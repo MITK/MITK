@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>455</width>
-    <height>974</height>
+    <height>1000</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -294,16 +294,6 @@
           </item>
          </widget>
         </item>
-        <item row="6" column="0">
-         <widget class="QLabel" name="titleLabel">
-          <property name="text">
-           <string>Title</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="1">
-         <widget class="QLineEdit" name="title"/>
-        </item>
        </layout>
       </item>
      </layout>
@@ -330,34 +320,37 @@
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
        <layout class="QFormLayout" name="formLayout_2">
-        <item row="0" column="0">
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="title"/>
+        </item>
+        <item row="1" column="0">
          <widget class="QLabel" name="label_3">
           <property name="text">
            <string>XAxis label</string>
           </property>
          </widget>
         </item>
-        <item row="0" column="1">
+        <item row="1" column="1">
          <widget class="QLineEdit" name="m_lineEditXAxisLabel"/>
         </item>
-        <item row="1" column="0">
+        <item row="2" column="0">
          <widget class="QLabel" name="label_4">
           <property name="text">
            <string>YAxis label</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
+        <item row="2" column="1">
          <widget class="QLineEdit" name="m_lineEditYAxisLabel"/>
         </item>
-        <item row="2" column="0">
+        <item row="3" column="0">
          <widget class="QLabel" name="label_9">
           <property name="text">
            <string>Y Axis scale</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
+        <item row="3" column="1">
          <widget class="QComboBox" name="m_comboBoxYAxisScale">
           <item>
            <property name="text">
@@ -371,7 +364,7 @@
           </item>
          </widget>
         </item>
-        <item row="3" column="0">
+        <item row="4" column="0">
          <widget class="QCheckBox" name="m_checkBoxShowLegend">
           <property name="text">
            <string>Show legend</string>
@@ -381,14 +374,14 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="0">
+        <item row="5" column="0">
          <widget class="QCheckBox" name="m_checkBoxStackedData">
           <property name="text">
            <string>Stacked data</string>
           </property>
          </widget>
         </item>
-        <item row="5" column="0">
+        <item row="6" column="0">
          <widget class="QCheckBox" name="m_checkBoxShowDataPoints">
           <property name="text">
            <string>Show data points</string>
@@ -398,10 +391,17 @@
           </property>
          </widget>
         </item>
-        <item row="6" column="0">
+        <item row="7" column="0">
          <widget class="QCheckBox" name="m_checkBoxShowSubchart">
           <property name="text">
            <string>Show Subchart</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="titleLabel">
+          <property name="text">
+           <string>Title</string>
           </property>
          </widget>
         </item>

@@ -566,7 +566,7 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
 
   // Apply in-plane upsampling for Gibbs ringing artifact
   double upsampling = 1;
-  if (m_Parameters.m_SignalGen.m_DoAddGibbsRinging)
+  if (m_Parameters.m_SignalGen.m_DoAddGibbsRinging && m_Parameters.m_SignalGen.m_ZeroRinging==0)
     upsampling = 2;
   m_WorkingSpacing = m_Parameters.m_SignalGen.m_ImageSpacing;
   m_WorkingSpacing[0] /= upsampling;
@@ -620,7 +620,7 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
     caster->SetInput(m_InputImage);
     caster->Update();
 
-    if (m_Parameters.m_SignalGen.m_DoAddGibbsRinging)
+    if (m_Parameters.m_SignalGen.m_DoAddGibbsRinging && m_Parameters.m_SignalGen.m_ZeroRinging==0)
     {
       PrintToLog("Upsampling input diffusion-weighted image for Gibbs ringing simulation.", false);
 
@@ -1292,7 +1292,12 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     if (m_Parameters.m_SignalGen.m_FrequencyMap.IsNotNull() && m_Parameters.m_Misc.m_DoAddDistortions)
       PrintToLog("Simulating distortions", false);
     if (m_Parameters.m_SignalGen.m_DoAddGibbsRinging)
-      PrintToLog("Simulating ringing artifacts", false);
+    {
+      if (m_Parameters.m_SignalGen.m_ZeroRinging > 0)
+        PrintToLog("Simulating ringing artifacts by zeroing " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_ZeroRinging) + "% of k-space frequencies", false);
+      else
+        PrintToLog("Simulating ringing artifacts by cropping high resolution inputs during k-space simulation", false);
+    }
     if (m_Parameters.m_Misc.m_DoAddEddyCurrents && m_Parameters.m_SignalGen.m_EddyStrength>0)
       PrintToLog("Simulating eddy currents: " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_EddyStrength), false);
     if (m_Parameters.m_Misc.m_DoAddSpikes && m_Parameters.m_SignalGen.m_Spikes>0)

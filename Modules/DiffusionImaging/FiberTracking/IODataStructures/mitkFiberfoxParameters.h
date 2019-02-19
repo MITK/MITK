@@ -88,6 +88,7 @@ namespace mitk
       , m_CroppingFactor(1)
       , m_Drift(0.06)
       , m_DoAddGibbsRinging(false)
+      , m_ZeroRinging(0)
       , m_DoSimulateRelaxation(true)
       , m_DoAddMotion(false)
       , m_DoRandomizeMotion(true)
@@ -139,6 +140,7 @@ namespace mitk
     float                               m_CroppingFactor;           ///< FOV size in y-direction is multiplied by this factor. Causes aliasing artifacts.
     float                               m_Drift;                    ///< Global signal decrease by the end of the acquisition.
     bool                                m_DoAddGibbsRinging;        ///< Add Gibbs ringing artifact
+    int                                 m_ZeroRinging;              ///< If > 0, ringing is simulated by by setting the defined percentage of higher frequencies to 0 in k-space. Otherwise, the input to the k-space simulation is generated with twice the resolution and cropped during k-space simulation (much slower).
     bool                                m_DoSimulateRelaxation;     ///< Add T2 relaxation effects
     bool                                m_DoAddMotion;              ///< Enable motion artifacts.
     bool                                m_DoRandomizeMotion;        ///< Toggles between random and linear motion.

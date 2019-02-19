@@ -337,6 +337,7 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_GeometryMessage->setVisible(false);
     m_Controls->m_AdvancedSignalOptionsFrame->setVisible(false);
     m_Controls->m_NoiseFrame->setVisible(false);
+    m_Controls->m_ZeroRinging->setVisible(false);
     m_Controls->m_GhostFrame->setVisible(false);
     m_Controls->m_DistortionsFrame->setVisible(false);
     m_Controls->m_EddyFrame->setVisible(false);
@@ -404,6 +405,7 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
     connect((QObject*) m_Controls->m_AddAliasing, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddAliasing(int)));
     connect((QObject*) m_Controls->m_AddMotion, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddMotion(int)));
     connect((QObject*) m_Controls->m_AddDrift, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddDrift(int)));
+    connect((QObject*) m_Controls->m_AddGibbsRinging, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddRinging(int)));
 
     connect((QObject*) m_Controls->m_Compartment1Box, SIGNAL(currentIndexChanged(int)), (QObject*) this, SLOT(Comp1ModelFrameVisibility(int)));
     connect((QObject*) m_Controls->m_Compartment2Box, SIGNAL(currentIndexChanged(int)), (QObject*) this, SLOT(Comp2ModelFrameVisibility(int)));
@@ -599,7 +601,7 @@ void QmitkFiberfoxView::UpdateParametersFromGui()
 
   // Drift
   m_Parameters.m_SignalGen.m_DoAddDrift = m_Controls->m_AddDrift->isChecked();
-  m_Parameters.m_SignalGen.m_Drift = m_Controls->m_DriftFactor->value()/100;
+  m_Parameters.m_SignalGen.m_Drift = static_cast<float>(m_Controls->m_DriftFactor->value())/100;
   if (m_Controls->m_AddDrift->isChecked())
   {
     m_Parameters.m_Misc.m_ArtifactModelString += "_DRIFT";
@@ -608,6 +610,7 @@ void QmitkFiberfoxView::UpdateParametersFromGui()
 
   // gibbs ringing
   m_Parameters.m_SignalGen.m_DoAddGibbsRinging = m_Controls->m_AddGibbsRinging->isChecked();
+  m_Parameters.m_SignalGen.m_ZeroRinging = m_Controls->m_ZeroRinging->value();
   if (m_Controls->m_AddGibbsRinging->isChecked())
   {
     m_Parameters.m_SignalGen.m_SimulateKspaceAcquisition = true;
@@ -1394,6 +1397,7 @@ void QmitkFiberfoxView::LoadParameters()
   m_Controls->m_SpikeScaleBox->setValue(m_Parameters.m_SignalGen.m_SpikeAmplitude);
   m_Controls->m_EddyGradientStrength->setValue(m_Parameters.m_SignalGen.m_EddyStrength);
   m_Controls->m_AddGibbsRinging->setChecked(m_Parameters.m_SignalGen.m_DoAddGibbsRinging);
+  m_Controls->m_ZeroRinging->setValue(m_Parameters.m_SignalGen.m_ZeroRinging);
   m_Controls->m_AddMotion->setChecked(m_Parameters.m_SignalGen.m_DoAddMotion);
   m_Controls->m_RandomMotion->setChecked(m_Parameters.m_SignalGen.m_DoRandomizeMotion);
   m_Controls->m_MotionVolumesBox->setText(QString(m_Parameters.m_Misc.m_MotionVolumesBox.c_str()));
@@ -1795,6 +1799,14 @@ void QmitkFiberfoxView::OnAddNoise(int value)
     m_Controls->m_NoiseFrame->setVisible(true);
   else
     m_Controls->m_NoiseFrame->setVisible(false);
+}
+
+void QmitkFiberfoxView::OnAddRinging(int value)
+{
+  if (value>0)
+    m_Controls->m_ZeroRinging->setVisible(true);
+  else
+    m_Controls->m_ZeroRinging->setVisible(false);
 }
 
 QmitkFiberfoxView::GradientListType QmitkFiberfoxView::GenerateHalfShell(int NPoints)

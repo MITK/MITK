@@ -129,6 +129,7 @@ protected slots:
     void OnAddAliasing(int value);
     void OnAddMotion(int value);
     void OnAddDrift(int value);
+    void OnAddRinging(int value);
     void OnMaskSelected(int value);
     void OnFibSelected(int value);
     void OnTemplateSelected(int value);

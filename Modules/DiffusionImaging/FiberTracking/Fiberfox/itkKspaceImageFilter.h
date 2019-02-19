@@ -131,6 +131,16 @@ namespace itk{
     AcquisitionType*                        m_ReadoutScheme;
 
     typename itk::Image< ScalarType, 2 >::Pointer m_MovedFmap;
+    int                                     ringing_lines_x;
+    int                                     ringing_lines_y;
+    float                                   kxMax;
+    float                                   kyMax;
+    float                                   xMax;
+    float                                   yMax;
+    float                                   yMaxFov;
+    float                                   yMaxFov_half;
+    float                                   numPix;
+    float                                   noiseVar;
 
   private:
 

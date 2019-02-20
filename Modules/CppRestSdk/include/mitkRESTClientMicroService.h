@@ -47,7 +47,7 @@ namespace mitk
     ~RESTClientMicroService();
 
    /**
-    * @brief Executes a HTTP GET request with the given uri and returns a task waiting for a json object
+    *@brief Executes a HTTP GET request with the given uri and returns a task waiting for a json object
     *
     * @param uri the URI resulting the target of the HTTP request
     * @return task with to wait for with resulting json object

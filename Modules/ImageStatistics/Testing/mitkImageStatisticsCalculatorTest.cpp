@@ -230,36 +230,36 @@ void mitkImageStatisticsCalculatorTestSuite::setUp()
   MITK_TEST_OUTPUT(<< "Loading test image '" << filename << "'")
 
   m_TestImage = mitk::IOUtil::Load<mitk::Image>(filename);
-  MITK_TEST_CONDITION_REQUIRED( m_TestImage.IsNotNull(), "Loaded an mitk::Image" );
+  CPPUNIT_ASSERT_MESSAGE("Failed loading an mitk::Image", m_TestImage.IsNotNull());
 
   m_Geometry = m_TestImage->GetSlicedGeometry()->GetPlaneGeometry(0);
-  MITK_TEST_CONDITION_REQUIRED( m_Geometry.IsNotNull(), "Getting image geometry" );
+  CPPUNIT_ASSERT_MESSAGE("Failed getting image geometry", m_Geometry.IsNotNull());
 
   m_Pic3DImage = mitk::IOUtil::Load<mitk::Image>(Pic3DFile);
-  MITK_TEST_CONDITION_REQUIRED( m_Pic3DImage.IsNotNull(), "Loaded Pic3D" );
+  CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D", m_Pic3DImage.IsNotNull());
   m_Pic3DImageMask = mitk::IOUtil::Load<mitk::Image>(Pic3DImageMaskFile);
-  MITK_TEST_CONDITION_REQUIRED( m_Pic3DImageMask.IsNotNull(), "Loaded Pic3D image mask" );
+  CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D image mask", m_Pic3DImageMask.IsNotNull());
   m_Pic3DImageMask2 = mitk::IOUtil::Load<mitk::Image>(Pic3DImageMaskFile2);
-  MITK_TEST_CONDITION_REQUIRED( m_Pic3DImageMask2.IsNotNull(), "Loaded Pic3D image secondary mask" );
+  CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D image secondary mask", m_Pic3DImageMask2.IsNotNull());
   m_Pic3DPlanarFigureAxial = mitk::IOUtil::Load<mitk::PlanarFigure>(Pic3DAxialPlanarFigureFile);
-  MITK_TEST_CONDITION_REQUIRED( m_Pic3DPlanarFigureAxial.IsNotNull(), "Loaded Pic3D axial planarFigure" );
+  CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D axial planarFigure", m_Pic3DPlanarFigureAxial.IsNotNull());
   m_Pic3DPlanarFigureSagittal = mitk::IOUtil::Load<mitk::PlanarFigure>(Pic3DSagittalPlanarFigureFile);
-  MITK_TEST_CONDITION_REQUIRED( m_Pic3DPlanarFigureSagittal.IsNotNull(), "Loaded Pic3D sagittal planarFigure" );
+  CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D sagittal planarFigure", m_Pic3DPlanarFigureSagittal.IsNotNull());
   m_Pic3DPlanarFigureCoronal = mitk::IOUtil::Load<mitk::PlanarFigure>(Pic3DCoronalPlanarFigureFile);
-  MITK_TEST_CONDITION_REQUIRED( m_Pic3DPlanarFigureCoronal.IsNotNull(), "Loaded Pic3D coronal planarFigure" );
+  CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D coronal planarFigure", m_Pic3DPlanarFigureCoronal.IsNotNull());
 
   m_US4DImage = mitk::IOUtil::Load<mitk::Image>(US4DFile);
-  MITK_TEST_CONDITION_REQUIRED( m_US4DImage.IsNotNull(), "Loaded US4D" );
+  CPPUNIT_ASSERT_MESSAGE("Failed loading US4D", m_US4DImage.IsNotNull());
   m_US4DImageMask = mitk::IOUtil::Load<mitk::Image>(US4DImageMaskFile);
-  MITK_TEST_CONDITION_REQUIRED( m_US4DImageMask.IsNotNull(), "Loaded US4D image mask" );
+  CPPUNIT_ASSERT_MESSAGE("Failed loading US4D image mask", m_US4DImageMask.IsNotNull());
   m_US4DImageMask2 = mitk::IOUtil::Load<mitk::Image>(US4DImageMaskFile2);
-  MITK_TEST_CONDITION_REQUIRED( m_US4DImageMask2.IsNotNull(), "Loaded US4D image mask2" );
+  CPPUNIT_ASSERT_MESSAGE("Failed loading US4D image mask2", m_US4DImageMask2.IsNotNull());
   m_US4DPlanarFigureAxial = mitk::IOUtil::Load<mitk::PlanarFigure>(US4DAxialPlanarFigureFile);
-  MITK_TEST_CONDITION_REQUIRED( m_US4DPlanarFigureAxial.IsNotNull(), "Loaded US4D axial planarFigure" );
+  CPPUNIT_ASSERT_MESSAGE("Failed loading US4D axial planarFigure", m_US4DPlanarFigureAxial.IsNotNull());
   m_US4DPlanarFigureSagittal = mitk::IOUtil::Load<mitk::PlanarFigure>(US4DSagittalPlanarFigureFile);
-  MITK_TEST_CONDITION_REQUIRED( m_US4DPlanarFigureSagittal.IsNotNull(), "Loaded US4D sagittal planarFigure" );
+  CPPUNIT_ASSERT_MESSAGE("Failed loading US4D sagittal planarFigure", m_US4DPlanarFigureSagittal.IsNotNull());
   m_US4DPlanarFigureCoronal = mitk::IOUtil::Load<mitk::PlanarFigure>(US4DCoronalPlanarFigureFile);
-  MITK_TEST_CONDITION_REQUIRED( m_US4DPlanarFigureCoronal.IsNotNull(), "Loaded US4D coronal planarFigure" );
+  CPPUNIT_ASSERT_MESSAGE("Failed loading US4D coronal planarFigure", m_US4DPlanarFigureCoronal.IsNotNull());
 
 }
 
@@ -587,8 +587,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestImageMaskingEmpty()
 
   auto statisticsContainer = ComputeStatistics( m_TestImage, mask_image );
   // test if no statisticsContainer for timestep 0 exists
-  MITK_TEST_CONDITION(!statisticsContainer->TimeStepExists(0), "No statistics for TimeStep 0 does exist.");
-  MITK_TEST_FOR_EXCEPTION(mitk::Exception, statisticsContainer->GetStatisticsForTimeStep(0));
+  CPPUNIT_ASSERT_MESSAGE("Statistics for TimeStep 0 exist.", !statisticsContainer->TimeStepExists(0));
+  CPPUNIT_ASSERT_THROW(statisticsContainer->GetStatisticsForTimeStep(0), mitk::Exception);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestImageMaskingNonEmpty()
@@ -667,8 +667,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestRecomputeOnModifiedMask()
   auto statisticsContainer = statisticsCalculator->GetStatistics();
 
   // test if no statisticsContainer for timestep 0 exists
-  MITK_TEST_CONDITION(!statisticsContainer->TimeStepExists(0), "No statistics for TimeStep 0 does exist.");
-  MITK_TEST_FOR_EXCEPTION(mitk::Exception, statisticsContainer->GetStatisticsForTimeStep(0));
+  CPPUNIT_ASSERT_MESSAGE("Statistics for TimeStep 0 exist.", !statisticsContainer->TimeStepExists(0));
+  CPPUNIT_ASSERT_THROW(statisticsContainer->GetStatisticsForTimeStep(0), mitk::Exception);
 
   // activate voxel in the mask image
   if (mask_image->GetDimension() == 3)
@@ -689,13 +689,13 @@ void mitkImageStatisticsCalculatorTestSuite::TestRecomputeOnModifiedMask()
 
   statisticsContainer = statisticsCalculator->GetStatistics();
 
-  MITK_TEST_CONDITION(statisticsContainer->TimeStepExists(0), "Statistics for TimeStep 0 does exist.");
+  CPPUNIT_ASSERT_MESSAGE("Statistics for TimeStep 0 does exist.", statisticsContainer->TimeStepExists(0));
   auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
 
   this->VerifyStatistics(statisticsObjectTimestep0, 128.0, 0.0, 128.0);
   auto numberOfVoxels = statisticsObjectTimestep0.GetValueConverted<mitk::ImageStatisticsContainer::VoxelCountType>(
     mitk::ImageStatisticsConstants::NUMBEROFVOXELS());
-  MITK_TEST_CONDITION(numberOfVoxels == 1, "Calculated mask voxel count '" << numberOfVoxels << "'  is equal to the desired value '" << 1 << "'" );
+  CPPUNIT_ASSERT_MESSAGE("Calculated mask voxel count is equal to the desired value 1", numberOfVoxels == 1);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestPic3DStatistics()
@@ -1735,23 +1735,17 @@ void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatist
   auto mean = stats.GetValueConverted<double>(mitk::ImageStatisticsConstants::MEAN());
   int tmpMean = mean * 100;
   double calculatedMean = tmpMean / 100.0;
-  MITK_TEST_CONDITION( calculatedMean == testMean,
-                       "Calculated mean grayvalue '" << calculatedMean <<
-                       "'  is equal to the desired value '" << testMean << "'" );
+  CPPUNIT_ASSERT_MESSAGE("Calculated mean grayvalue is not equal to the desired value.", calculatedMean == testMean);
 
   auto standardDeviation = stats.GetValueConverted<double>(mitk::ImageStatisticsConstants::STANDARDDEVIATION());
   int tmpSD = standardDeviation * 100;
   double calculatedSD = tmpSD / 100.0;
-  MITK_TEST_CONDITION( calculatedSD == testSD,
-                       "Calculated grayvalue sd '" << calculatedSD <<
-                       "'  is equal to the desired value '" << testSD <<"'" );
+  CPPUNIT_ASSERT_MESSAGE("Calculated grayvalue sd is not equal to the desired value.", calculatedSD == testSD);
 
   auto median = stats.GetValueConverted<double>(mitk::ImageStatisticsConstants::MEDIAN());
   int tmpMedian = median * 100;
   double calculatedMedian = tmpMedian / 100.0;
-  MITK_TEST_CONDITION( testMedian == calculatedMedian,
-                       "Calculated median grayvalue '" << calculatedMedian <<
-                       "' is equal to the desired value '" << testMedian << "'");
+  CPPUNIT_ASSERT_MESSAGE("Calculated median grayvalue is not equal to the desired value.", testMedian == calculatedMedian);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatisticsContainer::StatisticsObject stats,
@@ -1788,33 +1782,32 @@ void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatist
   auto entropyObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::ENTROPY());
   auto minIndexObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::IndexType>(mitk::ImageStatisticsConstants::MINIMUMPOSITION());
   auto maxIndexObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::IndexType>(mitk::ImageStatisticsConstants::MAXIMUMPOSITION());
-
-    MITK_TEST_CONDITION(numberOfVoxelsObject - N == 0, "calculated N: " << numberOfVoxelsObject << " expected N: " << N);
-    MITK_TEST_CONDITION(std::abs(meanObject - mean) < mitk::eps, "calculated mean: " << meanObject << " expected mean: " << mean);
-    // in one test case MPP is None because the roi has no positive pixels
-    if (!std::isnan(mppObject))
-    {
-        MITK_TEST_CONDITION(std::abs(mppObject - MPP) < mitk::eps, "calculated MPP: " << mppObject << " expected MPP: " << MPP);
-    }
-    MITK_TEST_CONDITION(std::abs(medianObject - median) < mitk::eps, "calculated median: " << medianObject << " expected median: " << median);
-    MITK_TEST_CONDITION(std::abs(skewnessObject - skewness) < mitk::eps, "calculated skewness: " << skewnessObject << " expected skewness: " << skewness);
-    MITK_TEST_CONDITION(std::abs(kurtosisObject - kurtosis) < mitk::eps, "calculated kurtosis: " << kurtosisObject << " expected kurtosis: " << kurtosis);
-    MITK_TEST_CONDITION(std::abs(uniformityObject - uniformity) < mitk::eps, "calculated uniformity: " << uniformityObject << " expected uniformity: " << uniformity);
-    MITK_TEST_CONDITION(std::abs(uppObject - UPP) < mitk::eps, "calculated UPP: " << uppObject << " expected UPP: " << UPP);
-    MITK_TEST_CONDITION(std::abs(varianceObject - variance) < mitk::eps, "calculated variance: " << varianceObject << " expected variance: " << variance);
-    MITK_TEST_CONDITION(std::abs(standardDeviationObject - stdev) < mitk::eps, "calculated stdev: " << standardDeviationObject << " expected stdev: " << stdev);
-    MITK_TEST_CONDITION(std::abs(minObject - min) < mitk::eps, "calculated min: " << minObject << " expected min: " << min);
-    MITK_TEST_CONDITION(std::abs(maxObject - max) < mitk::eps, "calculated max: " << maxObject << " expected max: " << max);
-    MITK_TEST_CONDITION(std::abs(rmsObject - RMS) < mitk::eps, "calculated RMS: " << rmsObject << " expected RMS: " << RMS);
-    MITK_TEST_CONDITION(std::abs(entropyObject - entropy) < mitk::eps, "calculated entropy: " << entropyObject << " expected entropy: " << entropy);
-    for (unsigned int i = 0; i < minIndex.size(); ++i)
-    {
-        MITK_TEST_CONDITION(std::abs(minIndexObject[i] - minIndex[i]) < mitk::eps, "minIndex [" << i << "] = " << minIndexObject[i] << " expected: " << minIndex[i]);
-    }
-    for (unsigned int i = 0; i < maxIndex.size(); ++i)
-    {
-        MITK_TEST_CONDITION(std::abs(maxIndexObject[i] - maxIndex[i]) < mitk::eps, "maxIndex [" << i << "] = " << maxIndexObject[i] << " expected: " << maxIndex[i]);
-    }
+  CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", numberOfVoxelsObject - N == 0);
+  CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(meanObject - mean) < mitk::eps);
+  // in one test case MPP is None because the roi has no positive pixels
+  if (!std::isnan(mppObject))
+  {
+      CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(mppObject - MPP) < mitk::eps);
+  }
+  CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(medianObject - median) < mitk::eps);
+  CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(skewnessObject - skewness) < mitk::eps);
+  CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(kurtosisObject - kurtosis) < mitk::eps);
+  CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(uniformityObject - uniformity) < mitk::eps);
+  CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(uppObject - UPP) < mitk::eps);
+  CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(varianceObject - variance) < mitk::eps);
+  CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(standardDeviationObject - stdev) < mitk::eps);
+  CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(minObject - min) < mitk::eps);
+  CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(maxObject - max) < mitk::eps);
+  CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(rmsObject - RMS) < mitk::eps);
+  CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(entropyObject - entropy) < mitk::eps);
+  for (unsigned int i = 0; i < minIndex.size(); ++i)
+  {
+      CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(minIndexObject[i] - minIndex[i]) < mitk::eps);
+  }
+  for (unsigned int i = 0; i < maxIndex.size(); ++i)
+  {
+      CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(maxIndexObject[i] - maxIndex[i]) < mitk::eps);
+  }
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestUninitializedImage()
@@ -1823,14 +1816,13 @@ void mitkImageStatisticsCalculatorTestSuite::TestUninitializedImage()
   * loading uninitialized image to datastorage
   ******************************/
   MITK_INFO << std::endl << "Test uninitialized image: -----------------------------------------------------------------------------------";
-  MITK_TEST_FOR_EXCEPTION_BEGIN(mitk::Exception)
+  CPPUNIT_ASSERT_THROW(
   mitk::Image::Pointer image = mitk::Image::New();
   mitk::DataNode::Pointer node = mitk::DataNode::New();
   node->SetData(image);
 
   mitk::ImageStatisticsCalculator::Pointer is = mitk::ImageStatisticsCalculator::New();
-  is->GetStatistics();
-  MITK_TEST_FOR_EXCEPTION_END(mitk::Exception)
+  is->GetStatistics(), mitk::Exception);
 }
 
 MITK_TEST_SUITE_REGISTRATION(mitkImageStatisticsCalculator)

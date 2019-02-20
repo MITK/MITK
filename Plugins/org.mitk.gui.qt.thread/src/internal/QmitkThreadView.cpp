@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QThread>
 
 #include <ui_QmitkThreadView.h>
-#include <mitkCppRestSdk.h>
 #include <mitkIRESTManager.h>
 #include <usModule.h>
 #include <usServiceTracker.h>
@@ -31,7 +30,6 @@ const std::string QmitkThreadView::VIEW_ID = "org.mitk.views.threadview";
 QmitkThreadView::QmitkThreadView()
   : m_Ui(new Ui::QmitkThreadView)
 {
-  mitk::ForceLinkage();
 }
 
 web::json::value QmitkThreadView::Notify(web::json::value data)

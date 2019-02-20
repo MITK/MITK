@@ -14,22 +14,37 @@ pplx::task<web::json::value> mitk::RESTClientMicroService::Get(web::uri uri)
             << mitk::RESTUtil::convertToUtf8(uri.authority().to_string());
 
   MitkRequest getRequest(MitkRESTMethods::GET);
-  // getRequest.set_request_uri(uri);
 
   return client->request(getRequest).then([=](pplx::task<MitkResponse> responseTask) {
-    MitkResponse response = responseTask.get();
-    auto status = response.status_code();
-    MITK_INFO << " status: " << status;
-
-    if (status != MitkRestStatusCodes::OK)
+    try
     {
-      mitkThrow() << "response was not OK";
-    }
+      MitkResponse response = responseTask.get();
+      auto status = response.status_code();
+      MITK_INFO << " status: " << status;
 
-    return response.extract_json().get();
+      if (status != MitkRestStatusCodes::OK)
+      {
+        mitkThrow() << "response was not OK";
+      }
+      try
+      {
+        utility::string_t requestContentType = response.headers().content_type();
+        if (requestContentType != L"application/json")
+        {
+          response.headers().set_content_type(L"application/json");
+        }
+        return response.extract_json().get();
+      }
+      catch (...)
+      {
+        mitkThrow() << "extracting json went wrong";
+      }
+    }
+    catch (...)
+    {
+      mitkThrow() << "getting response went wrong";
+    }
   });
-  // answer.wait();
-  // return answer.get();
 }
 
 pplx::task<web::json::value> mitk::RESTClientMicroService::PUT(web::uri uri, web::json::value content)
@@ -51,10 +66,23 @@ pplx::task<web::json::value> mitk::RESTClientMicroService::PUT(web::uri uri, web
         mitkThrow() << "response was not OK";
       }
 
-      return response.extract_json().get();
+      try
+      {
+        utility::string_t requestContentType = response.headers().content_type();
+        if (requestContentType != L"application/json")
+        {
+          response.headers().set_content_type(L"application/json");
+        }
+        return response.extract_json().get();
+      }
+      catch (...)
+      {
+        mitkThrow() << "extracting json went wrong";
+      }
     }
     catch (...)
     {
+      mitkThrow() << "getting response went wrong";
     }
   });
 }
@@ -72,15 +100,34 @@ pplx::task<web::json::value> mitk::RESTClientMicroService::POST(web::uri uri, we
   }
 
   return client->request(postRequest).then([=](pplx::task<MitkResponse> responseTask) {
-    MitkResponse response = responseTask.get();
-    auto status = response.status_code();
-    MITK_INFO << " status: " << status;
-
-    if (status != MitkRestStatusCodes::Created)
+    try
     {
-      mitkThrow() << "response was not Created";
-    }
+      MitkResponse response = responseTask.get();
+      auto status = response.status_code();
+      MITK_INFO << " status: " << status;
 
-    return response.extract_json().get();
+      if (status != MitkRestStatusCodes::Created)
+      {
+        mitkThrow() << "response was not Created";
+      }
+
+      try
+      {
+        utility::string_t requestContentType = response.headers().content_type();
+        if (requestContentType != L"application/json")
+        {
+          response.headers().set_content_type(L"application/json");
+        }
+        return response.extract_json().get();
+      }
+      catch (...)
+      {
+        mitkThrow() << "extracting json went wrong";
+      }
+    }
+    catch(...)
+    {
+      mitkThrow() << "getting response went wrong";
+    }
   });
 }

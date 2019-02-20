@@ -48,7 +48,8 @@ signals:
   void UpdateProgressBar();
   void UpdateLabel(QString);
 private slots:
-  void OnGetButtonClicked();
+  void OnGetMultipleButtonClicked();
+  void OnGetSingleButtonClicked();
   void OnPutButtonClicked();
   void OnPostButtonClicked();
   void OnUpdateProgressBar();

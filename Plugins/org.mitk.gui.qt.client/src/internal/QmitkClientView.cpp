@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QThread>
 
 #include "cpprest/json.h"
-#include <mitkCppRestSdk.h>
 #include <mitkIRESTManager.h>
 #include <ui_QmitkClientView.h>
 #include <usGetModuleContext.h>
@@ -31,7 +30,6 @@ const std::string QmitkClientView::VIEW_ID = "org.mitk.views.clientview";
 
 QmitkClientView::QmitkClientView() : m_Ui(new Ui::QmitkClientView)
 {
-  mitk::ForceLinkage();
 }
 
 QmitkClientView::~QmitkClientView()
@@ -43,7 +41,8 @@ void QmitkClientView::CreateQtPartControl(QWidget *parent)
 {
   m_Ui->setupUi(parent);
 
-  connect(m_Ui->getPushButton, &QPushButton::clicked, this, &QmitkClientView::OnGetButtonClicked);
+  connect(m_Ui->getMultiplePushButton, &QPushButton::clicked, this, &QmitkClientView::OnGetMultipleButtonClicked);
+  connect(m_Ui->getSinglePushButton, &QPushButton::clicked, this, &QmitkClientView::OnGetSingleButtonClicked);
   connect(m_Ui->putPushButton, &QPushButton::clicked, this, &QmitkClientView::OnPutButtonClicked);
   connect(m_Ui->postPushButton, &QPushButton::clicked, this, &QmitkClientView::OnPostButtonClicked);
   connect(this, &QmitkClientView::UpdateProgressBar, this, &QmitkClientView::OnUpdateProgressBar);
@@ -63,10 +62,10 @@ void QmitkClientView::OnUpdateLabel(QString text)
 
 void QmitkClientView::SetFocus() {}
 
-void QmitkClientView::OnGetButtonClicked()
+void QmitkClientView::OnGetMultipleButtonClicked()
 {
   m_Ui->progressBar->setValue(0);
-  m_Ui->getPushButton->setDisabled(true);
+  m_Ui->getMultiplePushButton->setDisabled(true);
   us::ModuleContext *context = us::ModuleRegistry::GetModule(1)->GetModuleContext();
 
   auto managerRef = context->GetServiceReference<mitk::IRESTManager>();
@@ -78,7 +77,7 @@ void QmitkClientView::OnGetButtonClicked()
       std::vector<pplx::task<void>> tasks;
       for (int i = 0; i < 20; i++)
       {
-        pplx::task<void> singleTask = managerService->SendRequest(L"https://jsonplaceholder.typicode.com/photos")
+        pplx::task<void> singleTask = managerService->SendRequest(L"http://193.174.48.78:8090/dcm4chee-arc/aets/DCM4CHEE/rs/studies/1.2.840.113654.2.70.1.97144850941324808603541273584489321943/series/1.2.840.113654.2.70.1.15771179684190906938515254678965278540/instances")
             .then([=](pplx::task<web::json::value> resultTask) {
           try
           {
@@ -109,7 +108,40 @@ void QmitkClientView::OnGetButtonClicked()
       m_Ui->responseLabel->setText("Waiting for change");
     }
   }
-  m_Ui->getPushButton->setEnabled(true);
+  m_Ui->getMultiplePushButton->setEnabled(true);
+}
+
+void QmitkClientView::OnGetSingleButtonClicked() 
+{
+  m_Ui->putPushButton->setDisabled(true);
+  us::ModuleContext *context = us::ModuleRegistry::GetModule(1)->GetModuleContext();
+
+  auto managerRef = context->GetServiceReference<mitk::IRESTManager>();
+  if (managerRef)
+  {
+    auto managerService = context->GetService(managerRef);
+    if (managerService)
+    {
+      managerService
+        ->SendRequest(L"http://193.174.48.78:8090/dcm4chee-arc/aets/DCM4CHEE/rs/studies/1.2.840.113654.2.70.1.97144850941324808603541273584489321943/series/1.2.840.113654.2.70.1.15771179684190906938515254678965278540/instances")
+        .then([=](pplx::task<web::json::value> resultTask) {
+          try
+          {
+            web::json::value result = resultTask.get();
+            utility::string_t stringT = result.to_string();
+            std::string stringStd(stringT.begin(), stringT.end());
+            QString stringQ = QString::fromStdString(stringStd);
+            emit UpdateLabel(stringQ);
+          }
+          catch (const mitk::Exception &exception)
+          {
+            MITK_ERROR << exception.what();
+            return;
+          }
+        });
+    }
+  }
+  m_Ui->putPushButton->setEnabled(true);
 }
 
 void QmitkClientView::OnPutButtonClicked()

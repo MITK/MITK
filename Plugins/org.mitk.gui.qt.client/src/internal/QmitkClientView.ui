@@ -18,9 +18,16 @@
     <widget class="QLineEdit" name="uriLineEdit"/>
    </item>
    <item>
-    <widget class="QPushButton" name="getPushButton">
+    <widget class="QPushButton" name="getSinglePushButton">
      <property name="text">
-      <string>GET</string>
+      <string>GET (single tasks)</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="getMultiplePushButton">
+     <property name="text">
+      <string>GET (multiple tasks)</string>
      </property>
     </widget>
    </item>

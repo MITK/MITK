@@ -75,7 +75,7 @@ namespace itk{
 
     itkSetMacro( SpikesPerSlice, unsigned int )     ///< Number of spikes per slice. Corresponding parameter in fiberfox parameter object specifies the number of spikes for the whole image and can thus not be used here.
     itkSetMacro( Z, double )                        ///< Slice position, necessary for eddy current simulation.
-    itkSetMacro( UseConstantRandSeed, bool )        ///< Use constant seed for random generator for reproducible results. ONLY USE FOR TESTING PURPOSES!
+    itkSetMacro( RandSeed, int )                  ///< Use constant seed for random generator for reproducible results.
     itkSetMacro( Translation, VectorType )
     itkSetMacro( RotationMatrix, MatrixType )
     itkSetMacro( Zidx, int )
@@ -109,7 +109,8 @@ namespace itk{
     itk::Vector<double,3>                   m_DiffusionGradientDirection;
     float                                   m_Z;
     int                                     m_Zidx;
-    bool                                    m_UseConstantRandSeed;
+    int                                     m_RandSeed;
+    itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
     unsigned int                            m_SpikesPerSlice;
     FiberBundle::Pointer                    m_FiberBundle;
     float                                   m_Gamma;
@@ -140,7 +141,6 @@ namespace itk{
     float                                   yMaxFov;
     float                                   yMaxFov_half;
     float                                   numPix;
-    float                                   noiseVar;
 
   private:
 

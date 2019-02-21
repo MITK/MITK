@@ -125,7 +125,7 @@ namespace mitk
     bool                                m_ReversePhase;             ///< If true, the phase readout direction will be inverted (-y instead of y)
     float                               m_PartialFourier;           ///< Partial fourier factor (0.5-1)
     float                               m_NoiseVariance;            ///< Variance of complex gaussian noise
-    int                                 m_NumberOfCoils;            ///< Number of coils in multi-coil acquisition
+    unsigned int                        m_NumberOfCoils;            ///< Number of coils in multi-coil acquisition
     CoilSensitivityProfile              m_CoilSensitivityProfile;   ///< Choose between constant, linear or exponential sensitivity profile of the used coils
     bool                                m_SimulateKspaceAcquisition;///< Flag to enable/disable k-space acquisition simulation
     double                              m_AxonRadius;               ///< Determines compartment volume fractions (0 == automatic axon radius estimation)

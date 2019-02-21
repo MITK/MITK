@@ -36,7 +36,7 @@ namespace itk {
   template< class ScalarType >
   KspaceImageFilter< ScalarType >::KspaceImageFilter()
     : m_Z(0)
-    , m_UseConstantRandSeed(false)
+    , m_RandSeed(-1)
     , m_SpikesPerSlice(0)
     , m_IsBaseline(true)
   {
@@ -54,6 +54,29 @@ namespace itk {
     m_TransY = -m_Translation[1];
     m_TransZ = -m_Translation[2];
 
+    kxMax = m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(0);
+    kyMax = m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(1);
+    xMax = m_CompartmentImages.at(0)->GetLargestPossibleRegion().GetSize(0); // scanner coverage in x-direction
+    yMax = m_CompartmentImages.at(0)->GetLargestPossibleRegion().GetSize(1); // scanner coverage in y-direction
+    yMaxFov = yMax;
+    if (m_Parameters->m_Misc.m_DoAddAliasing)
+        yMaxFov *= m_Parameters->m_SignalGen.m_CroppingFactor;               // actual FOV in y-direction (in x-direction FOV=xMax)
+    yMaxFov_half = yMaxFov/2;
+    numPix = kxMax*kyMax;
+
+    float ringing_factor = static_cast<float>(m_Parameters->m_SignalGen.m_ZeroRinging)/100.0;
+    ringing_lines_x = static_cast<int>(ceil(kxMax/2 * ringing_factor));
+    ringing_lines_y = static_cast<int>(ceil(kyMax/2 * ringing_factor));
+
+    // Adjust noise variance since it is the intended variance in physical space and not in k-space:
+    float noiseVar = m_Parameters->m_SignalGen.m_PartialFourier*m_Parameters->m_SignalGen.m_NoiseVariance/(kyMax*kxMax);
+
+    m_RandGen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
+    if (m_RandSeed>=0)  // always generate the same random numbers?
+      m_RandGen->SetSeed(m_RandSeed);
+    else
+      m_RandGen->SetSeed();
+
     typename OutputImageType::Pointer outputImage = OutputImageType::New();
     itk::ImageRegion<2> region;
     region.SetSize(0, m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(0));
@@ -62,7 +85,17 @@ namespace itk {
     outputImage->SetBufferedRegion( region );
     outputImage->SetRequestedRegion( region );
     outputImage->Allocate();
-    outputImage->FillBuffer(m_Spike);
+    vcl_complex<ScalarType> zero = vcl_complex<ScalarType>(0, 0);
+    outputImage->FillBuffer(zero);
+    if (m_Parameters->m_SignalGen.m_NoiseVariance>0 && m_Parameters->m_Misc.m_DoAddNoise)
+    {
+      ImageRegionIterator< OutputImageType > oit(outputImage, outputImage->GetLargestPossibleRegion());
+      while( !oit.IsAtEnd() )
+      {
+        oit.Set(vcl_complex<ScalarType>(m_RandGen->GetNormalVariate(0, noiseVar), m_RandGen->GetNormalVariate(0, noiseVar)));
+        ++oit;
+      }
+    }
 
     m_KSpaceImage = InputImageType::New();
     m_KSpaceImage->SetLargestPossibleRegion( region );
@@ -152,23 +185,6 @@ namespace itk {
         ++it;
       }
     }
-
-    kxMax = m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(0);
-    kyMax = m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(1);
-    xMax = m_CompartmentImages.at(0)->GetLargestPossibleRegion().GetSize(0); // scanner coverage in x-direction
-    yMax = m_CompartmentImages.at(0)->GetLargestPossibleRegion().GetSize(1); // scanner coverage in y-direction
-    yMaxFov = yMax;
-    if (m_Parameters->m_Misc.m_DoAddAliasing)
-        yMaxFov *= m_Parameters->m_SignalGen.m_CroppingFactor;               // actual FOV in y-direction (in x-direction FOV=xMax)
-    yMaxFov_half = yMaxFov/2;
-    numPix = kxMax*kyMax;
-
-    float ringing_factor = static_cast<float>(m_Parameters->m_SignalGen.m_ZeroRinging)/100.0;
-    ringing_lines_x = static_cast<int>(ceil(kxMax/2 * ringing_factor));
-    ringing_lines_y = static_cast<int>(ceil(kyMax/2 * ringing_factor));
-
-    // Adjust noise variance since it is the intended variance in physical space and not in k-space:
-    noiseVar = m_Parameters->m_SignalGen.m_PartialFourier*m_Parameters->m_SignalGen.m_NoiseVariance/(kyMax*kxMax);
   }
 
   template< class ScalarType >
@@ -204,25 +220,15 @@ namespace itk {
 
   template< class ScalarType >
   void KspaceImageFilter< ScalarType >
-  ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, ThreadIdType)
+  ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, ThreadIdType )
   {
-    itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
-    randGen->SetSeed();
-    if (m_UseConstantRandSeed)  // always generate the same random numbers?
-    {
-      randGen->SetSeed(0);
-    }
-    else
-    {
-      randGen->SetSeed();
-    }
-
     typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
 
     ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
 
     typedef ImageRegionConstIterator< InputImageType > InputIteratorType;
 
+    vcl_complex<ScalarType> zero = vcl_complex<ScalarType>(0, 0);
     while( !oit.IsAtEnd() )
     {
       typename OutputImageType::IndexType out_idx = oit.GetIndex();
@@ -233,6 +239,7 @@ namespace itk {
       // partial fourier
       if (kIdx[1]>kyMax*m_Parameters->m_SignalGen.m_PartialFourier)
       {
+        outputImage->SetPixel(kIdx, zero);
         ++oit;
         continue;
       }
@@ -243,8 +250,7 @@ namespace itk {
         if (kIdx[0] < ringing_lines_x || kIdx[1] < ringing_lines_y ||
             kIdx[0] >= kxMax - ringing_lines_x || kIdx[1] >= kyMax - ringing_lines_y)
         {
-          vcl_complex<ScalarType> zero = vcl_complex<ScalarType>(0, 0);
-          oit.Set(zero);
+          outputImage->SetPixel(kIdx, zero);
           ++oit;
           continue;
         }
@@ -378,9 +384,7 @@ namespace itk {
       if (m_SpikesPerSlice>0 && sqrt(s.imag()*s.imag()+s.real()*s.real()) > sqrt(m_Spike.imag()*m_Spike.imag()+m_Spike.real()*m_Spike.real()) )
         m_Spike = s;
 
-      if (m_Parameters->m_SignalGen.m_NoiseVariance>0 && m_Parameters->m_Misc.m_DoAddNoise)
-        s = vcl_complex<ScalarType>(s.real()+randGen->GetNormalVariate(0,noiseVar), s.imag()+randGen->GetNormalVariate(0,noiseVar));
-
+      s += outputImage->GetPixel(kIdx); // add precalculated noise
       outputImage->SetPixel(kIdx, s);
       m_KSpaceImage->SetPixel(kIdx, sqrt(s.imag()*s.imag()+s.real()*s.real()) );
 
@@ -430,19 +434,12 @@ namespace itk {
       ++oit;
     }
 
-    itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
-    randGen->SetSeed();
-    if (m_UseConstantRandSeed)  // always generate the same random numbers?
-      randGen->SetSeed(0);
-    else
-      randGen->SetSeed();
-
     m_Spike *=  m_Parameters->m_SignalGen.m_SpikeAmplitude;
     itk::Index< 2 > spikeIdx;
     for (unsigned int i=0; i<m_SpikesPerSlice; i++)
     {
-      spikeIdx[0] = randGen->GetIntegerVariate()%kxMax;
-      spikeIdx[1] = randGen->GetIntegerVariate()%kyMax;
+      spikeIdx[0] = m_RandGen->GetIntegerVariate()%kxMax;
+      spikeIdx[1] = m_RandGen->GetIntegerVariate()%kyMax;
       outputImage->SetPixel(spikeIdx, m_Spike);
       m_SpikeLog += "[" + boost::lexical_cast<std::string>(spikeIdx[0]) + "," + boost::lexical_cast<std::string>(spikeIdx[1]) + "," + boost::lexical_cast<std::string>(m_Zidx) + "] Magnitude: " + boost::lexical_cast<std::string>(m_Spike.real()) + "+" + boost::lexical_cast<std::string>(m_Spike.imag()) + "i\n";
     }

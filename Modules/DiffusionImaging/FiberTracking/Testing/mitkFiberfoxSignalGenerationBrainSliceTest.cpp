@@ -42,9 +42,10 @@ class mitkFiberfoxSignalGenerationBrainSliceTestSuite : public mitk::TestFixture
 {
 
   CPPUNIT_TEST_SUITE(mitkFiberfoxSignalGenerationBrainSliceTestSuite);
-  MITK_TEST(Test0);
   MITK_TEST(Test1);
   MITK_TEST(Test2);
+  MITK_TEST(Test3);
+  MITK_TEST(Test4);
   CPPUNIT_TEST_SUITE_END();
 
   typedef itk::VectorImage< short, 3>   ItkDwiType;
@@ -61,6 +62,7 @@ public:
 
   void setUp() override
   {
+    m_RefImages.clear();
     m_FiberBundle = mitk::IOUtil::Load<FiberBundle>(GetTestDataFilePath("DiffusionImaging/Fiberfox/SignalGen_BrainSlice.fib"));
     m_Template = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/Fiberfox/SignalGen_BrainSliceTemplate.nii.gz"));
 
@@ -86,6 +88,14 @@ public:
       adjust_to_template(parameters);
       m_Parameters.push_back(parameters);
       m_RefImages.push_back(mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/Fiberfox/params/BrainSlice_3_OUT.nii.gz")));
+    }
+
+    {
+      FiberfoxParameters parameters;
+      parameters.LoadParameters(GetTestDataFilePath("DiffusionImaging/Fiberfox/params/BrainSlice_4.ffp"), true);
+      adjust_to_template(parameters);
+      m_Parameters.push_back(parameters);
+      m_RefImages.push_back(mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/Fiberfox/params/BrainSlice_4_OUT.nii.gz")));
     }
   }
 
@@ -171,27 +181,33 @@ public:
         bool cond = CompareDwi(itkTestImagePointer, itkRefImagePointer);
         if (!cond)
         {
-          MITK_INFO << "Saving test image to " << mitk::IOUtil::GetTempPath();
-          mitk::IOUtil::Save(testImage, mitk::IOUtil::GetTempPath()+out);
+          MITK_INFO << "Saving test image to " << mitk::IOUtil::GetTempPath()+out;
+          mitk::IOUtil::Save(testImage, "DWI_NIFTI", mitk::IOUtil::GetTempPath()+out);
+          mitk::IOUtil::Save(refImage, "DWI_NIFTI", mitk::IOUtil::GetTempPath()+ "REF_" + out);
         }
         CPPUNIT_ASSERT_MESSAGE("Simulated images should be equal", cond);
       }
     }
   }
 
-  void Test0()
+  void Test1()
   {
     StartSimulation(m_Parameters.at(0), m_RefImages.at(0), "BrainSlice_1_OUT.dwi");
   }
 
-  void Test1()
+  void Test2()
   {
     StartSimulation(m_Parameters.at(1), m_RefImages.at(1), "BrainSlice_2_OUT.dwi");
   }
 
-  void Test2()
+  void Test3()
   {
     StartSimulation(m_Parameters.at(2), m_RefImages.at(2), "BrainSlice_3_OUT.dwi");
+  }
+
+  void Test4()
+  {
+    StartSimulation(m_Parameters.at(3), m_RefImages.at(3), "BrainSlice_4_OUT.dwi");
   }
 
 };

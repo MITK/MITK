@@ -122,7 +122,6 @@ InputParameters parseInput(int argc, char* argv[])
 
 void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSettings::Pointer *bfSet, CropSettings cropSet, BModeSettings bmodeSet, ProcessSettings processSet)
 {
-  xmlFile = "D:/TestEnv/Settings.xml";
   MITK_INFO << "Loading configuration File \"" << xmlFile << "\"";
   TiXmlDocument doc(xmlFile);
   if (!doc.LoadFile())

@@ -112,14 +112,21 @@ InputParameters parseInput(int argc, char* argv[])
   else
     mitkThrow() << "No output image path given..";
 
+  if (parsedArgs.count("settings"))
+    input.settingsFile = us::any_cast<std::string>(parsedArgs["settings"]);
+  else
+    mitkThrow() << "No settings image path given..";
+
   return input;
 }
 
 void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSettings::Pointer *bfSet, CropSettings cropSet, BModeSettings bmodeSet, ProcessSettings processSet)
 {
+  xmlFile = "D:/TestEnv/Settings.xml";
+  MITK_INFO << "Loading configuration File \"" << xmlFile << "\"";
   TiXmlDocument doc(xmlFile);
   if (!doc.LoadFile())
-    mitkThrow() << "Failed to load settings file " << xmlFile << "succeeded";
+    mitkThrow() << "Failed to load settings file \"" << xmlFile << "\" Error: " << doc.ErrorDesc();
 
   TiXmlElement* root = doc.FirstChildElement();
   if (root == NULL)
@@ -134,7 +141,6 @@ void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSetti
     {
       float PitchInMeters = std::stof(elem->Attribute("pitchInMeters"));
       float SpeedOfSound = std::stof(elem->Attribute("speedOfSound"));
-      float TimeSpacing = std::stof(elem->Attribute("timeSpacing"));
       float Angle = std::stof(elem->Attribute("angle"));
       bool IsPhotoacousticImage = std::stoi(elem->Attribute("isPhotoacousticImage"));
       unsigned int SamplesPerLine = std::stoi(elem->Attribute("samplesPerLine"));
@@ -200,12 +206,13 @@ void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSetti
     }
     if (elemName == "BMode")
     {
-      if (elem->Attribute("method") == "EnvelopeDetection")
+      std::string methodStr = elem->Attribute("method");
+      if (methodStr == "EnvelopeDetection")
         bmodeSet.method = mitk::PhotoacousticFilterService::BModeMethod::EnvelopeDetection;
       else if (elem->Attribute("method") == "Abs")
         bmodeSet.method = mitk::PhotoacousticFilterService::BModeMethod::Abs;
       else
-        mitkThrow() << "Beamforming method incorrectly set in configuration file";
+        mitkThrow() << "BMode method incorrectly set in configuration file";
       bmodeSet.UseLogFilter = (bool)std::stoi(elem->Attribute("useLogFilter"));
       processSet.DoBmode = std::stoi(elem->Attribute("do"));
     }
@@ -221,7 +228,18 @@ int main(int argc, char * argv[])
   CropSettings cropSettings{ 0,0,0,0,0,0 };
   ProcessSettings processSettings{ true, false, false };
 
-  ParseXML(input.settingsFile, input, &bfSettings, cropSettings, bmodeSettings, processSettings);
+  MITK_INFO << "Parsing settings XML...";
+  try
+  {
+    ParseXML(input.settingsFile, input, &bfSettings, cropSettings, bmodeSettings, processSettings);
+  }
+  catch (mitk::Exception e)
+  {
+    MITK_INFO << e;
+    return -1;
+  }
+
+  MITK_INFO << "Parsing settings XML...[Done]";
 
   MITK_INFO(input.verbose) << "Beamforming input image...";
   mitk::Image::Pointer inputImage = input.inputImage;

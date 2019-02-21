@@ -55,6 +55,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/algorithm/string/replace.hpp>
 #include <omp.h>
 #include <cmath>
+#include <thread>
 
 namespace itk
 {
@@ -65,7 +66,6 @@ TractsToDWIImageFilter< PixelType >::TractsToDWIImageFilter()
   , m_UseConstantRandSeed(false)
   , m_RandGen(itk::Statistics::MersenneTwisterRandomVariateGenerator::New())
 {
-  m_RandGen->SetSeed();
   m_DoubleInterpolator = itk::LinearInterpolateImageFunction< ItkDoubleImgType, float >::New();
   m_NullDir.Fill(0);
 }
@@ -123,11 +123,6 @@ SimulateKspaceAcquisition( std::vector< DoubleDwiType::Pointer >& compartment_im
   m_KspaceImage->Allocate();
   m_KspaceImage->FillBuffer(nullPix);
 
-  std::list< unsigned int > spikeVolume;
-  if (m_Parameters.m_Misc.m_DoAddSpikes)
-    for (unsigned int i=0; i<m_Parameters.m_SignalGen.m_Spikes; i++)
-      spikeVolume.push_back(m_RandGen->GetIntegerVariate()%(compartment_images.at(0)->GetVectorLength()));
-
   // calculate coil positions
   double a = m_Parameters.m_SignalGen.m_ImageRegion.GetSize(0)*m_Parameters.m_SignalGen.m_ImageSpacing[0];
   double b = m_Parameters.m_SignalGen.m_ImageRegion.GetSize(1)*m_Parameters.m_SignalGen.m_ImageSpacing[1];
@@ -141,7 +136,7 @@ SimulateKspaceAcquisition( std::vector< DoubleDwiType::Pointer >& compartment_im
   center[0] = a/2-m_Parameters.m_SignalGen.m_ImageSpacing[0]/2;
   center[1] = b/2-m_Parameters.m_SignalGen.m_ImageSpacing[2]/2;
   center[2] = c/2-m_Parameters.m_SignalGen.m_ImageSpacing[1]/2;
-  for (int c=0; c<m_Parameters.m_SignalGen.m_NumberOfCoils; c++)
+  for (unsigned int c=0; c<m_Parameters.m_SignalGen.m_NumberOfCoils; c++)
   {
     coilPositions.push_back(pos);
     m_CoilPointset->InsertPoint(c, pos*1000 + m_Parameters.m_SignalGen.m_ImageOrigin.GetVectorFromOrigin() + center );
@@ -156,35 +151,53 @@ SimulateKspaceAcquisition( std::vector< DoubleDwiType::Pointer >& compartment_im
     pos.SetVnlVector(rotZ*pos.GetVnlVector());
   }
 
+  auto num_slices = compartment_images.at(0)->GetLargestPossibleRegion().GetSize(2);
+  auto num_gradient_volumes = static_cast<int>(compartment_images.at(0)->GetVectorLength());
   auto max_threads = omp_get_max_threads();
   int out_threads = Math::ceil(std::sqrt(max_threads));
   int in_threads = Math::floor(std::sqrt(max_threads));
+  if (out_threads > num_gradient_volumes)
+  {
+    out_threads = num_gradient_volumes;
+    in_threads = Math::floor(static_cast<float>(max_threads/out_threads));
+  }
   PrintToLog("Parallel volumes: " + boost::lexical_cast<std::string>(out_threads), false, true, true);
   PrintToLog("Threads per slice: " + boost::lexical_cast<std::string>(in_threads), false, true, true);
+
+  std::list< std::tuple<unsigned int, unsigned int, unsigned int> > spikes;
+  if (m_Parameters.m_Misc.m_DoAddSpikes)
+    for (unsigned int i=0; i<m_Parameters.m_SignalGen.m_Spikes; i++)
+    {
+      // gradient volume and slice index
+      auto spike = std::tuple<unsigned int, unsigned int, unsigned int>(
+            m_RandGen->GetIntegerVariate()%num_gradient_volumes,
+            m_RandGen->GetIntegerVariate()%num_slices,
+            m_RandGen->GetIntegerVariate()%m_Parameters.m_SignalGen.m_NumberOfCoils);
+      spikes.push_back(spike);
+    }
 
   PrintToLog("0%   10   20   30   40   50   60   70   80   90   100%", false, true, false);
   PrintToLog("|----|----|----|----|----|----|----|----|----|----|\n*", false, false, false);
   unsigned long lastTick = 0;
 
-  boost::progress_display disp(compartment_images.at(0)->GetVectorLength()*compartment_images.at(0)->GetLargestPossibleRegion().GetSize(2));
+  boost::progress_display disp(static_cast<unsigned long>(num_gradient_volumes)*compartment_images.at(0)->GetLargestPossibleRegion().GetSize(2));
 
 #pragma omp parallel for num_threads(out_threads)
-  for (int g=0; g<static_cast<int>(compartment_images.at(0)->GetVectorLength()); g++)
+  for (int g=0; g<num_gradient_volumes; g++)
   {
     if (this->GetAbortGenerateData())
       continue;
 
-    std::list< unsigned int > spikeSlice;
+    std::list< std::tuple<unsigned int, unsigned int> > spikeSlice;
 #pragma omp critical
     {
 
-      for (auto sv : spikeVolume)
-        if (sv == static_cast<unsigned int>(g))
-          spikeSlice.push_back(m_RandGen->GetIntegerVariate()%compartment_images.at(0)->GetLargestPossibleRegion().GetSize(2));
-      spikeVolume.remove(g);
+      for (auto spike : spikes)
+        if (std::get<0>(spike) == static_cast<unsigned int>(g))
+          spikeSlice.push_back(std::tuple<unsigned int, unsigned int>(std::get<1>(spike), std::get<2>(spike)));
     }
 
-    for (unsigned int z=0; z<compartment_images.at(0)->GetLargestPossibleRegion().GetSize(2); z++)
+    for (unsigned int z=0; z<num_slices; z++)
     {
       std::vector< Float2DImageType::Pointer > compartment_slices;
       std::vector< float > t2Vector;
@@ -221,25 +234,26 @@ SimulateKspaceAcquisition( std::vector< DoubleDwiType::Pointer >& compartment_im
         t1Vector.push_back(signalModel->GetT1());
       }
 
-      int numSpikes = 0;
-      for (auto ss : spikeSlice)
-        if (ss == z)
-          ++numSpikes;
-      spikeSlice.remove(z);
-
-      int spikeCoil = m_RandGen->GetIntegerVariate()%m_Parameters.m_SignalGen.m_NumberOfCoils;
-
       if (this->GetAbortGenerateData())
         continue;
 
-      for (int c=0; c<m_Parameters.m_SignalGen.m_NumberOfCoils; c++)
+      for (unsigned int c=0; c<m_Parameters.m_SignalGen.m_NumberOfCoils; c++)
       {
+        int numSpikes = 0;
+        for (auto ss : spikeSlice)
+          if (std::get<0>(ss) == z && std::get<1>(ss) == c)
+            ++numSpikes;
+
         // create k-sapce (inverse fourier transform slices)
         auto idft = itk::KspaceImageFilter< Float2DImageType::PixelType >::New();
         idft->SetCompartmentImages(compartment_slices);
         idft->SetT2(t2Vector);
         idft->SetT1(t1Vector);
-        idft->SetUseConstantRandSeed(m_UseConstantRandSeed);
+        if (m_UseConstantRandSeed)
+        {
+          int linear_seed = g + num_gradient_volumes*z + num_gradient_volumes*compartment_images.at(0)->GetLargestPossibleRegion().GetSize(2)*c;
+          idft->SetRandSeed(linear_seed);
+        }
         idft->SetParameters(&m_Parameters);
         idft->SetZ((float)z-(float)( compartment_images.at(0)->GetLargestPossibleRegion().GetSize(2)
                                      -compartment_images.at(0)->GetLargestPossibleRegion().GetSize(2)%2 ) / 2.0);
@@ -249,13 +263,12 @@ SimulateKspaceAcquisition( std::vector< DoubleDwiType::Pointer >& compartment_im
         idft->SetTranslation(m_Translations.at(g));
         idft->SetRotationMatrix(m_RotationsInv.at(g));
         idft->SetDiffusionGradientDirection(m_Parameters.m_SignalGen.GetGradientDirection(g));
-        if (c==spikeCoil)
-          idft->SetSpikesPerSlice(numSpikes);
+        idft->SetSpikesPerSlice(numSpikes);
         idft->SetNumberOfThreads(in_threads);
         idft->Update();
 
 #pragma omp critical
-        if (c==spikeCoil && numSpikes>0)
+        if (numSpikes>0)
         {
           m_SpikeLog += "Volume " + boost::lexical_cast<std::string>(g) + " Coil " + boost::lexical_cast<std::string>(c) + "\n";
           m_SpikeLog += idft->GetSpikeLog();
@@ -537,7 +550,7 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
   // images containing real and imaginary part of the dMRI signal for each coil
   m_OutputImagesReal.clear();
   m_OutputImagesImag.clear();
-  for (int i=0; i<m_Parameters.m_SignalGen.m_NumberOfCoils; ++i)
+  for (unsigned int i=0; i<m_Parameters.m_SignalGen.m_NumberOfCoils; ++i)
   {
     typename DoubleDwiType::Pointer outputImageReal = DoubleDwiType::New();
     outputImageReal->SetSpacing( m_Parameters.m_SignalGen.m_ImageSpacing );

@@ -735,7 +735,7 @@ void mitk::FiberfoxParameters::LoadParameters(std::string filename, bool fix_see
 
       m_SignalGen.m_AcquisitionType = (SignalGenerationParameters::AcquisitionType)ReadVal<int>(v1,"acquisitiontype", m_SignalGen.m_AcquisitionType);
       m_SignalGen.m_CoilSensitivityProfile = (SignalGenerationParameters::CoilSensitivityProfile)ReadVal<int>(v1,"coilsensitivityprofile", m_SignalGen.m_CoilSensitivityProfile);
-      m_SignalGen.m_NumberOfCoils = ReadVal<int>(v1,"numberofcoils", m_SignalGen.m_NumberOfCoils);
+      m_SignalGen.m_NumberOfCoils = ReadVal<unsigned int>(v1,"numberofcoils", m_SignalGen.m_NumberOfCoils);
       m_SignalGen.m_ReversePhase = ReadVal<bool>(v1,"reversephase", m_SignalGen.m_ReversePhase);
       m_SignalGen.m_PartialFourier = ReadVal<float>(v1,"partialfourier", m_SignalGen.m_PartialFourier);
       m_SignalGen.m_NoiseVariance = ReadVal<float>(v1,"noisevariance", m_SignalGen.m_NoiseVariance);

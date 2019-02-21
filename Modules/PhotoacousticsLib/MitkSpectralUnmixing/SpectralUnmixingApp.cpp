@@ -263,8 +263,8 @@ int main(int argc, char *argv[])
   output1->SetSpacing(m_inputImage->GetGeometry()->GetSpacing());
   output2->SetSpacing(m_inputImage->GetGeometry()->GetSpacing());
 
-  std::string unmixingOutputHbO2 = outputDir + "_HbO2_SU_.nrrd";
-  std::string unmixingOutputHb = outputDir + "_Hb_SU_.nrrd";
+  std::string unmixingOutputHbO2 = outputDir + "_HbO2.nrrd";
+  std::string unmixingOutputHb = outputDir + "_Hb.nrrd";
   mitk::IOUtil::Save(output1, unmixingOutputHbO2);
   mitk::IOUtil::Save(output2, unmixingOutputHb);
 
@@ -279,7 +279,7 @@ int main(int argc, char *argv[])
   mitk::Image::Pointer sO2 = m_sO2->GetOutput(0);
   sO2->SetSpacing(m_inputImage->GetGeometry()->GetSpacing());
 
-  std::string outputSo2 = outputDir + "_sO2_.nrrd";
+  std::string outputSo2 = outputDir + "_sO2.nrrd";
   mitk::IOUtil::Save(sO2, outputSo2);
 
   m_sO2 = nullptr;

@@ -17,6 +17,7 @@ endforeach()
 #-----------------------------------------------------------------------------
 
 set(MITK_EXTENSION_DIRS "" CACHE STRING "")
+set(MITK_DIR_PLUS_EXTENSION_DIRS ${MITK_SOURCE_DIR} ${MITK_EXTENSION_DIRS})
 
 #-----------------------------------------------------------------------------
 # Superbuild Option - Enabled by default
@@ -640,19 +641,25 @@ endif()
 
 # on macOS all BlueBerry plugins get copied into every
 # application bundle (.app directory) specified here
-if(MITK_USE_BLUEBERRY AND APPLE)
+if(MITK_USE_BLUEBERRY #[[AND APPLE]])
 
-  include("${CMAKE_CURRENT_SOURCE_DIR}/Applications/AppList.cmake")
-
-  foreach(mitk_app ${MITK_APPS})
-    # extract option_name
-    string(REPLACE "^^" "\\;" target_info ${mitk_app})
-    set(target_info_list ${target_info})
-    list(GET target_info_list 1 option_name)
-    list(GET target_info_list 0 app_name)
-    # check if the application is enabled
-    if(${option_name} OR MITK_BUILD_ALL_APPS)
-      set(MACOSX_BUNDLE_NAMES ${MACOSX_BUNDLE_NAMES} Mitk${app_name})
+  foreach(MITK_EXTENSION_DIR ${MITK_DIR_PLUS_EXTENSION_DIRS})
+    set(MITK_APPLICATIONS_EXTENSION_DIR ${MITK_EXTENSION_DIR}/Applications)
+    get_filename_component(MITK_APPLICATIONS_EXTENSION_DIR ${MITK_APPLICATIONS_EXTENSION_DIR} ABSOLUTE)
+    if(EXISTS ${MITK_APPLICATIONS_EXTENSION_DIR}/AppList.cmake)
+      set(MITK_APPS "")
+      include(${MITK_APPLICATIONS_EXTENSION_DIR}/AppList.cmake)
+      foreach(mitk_app ${MITK_APPS})
+        # extract option_name
+        string(REPLACE "^^" "\\;" target_info ${mitk_app})
+        set(target_info_list ${target_info})
+        list(GET target_info_list 1 option_name)
+        list(GET target_info_list 0 app_name)
+        # check if the application is enabled
+        if(${option_name} OR MITK_BUILD_ALL_APPS)
+          set(MACOSX_BUNDLE_NAMES ${MACOSX_BUNDLE_NAMES} Mitk${app_name})
+        endif()
+      endforeach()
     endif()
   endforeach()
 
@@ -1130,16 +1137,23 @@ if(MITK_USE_BLUEBERRY)
   endmacro()
 
   # Get infos about application directories and build options
-  include("${CMAKE_CURRENT_SOURCE_DIR}/Applications/AppList.cmake")
-  set(mitk_apps_fullpath )
-  foreach(mitk_app ${MITK_APPS})
-    # extract option_name
-    string(REPLACE "^^" "\\;" target_info ${mitk_app})
-    set(target_info_list ${target_info})
-    list(GET target_info_list 0 directory_name)
-    list(GET target_info_list 1 option_name)
-    if(${option_name})
-      list(APPEND mitk_apps_fullpath "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${directory_name}^^${option_name}")
+  set(mitk_apps_fullpath "")
+  foreach(MITK_EXTENSION_DIR ${MITK_DIR_PLUS_EXTENSION_DIRS})
+    set(MITK_APPLICATIONS_EXTENSION_DIR ${MITK_EXTENSION_DIR}/Applications)
+    get_filename_component(MITK_APPLICATIONS_EXTENSION_DIR ${MITK_APPLICATIONS_EXTENSION_DIR} ABSOLUTE)
+    if(EXISTS ${MITK_APPLICATIONS_EXTENSION_DIR}/AppList.cmake)
+      set(MITK_APPS "")
+      include(${MITK_APPLICATIONS_EXTENSION_DIR}/AppList.cmake)
+      foreach(mitk_app ${MITK_APPS})
+        # extract option_name
+        string(REPLACE "^^" "\\;" target_info ${mitk_app})
+        set(target_info_list ${target_info})
+        list(GET target_info_list 0 directory_name)
+        list(GET target_info_list 1 option_name)
+        if(${option_name})
+          list(APPEND mitk_apps_fullpath "${MITK_EXTENSION_DIR}/Applications/${directory_name}^^${option_name}")
+        endif()
+      endforeach()
     endif()
   endforeach()
 
@@ -1179,68 +1193,69 @@ include(mitkSetupCPack)
 
 set(use_default_config ON)
 
-# MITK_APPS is set in Applications/AppList.cmake (included somewhere above
-# if MITK_USE_BLUEBERRY is set to ON).
-if(MITK_APPS)
+set(ALL_MITK_APPS "")
+set(activated_apps_no 0)
 
-  set(activated_apps_no 0)
-  list(LENGTH MITK_APPS app_count)
-
-  # Check how many apps have been enabled
-  # If more than one app has been activated, the we use the
-  # default CPack configuration. Otherwise that apps configuration
-  # will be used, if present.
-  foreach(mitk_app ${MITK_APPS})
-    # extract option_name
-    string(REPLACE "^^" "\\;" target_info ${mitk_app})
-    set(target_info_list ${target_info})
-    list(GET target_info_list 1 option_name)
-    # check if the application is enabled
-    if(${option_name} OR MITK_BUILD_ALL_APPS)
-      MATH(EXPR activated_apps_no "${activated_apps_no} + 1")
-    endif()
-  endforeach()
-
-  if(app_count EQUAL 1 AND (activated_apps_no EQUAL 1 OR MITK_BUILD_ALL_APPS))
-    # Corner case if there is only one app in total
-    set(use_project_cpack ON)
-  elseif(activated_apps_no EQUAL 1 AND NOT MITK_BUILD_ALL_APPS)
-    # Only one app is enabled (no "build all" flag set)
-    set(use_project_cpack ON)
-  else()
-    # Less or more then one app is enabled
-    set(use_project_cpack OFF)
-  endif()
-
-  foreach(mitk_app ${MITK_APPS})
-    # extract target_dir and option_name
-    string(REPLACE "^^" "\\;" target_info ${mitk_app})
-    set(target_info_list ${target_info})
-    list(GET target_info_list 0 target_dir)
-    list(GET target_info_list 1 option_name)
-    list(GET target_info_list 2 executable_name)
-    # check if the application is enabled
-    if(${option_name} OR MITK_BUILD_ALL_APPS)
-      # check whether application specific configuration files will be used
-      if(use_project_cpack)
-        # use files if they exist
-        if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/CPackOptions.cmake")
-          include("${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/CPackOptions.cmake")
-        endif()
-
-        if(EXISTS "${PROJECT_SOURCE_DIR}/Applications/${target_dir}/CPackConfig.cmake.in")
-          set(CPACK_PROJECT_CONFIG_FILE "${PROJECT_BINARY_DIR}/Applications/${target_dir}/CPackConfig.cmake")
-          configure_file(${PROJECT_SOURCE_DIR}/Applications/${target_dir}/CPackConfig.cmake.in
-                         ${CPACK_PROJECT_CONFIG_FILE} @ONLY)
-          set(use_default_config OFF)
-        endif()
+foreach(MITK_EXTENSION_DIR ${MITK_DIR_PLUS_EXTENSION_DIRS})
+  set(MITK_APPLICATIONS_EXTENSION_DIR ${MITK_EXTENSION_DIR}/Applications)
+  get_filename_component(MITK_APPLICATIONS_EXTENSION_DIR ${MITK_APPLICATIONS_EXTENSION_DIR} ABSOLUTE)
+  if(EXISTS ${MITK_APPLICATIONS_EXTENSION_DIR}/AppList.cmake)
+    set(MITK_APPS "")
+    include(${MITK_APPLICATIONS_EXTENSION_DIR}/AppList.cmake)
+    foreach(mitk_app ${MITK_APPS})
+      string(REPLACE "^^" "\\;" target_info ${mitk_app})
+      set(target_info_list ${target_info})
+      list(GET target_info_list 0 directory_name)
+      list(GET target_info_list 1 option_name)
+      list(GET target_info_list 2 executable_name)
+      list(APPEND ALL_MITK_APPS "${MITK_EXTENSION_DIR}/Applications/${directory_name}^^${option_name}^^${executable_name}")
+      if(${option_name} OR MITK_BUILD_ALL_APPS)
+        MATH(EXPR activated_apps_no "${activated_apps_no} + 1")
       endif()
-    # add link to the list
-    list(APPEND CPACK_CREATE_DESKTOP_LINKS "${executable_name}")
-    endif()
-  endforeach()
+    endforeach()
+  endif()
+endforeach()
 
+list(LENGTH ALL_MITK_APPS app_count)
+
+if(app_count EQUAL 1 AND (activated_apps_no EQUAL 1 OR MITK_BUILD_ALL_APPS))
+  # Corner case if there is only one app in total
+  set(use_project_cpack ON)
+elseif(activated_apps_no EQUAL 1 AND NOT MITK_BUILD_ALL_APPS)
+  # Only one app is enabled (no "build all" flag set)
+  set(use_project_cpack ON)
+else()
+  # Less or more then one app is enabled
+  set(use_project_cpack OFF)
 endif()
+
+foreach(mitk_app ${ALL_MITK_APPS})
+  # extract target_dir and option_name
+  string(REPLACE "^^" "\\;" target_info ${mitk_app})
+  set(target_info_list ${target_info})
+  list(GET target_info_list 0 target_dir)
+  list(GET target_info_list 1 option_name)
+  list(GET target_info_list 2 executable_name)
+  # check if the application is enabled
+  if(${option_name} OR MITK_BUILD_ALL_APPS)
+    # check whether application specific configuration files will be used
+    if(use_project_cpack)
+      # use files if they exist
+      if(EXISTS "${target_dir}/CPackOptions.cmake")
+        include("${target_dir}/CPackOptions.cmake")
+      endif()
+
+      if(EXISTS "${target_dir}/CPackConfig.cmake.in")
+        set(CPACK_PROJECT_CONFIG_FILE "${target_dir}/CPackConfig.cmake")
+        configure_file(${target_dir}/CPackConfig.cmake.in
+                       ${CPACK_PROJECT_CONFIG_FILE} @ONLY)
+        set(use_default_config OFF)
+      endif()
+    endif()
+  # add link to the list
+  list(APPEND CPACK_CREATE_DESKTOP_LINKS "${executable_name}")
+  endif()
+endforeach()
 
 # if no application specific configuration file was used, use default
 if(use_default_config)
@@ -1372,6 +1387,14 @@ add_subdirectory(Applications)
 if(MSVC AND TARGET MitkWorkbench)
   set_directory_properties(PROPERTIES VS_STARTUP_PROJECT MitkWorkbench)
 endif()
+
+foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
+  set(MITK_APPLICATIONS_EXTENSION_DIR ${MITK_EXTENSION_DIR}/Applications)
+  get_filename_component(MITK_APPLICATIONS_EXTENSION_DIR ${MITK_APPLICATIONS_EXTENSION_DIR} ABSOLUTE)
+  if(EXISTS ${MITK_APPLICATIONS_EXTENSION_DIR}/CMakeLists.txt)
+    add_subdirectory(${MITK_APPLICATIONS_EXTENSION_DIR} Applications)
+  endif()
+endforeach()
 
 #-----------------------------------------------------------------------------
 # MITK Examples

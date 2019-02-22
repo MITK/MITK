@@ -40,6 +40,37 @@ mitk::SemanticTypes::ControlPoint GetControlPointFromString(const std::string& d
   return controlPoint;
 }
 
+std::string mitk::GetCaseIDDICOMProperty()
+{
+  // extract suitable DICOM tag to use as the case id
+  // two alternatives can be used:
+  //        - DICOM tag "0x0010, 0x0010" is PatientName
+  //        - DICOM tag "0x0010, 0x0020" is PatientID
+  // in the current implementation the PatientName (0x0010, 0x0010) is used
+  return GeneratePropertyNameForDICOMTag(0x0010, 0x0010);
+}
+
+std::string mitk::GetNodeIDDICOMProperty()
+{
+  // extract suitable DICOM tag to use as the data node id
+  // DICOM tag "0x0020, 0x000e" is SeriesInstanceUID
+  return GeneratePropertyNameForDICOMTag(0x0020, 0x000e);
+}
+
+std::string mitk::GetDateDICOMProperty()
+{
+  // extract suitable DICOM tag to use as the data node id
+  // DICOM tag "0x0008, 0x0022" is AcquisitionDate
+  return GeneratePropertyNameForDICOMTag(0x0008, 0x0022);
+}
+
+std::string mitk::GetModalityDICOMProperty()
+{
+  // extract suitable DICOM tag to use as the information type
+  // DICOM tag "0x0008, 0x0060" is Modality
+  return GeneratePropertyNameForDICOMTag(0x0008, 0x0060);
+}
+
 mitk::SemanticTypes::CaseID mitk::GetCaseIDFromDataNode(const mitk::DataNode* dataNode)
 {
   if (nullptr == dataNode)
@@ -53,12 +84,7 @@ mitk::SemanticTypes::CaseID mitk::GetCaseIDFromDataNode(const mitk::DataNode* da
     mitkThrowException(SemanticRelationException) << "No valid base data.";
   }
 
-  // extract suitable DICOM tag to use as the case id
-  // two alternatives can be used:
-  //        - DICOM tag "0x0010, 0x0010" is PatientName
-  //        - DICOM tag "0x0010, 0x0020" is PatientID
-  // in the current implementation the PatientID (0x0010, 0x0010) is used
-  mitk::BaseProperty* dicomTag = baseData->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0010, 0x0010).c_str());
+  mitk::BaseProperty* dicomTag = baseData->GetProperty(GetCaseIDDICOMProperty().c_str());
   if (nullptr == dicomTag)
   {
     mitkThrowException(SemanticRelationException) << "Not a valid DICOM property.";
@@ -81,9 +107,7 @@ mitk::SemanticTypes::ID mitk::GetIDFromDataNode(const mitk::DataNode* dataNode)
     mitkThrowException(SemanticRelationException) << "No valid base data.";
   }
 
-  // extract suitable DICOM tag to use as the data node id
-  // DICOM tag "0x0020, 0x000e" is SeriesInstanceUID
-  mitk::BaseProperty* dicomTag = baseData->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0020, 0x000e).c_str());
+  mitk::BaseProperty* dicomTag = baseData->GetProperty(GetNodeIDDICOMProperty().c_str());
   if (nullptr == dicomTag)
   {
     mitkThrowException(SemanticRelationException) << "Not a valid DICOM property.";
@@ -105,9 +129,7 @@ mitk::SemanticTypes::ControlPoint mitk::GetDICOMDateFromDataNode(const mitk::Dat
     mitkThrowException(SemanticRelationException) << "No valid base data.";
   }
 
-  // extract suitable DICOM tag to use as the data node id
-  // DICOM tag "0x0008, 0x0022" is AcquisitionDate
-  mitk::BaseProperty* acquisitionDateProperty = baseData->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0022).c_str());
+  mitk::BaseProperty* acquisitionDateProperty = baseData->GetProperty(GetDateDICOMProperty().c_str());
   if (nullptr == acquisitionDateProperty)
   {
     mitkThrowException(SemanticRelationException) << "Not a valid DICOM property.";
@@ -140,9 +162,7 @@ mitk::SemanticTypes::InformationType mitk::GetDICOMModalityFromDataNode(const mi
     mitkThrowException(SemanticRelationException) << "No valid base data.";
   }
 
-  // extract suitable DICOM tag to use as the information type
-  // DICOM tag "0x0008, 0x0060" is Modality
-  mitk::BaseProperty* dicomTag = baseData->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0060).c_str());
+  mitk::BaseProperty* dicomTag = baseData->GetProperty(GetModalityDICOMProperty().c_str());
   if (nullptr == dicomTag)
   {
     mitkThrowException(SemanticRelationException) << "Not a valid DICOM property.";

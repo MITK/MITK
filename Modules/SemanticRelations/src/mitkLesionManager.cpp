@@ -85,21 +85,24 @@ void mitk::GenerateAdditionalLesionData(LesionData& lesionData, const SemanticTy
   SemanticTypes::Lesion lesion = lesionData.GetLesion();
   bool presence = false;
   double volume = 0.0;
-  try
+
+  SemanticTypes::ControlPointVector controlPoints = RelationStorage::GetAllControlPointsOfCase(caseID);
+  // sort the vector of control points for the timeline
+  std::sort(controlPoints.begin(), controlPoints.end());
+  for (const auto& controlPoint : controlPoints)
   {
-    SemanticTypes::ControlPointVector controlPoints = RelationStorage::GetAllControlPointsOfCase(caseID);
-    for (const auto& controlPoint : controlPoints)
+    try
     {
       presence = SemanticRelationsInference::IsLesionPresentAtControlPoint(caseID, lesion, controlPoint);
-      lesionPresence.push_back(presence);
-
-      volume = GetLesionVolume(caseID, lesion, controlPoint);
-      lesionVolume.push_back(volume);
     }
-  }
-  catch (const SemanticRelationException&)
-  {
-    return;
+    catch (SemanticRelationException& e)
+    {
+      mitkReThrow(e) << "Cannot determine the lesion presence for generating additional lesion data.";
+    }
+
+    lesionPresence.push_back(presence);
+    volume = GetLesionVolume(caseID, lesion, controlPoint);
+    lesionVolume.push_back(volume);
   }
 
   lesionData.SetLesionPresence(lesionPresence);

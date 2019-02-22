@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // semantic relations module
 #include "mitkControlPointManager.h"
 #include "mitkDICOMHelper.h"
+#include "mitkSemanticRelationException.h"
 #include "mitkUIDGeneratorBoost.h"
 
 // mitk core
@@ -24,9 +25,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::SemanticTypes::ControlPoint mitk::GenerateControlPoint(const DataNode* datanode)
 {
-  SemanticTypes::ControlPoint controlPoint = GetDICOMDateFromDataNode(datanode);
-  controlPoint.UID = UIDGeneratorBoost::GenerateUID();
+  SemanticTypes::ControlPoint controlPoint;
+  try
+  {
+    controlPoint = GetDICOMDateFromDataNode(datanode);
+  }
+  catch (SemanticRelationException& e)
+  {
+    mitkReThrow(e) << "Cannot generate a control point from the DICOM tag of the given data node";
+  }
 
+  controlPoint.UID = UIDGeneratorBoost::GenerateUID();
   return controlPoint;
 }
 

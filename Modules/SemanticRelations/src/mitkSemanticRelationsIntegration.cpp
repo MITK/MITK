@@ -62,18 +62,35 @@ void mitk::SemanticRelationsIntegration::AddImage(const DataNode* imageNode)
     mitkThrowException(SemanticRelationException) << "Not a valid image data node.";
   }
 
-  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(imageNode);
-  SemanticTypes::ID nodeID = GetIDFromDataNode(imageNode);
+  SemanticTypes::CaseID caseID;
+  SemanticTypes::ID imageID;
+  SemanticTypes::InformationType informationType;
+  SemanticTypes::ControlPoint controlPoint;
+  try // retrieve information
+  {
+    caseID = GetCaseIDFromDataNode(imageNode);
+    imageID = GetIDFromDataNode(imageNode);
 
-  RelationStorage::AddCase(caseID);
-  RelationStorage::AddImage(caseID, nodeID);
+    informationType = GetDICOMModalityFromDataNode(imageNode);
+    controlPoint = GenerateControlPoint(imageNode);
+  }
+  catch (SemanticRelationException& e)
+  {
+    mitkReThrow(e) << "Cannot add the given image data node.";
+  }
 
-  SemanticTypes::InformationType informationType = GetDICOMModalityFromDataNode(imageNode);
-  AddInformationTypeToImage(imageNode, informationType);
+  try // add and set information
+  {
+    RelationStorage::AddCase(caseID);
+    RelationStorage::AddImage(caseID, imageID);
 
-  // set the correct control point for this image
-  SemanticTypes::ControlPoint controlPoint = GenerateControlPoint(imageNode);
-  SetControlPointOfImage(imageNode, controlPoint);
+    AddInformationTypeToImage(imageNode, informationType);
+    SetControlPointOfImage(imageNode, controlPoint);
+  }
+  catch (SemanticRelationException& e)
+  {
+    mitkReThrow(e) << "Cannot add the given image data node.";
+  }
 }
 
 void mitk::SemanticRelationsIntegration::RemoveImage(const DataNode* imageNode)
@@ -83,12 +100,29 @@ void mitk::SemanticRelationsIntegration::RemoveImage(const DataNode* imageNode)
     mitkThrowException(SemanticRelationException) << "Not a valid image data node.";
   }
 
-  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(imageNode);
-  SemanticTypes::ID nodeID = GetIDFromDataNode(imageNode);
+  SemanticTypes::CaseID caseID;
+  SemanticTypes::ID imageID;
+  try // retrieve information
+  {
+    caseID = GetCaseIDFromDataNode(imageNode);
+    imageID = GetIDFromDataNode(imageNode);
+  }
+  catch (SemanticRelationException& e)
+  {
+    mitkReThrow(e) << "Cannot remove the given image data node.";
+  }
 
-  RemoveInformationTypeFromImage(imageNode);
-  UnlinkImageFromControlPoint(imageNode);
-  RelationStorage::RemoveImage(caseID, nodeID);
+  try // add and set information
+  {
+    RemoveInformationTypeFromImage(imageNode);
+    UnlinkImageFromControlPoint(imageNode);
+  }
+  catch (SemanticRelationException& e)
+  {
+    mitkReThrow(e) << "Cannot remove the given image data node.";
+  }
+
+  RelationStorage::RemoveImage(caseID, imageID);
   NotifyObserver(caseID);
 }
 
@@ -98,11 +132,9 @@ void mitk::SemanticRelationsIntegration::AddLesion(const SemanticTypes::CaseID& 
   {
     mitkThrowException(SemanticRelationException) << "The lesion " << lesion.UID << " to add already exists for the given case.";
   }
-  else
-  {
-    RelationStorage::AddLesion(caseID, lesion);
-    NotifyObserver(caseID);
-  }
+
+  RelationStorage::AddLesion(caseID, lesion);
+  NotifyObserver(caseID);
 }
 
 void mitk::SemanticRelationsIntegration::OverwriteLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion)
@@ -125,9 +157,18 @@ void mitk::SemanticRelationsIntegration::AddLesionAndLinkSegmentation(const Data
     mitkThrowException(SemanticRelationException) << "Not a valid segmentation data node.";
   }
 
-  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(segmentationNode);
-  AddLesion(caseID, lesion);
-  LinkSegmentationToLesion(segmentationNode, lesion);
+  SemanticTypes::CaseID caseID;
+  try
+  {
+    caseID = GetCaseIDFromDataNode(segmentationNode);
+    AddLesion(caseID, lesion);
+    LinkSegmentationToLesion(segmentationNode, lesion);
+  }
+  catch (SemanticRelationException& e)
+  {
+    mitkReThrow(e) << "Cannot add given lesion and link the given segmentation data node.";
+  }
+
   NotifyObserver(caseID);
 }
 
@@ -166,9 +207,19 @@ void mitk::SemanticRelationsIntegration::AddSegmentation(const DataNode* segment
     mitkThrowException(SemanticRelationException) << "Not a valid parent data node.";
   }
 
-  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(segmentationNode);
-  SemanticTypes::ID segmentationNodeID = GetIDFromDataNode(segmentationNode);
-  SemanticTypes::ID parentNodeID = GetIDFromDataNode(parentNode);
+  SemanticTypes::CaseID caseID;
+  SemanticTypes::ID segmentationNodeID;
+  SemanticTypes::ID parentNodeID;
+  try
+  {
+    caseID = GetCaseIDFromDataNode(segmentationNode);
+    segmentationNodeID = GetIDFromDataNode(segmentationNode);
+    parentNodeID = GetIDFromDataNode(parentNode);
+  }
+  catch (SemanticRelationException& e)
+  {
+    mitkReThrow(e) << "Cannot add the given segmentation data node.";
+  }
 
   RelationStorage::AddSegmentation(caseID, segmentationNodeID, parentNodeID);
   NotifyObserver(caseID);
@@ -181,10 +232,20 @@ void mitk::SemanticRelationsIntegration::LinkSegmentationToLesion(const DataNode
     mitkThrowException(SemanticRelationException) << "Not a valid segmentation data node.";
   }
 
-  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(segmentationNode);
+  SemanticTypes::CaseID caseID;
+  SemanticTypes::ID segmentationID;
+  try
+  {
+    caseID = GetCaseIDFromDataNode(segmentationNode);
+    segmentationID = GetIDFromDataNode(segmentationNode);
+  }
+  catch (SemanticRelationException& e)
+  {
+    mitkReThrow(e) << "Cannot link the given segmentation data node to the given lesion.";
+  }
+
   if (SemanticRelationsInference::InstanceExists(caseID, lesion))
   {
-    SemanticTypes::ID segmentationID = GetIDFromDataNode(segmentationNode);
     RelationStorage::LinkSegmentationToLesion(caseID, segmentationID, lesion);
     NotifyObserver(caseID);
   }
@@ -201,8 +262,18 @@ void mitk::SemanticRelationsIntegration::UnlinkSegmentationFromLesion(const Data
     mitkThrowException(SemanticRelationException) << "Not a valid segmentation data node.";
   }
 
-  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(segmentationNode);
-  SemanticTypes::ID segmentationID = GetIDFromDataNode(segmentationNode);
+  SemanticTypes::CaseID caseID;
+  SemanticTypes::ID segmentationID;
+  try
+  {
+    caseID = GetCaseIDFromDataNode(segmentationNode);
+    segmentationID = GetIDFromDataNode(segmentationNode);
+  }
+  catch (SemanticRelationException& e)
+  {
+    mitkReThrow(e) << "Cannot unlink the given segmentation data node from its lesion.";
+  }
+
   RelationStorage::UnlinkSegmentationFromLesion(caseID, segmentationID);
   NotifyObserver(caseID);
 }
@@ -214,8 +285,18 @@ void mitk::SemanticRelationsIntegration::RemoveSegmentation(const DataNode* segm
     mitkThrowException(SemanticRelationException) << "Not a valid segmentation data node.";
   }
 
-  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(segmentationNode);
-  SemanticTypes::ID segmentationNodeID = GetIDFromDataNode(segmentationNode);
+  SemanticTypes::CaseID caseID;
+  SemanticTypes::ID segmentationNodeID;
+  try
+  {
+    caseID = GetCaseIDFromDataNode(segmentationNode);
+    segmentationNodeID = GetIDFromDataNode(segmentationNode);
+  }
+  catch (SemanticRelationException& e)
+  {
+    mitkReThrow(e) << "Cannot remove the given segmentation data node.";
+  }
+
   RelationStorage::RemoveSegmentation(caseID, segmentationNodeID);
   NotifyObserver(caseID);
 }
@@ -227,25 +308,27 @@ void mitk::SemanticRelationsIntegration::SetControlPointOfImage(const DataNode* 
     mitkThrowException(SemanticRelationException) << "Not a valid image data node.";
   }
 
-  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(imageNode);
+  SemanticTypes::CaseID caseID;
+  try
+  {
+    caseID = GetCaseIDFromDataNode(imageNode);
+  }
+  catch (SemanticRelationException& e)
+  {
+    mitkReThrow(e) << "Cannot set the given control point for the given image data node.";
+  }
+
   SemanticTypes::ControlPointVector allControlPoints = RelationStorage::GetAllControlPointsOfCase(caseID);
   // need to check if an already existing control point fits/contains the user control point
   SemanticTypes::ControlPoint existingControlPoint = FindExistingControlPoint(controlPoint, allControlPoints);
-  if (!existingControlPoint.UID.empty())
+  try
   {
-    try
+    if (!existingControlPoint.UID.empty())
     {
       // found an already existing control point
       LinkImageToControlPoint(imageNode, existingControlPoint, false);
     }
-    catch (const SemanticRelationException&)
-    {
-      mitkThrowException(SemanticRelationException) << "The image data node can not be linked. Inconsistency in the semantic relations storage assumed.";
-    }
-  }
-  else
-  {
-    try
+    else
     {
       AddControlPointAndLinkImage(imageNode, controlPoint, false);
       // added a new control point
@@ -265,14 +348,15 @@ void mitk::SemanticRelationsIntegration::SetControlPointOfImage(const DataNode* 
       // add the control point to the (newly created or found / close) examination period
       AddControlPointToExaminationPeriod(caseID, controlPoint, examinationPeriod);
     }
-    catch (const SemanticRelationException&)
-    {
-      mitkThrowException(SemanticRelationException) << "The image data node can not be linked. Inconsistency in the semantic relations storage assumed.";
-    }
+  }
+  catch (SemanticRelationException& e)
+  {
+    mitkReThrow(e) << "Cannot set the given control point for the given image data node.";
   }
 
   ClearControlPoints(caseID);
   NotifyObserver(caseID);
+
 }
 
 void mitk::SemanticRelationsIntegration::AddControlPointAndLinkImage(const DataNode* imageNode, const SemanticTypes::ControlPoint& controlPoint, bool checkConsistence)
@@ -282,14 +366,31 @@ void mitk::SemanticRelationsIntegration::AddControlPointAndLinkImage(const DataN
     mitkThrowException(SemanticRelationException) << "Not a valid image data node.";
   }
 
-  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(imageNode);
+  SemanticTypes::CaseID caseID;
+  try
+  {
+    caseID = GetCaseIDFromDataNode(imageNode);
+  }
+  catch (SemanticRelationException& e)
+  {
+    mitkReThrow(e) << "Cannot add the given control point and link the given image data node.";
+  }
+
   if (SemanticRelationsInference::InstanceExists(caseID, controlPoint))
   {
     mitkThrowException(SemanticRelationException) << "The control point " << controlPoint.UID << " to add already exists for the given case. \n Use 'LinkImageToControlPoint' instead.";
   }
 
   RelationStorage::AddControlPoint(caseID, controlPoint);
-  LinkImageToControlPoint(imageNode, controlPoint, checkConsistence);
+
+  try
+  {
+    LinkImageToControlPoint(imageNode, controlPoint, checkConsistence);
+  }
+  catch (SemanticRelationException& e)
+  {
+    mitkReThrow(e) << "Cannot add the given control point and link the given image data node.";
+  }
 }
 
 void mitk::SemanticRelationsIntegration::LinkImageToControlPoint(const DataNode* imageNode, const SemanticTypes::ControlPoint& controlPoint, bool /*checkConsistence*/)
@@ -299,11 +400,21 @@ void mitk::SemanticRelationsIntegration::LinkImageToControlPoint(const DataNode*
     mitkThrowException(SemanticRelationException) << "Not a valid image data node.";
   }
 
-  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(imageNode);
+  SemanticTypes::CaseID caseID;
+  SemanticTypes::ID imageID;
+  try
+  {
+    caseID = GetCaseIDFromDataNode(imageNode);
+    imageID = GetIDFromDataNode(imageNode);
+  }
+  catch (SemanticRelationException& e)
+  {
+    mitkReThrow(e) << "Cannot link the image data node to the given control point.";
+  }
+
   if (SemanticRelationsInference::InstanceExists(caseID, controlPoint))
   {
-    SemanticTypes::ID dataID = GetIDFromDataNode(imageNode);
-    RelationStorage::LinkImageToControlPoint(caseID, dataID, controlPoint);
+    RelationStorage::LinkImageToControlPoint(caseID, imageID, controlPoint);
   }
   else
   {
@@ -318,10 +429,20 @@ void mitk::SemanticRelationsIntegration::UnlinkImageFromControlPoint(const DataN
     mitkThrowException(SemanticRelationException) << "Not a valid image data node.";
   }
 
-  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(imageNode);
-  SemanticTypes::ID dataID = GetIDFromDataNode(imageNode);
-  SemanticTypes::ControlPoint controlPoint = RelationStorage::GetControlPointOfImage(caseID, dataID);
-  RelationStorage::UnlinkImageFromControlPoint(caseID, dataID);
+  SemanticTypes::CaseID caseID = "";
+  SemanticTypes::ID imageID = "";
+  try
+  {
+    caseID = GetCaseIDFromDataNode(imageNode);
+    imageID = GetIDFromDataNode(imageNode);
+  }
+  catch (SemanticRelationException& e)
+  {
+    mitkReThrow(e) << "Cannot unlink the given image data node from its control point.";
+  }
+
+  SemanticTypes::ControlPoint controlPoint = RelationStorage::GetControlPointOfImage(caseID, imageID);
+  RelationStorage::UnlinkImageFromControlPoint(caseID, imageID);
   ClearControlPoints(caseID);
 }
 
@@ -354,10 +475,19 @@ void mitk::SemanticRelationsIntegration::AddControlPointToExaminationPeriod(cons
 
 void mitk::SemanticRelationsIntegration::SetInformationType(const DataNode* imageNode, const SemanticTypes::InformationType& informationType)
 {
-  RemoveInformationTypeFromImage(imageNode);
-  AddInformationTypeToImage(imageNode, informationType);
+  SemanticTypes::CaseID caseID;
+  try
+  {
+    caseID = GetCaseIDFromDataNode(imageNode);
 
-  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(imageNode);
+    RemoveInformationTypeFromImage(imageNode);
+    AddInformationTypeToImage(imageNode, informationType);
+  }
+  catch (SemanticRelationException& e)
+  {
+    mitkReThrow(e) << "Cannot set the given information type for the given image data node.";
+  }
+
   NotifyObserver(caseID);
 }
 
@@ -368,8 +498,18 @@ void mitk::SemanticRelationsIntegration::AddInformationTypeToImage(const DataNod
     mitkThrowException(SemanticRelationException) << "Not a valid image data node.";
   }
 
-  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(imageNode);
-  SemanticTypes::ID imageID = GetIDFromDataNode(imageNode);
+  SemanticTypes::CaseID caseID = "";
+  SemanticTypes::ID imageID = "";
+  try
+  {
+    caseID = GetCaseIDFromDataNode(imageNode);
+    imageID = GetIDFromDataNode(imageNode);
+  }
+  catch (SemanticRelationException& e)
+  {
+    mitkReThrow(e) << "Cannot add the given information type to the given image data node.";
+  }
+
   RelationStorage::AddInformationTypeToImage(caseID, imageID, informationType);
 }
 
@@ -380,8 +520,18 @@ void mitk::SemanticRelationsIntegration::RemoveInformationTypeFromImage(const Da
     mitkThrowException(SemanticRelationException) << "Not a valid image data node.";
   }
 
-  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(imageNode);
-  SemanticTypes::ID imageID = GetIDFromDataNode(imageNode);
+  SemanticTypes::CaseID caseID = "";
+  SemanticTypes::ID imageID = "";
+  try
+  {
+    caseID = GetCaseIDFromDataNode(imageNode);
+    imageID = GetIDFromDataNode(imageNode);
+  }
+  catch (SemanticRelationException& e)
+  {
+    mitkReThrow(e) << "Cannot remove the information type from the given image data node.";
+  }
+
   SemanticTypes::InformationType originalInformationType = RelationStorage::GetInformationTypeOfImage(caseID, imageID);
   RelationStorage::RemoveInformationTypeFromImage(caseID, imageID);
 

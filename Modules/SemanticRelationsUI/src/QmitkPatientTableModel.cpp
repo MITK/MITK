@@ -288,16 +288,9 @@ void QmitkPatientTableModel::SetLesionPresences()
       continue;
     }
 
-    try
-    {
-      // set the lesion presence for the current node
-      bool lesionPresence = mitk::SemanticRelationsInference::IsLesionPresent(m_Lesion, dataNode);
-      SetLesionPresenceOfNode(dataNode, lesionPresence);
-    }
-    catch (const mitk::SemanticRelationException&)
-    {
-      continue;
-    }
+    // set the lesion presence for the current node
+    bool lesionPresence = mitk::SemanticRelationsInference::IsLesionPresent(m_Lesion, dataNode);
+    SetLesionPresenceOfNode(dataNode, lesionPresence);
   }
 }
 

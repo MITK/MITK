@@ -61,8 +61,18 @@ mitk::SemanticTypes::Lesion mitk::SemanticRelationsInference::GetLesionOfSegment
     mitkThrowException(SemanticRelationException) << "Not a valid segmentation data node.";
   }
 
-  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(segmentationNode);
-  SemanticTypes::ID segmentationID = GetIDFromDataNode(segmentationNode);
+  SemanticTypes::CaseID caseID = "";
+  SemanticTypes::ID segmentationID = "";
+  try
+  {
+    caseID = GetCaseIDFromDataNode(segmentationNode);
+    segmentationID = GetIDFromDataNode(segmentationNode);
+  }
+  catch (SemanticRelationException& e)
+  {
+    mitkReThrow(e) << "Cannot get the lesion of the given segmentation data node.";
+  }
+
   return RelationStorage::GetLesionOfSegmentation(caseID, segmentationID);
 }
 
@@ -73,8 +83,17 @@ mitk::SemanticTypes::LesionVector mitk::SemanticRelationsInference::GetAllLesion
     mitkThrowException(SemanticRelationException) << "Not a valid image data node.";
   }
 
-  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(imageNode);
-  SemanticTypes::ID imageID = GetIDFromDataNode(imageNode);
+  SemanticTypes::CaseID caseID = "";
+  SemanticTypes::ID imageID = "";
+  try
+  {
+    caseID = GetCaseIDFromDataNode(imageNode);
+    imageID = GetIDFromDataNode(imageNode);
+  }
+  catch (SemanticRelationException& e)
+  {
+    mitkReThrow(e) << "Cannot get all lesions of the given image data node.";
+  }
 
   SemanticTypes::LesionVector allLesionsOfImage;
   // 1. get all segmentations that are connected to the given image
@@ -125,61 +144,64 @@ mitk::SemanticTypes::LesionVector mitk::SemanticRelationsInference::GetAllLesion
 
 bool mitk::SemanticRelationsInference::IsRepresentingALesion(const DataNode* segmentationNode)
 {
+  SemanticTypes::Lesion representedLesion;
   try
   {
-    SemanticTypes::Lesion representedLesion = GetLesionOfSegmentation(segmentationNode);
-    if (representedLesion.UID.empty())
-    {
-      return false;
-    }
-  }
-  catch (const Exception&)
-  {
-    return false;
-  }
-
-  return true;
-}
-
-bool mitk::SemanticRelationsInference::IsRepresentingALesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& segmentationID)
-{
-  SemanticTypes::Lesion representedLesion = RelationStorage::GetLesionOfSegmentation(caseID, segmentationID);
-  if (representedLesion.UID.empty())
-  {
-    return false;
-  }
-
-  return true;
-}
-
-bool mitk::SemanticRelationsInference::IsLesionPresent(const SemanticTypes::Lesion& lesion, const DataNode* dataNode)
-{
-  try
-  {
-    SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(dataNode);
-    SemanticTypes::ID dataNodeID = GetIDFromDataNode(dataNode);
-
-    if (NodePredicates::GetImagePredicate()->CheckNode(dataNode))
-    {
-      return IsLesionPresentOnImage(caseID, lesion, dataNodeID);
-    }
-
-    if (NodePredicates::GetSegmentationPredicate()->CheckNode(dataNode))
-    {
-      return IsLesionPresentOnSegmentation(caseID, lesion, dataNodeID);
-    }
-
-    return false;
+    representedLesion = GetLesionOfSegmentation(segmentationNode);
   }
   catch (const SemanticRelationException&)
   {
     return false;
   }
+
+  return !representedLesion.UID.empty();
+}
+
+bool mitk::SemanticRelationsInference::IsRepresentingALesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& segmentationID)
+{
+  SemanticTypes::Lesion representedLesion = RelationStorage::GetLesionOfSegmentation(caseID, segmentationID);
+  return !representedLesion.UID.empty();
+}
+
+bool mitk::SemanticRelationsInference::IsLesionPresent(const SemanticTypes::Lesion& lesion, const DataNode* dataNode)
+{
+  SemanticTypes::CaseID caseID = "";
+  SemanticTypes::ID dataNodeID = "";
+  try
+  {
+    caseID = GetCaseIDFromDataNode(dataNode);
+    dataNodeID = GetIDFromDataNode(dataNode);
+  }
+  catch (const SemanticRelationException&)
+  {
+    return false;
+  }
+
+  if (NodePredicates::GetImagePredicate()->CheckNode(dataNode))
+  {
+    return IsLesionPresentOnImage(caseID, lesion, dataNodeID);
+  }
+
+  if (NodePredicates::GetSegmentationPredicate()->CheckNode(dataNode))
+  {
+    return IsLesionPresentOnSegmentation(caseID, lesion, dataNodeID);
+  }
+
+  return false;
 }
 
 bool mitk::SemanticRelationsInference::IsLesionPresentOnImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion, const SemanticTypes::ID& imageID)
 {
-  SemanticTypes::IDVector allImageIDsOfLesion = GetAllImageIDsOfLesion(caseID, lesion);
+  SemanticTypes::IDVector allImageIDsOfLesion;
+  try
+  {
+    allImageIDsOfLesion = GetAllImageIDsOfLesion(caseID, lesion);
+  }
+  catch (SemanticRelationException& e)
+  {
+    mitkReThrow(e) << "Cannot get all image IDs of the given lesion to determine the lesion presence.";
+  }
+
   for (const auto& imageIDOfLesion : allImageIDsOfLesion)
   {
     if (imageIDOfLesion == imageID)
@@ -199,10 +221,19 @@ bool mitk::SemanticRelationsInference::IsLesionPresentOnSegmentation(const Seman
 
 bool mitk::SemanticRelationsInference::IsLesionPresentAtControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion, const SemanticTypes::ControlPoint& controlPoint)
 {
-  SemanticTypes::IDVector allImageIDsOfLesion = GetAllImageIDsOfLesion(caseID, lesion);
-  for (const auto& imageID : allImageIDsOfLesion)
+  SemanticTypes::IDVector allImageIDsOfLesion;
+  try
   {
-    auto imageControlPoint = mitk::RelationStorage::GetControlPointOfImage(caseID, imageID);
+    allImageIDsOfLesion = GetAllImageIDsOfLesion(caseID, lesion);
+  }
+  catch (SemanticRelationException& e)
+  {
+    mitkReThrow(e) << "Cannot get all image IDs of the given lesion to determine the lesion presence.";
+  }
+
+  for (const auto& imageIDOfLesion : allImageIDsOfLesion)
+  {
+    auto imageControlPoint = mitk::RelationStorage::GetControlPointOfImage(caseID, imageIDOfLesion);
     if (imageControlPoint.date == controlPoint.date)
     {
       return true;
@@ -214,30 +245,31 @@ bool mitk::SemanticRelationsInference::IsLesionPresentAtControlPoint(const Seman
 
 bool mitk::SemanticRelationsInference::InstanceExists(const DataNode* dataNode)
 {
+  SemanticTypes::CaseID caseID = "";
+  SemanticTypes::ID dataNodeID = "";
   try
   {
-    SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(dataNode);
-    SemanticTypes::ID dataNodeID = GetIDFromDataNode(dataNode);
-
-    if (NodePredicates::GetImagePredicate()->CheckNode(dataNode))
-    {
-      std::vector<std::string> allImageIDsOfCase = RelationStorage::GetAllImageIDsOfCase(caseID);
-      return std::find(allImageIDsOfCase.begin(), allImageIDsOfCase.end(), dataNodeID) != allImageIDsOfCase.end();
-    }
-    else if (NodePredicates::GetSegmentationPredicate()->CheckNode(dataNode))
-    {
-      std::vector<std::string> allSegmentationIDsOfCase = RelationStorage::GetAllSegmentationIDsOfCase(caseID);
-      return std::find(allSegmentationIDsOfCase.begin(), allSegmentationIDsOfCase.end(), dataNodeID) != allSegmentationIDsOfCase.end();
-    }
-    else
-    {
-      return false;
-    }
+    caseID = GetCaseIDFromDataNode(dataNode);
+    dataNodeID = GetIDFromDataNode(dataNode);
   }
   catch (const SemanticRelationException&)
   {
     return false;
   }
+
+  if (NodePredicates::GetImagePredicate()->CheckNode(dataNode))
+  {
+    std::vector<std::string> allImageIDsOfCase = RelationStorage::GetAllImageIDsOfCase(caseID);
+    return std::find(allImageIDsOfCase.begin(), allImageIDsOfCase.end(), dataNodeID) != allImageIDsOfCase.end();
+  }
+
+  if (NodePredicates::GetSegmentationPredicate()->CheckNode(dataNode))
+  {
+    std::vector<std::string> allSegmentationIDsOfCase = RelationStorage::GetAllSegmentationIDsOfCase(caseID);
+    return std::find(allSegmentationIDsOfCase.begin(), allSegmentationIDsOfCase.end(), dataNodeID) != allSegmentationIDsOfCase.end();
+  }
+
+  return false;
 }
 
 bool mitk::SemanticRelationsInference::InstanceExists(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion)
@@ -245,17 +277,14 @@ bool mitk::SemanticRelationsInference::InstanceExists(const SemanticTypes::CaseI
   SemanticTypes::LesionVector allLesions = RelationStorage::GetAllLesionsOfCase(caseID);
 
   // filter all lesions: check for equality with the given lesion using a lambda function
-  auto lambda = [&lesion](const SemanticTypes::Lesion& currentLesion) { return currentLesion.UID == lesion.UID; };
+  auto lambda = [&lesion](const SemanticTypes::Lesion& currentLesion)
+  {
+    return currentLesion.UID == lesion.UID;
+  };
+
   const auto existingLesion = std::find_if(allLesions.begin(), allLesions.end(), lambda);
 
-  if (existingLesion != allLesions.end())
-  {
-    return true;
-  }
-  else
-  {
-    return false;
-  }
+  return existingLesion != allLesions.end();
 }
 
 mitk::SemanticTypes::IDVector mitk::SemanticRelationsInference::GetAllImageIDsOfLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion)
@@ -293,9 +322,19 @@ mitk::SemanticTypes::ControlPoint mitk::SemanticRelationsInference::GetControlPo
     mitkThrowException(SemanticRelationException) << "Not a valid data node.";
   }
 
-  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(imageNode);
-  SemanticTypes::ID dataNodeID = GetIDFromDataNode(imageNode);
-  return RelationStorage::GetControlPointOfImage(caseID, dataNodeID);
+  SemanticTypes::CaseID caseID = "";
+  SemanticTypes::ID imageID = "";
+  try
+  {
+    caseID = GetCaseIDFromDataNode(imageNode);
+    imageID = GetIDFromDataNode(imageNode);
+  }
+  catch (SemanticRelationException& e)
+  {
+    mitkReThrow(e) << "Cannot get the control point of the given image data node.";
+  }
+
+  return RelationStorage::GetControlPointOfImage(caseID, imageID);
 }
 
 mitk::SemanticTypes::ControlPointVector mitk::SemanticRelationsInference::GetAllControlPointsOfLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion)
@@ -371,8 +410,18 @@ mitk::SemanticTypes::InformationType mitk::SemanticRelationsInference::GetInform
     mitkThrowException(SemanticRelationException) << "Not a valid image data node.";
   }
 
-  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(imageNode);
-  SemanticTypes::ID imageID = GetIDFromDataNode(imageNode);
+  SemanticTypes::CaseID caseID = "";
+  SemanticTypes::ID imageID = "";
+  try
+  {
+    caseID = GetCaseIDFromDataNode(imageNode);
+    imageID = GetIDFromDataNode(imageNode);
+  }
+  catch (SemanticRelationException& e)
+  {
+    mitkReThrow(e) << "Cannot get the information type of the given image data node.";
+  }
+
   return RelationStorage::GetInformationTypeOfImage(caseID, imageID);
 }
 

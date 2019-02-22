@@ -62,7 +62,7 @@ namespace mitk
     enum AcquisitionType : int
     {
       SingleShotEpi,
-      SpinEcho
+      ConventionalSpinEcho
     };
 
     SignalGenerationParameters()

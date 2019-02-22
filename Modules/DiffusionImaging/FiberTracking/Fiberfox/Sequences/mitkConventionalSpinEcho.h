@@ -14,22 +14,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _MITK_CartesianReadout_H
-#define _MITK_CartesianReadout_H
+#ifndef _MITK_ConventionalSpinEcho_H
+#define _MITK_ConventionalSpinEcho_H
 
 #include <mitkAcquisitionType.h>
 
 namespace mitk {
 
 /**
-  * \brief
+  * \brief Conventional spin echo sequence. Cartesian readout. One echo and one excitation per k-space line.
   *
   */
-class CartesianReadout : public AcquisitionType
+class ConventionalSpinEcho : public AcquisitionType
 {
 public:
 
-  CartesianReadout(FiberfoxParameters* parameters) : AcquisitionType(parameters)
+  ConventionalSpinEcho(FiberfoxParameters* parameters) : AcquisitionType(parameters)
   {
     kxMax = m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(0);
     kyMax = m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(1);
@@ -39,7 +39,7 @@ public:
     // maximum echo at center of each line
     m_NegTEhalf = -dt*(kxMax-(int)kxMax%2)/2;
   }
-  ~CartesianReadout() override
+  ~ConventionalSpinEcho() override
   {}
 
   float GetTimeFromMaxEcho(itk::Index< 2 > index) override

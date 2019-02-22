@@ -1286,7 +1286,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
       PrintToLog("Acquisition type: single shot EPI", false);
       break;
     }
-    case SignalGenerationParameters::SpinEcho:
+    case SignalGenerationParameters::ConventionalSpinEcho:
     {
       PrintToLog("Acquisition type: classic spin echo with cartesian k-space trajectory", false);
       break;

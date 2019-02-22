@@ -90,6 +90,8 @@ namespace mitk
       */
       StatisticNameVector GetAllStatisticNames() const;
 
+      StatisticNameVector GetExistingStatisticNames() const;
+
       bool HasStatistic(const std::string& name) const;
 
       /**

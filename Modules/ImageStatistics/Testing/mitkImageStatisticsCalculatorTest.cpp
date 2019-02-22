@@ -122,21 +122,18 @@ private:
 	void VerifyStatistics(mitk::ImageStatisticsContainer::StatisticsObject stats,
 		double testMean, double testSD, double testMedian = 0);
 
+	// T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
 	void VerifyStatistics(mitk::ImageStatisticsContainer::StatisticsObject stats,
 		unsigned long N,
 		double mean,
 		double MPP,
-		//double median,
 		double skewness,
 		double kurtosis,
-		//double uniformity,
-		//double UPP,
 		double variance,
 		double stdev,
 		double min,
 		double max,
 		double RMS,
-		//double entropy,
 		vnl_vector<int> minIndex,
 		vnl_vector<int> maxIndex);
 };
@@ -164,7 +161,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase1()
 	 ******************************/
 	MITK_INFO << std::endl << "Test case 1:-----------------------------------------------------------------------------------";
 
-	std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.dcm");
+	std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.nrrd");
 	m_TestImage = mitk::IOUtil::Load<mitk::Image>(filename);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading an mitk::Image", m_TestImage.IsNotNull());
 
@@ -198,7 +195,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase2()
 	 ******************************/
 	MITK_INFO << std::endl << "Test case 2:-----------------------------------------------------------------------------------";
 
-	std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.dcm");
+	std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.nrrd");
 	m_TestImage = mitk::IOUtil::Load<mitk::Image>(filename);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading an mitk::Image", m_TestImage.IsNotNull());
 
@@ -232,7 +229,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase3()
 	 ******************************/
 	MITK_INFO << std::endl << "Test case 3:-----------------------------------------------------------------------------------";
 
-	std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.dcm");
+	std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.nrrd");
 	m_TestImage = mitk::IOUtil::Load<mitk::Image>(filename);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading an mitk::Image", m_TestImage.IsNotNull());
 
@@ -264,7 +261,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase4()
 	 ******************************/
 	MITK_INFO << std::endl << "Test case 4:-----------------------------------------------------------------------------------";
 
-	std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.dcm");
+	std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.nrrd");
 	m_TestImage = mitk::IOUtil::Load<mitk::Image>(filename);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading an mitk::Image", m_TestImage.IsNotNull());
 
@@ -298,7 +295,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase5()
 	 ******************************/
 	MITK_INFO << std::endl << "Test case 5:-----------------------------------------------------------------------------------";
 
-	std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.dcm");
+	std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.nrrd");
 	m_TestImage = mitk::IOUtil::Load<mitk::Image>(filename);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading an mitk::Image", m_TestImage.IsNotNull());
 
@@ -332,7 +329,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase6()
 	 ******************************/
 	MITK_INFO << std::endl << "Test case 6:-----------------------------------------------------------------------------------";
 
-	std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.dcm");
+	std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.nrrd");
 	m_TestImage = mitk::IOUtil::Load<mitk::Image>(filename);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading an mitk::Image", m_TestImage.IsNotNull());
 
@@ -366,7 +363,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase7()
 	 ******************************/
 	MITK_INFO << std::endl << "Test case 7:-----------------------------------------------------------------------------------";
 
-	std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.dcm");
+	std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.nrrd");
 	m_TestImage = mitk::IOUtil::Load<mitk::Image>(filename);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading an mitk::Image", m_TestImage.IsNotNull());
 
@@ -400,7 +397,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase8()
 	 ******************************/
 	MITK_INFO << std::endl << "Test case 8:-----------------------------------------------------------------------------------";
 
-	std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.dcm");
+	std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.nrrd");
 	m_TestImage = mitk::IOUtil::Load<mitk::Image>(filename);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading an mitk::Image", m_TestImage.IsNotNull());
 
@@ -434,7 +431,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase9()
 	 ******************************/
 	MITK_INFO << std::endl << "Test case 9:-----------------------------------------------------------------------------------";
 
-	std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.dcm");
+	std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.nrrd");
 	m_TestImage = mitk::IOUtil::Load<mitk::Image>(filename);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading an mitk::Image", m_TestImage.IsNotNull());
 
@@ -468,7 +465,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase10()
 	 ******************************/
 	MITK_INFO << std::endl << "Test case 10:-----------------------------------------------------------------------------------";
 
-	std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.dcm");
+	std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.nrrd");
 	m_TestImage = mitk::IOUtil::Load<mitk::Image>(filename);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading an mitk::Image", m_TestImage.IsNotNull());
 
@@ -503,7 +500,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase11()
 	 ******************************/
 	MITK_INFO << std::endl << "Test case 11:-----------------------------------------------------------------------------------";
 
-	std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.dcm");
+	std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.nrrd");
 	m_TestImage = mitk::IOUtil::Load<mitk::Image>(filename);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading an mitk::Image", m_TestImage.IsNotNull());
 
@@ -537,7 +534,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase12()
 	 ******************************/
 	MITK_INFO << std::endl << "Test case 12:-----------------------------------------------------------------------------------";
 
-	std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.dcm");
+	std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.nrrd");
 	m_TestImage = mitk::IOUtil::Load<mitk::Image>(filename);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading an mitk::Image", m_TestImage.IsNotNull());
 
@@ -561,6 +558,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase12()
 	this->VerifyStatistics(statisticsObjectTimestep0, 212.66, 59.860, 248.640);
 }
 
+// T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
 void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedNoMask()
 {
 	MITK_INFO << std::endl << "Test Pic3D cropped without mask:-----------------------------------------------------------------------------------";
@@ -575,14 +573,11 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedNoMask()
 	double expected_median = -825;
 	double expected_skewness = 0.7120461106763573;
 	double expected_kurtosis = 1.8794464383714844;
-	//double expected_uniformity = ;
-	//double expected_UPP = ;
 	double expected_variance = 140541.38545953357;
 	double expected_standarddev = 374.88849736892911;
 	double expected_min = -927;
 	double expected_max = 147;
 	double expected_RMS = 677.35110431630551;
-	//double expected_entropy = ;
 	vnl_vector<int> expected_minIndex;
 	expected_minIndex.set_size(3);
 	expected_minIndex[0] = 2;
@@ -602,21 +597,18 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedNoMask()
 		expected_N,
 		expected_mean,
 		expected_MPP,
-		//expected_median,
 		expected_skewness,
 		expected_kurtosis,
-		//expected_uniformity,
-		//expected_UPP,
 		expected_variance,
 		expected_standarddev,
 		expected_min,
 		expected_max,
 		expected_RMS,
-		//expected_entropy,
 		expected_minIndex,
 		expected_maxIndex);
 }
 
+// T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
 void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedBinMask()
 {
 	MITK_INFO << std::endl << "Test Pic3D cropped binary mask:-----------------------------------------------------------------------------------";
@@ -629,19 +621,15 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedBinMask()
 	m_Pic3DCroppedBinMask = mitk::IOUtil::Load<mitk::Image>(Pic3DCroppedBinMaskFile);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D binary mask", m_Pic3DCroppedBinMask.IsNotNull());
 
-	//double expected_entropy = ;
 	double expected_kurtosis = 1.0765697398089618;
 	double expected_MPP = -nan("");
 	double expected_max = -22;
 	double expected_mean = -464;
-	//double expected_median = -494;
 	double expected_min = -846;
 	unsigned long expected_N = 4;
 	double expected_RMS = 595.42631785973322;
 	double expected_skewness = 0.0544059290851858;
 	double expected_standarddev = 373.14407405183323;
-	//double expected_UPP = ;
-	//double expected_uniformity = ;
 	double expected_variance = 139236.50;
 	vnl_vector<int> expected_minIndex;
 	expected_minIndex.set_size(3);
@@ -667,20 +655,18 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedBinMask()
 		expected_N,
 		expected_mean,
 		expected_MPP,
-		//expected_median,
 		expected_skewness,
 		expected_kurtosis,
-		//expected_uniformity,
-		//expected_UPP,
 		expected_variance,
 		expected_standarddev,
 		expected_min,
 		expected_max,
 		expected_RMS,
-		//expected_entropy,
 		expected_minIndex,
 		expected_maxIndex);
 }
+
+// T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
 void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedMultilabelMask()
 {
 	MITK_INFO << std::endl << "Test Pic3D cropped multilabel mask:-----------------------------------------------------------------------------------";
@@ -693,19 +679,15 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedMultilabelMask()
 	m_Pic3DCroppedMultilabelMask = mitk::IOUtil::Load<mitk::Image>(Pic3DCroppedMultilabelMaskFile);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D multilabel mask", m_Pic3DCroppedMultilabelMask.IsNotNull());
 
-	//double expected_entropy = ;
 	double expected_kurtosis = 1.5;
 	double expected_MPP = -nan("");
 	double expected_max = -22;
 	double expected_mean = -586.33333333333333;
-	//double expected_median = ;
 	double expected_min = -916;
 	unsigned long expected_N = 3;
 	double expected_RMS = 710.3006405741163;
 	double expected_skewness = 0.6774469597523700;
 	double expected_standarddev = 400.92421007245525;
-	//double expected_UPP = ;
-	//double expected_uniformity = ;
 	double expected_variance = 160740.22222222222;
 	vnl_vector<int> expected_minIndex;
 	expected_minIndex.set_size(3);
@@ -731,20 +713,18 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedMultilabelMask()
 		expected_N,
 		expected_mean,
 		expected_MPP,
-		//expected_median,
 		expected_skewness,
 		expected_kurtosis,
-		//expected_uniformity,
-		//expected_UPP,
 		expected_variance,
 		expected_standarddev,
 		expected_min,
 		expected_max,
 		expected_RMS,
-		//expected_entropy,
 		expected_minIndex,
 		expected_maxIndex);
 }
+
+// T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
 void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedPlanarFigure()
 {
 	MITK_INFO << std::endl << "Test Pic3D cropped planar figure:-----------------------------------------------------------------------------------";
@@ -757,19 +737,15 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedPlanarFigure()
 	m_Pic3DCroppedPlanarFigure = mitk::IOUtil::Load<mitk::PlanarFigure>(Pic3DCroppedPlanarFigureFile);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D planar figure", m_Pic3DCroppedPlanarFigure.IsNotNull());
 
-	//double expected_entropy = ;
 	double expected_kurtosis = 1;
 	double expected_MPP = -nan("");
 	double expected_max = -67;
 	double expected_mean = -446;
-	//double expected_median = -446;
 	double expected_min = -825;
 	unsigned long expected_N = 2;
 	double expected_RMS = 585.28369189650243;
 	double expected_skewness = 0;
 	double expected_standarddev = 379;
-	//double expected_UPP = ;
-	//double expected_uniformity = ;
 	double expected_variance = 143641;
 	vnl_vector<int> expected_minIndex;
 	expected_minIndex.set_size(3);
@@ -794,21 +770,18 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedPlanarFigure()
 		expected_N,
 		expected_mean,
 		expected_MPP,
-		//expected_median,
 		expected_skewness,
 		expected_kurtosis,
-		//expected_uniformity,
-		//expected_UPP,
 		expected_variance,
 		expected_standarddev,
 		expected_min,
 		expected_max,
 		expected_RMS,
-		//expected_entropy,
 		expected_minIndex,
 		expected_maxIndex);
 }
 
+// T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
 void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedNoMaskTimeStep1()
 {
 	MITK_INFO << std::endl << "Test US4D cropped without mask timestep 1:-----------------------------------------------------------------------------------";
@@ -817,19 +790,15 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedNoMaskTimeStep1()
 	m_US4DCroppedImage = mitk::IOUtil::Load<mitk::Image>(US4DCroppedFile);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading US4D_cropped", m_US4DCroppedImage.IsNotNull());
 
-	//double expected_entropy = ;
 	double expected_kurtosis = 1.5398359155908228;
 	double expected_MPP = 157.74074074074073;
 	double expected_max = 199;
 	double expected_mean = 157.74074074074073;
-	//double expected_median = 156;
 	double expected_min = 101;
 	unsigned long expected_N = 27;
 	double expected_RMS = 160.991718213494823;
 	double expected_skewness = 0.0347280313508018;
 	double expected_standarddev = 32.189936997387058;
-	//double expected_UPP = ;
-	//double expected_uniformity = ;
 	double expected_variance = 1036.19204389574722;
 	vnl_vector<int> expected_minIndex;
 	expected_minIndex.set_size(3);
@@ -850,20 +819,18 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedNoMaskTimeStep1()
 		expected_N,
 		expected_mean,
 		expected_MPP,
-		//expected_median,
 		expected_skewness,
 		expected_kurtosis,
-		//expected_uniformity,
-		//expected_UPP,
 		expected_variance,
 		expected_standarddev,
 		expected_min,
 		expected_max,
 		expected_RMS,
-		//expected_entropy,
 		expected_minIndex,
 		expected_maxIndex);
 }
+
+// T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
 void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedBinMaskTimeStep1()
 {
 	MITK_INFO << std::endl << "Test US4D cropped with binary mask timestep 1:-----------------------------------------------------------------------------------";
@@ -876,19 +843,15 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedBinMaskTimeStep1()
 	m_US4DCroppedBinMask = mitk::IOUtil::Load<mitk::Image>(US4DCroppedBinMaskFile);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading US4D binary mask", m_US4DCroppedBinMask.IsNotNull());
 
-	//double expected_entropy = ;
 	double expected_kurtosis = 1.5863739712889191;
 	double expected_MPP = 166.75;
 	double expected_max = 199;
 	double expected_mean = 166.75;
-	//double expected_median = 174;
 	double expected_min = 120;
 	unsigned long expected_N = 4;
 	double expected_RMS = 169.70636405273669;
 	double expected_skewness = -0.4285540263894276;
 	double expected_standarddev = 31.538666744172936;
-	//double expected_UPP = ;
-	//double expected_uniformity = ;
 	double expected_variance = 994.6874999999999;
 	vnl_vector<int> expected_minIndex;
 	expected_minIndex.set_size(3);
@@ -913,20 +876,18 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedBinMaskTimeStep1()
 		expected_N,
 		expected_mean,
 		expected_MPP,
-		//expected_median,
 		expected_skewness,
 		expected_kurtosis,
-		//expected_uniformity,
-		//expected_UPP,
 		expected_variance,
 		expected_standarddev,
 		expected_min,
 		expected_max,
 		expected_RMS,
-		//expected_entropy,
 		expected_minIndex,
 		expected_maxIndex);
 }
+
+// T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
 void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedMultilabelMaskTimeStep1()
 {
 	MITK_INFO << std::endl << "Test US4D cropped with mulitlabel mask timestep 1:-----------------------------------------------------------------------------------";
@@ -939,19 +900,15 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedMultilabelMaskTimeSt
 	m_US4DCroppedMultilabelMask = mitk::IOUtil::Load<mitk::Image>(US4DCroppedMultilabelMaskFile);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading US4D multilabel mask", m_US4DCroppedMultilabelMask.IsNotNull());
 
-	//double expected_entropy = ;
 	double expected_kurtosis = 1.0432484564918287;
 	double expected_MPP = 159.75;
 	double expected_max = 199;
 	double expected_mean = 159.75;
-	//double expected_median = ;
 	double expected_min = 120;
 	unsigned long expected_N = 4;
 	double expected_RMS = 163.74446555532802;
 	double expected_skewness = -0.004329226115093;
 	double expected_standarddev = 35.947009611371016;
-	//double expected_UPP = ;
-	//double expected_uniformity = ;
 	double expected_variance = 1292.187500000000227;
 	vnl_vector<int> expected_minIndex;
 	expected_minIndex.set_size(3);
@@ -976,20 +933,18 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedMultilabelMaskTimeSt
 		expected_N,
 		expected_mean,
 		expected_MPP,
-		//expected_median,
 		expected_skewness,
 		expected_kurtosis,
-		//expected_uniformity,
-		//expected_UPP,
 		expected_variance,
 		expected_standarddev,
 		expected_min,
 		expected_max,
 		expected_RMS,
-		//expected_entropy,
 		expected_minIndex,
 		expected_maxIndex);
 }
+
+// T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
 void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedPlanarFigureTimeStep1()
 {
 	MITK_INFO << std::endl << "Test US4D cropped planar figure timestep 1:-----------------------------------------------------------------------------------";
@@ -1002,19 +957,15 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedPlanarFigureTimeStep
 	m_US4DCroppedPlanarFigure = mitk::IOUtil::Load<mitk::PlanarFigure>(US4DCroppedPlanarFigureFile);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading US4D planar figure", m_US4DCroppedPlanarFigure.IsNotNull());
 
-	//double expected_entropy = ;
 	double expected_kurtosis = 1;
 	double expected_MPP = 172.5;
 	double expected_max = 197;
 	double expected_mean = 172.5;
-	//double expected_median = ;
 	double expected_min = 148;
 	unsigned long expected_N = 2;
 	double expected_RMS = 174.23116827938679;
 	double expected_skewness = 0;
 	double expected_standarddev = 24.5;
-	//double expected_UPP = ;
-	//double expected_uniformity = ;
 	double expected_variance = 600.25;
 	vnl_vector<int> expected_minIndex;
 	expected_minIndex.set_size(3);
@@ -1039,17 +990,13 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedPlanarFigureTimeStep
 		expected_N,
 		expected_mean,
 		expected_MPP,
-		//expected_median,
 		expected_skewness,
 		expected_kurtosis,
-		//expected_uniformity,
-		//expected_UPP,
 		expected_variance,
 		expected_standarddev,
 		expected_min,
 		expected_max,
 		expected_RMS,
-		//expected_entropy,
 		expected_minIndex,
 		expected_maxIndex);
 }
@@ -1132,38 +1079,31 @@ void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatist
 	CPPUNIT_ASSERT_MESSAGE("Calculated median grayvalue is not equal to the desired value.", testMedian == calculatedMedian);
 }
 
+// T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
 void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatisticsContainer::StatisticsObject stats,
 	unsigned long N,
 	double mean,
 	double MPP,
-	//double median,
 	double skewness,
 	double kurtosis,
-	//double uniformity,
-	//double UPP,
 	double variance,
 	double stdev,
 	double min,
 	double max,
 	double RMS,
-	//double entropy,
 	vnl_vector<int> minIndex,
 	vnl_vector<int> maxIndex)
 {
 	auto numberOfVoxelsObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::VoxelCountType>(mitk::ImageStatisticsConstants::NUMBEROFVOXELS());
 	auto meanObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MEAN());
 	auto mppObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MPP());
-	//auto medianObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MEDIAN());
 	auto skewnessObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::SKEWNESS());
 	auto kurtosisObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::KURTOSIS());
-	//auto uniformityObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::UNIFORMITY());
-	//auto uppObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::UPP());
 	auto varianceObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::VARIANCE());
 	auto standardDeviationObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::STANDARDDEVIATION());
 	auto minObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MINIMUM());
 	auto maxObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MAXIMUM());
 	auto rmsObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::RMS());
-	//auto entropyObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::ENTROPY());
 	auto minIndexObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::IndexType>(mitk::ImageStatisticsConstants::MINIMUMPOSITION());
 	auto maxIndexObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::IndexType>(mitk::ImageStatisticsConstants::MAXIMUMPOSITION());
 
@@ -1175,12 +1115,9 @@ void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatist
 	{
 		CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(mppObject - MPP) < mitk::eps);
 	}
-	//CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(medianObject - median) < mitk::eps);
 	MITK_INFO << "Difference in skewness value: " << std::abs(skewnessObject - skewness);
 	CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(skewnessObject - skewness) < mitk::eps);
 	CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(kurtosisObject - kurtosis) < mitk::eps);
-	//CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(uniformityObject - uniformity) < mitk::eps);
-	//CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(uppObject - UPP) < mitk::eps);
 	MITK_INFO << "Difference in variance value: " << std::abs(varianceObject - variance);
 	CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(varianceObject - variance) < mitk::eps);
 	CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(standardDeviationObject - stdev) < mitk::eps);
@@ -1188,7 +1125,6 @@ void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatist
 	CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(maxObject - max) < mitk::eps);
 	MITK_INFO << "Difference in RMS value: " << std::abs(rmsObject - RMS);
 	CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(rmsObject - RMS) < mitk::eps);
-	//CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(entropyObject - entropy) < mitk::eps);
 	for (unsigned int i = 0; i < minIndex.size(); ++i)
 	{
 		CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(minIndexObject[i] - minIndex[i]) < mitk::eps);

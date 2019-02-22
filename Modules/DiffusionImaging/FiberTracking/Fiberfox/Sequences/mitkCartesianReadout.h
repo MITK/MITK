@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 /**
-  * \brief Realizes EPI readout: one echo, maximum intensity in the k-space center, zig-zag trajectory
+  * \brief
   *
   */
 class CartesianReadout : public AcquisitionType

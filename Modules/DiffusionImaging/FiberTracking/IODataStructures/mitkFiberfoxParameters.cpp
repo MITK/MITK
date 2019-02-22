@@ -371,6 +371,7 @@ void mitk::FiberfoxParameters::SaveParameters(std::string filename)
   parameters.put("fiberfox.image.partialfourier", m_SignalGen.m_PartialFourier);
   parameters.put("fiberfox.image.noisevariance", m_SignalGen.m_NoiseVariance);
   parameters.put("fiberfox.image.trep", m_SignalGen.m_tRep);
+  parameters.put("fiberfox.image.tinv", m_SignalGen.m_tInv);
   parameters.put("fiberfox.image.signalScale", m_SignalGen.m_SignalScale);
   parameters.put("fiberfox.image.tEcho", m_SignalGen.m_tEcho);
   parameters.put("fiberfox.image.tLine", m_SignalGen.m_tLine);
@@ -740,6 +741,7 @@ void mitk::FiberfoxParameters::LoadParameters(std::string filename, bool fix_see
       m_SignalGen.m_PartialFourier = ReadVal<float>(v1,"partialfourier", m_SignalGen.m_PartialFourier);
       m_SignalGen.m_NoiseVariance = ReadVal<float>(v1,"noisevariance", m_SignalGen.m_NoiseVariance);
       m_SignalGen.m_tRep = ReadVal<float>(v1,"trep", m_SignalGen.m_tRep);
+      m_SignalGen.m_tInv = ReadVal<float>(v1,"tinv", m_SignalGen.m_tInv);
       m_SignalGen.m_SignalScale = ReadVal<float>(v1,"signalScale", m_SignalGen.m_SignalScale);
       m_SignalGen.m_tEcho = ReadVal<float>(v1,"tEcho", m_SignalGen.m_tEcho);
       m_SignalGen.m_tLine = ReadVal<float>(v1,"tLine", m_SignalGen.m_tLine);

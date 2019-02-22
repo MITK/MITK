@@ -105,6 +105,7 @@ namespace itk{
     FiberfoxParameters*                     m_Parameters;
     std::vector< float >                    m_T2;
     std::vector< float >                    m_T1;
+    std::vector< float >                    m_T1Relax;
     std::vector< InputImagePointerType >    m_CompartmentImages;
     itk::Vector<double,3>                   m_DiffusionGradientDirection;
     float                                   m_Z;

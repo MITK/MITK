@@ -185,6 +185,21 @@ namespace itk {
         ++it;
       }
     }
+
+    // calculate T1 relaxation (independent of actual readout)
+    m_T1Relax.clear();
+    if ( m_Parameters->m_SignalGen.m_DoSimulateRelaxation)
+      for (unsigned int i=0; i<m_CompartmentImages.size(); i++)
+      {
+        // account for T1 relaxation (how much magnetization is available since last excitation?)
+        float relaxation = (1.0-std::exp(-m_Parameters->m_SignalGen.m_tRep/m_T1[i]));
+
+        // account for inversion pulse and TI
+        if (m_Parameters->m_SignalGen.m_tInv > 0)
+          relaxation *= (1.0-std::exp(std::log(2) - m_Parameters->m_SignalGen.m_tInv/m_T1[i]));
+
+        m_T1Relax.push_back(relaxation);
+      }
   }
 
   template< class ScalarType >
@@ -287,11 +302,11 @@ namespace itk {
       // calcualte signal relaxation factors
       std::vector< float > relaxFactor;
       if ( m_Parameters->m_SignalGen.m_DoSimulateRelaxation)
-      {
         for (unsigned int i=0; i<m_CompartmentImages.size(); i++)
-          relaxFactor.push_back( std::exp(-tRf/m_T2[i] -fabs(t)/ m_Parameters->m_SignalGen.m_tInhom)
-                                 * (1.0-std::exp(-(m_Parameters->m_SignalGen.m_tRep + tRf)/m_T1[i])) );
-      }
+        {
+          // account for T2 relaxation (how much transverse magnetization is left since applicatiohn of RF pulse?)
+          relaxFactor.push_back(m_T1Relax[i] * std::exp(-tRf/m_T2[i] -fabs(t)/ m_Parameters->m_SignalGen.m_tInhom));
+        }
 
       // add ghosting by adding gradient delay induced offset
       if (m_Parameters->m_Misc.m_DoAddGhosts)

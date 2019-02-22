@@ -1297,6 +1297,8 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
       break;
     }
     }
+    if(m_Parameters.m_SignalGen.m_tInv>0)
+      PrintToLog("Using inversion pulse with TI " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_tInv) + "ms", false);
 
     if (m_Parameters.m_SignalGen.m_DoSimulateRelaxation)
       PrintToLog("Simulating signal relaxation", false);

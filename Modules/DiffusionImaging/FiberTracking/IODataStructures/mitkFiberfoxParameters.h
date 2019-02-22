@@ -70,6 +70,7 @@ namespace mitk
       , m_SignalScale(100)
       , m_tEcho(100)
       , m_tRep(4000)
+      , m_tInv(0)
       , m_tLine(1)
       , m_tInhom(50)
       , m_ReversePhase(false)
@@ -120,6 +121,7 @@ namespace mitk
     float                               m_SignalScale;              ///< Scaling factor for output signal (before noise is added).
     float                               m_tEcho;                    ///< Echo time TE.
     float                               m_tRep;                     ///< Echo time TR.
+    float                               m_tInv;                       ///< Inversion time
     float                               m_tLine;                    ///< k-space line readout time (dwell time).
     float                               m_tInhom;                   ///< T2'
     bool                                m_ReversePhase;             ///< If true, the phase readout direction will be inverted (-y instead of y)

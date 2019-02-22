@@ -764,6 +764,7 @@ void QmitkFiberfoxView::UpdateParametersFromGui()
   m_Parameters.m_SignalGen.m_tInhom = m_Controls->m_T2starBox->value();
   m_Parameters.m_SignalGen.m_tEcho = m_Controls->m_TEbox->value();
   m_Parameters.m_SignalGen.m_tRep = m_Controls->m_TRbox->value();
+  m_Parameters.m_SignalGen.m_tInv = m_Controls->m_TIbox->value();
   m_Parameters.m_SignalGen.m_DoDisablePartialVolume = m_Controls->m_EnforcePureFiberVoxelsBox->isChecked();
   m_Parameters.m_SignalGen.m_AxonRadius = m_Controls->m_FiberRadius->value();
   m_Parameters.m_SignalGen.m_SignalScale = m_Controls->m_SignalScaleBox->value();
@@ -1342,6 +1343,7 @@ void QmitkFiberfoxView::LoadParameters()
   m_Controls->m_ReversePhaseBox->setChecked(m_Parameters.m_SignalGen.m_ReversePhase);
   m_Controls->m_PartialFourier->setValue(m_Parameters.m_SignalGen.m_PartialFourier);
   m_Controls->m_TRbox->setValue(m_Parameters.m_SignalGen.m_tRep);
+  m_Controls->m_TIbox->setValue(m_Parameters.m_SignalGen.m_tInv);
   m_Controls->m_NumCoilsBox->setValue(m_Parameters.m_SignalGen.m_NumberOfCoils);
   m_Controls->m_CoilSensBox->setCurrentIndex(m_Parameters.m_SignalGen.m_CoilSensitivityProfile);
   m_Controls->m_AcquisitionTypeBox->setCurrentIndex(m_Parameters.m_SignalGen.m_AcquisitionType);

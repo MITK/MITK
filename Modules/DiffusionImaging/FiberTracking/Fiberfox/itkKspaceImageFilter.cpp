@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionConstIteratorWithIndex.h>
 #include <itkImageRegionIterator.h>
 #include <mitkSingleShotEpi.h>
-#include <mitkCartesianReadout.h>
+#include <mitkConventionalSpinEcho.h>
 #include <mitkDiffusionFunctionCollection.h>
 
 namespace itk {
@@ -146,8 +146,8 @@ namespace itk {
       case SignalGenerationParameters::SingleShotEpi:
         m_ReadoutScheme = new mitk::SingleShotEpi(m_Parameters);
       break;
-      case SignalGenerationParameters::SpinEcho:
-        m_ReadoutScheme = new mitk::CartesianReadout(m_Parameters);
+      case SignalGenerationParameters::ConventionalSpinEcho:
+        m_ReadoutScheme = new mitk::ConventionalSpinEcho(m_Parameters);
       break;
       default:
         m_ReadoutScheme = new mitk::SingleShotEpi(m_Parameters);

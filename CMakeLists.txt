@@ -285,6 +285,17 @@ foreach(_buildConfigFile ${_buildConfigFiles})
   list(APPEND _buildConfigs ${_buildConfigFile})
 endforeach()
 
+foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
+  file(GLOB _extBuildConfigFiles ${MITK_EXTENSION_DIR}/CMake/BuildConfigurations/*.cmake)
+
+  foreach(_extBuildConfigFile ${_extBuildConfigFiles})
+    get_filename_component(_extBuildConfigFile ${_extBuildConfigFile} NAME_WE)
+    list(APPEND _buildConfigs ${_extBuildConfigFile})
+  endforeach()
+
+  list(REMOVE_DUPLICATES _buildConfigs)
+endforeach()
+
 set(MITK_BUILD_CONFIGURATION "Custom" CACHE STRING "Use pre-defined MITK configurations")
 set_property(CACHE MITK_BUILD_CONFIGURATION PROPERTY STRINGS ${_buildConfigs})
 

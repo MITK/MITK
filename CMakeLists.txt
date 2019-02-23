@@ -641,7 +641,7 @@ endif()
 
 # on macOS all BlueBerry plugins get copied into every
 # application bundle (.app directory) specified here
-if(MITK_USE_BLUEBERRY #[[AND APPLE]])
+if(MITK_USE_BLUEBERRY AND APPLE)
 
   foreach(MITK_EXTENSION_DIR ${MITK_DIR_PLUS_EXTENSION_DIRS})
     set(MITK_APPLICATIONS_EXTENSION_DIR ${MITK_EXTENSION_DIR}/Applications)

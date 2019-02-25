@@ -90,6 +90,8 @@ namespace mitk
 
   IFileIO::ConfidenceLevel DICOMSegmentationIO::GetWriterConfidenceLevel() const
   {
+    return Unsupported; // T25798: Writer does not work!
+
     if (AbstractFileIO::GetWriterConfidenceLevel() == Unsupported)
       return Unsupported;
 

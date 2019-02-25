@@ -54,6 +54,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itksys/SystemTools.hxx>
 
+#include <regex>
+
 const std::string QmitkMultiLabelSegmentationView::VIEW_ID = "org.mitk.views.multilabelsegmentation";
 
 QmitkMultiLabelSegmentationView::QmitkMultiLabelSegmentationView()
@@ -180,14 +182,33 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget *parent)
   m_Controls.m_cbInterpolation->setCurrentIndex(0);
   m_Controls.m_swInterpolation->hide();
 
+  QString segTools2D = tr("Add Subtract Fill Erase Paint Wipe 'Region Growing' FastMarching2D Correction 'Live Wire'");
+  QString segTools3D = tr("Threshold 'Two Thresholds' 'Auto Threshold' 'Multiple Otsu'");
+
+  std::regex extSegTool2DRegEx("SegTool2D$");
+  std::regex extSegTool3DRegEx("SegTool3D$");
+
+  auto tools = m_ToolManager->GetTools();
+
+  for (const auto &tool : tools)
+  {
+    if (std::regex_search(tool->GetNameOfClass(), extSegTool2DRegEx))
+    {
+      segTools2D.append(QString(" '%1'").arg(tool->GetName()));
+    }
+    else if (std::regex_search(tool->GetNameOfClass(), extSegTool3DRegEx))
+    {
+      segTools3D.append(QString(" '%1'").arg(tool->GetName()));
+    }
+  }
+
   // *------------------------
   // * ToolSelection 2D
   // *------------------------
 
   m_Controls.m_ManualToolSelectionBox2D->SetGenerateAccelerators(true);
   m_Controls.m_ManualToolSelectionBox2D->SetToolGUIArea(m_Controls.m_ManualToolGUIContainer2D);
-  m_Controls.m_ManualToolSelectionBox2D->SetDisplayedToolGroups(
-    "Add Subtract Fill Erase Paint Wipe 'Region Growing' FastMarching2D Correction 'Live Wire'"); // todo: "Correction
+  m_Controls.m_ManualToolSelectionBox2D->SetDisplayedToolGroups(segTools2D.toStdString()); // todo: "Correction
   // 'Live Wire'"
   m_Controls.m_ManualToolSelectionBox2D->SetEnabledMode(
     QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible);
@@ -199,8 +220,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget *parent)
 
   m_Controls.m_ManualToolSelectionBox3D->SetGenerateAccelerators(true);
   m_Controls.m_ManualToolSelectionBox3D->SetToolGUIArea(m_Controls.m_ManualToolGUIContainer3D);
-  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups(
-    "Threshold 'Two Thresholds' 'Auto Threshold' 'Multiple Otsu'"); // todo add : FastMarching3D RegionGrowing Watershed
+  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups(segTools3D.toStdString()); // todo add : FastMarching3D RegionGrowing Watershed
   m_Controls.m_ManualToolSelectionBox3D->SetLayoutColumns(2);
   m_Controls.m_ManualToolSelectionBox3D->SetEnabledMode(
     QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible);
@@ -353,8 +373,7 @@ void QmitkMultiLabelSegmentationView::OnManualTool2DSelected(int id)
     mitk::StatusBar::GetInstance()->DisplayText(text.c_str());
 
     us::ModuleResource resource = m_ToolManager->GetToolById(id)->GetCursorIconResource();
-    if (resource.IsValid())
-      this->SetMouseCursor(resource, 0, 0);
+    this->SetMouseCursor(resource, 0, 0);
   }
 }
 
@@ -839,7 +858,7 @@ void QmitkMultiLabelSegmentationView::OnPreferencesChanged(const berry::IBerryPr
       {
         // segmentation node is a multi label segmentation
         segmentation->SetProperty("labelset.contour.active", drawOutline);
-        segmentation->SetProperty("opacity", mitk::FloatProperty::New(drawOutline->GetValue() ? 1.0f : 0.3f));
+        //segmentation->SetProperty("opacity", mitk::FloatProperty::New(drawOutline->GetValue() ? 1.0f : 0.3f));
         segmentation->SetProperty("volumerendering", volumeRendering);
         // force render window update to show outline
         segmentation->GetData()->Modified();
@@ -854,7 +873,7 @@ void QmitkMultiLabelSegmentationView::OnPreferencesChanged(const berry::IBerryPr
         {
           segmentation->SetProperty("outline binary", drawOutline);
           segmentation->SetProperty("outline width", mitk::FloatProperty::New(2.0));
-          segmentation->SetProperty("opacity", mitk::FloatProperty::New(drawOutline->GetValue() ? 1.0f : 0.3f));
+          //segmentation->SetProperty("opacity", mitk::FloatProperty::New(drawOutline->GetValue() ? 1.0f : 0.3f));
           segmentation->SetProperty("volumerendering", volumeRendering);
           // force render window update to show outline
           segmentation->GetData()->Modified();
@@ -925,7 +944,6 @@ void QmitkMultiLabelSegmentationView::NodeRemoved(const mitk::DataNode *node)
 
 void QmitkMultiLabelSegmentationView::OnEstablishLabelSetConnection()
 {
-  MITK_INFO << "Connection Established";
   if (m_WorkingNode.IsNull())
   {
     return;
@@ -950,7 +968,6 @@ void QmitkMultiLabelSegmentationView::OnEstablishLabelSetConnection()
 
 void QmitkMultiLabelSegmentationView::OnLooseLabelSetConnection()
 {
-  MITK_INFO << "Connection Lost";
   if (m_WorkingNode.IsNull())
   {
     return;
@@ -1090,13 +1107,14 @@ void QmitkMultiLabelSegmentationView::SetMouseCursor(const us::ModuleResource re
 {
   // Remove previously set mouse cursor
   if (m_MouseCursorSet)
-  {
-    mitk::ApplicationCursor::GetInstance()->PopCursor();
-  }
+    this->ResetMouseCursor();
 
-  us::ModuleResourceStream cursor(resource, std::ios::binary);
-  mitk::ApplicationCursor::GetInstance()->PushCursor(cursor, hotspotX, hotspotY);
-  m_MouseCursorSet = true;
+  if (resource)
+  {
+    us::ModuleResourceStream cursor(resource, std::ios::binary);
+    mitk::ApplicationCursor::GetInstance()->PushCursor(cursor, hotspotX, hotspotY);
+    m_MouseCursorSet = true;
+  }
 }
 
 void QmitkMultiLabelSegmentationView::InitializeListeners()

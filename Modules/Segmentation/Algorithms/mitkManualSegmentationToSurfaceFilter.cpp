@@ -50,11 +50,11 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
 
   if ((tmax - tstart) > 0)
   {
-    ProgressBar::GetInstance()->AddStepsToDo(7 * (tmax - tstart));
+    ProgressBar::GetInstance()->AddStepsToDo(4 * (tmax - tstart));
   }
   else
   {
-    ProgressBar::GetInstance()->AddStepsToDo(7);
+    ProgressBar::GetInstance()->AddStepsToDo(4);
   }
 
   for (int t = tstart; t < tmax; ++t)
@@ -62,7 +62,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
     vtkSmartPointer<vtkImageData> vtkimage = image->GetVtkImageData(t);
 
     // Median -->smooth 3D
-    MITK_INFO << (m_MedianFilter3D ? "Applying median..." : "No median filtering");
+    // MITK_INFO << (m_MedianFilter3D ? "Applying median..." : "No median filtering");
     if (m_MedianFilter3D)
     {
       vtkImageMedian3D *median = vtkImageMedian3D::New();
@@ -77,7 +77,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
     ProgressBar::GetInstance()->Progress();
 
     // Interpolate image spacing
-    MITK_INFO << (m_Interpolation ? "Resampling..." : "No resampling");
+    // MITK_INFO << (m_Interpolation ? "Resampling..." : "No resampling");
     if (m_Interpolation)
     {
       vtkImageResample *imageresample = vtkImageResample::New();
@@ -94,7 +94,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
     }
     ProgressBar::GetInstance()->Progress();
 
-    MITK_INFO << (m_UseGaussianImageSmooth ? "Applying gaussian smoothing..." : "No gaussian smoothing");
+    // MITK_INFO << (m_UseGaussianImageSmooth ? "Applying gaussian smoothing..." : "No gaussian smoothing");
     if (m_UseGaussianImageSmooth) // gauss
     {
       vtkImageShiftScale *scalefilter = vtkImageShiftScale::New();
@@ -116,14 +116,13 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       double range[2];
       vtkimage->GetScalarRange(range);
 
-      MITK_DEBUG << "Current scalar max is: " << range[1];
       if (range[1] != 0) // too little slices, image smoothing eliminates all segmentation pixels
       {
         vtkimage = gaussian->GetOutput(); //->Out
       }
       else
       {
-        MITK_INFO << "Smoothing removes all pixels of the segmentation. Use unsmoothed result";
+        MITK_INFO << "Smoothing would remove all pixels of the segmentation. Use unsmoothed result instead.";
       }
       gaussian->Delete();
       scalefilter->Delete();
@@ -135,7 +134,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
     ProgressBar::GetInstance()->Progress();
   }
 
-  MITK_INFO << "Updating Time Geometry to ensure right timely displaying";
+  // MITK_INFO << "Updating Time Geometry to ensure right timely displaying";
   // Fixing wrong time geometry
   TimeGeometry *surfaceTG = surface->GetTimeGeometry();
   auto *surfacePTG = dynamic_cast<ProportionalTimeGeometry *>(surfaceTG);
@@ -150,7 +149,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
     TimePointType duration = imagePTG->GetStepDuration();
     surfacePTG->SetFirstTimePoint(firstTime);
     surfacePTG->SetStepDuration(duration);
-    MITK_INFO << "First Time Point: " << firstTime << "  Duration: " << duration;
+    // MITK_INFO << "First Time Point: " << firstTime << "  Duration: " << duration;
   }
 };
 

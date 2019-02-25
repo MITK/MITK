@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "internal/org_mitk_gui_qt_application_Activator.h"
 
+#include <mitkIDataStorageService.h>
+#include <mitkNodePredicateProperty.h>
 #include <mitkWorkbenchUtil.h>
 
 #include <QmitkIOUtil.h>
@@ -25,6 +27,69 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIPreferences.h>
 
 #include <QFileDialog>
+
+namespace
+{
+  mitk::DataStorage::Pointer GetDataStorage()
+  {
+    auto context = mitk::org_mitk_gui_qt_application_Activator::GetContext();
+
+    if (nullptr == context)
+      return nullptr;
+
+    auto dataStorageServiceReference = context->getServiceReference<mitk::IDataStorageService>();
+
+    if (!dataStorageServiceReference)
+      return nullptr;
+
+    auto dataStorageService = context->getService<mitk::IDataStorageService>(dataStorageServiceReference);
+
+    if (nullptr == dataStorageService)
+      return nullptr;
+
+    auto dataStorageReference = dataStorageService->GetDataStorage();
+
+    if (dataStorageReference.IsNull())
+      return nullptr;
+
+    return dataStorageReference->GetDataStorage();
+  }
+
+  mitk::DataNode::Pointer GetFirstSelectedNode()
+  {
+    auto dataStorage = GetDataStorage();
+
+    if (dataStorage.IsNull())
+      return nullptr;
+
+    auto selectedNodes = dataStorage->GetSubset(mitk::NodePredicateProperty::New("selected", mitk::BoolProperty::New(true)));
+
+    if (selectedNodes->empty())
+      return nullptr;
+
+    return selectedNodes->front();
+  }
+
+  QString GetPathOfFirstSelectedNode()
+  {
+    auto firstSelectedNode = GetFirstSelectedNode();
+
+    if (firstSelectedNode.IsNull())
+      return "";
+
+    auto data = firstSelectedNode->GetData();
+
+    if (nullptr == data)
+      return "";
+
+    auto pathProperty = data->GetConstProperty("path");
+
+    if (pathProperty.IsNull())
+      return "";
+
+    return QFileInfo(QString::fromStdString(pathProperty->GetValueAsString())).canonicalPath();
+  }
+}
 
 class QmitkFileOpenActionPrivate
 {
@@ -110,9 +175,14 @@ QmitkFileOpenAction::~QmitkFileOpenAction()
 
 void QmitkFileOpenAction::Run()
 {
-  // ask the user for a list of files to open
+  auto path = GetPathOfFirstSelectedNode();
+
+  if (path.isEmpty())
+    path = d->getLastFileOpenPath();
+
+  // Ask the user for a list of files to open
   QStringList fileNames = QFileDialog::getOpenFileNames(nullptr, "Open",
-                                                        d->GetLastFileOpenPath(),
+                                                        path,
                                                         QmitkIOUtil::GetFileOpenFilterString());
 
   if (fileNames.empty())

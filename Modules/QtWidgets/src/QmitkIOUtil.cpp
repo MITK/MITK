@@ -181,19 +181,21 @@ mitk::DataStorage::SetOfObjects::Pointer QmitkIOUtil::Load(const QString &path,
 QString QmitkIOUtil::Save(const mitk::BaseData *data,
                           const QString &defaultBaseName,
                           const QString &defaultPath,
-                          QWidget *parent)
+                          QWidget *parent,
+                          bool setPathProperty)
 {
   std::vector<const mitk::BaseData *> dataVector;
   dataVector.push_back(data);
   QStringList defaultBaseNames;
   defaultBaseNames.push_back(defaultBaseName);
-  return Save(dataVector, defaultBaseNames, defaultPath, parent).back();
+  return Save(dataVector, defaultBaseNames, defaultPath, parent, setPathProperty).back();
 }
 
 QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData *> &data,
                               const QStringList &defaultBaseNames,
                               const QString &defaultPath,
-                              QWidget *parent)
+                              QWidget *parent,
+                              bool setPathProperty)
 {
   QStringList fileNames;
   QString currentPath = defaultPath;
@@ -360,7 +362,7 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData *> &data,
   if (!saveInfos.empty())
   {
     Impl::WriterOptionsDialogFunctor optionsCallback;
-    std::string errMsg = Save(saveInfos, &optionsCallback);
+    std::string errMsg = Save(saveInfos, &optionsCallback, setPathProperty);
     if (!errMsg.empty())
     {
       QMessageBox::warning(parent, "Error writing files", QString::fromStdString(errMsg));

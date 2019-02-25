@@ -376,6 +376,7 @@ void mitk::FiberfoxParameters::SaveParameters(std::string filename)
   parameters.put("fiberfox.image.tEcho", m_SignalGen.m_tEcho);
   parameters.put("fiberfox.image.tLine", m_SignalGen.m_tLine);
   parameters.put("fiberfox.image.tInhom", m_SignalGen.m_tInhom);
+  parameters.put("fiberfox.image.echoTrainLength", m_SignalGen.m_EchoTrainLength);
   parameters.put("fiberfox.image.simulatekspace", m_SignalGen.m_SimulateKspaceAcquisition);
   parameters.put("fiberfox.image.axonRadius", m_SignalGen.m_AxonRadius);
   parameters.put("fiberfox.image.doSimulateRelaxation", m_SignalGen.m_DoSimulateRelaxation);
@@ -746,6 +747,7 @@ void mitk::FiberfoxParameters::LoadParameters(std::string filename, bool fix_see
       m_SignalGen.m_tEcho = ReadVal<float>(v1,"tEcho", m_SignalGen.m_tEcho);
       m_SignalGen.m_tLine = ReadVal<float>(v1,"tLine", m_SignalGen.m_tLine);
       m_SignalGen.m_tInhom = ReadVal<float>(v1,"tInhom", m_SignalGen.m_tInhom);
+      m_SignalGen.m_EchoTrainLength = ReadVal<unsigned int>(v1,"echoTrainLength", m_SignalGen.m_EchoTrainLength);
       m_SignalGen.m_SimulateKspaceAcquisition = ReadVal<bool>(v1,"simulatekspace", m_SignalGen.m_SimulateKspaceAcquisition);
 
       m_SignalGen.m_AxonRadius = ReadVal<double>(v1,"axonRadius", m_SignalGen.m_AxonRadius);

@@ -99,6 +99,7 @@ set(H_FILES
   Fiberfox/Sequences/mitkAcquisitionType.h
   Fiberfox/Sequences/mitkSingleShotEpi.h
   Fiberfox/Sequences/mitkConventionalSpinEcho.h
+  Fiberfox/Sequences/mitkFastSpinEcho.h
 )
 
 set(RESOURCE_FILES

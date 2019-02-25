@@ -1288,7 +1288,12 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     }
     case SignalGenerationParameters::ConventionalSpinEcho:
     {
-      PrintToLog("Acquisition type: classic spin echo with cartesian k-space trajectory", false);
+      PrintToLog("Acquisition type: conventional spin echo (one RF pulse per line) with cartesian k-space trajectory", false);
+      break;
+    }
+    case SignalGenerationParameters::FastSpinEcho:
+    {
+      PrintToLog("Acquisition type: fast spin echo (one RF pulse per slice) with cartesian k-space trajectory (ETL: " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_EchoTrainLength) + ")", false);
       break;
     }
     default:

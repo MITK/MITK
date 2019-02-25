@@ -62,7 +62,8 @@ namespace mitk
     enum AcquisitionType : int
     {
       SingleShotEpi,
-      ConventionalSpinEcho
+      ConventionalSpinEcho,
+      FastSpinEcho,
     };
 
     SignalGenerationParameters()
@@ -73,6 +74,7 @@ namespace mitk
       , m_tInv(0)
       , m_tLine(1)
       , m_tInhom(50)
+      , m_EchoTrainLength(8)
       , m_ReversePhase(false)
       , m_PartialFourier(1.0)
       , m_NoiseVariance(0.001)
@@ -124,6 +126,7 @@ namespace mitk
     float                               m_tInv;                       ///< Inversion time
     float                               m_tLine;                    ///< k-space line readout time (dwell time).
     float                               m_tInhom;                   ///< T2'
+    unsigned int                        m_EchoTrainLength;          ///< Only relevant for Fast Spin Echo sequence (number of k-space lines acquired with one RF pulse)
     bool                                m_ReversePhase;             ///< If true, the phase readout direction will be inverted (-y instead of y)
     float                               m_PartialFourier;           ///< Partial fourier factor (0.5-1)
     float                               m_NoiseVariance;            ///< Variance of complex gaussian noise

@@ -762,6 +762,7 @@ void QmitkFiberfoxView::UpdateParametersFromGui()
   m_Parameters.m_SignalGen.m_ReversePhase = m_Controls->m_ReversePhaseBox->isChecked();
   m_Parameters.m_SignalGen.m_tLine = m_Controls->m_LineReadoutTimeBox->value();
   m_Parameters.m_SignalGen.m_tInhom = m_Controls->m_T2starBox->value();
+  m_Parameters.m_SignalGen.m_EchoTrainLength = m_Controls->m_EtlBox->value();
   m_Parameters.m_SignalGen.m_tEcho = m_Controls->m_TEbox->value();
   m_Parameters.m_SignalGen.m_tRep = m_Controls->m_TRbox->value();
   m_Parameters.m_SignalGen.m_tInv = m_Controls->m_TIbox->value();
@@ -1164,6 +1165,7 @@ void QmitkFiberfoxView::UpdateParametersFromGui()
   m_Parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.SignalScale", IntProperty::New(m_Parameters.m_SignalGen.m_SignalScale));
   m_Parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.FiberRadius", IntProperty::New(m_Parameters.m_SignalGen.m_AxonRadius));
   m_Parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Tinhom", DoubleProperty::New(m_Parameters.m_SignalGen.m_tInhom));
+  m_Parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.echoTrainLength", IntProperty::New(m_Parameters.m_SignalGen.m_EchoTrainLength));
   m_Parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Tline", DoubleProperty::New(m_Parameters.m_SignalGen.m_tLine));
   m_Parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.TE", DoubleProperty::New(m_Parameters.m_SignalGen.m_tEcho));
   m_Parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.b-value", DoubleProperty::New(m_Parameters.m_SignalGen.GetBvalue()));
@@ -1337,6 +1339,7 @@ void QmitkFiberfoxView::LoadParameters()
   m_Controls->m_TEbox->setValue(m_Parameters.m_SignalGen.m_tEcho);
   m_Controls->m_LineReadoutTimeBox->setValue(m_Parameters.m_SignalGen.m_tLine);
   m_Controls->m_T2starBox->setValue(m_Parameters.m_SignalGen.m_tInhom);
+  m_Controls->m_EtlBox->setValue(m_Parameters.m_SignalGen.m_EchoTrainLength);
   m_Controls->m_FiberRadius->setValue(m_Parameters.m_SignalGen.m_AxonRadius);
   m_Controls->m_RelaxationBox->setChecked(m_Parameters.m_SignalGen.m_DoSimulateRelaxation);
   m_Controls->m_EnforcePureFiberVoxelsBox->setChecked(m_Parameters.m_SignalGen.m_DoDisablePartialVolume);

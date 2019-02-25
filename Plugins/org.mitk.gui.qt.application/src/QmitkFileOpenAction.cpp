@@ -178,7 +178,7 @@ void QmitkFileOpenAction::Run()
   auto path = GetPathOfFirstSelectedNode();
 
   if (path.isEmpty())
-    path = d->getLastFileOpenPath();
+    path = d->GetLastFileOpenPath();
 
   // Ask the user for a list of files to open
   QStringList fileNames = QFileDialog::getOpenFileNames(nullptr, "Open",

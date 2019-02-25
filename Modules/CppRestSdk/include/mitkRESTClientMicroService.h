@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "cpprest/asyncrt_utils.h"
 #include "cpprest/containerstream.h"
+#include "cpprest/filestream.h"
 #include "cpprest/http_client.h"
 #include "cpprest/json.h"
 #include "cpprest/producerconsumerstream.h"
@@ -53,6 +54,14 @@ namespace mitk
     * @return task with to wait for with resulting json object
     */
    pplx::task<web::json::value> Get(web::uri uri);
+
+   /**
+    *@brief Executes a HTTP GET request with the given uri and and stores the byte stream in a file given by the filePath
+    *
+    * @param uri the URI resulting the target of the HTTP request
+    * @return task with to wait for 
+    */
+   pplx::task<web::json::value> Get(web::uri uri, utility::string_t filePath);
 
    /**
     * @brief Executes a HTTP PUT request with given uri and the content given as json

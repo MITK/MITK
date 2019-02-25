@@ -50,6 +50,7 @@ signals:
 private slots:
   void OnGetMultipleButtonClicked();
   void OnGetSingleButtonClicked();
+  void OnGetSaveButtonClicked();
   void OnPutButtonClicked();
   void OnPostButtonClicked();
   void OnUpdateProgressBar();

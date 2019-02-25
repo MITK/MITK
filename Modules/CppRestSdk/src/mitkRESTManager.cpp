@@ -5,7 +5,10 @@ mitk::RESTManager::RESTManager() {}
 
 mitk::RESTManager::~RESTManager() {}
 
-pplx::task<web::json::value> mitk::RESTManager::SendRequest(web::uri uri, RequestType type, web::json::value content)
+pplx::task<web::json::value> mitk::RESTManager::SendRequest(web::uri uri,
+                                                            RequestType type,
+                                                            web::json::value content,
+                                                            utility::string_t filePath)
 {
   pplx::task<web::json::value> answer;
   auto client = new RESTClientMicroService();
@@ -13,7 +16,14 @@ pplx::task<web::json::value> mitk::RESTManager::SendRequest(web::uri uri, Reques
   {
     case get:
     {
-      answer = client->Get(uri);
+      if (filePath == L"")
+      {
+        answer = client->Get(uri);
+      }
+      else
+      {
+        answer = client->Get(uri, filePath);
+      }
       break;
     }
     case post:

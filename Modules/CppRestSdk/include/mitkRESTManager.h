@@ -45,7 +45,10 @@ namespace mitk
      * @param body the body for the request (optional)
      * @return task to wait for
      */
-    pplx::task<web::json::value> SendRequest(web::uri uri, RequestType type = get, web::json::value = NULL) override;
+    pplx::task<web::json::value> SendRequest(web::uri uri,
+                                             RequestType type = get,
+                                             web::json::value = NULL,
+                                             utility::string_t filePath = L"") override;
     
     /**
      * @brief starts listening for requests if there isn't another observer listening and the port is free

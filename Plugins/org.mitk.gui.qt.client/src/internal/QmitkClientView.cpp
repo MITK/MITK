@@ -43,6 +43,7 @@ void QmitkClientView::CreateQtPartControl(QWidget *parent)
 
   connect(m_Ui->getMultiplePushButton, &QPushButton::clicked, this, &QmitkClientView::OnGetMultipleButtonClicked);
   connect(m_Ui->getSinglePushButton, &QPushButton::clicked, this, &QmitkClientView::OnGetSingleButtonClicked);
+  connect(m_Ui->getSavePushButton, &QPushButton::clicked, this, &QmitkClientView::OnGetSaveButtonClicked);
   connect(m_Ui->putPushButton, &QPushButton::clicked, this, &QmitkClientView::OnPutButtonClicked);
   connect(m_Ui->postPushButton, &QPushButton::clicked, this, &QmitkClientView::OnPostButtonClicked);
   connect(this, &QmitkClientView::UpdateProgressBar, this, &QmitkClientView::OnUpdateProgressBar);
@@ -139,6 +140,40 @@ void QmitkClientView::OnGetSingleButtonClicked()
             return;
           }
         });
+    }
+  }
+  m_Ui->putPushButton->setEnabled(true);
+}
+
+void QmitkClientView::OnGetSaveButtonClicked() 
+{
+  m_Ui->putPushButton->setDisabled(true);
+  us::ModuleContext *context = us::ModuleRegistry::GetModule(1)->GetModuleContext();
+
+  auto managerRef = context->GetServiceReference<mitk::IRESTManager>();
+  if (managerRef)
+  {
+    auto managerService = context->GetService(managerRef);
+    if (managerService)
+    {
+      managerService
+        ->SendRequest(L"http://193.174.48.78:8090/dcm4chee-arc/aets/DCM4CHEE/rs/studies/1.2.840.113654.2.70.1.97144850941324808603541273584489321943/series/1.2.840.113654.2.70.1.15771179684190906938515254678965278540/instances", mitk::IRESTManager::RequestType::get, NULL,L"FileStream.txt")
+        .then([=](pplx::task<web::json::value> resultTask) {
+          try
+          {
+            web::json::value result = resultTask.get();
+            utility::string_t stringT = result.to_string();
+            std::string stringStd(stringT.begin(), stringT.end());
+            QString stringQ = QString::fromStdString(stringStd);
+            emit UpdateLabel(stringQ);
+          }
+          catch (const mitk::Exception &exception)
+          {
+            MITK_ERROR << exception.what();
+            return;
+          }
+        });
+      m_Ui->responseLabel->setText("Waiting for change");
     }
   }
   m_Ui->putPushButton->setEnabled(true);

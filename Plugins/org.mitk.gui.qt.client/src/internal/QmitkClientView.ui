@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>253</width>
-    <height>206</height>
+    <height>265</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -28,6 +28,13 @@
     <widget class="QPushButton" name="getMultiplePushButton">
      <property name="text">
       <string>GET (multiple tasks)</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="getSavePushButton">
+     <property name="text">
+      <string>GET and Save to File</string>
      </property>
     </widget>
    </item>

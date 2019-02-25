@@ -182,19 +182,19 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mit
   m_SubSplit2->addWidget( mitkWidget4Container );
 
   // Create shadow widgets
-  m_ShadowWidgets[0] = new QWidget(mitkWidget1Container);
+  m_ShadowWidgets[0] = createShadowWidget(mitkWidget1Container);
   mitkWidgetLayout1->addWidget(m_ShadowWidgets[0]);
   m_ShadowWidgets[0]->hide();
 
-  m_ShadowWidgets[1] = new QWidget(mitkWidget2Container);
+  m_ShadowWidgets[1] = createShadowWidget(mitkWidget2Container);
   mitkWidgetLayout2->addWidget(m_ShadowWidgets[1]);
   m_ShadowWidgets[1]->hide();
 
-  m_ShadowWidgets[2] = new QWidget(mitkWidget3Container);
+  m_ShadowWidgets[2] = createShadowWidget(mitkWidget3Container);
   mitkWidgetLayout3->addWidget(m_ShadowWidgets[2]);
   m_ShadowWidgets[2]->hide();
 
-  m_ShadowWidgets[3] = new QWidget(mitkWidget4Container);
+  m_ShadowWidgets[3] = createShadowWidget(mitkWidget4Container);
   mitkWidgetLayout4->addWidget(m_ShadowWidgets[3]);
   m_ShadowWidgets[3]->hide();
 
@@ -267,6 +267,17 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mit
   connect(mitkWidget2, &QmitkRenderWindow::resized, this, &QmitkStdMultiWidget::OnWindowResized);
   connect(mitkWidget3, &QmitkRenderWindow::resized, this, &QmitkStdMultiWidget::OnWindowResized);
   connect(mitkWidget4, &QmitkRenderWindow::resized, this, &QmitkStdMultiWidget::OnWindowResized);
+}
+
+QWidget* QmitkStdMultiWidget::createShadowWidget(QWidget* parent)
+{
+  QWidget* shadowWidget = new QWidget(parent);
+  QLabel* l = new QLabel(shadowWidget);
+  l->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+  QHBoxLayout *layout = new QHBoxLayout();
+  layout->addWidget(l);
+  shadowWidget->setLayout(layout);
+  return shadowWidget;
 }
 
 void QmitkStdMultiWidget::InitializeWidget(bool showPlanesIn3d)

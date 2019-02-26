@@ -73,8 +73,6 @@ public:
     FiberfoxParameters GetParameters(){ return m_Parameters; }
     std::vector< ItkDoubleImgType::Pointer > GetVolumeFractions() ///< one double image for each compartment containing the corresponding volume fraction per voxel
     { return m_VolumeFractions; }
-    mitk::LevelWindow GetLevelWindow()  ///< Level window is determined from the output image
-    { return m_LevelWindow; }
     itkGetMacro( StatusText, std::string )
     itkGetMacro( PhaseImage, DoubleDwiType::Pointer )
     itkGetMacro( KspaceImage, DoubleDwiType::Pointer )
@@ -131,7 +129,6 @@ protected:
     typename DoubleDwiType::Pointer             m_KspaceImage;
     std::vector < typename DoubleDwiType::Pointer > m_OutputImagesReal;
     std::vector < typename DoubleDwiType::Pointer > m_OutputImagesImag;
-    mitk::LevelWindow                           m_LevelWindow;
     std::vector< ItkDoubleImgType::Pointer >    m_VolumeFractions;
     std::string                                 m_StatusText;
 

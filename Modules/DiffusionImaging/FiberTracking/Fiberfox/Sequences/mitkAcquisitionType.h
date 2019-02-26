@@ -46,8 +46,8 @@ public:
   itk::Index< 2 > GetSymmetricIndex(itk::Index< 2 >& index) const
   {
     itk::Index< 2 > sym;
-    sym[0] = (kxMax-index[0]-kxMax%2)%kxMax;
-    sym[1] = (kyMax-index[1]-kyMax%2)%kyMax;
+    sym[0] = kxMax-index[0]-1;
+    sym[1] = kyMax-index[1]-1;
     return sym;
   }
 

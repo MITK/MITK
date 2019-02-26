@@ -59,10 +59,23 @@ void mitk::ContourModelGLMapper2DBase::DrawContour(mitk::ContourModel* rendering
 
 void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel* renderingContour, mitk::BaseRenderer* renderer)
 {
-
   if(!renderingContour) return;
 
   mitk::DataNode* dataNode = this->GetDataNode();
+
+  bool render2D = true;
+  dataNode->GetBoolProperty("contour.render2D", render2D);
+
+  bool render3D = false;
+  dataNode->GetBoolProperty("contour.render3D", render3D);
+
+  if (!render2D && renderer->GetMapperID() == mitk::BaseRenderer::Standard2D) {
+    return;
+  }
+
+  if (!render3D && renderer->GetMapperID() == mitk::BaseRenderer::Standard3D) {
+    return;
+  }
 
   renderingContour->UpdateOutputInformation();
 
@@ -130,8 +143,11 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel* r
     bool showControlPointsNumbers = false;
     dataNode->GetBoolProperty("contour.controlpoints.text", showControlPointsNumbers);
 
-    bool projectmode=false;
+    bool projectmode = false;
     dataNode->GetVisibility(projectmode, renderer, "contour.project-onto-plane");
+
+    bool checkDistance = true;
+    dataNode->GetBoolProperty("contour.check-distance", checkDistance);
 
 
     mitk::ContourModel::VertexIterator pointsIt = renderingContour->IteratorBegin(timestep);
@@ -160,11 +176,11 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel* r
       //project to plane
       if(projectmode)
       {
-        drawit=true;
+        drawit = true;
       }
-      else if(scalardiff<maxDiff)//point is close enough to be drawn
+      else if(!checkDistance || scalardiff<maxDiff)//point is close enough to be drawn
       {
-        drawit=true;
+        drawit = true;
       }
       else
       {

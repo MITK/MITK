@@ -62,7 +62,8 @@ mitk::SegTool2D::SegTool2D(const char* type)
 m_LastEventSender(NULL),
 m_LastEventSlice(0),
 m_Contourmarkername ("Position"),
-m_ShowMarkerNodes (false)
+m_ShowMarkerNodes (false),
+m_Allow3D (false)
 {
   Tool::m_EventConfig = "DisplayConfigMITKNoCrosshair.xml";
 }
@@ -85,10 +86,10 @@ bool mitk::SegTool2D::FilterEvents(InteractionEvent* interactionEvent, DataNode*
 {
   const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>( interactionEvent );
 
-  bool isValidEvent = (
-                       positionEvent && // Only events of type mitk::InteractionPositionEvent
-                       interactionEvent->GetSender()->GetMapperID() == BaseRenderer::Standard2D // Only events from the 2D renderwindows
-                      );
+  bool isValidEvent = positionEvent;
+  if (!m_Allow3D) {
+    isValidEvent = isValidEvent && (interactionEvent->GetSender()->GetMapperID() == BaseRenderer::Standard2D);
+  }
   return isValidEvent;
 }
 
@@ -396,6 +397,11 @@ void mitk::SegTool2D::WriteSliceToVolume(mitk::SegTool2D::SliceInformation slice
 void mitk::SegTool2D::SetShowMarkerNodes(bool status)
 {
   m_ShowMarkerNodes = status;
+}
+
+void mitk::SegTool2D::SetAllow3dMapper(bool allow)
+{
+  m_Allow3D = allow;
 }
 
 void mitk::SegTool2D::SetEnable3DInterpolation(bool enabled)

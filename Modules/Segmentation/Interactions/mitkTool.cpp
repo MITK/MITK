@@ -57,6 +57,7 @@ mitk::Tool::Tool(const char* type)
 , m_DisplayInteractorConfigs()
 , m_EventConfig("DisplayConfigMITK.xml")
 , m_StartTime(clock_t())
+, m_Lock3D(false)
 {
 
 }
@@ -120,10 +121,27 @@ void mitk::Tool::SetToolManager(ToolManager* manager)
   m_ToolManager = manager;
 }
 
+void mitk::Tool::setLock3D(bool lock3D)
+{
+  m_Lock3D = lock3D;
+}
+
+bool mitk::Tool::getLock3D()
+{
+  return m_Lock3D;
+}
+
+#include <vtkRenderWindowInteractor.h>
+#include <vtkInteractorStyle.h>
 void mitk::Tool::Activated()
 {
   // As a legacy solution the display interaction of the new interaction framework is disabled here to avoid conflicts with tools
   // Note: this only affects InteractionEventObservers (formerly known as Listeners) all DataNode specific interaction will still be enabled
+  if (m_Lock3D) {
+    for (const auto& window : mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows()) {
+      window->GetInteractor()->Disable();
+    }
+  }
   m_DisplayInteractorConfigs.clear();
   std::vector<us::ServiceReference<InteractionEventObserver> > listEventObserver = us::GetModuleContext()->GetServiceReferences<InteractionEventObserver>();
   for (std::vector<us::ServiceReference<InteractionEventObserver> >::iterator it = listEventObserver.begin(); it != listEventObserver.end(); ++it)
@@ -145,6 +163,11 @@ void mitk::Tool::Activated()
 
 void mitk::Tool::Deactivated()
 {
+  if (m_Lock3D) {
+    for (const auto& window : mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows()) {
+      window->GetInteractor()->Enable();
+    }
+  }
   // Re-enabling InteractionEventObservers that have been previously disabled for legacy handling of Tools
   // in new interaction framework
   for (std::map<us::ServiceReferenceU, EventConfig>::iterator it = m_DisplayInteractorConfigs.begin();

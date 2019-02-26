@@ -66,6 +66,7 @@ class MITKSEGMENTATION_EXPORT FeedbackContourTool : public SegTool2D
     void SetFeedbackContour(ContourModel::Pointer);
 
     void SetFeedbackContourVisible(bool);
+    void SetFeedbackContourDraw3D(bool draw3D);
 
     /// Provide values from 0.0 (black) to 1.0 (full color)
     void SetFeedbackContourColor( float r, float g, float b );
@@ -102,6 +103,7 @@ class MITKSEGMENTATION_EXPORT FeedbackContourTool : public SegTool2D
     ContourModel::Pointer      m_FeedbackContour;
     DataNode::Pointer m_FeedbackContourNode;
     bool                  m_FeedbackContourVisible;
+
 
 };
 

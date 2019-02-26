@@ -83,6 +83,8 @@ class MITKSEGMENTATION_EXPORT SegTool2D : public Tool
 
     void SetShowMarkerNodes(bool);
 
+    void SetAllow3dMapper(bool);
+
     /**
      * \brief Enables or disables the 3D interpolation after writing back the 2D segmentation result, and defaults to true.
      */
@@ -173,6 +175,7 @@ class MITKSEGMENTATION_EXPORT SegTool2D : public Tool
     const std::string     m_Contourmarkername;
 
     bool m_ShowMarkerNodes;
+    bool m_Allow3D;
     static bool m_SurfaceInterpolationEnabled;
 };
 

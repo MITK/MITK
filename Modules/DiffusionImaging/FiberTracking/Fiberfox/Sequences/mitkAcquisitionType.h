@@ -38,12 +38,12 @@ public:
   }
   virtual ~AcquisitionType(){}
 
-  virtual float GetTimeFromMaxEcho(itk::Index< 2 > index) = 0;               ///< Time from maximum echo intensity in milliseconds
-  virtual float GetRedoutTime(itk::Index< 2 > index) = 0;                    ///< Time passed since readout started in milliseconds
-  virtual float GetTimeFromRf(itk::Index< 2 > index) = 0;                    ///< Time passed since RF pulse was applied in milliseconds
-  virtual itk::Index< 2 > GetActualKspaceIndex(itk::Index< 2 > index) = 0;    ///< Transfer simple image iterator index to desired k-space index (depends on k-space readout scheme)
+  virtual float GetTimeFromMaxEcho(const itk::Index< 2 >& index) = 0;               ///< Time from maximum echo intensity in milliseconds
+  virtual float GetRedoutTime(const itk::Index< 2 >& index) = 0;                    ///< Time passed since readout started in milliseconds
+  virtual float GetTimeFromRf(const itk::Index< 2 >& index) = 0;                    ///< Time passed since RF pulse was applied in milliseconds
+  virtual itk::Index< 2 > GetActualKspaceIndex(const itk::Index< 2 >& index) = 0;    ///< Transfer simple image iterator index to desired k-space index (depends on k-space readout scheme)
   virtual void AdjustEchoTime() = 0;                                          ///< Depending on the k-space readout scheme and acquisition parameters the minimum TE varies. This has to be checked and adjusted in this method.
-  itk::Index< 2 > GetSymmetricIndex(itk::Index< 2 >& index) const
+  itk::Index< 2 > GetSymmetricIndex(const itk::Index< 2 >& index)
   {
     itk::Index< 2 > sym;
     sym[0] = kxMax-index[0]-1;

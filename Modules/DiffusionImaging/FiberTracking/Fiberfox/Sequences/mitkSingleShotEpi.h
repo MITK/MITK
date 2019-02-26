@@ -45,36 +45,37 @@ public:
   {}
 
   // one echo per slice
-  float GetTimeFromMaxEcho(itk::Index< 2 > index) override
+  float GetTimeFromMaxEcho(const itk::Index< 2 >& index) override
   {
     float t = 0;
     t = m_NegTEhalf + (static_cast<float>(index[1])*kxMax+static_cast<float>(index[0]))*dt;
     return t;
   }
 
-  float GetRedoutTime(itk::Index< 2 > index) override
+  float GetRedoutTime(const itk::Index< 2 >& index) override
   {
     float t = 0;
     t = (static_cast<float>(index[1])*kxMax+static_cast<float>(index[0]))*dt;
     return t;
   }
 
-  float GetTimeFromRf(itk::Index< 2 > index) override
+  float GetTimeFromRf(const itk::Index< 2 >& index) override
   {
     return m_Parameters->m_SignalGen.m_tEcho + GetTimeFromMaxEcho(index);
   }
 
-  itk::Index< 2 > GetActualKspaceIndex(itk::Index< 2 > index) override
+  itk::Index< 2 > GetActualKspaceIndex(const itk::Index< 2 >& index) override
   {
+    itk::Index< 2 > out_idx = index;
     // reverse phase
     if (!m_Parameters->m_SignalGen.m_ReversePhase)
-      index[1] = kyMax-1-index[1];
+      out_idx[1] = kyMax-1-out_idx[1];
 
     // reverse readout direction
-    if (index[1]%2 == 1)
-      index[0] = kxMax-index[0]-1;
+    if (out_idx[1]%2 == 1)
+      out_idx[0] = kxMax-out_idx[0]-1;
 
-    return index;
+    return out_idx;
   }
 
   void AdjustEchoTime() override

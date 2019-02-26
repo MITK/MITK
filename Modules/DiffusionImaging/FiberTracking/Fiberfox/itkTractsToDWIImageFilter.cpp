@@ -881,22 +881,7 @@ bool TractsToDWIImageFilter< PixelType >::PrepareLogFile()
     }
   }
   else
-  {
-    filePath = mitk::IOUtil::GetTempPath() + '/';
-  }
-  // check if directory exists, else use /tmp/:
-  if( itksys::SystemTools::FileIsDirectory( filePath ) )
-  {
-    while( *(--(filePath.cend())) == '/')
-    {
-      filePath.pop_back();
-    }
-    filePath = filePath + '/';
-  }
-  else
-  {
-    filePath = mitk::IOUtil::GetTempPath() + '/';
-  }
+    return false;
 
   // Get file name:
   if( ! m_Parameters.m_Misc.m_ResultNode->GetName().empty() )
@@ -911,20 +896,6 @@ bool TractsToDWIImageFilter< PixelType >::PrepareLogFile()
   if( ! m_Parameters.m_Misc.m_OutputPrefix.empty() )
   {
     fileName = m_Parameters.m_Misc.m_OutputPrefix + fileName;
-  }
-  else
-  {
-    fileName = "fiberfox";
-  }
-
-  // check if file already exists and DO NOT overwrite existing files:
-  std::string NameTest = fileName;
-  int c = 0;
-  while( itksys::SystemTools::FileExists( filePath + '/' + fileName + ".log" )
-         && c <= std::numeric_limits<int>::max() )
-  {
-    fileName = NameTest + "_" + boost::lexical_cast<std::string>(c);
-    ++c;
   }
 
   try
@@ -944,11 +915,7 @@ bool TractsToDWIImageFilter< PixelType >::PrepareLogFile()
     return true;
   }
   else
-  {
-    m_StatusText += "Logfile could not be opened!\n";
-    MITK_ERROR << "itkTractsToDWIImageFilter.cpp: Logfile could not be opened!";
     return false;
-  }
 }
 
 
@@ -957,11 +924,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 {
   PrintToLog("\n**********************************************", false);
   // prepare logfile
-  if ( ! PrepareLogFile() )
-  {
-    this->SetAbortGenerateData( true );
-    return;
-  }
+  PrepareLogFile();
   PrintToLog("Starting Fiberfox dMRI simulation");
 
   m_TimeProbe.Start();
@@ -1288,7 +1251,12 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     }
     case SignalGenerationParameters::ConventionalSpinEcho:
     {
-      PrintToLog("Acquisition type: classic spin echo with cartesian k-space trajectory", false);
+      PrintToLog("Acquisition type: conventional spin echo (one RF pulse per line) with cartesian k-space trajectory", false);
+      break;
+    }
+    case SignalGenerationParameters::FastSpinEcho:
+    {
+      PrintToLog("Acquisition type: fast spin echo (one RF pulse per slice) with cartesian k-space trajectory (ETL: " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_EchoTrainLength) + ")", false);
       break;
     }
     default:
@@ -1353,8 +1321,6 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     PrintToLog("Scaling signal", false);
   if (m_Parameters.m_NoiseModel)
     PrintToLog("Adding noise: " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_NoiseVariance), false);
-  unsigned int window = 0;
-  unsigned int min = itk::NumericTraits<unsigned int>::max();
   ImageRegionIterator<OutputImageType> it4 (m_OutputImage, m_OutputImage->GetLargestPossibleRegion());
   DoubleDwiType::PixelType signal; signal.SetSize(m_Parameters.m_SignalGen.GetNumVolumes());
   boost::progress_display disp2(m_OutputImage->GetLargestPossibleRegion().GetNumberOfPixels());
@@ -1399,18 +1365,10 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         signal[i] = floor(signal[i]+0.5);
       else
         signal[i] = ceil(signal[i]-0.5);
-
-      if ( (!m_Parameters.m_SignalGen.IsBaselineIndex(i) || signal.Size()==1) && signal[i]>window)
-        window = signal[i];
-      if ( (!m_Parameters.m_SignalGen.IsBaselineIndex(i) || signal.Size()==1) && signal[i]<min)
-        min = signal[i];
     }
     it4.Set(signal);
     ++it4;
   }
-  window -= min;
-  unsigned int level = window/2 + min;
-  m_LevelWindow.SetLevelWindow(level, window);
   this->SetNthOutput(0, m_OutputImage);
 
   PrintToLog("\n", false);
@@ -1440,7 +1398,8 @@ void TractsToDWIImageFilter< PixelType >::PrintToLog(std::string m, bool addTime
   // timestamp
   if (addTime)
   {
-    m_Logfile << this->GetTime() << " > ";
+    if ( m_Logfile.is_open() )
+      m_Logfile << this->GetTime() << " > ";
     m_StatusText += this->GetTime() + " > ";
     if (stdOut)
       std::cout << this->GetTime() << " > ";
@@ -1462,8 +1421,8 @@ void TractsToDWIImageFilter< PixelType >::PrintToLog(std::string m, bool addTime
     if (stdOut)
       std::cout << "\n";
   }
-
-  m_Logfile.flush();
+  if ( m_Logfile.is_open() )
+    m_Logfile.flush();
 }
 
 template< class PixelType >

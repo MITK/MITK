@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionIterator.h>
 #include <mitkSingleShotEpi.h>
 #include <mitkConventionalSpinEcho.h>
+#include <mitkFastSpinEcho.h>
 #include <mitkDiffusionFunctionCollection.h>
 
 namespace itk {
@@ -60,8 +61,11 @@ namespace itk {
     yMax = m_CompartmentImages.at(0)->GetLargestPossibleRegion().GetSize(1); // scanner coverage in y-direction
     yMaxFov = yMax;
     if (m_Parameters->m_Misc.m_DoAddAliasing)
+    {
         yMaxFov *= m_Parameters->m_SignalGen.m_CroppingFactor;               // actual FOV in y-direction (in x-direction FOV=xMax)
-    yMaxFov_half = yMaxFov/2;
+        yMaxFov = std::ceil(yMaxFov);
+    }
+    yMaxFov_half = (yMaxFov-1)/2;
     numPix = kxMax*kyMax;
 
     float ringing_factor = static_cast<float>(m_Parameters->m_SignalGen.m_ZeroRinging)/100.0;
@@ -148,6 +152,9 @@ namespace itk {
       break;
       case SignalGenerationParameters::ConventionalSpinEcho:
         m_ReadoutScheme = new mitk::ConventionalSpinEcho(m_Parameters);
+      break;
+      case SignalGenerationParameters::FastSpinEcho:
+        m_ReadoutScheme = new mitk::FastSpinEcho(m_Parameters);
       break;
       default:
         m_ReadoutScheme = new mitk::SingleShotEpi(m_Parameters);
@@ -252,7 +259,11 @@ namespace itk {
       itk::Index< 2 > kIdx = m_ReadoutScheme->GetActualKspaceIndex(out_idx);
 
       // partial fourier
-      if (kIdx[1]>kyMax*m_Parameters->m_SignalGen.m_PartialFourier)
+      // two cases because we always want to skip the "later" parts of k-space
+      // in "normal" phase direction, the higher k-space indices are acquired first
+      // in reversed phase direction, the higher k-space indices are acquired later
+      if ((m_Parameters->m_SignalGen.m_ReversePhase && kIdx[1]>std::ceil(kyMax*m_Parameters->m_SignalGen.m_PartialFourier)) ||
+          (!m_Parameters->m_SignalGen.m_ReversePhase && kIdx[1]<std::floor(kyMax*(1.0 - m_Parameters->m_SignalGen.m_PartialFourier))))
       {
         outputImage->SetPixel(kIdx, zero);
         ++oit;
@@ -272,32 +283,24 @@ namespace itk {
       }
 
       // shift k for DFT: (0 -- N) --> (-N/2 -- N/2)
-      float kx = kIdx[0];
-      float ky = kIdx[1];
-      if (static_cast<int>(kxMax)%2==1)
-        kx -= (kxMax-1)/2;
-      else
-        kx -= kxMax/2;
-
-      if (static_cast<int>(kyMax)%2==1)
-        ky -= (kyMax-1)/2;
-      else
-        ky -= kyMax/2;
+      float kx = kIdx[0] - (kxMax-1)/2;
+      float ky = kIdx[1] - (kyMax-1)/2;
 
       // time from maximum echo
       float t = m_ReadoutScheme->GetTimeFromMaxEcho(out_idx);
 
-      // time passed since k-space readout started
-      float tRead = m_ReadoutScheme->GetRedoutTime(out_idx);
-
       // time passes since application of the RF pulse
-      float tRf = m_Parameters->m_SignalGen.m_tEcho+t;
+      float tRf = m_ReadoutScheme->GetTimeFromRf(out_idx);
 
       // calculate eddy current decay factor
       // (TODO: vielleicht umbauen dass hier die zeit vom letzten diffusionsgradienten an genommen wird. doku dann auch entsprechend anpassen.)
       float eddyDecay = 0;
-      if ( m_Parameters->m_Misc.m_DoAddEddyCurrents && m_Parameters->m_SignalGen.m_EddyStrength>0)
+      if ( m_Parameters->m_Misc.m_DoAddEddyCurrents && m_Parameters->m_SignalGen.m_EddyStrength>0 && !m_IsBaseline)
+      {
+        // time passed since k-space readout started
+        float tRead = m_ReadoutScheme->GetRedoutTime(out_idx);
         eddyDecay = std::exp(-tRead/m_Parameters->m_SignalGen.m_Tau );
+      }
 
       // calcualte signal relaxation factors
       std::vector< float > relaxFactor;
@@ -311,7 +314,7 @@ namespace itk {
       // add ghosting by adding gradient delay induced offset
       if (m_Parameters->m_Misc.m_DoAddGhosts)
       {
-        if (out_idx[1]%2 == 1)
+        if (kIdx[1]%2 == 1)
           kx -= m_Parameters->m_SignalGen.m_KspaceLineOffset;
         else
           kx += m_Parameters->m_SignalGen.m_KspaceLineOffset;
@@ -330,16 +333,8 @@ namespace itk {
         typename InputImageType::IndexType input_idx = it.GetIndex();
 
         // shift x,y for DFT: (0 -- N) --> (-N/2 -- N/2)
-        float x = input_idx[0];
-        float y = input_idx[1];
-        if (static_cast<int>(xMax)%2==1)
-          x -= (xMax-1)/2;
-        else
-          x -= xMax/2;
-        if (static_cast<int>(yMax)%2==1)
-          y -= (yMax-1)/2;
-        else
-          y -= yMax/2;
+        float x = input_idx[0] - (xMax-1)/2;
+        float y = input_idx[1] - (yMax-1)/2;
 
         // sum compartment signals and simulate relaxation
         ScalarType f_real = 0;
@@ -384,7 +379,7 @@ namespace itk {
         {
           if (y<-yMaxFov_half)
             y += yMaxFov;
-          else if (y>=yMaxFov_half)
+          else if (y>yMaxFov_half)
             y -= yMaxFov;
         }
 
@@ -411,8 +406,6 @@ namespace itk {
   void KspaceImageFilter< ScalarType >
   ::AfterThreadedGenerateData()
   {
-    delete m_ReadoutScheme;
-
     typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
     int kxMax = outputImage->GetLargestPossibleRegion().GetSize(0);  // k-space size in x-direction
     int kyMax = outputImage->GetLargestPossibleRegion().GetSize(1);  // k-space size in y-direction
@@ -420,27 +413,16 @@ namespace itk {
     ImageRegionIterator< OutputImageType > oit(outputImage, outputImage->GetLargestPossibleRegion());
     while( !oit.IsAtEnd() ) // use hermitian k-space symmetry to fill empty k-space parts resulting from partial fourier acquisition
     {
-      itk::Index< 2 > kIdx;
-      kIdx[0] = oit.GetIndex()[0];
-      kIdx[1] = oit.GetIndex()[1];
+      auto kIdx = m_ReadoutScheme->GetActualKspaceIndex(oit.GetIndex());
 
-      // reverse phase
-      if (!m_Parameters->m_SignalGen.m_ReversePhase)
-        kIdx[1] = static_cast<int>(kyMax-1-kIdx[1]);
-
-      if (kIdx[1]>kyMax*m_Parameters->m_SignalGen.m_PartialFourier)
+      if ((m_Parameters->m_SignalGen.m_ReversePhase && kIdx[1]>std::ceil(kyMax*m_Parameters->m_SignalGen.m_PartialFourier)) ||
+          (!m_Parameters->m_SignalGen.m_ReversePhase && kIdx[1]<std::floor(kyMax*(1.0 - m_Parameters->m_SignalGen.m_PartialFourier))))
       {
-        // reverse readout direction
-        if (oit.GetIndex()[1]%2 == 1)
-          kIdx[0] = kxMax-kIdx[0]-1;
-
         // calculate symmetric index
-        itk::Index< 2 > kIdx2;
-        kIdx2[0] = (kxMax-kIdx[0]-kxMax%2)%kxMax;
-        kIdx2[1] = (kyMax-kIdx[1]-kyMax%2)%kyMax;
+        auto sym = m_ReadoutScheme->GetSymmetricIndex(kIdx);
 
         // use complex conjugate of symmetric index value at current index
-        vcl_complex<ScalarType> s = outputImage->GetPixel(kIdx2);
+        vcl_complex<ScalarType> s = outputImage->GetPixel(sym);
         s = vcl_complex<ScalarType>(s.real(), -s.imag());
         outputImage->SetPixel(kIdx, s);
 
@@ -458,6 +440,7 @@ namespace itk {
       outputImage->SetPixel(spikeIdx, m_Spike);
       m_SpikeLog += "[" + boost::lexical_cast<std::string>(spikeIdx[0]) + "," + boost::lexical_cast<std::string>(spikeIdx[1]) + "," + boost::lexical_cast<std::string>(m_Zidx) + "] Magnitude: " + boost::lexical_cast<std::string>(m_Spike.real()) + "+" + boost::lexical_cast<std::string>(m_Spike.imag()) + "i\n";
     }
+    delete m_ReadoutScheme;
   }
 }
 #endif

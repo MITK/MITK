@@ -31,34 +31,37 @@ public:
 
   SingleShotEpi(FiberfoxParameters* parameters) : AcquisitionType(parameters)
   {
-    kxMax = m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(0);
-    kyMax = m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(1);
-
     dt =  m_Parameters->m_SignalGen.m_tLine/kxMax;  // time to read one k-space voxel
 
     // k-space center at maximum echo
     if ( kyMax%2==0 )
     {
-      m_NegTEhalf = -m_Parameters->m_SignalGen.m_tLine*(kyMax-1)/2 + dt*(kxMax-(int)kxMax%2)/2;
+      m_NegTEhalf = -m_Parameters->m_SignalGen.m_tLine*(kyMax-1)/2 + dt*(kxMax-kxMax%2)/2;
     }
     else
-      m_NegTEhalf = -m_Parameters->m_SignalGen.m_tLine*(kyMax-1)/2 - dt*(kxMax-(int)kxMax%2)/2;
+      m_NegTEhalf = -m_Parameters->m_SignalGen.m_tLine*(kyMax-1)/2 - dt*(kxMax-kxMax%2)/2;
   }
   ~SingleShotEpi() override
   {}
 
+  // one echo per slice
   float GetTimeFromMaxEcho(itk::Index< 2 > index) override
   {
     float t = 0;
-    t = m_NegTEhalf + ((float)index[1]*kxMax+(float)index[0])*dt;
+    t = m_NegTEhalf + (static_cast<float>(index[1])*kxMax+static_cast<float>(index[0]))*dt;
     return t;
   }
 
   float GetRedoutTime(itk::Index< 2 > index) override
   {
     float t = 0;
-    t = ((float)index[1]*kxMax+(float)index[0])*dt;
+    t = (static_cast<float>(index[1])*kxMax+static_cast<float>(index[0]))*dt;
     return t;
+  }
+
+  float GetTimeFromRf(itk::Index< 2 > index) override
+  {
+    return m_Parameters->m_SignalGen.m_tEcho + GetTimeFromMaxEcho(index);
   }
 
   itk::Index< 2 > GetActualKspaceIndex(itk::Index< 2 > index) override
@@ -76,7 +79,7 @@ public:
 
   void AdjustEchoTime() override
   {
-    int temp = m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(1)*m_Parameters->m_SignalGen.m_PartialFourier - (m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(1)+m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(1)%2)/2;
+    auto temp = m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(1)*m_Parameters->m_SignalGen.m_PartialFourier - (m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(1)+m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(1)%2)/2;
 
     if ( m_Parameters->m_SignalGen.m_tEcho/2 < temp*m_Parameters->m_SignalGen.m_tLine )
     {
@@ -87,10 +90,6 @@ public:
   }
 
 protected:
-
-  float dt;
-  int kxMax;
-  int kyMax;
 
 };
 

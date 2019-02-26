@@ -14,37 +14,38 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _MITK_ConventionalSpinEcho_H
-#define _MITK_ConventionalSpinEcho_H
+#ifndef _MITK_FastSpinEcho_H
+#define _MITK_FastSpinEcho_H
 
 #include <mitkAcquisitionType.h>
 
 namespace mitk {
 
 /**
-  * \brief Conventional spin echo sequence. Cartesian readout. One echo and one excitation per k-space line.
-  *
+  * \brief Fast spin echo sequence. Cartesian readout.
+  * Echo spacing = TE
   */
-class ConventionalSpinEcho : public AcquisitionType
+class FastSpinEcho : public AcquisitionType
 {
 public:
 
-  ConventionalSpinEcho(FiberfoxParameters* parameters) : AcquisitionType(parameters)
+  FastSpinEcho(FiberfoxParameters* parameters)
+    : AcquisitionType(parameters)
   {
+    m_LinesWithSameTime = static_cast<unsigned int>(std::ceil(static_cast<float>(kyMax)/m_Parameters->m_SignalGen.m_EchoTrainLength));
+
     dt =  m_Parameters->m_SignalGen.m_tLine/kxMax;  // time to read one k-space voxel
 
     // maximum echo at center of each line
     m_NegTEhalf = -dt*(kxMax-kxMax%2)/2;
   }
-  ~ConventionalSpinEcho() override
+  ~FastSpinEcho() override
   {}
 
   // one echo per k-space line
   float GetTimeFromMaxEcho(itk::Index< 2 > index) override
   {
-    float t = 0;
-    t = m_NegTEhalf + static_cast<float>(index[0])*dt;
-    return t;
+    return m_NegTEhalf + static_cast<float>(index[0])*dt;
   }
 
   // time since current readout pulse started
@@ -53,10 +54,10 @@ public:
     return static_cast<float>(index[0])*dt;
   }
 
-  // time from max-echo + TE
+  // depends on ETL
   float GetTimeFromRf(itk::Index< 2 > index) override
   {
-    return m_Parameters->m_SignalGen.m_tEcho + GetTimeFromMaxEcho(index);
+    return m_Parameters->m_SignalGen.m_tEcho*std::ceil(static_cast<float>(index[1]+1)/m_LinesWithSameTime) + GetTimeFromMaxEcho(index);
   }
 
   itk::Index< 2 > GetActualKspaceIndex(itk::Index< 2 > index) override
@@ -79,6 +80,8 @@ public:
   }
 
 protected:
+
+  unsigned int m_LinesWithSameTime;
 
 };
 

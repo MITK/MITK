@@ -455,5 +455,7 @@ protected:
   void FillGradientBackgroundWithBlack();
 
   void ResetTransformation(mitk::VtkPropRenderer* renderer);
+
+  QWidget* createShadowWidget(QWidget* parent);
 };
 #endif /*QmitkStdMultiWidget_h*/

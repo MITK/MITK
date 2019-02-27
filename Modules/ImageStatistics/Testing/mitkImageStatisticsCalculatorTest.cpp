@@ -956,12 +956,12 @@ mitkImageStatisticsCalculatorTestSuite::ComputeStatistics(mitk::Image::ConstPoin
 void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatisticsContainer::StatisticsObject stats,
 	mitk::ImageStatisticsContainer::RealType testMean, mitk::ImageStatisticsContainer::RealType testSD, mitk::ImageStatisticsContainer::RealType testMedian)
 {
-	auto meanObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MEAN());
-	auto standardDeviationObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::STANDARDDEVIATION());
-	auto medianObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MEDIAN());
-	MITK_INFO << "Mean value difference: " << meanObject - testMean;
-	MITK_INFO << "StdDev value difference: " << standardDeviationObject - testSD;
-	MITK_INFO << "Median value difference: " << medianObject - testMedian;
+	mitk::ImageStatisticsContainer::RealType meanObject;
+	mitk::ImageStatisticsContainer::RealType standardDeviationObject;
+	mitk::ImageStatisticsContainer::RealType medianObject;
+	CPPUNIT_ASSERT_NO_THROW(meanObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MEAN()));
+	CPPUNIT_ASSERT_NO_THROW(standardDeviationObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::STANDARDDEVIATION()));
+	CPPUNIT_ASSERT_NO_THROW(medianObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MEDIAN()));
 	CPPUNIT_ASSERT_MESSAGE("Calculated mean grayvalue is not equal to the desired value.", std::abs(meanObject - testMean) < mitk::eps);
 	CPPUNIT_ASSERT_MESSAGE("Calculated grayvalue sd is not equal to the desired value.", std::abs(standardDeviationObject - testSD) < mitk::eps);
 	CPPUNIT_ASSERT_MESSAGE("Calculated median grayvalue is not equal to the desired value.", std::abs(medianObject - testMedian) < mitk::eps);
@@ -982,18 +982,30 @@ void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatist
 	vnl_vector<int> minIndex,
 	vnl_vector<int> maxIndex)
 {
-	auto numberOfVoxelsObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::VoxelCountType>(mitk::ImageStatisticsConstants::NUMBEROFVOXELS());
-	auto meanObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MEAN());
-	auto mppObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MPP());
-	auto skewnessObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::SKEWNESS());
-	auto kurtosisObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::KURTOSIS());
-	auto varianceObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::VARIANCE());
-	auto standardDeviationObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::STANDARDDEVIATION());
-	auto minObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MINIMUM());
-	auto maxObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MAXIMUM());
-	auto rmsObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::RMS());
-	auto minIndexObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::IndexType>(mitk::ImageStatisticsConstants::MINIMUMPOSITION());
-	auto maxIndexObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::IndexType>(mitk::ImageStatisticsConstants::MAXIMUMPOSITION());
+	mitk::ImageStatisticsContainer::VoxelCountType numberOfVoxelsObject;
+	mitk::ImageStatisticsContainer::RealType meanObject;
+	mitk::ImageStatisticsContainer::RealType mppObject;
+	mitk::ImageStatisticsContainer::RealType skewnessObject;
+	mitk::ImageStatisticsContainer::RealType kurtosisObject;
+	mitk::ImageStatisticsContainer::RealType varianceObject;
+	mitk::ImageStatisticsContainer::RealType standardDeviationObject;
+	mitk::ImageStatisticsContainer::RealType minObject;
+	mitk::ImageStatisticsContainer::RealType maxObject;
+	mitk::ImageStatisticsContainer::RealType rmsObject;
+	mitk::ImageStatisticsContainer::IndexType minIndexObject;
+	mitk::ImageStatisticsContainer::IndexType maxIndexObject;
+	CPPUNIT_ASSERT_NO_THROW(numberOfVoxelsObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::VoxelCountType>(mitk::ImageStatisticsConstants::NUMBEROFVOXELS()));
+	CPPUNIT_ASSERT_NO_THROW(meanObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MEAN()));
+	CPPUNIT_ASSERT_NO_THROW(mppObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MPP()));
+	CPPUNIT_ASSERT_NO_THROW(skewnessObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::SKEWNESS()));
+	CPPUNIT_ASSERT_NO_THROW(kurtosisObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::KURTOSIS()));
+	CPPUNIT_ASSERT_NO_THROW(varianceObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::VARIANCE()));
+	CPPUNIT_ASSERT_NO_THROW(standardDeviationObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::STANDARDDEVIATION()));
+	CPPUNIT_ASSERT_NO_THROW(minObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MINIMUM()));
+	CPPUNIT_ASSERT_NO_THROW(maxObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MAXIMUM()));
+	CPPUNIT_ASSERT_NO_THROW(rmsObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::RMS()));
+	CPPUNIT_ASSERT_NO_THROW(minIndexObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::IndexType>(mitk::ImageStatisticsConstants::MINIMUMPOSITION()));
+	CPPUNIT_ASSERT_NO_THROW(maxIndexObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::IndexType>(mitk::ImageStatisticsConstants::MAXIMUMPOSITION()));
 
 	CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", numberOfVoxelsObject - N == 0);
 	CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(meanObject - mean) < mitk::eps);

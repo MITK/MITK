@@ -84,7 +84,8 @@ public:
   void TestUS4DCroppedBinMaskTimeStep1();
   void TestUS4DCroppedMultilabelMaskTimeStep1();
   void TestUS4DCroppedPlanarFigureTimeStep1();
-
+  void TestUS4DCroppedAllTimesteps();
+  void TestUS4DCropped3DMask();
 private:
 
 	mitk::Image::ConstPointer m_TestImage;
@@ -479,7 +480,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedNoMask()
 	std::string Pic3DCroppedFile = this->GetTestDataFilePath("ImageStatisticsTestData/Pic3D_cropped.nrrd");
 	m_Pic3DCroppedImage = mitk::IOUtil::Load<mitk::Image>(Pic3DCroppedFile);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D_cropped", m_Pic3DCroppedImage.IsNotNull());
-
+	//calculated ground truth via script
 	mitk::ImageStatisticsContainer::VoxelCountType expected_N = 27;
 	mitk::ImageStatisticsContainer::RealType expected_mean = -564.1481481481481481;
 	mitk::ImageStatisticsContainer::RealType expected_MPP = 113.66666666666667;
@@ -534,7 +535,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedBinMask()
 	std::string Pic3DCroppedBinMaskFile = this->GetTestDataFilePath("ImageStatisticsTestData/Pic3D_croppedBinMask.nrrd");
 	m_Pic3DCroppedBinMask = mitk::IOUtil::Load<mitk::Image>(Pic3DCroppedBinMaskFile);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D binary mask", m_Pic3DCroppedBinMask.IsNotNull());
-
+	//calculated ground truth via script
 	mitk::ImageStatisticsContainer::RealType expected_kurtosis = 1.0765697398089618;
 	mitk::ImageStatisticsContainer::RealType expected_MPP = -nan("");
 	mitk::ImageStatisticsContainer::RealType expected_max = -22;
@@ -593,7 +594,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedMultilabelMask()
 	std::string Pic3DCroppedMultilabelMaskFile = this->GetTestDataFilePath("ImageStatisticsTestData/Pic3D_croppedMultilabelMask.nrrd");
 	m_Pic3DCroppedMultilabelMask = mitk::IOUtil::Load<mitk::Image>(Pic3DCroppedMultilabelMaskFile);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D multilabel mask", m_Pic3DCroppedMultilabelMask.IsNotNull());
-
+	//calculated ground truth via script
 	mitk::ImageStatisticsContainer::RealType expected_kurtosis = 1.5;
 	mitk::ImageStatisticsContainer::RealType expected_MPP = -nan("");
 	mitk::ImageStatisticsContainer::RealType expected_max = -22;
@@ -652,7 +653,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedPlanarFigure()
 	std::string Pic3DCroppedPlanarFigureFile = this->GetTestDataFilePath("ImageStatisticsTestData/Pic3D_croppedPF.pf");
 	m_Pic3DCroppedPlanarFigure = mitk::IOUtil::Load<mitk::PlanarFigure>(Pic3DCroppedPlanarFigureFile);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D planar figure", m_Pic3DCroppedPlanarFigure.IsNotNull());
-
+	//calculated ground truth via script
 	mitk::ImageStatisticsContainer::RealType expected_kurtosis = 1;
 	mitk::ImageStatisticsContainer::RealType expected_MPP = -nan("");
 	mitk::ImageStatisticsContainer::RealType expected_max = -67;
@@ -706,7 +707,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedNoMaskTimeStep1()
 	std::string US4DCroppedFile = this->GetTestDataFilePath("ImageStatisticsTestData/US4D_Cropped.nrrd");
 	m_US4DCroppedImage = mitk::IOUtil::Load<mitk::Image>(US4DCroppedFile);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading US4D_cropped", m_US4DCroppedImage.IsNotNull());
-
+	//calculated ground truth via script
 	mitk::ImageStatisticsContainer::RealType expected_kurtosis = 1.5398359155908228;
 	mitk::ImageStatisticsContainer::RealType expected_MPP = 157.74074074074073;
 	mitk::ImageStatisticsContainer::RealType expected_max = 199;
@@ -760,7 +761,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedBinMaskTimeStep1()
 	std::string US4DCroppedBinMaskFile = this->GetTestDataFilePath("ImageStatisticsTestData/US4D_croppedBinMask.nrrd");
 	m_US4DCroppedBinMask = mitk::IOUtil::Load<mitk::Image>(US4DCroppedBinMaskFile);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading US4D binary mask", m_US4DCroppedBinMask.IsNotNull());
-
+	//calculated ground truth via script
 	mitk::ImageStatisticsContainer::RealType expected_kurtosis = 1.5863739712889191;
 	mitk::ImageStatisticsContainer::RealType expected_MPP = 166.75;
 	mitk::ImageStatisticsContainer::RealType expected_max = 199;
@@ -818,7 +819,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedMultilabelMaskTimeSt
 	std::string US4DCroppedMultilabelMaskFile = this->GetTestDataFilePath("ImageStatisticsTestData/US4D_croppedMultilabelMask.nrrd");
 	m_US4DCroppedMultilabelMask = mitk::IOUtil::Load<mitk::Image>(US4DCroppedMultilabelMaskFile);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading US4D multilabel mask", m_US4DCroppedMultilabelMask.IsNotNull());
-
+	//calculated ground truth via script
 	mitk::ImageStatisticsContainer::RealType expected_kurtosis = 1.0432484564918287;
 	mitk::ImageStatisticsContainer::RealType expected_MPP = 159.75;
 	mitk::ImageStatisticsContainer::RealType expected_max = 199;
@@ -876,7 +877,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedPlanarFigureTimeStep
 	std::string US4DCroppedPlanarFigureFile = this->GetTestDataFilePath("ImageStatisticsTestData/US4D_croppedPF.pf");
 	m_US4DCroppedPlanarFigure = mitk::IOUtil::Load<mitk::PlanarFigure>(US4DCroppedPlanarFigureFile);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading US4D planar figure", m_US4DCroppedPlanarFigure.IsNotNull());
-
+	//calculated ground truth via script
 	mitk::ImageStatisticsContainer::RealType expected_kurtosis = 1;
 	mitk::ImageStatisticsContainer::RealType expected_MPP = 172.5;
 	mitk::ImageStatisticsContainer::RealType expected_max = 197;
@@ -920,6 +921,22 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedPlanarFigureTimeStep
 		expected_RMS,
 		expected_minIndex,
 		expected_maxIndex);
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedAllTimesteps()
+{
+	std::string US4DCroppedFile = this->GetTestDataFilePath("ImageStatisticsTestData/US4D_cropped.nrrd");
+	m_US4DCroppedImage = mitk::IOUtil::Load<mitk::Image>(US4DCroppedFile);
+	CPPUNIT_ASSERT_MESSAGE("Failed loading US4D_cropped", m_US4DCroppedImage.IsNotNull());
+	mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+	CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage));
+	auto statisticsObjectTimestep1 = statisticsContainer->GetStatisticsForTimeStep(1);
+}
+void mitkImageStatisticsCalculatorTestSuite::TestUS4DCropped3DMask()
+{
+	std::string US4DCroppedFile = this->GetTestDataFilePath("ImageStatisticsTestData/US4D_cropped.nrrd");
+	m_US4DCroppedImage = mitk::IOUtil::Load<mitk::Image>(US4DCroppedFile);
+	CPPUNIT_ASSERT_MESSAGE("Failed loading US4D_cropped", m_US4DCroppedImage.IsNotNull());
 }
 
 mitk::PlanarPolygon::Pointer mitkImageStatisticsCalculatorTestSuite::GeneratePlanarPolygon(mitk::PlaneGeometry::Pointer geometry, std::vector <mitk::Point2D> points)

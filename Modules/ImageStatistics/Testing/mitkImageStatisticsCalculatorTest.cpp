@@ -169,8 +169,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase1()
 	mitk::Point2D pnt4; pnt4[0] = 10.5; pnt4[1] = 4.5;
 	std::vector<mitk::Point2D> points{ pnt1,pnt2,pnt3,pnt4 };
 	figure = GeneratePlanarPolygon(m_Geometry, points);
-
-	auto statisticsContainer = ComputeStatistics(m_TestImage, figure.GetPointer());
+	mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+	CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, figure.GetPointer()));
 	auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
 
 	this->VerifyStatistics(statisticsObjectTimestep0, 255.0, 0.0, 255.0);
@@ -196,7 +196,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase2()
 	std::vector<mitk::Point2D> points{ pnt1,pnt2,pnt3,pnt4 };
 	figure = GeneratePlanarPolygon(m_Geometry, points);
 
-	auto statisticsContainer = ComputeStatistics(m_TestImage, figure.GetPointer());
+	mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+	CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, figure.GetPointer()));
 	auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
 
 	this->VerifyStatistics(statisticsObjectTimestep0, 255.0, 0.0, 255.0);
@@ -221,7 +222,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase3()
 	std::vector<mitk::Point2D> points{ pnt1,pnt2,pnt3 };
 	figure = GeneratePlanarPolygon(m_Geometry, points);
 
-	auto statisticsContainer = ComputeStatistics(m_TestImage, figure.GetPointer());
+	mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+	CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, figure.GetPointer()));
 	auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
 
 	this->VerifyStatistics(statisticsObjectTimestep0, 255.0, 0.0, 255.0);
@@ -247,7 +249,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase4()
 	std::vector<mitk::Point2D> points{ pnt1,pnt2,pnt3,pnt4 };
 	figure = GeneratePlanarPolygon(m_Geometry, points);
 
-	auto statisticsContainer = ComputeStatistics(m_TestImage, figure.GetPointer());
+	mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+	CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, figure.GetPointer()));
 	auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
 
 	this->VerifyStatistics(statisticsObjectTimestep0, 191.25, 110.41823898251593, 242.250);
@@ -273,7 +276,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase5()
 	std::vector<mitk::Point2D> points{ pnt1,pnt2,pnt3,pnt4 };
 	figure = GeneratePlanarPolygon(m_Geometry, points);
 
-	auto statisticsContainer = ComputeStatistics(m_TestImage, figure.GetPointer());
+	mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+	CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, figure.GetPointer()));
 	auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
 
 	this->VerifyStatistics(statisticsObjectTimestep0, 191.50, 63.50, 134.34999990463257);
@@ -299,7 +303,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase6()
 	std::vector<mitk::Point2D> points{ pnt1,pnt2,pnt3,pnt4 };
 	figure = GeneratePlanarPolygon(m_Geometry, points);
 
-	auto statisticsContainer = ComputeStatistics(m_TestImage, figure.GetPointer());
+	mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+	CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, figure.GetPointer()));
 	auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
 
 	this->VerifyStatistics(statisticsObjectTimestep0, 191.5, 63.50, 134.34999990463257);
@@ -325,7 +330,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase7()
 	std::vector<mitk::Point2D> points{ pnt1,pnt2,pnt3,pnt4 };
 	figure = GeneratePlanarPolygon(m_Geometry, points);
 
-	auto statisticsContainer = ComputeStatistics(m_TestImage, figure.GetPointer());
+	mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+	CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, figure.GetPointer()));
 	auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
 
 	this->VerifyStatistics(statisticsObjectTimestep0, 127.666666666666667, 104.10358089689113, 140.250);
@@ -351,7 +357,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase8()
 	std::vector<mitk::Point2D> points{ pnt1,pnt2,pnt3,pnt4 };
 	figure = GeneratePlanarPolygon(m_Geometry, points);
 
-	auto statisticsContainer = ComputeStatistics(m_TestImage, figure.GetPointer());
+	mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+	CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, figure.GetPointer()));
 	auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
 
 	this->VerifyStatistics(statisticsObjectTimestep0, 128.0, 0.0, 128.0);
@@ -377,7 +384,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase9()
 	std::vector<mitk::Point2D> points{ pnt1,pnt2,pnt3,pnt4 };
 	figure = GeneratePlanarPolygon(m_Geometry, points);
 
-	auto statisticsContainer = ComputeStatistics(m_TestImage, figure.GetPointer());
+	mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+	CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, figure.GetPointer()));
 	auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
 
 	this->VerifyStatistics(statisticsObjectTimestep0, 191.5, 63.50, 134.34999990463257);
@@ -403,7 +411,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase10()
 	std::vector<mitk::Point2D> points{ pnt1,pnt2,pnt3,pnt4 };
 	figure = GeneratePlanarPolygon(m_Geometry, points);
 
-	auto statisticsContainer = ComputeStatistics(m_TestImage, figure.GetPointer());
+	mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+	CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, figure.GetPointer()));
 	auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
 
 	this->VerifyStatistics(statisticsObjectTimestep0, 127.666666666666667, 104.10358089689113, 140.250);
@@ -429,7 +438,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase11()
 	std::vector<mitk::Point2D> points{ pnt1,pnt2,pnt3,pnt4 };
 	figure = GeneratePlanarPolygon(m_Geometry, points);
 
-	auto statisticsContainer = ComputeStatistics(m_TestImage, figure.GetPointer());
+	mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+	CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, figure.GetPointer()));
 	auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
 
 	this->VerifyStatistics(statisticsObjectTimestep0, 204.0, 102.00, 242.250);
@@ -454,7 +464,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase12()
 	std::vector<mitk::Point2D> points{ pnt1,pnt2,pnt3 };
 	figure = GeneratePlanarPolygon(m_Geometry, points);
 
-	auto statisticsContainer = ComputeStatistics(m_TestImage, figure.GetPointer());
+	mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+	CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_TestImage, figure.GetPointer()));
 	auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
 
 	this->VerifyStatistics(statisticsObjectTimestep0, 212.666666666666667, 59.8683741404609923, 248.64999771118163);
@@ -492,7 +503,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedNoMask()
 	expected_maxIndex[1] = 1;
 	expected_maxIndex[2] = 2;
 
-	auto statisticsContainer = ComputeStatistics(m_Pic3DCroppedImage);
+	mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+	CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_Pic3DCroppedImage));
 	auto statisticsObject = statisticsContainer->GetStatisticsForTimeStep(0);
 
 	VerifyStatistics(statisticsObject,
@@ -550,7 +562,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedBinMask()
 	imgMaskGen->SetInputImage(m_Pic3DCroppedImage);
 	imgMaskGen->SetTimeStep(0);
 
-	auto statisticsContainer = ComputeStatistics(m_Pic3DCroppedImage, imgMaskGen.GetPointer(), nullptr, 1);
+	mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+	CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_Pic3DCroppedImage, imgMaskGen.GetPointer(), nullptr, 1));
 	auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
 
 	VerifyStatistics(statisticsObjectTimestep0,
@@ -608,7 +621,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedMultilabelMask()
 	imgMaskGen->SetInputImage(m_Pic3DCroppedImage);
 	imgMaskGen->SetTimeStep(0);
 
-	auto statisticsContainer = ComputeStatistics(m_Pic3DCroppedImage, imgMaskGen.GetPointer(), nullptr, 2);
+	mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+	CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_Pic3DCroppedImage, imgMaskGen.GetPointer(), nullptr, 2));
 	auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
 
 	VerifyStatistics(statisticsObjectTimestep0,
@@ -665,7 +679,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedPlanarFigure()
 	pfMaskGen->SetInputImage(m_Pic3DCroppedImage);
 	pfMaskGen->SetPlanarFigure(m_Pic3DCroppedPlanarFigure);
 
-	auto statisticsContainer = ComputeStatistics(m_Pic3DCroppedImage, pfMaskGen.GetPointer());
+	mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+	CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_Pic3DCroppedImage, pfMaskGen.GetPointer()));
 	auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
 
 	VerifyStatistics(statisticsObjectTimestep0,
@@ -714,7 +729,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedNoMaskTimeStep1()
 	expected_maxIndex[1] = 0;
 	expected_maxIndex[2] = 1;
 
-	auto statisticsContainer = ComputeStatistics(m_US4DCroppedImage);
+	mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+	CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage));
 	auto statisticsObjectTimestep1 = statisticsContainer->GetStatisticsForTimeStep(1);
 
 	VerifyStatistics(statisticsObjectTimestep1,
@@ -771,7 +787,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedBinMaskTimeStep1()
 	imgMask1->SetInputImage(m_US4DCroppedImage);
 	imgMask1->SetImageMask(m_US4DCroppedBinMask);
 
-	auto statisticsContainer = ComputeStatistics(m_US4DCroppedImage, imgMask1.GetPointer(), nullptr, 1);
+	mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+	CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage, imgMask1.GetPointer(), nullptr, 1));
 	auto statisticsObjectTimestep1 = statisticsContainer->GetStatisticsForTimeStep(1);
 
 	VerifyStatistics(statisticsObjectTimestep1,
@@ -828,7 +845,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedMultilabelMaskTimeSt
 	imgMask1->SetInputImage(m_US4DCroppedImage);
 	imgMask1->SetImageMask(m_US4DCroppedMultilabelMask);
 
-	auto statisticsContainer = ComputeStatistics(m_US4DCroppedImage, imgMask1.GetPointer(), nullptr, 1);
+	mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+	CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage, imgMask1.GetPointer(), nullptr, 1));
 	auto statisticsObjectTimestep1 = statisticsContainer->GetStatisticsForTimeStep(1);
 
 	VerifyStatistics(statisticsObjectTimestep1,
@@ -885,7 +903,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedPlanarFigureTimeStep
 	pfMaskGen->SetInputImage(m_US4DCroppedImage);
 	pfMaskGen->SetPlanarFigure(m_US4DCroppedPlanarFigure);
 
-	auto statisticsContainer = ComputeStatistics(m_US4DCroppedImage, pfMaskGen.GetPointer());
+	mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+	CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage, pfMaskGen.GetPointer()));
 	auto statisticsObjectTimestep1 = statisticsContainer->GetStatisticsForTimeStep(1);
 
 	VerifyStatistics(statisticsObjectTimestep1,

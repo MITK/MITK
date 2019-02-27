@@ -115,20 +115,20 @@ private:
 		unsigned short label = 1);
 
 	void VerifyStatistics(mitk::ImageStatisticsContainer::StatisticsObject stats,
-		double testMean, double testSD, double testMedian = 0);
+		mitk::ImageStatisticsContainer::RealType testMean, mitk::ImageStatisticsContainer::RealType testSD, mitk::ImageStatisticsContainer::RealType testMedian = 0);
 
 	// T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
 	void VerifyStatistics(mitk::ImageStatisticsContainer::StatisticsObject stats,
-		unsigned long N,
-		double mean,
-		double MPP,
-		double skewness,
-		double kurtosis,
-		double variance,
-		double stdev,
-		double min,
-		double max,
-		double RMS,
+		mitk::ImageStatisticsContainer::VoxelCountType N,
+		mitk::ImageStatisticsContainer::RealType mean,
+		mitk::ImageStatisticsContainer::RealType MPP,
+		mitk::ImageStatisticsContainer::RealType skewness,
+		mitk::ImageStatisticsContainer::RealType kurtosis,
+		mitk::ImageStatisticsContainer::RealType variance,
+		mitk::ImageStatisticsContainer::RealType stdev,
+		mitk::ImageStatisticsContainer::RealType min,
+		mitk::ImageStatisticsContainer::RealType max,
+		mitk::ImageStatisticsContainer::RealType RMS,
 		vnl_vector<int> minIndex,
 		vnl_vector<int> maxIndex);
 };
@@ -469,17 +469,17 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedNoMask()
 	m_Pic3DCroppedImage = mitk::IOUtil::Load<mitk::Image>(Pic3DCroppedFile);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D_cropped", m_Pic3DCroppedImage.IsNotNull());
 
-	unsigned long expected_N = 27;
-	double expected_mean = -564.1481481481481481;
-	double expected_MPP = 113.66666666666667;
-	double expected_median = -825;
-	double expected_skewness = 0.7120461106763573;
-	double expected_kurtosis = 1.8794464383714844;
-	double expected_variance = 140541.38545953357;
-	double expected_standarddev = 374.88849736892911;
-	double expected_min = -927;
-	double expected_max = 147;
-	double expected_RMS = 677.35110431630551;
+	mitk::ImageStatisticsContainer::VoxelCountType expected_N = 27;
+	mitk::ImageStatisticsContainer::RealType expected_mean = -564.1481481481481481;
+	mitk::ImageStatisticsContainer::RealType expected_MPP = 113.66666666666667;
+	mitk::ImageStatisticsContainer::RealType expected_median = -825;
+	mitk::ImageStatisticsContainer::RealType expected_skewness = 0.7120461106763573;
+	mitk::ImageStatisticsContainer::RealType expected_kurtosis = 1.8794464383714844;
+	mitk::ImageStatisticsContainer::RealType expected_variance = 140541.38545953357;
+	mitk::ImageStatisticsContainer::RealType expected_standarddev = 374.88849736892911;
+	mitk::ImageStatisticsContainer::RealType expected_min = -927;
+	mitk::ImageStatisticsContainer::RealType expected_max = 147;
+	mitk::ImageStatisticsContainer::RealType expected_RMS = 677.35110431630551;
 	vnl_vector<int> expected_minIndex;
 	expected_minIndex.set_size(3);
 	expected_minIndex[0] = 2;
@@ -523,16 +523,16 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedBinMask()
 	m_Pic3DCroppedBinMask = mitk::IOUtil::Load<mitk::Image>(Pic3DCroppedBinMaskFile);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D binary mask", m_Pic3DCroppedBinMask.IsNotNull());
 
-	double expected_kurtosis = 1.0765697398089618;
-	double expected_MPP = -nan("");
-	double expected_max = -22;
-	double expected_mean = -464;
-	double expected_min = -846;
-	unsigned long expected_N = 4;
-	double expected_RMS = 595.42631785973322;
-	double expected_skewness = 0.0544059290851858;
-	double expected_standarddev = 373.14407405183323;
-	double expected_variance = 139236.50;
+	mitk::ImageStatisticsContainer::RealType expected_kurtosis = 1.0765697398089618;
+	mitk::ImageStatisticsContainer::RealType expected_MPP = -nan("");
+	mitk::ImageStatisticsContainer::RealType expected_max = -22;
+	mitk::ImageStatisticsContainer::RealType expected_mean = -464;
+	mitk::ImageStatisticsContainer::RealType expected_min = -846;
+	mitk::ImageStatisticsContainer::VoxelCountType expected_N = 4;
+	mitk::ImageStatisticsContainer::RealType expected_RMS = 595.42631785973322;
+	mitk::ImageStatisticsContainer::RealType expected_skewness = 0.0544059290851858;
+	mitk::ImageStatisticsContainer::RealType expected_standarddev = 373.14407405183323;
+	mitk::ImageStatisticsContainer::RealType expected_variance = 139236.50;
 	vnl_vector<int> expected_minIndex;
 	expected_minIndex.set_size(3);
 	expected_minIndex[0] = 1;
@@ -581,16 +581,16 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedMultilabelMask()
 	m_Pic3DCroppedMultilabelMask = mitk::IOUtil::Load<mitk::Image>(Pic3DCroppedMultilabelMaskFile);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D multilabel mask", m_Pic3DCroppedMultilabelMask.IsNotNull());
 
-	double expected_kurtosis = 1.5;
-	double expected_MPP = -nan("");
-	double expected_max = -22;
-	double expected_mean = -586.33333333333333;
-	double expected_min = -916;
-	unsigned long expected_N = 3;
-	double expected_RMS = 710.3006405741163;
-	double expected_skewness = 0.6774469597523700;
-	double expected_standarddev = 400.92421007245525;
-	double expected_variance = 160740.22222222222;
+	mitk::ImageStatisticsContainer::RealType expected_kurtosis = 1.5;
+	mitk::ImageStatisticsContainer::RealType expected_MPP = -nan("");
+	mitk::ImageStatisticsContainer::RealType expected_max = -22;
+	mitk::ImageStatisticsContainer::RealType expected_mean = -586.33333333333333;
+	mitk::ImageStatisticsContainer::RealType expected_min = -916;
+	mitk::ImageStatisticsContainer::VoxelCountType expected_N = 3;
+	mitk::ImageStatisticsContainer::RealType expected_RMS = 710.3006405741163;
+	mitk::ImageStatisticsContainer::RealType expected_skewness = 0.6774469597523700;
+	mitk::ImageStatisticsContainer::RealType expected_standarddev = 400.92421007245525;
+	mitk::ImageStatisticsContainer::RealType expected_variance = 160740.22222222222;
 	vnl_vector<int> expected_minIndex;
 	expected_minIndex.set_size(3);
 	expected_minIndex[0] = 2;
@@ -639,16 +639,16 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedPlanarFigure()
 	m_Pic3DCroppedPlanarFigure = mitk::IOUtil::Load<mitk::PlanarFigure>(Pic3DCroppedPlanarFigureFile);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D planar figure", m_Pic3DCroppedPlanarFigure.IsNotNull());
 
-	double expected_kurtosis = 1;
-	double expected_MPP = -nan("");
-	double expected_max = -67;
-	double expected_mean = -446;
-	double expected_min = -825;
-	unsigned long expected_N = 2;
-	double expected_RMS = 585.28369189650243;
-	double expected_skewness = 0;
-	double expected_standarddev = 379;
-	double expected_variance = 143641;
+	mitk::ImageStatisticsContainer::RealType expected_kurtosis = 1;
+	mitk::ImageStatisticsContainer::RealType expected_MPP = -nan("");
+	mitk::ImageStatisticsContainer::RealType expected_max = -67;
+	mitk::ImageStatisticsContainer::RealType expected_mean = -446;
+	mitk::ImageStatisticsContainer::RealType expected_min = -825;
+	mitk::ImageStatisticsContainer::VoxelCountType expected_N = 2;
+	mitk::ImageStatisticsContainer::RealType expected_RMS = 585.28369189650243;
+	mitk::ImageStatisticsContainer::RealType expected_skewness = 0;
+	mitk::ImageStatisticsContainer::RealType expected_standarddev = 379;
+	mitk::ImageStatisticsContainer::RealType expected_variance = 143641;
 	vnl_vector<int> expected_minIndex;
 	expected_minIndex.set_size(3);
 	expected_minIndex[0] = 1;
@@ -692,16 +692,16 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedNoMaskTimeStep1()
 	m_US4DCroppedImage = mitk::IOUtil::Load<mitk::Image>(US4DCroppedFile);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading US4D_cropped", m_US4DCroppedImage.IsNotNull());
 
-	double expected_kurtosis = 1.5398359155908228;
-	double expected_MPP = 157.74074074074073;
-	double expected_max = 199;
-	double expected_mean = 157.74074074074073;
-	double expected_min = 101;
-	unsigned long expected_N = 27;
-	double expected_RMS = 160.991718213494823;
-	double expected_skewness = 0.0347280313508018;
-	double expected_standarddev = 32.189936997387058;
-	double expected_variance = 1036.19204389574722;
+	mitk::ImageStatisticsContainer::RealType expected_kurtosis = 1.5398359155908228;
+	mitk::ImageStatisticsContainer::RealType expected_MPP = 157.74074074074073;
+	mitk::ImageStatisticsContainer::RealType expected_max = 199;
+	mitk::ImageStatisticsContainer::RealType expected_mean = 157.74074074074073;
+	mitk::ImageStatisticsContainer::RealType expected_min = 101;
+	mitk::ImageStatisticsContainer::VoxelCountType expected_N = 27;
+	mitk::ImageStatisticsContainer::RealType expected_RMS = 160.991718213494823;
+	mitk::ImageStatisticsContainer::RealType expected_skewness = 0.0347280313508018;
+	mitk::ImageStatisticsContainer::RealType expected_standarddev = 32.189936997387058;
+	mitk::ImageStatisticsContainer::RealType expected_variance = 1036.19204389574722;
 	vnl_vector<int> expected_minIndex;
 	expected_minIndex.set_size(3);
 	expected_minIndex[0] = 0;
@@ -745,16 +745,16 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedBinMaskTimeStep1()
 	m_US4DCroppedBinMask = mitk::IOUtil::Load<mitk::Image>(US4DCroppedBinMaskFile);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading US4D binary mask", m_US4DCroppedBinMask.IsNotNull());
 
-	double expected_kurtosis = 1.5863739712889191;
-	double expected_MPP = 166.75;
-	double expected_max = 199;
-	double expected_mean = 166.75;
-	double expected_min = 120;
-	unsigned long expected_N = 4;
-	double expected_RMS = 169.70636405273669;
-	double expected_skewness = -0.4285540263894276;
-	double expected_standarddev = 31.538666744172936;
-	double expected_variance = 994.6874999999999;
+	mitk::ImageStatisticsContainer::RealType expected_kurtosis = 1.5863739712889191;
+	mitk::ImageStatisticsContainer::RealType expected_MPP = 166.75;
+	mitk::ImageStatisticsContainer::RealType expected_max = 199;
+	mitk::ImageStatisticsContainer::RealType expected_mean = 166.75;
+	mitk::ImageStatisticsContainer::RealType expected_min = 120;
+	mitk::ImageStatisticsContainer::VoxelCountType expected_N = 4;
+	mitk::ImageStatisticsContainer::RealType expected_RMS = 169.70636405273669;
+	mitk::ImageStatisticsContainer::RealType expected_skewness = -0.4285540263894276;
+	mitk::ImageStatisticsContainer::RealType expected_standarddev = 31.538666744172936;
+	mitk::ImageStatisticsContainer::RealType expected_variance = 994.6874999999999;
 	vnl_vector<int> expected_minIndex;
 	expected_minIndex.set_size(3);
 	expected_minIndex[0] = 0;
@@ -802,16 +802,16 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedMultilabelMaskTimeSt
 	m_US4DCroppedMultilabelMask = mitk::IOUtil::Load<mitk::Image>(US4DCroppedMultilabelMaskFile);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading US4D multilabel mask", m_US4DCroppedMultilabelMask.IsNotNull());
 
-	double expected_kurtosis = 1.0432484564918287;
-	double expected_MPP = 159.75;
-	double expected_max = 199;
-	double expected_mean = 159.75;
-	double expected_min = 120;
-	unsigned long expected_N = 4;
-	double expected_RMS = 163.74446555532802;
-	double expected_skewness = -0.004329226115093;
-	double expected_standarddev = 35.947009611371016;
-	double expected_variance = 1292.187500000000227;
+	mitk::ImageStatisticsContainer::RealType expected_kurtosis = 1.0432484564918287;
+	mitk::ImageStatisticsContainer::RealType expected_MPP = 159.75;
+	mitk::ImageStatisticsContainer::RealType expected_max = 199;
+	mitk::ImageStatisticsContainer::RealType expected_mean = 159.75;
+	mitk::ImageStatisticsContainer::RealType expected_min = 120;
+	mitk::ImageStatisticsContainer::VoxelCountType expected_N = 4;
+	mitk::ImageStatisticsContainer::RealType expected_RMS = 163.74446555532802;
+	mitk::ImageStatisticsContainer::RealType expected_skewness = -0.004329226115093;
+	mitk::ImageStatisticsContainer::RealType expected_standarddev = 35.947009611371016;
+	mitk::ImageStatisticsContainer::RealType expected_variance = 1292.187500000000227;
 	vnl_vector<int> expected_minIndex;
 	expected_minIndex.set_size(3);
 	expected_minIndex[0] = 0;
@@ -859,16 +859,16 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedPlanarFigureTimeStep
 	m_US4DCroppedPlanarFigure = mitk::IOUtil::Load<mitk::PlanarFigure>(US4DCroppedPlanarFigureFile);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading US4D planar figure", m_US4DCroppedPlanarFigure.IsNotNull());
 
-	double expected_kurtosis = 1;
-	double expected_MPP = 172.5;
-	double expected_max = 197;
-	double expected_mean = 172.5;
-	double expected_min = 148;
-	unsigned long expected_N = 2;
-	double expected_RMS = 174.23116827938679;
-	double expected_skewness = 0;
-	double expected_standarddev = 24.5;
-	double expected_variance = 600.25;
+	mitk::ImageStatisticsContainer::RealType expected_kurtosis = 1;
+	mitk::ImageStatisticsContainer::RealType expected_MPP = 172.5;
+	mitk::ImageStatisticsContainer::RealType expected_max = 197;
+	mitk::ImageStatisticsContainer::RealType expected_mean = 172.5;
+	mitk::ImageStatisticsContainer::RealType expected_min = 148;
+	mitk::ImageStatisticsContainer::VoxelCountType expected_N = 2;
+	mitk::ImageStatisticsContainer::RealType expected_RMS = 174.23116827938679;
+	mitk::ImageStatisticsContainer::RealType expected_skewness = 0;
+	mitk::ImageStatisticsContainer::RealType expected_standarddev = 24.5;
+	mitk::ImageStatisticsContainer::RealType expected_variance = 600.25;
 	vnl_vector<int> expected_minIndex;
 	expected_minIndex.set_size(3);
 	expected_minIndex[0] = 2;
@@ -928,14 +928,8 @@ const mitk::ImageStatisticsContainer::Pointer mitkImageStatisticsCalculatorTestS
 
 	statisticsCalculator->SetMask(planFigMaskGen.GetPointer());
 
-	try
-	{
-		return statisticsCalculator->GetStatistics();
-	}
-	catch (...)
-	{
-		return nullptr;
-	}
+	return statisticsCalculator->GetStatistics();
+
 }
 
 const mitk::ImageStatisticsContainer::Pointer
@@ -960,7 +954,7 @@ mitkImageStatisticsCalculatorTestSuite::ComputeStatistics(mitk::Image::ConstPoin
 }
 
 void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatisticsContainer::StatisticsObject stats,
-	double testMean, double testSD, double testMedian)
+	mitk::ImageStatisticsContainer::RealType testMean, mitk::ImageStatisticsContainer::RealType testSD, mitk::ImageStatisticsContainer::RealType testMedian)
 {
 	auto meanObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MEAN());
 	auto standardDeviationObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::STANDARDDEVIATION());
@@ -975,16 +969,16 @@ void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatist
 
 // T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
 void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatisticsContainer::StatisticsObject stats,
-	unsigned long N,
-	double mean,
-	double MPP,
-	double skewness,
-	double kurtosis,
-	double variance,
-	double stdev,
-	double min,
-	double max,
-	double RMS,
+	mitk::ImageStatisticsContainer::VoxelCountType N,
+	mitk::ImageStatisticsContainer::RealType mean,
+	mitk::ImageStatisticsContainer::RealType MPP,
+	mitk::ImageStatisticsContainer::RealType skewness,
+	mitk::ImageStatisticsContainer::RealType kurtosis,
+	mitk::ImageStatisticsContainer::RealType variance,
+	mitk::ImageStatisticsContainer::RealType stdev,
+	mitk::ImageStatisticsContainer::RealType min,
+	mitk::ImageStatisticsContainer::RealType max,
+	mitk::ImageStatisticsContainer::RealType RMS,
 	vnl_vector<int> minIndex,
 	vnl_vector<int> maxIndex)
 {

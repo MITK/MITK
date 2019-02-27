@@ -75,8 +75,8 @@ void ResectionFilter<TImageType>::computeIntersection()
 
   typename TImageType::RegionType region = input->GetLargestPossibleRegion();
 
-  using ImplicitFieldFilter = typename ImplicitFieldImageFilter<TImageType>;
-  ImplicitFieldFilter::Pointer deform = ImplicitFieldFilter::New();
+  using ImplicitFieldFilter = ImplicitFieldImageFilter<TImageType>;
+  typename ImplicitFieldFilter::Pointer deform = ImplicitFieldFilter::New();
   m_ProgressAccumulator->RegisterInternalFilter(deform, 0.5);
   deform->SetInput(input);
   deform->SetRegion(region);
@@ -86,7 +86,7 @@ void ResectionFilter<TImageType>::computeIntersection()
   } else { // if (m_RegionType == ResectionRegionType::OUTSIDE
     deform->SetRegionType(ImplicitFieldFilter::ResectionRegionType::OUTSIDE);
   }
-  if (!GetInPlace()) {
+  if (!itk::InPlaceImageFilter<TImageType, TImageType>::GetInPlace()) {
     deform->InPlaceOff();
   }
   deform->Update();

@@ -89,7 +89,7 @@ template<typename TPixel, unsigned int VImageDimension>
 void AccessResectFilter(const itk::Image<TPixel, VImageDimension>* itkImage, vtkSmartPointer<vtkPoints> points, vtkSmartPointer<vtkMatrix4x4> viewMatrix, ResectionTool::ResectionType resectionType)
 {
   using ResectionFilter = mitk::ResectionFilter<itk::Image<TPixel, VImageDimension>>;
-  ResectionFilter::Pointer resBuilder = ResectionFilter::New();
+  typename ResectionFilter::Pointer resBuilder = ResectionFilter::New();
   resBuilder->SetInputPoints(points);
   resBuilder->setViewportMatrix(viewMatrix);
   resBuilder->SetInput(itkImage);

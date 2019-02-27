@@ -19,7 +19,7 @@ void ImplicitFieldImageFilter<TImageType>::BeforeThreadedGenerateData()
   minMaxCalculator->ComputeMinimum();
   m_MinimumPixelValue = minMaxCalculator->GetMinimum();
 
-  if (!GetInPlace()) {
+  if (!itk::InPlaceImageFilter<TImageType, TImageType>::GetInPlace()) {
     itk::ImageAlgorithm::Copy(input.GetPointer(), output.GetPointer(), input->GetLargestPossibleRegion(), input->GetLargestPossibleRegion());
   }
   if (m_RegionType == ResectionRegionType::INSIDE) {

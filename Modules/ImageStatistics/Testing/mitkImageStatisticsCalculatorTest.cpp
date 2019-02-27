@@ -56,6 +56,8 @@ class mitkImageStatisticsCalculatorTestSuite : public mitk::TestFixture
   MITK_TEST(TestUS4DCroppedBinMaskTimeStep1);
   MITK_TEST(TestUS4DCroppedMultilabelMaskTimeStep1);
   MITK_TEST(TestUS4DCroppedPlanarFigureTimeStep1);
+  MITK_TEST(TestUS4DCroppedAllTimesteps);
+  MITK_TEST(TestUS4DCropped3DMask);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -130,8 +132,8 @@ private:
 		mitk::ImageStatisticsContainer::RealType min,
 		mitk::ImageStatisticsContainer::RealType max,
 		mitk::ImageStatisticsContainer::RealType RMS,
-		vnl_vector<int> minIndex,
-		vnl_vector<int> maxIndex);
+		mitk::ImageStatisticsContainer::IndexType minIndex,
+		mitk::ImageStatisticsContainer::IndexType maxIndex);
 };
 
 void mitkImageStatisticsCalculatorTestSuite::TestUninitializedImage()
@@ -492,13 +494,13 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedNoMask()
 	mitk::ImageStatisticsContainer::RealType expected_min = -927;
 	mitk::ImageStatisticsContainer::RealType expected_max = 147;
 	mitk::ImageStatisticsContainer::RealType expected_RMS = 677.35110431630551;
-	vnl_vector<int> expected_minIndex;
+	mitk::ImageStatisticsContainer::IndexType expected_minIndex;
 	expected_minIndex.set_size(3);
 	expected_minIndex[0] = 2;
 	expected_minIndex[1] = 1;
 	expected_minIndex[2] = 1;
 
-	vnl_vector<int> expected_maxIndex;
+	mitk::ImageStatisticsContainer::IndexType expected_maxIndex;
 	expected_maxIndex.set_size(3);
 	expected_maxIndex[0] = 0;
 	expected_maxIndex[1] = 1;
@@ -546,13 +548,13 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedBinMask()
 	mitk::ImageStatisticsContainer::RealType expected_skewness = 0.0544059290851858;
 	mitk::ImageStatisticsContainer::RealType expected_standarddev = 373.14407405183323;
 	mitk::ImageStatisticsContainer::RealType expected_variance = 139236.50;
-	vnl_vector<int> expected_minIndex;
+	mitk::ImageStatisticsContainer::IndexType expected_minIndex;
 	expected_minIndex.set_size(3);
 	expected_minIndex[0] = 1;
 	expected_minIndex[1] = 0;
 	expected_minIndex[2] = 0;
 
-	vnl_vector<int> expected_maxIndex;
+	mitk::ImageStatisticsContainer::IndexType expected_maxIndex;
 	expected_maxIndex.set_size(3);
 	expected_maxIndex[0] = 0;
 	expected_maxIndex[1] = 0;
@@ -605,13 +607,13 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedMultilabelMask()
 	mitk::ImageStatisticsContainer::RealType expected_skewness = 0.6774469597523700;
 	mitk::ImageStatisticsContainer::RealType expected_standarddev = 400.92421007245525;
 	mitk::ImageStatisticsContainer::RealType expected_variance = 160740.22222222222;
-	vnl_vector<int> expected_minIndex;
+	mitk::ImageStatisticsContainer::IndexType expected_minIndex;
 	expected_minIndex.set_size(3);
 	expected_minIndex[0] = 2;
 	expected_minIndex[1] = 0;
 	expected_minIndex[2] = 1;
 
-	vnl_vector<int> expected_maxIndex;
+	mitk::ImageStatisticsContainer::IndexType expected_maxIndex;
 	expected_maxIndex.set_size(3);
 	expected_maxIndex[0] = 0;
 	expected_maxIndex[1] = 0;
@@ -664,13 +666,13 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCroppedPlanarFigure()
 	mitk::ImageStatisticsContainer::RealType expected_skewness = 0;
 	mitk::ImageStatisticsContainer::RealType expected_standarddev = 379;
 	mitk::ImageStatisticsContainer::RealType expected_variance = 143641;
-	vnl_vector<int> expected_minIndex;
+	mitk::ImageStatisticsContainer::IndexType expected_minIndex;
 	expected_minIndex.set_size(3);
 	expected_minIndex[0] = 1;
 	expected_minIndex[1] = 1;
 	expected_minIndex[2] = 1;
 
-	vnl_vector<int> expected_maxIndex;
+	mitk::ImageStatisticsContainer::IndexType expected_maxIndex;
 	expected_maxIndex.set_size(3);
 	expected_maxIndex[0] = 0;
 	expected_maxIndex[1] = 1;
@@ -718,19 +720,19 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedNoMaskTimeStep1()
 	mitk::ImageStatisticsContainer::RealType expected_skewness = 0.0347280313508018;
 	mitk::ImageStatisticsContainer::RealType expected_standarddev = 32.189936997387058;
 	mitk::ImageStatisticsContainer::RealType expected_variance = 1036.19204389574722;
-	vnl_vector<int> expected_minIndex;
+	mitk::ImageStatisticsContainer::IndexType expected_minIndex;
 	expected_minIndex.set_size(3);
 	expected_minIndex[0] = 0;
 	expected_minIndex[1] = 2;
 	expected_minIndex[2] = 0;
 
-	vnl_vector<int> expected_maxIndex;
+	mitk::ImageStatisticsContainer::IndexType expected_maxIndex;
 	expected_maxIndex.set_size(3);
 	expected_maxIndex[0] = 0;
 	expected_maxIndex[1] = 0;
 	expected_maxIndex[2] = 1;
 
-	mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+	mitk::ImageStatisticsContainer::Pointer statisticsContainer=mitk::ImageStatisticsContainer::New();
 	CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage));
 	auto statisticsObjectTimestep1 = statisticsContainer->GetStatisticsForTimeStep(1);
 
@@ -772,13 +774,13 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedBinMaskTimeStep1()
 	mitk::ImageStatisticsContainer::RealType expected_skewness = -0.4285540263894276;
 	mitk::ImageStatisticsContainer::RealType expected_standarddev = 31.538666744172936;
 	mitk::ImageStatisticsContainer::RealType expected_variance = 994.6874999999999;
-	vnl_vector<int> expected_minIndex;
+	mitk::ImageStatisticsContainer::IndexType expected_minIndex;
 	expected_minIndex.set_size(3);
 	expected_minIndex[0] = 0;
 	expected_minIndex[1] = 0;
 	expected_minIndex[2] = 2;
 
-	vnl_vector<int> expected_maxIndex;
+	mitk::ImageStatisticsContainer::IndexType expected_maxIndex;
 	expected_maxIndex.set_size(3);
 	expected_maxIndex[0] = 1;
 	expected_maxIndex[1] = 1;
@@ -788,7 +790,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedBinMaskTimeStep1()
 	imgMask1->SetInputImage(m_US4DCroppedImage);
 	imgMask1->SetImageMask(m_US4DCroppedBinMask);
 
-	mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+	mitk::ImageStatisticsContainer::Pointer statisticsContainer=mitk::ImageStatisticsContainer::New();
 	CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage, imgMask1.GetPointer(), nullptr, 1));
 	auto statisticsObjectTimestep1 = statisticsContainer->GetStatisticsForTimeStep(1);
 
@@ -830,13 +832,13 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedMultilabelMaskTimeSt
 	mitk::ImageStatisticsContainer::RealType expected_skewness = -0.004329226115093;
 	mitk::ImageStatisticsContainer::RealType expected_standarddev = 35.947009611371016;
 	mitk::ImageStatisticsContainer::RealType expected_variance = 1292.187500000000227;
-	vnl_vector<int> expected_minIndex;
+	mitk::ImageStatisticsContainer::IndexType expected_minIndex;
 	expected_minIndex.set_size(3);
 	expected_minIndex[0] = 0;
 	expected_minIndex[1] = 0;
 	expected_minIndex[2] = 2;
 
-	vnl_vector<int> expected_maxIndex;
+	mitk::ImageStatisticsContainer::IndexType expected_maxIndex;
 	expected_maxIndex.set_size(3);
 	expected_maxIndex[0] = 0;
 	expected_maxIndex[1] = 0;
@@ -888,13 +890,13 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedPlanarFigureTimeStep
 	mitk::ImageStatisticsContainer::RealType expected_skewness = 0;
 	mitk::ImageStatisticsContainer::RealType expected_standarddev = 24.5;
 	mitk::ImageStatisticsContainer::RealType expected_variance = 600.25;
-	vnl_vector<int> expected_minIndex;
+	mitk::ImageStatisticsContainer::IndexType expected_minIndex;
 	expected_minIndex.set_size(3);
 	expected_minIndex[0] = 2;
 	expected_minIndex[1] = 2;
 	expected_minIndex[2] = 2;
 
-	vnl_vector<int> expected_maxIndex;
+	mitk::ImageStatisticsContainer::IndexType expected_maxIndex;
 	expected_maxIndex.set_size(3);
 	expected_maxIndex[0] = 2;
 	expected_maxIndex[1] = 2;
@@ -925,18 +927,36 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedPlanarFigureTimeStep
 
 void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedAllTimesteps()
 {
+	MITK_INFO << std::endl << "Test US4D cropped all timesteps:-----------------------------------------------------------------------------------";
+
 	std::string US4DCroppedFile = this->GetTestDataFilePath("ImageStatisticsTestData/US4D_cropped.nrrd");
 	m_US4DCroppedImage = mitk::IOUtil::Load<mitk::Image>(US4DCroppedFile);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading US4D_cropped", m_US4DCroppedImage.IsNotNull());
-	mitk::ImageStatisticsContainer::Pointer statisticsContainer;
+	mitk::ImageStatisticsContainer::Pointer statisticsContainer=mitk::ImageStatisticsContainer::New();
 	CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage));
-	auto statisticsObjectTimestep1 = statisticsContainer->GetStatisticsForTimeStep(1);
+	for (int i = 0; i < 4; i++)
+	{
+		CPPUNIT_ASSERT_MESSAGE("Error computing statistics for multiple timestep", statisticsContainer->TimeStepExists(i));
+	}
 }
 void mitkImageStatisticsCalculatorTestSuite::TestUS4DCropped3DMask()
 {
+	MITK_INFO << std::endl << "Test US4D cropped with Pic3D Mask:-----------------------------------------------------------------------------------";
+
 	std::string US4DCroppedFile = this->GetTestDataFilePath("ImageStatisticsTestData/US4D_cropped.nrrd");
 	m_US4DCroppedImage = mitk::IOUtil::Load<mitk::Image>(US4DCroppedFile);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading US4D_cropped", m_US4DCroppedImage.IsNotNull());
+
+	std::string Pic3DCroppedBinMaskFile = this->GetTestDataFilePath("ImageStatisticsTestData/Pic3D_croppedBinMask.nrrd");
+	m_Pic3DCroppedBinMask = mitk::IOUtil::Load<mitk::Image>(Pic3DCroppedBinMaskFile);
+	CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D binary mask", m_Pic3DCroppedBinMask.IsNotNull());
+
+	mitk::ImageMaskGenerator::Pointer imgMask = mitk::ImageMaskGenerator::New();
+	imgMask->SetInputImage(m_US4DCroppedImage);
+	imgMask->SetImageMask(m_Pic3DCroppedBinMask);
+
+	mitk::ImageStatisticsContainer::Pointer statisticsContainer=mitk::ImageStatisticsContainer::New();
+	CPPUNIT_ASSERT_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage,imgMask.GetPointer()),itk::ExceptionObject);
 }
 
 mitk::PlanarPolygon::Pointer mitkImageStatisticsCalculatorTestSuite::GeneratePlanarPolygon(mitk::PlaneGeometry::Pointer geometry, std::vector <mitk::Point2D> points)
@@ -1015,8 +1035,8 @@ void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatist
 	mitk::ImageStatisticsContainer::RealType min,
 	mitk::ImageStatisticsContainer::RealType max,
 	mitk::ImageStatisticsContainer::RealType RMS,
-	vnl_vector<int> minIndex,
-	vnl_vector<int> maxIndex)
+	mitk::ImageStatisticsContainer::IndexType minIndex,
+	mitk::ImageStatisticsContainer::IndexType maxIndex)
 {
 	mitk::ImageStatisticsContainer::VoxelCountType numberOfVoxelsObject;
 	mitk::ImageStatisticsContainer::RealType meanObject;

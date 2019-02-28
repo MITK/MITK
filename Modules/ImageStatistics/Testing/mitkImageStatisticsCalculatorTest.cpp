@@ -1046,7 +1046,6 @@ void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatist
 	CPPUNIT_ASSERT_NO_THROW(meanObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MEAN()));
 	CPPUNIT_ASSERT_NO_THROW(standardDeviationObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::STANDARDDEVIATION()));
 	CPPUNIT_ASSERT_NO_THROW(medianObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MEDIAN()));
-	MITK_INFO << "Median value difference: " << medianObject - testMedian;
 	CPPUNIT_ASSERT_MESSAGE("Calculated mean grayvalue is not equal to the desired value.", std::abs(meanObject - testMean) < mitk::eps);
 	CPPUNIT_ASSERT_MESSAGE("Calculated grayvalue sd is not equal to the desired value.", std::abs(standardDeviationObject - testSD) < mitk::eps);
 	CPPUNIT_ASSERT_MESSAGE("Calculated median grayvalue is not equal to the desired value.", std::abs(medianObject - testMedian) < mitk::eps);

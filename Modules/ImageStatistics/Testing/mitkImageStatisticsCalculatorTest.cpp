@@ -107,10 +107,6 @@ private:
 	// creates a polygon given a geometry and a vector of 2d points
 	mitk::PlanarPolygon::Pointer GeneratePlanarPolygon(mitk::PlaneGeometry::Pointer geometry, std::vector <mitk::Point2D> points);
 
-	// calculate statistics for the given image and planarpolygon
-	const mitk::ImageStatisticsContainer::Pointer ComputeStatistics(mitk::Image::ConstPointer image,
-		mitk::PlanarFigure::Pointer polygon);
-
 	// universal function to calculate statistics
 	const mitk::ImageStatisticsContainer::Pointer ComputeStatistics(mitk::Image::ConstPointer image,
 		mitk::MaskGenerator::Pointer maskGen = nullptr,
@@ -1018,23 +1014,6 @@ mitk::PlanarPolygon::Pointer mitkImageStatisticsCalculatorTestSuite::GeneratePla
 		figure->SetControlPoint(i, points[i], true);
 	}
 	return figure;
-}
-
-const mitk::ImageStatisticsContainer::Pointer mitkImageStatisticsCalculatorTestSuite::ComputeStatistics(mitk::Image::ConstPointer image, mitk::PlanarFigure::Pointer polygon)
-{
-	mitk::ImageStatisticsCalculator::Pointer statisticsCalculator = mitk::ImageStatisticsCalculator::New();
-	statisticsCalculator->SetInputImage(image);
-
-	statisticsCalculator->SetNBinsForHistogramStatistics(10);
-
-	mitk::PlanarFigureMaskGenerator::Pointer planFigMaskGen = mitk::PlanarFigureMaskGenerator::New();
-	planFigMaskGen->SetInputImage(image);
-	planFigMaskGen->SetPlanarFigure(polygon);
-
-	statisticsCalculator->SetMask(planFigMaskGen.GetPointer());
-
-	return statisticsCalculator->GetStatistics();
-
 }
 
 const mitk::ImageStatisticsContainer::Pointer

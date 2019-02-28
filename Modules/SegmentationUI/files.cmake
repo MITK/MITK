@@ -16,6 +16,7 @@ Qmitk/QmitkOtsuTool3DGUI.cpp
 Qmitk/QmitkPaintbrushToolGUI.cpp
 Qmitk/QmitkPickingToolGUI.cpp
 Qmitk/QmitkPixelManipulationToolGUI.cpp
+Qmitk/QmitkResectionToolGUI.cpp
 Qmitk/QmitkSlicesInterpolator.cpp
 Qmitk/QmitkSmartBrushToolGUI.cpp
 Qmitk/QmitkToolGUI.cpp
@@ -45,6 +46,7 @@ Qmitk/QmitkOtsuTool3DGUI.h
 Qmitk/QmitkPaintbrushToolGUI.h
 Qmitk/QmitkPickingToolGUI.h
 Qmitk/QmitkPixelManipulationToolGUI.h
+Qmitk/QmitkResectionToolGUI.h
 Qmitk/QmitkSlicesInterpolator.h
 Qmitk/QmitkSmartBrushToolGUI.h
 Qmitk/QmitkToolGUI.h

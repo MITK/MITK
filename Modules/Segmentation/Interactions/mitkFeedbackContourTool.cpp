@@ -13,6 +13,8 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
+#include <mitkContourModelGLMapper2D.h>
+#include <mitkVtkGLMapperWrapper.h>
 
 #include "mitkFeedbackContourTool.h"
 #include "mitkToolManager.h"
@@ -41,6 +43,10 @@ mitk::FeedbackContourTool::FeedbackContourTool(const char* type)
   m_FeedbackContourNode->SetProperty("contour.project-onto-plane", BoolProperty::New(false));
   m_FeedbackContourNode->SetProperty("contour.width", FloatProperty::New(1.0));
   m_FeedbackContourNode->SetProperty("draw-in-3d", BoolProperty::New(false));
+  m_FeedbackContourNode->SetProperty("contour.check-distance", BoolProperty::New(false));
+
+  m_FeedbackContourNode->SetMapper(mitk::BaseRenderer::Standard3D,
+      mitk::VtkGLMapperWrapper::New(mitk::ContourModelGLMapper2D::New().GetPointer()));
 
   SetFeedbackContourColorDefault();
 }
@@ -59,13 +65,15 @@ void mitk::FeedbackContourTool::SetFeedbackContourColorDefault()
     m_FeedbackContourNode->SetProperty("contour.color", ColorProperty::New(0.0/255.0, 255.0/255.0, 0.0/255.0));
 }
 
+void mitk::FeedbackContourTool::SetFeedbackContourDraw3D(bool draw3D)
+{
+  m_FeedbackContourNode->SetProperty("draw-in-3d", BoolProperty::New(draw3D));
+}
+
 void mitk::FeedbackContourTool::Deactivated()
 {
   Superclass::Deactivated();
-  DataStorage* storage = m_ToolManager->GetDataStorage();
-  if ( storage && m_FeedbackContourNode.IsNotNull())
-  {
-    storage->Remove( m_FeedbackContourNode );
+  if (m_FeedbackContourNode.IsNotNull()) {
     m_FeedbackContour->Clear();
     SetFeedbackContourVisible(false);
   }
@@ -74,7 +82,6 @@ void mitk::FeedbackContourTool::Deactivated()
 void mitk::FeedbackContourTool::Activated()
 {
   Superclass::Activated();
-
   SetFeedbackContourVisible(true);
 }
 
@@ -91,17 +98,14 @@ void mitk::FeedbackContourTool::SetFeedbackContour(ContourModel::Pointer contour
 
 void mitk::FeedbackContourTool::SetFeedbackContourVisible(bool visible)
 {
-  if ( m_FeedbackContourVisible == visible )
+  if ( m_FeedbackContourVisible == visible ) {
     return; // nothing changed
+  }
 
-  if ( DataStorage* storage = m_ToolManager->GetDataStorage() )
-  {
-    if (visible)
-    {
+  if ( DataStorage* storage = m_ToolManager->GetDataStorage()) {
+    if (visible) {
       storage->Add( m_FeedbackContourNode );
-    }
-    else
-    {
+    } else {
       storage->Remove( m_FeedbackContourNode );
     }
   }

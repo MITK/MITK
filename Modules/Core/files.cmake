@@ -21,6 +21,7 @@ set(CPP_FILES
   Algorithms/mitkImageTimeSelector.cpp
   Algorithms/mitkImageToImageFilter.cpp
   Algorithms/mitkImageToSurfaceFilter.cpp
+  Algorithms/mitkImplicitPolyDataSweepDistance.cpp
   Algorithms/mitkMultiComponentImageDataComparisonFilter.cpp
   Algorithms/mitkPlaneGeometryDataToSurfaceFilter.cpp
   Algorithms/mitkPointSetSource.cpp

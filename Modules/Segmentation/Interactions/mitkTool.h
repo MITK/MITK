@@ -191,6 +191,9 @@ namespace mitk
 
     virtual bool CanHandle(BaseData* referenceData) const;
 
+    void setLock3D(bool lock3D);
+    bool getLock3D();
+
   protected:
 
     friend class ToolManager;
@@ -260,6 +263,8 @@ namespace mitk
     std::map<us::ServiceReferenceU, EventConfig> m_DisplayInteractorConfigs;
 
     clock_t m_StartTime;
+
+    bool m_Lock3D;
   };
 
 } // namespace

@@ -52,6 +52,7 @@ set(CPP_FILES
   Interactions/mitkFeedbackContourTool.cpp
   Interactions/mitkFillRegionTool.cpp
   Interactions/mitkOtsuTool3D.cpp
+  Interactions/mitkResectionTool.cpp
   Interactions/mitkPaintbrushTool.cpp
   Interactions/mitkPixelManipulationTool.cpp
   Interactions/mitkRegionGrowingTool.cpp
@@ -101,6 +102,8 @@ set(RESOURCE_FILES
   RegionGrowing_Cursor_32x32.png
   SmartBrush_48x48.png
   SmartBrush_Cursor_32x32.png
+  ResectionTool_48x48.png
+  ResectionTool_Cursor_32x32.png
   Subtract_48x48.png
   Subtract_Cursor_32x32.png
   Threshold_48x48.png

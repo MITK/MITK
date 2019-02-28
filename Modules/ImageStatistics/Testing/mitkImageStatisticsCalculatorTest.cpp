@@ -100,6 +100,7 @@ private:
 	mitk::Image::ConstPointer m_US4DCroppedImage;
 	mitk::Image::Pointer m_US4DCroppedBinMask;
 	mitk::Image::Pointer m_US4DCroppedMultilabelMask;
+	mitk::Image::Pointer m_US4DCropped3DBinMask;
 	mitk::PlanarFigure::Pointer m_US4DCroppedPlanarFigure;
 
 	mitk::PlaneGeometry::Pointer m_Geometry;
@@ -984,24 +985,62 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCroppedAllTimesteps()
 		CPPUNIT_ASSERT_MESSAGE("Error computing statistics for multiple timestep", statisticsContainer->TimeStepExists(i));
 	}
 }
+
 void mitkImageStatisticsCalculatorTestSuite::TestUS4DCropped3DMask()
 {
-	MITK_INFO << std::endl << "Test US4D cropped with Pic3D Mask:-----------------------------------------------------------------------------------";
+	MITK_INFO << std::endl << "Test US4D cropped with 3D binary Mask:-----------------------------------------------------------------------------------";
 
 	std::string US4DCroppedFile = this->GetTestDataFilePath("ImageStatisticsTestData/US4D_cropped.nrrd");
 	m_US4DCroppedImage = mitk::IOUtil::Load<mitk::Image>(US4DCroppedFile);
 	CPPUNIT_ASSERT_MESSAGE("Failed loading US4D_cropped", m_US4DCroppedImage.IsNotNull());
 
-	std::string Pic3DCroppedBinMaskFile = this->GetTestDataFilePath("ImageStatisticsTestData/Pic3D_croppedBinMask.nrrd");
-	m_Pic3DCroppedBinMask = mitk::IOUtil::Load<mitk::Image>(Pic3DCroppedBinMaskFile);
-	CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D binary mask", m_Pic3DCroppedBinMask.IsNotNull());
+	std::string US4DCropped3DBinMaskFile = this->GetTestDataFilePath("ImageStatisticsTestData/US4D_cropped3DBinMask.nrrd");
+	m_US4DCropped3DBinMask = mitk::IOUtil::Load<mitk::Image>(US4DCropped3DBinMaskFile);
+	CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D binary mask", m_US4DCropped3DBinMask.IsNotNull());
+	//calculated ground truth via script
+	mitk::ImageStatisticsContainer::RealType expected_kurtosis = 1;
+	mitk::ImageStatisticsContainer::RealType expected_MPP = 198;
+	mitk::ImageStatisticsContainer::RealType expected_max = 199;
+	mitk::ImageStatisticsContainer::RealType expected_mean = 198;
+	mitk::ImageStatisticsContainer::RealType expected_min = 197;
+	mitk::ImageStatisticsContainer::VoxelCountType expected_N = 2;
+	mitk::ImageStatisticsContainer::RealType expected_RMS = 198.00252523642217;
+	mitk::ImageStatisticsContainer::RealType expected_skewness = 0;
+	mitk::ImageStatisticsContainer::RealType expected_standarddev = 1;
+	mitk::ImageStatisticsContainer::RealType expected_variance = 1;
+	mitk::ImageStatisticsContainer::IndexType expected_minIndex;
+	expected_minIndex.set_size(3);
+	expected_minIndex[0] = 1;
+	expected_minIndex[1] = 2;
+	expected_minIndex[2] = 1;
 
-	mitk::ImageMaskGenerator::Pointer imgMask = mitk::ImageMaskGenerator::New();
-	imgMask->SetInputImage(m_US4DCroppedImage);
-	imgMask->SetImageMask(m_Pic3DCroppedBinMask);
+	mitk::ImageStatisticsContainer::IndexType expected_maxIndex;
+	expected_maxIndex.set_size(3);
+	expected_maxIndex[0] = 1;
+	expected_maxIndex[1] = 1;
+	expected_maxIndex[2] = 1;
 
-	mitk::ImageStatisticsContainer::Pointer statisticsContainer=mitk::ImageStatisticsContainer::New();
-	CPPUNIT_ASSERT_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage,imgMask.GetPointer()),itk::ExceptionObject);
+	mitk::ImageMaskGenerator::Pointer imgMask1 = mitk::ImageMaskGenerator::New();
+	imgMask1->SetInputImage(m_US4DCroppedImage);
+	imgMask1->SetImageMask(m_US4DCropped3DBinMask);
+
+	mitk::ImageStatisticsContainer::Pointer statisticsContainer = mitk::ImageStatisticsContainer::New();
+	CPPUNIT_ASSERT_NO_THROW(statisticsContainer = ComputeStatistics(m_US4DCroppedImage, imgMask1.GetPointer(), nullptr, 1));
+	auto statisticsObjectTimestep1 = statisticsContainer->GetStatisticsForTimeStep(1);
+
+	VerifyStatistics(statisticsObjectTimestep1,
+		expected_N,
+		expected_mean,
+		expected_MPP,
+		expected_skewness,
+		expected_kurtosis,
+		expected_variance,
+		expected_standarddev,
+		expected_min,
+		expected_max,
+		expected_RMS,
+		expected_minIndex,
+		expected_maxIndex);
 }
 
 mitk::PlanarPolygon::Pointer mitkImageStatisticsCalculatorTestSuite::GeneratePlanarPolygon(mitk::PlaneGeometry::Pointer geometry, std::vector <mitk::Point2D> points)

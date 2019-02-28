@@ -310,10 +310,20 @@ mitkFunctionFindWhitelists(MITK)
 # Custom dependency logic
 
 option(MITK_USE_SYSTEM_Boost "Use the system Boost" OFF)
+
 set(MITK_USE_Boost_LIBRARIES "" CACHE STRING "A semi-colon separated list of required Boost libraries")
 
+if(MITK_USE_cpprestsdk)
+  list(APPEND MITK_USE_Boost_LIBRARIES date_time regex system)
+  if(UNIX)
+    list(APPEND MITK_USE_Boost_LIBRARIES atomic chrono filesystem random thread)
+  endif()
+  list(REMOVE_DUPLICATES MITK_USE_Boost_LIBRARIES)
+  set(MITK_USE_Boost_LIBRARIES ${MITK_USE_Boost_LIBRARIES} CACHE STRING "A semi-colon separated list of required Boost libraries" FORCE)
+endif()
+
 if(MITK_USE_Python)
-  set(MITK_USE_ZLIB ON)
+  set(MITK_USE_zlib ON)
   find_package(PythonLibs 3 REQUIRED)
   find_package(PythonInterp 3 REQUIRED)
 

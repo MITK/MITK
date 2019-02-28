@@ -2,6 +2,7 @@ mitkFunctionAddExternalProject(NAME Poco        ON  COMPONENTS Foundation Net Ut
 mitkFunctionAddExternalProject(NAME DCMTK       ON  DOC "EXPERIMENTAL, superbuild only: Use DCMTK in MITK")
 mitkFunctionAddExternalProject(NAME OpenIGTLink OFF)
 
+mitkFunctionAddExternalProject(NAME zlib        OFF ADVANCED)
 mitkFunctionAddExternalProject(NAME tinyxml     ON  ADVANCED)
 mitkFunctionAddExternalProject(NAME GDCM        ON  ADVANCED)
 mitkFunctionAddExternalProject(NAME GLUT        OFF ADVANCED)
@@ -11,7 +12,6 @@ mitkFunctionAddExternalProject(NAME ANN         ON  ADVANCED DOC "Use Approximat
 mitkFunctionAddExternalProject(NAME CppUnit     ON  ADVANCED DOC "Use CppUnit for unit tests")
 
 mitkFunctionAddExternalProject(NAME PCRE        OFF ADVANCED NO_PACKAGE)
-mitkFunctionAddExternalProject(NAME ZLIB        OFF ADVANCED NO_PACKAGE NO_CACHE)
 
 mitkFunctionAddExternalProject(NAME HDF5        ON ADVANCED)
 mitkFunctionAddExternalProject(NAME BetData     OFF ADVANCED)
@@ -32,6 +32,7 @@ mitkFunctionAddExternalProject(NAME ITK       ON           NO_CACHE DEPENDS HDF5
 mitkFunctionAddExternalProject(NAME VTK       ON           NO_CACHE)
 mitkFunctionAddExternalProject(NAME Boost     ON           NO_CACHE)
 
+mitkFunctionAddExternalProject(NAME cpprestsdk OFF         DEPENDS zlib Boost ADVANCED)
 mitkFunctionAddExternalProject(NAME ACVD      OFF          DOC "Use Approximated Centroidal Voronoi Diagrams")
 mitkFunctionAddExternalProject(NAME CTK       ON           DEPENDS Qt5 DCMTK DOC "Use CTK in MITK")
 mitkFunctionAddExternalProject(NAME Rasqal    OFF          DEPENDS Raptor2 PCRE ADVANCED)

@@ -307,13 +307,16 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
 
     m_Controls->m_BallWidget1->setVisible(true);
     m_Controls->m_BallWidget2->setVisible(false);
-    m_Controls->m_BallWidget2->SetT1(4500);
+    m_Controls->m_BallWidget2->SetT1(4658);
+    m_Controls->m_BallWidget2->SetT2(2200);
     m_Controls->m_AstrosticksWidget1->setVisible(false);
     m_Controls->m_AstrosticksWidget2->setVisible(false);
-    m_Controls->m_AstrosticksWidget2->SetT1(4500);
+    m_Controls->m_AstrosticksWidget2->SetT1(4658);
+    m_Controls->m_AstrosticksWidget2->SetT2(2200);
     m_Controls->m_DotWidget1->setVisible(false);
     m_Controls->m_DotWidget2->setVisible(false);
-    m_Controls->m_DotWidget2->SetT1(4500);
+    m_Controls->m_DotWidget2->SetT1(4658);
+    m_Controls->m_DotWidget2->SetT2(2200);
 
     m_Controls->m_PrototypeWidget1->setVisible(false);
     m_Controls->m_PrototypeWidget2->setVisible(false);
@@ -422,8 +425,36 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
     connect((QObject*) m_Controls->m_MaskComboBox, SIGNAL(currentIndexChanged(int)), (QObject*) this, SLOT(OnMaskSelected(int)));
     connect((QObject*) m_Controls->m_TemplateComboBox, SIGNAL(currentIndexChanged(int)), (QObject*) this, SLOT(OnTemplateSelected(int)));
     connect((QObject*) m_Controls->m_FiberBundleComboBox, SIGNAL(currentIndexChanged(int)), (QObject*) this, SLOT(OnFibSelected(int)));
+    connect((QObject*) m_Controls->m_LineReadoutTimeBox, SIGNAL( valueChanged(double)), (QObject*) this, SLOT(OnTlineChanged()));
   }
+  OnTlineChanged();
   UpdateGui();
+}
+
+void QmitkFiberfoxView::OnTlineChanged()
+{
+  unsigned int num_pix_line = 0;
+  if (m_Controls->m_TemplateComboBox->GetSelectedNode().IsNotNull())   // use geometry of selected image
+  {
+    mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(m_Controls->m_TemplateComboBox->GetSelectedNode()->GetData());
+    num_pix_line = img->GetDimension(0);
+  }
+  else if (m_Controls->m_MaskComboBox->GetSelectedNode().IsNotNull())   // use geometry of mask image
+  {
+    mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(m_Controls->m_MaskComboBox->GetSelectedNode()->GetData());
+    num_pix_line = img->GetDimension(0);
+  }
+  else
+  {
+     num_pix_line = static_cast<unsigned int>(m_Controls->m_SizeX->value());
+  }
+
+  double value = m_Controls->m_LineReadoutTimeBox->value();
+//  double dweel_pp = value/num_pix_line;
+  double bw = 1000.0/value;
+  double bw_pp = bw/num_pix_line;
+  std::string tt = "Bandwidth:\n" + boost::lexical_cast<std::string>(static_cast<int>(bw)) + "Hz\n" + boost::lexical_cast<std::string>(static_cast<int>(bw_pp)) + "Hz/Px";
+  m_Controls->m_LineReadoutTimeBox->setToolTip(tt.c_str());
 }
 
 void QmitkFiberfoxView::OnMaskSelected(int )
@@ -771,20 +802,19 @@ void QmitkFiberfoxView::UpdateParametersFromGui()
   m_Parameters.m_SignalGen.m_AxonRadius = m_Controls->m_FiberRadius->value();
   m_Parameters.m_SignalGen.m_SignalScale = m_Controls->m_SignalScaleBox->value();
 
-  double voxelVolume = m_Parameters.m_SignalGen.m_ImageSpacing[0]
-      * m_Parameters.m_SignalGen.m_ImageSpacing[1]
-      * m_Parameters.m_SignalGen.m_ImageSpacing[2];
-
-  if ( m_Parameters.m_SignalGen.m_SignalScale*voxelVolume > itk::NumericTraits<short>::max()*0.75 )
-  {
-    m_Parameters.m_SignalGen.m_SignalScale = itk::NumericTraits<short>::max()*0.75/voxelVolume;
-    m_Controls->m_SignalScaleBox->setValue(m_Parameters.m_SignalGen.m_SignalScale);
-    QMessageBox::information( nullptr, "Warning",
-                              "Maximum signal exceeding data type limits. Automatically adjusted to "
-                              + QString::number(m_Parameters.m_SignalGen.m_SignalScale)
-                              + " to obtain a maximum  signal of 75% of the data type maximum."
-                                " Relaxation and other effects that affect the signal intensities are not accounted for.");
-  }
+//  double voxelVolume = m_Parameters.m_SignalGen.m_ImageSpacing[0]
+//      * m_Parameters.m_SignalGen.m_ImageSpacing[1]
+//      * m_Parameters.m_SignalGen.m_ImageSpacing[2];
+//  if ( m_Parameters.m_SignalGen.m_SignalScale*voxelVolume > itk::NumericTraits<short>::max()*0.75 )
+//  {
+//    m_Parameters.m_SignalGen.m_SignalScale = itk::NumericTraits<short>::max()*0.75/voxelVolume;
+//    m_Controls->m_SignalScaleBox->setValue(m_Parameters.m_SignalGen.m_SignalScale);
+//    QMessageBox::information( nullptr, "Warning",
+//                              "Maximum signal exceeding data type limits. Automatically adjusted to "
+//                              + QString::number(m_Parameters.m_SignalGen.m_SignalScale)
+//                              + " to obtain a maximum  signal of 75% of the data type maximum."
+//                                " Relaxation and other effects that affect the signal intensities are not accounted for.");
+//  }
 
   // Noise
   m_Parameters.m_Misc.m_DoAddNoise = m_Controls->m_AddNoise->isChecked();
@@ -2095,6 +2125,7 @@ void QmitkFiberfoxView::SetOutputPath()
 
 void QmitkFiberfoxView::UpdateGui()
 {
+  OnTlineChanged();
   m_Controls->m_GeometryFrame->setEnabled(true);
   m_Controls->m_GeometryMessage->setVisible(false);
   m_Controls->m_DiffusionPropsMessage->setVisible(false);

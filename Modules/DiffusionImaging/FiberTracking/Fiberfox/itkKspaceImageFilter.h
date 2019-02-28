@@ -128,8 +128,7 @@ namespace itk{
 
     float                                   m_CoilSensitivityFactor;
     typename InputImageType::Pointer        m_KSpaceImage;
-    typename InputImageType::Pointer        m_TimeFromEchoImage;
-    typename InputImageType::Pointer        m_ReadoutTimeImage;
+    typename InputImageType::Pointer        m_TickImage;
     AcquisitionType*                        m_ReadoutScheme;
 
     typename itk::Image< ScalarType, 2 >::Pointer m_MovedFmap;

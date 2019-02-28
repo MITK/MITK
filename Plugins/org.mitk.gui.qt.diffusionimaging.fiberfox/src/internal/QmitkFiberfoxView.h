@@ -134,6 +134,7 @@ protected slots:
     void OnFibSelected(int value);
     void OnTemplateSelected(int value);
     void OnBvalsBvecsCheck(int value);
+    void OnTlineChanged();
 
 protected:
 

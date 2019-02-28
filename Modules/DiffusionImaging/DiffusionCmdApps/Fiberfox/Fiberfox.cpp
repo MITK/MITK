@@ -122,16 +122,6 @@ int main(int argc, char* argv[])
     outName = parameters.m_Misc.m_OutputPath + parameters.m_Misc.m_OutputPrefix;
   }
 
-  // check if log file already exists and avoid overwriting existing files:
-  std::string NameTest = outName;
-  int c = 0;
-  while( itksys::SystemTools::FileExists( outName + ".log" )
-         && c <= std::numeric_limits<int>::max() )
-  {
-    outName = NameTest + "_" + boost::lexical_cast<std::string>(c);
-    ++c;
-  }
-
   mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Diffusion Weighted Images", "Fiberbundles"}, {});
   mitk::BaseData::Pointer inputData = mitk::IOUtil::Load(input, &functor)[0];
 

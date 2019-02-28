@@ -56,10 +56,21 @@ void DftImageFilter< TPixelType >
   float szx = outputImage->GetLargestPossibleRegion().GetSize(0);
   float szy = outputImage->GetLargestPossibleRegion().GetSize(1);
 
+  float x_shift = 0;
+  float y_shift = 0;
+  if (static_cast<int>(szx)%2==1)
+      x_shift = (szx-1)/2;
+  else
+      x_shift = szx/2;
+  if (static_cast<int>(szy)%2==1)
+      y_shift = (szy-1)/2;
+  else
+      y_shift = szy/2;
+
   while( !oit.IsAtEnd() )
   {
-    float kx = oit.GetIndex()[0] - (szx-1)/2;
-    float ky = oit.GetIndex()[1] - (szy-1)/2;
+    float kx = oit.GetIndex()[0] - x_shift;
+    float ky = oit.GetIndex()[1] - y_shift;
     kx /= szx;
     ky /= szy;
 
@@ -67,8 +78,9 @@ void DftImageFilter< TPixelType >
     InputIteratorType it(inputImage, inputImage->GetLargestPossibleRegion() );
     while( !it.IsAtEnd() )
     {
-      float x = it.GetIndex()[0] - (szx-1)/2;
-      float y = it.GetIndex()[1] - (szy-1)/2;
+      float x = it.GetIndex()[0] - x_shift;
+      float y = it.GetIndex()[1] - y_shift;
+
       s += it.Get() * exp( std::complex<TPixelType>(0, -itk::Math::twopi * (kx*x + ky*y) ) );
       ++it;
     }

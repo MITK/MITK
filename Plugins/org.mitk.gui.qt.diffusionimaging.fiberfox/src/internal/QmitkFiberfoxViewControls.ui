@@ -434,6 +434,9 @@
            <property name="toolTip">
             <string>Dwell time (time to read one line in k-space) in ms.</string>
            </property>
+           <property name="decimals">
+            <number>4</number>
+           </property>
            <property name="maximum">
             <double>100.000000000000000</double>
            </property>
@@ -441,7 +444,7 @@
             <double>0.100000000000000</double>
            </property>
            <property name="value">
-            <double>1.000000000000000</double>
+            <double>0.020000000000000</double>
            </property>
           </widget>
          </item>
@@ -587,13 +590,13 @@
          <item row="1" column="1">
           <widget class="QSpinBox" name="m_SignalScaleBox">
            <property name="toolTip">
-            <string>TE in milliseconds</string>
+            <string/>
            </property>
            <property name="minimum">
             <number>1</number>
            </property>
            <property name="maximum">
-            <number>10000</number>
+            <number>100000</number>
            </property>
            <property name="singleStep">
             <number>1</number>
@@ -1914,7 +1917,7 @@
             <double>0.100000000000000</double>
            </property>
            <property name="value">
-            <double>25.000000000000000</double>
+            <double>40.000000000000000</double>
            </property>
           </widget>
          </item>
@@ -2107,7 +2110,7 @@
             <string>Eddy current induced magnetic field gradient (in mT/m).</string>
            </property>
            <property name="decimals">
-            <number>4</number>
+            <number>5</number>
            </property>
            <property name="maximum">
             <double>1000.000000000000000</double>
@@ -2116,7 +2119,7 @@
             <double>0.001000000000000</double>
            </property>
            <property name="value">
-            <double>0.010000000000000</double>
+            <double>0.002000000000000</double>
            </property>
           </widget>
          </item>

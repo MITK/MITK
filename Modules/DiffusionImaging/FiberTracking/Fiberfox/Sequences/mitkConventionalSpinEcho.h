@@ -29,39 +29,40 @@ class ConventionalSpinEcho : public AcquisitionType
 {
 public:
 
+  float half_read_time;
   ConventionalSpinEcho(FiberfoxParameters* parameters) : AcquisitionType(parameters)
   {
     dt =  m_Parameters->m_SignalGen.m_tLine/kxMax;  // time to read one k-space voxel
 
-    // maximum echo at center of each line
-    m_NegTEhalf = -dt*(kxMax-kxMax%2)/2;
+    half_read_time = kxMax * dt/2;
   }
   ~ConventionalSpinEcho() override
   {}
 
   // one echo per k-space line
-  float GetTimeFromMaxEcho(const itk::Index< 2 >& index) override
+  float GetTimeFromMaxEcho(const int& tick) override
   {
-    float t = 0;
-    t = m_NegTEhalf + static_cast<float>(index[0])*dt;
+    float t = dt*(tick % kxMax + 0.5f) - half_read_time;
     return t;
   }
 
-  // time since current readout pulse started
-  float GetRedoutTime(const itk::Index< 2 >& index) override
+  float GetTimeFromLastDiffusionGradient(const int& tick) override
   {
-    return static_cast<float>(index[0])*dt;
+    return (tick % kxMax)*dt;
   }
 
   // time from max-echo + TE
-  float GetTimeFromRf(const itk::Index< 2 >& index) override
+  float GetTimeFromRf(const int& tick) override
   {
-    return m_Parameters->m_SignalGen.m_tEcho + GetTimeFromMaxEcho(index);
+    return m_Parameters->m_SignalGen.m_tEcho + GetTimeFromMaxEcho(tick);
   }
 
-  itk::Index< 2 > GetActualKspaceIndex(const itk::Index< 2 >& index) override
+  itk::Index< 2 > GetActualKspaceIndex(const int& tick) override
   {
-    itk::Index< 2 > out_idx = index;
+    itk::Index< 2 > out_idx;
+    out_idx[0] = tick % kxMax;
+    out_idx[1] = tick / kxMax;
+
     // reverse phase
     if (!m_Parameters->m_SignalGen.m_ReversePhase)
       out_idx[1] = kyMax-1-out_idx[1];

@@ -29,45 +29,49 @@ class FastSpinEcho : public AcquisitionType
 {
 public:
 
+  unsigned int linesWithSameTime;
+  float half_read_time;
   FastSpinEcho(FiberfoxParameters* parameters)
     : AcquisitionType(parameters)
   {
-    m_LinesWithSameTime = static_cast<unsigned int>(std::ceil(static_cast<float>(kyMax)/m_Parameters->m_SignalGen.m_EchoTrainLength));
+    linesWithSameTime = static_cast<unsigned int>(std::ceil(static_cast<float>(kyMax)/m_Parameters->m_SignalGen.m_EchoTrainLength));
 
     dt =  m_Parameters->m_SignalGen.m_tLine/kxMax;  // time to read one k-space voxel
 
-    // maximum echo at center of each line
-    m_NegTEhalf = -dt*(kxMax-kxMax%2)/2;
+    half_read_time = kxMax * dt/2;
   }
   ~FastSpinEcho() override
   {}
 
   // one echo per k-space line
-  float GetTimeFromMaxEcho(const itk::Index< 2 >& index) override
+  float GetTimeFromMaxEcho(const int& tick) override
   {
-    return m_NegTEhalf + static_cast<float>(index[0])*dt;
+    float t = dt*(tick % kxMax + 0.5f) - half_read_time;
+    return t;
   }
 
-  // time since current readout pulse started
-  float GetRedoutTime(const itk::Index< 2 >& index) override
+  float GetTimeFromLastDiffusionGradient(const int& tick) override
   {
-    return static_cast<float>(index[0])*dt;
+    return (tick % kxMax)*dt;
   }
 
   // depends on ETL
-  float GetTimeFromRf(const itk::Index< 2 >& index) override
+  float GetTimeFromRf(const int& tick) override
   {
-    return m_Parameters->m_SignalGen.m_tEcho*std::ceil(static_cast<float>(index[1]+1)/m_LinesWithSameTime) + GetTimeFromMaxEcho(index);
+    return m_Parameters->m_SignalGen.m_tEcho*std::ceil(static_cast<float>(tick/kxMax+1)/linesWithSameTime) + GetTimeFromMaxEcho(tick);
   }
 
-  itk::Index< 2 > GetActualKspaceIndex(const itk::Index< 2 >& index) override
+  itk::Index< 2 > GetActualKspaceIndex(const int& tick) override
   {
-    itk::Index< 2 > out_idx = index;
+    itk::Index< 2 > out_idx;
+    out_idx[0] = tick % kxMax;
+    out_idx[1] = tick / kxMax;
+
     // reverse phase
     if (!m_Parameters->m_SignalGen.m_ReversePhase)
       out_idx[1] = kyMax-1-out_idx[1];
 
-    return index;
+    return out_idx;
   }
 
   void AdjustEchoTime() override
@@ -81,8 +85,6 @@ public:
   }
 
 protected:
-
-  unsigned int m_LinesWithSameTime;
 
 };
 

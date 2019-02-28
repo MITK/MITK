@@ -262,7 +262,7 @@ SimulateKspaceAcquisition( std::vector< DoubleDwiType::Pointer >& compartment_im
         idft->SetFiberBundle(m_FiberBundle);
         idft->SetTranslation(m_Translations.at(g));
         idft->SetRotationMatrix(m_RotationsInv.at(g));
-        idft->SetDiffusionGradientDirection(m_Parameters.m_SignalGen.GetGradientDirection(g));
+        idft->SetDiffusionGradientDirection(m_Parameters.m_SignalGen.GetGradientDirection(g)*m_Parameters.m_SignalGen.GetBvalue()/1000.0);
         idft->SetSpikesPerSlice(numSpikes);
         idft->SetNumberOfThreads(in_threads);
         idft->Update();
@@ -1256,7 +1256,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     }
     case SignalGenerationParameters::FastSpinEcho:
     {
-      PrintToLog("Acquisition type: fast spin echo (one RF pulse per slice) with cartesian k-space trajectory (ETL: " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_EchoTrainLength) + ")", false);
+      PrintToLog("Acquisition type: fast spin echo (one RF pulse per ETL lines) with cartesian k-space trajectory (ETL: " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_EchoTrainLength) + ")", false);
       break;
     }
     default:

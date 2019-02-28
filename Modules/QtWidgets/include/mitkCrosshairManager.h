@@ -6,7 +6,7 @@
 #include <mitkNodePredicateProperty.h>
 #include <QmitkRenderWindow.h>
 
-enum class CrosshairMode { PLANE, POINT, NONE };
+enum class CrosshairMode { PLANE = 0, POINT, NONE };
 
 class MITKQTWIDGETS_EXPORT CrosshairModeController : public QObject {
   Q_OBJECT

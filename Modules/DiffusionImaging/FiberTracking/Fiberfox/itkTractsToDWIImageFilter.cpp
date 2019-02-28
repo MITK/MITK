@@ -262,7 +262,7 @@ SimulateKspaceAcquisition( std::vector< DoubleDwiType::Pointer >& compartment_im
         idft->SetFiberBundle(m_FiberBundle);
         idft->SetTranslation(m_Translations.at(g));
         idft->SetRotationMatrix(m_RotationsInv.at(g));
-        idft->SetDiffusionGradientDirection(m_Parameters.m_SignalGen.GetGradientDirection(g));
+        idft->SetDiffusionGradientDirection(m_Parameters.m_SignalGen.GetGradientDirection(g)*m_Parameters.m_SignalGen.GetBvalue()/1000.0);
         idft->SetSpikesPerSlice(numSpikes);
         idft->SetNumberOfThreads(in_threads);
         idft->Update();

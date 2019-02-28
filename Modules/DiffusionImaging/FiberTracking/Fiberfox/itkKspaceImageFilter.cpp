@@ -119,9 +119,11 @@ namespace itk {
     m_Gamma = 42576000*itk::Math::twopi;    // Gyromagnetic ratio in Hz/T (1.5T)
     if ( m_Parameters->m_SignalGen.m_EddyStrength>0 && m_DiffusionGradientDirection.GetNorm()>0.001)
     {
-      m_DiffusionGradientDirection.Normalize();
       m_DiffusionGradientDirection = m_DiffusionGradientDirection *  m_Parameters->m_SignalGen.m_EddyStrength/1000 *  m_Gamma;
       m_IsBaseline = false;
+    }
+    else {
+      m_IsBaseline = true;
     }
 
     this->SetNthOutput(0, outputImage);
@@ -325,13 +327,12 @@ namespace itk {
       float tRf = m_ReadoutScheme->GetTimeFromRf(tick);
 
       // calculate eddy current decay factor
-      // (TODO: vielleicht umbauen dass hier die zeit vom letzten diffusionsgradienten an genommen wird. doku dann auch entsprechend anpassen.)
       float eddyDecay = 0;
       if ( m_Parameters->m_Misc.m_DoAddEddyCurrents && m_Parameters->m_SignalGen.m_EddyStrength>0 && !m_IsBaseline)
       {
         // time passed since k-space readout started
         float tRead = m_ReadoutScheme->GetTimeFromLastDiffusionGradient(tick);
-        eddyDecay = std::exp(-tRead/m_Parameters->m_SignalGen.m_Tau );
+        eddyDecay = std::exp(-tRead/m_Parameters->m_SignalGen.m_Tau ) * tRead/1000; // time in seconds here
       }
 
       // calcualte signal relaxation factors
@@ -400,17 +401,20 @@ namespace itk {
         // simulate eddy currents and other distortions
         float omega = 0;   // frequency offset
         if (  m_Parameters->m_Misc.m_DoAddEddyCurrents && m_Parameters->m_SignalGen.m_EddyStrength>0 && !m_IsBaseline)
+        {
+          // duration (tRead) already included in "eddyDecay"
           omega += (m_DiffusionGradientDirection[0]*pos[0]+m_DiffusionGradientDirection[1]*pos[1]+m_DiffusionGradientDirection[2]*pos[2]) * eddyDecay;
+        }
 
         // simulate distortions
         if (m_Parameters->m_Misc.m_DoAddDistortions)
         {
           if (m_MovedFmap.IsNotNull())    // if we have headmotion, use moved map
-            omega += m_MovedFmap->GetPixel(input_idx);
+            omega += m_MovedFmap->GetPixel(input_idx) * tRf;
           else if (m_Parameters->m_SignalGen.m_FrequencyMap.IsNotNull())
           {
             itk::Image<float, 3>::IndexType index; index[0] = input_idx[0]; index[1] = input_idx[1]; index[2] = m_Zidx;
-            omega += m_Parameters->m_SignalGen.m_FrequencyMap->GetPixel(index);
+            omega += m_Parameters->m_SignalGen.m_FrequencyMap->GetPixel(index) * tRf;
           }
         }
 
@@ -425,7 +429,7 @@ namespace itk {
 
         // actual DFT term
         vcl_complex<ScalarType> f(f_real * m_Parameters->m_SignalGen.m_SignalScale, 0);
-        s += f * std::exp( std::complex<ScalarType>(0, itk::Math::twopi * (kx*x + ky*y + omega*tRf )) );
+        s += f * std::exp( std::complex<ScalarType>(0, itk::Math::twopi * (kx*x + ky*y + omega )) );
 
         ++it;
       }

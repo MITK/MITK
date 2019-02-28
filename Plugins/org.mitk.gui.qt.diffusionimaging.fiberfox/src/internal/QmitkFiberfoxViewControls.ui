@@ -2110,7 +2110,7 @@
             <string>Eddy current induced magnetic field gradient (in mT/m).</string>
            </property>
            <property name="decimals">
-            <number>4</number>
+            <number>5</number>
            </property>
            <property name="maximum">
             <double>1000.000000000000000</double>

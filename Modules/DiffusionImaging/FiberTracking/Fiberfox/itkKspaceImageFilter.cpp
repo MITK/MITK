@@ -109,12 +109,12 @@ namespace itk {
     m_KSpaceImage->Allocate();
     m_KSpaceImage->FillBuffer(0.0);
 
-    m_TickImage = InputImageType::New();
-    m_TickImage->SetLargestPossibleRegion( region );
-    m_TickImage->SetBufferedRegion( region );
-    m_TickImage->SetRequestedRegion( region );
-    m_TickImage->Allocate();
-    m_TickImage->FillBuffer(-1.0);
+//    m_TickImage = InputImageType::New();
+//    m_TickImage->SetLargestPossibleRegion( region );
+//    m_TickImage->SetBufferedRegion( region );
+//    m_TickImage->SetRequestedRegion( region );
+//    m_TickImage->Allocate();
+//    m_TickImage->FillBuffer(-1.0);
 
     m_Gamma = 42576000*itk::Math::twopi;    // Gyromagnetic ratio in Hz/T (1.5T)
     if ( m_Parameters->m_SignalGen.m_EddyStrength>0 && m_DiffusionGradientDirection.GetNorm()>0.001)
@@ -309,7 +309,7 @@ namespace itk {
         ++oit;
         continue;
       }
-      m_TickImage->SetPixel(kIdx, tick);
+//      m_TickImage->SetPixel(kIdx, tick);
 
       // gibbs ringing by setting high frequencies to zero (alternative to using smaller k-space than input image space)
       if (m_Parameters->m_SignalGen.m_DoAddGibbsRinging && m_Parameters->m_SignalGen.m_ZeroRinging>0)
@@ -488,10 +488,10 @@ namespace itk {
     }
     delete m_ReadoutScheme;
 
-    typename itk::ImageFileWriter< InputImageType >::Pointer wr = itk::ImageFileWriter< InputImageType >::New();
-    wr->SetInput(m_TickImage);
-    wr->SetFileName("/home/neher/TimeFromRfImage.nii.gz");
-    wr->Update();
+//    typename itk::ImageFileWriter< InputImageType >::Pointer wr = itk::ImageFileWriter< InputImageType >::New();
+//    wr->SetInput(m_TickImage);
+//    wr->SetFileName("/home/neher/TimeFromRfImage.nii.gz");
+//    wr->Update();
   }
 }
 #endif

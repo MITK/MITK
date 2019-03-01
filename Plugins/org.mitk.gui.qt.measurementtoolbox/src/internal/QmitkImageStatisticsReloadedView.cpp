@@ -142,6 +142,8 @@ void QmitkImageStatisticsReloadedView::OnImageSelectorChanged()
   {
     m_selectedImageNode = selectedImageNode;
     if (m_selectedImageNode.IsNotNull()) {
+      ResetGUIDefault();
+
       auto isPlanarFigurePredicate = mitk::GetImageStatisticsPlanarFigurePredicate();
       auto isMaskPredicate = mitk::GetImageStatisticsMaskPredicate();
       auto hasSameGeometry = mitk::NodePredicateGeometry::New(m_selectedImageNode->GetData()->GetGeometry());
@@ -167,8 +169,7 @@ void QmitkImageStatisticsReloadedView::OnImageSelectorChanged()
     {
       m_Controls.widget_statistics->SetImageNodes({});
       m_Controls.widget_statistics->SetMaskNodes({});
-      m_Controls.widget_statistics->Reset();
-      m_Controls.widget_histogram->Reset();
+      m_Controls.widget_statistics->Reset();      m_Controls.widget_histogram->Reset();
       ResetGUI();
     }
   }
@@ -243,11 +244,23 @@ void QmitkImageStatisticsReloadedView::CalculateOrGetStatistics()
       imageStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(this->GetDataStorage(),image);
     }
 
+    
+
     bool imageStatisticsOlderThanInputs = false;
     if (imageStatistics && (imageStatistics->GetMTime() < image->GetMTime() ||
       (mask && imageStatistics->GetMTime() < mask->GetMTime()) ||
       (maskPlanarFigure && imageStatistics->GetMTime() < maskPlanarFigure->GetMTime()))) {
       imageStatisticsOlderThanInputs = true;
+    }
+
+    if (imageStatistics)
+    {
+      // triggers recomputation when switched between images and the newest one has not 100 bins (default)
+      auto calculatedBins = imageStatistics->GetStatisticsForTimeStep(0).m_Histogram.GetPointer()->Size();
+      if (calculatedBins != 100) 
+      {
+        OnRequestHistogramUpdate(m_Controls.widget_histogram->GetBins());
+      }
     }
 
     //statistics need to be computed
@@ -286,10 +299,16 @@ void QmitkImageStatisticsReloadedView::ComputeAndDisplayIntensityProfile(mitk::I
 void QmitkImageStatisticsReloadedView::ResetGUI()
 {
   m_Controls.widget_statistics->Reset();
-  m_Controls.widget_statistics->setEnabled(false);
-  m_Controls.widget_histogram->Reset();
+  m_Controls.widget_statistics->setEnabled(false);  m_Controls.widget_histogram->Reset();
   m_Controls.widget_histogram->setEnabled(false);
   m_Controls.checkBox_ignoreZero->setEnabled(false);
+}
+
+void QmitkImageStatisticsReloadedView::ResetGUIDefault()
+{
+  MITK_INFO << "reset GUI";
+  m_Controls.widget_histogram->ResetDefault();
+  m_Controls.checkBox_ignoreZero->setChecked(false);
 }
 
 void QmitkImageStatisticsReloadedView::OnStatisticsCalculationEnds()

@@ -45,8 +45,20 @@ void QmitkHistogramVisualizationWidget::SetHistogram(itk::Statistics::Histogram<
 
 void QmitkHistogramVisualizationWidget::Reset()
 {
-  m_Controls.chartWidget->Clear();
+ m_Controls.chartWidget->Clear();
 	SetGUIElementsEnabled(false);
+}
+
+int QmitkHistogramVisualizationWidget::GetBins() {
+  return m_Controls.spinBoxNBins->value();
+}
+
+void QmitkHistogramVisualizationWidget::ResetDefault()
+{
+  m_Controls.checkBoxUseDefaultNBins->setChecked(true);
+  m_Controls.spinBoxNBins->setEnabled(false);
+  m_Controls.spinBoxNBins->setValue(100);
+  m_Controls.checkBoxShowSubchart->setChecked(false);
 }
 
 void QmitkHistogramVisualizationWidget::SetTheme(QmitkChartWidget::ColorTheme style)

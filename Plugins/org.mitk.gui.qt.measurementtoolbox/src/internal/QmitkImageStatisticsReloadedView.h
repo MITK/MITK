@@ -87,6 +87,7 @@ protected:
   void ComputeAndDisplayIntensityProfile(mitk::Image * image, mitk::PlanarFigure::Pointer maskPlanarFigure);
 
   void ResetGUI();
+  void ResetGUIDefault();
 
   void OnStatisticsCalculationEnds();
   void OnRequestHistogramUpdate(unsigned int nBins);

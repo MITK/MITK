@@ -36,11 +36,12 @@ Below it is the statistics window which displays the calculated statistical feat
 
 Beneath the statistics window is the histogram window, which shows the histogram of the current selection.
 
-At top of the histogram window are two radiobuttons. Toggle one of them to either show the histogram as a barchart or as a lineplot.
+Draw a rectangular window with pressed left button to zoom the histogram view in. With a double click in the view area you can zoom out to the default viewport.
+You can also just pan the view in horizontal or vertical direction by dragging with the left mousebutton in the respective direction.
 
-Use mousewheel to zoom in and out the histogram. With the left mouse button the histogram is pannable in zoomed state.
+If the mask is not a closed planar figure or a segmentation an intensity profile is created instead of the histogram.
 
-If the histogram is displayed as a barchart a tooltip is available by hovering over one of the bins. A tooltip is also available, if an intesity profile is created for a path element as mask.
+A tooltip is available by hovering over one of the bins.
 
 At the bottom of each view is one button. They copy their respective data in csv format to the clipboard.
 

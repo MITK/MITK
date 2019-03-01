@@ -169,7 +169,8 @@ void QmitkImageStatisticsReloadedView::OnImageSelectorChanged()
     {
       m_Controls.widget_statistics->SetImageNodes({});
       m_Controls.widget_statistics->SetMaskNodes({});
-      m_Controls.widget_statistics->Reset();      m_Controls.widget_histogram->Reset();
+      m_Controls.widget_statistics->Reset();      
+      m_Controls.widget_histogram->Reset();
       ResetGUI();
     }
   }

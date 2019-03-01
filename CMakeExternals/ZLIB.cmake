@@ -1,4 +1,5 @@
 set(proj ZLIB)
+set(proj_DEPENDENCIES "")
 
 if(MITK_USE_${proj})
   set(${proj}_DEPENDS ${proj})

@@ -1,7 +1,14 @@
 set(proj cpprestsdk)
+set(proj_DEPENDENCIES Boost)
+
+find_package(ZLIB QUIET)
+
+if(NOT ZLIB_FOUND)
+  list(APPEND proj_DEPENDENCIES ZLIB)
+endif()
 
 if(MITK_USE_${proj})
-  set(${proj}_DEPENDS ${proj} Boost ZLIB)
+  set(${proj}_DEPENDS ${proj})
 
   if(DEFINED ${proj}_DIR AND NOT EXISTS ${${proj}_DIR})
     message(FATAL_ERROR "${proj}_DIR variable is defined but corresponds to non-existing directory!")

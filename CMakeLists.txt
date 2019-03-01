@@ -330,7 +330,8 @@ if(MITK_USE_cpprestsdk)
     endif()
     set(openssl_message "${openssl_message}If it still cannot be found, you can hint CMake to find OpenSSL by "
                         "adding/setting the OPENSSL_ROOT_DIR variable to the root directory of an "
-                        "OpenSSL installation.")
+                        "OpenSSL installation. Make sure to clear variables of partly found "
+                        "versions of OpenSSL before, or they will be mixed up.")
     message(FATAL_ERROR ${openssl_message})
   endif()
 

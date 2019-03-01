@@ -97,6 +97,12 @@ namespace mitk
 
     if (input)
     {
+      if ((input->GetDimension() != 3))
+      {
+        MITK_INFO << "DICOM segmentation writer is tested only with 3D images, sorry.";
+        return Unsupported;
+      }
+
       // Check if input file has dicom information for the referenced image (original DICOM image, e.g. CT) Still necessary, see write() 
       mitk::StringLookupTableProperty::Pointer dicomFilesProp =
       dynamic_cast<mitk::StringLookupTableProperty *>(input->GetProperty("referenceFiles").GetPointer());

@@ -101,6 +101,9 @@ mitk::LabelSetImage::LabelSetImage(const mitk::LabelSetImage &other)
     mitk::Image::Pointer liClone = other.GetLayerImage(i)->Clone();
     m_LayerContainer.push_back(liClone);
   }
+
+  // Add some DICOM Tags as properties to segmentation image
+  DICOMSegmentationPropertyHandler::DeriveDICOMSegmentationProperties(this);
 }
 
 void mitk::LabelSetImage::OnLabelSetModified()

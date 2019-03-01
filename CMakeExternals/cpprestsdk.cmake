@@ -19,6 +19,7 @@ if(MITK_USE_${proj})
       ${ep_common_cache_args}
       -DBUILD_SAMPLES:BOOL=OFF
       -DBUILD_TESTS:BOOL=OFF
+      -DWERROR:BOOL=OFF
     )
 
     if(OPENSSL_ROOT_DIR)

@@ -1,4 +1,4 @@
-set(proj zlib)
+set(proj ZLIB)
 
 if(MITK_USE_${proj})
   set(${proj}_DEPENDS ${proj})

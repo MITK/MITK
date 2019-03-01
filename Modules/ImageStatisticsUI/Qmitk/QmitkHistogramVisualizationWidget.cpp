@@ -25,7 +25,7 @@ QmitkHistogramVisualizationWidget::QmitkHistogramVisualizationWidget(QWidget* pa
   m_Controls.spinBoxNBins->setValue(m_DefaultNBins);
   m_Controls.spinBoxNBins->setMinimum(m_MinNBins);
   m_Controls.spinBoxNBins->setMaximum(m_MaxNBins);
-
+  SetGUIElementsEnabled(false);
   CreateConnections();
 }
 

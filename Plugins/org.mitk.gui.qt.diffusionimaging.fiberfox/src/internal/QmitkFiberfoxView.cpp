@@ -65,9 +65,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateOr.h>
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 QmitkFiberfoxWorker::QmitkFiberfoxWorker(QmitkFiberfoxView* view)
   : m_View(view)
 {
@@ -426,6 +423,7 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
     connect((QObject*) m_Controls->m_TemplateComboBox, SIGNAL(currentIndexChanged(int)), (QObject*) this, SLOT(OnTemplateSelected(int)));
     connect((QObject*) m_Controls->m_FiberBundleComboBox, SIGNAL(currentIndexChanged(int)), (QObject*) this, SLOT(OnFibSelected(int)));
     connect((QObject*) m_Controls->m_LineReadoutTimeBox, SIGNAL( valueChanged(double)), (QObject*) this, SLOT(OnTlineChanged()));
+    connect((QObject*) m_Controls->m_SizeX, SIGNAL( valueChanged(int)), (QObject*) this, SLOT(OnTlineChanged()));
   }
   OnTlineChanged();
   UpdateGui();
@@ -433,7 +431,7 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
 
 void QmitkFiberfoxView::OnTlineChanged()
 {
-  unsigned int num_pix_line = 0;
+  double num_pix_line = 0;
   if (m_Controls->m_TemplateComboBox->GetSelectedNode().IsNotNull())   // use geometry of selected image
   {
     mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(m_Controls->m_TemplateComboBox->GetSelectedNode()->GetData());
@@ -446,14 +444,14 @@ void QmitkFiberfoxView::OnTlineChanged()
   }
   else
   {
-     num_pix_line = static_cast<unsigned int>(m_Controls->m_SizeX->value());
+     num_pix_line = m_Controls->m_SizeX->value();
   }
 
-  double value = m_Controls->m_LineReadoutTimeBox->value();
-//  double dweel_pp = value/num_pix_line;
-  double bw = 1000.0/value;
+  double value = static_cast<double>(m_Controls->m_LineReadoutTimeBox->value())/1000.0;  // line readout time in seconds
+  double dweel_pp = value/num_pix_line; // pixel readout time in seconds
+  double bw = 1/dweel_pp;
   double bw_pp = bw/num_pix_line;
-  std::string tt = "Bandwidth:\n" + boost::lexical_cast<std::string>(static_cast<int>(bw)) + "Hz\n" + boost::lexical_cast<std::string>(static_cast<int>(bw_pp)) + "Hz/Px";
+  std::string tt = "Bandwidth:\n" + boost::lexical_cast<std::string>(itk::Math::Round<int, double>(bw)) + "Hz\n" + boost::lexical_cast<std::string>(itk::Math::Round<int, double>(bw_pp)) + "Hz/Px";
   m_Controls->m_LineReadoutTimeBox->setToolTip(tt.c_str());
 }
 

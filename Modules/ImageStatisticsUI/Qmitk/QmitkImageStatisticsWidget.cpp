@@ -28,6 +28,7 @@ QmitkImageStatisticsWidget::QmitkImageStatisticsWidget(QWidget* parent) : QWidge
   m_imageStatisticsModel = new QmitkImageStatisticsTableModel(parent);
   CreateConnections();
   m_ProxyModel = new QSortFilterProxyModel(this);
+  m_Controls.tableViewStatistics->setEnabled(false);
   m_Controls.tableViewStatistics->setModel(m_ProxyModel);
   m_ProxyModel->setSourceModel(m_imageStatisticsModel);
   connect(m_imageStatisticsModel, &QmitkImageStatisticsTableModel::dataAvailable, this, &QmitkImageStatisticsWidget::OnDataAvailable);
@@ -53,6 +54,7 @@ void QmitkImageStatisticsWidget::SetMaskNodes(const std::vector<mitk::DataNode::
 void QmitkImageStatisticsWidget::Reset()
 {
   m_imageStatisticsModel->Clear();
+  m_Controls.tableViewStatistics->setEnabled(false);
   m_Controls.buttonCopyImageStatisticsToClipboard->setEnabled(false);
 }
 
@@ -64,6 +66,7 @@ void QmitkImageStatisticsWidget::CreateConnections()
 void QmitkImageStatisticsWidget::OnDataAvailable()
 {
   m_Controls.buttonCopyImageStatisticsToClipboard->setEnabled(true);
+  m_Controls.tableViewStatistics->setEnabled(true);
 }
 
 void QmitkImageStatisticsWidget::OnClipboardButtonClicked()

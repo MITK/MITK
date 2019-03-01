@@ -62,6 +62,7 @@ void QmitkImageStatisticsReloadedView::CreateQtPartControl(QWidget *parent)
   m_Controls.sliderWidget_histogram->setPrefix("Time: ");
   m_Controls.sliderWidget_histogram->setDecimals(0);
   m_Controls.sliderWidget_histogram->setVisible(false);
+  ResetGUI();
 
   PrepareDataStorageComboBoxes();
   m_Controls.widget_statistics->SetDataStorage(this->GetDataStorage());
@@ -152,6 +153,7 @@ void QmitkImageStatisticsReloadedView::OnImageSelectorChanged()
       m_Controls.maskImageSelector->SetPredicate(isMaskOrPlanarFigureWithGeometryPredicate);
       //reset mask to <none>
       m_Controls.maskImageSelector->SetZeroEntryText("<none>");
+      m_Controls.checkBox_ignoreZero->setEnabled(true);
       m_selectedMaskNode = nullptr;
       m_Controls.widget_statistics->SetMaskNodes({});
       CalculateOrGetStatistics();
@@ -164,7 +166,10 @@ void QmitkImageStatisticsReloadedView::OnImageSelectorChanged()
     else
     {
       m_Controls.widget_statistics->SetImageNodes({});
+      m_Controls.widget_statistics->SetMaskNodes({});
       m_Controls.widget_statistics->Reset();
+      m_Controls.widget_histogram->Reset();
+      ResetGUI();
     }
   }
 }
@@ -281,9 +286,10 @@ void QmitkImageStatisticsReloadedView::ComputeAndDisplayIntensityProfile(mitk::I
 void QmitkImageStatisticsReloadedView::ResetGUI()
 {
   m_Controls.widget_statistics->Reset();
-  //m_Controls.widget_statistics->setEnabled(false);
+  m_Controls.widget_statistics->setEnabled(false);
   m_Controls.widget_histogram->Reset();
   m_Controls.widget_histogram->setEnabled(false);
+  m_Controls.checkBox_ignoreZero->setEnabled(false);
 }
 
 void QmitkImageStatisticsReloadedView::OnStatisticsCalculationEnds()

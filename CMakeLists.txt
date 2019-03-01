@@ -322,7 +322,7 @@ if(MITK_USE_cpprestsdk)
         set(openssl_message "${openssl_message}Please install it using your favorite package management "
                             "system (i.e. Homebrew or MacPorts).\n")
       else()
-        set(openssl_message "${openssl_message}Please install the dev package of OpenSSL (i.e. openssl-dev).\n")
+        set(openssl_message "${openssl_message}Please install the dev package of OpenSSL (i.e. libssl-dev).\n")
       endif()
     else()
       set(openssl_message "${openssl_message}Please install Win32 OpenSSL:\n"

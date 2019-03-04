@@ -31,12 +31,14 @@ if(MITK_USE_MatchPoint)
          )
     endif()
 
+    string(REPLACE "-DBOOST_ALL_DYN_LINK" "" modified_ep_common_args "${ep_common_args}")
+
     ExternalProject_Add(${proj}
        ${download_step}
        # INSTALL_COMMAND "${CMAKE_COMMAND} -P cmake_install.cmake"
        CMAKE_GENERATOR ${gen}
        CMAKE_ARGS
-         ${ep_common_args}
+         ${modified_ep_common_args}
          ${additional_cmake_args}
          -DBUILD_TESTING:BOOL=OFF
          -DITK_DIR:PATH=${ITK_DIR} #/src/ITK-build

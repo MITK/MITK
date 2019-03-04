@@ -53,11 +53,14 @@ const mitk::PointSet* mitk::PointSetVtkMapper3D::GetInput()
 
 mitk::PointSetVtkMapper3D::PointSetVtkMapper3D()
 : m_vtkSelectedPointList(NULL),
+  m_vtkSelectedAreaPointList(nullptr),
  m_vtkUnselectedPointList(NULL),
  m_VtkSelectedPolyDataMapper(NULL),
+  m_VtkSelectedAreaPolyDataMapper(nullptr),
  m_VtkUnselectedPolyDataMapper(NULL),
  m_vtkTextList(NULL),
  m_NumberOfSelectedAdded(0),
+  m_NumberOfSelectedAreaAdded(0),
  m_NumberOfUnselectedAdded(0),
  m_PointSize(1.0),
  m_ContourRadius(0.5),
@@ -68,6 +71,7 @@ mitk::PointSetVtkMapper3D::PointSetVtkMapper3D()
 
   //creating actors to be able to set transform
   m_SelectedActor = vtkSmartPointer<vtkActor>::New();
+  m_SelectedAreaActor = vtkSmartPointer<vtkActor>::New();
   m_UnselectedActor = vtkSmartPointer<vtkActor>::New();
   m_ContourActor = vtkSmartPointer<vtkActor>::New();
 }
@@ -81,6 +85,7 @@ void mitk::PointSetVtkMapper3D::ReleaseGraphicsResources(vtkWindow *renWin)
   m_PointsAssembly->ReleaseGraphicsResources(renWin);
 
   m_SelectedActor->ReleaseGraphicsResources(renWin);
+  m_SelectedAreaActor->ReleaseGraphicsResources(renWin);
   m_UnselectedActor->ReleaseGraphicsResources(renWin);
   m_ContourActor->ReleaseGraphicsResources(renWin);
 }
@@ -90,6 +95,7 @@ void mitk::PointSetVtkMapper3D::ReleaseGraphicsResources(mitk::BaseRenderer* ren
   m_PointsAssembly->ReleaseGraphicsResources(renderer->GetRenderWindow());
 
   m_SelectedActor->ReleaseGraphicsResources(renderer->GetRenderWindow());
+  m_SelectedAreaActor->ReleaseGraphicsResources(renderer->GetRenderWindow());
   m_UnselectedActor->ReleaseGraphicsResources(renderer->GetRenderWindow());
   m_ContourActor->ReleaseGraphicsResources(renderer->GetRenderWindow());
 
@@ -138,12 +144,16 @@ void mitk::PointSetVtkMapper3D::CreateEdgeObjectsBetweenPoints(itk::Point<float>
 void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
 {
   m_vtkSelectedPointList = vtkSmartPointer<vtkAppendPolyData>::New();
+  m_vtkSelectedAreaPointList = vtkSmartPointer<vtkAppendPolyData>::New();
   m_vtkUnselectedPointList = vtkSmartPointer<vtkAppendPolyData>::New();
 
   m_PointsAssembly->VisibilityOn();
 
   if(m_PointsAssembly->GetParts()->IsItemPresent(m_SelectedActor))
     m_PointsAssembly->RemovePart(m_SelectedActor);
+  if (m_PointsAssembly->GetParts()->IsItemPresent(m_SelectedAreaActor)) {
+    m_PointsAssembly->RemovePart(m_SelectedAreaActor);
+  }
   if(m_PointsAssembly->GetParts()->IsItemPresent(m_UnselectedActor))
     m_PointsAssembly->RemovePart(m_UnselectedActor);
   if(m_PointsAssembly->GetParts()->IsItemPresent(m_ContourActor))
@@ -233,6 +243,7 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
   itk::Point<float> lastPoint;
 
   m_NumberOfSelectedAdded = 0;
+  m_NumberOfSelectedAreaAdded = 0;
   m_NumberOfUnselectedAdded = 0;
   vtkSmartPointer<vtkPoints> localPoints = vtkSmartPointer<vtkPoints>::New();
   m_WorldPositions = vtkSmartPointer<vtkPoints>::New();
@@ -364,6 +375,18 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
     {
       m_vtkSelectedPointList->AddInputConnection(source->GetOutputPort());
       ++m_NumberOfSelectedAdded;
+
+      bool highlightSphere = false;
+      GetDataNode()->GetVisibility(highlightSphere, nullptr, "highlightSphere");
+      if (highlightSphere) {
+        vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
+        sphere->SetRadius(m_PointSize);
+        sphere->SetCenter(currentPoint);
+        sphere->SetThetaResolution(20);
+        sphere->SetPhiResolution(20);
+        m_vtkSelectedAreaPointList->AddInputConnection(sphere->GetOutputPort());
+        ++m_NumberOfSelectedAreaAdded;
+      }
     }
     else
     {
@@ -424,6 +447,15 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
     m_PointsAssembly->AddPart(m_SelectedActor);
   }
 
+  if (m_NumberOfSelectedAreaAdded > 0) {
+    m_VtkSelectedAreaPolyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+    m_VtkSelectedAreaPolyDataMapper->SetInputConnection(m_vtkSelectedAreaPointList->GetOutputPort());
+
+    m_SelectedAreaActor = vtkSmartPointer<vtkActor>::New();
+    m_SelectedAreaActor->SetMapper(m_VtkSelectedAreaPolyDataMapper);
+    m_PointsAssembly->AddPart(m_SelectedAreaActor);
+  }
+
   if (m_NumberOfUnselectedAdded > 0)
   {
     m_VtkUnselectedPolyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
@@ -454,6 +486,7 @@ void mitk::PointSetVtkMapper3D::VertexRendering()
   // turn off standard actors
   m_UnselectedActor->VisibilityOff();
   m_SelectedActor->VisibilityOff();
+  m_SelectedAreaActor->VisibilityOff();
 
   // point size
   m_PointSize = 2.0;
@@ -500,6 +533,7 @@ void mitk::PointSetVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *ren
   {
     m_UnselectedActor->VisibilityOff();
     m_SelectedActor->VisibilityOff();
+    m_SelectedAreaActor->VisibilityOff();
     m_ContourActor->VisibilityOff();
     return;
   }
@@ -507,6 +541,7 @@ void mitk::PointSetVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *ren
   // create new vtk render objects (e.g. sphere for a point)
 
   SetVtkMapperImmediateModeRendering(m_VtkSelectedPolyDataMapper);
+  SetVtkMapperImmediateModeRendering(m_VtkSelectedAreaPolyDataMapper);
   SetVtkMapperImmediateModeRendering(m_VtkUnselectedPolyDataMapper);
 
   BaseLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
@@ -556,15 +591,7 @@ void mitk::PointSetVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *ren
 
   m_UnselectedActor->SetVisibility( showPoints && !m_VertexRendering);
   m_SelectedActor->SetVisibility( showPoints && !m_VertexRendering);
-
-  if(false && dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("opacity")) != NULL)
-  {
-    mitk::FloatProperty::Pointer pointOpacity =dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("opacity"));
-    float opacity = pointOpacity->GetValue();
-    m_ContourActor->GetProperty()->SetOpacity(opacity);
-    m_UnselectedActor->GetProperty()->SetOpacity(opacity);
-    m_SelectedActor->GetProperty()->SetOpacity(opacity);
-  }
+  m_SelectedAreaActor->SetVisibility(showPoints && !m_VertexRendering);
 
   bool showContour = false;
   this->GetDataNode()->GetBoolProperty("show contour", showContour);
@@ -698,6 +725,9 @@ void mitk::PointSetVtkMapper3D::ApplyAllProperties(mitk::BaseRenderer* renderer,
   m_SelectedActor->GetProperty()->SetColor(selectedColor);
   m_SelectedActor->GetProperty()->SetOpacity(opacity);
 
+  m_SelectedAreaActor->GetProperty()->SetColor(selectedColor);
+  m_SelectedAreaActor->GetProperty()->SetOpacity(opacity * 0.25);
+
   m_UnselectedActor->GetProperty()->SetColor(unselectedColor);
   m_UnselectedActor->GetProperty()->SetOpacity(opacity);
 }
@@ -747,6 +777,7 @@ void mitk::PointSetVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk:
   node->AddProperty( "show points", mitk::BoolProperty::New(true), renderer, overwrite );
   node->AddProperty( "updateDataOnRender", mitk::BoolProperty::New(true), renderer, overwrite );
   node->AddProperty( "Vertex Rendering",mitk::BoolProperty::New(false),renderer,overwrite );
+  node->AddProperty("highlightSphere", mitk::BoolProperty::New(false), renderer, overwrite);
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 

@@ -139,6 +139,7 @@ namespace mitk {
     vtkSmartPointer<vtkCellArray> m_PointConnections;
 
     vtkSmartPointer<vtkAppendPolyData> m_vtkSelectedPointList;
+    vtkSmartPointer<vtkAppendPolyData> m_vtkSelectedAreaPointList;
     vtkSmartPointer<vtkAppendPolyData> m_vtkUnselectedPointList;
 
     vtkSmartPointer<vtkPoints> m_VtkPoints;
@@ -147,9 +148,11 @@ namespace mitk {
     vtkSmartPointer<vtkTransformPolyDataFilter> m_VtkPointsTransformer;
 
     vtkSmartPointer<vtkPolyDataMapper> m_VtkSelectedPolyDataMapper;
+    vtkSmartPointer<vtkPolyDataMapper> m_VtkSelectedAreaPolyDataMapper;
     vtkSmartPointer<vtkPolyDataMapper> m_VtkUnselectedPolyDataMapper;
 
     vtkSmartPointer<vtkActor> m_SelectedActor;
+    vtkSmartPointer<vtkActor> m_SelectedAreaActor;
     vtkSmartPointer<vtkActor> m_UnselectedActor;
     vtkSmartPointer<vtkActor> m_ContourActor;
 
@@ -160,7 +163,9 @@ namespace mitk {
 
     //variables to be able to log, how many inputs have been added to PolyDatas
     unsigned int m_NumberOfSelectedAdded;
+    unsigned int m_NumberOfSelectedAreaAdded;
     unsigned int m_NumberOfUnselectedAdded;
+    
 
     //variables to check if an update of the vtk objects is needed
     ScalarType m_PointSize;

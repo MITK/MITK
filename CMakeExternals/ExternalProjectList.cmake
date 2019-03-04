@@ -31,7 +31,7 @@ mitkFunctionAddExternalProject(NAME ITK       ON           NO_CACHE DEPENDS HDF5
 mitkFunctionAddExternalProject(NAME VTK       ON           NO_CACHE)
 mitkFunctionAddExternalProject(NAME Boost     ON           NO_CACHE)
 mitkFunctionAddExternalProject(NAME ZLIB      OFF          ADVANCED)
-mitkFunctionAddExternalProject(NAME cpprestsdk OFF         ADVANCED)
+mitkFunctionAddExternalProject(NAME cpprestsdk OFF         DEPENDS Boost ZLIB ADVANCED)
 mitkFunctionAddExternalProject(NAME ACVD      OFF          DOC "Use Approximated Centroidal Voronoi Diagrams")
 mitkFunctionAddExternalProject(NAME CTK       ON           DEPENDS Qt5 DCMTK DOC "Use CTK in MITK")
 mitkFunctionAddExternalProject(NAME Rasqal    OFF          DEPENDS Raptor2 PCRE ADVANCED)

@@ -1,11 +1,5 @@
 set(proj cpprestsdk)
-set(proj_DEPENDENCIES Boost)
-
-find_package(ZLIB QUIET)
-
-if(NOT ZLIB_FOUND)
-  list(APPEND proj_DEPENDENCIES ZLIB)
-endif()
+set(proj_DEPENDENCIES Boost ZLIB)
 
 if(MITK_USE_${proj})
   set(${proj}_DEPENDS ${proj})
@@ -35,6 +29,7 @@ if(MITK_USE_${proj})
       CMAKE_ARGS ${ep_common_args}
       CMAKE_CACHE_ARGS ${cmake_cache_args}
       CMAKE_CACHE_DEFAULT_ARGS ${ep_common_cache_default_args}
+      DEPENDS ${proj_DEPENDENCIES}
     )
 
     ExternalProject_Add_Step(${proj} git-submodule

@@ -13,13 +13,6 @@ foreach(policy ${project_policies})
 endforeach()
 
 #-----------------------------------------------------------------------------
-# MITK Extension Feature
-#-----------------------------------------------------------------------------
-
-set(MITK_EXTENSION_DIRS "" CACHE STRING "")
-set(MITK_DIR_PLUS_EXTENSION_DIRS ${MITK_SOURCE_DIR} ${MITK_EXTENSION_DIRS})
-
-#-----------------------------------------------------------------------------
 # Superbuild Option - Enabled by default
 #-----------------------------------------------------------------------------
 
@@ -33,6 +26,13 @@ else()
   project(MITK VERSION 2018.04.99)
   include_directories(SYSTEM ${MITK_SUPERBUILD_BINARY_DIR})
 endif()
+
+#-----------------------------------------------------------------------------
+# MITK Extension Feature
+#-----------------------------------------------------------------------------
+
+set(MITK_EXTENSION_DIRS "" CACHE STRING "")
+set(MITK_DIR_PLUS_EXTENSION_DIRS ${MITK_SOURCE_DIR} ${MITK_EXTENSION_DIRS})
 
 #-----------------------------------------------------------------------------
 # Update CMake module path

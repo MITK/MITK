@@ -17,3 +17,4 @@ MITK_CREATE_MODULE(
 
 add_subdirectory(test)
 add_subdirectory(MitkPABeamformingTool)
+add_subdirectory(MitkPAResampleCropTool)

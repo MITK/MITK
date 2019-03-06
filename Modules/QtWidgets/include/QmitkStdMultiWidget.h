@@ -378,6 +378,9 @@ public:
    */
   std::string GetCornerAnnotationText(unsigned int widgetNumber);
 
+  // get main split
+  QSplitter* GetMainSplit();
+
   /**
    * @brief GetGradientColors Getter for gradientbackground colors.
    * @param widgetNumber the widget number (0-3).

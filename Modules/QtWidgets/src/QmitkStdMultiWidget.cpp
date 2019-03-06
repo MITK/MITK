@@ -460,6 +460,11 @@ std::string QmitkStdMultiWidget::GetCornerAnnotationText(unsigned int widgetNumb
   return std::string(m_CornerAnnotations[widgetNumber]->GetText(0));
 }
 
+QSplitter* QmitkStdMultiWidget::GetMainSplit()
+{
+  return m_MainSplit;
+}
+
 QmitkStdMultiWidget::~QmitkStdMultiWidget()
 {
   DisablePositionTracking();

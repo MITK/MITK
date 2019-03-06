@@ -158,7 +158,7 @@ function generatePlotData(){
       x: xValues[index].slice(1),
       y: yValues[index].slice(1),
       type: chartType,
-      name: dataLabels[index]
+      name: dataLabels[index],
     };
 
 	  if(typeof xErrorValuesPlus[index] !== 'undefined'){
@@ -182,9 +182,9 @@ function generatePlotData(){
     // ===================== CHART TYPE OPTIONS HANDLING ===========
     // initialize line object
     trace["line"] = {}
-
-    if (chartType == "scatter"){
-      trace["line"]["color"] = dataProperties[dataLabels[index]]["color"]
+	
+	trace["line"]["color"] = dataProperties[dataLabels[index]]["color"]
+    if (chartType == "scatter"){  
     } else if (chartType == "area"){
       trace["fill"] = 'tozeroy'
     } else if (chartType == "spline"){
@@ -373,6 +373,6 @@ function transformView(transformTo) {
   dataProperties[dataLabels[0]]["chartType"] = transformTo; // preserve chartType for later updates
   let plotlyType = getPlotlyChartType(transformTo);
   let chart = document.getElementById("chart");
-  let update = {type : plotlyType}
+  let update = {type : plotlyType};
   Plotly.restyle(chart, update, 0); // updates the given plotly trace at index 0 with an update object built of a standard trace object
 };

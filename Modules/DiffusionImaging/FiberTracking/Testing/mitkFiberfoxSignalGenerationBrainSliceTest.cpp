@@ -58,54 +58,11 @@ public:
   /** Members used inside the different (sub-)tests. All members are initialized via setUp().*/
   FiberBundle::Pointer m_FiberBundle;
   mitk::Image::Pointer m_Template;
-  std::vector< FiberfoxParameters > m_Parameters;
-  std::vector< mitk::Image::Pointer > m_RefImages;
 
   void setUp() override
   {
-    m_RefImages.clear();
     m_FiberBundle = mitk::IOUtil::Load<FiberBundle>(GetTestDataFilePath("DiffusionImaging/Fiberfox/SignalGen_BrainSlice.fib"));
     m_Template = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/Fiberfox/SignalGen_BrainSliceTemplate.nii.gz"));
-
-    {
-      FiberfoxParameters parameters;
-      parameters.LoadParameters(GetTestDataFilePath("DiffusionImaging/Fiberfox/params/BrainSlice_1.ffp"), true);
-      adjust_to_template(parameters);
-      m_Parameters.push_back(parameters);
-      m_RefImages.push_back(mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/Fiberfox/params/BrainSlice_1_OUT.nii.gz")));
-    }
-
-    {
-      FiberfoxParameters parameters;
-      parameters.LoadParameters(GetTestDataFilePath("DiffusionImaging/Fiberfox/params/BrainSlice_2.ffp"), true);
-      adjust_to_template(parameters);
-      m_Parameters.push_back(parameters);
-      m_RefImages.push_back(mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/Fiberfox/params/BrainSlice_2_OUT.nii.gz")));
-    }
-
-    {
-      FiberfoxParameters parameters;
-      parameters.LoadParameters(GetTestDataFilePath("DiffusionImaging/Fiberfox/params/BrainSlice_3.ffp"), true);
-      adjust_to_template(parameters);
-      m_Parameters.push_back(parameters);
-      m_RefImages.push_back(mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/Fiberfox/params/BrainSlice_3_OUT.nii.gz")));
-    }
-
-    {
-      FiberfoxParameters parameters;
-      parameters.LoadParameters(GetTestDataFilePath("DiffusionImaging/Fiberfox/params/BrainSlice_4.ffp"), true);
-      adjust_to_template(parameters);
-      m_Parameters.push_back(parameters);
-      m_RefImages.push_back(mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/Fiberfox/params/BrainSlice_4_OUT.nii.gz")));
-    }
-
-    {
-      FiberfoxParameters parameters;
-      parameters.LoadParameters(GetTestDataFilePath("DiffusionImaging/Fiberfox/params/BrainSlice_5.ffp"), true);
-      adjust_to_template(parameters);
-      m_Parameters.push_back(parameters);
-      m_RefImages.push_back(mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/Fiberfox/params/BrainSlice_5_OUT.nii.gz")));
-    }
   }
 
   void adjust_to_template(mitk::FiberfoxParameters& parameters)
@@ -201,27 +158,47 @@ public:
 
   void Test1()
   {
-    StartSimulation(m_Parameters.at(0), m_RefImages.at(0), "BrainSlice_1_OUT.nii.gz");
+    FiberfoxParameters parameters;
+    parameters.LoadParameters(GetTestDataFilePath("DiffusionImaging/Fiberfox/params/BrainSlice_1.ffp"), true);
+    adjust_to_template(parameters);
+    mitk::Image::Pointer refImage = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/Fiberfox/params/BrainSlice_1_OUT.nii.gz"));
+    StartSimulation(parameters, refImage, "BrainSlice_1_OUT.nii.gz");
   }
 
   void Test2()
   {
-    StartSimulation(m_Parameters.at(1), m_RefImages.at(1), "BrainSlice_2_OUT.nii.gz");
+    FiberfoxParameters parameters;
+    parameters.LoadParameters(GetTestDataFilePath("DiffusionImaging/Fiberfox/params/BrainSlice_2.ffp"), true);
+    adjust_to_template(parameters);
+    mitk::Image::Pointer refImage = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/Fiberfox/params/BrainSlice_2_OUT.nii.gz"));
+    StartSimulation(parameters, refImage, "BrainSlice_2_OUT.nii.gz");
   }
 
   void Test3()
   {
-    StartSimulation(m_Parameters.at(2), m_RefImages.at(2), "BrainSlice_3_OUT.nii.gz");
+    FiberfoxParameters parameters;
+    parameters.LoadParameters(GetTestDataFilePath("DiffusionImaging/Fiberfox/params/BrainSlice_3.ffp"), true);
+    adjust_to_template(parameters);
+    mitk::Image::Pointer refImage = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/Fiberfox/params/BrainSlice_3_OUT.nii.gz"));
+    StartSimulation(parameters, refImage, "BrainSlice_3_OUT.nii.gz");
   }
 
   void Test4()
   {
-    StartSimulation(m_Parameters.at(3), m_RefImages.at(3), "BrainSlice_4_OUT.nii.gz");
+    FiberfoxParameters parameters;
+    parameters.LoadParameters(GetTestDataFilePath("DiffusionImaging/Fiberfox/params/BrainSlice_4.ffp"), true);
+    adjust_to_template(parameters);
+    mitk::Image::Pointer refImage = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/Fiberfox/params/BrainSlice_4_OUT.nii.gz"));
+    StartSimulation(parameters, refImage, "BrainSlice_4_OUT.nii.gz");
   }
 
   void Test5()
   {
-    StartSimulation(m_Parameters.at(4), m_RefImages.at(4), "BrainSlice_5_OUT.nii.gz");
+    FiberfoxParameters parameters;
+    parameters.LoadParameters(GetTestDataFilePath("DiffusionImaging/Fiberfox/params/BrainSlice_5.ffp"), true);
+    adjust_to_template(parameters);
+    mitk::Image::Pointer refImage = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/Fiberfox/params/BrainSlice_5_OUT.nii.gz"));
+    StartSimulation(parameters, refImage, "BrainSlice_5_OUT.nii.gz");
   }
 
 };

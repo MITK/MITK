@@ -4,10 +4,11 @@
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
 
-#include <mitkResectionFilter.h>
 #include <mitkImageAccessByItk.h>
-#include <mitkToolManager.h>
 #include <mitkITKImageImport.h>
+#include <mitkResectionFilter.h>
+#include <mitkSurfaceUtils.h>
+#include <mitkToolManager.h>
 
 namespace mitk
 {
@@ -143,6 +144,9 @@ void ResectionTool::Resect(ResectionType type)
   vtkMatrix4x4* worldView = getWorldToViewTransform(m_LastEventSender->GetVtkRenderer());
   AccessByItk_n(segmentation, AccessResectFilter, (points, worldView, type));
   segmentation->Modified();
+
+  SurfaceCreator::recreateModel(workingData, m_ToolManager->GetDataStorage(), 100);
+
   m_FeedbackContour->Clear();
   RenderingManager::GetInstance()->RequestUpdateAll();
 

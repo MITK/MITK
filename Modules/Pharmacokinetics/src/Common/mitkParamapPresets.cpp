@@ -123,7 +123,7 @@ namespace mitk {
   void ParamapPresets::NewPresets(std::map<std::string, ParamapPresets::Type>& newType)
   {
    m_Type = newType;
-    this->Save();
+    //this->Save();
   }
 
 }

@@ -134,7 +134,7 @@ namespace itk {
 
     float a = m_Parameters->m_SignalGen.m_ImageRegion.GetSize(0)*m_Parameters->m_SignalGen.m_ImageSpacing[0];
     float b = m_Parameters->m_SignalGen.m_ImageRegion.GetSize(1)*m_Parameters->m_SignalGen.m_ImageSpacing[1];
-    float diagonal = sqrt(a*a+b*b)/1000;   // image diagonal in m
+    float diagonal = sqrt(a*a+b*b)/2000;   // half image diagonal in m
 
     switch (m_Parameters->m_SignalGen.m_CoilSensitivityProfile)
     {
@@ -145,12 +145,12 @@ namespace itk {
       }
       case SignalGenerationParameters::COIL_LINEAR:
       {
-        m_CoilSensitivityFactor = -1/diagonal;          // about 50% of the signal in the image center remaining
+        m_CoilSensitivityFactor = (m_Parameters->m_SignalGen.m_CoilSensitivity-1)/diagonal;
         break;
       }
       case SignalGenerationParameters::COIL_EXPONENTIAL:
       {
-        m_CoilSensitivityFactor = -log(0.1)/diagonal;   // about 32% of the signal in the image center remaining
+        m_CoilSensitivityFactor = -log(m_Parameters->m_SignalGen.m_CoilSensitivity)/diagonal;
         break;
       }
     }
@@ -258,15 +258,19 @@ namespace itk {
     ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
     typedef ImageRegionConstIterator< InputImageType > InputIteratorType;
 
+    // shift for coil pos
+    float pos_x_shift = (xMax-1)/2;
+    float pos_y_shift = (yMax-1)/2;
+
     // precalculate shifts for DFT
     float x_shift = 0;
     float y_shift = 0;
     if (static_cast<int>(xMax)%2==1)
-        x_shift = (xMax-1)/2;
+        x_shift = pos_x_shift;
     else
         x_shift = xMax/2;
     if (static_cast<int>(yMax)%2==1)
-        y_shift = (yMax-1)/2;
+        y_shift = pos_y_shift;
     else
         y_shift = yMax/2;
 
@@ -391,7 +395,9 @@ namespace itk {
         if ((m_Parameters->m_Misc.m_DoAddEddyCurrents && m_Parameters->m_SignalGen.m_EddyStrength>0 && !m_IsBaseline) ||
             m_Parameters->m_SignalGen.m_CoilSensitivityProfile!=SignalGenerationParameters::COIL_CONSTANT)
         {
-          pos[0] = x; pos[1] = y; pos[2] = m_Z;
+          pos[0] = input_idx[0] - pos_x_shift;
+          pos[1] = input_idx[1] - pos_y_shift;
+          pos[2] = m_Z;
           pos = m_Transform*pos;
         }
 

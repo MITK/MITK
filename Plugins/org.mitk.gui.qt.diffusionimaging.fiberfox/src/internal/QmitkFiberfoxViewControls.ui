@@ -280,174 +280,6 @@
          <property name="horizontalSpacing">
           <number>6</number>
          </property>
-         <item row="8" column="1">
-          <widget class="QSpinBox" name="m_TIbox">
-           <property name="toolTip">
-            <string>Inversion time (in ms) for inversion recovery sequences. If 0, no inversion pulse is simulated.</string>
-           </property>
-           <property name="minimum">
-            <number>0</number>
-           </property>
-           <property name="maximum">
-            <number>999999999</number>
-           </property>
-           <property name="singleStep">
-            <number>1</number>
-           </property>
-           <property name="value">
-            <number>0</number>
-           </property>
-          </widget>
-         </item>
-         <item row="11" column="0">
-          <widget class="QLabel" name="m_TensorsToDWIBValueLabel_12">
-           <property name="toolTip">
-            <string/>
-           </property>
-           <property name="statusTip">
-            <string/>
-           </property>
-           <property name="whatsThis">
-            <string/>
-           </property>
-           <property name="text">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;T&lt;/span&gt;&lt;span style=&quot; font-style:italic; vertical-align:sub;&quot;&gt;inhom&lt;/span&gt; Relaxation: &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="wordWrap">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="11" column="1">
-          <widget class="QSpinBox" name="m_T2starBox">
-           <property name="toolTip">
-            <string>Relaxation time due to magnetic field inhomogeneities (T2', in milliseconds).</string>
-           </property>
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="maximum">
-            <number>10000</number>
-           </property>
-           <property name="singleStep">
-            <number>1</number>
-           </property>
-           <property name="value">
-            <number>50</number>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="0">
-          <widget class="QLabel" name="m_TensorsToDWIBValueLabel_14">
-           <property name="toolTip">
-            <string/>
-           </property>
-           <property name="statusTip">
-            <string/>
-           </property>
-           <property name="whatsThis">
-            <string/>
-           </property>
-           <property name="text">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Repetition Time &lt;span style=&quot; font-style:italic;&quot;&gt;TR&lt;/span&gt;: &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="wordWrap">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <widget class="QSpinBox" name="m_TEbox">
-           <property name="toolTip">
-            <string>TE in milliseconds</string>
-           </property>
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="maximum">
-            <number>999999999</number>
-           </property>
-           <property name="singleStep">
-            <number>1</number>
-           </property>
-           <property name="value">
-            <number>100</number>
-           </property>
-          </widget>
-         </item>
-         <item row="10" column="0">
-          <widget class="QLabel" name="m_TensorsToDWIBValueLabel_32">
-           <property name="toolTip">
-            <string/>
-           </property>
-           <property name="statusTip">
-            <string/>
-           </property>
-           <property name="whatsThis">
-            <string/>
-           </property>
-           <property name="text">
-            <string>Partial Fourier:</string>
-           </property>
-           <property name="wordWrap">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="10" column="1">
-          <widget class="QDoubleSpinBox" name="m_PartialFourier">
-           <property name="toolTip">
-            <string>Partial fourier factor (0.5-1)</string>
-           </property>
-           <property name="decimals">
-            <number>3</number>
-           </property>
-           <property name="minimum">
-            <double>0.500000000000000</double>
-           </property>
-           <property name="maximum">
-            <double>1.000000000000000</double>
-           </property>
-           <property name="singleStep">
-            <double>0.100000000000000</double>
-           </property>
-           <property name="value">
-            <double>1.000000000000000</double>
-           </property>
-          </widget>
-         </item>
-         <item row="14" column="0">
-          <widget class="QCheckBox" name="m_ReversePhaseBox">
-           <property name="toolTip">
-            <string>Output one image per compartment containing the corresponding volume fractions per voxel.</string>
-           </property>
-           <property name="text">
-            <string>Reverse Phase Encoding Direction</string>
-           </property>
-           <property name="checked">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="9" column="1">
-          <widget class="QDoubleSpinBox" name="m_LineReadoutTimeBox">
-           <property name="toolTip">
-            <string>Dwell time (time to read one line in k-space) in ms.</string>
-           </property>
-           <property name="decimals">
-            <number>4</number>
-           </property>
-           <property name="maximum">
-            <double>100.000000000000000</double>
-           </property>
-           <property name="singleStep">
-            <double>0.100000000000000</double>
-           </property>
-           <property name="value">
-            <double>1.000000000000000</double>
-           </property>
-          </widget>
-         </item>
          <item row="2" column="1">
           <widget class="QSpinBox" name="m_NumCoilsBox">
            <property name="toolTip">
@@ -467,18 +299,8 @@
            </property>
           </widget>
          </item>
-         <item row="13" column="1">
-          <widget class="QDoubleSpinBox" name="m_FiberRadius">
-           <property name="toolTip">
-            <string>Fiber radius used to calculate volume fractions (in µm). Set to 0 for automatic radius estimation.</string>
-           </property>
-           <property name="maximum">
-            <double>9999.000000000000000</double>
-           </property>
-          </widget>
-         </item>
-         <item row="9" column="0">
-          <widget class="QLabel" name="m_TensorsToDWIBValueLabel_15">
+         <item row="8" column="0">
+          <widget class="QLabel" name="m_TensorsToDWIBValueLabel_14">
            <property name="toolTip">
             <string/>
            </property>
@@ -489,82 +311,10 @@
             <string/>
            </property>
            <property name="text">
-            <string>Dwell Time:</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Repetition Time &lt;span style=&quot; font-style:italic;&quot;&gt;TR&lt;/span&gt;: &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="wordWrap">
             <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="16" column="0">
-          <widget class="QCheckBox" name="m_EnforcePureFiberVoxelsBox">
-           <property name="toolTip">
-            <string>Disable partial volume. Treat voxel content as fiber-only if at least one fiber is present.</string>
-           </property>
-           <property name="text">
-            <string>Disable Partial Volume Effects</string>
-           </property>
-           <property name="checked">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="m_TensorsToDWINumDirsLabel_6">
-           <property name="text">
-            <string>Acquisition Type:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="13" column="0">
-          <widget class="QLabel" name="m_TensorsToDWINumDirsLabel_4">
-           <property name="text">
-            <string>Fiber Radius:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="m_TensorsToDWINumDirsLabel_5">
-           <property name="text">
-            <string>Signal Scale:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="m_TensorsToDWIBValueLabel_13">
-           <property name="toolTip">
-            <string/>
-           </property>
-           <property name="statusTip">
-            <string/>
-           </property>
-           <property name="whatsThis">
-            <string/>
-           </property>
-           <property name="text">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of Channels:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="wordWrap">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="1">
-          <widget class="QSpinBox" name="m_TRbox">
-           <property name="toolTip">
-            <string>TR in milliseconds</string>
-           </property>
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="maximum">
-            <number>999999999</number>
-           </property>
-           <property name="singleStep">
-            <number>1</number>
-           </property>
-           <property name="value">
-            <number>4000</number>
            </property>
           </widget>
          </item>
@@ -587,6 +337,13 @@
            </item>
           </widget>
          </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="m_TensorsToDWINumDirsLabel_6">
+           <property name="text">
+            <string>Acquisition Type:</string>
+           </property>
+          </widget>
+         </item>
          <item row="1" column="1">
           <widget class="QSpinBox" name="m_SignalScaleBox">
            <property name="toolTip">
@@ -606,8 +363,79 @@
            </property>
           </widget>
          </item>
-         <item row="3" column="1">
-          <widget class="QComboBox" name="m_CoilSensBox">
+         <item row="18" column="0">
+          <widget class="QCheckBox" name="m_VolumeFractionsBox">
+           <property name="toolTip">
+            <string>Output phase image and volume fraction maps.</string>
+           </property>
+           <property name="text">
+            <string>Output Additional Images</string>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="m_TensorsToDWINumDirsLabel_5">
+           <property name="text">
+            <string>Signal Scale:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="12" column="0">
+          <widget class="QLabel" name="m_TensorsToDWIBValueLabel_12">
+           <property name="toolTip">
+            <string/>
+           </property>
+           <property name="statusTip">
+            <string/>
+           </property>
+           <property name="whatsThis">
+            <string/>
+           </property>
+           <property name="text">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;T&lt;/span&gt;&lt;span style=&quot; font-style:italic; vertical-align:sub;&quot;&gt;inhom&lt;/span&gt; Relaxation: &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="wordWrap">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="15" column="0">
+          <widget class="QCheckBox" name="m_ReversePhaseBox">
+           <property name="toolTip">
+            <string>Output one image per compartment containing the corresponding volume fractions per voxel.</string>
+           </property>
+           <property name="text">
+            <string>Reverse Phase Encoding Direction</string>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="1">
+          <widget class="QSpinBox" name="m_TIbox">
+           <property name="toolTip">
+            <string>Inversion time (in ms) for inversion recovery sequences. If 0, no inversion pulse is simulated.</string>
+           </property>
+           <property name="minimum">
+            <number>0</number>
+           </property>
+           <property name="maximum">
+            <number>999999999</number>
+           </property>
+           <property name="singleStep">
+            <number>1</number>
+           </property>
+           <property name="value">
+            <number>0</number>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QComboBox" name="m_CoilSensitivityProfileBox">
            <item>
             <property name="text">
              <string>Constant</string>
@@ -625,7 +453,170 @@
            </item>
           </widget>
          </item>
-         <item row="15" column="0">
+         <item row="14" column="0">
+          <widget class="QLabel" name="m_TensorsToDWINumDirsLabel_4">
+           <property name="text">
+            <string>Fiber Radius:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="17" column="0">
+          <widget class="QCheckBox" name="m_EnforcePureFiberVoxelsBox">
+           <property name="toolTip">
+            <string>Disable partial volume. Treat voxel content as fiber-only if at least one fiber is present.</string>
+           </property>
+           <property name="text">
+            <string>Disable Partial Volume Effects</string>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="10" column="0">
+          <widget class="QLabel" name="m_TensorsToDWIBValueLabel_15">
+           <property name="toolTip">
+            <string/>
+           </property>
+           <property name="statusTip">
+            <string/>
+           </property>
+           <property name="whatsThis">
+            <string/>
+           </property>
+           <property name="text">
+            <string>Dwell Time:</string>
+           </property>
+           <property name="wordWrap">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="11" column="0">
+          <widget class="QLabel" name="m_TensorsToDWIBValueLabel_32">
+           <property name="toolTip">
+            <string/>
+           </property>
+           <property name="statusTip">
+            <string/>
+           </property>
+           <property name="whatsThis">
+            <string/>
+           </property>
+           <property name="text">
+            <string>Partial Fourier:</string>
+           </property>
+           <property name="wordWrap">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QSpinBox" name="m_EtlBox">
+           <property name="toolTip">
+            <string>Only relevant for Fast Spin Echo sequence (number of k-space lines acquired with one RF pulse)</string>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>999999999</number>
+           </property>
+           <property name="singleStep">
+            <number>1</number>
+           </property>
+           <property name="value">
+            <number>8</number>
+           </property>
+          </widget>
+         </item>
+         <item row="12" column="1">
+          <widget class="QSpinBox" name="m_T2starBox">
+           <property name="toolTip">
+            <string>Relaxation time due to magnetic field inhomogeneities (T2', in milliseconds).</string>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>10000</number>
+           </property>
+           <property name="singleStep">
+            <number>1</number>
+           </property>
+           <property name="value">
+            <number>50</number>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="m_TensorsToDWIBValueLabel_35">
+           <property name="toolTip">
+            <string/>
+           </property>
+           <property name="statusTip">
+            <string/>
+           </property>
+           <property name="whatsThis">
+            <string/>
+           </property>
+           <property name="text">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Echo Train Length: &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="wordWrap">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="14" column="1">
+          <widget class="QDoubleSpinBox" name="m_FiberRadius">
+           <property name="toolTip">
+            <string>Fiber radius used to calculate volume fractions (in µm). Set to 0 for automatic radius estimation.</string>
+           </property>
+           <property name="maximum">
+            <double>9999.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="0">
+          <widget class="QLabel" name="m_TensorsToDWIBValueLabel_17">
+           <property name="toolTip">
+            <string/>
+           </property>
+           <property name="statusTip">
+            <string/>
+           </property>
+           <property name="whatsThis">
+            <string/>
+           </property>
+           <property name="text">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Inversion Time &lt;span style=&quot; font-style:italic;&quot;&gt;TI&lt;/span&gt;: &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="wordWrap">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="m_TensorsToDWIBValueLabel_13">
+           <property name="toolTip">
+            <string/>
+           </property>
+           <property name="statusTip">
+            <string/>
+           </property>
+           <property name="whatsThis">
+            <string/>
+           </property>
+           <property name="text">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of Channels:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="wordWrap">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="16" column="0">
           <widget class="QCheckBox" name="m_RelaxationBox">
            <property name="toolTip">
             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;TE&lt;/span&gt;, &lt;span style=&quot; font-style:italic;&quot;&gt;T&lt;/span&gt;&lt;span style=&quot; font-style:italic; vertical-align:sub;&quot;&gt;inhom&lt;/span&gt; and &lt;span style=&quot; font-style:italic;&quot;&gt;T2&lt;/span&gt; will have no effect if unchecked.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -638,7 +629,105 @@
            </property>
           </widget>
          </item>
-         <item row="5" column="0">
+         <item row="4" column="0">
+          <widget class="QLabel" name="m_TensorsToDWIBValueLabel_34">
+           <property name="toolTip">
+            <string/>
+           </property>
+           <property name="statusTip">
+            <string/>
+           </property>
+           <property name="whatsThis">
+            <string/>
+           </property>
+           <property name="text">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Coil Sensitivity Profile:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="wordWrap">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="1">
+          <widget class="QSpinBox" name="m_TRbox">
+           <property name="toolTip">
+            <string>TR in milliseconds</string>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>999999999</number>
+           </property>
+           <property name="singleStep">
+            <number>1</number>
+           </property>
+           <property name="value">
+            <number>4000</number>
+           </property>
+          </widget>
+         </item>
+         <item row="11" column="1">
+          <widget class="QDoubleSpinBox" name="m_PartialFourier">
+           <property name="toolTip">
+            <string>Partial fourier factor (0.5-1)</string>
+           </property>
+           <property name="decimals">
+            <number>3</number>
+           </property>
+           <property name="minimum">
+            <double>0.500000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>1.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.100000000000000</double>
+           </property>
+           <property name="value">
+            <double>1.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QSpinBox" name="m_TEbox">
+           <property name="toolTip">
+            <string>TE in milliseconds</string>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>999999999</number>
+           </property>
+           <property name="singleStep">
+            <number>1</number>
+           </property>
+           <property name="value">
+            <number>100</number>
+           </property>
+          </widget>
+         </item>
+         <item row="10" column="1">
+          <widget class="QDoubleSpinBox" name="m_LineReadoutTimeBox">
+           <property name="toolTip">
+            <string>Dwell time (time to read one line in k-space) in ms.</string>
+           </property>
+           <property name="decimals">
+            <number>4</number>
+           </property>
+           <property name="maximum">
+            <double>100.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.100000000000000</double>
+           </property>
+           <property name="value">
+            <double>1.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
           <widget class="QLabel" name="m_TensorsToDWIBValueLabel_33">
            <property name="toolTip">
             <string/>
@@ -658,7 +747,7 @@
           </widget>
          </item>
          <item row="3" column="0">
-          <widget class="QLabel" name="m_TensorsToDWIBValueLabel_34">
+          <widget class="QLabel" name="m_TensorsToDWIBValueLabel_37">
            <property name="toolTip">
             <string/>
            </property>
@@ -676,73 +765,22 @@
            </property>
           </widget>
          </item>
-         <item row="8" column="0">
-          <widget class="QLabel" name="m_TensorsToDWIBValueLabel_17">
+         <item row="3" column="1">
+          <widget class="QDoubleSpinBox" name="m_CoilSensitivityBox">
            <property name="toolTip">
-            <string/>
+            <string>Coil sensitivity in the center of the acquired slice. Not relevant for constant (always 1).</string>
            </property>
-           <property name="statusTip">
-            <string/>
-           </property>
-           <property name="whatsThis">
-            <string/>
-           </property>
-           <property name="text">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Inversion Time &lt;span style=&quot; font-style:italic;&quot;&gt;TI&lt;/span&gt;: &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="wordWrap">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="17" column="0">
-          <widget class="QCheckBox" name="m_VolumeFractionsBox">
-           <property name="toolTip">
-            <string>Output phase image and volume fraction maps.</string>
-           </property>
-           <property name="text">
-            <string>Output Additional Images</string>
-           </property>
-           <property name="checked">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="m_TensorsToDWIBValueLabel_35">
-           <property name="toolTip">
-            <string/>
-           </property>
-           <property name="statusTip">
-            <string/>
-           </property>
-           <property name="whatsThis">
-            <string/>
-           </property>
-           <property name="text">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Echo Train Length: &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="wordWrap">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
-          <widget class="QSpinBox" name="m_EtlBox">
-           <property name="toolTip">
-            <string>Only relevant for Fast Spin Echo sequence (number of k-space lines acquired with one RF pulse)</string>
-           </property>
-           <property name="minimum">
-            <number>1</number>
+           <property name="decimals">
+            <number>2</number>
            </property>
            <property name="maximum">
-            <number>999999999</number>
+            <double>1.000000000000000</double>
            </property>
            <property name="singleStep">
-            <number>1</number>
+            <double>0.100000000000000</double>
            </property>
            <property name="value">
-            <number>8</number>
+            <double>0.300000000000000</double>
            </property>
           </widget>
          </item>
@@ -2123,6 +2161,41 @@
            </property>
           </widget>
          </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="m_TensorsToDWIBValueLabel_38">
+           <property name="toolTip">
+            <string/>
+           </property>
+           <property name="statusTip">
+            <string/>
+           </property>
+           <property name="whatsThis">
+            <string/>
+           </property>
+           <property name="text">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Decay Constant &lt;span style=&quot; font-style:italic;&quot;&gt;τ&lt;/span&gt;:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="wordWrap">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QSpinBox" name="m_EddyTauBox">
+           <property name="toolTip">
+            <string>Eddy current induced field decays exponentially with this constant (in ms).</string>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>9999</number>
+           </property>
+           <property name="value">
+            <number>70</number>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
@@ -2836,7 +2909,7 @@
   <tabstop>m_AcquisitionTypeBox</tabstop>
   <tabstop>m_SignalScaleBox</tabstop>
   <tabstop>m_NumCoilsBox</tabstop>
-  <tabstop>m_CoilSensBox</tabstop>
+  <tabstop>m_CoilSensitivityProfileBox</tabstop>
   <tabstop>m_TEbox</tabstop>
   <tabstop>m_TRbox</tabstop>
   <tabstop>m_TIbox</tabstop>

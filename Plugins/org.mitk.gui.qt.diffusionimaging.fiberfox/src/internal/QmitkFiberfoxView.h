@@ -135,6 +135,8 @@ protected slots:
     void OnTemplateSelected(int value);
     void OnBvalsBvecsCheck(int value);
     void OnTlineChanged();
+    void OnCoilProfileChanged(int value);
+    void OnSequenceChanged(int value);
 
 protected:
 

@@ -131,15 +131,17 @@ SimulateKspaceAcquisition( std::vector< DoubleDwiType::Pointer >& compartment_im
 
   m_CoilPointset = mitk::PointSet::New();
   std::vector< itk::Vector<double, 3> > coilPositions;
-  itk::Vector<double, 3> pos; pos.Fill(0.0); pos[1] = -diagonal/2;
+  itk::Vector<double, 3> pos; pos.Fill(0.0);
+  pos[1] = -diagonal/2;
   itk::Vector<double, 3> center;
   center[0] = a/2-m_Parameters.m_SignalGen.m_ImageSpacing[0]/2;
   center[1] = b/2-m_Parameters.m_SignalGen.m_ImageSpacing[2]/2;
   center[2] = c/2-m_Parameters.m_SignalGen.m_ImageSpacing[1]/2;
+
   for (unsigned int c=0; c<m_Parameters.m_SignalGen.m_NumberOfCoils; c++)
   {
     coilPositions.push_back(pos);
-    m_CoilPointset->InsertPoint(c, pos*1000 + m_Parameters.m_SignalGen.m_ImageOrigin.GetVectorFromOrigin() + center );
+    m_CoilPointset->InsertPoint(c, pos*1000 );
 
     double rz = 360.0/m_Parameters.m_SignalGen.m_NumberOfCoils * itk::Math::pi/180;
     vnl_matrix_fixed< double, 3, 3 > rotZ; rotZ.set_identity();

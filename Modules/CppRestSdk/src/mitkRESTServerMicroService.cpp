@@ -14,14 +14,18 @@ mitk::RESTServerMicroService::~RESTServerMicroService()
 
 void mitk::RESTServerMicroService::OpenListener()
 {
+    //create listener
     m_Listener = MitkListener(m_Uri);
+    //Connect incoming get requests with HandleGet method
     m_Listener.support(web::http::methods::GET,
                        std::bind(&mitk::RESTServerMicroService::HandleGet, this, std::placeholders::_1));
+    //open listener
     m_Listener.open().wait();
 }
 
 void mitk::RESTServerMicroService::CloseListener()
 {
+  //close listener
   m_Listener.close().wait();
 }
 
@@ -42,6 +46,7 @@ void mitk::RESTServerMicroService::HandleGet(MitkRequest request)
   MITK_INFO << "Get Request fot server at port " << port << " Exact request uri: " << uriString;
   
   web::json::value content;
+  //get RESTManager as microservice to call th Handle method of the manager
   us::ModuleContext *context = us::GetModuleContext();
 
   auto managerRef = context->GetServiceReference<IRESTManager>();
@@ -52,6 +57,7 @@ void mitk::RESTServerMicroService::HandleGet(MitkRequest request)
     {
       web::json::value data = request.extract_json().get();
       MITK_INFO << "Server: Data send to manager";
+      //call the handle method
       content = managerService->Handle(build.to_uri(), data);
       MITK_INFO << "server: Data received from manager";
     }

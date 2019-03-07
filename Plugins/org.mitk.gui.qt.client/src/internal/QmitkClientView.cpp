@@ -67,6 +67,7 @@ void QmitkClientView::OnGetMultipleButtonClicked()
 {
   m_Ui->progressBar->setValue(0);
   m_Ui->getMultiplePushButton->setDisabled(true);
+  //Get microservice
   us::ModuleContext *context = us::ModuleRegistry::GetModule(1)->GetModuleContext();
 
   auto managerRef = context->GetServiceReference<mitk::IRESTManager>();
@@ -75,11 +76,13 @@ void QmitkClientView::OnGetMultipleButtonClicked()
     auto managerService = context->GetService(managerRef);
     if (managerService)
     {
+      //Create multiple tasks e.g. as shown below
       std::vector<pplx::task<void>> tasks;
       for (int i = 0; i < 20; i++)
       {
         pplx::task<void> singleTask = managerService->SendRequest(L"http://193.174.48.78:8090/dcm4chee-arc/aets/DCM4CHEE/rs/studies/1.2.840.113654.2.70.1.97144850941324808603541273584489321943/series/1.2.840.113654.2.70.1.15771179684190906938515254678965278540/instances")
             .then([=](pplx::task<web::json::value> resultTask) {
+          //Do something when a single task is done
           try
           {
             resultTask.get();
@@ -93,8 +96,11 @@ void QmitkClientView::OnGetMultipleButtonClicked()
           });
         tasks.push_back(singleTask);
       }
+      //Create a joinTask which includes all tasks you've created
       auto joinTask = pplx::when_all(begin(tasks), end(tasks));
+      //Run asynchonously
       joinTask.then([=](pplx::task<void> resultTask) { 
+        //Do something when all tasks are finished
         try
         {
           resultTask.get();
@@ -115,6 +121,7 @@ void QmitkClientView::OnGetMultipleButtonClicked()
 void QmitkClientView::OnGetSingleButtonClicked() 
 {
   m_Ui->putPushButton->setDisabled(true);
+  //Get the micorservice
   us::ModuleContext *context = us::ModuleRegistry::GetModule(1)->GetModuleContext();
 
   auto managerRef = context->GetServiceReference<mitk::IRESTManager>();
@@ -123,19 +130,26 @@ void QmitkClientView::OnGetSingleButtonClicked()
     auto managerService = context->GetService(managerRef);
     if (managerService)
     {
+      //Call the send request method which starts the actual request 
       managerService
         ->SendRequest(L"http://193.174.48.78:8090/dcm4chee-arc/aets/DCM4CHEE/rs/studies/1.2.840.113654.2.70.1.97144850941324808603541273584489321943/series/1.2.840.113654.2.70.1.15771179684190906938515254678965278540/instances")
-        .then([=](pplx::task<web::json::value> resultTask) {
+        .then([=](pplx::task<web::json::value> resultTask)/*It is important to use task-based continuation*/ {
           try
           {
+            //Get the result of the request
+            //This will throw an exception if the ascendent task threw an exception (e.g. invalid URI) 
             web::json::value result = resultTask.get();
+            //Do something with the result (e.g. convert it to a QSrting to update an UI element)
             utility::string_t stringT = result.to_string();
             std::string stringStd(stringT.begin(), stringT.end());
             QString stringQ = QString::fromStdString(stringStd);
+            //Note: if you want to update your UI, do this by using signals and slots. 
+            //The UI can't be updated from a Thread different to the Qt main thread
             emit UpdateLabel(stringQ);
           }
           catch (const mitk::Exception &exception)
           {
+            //Exceptions from ascendent tasks are catched here
             MITK_ERROR << exception.what();
             return;
           }

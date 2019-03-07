@@ -32,7 +32,7 @@ QmitkThreadView::QmitkThreadView()
 {
 }
 
-web::json::value QmitkThreadView::Notify(web::json::value data)
+web::json::value QmitkThreadView::Notify(web::json::value &data)
 {
   MITK_INFO << "Observer: Data in observer";
   return data.at(U("key 1"));

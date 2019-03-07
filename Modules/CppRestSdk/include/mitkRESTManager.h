@@ -43,12 +43,13 @@ namespace mitk
      * @param uri defines the URI the request is send to
      * @param type the RequestType of the HTTP request (optional)
      * @param body the body for the request (optional)
+     * @param filePath the file path to store the request to
      * @return task to wait for
      */
-    pplx::task<web::json::value> SendRequest(web::uri uri,
-                                             RequestType type = get,
-                                             web::json::value = NULL,
-                                             utility::string_t filePath = L"") override;
+    pplx::task<web::json::value> SendRequest(const web::uri &uri,
+                                             const RequestType &type = get,
+                                             const web::json::value &body= NULL,
+                                             const utility::string_t &filePath = L"") override;
     
     /**
      * @brief starts listening for requests if there isn't another observer listening and the port is free
@@ -56,7 +57,7 @@ namespace mitk
      * @param uri defines the URI for which incoming requests should be send to the observer
      * @param observer the observer which handles the incoming requests
      */
-    void ReceiveRequest(web::uri uri, IRESTObserver *observer) override;
+    void ReceiveRequest(const web::uri &uri, IRESTObserver *observer) override;
 
     /**
      * @brief Handles incoming requests by notifying the observer which should receive it
@@ -65,7 +66,7 @@ namespace mitk
      * @param body the body of the request
      * @return the data which is modified by the notified observer
      */
-    web::json::value Handle(web::uri uri, web::json::value body) override;
+    web::json::value Handle(const web::uri &uri, web::json::value &body) override;
 
     /**
      * @brief Handles the deletion of an observer for all or a specific uri
@@ -73,13 +74,12 @@ namespace mitk
      * @param observer the observer which shouldn't receive requests anymore
      * @param uri the uri for which the observer doesn't handle requests anymore (optional)
      */
-    virtual void HandleDeleteObserver(IRESTObserver *observer, web::uri uri) override;
+    virtual void HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri) override;
 
   private:
-    std::map<int, RESTClientMicroService *> m_ClientMap;                     // Map with port client pairs
     std::map<int, RESTServerMicroService *> m_ServerMap;                     // Map with port server pairs
     std::map<int, QThread*> m_ServerThreadMap;                               // Map with threads for servers
-    std::map<std::pair<int, utility::string_t>, IRESTObserver *> m_Observer; // Map with all observers
+    std::map<std::pair<int, utility::string_t>, IRESTObserver *> m_Observers; // Map with all observers
   };
 } // namespace mitk
 #endif // !mitkRESTManager_h

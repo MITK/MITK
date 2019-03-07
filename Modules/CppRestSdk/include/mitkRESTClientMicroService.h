@@ -51,17 +51,17 @@ namespace mitk
     *@brief Executes a HTTP GET request with the given uri and returns a task waiting for a json object
     *
     * @param uri the URI resulting the target of the HTTP request
-    * @return task with to wait for with resulting json object
+    * @return task to wait for with resulting json object
     */
-   pplx::task<web::json::value> Get(web::uri uri);
+   pplx::task<web::json::value> Get(const web::uri &uri);
 
    /**
     *@brief Executes a HTTP GET request with the given uri and and stores the byte stream in a file given by the filePath
     *
     * @param uri the URI resulting the target of the HTTP request
-    * @return task with to wait for 
+    * @return task to wait for returning an empty json object
     */
-   pplx::task<web::json::value> Get(web::uri uri, utility::string_t filePath);
+   pplx::task<web::json::value> Get(const web::uri &uri, const utility::string_t &filePath);
 
    /**
     * @brief Executes a HTTP PUT request with given uri and the content given as json
@@ -71,7 +71,7 @@ namespace mitk
     * created resources
     * @return task to wait for with resulting json object
     */
-   pplx::task<web::json::value> PUT(web::uri uri, web::json::value content);
+   pplx::task<web::json::value> PUT(const web::uri &uri, const web::json::value &content);
 
    /**
     * @brief Executes a HTTP POST request with given uri and the content given as json
@@ -80,7 +80,7 @@ namespace mitk
     * @param content the content as json value which should be the body of the request and thus the content of the created resource
     * @return task to wait for with resulting json object
     */
-   pplx::task<web::json::value> POST(web::uri uri, web::json::value content);
+   pplx::task<web::json::value> POST(const web::uri &uri, const web::json::value &content);
 
   };
 } // namespace mitk

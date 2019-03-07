@@ -34,6 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLabelSetImage.h>
 #include <mitkDICOMSegmentationConstants.h>
 #include <mitkDICOMSegmentationPropertyHelper.cpp>
+#include <mitkDICOMQIPropertyHelper.h>
 
 // ITK
 #include <itkTractDensityImageFilter.h>
@@ -374,11 +375,11 @@ mitk::DataNode::Pointer QmitkFiberQuantificationView::GenerateTractDensityImage(
     if (m_SelectedImage.IsNotNull())
     {
       mitk::LabelSetImage::Pointer multilabelImage = mitk::LabelSetImage::New();
-      multilabelImage->Initialize(m_SelectedImage);
       multilabelImage->InitializeByLabeledImage(img);
       multilabelImage->GetActiveLabelSet()->SetActiveLabel(1);
       mitk::Label::Pointer label = multilabelImage->GetActiveLabel();
       label->SetName("Tractogram");
+      mitk::DICOMQIPropertyHandler::DeriveDICOMSourceProperties(m_SelectedImage, multilabelImage);
 
       // init data node
       node->SetData(multilabelImage);

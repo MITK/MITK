@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkDICOMPharmacokineticsIO__cpp
 
 #include "mitkDICOMPMIO.h"
-#include "mitkDICOMPMIOMimeTypes.h"
+#include "mitkDICOMQIIOMimeTypes.h"
 #include "mitkDICOMPMConstants.h"
 #include <mitkDICOMDCMTKTagScanner.h>
 #include <mitkDICOMIOHelper.h>
@@ -30,8 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPropertyNameHelper.h>
 #include <dcmqi/ParaMapConverter.h>
 #include "mitkParamapPresets.h"
-#include <mitkDICOMQIPropertyHelper.h>
-#include <mitkDICOMPMPropertyHandler.h>
+
 
 // us
 #include <usGetModuleContext.h>
@@ -45,7 +44,7 @@ namespace mitk
 {
   DICOMPMIO::DICOMPMIO()
     : AbstractFileIO(Image::GetStaticNameOfClass(),
-                     mitk::MitkDICOMPMIOMimeTypes::DICOMPM_MIMETYPE_NAME(),
+                     mitk::MitkDICOMQIIOMimeTypes::DICOMPM_MIMETYPE_NAME(),
                      "DICOM PM")
 
   {

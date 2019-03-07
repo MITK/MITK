@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMPMIO.h"
 
-#include "mitkDICOMPMIOMimeTypes.h"
+#include "mitkDICOMQIIOMimeTypes.h"
 
 namespace mitk
 {
@@ -39,7 +39,7 @@ namespace mitk
       us::ServiceProperties props;
       props[us::ServiceConstants::SERVICE_RANKING()] = 10;
 
-      std::vector<mitk::CustomMimeType *> mimeTypes = mitk::MitkDICOMPMIOMimeTypes::Get();
+      std::vector<mitk::CustomMimeType *> mimeTypes = mitk::MitkDICOMQIIOMimeTypes::Get();
       for (std::vector<mitk::CustomMimeType *>::const_iterator mimeTypeIter = mimeTypes.begin(),
         iterEnd = mimeTypes.end();
         mimeTypeIter != iterEnd;
@@ -47,7 +47,6 @@ namespace mitk
       {
         context->RegisterService(*mimeTypeIter, props);
       }
-	  // IKO
       m_FileIOs.push_back(new DICOMPMIO());
     }
     void Unload(us::ModuleContext *) override

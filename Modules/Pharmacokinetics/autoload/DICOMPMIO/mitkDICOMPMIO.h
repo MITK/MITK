@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkDICOMPMIO_h
 
 #include <mitkAbstractFileIO.h>
-//#include <mitkLabelSetImage.h>
 #include <mitkImage.h>
 #include <dcmtk/dcmpmap/dpmparametricmapiod.h>
 #include <dcmqi/JSONSegmentationMetaInformationHandler.h>

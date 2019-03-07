@@ -97,6 +97,8 @@ namespace mitk {
     */
     mitk::Image::Pointer ApplyCropping(mitk::Image::Pointer inputImage, int above, int below, int right, int left, int minSlice, int maxSlice, int* errCode);
 
+    mitk::Image::Pointer ExtendImage(mitk::Image::Pointer inputImage, float pixelColor, unsigned int outputDimensionY);
+
     /** \brief Applies a Bandpass filter to the given image
     *
     * Applies a bandpass filter to the given image using the given parameters.

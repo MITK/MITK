@@ -39,7 +39,7 @@ struct CropSettings
 {
   unsigned int dimX;
   unsigned int dimY;
-  unsigned int cutBelow;
+  unsigned int cutAbove;
 };
 
 struct ResamplingSettings
@@ -110,7 +110,7 @@ InputParameters parseInput(int argc, char* argv[])
   return input;
 }
 
-void ParseXML(std::string xmlFile, InputParameters input, CropSettings cropSet, ResamplingSettings resSet)
+void ParseXML(std::string xmlFile, InputParameters input, CropSettings& cropSet, ResamplingSettings& resSet)
 {
   MITK_INFO << "Loading configuration File \"" << xmlFile << "\"";
   TiXmlDocument doc(xmlFile);
@@ -130,10 +130,10 @@ void ParseXML(std::string xmlFile, InputParameters input, CropSettings cropSet, 
     {
       cropSet.dimX = std::stoi(elem->Attribute("dimX"));
       cropSet.dimY = std::stoi(elem->Attribute("dimY"));
-      cropSet.cutBelow = std::stoi(elem->Attribute("cutBelow"));
-      resSet.spacing[0] = std::stoi(elem->Attribute("spacingX"));
-      resSet.spacing[1] = std::stoi(elem->Attribute("spacingY"));
-      resSet.spacing[2] = std::stoi(elem->Attribute("spacingZ"));
+      cropSet.cutAbove = std::stoi(elem->Attribute("cutAbove"));
+      resSet.spacing[0] = std::stod(elem->Attribute("spacingX"));
+      resSet.spacing[1] = std::stod(elem->Attribute("spacingY"));
+      resSet.spacing[2] = std::stod(elem->Attribute("spacingZ"));
     }
   }
 }
@@ -143,7 +143,7 @@ int main(int argc, char * argv[])
   auto input = parseInput(argc, argv);
 
   CropSettings cropSettings{ 0,0,0 };
-  ResamplingSettings resSettings{ 0,0,0 };
+  ResamplingSettings resSettings{ 0 };
 
   MITK_INFO << "Parsing settings XML...";
   try
@@ -164,6 +164,7 @@ int main(int argc, char * argv[])
 
   mitk::Image::Pointer output = input.inputImage;
   MITK_INFO(input.verbose) << "Resampling input image...";
+  MITK_INFO << resSettings.spacing[0];
   output = m_FilterService->ApplyResampling(output, resSettings.spacing);
   MITK_INFO(input.verbose) << "Resampling input image...[Done]";
 
@@ -174,13 +175,20 @@ int main(int argc, char * argv[])
   }
 
   int err = 0;
-  int above = input.inputImage->GetDimension(1) - cropSettings.dimY - cropSettings.cutBelow;
-  if (above < 0)
-    mitkThrow() << "Cannot crop an image to a larger dimension than before";
+  int below = output->GetDimension(1) - cropSettings.dimY - cropSettings.cutAbove;
+  if (below < 0)
+  {
+    MITK_INFO(input.verbose) << "Extending input image...";
+    output = m_FilterService->ExtendImage(output, 0, cropSettings.dimY);
+    MITK_INFO(input.verbose) << "Extending input image...[Done]";
+  }
+  else
+  {
+    MITK_INFO(input.verbose) << "Cropping input image...";
+    output = m_FilterService->ApplyCropping(output, cropSettings.cutAbove, below, 0, 0, 0, 0, &err);
+    MITK_INFO(input.verbose) << "Cropping input image...[Done]";
+  }
 
-  MITK_INFO(input.verbose) << "Cropping input image...";
-  output = m_FilterService->ApplyCropping(output, above, cropSettings.cutBelow, 0, 0, 0, 0, &err);
-  MITK_INFO(input.verbose) << "Cropping input image...[Done]";
   
   MITK_INFO(input.verbose) << "Saving image...";
   mitk::IOUtil::Save(output, input.outputFilename);

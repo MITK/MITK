@@ -120,7 +120,7 @@ InputParameters parseInput(int argc, char* argv[])
   return input;
 }
 
-void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSettings::Pointer *bfSet, CropSettings cropSet, BModeSettings bmodeSet, ProcessSettings processSet)
+void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSettings::Pointer *bfSet, CropSettings& cropSet, BModeSettings& bmodeSet, ProcessSettings& processSet)
 {
   MITK_INFO << "Loading configuration File \"" << xmlFile << "\"";
   TiXmlDocument doc(xmlFile);

@@ -42,9 +42,10 @@ namespace mitk
     static MitkDICOMSEGMimeType DICOMSEG_MIMETYPE();
     static std::string DICOMSEG_MIMETYPE_NAME();
 
+
     /** Mime type that parses dicom files to determine whether they are dicom pm objects.
     */
-    
+
     class MITKDICOMQI_EXPORT MitkDICOMPMMimeType : public CustomMimeType
     {
     public:
@@ -55,7 +56,7 @@ namespace mitk
 
     static MitkDICOMPMMimeType DICOMPM_MIMETYPE();
     static std::string DICOMPM_MIMETYPE_NAME();
-    
+
 	
 
     // Get all Mime Types

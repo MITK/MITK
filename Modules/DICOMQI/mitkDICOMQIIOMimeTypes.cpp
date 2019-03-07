@@ -35,9 +35,9 @@ namespace mitk
 
     mimeTypes.push_back(DICOMSEG_MIMETYPE().Clone());
     mimeTypes.push_back(DICOMPM_MIMETYPE().Clone());
-
     return mimeTypes;
   }
+
 
   // Mime Types
 
@@ -48,6 +48,7 @@ namespace mitk
     this->SetCategory(IOMimeTypes::CATEGORY_IMAGES());
     this->SetComment("DICOM SEG");
   }
+
 
   bool MitkDICOMQIIOMimeTypes::MitkDICOMSEGMimeType::AppliesTo(const std::string &path) const
   {
@@ -133,7 +134,6 @@ namespace mitk
 
 
   //======= Mime Type DICOM PM =======
-  //...
   MitkDICOMQIIOMimeTypes::MitkDICOMPMMimeType::MitkDICOMPMMimeType() : CustomMimeType(DICOMPM_MIMETYPE_NAME())
   {
     this->AddExtension("dcm");
@@ -206,7 +206,7 @@ namespace mitk
     return MitkDICOMPMMimeType();
   }
 
-
+  // Names
   std::string MitkDICOMQIIOMimeTypes::DICOMPM_MIMETYPE_NAME()
   {
     // create a unique and sensible name for this mime type

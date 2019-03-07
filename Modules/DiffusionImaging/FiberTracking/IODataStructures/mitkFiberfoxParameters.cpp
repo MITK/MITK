@@ -366,6 +366,7 @@ void mitk::FiberfoxParameters::SaveParameters(std::string filename)
 
   parameters.put("fiberfox.image.acquisitiontype", m_SignalGen.m_AcquisitionType);
   parameters.put("fiberfox.image.coilsensitivityprofile", m_SignalGen.m_CoilSensitivityProfile);
+  parameters.put("fiberfox.image.coilsensitivity", m_SignalGen.m_CoilSensitivity);
   parameters.put("fiberfox.image.numberofcoils", m_SignalGen.m_NumberOfCoils);
   parameters.put("fiberfox.image.reversephase", m_SignalGen.m_ReversePhase);
   parameters.put("fiberfox.image.partialfourier", m_SignalGen.m_PartialFourier);
@@ -528,6 +529,7 @@ void mitk::FiberfoxParameters::SaveParameters(std::string filename)
 
   boost::property_tree::xml_writer_settings<std::string> writerSettings(' ', 2);
   boost::property_tree::xml_parser::write_xml(filename, parameters, std::locale(), writerSettings);
+//  boost::property_tree::json_parser::write_json(filename, parameters, std::locale(), true);
 
   try{
     itk::ImageFileWriter<ItkFloatImgType>::Pointer writer = itk::ImageFileWriter<ItkFloatImgType>::New();
@@ -655,7 +657,13 @@ void mitk::FiberfoxParameters::LoadParameters(std::string filename, bool fix_see
 
 
   boost::property_tree::ptree parameterTree;
-  boost::property_tree::xml_parser::read_xml( filename, parameterTree );
+  try {
+    boost::property_tree::xml_parser::read_xml( filename, parameterTree );
+  }
+  catch (...)
+  {
+    boost::property_tree::json_parser::read_json( filename, parameterTree );
+  }
 
 
   m_FiberModelList.clear();
@@ -738,6 +746,7 @@ void mitk::FiberfoxParameters::LoadParameters(std::string filename, bool fix_see
       m_SignalGen.m_AcquisitionType = (SignalGenerationParameters::AcquisitionType)ReadVal<int>(v1,"acquisitiontype", m_SignalGen.m_AcquisitionType);
       m_SignalGen.m_CoilSensitivityProfile = (SignalGenerationParameters::CoilSensitivityProfile)ReadVal<int>(v1,"coilsensitivityprofile", m_SignalGen.m_CoilSensitivityProfile);
       m_SignalGen.m_NumberOfCoils = ReadVal<unsigned int>(v1,"numberofcoils", m_SignalGen.m_NumberOfCoils);
+      m_SignalGen.m_CoilSensitivity = ReadVal<float>(v1,"coilsensitivity", m_SignalGen.m_CoilSensitivity);
       m_SignalGen.m_ReversePhase = ReadVal<bool>(v1,"reversephase", m_SignalGen.m_ReversePhase);
       m_SignalGen.m_PartialFourier = ReadVal<float>(v1,"partialfourier", m_SignalGen.m_PartialFourier);
       m_SignalGen.m_NoiseVariance = ReadVal<float>(v1,"noisevariance", m_SignalGen.m_NoiseVariance);

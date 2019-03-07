@@ -64,6 +64,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateOr.h>
+#include <itkContinuousIndex.h>
 
 QmitkFiberfoxWorker::QmitkFiberfoxWorker(QmitkFiberfoxView* view)
   : m_View(view)
@@ -175,9 +176,19 @@ void QmitkFiberfoxView::AfterThread()
 
     {
       mitk::DataNode::Pointer node = mitk::DataNode::New();
-      node->SetData(m_TractsToDwiFilter->GetCoilPointset());
+      auto ps = m_TractsToDwiFilter->GetCoilPointset();
+
+      itk::ContinuousIndex< float, 3 > center;
+      center[0] = (parameters.m_SignalGen.m_ImageRegion.GetSize()[0]-1.0f)/2.0f;
+      center[1] = (parameters.m_SignalGen.m_ImageRegion.GetSize()[1]-1.0f)/2.0f;
+      center[2] = (parameters.m_SignalGen.m_ImageRegion.GetSize()[2]-1.0f)/2.0f;
+      itk::Point< float, 3 > wp;
+      m_TractsToDwiFilter->GetOutput()->TransformContinuousIndexToPhysicalPoint(center, wp);
+      ps->SetOrigin(wp);
+
+      node->SetData(ps);
       node->SetName("Coil Positions");
-      node->SetProperty("pointsize", mitk::FloatProperty::New(parameters.m_SignalGen.m_ImageSpacing[0]/4));
+      node->SetProperty("pointsize", mitk::FloatProperty::New(parameters.m_SignalGen.m_ImageSpacing[0]));
       node->SetProperty("color", mitk::ColorProperty::New(0, 1, 0));
       GetDataStorage()->Add(node, parameters.m_Misc.m_ResultNode);
     }
@@ -424,9 +435,27 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
     connect((QObject*) m_Controls->m_FiberBundleComboBox, SIGNAL(currentIndexChanged(int)), (QObject*) this, SLOT(OnFibSelected(int)));
     connect((QObject*) m_Controls->m_LineReadoutTimeBox, SIGNAL( valueChanged(double)), (QObject*) this, SLOT(OnTlineChanged()));
     connect((QObject*) m_Controls->m_SizeX, SIGNAL( valueChanged(int)), (QObject*) this, SLOT(OnTlineChanged()));
+
+    connect((QObject*) m_Controls->m_AcquisitionTypeBox, SIGNAL(currentIndexChanged(int)), (QObject*) this, SLOT(OnSequenceChanged(int)));
+    connect((QObject*) m_Controls->m_CoilSensitivityProfileBox, SIGNAL(currentIndexChanged(int)), (QObject*) this, SLOT(OnCoilProfileChanged(int)));
   }
-  OnTlineChanged();
   UpdateGui();
+}
+
+void QmitkFiberfoxView::OnCoilProfileChanged(int value)
+{
+  if (value == 1 || value == 2)
+    m_Controls->m_CoilSensitivityBox->setEnabled(true);
+  else
+    m_Controls->m_CoilSensitivityBox->setEnabled(false);
+}
+
+void QmitkFiberfoxView::OnSequenceChanged(int value)
+{
+  if (value == 2)
+    m_Controls->m_EtlBox->setEnabled(true);
+  else
+    m_Controls->m_EtlBox->setEnabled(false);
 }
 
 void QmitkFiberfoxView::OnTlineChanged()
@@ -595,7 +624,8 @@ void QmitkFiberfoxView::UpdateParametersFromGui()
     m_Parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Relaxation", BoolProperty::New(true));
     m_Parameters.m_Misc.m_ArtifactModelString += "_RELAX";
   }
-  m_Parameters.m_SignalGen.m_SimulateKspaceAcquisition = m_Parameters.m_SignalGen.m_DoSimulateRelaxation;
+  if (m_Parameters.m_SignalGen.m_DoSimulateRelaxation && m_Controls->m_FiberBundleComboBox->GetSelectedNode().IsNotNull())
+    m_Parameters.m_SignalGen.m_SimulateKspaceAcquisition = true;
 
   // N/2 ghosts
   m_Parameters.m_Misc.m_DoAddGhosts = m_Controls->m_AddGhosts->isChecked();
@@ -675,7 +705,9 @@ void QmitkFiberfoxView::UpdateParametersFromGui()
   }
 
   m_Parameters.m_SignalGen.m_EddyStrength = m_Controls->m_EddyGradientStrength->value();
+  m_Parameters.m_SignalGen.m_Tau = m_Controls->m_EddyTauBox->value();
   m_Parameters.m_Misc.m_DoAddEddyCurrents = m_Controls->m_AddEddy->isChecked();
+
   if (m_Controls->m_AddEddy->isChecked())
   {
     m_Parameters.m_SignalGen.m_SimulateKspaceAcquisition = true;
@@ -786,8 +818,9 @@ void QmitkFiberfoxView::UpdateParametersFromGui()
 
   // other imaging parameters
   m_Parameters.m_SignalGen.m_AcquisitionType = (SignalGenerationParameters::AcquisitionType)m_Controls->m_AcquisitionTypeBox->currentIndex();
-  m_Parameters.m_SignalGen.m_CoilSensitivityProfile = (SignalGenerationParameters::CoilSensitivityProfile)m_Controls->m_CoilSensBox->currentIndex();
+  m_Parameters.m_SignalGen.m_CoilSensitivityProfile = (SignalGenerationParameters::CoilSensitivityProfile)m_Controls->m_CoilSensitivityProfileBox->currentIndex();
   m_Parameters.m_SignalGen.m_NumberOfCoils = m_Controls->m_NumCoilsBox->value();
+  m_Parameters.m_SignalGen.m_CoilSensitivity = m_Controls->m_CoilSensitivityBox->value();
   m_Parameters.m_SignalGen.m_PartialFourier = m_Controls->m_PartialFourier->value();
   m_Parameters.m_SignalGen.m_ReversePhase = m_Controls->m_ReversePhaseBox->isChecked();
   m_Parameters.m_SignalGen.m_tLine = m_Controls->m_LineReadoutTimeBox->value();
@@ -1377,7 +1410,8 @@ void QmitkFiberfoxView::LoadParameters()
   m_Controls->m_TRbox->setValue(m_Parameters.m_SignalGen.m_tRep);
   m_Controls->m_TIbox->setValue(m_Parameters.m_SignalGen.m_tInv);
   m_Controls->m_NumCoilsBox->setValue(m_Parameters.m_SignalGen.m_NumberOfCoils);
-  m_Controls->m_CoilSensBox->setCurrentIndex(m_Parameters.m_SignalGen.m_CoilSensitivityProfile);
+  m_Controls->m_CoilSensitivityProfileBox->setCurrentIndex(m_Parameters.m_SignalGen.m_CoilSensitivityProfile);
+  m_Controls->m_CoilSensitivityBox->setValue(m_Parameters.m_SignalGen.m_CoilSensitivity);
   m_Controls->m_AcquisitionTypeBox->setCurrentIndex(m_Parameters.m_SignalGen.m_AcquisitionType);
 
   if (!m_Parameters.m_Misc.m_BvalsFile.empty())
@@ -1430,6 +1464,7 @@ void QmitkFiberfoxView::LoadParameters()
   m_Controls->m_SpikeNumBox->setValue(m_Parameters.m_SignalGen.m_Spikes);
   m_Controls->m_SpikeScaleBox->setValue(m_Parameters.m_SignalGen.m_SpikeAmplitude);
   m_Controls->m_EddyGradientStrength->setValue(m_Parameters.m_SignalGen.m_EddyStrength);
+  m_Controls->m_EddyTauBox->setValue(m_Parameters.m_SignalGen.m_Tau);
   m_Controls->m_AddGibbsRinging->setChecked(m_Parameters.m_SignalGen.m_DoAddGibbsRinging);
   m_Controls->m_ZeroRinging->setValue(m_Parameters.m_SignalGen.m_ZeroRinging);
   m_Controls->m_AddMotion->setChecked(m_Parameters.m_SignalGen.m_DoAddMotion);
@@ -2124,6 +2159,8 @@ void QmitkFiberfoxView::SetOutputPath()
 void QmitkFiberfoxView::UpdateGui()
 {
   OnTlineChanged();
+  OnCoilProfileChanged(m_Controls->m_CoilSensitivityProfileBox->currentIndex());
+  OnSequenceChanged(m_Controls->m_AcquisitionTypeBox->currentIndex());
   m_Controls->m_GeometryFrame->setEnabled(true);
   m_Controls->m_GeometryMessage->setVisible(false);
   m_Controls->m_DiffusionPropsMessage->setVisible(false);

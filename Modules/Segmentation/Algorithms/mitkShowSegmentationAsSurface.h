@@ -32,10 +32,6 @@ class MITKSEGMENTATION_EXPORT ShowSegmentationAsSurface : public SegmentationSin
     mitkClassMacro( ShowSegmentationAsSurface, SegmentationSink )
     mitkAlgorithmNewMacro( ShowSegmentationAsSurface );
 
-    DataNode::Pointer getCreatedNode()
-    {
-      return m_Node;
-    }
   protected:
 
     ShowSegmentationAsSurface();  // use smart pointers

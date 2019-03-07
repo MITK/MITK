@@ -236,12 +236,6 @@ void ShowSegmentationAsSurface::ThreadedUpdateSuccessful()
 
   InsertBelowGroupNode(m_Node);
 
-  DataNode::Pointer nodeToRemove = nullptr;
-  GetPointerParameter("Remove Node on Complete", nodeToRemove);
-  if (nodeToRemove != nullptr) {
-    m_DataStorage->Remove(nodeToRemove);
-  }
-
   Superclass::ThreadedUpdateSuccessful();
 }
 

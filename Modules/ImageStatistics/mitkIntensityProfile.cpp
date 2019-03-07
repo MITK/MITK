@@ -339,7 +339,7 @@ IntensityProfile::Pointer mitk::CreateIntensityProfileFromVector(const std::vect
   return result;
 }
 
-void mitk::ComputeIntensityProfileStatistics(IntensityProfile::ConstPointer intensityProfile, ImageStatisticsContainer::StatisticsObject& stats)
+void mitk::ComputeIntensityProfileStatistics(IntensityProfile::ConstPointer intensityProfile, ImageStatisticsContainer::ImageStatisticsObject& stats)
 {
   typedef std::vector<IntensityProfile::MeasurementType> StatsVecType;
 

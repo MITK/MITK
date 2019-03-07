@@ -22,8 +22,8 @@ namespace mitk
   ImageStatisticsContainer::ImageStatisticsContainer() { this->Reset(); }
 
   // The order is derived from the old (<2018) image statistics plugin.
-  const ImageStatisticsContainer::StatisticsObject::StatisticNameVector
-    ImageStatisticsContainer::StatisticsObject::m_DefaultNames = {ImageStatisticsConstants::MEAN(),
+  const ImageStatisticsContainer::ImageStatisticsObject::StatisticNameVector
+    ImageStatisticsContainer::ImageStatisticsObject::m_DefaultNames = {ImageStatisticsConstants::MEAN(),
                                                                   ImageStatisticsConstants::MEDIAN(),
                                                                   ImageStatisticsConstants::STANDARDDEVIATION(),
                                                                   ImageStatisticsConstants::RMS(),
@@ -40,9 +40,9 @@ namespace mitk
                                                                   ImageStatisticsConstants::MPP(),
                                                                   ImageStatisticsConstants::UPP()};
 
-  ImageStatisticsContainer::StatisticsObject::StatisticsObject() { Reset(); }
+  ImageStatisticsContainer::ImageStatisticsObject::ImageStatisticsObject() { Reset(); }
 
-  void ImageStatisticsContainer::StatisticsObject::AddStatistic(const std::string &key, StatisticsVariantType value)
+  void ImageStatisticsContainer::ImageStatisticsObject::AddStatistic(const std::string &key, StatisticsVariantType value)
   {
     m_Statistics.emplace(key, value);
 
@@ -55,20 +55,20 @@ namespace mitk
     }
   }
 
-  const ImageStatisticsContainer::StatisticsObject::StatisticNameVector &
-    ImageStatisticsContainer::StatisticsObject::GetDefaultStatisticNames()
+  const ImageStatisticsContainer::ImageStatisticsObject::StatisticNameVector &
+    ImageStatisticsContainer::ImageStatisticsObject::GetDefaultStatisticNames()
   {
     return m_DefaultNames;
   }
 
-  const ImageStatisticsContainer::StatisticsObject::StatisticNameVector &
-    ImageStatisticsContainer::StatisticsObject::GetCustomStatisticNames() const
+  const ImageStatisticsContainer::ImageStatisticsObject::StatisticNameVector &
+    ImageStatisticsContainer::ImageStatisticsObject::GetCustomStatisticNames() const
   {
     return m_CustomNames;
   }
 
-  ImageStatisticsContainer::StatisticsObject::StatisticNameVector
-    ImageStatisticsContainer::StatisticsObject::GetAllStatisticNames() const
+  ImageStatisticsContainer::ImageStatisticsObject::StatisticNameVector
+    ImageStatisticsContainer::ImageStatisticsObject::GetAllStatisticNames() const
   {
     StatisticNameVector names = GetDefaultStatisticNames();
 
@@ -77,8 +77,8 @@ namespace mitk
     return names;
   }
 
-    ImageStatisticsContainer::StatisticsObject::StatisticNameVector
-    ImageStatisticsContainer::StatisticsObject::GetExistingStatisticNames() const
+    ImageStatisticsContainer::ImageStatisticsObject::StatisticNameVector
+    ImageStatisticsContainer::ImageStatisticsObject::GetExistingStatisticNames() const
   {
     StatisticNameVector names;
 
@@ -89,12 +89,12 @@ namespace mitk
     return names;
   }
 
-  bool ImageStatisticsContainer::StatisticsObject::HasStatistic(const std::string &name) const
+  bool ImageStatisticsContainer::ImageStatisticsObject::HasStatistic(const std::string &name) const
   {
     return m_Statistics.find(name) != m_Statistics.cend();
   }
 
-  ImageStatisticsContainer::StatisticsVariantType ImageStatisticsContainer::StatisticsObject::GetValueNonConverted(
+  ImageStatisticsContainer::StatisticsVariantType ImageStatisticsContainer::ImageStatisticsObject::GetValueNonConverted(
     const std::string &name) const
   {
     if (HasStatistic(name))
@@ -107,7 +107,7 @@ namespace mitk
     }
   }
 
-  void ImageStatisticsContainer::StatisticsObject::Reset()
+  void ImageStatisticsContainer::ImageStatisticsObject::Reset()
   {
     m_Statistics.clear();
     m_CustomNames.clear();
@@ -118,7 +118,7 @@ namespace mitk
     return m_TimeStepMap.find(timeStep) != m_TimeStepMap.end();
   }
 
-  const ImageStatisticsContainer::StatisticsObject &ImageStatisticsContainer::GetStatisticsForTimeStep(
+  const ImageStatisticsContainer::ImageStatisticsObject &ImageStatisticsContainer::GetStatisticsForTimeStep(
     TimeStepType timeStep) const
   {
     auto it = m_TimeStepMap.find(timeStep);
@@ -129,7 +129,7 @@ namespace mitk
     mitkThrow() << "StatisticsObject for timeStep " << timeStep << " not found!";
   }
 
-  void ImageStatisticsContainer::SetStatisticsForTimeStep(TimeStepType timeStep, StatisticsObject statistics)
+  void ImageStatisticsContainer::SetStatisticsForTimeStep(TimeStepType timeStep, ImageStatisticsObject statistics)
   {
     if (timeStep < this->GetTimeSteps())
     {
@@ -188,11 +188,11 @@ namespace mitk
 
   void ImageStatisticsContainer::SetTimeStepMap(TimeStepMapType map) { m_TimeStepMap = map; }
 
-  ImageStatisticsContainer::StatisticsObject::StatisticNameVector GetAllStatisticNames(
+  ImageStatisticsContainer::ImageStatisticsObject::StatisticNameVector GetAllStatisticNames(
     const ImageStatisticsContainer *container)
   {
-    ImageStatisticsContainer::StatisticsObject::StatisticNameVector names =
-      ImageStatisticsContainer::StatisticsObject::GetDefaultStatisticNames();
+    ImageStatisticsContainer::ImageStatisticsObject::StatisticNameVector names =
+      ImageStatisticsContainer::ImageStatisticsObject::GetDefaultStatisticNames();
 
     if (container)
     {
@@ -210,11 +210,11 @@ namespace mitk
     return names;
   }
 
-  ImageStatisticsContainer::StatisticsObject::StatisticNameVector GetAllStatisticNames(
+  ImageStatisticsContainer::ImageStatisticsObject::StatisticNameVector GetAllStatisticNames(
     std::vector<ImageStatisticsContainer::ConstPointer> containers)
   {
-    ImageStatisticsContainer::StatisticsObject::StatisticNameVector names =
-      ImageStatisticsContainer::StatisticsObject::GetDefaultStatisticNames();
+    ImageStatisticsContainer::ImageStatisticsObject::StatisticNameVector names =
+      ImageStatisticsContainer::ImageStatisticsObject::GetDefaultStatisticNames();
 
     std::set<std::string> customKeys;
 

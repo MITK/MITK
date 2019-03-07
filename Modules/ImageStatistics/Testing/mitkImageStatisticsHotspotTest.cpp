@@ -453,7 +453,7 @@ struct mitkImageStatisticsHotspotTestClass
 
     Uses ImageStatisticsCalculator to find a hotspot in a defined ROI within the given image.
   */
-  static mitk::ImageStatisticsContainer::StatisticsObject CalculateStatistics(mitk::Image* image, const Parameters& testParameters,  unsigned int label)
+  static mitk::ImageStatisticsContainer::ImageStatisticsObject CalculateStatistics(mitk::Image* image, const Parameters& testParameters,  unsigned int label)
   {
     const unsigned int Dimension = 3;
     typedef itk::Image<unsigned short, Dimension> MaskImageType;
@@ -588,7 +588,7 @@ struct mitkImageStatisticsHotspotTestClass
 
     Checks validness of all statistics aspects. Lets test fail if any aspect is not sufficiently equal.
   */
-  static void ValidateStatistics(const mitk::ImageStatisticsContainer::StatisticsObject hotspotStatistics, const Parameters& testParameters, unsigned int label)
+  static void ValidateStatistics(const mitk::ImageStatisticsContainer::ImageStatisticsObject hotspotStatistics, const Parameters& testParameters, unsigned int label)
   {
     // check all expected test result against actual results
     double eps = 0.25; // value above the largest tested difference
@@ -630,7 +630,7 @@ int mitkImageStatisticsHotspotTest(int argc, char* argv[])
 
       for(unsigned int label = 0; label < parameters.m_NumberOfLabels; ++label)
       {
-        mitk::ImageStatisticsContainer::StatisticsObject statistics = mitkImageStatisticsHotspotTestClass::CalculateStatistics(image, parameters, label);
+        mitk::ImageStatisticsContainer::ImageStatisticsObject statistics = mitkImageStatisticsHotspotTestClass::CalculateStatistics(image, parameters, label);
 
         mitkImageStatisticsHotspotTestClass::ValidateStatistics(statistics, parameters, label);
         std::cout << std::endl;

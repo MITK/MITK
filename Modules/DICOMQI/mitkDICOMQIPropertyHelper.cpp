@@ -23,10 +23,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  void DICOMQIPropertyHandler::DeriveDICOMSourceProperties(const BaseData *sourceDICOMImage, BaseData *derivedDICOMImage)
+  void DICOMQIPropertyHelper::DeriveDICOMSourceProperties(const BaseData *sourceDICOMImage, BaseData *derivedDICOMImage)
   {
     // Check if original image is a DICOM image; if so, store relevant DICOM Tags into the PropertyList of new
-    // segmentation image
+    // segmentation/PM image
 
     PropertyList::Pointer sourcePropertyList = sourceDICOMImage->GetPropertyList();
     bool parentIsDICOM = false;
@@ -42,6 +42,7 @@ namespace mitk
 
     if (!parentIsDICOM)
       return;
+
 
     PropertyList::Pointer propertyList = derivedDICOMImage->GetPropertyList();
 
@@ -65,6 +66,7 @@ namespace mitk
     // Add DICOM Tag (0008,1030) Study Description; no default
     AdoptReferenceDICOMProperty(sourcePropertyList, propertyList, DICOMTag(0x0008, 0x1030));
 
+
     //====== Reference DICOM data ======
     // Add reference file paths to referenced DICOM data
     BaseProperty::Pointer dcmFilesProp = sourcePropertyList->GetProperty("files");
@@ -72,7 +74,7 @@ namespace mitk
       propertyList->SetProperty("referenceFiles", dcmFilesProp);
   }
 
-  void DICOMQIPropertyHandler::AdoptReferenceDICOMProperty(PropertyList *referencedPropertyList,
+  void DICOMQIPropertyHelper::AdoptReferenceDICOMProperty(PropertyList *referencedPropertyList,
     PropertyList *propertyList,
     const DICOMTag &tag,
     const std::string &defaultString)
@@ -81,7 +83,7 @@ namespace mitk
 
     // Get DICOM property from referenced image
     BaseProperty::Pointer originalProperty = referencedPropertyList->GetProperty(tagString.c_str());
-
+	
     // if property exists, copy the informtaion to the derived image
     if (originalProperty.IsNotNull())
       propertyList->SetProperty(tagString.c_str(), originalProperty);

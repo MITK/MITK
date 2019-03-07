@@ -14,25 +14,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef DICOMSEGMENTATIONPROPERTYHANDLER_H_
-#define DICOMSEGMENTATIONPROPERTYHANDLER_H_
+#ifndef DICOMSEGMENTATIONPROPERTYHELPER_H_
+#define DICOMSEGMENTATIONPROPERTYHELPER_H_
 
 #include <mitkDICOMTag.h>
-//#include <mitkLabel.h>
-//#include <mitkLabelSetImage.h>
+
 
 #include <MitkPharmacokineticsExports.h>
 
 namespace mitk
 {
-  class MITKPHARMACOKINETICS_EXPORT DICOMPMPropertyHandler
+  class MITKPHARMACOKINETICS_EXPORT DICOMPMPropertyHelper
   {
   public:
-    static PropertyList::Pointer GetDICOMPMProperties(PropertyList *referencedPropertyList);
-    static void SetReferenceDICOMProperty(PropertyList *referencedPropertyList,
-                                          PropertyList *propertyList,
-                                          const DICOMTag &tag,
-                                          const std::string &defaultString = "");
+	static PropertyList::Pointer DeriveDICOMPMProperties();
+
   };
 } // namespace mitk
 #endif

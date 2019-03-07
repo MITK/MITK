@@ -118,10 +118,7 @@ namespace mitk {
 
  
 
-  void ParamapPresets::Save()
-  {
-    //Not yet implemented
-  }
+
 
   void ParamapPresets::NewPresets(std::map<std::string, ParamapPresets::Type>& newType)
   {

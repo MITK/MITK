@@ -55,7 +55,6 @@ private:
   //## @brief method used in XLM-Reading; gets called when a start-tag is read
   void StartElement (const char *elementName, const char **atts) override;
 
-  void Save();
 
   //##Documentation
   //## @brief reads an XML-String-Attribute

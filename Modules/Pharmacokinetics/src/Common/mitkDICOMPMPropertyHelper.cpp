@@ -35,9 +35,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  PropertyList::Pointer DICOMPMPropertyHelper::DeriveDICOMPMProperties()
+  void DICOMPMPropertyHelper::DeriveDICOMPMProperties(BaseData *derivedDICOMImage)
   {
-    PropertyList::Pointer propertyList = PropertyList::New();
+    PropertyList::Pointer propertyList = derivedDICOMImage->GetPropertyList();
     
     // Add DICOM Tag (0008, 0060) Modality "PM"
     propertyList->SetProperty(GeneratePropertyNameForDICOMTag(0x0008, 0x0060).c_str(),
@@ -60,7 +60,7 @@ namespace mitk
                               TemporoSpatialStringProperty::New("Unknown"));
 
 
-    return propertyList;
+
   }
 
 

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define DICOMSEGMENTATIONPROPERTYHELPER_H_
 
 #include <mitkDICOMTag.h>
-
+#include <mitkBaseData.h>
 
 #include <MitkPharmacokineticsExports.h>
 
@@ -27,7 +27,7 @@ namespace mitk
   class MITKPHARMACOKINETICS_EXPORT DICOMPMPropertyHelper
   {
   public:
-	static PropertyList::Pointer DeriveDICOMPMProperties();
+    static void DeriveDICOMPMProperties(BaseData *derivedDICOMImage);
 
   };
 } // namespace mitk

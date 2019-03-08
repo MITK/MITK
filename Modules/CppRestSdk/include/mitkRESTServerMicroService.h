@@ -18,19 +18,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkRESTServerMicroService_h
 
 #include <QThread>
-#include "cpprest/asyncrt_utils.h"
-#include "cpprest/containerstream.h"
-#include "cpprest/filestream.h"
 #include "cpprest/http_listener.h"
-#include "cpprest/json.h"
-#include "cpprest/producerconsumerstream.h"
-#include "cpprest/uri.h"
 
 #include "MitkCppRestSdkExports.h"
 #include <mitkIRESTManager.h>
 #include <usGetModuleContext.h>
 #include <usModule.h>
 #include <usServiceTracker.h>
+
 typedef web::http::experimental::listener::http_listener MitkListener;
 typedef web::http::http_request MitkRequest;
 typedef web::http::http_response MitkResponse;

@@ -21,9 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "cpprest/containerstream.h"
 #include "cpprest/filestream.h"
 #include "cpprest/http_client.h"
-#include "cpprest/json.h"
 #include "cpprest/producerconsumerstream.h"
-#include "cpprest/uri.h"
 
 #include "MitkCppRestSdkExports.h"
 #include <mitkIRESTManager.h>

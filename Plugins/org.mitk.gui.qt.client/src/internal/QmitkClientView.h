@@ -19,8 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkAbstractView.h>
 #include "cpprest/uri.h"
-#include <future>
-#include <algorithm>
 #include <QString>
 namespace Ui
 {

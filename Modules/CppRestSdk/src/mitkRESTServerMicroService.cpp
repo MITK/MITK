@@ -1,7 +1,5 @@
 #include "mitkRESTServerMicroService.h"
 #include <mitkCommon.h>
-#include <usGetModuleContext.h>
-#include <usModule.h>
 
 mitk::RESTServerMicroService::RESTServerMicroService(web::uri uri) : m_Listener(uri)
 {

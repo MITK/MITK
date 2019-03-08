@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QThread>
 
 #include <mitkIRESTManager.h>
-#include <mitkIRESTObserver.h>
 #include <mitkRESTClientMicroService.h>
 #include <mitkRESTServerMicroService.h>
 

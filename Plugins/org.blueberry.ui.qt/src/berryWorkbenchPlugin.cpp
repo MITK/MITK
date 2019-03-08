@@ -68,6 +68,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QDebug>
 #include <QPrinterInfo>
+#include <QSvgGenerator>
 
 namespace berry
 {
@@ -367,6 +368,10 @@ void WorkbenchPlugin::start(ctkPluginContext* context)
   // Dummy code to force linkage to Qt5PrintSupport (issue with GCC 7.3)
   QPrinterInfo forceQt5PrintSupportLinkage;
   forceQt5PrintSupportLinkage.isNull();
+
+  // Same for Qt5Svg
+  QSvgGenerator forceQt5SvgLinkage;
+  forceQt5SvgLinkage.title();
 
   //context.addBundleListener(getBundleListener());
   AbstractUICTKPlugin::start(context);

@@ -217,6 +217,8 @@ if(MITK_USE_Qt5)
   set(MITK_QT5_COMPONENTS Concurrent OpenGL PrintSupport Script Sql Svg Widgets Xml XmlPatterns WebEngineWidgets UiTools Help LinguistTools)
   if(APPLE)
     list(APPEND MITK_QT5_COMPONENTS DBus)
+  elseif(UNIX)
+    list(APPEND MITK_QT5_COMPONENTS X11Extras)
   endif()
 
   # Hint at default install locations of Qt

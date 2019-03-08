@@ -69,7 +69,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImage.h>
 #include <itkImageRegionIterator.h>
 
-#include <mitkDICOMPMPropertyHandler.h>
+#include <mitkDICOMPMPropertyHelper.h>
+#include <mitkDICOMQIPropertyHelper.h>
 
 
 const std::string MRPerfusionView::VIEW_ID = "org.mitk.gui.qt.pharmacokinetics.mri";
@@ -1070,21 +1071,19 @@ void MRPerfusionView::OnJobError(QString err)
 void MRPerfusionView::OnJobResultsAreAvailable(mitk::modelFit::ModelFitResultNodeVectorType results,
     const ParameterFitBackgroundJob* pJob)
 {
-  MITK_INFO << "IKO: OnJobResultsAvailable";
   //Store the resulting parameter fit image via convenience helper function in data storage
   //(handles the correct generation of the nodes and their properties)
+  
   mitk::modelFit::StoreResultsInDataStorage(this->GetDataStorage(), results, pJob->GetParentNode());
-  
-	mitk::PropertyList::Pointer dicomPMPropertyList =
-		mitk::DICOMPMPropertyHandler::GetDICOMPMProperties(pJob->GetParentNode()->GetData()->GetPropertyList());
-  
-  mitk::modelFit::ModelFitResultNodeVectorType::const_iterator pos;
 
+  // Set DICOM properties, paramap-secific (DICOMPM) and general properties from source data (DICOMQI)
+
+  mitk::modelFit::ModelFitResultNodeVectorType::const_iterator pos;
   for (pos = results.begin(); pos != results.end(); pos++)
   {
-    pos->GetPointer()->GetData()->GetPropertyList()->ConcatenatePropertyList(dicomPMPropertyList);
+    mitk::DICOMQIPropertyHelper::DeriveDICOMSourceProperties(pJob->GetParentNode()->GetData(), pos->GetPointer()->GetData());
+    mitk::DICOMPMPropertyHelper::DeriveDICOMPMProperties(pos->GetPointer()->GetData());
   }
- 
   
     m_Controls.errorMessageLabel->setText("");
 	m_Controls.errorMessageLabel->hide();

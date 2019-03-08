@@ -17,11 +17,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "../QmitkDataManagerHotkeysPrefPage.h"
 #include "../QmitkDataManagerPreferencePage.h"
 #include "../QmitkDataManagerView.h"
+#include <QPrinterInfo>
 
 namespace mitk {
 
 void PluginActivator::start(ctkPluginContext* context)
 {
+  // Dummy code to force linkage to Qt5PrintSupport (issue with GCC 7.3)
+  QPrinterInfo info;
+  info.isNull();
+
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDataManagerView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDataManagerPreferencePage, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDataManagerHotkeysPrefPage, context)

@@ -41,11 +41,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QProcess>
 #include <QMainWindow>
+#include <QPrinterInfo>
 
 ctkPluginContext* QmitkCommonExtPlugin::_context = nullptr;
 
 void QmitkCommonExtPlugin::start(ctkPluginContext* context)
 {
+  // Dummy code to force linkage to Qt5PrintSupport (issue with GCC 7.3)
+  QPrinterInfo info;
+  info.isNull();
+
   this->_context = context;
 
   QtWidgetsExtRegisterClasses();

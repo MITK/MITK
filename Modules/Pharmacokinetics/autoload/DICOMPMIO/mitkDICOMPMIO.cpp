@@ -97,10 +97,9 @@ namespace mitk
 		mitkThrow() << "Cannot write non-image data";
 
     // Get DICOM information from referenced image
-    vector<DcmDataset *> dcmDatasets;
+    vector<std::unique_ptr<DcmDataset>> dcmDatasetsSourceImage;
+    std::unique_ptr<DcmFileFormat> readFileFormat(new DcmFileFormat());
 
-
-    DcmFileFormat *readFileFormat = new DcmFileFormat();
     try
     {
       // Generate dcmdataset witk DICOM tags from property list; ATM the source are the filepaths from the
@@ -114,7 +113,6 @@ namespace mitk
         return;
       }
 
-
 	  // returns a list of all referenced files
       StringLookupTable filesLut = filesProp->GetValue();
       const StringLookupTable::LookupTableType &lookUpTableMap = filesLut.GetLookupTable();
@@ -122,7 +120,10 @@ namespace mitk
       {
         const char *fileName = (it.second).c_str();
         if (readFileFormat->loadFile(fileName, EXS_Unknown).good())
-          dcmDatasets.push_back(readFileFormat->getAndRemoveDataset());
+        {
+          std::unique_ptr<DcmDataset> readDCMDataset(readFileFormat->getAndRemoveDataset());
+          dcmDatasetsSourceImage.push_back(std::move(readDCMDataset));
+        }
       }
     }
     catch (const std::exception &e)
@@ -135,7 +136,6 @@ namespace mitk
 	// Cast input PMinput to itk image 
 	ImageToItk<PMitkInputImageType>::Pointer PMimageToItkFilter = ImageToItk<PMitkInputImageType>::New();
 	PMimageToItkFilter->SetInput(mitkPMImage);
-	PMimageToItkFilter->Update();
 		
 	// Cast from original itk type to dcmqi input itk image type
 	typedef itk::CastImageFilter<PMitkInputImageType, PMitkInternalImageType> castItkImageFilterType;
@@ -143,43 +143,31 @@ namespace mitk
 	castFilter->SetInput(PMimageToItkFilter->GetOutput());
 	castFilter->Update();
 	PMitkInternalImageType::Pointer itkParamapImage = castFilter->GetOutput();
-	itkParamapImage->DisconnectPipeline();
 	
 	// Create PM meta information
-	const std::string &tmpMetaInfoFile = this->CreateMetaDataJsonFilePM();
+    const std::string tmpMetaInfoFile = this->CreateMetaDataJsonFilePM();
 
 	// Convert itk PM images to dicom image
 	MITK_INFO << "Writing PM image: " << path << std::endl;
 	try
-	{
-		dcmqi::ParaMapConverter *PMconverter = new dcmqi::ParaMapConverter();
-		DcmDataset *PMresult = PMconverter->itkimage2paramap(itkParamapImage, dcmDatasets, tmpMetaInfoFile);
-		// Write dicom file
-		DcmFileFormat dcmFileFormat(PMresult);
+    {
+      vector<DcmDataset*> rawVecDataset;
+      for (const auto& dcmDataSet : dcmDatasetsSourceImage)
+        rawVecDataset.push_back(dcmDataSet.get());
+        std::unique_ptr<dcmqi::ParaMapConverter> PMconverter(new dcmqi::ParaMapConverter());
+        std::unique_ptr<DcmDataset> PMresult (PMconverter->itkimage2paramap(itkParamapImage, rawVecDataset, tmpMetaInfoFile));
+        // Write dicom file
+        DcmFileFormat dcmFileFormat(PMresult.get());
 		std::string filePath = path.substr(0, path.find_last_of("."));
 		filePath = filePath + ".dcm";
 		dcmFileFormat.saveFile(filePath.c_str(), EXS_LittleEndianExplicit);
-		// Clean up
-		if (PMconverter != nullptr)
-			delete PMconverter;
-		if (PMresult != nullptr)
-			delete PMresult;
+
 	}
 	catch (const std::exception &e)
 	{
 		MITK_ERROR << "An error occurred during writing the DICOM Paramap: " << e.what() << endl;
 		return;
 	}
-
-	//-------------------------------------------------------------//
-
-    // End of image writing; clean up
-    if (readFileFormat)
-      delete readFileFormat;
-
-    for (auto obj : dcmDatasets)
-      delete obj;
-    dcmDatasets.clear();
 	
   }
   
@@ -202,7 +190,7 @@ namespace mitk
 	  auto pmType_parameterName = pmPresets->GetType(parameterName);
 	  auto pmType_modelName = pmPresets->GetType(modelName);
 
-	  // Here some other 
+      // Here some other
 	  // mandatory
 	  // TODO: where to get these from?
 	  // TODO: AnatomicRegionSequence from Segmentation?

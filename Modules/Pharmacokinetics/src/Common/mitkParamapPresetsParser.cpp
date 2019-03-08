@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkParamapPresets.h"
+#include "mitkParamapPresetsParser.h"
 #include <vtkObjectFactory.h>
 
 #include "usGetModuleContext.h"
@@ -25,14 +25,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-  const std::string ParamapPresets::PRESET = "preset";
-  const std::string ParamapPresets::TYPE = "type";
-  const std::string ParamapPresets::CODE_VALUE = "code_value";
-  const std::string ParamapPresets::CODE_SCHEME = "coding_scheme";
+  const std::string ParamapPresetsParser::PRESET = "preset";
+  const std::string ParamapPresetsParser::TYPE = "type";
+  const std::string ParamapPresetsParser::CODE_VALUE = "code_value";
+  const std::string ParamapPresetsParser::CODE_SCHEME = "coding_scheme";
 
-  vtkStandardNewMacro(ParamapPresets);
+  vtkStandardNewMacro(ParamapPresetsParser);
 
-  bool ParamapPresets::LoadPreset()
+  bool ParamapPresetsParser::LoadPreset()
   {
     us::ModuleResource presetResource = us::GetModuleContext()->GetModule()->GetResource("mitkParamapPresets.xml");
     if (!presetResource) return false;
@@ -42,14 +42,14 @@ namespace mitk {
     if (!vtkXMLParser::Parse())
     {
 #ifdef INTERDEBUG
-      MITK_INFO<<"ParamapPresets::LoadPreset xml file cannot parse!"<<std::endl;
+      MITK_INFO<<"ParamapPresetsParser::LoadPreset xml file cannot parse!"<<std::endl;
 #endif
       return false;
     }
     return true;
   }
 
-  bool ParamapPresets::LoadPreset(const std::string& fileName)
+  bool ParamapPresetsParser::LoadPreset(const std::string& fileName)
   {
     if (fileName.empty())
       return false;
@@ -59,7 +59,7 @@ namespace mitk {
     if (!vtkXMLParser::Parse())
     {
 #ifdef INTERDEBUG
-      MITK_INFO<<"ParamapPresets::LoadPreset xml file cannot parse!"<<std::endl;
+      MITK_INFO<<"ParamapPresetsParser::LoadPreset xml file cannot parse!"<<std::endl;
 #endif
     }
 
@@ -67,7 +67,7 @@ namespace mitk {
 
   }
 
-  void  ParamapPresets::StartElement(const char *elementName, const char **atts)
+  void  ParamapPresetsParser::StartElement(const char *elementName, const char **atts)
   {
     std::string elementNameString = elementName;
     if (elementNameString == PRESET)
@@ -84,7 +84,7 @@ namespace mitk {
 
   }
 
-  std::string ParamapPresets::ReadXMLStringAttribute(const std::string& name, const char **atts)
+  std::string ParamapPresetsParser::ReadXMLStringAttribute(const std::string& name, const char **atts)
   {
     if (atts)
     {
@@ -104,14 +104,14 @@ namespace mitk {
   }
 
 
-  ParamapPresets::Type ParamapPresets::GetType(const std::string& name)
+  ParamapPresetsParser::Type ParamapPresetsParser::GetType(const std::string& name)
   {
     return m_Type[name];
   }
 
 
 
-  std::map<std::string, ParamapPresets::Type> const ParamapPresets::GetTypePresets()
+  std::map<std::string, ParamapPresetsParser::Type> const ParamapPresetsParser::GetTypePresets()
   {
     return m_Type;
   }
@@ -120,7 +120,7 @@ namespace mitk {
 
 
 
-  void ParamapPresets::NewPresets(std::map<std::string, ParamapPresets::Type>& newType)
+  void ParamapPresetsParser::NewPresets(std::map<std::string, ParamapPresetsParser::Type>& newType)
   {
    m_Type = newType;
     //this->Save();

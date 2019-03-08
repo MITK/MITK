@@ -8,7 +8,7 @@ set(CPP_FILES
   Common/mitkPixelBasedDescriptionParameterImageGenerator.cpp
   Common/mitkDICOMPMConstants.cpp
   Common/mitkDICOMPMPropertyHelper.cpp
-  Common/mitkParamapPresets.cpp	
+  Common/mitkParamapPresetsParser.cpp	
   DescriptionParameters/mitkCurveDescriptionParameterBase.cpp
   DescriptionParameters/mitkAreaUnderTheCurveDescriptionParameter.cpp
   DescriptionParameters/mitkAreaUnderFirstMomentDescriptionParameter.cpp

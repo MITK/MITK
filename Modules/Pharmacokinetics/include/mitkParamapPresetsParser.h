@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-class MITKPHARMACOKINETICS_EXPORT ParamapPresets : public vtkXMLParser
+class MITKPHARMACOKINETICS_EXPORT ParamapPresetsParser : public vtkXMLParser
 {
 public:
 	struct Type
@@ -36,8 +36,8 @@ public:
 		Type(std::string value, std::string scheme) : codeValue(value), codeScheme(scheme){}
   };
 
-  static ParamapPresets *New();
-  vtkTypeMacro(ParamapPresets,vtkXMLParser);
+  static ParamapPresetsParser *New();
+  vtkTypeMacro(ParamapPresetsParser,vtkXMLParser);
 
   bool LoadPreset();
   bool LoadPreset(const std::string& fileName);
@@ -47,8 +47,8 @@ public:
 
 
 protected:
-  ParamapPresets() = default;
-  ~ParamapPresets() override = default;
+  ParamapPresetsParser() = default;
+  ~ParamapPresetsParser() override = default;
 
 private:
   //##Documentation

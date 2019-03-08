@@ -23,27 +23,33 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <string>
 #include <vtkSetGet.h>
 
+
+
 namespace mitk {
+
 
 class MITKPHARMACOKINETICS_EXPORT ParamapPresetsParser : public vtkXMLParser
 {
 public:
-	struct Type
-	{
-		std::string codeValue;
-		std::string codeScheme;
-		Type() = default;
-		Type(std::string value, std::string scheme) : codeValue(value), codeScheme(scheme){}
-  };
+  struct Type
+  {
+     std::string codeValue;
+     std::string codeScheme;
+     Type() = default;
+     Type(std::string value, std::string scheme) : codeValue(value), codeScheme(scheme){}
+   };
 
+  using ParamapPrestsType = std::map<std::string, Type>;
   static ParamapPresetsParser *New();
   vtkTypeMacro(ParamapPresetsParser,vtkXMLParser);
+
+
 
   bool LoadPreset();
   bool LoadPreset(const std::string& fileName);
   Type GetType(const std::string& name);
-  std::map<std::string, Type> const GetTypePresets();
-  void NewPresets(std::map<std::string, Type>& newType);
+  ParamapPrestsType  const GetTypePresets();
+  void NewPresets(ParamapPrestsType & newType);
 
 
 protected:
@@ -66,7 +72,7 @@ private:
   static const std::string CODE_SCHEME;
 
   std::string m_presetName;
-  std::map<std::string, Type> m_Type;
+  ParamapPrestsType  m_Type;
   std::string m_XmlFileName;
 };
 }

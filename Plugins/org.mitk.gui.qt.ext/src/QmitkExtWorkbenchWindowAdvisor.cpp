@@ -412,7 +412,7 @@ berry::WorkbenchWindowAdvisor(configurer),
   wbAdvisor(wbAdvisor),
   showViewToolbar(true),
   showPerspectiveToolbar(false),
-  showVersionInfo(true),
+  showVersionInfo(false),
   showMitkVersionInfo(true),
   showViewMenuItem(true),
   showNewWindowMenuItem(false),
@@ -1251,17 +1251,16 @@ QString QmitkExtWorkbenchWindowAdvisor::ComputeTitle()
 
   if(showMitkVersionInfo)
   {
-    title += QString(" ") + MITK_VERSION_STRING;
+    title += QString(" ") + MITK_REVISION_DESC;
   }
 
   if (showVersionInfo)
   {
     // add version informatioin
-    QString versions = QString(" (ITK %1.%2.%3  VTK %4.%5.%6 Qt %7 MITK %8)")
+    QString versions = QString(" (ITK %1.%2.%3 | VTK %4.%5.%6 | Qt %7)")
       .arg(ITK_VERSION_MAJOR).arg(ITK_VERSION_MINOR).arg(ITK_VERSION_PATCH)
       .arg(VTK_MAJOR_VERSION).arg(VTK_MINOR_VERSION).arg(VTK_BUILD_VERSION)
-      .arg(QT_VERSION_STR)
-      .arg(MITK_VERSION_STRING);
+      .arg(QT_VERSION_STR);
 
     title += versions;
   }

@@ -1251,7 +1251,12 @@ QString QmitkExtWorkbenchWindowAdvisor::ComputeTitle()
 
   if(showMitkVersionInfo)
   {
-    title += QString(" ") + MITK_REVISION_DESC;
+    QString mitkVersionInfo = MITK_REVISION_DESC;
+
+    if(mitkVersionInfo.isEmpty())
+      mitkVersionInfo = MITK_VERSION_STRING;
+
+    title += " " + mitkVersionInfo;
   }
 
   if (showVersionInfo)

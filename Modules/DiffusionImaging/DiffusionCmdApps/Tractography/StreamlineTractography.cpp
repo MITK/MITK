@@ -127,6 +127,7 @@ int main(int argc, char* argv[])
   parser.addArgument("no_data_interpolation", "", mitkCommandLineParser::Bool, "Don't interpolate input data:", "don't interpolate input image values");
   parser.addArgument("no_mask_interpolation", "", mitkCommandLineParser::Bool, "Don't interpolate masks:", "don't interpolate mask image values");
   parser.addArgument("compress", "", mitkCommandLineParser::Float, "Compress:", "compress output fibers using the given error threshold (in mm)");
+  parser.addArgument("fix_seed", "", mitkCommandLineParser::Bool, "Fix Random Seed:", "always use the same random numbers");
   parser.endGroup();
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
@@ -144,6 +145,10 @@ int main(int argc, char* argv[])
   float prior_weight = 0.5;
   if (parsedArgs.count("prior_weight"))
     prior_weight = us::any_cast<float>(parsedArgs["prior_weight"]);
+
+  bool fix_seed = false;
+  if (parsedArgs.count("fix_seed"))
+    fix_seed = us::any_cast<bool>(parsedArgs["fix_seed"]);
 
   bool restrict_to_prior = false;
   if (parsedArgs.count("restrict_to_prior"))
@@ -533,6 +538,7 @@ int main(int argc, char* argv[])
   if (ext != ".fib" && ext != ".trk")
     tracker->SetUseOutputProbabilityMap(true);
   tracker->SetMinTractLength(min_tract_length);
+  tracker->SetRandom(!fix_seed);
   tracker->Update();
 
   if (ext == ".fib" || ext == ".trk")

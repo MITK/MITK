@@ -56,8 +56,8 @@ int main(int argc, char* argv[])
   parser.setArgumentPrefix("--", "-");
 
   parser.beginGroup("1. Mandatory arguments:");
-  parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input:", "Input fiber bundle (.fib, .trk, .tck)", us::Any(), false);
-  parser.addArgument("", "o", mitkCommandLineParser::OutputFile, "Output:", "Output fiber bundle (.fib, .trk)", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::File, "Input:", "Input fiber bundle (.fib, .trk, .tck)", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("", "o", mitkCommandLineParser::File, "Output:", "Output fiber bundle (.fib, .trk)", us::Any(), false, false, false, mitkCommandLineParser::Output);
   parser.endGroup();
 
   parser.beginGroup("2. Resampling:");

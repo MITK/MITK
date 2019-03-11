@@ -85,11 +85,16 @@ public:
     StringList = 2,
     Int = 3,
     Float = 4,
-    InputDirectory = 5,
-    InputFile = 6,
-    OutputDirectory = 7,
-    OutputFile = 8,
-    InputImage = 9
+    Directory = 5,
+    File = 6,
+    Image = 7
+  };
+
+  enum Channel
+  {
+    None = 0,
+    Input = 1,
+    Output = 2
   };
 
   typedef std::vector<std::string> StringContainerType;
@@ -221,7 +226,8 @@ public:
                    const us::Any &defaultValue = us::Any(),
                    bool optional = true,
                    bool ignoreRest = false,
-                   bool deprecated = false);
+                   bool deprecated = false,
+                   mitkCommandLineParser::Channel channel = mitkCommandLineParser::Channel::None);
 
   /**
  * Adds a deprecated command line argument. If a deprecated argument is provided

@@ -105,8 +105,8 @@ int main(int argc, char* argv[])
   mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
   parser.addArgument("help", "h", mitkCommandLineParser::String, "Help", "Show this help text");
-  parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input file", "input dwi file", us::Any(),false);
-  parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output folder", "output folder and base name, e.g. /tmp/outPatient1 ", us::Any(),false);
+  parser.addArgument("", "i", mitkCommandLineParser::File, "Input file", "input dwi file", us::Any(),false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("", "o", mitkCommandLineParser::Directory, "Output folder", "output folder and base name, e.g. /tmp/outPatient1 ", us::Any(),false, false, false, mitkCommandLineParser::Output);
 
   parser.setTitle("Tensor Derived Maps Extraction");
   parser.setCategory("Diffusion Related Measures");

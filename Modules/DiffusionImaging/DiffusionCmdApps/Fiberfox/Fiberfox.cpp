@@ -43,13 +43,13 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
   parser.setDescription("Command line interface to Fiberfox." " Simulate a diffusion-weighted image from a tractogram using the specified parameter file.");
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("", "o", mitkCommandLineParser::String, "Output root:", "output root", us::Any(), false, false, false, mitkCommandLineParser::Output);
-  parser.addArgument("", "i", mitkCommandLineParser::String, "Input:", "Input tractogram or diffusion-weighted image.", us::Any(), false, false, false, mitkCommandLineParser::Input);
-  parser.addArgument("parameters", "p", mitkCommandLineParser::File, "Parameter file:", "fiberfox parameter file (.ffp)", us::Any(), false, false, false, mitkCommandLineParser::Input);
-  parser.addArgument("template", "t", mitkCommandLineParser::String, "Template image:", "Use parameters of the template image.", us::Any(), true, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output root:", "output folder and file prefix", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("", "i", mitkCommandLineParser::String, "Input:", "input tractogram or diffusion-weighted image", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("parameters", "p", mitkCommandLineParser::String, "Parameter file:", "fiberfox parameter file (.ffp)", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("template", "t", mitkCommandLineParser::String, "Template image:", "use parameters of the template image", us::Any(), true, false, false, mitkCommandLineParser::Input);
   parser.addArgument("verbose", "v", mitkCommandLineParser::Bool, "Output additional images:", "output volume fraction images etc.", us::Any());
-  parser.addArgument("dont_apply_direction_matrix", "", mitkCommandLineParser::Bool, "Don't apply direction matrix:", "Don't rotate gradients by image direction matrix.", us::Any());
-  parser.addArgument("fix_seed", "", mitkCommandLineParser::Bool, "Use fix random seed:", "Always use same sequence of random numbers.", us::Any());
+  parser.addArgument("dont_apply_direction_matrix", "", mitkCommandLineParser::Bool, "Don't apply direction matrix:", "don't rotate gradients by image direction matrix", us::Any());
+  parser.addArgument("fix_seed", "", mitkCommandLineParser::Bool, "Use fix random seed:", "always use same sequence of random numbers", us::Any());
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)

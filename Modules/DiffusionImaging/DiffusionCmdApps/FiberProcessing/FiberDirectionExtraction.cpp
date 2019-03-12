@@ -49,8 +49,8 @@ int main(int argc, char* argv[])
   parser.addArgument("only_mask_geometry", "", mitkCommandLineParser::Bool, "Only mask geometry:", "don't use content of mask image, only use it's geometry", false);
   parser.addArgument("verbose", "", mitkCommandLineParser::Bool, "Verbose:", "output optional and intermediate calculation results");
   parser.addArgument("numdirs", "", mitkCommandLineParser::Int, "Max. num. directions:", "maximum number of fibers per voxel", 3, true);
-  parser.addArgument("normalization", "", mitkCommandLineParser::Int, "Normalization method:", "1=global maximum, 2=single vector, 3=voxel-wise maximum", 1);
-  parser.addArgument("file_ending", "", mitkCommandLineParser::String, "Image type:", ".nrrd, .nii, .nii.gz (default)");
+  parser.addArgument("normalization", "", mitkCommandLineParser::Int, "Normalization method:", "1=global maximum; 2=single vector; 3=voxel-wise maximum", 1);
+  parser.addArgument("file_ending", "", mitkCommandLineParser::String, "Image type:", ".nrrd; .nii; .nii.gz", std::string(".nii.gz"));
 
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

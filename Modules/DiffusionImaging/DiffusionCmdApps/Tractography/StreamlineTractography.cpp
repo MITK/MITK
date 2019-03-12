@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
   parser.beginGroup("1. Mandatory arguments:");
   parser.addArgument("", "i", mitkCommandLineParser::StringList, "Input:", "input image (multiple possible for 'DetTensor' algorithm)", us::Any(), false, false, false, mitkCommandLineParser::Input);
   parser.addArgument("", "o", mitkCommandLineParser::String, "Output:", "output fiberbundle/probability map", us::Any(), false, false, false, mitkCommandLineParser::Output);
-  parser.addArgument("algorithm", "", mitkCommandLineParser::String, "Algorithm:", "which algorithm to use (Peaks, DetTensor, ProbTensor, DetODF, ProbODF, DetRF, ProbRF)", us::Any(), false);
+  parser.addArgument("algorithm", "", mitkCommandLineParser::String, "Algorithm:", "which algorithm to use (Peaks; DetTensor; ProbTensor; DetODF; ProbODF; DetRF; ProbRF)", us::Any(), false);
   parser.endGroup();
 
   parser.beginGroup("2. Seeding:");

@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
 
   parser.setArgumentPrefix("--", "-");
   parser.addArgument("", "i", mitkCommandLineParser::StringList, "Input:", "input tractograms (.fib/.trk/.tck/.dcm)", us::Any(), false, false, false, mitkCommandLineParser::Input);
-  parser.addArgument("", "o", mitkCommandLineParser::Directory, "Output Folder:", "move input tracts that do/don't overlap here", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output Folder:", "move input tracts that do/don't overlap here", us::Any(), false, false, false, mitkCommandLineParser::Output);
   parser.addArgument("reference", "", mitkCommandLineParser::StringList, "Reference:", "reference tractograms or mask images", us::Any(), false, false, false, mitkCommandLineParser::Input);
 
   parser.addArgument("overlap_fraction", "", mitkCommandLineParser::Float, "Overlap fraction:", "", 0.9);

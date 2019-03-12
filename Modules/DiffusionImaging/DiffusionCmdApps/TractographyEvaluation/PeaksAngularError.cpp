@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
   parser.setArgumentPrefix("--", "-");
   parser.addArgument("test", "", mitkCommandLineParser::StringList, "Test images", "test direction images", us::Any(), false, false, false, mitkCommandLineParser::Input);
   parser.addArgument("reference", "", mitkCommandLineParser::StringList, "Reference images", "reference direction images", us::Any(), false, false, false, mitkCommandLineParser::Input);
-  parser.addArgument("", "o", mitkCommandLineParser::Directory, "Output folder", "output folder", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output folder", "output folder", us::Any(), false, false, false, mitkCommandLineParser::Output);
   parser.addArgument("masks", "", mitkCommandLineParser::StringList, "Mask(s)", "mask image(s)", us::Any(), true, false, false, mitkCommandLineParser::Input);
   parser.addArgument("verbose", "", mitkCommandLineParser::Bool, "Verbose", "output error images");
   parser.addArgument("ignore_test", "", mitkCommandLineParser::Bool, "Ignore missing test", "don't increase error if no test directions are found");

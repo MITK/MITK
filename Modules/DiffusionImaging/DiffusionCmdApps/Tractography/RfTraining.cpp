@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
     parser.beginGroup("1. Mandatory arguments:");
     parser.addArgument("", "i", mitkCommandLineParser::StringList, "DWIs:", "input diffusion-weighted images", us::Any(), false, false, false, mitkCommandLineParser::Input);
     parser.addArgument("", "t", mitkCommandLineParser::StringList, "Tractograms:", "input training tractograms", us::Any(), false, false, false, mitkCommandLineParser::Input);
-    parser.addArgument("", "o", mitkCommandLineParser::File, "Forest:", "output random forest (HDF5)", us::Any(), false, false, false, mitkCommandLineParser::Output);
+    parser.addArgument("", "o", mitkCommandLineParser::String, "Forest:", "output random forest (HDF5)", us::Any(), false, false, false, mitkCommandLineParser::Output);
     parser.endGroup();
 
     parser.beginGroup("2. Additional input images:");

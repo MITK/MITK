@@ -97,9 +97,9 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("", "f", mitkCommandLineParser::File, "Fixed:", "fixed image", us::Any(), false, false, false, mitkCommandLineParser::Input);
-  parser.addArgument("", "m", mitkCommandLineParser::File, "Moving:", "moving image", us::Any(), false, false, false, mitkCommandLineParser::Input);
-  parser.addArgument("", "o", mitkCommandLineParser::File, "Output:", "output image", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("", "f", mitkCommandLineParser::String, "Fixed:", "fixed image", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("", "m", mitkCommandLineParser::String, "Moving:", "moving image", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output:", "output image", us::Any(), false, false, false, mitkCommandLineParser::Output);
   parser.addArgument("resample", "", mitkCommandLineParser::Bool, "Resample:", "resample moving image", false);
   parser.addArgument("coreg", "", mitkCommandLineParser::StringList, "", "additionally apply transform to these images", us::Any(), true, false, false, mitkCommandLineParser::Input);
 

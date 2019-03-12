@@ -32,9 +32,9 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("", "i", mitkCommandLineParser::File, "Input:", "input image", us::Any(), false, false, false, mitkCommandLineParser::Input);
-  parser.addArgument("", "o", mitkCommandLineParser::File, "Output:", "output image", us::Any(), false, false, false, mitkCommandLineParser::Output);
-  parser.addArgument("ref", "r", mitkCommandLineParser::File, "Reference:", "reference image", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("", "i", mitkCommandLineParser::String, "Input:", "input image", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output:", "output image", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("ref", "r", mitkCommandLineParser::String, "Reference:", "reference image", us::Any(), false, false, false, mitkCommandLineParser::Input);
   parser.addArgument("alignCentroid", "a", mitkCommandLineParser::Bool, "align centroids", "align centroids", us::Any(), true);
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

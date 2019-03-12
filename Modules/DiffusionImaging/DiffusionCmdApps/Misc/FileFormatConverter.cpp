@@ -34,8 +34,8 @@ int main(int argc, char* argv[])
     parser.setContributor("MIC");
 
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("", "i", mitkCommandLineParser::File, "Input:", "input file", us::Any(), false, false, false, mitkCommandLineParser::Input);
-    parser.addArgument("", "o", mitkCommandLineParser::File, "Output:", "output file", us::Any(), false, false, false, mitkCommandLineParser::Output);
+    parser.addArgument("", "i", mitkCommandLineParser::String, "Input:", "input file", us::Any(), false, false, false, mitkCommandLineParser::Input);
+    parser.addArgument("", "o", mitkCommandLineParser::String, "Output:", "output file", us::Any(), false, false, false, mitkCommandLineParser::Output);
 
     std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)

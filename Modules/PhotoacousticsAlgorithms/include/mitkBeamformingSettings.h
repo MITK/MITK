@@ -33,7 +33,6 @@ namespace mitk {
   {
   public:
     mitkClassMacroItkParent(BeamformingSettings, itk::Object);
-    mitkNewMacro1Param(BeamformingSettings, std::string);
     itkCloneMacro(Self);
 
     /** \brief Available delay calculation methods:
@@ -127,10 +126,6 @@ namespace mitk {
     }
 
   protected:
-
-    /**
-    */
-    BeamformingSettings(std::string xmlFile);
 
     /**
     */

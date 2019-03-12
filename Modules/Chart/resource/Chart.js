@@ -153,7 +153,7 @@ function generatePlotData(){
 
     let inputType = dataProperties[dataLabels[index]]["chartType"];
     let chartType = getPlotlyChartType(inputType);
-
+	
     let trace = {
       x: xValues[index].slice(1),
       y: yValues[index].slice(1),
@@ -181,9 +181,9 @@ function generatePlotData(){
 
     // ===================== CHART TYPE OPTIONS HANDLING ===========
     // initialize line object
-    trace["line"] = {}
+    trace["line"] = {};
 	
-	trace["line"]["color"] = dataProperties[dataLabels[index]]["color"]
+	trace["line"]["color"] = dataProperties[dataLabels[index]]["color"];
     if (chartType == "scatter"){  
     } else if (chartType == "area"){
       trace["fill"] = 'tozeroy'
@@ -196,8 +196,8 @@ function generatePlotData(){
       trace["line"]["shape"] = 'spline'
     }
 
-    // handle marker visibility/size
-    trace["marker"] = {size: chartData.m_DataPointSize}
+    // handle marker visibility/size/color
+    trace["marker"] = {size: chartData.m_DataPointSize, color: dataProperties[dataLabels[index]]["color"]}
     if (chartData.m_DataPointSize == 0){
       trace["mode"] = "lines";
     }

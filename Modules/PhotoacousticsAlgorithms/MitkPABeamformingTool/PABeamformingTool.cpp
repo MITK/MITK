@@ -45,6 +45,11 @@ struct CropSettings
   int zEnd;
 };
 
+struct ResampleSettings
+{
+  double spacing;
+};
+
 struct BModeSettings
 {
   mitk::PhotoacousticFilterService::BModeMethod method;
@@ -55,6 +60,7 @@ struct ProcessSettings
 {
   bool DoBeamforming;
   bool DoCropping;
+  bool DoResampling;
   bool DoBmode;
 };
 
@@ -120,7 +126,7 @@ InputParameters parseInput(int argc, char* argv[])
   return input;
 }
 
-void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSettings::Pointer *bfSet, CropSettings& cropSet, BModeSettings& bmodeSet, ProcessSettings& processSet)
+void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSettings::Pointer *bfSet, CropSettings& cropSet, ResampleSettings& resSet, BModeSettings& bmodeSet, ProcessSettings& processSet)
 {
   MITK_INFO << "Loading configuration File \"" << xmlFile << "\"";
   TiXmlDocument doc(xmlFile);
@@ -203,6 +209,11 @@ void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSetti
       cropSet.zEnd = std::stoi(elem->Attribute("cutSlices"));
       processSet.DoCropping = std::stoi(elem->Attribute("do"));
     }
+    if (elemName == "Resampling")
+    {
+      resSet.spacing = std::stod(elem->Attribute("spacing"));
+      processSet.DoResampling = std::stoi(elem->Attribute("do"));
+    }
     if (elemName == "BMode")
     {
       std::string methodStr = elem->Attribute("method");
@@ -225,12 +236,13 @@ int main(int argc, char * argv[])
   mitk::BeamformingSettings::Pointer bfSettings;
   BModeSettings bmodeSettings{ mitk::PhotoacousticFilterService::BModeMethod::EnvelopeDetection, false };
   CropSettings cropSettings{ 0,0,0,0,0,0 };
+  ResampleSettings resSettings{ 0.15 };
   ProcessSettings processSettings{ true, false, false };
 
   MITK_INFO << "Parsing settings XML...";
   try
   {
-    ParseXML(input.settingsFile, input, &bfSettings, cropSettings, bmodeSettings, processSettings);
+    ParseXML(input.settingsFile, input, &bfSettings, cropSettings, resSettings, bmodeSettings, processSettings);
   }
   catch (mitk::Exception e)
   {
@@ -250,16 +262,17 @@ int main(int argc, char * argv[])
     castFilter->SetInput(inputImage);
     castFilter->Update();
     inputImage = castFilter->GetOutput();
+    MITK_INFO << inputImage->GetPixelType().GetPixelTypeAsString();
     MITK_INFO(input.verbose) << "Casting input image to float...[Done]";
   }
 
   mitk::PhotoacousticFilterService::Pointer m_FilterService = mitk::PhotoacousticFilterService::New();
 
-  mitk::Image::Pointer output;
+  mitk::Image::Pointer output = inputImage;
   if (processSettings.DoBeamforming)
   {
     MITK_INFO(input.verbose) << "Beamforming input image...";
-    output = m_FilterService->ApplyBeamforming(inputImage, bfSettings);
+    output = m_FilterService->ApplyBeamforming(output, bfSettings);
     MITK_INFO(input.verbose) << "Beamforming input image...[Done]";
   }
   if (processSettings.DoCropping)
@@ -269,6 +282,13 @@ int main(int argc, char * argv[])
     output = m_FilterService->ApplyCropping(output, 
       cropSettings.above, cropSettings.below, cropSettings.right, cropSettings.left, cropSettings.zStart, cropSettings.zEnd, &err);
     MITK_INFO(input.verbose) << "Applying Crop filter to image...[Done]";
+  }
+  if (processSettings.DoResampling)
+  {
+    double spacing[3] = {output->GetGeometry()->GetSpacing()[0], resSettings.spacing, output->GetGeometry()->GetSpacing()[2]};
+    MITK_INFO(input.verbose) << "Applying Resample filter to image...";
+    output = m_FilterService->ApplyResampling(output, spacing);
+    MITK_INFO(input.verbose) << "Applying Resample filter to image...[Done]";
   }
   if (processSettings.DoBmode)
   {

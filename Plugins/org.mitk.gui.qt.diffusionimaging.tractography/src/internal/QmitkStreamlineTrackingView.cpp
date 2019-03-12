@@ -994,6 +994,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
   m_Tracker->SetAngularThreshold(m_Controls->m_AngularThresholdBox->value());
   m_Tracker->SetMinTractLength(m_Controls->m_MinTractLengthBox->value());
   m_Tracker->SetUseOutputProbabilityMap(m_Controls->m_OutputProbMap->isChecked());
+  m_Tracker->SetRandom(!m_Controls->m_FixSeedBox->isChecked());
 
   m_ParentNode = m_InputImageNodes.at(0);
   m_TrackingThread.start(QThread::LowestPriority);

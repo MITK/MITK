@@ -13,7 +13,7 @@ set(MOC_H_FILES
 )
 
 set(CACHED_RESOURCE_FILES
-  resources/ThreadIcon.png
+  resources/ThreadIcon.svg
   plugin.xml
 )
 

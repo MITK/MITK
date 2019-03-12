@@ -17,26 +17,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkIRESTManager_h
 #define mitkIRESTManager_h
 
-#include "cpprest/uri.h"
 #include "cpprest/json.h"
+#include "cpprest/uri.h"
 
 #include <MitkCoreExports.h>
 #include <mitkServiceInterface.h>
 
 #include <mitkIRESTObserver.h>
 
+
 namespace mitk
 {
+  class RESTServerMicroService;
   class IRESTManager
   {
-    
-
   public:
     virtual ~IRESTManager();
 
     /**
-    * @brief request type for client requests by calling SendRequest
-    */
+     * @brief request type for client requests by calling SendRequest
+     */
     enum RequestType
     {
       get,
@@ -81,6 +81,10 @@ namespace mitk
      * @param uri the uri for which the observer doesn't handle requests anymore (optional)
      */
     virtual void HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri = L"") = 0;
+
+    virtual std::map<int, RESTServerMicroService *> GetM_ServerMap() = 0;
+    virtual std::map<std::pair<int, utility::string_t>, IRESTObserver *> GetM_Observers() = 0;
+    
   };
 } // namespace mitk
 

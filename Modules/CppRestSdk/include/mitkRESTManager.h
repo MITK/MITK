@@ -75,6 +75,9 @@ namespace mitk
      */
     virtual void HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri) override;
 
+    virtual std::map<int, RESTServerMicroService *> GetM_ServerMap() override;
+    virtual std::map<std::pair<int, utility::string_t>, IRESTObserver *> GetM_Observers() override;
+
   private:
     std::map<int, RESTServerMicroService *> m_ServerMap;                     // Map with port server pairs
     std::map<int, QThread*> m_ServerThreadMap;                               // Map with threads for servers

@@ -13,7 +13,7 @@ set(MOC_H_FILES
 )
 
 set(CACHED_RESOURCE_FILES
-  resources/ClientIcon.png
+  resources/ClientIcon.svg
   plugin.xml
 )
 

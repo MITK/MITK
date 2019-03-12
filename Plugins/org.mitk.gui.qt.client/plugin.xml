@@ -5,6 +5,6 @@
           name="Client View"
           class="QmitkClientView"
           category="Examples"
-          icon="resources/ClientIcon.png" />
+          icon="resources/ClientIcon.svg" />
   </extension>
 </plugin>

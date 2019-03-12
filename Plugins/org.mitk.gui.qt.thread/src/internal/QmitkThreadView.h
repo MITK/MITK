@@ -42,7 +42,7 @@ public:
   ~QmitkThreadView() override;
 
   void CreateQtPartControl(QWidget *parent) override;
-  web::json::value Notify(web::json::value &data) override;
+  web::json::value Notify(web::json::value &data, const web::uri &uri) override;
 
 private slots:
   void OnStopAllButtonClicked();

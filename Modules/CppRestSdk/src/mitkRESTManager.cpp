@@ -1,6 +1,6 @@
 #include "mitkRESTManager.h"
 #include <mitkCommon.h>
-
+#include <QCoreApplication>
 mitk::RESTManager::RESTManager() {}
 
 mitk::RESTManager::~RESTManager() {}
@@ -78,15 +78,22 @@ void mitk::RESTManager::ReceiveRequest(const web::uri &uri, mitk::IRESTObserver 
     // add reference to server instance to map
     m_ServerMap[port] = server;
 
-    //Move server to seperate Thread and create connections between threads
-    m_ServerThreadMap[port] = new QThread();
-    server->moveToThread(m_ServerThreadMap[port]);
+    if (QCoreApplication::instance() != NULL)
+    {
+      // Move server to seperate Thread and create connections between threads
+      m_ServerThreadMap[port] = new QThread();
+      server->moveToThread(m_ServerThreadMap[port]);
 
-    connect(m_ServerThreadMap[port], &QThread::finished, server, &QObject::deleteLater);
+      connect(m_ServerThreadMap[port], &QThread::finished, server, &QObject::deleteLater);
 
-    //starting Server
-    m_ServerThreadMap[port]->start();
-    QMetaObject::invokeMethod(server, "OpenListener");
+      // starting Server
+      m_ServerThreadMap[port]->start();
+      QMetaObject::invokeMethod(server, "OpenListener");
+    }
+    else
+    {
+      server->OpenListener();
+    }
  
     utility::string_t host = uri.authority().to_string();
     std::string hoststring(host.begin(), host.end());
@@ -134,7 +141,7 @@ web::json::value mitk::RESTManager::Handle(const web::uri &uri, web::json::value
   if (m_Observers.count(key) != 0)
   {
     MITK_INFO << "Manager: Data send to observer";
-    return m_Observers[key]->Notify(body);
+    return m_Observers[key]->Notify(body,uri);
   }
   //No observer under this port, return null which results in status code 404 (s. RESTServerMicroService)
   else
@@ -181,10 +188,17 @@ void mitk::RESTManager::HandleDeleteObserver(IRESTObserver *observer, const web:
         {
           //  there isn't an observer at this port, delete m_ServerMap entry for this port
           // close listener
-          QMetaObject::invokeMethod(m_ServerMap[port], "CloseListener");
-          // end thread
-          m_ServerThreadMap[port]->quit();
-          m_ServerThreadMap[port]->wait();
+          if (QCoreApplication::instance() != NULL)
+          {
+            QMetaObject::invokeMethod(m_ServerMap[port], "CloseListener");
+            // end thread
+            m_ServerThreadMap[port]->quit();
+            m_ServerThreadMap[port]->wait();
+          }
+          else
+          {
+            m_ServerMap[port]->CloseListener();
+          }
           // delete server from map
           m_ServerMap.erase(port);
         }
@@ -199,5 +213,15 @@ void mitk::RESTManager::HandleDeleteObserver(IRESTObserver *observer, const web:
       ++it;
     }
   }
+}
+
+std::map<int, mitk::RESTServerMicroService *> mitk::RESTManager::GetM_ServerMap()
+{
+  return m_ServerMap;
+}
+
+std::map<std::pair<int, utility::string_t>, mitk::IRESTObserver *> mitk::RESTManager::GetM_Observers()
+{
+  return m_Observers;
 }
 

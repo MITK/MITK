@@ -5,6 +5,6 @@
           name="Thread View"
           class="QmitkThreadView"
           category="Examples"
-          icon="resources/ThreadIcon.png" />
+          icon="resources/ThreadIcon.svg" />
   </extension>
 </plugin>

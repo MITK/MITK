@@ -339,53 +339,39 @@ void QmitkImageStatisticsReloadedView::OnStatisticsCalculationEnds()
   if (this->m_CalculationThread->GetStatisticsUpdateSuccessFlag())
   {
     auto statistic = m_CalculationThread->GetStatisticsData();
+    auto image = m_CalculationThread->GetStatisticsImage();
+    mitk::BaseData::ConstPointer mask = nullptr;
     mitk::PropertyRelations::RuleResultVectorType rulesForCurrentStatistic;
     auto statisticNonConst = statistic->Clone();
     auto imageRule = mitk::StatisticsToImageRelationRule::New();
-    imageRule->Connect(statisticNonConst.GetPointer(), m_CalculationThread->GetStatisticsImage().GetPointer());
+    imageRule->Connect(statisticNonConst.GetPointer(), image);
     rulesForCurrentStatistic.push_back(imageRule.GetPointer());
 
     if (m_CalculationThread->GetMaskImage())
     {
       auto maskRule = mitk::StatisticsToMaskRelationRule::New();
-      maskRule->Connect(statisticNonConst.GetPointer(), m_CalculationThread->GetMaskImage().GetPointer());
+      mask = m_CalculationThread->GetMaskImage();
+      maskRule->Connect(statisticNonConst.GetPointer(), mask);
       rulesForCurrentStatistic.push_back(maskRule.GetPointer());
     }
     else if (m_CalculationThread->GetPlanarFigure())
     {
       auto planarFigureRule = mitk::StatisticsToMaskRelationRule::New();
-      planarFigureRule->Connect(statisticNonConst.GetPointer(), m_CalculationThread->GetPlanarFigure().GetPointer());
+      mask = m_CalculationThread->GetPlanarFigure();
+      planarFigureRule->Connect(statisticNonConst.GetPointer(), mask);
       rulesForCurrentStatistic.push_back(planarFigureRule.GetPointer());
     }
 
     m_statisticContainerRules.push_back(rulesForCurrentStatistic);
 
-    mitk::ImageStatisticsContainer::ConstPointer imageStatistics;
-    if (m_CalculationThread->GetMaskImage().GetPointer())
-    {
-      imageStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(
-        this->GetDataStorage(),
-        m_CalculationThread->GetStatisticsImage().GetPointer(),
-        m_CalculationThread->GetMaskImage().GetPointer());
-    }
-    else if (m_CalculationThread->GetPlanarFigure().GetPointer())
-    {
-      imageStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(
-        this->GetDataStorage(),
-        m_CalculationThread->GetStatisticsImage().GetPointer(),
-        m_CalculationThread->GetPlanarFigure().GetPointer());
-    }
-    else
-    {
-      imageStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(
-        this->GetDataStorage(), m_CalculationThread->GetStatisticsImage().GetPointer());
-    }
+    auto imageStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(
+      this->GetDataStorage(), image, mask);
 
     //if statistics base data already exist: add to existing node
     if (imageStatistics)
     {
-      auto avector = this->GetDataStorage()->GetAll()->CastToSTLConstContainer();
-      for (auto node : avector)
+      auto allDataNodes = this->GetDataStorage()->GetAll()->CastToSTLConstContainer();
+      for (auto node : allDataNodes)
       {
         auto nodeData = node->GetData();
         if (nodeData && nodeData->GetUID() ==imageStatistics->GetUID())
@@ -403,8 +389,7 @@ void QmitkImageStatisticsReloadedView::OnStatisticsCalculationEnds()
         statisticsNodeName += "_" + m_selectedMaskNode->GetName();
       }
       statisticsNodeName += "_statistics";
-      mitk::DataNode::Pointer statisticsNode;
-      statisticsNode = mitk::CreateImageStatisticsNode(statisticNonConst, statisticsNodeName);
+      auto statisticsNode = mitk::CreateImageStatisticsNode(statisticNonConst, statisticsNodeName);
       this->GetDataStorage()->Add(statisticsNode);
     }
 

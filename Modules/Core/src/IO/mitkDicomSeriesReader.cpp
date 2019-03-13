@@ -645,7 +645,7 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
 }
 
 DicomSeriesReader::FileNamesGrouping
-DicomSeriesReader::GetSeries(const StringContainer& files, bool)
+DicomSeriesReader::GetSeries(const StringContainer& files, bool, volatile bool* interrupt)
 {
   /**
     assumption about this method:
@@ -727,7 +727,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool)
   FileNamesGrouping result;
 
   // let GDCM scan files
-  if ( !scanner.Scan( files ) )
+  if ( !scanner.Scan( files, interrupt ) )
   {
     MITK_ERROR << "gdcm::Scanner failed when scanning " << files.size() << " input files.";
     return result;

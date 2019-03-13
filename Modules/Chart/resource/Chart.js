@@ -304,6 +304,14 @@ function generateChart(chartData)
   if (chartData.m_ShowSubchart){
     layout.xaxis.rangeslider = {}; // adds range slider below x axis
   }
+  /*
+  if (chartData.m_UseMinMaxValues){
+	layout ={
+		xaxis:{
+			range:[,]
+			}
+		};
+  }*/
 
   Plotly.newPlot('chart', data, layout, {displayModeBar: false, responsive: true});
 }

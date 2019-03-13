@@ -198,6 +198,7 @@ void mitk::RESTManager::HandleDeleteObserver(IRESTObserver *observer, const web:
           else
           {
             m_ServerMap[port]->CloseListener();
+            m_ServerMap[port]->~RESTServerMicroService();
           }
           // delete server from map
           m_ServerMap.erase(port);

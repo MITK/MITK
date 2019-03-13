@@ -200,7 +200,7 @@ namespace mitk
       m_StatisticContainers.emplace(labelNoMask, statisticContainerForImage);
     }
 
-    auto statObj = ImageStatisticsContainer::StatisticsObject();
+    auto statObj = ImageStatisticsContainer::ImageStatisticsObject();
 
     typename ImageStatisticsFilterType::Pointer statisticsFilter = ImageStatisticsFilterType::New();
     statisticsFilter->SetInput(image);
@@ -450,7 +450,7 @@ namespace mitk
         m_StatisticContainers.emplace(*it, statisticContainerForLabelImage);
       }
 
-      ImageStatisticsContainer::StatisticsObject statObj;
+      ImageStatisticsContainer::ImageStatisticsObject statObj;
 
       // find min, max, minindex and maxindex
       // make sure to only look in the masked region, use a masker for this

@@ -157,10 +157,10 @@ private:
                                                                                            mitk::MaskGenerator::Pointer secondardMaskGen=nullptr,
                                                                                            unsigned short label=1);
 
-  void VerifyStatistics(mitk::ImageStatisticsContainer::StatisticsObject stats,
+  void VerifyStatistics(mitk::ImageStatisticsContainer::ImageStatisticsObject stats,
                         double testMean, double testSD, double testMedian=0);
 
-  void VerifyStatistics(mitk::ImageStatisticsContainer::StatisticsObject stats,
+  void VerifyStatistics(mitk::ImageStatisticsContainer::ImageStatisticsObject stats,
                         unsigned long N,
                         double mean,
                         double MPP,
@@ -1729,7 +1729,7 @@ mitkImageStatisticsCalculatorTestSuite::ComputeStatisticsNew(mitk::Image::ConstP
     return imgStatCalc->GetStatistics(label);
 }
 
-void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatisticsContainer::StatisticsObject stats,
+void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatisticsContainer::ImageStatisticsObject stats,
                                                               double testMean, double testSD, double testMedian)
 {
   auto mean = stats.GetValueConverted<double>(mitk::ImageStatisticsConstants::MEAN());
@@ -1754,7 +1754,7 @@ void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatist
                        "' is equal to the desired value '" << testMedian << "'");
 }
 
-void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatisticsContainer::StatisticsObject stats,
+void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatisticsContainer::ImageStatisticsObject stats,
                                                               unsigned long N,
                                                               double mean,
                                                               double MPP,

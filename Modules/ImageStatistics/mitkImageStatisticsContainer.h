@@ -62,9 +62,9 @@ namespace mitk
     @details The statistics are stored in a map <name,value> with value as boost::variant<RealType, VoxelCountType, IndexType >.
     The type used to create the boost::variant is important as only this type can be recovered lateron.
     */
-    class MITKIMAGESTATISTICS_EXPORT StatisticsObject {
+    class MITKIMAGESTATISTICS_EXPORT ImageStatisticsObject {
     public:
-      StatisticsObject();
+      ImageStatisticsObject();
       /**
       @brief Adds a statistic to the statistics object
       @details if already a statistic with that name is included, it is overwritten
@@ -121,7 +121,7 @@ namespace mitk
       static const StatisticNameVector m_DefaultNames;
     };
 
-    using TimeStepMapType = std::map<TimeStepType, StatisticsObject>;
+    using TimeStepMapType = std::map<TimeStepType, ImageStatisticsObject>;
 
     unsigned int GetNumberOfTimeSteps() const;
 
@@ -133,13 +133,13 @@ namespace mitk
     @brief Returns the statisticObject for the given Timestep
     @pre timeStep must be valid
     */
-    const StatisticsObject& GetStatisticsForTimeStep(TimeStepType timeStep) const;
+    const ImageStatisticsObject& GetStatisticsForTimeStep(TimeStepType timeStep) const;
 
     /**
     @brief Sets the statisticObject for the given Timestep
     @pre timeStep must be valid
     */
-    void SetStatisticsForTimeStep(TimeStepType timeStep, StatisticsObject statistics);
+    void SetStatisticsForTimeStep(TimeStepType timeStep, ImageStatisticsObject statistics);
 
     /**
     @brief Checks if the Time step exists
@@ -159,8 +159,8 @@ namespace mitk
     TimeStepMapType m_TimeStepMap;
   };
 
-  MITKIMAGESTATISTICS_EXPORT ImageStatisticsContainer::StatisticsObject::StatisticNameVector GetAllStatisticNames(const ImageStatisticsContainer* container);
-  MITKIMAGESTATISTICS_EXPORT ImageStatisticsContainer::StatisticsObject::StatisticNameVector GetAllStatisticNames(std::vector<ImageStatisticsContainer::ConstPointer> containers);
+  MITKIMAGESTATISTICS_EXPORT ImageStatisticsContainer::ImageStatisticsObject::StatisticNameVector GetAllStatisticNames(const ImageStatisticsContainer* container);
+  MITKIMAGESTATISTICS_EXPORT ImageStatisticsContainer::ImageStatisticsObject::StatisticNameVector GetAllStatisticNames(std::vector<ImageStatisticsContainer::ConstPointer> containers);
 
 }
 #endif // MITKIMAGESTATISTICSCONTAINER

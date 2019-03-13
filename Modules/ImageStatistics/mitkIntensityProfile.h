@@ -106,7 +106,7 @@ namespace mitk
     * \param[in] stats An ImageStatisticsCalculator::Statistics object to hold the calculated statistics.
     *
     */
-  MITKIMAGESTATISTICS_EXPORT void ComputeIntensityProfileStatistics(IntensityProfile::ConstPointer intensityProfile, ImageStatisticsContainer::StatisticsObject& stats);
+  MITKIMAGESTATISTICS_EXPORT void ComputeIntensityProfileStatistics(IntensityProfile::ConstPointer intensityProfile, ImageStatisticsContainer::ImageStatisticsObject& stats);
 
   /** \brief Compute center of maximum area under the curve of an intensity profile.
     *

@@ -341,28 +341,22 @@ void QmitkImageStatisticsReloadedView::OnStatisticsCalculationEnds()
     auto statistic = m_CalculationThread->GetStatisticsData();
     auto image = m_CalculationThread->GetStatisticsImage();
     mitk::BaseData::ConstPointer mask = nullptr;
-    mitk::PropertyRelations::RuleResultVectorType rulesForCurrentStatistic;
     auto statisticNonConst = statistic->Clone();
     auto imageRule = mitk::StatisticsToImageRelationRule::New();
     imageRule->Connect(statisticNonConst.GetPointer(), image);
-    rulesForCurrentStatistic.push_back(imageRule.GetPointer());
 
     if (m_CalculationThread->GetMaskImage())
     {
       auto maskRule = mitk::StatisticsToMaskRelationRule::New();
       mask = m_CalculationThread->GetMaskImage();
       maskRule->Connect(statisticNonConst.GetPointer(), mask);
-      rulesForCurrentStatistic.push_back(maskRule.GetPointer());
     }
     else if (m_CalculationThread->GetPlanarFigure())
     {
       auto planarFigureRule = mitk::StatisticsToMaskRelationRule::New();
       mask = m_CalculationThread->GetPlanarFigure();
       planarFigureRule->Connect(statisticNonConst.GetPointer(), mask);
-      rulesForCurrentStatistic.push_back(planarFigureRule.GetPointer());
     }
-
-    m_statisticContainerRules.push_back(rulesForCurrentStatistic);
 
     auto imageStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(
       this->GetDataStorage(), image, mask);

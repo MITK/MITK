@@ -104,7 +104,6 @@ private:
   bool m_StatisticsUpdatePending=false;
   mitk::DataNode::ConstPointer m_selectedImageNode = nullptr, m_selectedMaskNode = nullptr;
 
-  std::vector<mitk::PropertyRelations::RuleResultVectorType> m_statisticContainerRules;
   mitk::PlanarFigure::Pointer m_selectedPlanarFigure=nullptr;
   long m_PlanarFigureObserverTag;
   bool m_ForceRecompute = false;

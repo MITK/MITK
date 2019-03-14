@@ -75,14 +75,25 @@ namespace mitk
 
   IFileIO::ConfidenceLevel DICOMPMIO::GetWriterConfidenceLevel() const
   {
-    if (AbstractFileIO::GetWriterConfidenceLevel() == Unsupported)
-      return Unsupported;
+  if (AbstractFileIO::GetWriterConfidenceLevel() == Unsupported)
+    return Unsupported;
 	
-	const Image *PMinput = static_cast<const Image *>(this->GetInput());
-	if (PMinput)
-		return Supported;
-	else
-		return Unsupported;
+  const Image *PMinput = static_cast<const Image *>(this->GetInput());
+  if (PMinput)
+  {
+    auto modalityProperty = PMinput->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0060).c_str());
+    if (modalityProperty.IsNotNull())
+    {
+      std::string modality = modalityProperty->GetValueAsString();
+      if (modality == "PM")
+      {
+        return Supported;
+      }
+      else return Unsupported;
+    }
+    else return Unsupported;
+  }
+  else return Unsupported;
   }
 
   void DICOMPMIO::Write()
@@ -210,15 +221,14 @@ namespace mitk
   }
 
 
-  // IKO: not yet implemented, TO DO: write DICOMPMReader
   std::vector<BaseData::Pointer> DICOMPMIO::Read()
   {
 	  mitk::LocaleSwitch localeSwitch("C");
 	  std::vector<BaseData::Pointer> result;
+
 	  return result;
   }
 
-  // IKO: not yet implemented TO DO: write DICOMPMReaderConfidenceLevel
   IFileIO::ConfidenceLevel DICOMPMIO::GetReaderConfidenceLevel() const
   {
 	  return Unsupported;

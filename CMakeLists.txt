@@ -310,7 +310,38 @@ mitkFunctionFindWhitelists(MITK)
 # Custom dependency logic
 
 option(MITK_USE_SYSTEM_Boost "Use the system Boost" OFF)
+
 set(MITK_USE_Boost_LIBRARIES "" CACHE STRING "A semi-colon separated list of required Boost libraries")
+
+if(MITK_USE_cpprestsdk)
+  find_package(OpenSSL QUIET)
+  if(NOT OpenSSL_FOUND)
+    set(openssl_message "Could not find OpenSSL (dependency of C++ REST SDK).\n")
+    if(UNIX)
+      if(APPLE)
+        set(openssl_message "${openssl_message}Please install it using your favorite package management "
+                            "system (i.e. Homebrew or MacPorts).\n")
+      else()
+        set(openssl_message "${openssl_message}Please install the dev package of OpenSSL (i.e. libssl-dev).\n")
+      endif()
+    else()
+      set(openssl_message "${openssl_message}Please install Win32 OpenSSL:\n"
+                          "  https://slproweb.com/products/Win32OpenSSL.html\n")
+    endif()
+    set(openssl_message "${openssl_message}If it still cannot be found, you can hint CMake to find OpenSSL by "
+                        "adding/setting the OPENSSL_ROOT_DIR variable to the root directory of an "
+                        "OpenSSL installation. Make sure to clear variables of partly found "
+                        "versions of OpenSSL before, or they will be mixed up.")
+    message(FATAL_ERROR ${openssl_message})
+  endif()
+
+  list(APPEND MITK_USE_Boost_LIBRARIES date_time regex system)
+  if(UNIX)
+    list(APPEND MITK_USE_Boost_LIBRARIES atomic chrono filesystem random thread)
+  endif()
+  list(REMOVE_DUPLICATES MITK_USE_Boost_LIBRARIES)
+  set(MITK_USE_Boost_LIBRARIES ${MITK_USE_Boost_LIBRARIES} CACHE STRING "A semi-colon separated list of required Boost libraries" FORCE)
+endif()
 
 if(MITK_USE_Python)
   set(MITK_USE_ZLIB ON)

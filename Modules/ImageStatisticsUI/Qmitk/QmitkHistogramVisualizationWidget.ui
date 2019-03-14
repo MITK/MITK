@@ -38,9 +38,9 @@
       </size>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
-     <widget class="QWidget" name="tabWidgetPlotPage1" native="true">
+     <widget class="QWidget" name="tabWidgetPlotPage1">
       <attribute name="title">
        <string>Default</string>
       </attribute>
@@ -154,9 +154,6 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="0">
-           <widget class="QSpinBox" name="spinBoxMaxValue"/>
-          </item>
           <item row="4" column="1">
            <widget class="QLabel" name="labelMaxValue">
             <property name="text">
@@ -165,7 +162,10 @@
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QSpinBox" name="spinBoxMinValue"/>
+           <widget class="QDoubleSpinBox" name="doubleSpinBoxMinValue"/>
+          </item>
+          <item row="4" column="0">
+           <widget class="QDoubleSpinBox" name="doubleSpinBoxMaxValue"/>
           </item>
          </layout>
         </widget>

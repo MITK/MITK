@@ -304,14 +304,6 @@ function generateChart(chartData)
   if (chartData.m_ShowSubchart){
     layout.xaxis.rangeslider = {}; // adds range slider below x axis
   }
-  /*
-  if (chartData.m_UseMinMaxValues){
-	layout ={
-		xaxis:{
-			range:[,]
-			}
-		};
-  }*/
 
   Plotly.newPlot('chart', data, layout, {displayModeBar: false, responsive: true});
 }
@@ -368,6 +360,18 @@ function SetShowErrorBars(showErrorBars)
 {
   chartData.m_ShowErrorBars = showErrorBars;
 }
+
+function UpdateMinMaxValue(minValue, maxValue)
+{
+  let chart = document.getElementById("chart");
+  let update = {
+	  xaxis:{
+		  range:[minValue, maxValue]
+		  }
+	  };
+  Plotly.relayout(chart, update);
+}
+
 /**
  * Transforms the view to another chart type.
  *

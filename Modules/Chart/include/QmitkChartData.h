@@ -40,7 +40,6 @@ class QmitkChartData : public QObject
   Q_PROPERTY(QVariant m_UsePercentageInPieChart READ GetUsePercentageInPieChart WRITE SetUsePercentageInPieChart NOTIFY SignalUsePercentageInPieChartChanged);
   Q_PROPERTY(QVariant m_DataPointSize READ GetDataPointSize WRITE SetDataPointSize NOTIFY SignalDataPointSizeChanged);
   Q_PROPERTY(QVariant m_StackedData READ GetStackedData WRITE SetStackedData NOTIFY SignalStackedDataChanged);
-  Q_PROPERTY(QVariant m_UseMinMaxValues READ GetUseMinMaxValues WRITE UseMinMaxValues MOTIFY SignalUseMinMaxValues);
 public:
   QmitkChartData();
 
@@ -90,8 +89,6 @@ public:
   Q_INVOKABLE QVariant GetStackedData() const { return m_StackedData; };
   Q_INVOKABLE void SetStackedData(const QVariant& stackedData) { m_StackedData = stackedData; emit SignalStackedDataChanged(m_StackedData); };
 
-  Q_INVOKABLE QVariant GetUseMinMaxValues() const { return m_UseMinMaxValues; };
-  Q_INVOKABLE void SetUseMinMaxValues(const QVariant& useMinMaxValues) { m_UseMinMaxValues = useMinMaxValues; emit SignalUseMinMaxValues(useMinMaxValues); };
 signals:
   void SignalYAxisLabelChanged(const QVariant label);
   void SignalXAxisLabelChanged(const QVariant label);
@@ -105,7 +102,6 @@ signals:
   void SignalUsePercentageInPieChartChanged(const QVariant usePercentageInPieChart);
   void SignalDataPointSizeChanged(const QVariant showDataPoints);
   void SignalStackedDataChanged(const QVariant stackedData);
-  void SignalUseMinMaxValues(const QVariant useMinMaxValues);
 
 private:
   QVariant m_xAxisLabel;
@@ -122,7 +118,6 @@ private:
   QVariant m_numberDatasets;
   QVariant m_DataPointSize = 0;
   QVariant m_StackedData;
-  QVariant m_UseMinMaxValues;
 };
 
 #endif  //QmitkC3Data_h

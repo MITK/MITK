@@ -26,7 +26,6 @@ QmitkImageStatisticsCalculationJob::QmitkImageStatisticsCalculationJob()
   , m_StatisticsImage(nullptr)
   , m_BinaryMask(nullptr)
   , m_PlanarFigureMask(nullptr)
-  , m_TimeStep(0)
   , m_IgnoreZeros(false)
   , m_HistogramNBins(100)
   , m_StatisticChanged(false)
@@ -55,16 +54,6 @@ void QmitkImageStatisticsCalculationJob::Initialize( mitk::Image::ConstPointer i
     this->m_BinaryMask = binaryImage;
   if(planarFig.IsNotNull())
     this->m_PlanarFigureMask = planarFig;
-}
-
-void QmitkImageStatisticsCalculationJob::SetTimeStep( int times )
-{
-  this->m_TimeStep = times;
-}
-
-int QmitkImageStatisticsCalculationJob::GetTimeStep() const
-{
-  return this->m_TimeStep;
 }
 
 mitk::ImageStatisticsContainer::ConstPointer QmitkImageStatisticsCalculationJob::GetStatisticsData() const

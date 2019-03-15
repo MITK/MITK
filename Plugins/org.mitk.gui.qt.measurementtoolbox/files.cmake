@@ -5,19 +5,16 @@ set(SRC_CPP_FILES
 set(INTERNAL_CPP_FILES
   QmitkMeasurementView.cpp
   QmitkImageStatisticsView.cpp
-  QmitkImageStatisticsReloadedView.cpp
   mitkPluginActivator.cpp
 )
 
 set(UI_FILES
-  src/internal/QmitkImageStatisticsReloadedViewControls.ui
   src/internal/QmitkImageStatisticsViewControls.ui
 )
 
 set(MOC_H_FILES
   src/internal/QmitkMeasurementView.h
   src/internal/QmitkImageStatisticsView.h
-  src/internal/QmitkImageStatisticsReloadedView.h
   src/internal/mitkPluginActivator.h
 )
 

@@ -14,10 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QmitkImageStatisticsReloadedView_H__INCLUDED
-#define QmitkImageStatisticsReloadedView_H__INCLUDED
+#ifndef QmitkImageStatisticsView_H__INCLUDED
+#define QmitkImageStatisticsView_H__INCLUDED
 
-#include "ui_QmitkImageStatisticsReloadedViewControls.h"
+#include "ui_QmitkImageStatisticsViewControls.h"
 
 // Qmitk includes
 #include <QmitkAbstractView.h>
@@ -36,7 +36,7 @@ gui accessible during calculation.
 
 \ingroup Plugins/org.mitk.gui.qt.measurementtoolbox
 */
-class QmitkImageStatisticsReloadedView : public QmitkAbstractView, public mitk::ILifecycleAwarePart, public berry::IPartListener
+class QmitkImageStatisticsView : public QmitkAbstractView, public mitk::ILifecycleAwarePart, public berry::IPartListener
 {
   Q_OBJECT
 
@@ -45,10 +45,10 @@ public:
 
   /*!
   \brief default constructor */
-  QmitkImageStatisticsReloadedView(QObject *parent = nullptr, const char *name = nullptr);
+  QmitkImageStatisticsView(QObject *parent = nullptr, const char *name = nullptr);
   /*!
   \brief default destructor */
-  virtual ~QmitkImageStatisticsReloadedView();
+  virtual ~QmitkImageStatisticsView();
   /*!
   \brief method for creating the widget containing the application   controls, like sliders, buttons etc. */
   virtual void CreateQtPartControl(QWidget *parent) override;
@@ -97,10 +97,10 @@ protected:
   void CalculateStatistics(mitk::Image::ConstPointer image, mitk::Image::ConstPointer mask=nullptr, mitk::PlanarFigure::ConstPointer maskPlanarFigure = nullptr);
   
   // member variables
-  Ui::QmitkImageStatisticsReloadedViewControls m_Controls;
+  Ui::QmitkImageStatisticsViewControls m_Controls;
 
 private:
-  typedef itk::SimpleMemberCommand< QmitkImageStatisticsReloadedView > ITKCommandType;
+  typedef itk::SimpleMemberCommand< QmitkImageStatisticsView > ITKCommandType;
   QmitkImageStatisticsCalculationJob * m_CalculationThread = nullptr;
   bool m_StatisticsUpdatePending=false;
   mitk::DataNode::ConstPointer m_selectedImageNode = nullptr, m_selectedMaskNode = nullptr;

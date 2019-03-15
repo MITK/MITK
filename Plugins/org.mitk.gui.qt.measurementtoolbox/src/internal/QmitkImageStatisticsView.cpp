@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkImageStatisticsReloadedView.h"
+#include "QmitkImageStatisticsView.h"
 
 #include <utility>
 
@@ -37,20 +37,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageStatisticsContainerManager.h"
 #include <mitkPlanarFigureInteractor.h>
 
-const std::string QmitkImageStatisticsReloadedView::VIEW_ID = "org.mitk.views.imagestatisticsReloaded";
+const std::string QmitkImageStatisticsView::VIEW_ID = "org.mitk.views.imagestatistics";
 
-QmitkImageStatisticsReloadedView::QmitkImageStatisticsReloadedView(QObject * /*parent*/, const char * /*name*/)
+QmitkImageStatisticsView::QmitkImageStatisticsView(QObject * /*parent*/, const char * /*name*/)
 {
   this->m_CalculationThread = new QmitkImageStatisticsCalculationJob();
 }
 
-QmitkImageStatisticsReloadedView::~QmitkImageStatisticsReloadedView()
+QmitkImageStatisticsView::~QmitkImageStatisticsView()
 {
   if (m_selectedPlanarFigure)
     m_selectedPlanarFigure->RemoveObserver(m_PlanarFigureObserverTag);
 }
 
-void QmitkImageStatisticsReloadedView::CreateQtPartControl(QWidget *parent)
+void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
 {
   m_Controls.setupUi(parent);
   m_Controls.widget_histogram->SetTheme(this->GetColorTheme());
@@ -68,32 +68,32 @@ void QmitkImageStatisticsReloadedView::CreateQtPartControl(QWidget *parent)
   CreateConnections();
 }
 
-void QmitkImageStatisticsReloadedView::CreateConnections()
+void QmitkImageStatisticsView::CreateConnections()
 {
   connect(this->m_CalculationThread,
           &QmitkImageStatisticsCalculationJob::finished,
           this,
-          &QmitkImageStatisticsReloadedView::OnStatisticsCalculationEnds,
+          &QmitkImageStatisticsView::OnStatisticsCalculationEnds,
           Qt::QueuedConnection);
   connect(this->m_Controls.checkBox_ignoreZero,
           &QCheckBox::stateChanged,
           this,
-          &QmitkImageStatisticsReloadedView::OnCheckBoxIgnoreZeroStateChanged);
+          &QmitkImageStatisticsView::OnCheckBoxIgnoreZeroStateChanged);
   connect(this->m_Controls.sliderWidget_histogram,
           &ctkSliderWidget::valueChanged,
           this,
-          &QmitkImageStatisticsReloadedView::OnSliderWidgetHistogramChanged);
+          &QmitkImageStatisticsView::OnSliderWidgetHistogramChanged);
   connect(this->m_Controls.imageSelector,
           static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
           this,
-          &QmitkImageStatisticsReloadedView::OnImageSelectorChanged);
+          &QmitkImageStatisticsView::OnImageSelectorChanged);
   connect(this->m_Controls.maskImageSelector,
           static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
           this,
-          &QmitkImageStatisticsReloadedView::OnMaskSelectorChanged);
+          &QmitkImageStatisticsView::OnMaskSelectorChanged);
 }
 
-void QmitkImageStatisticsReloadedView::OnCheckBoxIgnoreZeroStateChanged(int state)
+void QmitkImageStatisticsView::OnCheckBoxIgnoreZeroStateChanged(int state)
 {
   m_ForceRecompute = true;
   if (state != Qt::Unchecked)
@@ -107,7 +107,7 @@ void QmitkImageStatisticsReloadedView::OnCheckBoxIgnoreZeroStateChanged(int stat
   CalculateOrGetStatistics();
 }
 
-void QmitkImageStatisticsReloadedView::OnSliderWidgetHistogramChanged(double value)
+void QmitkImageStatisticsView::OnSliderWidgetHistogramChanged(double value)
 {
   unsigned int timeStep = static_cast<unsigned int>(value);
   auto mask = m_selectedMaskNode ? m_selectedMaskNode->GetData() : nullptr;
@@ -121,9 +121,9 @@ void QmitkImageStatisticsReloadedView::OnSliderWidgetHistogramChanged(double val
   }
 }
 
-void QmitkImageStatisticsReloadedView::PartClosed(const berry::IWorkbenchPartReference::Pointer &) {}
+void QmitkImageStatisticsView::PartClosed(const berry::IWorkbenchPartReference::Pointer &) {}
 
-void QmitkImageStatisticsReloadedView::FillHistogramWidget(const std::vector<HistogramType::ConstPointer> &histogram,
+void QmitkImageStatisticsView::FillHistogramWidget(const std::vector<HistogramType::ConstPointer> &histogram,
                                                            const std::vector<std::string> &dataLabels)
 {
   m_Controls.groupBox_histogram->setVisible(true);
@@ -133,10 +133,10 @@ void QmitkImageStatisticsReloadedView::FillHistogramWidget(const std::vector<His
   connect(m_Controls.widget_histogram,
           &QmitkHistogramVisualizationWidget::RequestHistogramUpdate,
           this,
-          &QmitkImageStatisticsReloadedView::OnRequestHistogramUpdate);
+          &QmitkImageStatisticsView::OnRequestHistogramUpdate);
 }
 
-QmitkChartWidget::ColorTheme QmitkImageStatisticsReloadedView::GetColorTheme() const
+QmitkChartWidget::ColorTheme QmitkImageStatisticsView::GetColorTheme() const
 {
   ctkPluginContext *context = berry::WorkbenchPlugin::GetDefault()->GetPluginContext();
   ctkServiceReference styleManagerRef = context->getServiceReference<berry::IQtStyleManager>();
@@ -155,7 +155,7 @@ QmitkChartWidget::ColorTheme QmitkImageStatisticsReloadedView::GetColorTheme() c
   return QmitkChartWidget::ColorTheme::darkstyle;
 }
 
-void QmitkImageStatisticsReloadedView::OnImageSelectorChanged()
+void QmitkImageStatisticsView::OnImageSelectorChanged()
 {
   auto selectedImageNode = m_Controls.imageSelector->GetSelectedNode();
   if (selectedImageNode != m_selectedImageNode)
@@ -185,7 +185,7 @@ void QmitkImageStatisticsReloadedView::OnImageSelectorChanged()
       connect(this->m_Controls.maskImageSelector,
               static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
               this,
-              &QmitkImageStatisticsReloadedView::OnMaskSelectorChanged);
+              &QmitkImageStatisticsView::OnMaskSelectorChanged);
     }
     else
     {
@@ -198,7 +198,7 @@ void QmitkImageStatisticsReloadedView::OnImageSelectorChanged()
   }
 }
 
-void QmitkImageStatisticsReloadedView::OnMaskSelectorChanged()
+void QmitkImageStatisticsView::OnMaskSelectorChanged()
 {
   auto selectedMaskNode = m_Controls.maskImageSelector->GetSelectedNode();
   if (selectedMaskNode != m_selectedMaskNode)
@@ -216,7 +216,7 @@ void QmitkImageStatisticsReloadedView::OnMaskSelectorChanged()
   }
 }
 
-void QmitkImageStatisticsReloadedView::CalculateOrGetStatistics()
+void QmitkImageStatisticsView::CalculateOrGetStatistics()
 {
   if (this->m_selectedPlanarFigure)
   {
@@ -263,7 +263,7 @@ void QmitkImageStatisticsReloadedView::CalculateOrGetStatistics()
     {
       m_selectedPlanarFigure = maskPlanarFigure;
       ITKCommandType::Pointer changeListener = ITKCommandType::New();
-      changeListener->SetCallbackFunction(this, &QmitkImageStatisticsReloadedView::CalculateOrGetStatistics);
+      changeListener->SetCallbackFunction(this, &QmitkImageStatisticsView::CalculateOrGetStatistics);
       this->m_PlanarFigureObserverTag =
         m_selectedPlanarFigure->AddObserver(mitk::EndInteractionPlanarFigureEvent(), changeListener);
       if (!maskPlanarFigure->IsClosed())
@@ -324,7 +324,7 @@ void QmitkImageStatisticsReloadedView::CalculateOrGetStatistics()
   m_ForceRecompute = false;
 }
 
-void QmitkImageStatisticsReloadedView::ComputeAndDisplayIntensityProfile(mitk::Image *image,
+void QmitkImageStatisticsView::ComputeAndDisplayIntensityProfile(mitk::Image *image,
                                                                          mitk::PlanarFigure::Pointer maskPlanarFigure)
 {
   auto intensityProfile = mitk::ComputeIntensityProfile(image, maskPlanarFigure);
@@ -336,7 +336,7 @@ void QmitkImageStatisticsReloadedView::ComputeAndDisplayIntensityProfile(mitk::I
                                                           "Intensity Profile of " + m_selectedImageNode->GetName());
 }
 
-void QmitkImageStatisticsReloadedView::ResetGUI()
+void QmitkImageStatisticsView::ResetGUI()
 {
   m_Controls.widget_statistics->Reset();
   m_Controls.widget_statistics->setEnabled(false);  m_Controls.widget_histogram->Reset();
@@ -344,14 +344,14 @@ void QmitkImageStatisticsReloadedView::ResetGUI()
   m_Controls.checkBox_ignoreZero->setEnabled(false);
 }
 
-void QmitkImageStatisticsReloadedView::ResetGUIDefault()
+void QmitkImageStatisticsView::ResetGUIDefault()
 {
   MITK_INFO << "reset GUI";
   m_Controls.widget_histogram->ResetDefault();
   m_Controls.checkBox_ignoreZero->setChecked(false);
 }
 
-void QmitkImageStatisticsReloadedView::OnStatisticsCalculationEnds()
+void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
 {
   mitk::StatusBar::GetInstance()->Clear();
 
@@ -419,13 +419,13 @@ void QmitkImageStatisticsReloadedView::OnStatisticsCalculationEnds()
   m_Controls.label_currentlyComputingStatistics->setVisible(false);
 }
 
-void QmitkImageStatisticsReloadedView::OnRequestHistogramUpdate(unsigned int nBins)
+void QmitkImageStatisticsView::OnRequestHistogramUpdate(unsigned int nBins)
 {
   m_CalculationThread->SetHistogramNBins(nBins);
   m_CalculationThread->start();
 }
 
-void QmitkImageStatisticsReloadedView::CalculateStatistics(mitk::Image::ConstPointer image,
+void QmitkImageStatisticsView::CalculateStatistics(mitk::Image::ConstPointer image,
                                                            mitk::Image::ConstPointer mask,
                                                            mitk::PlanarFigure::ConstPointer maskPlanarFigure)
 {
@@ -461,14 +461,14 @@ void QmitkImageStatisticsReloadedView::CalculateStatistics(mitk::Image::ConstPoi
   }
 }
 
-void QmitkImageStatisticsReloadedView::OnSelectionChanged(berry::IWorkbenchPart::Pointer part,
+void QmitkImageStatisticsView::OnSelectionChanged(berry::IWorkbenchPart::Pointer part,
                                                           const QList<mitk::DataNode::Pointer> &nodes)
 {
   Q_UNUSED(part);
   Q_UNUSED(nodes);
 }
 
-void QmitkImageStatisticsReloadedView::PrepareDataStorageComboBoxes()
+void QmitkImageStatisticsView::PrepareDataStorageComboBoxes()
 {
   auto isPlanarFigurePredicate = mitk::GetImageStatisticsPlanarFigurePredicate();
   auto isMaskPredicate = mitk::GetImageStatisticsMaskPredicate();
@@ -484,28 +484,28 @@ void QmitkImageStatisticsReloadedView::PrepareDataStorageComboBoxes()
   m_Controls.maskImageSelector->SetZeroEntryText("<none>");
 }
 
-void QmitkImageStatisticsReloadedView::Activated() {}
+void QmitkImageStatisticsView::Activated() {}
 
-void QmitkImageStatisticsReloadedView::Deactivated() {}
+void QmitkImageStatisticsView::Deactivated() {}
 
-void QmitkImageStatisticsReloadedView::Visible()
+void QmitkImageStatisticsView::Visible()
 {
   connect(this->m_Controls.imageSelector,
           static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
           this,
-          &QmitkImageStatisticsReloadedView::OnImageSelectorChanged);
+          &QmitkImageStatisticsView::OnImageSelectorChanged);
   connect(this->m_Controls.maskImageSelector,
           static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
           this,
-          &QmitkImageStatisticsReloadedView::OnMaskSelectorChanged);
+          &QmitkImageStatisticsView::OnMaskSelectorChanged);
   OnImageSelectorChanged();
   OnMaskSelectorChanged();
 }
 
-void QmitkImageStatisticsReloadedView::Hidden()
+void QmitkImageStatisticsView::Hidden()
 {
   m_Controls.imageSelector->disconnect();
   m_Controls.maskImageSelector->disconnect();
 }
 
-void QmitkImageStatisticsReloadedView::SetFocus() {}
+void QmitkImageStatisticsView::SetFocus() {}

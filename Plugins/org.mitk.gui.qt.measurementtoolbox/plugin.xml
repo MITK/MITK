@@ -12,17 +12,6 @@
       <keywordReference id="org.mitk.views.measurement.Keyword"/>
     </view>
   </extension>
-
-  <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.views.imagestatistics"
-          name="Statistics deprecated"
-          category="Quantification"
-          class="QmitkImageStatisticsView"
-          icon="resources/bar-chart.svg" >
-      <description>DEPRECATED: Calculate the statistic of image regions</description>
-      <keywordReference id="org.mitk.views.imagestatistics.Keyword"/>
-    </view>
-  </extension>
   
     <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.imagestatisticsReloaded"

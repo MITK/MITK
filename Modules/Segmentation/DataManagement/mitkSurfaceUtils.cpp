@@ -11,11 +11,6 @@
 namespace mitk
 {
 
-float SurfaceCreator::m_AgtkProgressWeight = 1.f;
-float SurfaceCreator::m_AgtkLastProgress = 0;
-int SurfaceCreator::m_AgtkProgressSteps = 0;
-int SurfaceCreator::m_AgtkProgressLastStep = 0;
-
 SurfaceCreator::SurfaceCreationTypeProperty::SurfaceCreationTypeProperty()
 {
   AddSurfaceCreationTypes();
@@ -64,48 +59,103 @@ itk::LightObject::Pointer SurfaceCreator::SurfaceCreationTypeProperty::InternalC
   return result;
 }
 
-DataNode::Pointer SurfaceCreator::createModel(DataNode::Pointer segNode, SurfaceCreationArgs args)
+DataNode::Pointer SurfaceCreator::createModel()
 {
-  if (args.outputStorage == nullptr) {
-    MITK_ERROR << "Tried to create segmentation without specifying output storage\n";
-    return nullptr;
-  }
+  m_Input->SetProperty("Surface Type", SurfaceCreationTypeProperty::New(m_Args.creationType));
+  m_Input->SetProperty("Surface Type.Smooth", BoolProperty::New(m_Args.smooth));
+  m_Input->SetProperty("Surface Type.Decimation", FloatProperty::New(m_Args.decimation * m_Args.decimationRate));
+  m_Input->SetProperty("Surface Type.Light Smoothing", BoolProperty::New(m_Args.lightSmoothing));
 
-  segNode->SetProperty("Surface Type", SurfaceCreationTypeProperty::New(args.creationType));
-  segNode->SetProperty("Surface Type.Smooth", BoolProperty::New(args.smooth));
-  segNode->SetProperty("Surface Type.Decimation", FloatProperty::New(args.decimation * args.decimationRate));
-  segNode->SetProperty("Surface Type.Light Smoothing", BoolProperty::New(args.lightSmoothing));
-
-  if (args.overwrite) {
-    auto childs = args.outputStorage->GetDerivations(segNode);
+  if (m_Args.overwrite) {
+    auto childs = m_Args.outputStorage->GetDerivations(m_Input);
     for (const auto& children : *childs) {
       if (dynamic_cast<Surface*>(children->GetData()) != nullptr) {
-        args.outputStorage->Remove(children);
+        m_Args.outputStorage->Remove(children);
       }
     }
   }
 
-  switch (args.creationType) {
+  vtkSmartPointer<vtkPolyData> result;
+
+  switch (m_Args.creationType) {
     default:
     case SurfaceCreationType::MITK:
-      return createModelMitk(segNode, args);
+      result = createModelMitk(m_Input, m_Args);
+      break;
     case SurfaceCreationType::AGTK:
-      return createModelAgtk(segNode, args);
+      result = createModelAgtk(m_Input, m_Args);
+      break;
   }
 
-  return nullptr;
+  Surface::Pointer surface = Surface::New();
+  surface->SetVtkPolyData(result);
+
+  DataNode::Pointer node = DataNode::New();
+
+  float color[3];
+  m_Input->GetColor(color);
+  node->SetColor(color);
+  node->SetOpacity(m_Args.opacity);
+
+  node->SetData(surface);
+
+  node->SetName(m_Input->GetName() + "_Model");
+
+  m_Args.outputStorage->Add(node, m_Input);
+
+  if (m_Args.removeOnComplete != nullptr) {
+    m_Args.outputStorage->Remove(m_Args.removeOnComplete);
+  }
+
+  return node;
 }
 
-DataNode::Pointer SurfaceCreator::recreateModel(DataNode::Pointer segNode, DataStorage::Pointer storage, int progressSteps)
+SurfaceCreator::SurfaceCreator()
 {
-  BaseProperty* surfTypeProp = segNode->GetProperty("Surface Type");
+  m_Input = nullptr;
+  m_Output = nullptr;
+
+  m_ProgressAccumulator = itk::ProgressAccumulator::New();
+}
+
+void SurfaceCreator::GenerateData()
+{
+  if (m_Input == nullptr) {
+    MITK_INFO << "Can't create model. Input was not set.\n";
+    return;
+  }
+
+  if (m_Args.outputStorage == nullptr) {
+    MITK_ERROR << "Tried to create segmentation without specifying output storage\n";
+    return;
+  }
+
+  m_ProgressAccumulator->ResetProgress();
+  m_ProgressAccumulator->SetMiniPipelineFilter(this);
+  m_ProgressAccumulator->UnregisterAllFilters();
+
+  if (m_Args.recreate) {
+    m_Output = recreateModel();
+  } else {
+    m_Output = createModel();
+  }
+
+  m_ProgressAccumulator->SetMiniPipelineFilter(nullptr);
+  m_ProgressAccumulator->UnregisterAllFilters();
+
+  UpdateProgress(1.);
+}
+
+DataNode::Pointer SurfaceCreator::recreateModel()
+{
+  BaseProperty* surfTypeProp = m_Input->GetProperty("Surface Type");
   if (surfTypeProp == nullptr) {
     return nullptr;
   }
 
   DataNode::Pointer previousModel = nullptr;
 
-  auto childs = storage->GetDerivations(segNode);
+  auto childs = m_Args.outputStorage->GetDerivations(m_Input);
   for (const auto& children : *childs) {
     if (dynamic_cast<Surface*>(children->GetData()) != nullptr) {
       previousModel = children;
@@ -122,75 +172,37 @@ DataNode::Pointer SurfaceCreator::recreateModel(DataNode::Pointer segNode, DataS
   previousModel->GetOpacity(args.opacity, nullptr);
 
   args.decimationRate = 0.f;
-  segNode->GetFloatProperty("Surface Type.Decimation", args.decimationRate);
+  m_Input->GetFloatProperty("Surface Type.Decimation", args.decimationRate);
   args.decimation = args.decimationRate > .0001f;
   args.smooth = true;
-  segNode->GetBoolProperty("Surface Type.Smooth", args.smooth);
+  m_Input->GetBoolProperty("Surface Type.Smooth", args.smooth);
   args.lightSmoothing = false;
-  segNode->GetBoolProperty("Surface Type.Light Smoothing", args.lightSmoothing);
-  args.outputStorage = storage;
-  args.progressSteps = progressSteps;
-  if (progressSteps > 0 && args.creationType == SurfaceCreationType::AGTK) {
-    ProgressBar::GetInstance()->AddStepsToDo(progressSteps);
-  }
+  m_Input->GetBoolProperty("Surface Type.Light Smoothing", args.lightSmoothing);
+  args.outputStorage = m_Args.outputStorage;
   args.overwrite = false;
   args.removeOnComplete = previousModel;
 
-  return createModel(segNode, args);
+  m_Args = args;
+
+  return createModel();
 }
 
-template<typename TPixel, unsigned int VImageDimension>
-void AccessItkPadFilter(const itk::Image<TPixel, VImageDimension>* itkImage, Image::Pointer& output)
-{
-  typedef itk::Image<TPixel, VImageDimension> itkImageType;
-
-  typedef itk::ConstantPadImageFilter<itkImageType, itkImageType> PadFilterType;
-  typename PadFilterType::Pointer padFilter = PadFilterType::New();
-
-  itkImageType::SizeType paddingSize;
-  paddingSize.Fill(1);
-
-  padFilter->SetInput(itkImage);
-  padFilter->SetPadBound(paddingSize);
-  padFilter->SetConstant(0);
-  padFilter->Update();
-
-  CastToMitkImage<itkImageType>(padFilter->GetOutput(), output);
-
-  // Move back by slice to adjust position by padding
-  Point3D point = output->GetGeometry()->GetOrigin();
-  auto spacing = output->GetGeometry()->GetSpacing();
-  auto directionMatrix = itkImage->GetDirection();
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) {
-      point[i] -= spacing[i] * directionMatrix[i][j];
-    }
-  }
-  output->SetOrigin(point);
-}
-
-DataNode::Pointer SurfaceCreator::createModelMitk(DataNode::Pointer segNode, SurfaceCreationArgs args)
+vtkSmartPointer<vtkPolyData> SurfaceCreator::createModelMitk(DataNode::Pointer segNode, SurfaceCreator::SurfaceCreationArgs args)
 {
   Image::Pointer image(dynamic_cast<Image*>(segNode->GetData()));
 
-  // Add padding to image
-  Image::Pointer imagePadded;
-  AccessByItk_n(image, AccessItkPadFilter, (imagePadded));
-
   ShowSegmentationAsSurface::Pointer surfaceFilter = ShowSegmentationAsSurface::New();
-  surfaceFilter->SetDataStorage(*args.outputStorage);
-  surfaceFilter->SetPointerParameter("Input", imagePadded);
-  surfaceFilter->SetPointerParameter("Group node", segNode);
-  surfaceFilter->SetParameter("Show result", true);
-  surfaceFilter->SetParameter("Sync visibility", false);
-  surfaceFilter->SetParameter("Median kernel size", 3u);
-  surfaceFilter->SetParameter("Decimate mesh", args.decimation);
-  surfaceFilter->SetParameter("Decimation rate", args.decimationRate);
-  surfaceFilter->SetParameter("Creation type", 1u);
-  surfaceFilter->SetParameter("Model Opacity", args.opacity);
-  surfaceFilter->SetParameter("Apply median", false);
-  surfaceFilter->SetParameter("Smooth", args.smooth);
-  surfaceFilter->SetPointerParameter("Remove Node on Complete", args.removeOnComplete);
+
+  ShowSegmentationAsSurface::InputImageType::Pointer itkImage;
+  CastToItkImage(image, itkImage);
+
+  surfaceFilter->SetInput(itkImage);
+  ShowSegmentationAsSurface::SurfaceComputingParameters surfaceArgs;
+  surfaceArgs.medianKernelSize = 3u;
+  surfaceArgs.decimateMesh = args.decimation;
+  surfaceArgs.decimationRate = args.decimationRate;
+  surfaceArgs.applyMedian = false;
+  surfaceArgs.smooth = args.smooth;
 
   // Can be uncommented for additional smoothnes at cost of the computation time
   /*if (args.smooth) {
@@ -201,27 +213,21 @@ DataNode::Pointer SurfaceCreator::createModelMitk(DataNode::Pointer segNode, Sur
       smoothingCoef = std::max(smoothingCoef, *iter);
     }
 
-    surfaceFilter->SetParameter("Gaussian SD", (float)sqrt(smoothingCoef));
-    surfaceFilter->SetParameter("Apply median", true);
+    surfaceArgs.gaussianSD = (float)sqrt(smoothingCoef);
+    surfaceArgs.applyMedian = true;
   }*/
 
-  surfaceFilter->StartAlgorithm();
+  m_ProgressAccumulator->RegisterInternalFilter(surfaceFilter, 1.f);
+  surfaceFilter->setArgs(surfaceArgs);
 
-  return surfaceFilter->getCreatedNode();
+  surfaceFilter->Update();
+
+  return surfaceFilter->GetOutput();
 }
 
-
-DataNode::Pointer SurfaceCreator::createModelAgtk(DataNode::Pointer segNode, SurfaceCreationArgs args)
+vtkSmartPointer<vtkPolyData> SurfaceCreator::createModelAgtk(DataNode::Pointer segNode, SurfaceCreationArgs args)
 {
   Image::Pointer image(dynamic_cast<Image*>(segNode->GetData()));
-
-
-  vtkSmartPointer<vtkCallbackCommand> progressCallback = vtkSmartPointer<vtkCallbackCommand>::New();
-  vtkSmartPointer<vtkCallbackCommand> endProgressCallback = vtkSmartPointer<vtkCallbackCommand>::New();
-  if (args.progressSteps > 0) {
-    progressCallback->SetCallback(SurfaceCreator::agtkOnProgress);
-    endProgressCallback->SetCallback(SurfaceCreator::agtkOnEndProgress);
-  }
 
   ShowSegmentationAsAgtkSurface::SurfaceComputingParameters surfaceParams;
   surfaceParams.blurSigma = .3f;
@@ -236,8 +242,6 @@ DataNode::Pointer SurfaceCreator::createModelAgtk(DataNode::Pointer segNode, Sur
   surfaceParams.smoothingType = ShowSegmentationAsAgtkSurface::SurfaceSmoothingType::WindowedSync;
   surfaceParams.decimationType = ShowSegmentationAsAgtkSurface::SurfaceDecimationType::None;
   surfaceParams.isResampling = true;
-  surfaceParams.vtkProgressCallback = progressCallback;
-  surfaceParams.vtkEndProgressCallback = endProgressCallback;
 
   if (args.decimation) {
     surfaceParams.decimationType = ShowSegmentationAsAgtkSurface::SurfaceDecimationType::DecimatePro;
@@ -256,54 +260,18 @@ DataNode::Pointer SurfaceCreator::createModelAgtk(DataNode::Pointer segNode, Sur
     surfaceParams.decimationType = ShowSegmentationAsAgtkSurface::SurfaceDecimationType::None;
   }
 
-  m_AgtkProgressWeight = 1.f / (1 + (float)args.smooth
-      + (float)(surfaceParams.smoothingType != ShowSegmentationAsAgtkSurface::SurfaceSmoothingType::None)
-      + (float)(surfaceParams.decimationType != ShowSegmentationAsAgtkSurface::SurfaceDecimationType::None));
-  m_AgtkLastProgress = 0.;
-  m_AgtkProgressSteps = args.progressSteps;
-  m_AgtkProgressLastStep = 0;
+  ShowSegmentationAsAgtkSurface::Pointer surfaceBuilder = ShowSegmentationAsAgtkSurface::New();
+  surfaceBuilder->setArgs(args, surfaceParams);
 
-  Surface::Pointer surface;
-  AccessByItk_n(image, ShowSegmentationAsAgtkSurface::AccessItkAgtkSurfaceFilter, (args, surfaceParams, surface));
+  ShowSegmentationAsAgtkSurface::InputImageType::Pointer itkImage;
+  CastToItkImage(image, itkImage);
+  surfaceBuilder->SetInput(itkImage);
 
-  DataNode::Pointer node = DataNode::New();
+  m_ProgressAccumulator->RegisterInternalFilter(surfaceBuilder, 1.f);
 
-  float color[3];
-  segNode->GetColor(color);
-  node->SetColor(color);
-  node->SetOpacity(args.opacity);
+  surfaceBuilder->Update();
 
-  node->SetData(surface);
-
-  node->SetName(segNode->GetName() + "_Model");
-
-  args.outputStorage->Add(node, segNode);
-
-  if (args.removeOnComplete != nullptr) {
-    args.outputStorage->Remove(args.removeOnComplete);
-  }
-
-  return node;
-}
-
-void SurfaceCreator::agtkOnProgress(vtkObject* caller, long unsigned int vtkNotUsed(eventId),
-    void* vtkNotUsed(clientData), void* vtkNotUsed(callData))
-{
-  vtkPolyDataAlgorithm* filter = static_cast<vtkPolyDataAlgorithm*>(caller);
-  float nextProgress = m_AgtkLastProgress + filter->GetProgress() * m_AgtkProgressWeight * m_AgtkProgressSteps;
-  int stepDiff = (int)nextProgress - m_AgtkProgressLastStep;
-  m_AgtkProgressLastStep = (int)nextProgress;
-  if (stepDiff > 0) {
-    ProgressBar::GetInstance()->Progress(stepDiff);
-  }
-}
-
-void SurfaceCreator::agtkOnEndProgress(vtkObject* caller, long unsigned int vtkNotUsed(eventId),
-  void* vtkNotUsed(clientData), void* vtkNotUsed(callData))
-{
-  vtkPolyDataAlgorithm* filter = static_cast<vtkPolyDataAlgorithm*>(caller);
-  float nextProgress = m_AgtkLastProgress + filter->GetProgress() * m_AgtkProgressWeight * m_AgtkProgressSteps;
-  m_AgtkLastProgress = nextProgress;
+  return surfaceBuilder->GetOutput();
 }
 
 }

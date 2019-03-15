@@ -18,6 +18,7 @@ set(CPP_FILES
   Algorithms/mitkOverwriteSliceImageFilter.cpp
   Algorithms/mitkSegmentationObjectFactory.cpp
   Algorithms/mitkShapeBasedInterpolationAlgorithm.cpp
+  Algorithms/mitkShowSegmentationAsAgtkSurface.cpp
   Algorithms/mitkShowSegmentationAsSmoothedSurface.cpp
   Algorithms/mitkShowSegmentationAsSurface.cpp
   Algorithms/mitkVtkImageOverwrite.cpp

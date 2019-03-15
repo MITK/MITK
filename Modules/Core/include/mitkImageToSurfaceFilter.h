@@ -234,7 +234,20 @@ namespace mitk {
     * */
       float m_SmoothRelaxation;
 
-  };
+
+      static float m_ProgressWeight;
+      static float m_CurrentProgress;
+      static ImageToSurfaceFilter* m_CurrentlyProgressingBuilder;
+
+      static void vtkOnProgress(vtkObject* caller, long unsigned int vtkNotUsed(eventId),
+        void* vtkNotUsed(clientData), void* vtkNotUsed(callData));
+
+      static void vtkOnEnd(vtkObject* caller, long unsigned int vtkNotUsed(eventId),
+        void* vtkNotUsed(clientData), void* vtkNotUsed(callData));
+
+      vtkSmartPointer<vtkCallbackCommand> m_VtkProgressCallback;
+      vtkSmartPointer<vtkCallbackCommand> m_VtkEndCallback;
+};
 
 } // namespace mitk
 

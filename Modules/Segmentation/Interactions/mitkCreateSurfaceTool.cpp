@@ -18,7 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCreateSurfaceTool.xpm"
 
+#include <mitkImage.h>
+#include <mitkImageCast.h>
 #include "mitkShowSegmentationAsSurface.h"
+#include <mitkSurface.h>
 #include "mitkProgressBar.h"
 #include "mitkStatusBar.h"
 #include "mitkToolManager.h"
@@ -66,21 +69,29 @@ bool mitk::CreateSurfaceTool::ProcessOneWorkingData( DataNode* node )
       // attach observer to get notified about result
       itk::SimpleMemberCommand<CreateSurfaceTool>::Pointer goodCommand = itk::SimpleMemberCommand<CreateSurfaceTool>::New();
       goodCommand->SetCallbackFunction(this, &CreateSurfaceTool::OnSurfaceCalculationDone);
-      surfaceFilter->AddObserver(mitk::ResultAvailable(), goodCommand);
+      surfaceFilter->AddObserver(itk::EndEvent(), goodCommand);
       itk::SimpleMemberCommand<CreateSurfaceTool>::Pointer badCommand = itk::SimpleMemberCommand<CreateSurfaceTool>::New();
       badCommand->SetCallbackFunction(this, &CreateSurfaceTool::OnSurfaceCalculationDone);
-      surfaceFilter->AddObserver(mitk::ProcessingError(), badCommand);
+      surfaceFilter->AddObserver(itk::AbortEvent(), badCommand);
 
       DataNode::Pointer nodepointer = node;
-      surfaceFilter->SetPointerParameter("Input", image);
-      surfaceFilter->SetPointerParameter("Group node", nodepointer);
-      surfaceFilter->SetParameter("Show result", true );
-      surfaceFilter->SetParameter("Sync visibility", false );
-      surfaceFilter->SetDataStorage( *m_ToolManager->GetDataStorage() );
+      
+      ShowSegmentationAsSurface::InputImageType::Pointer itkImage;
+      CastToItkImage(image, itkImage);
+
+      surfaceFilter->SetInput(itkImage);
 
       ProgressBar::GetInstance()->AddStepsToDo(1);
       StatusBar::GetInstance()->DisplayText("Surface creation started in background...");
-      surfaceFilter->StartAlgorithm();
+      surfaceFilter->Update();
+
+      DataNode::Pointer resultNode = DataNode::New();
+      Surface::Pointer surf = Surface::New();
+
+      surf->SetVtkPolyData(surfaceFilter->GetOutput());
+      resultNode->SetData(surf);
+
+      m_ToolManager->GetDataStorage()->Add(resultNode, nodepointer);
     }
     catch(...)
     {

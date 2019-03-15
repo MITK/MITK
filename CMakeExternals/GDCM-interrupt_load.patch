@@ -1,16 +1,18 @@
 diff --git a/Source/MediaStorageAndFileFormat/gdcmScanner.cxx b/Source/MediaStorageAndFileFormat/gdcmScanner.cxx
-index 0f6486be7..f8b6aabbe 100644
+index 0f6486be7..59e713d95 100644
 --- a/Source/MediaStorageAndFileFormat/gdcmScanner.cxx
 +++ b/Source/MediaStorageAndFileFormat/gdcmScanner.cxx
-@@ -22,6 +22,7 @@
+@@ -22,6 +22,9 @@
  #include "gdcmFileNameEvent.h"
  
  #include <algorithm> // std::find
++#ifdef _WIN32
 +#include <experimental/filesystem>
++#endif
  
  namespace gdcm
  {
-@@ -93,7 +94,7 @@ void Scanner::AddTag( Tag const & t )
+@@ -93,7 +96,7 @@ void Scanner::AddTag( Tag const & t )
      }
  }
  
@@ -19,7 +21,7 @@ index 0f6486be7..f8b6aabbe 100644
  {
    this->InvokeEvent( StartEvent() );
  
-@@ -130,6 +131,10 @@ bool Scanner::Scan( Directory::FilenamesType const & filenames )
+@@ -130,6 +133,10 @@ bool Scanner::Scan( Directory::FilenamesType const & filenames )
      Progress = 0;
      for(; it != Filenames.end(); ++it)
        {
@@ -30,10 +32,11 @@ index 0f6486be7..f8b6aabbe 100644
        Reader reader;
        const char *filename = it->c_str();
        assert( filename );
-@@ -156,6 +161,13 @@ bool Scanner::Scan( Directory::FilenamesType const & filenames )
+@@ -156,6 +163,15 @@ bool Scanner::Scan( Directory::FilenamesType const & filenames )
          Scanner::ProcessPublicTag(sf, filename);
          //Scanner::ProcessPrivateTag(sf, filename);
          }
++#ifdef _WIN32
 +      else if ( interrupt && 
 +        !std::experimental::filesystem::exists(
 +          std::experimental::filesystem::path(filename).parent_path()) )
@@ -41,11 +44,12 @@ index 0f6486be7..f8b6aabbe 100644
 +        *interrupt = true;
 +        return false;
 +        }
++#endif
        // Update progress
        Progress += progresstick;
        ProgressEvent pe;
 diff --git a/Source/MediaStorageAndFileFormat/gdcmScanner.h b/Source/MediaStorageAndFileFormat/gdcmScanner.h
-index 9ecfb5e4b..97bafb5e1 100644
+index 9ecfb5e4b..3288b6a98 100644
 --- a/Source/MediaStorageAndFileFormat/gdcmScanner.h
 +++ b/Source/MediaStorageAndFileFormat/gdcmScanner.h
 @@ -82,7 +82,7 @@ public:
@@ -53,7 +57,7 @@ index 9ecfb5e4b..97bafb5e1 100644
  
    /// Start the scan !
 -  bool Scan( Directory::FilenamesType const & filenames );
-+  bool Scan( Directory::FilenamesType const & filenames, volatile bool* m_interrupt = nullptr );
++  bool Scan( Directory::FilenamesType const & filenames, volatile bool* m_interrupt = nullptr);
  
    Directory::FilenamesType const &GetFilenames() const { return Filenames; }
  

@@ -430,10 +430,7 @@ void QmitkImageStatisticsView::CalculateStatistics(mitk::Image::ConstPointer ima
                                                            mitk::PlanarFigure::ConstPointer maskPlanarFigure)
 {
   this->m_StatisticsUpdatePending = true;
-  auto renderPart = this->GetRenderWindowPart();
-  unsigned int timeStep = renderPart->GetTimeNavigationController()->GetTime()->GetPos();
   this->m_CalculationThread->Initialize(image, mask, maskPlanarFigure);
-  this->m_CalculationThread->SetTimeStep(timeStep);
 
   try
   {

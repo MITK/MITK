@@ -63,13 +63,6 @@ public:
   mitk::Image::ConstPointer GetMaskImage() const;
   mitk::PlanarFigure::ConstPointer GetPlanarFigure() const;
 
-  //T25568: can be removed when deprecated image statistics plugin is removed
-  /*!
-  /brief Set the time step of the image you want to process. */
-  void SetTimeStep( int times );
-  /*!
-  /brief Get the time step of the image you want to process. */
-  int GetTimeStep() const;
   /*!
   /brief Set flag to ignore zero valued voxels */
   void SetIgnoreZeroValueVoxel( bool _arg );
@@ -104,8 +97,6 @@ private:
   mitk::Image::ConstPointer m_BinaryMask;                              ///< member variable holds the binary mask image for segmentation image statistics calculation.
   mitk::PlanarFigure::ConstPointer m_PlanarFigureMask;                 ///< member variable holds the planar figure for segmentation image statistics calculation.
   mitk::ImageStatisticsContainer::Pointer m_StatisticsContainer;
-  //T25568: can be removed when deprecated image statistics plugin is removed
-  int m_TimeStep;                                                 ///< member variable holds the time step for statistics calculation
   bool m_IgnoreZeros;                                             ///< member variable holds flag to indicate if zero valued voxel should be suppressed
   unsigned int m_HistogramNBins;                                      ///< member variable holds the bin size for histogram resolution.
   bool m_StatisticChanged;                                        ///< flag set if statistics have changed

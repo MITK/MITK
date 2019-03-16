@@ -1,4 +1,4 @@
-#include "mitkSHowSegmentationAsAgtkSurface.h"
+#include "mitkShowSegmentationAsAgtkSurface.h"
 
 namespace mitk
 {
@@ -159,7 +159,7 @@ void ShowSegmentationAsAgtkSurface::ComputeSurface()
   m_CurrentProgress = m_ProgressAccumulator->GetAccumulatedProgress();
 
   typedef vtkSmartPointer<vtkMarchingCubes> MarchingCubes;
-  typename MarchingCubes mcubes = MarchingCubes::New();
+  MarchingCubes mcubes = MarchingCubes::New();
   mcubes->AddObserver(vtkCommand::ProgressEvent, m_VtkProgressCallback);
   mcubes->AddObserver(vtkCommand::EndEvent, m_VtkEndCallback);
   mcubes->SetInputData(vtkImage);
@@ -189,7 +189,7 @@ void ShowSegmentationAsAgtkSurface::PostProcessing()
   switch (m_FilterArgs.decimationType) {
     case SurfaceDecimationType::DecimatePro: {
       typedef vtkSmartPointer<vtkDecimatePro> Decimate;
-      typename Decimate decimate = Decimate::New();
+      Decimate decimate = Decimate::New();
       decimate->AddObserver(vtkCommand::ProgressEvent, m_VtkProgressCallback);
       decimate->AddObserver(vtkCommand::EndEvent, m_VtkEndCallback);
       decimate->SetInputData(m_Output);
@@ -207,7 +207,7 @@ void ShowSegmentationAsAgtkSurface::PostProcessing()
     }
     case SurfaceDecimationType::QuadricDecimation: {
       typedef vtkSmartPointer<vtkQuadricDecimation> Decimation;
-      typename Decimation decimate = Decimation::New();
+      Decimation decimate = Decimation::New();
       decimate->AddObserver(vtkCommand::ProgressEvent, m_VtkProgressCallback);
       decimate->AddObserver(vtkCommand::EndEvent, m_VtkEndCallback);
       decimate->SetInputData(m_Output);
@@ -221,7 +221,7 @@ void ShowSegmentationAsAgtkSurface::PostProcessing()
   switch (m_FilterArgs.smoothingType) {
     case SurfaceSmoothingType::Laplacian: {
       typedef vtkSmartPointer<vtkSmoothPolyDataFilter> SmoothPolyData;
-      typename SmoothPolyData smooth = SmoothPolyData::New();
+      SmoothPolyData smooth = SmoothPolyData::New();
       smooth->AddObserver(vtkCommand::ProgressEvent, m_VtkProgressCallback);
       smooth->AddObserver(vtkCommand::EndEvent, m_VtkEndCallback);
       smooth->SetInputData(m_Output);
@@ -237,7 +237,7 @@ void ShowSegmentationAsAgtkSurface::PostProcessing()
     }
     case SurfaceSmoothingType::WindowedSync: {
       typedef vtkSmartPointer<vtkWindowedSincPolyDataFilter> SmoothPolyData;
-      typename SmoothPolyData smooth = SmoothPolyData::New();
+      SmoothPolyData smooth = SmoothPolyData::New();
       smooth->AddObserver(vtkCommand::ProgressEvent, m_VtkProgressCallback);
       smooth->AddObserver(vtkCommand::EndEvent, m_VtkEndCallback);
       smooth->SetInputData(m_Output);
@@ -256,7 +256,7 @@ void ShowSegmentationAsAgtkSurface::PostProcessing()
 
   // Compute normals
   typedef vtkSmartPointer<vtkPolyDataNormals> PolyDataNormals;
-  typename PolyDataNormals normals = PolyDataNormals::New();
+  PolyDataNormals normals = PolyDataNormals::New();
   normals->AddObserver(vtkCommand::ProgressEvent, m_VtkProgressCallback);
   normals->AddObserver(vtkCommand::EndEvent, m_VtkEndCallback);
   normals->SetInputData(m_Output);

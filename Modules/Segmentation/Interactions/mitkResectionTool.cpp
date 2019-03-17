@@ -4,10 +4,12 @@
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
 
-#include <mitkResectionFilter.h>
 #include <mitkImageAccessByItk.h>
-#include <mitkToolManager.h>
 #include <mitkITKImageImport.h>
+#include <mitkProgressBar.h>
+#include <mitkResectionFilter.h>
+#include <mitkSurfaceUtils.h>
+#include <mitkToolManager.h>
 
 namespace mitk
 {
@@ -143,11 +145,43 @@ void ResectionTool::Resect(ResectionType type)
   vtkMatrix4x4* worldView = getWorldToViewTransform(m_LastEventSender->GetVtkRenderer());
   AccessByItk_n(segmentation, AccessResectFilter, (points, worldView, type));
   segmentation->Modified();
+
+  SurfaceCreator::Pointer surfaceCreator = SurfaceCreator::New();
+  SurfaceCreator::SurfaceCreationArgs surfaceArgs;
+  surfaceArgs.recreate = true;
+  surfaceArgs.outputStorage = m_ToolManager->GetDataStorage();
+  surfaceCreator->setArgs(surfaceArgs);
+  surfaceCreator->setInput(workingData);
+
+  CommandProgressUpdate::Pointer progressCommand = CommandProgressUpdate::New();
+  surfaceCreator->AddObserver(itk::ProgressEvent(), progressCommand);
+
+  mitk::ProgressBar::GetInstance()->Reset();
+  mitk::ProgressBar::GetInstance()->AddStepsToDo(100);
+
+  surfaceCreator->Update();
+
+  mitk::ProgressBar::GetInstance()->Reset();
+
   m_FeedbackContour->Clear();
   RenderingManager::GetInstance()->RequestUpdateAll();
 
   m_State = ResectionState::NO_CONTOUR;
   stateChanged.Send(m_State);
+}
+
+void ResectionTool::CommandProgressUpdate::Execute(const itk::Object* caller, const itk::EventObject& event)
+{
+  const itk::ProcessObject* filter = static_cast<const itk::ProcessObject*>(caller);
+  if (!itk::ProgressEvent().CheckEvent(&event)) {
+    return;
+  }
+
+  int nextStep = (int)(filter->GetProgress() * m_NumberOfSteps);
+  if (nextStep > m_LastStep) {
+    mitk::ProgressBar::GetInstance()->Progress(nextStep - m_LastStep);
+    m_LastStep = nextStep;
+  }
 }
 
 }

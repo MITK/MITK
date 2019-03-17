@@ -14,49 +14,74 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITK_SHOW_SEGMENTATION_AS_SURFACE_H_INCLUDET_WAD
-#define MITK_SHOW_SEGMENTATION_AS_SURFACE_H_INCLUDET_WAD
+#pragma once
 
-#include "mitkSegmentationSink.h"
 #include <MitkSegmentationExports.h>
-#include "mitkUIDGenerator.h"
-#include "mitkSurface.h"
+
+#include <itkImage.h>
+#include <itkProcessObject.h>
+#include <itkProgressAccumulator.h>
+
+#include <vtkPolyData.h>
 
 namespace mitk
 {
 
-class MITKSEGMENTATION_EXPORT ShowSegmentationAsSurface : public SegmentationSink
+class MITKSEGMENTATION_EXPORT ShowSegmentationAsSurface : public itk::ProcessObject
 {
-  public:
 
-    mitkClassMacro( ShowSegmentationAsSurface, SegmentationSink )
-    mitkAlgorithmNewMacro( ShowSegmentationAsSurface );
+public:
+  struct SurfaceComputingParameters
+  {
+    unsigned short medianKernelSize = 3u;
+    bool applyMedian                = true;
+    bool smooth                     = true;
+    float gaussianSD                = 1.5f;
+    bool decimateMesh               = true;
+    float decimationRate            = .2f;
+  };
 
-  protected:
+  typedef ShowSegmentationAsSurface     Self;
+  typedef itk::ProcessObject            Superclass;
+  typedef itk::SmartPointer<Self>       Pointer;
+  typedef itk::SmartPointer<const Self> ConstPointer;
 
-    ShowSegmentationAsSurface();  // use smart pointers
-    virtual ~ShowSegmentationAsSurface();
+  itkNewMacro(Self);
+  itkTypeMacro(ShowSegmentationAsSurface, itk::ProcessObject);
 
-    virtual void Initialize(const NonBlockingAlgorithm* other = NULL) override;
-    virtual bool ReadyToRun() override;
+  static const unsigned int DIM = 3;
+  typedef itk::Image<unsigned char, 3> InputImageType;
 
-    virtual bool ThreadedUpdateFunction() override; // will be called from a thread after calling StartAlgorithm
+  itkGetObjectMacro(Output, vtkPolyData);
 
-    virtual void ThreadedUpdateSuccessful() override; // will be called from a thread after calling StartAlgorithm
+  void SetInput(InputImageType::Pointer input)
+  {
+    m_Input = input;
+  }
 
-  private:
+  void setArgs(SurfaceComputingParameters args)
+  {
+    m_Args = args;
+  }
 
-    UIDGenerator m_UIDGeneratorSurfaces;
+  virtual void Update() override { this->UpdateOutputData(nullptr); }
 
-    Surface::Pointer m_Surface;
-    DataNode::Pointer m_Node;
+protected:
+  ShowSegmentationAsSurface();
+  virtual ~ShowSegmentationAsSurface();
 
-    bool m_AddToTree;
+  virtual void GenerateData() ITK_OVERRIDE;
+
+  InputImageType::Pointer m_Input;
+  vtkSmartPointer<vtkPolyData> m_Output;
+
+  SurfaceComputingParameters m_Args;
+
+private:
+  itk::ProgressAccumulator::Pointer m_ProgressAccumulator;
 
 };
 
 } // namespace
-
-#endif
 
 

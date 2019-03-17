@@ -42,6 +42,34 @@ public:
   ResectionState GetState();
 
 protected:
+  class CommandProgressUpdate : public itk::Command
+  {
+  public:
+    using Self = CommandProgressUpdate;
+    using Superclass = itk::Command;
+    using Pointer = itk::SmartPointer<Self>;
+
+    itkNewMacro(Self);
+
+    void Execute(itk::Object* caller, const itk::EventObject& event) override
+    {
+      Execute((const itk::Object*) caller, event);
+    }
+
+    void Execute(const itk::Object* caller, const itk::EventObject& event) override;
+
+    void setNumberOfSteps(int steps)
+    {
+      m_NumberOfSteps = steps;
+    }
+
+  protected:
+    CommandProgressUpdate() {};
+
+    int m_LastStep = 0;
+    int m_NumberOfSteps = 100;
+  };
+
   ResectionState m_State;
 
   ResectionTool();

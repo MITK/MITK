@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkImageToSurfaceFilter.h>
 #include "mitkException.h"
+#include <vtkCommand.h>
+#include <vtkCallbackCommand.h>
 #include <vtkImageData.h>
 #include <vtkDecimatePro.h>
 #include <vtkImageChangeInformation.h>
@@ -28,16 +30,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyDataNormals.h>
 #include <vtkCleanPolyData.h>
 
-#include "mitkProgressBar.h"
+mitk::ImageToSurfaceFilter* mitk::ImageToSurfaceFilter::m_CurrentlyProgressingBuilder = nullptr;
+float mitk::ImageToSurfaceFilter::m_ProgressWeight = 0.f;
+float mitk::ImageToSurfaceFilter::m_CurrentProgress = 0.f;
 
-mitk::ImageToSurfaceFilter::ImageToSurfaceFilter():
+mitk::ImageToSurfaceFilter::ImageToSurfaceFilter() :
   m_Smooth(false),
-  m_Decimate( NoDecimation),
+  m_Decimate(NoDecimation),
   m_Threshold(1.0),
   m_TargetReduction(0.95f),
   m_SmoothIteration(50),
   m_SmoothRelaxation(0.1)
 {
+  m_VtkProgressCallback = vtkSmartPointer<vtkCallbackCommand>::New();
+  m_VtkProgressCallback->SetCallback(mitk::ImageToSurfaceFilter::vtkOnProgress);
+
+  m_VtkEndCallback = vtkSmartPointer<vtkCallbackCommand>::New();
+  m_VtkEndCallback->SetCallback(mitk::ImageToSurfaceFilter::vtkOnEnd);
 }
 
 mitk::ImageToSurfaceFilter::~ImageToSurfaceFilter()
@@ -52,6 +61,8 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
 
   //MarchingCube -->create Surface
   vtkSmartPointer<vtkMarchingCubes> skinExtractor = vtkSmartPointer<vtkMarchingCubes>::New();
+  skinExtractor->AddObserver(vtkCommand::ProgressEvent, m_VtkProgressCallback);
+  skinExtractor->AddObserver(vtkCommand::EndEvent, m_VtkEndCallback);
   skinExtractor->ComputeScalarsOff();
   skinExtractor->SetInputConnection(indexCoordinatesImageFilter->GetOutputPort());//RC++
   indexCoordinatesImageFilter->Delete();
@@ -66,6 +77,8 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
   {
     vtkSmoothPolyDataFilter *smoother = vtkSmoothPolyDataFilter::New();
     //read poly1 (poly1 can be the original polygon, or the decimated polygon)
+    smoother->AddObserver(vtkCommand::ProgressEvent, m_VtkProgressCallback);
+    smoother->AddObserver(vtkCommand::EndEvent, m_VtkEndCallback);
     smoother->SetInputConnection(skinExtractor->GetOutputPort());//RC++
     smoother->SetNumberOfIterations( m_SmoothIteration );
     smoother->SetRelaxationFactor( m_SmoothRelaxation );
@@ -80,12 +93,13 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
     polydata->Register(nullptr);//RC++
     smoother->Delete();
   }
-  ProgressBar::GetInstance()->Progress();
 
   //decimate = to reduce number of polygons
   if(m_Decimate==DecimatePro)
   {
     vtkDecimatePro *decimate = vtkDecimatePro::New();
+    decimate->AddObserver(vtkCommand::ProgressEvent, m_VtkProgressCallback);
+    decimate->AddObserver(vtkCommand::EndEvent, m_VtkEndCallback);
     decimate->SplittingOff();
     decimate->SetErrorIsAbsolute(5);
     decimate->SetFeatureAngle(30);
@@ -106,6 +120,8 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
   else if (m_Decimate==QuadricDecimation)
   {
     vtkQuadricDecimation* decimate = vtkQuadricDecimation::New();
+    decimate->AddObserver(vtkCommand::ProgressEvent, m_VtkProgressCallback);
+    decimate->AddObserver(vtkCommand::EndEvent, m_VtkEndCallback);
     decimate->SetTargetReduction(m_TargetReduction);
 
     decimate->SetInputData(polydata);
@@ -115,8 +131,6 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
     polydata->Register(nullptr);
     decimate->Delete();
   }
-
-  ProgressBar::GetInstance()->Progress();
 
   if(polydata->GetNumberOfPoints() > 0)
   {
@@ -143,10 +157,11 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
     }
     vtkmatrix->Delete();
   }
-  ProgressBar::GetInstance()->Progress();
 
   // determine point_data normals for the poly data points.
   vtkSmartPointer<vtkPolyDataNormals> normalsGenerator = vtkSmartPointer<vtkPolyDataNormals>::New();
+  normalsGenerator->AddObserver(vtkCommand::ProgressEvent, m_VtkProgressCallback);
+  normalsGenerator->AddObserver(vtkCommand::EndEvent, m_VtkEndCallback);
   normalsGenerator->SetInputData( polydata );
   normalsGenerator->AutoOrientNormalsOn();
   normalsGenerator->FlipNormalsOff();
@@ -155,6 +170,8 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
   normalsGenerator->SplittingOff();
 
   vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
+  cleanPolyDataFilter->AddObserver(vtkCommand::ProgressEvent, m_VtkProgressCallback);
+  cleanPolyDataFilter->AddObserver(vtkCommand::EndEvent, m_VtkEndCallback);
   cleanPolyDataFilter->SetInputConnection(normalsGenerator->GetOutputPort());
   cleanPolyDataFilter->PieceInvariantOff();
   cleanPolyDataFilter->ConvertLinesToPointsOff();
@@ -180,18 +197,20 @@ void mitk::ImageToSurfaceFilter::GenerateData()
   int tstart=outputRegion.GetIndex(3);
   int tmax=tstart+outputRegion.GetSize(3); //GetSize()==1 - will aber 0 haben, wenn nicht zeitaufgeloest
 
-  if ((tmax-tstart) > 0)
-  {
-    ProgressBar::GetInstance()->AddStepsToDo( 4 * (tmax - tstart)  );
-  }
+  m_ProgressWeight = 1.f / (1 // Skin Extractor
+    + (float)m_Smooth
+    + (float)(m_Decimate == DecimatePro) + (float)(m_Decimate == QuadricDecimation)
+    + 1 // Normals
+    + 1); // Clean poly data
 
+  m_CurrentProgress = 0.f;
+  m_CurrentlyProgressingBuilder = this;
 
   int t;
   for( t=tstart; t < tmax; ++t)
   {
     vtkImageData *vtkimagedata =  image->GetVtkImageData(t);
     CreateSurface(t,vtkimagedata,surface,m_Threshold);
-    ProgressBar::GetInstance()->Progress();
   }
 }
 
@@ -236,4 +255,25 @@ void mitk::ImageToSurfaceFilter::GenerateOutputInformation()
   if(inputImage.IsNull()) return;
 
   //Set Data
+}
+
+void mitk::ImageToSurfaceFilter::vtkOnProgress(vtkObject* caller, long unsigned int vtkNotUsed(eventId),
+  void* vtkNotUsed(clientData), void* vtkNotUsed(callData))
+{
+  vtkPolyDataAlgorithm* filter = static_cast<vtkPolyDataAlgorithm*>(caller);
+  if (filter == nullptr) {
+    std::cout << "filter bad =c";
+  }
+
+  m_CurrentlyProgressingBuilder->UpdateProgress(m_CurrentProgress + filter->GetProgress() * m_ProgressWeight);
+
+  if (m_CurrentlyProgressingBuilder->GetAbortGenerateData()) {
+    throw itk::ProcessAborted();
+  }
+}
+
+void mitk::ImageToSurfaceFilter::vtkOnEnd(vtkObject* caller, long unsigned int vtkNotUsed(eventId),
+  void* vtkNotUsed(clientData), void* vtkNotUsed(callData))
+{
+  m_CurrentProgress += m_ProgressWeight;
 }

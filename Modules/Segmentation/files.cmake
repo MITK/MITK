@@ -18,6 +18,7 @@ set(CPP_FILES
   Algorithms/mitkOverwriteSliceImageFilter.cpp
   Algorithms/mitkSegmentationObjectFactory.cpp
   Algorithms/mitkShapeBasedInterpolationAlgorithm.cpp
+  Algorithms/mitkShowSegmentationAsAgtkSurface.cpp
   Algorithms/mitkShowSegmentationAsSmoothedSurface.cpp
   Algorithms/mitkShowSegmentationAsSurface.cpp
   Algorithms/mitkVtkImageOverwrite.cpp
@@ -30,6 +31,7 @@ set(CPP_FILES
   #DataManagement/mitkContourModel.cpp
   DataManagement/mitkContourSet.cpp
   DataManagement/mitkExtrudedContour.cpp
+  DataManagement/mitkSurfaceUtils.cpp
   Interactions/mitkAdaptiveRegionGrowingTool.cpp
   Interactions/mitkAddContourTool.cpp
   Interactions/mitkAutoCropTool.cpp

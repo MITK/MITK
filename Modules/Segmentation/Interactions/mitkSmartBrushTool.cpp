@@ -293,7 +293,7 @@ void PasteResultIntoSegmentation(const itk::Image<TPixel, VImageDimension>* itkI
     itk::Image<float, 3>::RegionType region)
 {
   typedef itk::Image<TPixel, VImageDimension> TargetSegmentationType;
-  itk::BinaryThresholdImageFilter<itk::Image<float, VImageDimension>, TargetSegmentationType>::Pointer thresholdFilter;
+  typename itk::BinaryThresholdImageFilter<itk::Image<float, VImageDimension>, TargetSegmentationType>::Pointer thresholdFilter;
   thresholdFilter = itk::BinaryThresholdImageFilter<itk::Image<float, VImageDimension>, TargetSegmentationType>::New();
   thresholdFilter->SetInput(strokeBuffer);
   thresholdFilter->SetLowerThreshold(.5f);
@@ -305,7 +305,7 @@ void PasteResultIntoSegmentation(const itk::Image<TPixel, VImageDimension>* itkI
   thresholdFilter->GetOutput()->SetRequestedRegion(region);
 
   using PasteFilter = itk::PasteImageFilter<TargetSegmentationType, TargetSegmentationType>;
-  PasteFilter::Pointer pasteFilter = PasteFilter::New();
+  typename PasteFilter::Pointer pasteFilter = PasteFilter::New();
   pasteFilter->SetSourceImage(thresholdFilter->GetOutput());
   pasteFilter->SetSourceRegion(region);
   pasteFilter->SetDestinationImage(itkImage);

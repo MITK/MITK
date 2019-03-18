@@ -114,11 +114,11 @@ private:
 		mitk::MaskGenerator::Pointer secondardMaskGen = nullptr,
 		unsigned short label = 1);
 
-	void VerifyStatistics(mitk::ImageStatisticsContainer::StatisticsObject stats,
+	void VerifyStatistics(mitk::ImageStatisticsContainer::ImageStatisticsObject stats,
 		mitk::ImageStatisticsContainer::RealType testMean, mitk::ImageStatisticsContainer::RealType testSD, mitk::ImageStatisticsContainer::RealType testMedian = 0);
 
 	// T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
-	void VerifyStatistics(mitk::ImageStatisticsContainer::StatisticsObject stats,
+	void VerifyStatistics(mitk::ImageStatisticsContainer::ImageStatisticsObject stats,
 		mitk::ImageStatisticsContainer::VoxelCountType N,
 		mitk::ImageStatisticsContainer::RealType mean,
 		mitk::ImageStatisticsContainer::RealType MPP,
@@ -1064,7 +1064,7 @@ mitkImageStatisticsCalculatorTestSuite::ComputeStatistics(mitk::Image::ConstPoin
 	return imgStatCalc->GetStatistics(label);
 }
 
-void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatisticsContainer::StatisticsObject stats,
+void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatisticsContainer::ImageStatisticsObject stats,
 	mitk::ImageStatisticsContainer::RealType testMean, mitk::ImageStatisticsContainer::RealType testSD, mitk::ImageStatisticsContainer::RealType testMedian)
 {
 	mitk::ImageStatisticsContainer::RealType meanObject;
@@ -1079,7 +1079,7 @@ void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatist
 }
 
 // T26098 histogram statistics need to be tested (median, uniformity, UPP, entropy)
-void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatisticsContainer::StatisticsObject stats,
+void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatisticsContainer::ImageStatisticsObject stats,
 	mitk::ImageStatisticsContainer::VoxelCountType N,
 	mitk::ImageStatisticsContainer::RealType mean,
 	mitk::ImageStatisticsContainer::RealType MPP,

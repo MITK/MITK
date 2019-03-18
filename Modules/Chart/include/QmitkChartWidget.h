@@ -240,7 +240,7 @@ public:
    * \brief Updates the histogram´s min and max values
    * \details Zooms in to view the values between minValue and maxValue
    */
-  void UpdateMinMaxValue(double minValue,double maxValue);
+  void UpdateMinMaxValueView(double minValue,double maxValue);
 
   /*!
    * \brief Reloads the chart in the widget

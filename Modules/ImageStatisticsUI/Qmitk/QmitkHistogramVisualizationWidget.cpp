@@ -25,11 +25,6 @@ QmitkHistogramVisualizationWidget::QmitkHistogramVisualizationWidget(QWidget* pa
   m_Controls.spinBoxNBins->setValue(m_DefaultNBins);
   m_Controls.spinBoxNBins->setMinimum(m_MinNBins);
   m_Controls.spinBoxNBins->setMaximum(m_MaxNBins);
-  m_Controls.doubleSpinBoxMaxValue->setMaximum(1000);
-  m_Controls.doubleSpinBoxMaxValue->setMinimum(-1000);
-  m_Controls.doubleSpinBoxMinValue->setMaximum(1000);
-  m_Controls.doubleSpinBoxMinValue->setMinimum(-1000);
-
   CreateConnections();
 }
 
@@ -149,6 +144,14 @@ void QmitkHistogramVisualizationWidget::OnShowSubchartCheckBoxChanged()
 
 void QmitkHistogramVisualizationWidget::OnOverwriteMinMaxCheckBoxChanged()
 {
+	double min = m_Histogram->GetBinMin(0, 0);
+	auto maxVector = m_Histogram->GetDimensionMaxs(0);
+	double max;
+	if (m_Controls.checkBoxUseDefaultNBins->isChecked())
+		max = maxVector[m_DefaultNBins - 1];
+	else
+		max = maxVector[m_Controls.spinBoxNBins->value() - 1];
+
 	if (!m_Controls.checkBoxOverwriteMinMax->isChecked())
 	{
 		m_Controls.doubleSpinBoxMaxValue->setEnabled(false);
@@ -157,6 +160,8 @@ void QmitkHistogramVisualizationWidget::OnOverwriteMinMaxCheckBoxChanged()
 	}
 	else
 	{
+		m_Controls.doubleSpinBoxMinValue->setMinimum(min);
+		m_Controls.doubleSpinBoxMaxValue->setMaximum(max);
 		m_Controls.doubleSpinBoxMaxValue->setEnabled(true);
 		m_Controls.doubleSpinBoxMinValue->setEnabled(true);
 	}
@@ -166,12 +171,12 @@ void QmitkHistogramVisualizationWidget::OnMinValueSpinBoxValueChanged()
 {
 	m_Controls.doubleSpinBoxMaxValue->setMinimum(m_Controls.doubleSpinBoxMinValue->value()+1);
 
-	m_Controls.chartWidget->UpdateMinMaxValue(m_Controls.doubleSpinBoxMinValue->value(),m_Controls.doubleSpinBoxMaxValue->value());
+	m_Controls.chartWidget->UpdateMinMaxValueView(m_Controls.doubleSpinBoxMinValue->value(),m_Controls.doubleSpinBoxMaxValue->value());
 }
 
 void QmitkHistogramVisualizationWidget::OnMaxValueSpinBoxValueChanged()
 {
 	m_Controls.doubleSpinBoxMinValue->setMaximum(m_Controls.doubleSpinBoxMaxValue->value()-1);
 
-	m_Controls.chartWidget->UpdateMinMaxValue(m_Controls.doubleSpinBoxMinValue->value(),m_Controls.doubleSpinBoxMaxValue->value());
+	m_Controls.chartWidget->UpdateMinMaxValueView(m_Controls.doubleSpinBoxMinValue->value(),m_Controls.doubleSpinBoxMaxValue->value());
 }

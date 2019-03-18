@@ -361,7 +361,7 @@ function SetShowErrorBars(showErrorBars)
   chartData.m_ShowErrorBars = showErrorBars;
 }
 
-function UpdateMinMaxValue(minValue, maxValue)
+function UpdateMinMaxValueView(minValue, maxValue)
 {
   let chart = document.getElementById("chart");
   let update = {

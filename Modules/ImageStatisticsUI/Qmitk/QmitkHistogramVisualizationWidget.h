@@ -61,7 +61,7 @@ private:
 	/** \brief Shows / Hides the subchart. */
 	void OnShowSubchartCheckBoxChanged();
 	/** \brief Enables / Disables SpinBoxes to set custom min and max values */
-	void OnOverwriteMinMaxCheckBoxChanged();
+	void OnViewMinMaxCheckBoxChanged();
 	/**\brief */
 	void OnMaxValueSpinBoxValueChanged();
 	/** \brief */

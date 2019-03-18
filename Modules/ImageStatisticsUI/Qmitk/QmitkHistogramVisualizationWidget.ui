@@ -134,18 +134,18 @@
      </widget>
      <widget class="QWidget" name="tabWidgetPlotPage2">
       <attribute name="title">
-       <string>Overwrite</string>
+       <string>View</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <widget class="QCheckBox" name="checkBoxOverwriteMinMax">
+        <widget class="QCheckBox" name="checkBoxViewMinMax">
          <property name="text">
-          <string>Overwrite min/max values</string>
+          <string>Zoom to min/max values</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QFrame" name="frameOverwriteValues">
+        <widget class="QFrame" name="frameViewMinMaxValues">
          <layout class="QGridLayout" name="gridLayout">
           <item row="2" column="1">
            <widget class="QLabel" name="labelMinValue">

@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkRESTManagerQt_h
 #define mitkRESTManagerQt_h
 
+
 #include <QObject>
 #include <QThread>
 
@@ -29,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class MITKCPPRESTSDKQT_EXPORT RESTManagerQt : public QObject, public IRESTManager, public RESTManager
+  class MITKCPPRESTSDKQT_EXPORT RESTManagerQt : public QObject, public RESTManager
   {
     Q_OBJECT
 

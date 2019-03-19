@@ -17,6 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkRESTManager_h
 #define mitkRESTManager_h
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4251)
+#endif
+
 #include <mitkIRESTManager.h>
 #include <mitkRESTClientMicroService.h>
 #include <mitkRESTServerMicroService.h>
@@ -104,4 +109,9 @@ namespace mitk
     std::map<std::pair<int, utility::string_t>, IRESTObserver *> m_Observers; // Map with all observers
   };
 } // namespace mitk
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
 #endif // !mitkRESTManager_h

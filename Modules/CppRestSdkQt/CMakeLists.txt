@@ -3,7 +3,7 @@ if(MITK_USE_CppRestSdk)
   MITK_CREATE_MODULE(
     DEPENDS MitkCore MitkQtWidgetsExt CppMicroServices MitkCppRestSdk
     PACKAGE_DEPENDS Qt5|Core
-    WARNINGS_NO_ERRORS 
+    #WARNINGS_NO_ERRORS 
 	AUTOLOAD_WITH MitkQtWidgets
   )
   find_package(OpenSSL REQUIRED)

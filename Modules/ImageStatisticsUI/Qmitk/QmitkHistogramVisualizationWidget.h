@@ -51,20 +51,25 @@ public:
 
 private:
   void CreateConnections();
-
   void SetGUIElementsEnabled(bool enabled);
   /** \brief Helper function to convert the histogram in order to forward it to the ChartWidget. */
   std::map<double, double> ConvertHistogramToMap(itk::Statistics::Histogram<double>::ConstPointer histogram) const;
 
-  // slots
-  /** \brief  Saves the histogram to the clipboard. */
-  void OnClipboardButtonClicked();
-  /** \brief Enables / Disables SpinBox to change the number of bins. */
-  void OnDefaultNBinsCheckBoxChanged();
-  /** \brief Emits the signal RequestHistogramUpdate(unsigned int nBins) with the updated value. */
-  void OnNBinsSpinBoxValueChanged();
-  /** \brief Shows / Hides the subchart. */
-  void OnShowSubchartCheckBoxChanged();
+//slots
+	/** \brief  Saves the histogram to the clipboard. */
+	void OnClipboardButtonClicked();
+	/** \brief Enables / Disables SpinBox to change the number of bins. */
+	void OnDefaultNBinsCheckBoxChanged();
+	/** \brief Emits the signal RequestHistogramUpdate(unsigned int nBins) with the updated value. */
+	void OnNBinsSpinBoxValueChanged();
+	/** \brief Shows / Hides the subchart. */
+	void OnShowSubchartCheckBoxChanged();
+	/** \brief Enables / Disables SpinBoxes to set custom min and max values */
+	void OnViewMinMaxCheckBoxChanged();
+	/**\brief */
+	void OnMaxValueSpinBoxValueChanged();
+	/** \brief */
+	void OnMinValueSpinBoxValueChanged();
 
 private:
   Ui::QmitkHistogramVisualizationControls m_Controls;

@@ -364,13 +364,13 @@ function SetShowErrorBars(showErrorBars)
 /**
  * Zooms to the given x-axis min and max values.
  */
-function UpdateMinMaxValueView(minValue, maxValue)
+function UpdateMinMaxValueXView(minValueX, maxValueX)
 {
   //y-Axis can't be adapted for now. See https://github.com/plotly/plotly.js/issues/1876
   let chart = document.getElementById("chart");
   let update = {
 	  xaxis:{
-		  range:[minValue, maxValue]
+		  range:[minValueX, maxValueX]
 		  }
 	  };
   Plotly.relayout(chart, update);

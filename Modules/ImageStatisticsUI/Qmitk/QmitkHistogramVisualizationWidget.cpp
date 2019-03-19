@@ -161,7 +161,9 @@ void QmitkHistogramVisualizationWidget::OnViewMinMaxCheckBoxChanged()
 	else
 	{
 		m_Controls.doubleSpinBoxMinValue->setMinimum(min);
+    m_Controls.doubleSpinBoxMinValue->setValue(min);
 		m_Controls.doubleSpinBoxMaxValue->setMaximum(max);
+    m_Controls.doubleSpinBoxMaxValue->setValue(max);
 		m_Controls.doubleSpinBoxMaxValue->setEnabled(true);
 		m_Controls.doubleSpinBoxMinValue->setEnabled(true);
 	}

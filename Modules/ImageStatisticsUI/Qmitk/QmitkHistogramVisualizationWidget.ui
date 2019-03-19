@@ -42,7 +42,7 @@
      </property>
      <widget class="QWidget" name="tabWidgetPlotPage1">
       <attribute name="title">
-       <string>Default</string>
+       <string>Options</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_5">
        <item>
@@ -134,7 +134,7 @@
      </widget>
      <widget class="QWidget" name="tabWidgetPlotPage2">
       <attribute name="title">
-       <string>View</string>
+       <string>Custom Zoom</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
@@ -147,25 +147,25 @@
        <item>
         <widget class="QFrame" name="frameViewMinMaxValues">
          <layout class="QGridLayout" name="gridLayout">
-          <item row="2" column="1">
+          <item row="3" column="1">
            <widget class="QLabel" name="labelMinValue">
             <property name="text">
              <string>Minimum value</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="1">
+          <item row="3" column="0">
+           <widget class="QDoubleSpinBox" name="doubleSpinBoxMinValue"/>
+          </item>
+          <item row="2" column="0">
+           <widget class="QDoubleSpinBox" name="doubleSpinBoxMaxValue"/>
+          </item>
+          <item row="2" column="1">
            <widget class="QLabel" name="labelMaxValue">
             <property name="text">
              <string>Maximum value</string>
             </property>
            </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QDoubleSpinBox" name="doubleSpinBoxMinValue"/>
-          </item>
-          <item row="4" column="0">
-           <widget class="QDoubleSpinBox" name="doubleSpinBoxMaxValue"/>
           </item>
          </layout>
         </widget>

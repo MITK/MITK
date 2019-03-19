@@ -23,14 +23,7 @@ void mitk::RESTManagerQt::ReceiveRequest(const web::uri &uri, mitk::IRESTObserve
   // Checking if port is free to add a new Server
   if (m_ServerMap.count(port) == 0)
   {
-    // new observer has to be added
-    std::pair<int, utility::string_t> key(uri.port(), uri.path());
-    m_Observers[key] = observer;
-
-    // testing if entry has been added to observer map
-    utility::string_t uristringt = uri.path();
-    std::string uristring(uristringt.begin(), uristringt.end());
-    MITK_INFO << "[" << uri.port() << ", " << uristring << "] : Number of elements in map: " << m_Observers.count(key);
+    mitk::RESTManager::AddObserver(uri, observer);
 
     // creating server instance
     RESTServerMicroServiceQt *server = new RESTServerMicroServiceQt(uri.authority());
@@ -54,35 +47,7 @@ void mitk::RESTManagerQt::ReceiveRequest(const web::uri &uri, mitk::IRESTObserve
   // If there is already a server under this port
   else
   {
-    // Same host, means new observer but not a new server instance
-    if (m_ServerMap[port]->GetUri() == uri.authority())
-    {
-      // new observer has to be added
-      std::pair<int, utility::string_t> key(uri.port(), uri.path());
-      // only add a new observer if there isn't already an observer for this uri
-      if (m_Observers.count(key) == 0)
-      {
-        m_Observers[key] = observer;
-
-        // testing if entry has been added to map
-        utility::string_t uristringt = uri.path();
-        std::string uristring(uristringt.begin(), uristringt.end());
-        MITK_INFO << "[" << uri.port() << ", " << uristring
-                  << "] : Number of elements in map: " << m_Observers.count(key);
-
-        // info output
-        MITK_INFO << "started listening, no new server instance has been created";
-      }
-      else
-      {
-        MITK_ERROR << "Threre is already a observer handeling this data";
-      }
-    }
-    // Error, since another server can't be added under this port
-    else
-    {
-      MITK_ERROR << "There is already another server listening under this port";
-    }
+    mitk::RESTManager::ServerUnderPort(uri, observer);
   }
 }
 

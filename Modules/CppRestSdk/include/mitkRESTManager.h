@@ -74,6 +74,9 @@ namespace mitk
     virtual std::map<int, IRESTServerMicroService *> GetM_ServerMap() override;
     virtual std::map<std::pair<int, utility::string_t>, IRESTObserver *> GetM_Observers() override;
 
+    void AddObserver(const web::uri &uri, IRESTObserver *observer);
+    void ServerUnderPort(const web::uri &uri, IRESTObserver *observer);
+
   protected:
     std::map<int, IRESTServerMicroService *> m_ServerMap;                     // Map with port server pairs
     std::map<std::pair<int, utility::string_t>, IRESTObserver *> m_Observers; // Map with all observers

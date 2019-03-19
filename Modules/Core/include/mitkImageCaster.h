@@ -17,13 +17,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKIMAGECASTER_H
 #define MITKIMAGECASTER_H
 
-#include <mitkImageCast.h>
-#include <itkImage.h>
 #include <itkCastImageFilter.h>
-#include <vtkRenderWindow.h>
-#include <mitkSurface.h>
+#include <itkExtractImageFilter.h>
+#include <itkImage.h>
 
+#include <vtkRenderWindow.h>
+
+#include <mitkImageCast.h>
 #include <mitkPPSeqForEach.h>
+#include <mitkSurface.h>
 
 #define DeclareMitkImageCasterMethods(r, data, type) \
   static void CastToItkImage(const mitk::Image*, itk::SmartPointer<itk::Image<MITK_PP_TUPLE_REM(2)type> >&); \
@@ -61,6 +63,37 @@ namespace mitk
   protected:
     static vtkRenderer* m_3DRenderer;
   };
+
+  // Used to cast 4d Mitk image to 3d Mitk Image
+  template<typename TPixel, unsigned int VImageDimension = 4U>
+  void extract3Dfrom4DByItk(itk::Image<TPixel, VImageDimension>* itkImage4d, mitk::Image* image3d, unsigned int t)
+  {
+    typedef itk::Image<TPixel, VImageDimension> InputImageType;
+    typedef itk::Image<TPixel, VImageDimension - 1U> OutputImageType;
+    typedef itk::ExtractImageFilter<InputImageType, OutputImageType> ExtractImageFilterType;
+
+    auto region = itkImage4d->GetLargestPossibleRegion();
+    auto index = region.GetIndex();
+    auto size = region.GetSize();
+
+    // We use region size AxBxCx0 for extracting 3D image
+    index.Fill(0);
+    index[3] = t;
+    size[3] = 0;
+
+    region.SetIndex(index);
+    region.SetSize(size);
+
+    auto extractor = ExtractImageFilterType::New();
+
+    extractor->SetInput(itkImage4d);
+    extractor->SetDirectionCollapseToSubmatrix();
+    extractor->SetExtractionRegion(region);
+    extractor->Update();
+
+    image3d->InitializeByItk<OutputImageType>(extractor->GetOutput());
+    image3d->SetVolume(extractor->GetOutput()->GetBufferPointer());
+  }
 }
 
 #endif // MITKIMAGECASTER_H

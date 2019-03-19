@@ -42,7 +42,7 @@ const std::string QmitkImageStatisticsView::VIEW_ID = "org.mitk.views.imagestati
 
 QmitkImageStatisticsView::QmitkImageStatisticsView(QObject * /*parent*/, const char * /*name*/)
 {
-  this->m_CalculationThread = new QmitkImageStatisticsCalculationJob();
+  this->m_CalculationJob = new QmitkImageStatisticsCalculationJob();
 }
 
 QmitkImageStatisticsView::~QmitkImageStatisticsView()
@@ -74,7 +74,7 @@ void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
 
 void QmitkImageStatisticsView::CreateConnections()
 {
-  connect(this->m_CalculationThread,
+  connect(this->m_CalculationJob,
           &QmitkImageStatisticsCalculationJob::finished,
           this,
           &QmitkImageStatisticsView::OnStatisticsCalculationEnds,
@@ -106,11 +106,11 @@ void QmitkImageStatisticsView::OnCheckBoxIgnoreZeroStateChanged(int state)
   m_ForceRecompute = true;
   if (state != Qt::Unchecked)
   {
-    this->m_CalculationThread->SetIgnoreZeroValueVoxel(true);
+    this->m_CalculationJob->SetIgnoreZeroValueVoxel(true);
   }
   else
   {
-    this->m_CalculationThread->SetIgnoreZeroValueVoxel(false);
+    this->m_CalculationJob->SetIgnoreZeroValueVoxel(false);
   }
   CalculateOrGetStatistics();
 }
@@ -123,7 +123,7 @@ void QmitkImageStatisticsView::OnSliderWidgetHistogramChanged(double value)
     this->GetDataStorage(), m_selectedImageNode->GetData(), mask);
   HistogramType::ConstPointer histogram = imageStatistics->GetStatisticsForTimeStep(timeStep).m_Histogram;
 
-  if (histogram.IsNotNull() && this->m_CalculationThread->GetStatisticsUpdateSuccessFlag())
+  if (histogram.IsNotNull() && this->m_CalculationJob->GetStatisticsUpdateSuccessFlag())
   {
     this->FillHistogramWidget({histogram}, {m_selectedImageNode->GetName()});
   }
@@ -135,7 +135,7 @@ void QmitkImageStatisticsView::OnSliderWidgetIntensityProfileChanged(double valu
   auto image = dynamic_cast<mitk::Image*>(m_selectedImageNode->GetData());
   auto planarFigure = dynamic_cast<mitk::PlanarFigure*>(m_selectedMaskNode->GetData());
 
-  if (image && planarFigure && this->m_CalculationThread->GetStatisticsUpdateSuccessFlag())
+  if (image && planarFigure && this->m_CalculationJob->GetStatisticsUpdateSuccessFlag())
   {
     this->ComputeAndDisplayIntensityProfile(image, planarFigure);
   }
@@ -396,25 +396,25 @@ void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
 {
   mitk::StatusBar::GetInstance()->Clear();
 
-  if (this->m_CalculationThread->GetStatisticsUpdateSuccessFlag())
+  if (this->m_CalculationJob->GetStatisticsUpdateSuccessFlag())
   {
-    auto statistic = m_CalculationThread->GetStatisticsData();
-    auto image = m_CalculationThread->GetStatisticsImage();
+    auto statistic = m_CalculationJob->GetStatisticsData();
+    auto image = m_CalculationJob->GetStatisticsImage();
     mitk::BaseData::ConstPointer mask = nullptr;
     auto statisticNonConst = statistic->Clone();
     auto imageRule = mitk::StatisticsToImageRelationRule::New();
     imageRule->Connect(statisticNonConst.GetPointer(), image);
 
-    if (m_CalculationThread->GetMaskImage())
+    if (m_CalculationJob->GetMaskImage())
     {
       auto maskRule = mitk::StatisticsToMaskRelationRule::New();
-      mask = m_CalculationThread->GetMaskImage();
+      mask = m_CalculationJob->GetMaskImage();
       maskRule->Connect(statisticNonConst.GetPointer(), mask);
     }
-    else if (m_CalculationThread->GetPlanarFigure())
+    else if (m_CalculationJob->GetPlanarFigure())
     {
       auto planarFigureRule = mitk::StatisticsToMaskRelationRule::New();
-      mask = m_CalculationThread->GetPlanarFigure();
+      mask = m_CalculationJob->GetPlanarFigure();
       planarFigureRule->Connect(statisticNonConst.GetPointer(), mask);
     }
 
@@ -449,12 +449,12 @@ void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
 
     if (!m_selectedPlanarFigure || m_selectedPlanarFigure->IsClosed())
     {
-      this->FillHistogramWidget({m_CalculationThread->GetTimeStepHistogram()}, {m_selectedImageNode->GetName()});
+      this->FillHistogramWidget({m_CalculationJob->GetTimeStepHistogram()}, {m_selectedImageNode->GetName()});
     }
   }
   else
   {
-    mitk::StatusBar::GetInstance()->DisplayErrorText(m_CalculationThread->GetLastErrorMessage().c_str());
+    mitk::StatusBar::GetInstance()->DisplayErrorText(m_CalculationJob->GetLastErrorMessage().c_str());
     m_Controls.widget_histogram->setEnabled(false);
   }
   m_Controls.label_currentlyComputingStatistics->setVisible(false);
@@ -462,8 +462,8 @@ void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
 
 void QmitkImageStatisticsView::OnRequestHistogramUpdate(unsigned int nBins)
 {
-  m_CalculationThread->SetHistogramNBins(nBins);
-  m_CalculationThread->start();
+  m_CalculationJob->SetHistogramNBins(nBins);
+  m_CalculationJob->start();
 }
 
 void QmitkImageStatisticsView::CalculateStatistics(mitk::Image::ConstPointer image,
@@ -471,12 +471,12 @@ void QmitkImageStatisticsView::CalculateStatistics(mitk::Image::ConstPointer ima
                                                    mitk::PlanarFigure::ConstPointer maskPlanarFigure)
 {
   this->m_StatisticsUpdatePending = true;
-  this->m_CalculationThread->Initialize(image, mask, maskPlanarFigure);
+  this->m_CalculationJob->Initialize(image, mask, maskPlanarFigure);
 
   try
   {
     // Compute statistics
-    this->m_CalculationThread->start();
+    this->m_CalculationJob->start();
     m_Controls.label_currentlyComputingStatistics->setVisible(true);
   }
   catch (const mitk::Exception &e)

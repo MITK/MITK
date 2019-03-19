@@ -361,6 +361,9 @@ function SetShowErrorBars(showErrorBars)
   chartData.m_ShowErrorBars = showErrorBars;
 }
 
+/**
+ * Zooms to the given x-axis min and max values.
+ */
 function UpdateMinMaxValueView(minValue, maxValue)
 {
   //y-Axis can't be adapted for now. See https://github.com/plotly/plotly.js/issues/1876

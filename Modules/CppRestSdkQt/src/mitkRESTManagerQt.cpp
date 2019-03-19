@@ -67,28 +67,8 @@ void mitk::RESTManagerQt::HandleDeleteObserver(IRESTObserver *observer, const we
       // Check wether it is the right uri to be deleted
       if (uri == L"" || it->first.second == uri.path())
       {
-        // if yes
-        // 1. store port and path in a temporary variable
-        // (path is only needed to create a key for info output)
         int port = it->first.first;
-        utility::string_t path = it->first.second;
-        std::pair<int, utility::string_t> key(port, path);
-        MITK_INFO << "Number of elements at key [ " << port << ", " << std::string(key.second.begin(), key.second.end())
-                  << "]: " << m_Observers.count(key);
-        // 2. delete map entry
-        it = m_Observers.erase(it);
-        MITK_INFO << "Number of elements at key [ " << port << ", " << std::string(key.second.begin(), key.second.end())
-                  << "]: " << m_Observers.count(key);
-        // 3. check, if there is another observer under this port in observer map (with bool flag)
-        bool noObserverForPort = true;
-        for (auto o : m_Observers)
-        {
-          if (o.first.first == port)
-          {
-            // there still exists an observer for this port
-            noObserverForPort = false;
-          }
-        }
+        bool noObserverForPort = mitk::RESTManager::DeleteObserver(it, uri);
         if (noObserverForPort)
         {
           //  there isn't an observer at this port, delete m_ServerMap entry for this port

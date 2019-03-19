@@ -76,6 +76,7 @@ namespace mitk
 
     void AddObserver(const web::uri &uri, IRESTObserver *observer);
     void ServerUnderPort(const web::uri &uri, IRESTObserver *observer);
+    bool DeleteObserver(std::map < std::pair<int, utility::string_t>, IRESTObserver *>::iterator &it, const web::uri &uri);
 
   protected:
     std::map<int, IRESTServerMicroService *> m_ServerMap;                     // Map with port server pairs

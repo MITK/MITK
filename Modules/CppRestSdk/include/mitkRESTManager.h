@@ -74,8 +74,29 @@ namespace mitk
     virtual std::map<int, IRESTServerMicroService *> GetM_ServerMap() override;
     virtual std::map<std::pair<int, utility::string_t>, IRESTObserver *> GetM_Observers() override;
 
+    /**
+     * @brief adds an observer if a port is free, called by ReceiveRequest method
+     *
+     * @param uri the uri which builds the key for the observer map
+     * @param observer the observer which is added
+     */
     void AddObserver(const web::uri &uri, IRESTObserver *observer);
+
+    /**
+     * @brief handles server management if there is already a server under a port, called by ReceiveRequest method
+     *
+     * @param uri the uri which which is requested to be added
+     * @param observer the observer which proceeds the request
+     */
     void ServerUnderPort(const web::uri &uri, IRESTObserver *observer);
+
+    /**
+     * @brief deletes an observer, called by HandleDeleteObserver method
+     *
+     * @param it the iterator comparing the observers in HandleDeleteObserver method
+     * @param the uri for which the observer doesn't want to receive requests anymore
+     * @return bool if there is another observer under the port
+     */
     bool DeleteObserver(std::map < std::pair<int, utility::string_t>, IRESTObserver *>::iterator &it, const web::uri &uri);
 
   protected:

@@ -40,6 +40,7 @@ void QmitkIntensityProfileVisualizationWidget::SetIntensityProfile(mitk::Intensi
 	m_Controls.chartWidget->SetChartType(dataLabel, QmitkChartWidget::ChartType::line);
 	m_Controls.chartWidget->SetXAxisLabel("Distance");
 	m_Controls.chartWidget->SetYAxisLabel("Intensity");
+  m_Controls.chartWidget->SetShowLegend(false);
   m_Controls.chartWidget->Show(m_Controls.checkBoxShowSubchart->isChecked());
 	SetGUIElementsEnabled(true);
 }

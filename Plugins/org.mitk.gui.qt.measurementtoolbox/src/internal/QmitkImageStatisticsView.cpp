@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkStatisticsToImageRelationRule.h>
 #include <mitkStatisticsToMaskRelationRule.h>
 #include <mitkStatusBar.h>
+#include <mitkImageTimeSelector.h>
 
 #include "mitkImageStatisticsContainerManager.h"
 #include <mitkPlanarFigureInteractor.h>
@@ -61,6 +62,9 @@ void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
   m_Controls.sliderWidget_histogram->setPrefix("Time: ");
   m_Controls.sliderWidget_histogram->setDecimals(0);
   m_Controls.sliderWidget_histogram->setVisible(false);
+  m_Controls.sliderWidget_intensityProfile->setPrefix("Time: ");
+  m_Controls.sliderWidget_intensityProfile->setDecimals(0);
+  m_Controls.sliderWidget_intensityProfile->setVisible(false);
   ResetGUI();
 
   PrepareDataStorageComboBoxes();
@@ -83,6 +87,10 @@ void QmitkImageStatisticsView::CreateConnections()
           &ctkSliderWidget::valueChanged,
           this,
           &QmitkImageStatisticsView::OnSliderWidgetHistogramChanged);
+  connect(this->m_Controls.sliderWidget_intensityProfile,
+          &ctkSliderWidget::valueChanged,
+          this,
+          &QmitkImageStatisticsView::OnSliderWidgetIntensityProfileChanged);
   connect(this->m_Controls.imageSelector,
           static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
           this,
@@ -121,10 +129,22 @@ void QmitkImageStatisticsView::OnSliderWidgetHistogramChanged(double value)
   }
 }
 
+void QmitkImageStatisticsView::OnSliderWidgetIntensityProfileChanged(double value)
+{
+  //intensity profile is always computed on request, not stored as node in DataStorage
+  auto image = dynamic_cast<mitk::Image*>(m_selectedImageNode->GetData());
+  auto planarFigure = dynamic_cast<mitk::PlanarFigure*>(m_selectedMaskNode->GetData());
+
+  if (image && planarFigure && this->m_CalculationThread->GetStatisticsUpdateSuccessFlag())
+  {
+    this->ComputeAndDisplayIntensityProfile(image, planarFigure);
+  }
+}
+
 void QmitkImageStatisticsView::PartClosed(const berry::IWorkbenchPartReference::Pointer &) {}
 
 void QmitkImageStatisticsView::FillHistogramWidget(const std::vector<HistogramType::ConstPointer> &histogram,
-                                                           const std::vector<std::string> &dataLabels)
+                                                   const std::vector<std::string> &dataLabels)
 {
   m_Controls.groupBox_histogram->setVisible(true);
   m_Controls.widget_histogram->SetTheme(this->GetColorTheme());
@@ -191,7 +211,7 @@ void QmitkImageStatisticsView::OnImageSelectorChanged()
     {
       m_Controls.widget_statistics->SetImageNodes({});
       m_Controls.widget_statistics->SetMaskNodes({});
-      m_Controls.widget_statistics->Reset();      
+      m_Controls.widget_statistics->Reset();
       m_Controls.widget_histogram->Reset();
       ResetGUI();
     }
@@ -278,8 +298,6 @@ void QmitkImageStatisticsView::CalculateOrGetStatistics()
       imageStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(this->GetDataStorage(), image);
     }
 
-    
-
     bool imageStatisticsOlderThanInputs = false;
     if (imageStatistics &&
         (imageStatistics->GetMTime() < image->GetMTime() || (mask && imageStatistics->GetMTime() < mask->GetMTime()) ||
@@ -292,14 +310,15 @@ void QmitkImageStatisticsView::CalculateOrGetStatistics()
     {
       // triggers recomputation when switched between images and the newest one has not 100 bins (default)
       auto calculatedBins = imageStatistics->GetStatisticsForTimeStep(0).m_Histogram.GetPointer()->Size();
-      if (calculatedBins != 100) 
+      if (calculatedBins != 100)
       {
         OnRequestHistogramUpdate(m_Controls.widget_histogram->GetBins());
       }
     }
 
-    //statistics need to be computed
-    if (!imageStatistics || imageStatisticsOlderThanInputs || m_ForceRecompute) {
+    // statistics need to be computed
+    if (!imageStatistics || imageStatisticsOlderThanInputs || m_ForceRecompute)
+    {
       CalculateStatistics(image, mask.GetPointer(), maskPlanarFigure.GetPointer());
     }
     // statistics already computed
@@ -325,9 +344,30 @@ void QmitkImageStatisticsView::CalculateOrGetStatistics()
 }
 
 void QmitkImageStatisticsView::ComputeAndDisplayIntensityProfile(mitk::Image *image,
-                                                                         mitk::PlanarFigure::Pointer maskPlanarFigure)
+                                                                 mitk::PlanarFigure::Pointer maskPlanarFigure)
 {
-  auto intensityProfile = mitk::ComputeIntensityProfile(image, maskPlanarFigure);
+  mitk::Image::Pointer inputImage;
+  if (image->GetDimension() == 4)
+  {
+    m_Controls.sliderWidget_intensityProfile->setVisible(true);
+    unsigned int maxTimestep = image->GetTimeSteps();
+    m_Controls.sliderWidget_intensityProfile->setMaximum(maxTimestep - 1);
+    //Intensity profile can only be calculated on 3D, so extract if 4D
+    mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+    int currentTimestep = static_cast<int>(m_Controls.sliderWidget_intensityProfile->value());
+    timeSelector->SetInput(image);
+    timeSelector->SetTimeNr(currentTimestep);
+    timeSelector->Update();
+
+    inputImage = timeSelector->GetOutput();
+  }
+  else
+  {
+    m_Controls.sliderWidget_intensityProfile->setVisible(false);
+    inputImage = image;
+  }
+
+    auto intensityProfile = mitk::ComputeIntensityProfile(inputImage, maskPlanarFigure);
   // Don't show histogram for intensity profiles
   m_Controls.groupBox_histogram->setVisible(false);
   m_Controls.groupBox_intensityProfile->setVisible(true);
@@ -339,7 +379,8 @@ void QmitkImageStatisticsView::ComputeAndDisplayIntensityProfile(mitk::Image *im
 void QmitkImageStatisticsView::ResetGUI()
 {
   m_Controls.widget_statistics->Reset();
-  m_Controls.widget_statistics->setEnabled(false);  m_Controls.widget_histogram->Reset();
+  m_Controls.widget_statistics->setEnabled(false);
+  m_Controls.widget_histogram->Reset();
   m_Controls.widget_histogram->setEnabled(false);
   m_Controls.checkBox_ignoreZero->setEnabled(false);
 }
@@ -377,23 +418,23 @@ void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
       planarFigureRule->Connect(statisticNonConst.GetPointer(), mask);
     }
 
-    auto imageStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(
-      this->GetDataStorage(), image, mask);
+    auto imageStatistics =
+      mitk::ImageStatisticsContainerManager::GetImageStatistics(this->GetDataStorage(), image, mask);
 
-    //if statistics base data already exist: add to existing node
+    // if statistics base data already exist: add to existing node
     if (imageStatistics)
     {
       auto allDataNodes = this->GetDataStorage()->GetAll()->CastToSTLConstContainer();
       for (auto node : allDataNodes)
       {
         auto nodeData = node->GetData();
-        if (nodeData && nodeData->GetUID() ==imageStatistics->GetUID())
+        if (nodeData && nodeData->GetUID() == imageStatistics->GetUID())
         {
           node->SetData(statisticNonConst);
         }
       }
     }
-    //statistics base data does not exist: add new node
+    // statistics base data does not exist: add new node
     else
     {
       auto statisticsNodeName = m_selectedImageNode->GetName();
@@ -426,8 +467,8 @@ void QmitkImageStatisticsView::OnRequestHistogramUpdate(unsigned int nBins)
 }
 
 void QmitkImageStatisticsView::CalculateStatistics(mitk::Image::ConstPointer image,
-                                                           mitk::Image::ConstPointer mask,
-                                                           mitk::PlanarFigure::ConstPointer maskPlanarFigure)
+                                                   mitk::Image::ConstPointer mask,
+                                                   mitk::PlanarFigure::ConstPointer maskPlanarFigure)
 {
   this->m_StatisticsUpdatePending = true;
   this->m_CalculationThread->Initialize(image, mask, maskPlanarFigure);
@@ -459,7 +500,7 @@ void QmitkImageStatisticsView::CalculateStatistics(mitk::Image::ConstPointer ima
 }
 
 void QmitkImageStatisticsView::OnSelectionChanged(berry::IWorkbenchPart::Pointer part,
-                                                          const QList<mitk::DataNode::Pointer> &nodes)
+                                                  const QList<mitk::DataNode::Pointer> &nodes)
 {
   Q_UNUSED(part);
   Q_UNUSED(nodes);

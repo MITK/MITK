@@ -93,6 +93,7 @@ protected:
   void OnRequestHistogramUpdate(unsigned int nBins);
   void OnCheckBoxIgnoreZeroStateChanged(int state);
   void OnSliderWidgetHistogramChanged(double value);
+  void OnSliderWidgetIntensityProfileChanged(double value);
 
   void CalculateStatistics(mitk::Image::ConstPointer image, mitk::Image::ConstPointer mask=nullptr, mitk::PlanarFigure::ConstPointer maskPlanarFigure = nullptr);
   

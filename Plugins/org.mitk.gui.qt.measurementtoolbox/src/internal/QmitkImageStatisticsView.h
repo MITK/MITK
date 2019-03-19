@@ -103,7 +103,6 @@ protected:
 private:
   typedef itk::SimpleMemberCommand< QmitkImageStatisticsView > ITKCommandType;
   QmitkImageStatisticsCalculationJob * m_CalculationJob = nullptr;
-  bool m_StatisticsUpdatePending=false;
   mitk::DataNode::ConstPointer m_selectedImageNode = nullptr, m_selectedMaskNode = nullptr;
 
   mitk::PlanarFigure::Pointer m_selectedPlanarFigure=nullptr;

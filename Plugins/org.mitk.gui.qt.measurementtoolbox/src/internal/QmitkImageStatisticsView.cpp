@@ -470,7 +470,6 @@ void QmitkImageStatisticsView::CalculateStatistics(mitk::Image::ConstPointer ima
                                                    mitk::Image::ConstPointer mask,
                                                    mitk::PlanarFigure::ConstPointer maskPlanarFigure)
 {
-  this->m_StatisticsUpdatePending = true;
   this->m_CalculationJob->Initialize(image, mask, maskPlanarFigure);
 
   try
@@ -482,19 +481,16 @@ void QmitkImageStatisticsView::CalculateStatistics(mitk::Image::ConstPointer ima
   catch (const mitk::Exception &e)
   {
     mitk::StatusBar::GetInstance()->DisplayErrorText(e.GetDescription());
-    this->m_StatisticsUpdatePending = false;
     m_Controls.label_currentlyComputingStatistics->setVisible(false);
   }
   catch (const std::runtime_error &e)
   {
     mitk::StatusBar::GetInstance()->DisplayErrorText(e.what());
-    this->m_StatisticsUpdatePending = false;
     m_Controls.label_currentlyComputingStatistics->setVisible(false);
   }
   catch (const std::exception &e)
   {
     mitk::StatusBar::GetInstance()->DisplayErrorText(e.what());
-    this->m_StatisticsUpdatePending = false;
     m_Controls.label_currentlyComputingStatistics->setVisible(false);
   }
 }

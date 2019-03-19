@@ -40,7 +40,6 @@ class QmitkChartData : public QObject
   Q_PROPERTY(QVariant m_UsePercentageInPieChart READ GetUsePercentageInPieChart WRITE SetUsePercentageInPieChart NOTIFY SignalUsePercentageInPieChartChanged);
   Q_PROPERTY(QVariant m_DataPointSize READ GetDataPointSize WRITE SetDataPointSize NOTIFY SignalDataPointSizeChanged);
   Q_PROPERTY(QVariant m_StackedData READ GetStackedData WRITE SetStackedData NOTIFY SignalStackedDataChanged);
-
 public:
   QmitkChartData();
 

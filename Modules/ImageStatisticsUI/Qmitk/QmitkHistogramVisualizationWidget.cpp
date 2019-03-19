@@ -72,16 +72,22 @@ void QmitkHistogramVisualizationWidget::CreateConnections()
 	connect(m_Controls.checkBoxUseDefaultNBins, &QCheckBox::clicked, this, &QmitkHistogramVisualizationWidget::OnDefaultNBinsCheckBoxChanged);
 	connect(m_Controls.spinBoxNBins, &QSpinBox::editingFinished, this, &QmitkHistogramVisualizationWidget::OnNBinsSpinBoxValueChanged);
 	connect(m_Controls.checkBoxShowSubchart, &QCheckBox::clicked, this, &QmitkHistogramVisualizationWidget::OnShowSubchartCheckBoxChanged);
+	connect(m_Controls.checkBoxViewMinMax, &QCheckBox::clicked, this, &QmitkHistogramVisualizationWidget::OnViewMinMaxCheckBoxChanged);
+	connect(m_Controls.doubleSpinBoxMaxValue, &QSpinBox::editingFinished, this, &QmitkHistogramVisualizationWidget::OnMaxValueSpinBoxValueChanged);
+	connect(m_Controls.doubleSpinBoxMinValue, &QSpinBox::editingFinished, this, &QmitkHistogramVisualizationWidget::OnMinValueSpinBoxValueChanged);
 }
 
 void QmitkHistogramVisualizationWidget::SetGUIElementsEnabled(bool enabled)
 {
 	this->setEnabled(enabled);
-	m_Controls.groupBoxPlot->setEnabled(enabled);
+	m_Controls.tabWidgetPlot->setEnabled(enabled);
 	m_Controls.checkBoxShowSubchart->setEnabled(enabled);
 	m_Controls.checkBoxUseDefaultNBins->setEnabled(enabled);
 	m_Controls.spinBoxNBins->setEnabled(!m_Controls.checkBoxUseDefaultNBins->isChecked());
 	m_Controls.buttonCopyHistogramToClipboard->setEnabled(enabled);
+	m_Controls.checkBoxViewMinMax->setEnabled(enabled);
+	m_Controls.doubleSpinBoxMaxValue->setEnabled(m_Controls.checkBoxViewMinMax->isChecked());
+	m_Controls.doubleSpinBoxMinValue->setEnabled(m_Controls.checkBoxViewMinMax->isChecked());
 }
 
 std::map<double, double> QmitkHistogramVisualizationWidget::ConvertHistogramToMap(itk::Statistics::Histogram<double>::ConstPointer histogram) const
@@ -147,4 +153,43 @@ void QmitkHistogramVisualizationWidget::OnNBinsSpinBoxValueChanged()
 void QmitkHistogramVisualizationWidget::OnShowSubchartCheckBoxChanged()
 {
 	m_Controls.chartWidget->Show(m_Controls.checkBoxShowSubchart->isChecked());
+}
+
+void QmitkHistogramVisualizationWidget::OnViewMinMaxCheckBoxChanged()
+{
+	double min = m_Histogram->GetBinMin(0, 0);
+	auto maxVector = m_Histogram->GetDimensionMaxs(0);
+	double max;
+	if (m_Controls.checkBoxUseDefaultNBins->isChecked())
+		max = maxVector[m_DefaultNBins - 1];
+	else
+		max = maxVector[m_Controls.spinBoxNBins->value() - 1];
+
+	if (!m_Controls.checkBoxViewMinMax->isChecked())
+	{
+		m_Controls.doubleSpinBoxMaxValue->setEnabled(false);
+		m_Controls.doubleSpinBoxMinValue->setEnabled(false);
+		m_Controls.chartWidget->Reload();
+	}
+	else
+	{
+		m_Controls.doubleSpinBoxMinValue->setMinimum(min);
+		m_Controls.doubleSpinBoxMaxValue->setMaximum(max);
+		m_Controls.doubleSpinBoxMaxValue->setEnabled(true);
+		m_Controls.doubleSpinBoxMinValue->setEnabled(true);
+	}
+}
+
+void QmitkHistogramVisualizationWidget::OnMinValueSpinBoxValueChanged()
+{
+	m_Controls.doubleSpinBoxMaxValue->setMinimum(m_Controls.doubleSpinBoxMinValue->value()+1);
+
+	m_Controls.chartWidget->UpdateMinMaxValueView(m_Controls.doubleSpinBoxMinValue->value(),m_Controls.doubleSpinBoxMaxValue->value());
+}
+
+void QmitkHistogramVisualizationWidget::OnMaxValueSpinBoxValueChanged()
+{
+	m_Controls.doubleSpinBoxMinValue->setMaximum(m_Controls.doubleSpinBoxMaxValue->value()-1);
+
+	m_Controls.chartWidget->UpdateMinMaxValueView(m_Controls.doubleSpinBoxMinValue->value(),m_Controls.doubleSpinBoxMaxValue->value());
 }

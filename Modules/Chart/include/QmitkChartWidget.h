@@ -237,6 +237,12 @@ public:
   void SetShowErrorBars(bool showErrorBars);
 
   /*!
+   * \brief Updates the histogram´s min and max values
+   * \details Zooms in to view the values between minValue and maxValue
+   */
+  void UpdateMinMaxValueView(double minValue,double maxValue);
+
+  /*!
    * \brief Reloads the chart in the widget
    * \details reloading may be needed to display added data in an existing chart
    */

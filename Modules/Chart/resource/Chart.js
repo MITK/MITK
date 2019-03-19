@@ -360,6 +360,18 @@ function SetShowErrorBars(showErrorBars)
 {
   chartData.m_ShowErrorBars = showErrorBars;
 }
+
+function UpdateMinMaxValueView(minValue, maxValue)
+{
+  let chart = document.getElementById("chart");
+  let update = {
+	  xaxis:{
+		  range:[minValue, maxValue]
+		  }
+	  };
+  Plotly.relayout(chart, update);
+}
+
 /**
  * Transforms the view to another chart type.
  *

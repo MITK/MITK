@@ -51,6 +51,8 @@ namespace mitk
     void SetSelectionMode(bool selection);
     static bool GetMouseRotationMode();
 
+    void SetOnly3D(bool only3D) { m_Only3D = only3D; }
+
     static void SetSynchronization(bool on, bool studySync);
 
     static void RotateCamera(BaseRenderer* renderer, bool clockwise);
@@ -288,6 +290,9 @@ namespace mitk
      * @brief m_LinkPlanes Determines if angle between crosshair remains fixed when rotating
      */
     bool m_LinkPlanes;
+
+    // If set will be filtering all 2d events out. Otherwise all 3d events
+    bool m_Only3D;
 
     SNCVector m_RotatableSNCs; /// all SNCs that currently have CreatedWorldGeometries, that can be rotated.
     SNCVector m_SNCsToBeRotated; /// all SNCs that will be rotated (exceptions are the ones parallel to the one being clicked)

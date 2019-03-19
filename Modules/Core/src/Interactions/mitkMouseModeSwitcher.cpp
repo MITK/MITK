@@ -56,16 +56,21 @@ namespace {
   }
 }
 
-mitk::MouseModeSwitcher::MouseModeSwitcher(const std::string& rendererName) :
-    m_ActiveInteractionScheme(MITK), m_ActiveMouseMode(MousePointer)
+mitk::MouseModeSwitcher::MouseModeSwitcher() :
+  m_ActiveInteractionScheme(MITK), m_ActiveMouseMode(MousePointer)
 {
   m_ActiveMouseModes.clear();
   m_ActiveMouseModes[mitk::MouseModeSwitcher::CrossHair] = { 0x00000001 }; // Qt::LeftButton
   m_ActiveMouseModes[mitk::MouseModeSwitcher::Zoom] = { 0x00000002 }; // Qt::RightButton
   m_ActiveMouseModes[mitk::MouseModeSwitcher::Pan] = { 0x00000004 }; // Qt::MiddleButton
 
-  this->AddRenderer(rendererName);
   this->SetInteractionScheme(m_ActiveInteractionScheme);
+}
+
+mitk::MouseModeSwitcher::MouseModeSwitcher(mitk::BaseRenderer::Pointer renderer) :
+    mitk::MouseModeSwitcher::MouseModeSwitcher()
+{
+  this->AddRenderer(renderer);
 }
 
 mitk::MouseModeSwitcher::~MouseModeSwitcher()
@@ -75,17 +80,30 @@ mitk::MouseModeSwitcher::~MouseModeSwitcher()
   }
 }
 
-void mitk::MouseModeSwitcher::AddRenderer(const std::string& rendererName)
+void mitk::MouseModeSwitcher::AddRenderer(mitk::BaseRenderer::Pointer renderer)
 {
   DisplayInteractor::Pointer currentObserver = mitk::DisplayInteractor::New();
-  currentObserver->LoadStateMachine("DisplayInteraction.xml");
   currentObserver->SetEventConfig("DisplayConfigMITK.xml");
+
+  if (renderer->GetMapperID() == mitk::BaseRenderer::Standard2D) {
+    currentObserver->LoadStateMachine("DisplayInteraction.xml");
+    currentObserver->SetOnly3D(false);
+  } else if (renderer->GetMapperID() == mitk::BaseRenderer::Standard3D) {
+    currentObserver->LoadStateMachine("DisplayInteraction3D.xml");
+    currentObserver->SetOnly3D(true);
+  } else {
+    assert(false);
+  }
+
   // Register as listener via micro services
   us::ServiceProperties props;
   props["name"] = std::string("DisplayInteractor");
+
+  std::string rendererName = renderer->GetName();
   if (!rendererName.empty()) {
     props["rendererName"] = rendererName;
   }
+
   us::ServiceRegistration<InteractionEventObserver> serviceRegistration = 
     us::GetModuleContext()->RegisterService<InteractionEventObserver>(currentObserver.GetPointer(),props);
 

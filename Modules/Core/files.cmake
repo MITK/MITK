@@ -297,6 +297,7 @@ set(CPP_FILES
 set(RESOURCE_FILES
 Interactions/globalConfig.xml
 Interactions/DisplayInteraction.xml
+Interactions/DisplayInteraction3D.xml
 Interactions/DisplayConfig.xml
 Interactions/DisplayConfigPanLeft.xml
 Interactions/DisplayConfigPanRight.xml

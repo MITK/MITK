@@ -41,6 +41,9 @@
   <event_variant class="MousePressEvent" name="SetCrosshairL">
     <attribute name="EventButton" value="LeftMouseButton"/>
   </event_variant>
+  <event_variant class="MouseDoubleClickEvent" name="DoubleClick">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+  </event_variant>
 
   <!-- Moving -->
   <event_variant name="Move" class="MouseMoveEvent"/>

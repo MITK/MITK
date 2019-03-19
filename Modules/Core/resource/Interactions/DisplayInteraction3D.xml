@@ -1,0 +1,7 @@
+<statemachine>
+    <state name="start" startstate="true" >
+        <transition event_class="InteractionPositionEvent" event_variant="DoubleClick" target="start">
+          <action name="doubleClick"/>
+        </transition>
+    </state>
+</statemachine>

@@ -53,6 +53,11 @@ static void ReadPixel(const PixelType&, Image::Pointer image, const itk::Index<3
 
 static IntensityProfile::Pointer ComputeIntensityProfile(Image::Pointer image, itk::PolyLineParametricPath<3>::Pointer path)
 {
+  if (image->GetDimension() == 4)
+  {
+    mitkThrow() << "computation of intensity profiles not supported for 4D images";
+  }
+
   IntensityProfile::Pointer intensityProfile = IntensityProfile::New();
   itk::PolyLineParametricPath<3>::InputType input = path->StartOfInput();
   BaseGeometry* imageGeometry = image->GetGeometry();

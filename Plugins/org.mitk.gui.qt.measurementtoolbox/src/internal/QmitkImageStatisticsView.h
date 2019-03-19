@@ -93,6 +93,7 @@ protected:
   void OnRequestHistogramUpdate(unsigned int nBins);
   void OnCheckBoxIgnoreZeroStateChanged(int state);
   void OnSliderWidgetHistogramChanged(double value);
+  void OnSliderWidgetIntensityProfileChanged(double value);
 
   void CalculateStatistics(mitk::Image::ConstPointer image, mitk::Image::ConstPointer mask=nullptr, mitk::PlanarFigure::ConstPointer maskPlanarFigure = nullptr);
   
@@ -101,8 +102,7 @@ protected:
 
 private:
   typedef itk::SimpleMemberCommand< QmitkImageStatisticsView > ITKCommandType;
-  QmitkImageStatisticsCalculationJob * m_CalculationThread = nullptr;
-  bool m_StatisticsUpdatePending=false;
+  QmitkImageStatisticsCalculationJob * m_CalculationJob = nullptr;
   mitk::DataNode::ConstPointer m_selectedImageNode = nullptr, m_selectedMaskNode = nullptr;
 
   mitk::PlanarFigure::Pointer m_selectedPlanarFigure=nullptr;

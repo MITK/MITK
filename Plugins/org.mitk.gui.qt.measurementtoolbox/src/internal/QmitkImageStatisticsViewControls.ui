@@ -408,6 +408,9 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
+       <widget class="ctkSliderWidget" name="sliderWidget_intensityProfile" native="true"/>
+      </item>
+      <item>
        <widget class="QmitkIntensityProfileVisualizationWidget" name="widget_intensityProfile" native="true"/>
       </item>
      </layout>

@@ -516,7 +516,7 @@ public:
    */
   static
     FileNamesGrouping
-    GetSeries(const StringContainer& files, bool unused = true /* for backward compatibility */);
+    GetSeries(const StringContainer& files, bool unused = true /* for backward compatibility */, volatile bool* interrupt = nullptr);
 
   /**
    Loads a DICOM series composed by the file names enumerated in the file names container.

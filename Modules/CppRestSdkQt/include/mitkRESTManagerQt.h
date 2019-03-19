@@ -14,23 +14,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkRESTManager_h
-#define mitkRESTManager_h
+#ifndef mitkRESTManagerQt_h
+#define mitkRESTManagerQt_h
+
+#include <QObject>
+#include <QThread>
 
 #include <mitkIRESTManager.h>
 #include <mitkRESTClientMicroService.h>
-#include <mitkRESTServerMicroService.h>
+#include <mitkRESTServerMicroServiceQt.h>
 
-#include <MitkCppRestSdkExports.h>
+#include <MitkCppRestSdkQtExports.h>
 
 namespace mitk
 {
-  class MITKCPPRESTSDK_EXPORT RESTManager : public IRESTManager
+  class MITKCPPRESTSDKQT_EXPORT RESTManagerQt : public QObject, public IRESTManager
   {
+    Q_OBJECT
 
   public:
-    RESTManager();
-    ~RESTManager() override;
+    RESTManagerQt();
+    ~RESTManagerQt() override;
 
     /**
      * @brief Executes a HTTP request in the mitkRESTClientMicroService class
@@ -43,9 +47,9 @@ namespace mitk
      */
     pplx::task<web::json::value> SendRequest(const web::uri &uri,
                                              const RequestType &type = get,
-                                             const web::json::value &body= NULL,
+                                             const web::json::value &body = NULL,
                                              const utility::string_t &filePath = L"") override;
-    
+
     /**
      * @brief starts listening for requests if there isn't another observer listening and the port is free
      *
@@ -75,7 +79,8 @@ namespace mitk
     virtual std::map<std::pair<int, utility::string_t>, IRESTObserver *> GetM_Observers() override;
 
   private:
-    std::map<int, IRESTServerMicroService *> m_ServerMap;                     // Map with port server pairs
+    std::map<int, IRESTServerMicroService *> m_ServerMap;                      // Map with port server pairs
+    std::map<int, QThread *> m_ServerThreadMap;                               // Map with threads for servers
     std::map<std::pair<int, utility::string_t>, IRESTObserver *> m_Observers; // Map with all observers
   };
 } // namespace mitk

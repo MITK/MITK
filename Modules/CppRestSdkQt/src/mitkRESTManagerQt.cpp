@@ -1,31 +1,31 @@
-#include "mitkRESTManager.h"
+#include "mitkRESTManagerQt.h"
+#include <QCoreApplication>
 #include <mitkCommon.h>
+mitk::RESTManagerQt::RESTManagerQt() {}
 
-mitk::RESTManager::RESTManager() {}
+mitk::RESTManagerQt::~RESTManagerQt() {}
 
-mitk::RESTManager::~RESTManager() {}
-
-pplx::task<web::json::value> mitk::RESTManager::SendRequest(const web::uri &uri,
+pplx::task<web::json::value> mitk::RESTManagerQt::SendRequest(const web::uri &uri,
                                                             const RequestType &type,
                                                             const web::json::value &content,
                                                             const utility::string_t &filePath)
 {
   pplx::task<web::json::value> answer;
   auto client = new RESTClientMicroService();
-  //according to the RequestType, different HTTP requests are made
+  // according to the RequestType, different HTTP requests are made
   switch (type)
   {
     case get:
     {
       if (filePath == L"")
       {
-        //no file path specified, starts a normal get request returning the normal json result
+        // no file path specified, starts a normal get request returning the normal json result
         answer = client->Get(uri);
       }
       else
       {
-        //file path ist specified, the result of the get request ist stored in this file
-        //and an empty json object is returned
+        // file path ist specified, the result of the get request ist stored in this file
+        // and an empty json object is returned
         answer = client->Get(uri, filePath);
       }
       break;
@@ -34,21 +34,21 @@ pplx::task<web::json::value> mitk::RESTManager::SendRequest(const web::uri &uri,
     {
       if (content == NULL)
       {
-        //warning because normally you won't create an empty ressource
+        // warning because normally you won't create an empty ressource
         MITK_WARN << "Content for put is empty, this will create an empty ressource";
       }
       answer = client->POST(uri, content);
       break;
     }
-      break;
+    break;
     case put:
     {
       if (content == NULL)
       {
-        //warning because normally you won't empty a ressource
+        // warning because normally you won't empty a ressource
         MITK_WARN << "Content for put is empty, this will empty the ressource";
       }
-      answer = client->PUT(uri,content);
+      answer = client->PUT(uri, content);
       break;
     }
   }
@@ -56,7 +56,7 @@ pplx::task<web::json::value> mitk::RESTManager::SendRequest(const web::uri &uri,
   return answer;
 }
 
-void mitk::RESTManager::ReceiveRequest(const web::uri &uri, mitk::IRESTObserver *observer)
+void mitk::RESTManagerQt::ReceiveRequest(const web::uri &uri, mitk::IRESTObserver *observer)
 {
   // New instance of RESTServerMicroservice in m_ServerMap, key is port of the request
   int port = uri.port();
@@ -71,14 +71,22 @@ void mitk::RESTManager::ReceiveRequest(const web::uri &uri, mitk::IRESTObserver 
     // testing if entry has been added to observer map
     utility::string_t uristringt = uri.path();
     std::string uristring(uristringt.begin(), uristringt.end());
-    MITK_INFO <<"[" <<uri.port()<<", " << uristring << "] : Number of elements in map: " << m_Observers.count(key);
+    MITK_INFO << "[" << uri.port() << ", " << uristring << "] : Number of elements in map: " << m_Observers.count(key);
 
     // creating server instance
-    RESTServerMicroService *server = new RESTServerMicroService(uri.authority());
+    RESTServerMicroServiceQt *server = new RESTServerMicroServiceQt(uri.authority());
     // add reference to server instance to map
     m_ServerMap[port] = server;
-    //start Server
-    server->OpenListener();
+
+    // Move server to seperate Thread and create connections between threads
+    m_ServerThreadMap[port] = new QThread;
+    server->moveToThread(m_ServerThreadMap[port]);
+
+    connect(m_ServerThreadMap[port], &QThread::finished, server, &QObject::deleteLater);
+
+    // starting Server
+    m_ServerThreadMap[port]->start();
+    QMetaObject::invokeMethod(server, "OpenListener");
 
     utility::string_t host = uri.authority().to_string();
     std::string hoststring(host.begin(), host.end());
@@ -92,7 +100,7 @@ void mitk::RESTManager::ReceiveRequest(const web::uri &uri, mitk::IRESTObserver 
     {
       // new observer has to be added
       std::pair<int, utility::string_t> key(uri.port(), uri.path());
-      //only add a new observer if there isn't already an observer for this uri
+      // only add a new observer if there isn't already an observer for this uri
       if (m_Observers.count(key) == 0)
       {
         m_Observers[key] = observer;
@@ -100,7 +108,8 @@ void mitk::RESTManager::ReceiveRequest(const web::uri &uri, mitk::IRESTObserver 
         // testing if entry has been added to map
         utility::string_t uristringt = uri.path();
         std::string uristring(uristringt.begin(), uristringt.end());
-        MITK_INFO << "[" << uri.port() << ", " << uristring<< "] : Number of elements in map: " << m_Observers.count(key);
+        MITK_INFO << "[" << uri.port() << ", " << uristring
+                  << "] : Number of elements in map: " << m_Observers.count(key);
 
         // info output
         MITK_INFO << "started listening, no new server instance has been created";
@@ -118,17 +127,16 @@ void mitk::RESTManager::ReceiveRequest(const web::uri &uri, mitk::IRESTObserver 
   }
 }
 
-
-web::json::value mitk::RESTManager::Handle(const web::uri &uri, web::json::value &body)
+web::json::value mitk::RESTManagerQt::Handle(const web::uri &uri, web::json::value &body)
 {
   // Checking if there is an observer for the port and path
   std::pair<int, utility::string_t> key(uri.port(), uri.path());
   if (m_Observers.count(key) != 0)
   {
     MITK_INFO << "Manager: Data send to observer";
-    return m_Observers[key]->Notify(body,uri);
+    return m_Observers[key]->Notify(body, uri);
   }
-  //No observer under this port, return null which results in status code 404 (s. RESTServerMicroService)
+  // No observer under this port, return null which results in status code 404 (s. RESTServerMicroService)
   else
   {
     MITK_WARN << "No Observer can handle the data";
@@ -136,7 +144,7 @@ web::json::value mitk::RESTManager::Handle(const web::uri &uri, web::json::value
   }
 }
 
-void mitk::RESTManager::HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri= L"")
+void mitk::RESTManagerQt::HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri = L"")
 {
   for (auto it = m_Observers.begin(); it != m_Observers.end();)
   {
@@ -144,8 +152,8 @@ void mitk::RESTManager::HandleDeleteObserver(IRESTObserver *observer, const web:
     // Check wether observer is at this place in map
     if (obsMap == observer)
     {
-      //Check wether it is the right uri to be deleted
-      if (uri==L""||it->first.second == uri.path())
+      // Check wether it is the right uri to be deleted
+      if (uri == L"" || it->first.second == uri.path())
       {
         // if yes
         // 1. store port and path in a temporary variable
@@ -173,12 +181,15 @@ void mitk::RESTManager::HandleDeleteObserver(IRESTObserver *observer, const web:
         {
           //  there isn't an observer at this port, delete m_ServerMap entry for this port
           // close listener
-          m_ServerMap[port]->CloseListener();
-          dynamic_cast<mitk::RESTServerMicroService *>(m_ServerMap[port])->~RESTServerMicroService();
+          QMetaObject::invokeMethod(dynamic_cast<mitk::RESTServerMicroServiceQt *>(m_ServerMap[port]), "CloseListener");
+          // end thread
+          m_ServerThreadMap[port]->quit();
+          m_ServerThreadMap[port]->wait();
+ 
           // delete server from map
           m_ServerMap.erase(port);
         }
-      } 
+      }
       else
       {
         ++it;
@@ -191,13 +202,12 @@ void mitk::RESTManager::HandleDeleteObserver(IRESTObserver *observer, const web:
   }
 }
 
-std::map<int, mitk::IRESTServerMicroService *> mitk::RESTManager::GetM_ServerMap()
+std::map<int, mitk::IRESTServerMicroService *> mitk::RESTManagerQt::GetM_ServerMap()
 {
   return m_ServerMap;
 }
 
-std::map<std::pair<int, utility::string_t>, mitk::IRESTObserver *> mitk::RESTManager::GetM_Observers()
+std::map<std::pair<int, utility::string_t>, mitk::IRESTObserver *> mitk::RESTManagerQt::GetM_Observers()
 {
   return m_Observers;
 }
-

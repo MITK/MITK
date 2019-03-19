@@ -14,17 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkRESTServerMicroService_h
-#define mitkRESTServerMicroService_h
+#ifndef mitkRESTServerMicroServiceQt_h
+#define mitkRESTServerMicroServiceQt_h
 
-#include "cpprest/http_listener.h"
-
-#include "MitkCppRestSdkExports.h"
-#include <mitkIRESTManager.h>
-#include <usGetModuleContext.h>
-#include <usModule.h>
-#include <usServiceTracker.h>
-#include <MitkCppRestSdkExports.h>
+#include <QThread>
 #include <mitkIRESTServerMicroService.h>
 
 typedef web::http::experimental::listener::http_listener MitkListener;
@@ -36,8 +29,10 @@ typedef web::json::json_exception MitkJsonException;
 
 namespace mitk
 {
-  class MITKCPPRESTSDK_EXPORT RESTServerMicroService : public IRESTServerMicroService
+  class RESTServerMicroServiceQt : public QObject, public IRESTServerMicroService
   {
+    Q_OBJECT 
+
 
   public:
     /**
@@ -45,12 +40,21 @@ namespace mitk
      *
      * @param uri the URI at which the server is listening for requests
      */
-    RESTServerMicroService(web::uri uri);
-    ~RESTServerMicroService();
+    RESTServerMicroServiceQt(web::uri uri);
+    ~RESTServerMicroServiceQt();
 
     web::uri GetUri() override;
 
-     /**
+  private:
+    /**
+     * @brief Handle for incoming GET requests
+     *
+     * @param MitkRequest incoming request object
+     */
+    void HandleGet(MitkRequest request) override;
+
+  public slots:
+    /**
      * @brief Opens the listener and starts the listening process
      */
     void OpenListener() override;
@@ -59,13 +63,6 @@ namespace mitk
      * @brief Closes the listener and stops the listening process
      */
     void CloseListener() override;
-  private:
-    /**
-     * @brief Handle for incoming GET requests
-     *
-     * @param MitkRequest incoming request object
-     */
-    void HandleGet(MitkRequest request) override; 
   };
 } // namespace mitk
 #endif

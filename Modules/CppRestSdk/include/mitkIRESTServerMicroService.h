@@ -14,18 +14,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkRESTServerMicroService_h
-#define mitkRESTServerMicroService_h
+#ifndef mitkIRESTServerMicroService_h
+#define mitkIRESTServerMicroService_h
 
 #include "cpprest/http_listener.h"
 
-#include "MitkCppRestSdkExports.h"
+
+#include <MitkCppRestSdkExports.h>
 #include <mitkIRESTManager.h>
 #include <usGetModuleContext.h>
 #include <usModule.h>
 #include <usServiceTracker.h>
-#include <MitkCppRestSdkExports.h>
-#include <mitkIRESTServerMicroService.h>
 
 typedef web::http::experimental::listener::http_listener MitkListener;
 typedef web::http::http_request MitkRequest;
@@ -36,36 +35,42 @@ typedef web::json::json_exception MitkJsonException;
 
 namespace mitk
 {
-  class MITKCPPRESTSDK_EXPORT RESTServerMicroService : public IRESTServerMicroService
+  class MITKCPPRESTSDK_EXPORT IRESTServerMicroService
   {
 
   public:
+    //**
+    // * @brief Creates an server listening to the given URI
+    // *
+    // * @param uri the URI at which the server is listening for requests
+    // */
+    IRESTServerMicroService();
+    ~IRESTServerMicroService();
+
+    virtual web::uri GetUri() = 0;
+
     /**
-     * @brief Creates an server listening to the given URI
-     *
-     * @param uri the URI at which the server is listening for requests
-     */
-    RESTServerMicroService(web::uri uri);
-    ~RESTServerMicroService();
-
-    web::uri GetUri() override;
-
-     /**
      * @brief Opens the listener and starts the listening process
      */
-    void OpenListener() override;
+    virtual void OpenListener() = 0;
 
     /**
      * @brief Closes the listener and stops the listening process
      */
-    void CloseListener() override;
-  private:
+    virtual void CloseListener() = 0;
+
+  protected:
     /**
      * @brief Handle for incoming GET requests
      *
      * @param MitkRequest incoming request object
      */
-    void HandleGet(MitkRequest request) override; 
+    virtual void HandleGet(MitkRequest request) = 0;
+
+    MitkListener m_Listener;
+    web::uri m_Uri;
+
+    // public slots:
   };
 } // namespace mitk
 #endif

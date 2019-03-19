@@ -23,13 +23,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkCoreExports.h>
 #include <mitkServiceInterface.h>
 
+#include <MitkCppRestSdkExports.h>
+#include <mitkRESTClientMicroService.h>
 #include <mitkIRESTObserver.h>
 
 
 namespace mitk
 {
-  class RESTServerMicroService;
-  class IRESTManager
+  class IRESTServerMicroService;
+  class MITKCPPRESTSDK_EXPORT IRESTManager
   {
   public:
     virtual ~IRESTManager();
@@ -53,9 +55,9 @@ namespace mitk
      * @return task to wait for
      */
     virtual pplx::task<web::json::value> SendRequest(const web::uri &uri,
-                                                     const RequestType &type = get,
-                                                     const web::json::value &body = NULL,
-                                                     const utility::string_t &filePath = L"") = 0;
+                                             const RequestType &type = get,
+                                             const web::json::value &body = NULL,
+                                             const utility::string_t &filePath = L"") = 0;
 
     /**
      * @brief starts listening for requests if there isn't another observer listening and the port is free
@@ -82,9 +84,9 @@ namespace mitk
      */
     virtual void HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri = L"") = 0;
 
-    virtual std::map<int, RESTServerMicroService *> GetM_ServerMap() = 0;
+    virtual std::map<int, IRESTServerMicroService *> GetM_ServerMap() = 0;
     virtual std::map<std::pair<int, utility::string_t>, IRESTObserver *> GetM_Observers() = 0;
-    
+
   };
 } // namespace mitk
 

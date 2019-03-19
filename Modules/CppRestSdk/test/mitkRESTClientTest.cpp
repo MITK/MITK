@@ -32,8 +32,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceReference.h>
 #include <usServiceTracker.h>
 
-#include <QCoreApplication>
-#include <QThread>
 class mitkRESTClientTestSuite : public mitk::TestFixture, mitk::IRESTObserver
 {
   CPPUNIT_TEST_SUITE(mitkRESTClientTestSuite);

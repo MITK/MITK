@@ -15,7 +15,9 @@ void MitkCppRestSdkActivator::Load(us::ModuleContext *context)
 {
   //Registration of the RESTManagerMicroservice
   m_RESTManager.reset(new mitk::RESTManager);
-  context->RegisterService<mitk::IRESTManager>(m_RESTManager.get());
+  us::ServiceProperties props;
+  props[us::ServiceConstants::SERVICE_RANKING()] = 5;
+  context->RegisterService<mitk::IRESTManager>(m_RESTManager.get(),props);
 }
 
 void MitkCppRestSdkActivator::Unload(us::ModuleContext *) 

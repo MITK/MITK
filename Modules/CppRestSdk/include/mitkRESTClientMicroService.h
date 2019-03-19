@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usGetModuleContext.h>
 #include <usModule.h>
 #include <usServiceTracker.h>
+#include <MitkCppRestSdkExports.h>
 
 typedef web::http::client::http_client MitkClient;
 typedef web::http::http_request MitkRequest;
@@ -39,7 +40,7 @@ typedef web::json::json_exception MitkJsonException;
 
 namespace mitk
 {
-  class RESTClientMicroService
+  class MITKCPPRESTSDK_EXPORT RESTClientMicroService
   {
   public:
     RESTClientMicroService();

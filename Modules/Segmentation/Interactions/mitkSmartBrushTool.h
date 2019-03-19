@@ -41,8 +41,9 @@ namespace mitk
     virtual ~SmartBrushTool();
 
     typedef float InternalPixelType;
-    typedef itk::Image<InternalPixelType, 3> InternalImageType;
-    typedef itk::Image<mitk::Tool::DefaultSegmentationDataType, 3> SegmentationType;
+    typedef itk::Image<InternalPixelType, 3>                        InternalImageType;
+    typedef itk::Image<mitk::Tool::DefaultSegmentationDataType, 3>  SegmentationType;
+    typedef itk::Image<unsigned char, 3>                            BinarySegmentationType;
 
     InternalImageType::Pointer m_OriginalImage;
 
@@ -79,7 +80,6 @@ namespace mitk
     itk::Image<float, 3>::Pointer m_StrokeBuffer;
 
     SmartBrushStrokeFilter<InternalImageType>::Pointer m_SmartBrushStrokeFilter;
-    itk::BinaryThresholdImageFilter<itk::Image<float, 3>, SegmentationType>::Pointer m_ThresholdFilter;
 
     int m_Radius;
     float m_MinSpacing;

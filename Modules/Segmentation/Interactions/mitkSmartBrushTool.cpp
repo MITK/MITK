@@ -12,6 +12,7 @@
 #include <itkRescaleIntensityImageFilter.h>
 
 #include "mitkAbstractTransformGeometry.h"
+#include <mitkImageAccessByItk.h>
 #include "mitkImageToItk.h"
 #include "mitkITKImageImport.h"
 #include "mitkLevelWindowProperty.h"
@@ -41,14 +42,9 @@ mitk::SmartBrushTool::SmartBrushTool() :
   m_WorkingNode->SetProperty("levelwindow", mitk::LevelWindowProperty::New(mitk::LevelWindow(0, 1)));
   m_WorkingNode->SetProperty("binary", mitk::BoolProperty::New(true));
 
-  m_ThresholdFilter = itk::BinaryThresholdImageFilter<itk::Image<float, 3>, SegmentationType>::New();
+
   m_SmartBrushStrokeFilter = SmartBrushStrokeFilter<InternalImageType>::New();
 
-  m_ThresholdFilter->SetInput(m_StrokeBuffer);
-  m_ThresholdFilter->SetLowerThreshold(.5f);
-  m_ThresholdFilter->SetUpperThreshold(1.0001f);
-  m_ThresholdFilter->SetInsideValue(1);
-  m_ThresholdFilter->SetOutsideValue(0);
 }
 
 mitk::SmartBrushTool::~SmartBrushTool()
@@ -290,6 +286,34 @@ void mitk::SmartBrushTool::SetGeometrySlice(const itk::EventObject& geometrySlic
   MouseMovedImpl(planeGeometry, false);
 }
 
+template<typename TPixel, unsigned int VImageDimension>
+void PasteResultIntoSegmentation(const itk::Image<TPixel, VImageDimension>* itkImage,
+    itk::Image<float, 3>::Pointer strokeBuffer,
+    itk::Image<float, 3>::IndexType regionStart,
+    itk::Image<float, 3>::RegionType region)
+{
+  typedef itk::Image<TPixel, VImageDimension> TargetSegmentationType;
+  typename itk::BinaryThresholdImageFilter<itk::Image<float, VImageDimension>, TargetSegmentationType>::Pointer thresholdFilter;
+  thresholdFilter = itk::BinaryThresholdImageFilter<itk::Image<float, VImageDimension>, TargetSegmentationType>::New();
+  thresholdFilter->SetInput(strokeBuffer);
+  thresholdFilter->SetLowerThreshold(.5f);
+  thresholdFilter->SetUpperThreshold(1.0001f);
+  thresholdFilter->SetInsideValue(1);
+  thresholdFilter->SetOutsideValue(0);
+
+  thresholdFilter->SetInput(strokeBuffer);
+  thresholdFilter->GetOutput()->SetRequestedRegion(region);
+
+  using PasteFilter = itk::PasteImageFilter<TargetSegmentationType, TargetSegmentationType>;
+  typename PasteFilter::Pointer pasteFilter = PasteFilter::New();
+  pasteFilter->SetSourceImage(thresholdFilter->GetOutput());
+  pasteFilter->SetSourceRegion(region);
+  pasteFilter->SetDestinationImage(itkImage);
+  pasteFilter->SetDestinationIndex(regionStart);
+  pasteFilter->SetInPlace(true);
+  pasteFilter->Update();
+}
+
 void mitk::SmartBrushTool::MouseMovedImpl(const mitk::PlaneGeometry* planeGeometry, bool leftMouseButtonPressed)
 {
   CheckIfCurrentSliceHasChanged(planeGeometry);
@@ -426,22 +450,11 @@ void mitk::SmartBrushTool::MouseMovedImpl(const mitk::PlaneGeometry* planeGeomet
     strokePastFilter->Update();
 
     m_StrokeBuffer = strokePastFilter->GetOutput(); // Itk Logic =_=
-    m_ThresholdFilter->SetInput(m_StrokeBuffer);
-    m_ThresholdFilter->GetOutput()->SetRequestedRegion(segRegion);
 
     DataNode* workingNode(m_ToolManager->GetWorkingData(0));
     Image::Pointer image = dynamic_cast<Image*>(workingNode->GetData());
 
-    SegmentationType::Pointer target = mitk::ImageToItkImage<mitk::Tool::DefaultSegmentationDataType, 3>(image);
-
-    using PasteFilter = itk::PasteImageFilter<SegmentationType, SegmentationType>;
-    PasteFilter::Pointer pasteFilter = PasteFilter::New();
-    pasteFilter->SetSourceImage(m_ThresholdFilter->GetOutput());
-    pasteFilter->SetSourceRegion(segRegion);
-    pasteFilter->SetDestinationImage(target);
-    pasteFilter->SetDestinationIndex(segStart);
-    pasteFilter->SetInPlace(true);
-    pasteFilter->Update();
+    AccessFixedDimensionByItk_n(image, PasteResultIntoSegmentation, 3, (m_StrokeBuffer, segStart, segRegion));
 
     image->Update();
     image->Modified();

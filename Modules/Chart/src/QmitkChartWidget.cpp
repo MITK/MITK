@@ -640,11 +640,11 @@ void QmitkChartWidget::SetShowErrorBars(bool showErrorBars)
   m_Impl->SetShowErrorBars(showErrorBars);
 }
 
-void QmitkChartWidget::UpdateMinMaxValueView(double minValue, double maxValue)
+void QmitkChartWidget::UpdateMinMaxValueXView(double minValueX, double maxValueX)
 {
-  QString minMaxValueString = QString::fromStdString(std::to_string(minValue))+QString(",");
-  minMaxValueString += QString::fromStdString(std::to_string(maxValue));
-  const QString command = QString("UpdateMinMaxValueView(" + minMaxValueString + ")");
+  QString minMaxValueXString = QString::fromStdString(std::to_string(minValueX))+QString(",");
+  minMaxValueXString += QString::fromStdString(std::to_string(maxValueX));
+  const QString command = QString("UpdateMinMaxValueXView(" + minMaxValueXString + ")");
   m_Impl->CallJavaScriptFuntion(command);
 }
 

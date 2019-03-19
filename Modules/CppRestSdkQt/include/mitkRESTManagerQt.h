@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QThread>
 
 #include <mitkIRESTManager.h>
+#include <mitkRESTManager.h>
 #include <mitkRESTClientMicroService.h>
 #include <mitkRESTServerMicroServiceQt.h>
 
@@ -28,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class MITKCPPRESTSDKQT_EXPORT RESTManagerQt : public QObject, public IRESTManager
+  class MITKCPPRESTSDKQT_EXPORT RESTManagerQt : public QObject, public IRESTManager, public RESTManager
   {
     Q_OBJECT
 
@@ -79,9 +80,9 @@ namespace mitk
     virtual std::map<std::pair<int, utility::string_t>, IRESTObserver *> GetM_Observers() override;
 
   private:
-    std::map<int, IRESTServerMicroService *> m_ServerMap;                      // Map with port server pairs
+    //std::map<int, IRESTServerMicroService *> m_ServerMap;                      // Map with port server pairs
     std::map<int, QThread *> m_ServerThreadMap;                               // Map with threads for servers
-    std::map<std::pair<int, utility::string_t>, IRESTObserver *> m_Observers; // Map with all observers
+    //std::map<std::pair<int, utility::string_t>, IRESTObserver *> m_Observers; // Map with all observers
   };
 } // namespace mitk
 #endif // !mitkRESTManager_h

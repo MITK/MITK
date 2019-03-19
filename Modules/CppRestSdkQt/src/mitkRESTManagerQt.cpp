@@ -5,56 +5,15 @@ mitk::RESTManagerQt::RESTManagerQt() {}
 
 mitk::RESTManagerQt::~RESTManagerQt() {}
 
+
 pplx::task<web::json::value> mitk::RESTManagerQt::SendRequest(const web::uri &uri,
                                                             const RequestType &type,
                                                             const web::json::value &content,
                                                             const utility::string_t &filePath)
 {
-  pplx::task<web::json::value> answer;
-  auto client = new RESTClientMicroService();
-  // according to the RequestType, different HTTP requests are made
-  switch (type)
-  {
-    case get:
-    {
-      if (filePath == L"")
-      {
-        // no file path specified, starts a normal get request returning the normal json result
-        answer = client->Get(uri);
-      }
-      else
-      {
-        // file path ist specified, the result of the get request ist stored in this file
-        // and an empty json object is returned
-        answer = client->Get(uri, filePath);
-      }
-      break;
-    }
-    case post:
-    {
-      if (content == NULL)
-      {
-        // warning because normally you won't create an empty ressource
-        MITK_WARN << "Content for put is empty, this will create an empty ressource";
-      }
-      answer = client->POST(uri, content);
-      break;
-    }
-    break;
-    case put:
-    {
-      if (content == NULL)
-      {
-        // warning because normally you won't empty a ressource
-        MITK_WARN << "Content for put is empty, this will empty the ressource";
-      }
-      answer = client->PUT(uri, content);
-      break;
-    }
-  }
-
-  return answer;
+  return mitk::RESTManager::SendRequest(uri, type, content, filePath);
 }
+
 
 void mitk::RESTManagerQt::ReceiveRequest(const web::uri &uri, mitk::IRESTObserver *observer)
 {
@@ -127,21 +86,9 @@ void mitk::RESTManagerQt::ReceiveRequest(const web::uri &uri, mitk::IRESTObserve
   }
 }
 
-web::json::value mitk::RESTManagerQt::Handle(const web::uri &uri, web::json::value &body)
+ web::json::value mitk::RESTManagerQt::Handle(const web::uri &uri, web::json::value &body)
 {
-  // Checking if there is an observer for the port and path
-  std::pair<int, utility::string_t> key(uri.port(), uri.path());
-  if (m_Observers.count(key) != 0)
-  {
-    MITK_INFO << "Manager: Data send to observer";
-    return m_Observers[key]->Notify(body, uri);
-  }
-  // No observer under this port, return null which results in status code 404 (s. RESTServerMicroService)
-  else
-  {
-    MITK_WARN << "No Observer can handle the data";
-    return NULL;
-  }
+   return mitk::RESTManager::Handle(uri, body);
 }
 
 void mitk::RESTManagerQt::HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri = L"")
@@ -204,10 +151,10 @@ void mitk::RESTManagerQt::HandleDeleteObserver(IRESTObserver *observer, const we
 
 std::map<int, mitk::IRESTServerMicroService *> mitk::RESTManagerQt::GetM_ServerMap()
 {
-  return m_ServerMap;
+  return mitk::RESTManager::GetM_ServerMap();
 }
 
 std::map<std::pair<int, utility::string_t>, mitk::IRESTObserver *> mitk::RESTManagerQt::GetM_Observers()
 {
-  return m_Observers;
+  return mitk::RESTManager::GetM_Observers();
 }

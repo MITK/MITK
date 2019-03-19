@@ -71,7 +71,6 @@ void QmitkIntensityProfileVisualizationWidget::SetGUIElementsEnabled(bool enable
 	m_Controls.buttonCopyToClipboard->setEnabled(enabled);
 	m_Controls.checkBoxShowSubchart->setEnabled(enabled);
 	m_Controls.chartWidget->setEnabled(enabled);
-	m_Controls.labelInfo->setEnabled(enabled);
 }
 
 std::vector<double> QmitkIntensityProfileVisualizationWidget::ConvertIntensityProfileToVector(mitk::IntensityProfile::ConstPointer intensityProfile) const

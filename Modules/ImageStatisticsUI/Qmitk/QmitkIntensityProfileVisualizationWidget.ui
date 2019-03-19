@@ -70,13 +70,6 @@
        <widget class="QmitkChartWidget" name="chartWidget" native="true"/>
       </item>
       <item>
-       <widget class="QLabel" name="labelInfo">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QWidget" name="widgetClipboard" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <property name="spacing">

@@ -142,7 +142,10 @@ function generateStackPlotData(){
       y: yValues[index].slice(1),
       stackgroup: 'one',
       name: dataLabels[index],
-	  type: chartType
+	  type: chartType,
+	  marker:{
+		  color: dataProperties[dataLabels[index]]["color"]
+	  }
     };
 
     data.push(trace);

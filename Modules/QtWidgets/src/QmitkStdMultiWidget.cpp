@@ -378,11 +378,11 @@ void QmitkStdMultiWidget::InitializeWidget(bool showPlanesIn3d)
   //mitkWidget4->GetSliceNavigationController()
   //  ->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
 
-  m_MouseModeSwitcher = mitk::MouseModeSwitcher::New(mitkWidget1->GetRenderer()->GetName());
+  m_MouseModeSwitcher = mitk::MouseModeSwitcher::New(mitkWidget1->GetRenderer());
   //m_MouseModeSwitcher->AddRenderer(mitkWidget1->GetRenderer()->GetName());
-  m_MouseModeSwitcher->AddRenderer(mitkWidget2->GetRenderer()->GetName());
-  m_MouseModeSwitcher->AddRenderer(mitkWidget3->GetRenderer()->GetName());
-  m_MouseModeSwitcher->AddRenderer(mitkWidget4->GetRenderer()->GetName());
+  m_MouseModeSwitcher->AddRenderer(mitkWidget2->GetRenderer());
+  m_MouseModeSwitcher->AddRenderer(mitkWidget3->GetRenderer());
+  m_MouseModeSwitcher->AddRenderer(mitkWidget4->GetRenderer());
 
   mitkWidget1->GetSliceNavigationController()->crosshairPositionEvent.AddListener(mitk::MessageDelegate<QmitkStdMultiWidget>(this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent));
   mitkWidget2->GetSliceNavigationController()->crosshairPositionEvent.AddListener(mitk::MessageDelegate<QmitkStdMultiWidget>(this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent));

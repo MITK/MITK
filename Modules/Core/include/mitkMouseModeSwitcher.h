@@ -72,8 +72,8 @@ namespace mitk {
 #pragma GCC visibility pop
 
     mitkClassMacroItkParent( MouseModeSwitcher, itk::Object );
-    mitkNewMacro1Param(Self, const std::string&);
-    itkCloneMacro(Self);
+    mitkNewMacro1Param(Self, BaseRenderer::Pointer);
+    itkNewMacro(Self);
 
     // enum of the different interaction schemes that are available
     enum InteractionScheme
@@ -126,10 +126,11 @@ namespace mitk {
     /**
     * \brief Initializes the listener with the MITK default behavior.
     */
-    void AddRenderer(const std::string& rendererName);
+    void AddRenderer(BaseRenderer::Pointer renderer);
 
   protected:
-    MouseModeSwitcher(const std::string& rendererName = "");
+    MouseModeSwitcher(BaseRenderer::Pointer renderer);
+    MouseModeSwitcher();
     virtual ~MouseModeSwitcher();
   private:
 

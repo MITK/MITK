@@ -77,7 +77,9 @@ void mitk::DisplayInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("levelWindow", AdjustLevelWindow);
   CONNECT_FUNCTION("setCrosshair", SetCrosshair);
 
-  CONNECT_FUNCTION ("updateStatusbar", UpdateStatusbar)
+  CONNECT_FUNCTION("doubleClick", SetCrosshair);
+
+  CONNECT_FUNCTION("updateStatusbar", UpdateStatusbar)
   CONNECT_FUNCTION("startRotation", StartRotation);
   CONNECT_FUNCTION("endRotation", EndRotation);
   CONNECT_FUNCTION("rotationModeChanged", EndRotation);
@@ -87,6 +89,7 @@ void mitk::DisplayInteractor::ConnectActionsAndFunctions()
 
   CONNECT_FUNCTION("rotateClock", RotateClock);
   CONNECT_FUNCTION("rotateBackClock", RotateBackClock);
+
   CONNECT_FUNCTION("selectObject", SelectObject);
   CONNECT_FUNCTION("deSelectObject", DeSelectObject);
 
@@ -110,6 +113,7 @@ mitk::DisplayInteractor::DisplayInteractor()
   , m_ZoomFactor(2)
   , m_LinkPlanes(true)
   , m_SelectionMode(false)
+  , m_Only3D(false)
 {
   m_StartCoordinateInMM.Fill(0);
   m_LastDisplayCoordinate.Fill(0);
@@ -1161,10 +1165,15 @@ void mitk::DisplayInteractor::ConfigurationChanged()
 
 bool mitk::DisplayInteractor::FilterEvents(InteractionEvent* interactionEvent, DataNode* /*dataNode*/)
 {
-  if (interactionEvent->GetSender() == nullptr)
+  if (interactionEvent->GetSender() == nullptr) {
     return false;
-  if (interactionEvent->GetSender()->GetMapperID() == BaseRenderer::Standard3D)
+  }
+  if (!m_Only3D && interactionEvent->GetSender()->GetMapperID() == BaseRenderer::Standard3D) {
     return false;
+  }
+  if (m_Only3D && interactionEvent->GetSender()->GetMapperID() == BaseRenderer::Standard2D) {
+    return false;
+  }
 
   return true;
 }

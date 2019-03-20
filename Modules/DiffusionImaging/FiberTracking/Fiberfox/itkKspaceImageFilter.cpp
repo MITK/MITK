@@ -116,7 +116,7 @@ namespace itk {
 //    m_TickImage->Allocate();
 //    m_TickImage->FillBuffer(-1.0);
 
-    m_Gamma = 42576000*itk::Math::twopi;    // Gyromagnetic ratio in Hz/T (1.5T)
+    m_Gamma = 42576000*itk::Math::twopi;    // Gyromagnetic ratio in Hz/T
     if ( m_Parameters->m_SignalGen.m_EddyStrength>0 && m_DiffusionGradientDirection.GetNorm()>0.001)
     {
       m_DiffusionGradientDirection = m_DiffusionGradientDirection *  m_Parameters->m_SignalGen.m_EddyStrength/1000 *  m_Gamma;
@@ -323,8 +323,8 @@ namespace itk {
         }
       }
 
-      // time passes since application of the RF pulse
-      float tRf = m_ReadoutScheme->GetTimeFromRf(tick);
+      // time from maximum echo
+      float t = m_ReadoutScheme->GetTimeFromMaxEcho(tick);
 
       // calculate eddy current decay factor
       float eddyDecay = 0;
@@ -332,15 +332,16 @@ namespace itk {
       {
         // time passed since k-space readout started
         float tRead = m_ReadoutScheme->GetTimeFromLastDiffusionGradient(tick);
-        eddyDecay = std::exp(-tRead/m_Parameters->m_SignalGen.m_Tau ) * tRead/1000; // time in seconds here
+        eddyDecay = std::exp(-tRead/m_Parameters->m_SignalGen.m_Tau ) * t/1000; // time in seconds here
       }
 
       // calcualte signal relaxation factors
       std::vector< float > relaxFactor;
       if ( m_Parameters->m_SignalGen.m_DoSimulateRelaxation)
       {
-        // time from maximum echo
-        float t = m_ReadoutScheme->GetTimeFromMaxEcho(tick);
+        // time passes since application of the RF pulse
+        float tRf = m_ReadoutScheme->GetTimeFromRf(tick);
+
         for (unsigned int i=0; i<m_CompartmentImages.size(); i++)
         {
           // account for T2 relaxation (how much transverse magnetization is left since applicatiohn of RF pulse?)
@@ -362,7 +363,7 @@ namespace itk {
       }
 
       // pull stuff out of inner loop
-      tRf /= 1000; // time in seconds
+      t /= 1000; // time in seconds
       kx /= xMax;
       ky /= yMaxFov;
 
@@ -399,22 +400,22 @@ namespace itk {
           f_real *= CoilSensitivity(pos);
 
         // simulate eddy currents and other distortions
-        float omega = 0;   // frequency offset
+        float phi = 0;   // phase shift
         if (  m_Parameters->m_Misc.m_DoAddEddyCurrents && m_Parameters->m_SignalGen.m_EddyStrength>0 && !m_IsBaseline)
         {
           // duration (tRead) already included in "eddyDecay"
-          omega += (m_DiffusionGradientDirection[0]*pos[0]+m_DiffusionGradientDirection[1]*pos[1]+m_DiffusionGradientDirection[2]*pos[2]) * eddyDecay;
+          phi += (m_DiffusionGradientDirection[0]*pos[0]+m_DiffusionGradientDirection[1]*pos[1]+m_DiffusionGradientDirection[2]*pos[2]) * eddyDecay;
         }
 
         // simulate distortions
         if (m_Parameters->m_Misc.m_DoAddDistortions)
         {
           if (m_MovedFmap.IsNotNull())    // if we have headmotion, use moved map
-            omega += m_MovedFmap->GetPixel(input_idx) * tRf;
+            phi += m_MovedFmap->GetPixel(input_idx) * t;
           else if (m_Parameters->m_SignalGen.m_FrequencyMap.IsNotNull())
           {
             itk::Image<float, 3>::IndexType index; index[0] = input_idx[0]; index[1] = input_idx[1]; index[2] = m_Zidx;
-            omega += m_Parameters->m_SignalGen.m_FrequencyMap->GetPixel(index) * tRf;
+            phi += m_Parameters->m_SignalGen.m_FrequencyMap->GetPixel(index) * t;
           }
         }
 
@@ -429,7 +430,7 @@ namespace itk {
 
         // actual DFT term
         vcl_complex<ScalarType> f(f_real * m_Parameters->m_SignalGen.m_SignalScale, 0);
-        s += f * std::exp( std::complex<ScalarType>(0, itk::Math::twopi * (kx*x + ky*y + omega )) );
+        s += f * std::exp( std::complex<ScalarType>(0, itk::Math::twopi * (kx*x + ky*y + phi )) );
 
         ++it;
       }

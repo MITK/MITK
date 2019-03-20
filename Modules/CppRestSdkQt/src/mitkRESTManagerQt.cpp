@@ -1,19 +1,8 @@
 #include "mitkRESTManagerQt.h"
-#include <QCoreApplication>
 #include <mitkCommon.h>
 mitk::RESTManagerQt::RESTManagerQt() {}
 
 mitk::RESTManagerQt::~RESTManagerQt() {}
-
-
-pplx::task<web::json::value> mitk::RESTManagerQt::SendRequest(const web::uri &uri,
-                                                            const RequestType &type,
-                                                            const web::json::value &content,
-                                                            const utility::string_t &filePath)
-{
-  return mitk::RESTManager::SendRequest(uri, type, content, filePath);
-}
-
 
 void mitk::RESTManagerQt::ReceiveRequest(const web::uri &uri, mitk::IRESTObserver *observer)
 {
@@ -49,11 +38,6 @@ void mitk::RESTManagerQt::ReceiveRequest(const web::uri &uri, mitk::IRESTObserve
   {
     mitk::RESTManager::ServerUnderPort(uri, observer);
   }
-}
-
- web::json::value mitk::RESTManagerQt::Handle(const web::uri &uri, web::json::value &body)
-{
-   return mitk::RESTManager::Handle(uri, body);
 }
 
 void mitk::RESTManagerQt::HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri = L"")
@@ -92,14 +76,4 @@ void mitk::RESTManagerQt::HandleDeleteObserver(IRESTObserver *observer, const we
       ++it;
     }
   }
-}
-
-std::map<int, mitk::RESTServerMicroService *> mitk::RESTManagerQt::GetM_ServerMap()
-{
-  return mitk::RESTManager::GetM_ServerMap();
-}
-
-std::map<std::pair<int, utility::string_t>, mitk::IRESTObserver *> mitk::RESTManagerQt::GetM_Observers()
-{
-  return mitk::RESTManager::GetM_Observers();
 }

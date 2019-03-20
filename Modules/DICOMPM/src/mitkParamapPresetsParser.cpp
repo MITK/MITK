@@ -34,7 +34,6 @@ namespace mitk {
 
   bool ParamapPresetsParser::LoadPreset()
   {
-	std::cout << "ParamapPresetsParser::LoadPreset() is called" << std::endl;
     us::ModuleResource presetResource = us::GetModuleContext()->GetModule()->GetResource("mitkParamapPresets.xml");
     if (!presetResource) return false;
 

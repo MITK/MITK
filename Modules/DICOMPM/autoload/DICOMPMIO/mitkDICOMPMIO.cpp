@@ -157,7 +157,6 @@ namespace mitk
 	
 	// Create PM meta information
     const std::string tmpMetaInfoFile = this->CreateMetaDataJsonFilePM();
-	MITK_INFO << "tmpMetaInfoFile" << tmpMetaInfoFile;
 	// Convert itk PM images to dicom image
 	MITK_INFO << "Writing PM image: " << path << std::endl;
 	try
@@ -166,9 +165,7 @@ namespace mitk
       for (const auto& dcmDataSet : dcmDatasetsSourceImage)
         rawVecDataset.push_back(dcmDataSet.get());
         std::unique_ptr<dcmqi::ParaMapConverter> PMconverter(new dcmqi::ParaMapConverter());
-		MITK_INFO << "PMconverter->itkimage2paramap is called";
         std::unique_ptr<DcmDataset> PMresult (PMconverter->itkimage2paramap(itkParamapImage, rawVecDataset, tmpMetaInfoFile));
-		MITK_INFO << "PMconverter->itkimage2paramap is successfully finished";
 		// Write dicom file
         DcmFileFormat dcmFileFormat(PMresult.get());
 		std::string filePath = path.substr(0, path.find_last_of("."));
@@ -186,7 +183,6 @@ namespace mitk
   
   const std::string mitk::DICOMPMIO::CreateMetaDataJsonFilePM() const
   {  
-	  MITK_INFO << "mitk::DICOMPMIO::CreateMetaDataJsonFilePM() is called";
 	  const mitk::Image *PMimage = dynamic_cast<const mitk::Image *>(this->GetInput());
 	  dcmqi::JSONParametricMapMetaInformationHandler PMhandler;
 	  
@@ -199,28 +195,21 @@ namespace mitk
       mitk::ParamapPresetsParser* pmPresets = mitk::ParamapPresetsParser::New();
       // Here the mitkParamapPresets.xml file containing the Coding Schmeme Designator and Code Value are parsed and the relevant values extracted
 	  pmPresets->LoadPreset();
-	  MITK_INFO << "pmPresets->LoadPreset(): " << pmPresets->LoadPreset();
 	  auto pmType_parameterName = pmPresets->GetType(parameterName);
 	  auto pmType_modelName = pmPresets->GetType(modelName);
 	  
-      // Here some other
-	  // mandatory
-	  // TODO: where to get these from?
-	  // TODO: AnatomicRegionSequence from Segmentation?
-
-	  PMhandler.setAnatomicRegionSequence("T-9200B", "SRT", "Prostate");
+	  // Pass codes to Paramap Converter
 	  PMhandler.setDerivedPixelContrast("TCS");
 	  PMhandler.setFrameLaterality("U");
-	  // optional
-	  PMhandler.setQuantityValueCode(pmType_parameterName.codeValue, pmType_parameterName.codeScheme, parameterName);
+	  PMhandler.setQuantityValueCode(pmType_parameterName.codeValue, pmType_parameterName.codeScheme, parameterName);	  
 	  PMhandler.setMeasurementMethodCode(pmType_modelName.codeValue, pmType_modelName.codeScheme, modelName);
+	  PMhandler.setMeasurementUnitsCode("/min", "UCUM", "/m");
 	  PMhandler.setSeriesNumber("1");
 	  PMhandler.setInstanceNumber("1");
-	  PMhandler.setDerivationCode("110816", "DCM", "Time Course of Signal");
-	  PMhandler.setMeasurementUnitsCode("/min", "UCUM", "/m");
+	  PMhandler.setDerivationCode("129104", "DCM", "Perfusion image analysis");
 	  PMhandler.setRealWorldValueSlope(1);
 
-	  MITK_INFO << "mitk::DICOMPMIO::CreateMetaDataJsonFilePM() is successfully finished.";
+
 	  return PMhandler.getJSONOutputAsString();
 
   }

@@ -6,9 +6,6 @@ set(CPP_FILES
   Common/mitkConcentrationCurveGenerator.cpp
   Common/mitkDescriptionParameterImageGeneratorBase.cpp
   Common/mitkPixelBasedDescriptionParameterImageGenerator.cpp
-  Common/mitkDICOMPMConstants.cpp
-  Common/mitkDICOMPMPropertyHelper.cpp
-  Common/mitkParamapPresetsParser.cpp	
   DescriptionParameters/mitkCurveDescriptionParameterBase.cpp
   DescriptionParameters/mitkAreaUnderTheCurveDescriptionParameter.cpp
   DescriptionParameters/mitkAreaUnderFirstMomentDescriptionParameter.cpp
@@ -64,7 +61,5 @@ mitkDICOMSegmentationConstants.h
 set(MOC_H_FILES
 )
 
-set(RESOURCE_FILES
-mitkParamapPresets.xml
-)
+
 

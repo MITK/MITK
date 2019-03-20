@@ -24,12 +24,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "cpprest/http_listener.h"
 
-#include "MitkCppRestSdkExports.h"
 #include <mitkIRESTManager.h>
 #include <usGetModuleContext.h>
 #include <usModule.h>
 #include <usServiceTracker.h>
-#include <MitkCppRestSdkExports.h>
 
 typedef web::http::experimental::listener::http_listener MitkListener;
 typedef web::http::http_request MitkRequest;

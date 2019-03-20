@@ -1,14 +1,11 @@
 #include "mitkCppRestSdkActivator.h"
 #include<usGetModuleContext.h>
 #include<usModule.h> 
-#include<usModuleActivator.h> 
 #include<usModuleContext.h> 
-#include<usModuleEvent.h> 
 #include<usModuleInitialization.h> 
 #include<usModuleResource.h> 
 #include<usModuleResourceStream.h> 
 #include<usModuleSettings.h> 
-#include<usServiceTracker.h>
 #include<mitkCommon.h>
 
 void MitkCppRestSdkActivator::Load(us::ModuleContext *context)

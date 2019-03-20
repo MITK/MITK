@@ -11,7 +11,7 @@ pplx::task<web::json::value> mitk::RESTClientMicroService::Get(const web::uri &u
   //Create new HTTP client
   MitkClient *client = new MitkClient(uri);
 
-  MITK_INFO << "Calling GET with " << utility::conversions::to_utf8string(uri.path()) << " on client "
+  MITK_INFO << "Calling GET with " << mitk::RESTUtil::convertToUtf8(uri.path()) << " on client "
             << mitk::RESTUtil::convertToUtf8(uri.authority().to_string());
 
   //create get request
@@ -61,7 +61,7 @@ pplx::task<web::json::value> mitk::RESTClientMicroService::Get(const web::uri &u
   // Create new HTTP client
   MitkClient *client = new MitkClient(uri);
 
-  MITK_INFO << "Calling GET with " << utility::conversions::to_utf8string(uri.path()) << " on client "
+  MITK_INFO << "Calling GET with " << mitk::RESTUtil::convertToUtf8(uri.path()) << " on client "
             << mitk::RESTUtil::convertToUtf8(uri.authority().to_string()) << " save into "
              << mitk::RESTUtil::convertToUtf8(filePath);
   
@@ -105,7 +105,7 @@ pplx::task<web::json::value> mitk::RESTClientMicroService::PUT(const web::uri &u
   // Create new HTTP client
   MitkClient *client = new MitkClient(uri);
 
-  MITK_INFO << "Calling PUT with " << utility::conversions::to_utf8string(uri.path()) << " on client "
+  MITK_INFO << "Calling PUT with " << mitk::RESTUtil::convertToUtf8(uri.path()) << " on client "
             << mitk::RESTUtil::convertToUtf8(uri.authority().to_string());
 
   // create put request
@@ -158,7 +158,7 @@ pplx::task<web::json::value> mitk::RESTClientMicroService::POST(const web::uri &
 {
   // Create new HTTP client
   MitkClient *client = new MitkClient(uri);
-  MITK_INFO << "Calling POST with " << utility::conversions::to_utf8string(uri.path()) << " on client "
+  MITK_INFO << "Calling POST with " << mitk::RESTUtil::convertToUtf8(uri.path()) << " on client "
             << mitk::RESTUtil::convertToUtf8(uri.authority().to_string());
 
   // Create post request

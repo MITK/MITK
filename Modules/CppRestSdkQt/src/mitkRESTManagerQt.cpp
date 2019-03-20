@@ -1,5 +1,7 @@
 #include "mitkRESTManagerQt.h"
 #include <mitkCommon.h>
+#include <mitkRESTUtil.h>
+
 mitk::RESTManagerQt::RESTManagerQt() {}
 
 mitk::RESTManagerQt::~RESTManagerQt() {}
@@ -29,9 +31,7 @@ void mitk::RESTManagerQt::ReceiveRequest(const web::uri &uri, mitk::IRESTObserve
     m_ServerThreadMap[port]->start();
     QMetaObject::invokeMethod(server, "OpenListener");
 
-    utility::string_t host = uri.authority().to_string();
-    std::string hoststring(host.begin(), host.end());
-    MITK_INFO << "new server" << hoststring << " at port" << port;
+    MITK_INFO << "new server " << mitk::RESTUtil::convertToUtf8(uri.authority().to_string()) << " at port " << port;
   }
   // If there is already a server under this port
   else

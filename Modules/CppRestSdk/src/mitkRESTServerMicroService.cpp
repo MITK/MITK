@@ -1,5 +1,6 @@
 #include "mitkRESTServerMicroService.h"
 #include <mitkCommon.h>
+#include<mitkRESTUtil.h>
 
 mitk::RESTServerMicroService::RESTServerMicroService(web::uri uri)
 {
@@ -40,8 +41,8 @@ void mitk::RESTServerMicroService::HandleGet(MitkRequest request)
   build.append(request.absolute_uri());
   utility::string_t uriStringT = build.to_uri().to_string();
 
-  std::string uriString(uriStringT.begin(), uriStringT.end());
-  MITK_INFO << "Get Request fot server at port " << port << " Exact request uri: " << uriString;
+  MITK_INFO << "Get Request for server at port " << port << " Exact request uri: " 
+    << mitk::RESTUtil::convertToUtf8(uriStringT);
   
   web::json::value content;
   //get RESTManager as microservice to call th Handle method of the manager

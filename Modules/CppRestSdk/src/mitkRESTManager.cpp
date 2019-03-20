@@ -1,5 +1,6 @@
 #include "mitkRESTManager.h"
 #include <mitkCommon.h>
+#include <mitkRESTUtil.h>
 
 mitk::RESTManager::RESTManager() {}
 
@@ -72,9 +73,7 @@ void mitk::RESTManager::ReceiveRequest(const web::uri &uri, mitk::IRESTObserver 
     //start Server
     server->OpenListener();
 
-    utility::string_t host = uri.authority().to_string();
-    std::string hoststring(host.begin(), host.end());
-    MITK_INFO << "new server" << hoststring << " at port" << port;
+    MITK_INFO << "new server " << mitk::RESTUtil::convertToUtf8(uri.authority().to_string()) << " at port " << port;
   }
   // If there is already a server under this port
   else
@@ -153,9 +152,8 @@ void mitk::RESTManager::AddObserver(const web::uri &uri, IRESTObserver *observer
   m_Observers[key] = observer;
 
   // testing if entry has been added to observer map
-  utility::string_t uristringt = uri.path();
-  std::string uristring(uristringt.begin(), uristringt.end());
-  MITK_INFO << "[" << uri.port() << ", " << uristring << "] : Number of elements in map: " << m_Observers.count(key);
+  MITK_INFO << "[" << uri.port() << ", " << mitk::RESTUtil::convertToUtf8(uri.path())
+            << "] : Number of elements in map: " << m_Observers.count(key);
 }
 
 void mitk::RESTManager::ServerUnderPort(const web::uri &uri, IRESTObserver *observer) 
@@ -171,9 +169,7 @@ void mitk::RESTManager::ServerUnderPort(const web::uri &uri, IRESTObserver *obse
       m_Observers[key] = observer;
 
       // testing if entry has been added to map
-      utility::string_t uristringt = uri.path();
-      std::string uristring(uristringt.begin(), uristringt.end());
-      MITK_INFO << "[" << uri.port() << ", " << uristring
+      MITK_INFO << "[" << uri.port() << ", " << mitk::RESTUtil::convertToUtf8(uri.path())
                 << "] : Number of elements in map: " << m_Observers.count(key);
 
       // info output
@@ -200,11 +196,11 @@ bool mitk::RESTManager::DeleteObserver(std::map<std::pair<int, utility::string_t
   int port = it->first.first;
   utility::string_t path = it->first.second;
   std::pair<int, utility::string_t> key(port, path);
-  MITK_INFO << "Number of elements at key [ " << port << ", " << std::string(key.second.begin(), key.second.end())
+  MITK_INFO << "Number of elements at key [ " << port << ", " << mitk::RESTUtil::convertToUtf8(key.second)
             << "]: " << m_Observers.count(key);
   // 2. delete map entry
   it = m_Observers.erase(it);
-  MITK_INFO << "Number of elements at key [ " << port << ", " << std::string(key.second.begin(), key.second.end())
+  MITK_INFO << "Number of elements at key [ " << port << ", " << mitk::RESTUtil::convertToUtf8(key.second)
             << "]: " << m_Observers.count(key);
   // 3. check, if there is another observer under this port in observer map (with bool flag)
   bool noObserverForPort = true;

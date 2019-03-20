@@ -1,5 +1,4 @@
 #include "mitkRESTServerMicroServiceQt.h"
-#include <mitkCommon.h>
 
 mitk::RESTServerMicroServiceQt::RESTServerMicroServiceQt(web::uri uri) : RESTServerMicroService(uri)
 {

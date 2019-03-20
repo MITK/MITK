@@ -23,10 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #endif
 
 #include <mitkIRESTManager.h>
-#include <mitkRESTClientMicroService.h>
 #include <mitkRESTServerMicroService.h>
 
-#include <MitkCppRestSdkExports.h>
+
 
 namespace mitk
 {

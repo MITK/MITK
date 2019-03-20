@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRawShModel.h>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
+#include <boost/property_tree/json_parser.hpp>
 #include <limits>
 #include <MitkFiberTrackingExports.h>
 #include <itkMersenneTwisterRandomVariateGenerator.h>
@@ -77,16 +78,17 @@ namespace mitk
       , m_EchoTrainLength(8)
       , m_ReversePhase(false)
       , m_PartialFourier(1.0)
-      , m_NoiseVariance(0.001)
+      , m_NoiseVariance(0.001f)
       , m_NumberOfCoils(1)
       , m_CoilSensitivityProfile(SignalGenerationParameters::COIL_CONSTANT)
+      , m_CoilSensitivity(0.3f)
       , m_SimulateKspaceAcquisition(false)
       , m_AxonRadius(0)
       , m_DoDisablePartialVolume(false)
       , m_Spikes(0)
       , m_SpikeAmplitude(1)
       , m_KspaceLineOffset(0)
-      , m_EddyStrength(300)
+      , m_EddyStrength(0.002f)
       , m_Tau(70)
       , m_CroppingFactor(1)
       , m_Drift(0.06)
@@ -132,6 +134,7 @@ namespace mitk
     float                               m_NoiseVariance;            ///< Variance of complex gaussian noise
     unsigned int                        m_NumberOfCoils;            ///< Number of coils in multi-coil acquisition
     CoilSensitivityProfile              m_CoilSensitivityProfile;   ///< Choose between constant, linear or exponential sensitivity profile of the used coils
+    float                               m_CoilSensitivity;          ///< signal remaining in slice center
     bool                                m_SimulateKspaceAcquisition;///< Flag to enable/disable k-space acquisition simulation
     double                              m_AxonRadius;               ///< Determines compartment volume fractions (0 == automatic axon radius estimation)
     bool                                m_DoDisablePartialVolume;   ///< Disable partial volume effects. Each voxel is either all fiber or all non-fiber.

@@ -256,7 +256,7 @@ public:
   * Triggers a replot of the curve. Replot should be called once after
   * setting new data.
   */
-  DEPRECATED(void Replot());
+  void Replot();
 
   /**
   * Resets the plot into an empty state

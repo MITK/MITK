@@ -129,7 +129,7 @@ void QmitkImageStatisticsView::OnSliderWidgetHistogramChanged(double value)
   }
 }
 
-void QmitkImageStatisticsView::OnSliderWidgetIntensityProfileChanged(double value)
+void QmitkImageStatisticsView::OnSliderWidgetIntensityProfileChanged()
 {
   //intensity profile is always computed on request, not stored as node in DataStorage
   auto image = dynamic_cast<mitk::Image*>(m_selectedImageNode->GetData());

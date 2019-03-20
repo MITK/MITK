@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkModelFitConstants.h"
 #include "mitkModelFitInfo.h"
 
+#include <mitkDICOMPMPropertyHelper.h>
+#include <mitkDICOMQIPropertyHelper.h>
 
 namespace mitk
 {
@@ -272,7 +274,14 @@ MITKMODELFIT_EXPORT void mitk::modelFit::StoreResultsInDataStorage(DataStorage* 
     storage->Add(*pos,parentNode);
   }
 
+  // Set DICOM properties, paramap-secific (DICOMPM) and general properties from source data (DICOMQI)
 
+  for (ModelFitResultNodeVectorType::const_iterator pos = resultNodes.begin(); pos != resultNodes.end(); pos++)
+  {
+    mitk::DICOMQIPropertyHelper::DeriveDICOMSourceProperties(parentNode->GetData(), pos->GetPointer()->GetData());
+    mitk::DICOMPMPropertyHelper::DeriveDICOMPMProperties(pos->GetPointer()->GetData());
+  }
+  
 
 };
 

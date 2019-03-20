@@ -69,8 +69,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImage.h>
 #include <itkImageRegionIterator.h>
 
-#include <mitkDICOMPMPropertyHelper.h>
-#include <mitkDICOMQIPropertyHelper.h>
+//#include <mitkDICOMPMPropertyHelper.h>
+//#include <mitkDICOMQIPropertyHelper.h>
 
 
 const std::string MRPerfusionView::VIEW_ID = "org.mitk.gui.qt.pharmacokinetics.mri";
@@ -1077,7 +1077,7 @@ void MRPerfusionView::OnJobResultsAreAvailable(mitk::modelFit::ModelFitResultNod
   mitk::modelFit::StoreResultsInDataStorage(this->GetDataStorage(), results, pJob->GetParentNode());
 
   // Set DICOM properties, paramap-secific (DICOMPM) and general properties from source data (DICOMQI)
-
+  /*
   mitk::modelFit::ModelFitResultNodeVectorType::const_iterator pos;
   for (pos = results.begin(); pos != results.end(); pos++)
   {
@@ -1087,7 +1087,7 @@ void MRPerfusionView::OnJobResultsAreAvailable(mitk::modelFit::ModelFitResultNod
   
     m_Controls.errorMessageLabel->setText("");
 	m_Controls.errorMessageLabel->hide();
-
+	*/
 
 
 

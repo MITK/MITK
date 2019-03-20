@@ -54,7 +54,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 * @deprecatedSince{2018_04} Use QmitkChartWidget instead
 */
 
-class DEPRECATED() MITKQTWIDGETSEXT_EXPORT QmitkPlotWidget
+class MITKQTWIDGETSEXT_EXPORT QmitkPlotWidget
   : public QWidget
   {
 private:
@@ -256,7 +256,7 @@ public:
   * Triggers a replot of the curve. Replot should be called once after
   * setting new data.
   */
-  void Replot();
+  DEPRECATED(void Replot());
 
   /**
   * Resets the plot into an empty state

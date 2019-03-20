@@ -7,5 +7,4 @@ set(CPP_FILES
   mitkIRESTManager.cpp
   mitkRESTManager.cpp
   mitkIRESTObserver.cpp
-  mitkCppRestSdk.cpp
 )

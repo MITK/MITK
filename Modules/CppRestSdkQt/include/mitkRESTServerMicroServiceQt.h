@@ -18,18 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkRESTServerMicroServiceQt_h
 
 #include <QThread>
-#include <mitkIRESTServerMicroService.h>
-
-typedef web::http::experimental::listener::http_listener MitkListener;
-typedef web::http::http_request MitkRequest;
-typedef web::http::http_response MitkResponse;
-typedef web::http::methods MitkRESTMethods;
-typedef web::http::status_codes MitkRestStatusCodes;
-typedef web::json::json_exception MitkJsonException;
+#include <mitkRESTServerMicroService.h>
 
 namespace mitk
 {
-  class RESTServerMicroServiceQt : public QObject, public IRESTServerMicroService
+  class RESTServerMicroServiceQt : public QObject, public RESTServerMicroService
   {
     Q_OBJECT 
 
@@ -42,16 +35,6 @@ namespace mitk
      */
     RESTServerMicroServiceQt(web::uri uri);
     ~RESTServerMicroServiceQt();
-
-    web::uri GetUri() override;
-
-  private:
-    /**
-     * @brief Handle for incoming GET requests
-     *
-     * @param MitkRequest incoming request object
-     */
-    void HandleGet(MitkRequest request) override;
 
   public slots:
     /**

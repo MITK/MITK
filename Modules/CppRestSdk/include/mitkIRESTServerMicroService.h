@@ -26,6 +26,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModule.h>
 #include <usServiceTracker.h>
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4251)
+#endif
+
 typedef web::http::experimental::listener::http_listener MitkListener;
 typedef web::http::http_request MitkRequest;
 typedef web::http::http_response MitkResponse;
@@ -59,7 +64,7 @@ namespace mitk
      */
     virtual void CloseListener() = 0;
 
-  protected:
+  private:
     /**
      * @brief Handle for incoming GET requests
      *
@@ -67,10 +72,14 @@ namespace mitk
      */
     virtual void HandleGet(MitkRequest request) = 0;
 
+  protected:
     MitkListener m_Listener;
     web::uri m_Uri;
-
-    // public slots:
   };
 } // namespace mitk
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
 #endif

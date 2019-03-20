@@ -18,7 +18,7 @@ void MitkCppRestSdkQtActivator::Load(us::ModuleContext *context)
   m_RESTManagerQt.reset(new mitk::RESTManagerQt);
  
   us::ServiceProperties props;
-  if (QCoreApplication::instance()!=NULL)
+  if (QCoreApplication::instance()!=nullptr)
   {
     props[us::ServiceConstants::SERVICE_RANKING()] = 10;
   }

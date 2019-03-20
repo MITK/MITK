@@ -76,7 +76,7 @@ namespace mitk
      */
     virtual void HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri) override;
 
-    virtual std::map<int, IRESTServerMicroService *> GetM_ServerMap() override;
+    virtual std::map<int, RESTServerMicroService *> GetM_ServerMap() override;
     virtual std::map<std::pair<int, utility::string_t>, IRESTObserver *> GetM_Observers() override;
 
     /**
@@ -105,7 +105,7 @@ namespace mitk
     bool DeleteObserver(std::map < std::pair<int, utility::string_t>, IRESTObserver *>::iterator &it, const web::uri &uri);
 
   protected:
-    std::map<int, IRESTServerMicroService *> m_ServerMap;                     // Map with port server pairs
+    std::map<int, RESTServerMicroService *> m_ServerMap;                     // Map with port server pairs
     std::map<std::pair<int, utility::string_t>, IRESTObserver *> m_Observers; // Map with all observers
   };
 } // namespace mitk

@@ -40,12 +40,12 @@ namespace mitk
     /**
      * @brief Opens the listener and starts the listening process
      */
-    void OpenListener() override;
+    void OpenListener();
 
     /**
      * @brief Closes the listener and stops the listening process
      */
-    void CloseListener() override;
+    void CloseListener();
   };
 } // namespace mitk
 #endif

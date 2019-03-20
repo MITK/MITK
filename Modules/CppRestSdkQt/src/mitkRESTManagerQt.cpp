@@ -73,7 +73,7 @@ void mitk::RESTManagerQt::HandleDeleteObserver(IRESTObserver *observer, const we
         {
           //  there isn't an observer at this port, delete m_ServerMap entry for this port
           // close listener
-          QMetaObject::invokeMethod(dynamic_cast<mitk::RESTServerMicroServiceQt *>(m_ServerMap[port]), "CloseListener");
+          QMetaObject::invokeMethod(static_cast<mitk::RESTServerMicroServiceQt *>(m_ServerMap[port]), "CloseListener");
           // end thread
           m_ServerThreadMap[port]->quit();
           m_ServerThreadMap[port]->wait();
@@ -94,7 +94,7 @@ void mitk::RESTManagerQt::HandleDeleteObserver(IRESTObserver *observer, const we
   }
 }
 
-std::map<int, mitk::IRESTServerMicroService *> mitk::RESTManagerQt::GetM_ServerMap()
+std::map<int, mitk::RESTServerMicroService *> mitk::RESTManagerQt::GetM_ServerMap()
 {
   return mitk::RESTManager::GetM_ServerMap();
 }

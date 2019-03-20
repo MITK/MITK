@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class IRESTServerMicroService;
+  class RESTServerMicroService;
   class MITKCPPRESTSDK_EXPORT IRESTManager
   {
   public:
@@ -84,7 +84,7 @@ namespace mitk
      */
     virtual void HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri = L"") = 0;
 
-    virtual std::map<int, IRESTServerMicroService *> GetM_ServerMap() = 0;
+    virtual std::map<int, RESTServerMicroService *> GetM_ServerMap() = 0;
     virtual std::map<std::pair<int, utility::string_t>, IRESTObserver *> GetM_Observers() = 0;
 
   };

@@ -8,5 +8,4 @@ set(CPP_FILES
   mitkRESTManager.cpp
   mitkIRESTObserver.cpp
   mitkCppRestSdk.cpp
-  mitkIRESTServerMicroService.cpp
 )

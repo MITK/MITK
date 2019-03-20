@@ -136,7 +136,7 @@ void mitk::RESTManager::HandleDeleteObserver(IRESTObserver *observer, const web:
   }
 }
 
-std::map<int, mitk::IRESTServerMicroService *> mitk::RESTManager::GetM_ServerMap()
+std::map<int, mitk::RESTServerMicroService *> mitk::RESTManager::GetM_ServerMap()
 {
   return m_ServerMap;
 }

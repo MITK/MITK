@@ -17,6 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkRESTServerMicroService_h
 #define mitkRESTServerMicroService_h
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4251)
+#endif
+
 #include "cpprest/http_listener.h"
 
 #include "MitkCppRestSdkExports.h"
@@ -25,7 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModule.h>
 #include <usServiceTracker.h>
 #include <MitkCppRestSdkExports.h>
-#include <mitkIRESTServerMicroService.h>
 
 typedef web::http::experimental::listener::http_listener MitkListener;
 typedef web::http::http_request MitkRequest;
@@ -36,7 +40,7 @@ typedef web::json::json_exception MitkJsonException;
 
 namespace mitk
 {
-  class MITKCPPRESTSDK_EXPORT RESTServerMicroService : public IRESTServerMicroService
+  class MITKCPPRESTSDK_EXPORT RESTServerMicroService
   {
 
   public:
@@ -48,24 +52,31 @@ namespace mitk
     RESTServerMicroService(web::uri uri);
     ~RESTServerMicroService();
 
-    web::uri GetUri() override;
+    web::uri GetUri();
 
      /**
      * @brief Opens the listener and starts the listening process
      */
-    void OpenListener() override;
+    void OpenListener();
 
     /**
      * @brief Closes the listener and stops the listening process
      */
-    void CloseListener() override;
+    void CloseListener();
   private:
     /**
      * @brief Handle for incoming GET requests
      *
      * @param MitkRequest incoming request object
      */
-    void HandleGet(MitkRequest request) override; 
+    void HandleGet(MitkRequest request); 
+
+  protected:
+    MitkListener m_Listener;
+    web::uri m_Uri;
   };
 } // namespace mitk
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 #endif

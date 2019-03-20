@@ -134,11 +134,18 @@ function generateStackPlotData(){
   let data = [];
 
   for (let index = 0; index < dataLabels.length; index++){
+	let inputType = dataProperties[dataLabels[index]]["chartType"];
+    let chartType = getPlotlyChartType(inputType);
+	
     let trace = {
       x: xValues[index].slice(1),
       y: yValues[index].slice(1),
       stackgroup: 'one',
-      name: dataLabels[index]
+      name: dataLabels[index],
+	  type: chartType,
+	  marker:{
+		  color: dataProperties[dataLabels[index]]["color"]
+	  }
     };
 
     data.push(trace);
@@ -296,7 +303,11 @@ function generateChart(chartData)
 		}
 	}
   };
-
+  
+  if (chartData.m_StackedData){
+	  layout["barmode"] = 'stack';
+  } 
+  
   if (chartData.m_YAxisScale){
       layout.yaxis["type"] = "log"
   }

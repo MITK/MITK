@@ -68,8 +68,7 @@ namespace mitk
      * @param MitkRequest incoming request object
      */
     void HandleGet(const MitkRequest &request); 
-  //TODO private machen
-  protected:
+
     MitkListener m_Listener;
     web::uri m_Uri;
   };

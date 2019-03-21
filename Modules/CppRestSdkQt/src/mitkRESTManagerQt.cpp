@@ -42,6 +42,7 @@ void mitk::RESTManagerQt::ReceiveRequest(const web::uri &uri, mitk::IRESTObserve
 
 void mitk::RESTManagerQt::HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri = L"")
 {
+
   for (auto it = m_Observers.begin(); it != m_Observers.end();)
   {
     mitk::IRESTObserver *obsMap = it->second;

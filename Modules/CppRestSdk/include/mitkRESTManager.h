@@ -78,7 +78,6 @@ namespace mitk
     /**
     * @brief internal use only
     */
-    //TODO alternative: aus interface rausnehmen und dynamic casten
     virtual const std::map<int, RESTServer *>& GetServerMap() override;
     virtual const std::map<std::pair<int, utility::string_t>, IRESTObserver *>& GetObservers() override;
 
@@ -107,6 +106,8 @@ namespace mitk
      * @return bool if there is another observer under the port
      */
     bool DeleteObserver(std::map < std::pair<int, utility::string_t>, IRESTObserver *>::iterator &it, const web::uri &uri);
+
+
 //TODO Member immer private, zugriff über getter/setter
     std::map<int, RESTServer *> m_ServerMap;                     // Map with port server pairs
     std::map<std::pair<int, utility::string_t>, IRESTObserver *> m_Observers; // Map with all observers

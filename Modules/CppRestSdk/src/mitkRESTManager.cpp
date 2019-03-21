@@ -136,12 +136,12 @@ void mitk::RESTManager::HandleDeleteObserver(IRESTObserver *observer, const web:
   }
 }
 
-const std::map<int, mitk::RESTServer *> &mitk::RESTManager::GetM_ServerMap()
+const std::map<int, mitk::RESTServer *> &mitk::RESTManager::GetServerMap()
 {
   return m_ServerMap;
 }
 
-const std::map<std::pair<int, utility::string_t>, mitk::IRESTObserver *> &mitk::RESTManager::GetM_Observers()
+const std::map<std::pair<int, utility::string_t>, mitk::IRESTObserver *> &mitk::RESTManager::GetObservers()
 {
   return m_Observers;
 }

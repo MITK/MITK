@@ -84,8 +84,8 @@ namespace mitk
      */
     virtual void HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri = L"") = 0;
 
-    virtual const std::map<int, RESTServer *>& GetM_ServerMap() = 0;
-    virtual const std::map<std::pair<int, utility::string_t>, IRESTObserver *>& GetM_Observers() = 0;
+    virtual const std::map<int, RESTServer *>& GetServerMap() = 0;
+    virtual const std::map<std::pair<int, utility::string_t>, IRESTObserver *>& GetObservers() = 0;
 
   };
 } // namespace mitk

@@ -81,8 +81,8 @@ namespace mitk
     * @brief internal use only
     */
     //TODO alternative: aus interface rausnehmen und dynamic casten
-    virtual const std::map<int, RESTServer *>& GetM_ServerMap() override;
-    virtual const std::map<std::pair<int, utility::string_t>, IRESTObserver *>& GetM_Observers() override;
+    virtual const std::map<int, RESTServer *>& GetServerMap() override;
+    virtual const std::map<std::pair<int, utility::string_t>, IRESTObserver *>& GetObservers() override;
 
     protected:
     /**

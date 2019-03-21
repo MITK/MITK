@@ -65,8 +65,7 @@ namespace mitk
      * @param body the body of the request
      * @return the data which is modified by the notified observer
      */
-    //TODO body const
-    web::json::value Handle(const web::uri &uri, web::json::value &body) override;
+    web::json::value Handle(const web::uri &uri, const web::json::value &body) override;
 
     /**
      * @brief Handles the deletion of an observer for all or a specific uri

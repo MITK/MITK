@@ -48,14 +48,15 @@ class mitkRESTClientTestSuite : public mitk::TestFixture, mitk::IRESTObserver
 public:
   mitk::IRESTManager *m_Service;
 
-  web::json::value Notify(web::json::value &data, const web::uri &uri) override
+  web::json::value Notify(const web::json::value &data, const web::uri &uri) override
   {
     MITK_INFO << "Observer: Data in observer";
-    data[L"userId"] = web::json::value(1);
-    data[L"id"] = web::json::value(1);
-    data[L"title"] = web::json::value(U("this is a title"));
-    data[L"body"] = web::json::value(U("this is a body"));
-    return data;
+    web::json::value returnData = data;
+    returnData[L"userId"] = web::json::value(1);
+    returnData[L"id"] = web::json::value(1);
+    returnData[L"title"] = web::json::value(U("this is a title"));
+    returnData[L"body"] = web::json::value(U("this is a body"));
+    return returnData;
   }
 
   /**

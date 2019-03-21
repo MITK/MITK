@@ -74,7 +74,7 @@ namespace mitk
      * @param body the body of the request
      * @return the data which is modified by the notified observer
      */
-    virtual web::json::value Handle(const web::uri &uri, web::json::value &body) = 0;
+    virtual web::json::value Handle(const web::uri &uri, const web::json::value &body) = 0;
 
     /**
      * @brief Handles the deletion of an observer for all or a specific uri

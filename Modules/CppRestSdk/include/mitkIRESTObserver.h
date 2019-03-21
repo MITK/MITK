@@ -39,7 +39,7 @@ namespace mitk
      * @param data the data of the incoming request
      * @return the modified data
      */
-    virtual web::json::value Notify(web::json::value &data, const web::uri &uri) = 0;
+    virtual web::json::value Notify(const web::json::value &data, const web::uri &uri) = 0;
 
 
   private:

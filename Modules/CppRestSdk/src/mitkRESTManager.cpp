@@ -83,7 +83,7 @@ void mitk::RESTManager::ReceiveRequest(const web::uri &uri, mitk::IRESTObserver 
   }
 }
 
-web::json::value mitk::RESTManager::Handle(const web::uri &uri, web::json::value &body)
+web::json::value mitk::RESTManager::Handle(const web::uri &uri, const web::json::value &body)
 {
   // Checking if there is an observer for the port and path
   std::pair<int, utility::string_t> key(uri.port(), uri.path());

@@ -171,7 +171,7 @@ public:
       data[L"title"] = web::json::value(U("this is a changed title"));
       data[L"body"] = web::json::value(U("and the body is changed as well"));
       m_Service
-        ->SendRequest(L"https://jsonplaceholder.typicode.com/posts/1", mitk::IRESTManager::RequestType::Put, data)
+        ->SendRequest(L"https://jsonplaceholder.typicode.com/posts/1", mitk::IRESTManager::RequestType::Put, &data)
         .then([=](pplx::task<web::json::value> resultTask) {
           try
           {
@@ -200,7 +200,7 @@ public:
       data[L"userId"] = web::json::value(1);
       data[L"title"] = web::json::value(U("this is a new title"));
       data[L"body"] = web::json::value(U("this is a new body"));
-      m_Service->SendRequest(L"https://jsonplaceholder.typicode.com/posts", mitk::IRESTManager::RequestType::Post, data)
+      m_Service->SendRequest(L"https://jsonplaceholder.typicode.com/posts", mitk::IRESTManager::RequestType::Post, &data)
         .then([=](pplx::task<web::json::value> resultTask) {
           try
           {
@@ -244,7 +244,7 @@ public:
       data[L"id"] = web::json::value(1);
       data[L"title"] = web::json::value(U("this is a changed title"));
       data[L"body"] = web::json::value(U("and the body is changed as well"));
-      m_Service->SendRequest(L"http://localhost:1234/invalid", mitk::IRESTManager::RequestType::Put, data)
+      m_Service->SendRequest(L"http://localhost:1234/invalid", mitk::IRESTManager::RequestType::Put, &data)
         .then([=](pplx::task<web::json::value> resultTask) {
             *result = resultTask.get();})
         .wait();
@@ -265,7 +265,7 @@ public:
       data[L"userId"] = web::json::value(1);
       data[L"title"] = web::json::value(U("this is a new title"));
       data[L"body"] = web::json::value(U("this is a new body"));
-      m_Service->SendRequest(L"http://localhost:1234/invalid", mitk::IRESTManager::RequestType::Post, data)
+      m_Service->SendRequest(L"http://localhost:1234/invalid", mitk::IRESTManager::RequestType::Post, &data)
         .then([=](pplx::task<web::json::value> resultTask) {
             *result = resultTask.get();
         })

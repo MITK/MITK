@@ -45,10 +45,9 @@ namespace mitk
      * @param filePath the file path to store the request to
      * @return task to wait for
      */
-    //TODO aus body pointer machen, nullptr
     pplx::task<web::json::value> SendRequest(const web::uri &uri,
                                              const RequestType &type = RequestType::Get,
-                                             const web::json::value &body= NULL,
+                                             const web::json::value *body= nullptr,
                                              const utility::string_t &filePath = L"") override;
     
     /**

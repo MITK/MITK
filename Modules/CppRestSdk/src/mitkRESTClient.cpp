@@ -100,7 +100,7 @@ pplx::task<web::json::value> mitk::RESTClient::Get(const web::uri &uri, const ut
     });
 }
 
-pplx::task<web::json::value> mitk::RESTClient::Put(const web::uri &uri, const web::json::value &content)
+pplx::task<web::json::value> mitk::RESTClient::Put(const web::uri &uri, const web::json::value *content)
 {
   // Create new HTTP client
   MitkClient *client = new MitkClient(uri);
@@ -111,9 +111,9 @@ pplx::task<web::json::value> mitk::RESTClient::Put(const web::uri &uri, const we
   // create put request
   MitkRequest putRequest(MitkRESTMethods::PUT);
   //set body of the put request with data given by client
-  if (content != NULL)
+  if (content != nullptr)
   {
-    putRequest.set_body(content);
+    putRequest.set_body(*content);
   } 
   //make put request
   return client->request(putRequest).then([=](pplx::task<MitkResponse> responseTask) {
@@ -154,7 +154,7 @@ pplx::task<web::json::value> mitk::RESTClient::Put(const web::uri &uri, const we
   });
 }
 
-pplx::task<web::json::value> mitk::RESTClient::Post(const web::uri &uri, const web::json::value &content)
+pplx::task<web::json::value> mitk::RESTClient::Post(const web::uri &uri, const web::json::value *content)
 {
   // Create new HTTP client
   MitkClient *client = new MitkClient(uri);
@@ -164,9 +164,9 @@ pplx::task<web::json::value> mitk::RESTClient::Post(const web::uri &uri, const w
   // Create post request
   MitkRequest postRequest(MitkRESTMethods::POST);
   // set body of the put request with data given by client
-  if (content != NULL)
+  if (content != nullptr)
   {
-    postRequest.set_body(content);
+    postRequest.set_body(*content);
   }
 
   //make post request

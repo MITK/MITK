@@ -8,7 +8,7 @@ mitk::RESTManager::~RESTManager() {}
 
 pplx::task<web::json::value> mitk::RESTManager::SendRequest(const web::uri &uri,
                                                             const RequestType &type,
-                                                            const web::json::value &content,
+                                                            const web::json::value *content,
                                                             const utility::string_t &filePath)
 {
   pplx::task<web::json::value> answer;
@@ -34,7 +34,7 @@ pplx::task<web::json::value> mitk::RESTManager::SendRequest(const web::uri &uri,
     case RequestType::Post:
     
       //TODO fixen wert vorne bei vergleich
-      if (content == NULL)
+      if (content == nullptr)
       {
         // warning because normally you won't create an empty ressource
         MITK_WARN << "Content for put is empty, this will create an empty ressource";
@@ -44,7 +44,7 @@ pplx::task<web::json::value> mitk::RESTManager::SendRequest(const web::uri &uri,
     
     case RequestType::Put:
     
-      if (content == NULL)
+      if (content == nullptr)
       {
         // warning because normally you won't empty a ressource
         MITK_WARN << "Content for put is empty, this will empty the ressource";

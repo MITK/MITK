@@ -210,7 +210,7 @@ void QmitkClientView::OnPutButtonClicked()
       data[L"title"] = web::json::value(U("this is a changed title"));
       data[L"body"] = web::json::value(U("and the body is changed as well"));
       managerService->SendRequest(
-        L"https://jsonplaceholder.typicode.com/posts/1", mitk::IRESTManager::RequestType::Put, data)
+        L"https://jsonplaceholder.typicode.com/posts/1", mitk::IRESTManager::RequestType::Put, &data)
         .then([=](pplx::task<web::json::value> resultTask) {
           try
           {
@@ -247,7 +247,7 @@ void QmitkClientView::OnPostButtonClicked()
       data[L"title"] = web::json::value(U("this is a new title"));
       data[L"body"] = web::json::value(U("this is a new body"));
       managerService
-        ->SendRequest(L"https://jsonplaceholder.typicode.com/posts", mitk::IRESTManager::RequestType::Post, data)
+        ->SendRequest(L"https://jsonplaceholder.typicode.com/posts", mitk::IRESTManager::RequestType::Post, &data)
         .then([=](pplx::task<web::json::value> resultTask) {
         try
         {

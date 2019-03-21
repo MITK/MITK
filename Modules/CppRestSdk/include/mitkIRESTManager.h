@@ -56,7 +56,7 @@ namespace mitk
      */
     virtual pplx::task<web::json::value> SendRequest(const web::uri &uri,
                                              const RequestType &type = RequestType::Get,
-                                             const web::json::value &body = NULL,
+                                             const web::json::value *body = nullptr,
                                              const utility::string_t &filePath = L"") = 0;
 
     /**

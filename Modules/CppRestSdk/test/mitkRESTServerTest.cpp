@@ -45,12 +45,7 @@ public:
 
   web::json::value Notify(const web::uri &uri, const web::json::value &data) override
   {
-    web::json::value returnData = data;
-    returnData[L"userId"] = web::json::value(1);
-    returnData[L"id"] = web::json::value(1);
-    returnData[L"title"] = web::json::value(U("this is a title"));
-    returnData[L"body"] = web::json::value(U("this is a body"));
-    return returnData;
+    return m_Data;
   }
 
   /**
@@ -144,11 +139,6 @@ public:
     m_Service->ReceiveRequest(L"http://localhost:8080/test", this);
    
     web::json::value *result = new web::json::value();
-    web::json::value data;
-    data[L"userId"] = web::json::value(1);
-    data[L"id"] = web::json::value(1);
-    data[L"title"] = web::json::value(U("this is a title"));
-    data[L"body"] = web::json::value(U("this is a body"));
 
     m_Service->SendRequest(L"http://localhost:8080/test")
       .then([=](pplx::task<web::json::value> resultTask) {
@@ -164,7 +154,7 @@ public:
       })
       .wait();
     
-    CPPUNIT_ASSERT_MESSAGE("Opened listener and send request to same uri, returned expected JSON", *result == data);
+    CPPUNIT_ASSERT_MESSAGE("Opened listener and send request to same uri, returned expected JSON", *result == m_Data);
   }
 
   void RequestToClosedListener()
@@ -195,11 +185,6 @@ public:
     m_Service->ReceiveRequest(L"http://localhost:8080/test", this);
     
     web::json::value *result = new web::json::value();
-    web::json::value data;
-    data[L"userId"] = web::json::value(1);
-    data[L"id"] = web::json::value(1);
-    data[L"title"] = web::json::value(U("this is a title"));
-    data[L"body"] = web::json::value(U("this is a body"));
 
     m_Service->SendRequest(L"http://localhost:8080/example")
       .then([=](pplx::task<web::json::value> resultTask) { *result = resultTask.get(); })

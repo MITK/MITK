@@ -47,15 +47,11 @@ class mitkRESTClientTestSuite : public mitk::TestFixture, mitk::IRESTObserver
 
 public:
   mitk::IRESTManager *m_Service;
+  web::json::value m_Data;
 
   web::json::value Notify(const web::uri &uri, const web::json::value &data) override
   {
-    web::json::value returnData = data;
-    returnData[L"userId"] = web::json::value(1);
-    returnData[L"id"] = web::json::value(1);
-    returnData[L"title"] = web::json::value(U("this is a title"));
-    returnData[L"body"] = web::json::value(U("this is a body"));
-    return returnData;
+    return m_Data;
   }
 
   /**
@@ -64,6 +60,11 @@ public:
    */
   void setUp() override
   {
+    m_Data[L"userId"] = web::json::value(1);
+    m_Data[L"id"] = web::json::value(1);
+    m_Data[L"title"] = web::json::value(U("this is a title"));
+    m_Data[L"body"] = web::json::value(U("this is a body"));
+
     us::ServiceReference<mitk::IRESTManager> serviceRef =
       us::GetModuleContext()->GetServiceReference<mitk::IRESTManager>();
     if (serviceRef)
@@ -87,12 +88,6 @@ public:
   void GetRequestValidURI_ReturnsExpectedJSON()
   {
     web::json::value *result = new web::json::value();
-    web::json::value data;
-    //TODO: data als memebrvariable/ in setup/ in methode
-    data[L"userId"] = web::json::value(1);
-    data[L"id"] = web::json::value(1);
-    data[L"title"] = web::json::value(U("this is a title"));
-    data[L"body"] = web::json::value(U("this is a body"));
 
     m_Service->SendRequest(L"http://localhost:8080/test")
       .then([=](pplx::task<web::json::value> resultTask) {
@@ -108,7 +103,7 @@ public:
       })
       .wait();
     
-    CPPUNIT_ASSERT_MESSAGE("Result is the expected JSON value", *result == data);
+    CPPUNIT_ASSERT_MESSAGE("Result is the expected JSON value", *result == m_Data);
   }
 
   void MultipleGetRequestValidURI_AllTasksFinish()
@@ -161,14 +156,9 @@ public:
   {
     // optional: link might get invalid or content is changed
     web::json::value *result = new web::json::value();
-    web::json::value data;
 
-    data[L"userId"] = web::json::value(1);
-    data[L"id"] = web::json::value(1);
-    data[L"title"] = web::json::value(U("this is a changed title"));
-    data[L"body"] = web::json::value(U("and the body is changed as well"));
     m_Service
-      ->SendRequest(L"https://jsonplaceholder.typicode.com/posts/1", mitk::IRESTManager::RequestType::Put, &data)
+      ->SendRequest(L"https://jsonplaceholder.typicode.com/posts/1", mitk::IRESTManager::RequestType::Put, &m_Data)
       .then([=](pplx::task<web::json::value> resultTask) {
         try
         {
@@ -184,7 +174,7 @@ public:
     
     CPPUNIT_ASSERT_MESSAGE(
       "Result is the expected JSON value, check if the link is still valid since this is an optional test",
-      *result == data);
+      *result == m_Data);
   }
 
   void PostRequestValidURI_ReturnsExpectedJSON()
@@ -193,9 +183,9 @@ public:
     web::json::value *result = new web::json::value();
     web::json::value data;
 
-      data[L"userId"] = web::json::value(1);
-      data[L"title"] = web::json::value(U("this is a new title"));
-      data[L"body"] = web::json::value(U("this is a new body"));
+    data[L"userId"] = m_Data[L"userId"];
+    data[L"title"] = m_Data[L"title"];
+    data[L"body"] = m_Data[L"body"];
 
     m_Service->SendRequest(L"https://jsonplaceholder.typicode.com/posts", mitk::IRESTManager::RequestType::Post, &data)
       .then([=](pplx::task<web::json::value> resultTask) {
@@ -232,13 +222,8 @@ public:
   {
     //Method which makes a put request to an invalid uri
     web::json::value *result = new web::json::value();
-    web::json::value data;
 
-    data[L"userId"] = web::json::value(1);
-    data[L"id"] = web::json::value(1);
-    data[L"title"] = web::json::value(U("this is a changed title"));
-    data[L"body"] = web::json::value(U("and the body is changed as well"));
-    m_Service->SendRequest(L"http://localhost:1234/invalid", mitk::IRESTManager::RequestType::Put, &data)
+    m_Service->SendRequest(L"http://localhost:1234/invalid", mitk::IRESTManager::RequestType::Put, &m_Data)
       .then([=](pplx::task<web::json::value> resultTask) {
           *result = resultTask.get();})
       .wait();    
@@ -252,12 +237,8 @@ public:
   {
     //Method which makes a post request to an invalid uri
     web::json::value *result = new web::json::value();
-    web::json::value data;
 
-    data[L"userId"] = web::json::value(1);
-    data[L"title"] = web::json::value(U("this is a new title"));
-    data[L"body"] = web::json::value(U("this is a new body"));
-    m_Service->SendRequest(L"http://localhost:1234/invalid", mitk::IRESTManager::RequestType::Post, &data)
+    m_Service->SendRequest(L"http://localhost:1234/invalid", mitk::IRESTManager::RequestType::Post, &m_Data)
       .then([=](pplx::task<web::json::value> resultTask) {
           *result = resultTask.get();
       })

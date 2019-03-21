@@ -71,8 +71,7 @@ namespace mitk
      * created resources
      * @return task to wait for with resulting json object
      */
-    //TODO Put
-    pplx::task<web::json::value> PUT(const web::uri &uri, const web::json::value &content);
+    pplx::task<web::json::value> Put(const web::uri &uri, const web::json::value &content);
 
     /**
      * @brief Executes a HTTP POST request with given uri and the content given as json
@@ -82,8 +81,7 @@ namespace mitk
      * created resource
      * @return task to wait for with resulting json object
      */
-    //TODO Post
-    pplx::task<web::json::value> POST(const web::uri &uri, const web::json::value &content);
+    pplx::task<web::json::value> Post(const web::uri &uri, const web::json::value &content);
   };
 } // namespace mitk
 #endif // !mitkRESTClient_h

@@ -39,7 +39,7 @@ pplx::task<web::json::value> mitk::RESTManager::SendRequest(const web::uri &uri,
         // warning because normally you won't create an empty ressource
         MITK_WARN << "Content for put is empty, this will create an empty ressource";
       }
-      answer = client->POST(uri, content);
+      answer = client->Post(uri, content);
       break;
     
     case RequestType::Put:
@@ -49,7 +49,7 @@ pplx::task<web::json::value> mitk::RESTManager::SendRequest(const web::uri &uri,
         // warning because normally you won't empty a ressource
         MITK_WARN << "Content for put is empty, this will empty the ressource";
       }
-      answer = client->PUT(uri, content);
+      answer = client->Put(uri, content);
       break;
     //TODO: default hinzufügen
   }

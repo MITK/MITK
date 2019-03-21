@@ -100,7 +100,7 @@ pplx::task<web::json::value> mitk::RESTClient::Get(const web::uri &uri, const ut
     });
 }
 
-pplx::task<web::json::value> mitk::RESTClient::PUT(const web::uri &uri, const web::json::value &content)
+pplx::task<web::json::value> mitk::RESTClient::Put(const web::uri &uri, const web::json::value &content)
 {
   // Create new HTTP client
   MitkClient *client = new MitkClient(uri);
@@ -154,7 +154,7 @@ pplx::task<web::json::value> mitk::RESTClient::PUT(const web::uri &uri, const we
   });
 }
 
-pplx::task<web::json::value> mitk::RESTClient::POST(const web::uri &uri, const web::json::value &content)
+pplx::task<web::json::value> mitk::RESTClient::Post(const web::uri &uri, const web::json::value &content)
 {
   // Create new HTTP client
   MitkClient *client = new MitkClient(uri);

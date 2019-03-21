@@ -18,11 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkRESTServerMicroServiceQt_h
 
 #include <QThread>
-#include <mitkRESTServerMicroService.h>
+#include <mitkRESTServer.h>
 
 namespace mitk
 {
-  class RESTServerMicroServiceQt : public QObject, public RESTServerMicroService
+  class RESTServerMicroServiceQt : public QObject, public RESTServer
   {
     Q_OBJECT 
 

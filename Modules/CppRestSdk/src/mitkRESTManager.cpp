@@ -59,7 +59,7 @@ pplx::task<web::json::value> mitk::RESTManager::SendRequest(const web::uri &uri,
 
 void mitk::RESTManager::ReceiveRequest(const web::uri &uri, mitk::IRESTObserver *observer)
 {
-  // New instance of RESTServerMicroservice in m_ServerMap, key is port of the request
+  // New instance of RESTServer in m_ServerMap, key is port of the request
   int port = uri.port();
 
   // Checking if port is free to add a new Server
@@ -67,7 +67,7 @@ void mitk::RESTManager::ReceiveRequest(const web::uri &uri, mitk::IRESTObserver 
   {
     this->AddObserver(uri, observer);
     // creating server instance
-    auto server = new RESTServerMicroService(uri.authority());
+    auto server = new RESTServer(uri.authority());
     // add reference to server instance to map
     m_ServerMap[port] = server;
     // start Server
@@ -93,7 +93,7 @@ web::json::value mitk::RESTManager::Handle(const web::uri &uri, web::json::value
     MITK_INFO << "Manager: Data send to observer";
     return m_Observers[key]->Notify(body, uri);
   }
-  // No observer under this port, return null which results in status code 404 (s. RESTServerMicroService)
+  // No observer under this port, return null which results in status code 404 (s. RESTServer)
   else
   {
     MITK_WARN << "No Observer can handle the data";
@@ -136,7 +136,7 @@ void mitk::RESTManager::HandleDeleteObserver(IRESTObserver *observer, const web:
   }
 }
 
-const std::map<int, mitk::RESTServerMicroService *> &mitk::RESTManager::GetM_ServerMap()
+const std::map<int, mitk::RESTServer *> &mitk::RESTManager::GetM_ServerMap()
 {
   return m_ServerMap;
 }

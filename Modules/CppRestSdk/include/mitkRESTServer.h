@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkRESTServerMicroService_h
-#define mitkRESTServerMicroService_h
+#ifndef mitkRESTServer_h
+#define mitkRESTServer_h
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -38,7 +38,7 @@ typedef web::json::json_exception MitkJsonException;
 
 namespace mitk
 {
-  class MITKCPPRESTSDK_EXPORT RESTServerMicroService
+  class MITKCPPRESTSDK_EXPORT RESTServer
   {
 
   public:
@@ -47,8 +47,8 @@ namespace mitk
      *
      * @param uri the URI at which the server is listening for requests
      */
-    RESTServerMicroService(const web::uri &uri);
-    ~RESTServerMicroService();
+    RESTServer(const web::uri &uri);
+    ~RESTServer();
 
     web::uri GetUri();
 

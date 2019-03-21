@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #endif
 
 #include <mitkIRESTManager.h>
-#include <mitkRESTServerMicroService.h>
+#include <mitkRESTServer.h>
 
 
 
@@ -81,7 +81,7 @@ namespace mitk
     * @brief internal use only
     */
     //TODO alternative: aus interface rausnehmen und dynamic casten
-    virtual const std::map<int, RESTServerMicroService *>& GetM_ServerMap() override;
+    virtual const std::map<int, RESTServer *>& GetM_ServerMap() override;
     virtual const std::map<std::pair<int, utility::string_t>, IRESTObserver *>& GetM_Observers() override;
 
     protected:
@@ -110,7 +110,7 @@ namespace mitk
      */
     bool DeleteObserver(std::map < std::pair<int, utility::string_t>, IRESTObserver *>::iterator &it, const web::uri &uri);
 //TODO Member immer private, zugriff über getter/setter
-    std::map<int, RESTServerMicroService *> m_ServerMap;                     // Map with port server pairs
+    std::map<int, RESTServer *> m_ServerMap;                     // Map with port server pairs
     std::map<std::pair<int, utility::string_t>, IRESTObserver *> m_Observers; // Map with all observers
   };
 } // namespace mitk

@@ -1,39 +1,39 @@
-#include "mitkRESTServerMicroService.h"
+#include "mitkRESTServer.h"
 #include <mitkCommon.h>
 #include<mitkRESTUtil.h>
 
-mitk::RESTServerMicroService::RESTServerMicroService(const web::uri &uri)
+mitk::RESTServer::RESTServer(const web::uri &uri)
 {
   m_Uri = uri;
 }
 
-mitk::RESTServerMicroService::~RESTServerMicroService()
+mitk::RESTServer::~RESTServer()
 {
 }
 
-void mitk::RESTServerMicroService::OpenListener()
+void mitk::RESTServer::OpenListener()
 {
     //create listener
     m_Listener = MitkListener(m_Uri);
     //Connect incoming get requests with HandleGet method
     m_Listener.support(web::http::methods::GET,
-                       std::bind(&mitk::RESTServerMicroService::HandleGet, this, std::placeholders::_1));
+                       std::bind(&mitk::RESTServer::HandleGet, this, std::placeholders::_1));
     //open listener
     m_Listener.open().wait();
 }
 
-void mitk::RESTServerMicroService::CloseListener()
+void mitk::RESTServer::CloseListener()
 {
   //close listener
   m_Listener.close().wait();
 }
 
-web::uri mitk::RESTServerMicroService::GetUri() 
+web::uri mitk::RESTServer::GetUri() 
 {
   return m_Uri;
 }
 
-void mitk::RESTServerMicroService::HandleGet(const MitkRequest &request)
+void mitk::RESTServer::HandleGet(const MitkRequest &request)
 {
   int port = m_Listener.uri().port();
  //getting exact request uri has to be a parameter in handle function

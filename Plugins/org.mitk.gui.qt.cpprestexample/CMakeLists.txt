@@ -1,4 +1,4 @@
-project(org_mitk_gui_qt_client)
+project(org_mitk_gui_qt_cpprestexample)
 
 mitk_create_plugin(
   EXPORT_DIRECTIVE THREAD_EXPORT

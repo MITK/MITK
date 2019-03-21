@@ -14,54 +14,54 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkThreadView.h"
+#include "QmitkServerView.h"
 
 #include <QThread>
 
-#include <ui_QmitkThreadView.h>
+#include <ui_QmitkServerView.h>
 #include <mitkIRESTManager.h>
 #include <usModule.h>
 #include <usServiceTracker.h>
 #include <usModuleRegistry.h>
 #include <usGetModuleContext.h>
 
-const std::string QmitkThreadView::VIEW_ID = "org.mitk.views.threadview";
+const std::string QmitkServerView::VIEW_ID = "org.mitk.views.serverview";
 
-QmitkThreadView::QmitkThreadView()
-  : m_Ui(new Ui::QmitkThreadView)
+QmitkServerView::QmitkServerView()
+  : m_Ui(new Ui::QmitkServerView)
 {
 }
 
-web::json::value QmitkThreadView::Notify(const web::uri &uri, const web::json::value &data)
+web::json::value QmitkServerView::Notify(const web::uri &uri, const web::json::value &data)
 {
   MITK_INFO << "Observer: Data in observer";
   return data.at(U("key 1"));
 }
 
-QmitkThreadView::~QmitkThreadView()
+QmitkServerView::~QmitkServerView()
 {
   delete m_Ui;
 }
 
-void QmitkThreadView::CreateQtPartControl(QWidget* parent)
+void QmitkServerView::CreateQtPartControl(QWidget* parent)
 {
   m_Ui->setupUi(parent);
 
-  connect(m_Ui->stopAllPushButton, &QPushButton::clicked, this, &QmitkThreadView::OnStopAllButtonClicked);
+  connect(m_Ui->stopAllPushButton, &QPushButton::clicked, this, &QmitkServerView::OnStopAllButtonClicked);
   
-  connect(m_Ui->testListenCheckBox, &QCheckBox::clicked, this, &QmitkThreadView::OnTestListenCheckBoxClicked);
-  connect(m_Ui->exampleListenCheckBox, &QCheckBox::clicked, this, &QmitkThreadView::OnExampleListenCheckBoxClicked);
-  connect(m_Ui->port8090CheckBox, &QCheckBox::clicked, this, &QmitkThreadView::OnPort8090ListenCheckBoxClicked);
+  connect(m_Ui->testListenCheckBox, &QCheckBox::clicked, this, &QmitkServerView::OnTestListenCheckBoxClicked);
+  connect(m_Ui->exampleListenCheckBox, &QCheckBox::clicked, this, &QmitkServerView::OnExampleListenCheckBoxClicked);
+  connect(m_Ui->port8090CheckBox, &QCheckBox::clicked, this, &QmitkServerView::OnPort8090ListenCheckBoxClicked);
 
-  connect(m_Ui->stopAllPushButton, &QPushButton::clicked, this, &QmitkThreadView::OnStopAllButtonClicked);
+  connect(m_Ui->stopAllPushButton, &QPushButton::clicked, this, &QmitkServerView::OnStopAllButtonClicked);
 }
 
-void QmitkThreadView::SetFocus()
+void QmitkServerView::SetFocus()
 {
 }
 
 
-void QmitkThreadView::StartListening(web::uri uri)
+void QmitkServerView::StartListening(web::uri uri)
 {
   us::ModuleContext *context = us::ModuleRegistry::GetModule(1)->GetModuleContext();
 
@@ -76,7 +76,7 @@ void QmitkThreadView::StartListening(web::uri uri)
   }
 }
 
-void QmitkThreadView::StopListening(web::uri uri) 
+void QmitkServerView::StopListening(web::uri uri) 
 {
   us::ModuleContext *context = us::ModuleRegistry::GetModule(1)->GetModuleContext();
 
@@ -91,7 +91,7 @@ void QmitkThreadView::StopListening(web::uri uri)
   }
 }
 
-void QmitkThreadView::OnStopAllButtonClicked()
+void QmitkServerView::OnStopAllButtonClicked()
 {
   us::ModuleContext *context = us::ModuleRegistry::GetModule(1)->GetModuleContext();
 
@@ -109,7 +109,7 @@ void QmitkThreadView::OnStopAllButtonClicked()
   m_Ui->port8090CheckBox->setChecked(false);
 }
 
-void QmitkThreadView::OnTestListenCheckBoxClicked()
+void QmitkServerView::OnTestListenCheckBoxClicked()
 {
   if (m_Ui->testListenCheckBox->isChecked())
   {
@@ -121,7 +121,7 @@ void QmitkThreadView::OnTestListenCheckBoxClicked()
   }
 }
 
-void QmitkThreadView::OnExampleListenCheckBoxClicked() 
+void QmitkServerView::OnExampleListenCheckBoxClicked() 
 {
   if (m_Ui->exampleListenCheckBox->isChecked())
   {
@@ -133,7 +133,7 @@ void QmitkThreadView::OnExampleListenCheckBoxClicked()
   }
 }
 
-void QmitkThreadView::OnPort8090ListenCheckBoxClicked() 
+void QmitkServerView::OnPort8090ListenCheckBoxClicked() 
 {
   if (m_Ui->port8090CheckBox->isChecked())
   {

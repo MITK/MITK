@@ -14,20 +14,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef PluginActivator_h
-#define PluginActivator_h
+#include "PluginActivator.h"
+#include "QmitkClientView.h"
+#include "QmitkServerView.h"
 
-#include <ctkPluginActivator.h>
-
-class PluginActivator : public QObject, public ctkPluginActivator
+void PluginActivator::start(ctkPluginContext* context)
 {
-  Q_OBJECT
-  Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_exampleplugin")
-  Q_INTERFACES(ctkPluginActivator)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkClientView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkServerView, context)
+}
 
-public:
-  void start(ctkPluginContext* context);
-  void stop(ctkPluginContext* context);
-};
-
-#endif
+void PluginActivator::stop(ctkPluginContext*)
+{
+}

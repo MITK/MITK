@@ -14,15 +14,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkRESTServerMicroServiceQt_h
-#define mitkRESTServerMicroServiceQt_h
+#ifndef mitkRESTServerQt_h
+#define mitkRESTServerQt_h
 
 #include <QThread>
 #include <mitkRESTServer.h>
 
 namespace mitk
 {
-  class RESTServerMicroServiceQt : public QObject, public RESTServer
+  class RESTServerQt : public QObject, public RESTServer
   {
     Q_OBJECT 
 
@@ -33,8 +33,8 @@ namespace mitk
      *
      * @param uri the URI at which the server is listening for requests
      */
-    RESTServerMicroServiceQt(const web::uri &uri);
-    ~RESTServerMicroServiceQt();
+    RESTServerQt(const web::uri &uri);
+    ~RESTServerQt();
 
   public slots:
     /**

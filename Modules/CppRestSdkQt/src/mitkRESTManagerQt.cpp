@@ -8,7 +8,7 @@ mitk::RESTManagerQt::~RESTManagerQt() {}
 
 void mitk::RESTManagerQt::ReceiveRequest(const web::uri &uri, mitk::IRESTObserver *observer)
 {
-  // New instance of RESTServerMicroservice in m_ServerMap, key is port of the request
+  // New instance of RESTServer in m_ServerMap, key is port of the request
   int port = uri.port();
 
   // Checking if port is free to add a new Server
@@ -17,7 +17,7 @@ void mitk::RESTManagerQt::ReceiveRequest(const web::uri &uri, mitk::IRESTObserve
     mitk::RESTManager::AddObserver(uri, observer);
 
     // creating server instance
-    auto server = new RESTServerMicroServiceQt(uri.authority());
+    auto server = new RESTServerQt(uri.authority());
     // add reference to server instance to map
     m_ServerMap[port] = server;
 
@@ -57,7 +57,7 @@ void mitk::RESTManagerQt::HandleDeleteObserver(IRESTObserver *observer, const we
         {
           //  there isn't an observer at this port, delete m_ServerMap entry for this port
           // close listener
-          QMetaObject::invokeMethod(static_cast<mitk::RESTServerMicroServiceQt *>(m_ServerMap[port]), "CloseListener");
+          QMetaObject::invokeMethod(static_cast<mitk::RESTServerQt *>(m_ServerMap[port]), "CloseListener");
           // end thread
           m_ServerThreadMap[port]->quit();
           m_ServerThreadMap[port]->wait();

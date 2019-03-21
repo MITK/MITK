@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIRESTManager.h>
 #include <mitkRESTManager.h>
 #include <mitkRESTClient.h>
-#include <mitkRESTServerMicroServiceQt.h>
+#include <mitkRESTServerQt.h>
 
 #include <MitkCppRestSdkQtExports.h>
 

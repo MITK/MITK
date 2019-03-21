@@ -80,8 +80,7 @@ void mitk::RESTManager::ReceiveRequest(const web::uri &uri, mitk::IRESTObserver 
   // If there is already a server under this port
   else
   {
-    //TODO umbenennen
-    this->ServerUnderPort(uri, observer);
+    this->RequestForATakenPort(uri, observer);
   }
 }
 
@@ -91,7 +90,7 @@ web::json::value mitk::RESTManager::Handle(const web::uri &uri, const web::json:
   std::pair<int, utility::string_t> key(uri.port(), uri.path());
   if (0 != m_Observers.count(key))
   {
-    return m_Observers[key]->Notify(body, uri);
+    return m_Observers[key]->Notify(uri, body);
   }
   // No observer under this port, return null which results in status code 404 (s. RESTServer)
   else
@@ -153,7 +152,7 @@ void mitk::RESTManager::AddObserver(const web::uri &uri, IRESTObserver *observer
   m_Observers[key] = observer;
 }
 
-void mitk::RESTManager::ServerUnderPort(const web::uri &uri, IRESTObserver *observer)
+void mitk::RESTManager::RequestForATakenPort(const web::uri &uri, IRESTObserver *observer)
 {
   // Same host, means new observer but not a new server instance
   if (uri.authority() == m_ServerMap[uri.port()]->GetUri())

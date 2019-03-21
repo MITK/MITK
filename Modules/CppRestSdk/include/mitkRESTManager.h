@@ -97,7 +97,7 @@ namespace mitk
      * @param uri the uri which which is requested to be added
      * @param observer the observer which proceeds the request
      */
-    void ServerUnderPort(const web::uri &uri, IRESTObserver *observer);
+    void RequestForATakenPort(const web::uri &uri, IRESTObserver *observer);
 
     /**
      * @brief deletes an observer, called by HandleDeleteObserver method

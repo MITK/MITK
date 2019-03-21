@@ -36,7 +36,7 @@ void mitk::RESTManagerQt::ReceiveRequest(const web::uri &uri, mitk::IRESTObserve
   // If there is already a server under this port
   else
   {
-    mitk::RESTManager::ServerUnderPort(uri, observer);
+    mitk::RESTManager::RequestForATakenPort(uri, observer);
   }
 }
 

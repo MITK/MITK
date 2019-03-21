@@ -48,7 +48,7 @@ class mitkRESTClientTestSuite : public mitk::TestFixture, mitk::IRESTObserver
 public:
   mitk::IRESTManager *m_Service;
 
-  web::json::value Notify(const web::json::value &data, const web::uri &uri) override
+  web::json::value Notify(const web::uri &uri, const web::json::value &data) override
   {
     web::json::value returnData = data;
     returnData[L"userId"] = web::json::value(1);

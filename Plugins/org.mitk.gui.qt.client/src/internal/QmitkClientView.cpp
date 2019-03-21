@@ -94,7 +94,7 @@ void QmitkClientView::OnGetMultipleButtonClicked()
             return;
           }
           });
-        tasks.push_back(singleTask);
+        tasks.emplace_back(singleTask);
       }
       //Create a joinTask which includes all tasks you've created
       auto joinTask = pplx::when_all(begin(tasks), end(tasks));

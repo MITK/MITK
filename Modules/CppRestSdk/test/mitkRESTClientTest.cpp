@@ -111,8 +111,7 @@ public:
     int *count = new int(0);
 
       // Create multiple tasks e.g. as shown below
-      //TODO: vector konstruktoren anschauen / emplace_back
-      std::vector<pplx::task<void>> tasks;
+    std::vector<pplx::task<void>> tasks;
     for (int i = 0; i < 20; ++i)
     {
       pplx::task<void> singleTask =
@@ -130,7 +129,7 @@ public:
               return;
             }
           });
-      tasks.push_back(singleTask);
+      tasks.emplace_back(singleTask);
     }
       // Create a joinTask which includes all tasks you've created
       auto joinTask = pplx::when_all(begin(tasks), end(tasks));

@@ -80,7 +80,7 @@ pplx::task<web::json::value> mitk::RESTClient::Get(const web::uri &uri, const ut
     // Write the response body into the file buffer.
     .then([=](MitkResponse response) -> pplx::task<size_t> {
       auto status = response.status_code();
-      MITK_DEBUG << "Status code: " << status;
+      MITK_INFO << "Status code: " << status;
 
       if (web::http::status_codes::OK != status)
       {

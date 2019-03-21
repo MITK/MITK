@@ -50,7 +50,6 @@ public:
 
   web::json::value Notify(const web::json::value &data, const web::uri &uri) override
   {
-    MITK_INFO << "Observer: Data in observer";
     web::json::value returnData = data;
     returnData[L"userId"] = web::json::value(1);
     returnData[L"id"] = web::json::value(1);

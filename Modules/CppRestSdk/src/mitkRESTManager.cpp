@@ -33,7 +33,6 @@ pplx::task<web::json::value> mitk::RESTManager::SendRequest(const web::uri &uri,
     
     case RequestType::Post:
     
-      //TODO fixen wert vorne bei vergleich
       if (nullptr == content)
       {
         // warning because normally you won't create an empty ressource
@@ -51,7 +50,10 @@ pplx::task<web::json::value> mitk::RESTManager::SendRequest(const web::uri &uri,
       }
       answer = client->Put(uri, content);
       break;
-    //TODO: default hinzufügen
+    
+    default:
+      mitkThrow() << "Request Type not supported";
+      break;
   }
 
   return answer;
@@ -89,8 +91,6 @@ web::json::value mitk::RESTManager::Handle(const web::uri &uri, const web::json:
   std::pair<int, utility::string_t> key(uri.port(), uri.path());
   if (0 != m_Observers.count(key))
   {
-    //TODO Ausgaben minimieren
-    MITK_INFO << "Manager: Data send to observer";
     return m_Observers[key]->Notify(body, uri);
   }
   // No observer under this port, return null which results in status code 404 (s. RESTServer)
@@ -151,10 +151,6 @@ void mitk::RESTManager::AddObserver(const web::uri &uri, IRESTObserver *observer
   // new observer has to be added
   std::pair<int, utility::string_t> key(uri.port(), uri.path());
   m_Observers[key] = observer;
-
-  // testing if entry has been added to observer map
-  MITK_INFO << "[" << uri.port() << ", " << mitk::RESTUtil::convertToUtf8(uri.path())
-            << "] : Number of elements in map: " << m_Observers.count(key);
 }
 
 void mitk::RESTManager::ServerUnderPort(const web::uri &uri, IRESTObserver *observer)
@@ -193,12 +189,8 @@ bool mitk::RESTManager::DeleteObserver(std::map<std::pair<int, utility::string_t
   int port = it->first.first;
   utility::string_t path = it->first.second;
   std::pair<int, utility::string_t> key(port, path);
-  MITK_INFO << "Number of elements at key [ " << port << ", " << mitk::RESTUtil::convertToUtf8(key.second)
-            << "]: " << m_Observers.count(key);
   // 2. delete map entry
   it = m_Observers.erase(it);
-  MITK_INFO << "Number of elements at key [ " << port << ", " << mitk::RESTUtil::convertToUtf8(key.second)
-            << "]: " << m_Observers.count(key);
   // 3. check, if there is another observer under this port in observer map (with bool flag)
   for (auto o : m_Observers)
   {

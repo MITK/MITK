@@ -55,10 +55,8 @@ void mitk::RESTServer::HandleGet(const MitkRequest &request)
     if (managerService)
     {
       web::json::value data = request.extract_json().get();
-      MITK_INFO << "Server: Data send to manager";
       //call the handle method
       content = managerService->Handle(build.to_uri(), data);
-      MITK_INFO << "server: Data received from manager";
     }
   }
   if (content!=NULL)

@@ -39,12 +39,11 @@ namespace mitk
     /**
      * @brief request type for client requests by calling SendRequest
      */
-    //TODO: Get, Post, Put
     enum class RequestType
     {
-      get,
-      post,
-      put
+      Get,
+      Post,
+      Put
     };
 
     /**
@@ -56,7 +55,7 @@ namespace mitk
      * @return task to wait for
      */
     virtual pplx::task<web::json::value> SendRequest(const web::uri &uri,
-                                             const RequestType &type = RequestType::get,
+                                             const RequestType &type = RequestType::Get,
                                              const web::json::value &body = NULL,
                                              const utility::string_t &filePath = L"") = 0;
 

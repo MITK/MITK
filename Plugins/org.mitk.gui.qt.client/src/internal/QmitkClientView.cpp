@@ -171,7 +171,7 @@ void QmitkClientView::OnGetSaveButtonClicked()
     if (managerService)
     {
       managerService
-        ->SendRequest(L"http://193.174.48.78:8090/dcm4chee-arc/aets/DCM4CHEE/rs/studies/1.2.840.113654.2.70.1.97144850941324808603541273584489321943/series/1.2.840.113654.2.70.1.15771179684190906938515254678965278540/instances", mitk::IRESTManager::RequestType::get, NULL,L"FileStream.txt")
+        ->SendRequest(L"http://193.174.48.78:8090/dcm4chee-arc/aets/DCM4CHEE/rs/studies/1.2.840.113654.2.70.1.97144850941324808603541273584489321943/series/1.2.840.113654.2.70.1.15771179684190906938515254678965278540/instances", mitk::IRESTManager::RequestType::Get, NULL,L"FileStream.txt")
         .then([=](pplx::task<web::json::value> resultTask) {
           try
           {
@@ -210,7 +210,7 @@ void QmitkClientView::OnPutButtonClicked()
       data[L"title"] = web::json::value(U("this is a changed title"));
       data[L"body"] = web::json::value(U("and the body is changed as well"));
       managerService->SendRequest(
-        L"https://jsonplaceholder.typicode.com/posts/1", mitk::IRESTManager::RequestType::put, data)
+        L"https://jsonplaceholder.typicode.com/posts/1", mitk::IRESTManager::RequestType::Put, data)
         .then([=](pplx::task<web::json::value> resultTask) {
           try
           {
@@ -247,7 +247,7 @@ void QmitkClientView::OnPostButtonClicked()
       data[L"title"] = web::json::value(U("this is a new title"));
       data[L"body"] = web::json::value(U("this is a new body"));
       managerService
-        ->SendRequest(L"https://jsonplaceholder.typicode.com/posts", mitk::IRESTManager::RequestType::post, data)
+        ->SendRequest(L"https://jsonplaceholder.typicode.com/posts", mitk::IRESTManager::RequestType::Post, data)
         .then([=](pplx::task<web::json::value> resultTask) {
         try
         {

@@ -16,7 +16,7 @@ pplx::task<web::json::value> mitk::RESTManager::SendRequest(const web::uri &uri,
   // according to the RequestType, different HTTP requests are made
   switch (type)
   {
-    case RequestType::get:
+    case RequestType::Get:
     
       if (filePath.empty())
       {
@@ -31,7 +31,7 @@ pplx::task<web::json::value> mitk::RESTManager::SendRequest(const web::uri &uri,
       }
       break;
     
-    case RequestType::post:
+    case RequestType::Post:
     
       //TODO fixen wert vorne bei vergleich
       if (content == NULL)
@@ -42,7 +42,7 @@ pplx::task<web::json::value> mitk::RESTManager::SendRequest(const web::uri &uri,
       answer = client->POST(uri, content);
       break;
     
-    case RequestType::put:
+    case RequestType::Put:
     
       if (content == NULL)
       {

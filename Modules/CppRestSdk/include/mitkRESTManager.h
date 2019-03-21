@@ -47,7 +47,7 @@ namespace mitk
      */
     //TODO aus body pointer machen, nullptr
     pplx::task<web::json::value> SendRequest(const web::uri &uri,
-                                             const RequestType &type = RequestType::get,
+                                             const RequestType &type = RequestType::Get,
                                              const web::json::value &body= NULL,
                                              const utility::string_t &filePath = L"") override;
     

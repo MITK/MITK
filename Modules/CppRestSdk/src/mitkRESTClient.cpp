@@ -26,7 +26,7 @@ pplx::task<web::json::value> mitk::RESTClient::Get(const web::uri &uri)
       auto status = response.status_code();
       MITK_INFO << " status: " << status;
 
-      if (status != MitkRestStatusCodes::OK)
+      if (MitkRestStatusCodes::OK != status)
       {
         //throw if something went wrong (e.g. invalid uri)
         //this exception can be handled by client
@@ -37,7 +37,7 @@ pplx::task<web::json::value> mitk::RESTClient::Get(const web::uri &uri)
         //parse content type to application/json if it isn't already
         //this is important if the content type is e.g. application/dicom+json
         utility::string_t requestContentType = response.headers().content_type();
-        if (requestContentType != L"application/json")
+        if (L"application/json" != requestContentType)
         {
           response.headers().set_content_type(L"application/json");
         }
@@ -82,7 +82,7 @@ pplx::task<web::json::value> mitk::RESTClient::Get(const web::uri &uri, const ut
       auto status = response.status_code();
       MITK_DEBUG << "Status code: " << status;
 
-      if (status != web::http::status_codes::OK)
+      if (web::http::status_codes::OK != status)
       {
         // throw if something went wrong (e.g. invalid uri)
         // this exception can be handled by client
@@ -111,7 +111,7 @@ pplx::task<web::json::value> mitk::RESTClient::Put(const web::uri &uri, const we
   // create put request
   MitkRequest putRequest(MitkRESTMethods::PUT);
   //set body of the put request with data given by client
-  if (content != nullptr)
+  if (nullptr != content)
   {
     putRequest.set_body(*content);
   } 
@@ -123,7 +123,7 @@ pplx::task<web::json::value> mitk::RESTClient::Put(const web::uri &uri, const we
       MitkResponse response = responseTask.get();
       auto status = response.status_code();
       MITK_INFO << " status: " << status;
-      if (status != MitkRestStatusCodes::OK)
+      if (MitkRestStatusCodes::OK != status)
       {
         // throw if something went wrong (e.g. invalid uri)
         // this exception can be handled by client
@@ -135,7 +135,7 @@ pplx::task<web::json::value> mitk::RESTClient::Put(const web::uri &uri, const we
         // parse content type to application/json if it isn't already
         // this is important if the content type is e.g. application/dicom+json
         utility::string_t requestContentType = response.headers().content_type();
-        if (requestContentType != L"application/json")
+        if (L"application/json" != requestContentType)
         {
           response.headers().set_content_type(L"application/json");
         }
@@ -164,7 +164,7 @@ pplx::task<web::json::value> mitk::RESTClient::Post(const web::uri &uri, const w
   // Create post request
   MitkRequest postRequest(MitkRESTMethods::POST);
   // set body of the put request with data given by client
-  if (content != nullptr)
+  if (nullptr != content)
   {
     postRequest.set_body(*content);
   }
@@ -178,7 +178,7 @@ pplx::task<web::json::value> mitk::RESTClient::Post(const web::uri &uri, const w
       auto status = response.status_code();
       MITK_INFO << " status: " << status;
 
-      if (status != MitkRestStatusCodes::Created)
+      if (MitkRestStatusCodes::Created != status)
       {
         // throw if something went wrong (e.g. invalid uri)
         // this exception can be handled by client
@@ -190,7 +190,7 @@ pplx::task<web::json::value> mitk::RESTClient::Post(const web::uri &uri, const w
         // parse content type to application/json if it isn't already
         // this is important if the content type is e.g. application/dicom+json
         utility::string_t requestContentType = response.headers().content_type();
-        if (requestContentType != L"application/json")
+        if (L"application/json" != requestContentType)
         {
           response.headers().set_content_type(L"application/json");
         }

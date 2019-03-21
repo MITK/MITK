@@ -157,7 +157,7 @@ public:
         }
       }).wait();
      }
-    CPPUNIT_ASSERT_MESSAGE("Multiple Requests", *count ==21);
+    CPPUNIT_ASSERT_MESSAGE("Multiple Requests", 21 == *count);
   }
 
   void PutRequestValidURI_ReturnsExpectedJSON()

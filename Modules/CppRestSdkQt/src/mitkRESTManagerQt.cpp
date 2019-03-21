@@ -12,7 +12,7 @@ void mitk::RESTManagerQt::ReceiveRequest(const web::uri &uri, mitk::IRESTObserve
   int port = uri.port();
 
   // Checking if port is free to add a new Server
-  if (m_ServerMap.count(port) == 0)
+  if (0 == m_ServerMap.count(port))
   {
     mitk::RESTManager::AddObserver(uri, observer);
 
@@ -47,10 +47,10 @@ void mitk::RESTManagerQt::HandleDeleteObserver(IRESTObserver *observer, const we
   {
     mitk::IRESTObserver *obsMap = it->second;
     // Check wether observer is at this place in map
-    if (obsMap == observer)
+    if (observer == obsMap)
     {
       // Check wether it is the right uri to be deleted
-      if (uri.is_empty() || it->first.second == uri.path())
+      if (uri.is_empty() || uri.path() == it->first.second)
       {
         int port = it->first.first;
         bool noObserverForPort = mitk::RESTManager::DeleteObserver(it, uri);

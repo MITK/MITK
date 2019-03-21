@@ -34,7 +34,7 @@ pplx::task<web::json::value> mitk::RESTManager::SendRequest(const web::uri &uri,
     case RequestType::Post:
     
       //TODO fixen wert vorne bei vergleich
-      if (content == nullptr)
+      if (nullptr == content)
       {
         // warning because normally you won't create an empty ressource
         MITK_WARN << "Content for put is empty, this will create an empty ressource";
@@ -44,7 +44,7 @@ pplx::task<web::json::value> mitk::RESTManager::SendRequest(const web::uri &uri,
     
     case RequestType::Put:
     
-      if (content == nullptr)
+      if (nullptr == content)
       {
         // warning because normally you won't empty a ressource
         MITK_WARN << "Content for put is empty, this will empty the ressource";
@@ -63,7 +63,7 @@ void mitk::RESTManager::ReceiveRequest(const web::uri &uri, mitk::IRESTObserver 
   int port = uri.port();
 
   // Checking if port is free to add a new Server
-  if (m_ServerMap.count(port) == 0)
+  if (0 == m_ServerMap.count(port))
   {
     this->AddObserver(uri, observer);
     // creating server instance
@@ -87,7 +87,7 @@ web::json::value mitk::RESTManager::Handle(const web::uri &uri, const web::json:
 {
   // Checking if there is an observer for the port and path
   std::pair<int, utility::string_t> key(uri.port(), uri.path());
-  if (m_Observers.count(key) != 0)
+  if (0 != m_Observers.count(key))
   {
     //TODO Ausgaben minimieren
     MITK_INFO << "Manager: Data send to observer";
@@ -107,10 +107,10 @@ void mitk::RESTManager::HandleDeleteObserver(IRESTObserver *observer, const web:
   {
     mitk::IRESTObserver *obsMap = it->second;
     // Check wether observer is at this place in map
-    if (obsMap == observer)
+    if (observer == obsMap)
     {
       // Check wether it is the right uri to be deleted
-      if (uri.is_empty() || it->first.second == uri.path())
+      if (uri.is_empty() || uri.path() == it->first.second)
       {
         int port = it->first.first;
         bool noObserverForPort = this->DeleteObserver(it, uri);
@@ -160,12 +160,12 @@ void mitk::RESTManager::AddObserver(const web::uri &uri, IRESTObserver *observer
 void mitk::RESTManager::ServerUnderPort(const web::uri &uri, IRESTObserver *observer)
 {
   // Same host, means new observer but not a new server instance
-  if (m_ServerMap[uri.port()]->GetUri() == uri.authority())
+  if (uri.authority() == m_ServerMap[uri.port()]->GetUri())
   {
     // new observer has to be added
     std::pair<int, utility::string_t> key(uri.port(), uri.path());
     // only add a new observer if there isn't already an observer for this uri
-    if (m_Observers.count(key) == 0)
+    if (0 == m_Observers.count(key))
     {
       this->AddObserver(uri, observer);
 
@@ -202,7 +202,7 @@ bool mitk::RESTManager::DeleteObserver(std::map<std::pair<int, utility::string_t
   // 3. check, if there is another observer under this port in observer map (with bool flag)
   for (auto o : m_Observers)
   {
-    if (o.first.first == port)
+    if (port == o.first.first)
     {
       // there still exists an observer for this port
       return false;

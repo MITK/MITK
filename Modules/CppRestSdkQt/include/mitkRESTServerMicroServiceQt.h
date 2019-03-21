@@ -33,7 +33,7 @@ namespace mitk
      *
      * @param uri the URI at which the server is listening for requests
      */
-    RESTServerMicroServiceQt(web::uri uri);
+    RESTServerMicroServiceQt(const web::uri &uri);
     ~RESTServerMicroServiceQt();
 
   public slots:

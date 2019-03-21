@@ -1,12 +1,12 @@
-#include "mitkRESTClientMicroService.h"
+#include "mitkRESTClient.h"
 #include "mitkRESTUtil.h"
 #include <mitkCommon.h>
 
-mitk::RESTClientMicroService::RESTClientMicroService() {}
+mitk::RESTClient::RESTClient() {}
 
-mitk::RESTClientMicroService::~RESTClientMicroService() {}
+mitk::RESTClient::~RESTClient() {}
 
-pplx::task<web::json::value> mitk::RESTClientMicroService::Get(const web::uri &uri)
+pplx::task<web::json::value> mitk::RESTClient::Get(const web::uri &uri)
 {
   //Create new HTTP client
   MitkClient *client = new MitkClient(uri);
@@ -56,7 +56,7 @@ pplx::task<web::json::value> mitk::RESTClientMicroService::Get(const web::uri &u
   });
 }
 
-pplx::task<web::json::value> mitk::RESTClientMicroService::Get(const web::uri &uri, const utility::string_t &filePath)
+pplx::task<web::json::value> mitk::RESTClient::Get(const web::uri &uri, const utility::string_t &filePath)
 {
   // Create new HTTP client
   MitkClient *client = new MitkClient(uri);
@@ -100,7 +100,7 @@ pplx::task<web::json::value> mitk::RESTClientMicroService::Get(const web::uri &u
     });
 }
 
-pplx::task<web::json::value> mitk::RESTClientMicroService::PUT(const web::uri &uri, const web::json::value &content)
+pplx::task<web::json::value> mitk::RESTClient::PUT(const web::uri &uri, const web::json::value &content)
 {
   // Create new HTTP client
   MitkClient *client = new MitkClient(uri);
@@ -154,7 +154,7 @@ pplx::task<web::json::value> mitk::RESTClientMicroService::PUT(const web::uri &u
   });
 }
 
-pplx::task<web::json::value> mitk::RESTClientMicroService::POST(const web::uri &uri, const web::json::value &content)
+pplx::task<web::json::value> mitk::RESTClient::POST(const web::uri &uri, const web::json::value &content)
 {
   // Create new HTTP client
   MitkClient *client = new MitkClient(uri);

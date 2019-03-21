@@ -1,15 +1,18 @@
 if(MITK_USE_CppRestSdk)
 
   MITK_CREATE_MODULE(
-    DEPENDS MitkCore CppMicroServices
+    DEPENDS MitkCore
     #WARNINGS_NO_ERRORS 
     AUTOLOAD_WITH MitkCore
   )
-  find_package(OpenSSL REQUIRED)
-
-  target_link_libraries(${MODULE_TARGET} PRIVATE cpprestsdk::cpprest)
-  target_link_libraries(${MODULE_TARGET} PUBLIC OpenSSL::SSL)
   
-add_subdirectory(test)
+  if(TARGET ${MODULE_TARGET})
+    find_package(OpenSSL REQUIRED)
+	
+    target_link_libraries(${MODULE_TARGET} PRIVATE cpprestsdk::cpprest)
+    target_link_libraries(${MODULE_TARGET} PUBLIC OpenSSL::SSL)
+  endif()
+  
+  add_subdirectory(test)
 
 endif(MITK_USE_CppRestSdk)

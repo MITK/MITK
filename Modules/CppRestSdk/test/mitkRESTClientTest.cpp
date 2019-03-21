@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestingMacros.h"
 
 // MITK includes
-#include "mitkRESTClientMicroService.h"
+#include "mitkRESTClient.h"
 
 // VTK includes
 #include <vtkDebugLeaks.h>
@@ -88,6 +88,7 @@ public:
   {
     web::json::value *result = new web::json::value();
     web::json::value data;
+    //TODO: data als memebrvariable/ in setup/ in methode
     data[L"userId"] = web::json::value(1);
     data[L"id"] = web::json::value(1);
     data[L"title"] = web::json::value(U("this is a title"));
@@ -117,8 +118,9 @@ public:
     if (m_Service)
     {
       // Create multiple tasks e.g. as shown below
+      //TODO: vector konstruktoren anschauen / emplace_back
       std::vector<pplx::task<void>> tasks;
-      for (int i = 0; i < 20; i++)
+      for (int i = 0; i < 20; ++i)
       {
         pplx::task<void> singleTask =
           m_Service->SendRequest(L"http://localhost:8080/test")

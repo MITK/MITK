@@ -2,7 +2,7 @@
 #include <mitkCommon.h>
 #include<mitkRESTUtil.h>
 
-mitk::RESTServerMicroService::RESTServerMicroService(web::uri uri)
+mitk::RESTServerMicroService::RESTServerMicroService(const web::uri &uri)
 {
   m_Uri = uri;
 }
@@ -33,20 +33,20 @@ web::uri mitk::RESTServerMicroService::GetUri()
   return m_Uri;
 }
 
-void mitk::RESTServerMicroService::HandleGet(MitkRequest request)
+void mitk::RESTServerMicroService::HandleGet(const MitkRequest &request)
 {
   int port = m_Listener.uri().port();
  //getting exact request uri has to be a parameter in handle function
   web::uri_builder build(m_Listener.uri());
   build.append(request.absolute_uri());
-  utility::string_t uriStringT = build.to_uri().to_string();
+  auto uriStringT = build.to_uri().to_string();
 
   MITK_INFO << "Get Request for server at port " << port << " Exact request uri: " 
     << mitk::RESTUtil::convertToUtf8(uriStringT);
   
   web::json::value content;
   //get RESTManager as microservice to call th Handle method of the manager
-  us::ModuleContext *context = us::GetModuleContext();
+  auto context = us::GetModuleContext();
 
   auto managerRef = context->GetServiceReference<IRESTManager>();
   if (managerRef)

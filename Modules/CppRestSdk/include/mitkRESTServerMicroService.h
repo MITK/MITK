@@ -47,7 +47,7 @@ namespace mitk
      *
      * @param uri the URI at which the server is listening for requests
      */
-    RESTServerMicroService(web::uri uri);
+    RESTServerMicroService(const web::uri &uri);
     ~RESTServerMicroService();
 
     web::uri GetUri();
@@ -67,8 +67,8 @@ namespace mitk
      *
      * @param MitkRequest incoming request object
      */
-    void HandleGet(MitkRequest request); 
-
+    void HandleGet(const MitkRequest &request); 
+  //TODO private machen
   protected:
     MitkListener m_Listener;
     web::uri m_Uri;

@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkIRESTManager.h>
 #include <mitkRESTManager.h>
-#include <mitkRESTClientMicroService.h>
+#include <mitkRESTClient.h>
 #include <mitkRESTServerMicroServiceQt.h>
 
 #include <MitkCppRestSdkQtExports.h>
@@ -52,10 +52,10 @@ namespace mitk
      * @param observer the observer which shouldn't receive requests anymore
      * @param uri the uri for which the observer doesn't handle requests anymore (optional)
      */
-    virtual void HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri) override;
+    void HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri) override;
 
   private:
-    std::map<int, QThread *> m_ServerThreadMap;                               // Map with threads for servers
+    std::map<int, QThread *> m_ServerThreadMap; // Map with threads for servers
   };
 } // namespace mitk
 #endif // !mitkRESTManager_h

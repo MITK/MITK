@@ -43,6 +43,8 @@ public:
   mitk::IRESTManager *m_Service;
   web::json::value m_Data;
 
+  //TODO: bei Notify uri parameter zuerst
+  //TODO: data als const ref
   web::json::value Notify(web::json::value &data, const web::uri &uri) override
   {
     MITK_INFO << "Observer: Data in observer";
@@ -69,6 +71,7 @@ public:
     {
       m_Service = us::GetModuleContext()->GetService(serviceRef);
     }
+    //TODO: if(m_Service) überprüfen, exception wenn nicht
   }
 
   void tearDown() override { m_Service->HandleDeleteObserver(this); }

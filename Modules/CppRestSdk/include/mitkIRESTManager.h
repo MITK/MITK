@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkServiceInterface.h>
 
 #include <MitkCppRestSdkExports.h>
-#include <mitkRESTClientMicroService.h>
+#include <mitkRESTClient.h>
 #include <mitkIRESTObserver.h>
 
 
@@ -39,7 +39,8 @@ namespace mitk
     /**
      * @brief request type for client requests by calling SendRequest
      */
-    enum RequestType
+    //TODO: Get, Post, Put
+    enum class RequestType
     {
       get,
       post,
@@ -47,7 +48,7 @@ namespace mitk
     };
 
     /**
-     * @brief Executes a HTTP request in the mitkRESTClientMicroService class
+     * @brief Executes a HTTP request in the mitkRESTClient class
      *
      * @param uri defines the URI the request is send to
      * @param type the RequestType of the HTTP request (optional)
@@ -55,7 +56,7 @@ namespace mitk
      * @return task to wait for
      */
     virtual pplx::task<web::json::value> SendRequest(const web::uri &uri,
-                                             const RequestType &type = get,
+                                             const RequestType &type = RequestType::get,
                                              const web::json::value &body = NULL,
                                              const utility::string_t &filePath = L"") = 0;
 
@@ -84,8 +85,8 @@ namespace mitk
      */
     virtual void HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri = L"") = 0;
 
-    virtual std::map<int, RESTServerMicroService *> GetM_ServerMap() = 0;
-    virtual std::map<std::pair<int, utility::string_t>, IRESTObserver *> GetM_Observers() = 0;
+    virtual const std::map<int, RESTServerMicroService *>& GetM_ServerMap() = 0;
+    virtual const std::map<std::pair<int, utility::string_t>, IRESTObserver *>& GetM_Observers() = 0;
 
   };
 } // namespace mitk

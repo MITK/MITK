@@ -17,7 +17,7 @@ void mitk::RESTManagerQt::ReceiveRequest(const web::uri &uri, mitk::IRESTObserve
     mitk::RESTManager::AddObserver(uri, observer);
 
     // creating server instance
-    RESTServerMicroServiceQt *server = new RESTServerMicroServiceQt(uri.authority());
+    auto server = new RESTServerMicroServiceQt(uri.authority());
     // add reference to server instance to map
     m_ServerMap[port] = server;
 
@@ -49,7 +49,7 @@ void mitk::RESTManagerQt::HandleDeleteObserver(IRESTObserver *observer, const we
     if (obsMap == observer)
     {
       // Check wether it is the right uri to be deleted
-      if (uri == L"" || it->first.second == uri.path())
+      if (uri.is_empty() || it->first.second == uri.path())
       {
         int port = it->first.first;
         bool noObserverForPort = mitk::RESTManager::DeleteObserver(it, uri);

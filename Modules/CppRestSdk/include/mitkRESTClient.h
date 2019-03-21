@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkRESTClientMicroService_h
-#define mitkRESTClientMicroService_h
+#ifndef mitkRESTClient_h
+#define mitkRESTClient_h
 
 #include "cpprest/asyncrt_utils.h"
 #include "cpprest/containerstream.h"
@@ -39,14 +39,15 @@ typedef web::json::json_exception MitkJsonException;
 
 namespace mitk
 {
-  class MITKCPPRESTSDK_EXPORT RESTClientMicroService
+  //TODO doku hinzufügen, wenn methode exception werfen kann 
+  class MITKCPPRESTSDK_EXPORT RESTClient
   {
   public:
-    RESTClientMicroService();
-    ~RESTClientMicroService();
+    RESTClient();
+    ~RESTClient();
 
     /**
-     *@brief Executes a HTTP GET request with the given uri and returns a task waiting for a json object
+     * @brief Executes a HTTP GET request with the given uri and returns a task waiting for a json object
      *
      * @param uri the URI resulting the target of the HTTP request
      * @return task to wait for with resulting json object
@@ -54,8 +55,8 @@ namespace mitk
     pplx::task<web::json::value> Get(const web::uri &uri);
 
     /**
-     *@brief Executes a HTTP GET request with the given uri and and stores the byte stream in a file given by the
-     *filePath
+     * @brief Executes a HTTP GET request with the given uri and and stores the byte stream in a file given by the
+     * filePath
      *
      * @param uri the URI resulting the target of the HTTP request
      * @return task to wait for returning an empty json object
@@ -70,6 +71,7 @@ namespace mitk
      * created resources
      * @return task to wait for with resulting json object
      */
+    //TODO Put
     pplx::task<web::json::value> PUT(const web::uri &uri, const web::json::value &content);
 
     /**
@@ -80,7 +82,8 @@ namespace mitk
      * created resource
      * @return task to wait for with resulting json object
      */
+    //TODO Post
     pplx::task<web::json::value> POST(const web::uri &uri, const web::json::value &content);
   };
 } // namespace mitk
-#endif // !mitkRESTClientMicroService_h
+#endif // !mitkRESTClient_h

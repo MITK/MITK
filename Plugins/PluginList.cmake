@@ -111,6 +111,6 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.pharmacokinetics.simulation:OFF
   org.mitk.gui.qt.pharmacokinetics.curvedescriptor:OFF
   org.mitk.gui.qt.pharmacokinetics.concentration.mri:OFF
-  org.mitk.gui.qt.thread:ON
-  org.mitk.gui.qt.client:ON
+  org.mitk.gui.qt.thread:OFF
+  org.mitk.gui.qt.client:OFF
 )

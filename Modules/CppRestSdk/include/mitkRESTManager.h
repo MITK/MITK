@@ -37,7 +37,7 @@ namespace mitk
     ~RESTManager() override;
 
     /**
-     * @brief Executes a HTTP request in the mitkRESTClientMicroService class
+     * @brief Executes a HTTP request in the mitkRESTClient class
      *
      * @param uri defines the URI the request is send to
      * @param type the RequestType of the HTTP request (optional)
@@ -45,8 +45,9 @@ namespace mitk
      * @param filePath the file path to store the request to
      * @return task to wait for
      */
+    //TODO aus body pointer machen, nullptr
     pplx::task<web::json::value> SendRequest(const web::uri &uri,
-                                             const RequestType &type = get,
+                                             const RequestType &type = RequestType::get,
                                              const web::json::value &body= NULL,
                                              const utility::string_t &filePath = L"") override;
     
@@ -65,6 +66,7 @@ namespace mitk
      * @param body the body of the request
      * @return the data which is modified by the notified observer
      */
+    //TODO body const
     web::json::value Handle(const web::uri &uri, web::json::value &body) override;
 
     /**
@@ -75,9 +77,14 @@ namespace mitk
      */
     virtual void HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri) override;
 
-    virtual std::map<int, RESTServerMicroService *> GetM_ServerMap() override;
-    virtual std::map<std::pair<int, utility::string_t>, IRESTObserver *> GetM_Observers() override;
+    /**
+    * @brief internal use only
+    */
+    //TODO alternative: aus interface rausnehmen und dynamic casten
+    virtual const std::map<int, RESTServerMicroService *>& GetM_ServerMap() override;
+    virtual const std::map<std::pair<int, utility::string_t>, IRESTObserver *>& GetM_Observers() override;
 
+    protected:
     /**
      * @brief adds an observer if a port is free, called by ReceiveRequest method
      *
@@ -102,8 +109,7 @@ namespace mitk
      * @return bool if there is another observer under the port
      */
     bool DeleteObserver(std::map < std::pair<int, utility::string_t>, IRESTObserver *>::iterator &it, const web::uri &uri);
-
-  protected:
+//TODO Member immer private, zugriff über getter/setter
     std::map<int, RESTServerMicroService *> m_ServerMap;                     // Map with port server pairs
     std::map<std::pair<int, utility::string_t>, IRESTObserver *> m_Observers; // Map with all observers
   };

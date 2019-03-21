@@ -12,46 +12,46 @@ pplx::task<web::json::value> mitk::RESTManager::SendRequest(const web::uri &uri,
                                                             const utility::string_t &filePath)
 {
   pplx::task<web::json::value> answer;
-  auto client = new RESTClientMicroService();
-  //according to the RequestType, different HTTP requests are made
+  auto client = new RESTClient();
+  // according to the RequestType, different HTTP requests are made
   switch (type)
   {
-    case get:
-    {
-      if (filePath == L"")
+    case RequestType::get:
+    
+      if (filePath.empty())
       {
-        //no file path specified, starts a normal get request returning the normal json result
+        // no file path specified, starts a normal get request returning the normal json result
         answer = client->Get(uri);
       }
       else
       {
-        //file path ist specified, the result of the get request ist stored in this file
-        //and an empty json object is returned
+        // file path ist specified, the result of the get request ist stored in this file
+        // and an empty json object is returned
         answer = client->Get(uri, filePath);
       }
       break;
-    }
-    case post:
-    {
+    
+    case RequestType::post:
+    
+      //TODO fixen wert vorne bei vergleich
       if (content == NULL)
       {
-        //warning because normally you won't create an empty ressource
+        // warning because normally you won't create an empty ressource
         MITK_WARN << "Content for put is empty, this will create an empty ressource";
       }
       answer = client->POST(uri, content);
       break;
-    }
-      break;
-    case put:
-    {
+    
+    case RequestType::put:
+    
       if (content == NULL)
       {
-        //warning because normally you won't empty a ressource
+        // warning because normally you won't empty a ressource
         MITK_WARN << "Content for put is empty, this will empty the ressource";
       }
-      answer = client->PUT(uri,content);
+      answer = client->PUT(uri, content);
       break;
-    }
+    //TODO: default hinzufügen
   }
 
   return answer;
@@ -67,10 +67,10 @@ void mitk::RESTManager::ReceiveRequest(const web::uri &uri, mitk::IRESTObserver 
   {
     this->AddObserver(uri, observer);
     // creating server instance
-    RESTServerMicroService *server = new RESTServerMicroService(uri.authority());
+    auto server = new RESTServerMicroService(uri.authority());
     // add reference to server instance to map
     m_ServerMap[port] = server;
-    //start Server
+    // start Server
     server->OpenListener();
 
     MITK_INFO << "new server " << mitk::RESTUtil::convertToUtf8(uri.authority().to_string()) << " at port " << port;
@@ -78,10 +78,10 @@ void mitk::RESTManager::ReceiveRequest(const web::uri &uri, mitk::IRESTObserver 
   // If there is already a server under this port
   else
   {
+    //TODO umbenennen
     this->ServerUnderPort(uri, observer);
   }
 }
-
 
 web::json::value mitk::RESTManager::Handle(const web::uri &uri, web::json::value &body)
 {
@@ -89,10 +89,11 @@ web::json::value mitk::RESTManager::Handle(const web::uri &uri, web::json::value
   std::pair<int, utility::string_t> key(uri.port(), uri.path());
   if (m_Observers.count(key) != 0)
   {
+    //TODO Ausgaben minimieren
     MITK_INFO << "Manager: Data send to observer";
-    return m_Observers[key]->Notify(body,uri);
+    return m_Observers[key]->Notify(body, uri);
   }
-  //No observer under this port, return null which results in status code 404 (s. RESTServerMicroService)
+  // No observer under this port, return null which results in status code 404 (s. RESTServerMicroService)
   else
   {
     MITK_WARN << "No Observer can handle the data";
@@ -100,7 +101,7 @@ web::json::value mitk::RESTManager::Handle(const web::uri &uri, web::json::value
   }
 }
 
-void mitk::RESTManager::HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri= L"")
+void mitk::RESTManager::HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri = L"")
 {
   for (auto it = m_Observers.begin(); it != m_Observers.end();)
   {
@@ -108,8 +109,8 @@ void mitk::RESTManager::HandleDeleteObserver(IRESTObserver *observer, const web:
     // Check wether observer is at this place in map
     if (obsMap == observer)
     {
-      //Check wether it is the right uri to be deleted
-      if (uri==L""||it->first.second == uri.path())
+      // Check wether it is the right uri to be deleted
+      if (uri.is_empty() || it->first.second == uri.path())
       {
         int port = it->first.first;
         bool noObserverForPort = this->DeleteObserver(it, uri);
@@ -118,11 +119,11 @@ void mitk::RESTManager::HandleDeleteObserver(IRESTObserver *observer, const web:
           //  there isn't an observer at this port, delete m_ServerMap entry for this port
           // close listener
           m_ServerMap[port]->CloseListener();
-          dynamic_cast<mitk::RESTServerMicroService *>(m_ServerMap[port])->~RESTServerMicroService();
+          delete m_ServerMap[port];
           // delete server from map
           m_ServerMap.erase(port);
         }
-      } 
+      }
       else
       {
         ++it;
@@ -135,12 +136,12 @@ void mitk::RESTManager::HandleDeleteObserver(IRESTObserver *observer, const web:
   }
 }
 
-std::map<int, mitk::RESTServerMicroService *> mitk::RESTManager::GetM_ServerMap()
+const std::map<int, mitk::RESTServerMicroService *> &mitk::RESTManager::GetM_ServerMap()
 {
   return m_ServerMap;
 }
 
-std::map<std::pair<int, utility::string_t>, mitk::IRESTObserver *> mitk::RESTManager::GetM_Observers()
+const std::map<std::pair<int, utility::string_t>, mitk::IRESTObserver *> &mitk::RESTManager::GetM_Observers()
 {
   return m_Observers;
 }
@@ -156,7 +157,7 @@ void mitk::RESTManager::AddObserver(const web::uri &uri, IRESTObserver *observer
             << "] : Number of elements in map: " << m_Observers.count(key);
 }
 
-void mitk::RESTManager::ServerUnderPort(const web::uri &uri, IRESTObserver *observer) 
+void mitk::RESTManager::ServerUnderPort(const web::uri &uri, IRESTObserver *observer)
 {
   // Same host, means new observer but not a new server instance
   if (m_ServerMap[uri.port()]->GetUri() == uri.authority())
@@ -166,11 +167,7 @@ void mitk::RESTManager::ServerUnderPort(const web::uri &uri, IRESTObserver *obse
     // only add a new observer if there isn't already an observer for this uri
     if (m_Observers.count(key) == 0)
     {
-      m_Observers[key] = observer;
-
-      // testing if entry has been added to map
-      MITK_INFO << "[" << uri.port() << ", " << mitk::RESTUtil::convertToUtf8(uri.path())
-                << "] : Number of elements in map: " << m_Observers.count(key);
+      this->AddObserver(uri, observer);
 
       // info output
       MITK_INFO << "started listening, no new server instance has been created";
@@ -203,15 +200,13 @@ bool mitk::RESTManager::DeleteObserver(std::map<std::pair<int, utility::string_t
   MITK_INFO << "Number of elements at key [ " << port << ", " << mitk::RESTUtil::convertToUtf8(key.second)
             << "]: " << m_Observers.count(key);
   // 3. check, if there is another observer under this port in observer map (with bool flag)
-  bool noObserverForPort = true;
   for (auto o : m_Observers)
   {
     if (o.first.first == port)
     {
       // there still exists an observer for this port
-      noObserverForPort = false;
+      return false;
     }
   }
-  return noObserverForPort;
+  return true;
 }
-

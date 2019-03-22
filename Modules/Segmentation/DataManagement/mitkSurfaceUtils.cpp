@@ -66,7 +66,7 @@ DataNode::Pointer SurfaceCreator::createModel()
   m_Input->SetProperty("Surface Type.Decimation", FloatProperty::New(m_Args.decimation * m_Args.decimationRate));
   m_Input->SetProperty("Surface Type.Light Smoothing", BoolProperty::New(m_Args.lightSmoothing));
 
-  if (m_Args.overwrite) {
+  if (m_Args.outputStorage != nullptr && m_Args.overwrite) {
     auto childs = m_Args.outputStorage->GetDerivations(m_Input);
     for (const auto& children : *childs) {
       if (dynamic_cast<Surface*>(children->GetData()) != nullptr) {
@@ -101,13 +101,41 @@ DataNode::Pointer SurfaceCreator::createModel()
 
   node->SetName(m_Input->GetName() + "_Model");
 
-  m_Args.outputStorage->Add(node, m_Input);
+  if (m_Args.outputStorage != nullptr) {
+    m_Args.outputStorage->Add(node, m_Input);
 
-  if (m_Args.removeOnComplete != nullptr) {
-    m_Args.outputStorage->Remove(m_Args.removeOnComplete);
+    if (m_Args.removeOnComplete != nullptr) {
+      m_Args.outputStorage->Remove(m_Args.removeOnComplete);
+    }
   }
 
   return node;
+}
+
+vtkSmartPointer<vtkPolyData> SurfaceCreator::getPolyData()
+{
+  if (m_Output == nullptr) {
+    return nullptr;
+  }
+  
+  mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(m_Output->GetData());
+  if (surface == nullptr) {
+    return nullptr;
+  }
+
+  return surface->GetVtkPolyData();
+}
+
+void SurfaceCreator::populateCreationProperties(mitk::DataNode::Pointer segNode)
+{
+  if (m_Input == nullptr) {
+    return;
+  }
+
+  segNode->SetProperty("Surface Type", SurfaceCreationTypeProperty::New(m_Args.creationType));
+  segNode->SetProperty("Surface Type.Smooth", BoolProperty::New(m_Args.smooth));
+  segNode->SetProperty("Surface Type.Decimation", FloatProperty::New(m_Args.decimation * m_Args.decimationRate));
+  segNode->SetProperty("Surface Type.Light Smoothing", BoolProperty::New(m_Args.lightSmoothing));
 }
 
 SurfaceCreator::SurfaceCreator()
@@ -122,11 +150,6 @@ void SurfaceCreator::GenerateData()
 {
   if (m_Input == nullptr) {
     MITK_INFO << "Can't create model. Input was not set.\n";
-    return;
-  }
-
-  if (m_Args.outputStorage == nullptr) {
-    MITK_ERROR << "Tried to create segmentation without specifying output storage\n";
     return;
   }
 
@@ -150,6 +173,11 @@ DataNode::Pointer SurfaceCreator::recreateModel()
 {
   BaseProperty* surfTypeProp = m_Input->GetProperty("Surface Type");
   if (surfTypeProp == nullptr) {
+    return nullptr;
+  }
+
+  if (m_Args.outputStorage == nullptr) {
+    MITK_ERROR << "Tried to recreate segmentation model without specifying output storage\n";
     return nullptr;
   }
 
@@ -232,14 +260,13 @@ vtkSmartPointer<vtkPolyData> SurfaceCreator::createModelAgtk(DataNode::Pointer s
   ShowSegmentationAsAgtkSurface::SurfaceComputingParameters surfaceParams;
   surfaceParams.blurSigma = .3f;
   if (args.lightSmoothing) {
-    surfaceParams.smoothingIterations = 1;
+    surfaceParams.smoothingIterations = 2;
     surfaceParams.smoothingRelaxation = .25f;
   } else {
     surfaceParams.smoothingIterations = 15;
     surfaceParams.smoothingRelaxation = .1f;
   }
 
-  surfaceParams.smoothingType = ShowSegmentationAsAgtkSurface::SurfaceSmoothingType::WindowedSync;
   surfaceParams.decimationType = ShowSegmentationAsAgtkSurface::SurfaceDecimationType::None;
   surfaceParams.isResampling = true;
 
@@ -252,7 +279,11 @@ vtkSmartPointer<vtkPolyData> SurfaceCreator::createModelAgtk(DataNode::Pointer s
   }
 
   if (args.smooth) {
-    surfaceParams.smoothingType = ShowSegmentationAsAgtkSurface::SurfaceSmoothingType::WindowedSync;
+    if (args.lightSmoothing) {
+      surfaceParams.smoothingType = ShowSegmentationAsAgtkSurface::SurfaceSmoothingType::Laplacian;
+    } else {
+      surfaceParams.smoothingType = ShowSegmentationAsAgtkSurface::SurfaceSmoothingType::WindowedSync;
+    }
   } else {
     surfaceParams.isBlurImage = false;
     surfaceParams.levelValue = 0.f;

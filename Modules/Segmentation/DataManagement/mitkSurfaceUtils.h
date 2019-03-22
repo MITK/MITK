@@ -98,6 +98,10 @@ public:
     m_Args = args;
   }
 
+  // Deprecated methods for dumdums
+  vtkSmartPointer<vtkPolyData> getPolyData();
+  void populateCreationProperties(mitk::DataNode::Pointer segNode);
+
 protected:
   SurfaceCreator();
   virtual ~SurfaceCreator() {}

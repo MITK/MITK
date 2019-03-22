@@ -140,7 +140,7 @@ const std::map<int, mitk::RESTServer *> &mitk::RESTManager::GetServerMap()
   return m_ServerMap;
 }
 
-const std::map<std::pair<int, utility::string_t>, mitk::IRESTObserver *> &mitk::RESTManager::GetObservers()
+std::map<std::pair<int, utility::string_t>, mitk::IRESTObserver *> &mitk::RESTManager::GetObservers()
 {
   return m_Observers;
 }
@@ -200,4 +200,19 @@ bool mitk::RESTManager::DeleteObserver(std::map<std::pair<int, utility::string_t
     }
   }
   return true;
+}
+
+void mitk::RESTManager::SetServerMap(const int port, RESTServer *server) 
+{
+  m_ServerMap[port] = server;
+}
+
+void mitk::RESTManager::DeleteFromServerMap(const int port) 
+{
+  m_ServerMap.erase(port);
+}
+
+void mitk::RESTManager::SetObservers(const std::pair<int, utility::string_t> key, IRESTObserver *observer) 
+{
+  m_Observers[key] = observer;
 }

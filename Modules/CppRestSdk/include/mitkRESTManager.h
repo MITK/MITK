@@ -80,7 +80,7 @@ namespace mitk
     * @brief internal use only
     */
     virtual const std::map<int, RESTServer *>& GetServerMap() override;
-    virtual const std::map<std::pair<int, utility::string_t>, IRESTObserver *>& GetObservers() override;
+    virtual std::map<std::pair<int, utility::string_t>, IRESTObserver *>& GetObservers() override;
 
     protected:
     /**
@@ -108,8 +108,11 @@ namespace mitk
      */
     bool DeleteObserver(std::map < std::pair<int, utility::string_t>, IRESTObserver *>::iterator &it, const web::uri &uri);
 
+    void SetServerMap(const int port, RESTServer *server);
+    void DeleteFromServerMap(const int port);
+    void SetObservers(const std::pair<int, utility::string_t> key, IRESTObserver *observer);
 
-//TODO Member immer private, zugriff über getter/setter
+    private:
     std::map<int, RESTServer *> m_ServerMap;                     // Map with port server pairs
     std::map<std::pair<int, utility::string_t>, IRESTObserver *> m_Observers; // Map with all observers
   };

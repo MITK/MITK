@@ -12,14 +12,14 @@ void mitk::RESTManagerQt::ReceiveRequest(const web::uri &uri, mitk::IRESTObserve
   int port = uri.port();
 
   // Checking if port is free to add a new Server
-  if (0 == m_ServerMap.count(port))
+  if (0 == GetServerMap().count(port))
   {
     mitk::RESTManager::AddObserver(uri, observer);
 
     // creating server instance
     auto server = new RESTServerQt(uri.authority());
     // add reference to server instance to map
-    m_ServerMap[port] = server;
+    mitk::RESTManager::SetServerMap(port, server);
 
     // Move server to seperate Thread and create connections between threads
     m_ServerThreadMap[port] = new QThread;
@@ -42,8 +42,8 @@ void mitk::RESTManagerQt::ReceiveRequest(const web::uri &uri, mitk::IRESTObserve
 
 void mitk::RESTManagerQt::HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri = L"")
 {
-
-  for (auto it = m_Observers.begin(); it != m_Observers.end();)
+  auto &observerMap = mitk::RESTManager::GetObservers();
+  for (auto it = observerMap.begin(); it != observerMap.end();)
   {
     mitk::IRESTObserver *obsMap = it->second;
     // Check wether observer is at this place in map
@@ -58,13 +58,13 @@ void mitk::RESTManagerQt::HandleDeleteObserver(IRESTObserver *observer, const we
         {
           //  there isn't an observer at this port, delete m_ServerMap entry for this port
           // close listener
-          QMetaObject::invokeMethod(static_cast<mitk::RESTServerQt *>(m_ServerMap[port]), "CloseListener");
+          QMetaObject::invokeMethod(static_cast<mitk::RESTServerQt *>(mitk::RESTManager::GetServerMap().at(port)), "CloseListener");
           // end thread
           m_ServerThreadMap[port]->quit();
           m_ServerThreadMap[port]->wait();
  
           // delete server from map
-          m_ServerMap.erase(port);
+          mitk::RESTManager::DeleteFromServerMap(port);
         }
       }
       else

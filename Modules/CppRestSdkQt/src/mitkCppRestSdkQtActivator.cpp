@@ -15,6 +15,7 @@ void MitkCppRestSdkQtActivator::Load(us::ModuleContext *context)
   m_RESTManagerQt.reset(new mitk::RESTManagerQt);
  
   us::ServiceProperties props;
+  //The standard RESTManager which is used for non-qt applications has a ranking of 5
   if (nullptr != QCoreApplication::instance)
   {
     props[us::ServiceConstants::SERVICE_RANKING()] = 10;

@@ -29,6 +29,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  /**
+  * @class RESTManager
+  * @brief this is a microservice for managing REST-requests, used for non-qt applications. 
+  *
+  * RESTManagerQt in the CppRestSdkQt module inherits from this class and is the equivalent microservice
+  * used for Qt applications.
+  */
   class MITKCPPRESTSDK_EXPORT RESTManager : public IRESTManager
   {
 

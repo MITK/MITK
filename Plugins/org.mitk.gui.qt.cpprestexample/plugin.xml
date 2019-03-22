@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.clientview"
+          name="Client View"
+          class="QmitkClientView"
+          category="Examples"
+          icon="resources/ClientIcon.svg" />
+    <view id="org.mitk.views.serverview"
+		  name="Server View"
+	      class="QmitkServerView"
+          category="Examples"
+          icon="resources/ServerIcon.svg" />
+  </extension>
+</plugin>

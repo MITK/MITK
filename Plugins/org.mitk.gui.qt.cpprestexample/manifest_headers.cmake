@@ -1,0 +1,5 @@
+set(Plugin-Name "CppRestExample Plugin")
+set(Plugin-Version "1.0")
+set(Plugin-Vendor "CAMIC")
+set(Plugin-ContactAddress "https://mitk.org")
+set(Require-Plugin org.mitk.gui.qt.common)

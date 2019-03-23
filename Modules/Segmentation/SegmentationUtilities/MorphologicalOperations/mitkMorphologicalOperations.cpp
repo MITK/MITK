@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkBinaryFillholeImageFilter.h>
 #include <itkBinaryMorphologicalClosingImageFilter.h>
 #include <itkBinaryMorphologicalOpeningImageFilter.h>
+#include <itkLabelMedianImageFilter.h>
 
 #include <itkBinaryThresholdImageFilter.h>
 #include <itkConnectedComponentImageFilter.h>
@@ -243,6 +244,40 @@ void mitk::MorphologicalOperations::RemoveFragments(mitk::Image::Pointer& image,
   MITK_INFO << "Finished RemoveFragments";
 }
 
+void mitk::MorphologicalOperations::WeightedMedian(mitk::Image::Pointer& image, int factor, int centerWeight)
+{
+  MITK_INFO << "Start WeihtedMedian...";
+
+  int timeSteps = static_cast<int>(image->GetTimeSteps());
+
+  if (timeSteps > 1)
+  {
+    mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+    timeSelector->SetInput(image);
+
+    for (int t = 0; t < timeSteps; ++t)
+    {
+      MITK_INFO << "  Processing time step " << t;
+
+      timeSelector->SetTimeNr(t);
+      timeSelector->Update();
+
+      mitk::Image::Pointer img3D = timeSelector->GetOutput();
+      img3D->DisconnectPipeline();
+
+      AccessByItk_3(img3D, itkWeightedMedian, img3D, factor, centerWeight);
+
+      mitk::ImageReadAccessor accessor(img3D);
+      image->SetVolume(accessor.GetData(), t);
+    }
+  } else
+  {
+    AccessByItk_3(image, itkWeightedMedian, image, factor, centerWeight);
+  }
+
+  MITK_INFO << "Finished WeihtedMedian";
+}
+
 template<typename TPixel, unsigned int VDimension>
 void mitk::MorphologicalOperations::itkClosing(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer& resultImage, int factor, mitk::MorphologicalOperations::StructuralElementType structuralElementFlags)
 {
@@ -397,6 +432,23 @@ void mitk::MorphologicalOperations::itkFillHoles(itk::Image<TPixel, VDimension>*
   fillHoleFilter->UpdateLargestPossibleRegion();
 
   mitk::CastToMitkImage(fillHoleFilter->GetOutput(), resultImage);
+}
+
+template<typename TPixel, unsigned int VDimension>
+void mitk::MorphologicalOperations::itkWeightedMedian(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer& resultImage, int factor, int centerWeight)
+{
+  typedef itk::Image<TPixel, VDimension> ImageType;
+  typedef typename itk::LabelMedianImageFilter<ImageType, ImageType> FilterType;
+
+  typename FilterType::Pointer filter = FilterType::New();
+  typename ImageType::SizeType size;
+  size.Fill(factor);
+  filter->SetRadius(size);
+  filter->SetCenterWeight(centerWeight);
+  filter->SetInput(sourceImage);
+  filter->UpdateLargestPossibleRegion();
+
+  mitk::CastToMitkImage(filter->GetOutput(), resultImage);
 }
 
 template<typename TPixel, unsigned int VDimension>

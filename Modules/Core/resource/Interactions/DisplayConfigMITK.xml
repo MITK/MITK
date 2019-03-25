@@ -12,7 +12,7 @@
   <!-- Zoom either by moving mouse leftright or updown -->
   <param name="zoomDirection" value="updown"/>
   <!-- react to an event, even tough is was already processed by a DataInteractor-->
-  <param name="alwaysReact" value="true"/>
+  <param name="alwaysReact" value="false"/>
   <!-- reverse levelWindow reaction -->
   <param name="levelWindowDirection" value="updown"/>
 

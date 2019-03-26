@@ -3,4 +3,6 @@ SimpleITK
 dipy
 sklearn
 https://github.com/MIC-DKFZ/batchgenerators/archive/master.zip
-https://github.com/MIC-DKFZ/TractSeg/archive/v1.8.zip
+https://github.com/MIC-DKFZ/TractSeg/archive/v1.9.zip
+torch
+torchvision

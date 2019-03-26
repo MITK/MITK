@@ -1066,9 +1066,9 @@ mitkImageStatisticsCalculatorTestSuite::ComputeStatistics(mitk::Image::ConstPoin
 void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatisticsContainer::ImageStatisticsObject stats,
 	mitk::ImageStatisticsContainer::RealType testMean, mitk::ImageStatisticsContainer::RealType testSD, mitk::ImageStatisticsContainer::RealType testMedian)
 {
-	mitk::ImageStatisticsContainer::RealType meanObject;
-	mitk::ImageStatisticsContainer::RealType standardDeviationObject;
-	mitk::ImageStatisticsContainer::RealType medianObject;
+    mitk::ImageStatisticsContainer::RealType meanObject = 0;
+    mitk::ImageStatisticsContainer::RealType standardDeviationObject = 0;
+    mitk::ImageStatisticsContainer::RealType medianObject = 0;
 	CPPUNIT_ASSERT_NO_THROW(meanObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MEAN()));
 	CPPUNIT_ASSERT_NO_THROW(standardDeviationObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::STANDARDDEVIATION()));
 	CPPUNIT_ASSERT_NO_THROW(medianObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MEDIAN()));
@@ -1093,15 +1093,15 @@ void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatist
 	mitk::ImageStatisticsContainer::IndexType maxIndex)
 {
 	mitk::ImageStatisticsContainer::VoxelCountType numberOfVoxelsObject;
-	mitk::ImageStatisticsContainer::RealType meanObject;
+    mitk::ImageStatisticsContainer::RealType meanObject = 0;
 	mitk::ImageStatisticsContainer::RealType mppObject;
-	mitk::ImageStatisticsContainer::RealType skewnessObject;
-	mitk::ImageStatisticsContainer::RealType kurtosisObject;
-	mitk::ImageStatisticsContainer::RealType varianceObject;
-	mitk::ImageStatisticsContainer::RealType standardDeviationObject;
-	mitk::ImageStatisticsContainer::RealType minObject;
-	mitk::ImageStatisticsContainer::RealType maxObject;
-	mitk::ImageStatisticsContainer::RealType rmsObject;
+    mitk::ImageStatisticsContainer::RealType skewnessObject = 0;
+    mitk::ImageStatisticsContainer::RealType kurtosisObject = 0;
+    mitk::ImageStatisticsContainer::RealType varianceObject = 0;
+    mitk::ImageStatisticsContainer::RealType standardDeviationObject = 0;
+    mitk::ImageStatisticsContainer::RealType minObject = 0;
+    mitk::ImageStatisticsContainer::RealType maxObject = 0;
+    mitk::ImageStatisticsContainer::RealType rmsObject = 0;
 	mitk::ImageStatisticsContainer::IndexType minIndexObject;
 	mitk::ImageStatisticsContainer::IndexType maxIndexObject;
 	CPPUNIT_ASSERT_NO_THROW(numberOfVoxelsObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::VoxelCountType>(mitk::ImageStatisticsConstants::NUMBEROFVOXELS()));

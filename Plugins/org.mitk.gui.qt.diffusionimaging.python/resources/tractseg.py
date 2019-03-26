@@ -29,23 +29,27 @@ try:
     affine[2, 3] = in_image.GetOrigin()[2]
     affine[3, 3] = 1
 
-    data, flip_axis = img_utils.flip_peaks_to_correct_orientation_if_needed(nib.Nifti1Image(data, affine=affine), do_flip=True)
+    data, flip_axis = img_utils.flip_peaks_to_correct_orientation_if_needed(nib.Nifti1Image(data, affine=affine),
+                                                                            do_flip=True)
     print('flip_axis', flip_axis)
 
     print('output_type', output_type)
     print('get_probs', get_probs)
     print('dropout_sampling', dropout_sampling)
     print('threshold', threshold)
-    seg = run_tractseg(data=data, output_type=output_type, input_type="peaks", verbose=verbose, get_probs=get_probs, dropout_sampling=dropout_sampling, threshold=threshold, postprocess=True)
 
-    bla = nib.Nifti1Image(seg, affine)
-    nib.save(bla, '/home/neher/test.nii.gz')
+    seg = run_tractseg(data=data, output_type=output_type, input_type="peaks", verbose=verbose, get_probs=get_probs,
+                       dropout_sampling=dropout_sampling, threshold=threshold, postprocess=False)
+
+    # bla = nib.Nifti1Image(seg, affine)
+    # nib.save(bla, '/home/neher/test.nii.gz')
     if swapaxes:
+        print("Swapping axes back!")
         seg = np.swapaxes(seg, 0, 2)
 
+    print('Output shape: ' + str(seg.shape))
     if output_type == "tract_segmentation":
 
-        print("tract_segmentation", get_probs, dropout_sampling)
         if not get_probs and not dropout_sampling:
             if collapse:
                 temp = np.zeros((seg.shape[0], seg.shape[1], seg.shape[2]))
@@ -93,7 +97,6 @@ try:
         segmentation.SetDirection(in_image.GetDirection())
 
     elif output_type == "TOM":
-
         if not collapse:
             for x in range(0, 72):
                 tom = sitk.GetImageFromArray(seg[:, :, :, x * 3:x * 3 + 3])

@@ -268,7 +268,7 @@ vtkSmartPointer<vtkPolyData> SurfaceCreator::createModelAgtk(DataNode::Pointer s
   }
 
   surfaceParams.decimationType = ShowSegmentationAsAgtkSurface::SurfaceDecimationType::None;
-  surfaceParams.isResampling = true;
+  surfaceParams.isResampling = false;
 
   if (args.decimation) {
     surfaceParams.decimationType = ShowSegmentationAsAgtkSurface::SurfaceDecimationType::DecimatePro;
@@ -290,6 +290,8 @@ vtkSmartPointer<vtkPolyData> SurfaceCreator::createModelAgtk(DataNode::Pointer s
     surfaceParams.smoothingType = ShowSegmentationAsAgtkSurface::SurfaceSmoothingType::None;
     surfaceParams.decimationType = ShowSegmentationAsAgtkSurface::SurfaceDecimationType::None;
   }
+
+  surfaceParams.spacing = image->GetGeometry()->GetSpacing();
 
   ShowSegmentationAsAgtkSurface::Pointer surfaceBuilder = ShowSegmentationAsAgtkSurface::New();
   surfaceBuilder->setArgs(args, surfaceParams);

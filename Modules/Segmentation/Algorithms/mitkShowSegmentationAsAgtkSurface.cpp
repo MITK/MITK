@@ -1,5 +1,13 @@
 #include "mitkShowSegmentationAsAgtkSurface.h"
 
+#include <vtkCallbackCommand.h>
+#include <vtkDecimatePro.h>
+#include <vtkFlyingEdges3D.h>
+#include <vtkPolyDataNormals.h>
+#include <vtkQuadricDecimation.h>
+#include <vtkSmoothPolyDataFilter.h>
+#include <vtkWindowedSincPolyDataFilter.h>
+
 namespace mitk
 {
 
@@ -117,7 +125,10 @@ void ShowSegmentationAsAgtkSurface::PreProcessing()
     m_FloatTmpImage = smoothingImage->GetOutput();
   }
 
-  if (m_FilterArgs.isResampling && m_FilterArgs.spacing > 1.0e-05) {
+  double minSpacing = std::min(m_FilterArgs.spacing[0], m_FilterArgs.spacing[1]);
+  minSpacing = std::min(minSpacing, m_FilterArgs.spacing[3]);
+
+  if (m_FilterArgs.isResampling && minSpacing > 1.0e-05) {
     typedef itk::LinearInterpolateImageFunction<FloatImage, double> InterpolatorType;
     typename InterpolatorType::Pointer interpolator = InterpolatorType::New();
 
@@ -128,8 +139,8 @@ void ShowSegmentationAsAgtkSurface::PreProcessing()
     FloatImage::SpacingType newSpacing;
 
     for (size_t n = 0; n < DIM; ++n) {
-      newSize[n] = (oldSize[n] - 1) * oldSpacing[n] / m_FilterArgs.spacing + 1;
-      newSpacing[n] = m_FilterArgs.spacing;
+      newSize[n] = (oldSize[n] - 1) * oldSpacing[n] / m_FilterArgs.spacing[n] + 1;
+      newSpacing[n] = m_FilterArgs.spacing[n];
     }
 
     typedef itk::ResampleImageFilter<FloatImage, FloatImage> ResampleImageFilterType;
@@ -158,18 +169,18 @@ void ShowSegmentationAsAgtkSurface::ComputeSurface()
 
   m_CurrentProgress = m_ProgressAccumulator->GetAccumulatedProgress();
 
-  typedef vtkSmartPointer<vtkMarchingCubes> MarchingCubes;
-  MarchingCubes mcubes = MarchingCubes::New();
-  mcubes->AddObserver(vtkCommand::ProgressEvent, m_VtkProgressCallback);
-  mcubes->AddObserver(vtkCommand::EndEvent, m_VtkEndCallback);
-  mcubes->SetInputData(vtkImage);
-  mcubes->SetValue(0, m_LevelValue);
-  mcubes->SetComputeGradients(false);
-  mcubes->SetComputeNormals(false);
-  mcubes->SetComputeScalars(false);
-  mcubes->Update();
+  typedef vtkSmartPointer<vtkFlyingEdges3D> FlyingEdges;
+  FlyingEdges flyingEdges = FlyingEdges::New();
+  flyingEdges->AddObserver(vtkCommand::ProgressEvent, m_VtkProgressCallback);
+  flyingEdges->AddObserver(vtkCommand::EndEvent, m_VtkEndCallback);
+  flyingEdges->SetInputData(vtkImage);
+  flyingEdges->ComputeNormalsOff();
+  flyingEdges->ComputeGradientsOn();
+  flyingEdges->ComputeScalarsOn();
+  
+  flyingEdges->Update();
+  m_Output = flyingEdges->GetOutput();
 
-  m_Output = mcubes->GetOutput();
   vtkSmartPointer<vtkPoints> points = m_Output->GetPoints();
   itk::Matrix<double, DIM, DIM> tmpDirection = m_FloatTmpImage->GetDirection();
   itk::Vector<double, DIM> tmpOrigin = m_FloatTmpImage->GetOrigin().GetDataPointer();
@@ -253,7 +264,7 @@ void ShowSegmentationAsAgtkSurface::PostProcessing()
       break;
     }
   }
-
+  
   // Compute normals
   typedef vtkSmartPointer<vtkPolyDataNormals> PolyDataNormals;
   PolyDataNormals normals = PolyDataNormals::New();
@@ -272,9 +283,12 @@ void ShowSegmentationAsAgtkSurface::PostProcessing()
 
 void ShowSegmentationAsAgtkSurface::GenerateData()
 {
+  double minSpacing = std::min(m_FilterArgs.spacing[0], m_FilterArgs.spacing[1]);
+  minSpacing = std::min(minSpacing, m_FilterArgs.spacing[3]);
+
   m_ProgressWeight = 1.f / (1 // Resample
       + (float)m_SurfaceArgs.smooth * 5 // Smoothing
-      + (float)(m_FilterArgs.isResampling && m_FilterArgs.spacing > 1.0e-05) // Additional resampling
+      + (float)(m_FilterArgs.isResampling && minSpacing > 1.0e-05) // Additional resampling
       + 1 // Itk To Vtk
       + 1 // Marching Cubes
       + (float)(m_FilterArgs.decimationType != SurfaceDecimationType::None) // Decimation

@@ -124,8 +124,8 @@ int main(int argc, char* argv[])
   parser.setArgumentPrefix("--", "-");
 
   // Required Parameter
-  parser.addArgument("image", "i", mitkCommandLineParser::InputImage, "Input Image", "Path to the input image files (Separated with semicolons)", us::Any(), false);
-  parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output text file", "Path to output file. The output statistic is appended to this file.", us::Any(), false);
+  parser.addArgument("image", "i", mitkCommandLineParser::Image, "Input Image", "Path to the input image files (Separated with semicolons)", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output text file", "Path to output file. The output statistic is appended to this file.", us::Any(), false, false, false, mitkCommandLineParser::Output);
   parser.addArgument("direction", "dir", mitkCommandLineParser::String, "Int", "Allows to specify the direction for Cooc and RL. 0: All directions, 1: Only single direction (Test purpose), 2,3,4... Without dimension 0,1,2... ", us::Any());
 
   // Miniapp Infos

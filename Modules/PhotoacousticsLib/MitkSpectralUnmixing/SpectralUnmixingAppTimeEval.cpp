@@ -56,18 +56,18 @@ InputParameters parseInput(int argc, char *argv[])
   parser.beginGroup("Required parameters");
   parser.addArgument("inputPath",
                      "i",
-                     mitkCommandLineParser::InputDirectory,
+                     mitkCommandLineParser::Directory,
                      "Input folder (directory)",
                      "input folder",
                      us::Any(),
-                     false);
+                     false, false, false, mitkCommandLineParser::Input);
   parser.addArgument("outputPath",
                      "o",
-                     mitkCommandLineParser::OutputDirectory,
+                     mitkCommandLineParser::Directory,
                      "Input save folder (directory)",
                      "input save folder",
                      us::Any(),
-                     false);
+                     false, false, false, mitkCommandLineParser::Output);
   parser.addArgument("numberOfInputs",
                      "n",
                      mitkCommandLineParser::Int,

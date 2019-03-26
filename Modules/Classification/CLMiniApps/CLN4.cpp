@@ -37,9 +37,9 @@ int main(int argc, char* argv[])
   parser.setArgumentPrefix("--", "-");
   // Add command line argument names
   parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
-  parser.addArgument("input", "i", mitkCommandLineParser::InputDirectory, "Input file:", "Input file", us::Any(), false);
-  parser.addArgument("mask", "m", mitkCommandLineParser::OutputFile, "Output file:", "Mask file", us::Any(), false);
-  parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output file:", "Output file", us::Any(), false);
+  parser.addArgument("input", "i", mitkCommandLineParser::Directory, "Input file:", "Input file", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("mask", "m", mitkCommandLineParser::File, "Output file:", "Mask file", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file:", "Output file", us::Any(), false, false, false, mitkCommandLineParser::Output);
 
   parser.addArgument("number-of-controllpoints", "noc", mitkCommandLineParser::Int, "Parameter", "The noc for the point grid size defining the B-spline estimate (default 4)", us::Any(), true);
   parser.addArgument("number-of-fitting-levels", "nofl", mitkCommandLineParser::Int, "Parameter", "Number of fitting levels for the multi-scale approach (default 1)", us::Any(), true);

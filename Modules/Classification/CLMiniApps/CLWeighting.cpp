@@ -138,9 +138,9 @@ int main(int argc, char* argv[])
   mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
   // required params
-  parser.addArgument("training", "t", mitkCommandLineParser::InputImage, "Input Image", "desc", us::Any(), false);
-  parser.addArgument("prediction", "p", mitkCommandLineParser::InputImage, "Input Image", "desc", us::Any(), false);
-  parser.addArgument("output", "o", mitkCommandLineParser::InputImage, "Normalisation mode", "desc", us::Any(), false);
+  parser.addArgument("training", "t", mitkCommandLineParser::Image, "Input Image", "desc", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("prediction", "p", mitkCommandLineParser::Image, "Input Image", "desc", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("output", "o", mitkCommandLineParser::Image, "Normalisation mode", "desc", us::Any(), false, false, false, mitkCommandLineParser::Input);
   //parser.addArgument("algorithm", "a", mitkCommandLineParser::InputImage, "Input Mask", "desc", us::Any(), false);
 
   // Miniapp Infos

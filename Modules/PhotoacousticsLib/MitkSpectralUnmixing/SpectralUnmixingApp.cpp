@@ -56,18 +56,18 @@ InputParameters parseInput(int argc, char *argv[])
   parser.beginGroup("Required parameters");
   parser.addArgument("inputFilename",
                      "i",
-                     mitkCommandLineParser::InputDirectory,
+                     mitkCommandLineParser::Directory,
                      "Input Filename (NAME.nrrd)",
                      "input filename",
                      us::Any(),
-                     false);
+                     false, false, false, mitkCommandLineParser::Input);
   parser.addArgument("outputFileStruct",
                      "o",
-                     mitkCommandLineParser::OutputDirectory,
+                     mitkCommandLineParser::Directory,
                      "Input save name (name without ending!)",
                      "input save name",
                      us::Any(),
-                     false);
+                     false, false, false, mitkCommandLineParser::Output);
   parser.addArgument("inputWavelengths",
                      "l",
                      mitkCommandLineParser::StringList,

@@ -1257,6 +1257,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     case SignalGenerationParameters::FastSpinEcho:
     {
       PrintToLog("Acquisition type: fast spin echo (one RF pulse per ETL lines) with cartesian k-space trajectory (ETL: " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_EchoTrainLength) + ")", false);
+      PrintToLog("Effective TE: " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_tEcho*m_Parameters.m_SignalGen.m_EchoTrainLength/2), false);
       break;
     }
     default:

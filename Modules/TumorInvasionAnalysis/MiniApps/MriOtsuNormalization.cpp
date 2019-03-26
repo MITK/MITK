@@ -42,8 +42,8 @@ int main(int argc, char *argv[])
   parser.setArgumentPrefix("--", "-");
 
   // Add command line argument names
-  parser.addArgument("input", "i", mitkCommandLineParser::InputImage, "input image", "input image");
-  parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "output image", "output image");
+  parser.addArgument("input", "i", mitkCommandLineParser::Image, "input image", "input image", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("output", "o", mitkCommandLineParser::File, "output image", "output image", us::Any(), false, false, false, mitkCommandLineParser::Output);
   parser.addArgument("bins", "b", mitkCommandLineParser::Int, "number of regions (bins)", "number of regions (bins)");
 
   parser.addArgument(

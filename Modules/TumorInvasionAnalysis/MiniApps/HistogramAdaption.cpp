@@ -39,8 +39,8 @@ int main(int argc, char *argv[])
   parser.setArgumentPrefix("--", "-");
 
   // Add command line argument names
-  parser.addArgument("input", "i", mitkCommandLineParser::InputImage, "input image");
-  parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "output image");
+  parser.addArgument("input", "i", mitkCommandLineParser::Image, "input image", "", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("output", "o", mitkCommandLineParser::File, "output image", "", us::Any(), false, false, false, mitkCommandLineParser::Output);
   parser.addArgument("cutOff", "c", mitkCommandLineParser::Float, "value at which different slope is to be applied");
   parser.addArgument(
     "slope", "s", mitkCommandLineParser::Float, "slope to be applied (total delta to max value starting from cutOff)");

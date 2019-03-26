@@ -49,9 +49,9 @@ int main(int argc, char* argv[])
   parser.setArgumentPrefix("--","-");
   // Add command line argument names
   parser.addArgument("help", "h",mitkCommandLineParser::Bool, "Help:", "Show this help text");
-  parser.addArgument("input-left", "i1", mitkCommandLineParser::InputFile, "Input file:", "Input File",us::Any(),false);
-  parser.addArgument("input-right", "i2", mitkCommandLineParser::InputFile, "Input file:", "Input File", us::Any(), false);
-  parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output file:", "Output file", us::Any(), false);
+  parser.addArgument("input-left", "i1", mitkCommandLineParser::File, "Input file:", "Input File",us::Any(),false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("input-right", "i2", mitkCommandLineParser::File, "Input file:", "Input File", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file:", "Output file", us::Any(), false, false, false, mitkCommandLineParser::Output);
 
   parser.addArgument("as-double", "double", mitkCommandLineParser::Bool, "Result as double", "Result as double image type", false, true);
 

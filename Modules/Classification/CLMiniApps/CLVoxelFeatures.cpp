@@ -236,9 +236,9 @@ int main(int argc, char* argv[])
   mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
   // required params
-  parser.addArgument("image", "i", mitkCommandLineParser::InputImage, "Input Image", "Path to the input VTK polydata", us::Any(), false);
-  parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output text file", "Target file. The output statistic is appended to this file.", us::Any(), false);
-  parser.addArgument("extension", "e", mitkCommandLineParser::OutputFile, "Extension", "File extension. Default is .nii.gz", us::Any(), true);
+  parser.addArgument("image", "i", mitkCommandLineParser::Image, "Input Image", "Path to the input VTK polydata", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output text file", "Target file. The output statistic is appended to this file.", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("extension", "e", mitkCommandLineParser::File, "Extension", "File extension. Default is .nii.gz", us::Any(), true, false, false, mitkCommandLineParser::Output);
 
   parser.addArgument("gaussian","g",mitkCommandLineParser::String, "Gaussian Filtering of the input images", "Gaussian Filter. Followed by the used variances seperated by ';' ",us::Any());
   parser.addArgument("difference-of-gaussian","dog",mitkCommandLineParser::String, "Difference of Gaussian Filtering of the input images", "Difference of Gaussian Filter. Followed by the used variances seperated by ';' ",us::Any());

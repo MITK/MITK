@@ -60,13 +60,13 @@ InputParameters parseInput(int argc, char* argv[])
 
   parser.beginGroup("Required parameters");
   parser.addArgument(
-    "inputImage", "i", mitkCommandLineParser::InputImage,
+    "inputImage", "i", mitkCommandLineParser::Image,
     "Input image (mitk::Image)", "input image (.nrrd file)",
-    us::Any(), false);
+    us::Any(), false, false, false, mitkCommandLineParser::Input);
   parser.addArgument(
-    "output", "o", mitkCommandLineParser::OutputFile,
+    "output", "o", mitkCommandLineParser::File,
     "Output filename", "output image (.nrrd file)",
-    us::Any(), false);
+    us::Any(), false, false, false, mitkCommandLineParser::Output);
   parser.addArgument(
     "settings", "s", mitkCommandLineParser::String,
     "settings file", "file containing specifications (.xml file)",

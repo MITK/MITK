@@ -59,9 +59,9 @@ int main(int argc, char* argv[])
   parser.setArgumentPrefix("--","-");
   // Add command line argument names
   parser.addArgument("help", "h",mitkCommandLineParser::Bool, "Help:", "Show this help text");
-  parser.addArgument("moving", "m", mitkCommandLineParser::InputDirectory, "Input folder:", "Input folder", us::Any(), false);
-  parser.addArgument("fixed", "f", mitkCommandLineParser::InputDirectory, "Input folder:", "Input folder", us::Any(), false);
-  parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output file:", "Output file", us::Any(), false);
+  parser.addArgument("moving", "m", mitkCommandLineParser::Directory, "Input folder:", "Input folder", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("fixed", "f", mitkCommandLineParser::Directory, "Input folder:", "Input folder", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file:", "Output file", us::Any(), false, false, false, mitkCommandLineParser::Output);
   parser.addArgument("reader", "r", mitkCommandLineParser::Int, "Reader ID", "Reader Name", us::Any(), false);
   parser.addArgument("interpolation", "interp", mitkCommandLineParser::Int, "Reader ID", "Reader Name", us::Any(), false);
 

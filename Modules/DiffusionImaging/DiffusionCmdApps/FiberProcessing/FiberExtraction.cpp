@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
   parser.addArgument("", "o", mitkCommandLineParser::String, "Output:", "output tractogram", us::Any(), false);
   parser.addArgument("planfirgure1", "pf1", mitkCommandLineParser::String, "Figure 1:", "first planar figure ROI", us::Any(), false);
   parser.addArgument("planfirgure2", "pf2", mitkCommandLineParser::String, "Figure 2:", "second planar figure ROI", us::Any());
-  parser.addArgument("operation", "op", mitkCommandLineParser::String, "Operation:", "logical operation (AND, OR, NOT)", us::Any());
+  parser.addArgument("operation", "op", mitkCommandLineParser::String, "Operation:", "logical operation (AND; OR; NOT)", us::Any());
 
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

@@ -38,9 +38,9 @@ int StartPeakExtraction(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input image", "sh coefficient image", us::Any(), false);
-  parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output directory", "output root", us::Any(), false);
-  parser.addArgument("mask", "", mitkCommandLineParser::InputFile, "Mask", "mask image");
+  parser.addArgument("", "i", mitkCommandLineParser::String, "Input image", "sh coefficient image", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output directory", "output root", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("mask", "", mitkCommandLineParser::String, "Mask", "mask image", us::Any(), true, false, false, mitkCommandLineParser::Input);
   parser.addArgument("normalization", "", mitkCommandLineParser::Int, "Normalization", "0=no norm, 1=max norm, 2=single vec norm", 1, true);
   parser.addArgument("numpeaks", "", mitkCommandLineParser::Int, "Max. number of peaks", "maximum number of extracted peaks", 2, true);
 
@@ -252,10 +252,10 @@ int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input image", "sh coefficient image", us::Any(), false);
-  parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output directory", "output root", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::String, "Input image", "sh coefficient image", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output directory", "output root", us::Any(), false, false, false, mitkCommandLineParser::Output);
   parser.addArgument("shOrder", "sh", mitkCommandLineParser::Int, "Spherical harmonics order", "spherical harmonics order");
-  parser.addArgument("mask", "m", mitkCommandLineParser::InputFile, "Mask", "mask image");
+  parser.addArgument("mask", "m", mitkCommandLineParser::String, "Mask", "mask image", us::Any(), true, false, false, mitkCommandLineParser::Input);
   parser.addArgument("normalization", "n", mitkCommandLineParser::Int, "Normalization", "0=no norm, 1=max norm, 2=single vec norm", 1, true);
   parser.addArgument("numpeaks", "p", mitkCommandLineParser::Int, "Max. number of peaks", "maximum number of extracted peaks", 2, true);
   parser.addArgument("peakthres", "r", mitkCommandLineParser::Float, "Peak threshold", "peak threshold relative to largest peak", 0.4, true);

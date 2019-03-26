@@ -41,16 +41,16 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input:", "input tractogram (.fib/.trk)", us::Any(), false);
-  parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output root", us::Any(), false);
-  parser.addArgument("mask", "", mitkCommandLineParser::InputFile, "Mask:", "mask image");
+  parser.addArgument("", "i", mitkCommandLineParser::String, "Input:", "input tractogram (.fib/.trk)", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output:", "output root", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("mask", "", mitkCommandLineParser::String, "Mask:", "mask image", us::Any(), false, false, false, mitkCommandLineParser::Input);
   parser.addArgument("athresh", "", mitkCommandLineParser::Float, "Angular threshold:", "angular threshold in degrees. closer fiber directions are regarded as one direction and clustered together.", 25, true);
   parser.addArgument("peakthresh", "", mitkCommandLineParser::Float, "Peak size threshold:", "peak size threshold relative to largest peak in voxel", 0.2, true);
   parser.addArgument("only_mask_geometry", "", mitkCommandLineParser::Bool, "Only mask geometry:", "don't use content of mask image, only use it's geometry", false);
   parser.addArgument("verbose", "", mitkCommandLineParser::Bool, "Verbose:", "output optional and intermediate calculation results");
   parser.addArgument("numdirs", "", mitkCommandLineParser::Int, "Max. num. directions:", "maximum number of fibers per voxel", 3, true);
-  parser.addArgument("normalization", "", mitkCommandLineParser::Int, "Normalization method:", "1=global maximum, 2=single vector, 3=voxel-wise maximum", 1);
-  parser.addArgument("file_ending", "", mitkCommandLineParser::String, "Image type:", ".nrrd, .nii, .nii.gz (default)");
+  parser.addArgument("normalization", "", mitkCommandLineParser::Int, "Normalization method:", "1=global maximum; 2=single vector; 3=voxel-wise maximum", 1);
+  parser.addArgument("file_ending", "", mitkCommandLineParser::String, "Image type:", ".nrrd; .nii; .nii.gz", std::string(".nii.gz"));
 
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

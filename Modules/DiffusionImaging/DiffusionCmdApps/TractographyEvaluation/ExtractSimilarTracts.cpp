@@ -40,11 +40,11 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input:", "input fiber bundle (.fib, .trk, .tck)", us::Any(), false);
-  parser.addArgument("ref_tracts", "", mitkCommandLineParser::StringList, "Ref. Tracts:", "reference tracts (.fib, .trk, .tck)", us::Any(), false);
-  parser.addArgument("ref_masks", "", mitkCommandLineParser::StringList, "Ref. Masks:", "reference bundle masks", us::Any());
+  parser.addArgument("", "i", mitkCommandLineParser::String, "Input:", "input fiber bundle (.fib, .trk, .tck)", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("ref_tracts", "", mitkCommandLineParser::StringList, "Ref. Tracts:", "reference tracts (.fib, .trk, .tck)", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("ref_masks", "", mitkCommandLineParser::StringList, "Ref. Masks:", "reference bundle masks", us::Any(), true, false, false, mitkCommandLineParser::Input);
 
-  parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output root", us::Any(), false);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output:", "output root", us::Any(), false, false, false, mitkCommandLineParser::Output);
   parser.addArgument("distance", "", mitkCommandLineParser::Int, "Distance:", "", 10);
   parser.addArgument("metric", "", mitkCommandLineParser::String, "Metric:", "EU_MEAN (default), EU_STD, EU_MAX");
   parser.addArgument("subsample", "", mitkCommandLineParser::Float, "Subsampling factor:", "Only use specified fraction of input fibers", 1.0);

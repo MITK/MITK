@@ -35,9 +35,9 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("", "f", mitkCommandLineParser::InputFile, "Input Tractogram", "input tractogram (.fib)", us::Any(), false);
-  parser.addArgument("", "p", mitkCommandLineParser::InputFile, "Parcellation", "parcellation image", us::Any(), false);
-  parser.addArgument("", "o", mitkCommandLineParser::String, "Output network", "where to save the output (.cnf, .mat)", us::Any(), false);
+  parser.addArgument("", "f", mitkCommandLineParser::String, "Input Tractogram", "input tractogram (.fib)", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("", "p", mitkCommandLineParser::String, "Parcellation", "parcellation image", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output network", "where to save the output (.cnf; .mat)", us::Any(), false);
 
   parser.addArgument("noCenterOfMass", "", mitkCommandLineParser::Bool, "No center of mass", "Do not use center of mass for node positions");
 

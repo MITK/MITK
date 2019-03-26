@@ -62,24 +62,24 @@ int main(int argc, char* argv[])
   parser.setArgumentPrefix("--", "-");
 
   parser.beginGroup("1. Mandatory arguments:");
-  parser.addArgument("", "i", mitkCommandLineParser::StringList, "Input:", "input image (multiple possible for 'DetTensor' algorithm)", us::Any(), false);
-  parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output fiberbundle/probability map", us::Any(), false);
-  parser.addArgument("algorithm", "", mitkCommandLineParser::String, "Algorithm:", "which algorithm to use (Peaks, DetTensor, ProbTensor, DetODF, ProbODF, DetRF, ProbRF)", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::StringList, "Input:", "input image (multiple possible for 'DetTensor' algorithm)", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output:", "output fiberbundle/probability map", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("algorithm", "", mitkCommandLineParser::String, "Algorithm:", "which algorithm to use (Peaks; DetTensor; ProbTensor; DetODF; ProbODF; DetRF; ProbRF)", us::Any(), false);
   parser.endGroup();
 
   parser.beginGroup("2. Seeding:");
   parser.addArgument("seeds", "", mitkCommandLineParser::Int, "Seeds per voxel:", "number of seed points per voxel", 1);
-  parser.addArgument("seed_image", "", mitkCommandLineParser::String, "Seed image:", "mask image defining seed voxels", us::Any());
+  parser.addArgument("seed_image", "", mitkCommandLineParser::String, "Seed image:", "mask image defining seed voxels", us::Any(), true, false, false, mitkCommandLineParser::Input);
   parser.addArgument("trials_per_seed", "", mitkCommandLineParser::Int, "Max. trials per seed:", "try each seed N times until a valid streamline is obtained (only for probabilistic tractography)", 10);
   parser.addArgument("max_tracts", "", mitkCommandLineParser::Int, "Max. number of tracts:", "tractography is stopped if the reconstructed number of tracts is exceeded", -1);
   parser.endGroup();
 
   parser.beginGroup("3. Tractography constraints:");
-  parser.addArgument("tracking_mask", "", mitkCommandLineParser::String, "Mask image:", "streamlines leaving the mask will stop immediately", us::Any());
-  parser.addArgument("stop_image", "", mitkCommandLineParser::String, "Stop ROI image:", "streamlines entering the mask will stop immediately", us::Any());
-  parser.addArgument("exclusion_image", "", mitkCommandLineParser::String, "Exclusion ROI image:", "streamlines entering the mask will be discarded", us::Any());
+  parser.addArgument("tracking_mask", "", mitkCommandLineParser::String, "Mask image:", "streamlines leaving the mask will stop immediately", us::Any(), true, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("stop_image", "", mitkCommandLineParser::String, "Stop ROI image:", "streamlines entering the mask will stop immediately", us::Any(), true, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("exclusion_image", "", mitkCommandLineParser::String, "Exclusion ROI image:", "streamlines entering the mask will be discarded", us::Any(), true, false, false, mitkCommandLineParser::Input);
   parser.addArgument("ep_constraint", "", mitkCommandLineParser::String, "Endpoint constraint:", "determines which fibers are accepted based on their endpoint location - options are NONE, EPS_IN_TARGET, EPS_IN_TARGET_LABELDIFF, EPS_IN_SEED_AND_TARGET, MIN_ONE_EP_IN_TARGET, ONE_EP_IN_TARGET and NO_EP_IN_TARGET", us::Any());
-  parser.addArgument("target_image", "", mitkCommandLineParser::String, "Target ROI image:", "effact depends on the chosen endpoint constraint (option ep_constraint)", us::Any());
+  parser.addArgument("target_image", "", mitkCommandLineParser::String, "Target ROI image:", "effact depends on the chosen endpoint constraint (option ep_constraint)", us::Any(), true, false, false, mitkCommandLineParser::Input);
   parser.endGroup();
 
   parser.beginGroup("4. Streamline integration parameters:");
@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
   parser.endGroup();
 
   parser.beginGroup("5. Tractography prior:");
-  parser.addArgument("prior_image", "", mitkCommandLineParser::String, "Peak prior:", "tractography prior in thr for of a peak image", us::Any());
+  parser.addArgument("prior_image", "", mitkCommandLineParser::String, "Peak prior:", "tractography prior in thr for of a peak image", us::Any(), true, false, false, mitkCommandLineParser::Input);
   parser.addArgument("prior_weight", "", mitkCommandLineParser::Float, "Prior weight", "weighting factor between prior and data.", 0.5);
   parser.addArgument("restrict_to_prior", "", mitkCommandLineParser::Bool, "Restrict to prior:", "restrict tractography to regions where the prior is valid.");
   parser.addArgument("new_directions_from_prior", "", mitkCommandLineParser::Bool, "New directios from prior:", "the prior can create directions where there are none in the data.");
@@ -112,12 +112,12 @@ int main(int argc, char* argv[])
   parser.endGroup();
 
   parser.beginGroup("8. Random forest tractography specific:");
-  parser.addArgument("forest", "", mitkCommandLineParser::String, "Forest:", "input random forest (HDF5 file)", us::Any());
+  parser.addArgument("forest", "", mitkCommandLineParser::String, "Forest:", "input random forest (HDF5 file)", us::Any(), true, false, false, mitkCommandLineParser::Input);
   parser.addArgument("use_sh_features", "", mitkCommandLineParser::Bool, "Use SH features:", "use SH features");
   parser.endGroup();
 
   parser.beginGroup("9. Additional input:");
-  parser.addArgument("additional_images", "", mitkCommandLineParser::StringList, "Additional images:", "specify a list of float images that hold additional information (FA, GFA, additional features for RF tractography)", us::Any());
+  parser.addArgument("additional_images", "", mitkCommandLineParser::StringList, "Additional images:", "specify a list of float images that hold additional information (FA, GFA, additional features for RF tractography)", us::Any(), true, false, false, mitkCommandLineParser::Input);
   parser.endGroup();
 
   parser.beginGroup("10. Misc:");

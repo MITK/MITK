@@ -35,8 +35,8 @@ int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input image", "input raw dwi", us::Any(), false);
-  parser.addArgument("", "o", mitkCommandLineParser::OutputFile, "Output image", "output image", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::String, "Input image", "input raw dwi", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output image", "output image", us::Any(), false, false, false, mitkCommandLineParser::Output);
   parser.addArgument("b0Threshold", "t", mitkCommandLineParser::Int, "b0 threshold", "baseline image intensity threshold", 0, true);
 
   parser.setCategory("Signal Modelling");

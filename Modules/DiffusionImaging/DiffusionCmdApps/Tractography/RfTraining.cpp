@@ -49,16 +49,16 @@ int main(int argc, char* argv[])
     parser.setArgumentPrefix("--", "-");
 
     parser.beginGroup("1. Mandatory arguments:");
-    parser.addArgument("", "i", mitkCommandLineParser::StringList, "DWIs:", "input diffusion-weighted images", us::Any(), false);
-    parser.addArgument("", "t", mitkCommandLineParser::StringList, "Tractograms:", "input training tractograms", us::Any(), false);
-    parser.addArgument("", "o", mitkCommandLineParser::OutputFile, "Forest:", "output random forest (HDF5)", us::Any(), false);
+    parser.addArgument("", "i", mitkCommandLineParser::StringList, "DWIs:", "input diffusion-weighted images", us::Any(), false, false, false, mitkCommandLineParser::Input);
+    parser.addArgument("", "t", mitkCommandLineParser::StringList, "Tractograms:", "input training tractograms", us::Any(), false, false, false, mitkCommandLineParser::Input);
+    parser.addArgument("", "o", mitkCommandLineParser::String, "Forest:", "output random forest (HDF5)", us::Any(), false, false, false, mitkCommandLineParser::Output);
     parser.endGroup();
 
     parser.beginGroup("2. Additional input images:");
-    parser.addArgument("masks", "", mitkCommandLineParser::StringList, "Masks:", "restrict training using a binary mask image", us::Any());
-    parser.addArgument("wm_masks", "", mitkCommandLineParser::StringList, "WM-Masks:", "if no binary white matter mask is specified, the envelope of the input tractogram is used", us::Any());
-    parser.addArgument("volume_modification_images", "", mitkCommandLineParser::StringList, "Volume modification images:", "specify a list of float images that modify the fiber density", us::Any());
-    parser.addArgument("additional_feature_images", "", mitkCommandLineParser::StringList, "Additional feature images:", "specify a list of float images that hold additional features (float)", us::Any());
+    parser.addArgument("masks", "", mitkCommandLineParser::StringList, "Masks:", "restrict training using a binary mask image", us::Any(), true, false, false, mitkCommandLineParser::Input);
+    parser.addArgument("wm_masks", "", mitkCommandLineParser::StringList, "WM-Masks:", "if no binary white matter mask is specified, the envelope of the input tractogram is used", us::Any(), true, false, false, mitkCommandLineParser::Input);
+    parser.addArgument("volume_modification_images", "", mitkCommandLineParser::StringList, "Volume modification images:", "specify a list of float images that modify the fiber density", us::Any(), true, false, false, mitkCommandLineParser::Input);
+    parser.addArgument("additional_feature_images", "", mitkCommandLineParser::StringList, "Additional feature images:", "specify a list of float images that hold additional features (float)", us::Any(), true, false, false, mitkCommandLineParser::Input);
     parser.endGroup();
 
     parser.beginGroup("3. Forest parameters:");

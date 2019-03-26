@@ -1,13 +1,5 @@
 #include <MitkSegmentationExports.h>
 
-#include <vtkCallbackCommand.h>
-#include <vtkDecimatePro.h>
-#include <vtkMarchingCubes.h>
-#include <vtkPolyDataNormals.h>
-#include <vtkQuadricDecimation.h>
-#include <vtkSmoothPolyDataFilter.h>
-#include <vtkWindowedSincPolyDataFilter.h>
-
 #include <itkAddImageFilter.h>
 #include <itkConstantPadImageFilter.h>
 #include <itkDiscreteGaussianImageFilter.h>
@@ -65,7 +57,7 @@ public:
     SurfaceDecimationType decimationType = SurfaceDecimationType::DecimatePro;
     float reduction = .25f;
     bool isResampling = true;
-    float spacing = 1.f;
+    mitk::Vector3D spacing = 1.f;
     bool isFillHoles = true;
   };
 

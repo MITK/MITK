@@ -105,7 +105,6 @@ namespace
 }
 
 const std::string QmitkCESTStatisticsView::VIEW_ID = "org.mitk.views.ceststatistics";
-static const int STAT_TABLE_BASE_HEIGHT = 180;
 
 QmitkCESTStatisticsView::QmitkCESTStatisticsView(QObject* /*parent*/, const char* /*name*/)
 {

@@ -21,11 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "org_mitk_gui_qt_common_Export.h"
 
-#ifdef _MSC_VER
-#  pragma warning(push)
-#  pragma warning(disable:4251)
-#endif
-
 namespace mitk
 {
 struct MITK_QT_COMMON NodeSelectionConstants
@@ -43,9 +38,5 @@ struct MITK_QT_COMMON NodeSelectionConstants
 };
 
 }
-
-#ifdef _MSC_VER
-#  pragma warning(pop)
-#endif
 
 #endif

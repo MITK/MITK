@@ -17,11 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkRESTServer_h
 #define mitkRESTServer_h
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4251)
-#endif
-
 #include "cpprest/http_listener.h"
 
 #include <mitkIRESTManager.h>
@@ -67,13 +62,11 @@ namespace mitk
      *
      * @param MitkRequest incoming request object
      */
-    void HandleGet(const MitkRequest &request); 
+    void HandleGet(const MitkRequest &request);
 
     MitkListener m_Listener;
     web::uri m_Uri;
   };
 } // namespace mitk
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+
 #endif

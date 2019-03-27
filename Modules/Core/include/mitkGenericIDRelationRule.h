@@ -19,11 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPropertyRelationRuleBase.h"
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4251)
-#endif
-
 namespace mitk
 {
   /**This rule class can be used for relations that are only defined on the ID-layer and
@@ -137,9 +132,5 @@ namespace mitk
   };
 
 } // namespace mitk
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 #endif

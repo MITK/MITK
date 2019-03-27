@@ -21,11 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkImageStatisticsExports.h>
 
-#ifdef _MSC_VER
-#  pragma warning(push)
-#  pragma warning(disable:4251)
-#endif
-
 namespace mitk
 {
 
@@ -52,9 +47,5 @@ namespace mitk
 
   };
 }
-
-#ifdef _MSC_VER
-#  pragma warning(pop)
-#endif
 
 #endif

@@ -31,9 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #ifdef _MSC_VER
 // disable inheritance by dominance warnings
-#pragma warning( disable : 4250 4275 4251 )
-// disable warning: C++ exception specification ignored except to indicate a function is not __declspec(nothrow)
-#pragma warning( disable : 4290 )
+#pragma warning( disable : 4250 4275 )
 #endif
 
 class QDebug;

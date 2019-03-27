@@ -38,11 +38,6 @@
 
 #include "usServiceReference.h"
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4251)
-#endif
-
 US_BEGIN_NAMESPACE
 
 class ServiceEventData;
@@ -189,9 +184,5 @@ US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const ServiceEvent& ev
 /** @}*/
 
 US_END_NAMESPACE
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 #endif // USSERVICEEVENT_H

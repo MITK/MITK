@@ -47,6 +47,7 @@ function(mitkFunctionCheckCompilerFlags CXX_FLAG_TO_TEST RESULT_VAR)
 
   if(HAS_FLAG_${suffix})
     set(${RESULT_VAR} "${${RESULT_VAR}} ${CXX_FLAG_TO_TEST}" PARENT_SCOPE)
+    string(STRIP ${${RESULT_VAR}} ${RESULT_VAR})
   endif()
 
 endfunction()
@@ -96,12 +97,14 @@ function(mitkFunctionCheckCAndCXXCompilerFlags FLAG_TO_TEST C_RESULT_VAR CXX_RES
 
   if(HAS_CXX_FLAG_${suffix})
     set(${CXX_RESULT_VAR} "${_saved_cxx_result_var} ${FLAG_TO_TEST}" PARENT_SCOPE)
+    string(STRIP ${${CXX_RESULT_VAR}} ${CXX_RESULT_VAR})
   endif()
 
   CHECK_C_COMPILER_FLAG(${FLAG_TO_TEST_FIXED} HAS_C_FLAG_${suffix})
 
   if(HAS_C_FLAG_${suffix})
     set(${C_RESULT_VAR} "${_saved_c_result_var} ${FLAG_TO_TEST}" PARENT_SCOPE)
+    string(STRIP ${${C_RESULT_VAR}} ${C_RESULT_VAR})
   endif()
 
 endfunction()

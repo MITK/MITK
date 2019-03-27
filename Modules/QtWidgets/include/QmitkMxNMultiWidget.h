@@ -110,16 +110,6 @@ Q_SIGNALS:
   void WheelMoved(QWheelEvent *);
   void Moved();
 
-public:
-
-  enum
-  {
-    AXIAL,
-    SAGITTAL,
-    CORONAL,
-    THREE_D
-  };
-
 private:
 
   void InitializeGUI();
@@ -131,9 +121,6 @@ private:
 
   QString GetNameFromIndex(int row, int column) const;
   QString GetNameFromIndex(size_t index) const;
-
-  // #TODO: see T24173
-  mitk::DataNode::Pointer GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes);
 
   QGridLayout* m_MxNMultiWidgetLayout;
   RenderWindowWidgetMap m_RenderWindowWidgets;

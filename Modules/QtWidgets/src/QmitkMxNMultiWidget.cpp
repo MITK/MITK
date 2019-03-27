@@ -455,9 +455,3 @@ QString QmitkMxNMultiWidget::GetNameFromIndex(size_t index) const
 
   return QString();
 }
-
-mitk::DataNode::Pointer QmitkMxNMultiWidget::GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes)
-{
-  // #TODO: see T24173
-  return nodes->front();
-}

@@ -16,9 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkMultiWidgetConfigurationToolBar.h"
 
-QmitkMultiWidgetConfigurationToolBar::QmitkMultiWidgetConfigurationToolBar(QmitkCustomMultiWidget* customMultiWidget)
-  : QToolBar(customMultiWidget)
-  , m_CustomMultiWidget(customMultiWidget)
+QmitkMultiWidgetConfigurationToolBar::QmitkMultiWidgetConfigurationToolBar()
+  : QToolBar()
 {
   QToolBar::setOrientation(Qt::Vertical);
   QToolBar::setIconSize(QSize(17, 17));
@@ -44,12 +43,12 @@ void QmitkMultiWidgetConfigurationToolBar::InitializeToolBar()
 
 void QmitkMultiWidgetConfigurationToolBar::AddButtons()
 {
-  QAction* setLayoutAction = new QAction(QIcon(":/Qmitk/cmwLayout.png"), tr("Set multi widget layout"), this);
+  QAction* setLayoutAction = new QAction(QIcon(":/Qmitk/mwLayout.png"), tr("Set multi widget layout"), this);
   connect(setLayoutAction, &QAction::triggered, this, &QmitkMultiWidgetConfigurationToolBar::OnSetLayout);
 
   QToolBar::addAction(setLayoutAction);
 
-  m_SynchronizeAction = new QAction(QIcon(":/Qmitk/cmwSynchronized.png"), tr("Desynchronize render windows"), this);
+  m_SynchronizeAction = new QAction(QIcon(":/Qmitk/mwSynchronized.png"), tr("Desynchronize render windows"), this);
   m_SynchronizeAction->setCheckable(true);
   m_SynchronizeAction->setChecked(true);
   connect(m_SynchronizeAction, &QAction::triggered, this, &QmitkMultiWidgetConfigurationToolBar::OnSynchronize);
@@ -59,12 +58,9 @@ void QmitkMultiWidgetConfigurationToolBar::AddButtons()
 
 void QmitkMultiWidgetConfigurationToolBar::OnSetLayout()
 {
-  if (nullptr != m_CustomMultiWidget)
-  {
-    m_LayoutSelectionPopup->setWindowFlags(Qt::Popup);
-    m_LayoutSelectionPopup->move(this->cursor().pos());
-    m_LayoutSelectionPopup->show();
-  }
+  m_LayoutSelectionPopup->setWindowFlags(Qt::Popup);
+  m_LayoutSelectionPopup->move(this->cursor().pos());
+  m_LayoutSelectionPopup->show();
 }
 
 void QmitkMultiWidgetConfigurationToolBar::OnSynchronize()
@@ -72,13 +68,12 @@ void QmitkMultiWidgetConfigurationToolBar::OnSynchronize()
   bool synchronized = m_SynchronizeAction->isChecked();
   if (synchronized)
   {
-    m_SynchronizeAction->setIcon(QIcon(":/Qmitk/cmwSynchronized.png"));
+    m_SynchronizeAction->setIcon(QIcon(":/Qmitk/mwSynchronized.png"));
     m_SynchronizeAction->setText(tr("Desynchronize render windows"));
-
   }
   else
   {
-    m_SynchronizeAction->setIcon(QIcon(":/Qmitk/cmwDesynchronized.png"));
+    m_SynchronizeAction->setIcon(QIcon(":/Qmitk/mwDesynchronized.png"));
     m_SynchronizeAction->setText(tr("Synchronize render windows"));
   }
 

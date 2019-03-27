@@ -14,30 +14,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkCustomMultiWidgetEditorPreferencePage.h"
-#include <QmitkCustomMultiWidgetEditor.h>
+#include "QmitkMxNMultiWidgetEditorPreferencePage.h"
+#include <QmitkMxNMultiWidgetEditor.h>
 
 // berry framework
 #include <berryIPreferencesService.h>
 #include <berryPlatform.h>
 
-QmitkCustomMultiWidgetEditorPreferencePage::QmitkCustomMultiWidgetEditorPreferencePage()
+QmitkMxNMultiWidgetEditorPreferencePage::QmitkMxNMultiWidgetEditorPreferencePage()
   : m_Preferences(nullptr)
 {
   // nothing here
 }
 
-QmitkCustomMultiWidgetEditorPreferencePage::~QmitkCustomMultiWidgetEditorPreferencePage()
+QmitkMxNMultiWidgetEditorPreferencePage::~QmitkMxNMultiWidgetEditorPreferencePage()
 {
   //nothing here
 }
 
-void QmitkCustomMultiWidgetEditorPreferencePage::Init(berry::IWorkbench::Pointer)
+void QmitkMxNMultiWidgetEditorPreferencePage::Init(berry::IWorkbench::Pointer)
 {
   // nothing here
 }
 
-void QmitkCustomMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
+void QmitkMxNMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
 {
   m_MainControl = new QWidget(parent);
 
@@ -45,7 +45,7 @@ void QmitkCustomMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent
 
   berry::IPreferencesService* preferenceService = berry::Platform::GetPreferencesService();
   Q_ASSERT(preferenceService);
-  m_Preferences = preferenceService->GetSystemPreferences()->Node(QmitkCustomMultiWidgetEditor::EDITOR_ID);
+  m_Preferences = preferenceService->GetSystemPreferences()->Node(QmitkMxNMultiWidgetEditor::EDITOR_ID);
 
   connect(m_Ui.m_RenderingModeComboBox, SIGNAL(activated(int)), SLOT(ChangeRenderingMode(int)));
   connect(m_Ui.m_ColormapComboBox, SIGNAL(activated(int)), SLOT(ChangeColormap(int)));
@@ -54,12 +54,12 @@ void QmitkCustomMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent
   Update();
 }
 
-QWidget* QmitkCustomMultiWidgetEditorPreferencePage::GetQtControl() const
+QWidget* QmitkMxNMultiWidgetEditorPreferencePage::GetQtControl() const
 {
   return m_MainControl;
 }
 
-bool QmitkCustomMultiWidgetEditorPreferencePage::PerformOk()
+bool QmitkMxNMultiWidgetEditorPreferencePage::PerformOk()
 {
   m_Preferences->PutBool("Use constrained zooming and panning", m_Ui.m_EnableFlexibleZooming->isChecked());
   m_Preferences->PutBool("Show level/window widget", m_Ui.m_ShowLevelWindowWidget->isChecked());
@@ -75,12 +75,12 @@ bool QmitkCustomMultiWidgetEditorPreferencePage::PerformOk()
   return true;
 }
 
-void QmitkCustomMultiWidgetEditorPreferencePage::PerformCancel()
+void QmitkMxNMultiWidgetEditorPreferencePage::PerformCancel()
 {
   // nothing here
 }
 
-void QmitkCustomMultiWidgetEditorPreferencePage::Update()
+void QmitkMxNMultiWidgetEditorPreferencePage::Update()
 {
   m_Ui.m_EnableFlexibleZooming->setChecked(m_Preferences->GetBool("Use constrained zooming and panning", true));
   m_Ui.m_ShowLevelWindowWidget->setChecked(m_Preferences->GetBool("Show level/window widget", true));
@@ -97,13 +97,13 @@ void QmitkCustomMultiWidgetEditorPreferencePage::Update()
   m_Ui.m_CrosshairGapSize->setValue(m_Preferences->GetInt("crosshair gap size", 32));
 }
 
-void QmitkCustomMultiWidgetEditorPreferencePage::ResetPreferencesAndGUI()
+void QmitkMxNMultiWidgetEditorPreferencePage::ResetPreferencesAndGUI()
 {
   m_Preferences->Clear();
   Update();
 }
 
-void QmitkCustomMultiWidgetEditorPreferencePage::ChangeRenderingMode(int i)
+void QmitkMxNMultiWidgetEditorPreferencePage::ChangeRenderingMode(int i)
 {
   if (0 == i)
   {
@@ -119,7 +119,7 @@ void QmitkCustomMultiWidgetEditorPreferencePage::ChangeRenderingMode(int i)
   }
 }
 
-void QmitkCustomMultiWidgetEditorPreferencePage::ChangeColormap(int i)
+void QmitkMxNMultiWidgetEditorPreferencePage::ChangeColormap(int i)
 {
   if (0 == i)
   {

@@ -60,7 +60,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkMemoryUsageIndicatorView.h>
 #include <QmitkPreferencesDialog.h>
 #include <QmitkOpenDicomEditorAction.h>
-#include <QmitkOpenCustomMultiWidgetEditorAction.h>
+#include <QmitkOpenMxNMultiWidgetEditorAction.h>
 #include <QmitkOpenStdMultiWidgetEditorAction.h>
 
 #include <itkConfigure.h>
@@ -313,9 +313,9 @@ public:
       {
         windowAdvisor->openStdMultiWidgetEditorAction->setEnabled(true);
       }
-      if (windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.custommultiwidget"))
+      if (windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.mxnmultiwidget"))
       {
-        windowAdvisor->openCustomMultiWidgetEditorAction->setEnabled(true);
+        windowAdvisor->openMxNMultiWidgetEditorAction->setEnabled(true);
       }
 
       windowAdvisor->fileSaveProjectAction->setEnabled(true);
@@ -363,9 +363,9 @@ public:
       {
         windowAdvisor->openStdMultiWidgetEditorAction->setEnabled(false);
       }
-      if (windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.custommultiwidget"))
+      if (windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.mxnmultiwidget"))
       {
-        windowAdvisor->openCustomMultiWidgetEditorAction->setEnabled(false);
+        windowAdvisor->openMxNMultiWidgetEditorAction->setEnabled(false);
       }
 
       windowAdvisor->fileSaveProjectAction->setEnabled(false);
@@ -760,9 +760,9 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   {
     openStdMultiWidgetEditorAction = new QmitkOpenStdMultiWidgetEditorAction(QIcon(":/org.mitk.gui.qt.ext/Editor.png"), window);
   }
-  if (this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.custommultiwidget"))
+  if (this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.mxnmultiwidget"))
   {
-    openCustomMultiWidgetEditorAction = new QmitkOpenCustomMultiWidgetEditorAction(QIcon(":/org.mitk.gui.qt.ext/Editor.png"), window);
+    openMxNMultiWidgetEditorAction = new QmitkOpenMxNMultiWidgetEditorAction(QIcon(":/org.mitk.gui.qt.ext/Editor.png"), window);
   }
 
   if (imageNavigatorViewFound)
@@ -818,9 +818,9 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   {
     mainActionsToolBar->addAction(openStdMultiWidgetEditorAction);
   }
-  if (this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.custommultiwidget"))
+  if (this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.mxnmultiwidget"))
   {
-    mainActionsToolBar->addAction(openCustomMultiWidgetEditorAction);
+    mainActionsToolBar->addAction(openMxNMultiWidgetEditorAction);
   }
 
   if (imageNavigatorViewFound)

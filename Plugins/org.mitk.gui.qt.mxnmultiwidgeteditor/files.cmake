@@ -1,26 +1,26 @@
 set(SRC_CPP_FILES
-  QmitkCustomMultiWidgetEditor.cpp
+  QmitkMxNMultiWidgetEditor.cpp
   QmitkMultiWidgetDecorationManager.cpp
 )
 
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
-  QmitkCustomMultiWidgetEditorPreferencePage.cpp
+  QmitkMxNMultiWidgetEditorPreferencePage.cpp
 )
 
 set(UI_FILES
-  src/internal/QmitkCustomMultiWidgetEditorPreferencePage.ui
+  src/internal/QmitkMxNMultiWidgetEditorPreferencePage.ui
 )
 
 set(MOC_H_FILES
-  src/QmitkCustomMultiWidgetEditor.h
+  src/QmitkMxNMultiWidgetEditor.h
   
   src/internal/mitkPluginActivator.h
-  src/internal/QmitkCustomMultiWidgetEditorPreferencePage.h
+  src/internal/QmitkMxNMultiWidgetEditorPreferencePage.h
 )
 
 set(CACHED_RESOURCE_FILES
-  resources/CustomMultiWidgetEditor.svg
+  resources/MxNMultiWidgetEditor.svg
   plugin.xml
 )
 

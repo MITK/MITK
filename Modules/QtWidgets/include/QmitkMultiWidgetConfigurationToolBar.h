@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QToolBar>
 
 // mitk qtwidgets
-#include "QmitkCustomMultiWidget.h"
 #include "QmitkMultiWidgetLayoutSelectionWidget.h"
 
 /**
@@ -36,7 +35,7 @@ class MITKQTWIDGETS_EXPORT QmitkMultiWidgetConfigurationToolBar : public QToolBa
 
 public:
 
-  QmitkMultiWidgetConfigurationToolBar(QmitkCustomMultiWidget* customMultiWidget);
+  QmitkMultiWidgetConfigurationToolBar();
   ~QmitkMultiWidgetConfigurationToolBar() override;
 
 Q_SIGNALS:
@@ -53,8 +52,6 @@ private:
 
   void InitializeToolBar();;
   void AddButtons();
-
-  QmitkCustomMultiWidget* m_CustomMultiWidget;
 
   QAction* m_SynchronizeAction;
 

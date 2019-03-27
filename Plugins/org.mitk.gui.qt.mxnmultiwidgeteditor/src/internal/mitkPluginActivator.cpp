@@ -16,29 +16,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPluginActivator.h"
 
-#include <QmitkCustomMultiWidgetEditor.h>
-#include "QmitkCustomMultiWidgetEditorPreferencePage.h"
+#include <QmitkMxNMultiWidgetEditor.h>
+#include "QmitkMxNMultiWidgetEditorPreferencePage.h"
 
 namespace mitk
 {
-  ctkPluginContext* CustomMultiWidgetActivator::m_Context = nullptr;
+  ctkPluginContext* MxNMultiWidgetActivator::m_Context = nullptr;
 
-  void CustomMultiWidgetActivator::start(ctkPluginContext* context)
+  void MxNMultiWidgetActivator::start(ctkPluginContext* context)
   {
     m_Context = context;
 
-    BERRY_REGISTER_EXTENSION_CLASS(QmitkCustomMultiWidgetEditor, context)
-    BERRY_REGISTER_EXTENSION_CLASS(QmitkCustomMultiWidgetEditorPreferencePage, context)
+    BERRY_REGISTER_EXTENSION_CLASS(QmitkMxNMultiWidgetEditor, context)
+    BERRY_REGISTER_EXTENSION_CLASS(QmitkMxNMultiWidgetEditorPreferencePage, context)
   }
 
-  void CustomMultiWidgetActivator::stop(ctkPluginContext* context)
+  void MxNMultiWidgetActivator::stop(ctkPluginContext* context)
   {
     Q_UNUSED(context)
 
     m_Context = nullptr;
   }
 
-  ctkPluginContext* CustomMultiWidgetActivator::GetContext()
+  ctkPluginContext* MxNMultiWidgetActivator::GetContext()
   {
     return m_Context;
   }

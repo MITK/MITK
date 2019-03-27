@@ -14,34 +14,33 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKCUSTOMMULTIWIDGETEDITOR_H
-#define QMITKCUSTOMMULTIWIDGETEDITOR_H
+#ifndef QMITKMXNMULTIWIDGETEDITOR_H
+#define QMITKMXNMULTIWIDGETEDITOR_H
 
 #include <QmitkAbstractRenderEditor.h>
 #include <mitkILinkedRenderWindowPart.h>
 
-// custom multi widget editor
-#include <org_mitk_gui_qt_custommultiwidgeteditor_Export.h>
+#include <org_mitk_gui_qt_mxnmultiwidgeteditor_Export.h>
 
 // berry
 #include <berryIPartListener.h>
 
 #include <memory>
 
-class QmitkCustomMultiWidget;
+class QmitkMxNMultiWidget;
 
-class CUSTOMMULTIWIDGETEDITOR_EXPORT QmitkCustomMultiWidgetEditor final : public QmitkAbstractRenderEditor, public berry::IPartListener
+class MXNMULTIWIDGETEDITOR_EXPORT QmitkMxNMultiWidgetEditor final : public QmitkAbstractRenderEditor, public berry::IPartListener
 {
   Q_OBJECT
 
 public:
 
-  berryObjectMacro(QmitkCustomMultiWidgetEditor)
+  berryObjectMacro(QmitkMxNMultiWidgetEditor)
 
   static const QString EDITOR_ID;
 
-  QmitkCustomMultiWidgetEditor();
-  ~QmitkCustomMultiWidgetEditor();
+  QmitkMxNMultiWidgetEditor();
+  ~QmitkMxNMultiWidgetEditor();
 
   /**
   * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
@@ -78,7 +77,7 @@ public:
   /**
   * @brief Overridden from berry::IPartListener
   */
-  berry::IPartListener::Events::Types QmitkCustomMultiWidgetEditor::GetPartEventTypes() const override;
+  berry::IPartListener::Events::Types GetPartEventTypes() const override;
   /**
   * @brief Overridden from berry::IPartListener
   */
@@ -89,9 +88,9 @@ public:
   void PartClosed(const berry::IWorkbenchPartReference::Pointer& partRef) override;
 
   /**
-  * @brief Return the current custom multi widget of this editor.
+  * @brief Return the current MxN multi widget of this editor.
   */
-  QmitkCustomMultiWidget* GetCustomMultiWidget();
+  QmitkMxNMultiWidget* GetMxNMultiWidget();
 
 private Q_SLOTS:
 
@@ -116,4 +115,4 @@ private:
   const std::unique_ptr<Impl> m_Impl;
 };
 
-#endif // QMITKCUSTOMMULTIWIDGETEDITOR_H
+#endif // QMITKMXNMULTIWIDGETEDITOR_H

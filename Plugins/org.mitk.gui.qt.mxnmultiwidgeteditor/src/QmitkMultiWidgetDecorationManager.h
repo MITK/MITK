@@ -14,11 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKMULTIWIDGETDECORATIONMANAGER_H
-#define QMITKMULTIWIDGETDECORATIONMANAGER_H
+#ifndef QMITKMXNMULTIWIDGETDECORATIONMANAGER_H
+#define QMITKMXNMULTIWIDGETDECORATIONMANAGER_H
 
-// custom multi widget editor
-#include <org_mitk_gui_qt_custommultiwidgeteditor_Export.h>
+// mxn multi widget editor
+#include <org_mitk_gui_qt_mxnmultiwidgeteditor_Export.h>
 
 // mitk core
 #include <mitkColorProperty.h>
@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLogoAnnotation.h>
 
 // mitk qtwidgets
-#include <QmitkCustomMultiWidget.h>
+#include <QmitkMxNMultiWidget.h>
 
 // berry
 #include <berryIBerryPreferences.h>
@@ -45,12 +45,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 *
 *
 */
-class CUSTOMMULTIWIDGETEDITOR_EXPORT QmitkMultiWidgetDecorationManager
+class MXNMULTIWIDGETEDITOR_EXPORT QmitkMultiWidgetDecorationManager
 {
 
 public:
 
-  QmitkMultiWidgetDecorationManager(QmitkCustomMultiWidget* customMultiWidget);
+  QmitkMultiWidgetDecorationManager(QmitkMxNMultiWidget* mxnMultiWidget);
 
   enum class Colormap
   {
@@ -117,7 +117,7 @@ private:
   void ShowGradientBackground(const QString& widgetID, bool show);
   void ShowAllGradientBackgrounds(bool show);
   /**
-  * @rief Return a render window (widget) specific background color gradient
+  * @brief Return a render window (widget) specific background color gradient
   *
   * @param widgetID   The widget identifier.
   *
@@ -136,9 +136,9 @@ private:
   bool IsCornerAnnotationVisible(const QString& widgetID) const;
   bool AreAllCornerAnnotationsVisible() const;
 
-  QmitkCustomMultiWidget* m_CustomMultiWidget;
+  QmitkMxNMultiWidget* m_MxNMultiWidget;
   mitk::LogoAnnotation::Pointer m_LogoAnnotation;
 
 };
 
-#endif // QMITKMULTIWIDGETDECORATIONMANAGER_H
+#endif // QMITKMXNMULTIWIDGETDECORATIONMANAGER_H

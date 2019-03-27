@@ -14,11 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKCUSTOMMULTIWIDGETEDITORPREFERENCEPAGE_H
-#define QMITKCUSTOMMULTIWIDGETEDITORPREFERENCEPAGE_H
+#ifndef QMITKMXNMULTIWIDGETEDITORPREFERENCEPAGE_H
+#define QMITKMXNMULTIWIDGETEDITORPREFERENCEPAGE_H
 
-// custom multi widget editor
-#include "ui_QmitkCustomMultiWidgetEditorPreferencePage.h"
+#include "ui_QmitkMxNMultiWidgetEditorPreferencePage.h"
 
 #include <berryIPreferences.h>
 #include <berryIQtPreferencePage.h>
@@ -26,14 +25,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QScopedPointer>
 #include <QPushButton>
 
-class QmitkCustomMultiWidgetEditorPreferencePage : public QObject, public berry::IQtPreferencePage
+class QmitkMxNMultiWidgetEditorPreferencePage : public QObject, public berry::IQtPreferencePage
 {
   Q_OBJECT
   Q_INTERFACES(berry::IPreferencePage)
 
 public:
-  QmitkCustomMultiWidgetEditorPreferencePage();
-  ~QmitkCustomMultiWidgetEditorPreferencePage();
+
+  QmitkMxNMultiWidgetEditorPreferencePage();
+  ~QmitkMxNMultiWidgetEditorPreferencePage();
 
   void Init(berry::IWorkbench::Pointer) override;
   void CreateQtControl(QWidget* parent) override;
@@ -72,9 +72,9 @@ protected:
 
 private:
 
-  Ui::QmitkCustomMultiWidgetEditorPreferencePage m_Ui;
+  Ui::QmitkMxNMultiWidgetEditorPreferencePage m_Ui;
   QWidget* m_MainControl;
 
 };
 
-#endif // QMITKCUSTOMMULTIWIDGETEDITORPREFERENCEPAGE_H
+#endif // QMITKMXNMULTIWIDGETEDITORPREFERENCEPAGE_H

@@ -14,13 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKOPENCUSTOMMULTIWIDGETEDITORACTION_H
-#define QMITKOPENCUSTOMMULTIWIDGETEDITORACTION_H
+#ifndef QMITKOPENMXNMULTIWIDGETEDITORACTION_H
+#define QMITKOPENMXNMULTIWIDGETEDITORACTION_H
 
 #ifdef __MINGW32__
-// We need to inlclude winbase.h here in order to declare
+// We need to include winbase.h here in order to declare
 // atomic intrinsics like InterlockedIncrement correctly.
-// Otherwhise, they would be declared wrong within qatomic_windows.h .
+// Otherwise they would be declared wrong within qatomic_windows.h .
 #include <windows.h>
 #endif
 
@@ -32,14 +32,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchWindow.h>
 #include <berryIPreferences.h>
 
-class MITK_QT_COMMON_EXT_EXPORT QmitkOpenCustomMultiWidgetEditorAction : public QAction
+class MITK_QT_COMMON_EXT_EXPORT QmitkOpenMxNMultiWidgetEditorAction : public QAction
 {
   Q_OBJECT
 
 public:
 
-  QmitkOpenCustomMultiWidgetEditorAction(berry::IWorkbenchWindow::Pointer window);
-  QmitkOpenCustomMultiWidgetEditorAction(const QIcon& icon, berry::IWorkbenchWindow::Pointer window);
+  QmitkOpenMxNMultiWidgetEditorAction(berry::IWorkbenchWindow::Pointer window);
+  QmitkOpenMxNMultiWidgetEditorAction(const QIcon& icon, berry::IWorkbenchWindow::Pointer window);
 
 protected slots:
 
@@ -53,4 +53,4 @@ private:
 
 };
 
-#endif // QMITKOPENCUSTOMMULTIWIDGETEDITORACTION_H
+#endif // QMITKOPENMXNMULTIWIDGETEDITORACTION_H

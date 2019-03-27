@@ -21,10 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class CustomMultiWidgetActivator : public QObject, public ctkPluginActivator
+  class MxNMultiWidgetActivator : public QObject, public ctkPluginActivator
   {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_custommultiwidgeteditor")
+    Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_mxnmultiwidgeteditor")
     Q_INTERFACES(ctkPluginActivator)
 
   public:

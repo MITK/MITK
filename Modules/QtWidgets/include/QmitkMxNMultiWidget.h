@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKCUSTOMMULTIWIDGET_H
-#define QMITKCUSTOMMULTIWIDGET_H
+#ifndef QMITKMXNMULTIWIDGET_H
+#define QMITKMXNMULTIWIDGET_H
 
 // qt widgets module
 #include "MitkQtWidgetsExports.h"
@@ -42,11 +42,11 @@ namespace mitk
 }
 
 /**
-* @brief The 'QmitkCustomMultiWidget' is a 'QWidget' that is used to display multiple render windows at once.
+* @brief The 'QmitkMxNMultiWidget' is a QWidget that is used to display multiple render windows at once.
 *
 *     Render windows can dynamically be added and removed to change the layout of the multi widget.
 */
-class MITKQTWIDGETS_EXPORT QmitkCustomMultiWidget : public QWidget
+class MITKQTWIDGETS_EXPORT QmitkMxNMultiWidget : public QWidget
 {
   Q_OBJECT
 
@@ -56,13 +56,13 @@ public:
   using RenderWindowWidgetMap = std::map<QString, std::shared_ptr<QmitkRenderWindowWidget>>;
   using RenderWindowHash = QHash<QString, QmitkRenderWindow*>;
 
-  QmitkCustomMultiWidget(QWidget* parent = 0,
+  QmitkMxNMultiWidget(QWidget* parent = 0,
                          Qt::WindowFlags f = 0,
                          mitk::RenderingManager* renderingManager = nullptr,
                          mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard,
-                         const QString& multiWidgetName = "custommulti");
+                         const QString& multiWidgetName = "mxnmulti");
 
-  virtual ~QmitkCustomMultiWidget();
+  virtual ~QmitkMxNMultiWidget();
   
   void SetDataStorage(mitk::DataStorage* dataStorage);
   void InitializeRenderWindowWidgets();
@@ -135,7 +135,7 @@ private:
   // #TODO: see T24173
   mitk::DataNode::Pointer GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes);
 
-  QGridLayout* m_CustomMultiWidgetLayout;
+  QGridLayout* m_MxNMultiWidgetLayout;
   RenderWindowWidgetMap m_RenderWindowWidgets;
 
   RenderWindowWidgetPointer m_ActiveRenderWindowWidget;
@@ -155,4 +155,4 @@ private:
   mitk::DataStorage::Pointer m_DataStorage;
 };
 
-#endif // QMITKCUSTOMMULTIWIDGET_H
+#endif // QMITKMXNMULTIWIDGET_H

@@ -28,8 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // qt
 #include <QColor>
 
-QmitkMultiWidgetDecorationManager::QmitkMultiWidgetDecorationManager(QmitkCustomMultiWidget* customMultiWidget)
-  : m_CustomMultiWidget(customMultiWidget)
+QmitkMultiWidgetDecorationManager::QmitkMultiWidgetDecorationManager(QmitkMxNMultiWidget* mxnMultiWidget)
+  : m_MxNMultiWidget(mxnMultiWidget)
   , m_LogoAnnotation(mitk::LogoAnnotation::New())
 {
   // nothing here
@@ -87,7 +87,7 @@ void QmitkMultiWidgetDecorationManager::DecorationPreferencesChanged(const berry
 
 void QmitkMultiWidgetDecorationManager::ShowDecorations(bool show, const QStringList& decorations)
 {
-  if (nullptr != m_CustomMultiWidget)
+  if (nullptr != m_MxNMultiWidget)
   {
     return;
   }
@@ -102,7 +102,7 @@ void QmitkMultiWidgetDecorationManager::ShowDecorations(bool show, const QString
   }
   if (decorations.isEmpty() || decorations.contains(mitk::IRenderWindowPart::DECORATION_MENU))
   {
-    //m_CustomMultiWidget->ActivateAllRenderWindowMenus(show);
+    //m_MxNMultiWidget->ActivateAllRenderWindowMenus(show);
   }
   if (decorations.isEmpty() || decorations.contains(mitk::IRenderWindowPart::DECORATION_BACKGROUND))
   {
@@ -178,7 +178,7 @@ vtkSmartPointer<vtkImageData> QmitkMultiWidgetDecorationManager::GetVtkLogo(cons
 
 void QmitkMultiWidgetDecorationManager::SetLogo(vtkSmartPointer<vtkImageData> vtkLogo)
 {
-  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = m_CustomMultiWidget->GetLastRenderWindowWidget();
+  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = m_MxNMultiWidget->GetLastRenderWindowWidget();
   if (nullptr != renderWindowWidget && m_LogoAnnotation.IsNotNull())
   {
     mitk::ManualPlacementAnnotationRenderer::AddAnnotation(m_LogoAnnotation.GetPointer(), renderWindowWidget->GetRenderWindow()->GetRenderer());
@@ -194,7 +194,7 @@ void QmitkMultiWidgetDecorationManager::SetLogo(vtkSmartPointer<vtkImageData> vt
 
 void QmitkMultiWidgetDecorationManager::ShowLogo(bool show)
 {
-  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = m_CustomMultiWidget->GetLastRenderWindowWidget();
+  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = m_MxNMultiWidget->GetLastRenderWindowWidget();
   if (nullptr != renderWindowWidget)
   {
     m_LogoAnnotation->SetVisibility(show);
@@ -226,7 +226,7 @@ void QmitkMultiWidgetDecorationManager::SetColormap(QmitkMultiWidgetDecorationMa
 
 void QmitkMultiWidgetDecorationManager::SetDecorationColor(const QString& widgetID, const mitk::Color& color)
 {
-  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = m_CustomMultiWidget->GetRenderWindowWidget(widgetID);
+  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = m_MxNMultiWidget->GetRenderWindowWidget(widgetID);
   if (nullptr != renderWindowWidget)
   {
     renderWindowWidget->SetDecorationColor(color);
@@ -238,7 +238,7 @@ void QmitkMultiWidgetDecorationManager::SetDecorationColor(const QString& widget
 
 void QmitkMultiWidgetDecorationManager::SetAllDecorationColors(const mitk::Color& color)
 {
-  QmitkCustomMultiWidget::RenderWindowWidgetMap renderWindowWidgets = m_CustomMultiWidget->GetRenderWindowWidgets();
+  QmitkMxNMultiWidget::RenderWindowWidgetMap renderWindowWidgets = m_MxNMultiWidget->GetRenderWindowWidgets();
   for (const auto& renderWindowWidget : renderWindowWidgets)
   {
     renderWindowWidget.second->SetDecorationColor(color);
@@ -247,7 +247,7 @@ void QmitkMultiWidgetDecorationManager::SetAllDecorationColors(const mitk::Color
 
 mitk::Color QmitkMultiWidgetDecorationManager::GetDecorationColor(const QString& widgetID) const
 {
-  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = m_CustomMultiWidget->GetRenderWindowWidget(widgetID);
+  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = m_MxNMultiWidget->GetRenderWindowWidget(widgetID);
   if (nullptr != renderWindowWidget)
   {
     return renderWindowWidget->GetDecorationColor();
@@ -260,7 +260,7 @@ mitk::Color QmitkMultiWidgetDecorationManager::GetDecorationColor(const QString&
 
 void QmitkMultiWidgetDecorationManager::ShowColoredRectangle(const QString& widgetID, bool show)
 {
-  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = m_CustomMultiWidget->GetRenderWindowWidget(widgetID);
+  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = m_MxNMultiWidget->GetRenderWindowWidget(widgetID);
   if (nullptr != renderWindowWidget)
   {
     renderWindowWidget->ShowColoredRectangle(show);
@@ -272,7 +272,7 @@ void QmitkMultiWidgetDecorationManager::ShowColoredRectangle(const QString& widg
 
 void QmitkMultiWidgetDecorationManager::ShowAllColoredRectangles(bool show)
 {
-  QmitkCustomMultiWidget::RenderWindowWidgetMap renderWindowWidgets = m_CustomMultiWidget->GetRenderWindowWidgets();
+  QmitkMxNMultiWidget::RenderWindowWidgetMap renderWindowWidgets = m_MxNMultiWidget->GetRenderWindowWidgets();
   for (const auto& renderWindowWidget : renderWindowWidgets)
   {
     renderWindowWidget.second->ShowColoredRectangle(show);
@@ -281,7 +281,7 @@ void QmitkMultiWidgetDecorationManager::ShowAllColoredRectangles(bool show)
 
 bool QmitkMultiWidgetDecorationManager::IsColoredRectangleVisible(const QString& widgetID) const
 {
-  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = m_CustomMultiWidget->GetRenderWindowWidget(widgetID);
+  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = m_MxNMultiWidget->GetRenderWindowWidget(widgetID);
   if (nullptr != renderWindowWidget)
   {
     return renderWindowWidget->IsColoredRectangleVisible();
@@ -293,7 +293,7 @@ bool QmitkMultiWidgetDecorationManager::IsColoredRectangleVisible(const QString&
 
 bool QmitkMultiWidgetDecorationManager::AreAllColoredRectanglesVisible() const
 {
-  QmitkCustomMultiWidget::RenderWindowWidgetMap renderWindowWidgets = m_CustomMultiWidget->GetRenderWindowWidgets();
+  QmitkMxNMultiWidget::RenderWindowWidgetMap renderWindowWidgets = m_MxNMultiWidget->GetRenderWindowWidgets();
   bool allTrue = true;
   for (const auto& renderWindowWidget : renderWindowWidgets)
   {
@@ -305,7 +305,7 @@ bool QmitkMultiWidgetDecorationManager::AreAllColoredRectanglesVisible() const
 
 void QmitkMultiWidgetDecorationManager::SetGradientBackgroundColors(const mitk::Color& upper, const mitk::Color& lower, const QString& widgetID)
 {
-  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = m_CustomMultiWidget->GetRenderWindowWidget(widgetID);
+  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = m_MxNMultiWidget->GetRenderWindowWidget(widgetID);
   if (nullptr != renderWindowWidget)
   {
     renderWindowWidget->SetGradientBackgroundColors(upper, lower);
@@ -317,7 +317,7 @@ void QmitkMultiWidgetDecorationManager::SetGradientBackgroundColors(const mitk::
 
 void QmitkMultiWidgetDecorationManager::SetAllGradientBackgroundColors(const mitk::Color& upper, const mitk::Color& lower)
 {
-  QmitkCustomMultiWidget::RenderWindowWidgetMap renderWindowWidgets = m_CustomMultiWidget->GetRenderWindowWidgets();
+  QmitkMxNMultiWidget::RenderWindowWidgetMap renderWindowWidgets = m_MxNMultiWidget->GetRenderWindowWidgets();
   for (const auto& renderWindowWidget : renderWindowWidgets)
   {
     renderWindowWidget.second->SetGradientBackgroundColors(upper, lower);
@@ -332,7 +332,7 @@ void QmitkMultiWidgetDecorationManager::FillAllGradientBackgroundColorsWithBlack
 
 void QmitkMultiWidgetDecorationManager::ShowGradientBackground(const QString& widgetID, bool show)
 {
-  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = m_CustomMultiWidget->GetRenderWindowWidget(widgetID);
+  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = m_MxNMultiWidget->GetRenderWindowWidget(widgetID);
   if (nullptr != renderWindowWidget)
   {
     renderWindowWidget->ShowGradientBackground(show);
@@ -344,7 +344,7 @@ void QmitkMultiWidgetDecorationManager::ShowGradientBackground(const QString& wi
 
 void QmitkMultiWidgetDecorationManager::ShowAllGradientBackgrounds(bool show)
 {
-  QmitkCustomMultiWidget::RenderWindowWidgetMap renderWindowWidgets = m_CustomMultiWidget->GetRenderWindowWidgets();
+  QmitkMxNMultiWidget::RenderWindowWidgetMap renderWindowWidgets = m_MxNMultiWidget->GetRenderWindowWidgets();
   for (const auto& renderWindowWidget : renderWindowWidgets)
   {
     renderWindowWidget.second->ShowGradientBackground(show);
@@ -353,7 +353,7 @@ void QmitkMultiWidgetDecorationManager::ShowAllGradientBackgrounds(bool show)
 
 std::pair<mitk::Color, mitk::Color> QmitkMultiWidgetDecorationManager::GetGradientBackgroundColors(const QString& widgetID) const
 {
-  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = m_CustomMultiWidget->GetRenderWindowWidget(widgetID);
+  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = m_MxNMultiWidget->GetRenderWindowWidget(widgetID);
   if (nullptr != renderWindowWidget)
   {
     return renderWindowWidget->GetGradientBackgroundColors();
@@ -366,7 +366,7 @@ std::pair<mitk::Color, mitk::Color> QmitkMultiWidgetDecorationManager::GetGradie
 
 bool QmitkMultiWidgetDecorationManager::IsGradientBackgroundOn(const QString& widgetID) const
 {
-  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = m_CustomMultiWidget->GetRenderWindowWidget(widgetID);
+  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = m_MxNMultiWidget->GetRenderWindowWidget(widgetID);
   if (nullptr != renderWindowWidget)
   {
     return renderWindowWidget->IsGradientBackgroundOn();
@@ -378,7 +378,7 @@ bool QmitkMultiWidgetDecorationManager::IsGradientBackgroundOn(const QString& wi
 
 bool QmitkMultiWidgetDecorationManager::AreAllGradientBackgroundsOn() const
 {
-  QmitkCustomMultiWidget::RenderWindowWidgetMap renderWindowWidgets = m_CustomMultiWidget->GetRenderWindowWidgets();
+  QmitkMxNMultiWidget::RenderWindowWidgetMap renderWindowWidgets = m_MxNMultiWidget->GetRenderWindowWidgets();
   bool allTrue = true;
   for (const auto& renderWindowWidget : renderWindowWidgets)
   {
@@ -390,7 +390,7 @@ bool QmitkMultiWidgetDecorationManager::AreAllGradientBackgroundsOn() const
 
 void QmitkMultiWidgetDecorationManager::SetCornerAnnotationText(const QString& widgetID, const std::string& cornerAnnotation)
 {
-  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = m_CustomMultiWidget->GetRenderWindowWidget(widgetID);
+  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = m_MxNMultiWidget->GetRenderWindowWidget(widgetID);
   if (nullptr != renderWindowWidget)
   {
     renderWindowWidget->SetCornerAnnotationText(cornerAnnotation);
@@ -402,7 +402,7 @@ void QmitkMultiWidgetDecorationManager::SetCornerAnnotationText(const QString& w
 
 std::string QmitkMultiWidgetDecorationManager::GetCornerAnnotationText(const QString& widgetID) const
 {
-  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = m_CustomMultiWidget->GetRenderWindowWidget(widgetID);
+  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = m_MxNMultiWidget->GetRenderWindowWidget(widgetID);
   if (nullptr != renderWindowWidget)
   {
     return renderWindowWidget->GetCornerAnnotationText();
@@ -414,7 +414,7 @@ std::string QmitkMultiWidgetDecorationManager::GetCornerAnnotationText(const QSt
 
 void QmitkMultiWidgetDecorationManager::ShowCornerAnnotation(const QString& widgetID, bool show)
 {
-  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = m_CustomMultiWidget->GetRenderWindowWidget(widgetID);
+  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = m_MxNMultiWidget->GetRenderWindowWidget(widgetID);
   if (nullptr != renderWindowWidget)
   {
     renderWindowWidget->ShowCornerAnnotation(show);
@@ -426,7 +426,7 @@ void QmitkMultiWidgetDecorationManager::ShowCornerAnnotation(const QString& widg
 
 void QmitkMultiWidgetDecorationManager::ShowAllCornerAnnotations(bool show)
 {
-  QmitkCustomMultiWidget::RenderWindowWidgetMap renderWindowWidgets = m_CustomMultiWidget->GetRenderWindowWidgets();
+  QmitkMxNMultiWidget::RenderWindowWidgetMap renderWindowWidgets = m_MxNMultiWidget->GetRenderWindowWidgets();
   for (const auto& renderWindowWidget : renderWindowWidgets)
   {
     renderWindowWidget.second->ShowCornerAnnotation(show);
@@ -435,7 +435,7 @@ void QmitkMultiWidgetDecorationManager::ShowAllCornerAnnotations(bool show)
 
 bool QmitkMultiWidgetDecorationManager::IsCornerAnnotationVisible(const QString& widgetID) const
 {
-  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = m_CustomMultiWidget->GetRenderWindowWidget(widgetID);
+  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = m_MxNMultiWidget->GetRenderWindowWidget(widgetID);
   if (nullptr != renderWindowWidget)
   {
     return renderWindowWidget->IsCornerAnnotationVisible();
@@ -447,7 +447,7 @@ bool QmitkMultiWidgetDecorationManager::IsCornerAnnotationVisible(const QString&
 
 bool QmitkMultiWidgetDecorationManager::AreAllCornerAnnotationsVisible() const
 {
-  QmitkCustomMultiWidget::RenderWindowWidgetMap renderWindowWidgets = m_CustomMultiWidget->GetRenderWindowWidgets();
+  QmitkMxNMultiWidget::RenderWindowWidgetMap renderWindowWidgets = m_MxNMultiWidget->GetRenderWindowWidgets();
   bool allTrue = true;
   for (const auto& renderWindowWidget : renderWindowWidgets)
   {

@@ -25,6 +25,13 @@ namespace mitk
   /**
   * @brief This class serves as an event state machine while simultaneously observing interaction events.
   *   It connects the actions from the event state machine .xml-file with concrete functions of this class.
+  *
+  *   The observed interaction events are mouse events that trigger certain actions, according to an event configuration (e.g. PACS mode).
+  *   These actions are defined and connected inside this broadcast class.
+  *   They typically contain some preprocessing steps and use the results of the preprocessing to broadcast a specific display event.
+  *
+  *   Any instance that wants to react on the invoked events can call 'AddObserver' on a specific broadcast instance,
+  *   given an itkEventObject and an itkCommand.
   */
   class MITKCORE_EXPORT DisplayActionEventBroadcast : public EventStateMachine, public InteractionEventObserver
   {

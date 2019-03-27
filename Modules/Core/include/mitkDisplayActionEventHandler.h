@@ -26,6 +26,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  /**
+  * @brief This class simplifies the process of adding an itkEventObject-itkCommand pair as an observer of a
+  *        DisplayActionEventBroadcast instance.
+  *        The 'SetObservableBroadcast'-function can be used to define the broadcast instance that should be observed.
+  *        The 'ConnectDisplayActionEvent'-function can be used to add a an observer to the broadcast.
+  *        Such an observer consists of a DisplayActionEvent (an itkEventObject) and a StdFunctionCommand (an itkCommand).
+  *        The StdFunctionCommand is created inside the function by the given two std::functions.
+  */
   class MITKCORE_EXPORT DisplayActionEventHandler
   {
   public:

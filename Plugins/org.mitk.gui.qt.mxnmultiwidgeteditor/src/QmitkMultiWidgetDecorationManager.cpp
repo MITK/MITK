@@ -37,7 +37,7 @@ QmitkMultiWidgetDecorationManager::QmitkMultiWidgetDecorationManager(QmitkMxNMul
 
 void QmitkMultiWidgetDecorationManager::DecorationPreferencesChanged(const berry::IBerryPreferences* preferences)
 {
-  // Enable change of logo. If no DepartmentLogo was set explicitly, MBILogo is used.
+  // Enable change of logo. If no DepartmentLogo was set explicitly, MITK Logo is used.
   // Set new department logo by prefs->Set("DepartmentLogo", "PathToImage");
 
   // If no logo was set for this plug-in specifically, walk the parent preference nodes
@@ -45,7 +45,7 @@ void QmitkMultiWidgetDecorationManager::DecorationPreferencesChanged(const berry
 
   // Disable the logo first, otherwise setting a new logo will have no effect due to how mitkManufacturerLogo works
   ShowLogo(false);
-  SetupLogo(qPrintable(":/org.mitk.gui.qt.stdmultiwidgeteditor/defaultWatermark.png"));
+  SetupLogo(qPrintable(":/org.mitk.gui.qt.mxnmultiwidgeteditor/defaultWatermark.png"));
   ShowLogo(true);
 
   const berry::IPreferences* currentNode = preferences;

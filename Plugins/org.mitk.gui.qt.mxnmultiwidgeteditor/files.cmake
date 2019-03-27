@@ -25,6 +25,7 @@ set(CACHED_RESOURCE_FILES
 )
 
 set(QRC_FILES
+  resources/QmitkMxNMultiWidgetEditor.qrc
 )
 
 foreach(file ${SRC_CPP_FILES})

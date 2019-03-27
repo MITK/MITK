@@ -59,8 +59,8 @@ int main(int argc, char* argv[])
   outfilename += ".dti";
 
   int threshold = 0;
-  if (parsedArgs.count("b0Threshold"))
-    threshold = us::any_cast<int>(parsedArgs["b0Threshold"]);
+  if (parsedArgs.count("b0_threshold"))
+    threshold = us::any_cast<int>(parsedArgs["b0_threshold"]);
 
   bool correct_negative_eigenv = false;
   if (parsedArgs.count("correct_negative_eigenv"))

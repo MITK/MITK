@@ -59,18 +59,10 @@ public:
     }
 
 private:
-#ifdef _MSC_VER
- #pragma warning(push)
- #pragma warning(disable: 4251)
-#endif
     // this pragma ignores the following warning:
     // warning C4251: 'mitk::Particle::pos' : class   'ATL::CStringT'   needs to have dll-interface to be used   by clients of class 'Particle'
     vnl_vector_fixed<float, 3> pos; // particle position (world coordinates. corner based voxels. not accounted for image rotation.
     vnl_vector_fixed<float, 3> dir; // normalized direction vector
-#ifdef _MSC_VER
- #pragma warning(pop)
-#endif
-
 };
 
 class MITKFIBERTRACKING_EXPORT EndPoint

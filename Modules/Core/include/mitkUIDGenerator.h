@@ -21,11 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMersenneTwisterRandomVariateGenerator.h>
 #include <string>
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4251)
-#endif
-
 namespace mitk
 {
   /*!
@@ -55,9 +50,5 @@ namespace mitk
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandomGenerator;
   };
 }
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 #endif

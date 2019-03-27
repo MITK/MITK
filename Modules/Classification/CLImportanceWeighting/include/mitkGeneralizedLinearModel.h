@@ -93,10 +93,6 @@ namespace mitk
     // that the most important columns are first. Depends on a QR-algorithm.
     void EstimatePermutation(const vnl_matrix<double> &xData);
 
-#ifdef _MSC_VER
-#  pragma warning(disable: 4251)
-#endif
-
     vnl_vector<unsigned int>    m_Permutation;        // Holds a permutation matrix which is used during calculation of B
     vnl_vector<double>          m_B;                  // B-Values. Linear componentn of the model.
     bool                        m_AddConstantColumn;  // If true, a constant value is added to each row

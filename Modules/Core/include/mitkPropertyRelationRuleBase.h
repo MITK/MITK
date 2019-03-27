@@ -28,11 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <string>
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4251)
-#endif
-
 namespace mitk
 {
   /**Base class to standardize/abstract/encapsulate rules and business logic to detect and define
@@ -340,9 +335,5 @@ namespace mitk
   };
 
 } // namespace mitk
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 #endif

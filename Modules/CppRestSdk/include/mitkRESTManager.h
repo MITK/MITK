@@ -17,11 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkRESTManager_h
 #define mitkRESTManager_h
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4251)
-#endif
-
 #include <mitkIRESTManager.h>
 #include <mitkRESTServer.h>
 
@@ -31,7 +26,7 @@ namespace mitk
 {
   /**
   * @class RESTManager
-  * @brief this is a microservice for managing REST-requests, used for non-qt applications. 
+  * @brief this is a microservice for managing REST-requests, used for non-qt applications.
   *
   * RESTManagerQt in the CppRestSdkQt module inherits from this class and is the equivalent microservice
   * used for Qt applications.
@@ -57,7 +52,7 @@ namespace mitk
                                              const RequestType &type = RequestType::Get,
                                              const web::json::value *body= nullptr,
                                              const utility::string_t &filePath = L"") override;
-    
+
     /**
      * @brief starts listening for requests if there isn't another observer listening and the port is free
      *
@@ -124,9 +119,5 @@ namespace mitk
     std::map<std::pair<int, utility::string_t>, IRESTObserver *> m_Observers; // Map with all observers
   };
 } // namespace mitk
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 #endif // !mitkRESTManager_h

@@ -42,11 +42,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkCommandLineExports.h>
 #include <mitkVersion.h>
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4251)
-#endif
-
 /**
  *
  * The MITK command line parser, based on the CTK command line parser.

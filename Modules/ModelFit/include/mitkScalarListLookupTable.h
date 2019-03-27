@@ -23,11 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "MitkModelFitExports.h"
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 4251)
-#endif
-
 namespace mitk
 {
     /**
@@ -96,9 +91,5 @@ namespace mitk
     MITKMODELFIT_EXPORT std::ostream& operator<<(std::ostream& stream,
             const ScalarListLookupTable& l);
 }
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 #endif // mitkScalarListLookupTable_h

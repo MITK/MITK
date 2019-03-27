@@ -25,11 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // c++
 #include <vector>
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4251)
-#endif
-
 namespace mitk
 {
   /**
@@ -64,9 +59,5 @@ namespace mitk
 
   };
 } // end namespace
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 #endif // MITKLESIONDATA_H

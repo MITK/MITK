@@ -1,4 +1,4 @@
-if(MITK_USE_CppRestSdk)
+if(MITK_USE_cpprestsdk)
 
   MITK_CREATE_MODULE(
     DEPENDS MitkCore MitkCppRestSdk

@@ -27,11 +27,6 @@
 
 #include <string>
 
-#ifdef _MSC_VER
-# pragma warning(push)
-# pragma warning(disable: 4251)
-#endif
-
 US_BEGIN_NAMESPACE
 
 struct ModuleActivator;
@@ -51,9 +46,5 @@ struct US_Core_EXPORT ModuleInfo
 };
 
 US_END_NAMESPACE
-
-#ifdef _MSC_VER
-# pragma warning(pop)
-#endif
 
 #endif // USMODULEINFO_H

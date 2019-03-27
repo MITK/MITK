@@ -273,7 +273,6 @@ endforeach()
 
 env_option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
 env_option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
-env_option(MITK_USE_CppRestSdk "Use cpp rest sdk library" OFF)
 
 #-----------------------------------------------------------------------------
 # Build configurations
@@ -719,12 +718,13 @@ if (OPENMP_FOUND)
 endif()
 
 if(WIN32)
-  set(MITK_CXX_FLAGS "${MITK_CXX_FLAGS} -D_WIN32_WINNT=0x0501 -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN -DNOMINMAX")
+  set(MITK_CXX_FLAGS "${MITK_CXX_FLAGS} -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN -DNOMINMAX")
   mitkFunctionCheckCompilerFlags("/wd4005" MITK_CXX_FLAGS) # warning C4005: macro redefinition
   mitkFunctionCheckCompilerFlags("/wd4231" MITK_CXX_FLAGS) # warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
   # the following line should be removed after fixing bug 17637
   mitkFunctionCheckCompilerFlags("/wd4316" MITK_CXX_FLAGS) # warning C4316: object alignment on heap
   mitkFunctionCheckCompilerFlags("/wd4180" MITK_CXX_FLAGS) # warning C4180: qualifier applied to function type has no meaning
+  mitkFunctionCheckCompilerFlags("/wd4251" MITK_CXX_FLAGS) # warning C4251: 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
 endif()
 
 if(APPLE)
@@ -866,11 +866,6 @@ endif()
 
 if(MITK_USE_OpenCL)
   find_package(OpenCL REQUIRED)
-endif()
-
-if(MITK_USE_CppRestSdk)
-  message(WARNING "Be sure to install cpprestsdk via vcpkg and set cpprestsdk_DIR to /vcpkg/installed/[OS_VERSION]/share/cpprestsdk")
-  find_package(cpprestsdk REQUIRED)
 endif()
 
 # Qt support

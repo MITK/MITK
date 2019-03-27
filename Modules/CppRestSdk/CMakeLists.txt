@@ -1,4 +1,4 @@
-if(MITK_USE_CppRestSdk)
+if(MITK_USE_cpprestsdk)
 
   MITK_CREATE_MODULE(
     DEPENDS MitkCore
@@ -11,4 +11,4 @@ if(MITK_USE_CppRestSdk)
 
   add_subdirectory(test)
 
-endif(MITK_USE_CppRestSdk)
+endif()

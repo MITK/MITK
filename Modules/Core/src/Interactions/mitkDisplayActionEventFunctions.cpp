@@ -41,7 +41,6 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Move
         return;
       }
 
-      // concrete action
       sendingRenderer->GetCameraController()->MoveBy(displayActionEvent->GetMoveVector());
       sendingRenderer->GetRenderingManager()->RequestUpdate(sendingRenderer->GetRenderWindow());
     }
@@ -63,7 +62,6 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::SetC
         return;
       }
 
-      // concrete action
       BaseRenderer::GetInstance(sendingRenderer->GetRenderWindow())->GetSliceNavigationController()->SelectSliceByPoint(displayActionEvent->GetPosition());
     }
   };
@@ -84,7 +82,6 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Zoom
         return;
       }
 
-      // concrete action
       if (1.0 != displayActionEvent->GetZoomFactor())
       {
         sendingRenderer->GetCameraController()->Zoom(displayActionEvent->GetZoomFactor(), displayActionEvent->GetStartCoordinate());
@@ -109,7 +106,6 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Scro
         return;
       }
 
-      // concrete action
       mitk::SliceNavigationController* sliceNavigationController = sendingRenderer->GetSliceNavigationController();
       if (nullptr == sliceNavigationController)
       {
@@ -150,8 +146,6 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::SetL
       {
         return;
       }
-
-      // concrete action
 
       // get the the topmost visible image of the sending renderer
       DataStorage::Pointer storage = sendingRenderer->GetDataStorage();
@@ -202,7 +196,6 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Move
         return;
       }
 
-      // concrete action
       auto allRenderWindows = sendingRenderer->GetRenderingManager()->GetAllRegisteredRenderWindows();
       for (auto renderWindow : allRenderWindows)
       {
@@ -232,7 +225,6 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::SetC
         return;
       }
 
-      // concrete action
       auto allRenderWindows = sendingRenderer->GetRenderingManager()->GetAllRegisteredRenderWindows();
       for (auto renderWindow : allRenderWindows)
       {
@@ -260,7 +252,6 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Zoom
         return;
       }
 
-      // concrete action
       if (1.0 != displayActionEvent->GetZoomFactor())
       {
         auto allRenderWindows = sendingRenderer->GetRenderingManager()->GetAllRegisteredRenderWindows();
@@ -293,7 +284,6 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Scro
         return;
       }
 
-      // concrete action
       auto allRenderWindows = sendingRenderer->GetRenderingManager()->GetAllRegisteredRenderWindows();
       for (auto renderWindow : allRenderWindows)
       {

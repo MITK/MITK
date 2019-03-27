@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDisplayActionEventHandler.h"
 
-void mitk::DisplayActionEventHandler::SetObservableBroadcast(mitk::DisplayActionEventBroadcast* observableBroadcast)
+void mitk::DisplayActionEventHandler::SetObservableBroadcast(DisplayActionEventBroadcast* observableBroadcast)
 {
   if (m_ObservableBroadcast == observableBroadcast)
   {
@@ -40,9 +40,9 @@ void mitk::DisplayActionEventHandler::SetObservableBroadcast(mitk::DisplayAction
   m_ObservableBroadcast = observableBroadcast;
 }
 
-mitk::DisplayActionEventHandler::OberserverTagType mitk::DisplayActionEventHandler::ConnectDisplayActionEvent(const mitk::DisplayActionEvent& displayActionEvent,
-  const mitk::StdFunctionCommand::ActionFunction& actionFunction,
-  const mitk::StdFunctionCommand::FilterFunction& filterFunction)
+mitk::DisplayActionEventHandler::OberserverTagType mitk::DisplayActionEventHandler::ConnectDisplayActionEvent(const DisplayActionEvent& displayActionEvent,
+  const StdFunctionCommand::ActionFunction& actionFunction,
+  const StdFunctionCommand::FilterFunction& filterFunction)
 {
   if (m_ObservableBroadcast.IsExpired())
   {
@@ -50,7 +50,7 @@ mitk::DisplayActionEventHandler::OberserverTagType mitk::DisplayActionEventHandl
   }
 
   auto observableBroadcast = m_ObservableBroadcast.Lock();
-  auto command = mitk::StdFunctionCommand::New();
+  auto command = StdFunctionCommand::New();
   command->SetCommandAction(actionFunction);
   command->SetCommandFilter(filterFunction);
   OberserverTagType tag = observableBroadcast->AddObserver(displayActionEvent, command);

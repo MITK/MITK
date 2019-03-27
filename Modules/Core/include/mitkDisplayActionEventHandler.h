@@ -51,7 +51,7 @@ namespace mitk
     *
     * @par  observableBroadcast   The 'DisplayActionEventBroadcast'-class that should be observed.
     */
-    void SetObservableBroadcast(mitk::DisplayActionEventBroadcast* observableBroadcast);
+    void SetObservableBroadcast(DisplayActionEventBroadcast* observableBroadcast);
 
     /**
     * @brief Uses the given std::functions to customize a command:
@@ -69,9 +69,9 @@ namespace mitk
     *
     * @return   A tag to identify, receive or remove the newly created 'StdFunctionCommand'.
     */
-    OberserverTagType ConnectDisplayActionEvent(const mitk::DisplayActionEvent& displayActionEvent,
-      const mitk::StdFunctionCommand::ActionFunction& actionFunction,
-      const mitk::StdFunctionCommand::FilterFunction& filterFunction = [](const itk::EventObject&) { return true; });
+    OberserverTagType ConnectDisplayActionEvent(const DisplayActionEvent& displayActionEvent,
+      const StdFunctionCommand::ActionFunction& actionFunction,
+      const StdFunctionCommand::FilterFunction& filterFunction = [](const itk::EventObject&) { return true; });
 
     /**
     * @brief Uses the given observer tag to remove the corresponding custom command as an observer of the observed
@@ -89,7 +89,7 @@ namespace mitk
 
   protected:
 
-    mitk::WeakPointer<mitk::DisplayActionEventBroadcast> m_ObservableBroadcast;
+    WeakPointer<DisplayActionEventBroadcast> m_ObservableBroadcast;
     std::vector<OberserverTagType> m_ObserverTags;
 
   };

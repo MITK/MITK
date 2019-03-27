@@ -50,7 +50,7 @@ mitk::DisplayActionEventBroadcast::DisplayActionEventBroadcast()
   // register the broadcast class (itself) as an interaction event observer via micro services
   us::ServiceProperties props;
   props["name"] = std::string("DisplayActionEventBroadcast");
-  m_ServiceRegistration = us::GetModuleContext()->RegisterService<mitk::InteractionEventObserver>(this, props);
+  m_ServiceRegistration = us::GetModuleContext()->RegisterService<InteractionEventObserver>(this, props);
 }
 
 mitk::DisplayActionEventBroadcast::~DisplayActionEventBroadcast()
@@ -93,7 +93,7 @@ void mitk::DisplayActionEventBroadcast::ConnectActionsAndFunctions()
 
 void mitk::DisplayActionEventBroadcast::ConfigurationChanged()
 {
-  mitk::PropertyList::Pointer properties = GetAttributes();
+  PropertyList::Pointer properties = GetAttributes();
 
   // allwaysReact
   std::string strAlwaysReact = "";
@@ -172,7 +172,7 @@ void mitk::DisplayActionEventBroadcast::ConfigurationChanged()
 
 bool mitk::DisplayActionEventBroadcast::FilterEvents(InteractionEvent* interactionEvent, DataNode * /*dataNode*/)
 {
-  mitk::BaseRenderer* sendingRenderer = interactionEvent->GetSender();
+  BaseRenderer* sendingRenderer = interactionEvent->GetSender();
   if (nullptr == sendingRenderer)
   {
     return false;
@@ -295,7 +295,7 @@ bool mitk::DisplayActionEventBroadcast::CheckRotationPossible(const InteractionE
         // together with the primary one
         //                                                     if different, DON'T rotate
         if (intersectionLine.IsParallel(intersectionLineWithGeometryToBeRotated) &&
-            intersectionLine.Distance(intersectionLineWithGeometryToBeRotated.GetPoint1()) < mitk::eps)
+            intersectionLine.Distance(intersectionLineWithGeometryToBeRotated.GetPoint1()) < eps)
         {
           m_SNCsToBeRotated.push_back(snc);
         }
@@ -617,8 +617,8 @@ void mitk::DisplayActionEventBroadcast::AdjustLevelWindow(StateMachineAction* /*
     return;
   }
 
-  mitk::ScalarType level;
-  mitk::ScalarType window;
+  ScalarType level;
+  ScalarType window;
 
   if (m_LevelDirection == "leftright")
   {
@@ -676,10 +676,10 @@ void mitk::DisplayActionEventBroadcast::UpdateStatusbar(StateMachineAction* /*st
     return;
   }
 
-  mitk::BaseRenderer::Pointer renderer = positionEvent->GetSender();
+  BaseRenderer::Pointer renderer = positionEvent->GetSender();
 
-  TNodePredicateDataType<mitk::Image>::Pointer isImageData = TNodePredicateDataType<mitk::Image>::New();
-  mitk::DataStorage::SetOfObjects::ConstPointer nodes = renderer->GetDataStorage()->GetSubset(isImageData).GetPointer();
+  TNodePredicateDataType<Image>::Pointer isImageData = TNodePredicateDataType<Image>::New();
+  DataStorage::SetOfObjects::ConstPointer nodes = renderer->GetDataStorage()->GetSubset(isImageData).GetPointer();
   if (nodes.IsNull())
   {
     return;
@@ -688,9 +688,9 @@ void mitk::DisplayActionEventBroadcast::UpdateStatusbar(StateMachineAction* /*st
   Point3D worldposition;
   renderer->DisplayToWorld(positionEvent->GetPointerPositionOnScreen(), worldposition);
 
-  mitk::Image::Pointer image3D;
-  mitk::DataNode::Pointer node;
-  mitk::DataNode::Pointer topSourceNode;
+  Image::Pointer image3D;
+  DataNode::Pointer node;
+  DataNode::Pointer topSourceNode;
 
   int component = 0;
 
@@ -704,30 +704,30 @@ void mitk::DisplayActionEventBroadcast::UpdateStatusbar(StateMachineAction* /*st
   node->GetBoolProperty("binary", isBinary);
   if (isBinary)
   {
-    mitk::DataStorage::SetOfObjects::ConstPointer sourcenodes = renderer->GetDataStorage()->GetSources(node, nullptr, true);
+    DataStorage::SetOfObjects::ConstPointer sourcenodes = renderer->GetDataStorage()->GetSources(node, nullptr, true);
     if (!sourcenodes->empty())
     {
       topSourceNode = renderer->GetDataStorage()->GetTopLayerNode(sourcenodes, worldposition, renderer);
     }
     if (topSourceNode.IsNotNull())
     {
-      image3D = dynamic_cast<mitk::Image*>(topSourceNode->GetData());
+      image3D = dynamic_cast<Image*>(topSourceNode->GetData());
       topSourceNode->GetIntProperty("Image.Displayed Component", component);
     }
     else
     {
-      image3D = dynamic_cast<mitk::Image*>(node->GetData());
+      image3D = dynamic_cast<Image*>(node->GetData());
       node->GetIntProperty("Image.Displayed Component", component);
     }
   }
   else
   {
-    image3D = dynamic_cast<mitk::Image *>(node->GetData());
+    image3D = dynamic_cast<Image *>(node->GetData());
     node->GetIntProperty("Image.Displayed Component", component);
   }
 
   // get the position and pixel value from the image and build up status bar text
-  auto statusBar = mitk::StatusBar::GetInstance();
+  auto statusBar = StatusBar::GetInstance();
   if (image3D.IsNotNull() && statusBar != nullptr)
   {
     itk::Index<3> p;
@@ -747,9 +747,9 @@ void mitk::DisplayActionEventBroadcast::UpdateStatusbar(StateMachineAction* /*st
     }
     else
     {
-      mitk::ScalarType pixelValue;
+      ScalarType pixelValue;
       mitkPixelTypeMultiplex5(
-        mitk::FastSinglePixelAccess,
+        FastSinglePixelAccess,
         image3D->GetChannelDescriptor().GetPixelType(),
         image3D,
         image3D->GetVolumeData(renderer->GetTimeStep()),
@@ -765,7 +765,7 @@ void mitk::DisplayActionEventBroadcast::UpdateStatusbar(StateMachineAction* /*st
   }
 }
 
-bool mitk::DisplayActionEventBroadcast::GetBoolProperty(mitk::PropertyList::Pointer propertyList, const char* propertyName, bool defaultValue)
+bool mitk::DisplayActionEventBroadcast::GetBoolProperty(PropertyList::Pointer propertyList, const char* propertyName, bool defaultValue)
 {
   std::string valueAsString;
   if (!propertyList->GetStringProperty(propertyName, valueAsString))

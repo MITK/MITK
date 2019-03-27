@@ -118,7 +118,7 @@ namespace mitk
 
     void UpdateStatusbar(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
 
-    bool GetBoolProperty(mitk::PropertyList::Pointer propertyList, const char* propertyName, bool defaultValue);
+    bool GetBoolProperty(PropertyList::Pointer propertyList, const char* propertyName, bool defaultValue);
 
     /**
     * @brief Reference to the service registration of the observer.
@@ -135,19 +135,19 @@ namespace mitk
     /**
     * @brief Coordinate of the mouse pointer at beginning of an interaction (translated to mm unit).
     */
-    mitk::Point2D m_StartCoordinateInMM;
+    Point2D m_StartCoordinateInMM;
     /**
     * @brief Coordinate of the mouse pointer in the last step within an interaction.
     */
-    mitk::Point2D m_LastDisplayCoordinate;
+    Point2D m_LastDisplayCoordinate;
     /**
     * @brief Coordinate of the mouse pointer in the last step within an interaction (translated to mm unit).
     */
-    mitk::Point2D m_LastCoordinateInMM;
+    Point2D m_LastCoordinateInMM;
     /**
     * \brief Current coordinates of the pointer.
     */
-    mitk::Point2D m_CurrentDisplayCoordinate;
+    Point2D m_CurrentDisplayCoordinate;
 
     /**
     * @brief Defines the behavior at the end of a data set.

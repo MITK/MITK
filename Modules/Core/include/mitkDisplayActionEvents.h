@@ -161,7 +161,7 @@ namespace mitk
     typedef DisplayActionEvent Superclass;
 
     DisplaySetLevelWindowEvent() : Superclass() {}
-    DisplaySetLevelWindowEvent(InteractionEvent* interactionEvent, mitk::ScalarType level, mitk::ScalarType window)
+    DisplaySetLevelWindowEvent(InteractionEvent* interactionEvent, ScalarType level, ScalarType window)
       : Superclass(interactionEvent)
       , m_Level(level)
       , m_Window(window)
@@ -174,13 +174,13 @@ namespace mitk
       return dynamic_cast<const Self*>(e) != nullptr;
     }
     virtual itk::EventObject* MakeObject() const override { return new Self(GetInteractionEvent(), m_Level, m_Window); }
-    mitk::ScalarType GetLevel() const { return m_Level; }
-    mitk::ScalarType GetWindow() const { return m_Window; }
+    ScalarType GetLevel() const { return m_Level; }
+    ScalarType GetWindow() const { return m_Window; }
     DisplaySetLevelWindowEvent(const Self& s) : Superclass(s), m_Level(s.GetLevel()), m_Window(s.GetWindow()) {};
 
   private:
-    mitk::ScalarType m_Level;
-    mitk::ScalarType m_Window;
+    ScalarType m_Level;
+    ScalarType m_Window;
   };
 
 } // end namespace

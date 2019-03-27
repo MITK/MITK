@@ -273,7 +273,6 @@ endforeach()
 
 env_option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
 env_option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
-env_option(MITK_USE_CppRestSdk "Use cpp rest sdk library" OFF)
 
 #-----------------------------------------------------------------------------
 # Build configurations
@@ -866,11 +865,6 @@ endif()
 
 if(MITK_USE_OpenCL)
   find_package(OpenCL REQUIRED)
-endif()
-
-if(MITK_USE_CppRestSdk)
-  message(WARNING "Be sure to install cpprestsdk via vcpkg and set cpprestsdk_DIR to /vcpkg/installed/[OS_VERSION]/share/cpprestsdk")
-  find_package(cpprestsdk REQUIRED)
 endif()
 
 # Qt support

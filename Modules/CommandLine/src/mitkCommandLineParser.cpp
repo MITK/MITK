@@ -253,7 +253,15 @@ string CommandLineParserArgumentDescription::helpText()
 
   if (!this->DefaultValue.Empty())
   {
-    text = text + ", (default: " + this->DefaultValue.ToString() + ")";
+    if (this->ValueType == 1)
+    {
+      if (this->DefaultValue.ToString() == "0")
+        text = text + ", (default: false)";
+      else
+        text = text + ", (default: true)";
+    }
+    else
+      text = text + ", (default: " + this->DefaultValue.ToString() + ")";
   }
   string value_type = "Unknown";
   switch (this->ValueType)

@@ -53,7 +53,7 @@ void mitk::RESTManagerQt::HandleDeleteObserver(IRESTObserver *observer, const we
       if (uri.is_empty() || uri.path() == it->first.second)
       {
         int port = it->first.first;
-        bool noObserverForPort = mitk::RESTManager::DeleteObserver(it, uri);
+        bool noObserverForPort = mitk::RESTManager::DeleteObserver(it);
         if (noObserverForPort)
         {
           //  there isn't an observer at this port, delete m_ServerMap entry for this port

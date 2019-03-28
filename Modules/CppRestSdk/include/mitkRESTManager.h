@@ -103,10 +103,9 @@ namespace mitk
      * @brief deletes an observer, called by HandleDeleteObserver method
      *
      * @param it the iterator comparing the observers in HandleDeleteObserver method
-     * @param the uri for which the observer doesn't want to receive requests anymore
      * @return bool if there is another observer under the port
      */
-    bool DeleteObserver(std::map<std::pair<int, utility::string_t>, IRESTObserver *>::iterator &it, const web::uri &uri);
+    bool DeleteObserver(std::map<std::pair<int, utility::string_t>, IRESTObserver *>::iterator &it);
 
     void SetServerMap(const int port, RESTServer *server);
     void DeleteFromServerMap(const int port);

@@ -122,7 +122,7 @@ private:
   void InitializeGUI();
   void InitializeDisplayActionEventHandling();
 
-  void CreateRenderWindowWidget(const std::string& cornerAnnotation = "");
+  void CreateRenderWindowWidget();
   void DestroyRenderWindowWidget();
   void FillMultiWidgetLayout();
 

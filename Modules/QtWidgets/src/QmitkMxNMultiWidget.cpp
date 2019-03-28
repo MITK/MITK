@@ -88,7 +88,7 @@ void QmitkMxNMultiWidget::InitializeRenderWindowWidgets()
 {
   m_MultiWidgetRows = 1;
   m_MultiWidgetColumns = 1;
-  CreateRenderWindowWidget("2015-01-14 - CT");
+  CreateRenderWindowWidget();
   InitializeGUI();
 }
 
@@ -367,12 +367,12 @@ void QmitkMxNMultiWidget::InitializeDisplayActionEventHandling()
   Synchronize(true);
 }
 
-void QmitkMxNMultiWidget::CreateRenderWindowWidget(const std::string& /*cornerAnnotation = ""*/)
+void QmitkMxNMultiWidget::CreateRenderWindowWidget()
 {
   // create the render window widget and connect signals / slots
   QString renderWindowWidgetName = GetNameFromIndex(m_RenderWindowWidgets.size());
   RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, m_DataStorage);
-  renderWindowWidget->SetCornerAnnotationText(renderWindowWidgetName.toStdString()/*cornerAnnotation*/);
+  renderWindowWidget->SetCornerAnnotationText(renderWindowWidgetName.toStdString());
 
   // store the newly created render window widget with the UID
   m_RenderWindowWidgets.insert(std::make_pair(renderWindowWidgetName, renderWindowWidget));

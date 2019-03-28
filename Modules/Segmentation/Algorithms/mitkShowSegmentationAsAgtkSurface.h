@@ -97,7 +97,6 @@ private:
   void operator=(const Self&);
 
   typename FloatImage::Pointer m_FloatTmpImage;
-  double m_LevelValue;
 
   static float m_CurrentProgress; // Used only for vtk filters
   static float m_ProgressWeight;

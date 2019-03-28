@@ -49,7 +49,7 @@ public:
   mitk::IRESTManager *m_Service;
   web::json::value m_Data;
 
-  web::json::value Notify(const web::uri &uri, const web::json::value &data) override
+  web::json::value Notify(const web::uri &, const web::json::value &) override
   {
     return m_Data;
   }

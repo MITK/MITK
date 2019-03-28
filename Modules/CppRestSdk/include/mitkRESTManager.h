@@ -20,8 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIRESTManager.h>
 #include <mitkRESTServer.h>
 
-
-
 namespace mitk
 {
   /**
@@ -50,8 +48,8 @@ namespace mitk
      */
     pplx::task<web::json::value> SendRequest(const web::uri &uri,
                                              const RequestType &type = RequestType::Get,
-                                             const web::json::value *body= nullptr,
-                                             const utility::string_t &filePath = L"") override;
+                                             const web::json::value *body = nullptr,
+                                             const utility::string_t &filePath = {}) override;
 
     /**
      * @brief starts listening for requests if there isn't another observer listening and the port is free
@@ -76,7 +74,7 @@ namespace mitk
      * @param observer the observer which shouldn't receive requests anymore
      * @param uri the uri for which the observer doesn't handle requests anymore (optional)
      */
-    virtual void HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri) override;
+    virtual void HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri = {}) override;
 
     /**
     * @brief internal use only
@@ -108,7 +106,7 @@ namespace mitk
      * @param the uri for which the observer doesn't want to receive requests anymore
      * @return bool if there is another observer under the port
      */
-    bool DeleteObserver(std::map < std::pair<int, utility::string_t>, IRESTObserver *>::iterator &it, const web::uri &uri);
+    bool DeleteObserver(std::map<std::pair<int, utility::string_t>, IRESTObserver *>::iterator &it, const web::uri &uri);
 
     void SetServerMap(const int port, RESTServer *server);
     void DeleteFromServerMap(const int port);

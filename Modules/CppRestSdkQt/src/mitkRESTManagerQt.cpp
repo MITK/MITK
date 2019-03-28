@@ -40,7 +40,7 @@ void mitk::RESTManagerQt::ReceiveRequest(const web::uri &uri, mitk::IRESTObserve
   }
 }
 
-void mitk::RESTManagerQt::HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri = L"")
+void mitk::RESTManagerQt::HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri)
 {
   auto &observerMap = mitk::RESTManager::GetObservers();
   for (auto it = observerMap.begin(); it != observerMap.end();)

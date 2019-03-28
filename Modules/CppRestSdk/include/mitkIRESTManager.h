@@ -67,7 +67,7 @@ namespace mitk
     virtual pplx::task<web::json::value> SendRequest(const web::uri &uri,
                                              const RequestType &type = RequestType::Get,
                                              const web::json::value *body = nullptr,
-                                             const utility::string_t &filePath = L"") = 0;
+                                             const utility::string_t &filePath = {}) = 0;
 
     /**
      * @brief starts listening for requests if there isn't another observer listening and the port is free
@@ -92,7 +92,7 @@ namespace mitk
      * @param observer the observer which shouldn't receive requests anymore
      * @param uri the uri for which the observer doesn't handle requests anymore (optional)
      */
-    virtual void HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri = L"") = 0;
+    virtual void HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri = {}) = 0;
 
     virtual const std::map<int, RESTServer *>& GetServerMap() = 0;
     virtual const std::map<std::pair<int, utility::string_t>, IRESTObserver *>& GetObservers() = 0;

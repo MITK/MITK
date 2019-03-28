@@ -17,7 +17,7 @@ pplx::task<web::json::value> mitk::RESTManager::SendRequest(const web::uri &uri,
   switch (type)
   {
     case RequestType::Get:
-    
+
       if (filePath.empty())
       {
         // no file path specified, starts a normal get request returning the normal json result
@@ -30,9 +30,9 @@ pplx::task<web::json::value> mitk::RESTManager::SendRequest(const web::uri &uri,
         answer = client->Get(uri, filePath);
       }
       break;
-    
+
     case RequestType::Post:
-    
+
       if (nullptr == content)
       {
         // warning because normally you won't create an empty ressource
@@ -40,9 +40,9 @@ pplx::task<web::json::value> mitk::RESTManager::SendRequest(const web::uri &uri,
       }
       answer = client->Post(uri, content);
       break;
-    
+
     case RequestType::Put:
-    
+
       if (nullptr == content)
       {
         // warning because normally you won't empty a ressource
@@ -50,7 +50,7 @@ pplx::task<web::json::value> mitk::RESTManager::SendRequest(const web::uri &uri,
       }
       answer = client->Put(uri, content);
       break;
-    
+
     default:
       mitkThrow() << "Request Type not supported";
       break;
@@ -96,7 +96,7 @@ web::json::value mitk::RESTManager::Handle(const web::uri &uri, const web::json:
   else
   {
     MITK_WARN << "No Observer can handle the data";
-    return NULL;
+    return web::json::value();
   }
 }
 
@@ -202,17 +202,17 @@ bool mitk::RESTManager::DeleteObserver(std::map<std::pair<int, utility::string_t
   return true;
 }
 
-void mitk::RESTManager::SetServerMap(const int port, RESTServer *server) 
+void mitk::RESTManager::SetServerMap(const int port, RESTServer *server)
 {
   m_ServerMap[port] = server;
 }
 
-void mitk::RESTManager::DeleteFromServerMap(const int port) 
+void mitk::RESTManager::DeleteFromServerMap(const int port)
 {
   m_ServerMap.erase(port);
 }
 
-void mitk::RESTManager::SetObservers(const std::pair<int, utility::string_t> key, IRESTObserver *observer) 
+void mitk::RESTManager::SetObservers(const std::pair<int, utility::string_t> key, IRESTObserver *observer)
 {
   m_Observers[key] = observer;
 }

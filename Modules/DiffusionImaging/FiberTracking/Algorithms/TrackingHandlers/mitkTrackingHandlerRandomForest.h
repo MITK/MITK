@@ -78,7 +78,6 @@ public:
 
   void StartTraining();
 
-  void SetMode( MODE m ) override{ m_Mode = m; }
   void SetForest(mitk::TractographyForest::Pointer forest){ m_Forest = forest; }
   void SetMaxNumWmSamples(int num){ m_MaxNumWmSamples=num; }
   void SetNumPreviousDirections( unsigned int num ){ m_NumPreviousDirections=num; }

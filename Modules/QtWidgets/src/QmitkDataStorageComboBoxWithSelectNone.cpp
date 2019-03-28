@@ -148,10 +148,7 @@ void QmitkDataStorageComboBoxWithSelectNone::SetNode(int index, const mitk::Data
     // if node identical, we only update the name in the QComboBoxItem
     if( dataNode == this->m_Nodes.at(index-1 ) )
     {
-      mitk::BaseProperty* nameProperty = dataNode->GetProperty("name");
-      std::string dataNodeNameStr = nameProperty->GetValueAsString();
-
-      this->setItemText(index, QString::fromStdString( dataNodeNameStr) );
+      this->setItemText(index, GetDisplayedNodeName(dataNode));
     }
     else
       QmitkDataStorageComboBox::InsertNode(index - 1, dataNode);

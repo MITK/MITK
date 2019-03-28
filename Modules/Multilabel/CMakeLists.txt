@@ -1,5 +1,5 @@
 MITK_CREATE_MODULE(
-  DEPENDS MitkCore MitkAlgorithmsExt MitkSceneSerializationBase MitkDICOMQI MitkDICOMReader
+  DEPENDS MitkCore MitkAlgorithmsExt MitkSceneSerializationBase MitkDICOMQI
   PACKAGE_DEPENDS PRIVATE ITK|ITKQuadEdgeMesh+ITKAntiAlias+ITKIONRRD
 )
 

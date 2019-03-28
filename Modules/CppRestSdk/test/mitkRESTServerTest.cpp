@@ -14,12 +14,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#ifdef _WIN32
+  #include <Windows.h>
+#endif
+
 // Testing
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
 // MITK includes
-#include "mitkRESTServer.h"
+#include <mitkRESTServer.h>
 
 // VTK includes
 #include <vtkDebugLeaks.h>

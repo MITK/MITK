@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkRESTServer_h
 #define mitkRESTServer_h
 
-#include "cpprest/http_listener.h"
+#include <cpprest/http_listener.h>
 
 #include <mitkIRESTManager.h>
 #include <usGetModuleContext.h>

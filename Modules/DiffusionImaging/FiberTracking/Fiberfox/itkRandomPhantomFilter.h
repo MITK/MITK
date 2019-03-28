@@ -76,7 +76,7 @@ public:
 
   void SetMinTwist(unsigned int MinTwist);
 
-  void SetFixSeed(bool FixSeed);
+  void SetFixSeed(int FixSeed);
 
 protected:
 
@@ -102,7 +102,7 @@ protected:
   unsigned int        m_MinTwist;
   unsigned int        m_MaxTwist;
   mitk::Vector3D      m_VolumeSize;
-  bool                m_FixSeed;
+  int                 m_FixSeed;
   Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen;
 };
 }

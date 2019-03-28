@@ -48,11 +48,6 @@ QmitkDataNodeColorMapAction::QmitkDataNodeColorMapAction(QWidget* parent, berry:
   InitializeAction();
 }
 
-QmitkDataNodeColorMapAction::~QmitkDataNodeColorMapAction()
-{
-  // nothing here
-}
-
 void QmitkDataNodeColorMapAction::InitializeAction()
 {
   setCheckable(true);

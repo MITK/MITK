@@ -33,8 +33,6 @@ public:
   QmitkDataNodeSurfaceRepresentationAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
   QmitkDataNodeSurfaceRepresentationAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
 
-  virtual ~QmitkDataNodeSurfaceRepresentationAction() override;
-
 private Q_SLOTS:
 
   void OnMenuAboutShow();

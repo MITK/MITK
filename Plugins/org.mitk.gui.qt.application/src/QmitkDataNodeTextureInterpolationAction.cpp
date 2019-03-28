@@ -35,11 +35,6 @@ QmitkDataNodeTextureInterpolationAction::QmitkDataNodeTextureInterpolationAction
   InitializeAction();
 }
 
-QmitkDataNodeTextureInterpolationAction::~QmitkDataNodeTextureInterpolationAction()
-{
-  // nothing here
-}
-
 void QmitkDataNodeTextureInterpolationAction::InitializeAction()
 {
   setCheckable(true);

@@ -37,11 +37,6 @@ QmitkDataNodeOpacityAction::QmitkDataNodeOpacityAction(QWidget* parent, berry::I
   InitializeAction();
 }
 
-QmitkDataNodeOpacityAction::~QmitkDataNodeOpacityAction()
-{
-  // nothing here
-}
-
 void QmitkDataNodeOpacityAction::InitializeAction()
 {
   m_OpacitySlider = new QSlider;

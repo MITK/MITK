@@ -45,11 +45,6 @@ QmitkDataNodeComponentAction::QmitkDataNodeComponentAction(QWidget* parent, berr
   InitializeAction();
 }
 
-QmitkDataNodeComponentAction::~QmitkDataNodeComponentAction()
-{
-  // nothing here
-}
-
 void QmitkDataNodeComponentAction::InitializeAction()
 {
   setCheckable(true);

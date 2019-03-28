@@ -37,11 +37,6 @@ QmitkDataNodeShowDetailsAction::QmitkDataNodeShowDetailsAction(QWidget* parent, 
   InitializeAction();
 }
 
-QmitkDataNodeShowDetailsAction::~QmitkDataNodeShowDetailsAction()
-{
-  // nothing here
-}
-
 void QmitkDataNodeShowDetailsAction::InitializeAction()
 {
   connect(this, &QmitkDataNodeShowDetailsAction::triggered, this, &QmitkDataNodeShowDetailsAction::OnActionTriggered);

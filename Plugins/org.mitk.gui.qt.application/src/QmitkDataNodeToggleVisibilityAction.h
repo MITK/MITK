@@ -41,8 +41,6 @@ public:
   QmitkDataNodeToggleVisibilityAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
   QmitkDataNodeToggleVisibilityAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
 
-  virtual ~QmitkDataNodeToggleVisibilityAction() override;
-
 private Q_SLOTS:
 
   void OnActionTriggered(bool);

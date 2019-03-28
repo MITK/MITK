@@ -42,11 +42,6 @@ QmitkDataNodeReinitAction::QmitkDataNodeReinitAction(QWidget* parent, berry::IWo
   InitializeAction();
 }
 
-QmitkDataNodeReinitAction::~QmitkDataNodeReinitAction()
-{
-  // nothing here
-}
-
 void QmitkDataNodeReinitAction::InitializeAction()
 {
   connect(this, &QmitkDataNodeReinitAction::triggered, this, &QmitkDataNodeReinitAction::OnActionTriggered);

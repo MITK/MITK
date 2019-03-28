@@ -33,8 +33,6 @@ public:
   QmitkDataNodeHideAllNodesAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
   QmitkDataNodeHideAllNodesAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
 
-  virtual ~QmitkDataNodeHideAllNodesAction() override;
-
 private Q_SLOTS:
 
   void OnActionTriggered(bool);

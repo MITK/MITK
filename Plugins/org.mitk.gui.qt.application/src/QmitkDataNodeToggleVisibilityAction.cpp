@@ -79,11 +79,6 @@ QmitkDataNodeToggleVisibilityAction::QmitkDataNodeToggleVisibilityAction(QWidget
   InitializeAction();
 }
 
-QmitkDataNodeToggleVisibilityAction::~QmitkDataNodeToggleVisibilityAction()
-{
-  // nothing here
-}
-
 void QmitkDataNodeToggleVisibilityAction::InitializeAction()
 {
   connect(this, &QmitkDataNodeToggleVisibilityAction::triggered, this, &QmitkDataNodeToggleVisibilityAction::OnActionTriggered);

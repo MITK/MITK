@@ -38,11 +38,6 @@ QmitkDataNodeColorAction::QmitkDataNodeColorAction(QWidget* parent, berry::IWork
   InitializeAction();
 }
 
-QmitkDataNodeColorAction::~QmitkDataNodeColorAction()
-{
-  // nothing here
-}
-
 void QmitkDataNodeColorAction::InitializeAction()
 {
   m_ColorButton = new QPushButton;

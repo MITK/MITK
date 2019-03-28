@@ -35,11 +35,6 @@ QmitkDataNodeShowSelectedNodesAction::QmitkDataNodeShowSelectedNodesAction(QWidg
   InitializeAction();
 }
 
-QmitkDataNodeShowSelectedNodesAction::~QmitkDataNodeShowSelectedNodesAction()
-{
-  // nothing here
-}
-
 void QmitkDataNodeShowSelectedNodesAction::InitializeAction()
 {
   connect(this, &QmitkDataNodeShowSelectedNodesAction::triggered, this, &QmitkDataNodeShowSelectedNodesAction::OnActionTriggered);

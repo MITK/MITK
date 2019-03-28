@@ -33,8 +33,6 @@ public:
   QmitkDataNodeReinitAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
   QmitkDataNodeReinitAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
 
-  virtual ~QmitkDataNodeReinitAction() override;
-
 private Q_SLOTS:
 
   void OnActionTriggered(bool);

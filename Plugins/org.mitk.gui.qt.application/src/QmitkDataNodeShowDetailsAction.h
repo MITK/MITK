@@ -33,8 +33,6 @@ public:
   QmitkDataNodeShowDetailsAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
   QmitkDataNodeShowDetailsAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
 
-  virtual ~QmitkDataNodeShowDetailsAction() override;
-
 private Q_SLOTS:
 
   void OnActionTriggered(bool);

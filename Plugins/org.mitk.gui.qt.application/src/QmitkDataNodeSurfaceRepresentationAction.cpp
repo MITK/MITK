@@ -39,11 +39,6 @@ QmitkDataNodeSurfaceRepresentationAction::QmitkDataNodeSurfaceRepresentationActi
   InitializeAction();
 }
 
-QmitkDataNodeSurfaceRepresentationAction::~QmitkDataNodeSurfaceRepresentationAction()
-{
-  // nothing here
-}
-
 void QmitkDataNodeSurfaceRepresentationAction::InitializeAction()
 {
   setCheckable(true);

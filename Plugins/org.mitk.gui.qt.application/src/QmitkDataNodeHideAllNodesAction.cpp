@@ -35,11 +35,6 @@ QmitkDataNodeHideAllNodesAction::QmitkDataNodeHideAllNodesAction(QWidget* parent
   InitializeAction();
 }
 
-QmitkDataNodeHideAllNodesAction::~QmitkDataNodeHideAllNodesAction()
-{
-  // nothing here
-}
-
 void QmitkDataNodeHideAllNodesAction::InitializeAction()
 {
   connect(this, &QmitkDataNodeHideAllNodesAction::triggered, this, &QmitkDataNodeHideAllNodesAction::OnActionTriggered);

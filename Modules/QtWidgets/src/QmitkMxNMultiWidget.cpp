@@ -64,8 +64,6 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
   , m_DisplayActionEventHandler(nullptr)
   , m_DataStorage(nullptr)
 {
-  // create widget manually
-  // create and set layout
   InitializeGUI();
   InitializeDisplayActionEventHandling();
   resize(QSize(364, 477).expandedTo(minimumSizeHint()));
@@ -88,7 +86,6 @@ void QmitkMxNMultiWidget::SetDataStorage(mitk::DataStorage* dataStorage)
 
 void QmitkMxNMultiWidget::InitializeRenderWindowWidgets()
 {
-  // create render window widget initially
   m_MultiWidgetRows = 1;
   m_MultiWidgetColumns = 1;
   CreateRenderWindowWidget("2015-01-14 - CT");
@@ -295,25 +292,7 @@ void QmitkMxNMultiWidget::ActivateAllCrosshairs(bool activate)
 
 const mitk::Point3D QmitkMxNMultiWidget::GetSelectedPosition(const QString& /*widgetName*/) const
 {
-  /*
-  const mitk::PlaneGeometry *plane1 = mitkWidget1->GetSliceNavigationController()->GetCurrentPlaneGeometry();
-  const mitk::PlaneGeometry *plane2 = mitkWidget2->GetSliceNavigationController()->GetCurrentPlaneGeometry();
-  const mitk::PlaneGeometry *plane3 = mitkWidget3->GetSliceNavigationController()->GetCurrentPlaneGeometry();
-
-  mitk::Line3D line;
-  if ((plane1 != NULL) && (plane2 != NULL) && (plane1->IntersectionLine(plane2, line)))
-  {
-  mitk::Point3D point;
-  if ((plane3 != NULL) && (plane3->IntersectionPoint(line, point)))
-  {
-  return point;
-  }
-  }
-  // TODO BUG POSITIONTRACKER;
-  mitk::Point3D p;
-  return p;
-  // return m_LastLeftClickPositionSupplier->GetCurrentPoint();
-  */
+  // see T26208
   return mitk::Point3D();
 }
 

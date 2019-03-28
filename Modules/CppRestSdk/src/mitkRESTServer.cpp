@@ -28,7 +28,7 @@ void mitk::RESTServer::CloseListener()
   m_Listener.close().wait();
 }
 
-web::uri mitk::RESTServer::GetUri() 
+web::uri mitk::RESTServer::GetUri()
 {
   return m_Uri;
 }
@@ -41,9 +41,9 @@ void mitk::RESTServer::HandleGet(const MitkRequest &request)
   build.append(request.absolute_uri());
   auto uriStringT = build.to_uri().to_string();
 
-  MITK_INFO << "Get Request for server at port " << port << " Exact request uri: " 
+  MITK_INFO << "Get Request for server at port " << port << " Exact request uri: "
     << mitk::RESTUtil::convertToUtf8(uriStringT);
-  
+
   web::json::value content;
   //get RESTManager as microservice to call th Handle method of the manager
   auto context = us::GetModuleContext();
@@ -59,7 +59,7 @@ void mitk::RESTServer::HandleGet(const MitkRequest &request)
       content = managerService->Handle(build.to_uri(), data);
     }
   }
-  if (content!=NULL)
+  if (!content.is_null())
   {
     //content handled by observer
     request.reply(MitkRestStatusCodes::OK, content);

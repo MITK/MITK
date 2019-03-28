@@ -60,7 +60,7 @@ namespace mitk
      * @param observer the observer which shouldn't receive requests anymore
      * @param uri the uri for which the observer doesn't handle requests anymore (optional)
      */
-    void HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri) override;
+    void HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri = {}) override;
 
   private:
     std::map<int, QThread *> m_ServerThreadMap; // Map with threads for servers

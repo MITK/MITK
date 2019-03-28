@@ -37,9 +37,9 @@ pplx::task<web::json::value> mitk::RESTClient::Get(const web::uri &uri)
         //parse content type to application/json if it isn't already
         //this is important if the content type is e.g. application/dicom+json
         utility::string_t requestContentType = response.headers().content_type();
-        if (L"application/json" != requestContentType)
+        if (_XPLATSTR("application/json") != requestContentType)
         {
-          response.headers().set_content_type(L"application/json");
+          response.headers().set_content_type(_XPLATSTR("application/json"));
         }
         //return json answer
         return response.extract_json().get();
@@ -135,9 +135,9 @@ pplx::task<web::json::value> mitk::RESTClient::Put(const web::uri &uri, const we
         // parse content type to application/json if it isn't already
         // this is important if the content type is e.g. application/dicom+json
         utility::string_t requestContentType = response.headers().content_type();
-        if (L"application/json" != requestContentType)
+        if (_XPLATSTR("application/json") != requestContentType)
         {
-          response.headers().set_content_type(L"application/json");
+          response.headers().set_content_type(_XPLATSTR("application/json"));
         }
         // return json answer
         return response.extract_json().get();
@@ -190,9 +190,9 @@ pplx::task<web::json::value> mitk::RESTClient::Post(const web::uri &uri, const w
         // parse content type to application/json if it isn't already
         // this is important if the content type is e.g. application/dicom+json
         utility::string_t requestContentType = response.headers().content_type();
-        if (L"application/json" != requestContentType)
+        if (_XPLATSTR("application/json") != requestContentType)
         {
-          response.headers().set_content_type(L"application/json");
+          response.headers().set_content_type(_XPLATSTR("application/json"));
         }
         // return json answer
         return response.extract_json().get();

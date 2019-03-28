@@ -100,7 +100,7 @@ web::json::value mitk::RESTManager::Handle(const web::uri &uri, const web::json:
   }
 }
 
-void mitk::RESTManager::HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri = L"")
+void mitk::RESTManager::HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri)
 {
   for (auto it = m_Observers.begin(); it != m_Observers.end();)
   {

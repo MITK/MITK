@@ -71,11 +71,6 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
   resize(QSize(364, 477).expandedTo(minimumSizeHint()));
 }
 
-QmitkMxNMultiWidget::~QmitkMxNMultiWidget()
-{
-  // nothing here
-}
-
 void QmitkMxNMultiWidget::SetDataStorage(mitk::DataStorage* dataStorage)
 {
   if (dataStorage == m_DataStorage)

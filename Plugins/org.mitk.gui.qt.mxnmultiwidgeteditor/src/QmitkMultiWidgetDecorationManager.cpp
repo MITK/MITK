@@ -31,9 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkMultiWidgetDecorationManager::QmitkMultiWidgetDecorationManager(QmitkMxNMultiWidget* mxnMultiWidget)
   : m_MxNMultiWidget(mxnMultiWidget)
   , m_LogoAnnotation(mitk::LogoAnnotation::New())
-{
-  // nothing here
-}
+{}
 
 void QmitkMultiWidgetDecorationManager::DecorationPreferencesChanged(const berry::IBerryPreferences* preferences)
 {

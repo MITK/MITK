@@ -40,7 +40,7 @@ public:
   static const QString EDITOR_ID;
 
   QmitkMxNMultiWidgetEditor();
-  ~QmitkMxNMultiWidgetEditor();
+  virtual ~QmitkMxNMultiWidgetEditor();
 
   /**
   * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart

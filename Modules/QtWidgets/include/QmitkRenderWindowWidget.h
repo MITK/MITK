@@ -53,7 +53,7 @@ public:
     mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard
   );
 
-  ~QmitkRenderWindowWidget() override;
+  virtual ~QmitkRenderWindowWidget();
 
   void SetDataStorage(mitk::DataStorage* dataStorage);
 

@@ -38,7 +38,7 @@ class QmitkMxNMultiWidgetEditor::Impl final
 public:
 
   Impl();
-  ~Impl();
+  ~Impl() = default;
 
   QmitkMxNMultiWidget* m_MxNMultiWidget;
   QmitkInteractionSchemeToolBar* m_InteractionSchemeToolBar;
@@ -55,19 +55,12 @@ QmitkMxNMultiWidgetEditor::Impl::Impl()
   // nothing here
 }
 
-QmitkMxNMultiWidgetEditor::Impl::~Impl()
-{
-  // nothing here
-}
-
 //////////////////////////////////////////////////////////////////////////
 // QmitkMxNMultiWidgetEditor
 //////////////////////////////////////////////////////////////////////////
 QmitkMxNMultiWidgetEditor::QmitkMxNMultiWidgetEditor()
   : m_Impl(new Impl())
-{
-  // nothing here
-}
+{}
 
 QmitkMxNMultiWidgetEditor::~QmitkMxNMultiWidgetEditor()
 {

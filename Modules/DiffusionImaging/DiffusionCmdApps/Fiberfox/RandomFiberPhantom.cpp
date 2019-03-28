@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
   parser.addArgument("max_twist", "", mitkCommandLineParser::Int, "", "", 30);
   parser.addArgument("compress", "", mitkCommandLineParser::Float, "Compress:", "compress fiber using the given error threshold (in mm)", 0.1);
   parser.addArgument("", "o", mitkCommandLineParser::String, "Output folder:", "output folder", us::Any(), false, false, false, mitkCommandLineParser::Output);
-  parser.addArgument("fix_seed", "", mitkCommandLineParser::Bool, "Fix random seed:", "produce same random values on each ru.", us::Any());
+  parser.addArgument("fix_seed", "", mitkCommandLineParser::Int, "Fix random seed:", "if >= 0, produce same random values on each run using this seed.", -1);
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -116,9 +116,9 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("max_twist"))
     max_twist = us::any_cast<int>(parsedArgs["max_twist"]);
 
-  bool fix_seed = false;
+  int fix_seed = -1;
   if (parsedArgs.count("fix_seed"))
-    fix_seed = us::any_cast<bool>(parsedArgs["fix_seed"]);
+    fix_seed = us::any_cast<int>(parsedArgs["fix_seed"]);
 
   try
   {

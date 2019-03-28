@@ -36,7 +36,7 @@ RandomPhantomFilter::RandomPhantomFilter()
   , m_StepSizeMax(30)
   , m_MinTwist(10)
   , m_MaxTwist(30)
-  , m_FixSeed(false)
+  , m_FixSeed(-1)
 {
   m_VolumeSize[0] = 500;
   m_VolumeSize[1] = 500;
@@ -234,7 +234,7 @@ bool RandomPhantomFilter::IsInVolume(mitk::Vector3D pos)
   return false;
 }
 
-void RandomPhantomFilter::SetFixSeed(bool FixSeed)
+void RandomPhantomFilter::SetFixSeed(int FixSeed)
 {
   m_FixSeed = FixSeed;
 }
@@ -297,8 +297,8 @@ void RandomPhantomFilter::SetStartRadiusMin(unsigned int StartRadiusMin)
 void RandomPhantomFilter::GenerateData()
 {
   randGen = Statistics::MersenneTwisterRandomVariateGenerator::New();
-  if (m_FixSeed)
-    randGen->SetSeed(42);
+  if (m_FixSeed>=0)
+    randGen->SetSeed(m_FixSeed);
   else
     randGen->SetSeed();
 

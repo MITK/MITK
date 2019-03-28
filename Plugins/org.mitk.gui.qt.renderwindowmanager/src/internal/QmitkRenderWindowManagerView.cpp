@@ -61,7 +61,7 @@ void QmitkRenderWindowManagerView::CreateQtPartControl(QWidget* parent)
   m_Controls.setupUi(parent);
 
   // add custom render window manager UI widget to the 'renderWindowManagerTab'
-  m_RenderWindowInspector = new QmitkDataStorageRenderWindowInspector(parent);
+  m_RenderWindowInspector = new QmitkRenderWindowDataStorageInspector(parent);
   m_RenderWindowInspector->SetDataStorage(GetDataStorage());
   m_RenderWindowInspector->setObjectName(QStringLiteral("m_RenderWindowManipulatorWidget"));
   m_Controls.verticalLayout->addWidget(m_RenderWindowInspector);

@@ -33,14 +33,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 /*
 * @brief The 'QmitkDataStorageRenderWindowListModel' is a list model derived from the 'QmitkAbstractDataStorageModel'.
 */
-class MITKRENDERWINDOWMANAGERUI_EXPORT QmitkDataStorageRenderWindowListModel : public QmitkAbstractDataStorageModel
+class MITKRENDERWINDOWMANAGERUI_EXPORT QmitkRenderWindowDataStorageListModel : public QmitkAbstractDataStorageModel
 {
   Q_OBJECT
 
 public:
 
-  QmitkDataStorageRenderWindowListModel(QObject* parent = nullptr);
-  ~QmitkDataStorageRenderWindowListModel() override;
+  QmitkRenderWindowDataStorageListModel(QObject* parent = nullptr);
 
   // override from 'QmitkAbstractDataStorageModel'
   /**

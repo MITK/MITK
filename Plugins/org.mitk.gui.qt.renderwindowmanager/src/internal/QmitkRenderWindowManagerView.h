@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkRenderWindowManagerControls.h"
 
 // render window manager UI module
-#include <QmitkDataStorageRenderWindowInspector.h>
+#include <QmitkRenderWindowDataStorageInspector.h>
 
 // mitk gui qt application
 #include <QmitkDataNodeContextMenu.h>
@@ -71,7 +71,7 @@ private:
 
   mitk::IRenderWindowPart* m_RenderWindowPart;
 
-  QmitkDataStorageRenderWindowInspector* m_RenderWindowInspector;
+  QmitkRenderWindowDataStorageInspector* m_RenderWindowInspector;
   QAbstractItemView* m_InspectorView;
   QmitkDataNodeContextMenu* m_DataNodeContextMenu;
 

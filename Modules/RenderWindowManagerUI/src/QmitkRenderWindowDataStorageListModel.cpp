@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 // render window manager UI module
-#include "QmitkDataStorageRenderWindowListModel.h"
+#include "QmitkRenderWindowDataStorageListModel.h"
 
 // qt widgets module
 #include "QmitkCustomVariants.h"
@@ -23,48 +23,42 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkMimeTypes.h"
 #include "QmitkNodeDescriptorManager.h"
 
-QmitkDataStorageRenderWindowListModel::QmitkDataStorageRenderWindowListModel(QObject* parent /*= nullptr*/)
+QmitkRenderWindowDataStorageListModel::QmitkRenderWindowDataStorageListModel(QObject* parent /*= nullptr*/)
   : QmitkAbstractDataStorageModel(parent)
 {
   m_RenderWindowLayerController = std::make_unique<mitk::RenderWindowLayerController>();
 }
 
-QmitkDataStorageRenderWindowListModel::~QmitkDataStorageRenderWindowListModel()
-{
-  // nothing here
-}
-
-void QmitkDataStorageRenderWindowListModel::DataStorageChanged()
+void QmitkRenderWindowDataStorageListModel::DataStorageChanged()
 {
   m_RenderWindowLayerController->SetDataStorage(m_DataStorage.Lock());
   UpdateModelData();
 }
 
-void QmitkDataStorageRenderWindowListModel::NodePredicateChanged()
+void QmitkRenderWindowDataStorageListModel::NodePredicateChanged()
 {
   UpdateModelData();
 }
 
-void QmitkDataStorageRenderWindowListModel::NodeAdded(const mitk::DataNode* node)
+void QmitkRenderWindowDataStorageListModel::NodeAdded(const mitk::DataNode* node)
 {
   // add a node to each render window specific list (or to a global list initially)
   AddDataNodeToAllRenderer(const_cast<mitk::DataNode*>(node));
   UpdateModelData();
 }
 
-void QmitkDataStorageRenderWindowListModel::NodeChanged(const mitk::DataNode* /*node*/)
+void QmitkRenderWindowDataStorageListModel::NodeChanged(const mitk::DataNode* /*node*/)
 {
   // nothing here, since the "'NodeChanged'-event is currently sent far too often
-  //UpdateModelData();
 }
 
-void QmitkDataStorageRenderWindowListModel::NodeRemoved(const mitk::DataNode* /*node*/)
+void QmitkRenderWindowDataStorageListModel::NodeRemoved(const mitk::DataNode* /*node*/)
 {
   // update model data to create a new list without the removed data node
   UpdateModelData();
 }
 
-QModelIndex QmitkDataStorageRenderWindowListModel::index(int row, int column, const QModelIndex& parent) const
+QModelIndex QmitkRenderWindowDataStorageListModel::index(int row, int column, const QModelIndex& parent) const
 {
   bool hasIndex = this->hasIndex(row, column, parent);
   if (hasIndex)
@@ -75,12 +69,12 @@ QModelIndex QmitkDataStorageRenderWindowListModel::index(int row, int column, co
   return QModelIndex();
 }
 
-QModelIndex QmitkDataStorageRenderWindowListModel::parent(const QModelIndex& /*child*/) const
+QModelIndex QmitkRenderWindowDataStorageListModel::parent(const QModelIndex& /*child*/) const
 {
   return QModelIndex();
 }
 
-int QmitkDataStorageRenderWindowListModel::rowCount(const QModelIndex& parent /*= QModelIndex()*/) const
+int QmitkRenderWindowDataStorageListModel::rowCount(const QModelIndex& parent /*= QModelIndex()*/) const
 {
   if (parent.isValid())
   {
@@ -90,7 +84,7 @@ int QmitkDataStorageRenderWindowListModel::rowCount(const QModelIndex& parent /*
   return static_cast<int>(m_LayerStack.size());
 }
 
-int QmitkDataStorageRenderWindowListModel::columnCount(const QModelIndex& parent /*= QModelIndex()*/) const
+int QmitkRenderWindowDataStorageListModel::columnCount(const QModelIndex& parent /*= QModelIndex()*/) const
 {
   if (parent.isValid())
   {
@@ -100,7 +94,7 @@ int QmitkDataStorageRenderWindowListModel::columnCount(const QModelIndex& parent
   return 1;
 }
 
-QVariant QmitkDataStorageRenderWindowListModel::data(const QModelIndex& index, int role) const
+QVariant QmitkRenderWindowDataStorageListModel::data(const QModelIndex& index, int role) const
 {
   if (m_BaseRenderer.IsExpired())
   {
@@ -163,7 +157,7 @@ QVariant QmitkDataStorageRenderWindowListModel::data(const QModelIndex& index, i
   return QVariant();
 }
 
-bool QmitkDataStorageRenderWindowListModel::setData(const QModelIndex& index, const QVariant& value, int role /*= Qt::EditRole*/)
+bool QmitkRenderWindowDataStorageListModel::setData(const QModelIndex& index, const QVariant& value, int role /*= Qt::EditRole*/)
 {
   if (m_BaseRenderer.IsExpired())
   {
@@ -198,7 +192,7 @@ bool QmitkDataStorageRenderWindowListModel::setData(const QModelIndex& index, co
   return false;
 }
 
-Qt::ItemFlags QmitkDataStorageRenderWindowListModel::flags(const QModelIndex &index) const
+Qt::ItemFlags QmitkRenderWindowDataStorageListModel::flags(const QModelIndex &index) const
 {
   if (this != index.model())
   {
@@ -213,24 +207,24 @@ Qt::ItemFlags QmitkDataStorageRenderWindowListModel::flags(const QModelIndex &in
   return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
 }
 
-Qt::DropActions QmitkDataStorageRenderWindowListModel::supportedDropActions() const
+Qt::DropActions QmitkRenderWindowDataStorageListModel::supportedDropActions() const
 {
   return Qt::CopyAction | Qt::MoveAction;
 }
 
-Qt::DropActions QmitkDataStorageRenderWindowListModel::supportedDragActions() const
+Qt::DropActions QmitkRenderWindowDataStorageListModel::supportedDragActions() const
 {
   return Qt::CopyAction | Qt::MoveAction;
 }
 
-QStringList QmitkDataStorageRenderWindowListModel::mimeTypes() const
+QStringList QmitkRenderWindowDataStorageListModel::mimeTypes() const
 {
   QStringList types = QAbstractItemModel::mimeTypes();
   types << QmitkMimeTypes::DataNodePtrs;
   return types;
 }
 
-QMimeData* QmitkDataStorageRenderWindowListModel::mimeData(const QModelIndexList& indexes) const
+QMimeData* QmitkRenderWindowDataStorageListModel::mimeData(const QModelIndexList& indexes) const
 {
   QMimeData* mimeData = new QMimeData();
   QByteArray encodedData;
@@ -250,7 +244,7 @@ QMimeData* QmitkDataStorageRenderWindowListModel::mimeData(const QModelIndexList
   return mimeData;
 }
 
-bool QmitkDataStorageRenderWindowListModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int /*row*/, int column, const QModelIndex& parent)
+bool QmitkRenderWindowDataStorageListModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int /*row*/, int column, const QModelIndex& parent)
 {
   if (m_BaseRenderer.IsExpired())
   {
@@ -296,7 +290,7 @@ bool QmitkDataStorageRenderWindowListModel::dropMimeData(const QMimeData* data, 
   return false;
 }
 
-void QmitkDataStorageRenderWindowListModel::SetControlledRenderer(mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer)
+void QmitkRenderWindowDataStorageListModel::SetControlledRenderer(mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer)
 {
   m_RenderWindowLayerController->SetControlledRenderer(controlledRenderer);
 
@@ -317,7 +311,7 @@ void QmitkDataStorageRenderWindowListModel::SetControlledRenderer(mitk::RenderWi
   }
 }
 
-void QmitkDataStorageRenderWindowListModel::SetCurrentRenderer(mitk::BaseRenderer* baseRenderer)
+void QmitkRenderWindowDataStorageListModel::SetCurrentRenderer(mitk::BaseRenderer* baseRenderer)
 {
   if (m_BaseRenderer == baseRenderer)
   {
@@ -331,7 +325,7 @@ void QmitkDataStorageRenderWindowListModel::SetCurrentRenderer(mitk::BaseRendere
   }
 }
 
-mitk::BaseRenderer* QmitkDataStorageRenderWindowListModel::GetCurrentRenderer() const
+mitk::BaseRenderer* QmitkRenderWindowDataStorageListModel::GetCurrentRenderer() const
 {
   if (m_BaseRenderer.IsExpired())
   {
@@ -341,12 +335,12 @@ mitk::BaseRenderer* QmitkDataStorageRenderWindowListModel::GetCurrentRenderer() 
   return m_BaseRenderer.Lock().GetPointer();
 }
 
-void QmitkDataStorageRenderWindowListModel::AddDataNodeToAllRenderer(mitk::DataNode* dataNode)
+void QmitkRenderWindowDataStorageListModel::AddDataNodeToAllRenderer(mitk::DataNode* dataNode)
 {
   m_RenderWindowLayerController->InsertLayerNode(dataNode);
 }
 
-void QmitkDataStorageRenderWindowListModel::UpdateModelData()
+void QmitkRenderWindowDataStorageListModel::UpdateModelData()
 {
   if (!m_DataStorage.IsExpired())
   {

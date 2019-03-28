@@ -14,35 +14,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKDATASTORAGERENDERWINDOWINSPECTOR_H
-#define QMITKDATASTORAGERENDERWINDOWINSPECTOR_H
+#ifndef QMITKRENDERWINDOWDATASTORAGEINSPECTOR_H
+#define QMITKRENDERWINDOWDATASTORAGEWINSPECTOR_H
 
 // render window manager UI module
 #include "MitkRenderWindowManagerUIExports.h"
-#include "ui_QmitkDataStorageRenderWindowInspector.h"
+#include "ui_QmitkRenderWindowDataStorageInspector.h"
 
 // render window manager module
+#include <mitkRenderWindowLayerController.h>
 #include <mitkRenderWindowViewDirectionController.h>
-#include <QmitkDataStorageRenderWindowListModel.h>
+#include <QmitkRenderWindowDataStorageListModel.h>
 
 // qt widgets module
 #include <QmitkAbstractDataStorageInspector.h>
 
 /**
-* The 'QmitkDataStorageRenderWindowInspector' offers a GUI to manipulate the base renderer / render windows of the MITK workbench.
-* The widgets supports adding a layer to an active render window, moving layers up and down, removing layers,
-* resetting layers (hiding them) or removing all layers at once.
+* The 'QmitkRenderWindowDataStorageInspector' offers a GUI to manipulate the base renderer / render windows of the MITK workbench.
 *
 * In order to use this widget, a (e.g.) plugin has to set the controlled renderer, which will be forwarded to
 * a render window view direction controller.
 */
-class MITKRENDERWINDOWMANAGERUI_EXPORT QmitkDataStorageRenderWindowInspector : public QmitkAbstractDataStorageInspector
+class MITKRENDERWINDOWMANAGERUI_EXPORT QmitkRenderWindowDataStorageInspector : public QmitkAbstractDataStorageInspector
 {
   Q_OBJECT
 
 public:
 
-  QmitkDataStorageRenderWindowInspector(QWidget* parent = nullptr);
+  QmitkRenderWindowDataStorageInspector(QWidget* parent = nullptr);
 
   // override from 'QmitkAbstractDataStorageInspector'
   /**
@@ -85,10 +84,11 @@ private:
   virtual void Initialize() override;
   void SetUpConnections();
 
-  Ui::QmitkDataStorageRenderWindowInspector m_Controls;
+  Ui::QmitkRenderWindowDataStorageInspector m_Controls;
 
-  std::unique_ptr<QmitkDataStorageRenderWindowListModel> m_StorageModel;
+  std::unique_ptr<QmitkRenderWindowDataStorageListModel> m_StorageModel;
+  std::unique_ptr<mitk::RenderWindowLayerController> m_RenderWindowLayerController;
   std::unique_ptr<mitk::RenderWindowViewDirectionController> m_RenderWindowViewDirectionController;
 };
 
-#endif // QMITKDATASTORAGERENDERWINDOWINSPECTOR_H
+#endif // QMITKRENDERWINDOWDATASTORAGEINSPECTOR_H

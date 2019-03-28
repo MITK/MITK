@@ -1,19 +1,19 @@
 set(H_FILES
-  include/QmitkDataStorageRenderWindowInspector.h
-  include/QmitkDataStorageRenderWindowListModel.h
+  include/QmitkRenderWindowDataStorageInspector.h
+  include/QmitkRenderWindowDataStorageListModel.h
 )
 
 set(CPP_FILES
-  QmitkDataStorageRenderWindowInspector.cpp
-  QmitkDataStorageRenderWindowListModel.cpp
+  QmitkRenderWindowDataStorageInspector.cpp
+  QmitkRenderWindowDataStorageListModel.cpp
 
 )
 
 set(MOC_H_FILES
-  include/QmitkDataStorageRenderWindowInspector.h
-  include/QmitkDataStorageRenderWindowListModel.h
+  include/QmitkRenderWindowDataStorageInspector.h
+  include/QmitkRenderWindowDataStorageListModel.h
 )
 
 set(UI_FILES
-  src/QmitkDataStorageRenderWindowInspector.ui
+  src/QmitkRenderWindowDataStorageInspector.ui
 )

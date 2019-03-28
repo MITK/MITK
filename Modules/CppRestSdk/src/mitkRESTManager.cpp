@@ -112,7 +112,7 @@ void mitk::RESTManager::HandleDeleteObserver(IRESTObserver *observer, const web:
       if (uri.is_empty() || uri.path() == it->first.second)
       {
         int port = it->first.first;
-        bool noObserverForPort = this->DeleteObserver(it, uri);
+        bool noObserverForPort = this->DeleteObserver(it);
         if (noObserverForPort)
         {
           //  there isn't an observer at this port, delete m_ServerMap entry for this port
@@ -179,26 +179,21 @@ void mitk::RESTManager::RequestForATakenPort(const web::uri &uri, IRESTObserver 
   }
 }
 
-bool mitk::RESTManager::DeleteObserver(std::map<std::pair<int, utility::string_t>, IRESTObserver *>::iterator &it,
-                                       const web::uri &uri)
+bool mitk::RESTManager::DeleteObserver(std::map<std::pair<int, utility::string_t>, IRESTObserver *>::iterator &it)
 {
-  // if yes
-  // 1. store port and path in a temporary variable
-  // (path is only needed to create a key for info output)
   int port = it->first.first;
-  utility::string_t path = it->first.second;
-  std::pair<int, utility::string_t> key(port, path);
-  // 2. delete map entry
+
   it = m_Observers.erase(it);
-  // 3. check, if there is another observer under this port in observer map (with bool flag)
-  for (auto o : m_Observers)
+
+  for (auto observer : m_Observers)
   {
-    if (port == o.first.first)
+    if (port == observer.first.first)
     {
       // there still exists an observer for this port
       return false;
     }
   }
+
   return true;
 }
 

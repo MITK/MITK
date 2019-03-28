@@ -43,8 +43,15 @@ namespace mitk
 
 /**
 * @brief The 'QmitkMxNMultiWidget' is a QWidget that is used to display multiple render windows at once.
+*        Render windows can dynamically be added and removed to change the layout of the multi widget. This
+*        is done by using the 'ResetLayout'-function to define a layout. This will automatically add or remove
+*        the appropriate number of render window widgets.
+*        Several functions exist to retrieve specific render window(s) (widgets) by their position or name.
 *
-*     Render windows can dynamically be added and removed to change the layout of the multi widget.
+*        The class uses the 'DisplayActionEventBroadcast' and 'DisplayActionEventHandler' classes to
+*        load a state machine and set an event configuration. PACS mode is used per default.
+*        Using the 'Synchronize' function the user can enable or disable the synchronization of display action events.
+*        See 'DisplayActionEventFunctions'-class for the different synchronized and non-synchronized functions used.
 */
 class MITKQTWIDGETS_EXPORT QmitkMxNMultiWidget : public QWidget
 {

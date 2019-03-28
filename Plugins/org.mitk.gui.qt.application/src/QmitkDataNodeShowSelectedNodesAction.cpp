@@ -52,15 +52,7 @@ void QmitkDataNodeShowSelectedNodesAction::OnActionTriggered(bool /*checked*/)
     return;
   }
 
-  mitk::BaseRenderer* baseRenderer;
-  if (m_BaseRenderer.IsExpired())
-  {
-    baseRenderer = nullptr;
-  }
-  else
-  {
-    baseRenderer = m_BaseRenderer.Lock();
-  }
+  mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
 
   auto dataNodes = GetSelectedNodes();
   auto nodeset = m_DataStorage.Lock()->GetAll();

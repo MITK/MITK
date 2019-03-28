@@ -57,6 +57,16 @@ void QmitkAbstractDataNodeAction::SetBaseRenderer(mitk::BaseRenderer* baseRender
   }
 }
 
+mitk::BaseRenderer::Pointer QmitkAbstractDataNodeAction::GetBaseRenderer()
+{
+  mitk::BaseRenderer::Pointer baseRenderer;
+  if (!m_BaseRenderer.IsExpired())
+  {
+    baseRenderer = m_BaseRenderer.Lock();
+  }
+  return baseRenderer;
+}
+
 QList<mitk::DataNode::Pointer> QmitkAbstractDataNodeAction::GetSelectedNodes()
 {
   QList<mitk::DataNode::Pointer> selectedNodes;

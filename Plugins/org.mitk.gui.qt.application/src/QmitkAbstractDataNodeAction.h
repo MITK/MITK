@@ -48,11 +48,21 @@ public:
 protected:
 
   virtual void InitializeAction() = 0;
+
+  /**
+  * @brief Grants access to the base renderer stored for the action.
+  *        Will return nullptr if renderer was never set or has become invalid
+  */
+  mitk::BaseRenderer::Pointer GetBaseRenderer();
+
   mitk::DataNode::Pointer GetSelectedNode();
   QList<mitk::DataNode::Pointer> GetSelectedNodes();
 
   berry::IWorkbenchPartSite::WeakPtr m_WorkbenchPartSite;
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
+
+private:
+
   mitk::WeakPointer<mitk::BaseRenderer> m_BaseRenderer;
 
 };

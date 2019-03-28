@@ -69,15 +69,7 @@ void QmitkDataNodeColorMapAction::OnMenuAboutShow()
     return;
   }
 
-  mitk::BaseRenderer* baseRenderer;
-  if (m_BaseRenderer.IsExpired())
-  {
-    baseRenderer = nullptr;
-  }
-  else
-  {
-    baseRenderer = m_BaseRenderer.Lock();
-  }
+  mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
 
   mitk::LookupTableProperty::Pointer lookupTableProperty = dynamic_cast<mitk::LookupTableProperty*>(dataNode->GetProperty("LookupTable", baseRenderer));
   if (lookupTableProperty.IsNull())
@@ -119,15 +111,7 @@ void QmitkDataNodeColorMapAction::OnActionTriggered(bool /*checked*/)
     return;
   }
 
-  mitk::BaseRenderer* baseRenderer;
-  if (m_BaseRenderer.IsExpired())
-  {
-    baseRenderer = nullptr;
-  }
-  else
-  {
-    baseRenderer = m_BaseRenderer.Lock();
-  }
+  mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
 
   mitk::LookupTableProperty::Pointer lookupTableProperty = dynamic_cast<mitk::LookupTableProperty*>(dataNode->GetProperty("LookupTable", baseRenderer));
   if (lookupTableProperty.IsNull())

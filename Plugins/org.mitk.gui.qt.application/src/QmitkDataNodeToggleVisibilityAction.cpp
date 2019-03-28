@@ -101,15 +101,7 @@ void QmitkDataNodeToggleVisibilityAction::OnActionTriggered(bool /*checked*/)
     return;
   }
 
-  mitk::BaseRenderer* baseRenderer;
-  if (m_BaseRenderer.IsExpired())
-  {
-    baseRenderer = nullptr;
-  }
-  else
-  {
-    baseRenderer = m_BaseRenderer.Lock();
-  }
+  mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
 
   auto dataNodes = GetSelectedNodes();
   ToggleVisibilityAction::Run(m_WorkbenchPartSite.Lock(), m_DataStorage.Lock(), dataNodes, baseRenderer);

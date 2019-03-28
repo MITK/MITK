@@ -60,15 +60,7 @@ void QmitkDataNodeSurfaceRepresentationAction::OnMenuAboutShow()
     return;
   }
 
-  mitk::BaseRenderer* baseRenderer;
-  if (m_BaseRenderer.IsExpired())
-  {
-    baseRenderer = nullptr;
-  }
-  else
-  {
-    baseRenderer = m_BaseRenderer.Lock();
-  }
+  mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
 
   mitk::EnumerationProperty* representationProp = dynamic_cast<mitk::EnumerationProperty*>(dataNode->GetProperty("material.representation", baseRenderer));
   if (nullptr == representationProp)
@@ -101,15 +93,7 @@ void QmitkDataNodeSurfaceRepresentationAction::OnActionTriggered(bool /*checked*
     return;
   }
 
-  mitk::BaseRenderer* baseRenderer;
-  if (m_BaseRenderer.IsExpired())
-  {
-    baseRenderer = nullptr;
-  }
-  else
-  {
-    baseRenderer = m_BaseRenderer.Lock();
-  }
+  mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
 
   mitk::EnumerationProperty* representationProp = dynamic_cast<mitk::EnumerationProperty*>(dataNode->GetProperty("material.representation", baseRenderer));
   if (nullptr == representationProp)

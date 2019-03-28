@@ -56,15 +56,7 @@ void QmitkDataNodeTextureInterpolationAction::InitializeWithDataNode(const mitk:
     return;
   }
 
-  mitk::BaseRenderer* baseRenderer;
-  if (m_BaseRenderer.IsExpired())
-  {
-    baseRenderer = nullptr;
-  }
-  else
-  {
-    baseRenderer = m_BaseRenderer.Lock();
-  }
+  mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
 
   bool textureInterpolation = false;
   dataNode->GetBoolProperty("texture interpolation", textureInterpolation, baseRenderer);
@@ -79,15 +71,7 @@ void QmitkDataNodeTextureInterpolationAction::OnActionToggled(bool checked)
     return;
   }
 
-  mitk::BaseRenderer* baseRenderer;
-  if (m_BaseRenderer.IsExpired())
-  {
-    baseRenderer = nullptr;
-  }
-  else
-  {
-    baseRenderer = m_BaseRenderer.Lock();
-  }
+  mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
 
   dataNode->SetBoolProperty("texture interpolation", checked, baseRenderer);
 

@@ -66,15 +66,7 @@ void QmitkDataNodeColorAction::InitializeAction()
 
 void QmitkDataNodeColorAction::InitializeWithDataNode(const mitk::DataNode* dataNode)
 {
-  mitk::BaseRenderer* baseRenderer;
-  if (m_BaseRenderer.IsExpired())
-  {
-    baseRenderer = nullptr;
-  }
-  else
-  {
-    baseRenderer = m_BaseRenderer.Lock();
-  }
+  mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
 
   float rgb[3];
   if (dataNode->GetColor(rgb, baseRenderer))
@@ -94,15 +86,7 @@ void QmitkDataNodeColorAction::OnColorChanged()
     return;
   }
 
-  mitk::BaseRenderer* baseRenderer;
-  if (m_BaseRenderer.IsExpired())
-  {
-    baseRenderer = nullptr;
-  }
-  else
-  {
-    baseRenderer = m_BaseRenderer.Lock();
-  }
+  mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
 
   bool selectedColor = false;
   QColor newColor;

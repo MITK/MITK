@@ -72,15 +72,7 @@ void QmitkDataNodeOpacityAction::InitializeWithDataNode(const mitk::DataNode* da
     return;
   }
 
-  mitk::BaseRenderer* baseRenderer;
-  if (m_BaseRenderer.IsExpired())
-  {
-    baseRenderer = nullptr;
-  }
-  else
-  {
-    baseRenderer = m_BaseRenderer.Lock();
-  }
+  mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
 
   float opacity = 0.0;
   if (dataNode->GetFloatProperty("opacity", opacity, baseRenderer))
@@ -97,15 +89,7 @@ void QmitkDataNodeOpacityAction::OnOpacityChanged(int value)
     return;
   }
 
-  mitk::BaseRenderer* baseRenderer;
-  if (m_BaseRenderer.IsExpired())
-  {
-    baseRenderer = nullptr;
-  }
-  else
-  {
-    baseRenderer = m_BaseRenderer.Lock();
-  }
+  mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
 
   float opacity = static_cast<float>(value) / 100.0f;
   dataNode->SetFloatProperty("opacity", opacity, baseRenderer);

@@ -89,15 +89,7 @@ void QmitkDataNodeComponentAction::InitializeWithDataNode(const mitk::DataNode* 
     return;
   }
 
-  mitk::BaseRenderer* baseRenderer;
-  if (m_BaseRenderer.IsExpired())
-  {
-    baseRenderer = nullptr;
-  }
-  else
-  {
-    baseRenderer = m_BaseRenderer.Lock();
-  }
+  mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
 
   int numComponents = 0;
   numComponents = img->GetPixelType().GetNumberOfComponents();

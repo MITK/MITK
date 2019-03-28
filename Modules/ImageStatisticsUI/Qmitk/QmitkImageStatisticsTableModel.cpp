@@ -115,18 +115,25 @@ QVariant QmitkImageStatisticsTableModel::data(const QModelIndex &index, int role
     {
       if (Qt::DisplayRole == role)
       {
-        auto statsObj = containerInfo.first->GetStatisticsForTimeStep(containerInfo.second);
-        auto statisticKey = m_StatisticNames.at(index.row());
-        std::stringstream ss;
-        if (statsObj.HasStatistic(statisticKey))
+        if (containerInfo.first->TimeStepExists(containerInfo.second))
         {
-          ss << statsObj.GetValueNonConverted(statisticKey);
+          auto statsObj = containerInfo.first->GetStatisticsForTimeStep(containerInfo.second);
+          auto statisticKey = m_StatisticNames.at(index.row());
+          std::stringstream ss;
+          if (statsObj.HasStatistic(statisticKey))
+          {
+            ss << statsObj.GetValueNonConverted(statisticKey);
+          }
+          else
+          {
+            ss << "N/A";
+          }
+          result = QVariant(QString::fromStdString(ss.str()));
         }
         else
         {
-          ss << "N/A";
+          result = QVariant(QString::fromStdString("N/A"));
         }
-        result = QVariant(QString::fromStdString(ss.str()));
       }
       else if (Qt::UserRole == role)
       {

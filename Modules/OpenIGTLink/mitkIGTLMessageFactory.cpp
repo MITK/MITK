@@ -113,7 +113,6 @@ mitk::IGTLMessageFactory::IGTLMessageFactory()
   this->AddMessageNewMethod("GET_TRANS", (PointerToMessageBaseNew)&igtl::GetTransformMessage::New);
   //this->AddMessageNewMethod("GET_POS", (PointerToMessageBaseNew)&igtl::GetPositionMessage::New); //not available???
   this->AddMessageNewMethod("GET_STATUS", (PointerToMessageBaseNew)&igtl::GetStatusMessage::New);
-  this->AddMessageNewMethod("GET_CAPABIL", (PointerToMessageBaseNew)&igtl::GetCapabilityMessage::New);
 
   //  //OpenIGTLink Types V2
   this->AddMessageNewMethod("IMGMETA", (PointerToMessageBaseNew)&igtl::ImageMetaMessage::New);

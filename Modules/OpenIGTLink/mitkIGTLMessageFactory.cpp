@@ -102,7 +102,7 @@ mitk::IGTLMessageFactory::IGTLMessageFactory()
 
   this->AddMessageNewMethod("NONE", nullptr);
 
-  //OpenIGTLink Types V1
+  // OpenIGTLink Types V1
   this->AddMessageNewMethod("IMAGE", (PointerToMessageBaseNew)&igtl::ImageMessage::New);
   this->AddMessageNewMethod("TRANSFORM", (PointerToMessageBaseNew)&igtl::TransformMessage::New);
   this->AddMessageNewMethod("POSITION", (PointerToMessageBaseNew)&igtl::PositionMessage::New);
@@ -114,7 +114,7 @@ mitk::IGTLMessageFactory::IGTLMessageFactory()
   //this->AddMessageNewMethod("GET_POS", (PointerToMessageBaseNew)&igtl::GetPositionMessage::New); //not available???
   this->AddMessageNewMethod("GET_STATUS", (PointerToMessageBaseNew)&igtl::GetStatusMessage::New);
 
-  //  //OpenIGTLink Types V2
+  // OpenIGTLink Types V2
   this->AddMessageNewMethod("IMGMETA", (PointerToMessageBaseNew)&igtl::ImageMetaMessage::New);
   this->AddMessageNewMethod("LBMETA", (PointerToMessageBaseNew)&igtl::LabelMetaMessage::New);
   this->AddMessageNewMethod("COLORT", (PointerToMessageBaseNew)&igtl::ColorTableMessage::New);

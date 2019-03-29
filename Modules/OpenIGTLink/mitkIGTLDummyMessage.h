@@ -26,12 +26,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-/** Documentation
-* \class IGTLDummyMessage
-* \brief This class is a dummy message to show the how to implement a new message
-* type
+/**
+ * \class IGTLDummyMessage
+ * \brief This class is a dummy message to show how to implement a new message type
 */
-class MITKOPENIGTLINK_EXPORT IGTLDummyMessage: public igtl::StringMessage
+class MITKOPENIGTLINK_EXPORT IGTLDummyMessage : public igtl::StringMessage
 {
 public:
   typedef IGTLDummyMessage                     Self;
@@ -45,12 +44,12 @@ public:
 public:
   /**
    * Set dummy string
-  */
+   */
   void SetDummyString( const std::string& dummyString );
 
   /**
    * Get dummy string
-  */
+   */
   std::string GetDummyString();
 
   /**

@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK includes
 #include <mitkBaseRenderer.h>
+#include <mitkCameraController.h>
 #include <mitkLookupTableProperty.h>
 #include <mitkVtkInterpolationProperty.h>
 #include <mitkVtkRepresentationProperty.h>
@@ -177,6 +178,7 @@ void mitk::GizmoMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
 
   // check if something important has changed and we need to re-render
   if ((ls->m_LastUpdateTime >= node->GetMTime()) && (ls->m_LastUpdateTime >= gizmo->GetPipelineMTime()) &&
+      (ls->m_LastUpdateTime >= renderer->GetCameraController()->GetMTime()) &&
       (ls->m_LastUpdateTime >= renderer->GetCurrentWorldPlaneGeometryUpdateTime()) &&
       (ls->m_LastUpdateTime >= renderer->GetCurrentWorldPlaneGeometry()->GetMTime()) &&
       (ls->m_LastUpdateTime >= node->GetPropertyList()->GetMTime()) &&
@@ -215,8 +217,8 @@ void mitk::GizmoMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
 
   auto appender = vtkSmartPointer<vtkAppendPolyData>::New();
 
-  double diagonal = std::min(renderer->GetSizeX(), renderer->GetSizeY());
-  double arrowLength = 0.1 * diagonal; // fixed in relation to window size
+  double diagonal = std::min(renderer->GetSizeX(), renderer->GetSizeY()) * renderer->GetScaleFactorMMPerDisplayUnit();
+  double arrowLength = 0.3 * diagonal; // fixed in relation to window size
   auto disk = Create2DDisk(viewRight, viewUp, gizmoCenterView - cameraDirection, 0.1 * arrowLength);
   AssignScalarValueTo(disk, Gizmo::MoveFreely);
   appender->AddInputData(disk);

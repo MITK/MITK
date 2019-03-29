@@ -856,9 +856,12 @@ bool WorkbenchWindow::RestoreState(IMemento::Pointer memento,
     //      public void runWithException() {
     if (!shellBounds.intersects(displayBounds))
     {
+      // Center on default screen
       QRect clientArea(Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetAvailableScreenSize());
-      shellBounds.setX(clientArea.x());
-      shellBounds.setY(clientArea.y());
+      shellBounds.setX(clientArea.width() * 0.05);
+      shellBounds.setY(clientArea.height() * 0.05);
+      shellBounds.setWidth(clientArea.width() * 0.9);
+      shellBounds.setHeight(clientArea.height() * 0.9);
     }
     GetShell()->SetBounds(shellBounds);
     //      }});

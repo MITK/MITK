@@ -150,7 +150,7 @@ void QmitkStdMultiWidgetEditorPreferencePage::Update()
   m_Ui->m_DisplayMetaInfo->setChecked(m_Preferences->GetBool("Display metainfo", true));
   m_Ui->m_SelectionMode->setChecked(m_Preferences->GetBool("Selection on 3D View", false));
   //m_Ui->m_PACSLikeMouseMode->setChecked(m_Preferences->GetBool("PACS like mouse interaction", false));
-  int mode= m_Preferences->GetInt("Rendering Mode",0);
+  int mode= m_Preferences->GetInt("Rendering Mode", 2);
   m_Ui->m_RenderingMode->setCurrentIndex(mode);
   m_Ui->m_CrosshairGapSize->setValue(m_Preferences->GetInt("crosshair gap size", 32));
   m_Ui->m_RotationStep->setValue(m_Preferences->GetInt("Rotation Step", 90));

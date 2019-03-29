@@ -55,8 +55,8 @@ public:
 
   /**
    * Returns a clone of itself
-  */
-  igtl::MessageBase::Pointer Clone();
+   */
+  igtl::MessageBase::Pointer Clone() override;
 
 protected:
   IGTLDummyMessage();

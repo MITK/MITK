@@ -52,7 +52,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // a type of data that will be shared with the message functions
 // of this handler class.
 
-mitkIGTMessageCloneClassMacro(igtl::TransformMessage, TransformMsgCloneHandler);
+mitkIGTMessageCloneClassMacro(igtl::TransformMessage, TransformMsgCloneHandler)
 
 /**
  * \brief Clones the original message interpreted as transform message

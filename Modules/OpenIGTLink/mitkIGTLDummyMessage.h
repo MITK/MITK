@@ -39,8 +39,8 @@ public:
   typedef igtl::SmartPointer<Self>             Pointer;
   typedef igtl::SmartPointer<const Self>       ConstPointer;
 
-  igtlTypeMacro( mitk::IGTLDummyMessage, igtl::StringMessage );
-  igtlNewMacro( mitk::IGTLDummyMessage );
+  igtlTypeMacro( mitk::IGTLDummyMessage, igtl::StringMessage )
+  igtlNewMacro( mitk::IGTLDummyMessage )
 
 public:
   /**
@@ -65,9 +65,7 @@ protected:
   std::string m_dummyString;
 };
 
-
-mitkIGTMessageCloneClassMacro(IGTLDummyMessage, DummyMsgCloneHandler);
-
+mitkIGTMessageCloneClassMacro(IGTLDummyMessage, DummyMsgCloneHandler)
 
 } // namespace mitk
 

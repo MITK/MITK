@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 using namespace mitk;
 
 template <class T>
-static void ReadPixel(const PixelType&, Image::Pointer image, const itk::Index<3>& index, ScalarType* returnValue)
+static void ReadPixel(const PixelType&, const Image* image, const itk::Index<3>& index, ScalarType* returnValue)
 {
   switch (image->GetDimension())
   {
@@ -51,7 +51,7 @@ static void ReadPixel(const PixelType&, Image::Pointer image, const itk::Index<3
   }
 }
 
-static IntensityProfile::Pointer ComputeIntensityProfile(Image::Pointer image, itk::PolyLineParametricPath<3>::Pointer path)
+static const IntensityProfile* ComputeIntensityProfile(const Image* image, const itk::PolyLineParametricPath<3>* path)
 {
   if (image->GetDimension() == 4)
   {
@@ -144,7 +144,7 @@ static typename itk::InterpolateImageFunction<TInputImage>::Pointer CreateInterp
 }
 
 template <class TPixel, unsigned int VImageDimension>
-static void ComputeIntensityProfile(itk::Image<TPixel, VImageDimension>* image, itk::PolyLineParametricPath<3>::Pointer path, unsigned int numSamples, InterpolateImageFunction::Enum interpolator, IntensityProfile::Pointer intensityProfile)
+static void ComputeIntensityProfile(const itk::Image<TPixel, VImageDimension>* image, const itk::PolyLineParametricPath<3>* path, unsigned int numSamples, InterpolateImageFunction::Enum interpolator, IntensityProfile* intensityProfile)
 {
   typename itk::InterpolateImageFunction<itk::Image<TPixel, VImageDimension> >::Pointer interpolateImageFunction = CreateInterpolateImageFunction<itk::Image<TPixel, VImageDimension> >(interpolator);
   interpolateImageFunction->SetInputImage(image);
@@ -161,11 +161,11 @@ static void ComputeIntensityProfile(itk::Image<TPixel, VImageDimension>* image, 
   }
 }
 
-static IntensityProfile::Pointer ComputeIntensityProfile(Image::Pointer image, itk::PolyLineParametricPath<3>::Pointer path, unsigned int numSamples, InterpolateImageFunction::Enum interpolator)
+static const IntensityProfile* ComputeIntensityProfile(const Image* image, const itk::PolyLineParametricPath<3>* path, unsigned int numSamples, InterpolateImageFunction::Enum interpolator)
 {
   IntensityProfile::Pointer intensityProfile = IntensityProfile::New();
-  AccessFixedDimensionByItk_n(image, ComputeIntensityProfile, 3, (path, numSamples, interpolator, intensityProfile));
-  return intensityProfile;
+  AccessFixedDimensionByItk_n(image, ComputeIntensityProfile, 3, (path, numSamples, interpolator, intensityProfile.GetPointer()));
+  return intensityProfile.GetPointer();
 }
 
 class AddPolyLineElementToPath
@@ -196,7 +196,7 @@ private:
   itk::PolyLineParametricPath<3>::ContinuousIndexType m_Vertex;
 };
 
-static itk::PolyLineParametricPath<3>::Pointer CreatePathFromPlanarFigure(BaseGeometry* imageGeometry, PlanarFigure* planarFigure)
+static const itk::PolyLineParametricPath<3>* CreatePathFromPlanarFigure(const BaseGeometry* imageGeometry, const PlanarFigure* planarFigure)
 {
   itk::PolyLineParametricPath<3>::Pointer path = itk::PolyLineParametricPath<3>::New();
   const PlanarFigure::PolyLineType polyLine = planarFigure->GetPolyLine(0);
@@ -228,17 +228,17 @@ static itk::PolyLineParametricPath<3>::Pointer CreatePathFromPoints(BaseGeometry
   return path;
 }
 
-IntensityProfile::Pointer mitk::ComputeIntensityProfile(Image::Pointer image, PlanarFigure::Pointer planarFigure)
+const IntensityProfile* mitk::ComputeIntensityProfile(const Image* image, const PlanarFigure* planarFigure)
 {
   return ::ComputeIntensityProfile(image, CreatePathFromPlanarFigure(image->GetGeometry(), planarFigure));
 }
 
-IntensityProfile::Pointer mitk::ComputeIntensityProfile(Image::Pointer image, PlanarLine::Pointer planarLine, unsigned int numSamples, InterpolateImageFunction::Enum interpolator)
+const IntensityProfile* mitk::ComputeIntensityProfile(const Image* image, const PlanarLine* planarLine, unsigned int numSamples, InterpolateImageFunction::Enum interpolator)
 {
-  return ::ComputeIntensityProfile(image, CreatePathFromPlanarFigure(image->GetGeometry(), planarLine.GetPointer()), numSamples, interpolator);
+  return ::ComputeIntensityProfile(image, CreatePathFromPlanarFigure(image->GetGeometry(), planarLine), numSamples, interpolator);
 }
 
-IntensityProfile::Pointer mitk::ComputeIntensityProfile(Image::Pointer image, const Point3D& startPoint, const Point3D& endPoint, unsigned int numSamples, InterpolateImageFunction::Enum interpolator)
+const IntensityProfile* mitk::ComputeIntensityProfile(const Image* image, const Point3D& startPoint, const Point3D& endPoint, unsigned int numSamples, InterpolateImageFunction::Enum interpolator)
 {
   return ::ComputeIntensityProfile(image, CreatePathFromPoints(image->GetGeometry(), startPoint, endPoint), numSamples, interpolator);
 }

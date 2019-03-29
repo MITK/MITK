@@ -143,7 +143,7 @@ void QmitkImageStatisticsView::OnSliderWidgetIntensityProfileChanged()
 
 void QmitkImageStatisticsView::PartClosed(const berry::IWorkbenchPartReference::Pointer &) {}
 
-void QmitkImageStatisticsView::FillHistogramWidget(const std::vector<HistogramType::ConstPointer> &histogram,
+void QmitkImageStatisticsView::FillHistogramWidget(const std::vector<const HistogramType*> &histogram,
                                                    const std::vector<std::string> &dataLabels)
 {
   m_Controls.groupBox_histogram->setVisible(true);
@@ -343,10 +343,10 @@ void QmitkImageStatisticsView::CalculateOrGetStatistics()
   m_ForceRecompute = false;
 }
 
-void QmitkImageStatisticsView::ComputeAndDisplayIntensityProfile(mitk::Image *image,
-                                                                 mitk::PlanarFigure::Pointer maskPlanarFigure)
+void QmitkImageStatisticsView::ComputeAndDisplayIntensityProfile(const mitk::Image *image,
+                                                                 const mitk::PlanarFigure* maskPlanarFigure)
 {
-  mitk::Image::Pointer inputImage;
+  const mitk::Image* inputImage;
   if (image->GetDimension() == 4)
   {
     m_Controls.sliderWidget_intensityProfile->setVisible(true);
@@ -367,12 +367,12 @@ void QmitkImageStatisticsView::ComputeAndDisplayIntensityProfile(mitk::Image *im
     inputImage = image;
   }
 
-    auto intensityProfile = mitk::ComputeIntensityProfile(inputImage, maskPlanarFigure);
+  auto intensityProfile = mitk::ComputeIntensityProfile(inputImage, maskPlanarFigure);
   // Don't show histogram for intensity profiles
   m_Controls.groupBox_histogram->setVisible(false);
   m_Controls.groupBox_intensityProfile->setVisible(true);
   m_Controls.widget_intensityProfile->Reset();
-  m_Controls.widget_intensityProfile->SetIntensityProfile(intensityProfile.GetPointer(),
+  m_Controls.widget_intensityProfile->SetIntensityProfile(intensityProfile,
                                                           "Intensity Profile of " + m_selectedImageNode->GetName());
 }
 
@@ -466,9 +466,9 @@ void QmitkImageStatisticsView::OnRequestHistogramUpdate(unsigned int nBins)
   m_CalculationJob->start();
 }
 
-void QmitkImageStatisticsView::CalculateStatistics(mitk::Image::ConstPointer image,
-                                                   mitk::Image::ConstPointer mask,
-                                                   mitk::PlanarFigure::ConstPointer maskPlanarFigure)
+void QmitkImageStatisticsView::CalculateStatistics(const mitk::Image* image,
+                                                   const mitk::Image* mask,
+                                                   const mitk::PlanarFigure* maskPlanarFigure)
 {
   this->m_CalculationJob->Initialize(image, mask, maskPlanarFigure);
 

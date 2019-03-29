@@ -59,12 +59,7 @@ public:
   \brief  Is called from the selection mechanism once the data manager selection has changed*/
   void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &selectedNodes) override;
 
-  void PrepareDataStorageComboBoxes();
-
   static const std::string VIEW_ID;
-
-  void FillHistogramWidget(const std::vector<HistogramType::ConstPointer>& histogram, const std::vector<std::string>& dataLabels);
-  QmitkChartWidget::ColorTheme GetColorTheme() const;
 protected:
   virtual void Activated() override;
   virtual void Deactivated() override;
@@ -79,12 +74,17 @@ protected:
   /** \brief Required for berry::IPartListener */
   virtual Events::Types GetPartEventTypes() const override { return Events::CLOSED; }
 
+  void PrepareDataStorageComboBoxes();
+  void FillHistogramWidget(const std::vector<const HistogramType*> &histogram,
+                           const std::vector<std::string> &dataLabels);
+  QmitkChartWidget::ColorTheme GetColorTheme() const;
+
   void OnImageSelectorChanged();
   void OnMaskSelectorChanged();
 
   void CalculateOrGetStatistics();
 
-  void ComputeAndDisplayIntensityProfile(mitk::Image * image, mitk::PlanarFigure::Pointer maskPlanarFigure);
+  void ComputeAndDisplayIntensityProfile(const mitk::Image * image, const mitk::PlanarFigure* maskPlanarFigure);
 
   void ResetGUI();
   void ResetGUIDefault();
@@ -95,7 +95,7 @@ protected:
   void OnSliderWidgetHistogramChanged(double value);
   void OnSliderWidgetIntensityProfileChanged();
 
-  void CalculateStatistics(mitk::Image::ConstPointer image, mitk::Image::ConstPointer mask=nullptr, mitk::PlanarFigure::ConstPointer maskPlanarFigure = nullptr);
+  void CalculateStatistics(const mitk::Image* image, const mitk::Image* mask=nullptr, const mitk::PlanarFigure* maskPlanarFigure = nullptr);
   
   // member variables
   Ui::QmitkImageStatisticsViewControls m_Controls;

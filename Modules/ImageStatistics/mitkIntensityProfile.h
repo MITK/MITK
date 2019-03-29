@@ -34,7 +34,7 @@ namespace mitk
     *
     * \return The computed intensity profile.
     */
-  MITKIMAGESTATISTICS_EXPORT IntensityProfile::Pointer ComputeIntensityProfile(Image::Pointer image, PlanarFigure::Pointer planarFigure);
+  MITKIMAGESTATISTICS_EXPORT const IntensityProfile* ComputeIntensityProfile(const Image* image, const PlanarFigure* planarFigure);
 
   namespace InterpolateImageFunction
   {
@@ -70,7 +70,7 @@ namespace mitk
     *
     * \return The computed intensity profile.
     */
-  MITKIMAGESTATISTICS_EXPORT IntensityProfile::Pointer ComputeIntensityProfile(Image::Pointer image, PlanarLine::Pointer planarLine, unsigned int numSamples, InterpolateImageFunction::Enum interpolator = InterpolateImageFunction::NearestNeighbor);
+  MITKIMAGESTATISTICS_EXPORT const IntensityProfile* ComputeIntensityProfile(const Image* image, const PlanarLine* planarLine, unsigned int numSamples, InterpolateImageFunction::Enum interpolator = InterpolateImageFunction::NearestNeighbor);
 
   /** \brief Compute intensity profile of an image for each sample between two points.
     *
@@ -83,7 +83,7 @@ namespace mitk
     *
     * \return The computed intensity profile.
     */
-  MITKIMAGESTATISTICS_EXPORT IntensityProfile::Pointer ComputeIntensityProfile(Image::Pointer image, const Point3D& startPoint, const Point3D& endPoint, unsigned int numSamples, InterpolateImageFunction::Enum interpolator = InterpolateImageFunction::NearestNeighbor);
+  MITKIMAGESTATISTICS_EXPORT const IntensityProfile* ComputeIntensityProfile(const Image* image, const Point3D& startPoint, const Point3D& endPoint, unsigned int numSamples, InterpolateImageFunction::Enum interpolator = InterpolateImageFunction::NearestNeighbor);
 
   /** \brief Compute global maximum of an intensity profile.
     *

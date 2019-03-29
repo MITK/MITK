@@ -83,47 +83,42 @@ void ShowSegmentationAsAgtkSurface::PreProcessing()
   resampler->Update();
   m_FloatTmpImage = resampler->GetOutput();
 
-  m_LevelValue = m_FilterArgs.levelValue;
-  if (!m_SurfaceArgs.smooth) {
-    m_LevelValue = .5 * (BACKGROUND_VALUE + FOREGROUND_VALUE) - m_LevelValue;
-  } else {
-    typedef itk::SignedMaurerDistanceMapImageFilter<FloatImage, FloatImage> DistanceMapType;
-    typename DistanceMapType::Pointer distanceToForeground = DistanceMapType::New();
-    m_ProgressAccumulator->RegisterInternalFilter(distanceToForeground, m_ProgressWeight);
-    distanceToForeground->SetInput(m_FloatTmpImage);
-    distanceToForeground->SetUseImageSpacing(true);
-    distanceToForeground->SetBackgroundValue(BACKGROUND_VALUE);
-    distanceToForeground->SetInsideIsPositive(false);
+  typedef itk::SignedMaurerDistanceMapImageFilter<FloatImage, FloatImage> DistanceMapType;
+  typename DistanceMapType::Pointer distanceToForeground = DistanceMapType::New();
+  m_ProgressAccumulator->RegisterInternalFilter(distanceToForeground, m_ProgressWeight);
+  distanceToForeground->SetInput(m_FloatTmpImage);
+  distanceToForeground->SetUseImageSpacing(true);
+  distanceToForeground->SetBackgroundValue(BACKGROUND_VALUE);
+  distanceToForeground->SetInsideIsPositive(false);
 
-    typename DistanceMapType::Pointer distanceToBackground = DistanceMapType::New();
-    m_ProgressAccumulator->RegisterInternalFilter(distanceToBackground, m_ProgressWeight);
-    distanceToBackground->SetInput(m_FloatTmpImage);
-    distanceToBackground->SetUseImageSpacing(true);
-    distanceToBackground->SetBackgroundValue(FOREGROUND_VALUE);
-    distanceToBackground->SetInsideIsPositive(true);
+  typename DistanceMapType::Pointer distanceToBackground = DistanceMapType::New();
+  m_ProgressAccumulator->RegisterInternalFilter(distanceToBackground, m_ProgressWeight);
+  distanceToBackground->SetInput(m_FloatTmpImage);
+  distanceToBackground->SetUseImageSpacing(true);
+  distanceToBackground->SetBackgroundValue(FOREGROUND_VALUE);
+  distanceToBackground->SetInsideIsPositive(true);
 
-    typedef itk::AddImageFilter<FloatImage> AddImageFilterType;
-    typename AddImageFilterType::Pointer add = AddImageFilterType::New();
-    m_ProgressAccumulator->RegisterInternalFilter(add, m_ProgressWeight);
-    add->SetInput1(distanceToForeground->GetOutput());
-    add->SetInput2(distanceToBackground->GetOutput());
+  typedef itk::AddImageFilter<FloatImage> AddImageFilterType;
+  typename AddImageFilterType::Pointer add = AddImageFilterType::New();
+  m_ProgressAccumulator->RegisterInternalFilter(add, m_ProgressWeight);
+  add->SetInput1(distanceToForeground->GetOutput());
+  add->SetInput2(distanceToBackground->GetOutput());
 
-    typedef itk::MultiplyImageFilter<FloatImage> MultiplyImageFilterType;
-    MultiplyImageFilterType::Pointer multiply = MultiplyImageFilterType::New();
-    m_ProgressAccumulator->RegisterInternalFilter(multiply, m_ProgressWeight);
-    multiply->SetInput(add->GetOutput());
-    multiply->SetConstant(.5);
+  typedef itk::MultiplyImageFilter<FloatImage> MultiplyImageFilterType;
+  MultiplyImageFilterType::Pointer multiply = MultiplyImageFilterType::New();
+  m_ProgressAccumulator->RegisterInternalFilter(multiply, m_ProgressWeight);
+  multiply->SetInput(add->GetOutput());
+  multiply->SetConstant(.5);
 
-    typedef itk::DiscreteGaussianImageFilter<FloatImage, FloatImage> BlurImageFilterType;
-    typename BlurImageFilterType::Pointer smoothingImage = BlurImageFilterType::New();
-    m_ProgressAccumulator->RegisterInternalFilter(smoothingImage, m_ProgressWeight);
-    smoothingImage->SetInput(multiply->GetOutput());
-    smoothingImage->SetUseImageSpacing(false);
-    smoothingImage->SetVariance(m_FilterArgs.blurSigma * m_FilterArgs.blurSigma);
-    smoothingImage->Update();
+  typedef itk::DiscreteGaussianImageFilter<FloatImage, FloatImage> BlurImageFilterType;
+  typename BlurImageFilterType::Pointer smoothingImage = BlurImageFilterType::New();
+  m_ProgressAccumulator->RegisterInternalFilter(smoothingImage, m_ProgressWeight);
+  smoothingImage->SetInput(multiply->GetOutput());
+  smoothingImage->SetUseImageSpacing(false);
+  smoothingImage->SetVariance(m_FilterArgs.blurSigma * m_FilterArgs.blurSigma);
+  smoothingImage->Update();
 
-    m_FloatTmpImage = smoothingImage->GetOutput();
-  }
+  m_FloatTmpImage = smoothingImage->GetOutput();
 
   double minSpacing = std::min(m_FilterArgs.spacing[0], m_FilterArgs.spacing[1]);
   minSpacing = std::min(minSpacing, m_FilterArgs.spacing[3]);

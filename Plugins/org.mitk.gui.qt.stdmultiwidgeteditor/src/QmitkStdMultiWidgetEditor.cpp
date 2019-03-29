@@ -274,7 +274,7 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
     berry::IPreferences::Pointer prefs = this->GetPreferences();
 
-    mitk::BaseRenderer::RenderingMode::Type renderingMode = static_cast<mitk::BaseRenderer::RenderingMode::Type>(prefs->GetInt( "Rendering Mode" , 0 ));
+    mitk::BaseRenderer::RenderingMode::Type renderingMode = static_cast<mitk::BaseRenderer::RenderingMode::Type>(prefs->GetInt( "Rendering Mode" , 2 ));
 
     QString planeProperty("Plane Visibility 3D");
     bool planeVisibility3D = prefs->GetBool(planeProperty, true);

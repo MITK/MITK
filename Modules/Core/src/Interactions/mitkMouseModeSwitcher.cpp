@@ -82,6 +82,11 @@ mitk::MouseModeSwitcher::~MouseModeSwitcher()
 
 void mitk::MouseModeSwitcher::AddRenderer(mitk::BaseRenderer::Pointer renderer)
 {
+  std::string rendererName = renderer->GetName();
+  if (m_RegisteredRendererNames.find(rendererName) != m_RegisteredRendererNames.end()) {
+    return; // Already registered renderer with same name
+  }
+
   DisplayInteractor::Pointer currentObserver = mitk::DisplayInteractor::New();
   currentObserver->SetEventConfig("DisplayConfigMITK.xml");
 
@@ -99,7 +104,6 @@ void mitk::MouseModeSwitcher::AddRenderer(mitk::BaseRenderer::Pointer renderer)
   us::ServiceProperties props;
   props["name"] = std::string("DisplayInteractor");
 
-  std::string rendererName = renderer->GetName();
   if (!rendererName.empty()) {
     props["rendererName"] = rendererName;
   }
@@ -109,6 +113,7 @@ void mitk::MouseModeSwitcher::AddRenderer(mitk::BaseRenderer::Pointer renderer)
 
   m_Observers.push_back(currentObserver);
   m_ServiceRegistrations.push_back(serviceRegistration);
+  m_RegisteredRendererNames.insert(rendererName);
 }
 
 void mitk::MouseModeSwitcher::SetInteractionScheme(InteractionScheme scheme)

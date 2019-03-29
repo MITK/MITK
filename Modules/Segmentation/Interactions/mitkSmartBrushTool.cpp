@@ -374,8 +374,7 @@ void mitk::SmartBrushTool::MouseMovedImpl(const mitk::PlaneGeometry* planeGeomet
   }
 
   ContourModel::Pointer contour = ContourModel::New();
-  contour->Expand(m_LastTimeStep + 1);
-  contour->SetClosed(true, m_LastTimeStep);
+  contour->SetClosed(true);
 
   ContourModel::VertexIterator it = m_MasterContour->Begin();
   ContourModel::VertexIterator end = m_MasterContour->End();
@@ -389,7 +388,7 @@ void mitk::SmartBrushTool::MouseMovedImpl(const mitk::PlaneGeometry* planeGeomet
     point[0] += indexCoordinates[0];
     point[1] += indexCoordinates[1];
 
-    contour->AddVertex(point, m_LastTimeStep);
+    contour->AddVertex(point);
     it++;
   }
 
@@ -404,9 +403,11 @@ void mitk::SmartBrushTool::MouseMovedImpl(const mitk::PlaneGeometry* planeGeomet
   while (it != end) {
     Point3D point = (*it)->Coordinates;
 
-    displayContour->AddVertex(point, m_LastTimeStep);
+    displayContour->AddVertex(point);
     it++;
   }
+
+  FeedbackContourTool::SetFeedbackContour(m_LastTimeStep == 0 ? displayContour : ContourModelUtils::MoveZerothContourTimeStep(displayContour, m_LastTimeStep));
 
   m_FeedbackContourNode->GetData()->Modified();
 

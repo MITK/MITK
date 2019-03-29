@@ -106,6 +106,8 @@ protected:
   SurfaceCreator();
   virtual ~SurfaceCreator() {}
 
+  std::string generateLogStr();
+
   void GenerateData();
 
   DataNode::Pointer createModel();

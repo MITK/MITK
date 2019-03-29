@@ -8,6 +8,8 @@
 #include "mitkShowSegmentationAsAgtkSurface.h"
 #include "mitkShowSegmentationAsSurface.h"
 
+#include <AutoplanLogging.h>
+
 namespace mitk
 {
 
@@ -117,7 +119,7 @@ vtkSmartPointer<vtkPolyData> SurfaceCreator::getPolyData()
   if (m_Output == nullptr) {
     return nullptr;
   }
-  
+
   mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(m_Output->GetData());
   if (surface == nullptr) {
     return nullptr;
@@ -146,6 +148,51 @@ SurfaceCreator::SurfaceCreator()
   m_ProgressAccumulator = itk::ProgressAccumulator::New();
 }
 
+std::string SurfaceCreator::generateLogStr()
+{
+  std::string result = "";
+
+  result += "{";
+
+  result += "\"algorithm\":";
+  if (m_Args.creationType == SurfaceCreationType::MITK) {
+    result += "\"MITK\"";
+  } else if (m_Args.creationType == SurfaceCreationType::AGTK) {
+    result += "\"AGTK\"";
+  } else {
+    result += "\"unknown\"";
+  }
+  result += ",";
+
+  result += "\"smooth\":";
+  result += m_Args.smooth ? "true" : "false";
+  result += ",";
+
+  result += "\"light_smoothing\":";
+  result += m_Args.lightSmoothing ? "true" : "false";
+  result += ",";
+
+  result += "\"decimation\":";
+  result += std::to_string((int)(m_Args.decimation * m_Args.decimationRate * 100));
+  result += ",";
+
+  result += "\"polygons\":";
+  if (m_Output != nullptr) {
+    mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(m_Output->GetData());
+    if (surface != nullptr) {
+      result += std::to_string(surface->GetVtkPolyData()->GetNumberOfPolys());
+    } else {
+      result += "-1";
+    }
+  } else {
+    result += "-1";
+  }
+
+  result += "}";
+
+  return result;
+}
+
 void SurfaceCreator::GenerateData()
 {
   if (m_Input == nullptr) {
@@ -162,6 +209,11 @@ void SurfaceCreator::GenerateData()
   } else {
     m_Output = createModel();
   }
+
+  // Log to server used method and amount of generated triangles
+  Logger::Log::get().setAdditionalField("model_creation", generateLogStr().c_str());
+  AUTOPLAN_INFO << "Model creation finished";
+  Logger::Log::get().resetAdditionalField();
 
   m_ProgressAccumulator->SetMiniPipelineFilter(nullptr);
   m_ProgressAccumulator->UnregisterAllFilters();

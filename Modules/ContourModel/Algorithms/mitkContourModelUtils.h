@@ -63,6 +63,10 @@ class MITKCONTOURMODEL_EXPORT ContourModelUtils : public itk::Object
     */
     static void FillContourInSlice( ContourModel* projectedContour, unsigned int timeStep, Image* sliceImage, int paintingPixelValue = 1 );
 
+    /**
+    \brief Move the contour in time step 0 to a new contour model at the give time step
+    */
+    static ContourModel::Pointer MoveZerothContourTimeStep(const ContourModel* contour, unsigned int timeStep);
 
 protected:
 

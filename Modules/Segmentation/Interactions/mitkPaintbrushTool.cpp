@@ -403,8 +403,7 @@ void mitk::PaintbrushTool::MouseMovedImpl(const mitk::PlaneGeometry* planeGeomet
   MITK_DEBUG << "Mouse at C " << indexCoordinates;
 
   ContourModel::Pointer contour = ContourModel::New();
-  contour->Expand(m_LastTimeStep + 1);
-  contour->SetClosed(true, m_LastTimeStep);
+  contour->SetClosed(true);
 
   ContourModel::VertexIterator it = m_MasterContour->Begin();
   ContourModel::VertexIterator end = m_MasterContour->End();
@@ -415,7 +414,7 @@ void mitk::PaintbrushTool::MouseMovedImpl(const mitk::PlaneGeometry* planeGeomet
     point[0] += indexCoordinates[0];
     point[1] += indexCoordinates[1];
 
-    contour->AddVertex(point, m_LastTimeStep);
+    contour->AddVertex(point);
     it++;
   }
 
@@ -425,7 +424,7 @@ void mitk::PaintbrushTool::MouseMovedImpl(const mitk::PlaneGeometry* planeGeomet
     const double radius = static_cast<double>(m_Size) / 2.0;
 
     // draw it the old way
-    FeedbackContourTool::FillContourInSlice(contour, m_LastTimeStep, m_WorkingSlice, m_PaintingPixelValue);
+    FeedbackContourTool::FillContourInSlice(contour, m_WorkingSlice, m_PaintingPixelValue);
     m_WorkingNode->SetData(m_WorkingSlice);
     m_WorkingNode->Modified();
 
@@ -476,7 +475,7 @@ void mitk::PaintbrushTool::MouseMovedImpl(const mitk::PlaneGeometry* planeGeomet
 
       contour->AddVertex(vertex);
 
-      FeedbackContourTool::FillContourInSlice(contour, m_LastTimeStep, m_WorkingSlice, m_PaintingPixelValue);
+      FeedbackContourTool::FillContourInSlice(contour, m_WorkingSlice, m_PaintingPixelValue);
       m_WorkingNode->SetData(m_WorkingSlice);
       m_WorkingNode->Modified();
     }
@@ -498,10 +497,11 @@ void mitk::PaintbrushTool::MouseMovedImpl(const mitk::PlaneGeometry* planeGeomet
   {
     Point3D point = (*it)->Coordinates;
 
-    displayContour->AddVertex(point, m_LastTimeStep);
+    displayContour->AddVertex(point);
     it++;
   }
 
+  FeedbackContourTool::SetFeedbackContour(m_LastTimeStep == 0 ? displayContour : ContourModelUtils::MoveZerothContourTimeStep(displayContour, m_LastTimeStep));
   m_FeedbackContourNode->GetData()->Modified();
 }
 

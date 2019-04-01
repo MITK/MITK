@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
   /**
-   * Read and Writes a LabelSetImage to a dcm file
+   * Read and Writes a Parametric map to a dcm file
    * @ingroup Process
    */
   class DICOMPMIO : public mitk::AbstractFileIO
@@ -46,8 +46,8 @@ namespace mitk
     using AbstractFileReader::Read;
 
     /**
-     * @brief Reads a number of DICOM segmentation from the file system
-     * @return a vector of mitk::LabelSetImages
+     * @brief Reads a DICOM parametric maps from the file system
+     * @return a  mitk::Image
      * @throws throws an mitk::Exception if an error ocurrs
      */
     virtual std::vector<BaseData::Pointer> Read() override;

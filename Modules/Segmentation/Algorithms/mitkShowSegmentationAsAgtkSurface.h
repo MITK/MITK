@@ -76,6 +76,21 @@ public:
     m_Input = input;
   }
 
+  void SetProgress(float progress)
+  {
+    m_CurrentProgress = progress;
+  }
+
+  float GetProgress()
+  {
+    return m_CurrentProgress;
+  }
+
+  float GetProgressWeight()
+  {
+    return m_ProgressWeight;
+  }
+
 protected:
   ShowSegmentationAsAgtkSurface();
   virtual ~ShowSegmentationAsAgtkSurface() {};
@@ -98,16 +113,15 @@ private:
 
   typename FloatImage::Pointer m_FloatTmpImage;
 
-  static float m_CurrentProgress; // Used only for vtk filters
-  static float m_ProgressWeight;
-  static ShowSegmentationAsAgtkSurface* m_CurrentlyProgressingBuilder;
+  float m_CurrentProgress; // Used only for vtk filters
+  float m_ProgressWeight;
   itk::ProgressAccumulator::Pointer m_ProgressAccumulator;
 
   static void vtkOnProgress(vtkObject* caller, long unsigned int vtkNotUsed(eventId),
       void* vtkNotUsed(clientData), void* vtkNotUsed(callData));
 
   static void vtkOnEnd(vtkObject* caller, long unsigned int vtkNotUsed(eventId),
-      void* vtkNotUsed(clientData), void* vtkNotUsed(callData));
+      void* clientData, void* vtkNotUsed(callData));
 
   vtkSmartPointer<vtkCallbackCommand> m_VtkProgressCallback;
   vtkSmartPointer<vtkCallbackCommand> m_VtkEndCallback;

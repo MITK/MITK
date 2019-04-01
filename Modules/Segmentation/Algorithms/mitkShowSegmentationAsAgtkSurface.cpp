@@ -11,20 +11,20 @@
 namespace mitk
 {
 
-ShowSegmentationAsAgtkSurface* ShowSegmentationAsAgtkSurface::m_CurrentlyProgressingBuilder = nullptr;
-float ShowSegmentationAsAgtkSurface::m_CurrentProgress = 0.f;
-float ShowSegmentationAsAgtkSurface::m_ProgressWeight = 0.f;
-
 ShowSegmentationAsAgtkSurface::ShowSegmentationAsAgtkSurface()
 {
+  m_CurrentProgress = 0.f;
+  m_ProgressWeight = 0.f;
+
   m_ProgressAccumulator = itk::ProgressAccumulator::New();
 
   m_VtkProgressCallback = vtkSmartPointer<vtkCallbackCommand>::New();
   m_VtkProgressCallback->SetCallback(this->vtkOnProgress);
+  m_VtkProgressCallback->SetClientData(this);
 
   m_VtkEndCallback = vtkSmartPointer<vtkCallbackCommand>::New();
   m_VtkEndCallback->SetCallback(this->vtkOnEnd);
-
+  m_VtkEndCallback->SetClientData(this);
 }
 
 void ShowSegmentationAsAgtkSurface::PreProcessing()
@@ -293,7 +293,6 @@ void ShowSegmentationAsAgtkSurface::GenerateData()
   m_ProgressAccumulator->ResetProgress();
   m_ProgressAccumulator->SetMiniPipelineFilter(this);
   m_ProgressAccumulator->UnregisterAllFilters();
-  m_CurrentlyProgressingBuilder = this;
 
   PreProcessing();
   ComputeSurface();
@@ -306,21 +305,25 @@ void ShowSegmentationAsAgtkSurface::GenerateData()
 }
 
 void ShowSegmentationAsAgtkSurface::vtkOnProgress(vtkObject* caller, long unsigned int vtkNotUsed(eventId),
-    void* vtkNotUsed(clientData), void* vtkNotUsed(callData))
+    void* clientData, void* vtkNotUsed(callData))
 {
   vtkPolyDataAlgorithm* filter = static_cast<vtkPolyDataAlgorithm*>(caller);
 
-  m_CurrentlyProgressingBuilder->UpdateProgress(m_CurrentProgress + filter->GetProgress() * m_ProgressWeight);
+  auto builder = static_cast<mitk::ShowSegmentationAsAgtkSurface*>(clientData);
 
-  if (m_CurrentlyProgressingBuilder->GetAbortGenerateData()) {
+  builder->UpdateProgress(builder->GetProgress() + filter->GetProgress() * builder->GetProgressWeight());
+
+  if (builder->GetAbortGenerateData()) {
     throw itk::ProcessAborted();
   }
 }
 
 void ShowSegmentationAsAgtkSurface::vtkOnEnd(vtkObject* caller, long unsigned int vtkNotUsed(eventId),
-    void* vtkNotUsed(clientData), void* vtkNotUsed(callData))
+    void* clientData, void* vtkNotUsed(callData))
 {
-  m_CurrentProgress += m_ProgressWeight;
+  auto builder = static_cast<mitk::ShowSegmentationAsAgtkSurface*>(clientData);
+
+  builder->SetProgress(builder->GetProgress() + builder->GetProgressWeight());
 }
 
 }

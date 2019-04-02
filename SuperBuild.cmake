@@ -116,6 +116,8 @@ else()
   set(gen "${CMAKE_GENERATOR}")
 endif()
 
+set(gen_platform ${CMAKE_GENERATOR_PLATFORM})
+
 # Use this value where semi-colons are needed in ep_add args:
 set(sep "^^")
 
@@ -357,6 +359,7 @@ ExternalProject_Add(${proj}
   LIST_SEPARATOR ${sep}
   DOWNLOAD_COMMAND ""
   CMAKE_GENERATOR ${gen}
+  CMAKE_GENERATOR_PLATFORM ${gen_platform}
   CMAKE_CACHE_ARGS
     # --------------- Build options ----------------
     -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_INSTALL_PREFIX}

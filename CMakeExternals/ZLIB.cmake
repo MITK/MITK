@@ -22,6 +22,8 @@ if(MITK_USE_ZLIB)
       LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/zlib-66a75305.tar.gz
       URL_MD5 "4c3f572b487ae7947fd88ec363533bc5"
+      CMAKE_GENERATOR ${gen}
+      CMAKE_GENERATOR_PLATFORM ${gen_platform}
       CMAKE_ARGS
         ${ep_common_args}
         ${additional_cmake_args}

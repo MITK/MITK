@@ -26,6 +26,7 @@ if(MITK_USE_ACVD)
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/ACVD-vtk6_3d5ae388-patched.tar.gz
       URL_MD5 a59e658c8309f6a7004705d86d520d12
       CMAKE_GENERATOR ${gen}
+      CMAKE_GENERATOR_PLATFORM ${gen_platform}
       CMAKE_ARGS
         ${ep_common_args}
         ${additional_args}

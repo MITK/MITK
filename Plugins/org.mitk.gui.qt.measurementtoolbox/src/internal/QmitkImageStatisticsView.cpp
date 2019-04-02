@@ -401,21 +401,20 @@ void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
     auto statistic = m_CalculationJob->GetStatisticsData();
     auto image = m_CalculationJob->GetStatisticsImage();
     mitk::BaseData::ConstPointer mask = nullptr;
-    auto statisticNonConst = statistic->Clone();
     auto imageRule = mitk::StatisticsToImageRelationRule::New();
-    imageRule->Connect(statisticNonConst.GetPointer(), image);
+    imageRule->Connect(statistic, image);
 
     if (m_CalculationJob->GetMaskImage())
     {
       auto maskRule = mitk::StatisticsToMaskRelationRule::New();
       mask = m_CalculationJob->GetMaskImage();
-      maskRule->Connect(statisticNonConst.GetPointer(), mask);
+      maskRule->Connect(statistic, mask);
     }
     else if (m_CalculationJob->GetPlanarFigure())
     {
       auto planarFigureRule = mitk::StatisticsToMaskRelationRule::New();
       mask = m_CalculationJob->GetPlanarFigure();
-      planarFigureRule->Connect(statisticNonConst.GetPointer(), mask);
+      planarFigureRule->Connect(statistic, mask);
     }
 
     auto imageStatistics =
@@ -430,7 +429,7 @@ void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
         auto nodeData = node->GetData();
         if (nodeData && nodeData->GetUID() == imageStatistics->GetUID())
         {
-          node->SetData(statisticNonConst);
+          node->SetData(statistic);
         }
       }
     }
@@ -443,7 +442,7 @@ void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
         statisticsNodeName += "_" + m_selectedMaskNode->GetName();
       }
       statisticsNodeName += "_statistics";
-      auto statisticsNode = mitk::CreateImageStatisticsNode(statisticNonConst, statisticsNodeName);
+      auto statisticsNode = mitk::CreateImageStatisticsNode(statistic, statisticsNodeName);
       this->GetDataStorage()->Add(statisticsNode);
     }
 

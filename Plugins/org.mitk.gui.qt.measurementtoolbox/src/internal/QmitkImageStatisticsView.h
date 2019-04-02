@@ -75,12 +75,12 @@ protected:
   void OnMaskSelectorChanged();
 
   void CalculateOrGetStatistics();
-  void CalculateStatistics(mitk::Image::ConstPointer image,
-                           mitk::Image::ConstPointer mask = nullptr,
-                           mitk::PlanarFigure::ConstPointer maskPlanarFigure = nullptr);
+  void CalculateStatistics(const mitk::Image* image,
+                           const mitk::Image* mask = nullptr,
+                           const mitk::PlanarFigure* maskPlanarFigure = nullptr);
 
-  void ComputeAndDisplayIntensityProfile(mitk::Image * image, mitk::PlanarFigure::Pointer maskPlanarFigure);
-  void FillHistogramWidget(const std::vector<HistogramType::ConstPointer> &histogram,
+  void ComputeAndDisplayIntensityProfile(mitk::Image * image, mitk::PlanarFigure* maskPlanarFigure);
+  void FillHistogramWidget(const std::vector<const HistogramType*> &histogram,
                            const std::vector<std::string> &dataLabels);
   QmitkChartWidget::ColorTheme GetColorTheme() const;
 

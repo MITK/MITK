@@ -143,7 +143,7 @@ void QmitkImageStatisticsView::OnSliderWidgetIntensityProfileChanged()
 
 void QmitkImageStatisticsView::PartClosed(const berry::IWorkbenchPartReference::Pointer &) {}
 
-void QmitkImageStatisticsView::FillHistogramWidget(const std::vector<HistogramType::ConstPointer> &histogram,
+void QmitkImageStatisticsView::FillHistogramWidget(const std::vector<const HistogramType*> &histogram,
                                                    const std::vector<std::string> &dataLabels)
 {
   m_Controls.groupBox_histogram->setVisible(true);
@@ -201,7 +201,7 @@ void QmitkImageStatisticsView::OnImageSelectorChanged()
       m_selectedMaskNode = nullptr;
       m_Controls.widget_statistics->SetMaskNodes({});
       CalculateOrGetStatistics();
-      m_Controls.widget_statistics->SetImageNodes({m_selectedImageNode.GetPointer()});
+      m_Controls.widget_statistics->SetImageNodes({m_selectedImageNode});
       connect(this->m_Controls.maskImageSelector,
               static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
               this,
@@ -226,7 +226,7 @@ void QmitkImageStatisticsView::OnMaskSelectorChanged()
     m_selectedMaskNode = selectedMaskNode;
     if (m_selectedMaskNode.IsNotNull())
     {
-      m_Controls.widget_statistics->SetMaskNodes({m_selectedMaskNode.GetPointer()});
+      m_Controls.widget_statistics->SetMaskNodes({m_selectedMaskNode});
     }
     else
     {
@@ -250,8 +250,8 @@ void QmitkImageStatisticsView::CalculateOrGetStatistics()
   if (m_selectedImageNode != nullptr)
   {
     auto image = dynamic_cast<mitk::Image *>(m_selectedImageNode->GetData());
-    mitk::Image::Pointer mask = nullptr;
-    mitk::PlanarFigure::Pointer maskPlanarFigure = nullptr;
+    mitk::Image* mask = nullptr;
+    mitk::PlanarFigure* maskPlanarFigure = nullptr;
 
     if (image->GetDimension() == 4)
     {
@@ -277,7 +277,7 @@ void QmitkImageStatisticsView::CalculateOrGetStatistics()
     if (mask)
     {
       imageStatistics =
-        mitk::ImageStatisticsContainerManager::GetImageStatistics(this->GetDataStorage(), image, mask.GetPointer());
+        mitk::ImageStatisticsContainerManager::GetImageStatistics(this->GetDataStorage(), image, mask);
     }
     else if (maskPlanarFigure)
     {
@@ -291,7 +291,7 @@ void QmitkImageStatisticsView::CalculateOrGetStatistics()
         ComputeAndDisplayIntensityProfile(image, maskPlanarFigure);
       }
       imageStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(
-        this->GetDataStorage(), image, maskPlanarFigure.GetPointer());
+        this->GetDataStorage(), image, maskPlanarFigure);
     }
     else
     {
@@ -319,7 +319,7 @@ void QmitkImageStatisticsView::CalculateOrGetStatistics()
     // statistics need to be computed
     if (!imageStatistics || imageStatisticsOlderThanInputs || m_ForceRecompute)
     {
-      CalculateStatistics(image, mask.GetPointer(), maskPlanarFigure.GetPointer());
+      CalculateStatistics(image, mask, maskPlanarFigure);
     }
     // statistics already computed
     else
@@ -344,7 +344,7 @@ void QmitkImageStatisticsView::CalculateOrGetStatistics()
 }
 
 void QmitkImageStatisticsView::ComputeAndDisplayIntensityProfile(mitk::Image *image,
-                                                                 mitk::PlanarFigure::Pointer maskPlanarFigure)
+                                                                 mitk::PlanarFigure* maskPlanarFigure)
 {
   mitk::Image::Pointer inputImage;
   if (image->GetDimension() == 4)
@@ -464,9 +464,9 @@ void QmitkImageStatisticsView::OnRequestHistogramUpdate(unsigned int nBins)
   m_CalculationJob->start();
 }
 
-void QmitkImageStatisticsView::CalculateStatistics(mitk::Image::ConstPointer image,
-                                                   mitk::Image::ConstPointer mask,
-                                                   mitk::PlanarFigure::ConstPointer maskPlanarFigure)
+void QmitkImageStatisticsView::CalculateStatistics(const mitk::Image* image,
+                                                   const mitk::Image* mask,
+                                                   const mitk::PlanarFigure* maskPlanarFigure)
 {
   this->m_CalculationJob->Initialize(image, mask, maskPlanarFigure);
 

@@ -387,7 +387,6 @@ void QmitkImageStatisticsView::ResetGUI()
 
 void QmitkImageStatisticsView::ResetGUIDefault()
 {
-  MITK_INFO << "reset GUI";
   m_Controls.widget_histogram->ResetDefault();
   m_Controls.checkBox_ignoreZero->setChecked(false);
 }

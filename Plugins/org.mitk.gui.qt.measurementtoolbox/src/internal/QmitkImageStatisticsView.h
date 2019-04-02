@@ -70,7 +70,6 @@ protected:
   virtual void Deactivated() override;
   virtual void Visible() override;
   virtual void Hidden() override;
-
   virtual void SetFocus() override;
 
   /** \brief Is called right before the view closes (before the destructor) */

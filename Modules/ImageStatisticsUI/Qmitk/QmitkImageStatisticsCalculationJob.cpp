@@ -28,7 +28,6 @@ QmitkImageStatisticsCalculationJob::QmitkImageStatisticsCalculationJob()
   , m_PlanarFigureMask(nullptr)
   , m_IgnoreZeros(false)
   , m_HistogramNBins(100)
-  , m_StatisticChanged(false)
   , m_CalculationSuccessful(false)
 {
 }
@@ -110,10 +109,6 @@ QmitkImageStatisticsCalculationJob::GetTimeStepHistogram(unsigned int t) const
 
   return this->m_HistogramVector[t];
 }
-
-bool QmitkImageStatisticsCalculationJob::GetStatisticsChangedFlag() const
-{
-  return m_StatisticChanged;
 }
 
 bool QmitkImageStatisticsCalculationJob::GetStatisticsUpdateSuccessFlag() const
@@ -179,8 +174,6 @@ void QmitkImageStatisticsCalculationJob::run()
     statisticCalculationSuccessful = false;
   }
 
-  bool statisticChanged = false;
-
   if (this->m_IgnoreZeros)
   {
       mitk::IgnorePixelMaskGenerator::Pointer ignorePixelValueMaskGen = mitk::IgnorePixelMaskGenerator::New();
@@ -218,7 +211,6 @@ void QmitkImageStatisticsCalculationJob::run()
       statisticCalculationSuccessful = false;
     }
 
-  this->m_StatisticChanged = statisticChanged;
   this->m_CalculationSuccessful = statisticCalculationSuccessful;
 
   if(statisticCalculationSuccessful)

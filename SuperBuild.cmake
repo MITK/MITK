@@ -359,6 +359,7 @@ ExternalProject_Add(${proj}
   LIST_SEPARATOR ${sep}
   DOWNLOAD_COMMAND ""
   CMAKE_GENERATOR ${gen}
+  CMAKE_GENERATOR_PLATFORM ${gen_platform}
   CMAKE_CACHE_ARGS
     # --------------- Build options ----------------
     -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_INSTALL_PREFIX}

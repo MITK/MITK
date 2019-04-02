@@ -14,6 +14,8 @@ if(MITK_USE_${proj})
     ExternalProject_Add(${proj}
       GIT_REPOSITORY https://github.com/madler/zlib.git
       GIT_TAG v1.2.11
+      CMAKE_GENERATOR ${gen}
+      CMAKE_GENERATOR_PLATFORM ${gen_platform}
       CMAKE_ARGS ${ep_common_args}
       CMAKE_CACHE_ARGS ${ep_common_cache_args}
       CMAKE_CACHE_DEFAULT_ARGS ${ep_common_cache_default_args}

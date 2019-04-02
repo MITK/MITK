@@ -31,6 +31,7 @@ if(MITK_USE_DCMTK)
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/dcmtk_29f9de10.tar.gz
       URL_MD5 c4b13ef2e694f3b8c50d7181fc959f4a
       CMAKE_GENERATOR ${gen}
+      CMAKE_GENERATOR_PLATFORM ${gen_platform}
       CMAKE_ARGS
          ${ep_common_args}
          ${additional_args}

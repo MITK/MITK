@@ -27,6 +27,7 @@ if(MITK_USE_Poco)
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/poco-1.9.0.tar.gz
       URL_MD5 1011839033f72de138f0c523c2caa121
       CMAKE_GENERATOR ${gen}
+      CMAKE_GENERATOR_PLATFORM ${gen_platform}
       CMAKE_ARGS
         ${ep_common_args}
         ${additional_cmake_args}

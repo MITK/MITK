@@ -28,6 +28,7 @@ if(NOT DEFINED Redland_DIR)
      URL_MD5 e5be03eda13ef68aabab6e42aa67715e
      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Redland-1.0.17.patch
      CMAKE_GENERATOR ${gen}
+     CMAKE_GENERATOR_PLATFORM ${gen_platform}
      CMAKE_ARGS
        ${ep_common_args}
        ${additional_cmake_args}

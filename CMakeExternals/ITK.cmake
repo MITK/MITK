@@ -52,6 +52,7 @@ if(NOT DEFINED ITK_DIR)
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-4.13.1.tar.xz
      URL_MD5 bc7296e7faccdcb5656a7669d4d875d2
      CMAKE_GENERATOR ${gen}
+     CMAKE_GENERATOR_PLATFORM ${gen_platform}
      CMAKE_ARGS
        ${ep_common_args}
        ${additional_cmake_args}

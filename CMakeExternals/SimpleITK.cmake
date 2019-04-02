@@ -62,6 +62,8 @@ if(MITK_USE_SimpleITK)
        # PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/SimpleITK-0.8.1.patch
        INSTALL_COMMAND ""
        SOURCE_SUBDIR SuperBuild
+       CMAKE_GENERATOR ${gen}
+       CMAKE_GENERATOR_PLATFORM ${gen_platform}
        CMAKE_ARGS
          ${ep_common_cache_default_args}
          # -DCMAKE_BUILD_WITH_INSTALL_RPATH:BOOL=ON

@@ -30,6 +30,7 @@ if(MITK_USE_ANN)
        URL_MD5 7ffaacc7ea79ca39d4958a6378071365
        PATCH_COMMAND ${patch_cmd}
        CMAKE_GENERATOR ${gen}
+       CMAKE_GENERATOR_PLATFORM ${gen_platform}
        CMAKE_ARGS
          ${ep_common_args}
          ${additional_args}

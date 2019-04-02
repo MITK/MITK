@@ -35,6 +35,7 @@ if(MITK_USE_MatchPoint)
        ${download_step}
        # INSTALL_COMMAND "${CMAKE_COMMAND} -P cmake_install.cmake"
        CMAKE_GENERATOR ${gen}
+       CMAKE_GENERATOR_PLATFORM ${gen_platform}
        CMAKE_ARGS
          ${ep_common_args}
          ${additional_cmake_args}

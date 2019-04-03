@@ -79,7 +79,7 @@ set(MITK_MODULES
   ModelFitUI
   Pharmacokinetics
   PharmacokineticsUI
-  CppRestSdk
+  REST
 )
 
 if(MITK_ENABLE_PIC_READER)

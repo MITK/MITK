@@ -82,7 +82,7 @@ public:
 
   void OpenListener_Succeed()
   {
-    m_Service->ReceiveRequest(_XPLATSTR("http://localhost:8080/test"), this);
+    m_Service->ReceiveRequest(_XPLATSTR("http://localhost:8080/servertest"), this);
 
     CPPUNIT_ASSERT_MESSAGE("Open one listener, observer map size is one", 1 == m_Service->GetObservers().size());
     CPPUNIT_ASSERT_MESSAGE("Open one listener, server map size is one", 1 == m_Service->GetServerMap().size());
@@ -90,9 +90,9 @@ public:
 
   void TwoListenerSameHostSamePort_OnlyOneOpened()
   {
-    m_Service->ReceiveRequest(_XPLATSTR("http://localhost:8080/test"), this);
-    m_Service->ReceiveRequest(_XPLATSTR("http://localhost:8080/example"), this);
-  
+    m_Service->ReceiveRequest(_XPLATSTR("http://localhost:8080/servertest"), this);
+    m_Service->ReceiveRequest(_XPLATSTR("http://localhost:8080/serverexample"), this);
+
     CPPUNIT_ASSERT_MESSAGE("Open two listener with a different path,same host, same port, observer map size is two",
                            2 == m_Service->GetObservers().size());
     CPPUNIT_ASSERT_MESSAGE("Open two listener with a different path,same host, same port, server map size is one",
@@ -101,27 +101,27 @@ public:
 
   void CloseListener_Succeed()
   {
-    m_Service->ReceiveRequest(_XPLATSTR("http://localhost:8080/test"), this);
-   
+    m_Service->ReceiveRequest(_XPLATSTR("http://localhost:8080/servertest"), this);
+
     CPPUNIT_ASSERT_MESSAGE("Open one listener, observer map size is one", 1 == m_Service->GetObservers().size());
     CPPUNIT_ASSERT_MESSAGE("Open one listener, server map size is one", 1 == m_Service->GetServerMap().size());
 
     m_Service->HandleDeleteObserver(this);
-  
+
     CPPUNIT_ASSERT_MESSAGE("Closed listener, observer map is empty", 0 == m_Service->GetObservers().size());
     CPPUNIT_ASSERT_MESSAGE("Closed listener, server map is empty", 0 == m_Service->GetServerMap().size());
   }
 
   void OpenMultipleListenerCloseOne_Succeed()
   {
-    m_Service->ReceiveRequest(_XPLATSTR("http://localhost:8080/test"), this);
-    m_Service->ReceiveRequest(_XPLATSTR("http://localhost:8090/example"), this);
-   
+    m_Service->ReceiveRequest(_XPLATSTR("http://localhost:8080/servertest"), this);
+    m_Service->ReceiveRequest(_XPLATSTR("http://localhost:8090/serverexample"), this);
+
     CPPUNIT_ASSERT_MESSAGE("Open two listener, observer map size is two", 2 == m_Service->GetObservers().size());
     CPPUNIT_ASSERT_MESSAGE("Open two listener, server map size is two", 2 == m_Service->GetServerMap().size());
 
-    m_Service->HandleDeleteObserver(this, _XPLATSTR("http://localhost:8080/test"));
-   
+    m_Service->HandleDeleteObserver(this, _XPLATSTR("http://localhost:8080/servertest"));
+
     CPPUNIT_ASSERT_MESSAGE("Closed one of two listeners, observer map is size is one",
                            1 == m_Service->GetObservers().size());
     CPPUNIT_ASSERT_MESSAGE("Closed one of two listener, server map size is one",
@@ -130,25 +130,25 @@ public:
 
   void OpenMultipleListenerCloseAll_Succeed()
   {
-    m_Service->ReceiveRequest(_XPLATSTR("http://localhost:8080/test"), this);
-    m_Service->ReceiveRequest(_XPLATSTR("http://localhost:8090/example"), this);
-    
+    m_Service->ReceiveRequest(_XPLATSTR("http://localhost:8080/servertest"), this);
+    m_Service->ReceiveRequest(_XPLATSTR("http://localhost:8090/serverexample"), this);
+
     CPPUNIT_ASSERT_MESSAGE("Open two listener, observer map size is two", 2 == m_Service->GetObservers().size());
     CPPUNIT_ASSERT_MESSAGE("Open two listener, server map size is two", 2 == m_Service->GetServerMap().size());
 
     m_Service->HandleDeleteObserver(this);
-  
+
     CPPUNIT_ASSERT_MESSAGE("Closed all listeners, observer map is empty", 0 == m_Service->GetObservers().size());
     CPPUNIT_ASSERT_MESSAGE("Closed all listeners, server map is empty", 0 == m_Service->GetServerMap().size());
   }
 
   void OpenListenerGetRequestSamePath_ReturnExpectedJSON()
   {
-    m_Service->ReceiveRequest(_XPLATSTR("http://localhost:8080/test"), this);
-   
+    m_Service->ReceiveRequest(_XPLATSTR("http://localhost:8080/servertest"), this);
+
     web::json::value result;
 
-    m_Service->SendRequest(_XPLATSTR("http://localhost:8080/test"))
+    m_Service->SendRequest(_XPLATSTR("http://localhost:8080/servertest"))
       .then([&](pplx::task<web::json::value> resultTask) {
         try
         {
@@ -161,7 +161,7 @@ public:
         }
       })
       .wait();
-    
+
     CPPUNIT_ASSERT_MESSAGE("Opened listener and send request to same uri, returned expected JSON", result == m_Data);
   }
 
@@ -169,35 +169,35 @@ public:
   {
     web::json::value result;
 
-    m_Service->SendRequest(_XPLATSTR("http://localhost:8080/test"))
+    m_Service->SendRequest(_XPLATSTR("http://localhost:8080/servertest"))
       .then([&](pplx::task<web::json::value> resultTask) { result = resultTask.get(); })
       .wait();
   }
 
   void CloseListener_NoRequestPossible()
   {
-    m_Service->ReceiveRequest(_XPLATSTR("http://localhost:8080/test"), this);
-  
+    m_Service->ReceiveRequest(_XPLATSTR("http://localhost:8080/servertest"), this);
+
     CPPUNIT_ASSERT_MESSAGE("Open one listener, observer map size is one", 1 == m_Service->GetObservers().size());
     CPPUNIT_ASSERT_MESSAGE("Open one listener, server map size is one", 1 == m_Service->GetServerMap().size());
 
     m_Service->HandleDeleteObserver(this);
-    
+
     CPPUNIT_ASSERT_MESSAGE("Closed listener, observer map is empty", 0 == m_Service->GetObservers().size());
     CPPUNIT_ASSERT_MESSAGE("Closed listener, server map is empty", 0 == m_Service->GetServerMap().size());
-    
+
     CPPUNIT_ASSERT_THROW(RequestToClosedListener(), mitk::Exception);
   }
 
   void RequestToDifferentPathNotFound()
   {
-    m_Service->ReceiveRequest(_XPLATSTR("http://localhost:8080/test"), this);
-    
+    m_Service->ReceiveRequest(_XPLATSTR("http://localhost:8080/servertest"), this);
+
     web::json::value result;
 
-    m_Service->SendRequest(_XPLATSTR("http://localhost:8080/example"))
+    m_Service->SendRequest(_XPLATSTR("http://localhost:8080/serverexample"))
       .then([&](pplx::task<web::json::value> resultTask) { result = resultTask.get(); })
-      .wait();  
+      .wait();
   }
 
   void OpenListenerGetRequestDifferentPath_ReturnNotFound()
@@ -205,20 +205,20 @@ public:
     CPPUNIT_ASSERT_THROW(RequestToDifferentPathNotFound(), mitk::Exception);
   }
 
-  void OpenListenerCloseAndReopen_Succeed() 
+  void OpenListenerCloseAndReopen_Succeed()
   {
-    m_Service->ReceiveRequest(_XPLATSTR("http://localhost:8080/test"), this);
-    
+    m_Service->ReceiveRequest(_XPLATSTR("http://localhost:8080/servertest"), this);
+
     CPPUNIT_ASSERT_MESSAGE("Open one listener, observer map size is one", 1 == m_Service->GetObservers().size());
     CPPUNIT_ASSERT_MESSAGE("Open one listener, server map size is one", 1 == m_Service->GetServerMap().size());
 
     m_Service->HandleDeleteObserver(this);
-    
+
     CPPUNIT_ASSERT_MESSAGE("Closed listener, observer map is empty", 0 == m_Service->GetObservers().size());
     CPPUNIT_ASSERT_MESSAGE("Closed listener, server map is empty", 0 == m_Service->GetServerMap().size());
 
-    m_Service->ReceiveRequest(_XPLATSTR("http://localhost:8080/test"), this);
-    
+    m_Service->ReceiveRequest(_XPLATSTR("http://localhost:8080/servertest"), this);
+
     CPPUNIT_ASSERT_MESSAGE("Reopened listener, observer map size is one", 1 == m_Service->GetObservers().size());
     CPPUNIT_ASSERT_MESSAGE("Reopened listener, server map size is one", 1 == m_Service->GetServerMap().size());
   }

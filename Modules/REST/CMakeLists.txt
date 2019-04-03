@@ -1,6 +1,6 @@
 if(MITK_USE_cpprestsdk)
 
-  MITK_CREATE_MODULE(
+  mitk_create_module(
     DEPENDS MitkCore
     AUTOLOAD_WITH MitkCore
   )

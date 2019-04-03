@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "MitkRESTServiceActivator.h"
+#include "mitkRESTServiceActivator.h"
 #include <usModuleContext.h>
 
 void MitkRESTServiceActivator::Load(us::ModuleContext *context)

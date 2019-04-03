@@ -21,8 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include <mitkMaskGenerator.h>
 #include <mitkImageStatisticsContainer.h>
-#include <itkImage.h>
-#include <itkObject.h>
 
 namespace mitk
 {

@@ -80,6 +80,7 @@ set(MITK_MODULES
   Pharmacokinetics
   PharmacokineticsUI
   REST
+  RESTService
 )
 
 if(MITK_ENABLE_PIC_READER)

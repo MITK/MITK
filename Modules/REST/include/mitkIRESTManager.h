@@ -17,31 +17,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkIRESTManager_h
 #define mitkIRESTManager_h
 
-#include "cpprest/json.h"
-#include "cpprest/uri.h"
-
-#include <MitkCoreExports.h>
 #include <mitkServiceInterface.h>
 
-#include <MitkCppRestSdkExports.h>
-#include <mitkRESTClient.h>
-#include <mitkIRESTObserver.h>
+#include <MitkRESTExports.h>
 
+#include <cpprest/json.h>
+#include <cpprest/uri.h>
 
 namespace mitk
 {
+  class IRESTObserver;
+  class RESTServer;
+
   /**
    * @class IRESTManager
-   * @brief this is a microservice interface for managing REST-requests.
-   *
-   * There are two microservices implementing this interface.
-   * 1. The RESTManager in the CppRestSdk Module is the service used for non-Qt applications
-   * 2. The RESTManagerQt in the CppRestSdkQt Module which is used for Qt-applications.
-   * If a Qt application is running, the RESTManagerQt is the default service which is automatically selected.
+   * @brief This is a microservice interface for managing REST requests.
    */
-
-  class RESTServer;
-  class MITKCPPRESTSDK_EXPORT IRESTManager
+  class MITKREST_EXPORT IRESTManager
   {
   public:
     virtual ~IRESTManager();
@@ -64,10 +56,12 @@ namespace mitk
      * @param body the body for the request (optional)
      * @return task to wait for
      */
-    virtual pplx::task<web::json::value> SendRequest(const web::uri &uri,
-                                             const RequestType &type = RequestType::Get,
-                                             const web::json::value *body = nullptr,
-                                             const utility::string_t &filePath = {}) = 0;
+    virtual pplx::task<web::json::value> SendRequest(
+      const web::uri &uri,
+      const RequestType &type = RequestType::Get,
+      const web::json::value *body = nullptr,
+      const utility::string_t &filePath = {}
+    ) = 0;
 
     /**
      * @brief starts listening for requests if there isn't another observer listening and the port is free
@@ -98,7 +92,7 @@ namespace mitk
     virtual const std::map<std::pair<int, utility::string_t>, IRESTObserver *>& GetObservers() = 0;
 
   };
-} // namespace mitk
+}
 
 MITK_DECLARE_SERVICE_INTERFACE(mitk::IRESTManager, "org.mitk.IRESTManager")
 

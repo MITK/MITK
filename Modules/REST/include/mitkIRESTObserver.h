@@ -17,13 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkIRESTObserver_h
 #define mitkIRESTObserver_h
 
-#include "cpprest/json.h"
-#include "cpprest/uri.h"
-#include <MitkCppRestSdkExports.h>
+#include <MitkRESTExports.h>
+
+#include <cpprest/json.h>
+#include <cpprest/uri.h>
 
 namespace mitk
 {
-  class MITKCPPRESTSDK_EXPORT IRESTObserver
+  class MITKREST_EXPORT IRESTObserver
   {
   public:
     /**
@@ -46,4 +47,4 @@ namespace mitk
   };
 }
 
-#endif // !mitkIRESTObserver
+#endif

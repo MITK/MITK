@@ -1,10 +1,34 @@
-#include "mitkRESTManager.h"
-#include <mitkCommon.h>
-#include <mitkRESTUtil.h>
+/*===================================================================
 
-mitk::RESTManager::RESTManager() {}
+The Medical Imaging Interaction Toolkit (MITK)
 
-mitk::RESTManager::~RESTManager() {}
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
+
+#include <mitkRESTManager.h>
+#include <mitkRESTClient.h>
+#include <mitkRESTServer.h>
+#include <mitkIRESTObserver.h>
+
+#include <mitkExceptionMacro.h>
+#include <mitkLogMacros.h>
+
+mitk::RESTManager::RESTManager()
+{
+}
+
+mitk::RESTManager::~RESTManager()
+{
+}
 
 pplx::task<web::json::value> mitk::RESTManager::SendRequest(const web::uri &uri,
                                                             const RequestType &type,
@@ -12,48 +36,33 @@ pplx::task<web::json::value> mitk::RESTManager::SendRequest(const web::uri &uri,
                                                             const utility::string_t &filePath)
 {
   pplx::task<web::json::value> answer;
-  auto client = new RESTClient();
-  // according to the RequestType, different HTTP requests are made
+  auto client = new RESTClient;
+
   switch (type)
   {
     case RequestType::Get:
-
-      if (filePath.empty())
-      {
-        // no file path specified, starts a normal get request returning the normal json result
-        answer = client->Get(uri);
-      }
-      else
-      {
-        // file path ist specified, the result of the get request ist stored in this file
-        // and an empty json object is returned
-        answer = client->Get(uri, filePath);
-      }
+      answer = !filePath.empty()
+        ? client->Get(uri, filePath)
+        : client->Get(uri);
       break;
 
     case RequestType::Post:
-
       if (nullptr == content)
-      {
-        // warning because normally you won't create an empty ressource
-        MITK_WARN << "Content for put is empty, this will create an empty ressource";
-      }
+        MITK_WARN << "Content for put is empty, this will create an empty resource";
+
       answer = client->Post(uri, content);
       break;
 
     case RequestType::Put:
 
       if (nullptr == content)
-      {
-        // warning because normally you won't empty a ressource
         MITK_WARN << "Content for put is empty, this will empty the ressource";
-      }
+
       answer = client->Put(uri, content);
       break;
 
     default:
       mitkThrow() << "Request Type not supported";
-      break;
   }
 
   return answer;
@@ -62,7 +71,7 @@ pplx::task<web::json::value> mitk::RESTManager::SendRequest(const web::uri &uri,
 void mitk::RESTManager::ReceiveRequest(const web::uri &uri, mitk::IRESTObserver *observer)
 {
   // New instance of RESTServer in m_ServerMap, key is port of the request
-  int port = uri.port();
+  auto port = uri.port();
 
   // Checking if port is free to add a new Server
   if (0 == m_ServerMap.count(port))
@@ -74,8 +83,6 @@ void mitk::RESTManager::ReceiveRequest(const web::uri &uri, mitk::IRESTObserver 
     m_ServerMap[port] = server;
     // start Server
     server->OpenListener();
-
-    MITK_INFO << "new server " << mitk::RESTUtil::convertToUtf8(uri.authority().to_string()) << " at port " << port;
   }
   // If there is already a server under this port
   else
@@ -163,9 +170,6 @@ void mitk::RESTManager::RequestForATakenPort(const web::uri &uri, IRESTObserver 
     if (0 == m_Observers.count(key))
     {
       this->AddObserver(uri, observer);
-
-      // info output
-      MITK_INFO << "started listening, no new server instance has been created";
     }
     else
     {

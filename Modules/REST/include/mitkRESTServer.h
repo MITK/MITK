@@ -17,25 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkRESTServer_h
 #define mitkRESTServer_h
 
-#include <cpprest/http_listener.h>
-
-#include <mitkIRESTManager.h>
-#include <usGetModuleContext.h>
-#include <usModule.h>
-#include <usServiceTracker.h>
-
-typedef web::http::experimental::listener::http_listener MitkListener;
-typedef web::http::http_request MitkRequest;
-typedef web::http::http_response MitkResponse;
-typedef web::http::methods MitkRESTMethods;
-typedef web::http::status_codes MitkRestStatusCodes;
-typedef web::json::json_exception MitkJsonException;
+#include <MitkRESTExports.h>
+#include <cpprest/uri.h>
 
 namespace mitk
 {
-  class MITKCPPRESTSDK_EXPORT RESTServer
+  class MITKREST_EXPORT RESTServer
   {
-
   public:
     /**
      * @brief Creates an server listening to the given URI
@@ -62,11 +50,9 @@ namespace mitk
      *
      * @param MitkRequest incoming request object
      */
-    void HandleGet(const MitkRequest &request);
-
-    MitkListener m_Listener;
-    web::uri m_Uri;
+    class Impl;
+    std::unique_ptr<Impl> m_Impl;
   };
-} // namespace mitk
+}
 
 #endif

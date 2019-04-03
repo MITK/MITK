@@ -14,20 +14,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <mitkIRESTObserver.h>
-#include <mitkIRESTManager.h>
-
+#include "MitkRESTServiceActivator.h"
 #include <usModuleContext.h>
-#include <usGetModuleContext.h>
 
-mitk::IRESTObserver::~IRESTObserver() 
+void MitkRESTServiceActivator::Load(us::ModuleContext *context)
 {
-  auto context = us::GetModuleContext();
-  auto managerRef = context->GetServiceReference<IRESTManager>();
-  if (managerRef)
-  {
-    auto manager = context->GetService(managerRef);
-    if (manager)
-      manager->HandleDeleteObserver(this);
-  }
+  m_RESTManager.reset(new mitk::RESTManager);
+  context->RegisterService<mitk::IRESTManager>(m_RESTManager.get());
 }
+
+void MitkRESTServiceActivator::Unload(us::ModuleContext *)
+{
+}
+
+US_EXPORT_MODULE_ACTIVATOR(MitkRESTServiceActivator)

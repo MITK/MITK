@@ -1,10 +1,92 @@
-#include "mitkRESTServer.h"
-#include <mitkCommon.h>
-#include<mitkRESTUtil.h>
+/*===================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
+
+#include <mitkRESTServer.h>
+
+#include <mitkIRESTManager.h>
+
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
+
+#include <cpprest/http_listener.h>
+
+using namespace std::placeholders;
+
+using http_listener = web::http::experimental::listener::http_listener;
+using http_request = web::http::http_request;
+using methods = web::http::methods;
+using status_codes = web::http::status_codes;
+
+namespace mitk
+{
+  class RESTServer::Impl
+  {
+  public:
+    Impl(const web::uri &uri);
+    ~Impl();
+
+    void HandleGet(const http_request &request);
+
+    web::http::experimental::listener::http_listener listener;
+    web::uri uri;
+  };
+
+  RESTServer::Impl::Impl(const web::uri &uri)
+    : uri{uri}
+  {
+  }
+
+  RESTServer::Impl::~Impl()
+  {
+  }
+
+  void RESTServer::Impl::HandleGet(const http_request &request)
+  {
+    auto port = this->listener.uri().port();
+
+    web::uri_builder builder(this->listener.uri());
+    builder.append(request.absolute_uri());
+
+    auto uriString = builder.to_uri().to_string();
+
+    web::json::value content;
+
+    auto context = us::GetModuleContext();
+    auto managerRef = context->GetServiceReference<IRESTManager>();
+
+    if (managerRef)
+    {
+      auto manager = context->GetService(managerRef);
+      if (manager)
+      {
+        auto data = request.extract_json().get();
+        content = manager->Handle(builder.to_uri(), data);
+      }
+    }
+
+    request.reply(content.is_null()
+      ? status_codes::NotFound
+      : status_codes::OK);
+  }
+}
+
 
 mitk::RESTServer::RESTServer(const web::uri &uri)
+  : m_Impl{std::make_unique<Impl>(uri)}
 {
-  m_Uri = uri;
 }
 
 mitk::RESTServer::~RESTServer()
@@ -13,60 +95,17 @@ mitk::RESTServer::~RESTServer()
 
 void mitk::RESTServer::OpenListener()
 {
-    //create listener
-    m_Listener = MitkListener(m_Uri);
-    //Connect incoming get requests with HandleGet method
-    m_Listener.support(web::http::methods::GET,
-                       std::bind(&mitk::RESTServer::HandleGet, this, std::placeholders::_1));
-    //open listener
-    m_Listener.open().wait();
+  m_Impl->listener = http_listener(m_Impl->uri);
+  m_Impl->listener.support(methods::GET, std::bind(&Impl::HandleGet, m_Impl.get(), _1));
+  m_Impl->listener.open().wait();
 }
 
 void mitk::RESTServer::CloseListener()
 {
-  //close listener
-  m_Listener.close().wait();
+  m_Impl->listener.close().wait();
 }
 
 web::uri mitk::RESTServer::GetUri()
 {
-  return m_Uri;
-}
-
-void mitk::RESTServer::HandleGet(const MitkRequest &request)
-{
-  int port = m_Listener.uri().port();
- //getting exact request uri has to be a parameter in handle function
-  web::uri_builder build(m_Listener.uri());
-  build.append(request.absolute_uri());
-  auto uriStringT = build.to_uri().to_string();
-
-  MITK_INFO << "Get Request for server at port " << port << " Exact request uri: "
-    << mitk::RESTUtil::convertToUtf8(uriStringT);
-
-  web::json::value content;
-  //get RESTManager as microservice to call th Handle method of the manager
-  auto context = us::GetModuleContext();
-
-  auto managerRef = context->GetServiceReference<IRESTManager>();
-  if (managerRef)
-  {
-    auto managerService = context->GetService(managerRef);
-    if (managerService)
-    {
-      web::json::value data = request.extract_json().get();
-      //call the handle method
-      content = managerService->Handle(build.to_uri(), data);
-    }
-  }
-  if (!content.is_null())
-  {
-    //content handled by observer
-    request.reply(MitkRestStatusCodes::OK, content);
-  }
-  else
-  {
-    //no observer to handle data
-    request.reply(MitkRestStatusCodes::NotFound);
-  }
+  return m_Impl->uri;
 }

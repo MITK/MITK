@@ -1,210 +1,162 @@
-#include "mitkRESTClient.h"
-#include "mitkRESTUtil.h"
-#include <mitkCommon.h>
+/*===================================================================
 
-mitk::RESTClient::RESTClient() {}
+The Medical Imaging Interaction Toolkit (MITK)
 
-mitk::RESTClient::~RESTClient() {}
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
+
+#include <mitkRESTClient.h>
+#include <mitkRESTUtil.h>
+#include <mitkExceptionMacro.h>
+
+#include <cpprest/http_client.h>
+#include <cpprest/filestream.h>
+
+using http_client = web::http::client::http_client;
+using http_request = web::http::http_request;
+using http_response = web::http::http_response;
+using methods = web::http::methods;
+using status_codes = web::http::status_codes;
+using file_buffer = concurrency::streams::file_buffer<uint8_t>;
+using streambuf = concurrency::streams::streambuf<uint8_t>;
+
+mitk::RESTClient::RESTClient()
+{
+}
+
+mitk::RESTClient::~RESTClient()
+{
+}
 
 pplx::task<web::json::value> mitk::RESTClient::Get(const web::uri &uri)
 {
-  //Create new HTTP client
-  MitkClient *client = new MitkClient(uri);
+  auto client = new http_client(uri);
+  http_request request;
 
-  MITK_INFO << "Calling GET with " << mitk::RESTUtil::convertToUtf8(uri.path()) << " on client "
-            << mitk::RESTUtil::convertToUtf8(uri.authority().to_string());
-
-  //create get request
-  MitkRequest getRequest(MitkRESTMethods::GET);
-
-  //make request
-  return client->request(getRequest).then([=](pplx::task<MitkResponse> responseTask) {
+  return client->request(request).then([=](pplx::task<web::http::http_response> responseTask) {
     try
     {
-      //get response of the request
-      MitkResponse response = responseTask.get();
+      auto response = responseTask.get();
       auto status = response.status_code();
-      MITK_INFO << " status: " << status;
 
-      if (MitkRestStatusCodes::OK != status)
-      {
-        //throw if something went wrong (e.g. invalid uri)
-        //this exception can be handled by client
-        mitkThrow() << "response was not OK";
-      }
-      try
-      {
-        //parse content type to application/json if it isn't already
-        //this is important if the content type is e.g. application/dicom+json
-        utility::string_t requestContentType = response.headers().content_type();
-        if (_XPLATSTR("application/json") != requestContentType)
-        {
-          response.headers().set_content_type(_XPLATSTR("application/json"));
-        }
-        //return json answer
-        return response.extract_json().get();
-      }
-      catch (...)
-      {
-        mitkThrow() << "extracting json went wrong";
-      }
+      if (status_codes::OK != status)
+        mitkThrow();
+
+      auto requestContentType = response.headers().content_type();
+
+      if (_XPLATSTR("application/json") != requestContentType)
+        response.headers().set_content_type(_XPLATSTR("application/json"));
+
+      return response.extract_json().get();
     }
     catch (...)
     {
-      mitkThrow() << "getting response went wrong";
+      mitkThrow() << "Getting response went wrong";
     }
   });
 }
 
 pplx::task<web::json::value> mitk::RESTClient::Get(const web::uri &uri, const utility::string_t &filePath)
 {
-  // Create new HTTP client
-  MitkClient *client = new MitkClient(uri);
-
-  MITK_INFO << "Calling GET with " << mitk::RESTUtil::convertToUtf8(uri.path()) << " on client "
-            << mitk::RESTUtil::convertToUtf8(uri.authority().to_string()) << " save into "
-             << mitk::RESTUtil::convertToUtf8(filePath);
-  
-  //create new file buffer
+  auto client = new http_client(uri);
   auto fileBuffer = std::make_shared<concurrency::streams::streambuf<uint8_t>>();
-  // create get request
-  MitkRequest getRequest(MitkRESTMethods::GET);
+  http_request request;
 
-  //open file stream for the specified file path
-  return concurrency::streams::file_buffer<uint8_t>::open(filePath, std::ios::out)
-    .then([=](concurrency::streams::streambuf<uint8_t> outFile) -> pplx::task<MitkResponse> {
+  // Open file stream for the specified file path
+  return file_buffer::open(filePath, std::ios::out)
+    .then([=](streambuf outFile) -> pplx::task<http_response> {
       *fileBuffer = outFile;
-      //make the get request
-      return client->request(MitkRESTMethods::GET);
+      return client->request(methods::GET);
     })
-    // Write the response body into the file buffer.
-    .then([=](MitkResponse response) -> pplx::task<size_t> {
+    // Write the response body into the file buffer
+    .then([=](http_response response) -> pplx::task<size_t> {
       auto status = response.status_code();
-      MITK_INFO << "Status code: " << status;
 
-      if (web::http::status_codes::OK != status)
-      {
-        // throw if something went wrong (e.g. invalid uri)
-        // this exception can be handled by client
-        mitkThrow() << "GET ended up with response " << mitk::RESTUtil::convertToUtf8(response.to_string());
-      }
+      if (status_codes::OK != status)
+        mitkThrow() << "GET ended up with response " << RESTUtil::convertToUtf8(response.to_string());
       
       return response.body().read_to_end(*fileBuffer);
     })
-    // Close the file buffer.
-    .then([=](size_t) { return fileBuffer->close(); })
+    // Close the file buffer
+    .then([=](size_t) {
+      return fileBuffer->close();
+    })
+    // Return empty JSON object
     .then([=]() {
-      //return empty json object
-      web::json::value data;
-      return data;
+       return web::json::value();
     });
 }
 
 pplx::task<web::json::value> mitk::RESTClient::Put(const web::uri &uri, const web::json::value *content)
 {
-  // Create new HTTP client
-  MitkClient *client = new MitkClient(uri);
+  auto client = new http_client(uri);
+  http_request request(methods::PUT);
 
-  MITK_INFO << "Calling PUT with " << mitk::RESTUtil::convertToUtf8(uri.path()) << " on client "
-            << mitk::RESTUtil::convertToUtf8(uri.authority().to_string());
-
-  // create put request
-  MitkRequest putRequest(MitkRESTMethods::PUT);
-  //set body of the put request with data given by client
   if (nullptr != content)
-  {
-    putRequest.set_body(*content);
-  } 
-  //make put request
-  return client->request(putRequest).then([=](pplx::task<MitkResponse> responseTask) {
+    request.set_body(*content);
+ 
+  return client->request(request).then([=](pplx::task<http_response> responseTask) {
     try
     {
-      // get response of the request 
-      MitkResponse response = responseTask.get();
+      auto response = responseTask.get();
       auto status = response.status_code();
-      MITK_INFO << " status: " << status;
-      if (MitkRestStatusCodes::OK != status)
-      {
-        // throw if something went wrong (e.g. invalid uri)
-        // this exception can be handled by client
-        mitkThrow() << "response was not OK";
-      }
 
-      try
-      {
-        // parse content type to application/json if it isn't already
-        // this is important if the content type is e.g. application/dicom+json
-        utility::string_t requestContentType = response.headers().content_type();
-        if (_XPLATSTR("application/json") != requestContentType)
-        {
-          response.headers().set_content_type(_XPLATSTR("application/json"));
-        }
-        // return json answer
-        return response.extract_json().get();
-      }
-      catch (...)
-      {
-        mitkThrow() << "extracting json went wrong";
-      }
+      if (status_codes::OK != status)
+        mitkThrow();
+
+      // Parse content type to application/json if it isn't already. This is
+      // important if the content type is e.g. application/dicom+json.
+      auto requestContentType = response.headers().content_type();
+
+      if (_XPLATSTR("application/json") != requestContentType)
+        response.headers().set_content_type(_XPLATSTR("application/json"));
+
+      return response.extract_json().get();
     }
     catch (...)
     {
-      mitkThrow() << "getting response went wrong";
+      mitkThrow() << "Getting response went wrong";
     }
   });
 }
 
 pplx::task<web::json::value> mitk::RESTClient::Post(const web::uri &uri, const web::json::value *content)
 {
-  // Create new HTTP client
-  MitkClient *client = new MitkClient(uri);
-  MITK_INFO << "Calling POST with " << mitk::RESTUtil::convertToUtf8(uri.path()) << " on client "
-            << mitk::RESTUtil::convertToUtf8(uri.authority().to_string());
+  auto client = new http_client(uri);
+  http_request request(methods::POST);
 
-  // Create post request
-  MitkRequest postRequest(MitkRESTMethods::POST);
-  // set body of the put request with data given by client
   if (nullptr != content)
-  {
-    postRequest.set_body(*content);
-  }
+    request.set_body(*content);
 
-  //make post request
-  return client->request(postRequest).then([=](pplx::task<MitkResponse> responseTask) {
+  return client->request(request).then([=](pplx::task<http_response> responseTask) {
     try
     {
-      // get response of the request 
-      MitkResponse response = responseTask.get();
+      auto response = responseTask.get();
       auto status = response.status_code();
-      MITK_INFO << " status: " << status;
 
-      if (MitkRestStatusCodes::Created != status)
-      {
-        // throw if something went wrong (e.g. invalid uri)
-        // this exception can be handled by client
-        mitkThrow() << "response was not Created";
-      }
+      if (status_codes::Created != status)
+        mitkThrow();
 
-      try
-      {
-        // parse content type to application/json if it isn't already
-        // this is important if the content type is e.g. application/dicom+json
-        utility::string_t requestContentType = response.headers().content_type();
-        if (_XPLATSTR("application/json") != requestContentType)
-        {
-          response.headers().set_content_type(_XPLATSTR("application/json"));
-        }
-        // return json answer
-        return response.extract_json().get();
-      }
-      catch (...)
-      {
-        mitkThrow() << "extracting json went wrong";
-      }
+      // Parse content type to application/json if it isn't already. This is
+      // important if the content type is e.g. application/dicom+json.
+      auto requestContentType = response.headers().content_type();
+      if (_XPLATSTR("application/json") != requestContentType)
+        response.headers().set_content_type(_XPLATSTR("application/json"));
+
+      return response.extract_json().get();
     }
     catch(...)
     {
-      mitkThrow() << "getting response went wrong";
+      mitkThrow() << "Getting response went wrong";
     }
   });
 }

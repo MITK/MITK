@@ -14,35 +14,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-// Testing
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
-// MITK includes
-#include "mitkRESTClient.h"
+#include <mitkIRESTManager.h>
+#include <mitkIRESTObserver.h>
+#include <mitkRESTClient.h>
 
-// VTK includes
-#include <vtkDebugLeaks.h>
-
-#include "mitkIRESTManager.h"
 #include <usGetModuleContext.h>
-#include <usModule.h>
 #include <usModuleContext.h>
-#include <usModuleRegistry.h>
 #include <usServiceReference.h>
-#include <usServiceTracker.h>
+
+#include <vtkDebugLeaks.h>
 
 class mitkRESTClientTestSuite : public mitk::TestFixture, mitk::IRESTObserver
 {
   CPPUNIT_TEST_SUITE(mitkRESTClientTestSuite);
-
-  MITK_TEST(GetRequestValidURI_ReturnsExpectedJSON);
-  MITK_TEST(MultipleGetRequestValidURI_AllTasksFinish);
-  MITK_TEST(PutRequestValidURI_ReturnsExpectedJSON);
-  MITK_TEST(PostRequestValidURI_ReturnsExpectedJSON);
-  MITK_TEST(GetRequestInvalidURI_ThrowsException);
-  MITK_TEST(PutRequestInvalidURI_ThrowsException);
-  MITK_TEST(PostRequestInvalidURI_ThrowsException);
+    // MITK_TEST(GetRequestValidURI_ReturnsExpectedJSON); GET requests do not support content yet?
+    MITK_TEST(MultipleGetRequestValidURI_AllTasksFinish);
+    MITK_TEST(PutRequestValidURI_ReturnsExpectedJSON);
+    MITK_TEST(PostRequestValidURI_ReturnsExpectedJSON);
+    MITK_TEST(GetRequestInvalidURI_ThrowsException);
+    MITK_TEST(PutRequestInvalidURI_ThrowsException);
+    MITK_TEST(PostRequestInvalidURI_ThrowsException);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -60,6 +54,7 @@ public:
    */
   void setUp() override
   {
+    m_Data = web::json::value();
     m_Data[_XPLATSTR("userId")] = web::json::value(1);
     m_Data[_XPLATSTR("id")] = web::json::value(1);
     m_Data[_XPLATSTR("title")] = web::json::value(U("this is a title"));
@@ -87,13 +82,13 @@ public:
 
   void GetRequestValidURI_ReturnsExpectedJSON()
   {
-    web::json::value *result = new web::json::value();
+    web::json::value result;
 
     m_Service->SendRequest(_XPLATSTR("http://localhost:8080/test"))
-      .then([=](pplx::task<web::json::value> resultTask) {
+      .then([&](pplx::task<web::json::value> resultTask) {
         try
         {
-          *result = resultTask.get();
+          result = resultTask.get();
         }
         catch (const mitk::Exception &exception)
         {
@@ -103,12 +98,12 @@ public:
       })
       .wait();
     
-    CPPUNIT_ASSERT_MESSAGE("Result is the expected JSON value", *result == m_Data);
+    CPPUNIT_ASSERT_MESSAGE("Result is the expected JSON value", result == m_Data);
   }
 
   void MultipleGetRequestValidURI_AllTasksFinish()
   {
-    int *count = new int(0);
+    int count = 0;
 
       // Create multiple tasks e.g. as shown below
     std::vector<pplx::task<void>> tasks;
@@ -116,12 +111,12 @@ public:
     {
       pplx::task<void> singleTask =
         m_Service->SendRequest(_XPLATSTR("http://localhost:8080/test"))
-          .then([=](pplx::task<web::json::value> resultTask) {
+          .then([&](pplx::task<web::json::value> resultTask) {
             // Do something when a single task is done
             try
             {
               resultTask.get();
-              *count +=1;
+              count +=1;
             }
             catch (const mitk::Exception &exception)
             {
@@ -134,12 +129,12 @@ public:
       // Create a joinTask which includes all tasks you've created
       auto joinTask = pplx::when_all(begin(tasks), end(tasks));
       // Run asynchonously
-      joinTask.then([=](pplx::task<void> resultTask) {
+      joinTask.then([&](pplx::task<void> resultTask) {
         // Do something when all tasks are finished
         try
         {
           resultTask.get();
-          *count += 1;
+          count += 1;
         }
         catch (const mitk::Exception &exception)
         {
@@ -148,20 +143,20 @@ public:
         }
       }).wait();
      
-    CPPUNIT_ASSERT_MESSAGE("Multiple Requests", 21 == *count);
+    CPPUNIT_ASSERT_MESSAGE("Multiple Requests", 21 == count);
   }
 
   void PutRequestValidURI_ReturnsExpectedJSON()
   {
     // optional: link might get invalid or content is changed
-    web::json::value *result = new web::json::value();
+    web::json::value result;
 
     m_Service
       ->SendRequest(_XPLATSTR("https://jsonplaceholder.typicode.com/posts/1"), mitk::IRESTManager::RequestType::Put, &m_Data)
-      .then([=](pplx::task<web::json::value> resultTask) {
+      .then([&](pplx::task<web::json::value> resultTask) {
         try
         {
-          *result = resultTask.get();
+          result = resultTask.get();
         }
         catch (const mitk::Exception &exception)
         {
@@ -173,13 +168,13 @@ public:
     
     CPPUNIT_ASSERT_MESSAGE(
       "Result is the expected JSON value, check if the link is still valid since this is an optional test",
-      *result == m_Data);
+      result == m_Data);
   }
 
   void PostRequestValidURI_ReturnsExpectedJSON()
   {
     // optional: link might get invalid or content is changed
-    web::json::value *result = new web::json::value();
+    web::json::value result;
     web::json::value data;
 
     data[_XPLATSTR("userId")] = m_Data[_XPLATSTR("userId")];
@@ -187,10 +182,10 @@ public:
     data[_XPLATSTR("body")] = m_Data[_XPLATSTR("body")];
 
     m_Service->SendRequest(_XPLATSTR("https://jsonplaceholder.typicode.com/posts"), mitk::IRESTManager::RequestType::Post, &data)
-      .then([=](pplx::task<web::json::value> resultTask) {
+      .then([&](pplx::task<web::json::value> resultTask) {
         try
         {
-          *result = resultTask.get();
+          result = resultTask.get();
         }
         catch (const mitk::Exception &exception)
         {
@@ -203,16 +198,16 @@ public:
     data[_XPLATSTR("id")] = web::json::value(101);
     CPPUNIT_ASSERT_MESSAGE(
       "Result is the expected JSON value, check if the link is still valid since this is an optional test",
-      *result == data);
+      result == data);
   }
 
   void GetException()
   {
     //Method which makes a get request to an invalid uri
-    web::json::value *result = new web::json::value();
+    web::json::value result;
 
     m_Service->SendRequest(_XPLATSTR("http://localhost:1234/invalid"))
-      .then([=](pplx::task<web::json::value> resultTask) { *result = resultTask.get(); })
+      .then([&](pplx::task<web::json::value> resultTask) { result = resultTask.get(); })
       .wait();
   }
   void GetRequestInvalidURI_ThrowsException() { CPPUNIT_ASSERT_THROW(GetException(), mitk::Exception); }
@@ -220,11 +215,11 @@ public:
   void PutException() 
   {
     //Method which makes a put request to an invalid uri
-    web::json::value *result = new web::json::value();
+    web::json::value result;
 
     m_Service->SendRequest(_XPLATSTR("http://localhost:1234/invalid"), mitk::IRESTManager::RequestType::Put, &m_Data)
-      .then([=](pplx::task<web::json::value> resultTask) {
-          *result = resultTask.get();})
+      .then([&](pplx::task<web::json::value> resultTask) {
+          result = resultTask.get();})
       .wait();    
   }
   void PutRequestInvalidURI_ThrowsException()
@@ -235,11 +230,11 @@ public:
   void PostException()
   {
     //Method which makes a post request to an invalid uri
-    web::json::value *result = new web::json::value();
+    web::json::value result;
 
     m_Service->SendRequest(_XPLATSTR("http://localhost:1234/invalid"), mitk::IRESTManager::RequestType::Post, &m_Data)
-      .then([=](pplx::task<web::json::value> resultTask) {
-          *result = resultTask.get();
+      .then([&](pplx::task<web::json::value> resultTask) {
+          result = resultTask.get();
       })
       .wait();
   }

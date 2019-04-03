@@ -2,7 +2,6 @@ if(MITK_USE_cpprestsdk)
 
   mitk_create_module(
     DEPENDS MitkCore
-    AUTOLOAD_WITH MitkCore
   )
 
   if(TARGET ${MODULE_TARGET})

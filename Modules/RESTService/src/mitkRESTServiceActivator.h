@@ -14,24 +14,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKCPPRESTSDKACTIVATOR_H_
-#define MITKCPPRESTSDKACTIVATOR_H_
+#ifndef mitkRESTServiceActivator_h
+#define mitkRESTServiceActivator_h
 
 #include <mitkRESTManager.h>
-
 #include <usModuleActivator.h>
-#include <usModuleEvent.h> 
-#include <usServiceRegistration.h> 
-#include <usServiceTracker.h>
 
-class MitkCppRestSdkActivator : public us::ModuleActivator
+class MitkRESTServiceActivator : public us::ModuleActivator
 {
-
 public:
   void Load(us::ModuleContext *context) override;
-  void Unload(us::ModuleContext *) override;
+  void Unload(us::ModuleContext *context) override;
 
 private:
   std::unique_ptr<mitk::RESTManager> m_RESTManager;
 };
+
 #endif

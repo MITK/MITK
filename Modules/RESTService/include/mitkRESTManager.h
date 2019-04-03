@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkRESTManager_h
 
 #include <mitkIRESTManager.h>
-#include <mitkRESTServer.h>
+#include <MitkRESTServiceExports.h>
 
 namespace mitk
 {
@@ -29,9 +29,8 @@ namespace mitk
   * RESTManagerQt in the CppRestSdkQt module inherits from this class and is the equivalent microservice
   * used for Qt applications.
   */
-  class MITKCPPRESTSDK_EXPORT RESTManager : public IRESTManager
+  class MITKRESTSERVICE_EXPORT RESTManager : public IRESTManager
   {
-
   public:
     RESTManager();
     ~RESTManager() override;
@@ -74,15 +73,15 @@ namespace mitk
      * @param observer the observer which shouldn't receive requests anymore
      * @param uri the uri for which the observer doesn't handle requests anymore (optional)
      */
-    virtual void HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri = {}) override;
+    void HandleDeleteObserver(IRESTObserver *observer, const web::uri &uri = {}) override;
 
     /**
     * @brief internal use only
     */
-    virtual const std::map<int, RESTServer *>& GetServerMap() override;
-    virtual std::map<std::pair<int, utility::string_t>, IRESTObserver *>& GetObservers() override;
+    const std::map<int, RESTServer *>& GetServerMap() override;
+    std::map<std::pair<int, utility::string_t>, IRESTObserver *>& GetObservers() override;
 
-    protected:
+  private:
     /**
      * @brief adds an observer if a port is free, called by ReceiveRequest method
      *
@@ -111,10 +110,9 @@ namespace mitk
     void DeleteFromServerMap(const int port);
     void SetObservers(const std::pair<int, utility::string_t> key, IRESTObserver *observer);
 
-    private:
-    std::map<int, RESTServer *> m_ServerMap;                     // Map with port server pairs
+    std::map<int, RESTServer *> m_ServerMap; // Map with port server pairs
     std::map<std::pair<int, utility::string_t>, IRESTObserver *> m_Observers; // Map with all observers
   };
-} // namespace mitk
+}
 
-#endif // !mitkRESTManager_h
+#endif

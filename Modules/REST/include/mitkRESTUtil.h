@@ -14,30 +14,33 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKRESTUTIL_H
-#define MITKRESTUTIL_H
+#ifndef mitkRESTUtil_h
+#define mitkRESTUtil_h
 
-#include "MitkCppRestSdkExports.h"
-
-#include "cpprest/asyncrt_utils.h"
-#include <iostream>
+#include <MitkRESTExports.h>
+#include <cpprest/asyncrt_utils.h>
 
 namespace mitk
 {
-  class MITKCPPRESTSDK_EXPORT RESTUtil
+  class MITKREST_EXPORT RESTUtil
   {
   public:
-
     /**
      * @brief Converts the given std::wstring into a std::string representation
      */
-    static std::string convertToUtf8(utility::string_t stringT) { return utility::conversions::to_utf8string(stringT); }
+    static std::string convertToUtf8(const utility::string_t &string)
+    {
+      return utility::conversions::to_utf8string(string);
+    }
 
-	/**
-	 * @brief Converts the given std::string into a std::wstring representation
-	 */
-    static utility::string_t convertToTString(std::string string) { return utility::conversions::to_string_t(string); }
+	  /**
+	   * @brief Converts the given std::string into a std::wstring representation
+	   */
+    static utility::string_t convertToTString(const std::string &string)
+    {
+      return utility::conversions::to_string_t(string);
+    }
   };
-};
+}
 
-#endif // MITKRESTUTIL_H
+#endif

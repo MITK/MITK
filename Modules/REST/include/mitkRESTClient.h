@@ -17,28 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkRESTClient_h
 #define mitkRESTClient_h
 
-#include "cpprest/asyncrt_utils.h"
-#include "cpprest/containerstream.h"
-#include "cpprest/filestream.h"
-#include "cpprest/http_client.h"
-#include "cpprest/producerconsumerstream.h"
-
-#include <mitkIRESTManager.h>
-#include <usGetModuleContext.h>
-#include <usModule.h>
-#include <usServiceTracker.h>
-
-typedef web::http::client::http_client MitkClient;
-typedef web::http::http_request MitkRequest;
-typedef web::http::http_response MitkResponse;
-typedef web::http::methods MitkRESTMethods;
-typedef web::http::uri_builder MitkUriBuilder;
-typedef web::http::status_codes MitkRestStatusCodes;
-typedef web::json::json_exception MitkJsonException;
+#include <MitkRESTExports.h>
+#include <cpprest/http_client.h>
 
 namespace mitk
 {
-  class MITKCPPRESTSDK_EXPORT RESTClient
+  class MITKREST_EXPORT RESTClient
   {
   public:
     RESTClient();
@@ -85,5 +69,6 @@ namespace mitk
      */
     pplx::task<web::json::value> Post(const web::uri &uri, const web::json::value *content);
   };
-} // namespace mitk
-#endif // !mitkRESTClient_h
+}
+
+#endif

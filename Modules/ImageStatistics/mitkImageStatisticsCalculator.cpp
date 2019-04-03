@@ -108,9 +108,7 @@ namespace mitk
 
     if (IsUpdateRequired(label))
     {
-      // auto aStatisticContainer = ImageStatisticsContainer::New();
       auto timeGeometry = m_Image->GetTimeGeometry();
-      // aStatisticContainer->SetTimeGeometry(timeGeometry);
       // always compute statistics on all timesteps
       for (unsigned int timeStep = 0; timeStep < m_Image->GetTimeSteps(); timeStep++)
       {
@@ -158,8 +156,6 @@ namespace mitk
           // 2) calculate statistics masked
           AccessByItk_2(m_ImageTimeSlice, InternalCalculateStatisticsMasked, timeGeometry, timeStep)
         }
-
-        // this->Modified();
       }
     }
 
@@ -190,8 +186,6 @@ namespace mitk
     if (it != m_StatisticContainers.end())
     {
       statisticContainerForImage = it->second;
-      // statisticContainerForImage->Reset();
-      // statisticContainerForImage->SetTimeGeometry(timeGeometry);
     }
     else
     {
@@ -438,8 +432,6 @@ namespace mitk
       if (labelIt != m_StatisticContainers.end())
       {
         statisticContainerForLabelImage = labelIt->second;
-        // statisticContainerForLabelImage->Reset();
-        // statisticContainerForLabelImage->SetTimeGeometry(timeGeometry);
       }
       // create new statisticContainer
       else

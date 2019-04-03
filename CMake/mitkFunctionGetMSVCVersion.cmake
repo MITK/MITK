@@ -10,7 +10,7 @@ if(MSVC)
     message(WARNING "Unknown Visual Studio version ${MSVC_VERSION} (CMake/mitkFunctionGetMSVCVersion.cmake)")
   endif()
 
-  if("${CMAKE_GENERATOR}" MATCHES ".*Win64")
+  if(CMAKE_VS_PLATFORM_NAME STREQUAL x64)
     set(CMAKE_LIBRARY_ARCHITECTURE x64 PARENT_SCOPE)
   else()
     set(CMAKE_LIBRARY_ARCHITECTURE x86 PARENT_SCOPE)

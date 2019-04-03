@@ -362,21 +362,20 @@ void QmitkCESTStatisticsView::OnThreadedStatisticsCalculationEnds()
   {
     auto statistics = this->m_CalculatorJob->GetStatisticsData();
 
-    auto statisticNonConst = statistics->Clone();
     std::string statisticsNodeName = "CEST_statistics";
-    auto statisticsNode = mitk::CreateImageStatisticsNode(statisticNonConst, statisticsNodeName);
+    auto statisticsNode = mitk::CreateImageStatisticsNode(statistics, statisticsNodeName);
     auto imageRule = mitk::StatisticsToImageRelationRule::New();
-    imageRule->Connect(statisticNonConst.GetPointer(), m_CalculatorJob->GetStatisticsImage().GetPointer());
+    imageRule->Connect(statistics, m_CalculatorJob->GetStatisticsImage());
 
     if (m_CalculatorJob->GetMaskImage())
     {
       auto maskRule = mitk::StatisticsToMaskRelationRule::New();
-      maskRule->Connect(statisticNonConst.GetPointer(), m_CalculatorJob->GetMaskImage().GetPointer());
+      maskRule->Connect(statistics, m_CalculatorJob->GetMaskImage());
     }
     else if (m_CalculatorJob->GetPlanarFigure())
     {
       auto planarFigureRule = mitk::StatisticsToMaskRelationRule::New();
-      planarFigureRule->Connect(statisticNonConst.GetPointer(), m_CalculatorJob->GetPlanarFigure().GetPointer());
+      planarFigureRule->Connect(statistics, m_CalculatorJob->GetPlanarFigure());
     }
 
     this->GetDataStorage()->Add(statisticsNode);

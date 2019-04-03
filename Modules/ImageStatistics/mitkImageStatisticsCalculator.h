@@ -21,8 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include <mitkMaskGenerator.h>
 #include <mitkImageStatisticsContainer.h>
-#include <itkImage.h>
-#include <itkObject.h>
 
 namespace mitk
 {
@@ -49,16 +47,16 @@ namespace mitk
 
         /**Documentation
         @brief Set the image for which the statistics are to be computed.*/
-        void SetInputImage(mitk::Image::ConstPointer image);
+        void SetInputImage(const mitk::Image* image);
 
         /**Documentation
         @brief Set the mask generator that creates the mask which is to be used to calculate statistics. If no more mask is desired simply set @param mask to nullptr*/
-        void SetMask(mitk::MaskGenerator::Pointer mask);
+        void SetMask(mitk::MaskGenerator* mask);
 
         /**Documentation
         @brief Set this if more than one mask should be applied (for instance if a IgnorePixelValueMask were to be used alongside with a segmentation).
         Both masks are combined using pixel wise AND operation. The secondary mask does not have to be the same size than the primary but they need to have some overlap*/
-        void SetSecondaryMask(mitk::MaskGenerator::Pointer mask);
+        void SetSecondaryMask(mitk::MaskGenerator* mask);
 
         /**Documentation
         @brief Set number of bins to be used for histogram statistics. If Bin size is set after number of bins, bin size will be used instead!*/
@@ -82,7 +80,7 @@ namespace mitk
         @brief Returns the statistics for label @a label. If these requested statistics are not computed yet the computation is done as well.
         For performance reasons, statistics for all labels in the image are computed at once.
          */
-        ImageStatisticsContainer::Pointer GetStatistics(LabelIndex label=1);
+        ImageStatisticsContainer* GetStatistics(LabelIndex label=1);
 
     protected:
         ImageStatisticsCalculator(){

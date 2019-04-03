@@ -41,8 +41,6 @@ class QmitkImageStatisticsView : public QmitkAbstractView, public mitk::ILifecyc
   Q_OBJECT
 
 public:
-  using HistogramType = mitk::ImageStatisticsContainer::HistogramType;
-
   /*!
   \brief default constructor */
   QmitkImageStatisticsView(QObject *parent = nullptr, const char *name = nullptr);
@@ -53,24 +51,18 @@ public:
   \brief method for creating the widget containing the application   controls, like sliders, buttons etc. */
   virtual void CreateQtPartControl(QWidget *parent) override;
   /*!
-  \brief method for creating the connections of main and control widget */
-  virtual void CreateConnections();
-  /*!
   \brief  Is called from the selection mechanism once the data manager selection has changed*/
   void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &selectedNodes) override;
 
-  void PrepareDataStorageComboBoxes();
-
   static const std::string VIEW_ID;
 
-  void FillHistogramWidget(const std::vector<HistogramType::ConstPointer>& histogram, const std::vector<std::string>& dataLabels);
-  QmitkChartWidget::ColorTheme GetColorTheme() const;
 protected:
+  using HistogramType = mitk::ImageStatisticsContainer::HistogramType;
+
   virtual void Activated() override;
   virtual void Deactivated() override;
   virtual void Visible() override;
   virtual void Hidden() override;
-
   virtual void SetFocus() override;
 
   /** \brief Is called right before the view closes (before the destructor) */
@@ -83,11 +75,22 @@ protected:
   void OnMaskSelectorChanged();
 
   void CalculateOrGetStatistics();
+  void CalculateStatistics(const mitk::Image* image,
+                           const mitk::Image* mask = nullptr,
+                           const mitk::PlanarFigure* maskPlanarFigure = nullptr);
 
-  void ComputeAndDisplayIntensityProfile(mitk::Image * image, mitk::PlanarFigure::Pointer maskPlanarFigure);
+  void ComputeAndDisplayIntensityProfile(mitk::Image * image, mitk::PlanarFigure* maskPlanarFigure);
+  void FillHistogramWidget(const std::vector<const HistogramType*> &histogram,
+                           const std::vector<std::string> &dataLabels);
+  QmitkChartWidget::ColorTheme GetColorTheme() const;
 
   void ResetGUI();
   void ResetGUIDefault();
+
+  void PrepareDataStorageComboBoxes();
+  /*!
+  \brief method for creating the connections of main and control widget */
+  virtual void CreateConnections();
 
   void OnStatisticsCalculationEnds();
   void OnRequestHistogramUpdate(unsigned int nBins);
@@ -95,9 +98,7 @@ protected:
   void OnSliderWidgetHistogramChanged(double value);
   void OnSliderWidgetIntensityProfileChanged();
 
-  void CalculateStatistics(mitk::Image::ConstPointer image, mitk::Image::ConstPointer mask=nullptr, mitk::PlanarFigure::ConstPointer maskPlanarFigure = nullptr);
-  
-  // member variables
+  // member variable
   Ui::QmitkImageStatisticsViewControls m_Controls;
 
 private:

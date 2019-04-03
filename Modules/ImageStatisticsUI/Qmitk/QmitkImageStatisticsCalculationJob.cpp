@@ -28,7 +28,6 @@ QmitkImageStatisticsCalculationJob::QmitkImageStatisticsCalculationJob()
   , m_PlanarFigureMask(nullptr)
   , m_IgnoreZeros(false)
   , m_HistogramNBins(100)
-  , m_StatisticChanged(false)
   , m_CalculationSuccessful(false)
 {
 }
@@ -37,44 +36,33 @@ QmitkImageStatisticsCalculationJob::~QmitkImageStatisticsCalculationJob()
 {
 }
 
-void QmitkImageStatisticsCalculationJob::Initialize( mitk::Image::ConstPointer image, mitk::Image::ConstPointer binaryImage, mitk::PlanarFigure::ConstPointer planarFig )
+void QmitkImageStatisticsCalculationJob::Initialize(const mitk::Image *image,
+                                                    const mitk::Image *binaryImage,
+                                                    const mitk::PlanarFigure *planarFig)
 {
-  // reset old values
-  if( this->m_StatisticsImage.IsNotNull() )
-    this->m_StatisticsImage = nullptr;
-  if( this->m_BinaryMask.IsNotNull() )
-    this->m_BinaryMask = nullptr;
-  if( this->m_PlanarFigureMask.IsNotNull())
-    this->m_PlanarFigureMask = nullptr;
-
-  // set new values if passed in
-  if(image.IsNotNull())
-    this->m_StatisticsImage = image;
-  if(binaryImage.IsNotNull())
-    this->m_BinaryMask = binaryImage;
-  if(planarFig.IsNotNull())
-    this->m_PlanarFigureMask = planarFig;
+  this->m_StatisticsImage = image;
+  this->m_BinaryMask = binaryImage;
+  this->m_PlanarFigureMask = planarFig;
 }
 
-mitk::ImageStatisticsContainer::ConstPointer QmitkImageStatisticsCalculationJob::GetStatisticsData() const
+mitk::ImageStatisticsContainer* QmitkImageStatisticsCalculationJob::GetStatisticsData() const
 {
-  mitk::ImageStatisticsContainer::ConstPointer constContainer = this->m_StatisticsContainer.GetPointer();
-  return constContainer;
+  return this->m_StatisticsContainer.GetPointer();
 }
 
-mitk::Image::ConstPointer QmitkImageStatisticsCalculationJob::GetStatisticsImage() const
+const mitk::Image* QmitkImageStatisticsCalculationJob::GetStatisticsImage() const
 {
-  return this->m_StatisticsImage;
+  return this->m_StatisticsImage.GetPointer();
 }
 
-mitk::Image::ConstPointer QmitkImageStatisticsCalculationJob::GetMaskImage() const
+const mitk::Image* QmitkImageStatisticsCalculationJob::GetMaskImage() const
 {
-  return this->m_BinaryMask;
+  return this->m_BinaryMask.GetPointer();
 }
 
-mitk::PlanarFigure::ConstPointer QmitkImageStatisticsCalculationJob::GetPlanarFigure() const
+const mitk::PlanarFigure* QmitkImageStatisticsCalculationJob::GetPlanarFigure() const
 {
-  return this->m_PlanarFigureMask;
+  return this->m_PlanarFigureMask.GetPointer();
 }
 
 void QmitkImageStatisticsCalculationJob::SetIgnoreZeroValueVoxel(bool _arg)
@@ -102,18 +90,13 @@ std::string QmitkImageStatisticsCalculationJob::GetLastErrorMessage() const
   return m_message;
 }
 
-QmitkImageStatisticsCalculationJob::HistogramType::ConstPointer
+const QmitkImageStatisticsCalculationJob::HistogramType*
 QmitkImageStatisticsCalculationJob::GetTimeStepHistogram(unsigned int t) const
 {
   if (t >= this->m_HistogramVector.size())
     return nullptr;
 
-  return this->m_HistogramVector[t];
-}
-
-bool QmitkImageStatisticsCalculationJob::GetStatisticsChangedFlag() const
-{
-  return m_StatisticChanged;
+  return this->m_HistogramVector.at(t).GetPointer();
 }
 
 bool QmitkImageStatisticsCalculationJob::GetStatisticsUpdateSuccessFlag() const
@@ -179,8 +162,6 @@ void QmitkImageStatisticsCalculationJob::run()
     statisticCalculationSuccessful = false;
   }
 
-  bool statisticChanged = false;
-
   if (this->m_IgnoreZeros)
   {
       mitk::IgnorePixelMaskGenerator::Pointer ignorePixelValueMaskGen = mitk::IgnorePixelMaskGenerator::New();
@@ -218,7 +199,6 @@ void QmitkImageStatisticsCalculationJob::run()
       statisticCalculationSuccessful = false;
     }
 
-  this->m_StatisticChanged = statisticChanged;
   this->m_CalculationSuccessful = statisticCalculationSuccessful;
 
   if(statisticCalculationSuccessful)

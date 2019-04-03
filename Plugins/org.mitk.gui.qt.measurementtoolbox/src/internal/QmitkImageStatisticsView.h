@@ -55,7 +55,6 @@ public:
   void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &selectedNodes) override;
 
   static const std::string VIEW_ID;
-
 protected:
   using HistogramType = mitk::ImageStatisticsContainer::HistogramType;
 
@@ -70,6 +69,11 @@ protected:
  
   /** \brief Required for berry::IPartListener */
   virtual Events::Types GetPartEventTypes() const override { return Events::CLOSED; }
+
+  void PrepareDataStorageComboBoxes();
+  void FillHistogramWidget(const std::vector<const HistogramType*> &histogram,
+                           const std::vector<std::string> &dataLabels);
+  QmitkChartWidget::ColorTheme GetColorTheme() const;
 
   void OnImageSelectorChanged();
   void OnMaskSelectorChanged();

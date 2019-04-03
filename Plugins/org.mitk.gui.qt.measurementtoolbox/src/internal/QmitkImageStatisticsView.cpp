@@ -152,7 +152,7 @@ void QmitkImageStatisticsView::OnSliderWidgetIntensityProfileChanged()
 
 void QmitkImageStatisticsView::PartClosed(const berry::IWorkbenchPartReference::Pointer &) {}
 
-void QmitkImageStatisticsView::FillHistogramWidget(const std::vector<const HistogramType *> &histogram,
+void QmitkImageStatisticsView::FillHistogramWidget(const std::vector<const HistogramType*> &histogram,
                                                    const std::vector<std::string> &dataLabels)
 {
   m_Controls.groupBox_histogram->setVisible(true);
@@ -354,7 +354,7 @@ void QmitkImageStatisticsView::CalculateOrGetStatistics()
 void QmitkImageStatisticsView::ComputeAndDisplayIntensityProfile(mitk::Image *image,
                                                                  mitk::PlanarFigure *maskPlanarFigure)
 {
-  mitk::Image::Pointer inputImage;
+  const mitk::Image* inputImage;
   if (image->GetDimension() == 4)
   {
     m_Controls.sliderWidget_intensityProfile->setVisible(true);
@@ -380,7 +380,7 @@ void QmitkImageStatisticsView::ComputeAndDisplayIntensityProfile(mitk::Image *im
   m_Controls.groupBox_histogram->setVisible(false);
   m_Controls.groupBox_intensityProfile->setVisible(true);
   m_Controls.widget_intensityProfile->Reset();
-  m_Controls.widget_intensityProfile->SetIntensityProfile(intensityProfile.GetPointer(),
+  m_Controls.widget_intensityProfile->SetIntensityProfile(intensityProfile,
                                                           "Intensity Profile of " + m_selectedImageNode->GetName());
 }
 

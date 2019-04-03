@@ -354,7 +354,7 @@ void QmitkImageStatisticsView::CalculateOrGetStatistics()
 void QmitkImageStatisticsView::ComputeAndDisplayIntensityProfile(mitk::Image *image,
                                                                  mitk::PlanarFigure *maskPlanarFigure)
 {
-  const mitk::Image* inputImage;
+  mitk::Image::Pointer inputImage;
   if (image->GetDimension() == 4)
   {
     m_Controls.sliderWidget_intensityProfile->setVisible(true);
@@ -375,12 +375,12 @@ void QmitkImageStatisticsView::ComputeAndDisplayIntensityProfile(mitk::Image *im
     inputImage = image;
   }
 
-  auto intensityProfile = mitk::ComputeIntensityProfile(inputImage, maskPlanarFigure);
+    auto intensityProfile = mitk::ComputeIntensityProfile(inputImage, maskPlanarFigure);
   // Don't show histogram for intensity profiles
   m_Controls.groupBox_histogram->setVisible(false);
   m_Controls.groupBox_intensityProfile->setVisible(true);
   m_Controls.widget_intensityProfile->Reset();
-  m_Controls.widget_intensityProfile->SetIntensityProfile(intensityProfile,
+  m_Controls.widget_intensityProfile->SetIntensityProfile(intensityProfile.GetPointer(),
                                                           "Intensity Profile of " + m_selectedImageNode->GetName());
 }
 

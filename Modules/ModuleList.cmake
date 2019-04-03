@@ -80,7 +80,6 @@ set(MITK_MODULES
   Pharmacokinetics
   PharmacokineticsUI
   CppRestSdk
-  CppRestSdkQt
 )
 
 if(MITK_ENABLE_PIC_READER)

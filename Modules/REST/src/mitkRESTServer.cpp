@@ -55,8 +55,6 @@ namespace mitk
 
   void RESTServer::Impl::HandleGet(const http_request &request)
   {
-    auto port = this->listener.uri().port();
-
     web::uri_builder builder(this->listener.uri());
     builder.append(request.absolute_uri());
 

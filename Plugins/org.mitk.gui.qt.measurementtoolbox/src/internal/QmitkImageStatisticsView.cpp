@@ -48,7 +48,16 @@ QmitkImageStatisticsView::QmitkImageStatisticsView(QObject * /*parent*/, const c
 QmitkImageStatisticsView::~QmitkImageStatisticsView()
 {
   if (m_selectedPlanarFigure)
+  {
     m_selectedPlanarFigure->RemoveObserver(m_PlanarFigureObserverTag);
+  }
+
+  if (!m_CalculationJob->isFinished())
+  {
+    m_CalculationJob->terminate();
+    m_CalculationJob->wait();
+  }
+  this->m_CalculationJob->deleteLater();
 }
 
 void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)

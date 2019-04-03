@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  void ImageStatisticsCalculator::SetInputImage(mitk::Image::ConstPointer image)
+  void ImageStatisticsCalculator::SetInputImage(const mitk::Image *image)
   {
     if (image != m_Image)
     {
@@ -39,7 +39,7 @@ namespace mitk
     }
   }
 
-  void ImageStatisticsCalculator::SetMask(mitk::MaskGenerator::Pointer mask)
+  void ImageStatisticsCalculator::SetMask(mitk::MaskGenerator *mask)
   {
     if (mask != m_MaskGenerator)
     {
@@ -48,7 +48,7 @@ namespace mitk
     }
   }
 
-  void ImageStatisticsCalculator::SetSecondaryMask(mitk::MaskGenerator::Pointer mask)
+  void ImageStatisticsCalculator::SetSecondaryMask(mitk::MaskGenerator *mask)
   {
     if (mask != m_SecondaryMaskGenerator)
     {
@@ -94,7 +94,7 @@ namespace mitk
 
   double ImageStatisticsCalculator::GetBinSizeForHistogramStatistics() const { return m_binSizeForHistogramStatistics; }
 
-  mitk::ImageStatisticsContainer::Pointer ImageStatisticsCalculator::GetStatistics(LabelIndex label)
+  mitk::ImageStatisticsContainer* ImageStatisticsCalculator::GetStatistics(LabelIndex label)
   {
     if (m_Image.IsNull())
     {
@@ -166,7 +166,7 @@ namespace mitk
     auto it = m_StatisticContainers.find(label);
     if (it != m_StatisticContainers.end())
     {
-      return it->second;
+      return (it->second).GetPointer();
     }
     else
     {

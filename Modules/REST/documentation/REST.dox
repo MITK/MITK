@@ -1,12 +1,12 @@
 /**
 
-\page CppRestSdkModule The MITK CppRestSdk Module
+\page RESTModule The MITK REST Module
 
 \tableofcontents
 
-\section CppRestSdk_brief Description
-The MITK CppRestSdk Module is able to manage REST requests. The two main classes to use are the RESTManager and the RESTManageQt (in the CppRestSdkQt Module).
-These are MicroServices which can be accessed via
+\section REST_brief Description
+The MITK REST Module is able to manage REST requests. The main class is the RESTManager.
+It is a MicroServices which can be accessed via
 \code{.cpp}
 auto *context = us::GetModuleContext();
   auto managerRef = context->GetServiceReference<IRESTManager>();
@@ -20,17 +20,17 @@ auto *context = us::GetModuleContext();
   }
 \endcode
 
-\subsection CppRestSdk_Technical Technical background
+\subsection REST_Technical Technical background
 
- The module uses the library <a href="https://github.com/Microsoft/cpprestsdk">CppRestSdk</a> for REST mechanisms as well as JSON convertion and asynchronic prorgamming
+ The module uses the <a href="https://github.com/Microsoft/cpprestsdk">Microsoft C++ REST SDK</a> for REST mechanisms as well as JSON convertion and asynchronic programming.
 
-\section Use_CppRestSdk How to use the CppRestSdk Module
+\section Use_REST How to use the REST Module
 
-You can use the CppRestSdk from two different perspectives in MITK:
+You can use the REST module from two different perspectives in MITK:
 
 <ol>
-  <li> The Server view (receive Requests from clients)
-  <li> The Client view (send Requests to servers)
+  <li> The Server view (receive requests from clients)
+  <li> The Client view (send requests to servers)
 </ol>
 
 The following sections will give you an introduction on how to use which of those roles:
@@ -54,7 +54,7 @@ auto *context = us::GetModuleContext();
   }
 \endcode
 
-If a client sends a request, the Notify method is called and a response is sent. By now, only Get-requests from clients are supported.
+If a client sends a request, the Notify method is called and a response is sent. By now, only GET-requests from clients are supported.
 
 If you want to stop listening for requests you can do this by calling
 

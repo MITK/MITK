@@ -79,8 +79,8 @@ set(MITK_MODULES
   ModelFitUI
   Pharmacokinetics
   PharmacokineticsUI
-  CppRestSdk
-  CppRestSdkQt
+  REST
+  RESTService
 )
 
 if(MITK_ENABLE_PIC_READER)

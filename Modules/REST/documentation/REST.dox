@@ -1,0 +1,194 @@
+/**
+
+\page RESTModule The MITK REST Module
+
+\tableofcontents
+
+\section REST_brief Description
+The MITK REST Module is able to manage REST requests. The main class is the RESTManager.
+It is a MicroServices which can be accessed via
+\code{.cpp}
+auto *context = us::GetModuleContext();
+  auto managerRef = context->GetServiceReference<IRESTManager>();
+  if (managerRef)
+  {
+    auto managerService = context->GetService(managerRef);
+    if (managerService)
+    {
+      //call the function you need from the service
+    }
+  }
+\endcode
+
+\subsection REST_Technical Technical background
+
+ The module uses the <a href="https://github.com/Microsoft/cpprestsdk">Microsoft C++ REST SDK</a> for REST mechanisms as well as JSON convertion and asynchronic programming.
+
+\section Use_REST How to use the REST Module
+
+You can use the REST module from two different perspectives in MITK:
+
+<ol>
+  <li> The Server view (receive requests from clients)
+  <li> The Client view (send requests to servers)
+</ol>
+
+The following sections will give you an introduction on how to use which of those roles:
+
+\subsection Server_Use Use from a Server perspective
+To act as a server, you need to implement the <code>IRESTObserver</code>, which has a <code>Notify()</code> method that has to be implemented.
+In this <code>Notify()</code> method you specify how you want to react to incoming requests and with which data you want to respond to the requests.
+
+You can then start listening for requests from clients as shown below:
+
+\code{.cpp}
+auto *context = us::GetModuleContext();
+  auto managerRef = context->GetServiceReference<IRESTManager>();
+  if (managerRef)
+  {
+    auto managerService = context->GetService(managerRef);
+    if (managerService)
+    {
+      managerService->ReceiveRequests(uri /*specify your uri which you want to receive requests for*/, this);
+    }
+  }
+\endcode
+
+If a client sends a request, the Notify method is called and a response is sent. By now, only GET-requests from clients are supported.
+
+If you want to stop listening for requests you can do this by calling
+
+\code{.cpp}
+auto *context = us::GetModuleContext();
+  auto managerRef = context->GetServiceReference<IRESTManager>();
+  if (managerRef)
+  {
+    auto managerService = context->GetService(managerRef);
+    if (managerService)
+    {
+      managerService->HandleDeleteObserver(this, uri);
+    }
+  }
+\endcode
+
+You don't have to specify a uri in the HandleDeleteObserver method, if you only call <code>managerService->HandleDeleteObserver(this);</code>, all uris you receive requests for are deleted and you aren't listening to any requests anymore.
+
+\subsection Client_Use Use from a Client perspective
+
+The following example shows how to send requests from a client perspective:
+
+\code{.cpp}
+ //Get the microservice
+  auto *context = us::ModuleRegistry::GetModule(1)->GetModuleContext();
+  auto managerRef = context->GetServiceReference<mitk::IRESTManager>();
+  if (managerRef)
+  {
+    auto managerService = context->GetService(managerRef);
+    if (managerService)
+    {
+      //Call the send request method which starts the actual request
+      managerService
+        ->SendRequest(_XPLATSTR("https://jsonplaceholder.typicode.com/posts/1"))
+        .then([=](pplx::task<web::json::value> resultTask)/*It is important to use task-based continuation*/ {
+          try
+          {
+            //Get the result of the request
+            //This will throw an exception if the ascendent task threw an exception (e.g. invalid URI)
+            web::json::value result = resultTask.get();
+            //Do something with the result (e.g. convert it to a QString to update an UI element)
+            utility::string_t stringT = result.to_string();
+            std::string stringStd(stringT.begin(), stringT.end());
+            QString stringQ = QString::fromStdString(stringStd);
+            //Note: if you want to update your UI, do this by using signals and slots.
+            //The UI can't be updated from a Thread different to the Qt main thread
+            emit UpdateLabel(stringQ);
+          }
+          catch (const mitk::Exception &exception)
+          {
+            //Exceptions from ascendent tasks are catched here
+            MITK_ERROR << exception.what();
+            return;
+          }
+        });
+    }
+  }
+\endcode
+
+The steps you need to make are the following:
+<ol>
+  <li> Get the microservice. You can get the microservice via the module context. If you want to use the microservice within a plug-in, you need to get the module context from the <code>us::ModuleRegistry</code>.
+  <li> Call the <code>SendRequest</code> method. This will start the request itself and is performed asynchronously. As soon as the response is sent by the server, the <code>.then(...)</code> block is executed.
+  <li> Choose parameters for <code>.then(...)</code> block. For exception handling, it is important to choose <code>pplx::task<web::json::value> </code>. This is a task-based continuation.
+  For more information, visit https://docs.microsoft.com/en-us/cpp/parallel/concrt/exception-handling-in-the-concurrency-runtime?view=vs-2017.
+  <li> Get the result of the request. You can get the JSON-value of the result by callint <code>.get()</code>. At this point, an exception is thrown if something in the previous tasks threw an exception.
+  <li> Do something with the result.
+  \note If you want to modify GUI elements within the <code>.then(...)</code> block, you need to do this by using signals and slots because GUI elements can only be modified by th Qt Main Thread.
+  For more information, visit https://doc.qt.io/Qt-5/thread-basics.html#gui-thread-and-worker-thread
+  <li> Exception handling. Here you can define the behaviour if an exception is thrown, exceptions from ascendent tasks are also catched here.
+</ol>
+
+Code, which is followed by this codeblock shown above will be performed asynchronously while waiting for the result.
+Besides Get-Requests, you can also perform Put or Post requests by specifying a <code>RequestType</code> in the <code>SendRequest</code> method.
+
+The following example shows, how you can perform multiple tasks, encapsulated to one joined task. The steps are based on the example for one request and only the specific steps for encapsulation are described.
+
+\code{.cpp}
+ //Get the microservice
+  //Get microservice
+  auto *context = us::ModuleRegistry::GetModule(1)->GetModuleContext();
+  auto managerRef = context->GetServiceReference<mitk::IRESTManager>();
+  if (managerRef)
+  {
+    auto managerService = context->GetService(managerRef);
+    if (managerService)
+    {
+      //Create multiple tasks e.g. as shown below
+      std::vector<pplx::task<void>> tasks;
+      for (int i = 0; i < 20; i++)
+      {
+        pplx::task<void> singleTask = managerService->SendRequest(L"https://jsonplaceholder.typicode.com/posts/1")
+            .then([=](pplx::task<web::json::value> resultTask) {
+          //Do something when a single task is done
+          try
+          {
+            resultTask.get();
+            emit UpdateProgressBar();
+          }
+          catch (const mitk::Exception &exception)
+          {
+            MITK_ERROR << exception.what();
+            return;
+          }
+          });
+        tasks.emplace_back(singleTask);
+      }
+      //Create a joinTask which includes all tasks you've created
+      auto joinTask = pplx::when_all(begin(tasks), end(tasks));
+      //Run asynchonously
+      joinTask.then([=](pplx::task<void> resultTask) {
+        //Do something when all tasks are finished
+        try
+        {
+          resultTask.get();
+          emit UpdateLabel("All tasks finished");
+        }
+        catch (const mitk::Exception &exception)
+        {
+          MITK_ERROR << exception.what();
+          return;
+        }
+        });
+    }
+\endcode
+
+The steps you need to make are the following:
+<ol>
+  <li> Get the microservice. See example above.
+  <li> Create multiple tasks. In this example, 20 identical tasks are created and are saved into a vector. In general, it is possible to place any tasks in that vector.
+  <li> Do something when a single task is done. Here, an action is performed if a single tasks is finished. In this example, a progress bar is loaded by a specific number of percent.
+  <li> Create a joinTask. Here, all small tasks are encapsulated in one big task.
+  <li> Run joinTask asynchonously. The <code>then(...)</code> of the joinTask is performed when all single tasks are finished.
+  <li> Do something when all tasks are finished. The handling of the end of a joinTask is equivalent to the end of a single tasks.
+</ol>
+
+*/

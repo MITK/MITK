@@ -66,13 +66,13 @@ public:
     {
       m_Service = us::GetModuleContext()->GetService(serviceRef);
     }
-    
+
     if (!m_Service)
     {
       CPPUNIT_FAIL("Getting Service in setUp() failed");
     }
 
-    m_Service->ReceiveRequest(_XPLATSTR("http://localhost:8080/test"), this);
+    m_Service->ReceiveRequest(_XPLATSTR("http://localhost:8080/clienttest"), this);
   }
 
   void tearDown() override
@@ -84,7 +84,7 @@ public:
   {
     web::json::value result;
 
-    m_Service->SendRequest(_XPLATSTR("http://localhost:8080/test"))
+    m_Service->SendRequest(_XPLATSTR("http://localhost:8080/clienttest"))
       .then([&](pplx::task<web::json::value> resultTask) {
         try
         {
@@ -97,7 +97,7 @@ public:
         }
       })
       .wait();
-    
+
     CPPUNIT_ASSERT_MESSAGE("Result is the expected JSON value", result == m_Data);
   }
 
@@ -110,7 +110,7 @@ public:
     for (int i = 0; i < 20; ++i)
     {
       pplx::task<void> singleTask =
-        m_Service->SendRequest(_XPLATSTR("http://localhost:8080/test"))
+        m_Service->SendRequest(_XPLATSTR("http://localhost:8080/clienttest"))
           .then([&](pplx::task<web::json::value> resultTask) {
             // Do something when a single task is done
             try
@@ -142,7 +142,7 @@ public:
           return;
         }
       }).wait();
-     
+
     CPPUNIT_ASSERT_MESSAGE("Multiple Requests", 21 == count);
   }
 
@@ -165,7 +165,7 @@ public:
         }
       })
       .wait();
-    
+
     CPPUNIT_ASSERT_MESSAGE(
       "Result is the expected JSON value, check if the link is still valid since this is an optional test",
       result == m_Data);
@@ -194,7 +194,7 @@ public:
         }
       })
       .wait();
-    
+
     data[_XPLATSTR("id")] = web::json::value(101);
     CPPUNIT_ASSERT_MESSAGE(
       "Result is the expected JSON value, check if the link is still valid since this is an optional test",
@@ -212,7 +212,7 @@ public:
   }
   void GetRequestInvalidURI_ThrowsException() { CPPUNIT_ASSERT_THROW(GetException(), mitk::Exception); }
 
-  void PutException() 
+  void PutException()
   {
     //Method which makes a put request to an invalid uri
     web::json::value result;
@@ -220,7 +220,7 @@ public:
     m_Service->SendRequest(_XPLATSTR("http://localhost:1234/invalid"), mitk::IRESTManager::RequestType::Put, &m_Data)
       .then([&](pplx::task<web::json::value> resultTask) {
           result = resultTask.get();})
-      .wait();    
+      .wait();
   }
   void PutRequestInvalidURI_ThrowsException()
   {

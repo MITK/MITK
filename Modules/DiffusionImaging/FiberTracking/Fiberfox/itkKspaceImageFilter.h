@@ -79,9 +79,12 @@ namespace itk{
     itkSetMacro( Translation, VectorType )
     itkSetMacro( RotationMatrix, MatrixType )
     itkSetMacro( Zidx, int )
+    itkSetMacro( StoreTimings, bool )
     itkSetMacro( FiberBundle, FiberBundle::Pointer )
     itkSetMacro( CoilPosition, VectorType )
     itkGetMacro( KSpaceImage, typename InputImageType::Pointer )    ///< k-space magnitude image
+    itkGetMacro( TickImage, typename InputImageType::Pointer )    ///< k-space readout ordering encoded in the voxels
+    itkGetMacro( RfImage, typename InputImageType::Pointer )    ///< time passed since last RF pulse encoded per voxel
     itkGetMacro( SpikeLog, std::string )
 
     void SetParameters( FiberfoxParameters* param ){ m_Parameters = param; }
@@ -129,6 +132,7 @@ namespace itk{
     float                                   m_CoilSensitivityFactor;
     typename InputImageType::Pointer        m_KSpaceImage;
     typename InputImageType::Pointer        m_TickImage;
+    typename InputImageType::Pointer        m_RfImage;
     AcquisitionType*                        m_ReadoutScheme;
 
     typename itk::Image< ScalarType, 2 >::Pointer m_MovedFmap;
@@ -141,6 +145,7 @@ namespace itk{
     float                                   yMaxFov;
     float                                   yMaxFov_half;
     float                                   numPix;
+    bool                                    m_StoreTimings;
 
   private:
 

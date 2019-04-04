@@ -242,7 +242,7 @@ namespace mitk
       , m_AfterSimulationMessage("")
       , m_BvalsFile("")
       , m_BvecsFile("")
-      , m_CheckOutputVolumeFractionsBox(false)
+      , m_OutputAdditionalImages(false)
       , m_CheckAdvancedSignalOptionsBox(false)
       , m_DoAddNoise(false)
       , m_DoAddGhosts(false)
@@ -269,7 +269,7 @@ namespace mitk
 
     /** member variables that store the check-state of GUI checkboxes */
     // image generation
-    bool                m_CheckOutputVolumeFractionsBox;
+    bool                m_OutputAdditionalImages;
     bool                m_CheckAdvancedSignalOptionsBox;
     bool                m_DoAddNoise;
     bool                m_DoAddGhosts;

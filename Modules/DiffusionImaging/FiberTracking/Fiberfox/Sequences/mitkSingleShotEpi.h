@@ -84,11 +84,9 @@ public:
 
   void AdjustEchoTime() override
   {
-    auto temp = m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(1)*m_Parameters->m_SignalGen.m_PartialFourier - (m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(1)+m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(1)%2)/2;
-
-    if ( m_Parameters->m_SignalGen.m_tEcho/2 < temp*m_Parameters->m_SignalGen.m_tLine )
+    if ( m_Parameters->m_SignalGen.m_tEcho < kyMax*m_Parameters->m_SignalGen.m_tLine )
     {
-      m_Parameters->m_SignalGen.m_tEcho = 2*temp*m_Parameters->m_SignalGen.m_tLine;
+      m_Parameters->m_SignalGen.m_tEcho = kyMax*m_Parameters->m_SignalGen.m_tLine;
       MITK_WARN << "Echo time is too short! Time not sufficient to read slice. Automatically adjusted to " << m_Parameters->m_SignalGen.m_tEcho << " ms";
       m_Parameters->m_Misc.m_AfterSimulationMessage += "Echo time was chosen too short! Time not sufficient to read slice. Internally adjusted to " + boost::lexical_cast<std::string>(m_Parameters->m_SignalGen.m_tEcho) + " ms\n";
     }

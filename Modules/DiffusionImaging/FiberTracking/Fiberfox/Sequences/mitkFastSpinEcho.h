@@ -58,7 +58,9 @@ public:
   // depends on ETL
   float GetTimeFromRf(const int& tick) override
   {
-    return m_Parameters->m_SignalGen.m_tEcho*std::ceil(static_cast<float>(tick/kxMax+1)/linesWithSameTime) + GetTimeFromMaxEcho(tick);
+    float echo_nr = std::ceil(static_cast<float>(tick/kxMax+1)/linesWithSameTime);
+    echo_nr -= std::ceil(static_cast<float>(m_Parameters->m_SignalGen.m_EchoTrainLength)/2);
+    return m_Parameters->m_SignalGen.m_tEcho + echo_nr*m_Parameters->m_SignalGen.m_tLine + GetTimeFromMaxEcho(tick);
   }
 
   itk::Index< 2 > GetActualKspaceIndex(const int& tick) override
@@ -76,9 +78,9 @@ public:
 
   void AdjustEchoTime() override
   {
-    if ( m_Parameters->m_SignalGen.m_tEcho < m_Parameters->m_SignalGen.m_tLine )
+    if ( m_Parameters->m_SignalGen.m_tEcho < m_Parameters->m_SignalGen.m_EchoTrainLength*m_Parameters->m_SignalGen.m_tLine )
     {
-      m_Parameters->m_SignalGen.m_tEcho = m_Parameters->m_SignalGen.m_tLine;
+      m_Parameters->m_SignalGen.m_tEcho = m_Parameters->m_SignalGen.m_EchoTrainLength*m_Parameters->m_SignalGen.m_tLine;
       MITK_WARN << "Echo time is too short! Time not sufficient to read slice. Automatically adjusted to " << m_Parameters->m_SignalGen.m_tEcho << " ms";
       m_Parameters->m_Misc.m_AfterSimulationMessage += "Echo time was chosen too short! Time not sufficient to read slice. Internally adjusted to " + boost::lexical_cast<std::string>(m_Parameters->m_SignalGen.m_tEcho) + " ms\n";
     }

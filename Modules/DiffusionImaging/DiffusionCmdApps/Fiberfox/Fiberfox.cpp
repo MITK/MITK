@@ -181,8 +181,11 @@ int main(int argc, char* argv[])
   if (verbose)
   {
     MITK_DEBUG << outName << ".ffp";
+    parameters.m_Misc.m_OutputAdditionalImages = true;
     parameters.SaveParameters(outName+".ffp");
   }
+  else
+    parameters.m_Misc.m_OutputAdditionalImages = false;
   
   if (apply_direction_matrix)
   {
@@ -210,6 +213,22 @@ int main(int argc, char* argv[])
 
   if (verbose)
   {
+    if (tractsToDwiFilter->GetTickImage().IsNotNull())
+    {
+      mitk::Image::Pointer mitkImage = mitk::Image::New();
+      itk::TractsToDWIImageFilter< short >::Float2DImageType::Pointer itkImage = tractsToDwiFilter->GetTickImage();
+      mitkImage = mitk::GrabItkImageMemory( itkImage.GetPointer() );
+      mitk::IOUtil::Save(mitkImage, outName+"_Ticks.nii.gz");
+    }
+
+    if (tractsToDwiFilter->GetRfImage().IsNotNull())
+    {
+      mitk::Image::Pointer mitkImage = mitk::Image::New();
+      itk::TractsToDWIImageFilter< short >::Float2DImageType::Pointer itkImage = tractsToDwiFilter->GetRfImage();
+      mitkImage = mitk::GrabItkImageMemory( itkImage.GetPointer() );
+      mitk::IOUtil::Save(mitkImage, outName+"_TimrFromRf.nii.gz");
+    }
+
     std::vector< itk::TractsToDWIImageFilter< short >::ItkDoubleImgType::Pointer > volumeFractions = tractsToDwiFilter->GetVolumeFractions();
     for (unsigned int k=0; k<volumeFractions.size(); k++)
     {

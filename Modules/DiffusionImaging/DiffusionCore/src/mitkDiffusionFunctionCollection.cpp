@@ -514,13 +514,16 @@ mitk::gradients::GradientDirectionContainerType::Pointer mitk::gradients::ReadBv
     vec[2] = bvec_entries.at(i+2*bval_entries.size());
 
     // Adjust the vector length to encode gradient strength
-    double factor = b_val/reference_bval;
-    if(vec.magnitude() > 0)
+    if (reference_bval>0)
     {
-      vec.normalize();
-      vec[0] = sqrt(factor)*vec[0];
-      vec[1] = sqrt(factor)*vec[1];
-      vec[2] = sqrt(factor)*vec[2];
+      double factor = b_val/reference_bval;
+      if(vec.magnitude() > 0)
+      {
+        vec.normalize();
+        vec[0] = sqrt(factor)*vec[0];
+        vec[1] = sqrt(factor)*vec[1];
+        vec[2] = sqrt(factor)*vec[2];
+      }
     }
 
     directioncontainer->InsertElement(i,vec);

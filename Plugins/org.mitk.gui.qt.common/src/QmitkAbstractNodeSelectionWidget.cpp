@@ -23,14 +23,61 @@ m_IsOptional(false), m_SelectOnlyVisibleNodes(true)
 {
 }
 
+QmitkAbstractNodeSelectionWidget::~QmitkAbstractNodeSelectionWidget()
+{
+  if (!m_DataStorage.IsExpired())
+  {
+    auto dataStorage = m_DataStorage.Lock();
+
+    // remove Listener for the data storage itself
+    dataStorage->RemoveObserver(m_DataStorageDeletedTag);
+
+    // remove listener from data storage
+    dataStorage->RemoveNodeEvent.RemoveListener(
+      mitk::MessageDelegate1<QmitkAbstractNodeSelectionWidget, const mitk::DataNode*>(this, &QmitkAbstractNodeSelectionWidget::NodeRemovedFromStorage));
+  }
+};
+
+
 void QmitkAbstractNodeSelectionWidget::SetDataStorage(mitk::DataStorage* dataStorage)
 {
-  if (m_DataStorage != dataStorage)
+  if (m_DataStorage == dataStorage)
   {
-    m_DataStorage = dataStorage;
-    this->OnDataStorageChanged();
-    this->UpdateInfo();
+    return;
   }
+
+  if (!m_DataStorage.IsExpired())
+  {
+    auto oldStorage = m_DataStorage.Lock();
+
+    // remove Listener for the data storage itself
+    oldStorage->RemoveObserver(m_DataStorageDeletedTag);
+
+    // remove listener from old data storage
+    oldStorage->RemoveNodeEvent.RemoveListener(
+      mitk::MessageDelegate1<QmitkAbstractNodeSelectionWidget, const mitk::DataNode*>(this, &QmitkAbstractNodeSelectionWidget::NodeRemovedFromStorage));
+  }
+
+  m_DataStorage = dataStorage;
+
+  if (!m_DataStorage.IsExpired())
+  {
+    auto newStorage = m_DataStorage.Lock();
+
+    // add Listener for the data storage itself
+    auto command = itk::SimpleMemberCommand<QmitkAbstractNodeSelectionWidget>::New();
+    command->SetCallbackFunction(this, &QmitkAbstractNodeSelectionWidget::SetDataStorageDeleted);
+    m_DataStorageDeletedTag = newStorage->AddObserver(itk::DeleteEvent(), command);
+
+    // add listener for new data storage
+    newStorage->RemoveNodeEvent.AddListener(
+      mitk::MessageDelegate1<QmitkAbstractNodeSelectionWidget, const mitk::DataNode*>(this, &QmitkAbstractNodeSelectionWidget::NodeRemovedFromStorage));
+  }
+
+  // update model if the data storage has been changed
+  m_DataStorage = dataStorage;
+  this->OnDataStorageChanged();
+  this->UpdateInfo();
 };
 
 void QmitkAbstractNodeSelectionWidget::SetNodePredicate(mitk::NodePredicateBase* nodePredicate)
@@ -111,3 +158,8 @@ void QmitkAbstractNodeSelectionWidget::SetSelectionIsOptional(bool isOptional)
   m_IsOptional = isOptional;
   this->UpdateInfo();
 };
+
+void QmitkAbstractNodeSelectionWidget::SetDataStorageDeleted()
+{
+  this->SetDataStorage(nullptr);
+}

@@ -235,3 +235,15 @@ void QmitkSingleNodeSelectionWidget::SetCurrentSelection(NodeList selectedNodes)
     emit CurrentSelectionChanged(newEmission);
   }
 };
+
+void QmitkSingleNodeSelectionWidget::NodeRemovedFromStorage(const mitk::DataNode* node)
+{
+  if (m_SelectedNode == node && node != nullptr)
+  {
+    m_SelectedNode = nullptr;
+    auto newEmission = this->CompileEmitSelection();
+
+    emit CurrentSelectionChanged(newEmission);
+    this->UpdateInfo();
+  }
+}

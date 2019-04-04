@@ -59,13 +59,13 @@ protected:
   mitk::DataNode::Pointer ExtractCurrentValidSelection(const NodeList& nodes) const;
   NodeList CompileEmitSelection() const;
 
-  virtual bool eventFilter(QObject *obj, QEvent *ev) override;
+  bool eventFilter(QObject *obj, QEvent *ev) override;
   void EditSelection();
-  virtual void UpdateInfo() override;
+  void UpdateInfo() override;
 
-  virtual void OnNodePredicateChanged(mitk::NodePredicateBase* newPredicate) override;
-  virtual void OnDataStorageChanged() override;
-
+  void OnNodePredicateChanged(mitk::NodePredicateBase* newPredicate) override;
+  void OnDataStorageChanged() override;
+  void NodeRemovedFromStorage(const mitk::DataNode* node) override;
 
   NodeList m_ExternalSelection;
   mitk::DataNode::Pointer m_SelectedNode;

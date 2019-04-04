@@ -65,16 +65,17 @@ public Q_SLOTS:
   void OnEditSelection();
 
 protected Q_SLOTS:
-  void OnClearSelection(mitk::DataNode* node);
+  void OnClearSelection(const mitk::DataNode* node);
 
 protected:
   NodeList CompileEmitSelection() const;
 
-  virtual void UpdateInfo() override;
+  void UpdateInfo() override;
   virtual void UpdateList();
 
-  virtual void OnNodePredicateChanged(mitk::NodePredicateBase* newPredicate) override;
-  virtual void OnDataStorageChanged() override;
+  void OnNodePredicateChanged(mitk::NodePredicateBase* newPredicate) override;
+  void OnDataStorageChanged() override;
+  void NodeRemovedFromStorage(const mitk::DataNode* node) override;
 
   NodeList m_CurrentSelection;
 

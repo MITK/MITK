@@ -39,6 +39,7 @@ class MITK_QT_COMMON QmitkAbstractNodeSelectionWidget : public QWidget
 
 public:
   explicit QmitkAbstractNodeSelectionWidget(QWidget* parent = nullptr);
+  virtual ~QmitkAbstractNodeSelectionWidget();
 
   /**
   * @brief Sets the data storage that will be used /monitored by widget.
@@ -137,6 +138,8 @@ protected:
   /**Member is called if the data storage has changed. Thus the selection might change to.*/
   virtual void OnDataStorageChanged() = 0;
 
+  virtual void NodeRemovedFromStorage(const mitk::DataNode* node) = 0;
+
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
   mitk::NodePredicateBase::Pointer m_NodePredicate;
 
@@ -147,5 +150,12 @@ protected:
 
   bool m_IsOptional;
   bool m_SelectOnlyVisibleNodes;
+
+private:
+  /** Helper triggered on the storage delete event */
+  void SetDataStorageDeleted();
+
+  unsigned long m_DataStorageDeletedTag;
+
 };
 #endif // QmitkAbstractNodeSelectionWidget_H

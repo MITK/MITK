@@ -151,6 +151,28 @@ void QmitkFiberfoxView::AfterThread()
 
   if (m_Controls->m_VolumeFractionsBox->isChecked())
   {
+    if (m_TractsToDwiFilter->GetTickImage().IsNotNull())
+    {
+      mitk::Image::Pointer mitkImage = mitk::Image::New();
+      itk::TractsToDWIImageFilter< short >::Float2DImageType::Pointer itkImage = m_TractsToDwiFilter->GetTickImage();
+      mitkImage = mitk::GrabItkImageMemory( itkImage.GetPointer() );
+      mitk::DataNode::Pointer node = mitk::DataNode::New();
+      node->SetData( mitkImage );
+      node->SetName("Tick Image");
+      GetDataStorage()->Add(node, parameters.m_Misc.m_ResultNode);
+    }
+
+    if (m_TractsToDwiFilter->GetRfImage().IsNotNull())
+    {
+      mitk::Image::Pointer mitkImage = mitk::Image::New();
+      itk::TractsToDWIImageFilter< short >::Float2DImageType::Pointer itkImage = m_TractsToDwiFilter->GetRfImage();
+      mitkImage = mitk::GrabItkImageMemory( itkImage.GetPointer() );
+      mitk::DataNode::Pointer node = mitk::DataNode::New();
+      node->SetData( mitkImage );
+      node->SetName("RF Image");
+      GetDataStorage()->Add(node, parameters.m_Misc.m_ResultNode);
+    }
+
     if (m_TractsToDwiFilter->GetPhaseImage().IsNotNull())
     {
       mitk::Image::Pointer phaseImage = mitk::Image::New();
@@ -479,7 +501,7 @@ void QmitkFiberfoxView::UpdateParametersFromGui()
 {
   m_Parameters.ClearSignalParameters();
   m_Parameters.m_Misc.m_CheckAdvancedSignalOptionsBox = m_Controls->m_AdvancedOptionsBox_2->isChecked();
-  m_Parameters.m_Misc.m_CheckOutputVolumeFractionsBox = m_Controls->m_VolumeFractionsBox->isChecked();
+  m_Parameters.m_Misc.m_OutputAdditionalImages = m_Controls->m_VolumeFractionsBox->isChecked();
 
   std::string outputPath = m_Controls->m_SavePathEdit->text().toStdString();
   if (outputPath.compare("-")!=0)
@@ -1415,7 +1437,7 @@ void QmitkFiberfoxView::LoadParameters()
     m_Controls->m_NoiseLevel->setValue(m_Parameters.m_SignalGen.m_NoiseVariance);
   }
 
-  m_Controls->m_VolumeFractionsBox->setChecked(m_Parameters.m_Misc.m_CheckOutputVolumeFractionsBox);
+  m_Controls->m_VolumeFractionsBox->setChecked(m_Parameters.m_Misc.m_OutputAdditionalImages);
   m_Controls->m_AdvancedOptionsBox_2->setChecked(m_Parameters.m_Misc.m_CheckAdvancedSignalOptionsBox);
   m_Controls->m_AddGhosts->setChecked(m_Parameters.m_Misc.m_DoAddGhosts);
   m_Controls->m_AddAliasing->setChecked(m_Parameters.m_Misc.m_DoAddAliasing);

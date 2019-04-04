@@ -77,6 +77,8 @@ public:
     itkGetMacro( PhaseImage, DoubleDwiType::Pointer )
     itkGetMacro( KspaceImage, DoubleDwiType::Pointer )
     itkGetMacro( CoilPointset, mitk::PointSet::Pointer )
+    itkGetMacro( TickImage, typename Float2DImageType::Pointer )    ///< k-space readout ordering encoded in the voxels
+    itkGetMacro( RfImage, typename Float2DImageType::Pointer )    ///< time passed since last RF pulse encoded per voxel
 
     void GenerateData() override;
 
@@ -162,6 +164,9 @@ protected:
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
     itk::LinearInterpolateImageFunction< ItkDoubleImgType, float >::Pointer   m_DoubleInterpolator;
     itk::Vector<double,3>                       m_NullDir;
+
+    Float2DImageType::Pointer                   m_TickImage;
+    Float2DImageType::Pointer                   m_RfImage;
 };
 }
 

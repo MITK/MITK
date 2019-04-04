@@ -409,7 +409,7 @@ void mitk::FiberfoxParameters::SaveParameters(std::string filename)
   parameters.put("fiberfox.image.artifacts.doAddDistortions", m_Misc.m_DoAddDistortions);
   parameters.put("fiberfox.image.artifacts.doAddDrift", m_SignalGen.m_DoAddDrift);
 
-  parameters.put("fiberfox.image.outputvolumefractions", m_Misc.m_CheckOutputVolumeFractionsBox);
+  parameters.put("fiberfox.image.outputvolumefractions", m_Misc.m_OutputAdditionalImages);
   parameters.put("fiberfox.image.showadvanced", m_Misc.m_CheckAdvancedSignalOptionsBox);
   parameters.put("fiberfox.image.signalmodelstring", m_Misc.m_SignalModelString);
   parameters.put("fiberfox.image.artifactmodelstring", m_Misc.m_ArtifactModelString);
@@ -703,7 +703,7 @@ void mitk::FiberfoxParameters::LoadParameters(std::string filename, bool fix_see
       m_Misc.m_SignalModelString = ReadVal<std::string>(v1,"signalmodelstring", m_Misc.m_SignalModelString);
       m_Misc.m_ArtifactModelString = ReadVal<std::string>(v1,"artifactmodelstring", m_Misc.m_ArtifactModelString);
       m_Misc.m_OutputPath = ReadVal<std::string>(v1,"outpath", m_Misc.m_OutputPath);
-      m_Misc.m_CheckOutputVolumeFractionsBox = ReadVal<bool>(v1,"outputvolumefractions", m_Misc.m_CheckOutputVolumeFractionsBox);
+      m_Misc.m_OutputAdditionalImages = ReadVal<bool>(v1,"outputvolumefractions", m_Misc.m_OutputAdditionalImages);
       m_Misc.m_CheckAdvancedSignalOptionsBox = ReadVal<bool>(v1,"showadvanced", m_Misc.m_CheckAdvancedSignalOptionsBox);
       m_Misc.m_DoAddDistortions = ReadVal<bool>(v1,"artifacts.doAddDistortions", m_Misc.m_DoAddDistortions);
       m_Misc.m_DoAddNoise = ReadVal<bool>(v1,"artifacts.addnoise", m_Misc.m_DoAddNoise);

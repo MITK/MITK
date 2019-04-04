@@ -176,6 +176,8 @@ SimulateKspaceAcquisition( std::vector< DoubleDwiType::Pointer >& compartment_im
       spikes.push_back(spike);
     }
 
+  bool output_timing = m_Parameters.m_Misc.m_OutputAdditionalImages;
+
   PrintToLog("0%   10   20   30   40   50   60   70   80   90   100%", false, true, false);
   PrintToLog("|----|----|----|----|----|----|----|----|----|----|\n*", false, false, false);
   unsigned long lastTick = 0;
@@ -265,6 +267,12 @@ SimulateKspaceAcquisition( std::vector< DoubleDwiType::Pointer >& compartment_im
         idft->SetDiffusionGradientDirection(m_Parameters.m_SignalGen.GetGradientDirection(g)*m_Parameters.m_SignalGen.GetBvalue()/1000.0);
         idft->SetSpikesPerSlice(numSpikes);
         idft->SetNumberOfThreads(in_threads);
+#pragma omp critical
+        if (output_timing)
+        {
+            idft->SetStoreTimings(true);
+            output_timing = false;
+        }
         idft->Update();
 
 #pragma omp critical
@@ -276,6 +284,11 @@ SimulateKspaceAcquisition( std::vector< DoubleDwiType::Pointer >& compartment_im
 
         Complex2DImageType::Pointer fSlice;
         fSlice = idft->GetOutput();
+
+        if (idft->GetTickImage().IsNotNull())
+            m_TickImage = idft->GetTickImage();
+        if (idft->GetRfImage().IsNotNull())
+            m_RfImage = idft->GetRfImage();
 
         // fourier transform slice
         Complex2DImageType::Pointer newSlice;
@@ -519,6 +532,9 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
   m_Translations.clear();
   m_MotionLog = "";
   m_SpikeLog = "";
+
+  m_TickImage = nullptr;
+  m_RfImage = nullptr;
 
   // initialize output dwi image
   m_Parameters.m_SignalGen.m_CroppedRegion = m_Parameters.m_SignalGen.m_ImageRegion;
@@ -1257,7 +1273,6 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     case SignalGenerationParameters::FastSpinEcho:
     {
       PrintToLog("Acquisition type: fast spin echo (one RF pulse per ETL lines) with cartesian k-space trajectory (ETL: " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_EchoTrainLength) + ")", false);
-      PrintToLog("Effective TE: " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_tEcho*m_Parameters.m_SignalGen.m_EchoTrainLength/2), false);
       break;
     }
     default:

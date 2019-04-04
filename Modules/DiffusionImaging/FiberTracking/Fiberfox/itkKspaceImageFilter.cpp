@@ -41,6 +41,7 @@ namespace itk {
     , m_RandSeed(-1)
     , m_SpikesPerSlice(0)
     , m_IsBaseline(true)
+    , m_StoreTimings(false)
   {
     m_DiffusionGradientDirection.Fill(0.0);
     m_CoilPosition.Fill(0.0);
@@ -109,12 +110,27 @@ namespace itk {
     m_KSpaceImage->Allocate();
     m_KSpaceImage->FillBuffer(0.0);
 
-//    m_TickImage = InputImageType::New();
-//    m_TickImage->SetLargestPossibleRegion( region );
-//    m_TickImage->SetBufferedRegion( region );
-//    m_TickImage->SetRequestedRegion( region );
-//    m_TickImage->Allocate();
-//    m_TickImage->FillBuffer(-1.0);
+    if (m_StoreTimings)
+    {
+        m_TickImage = InputImageType::New();
+        m_TickImage->SetLargestPossibleRegion( region );
+        m_TickImage->SetBufferedRegion( region );
+        m_TickImage->SetRequestedRegion( region );
+        m_TickImage->Allocate();
+        m_TickImage->FillBuffer(-1.0);
+
+        m_RfImage = InputImageType::New();
+        m_RfImage->SetLargestPossibleRegion( region );
+        m_RfImage->SetBufferedRegion( region );
+        m_RfImage->SetRequestedRegion( region );
+        m_RfImage->Allocate();
+        m_RfImage->FillBuffer(-1.0);
+    }
+    else
+    {
+        m_TickImage = nullptr;
+        m_RfImage = nullptr;
+    }
 
     m_Gamma = 42576000*itk::Math::twopi;    // Gyromagnetic ratio in Hz/T
     if ( m_Parameters->m_SignalGen.m_EddyStrength>0 && m_DiffusionGradientDirection.GetNorm()>0.001)
@@ -309,7 +325,8 @@ namespace itk {
         ++oit;
         continue;
       }
-//      m_TickImage->SetPixel(kIdx, tick);
+      if (m_StoreTimings)
+        m_TickImage->SetPixel(kIdx, tick);
 
       // gibbs ringing by setting high frequencies to zero (alternative to using smaller k-space than input image space)
       if (m_Parameters->m_SignalGen.m_DoAddGibbsRinging && m_Parameters->m_SignalGen.m_ZeroRinging>0)
@@ -341,6 +358,8 @@ namespace itk {
       {
         // time passes since application of the RF pulse
         float tRf = m_ReadoutScheme->GetTimeFromRf(tick);
+        if (m_StoreTimings)
+            m_RfImage->SetPixel(kIdx, tRf);
 
         for (unsigned int i=0; i<m_CompartmentImages.size(); i++)
         {
@@ -488,11 +507,6 @@ namespace itk {
       m_SpikeLog += "[" + boost::lexical_cast<std::string>(spikeIdx[0]) + "," + boost::lexical_cast<std::string>(spikeIdx[1]) + "," + boost::lexical_cast<std::string>(m_Zidx) + "] Magnitude: " + boost::lexical_cast<std::string>(m_Spike.real()) + "+" + boost::lexical_cast<std::string>(m_Spike.imag()) + "i\n";
     }
     delete m_ReadoutScheme;
-
-//    typename itk::ImageFileWriter< InputImageType >::Pointer wr = itk::ImageFileWriter< InputImageType >::New();
-//    wr->SetInput(m_TickImage);
-//    wr->SetFileName("/home/neher/TimeFromRfImage.nii.gz");
-//    wr->Update();
   }
 }
 #endif

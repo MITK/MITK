@@ -438,9 +438,12 @@ namespace mitk
 
   //##Documentation
   //## @brief returns the topmost visible node of a given list of nodes.
+  //## The function returns a node that is visible and has the highest layer of a set of given nodes.
+  //## The property list, which is used to find the visibility- and layer-property is is specified by the
+  //## given base renderer.
   //##
-  MITKCORE_EXPORT DataNode::Pointer FindTopmostVisibleNode(const DataStorage::SetOfObjects* nodes,
-                                                           const Point3D worldposition,
+  MITKCORE_EXPORT DataNode::Pointer FindTopmostVisibleNode(const DataStorage::SetOfObjects::ConstPointer nodes,
+                                                           const Point3D worldPosition,
                                                            const TimePointType timePoint,
                                                            const BaseRenderer* baseRender);
 } // namespace mitk

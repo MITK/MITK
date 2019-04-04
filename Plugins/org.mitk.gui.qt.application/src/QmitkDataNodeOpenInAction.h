@@ -33,7 +33,7 @@ class MITK_QT_APP QmitkDataNodeOpenInAction : public QAction, public QmitkAbstra
 
 public:
 
-  typedef std::vector<mitk::BaseRenderer::ConstPointer> RendererVector;
+  typedef std::vector<mitk::BaseRenderer*> RendererVector;
 
   QmitkDataNodeOpenInAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
   QmitkDataNodeOpenInAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);

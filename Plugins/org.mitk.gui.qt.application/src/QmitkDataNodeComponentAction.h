@@ -36,8 +36,6 @@ public:
   QmitkDataNodeComponentAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
   QmitkDataNodeComponentAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
 
-  virtual ~QmitkDataNodeComponentAction() override;
-
   virtual void InitializeWithDataNode(const mitk::DataNode* dataNode) override;
 
 private Q_SLOTS:

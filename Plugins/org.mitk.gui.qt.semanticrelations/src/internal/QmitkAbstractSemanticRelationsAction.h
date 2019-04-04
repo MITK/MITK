@@ -31,8 +31,6 @@ public:
   QmitkAbstractSemanticRelationsAction(berry::IWorkbenchPartSite::Pointer workbenchPartSite);
   QmitkAbstractSemanticRelationsAction(berry::IWorkbenchPartSite* workbenchPartSite);
 
-  virtual ~QmitkAbstractSemanticRelationsAction() override;
-
 protected:
 
   std::unique_ptr<mitk::SemanticRelationsIntegration> m_SemanticRelationsIntegration;

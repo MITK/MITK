@@ -42,11 +42,6 @@ QmitkDataNodeComponentAction::QmitkDataNodeComponentAction(QWidget* parent, berr
   InitializeAction();
 }
 
-QmitkDataNodeComponentAction::~QmitkDataNodeComponentAction()
-{
-  // nothing here
-}
-
 void QmitkDataNodeComponentAction::InitializeAction()
 {
   setCheckable(true);
@@ -86,9 +81,11 @@ void QmitkDataNodeComponentAction::InitializeWithDataNode(const mitk::DataNode* 
     return;
   }
 
+  mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
+
   int numComponents = 0;
   numComponents = img->GetPixelType().GetNumberOfComponents();
-  mitk::IntProperty* componentProperty = dynamic_cast<mitk::IntProperty*>(dataNode->GetProperty("Image.Displayed Component"));
+  mitk::IntProperty* componentProperty = dynamic_cast<mitk::IntProperty*>(dataNode->GetProperty("Image.Displayed Component", baseRenderer));
   if (numComponents <= 1 || nullptr == componentProperty)
   {
     m_ComponentSlider->SetProperty(static_cast<mitk::IntProperty*>(nullptr));

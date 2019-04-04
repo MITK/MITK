@@ -38,7 +38,8 @@ class MITKQTWIDGETS_EXPORT QmitkMouseModeSwitcher : public QToolBar
   Q_OBJECT
 
 public:
-  QmitkMouseModeSwitcher(QWidget *parent = nullptr);
+
+  QmitkMouseModeSwitcher(QWidget* parent = nullptr);
   ~QmitkMouseModeSwitcher() override;
 
   typedef mitk::MouseModeSwitcher::MouseMode MouseMode;
@@ -53,7 +54,7 @@ public slots:
     \todo QmitkMouseModeSwitcher could be enhanced to actively observe mitk::MouseModeSwitcher and change available
     actions or visibility appropriately.
   */
-  void setMouseModeSwitcher(mitk::MouseModeSwitcher *);
+  void setMouseModeSwitcher(mitk::MouseModeSwitcher*);
 
 signals:
 
@@ -65,25 +66,23 @@ signals:
     because this must enable/disable automatic reaction of SliceNavigationControllers
     to mouse clicks - depending on which mode is active.
   */
-  void MouseModeSelected(mitk::MouseModeSwitcher::MouseMode id); // TODO change int to enum of MouseModeSwitcher
+  void MouseModeSelected(MouseMode id);
 
 protected slots:
 
-  void modeSelectedByUser();
-  void addButton(MouseMode id,
-                 const QString &toolName,
-                 const QIcon &icon,
-                 bool on = false); // TODO change int to enum of MouseModeSwitcher
+  void OnMouseModeChangedViaButton();
+  void addButton(MouseMode id, const QString& toolName, const QIcon& icon, bool on = false);
 
 protected:
-  void OnMouseModeChanged(const itk::EventObject &);
 
-  QActionGroup *m_ActionGroup;
-  mitk::MouseModeSwitcher *m_MouseModeSwitcher;
+  void OnMouseModeChangedViaCommand(const itk::EventObject&);
+
+  QActionGroup* m_ActionGroup;
+  mitk::MouseModeSwitcher* m_MouseModeSwitcher;
 
   unsigned long m_ObserverTag;
 
-  bool m_InObservationReaction;
+  bool m_ActionButtonBlocked;
 };
 
 #endif

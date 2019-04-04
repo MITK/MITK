@@ -53,7 +53,7 @@ void mitk::RenderWindowLayerController::SetBaseDataNode(DataNode* dataNode, cons
     // set the data node as base data node in all controlled renderer
     for (const auto& renderer : m_ControlledRenderer)
     {
-      if (renderer.IsNotNull())
+      if (nullptr != renderer)
       {
         SetBaseDataNode(dataNode, renderer);
       }
@@ -97,7 +97,7 @@ void mitk::RenderWindowLayerController::InsertLayerNode(DataNode* dataNode, int 
     // insert data node in all controlled renderer
     for (const auto& renderer : m_ControlledRenderer)
     {
-      if (renderer.IsNotNull())
+      if (nullptr != renderer)
       {
         InsertLayerNode(dataNode, layer, renderer);
       }
@@ -120,7 +120,14 @@ void mitk::RenderWindowLayerController::InsertLayerNode(DataNode* dataNode, int 
 void mitk::RenderWindowLayerController::InsertLayerNodeInternal(DataNode* dataNode, int newLayer, const BaseRenderer* renderer /*= nullptr*/)
 {
   dataNode->SetBoolProperty("fixedLayer", true, renderer);
-  dataNode->SetVisibility(true, renderer);
+  // use visibility of existing renderer or common renderer
+  bool visible = false;
+  bool visibilityProperty = dataNode->GetVisibility(visible, renderer);
+  if (true == visibilityProperty)
+  {
+    // found a visibility property
+    dataNode->SetVisibility(visible, renderer);
+  }
 
   // get the layer stack without the base node of the current renderer
   RenderWindowLayerUtilities::LayerStack stackedLayers = RenderWindowLayerUtilities::GetLayerStack(m_DataStorage, renderer, false);
@@ -140,18 +147,13 @@ void mitk::RenderWindowLayerController::InsertLayerNodeInternal(DataNode* dataNo
     if (RenderWindowLayerUtilities::TOP_LAYER_INDEX == newLayer)
     {
       // get the first value (highest int-key -> topmost layer)
-      // +1 indicates inserting the node above the topmost layer
+      // + 1 indicates inserting the node above the topmost layer
       newLayer = stackedLayers.begin()->first + 1;
     }
     else
     {
-      // see if layer is already taken
-      RenderWindowLayerUtilities::LayerStack::iterator layerStackIterator = stackedLayers.find(newLayer);
-      for (; layerStackIterator != stackedLayers.end(); ++layerStackIterator)
-      {
-        // move data nodes after the new layer one layer up
-        layerStackIterator->second->SetIntProperty("layer", layerStackIterator->first + 1, renderer);
-      }
+      MoveNodeToPosition(dataNode, newLayer, renderer);
+      return;
     }
   }
   // update data storage (the "data node model")
@@ -172,7 +174,7 @@ void mitk::RenderWindowLayerController::RemoveLayerNode(DataNode* dataNode, cons
     // remove data node from all controlled renderer
     for (const auto& renderer : m_ControlledRenderer)
     {
-      if (renderer.IsNotNull())
+      if (nullptr != renderer)
       {
         RemoveLayerNode(dataNode, renderer);
       }
@@ -189,6 +191,79 @@ void mitk::RenderWindowLayerController::RemoveLayerNode(DataNode* dataNode, cons
   }
 }
 
+bool mitk::RenderWindowLayerController::MoveNodeToPosition(DataNode* dataNode, int newLayer, const BaseRenderer* renderer /*= nullptr*/)
+{
+  if (nullptr == dataNode)
+  {
+    return false;
+  }
+
+  if (nullptr == renderer)
+  {
+    // move data node to position in all controlled renderer
+    for (const auto& renderer : m_ControlledRenderer)
+    {
+      if (nullptr != renderer)
+      {
+        MoveNodeToPosition(dataNode, newLayer, renderer);
+        // we don't store/need the returned boolean value
+        return false;
+      }
+    }
+  }
+  else
+  {
+    // get the layer stack without the base node of the current renderer
+    RenderWindowLayerUtilities::LayerStack stackedLayers = RenderWindowLayerUtilities::GetLayerStack(m_DataStorage, renderer, false);
+    if (!stackedLayers.empty())
+    {
+      // get the current layer value of the given data node
+      int currentLayer;
+      bool wasFound = dataNode->GetIntProperty("layer", currentLayer, renderer);
+      if (wasFound && currentLayer != newLayer)
+      {
+        // move the given data node to the specified layer
+        dataNode->SetIntProperty("layer", newLayer, renderer);
+
+        int upperBound;
+        int lowerBound;
+        int step;
+        if (currentLayer < newLayer)
+        {
+          // move node up
+          upperBound = newLayer + 1;
+          lowerBound = currentLayer + 1;
+          step = -1; // move all other nodes one step down
+        }
+        else
+        {
+          upperBound = currentLayer;
+          lowerBound = newLayer;
+          step = 1; // move all other nodes one step up
+        }
+
+        // move all other data nodes between the upper and the lower bound
+        for (auto& layer : stackedLayers)
+        {
+          if (layer.second != dataNode && layer.first < upperBound && layer.first >= lowerBound)
+          {
+            layer.second->SetIntProperty("layer", layer.first + step, renderer);
+          }
+          // else: current data node is the selected data node or
+          // was previously already above the selected data node or
+          // was previously already below the new layer position
+        }
+        dataNode->Modified();
+        mitk::RenderingManager::GetInstance()->RequestUpdate(renderer->GetRenderWindow());
+        return true;
+      }
+      // else: data node has no layer information or is already at the specified position
+    }
+    // else: do not work with empty layer stack
+  }
+  return false;
+}
+
 bool mitk::RenderWindowLayerController::MoveNodeToFront(DataNode* dataNode, const BaseRenderer* renderer /*= nullptr*/)
 {
   if (nullptr == dataNode)
@@ -201,7 +276,7 @@ bool mitk::RenderWindowLayerController::MoveNodeToFront(DataNode* dataNode, cons
     // move data node to front in all controlled renderer
     for (const auto& renderer : m_ControlledRenderer)
     {
-      if (renderer.IsNotNull())
+      if (nullptr != renderer)
       {
         MoveNodeToFront(dataNode, renderer);
         // we don't store/need the returned boolean value
@@ -247,7 +322,7 @@ bool mitk::RenderWindowLayerController::MoveNodeToBack(DataNode* dataNode, const
     // move data node to back in all controlled renderer
     for (const auto& renderer : m_ControlledRenderer)
     {
-      if (renderer.IsNotNull())
+      if (nullptr != renderer)
       {
         MoveNodeToBack(dataNode, renderer);
         // we don't store/need the returned boolean value
@@ -304,7 +379,7 @@ bool mitk::RenderWindowLayerController::MoveNodeUp(DataNode* dataNode, const Bas
     // move data node down in all controlled renderer
     for (const auto& renderer : m_ControlledRenderer)
     {
-      if (renderer.IsNotNull())
+      if (nullptr != renderer)
       {
         MoveNodeUp(dataNode, renderer);
         // we don't store/need the returned boolean value
@@ -359,7 +434,7 @@ bool mitk::RenderWindowLayerController::MoveNodeDown(DataNode* dataNode, const B
     // move data node up in all controlled renderer
     for (const auto& renderer : m_ControlledRenderer)
     {
-      if (renderer.IsNotNull())
+      if (nullptr != renderer)
       {
         MoveNodeDown(dataNode, renderer);
         // we don't store/need the returned boolean value
@@ -418,7 +493,7 @@ void mitk::RenderWindowLayerController::SetVisibilityOfDataNode(bool visibility,
     // set visibility of data node in all controlled renderer
     for (const auto& renderer : m_ControlledRenderer)
     {
-      if (renderer.IsNotNull())
+      if (nullptr != renderer)
       {
         SetVisibilityOfDataNode(visibility, dataNode, renderer);
       }
@@ -441,7 +516,7 @@ void mitk::RenderWindowLayerController::HideDataNodeInAllRenderer(const DataNode
 
   for (const auto& renderer : m_ControlledRenderer)
   {
-    if (renderer.IsNotNull())
+    if (nullptr != renderer)
     {
       dataNode->GetPropertyList(renderer)->SetBoolProperty("visible", false);
     }
@@ -457,7 +532,7 @@ void mitk::RenderWindowLayerController::ResetRenderer(bool onlyVisibility /*= tr
     // reset all controlled renderer
     for (const auto& renderer : m_ControlledRenderer)
     {
-      if (renderer.IsNotNull())
+      if (nullptr != renderer)
       {
         ResetRenderer(onlyVisibility, renderer);
       }

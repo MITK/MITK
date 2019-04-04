@@ -96,11 +96,6 @@ QmitkDataNodeRemoveAction::QmitkDataNodeRemoveAction(QWidget* parent, berry::IWo
   InitializeAction();
 }
 
-QmitkDataNodeRemoveAction::~QmitkDataNodeRemoveAction()
-{
-  // nothing here
-}
-
 void QmitkDataNodeRemoveAction::InitializeAction()
 {
   connect(this, &QmitkDataNodeRemoveAction::triggered, this, &QmitkDataNodeRemoveAction::OnActionTriggered);

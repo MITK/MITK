@@ -71,6 +71,23 @@ void QmitkDataNodeContextMenu::SetDataStorage(mitk::DataStorage* dataStorage)
   }
 }
 
+void QmitkDataNodeContextMenu::SetBaseRenderer(mitk::BaseRenderer* baseRenderer)
+{
+  if (m_BaseRenderer != baseRenderer)
+  {
+    // set the new base renderer - also for all actions
+    m_BaseRenderer = baseRenderer;
+    for (DescriptorActionListType::const_iterator it = m_DescriptorActionList.begin(); it != m_DescriptorActionList.end(); ++it)
+    {
+      QmitkAbstractDataNodeAction *abstractDataNodeAction = dynamic_cast<QmitkAbstractDataNodeAction *>(it->second);
+      if (nullptr != abstractDataNodeAction)
+      {
+        abstractDataNodeAction->SetBaseRenderer(m_BaseRenderer.Lock());
+      }
+    }
+  }
+}
+
 void QmitkDataNodeContextMenu::SetSurfaceDecimation(bool surfaceDecimation)
 {
   m_SurfaceDecimation = surfaceDecimation;
@@ -263,7 +280,6 @@ void QmitkDataNodeContextMenu::InitExtensionPointActions()
 
 void QmitkDataNodeContextMenu::InitServiceActions()
 {
-
 }
 
 void QmitkDataNodeContextMenu::OnContextMenuRequested(const QPoint& /*pos*/)
@@ -280,6 +296,15 @@ void QmitkDataNodeContextMenu::OnContextMenuRequested(const QPoint& /*pos*/)
   }
 
   // if either a selection was set or a selection could be retrieved from the workbench selection service
+  berry::ISelection::ConstPointer selection = m_WorkbenchPartSite.Lock()->GetWorkbenchWindow()->GetSelectionService()->GetSelection();
+  mitk::DataNodeSelection::ConstPointer currentSelection = selection.Cast<const mitk::DataNodeSelection>();
+
+  if (currentSelection.IsNull() || currentSelection->IsEmpty())
+  {
+    return;
+  }
+
+  m_SelectedNodes = QList<mitk::DataNode::Pointer>::fromStdList(currentSelection->GetSelectedDataNodes());
   if (!m_SelectedNodes.isEmpty())
   {
     clear();
@@ -304,15 +329,6 @@ void QmitkDataNodeContextMenu::OnContextMenuRequested(const QPoint& /*pos*/)
         abstractDataNodeAction->SetSelectedNodes(m_SelectedNodes);
       }
     }
-
-    /*
-    if (!m_ShowInActions.isEmpty())
-    {
-      QMenu* showInMenu = m_NodeMenu->addMenu(tr("Show In"));
-      showInMenu->addActions(m_ShowInActions);
-    }
-    */
-
     addActions(actions);
     popup(QCursor::pos());
   }

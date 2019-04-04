@@ -41,8 +41,6 @@ public:
   QmitkDataNodeRemoveAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
   QmitkDataNodeRemoveAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
 
-  virtual ~QmitkDataNodeRemoveAction() override;
-
 private Q_SLOTS:
 
   void OnActionTriggered(bool);

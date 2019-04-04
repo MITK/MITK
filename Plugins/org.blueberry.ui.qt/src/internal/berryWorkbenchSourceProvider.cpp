@@ -64,7 +64,6 @@ WorkbenchSourceProvider::WorkbenchSourceProvider()
   , lastActivePart(nullptr)
   , lastActivePartSite(nullptr)
   , lastShowInInput(nullptr)
-  , lastEditorInput(nullptr)
   , display(nullptr)
 {
 }
@@ -314,18 +313,24 @@ void WorkbenchSourceProvider::CheckActivePart(bool updateShowInSelection)
     lastActiveEditor = newActiveEditor.Cast<const IEditorPart>().GetPointer();
   }
   const Object::ConstPointer newEditorInput = currentState.value(ISources::ACTIVE_EDITOR_INPUT_NAME());
-  if (newEditorInput != lastEditorInput)
+  IEditorInput::ConstPointer lastInput;
+  if (!lastEditorInput.Expired())
+  {
+    lastInput = lastEditorInput.Lock();
+  }
+  if (newEditorInput != lastInput)
   {
     sources |= ISources::ACTIVE_EDITOR();
     if (newEditorInput != IEvaluationContext::UNDEFINED_VARIABLE)
     {
-      lastEditorInput = newEditorInput.Cast<const IEditorInput>().GetPointer();
+      lastEditorInput = newEditorInput.Cast<const IEditorInput>();
     }
     else
     {
-      lastEditorInput = nullptr;
+      lastEditorInput.Reset();
     }
   }
+
   const Object::ConstPointer newActiveEditorId = currentState.value(ISources::ACTIVE_EDITOR_ID_NAME());
   if (newActiveEditorId != lastActiveEditorId)
   {
@@ -763,12 +768,17 @@ void WorkbenchSourceProvider::CheckOtherSources(const SmartPointer<const Shell>&
 void WorkbenchSourceProvider::HandleInputChanged(const SmartPointer<IEditorPart>& editor)
 {
   IEditorInput::Pointer newInput = editor->GetEditorInput();
-  if (newInput != lastEditorInput)
+  IEditorInput::ConstPointer lastInput;
+  if (!lastEditorInput.Expired())
+  {
+    lastInput = lastEditorInput.Lock();
+  }
+  if (newInput != lastInput)
   {
     FireSourceChanged(ISources::ACTIVE_EDITOR(),
                       ISources::ACTIVE_EDITOR_INPUT_NAME(),
                       newInput.IsNull() ? IEvaluationContext::UNDEFINED_VARIABLE : Object::ConstPointer(newInput));
-    lastEditorInput = newInput.GetPointer();
+    lastEditorInput = newInput;
   }
 }
 

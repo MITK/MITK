@@ -43,7 +43,7 @@ void QmitkSemanticRelationsContextMenu::SetDataStorage(mitk::DataStorage* dataSt
   }
 }
 
-void QmitkSemanticRelationsContextMenu::SetControlledRenderer(RenderWindowLayerUtilities::RendererVector controlledRenderer)
+void QmitkSemanticRelationsContextMenu::SetControlledRenderer(mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer)
 {
   if (m_ControlledRenderer != controlledRenderer)
   {

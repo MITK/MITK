@@ -89,6 +89,14 @@ namespace mitk
     */
     void RemoveLayerNode(DataNode* dataNode, const BaseRenderer* renderer = nullptr);
     /**
+    * @brief Move the data node to the given layer. This will change only the "layer" property.
+    *
+    * @param dataNode   The data node that should be moved.
+    * @param renderer   Pointer to the renderer instance for which the data node should be moved.
+    *                   If it is a nullptr (default) all controlled renderer will be affected.
+    */
+    bool MoveNodeToPosition(DataNode* dataNode, int newLayer, const BaseRenderer* renderer = nullptr);
+    /**
     * @brief Set the node in the given renderer as the topmost layer. This will change only the "layer" property.
     *
     * @param dataNode   The data node that should be moved.

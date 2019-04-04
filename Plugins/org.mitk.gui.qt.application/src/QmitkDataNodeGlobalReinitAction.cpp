@@ -60,11 +60,6 @@ QmitkDataNodeGlobalReinitAction::QmitkDataNodeGlobalReinitAction(QWidget* parent
   InitializeAction();
 }
 
-QmitkDataNodeGlobalReinitAction::~QmitkDataNodeGlobalReinitAction()
-{
-  // nothing here
-}
-
 void QmitkDataNodeGlobalReinitAction::InitializeAction()
 {
   connect(this, &QmitkDataNodeGlobalReinitAction::triggered, this, &QmitkDataNodeGlobalReinitAction::OnActionTriggered);

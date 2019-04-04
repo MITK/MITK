@@ -72,6 +72,7 @@ bool QmitkNodeTableViewKeyFilter::eventFilter(QObject *obj, QEvent *event)
     const auto& selectedNodes = AbstractDataNodeAction::GetSelectedNodes(dataManagerView->GetSite());
     if (keySequence == makeAllInvisible)
     {
+      auto nodeset = dataStorage->GetAll();
       HideAllAction::Run(selectedNodes);
       return true;
     }

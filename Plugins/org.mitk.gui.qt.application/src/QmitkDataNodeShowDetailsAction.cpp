@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkDataNodeShowDetailsAction.h>
 
-// mitk gui qt application
 #include "QmitkNodeDetailsDialog.h"
 
 namespace ShowDetailsAction
@@ -49,11 +48,6 @@ QmitkDataNodeShowDetailsAction::QmitkDataNodeShowDetailsAction(QWidget* parent, 
   setText(tr("Show details"));
   m_Parent = parent;
   InitializeAction();
-}
-
-QmitkDataNodeShowDetailsAction::~QmitkDataNodeShowDetailsAction()
-{
-  // nothing here
 }
 
 void QmitkDataNodeShowDetailsAction::InitializeAction()

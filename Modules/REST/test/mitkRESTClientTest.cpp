@@ -32,8 +32,8 @@ class mitkRESTClientTestSuite : public mitk::TestFixture, mitk::IRESTObserver
   CPPUNIT_TEST_SUITE(mitkRESTClientTestSuite);
     // MITK_TEST(GetRequestValidURI_ReturnsExpectedJSON); GET requests do not support content yet?
     MITK_TEST(MultipleGetRequestValidURI_AllTasksFinish);
-    MITK_TEST(PutRequestValidURI_ReturnsExpectedJSON);
-    MITK_TEST(PostRequestValidURI_ReturnsExpectedJSON);
+    // MITK_TEST(PutRequestValidURI_ReturnsExpectedJSON); Does not work reliably on dart clients
+    // MITK_TEST(PostRequestValidURI_ReturnsExpectedJSON);              -- " --
     MITK_TEST(GetRequestInvalidURI_ThrowsException);
     MITK_TEST(PutRequestInvalidURI_ThrowsException);
     MITK_TEST(PostRequestInvalidURI_ThrowsException);

@@ -1,7 +1,7 @@
 set(CPP_FILES
   Qmitk/QmitkHistogramVisualizationWidget.cpp
   Qmitk/QmitkIntensityProfileVisualizationWidget.cpp
-  Qmitk/QmitkImageStatisticsTableModel.cpp
+  Qmitk/QmitkImageStatisticsTreeModel.cpp
   Qmitk/QmitkImageStatisticsCalculationJob.cpp
   Qmitk/QmitkTableModelToStringConverter.cpp
   Qmitk/QmitkImageStatisticsWidget.cpp
@@ -25,7 +25,7 @@ set(UI_FILES
 set(MOC_H_FILES
   Qmitk/QmitkHistogramVisualizationWidget.h
   Qmitk/QmitkIntensityProfileVisualizationWidget.h
-  Qmitk/QmitkImageStatisticsTableModel.h
+  Qmitk/QmitkImageStatisticsTreeModel.h
   Qmitk/QmitkImageStatisticsCalculationJob.h
   Qmitk/QmitkImageStatisticsWidget.h
 )

@@ -61,7 +61,7 @@ public:
   virtual itk::ImageRegion<3> GetLargestPossibleRegion() = 0;
   virtual bool WorldToIndex(itk::Point<float, 3>& pos, itk::Index<3>& index) = 0;
 
-  void SetParameters(mitk::StreamlineTractographyParameters* parameters)
+  void SetParameters(std::shared_ptr< mitk::StreamlineTractographyParameters > parameters)
   {
     m_Parameters = parameters;
 
@@ -89,12 +89,14 @@ protected:
   BoostRngType        m_Rng;
   ItkRngType::Pointer m_RngItk;
   bool                m_NeedsDataInit;
-  mitk::StreamlineTractographyParameters* m_Parameters;
+  std::shared_ptr< mitk::StreamlineTractographyParameters > m_Parameters;
 
   void DataModified()
   {
     m_NeedsDataInit = true;
   }
+
+  vnl_matrix_fixed<float,3,3> m_FloatImageRotation;
 
 };
 

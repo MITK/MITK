@@ -105,6 +105,13 @@ void TrackingHandlerTensor::InitForTracking()
             m_FaImage->SetPixel(index, m_FaImage->GetPixel(index)/m_NumberOfInputs);
         }
 
+    auto double_dir = m_TensorImages.at(0)->GetDirection().GetVnlMatrix();
+    for (int r=0; r<3; r++)
+      for (int c=0; c<3; c++)
+      {
+        m_FloatImageRotation[r][c] = double_dir[r][c];
+      }
+
     m_NeedsDataInit = false;
   }
 
@@ -360,6 +367,8 @@ vnl_vector_fixed<float,3> TrackingHandlerTensor::ProposeDirection(const itk::Poi
     output_direction[1] *= -1;
   if (m_Parameters->m_FlipZ)
     output_direction[2] *= -1;
+  if (m_Parameters->m_ApplyDirectionMatrix)
+    output_direction = m_FloatImageRotation*output_direction;
 
   return output_direction;
 }

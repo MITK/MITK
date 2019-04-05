@@ -128,7 +128,7 @@ private:
 
   bool CheckAndStoreLastParams(QObject* obj);
   void StartStopTrackingGui(bool start);
-  mitk::StreamlineTractographyParameters GetParametersFromGui();
+  std::shared_ptr< mitk::StreamlineTractographyParameters > GetParametersFromGui();
 
   std::vector< itk::Point<float> >        m_SeedPoints;
   mitk::DataNode::Pointer                 m_ParentNode;

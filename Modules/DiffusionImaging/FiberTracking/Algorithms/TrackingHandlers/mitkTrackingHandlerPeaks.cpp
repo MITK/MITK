@@ -20,7 +20,6 @@ namespace mitk
 {
 
 TrackingHandlerPeaks::TrackingHandlerPeaks()
-  : m_ApplyDirectionMatrix(false)
 {
 
 }
@@ -167,7 +166,7 @@ vnl_vector_fixed<float,3> TrackingHandlerPeaks::GetDirection(itk::Index<3> idx3,
     dir[1] *= -1;
   if (m_Parameters->m_FlipZ)
     dir[2] *= -1;
-  if (m_ApplyDirectionMatrix)
+  if (m_Parameters->m_ApplyDirectionMatrix)
     dir = m_FloatImageRotation*dir;
 
   return dir;
@@ -279,7 +278,7 @@ vnl_vector_fixed<float,3> TrackingHandlerPeaks::ProposeDirection(const itk::Poin
     float a = 1;
     if (old_mag>0.5)
       a = dot_product(output_direction, oldDir);
-    if (a>=m_AngularThreshold)
+    if (a>=m_Parameters->GetAngularThreshold())
       output_direction *= mag;
     else
       output_direction.fill(0);

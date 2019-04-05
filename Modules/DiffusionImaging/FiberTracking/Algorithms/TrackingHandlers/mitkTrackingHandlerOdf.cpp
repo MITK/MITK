@@ -57,6 +57,13 @@ void TrackingHandlerOdf::InitForTracking()
         m_OdfHemisphereIndices.push_back(i);
     m_OdfFloatDirs.set_size(m_OdfHemisphereIndices.size(), 3);
 
+    auto double_dir = m_OdfImage->GetDirection().GetVnlMatrix();
+    for (int r=0; r<3; r++)
+      for (int c=0; c<3; c++)
+      {
+        m_FloatImageRotation[r][c] = double_dir[r][c];
+      }
+
     for (unsigned int i=0; i<m_OdfHemisphereIndices.size(); i++)
     {
       m_OdfFloatDirs[i][0] = odf.GetDirection(m_OdfHemisphereIndices[i])[0];
@@ -76,6 +83,12 @@ void TrackingHandlerOdf::InitForTracking()
     }
 
     m_NeedsDataInit = false;
+  }
+
+  if (m_OdfFromTensor)
+  {
+    m_Parameters->m_OdfCutoff = 0;
+    m_Parameters->m_SharpenOdfs = false;
   }
 
   m_GfaInterpolator->SetInputImage(m_GfaImage);
@@ -103,12 +116,12 @@ int TrackingHandlerOdf::SampleOdf(vnl_vector< float >& probs, vnl_vector< float 
       boost::random::variate_generator<boost::random::mt19937&, boost::random::discrete_distribution<int,float>> sampler(m_Rng, dist);
       sampled_idx = sampler();
     }
-    if (probs[sampled_idx]>max_prob && probs[sampled_idx]>m_Parameters->m_OdfCutoff && fabs(angles[sampled_idx])>=m_Parameters->m_AngularThreshold)
+    if (probs[sampled_idx]>max_prob && probs[sampled_idx]>m_Parameters->m_OdfCutoff && fabs(angles[sampled_idx])>=m_Parameters->GetAngularThreshold())
     {
       max_prob = probs[sampled_idx];
       max_sample_idx = sampled_idx;
     }
-    else if ( (probs[sampled_idx]<=m_Parameters->m_OdfCutoff || fabs(angles[sampled_idx])<m_AngularThreshold) && trials<50) // we allow 50 trials to exceed the ODF threshold
+    else if ( (probs[sampled_idx]<=m_Parameters->m_OdfCutoff || fabs(angles[sampled_idx])<m_Parameters->GetAngularThreshold()) && trials<50) // we allow 50 trials to exceed the ODF threshold
       i--;
   }
 
@@ -266,7 +279,7 @@ vnl_vector_fixed<float,3> TrackingHandlerOdf::ProposeDirection(const itk::Point<
   {
     output_direction.normalize();
     float a = dot_product(output_direction, last_dir);
-    if (a<m_Parameters->get)
+    if (a<m_Parameters->GetAngularThreshold())
       output_direction.fill(0);
   }
   else
@@ -278,6 +291,8 @@ vnl_vector_fixed<float,3> TrackingHandlerOdf::ProposeDirection(const itk::Point<
     output_direction[1] *= -1;
   if (m_Parameters->m_FlipZ)
     output_direction[2] *= -1;
+  if (m_Parameters->m_ApplyDirectionMatrix)
+    output_direction = m_FloatImageRotation*output_direction;
 
   return output_direction;
 }

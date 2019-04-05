@@ -66,6 +66,8 @@ public:
   typedef itk::Image<double, 3>                       ItkDoubleImgType;
   typedef itk::Image<float, 3>                        ItkFloatImgType;
   typedef vtkSmartPointer< vtkPolyData >              PolyDataType;
+  typedef mitk::StreamlineTractographyParameters::EndpointConstraints EndpointConstraints;
+  typedef mitk::StreamlineTractographyParameters::MODE MODE;
 
   typedef std::deque< vnl_vector_fixed<float,3> > DirectionContainer;
   typedef std::deque< itk::Point<float> > FiberType;
@@ -114,6 +116,9 @@ public:
 
   void SetTrackingPriorHandler(mitk::TrackingDataHandler *TrackingPriorHandler);
 
+  std::shared_ptr< mitk::StreamlineTractographyParameters > GetParameters() const;
+  void SetParameters(std::shared_ptr< mitk::StreamlineTractographyParameters > Parameters);
+
 protected:
 
   void GenerateData() override;
@@ -147,7 +152,6 @@ protected:
   ItkDoubleImgType::Pointer           m_OutputProbabilityMap;
 
   float                               m_MinVoxelSize;
-  int                                 m_MaxLength;
 
   bool                                m_Verbose;
   bool                                m_DemoMode;
@@ -174,7 +178,7 @@ protected:
   bool                                                                     m_SeedImageSet;
   bool                                                                     m_TargetImageSet;
 
-  mitk::StreamlineTractographyParameters* m_Parameters;
+  std::shared_ptr< mitk::StreamlineTractographyParameters > m_Parameters;
 
 
   // Directional priors

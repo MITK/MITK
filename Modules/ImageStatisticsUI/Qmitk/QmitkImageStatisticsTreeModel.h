@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef QmitkImageStatisticsTableModel_h
-#define QmitkImageStatisticsTableModel_h
+#ifndef QmitkImageStatisticsTreeModel_h
+#define QmitkImageStatisticsTreeModel_h
 
 #include "itkSimpleFastMutexLock.h"
 
@@ -26,26 +26,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkImageStatisticsUIExports.h>
 #include "mitkImageStatisticsContainer.h"
 
+class QmitkImageStatisticsTreeItem;
+
 /*!
-\class QmitkImageStatisticsTableModel
+\class QmitkImageStatisticsTreeModel
 Model that takes a mitk::ImageStatisticsContainer and represents it as model in context of the QT view-model-concept.
 */
-class MITKIMAGESTATISTICSUI_EXPORT QmitkImageStatisticsTableModel : public QmitkAbstractDataStorageModel
+class MITKIMAGESTATISTICSUI_EXPORT QmitkImageStatisticsTreeModel : public QmitkAbstractDataStorageModel
 {
     Q_OBJECT
 
 public:
-  enum class ViewMode {
-    imageXStatistic,
-    imageXMask
-  };
 
-  QmitkImageStatisticsTableModel(QObject *parent = nullptr);
-  virtual ~QmitkImageStatisticsTableModel();
+  QmitkImageStatisticsTreeModel(QObject *parent = nullptr);
+  virtual ~QmitkImageStatisticsTreeModel();
 
   void SetImageNodes(const std::vector<mitk::DataNode::ConstPointer>& nodes);
   void SetMaskNodes(const std::vector<mitk::DataNode::ConstPointer>& nodes);
-  void SetViewMode(ViewMode m);
   void Clear();
 
   virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
@@ -59,6 +56,8 @@ public:
 
 signals:
   void dataAvailable();
+  /** Is emitted whenever the model changes are finished (usually a bit later than dataAvailable()).*/
+  void modelChanged();
 
 protected:
   /*
@@ -86,9 +85,11 @@ private:
     void UpdateByDataStorage();
 
     using StatisticsContainerVector = std::vector<mitk::ImageStatisticsContainer::ConstPointer>;
-    /* the function returns the statistic container and the time point indicated by the index.
-     If the index is not valid result.first will point to a nullptr.*/
-    std::pair<mitk::ImageStatisticsContainer::ConstPointer, unsigned int> GetRelevantStatsticsByIndex(const QModelIndex &index) const;
+    /* builds a hierarchical tree model for the image statistics
+    1. Level: Image
+    --> 2. Level: Mask [if exist]
+        --> 3. Level: Timestep [if >1 exist] */
+    void BuildHierarchicalModel();
 
     StatisticsContainerVector m_Statistics;
 
@@ -97,17 +98,17 @@ private:
     /** Helper that is constructed when m_ImageNodes is set. It has the same order
     like m_ImageNodes, but each image is represented n times, while n is the number
     of time steps the respective image has. This structure makes the business logic
-    to select the correct image given a QIndex much simpler and therfore easy to
-    understand/maintaine. */
+    to select the correct image given a QIndex much simpler and therefore easy to
+    understand/maintain. */
     std::vector<std::pair<mitk::DataNode::ConstPointer, unsigned int> > m_TimeStepResolvedImageNodes;
     /** relevant masks set by the user.*/
     std::vector<mitk::DataNode::ConstPointer> m_MaskNodes;
     /** @sa m_TimeStepResolvedImageNodes */
     std::vector<std::pair<mitk::DataNode::ConstPointer, unsigned int>> m_TimeStepResolvedMaskNodes;
     std::vector<std::string> m_StatisticNames;
-    ViewMode m_ViewMode = ViewMode::imageXStatistic;
 
     itk::SimpleFastMutexLock m_Mutex;
+    QmitkImageStatisticsTreeItem *m_rootItem;
 };
 
-#endif // mitkQmitkImageStatisticsTableModel_h
+#endif // mitkQmitkImageStatisticsTreeModel_h

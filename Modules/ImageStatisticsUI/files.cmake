@@ -5,10 +5,12 @@ set(CPP_FILES
   Qmitk/QmitkImageStatisticsCalculationJob.cpp
   Qmitk/QmitkTableModelToStringConverter.cpp
   Qmitk/QmitkImageStatisticsWidget.cpp
+  Qmitk/QmitkImageStatisticsTreeItem.cpp
 )
 
 set(H_FILES
   Qmitk/QmitkTableModelToStringConverter.h
+  Qmitk/QmitkImageStatisticsTreeItem.h
 )
 
 set(TPP_FILES

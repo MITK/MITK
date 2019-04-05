@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qt
 #include <QMessageBox>
+#include <QFileDialog>
 
 // MITK
 #include <mitkLookupTable.h>
@@ -155,6 +156,7 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_ExclusionImageSelectionWidget->SetSelectionIsOptional(true);
 
     connect( m_TrackingTimer, SIGNAL(timeout()), this, SLOT(TimerUpdate()) );
+    connect( m_Controls->m_SaveParametersButton, SIGNAL(clicked()), this, SLOT(SaveParameters()) );
     connect( m_Controls->commandLinkButton_2, SIGNAL(clicked()), this, SLOT(StopTractography()) );
     connect( m_Controls->commandLinkButton, SIGNAL(clicked()), this, SLOT(DoFiberTracking()) );
     connect( m_Controls->m_InteractiveBox, SIGNAL(stateChanged(int)), this, SLOT(ToggleInteractive()) );
@@ -217,8 +219,31 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
 
     StartStopTrackingGui(false);
   }
+  m_ParameterFile = QDir::currentPath()+"/param.stp";
 
   UpdateGui();
+}
+
+mitk::StreamlineTractographyParameters QmitkStreamlineTrackingView::GetParametersFromGui()
+{
+  mitk::StreamlineTractographyParameters params;
+  params.m_InteractiveRadius = m_Controls->m_SeedRadiusBox->value();
+  params.m_MaxNumFibers = m_Controls->m_NumFibersBox->value();
+  return params;
+}
+
+void QmitkStreamlineTrackingView::SaveParameters()
+{
+  QString filename = QFileDialog::getSaveFileName(
+        0,
+        tr("Save Parameters"),
+        m_ParameterFile,
+        tr("Streamline Tractography Parameters (*.stp)") );
+
+  m_ParameterFile = filename;
+
+  auto params = GetParametersFromGui();
+  params.SaveParameters(m_ParameterFile.toStdString());
 }
 
 void QmitkStreamlineTrackingView::StopTractography()

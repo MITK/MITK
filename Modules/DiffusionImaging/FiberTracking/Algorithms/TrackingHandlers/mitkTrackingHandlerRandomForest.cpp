@@ -195,13 +195,13 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
       check_last_dir = true;
   }
 
-  if (!m_Interpolate && oldIndex==idx)
+  if (!m_Parameters->m_InterpolateTractographyData && oldIndex==idx)
     return last_dir;
 
   // store feature pixel values in a vigra data type
   vigra::MultiArray<2, float> featureData = vigra::MultiArray<2, float>( vigra::Shape2(1,m_Forest->GetNumFeatures()) );
   featureData.init(0.0);
-  typename DwiFeatureImageType::PixelType dwiFeaturePixel = mitk::imv::GetImageValue< typename DwiFeatureImageType::PixelType >(pos, m_Interpolate, m_DwiFeatureImageInterpolator);
+  typename DwiFeatureImageType::PixelType dwiFeaturePixel = mitk::imv::GetImageValue< typename DwiFeatureImageType::PixelType >(pos, m_Parameters->m_InterpolateTractographyData, m_DwiFeatureImageInterpolator);
   for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
     featureData(0,f) = dwiFeaturePixel[f];
 
@@ -217,11 +217,11 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
     vnl_vector_fixed<double,3> tempD;
     tempD[0] = d[0]; tempD[1] = d[1]; tempD[2] = d[2];
 
-    if (m_FlipX)
+    if (m_Parameters->m_FlipX)
         tempD[0] *= -1;
-    if (m_FlipY)
+    if (m_Parameters->m_FlipY)
         tempD[1] *= -1;
-    if (m_FlipZ)
+    if (m_Parameters->m_FlipZ)
         tempD[2] *= -1;
 
     tempD = inverse_direction_matrix * tempD;
@@ -276,14 +276,14 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
         float angle = angles[classLabel];
         float abs_angle = fabs(angle);
 
-        if (m_Mode==MODE::PROBABILISTIC)
+        if (m_Parameters->m_Mode==MODE::PROBABILISTIC)
         {
           probs2[classLabel] = probs(0,i);
           if (check_last_dir)
             probs2[classLabel] *= abs_angle;
           probs_sum += probs2[classLabel];
         }
-        else if (m_Mode==MODE::DETERMINISTIC)
+        else if (m_Parameters->m_Mode==MODE::DETERMINISTIC)
         {
           vnl_vector_fixed<float,3> d = m_DirectionContainer.at(classLabel);  // get direction vector assiciated with the respective direction index
           if (check_last_dir)   // do we have a previous streamline direction or did we just start?
@@ -310,7 +310,7 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
   }
 
 
-  if (m_Mode==MODE::PROBABILISTIC && pNonFib<0.5)
+  if (m_Parameters->m_Mode==MODE::PROBABILISTIC && pNonFib<0.5)
   {
     boost::random::discrete_distribution<int, float> dist(probs2.begin(), probs2.end());
     int sampled_idx = 0;
@@ -345,11 +345,11 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
     output_direction[1] = tempD[1];
     output_direction[2] = tempD[2];
 
-    if (m_FlipX)
+    if (m_Parameters->m_FlipX)
       output_direction[0] *= -1;
-    if (m_FlipY)
+    if (m_Parameters->m_FlipY)
       output_direction[1] *= -1;
-    if (m_FlipZ)
+    if (m_Parameters->m_FlipZ)
       output_direction[2] *= -1;
   }
 
@@ -851,7 +851,7 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::CalculateTr
             float volume_mod = mitk::imv::GetImageValue<float>(itkP1, false, volume_interpolator);
 
             // diffusion signal features
-            typename DwiFeatureImageType::PixelType pix = mitk::imv::GetImageValue< typename DwiFeatureImageType::PixelType >(itkP1, m_Interpolate, dwi_interp);
+            typename DwiFeatureImageType::PixelType pix = mitk::imv::GetImageValue< typename DwiFeatureImageType::PixelType >(itkP1, m_Parameters->m_InterpolateTractographyData, dwi_interp);
             for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
               m_FeatureData(sampleCounter,f) = pix[f];
 

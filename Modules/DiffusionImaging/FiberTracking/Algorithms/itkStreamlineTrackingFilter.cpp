@@ -52,38 +52,12 @@ StreamlineTrackingFilter
   , m_ExclusionRegions(nullptr)
   , m_OutputProbabilityMap(nullptr)
   , m_MinVoxelSize(-1)
-  , m_AngularThresholdDeg(-1)
-  , m_StepSizeVox(-1)
-  , m_SamplingDistanceVox(-1)
-  , m_AngularThreshold(-1)
-  , m_StepSize(0)
   , m_MaxLength(10000)
-  , m_MinTractLength(20.0)
-  , m_MaxTractLength(400.0)
-  , m_SeedsPerVoxel(1)
-  , m_AvoidStop(true)
-  , m_RandomSampling(false)
-  , m_SamplingDistance(-1)
-  , m_DeflectionMod(1.0)
-  , m_OnlyForwardSamples(true)
-  , m_UseStopVotes(true)
-  , m_NumberOfSamples(30)
-  , m_NumPreviousDirections(1)
-  , m_MaxNumTracts(-1)
   , m_Verbose(true)
-  , m_LoopCheck(-1)
   , m_DemoMode(false)
-  , m_Random(true)
-  , m_UseOutputProbabilityMap(false)
   , m_CurrentTracts(0)
   , m_Progress(0)
   , m_StopTracking(false)
-  , m_InterpolateMasks(true)
-  , m_TrialsPerSeed(10)
-  , m_EndpointConstraint(EndpointConstraints::NONE)
-  , m_IntroduceDirectionsFromPrior(true)
-  , m_TrackingPriorAsMask(true)
-  , m_TrackingPriorWeight(1.0)
   , m_TrackingPriorHandler(nullptr)
 {
   this->SetNumberOfRequiredInputs(0);
@@ -94,7 +68,7 @@ std::string StreamlineTrackingFilter::GetStatusText()
   std::string status = "Seedpoints processed: " + boost::lexical_cast<std::string>(m_Progress) + "/" + boost::lexical_cast<std::string>(m_SeedPoints.size());
   if (m_SeedPoints.size()>0)
     status += " (" + boost::lexical_cast<std::string>(100*m_Progress/m_SeedPoints.size()) + "%)";
-  if (m_MaxNumTracts>0)
+  if (m_Parameters->m_MaxNumFibers>0)
     status += "\nFibers accepted: " + boost::lexical_cast<std::string>(m_CurrentTracts) + "/" + boost::lexical_cast<std::string>(m_MaxNumTracts);
   else
     status += "\nFibers accepted: " + boost::lexical_cast<std::string>(m_CurrentTracts);
@@ -105,7 +79,7 @@ std::string StreamlineTrackingFilter::GetStatusText()
 void StreamlineTrackingFilter::BeforeTracking()
 {
   m_StopTracking = false;
-  m_TrackingHandler->SetRandom(m_Random);
+  m_TrackingHandler->SetParameters(m_Parameters);
   m_TrackingHandler->InitForTracking();
   m_FiberPolyData = PolyDataType::New();
   m_Points = vtkSmartPointer< vtkPoints >::New();
@@ -119,22 +93,6 @@ void StreamlineTrackingFilter::BeforeTracking()
     m_MinVoxelSize = static_cast<float>(imageSpacing[1]);
   else
     m_MinVoxelSize = static_cast<float>(imageSpacing[2]);
-
-  if (m_StepSizeVox<static_cast<float>(mitk::eps))
-    m_StepSize = 0.5f*m_MinVoxelSize;
-  else
-    m_StepSize = m_StepSizeVox*m_MinVoxelSize;
-
-  if (m_AngularThresholdDeg<0)
-  {
-    if  (m_StepSize/m_MinVoxelSize<=0.966f)  // minimum 15° for automatic estimation
-      m_AngularThreshold = static_cast<float>(std::cos( 0.5 * itk::Math::pi * static_cast<double>(m_StepSize/m_MinVoxelSize) ));
-    else
-      m_AngularThreshold = static_cast<float>(std::cos( 0.5 * itk::Math::pi * 0.966 ));
-  }
-  else
-    m_AngularThreshold = static_cast<float>(std::cos( static_cast<double>(m_AngularThresholdDeg)*itk::Math::pi/180.0 ));
-  m_TrackingHandler->SetAngularThreshold(m_AngularThreshold);
 
   if (m_TrackingPriorHandler!=nullptr)
   {
@@ -781,7 +739,7 @@ void StreamlineTrackingFilter::GenerateData()
         }
       }
 
-      if (success || m_TrackingHandler->GetMode()!=mitk::TrackingDataHandler::PROBABILISTIC)
+      if (success || m_TrackingHandler->GetMode()!=MODE::PROBABILISTIC)
         break;  // we only try one seed point multiple times if we use a probabilistic tracker and have not found a valid streamline yet
 
     }// trials per seed
@@ -967,17 +925,17 @@ void StreamlineTrackingFilter::SetDicomProperties(mitk::FiberBundle::Pointer fib
   std::string algo_code_value = "-";
   std::string algo_code_meaning = "-";
 
-  if (m_TrackingHandler->GetMode()==mitk::TrackingDataHandler::DETERMINISTIC && dynamic_cast<mitk::TrackingHandlerTensor*>(m_TrackingHandler) && !m_TrackingHandler->GetInterpolate())
+  if (m_TrackingHandler->GetMode()==MODE::DETERMINISTIC && dynamic_cast<mitk::TrackingHandlerTensor*>(m_TrackingHandler) && !m_TrackingHandler->GetInterpolate())
   {
     algo_code_value = "sup181_ee04";
     algo_code_meaning = "FACT";
   }
-  else if (m_TrackingHandler->GetMode()==mitk::TrackingDataHandler::DETERMINISTIC)
+  else if (m_TrackingHandler->GetMode()==MODE::DETERMINISTIC)
   {
     algo_code_value = "sup181_ee01";
     algo_code_meaning = "Deterministic";
   }
-  else if (m_TrackingHandler->GetMode()==mitk::TrackingDataHandler::PROBABILISTIC)
+  else if (m_TrackingHandler->GetMode()==MODE::PROBABILISTIC)
   {
     algo_code_value = "sup181_ee02";
     algo_code_meaning = "Probabilistic";

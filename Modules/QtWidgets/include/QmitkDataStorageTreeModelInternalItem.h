@@ -66,7 +66,7 @@ See LICENSE.txt or http://www.mitk.org for details.
     ///
     /// Return the DataNode associated with this node
     ///
-    mitk::DataNode* GetDataNode() const;
+    mitk::DataNode::Pointer GetDataNode() const;
     ///
     /// Get all children as vector
     ///
@@ -95,7 +95,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   protected:
     QmitkDataStorageTreeModelInternalItem *m_Parent;
     std::vector<QmitkDataStorageTreeModelInternalItem *> m_Children;
-    mitk::DataNode::Pointer m_DataNode;
+    mitk::WeakPointer<mitk::DataNode> m_DataNode;
   };
 
 #endif /* QMITKDATASTORAGETREEMODEL_H_ */

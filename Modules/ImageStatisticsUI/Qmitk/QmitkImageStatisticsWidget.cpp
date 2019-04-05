@@ -32,6 +32,10 @@ QmitkImageStatisticsWidget::QmitkImageStatisticsWidget(QWidget* parent) : QWidge
   m_Controls.treeViewStatistics->setModel(m_ProxyModel);
   m_ProxyModel->setSourceModel(m_imageStatisticsModel);
   connect(m_imageStatisticsModel, &QmitkImageStatisticsTreeModel::dataAvailable, this, &QmitkImageStatisticsWidget::OnDataAvailable);
+  connect(m_imageStatisticsModel,
+          &QmitkImageStatisticsTreeModel::modelChanged,
+          m_Controls.treeViewStatistics,
+          &QTreeView::expandAll);
 }
 
 void QmitkImageStatisticsWidget::SetDataStorage(mitk::DataStorage* newDataStorage)

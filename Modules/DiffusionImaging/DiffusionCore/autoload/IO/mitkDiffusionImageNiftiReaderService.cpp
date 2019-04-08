@@ -311,10 +311,7 @@ void DiffusionImageNiftiReaderService::InternalRead()
           bvecs_file = base_path + "bvec";
 
         DiffusionVectors = mitk::gradients::ReadBvalsBvecs(bvals_file, bvecs_file, BValue);
-
-        for(int i=0; i<3; i++)
-          for(int j=0; j<3; j++)
-            MeasurementFrame[i][j] = i==j ? 1 : 0;
+        MeasurementFrame.set_identity();
       }
 
       outputForCache = mitk::GrabItkImageMemory( itkVectorImage);
@@ -325,7 +322,7 @@ void DiffusionImageNiftiReaderService::InternalRead()
       mitk::DiffusionPropertyHelper::SetMeasurementFrame(outputForCache, MeasurementFrame);
       mitk::DiffusionPropertyHelper::SetBValueMap(outputForCache, BValueMap);
       mitk::DiffusionPropertyHelper::SetReferenceBValue(outputForCache, BValue);
-      mitk::DiffusionPropertyHelper::SetKeepOriginalGradientDirections(outputForCache, !us::any_cast<bool>(this->GetOptions()["Apply rotation to gradients"]));
+      mitk::DiffusionPropertyHelper::SetApplyMatrixToGradients(outputForCache, us::any_cast<bool>(this->GetOptions()["Apply rotation to gradients"]));
       mitk::DiffusionPropertyHelper::InitializeImage(outputForCache);
 
       // Since we have already read the tree, we can store it in a cache variable

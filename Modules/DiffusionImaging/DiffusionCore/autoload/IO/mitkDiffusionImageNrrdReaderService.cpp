@@ -221,7 +221,7 @@ namespace mitk
         mitk::DiffusionPropertyHelper::SetMeasurementFrame(outputForCache, MeasurementFrame);
         mitk::DiffusionPropertyHelper::SetBValueMap(outputForCache, BValueMap);
         mitk::DiffusionPropertyHelper::SetReferenceBValue(outputForCache, BValue);
-        mitk::DiffusionPropertyHelper::SetKeepOriginalGradientDirections(outputForCache, !us::any_cast<bool>(this->GetOptions()["Apply rotation to gradients"]));
+        mitk::DiffusionPropertyHelper::SetApplyMatrixToGradients(outputForCache, us::any_cast<bool>(this->GetOptions()["Apply rotation to gradients"]));
         mitk::DiffusionPropertyHelper::InitializeImage(outputForCache);
 
         // Since we have already read the tree, we can store it in a cache variable

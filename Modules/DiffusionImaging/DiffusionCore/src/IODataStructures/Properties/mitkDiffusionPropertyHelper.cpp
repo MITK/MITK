@@ -32,7 +32,8 @@ const std::string mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME = 
 const std::string mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME = "DWMRI.ReferenceBValue";
 const std::string mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME = "DWMRI.BValueMap";
 const std::string mitk::DiffusionPropertyHelper::MODALITY = "DWMRI.Modality";
-const std::string mitk::DiffusionPropertyHelper::KEEP_ORIGINAL_DIRECTIONS = "DWMRI.KeepOriginalDirections";
+const std::string mitk::DiffusionPropertyHelper::APPLY_MATRIX_TO_GRADIENTS = "DWMRI.ApplyMatrixToGradients";
+const std::string mitk::DiffusionPropertyHelper::APPLY_MF_TO_GRADIENTS = "DWMRI.ApplyMfToGradients";
 
 mitk::DiffusionPropertyHelper::DiffusionPropertyHelper()
 {
@@ -207,15 +208,20 @@ void mitk::DiffusionPropertyHelper::ApplyMeasurementFrameAndRotationMatrix(mitk:
     return;
   }
 
-  bool keep_originals = false;
-  image->GetPropertyList()->GetBoolProperty(mitk::DiffusionPropertyHelper::KEEP_ORIGINAL_DIRECTIONS.c_str(), keep_originals);
+  bool apply_matrix = true;
+  image->GetPropertyList()->GetBoolProperty(mitk::DiffusionPropertyHelper::APPLY_MATRIX_TO_GRADIENTS.c_str(), apply_matrix);
+  bool apply_mf = true;
+  image->GetPropertyList()->GetBoolProperty(mitk::DiffusionPropertyHelper::APPLY_MF_TO_GRADIENTS.c_str(), apply_mf);
 
-  if (!keep_originals)
+  if (apply_matrix)
+  {
+    MITK_INFO << "Applying image rotation to diffusion-gradient directions:";
+    std::cout << imageRotationMatrix << std::endl;
+  }
+  if (apply_mf)
   {
     MITK_INFO << "Applying measurement frame to diffusion-gradient directions:";
     std::cout << measurementFrame << std::endl;
-    MITK_INFO << "Applying image rotation to diffusion-gradient directions:";
-    std::cout << imageRotationMatrix << std::endl;
   }
 
   int c = 0;
@@ -223,11 +229,10 @@ void mitk::DiffusionPropertyHelper::ApplyMeasurementFrameAndRotationMatrix(mitk:
       gdcit != originalDirections->End(); ++gdcit)
   {
     vnl_vector<double> vec = gdcit.Value();
-    if (!keep_originals)
-    {
+    if (apply_matrix)
       vec = vec.pre_multiply(measurementFrame);
+    if (apply_mf)
       vec = vec.pre_multiply(imageRotationMatrix);
-    }
     directions->InsertElement(c, vec);
     c++;
   }
@@ -272,13 +277,18 @@ void mitk::DiffusionPropertyHelper::UnApplyMeasurementFrameAndRotationMatrix(mit
     return;
   }
 
-  bool keep_originals = false;
-  image->GetPropertyList()->GetBoolProperty(mitk::DiffusionPropertyHelper::KEEP_ORIGINAL_DIRECTIONS.c_str(), keep_originals);
+  bool apply_matrix = true;
+  image->GetPropertyList()->GetBoolProperty(mitk::DiffusionPropertyHelper::APPLY_MATRIX_TO_GRADIENTS.c_str(), apply_matrix);
+  bool apply_mf = true;
+  image->GetPropertyList()->GetBoolProperty(mitk::DiffusionPropertyHelper::APPLY_MF_TO_GRADIENTS.c_str(), apply_mf);
 
-  if (!keep_originals)
+  if (apply_matrix)
   {
     MITK_INFO << "Reverting image rotation to diffusion-gradient directions:";
     std::cout << imageRotationMatrix << std::endl;
+  }
+  if (apply_mf)
+  {
     MITK_INFO << "Reverting measurement frame to diffusion-gradient directions:";
     std::cout << measurementFrame << std::endl;
   }
@@ -288,11 +298,10 @@ void mitk::DiffusionPropertyHelper::UnApplyMeasurementFrameAndRotationMatrix(mit
       gdcit != modifiedDirections->End(); ++gdcit)
   {
     vnl_vector<double> vec = gdcit.Value();
-    if (!keep_originals)
-    {
+    if (apply_matrix)
       vec = vec.pre_multiply(imageRotationMatrix);
+    if (apply_mf)
       vec = vec.pre_multiply(measurementFrame);
-    }
     directions->InsertElement(c, vec);
     c++;
   }
@@ -300,9 +309,14 @@ void mitk::DiffusionPropertyHelper::UnApplyMeasurementFrameAndRotationMatrix(mit
   SetOriginalGradientContainer(image, directions);
 }
 
-void mitk::DiffusionPropertyHelper::SetKeepOriginalGradientDirections(mitk::Image* image, bool keep)
+void mitk::DiffusionPropertyHelper::SetApplyMatrixToGradients(mitk::Image* image, bool apply)
 {
-  image->GetPropertyList()->SetProperty( mitk::DiffusionPropertyHelper::KEEP_ORIGINAL_DIRECTIONS.c_str(), mitk::BoolProperty::New(keep) );
+  image->GetPropertyList()->SetProperty( mitk::DiffusionPropertyHelper::APPLY_MATRIX_TO_GRADIENTS.c_str(), mitk::BoolProperty::New(apply) );
+}
+
+void mitk::DiffusionPropertyHelper::SetApplyMfToGradients(mitk::Image* image, bool apply)
+{
+  image->GetPropertyList()->SetProperty( mitk::DiffusionPropertyHelper::APPLY_MF_TO_GRADIENTS.c_str(), mitk::BoolProperty::New(apply) );
 }
 
 void mitk::DiffusionPropertyHelper::UpdateBValueMap(mitk::Image* image)
@@ -371,8 +385,11 @@ void mitk::DiffusionPropertyHelper::CopyProperties(mitk::Image* source, mitk::Im
 
 void mitk::DiffusionPropertyHelper::InitializeImage(mitk::Image* image)
 {
-  if ( image->GetProperty(mitk::DiffusionPropertyHelper::KEEP_ORIGINAL_DIRECTIONS.c_str()).IsNull() )
-    image->SetProperty( mitk::DiffusionPropertyHelper::KEEP_ORIGINAL_DIRECTIONS.c_str(), mitk::BoolProperty::New(false) );
+  if ( image->GetProperty(mitk::DiffusionPropertyHelper::APPLY_MATRIX_TO_GRADIENTS.c_str()).IsNull() )
+    image->SetProperty( mitk::DiffusionPropertyHelper::APPLY_MATRIX_TO_GRADIENTS.c_str(), mitk::BoolProperty::New(true) );
+
+  if ( image->GetProperty(mitk::DiffusionPropertyHelper::APPLY_MF_TO_GRADIENTS.c_str()).IsNull() )
+    image->SetProperty( mitk::DiffusionPropertyHelper::APPLY_MF_TO_GRADIENTS.c_str(), mitk::BoolProperty::New(true) );
 
   if(  image->GetProperty(mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str()).IsNull() )
   {

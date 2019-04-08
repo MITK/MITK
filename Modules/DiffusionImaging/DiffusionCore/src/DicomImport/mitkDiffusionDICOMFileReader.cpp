@@ -157,7 +157,7 @@ bool mitk::DiffusionDICOMFileReader
     mitk::CastToMitkImage( helper.LoadToVector<short, 3>( filenames ), output_image );
   }
 
-  mitk::DiffusionPropertyHelper::SetKeepOriginalGradientDirections(output_image, !m_ApplyRotationToGradients);
+  mitk::DiffusionPropertyHelper::SetApplyMatrixToGradients(output_image, m_ApplyRotationToGradients);
   mitk::DiffusionPropertyHelper::InitializeImage(output_image);
   output_image->SetProperty("diffusion.dicom.importname", mitk::StringProperty::New( helper.GetOutputName(filenames) ) );
 

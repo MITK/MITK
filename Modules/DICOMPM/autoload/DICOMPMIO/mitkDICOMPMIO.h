@@ -66,7 +66,7 @@ namespace mitk
 
 	const std::string CreateMetaDataJsonFilePM() const;
 
-    void AddDICOMTagsToService();
+  //void AddDICOMTagsToService();
   };
 } // end of namespace mitk
 

@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMPMIO.h"
 #include "mitkDICOMPMIOMimeTypes.h"
-#include "mitkDICOMPMConstants.h"
 #include <mitkDICOMDCMTKTagScanner.h>
 #include <mitkDICOMIOHelper.h>
 #include <mitkDICOMProperty.h>
@@ -51,26 +50,7 @@ namespace mitk
     AbstractFileWriter::SetRanking(10);
     AbstractFileReader::SetRanking(10);
     this->RegisterService();
-    this->AddDICOMTagsToService();
-  }
-
-  void DICOMPMIO::AddDICOMTagsToService()
-  {
-    IDICOMTagsOfInterest *toiService = GetDicomTagsOfInterestService();
-    if (toiService != nullptr)
-    {
-	  toiService->AddTagOfInterest(DICOMPMConstants::RWVM_SEQUENCE_PATH());
-	  toiService->AddTagOfInterest(DICOMPMConstants::UNITS_SEQUENCE_PATH());
-	  toiService->AddTagOfInterest(DICOMPMConstants::UNITS_CODE_VALUE_PATH());
-	  toiService->AddTagOfInterest(DICOMPMConstants::UNITS_CODE_SCHEME_PATH());
-	  toiService->AddTagOfInterest(DICOMPMConstants::UNITS_CODE_MEANING_PATH());
-	  toiService->AddTagOfInterest(DICOMPMConstants::QUANTITY_DEFINITION_SEQUENCE_PATH());
-	  toiService->AddTagOfInterest(DICOMPMConstants::QUANTITY_DEFINITION_VALUE_TYPE_PATH());
-	  toiService->AddTagOfInterest(DICOMPMConstants::QUANTITY_DEFINITION_CONCEPT_CODE_SEQUENCE_PATH());
-	  toiService->AddTagOfInterest(DICOMPMConstants::QUANTITY_DEFINITION_CONCEPT_CODE_VALUE_PATH());
-	  toiService->AddTagOfInterest(DICOMPMConstants::QUANTITY_DEFINITION_CONCEPT_CODE_SCHEME_PATH());
-	  toiService->AddTagOfInterest(DICOMPMConstants::QUANTITY_DEFINITION_CONCEPT_CODE_MEANING_PATH());
-    }
+    //this->AddDICOMTagsToService();
   }
 
   IFileIO::ConfidenceLevel DICOMPMIO::GetWriterConfidenceLevel() const

@@ -926,7 +926,6 @@ DicomSeriesReader::GetSeriesFromDescriptors(std::map<std::string, mitk::DicomSer
 
     gdcm::Scanner::TagToValue& tagMap = const_cast<gdcm::Scanner::TagToValue&>(fileIter->second);
     const char* seriesInstanceUid = tagMap[tagSeriesInstanceUID];
-    std::cout << "SeriesUid " << seriesInstanceUid << " Name " << fileIter->first << std::endl;
     if (!seriesInstanceUid) {
       continue;
     }

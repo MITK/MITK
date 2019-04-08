@@ -47,15 +47,7 @@ namespace mitk
     // Add DICOM Tag (0070,0084) Content Creator Name
     propertyList->SetProperty(GeneratePropertyNameForDICOMTag(0x0070, 0x0084).c_str(),
                               TemporoSpatialStringProperty::New("MITK"));
-    // Add DICOM Tag (0012, 0071) Clinical Trial Series ID
-    propertyList->SetProperty(GeneratePropertyNameForDICOMTag(0x0012, 0x0071).c_str(),
-                              TemporoSpatialStringProperty::New("Session 1"));
-    // Add DICOM Tag (0012,0050) Clinical Trial Time Point ID
-    propertyList->SetProperty(GeneratePropertyNameForDICOMTag(0x0012, 0x0050).c_str(),
-                              TemporoSpatialStringProperty::New("0"));
-    // Add DICOM Tag (0012, 0060) Clinical Trial Coordinating Center Name
-    propertyList->SetProperty(GeneratePropertyNameForDICOMTag(0x0012, 0x0060).c_str(),
-                              TemporoSpatialStringProperty::New("Unknown"));
+
 
 
 

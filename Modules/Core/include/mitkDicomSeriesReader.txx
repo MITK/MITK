@@ -139,9 +139,13 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK4D( std::list<StringContainer>& 
     image = preLoadedImageBlock;
   }
 
-  gdcm::Scanner scanner;
-  ScanForSliceInformation(imageBlockDescriptor.GetFilenames(), scanner);
-  CopyMetaDataToImageProperties( imageBlocks, scanner.GetMappings(), io, imageBlockDescriptor, image);
+  if (imageBlockDescriptor.GetSlicesInfo().empty()) {
+    gdcm::Scanner scanner;
+    ScanForSliceInformation(imageBlockDescriptor.GetFilenames(), scanner);
+    CopyMetaDataToImageProperties( imageBlocks, scanner.GetMappings(), io, imageBlockDescriptor, image);
+  } else {
+    CopyMetaDataToImageProperties( imageBlocks, io, imageBlockDescriptor, image);
+  }
 
   MITK_DEBUG << "Volume dimension: [" << image->GetDimension(0) << ", "
     << image->GetDimension(1) << ", "

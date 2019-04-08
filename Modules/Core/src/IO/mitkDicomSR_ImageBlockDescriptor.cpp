@@ -228,6 +228,7 @@ void DicomSeriesReader::ImageBlockDescriptor::SetNumberOfFrames(const std::strin
   } catch (...) {
   }
 
+  m_NumberOfFrames = numberOfFramesInt;
   m_IsMultiFrameImage = (numberOfFramesInt > 1);
 }
 
@@ -277,4 +278,33 @@ void DicomSeriesReader::ImageBlockDescriptor::SetPhotometricInterpretation(std::
   m_PhotometricInterpretation = interpretation;
 }
 
+std::map<std::string, DicomSeriesReader::SliceInfo> DicomSeriesReader::ImageBlockDescriptor::GetSlicesInfo() const
+{
+  return m_SlicesInfo;
+}
+
+void DicomSeriesReader::ImageBlockDescriptor::SetSlicesInfo(const std::map<std::string, SliceInfo>& slicesInfo)
+{
+  m_SlicesInfo = slicesInfo;
+}
+
+std::string DicomSeriesReader::ImageBlockDescriptor::GetNumberOfFrames() const
+{
+  return m_NumberOfFrames;
+}
+
+void DicomSeriesReader::ImageBlockDescriptor::SetFileNames(const StringContainer& files)
+{
+  m_Filenames = files;
+}
+
+std::string DicomSeriesReader::ImageBlockDescriptor::GetPixelSpacing()
+{
+  return m_PixelSpacing;
+}
+
+std::string DicomSeriesReader::ImageBlockDescriptor::GetImagerPixelSpacing()
+{
+  return m_ImagerPixelSpacing;
+}
 } // end namespace mitk

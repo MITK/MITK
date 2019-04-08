@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMSegmentationIO.h"
 
-#include <mitkDICOMQIIOMimeTypes.h>
+#include <mitkDICOMSegIOMimeTypes.h>
 
 namespace mitk
 {
@@ -39,7 +39,7 @@ namespace mitk
       us::ServiceProperties props;
       props[us::ServiceConstants::SERVICE_RANKING()] = 10;
 
-      std::vector<mitk::CustomMimeType *> mimeTypes = mitk::MitkDICOMQIIOMimeTypes::Get();
+      std::vector<mitk::CustomMimeType *> mimeTypes = mitk::MitkDICOMSEGIOMimeTypes::Get();
       for (std::vector<mitk::CustomMimeType *>::const_iterator mimeTypeIter = mimeTypes.begin(),
         iterEnd = mimeTypes.end();
         mimeTypeIter != iterEnd;

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkDICOMPMIO__cpp
 
 #include "mitkDICOMPMIO.h"
-#include "mitkDICOMQIIOMimeTypes.h"
+#include "mitkDICOMPMIOMimeTypes.h"
 #include "mitkDICOMPMConstants.h"
 #include <mitkDICOMDCMTKTagScanner.h>
 #include <mitkDICOMIOHelper.h>
@@ -44,7 +44,7 @@ namespace mitk
 {
   DICOMPMIO::DICOMPMIO()
     : AbstractFileIO(Image::GetStaticNameOfClass(),
-                     mitk::MitkDICOMQIIOMimeTypes::DICOMPM_MIMETYPE_NAME(),
+                     mitk::MitkDICOMPMIOMimeTypes::DICOMPM_MIMETYPE_NAME(),
                      "DICOM PM")
 
   {
@@ -126,6 +126,7 @@ namespace mitk
 
 	  // returns a list of all referenced files
       StringLookupTable filesLut = filesProp->GetValue();
+
       const StringLookupTable::LookupTableType &lookUpTableMap = filesLut.GetLookupTable();
       for (auto it : lookUpTableMap)
       {
@@ -161,12 +162,14 @@ namespace mitk
 	MITK_INFO << "Writing PM image: " << path << std::endl;
 	try
     {
+    // convert from unique to raw pointer
       vector<DcmDataset*> rawVecDataset;
       for (const auto& dcmDataSet : dcmDatasetsSourceImage)
         rawVecDataset.push_back(dcmDataSet.get());
+        
         std::unique_ptr<dcmqi::ParaMapConverter> PMconverter(new dcmqi::ParaMapConverter());
         std::unique_ptr<DcmDataset> PMresult (PMconverter->itkimage2paramap(itkParamapImage, rawVecDataset, tmpMetaInfoFile));
-		// Write dicom file
+		    // Write dicom file
         DcmFileFormat dcmFileFormat(PMresult.get());
 		std::string filePath = path.substr(0, path.find_last_of("."));
 		filePath = filePath + ".dcm";
@@ -185,6 +188,7 @@ namespace mitk
   {  
 	  const mitk::Image *PMimage = dynamic_cast<const mitk::Image *>(this->GetInput());
 	  dcmqi::JSONParametricMapMetaInformationHandler PMhandler;
+
 	  
 	  // Get Metadata from modelFitConstants
 	  std::string parameterName;
@@ -192,7 +196,7 @@ namespace mitk
 	  std::string modelName;
 	  PMimage->GetPropertyList()->GetStringProperty(ModelFitConstants::MODEL_NAME_PROPERTY_NAME().c_str(), modelName);
 
-      mitk::ParamapPresetsParser* pmPresets = mitk::ParamapPresetsParser::New();
+    mitk::ParamapPresetsParser* pmPresets = new mitk::ParamapPresetsParser();
       // Here the mitkParamapPresets.xml file containing the Coding Schmeme Designator and Code Value are parsed and the relevant values extracted
 	  pmPresets->LoadPreset();
 	  auto pmType_parameterName = pmPresets->GetType(parameterName);
@@ -209,6 +213,7 @@ namespace mitk
 	  PMhandler.setDerivationCode("129104", "DCM", "Perfusion image analysis");
 	  PMhandler.setRealWorldValueSlope(1);
 
+    
 
 	  return PMhandler.getJSONOutputAsString();
 

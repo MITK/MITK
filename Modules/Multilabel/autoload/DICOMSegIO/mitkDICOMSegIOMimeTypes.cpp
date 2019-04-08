@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkDICOMQIIOMimeTypes.h"
+#include "mitkDICOMSegIOMimeTypes.h"
 #include "mitkIOMimeTypes.h"
 
 #include <mitkLogMacros.h>
@@ -27,22 +27,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  std::vector<CustomMimeType *> MitkDICOMQIIOMimeTypes::Get()
+  std::vector<CustomMimeType *> MitkDICOMSEGIOMimeTypes::Get()
   {
     std::vector<CustomMimeType *> mimeTypes;
 
     // order matters here (descending rank for mime types)
 
     mimeTypes.push_back(DICOMSEG_MIMETYPE().Clone());
-    mimeTypes.push_back(DICOMPM_MIMETYPE().Clone());
     return mimeTypes;
   }
 
 
-  // Mime Types
-
-  //======= Mime Type DICOM SEG =======
-  MitkDICOMQIIOMimeTypes::MitkDICOMSEGMimeType::MitkDICOMSEGMimeType() : CustomMimeType(DICOMSEG_MIMETYPE_NAME())
+  MitkDICOMSEGIOMimeTypes::MitkDICOMSEGMimeType::MitkDICOMSEGMimeType() : CustomMimeType(DICOMSEG_MIMETYPE_NAME())
   {
     this->AddExtension("dcm");
     this->SetCategory(IOMimeTypes::CATEGORY_IMAGES());
@@ -50,7 +46,7 @@ namespace mitk
   }
 
 
-  bool MitkDICOMQIIOMimeTypes::MitkDICOMSEGMimeType::AppliesTo(const std::string &path) const
+  bool MitkDICOMSEGIOMimeTypes::MitkDICOMSEGMimeType::AppliesTo(const std::string &path) const
   {
     std::ifstream myfile;
     myfile.open(path, std::ios::binary);
@@ -115,17 +111,17 @@ namespace mitk
     return canRead;
   }
 
-  MitkDICOMQIIOMimeTypes::MitkDICOMSEGMimeType *MitkDICOMQIIOMimeTypes::MitkDICOMSEGMimeType::Clone() const
+  MitkDICOMSEGIOMimeTypes::MitkDICOMSEGMimeType *MitkDICOMSEGIOMimeTypes::MitkDICOMSEGMimeType::Clone() const
   {
     return new MitkDICOMSEGMimeType(*this);
   }
 
-  MitkDICOMQIIOMimeTypes::MitkDICOMSEGMimeType MitkDICOMQIIOMimeTypes::DICOMSEG_MIMETYPE()
+  MitkDICOMSEGIOMimeTypes::MitkDICOMSEGMimeType MitkDICOMSEGIOMimeTypes::DICOMSEG_MIMETYPE()
   {
     return MitkDICOMSEGMimeType();
   }
 
-  std::string MitkDICOMQIIOMimeTypes::DICOMSEG_MIMETYPE_NAME()
+  std::string MitkDICOMSEGIOMimeTypes::DICOMSEG_MIMETYPE_NAME()
   {
     // create a unique and sensible name for this mime type
     static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".image.dicom.seg";
@@ -133,86 +129,5 @@ namespace mitk
   }
 
 
-  //======= Mime Type DICOM PM =======
-  MitkDICOMQIIOMimeTypes::MitkDICOMPMMimeType::MitkDICOMPMMimeType() : CustomMimeType(DICOMPM_MIMETYPE_NAME())
-  {
-    this->AddExtension("dcm");
-    this->SetCategory(IOMimeTypes::CATEGORY_IMAGES());
-    this->SetComment("DICOM PM");
-  }
-
-  bool MitkDICOMQIIOMimeTypes::MitkDICOMPMMimeType::AppliesTo(const std::string &path) const
-  {
-    std::ifstream myfile;
-    myfile.open(path, std::ios::binary);
-    //    myfile.seekg (128);
-    char *buffer = new char[128];
-    myfile.read(buffer, 128);
-    myfile.read(buffer, 4);
-    if (std::string(buffer).compare("DICM") != 0)
-    {
-      delete[] buffer;
-      return false;
-    }
-    delete[] buffer;
-
-    bool canRead(CustomMimeType::AppliesTo(path));
-
-    // fix for bug 18572
-    // Currently this function is called for writing as well as reading, in that case
-    // the image information can of course not be read
-    // This is a bug, this function should only be called for reading.
-    if (!itksys::SystemTools::FileExists(path.c_str()))
-    {
-      return canRead;
-    }
-    // end fix for bug 18572
-    DcmFileFormat dcmFileFormat;
-    OFCondition status = dcmFileFormat.loadFile(path.c_str());
-
-    if (status.bad())
-    {
-      canRead = false;
-    }
-
-    if (!canRead)
-    {
-      return canRead;
-    }
-
-    OFString modality;
-    if (dcmFileFormat.getDataset()->findAndGetOFString(DCM_Modality, modality).good())
-    {
-      if (modality.compare("RWV") == 0)
-      {
-        canRead = true;
-      }
-      else
-      {
-        canRead = false;
-      }
-    }
-
-    return canRead;
-  }
-
-    MitkDICOMQIIOMimeTypes::MitkDICOMPMMimeType *MitkDICOMQIIOMimeTypes::MitkDICOMPMMimeType::Clone() const
-  {
-    return new MitkDICOMPMMimeType(*this);
-  }
-
-    MitkDICOMQIIOMimeTypes::MitkDICOMPMMimeType MitkDICOMQIIOMimeTypes::DICOMPM_MIMETYPE()
-  {
-    return MitkDICOMPMMimeType();
-  }
-
-  // Names
-  std::string MitkDICOMQIIOMimeTypes::DICOMPM_MIMETYPE_NAME()
-  {
-    // create a unique and sensible name for this mime type
-    static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".image.dicom.pm";
-    return name;
-  }
-    
 
 }

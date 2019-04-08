@@ -196,7 +196,7 @@ namespace mitk
 	  std::string modelName;
 	  PMimage->GetPropertyList()->GetStringProperty(ModelFitConstants::MODEL_NAME_PROPERTY_NAME().c_str(), modelName);
 
-    mitk::ParamapPresetsParser* pmPresets = new mitk::ParamapPresetsParser();
+    mitk::ParamapPresetsParser* pmPresets = mitk::ParamapPresetsParser::New();
       // Here the mitkParamapPresets.xml file containing the Coding Schmeme Designator and Code Value are parsed and the relevant values extracted
 	  pmPresets->LoadPreset();
 	  auto pmType_parameterName = pmPresets->GetType(parameterName);

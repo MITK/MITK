@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <omp.h>
 #include <itksys/SystemTools.hxx>
 #include <mitkEqual.h>
+#include <mitkStreamlineTractographyParameters.h>
 
 class mitkStreamlineTractographyTestSuite : public mitk::TestFixture
 {
@@ -70,6 +71,7 @@ public:
   float gfa_threshold;
   float odf_threshold;
   float peak_threshold;
+  std::shared_ptr<mitk::StreamlineTractographyParameters> params;
 
   itk::StreamlineTrackingFilter::Pointer tracker;
 
@@ -87,6 +89,10 @@ public:
     mitk::Image::Pointer seed_image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/StreamlineTractography/seed_image.nii.gz"));
     mitk::Image::Pointer mask_image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/StreamlineTractography/mask_image.nii.gz"));
     mitk::Image::Pointer gfa_image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/StreamlineTractography/gfa_image.nii.gz"));
+
+    params = std::make_shared<mitk::StreamlineTractographyParameters>();
+    params->m_FixRandomSeed = true;
+    params->m_InterpolateRoiImages = false;
 
     {
       typedef mitk::ImageToItk< mitk::TrackingHandlerPeaks::PeakImgType > CasterType;
@@ -147,23 +153,25 @@ public:
 
   void SetupTracker(mitk::TrackingDataHandler* handler)
   {
+
     tracker = itk::StreamlineTrackingFilter::New();
-    tracker->SetRandom(false);
-    tracker->SetInterpolateMasks(false);
-    tracker->SetNumberOfSamples(0);
-    tracker->SetAngularThreshold(-1);
+
+//    tracker->SetInterpolateMasks(false);
+//    tracker->SetNumberOfSamples(0);
+//    tracker->SetAngularThreshold(-1);
     tracker->SetMaskImage(itk_mask_image);
     tracker->SetSeedImage(itk_seed_image);
     tracker->SetStoppingRegions(nullptr);
-    tracker->SetSeedsPerVoxel(1);
-    tracker->SetStepSize(0.5);
-    tracker->SetSamplingDistance(0.25);
-    tracker->SetUseStopVotes(true);
-    tracker->SetOnlyForwardSamples(true);
-    tracker->SetMinTractLength(20);
-    tracker->SetMaxNumTracts(-1);
+//    tracker->SetSeedsPerVoxel(1);
+//    tracker->SetStepSize(0.5);
+//    tracker->SetSamplingDistance(0.25);
+//    tracker->SetUseStopVotes(true);
+//    tracker->SetOnlyForwardSamples(true);
+//    tracker->SetMinTractLength(20);
+//    tracker->SetMaxNumTracts(-1);
     tracker->SetTrackingHandler(handler);
-    tracker->SetUseOutputProbabilityMap(false);
+//    tracker->SetUseOutputProbabilityMap(false);
+    tracker->SetParameters(params);
   }
 
   void tearDown() override
@@ -208,8 +216,7 @@ public:
   {
     mitk::TrackingHandlerPeaks* handler = new mitk::TrackingHandlerPeaks();
     handler->SetPeakImage(itk_peak_image);
-    handler->SetPeakThreshold(peak_threshold);
-
+    params->m_Cutoff = peak_threshold;
 
     SetupTracker(handler);
     tracker->Update();
@@ -226,8 +233,8 @@ public:
   {
     mitk::TrackingHandlerPeaks* handler = new mitk::TrackingHandlerPeaks();
     handler->SetPeakImage(itk_peak_image);
-    handler->SetPeakThreshold(peak_threshold);
-    handler->SetInterpolate(false);
+    params->m_Cutoff = peak_threshold;
+    params->m_InterpolateTractographyData = false;
 
     SetupTracker(handler);
     tracker->Update();
@@ -244,8 +251,7 @@ public:
   {
     mitk::TrackingHandlerTensor* handler = new mitk::TrackingHandlerTensor();
     handler->SetTensorImage(itk_tensor_image);
-    handler->SetFaThreshold(gfa_threshold);
-
+    params->m_Cutoff = gfa_threshold;
 
     SetupTracker(handler);
     tracker->Update();
@@ -262,8 +268,8 @@ public:
   {
     mitk::TrackingHandlerTensor* handler = new mitk::TrackingHandlerTensor();
     handler->SetTensorImage(itk_tensor_image);
-    handler->SetFaThreshold(gfa_threshold);
-    handler->SetInterpolate(false);
+    params->m_Cutoff = gfa_threshold;
+    params->m_InterpolateTractographyData = false;
 
     SetupTracker(handler);
     tracker->Update();
@@ -280,10 +286,10 @@ public:
   {
     mitk::TrackingHandlerTensor* handler = new mitk::TrackingHandlerTensor();
     handler->SetTensorImage(itk_tensor_image);
-    handler->SetFaThreshold(gfa_threshold);
-    handler->SetInterpolate(false);
-    handler->SetF(0);
-    handler->SetG(1);
+    params->m_Cutoff = gfa_threshold;
+    params->m_InterpolateTractographyData = false;
+    params->m_F = 0;
+    params->m_G = 1;
 
     SetupTracker(handler);
     tracker->Update();
@@ -300,9 +306,10 @@ public:
   {
     mitk::TrackingHandlerOdf* handler = new mitk::TrackingHandlerOdf();
     handler->SetOdfImage(itk_odf_image);
-    handler->SetGfaThreshold(gfa_threshold);
-    handler->SetOdfThreshold(0);
-    handler->SetSharpenOdfs(true);
+
+    params->m_Cutoff = gfa_threshold;
+    params->m_OdfCutoff = 0;
+    params->m_SharpenOdfs = true;
 
     SetupTracker(handler);
     tracker->Update();
@@ -319,9 +326,10 @@ public:
   {
     mitk::TrackingHandlerOdf* handler = new mitk::TrackingHandlerOdf();
     handler->SetOdfImage(itk_odf_image);
-    handler->SetGfaThreshold(gfa_threshold);
-    handler->SetOdfThreshold(0);
-    handler->SetSharpenOdfs(false);
+
+    params->m_Cutoff = gfa_threshold;
+    params->m_OdfCutoff = 0;
+    params->m_SharpenOdfs = false;
 
     SetupTracker(handler);
     tracker->Update();
@@ -339,10 +347,11 @@ public:
   {
     mitk::TrackingHandlerOdf* handler = new mitk::TrackingHandlerOdf();
     handler->SetOdfImage(itk_odf_image);
-    handler->SetGfaThreshold(gfa_threshold);
-    handler->SetOdfThreshold(0);
-    handler->SetSharpenOdfs(true);
-    handler->SetInterpolate(false);
+
+    params->m_Cutoff = gfa_threshold;
+    params->m_OdfCutoff = 0;
+    params->m_SharpenOdfs = true;
+    params->m_InterpolateTractographyData = false;
 
     SetupTracker(handler);
     tracker->Update();
@@ -359,12 +368,13 @@ public:
   {
     mitk::TrackingHandlerOdf* handler = new mitk::TrackingHandlerOdf();
     handler->SetOdfImage(itk_odf_image);
-    handler->SetGfaThreshold(gfa_threshold);
-    handler->SetOdfThreshold(0);
-    handler->SetSharpenOdfs(true);
+
+    params->m_Cutoff = gfa_threshold;
+    params->m_OdfCutoff = 0;
+    params->m_SharpenOdfs = true;
+    params->m_SeedsPerVoxel = 3;
 
     SetupTracker(handler);
-    tracker->SetSeedsPerVoxel(3);
     tracker->Update();
 
     vtkSmartPointer< vtkPolyData > poly = tracker->GetFiberPolyData();
@@ -379,13 +389,14 @@ public:
   {
     mitk::TrackingHandlerOdf* handler = new mitk::TrackingHandlerOdf();
     handler->SetOdfImage(itk_odf_image);
-    handler->SetGfaThreshold(gfa_threshold);
-    handler->SetOdfThreshold(0);
-    handler->SetSharpenOdfs(true);
-    handler->SetMode(mitk::TrackingDataHandler::MODE::PROBABILISTIC);
+
+    params->m_Cutoff = gfa_threshold;
+    params->m_OdfCutoff = 0;
+    params->m_SharpenOdfs = true;
+    params->m_SeedsPerVoxel = 3;
+    params->m_Mode = mitk::TrackingDataHandler::MODE::PROBABILISTIC;
 
     SetupTracker(handler);
-    tracker->SetSeedsPerVoxel(3);
     tracker->Update();
 
     vtkSmartPointer< vtkPolyData > poly = tracker->GetFiberPolyData();
@@ -400,14 +411,15 @@ public:
   {
     mitk::TrackingHandlerOdf* handler = new mitk::TrackingHandlerOdf();
     handler->SetOdfImage(itk_odf_image);
-    handler->SetGfaThreshold(gfa_threshold);
-    handler->SetOdfThreshold(0);
-    handler->SetSharpenOdfs(true);
-    handler->SetMode(mitk::TrackingDataHandler::MODE::PROBABILISTIC);
+
+    params->m_Cutoff = gfa_threshold;
+    params->m_OdfCutoff = 0;
+    params->m_SharpenOdfs = true;
+    params->m_SeedsPerVoxel = 10;
+    params->m_Mode = mitk::TrackingDataHandler::MODE::PROBABILISTIC;
+    params->m_OutputProbMap = true;
 
     SetupTracker(handler);
-    tracker->SetSeedsPerVoxel(10);
-    tracker->SetUseOutputProbabilityMap(true);
     tracker->Update();
 
     itk::StreamlineTrackingFilter::ItkDoubleImgType::Pointer outImg = tracker->GetOutputProbabilityMap();

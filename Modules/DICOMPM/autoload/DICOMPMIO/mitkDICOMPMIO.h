@@ -34,10 +34,6 @@ namespace mitk
   {
   public:
     
-    typedef mitk::Image PMInputType;
-	typedef itk::Image<double, 3> PMitkInputImageType;
-	typedef IODFloatingPointImagePixelModule::value_type PMFloatPixelType; // input type required for DCMQI
-	typedef itk::Image<PMFloatPixelType, 3> PMitkInternalImageType;
 	
     DICOMPMIO();
 
@@ -59,6 +55,11 @@ namespace mitk
     virtual ConfidenceLevel GetWriterConfidenceLevel() const override;
 
   private:
+
+    typedef mitk::Image PMInputType;
+    typedef itk::Image<double, 3> PMitkInputImageType;
+    typedef IODFloatingPointImagePixelModule::value_type PMFloatPixelType; // input type required for DCMQI
+    typedef itk::Image<PMFloatPixelType, 3> PMitkInternalImageType;
     DICOMPMIO *IOClone() const override;
 
     // -------------- DICOMPMIO specific functions -------------

@@ -27,7 +27,7 @@ ShowSegmentationAsAgtkSurface::ShowSegmentationAsAgtkSurface()
   m_VtkEndCallback->SetClientData(this);
 }
 
-void ShowSegmentationAsAgtkSurface::PreProcessing()
+bool ShowSegmentationAsAgtkSurface::PreProcessing()
 {
   static const int BACKGROUND_VALUE = 0;
   static const int FOREGROUND_VALUE = 1;
@@ -52,6 +52,11 @@ void ShowSegmentationAsAgtkSurface::PreProcessing()
   }
 
   for (size_t i = 0; i < DIM; ++i) {
+
+    if (minIndex[i] > maxIndex[i]) {
+      return false;
+    }
+
     minIndex[i] = minIndex[i] - PAD_SIZE;
     maxIndex[i] = maxIndex[i] + PAD_SIZE;
 
@@ -150,6 +155,8 @@ void ShowSegmentationAsAgtkSurface::PreProcessing()
     resampler->Update();
     m_FloatTmpImage = resampler->GetOutput();
   }
+
+  return true;
 }
 
 void ShowSegmentationAsAgtkSurface::ComputeSurface()
@@ -294,9 +301,13 @@ void ShowSegmentationAsAgtkSurface::GenerateData()
   m_ProgressAccumulator->SetMiniPipelineFilter(this);
   m_ProgressAccumulator->UnregisterAllFilters();
 
-  PreProcessing();
-  ComputeSurface();
-  PostProcessing();
+  if (PreProcessing()) {
+    ComputeSurface();
+    PostProcessing();
+  } else {
+    MITK_WARN << "Creating empty surface!";
+    m_Output = vtkSmartPointer<vtkPolyData>::New();
+  }
 
   m_ProgressAccumulator->SetMiniPipelineFilter(nullptr);
   m_ProgressAccumulator->UnregisterAllFilters();

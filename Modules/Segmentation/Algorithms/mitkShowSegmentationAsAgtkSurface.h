@@ -101,7 +101,7 @@ protected:
   InputImageType::Pointer m_Input;
   vtkSmartPointer<vtkPolyData> m_Output;
 
-  void PreProcessing();
+  bool PreProcessing();
   void ComputeSurface();
   void PostProcessing();
 

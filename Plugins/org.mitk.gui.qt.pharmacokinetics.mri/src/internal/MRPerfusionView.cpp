@@ -1076,20 +1076,6 @@ void MRPerfusionView::OnJobResultsAreAvailable(mitk::modelFit::ModelFitResultNod
   
   mitk::modelFit::StoreResultsInDataStorage(this->GetDataStorage(), results, pJob->GetParentNode());
 
-  // Set DICOM properties, paramap-secific (DICOMPM) and general properties from source data (DICOMQI)
-  /*
-  mitk::modelFit::ModelFitResultNodeVectorType::const_iterator pos;
-  for (pos = results.begin(); pos != results.end(); pos++)
-  {
-    mitk::DICOMQIPropertyHelper::DeriveDICOMSourceProperties(pJob->GetParentNode()->GetData(), pos->GetPointer()->GetData());
-    mitk::DICOMPMPropertyHelper::DeriveDICOMPMProperties(pos->GetPointer()->GetData());
-  }
-  
-    m_Controls.errorMessageLabel->setText("");
-	m_Controls.errorMessageLabel->hide();
-	*/
-
-
 
 
 };

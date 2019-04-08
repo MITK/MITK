@@ -300,27 +300,10 @@ void mitk::DiffusionPropertyHelper::UnApplyMeasurementFrameAndRotationMatrix(mit
   SetOriginalGradientContainer(image, directions);
 }
 
-void mitk::DiffusionPropertyHelper::ClearMeasurementFrameAndRotationMatrixFromGradients(mitk::Image* image)
+void mitk::DiffusionPropertyHelper::SetKeepOriginalGradientDirections(mitk::Image* image, bool keep)
 {
-  GradientDirectionsContainerType::Pointer originalDirections = GetOriginalGradientContainer(image);
-  GradientDirectionsContainerType::Pointer directions = GradientDirectionsContainerType::New();
-
-  if(originalDirections.IsNull() || originalDirections->size()==0)
-    return;
-
-  int c = 0;
-  for(GradientDirectionsContainerType::ConstIterator gdcit = originalDirections->Begin();
-      gdcit != originalDirections->End(); ++gdcit)
-  {
-    vnl_vector<double> vec = gdcit.Value();
-    directions->InsertElement(c, vec);
-    c++;
-  }
-
-  image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::KEEP_ORIGINAL_DIRECTIONS.c_str(), mitk::BoolProperty::New(true) );
-  SetGradientContainer(image, directions);
+  image->GetPropertyList()->SetProperty( mitk::DiffusionPropertyHelper::KEEP_ORIGINAL_DIRECTIONS.c_str(), mitk::BoolProperty::New(keep) );
 }
-
 
 void mitk::DiffusionPropertyHelper::UpdateBValueMap(mitk::Image* image)
 {
@@ -393,7 +376,7 @@ void mitk::DiffusionPropertyHelper::InitializeImage(mitk::Image* image)
 
   if(  image->GetProperty(mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str()).IsNull() )
   {
-    // we don't have the original gradient directions. Therefore use the modified directions and roatate them back.
+    // we don't have the original gradient directions. Therefore use the modified directions and rotate them back.
     UnApplyMeasurementFrameAndRotationMatrix(image);
   }
   else

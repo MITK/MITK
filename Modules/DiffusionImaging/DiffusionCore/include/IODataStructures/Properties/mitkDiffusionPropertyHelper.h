@@ -49,7 +49,6 @@ namespace mitk
     static bool IsDiffusionWeightedImage(const mitk::Image *);
     static bool IsDiffusionWeightedImage(const mitk::DataNode* node);
 
-    static void ClearMeasurementFrameAndRotationMatrixFromGradients(mitk::Image* image);
     static void CopyProperties(mitk::Image* source, mitk::Image* target, bool ignore_original_gradients=false);
 
     static ImageType::Pointer GetItkVectorImage(Image *image);
@@ -60,6 +59,7 @@ namespace mitk
     static GradientDirectionsContainerType::Pointer GetOriginalGradientContainer(const mitk::Image *);
     static GradientDirectionsContainerType::Pointer GetGradientContainer(const mitk::Image *);
 
+    static void SetKeepOriginalGradientDirections(mitk::Image* image, bool keep);
     static void SetMeasurementFrame(mitk::Image* image, MeasurementFrameType mf);
     static void SetReferenceBValue(mitk::Image* image, float b_value);
     static void SetBValueMap(mitk::Image* image, BValueMapType map);

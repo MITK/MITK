@@ -70,6 +70,10 @@ DiffusionImageNiftiReaderService::
 DiffusionImageNiftiReaderService::
 DiffusionImageNiftiReaderService(CustomMimeType mime_type, std::string mime_type_description ) : mitk::AbstractFileReader( mime_type, mime_type_description )
 {
+  Options defaultOptions;
+  defaultOptions["Apply rotation to gradients"] = true;
+  this->SetDefaultOptions(defaultOptions);
+
   m_ServiceReg = this->RegisterService();
 }
 
@@ -321,6 +325,7 @@ void DiffusionImageNiftiReaderService::InternalRead()
       mitk::DiffusionPropertyHelper::SetMeasurementFrame(outputForCache, MeasurementFrame);
       mitk::DiffusionPropertyHelper::SetBValueMap(outputForCache, BValueMap);
       mitk::DiffusionPropertyHelper::SetReferenceBValue(outputForCache, BValue);
+      mitk::DiffusionPropertyHelper::SetKeepOriginalGradientDirections(outputForCache, !us::any_cast<bool>(this->GetOptions()["Apply rotation to gradients"]));
       mitk::DiffusionPropertyHelper::InitializeImage(outputForCache);
 
       // Since we have already read the tree, we can store it in a cache variable

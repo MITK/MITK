@@ -147,24 +147,7 @@ bool mitk::EventStateMachine::HandleEvent(InteractionEvent* event, DataNode* dat
     const ActionVectorType actions = transition->GetActions();
     for (ActionVectorType::const_iterator it = actions.cbegin(); it != actions.cend(); ++it)
     {
-#ifdef NDEBUG
-      try
-#endif
-      {
-        ExecuteAction(*it, event);
-      }
-#ifdef NDEBUG
-      catch( const std::exception& e )
-      {
-        MITK_ERROR << "Unhandled exception caught in ExecuteAction(): " << e.what();
-        return false;
-      }
-      catch( ... )
-      {
-        MITK_ERROR << "Unhandled exception caught in ExecuteAction()";
-        return false;
-      }
-#endif
+      ExecuteAction(*it, event);
     }
 
     return true;
@@ -280,27 +263,8 @@ mitk::StateMachineTransition* mitk::EventStateMachine::GetExecutableTransition( 
       {
         // if the condition has not been evaluated yet, do it now and store
         // the result in the map
-#ifdef NDEBUG
-        try
-#endif
-        {
-          currentConditionFulfilled = CheckCondition( (*conditionIter), event );
-          conditionsMap.insert( std::pair<std::string, bool>(conditionName, currentConditionFulfilled) );
-        }
-#ifdef NDEBUG
-        catch (const std::exception& e)
-        {
-          MITK_ERROR << "Unhandled excaption caught in CheckCondition(): " << e.what();
-          currentConditionFulfilled = false;
-          break;
-        }
-        catch (...)
-        {
-          MITK_ERROR << "Unhandled excaption caught in CheckCondition()";
-          currentConditionFulfilled = false;
-          break;
-        }
-#endif
+        currentConditionFulfilled = CheckCondition( (*conditionIter), event );
+        conditionsMap.insert( std::pair<std::string, bool>(conditionName, currentConditionFulfilled) );
       }
       else
       {

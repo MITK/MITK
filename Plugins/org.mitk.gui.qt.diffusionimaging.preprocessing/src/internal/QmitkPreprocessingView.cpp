@@ -1514,8 +1514,7 @@ void QmitkPreprocessingView::DoClearRotationOfGradients()
 
   mitk::Image::Pointer newDwi = image->Clone();
 
-  PropHelper::InitializeImage( newDwi );
-  PropHelper::ClearMeasurementFrameAndRotationMatrixFromGradients(newDwi);
+  PropHelper::SetApplyMatrixToGradients(newDwi, false);
 
   mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
   imageNode->SetData( newDwi );

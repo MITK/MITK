@@ -20,34 +20,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QAbstractItemModel>
 
 /**
-\brief Converts the content of a table model to a string
+\brief Converts the content of the statistics model to a string
 
 \details
-The content of a table model is converted (as-is or transposed) to a string. Each cell of the table
-is converted to a string. Default oder: iteration over rows. The line separation delimiter (default:
-'\n' and the column separation delimiter (default: ',') can be chosen. It also can be chosen if
-the (colum/row) headers should be exported to the string.
+The content of a table model is converted to a string. Each cell is converted to a string. Default 
+oder: iteration over rows. The line separation delimiter (default: '\n') and the column separation 
+delimiter (default: ',') can be chosen. It also can be chosen if the headers should 
+be exported to the string.
 
 By default, the produced string is csv conform
 */
 
-class MITKIMAGESTATISTICSUI_EXPORT QmitkTableModelToStringConverter
+class MITKIMAGESTATISTICSUI_EXPORT QmitkStatisticsModelToStringConverter
 {
-
 public:
-  QmitkTableModelToStringConverter();
+  QmitkStatisticsModelToStringConverter();
 
-  void SetTableModel(QAbstractItemModel* model);
+  void SetTableModel(QAbstractItemModel *model);
+  void SetRootIndex(QModelIndex rootIndex);
   /**
   \brief Returns the string
   \exception throws exception if model is nullptr
   */
   QString GetString() const;
-  /**
-  \brief If the table should be transposed (iterate over columns instead of rows)
-  */
-  void SetTransposeOutput(bool transposeOutput);
-  void SetLineDelimiter(QChar lineDelimiter);
+  void SetRowDelimiter(QChar lineDelimiter);
   void SetColumnDelimiter(QChar columnDelimiter);
   /**
   \brief If header data (column/row captions) are exported
@@ -55,11 +51,16 @@ public:
   void SetIncludeHeaderData(bool includeHeaderData);
 
 private:
-  QString GetStringTransposed() const;
-  QString GetStringNonTransposed() const;
+  /**
+\brief Iterates recursively over all cells and returns their content
+\details based on https://stackoverflow.com/questions/39153835/how-to-loop-over-qabstractitemview-indexes
+*/
+  QString Iterate(const QModelIndex &index,
+                  const QAbstractItemModel *model,
+                  int depth = 0) const;
 
-  QAbstractItemModel* m_tableModel=nullptr;
-  bool m_transposeOutput=false;
+  QAbstractItemModel *m_statisticsModel = nullptr;
+  QModelIndex m_rootIndex;
   QChar m_lineDelimiter = '\n';
   bool m_includeHeaderData = false;
   QString m_columnDelimiterWithSpace = ", ";

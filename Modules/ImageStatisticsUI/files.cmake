@@ -3,13 +3,13 @@ set(CPP_FILES
   Qmitk/QmitkIntensityProfileVisualizationWidget.cpp
   Qmitk/QmitkImageStatisticsTreeModel.cpp
   Qmitk/QmitkImageStatisticsCalculationJob.cpp
-  Qmitk/QmitkTableModelToStringConverter.cpp
+  Qmitk/QmitkStatisticsModelToStringConverter.cpp
   Qmitk/QmitkImageStatisticsWidget.cpp
   Qmitk/QmitkImageStatisticsTreeItem.cpp
 )
 
 set(H_FILES
-  Qmitk/QmitkTableModelToStringConverter.h
+  Qmitk/QmitkStatisticsModelToStringConverter.h
   Qmitk/QmitkImageStatisticsTreeItem.h
 )
 

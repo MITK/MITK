@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkImageStatisticsWidget.h"
 
-#include "QmitkTableModelToStringConverter.h"
+#include "QmitkStatisticsModelToStringConverter.h"
 #include "QmitkImageStatisticsTreeModel.h"
 
 #include <QSortFilterProxyModel>
@@ -73,10 +73,10 @@ void QmitkImageStatisticsWidget::OnDataAvailable()
 
 void QmitkImageStatisticsWidget::OnClipboardButtonClicked()
 {
-  QmitkTableModelToStringConverter converter;
+  QmitkStatisticsModelToStringConverter converter;
   converter.SetTableModel(m_imageStatisticsModel);
+  converter.SetRootIndex(m_Controls.treeViewStatistics->rootIndex());
   converter.SetIncludeHeaderData(true);
-  converter.SetColumnDelimiter('\t');
 
   QString clipboardAsString = converter.GetString();
   QApplication::clipboard()->setText(clipboardAsString, QClipboard::Clipboard);

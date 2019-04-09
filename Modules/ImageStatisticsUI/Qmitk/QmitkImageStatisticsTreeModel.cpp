@@ -129,14 +129,14 @@ QVariant QmitkImageStatisticsTreeModel::headerData(int section, Qt::Orientation 
 {
   if ((Qt::DisplayRole == role) && (Qt::Horizontal == orientation))
   {
-      if (section == 0)
-      {
-        return QVariant("Image/[Mask]/[Timestep]");
-      }
-      else
-      {
-        return QVariant(m_StatisticNames.at(section - 1).c_str());
-      }
+    if (section == 0)
+    {
+      return m_HeaderFirstColumn;
+    }
+    else
+    {
+      return QVariant(m_StatisticNames.at(section - 1).c_str());
+    }
   }
   return QVariant();
 }
@@ -259,7 +259,10 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
   delete m_RootItem;
   m_RootItem = new QmitkImageStatisticsTreeItem();
 
-  std::map<mitk::DataNode::Pointer, QmitkImageStatisticsTreeItem*> dataNodeToTreeItem;
+  bool hasMask = false;
+  bool hasMultipleTimesteps = false;
+
+  std::map<mitk::DataNode::Pointer, QmitkImageStatisticsTreeItem *> dataNodeToTreeItem;
 
   for (auto statistic : m_Statistics)
   {
@@ -322,6 +325,7 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
 
       imageItem->appendChild(maskItem);
       lastParent = maskItem;
+      hasMask = true;
     }
     else
     {
@@ -338,8 +342,19 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
           statistic->GetStatisticsForTimeStep(i), m_StatisticNames, timeStepLabel, lastParent);
         lastParent->appendChild(statisticsItem);
       }
+      hasMultipleTimesteps = true;
     }
   }
+  QString headerString = "Images";
+  if (hasMask)
+  {
+    headerString += "/Masks";
+  }
+  if (hasMultipleTimesteps)
+  {
+    headerString += "/Timesteps";
+  }
+  m_HeaderFirstColumn = headerString;
 }
 
 void QmitkImageStatisticsTreeModel::NodeRemoved(const mitk::DataNode *)

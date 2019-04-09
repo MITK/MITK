@@ -109,6 +109,7 @@ private:
 
     itk::SimpleFastMutexLock m_Mutex;
     QmitkImageStatisticsTreeItem *m_RootItem;
+    QVariant m_HeaderFirstColumn;
 };
 
 #endif // mitkQmitkImageStatisticsTreeModel_h

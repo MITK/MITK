@@ -226,7 +226,7 @@ int main(int argc, char* argv[])
       mitk::Image::Pointer mitkImage = mitk::Image::New();
       itk::TractsToDWIImageFilter< short >::Float2DImageType::Pointer itkImage = tractsToDwiFilter->GetRfImage();
       mitkImage = mitk::GrabItkImageMemory( itkImage.GetPointer() );
-      mitk::IOUtil::Save(mitkImage, outName+"_TimrFromRf.nii.gz");
+      mitk::IOUtil::Save(mitkImage, outName+"_TimeFromRf.nii.gz");
     }
 
     std::vector< itk::TractsToDWIImageFilter< short >::ItkDoubleImgType::Pointer > volumeFractions = tractsToDwiFilter->GetVolumeFractions();

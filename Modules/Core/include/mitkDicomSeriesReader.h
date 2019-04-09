@@ -312,7 +312,15 @@ class Image;
 class MITKCORE_EXPORT DicomSeriesReader
 {
 public:
-  
+
+  struct SliceInfo {
+    std::string m_ImagePositionPatient = "";
+    std::string m_InstanceNumber = "";
+    std::string m_AcquisitionNumber = "";
+    std::string m_SOPInstanceUID = "";
+    std::string m_Orientation = "";
+  };
+
   // TODO This function is for debugging purposes. It allows you to save itkImage in the DICOM file set.
   template <typename ImageType>
   static
@@ -389,6 +397,14 @@ public:
       /// Confidence of the reader that this block can be read successfully.
       ReaderImplementationLevel GetReaderImplementationLevel() const;
 
+      std::string GetPixelSpacing();
+
+      std::string GetImagerPixelSpacing();
+
+      std::map<std::string, SliceInfo> GetSlicesInfo() const;
+
+      std::string GetNumberOfFrames() const;
+
       /// Whether or not the block contains a gantry tilt which will be "corrected" during loading
       bool HasGantryTiltCorrected() const;
 
@@ -419,15 +435,9 @@ public:
       ImageBlockDescriptor();
       ~ImageBlockDescriptor();
 
-    private:
-
-      friend class DicomSeriesReader;
-
-      ImageBlockDescriptor(const StringContainer& files);
-
       void AddFile(const std::string& file);
       void AddFiles(const StringContainer& files);
-
+      void SetFileNames(const StringContainer& files);
 
       void SetImageBlockUID(const std::string& uid);
 
@@ -435,7 +445,7 @@ public:
 
       void SetModality(const std::string& modality);
 
-      void SetNumberOfFrames(const std::string& );
+      void SetNumberOfFrames(const std::string& numberOfFrames);
 
       void SetSOPClassUID(const std::string& mediaStorageSOPClassUID);
 
@@ -453,6 +463,14 @@ public:
       
       void SetPhotometricInterpretation(std::string interpretation);
 
+      void SetSlicesInfo(const std::map<std::string, SliceInfo>& slicesInfo);
+
+  private:
+
+      friend class DicomSeriesReader;
+
+      ImageBlockDescriptor(const StringContainer& files);
+
       StringContainer m_Filenames;
       std::string m_ImageBlockUID;
       std::string m_SeriesInstanceUID;
@@ -466,6 +484,9 @@ public:
       std::string m_Orientation;
       bool m_BadSlicingDistance;
       std::string m_PhotometricInterpretation;
+
+      std::string m_NumberOfFrames;
+      std::map<std::string, SliceInfo> m_SlicesInfo;
   };
 
   typedef std::map<std::string, ImageBlockDescriptor> FileNamesGrouping;
@@ -518,6 +539,10 @@ public:
     FileNamesGrouping
     GetSeries(const StringContainer& files, bool unused = true /* for backward compatibility */, volatile bool* interrupt = nullptr);
 
+  static DicomSeriesReader::FileNamesGrouping GetSeriesFromDescriptors(
+    std::map<std::string, mitk::DicomSeriesReader::ImageBlockDescriptor>& serieDescriptors,
+    volatile bool* interrupt = nullptr);
+
   /**
    Loads a DICOM series composed by the file names enumerated in the file names container.
    If a callback method is supplied, it will be called after every progress update with a progress value in [0,1].
@@ -547,7 +572,8 @@ public:
                               bool correctGantryTilt = true,
                               UpdateCallBackMethod callback = nullptr,
                               void *source = nullptr,
-                              itk::SmartPointer<Image> preLoadedImageBlock = nullptr);
+                              itk::SmartPointer<Image> preLoadedImageBlock = nullptr,
+                              mitk::DicomSeriesReader::ImageBlockDescriptor descriptor = mitk::DicomSeriesReader::ImageBlockDescriptor());
 
   /**
   \brief Scan for slice image information
@@ -567,6 +593,15 @@ public:
 
   \todo We can probably remove this method if we somehow transfer 3D+t information from GetSeries to LoadDicomSeries.
   */
+  static void sortIntoBlocks(std::list<StringContainer>& imageBlocks,
+                                                     const StringContainer& presortedFilenames,
+                                                     unsigned int numberOfBlocks,
+                                                     bool& canLoadAs4D);
+
+  static std::list<StringContainer> SortIntoBlocksFor3DplusT(const StringContainer& presortedFilenames,
+                                                             bool& canLoadAs4D,
+                                                             const std::map<std::string, SliceInfo>& slicesInfo);
+
   static
     std::list<StringContainer>
     SortIntoBlocksFor3DplusT(const StringContainer& presortedFilenames, const gdcm::Scanner::MappingType& tagValueMappings_, bool& canLoadAs4D);
@@ -771,6 +806,10 @@ protected:
   SliceGroupingAnalysisResult
   AnalyzeFileForITKImageSeriesReaderSpacingAssumption(const StringContainer& files, const gdcm::Scanner::MappingType& tagValueMappings_);
 
+  static
+  SliceGroupingAnalysisResult
+  AnalyzeFileForITKImageSeriesReaderSpacingAssumption(const StringContainer& files, ImageBlockDescriptor descriptor);
+
   /**
     \brief Safely convert const char* to std::string.
   */
@@ -834,6 +873,7 @@ protected:
 \endverbatim
 
    */
+  static StringContainer SortSeriesSlices(const DicomSeriesReader::ImageBlockDescriptor& descriptor);
   static StringContainer SortSeriesSlices(const StringContainer &unsortedFilenames, const gdcm::Scanner::MappingType& tags);
 
 public:
@@ -909,7 +949,8 @@ protected:
   */
   static
   void
-  LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool check_4d, bool correctTilt, UpdateCallBackMethod callback, void *source, itk::SmartPointer<Image> preLoadedImageBlock);
+  LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool check_4d, bool correctTilt, UpdateCallBackMethod callback, void *source, itk::SmartPointer<Image> preLoadedImageBlock,
+    mitk::DicomSeriesReader::ImageBlockDescriptor descriptor = mitk::DicomSeriesReader::ImageBlockDescriptor());
 
   /**
     \brief Feed files into itk::ImageSeriesReader and retrieve a 3D MITK image.
@@ -961,12 +1002,24 @@ protected:
     const std::pair<std::string, std::map<gdcm::Tag, const char*>> &ds2
   );
 
+  static
+  bool
+  SortFunction(
+    const std::pair<std::string, SliceInfo> &ds1,
+    const std::pair<std::string, SliceInfo> &ds2
+  );
+
 
   /**
     \brief Copy information about files and DICOM tags from ITK's MetaDataDictionary
            and from the list of input files to the PropertyList of mitk::Image.
     \todo Tag copy must follow; image level will cause some additional files parsing, probably.
   */
+  static void copyMetaDataForSerieToImageProperties(Image* image, DcmIoType* io, const ImageBlockDescriptor& blockInfo);
+
+  static void CopyMetaDataToImageProperties(StringContainer filenames, DcmIoType *io, const ImageBlockDescriptor& blockInfo, Image *image);
+  static void CopyMetaDataToImageProperties(std::list<StringContainer> imageBlock, DcmIoType* io, const ImageBlockDescriptor& blockInfo, Image* image);
+
   static void CopyMetaDataToImageProperties( StringContainer filenames, const gdcm::Scanner::MappingType& tagValueMappings_, DcmIoType* io, const ImageBlockDescriptor& blockInfo, Image* image);
   static void CopyMetaDataToImageProperties( std::list<StringContainer> imageBlock, const gdcm::Scanner::MappingType& tagValueMappings_, DcmIoType* io, const ImageBlockDescriptor& blockInfo, Image* image);
 

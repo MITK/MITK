@@ -14,8 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <QStringList>
-
 #include "QmitkImageStatisticsTreeItem.h"
 
 QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem(

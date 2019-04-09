@@ -108,7 +108,7 @@ private:
     std::vector<std::string> m_StatisticNames;
 
     itk::SimpleFastMutexLock m_Mutex;
-    QmitkImageStatisticsTreeItem *m_rootItem;
+    QmitkImageStatisticsTreeItem *m_RootItem;
 };
 
 #endif // mitkQmitkImageStatisticsTreeModel_h

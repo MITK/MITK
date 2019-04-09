@@ -25,14 +25,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkImageStatisticsTreeModel::QmitkImageStatisticsTreeModel(QObject *parent) : QmitkAbstractDataStorageModel(parent)
 {
-  m_rootItem = new QmitkImageStatisticsTreeItem();
+  m_RootItem = new QmitkImageStatisticsTreeItem();
 }
 
 QmitkImageStatisticsTreeModel ::~QmitkImageStatisticsTreeModel()
 {
   // set data storage to nullptr so that the event listener gets removed
   this->SetDataStorage(nullptr);
-  delete m_rootItem;
+  delete m_RootItem;
 };
 
 void QmitkImageStatisticsTreeModel::DataStorageChanged()
@@ -64,7 +64,7 @@ int QmitkImageStatisticsTreeModel::rowCount(const QModelIndex &parent) const
     return 0;
 
   if (!parent.isValid())
-    parentItem = m_rootItem;
+    parentItem = m_RootItem;
   else
     parentItem = static_cast<QmitkImageStatisticsTreeItem *>(parent.internalPointer());
 
@@ -92,7 +92,7 @@ QModelIndex QmitkImageStatisticsTreeModel::index(int row, int column, const QMod
   QmitkImageStatisticsTreeItem *parentItem;
 
   if (!parent.isValid())
-    parentItem = m_rootItem;
+    parentItem = m_RootItem;
   else
     parentItem = static_cast<QmitkImageStatisticsTreeItem *>(parent.internalPointer());
 
@@ -111,7 +111,7 @@ QModelIndex QmitkImageStatisticsTreeModel::parent(const QModelIndex &child) cons
   QmitkImageStatisticsTreeItem *childItem = static_cast<QmitkImageStatisticsTreeItem *>(child.internalPointer());
   QmitkImageStatisticsTreeItem *parentItem = childItem->parentItem();
 
-  if (parentItem == m_rootItem)
+  if (parentItem == m_RootItem)
     return QModelIndex();
 
   return createIndex(parentItem->row(), 0, parentItem);
@@ -255,9 +255,9 @@ void QmitkImageStatisticsTreeModel::UpdateByDataStorage()
 
 void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
 {
-  //reset old model
-  delete m_rootItem;
-  m_rootItem = new QmitkImageStatisticsTreeItem();
+  // reset old model
+  delete m_RootItem;
+  m_RootItem = new QmitkImageStatisticsTreeItem();
 
   std::map<mitk::DataNode::Pointer, QmitkImageStatisticsTreeItem*> dataNodeToTreeItem;
 

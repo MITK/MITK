@@ -19,16 +19,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkImageStatisticsTreeItem.h"
 
 QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem(
-  mitk::ImageStatisticsContainer::ImageStatisticsObject statisticsData,
-  mitk::ImageStatisticsContainer::ImageStatisticsObject::StatisticNameVector statisticNames,
+  ImageStatisticsObject statisticsData,
+  StatisticNameVector statisticNames,
   QVariant label,
   QmitkImageStatisticsTreeItem *parent)
+  : m_statistics(statisticsData) , m_statisticNames(statisticNames), m_label(label), m_parentItem(parent)
 {
-  m_parentItem = parent;
-  m_statistics = statisticsData;
-  m_statisticNames = statisticNames;
-  m_label = label;
 }
+
+ QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem(StatisticNameVector statisticNames,
+                                                           QVariant label,
+                                                           QmitkImageStatisticsTreeItem *parentItem)
+  : QmitkImageStatisticsTreeItem(ImageStatisticsObject(), statisticNames, label, parentItem )
+{
+}
+
+ QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem() : QmitkImageStatisticsTreeItem(StatisticNameVector(), QVariant(), nullptr ) {}
 
 QmitkImageStatisticsTreeItem::~QmitkImageStatisticsTreeItem()
 {

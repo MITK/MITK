@@ -29,12 +29,13 @@ Model that takes a mitk::ImageStatisticsContainer and represents it as model in 
 class QmitkImageStatisticsTreeItem
 {
 public:
-  explicit QmitkImageStatisticsTreeItem(
-    mitk::ImageStatisticsContainer::ImageStatisticsObject statisticsData =
-      mitk::ImageStatisticsContainer::ImageStatisticsObject(),
-    mitk::ImageStatisticsContainer::ImageStatisticsObject::StatisticNameVector statisticNames =
-      mitk::ImageStatisticsContainer::ImageStatisticsObject::StatisticNameVector(),
-    QVariant label = QVariant(), QmitkImageStatisticsTreeItem *parentItem = nullptr);
+  using ImageStatisticsObject = mitk::ImageStatisticsContainer::ImageStatisticsObject;
+  using StatisticNameVector = mitk::ImageStatisticsContainer::ImageStatisticsObject::StatisticNameVector;
+  QmitkImageStatisticsTreeItem();
+  explicit QmitkImageStatisticsTreeItem(ImageStatisticsObject statisticsData,
+    StatisticNameVector statisticNames, QVariant label, QmitkImageStatisticsTreeItem *parentItem = nullptr);
+  explicit QmitkImageStatisticsTreeItem(StatisticNameVector statisticNames,
+    QVariant label, QmitkImageStatisticsTreeItem *parentItem = nullptr);
   ~QmitkImageStatisticsTreeItem();
 
   void appendChild(QmitkImageStatisticsTreeItem *child);

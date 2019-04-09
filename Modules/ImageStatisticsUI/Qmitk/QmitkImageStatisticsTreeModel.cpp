@@ -277,41 +277,49 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
       mitkThrow() << "no image found connected to statistic" << statistic << " Aborting.";
     }
     auto image = imageCandidates->front();
-    //image: 1. hierarchy level
+    // image: 1. hierarchy level
     QmitkImageStatisticsTreeItem *imageItem;
     auto search = dataNodeToTreeItem.find(image);
-    //the tree item was created previously
+    // the tree item was created previously
     if (search != dataNodeToTreeItem.end())
     {
       imageItem = search->second;
     }
-    //create the tree item
+    // create the tree item
     else
     {
       QString imageLabel = QString::fromStdString(image->GetName());
-      mitk::ImageStatisticsContainer::ImageStatisticsObject statisticsObject;
       if (statistic->GetTimeSteps() == 1 && maskCandidates->empty())
       {
-        statisticsObject = statistic->GetStatisticsForTimeStep(0);
+        auto statisticsObject = statistic->GetStatisticsForTimeStep(0);
+        imageItem = new QmitkImageStatisticsTreeItem(statisticsObject, m_StatisticNames, imageLabel, m_RootItem);
       }
-      imageItem = new QmitkImageStatisticsTreeItem(statisticsObject, m_StatisticNames, imageLabel, m_rootItem);
-      m_rootItem->appendChild(imageItem);
-      dataNodeToTreeItem.emplace(image,imageItem);
+      else
+      {
+        imageItem = new QmitkImageStatisticsTreeItem(m_StatisticNames, imageLabel, m_RootItem);
+      }
+      m_RootItem->appendChild(imageItem);
+      dataNodeToTreeItem.emplace(image, imageItem);
     }
 
-    //mask: 2. hierarchy level (optional, only if mask exists)
+    // mask: 2. hierarchy level (optional, only if mask exists)
     QmitkImageStatisticsTreeItem *lastParent;
     if (!maskCandidates->empty())
     {
       auto mask = maskCandidates->front();
       QString maskLabel = QString::fromStdString(mask->GetName());
-      mitk::ImageStatisticsContainer::ImageStatisticsObject statisticsObject;
-      //add statistical values directly in this hierarchy level
+      QmitkImageStatisticsTreeItem *maskItem;
+      // add statistical values directly in this hierarchy level
       if (statistic->GetTimeSteps() == 1)
       {
-        statisticsObject = statistic->GetStatisticsForTimeStep(0);
+        auto statisticsObject = statistic->GetStatisticsForTimeStep(0);
+        maskItem = new QmitkImageStatisticsTreeItem(statisticsObject, m_StatisticNames, maskLabel, imageItem);
       }
-      auto maskItem = new QmitkImageStatisticsTreeItem(statisticsObject, m_StatisticNames, maskLabel, imageItem);
+      else
+      {
+        maskItem = new QmitkImageStatisticsTreeItem(m_StatisticNames, maskLabel, imageItem);
+      }
+
       imageItem->appendChild(maskItem);
       lastParent = maskItem;
     }
@@ -324,8 +332,8 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
     {
       for (unsigned int i = 0; i < statistic->GetTimeSteps(); i++)
       {
-        QString timeStepLabel =
-          "[" + QString::number(i) + "] " + QString::number(statistic->GetTimeGeometry()->TimeStepToTimePoint(i)) + " ms";
+        QString timeStepLabel = "[" + QString::number(i) + "] " +
+                                QString::number(statistic->GetTimeGeometry()->TimeStepToTimePoint(i)) + " ms";
         auto statisticsItem = new QmitkImageStatisticsTreeItem(
           statistic->GetStatisticsForTimeStep(i), m_StatisticNames, timeStepLabel, lastParent);
         lastParent->appendChild(statisticsItem);

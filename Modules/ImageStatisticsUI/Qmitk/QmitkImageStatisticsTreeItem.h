@@ -50,8 +50,8 @@ public:
 private:
   QVariant m_label;
   QList<QmitkImageStatisticsTreeItem *> m_childItems;
-  mitk::ImageStatisticsContainer::ImageStatisticsObject m_statistics;
-  mitk::ImageStatisticsContainer::ImageStatisticsObject::StatisticNameVector m_statisticNames;
+  ImageStatisticsObject m_statistics;
+  StatisticNameVector m_statisticNames;
   QmitkImageStatisticsTreeItem *m_parentItem = nullptr;
 };
 

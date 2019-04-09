@@ -44,7 +44,7 @@ namespace mitk
     auto det = vnl_determinant(matrix);
     if (fabs(det-1.0) > epsilon)
     {
-      MITK_WARN << "Matrix is not a rotation matrix! Determinant≠1 (" << det << ")";
+      MITK_WARN << "Invalid rotation matrix! Determinant != 1 (" << det << ")";
       rotation = false;
     }
 
@@ -54,7 +54,7 @@ namespace mitk
     auto max = should_be_id.absolute_value_max();
     if (max > epsilon)
     {
-      MITK_WARN << "Matrix is not a rotation matrix! R*R^T≠ID. Max value: " << max << " (should be 0)";
+      MITK_WARN << "Invalid rotation matrix! R*R^T != ID. Max value: " << max << " (should be 0)";
       rotation = false;
     }
 

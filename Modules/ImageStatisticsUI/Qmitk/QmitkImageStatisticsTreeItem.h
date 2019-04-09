@@ -23,8 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageStatisticsContainer.h"
 
 /*!
-\class QmitkImageStatisticsTableModel
-Model that takes a mitk::ImageStatisticsContainer and represents it as model in context of the QT view-model-concept.
+\class QmitkImageStatisticsTreeItem
+An item that represents an entry (usually ImageStatisticsObject) for the QmitkImageStatisticsTreeModel
 */
 class QmitkImageStatisticsTreeItem
 {

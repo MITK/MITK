@@ -39,6 +39,8 @@ namespace mitk {
     * Output:
     * The output will be one MITK image. Where one can see the oxygen saturation of all pixels above the set threholds. If a pixel is
     * below a threhold or NAN then the value will be set to zero.
+    *
+    * UPDATE: SO2 Filter will get an second output, the total hemoglobin value with ->GetOutput(1).
     */
     class MITKPHOTOACOUSTICSLIB_EXPORT SpectralUnmixingSO2 : public mitk::ImageToImageFilter
     {
@@ -92,9 +94,17 @@ namespace mitk {
       * If not the method returns zero otherwise it returns the calculated result.
       * @param pixelHb is the pixel value of the Hb input.
       * @param pixelHb is the pixel value of the Hb input.
-      * @warn if the HbO2 value is NAN (in patricular if Hb == -HbO2), but result will be set to zero
+      * @warn if the sO2 value is NAN (in patricular if Hb == -HbO2), but result will be set to zero
       */
       float CalculateSO2(float pixelHb, float pixelHbO2);
+
+      /**
+      * \brief calculates (Hb + HbO2).
+      * @param pixelHb is the pixel value of the Hb input.
+      * @param pixelHb is the pixel value of the Hb input.
+      * @warn if the tHb value is NAN (in patricular if Hb == -HbO2), but result will be set to zero
+      */
+      float CalculateTHb(float pixelHb, float pixelHbO2);
 
       /**
       * \brief return true if SO2 result is not significant by checking if the input values are above the threshold of the settings

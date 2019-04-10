@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataNode.h>
 
 class QSortFilterProxyModel;
-class QmitkImageStatisticsTableModel;
+class QmitkImageStatisticsTreeModel;
 
 class MITKIMAGESTATISTICSUI_EXPORT QmitkImageStatisticsWidget : public QWidget
 {
@@ -51,7 +51,7 @@ private:
 
 private:
   Ui::QmitkImageStatisticsControls m_Controls;
-  QmitkImageStatisticsTableModel *m_imageStatisticsModel;
+  QmitkImageStatisticsTreeModel *m_imageStatisticsModel;
   QSortFilterProxyModel *m_ProxyModel;
 };
 #endif // QmitkImageStatisticsWidget_H__INCLUDED

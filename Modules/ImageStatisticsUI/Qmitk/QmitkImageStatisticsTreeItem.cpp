@@ -64,7 +64,7 @@ QVariant QmitkImageStatisticsTreeItem::data(int column) const
   QVariant result;
   if (column > 0 && !m_statisticNames.empty())
   {
-    if (column - 1 < m_statisticNames.size())
+    if (column - 1 < static_cast<int>(m_statisticNames.size()))
     {
       auto statisticKey = m_statisticNames.at(column - 1);
       std::stringstream ss;

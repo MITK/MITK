@@ -37,7 +37,6 @@ QString QmitkStatisticsModelToStringConverter::GetString() const
   }
 
   QString textData;
-  int rows = m_statisticsModel->rowCount();
   int columns = m_statisticsModel->columnCount();
 
   if (m_includeHeaderData)

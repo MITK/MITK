@@ -51,7 +51,7 @@ void QmitkImageStatisticsTreeModel::NodePredicateChanged()
   emit modelChanged();
 }
 
-int QmitkImageStatisticsTreeModel::columnCount(const QModelIndex &parent) const
+int QmitkImageStatisticsTreeModel::columnCount(const QModelIndex& /*parent*/) const
 {
   int columns = m_StatisticNames.size() + 1;
   return columns;

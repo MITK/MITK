@@ -27,9 +27,10 @@ ResectionTool::~ResectionTool()
 {
 }
 
+#define QT_TRANSLATE_NOOP(x,y) y
 const char* ResectionTool::GetName() const
 {
-  return "Resection";
+  return QT_TRANSLATE_NOOP("SegmentationTool", "Resection");
 }
 
 const char** ResectionTool::GetXPM() const

@@ -34,8 +34,6 @@ public:
   QmitkDataNodeColorAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
   QmitkDataNodeColorAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
 
-  virtual ~QmitkDataNodeColorAction() override;
-
   virtual void InitializeWithDataNode(const mitk::DataNode* dataNode) override;
 
 private Q_SLOTS:

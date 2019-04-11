@@ -34,8 +34,6 @@ public:
   QmitkDataNodeOpacityAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
   QmitkDataNodeOpacityAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
 
-  virtual ~QmitkDataNodeOpacityAction() override;
-
   virtual void InitializeWithDataNode(const mitk::DataNode* dataNode) override;
 
 private Q_SLOTS:

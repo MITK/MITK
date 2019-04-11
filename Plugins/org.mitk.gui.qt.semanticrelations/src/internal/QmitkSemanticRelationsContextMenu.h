@@ -49,7 +49,7 @@ public:
   virtual ~QmitkSemanticRelationsContextMenu() override;
 
   void SetDataStorage(mitk::DataStorage* dataStorage);
-  void SetControlledRenderer(RenderWindowLayerUtilities::RendererVector controlledRenderer);
+  void SetControlledRenderer(mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer);
 
 public Q_SLOTS:
 
@@ -62,7 +62,7 @@ private:
   QWidget* m_Parent;
   berry::IWorkbenchPartSite::WeakPtr m_WorkbenchPartSite;
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
-  RenderWindowLayerUtilities::RendererVector m_ControlledRenderer;
+  mitk::RenderWindowLayerUtilities::RendererVector m_ControlledRenderer;
 
   QmitkDataNodeSetControlPointAction* m_ControlPointAction;
   QmitkDataNodeSetInformationTypeAction* m_InformationTypeAction;

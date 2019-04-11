@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace RemoveAction
 {
-  void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite, mitk::DataStorage::Pointer dataStorage, QList<mitk::DataNode::Pointer> selectedNodes, QWidget* parent /* = nullptr*/)
+  void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite, mitk::DataStorage::Pointer dataStorage, const QList<mitk::DataNode::Pointer>& selectedNodes, QWidget* parent /* = nullptr*/)
   {
     if (selectedNodes.empty())
     {
@@ -94,11 +94,6 @@ QmitkDataNodeRemoveAction::QmitkDataNodeRemoveAction(QWidget* parent, berry::IWo
   setText(tr("Remove"));
   m_Parent = parent;
   InitializeAction();
-}
-
-QmitkDataNodeRemoveAction::~QmitkDataNodeRemoveAction()
-{
-  // nothing here
 }
 
 void QmitkDataNodeRemoveAction::InitializeAction()

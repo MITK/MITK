@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKDATAMANAGERVIEW_H_
-#define QMITKDATAMANAGERVIEW_H_
+#ifndef QMITKDATAMANAGERVIEW_H
+#define QMITKDATAMANAGERVIEW_H
 
 #include <org_mitk_gui_qt_datamanager_Export.h>
 
@@ -139,4 +139,4 @@ private:
 
 };
 
-#endif // QMITKDATAMANAGERVIEW_H_
+#endif // QMITKDATAMANAGERVIEW_H

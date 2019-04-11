@@ -95,19 +95,25 @@ public:
   void PartVisible(const berry::IWorkbenchPartReference::Pointer& partRef) override;
 
   /**
+  * \see IPartListener::PartInputChanged()
+  */
+  void PartInputChanged(const berry::IWorkbenchPartReference::Pointer& partRef) override;
+
+  /**
+  * Notifies this listener that the given window has been opened.
+  */
+  void WindowOpened(const berry::IWorkbenchWindow::Pointer& window) override;
+
+  /**
    * Notifies this listener that the given window has been closed.
    */
   void WindowClosed(const berry::IWorkbenchWindow::Pointer& window) override;
-
-  /**
-   * Notifies this listener that the given window has been opened.
-   */
-  void WindowOpened(const berry::IWorkbenchWindow::Pointer& /*window*/) override;
 
 private:
 
   void RenderWindowPartActivated(mitk::IRenderWindowPart* renderPart);
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderPart);
+  void RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderPart);
 
 private:
 

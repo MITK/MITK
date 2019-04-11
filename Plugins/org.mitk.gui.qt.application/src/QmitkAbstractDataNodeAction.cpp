@@ -53,11 +53,6 @@ QmitkAbstractDataNodeAction::QmitkAbstractDataNodeAction(berry::IWorkbenchPartSi
   m_WorkbenchPartSite = berry::IWorkbenchPartSite::Pointer(workbenchPartSite);
 }
 
-QmitkAbstractDataNodeAction::~QmitkAbstractDataNodeAction()
-{
-  // nothing here
-}
-
 void QmitkAbstractDataNodeAction::SetDataStorage(mitk::DataStorage* dataStorage)
 {
   if (m_DataStorage != dataStorage)
@@ -72,6 +67,25 @@ void QmitkAbstractDataNodeAction::SetSelectedNodes(const QList<mitk::DataNode::P
   m_SelectedNodes = selectedNodes;
   // use the first selected node to initialize the data node actions
   InitializeWithDataNode(m_SelectedNodes.front());
+}
+
+void QmitkAbstractDataNodeAction::SetBaseRenderer(mitk::BaseRenderer* baseRenderer)
+{
+  if (m_BaseRenderer != baseRenderer)
+  {
+    // set the new base renderer
+    m_BaseRenderer = baseRenderer;
+  }
+}
+
+mitk::BaseRenderer::Pointer QmitkAbstractDataNodeAction::GetBaseRenderer()
+{
+  mitk::BaseRenderer::Pointer baseRenderer;
+  if (!m_BaseRenderer.IsExpired())
+  {
+    baseRenderer = m_BaseRenderer.Lock();
+  }
+  return baseRenderer;
 }
 
 QList<mitk::DataNode::Pointer> QmitkAbstractDataNodeAction::GetSelectedNodes() const

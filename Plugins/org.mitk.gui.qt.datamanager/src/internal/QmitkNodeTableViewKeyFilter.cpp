@@ -69,33 +69,47 @@ bool QmitkNodeTableViewKeyFilter::eventFilter(QObject *obj, QEvent *event)
       keySequence = QKeySequence(keyEvent->key());
     }
 
-    const auto& selectedNodes = AbstractDataNodeAction::GetSelectedNodes(dataManagerView->GetSite());
+    auto selectedNodes = AbstractDataNodeAction::GetSelectedNodes(dataManagerView->GetSite());
     if (keySequence == makeAllInvisible)
     {
+      if (selectedNodes.empty())
+      {
+        // if no nodes are selected, hide all nodes of the data storage
+        auto nodeset = dataStorage->GetAll();
+        for (auto it = nodeset->Begin(); it != nodeset->End(); ++it)
+        {
+          mitk::DataNode* node = it->Value();
+          if (nullptr != node)
+          {
+            selectedNodes.push_back(node);
+          }
+        }
+      }
+
       HideAllAction::Run(selectedNodes);
       return true;
     }
-    else if (keySequence == deleteSelectedNodes)
+    if (keySequence == deleteSelectedNodes)
     {
       RemoveAction::Run(dataManagerView->GetSite(), dataStorage, selectedNodes);
       return true;
     }
-    else if (keySequence == toggleVisibility)
+    if (keySequence == toggleVisibility)
     {
       ToggleVisibilityAction::Run(dataManagerView->GetSite(), dataStorage, selectedNodes);
       return true;
     }
-    else if (keySequence == reinit)
+    if (keySequence == reinit)
     {
       ReinitAction::Run(dataManagerView->GetSite(), dataStorage, selectedNodes);
       return true;
     }
-    else if (keySequence == globalReinit)
+    if (keySequence == globalReinit)
     {
       GlobalReinitAction::Run(dataManagerView->GetSite(), dataStorage);
       return true;
     }
-    else if (keySequence == showInfo)
+    if (keySequence == showInfo)
     {
       ShowDetailsAction::Run(selectedNodes);
       return true;

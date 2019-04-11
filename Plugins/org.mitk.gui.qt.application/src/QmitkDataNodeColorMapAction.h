@@ -36,8 +36,6 @@ public:
   QmitkDataNodeColorMapAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
   QmitkDataNodeColorMapAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
 
-  virtual ~QmitkDataNodeColorMapAction() override;
-
 private Q_SLOTS:
 
   void OnMenuAboutShow();
@@ -48,6 +46,7 @@ protected:
   virtual void InitializeAction() override;
 
   void UseWholePixelRange(mitk::DataNode* node);
+
 };
 
 #endif // QMITKDATANODECOLORMAPACTION_H

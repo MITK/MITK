@@ -45,11 +45,6 @@ QmitkDataNodeColorMapAction::QmitkDataNodeColorMapAction(QWidget* parent, berry:
   InitializeAction();
 }
 
-QmitkDataNodeColorMapAction::~QmitkDataNodeColorMapAction()
-{
-  // nothing here
-}
-
 void QmitkDataNodeColorMapAction::InitializeAction()
 {
   setCheckable(true);
@@ -66,13 +61,15 @@ void QmitkDataNodeColorMapAction::OnMenuAboutShow()
     return;
   }
 
-  mitk::LookupTableProperty::Pointer lookupTableProperty = dynamic_cast<mitk::LookupTableProperty*>(dataNode->GetProperty("LookupTable"));
+  mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
+
+  mitk::LookupTableProperty::Pointer lookupTableProperty = dynamic_cast<mitk::LookupTableProperty*>(dataNode->GetProperty("LookupTable", baseRenderer));
   if (lookupTableProperty.IsNull())
   {
     mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
     lookupTableProperty = mitk::LookupTableProperty::New();
     lookupTableProperty->SetLookupTable(mitkLut);
-    dataNode->SetProperty("LookupTable", lookupTableProperty);
+    dataNode->SetProperty("LookupTable", lookupTableProperty, baseRenderer);
   }
 
   mitk::LookupTable::Pointer lookupTable = lookupTableProperty->GetValue();
@@ -82,29 +79,25 @@ void QmitkDataNodeColorMapAction::OnMenuAboutShow()
   }
 
   menu()->clear();
-  QAction* tmp;
-
-  int i = 0;
-  std::string lutType = lookupTable->typenameList[i];
-
-  while (lutType != "END_OF_ARRAY")
+  QAction* lutAction;
+  for (const auto& lutTypeString : lookupTable->typenameList)
   {
-    tmp = menu()->addAction(QString::fromStdString(lutType));
-    tmp->setCheckable(true);
+    lutAction = menu()->addAction(QString::fromStdString(lutTypeString));
+    lutAction->setCheckable(true);
 
-    if (lutType == lookupTable->GetActiveTypeAsString())
+    if (lutTypeString == lookupTable->GetActiveTypeAsString())
     {
-      tmp->setChecked(true);
+      lutAction->setChecked(true);
     }
 
-    connect(tmp, &QAction::triggered, this, &QmitkDataNodeColorMapAction::OnActionTriggered);
-
-    lutType = lookupTable->typenameList[++i];
+    connect(lutAction, &QAction::triggered, this, &QmitkDataNodeColorMapAction::OnActionTriggered);
   }
 }
 
 void QmitkDataNodeColorMapAction::OnActionTriggered(bool /*checked*/)
 {
+  mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
+
   auto selectedNodes = GetSelectedNodes();
   for (auto& dataNode : selectedNodes)
   {
@@ -112,7 +105,7 @@ void QmitkDataNodeColorMapAction::OnActionTriggered(bool /*checked*/)
     {
       continue;
     }
-    mitk::LookupTableProperty::Pointer lookupTableProperty = dynamic_cast<mitk::LookupTableProperty*>(dataNode->GetProperty("LookupTable"));
+    mitk::LookupTableProperty::Pointer lookupTableProperty = dynamic_cast<mitk::LookupTableProperty*>(dataNode->GetProperty("LookupTable", baseRenderer));
     if (lookupTableProperty.IsNull())
     {
       continue;
@@ -124,15 +117,18 @@ void QmitkDataNodeColorMapAction::OnActionTriggered(bool /*checked*/)
       continue;
     }
 
+    mitk::LookupTable::Pointer renderWindowSpecificLutTab = lookupTable->Clone();
+
     QAction* senderAction = qobject_cast<QAction*>(QObject::sender());
     if (nullptr == senderAction)
     {
       continue;
     }
 
+    // set lookup table type defined by the action string
     std::string activatedItem = senderAction->text().toStdString();
-    lookupTable->SetType(activatedItem);
-    lookupTableProperty->SetValue(lookupTable);
+    renderWindowSpecificLutTab->SetType(activatedItem);
+    dataNode->SetProperty("LookupTable", mitk::LookupTableProperty::New(renderWindowSpecificLutTab), baseRenderer);
 
     if (mitk::LookupTable::LookupTableType::MULTILABEL == lookupTable->GetActiveType())
     {
@@ -140,9 +136,17 @@ void QmitkDataNodeColorMapAction::OnActionTriggered(bool /*checked*/)
       UseWholePixelRange(dataNode);
     }
 
-    mitk::RenderingModeProperty::Pointer renderingMode = dynamic_cast<mitk::RenderingModeProperty*>(dataNode->GetProperty("Image Rendering.Mode"));
+    mitk::RenderingModeProperty::Pointer renderingMode = dynamic_cast<mitk::RenderingModeProperty*>(dataNode->GetProperty("Image Rendering.Mode", baseRenderer));
     renderingMode->SetValue(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR);
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+    if (nullptr == baseRenderer)
+    {
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+    else
+    {
+      mitk::RenderingManager::GetInstance()->RequestUpdate(baseRenderer->GetRenderWindow());
+    }
   }
 }
 

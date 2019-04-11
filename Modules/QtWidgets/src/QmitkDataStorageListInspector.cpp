@@ -35,12 +35,12 @@ QmitkDataStorageListInspector::QmitkDataStorageListInspector(QWidget* parent/* =
 QAbstractItemView* QmitkDataStorageListInspector::GetView()
 {
   return m_Controls.view;
-};
+}
 
 const QAbstractItemView* QmitkDataStorageListInspector::GetView() const
 {
   return m_Controls.view;
-};
+}
 
 void QmitkDataStorageListInspector::Initialize()
 {
@@ -58,4 +58,4 @@ void QmitkDataStorageListInspector::SetSelectionMode(SelectionMode mode)
 QmitkDataStorageListInspector::SelectionMode QmitkDataStorageListInspector::GetSelectionMode() const
 {
   return m_Controls.view->selectionMode();
-};
+}

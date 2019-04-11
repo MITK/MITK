@@ -35,11 +35,6 @@ QmitkDataNodeTextureInterpolationAction::QmitkDataNodeTextureInterpolationAction
   InitializeAction();
 }
 
-QmitkDataNodeTextureInterpolationAction::~QmitkDataNodeTextureInterpolationAction()
-{
-  // nothing here
-}
-
 void QmitkDataNodeTextureInterpolationAction::InitializeAction()
 {
   setCheckable(true);
@@ -50,8 +45,16 @@ void QmitkDataNodeTextureInterpolationAction::InitializeAction()
 
 void QmitkDataNodeTextureInterpolationAction::InitializeWithDataNode(const mitk::DataNode* dataNode)
 {
+  if (nullptr == dataNode)
+  {
+    setChecked(false);
+    return;
+  }
+
+  mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
+
   bool textureInterpolation = false;
-  dataNode->GetBoolProperty("texture interpolation", textureInterpolation);
+  dataNode->GetBoolProperty("texture interpolation", textureInterpolation, baseRenderer);
   setChecked(textureInterpolation);
 }
 
@@ -63,8 +66,17 @@ void QmitkDataNodeTextureInterpolationAction::OnActionToggled(bool checked)
     return;
   }
 
-  dataNode->SetBoolProperty("texture interpolation", checked);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
+  dataNode->SetBoolProperty("texture interpolation", checked, baseRenderer);
+
+  if (nullptr == baseRenderer)
+  {
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+  else
+  {
+    mitk::RenderingManager::GetInstance()->RequestUpdate(baseRenderer->GetRenderWindow());
+  }
 }
 
 void QmitkDataNodeTextureInterpolationAction::OnActionChanged()

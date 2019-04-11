@@ -93,7 +93,7 @@ void QmitkSemanticRelationsView::RenderWindowPartActivated(mitk::IRenderWindowPa
   QHash<QString, QmitkRenderWindow*>::Iterator it;
 
   mitk::BaseRenderer* baseRenderer = nullptr;
-  RenderWindowLayerUtilities::RendererVector controlledRenderer;
+  mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer;
   for (it = windowMap.begin(); it != windowMap.end(); ++it)
   {
     baseRenderer = mitk::BaseRenderer::GetInstance(it.value()->GetVtkRenderWindow());

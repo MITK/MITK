@@ -28,7 +28,8 @@ namespace ReinitAction
 {
   MITK_QT_APP void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite,
                        mitk::DataStorage::Pointer dataStorage,
-                       QList<mitk::DataNode::Pointer> selectedNodes);
+                       const QList<mitk::DataNode::Pointer>& selectedNodes = QList<mitk::DataNode::Pointer>(),
+                       mitk::BaseRenderer* baseRenderer = nullptr);
 }
 
 class MITK_QT_APP QmitkDataNodeReinitAction : public QAction, public QmitkAbstractDataNodeAction
@@ -39,8 +40,6 @@ public:
 
   QmitkDataNodeReinitAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
   QmitkDataNodeReinitAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
-
-  virtual ~QmitkDataNodeReinitAction() override;
 
 private Q_SLOTS:
 

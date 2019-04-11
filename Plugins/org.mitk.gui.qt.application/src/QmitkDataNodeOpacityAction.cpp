@@ -37,11 +37,6 @@ QmitkDataNodeOpacityAction::QmitkDataNodeOpacityAction(QWidget* parent, berry::I
   InitializeAction();
 }
 
-QmitkDataNodeOpacityAction::~QmitkDataNodeOpacityAction()
-{
-  // nothing here
-}
-
 void QmitkDataNodeOpacityAction::InitializeAction()
 {
   m_OpacitySlider = new QSlider;
@@ -66,8 +61,16 @@ void QmitkDataNodeOpacityAction::InitializeAction()
 
 void QmitkDataNodeOpacityAction::InitializeWithDataNode(const mitk::DataNode* dataNode)
 {
+  if (nullptr == dataNode)
+  {
+    m_OpacitySlider->setValue(static_cast<int>(0));
+    return;
+  }
+
+  mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
+
   float opacity = 0.0;
-  if (dataNode->GetFloatProperty("opacity", opacity))
+  if (dataNode->GetFloatProperty("opacity", opacity, baseRenderer))
   {
     m_OpacitySlider->setValue(static_cast<int>(opacity * 100));
   }
@@ -81,10 +84,19 @@ void QmitkDataNodeOpacityAction::OnOpacityChanged(int value)
     return;
   }
 
-  float opacity = static_cast<float>(value) / 100.0f;
-  dataNode->SetFloatProperty("opacity", opacity);
+  mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
 
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  float opacity = static_cast<float>(value) / 100.0f;
+  dataNode->SetFloatProperty("opacity", opacity, baseRenderer);
+
+  if (nullptr == baseRenderer)
+  {
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+  else
+  {
+    mitk::RenderingManager::GetInstance()->RequestUpdate(baseRenderer->GetRenderWindow());
+  }
 }
 
 void QmitkDataNodeOpacityAction::OnActionChanged()

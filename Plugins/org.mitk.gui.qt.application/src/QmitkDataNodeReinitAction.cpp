@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // namespace that contains the concrete action
 namespace ReinitAction
 {
-  void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite, mitk::DataStorage::Pointer dataStorage, QList<mitk::DataNode::Pointer> selectedNodes)
+  void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite, mitk::DataStorage::Pointer dataStorage, const QList<mitk::DataNode::Pointer>& selectedNodes /*= QList<mitk::DataNode::Pointer>()*/, mitk::BaseRenderer* baseRenderer /*= nullptr*/)
   {
     if (selectedNodes.empty())
     {
@@ -48,7 +48,7 @@ namespace ReinitAction
     }
 
 
-    auto boundingBoxPredicate = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false)));
+    auto boundingBoxPredicate = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false), baseRenderer));
 
     mitk::DataStorage::SetOfObjects::Pointer nodes = mitk::DataStorage::SetOfObjects::New();
     for (const auto& dataNode : selectedNodes)
@@ -66,17 +66,31 @@ namespace ReinitAction
 
     if (1 == nodes->Size()) // Special case: If exactly one ...
     {
-      auto image = dynamic_cast<mitk::Image *>(nodes->ElementAt(0)->GetData());
+      auto image = dynamic_cast<mitk::Image*>(nodes->ElementAt(0)->GetData());
 
       if (nullptr != image) // ... image is selected, reinit is expected to rectify askew images.
       {
-        mitk::RenderingManager::GetInstance()->InitializeViews(image->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+        if (nullptr == baseRenderer)
+        {
+          mitk::RenderingManager::GetInstance()->InitializeViews(image->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+        }
+        else
+        {
+          mitk::RenderingManager::GetInstance()->InitializeView(baseRenderer->GetRenderWindow(), image->GetTimeGeometry(), true);
+        }
         return;
       }
     }
 
-    auto boundingGeometry = dataStorage->ComputeBoundingGeometry3D(nodes, "visible");
-    mitk::RenderingManager::GetInstance()->InitializeViews(boundingGeometry);
+    auto boundingGeometry = dataStorage->ComputeBoundingGeometry3D(nodes, "visible", baseRenderer);
+    if (nullptr == baseRenderer)
+    {
+      mitk::RenderingManager::GetInstance()->InitializeViews(boundingGeometry);
+    }
+    else
+    {
+      mitk::RenderingManager::GetInstance()->InitializeView(baseRenderer->GetRenderWindow(), boundingGeometry);
+    }
   }
 }
 
@@ -96,11 +110,6 @@ QmitkDataNodeReinitAction::QmitkDataNodeReinitAction(QWidget* parent, berry::IWo
   InitializeAction();
 }
 
-QmitkDataNodeReinitAction::~QmitkDataNodeReinitAction()
-{
-  // nothing here
-}
-
 void QmitkDataNodeReinitAction::InitializeAction()
 {
   connect(this, &QmitkDataNodeReinitAction::triggered, this, &QmitkDataNodeReinitAction::OnActionTriggered);
@@ -118,6 +127,8 @@ void QmitkDataNodeReinitAction::OnActionTriggered(bool /*checked*/)
     return;
   }
 
+  mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
+
   auto selectedNodes = GetSelectedNodes();
-  ReinitAction::Run(m_WorkbenchPartSite.Lock(), m_DataStorage.Lock(), selectedNodes);
+  ReinitAction::Run(m_WorkbenchPartSite.Lock(), m_DataStorage.Lock(), selectedNodes, baseRenderer);
 }

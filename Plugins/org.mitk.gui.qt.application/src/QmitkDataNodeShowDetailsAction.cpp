@@ -16,12 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkDataNodeShowDetailsAction.h>
 
-// mitk gui qt application
 #include "QmitkNodeDetailsDialog.h"
 
 namespace ShowDetailsAction
 {
-  void Run(QList<mitk::DataNode::Pointer> selectedNodes, QWidget* parent /* = nullptr*/)
+  void Run(const QList<mitk::DataNode::Pointer>& selectedNodes, QWidget* parent /* = nullptr*/)
   {
     if (selectedNodes.empty())
     {
@@ -49,11 +48,6 @@ QmitkDataNodeShowDetailsAction::QmitkDataNodeShowDetailsAction(QWidget* parent, 
   setText(tr("Show details"));
   m_Parent = parent;
   InitializeAction();
-}
-
-QmitkDataNodeShowDetailsAction::~QmitkDataNodeShowDetailsAction()
-{
-  // nothing here
 }
 
 void QmitkDataNodeShowDetailsAction::InitializeAction()

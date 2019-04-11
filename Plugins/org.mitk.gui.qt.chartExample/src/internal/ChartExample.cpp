@@ -76,6 +76,12 @@ void ChartExample::CreateQtPartControl(QWidget *parent)
 
   m_AxisScaleNameToAxisScaleType.emplace("linear", QmitkChartWidget::AxisScale::linear);
   m_AxisScaleNameToAxisScaleType.emplace("logarithmic", QmitkChartWidget::AxisScale::log);
+
+  m_LegendPositionNameToLegendPositionType.emplace("bottom middle", QmitkChartWidget::LegendPosition::bottomMiddle);
+  m_LegendPositionNameToLegendPositionType.emplace("bottom right", QmitkChartWidget::LegendPosition::bottomRight);
+  m_LegendPositionNameToLegendPositionType.emplace("top right", QmitkChartWidget::LegendPosition::topRight);
+  m_LegendPositionNameToLegendPositionType.emplace("top left", QmitkChartWidget::LegendPosition::topLeft);
+  m_LegendPositionNameToLegendPositionType.emplace("middle right", QmitkChartWidget::LegendPosition::middleRight);
 }
 
 void ChartExample::FillRandomDataValues()
@@ -109,6 +115,8 @@ void ChartExample::CreateChart()
   auto xAxisLabel = m_Controls.m_lineEditXAxisLabel->text().toStdString();
   auto yAxisLabel = m_Controls.m_lineEditYAxisLabel->text().toStdString();
   auto showLegend = m_Controls.m_checkBoxShowLegend->isChecked();
+  auto legendPosition =
+    m_LegendPositionNameToLegendPositionType.at(m_Controls.m_comboBoxLegendPosition->currentText().toStdString());
   auto showDataPoints = m_Controls.m_checkBoxShowDataPoints->isChecked();
   auto stackedData = m_Controls.m_checkBoxStackedData->isChecked();
   auto showSubchart = m_Controls.m_checkBoxShowSubchart->isChecked();
@@ -119,6 +127,7 @@ void ChartExample::CreateChart()
   m_Controls.m_Chart->SetXAxisLabel(xAxisLabel);
   m_Controls.m_Chart->SetYAxisLabel(yAxisLabel);
   m_Controls.m_Chart->SetShowLegend(showLegend);
+  m_Controls.m_Chart->SetLegendPosition(legendPosition);
   m_Controls.m_Chart->SetShowErrorBars(true);
   m_Controls.m_Chart->SetShowDataPoints(showDataPoints);
   m_Controls.m_Chart->SetStackedData(stackedData);

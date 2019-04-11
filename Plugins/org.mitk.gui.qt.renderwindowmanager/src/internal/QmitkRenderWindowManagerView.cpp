@@ -111,6 +111,7 @@ void QmitkRenderWindowManagerView::SetControlledRenderer()
 
 void QmitkRenderWindowManagerView::OnRenderWindowSelectionChanged(const QString& renderWindowId)
 {
+  m_RenderWindowInspector->SetActiveRenderWindow(renderWindowId);
   mitk::BaseRenderer* selectedRenderer = mitk::BaseRenderer::GetByName(renderWindowId.toStdString());
   if (nullptr != selectedRenderer)
   {

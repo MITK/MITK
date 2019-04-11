@@ -42,8 +42,9 @@ tramp
 .org-id-locations
 *_archive
 
-# VS Code
+# Visual Studio / VS Code
 .vs/
+CMakeSettings.json
 
 ########## OS specific
 

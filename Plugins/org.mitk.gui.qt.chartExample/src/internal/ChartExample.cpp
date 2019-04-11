@@ -42,12 +42,19 @@ void ChartExample::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.m_checkBoxEnableErrors, &QCheckBox::toggled, this, &ChartExample::ShowErrorOptions);
   connect(m_Controls.m_checkBoxEnableXErrors, &QCheckBox::toggled, this, &ChartExample::ShowXErrorOptions);
   connect(m_Controls.m_checkBoxEnableYErrors, &QCheckBox::toggled, this, &ChartExample::ShowYErrorOptions);
+  connect(m_Controls.m_doubleSpinBox_minZoomX, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoom);
+  connect(m_Controls.m_doubleSpinBox_maxZoomX, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoom);
+  connect(m_Controls.m_doubleSpinBox_minZoomY, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoom);
+  connect(m_Controls.m_doubleSpinBox_maxZoomY, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoom);
 
   m_Controls.m_groupBoxErrors->setVisible(false);
   m_Controls.m_groupBoxXErrors->setVisible(false);
   m_Controls.m_groupBoxYErrors->setVisible(false);
   m_Controls.m_lineEditDataXVector->setVisible(false);
   m_Controls.m_lineEditDataXVector->setText("0;1;2;3;4;5;6;7;8;9");
+
+  m_Controls.m_doubleSpinBox_maxZoomX->setValue(10);
+  m_Controls.m_doubleSpinBox_maxZoomY->setValue(10);
 
   FillRandomDataValues();
   auto chartStyle = GetColorTheme();
@@ -224,6 +231,11 @@ void ChartExample::ShowXErrorOptions(bool show)
 void ChartExample::ShowYErrorOptions(bool show)
 {
   m_Controls.m_groupBoxYErrors->setVisible(show);
+}
+
+void ChartExample::AdaptZoom() {
+  m_Controls.m_Chart->UpdateMinMaxValueXView(m_Controls.m_doubleSpinBox_minZoomX->value(),
+                                             m_Controls.m_doubleSpinBox_maxZoomX->value());
 }
 
 std::vector<double> ChartExample::GenerateRandomNumbers(unsigned int amount, double max) const

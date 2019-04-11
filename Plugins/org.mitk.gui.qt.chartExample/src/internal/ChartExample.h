@@ -51,6 +51,9 @@ protected:
   void ShowXErrorOptions(bool show);
   void ShowYErrorOptions(bool show);
 
+  void AdaptZoomX();
+  void AdaptZoomY();
+
 private:
   void FillRandomDataValues();
   std::vector<double> GenerateRandomNumbers(unsigned int amount, double max) const;

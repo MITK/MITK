@@ -388,6 +388,21 @@ function UpdateMinMaxValueXView(minValueX, maxValueX)
 }
 
 /**
+ * Zooms to the given y-axis min and max values.
+ */
+function UpdateMinMaxValueYView(minValueY, maxValueY)
+{
+  //x-Axis can't be adapted for now. See https://github.com/plotly/plotly.js/issues/1876
+  let chart = document.getElementById("chart");
+  let update = {
+	  yaxis:{
+		  range:[minValueY, maxValueY]
+		  }
+	  };
+  Plotly.relayout(chart, update);
+}
+
+/**
  * Transforms the view to another chart type.
  *
  * This method is called by C++. Changes on signature with caution.

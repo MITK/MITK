@@ -648,6 +648,13 @@ void QmitkChartWidget::UpdateMinMaxValueXView(double minValueX, double maxValueX
   m_Impl->CallJavaScriptFuntion(command);
 }
 
+void QmitkChartWidget::UpdateMinMaxValueYView(double minValueY, double maxValueY) {
+  QString minMaxValueYString = QString::fromStdString(std::to_string(minValueY)) + QString(",");
+  minMaxValueYString += QString::fromStdString(std::to_string(maxValueY));
+  const QString command = QString("UpdateMinMaxValueYView(" + minMaxValueYString + ")");
+  m_Impl->CallJavaScriptFuntion(command);
+}
+
 void QmitkChartWidget::Reload()
 {
   const QString command = QString("Reload()");

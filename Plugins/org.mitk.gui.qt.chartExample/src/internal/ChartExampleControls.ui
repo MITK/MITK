@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>455</width>
-    <height>1135</height>
+    <height>1054</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -37,7 +37,7 @@
         <x>0</x>
         <y>0</y>
         <width>420</width>
-        <height>417</height>
+        <height>411</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -356,7 +356,7 @@
         <x>0</x>
         <y>0</y>
         <width>437</width>
-        <height>241</height>
+        <height>210</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -465,6 +465,49 @@
         </layout>
        </item>
       </layout>
+     </widget>
+     <widget class="QWidget" name="page_3">
+      <attribute name="label">
+       <string>Zoom</string>
+      </attribute>
+      <widget class="QWidget" name="gridLayoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>431</width>
+         <height>121</height>
+        </rect>
+       </property>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_14">
+          <property name="text">
+           <string>x:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_15">
+          <property name="text">
+           <string>y:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QDoubleSpinBox" name="m_doubleSpinBox_minZoomX"/>
+        </item>
+        <item row="1" column="1">
+         <widget class="QDoubleSpinBox" name="m_doubleSpinBox_minZoomY"/>
+        </item>
+        <item row="0" column="2">
+         <widget class="QDoubleSpinBox" name="m_doubleSpinBox_maxZoomX"/>
+        </item>
+        <item row="1" column="2">
+         <widget class="QDoubleSpinBox" name="m_doubleSpinBox_maxZoomY"/>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </widget>
    </item>

@@ -103,12 +103,14 @@ void ShowSegmentationAsAgtkSurface::PreProcessing()
   m_ProgressAccumulator->RegisterInternalFilter(add, m_ProgressWeight);
   add->SetInput1(distanceToForeground->GetOutput());
   add->SetInput2(distanceToBackground->GetOutput());
+  add->InPlaceOn();
 
   typedef itk::MultiplyImageFilter<FloatImage> MultiplyImageFilterType;
   MultiplyImageFilterType::Pointer multiply = MultiplyImageFilterType::New();
   m_ProgressAccumulator->RegisterInternalFilter(multiply, m_ProgressWeight);
   multiply->SetInput(add->GetOutput());
   multiply->SetConstant(.5);
+  multiply->InPlaceOn();
 
   typedef itk::DiscreteGaussianImageFilter<FloatImage, FloatImage> BlurImageFilterType;
   typename BlurImageFilterType::Pointer smoothingImage = BlurImageFilterType::New();
@@ -161,8 +163,13 @@ void ShowSegmentationAsAgtkSurface::ComputeSurface()
   itkToVtk->Update();
   vtkSmartPointer<vtkImageData> vtkImage = itkToVtk->GetOutput();
 
-
   m_CurrentProgress = m_ProgressAccumulator->GetAccumulatedProgress();
+  m_ProgressAccumulator->UnregisterAllFilters();
+
+  itk::Matrix<double, DIM, DIM> tmpDirection = m_FloatTmpImage->GetDirection();
+  itk::Vector<double, DIM> tmpOrigin = m_FloatTmpImage->GetOrigin().GetDataPointer();
+  m_FloatTmpImage->DisconnectPipeline();
+  m_FloatTmpImage = nullptr;
 
   typedef vtkSmartPointer<vtkFlyingEdges3D> FlyingEdges;
   FlyingEdges flyingEdges = FlyingEdges::New();
@@ -172,13 +179,11 @@ void ShowSegmentationAsAgtkSurface::ComputeSurface()
   flyingEdges->ComputeNormalsOff();
   flyingEdges->ComputeGradientsOn();
   flyingEdges->ComputeScalarsOn();
-  
+
   flyingEdges->Update();
   m_Output = flyingEdges->GetOutput();
 
   vtkSmartPointer<vtkPoints> points = m_Output->GetPoints();
-  itk::Matrix<double, DIM, DIM> tmpDirection = m_FloatTmpImage->GetDirection();
-  itk::Vector<double, DIM> tmpOrigin = m_FloatTmpImage->GetOrigin().GetDataPointer();
 
   for (size_t n = 0; n < points->GetNumberOfPoints(); ++n) {
     itk::Vector<double, DIM> point = points->GetPoint(n);
@@ -259,7 +264,7 @@ void ShowSegmentationAsAgtkSurface::PostProcessing()
       break;
     }
   }
-  
+
   // Compute normals
   typedef vtkSmartPointer<vtkPolyDataNormals> PolyDataNormals;
   PolyDataNormals normals = PolyDataNormals::New();

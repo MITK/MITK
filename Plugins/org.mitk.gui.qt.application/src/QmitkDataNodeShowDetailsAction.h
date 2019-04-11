@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace ShowDetailsAction
 {
-  MITK_QT_APP void Run(QList<mitk::DataNode::Pointer> selectedNodes,
+  MITK_QT_APP void Run(const QList<mitk::DataNode::Pointer>& selectedNodes,
                        QWidget* parent = nullptr);
 }
 

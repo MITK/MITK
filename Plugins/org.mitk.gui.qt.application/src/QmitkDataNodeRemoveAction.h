@@ -28,7 +28,7 @@ namespace RemoveAction
 {
   MITK_QT_APP void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite,
                        mitk::DataStorage::Pointer dataStorage,
-                       QList<mitk::DataNode::Pointer> selectedNodes,
+                       const QList<mitk::DataNode::Pointer>& selectedNodes,
                        QWidget* parent = nullptr);
 }
 

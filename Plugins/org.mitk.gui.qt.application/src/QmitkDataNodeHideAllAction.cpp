@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace HideAllAction
 {
-  void Run(QList<mitk::DataNode::Pointer> selectedNodes, mitk::BaseRenderer* baseRenderer /*= nullptr*/)
+  void Run(const QList<mitk::DataNode::Pointer>& selectedNodes, mitk::BaseRenderer* baseRenderer /*= nullptr*/)
   {
     if (selectedNodes.empty())
     {

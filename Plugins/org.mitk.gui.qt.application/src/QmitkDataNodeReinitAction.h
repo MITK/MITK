@@ -28,7 +28,7 @@ namespace ReinitAction
 {
   MITK_QT_APP void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite,
                        mitk::DataStorage::Pointer dataStorage,
-                       QList<mitk::DataNode::Pointer> selectedNodes = QList<mitk::DataNode::Pointer>(),
+                       const QList<mitk::DataNode::Pointer>& selectedNodes = QList<mitk::DataNode::Pointer>(),
                        mitk::BaseRenderer* baseRenderer = nullptr);
 }
 

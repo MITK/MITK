@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace ShowDetailsAction
 {
-  void Run(QList<mitk::DataNode::Pointer> selectedNodes, QWidget* parent /* = nullptr*/)
+  void Run(const QList<mitk::DataNode::Pointer>& selectedNodes, QWidget* parent /* = nullptr*/)
   {
     if (selectedNodes.empty())
     {

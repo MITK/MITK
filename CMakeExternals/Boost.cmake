@@ -188,7 +188,7 @@ $<$<CONFIG:RelWithDebInfo>:variant=release>")
 
     else()
 
-      set(#[[bootstrap_cmd test -e ./b2 ||]] ./bootstrap.sh ${bootstrap_args})
+      set(bootstrap_cmd #[[ test -e ./b2 || ]] ./bootstrap.sh ${bootstrap_args})
       set(b2_cmd ./b2 ${b2_options} ${b2_properties} stage)
 
       #[[ We already told Boost if we want to use GCC or Clang but so far we

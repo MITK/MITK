@@ -46,21 +46,11 @@ public:
   vnl_vector_fixed<float,3> ProposeDirection(const itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex) override;  ///< predicts next progression direction at the given position
   bool WorldToIndex(itk::Point<float, 3>& pos, itk::Index<3>& index) override;
 
-  void SetF(float f){ m_F = f; }
-  void SetG(float g){ m_G = g; }
-  void SetFaThreshold(float FaThreshold){ m_FaThreshold = FaThreshold; }
   void AddTensorImage( ItkTensorImageType::ConstPointer img ){ m_TensorImages.push_back(img); DataModified(); }
   void SetTensorImage( ItkTensorImageType::ConstPointer img ){ m_TensorImages.clear(); m_TensorImages.push_back(img); DataModified(); }
   void ClearTensorImages(){ m_TensorImages.clear(); DataModified(); }
   void SetFaImage( ItkFloatImgType::Pointer img ){ m_FaImage = img; DataModified(); }
   void SetInterpolateTensors( bool interpolateTensors ){ m_InterpolateTensors = interpolateTensors; }
-  void SetMode( MODE m ) override
-  {
-    if (m==MODE::DETERMINISTIC)
-      m_Mode = m;
-    else
-      mitkThrow() << "Tensor tracker is only implemented for deterministic mode.";
-  }
   int GetNumTensorImages() const { return m_TensorImages.size(); }
 
 
@@ -74,10 +64,6 @@ protected:
   vnl_vector_fixed<float,3> GetMatchingDirection(itk::Index<3> idx, vnl_vector_fixed<float,3>& oldDir, int& image_num);
   vnl_vector_fixed<float,3> GetDirection(itk::Point<float, 3> itkP, vnl_vector_fixed<float,3> oldDir, TensorType& tensor);
   vnl_vector_fixed<float,3> GetLargestEigenvector(TensorType& tensor);
-
-  float   m_FaThreshold;
-  float   m_F;
-  float   m_G;
 
   std::vector< ItkDoubleImgType::Pointer >        m_EmaxImage;    ///< Stores largest eigenvalues per voxel (one for each tensor)
   ItkFloatImgType::Pointer                        m_FaImage;      ///< FA image used to determine streamline termination.

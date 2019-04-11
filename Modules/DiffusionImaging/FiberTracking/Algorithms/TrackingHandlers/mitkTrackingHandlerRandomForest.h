@@ -78,10 +78,8 @@ public:
 
   void StartTraining();
 
-  void SetMode( MODE m ) override{ m_Mode = m; }
   void SetForest(mitk::TractographyForest::Pointer forest){ m_Forest = forest; }
   void SetMaxNumWmSamples(int num){ m_MaxNumWmSamples=num; }
-  void SetNumPreviousDirections( unsigned int num ){ m_NumPreviousDirections=num; }
   void SetNumTrees(int num){ m_NumTrees = num; }
   void SetMaxTreeDepth(int depth){ m_MaxTreeDepth = depth; }
   void SetFiberSamplingStep(float step){ m_WmSampleDistance = step; }
@@ -139,7 +137,6 @@ protected:
   std::vector< unsigned int >                                 m_GmSamples;                ///< number of gray matter samples
   int                                                         m_GmSamplesPerVoxel;        ///< number of gray matter samplees per voxel. if -1, then the number is automatically chosen to gain an overall number of GM samples close to the number of WM samples.
   vigra::MultiArray<2, float>                                 m_FeatureData;              ///< vigra container for training features
-  unsigned int                                                m_NumPreviousDirections;        ///< How many "old" directions should be used as classification features?
 
   // only for tracking
   vigra::MultiArray<2, float>                                 m_LabelData;                    ///< vigra container for training labels

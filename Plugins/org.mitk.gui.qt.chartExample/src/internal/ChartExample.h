@@ -51,7 +51,8 @@ protected:
   void ShowXErrorOptions(bool show);
   void ShowYErrorOptions(bool show);
 
-  void AdaptZoom();
+  void AdaptZoomX();
+  void AdaptZoomY();
 
 private:
   void FillRandomDataValues();

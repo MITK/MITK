@@ -42,10 +42,10 @@ void ChartExample::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.m_checkBoxEnableErrors, &QCheckBox::toggled, this, &ChartExample::ShowErrorOptions);
   connect(m_Controls.m_checkBoxEnableXErrors, &QCheckBox::toggled, this, &ChartExample::ShowXErrorOptions);
   connect(m_Controls.m_checkBoxEnableYErrors, &QCheckBox::toggled, this, &ChartExample::ShowYErrorOptions);
-  connect(m_Controls.m_doubleSpinBox_minZoomX, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoom);
-  connect(m_Controls.m_doubleSpinBox_maxZoomX, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoom);
-  connect(m_Controls.m_doubleSpinBox_minZoomY, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoom);
-  connect(m_Controls.m_doubleSpinBox_maxZoomY, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoom);
+  connect(m_Controls.m_doubleSpinBox_minZoomX, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoomX);
+  connect(m_Controls.m_doubleSpinBox_maxZoomX, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoomX);
+  connect(m_Controls.m_doubleSpinBox_minZoomY, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoomY);
+  connect(m_Controls.m_doubleSpinBox_maxZoomY, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoomY);
 
   m_Controls.m_groupBoxErrors->setVisible(false);
   m_Controls.m_groupBoxXErrors->setVisible(false);
@@ -233,9 +233,15 @@ void ChartExample::ShowYErrorOptions(bool show)
   m_Controls.m_groupBoxYErrors->setVisible(show);
 }
 
-void ChartExample::AdaptZoom() {
+void ChartExample::AdaptZoomX() {
   m_Controls.m_Chart->UpdateMinMaxValueXView(m_Controls.m_doubleSpinBox_minZoomX->value(),
                                              m_Controls.m_doubleSpinBox_maxZoomX->value());
+}
+
+void ChartExample::AdaptZoomY()
+{
+  m_Controls.m_Chart->UpdateMinMaxValueYView(m_Controls.m_doubleSpinBox_minZoomY->value(),
+                                             m_Controls.m_doubleSpinBox_maxZoomY->value());
 }
 
 std::vector<double> ChartExample::GenerateRandomNumbers(unsigned int amount, double max) const

@@ -20,8 +20,6 @@ namespace mitk
 {
 
 TrackingHandlerPeaks::TrackingHandlerPeaks()
-  : m_PeakThreshold(0.1)
-  , m_ApplyDirectionMatrix(false)
 {
 
 }
@@ -71,7 +69,7 @@ void TrackingHandlerPeaks::InitForTracking()
     m_NeedsDataInit = false;
   }
 
-  std::cout << "TrackingHandlerPeaks - Peak threshold: " << m_PeakThreshold << std::endl;
+  std::cout << "TrackingHandlerPeaks - Peak threshold: " << m_Parameters->m_Cutoff << std::endl;
 }
 
 vnl_vector_fixed<float,3> TrackingHandlerPeaks::GetMatchingDirection(itk::Index<3> idx3, vnl_vector_fixed<float,3>& oldDir)
@@ -83,7 +81,7 @@ vnl_vector_fixed<float,3> TrackingHandlerPeaks::GetMatchingDirection(itk::Index<
   {
     bool found = false;
 
-    if (m_Random)
+    if (!m_Parameters->m_FixRandomSeed)
     {
       // try m_NumDirs times to get a non-zero random direction
       for (int j=0; j<m_NumDirs; j++)
@@ -162,13 +160,13 @@ vnl_vector_fixed<float,3> TrackingHandlerPeaks::GetDirection(itk::Index<3> idx3,
     dir[k] = m_PeakImage->GetPixel(idx4);
   }
 
-  if (m_FlipX)
+  if (m_Parameters->m_FlipX)
     dir[0] *= -1;
-  if (m_FlipY)
+  if (m_Parameters->m_FlipY)
     dir[1] *= -1;
-  if (m_FlipZ)
+  if (m_Parameters->m_FlipZ)
     dir[2] *= -1;
-  if (m_ApplyDirectionMatrix)
+  if (m_Parameters->m_ApplyDirectionMatrix)
     dir = m_FloatImageRotation*dir;
 
   return dir;
@@ -268,13 +266,13 @@ vnl_vector_fixed<float,3> TrackingHandlerPeaks::ProposeDirection(const itk::Poin
     oldDir = olddirs.back();
   float old_mag = oldDir.magnitude();
 
-  if (!m_Interpolate && oldIndex==index)
+  if (!m_Parameters->m_InterpolateTractographyData && oldIndex==index)
     return oldDir;
 
-  output_direction = GetDirection(pos, m_Interpolate, oldDir);
+  output_direction = GetDirection(pos, m_Parameters->m_InterpolateTractographyData, oldDir);
   float mag = output_direction.magnitude();
 
-  if (mag>=m_PeakThreshold)
+  if (mag>=m_Parameters->m_Cutoff)
   {
     if (m_Mode == MODE::PROBABILISTIC)
     {
@@ -289,7 +287,7 @@ vnl_vector_fixed<float,3> TrackingHandlerPeaks::ProposeDirection(const itk::Poin
     float a = 1;
     if (old_mag>0.5)
       a = dot_product(output_direction, oldDir);
-    if (a>=m_AngularThreshold)
+    if (a>=m_Parameters->GetAngularThreshold())
       output_direction *= mag;
     else
       output_direction.fill(0);

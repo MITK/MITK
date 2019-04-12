@@ -171,6 +171,19 @@ QGroupBox {
         </property>
        </widget>
       </item>
+      <item row="4" column="0">
+       <widget class="QCommandLinkButton" name="m_SaveParametersButton">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="toolTip">
+         <string>Stop tractography and return all fibers reconstructed until now.</string>
+        </property>
+        <property name="text">
+         <string>Save Parameters</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

@@ -227,7 +227,7 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
 std::shared_ptr<mitk::StreamlineTractographyParameters> QmitkStreamlineTrackingView::GetParametersFromGui()
 {
   std::shared_ptr<mitk::StreamlineTractographyParameters> params = std::make_shared<mitk::StreamlineTractographyParameters>();
-  params->m_InteractiveRadius = m_Controls->m_SeedRadiusBox->value();
+  params->m_InteractiveRadiusMm = m_Controls->m_SeedRadiusBox->value();
   params->m_MaxNumFibers = m_Controls->m_NumFibersBox->value();
   params->m_Cutoff = static_cast<float>(m_Controls->m_ScalarThresholdBox->value());
   params->m_F = static_cast<float>(m_Controls->m_fBox->value());
@@ -261,7 +261,7 @@ std::shared_ptr<mitk::StreamlineTractographyParameters> QmitkStreamlineTrackingV
   params->m_NumSamples = m_Controls->m_NumSamplesBox->value();
   params->SetLoopCheckDeg(m_Controls->m_LoopCheckBox->value());
   params->SetAngularThresholdDeg(m_Controls->m_AngularThresholdBox->value());
-  params->m_MinTractLength = m_Controls->m_MinTractLengthBox->value();
+  params->m_MinTractLengthMm = m_Controls->m_MinTractLengthBox->value();
   params->m_OutputProbMap = m_Controls->m_OutputProbMap->isChecked();
   params->m_FixRandomSeed = m_Controls->m_FixSeedBox->isChecked();
 
@@ -385,7 +385,7 @@ void QmitkStreamlineTrackingView::AfterThread()
         GetDataStorage()->Add(m_InteractiveNode);
       }
       m_InteractiveNode->SetData(fib);
-      m_InteractiveNode->SetFloatProperty("Fiber2DSliceThickness", m_Tracker->GetMinVoxelSize()/2);
+      m_InteractiveNode->SetFloatProperty("Fiber2DSliceThickness", params->GetMinVoxelSizeMm()/2);
 
       if (auto renderWindowPart = this->GetRenderWindowPart())
           renderWindowPart->RequestUpdate();
@@ -398,7 +398,7 @@ void QmitkStreamlineTrackingView::AfterThread()
       name += m_ParentNode->GetName().c_str();
       name += "_Streamline";
       node->SetName(name.toStdString());
-      node->SetFloatProperty("Fiber2DSliceThickness", m_Tracker->GetMinVoxelSize()/2);
+      node->SetFloatProperty("Fiber2DSliceThickness", params->GetMinVoxelSizeMm()/2);
       GetDataStorage()->Add(node, m_ParentNode);
     }
   }
@@ -426,7 +426,7 @@ void QmitkStreamlineTrackingView::AfterThread()
       lut_prop->SetLookupTable(lut);
       m_InteractiveNode->SetProperty("LookupTable", lut_prop);
       m_InteractiveNode->SetProperty("opacity", mitk::FloatProperty::New(0.5));
-      m_InteractiveNode->SetFloatProperty("Fiber2DSliceThickness", m_Tracker->GetMinVoxelSize()/2);
+      m_InteractiveNode->SetFloatProperty("Fiber2DSliceThickness", params->GetMinVoxelSizeMm()/2);
 
       if (auto renderWindowPart = this->GetRenderWindowPart())
           renderWindowPart->RequestUpdate();

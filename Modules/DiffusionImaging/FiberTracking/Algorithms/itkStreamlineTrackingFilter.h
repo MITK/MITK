@@ -86,7 +86,6 @@ public:
 
   itkGetMacro( OutputProbabilityMap, ItkDoubleImgType::Pointer)    ///< Output probability map
   itkGetMacro( FiberPolyData, PolyDataType )            ///< Output fibers
-  itkGetMacro( MinVoxelSize, float)
 
   itkSetMacro( SeedImage, ItkFloatImgType::Pointer)     ///< Seeds are only placed inside of this mask.
   itkSetMacro( MaskImage, ItkFloatImgType::Pointer)     ///< Tracking is only performed inside of this mask image.
@@ -150,8 +149,6 @@ protected:
   ItkFloatImgType::Pointer            m_MaskImage;
   ItkFloatImgType::Pointer            m_ExclusionRegions;
   ItkDoubleImgType::Pointer           m_OutputProbabilityMap;
-
-  float                               m_MinVoxelSize;
 
   bool                                m_Verbose;
   bool                                m_DemoMode;

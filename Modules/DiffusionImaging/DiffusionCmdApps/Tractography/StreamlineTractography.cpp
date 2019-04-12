@@ -221,9 +221,9 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("compress"))
     compress = us::any_cast<float>(parsedArgs["compress"]);
 
-  params->m_MinTractLength = 20;
+  params->m_MinTractLengthMm = 20;
   if (parsedArgs.count("min_tract_length"))
-    params->m_MinTractLength = us::any_cast<float>(parsedArgs["min_tract_length"]);
+    params->m_MinTractLengthMm = us::any_cast<float>(parsedArgs["min_tract_length"]);
 
   params->SetLoopCheckDeg(-1);
   if (parsedArgs.count("loop_check"))

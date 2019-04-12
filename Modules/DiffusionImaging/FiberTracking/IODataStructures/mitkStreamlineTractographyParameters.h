@@ -69,7 +69,7 @@ namespace mitk
     // - seed image
 
     // interactive
-    float m_InteractiveRadius = 2;
+    float m_InteractiveRadiusMm = 2;
     unsigned int m_NumInteractiveSeeds = 50;
     bool m_EnableInteractive = false;
 
@@ -86,7 +86,7 @@ namespace mitk
     float m_Cutoff = 0.1;
     // - fa/gfa image
     float m_OdfCutoff = 0.00025;
-    float m_MinTractLength = 20;
+    float m_MinTractLengthMm = 20;
     float m_MaxTractLength = 400;
     float m_F = 1;
     float m_G = 0;
@@ -123,19 +123,20 @@ namespace mitk
     float m_Compression = 0.1;
     bool m_OutputProbMap = false;
 
-    float GetAngularThreshold() const;
-    void SetAngularThresholdDeg(float AngularThresholdDeg);
+    float GetAngularThresholdDot() const;
+    void SetAngularThresholdDeg(float angular_threshold_deg);
 
     float GetLoopCheckDeg() const;
-    void SetLoopCheckDeg(float LoopCheckDeg);
+    void SetLoopCheckDeg(float loop_check_deg);
 
     float GetStepSizeMm() const;
-    void SetStepSizeVox(float StepSizeVox);
+    void SetStepSizeVox(float step_size_vox);
 
     float GetSamplingDistanceMm() const;
-    void SetSamplingDistanceVox(float SamplingDistance);
+    void SetSamplingDistanceVox(float sampling_distance_vox);
 
-    void SetMinVoxelSize(float MinVoxelSize);
+    void SetMinVoxelSizeMm(float min_voxel_size_mm);
+    float GetMinVoxelSizeMm() const;
 
   private:
 
@@ -145,19 +146,14 @@ namespace mitk
     float m_SamplingDistanceMm;
 
     float m_AngularThresholdDeg = -1;
-    float m_AngularThreshold;
+    float m_AngularThresholdDot;
 
     float m_LoopCheckDeg = -1;
 
     float m_StepSizeVox = -1;
     float m_StepSizeMm;
 
-    float m_MinVoxelSize = 1.0;
-
-
-//    float m_AngularThreshold = 0; // in deg
-//    float m_LoopCheck = 0; // in deg
-//    float m_StepSize = 0;
+    float m_MinVoxelSizeMm = 1.0;
   };
 }
 

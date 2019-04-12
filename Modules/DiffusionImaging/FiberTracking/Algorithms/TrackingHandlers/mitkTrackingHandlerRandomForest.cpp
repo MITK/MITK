@@ -295,7 +295,7 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
           vnl_vector_fixed<float,3> d = m_DirectionContainer.at(classLabel);  // get direction vector assiciated with the respective direction index
           if (check_last_dir)   // do we have a previous streamline direction or did we just start?
           {
-            if (abs_angle>=m_Parameters->GetAngularThreshold())         // is angle between the directions smaller than our hard threshold?
+            if (abs_angle>=m_Parameters->GetAngularThresholdDot())         // is angle between the directions smaller than our hard threshold?
             {
               if (angle<0)                          // make sure we don't walk backwards
                 d *= -1;
@@ -330,7 +330,7 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
         sampled_idx = sampler();
       }
 
-      if ( probs2[sampled_idx]>0.1 && (!check_last_dir || (check_last_dir && fabs(angles[sampled_idx])>=m_Parameters->GetAngularThreshold())) )
+      if ( probs2[sampled_idx]>0.1 && (!check_last_dir || (check_last_dir && fabs(angles[sampled_idx])>=m_Parameters->GetAngularThresholdDot())) )
         break;
     }
 

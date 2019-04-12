@@ -348,7 +348,7 @@ vnl_vector_fixed<float,3> TrackingHandlerTensor::ProposeDirection(const itk::Poi
       float a = 1;
       if (old_mag>0.5)
         a = dot_product(output_direction, oldDir);
-      if (a>=m_Parameters->GetAngularThreshold())
+      if (a>=m_Parameters->GetAngularThresholdDot())
         output_direction *= mag;
       else
         output_direction.fill(0);

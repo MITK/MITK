@@ -117,12 +117,12 @@ int TrackingHandlerOdf::SampleOdf(vnl_vector< float >& probs, vnl_vector< float 
       boost::random::variate_generator<boost::random::mt19937&, boost::random::discrete_distribution<int,float>> sampler(m_Rng, dist);
       sampled_idx = sampler();
     }
-    if (probs[sampled_idx]>max_prob && probs[sampled_idx]>m_Parameters->m_OdfCutoff && fabs(angles[sampled_idx])>=m_Parameters->GetAngularThreshold())
+    if (probs[sampled_idx]>max_prob && probs[sampled_idx]>m_Parameters->m_OdfCutoff && fabs(angles[sampled_idx])>=m_Parameters->GetAngularThresholdDot())
     {
       max_prob = probs[sampled_idx];
       max_sample_idx = sampled_idx;
     }
-    else if ( (probs[sampled_idx]<=m_Parameters->m_OdfCutoff || fabs(angles[sampled_idx])<m_Parameters->GetAngularThreshold()) && trials<50) // we allow 50 trials to exceed the ODF threshold
+    else if ( (probs[sampled_idx]<=m_Parameters->m_OdfCutoff || fabs(angles[sampled_idx])<m_Parameters->GetAngularThresholdDot()) && trials<50) // we allow 50 trials to exceed the ODF threshold
       i--;
   }
 
@@ -280,7 +280,7 @@ vnl_vector_fixed<float,3> TrackingHandlerOdf::ProposeDirection(const itk::Point<
   {
     output_direction.normalize();
     float a = dot_product(output_direction, last_dir);
-    if (a<m_Parameters->GetAngularThreshold())
+    if (a<m_Parameters->GetAngularThresholdDot())
       output_direction.fill(0);
   }
   else

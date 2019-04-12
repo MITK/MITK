@@ -100,7 +100,7 @@ protected:
     if (m_Parameters==nullptr)
       mitkThrow() << "No tractography parameter opbect set!";
 
-    m_Parameters->SetMinVoxelSize(minVoxelSize);
+    m_Parameters->SetMinVoxelSizeMm(minVoxelSize);
   }
 
   BoostRngType        m_Rng;

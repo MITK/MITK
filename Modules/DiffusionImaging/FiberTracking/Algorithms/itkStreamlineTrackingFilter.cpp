@@ -51,7 +51,6 @@ StreamlineTrackingFilter
   , m_MaskImage(nullptr)
   , m_ExclusionRegions(nullptr)
   , m_OutputProbabilityMap(nullptr)
-  , m_MinVoxelSize(-1)
   , m_Verbose(true)
   , m_DemoMode(false)
   , m_CurrentTracts(0)
@@ -241,16 +240,16 @@ void StreamlineTrackingFilter::BeforeTracking()
   else if (m_Parameters->m_EpConstraints==EndpointConstraints::NO_EP_IN_TARGET)
     std::cout << "StreamlineTracking - Endpoint constraint: NO_EP_IN_TARGET" << std::endl;
 
-  std::cout << "StreamlineTracking - Angular threshold: " << m_Parameters->GetAngularThreshold() << "°" << std::endl;
-  std::cout << "StreamlineTracking - Stepsize: " << m_Parameters->GetStepSizeMm() << "mm (" << m_Parameters->GetStepSizeMm()/m_MinVoxelSize << "*vox)" << std::endl;
+  std::cout << "StreamlineTracking - Angular threshold: " << m_Parameters->GetAngularThresholdDot() << "°" << std::endl;
+  std::cout << "StreamlineTracking - Stepsize: " << m_Parameters->GetStepSizeMm() << "mm (" << m_Parameters->GetStepSizeMm()/m_Parameters->GetMinVoxelSizeMm() << "*vox)" << std::endl;
   std::cout << "StreamlineTracking - Seeds per voxel: " << m_Parameters->m_SeedsPerVoxel << std::endl;
   std::cout << "StreamlineTracking - Max. tract length: " << m_Parameters->m_MaxTractLength << "mm" << std::endl;
-  std::cout << "StreamlineTracking - Min. tract length: " << m_Parameters->m_MinTractLength << "mm" << std::endl;
+  std::cout << "StreamlineTracking - Min. tract length: " << m_Parameters->m_MinTractLengthMm << "mm" << std::endl;
   std::cout << "StreamlineTracking - Max. num. tracts: " << m_Parameters->m_MaxNumFibers << std::endl;
   std::cout << "StreamlineTracking - Loop check: " << m_Parameters->GetLoopCheckDeg() << "°" << std::endl;
 
   std::cout << "StreamlineTracking - Num. neighborhood samples: " << m_Parameters->m_NumSamples << std::endl;
-  std::cout << "StreamlineTracking - Max. sampling distance: " << m_Parameters->GetSamplingDistanceMm() << "mm (" << m_Parameters->GetSamplingDistanceMm()/m_MinVoxelSize << "*vox)" << std::endl;
+  std::cout << "StreamlineTracking - Max. sampling distance: " << m_Parameters->GetSamplingDistanceMm() << "mm (" << m_Parameters->GetSamplingDistanceMm()/m_Parameters->GetMinVoxelSizeMm() << "*vox)" << std::endl;
   std::cout << "StreamlineTracking - Deflection modifier: " << m_Parameters->m_DeflectionMod << std::endl;
 
   std::cout << "StreamlineTracking - Use stop votes: " << m_Parameters->m_StopVotes << std::endl;
@@ -529,7 +528,7 @@ float StreamlineTrackingFilter::CheckCurvature(DirectionContainer* fib, bool fro
 {
   if (fib->size()<8)
     return 0;
-  float m_Distance = std::max(m_MinVoxelSize*4, m_Parameters->GetStepSizeMm()*8);
+  float m_Distance = std::max(m_Parameters->GetMinVoxelSizeMm()*4, m_Parameters->GetStepSizeMm()*8);
   float dist = 0;
 
   std::vector< vnl_vector_fixed< float, 3 > > vectors;
@@ -706,7 +705,7 @@ void StreamlineTrackingFilter::GenerateData()
 
         counter = fib.size();
 
-        if (tractLength>=m_Parameters->m_MinTractLength && counter>=2 && !exclude)
+        if (tractLength>=m_Parameters->m_MinTractLengthMm && counter>=2 && !exclude)
         {
 #pragma omp critical
           if ( IsValidFiber(&fib) )

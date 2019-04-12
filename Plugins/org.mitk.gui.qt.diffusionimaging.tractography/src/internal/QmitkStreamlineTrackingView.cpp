@@ -841,12 +841,6 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
   }
   else
   {
-    if (m_Controls->m_ModeBox->currentIndex()==1)
-    {
-      QMessageBox::information(nullptr, "Information", "Probabilstic tractography is not implemented for peak images.");
-      StartStopTrackingGui(false);
-      return;
-    }
     if (m_TrackingHandler==nullptr)
     {
       m_TrackingHandler = new mitk::TrackingHandlerPeaks();
@@ -921,7 +915,20 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     }
 
     m_TrackingPriorHandler->SetInterpolate(m_Controls->m_InterpolationBox->isChecked());
-    m_TrackingPriorHandler->SetMode(mitk::TrackingDataHandler::MODE::DETERMINISTIC);
+    switch (m_Controls->m_ModeBox->currentIndex())
+    {
+    case 0:
+      m_TrackingPriorHandler->SetMode(mitk::TrackingDataHandler::MODE::DETERMINISTIC);
+      break;
+    case 1:
+      m_TrackingPriorHandler->SetMode(mitk::TrackingDataHandler::MODE::PROBABILISTIC);
+      break;
+    default:
+      m_TrackingPriorHandler->SetMode(mitk::TrackingDataHandler::MODE::DETERMINISTIC);
+    }
+    m_TrackingPriorHandler->SetFlipX(m_Controls->m_PriorFlipXBox->isChecked());
+    m_TrackingPriorHandler->SetFlipY(m_Controls->m_PriorFlipYBox->isChecked());
+    m_TrackingPriorHandler->SetFlipZ(m_Controls->m_PriorFlipZBox->isChecked());
 
     m_Tracker->SetTrackingPriorHandler(m_TrackingPriorHandler);
     m_Tracker->SetTrackingPriorWeight(m_Controls->m_PriorWeightBox->value());

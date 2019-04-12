@@ -52,10 +52,7 @@ public:
   itk::ImageRegion<3> GetLargestPossibleRegion() override{ return imageRegion3; }
   void SetMode( MODE m ) override
   {
-    if (m==MODE::DETERMINISTIC)
-      m_Mode = m;
-    else
-      mitkThrow() << "Peak tracker is only implemented for deterministic mode.";
+    m_Mode = m;
   }
 
 protected:

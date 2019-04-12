@@ -276,7 +276,16 @@ vnl_vector_fixed<float,3> TrackingHandlerPeaks::ProposeDirection(const itk::Poin
 
   if (mag>=m_PeakThreshold)
   {
+    if (m_Mode == MODE::PROBABILISTIC)
+    {
+      output_direction[0] += this->m_RngItk->GetNormalVariate(0, fabs(output_direction[0])*0.01);
+      output_direction[1] += this->m_RngItk->GetNormalVariate(0, fabs(output_direction[1])*0.01);
+      output_direction[2] += this->m_RngItk->GetNormalVariate(0, fabs(output_direction[2])*0.01);
+      mag = output_direction.magnitude();
+    }
+
     output_direction.normalize();
+
     float a = 1;
     if (old_mag>0.5)
       a = dot_product(output_direction, oldDir);

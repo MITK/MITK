@@ -464,12 +464,23 @@ void QmitkChartWidget::Impl::ClearJavaScriptChart()
 
 void QmitkChartWidget::Impl::InitializeJavaScriptChart()
 {
-  m_WebChannel->registerObject(QStringLiteral("chartData"), &m_C3Data);
+  auto alreadyRegisteredObjects = m_WebChannel->registeredObjects();
+  auto alreadyRegisteredObjectsValues = alreadyRegisteredObjects.values();
+  //only register objects that have not been registered yet
+  if (alreadyRegisteredObjectsValues.indexOf(&m_C3Data) == -1)
+  {
+    m_WebChannel->registerObject(QStringLiteral("chartData"), &m_C3Data);
+  }
+
   unsigned count = 0;
   for (auto &xyData : m_C3xyData)
   {
-    QString variableName = "xyData" + QString::number(count);
-    m_WebChannel->registerObject(variableName, xyData.get());
+    // only register objects that have not been registered yet
+    if (alreadyRegisteredObjectsValues.indexOf(xyData.get()) == -1)
+    {
+      QString variableName = "xyData" + QString::number(count);
+      m_WebChannel->registerObject(variableName, xyData.get());
+    }
     count++;
   }
 

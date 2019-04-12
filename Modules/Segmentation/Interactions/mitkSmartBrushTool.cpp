@@ -422,6 +422,13 @@ void mitk::SmartBrushTool::MouseMovedImpl(const mitk::PlaneGeometry* planeGeomet
     brushStart[2] = globalIndexCoordinates[2] - m_Radius;
 
     itk::Image<float, 3>::SizeType imageSize = m_OriginalImage->GetLargestPossibleRegion().GetSize();
+
+    for (int i = 0; i < 3; i++) {
+      if (brushStart[i] >= imageSize[i]) {
+        return; // Brush outside of image
+      }
+    }
+
     // Clamp region in image
     for (int i = 0; i < 3; i++) {
       if (brushStart[i] < 0) {

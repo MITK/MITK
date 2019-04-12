@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
   parser.beginGroup("1. Mandatory arguments:");
   parser.addArgument("", "i", mitkCommandLineParser::StringList, "Input:", "input image (multiple possible for 'DetTensor' algorithm)", us::Any(), false, false, false, mitkCommandLineParser::Input);
   parser.addArgument("", "o", mitkCommandLineParser::String, "Output:", "output fiberbundle/probability map", us::Any(), false, false, false, mitkCommandLineParser::Output);
-  parser.addArgument("algorithm", "", mitkCommandLineParser::String, "Algorithm:", "which algorithm to use (Peaks; DetTensor; ProbTensor; DetODF; ProbODF; DetRF; ProbRF)", us::Any(), false);
+  parser.addArgument("algorithm", "", mitkCommandLineParser::String, "Algorithm:", "which algorithm to use (DetPeaks; ProbPeaks; DetTensor; ProbTensor; DetODF; ProbODF; DetRF; ProbRF)", us::Any(), false);
   parser.endGroup();
 
   parser.beginGroup("2. Seeding:");
@@ -97,6 +97,9 @@ int main(int argc, char* argv[])
   parser.addArgument("prior_weight", "", mitkCommandLineParser::Float, "Prior weight", "weighting factor between prior and data.", 0.5);
   parser.addArgument("restrict_to_prior", "", mitkCommandLineParser::Bool, "Restrict to prior:", "restrict tractography to regions where the prior is valid.");
   parser.addArgument("new_directions_from_prior", "", mitkCommandLineParser::Bool, "New directios from prior:", "the prior can create directions where there are none in the data.");
+  parser.addArgument("prior_flip_x", "", mitkCommandLineParser::Bool, "Prior Flip X:", "multiply x-coordinate of prior direction by -1");
+  parser.addArgument("prior_flip_y", "", mitkCommandLineParser::Bool, "Prior Flip Y:", "multiply y-coordinate of prior direction by -1");
+  parser.addArgument("prior_flip_z", "", mitkCommandLineParser::Bool, "Prior Flip Z:", "multiply z-coordinate of prior direction by -1");
   parser.endGroup();
 
   parser.beginGroup("6. Neighborhood sampling:");
@@ -191,6 +194,16 @@ int main(int argc, char* argv[])
   bool flip_z = false;
   if (parsedArgs.count("flip_z"))
     flip_z = us::any_cast<bool>(parsedArgs["flip_z"]);
+
+  bool prior_flip_x = false;
+  if (parsedArgs.count("prior_flip_x"))
+    prior_flip_x = us::any_cast<bool>(parsedArgs["prior_flip_x"]);
+  bool prior_flip_y = false;
+  if (parsedArgs.count("prior_flip_y"))
+    prior_flip_y = us::any_cast<bool>(parsedArgs["prior_flip_y"]);
+  bool prior_flip_z = false;
+  if (parsedArgs.count("prior_flip_z"))
+    prior_flip_z = us::any_cast<bool>(parsedArgs["prior_flip_z"]);
 
   bool apply_image_rotation = false;
   if (parsedArgs.count("apply_image_rotation"))
@@ -352,7 +365,7 @@ int main(int argc, char* argv[])
   }
 
   //    //////////////////////////////////////////////////////////////////
-  //      omp_set_num_threads(1);
+//        omp_set_num_threads(1);
 
   typedef itk::StreamlineTrackingFilter TrackerType;
   TrackerType::Pointer tracker = TrackerType::New();
@@ -379,7 +392,14 @@ int main(int argc, char* argv[])
     dynamic_cast<mitk::TrackingHandlerPeaks*>(priorhandler)->SetPeakImage(itkImg);
     dynamic_cast<mitk::TrackingHandlerPeaks*>(priorhandler)->SetPeakThreshold(0.0);
     dynamic_cast<mitk::TrackingHandlerPeaks*>(priorhandler)->SetInterpolate(interpolate);
-    dynamic_cast<mitk::TrackingHandlerPeaks*>(priorhandler)->SetMode(mitk::TrackingDataHandler::MODE::DETERMINISTIC);
+
+    priorhandler->SetFlipX(prior_flip_x);
+    priorhandler->SetFlipY(prior_flip_y);
+    priorhandler->SetFlipZ(prior_flip_z);
+    if (algorithm == "ProbPeaks")
+      priorhandler->SetMode(mitk::TrackingDataHandler::MODE::PROBABILISTIC);
+    else
+      priorhandler->SetMode(mitk::TrackingDataHandler::MODE::DETERMINISTIC);
 
     tracker->SetTrackingPriorHandler(priorhandler);
     tracker->SetTrackingPriorWeight(prior_weight);
@@ -415,13 +435,17 @@ int main(int argc, char* argv[])
     if (algorithm == "ProbRF")
       handler->SetMode(mitk::TrackingDataHandler::MODE::PROBABILISTIC);
   }
-  else if (algorithm == "Peaks")
+  else if (algorithm == "DetPeaks" or algorithm == "ProbPeaks")
   {
     handler = new mitk::TrackingHandlerPeaks();
 
     MITK_INFO << "loading input peak image";
     mitk::Image::Pointer mitkImage = mitk::IOUtil::Load<mitk::Image>(input_files.at(0));
     mitk::TrackingHandlerPeaks::PeakImgType::Pointer itkImg = mitk::convert::GetItkPeakFromPeakImage(mitkImage);
+    if (algorithm == "ProbPeaks")
+      handler->SetMode(mitk::TrackingDataHandler::MODE::PROBABILISTIC);
+    else
+      handler->SetMode(mitk::TrackingDataHandler::MODE::DETERMINISTIC);
 
     dynamic_cast<mitk::TrackingHandlerPeaks*>(handler)->SetPeakImage(itkImg);
     dynamic_cast<mitk::TrackingHandlerPeaks*>(handler)->SetApplyDirectionMatrix(apply_image_rotation);
@@ -494,7 +518,7 @@ int main(int argc, char* argv[])
   }
   else
   {
-    MITK_INFO << "Unknown tractography algorithm (" + algorithm+"). Known types are Peaks, DetTensor, ProbTensor, DetODF, ProbODF, DetRF, ProbRF.";
+    MITK_INFO << "Unknown tractography algorithm (" + algorithm+"). Known types are DetPeaks, ProbPeaks, DetTensor, ProbTensor, DetODF, ProbODF, DetRF, ProbRF.";
     return EXIT_FAILURE;
   }
   handler->SetInterpolate(interpolate);

@@ -290,7 +290,7 @@ function generateChart(chartData)
     margin: {
       l: 50,
       r: 10,
-      b: 20,
+      b: 40,
       t: marginTop,
       pad: 4
     },

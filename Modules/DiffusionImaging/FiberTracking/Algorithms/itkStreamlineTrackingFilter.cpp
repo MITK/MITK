@@ -77,16 +77,6 @@ std::string StreamlineTrackingFilter::GetStatusText()
 
 void StreamlineTrackingFilter::BeforeTracking()
 {
-  itk::Vector< double, 3 > imageSpacing = m_TrackingHandler->GetSpacing();
-  if(imageSpacing[0]<imageSpacing[1] && imageSpacing[0]<imageSpacing[2])
-    m_MinVoxelSize = static_cast<float>(imageSpacing[0]);
-  else if (imageSpacing[1] < imageSpacing[2])
-    m_MinVoxelSize = static_cast<float>(imageSpacing[1]);
-  else
-    m_MinVoxelSize = static_cast<float>(imageSpacing[2]);
-
-  m_Parameters->SetMinVoxelSize(m_MinVoxelSize);
-
   m_StopTracking = false;
   m_TrackingHandler->SetParameters(m_Parameters);
   m_TrackingHandler->InitForTracking();
@@ -106,6 +96,7 @@ void StreamlineTrackingFilter::BeforeTracking()
     m_PolyDataContainer.push_back(poly);
   }
 
+  auto imageSpacing = m_TrackingHandler->GetSpacing();
   if (m_Parameters->m_OutputProbMap)
   {
     m_OutputProbabilityMap = ItkDoubleImgType::New();

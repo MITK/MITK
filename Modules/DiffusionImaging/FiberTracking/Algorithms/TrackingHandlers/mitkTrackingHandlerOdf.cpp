@@ -82,6 +82,7 @@ void TrackingHandlerOdf::InitForTracking()
       m_GfaImage = gfaFilter->GetOutput();
     }
 
+    this->CalculateMinVoxelSize();
     m_NeedsDataInit = false;
   }
 

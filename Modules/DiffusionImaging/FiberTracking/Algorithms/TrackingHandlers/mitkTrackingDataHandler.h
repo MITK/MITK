@@ -86,6 +86,23 @@ public:
 
 protected:
 
+  void CalculateMinVoxelSize()
+  {
+    itk::Vector< double, 3 > imageSpacing = this->GetSpacing();
+    float minVoxelSize = 0;
+    if(imageSpacing[0]<imageSpacing[1] && imageSpacing[0]<imageSpacing[2])
+      minVoxelSize = static_cast<float>(imageSpacing[0]);
+    else if (imageSpacing[1] < imageSpacing[2])
+      minVoxelSize = static_cast<float>(imageSpacing[1]);
+    else
+      minVoxelSize = static_cast<float>(imageSpacing[2]);
+
+    if (m_Parameters==nullptr)
+      mitkThrow() << "No tractography parameter opbect set!";
+
+    m_Parameters->SetMinVoxelSize(minVoxelSize);
+  }
+
   BoostRngType        m_Rng;
   ItkRngType::Pointer m_RngItk;
   bool                m_NeedsDataInit;

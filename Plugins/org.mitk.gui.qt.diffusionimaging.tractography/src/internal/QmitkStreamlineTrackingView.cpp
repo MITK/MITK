@@ -240,6 +240,9 @@ std::shared_ptr<mitk::StreamlineTractographyParameters> QmitkStreamlineTrackingV
   params->m_RestrictToPrior = m_Controls->m_PriorAsMaskBox->isChecked();
   params->m_NewDirectionsFromPrior = m_Controls->m_NewDirectionsFromPriorBox->isChecked();
 
+  params->m_PriorFlipX = m_Controls->m_PriorFlipXBox->isChecked();
+  params->m_PriorFlipY = m_Controls->m_PriorFlipYBox->isChecked();
+  params->m_PriorFlipZ = m_Controls->m_PriorFlipZBox->isChecked();
 
   params->m_FlipX = m_Controls->m_FlipXBox->isChecked();
   params->m_FlipY = m_Controls->m_FlipYBox->isChecked();
@@ -278,7 +281,6 @@ std::shared_ptr<mitk::StreamlineTractographyParameters> QmitkStreamlineTrackingV
   {
   case 0:
     params->m_EpConstraints = itk::StreamlineTrackingFilter::EndpointConstraints::NONE;
-    m_Tracker->SetTargetRegions(nullptr);
     break;
   case 1:
     params->m_EpConstraints = itk::StreamlineTrackingFilter::EndpointConstraints::EPS_IN_TARGET;
@@ -805,6 +807,9 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
 
   m_Tracker = TrackerType::New();
 
+  if (params->m_EpConstraints == itk::StreamlineTrackingFilter::EndpointConstraints::NONE)
+      m_Tracker->SetTargetRegions(nullptr);
+
   if( dynamic_cast<mitk::TensorImage*>(m_InputImageNodes.at(0)->GetData()) )
   {
     if (m_Controls->m_ModeBox->currentIndex()==1)
@@ -987,20 +992,10 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
       dynamic_cast<mitk::TrackingHandlerPeaks*>(m_TrackingPriorHandler)->SetPeakImage(itkImg);
       m_LastPrior = m_Controls->m_PriorImageSelectionWidget->GetSelectedNode();
     }
-    switch (m_Controls->m_ModeBox->currentIndex())
-    {
-    case 0:
-      m_TrackingPriorHandler->SetMode(mitk::TrackingDataHandler::MODE::DETERMINISTIC);
-      break;
-    case 1:
-      m_TrackingPriorHandler->SetMode(mitk::TrackingDataHandler::MODE::PROBABILISTIC);
-      break;
-    default:
-      m_TrackingPriorHandler->SetMode(mitk::TrackingDataHandler::MODE::DETERMINISTIC);
-    }
-    m_TrackingPriorHandler->SetFlipX(m_Controls->m_PriorFlipXBox->isChecked());
-    m_TrackingPriorHandler->SetFlipY(m_Controls->m_PriorFlipYBox->isChecked());
-    m_TrackingPriorHandler->SetFlipZ(m_Controls->m_PriorFlipZBox->isChecked());
+
+    prior_params->m_FlipX = m_Controls->m_PriorFlipXBox->isChecked();
+    prior_params->m_FlipY = m_Controls->m_PriorFlipYBox->isChecked();
+    prior_params->m_FlipZ = m_Controls->m_PriorFlipZBox->isChecked();
     m_TrackingPriorHandler->SetParameters(prior_params);
 
     m_Tracker->SetTrackingPriorHandler(m_TrackingPriorHandler);
@@ -1013,29 +1008,6 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     ItkFloatImageType::Pointer mask = ItkFloatImageType::New();
     mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_ExclusionImageSelectionWidget->GetSelectedNode()->GetData()), mask);
     m_Tracker->SetExclusionRegions(mask);
-  }
-
-  if (params->m_EpConstraints == itk::StreamlineTrackingFilter::EndpointConstraints::NONE)
-    m_Tracker->SetTargetRegions(nullptr);
-    break;
-  case 1:
-    m_Tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::EPS_IN_TARGET);
-    break;
-  case 2:
-    m_Tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::EPS_IN_TARGET_LABELDIFF);
-    break;
-  case 3:
-    m_Tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::EPS_IN_SEED_AND_TARGET);
-    break;
-  case 4:
-    m_Tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::MIN_ONE_EP_IN_TARGET);
-    break;
-  case 5:
-    m_Tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::ONE_EP_IN_TARGET);
-    break;
-  case 6:
-    m_Tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::NO_EP_IN_TARGET);
-    break;
   }
 
   if (params->m_EpConstraints!=itk::StreamlineTrackingFilter::EndpointConstraints::NONE && m_Controls->m_TargetImageSelectionWidget->GetSelectedNode().IsNull())
@@ -1052,6 +1024,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     return;
   }
 
+  m_Tracker->SetParameters(params);
   m_Tracker->SetTrackingHandler(m_TrackingHandler);
   m_Tracker->SetVerbose(!m_Controls->m_InteractiveBox->isChecked());
 

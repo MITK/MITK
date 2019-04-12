@@ -66,6 +66,8 @@ void TrackingHandlerPeaks::InitForTracking()
     m_DummyImage->FillBuffer(0.0);
 
     m_NumDirs = imageRegion4.GetSize(3)/3;
+
+    this->CalculateMinVoxelSize();
     m_NeedsDataInit = false;
   }
 
@@ -274,7 +276,7 @@ vnl_vector_fixed<float,3> TrackingHandlerPeaks::ProposeDirection(const itk::Poin
 
   if (mag>=m_Parameters->m_Cutoff)
   {
-    if (m_Mode == MODE::PROBABILISTIC)
+    if (m_Parameters->m_Mode == MODE::PROBABILISTIC)
     {
       output_direction[0] += this->m_RngItk->GetNormalVariate(0, fabs(output_direction[0])*0.01);
       output_direction[1] += this->m_RngItk->GetNormalVariate(0, fabs(output_direction[1])*0.01);

@@ -179,6 +179,7 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::InitForTrac
         m_FloatImageRotation[r][c] = double_dir[r][c];
       }
 
+    this->CalculateMinVoxelSize();
     m_NeedsDataInit = false;
   }
 }

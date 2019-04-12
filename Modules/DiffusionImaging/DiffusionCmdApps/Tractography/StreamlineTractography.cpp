@@ -65,7 +65,8 @@ int main(int argc, char* argv[])
   parser.beginGroup("1. Mandatory arguments:");
   parser.addArgument("", "i", mitkCommandLineParser::StringList, "Input:", "input image (multiple possible for 'DetTensor' algorithm)", us::Any(), false, false, false, mitkCommandLineParser::Input);
   parser.addArgument("", "o", mitkCommandLineParser::String, "Output:", "output fiberbundle/probability map", us::Any(), false, false, false, mitkCommandLineParser::Output);
-  parser.addArgument("algorithm", "", mitkCommandLineParser::String, "Algorithm:", "which algorithm to use (DetPeaks; ProbPeaks; DetTensor; ProbTensor; DetODF; ProbODF; DetRF; ProbRF)", us::Any(), false);
+  parser.addArgument("type", "", mitkCommandLineParser::String, "Type:", "which tracker to use (Peaks; Tensor; ODF; RF)", us::Any(), false);
+  parser.addArgument("probabilistic", "", mitkCommandLineParser::Bool, "Probabilistic:", "Probabilistic tractography", us::Any(false));
   parser.endGroup();
 
   parser.beginGroup("2. Seeding:");
@@ -140,9 +141,15 @@ int main(int argc, char* argv[])
 
   mitkCommandLineParser::StringContainerType input_files = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["i"]);
   std::string outFile = us::any_cast<std::string>(parsedArgs["o"]);
-  std::string algorithm = us::any_cast<std::string>(parsedArgs["algorithm"]);
+  std::string type = us::any_cast<std::string>(parsedArgs["type"]);
 
   std::shared_ptr< mitk::StreamlineTractographyParameters > params = std::make_shared<mitk::StreamlineTractographyParameters>();
+
+  if (parsedArgs.count("probabilistic"))
+    params->m_Mode = mitk::StreamlineTractographyParameters::MODE::PROBABILISTIC;
+  else {
+    params->m_Mode = mitk::StreamlineTractographyParameters::MODE::DETERMINISTIC;
+  }
 
   std::string prior_image = "";
   if (parsedArgs.count("prior_image"))
@@ -391,22 +398,17 @@ int main(int argc, char* argv[])
     mitk::TrackingHandlerPeaks::PeakImgType::Pointer itkImg = caster->GetOutput();
 
     std::shared_ptr< mitk::StreamlineTractographyParameters > prior_params = std::make_shared< mitk::StreamlineTractographyParameters >(*params);
+    prior_params->m_FlipX = prior_flip_x;
+    prior_params->m_FlipY = prior_flip_y;
+    prior_params->m_FlipZ = prior_flip_z;
     prior_params->m_Cutoff = 0.0;
-    prior_params->m_Mode = mitk::StreamlineTractographyParameters::MODE::DETERMINISTIC;
     dynamic_cast<mitk::TrackingHandlerPeaks*>(priorhandler)->SetPeakImage(itkImg);
-    dynamic_cast<mitk::TrackingHandlerPeaks*>(priorhandler)->SetPeakThreshold(0.0);
-    dynamic_cast<mitk::TrackingHandlerPeaks*>(priorhandler)->SetInterpolate(interpolate);
-    dynamic_cast<mitk::TrackingHandlerPeaks*>(priorhandler)->SetMode(mitk::TrackingDataHandler::MODE::DETERMINISTIC);
-
     priorhandler->SetParameters(prior_params);
     tracker->SetTrackingPriorHandler(priorhandler);
-    tracker->SetTrackingPriorWeight(prior_weight);
-    tracker->SetTrackingPriorAsMask(restrict_to_prior);
-    tracker->SetIntroduceDirectionsFromPrior(new_directions_from_prior);
   }
 
   mitk::TrackingDataHandler* handler;
-  if (algorithm == "DetRF" || algorithm == "ProbRF")
+  if (type == "RF")
   {
     mitk::TractographyForest::Pointer forest = mitk::IOUtil::Load<mitk::TractographyForest>(forestFile);
     if (forest.IsNull())
@@ -429,25 +431,17 @@ int main(int argc, char* argv[])
       dynamic_cast<mitk::TrackingHandlerRandomForest<6,100>*>(handler)->AddDwi(input);
       dynamic_cast<mitk::TrackingHandlerRandomForest<6,100>*>(handler)->SetAdditionalFeatureImages(addImages);
     }
-
-    if (algorithm == "ProbRF")
-      params->m_Mode = mitk::TrackingDataHandler::MODE::PROBABILISTIC;
   }
-  else if (algorithm == "DetPeaks" or algorithm == "ProbPeaks")
+  else if (type == "Peaks")
   {
     handler = new mitk::TrackingHandlerPeaks();
 
     MITK_INFO << "loading input peak image";
     mitk::Image::Pointer mitkImage = mitk::IOUtil::Load<mitk::Image>(input_files.at(0));
     mitk::TrackingHandlerPeaks::PeakImgType::Pointer itkImg = mitk::convert::GetItkPeakFromPeakImage(mitkImage);
-    if (algorithm == "ProbPeaks")
-      handler->SetMode(mitk::TrackingDataHandler::MODE::PROBABILISTIC);
-    else
-      handler->SetMode(mitk::TrackingDataHandler::MODE::DETERMINISTIC);
-
     dynamic_cast<mitk::TrackingHandlerPeaks*>(handler)->SetPeakImage(itkImg);
   }
-  else if (algorithm == "DetTensor")
+  else if (type == "Tensor" && params->m_Mode == mitk::StreamlineTractographyParameters::MODE::DETERMINISTIC)
   {
     handler = new mitk::TrackingHandlerTensor();
 
@@ -463,13 +457,13 @@ int main(int argc, char* argv[])
     if (addImages.at(0).size()>0)
       dynamic_cast<mitk::TrackingHandlerTensor*>(handler)->SetFaImage(addImages.at(0).at(0));
   }
-  else if (algorithm == "DetODF" || algorithm == "ProbODF" || algorithm == "ProbTensor")
+  else if (type == "ODF" || (type == "Tensor" && params->m_Mode == mitk::StreamlineTractographyParameters::MODE::PROBABILISTIC))
   {
     handler = new mitk::TrackingHandlerOdf();
 
     mitk::OdfImage::ItkOdfImageType::Pointer itkImg = nullptr;
 
-    if (algorithm == "ProbTensor")
+    if (type == "Tensor")
     {
       MITK_INFO << "Converting Tensor to ODF image";
       auto input = mitk::IOUtil::Load<mitk::Image>(input_files.at(0));
@@ -497,15 +491,12 @@ int main(int argc, char* argv[])
 
     dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetOdfImage(itkImg);
 
-    if (algorithm == "ProbODF" || algorithm == "ProbTensor")
-      params->m_Mode = mitk::TrackingDataHandler::MODE::PROBABILISTIC;
-
     if (addImages.at(0).size()>0)
       dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetGfaImage(addImages.at(0).at(0));
   }
   else
   {
-    MITK_INFO << "Unknown tractography algorithm (" + algorithm+"). Known types are Peaks, DetTensor, ProbTensor, DetODF, ProbODF, DetRF, ProbRF.";
+    MITK_INFO << "Unknown tractography algorithm (" + type+"). Known types are Peaks, DetTensor, ProbTensor, DetODF, ProbODF, DetRF, ProbRF.";
     return EXIT_FAILURE;
   }
 
@@ -524,7 +515,7 @@ int main(int argc, char* argv[])
   else if (ep_constraint=="NO_EP_IN_TARGET")
     params->m_EpConstraints = itk::StreamlineTrackingFilter::EndpointConstraints::NO_EP_IN_TARGET;
 
-  MITK_INFO << "Tractography algorithm: " << algorithm;
+  MITK_INFO << "Tractography algorithm: " << type;
   tracker->SetMaskImage(mask);
   tracker->SetSeedImage(seed);
   tracker->SetStoppingRegions(stop);

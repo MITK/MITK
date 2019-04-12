@@ -98,6 +98,9 @@ namespace mitk
     float m_Weight = 0.5;
     bool m_RestrictToPrior = true;
     bool m_NewDirectionsFromPrior = true;
+    bool        m_PriorFlipX = false;
+    bool        m_PriorFlipY = false;
+    bool        m_PriorFlipZ = false;
 
     // neighborhood sampling
     unsigned int m_NumSamples = 0;

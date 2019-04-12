@@ -253,7 +253,7 @@ std::shared_ptr<mitk::StreamlineTractographyParameters> QmitkStreamlineTrackingV
   params->m_InterpolateRoiImages = m_Controls->m_MaskInterpolationBox->isChecked();
   params->m_SeedsPerVoxel = m_Controls->m_SeedsPerVoxelBox->value();
   params->SetStepSizeVox(m_Controls->m_StepSizeBox->value());
-  params->SetSamplingDistance(m_Controls->m_SamplingDistanceBox->value());
+  params->SetSamplingDistanceVox(m_Controls->m_SamplingDistanceBox->value());
   params->m_StopVotes = m_Controls->m_StopVotesBox->isChecked();
   params->m_OnlyForwardSamples = m_Controls->m_FrontalSamplesBox->isChecked();
   params->m_TrialsPerSeed = m_Controls->m_TrialsPerSeedBox->value();

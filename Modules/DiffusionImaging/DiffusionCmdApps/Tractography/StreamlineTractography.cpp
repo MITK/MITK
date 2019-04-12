@@ -269,9 +269,9 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("step_size"))
     params->SetStepSizeVox(us::any_cast<float>(parsedArgs["step_size"]));
 
-  params->SetSamplingDistance(-1);
+  params->SetSamplingDistanceVox(-1);
   if (parsedArgs.count("sampling_distance"))
-    params->SetSamplingDistance(us::any_cast<float>(parsedArgs["sampling_distance"]));
+    params->SetSamplingDistanceVox(us::any_cast<float>(parsedArgs["sampling_distance"]));
 
   params->m_NumSamples = 0;
   if (parsedArgs.count("num_samples"))

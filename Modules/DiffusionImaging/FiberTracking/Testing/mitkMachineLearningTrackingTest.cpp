@@ -81,7 +81,7 @@ public:
   {
     std::shared_ptr<mitk::StreamlineTractographyParameters> params = std::make_shared<mitk::StreamlineTractographyParameters>();
     params->m_RandomSampling = false;
-    params->SetSamplingDistance(0.5);
+    params->SetSamplingDistanceVox(0.5);
     params->m_AvoidStop = true;
     params->SetAngularThresholdDeg(45);
     params->SetStepSizeVox(-1);

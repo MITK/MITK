@@ -98,9 +98,9 @@ namespace mitk
     float m_Weight = 0.5;
     bool m_RestrictToPrior = true;
     bool m_NewDirectionsFromPrior = true;
-    bool        m_PriorFlipX = false;
-    bool        m_PriorFlipY = false;
-    bool        m_PriorFlipZ = false;
+    bool m_PriorFlipX = false;
+    bool m_PriorFlipY = false;
+    bool m_PriorFlipZ = false;
 
     // neighborhood sampling
     unsigned int m_NumSamples = 0;
@@ -111,49 +111,46 @@ namespace mitk
     float m_DeflectionMod = 1.0;
 
     // data handling
-    bool        m_FlipX = false;
-    bool        m_FlipY = false;
-    bool        m_FlipZ = false;
-    bool        m_InterpolateTractographyData = true;
-    bool        m_InterpolateRoiImages;
-    bool        m_ApplyDirectionMatrix = false;
+    bool m_FlipX = false;
+    bool m_FlipY = false;
+    bool m_FlipZ = false;
+    bool m_InterpolateTractographyData = true;
+    bool m_InterpolateRoiImages;
+    bool m_ApplyDirectionMatrix = false;
 
     // output and postprocessing
     bool m_CompressFibers = true;
     float m_Compression = 0.1;
     bool m_OutputProbMap = false;
 
-    float GetAngularThresholdDeg() const;
+    float GetAngularThreshold() const;
     void SetAngularThresholdDeg(float AngularThresholdDeg);
 
     float GetLoopCheckDeg() const;
     void SetLoopCheckDeg(float LoopCheckDeg);
 
-    float GetStepSizeVox() const;
+    float GetStepSizeMm() const;
     void SetStepSizeVox(float StepSizeVox);
 
+    float GetSamplingDistanceMm() const;
+    void SetSamplingDistanceVox(float SamplingDistance);
+
     void SetMinVoxelSize(float MinVoxelSize);
-
-    float GetAngularThreshold() const;
-
-    float GetSamplingDistance() const;
-    void SetSamplingDistance(float SamplingDistance);
-
-    float GetStepSize() const;
 
   private:
 
     void AutoAdjust();
 
-    float m_SamplingDistance = -1;
+    float m_SamplingDistanceVox = -1;
+    float m_SamplingDistanceMm;
 
-    float m_AngularThresholdDeg;
-    float m_LoopCheckDeg;
-    float m_StepSizeVox;
-
+    float m_AngularThresholdDeg = -1;
     float m_AngularThreshold;
-    float m_LoopCheck;
-    float m_StepSize; // mm
+
+    float m_LoopCheckDeg = -1;
+
+    float m_StepSizeVox = -1;
+    float m_StepSizeMm;
 
     float m_MinVoxelSize = 1.0;
 

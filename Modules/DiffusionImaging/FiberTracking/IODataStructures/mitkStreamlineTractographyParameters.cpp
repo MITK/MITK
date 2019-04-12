@@ -26,9 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::StreamlineTractographyParameters::StreamlineTractographyParameters()
 {
-  SetStepSizeVox(0.5);
-  SetAngularThresholdDeg(-1);
-  SetLoopCheckDeg(-1);
+  AutoAdjust();
 }
 
 mitk::StreamlineTractographyParameters::~StreamlineTractographyParameters()
@@ -86,7 +84,7 @@ void mitk::StreamlineTractographyParameters::SaveParameters(std::string filename
   parameters.put("prior.new_directions", m_NewDirectionsFromPrior);
 
   parameters.put("nsampling.num_samples", m_NumSamples);
-  parameters.put("nsampling.sampling_distance", m_SamplingDistance);
+  parameters.put("nsampling.sampling_distance", m_SamplingDistanceVox);
   parameters.put("nsampling.only_frontal", m_OnlyForwardSamples);
   parameters.put("nsampling.stop_votes", m_StopVotes);
 
@@ -224,7 +222,7 @@ void mitk::StreamlineTractographyParameters::LoadParameters(std::string filename
     else if( v1.first == "nsampling" )
     {
       m_NumSamples = ReadVal<unsigned int>(v1,"num_samples", m_NumSamples);
-      m_SamplingDistance = ReadVal<float>(v1,"sampling_distance", m_SamplingDistance);
+      m_SamplingDistanceVox = ReadVal<float>(v1,"sampling_distance", m_SamplingDistanceVox);
       m_OnlyForwardSamples = ReadVal<bool>(v1,"only_frontal", m_OnlyForwardSamples);
       m_StopVotes = ReadVal<bool>(v1,"stop_votes", m_StopVotes);
     }
@@ -266,14 +264,14 @@ void mitk::StreamlineTractographyParameters::LoadParameters(std::string filename
   setlocale(LC_ALL, currLocale.c_str());
 }
 
-float mitk::StreamlineTractographyParameters::GetSamplingDistance() const
+float mitk::StreamlineTractographyParameters::GetSamplingDistanceMm() const
 {
-  return m_SamplingDistance;
+  return m_SamplingDistanceMm;
 }
 
-void mitk::StreamlineTractographyParameters::SetSamplingDistance(float SamplingDistance)
+void mitk::StreamlineTractographyParameters::SetSamplingDistanceVox(float SamplingDistance)
 {
-  m_SamplingDistance = SamplingDistance;
+  m_SamplingDistanceVox = SamplingDistance;
   AutoAdjust();
 }
 
@@ -281,12 +279,12 @@ void mitk::StreamlineTractographyParameters::AutoAdjust()
 {
   if (m_StepSizeVox<static_cast<float>(mitk::eps))
     m_StepSizeVox = 0.5;
-  m_StepSize = m_StepSizeVox*m_MinVoxelSize;
+  m_StepSizeMm = m_StepSizeVox*m_MinVoxelSize;
 
   if (m_AngularThresholdDeg<0)
   {
-    if  (m_StepSize/m_MinVoxelSize<=0.966f)  // minimum 15° for automatic estimation
-      m_AngularThreshold = static_cast<float>(std::cos( 0.5 * itk::Math::pi * static_cast<double>(m_StepSize/m_MinVoxelSize) ));
+    if  (m_StepSizeMm/m_MinVoxelSize<=0.966f)  // minimum 15° for automatic estimation
+      m_AngularThreshold = static_cast<float>(std::cos( 0.5 * itk::Math::pi * static_cast<double>(m_StepSizeMm/m_MinVoxelSize) ));
     else
       m_AngularThreshold = static_cast<float>(std::cos( 0.5 * itk::Math::pi * 0.966 ));
 
@@ -295,13 +293,14 @@ void mitk::StreamlineTractographyParameters::AutoAdjust()
   else
     m_AngularThreshold = static_cast<float>(std::cos( static_cast<double>(m_AngularThresholdDeg)*itk::Math::pi/180.0 ));
 
-  if (m_SamplingDistance<static_cast<float>(mitk::eps))
-    m_SamplingDistance = m_MinVoxelSize*0.25f;
+  if (m_SamplingDistanceVox<static_cast<float>(mitk::eps))
+    m_SamplingDistanceVox = m_MinVoxelSize*0.25f;
+  m_SamplingDistanceMm = m_SamplingDistanceVox*m_MinVoxelSize;
 }
 
-float mitk::StreamlineTractographyParameters::GetStepSize() const
+float mitk::StreamlineTractographyParameters::GetStepSizeMm() const
 {
-  return m_StepSize;
+  return m_StepSizeMm;
 }
 
 void mitk::StreamlineTractographyParameters::SetMinVoxelSize(float MinVoxelSize)
@@ -313,11 +312,6 @@ void mitk::StreamlineTractographyParameters::SetMinVoxelSize(float MinVoxelSize)
 float mitk::StreamlineTractographyParameters::GetAngularThreshold() const
 {
   return m_AngularThreshold;
-}
-
-float mitk::StreamlineTractographyParameters::GetStepSizeVox() const
-{
-  return m_StepSizeVox;
 }
 
 void mitk::StreamlineTractographyParameters::SetStepSizeVox(float StepSizeVox)
@@ -334,11 +328,6 @@ float mitk::StreamlineTractographyParameters::GetLoopCheckDeg() const
 void mitk::StreamlineTractographyParameters::SetLoopCheckDeg(float LoopCheckDeg)
 {
   m_LoopCheckDeg = LoopCheckDeg;
-}
-
-float mitk::StreamlineTractographyParameters::GetAngularThresholdDeg() const
-{
-  return m_AngularThresholdDeg;
 }
 
 void mitk::StreamlineTractographyParameters::SetAngularThresholdDeg(float AngularThresholdDeg)

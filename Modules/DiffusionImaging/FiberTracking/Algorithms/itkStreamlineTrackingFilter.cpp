@@ -242,7 +242,7 @@ void StreamlineTrackingFilter::BeforeTracking()
     std::cout << "StreamlineTracking - Endpoint constraint: NO_EP_IN_TARGET" << std::endl;
 
   std::cout << "StreamlineTracking - Angular threshold: " << m_Parameters->GetAngularThreshold() << "°" << std::endl;
-  std::cout << "StreamlineTracking - Stepsize: " << m_Parameters->GetStepSize() << "mm (" << m_Parameters->GetStepSize()/m_MinVoxelSize << "*vox)" << std::endl;
+  std::cout << "StreamlineTracking - Stepsize: " << m_Parameters->GetStepSizeMm() << "mm (" << m_Parameters->GetStepSizeMm()/m_MinVoxelSize << "*vox)" << std::endl;
   std::cout << "StreamlineTracking - Seeds per voxel: " << m_Parameters->m_SeedsPerVoxel << std::endl;
   std::cout << "StreamlineTracking - Max. tract length: " << m_Parameters->m_MaxTractLength << "mm" << std::endl;
   std::cout << "StreamlineTracking - Min. tract length: " << m_Parameters->m_MinTractLength << "mm" << std::endl;
@@ -250,7 +250,7 @@ void StreamlineTrackingFilter::BeforeTracking()
   std::cout << "StreamlineTracking - Loop check: " << m_Parameters->GetLoopCheckDeg() << "°" << std::endl;
 
   std::cout << "StreamlineTracking - Num. neighborhood samples: " << m_Parameters->m_NumSamples << std::endl;
-  std::cout << "StreamlineTracking - Max. sampling distance: " << m_Parameters->GetSamplingDistance() << "mm (" << m_Parameters->GetSamplingDistance()/m_MinVoxelSize << "*vox)" << std::endl;
+  std::cout << "StreamlineTracking - Max. sampling distance: " << m_Parameters->GetSamplingDistanceMm() << "mm (" << m_Parameters->GetSamplingDistanceMm()/m_MinVoxelSize << "*vox)" << std::endl;
   std::cout << "StreamlineTracking - Deflection modifier: " << m_Parameters->m_DeflectionMod << std::endl;
 
   std::cout << "StreamlineTracking - Use stop votes: " << m_Parameters->m_StopVotes << std::endl;
@@ -270,9 +270,9 @@ void StreamlineTrackingFilter::BeforeTracking()
 
 void StreamlineTrackingFilter::CalculateNewPosition(itk::Point<float, 3>& pos, vnl_vector_fixed<float, 3>& dir)
 {
-  pos[0] += dir[0]*m_Parameters->GetStepSize();
-  pos[1] += dir[1]*m_Parameters->GetStepSize();
-  pos[2] += dir[2]*m_Parameters->GetStepSize();
+  pos[0] += dir[0]*m_Parameters->GetStepSizeMm();
+  pos[1] += dir[1]*m_Parameters->GetStepSizeMm();
+  pos[2] += dir[2]*m_Parameters->GetStepSizeMm();
 }
 
 std::vector< vnl_vector_fixed<float,3> > StreamlineTrackingFilter::CreateDirections(unsigned int NPoints)
@@ -348,7 +348,7 @@ vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(const itk::P
         d[1] = static_cast<float>(m_TrackingHandler->GetRandDouble(-0.5, 0.5));
         d[2] = static_cast<float>(m_TrackingHandler->GetRandDouble(-0.5, 0.5));
         d.normalize();
-        d *= static_cast<float>(m_TrackingHandler->GetRandDouble(0, static_cast<double>(m_Parameters->GetSamplingDistance())));
+        d *= static_cast<float>(m_TrackingHandler->GetRandDouble(0, static_cast<double>(m_Parameters->GetSamplingDistanceMm())));
       }
       else
       {
@@ -361,7 +361,7 @@ vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(const itk::P
         }
         else if (m_Parameters->m_OnlyForwardSamples && dot<0)
           continue;
-        d *= m_Parameters->GetSamplingDistance();
+        d *= m_Parameters->GetSamplingDistanceMm();
       }
 
       sample_pos[0] = pos[0] + d[0];
@@ -489,7 +489,7 @@ float StreamlineTrackingFilter::FollowStreamline(itk::Point<float, 3> pos, vnl_v
       fib->push_back(pos);
       container->push_back(dir);
     }
-    tractLength +=  m_Parameters->GetStepSize();
+    tractLength +=  m_Parameters->GetStepSizeMm();
 
     if (m_Parameters->GetLoopCheckDeg()>=0 && CheckCurvature(container, front)>m_Parameters->GetLoopCheckDeg())
       return tractLength;
@@ -529,7 +529,7 @@ float StreamlineTrackingFilter::CheckCurvature(DirectionContainer* fib, bool fro
 {
   if (fib->size()<8)
     return 0;
-  float m_Distance = std::max(m_MinVoxelSize*4, m_Parameters->GetStepSize()*8);
+  float m_Distance = std::max(m_MinVoxelSize*4, m_Parameters->GetStepSizeMm()*8);
   float dist = 0;
 
   std::vector< vnl_vector_fixed< float, 3 > > vectors;
@@ -541,7 +541,7 @@ float StreamlineTrackingFilter::CheckCurvature(DirectionContainer* fib, bool fro
     int c = 0;
     while(dist<m_Distance && c<static_cast<int>(fib->size())-1)
     {
-      dist += m_Parameters->GetStepSize();
+      dist += m_Parameters->GetStepSizeMm();
       vnl_vector_fixed< float, 3 > v = fib->at(static_cast<unsigned int>(c));
       if (dot_product(v,meanV)<0)
         v = -v;
@@ -555,7 +555,7 @@ float StreamlineTrackingFilter::CheckCurvature(DirectionContainer* fib, bool fro
     int c = static_cast<int>(fib->size())-1;
     while(dist<m_Distance && c>=0)
     {
-      dist += m_Parameters->GetStepSize();
+      dist += m_Parameters->GetStepSizeMm();
       vnl_vector_fixed< float, 3 > v = fib->at(static_cast<unsigned int>(c));
       if (dot_product(v,meanV)<0)
         v = -v;

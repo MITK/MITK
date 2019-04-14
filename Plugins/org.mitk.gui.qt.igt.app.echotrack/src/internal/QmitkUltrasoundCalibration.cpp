@@ -39,6 +39,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkPointSet.h>
+#include <mitkPointSetDataInteractor.h>
+#include <mitkPointSetShapeProperty.h>
 #include <mitkSceneIO.h>
 
 // us
@@ -49,6 +51,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkMatrix4x4.h>
 #include <vtkPlane.h>
 #include <vtkPoints.h>
+#include <vtkSphereSource.h>
 #include <vtkTransform.h>
 
 #include <vtkVertexGlyphFilter.h>
@@ -105,6 +108,9 @@ QmitkUltrasoundCalibration::~QmitkUltrasoundCalibration()
   this->GetDataStorage()->Remove(m_VerificationReferencePointsDataNode);
 
   delete m_Timer;
+
+  // remove observer for phantom-based point adding
+  m_CalibPointsImage->RemoveAllObservers();
 }
 
 void QmitkUltrasoundCalibration::SetFocus()
@@ -164,10 +170,18 @@ void QmitkUltrasoundCalibration::CreateQtPartControl(QWidget *parent)
           SLOT(OnAddCalibPoint())); // Tracking & Image Points (Calibration)
   connect(m_Controls.m_CalibBtnCalibrate, SIGNAL(clicked()), this, SLOT(OnCalibration())); // Perform Calibration
   // Phantom-based calibration
-  connect(m_Controls.m_CalibBtnLoadPhantomConfiguration, SIGNAL(clicked()), this, SLOT(OnLoadPhantomConfiguration())); // Phantom configuration
-  connect(m_Controls.m_CalibBtnAddUSCalibrationPointPhantom, SIGNAL(clicked()), this, SLOT(OnAddCalibPointPhantomBased())); // Add calibration point (phantom-based)
-  connect(m_Controls.m_CalibBtnPerformPhantomCalibration, SIGNAL(clicked()), this, SLOT(OnPhantomBasedCalibration())); // Perform phantom-based calibration
-  connect(m_Controls.m_CalibBtnSavePhantomCalibration, SIGNAL(clicked()), this, SLOT(OnSaveCalibration())); // Perform phantom-based calibration
+  connect(m_Controls.m_CalibBtnLoadPhantomConfiguration,
+          SIGNAL(clicked()),
+          this,
+          SLOT(OnLoadPhantomConfiguration())); // Phantom configuration
+  connect(m_Controls.m_CalibBtnPerformPhantomCalibration,
+          SIGNAL(clicked()),
+          this,
+          SLOT(OnPhantomBasedCalibration())); // Perform phantom-based calibration
+  connect(m_Controls.m_CalibBtnSavePhantomCalibration,
+          SIGNAL(clicked()),
+          this,
+          SLOT(OnSaveCalibration())); // Perform phantom-based calibration
 
   // Evaluation
   connect(m_Controls.m_EvalBtnStep1, SIGNAL(clicked()), this, SLOT(OnAddEvalProjectedPoint())); // Needle Projection
@@ -771,22 +785,26 @@ void QmitkUltrasoundCalibration::OnCalibration()
   translationFloat[1] = m->GetElement(1, 3);
   translationFloat[2] = m->GetElement(2, 3);
 
-  mitk::DataNode::Pointer CalibPointsImage = mitk::DataNode::New();
-  CalibPointsImage->SetName("Calibration Points Image");
-  CalibPointsImage->SetData(m_CalibPointsImage);
-  this->GetDataStorage()->Add(CalibPointsImage);
+  // mitk::DataNode::Pointer CalibPointsImage = mitk::DataNode::New();
+  // CalibPointsImage->SetName("Calibration Points Image");
+  // CalibPointsImage->SetData(m_CalibPointsImage);
+  // this->GetDataStorage()->Add(CalibPointsImage);
 
-  mitk::DataNode::Pointer CalibPointsTracking = mitk::DataNode::New();
-  CalibPointsTracking->SetName("Calibration Points Tracking");
-  CalibPointsTracking->SetData(m_CalibPointsTool);
-  this->GetDataStorage()->Add(CalibPointsTracking);
+  // mitk::DataNode::Pointer CalibPointsTracking = mitk::DataNode::New();
+  // CalibPointsTracking->SetName("Calibration Points Tracking");
+  // CalibPointsTracking->SetData(m_CalibPointsTool);
+  // this->GetDataStorage()->Add(CalibPointsTracking);
 
   mitk::PointSet::Pointer ImagePointsTransformed = m_CalibPointsImage->Clone();
   this->ApplyTransformToPointSet(ImagePointsTransformed, transform);
-  mitk::DataNode::Pointer CalibPointsImageTransformed = mitk::DataNode::New();
-  CalibPointsImageTransformed->SetName("Calibration Points Image (Transformed)");
+  mitk::DataNode::Pointer CalibPointsImageTransformed = this->GetDataStorage()->GetNamedNode("Calibration Points Image (Transformed)");
+  if (CalibPointsImageTransformed.IsNull())
+  {
+    CalibPointsImageTransformed = mitk::DataNode::New();
+    CalibPointsImageTransformed->SetName("Calibration Points Image (Transformed)");
+    this->GetDataStorage()->Add(CalibPointsImageTransformed);
+  }
   CalibPointsImageTransformed->SetData(ImagePointsTransformed);
-  this->GetDataStorage()->Add(CalibPointsImageTransformed);
 
   // Set new calibration transform
   m_Transformation = mitk::AffineTransform3D::New();
@@ -835,6 +853,13 @@ void QmitkUltrasoundCalibration::OnCalibration()
 
 void QmitkUltrasoundCalibration::OnLoadPhantomConfiguration()
 {
+  // clear all data
+  ClearTemporaryMembers();
+  // reset UI
+  m_Controls.m_CalibBtnPerformPhantomCalibration->setEnabled(false);
+  m_Controls.m_CalibBtnSavePhantomCalibration->setEnabled(false);
+
+  // open phantom configuration
   std::string fileName = QFileDialog::getOpenFileName(nullptr, "Load phantom configuration", "", "*.mps").toStdString();
   m_PhantomConfigurationPointSet = dynamic_cast<mitk::PointSet *>(mitk::IOUtil::Load(fileName).at(0).GetPointer());
   // transform phantom fiducials to tracking space
@@ -846,34 +871,76 @@ void QmitkUltrasoundCalibration::OnLoadPhantomConfiguration()
     mitk::Point3D transformedPoint = currentSensorData->TransformPoint(phantomPoint);
     this->m_CalibPointsTool->InsertPoint(i, transformedPoint);
   }
+
+  // add point set interactor for image calibration points
+  mitk::PointSetDataInteractor::Pointer imageCalibrationPointSetInteractor = mitk::PointSetDataInteractor::New();
+  imageCalibrationPointSetInteractor->LoadStateMachine("PointSet.xml");
+  imageCalibrationPointSetInteractor->SetEventConfig("PointSetConfig.xml");
+  imageCalibrationPointSetInteractor->SetDataNode(m_WorldNode);
+  imageCalibrationPointSetInteractor->SetMaxPoints(m_PhantomConfigurationPointSet->GetSize());
+  // Call On AddCalibPointPhantomBased() when point was added
+  itk::SimpleMemberCommand<QmitkUltrasoundCalibration>::Pointer pointAddedCommand =
+    itk::SimpleMemberCommand<QmitkUltrasoundCalibration>::New();
+  pointAddedCommand->SetCallbackFunction(this, &QmitkUltrasoundCalibration::OnPhantomCalibPointsChanged);
+  m_CalibPointsImage->AddObserver(mitk::PointSetAddEvent(), pointAddedCommand);
+  m_CalibPointsImage->AddObserver(mitk::PointSetMoveEvent(), pointAddedCommand);
+  // Set size of image points points
+  m_WorldNode->ReplaceProperty("point 2D size", mitk::FloatProperty::New(10.0));
 }
 
-void QmitkUltrasoundCalibration::OnAddCalibPointPhantomBased()
+void QmitkUltrasoundCalibration::OnPhantomCalibPointsChanged()
 {
-  mitk::Point3D world = this->GetRenderWindowPart()->GetSelectedPosition();
-  if (m_CalibPointsCount < m_PhantomConfigurationPointSet->GetSize())
+  int currentIndex = m_CalibPointsImage->SearchSelectedPoint();
+  mitk::Point3D currentImagePoint = m_CalibPointsImage->GetPoint(currentIndex);
+  // create sphere to show current fiducial
+  std::stringstream pointName;
+  pointName << "Point";
+  pointName << currentIndex;
+  this->GetDataStorage()->Remove(this->GetDataStorage()->GetNamedNode(pointName.str()));
+  vtkSmartPointer<vtkSphereSource> vtkPointSphere = vtkSmartPointer<vtkSphereSource>::New();
+  vtkPointSphere->SetCenter(currentImagePoint[0], currentImagePoint[1], currentImagePoint[2]);
+  vtkPointSphere->SetRadius(10.0);
+  vtkPointSphere->SetPhiResolution(40);
+  vtkPointSphere->SetThetaResolution(40);
+  vtkPointSphere->Update();
+  mitk::Surface::Pointer pointSphere = mitk::Surface::New();
+  pointSphere->SetVtkPolyData(vtkPointSphere->GetOutput());
+  mitk::DataNode::Pointer sphereNode = mitk::DataNode::New();
+  sphereNode->SetName(pointName.str());
+  sphereNode->SetData(pointSphere);
+  sphereNode->SetColor(1.0, 1.0, 0.0);
+  this->GetDataStorage()->Add(sphereNode);
+  // create sphere to show radius in which next point has to be placed
+  this->GetDataStorage()->Remove(this->GetDataStorage()->GetNamedNode("NextPointIndicator"));
+  if (currentIndex < m_CalibPointsTool->GetSize() - 1)
   {
-    this->m_CalibPointsImage->InsertPoint(m_CalibPointsCount, world);
-    m_CalibPointsCount++;
+    float distanceToNextPoint =
+      m_CalibPointsTool->GetPoint(currentIndex).EuclideanDistanceTo(m_CalibPointsTool->GetPoint(currentIndex + 1));
+    vtkSmartPointer<vtkSphereSource> vtkHelperSphere = vtkSmartPointer<vtkSphereSource>::New();
+    vtkHelperSphere->SetCenter(currentImagePoint[0], currentImagePoint[1], currentImagePoint[2]);
+    vtkHelperSphere->SetRadius(distanceToNextPoint);
+    vtkHelperSphere->SetPhiResolution(40);
+    vtkHelperSphere->SetThetaResolution(40);
+    vtkHelperSphere->Update();
+    mitk::Surface::Pointer helperSphere = mitk::Surface::New();
+    helperSphere->SetVtkPolyData(vtkHelperSphere->GetOutput());
+    mitk::DataNode::Pointer helperSphereNode = mitk::DataNode::New();
+    helperSphereNode->SetName("NextPointIndicator");
+    helperSphereNode->SetData(helperSphere);
+    helperSphereNode->SetColor(0.0, 1.0, 0.0);
+    this->GetDataStorage()->Add(helperSphereNode);
   }
-  else
+  if (m_CalibPointsTool->GetSize() == m_CalibPointsImage->GetSize())
   {
-    QMessageBox::warning(nullptr, "Warning", "Already selected enough features in the image");
+    m_Controls.m_CalibBtnPerformPhantomCalibration->setEnabled(true);
   }
 }
 
 void QmitkUltrasoundCalibration::OnPhantomBasedCalibration()
 {
-  //// transform phantom fiducials to tracking space
-  //mitk::NavigationData::Pointer currentSensorData = this->m_Tracker->GetOutput(0)->Clone();
-  //
-  //for (int i = 0; i < m_PhantomConfigurationPointSet->GetSize(); i++)
-  //{
-  //  mitk::Point3D transformedPoint = currentSensorData->TransformPoint(m_PhantomConfigurationPointSet->GetPoint(i));
-  //  this->m_CalibPointsTool->InsertPoint(i, transformedPoint);
-  //}
   // perform calibration
   OnCalibration();
+  m_Controls.m_CalibBtnSavePhantomCalibration->setEnabled(true);
 }
 
 void QmitkUltrasoundCalibration::OnAddEvalTargetPoint()

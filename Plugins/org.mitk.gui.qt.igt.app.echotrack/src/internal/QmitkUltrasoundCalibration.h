@@ -192,7 +192,7 @@ protected slots:
   /*
    * \brief add a calibration point to be used for phantom based calibration
    */
-  void OnAddCalibPointPhantomBased();
+  void OnPhantomCalibPointsChanged();
   /*
    * \brief perform phantom based calibration
    */

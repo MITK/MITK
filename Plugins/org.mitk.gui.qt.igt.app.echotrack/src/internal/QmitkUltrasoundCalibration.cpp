@@ -369,11 +369,8 @@ void QmitkUltrasoundCalibration::OnAddCurrentTipPositionForVerification()
 void QmitkUltrasoundCalibration::OnStartCalibrationProcess()
 {
   // US Image Stream
-  m_Node = mitk::DataNode::New();
+  m_Node = this->GetDataStorage()->GetNamedNode("US Viewing Stream - Image 0")->Clone();
   m_Node->SetName("US Calibration Viewing Stream");
-  // create a dummy image (gray values 0..255) for correct initialization of level window, etc.
-  mitk::Image::Pointer dummyImage = mitk::ImageGenerator::GenerateRandomImage<float>(100, 100, 1, 1, 1, 1, 1, 255, 0);
-  m_Node->SetData(dummyImage);
   this->GetDataStorage()->Add(m_Node);
 
   // data node for calibration point set
@@ -791,7 +788,8 @@ void QmitkUltrasoundCalibration::OnCalibration()
   CalibPointsImageTransformed->SetData(ImagePointsTransformed);
   this->GetDataStorage()->Add(CalibPointsImageTransformed);
 
-  // Set new calibration transofrm
+  // Set new calibration transform
+  m_Transformation = mitk::AffineTransform3D::New();
   m_Transformation->SetTranslation(translationFloat);
   m_Transformation->SetMatrix(rotationFloat);
   MITK_INFO << "New Calibration transform: " << m_Transformation;
@@ -844,7 +842,8 @@ void QmitkUltrasoundCalibration::OnLoadPhantomConfiguration()
 
   for (int i = 0; i < m_PhantomConfigurationPointSet->GetSize(); i++)
   {
-    mitk::Point3D transformedPoint = currentSensorData->TransformPoint(m_PhantomConfigurationPointSet->GetPoint(i));
+    mitk::Point3D phantomPoint = m_PhantomConfigurationPointSet->GetPoint(i);
+    mitk::Point3D transformedPoint = currentSensorData->TransformPoint(phantomPoint);
     this->m_CalibPointsTool->InsertPoint(i, transformedPoint);
   }
 }

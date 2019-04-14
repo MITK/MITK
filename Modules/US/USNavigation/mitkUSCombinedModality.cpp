@@ -66,7 +66,6 @@ void mitk::USCombinedModality::GenerateData()
   // now update image data
   mitk::ImageReadAccessor inputReadAccessor(image, image->GetSliceData(0, 0, 0));
   output->SetSlice(inputReadAccessor.GetData());                         // copy image data
-  output->GetGeometry()->SetSpacing(image->GetGeometry()->GetSpacing()); // copy spacing because this might also change
 
   // and update calibration (= transformation of the image)
   std::string calibrationKey = this->GetIdentifierForCurrentCalibration();
@@ -81,6 +80,7 @@ void mitk::USCombinedModality::GenerateData()
       this->GetOutput()->GetGeometry()->SetIndexToWorldTransform(calibrationIterator->second);
     }
   }
+  output->GetGeometry()->SetSpacing(image->GetGeometry()->GetSpacing()); // copy spacing because this might also change
 }
 
 void mitk::USCombinedModality::OnFreeze(bool freeze)

@@ -50,7 +50,6 @@ namespace mitk
     AbstractFileWriter::SetRanking(10);
     AbstractFileReader::SetRanking(10);
     this->RegisterService();
-    //this->AddDICOMTagsToService();
   }
 
   IFileIO::ConfidenceLevel DICOMPMIO::GetWriterConfidenceLevel() const

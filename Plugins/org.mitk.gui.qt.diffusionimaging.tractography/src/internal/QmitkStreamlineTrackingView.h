@@ -114,6 +114,7 @@ protected slots:
   void StopTractography();
   void OnSliceChanged();
   void SaveParameters();
+  void LoadParameters();
 
 protected:
 
@@ -129,6 +130,7 @@ private:
   bool CheckAndStoreLastParams(QObject* obj);
   void StartStopTrackingGui(bool start);
   std::shared_ptr< mitk::StreamlineTractographyParameters > GetParametersFromGui();
+  void ParametersToGui(mitk::StreamlineTractographyParameters& params);
 
   std::vector< itk::Point<float> >        m_SeedPoints;
   mitk::DataNode::Pointer                 m_ParentNode;

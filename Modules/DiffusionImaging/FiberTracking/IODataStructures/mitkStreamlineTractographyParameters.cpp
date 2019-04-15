@@ -73,6 +73,7 @@ void mitk::StreamlineTractographyParameters::SaveParameters(std::string filename
   parameters.put("tractography.odf_cutoff", m_OdfCutoff);
   parameters.put("tractography.step_size_vox", m_StepSizeVox);
   parameters.put("tractography.min_tract_length_mm", m_MinTractLengthMm);
+  parameters.put("tractography.max_tract_length_mm", m_MaxTractLengthMm);
   parameters.put("tractography.angluar_threshold_deg", m_AngularThresholdDeg);
   parameters.put("tractography.loop_check_deg", m_LoopCheckDeg);
   parameters.put("tractography.f", m_F);
@@ -160,7 +161,7 @@ void mitk::StreamlineTractographyParameters::LoadParameters(std::string filename
   boost::property_tree::ptree parameterTree;
   boost::property_tree::json_parser::read_json( filename, parameterTree );
 
-  BOOST_FOREACH( boost::property_tree::ptree::value_type const& v1, parameterTree.get_child("fiberfox") )
+  BOOST_FOREACH( boost::property_tree::ptree::value_type const& v1, parameterTree )
   {
     if( v1.first == "seeding" )
     {
@@ -210,6 +211,7 @@ void mitk::StreamlineTractographyParameters::LoadParameters(std::string filename
       m_OdfCutoff = ReadVal<float>(v1,"odf_cutoff", m_OdfCutoff);
       SetStepSizeVox(ReadVal<float>(v1,"step_size_vox", m_StepSizeVox));
       m_MinTractLengthMm = ReadVal<float>(v1,"min_tract_length_mm", m_MinTractLengthMm);
+      m_MaxTractLengthMm = ReadVal<float>(v1,"min_tract_length_mm", m_MaxTractLengthMm);
       SetAngularThresholdDeg(ReadVal<float>(v1,"angluar_threshold_deg", m_AngularThresholdDeg));
       SetLoopCheckDeg(ReadVal<float>(v1,"loop_check_deg", m_LoopCheckDeg));
       m_F = ReadVal<float>(v1,"f", m_F);
@@ -304,9 +306,24 @@ void mitk::StreamlineTractographyParameters::AutoAdjust()
   m_SamplingDistanceMm = m_SamplingDistanceVox*m_MinVoxelSizeMm;
 }
 
+float mitk::StreamlineTractographyParameters::GetStepSizeVox() const
+{
+    return m_StepSizeVox;
+}
+
+float mitk::StreamlineTractographyParameters::GetAngularThresholdDeg() const
+{
+    return m_AngularThresholdDeg;
+}
+
+float mitk::StreamlineTractographyParameters::GetSamplingDistanceVox() const
+{
+    return m_SamplingDistanceVox;
+}
+
 float mitk::StreamlineTractographyParameters::GetMinVoxelSizeMm() const
 {
-  return m_MinVoxelSizeMm;
+    return m_MinVoxelSizeMm;
 }
 
 float mitk::StreamlineTractographyParameters::GetStepSizeMm() const

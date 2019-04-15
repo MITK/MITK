@@ -133,6 +133,7 @@ int main(int argc, char* argv[])
   parser.addArgument("no_mask_interpolation", "", mitkCommandLineParser::Bool, "Don't interpolate masks:", "don't interpolate mask image values");
   parser.addArgument("compress", "", mitkCommandLineParser::Float, "Compress:", "compress output fibers using the given error threshold (in mm)");
   parser.addArgument("fix_seed", "", mitkCommandLineParser::Bool, "Fix Random Seed:", "always use the same random numbers");
+  parser.addArgument("parameter_file", "", mitkCommandLineParser::String, "Parameter File:", "load parameters from json file (svae using MITK Diffusion GUI). the parameters loaded form this file are overwritten by the manually set parameters.", us::Any(), true, false, false, mitkCommandLineParser::Input);
   parser.endGroup();
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
@@ -144,6 +145,12 @@ int main(int argc, char* argv[])
   std::string type = us::any_cast<std::string>(parsedArgs["type"]);
 
   std::shared_ptr< mitk::StreamlineTractographyParameters > params = std::make_shared<mitk::StreamlineTractographyParameters>();
+
+  if (parsedArgs.count("parameter_file"))
+  {
+    auto parameter_file = us::any_cast<std::string>(parsedArgs["parameter_file"]);
+    params->LoadParameters(parameter_file);
+  }
 
   if (parsedArgs.count("probabilistic"))
     params->m_Mode = mitk::StreamlineTractographyParameters::MODE::PROBABILISTIC;

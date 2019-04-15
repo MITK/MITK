@@ -87,7 +87,7 @@ namespace mitk
     // - fa/gfa image
     float m_OdfCutoff = 0.00025;
     float m_MinTractLengthMm = 20;
-    float m_MaxTractLength = 400;
+    float m_MaxTractLengthMm = 400;
     float m_F = 1;
     float m_G = 0;
     bool m_FixRandomSeed = false;
@@ -124,15 +124,18 @@ namespace mitk
     bool m_OutputProbMap = false;
 
     float GetAngularThresholdDot() const;
+    float GetAngularThresholdDeg() const;
     void SetAngularThresholdDeg(float angular_threshold_deg);
 
     float GetLoopCheckDeg() const;
     void SetLoopCheckDeg(float loop_check_deg);
 
     float GetStepSizeMm() const;
+    float GetStepSizeVox() const;
     void SetStepSizeVox(float step_size_vox);
 
     float GetSamplingDistanceMm() const;
+    float GetSamplingDistanceVox() const;
     void SetSamplingDistanceVox(float sampling_distance_vox);
 
     void SetMinVoxelSizeMm(float min_voxel_size_mm);

@@ -243,7 +243,7 @@ void StreamlineTrackingFilter::BeforeTracking()
   std::cout << "StreamlineTracking - Angular threshold: " << m_Parameters->GetAngularThresholdDot() << "°" << std::endl;
   std::cout << "StreamlineTracking - Stepsize: " << m_Parameters->GetStepSizeMm() << "mm (" << m_Parameters->GetStepSizeMm()/m_Parameters->GetMinVoxelSizeMm() << "*vox)" << std::endl;
   std::cout << "StreamlineTracking - Seeds per voxel: " << m_Parameters->m_SeedsPerVoxel << std::endl;
-  std::cout << "StreamlineTracking - Max. tract length: " << m_Parameters->m_MaxTractLength << "mm" << std::endl;
+  std::cout << "StreamlineTracking - Max. tract length: " << m_Parameters->m_MaxTractLengthMm << "mm" << std::endl;
   std::cout << "StreamlineTracking - Min. tract length: " << m_Parameters->m_MinTractLengthMm << "mm" << std::endl;
   std::cout << "StreamlineTracking - Max. num. tracts: " << m_Parameters->m_MaxNumFibers << std::endl;
   std::cout << "StreamlineTracking - Loop check: " << m_Parameters->GetLoopCheckDeg() << "°" << std::endl;
@@ -493,7 +493,7 @@ float StreamlineTrackingFilter::FollowStreamline(itk::Point<float, 3> pos, vnl_v
     if (m_Parameters->GetLoopCheckDeg()>=0 && CheckCurvature(container, front)>m_Parameters->GetLoopCheckDeg())
       return tractLength;
 
-    if (tractLength>m_Parameters->m_MaxTractLength)
+    if (tractLength>m_Parameters->m_MaxTractLengthMm)
       return tractLength;
 
     if (m_DemoMode && !m_Parameters->m_OutputProbMap) // CHECK: warum sind die samplingpunkte der streamline in der visualisierung immer einen schritt voras?

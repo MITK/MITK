@@ -65,6 +65,7 @@ Specify various ROI and mask images to constrain the tractography process.
 - ODF Cutoff: Additional threshold on the ODF magnitude. This is useful in case of CSD fODF tractography. For fODFs a good default value is 0.1, for normalized dODFs, e.g. Q-ball ODFs, this threshold should be very low (0.00025) or 0.
 - Step Size: The algorithm proceeds along the streamline with a fixed stepsize. Default is 0.5*minSpacing.
 - Min. Tract Length: Shorter fibers are discarded.
+- Max. Tract Length: Longer fibers are discarded.
 - Angular threshold: Maximum angle between two successive steps (in degree). Default is 90° * step_size. For probabilistic tractography, candidate directions exceeding this threshold have probability 0, i.e. the respective ODF value is set to zero. The probabilities of the valid directions are normalized to sum to 1.
 - Loop Check: Stop streamline if the threshold on the angular stdev over the last 4 voxel lengths is exceeded. -1 = no loop check.
 - f and g values to balance between FACT [2] and TEND [3,4] tracking (only for tensor based tractography). For further information please refer to [2,3]

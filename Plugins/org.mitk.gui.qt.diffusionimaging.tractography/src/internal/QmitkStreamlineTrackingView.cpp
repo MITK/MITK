@@ -157,6 +157,7 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
 
     connect( m_TrackingTimer, SIGNAL(timeout()), this, SLOT(TimerUpdate()) );
     connect( m_Controls->m_SaveParametersButton, SIGNAL(clicked()), this, SLOT(SaveParameters()) );
+    connect( m_Controls->m_LoadParametersButton, SIGNAL(clicked()), this, SLOT(LoadParameters()) );
     connect( m_Controls->commandLinkButton_2, SIGNAL(clicked()), this, SLOT(StopTractography()) );
     connect( m_Controls->commandLinkButton, SIGNAL(clicked()), this, SLOT(DoFiberTracking()) );
     connect( m_Controls->m_InteractiveBox, SIGNAL(stateChanged(int)), this, SLOT(ToggleInteractive()) );
@@ -183,6 +184,7 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_SamplingDistanceBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_AngularThresholdBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_MinTractLengthBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_MaxTractLengthBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_fBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_gBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_NumSamplesBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
@@ -195,6 +197,9 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_FlipXBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_FlipYBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_FlipZBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_PriorFlipXBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_PriorFlipYBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_PriorFlipZBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_FrontalSamplesBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_StopVotesBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_LoopCheckBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
@@ -209,6 +214,7 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_SamplingDistanceBox->editingFinished();
     m_Controls->m_AngularThresholdBox->editingFinished();
     m_Controls->m_MinTractLengthBox->editingFinished();
+    m_Controls->m_MaxTractLengthBox->editingFinished();
     m_Controls->m_fBox->editingFinished();
     m_Controls->m_gBox->editingFinished();
     m_Controls->m_NumSamplesBox->editingFinished();
@@ -224,9 +230,107 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
   UpdateGui();
 }
 
+void QmitkStreamlineTrackingView::ParametersToGui(mitk::StreamlineTractographyParameters& params)
+{
+  m_Controls->m_SeedRadiusBox->setValue(params.m_InteractiveRadiusMm);
+
+  m_Controls->m_NumSeedsBox->setValue(params.m_NumInteractiveSeeds);
+  m_Controls->m_InteractiveBox->setChecked(params.m_EnableInteractive);
+  m_Controls->m_FiberErrorBox->setValue(params.m_Compression);
+  m_Controls->m_ResampleFibersBox->setChecked(params.m_CompressFibers);
+
+  m_Controls->m_SeedRadiusBox->setValue(params.m_InteractiveRadiusMm);
+  m_Controls->m_NumFibersBox->setValue(params.m_MaxNumFibers);
+  m_Controls->m_ScalarThresholdBox->setValue(params.m_Cutoff);
+  m_Controls->m_fBox->setValue(params.m_F);
+  m_Controls->m_gBox->setValue(params.m_G);
+
+  m_Controls->m_OdfCutoffBox->setValue(params.m_OdfCutoff);
+  m_Controls->m_SharpenOdfsBox->setChecked(params.m_SharpenOdfs);
+
+  m_Controls->m_PriorWeightBox->setValue(params.m_Weight);
+  m_Controls->m_PriorAsMaskBox->setChecked(params.m_RestrictToPrior);
+  m_Controls->m_NewDirectionsFromPriorBox->setChecked(params.m_NewDirectionsFromPrior);
+
+  m_Controls->m_PriorFlipXBox->setChecked(params.m_PriorFlipX);
+  m_Controls->m_PriorFlipYBox->setChecked(params.m_PriorFlipY);
+  m_Controls->m_PriorFlipZBox->setChecked(params.m_PriorFlipZ);
+
+  m_Controls->m_FlipXBox->setChecked(params.m_FlipX);
+  m_Controls->m_FlipYBox->setChecked(params.m_FlipY);
+  m_Controls->m_FlipZBox->setChecked(params.m_FlipZ);
+  m_Controls->m_InterpolationBox->setChecked(params.m_InterpolateTractographyData);
+
+
+  m_Controls->m_MaskInterpolationBox->setChecked(params.m_InterpolateRoiImages);
+  m_Controls->m_SeedsPerVoxelBox->setValue(params.m_SeedsPerVoxel);
+  m_Controls->m_StepSizeBox->setValue(params.GetStepSizeVox());
+  m_Controls->m_SamplingDistanceBox->setValue(params.GetSamplingDistanceVox());
+  m_Controls->m_StopVotesBox->setChecked(params.m_StopVotes);
+  m_Controls->m_FrontalSamplesBox->setChecked(params.m_OnlyForwardSamples);
+  m_Controls->m_TrialsPerSeedBox->setValue(params.m_TrialsPerSeed);
+
+  m_Controls->m_NumSamplesBox->setValue(params.m_NumSamples);
+  m_Controls->m_LoopCheckBox->setValue(params.GetLoopCheckDeg());
+  m_Controls->m_AngularThresholdBox->setValue(params.GetAngularThresholdDeg());
+  m_Controls->m_MinTractLengthBox->setValue(params.m_MinTractLengthMm);
+  m_Controls->m_MaxTractLengthBox->setValue(params.m_MaxTractLengthMm);
+  m_Controls->m_OutputProbMap->setChecked(params.m_OutputProbMap);
+  m_Controls->m_FixSeedBox->setChecked(params.m_FixRandomSeed);
+
+  switch (params.m_Mode)
+  {
+  case mitk::TrackingDataHandler::MODE::DETERMINISTIC:
+    m_Controls->m_ModeBox->setCurrentIndex(0);
+    break;
+  case mitk::TrackingDataHandler::MODE::PROBABILISTIC:
+    m_Controls->m_ModeBox->setCurrentIndex(1);
+    break;
+  }
+
+  switch (params.m_EpConstraints)
+  {
+  case itk::StreamlineTrackingFilter::EndpointConstraints::NONE:
+    m_Controls->m_EpConstraintsBox->setCurrentIndex(0);
+    break;
+  case itk::StreamlineTrackingFilter::EndpointConstraints::EPS_IN_TARGET:
+    m_Controls->m_EpConstraintsBox->setCurrentIndex(1);
+    break;
+  case itk::StreamlineTrackingFilter::EndpointConstraints::EPS_IN_TARGET_LABELDIFF:
+    m_Controls->m_EpConstraintsBox->setCurrentIndex(2);
+    break;
+  case itk::StreamlineTrackingFilter::EndpointConstraints::EPS_IN_SEED_AND_TARGET:
+    m_Controls->m_EpConstraintsBox->setCurrentIndex(3);
+    break;
+  case itk::StreamlineTrackingFilter::EndpointConstraints::MIN_ONE_EP_IN_TARGET:
+    m_Controls->m_EpConstraintsBox->setCurrentIndex(4);
+    break;
+  case itk::StreamlineTrackingFilter::EndpointConstraints::ONE_EP_IN_TARGET:
+    m_Controls->m_EpConstraintsBox->setCurrentIndex(5);
+    break;
+  case itk::StreamlineTrackingFilter::EndpointConstraints::NO_EP_IN_TARGET:
+    m_Controls->m_EpConstraintsBox->setCurrentIndex(6);
+    break;
+  }
+}
+
 std::shared_ptr<mitk::StreamlineTractographyParameters> QmitkStreamlineTrackingView::GetParametersFromGui()
 {
+
+  // NOT IN GUI
+//  unsigned int m_NumPreviousDirections = 1;
+//  bool m_AvoidStop = true;
+//  bool m_RandomSampling = false;
+//  float m_DeflectionMod = 1.0;
+//  bool m_ApplyDirectionMatrix = false;
+
   std::shared_ptr<mitk::StreamlineTractographyParameters> params = std::make_shared<mitk::StreamlineTractographyParameters>();
+  params->m_InteractiveRadiusMm = m_Controls->m_SeedRadiusBox->value();
+  params->m_NumInteractiveSeeds = m_Controls->m_NumSeedsBox->value();
+  params->m_EnableInteractive = m_Controls->m_InteractiveBox->isChecked();
+  params->m_Compression = m_Controls->m_FiberErrorBox->value();
+  params->m_CompressFibers = m_Controls->m_ResampleFibersBox->isChecked();
+
   params->m_InteractiveRadiusMm = m_Controls->m_SeedRadiusBox->value();
   params->m_MaxNumFibers = m_Controls->m_NumFibersBox->value();
   params->m_Cutoff = static_cast<float>(m_Controls->m_ScalarThresholdBox->value());
@@ -262,6 +366,7 @@ std::shared_ptr<mitk::StreamlineTractographyParameters> QmitkStreamlineTrackingV
   params->SetLoopCheckDeg(m_Controls->m_LoopCheckBox->value());
   params->SetAngularThresholdDeg(m_Controls->m_AngularThresholdBox->value());
   params->m_MinTractLengthMm = m_Controls->m_MinTractLengthBox->value();
+  params->m_MaxTractLengthMm = m_Controls->m_MaxTractLengthBox->value();
   params->m_OutputProbMap = m_Controls->m_OutputProbMap->isChecked();
   params->m_FixRandomSeed = m_Controls->m_FixSeedBox->isChecked();
 
@@ -309,14 +414,35 @@ void QmitkStreamlineTrackingView::SaveParameters()
 {
   QString filename = QFileDialog::getSaveFileName(
         0,
-        tr("Save Parameters"),
+        tr("Save Tractography Parameters"),
         m_ParameterFile,
         tr("Streamline Tractography Parameters (*.stp)") );
+
+  if(filename.isEmpty() || filename.isNull())
+    return;
 
   m_ParameterFile = filename;
 
   auto params = GetParametersFromGui();
   params->SaveParameters(m_ParameterFile.toStdString());
+}
+
+void QmitkStreamlineTrackingView::LoadParameters()
+{
+  QString filename = QFileDialog::getOpenFileName(
+        0,
+        tr("Load Tractography Parameters"),
+        m_ParameterFile,
+        tr("Streamline Tractography Parameters (*.stp)") );
+
+  if(filename.isEmpty() || filename.isNull())
+    return;
+
+  m_ParameterFile = filename;
+
+  mitk::StreamlineTractographyParameters params;
+  params.LoadParameters(m_ParameterFile.toStdString());
+  ParametersToGui(params);
 }
 
 void QmitkStreamlineTrackingView::StopTractography()

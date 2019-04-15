@@ -211,7 +211,7 @@ void mitk::StreamlineTractographyParameters::LoadParameters(std::string filename
       m_OdfCutoff = ReadVal<float>(v1,"odf_cutoff", m_OdfCutoff);
       SetStepSizeVox(ReadVal<float>(v1,"step_size_vox", m_StepSizeVox));
       m_MinTractLengthMm = ReadVal<float>(v1,"min_tract_length_mm", m_MinTractLengthMm);
-      m_MaxTractLengthMm = ReadVal<float>(v1,"min_tract_length_mm", m_MaxTractLengthMm);
+      m_MaxTractLengthMm = ReadVal<float>(v1,"max_tract_length_mm", m_MaxTractLengthMm);
       SetAngularThresholdDeg(ReadVal<float>(v1,"angluar_threshold_deg", m_AngularThresholdDeg));
       SetLoopCheckDeg(ReadVal<float>(v1,"loop_check_deg", m_LoopCheckDeg));
       m_F = ReadVal<float>(v1,"f", m_F);

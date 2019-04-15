@@ -20,10 +20,7 @@ namespace mitk
 {
 
 TrackingHandlerTensor::TrackingHandlerTensor()
-  : m_FaThreshold(0.1)
-  , m_F(1.0)
-  , m_G(0.0)
-  , m_InterpolateTensors(true)
+  : m_InterpolateTensors(true)
   , m_NumberOfInputs(0)
 {
   m_FaInterpolator = itk::LinearInterpolateImageFunction< itk::Image< float, 3 >, float >::New();
@@ -108,22 +105,30 @@ void TrackingHandlerTensor::InitForTracking()
             m_FaImage->SetPixel(index, m_FaImage->GetPixel(index)/m_NumberOfInputs);
         }
 
+    auto double_dir = m_TensorImages.at(0)->GetDirection().GetVnlMatrix();
+    for (int r=0; r<3; r++)
+      for (int c=0; c<3; c++)
+      {
+        m_FloatImageRotation[r][c] = double_dir[r][c];
+      }
+
+    this->CalculateMinVoxelSize();
     m_NeedsDataInit = false;
   }
 
 
-  if (m_F+m_G>1.0)
+  if (m_Parameters->m_F+m_Parameters->m_G>1.0)
   {
-    float temp = m_F+m_G;
-    m_F /= temp;
-    m_G /= temp;
+    float temp = m_Parameters->m_F+m_Parameters->m_G;
+    m_Parameters->m_F /= temp;
+    m_Parameters->m_G /= temp;
   }
 
   m_FaInterpolator->SetInputImage(m_FaImage);
 
-  std::cout << "TrackingHandlerTensor - FA threshold: " << m_FaThreshold << std::endl;
-  std::cout << "TrackingHandlerTensor - f: " << m_F << std::endl;
-  std::cout << "TrackingHandlerTensor - g: " << m_G << std::endl;
+  std::cout << "TrackingHandlerTensor - FA threshold: " << m_Parameters->m_Cutoff << std::endl;
+  std::cout << "TrackingHandlerTensor - f: " << m_Parameters->m_F << std::endl;
+  std::cout << "TrackingHandlerTensor - g: " << m_Parameters->m_G << std::endl;
 }
 
 vnl_vector_fixed<float,3> TrackingHandlerTensor::GetMatchingDirection(itk::Index<3> idx, vnl_vector_fixed<float,3>& oldDir, int& image_num)
@@ -189,7 +194,7 @@ vnl_vector_fixed<float,3> TrackingHandlerTensor::GetDirection(itk::Point<float, 
     return dir;
 
   int image_num = -1;
-  if (!m_Interpolate)
+  if (!m_Parameters->m_InterpolateTractographyData)
   {
     dir = GetMatchingDirection(idx, oldDir, image_num);
     if (image_num>=0)
@@ -304,24 +309,24 @@ vnl_vector_fixed<float,3> TrackingHandlerTensor::ProposeDirection(const itk::Poi
     itk::Index<3> index;
     m_TensorImages.at(0)->TransformPhysicalPointToIndex(pos, index);
 
-    float fa = mitk::imv::GetImageValue<float>(pos, m_Interpolate, m_FaInterpolator);
-    if (fa<m_FaThreshold)
+    float fa = mitk::imv::GetImageValue<float>(pos, m_Parameters->m_InterpolateTractographyData, m_FaInterpolator);
+    if (fa<m_Parameters->m_Cutoff)
       return output_direction;
 
     vnl_vector_fixed<float,3> oldDir; oldDir.fill(0.0);
     if (!olddirs.empty())
       oldDir = olddirs.back();
 
-    if (m_FlipX)
+    if (m_Parameters->m_FlipX)
       oldDir[0] *= -1;
-    if (m_FlipY)
+    if (m_Parameters->m_FlipY)
       oldDir[1] *= -1;
-    if (m_FlipZ)
+    if (m_Parameters->m_FlipZ)
       oldDir[2] *= -1;
 
     float old_mag = oldDir.magnitude();
 
-    if (!m_Interpolate && oldIndex==index)
+    if (!m_Parameters->m_InterpolateTractographyData && oldIndex==index)
       return oldDir;
 
     output_direction = GetDirection(pos, oldDir, tensor);
@@ -331,19 +336,19 @@ vnl_vector_fixed<float,3> TrackingHandlerTensor::ProposeDirection(const itk::Poi
     {
       output_direction.normalize();
 
-      if (old_mag>0.5 && m_G>mitk::eps)  // TEND tracking
+      if (old_mag>0.5 && m_Parameters->m_G>mitk::eps)  // TEND tracking
       {
 
-        output_direction[0] = m_F*output_direction[0] + (1-m_F)*( (1-m_G)*oldDir[0] + m_G*(tensor[0]*oldDir[0] + tensor[1]*oldDir[1] + tensor[2]*oldDir[2]));
-        output_direction[1] = m_F*output_direction[1] + (1-m_F)*( (1-m_G)*oldDir[1] + m_G*(tensor[1]*oldDir[0] + tensor[3]*oldDir[1] + tensor[4]*oldDir[2]));
-        output_direction[2] = m_F*output_direction[2] + (1-m_F)*( (1-m_G)*oldDir[2] + m_G*(tensor[2]*oldDir[0] + tensor[4]*oldDir[1] + tensor[5]*oldDir[2]));
+        output_direction[0] = m_Parameters->m_F*output_direction[0] + (1-m_Parameters->m_F)*( (1-m_Parameters->m_G)*oldDir[0] + m_Parameters->m_G*(tensor[0]*oldDir[0] + tensor[1]*oldDir[1] + tensor[2]*oldDir[2]));
+        output_direction[1] = m_Parameters->m_F*output_direction[1] + (1-m_Parameters->m_F)*( (1-m_Parameters->m_G)*oldDir[1] + m_Parameters->m_G*(tensor[1]*oldDir[0] + tensor[3]*oldDir[1] + tensor[4]*oldDir[2]));
+        output_direction[2] = m_Parameters->m_F*output_direction[2] + (1-m_Parameters->m_F)*( (1-m_Parameters->m_G)*oldDir[2] + m_Parameters->m_G*(tensor[2]*oldDir[0] + tensor[4]*oldDir[1] + tensor[5]*oldDir[2]));
         output_direction.normalize();
       }
 
       float a = 1;
       if (old_mag>0.5)
         a = dot_product(output_direction, oldDir);
-      if (a>=m_AngularThreshold)
+      if (a>=m_Parameters->GetAngularThresholdDot())
         output_direction *= mag;
       else
         output_direction.fill(0);
@@ -357,12 +362,14 @@ vnl_vector_fixed<float,3> TrackingHandlerTensor::ProposeDirection(const itk::Poi
 
   }
 
-  if (m_FlipX)
+  if (m_Parameters->m_FlipX)
     output_direction[0] *= -1;
-  if (m_FlipY)
+  if (m_Parameters->m_FlipY)
     output_direction[1] *= -1;
-  if (m_FlipZ)
+  if (m_Parameters->m_FlipZ)
     output_direction[2] *= -1;
+  if (m_Parameters->m_ApplyDirectionMatrix)
+    output_direction = m_FloatImageRotation*output_direction;
 
   return output_direction;
 }

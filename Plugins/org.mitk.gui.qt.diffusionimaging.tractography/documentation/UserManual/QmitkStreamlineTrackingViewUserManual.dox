@@ -58,7 +58,7 @@ Specify various ROI and mask images to constrain the tractography process.
 
 \section StrTrackUserManualParameters Tractography Parameters
 
-- Mode: Toggle between deterministic and probabilistic tractography. Peak tracking only supports deterministic mode. The probabilistic method simply samples the output direction from the discrete probability ditribution provided by the discretized ODF.
+- Mode: Toggle between deterministic and probabilistic tractography (also affects tracking prior proposals). The probabilistic method simply samples the output direction from the discrete probability ditribution provided by the discretized ODF. Probabilistic peak tracking does not derive probabilities from the data but simply adds a normally distributed jitter to the proposed direction.
 - Sharpen ODFs: If you are using dODF images as input, it is advisable to sharpen the ODFs (min-max normalize and raise to the power of 4). This is not necessary (and not recommended) for CSD fODFs, since they are naturally much sharper.
 - Cutoff: If the streamline reaches a position with an FA value or peak magnitude lower than the speciefied threshold, tracking is terminated. Typical values are 0.2 for FA/GFA and 0.1 for CSD peaks.
 - FA/GFA image used to determine streamline termination. If no image is specified, the FA/GFA image is automatically calculated from the input image. If multiple tensor images are used as input, it is recommended to provide such an image since the FA maps calculated from the individual input tensor images can not provide a suitable termination criterion.
@@ -74,6 +74,7 @@ It is possible to use a peak image as prior for tractography on arbitrary other 
 - Weight: Weighting factor between prior and input data directions. A weight of zero means that no prior iformation is used. With a weight of one, tractography is performed directly on the prior directions itself.
 - Restrict to Prior: The prior image is used as tractography mask. Voxels without prior peaks are excluded.
 - New Directions from Prior: By default, the prior is used even if there is no valid direction found in the data. If unchecked, the prior cannot create directions where there are none in the data.
+- Flip directions: Internally flips prior directions. This might be necessary depending on the input data.
 
 \section StrTrackUserManualDataHandling Data Handling
 - Flip directions: Internally flips progression directions. This might be necessary depending on the input data.

@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qt
 #include <QMessageBox>
+#include <QFileDialog>
 
 // MITK
 #include <mitkLookupTable.h>
@@ -155,6 +156,7 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_ExclusionImageSelectionWidget->SetSelectionIsOptional(true);
 
     connect( m_TrackingTimer, SIGNAL(timeout()), this, SLOT(TimerUpdate()) );
+    connect( m_Controls->m_SaveParametersButton, SIGNAL(clicked()), this, SLOT(SaveParameters()) );
     connect( m_Controls->commandLinkButton_2, SIGNAL(clicked()), this, SLOT(StopTractography()) );
     connect( m_Controls->commandLinkButton, SIGNAL(clicked()), this, SLOT(DoFiberTracking()) );
     connect( m_Controls->m_InteractiveBox, SIGNAL(stateChanged(int)), this, SLOT(ToggleInteractive()) );
@@ -217,8 +219,104 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
 
     StartStopTrackingGui(false);
   }
+  m_ParameterFile = QDir::currentPath()+"/param.stp";
 
   UpdateGui();
+}
+
+std::shared_ptr<mitk::StreamlineTractographyParameters> QmitkStreamlineTrackingView::GetParametersFromGui()
+{
+  std::shared_ptr<mitk::StreamlineTractographyParameters> params = std::make_shared<mitk::StreamlineTractographyParameters>();
+  params->m_InteractiveRadiusMm = m_Controls->m_SeedRadiusBox->value();
+  params->m_MaxNumFibers = m_Controls->m_NumFibersBox->value();
+  params->m_Cutoff = static_cast<float>(m_Controls->m_ScalarThresholdBox->value());
+  params->m_F = static_cast<float>(m_Controls->m_fBox->value());
+  params->m_G = static_cast<float>(m_Controls->m_gBox->value());
+
+  params->m_OdfCutoff = static_cast<float>(m_Controls->m_OdfCutoffBox->value());
+  params->m_SharpenOdfs = m_Controls->m_SharpenOdfsBox->isChecked();
+
+  params->m_Weight = static_cast<float>(m_Controls->m_PriorWeightBox->value());
+  params->m_RestrictToPrior = m_Controls->m_PriorAsMaskBox->isChecked();
+  params->m_NewDirectionsFromPrior = m_Controls->m_NewDirectionsFromPriorBox->isChecked();
+
+  params->m_PriorFlipX = m_Controls->m_PriorFlipXBox->isChecked();
+  params->m_PriorFlipY = m_Controls->m_PriorFlipYBox->isChecked();
+  params->m_PriorFlipZ = m_Controls->m_PriorFlipZBox->isChecked();
+
+  params->m_FlipX = m_Controls->m_FlipXBox->isChecked();
+  params->m_FlipY = m_Controls->m_FlipYBox->isChecked();
+  params->m_FlipZ = m_Controls->m_FlipZBox->isChecked();
+  params->m_InterpolateTractographyData = m_Controls->m_InterpolationBox->isChecked();
+
+
+  params->m_InterpolateRoiImages = m_Controls->m_MaskInterpolationBox->isChecked();
+  params->m_SeedsPerVoxel = m_Controls->m_SeedsPerVoxelBox->value();
+  params->SetStepSizeVox(m_Controls->m_StepSizeBox->value());
+  params->SetSamplingDistanceVox(m_Controls->m_SamplingDistanceBox->value());
+  params->m_StopVotes = m_Controls->m_StopVotesBox->isChecked();
+  params->m_OnlyForwardSamples = m_Controls->m_FrontalSamplesBox->isChecked();
+  params->m_TrialsPerSeed = m_Controls->m_TrialsPerSeedBox->value();
+
+  params->m_NumSamples = m_Controls->m_NumSamplesBox->value();
+  params->SetLoopCheckDeg(m_Controls->m_LoopCheckBox->value());
+  params->SetAngularThresholdDeg(m_Controls->m_AngularThresholdBox->value());
+  params->m_MinTractLengthMm = m_Controls->m_MinTractLengthBox->value();
+  params->m_OutputProbMap = m_Controls->m_OutputProbMap->isChecked();
+  params->m_FixRandomSeed = m_Controls->m_FixSeedBox->isChecked();
+
+  switch (m_Controls->m_ModeBox->currentIndex())
+  {
+  case 0:
+    params->m_Mode = mitk::TrackingDataHandler::MODE::DETERMINISTIC;
+    break;
+  case 1:
+    params->m_Mode = mitk::TrackingDataHandler::MODE::PROBABILISTIC;
+    break;
+  default:
+    params->m_Mode = mitk::TrackingDataHandler::MODE::DETERMINISTIC;
+  }
+
+  switch (m_Controls->m_EpConstraintsBox->currentIndex())
+  {
+  case 0:
+    params->m_EpConstraints = itk::StreamlineTrackingFilter::EndpointConstraints::NONE;
+    break;
+  case 1:
+    params->m_EpConstraints = itk::StreamlineTrackingFilter::EndpointConstraints::EPS_IN_TARGET;
+    break;
+  case 2:
+    params->m_EpConstraints = itk::StreamlineTrackingFilter::EndpointConstraints::EPS_IN_TARGET_LABELDIFF;
+    break;
+  case 3:
+    params->m_EpConstraints = itk::StreamlineTrackingFilter::EndpointConstraints::EPS_IN_SEED_AND_TARGET;
+    break;
+  case 4:
+    params->m_EpConstraints = itk::StreamlineTrackingFilter::EndpointConstraints::MIN_ONE_EP_IN_TARGET;
+    break;
+  case 5:
+    params->m_EpConstraints = itk::StreamlineTrackingFilter::EndpointConstraints::ONE_EP_IN_TARGET;
+    break;
+  case 6:
+    params->m_EpConstraints = itk::StreamlineTrackingFilter::EndpointConstraints::NO_EP_IN_TARGET;
+    break;
+  }
+
+  return params;
+}
+
+void QmitkStreamlineTrackingView::SaveParameters()
+{
+  QString filename = QFileDialog::getSaveFileName(
+        0,
+        tr("Save Parameters"),
+        m_ParameterFile,
+        tr("Streamline Tractography Parameters (*.stp)") );
+
+  m_ParameterFile = filename;
+
+  auto params = GetParametersFromGui();
+  params->SaveParameters(m_ParameterFile.toStdString());
 }
 
 void QmitkStreamlineTrackingView::StopTractography()
@@ -245,8 +343,9 @@ void QmitkStreamlineTrackingView::BeforeThread()
 
 void QmitkStreamlineTrackingView::AfterThread()
 {
+  auto params = m_Tracker->GetParameters();
   m_TrackingTimer->stop();
-  if (!m_Tracker->GetUseOutputProbabilityMap())
+  if (!params->m_OutputProbMap)
   {
     vtkSmartPointer<vtkPolyData> fiberBundle = m_Tracker->GetFiberPolyData();
 
@@ -286,7 +385,7 @@ void QmitkStreamlineTrackingView::AfterThread()
         GetDataStorage()->Add(m_InteractiveNode);
       }
       m_InteractiveNode->SetData(fib);
-      m_InteractiveNode->SetFloatProperty("Fiber2DSliceThickness", m_Tracker->GetMinVoxelSize()/2);
+      m_InteractiveNode->SetFloatProperty("Fiber2DSliceThickness", params->GetMinVoxelSizeMm()/2);
 
       if (auto renderWindowPart = this->GetRenderWindowPart())
           renderWindowPart->RequestUpdate();
@@ -299,7 +398,7 @@ void QmitkStreamlineTrackingView::AfterThread()
       name += m_ParentNode->GetName().c_str();
       name += "_Streamline";
       node->SetName(name.toStdString());
-      node->SetFloatProperty("Fiber2DSliceThickness", m_Tracker->GetMinVoxelSize()/2);
+      node->SetFloatProperty("Fiber2DSliceThickness", params->GetMinVoxelSizeMm()/2);
       GetDataStorage()->Add(node, m_ParentNode);
     }
   }
@@ -327,7 +426,7 @@ void QmitkStreamlineTrackingView::AfterThread()
       lut_prop->SetLookupTable(lut);
       m_InteractiveNode->SetProperty("LookupTable", lut_prop);
       m_InteractiveNode->SetProperty("opacity", mitk::FloatProperty::New(0.5));
-      m_InteractiveNode->SetFloatProperty("Fiber2DSliceThickness", m_Tracker->GetMinVoxelSize()/2);
+      m_InteractiveNode->SetFloatProperty("Fiber2DSliceThickness", params->GetMinVoxelSizeMm()/2);
 
       if (auto renderWindowPart = this->GetRenderWindowPart())
           renderWindowPart->RequestUpdate();
@@ -693,6 +792,8 @@ void QmitkStreamlineTrackingView::StartStopTrackingGui(bool start)
 
 void QmitkStreamlineTrackingView::DoFiberTracking()
 {
+  auto params = GetParametersFromGui();
+
   if (m_InputImageNodes.empty())
   {
     QMessageBox::information(nullptr, "Information", "Please select an input image in the datamaneger (tensor, ODF, peak or dMRI image)!");
@@ -705,6 +806,9 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
   StartStopTrackingGui(true);
 
   m_Tracker = TrackerType::New();
+
+  if (params->m_EpConstraints == itk::StreamlineTrackingFilter::EndpointConstraints::NONE)
+      m_Tracker->SetTargetRegions(nullptr);
 
   if( dynamic_cast<mitk::TensorImage*>(m_InputImageNodes.at(0)->GetData()) )
   {
@@ -735,9 +839,6 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
         }
       }
 
-      dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetGfaThreshold(static_cast<float>(m_Controls->m_ScalarThresholdBox->value()));
-      dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetOdfThreshold(0);
-      dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetSharpenOdfs(true);
       dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetIsOdfFromTensor(true);
     }
     else
@@ -756,10 +857,6 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
           dynamic_cast<mitk::TrackingHandlerTensor*>(m_TrackingHandler)->SetFaImage(itkImg);
         }
       }
-
-      dynamic_cast<mitk::TrackingHandlerTensor*>(m_TrackingHandler)->SetFaThreshold(static_cast<float>(m_Controls->m_ScalarThresholdBox->value()));
-      dynamic_cast<mitk::TrackingHandlerTensor*>(m_TrackingHandler)->SetF(static_cast<float>(m_Controls->m_fBox->value()));
-      dynamic_cast<mitk::TrackingHandlerTensor*>(m_TrackingHandler)->SetG(static_cast<float>(m_Controls->m_gBox->value()));
     }
   }
   else if ( dynamic_cast<mitk::OdfImage*>(m_InputImageNodes.at(0)->GetData()) ||
@@ -781,10 +878,6 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
         dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetGfaImage(itkImg);
       }
     }
-
-    dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetGfaThreshold(static_cast<float>(m_Controls->m_ScalarThresholdBox->value()));
-    dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetOdfThreshold(static_cast<float>(m_Controls->m_OdfCutoffBox->value()));
-    dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetSharpenOdfs(m_Controls->m_SharpenOdfsBox->isChecked());
   }
   else if ( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image*>(m_InputImageNodes.at(0)->GetData())) )
   {
@@ -812,22 +905,20 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
       bool forest_valid = false;
       if (forest->GetNumFeatures()>=100)
       {
-        unsigned int num_previous_directions = static_cast<unsigned int>((forest->GetNumFeatures() - (100 + additionalFeatureImages.at(0).size()))/3);
+        params->m_NumPreviousDirections = static_cast<unsigned int>((forest->GetNumFeatures() - (100 + additionalFeatureImages.at(0).size()))/3);
         m_TrackingHandler = new mitk::TrackingHandlerRandomForest<6, 100>();
         dynamic_cast<mitk::TrackingHandlerRandomForest<6, 100>*>(m_TrackingHandler)->AddDwi(dwi);
         dynamic_cast<mitk::TrackingHandlerRandomForest<6, 100>*>(m_TrackingHandler)->SetAdditionalFeatureImages(additionalFeatureImages);
         dynamic_cast<mitk::TrackingHandlerRandomForest<6, 100>*>(m_TrackingHandler)->SetForest(forest);
-        dynamic_cast<mitk::TrackingHandlerRandomForest<6, 100>*>(m_TrackingHandler)->SetNumPreviousDirections(num_previous_directions);
         forest_valid = dynamic_cast<mitk::TrackingHandlerRandomForest<6, 100>*>(m_TrackingHandler)->IsForestValid();
       }
       else
       {
-        unsigned int num_previous_directions = static_cast<unsigned int>((forest->GetNumFeatures() - (28 + additionalFeatureImages.at(0).size()))/3);
+        params->m_NumPreviousDirections = static_cast<unsigned int>((forest->GetNumFeatures() - (28 + additionalFeatureImages.at(0).size()))/3);
         m_TrackingHandler = new mitk::TrackingHandlerRandomForest<6, 28>();
         dynamic_cast<mitk::TrackingHandlerRandomForest<6, 28>*>(m_TrackingHandler)->AddDwi(dwi);
         dynamic_cast<mitk::TrackingHandlerRandomForest<6, 28>*>(m_TrackingHandler)->SetAdditionalFeatureImages(additionalFeatureImages);
         dynamic_cast<mitk::TrackingHandlerRandomForest<6, 28>*>(m_TrackingHandler)->SetForest(forest);
-        dynamic_cast<mitk::TrackingHandlerRandomForest<6, 28>*>(m_TrackingHandler)->SetNumPreviousDirections(num_previous_directions);
         forest_valid = dynamic_cast<mitk::TrackingHandlerRandomForest<6, 28>*>(m_TrackingHandler)->IsForestValid();
       }
 
@@ -841,29 +932,17 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
   }
   else
   {
+    if (m_Controls->m_ModeBox->currentIndex()==1)
+    {
+      QMessageBox::information(nullptr, "Information", "Probabilstic tractography is not implemented for peak images.");
+      StartStopTrackingGui(false);
+      return;
+    }
     if (m_TrackingHandler==nullptr)
     {
       m_TrackingHandler = new mitk::TrackingHandlerPeaks();
       dynamic_cast<mitk::TrackingHandlerPeaks*>(m_TrackingHandler)->SetPeakImage(mitk::convert::GetItkPeakFromPeakImage(dynamic_cast<mitk::Image*>(m_InputImageNodes.at(0)->GetData())));
     }
-
-    dynamic_cast<mitk::TrackingHandlerPeaks*>(m_TrackingHandler)->SetPeakThreshold(static_cast<float>(m_Controls->m_ScalarThresholdBox->value()));
-  }
-
-  m_TrackingHandler->SetFlipX(m_Controls->m_FlipXBox->isChecked());
-  m_TrackingHandler->SetFlipY(m_Controls->m_FlipYBox->isChecked());
-  m_TrackingHandler->SetFlipZ(m_Controls->m_FlipZBox->isChecked());
-  m_TrackingHandler->SetInterpolate(m_Controls->m_InterpolationBox->isChecked());
-  switch (m_Controls->m_ModeBox->currentIndex())
-  {
-  case 0:
-    m_TrackingHandler->SetMode(mitk::TrackingDataHandler::MODE::DETERMINISTIC);
-    break;
-  case 1:
-    m_TrackingHandler->SetMode(mitk::TrackingDataHandler::MODE::PROBABILISTIC);
-    break;
-  default:
-    m_TrackingHandler->SetMode(mitk::TrackingDataHandler::MODE::DETERMINISTIC);
   }
 
   if (m_Controls->m_InteractiveBox->isChecked())
@@ -900,6 +979,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
 
   if (m_Controls->m_PriorImageSelectionWidget->GetSelectedNode().IsNotNull())
   {
+    auto prior_params = GetParametersFromGui();
     if (m_LastPrior!=m_Controls->m_PriorImageSelectionWidget->GetSelectedNode() || m_TrackingPriorHandler==nullptr)
     {
       typedef mitk::ImageToItk< mitk::TrackingHandlerPeaks::PeakImgType > CasterType;
@@ -910,30 +990,15 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
       mitk::TrackingHandlerPeaks::PeakImgType::Pointer itkImg = caster->GetOutput();
       m_TrackingPriorHandler = new mitk::TrackingHandlerPeaks();
       dynamic_cast<mitk::TrackingHandlerPeaks*>(m_TrackingPriorHandler)->SetPeakImage(itkImg);
-      dynamic_cast<mitk::TrackingHandlerPeaks*>(m_TrackingPriorHandler)->SetPeakThreshold(0.0);
       m_LastPrior = m_Controls->m_PriorImageSelectionWidget->GetSelectedNode();
     }
 
-    m_TrackingPriorHandler->SetInterpolate(m_Controls->m_InterpolationBox->isChecked());
-    switch (m_Controls->m_ModeBox->currentIndex())
-    {
-    case 0:
-      m_TrackingPriorHandler->SetMode(mitk::TrackingDataHandler::MODE::DETERMINISTIC);
-      break;
-    case 1:
-      m_TrackingPriorHandler->SetMode(mitk::TrackingDataHandler::MODE::PROBABILISTIC);
-      break;
-    default:
-      m_TrackingPriorHandler->SetMode(mitk::TrackingDataHandler::MODE::DETERMINISTIC);
-    }
-    m_TrackingPriorHandler->SetFlipX(m_Controls->m_PriorFlipXBox->isChecked());
-    m_TrackingPriorHandler->SetFlipY(m_Controls->m_PriorFlipYBox->isChecked());
-    m_TrackingPriorHandler->SetFlipZ(m_Controls->m_PriorFlipZBox->isChecked());
+    prior_params->m_FlipX = m_Controls->m_PriorFlipXBox->isChecked();
+    prior_params->m_FlipY = m_Controls->m_PriorFlipYBox->isChecked();
+    prior_params->m_FlipZ = m_Controls->m_PriorFlipZBox->isChecked();
+    m_TrackingPriorHandler->SetParameters(prior_params);
 
     m_Tracker->SetTrackingPriorHandler(m_TrackingPriorHandler);
-    m_Tracker->SetTrackingPriorWeight(m_Controls->m_PriorWeightBox->value());
-    m_Tracker->SetTrackingPriorAsMask(m_Controls->m_PriorAsMaskBox->isChecked());
-    m_Tracker->SetIntroduceDirectionsFromPrior(m_Controls->m_NewDirectionsFromPriorBox->isChecked());
   }
   else if (m_Controls->m_PriorImageSelectionWidget->GetSelectedNode().IsNull())
     m_Tracker->SetTrackingPriorHandler(nullptr);
@@ -945,40 +1010,13 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     m_Tracker->SetExclusionRegions(mask);
   }
 
-  // Endpoint constraints
-  switch (m_Controls->m_EpConstraintsBox->currentIndex())
-  {
-  case 0:
-    m_Tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::NONE);
-    m_Tracker->SetTargetRegions(nullptr);
-    break;
-  case 1:
-    m_Tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::EPS_IN_TARGET);
-    break;
-  case 2:
-    m_Tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::EPS_IN_TARGET_LABELDIFF);
-    break;
-  case 3:
-    m_Tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::EPS_IN_SEED_AND_TARGET);
-    break;
-  case 4:
-    m_Tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::MIN_ONE_EP_IN_TARGET);
-    break;
-  case 5:
-    m_Tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::ONE_EP_IN_TARGET);
-    break;
-  case 6:
-    m_Tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::NO_EP_IN_TARGET);
-    break;
-  }
-
-  if (m_Tracker->GetEndpointConstraint()!=itk::StreamlineTrackingFilter::EndpointConstraints::NONE && m_Controls->m_TargetImageSelectionWidget->GetSelectedNode().IsNull())
+  if (params->m_EpConstraints!=itk::StreamlineTrackingFilter::EndpointConstraints::NONE && m_Controls->m_TargetImageSelectionWidget->GetSelectedNode().IsNull())
   {
     QMessageBox::information(nullptr, "Error", "Endpoint constraints are used but no target image is set!");
     StartStopTrackingGui(false);
     return;
   }
-  else if (m_Tracker->GetEndpointConstraint()==itk::StreamlineTrackingFilter::EndpointConstraints::EPS_IN_SEED_AND_TARGET
+  else if (params->m_EpConstraints==itk::StreamlineTrackingFilter::EndpointConstraints::EPS_IN_SEED_AND_TARGET
            && (m_Controls->m_SeedImageSelectionWidget->GetSelectedNode().IsNull()|| m_Controls->m_TargetImageSelectionWidget->GetSelectedNode().IsNull()) )
   {
     QMessageBox::information(nullptr, "Error", "Endpoint constraint EPS_IN_SEED_AND_TARGET is used but no target or no seed image is set!");
@@ -986,22 +1024,9 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     return;
   }
 
-  m_Tracker->SetInterpolateMasks(m_Controls->m_MaskInterpolationBox->isChecked());
-  m_Tracker->SetVerbose(!m_Controls->m_InteractiveBox->isChecked());
-  m_Tracker->SetSeedsPerVoxel(m_Controls->m_SeedsPerVoxelBox->value());
-  m_Tracker->SetStepSize(m_Controls->m_StepSizeBox->value());
-  m_Tracker->SetSamplingDistance(m_Controls->m_SamplingDistanceBox->value());
-  m_Tracker->SetUseStopVotes(m_Controls->m_StopVotesBox->isChecked());
-  m_Tracker->SetOnlyForwardSamples(m_Controls->m_FrontalSamplesBox->isChecked());
-  m_Tracker->SetTrialsPerSeed(m_Controls->m_TrialsPerSeedBox->value());
-  m_Tracker->SetMaxNumTracts(m_Controls->m_NumFibersBox->value());
-  m_Tracker->SetNumberOfSamples(m_Controls->m_NumSamplesBox->value());
+  m_Tracker->SetParameters(params);
   m_Tracker->SetTrackingHandler(m_TrackingHandler);
-  m_Tracker->SetLoopCheck(m_Controls->m_LoopCheckBox->value());
-  m_Tracker->SetAngularThreshold(m_Controls->m_AngularThresholdBox->value());
-  m_Tracker->SetMinTractLength(m_Controls->m_MinTractLengthBox->value());
-  m_Tracker->SetUseOutputProbabilityMap(m_Controls->m_OutputProbMap->isChecked());
-  m_Tracker->SetRandom(!m_Controls->m_FixSeedBox->isChecked());
+  m_Tracker->SetVerbose(!m_Controls->m_InteractiveBox->isChecked());
 
   m_ParentNode = m_InputImageNodes.at(0);
   m_TrackingThread.start(QThread::LowestPriority);

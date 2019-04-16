@@ -36,7 +36,7 @@ set(CACHED_RESOURCE_FILES
 )
 
 set(QRC_FILES
-
+  resources/QmitkTractography.qrc
 )
 
 

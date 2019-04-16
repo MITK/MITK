@@ -48,7 +48,7 @@ set(CACHED_RESOURCE_FILES
 )
 
 set(QRC_FILES
-  resources/QmitkDiffusionImaging.qrc
+  resources/QmitkFiberprocessing.qrc
 )
 
 

@@ -55,7 +55,6 @@ set(CACHED_RESOURCE_FILES
   resources/syntheticdata.png
   resources/fieldmap.png
   resources/models.png
-
   resources/upload.ico
   resources/download.ico
   resources/right.ico
@@ -63,6 +62,7 @@ set(CACHED_RESOURCE_FILES
 )
 
 set(QRC_FILES
+    resources/QmitkFiberfox.qrc
 )
 
 

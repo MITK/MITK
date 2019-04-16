@@ -39,6 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTensorImageToOdfImageFilter.h>
 #include <mitkTractographyForest.h>
 #include <mitkPreferenceListReaderOptionsFunctor.h>
+#include <mitkStreamlineTractographyParameters.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -64,7 +65,8 @@ int main(int argc, char* argv[])
   parser.beginGroup("1. Mandatory arguments:");
   parser.addArgument("", "i", mitkCommandLineParser::StringList, "Input:", "input image (multiple possible for 'DetTensor' algorithm)", us::Any(), false, false, false, mitkCommandLineParser::Input);
   parser.addArgument("", "o", mitkCommandLineParser::String, "Output:", "output fiberbundle/probability map", us::Any(), false, false, false, mitkCommandLineParser::Output);
-  parser.addArgument("algorithm", "", mitkCommandLineParser::String, "Algorithm:", "which algorithm to use (DetPeaks; ProbPeaks; DetTensor; ProbTensor; DetODF; ProbODF; DetRF; ProbRF)", us::Any(), false);
+  parser.addArgument("type", "", mitkCommandLineParser::String, "Type:", "which tracker to use (Peaks; Tensor; ODF; RF)", us::Any(), false);
+  parser.addArgument("probabilistic", "", mitkCommandLineParser::Bool, "Probabilistic:", "Probabilistic tractography", us::Any(false));
   parser.endGroup();
 
   parser.beginGroup("2. Seeding:");
@@ -95,8 +97,8 @@ int main(int argc, char* argv[])
   parser.beginGroup("5. Tractography prior:");
   parser.addArgument("prior_image", "", mitkCommandLineParser::String, "Peak prior:", "tractography prior in thr for of a peak image", us::Any(), true, false, false, mitkCommandLineParser::Input);
   parser.addArgument("prior_weight", "", mitkCommandLineParser::Float, "Prior weight", "weighting factor between prior and data.", 0.5);
-  parser.addArgument("restrict_to_prior", "", mitkCommandLineParser::Bool, "Restrict to prior:", "restrict tractography to regions where the prior is valid.");
-  parser.addArgument("new_directions_from_prior", "", mitkCommandLineParser::Bool, "New directios from prior:", "the prior can create directions where there are none in the data.");
+  parser.addArgument("dont_restrict_to_prior", "", mitkCommandLineParser::Bool, "Don't restrict to prior:", "don't restrict tractography to regions where the prior is valid.", us::Any(false));
+  parser.addArgument("no_new_directions_from_prior", "", mitkCommandLineParser::Bool, "No new directios from prior:", "the prior cannot create directions where there are none in the data.", us::Any(false));
   parser.addArgument("prior_flip_x", "", mitkCommandLineParser::Bool, "Prior Flip X:", "multiply x-coordinate of prior direction by -1");
   parser.addArgument("prior_flip_y", "", mitkCommandLineParser::Bool, "Prior Flip Y:", "multiply y-coordinate of prior direction by -1");
   parser.addArgument("prior_flip_z", "", mitkCommandLineParser::Bool, "Prior Flip Z:", "multiply z-coordinate of prior direction by -1");
@@ -131,6 +133,7 @@ int main(int argc, char* argv[])
   parser.addArgument("no_mask_interpolation", "", mitkCommandLineParser::Bool, "Don't interpolate masks:", "don't interpolate mask image values");
   parser.addArgument("compress", "", mitkCommandLineParser::Float, "Compress:", "compress output fibers using the given error threshold (in mm)");
   parser.addArgument("fix_seed", "", mitkCommandLineParser::Bool, "Fix Random Seed:", "always use the same random numbers");
+  parser.addArgument("parameter_file", "", mitkCommandLineParser::String, "Parameter File:", "load parameters from json file (svae using MITK Diffusion GUI). the parameters loaded form this file are overwritten by the manually set parameters.", us::Any(), true, false, false, mitkCommandLineParser::Input);
   parser.endGroup();
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
@@ -139,61 +142,73 @@ int main(int argc, char* argv[])
 
   mitkCommandLineParser::StringContainerType input_files = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["i"]);
   std::string outFile = us::any_cast<std::string>(parsedArgs["o"]);
-  std::string algorithm = us::any_cast<std::string>(parsedArgs["algorithm"]);
+  std::string type = us::any_cast<std::string>(parsedArgs["type"]);
+
+  std::shared_ptr< mitk::StreamlineTractographyParameters > params = std::make_shared<mitk::StreamlineTractographyParameters>();
+
+  if (parsedArgs.count("parameter_file"))
+  {
+    auto parameter_file = us::any_cast<std::string>(parsedArgs["parameter_file"]);
+    params->LoadParameters(parameter_file);
+  }
+
+  if (parsedArgs.count("probabilistic"))
+    params->m_Mode = mitk::StreamlineTractographyParameters::MODE::PROBABILISTIC;
+  else {
+    params->m_Mode = mitk::StreamlineTractographyParameters::MODE::DETERMINISTIC;
+  }
 
   std::string prior_image = "";
   if (parsedArgs.count("prior_image"))
     prior_image = us::any_cast<std::string>(parsedArgs["prior_image"]);
 
-  float prior_weight = 0.5;
   if (parsedArgs.count("prior_weight"))
-    prior_weight = us::any_cast<float>(parsedArgs["prior_weight"]);
+    params->m_Weight = us::any_cast<float>(parsedArgs["prior_weight"]);
 
-  bool fix_seed = false;
   if (parsedArgs.count("fix_seed"))
-    fix_seed = us::any_cast<bool>(parsedArgs["fix_seed"]);
+    params->m_FixRandomSeed = us::any_cast<bool>(parsedArgs["fix_seed"]);
 
-  bool restrict_to_prior = false;
-  if (parsedArgs.count("restrict_to_prior"))
-    restrict_to_prior = us::any_cast<bool>(parsedArgs["restrict_to_prior"]);
+  params->m_RestrictToPrior = true;
+  if (parsedArgs.count("dont_restrict_to_prior"))
+    params->m_RestrictToPrior = !us::any_cast<bool>(parsedArgs["dont_restrict_to_prior"]);
 
-  bool new_directions_from_prior = false;
-  if (parsedArgs.count("new_directions_from_prior"))
-    new_directions_from_prior = us::any_cast<bool>(parsedArgs["new_directions_from_prior"]);
+  params->m_NewDirectionsFromPrior = true;
+  if (parsedArgs.count("no_new_directions_from_prior"))
+    params->m_NewDirectionsFromPrior = !us::any_cast<bool>(parsedArgs["no_new_directions_from_prior"]);
 
-  bool sharpen_odfs = false;
+  params->m_SharpenOdfs = false;
   if (parsedArgs.count("sharpen_odfs"))
-    sharpen_odfs = us::any_cast<bool>(parsedArgs["sharpen_odfs"]);
+    params->m_SharpenOdfs = us::any_cast<bool>(parsedArgs["sharpen_odfs"]);
 
-  bool interpolate = true;
+  params->m_InterpolateTractographyData = true;
   if (parsedArgs.count("no_data_interpolation"))
-    interpolate = !us::any_cast<bool>(parsedArgs["no_data_interpolation"]);
+    params->m_InterpolateTractographyData = !us::any_cast<bool>(parsedArgs["no_data_interpolation"]);
 
-  bool mask_interpolation = true;
+  params->m_InterpolateRoiImages = true;
   if (parsedArgs.count("no_mask_interpolation"))
-    interpolate = !us::any_cast<bool>(parsedArgs["no_mask_interpolation"]);
+    params->m_InterpolateRoiImages = !us::any_cast<bool>(parsedArgs["no_mask_interpolation"]);
 
   bool use_sh_features = false;
   if (parsedArgs.count("use_sh_features"))
     use_sh_features = us::any_cast<bool>(parsedArgs["use_sh_features"]);
 
-  bool use_stop_votes = false;
+  params->m_StopVotes = false;
   if (parsedArgs.count("use_stop_votes"))
-    use_stop_votes = us::any_cast<bool>(parsedArgs["use_stop_votes"]);
+    params->m_StopVotes = us::any_cast<bool>(parsedArgs["use_stop_votes"]);
 
-  bool use_only_forward_samples = false;
+  params->m_OnlyForwardSamples = false;
   if (parsedArgs.count("use_only_forward_samples"))
-    use_only_forward_samples = us::any_cast<bool>(parsedArgs["use_only_forward_samples"]);
+    params->m_OnlyForwardSamples = us::any_cast<bool>(parsedArgs["use_only_forward_samples"]);
 
-  bool flip_x = false;
+  params->m_FlipX = false;
   if (parsedArgs.count("flip_x"))
-    flip_x = us::any_cast<bool>(parsedArgs["flip_x"]);
-  bool flip_y = false;
+    params->m_FlipX = us::any_cast<bool>(parsedArgs["flip_x"]);
+  params->m_FlipY = false;
   if (parsedArgs.count("flip_y"))
-    flip_y = us::any_cast<bool>(parsedArgs["flip_y"]);
-  bool flip_z = false;
+    params->m_FlipY = us::any_cast<bool>(parsedArgs["flip_y"]);
+  params->m_FlipZ = false;
   if (parsedArgs.count("flip_z"))
-    flip_z = us::any_cast<bool>(parsedArgs["flip_z"]);
+    params->m_FlipZ = us::any_cast<bool>(parsedArgs["flip_z"]);
 
   bool prior_flip_x = false;
   if (parsedArgs.count("prior_flip_x"))
@@ -205,21 +220,21 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("prior_flip_z"))
     prior_flip_z = us::any_cast<bool>(parsedArgs["prior_flip_z"]);
 
-  bool apply_image_rotation = false;
+  params->m_ApplyDirectionMatrix = false;
   if (parsedArgs.count("apply_image_rotation"))
-    apply_image_rotation = us::any_cast<bool>(parsedArgs["apply_image_rotation"]);
+    params->m_ApplyDirectionMatrix = us::any_cast<bool>(parsedArgs["apply_image_rotation"]);
 
   float compress = -1;
   if (parsedArgs.count("compress"))
     compress = us::any_cast<float>(parsedArgs["compress"]);
 
-  float min_tract_length = 20;
+  params->m_MinTractLengthMm = 20;
   if (parsedArgs.count("min_tract_length"))
-    min_tract_length = us::any_cast<float>(parsedArgs["min_tract_length"]);
+    params->m_MinTractLengthMm = us::any_cast<float>(parsedArgs["min_tract_length"]);
 
-  float loop_check = -1;
+  params->SetLoopCheckDeg(-1);
   if (parsedArgs.count("loop_check"))
-    loop_check = us::any_cast<float>(parsedArgs["loop_check"]);
+    params->SetLoopCheckDeg(us::any_cast<float>(parsedArgs["loop_check"]));
 
   std::string forestFile;
   if (parsedArgs.count("forest"))
@@ -249,49 +264,49 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("ep_constraint"))
     ep_constraint = us::any_cast<std::string>(parsedArgs["ep_constraint"]);
 
-  float cutoff = 0.1f;
+  params->m_Cutoff = 0.1f;
   if (parsedArgs.count("cutoff"))
-    cutoff = us::any_cast<float>(parsedArgs["cutoff"]);
+    params->m_Cutoff = us::any_cast<float>(parsedArgs["cutoff"]);
 
-  float odf_cutoff = 0.0;
+  params->m_OdfCutoff = 0.0;
   if (parsedArgs.count("odf_cutoff"))
-    odf_cutoff = us::any_cast<float>(parsedArgs["odf_cutoff"]);
+    params->m_OdfCutoff = us::any_cast<float>(parsedArgs["odf_cutoff"]);
 
-  float stepsize = -1;
+  params->SetStepSizeVox(-1);
   if (parsedArgs.count("step_size"))
-    stepsize = us::any_cast<float>(parsedArgs["step_size"]);
+    params->SetStepSizeVox(us::any_cast<float>(parsedArgs["step_size"]));
 
-  float sampling_distance = -1;
+  params->SetSamplingDistanceVox(-1);
   if (parsedArgs.count("sampling_distance"))
-    sampling_distance = us::any_cast<float>(parsedArgs["sampling_distance"]);
+    params->SetSamplingDistanceVox(us::any_cast<float>(parsedArgs["sampling_distance"]));
 
-  unsigned int num_samples = 0;
+  params->m_NumSamples = 0;
   if (parsedArgs.count("num_samples"))
-    num_samples = static_cast<unsigned int>(us::any_cast<int>(parsedArgs["num_samples"]));
+    params->m_NumSamples = static_cast<unsigned int>(us::any_cast<int>(parsedArgs["num_samples"]));
 
-  int num_seeds = 1;
+  params->m_SeedsPerVoxel = 1;
   if (parsedArgs.count("seeds"))
-    num_seeds = us::any_cast<int>(parsedArgs["seeds"]);
+    params->m_SeedsPerVoxel = us::any_cast<int>(parsedArgs["seeds"]);
 
-  unsigned int trials_per_seed = 10;
+  params->m_TrialsPerSeed = 10;
   if (parsedArgs.count("trials_per_seed"))
-    trials_per_seed = static_cast<unsigned int>(us::any_cast<int>(parsedArgs["trials_per_seed"]));
+    params->m_TrialsPerSeed = static_cast<unsigned int>(us::any_cast<int>(parsedArgs["trials_per_seed"]));
 
-  float tend_f = 1;
+  params->m_F = 1;
   if (parsedArgs.count("tend_f"))
-    tend_f = us::any_cast<float>(parsedArgs["tend_f"]);
+    params->m_F = us::any_cast<float>(parsedArgs["tend_f"]);
 
-  float tend_g = 0;
+  params->m_G = 0;
   if (parsedArgs.count("tend_g"))
-    tend_g = us::any_cast<float>(parsedArgs["tend_g"]);
+    params->m_G = us::any_cast<float>(parsedArgs["tend_g"]);
 
-  float angular_threshold = -1;
+  params->SetAngularThresholdDeg(-1);
   if (parsedArgs.count("angular_threshold"))
-    angular_threshold = us::any_cast<float>(parsedArgs["angular_threshold"]);
+    params->SetAngularThresholdDeg(us::any_cast<float>(parsedArgs["angular_threshold"]));
 
-  int max_tracts = -1;
+  params->m_MaxNumFibers = -1;
   if (parsedArgs.count("max_tracts"))
-    max_tracts = us::any_cast<int>(parsedArgs["max_tracts"]);
+    params->m_MaxNumFibers = us::any_cast<int>(parsedArgs["max_tracts"]);
 
 
   std::string ext = itksys::SystemTools::GetFilenameExtension(outFile);
@@ -365,7 +380,7 @@ int main(int argc, char* argv[])
   }
 
   //    //////////////////////////////////////////////////////////////////
-//        omp_set_num_threads(1);
+  //      omp_set_num_threads(1);
 
   typedef itk::StreamlineTrackingFilter TrackerType;
   TrackerType::Pointer tracker = TrackerType::New();
@@ -389,26 +404,18 @@ int main(int argc, char* argv[])
     caster->Update();
     mitk::TrackingHandlerPeaks::PeakImgType::Pointer itkImg = caster->GetOutput();
 
+    std::shared_ptr< mitk::StreamlineTractographyParameters > prior_params = std::make_shared< mitk::StreamlineTractographyParameters >(*params);
+    prior_params->m_FlipX = prior_flip_x;
+    prior_params->m_FlipY = prior_flip_y;
+    prior_params->m_FlipZ = prior_flip_z;
+    prior_params->m_Cutoff = 0.0;
     dynamic_cast<mitk::TrackingHandlerPeaks*>(priorhandler)->SetPeakImage(itkImg);
-    dynamic_cast<mitk::TrackingHandlerPeaks*>(priorhandler)->SetPeakThreshold(0.0);
-    dynamic_cast<mitk::TrackingHandlerPeaks*>(priorhandler)->SetInterpolate(interpolate);
-
-    priorhandler->SetFlipX(prior_flip_x);
-    priorhandler->SetFlipY(prior_flip_y);
-    priorhandler->SetFlipZ(prior_flip_z);
-    if (algorithm == "ProbPeaks")
-      priorhandler->SetMode(mitk::TrackingDataHandler::MODE::PROBABILISTIC);
-    else
-      priorhandler->SetMode(mitk::TrackingDataHandler::MODE::DETERMINISTIC);
-
+    priorhandler->SetParameters(prior_params);
     tracker->SetTrackingPriorHandler(priorhandler);
-    tracker->SetTrackingPriorWeight(prior_weight);
-    tracker->SetTrackingPriorAsMask(restrict_to_prior);
-    tracker->SetIntroduceDirectionsFromPrior(new_directions_from_prior);
   }
 
   mitk::TrackingDataHandler* handler;
-  if (algorithm == "DetRF" || algorithm == "ProbRF")
+  if (type == "RF")
   {
     mitk::TractographyForest::Pointer forest = mitk::IOUtil::Load<mitk::TractographyForest>(forestFile);
     if (forest.IsNull())
@@ -431,27 +438,17 @@ int main(int argc, char* argv[])
       dynamic_cast<mitk::TrackingHandlerRandomForest<6,100>*>(handler)->AddDwi(input);
       dynamic_cast<mitk::TrackingHandlerRandomForest<6,100>*>(handler)->SetAdditionalFeatureImages(addImages);
     }
-
-    if (algorithm == "ProbRF")
-      handler->SetMode(mitk::TrackingDataHandler::MODE::PROBABILISTIC);
   }
-  else if (algorithm == "DetPeaks" or algorithm == "ProbPeaks")
+  else if (type == "Peaks")
   {
     handler = new mitk::TrackingHandlerPeaks();
 
     MITK_INFO << "loading input peak image";
     mitk::Image::Pointer mitkImage = mitk::IOUtil::Load<mitk::Image>(input_files.at(0));
     mitk::TrackingHandlerPeaks::PeakImgType::Pointer itkImg = mitk::convert::GetItkPeakFromPeakImage(mitkImage);
-    if (algorithm == "ProbPeaks")
-      handler->SetMode(mitk::TrackingDataHandler::MODE::PROBABILISTIC);
-    else
-      handler->SetMode(mitk::TrackingDataHandler::MODE::DETERMINISTIC);
-
     dynamic_cast<mitk::TrackingHandlerPeaks*>(handler)->SetPeakImage(itkImg);
-    dynamic_cast<mitk::TrackingHandlerPeaks*>(handler)->SetApplyDirectionMatrix(apply_image_rotation);
-    dynamic_cast<mitk::TrackingHandlerPeaks*>(handler)->SetPeakThreshold(cutoff);
   }
-  else if (algorithm == "DetTensor")
+  else if (type == "Tensor" && params->m_Mode == mitk::StreamlineTractographyParameters::MODE::DETERMINISTIC)
   {
     handler = new mitk::TrackingHandlerTensor();
 
@@ -464,26 +461,20 @@ int main(int argc, char* argv[])
       dynamic_cast<mitk::TrackingHandlerTensor*>(handler)->AddTensorImage(itkImg.GetPointer());
     }
 
-    dynamic_cast<mitk::TrackingHandlerTensor*>(handler)->SetFaThreshold(cutoff);
-    dynamic_cast<mitk::TrackingHandlerTensor*>(handler)->SetF(tend_f);
-    dynamic_cast<mitk::TrackingHandlerTensor*>(handler)->SetG(tend_g);
-
     if (addImages.at(0).size()>0)
       dynamic_cast<mitk::TrackingHandlerTensor*>(handler)->SetFaImage(addImages.at(0).at(0));
   }
-  else if (algorithm == "DetODF" || algorithm == "ProbODF" || algorithm == "ProbTensor")
+  else if (type == "ODF" || (type == "Tensor" && params->m_Mode == mitk::StreamlineTractographyParameters::MODE::PROBABILISTIC))
   {
     handler = new mitk::TrackingHandlerOdf();
 
     mitk::OdfImage::ItkOdfImageType::Pointer itkImg = nullptr;
 
-    if (algorithm == "ProbTensor")
+    if (type == "Tensor")
     {
       MITK_INFO << "Converting Tensor to ODF image";
       auto input = mitk::IOUtil::Load<mitk::Image>(input_files.at(0));
       itkImg = mitk::convert::GetItkOdfFromTensorImage(input);
-      sharpen_odfs = true;
-      odf_cutoff = 0;
       dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetIsOdfFromTensor(true);
     }
     else
@@ -506,63 +497,41 @@ int main(int argc, char* argv[])
     }
 
     dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetOdfImage(itkImg);
-    dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetGfaThreshold(cutoff);
-    dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetOdfThreshold(odf_cutoff);
-    dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetSharpenOdfs(sharpen_odfs);
-
-    if (algorithm == "ProbODF" || algorithm == "ProbTensor")
-      dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetMode(mitk::TrackingHandlerOdf::MODE::PROBABILISTIC);
 
     if (addImages.at(0).size()>0)
       dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetGfaImage(addImages.at(0).at(0));
   }
   else
   {
-    MITK_INFO << "Unknown tractography algorithm (" + algorithm+"). Known types are DetPeaks, ProbPeaks, DetTensor, ProbTensor, DetODF, ProbODF, DetRF, ProbRF.";
+    MITK_INFO << "Unknown tractography algorithm (" + type+"). Known types are Peaks, DetTensor, ProbTensor, DetODF, ProbODF, DetRF, ProbRF.";
     return EXIT_FAILURE;
   }
-  handler->SetInterpolate(interpolate);
-  handler->SetFlipX(flip_x);
-  handler->SetFlipY(flip_y);
-  handler->SetFlipZ(flip_z);
 
   if (ep_constraint=="NONE")
-    tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::NONE);
+    params->m_EpConstraints = itk::StreamlineTrackingFilter::EndpointConstraints::NONE;
   else if (ep_constraint=="EPS_IN_TARGET")
-    tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::EPS_IN_TARGET);
+    params->m_EpConstraints = itk::StreamlineTrackingFilter::EndpointConstraints::EPS_IN_TARGET;
   else if (ep_constraint=="EPS_IN_TARGET_LABELDIFF")
-    tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::EPS_IN_TARGET_LABELDIFF);
+    params->m_EpConstraints = itk::StreamlineTrackingFilter::EndpointConstraints::EPS_IN_TARGET_LABELDIFF;
   else if (ep_constraint=="EPS_IN_SEED_AND_TARGET")
-    tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::EPS_IN_SEED_AND_TARGET);
+    params->m_EpConstraints = itk::StreamlineTrackingFilter::EndpointConstraints::EPS_IN_SEED_AND_TARGET;
   else if (ep_constraint=="MIN_ONE_EP_IN_TARGET")
-    tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::MIN_ONE_EP_IN_TARGET);
+    params->m_EpConstraints = itk::StreamlineTrackingFilter::EndpointConstraints::MIN_ONE_EP_IN_TARGET;
   else if (ep_constraint=="ONE_EP_IN_TARGET")
-    tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::ONE_EP_IN_TARGET);
+    params->m_EpConstraints = itk::StreamlineTrackingFilter::EndpointConstraints::ONE_EP_IN_TARGET;
   else if (ep_constraint=="NO_EP_IN_TARGET")
-    tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::NO_EP_IN_TARGET);
+    params->m_EpConstraints = itk::StreamlineTrackingFilter::EndpointConstraints::NO_EP_IN_TARGET;
 
-  MITK_INFO << "Tractography algorithm: " << algorithm;
-  tracker->SetInterpolateMasks(mask_interpolation);
-  tracker->SetNumberOfSamples(num_samples);
-  tracker->SetAngularThreshold(angular_threshold);
+  MITK_INFO << "Tractography algorithm: " << type;
   tracker->SetMaskImage(mask);
   tracker->SetSeedImage(seed);
   tracker->SetStoppingRegions(stop);
   tracker->SetTargetRegions(target);
   tracker->SetExclusionRegions(exclusion);
-  tracker->SetSeedsPerVoxel(num_seeds);
-  tracker->SetStepSize(stepsize);
-  tracker->SetSamplingDistance(sampling_distance);
-  tracker->SetUseStopVotes(use_stop_votes);
-  tracker->SetOnlyForwardSamples(use_only_forward_samples);
-  tracker->SetLoopCheck(loop_check);
-  tracker->SetMaxNumTracts(max_tracts);
-  tracker->SetTrialsPerSeed(trials_per_seed);
   tracker->SetTrackingHandler(handler);
   if (ext != ".fib" && ext != ".trk")
-    tracker->SetUseOutputProbabilityMap(true);
-  tracker->SetMinTractLength(min_tract_length);
-  tracker->SetRandom(!fix_seed);
+    params->m_OutputProbMap = true;
+  tracker->SetParameters(params);
   tracker->Update();
 
   if (ext == ".fib" || ext == ".trk")

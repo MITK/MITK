@@ -1,11 +1,6 @@
-set(SRC_CPP_FILES
-  QmitkMlbstTrainingDataWidget.cpp
-)
-
 set(INTERNAL_CPP_FILES
   QmitkGibbsTrackingView.cpp
   QmitkStreamlineTrackingView.cpp
-  QmitkMLBTView.cpp
 
   Perspectives/QmitkGibbsTractographyPerspective.cpp
   Perspectives/QmitkStreamlineTractographyPerspective.cpp
@@ -16,9 +11,6 @@ set(INTERNAL_CPP_FILES
 set(UI_FILES
   src/internal/QmitkGibbsTrackingViewControls.ui
   src/internal/QmitkStreamlineTrackingViewControls.ui
-  src/internal/QmitkMLBTViewControls.ui
-
-  src/QmitkMlbstTrainingDataWidgetControls.ui
 )
 
 set(MOC_H_FILES
@@ -26,9 +18,6 @@ set(MOC_H_FILES
 
   src/internal/QmitkGibbsTrackingView.h
   src/internal/QmitkStreamlineTrackingView.h
-  src/internal/QmitkMLBTView.h
-
-  src/QmitkMlbstTrainingDataWidget.h
 
   src/internal/Perspectives/QmitkGibbsTractographyPerspective.h
   src/internal/Perspectives/QmitkStreamlineTractographyPerspective.h
@@ -40,6 +29,10 @@ set(CACHED_RESOURCE_FILES
   resources/tract.png
   resources/tractogram.png
   resources/ml_tractography.png
+  resources/upload.ico
+  resources/download.ico
+  resources/right.ico
+  resources/stop.ico
 )
 
 set(QRC_FILES

@@ -31,7 +31,6 @@ TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::TrackingHandlerR
   , m_SampleFraction(1.0)
   , m_NumberOfSamples(0)
   , m_GmSamplesPerVoxel(-1)
-  , m_NumPreviousDirections(1)
   , m_BidirectionalFiberSampling(false)
   , m_ZeroDirWmFeatures(true)
   , m_MaxNumWmSamples(-1)
@@ -173,6 +172,14 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::InitForTrac
       m_AdditionalFeatureImageInterpolators.push_back(v);
     }
 
+    auto double_dir = m_DwiFeatureImages.at(0)->GetDirection().GetVnlMatrix();
+    for (int r=0; r<3; r++)
+      for (int c=0; c<3; c++)
+      {
+        m_FloatImageRotation[r][c] = double_dir[r][c];
+      }
+
+    this->CalculateMinVoxelSize();
     m_NeedsDataInit = false;
   }
 }
@@ -195,13 +202,13 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
       check_last_dir = true;
   }
 
-  if (!m_Interpolate && oldIndex==idx)
+  if (!m_Parameters->m_InterpolateTractographyData && oldIndex==idx)
     return last_dir;
 
   // store feature pixel values in a vigra data type
   vigra::MultiArray<2, float> featureData = vigra::MultiArray<2, float>( vigra::Shape2(1,m_Forest->GetNumFeatures()) );
   featureData.init(0.0);
-  typename DwiFeatureImageType::PixelType dwiFeaturePixel = mitk::imv::GetImageValue< typename DwiFeatureImageType::PixelType >(pos, m_Interpolate, m_DwiFeatureImageInterpolator);
+  typename DwiFeatureImageType::PixelType dwiFeaturePixel = mitk::imv::GetImageValue< typename DwiFeatureImageType::PixelType >(pos, m_Parameters->m_InterpolateTractographyData, m_DwiFeatureImageInterpolator);
   for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
     featureData(0,f) = dwiFeaturePixel[f];
 
@@ -217,11 +224,11 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
     vnl_vector_fixed<double,3> tempD;
     tempD[0] = d[0]; tempD[1] = d[1]; tempD[2] = d[2];
 
-    if (m_FlipX)
+    if (m_Parameters->m_FlipX)
         tempD[0] *= -1;
-    if (m_FlipY)
+    if (m_Parameters->m_FlipY)
         tempD[1] *= -1;
-    if (m_FlipZ)
+    if (m_Parameters->m_FlipZ)
         tempD[2] *= -1;
 
     tempD = inverse_direction_matrix * tempD;
@@ -248,7 +255,7 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
     for (auto interpolator : m_AdditionalFeatureImageInterpolators.at(0))
     {
       float v = mitk::imv::GetImageValue<float>(pos, false, interpolator);
-      featureData(0,NumberOfSignalFeatures+m_NumPreviousDirections*3+c) = v;
+      featureData(0,NumberOfSignalFeatures+m_Parameters->m_NumPreviousDirections*3+c) = v;
       c++;
     }
   }
@@ -276,19 +283,19 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
         float angle = angles[classLabel];
         float abs_angle = fabs(angle);
 
-        if (m_Mode==MODE::PROBABILISTIC)
+        if (m_Parameters->m_Mode==MODE::PROBABILISTIC)
         {
           probs2[classLabel] = probs(0,i);
           if (check_last_dir)
             probs2[classLabel] *= abs_angle;
           probs_sum += probs2[classLabel];
         }
-        else if (m_Mode==MODE::DETERMINISTIC)
+        else if (m_Parameters->m_Mode==MODE::DETERMINISTIC)
         {
           vnl_vector_fixed<float,3> d = m_DirectionContainer.at(classLabel);  // get direction vector assiciated with the respective direction index
           if (check_last_dir)   // do we have a previous streamline direction or did we just start?
           {
-            if (abs_angle>=m_AngularThreshold)         // is angle between the directions smaller than our hard threshold?
+            if (abs_angle>=m_Parameters->GetAngularThresholdDot())         // is angle between the directions smaller than our hard threshold?
             {
               if (angle<0)                          // make sure we don't walk backwards
                 d *= -1;
@@ -310,7 +317,7 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
   }
 
 
-  if (m_Mode==MODE::PROBABILISTIC && pNonFib<0.5)
+  if (m_Parameters->m_Mode==MODE::PROBABILISTIC && pNonFib<0.5)
   {
     boost::random::discrete_distribution<int, float> dist(probs2.begin(), probs2.end());
     int sampled_idx = 0;
@@ -323,7 +330,7 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
         sampled_idx = sampler();
       }
 
-      if ( probs2[sampled_idx]>0.1 && (!check_last_dir || (check_last_dir && fabs(angles[sampled_idx])>=m_AngularThreshold)) )
+      if ( probs2[sampled_idx]>0.1 && (!check_last_dir || (check_last_dir && fabs(angles[sampled_idx])>=m_Parameters->GetAngularThresholdDot())) )
         break;
     }
 
@@ -345,12 +352,14 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
     output_direction[1] = tempD[1];
     output_direction[2] = tempD[2];
 
-    if (m_FlipX)
+    if (m_Parameters->m_FlipX)
       output_direction[0] *= -1;
-    if (m_FlipY)
+    if (m_Parameters->m_FlipY)
       output_direction[1] *= -1;
-    if (m_FlipZ)
+    if (m_Parameters->m_FlipZ)
       output_direction[2] *= -1;
+    if (m_Parameters->m_ApplyDirectionMatrix)
+      output_direction = m_FloatImageRotation*output_direction;
   }
 
   return output_direction * w;
@@ -436,11 +445,11 @@ bool TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::IsForestVal
   {
     if (m_Forest->GetNumTrees() <= 0)
       MITK_ERROR << "Forest contains no trees!";
-    if ( m_Forest->GetNumFeatures() != static_cast<int>(NumberOfSignalFeatures+3*m_NumPreviousDirections+additional_features) )
-      MITK_ERROR << "Wrong number of features in forest: got " << m_Forest->GetNumFeatures() << ", expected " << (NumberOfSignalFeatures+3*m_NumPreviousDirections+additional_features);
+    if ( m_Forest->GetNumFeatures() != static_cast<int>(NumberOfSignalFeatures+3*m_Parameters->m_NumPreviousDirections+additional_features) )
+      MITK_ERROR << "Wrong number of features in forest: got " << m_Forest->GetNumFeatures() << ", expected " << (NumberOfSignalFeatures+3*m_Parameters->m_NumPreviousDirections+additional_features);
   }
 
-  if(m_Forest && m_Forest->GetNumTrees()>0 && m_Forest->GetNumFeatures() == static_cast<int>(NumberOfSignalFeatures+3*m_NumPreviousDirections+additional_features))
+  if(m_Forest && m_Forest->GetNumTrees()>0 && m_Forest->GetNumFeatures() == static_cast<int>(NumberOfSignalFeatures+3*m_Parameters->m_NumPreviousDirections+additional_features))
     return true;
 
   return false;
@@ -573,7 +582,7 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::InitForTrai
     if (m_BidirectionalFiberSampling)
       wmSamples *= 2;
     if (m_ZeroDirWmFeatures)
-      wmSamples *= (m_NumPreviousDirections+1);
+      wmSamples *= (m_Parameters->m_NumPreviousDirections+1);
 
     MITK_INFO << "White matter samples available: " << wmSamples;
 
@@ -651,7 +660,7 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::CalculateTr
 {
   vnl_vector_fixed<float,3> ref; ref.fill(0); ref[0]=1;
 
-  m_FeatureData.reshape( vigra::Shape2(m_NumberOfSamples, NumberOfSignalFeatures+m_NumPreviousDirections*3+m_AdditionalFeatureImages.at(0).size()) );
+  m_FeatureData.reshape( vigra::Shape2(m_NumberOfSamples, NumberOfSignalFeatures+m_Parameters->m_NumPreviousDirections*3+m_AdditionalFeatureImages.at(0).size()) );
   m_LabelData.reshape( vigra::Shape2(m_NumberOfSamples,1) );
   m_Weights.reshape( vigra::Shape2(m_NumberOfSamples,1) );
   MITK_INFO << "Number of features: " << m_FeatureData.shape(1);
@@ -694,8 +703,8 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::CalculateTr
           }
 
           // direction feature
-          int num_zero_dirs = m_RandGen->GetIntegerVariate(m_NumPreviousDirections);  // how many directions should be zero?
-          for (unsigned int i=0; i<m_NumPreviousDirections; i++)
+          int num_zero_dirs = m_RandGen->GetIntegerVariate(m_Parameters->m_NumPreviousDirections);  // how many directions should be zero?
+          for (unsigned int i=0; i<m_Parameters->m_NumPreviousDirections; i++)
           {
             int c=0;
             vnl_vector_fixed<float,3> probe;
@@ -724,7 +733,7 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::CalculateTr
             itk::Point<float, 3> itkP;
             image->TransformIndexToPhysicalPoint(it.GetIndex(), itkP);
             float v = mitk::imv::GetImageValue<float>(itkP, false, interpolator);
-            m_FeatureData(sampleCounter,NumberOfSignalFeatures+m_NumPreviousDirections*3+add_feat_c) = v;
+            m_FeatureData(sampleCounter,NumberOfSignalFeatures+m_Parameters->m_NumPreviousDirections*3+add_feat_c) = v;
             add_feat_c++;
           }
 
@@ -749,10 +758,10 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::CalculateTr
       vtkPoints* points = cell->GetPoints();
       float fiber_weight = fib->GetFiberWeight(i);
 
-      for (int n = 0; n <= static_cast<int>(m_NumPreviousDirections); ++n)
+      for (int n = 0; n <= static_cast<int>(m_Parameters->m_NumPreviousDirections); ++n)
       {
         if (!m_ZeroDirWmFeatures)
-          n = m_NumPreviousDirections;
+          n = m_Parameters->m_NumPreviousDirections;
         for (bool reverse : {false, true})
         {
           for (int j=1; j<numPoints-1; j++)
@@ -762,7 +771,7 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::CalculateTr
 
             itk::Point<float, 3> itkP1, itkP2;
 
-            int num_nonzero_dirs = m_NumPreviousDirections;
+            int num_nonzero_dirs = m_Parameters->m_NumPreviousDirections;
             if (!reverse)
               num_nonzero_dirs = std::min(n, j);
             else
@@ -770,7 +779,7 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::CalculateTr
 
             vnl_vector_fixed<float,3> dir;
             // zero directions
-            for (unsigned int k=0; k<m_NumPreviousDirections-num_nonzero_dirs; k++)
+            for (unsigned int k=0; k<m_Parameters->m_NumPreviousDirections-num_nonzero_dirs; k++)
             {
               dir.fill(0.0);
               int c = 0;
@@ -815,7 +824,7 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::CalculateTr
                 dir *= -1;
 
               int c = 0;
-              for (unsigned int f=NumberOfSignalFeatures+3*(k+m_NumPreviousDirections-num_nonzero_dirs); f<NumberOfSignalFeatures+3*(k+1+m_NumPreviousDirections-num_nonzero_dirs); f++)
+              for (unsigned int f=NumberOfSignalFeatures+3*(k+m_Parameters->m_NumPreviousDirections-num_nonzero_dirs); f<NumberOfSignalFeatures+3*(k+1+m_Parameters->m_NumPreviousDirections-num_nonzero_dirs); f++)
               {
                 m_FeatureData(sampleCounter,f) = dir[c];
                 c++;
@@ -851,7 +860,7 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::CalculateTr
             float volume_mod = mitk::imv::GetImageValue<float>(itkP1, false, volume_interpolator);
 
             // diffusion signal features
-            typename DwiFeatureImageType::PixelType pix = mitk::imv::GetImageValue< typename DwiFeatureImageType::PixelType >(itkP1, m_Interpolate, dwi_interp);
+            typename DwiFeatureImageType::PixelType pix = mitk::imv::GetImageValue< typename DwiFeatureImageType::PixelType >(itkP1, m_Parameters->m_InterpolateTractographyData, dwi_interp);
             for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
               m_FeatureData(sampleCounter,f) = pix[f];
 

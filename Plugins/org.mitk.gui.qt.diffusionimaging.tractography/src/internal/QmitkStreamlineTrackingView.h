@@ -40,6 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkStdMultiWidget.h>
 #include <QmitkSliceNavigationListener.h>
 #include <mitkILifecycleAwarePart.h>
+#include <mitkStreamlineTractographyParameters.h>
 
 class QmitkStreamlineTrackingView;
 
@@ -112,6 +113,8 @@ protected slots:
   void TimerUpdate();
   void StopTractography();
   void OnSliceChanged();
+  void SaveParameters();
+  void LoadParameters();
 
 protected:
 
@@ -126,6 +129,8 @@ private:
 
   bool CheckAndStoreLastParams(QObject* obj);
   void StartStopTrackingGui(bool start);
+  std::shared_ptr< mitk::StreamlineTractographyParameters > GetParametersFromGui();
+  void ParametersToGui(mitk::StreamlineTractographyParameters& params);
 
   std::vector< itk::Point<float> >        m_SeedPoints;
   mitk::DataNode::Pointer                 m_ParentNode;
@@ -146,6 +151,7 @@ private:
   mitk::DataNode::Pointer                 m_LastPrior;
   mitk::TrackingDataHandler*              m_TrackingPriorHandler;
   std::map< QString, std::string >        m_LastTractoParams;
+  QString                                 m_ParameterFile;
 };
 
 

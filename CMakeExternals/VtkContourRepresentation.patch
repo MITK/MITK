@@ -1,0 +1,12 @@
+diff --git a/Interaction/Widgets/vtkContourRepresentation.cxx b/Interaction/Widgets/vtkContourRepresentation.cxx
+--- a/Interaction/Widgets/vtkContourRepresentation.cxx
++++ b/Interaction/Widgets/vtkContourRepresentation.cxx
+@@ -140,6 +140,8 @@
+ 
+   this->UpdateLines( static_cast<int>(this->Internal->Nodes.size())-1);
+   this->NeedToRender = 1;
++
++  this->BuildRepresentation();
+ }
+ 
+ //----------------------------------------------------------------------

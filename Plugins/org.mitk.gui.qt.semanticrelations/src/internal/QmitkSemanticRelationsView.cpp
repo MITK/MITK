@@ -47,6 +47,32 @@ void QmitkSemanticRelationsView::SetFocus()
   // nothing here
 }
 
+void QmitkSemanticRelationsView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
+{
+  if (m_RenderWindowPart != renderWindowPart)
+  {
+    m_RenderWindowPart = renderWindowPart;
+    SetControlledRenderer();
+  }
+}
+
+void QmitkSemanticRelationsView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart)
+{
+  if (m_RenderWindowPart == renderWindowPart)
+  {
+    m_RenderWindowPart = nullptr;
+    SetControlledRenderer();
+  }
+}
+
+void QmitkSemanticRelationsView::RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart)
+{
+  if (m_RenderWindowPart == renderWindowPart)
+  {
+    SetControlledRenderer();
+  }
+}
+
 void QmitkSemanticRelationsView::CreateQtPartControl(QWidget* parent)
 {
   // create GUI widgets
@@ -84,26 +110,6 @@ void QmitkSemanticRelationsView::CreateQtPartControl(QWidget* parent)
   {
     AddToComboBox(caseID);
   }
-}
-
-void QmitkSemanticRelationsView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
-{
-  // connect QmitkRenderWindows - underlying vtkRenderWindow is the same as "mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows()"
-  QHash<QString, QmitkRenderWindow*> windowMap = renderWindowPart->GetQmitkRenderWindows();
-  QHash<QString, QmitkRenderWindow*>::Iterator it;
-
-  mitk::BaseRenderer* baseRenderer = nullptr;
-  mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer;
-  for (it = windowMap.begin(); it != windowMap.end(); ++it)
-  {
-    baseRenderer = mitk::BaseRenderer::GetInstance(it.value()->GetVtkRenderWindow());
-    if (nullptr != baseRenderer)
-    {
-      controlledRenderer.push_back(baseRenderer);
-    }
-  }
-
-  m_ContextMenu->SetControlledRenderer(controlledRenderer);
 }
 
 void QmitkSemanticRelationsView::SetUpConnections()
@@ -270,4 +276,26 @@ void QmitkSemanticRelationsView::JumpToPosition(const mitk::DataNode* dataNode)
       mitk::RenderingManager::GetInstance()->InitializeViews(segmentation->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
     }
   }
+}
+
+void QmitkSemanticRelationsView::SetControlledRenderer()
+{
+  QHash<QString, QmitkRenderWindow*> renderWindows;
+  if (m_RenderWindowPart != nullptr)
+  {
+    renderWindows = m_RenderWindowPart->GetQmitkRenderWindows();
+  }
+
+  mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer;
+  mitk::BaseRenderer* baseRenderer = nullptr;
+  for (const auto& renderWindow : renderWindows.values())
+  {
+    baseRenderer = mitk::BaseRenderer::GetInstance(renderWindow->GetVtkRenderWindow());
+    if (nullptr != baseRenderer)
+    {
+      controlledRenderer.push_back(baseRenderer);
+    }
+  }
+
+  m_ContextMenu->SetControlledRenderer(controlledRenderer);
 }

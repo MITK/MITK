@@ -54,13 +54,14 @@ public:
 
   static const std::string VIEW_ID;
 
+  virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  virtual void RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart) override;
+
 protected:
 
   virtual void SetFocus() override;
   virtual void CreateQtPartControl(QWidget* parent) override;
-
-  virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
-  virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart*) override { }
 
 private Q_SLOTS:
 
@@ -94,7 +95,12 @@ private:
   void OpenInEditor(const mitk::DataNode* dataNode);
   void JumpToPosition(const mitk::DataNode* dataNode);
 
+  void SetControlledRenderer();
+
   Ui::QmitkSemanticRelationsControls m_Controls;
+
+  mitk::IRenderWindowPart* m_RenderWindowPart;
+
   QmitkLesionInfoWidget* m_LesionInfoWidget;
   QmitkPatientTableInspector* m_PatientTableInspector;
   QmitkDnDDataNodeWidget* m_DnDDataNodeWidget;

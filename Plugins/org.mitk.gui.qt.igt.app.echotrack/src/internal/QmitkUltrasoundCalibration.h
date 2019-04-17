@@ -190,6 +190,35 @@ protected slots:
    */
   void OnLoadPhantomConfiguration();
   /*
+   * \brief match the annotation pointset with the geometry of the phantom configuration
+   */
+  void OnMatchAnnotationToPhantomConfiguration();
+  /*
+   * \brief move the annotation pointset up
+   */
+  void OnMovePhantomAnnotationsUp();
+  /*
+   * \brief move the annotation pointset down
+   */
+  void OnMovePhantomAnnotationsDown();
+  /*
+   * \brief move the annotation pointset left
+   */
+  void OnMovePhantomAnnotationsLeft();
+  /*
+   * \brief move the annotation pointset right
+   */
+  void OnMovePhantomAnnotationsRight();
+  /*
+   * \brief rotate the annotation pointset right
+   */
+  void OnRotatePhantomAnnotationsRight();
+  /*
+   * \brief rotate the annotation pointset left
+   */
+  void OnRotatePhantomAnnotationsLeft();
+
+  /*
    * \brief add a calibration point to be used for phantom based calibration
    */
   void OnPhantomCalibPointsChanged();
@@ -210,6 +239,14 @@ protected:
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
   virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source, const QList<mitk::DataNode::Pointer> &nodes);
+
+  void UpdatePhantomAnnotationPointVisualization(int index = -1);
+  /*! \brief translate the annotated image feature m_CalibPoints image by the specified translation vector
+  */
+  void TranslatePhantomAnnotations(double tx, double ty, double tz);
+  /*! \brief rotate the annotated image feature m_CalibPoints image by the specified angle
+   */
+  void RotatePhantomAnnotations(double angle);
 
   Ui::QmitkUltrasoundCalibrationControls m_Controls;
 
@@ -275,7 +312,8 @@ protected:
    * \brief Pointset containing corresponding points on the image.
    */
   mitk::PointSet::Pointer m_CalibPointsTool;
-  mitk::PointSet::Pointer m_PhantomConfigurationPointSet; ///< pointset holding the feature position of the phantom in tool coordinates
+  mitk::PointSet::Pointer
+    m_PhantomConfigurationPointSet; ///< pointset holding the feature position of the phantom in tool coordinates
   /**
    * \brief Pointset containing Projected Points (aka "where we thought the needle was gonna land")
    */
@@ -347,7 +385,7 @@ protected:
                     mitk::PointSet::Pointer realWorldFiducials,
                     vtkSmartPointer<vtkLandmarkTransform> transform = nullptr);
 
-  void ApplyTransformToPointSet(mitk::PointSet::Pointer pointSet, vtkSmartPointer<vtkLandmarkTransform> transform);
+  void ApplyTransformToPointSet(mitk::PointSet::Pointer pointSet, vtkSmartPointer<vtkAbstractTransform> transform);
 
   mitk::PointSet::Pointer m_SpacingPoints;
   mitk::DataNode::Pointer m_SpacingNode;

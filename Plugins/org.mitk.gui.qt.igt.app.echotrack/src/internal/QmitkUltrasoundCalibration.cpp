@@ -174,6 +174,17 @@ void QmitkUltrasoundCalibration::CreateQtPartControl(QWidget *parent)
           SIGNAL(clicked()),
           this,
           SLOT(OnLoadPhantomConfiguration())); // Phantom configuration
+  connect(m_Controls.m_CalibBtnMatchAnnotationToPhantomConfiguration,
+          SIGNAL(clicked()),
+          this,
+          SLOT(OnMatchAnnotationToPhantomConfiguration()));
+  connect(m_Controls.m_CalibBtnMoveUp, SIGNAL(clicked()), this, SLOT(OnMovePhantomAnnotationsUp()));
+  connect(m_Controls.m_CalibBtnMoveDown, SIGNAL(clicked()), this, SLOT(OnMovePhantomAnnotationsDown()));
+  connect(m_Controls.m_CalibBtnMoveLeft, SIGNAL(clicked()), this, SLOT(OnMovePhantomAnnotationsLeft()));
+  connect(m_Controls.m_CalibBtnMoveRight, SIGNAL(clicked()), this, SLOT(OnMovePhantomAnnotationsRight()));
+  connect(m_Controls.m_CalibBtnRotateRight, SIGNAL(clicked()), this, SLOT(OnRotatePhantomAnnotationsRight()));
+  connect(m_Controls.m_CalibBtnRotateLeft, SIGNAL(clicked()), this, SLOT(OnRotatePhantomAnnotationsLeft()));
+
   connect(m_Controls.m_CalibBtnPerformPhantomCalibration,
           SIGNAL(clicked()),
           this,
@@ -181,7 +192,7 @@ void QmitkUltrasoundCalibration::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.m_CalibBtnSavePhantomCalibration,
           SIGNAL(clicked()),
           this,
-          SLOT(OnSaveCalibration())); // Perform phantom-based calibration
+          SLOT(OnSaveCalibration())); // Save phantom-based calibration
 
   // Evaluation
   connect(m_Controls.m_EvalBtnStep1, SIGNAL(clicked()), this, SLOT(OnAddEvalProjectedPoint())); // Needle Projection
@@ -797,7 +808,8 @@ void QmitkUltrasoundCalibration::OnCalibration()
 
   mitk::PointSet::Pointer ImagePointsTransformed = m_CalibPointsImage->Clone();
   this->ApplyTransformToPointSet(ImagePointsTransformed, transform);
-  mitk::DataNode::Pointer CalibPointsImageTransformed = this->GetDataStorage()->GetNamedNode("Calibration Points Image (Transformed)");
+  mitk::DataNode::Pointer CalibPointsImageTransformed =
+    this->GetDataStorage()->GetNamedNode("Calibration Points Image (Transformed)");
   if (CalibPointsImageTransformed.IsNull())
   {
     CalibPointsImageTransformed = mitk::DataNode::New();
@@ -856,6 +868,8 @@ void QmitkUltrasoundCalibration::OnLoadPhantomConfiguration()
   // clear all data
   ClearTemporaryMembers();
   // reset UI
+  m_Controls.m_CalibBtnMatchAnnotationToPhantomConfiguration->setEnabled(false);
+  m_Controls.m_RefinePhantomAnnotationsGroupBox->setEnabled(false);
   m_Controls.m_CalibBtnPerformPhantomCalibration->setEnabled(false);
   m_Controls.m_CalibBtnSavePhantomCalibration->setEnabled(false);
 
@@ -892,27 +906,10 @@ void QmitkUltrasoundCalibration::OnPhantomCalibPointsChanged()
 {
   int currentIndex = m_CalibPointsImage->SearchSelectedPoint();
   mitk::Point3D currentImagePoint = m_CalibPointsImage->GetPoint(currentIndex);
-  // create sphere to show current fiducial
-  std::stringstream pointName;
-  pointName << "Point";
-  pointName << currentIndex;
-  this->GetDataStorage()->Remove(this->GetDataStorage()->GetNamedNode(pointName.str()));
-  vtkSmartPointer<vtkSphereSource> vtkPointSphere = vtkSmartPointer<vtkSphereSource>::New();
-  vtkPointSphere->SetCenter(currentImagePoint[0], currentImagePoint[1], currentImagePoint[2]);
-  vtkPointSphere->SetRadius(10.0);
-  vtkPointSphere->SetPhiResolution(40);
-  vtkPointSphere->SetThetaResolution(40);
-  vtkPointSphere->Update();
-  mitk::Surface::Pointer pointSphere = mitk::Surface::New();
-  pointSphere->SetVtkPolyData(vtkPointSphere->GetOutput());
-  mitk::DataNode::Pointer sphereNode = mitk::DataNode::New();
-  sphereNode->SetName(pointName.str());
-  sphereNode->SetData(pointSphere);
-  sphereNode->SetColor(1.0, 1.0, 0.0);
-  this->GetDataStorage()->Add(sphereNode);
+  UpdatePhantomAnnotationPointVisualization(currentIndex);
   // create sphere to show radius in which next point has to be placed
-  this->GetDataStorage()->Remove(this->GetDataStorage()->GetNamedNode("NextPointIndicator"));
-  if (currentIndex < m_CalibPointsTool->GetSize() - 1)
+   this->GetDataStorage()->Remove(this->GetDataStorage()->GetNamedNode("NextPointIndicator"));
+   if (currentIndex < m_CalibPointsTool->GetSize() - 1)
   {
     float distanceToNextPoint =
       m_CalibPointsTool->GetPoint(currentIndex).EuclideanDistanceTo(m_CalibPointsTool->GetPoint(currentIndex + 1));
@@ -932,8 +929,116 @@ void QmitkUltrasoundCalibration::OnPhantomCalibPointsChanged()
   }
   if (m_CalibPointsTool->GetSize() == m_CalibPointsImage->GetSize())
   {
-    m_Controls.m_CalibBtnPerformPhantomCalibration->setEnabled(true);
+    m_Controls.m_CalibBtnMatchAnnotationToPhantomConfiguration->setEnabled(true);
   }
+}
+
+void QmitkUltrasoundCalibration::UpdatePhantomAnnotationPointVisualization(int index)
+{
+  mitk::Point3D currentImagePoint = m_CalibPointsImage->GetPoint(index);
+  // create sphere to show current fiducial
+  std::stringstream pointName;
+  pointName << "Point";
+  pointName << index;
+  this->GetDataStorage()->Remove(this->GetDataStorage()->GetNamedNode(pointName.str()));
+  vtkSmartPointer<vtkSphereSource> vtkPointSphere = vtkSmartPointer<vtkSphereSource>::New();
+  vtkPointSphere->SetCenter(currentImagePoint[0], currentImagePoint[1], currentImagePoint[2]);
+  vtkPointSphere->SetRadius(5.0);
+  vtkPointSphere->SetPhiResolution(40);
+  vtkPointSphere->SetThetaResolution(40);
+  vtkPointSphere->Update();
+  mitk::Surface::Pointer pointSphere = mitk::Surface::New();
+  pointSphere->SetVtkPolyData(vtkPointSphere->GetOutput());
+  mitk::DataNode::Pointer sphereNode = mitk::DataNode::New();
+  sphereNode->SetName(pointName.str());
+  sphereNode->SetData(pointSphere);
+  sphereNode->SetColor(1.0, 1.0, 0.0);
+  this->GetDataStorage()->Add(sphereNode);
+}
+
+void QmitkUltrasoundCalibration::OnMatchAnnotationToPhantomConfiguration()
+{
+  // Transform pointset of phantom configuration to currently annotated image points
+  vtkSmartPointer<vtkLandmarkTransform> transform = vtkSmartPointer<vtkLandmarkTransform>::New();
+  transform->SetModeToRigidBody();
+  vtkSmartPointer<vtkPoints> toolLandmarks = this->ConvertPointSetToVtkPolyData(m_CalibPointsTool)->GetPoints();
+  transform->SetSourceLandmarks(toolLandmarks);
+  transform->SetTargetLandmarks(this->ConvertPointSetToVtkPolyData(m_CalibPointsImage)->GetPoints());
+  transform->Update();
+  // update image annotation with matched phantom configuration
+  vtkSmartPointer<vtkPoints> transformedToolLandmarks = vtkSmartPointer<vtkPoints>::New();
+  transform->TransformPoints(toolLandmarks, transformedToolLandmarks);
+  for (int i = 0; i < transformedToolLandmarks->GetNumberOfPoints(); i++)
+  {
+    m_CalibPointsImage->InsertPoint(i, transformedToolLandmarks->GetPoint(i));
+    UpdatePhantomAnnotationPointVisualization(i);
+  }
+  m_Controls.m_RefinePhantomAnnotationsGroupBox->setEnabled(true);
+  m_Controls.m_CalibBtnPerformPhantomCalibration->setEnabled(true);
+}
+
+void QmitkUltrasoundCalibration::TranslatePhantomAnnotations(double tx, double ty, double tz)
+{
+  vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
+  transform->Translate(tx, ty, tz);
+  vtkSmartPointer<vtkPoints> currentPoints = this->ConvertPointSetToVtkPolyData(m_CalibPointsImage)->GetPoints();
+  vtkSmartPointer<vtkPoints> transformedPoints = vtkSmartPointer<vtkPoints>::New();
+  transform->TransformPoints(currentPoints, transformedPoints);
+  for (int i = 0; i < transformedPoints->GetNumberOfPoints(); i++)
+  {
+    m_CalibPointsImage->InsertPoint(i, transformedPoints->GetPoint(i));
+    UpdatePhantomAnnotationPointVisualization(i);
+  }
+}
+
+void QmitkUltrasoundCalibration::RotatePhantomAnnotations(double angle)
+{
+  vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
+  transform->RotateZ(angle);
+  vtkSmartPointer<vtkPoints> currentPoints = this->ConvertPointSetToVtkPolyData(m_CalibPointsImage)->GetPoints();
+  vtkSmartPointer<vtkPoints> transformedPoints = vtkSmartPointer<vtkPoints>::New();
+  transform->TransformPoints(currentPoints, transformedPoints);
+  for (int i = 0; i < transformedPoints->GetNumberOfPoints(); i++)
+  {
+    m_CalibPointsImage->InsertPoint(i, transformedPoints->GetPoint(i));
+    UpdatePhantomAnnotationPointVisualization(i);
+  }
+}
+
+void QmitkUltrasoundCalibration::OnMovePhantomAnnotationsUp()
+{
+  this->TranslatePhantomAnnotations(0, -m_Image->GetGeometry()->GetSpacing()[1], 0);
+}
+
+void QmitkUltrasoundCalibration::OnMovePhantomAnnotationsDown()
+{
+  this->TranslatePhantomAnnotations(0, m_Image->GetGeometry()->GetSpacing()[1], 0);
+}
+
+void QmitkUltrasoundCalibration::OnMovePhantomAnnotationsLeft()
+{
+  this->TranslatePhantomAnnotations(-m_Image->GetGeometry()->GetSpacing()[0], 0, 0);
+}
+
+void QmitkUltrasoundCalibration::OnMovePhantomAnnotationsRight()
+{
+  this->TranslatePhantomAnnotations(m_Image->GetGeometry()->GetSpacing()[0], 0, 0);
+}
+
+void QmitkUltrasoundCalibration::OnRotatePhantomAnnotationsRight()
+{
+  mitk::BoundingBox::PointType centerOfPointSet = m_CalibPointsImage->GetGeometry()->GetBoundingBox()->GetCenter();
+  this->TranslatePhantomAnnotations(-centerOfPointSet[0], -centerOfPointSet[1], -centerOfPointSet[2]);
+  this->RotatePhantomAnnotations(0.5);
+  this->TranslatePhantomAnnotations(centerOfPointSet[0], centerOfPointSet[1], centerOfPointSet[2]);
+}
+
+void QmitkUltrasoundCalibration::OnRotatePhantomAnnotationsLeft()
+{
+  mitk::BoundingBox::PointType centerOfPointSet = m_CalibPointsImage->GetGeometry()->GetBoundingBox()->GetCenter();
+  this->TranslatePhantomAnnotations(-centerOfPointSet[0], -centerOfPointSet[1], -centerOfPointSet[2]);
+  this->RotatePhantomAnnotations(-0.5);
+  this->TranslatePhantomAnnotations(centerOfPointSet[0], centerOfPointSet[1], centerOfPointSet[2]);
 }
 
 void QmitkUltrasoundCalibration::OnPhantomBasedCalibration()
@@ -1236,7 +1341,7 @@ double QmitkUltrasoundCalibration::ComputeFRE(mitk::PointSet::Pointer imageFiduc
 }
 
 void QmitkUltrasoundCalibration::ApplyTransformToPointSet(mitk::PointSet::Pointer pointSet,
-                                                          vtkSmartPointer<vtkLandmarkTransform> transform)
+                                                          vtkSmartPointer<vtkAbstractTransform> transform)
 {
   for (int i = 0; i < pointSet->GetSize(); ++i)
   {

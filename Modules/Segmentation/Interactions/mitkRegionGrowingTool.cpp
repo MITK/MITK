@@ -57,6 +57,7 @@ mitk::RegionGrowingTool::RegionGrowingTool()
     m_ScreenYDifference(0),
     m_ScreenXDifference(0),
     m_MouseDistanceScaleFactor(0.5),
+    m_PaintingPixelValue(0),
     m_FillFeedbackContour(true),
     m_ConnectedComponentValue(1)
 {
@@ -470,22 +471,11 @@ void mitk::RegionGrowingTool::OnMousePressedOutside(StateMachineAction *, Intera
           workingSliceGeometry, FeedbackContourTool::ProjectContourTo2DSlice(m_WorkingSlice, resultContour));
 
         // this is not a beautiful solution, just one that works, check T22412 for details
-        int timestep = positionEvent->GetSender()->GetTimeStep();
-        if (0 != timestep)
-        {
-          int size = resultContourWorld->GetNumberOfVertices(0);
-          auto resultContourTimeWorld = mitk::ContourModel::New();
-          resultContourTimeWorld->Expand(timestep + 1);
-          for (int loop = 0; loop < size; ++loop)
-          {
-            resultContourTimeWorld->AddVertex(resultContourWorld->GetVertexAt(loop, 0), timestep);
-          }
-          FeedbackContourTool::SetFeedbackContour(resultContourTimeWorld);
-        }
-        else
-        {
-          FeedbackContourTool::SetFeedbackContour(resultContourWorld);
-        }
+        auto t = positionEvent->GetSender()->GetTimeStep();
+
+        FeedbackContourTool::SetFeedbackContour(0 != t
+          ? ContourModelUtils::MoveZerothContourTimeStep(resultContourWorld, t)
+          : resultContourWorld);
 
         FeedbackContourTool::SetFeedbackContourVisible(true);
         mitk::RenderingManager::GetInstance()->RequestUpdate(m_LastEventSender->GetRenderWindow());

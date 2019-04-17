@@ -164,6 +164,15 @@ namespace itk
     {
       this->m_Image = it.m_Image; // copy the smart pointer
       this->m_Region = it.m_Region;
+      this->m_InitializeValue = it.m_InitializeValue;
+      this->m_RegionGrowingState = it.m_RegionGrowingState;
+      this->m_MinTH = it.m_MinTH;
+      this->m_MaxTH = it.m_MaxTH;
+      this->m_SeedPointValue = it.m_SeedPointValue;
+      this->m_VoxelCounter = it.m_VoxelCounter;
+      this->m_LastVoxelNumber = it.m_LastVoxelNumber;
+      this->m_DetectedLeakagePoint = it.m_DetectedLeakagePoint;
+      this->m_CurrentLeakageRatio = it.m_CurrentLeakageRatio;
       return *this;
     }
 

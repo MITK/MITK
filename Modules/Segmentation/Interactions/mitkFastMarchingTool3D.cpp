@@ -45,7 +45,9 @@ mitk::FastMarchingTool3D::FastMarchingTool3D()
     m_StoppingValue(100),
     m_Sigma(1.0),
     m_Alpha(-0.5),
-    m_Beta(3.0)
+    m_Beta(3.0),
+    m_PointSetAddObserverTag(0),
+    m_PointSetRemoveObserverTag(0)
 {
 }
 

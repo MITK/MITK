@@ -212,8 +212,7 @@ unsigned long mitk::BaseData::GetMTime() const
   {
     if ((time < m_TimeGeometry->GetMTime()))
     {
-      Modified();
-      return Superclass::GetMTime();
+      return m_TimeGeometry->GetMTime();
     }
   }
   return time;

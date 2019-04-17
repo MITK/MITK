@@ -25,11 +25,6 @@
 #include <usCoreConfig.h>
 #include <usAny.h>
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4251)
-#endif
-
 US_BEGIN_NAMESPACE
 
 /// \cond
@@ -205,10 +200,6 @@ private:
 };
 
 US_END_NAMESPACE
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 /**
  * \ingroup MicroServicesUtils

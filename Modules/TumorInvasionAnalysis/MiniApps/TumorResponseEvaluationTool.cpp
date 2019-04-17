@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
   parser.setArgumentPrefix("--", "-");
   // Add command line argument names
   parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Show options");
-  parser.addArgument("loadFile", "l", mitkCommandLineParser::InputFile, "DataCollection File");
+  parser.addArgument("loadFile", "l", mitkCommandLineParser::File, "DataCollection File", "", us::Any(), false, false, false, mitkCommandLineParser::Input);
   parser.addArgument(
     "colIds", "c", mitkCommandLineParser::String, "Patient Identifiers from DataCollection used for training");
   parser.addArgument(
@@ -53,8 +53,8 @@ int main(int argc, char *argv[])
   parser.addArgument("treeDepth", "d", mitkCommandLineParser::Int, "limits tree depth");
   parser.addArgument("forestSize", "f", mitkCommandLineParser::Int, "number of trees");
   parser.addArgument("configName", "n", mitkCommandLineParser::String, "human readable name for configuration");
-  parser.addArgument("output", "o", mitkCommandLineParser::OutputDirectory, "output folder for results");
-  parser.addArgument("forest", "t", mitkCommandLineParser::OutputFile, "store trained forest to file");
+  parser.addArgument("output", "o", mitkCommandLineParser::Directory, "output folder for results", "", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("forest", "t", mitkCommandLineParser::File, "store trained forest to file", "", us::Any(), false, false, false, mitkCommandLineParser::Output);
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   // Show a help message

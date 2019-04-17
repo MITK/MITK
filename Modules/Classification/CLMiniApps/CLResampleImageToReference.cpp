@@ -82,9 +82,9 @@ int main(int argc, char* argv[])
   mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
   // required params
-  parser.addArgument("fix", "f", mitkCommandLineParser::InputImage, "Input Image", "Path to the input VTK polydata", us::Any(), false);
-  parser.addArgument("moving", "m", mitkCommandLineParser::OutputFile, "Output text file", "Target file. The output statistic is appended to this file.", us::Any(), false);
-  parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Extension", "File extension. Default is .nii.gz", us::Any(), false);
+  parser.addArgument("fix", "f", mitkCommandLineParser::Image, "Input Image", "Path to the input VTK polydata", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("moving", "m", mitkCommandLineParser::File, "Output text file", "Target file. The output statistic is appended to this file.", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("output", "o", mitkCommandLineParser::File, "Extension", "File extension. Default is .nii.gz", us::Any(), false, false, false, mitkCommandLineParser::Output);
 
   // Miniapp Infos
   parser.setCategory("Classification Tools");

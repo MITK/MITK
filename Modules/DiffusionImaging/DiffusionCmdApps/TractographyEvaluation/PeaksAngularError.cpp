@@ -40,10 +40,10 @@ int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("test", "", mitkCommandLineParser::StringList, "Test images", "test direction images", us::Any(), false);
-  parser.addArgument("reference", "", mitkCommandLineParser::StringList, "Reference images", "reference direction images", us::Any(), false);
-  parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output folder", "output folder", us::Any(), false);
-  parser.addArgument("masks", "", mitkCommandLineParser::StringList, "Mask(s)", "mask image(s)");
+  parser.addArgument("test", "", mitkCommandLineParser::StringList, "Test images", "test direction images", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("reference", "", mitkCommandLineParser::StringList, "Reference images", "reference direction images", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output folder", "output folder", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("masks", "", mitkCommandLineParser::StringList, "Mask(s)", "mask image(s)", us::Any(), true, false, false, mitkCommandLineParser::Input);
   parser.addArgument("verbose", "", mitkCommandLineParser::Bool, "Verbose", "output error images");
   parser.addArgument("ignore_test", "", mitkCommandLineParser::Bool, "Ignore missing test", "don't increase error if no test directions are found");
   parser.addArgument("ignore_ref", "", mitkCommandLineParser::Bool, "Ignore ignore missing ref", "don't increase error if no ref directions are found");

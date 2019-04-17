@@ -58,13 +58,13 @@ int main(int argc, char* argv[])
   parser.setArgumentPrefix("--", "-");
   // Add command line argument names
   parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
-  parser.addArgument("input", "i", mitkCommandLineParser::InputDirectory, "Input file:", "Input file", us::Any(), false);
-  parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output file:", "Output file", us::Any(), false);
+  parser.addArgument("input", "i", mitkCommandLineParser::Directory, "Input file:", "Input file", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file:", "Output file", us::Any(), false, false, false, mitkCommandLineParser::Output);
 
-  parser.addArgument("single-rate", "sr", mitkCommandLineParser::OutputFile, "Single Acceptance rate for all voxel", "Output file", us::Any(), true);
-  parser.addArgument("class-rate", "cr", mitkCommandLineParser::OutputFile, "Class-dependend acceptance rate", "Output file", us::Any(), true);
-  parser.addArgument("single-number", "sn", mitkCommandLineParser::OutputFile, "Single Number of Voxel for each class", "Output file", us::Any(), true);
-  parser.addArgument("class-number", "cn", mitkCommandLineParser::OutputFile, "Class-dependedn number of voxels ", "Output file", us::Any(), true);
+  parser.addArgument("single-rate", "sr", mitkCommandLineParser::File, "Single Acceptance rate for all voxel", "Output file", us::Any(), true, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("class-rate", "cr", mitkCommandLineParser::File, "Class-dependend acceptance rate", "Output file", us::Any(), true, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("single-number", "sn", mitkCommandLineParser::File, "Single Number of Voxel for each class", "Output file", us::Any(), true, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("class-number", "cn", mitkCommandLineParser::File, "Class-dependedn number of voxels ", "Output file", us::Any(), true, false, false, mitkCommandLineParser::Output);
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
 

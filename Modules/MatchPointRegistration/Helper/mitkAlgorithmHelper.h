@@ -42,12 +42,16 @@ namespace mitk
   {
   public:
 
-    MITKAlgorithmHelper(map::algorithm::RegistrationAlgorithmBase* algorithm = nullptr);
+    MITKAlgorithmHelper(map::algorithm::RegistrationAlgorithmBase* algorithm);
 
     void SetData(const mitk::BaseData* moving, const mitk::BaseData* target);
 
     void SetAllowImageCasting(bool allowCasting);
     bool GetAllowImageCasting() const;
+
+    static bool HasImageAlgorithmInterface(const map::algorithm::RegistrationAlgorithmBase* algorithm);
+    static bool HasPointSetAlgorithmInterface(const map::algorithm::RegistrationAlgorithmBase* algorithm);
+
 
     struct CheckError
     {

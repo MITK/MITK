@@ -110,6 +110,9 @@ private:
   void GenerateHR3DAtlasScreenshots(QString fileName, QString filter = "");
   void GenerateMultiplanarScreenshots(QString fileName);
 
+  mitk::DataNode::Pointer GetTopLayerNode();
+  void MultichannelScreenshot(mitk::VtkPropRenderer* renderer, QString fileName, QString filter);
+
   /*!
   \brief taking a screenshot "from" the specified renderer
   \param magnificationFactor specifying the quality of the screenshot (the magnification of the actual RenderWindow size)

@@ -39,7 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTriangleFilter.h>
 
 mitk::ExtrudedContour::ExtrudedContour()
-  : m_Contour(nullptr), m_ClippingGeometry(nullptr), m_AutomaticVectorGeneration(false)
+  : m_Contour(nullptr), m_ClippingGeometry(nullptr), m_AutomaticVectorGeneration(false), m_Decimate(nullptr)
 {
   ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
   timeGeometry->Initialize(1);

@@ -96,20 +96,20 @@ InputParameters parseInput(int argc, char* argv[])
 
   parser.beginGroup("Required parameters");
   parser.addArgument(
-    "savePath", "s", mitkCommandLineParser::InputDirectory,
+    "savePath", "s", mitkCommandLineParser::Directory,
     "Input save folder (directory)", "input save folder",
-    us::Any(), false);
+    us::Any(), false, false, false, mitkCommandLineParser::Input);
   parser.addArgument(
-    "mitkMcxyz", "m", mitkCommandLineParser::OutputFile,
+    "mitkMcxyz", "m", mitkCommandLineParser::File,
     "MitkMcxyz binary (file)", "path to the MitkMcxyz binary",
-    us::Any(), false);
+    us::Any(), false, false, false, mitkCommandLineParser::Output);
   parser.endGroup();
 
   parser.beginGroup("Optional parameters");
   parser.addArgument(
-    "probe", "p", mitkCommandLineParser::OutputFile,
+    "probe", "p", mitkCommandLineParser::File,
     "xml probe file (file)", "file to the definition of the used probe (*.xml)",
-    us::Any());
+    us::Any(), true, false, false, mitkCommandLineParser::Output);
   parser.addArgument(
     "verbose", "v", mitkCommandLineParser::Bool,
     "Verbose Output", "Whether to produce verbose, or rather debug output");

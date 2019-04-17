@@ -46,9 +46,9 @@ int main(int argc, char* argv[])
   parser.setDescription("Find tracts that overlap with the reference masks or tracts");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("", "i", mitkCommandLineParser::StringList, "Input:", "input tractograms (.fib/.trk/.tck/.dcm)", us::Any(), false);
-  parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output Folder:", "move input tracts that do/don't overlap here", us::Any(), false);
-  parser.addArgument("reference", "", mitkCommandLineParser::StringList, "Reference:", "reference tractograms or mask images", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::StringList, "Input:", "input tractograms (.fib/.trk/.tck/.dcm)", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output Folder:", "move input tracts that do/don't overlap here", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("reference", "", mitkCommandLineParser::StringList, "Reference:", "reference tractograms or mask images", us::Any(), false, false, false, mitkCommandLineParser::Input);
 
   parser.addArgument("overlap_fraction", "", mitkCommandLineParser::Float, "Overlap fraction:", "", 0.9);
   parser.addArgument("use_any_overlap", "", mitkCommandLineParser::Bool, "Use any overlap:", "Don't find maximum overlap but use first overlap larger threshold");

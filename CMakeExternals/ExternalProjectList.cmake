@@ -11,7 +11,6 @@ mitkFunctionAddExternalProject(NAME ANN         ON  ADVANCED DOC "Use Approximat
 mitkFunctionAddExternalProject(NAME CppUnit     ON  ADVANCED DOC "Use CppUnit for unit tests")
 
 mitkFunctionAddExternalProject(NAME PCRE        OFF ADVANCED NO_PACKAGE)
-mitkFunctionAddExternalProject(NAME ZLIB        OFF ADVANCED NO_PACKAGE NO_CACHE)
 
 mitkFunctionAddExternalProject(NAME HDF5        ON ADVANCED)
 mitkFunctionAddExternalProject(NAME BetData     OFF ADVANCED)
@@ -31,7 +30,8 @@ mitkFunctionAddExternalProject(NAME Vigra     OFF          DEPENDS HDF5)
 mitkFunctionAddExternalProject(NAME ITK       ON           NO_CACHE DEPENDS HDF5)
 mitkFunctionAddExternalProject(NAME VTK       ON           NO_CACHE)
 mitkFunctionAddExternalProject(NAME Boost     ON           NO_CACHE)
-
+mitkFunctionAddExternalProject(NAME ZLIB      OFF          ADVANCED)
+mitkFunctionAddExternalProject(NAME cpprestsdk OFF         DEPENDS Boost ZLIB ADVANCED)
 mitkFunctionAddExternalProject(NAME ACVD      OFF          DOC "Use Approximated Centroidal Voronoi Diagrams")
 mitkFunctionAddExternalProject(NAME CTK       ON           DEPENDS Qt5 DCMTK DOC "Use CTK in MITK")
 mitkFunctionAddExternalProject(NAME Rasqal    OFF          DEPENDS Raptor2 PCRE ADVANCED)

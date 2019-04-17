@@ -16,16 +16,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkDataNodeShowDetailsAction.h>
 
-// mitk gui qt application
-#include "src/internal/QmitkInfoDialog.h"
+#include "QmitkNodeDetailsDialog.h"
 
 namespace ShowDetailsAction
 {
-  void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite, QWidget* parent /* = nullptr*/)
+  void Run(const QList<mitk::DataNode::Pointer>& selectedNodes, QWidget* parent /* = nullptr*/)
   {
-    auto selectedNodes = AbstractDataNodeAction::GetSelectedNodes(workbenchPartSite);
+    if (selectedNodes.empty())
+    {
+      return;
+    }
 
-    QmitkInfoDialog infoDialog(selectedNodes, parent);
+    QmitkNodeDetailsDialog infoDialog(selectedNodes, parent);
     infoDialog.exec();
   }
 }
@@ -48,22 +50,13 @@ QmitkDataNodeShowDetailsAction::QmitkDataNodeShowDetailsAction(QWidget* parent, 
   InitializeAction();
 }
 
-QmitkDataNodeShowDetailsAction::~QmitkDataNodeShowDetailsAction()
-{
-  // nothing here
-}
-
 void QmitkDataNodeShowDetailsAction::InitializeAction()
 {
   connect(this, &QmitkDataNodeShowDetailsAction::triggered, this, &QmitkDataNodeShowDetailsAction::OnActionTriggered);
 }
 
-void QmitkDataNodeShowDetailsAction::OnActionTriggered(bool checked)
+void QmitkDataNodeShowDetailsAction::OnActionTriggered(bool /*checked*/)
 {
-  if (m_WorkbenchPartSite.Expired())
-  {
-    return;
-  }
-
-  ShowDetailsAction::Run(m_WorkbenchPartSite.Lock(), m_Parent);
+  auto selectedNodes = GetSelectedNodes();
+  ShowDetailsAction::Run(selectedNodes, m_Parent);
 }

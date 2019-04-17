@@ -16,6 +16,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkGenericIDRelationRule.h"
 
+bool mitk::GenericIDRelationRule::IsAbstract() const
+{
+  return m_RuleIDTag.empty();
+};
+
+bool mitk::GenericIDRelationRule::IsSupportedRuleID(const RuleIDType& ruleID) const
+{
+  return ruleID == this->GetRuleID() || (IsAbstract() && ruleID.find("IDRelation_") == 0);
+};
+
 mitk::GenericIDRelationRule::RuleIDType mitk::GenericIDRelationRule::GetRuleID() const
 {
   return "IDRelation_" + m_RuleIDTag;
@@ -34,6 +44,11 @@ std::string mitk::GenericIDRelationRule::GetSourceRoleName() const
 std::string mitk::GenericIDRelationRule::GetDestinationRoleName() const
 {
   return m_DestinationRole;
+};
+
+mitk::GenericIDRelationRule::RelationUIDType mitk::GenericIDRelationRule::Connect(IPropertyOwner *source, const IPropertyProvider *destination) const
+{
+  return Superclass::Connect(source, destination);
 };
 
 mitk::GenericIDRelationRule::GenericIDRelationRule(const RuleIDType &ruleIDTag)

@@ -22,8 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkAbstractDataNodeAction.h"
 
 // qt
-#include <QPushButton.h>
-#include <QWidgetAction.h>
+#include <QPushButton>
+#include <QWidgetAction>
 
 class MITK_QT_APP QmitkDataNodeColorAction : public QWidgetAction, public QmitkAbstractDataNodeAction
 {
@@ -33,8 +33,6 @@ public:
 
   QmitkDataNodeColorAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
   QmitkDataNodeColorAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
-
-  virtual ~QmitkDataNodeColorAction() override;
 
   virtual void InitializeWithDataNode(const mitk::DataNode* dataNode) override;
 

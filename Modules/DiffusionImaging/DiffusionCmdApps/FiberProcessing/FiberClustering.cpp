@@ -51,22 +51,22 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input:", "input fiber bundle (.fib, .trk, .tck)", us::Any(), false);
-  parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output root", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::String, "Input:", "input fiber bundle (.fib; .trk; .tck)", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output:", "output root", us::Any(), false, false, false, mitkCommandLineParser::Output);
 
   parser.addArgument("cluster_size", "", mitkCommandLineParser::Int, "Cluster size:", "", 10);
   parser.addArgument("fiber_points", "", mitkCommandLineParser::Int, "Fiber points:", "", 12);
   parser.addArgument("min_fibers", "", mitkCommandLineParser::Int, "Min. fibers per cluster:", "", 1);
   parser.addArgument("max_clusters", "", mitkCommandLineParser::Int, "Max. clusters:", "");
-  parser.addArgument("merge_clusters", "", mitkCommandLineParser::Float, "Merge clusters:", "", -1.0);
+  parser.addArgument("merge_clusters", "", mitkCommandLineParser::Float, "Merge clusters:", "Set to 0 to avoid merging and to -1 to use the original cluster size", -1.0);
   parser.addArgument("output_centroids", "", mitkCommandLineParser::Bool, "Output centroids:", "");
   parser.addArgument("only_centroids", "", mitkCommandLineParser::Bool, "Output only centroids:", "");
   parser.addArgument("merge_centroids", "", mitkCommandLineParser::Bool, "Merge centroids:", "");
-  parser.addArgument("metrics", "", mitkCommandLineParser::StringList, "Metrics:", "EU_MEAN (default), EU_STD, EU_MAX, ANAT, MAP, LENGTH");
+  parser.addArgument("metrics", "", mitkCommandLineParser::StringList, "Metrics:", "EU_MEAN; EU_STD; EU_MAX; ANAT; MAP; LENGTH", std::string("EU_MEAN"));
   parser.addArgument("metric_weights", "", mitkCommandLineParser::StringList, "Metric weights:", "add one float weight for each used metric");
-  parser.addArgument("input_centroids", "", mitkCommandLineParser::String, "Input centroids:", "");
-  parser.addArgument("scalar_map", "", mitkCommandLineParser::String, "Scalar map:", "");
-  parser.addArgument("parcellation", "", mitkCommandLineParser::String, "Parcellation:", "");
+  parser.addArgument("input_centroids", "", mitkCommandLineParser::String, "Input centroids:", "", us::Any(), true, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("scalar_map", "", mitkCommandLineParser::String, "Scalar map:", "", us::Any(), true, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("parcellation", "", mitkCommandLineParser::String, "Parcellation:", "", us::Any(), true, false, false, mitkCommandLineParser::Input);
   parser.addArgument("file_ending", "", mitkCommandLineParser::String, "File ending:", "");
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

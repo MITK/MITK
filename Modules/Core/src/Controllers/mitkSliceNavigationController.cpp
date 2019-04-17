@@ -392,9 +392,6 @@ namespace mitk
       {
         this->InvokeEvent(GeometrySliceEvent(m_CreatedWorldGeometry, m_Slice->GetPos()));
 
-        // send crosshair event
-        crosshairPositionEvent.Send();
-
         // Request rendering update for all views
         this->GetRenderingManager()->RequestUpdateAll();
       }
@@ -507,6 +504,8 @@ namespace mitk
         this->GetSlice()->SetPos(0);
       }
       this->SendCreatedWorldGeometryUpdate();
+      // send crosshair event
+      SetCrosshairEvent.Send(point);
     }
   }
 

@@ -206,6 +206,31 @@ mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyCropping(
   }
 }
 
+mitk::Image::Pointer mitk::PhotoacousticFilterService::ExtendImage(mitk::Image::Pointer inputImage, float pixelColor, unsigned int outputDimensionY)
+{
+  mitk::Image::Pointer outputImage = mitk::Image::New();
+  unsigned int dim[] = {inputImage->GetDimension(0), outputDimensionY, inputImage->GetDimension(2)};
+  outputImage->Initialize(inputImage->GetPixelType(), 3, dim);
+
+  float *sliceData = new float[dim[0] * dim[1]];
+
+  for (size_t i = inputImage->GetDimension(1) * dim[0]; i < dim[0] * dim[1]; ++i)
+  {
+    sliceData[i] = pixelColor;
+  }
+
+  for (unsigned int slice = 0; slice < dim[2]; ++slice)
+  {
+    mitk::ImageReadAccessor cpy(inputImage, inputImage->GetSliceData(slice));
+    cpy.GetData();
+    std::memcpy((void*)sliceData, cpy.GetData(), sizeof(float) * inputImage->GetDimension(1) * dim[0]);
+    outputImage->SetSlice(sliceData, slice);
+  }
+
+  delete[] sliceData;
+  return outputImage;
+}
+
 mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyBeamforming(
   mitk::Image::Pointer inputImage,
   BeamformingSettings::Pointer config,

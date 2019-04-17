@@ -55,8 +55,8 @@ int main(int argc, char* argv[])
   parser.setArgumentPrefix("--","-");
   // Add command line argument names
   parser.addArgument("help", "h",mitkCommandLineParser::Bool, "Help:", "Show this help text");
-  parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input file:", "Input file",us::Any(),false);
-  parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output file:", "Output file", us::Any(), false);
+  parser.addArgument("input", "i", mitkCommandLineParser::File, "Input file:", "Input file",us::Any(),false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file:", "Output file", us::Any(), false, false, false, mitkCommandLineParser::Output);
   parser.addArgument("type", "t", mitkCommandLineParser::String, "Type definition:", "Define Scalar data type: int, uint, short, ushort, char, uchar, float, double", us::Any(), false);
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

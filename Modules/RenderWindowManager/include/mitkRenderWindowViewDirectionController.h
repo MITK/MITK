@@ -34,12 +34,14 @@ namespace mitk
   * or 'mitk::SliceNavigationController::Sagittal'.
   *
   * Functions with 'mitk::BaseRenderer* renderer' have 'nullptr' as their default argument. Using the nullptr
-  * these functions operate on all base renderer. Giving a specific base renderer will modify the node only for the given renderer.
+  * these functions operate on all base renderer. Giving a specific base renderer will modify the view direction only for the given renderer.
   */
   class MITKRENDERWINDOWMANAGER_EXPORT RenderWindowViewDirectionController
   {
   public:
     
+    using ViewDirection = mitk::SliceNavigationController::ViewDirection;
+
     RenderWindowViewDirectionController();
     /**
     * @brief Set the data storage on which to work.
@@ -53,17 +55,27 @@ namespace mitk
     // wrapper functions to modify the view direction
     /**
     * @brief Set the view direction for the given renderer (nullptr = all renderer)
-    * @param viewDirection  The view direction that should be used for this renderer.
+    * @param viewDirection  The view direction that should be used for this renderer as a string.
     *                       Currently "axial", "coronal" and "sagittal" is supported.
     * @param renderer       Pointer to the renderer instance for which the view direction should be changed.
-    *                       If it is a nullptr (default) nothing happens. The view direction can not be changed
-    *                       for all controlled renderer at the moment.
+    *                       If it is a nullptr (default) all controlled renderer will be affected.
     */
-    void SetViewDirectionOfRenderer(const std::string &viewDirection, BaseRenderer* renderer = nullptr);
+    void SetViewDirectionOfRenderer(const std::string& viewDirection, BaseRenderer* renderer = nullptr);
+    /**
+    * @brief Set the view direction for the given renderer (nullptr = all renderer)
+    * @param viewDirection  The view direction that should be used for this renderer.
+    * @param renderer       Pointer to the renderer instance for which the view direction should be changed.
+    *                       If it is a nullptr (default) nothing happens.
+    */
+    void SetViewDirectionOfRenderer(ViewDirection viewDirection, BaseRenderer* renderer = nullptr);
+    /**
+    * @brief Reinitialize the given renderer with the currently visible nodes.
+    * @param renderer       Pointer to the renderer instance for which the view direction should be changed.
+    *                       If it is a nullptr (default) all controlled renderer will be affected.
+    */
+    void InitializeViewByBoundingObjects(const BaseRenderer* renderer);
 
   private:
-
-    void InitializeViewByBoundingObjects(const BaseRenderer* renderer);
 
     DataStorage::Pointer m_DataStorage;
     RenderWindowLayerUtilities::RendererVector m_ControlledRenderer;

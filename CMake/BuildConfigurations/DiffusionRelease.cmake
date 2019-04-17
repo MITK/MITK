@@ -7,7 +7,11 @@ set(MITK_USE_MatchPoint ON CACHE BOOL "" FORCE)
 set(MITK_USE_DCMTK ON CACHE BOOL "" FORCE)
 set(MITK_USE_DCMQI ON CACHE BOOL "" FORCE)
 set(MITK_USE_OpenMP ON CACHE BOOL "" FORCE)
-set(MITK_USE_Python ON CACHE BOOL "" FORCE)
+if(UNIX AND NOT APPLE)
+  set(MITK_USE_Python ON CACHE BOOL "" FORCE)
+else()
+  set(MITK_USE_Python OFF CACHE BOOL "" FORCE)
+endif()
 set(MITK_USE_BetData ON CACHE BOOL "" FORCE)
 
 # Disable all apps but MITK Diffusion
@@ -38,4 +42,5 @@ set(BLUEBERRY_USE_QT_HELP ON CACHE BOOL "Enable support for integrating bundle d
 # Enable console window
 set(MITK_SHOW_CONSOLE_WINDOW ON CACHE BOOL "Use this to enable or disable the console window when starting MITK GUI Applications" FORCE)
 
+set(MITK_VTK_DEBUG_LEAKS OFF CACHE BOOL "" FORCE)
 set(CMAKE_BUILD_TYPE Release CACHE STRING "" FORCE)

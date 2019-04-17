@@ -66,14 +66,14 @@ void setupParser(mitkCommandLineParser& parser)
     // see mitkCommandLineParser::addArgument for more information
     parser.beginGroup("Required I/O parameters");
     parser.addArgument(
-        "input", "i", mitkCommandLineParser::InputFile, "Input file", "input 3D+t image file", us::Any(), false);
+        "input", "i", mitkCommandLineParser::File, "Input file", "input 3D+t image file", us::Any(), false, false, false, mitkCommandLineParser::Input);
     parser.addArgument("output",
         "o",
-        mitkCommandLineParser::OutputFile,
+        mitkCommandLineParser::File,
         "Output file",
         "where to save the output concentration image.",
         us::Any(),
-        false);
+        false, false, false, mitkCommandLineParser::Output);
     parser.endGroup();
 
     parser.beginGroup("Conversion parameters");

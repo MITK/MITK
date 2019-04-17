@@ -644,6 +644,7 @@ mitk::LabelSetImageVtkMapper2D::LocalStorage::LocalStorage()
   m_OutlineShadowActor = vtkSmartPointer<vtkActor>::New();
 
   m_NumberOfLayers = 0;
+  m_mmPerPixel = nullptr;
 
   m_OutlineActor->SetMapper(m_OutlineMapper);
   m_OutlineShadowActor->SetMapper(m_OutlineMapper);

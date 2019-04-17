@@ -178,12 +178,12 @@ int main( int argc, char* argv[] )
   parser.setArgumentPrefix("--","-");
 
   // mandatory arguments
-  parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input: ", "input image (DWI)", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::String, "Input: ", "input image (DWI)", us::Any(), false, false, false, mitkCommandLineParser::Input);
   parser.addArgument("", "o", mitkCommandLineParser::String, "Output Preifx: ", "Prefix for the output images, will append _f, _K, _D accordingly ", us::Any(), false);
   parser.addArgument("output_type", "", mitkCommandLineParser::String, "Output Type: ", "choose data type of output image, e.g. '.nii' or '.nrrd' ", us::Any(), false);
 
   // optional arguments
-  parser.addArgument("mask", "m", mitkCommandLineParser::InputFile, "Masking Image: ", "ROI (segmentation)", us::Any());
+  parser.addArgument("mask", "m", mitkCommandLineParser::String, "Masking Image: ", "ROI (segmentation)", us::Any(), true, false, false, mitkCommandLineParser::Input);
   parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help", "Show this help text");
   parser.addArgument("omitbzero", "om", mitkCommandLineParser::Bool, "Omit b0:", "Omit b0 value during fit (default = false)", us::Any());
   parser.addArgument("lowerkbound", "kl", mitkCommandLineParser::Float, "lower Kbound:", "Set (unsigned) lower boundary for Kurtosis parameter (default = -1000)", us::Any());

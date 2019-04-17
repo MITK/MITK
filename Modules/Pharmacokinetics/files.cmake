@@ -48,7 +48,6 @@ set(CPP_FILES
   Models/mitkNumericTwoTissueCompartmentModel.cpp
   Models/mitkNumericTwoTissueCompartmentModelFactory.cpp
   Models/mitkNumericTwoTissueCompartmentModelParameterizer.cpp  
-  SimulationFramework/mitkPerfusionDataGenerator.cpp
   SimulationFramework/mitkImageGenerationHelper.cpp
 )
 

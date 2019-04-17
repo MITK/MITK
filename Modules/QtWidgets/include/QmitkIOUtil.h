@@ -119,7 +119,8 @@ public:
   static QString Save(const mitk::BaseData *data,
                       const QString &defaultBaseName,
                       const QString &defaultPath = QString(),
-                      QWidget *parent = nullptr);
+                      QWidget *parent = nullptr,
+                      bool setPathProperty = false);
 
   /**
    * @brief Save a list of BaseData objects using a "File Save Dialog".
@@ -182,7 +183,8 @@ public:
   static QStringList Save(const std::vector<const mitk::BaseData *> &data,
                           const QStringList &defaultBaseNames,
                           const QString &defaultPath = QString(),
-                          QWidget *parent = nullptr);
+                          QWidget *parent = nullptr,
+                          bool setPathProperty = false);
 
   using mitk::IOUtil::Save;
 

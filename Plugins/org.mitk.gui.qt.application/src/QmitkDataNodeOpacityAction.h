@@ -22,8 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkAbstractDataNodeAction.h"
 
 // qt
-#include <QSlider.h>
-#include <QWidgetAction.h>
+#include <QSlider>
+#include <QWidgetAction>
 
 class MITK_QT_APP QmitkDataNodeOpacityAction : public QWidgetAction, public QmitkAbstractDataNodeAction
 {
@@ -33,8 +33,6 @@ public:
 
   QmitkDataNodeOpacityAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
   QmitkDataNodeOpacityAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
-
-  virtual ~QmitkDataNodeOpacityAction() override;
 
   virtual void InitializeWithDataNode(const mitk::DataNode* dataNode) override;
 

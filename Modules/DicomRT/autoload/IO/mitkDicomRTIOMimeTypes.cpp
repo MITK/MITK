@@ -97,9 +97,12 @@ std::string DicomRTIOMimeTypes::GetModality(const std::string & path)
   scanner->Scan();
 
   mitk::DICOMDatasetAccessingImageFrameList frames = scanner->GetFrameInfoList();
+  std::string modality = "";
+  if (frames.empty())
+    return modality;
   auto findings = frames.front()->GetTagValueAsString(DICOMTagPath(0x0008, 0x0060));
 
-  std::string modality = findings.front().value;
+  modality = findings.front().value;
   return modality;
 }
 

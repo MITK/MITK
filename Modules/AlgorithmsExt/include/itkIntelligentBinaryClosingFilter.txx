@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace itk
 {
   template <class TInputImage, class TOutputImage>
-  IntelligentBinaryClosingFilter<TInputImage, TOutputImage>::IntelligentBinaryClosingFilter()
+  IntelligentBinaryClosingFilter<TInputImage, TOutputImage>::IntelligentBinaryClosingFilter(): m_ClosingRadius(4.0), m_SurfaceRatio(70)
   {
     m_ErodeImageFilter = BinaryErodeImageFilterType::New();
     m_DilateImageFilter = BinaryDilateImageFilterType::New();
@@ -31,8 +31,6 @@ namespace itk
     m_RelabelComponentImageFilter = RelabelComponentImageFilterType::New();
     m_RelabelComponentImageFilter->SetInPlace(true);
     m_BorderDetectionDilateFilter = DilateComponentImageFilterType::New();
-    m_ClosingRadius = 4.0;
-    m_SurfaceRatio = 70;
   }
 
   template <class TInputImage, class TOutputImage>

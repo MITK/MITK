@@ -39,6 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace itk{
 
 FibersFromPlanarFiguresFilter::FibersFromPlanarFiguresFilter()
+  : m_FixSeed(false)
 {
 
 }
@@ -52,7 +53,10 @@ FibersFromPlanarFiguresFilter::~FibersFromPlanarFiguresFilter()
 void FibersFromPlanarFiguresFilter::GeneratePoints()
 {
   Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen = Statistics::MersenneTwisterRandomVariateGenerator::New();
-  randGen->SetSeed((unsigned int)0);
+  if (m_FixSeed)
+    randGen->SetSeed(0);
+  else
+    randGen->SetSeed();
   m_2DPoints.clear();
   unsigned int count = 0;
 
@@ -75,6 +79,11 @@ void FibersFromPlanarFiguresFilter::GeneratePoints()
       count++;
     }
   }
+}
+
+void FibersFromPlanarFiguresFilter::SetFixSeed(bool FixSeed)
+{
+  m_FixSeed = FixSeed;
 }
 
 void FibersFromPlanarFiguresFilter::GenerateData()
@@ -173,6 +182,8 @@ void FibersFromPlanarFiguresFilter::GenerateData()
 
         // apply twist
         tRot[0][0] = tDir[0]*tDir2[0] + tDir[1]*tDir2[1];
+        if (tRot[0][0]>1.0)
+          tRot[0][0] = 1.0;
         tRot[1][1] = tRot[0][0];
         tRot[1][0] = sin(acos(tRot[0][0]));
         tRot[0][1] = -tRot[1][0];
@@ -215,7 +226,6 @@ void FibersFromPlanarFiguresFilter::GenerateData()
 
         mitk::Point3D w;
         planeGeo->Map(p0, w);
-
 
         vtkIdType id = m_VtkPoints->InsertNextPoint(w.GetDataPointer());
         container->GetPointIds()->InsertNextId(id);

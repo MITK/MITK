@@ -93,11 +93,9 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 {
   m_CurrentRowCount = 0;
   m_Parent = parent;
-  //# Preferences
-  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
-  berry::IBerryPreferences::Pointer prefs = (prefService->GetSystemPreferences()->Node(VIEW_ID)).Cast<berry::IBerryPreferences>();
+
+  berry::IBerryPreferences::Pointer prefs = this->GetPreferences().Cast<berry::IBerryPreferences>();
   assert(prefs);
-  prefs->OnChanged.AddListener(berry::MessageDelegate1<QmitkDataManagerView, const berry::IBerryPreferences*>(this, &QmitkDataManagerView::OnPreferencesChanged));
 
   //# GUI
   m_NodeTreeModel = new QmitkDataStorageTreeModel(GetDataStorage(), prefs->GetBool("Place new nodes on top", true));
@@ -208,11 +206,12 @@ void QmitkDataManagerView::NodeSelectionChanged(const QItemSelection& /*selected
       node->SetSelected(selectedNodes.contains(node));
     }
   }
+  m_DataNodeContextMenu->SetSelectedNodes(selectedNodes);
 }
 
 void QmitkDataManagerView::OnNodeVisibilityChanged()
 {
-  ToggleVisibilityAction::Run(GetSite(), GetDataStorage());
+  ToggleVisibilityAction::Run(GetSite(), GetDataStorage(), QList<mitk::DataNode::Pointer>());
 }
 
 void QmitkDataManagerView::ShowIn(const QString& editorId)

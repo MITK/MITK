@@ -92,6 +92,10 @@ QmitkLabelSetWidget::~QmitkLabelSetWidget() {}
 void QmitkLabelSetWidget::OnTableViewContextMenuRequested(const QPoint & /*pos*/)
 {
   int pixelValue = GetPixelValueOfSelectedItem();
+
+  if (-1 == pixelValue)
+    return;
+
   QMenu *menu = new QMenu(m_Controls.m_LabelSetTableWidget);
 
   if (m_Controls.m_LabelSetTableWidget->selectedItems().size() > 1)
@@ -228,8 +232,15 @@ void QmitkLabelSetWidget::OnTableViewContextMenuRequested(const QPoint & /*pos*/
     QWidgetAction *OpacityAction = new QWidgetAction(this);
     OpacityAction->setDefaultWidget(_OpacityWidget);
     //  QObject::connect( m_OpacityAction, SIGNAL( changed() ), this, SLOT( OpacityActionChanged() ) );
-    opacitySlider->setValue(static_cast<int>(
-      GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->GetOpacity() * 100));
+    auto workingImage = this->GetWorkingImage();
+    auto activeLayer = workingImage->GetActiveLayer();
+    auto label = workingImage->GetLabel(pixelValue, activeLayer);
+
+    if (nullptr != label)
+    {
+      auto opacity = label->GetOpacity();
+      opacitySlider->setValue(static_cast<int>(opacity * 100));
+    }
 
     menu->addAction(OpacityAction);
   }

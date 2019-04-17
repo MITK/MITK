@@ -35,34 +35,36 @@ QmitkDataNodeShowSelectedNodesAction::QmitkDataNodeShowSelectedNodesAction(QWidg
   InitializeAction();
 }
 
-QmitkDataNodeShowSelectedNodesAction::~QmitkDataNodeShowSelectedNodesAction()
-{
-  // nothing here
-}
-
 void QmitkDataNodeShowSelectedNodesAction::InitializeAction()
 {
   connect(this, &QmitkDataNodeShowSelectedNodesAction::triggered, this, &QmitkDataNodeShowSelectedNodesAction::OnActionTriggered);
 }
 
-void QmitkDataNodeShowSelectedNodesAction::OnActionTriggered(bool checked)
+void QmitkDataNodeShowSelectedNodesAction::OnActionTriggered(bool /*checked*/)
 {
   if (m_DataStorage.IsExpired())
   {
     return;
   }
 
-  auto dataStorage = m_DataStorage.Lock();
+  mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
 
-  auto selectedNodes = GetSelectedNodes();
-  auto nodeset = dataStorage->GetAll();
+  auto dataNodes = GetSelectedNodes();
+  auto nodeset = m_DataStorage.Lock()->GetAll();
   for (auto& node : *nodeset)
   {
     if (node.IsNotNull())
     {
-      node->SetVisibility(selectedNodes.contains(node));
+      node->SetVisibility(dataNodes.contains(node), baseRenderer);
     }
   }
 
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  if (nullptr == baseRenderer)
+  {
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+  else
+  {
+    mitk::RenderingManager::GetInstance()->RequestUpdate(baseRenderer->GetRenderWindow());
+  }
 }

@@ -53,6 +53,7 @@ endif()
 get_property(external_projects GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS)
 
 list(REMOVE_ITEM external_projects Python)
+list(REMOVE_ITEM external_projects OpenMP)
 if(MITK_CTEST_SCRIPT_MODE)
   # Write a file containing the list of enabled external project targets.
   # This file can be read by a ctest script to separately build projects.
@@ -115,6 +116,8 @@ else()
   set(gen "${CMAKE_GENERATOR}")
 endif()
 
+set(gen_platform ${CMAKE_GENERATOR_PLATFORM})
+
 # Use this value where semi-colons are needed in ep_add args:
 set(sep "^^")
 
@@ -123,6 +126,10 @@ set(sep "^^")
 if(MSVC_VERSION)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /bigobj /MP")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj /MP")
+endif()
+
+if(MITK_USE_Boost_LIBRARIES)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_ALL_DYN_LINK")
 endif()
 
 # This is a workaround for passing linker flags
@@ -352,6 +359,7 @@ ExternalProject_Add(${proj}
   LIST_SEPARATOR ${sep}
   DOWNLOAD_COMMAND ""
   CMAKE_GENERATOR ${gen}
+  CMAKE_GENERATOR_PLATFORM ${gen_platform}
   CMAKE_CACHE_ARGS
     # --------------- Build options ----------------
     -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_INSTALL_PREFIX}

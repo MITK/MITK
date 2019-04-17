@@ -21,19 +21,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace HideAllAction
 {
-	void Run(mitk::DataStorage::Pointer dataStorage)
-	{
-		auto nodeset = dataStorage->GetAll();
-		for (auto& node : *nodeset)
-		{
-			if (node.IsNotNull())
-			{
-				node->SetVisibility(false);
-			}
-		}
+  void Run(const QList<mitk::DataNode::Pointer>& selectedNodes, mitk::BaseRenderer* baseRenderer /*= nullptr*/)
+  {
+    if (selectedNodes.empty())
+    {
+      return;
+    }
 
-		mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-	}
+    for (auto& node : selectedNodes)
+    {
+      if (node.IsNotNull())
+      {
+        node->SetVisibility(false, baseRenderer);
+      }
+    }
+
+    if (nullptr == baseRenderer)
+    {
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+    else
+    {
+      mitk::RenderingManager::GetInstance()->RequestUpdate(baseRenderer->GetRenderWindow());
+    }
+  }
 }
 
 QmitkDataNodeHideAllAction::QmitkDataNodeHideAllAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchpartSite)
@@ -52,22 +63,15 @@ QmitkDataNodeHideAllAction::QmitkDataNodeHideAllAction(QWidget* parent, berry::I
   InitializeAction();
 }
 
-QmitkDataNodeHideAllAction::~QmitkDataNodeHideAllAction()
-{
-  // nothing here
-}
-
 void QmitkDataNodeHideAllAction::InitializeAction()
 {
   connect(this, &QmitkDataNodeHideAllAction::triggered, this, &QmitkDataNodeHideAllAction::OnActionTriggered);
 }
 
-void QmitkDataNodeHideAllAction::OnActionTriggered(bool checked)
+void QmitkDataNodeHideAllAction::OnActionTriggered(bool /*checked*/)
 {
-  if (m_DataStorage.IsExpired())
-  {
-    return;
-  }
+  mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
 
-	HideAllAction::Run(m_DataStorage.Lock());
+  auto selectedNodes = GetSelectedNodes();
+  HideAllAction::Run(selectedNodes, baseRenderer);
 }

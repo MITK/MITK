@@ -33,8 +33,6 @@ public:
   QmitkDataNodeTextureInterpolationAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
   QmitkDataNodeTextureInterpolationAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
 
-  virtual ~QmitkDataNodeTextureInterpolationAction() override;
-
   virtual void InitializeWithDataNode(const mitk::DataNode* dataNode) override;
 
 private Q_SLOTS:

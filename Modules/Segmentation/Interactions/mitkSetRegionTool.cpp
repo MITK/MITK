@@ -75,7 +75,7 @@ void mitk::SetRegionTool::OnMousePressed(StateMachineAction *, InteractionEvent 
   sliceGeometry->WorldToIndex(positionEvent->GetPositionInWorld(), projectedPointIn2D);
   if (!sliceGeometry->IsIndexInside(projectedPointIn2D))
   {
-    MITK_ERROR << "point apparently not inside segmentation slice" << std::endl;
+    MITK_WARN << "Point outside of segmentation slice." << std::endl;
     return; // can't use that as a seed point
   }
 
@@ -119,7 +119,12 @@ void mitk::SetRegionTool::OnMousePressed(StateMachineAction *, InteractionEvent 
   contourextractor->Update();
 
   mitk::ContourModel::Pointer awesomeContour = contourextractor->GetOutput();
-  FeedbackContourTool::SetFeedbackContour(awesomeContour);
+  auto t = positionEvent->GetSender()->GetTimeStep();
+
+  FeedbackContourTool::SetFeedbackContour(0 != t
+    ? ContourModelUtils::MoveZerothContourTimeStep(awesomeContour, t)
+    : awesomeContour);
+
   FeedbackContourTool::SetFeedbackContourVisible(true);
   mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
 }

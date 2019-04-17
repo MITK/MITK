@@ -169,6 +169,35 @@ void mitk::Stepper::Previous()
   }
 }
 
+void mitk::Stepper::MoveSlice(int sliceDelta)
+{
+  int newPosition = this->GetPos() + sliceDelta;
+  // if auto repeat is on, increasing continues at the first slice if the last slice was reached and vice versa
+  int maxSlices = this->GetSteps();
+  if (m_AutoRepeat)
+  {
+    while (newPosition < 0)
+    {
+      newPosition += maxSlices;
+    }
+    while (newPosition >= maxSlices)
+    {
+      newPosition -= maxSlices;
+    }
+  }
+  else
+  {
+    // if the new slice is below 0 we still show slice 0
+    // due to the stepper using unsigned int we have to do this ourselves
+    if (newPosition < 1)
+    {
+      newPosition = 0;
+    }
+  }
+
+  this->SetPos(newPosition);
+}
+
 void mitk::Stepper::First()
 {
   this->SetPos(0);

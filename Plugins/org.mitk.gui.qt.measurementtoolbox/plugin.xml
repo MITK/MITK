@@ -12,13 +12,13 @@
       <keywordReference id="org.mitk.views.measurement.Keyword"/>
     </view>
   </extension>
-
-  <extension point="org.blueberry.ui.views">
+  
+    <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.imagestatistics"
           name="Statistics"
           category="Quantification"
           class="QmitkImageStatisticsView"
-          icon="resources/bar-chart.svg" >
+          icon="resources/bar-chart2.svg" >
       <description>Calculate the statistic of image regions</description>
       <keywordReference id="org.mitk.views.imagestatistics.Keyword"/>
     </view>

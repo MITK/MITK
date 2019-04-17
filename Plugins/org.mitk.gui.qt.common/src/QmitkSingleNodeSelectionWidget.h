@@ -33,7 +33,7 @@ class QmitkAbstractDataStorageModel;
 
 /**
 * \class QmitkSingleNodeSelectionWidget
-* \brief Widget that that represents a node selection. It acts like a button. Clicking on it
+* \brief Widget that represents a node selection. It acts like a button. Clicking on it
 * allows to change the selection.
 */
 class MITK_QT_COMMON QmitkSingleNodeSelectionWidget : public QmitkAbstractNodeSelectionWidget

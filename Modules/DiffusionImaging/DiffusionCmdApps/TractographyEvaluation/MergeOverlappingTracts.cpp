@@ -49,8 +49,8 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("", "i", mitkCommandLineParser::StringList, "Input:", "input tracts", us::Any(), false);
-  parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output Folder:", "output folder", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::StringList, "Input:", "input tracts", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output Folder:", "output folder", us::Any(), false, false, false, mitkCommandLineParser::Output);
   parser.addArgument("overlap", "", mitkCommandLineParser::Float, "Overlap threshold:", "Tracts with overlap larger than this threshold are merged", 0.8, false);
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

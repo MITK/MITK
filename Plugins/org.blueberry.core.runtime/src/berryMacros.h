@@ -41,7 +41,7 @@ class QStringList;
   { return ::berry::Reflection::TypeInfo::New<Self>(); }                 \
   ::berry::Reflection::TypeInfo GetTypeInfo() const override             \
   { return Self::GetStaticTypeInfo(); }                                  \
-  typedef ::berry::Reflection::TypeList<__VA_ARGS__> SuperclassTypes;    \
+  /*typedef ::berry::Reflection::TypeList<__VA_ARGS__> SuperclassTypes;*/\
   static QList< ::berry::Reflection::TypeInfo> GetStaticSuperclasses()   \
   { return ::berry::Reflection::GetSuperclasses<Self>(); }               \
   QList< ::berry::Reflection::TypeInfo> GetSuperclasses() const override \

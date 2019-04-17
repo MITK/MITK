@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  CalculateSegmentationVolume::CalculateSegmentationVolume() {}
+  CalculateSegmentationVolume::CalculateSegmentationVolume() : m_Volume(0){}
   CalculateSegmentationVolume::~CalculateSegmentationVolume() {}
   template <typename TPixel, unsigned int VImageDimension>
   void CalculateSegmentationVolume::ItkImageProcessing(itk::Image<TPixel, VImageDimension> *itkImage,

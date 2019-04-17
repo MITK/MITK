@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkMultiWidgetLayoutSelectionWidget</class>
+ <widget class="QWidget" name="QmitkMultiWidgetLayoutSelectionWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>230</width>
+    <height>230</height>
+   </rect>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QTableWidget" name="tableWidget">
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="showDropIndicator" stdset="0">
+      <bool>false</bool>
+     </property>
+     <property name="dragDropOverwriteMode">
+      <bool>false</bool>
+     </property>
+     <property name="rowCount">
+      <number>3</number>
+     </property>
+     <property name="columnCount">
+      <number>4</number>
+     </property>
+     <attribute name="horizontalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
+     <attribute name="horizontalHeaderDefaultSectionSize">
+      <number>50</number>
+     </attribute>
+     <attribute name="horizontalHeaderMinimumSectionSize">
+      <number>50</number>
+     </attribute>
+     <attribute name="verticalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
+     <attribute name="verticalHeaderDefaultSectionSize">
+      <number>50</number>
+     </attribute>
+     <attribute name="verticalHeaderMinimumSectionSize">
+      <number>50</number>
+     </attribute>
+     <row/>
+     <row/>
+     <row/>
+     <column/>
+     <column/>
+     <column/>
+     <column/>
+     <column/>
+     <column/>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="setLayoutPushButton">
+     <property name="text">
+      <string>Set multi widget layout</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

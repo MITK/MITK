@@ -36,6 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkPoints.h"
 #include <vtkCellArray.h>
 #include <vtkPolyLine.h>
+#include <mitkWorkbenchUtil.h>
 
 
 const std::string QmitkTractbasedSpatialStatisticsView::VIEW_ID = "org.mitk.views.tractbasedspatialstatistics";
@@ -208,7 +209,7 @@ void QmitkTractbasedSpatialStatisticsView::InitPointsets()
     m_P1->SetColor( 1.0, 0.0, 0.0 );
     this->GetDataStorage()->Add(m_P1);
     m_Controls->m_PointWidget->SetPointSetNode(m_P1);
-    auto renderWindowPart = this->GetRenderWindowPart(OPEN);
+    auto renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::IRenderWindowPartStrategy::OPEN);
     auto axialSnc = renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController();
     auto sagittalSnc = renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController();
     auto coronalSnc = renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController();

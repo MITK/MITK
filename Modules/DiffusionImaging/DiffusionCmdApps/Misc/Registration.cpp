@@ -224,8 +224,8 @@ int main( int argc, char* argv[] )
   // Add command line argument names
   parser.addArgument("help", "h",mitkCommandLineParser::Bool, "Help", "Show this help text");
   //parser.addArgument("usemask", "u", QVariant::Bool, "Use segmentations (derived resources) to exclude areas from registration metrics");
-  parser.addArgument("", "i", mitkCommandLineParser::InputDirectory, "Input:", "Input folder",us::Any(),false);
-  parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output:", "Output folder (ending with /)",us::Any(),false);
+  parser.addArgument("", "i", mitkCommandLineParser::String, "Input:", "Input folder",us::Any(),false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output:", "Output folder (ending with /)",us::Any(),false, false, false, mitkCommandLineParser::Output);
   parser.addArgument("fixed", "f", mitkCommandLineParser::String, "Fixed images:", "Suffix for fixed image (if none is supplied first file matching moving pattern is chosen)",us::Any(),true);
   parser.addArgument("moving", "m", mitkCommandLineParser::String, "Moving images:", "Suffix for moving images",us::Any(),false);
   parser.addArgument("derived", "d", mitkCommandLineParser::String, "Derived resources:", "Derived resources suffixes (replaces suffix for moving images); comma separated",us::Any(),true);

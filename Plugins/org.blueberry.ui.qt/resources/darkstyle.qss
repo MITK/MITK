@@ -19,6 +19,19 @@ See LICENSE.txt or http://www.mitk.org for details.
   iconAccentColor = #d4821e <- This line is parsed by MITK
 */
 
+font.warning {
+  color: #ff5c33;
+  font-weight: bold;
+}
+
+font.normal {
+  color: #f1f1f1;
+}
+
+font.highlight {
+  color: #d4821e;
+}
+
 QWidget {
   background-color: #2d2d30;
   border: none;

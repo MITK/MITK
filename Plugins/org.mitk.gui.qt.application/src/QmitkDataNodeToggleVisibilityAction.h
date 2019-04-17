@@ -26,7 +26,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace ToggleVisibilityAction
 {
-  MITK_QT_APP void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite, mitk::DataStorage::Pointer dataStorage, QList<mitk::DataNode::Pointer> selectedNodes = QList<mitk::DataNode::Pointer>());
+  MITK_QT_APP void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite,
+                       mitk::DataStorage::Pointer dataStorage,
+                       const QList<mitk::DataNode::Pointer>& selectedNodes = QList<mitk::DataNode::Pointer>(),
+                       mitk::BaseRenderer* baseRenderer = nullptr);
 }
 
 class MITK_QT_APP QmitkDataNodeToggleVisibilityAction : public QAction, public QmitkAbstractDataNodeAction
@@ -37,8 +40,6 @@ public:
 
   QmitkDataNodeToggleVisibilityAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
   QmitkDataNodeToggleVisibilityAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
-
-  virtual ~QmitkDataNodeToggleVisibilityAction() override;
 
 private Q_SLOTS:
 

@@ -90,13 +90,13 @@ void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selected
     surfaceFilter->SetParameter("Sync visibility", false);
     surfaceFilter->SetParameter("Median kernel size", 3u);
     surfaceFilter->SetParameter("Decimate mesh", m_IsDecimated);
-    surfaceFilter->SetParameter("Decimation rate", (float) decimation);
+    surfaceFilter->SetParameter("Decimation rate", decimation);
 
     if (m_IsSmoothed)
     {
       surfaceFilter->SetParameter("Apply median", true);
       surfaceFilter->SetParameter("Smooth", true);
-      surfaceFilter->SetParameter("Gaussian SD", sqrtf(smoothing)); // use sqrt to account for setting of variance in preferences
+      surfaceFilter->SetParameter("Gaussian SD", sqrt(smoothing)); // use sqrt to account for setting of variance in preferences
       StatusBar::GetInstance()->DisplayText("Smoothed surface creation started in background...");
     }
     else

@@ -28,8 +28,3 @@ QmitkAbstractSemanticRelationsAction::QmitkAbstractSemanticRelationsAction(berry
 {
   // nothing here
 }
-
-QmitkAbstractSemanticRelationsAction::~QmitkAbstractSemanticRelationsAction()
-{
-  // nothing here
-}

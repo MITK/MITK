@@ -20,7 +20,6 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
   #[[ Reset variables. ]]
   set(patch_cmd "")
   set(configure_cmd "")
-  set(build_cmd "")
   set(install_cmd "")
 
   set(BOOST_ROOT ${ep_prefix})
@@ -161,7 +160,7 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
     set(b2_properties
       threading=multi
       runtime-link=shared
-      "cxxflags=${CMAKE_CXX_FLAGS} ${MITK_CXX14_FLAG}"
+      "cxxflags=${MITK_CXX14_FLAG} ${CMAKE_CXX_FLAGS}"
     )
 
     if(CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -185,12 +184,12 @@ $<$<CONFIG:RelWithDebInfo>:variant=release>")
     if(WIN32)
 
       set(bootstrap_cmd if not exist b2.exe \( call bootstrap.bat ${bootstrap_args} \))
-      set(build_cmd cd <SOURCE_DIR> && b2 ${b2_options} ${b2_properties} stage)
+      set(b2_cmd b2 ${b2_options} ${b2_properties} stage)
 
     else()
 
       set(bootstrap_cmd test -e ./b2 || ./bootstrap.sh ${bootstrap_args})
-      set(build_cmd cd <SOURCE_DIR> && ./b2 ${b2_options} ${b2_properties} stage)
+      set(b2_cmd ./b2 ${b2_options} ${b2_properties} stage)
 
       #[[ We already told Boost if we want to use GCC or Clang but so far we
           were not able to specify the exact same compiler we set in CMake
@@ -243,10 +242,6 @@ g"
     set(configure_cmd ${dummy_cmd}) #[[ Do nothing ]]
   endif()
 
-  if(NOT build_cmd)
-    set(build_cmd ${dummy_cmd}) #[[ Do nothing ]]
-  endif()
-
   if(WIN32)
     set(install_cmd
       if not exist $<SHELL_PATH:${ep_prefix}/include/boost/config.hpp>
@@ -264,22 +259,27 @@ g"
     URL_MD5 ${md5}
     PATCH_COMMAND ${patch_cmd}
     CONFIGURE_COMMAND ${configure_cmd}
-    BUILD_COMMAND ${build_cmd}
+    BUILD_COMMAND ""
     INSTALL_COMMAND ${install_cmd}
   )
 
-  if(bootstrap_cmd)
-    ExternalProject_Add_Step(${proj} bootstrap
-      COMMAND ${bootstrap_cmd}
-      DEPENDEES patch
-      DEPENDERS configure
-      WORKING_DIRECTORY <SOURCE_DIR>
-    )
-  endif()
+  ExternalProject_Add_Step(${proj} bootstrap
+    COMMAND ${bootstrap_cmd}
+    DEPENDEES patch
+    DEPENDERS configure
+    WORKING_DIRECTORY <SOURCE_DIR>
+  )
+
+  ExternalProject_Add_Step(${proj} b2
+    COMMAND ${b2_cmd}
+    DEPENDEES bootstrap
+    DEPENDERS build
+    WORKING_DIRECTORY <SOURCE_DIR>
+  )
 
   if(WIN32)
 
-      #[[ Reuse already extracted files. ]]
+    #[[ Reuse already extracted files. ]]
 
     set(stamp_dir ${ep_prefix}/src/Boost-stamp)
 

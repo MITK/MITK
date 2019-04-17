@@ -91,11 +91,13 @@ namespace mitk {
     * @param below How many voxels will be cut from the bottom of the image.
     * @param right How many voxels will be cut from the right side of the image.
     * @param left How many voxels will be cut from the left side of the image.
-    * @param minSlice The first slice to be present in the resulting image.
-    * @param maxSlice The last slice to be present in the resulting image.
+    * @param minSlice The first slice to be present in the resulting volume.
+    * @param maxSlice How many slices are cut off from the end of the volume.
     * @return The processed image is returned after the filter has finished. For the purposes of this module, the returned image is always of type float.
     */
     mitk::Image::Pointer ApplyCropping(mitk::Image::Pointer inputImage, int above, int below, int right, int left, int minSlice, int maxSlice, int* errCode);
+
+    mitk::Image::Pointer ExtendImage(mitk::Image::Pointer inputImage, float pixelColor, unsigned int outputDimensionY);
 
     /** \brief Applies a Bandpass filter to the given image
     *

@@ -27,10 +27,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace RemoveAction
 {
-  void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite, mitk::DataStorage::Pointer dataStorage, QWidget* parent /* = nullptr*/)
+  void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite, mitk::DataStorage::Pointer dataStorage, const QList<mitk::DataNode::Pointer>& selectedNodes, QWidget* parent /* = nullptr*/)
   {
+    if (selectedNodes.empty())
+    {
+      return;
+    }
+
     QString question("Do you really want to remove ");
-    auto selectedNodes = AbstractDataNodeAction::GetSelectedNodes(workbenchPartSite);
     for (auto& dataNode : selectedNodes)
     {
       if (nullptr == dataNode)
@@ -92,17 +96,12 @@ QmitkDataNodeRemoveAction::QmitkDataNodeRemoveAction(QWidget* parent, berry::IWo
   InitializeAction();
 }
 
-QmitkDataNodeRemoveAction::~QmitkDataNodeRemoveAction()
-{
-  // nothing here
-}
-
 void QmitkDataNodeRemoveAction::InitializeAction()
 {
   connect(this, &QmitkDataNodeRemoveAction::triggered, this, &QmitkDataNodeRemoveAction::OnActionTriggered);
 }
 
-void QmitkDataNodeRemoveAction::OnActionTriggered(bool checked)
+void QmitkDataNodeRemoveAction::OnActionTriggered(bool /*checked*/)
 {
   if (m_WorkbenchPartSite.Expired())
   {
@@ -114,5 +113,6 @@ void QmitkDataNodeRemoveAction::OnActionTriggered(bool checked)
     return;
   }
 
-  RemoveAction::Run(m_WorkbenchPartSite.Lock(), m_DataStorage.Lock(), m_Parent);
+  auto selectedNodes = GetSelectedNodes();
+  RemoveAction::Run(m_WorkbenchPartSite.Lock(), m_DataStorage.Lock(), selectedNodes, m_Parent);
 }

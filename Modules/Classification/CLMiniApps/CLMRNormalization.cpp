@@ -44,11 +44,11 @@ int main(int argc, char* argv[])
   mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
   // required params
-  parser.addArgument("image", "i", mitkCommandLineParser::InputImage, "Input Image", "Path to the input VTK polydata", us::Any(), false);
-  parser.addArgument("mode", "mode", mitkCommandLineParser::InputImage, "Normalisation mode", "1,2,3: Single Area normalization to Mean, Median, Mode, 4,5,6: Mean, Median, Mode of two regions. ", us::Any(), false);
-  parser.addArgument("mask0", "m0", mitkCommandLineParser::InputImage, "Input Mask", "The median of the area covered by this mask will be set to 0", us::Any(), false);
-  parser.addArgument("mask1", "m1", mitkCommandLineParser::InputImage, "Input Mask", "The median of the area covered by this mask will be set to 1", us::Any(), true);
-  parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output Image", "Target file. The output statistic is appended to this file.", us::Any(), false);
+  parser.addArgument("image", "i", mitkCommandLineParser::Image, "Input Image", "Path to the input VTK polydata", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("mode", "mode", mitkCommandLineParser::Image, "Normalisation mode", "1,2,3: Single Area normalization to Mean, Median, Mode, 4,5,6: Mean, Median, Mode of two regions. ", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("mask0", "m0", mitkCommandLineParser::Image, "Input Mask", "The median of the area covered by this mask will be set to 0", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("mask1", "m1", mitkCommandLineParser::Image, "Input Mask", "The median of the area covered by this mask will be set to 1", us::Any(), true, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output Image", "Target file. The output statistic is appended to this file.", us::Any(), false, false, false, mitkCommandLineParser::Output);
   parser.addArgument("ignore-outlier", "outlier", mitkCommandLineParser::Bool, "Ignore Outlier", "Ignores the highest and lowest 2% during calculation. Only on single mask normalization.", us::Any(), true);
   parser.addArgument("value", "v", mitkCommandLineParser::Float, "Target Value", "Target value, the target value (for example median) is set to this value.", us::Any(), true);
   parser.addArgument("width", "w", mitkCommandLineParser::Float, "Target Width", "Ignores the highest and lowest 2% during calculation. Only on single mask normalization.", us::Any(), true);

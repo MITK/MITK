@@ -41,11 +41,12 @@ namespace mitk
     void ThreadedUpdateSuccessful() override; // will be called from a thread after calling StartAlgorithm
 
   private:
+    mitk::Surface::Pointer ConvertBinaryImageToSurface(mitk::Image::Pointer binaryImage);
+
     UIDGenerator m_UIDGeneratorSurfaces;
 
-    Surface::Pointer m_Surface;
-    DataNode::Pointer m_Node;
-
+    std::vector<DataNode::Pointer> m_SurfaceNodes;
+    bool m_IsLabelSetImage;
   };
 
 } // namespace

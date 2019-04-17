@@ -60,17 +60,12 @@ QmitkDataNodeGlobalReinitAction::QmitkDataNodeGlobalReinitAction(QWidget* parent
   InitializeAction();
 }
 
-QmitkDataNodeGlobalReinitAction::~QmitkDataNodeGlobalReinitAction()
-{
-  // nothing here
-}
-
 void QmitkDataNodeGlobalReinitAction::InitializeAction()
 {
   connect(this, &QmitkDataNodeGlobalReinitAction::triggered, this, &QmitkDataNodeGlobalReinitAction::OnActionTriggered);
 }
 
-void QmitkDataNodeGlobalReinitAction::OnActionTriggered(bool checked)
+void QmitkDataNodeGlobalReinitAction::OnActionTriggered(bool /*checked*/)
 {
   if (m_WorkbenchPartSite.Expired())
   {

@@ -770,6 +770,9 @@ public:
     sizeZm1 = sizeZ - 1;
 
     fullXY = fullX * fullY;
+    currentChunkStart = 0;
+    currentChunkEnd = 0;
+    offZ = 0;
   }
 
   inline float sample(int x, int y, int z) { return float(dataPtr[x + y * sizeX + z * sizeXY]); }
@@ -1172,6 +1175,7 @@ public:
     sizeZm1 = sizeZ - 1;
 
     fullXY = fullX * fullY;
+    offZ = 0;
   }
 
   inline int sample(int x, int y, int z) { return dataPtr[(x + y * sizeX + z * sizeXY) * 4 + 3]; }

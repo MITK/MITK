@@ -31,14 +31,15 @@ class QmitkChartData : public QObject
   Q_PROPERTY(QVariant m_xAxisLabel READ GetXAxisLabel WRITE SetXAxisLabel NOTIFY SignalXAxisLabelChanged);
   Q_PROPERTY(QVariant m_yAxisLabel READ GetYAxisLabel WRITE SetYAxisLabel NOTIFY SignalYAxisLabelChanged);
   Q_PROPERTY(QVariant m_chartTitle READ GetTitle WRITE SetTitle NOTIFY SignalTitleChanged);
+  Q_PROPERTY(QVariant m_themeName READ GetThemeName WRITE SetThemeName NOTIFY SignalThemeNameChanged);
   Q_PROPERTY(QVariant m_LegendPosition READ GetLegendPosition WRITE SetLegendPosition NOTIFY SignalLegendPositionChanged);
   Q_PROPERTY(QVariant m_ShowLegend READ GetShowLegend WRITE SetShowLegend NOTIFY SignalShowLegendChanged);
+  Q_PROPERTY(QVariant m_ShowErrorBars READ GetShowErrorBars WRITE SetShowErrorBars NOTIFY SignalShowErrorBarsChanged);
   Q_PROPERTY(QVariant m_YAxisScale READ GetYAxisScale WRITE SetYAxisScale NOTIFY SignalYAxisScaleChanged);
   Q_PROPERTY(QVariant m_ShowSubchart READ GetShowSubchart WRITE SetShowSubchart NOTIFY SignalShowSubchartChanged);
   Q_PROPERTY(QVariant m_UsePercentageInPieChart READ GetUsePercentageInPieChart WRITE SetUsePercentageInPieChart NOTIFY SignalUsePercentageInPieChartChanged);
   Q_PROPERTY(QVariant m_DataPointSize READ GetDataPointSize WRITE SetDataPointSize NOTIFY SignalDataPointSizeChanged);
   Q_PROPERTY(QVariant m_StackedData READ GetStackedData WRITE SetStackedData NOTIFY SignalStackedDataChanged);
-
 public:
   QmitkChartData();
 
@@ -53,11 +54,25 @@ public:
   Q_INVOKABLE QVariant GetTitle() const { return m_chartTitle; };
   Q_INVOKABLE void SetTitle(const QVariant& title) { m_chartTitle = title; emit SignalTitleChanged(title); };
 
+  Q_INVOKABLE QVariant GetThemeName() const { return m_themeName; };
+  Q_INVOKABLE void SetThemeName(const QVariant &themeName)
+  {
+    m_themeName = themeName;
+    emit SignalThemeNameChanged(themeName);
+  };
+
   Q_INVOKABLE QVariant GetLegendPosition() const { return m_LegendPosition; };
   Q_INVOKABLE void SetLegendPosition(const QVariant& legendPosition) { m_LegendPosition = legendPosition; emit SignalLegendPositionChanged(legendPosition); };
 
   Q_INVOKABLE QVariant GetShowLegend() const { return m_ShowLegend; };
   Q_INVOKABLE void SetShowLegend(const QVariant& show) { m_ShowLegend = show; emit SignalShowLegendChanged(show); };
+
+  Q_INVOKABLE QVariant GetShowErrorBars() const { return m_ShowErrorBars; };
+  Q_INVOKABLE void SetShowErrorBars(const QVariant &show)
+  {
+    m_ShowErrorBars = show;
+    emit SignalShowErrorBarsChanged(show);
+  };
 
   Q_INVOKABLE QVariant GetYAxisScale() const { return m_YAxisScale; };
   Q_INVOKABLE void SetYAxisScale(const QVariant& YAxisScale) { m_YAxisScale = YAxisScale; emit SignalYAxisScaleChanged(YAxisScale); };
@@ -69,7 +84,7 @@ public:
   Q_INVOKABLE void SetUsePercentageInPieChart(const QVariant& usePercentageInPieChart) { m_UsePercentageInPieChart = usePercentageInPieChart; emit SignalUsePercentageInPieChartChanged(usePercentageInPieChart); };
 
   Q_INVOKABLE QVariant GetDataPointSize() const { return m_DataPointSize; };
-  Q_INVOKABLE void SetDataPointSize(const QVariant& showDataPoints) { if (showDataPoints > 0) { m_DataPointSize = 3; } else { m_DataPointSize = 0; } emit SignalDataPointSizeChanged(showDataPoints); };
+  Q_INVOKABLE void SetDataPointSize(const QVariant& showDataPoints) { m_DataPointSize = showDataPoints; emit SignalDataPointSizeChanged(showDataPoints); };
 
   Q_INVOKABLE QVariant GetStackedData() const { return m_StackedData; };
   Q_INVOKABLE void SetStackedData(const QVariant& stackedData) { m_StackedData = stackedData; emit SignalStackedDataChanged(m_StackedData); };
@@ -79,8 +94,10 @@ signals:
   void SignalXAxisLabelChanged(const QVariant label);
   void SignalLegendPositionChanged(const QVariant legendPosition);
   void SignalShowLegendChanged(const QVariant show);
+  void SignalShowErrorBarsChanged(const QVariant show);
   void SignalYAxisScaleChanged(const QVariant YAxisScale);
   void SignalTitleChanged(const QVariant title);
+  void SignalThemeNameChanged(const QVariant themeName);
   void SignalShowSubchartChanged(const QVariant showSubchart);
   void SignalUsePercentageInPieChartChanged(const QVariant usePercentageInPieChart);
   void SignalDataPointSizeChanged(const QVariant showDataPoints);
@@ -90,9 +107,11 @@ private:
   QVariant m_xAxisLabel;
   QVariant m_yAxisLabel;
   QVariant m_chartTitle;
+  QVariant m_themeName = "dark";
 
   QVariant m_ShowLegend = true;
-  QVariant m_LegendPosition;
+  QVariant m_ShowErrorBars;
+  QVariant m_LegendPosition = "topRight";
   QVariant m_ShowSubchart;
   QVariant m_YAxisScale;
   QVariant m_UsePercentageInPieChart;

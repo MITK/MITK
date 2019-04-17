@@ -61,6 +61,7 @@ if(MITK_USE_CTK)
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}
+      CMAKE_GENERATOR_PLATFORM ${gen_platform}
       CMAKE_ARGS
         ${ep_common_args}
         ${ctk_optional_cache_args}

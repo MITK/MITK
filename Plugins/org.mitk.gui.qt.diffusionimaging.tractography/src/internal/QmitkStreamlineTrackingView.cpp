@@ -80,7 +80,7 @@ QmitkStreamlineTrackingView::QmitkStreamlineTrackingView()
   , m_ThreadIsRunning(false)
   , m_DeleteTrackingHandler(false)
   , m_Visible(false)
-  , m_LastPrior("")
+  , m_LastPrior(nullptr)
   , m_TrackingPriorHandler(nullptr)
 {
   m_TrackingWorker.moveToThread(&m_TrackingThread);
@@ -524,7 +524,7 @@ void QmitkStreamlineTrackingView::DeleteTrackingHandler()
     delete m_TrackingHandler;
     m_TrackingHandler = nullptr;
     m_DeleteTrackingHandler = false;
-    m_LastPrior = "";
+    m_LastPrior = nullptr;
   }
   else if (m_ThreadIsRunning)
   {
@@ -661,7 +661,8 @@ void QmitkStreamlineTrackingView::UpdateGui()
       m_Controls->m_gBox->setEnabled(true);
       m_Controls->m_gLabel->setEnabled(true);
     }
-    else if ( dynamic_cast<mitk::OdfImage*>(m_InputImageNodes.at(0)->GetData()) )
+    else if ( dynamic_cast<mitk::OdfImage*>(m_InputImageNodes.at(0)->GetData()) ||
+              dynamic_cast<mitk::ShImage*>(m_InputImageNodes.at(0)->GetData()))
     {
       m_Controls->m_OdfCutoffBox->setEnabled(true);
       m_Controls->m_OdfCutoffLabel->setEnabled(true);
@@ -905,7 +906,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
 
   if (m_Controls->m_PriorImageSelectionWidget->GetSelectedNode().IsNotNull())
   {
-    if (m_LastPrior!=m_Controls->m_PriorImageSelectionWidget->GetSelectedNode()->GetUID() || m_TrackingPriorHandler==nullptr)
+    if (m_LastPrior!=m_Controls->m_PriorImageSelectionWidget->GetSelectedNode() || m_TrackingPriorHandler==nullptr)
     {
       typedef mitk::ImageToItk< mitk::TrackingHandlerPeaks::PeakImgType > CasterType;
       CasterType::Pointer caster = CasterType::New();
@@ -916,7 +917,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
       m_TrackingPriorHandler = new mitk::TrackingHandlerPeaks();
       dynamic_cast<mitk::TrackingHandlerPeaks*>(m_TrackingPriorHandler)->SetPeakImage(itkImg);
       dynamic_cast<mitk::TrackingHandlerPeaks*>(m_TrackingPriorHandler)->SetPeakThreshold(0.0);
-      m_LastPrior = m_Controls->m_PriorImageSelectionWidget->GetSelectedNode()->GetUID();
+      m_LastPrior = m_Controls->m_PriorImageSelectionWidget->GetSelectedNode();
     }
 
     m_TrackingPriorHandler->SetInterpolate(m_Controls->m_InterpolationBox->isChecked());
@@ -993,6 +994,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
   m_Tracker->SetAngularThreshold(m_Controls->m_AngularThresholdBox->value());
   m_Tracker->SetMinTractLength(m_Controls->m_MinTractLengthBox->value());
   m_Tracker->SetUseOutputProbabilityMap(m_Controls->m_OutputProbMap->isChecked());
+  m_Tracker->SetRandom(!m_Controls->m_FixSeedBox->isChecked());
 
   m_ParentNode = m_InputImageNodes.at(0);
   m_TrackingThread.start(QThread::LowestPriority);

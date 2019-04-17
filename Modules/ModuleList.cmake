@@ -24,6 +24,7 @@ set(MITK_MODULES
   Gizmo
   GraphAlgorithms
   Multilabel
+  Chart
   ImageStatistics
   ContourModel
   SurfaceInterpolation
@@ -31,7 +32,7 @@ set(MITK_MODULES
   PlanarFigureSegmentation
   QtWidgets
   QtWidgetsExt
-  Chart
+  ImageStatisticsUI
   SegmentationUI
   MatchPointRegistration
   MatchPointRegistrationUI
@@ -78,6 +79,8 @@ set(MITK_MODULES
   ModelFitUI
   Pharmacokinetics
   PharmacokineticsUI
+  REST
+  RESTService
 )
 
 if(MITK_ENABLE_PIC_READER)

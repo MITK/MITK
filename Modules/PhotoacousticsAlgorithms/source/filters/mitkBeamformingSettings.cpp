@@ -18,15 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBeamformingUtils.h"
 #include "itkMutexLock.h"
 
-mitk::BeamformingSettings::BeamformingSettings(std::string xmlFile)
-{
-  if((xmlFile.length())>0)
-  {
-    MITK_ERROR << "Not implemented yet.";
-    mitkThrow() << "Not implemented yet.";
-  }
-}
-
 mitk::BeamformingSettings::BeamformingSettings(float pitchInMeters,
   float speedOfSound,
   float timeSpacing,

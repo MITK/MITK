@@ -210,13 +210,13 @@ void mitk::DiffusionPropertyHelper::ApplyMeasurementFrameAndRotationMatrix(mitk:
   bool keep_originals = false;
   image->GetPropertyList()->GetBoolProperty(mitk::DiffusionPropertyHelper::KEEP_ORIGINAL_DIRECTIONS.c_str(), keep_originals);
 
-//  if (!keep_originals)
-//  {
-//    MITK_INFO << "Applying measurement frame to diffusion-gradient directions:";
-//    std::cout << measurementFrame << std::endl;
-//    MITK_INFO << "Applying image rotation to diffusion-gradient directions:";
-//    std::cout << imageRotationMatrix << std::endl;
-//  }
+  if (!keep_originals)
+  {
+    MITK_INFO << "Applying measurement frame to diffusion-gradient directions:";
+    std::cout << measurementFrame << std::endl;
+    MITK_INFO << "Applying image rotation to diffusion-gradient directions:";
+    std::cout << imageRotationMatrix << std::endl;
+  }
 
   int c = 0;
   for(GradientDirectionsContainerType::ConstIterator gdcit = originalDirections->Begin();
@@ -275,13 +275,13 @@ void mitk::DiffusionPropertyHelper::UnApplyMeasurementFrameAndRotationMatrix(mit
   bool keep_originals = false;
   image->GetPropertyList()->GetBoolProperty(mitk::DiffusionPropertyHelper::KEEP_ORIGINAL_DIRECTIONS.c_str(), keep_originals);
 
-//  if (!keep_originals)
-//  {
-//    MITK_INFO << "Reverting image rotation to diffusion-gradient directions:";
-//    std::cout << imageRotationMatrix << std::endl;
-//    MITK_INFO << "Reverting measurement frame to diffusion-gradient directions:";
-//    std::cout << measurementFrame << std::endl;
-//  }
+  if (!keep_originals)
+  {
+    MITK_INFO << "Reverting image rotation to diffusion-gradient directions:";
+    std::cout << imageRotationMatrix << std::endl;
+    MITK_INFO << "Reverting measurement frame to diffusion-gradient directions:";
+    std::cout << measurementFrame << std::endl;
+  }
 
   int c = 0;
   for(GradientDirectionsContainerType::ConstIterator gdcit = modifiedDirections->Begin();

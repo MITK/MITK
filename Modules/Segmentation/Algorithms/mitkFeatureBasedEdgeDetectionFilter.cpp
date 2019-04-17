@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkUnstructuredGrid.h>
 #include <SegmentationUtilities/MorphologicalOperations/mitkMorphologicalOperations.h>
 #include <mitkImageMaskGenerator.h>
+#include <mitkImageStatisticsConstants.h>
 
 #include <itkBinaryBallStructuringElement.h>
 #include <itkBinaryContourImageFilter.h>
@@ -47,7 +48,7 @@ mitk::FeatureBasedEdgeDetectionFilter::~FeatureBasedEdgeDetectionFilter()
 
 void mitk::FeatureBasedEdgeDetectionFilter::GenerateData()
 {
-  mitk::Image::Pointer image = ImageToUnstructuredGridFilter::GetInput();
+  mitk::Image::ConstPointer image = ImageToUnstructuredGridFilter::GetInput();
 
   if (m_SegmentationMask.IsNull())
   {
@@ -64,9 +65,9 @@ void mitk::FeatureBasedEdgeDetectionFilter::GenerateData()
   mitk::ImageMaskGenerator::Pointer imgMask = mitk::ImageMaskGenerator::New();
   imgMask->SetImageMask(m_SegmentationMask);
 
-  mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer stats = statCalc->GetStatistics();
-  double mean = stats->GetMean();
-  double stdDev = stats->GetStd();
+  auto stats = statCalc->GetStatistics()->GetStatisticsForTimeStep(0);
+  double mean = stats.GetValueConverted<double>(mitk::ImageStatisticsConstants::MEAN());
+  double stdDev = stats.GetValueConverted<double>(mitk::ImageStatisticsConstants::STANDARDDEVIATION());
 
   double upperThreshold = mean + stdDev;
   double lowerThreshold = mean - stdDev;
@@ -156,7 +157,7 @@ void mitk::FeatureBasedEdgeDetectionFilter::ContourSearch(itk::Image<TPixel, VIm
 }
 
 template <typename TPixel, unsigned int VImageDimension>
-void mitk::FeatureBasedEdgeDetectionFilter::ITKThresholding(itk::Image<TPixel, VImageDimension> *originalImage,
+void mitk::FeatureBasedEdgeDetectionFilter::ITKThresholding(const itk::Image<TPixel, VImageDimension> *originalImage,
                                                             double lower,
                                                             double upper,
                                                             mitk::Image::Pointer &result)

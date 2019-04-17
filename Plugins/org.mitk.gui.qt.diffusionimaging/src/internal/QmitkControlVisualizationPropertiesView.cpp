@@ -41,7 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkRenderWindow.h>
 #include <itkFlipPeaksFilter.h>
 #include <mitkImageToItk.h>
-
+#include <mitkWorkbenchUtil.h>
 #include "berryIWorkbenchWindow.h"
 #include "berryIWorkbenchPage.h"
 #include "berryISelectionService.h"
@@ -98,7 +98,7 @@ QmitkControlVisualizationPropertiesView::~QmitkControlVisualizationPropertiesVie
 
 void QmitkControlVisualizationPropertiesView::SetTs(int currentThickSlicesMode, int num, std::string render_window)
 {
-  if (auto renderWindowPart = this->GetRenderWindowPart(OPEN))
+  if (auto renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::IRenderWindowPartStrategy::OPEN))
   {
     mitk::BaseRenderer::Pointer renderer = renderWindowPart->GetQmitkRenderWindow(QString(render_window.c_str()))->GetRenderer();
     renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices.num", mitk::IntProperty::New(num));
@@ -1034,7 +1034,7 @@ void QmitkControlVisualizationPropertiesView::PlanarFigureFocus()
       QmitkRenderWindow* selectedRenderWindow = 0;
       bool PlanarFigureInitializedWindow = false;
 
-      auto renderWindowPart = this->GetRenderWindowPart(OPEN);
+      auto renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::IRenderWindowPartStrategy::OPEN);
 
       QmitkRenderWindow* axialRenderWindow =
           renderWindowPart->GetQmitkRenderWindow("axial");

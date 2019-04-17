@@ -46,9 +46,9 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("", "i1", mitkCommandLineParser::StringList, "Input tractograms:", "input tractograms (.fib, vtk ascii file format)", us::Any(), false);
-  parser.addArgument("", "i2", mitkCommandLineParser::InputFile, "Input image:", "input image", us::Any(), false);
-  parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output root", us::Any(), false);
+  parser.addArgument("", "i1", mitkCommandLineParser::StringList, "Input tractograms:", "input tractograms (files or folder)", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("", "i2", mitkCommandLineParser::String, "Input image:", "input image", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output:", "output root", us::Any(), false, false, false, mitkCommandLineParser::Output);
 
   parser.addArgument("max_iter", "", mitkCommandLineParser::Int, "Max. iterations:", "maximum number of optimizer iterations", 20);
   parser.addArgument("bundle_based", "", mitkCommandLineParser::Bool, "Bundle based fit:", "fit one weight per input tractogram/bundle, not for each fiber", false);
@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
   parser.addArgument("save_weights", "", mitkCommandLineParser::Bool, "Save Weights:", "save fiber weights in a separate text file", false);
   parser.addArgument("filter_outliers", "", mitkCommandLineParser::Bool, "Filter outliers:", "perform second optimization run with an upper weight bound based on the first weight estimation (99% quantile)", false);
   parser.addArgument("join_tracts", "", mitkCommandLineParser::Bool, "Join output tracts:", "outout tracts are merged into a single tractogram", false);
-  parser.addArgument("regu", "", mitkCommandLineParser::String, "Regularization:", "MSM, Variance, VoxelVariance (default), Lasso, GroupLasso, GroupVariance, NONE");
+  parser.addArgument("regu", "", mitkCommandLineParser::String, "Regularization:", "MSM; Variance; VoxelVariance; Lasso; GroupLasso; GroupVariance; NONE", std::string("VoxelVariance"));
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)

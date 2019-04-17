@@ -34,6 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLabelSetImage.h>
 #include <mitkDICOMSegmentationConstants.h>
 #include <mitkDICOMSegmentationPropertyHelper.cpp>
+#include <mitkDICOMQIPropertyHelper.h>
 
 // ITK
 #include <itkTractDensityImageFilter.h>
@@ -210,15 +211,15 @@ void QmitkFiberQuantificationView::ProcessSelectedBundles()
       DataNode::Pointer newNode = nullptr;
       switch(generationMethod){
       case 0:
-        newNode = GenerateTractDensityImage(fib, false, true);
+        newNode = GenerateTractDensityImage(fib, false, true, node->GetName());
         name += "_TDI";
         break;
       case 1:
-        newNode = GenerateTractDensityImage(fib, false, false);
+        newNode = GenerateTractDensityImage(fib, false, false, node->GetName());
         name += "_TDI";
         break;
       case 2:
-        newNode = GenerateTractDensityImage(fib, true, false);
+        newNode = GenerateTractDensityImage(fib, true, false, node->GetName());
         name += "_envelope";
         break;
       case 3:
@@ -340,7 +341,7 @@ mitk::DataNode::Pointer QmitkFiberQuantificationView::GenerateColorHeatmap(mitk:
 }
 
 // generate tract density image from fiber bundle
-mitk::DataNode::Pointer QmitkFiberQuantificationView::GenerateTractDensityImage(mitk::FiberBundle::Pointer fib, bool binary, bool absolute)
+mitk::DataNode::Pointer QmitkFiberQuantificationView::GenerateTractDensityImage(mitk::FiberBundle::Pointer fib, bool binary, bool absolute, std::string name)
 {
   mitk::DataNode::Pointer node = mitk::DataNode::New();
   if (binary)
@@ -374,11 +375,46 @@ mitk::DataNode::Pointer QmitkFiberQuantificationView::GenerateTractDensityImage(
     if (m_SelectedImage.IsNotNull())
     {
       mitk::LabelSetImage::Pointer multilabelImage = mitk::LabelSetImage::New();
-      multilabelImage->Initialize(m_SelectedImage);
       multilabelImage->InitializeByLabeledImage(img);
       multilabelImage->GetActiveLabelSet()->SetActiveLabel(1);
       mitk::Label::Pointer label = multilabelImage->GetActiveLabel();
       label->SetName("Tractogram");
+
+      // Add Segmented Property Category Code Sequence tags (0062, 0003): Sequence defining the general category of this
+      // segment.
+      // (0008,0100) Code Value
+      label->SetProperty(
+            DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_VALUE_PATH()).c_str(),
+            TemporoSpatialStringProperty::New("T-D000A"));
+
+      // (0008,0102) Coding Scheme Designator
+      label->SetProperty(
+            DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_SCHEME_PATH()).c_str(),
+            TemporoSpatialStringProperty::New("SRT"));
+
+      // (0008,0104) Code Meaning
+      label->SetProperty(
+            DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_MEANING_PATH()).c_str(),
+            TemporoSpatialStringProperty::New("Anatomical Structure"));
+      //------------------------------------------------------------
+      // Add Segmented Property Type Code Sequence (0062, 000F): Sequence defining the specific property type of this
+      // segment.
+      // (0008,0100) Code Value
+      label->SetProperty(
+            DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_TYPE_CODE_VALUE_PATH()).c_str(),
+            TemporoSpatialStringProperty::New("DUMMY"));
+
+      // (0008,0102) Coding Scheme Designator
+      label->SetProperty(
+            DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_TYPE_CODE_SCHEME_PATH()).c_str(),
+            TemporoSpatialStringProperty::New("SRT"));
+
+      // (0008,0104) Code Meaning
+      label->SetProperty(
+            DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_TYPE_CODE_MEANING_PATH()).c_str(),
+            TemporoSpatialStringProperty::New(name));
+
+      mitk::DICOMQIPropertyHandler::DeriveDICOMSourceProperties(m_SelectedImage, multilabelImage);
 
       // init data node
       node->SetData(multilabelImage);

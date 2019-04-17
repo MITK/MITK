@@ -36,6 +36,8 @@ if(MITK_USE_PCRE)
       endif()
 
       set(configure_cmd
+        CMAKE_GENERATOR ${gen}
+        CMAKE_GENERATOR_PLATFORM ${gen_platform}
         CMAKE_ARGS
           ${ep_common_args}
           ${additional_cmake_args}

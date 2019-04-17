@@ -83,6 +83,7 @@ set(H_FILES
   Fiberfox/itkKspaceImageFilter.h
   Fiberfox/itkDftImageFilter.h
   Fiberfox/itkFieldmapGeneratorFilter.h
+  Fiberfox/itkRandomPhantomFilter.h
 
   Fiberfox/SignalModels/mitkDiffusionSignalModel.h
   Fiberfox/SignalModels/mitkTensorModel.h
@@ -97,7 +98,8 @@ set(H_FILES
 
   Fiberfox/Sequences/mitkAcquisitionType.h
   Fiberfox/Sequences/mitkSingleShotEpi.h
-  Fiberfox/Sequences/mitkCartesianReadout.h
+  Fiberfox/Sequences/mitkConventionalSpinEcho.h
+  Fiberfox/Sequences/mitkFastSpinEcho.h
 )
 
 set(RESOURCE_FILES

@@ -28,35 +28,37 @@ See LICENSE.txt or http://www.mitk.org for details.
 // namespace that contains the concrete action
 namespace ToggleVisibilityAction
 {
-  void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite, mitk::DataStorage::Pointer dataStorage, QList<mitk::DataNode::Pointer> selectedNodes /* = QList<mitk::DataNode::Pointer>()*/)
+  void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite, mitk::DataStorage::Pointer dataStorage, const QList<mitk::DataNode::Pointer>& selectedNodes /*= QList<mitk::DataNode::Pointer>()*/, mitk::BaseRenderer* baseRenderer /*= nullptr*/)
   {
-    if (selectedNodes.empty())
-    {
-      selectedNodes = AbstractDataNodeAction::GetSelectedNodes(workbenchPartSite);
-    }
-
     bool isVisible;
     for (auto& node : selectedNodes)
     {
       if (node.IsNotNull())
       {
         isVisible = false;
-        node->GetBoolProperty("visible", isVisible);
-        node->SetVisibility(!isVisible);
+        node->GetBoolProperty("visible", isVisible, baseRenderer);
+        node->SetVisibility(!isVisible, baseRenderer);
       }
     }
 
     berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
-    berry::IPreferences::Pointer preferencesNode = prefService->GetSystemPreferences()->Node(QmitkDataNodeGlobalReinitAction::ACTION_ID);
 
-    bool globalReinit = preferencesNode->GetBool("Call global reinit if node visibility is changed", false);
+    berry::IPreferences::Pointer preferences = prefService->GetSystemPreferences()->Node(QmitkDataNodeGlobalReinitAction::ACTION_ID);
+    bool globalReinit = preferences->GetBool("Call global reinit if node visibility is changed", false);
     if (globalReinit)
     {
       GlobalReinitAction::Run(workbenchPartSite, dataStorage);
     }
     else
     {
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      if (nullptr == baseRenderer)
+      {
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      }
+      else
+      {
+        mitk::RenderingManager::GetInstance()->RequestUpdate(baseRenderer->GetRenderWindow());
+      }
     }
   }
 }
@@ -77,17 +79,12 @@ QmitkDataNodeToggleVisibilityAction::QmitkDataNodeToggleVisibilityAction(QWidget
   InitializeAction();
 }
 
-QmitkDataNodeToggleVisibilityAction::~QmitkDataNodeToggleVisibilityAction()
-{
-  // nothing here
-}
-
 void QmitkDataNodeToggleVisibilityAction::InitializeAction()
 {
   connect(this, &QmitkDataNodeToggleVisibilityAction::triggered, this, &QmitkDataNodeToggleVisibilityAction::OnActionTriggered);
 }
 
-void QmitkDataNodeToggleVisibilityAction::OnActionTriggered(bool checked)
+void QmitkDataNodeToggleVisibilityAction::OnActionTriggered(bool /*checked*/)
 {
   if (m_WorkbenchPartSite.Expired())
   {
@@ -99,5 +96,8 @@ void QmitkDataNodeToggleVisibilityAction::OnActionTriggered(bool checked)
     return;
   }
 
-  ToggleVisibilityAction::Run(m_WorkbenchPartSite.Lock(), m_DataStorage.Lock());
+  mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
+
+  auto dataNodes = GetSelectedNodes();
+  ToggleVisibilityAction::Run(m_WorkbenchPartSite.Lock(), m_DataStorage.Lock(), dataNodes, baseRenderer);
 }

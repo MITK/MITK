@@ -45,6 +45,12 @@ void QmitkPointSetInteractionView::CreateQtPartControl( QWidget *parent )
   m_Controls->setupUi(parent);
   m_Controls->m_PbAddPointSet->connect( m_Controls->m_PbAddPointSet, SIGNAL( clicked() )
     , this, SLOT( OnAddPointSetClicked() ) );
+
+    if (mitk::IRenderWindowPart *renderWindowPart = GetRenderWindowPart())
+  {
+    // let the point set widget know about the render window part (crosshair updates)
+    RenderWindowPartActivated(renderWindowPart);
+  }
 }
 
 void QmitkPointSetInteractionView::SetFocus()

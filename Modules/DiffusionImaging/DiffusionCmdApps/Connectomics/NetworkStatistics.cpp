@@ -49,8 +49,8 @@ int main(int argc, char* argv[])
 
   parser.setArgumentPrefix("--", "-");
 
-  parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input network", "input connectomics network (.cnf)", us::Any(), false);
-  parser.addArgument("", "o", mitkCommandLineParser::OutputFile, "Output file", "name of output file", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::String, "Input network", "input connectomics network (.cnf)", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output file", "name of output file", us::Any(), false, false, false, mitkCommandLineParser::Output);
 
   parser.addArgument("noGlobalStatistics", "g", mitkCommandLineParser::Bool, "No global statistics", "Do not calculate global statistics");
   parser.addArgument("createConnectivityMatriximage", "I", mitkCommandLineParser::Bool, "Write connectivity matrix image", "Write connectivity matrix image");

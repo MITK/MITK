@@ -775,22 +775,23 @@ namespace mitk
     return data;
   }
 
-  void IOUtil::Save(const BaseData *data, const std::string &path) { Save(data, path, IFileWriter::Options()); }
-  void IOUtil::Save(const BaseData *data, const std::string &path, const IFileWriter::Options &options)
+  void IOUtil::Save(const BaseData *data, const std::string &path, bool setPathProperty) { Save(data, path, IFileWriter::Options(), setPathProperty); }
+  void IOUtil::Save(const BaseData *data, const std::string &path, const IFileWriter::Options &options, bool setPathProperty)
   {
-    Save(data, std::string(), path, options);
+    Save(data, std::string(), path, options, setPathProperty);
   }
 
-  void IOUtil::Save(const BaseData *data, const std::string &mimeType, const std::string &path, bool addExtension)
+  void IOUtil::Save(const BaseData *data, const std::string &mimeType, const std::string &path, bool addExtension, bool setPathProperty)
   {
-    Save(data, mimeType, path, IFileWriter::Options(), addExtension);
+    Save(data, mimeType, path, IFileWriter::Options(), addExtension, setPathProperty);
   }
 
   void IOUtil::Save(const BaseData *data,
                     const std::string &mimeType,
                     const std::string &path,
                     const IFileWriter::Options &options,
-                    bool addExtension)
+                    bool addExtension,
+                    bool setPathProperty)
   {
     if ((data == nullptr) || (data->IsEmpty()))
       mitkThrow() << "BaseData cannotbe null or empty for save methods in IOUtil.h.";
@@ -798,12 +799,12 @@ namespace mitk
     std::string errMsg;
     if (options.empty())
     {
-      errMsg = Save(data, mimeType, path, nullptr, addExtension);
+      errMsg = Save(data, mimeType, path, nullptr, addExtension, setPathProperty);
     }
     else
     {
       Impl::FixedWriterOptionsFunctor optionsCallback(options);
-      errMsg = Save(data, mimeType, path, &optionsCallback, addExtension);
+      errMsg = Save(data, mimeType, path, &optionsCallback, addExtension, setPathProperty);
     }
 
     if (!errMsg.empty())
@@ -812,9 +813,9 @@ namespace mitk
     }
   }
 
-  void IOUtil::Save(std::vector<IOUtil::SaveInfo> &saveInfos)
+  void IOUtil::Save(std::vector<IOUtil::SaveInfo> &saveInfos, bool setPathProperty)
   {
-    std::string errMsg = Save(saveInfos, nullptr);
+    std::string errMsg = Save(saveInfos, nullptr, setPathProperty);
     if (!errMsg.empty())
     {
       mitkThrow() << errMsg;
@@ -825,7 +826,8 @@ namespace mitk
                            const std::string &mimeTypeName,
                            const std::string &path,
                            WriterOptionsFunctorBase *optionsCallback,
-                           bool addExtension)
+                           bool addExtension,
+                           bool setPathProperty)
   {
     if (path.empty())
     {
@@ -855,10 +857,10 @@ namespace mitk
 
     std::vector<SaveInfo> infos;
     infos.push_back(saveInfo);
-    return Save(infos, optionsCallback);
+    return Save(infos, optionsCallback, setPathProperty);
   }
 
-  std::string IOUtil::Save(std::vector<SaveInfo> &saveInfos, WriterOptionsFunctorBase *optionsCallback)
+  std::string IOUtil::Save(std::vector<SaveInfo> &saveInfos, WriterOptionsFunctorBase *optionsCallback, bool setPathProperty)
   {
     if (saveInfos.empty())
     {
@@ -947,6 +949,10 @@ namespace mitk
       {
         errMsg += std::string("Exception occurred when writing to ") + saveInfo.m_Path + ":\n" + e.what() + "\n";
       }
+
+      if (setPathProperty)
+        saveInfo.m_BaseData->GetPropertyList()->SetStringProperty("path", saveInfo.m_Path.c_str());
+
       mitk::ProgressBar::GetInstance()->Progress(2);
       --filesToWrite;
     }

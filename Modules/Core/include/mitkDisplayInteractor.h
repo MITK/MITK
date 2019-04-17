@@ -37,16 +37,20 @@ namespace mitk
   class MITKCORE_EXPORT DisplayInteractor : public EventStateMachine, public InteractionEventObserver
   {
   public:
-    mitkClassMacro(DisplayInteractor, EventStateMachine) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
-      /**
-       * By this function the Observer gets notified about new events.
-       * Here it is adapted to pass the events to the state machine in order to use
-       * its infrastructure.
-       * It also checks if event is to be accepted when it already has been processed by a DataInteractor.
-       */
-      void Notify(InteractionEvent *interactionEvent, bool isHandled) override;
+
+    mitkClassMacro(DisplayInteractor, EventStateMachine)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
+    /**
+    * By this function the Observer gets notified about new events.
+    * Here it is adapted to pass the events to the state machine in order to use
+    * its infrastructure.
+    * It also checks if event is to be accepted when it already has been processed by a DataInteractor.
+    */
+    virtual void Notify(InteractionEvent *interactionEvent, bool isHandled) override;
 
   protected:
+
     DisplayInteractor();
     ~DisplayInteractor() override;
     /**
@@ -156,9 +160,6 @@ namespace mitk
     */
     bool GetBoolProperty(mitk::PropertyList::Pointer propertyList, const char *propertyName, bool defaultValue);
 
-    // Typedefs
-    typedef std::vector<SliceNavigationController *> SNCVector;
-
   private:
     /**
      * @brief UpdateStatusBar
@@ -262,9 +263,9 @@ namespace mitk
      */
     bool m_LinkPlanes;
 
+    typedef std::vector<SliceNavigationController*> SNCVector;
     SNCVector m_RotatableSNCs; /// all SNCs that currently have CreatedWorldGeometries, that can be rotated.
-    SNCVector
-      m_SNCsToBeRotated; /// all SNCs that will be rotated (exceptions are the ones parallel to the one being clicked)
+    SNCVector m_SNCsToBeRotated; /// all SNCs that will be rotated (exceptions are the ones parallel to the one being clicked)
 
     Point3D m_LastCursorPosition; /// used for calculation of the rotation angle
     Point3D m_CenterOfRotation;   /// used for calculation of the rotation angle

@@ -45,10 +45,10 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input:", "input image (tensor, ODF or SH-coefficient image)", us::Any(), false);
-  parser.addArgument("", "o", mitkCommandLineParser::OutputFile, "Output:", "output tractogram", us::Any(), false);
-  parser.addArgument("parameters", "", mitkCommandLineParser::InputFile, "Parameters:", "parameter file (.gtp)", us::Any(), false);
-  parser.addArgument("mask", "", mitkCommandLineParser::InputFile, "Mask:", "binary mask image");
+  parser.addArgument("", "i", mitkCommandLineParser::String, "Input:", "input image (tensor, ODF or SH-coefficient image)", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output:", "output tractogram", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("parameters", "", mitkCommandLineParser::String, "Parameters:", "parameter file (.gtp)", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("mask", "", mitkCommandLineParser::String, "Mask:", "binary mask image", us::Any(), false, false, false, mitkCommandLineParser::Input);
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)

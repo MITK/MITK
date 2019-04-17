@@ -34,9 +34,9 @@ int main(int argc, char* argv[])
   parser.setArgumentPrefix("--","-");
   // Add command line argument names
   parser.addArgument("help", "h",mitkCommandLineParser::Bool, "Help:", "Show this help text");
-  parser.addArgument("image", "i", mitkCommandLineParser::InputFile, "Input image:", "Input Image",us::Any(),false);
-  parser.addArgument("mask", "m", mitkCommandLineParser::InputFile, "Input mask:", "Input Mask", us::Any(), false);
-  parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output file:", "Output Mask", us::Any(), false);
+  parser.addArgument("image", "i", mitkCommandLineParser::File, "Input image:", "Input Image",us::Any(),false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("mask", "m", mitkCommandLineParser::File, "Input mask:", "Input Mask", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file:", "Output Mask", us::Any(), false, false, false, mitkCommandLineParser::Output);
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
 

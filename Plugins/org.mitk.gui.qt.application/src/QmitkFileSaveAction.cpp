@@ -20,12 +20,77 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkWorkbenchUtil.h>
 #include <mitkDataNodeSelection.h>
+#include <mitkIDataStorageService.h>
 
 #include <berryISelectionService.h>
 #include <berryINullSelectionListener.h>
 #include <berryIPreferences.h>
 
 #include <QmitkIOUtil.h>
+
+#include <QFileDialog>
+#include <QMessageBox>
+
+namespace
+{
+  mitk::DataStorage::Pointer GetDataStorage()
+  {
+    auto context = mitk::org_mitk_gui_qt_application_Activator::GetContext();
+
+    if (nullptr == context)
+      return nullptr;
+
+    auto dataStorageServiceReference = context->getServiceReference<mitk::IDataStorageService>();
+
+    if (!dataStorageServiceReference)
+      return nullptr;
+
+    auto dataStorageService = context->getService<mitk::IDataStorageService>(dataStorageServiceReference);
+
+    if (nullptr == dataStorageService)
+      return nullptr;
+
+    auto dataStorageReference = dataStorageService->GetDataStorage();
+
+    if (dataStorageReference.IsNull())
+      return nullptr;
+
+    return dataStorageReference->GetDataStorage();
+  }
+
+  QString GetParentPath(mitk::DataNode::Pointer dataNode)
+  {
+    if (dataNode.IsNull())
+      return "";
+
+    auto dataStorage = GetDataStorage();
+
+    if (dataStorage.IsNull())
+      return "";
+
+    auto sources = dataStorage->GetSources(dataNode);
+
+    if (sources.IsNull() || sources->empty())
+      return "";
+
+    const auto &parentNode = sources->front();
+
+    if (parentNode.IsNull())
+      return "";
+
+    auto data = parentNode->GetData();
+
+    if (nullptr != data)
+    {
+      auto pathProperty = data->GetConstProperty("path");
+
+      if (pathProperty.IsNotNull())
+        return QFileInfo(QString::fromStdString(pathProperty->GetValueAsString())).canonicalPath();
+    }
+
+    return GetParentPath(parentNode);
+  }
+}
 
 class QmitkFileSaveActionPrivate
 {
@@ -177,13 +242,32 @@ void QmitkFileSaveAction::Run()
     names.push_back(QString::fromStdString(name));
   }
 
+  QString path;
+
+  if (1 == data.size())
+  {
+    if (nullptr != data[0])
+    {
+      auto pathProperty = data[0]->GetConstProperty("path");
+
+      if (pathProperty.IsNotNull())
+        path = QFileInfo(QString::fromStdString(pathProperty->GetValueAsString())).canonicalPath();
+    }
+
+    if (path.isEmpty())
+      path = GetParentPath(dataNodes.front());
+  }
+
+  if (path.isEmpty())
+    path = d->GetLastFileSavePath();
+
   try
   {
-    QStringList fileNames = QmitkIOUtil::Save(data, names, d->GetLastFileSavePath(), d->m_Action->parentWidget());
+    auto setPathProperty = true;
+    auto fileNames = QmitkIOUtil::Save(data, names, path, d->m_Action->parentWidget(), setPathProperty);
+
     if (!fileNames.empty())
-    {
       d->SetLastFileSavePath(QFileInfo(fileNames.back()).absolutePath());
-    }
   }
   catch (const mitk::Exception& e)
   {

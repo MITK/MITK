@@ -37,9 +37,9 @@ public:
   void setTransparentForMouseEvents(bool transparent = true);
 
 protected:
-  virtual bool event(QEvent* e) override;
-  virtual bool eventFilter(QObject* watched, QEvent* event) override;
-  virtual void paintEvent(QPaintEvent* event) override;
+  bool event(QEvent* e) override;
+  bool eventFilter(QObject* watched, QEvent* event) override;
+  void paintEvent(QPaintEvent* event) override;
 
 private:
   void installEventFilterOnParent();

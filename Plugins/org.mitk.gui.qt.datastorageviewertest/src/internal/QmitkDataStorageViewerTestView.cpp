@@ -258,7 +258,7 @@ void QmitkDataStorageViewerTestView::OnOnlyUneven(bool checked)
       if (!(nodes.size() % 2))
       {
         std::stringstream ss;
-        ss << "<font class=\"warning\"><p>Invalid selection.<p/><p>The number of selected nodes must be even! the current number is " << nodes.size() << ".</p>";
+        ss << "<font class=\"warning\"><p>Invalid selection.<p/><p>The number of selected nodes must be uneven! the current number is " << nodes.size() << ".</p>";
         return ss.str();
       }
       return std::string();

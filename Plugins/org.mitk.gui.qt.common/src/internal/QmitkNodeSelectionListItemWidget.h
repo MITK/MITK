@@ -34,14 +34,14 @@ public:
   explicit QmitkNodeSelectionListItemWidget(QWidget* parent = nullptr);
   ~QmitkNodeSelectionListItemWidget();
 
-  mitk::DataNode::Pointer GetSelectedNode() const;
+  const mitk::DataNode* GetSelectedNode() const;
 
 public Q_SLOTS :
-  virtual void SetSelectedNode(mitk::DataNode* node);
+  virtual void SetSelectedNode(const mitk::DataNode* node);
   virtual void SetClearAllowed(bool allowed);
 
 signals:
-  void ClearSelection(mitk::DataNode* node);
+  void ClearSelection(const mitk::DataNode* node);
 
 protected Q_SLOTS:
   void OnClearSelection();

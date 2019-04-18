@@ -42,12 +42,12 @@ QmitkNodeSelectionListItemWidget::~QmitkNodeSelectionListItemWidget()
 {
 }
 
-mitk::DataNode::Pointer QmitkNodeSelectionListItemWidget::GetSelectedNode() const
+const mitk::DataNode* QmitkNodeSelectionListItemWidget::GetSelectedNode() const
 {
   return m_Controls.btnSelect->GetSelectedNode();
 };
 
-void QmitkNodeSelectionListItemWidget::SetSelectedNode(mitk::DataNode* node)
+void QmitkNodeSelectionListItemWidget::SetSelectedNode(const mitk::DataNode* node)
 {
   m_Controls.btnSelect->SetSelectedNode(node);
   this->update();
@@ -79,9 +79,9 @@ bool QmitkNodeSelectionListItemWidget::eventFilter(QObject *obj, QEvent *ev)
       {
         auto selection = this->GetSelectedNode();
 
-        if (selection.IsNotNull())
+        if (selection != nullptr)
         {
-          QList<mitk::DataNode::Pointer> selectionList({ this->GetSelectedNode() });
+          QList<mitk::DataNode::ConstPointer> selectionList({ this->GetSelectedNode() });
           QmitkNodeDetailsDialog infoDialog(selectionList, this);
           infoDialog.exec();
           return true;

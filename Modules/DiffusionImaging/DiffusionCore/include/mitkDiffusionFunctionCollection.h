@@ -61,6 +61,16 @@ public:
     return itkPoint;
   }
 
+  template< class TType >
+  static itk::Vector<float, 3> GetItkVector(double point[3])
+  {
+    itk::Vector<TType, 3> itkVector;
+    itkVector[0] = static_cast<TType>(point[0]);
+    itkVector[1] = static_cast<TType>(point[1]);
+    itkVector[2] = static_cast<TType>(point[2]);
+    return itkVector;
+  }
+
   template< class TPixelType, class TOutPixelType=TPixelType >
   static TOutPixelType GetImageValue(const itk::Point<float, 3>& itkP, bool interpolate, typename itk::LinearInterpolateImageFunction< itk::Image< TPixelType, 3 >, float >::Pointer interpolator)
   {

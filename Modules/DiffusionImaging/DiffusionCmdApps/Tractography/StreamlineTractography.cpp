@@ -92,6 +92,7 @@ int main(int argc, char* argv[])
   parser.addArgument("min_tract_length", "", mitkCommandLineParser::Float, "Min. tract length:", "minimum fiber length (in mm)", 20);
   parser.addArgument("angular_threshold", "", mitkCommandLineParser::Float, "Angular threshold:", "angular threshold between two successive steps, (default: 90° * step_size, minimum 15°)");
   parser.addArgument("loop_check", "", mitkCommandLineParser::Float, "Check for loops:", "threshold on angular stdev over the last 4 voxel lengths");
+  parser.addArgument("peak_jitter", "", mitkCommandLineParser::Float, "Peak jitter:", "important for probabilistic peak tractography and peak prior. actual jitter is drawn from a normal distribution with peak_jitter*fabs(direction_value) as standard deviation.", 0.01);
   parser.endGroup();
 
   parser.beginGroup("5. Tractography prior:");
@@ -271,6 +272,10 @@ int main(int argc, char* argv[])
   params->m_OdfCutoff = 0.0;
   if (parsedArgs.count("odf_cutoff"))
     params->m_OdfCutoff = us::any_cast<float>(parsedArgs["odf_cutoff"]);
+
+  params->m_PeakJitter = 0.01;
+  if (parsedArgs.count("peak_jitter"))
+    params->m_PeakJitter = us::any_cast<float>(parsedArgs["peak_jitter"]);
 
   params->SetStepSizeVox(-1);
   if (parsedArgs.count("step_size"))

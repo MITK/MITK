@@ -4,5 +4,7 @@
         <file>right.ico</file>
         <file>stop.ico</file>
         <file>upload.ico</file>
+        <file>circle.png</file>
+        <file>refresh.xpm</file>
     </qresource>
 </RCC>

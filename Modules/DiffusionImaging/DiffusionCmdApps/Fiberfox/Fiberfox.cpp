@@ -197,19 +197,25 @@ int main(int argc, char* argv[])
   tractsToDwiFilter->Update();
 
   mitk::Image::Pointer image = mitk::GrabItkImageMemory(tractsToDwiFilter->GetOutput());
-  if (apply_direction_matrix)
-    mitk::DiffusionPropertyHelper::SetGradientContainer(image, parameters.m_SignalGen.GetItkGradientContainer());
-  else
-    mitk::DiffusionPropertyHelper::SetOriginalGradientContainer(image, parameters.m_SignalGen.GetItkGradientContainer());
-  mitk::DiffusionPropertyHelper::SetReferenceBValue(image, parameters.m_SignalGen.GetBvalue());
-  mitk::DiffusionPropertyHelper::InitializeImage(image);
 
-  if (file_extension=="")
-    mitk::IOUtil::Save(image, "DWI_NIFTI", outName+".nii.gz");
-  else if (file_extension==".nii" || file_extension==".nii.gz")
-    mitk::IOUtil::Save(image, "DWI_NIFTI", outName+file_extension);
+  if (parameters.m_SignalGen.GetNumWeightedVolumes()>0)
+  {
+    if (apply_direction_matrix)
+      mitk::DiffusionPropertyHelper::SetGradientContainer(image, parameters.m_SignalGen.GetItkGradientContainer());
+    else
+      mitk::DiffusionPropertyHelper::SetOriginalGradientContainer(image, parameters.m_SignalGen.GetItkGradientContainer());
+    mitk::DiffusionPropertyHelper::SetReferenceBValue(image, parameters.m_SignalGen.GetBvalue());
+    mitk::DiffusionPropertyHelper::InitializeImage(image);
+
+    if (file_extension=="")
+      mitk::IOUtil::Save(image, "DWI_NIFTI", outName+".nii.gz");
+    else if (file_extension==".nii" || file_extension==".nii.gz")
+      mitk::IOUtil::Save(image, "DWI_NIFTI", outName+file_extension);
+    else
+      mitk::IOUtil::Save(image, outName+file_extension);
+  }
   else
-    mitk::IOUtil::Save(image, outName+file_extension);
+    mitk::IOUtil::Save(image, outName+".nii.gz");
 
   if (verbose)
   {

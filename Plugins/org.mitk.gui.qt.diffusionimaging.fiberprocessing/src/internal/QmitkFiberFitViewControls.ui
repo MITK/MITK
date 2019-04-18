@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>QmitkFiberFitViewControls</class>
  <widget class="QWidget" name="QmitkFiberFitViewControls">
@@ -50,7 +50,7 @@ QGroupBox {
       <item row="4" column="1">
        <widget class="QCheckBox" name="m_OutliersBox">
         <property name="text">
-         <string></string>
+         <string/>
         </property>
         <property name="checked">
          <bool>false</bool>
@@ -65,12 +65,15 @@ QGroupBox {
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QmitkDataStorageComboBox" name="m_TractBox"></widget>
+       <widget class="QmitkDataStorageComboBox" name="m_TractBox"/>
       </item>
       <item row="3" column="1">
        <widget class="QDoubleSpinBox" name="m_ReguBox">
         <property name="toolTip">
          <string>Weight for regularization.</string>
+        </property>
+        <property name="decimals">
+         <number>4</number>
         </property>
         <property name="maximum">
          <double>999999.000000000000000</double>
@@ -113,7 +116,7 @@ QGroupBox {
          </font>
         </property>
         <property name="toolTip">
-         <string></string>
+         <string/>
         </property>
         <property name="text">
          <string>Start</string>
@@ -123,7 +126,7 @@ QGroupBox {
       <item row="0" column="1">
        <widget class="QmitkDataStorageComboBox" name="m_ImageBox">
         <property name="toolTip">
-         <string></string>
+         <string/>
         </property>
        </widget>
       </item>
@@ -144,7 +147,7 @@ QGroupBox {
       <item row="5" column="1">
        <widget class="QCheckBox" name="m_ResidualsBox">
         <property name="text">
-         <string></string>
+         <string/>
         </property>
         <property name="checked">
          <bool>false</bool>
@@ -219,6 +222,6 @@ QGroupBox {
    <header location="global">QmitkDataStorageComboBox.h</header>
   </customwidget>
  </customwidgets>
- <resources></resources>
- <connections></connections>
+ <resources/>
+ <connections/>
 </ui>

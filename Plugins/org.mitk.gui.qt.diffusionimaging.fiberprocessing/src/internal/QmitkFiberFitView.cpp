@@ -96,7 +96,7 @@ void QmitkFiberFitView::StartFit()
   if (m_Controls->m_TractBox->GetSelectedNode().IsNull() || m_Controls->m_ImageBox->GetSelectedNode().IsNull())
     return;
 
-  mitk::FiberBundle::Pointer input_tracts = dynamic_cast<mitk::FiberBundle*>(m_Controls->m_TractBox->GetSelectedNode()->GetData());
+  mitk::FiberBundle::Pointer input_tracts = dynamic_cast<mitk::FiberBundle*>(m_Controls->m_TractBox->GetSelectedNode()->GetData())->GetDeepCopy();
 
   mitk::DataNode::Pointer node = m_Controls->m_ImageBox->GetSelectedNode();
   itk::FitFibersToImageFilter::Pointer fitter = itk::FitFibersToImageFilter::New();

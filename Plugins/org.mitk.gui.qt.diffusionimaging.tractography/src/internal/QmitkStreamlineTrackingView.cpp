@@ -205,6 +205,7 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_LoopCheckBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_TrialsPerSeedBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_EpConstraintsBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_PeakJitterBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
 
     m_Controls->m_SeedsPerVoxelBox->editingFinished();
     m_Controls->m_NumFibersBox->editingFinished();
@@ -222,6 +223,7 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_NumSeedsBox->editingFinished();
     m_Controls->m_LoopCheckBox->editingFinished();
     m_Controls->m_TrialsPerSeedBox->editingFinished();
+    m_Controls->m_PeakJitterBox->editingFinished();
 
     StartStopTrackingGui(false);
   }
@@ -277,6 +279,7 @@ void QmitkStreamlineTrackingView::ParametersToGui(mitk::StreamlineTractographyPa
   m_Controls->m_MaxTractLengthBox->setValue(params.m_MaxTractLengthMm);
   m_Controls->m_OutputProbMap->setChecked(params.m_OutputProbMap);
   m_Controls->m_FixSeedBox->setChecked(params.m_FixRandomSeed);
+  m_Controls->m_PeakJitterBox->setValue(params.m_PeakJitter);
 
   switch (params.m_Mode)
   {
@@ -369,6 +372,7 @@ std::shared_ptr<mitk::StreamlineTractographyParameters> QmitkStreamlineTrackingV
   params->m_MaxTractLengthMm = m_Controls->m_MaxTractLengthBox->value();
   params->m_OutputProbMap = m_Controls->m_OutputProbMap->isChecked();
   params->m_FixRandomSeed = m_Controls->m_FixSeedBox->isChecked();
+  params->m_PeakJitter = static_cast<float>(m_Controls->m_PeakJitterBox->value());
 
   switch (m_Controls->m_ModeBox->currentIndex())
   {
@@ -839,6 +843,7 @@ void QmitkStreamlineTrackingView::UpdateGui()
   m_Controls->m_TrialsPerSeedLabel->setEnabled(false);
   m_Controls->m_TargetImageSelectionWidget->setEnabled(false);
   m_Controls->m_TargetImageLabel->setEnabled(false);
+  m_Controls->m_PeakJitterBox->setEnabled(false);
 
   if (m_Controls->m_InteractiveBox->isChecked())
   {
@@ -861,11 +866,12 @@ void QmitkStreamlineTrackingView::UpdateGui()
     m_Controls->m_TargetImageLabel->setEnabled(true);
   }
 
-  // trials per seed are only important for probabilistic tractography
+  // stuff that is only important for probabilistic tractography
   if (m_Controls->m_ModeBox->currentIndex()==1)
   {
     m_Controls->m_TrialsPerSeedBox->setEnabled(true);
     m_Controls->m_TrialsPerSeedLabel->setEnabled(true);
+    m_Controls->m_PeakJitterBox->setEnabled(true);
   }
 
   if(!m_InputImageNodes.empty())
@@ -1058,12 +1064,6 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
   }
   else
   {
-    if (m_Controls->m_ModeBox->currentIndex()==1)
-    {
-      QMessageBox::information(nullptr, "Information", "Probabilstic tractography is not implemented for peak images.");
-      StartStopTrackingGui(false);
-      return;
-    }
     if (m_TrackingHandler==nullptr)
     {
       m_TrackingHandler = new mitk::TrackingHandlerPeaks();

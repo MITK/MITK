@@ -1,10 +1,10 @@
 <RCC>
     <qresource prefix="/QmitkFiberfox">
-        <file>download.ico</file>
-        <file>right.ico</file>
-        <file>stop.ico</file>
-        <file>upload.ico</file>
         <file>circle.png</file>
         <file>refresh.xpm</file>
+        <file>download.png</file>
+        <file>right.png</file>
+        <file>stop.png</file>
+        <file>upload.png</file>
     </qresource>
 </RCC>

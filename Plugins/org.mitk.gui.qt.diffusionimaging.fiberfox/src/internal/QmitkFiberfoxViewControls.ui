@@ -2475,7 +2475,7 @@
         </property>
         <property name="icon">
          <iconset resource="../../resources/QmitkFiberfox.qrc">
-          <normaloff>:/QmitkFiberfox/download.ico</normaloff>:/QmitkFiberfox/download.ico</iconset>
+          <normaloff>:/QmitkFiberfox/download.png</normaloff>:/QmitkFiberfox/download.png</iconset>
         </property>
        </widget>
       </item>
@@ -2495,7 +2495,7 @@
         </property>
         <property name="icon">
          <iconset resource="../../resources/QmitkFiberfox.qrc">
-          <normaloff>:/QmitkFiberfox/upload.ico</normaloff>:/QmitkFiberfox/upload.ico</iconset>
+          <normaloff>:/QmitkFiberfox/upload.png</normaloff>:/QmitkFiberfox/upload.png</iconset>
         </property>
        </widget>
       </item>
@@ -2539,7 +2539,7 @@
         </property>
         <property name="icon">
          <iconset resource="../../resources/QmitkFiberfox.qrc">
-          <normaloff>:/QmitkFiberfox/right.ico</normaloff>:/QmitkFiberfox/right.ico</iconset>
+          <normaloff>:/QmitkFiberfox/right.png</normaloff>:/QmitkFiberfox/right.png</iconset>
         </property>
        </widget>
       </item>
@@ -2732,7 +2732,7 @@
         </property>
         <property name="icon">
          <iconset resource="../../resources/QmitkFiberfox.qrc">
-          <normaloff>:/QmitkFiberfox/stop.ico</normaloff>:/QmitkFiberfox/stop.ico</iconset>
+          <normaloff>:/QmitkFiberfox/stop.png</normaloff>:/QmitkFiberfox/stop.png</iconset>
         </property>
        </widget>
       </item>

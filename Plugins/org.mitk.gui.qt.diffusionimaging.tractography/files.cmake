@@ -29,10 +29,10 @@ set(CACHED_RESOURCE_FILES
   resources/tract.png
   resources/tractogram.png
   resources/ml_tractography.png
-  resources/upload.ico
-  resources/download.ico
-  resources/right.ico
-  resources/stop.ico
+  resources/download.png
+  resources/right.png
+  resources/stop.png
+  resources/upload.png
 )
 
 set(QRC_FILES

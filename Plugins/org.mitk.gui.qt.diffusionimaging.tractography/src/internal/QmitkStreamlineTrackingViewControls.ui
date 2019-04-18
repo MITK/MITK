@@ -121,7 +121,7 @@ QGroupBox {
            </property>
            <property name="icon">
             <iconset resource="../../resources/QmitkTractography.qrc">
-             <normaloff>:/QmitkTractography/download.ico</normaloff>:/QmitkTractography/download.ico</iconset>
+             <normaloff>:/QmitkTractography/download.png</normaloff>:/QmitkTractography/download.png</iconset>
            </property>
           </widget>
          </item>
@@ -138,7 +138,7 @@ QGroupBox {
            </property>
            <property name="icon">
             <iconset resource="../../resources/QmitkTractography.qrc">
-             <normaloff>:/QmitkTractography/upload.ico</normaloff>:/QmitkTractography/upload.ico</iconset>
+             <normaloff>:/QmitkTractography/upload.png</normaloff>:/QmitkTractography/upload.png</iconset>
            </property>
           </widget>
          </item>
@@ -155,7 +155,7 @@ QGroupBox {
         </property>
         <property name="icon">
          <iconset resource="../../resources/QmitkTractography.qrc">
-          <normaloff>:/QmitkTractography/right.ico</normaloff>:/QmitkTractography/right.ico</iconset>
+          <normaloff>:/QmitkTractography/right.png</normaloff>:/QmitkTractography/right.png</iconset>
         </property>
        </widget>
       </item>
@@ -172,7 +172,7 @@ QGroupBox {
         </property>
         <property name="icon">
          <iconset resource="../../resources/QmitkTractography.qrc">
-          <normaloff>:/QmitkTractography/stop.ico</normaloff>:/QmitkTractography/stop.ico</iconset>
+          <normaloff>:/QmitkTractography/stop.png</normaloff>:/QmitkTractography/stop.png</iconset>
         </property>
        </widget>
       </item>
@@ -578,7 +578,7 @@ QGroupBox {
         <x>0</x>
         <y>0</y>
         <width>435</width>
-        <height>169</height>
+        <height>184</height>
        </rect>
       </property>
       <attribute name="label">
@@ -714,7 +714,7 @@ QGroupBox {
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-228</y>
+        <y>0</y>
         <width>421</width>
         <height>428</height>
        </rect>
@@ -1126,7 +1126,7 @@ QGroupBox {
         <x>0</x>
         <y>0</y>
         <width>435</width>
-        <height>169</height>
+        <height>184</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1282,7 +1282,7 @@ QGroupBox {
         <x>0</x>
         <y>0</y>
         <width>435</width>
-        <height>169</height>
+        <height>184</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1412,7 +1412,7 @@ QGroupBox {
         <x>0</x>
         <y>0</y>
         <width>435</width>
-        <height>169</height>
+        <height>184</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1581,7 +1581,7 @@ QGroupBox {
         <x>0</x>
         <y>0</y>
         <width>435</width>
-        <height>169</height>
+        <height>184</height>
        </rect>
       </property>
       <attribute name="label">

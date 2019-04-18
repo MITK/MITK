@@ -1,8 +1,8 @@
 <RCC>
     <qresource prefix="/QmitkTractography">
-        <file>download.ico</file>
-        <file>right.ico</file>
-        <file>stop.ico</file>
-        <file>upload.ico</file>
+        <file>upload.png</file>
+        <file>download.png</file>
+        <file>right.png</file>
+        <file>stop.png</file>
     </qresource>
 </RCC>

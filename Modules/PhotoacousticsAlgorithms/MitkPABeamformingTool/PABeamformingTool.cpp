@@ -48,6 +48,7 @@ struct CropSettings
 struct ResampleSettings
 {
   double spacing;
+  int dimX;
 };
 
 struct BModeSettings
@@ -144,6 +145,10 @@ void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSetti
     std::string elemName = elem->Value();
     if (elemName == "Beamforming")
     {
+      processSet.DoBeamforming = std::stoi(elem->Attribute("do"));
+      if (!processSet.DoBeamforming)
+        continue;
+
       float PitchInMeters = std::stof(elem->Attribute("pitchInMeters"));
       float SpeedOfSound = std::stof(elem->Attribute("speedOfSound"));
       float Angle = std::stof(elem->Attribute("angle"));
@@ -197,25 +202,35 @@ void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSetti
         ApodizationArraySize,
         Algorithm
       );
-      processSet.DoBeamforming = std::stoi(elem->Attribute("do"));
     }
     if (elemName == "Cropping") 
     {
+      processSet.DoCropping = std::stoi(elem->Attribute("do"));
+      if (!processSet.DoCropping)
+        continue;
+
       cropSet.above = std::stoi(elem->Attribute("cutAbove"));
       cropSet.below = std::stoi(elem->Attribute("cutBelow"));
       cropSet.right = std::stoi(elem->Attribute("cutRight"));
       cropSet.left = std::stoi(elem->Attribute("cutLeft"));
       cropSet.zStart = std::stoi(elem->Attribute("firstSlice"));
       cropSet.zEnd = std::stoi(elem->Attribute("cutSlices"));
-      processSet.DoCropping = std::stoi(elem->Attribute("do"));
     }
     if (elemName == "Resampling")
     {
-      resSet.spacing = std::stod(elem->Attribute("spacing"));
       processSet.DoResampling = std::stoi(elem->Attribute("do"));
+      if (!processSet.DoResampling)
+        continue;
+
+      resSet.spacing = std::stod(elem->Attribute("spacing"));
+      resSet.dimX = std::stoi(elem->Attribute("dimX"));
     }
     if (elemName == "BMode")
     {
+      processSet.DoBmode = std::stoi(elem->Attribute("do"));
+      if (!processSet.DoBmode)
+        continue;
+
       std::string methodStr = elem->Attribute("method");
       if (methodStr == "EnvelopeDetection")
         bmodeSet.method = mitk::PhotoacousticFilterService::BModeMethod::EnvelopeDetection;
@@ -224,7 +239,6 @@ void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSetti
       else
         mitkThrow() << "BMode method incorrectly set in configuration file";
       bmodeSet.UseLogFilter = (bool)std::stoi(elem->Attribute("useLogFilter"));
-      processSet.DoBmode = std::stoi(elem->Attribute("do"));
     }
   }
 }
@@ -285,9 +299,14 @@ int main(int argc, char * argv[])
   }
   if (processSettings.DoResampling)
   {
-    double spacing[3] = {output->GetGeometry()->GetSpacing()[0], resSettings.spacing, output->GetGeometry()->GetSpacing()[2]};
+    double spacing[3] = {output->GetGeometry()->GetSpacing()[0]*output->GetDimension(0)/resSettings.dimX, resSettings.spacing, output->GetGeometry()->GetSpacing()[2]};
     MITK_INFO(input.verbose) << "Applying Resample filter to image...";
     output = m_FilterService->ApplyResampling(output, spacing);
+    if (output->GetDimension(0) != resSettings.dimX)
+    {
+      double dim[3] = {(double)resSettings.dimX, (double)output->GetDimension(1), (double)output->GetDimension(2)};
+      output = m_FilterService->ApplyResamplingToDim(output, dim);
+    }
     MITK_INFO(input.verbose) << "Applying Resample filter to image...[Done]";
   }
   if (processSettings.DoBmode)

@@ -1319,7 +1319,7 @@ void MRPerfusionView::PrepareConcentrationImage()
   mitk::DataNode::Pointer concentrationNode = this->m_selectedNode;
   m_HasGeneratedNewInput = false;
 
-  if (this->m_Controls.radioButtonNoConversion->isChecked())
+  if (!this->m_Controls.radioButtonNoConversion->isChecked())
   {
     concentrationImage = this->ConvertConcentrationImage(false);
     concentrationNode = GenerateConcentrationNode(concentrationImage, "Concentration");

@@ -514,8 +514,8 @@ QGroupBox {
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../../../../../debug/MITK-build/Plugins/org.mitk.gui.qt.diffusionimaging/org_mitk_gui_qt_diffusionimaging_cached.qrc">
-             <normaloff>:/org.mitk.gui.qt.diffusionimaging/resources/color64.gif</normaloff>:/org.mitk.gui.qt.diffusionimaging/resources/color64.gif</iconset>
+            <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+             <normaloff>:/QmitkDiffusionImaging/color64.png</normaloff>:/QmitkDiffusionImaging/color64.png</iconset>
            </property>
           </widget>
          </item>
@@ -859,8 +859,8 @@ p, li { white-space: pre-wrap; }
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../../../../../debug/MITK-build/Plugins/org.mitk.gui.qt.diffusionimaging/org_mitk_gui_qt_diffusionimaging_cached.qrc">
-             <normaloff>:/org.mitk.gui.qt.diffusionimaging/resources/color64.gif</normaloff>:/org.mitk.gui.qt.diffusionimaging/resources/color64.gif</iconset>
+            <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+             <normaloff>:/QmitkDiffusionImaging/color64.png</normaloff>:/QmitkDiffusionImaging/color64.png</iconset>
            </property>
           </widget>
          </item>
@@ -996,7 +996,6 @@ p, li { white-space: pre-wrap; }
  </includes>
  <resources>
   <include location="../../resources/QmitkDiffusionImaging.qrc"/>
-  <include location="../../../../../debug/MITK-build/Plugins/org.mitk.gui.qt.diffusionimaging/org_mitk_gui_qt_diffusionimaging_cached.qrc"/>
  </resources>
  <connections/>
 </ui>

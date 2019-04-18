@@ -26,7 +26,7 @@
       <string>Save Parameters</string>
      </property>
      <property name="icon">
-      <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+      <iconset>
        <normaloff>:/QmitkDiffusionImaging/general_icons/download.ico</normaloff>:/QmitkDiffusionImaging/general_icons/download.ico</iconset>
      </property>
     </widget>
@@ -40,7 +40,7 @@
       <string>Load Parameters</string>
      </property>
      <property name="icon">
-      <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+      <iconset>
        <normaloff>:/QmitkDiffusionImaging/general_icons/upload.ico</normaloff>:/QmitkDiffusionImaging/general_icons/upload.ico</iconset>
      </property>
     </widget>
@@ -115,8 +115,8 @@
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-              <normaloff>:/QmitkDiffusionImaging/circle.png</normaloff>:/QmitkDiffusionImaging/circle.png</iconset>
+             <iconset resource="../../resources/QmitkFiberfox.qrc">
+              <normaloff>:/QmitkFiberfox/circle.png</normaloff>:/QmitkFiberfox/circle.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -150,8 +150,8 @@
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-              <normaloff>:/QmitkDiffusionImaging/general_icons/refresh.ico</normaloff>:/QmitkDiffusionImaging/general_icons/refresh.ico</iconset>
+             <iconset resource="../../resources/QmitkFiberfox.qrc">
+              <normaloff>:/QmitkFiberfox/refresh.xpm</normaloff>:/QmitkFiberfox/refresh.xpm</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -507,7 +507,7 @@
              <string>Generate Fibers</string>
             </property>
             <property name="icon">
-             <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+             <iconset>
               <normaloff>:/QmitkDiffusionImaging/general_icons/right.ico</normaloff>:/QmitkDiffusionImaging/general_icons/right.ico</iconset>
             </property>
            </widget>
@@ -949,7 +949,7 @@
              <string>Align With Grid</string>
             </property>
             <property name="icon">
-             <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+             <iconset>
               <normaloff>:/QmitkDiffusionImaging/general_icons/right.ico</normaloff>:/QmitkDiffusionImaging/general_icons/right.ico</iconset>
             </property>
            </widget>
@@ -964,7 +964,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>403</width>
+        <width>395</width>
         <height>277</height>
        </rect>
       </property>
@@ -1529,7 +1529,7 @@
           <string>Generate</string>
          </property>
          <property name="icon">
-          <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+          <iconset>
            <normaloff>:/QmitkDiffusionImaging/general_icons/right.ico</normaloff>:/QmitkDiffusionImaging/general_icons/right.ico</iconset>
          </property>
         </widget>
@@ -1891,7 +1891,7 @@
           <string>Copy Bundles</string>
          </property>
          <property name="icon">
-          <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+          <iconset>
            <normaloff>:/QmitkDiffusionImaging/general_icons/copy2.ico</normaloff>:/QmitkDiffusionImaging/general_icons/copy2.ico</iconset>
          </property>
         </widget>
@@ -1910,7 +1910,7 @@
           <string>Transform Selection</string>
          </property>
          <property name="icon">
-          <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+          <iconset>
            <normaloff>:/QmitkDiffusionImaging/general_icons/refresh.ico</normaloff>:/QmitkDiffusionImaging/general_icons/refresh.ico</iconset>
          </property>
         </widget>
@@ -1929,7 +1929,7 @@
           <string>Join Bundles</string>
          </property>
          <property name="icon">
-          <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+          <iconset>
            <normaloff>:/QmitkDiffusionImaging/general_icons/plus.ico</normaloff>:/QmitkDiffusionImaging/general_icons/plus.ico</iconset>
          </property>
         </widget>
@@ -2006,7 +2006,7 @@
   <tabstop>m_FidPosX</tabstop>
  </tabstops>
  <resources>
-  <include location="../../resources/QmitkDiffusionImaging.qrc"/>
+  <include location="../../resources/QmitkFiberfox.qrc"/>
  </resources>
  <connections/>
 </ui>

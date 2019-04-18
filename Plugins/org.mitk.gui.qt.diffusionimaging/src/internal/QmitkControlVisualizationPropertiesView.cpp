@@ -197,12 +197,15 @@ void QmitkControlVisualizationPropertiesView::SetColor()
   if(m_SelectedNode)
   {
     QColor c = QColorDialog::getColor();
-    float rgb[3];
-    rgb[0] = static_cast<float>(c.redF());
-    rgb[1] = static_cast<float>(c.greenF());
-    rgb[2] = static_cast<float>(c.blueF());
-    m_SelectedNode->SetColor(rgb);
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    if (c.isValid())
+    {
+      float rgb[3];
+      rgb[0] = static_cast<float>(c.redF());
+      rgb[1] = static_cast<float>(c.greenF());
+      rgb[2] = static_cast<float>(c.blueF());
+      m_SelectedNode->SetColor(rgb);
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
   }
 }
 

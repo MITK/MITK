@@ -79,6 +79,7 @@ void mitk::StreamlineTractographyParameters::SaveParameters(std::string filename
   parameters.put("tractography.f", m_F);
   parameters.put("tractography.g", m_G);
   parameters.put("tractography.fix_seed", m_FixRandomSeed);
+  parameters.put("tractography.peak_jitter", m_PeakJitter);
 
   parameters.put("prior.weight", m_Weight);
   parameters.put("prior.restrict_to_prior", m_RestrictToPrior);
@@ -217,6 +218,7 @@ void mitk::StreamlineTractographyParameters::LoadParameters(std::string filename
       m_F = ReadVal<float>(v1,"f", m_F);
       m_G = ReadVal<float>(v1,"g", m_G);
       m_FixRandomSeed = ReadVal<bool>(v1,"fix_seed", m_FixRandomSeed);
+      m_PeakJitter = ReadVal<float>(v1,"peak_jitter", m_PeakJitter);
     }
     else if( v1.first == "prior" )
     {

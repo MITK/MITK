@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/QmitkDiffusionImaging">
+    <qresource prefix="/QmitkFiberprocessing">
         <file>FiberBundle.png</file>
         <file>circle.png</file>
         <file>polygon.png</file>

@@ -53,7 +53,7 @@ QGroupBox {
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-18</y>
+        <y>0</y>
         <width>353</width>
         <height>503</height>
        </rect>
@@ -382,8 +382,8 @@ QGroupBox {
                 <string/>
                </property>
                <property name="icon">
-                <iconset resource="../../../org.mitk.gui.qt.diffusionimaging.fiberfox/resources/QmitkDiffusionImaging.qrc">
-                 <normaloff>:/QmitkDiffusionImaging/circle.png</normaloff>:/QmitkDiffusionImaging/circle.png</iconset>
+                <iconset resource="../../../../../debug/MITK-build/Plugins/org.mitk.gui.qt.diffusionimaging.fiberprocessing/org_mitk_gui_qt_diffusionimaging_fiberprocessing_cached.qrc">
+                 <normaloff>:/org.mitk.gui.qt.diffusionimaging.fiberprocessing/resources/circle.png</normaloff>:/org.mitk.gui.qt.diffusionimaging.fiberprocessing/resources/circle.png</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -427,8 +427,8 @@ QGroupBox {
                 <string/>
                </property>
                <property name="icon">
-                <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-                 <normaloff>:/QmitkDiffusionImaging/polygon.png</normaloff>:/QmitkDiffusionImaging/polygon.png</iconset>
+                <iconset resource="../../../../../debug/MITK-build/Plugins/org.mitk.gui.qt.diffusionimaging.fiberprocessing/org_mitk_gui_qt_diffusionimaging_fiberprocessing_cached.qrc">
+                 <normaloff>:/org.mitk.gui.qt.diffusionimaging.fiberprocessing/resources/polygon.png</normaloff>:/org.mitk.gui.qt.diffusionimaging.fiberprocessing/resources/polygon.png</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -598,7 +598,7 @@ QGroupBox {
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-34</y>
+        <y>0</y>
         <width>353</width>
         <height>456</height>
        </rect>
@@ -1725,8 +1725,7 @@ QGroupBox {
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../org.mitk.gui.qt.diffusionimaging.fiberfox/resources/QmitkDiffusionImaging.qrc"/>
-  <include location="../../resources/QmitkDiffusionImaging.qrc"/>
+  <include location="../../../../../debug/MITK-build/Plugins/org.mitk.gui.qt.diffusionimaging.fiberprocessing/org_mitk_gui_qt_diffusionimaging_fiberprocessing_cached.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -46,7 +46,6 @@ set(CACHED_RESOURCE_FILES
   resources/sh.png
   resources/refresh.xpm
   resources/segmentation.svg
-  resources/color64.gif
  )
 
 set(QRC_FILES

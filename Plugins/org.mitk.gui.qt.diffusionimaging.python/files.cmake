@@ -34,7 +34,7 @@ set(CACHED_RESOURCE_FILES
 )
 
 set(QRC_FILES
-  resources/diffusion_python_resources.qrc
+  resources/QmitkDiffusionPython.qrc
 )
 
 

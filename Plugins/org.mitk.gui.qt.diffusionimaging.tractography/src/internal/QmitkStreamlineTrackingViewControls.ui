@@ -120,8 +120,8 @@ QGroupBox {
             <string>Save Parameters</string>
            </property>
            <property name="icon">
-            <iconset resource="../../../../../debug/MITK-build/Plugins/org.mitk.gui.qt.diffusionimaging.tractography/org_mitk_gui_qt_diffusionimaging_tractography_cached.qrc">
-             <normaloff>:/org.mitk.gui.qt.diffusionimaging.tractography/resources/download.ico</normaloff>:/org.mitk.gui.qt.diffusionimaging.tractography/resources/download.ico</iconset>
+            <iconset resource="../../resources/QmitkTractography.qrc">
+             <normaloff>:/QmitkTractography/download.png</normaloff>:/QmitkTractography/download.png</iconset>
            </property>
           </widget>
          </item>
@@ -137,8 +137,8 @@ QGroupBox {
             <string>Load Parameters</string>
            </property>
            <property name="icon">
-            <iconset resource="../../../../../debug/MITK-build/Plugins/org.mitk.gui.qt.diffusionimaging.tractography/org_mitk_gui_qt_diffusionimaging_tractography_cached.qrc">
-             <normaloff>:/org.mitk.gui.qt.diffusionimaging.tractography/resources/upload.ico</normaloff>:/org.mitk.gui.qt.diffusionimaging.tractography/resources/upload.ico</iconset>
+            <iconset resource="../../resources/QmitkTractography.qrc">
+             <normaloff>:/QmitkTractography/upload.png</normaloff>:/QmitkTractography/upload.png</iconset>
            </property>
           </widget>
          </item>
@@ -154,8 +154,8 @@ QGroupBox {
          <string>Start Tractography</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../../../debug/MITK-build/Plugins/org.mitk.gui.qt.diffusionimaging.tractography/org_mitk_gui_qt_diffusionimaging_tractography_cached.qrc">
-          <normaloff>:/org.mitk.gui.qt.diffusionimaging.tractography/resources/right.ico</normaloff>:/org.mitk.gui.qt.diffusionimaging.tractography/resources/right.ico</iconset>
+         <iconset resource="../../resources/QmitkTractography.qrc">
+          <normaloff>:/QmitkTractography/right.png</normaloff>:/QmitkTractography/right.png</iconset>
         </property>
        </widget>
       </item>
@@ -171,8 +171,8 @@ QGroupBox {
          <string>Stop Tractography</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../../../debug/MITK-build/Plugins/org.mitk.gui.qt.diffusionimaging.tractography/org_mitk_gui_qt_diffusionimaging_tractography_cached.qrc">
-          <normaloff>:/org.mitk.gui.qt.diffusionimaging.tractography/resources/stop.ico</normaloff>:/org.mitk.gui.qt.diffusionimaging.tractography/resources/stop.ico</iconset>
+         <iconset resource="../../resources/QmitkTractography.qrc">
+          <normaloff>:/QmitkTractography/stop.png</normaloff>:/QmitkTractography/stop.png</iconset>
         </property>
        </widget>
       </item>
@@ -716,7 +716,7 @@ QGroupBox {
         <x>0</x>
         <y>0</y>
         <width>421</width>
-        <height>397</height>
+        <height>428</height>
        </rect>
       </property>
       <attribute name="label">
@@ -726,87 +726,6 @@ QGroupBox {
        <string>Specify the behavior of the tractography at each streamline integration step (step size, deterministic/probabilistic, ...).</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_14">
-       <item row="10" column="1">
-        <widget class="QSpinBox" name="m_AngularThresholdBox">
-         <property name="toolTip">
-          <string>Angular threshold between two steps (in degree). Default: 90° * step_size</string>
-         </property>
-         <property name="minimum">
-          <number>-1</number>
-         </property>
-         <property name="maximum">
-          <number>90</number>
-         </property>
-         <property name="singleStep">
-          <number>1</number>
-         </property>
-         <property name="value">
-          <number>-1</number>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="mFaImageLabel">
-         <property name="toolTip">
-          <string/>
-         </property>
-         <property name="text">
-          <string>FA/GFA Image:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="m_OdfCutoffLabel">
-         <property name="toolTip">
-          <string/>
-         </property>
-         <property name="text">
-          <string>ODF Cutoff:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="14" column="1">
-        <widget class="QCheckBox" name="m_FixSeedBox">
-         <property name="toolTip">
-          <string>Always produce the same random numbers.</string>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="15" column="0">
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="13" column="1">
-        <widget class="QDoubleSpinBox" name="m_gBox">
-         <property name="toolTip">
-          <string>f=1 + g=0 means FACT (depending on the chosen interpolation). f=0 and g=1 means TEND (disable interpolation for this mode!).</string>
-         </property>
-         <property name="decimals">
-          <number>2</number>
-         </property>
-         <property name="maximum">
-          <double>1.000000000000000</double>
-         </property>
-         <property name="singleStep">
-          <double>0.100000000000000</double>
-         </property>
-         <property name="value">
-          <double>0.000000000000000</double>
-         </property>
-        </widget>
-       </item>
        <item row="8" column="1">
         <widget class="QDoubleSpinBox" name="m_MinTractLengthBox">
          <property name="toolTip">
@@ -829,70 +748,18 @@ QGroupBox {
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="m_FaThresholdLabel_5">
+       <item row="12" column="0">
+        <widget class="QLabel" name="m_fLabel">
          <property name="toolTip">
-          <string/>
+          <string>f parameter of tensor tractography. f=1 + g=0 means FACT (depending on the chosen interpolation). f=0 and g=1 means TEND (disable interpolation for this mode!).</string>
          </property>
          <property name="text">
-          <string>Sharpen ODFs:</string>
+          <string>f:</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
-        <widget class="QDoubleSpinBox" name="m_ScalarThresholdBox">
-         <property name="toolTip">
-          <string>Threshold on peak magnitude, FA, GFA, ...</string>
-         </property>
-         <property name="decimals">
-          <number>5</number>
-         </property>
-         <property name="maximum">
-          <double>1.000000000000000</double>
-         </property>
-         <property name="singleStep">
-          <double>0.100000000000000</double>
-         </property>
-         <property name="value">
-          <double>0.100000000000000</double>
-         </property>
-        </widget>
-       </item>
-       <item row="13" column="0">
-        <widget class="QLabel" name="m_gLabel">
-         <property name="toolTip">
-          <string/>
-         </property>
-         <property name="text">
-          <string>g:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="11" column="0">
-        <widget class="QLabel" name="m_LoopCheckLabel">
-         <property name="toolTip">
-          <string/>
-         </property>
-         <property name="text">
-          <string>Loop Check:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QCheckBox" name="m_SharpenOdfsBox">
-         <property name="toolTip">
-          <string>If you are using dODF images as input, it is advisable to sharpen the ODFs (min-max normalize and raise to the power of 4). This is not necessary for CSD fODFs, since they are naturally much sharper.</string>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <widget class="QmitkSingleNodeSelectionWidget" name="m_FaImageSelectionWidget" native="true"/>
-       </item>
-       <item row="12" column="1">
-        <widget class="QDoubleSpinBox" name="m_fBox">
+       <item row="13" column="1">
+        <widget class="QDoubleSpinBox" name="m_gBox">
          <property name="toolTip">
           <string>f=1 + g=0 means FACT (depending on the chosen interpolation). f=0 and g=1 means TEND (disable interpolation for this mode!).</string>
          </property>
@@ -906,7 +773,27 @@ QGroupBox {
           <double>0.100000000000000</double>
          </property>
          <property name="value">
-          <double>1.000000000000000</double>
+          <double>0.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="m_FaThresholdLabel_5">
+         <property name="toolTip">
+          <string/>
+         </property>
+         <property name="text">
+          <string>Sharpen ODFs:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="15" column="0">
+        <widget class="QLabel" name="m_FaThresholdLabel_6">
+         <property name="toolTip">
+          <string/>
+         </property>
+         <property name="text">
+          <string>Fix Random Seed:</string>
          </property>
         </widget>
        </item>
@@ -929,26 +816,6 @@ QGroupBox {
          </property>
         </widget>
        </item>
-       <item row="8" column="0">
-        <widget class="QLabel" name="m_MinTractLengthLabel">
-         <property name="toolTip">
-          <string/>
-         </property>
-         <property name="text">
-          <string>Min. Tract Length:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="12" column="0">
-        <widget class="QLabel" name="m_fLabel">
-         <property name="toolTip">
-          <string>f parameter of tensor tractography. f=1 + g=0 means FACT (depending on the chosen interpolation). f=0 and g=1 means TEND (disable interpolation for this mode!).</string>
-         </property>
-         <property name="text">
-          <string>f:</string>
-         </property>
-        </widget>
-       </item>
        <item row="10" column="0">
         <widget class="QLabel" name="m_AngularThresholdLabel">
          <property name="toolTip">
@@ -959,25 +826,84 @@ QGroupBox {
          </property>
         </widget>
        </item>
-       <item row="6" column="1">
-        <widget class="QDoubleSpinBox" name="m_StepSizeBox">
+       <item row="9" column="0">
+        <widget class="QLabel" name="m_MinTractLengthLabel_2">
          <property name="toolTip">
-          <string>Step size (in voxels)</string>
+          <string/>
+         </property>
+         <property name="text">
+          <string>Max. Tract Length:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="m_FaThresholdLabel">
+         <property name="toolTip">
+          <string/>
+         </property>
+         <property name="text">
+          <string>Cutoff:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QCheckBox" name="m_SharpenOdfsBox">
+         <property name="toolTip">
+          <string>If you are using dODF images as input, it is advisable to sharpen the ODFs (min-max normalize and raise to the power of 4). This is not necessary for CSD fODFs, since they are naturally much sharper.</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="1">
+        <widget class="QSpinBox" name="m_AngularThresholdBox">
+         <property name="toolTip">
+          <string>Angular threshold between two steps (in degree). Default: 90° * step_size</string>
+         </property>
+         <property name="minimum">
+          <number>-1</number>
+         </property>
+         <property name="maximum">
+          <number>90</number>
+         </property>
+         <property name="singleStep">
+          <number>1</number>
+         </property>
+         <property name="value">
+          <number>-1</number>
+         </property>
+        </widget>
+       </item>
+       <item row="16" column="0">
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="12" column="1">
+        <widget class="QDoubleSpinBox" name="m_fBox">
+         <property name="toolTip">
+          <string>f=1 + g=0 means FACT (depending on the chosen interpolation). f=0 and g=1 means TEND (disable interpolation for this mode!).</string>
          </property>
          <property name="decimals">
           <number>2</number>
          </property>
-         <property name="minimum">
-          <double>0.010000000000000</double>
-         </property>
          <property name="maximum">
-          <double>10.000000000000000</double>
+          <double>1.000000000000000</double>
          </property>
          <property name="singleStep">
           <double>0.100000000000000</double>
          </property>
          <property name="value">
-          <double>0.500000000000000</double>
+          <double>1.000000000000000</double>
          </property>
         </widget>
        </item>
@@ -1008,26 +934,6 @@ QGroupBox {
          </property>
         </widget>
        </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="m_StepsizeLabel">
-         <property name="toolTip">
-          <string/>
-         </property>
-         <property name="text">
-          <string>Step Size:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="m_FaThresholdLabel">
-         <property name="toolTip">
-          <string/>
-         </property>
-         <property name="text">
-          <string>Cutoff:</string>
-         </property>
-        </widget>
-       </item>
        <item row="5" column="1">
         <widget class="QDoubleSpinBox" name="m_OdfCutoffBox">
          <property name="toolTip">
@@ -1047,23 +953,33 @@ QGroupBox {
          </property>
         </widget>
        </item>
-       <item row="14" column="0">
-        <widget class="QLabel" name="m_FaThresholdLabel_6">
+       <item row="8" column="0">
+        <widget class="QLabel" name="m_MinTractLengthLabel">
          <property name="toolTip">
           <string/>
          </property>
          <property name="text">
-          <string>Fix Random Seed:</string>
+          <string>Min. Tract Length:</string>
          </property>
         </widget>
        </item>
-       <item row="9" column="0">
-        <widget class="QLabel" name="m_MinTractLengthLabel_2">
+       <item row="4" column="0">
+        <widget class="QLabel" name="mFaImageLabel">
          <property name="toolTip">
           <string/>
          </property>
          <property name="text">
-          <string>Max. Tract Length:</string>
+          <string>FA/GFA Image:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="0">
+        <widget class="QLabel" name="m_LoopCheckLabel">
+         <property name="toolTip">
+          <string/>
+         </property>
+         <property name="text">
+          <string>Loop Check:</string>
          </property>
         </widget>
        </item>
@@ -1086,6 +1002,119 @@ QGroupBox {
          </property>
          <property name="value">
           <double>400.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="15" column="1">
+        <widget class="QCheckBox" name="m_FixSeedBox">
+         <property name="toolTip">
+          <string>Always produce the same random numbers.</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="m_StepsizeLabel">
+         <property name="toolTip">
+          <string/>
+         </property>
+         <property name="text">
+          <string>Step Size:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="m_OdfCutoffLabel">
+         <property name="toolTip">
+          <string/>
+         </property>
+         <property name="text">
+          <string>ODF Cutoff:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="QDoubleSpinBox" name="m_StepSizeBox">
+         <property name="toolTip">
+          <string>Step size (in voxels)</string>
+         </property>
+         <property name="decimals">
+          <number>2</number>
+         </property>
+         <property name="minimum">
+          <double>0.010000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>10.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>0.100000000000000</double>
+         </property>
+         <property name="value">
+          <double>0.500000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="13" column="0">
+        <widget class="QLabel" name="m_gLabel">
+         <property name="toolTip">
+          <string/>
+         </property>
+         <property name="text">
+          <string>g:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QmitkSingleNodeSelectionWidget" name="m_FaImageSelectionWidget" native="true"/>
+       </item>
+       <item row="3" column="1">
+        <widget class="QDoubleSpinBox" name="m_ScalarThresholdBox">
+         <property name="toolTip">
+          <string>Threshold on peak magnitude, FA, GFA, ...</string>
+         </property>
+         <property name="decimals">
+          <number>5</number>
+         </property>
+         <property name="maximum">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>0.100000000000000</double>
+         </property>
+         <property name="value">
+          <double>0.100000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="14" column="0">
+        <widget class="QLabel" name="m_PeakJitterLabel">
+         <property name="toolTip">
+          <string/>
+         </property>
+         <property name="text">
+          <string>Peak Jitter:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="14" column="1">
+        <widget class="QDoubleSpinBox" name="m_PeakJitterBox">
+         <property name="toolTip">
+          <string>Important for probabilistic peak tractography and peak prior. Actual jitter is drawn from a normal distribution with peak_jitter*fabs(direction_value) as standard deviation.</string>
+         </property>
+         <property name="decimals">
+          <number>3</number>
+         </property>
+         <property name="maximum">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>0.100000000000000</double>
+         </property>
+         <property name="value">
+          <double>0.010000000000000</double>
          </property>
         </widget>
        </item>
@@ -1663,7 +1692,7 @@ QGroupBox {
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../../../debug/MITK-build/Plugins/org.mitk.gui.qt.diffusionimaging.tractography/org_mitk_gui_qt_diffusionimaging_tractography_cached.qrc"/>
+  <include location="../../resources/QmitkTractography.qrc"/>
  </resources>
  <connections/>
 </ui>

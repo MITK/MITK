@@ -72,6 +72,8 @@ void TrackingHandlerPeaks::InitForTracking()
   }
 
   std::cout << "TrackingHandlerPeaks - Peak threshold: " << m_Parameters->m_Cutoff << std::endl;
+  if (m_Parameters->m_Mode == MODE::PROBABILISTIC)
+    std::cout << "TrackingHandlerPeaks - Peak jitter: " << m_Parameters->m_PeakJitter << std::endl;
 }
 
 vnl_vector_fixed<float,3> TrackingHandlerPeaks::GetMatchingDirection(itk::Index<3> idx3, vnl_vector_fixed<float,3>& oldDir)
@@ -278,9 +280,9 @@ vnl_vector_fixed<float,3> TrackingHandlerPeaks::ProposeDirection(const itk::Poin
   {
     if (m_Parameters->m_Mode == MODE::PROBABILISTIC)
     {
-      output_direction[0] += this->m_RngItk->GetNormalVariate(0, fabs(output_direction[0])*0.01);
-      output_direction[1] += this->m_RngItk->GetNormalVariate(0, fabs(output_direction[1])*0.01);
-      output_direction[2] += this->m_RngItk->GetNormalVariate(0, fabs(output_direction[2])*0.01);
+      output_direction[0] += this->m_RngItk->GetNormalVariate(0, fabs(output_direction[0])*m_Parameters->m_PeakJitter);
+      output_direction[1] += this->m_RngItk->GetNormalVariate(0, fabs(output_direction[1])*m_Parameters->m_PeakJitter);
+      output_direction[2] += this->m_RngItk->GetNormalVariate(0, fabs(output_direction[2])*m_Parameters->m_PeakJitter);
       mag = output_direction.magnitude();
     }
 

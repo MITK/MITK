@@ -650,6 +650,10 @@ void StreamlineTrackingFilter::GenerateData()
   if (print_interval<100)
     m_Verbose=false;
 
+  unsigned int trials_per_seed = 1;
+  if(m_Parameters->m_Mode==mitk::TrackingDataHandler::MODE::PROBABILISTIC)
+    trials_per_seed = m_Parameters->m_TrialsPerSeed;
+
 #pragma omp parallel
   while (i<num_seeds && !m_StopTracking)
   {
@@ -676,7 +680,7 @@ void StreamlineTrackingFilter::GenerateData()
 
     const itk::Point<float> worldPos = m_SeedPoints.at(static_cast<unsigned int>(temp_i));
 
-    for (unsigned int trials=0; trials<m_Parameters->m_TrialsPerSeed; ++trials)
+    for (unsigned int trials=0; trials<trials_per_seed; ++trials)
     {
       FiberType fib;
       DirectionContainer direction_container;

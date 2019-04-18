@@ -2474,8 +2474,8 @@
          <string>Save Parameters</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../../../debug/MITK-build/Plugins/org.mitk.gui.qt.diffusionimaging.fiberfox/org_mitk_gui_qt_diffusionimaging_fiberfox_cached.qrc">
-          <normaloff>:/org.mitk.gui.qt.diffusionimaging.fiberfox/resources/download.ico</normaloff>:/org.mitk.gui.qt.diffusionimaging.fiberfox/resources/download.ico</iconset>
+         <iconset resource="../../resources/QmitkFiberfox.qrc">
+          <normaloff>:/QmitkFiberfox/download.png</normaloff>:/QmitkFiberfox/download.png</iconset>
         </property>
        </widget>
       </item>
@@ -2494,8 +2494,8 @@
          <string>Load Parameters</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../../../debug/MITK-build/Plugins/org.mitk.gui.qt.diffusionimaging.fiberfox/org_mitk_gui_qt_diffusionimaging_fiberfox_cached.qrc">
-          <normaloff>:/org.mitk.gui.qt.diffusionimaging.fiberfox/resources/upload.ico</normaloff>:/org.mitk.gui.qt.diffusionimaging.fiberfox/resources/upload.ico</iconset>
+         <iconset resource="../../resources/QmitkFiberfox.qrc">
+          <normaloff>:/QmitkFiberfox/upload.png</normaloff>:/QmitkFiberfox/upload.png</iconset>
         </property>
        </widget>
       </item>
@@ -2538,8 +2538,8 @@
          <string>Start Simulation</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../../../debug/MITK-build/Plugins/org.mitk.gui.qt.diffusionimaging.fiberfox/org_mitk_gui_qt_diffusionimaging_fiberfox_cached.qrc">
-          <normaloff>:/org.mitk.gui.qt.diffusionimaging.fiberfox/resources/right.ico</normaloff>:/org.mitk.gui.qt.diffusionimaging.fiberfox/resources/right.ico</iconset>
+         <iconset resource="../../resources/QmitkFiberfox.qrc">
+          <normaloff>:/QmitkFiberfox/right.png</normaloff>:/QmitkFiberfox/right.png</iconset>
         </property>
        </widget>
       </item>
@@ -2731,8 +2731,8 @@
          <string>Abort Simulation</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../../../debug/MITK-build/Plugins/org.mitk.gui.qt.diffusionimaging.fiberfox/org_mitk_gui_qt_diffusionimaging_fiberfox_cached.qrc">
-          <normaloff>:/org.mitk.gui.qt.diffusionimaging.fiberfox/resources/stop.ico</normaloff>:/org.mitk.gui.qt.diffusionimaging.fiberfox/resources/stop.ico</iconset>
+         <iconset resource="../../resources/QmitkFiberfox.qrc">
+          <normaloff>:/QmitkFiberfox/stop.png</normaloff>:/QmitkFiberfox/stop.png</iconset>
         </property>
        </widget>
       </item>
@@ -2885,7 +2885,7 @@
   <tabstop>m_ZeroRinging</tabstop>
  </tabstops>
  <resources>
-  <include location="../../../../../debug/MITK-build/Plugins/org.mitk.gui.qt.diffusionimaging.fiberfox/org_mitk_gui_qt_diffusionimaging_fiberfox_cached.qrc"/>
+  <include location="../../resources/QmitkFiberfox.qrc"/>
  </resources>
  <connections/>
 </ui>

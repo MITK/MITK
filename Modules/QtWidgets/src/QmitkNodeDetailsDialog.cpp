@@ -30,6 +30,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkNodeDetailsDialog::QmitkNodeDetailsDialog(const QList<mitk::DataNode::Pointer>& nodes, QWidget* parent /*= nullptr*/, Qt::WindowFlags flags /*= nullptr */)
   : QDialog(parent, flags)
 {
+  QList<mitk::DataNode::ConstPointer> constNodes;
+
+  for (auto& node : nodes)
+  {
+    constNodes.append(node.GetPointer());
+  }
+
+  InitWidgets(constNodes);
+}
+
+QmitkNodeDetailsDialog::QmitkNodeDetailsDialog(const QList<mitk::DataNode::ConstPointer>& nodes, QWidget* parent /*= nullptr*/, Qt::WindowFlags flags /*= nullptr */)
+  : QDialog(parent, flags)
+{
+  InitWidgets(nodes);
+}
+
+void QmitkNodeDetailsDialog::InitWidgets(const QList<mitk::DataNode::ConstPointer>& nodes)
+{
   auto parentLayout = new QGridLayout;
   auto dataStorageComboBox = new QmitkDataStorageComboBox(this, true);
   m_KeyWord = new QLineEdit;
@@ -52,7 +70,7 @@ QmitkNodeDetailsDialog::QmitkNodeDetailsDialog(const QList<mitk::DataNode::Point
 
   connect(dataStorageComboBox, &QmitkDataStorageComboBox::OnSelectionChanged, this, &QmitkNodeDetailsDialog::OnSelectionChanged);
 
-  for(auto& node : nodes)
+  for (auto& node : nodes)
   {
     dataStorageComboBox->AddNode(node);
   }
@@ -62,7 +80,7 @@ QmitkNodeDetailsDialog::QmitkNodeDetailsDialog(const QList<mitk::DataNode::Point
   connect(cancelButton, &QPushButton::clicked, this, &QmitkNodeDetailsDialog::OnCancelButtonClicked);
 
   cancelButton->setDefault(true);
-}
+};
 
 void QmitkNodeDetailsDialog::OnSelectionChanged(const mitk::DataNode* node)
 {

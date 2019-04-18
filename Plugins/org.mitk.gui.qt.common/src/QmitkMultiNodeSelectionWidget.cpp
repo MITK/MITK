@@ -178,7 +178,7 @@ void QmitkMultiNodeSelectionWidget::UpdateList()
       widget->SetSelectedNode(node);
       widget->SetClearAllowed(m_IsOptional || m_CurrentSelection.size() > 1);
 
-      connect(widget, SIGNAL(ClearSelection(mitk::DataNode*)), this, SLOT(OnClearSelection(mitk::DataNode*)));
+      connect(widget, &QmitkNodeSelectionListItemWidget::ClearSelection, this, &QmitkMultiNodeSelectionWidget::OnClearSelection);
       newItem->setData(Qt::UserRole, QVariant::fromValue<mitk::DataNode::Pointer>(node));
 
       m_Controls.list->addItem(newItem);

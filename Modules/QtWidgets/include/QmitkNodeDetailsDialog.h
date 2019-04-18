@@ -32,6 +32,7 @@ class MITKQTWIDGETS_EXPORT QmitkNodeDetailsDialog : public QDialog
 
 public:
 
+  QmitkNodeDetailsDialog(const QList<mitk::DataNode::ConstPointer>& nodes, QWidget* parent = nullptr, Qt::WindowFlags flags = nullptr);
   QmitkNodeDetailsDialog(const QList<mitk::DataNode::Pointer>& nodes, QWidget* parent = nullptr, Qt::WindowFlags flags = nullptr);
 
 public Q_SLOTS:
@@ -50,6 +51,9 @@ protected:
   QLineEdit* m_KeyWord;
   QPushButton* m_SearchButton;
   QTextBrowser* m_TextBrowser;
+
+private:
+  void InitWidgets(const QList<mitk::DataNode::ConstPointer>& nodes);
 
 };
 

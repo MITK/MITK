@@ -100,11 +100,11 @@ void mitk::MaskedDynamicImageStatisticsGenerator::DoCalculateStatistics(const it
   //add the time frames to the fit filter
   unsigned int timeSteps = this->m_DynamicImage->GetTimeSteps();
   std::vector<Image::Pointer> frameCache;
+  mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
+  imageTimeSelector->SetInput(this->m_DynamicImage);
   for (unsigned int i = 0; i < timeSteps; ++i)
   {
     typename InputFrameImageType::Pointer frameImage;
-    mitk::ImageTimeSelector::Pointer imageTimeSelector =	mitk::ImageTimeSelector::New();
-    imageTimeSelector->SetInput(this->m_DynamicImage);
     imageTimeSelector->SetTimeNr(i);
     imageTimeSelector->UpdateLargestPossibleRegion();
 

@@ -44,7 +44,7 @@ public:
 
 
     /** Getter and Setter for 4D mitk::Image*/
-    itkSetObjectMacro(DynamicImage,Image);
+    itkSetConstObjectMacro(DynamicImage,Image);
     itkGetConstObjectMacro(DynamicImage,Image);
 
     /** Parameters Relevant for conversion Calculation; Have to be Set externally (Sequence Dependend)*/
@@ -64,7 +64,7 @@ public:
     itkGetConstReferenceMacro(Factor, double);
 
     /** Getter and Setter for T10 Map image*/
-    itkSetObjectMacro(T10Image,Image);
+    itkSetConstObjectMacro(T10Image,Image);
     itkGetConstObjectMacro(T10Image,Image);
 
     itkSetMacro(T2Factor, double);
@@ -99,11 +99,11 @@ protected:
      ~ConcentrationCurveGenerator();
 
     template<class Tpixel>
-    mitk::Image::Pointer convertToConcentration(mitk::Image::Pointer inputImage,mitk::Image::Pointer baselineImage);
+    mitk::Image::Pointer convertToConcentration(const mitk::Image* inputImage, const mitk::Image* baselineImage);
 
 
     /** Calls ConvertToconcentrationFunctor for passed 3D itk::image*/
-mitk::Image::Pointer ConvertSignalToConcentrationCurve(mitk::Image::Pointer inputImage, mitk::Image::Pointer baselineImage);
+    mitk::Image::Pointer ConvertSignalToConcentrationCurve(const mitk::Image* inputImage, const mitk::Image* baselineImage);
 
 
 
@@ -115,9 +115,9 @@ mitk::Image::Pointer ConvertSignalToConcentrationCurve(mitk::Image::Pointer inpu
 
 
 private:
-    Image::Pointer m_DynamicImage;
-    Image::Pointer m_BaselineImage;
-    Image::Pointer m_T10Image;
+    Image::ConstPointer m_DynamicImage;
+    Image::ConstPointer m_BaselineImage;
+    Image::ConstPointer m_T10Image;
 
     Image::Pointer m_ConvertedImage;
 

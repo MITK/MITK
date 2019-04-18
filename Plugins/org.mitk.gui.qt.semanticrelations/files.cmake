@@ -6,6 +6,7 @@ set(INTERNAL_CPP_FILES
   QmitkDataNodeUnlinkFromLesionAction.cpp
   QmitkDataNodeSetControlPointAction.cpp
   QmitkDataNodeSetInformationTypeAction.cpp
+  QmitkDataSetOpenInAction.cpp
   QmitkLesionInfoWidget.cpp
   QmitkSemanticRelationsContextMenu.cpp
   QmitkSemanticRelationsNodeSelectionDialog.cpp
@@ -24,6 +25,7 @@ set(MOC_H_FILES
   src/internal/QmitkDataNodeUnlinkFromLesionAction.h
   src/internal/QmitkDataNodeSetControlPointAction.h
   src/internal/QmitkDataNodeSetInformationTypeAction.h
+  src/internal/QmitkDataSetOpenInAction.h
   src/internal/QmitkLesionInfoWidget.h
   src/internal/QmitkSemanticRelationsContextMenu.h
   src/internal/QmitkSemanticRelationsNodeSelectionDialog.h

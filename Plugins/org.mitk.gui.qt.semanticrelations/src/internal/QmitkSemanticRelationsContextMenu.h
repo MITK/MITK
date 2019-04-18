@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkDataNodeSetInformationTypeAction.h"
 #include "QmitkDataNodeUnlinkFromLesionAction.h"
 #include "QmitkDataNodeRemoveFromSemanticRelationsAction.h"
+#include "QmitkDataSetOpenInAction.h"
 
 // mitk core
 #include <mitkDataStorage.h>
@@ -29,9 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk render window manager module
 #include <mitkRenderWindowLayerUtilities.h>
-
-// mitk gui qt application plugin
-#include <QmitkDataNodeOpenInAction.h>
 
 // blueberry ui qt plugin
 #include <berryIWorkbenchPartSite.h>
@@ -46,7 +44,6 @@ class QmitkSemanticRelationsContextMenu : public QMenu
 public:
 
   QmitkSemanticRelationsContextMenu(berry::IWorkbenchPartSite::Pointer workbenchPartSite, QWidget* parent = nullptr);
-  virtual ~QmitkSemanticRelationsContextMenu() override;
 
   void SetDataStorage(mitk::DataStorage* dataStorage);
   void SetControlledRenderer(mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer);
@@ -68,8 +65,7 @@ private:
   QmitkDataNodeSetInformationTypeAction* m_InformationTypeAction;
   QmitkDataNodeUnlinkFromLesionAction* m_UnlinkFromLesionAction;
   QmitkDataNodeRemoveFromSemanticRelationsAction* m_RemoveFromSemanticRelationsAction;
-  QmitkDataNodeOpenInAction* m_OpenInAction;
-
+  QmitkDataSetOpenInAction* m_DataSetOpenInAction;
 };
 
 #endif // QMITKSEMANTICRELATIONSCONTEXTMENU_H

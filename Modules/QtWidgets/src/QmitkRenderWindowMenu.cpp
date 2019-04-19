@@ -823,6 +823,7 @@ void QmitkRenderWindowMenu::OnTSNumChanged(int num)
                                                                 mitk::IntProperty::New(num));
 
     m_TSLabel->setText(QString::number(num * 2 + 1));
+
     m_Renderer->SendUpdateSlice();
     m_Renderer->GetRenderingManager()->RequestUpdateAll();
   }
@@ -837,7 +838,7 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
   crosshairModesMenu->clear();
 
   // Show/hide crosshair
-  {
+  if (m_Renderer.IsNotNull() && m_Renderer->GetMapperID() == mitk::BaseRenderer::Standard3D) {
     QAction* showHideCrosshairAction = crosshairModesMenu->addAction(tr("Show Crosshair"));
     showHideCrosshairAction->setCheckable(true);
     showHideCrosshairAction->setChecked(m_MultiWidget->crosshairManager->getShowPlanesIn3D());
@@ -848,7 +849,7 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
   }
 
   // Rotation mode
-  {
+  if (m_Renderer.IsNotNull() && m_Renderer->GetMapperID() == mitk::BaseRenderer::Standard2D) {
     QAction* rotationGroupSeparator = new QAction(crosshairModesMenu);
     rotationGroupSeparator->setSeparator(true);
     rotationGroupSeparator->setText(tr("Rotation mode"));
@@ -1040,5 +1041,14 @@ void QmitkRenderWindowMenu::updateWindows()
 {
   if (m_MultiWidget && m_MultiWidget->crosshairManager) {
     m_MultiWidget->crosshairManager->updateAllWindows();
+  }
+}
+
+void QmitkRenderWindowMenu::resetThickSlice()
+{
+  if (m_Renderer.IsNotNull()) {
+    m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices", mitk::ResliceMethodProperty::New(0));
+    m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices.num", mitk::IntProperty::New(0));
+    m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices.showarea", mitk::BoolProperty::New(false));
   }
 }

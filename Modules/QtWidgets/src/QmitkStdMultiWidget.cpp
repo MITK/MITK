@@ -2613,6 +2613,10 @@ QWidget* QmitkStdMultiWidget::getShadowWidget4() const
   return m_ShadowWidgets[3];
 }
 
-
-
-
+void QmitkStdMultiWidget::resetThickSlice()
+{
+  unsigned int size = 4;
+  for (int i = 0; i < size; i++) {
+    GetRenderWindow(i)->resetThickSlice();
+  }
+}

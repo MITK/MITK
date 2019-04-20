@@ -260,17 +260,22 @@ int main(int argc, char* argv[])
         auto fib = output_tracts.at(bundle);
         if (filter_zero)
           fib = fib->FilterByWeights(0.0);
-        fib->ColorFibersByFiberWeights(false, true);
-        mitk::IOUtil::Save(fib, outRoot + name + "_fitted.fib");
-
-        if (save_weights)
+        if (fib->GetNumFibers()>0)
         {
-          ofstream logfile;
-          logfile.open (outRoot + name + "_weights.txt");
-          for (unsigned int f=0; f<output_tracts.at(bundle)->GetNumFibers(); ++f)
-            logfile << output_tracts.at(bundle)->GetFiberWeight(f) << "\n";
-          logfile.close();
+          fib->ColorFibersByFiberWeights(false, true);
+          mitk::IOUtil::Save(fib, outRoot + name + "_fitted.fib");
+
+          if (save_weights)
+          {
+            ofstream logfile;
+            logfile.open (outRoot + name + "_weights.txt");
+            for (unsigned int f=0; f<output_tracts.at(bundle)->GetNumFibers(); ++f)
+              logfile << output_tracts.at(bundle)->GetFiberWeight(f) << "\n";
+            logfile.close();
+          }
         }
+        else
+          MITK_INFO << "Output contains no fibers!";
       }
     }
     else
@@ -279,17 +284,22 @@ int main(int argc, char* argv[])
       out = out->AddBundles(output_tracts);
       if (filter_zero)
         out = out->FilterByWeights(0.0); 
-      out->ColorFibersByFiberWeights(false, true);
-      mitk::IOUtil::Save(out, outRoot + "_fitted.fib");
-
-      if (save_weights)
+      if (out->GetNumFibers()>0)
       {
-        ofstream logfile;
-        logfile.open (outRoot + "_weights.txt");
-        for (unsigned int f=0; f<out->GetNumFibers(); ++f)
-          logfile << out->GetFiberWeight(f) << "\n";
-        logfile.close();
+        out->ColorFibersByFiberWeights(false, true);
+        mitk::IOUtil::Save(out, outRoot + "_fitted.fib");
+
+        if (save_weights)
+        {
+          ofstream logfile;
+          logfile.open (outRoot + "_weights.txt");
+          for (unsigned int f=0; f<out->GetNumFibers(); ++f)
+            logfile << out->GetFiberWeight(f) << "\n";
+          logfile.close();
+        }
       }
+      else
+        MITK_INFO << "Output contains no fibers!";
     }
   }
   catch (itk::ExceptionObject e)

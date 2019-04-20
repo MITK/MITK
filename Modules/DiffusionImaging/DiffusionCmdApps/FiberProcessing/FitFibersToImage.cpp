@@ -56,6 +56,7 @@ int main(int argc, char* argv[])
   parser.addArgument("lambda", "", mitkCommandLineParser::Float, "Lambda:", "modifier for regularization", 0.1);
   parser.addArgument("save_res", "", mitkCommandLineParser::Bool, "Save Residuals:", "save residual images", false);
   parser.addArgument("save_weights", "", mitkCommandLineParser::Bool, "Save Weights:", "save fiber weights in a separate text file", false);
+  parser.addArgument("filter_zero", "", mitkCommandLineParser::Bool, "Filter Zero Weights:", "filter fibers with zero weight", false);
   parser.addArgument("filter_outliers", "", mitkCommandLineParser::Bool, "Filter outliers:", "perform second optimization run with an upper weight bound based on the first weight estimation (99% quantile)", false);
   parser.addArgument("join_tracts", "", mitkCommandLineParser::Bool, "Join output tracts:", "outout tracts are merged into a single tractogram", false);
   parser.addArgument("regu", "", mitkCommandLineParser::String, "Regularization:", "MSM; Variance; VoxelVariance; Lasso; GroupLasso; GroupVariance; NONE", std::string("VoxelVariance"));
@@ -75,6 +76,10 @@ int main(int argc, char* argv[])
   bool save_residuals = false;
   if (parsedArgs.count("save_res"))
     save_residuals = us::any_cast<bool>(parsedArgs["save_res"]);
+
+  bool filter_zero = false;
+  if (parsedArgs.count("filter_zero"))
+    filter_zero = us::any_cast<bool>(parsedArgs["filter_zero"]);
 
   bool save_weights = false;
   if (parsedArgs.count("save_weights"))
@@ -252,7 +257,11 @@ int main(int argc, char* argv[])
       {
         std::string name = fib_names.at(bundle);
         name = ist::GetFilenameWithoutExtension(name);
-        mitk::IOUtil::Save(output_tracts.at(bundle), outRoot + name + "_fitted.fib");
+        auto fib = output_tracts.at(bundle);
+        if (filter_zero)
+          fib = fib->FilterByWeights(0.0);
+        fib->ColorFibersByFiberWeights(false, true);
+        mitk::IOUtil::Save(fib, outRoot + name + "_fitted.fib");
 
         if (save_weights)
         {
@@ -268,6 +277,8 @@ int main(int argc, char* argv[])
     {
       mitk::FiberBundle::Pointer out = mitk::FiberBundle::New();
       out = out->AddBundles(output_tracts);
+      if (filter_zero)
+        out = out->FilterByWeights(0.0); 
       out->ColorFibersByFiberWeights(false, true);
       mitk::IOUtil::Save(out, outRoot + "_fitted.fib");
 

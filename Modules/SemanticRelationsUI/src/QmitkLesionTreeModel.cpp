@@ -34,11 +34,6 @@ QmitkLesionTreeModel::QmitkLesionTreeModel(QObject* parent/* = nullptr*/)
   // nothing here
 }
 
-QmitkLesionTreeModel::~QmitkLesionTreeModel()
-{
-  // nothing here
-}
-
 //////////////////////////////////////////////////////////////////////////
 // overridden virtual functions from QAbstractItemModel
 //////////////////////////////////////////////////////////////////////////
@@ -142,25 +137,6 @@ QVariant QmitkLesionTreeModel::data(const QModelIndex& index, int role) const
         return QVariant(lesionPresence.at(index.column() - 1));
       }
     }
-    // parent is not the root item -> 2. item of a lesion entry
-    else
-    {
-      // display role fills the first columns with the property name "Volume"
-      if (0 == index.column())
-      {
-        return "Volume";
-      }
-      else
-      {
-        // display role fills other columns with the lesion volume info
-        const auto lesionVolume= currentItem->GetData().GetLesionVolume();
-        if (index.column() - 1 > static_cast<int>(lesionVolume.size()))
-        {
-          return "";
-        }
-        return QVariant(lesionVolume.at(index.column() - 1));
-      }
-    }
   }
 
   if (Qt::BackgroundColorRole == role)
@@ -238,10 +214,6 @@ void QmitkLesionTreeModel::AddLesion(const mitk::SemanticTypes::Lesion& lesion)
   // add the 1. level lesion item to the root item
   std::shared_ptr<QmitkLesionTreeItem> newLesionTreeItem = std::make_shared<QmitkLesionTreeItem>(lesionData);
   m_RootItem->AddChild(newLesionTreeItem);
-
-  // add the 2. level lesion item to the 1. level lesion item
-  std::shared_ptr<QmitkLesionTreeItem> newChildItem = std::make_shared<QmitkLesionTreeItem>(lesionData);
-  newLesionTreeItem->AddChild(newChildItem);
 }
 
 void QmitkLesionTreeModel::SetSelectedDataNodesPresence()

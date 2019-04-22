@@ -38,7 +38,6 @@ public:
   *	@brief Initialize the root item of the model. The root item does not have a parent item.
   */
   QmitkLesionTreeModel(QObject* parent = nullptr);
-  ~QmitkLesionTreeModel();
 
   //////////////////////////////////////////////////////////////////////////
   // overridden virtual functions from QAbstractItemModel

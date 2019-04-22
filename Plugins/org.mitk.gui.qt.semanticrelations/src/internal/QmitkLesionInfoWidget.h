@@ -56,7 +56,6 @@ public:
   static const QBrush CONNECTED_BACKGROUND_COLOR;
 
   QmitkLesionInfoWidget(mitk::DataStorage* dataStorage, berry::IWorkbenchPartSite::Pointer workbenchPartSite, QWidget* parent = nullptr);
-  ~QmitkLesionInfoWidget();
 
   void SetCaseID(const mitk::SemanticTypes::CaseID& caseID);
 

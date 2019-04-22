@@ -51,11 +51,6 @@ QmitkLesionInfoWidget::QmitkLesionInfoWidget(mitk::DataStorage* dataStorage,
   Initialize();
 }
 
-QmitkLesionInfoWidget::~QmitkLesionInfoWidget()
-{
-  // nothing here
-}
-
 void QmitkLesionInfoWidget::Initialize()
 {
   m_Controls.setupUi(this);

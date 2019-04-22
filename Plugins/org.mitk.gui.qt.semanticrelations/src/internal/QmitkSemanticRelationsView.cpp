@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkSemanticRelationsView.h"
 #include "QmitkDataNodeAddToSemanticRelationsAction.h"
 #include "QmitkDataNodeRemoveFromSemanticRelationsAction.h"
+#include "QmitkLabelSetJumpToAction.h"
 
 // semantic relations module
 #include <mitkDICOMHelper.h>
@@ -25,12 +26,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSemanticRelationsInference.h>
 #include <mitkRelationStorage.h>
 
+// mitk core
+#include <mitkImage.h>
+
 // mitk qt widgets module
 #include <QmitkDnDDataNodeWidget.h>
 #include <QmitkRenderWindow.h>
-
-// mitk multi label module
-#include <mitkLabelSetImage.h>
 
 // berry
 #include <berryISelectionService.h>
@@ -78,7 +79,7 @@ void QmitkSemanticRelationsView::CreateQtPartControl(QWidget* parent)
   // create GUI widgets
   m_Controls.setupUi(parent);
 
-  m_LesionInfoWidget = new QmitkLesionInfoWidget(GetDataStorage(), parent);
+  m_LesionInfoWidget = new QmitkLesionInfoWidget(GetDataStorage(), GetSite(), parent);
   m_Controls.gridLayout->addWidget(m_LesionInfoWidget);
 
   m_PatientTableInspector = new QmitkPatientTableInspector(parent);
@@ -169,7 +170,7 @@ void QmitkSemanticRelationsView::OnDataNodeDoubleClicked(const mitk::DataNode* d
   }
   else if (mitk::NodePredicates::GetSegmentationPredicate()->CheckNode(dataNode))
   {
-    JumpToPosition(dataNode);
+    LabelSetJumpToAction::Run(GetSite(), dataNode);
   }
 }
 
@@ -236,45 +237,6 @@ void QmitkSemanticRelationsView::OpenInEditor(const mitk::DataNode* dataNode)
   if (nullptr != image)
   {
     mitk::RenderingManager::GetInstance()->InitializeViews(image->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
-  }
-}
-
-void QmitkSemanticRelationsView::JumpToPosition(const mitk::DataNode* dataNode)
-{
-  if (nullptr == dataNode)
-  {
-    return;
-  }
-
-  mitk::LabelSetImage* labelSetImage = dynamic_cast<mitk::LabelSetImage*>(dataNode->GetData());
-  if (nullptr == labelSetImage)
-  {
-    return;
-  }
-
-  unsigned int activeLayer = labelSetImage->GetActiveLayer();
-  mitk::Label* activeLabel = labelSetImage->GetActiveLabel(activeLayer);
-  labelSetImage->UpdateCenterOfMass(activeLabel->GetValue(), activeLayer);
-  const mitk::Point3D& centerPosition = activeLabel->GetCenterOfMassCoordinates();
-  if (centerPosition.GetVnlVector().max_value() > 0.0)
-  {
-    auto renderWindowPart = GetRenderWindowPart();
-    if (nullptr == renderWindowPart)
-    {
-      renderWindowPart = GetRenderWindowPart(mitk::WorkbenchUtil::IRenderWindowPartStrategy::BRING_TO_FRONT | mitk::WorkbenchUtil::IRenderWindowPartStrategy::OPEN);
-      if (nullptr == renderWindowPart)
-      {
-        // no render window available
-        return;
-      }
-    }
-
-    auto segmentation = dynamic_cast<mitk::LabelSetImage*>(dataNode->GetData());
-    if (nullptr != segmentation)
-    {
-      renderWindowPart->SetSelectedPosition(centerPosition);
-      mitk::RenderingManager::GetInstance()->InitializeViews(segmentation->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
-    }
   }
 }
 

@@ -30,6 +30,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk
 #include <mitkDataStorage.h>
 
+// berry
+#include <berryIWorkbenchPartSite.h>
+
 // qt
 #include <QWidget>
 
@@ -52,7 +55,7 @@ public:
   static const QBrush SELECTED_BACKGROUND_COLOR;
   static const QBrush CONNECTED_BACKGROUND_COLOR;
 
-  QmitkLesionInfoWidget(mitk::DataStorage* dataStorage, QWidget* parent = nullptr);
+  QmitkLesionInfoWidget(mitk::DataStorage* dataStorage, berry::IWorkbenchPartSite::Pointer workbenchPartSite, QWidget* parent = nullptr);
   ~QmitkLesionInfoWidget();
 
   void SetCaseID(const mitk::SemanticTypes::CaseID& caseID);
@@ -94,6 +97,7 @@ private:
   mitk::SemanticTypes::CaseID m_CaseID;
 
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
+  berry::IWorkbenchPartSite::WeakPtr m_WorkbenchPartSite;
   std::unique_ptr<mitk::SemanticRelationsDataStorageAccess> m_SemanticRelationsDataStorageAccess;
   std::unique_ptr<mitk::SemanticRelationsIntegration> m_SemanticRelationsIntegration;
 

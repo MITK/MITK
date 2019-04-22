@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // semantic relations plugin
 #include "QmitkLesionInfoWidget.h"
 #include "QmitkSemanticRelationsNodeSelectionDialog.h"
+#include "QmitkFocusOnLesionAction.h"
 
 // semantic relations UI module
 #include <QmitkLesionTextDialog.h>
@@ -38,9 +39,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <QString>
 
-QmitkLesionInfoWidget::QmitkLesionInfoWidget(mitk::DataStorage* dataStorage, QWidget* parent /*= nullptr*/)
+QmitkLesionInfoWidget::QmitkLesionInfoWidget(mitk::DataStorage* dataStorage,
+                                             berry::IWorkbenchPartSite::Pointer workbenchPartSite,
+                                             QWidget* parent /*= nullptr*/)
   : QWidget(parent)
   , m_DataStorage(dataStorage)
+  , m_WorkbenchPartSite(workbenchPartSite)
   , m_SemanticRelationsDataStorageAccess(std::make_unique<mitk::SemanticRelationsDataStorageAccess>(dataStorage))
   , m_SemanticRelationsIntegration(std::make_unique<mitk::SemanticRelationsIntegration>())
 {
@@ -220,6 +224,14 @@ void QmitkLesionInfoWidget::OnLesionListContextMenuRequested(const QPoint& pos)
   removeLesion->setEnabled(true);
   connect(removeLesion, &QAction::triggered, [this, selectedLesion] { OnRemoveLesion(selectedLesion); });
   menu->addAction(removeLesion);
+
+  if (!m_WorkbenchPartSite.Expired())
+  {
+    QmitkFocusOnLesionAction* focusOnLesion = new QmitkFocusOnLesionAction(this, m_WorkbenchPartSite.Lock());
+    focusOnLesion->SetDataStorage(m_DataStorage.Lock());
+    focusOnLesion->SetSelectedLesion(selectedLesion);
+    menu->addAction(focusOnLesion);
+  }
 
   menu->popup(QCursor::pos());
 }

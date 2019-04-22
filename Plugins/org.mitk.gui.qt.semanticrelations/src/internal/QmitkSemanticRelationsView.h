@@ -93,7 +93,6 @@ private:
   void RemoveFromComboBox(const mitk::SemanticTypes::CaseID& caseID);
 
   void OpenInEditor(const mitk::DataNode* dataNode);
-  void JumpToPosition(const mitk::DataNode* dataNode);
 
   void SetControlledRenderer();
 

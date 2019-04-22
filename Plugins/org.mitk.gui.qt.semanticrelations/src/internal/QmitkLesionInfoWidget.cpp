@@ -16,8 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations plugin
 #include "QmitkLesionInfoWidget.h"
-#include "QmitkSemanticRelationsNodeSelectionDialog.h"
+#include "QmitkDataNodeAddToSemanticRelationsAction.h"
 #include "QmitkFocusOnLesionAction.h"
+#include "QmitkSemanticRelationsNodeSelectionDialog.h"
 
 // semantic relations UI module
 #include <QmitkLesionTextDialog.h>
@@ -281,6 +282,13 @@ void QmitkLesionInfoWidget::OnLinkToSegmentation(mitk::SemanticTypes::Lesion sel
     return;
   }
 
+  // if the segmentation is not contained in the semantic relations, add it
+  if (!mitk::SemanticRelationsInference::InstanceExists(selectedDataNode))
+  {
+    AddToSemanticRelationsAction::Run(m_SemanticRelationsIntegration.get(), dataStorage, selectedDataNode);
+  }
+
+  // link the segmentation
   try
   {
     m_SemanticRelationsIntegration->LinkSegmentationToLesion(selectedDataNode, selectedLesion);

@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDICOMHelper.h>
 #include <mitkNodePredicates.h>
 #include <mitkSemanticRelationException.h>
+#include <mitkSemanticRelationsInference.h>
 #include <mitkUIDGeneratorBoost.h>
 
 // mitk gui common plugin
@@ -126,6 +127,12 @@ namespace AddToSemanticRelationsAction
       // add UID to distinguish between different segmentations of the same parent node
       baseData->SetProperty(nodeIDPropertyName,
         mitk::TemporoSpatialStringProperty::New(nodeID + mitk::UIDGeneratorBoost::GenerateUID()));
+    }
+
+    // add the parent node if not already existent
+    if (!mitk::SemanticRelationsInference::InstanceExists(parentNodes->front()))
+    {
+      AddImage(semanticRelationsIntegration, parentNodes->front());
     }
 
     try

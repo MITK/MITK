@@ -57,14 +57,14 @@ InputParameters parseInput(int argc, char *argv[])
   parser.beginGroup("Required parameters");
   parser.addArgument("inputFilename",
                      "i",
-                     mitkCommandLineParser::InputDirectory,
+                     mitkCommandLineParser::Directory,
                      "Input Filename (NAME.nrrd)",
                      "input filename",
                      us::Any(),
                      false);
   parser.addArgument("outputFileStruct",
                      "o",
-                     mitkCommandLineParser::OutputDirectory,
+                     mitkCommandLineParser::Directory,
                      "Output save name (name without ending!)",
                      "Output save name",
                      us::Any(),

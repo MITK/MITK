@@ -33,6 +33,7 @@ struct InputParameters
   std::string outputFilename;
   bool verbose;
   std::string settingsFile;
+  std::string imageType;
 };
 
 struct CropSettings
@@ -88,6 +89,10 @@ InputParameters parseInput(int argc, char* argv[])
     "settings", "s", mitkCommandLineParser::String,
     "settings file", "file containing beamforming and other specifications(.xml file)",
     us::Any(), false);
+  parser.addArgument(
+    "type", "t", mitkCommandLineParser::String,
+    "image type", "Specifies whether to use the PA or US subsection of the xml file must be 'PA' or 'US'",
+    us::Any(), false);
   parser.endGroup();
 
   parser.beginGroup("Optional parameters");
@@ -124,7 +129,22 @@ InputParameters parseInput(int argc, char* argv[])
   else
     mitkThrow() << "No settings image path given..";
 
+  if (parsedArgs.count("type"))
+    input.imageType = us::any_cast<std::string>(parsedArgs["type"]);
+  else
+    mitkThrow() << "No settings image type given..";
+
   return input;
+}
+
+TiXmlElement* getRootChild(TiXmlElement* root, std::string childName)
+{
+  for (TiXmlElement* elem = root->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement())
+  {
+    if (elem->Value() == childName)
+      return elem;
+  }
+  return nullptr;
 }
 
 void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSettings::Pointer *bfSet, CropSettings& cropSet, ResampleSettings& resSet, BModeSettings& bmodeSet, ProcessSettings& processSet)
@@ -140,7 +160,12 @@ void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSetti
     mitkThrow() << "Failed to load file: No root element.";
     doc.Clear();
   }
-  for (TiXmlElement* elem = root->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement())
+
+  TiXmlElement* elemtop = getRootChild(root, input.imageType);
+  if(elemtop == nullptr)
+      mitkThrow() << "The xml file is wrongly formatted, no element \"" << input.imageType << "\" found";
+
+  for (TiXmlElement* elem = elemtop->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement())
   {
     std::string elemName = elem->Value();
     if (elemName == "Beamforming")
@@ -203,7 +228,7 @@ void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSetti
         Algorithm
       );
     }
-    if (elemName == "Cropping") 
+    if (elemName == "Cropping")
     {
       processSet.DoCropping = std::stoi(elem->Attribute("do"));
       if (!processSet.DoCropping)

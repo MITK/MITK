@@ -30,6 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCoreObjectFactory.h>
 #include <mitkIOUtil.h>
 #include <itkFiberCurvatureFilter.h>
+#include <mitkDiffusionDataIOHelper.h>
+#include <itkImage.h>
 
 
 mitk::FiberBundle::Pointer LoadFib(std::string filename)
@@ -91,12 +93,39 @@ int main(int argc, char* argv[])
   parser.addArgument("translate_x", "", mitkCommandLineParser::Float, "Translate x-axis:", "Translate in direction of x-axis (in mm)");
   parser.addArgument("translate_y", "", mitkCommandLineParser::Float, "Translate y-axis:", "Translate in direction of y-axis (in mm)");
   parser.addArgument("translate_z", "", mitkCommandLineParser::Float, "Translate z-axis:", "Translate in direction of z-axis (in mm)");
+
+  parser.endGroup();
+
+  parser.beginGroup("5. Remove fiber parts:");
+  parser.addArgument("remove_inside", "", mitkCommandLineParser::Bool, "Remove fibers inside mask:", "remove fibers inside mask");
+  parser.addArgument("remove_outside", "", mitkCommandLineParser::Bool, "Remove fibers outside mask:", "remove fibers outside mask");
+  parser.addArgument("mask", "", mitkCommandLineParser::String, "Mask image:", "mask image", us::Any(), true, false, false, mitkCommandLineParser::Input);
   parser.endGroup();
 
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;
+
+  bool remove_outside = false;
+  if (parsedArgs.count("remove_outside"))
+    remove_outside = us::any_cast<bool>(parsedArgs["remove_outside"]);
+
+  bool remove_inside = false;
+  if (!remove_outside && parsedArgs.count("remove_inside"))
+    remove_inside = us::any_cast<bool>(parsedArgs["remove_inside"]);
+
+  typedef itk::Image< unsigned char, 3 > UcharImageType;
+  UcharImageType::Pointer mask = nullptr;
+  if (remove_inside || remove_outside)
+  {
+    if (parsedArgs.count("mask"))
+      mask = mitk::DiffusionDataIOHelper::load_itk_image< UcharImageType >(us::any_cast<std::string>(parsedArgs["mask"]));
+    else {
+      MITK_INFO << "Mask needed to remove fibers inside or outside mask!";
+      return EXIT_FAILURE;
+    }
+  }
 
   bool remove = false;
   if (parsedArgs.count("remove"))
@@ -221,6 +250,14 @@ int main(int argc, char* argv[])
 
     if (compress>0)
       fib->Compress(compress);
+
+    if ( mask.IsNotNull() )
+    {
+      if (remove_outside)
+        fib = fib->RemoveFibersOutside(mask, false);
+      else if (remove_inside)
+        fib = fib->RemoveFibersOutside(mask, true);
+    }
 
     if (axis/100==1)
       fib->MirrorFibers(0);

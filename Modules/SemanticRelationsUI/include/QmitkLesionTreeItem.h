@@ -42,7 +42,6 @@ public:
   using ParentPointer = std::weak_ptr<QmitkLesionTreeItem>;
 
   QmitkLesionTreeItem(mitk::LesionData lesionData = mitk::LesionData());
-  ~QmitkLesionTreeItem();
 
   /**
   * @brief Return the child of this item at a specific position.

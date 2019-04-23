@@ -54,10 +54,6 @@ QmitkControlPointDialog::QmitkControlPointDialog(QWidget* parent)
   setMinimumSize(250, 100);
 }
 
-QmitkControlPointDialog::~QmitkControlPointDialog()
-{
-}
-
 void QmitkControlPointDialog::SetCurrentDate(mitk::SemanticTypes::ControlPoint currentControlPoint)
 {
   m_DateEdit->setDate(QDate(currentControlPoint.date.year(), currentControlPoint.date.month(), currentControlPoint.date.day()));

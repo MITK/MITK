@@ -33,8 +33,6 @@ public:
 
   QmitkControlPointDialog(QWidget *parent = nullptr);
 
-  virtual ~QmitkControlPointDialog();
-
   void SetCurrentDate(mitk::SemanticTypes::ControlPoint currentControlPoint);
   QDate GetCurrentDate() const;
 

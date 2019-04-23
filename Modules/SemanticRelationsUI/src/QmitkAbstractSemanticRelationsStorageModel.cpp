@@ -37,7 +37,11 @@ QmitkAbstractSemanticRelationsStorageModel::~QmitkAbstractSemanticRelationsStora
 
 void QmitkAbstractSemanticRelationsStorageModel::Update(const mitk::SemanticTypes::CaseID& caseID)
 {
-  UpdateModelData(caseID);
+  // if the case ID of updated instance is equal to the currently active caseID
+  if (caseID == m_CaseID)
+  {
+    UpdateModelData();
+  }
 }
 
 void QmitkAbstractSemanticRelationsStorageModel::SetCaseID(const mitk::SemanticTypes::CaseID& caseID)
@@ -56,15 +60,6 @@ void QmitkAbstractSemanticRelationsStorageModel::SetDataNodeSelection(const QLis
 {
   m_SelectedDataNodes = dataNodeSelection;
   UpdateModelData();
-}
-
-void QmitkAbstractSemanticRelationsStorageModel::UpdateModelData(const mitk::SemanticTypes::CaseID& caseID)
-{
-  // if the case ID of updated instance is equal to the currently active caseID
-  if (caseID == m_CaseID)
-  {
-    UpdateModelData();
-  }
 }
 
 void QmitkAbstractSemanticRelationsStorageModel::UpdateModelData()

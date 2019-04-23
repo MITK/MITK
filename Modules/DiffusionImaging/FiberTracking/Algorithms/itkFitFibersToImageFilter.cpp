@@ -12,7 +12,7 @@ FitFibersToImageFilter::FitFibersToImageFilter()
   , m_MaskImage(nullptr)
   , m_FitIndividualFibers(true)
   , m_GradientTolerance(1e-5)
-  , m_Lambda(0.1)
+  , m_Lambda(1.0)
   , m_MaxIterations(20)
   , m_Coverage(0)
   , m_Overshoot(0)
@@ -170,13 +170,6 @@ void FitFibersToImageFilter::CreateDiffSystem()
   }
 
   m_NumCoveredDirections = voxel_indicator.sum();
-
-//  m_MeanTractDensity /= (m_NumCoveredDirections*fiber_count);
-//  m_MeanSignal /= m_NumCoveredDirections;
-//  A /= m_MeanTractDensity;
-//  b *= 100.0/m_MeanSignal;  // times 100 because we want to avoid too small values for computational reasons
-
-  // NEW FIT
   m_MeanTractDensity /= m_NumCoveredDirections;
   m_MeanSignal /= m_NumCoveredDirections;
   b /= m_MeanSignal;
@@ -331,12 +324,7 @@ void FitFibersToImageFilter::CreatePeakSystem()
       ++fiber_count;
     }
   }
-//  m_MeanTractDensity /= (m_NumCoveredDirections*fiber_count);
-//  m_MeanSignal /= m_NumCoveredDirections;
-//  A /= m_MeanTractDensity;
-//  b *= 100.0/m_MeanSignal;  // times 100 because we want to avoid too small values for computational reasons
 
-  // NEW FIT
   m_MeanTractDensity /= m_NumCoveredDirections;
   m_MeanSignal /= m_NumCoveredDirections;
   b /= m_MeanSignal;
@@ -438,12 +426,7 @@ void FitFibersToImageFilter::CreateScalarSystem()
       ++fiber_count;
     }
   }
-//  m_MeanTractDensity /= (numCoveredVoxels*fiber_count);
-//  m_MeanSignal /= numCoveredVoxels;
-//  A /= m_MeanTractDensity;
-//  b *= 100.0/m_MeanSignal;  // times 100 because we want to avoid too small values for computational reasons
 
-//   NEW FIT
   m_MeanTractDensity /= numCoveredVoxels;
   m_MeanSignal /= numCoveredVoxels;
   b /= m_MeanSignal;

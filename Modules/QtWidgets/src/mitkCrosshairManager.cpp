@@ -3,8 +3,6 @@
 
 #include "mitkCrosshairManager.h"
 
-CrosshairModeController* CrosshairModeController::instance = nullptr;
-
 mitkCrosshairManager::mitkCrosshairManager(const QString& parentWidget) :
   m_Selected(nullptr),
   m_ShowSelected(false),
@@ -20,9 +18,8 @@ mitkCrosshairManager::mitkCrosshairManager(const QString& parentWidget) :
   m_SwivelColor.Set(0., 1., 1.);
   m_SwivelSelectedColor.Set(1., 1., 0.);
 
-  auto crosshairModeController = CrosshairModeController::getInstance();
-  connect(crosshairModeController, &CrosshairModeController::crosshairModeChanged, this, &mitkCrosshairManager::setCrosshairMode);
-  m_CrosshairMode = crosshairModeController->getMode();
+  connect(&m_CrosshairModeController, &CrosshairModeController::crosshairModeChanged, this, &mitkCrosshairManager::setCrosshairMode);
+  m_CrosshairMode = m_CrosshairModeController.getMode();
 }
 
 mitkCrosshairManager::~mitkCrosshairManager()
@@ -41,7 +38,7 @@ void mitkCrosshairManager::setCrosshairMode(CrosshairMode mode)
 
   emit crosshairModeChanged(m_CrosshairMode);
 
-  CrosshairModeController::getInstance()->setMode(mode);
+  m_CrosshairModeController.setMode(mode);
 }
 
 CrosshairMode mitkCrosshairManager::getCrosshairMode()
@@ -375,21 +372,20 @@ QToolButton* mitkCrosshairManager::createUiModeController()
   crosshairModesIcons[CrosshairMode::POINT] = "point.png";
   crosshairModesIcons[CrosshairMode::NONE] = "no_crosshair.png";
 
-  auto crosshairModeController = CrosshairModeController::getInstance();
   for (auto& mode : crosshairModesNames.keys()) {
     QAction* crosshairModeAction = new QAction(crosshairModesNames[mode], controller);
     crosshairModeAction->setIcon(QIcon(":/Qmitk/CrosshairModes/" + crosshairModesIcons[mode]));
     connect(crosshairModeAction, &QAction::triggered, controller, [controller, crosshairModeAction]() {
       controller->setIcon(crosshairModeAction->icon());
     });
-    connect(crosshairModeAction, &QAction::triggered, crosshairModeController, [crosshairModeController, mode]() {
-      crosshairModeController->setMode(mode);
+    connect(crosshairModeAction, &QAction::triggered, this, [this, mode]() {
+      m_CrosshairModeController.setMode(mode);
     });
 
     controller->addAction(crosshairModeAction);
   }
 
-  connect(crosshairModeController, &CrosshairModeController::crosshairModeChanged, controller, [controller](CrosshairMode mode) {
+  connect(&m_CrosshairModeController, &CrosshairModeController::crosshairModeChanged, controller, [controller](CrosshairMode mode) {
     controller->setIcon(controller->actions().at((int)mode)->icon());
   });
 

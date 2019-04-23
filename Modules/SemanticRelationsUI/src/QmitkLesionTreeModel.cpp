@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // semantic relations module
 #include <mitkControlPointManager.h>
 #include <mitkLesionManager.h>
+#include <mitkNodePredicates.h>
 #include <mitkSemanticRelationException.h>
 #include <mitkSemanticRelationsInference.h>
 #include <mitkRelationStorage.h>
@@ -181,6 +182,19 @@ QVariant QmitkLesionTreeModel::headerData(int section, Qt::Orientation orientati
   }
 
   return QVariant();
+}
+
+const mitk::DataNode* QmitkLesionTreeModel::GetLastSegmentation() const
+{
+  return m_LastSegmentation;
+}
+
+void QmitkLesionTreeModel::NodeAdded(const mitk::DataNode* dataNode)
+{
+  if (mitk::NodePredicates::GetSegmentationPredicate()->CheckNode(dataNode))
+  {
+    m_LastSegmentation = dataNode;
+  }
 }
 
 void QmitkLesionTreeModel::SetData()

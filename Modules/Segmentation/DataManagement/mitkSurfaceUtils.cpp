@@ -223,11 +223,6 @@ void SurfaceCreator::GenerateData()
 
 DataNode::Pointer SurfaceCreator::recreateModel()
 {
-  BaseProperty* surfTypeProp = m_Input->GetProperty("Surface Type");
-  if (surfTypeProp == nullptr) {
-    return nullptr;
-  }
-
   if (m_Args.outputStorage == nullptr) {
     MITK_ERROR << "Tried to recreate segmentation model without specifying output storage\n";
     return nullptr;
@@ -245,6 +240,21 @@ DataNode::Pointer SurfaceCreator::recreateModel()
 
   if (previousModel == nullptr) {
     return nullptr;
+  }
+
+  BaseProperty* surfTypeProp = m_Input->GetProperty("Surface Type");
+
+  if (surfTypeProp == nullptr) {
+    // Fallback for models generated the old way
+    SurfaceCreationArgs args;
+    args.creationType = SurfaceCreationType::AGTK;
+    args.smooth = true;
+    args.removeOnComplete = previousModel;
+    args.outputStorage = m_Args.outputStorage;
+    args.overwrite = false;
+
+    m_Args = args;
+    return createModel();
   }
 
   SurfaceCreationArgs args;

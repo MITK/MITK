@@ -141,7 +141,7 @@ void QmitkSemanticRelationsView::NodeRemoved(const mitk::DataNode* dataNode)
   {
     // no observer needed for the integration; simply use a temporary instance for removing
     mitk::SemanticRelationsIntegration semanticRelationsIntegration;
-    RemoveFromSemanticRelationsAction::Run(&semanticRelationsIntegration, dataNode);
+    RemoveFromSemanticRelationsAction::Run(&semanticRelationsIntegration, GetDataStorage(), dataNode);
     mitk::SemanticTypes::CaseID caseID = mitk::GetCaseIDFromDataNode(dataNode);
     RemoveFromComboBox(caseID);
   }

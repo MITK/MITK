@@ -93,6 +93,17 @@ namespace AddToSemanticRelationsAction
     // continue with valid segmentation data
     // get parent node of the current segmentation node with the node predicate
     mitk::DataStorage::SetOfObjects::ConstPointer parentNodes = dataStorage->GetSources(segmentation, mitk::NodePredicates::GetImagePredicate(), false);
+    if (parentNodes->empty())
+    {
+      // segmentation without corresponding image will not be added
+      std::stringstream exceptionMessage; exceptionMessage << "No parent image found";
+      QMessageBox msgBox(QMessageBox::Warning,
+        "Could not add the selected segmentation.",
+        "The program wasn't able to correctly add the selected segmentation.\n"
+        "Reason:\n" + QString::fromStdString(exceptionMessage.str()));
+      msgBox.exec();
+      return;
+    }
 
     // check for already existing, identifying base properties
     auto caseIDPropertyName = mitk::GetCaseIDDICOMProperty();

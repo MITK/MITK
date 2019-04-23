@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // namespace that contains the concrete action
 namespace RemoveFromSemanticRelationsAction
 {
-  void Run(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, const mitk::DataNode* dataNode)
+  void Run(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, const mitk::DataStorage* dataStorage, const mitk::DataNode* dataNode)
   {
     if (nullptr == dataNode)
     {
@@ -39,7 +39,7 @@ namespace RemoveFromSemanticRelationsAction
 
     if (mitk::NodePredicates::GetImagePredicate()->CheckNode(dataNode))
     {
-      RemoveImage(semanticRelationsIntegration, dataNode);
+      RemoveImage(semanticRelationsIntegration, dataStorage, dataNode);
     }
     else if (mitk::NodePredicates::GetSegmentationPredicate()->CheckNode(dataNode))
     {
@@ -47,7 +47,7 @@ namespace RemoveFromSemanticRelationsAction
     }
   }
 
-  void RemoveImage(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, const mitk::DataNode* image)
+  void RemoveImage(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, const mitk::DataStorage* dataStorage, const mitk::DataNode* image)
   {
     if (nullptr == image)
     {
@@ -56,6 +56,12 @@ namespace RemoveFromSemanticRelationsAction
 
     try
     {
+      // remove each corresponding segmentation from the semantic relations storage
+      mitk::DataStorage::SetOfObjects::ConstPointer childNodes = dataStorage->GetDerivations(image, mitk::NodePredicates::GetSegmentationPredicate(), false);
+      for (auto it = childNodes->Begin(); it != childNodes->End(); ++it)
+      {
+        RemoveSegmentation(semanticRelationsIntegration, it->Value());
+      }
       // remove the image from the semantic relations storage
       semanticRelationsIntegration->RemoveImage(image);
     }
@@ -126,6 +132,16 @@ void QmitkDataNodeRemoveFromSemanticRelationsAction::InitializeAction()
 
 void QmitkDataNodeRemoveFromSemanticRelationsAction::OnActionTriggered(bool /*checked*/)
 {
+  if (nullptr == m_SemanticRelationsIntegration)
+  {
+    return;
+  }
+
+  if (m_DataStorage.IsExpired())
+  {
+    return;
+  }
+
   auto dataNode = GetSelectedNode();
-  RemoveFromSemanticRelationsAction::Run(m_SemanticRelationsIntegration.get(), dataNode);
+  RemoveFromSemanticRelationsAction::Run(m_SemanticRelationsIntegration.get(), m_DataStorage.Lock(),dataNode);
 }

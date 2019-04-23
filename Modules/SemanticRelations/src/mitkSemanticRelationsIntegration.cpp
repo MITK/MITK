@@ -112,7 +112,7 @@ void mitk::SemanticRelationsIntegration::RemoveImage(const DataNode* imageNode)
     mitkReThrow(e) << "Cannot remove the given image data node.";
   }
 
-  try // add and set information
+  try
   {
     RemoveInformationTypeFromImage(imageNode);
     UnlinkImageFromControlPoint(imageNode);
@@ -291,6 +291,15 @@ void mitk::SemanticRelationsIntegration::RemoveSegmentation(const DataNode* segm
   {
     caseID = GetCaseIDFromDataNode(segmentationNode);
     segmentationNodeID = GetIDFromDataNode(segmentationNode);
+  }
+  catch (SemanticRelationException& e)
+  {
+    mitkReThrow(e) << "Cannot remove the given segmentation data node.";
+  }
+
+  try
+  {
+    UnlinkSegmentationFromLesion(segmentationNode);
   }
   catch (SemanticRelationException& e)
   {

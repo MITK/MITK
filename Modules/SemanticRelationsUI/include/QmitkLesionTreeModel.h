@@ -55,11 +55,13 @@ public:
   // end override
   //////////////////////////////////////////////////////////////////////////
 
+  const mitk::DataNode* GetLastSegmentation() const;
+
 protected:
   
   // the following functions have to be overridden but are not implemented in this model
   virtual void NodePredicateChanged() override { }
-  virtual void NodeAdded(const mitk::DataNode*) override { }
+  virtual void NodeAdded(const mitk::DataNode*) override;
   virtual void NodeChanged(const mitk::DataNode*) override { }
   virtual void NodeRemoved(const mitk::DataNode*) override { }
   /**
@@ -88,6 +90,7 @@ private:
   QmitkLesionTreeItem* GetItemByIndex(const QModelIndex& index) const;
 
   std::map<mitk::SemanticTypes::ID, bool> m_DataNodePresence;
+  const mitk::DataNode* m_LastSegmentation;
 
   std::shared_ptr<QmitkLesionTreeItem> m_RootItem;
   mitk::SemanticTypes::ControlPointVector m_ControlPoints;

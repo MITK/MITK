@@ -77,14 +77,8 @@ void QmitkLesionInfoWidget::Initialize()
 void QmitkLesionInfoWidget::SetUpConnections()
 {
   connect(m_StorageModel, &QmitkLesionTreeModel::ModelUpdated, this, &QmitkLesionInfoWidget::OnModelUpdated);
-
-  // connect buttons to modify semantic relations
   connect(m_Controls.addLesionPushButton, &QPushButton::clicked, this, &QmitkLesionInfoWidget::OnAddLesionButtonClicked);
-
-  // connect each list widget with a custom slots
   connect(m_Controls.lesionTreeView->selectionModel(), &QItemSelectionModel::currentChanged, this, &QmitkLesionInfoWidget::OnSelectionChanged);
-
-  // connect context menu entries
   connect(m_Controls.lesionTreeView, &QTreeView::customContextMenuRequested, this, &QmitkLesionInfoWidget::OnLesionListContextMenuRequested);
 }
 
@@ -247,6 +241,11 @@ void QmitkLesionInfoWidget::OnLinkToSegmentation(mitk::SemanticTypes::Lesion sel
   dialog->SetNodePredicate(mitk::NodePredicates::GetSegmentationPredicate());
   dialog->SetSelectOnlyVisibleNodes(true);
   dialog->SetCaseID(m_CaseID);
+  // set the last added segmentation node as pre-selected data node
+  const mitk::DataNode* lastSegmentation = m_StorageModel->GetLastSegmentation();
+  QList<mitk::DataNode::Pointer> selectedDataNodes;
+  selectedDataNodes.push_back(const_cast<mitk::DataNode*>(lastSegmentation));
+  dialog->SetCurrentSelection(selectedDataNodes);
 
   int dialogReturnValue = dialog->exec();
   if (QDialog::Rejected == dialogReturnValue)
@@ -254,12 +253,12 @@ void QmitkLesionInfoWidget::OnLinkToSegmentation(mitk::SemanticTypes::Lesion sel
     return;
   }
 
-  auto nodes = dialog->GetSelectedNodes();
   mitk::DataNode::Pointer selectedDataNode = nullptr;
-  if (!nodes.isEmpty())
+  selectedDataNodes = dialog->GetSelectedNodes();
+  if (!selectedDataNodes.isEmpty())
   {
     // only single selection allowed
-    selectedDataNode = nodes.front();
+    selectedDataNode = selectedDataNodes.front();
   }
 
   if (nullptr == selectedDataNode

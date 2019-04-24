@@ -11,14 +11,7 @@ enum class CrosshairMode { PLANE = 0, POINT, NONE };
 class MITKQTWIDGETS_EXPORT CrosshairModeController : public QObject {
   Q_OBJECT
 public:
-  static CrosshairModeController* instance;
-  static CrosshairModeController* getInstance()
-  {
-    if (instance == nullptr) {
-      instance = new CrosshairModeController();
-    }
-    return instance;
-  }
+CrosshairModeController() : m_Mode(CrosshairMode::PLANE) {}
 CrosshairMode getMode() { return m_Mode; }
 void setMode(CrosshairMode mode)
 {
@@ -31,7 +24,6 @@ void setMode(CrosshairMode mode)
 signals:
   void crosshairModeChanged(CrosshairMode mode);
 private:
-  CrosshairModeController() : m_Mode(CrosshairMode::PLANE) {};
   CrosshairMode m_Mode;
 };
 
@@ -90,7 +82,7 @@ public:
   void setSingleDataStorage(bool single);
 
   // Returns QToolButton which can be used to control crosshair mode
-  static QToolButton* createUiModeController();
+  QToolButton* createUiModeController();
 
   // Updates crosshair position
   // Only updates point crosshair, cause planes changes dinamicaly
@@ -123,6 +115,7 @@ private:
 
   CrosshairMode m_CrosshairMode;
   CrosshairMode* m_OverwriteCrosshairMode;
+  CrosshairModeController m_CrosshairModeController;
   std::vector<QmitkRenderWindow*> m_ManagedWindows;
 
   QmitkRenderWindow* m_Selected;

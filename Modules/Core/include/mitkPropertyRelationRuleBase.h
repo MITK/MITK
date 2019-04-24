@@ -315,6 +315,8 @@ namespace mitk
 
     itk::LightObject::Pointer InternalClone() const override;
 
+    static std::vector<std::string> GetPropertyKeys(const mitk::IPropertyProvider *owner);
+
   private:
     /** Creats a relation UID*/
     static RelationUIDType CreateRelationUID();

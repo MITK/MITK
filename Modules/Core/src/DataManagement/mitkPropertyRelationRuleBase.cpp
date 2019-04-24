@@ -73,7 +73,7 @@ std::string mitk::PropertyRelationRuleBase::GetRIIPropertyRegEx(const std::strin
 
 //workaround until T24729 is done. Please remove if T24728 is done
 //then could directly use owner->GetPropertyKeys() again.
-auto GetPropertyKeys(const mitk::IPropertyProvider *owner)
+std::vector<std::string> mitk::PropertyRelationRuleBase::GetPropertyKeys(const mitk::IPropertyProvider *owner)
 {
   std::vector<std::string> keys;
   auto sourceCasted = dynamic_cast<const mitk::DataNode*>(owner);
@@ -606,27 +606,17 @@ mitk::PropertyRelationRuleBase::RuleIDType mitk::PropertyRelationRuleBase::GetRu
     mitkThrow() << "Error. Source is invalid. Cannot deduce rule ID";
   }
 
-  auto regExStr = this->GetRIIPropertyRegEx("ruleID", instanceID);
+  auto path = GetRootKeyPath().AddElement(instanceID).AddElement("ruleID");
+  auto name = PropertyKeyPathToPropertyName(path);
 
-  auto regEx = std::regex(regExStr);
-
-  //workaround until T24729 is done. You can use directly source->GetPropertyKeys again, when fixed.
-  const auto keys = GetPropertyKeys(source);
-  //end workaround for T24729
-
-  RelationUIDVectorType relationUIDs;
+  const auto prop = source->GetConstProperty(name);
 
   std::string result;
 
-  for (const auto &key : keys)
-  {
-    if (std::regex_match(key, regEx))
-    {
-      auto idProp = source->GetConstProperty(key);
-      result = idProp->GetValueAsString();
-      break;
-    }
-  }
+ if (prop.IsNotNull())
+ {
+   result = prop->GetValueAsString();
+ }
 
   if (result.empty())
   {

@@ -121,6 +121,7 @@ set(MODULE_TESTS
   mitkNodePredicateGeometryTest.cpp
   mitkPreferenceListReaderOptionsFunctorTest.cpp
   mitkGenericIDRelationRuleTest.cpp
+  mitkSourceImageRelationRuleTest.cpp
 )
 
 if(MITK_ENABLE_RENDERING_TESTING)

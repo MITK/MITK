@@ -763,7 +763,7 @@ public:
     auto prop = source_data_1->GetProperty(name.c_str());
     CPPUNIT_ASSERT_MESSAGE(
       "Destination uid was not stored with the correct key. Already existing session should be used.", prop);
-    CPPUNIT_ASSERT_MESSAGE("Incorrect destination uid was not stored.", prop->GetValueAsString() == dest_1_data->GetUID());
+    CPPUNIT_ASSERT_MESSAGE("Incorrect destination uid was  stored.", prop->GetValueAsString() == dest_1_data->GetUID());
 
     // check actualization of an id only connection
     rule->Connect(source_idOnly_1, dest_1);
@@ -775,12 +775,12 @@ public:
     prop = source_idOnly_1->GetProperty(name.c_str());
     CPPUNIT_ASSERT_MESSAGE(
       "Data layer information was not stored with the correct key. Already existing session should be used.", prop);
-    CPPUNIT_ASSERT_MESSAGE("Incorrect data layer information was not stored.",
+    CPPUNIT_ASSERT_MESSAGE("Incorrect data layer information not stored.",
                            prop->GetValueAsString() == dest_1->GetName());
     prop = source_idOnly_1->GetProperty("referencedName");
     CPPUNIT_ASSERT_MESSAGE(
       "Data layer information was not stored with the correct key. Already existing session should be used.", prop);
-    CPPUNIT_ASSERT_MESSAGE("Incorrect data layer information was not stored.",
+    CPPUNIT_ASSERT_MESSAGE("Incorrect data layer information was stored.",
                            prop->GetValueAsString() == dest_1->GetName());
 
     // check actualization of an existing connection
@@ -797,23 +797,23 @@ public:
     prop = source_multi->GetProperty(name.c_str());
     CPPUNIT_ASSERT_MESSAGE(
       "Data layer information was not stored with the correct key. Already existing session should be used.", prop);
-    CPPUNIT_ASSERT_MESSAGE("Incorrect data layer information was not stored.",
+    CPPUNIT_ASSERT_MESSAGE("Incorrect data layer information was stored.",
                            prop->GetValueAsString() == unRelated->GetName());
     prop = source_multi->GetProperty("referencedName");
     CPPUNIT_ASSERT_MESSAGE(
       "Data layer information was not stored with the correct key. Already existing session should be used.", prop);
-    CPPUNIT_ASSERT_MESSAGE("Incorrect data layer information was not stored.",
+    CPPUNIT_ASSERT_MESSAGE("Incorrect data layer information was stored.",
                            prop->GetValueAsString() == unRelated->GetName());
     name = "MITK.Relations.5.destinationUID";
     prop = source_multi->GetProperty(name.c_str());
     CPPUNIT_ASSERT_MESSAGE(
       "Destination uid was not stored with the correct key. Already existing session should be used.", prop);
-    CPPUNIT_ASSERT_MESSAGE("Incorrect destination uid was not stored.", prop->GetValueAsString() == unRelated_1_data->GetUID());
+    CPPUNIT_ASSERT_MESSAGE("Incorrect destination uid was stored.", prop->GetValueAsString() == unRelated_1_data->GetUID());
 
     auto storedRelationUIDs = rule->GetRelationUIDs(source_multi, unRelated);
     CPPUNIT_ASSERT_MESSAGE(
       "Relation uid was not stored for given source and destination.", storedRelationUIDs.size() == 1);
-    CPPUNIT_ASSERT_MESSAGE("Incorrect Relation uid was not stored.", storedRelationUIDs[0] == newConnectUID);
+    CPPUNIT_ASSERT_MESSAGE("Incorrect Relation uid was stored.", storedRelationUIDs[0] == newConnectUID);
   }
 
   void Disconnect()

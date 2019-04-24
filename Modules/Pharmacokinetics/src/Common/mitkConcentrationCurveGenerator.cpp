@@ -53,8 +53,6 @@ void mitk::ConcentrationCurveGenerator::Convert()
     mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
     imageTimeSelector->SetInput(this->m_DynamicImage);
 
-
-
     for(unsigned int i = 0; i< this->m_DynamicImage->GetTimeSteps(); ++i)
     {
         imageTimeSelector->SetTimeNr(i);
@@ -84,11 +82,8 @@ void mitk::ConcentrationCurveGenerator::PrepareBaselineImage()
 
 }
 
-mitk::Image::Pointer mitk::ConcentrationCurveGenerator::ConvertSignalToConcentrationCurve(mitk::Image::Pointer inputImage,mitk::Image::Pointer baselineImage)
+mitk::Image::Pointer mitk::ConcentrationCurveGenerator::ConvertSignalToConcentrationCurve(const mitk::Image* inputImage, const mitk::Image* baselineImage)
 {
-
-
-
     mitk::PixelType m_PixelType = inputImage->GetPixelType();
     mitk::Image::Pointer outputImage;
 
@@ -114,14 +109,6 @@ mitk::Image::Pointer mitk::ConcentrationCurveGenerator::ConvertSignalToConcentra
     {
         outputImage = convertToConcentration<short>(inputImage, baselineImage);
     }
-    /*else if(m_PixelType.GetComponentType() == itk::ImageIOBase::ULONG)
-    {
-        outputImage = convertToConcentration<unsigned long>(inputImage, baselineImage);
-    }
-    else if(m_PixelType.GetComponentType() == itk::ImageIOBase::LONG)
-    {
-        outputImage = convertToConcentration<long>(inputImage, baselineImage);
-    }*/
     else if(m_PixelType.GetComponentType() == itk::ImageIOBase::DOUBLE)
     {
         outputImage = convertToConcentration<double>(inputImage, baselineImage);
@@ -140,7 +127,7 @@ mitk::Image::Pointer mitk::ConcentrationCurveGenerator::ConvertSignalToConcentra
 }
 
 template<class Tpixel>
-mitk::Image::Pointer mitk::ConcentrationCurveGenerator::convertToConcentration(mitk::Image::Pointer inputImage,mitk::Image::Pointer baselineImage)
+mitk::Image::Pointer mitk::ConcentrationCurveGenerator::convertToConcentration(const mitk::Image* inputImage, const mitk::Image* baselineImage)
 {
     typedef itk::Image<Tpixel, 3> InputImageType;
 

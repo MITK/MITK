@@ -46,7 +46,12 @@ void ParameterFitBackgroundJob::OnFitEvent(::itk::Object* caller, const itk::Eve
 }
 
 ParameterFitBackgroundJob::
-ParameterFitBackgroundJob(mitk::ParameterFitImageGeneratorBase* generator, const mitk::modelFit::ModelFitInfo* fitInfo, mitk::DataNode* parentNode)
+ParameterFitBackgroundJob(mitk::ParameterFitImageGeneratorBase* generator, const mitk::modelFit::ModelFitInfo* fitInfo, mitk::DataNode* parentNode) : ParameterFitBackgroundJob(generator, fitInfo, parentNode, {})
+{
+};
+
+ParameterFitBackgroundJob::
+ParameterFitBackgroundJob(mitk::ParameterFitImageGeneratorBase* generator, const mitk::modelFit::ModelFitInfo* fitInfo, mitk::DataNode* parentNode, mitk::modelFit::ModelFitResultNodeVectorType additionalRelevantNodes)
 {
   if (!generator)
   {
@@ -61,6 +66,7 @@ ParameterFitBackgroundJob(mitk::ParameterFitImageGeneratorBase* generator, const
   m_Generator = generator;
   m_ModelFitInfo = fitInfo;
   m_ParentNode = parentNode;
+  m_AdditionalRelevantNodes = additionalRelevantNodes;
 
   m_spCommand = ::itk::MemberCommand<ParameterFitBackgroundJob>::New();
   m_spCommand->SetCallbackFunction(this, &ParameterFitBackgroundJob::OnFitEvent);
@@ -73,6 +79,12 @@ GetParentNode() const
 {
   return m_ParentNode;
 };
+
+mitk::modelFit::ModelFitResultNodeVectorType ParameterFitBackgroundJob::GetAdditionalRelevantNodes() const
+{
+  return m_AdditionalRelevantNodes;
+};
+
 
 ParameterFitBackgroundJob::
 ~ParameterFitBackgroundJob()

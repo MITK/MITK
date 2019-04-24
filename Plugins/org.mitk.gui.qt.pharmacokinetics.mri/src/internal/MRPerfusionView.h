@@ -118,12 +118,10 @@ protected:
 
   void InitModelComboBox() const;
 
-  /*! Helper method that adds an concentration image as child node to the current m_selectedNode and returns this new child node.*/
-  mitk::DataNode::Pointer AddConcentrationImage(mitk::Image* image, const std::string& nodeName) const;
+  /*! Helper method that generates a node for the passed concentration image.*/
+  mitk::DataNode::Pointer GenerateConcentrationNode(mitk::Image* image, const std::string& nodeName) const;
 
-
-
-  /*! \brief called by QmitkFunctionality when DataManager's selection has changed
+    /*! \brief called by QmitkFunctionality when DataManager's selection has changed
   */
   virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
                                   const QList<mitk::DataNode::Pointer>& selectedNodes);
@@ -145,16 +143,6 @@ protected:
   mitk::Image::Pointer m_selectedAIFMask;
   mitk::Image::Pointer m_selectedAIFImage;
 
-  /* Node used for the fit (my be the selected image
-  or converted ones (depending on the ui settings */
-  mitk::DataNode::Pointer m_inputNode;
-  mitk::DataNode::Pointer m_inputAIFNode;
-
-  /* Image used for the fit (my be the selected image
-   or converted ones (depending on the ui settings */
-  mitk::Image::Pointer m_inputImage;
-  mitk::Image::Pointer m_inputAIFImage;
-
   mitk::ModelFactoryBase::Pointer m_selectedModelFactory;
 
   mitk::SimpleBarrierConstraintChecker::Pointer m_modelConstraints;
@@ -171,11 +159,17 @@ private:
    AIFMode controls if the concentration image for the fit input or the AIF will be converted.*/
   mitk::Image::Pointer ConvertConcentrationImage(bool AIFMode);
 
-  /**Helper function that (depending on the gui settings) directly pass back the selected image/node
-   or the newly generated concentration image/node. The result is always what should be used as input for
-   the fitting. If AIFMode is true the function will generate the data for the AIF.*/
-  void GetConcentrationImage(mitk::Image::Pointer& concentrationImage,
-      mitk::DataNode::Pointer& concentrationNode, bool AIFMode);
+  /**Helper function that (depending on the gui settings) prepares m_inputNode and m_inputImage.
+   Either by directly pass back the selected image/node or the newly generated concentration image/node.
+   After calling this method  m_inputImage are always what should be used as input image
+   for the fitting.*/
+  void PrepareConcentrationImage();
+
+  /**Helper function that (depending on the gui settings) prepares m_inputAIFNode and m_inputAIFImage.
+  Either by directly pass back the selected image/node or the newly generated concentration image/node.
+  After calling this method m_inputAIFImage are always what should be used as AIF image
+  for the fitting.*/
+  void PrepareAIFConcentrationImage();
 
   /**Helper function that (depending on the gui settings) generates and passes back the AIF and its time grid
    that should be used for fitting.
@@ -200,6 +194,19 @@ private:
 
   mitk::NodePredicateBase::Pointer m_IsNoMaskImagePredicate;
   mitk::NodePredicateBase::Pointer m_IsMaskPredicate;
+
+  /* Node used for the fit (my be the selected image
+  or converted ones (depending on the ui settings */
+  mitk::DataNode::Pointer m_inputNode;
+  mitk::DataNode::Pointer m_inputAIFNode;
+  bool m_HasGeneratedNewInput;
+  bool m_HasGeneratedNewInputAIF;
+
+  /* Image used for the fit (my be the selected image
+  or converted ones (depending on the ui settings */
+  mitk::Image::Pointer m_inputImage;
+  mitk::Image::Pointer m_inputAIFImage;
+
 };
 
 #endif

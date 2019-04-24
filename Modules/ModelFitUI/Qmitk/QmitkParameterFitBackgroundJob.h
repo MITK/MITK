@@ -44,13 +44,18 @@ class MITKMODELFITUI_EXPORT ParameterFitBackgroundJob : public QObject, public Q
 
 public:
   ParameterFitBackgroundJob(mitk::ParameterFitImageGeneratorBase* generator, const mitk::modelFit::ModelFitInfo* fitInfo, mitk::DataNode* parentNode = NULL);
-    ~ParameterFitBackgroundJob();
+  /** */
+  ParameterFitBackgroundJob(mitk::ParameterFitImageGeneratorBase* generator, const mitk::modelFit::ModelFitInfo* fitInfo, mitk::DataNode* parentNode, mitk::modelFit::ModelFitResultNodeVectorType additionalRelevantNodes);
+
+  ~ParameterFitBackgroundJob();
 
 		void run();
 
     /**Returns the node (if defined), that is the parent object for the results of the job.
     May be null.*/
     mitk::DataNode* GetParentNode() const;
+
+    mitk::modelFit::ModelFitResultNodeVectorType GetAdditionalRelevantNodes() const;
 
 signals:
     void Finished();
@@ -64,6 +69,7 @@ protected:
 	mitk::ParameterFitImageGeneratorBase::Pointer m_Generator;
   mitk::modelFit::ModelFitInfo::ConstPointer m_ModelFitInfo;
   mitk::DataNode::Pointer m_ParentNode;
+  mitk::modelFit::ModelFitResultNodeVectorType m_AdditionalRelevantNodes;
 
   // Results
   mitk::modelFit::ModelFitResultNodeVectorType m_Results;

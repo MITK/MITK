@@ -170,6 +170,9 @@ QmitkDeformableRegistrationView::QmitkDeformableRegistrationView(QObject * /*par
 
 QmitkDeformableRegistrationView::~QmitkDeformableRegistrationView()
 {
+  this->GetDataStorage()->RemoveNodeEvent.RemoveListener(mitk::MessageDelegate1<QmitkDeformableRegistrationView,
+    const mitk::DataNode*>(this, &QmitkDeformableRegistrationView::DataNodeHasBeenRemoved));
+
   if (m_SelListener)
   {
     berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();

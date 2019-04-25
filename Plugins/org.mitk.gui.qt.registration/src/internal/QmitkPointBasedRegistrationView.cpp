@@ -241,6 +241,9 @@ m_OldFixedLabel(""), m_OldMovingLabel(""), m_Deactivated (false), m_CurrentFixed
 
 QmitkPointBasedRegistrationView::~QmitkPointBasedRegistrationView()
 {
+  this->GetDataStorage()->RemoveNodeEvent.RemoveListener(mitk::MessageDelegate1<QmitkPointBasedRegistrationView,
+    const mitk::DataNode*>(this, &QmitkPointBasedRegistrationView::DataNodeHasBeenRemoved));
+
   if(m_SelListener)
   {
     berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();

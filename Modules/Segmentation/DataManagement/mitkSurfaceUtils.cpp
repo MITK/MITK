@@ -244,7 +244,7 @@ DataNode::Pointer SurfaceCreator::recreateModel()
 
   BaseProperty* surfTypeProp = m_Input->GetProperty("Surface Type");
 
-  if (surfTypeProp == nullptr) {
+  if (surfTypeProp == nullptr || dynamic_cast<SurfaceCreationTypeProperty*>(surfTypeProp) == nullptr) {
     // Fallback for models generated the old way
     SurfaceCreationArgs args;
     args.creationType = SurfaceCreationType::AGTK;

@@ -5,7 +5,14 @@
     <view id="org.mitk.views.semanticrelations"
           name="Semantic Relations"
           class="QmitkSemanticRelationsView"
-		  icon="resources/SemanticRelations_48.png" />
+		  icon="resources/SemanticRelations_48.png"
+		  category="Semantic Relations"/>
+
+	<view id="org.mitk.views.semanticrelationsstatistics"
+          name="Semantic Relations Statistics"
+          class="QmitkSemanticRelationsStatisticsView"
+		  icon="resources/SemanticRelationsStatistics_48.png"
+		  category="Semantic Relations"/>
   </extension>
 
 </plugin>

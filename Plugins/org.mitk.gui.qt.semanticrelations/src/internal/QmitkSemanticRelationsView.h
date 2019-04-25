@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // berry
 #include <berryISelectionListener.h>
 
-// mitk qt
+// mitk qt gui common plugin
 #include <QmitkAbstractView.h>
 
 class QmitkDnDDataNodeWidget;

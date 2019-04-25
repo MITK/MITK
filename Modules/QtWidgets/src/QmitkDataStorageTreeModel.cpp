@@ -612,7 +612,8 @@ void QmitkDataStorageTreeModel::AddNodeInternal(const mitk::DataNode *node)
     // emit endInsertRows event
     endInsertRows();
 
-    this->AdjustLayerProperty();
+    // Adjusting moved to Autoplan Seg Manger
+    //this->AdjustLayerProperty();
 }
 
 void QmitkDataStorageTreeModel::AddNode( const mitk::DataNode* node )
@@ -671,7 +672,8 @@ void QmitkDataStorageTreeModel::RemoveNodeInternal( const mitk::DataNode* node )
       endInsertRows();
     }
 
-    this->AdjustLayerProperty();
+    // Adjusting moved to Autoplan Seg Manger
+    //this->AdjustLayerProperty();
 }
 
 void QmitkDataStorageTreeModel::RemoveNode(const mitk::DataNode* node )

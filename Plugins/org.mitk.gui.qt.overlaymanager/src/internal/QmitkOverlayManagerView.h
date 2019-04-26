@@ -109,7 +109,7 @@ private:
 
   QWidget* m_Parent;
   unsigned long m_PropertyNameChangedTag;
-  unsigned long m_OverlayManagerObserverTag;
+  unsigned long* m_OverlayManagerObserverTag;
   std::string m_SelectionClassName;
   mitk::IPropertyAliases* m_PropertyAliases;
   mitk::IPropertyDescriptions* m_PropertyDescriptions;

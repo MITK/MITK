@@ -126,7 +126,8 @@ namespace mitk
     {
       return it->second;
     }
-    mitkThrow() << "StatisticsObject for timeStep " << timeStep << " not found!";
+    ImageStatisticsContainer::ImageStatisticsObject* a = new ImageStatisticsContainer::ImageStatisticsObject();
+    return *a;
   }
 
   void ImageStatisticsContainer::SetStatisticsForTimeStep(TimeStepType timeStep, ImageStatisticsObject statistics)

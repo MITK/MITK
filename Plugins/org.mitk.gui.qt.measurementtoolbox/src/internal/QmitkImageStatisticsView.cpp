@@ -132,9 +132,16 @@ void QmitkImageStatisticsView::OnSliderWidgetHistogramChanged(double value)
     this->GetDataStorage(), m_selectedImageNode->GetData(), mask);
   HistogramType::ConstPointer histogram = imageStatistics->GetStatisticsForTimeStep(timeStep).m_Histogram;
 
-  if (histogram.IsNotNull() && this->m_CalculationJob->GetStatisticsUpdateSuccessFlag())
+  if(this->m_CalculationJob->GetStatisticsUpdateSuccessFlag())
   {
-    this->FillHistogramWidget({histogram}, {m_selectedImageNode->GetName()});
+    if (histogram.IsNotNull())
+    {
+      this->FillHistogramWidget({histogram}, {m_selectedImageNode->GetName()});
+    }
+    else {
+      HistogramType::Pointer emptyHistogram = HistogramType::New();
+      this->FillHistogramWidget({emptyHistogram}, {m_selectedImageNode->GetName()});
+    }
   }
 }
 

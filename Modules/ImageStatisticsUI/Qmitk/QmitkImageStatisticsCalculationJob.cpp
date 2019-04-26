@@ -209,12 +209,8 @@ void QmitkImageStatisticsCalculationJob::run()
     for (unsigned int i = 0; i < m_StatisticsImage->GetTimeSteps(); i++)
     {
       HistogramType::ConstPointer tempHistogram;
-      try {
-        tempHistogram = calculator->GetStatistics()->GetStatisticsForTimeStep(i).m_Histogram;
-        this->m_HistogramVector.push_back(tempHistogram);
-      } catch (mitk::Exception) {
-        MITK_WARN << ":-(";
-      }
+      tempHistogram = calculator->GetStatistics()->GetStatisticsForTimeStep(i).m_Histogram;
+      this->m_HistogramVector.push_back(tempHistogram);
 
     }
 

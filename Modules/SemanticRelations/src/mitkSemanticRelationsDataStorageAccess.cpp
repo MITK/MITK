@@ -34,11 +34,6 @@ mitk::SemanticRelationsDataStorageAccess::SemanticRelationsDataStorageAccess(Dat
   // nothing here
 }
 
-mitk::SemanticRelationsDataStorageAccess::~SemanticRelationsDataStorageAccess()
-{
-  // nothing here
-}
-
 /************************************************************************/
 /* functions to get instances / attributes                              */
 /************************************************************************/
@@ -221,7 +216,17 @@ mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelations
     mitkThrow() << "Not a valid data storage.";
   }
 
-  DataNodeVector allSpecificImages = GetAllSpecificImages(caseID, controlPoint, informationType);
+  DataNodeVector allSpecificImages;
+  try
+  {
+    allSpecificImages = GetAllSpecificImages(caseID, controlPoint, informationType);
+
+  }
+  catch (SemanticRelationException& e)
+  {
+    mitkReThrow(e) << "Cannot get the specific segmentation";
+  }
+
   DataNodeVector allSpecificSegmentations;
   for (const auto& imageNode : allSpecificImages)
   {
@@ -233,4 +238,35 @@ mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelations
   }
 
   return allSpecificSegmentations;
+}
+
+mitk::DataNode::Pointer mitk::SemanticRelationsDataStorageAccess::GetSpecificSegmentation(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint,
+  const SemanticTypes::InformationType& informationType, const SemanticTypes::Lesion& lesion) const
+{
+  if (m_DataStorage.IsExpired())
+  {
+    mitkThrow() << "Not a valid data storage.";
+  }
+
+  DataNodeVector allSpecificSegmentations;
+  try
+  {
+    allSpecificSegmentations = GetAllSpecificSegmentations(caseID, controlPoint, informationType);
+
+  }
+  catch (SemanticRelationException& e)
+  {
+      mitkReThrow(e) << "Cannot get the specific segmentation";
+  }
+
+  for (const auto& segmentationNode : allSpecificSegmentations)
+  {
+    SemanticTypes::Lesion representedLesion = SemanticRelationsInference::GetLesionOfSegmentation(segmentationNode);
+    if (representedLesion.UID == lesion.UID)
+    {
+      return segmentationNode;
+    }
+  }
+
+  return mitk::DataNode::Pointer();
 }

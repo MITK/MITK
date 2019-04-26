@@ -47,7 +47,6 @@ namespace mitk
     using DataNodeVector = std::vector<DataNode::Pointer>;
 
     SemanticRelationsDataStorageAccess(DataStorage* dataStorage);
-    ~SemanticRelationsDataStorageAccess();
 
     /************************************************************************/
     /* functions to get instances / attributes                              */
@@ -74,7 +73,7 @@ namespace mitk
     * @throw  SemanticRelationException, if UID of the lesion does not exist for a lesion instance (this can be checked via 'InstanceExists').
     *
     * @param caseID   The current case identifier is defined by the given string.
-    * @param lesion   A Lesion with a UID that identifies the corresponding lesion instance.
+    * @param lesion   A lesion with a UID that identifies the corresponding lesion instance.
     * @return         A vector of data nodes representing segmentations that define the given lesion.
     */
     DataNodeVector GetAllSegmentationsOfLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const;
@@ -96,7 +95,7 @@ namespace mitk
     * @throw  SemanticRelationException, if UID of the lesion does not exist for a lesion instance (this can be checked via 'InstanceExists').
     *
     * @param caseID   The current case identifier is defined by the given string.
-    * @param lesion   A Lesion with a UID that identifies the corresponding lesion instance.
+    * @param lesion   A lesion with a UID that identifies the corresponding lesion instance.
     * @return         A vector of data nodes representing images on which the lesions are visible.
     */
     DataNodeVector GetAllImagesOfLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const;
@@ -129,6 +128,25 @@ namespace mitk
     * @return                   A vector of segmentation nodes that are defined with the given information type with the given control point.
     */
     DataNodeVector GetAllSpecificSegmentations(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::InformationType& informationType) const;
+    /**
+    * @brief Return the single segmentation node that is defined with the given information type, the given control point and is representing the given lesion.
+    *        The function uses the 'GetAllSpecificSegmentations'-function to retrieve the specific segmentations and then checks for the represented lesion.
+    *
+    * @pre    The UID of the control point has to exist for a control point instance.
+    *         The information type has to exist for the given case (and is therefore used by at least one data node).
+    *         The lesion has to exist for the given case.
+    * @throw  SemanticRelationException, if the UID of the control point does not exist for a control point instance (this can be checked via 'InstanceExists') or
+    *                                    if the information type is not used by any data node (this can be checked via 'InstanceExists') or
+    *                                    if the lesion does not exist for the given case (this can be checked via 'InstanceExists').
+    *
+    * @param caseID             The current case identifier is defined by the given string.
+    * @param controlPoint       A control point with a UID that identifies the corresponding control point instance.
+    * @param informationType    An information type that identifies the corresponding information type instance.
+    * @param lesion             A lesion with a UID that identifies the corresponding lesion instance.
+    * @return                   A single segmentation node that is defined with the given information type, the given control point and is representing the given lesion.
+    */
+    DataNode::Pointer GetSpecificSegmentation(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint,
+                                              const SemanticTypes::InformationType& informationType, const SemanticTypes::Lesion& lesion) const;
 
   private:
 

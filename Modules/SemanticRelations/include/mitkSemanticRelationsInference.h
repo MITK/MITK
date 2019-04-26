@@ -83,9 +83,32 @@ namespace mitk
     * @param controlPoint   A specific control point which has to be available at a returned (found) lesion:
     *                       Only those lesions are returned for which the image of the associated segmentation is linked to the given control point.
     *                       If the control point instance does not exist, an empty vector is returned.
-    * @return               A vector of control points.
+    * @return               A vector of lesions.
     */
     MITKSEMANTICRELATIONS_EXPORT SemanticTypes::LesionVector GetAllLesionsOfControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint);
+    /**
+    * @brief  Returns a vector of all lesions that are valid for the given case, given a specific information type.
+    *
+    * @param caseID           The current case identifier is defined by the given string.
+    * @param informationType  A specific information type which has to be available at a returned (found) lesion:
+    *                         Only those lesions are returned for which the image of the associated segmentation is of the given information type.
+    *                         If the information type instance does not exist, an empty vector is returned.
+    * @return                 A vector of lesions.
+    */
+    MITKSEMANTICRELATIONS_EXPORT SemanticTypes::LesionVector GetAllLesionsOfInformationType(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType);
+    /**
+    * @brief  Returns a vector of all lesions that are valid for the given case, given a specific control point and a specific information type.
+    *
+    * @param caseID           The current case identifier is defined by the given string.
+    * @param controlPoint     A specific control point which has to be available at a returned (found) lesion:
+    *                         Only those lesions are returned for which the image of the associated segmentation is linked to the given control point.
+    *                         If the control point instance does not exist, an empty vector is returned.
+    * @param informationType  A specific information type which has to be available at a returned (found) lesion:
+    *                         Only those lesions are returned for which the image of the associated segmentation is of the given information type.
+    *                         If the information type instance does not exist, an empty vector is returned.
+    * @return                 A vector of lesions.
+    */
+    MITKSEMANTICRELATIONS_EXPORT SemanticTypes::LesionVector GetAllSpecificLesions(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::InformationType& informationType);
     /**
     * @brief  Check if the given segmentation refers to an existing lesion instance.
     *         This function can be used before calling 'GetRepresentedLesion' in order to avoid a possible exception.

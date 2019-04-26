@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLesionData.h"
 
 // mitk core
-#include <mitkDataNode.h>
+#include <mitkDataStorage.h>
 
 /*
 * @brief Provides helper functions that are needed to work with lesions.
@@ -72,7 +72,7 @@ namespace mitk
   * @param  lesionData          The lesion data that holds the lesion and will hold the additional lesion data.
   * @param  caseID              The current case ID.
   */
-  MITKSEMANTICRELATIONS_EXPORT void GenerateAdditionalLesionData(LesionData& lesionData, const SemanticTypes::CaseID& caseID);
+  MITKSEMANTICRELATIONS_EXPORT void GenerateAdditionalLesionData(DataStorage* dataStorage, LesionData& lesionData, const SemanticTypes::CaseID& caseID);
 } // namespace mitk
 
 #endif // MITKLESIONMANAGER_H

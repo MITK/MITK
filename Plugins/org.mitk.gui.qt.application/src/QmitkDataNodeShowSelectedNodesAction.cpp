@@ -55,7 +55,16 @@ void QmitkDataNodeShowSelectedNodesAction::OnActionTriggered(bool /*checked*/)
   {
     if (node.IsNotNull())
     {
-      node->SetVisibility(dataNodes.contains(node), baseRenderer);
+      node->SetVisibility(dataNodes.contains(node));
+      if(node->GetData() == nullptr)
+      {
+        node->SetVisibility(true);
+        mitk::DataStorage::SetOfObjects::ConstPointer derivations = m_DataStorage.Lock()->GetDerivations(node);
+        for (mitk::DataStorage::SetOfObjects::const_iterator iter = derivations->begin(); iter != derivations->end(); ++iter)
+        {
+          (*iter)->SetVisibility(true);
+        }
+      }
     }
   }
 

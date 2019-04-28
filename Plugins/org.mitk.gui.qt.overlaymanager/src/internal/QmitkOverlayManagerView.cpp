@@ -51,7 +51,7 @@ const std::string QmitkOverlayManagerView::VIEW_ID = "org.mitk.views.overlaymana
 QmitkOverlayManagerView::QmitkOverlayManagerView()
   : m_Parent(nullptr),
     m_PropertyNameChangedTag(0),
-    m_OverlayManagerObserverTag(0),
+    m_OverlayManagerObserverTag(nullptr),
     m_PropertyAliases(nullptr),
     m_PropertyDescriptions(nullptr),
     m_PropertyPersistence(nullptr),
@@ -281,18 +281,24 @@ void QmitkOverlayManagerView::Deactivated()
 void QmitkOverlayManagerView::Visible()
 {
   mitk::OverlayManager* om = mitk::OverlayManager::GetInstance();
-  if(om && m_OverlayManagerObserverTag == 0)
+  if(om && m_OverlayManagerObserverTag == nullptr)
   {
     itk::MemberCommand<QmitkOverlayManagerView>::Pointer command
         = itk::MemberCommand<QmitkOverlayManagerView>::New();
     command->SetCallbackFunction(this, &QmitkOverlayManagerView::OnOverlayAdded );
-    m_OverlayManagerObserverTag = om->AddObserver(mitk::OverlayAddEvent(), command);
+    m_OverlayManagerObserverTag = new unsigned long(om->AddObserver(mitk::OverlayAddEvent(), command));
   }
   this->OnActivateOverlayList();
 }
 
 void QmitkOverlayManagerView::Hidden()
 {
+  mitk::OverlayManager* om = mitk::OverlayManager::GetInstance();
+  if (om && m_OverlayManagerObserverTag != nullptr) {
+    om->RemoveObserver(*m_OverlayManagerObserverTag);
+    delete m_OverlayManagerObserverTag;
+    m_OverlayManagerObserverTag = nullptr;
+  }
 }
 
 void QmitkOverlayManagerView::OnPropertyListChanged(int index)

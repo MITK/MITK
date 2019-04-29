@@ -58,9 +58,9 @@ The mapper view offers two options to map images:\n
 For images "Map" fills the pixels of the output image by interpolating input image pixels using the registration object. This option always works.
 But may take longer and introduces interpolation errors, because a new image is resampled.\n
 The second option "Refine geometry" is only offered, if the registration (more precise its inverse kernel) is matrix based and the selected data is an image.
-In this case it just clones the image and refines the image geometry (origin, orientation, ...); thus no interpolation artefacts are introduced.
-\remark If you want to use a mapped image in conjunction with the statistic plugin and an mask of the reference image, you must use "Map" to ensure the same geometry.
-Otherwise the statistic plugin will fail.
+In this case it just clones the image and refines its image geometry (origin and orientation) to project it to the position indicated by the registration; thus no interpolation artefacts are introduced.
+\remark If you want to use a mapped image in conjunction with the statistic plugin and an mask of the reference image (or you want to proceed any other computation that expects the voxel to be in the same grid for direct numeric comparison), you must use "Map" to ensure the same geometry
+(including the same image grid; including same spacing and resolution). Otherwise operations like the statistic plugin will fail.
 
 \section MAP_MAPPER_Settings Settings
 If you map the image (and not just refine the geometry), you have several settings available:\n

@@ -28,7 +28,7 @@ QmitkStatisticsTreeModel::QmitkStatisticsTreeModel(QObject* parent/* = nullptr*/
   : QmitkAbstractSemanticRelationsStorageModel(parent)
   , m_RootItem(std::make_shared<QmitkLesionTreeItem>(mitk::LesionData()))
 {
-  // nothing here
+  m_StatisticsCalculator = std::make_unique<QmitkStatisticsCalculator>();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -176,6 +176,38 @@ QVariant QmitkStatisticsTreeModel::headerData(int section, Qt::Orientation orien
   return QVariant();
 }
 
+void QmitkStatisticsTreeModel::DataStorageChanged()
+{
+  if (!m_DataStorage.IsExpired())
+  {
+    auto dataStorage = m_DataStorage.Lock();
+    m_SemanticRelationsDataStorageAccess = std::make_unique<mitk::SemanticRelationsDataStorageAccess>(dataStorage);
+    m_StatisticsCalculator->SetDataStorage(dataStorage);
+    UpdateModelData();
+  }
+}
+
+void QmitkStatisticsTreeModel::NodeRemoved(const mitk::DataNode*)
+{
+  emit beginResetModel();
+  UpdateModelData();
+  emit endResetModel();
+}
+
+void QmitkStatisticsTreeModel::NodeAdded(const mitk::DataNode*)
+{
+  emit beginResetModel();
+  UpdateModelData();
+  emit endResetModel();
+}
+
+void QmitkStatisticsTreeModel::NodeChanged(const mitk::DataNode*)
+{
+  emit beginResetModel();
+  UpdateModelData();
+  emit endResetModel();
+}
+
 void QmitkStatisticsTreeModel::SetData()
 {
   m_RootItem = std::make_shared<QmitkLesionTreeItem>(mitk::LesionData());
@@ -211,7 +243,7 @@ void QmitkStatisticsTreeModel::AddLesion(const mitk::SemanticTypes::Lesion& lesi
 
   // create new lesion tree item data and modify it according to the control point data
   mitk::LesionData lesionData(lesion);
-  mitk::GenerateAdditionalLesionData(dataStorage, lesionData, m_CaseID);
+  m_StatisticsCalculator->ComputeLesionVolume(lesionData, m_CaseID);
 
   // add the 1. level lesion item to the root item
   std::shared_ptr<QmitkLesionTreeItem> newLesionTreeItem = std::make_shared<QmitkLesionTreeItem>(lesionData);

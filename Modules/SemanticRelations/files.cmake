@@ -10,6 +10,5 @@ set(CPP_FILES
   mitkSemanticRelationsDataStorageAccess.cpp
   mitkSemanticRelationsInference.cpp
   mitkSemanticRelationsIntegration.cpp
-  mitkStatisticsCalculator.cpp
   mitkUIDGeneratorBoost.cpp
 )

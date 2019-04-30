@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkSemanticRelationsUIExports.h"
 #include "QmitkAbstractSemanticRelationsStorageModel.h"
 #include "QmitkLesionTreeItem.h"
+#include <QmitkStatisticsCalculator.h>
 
 /*
 * @brief
@@ -53,11 +54,11 @@ public:
 
 protected:
 
-  // the following functions have to be overridden but are not implemented in this model
+  virtual void DataStorageChanged() override;
   virtual void NodePredicateChanged() override { }
-  virtual void NodeAdded(const mitk::DataNode*) override { }
-  virtual void NodeChanged(const mitk::DataNode*) override { }
-  virtual void NodeRemoved(const mitk::DataNode*) override { }
+  virtual void NodeAdded(const mitk::DataNode*) override;
+  virtual void NodeChanged(const mitk::DataNode*) override;
+  virtual void NodeRemoved(const mitk::DataNode*) override;
   /**
   * @brief Overridden from 'QmitkAbstractSemanticRelationsStorageModel': This function retrieves all control points
   *        of the current case and stores them to define the header of the tree.
@@ -71,6 +72,8 @@ private:
   void AddLesion(const mitk::SemanticTypes::Lesion& lesion);
 
   QmitkLesionTreeItem* GetItemByIndex(const QModelIndex& index) const;
+
+  std::unique_ptr<QmitkStatisticsCalculator> m_StatisticsCalculator;
 
   std::shared_ptr<QmitkLesionTreeItem> m_RootItem;
   mitk::SemanticTypes::ControlPointVector m_ControlPoints;

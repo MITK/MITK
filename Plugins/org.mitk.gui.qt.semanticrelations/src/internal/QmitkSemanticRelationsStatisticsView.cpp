@@ -18,16 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkSemanticRelationsStatisticsView.h"
 
 // semantic relations module
-#include <mitkDICOMHelper.h>
-#include <mitkNodePredicates.h>
-#include <mitkSemanticRelationsInference.h>
 #include <mitkSemanticRelationsIntegration.h>
 #include <mitkRelationStorage.h>
-
-// qt
-#include <QComboBox>
-#include <QHBoxLayout>
-#include <QTreeView>
 
 const std::string QmitkSemanticRelationsStatisticsView::VIEW_ID = "org.mitk.views.semanticrelationsstatistics";
 
@@ -71,7 +63,6 @@ void QmitkSemanticRelationsStatisticsView::SetUpConnections()
 {
   connect(m_Controls.caseIDComboBox, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged), this, &QmitkSemanticRelationsStatisticsView::OnCaseIDSelectionChanged);
   connect(m_StatisticsTreeModel, &QmitkStatisticsTreeModel::ModelUpdated, this, &QmitkSemanticRelationsStatisticsView::OnModelUpdated);
-
 }
 
 void QmitkSemanticRelationsStatisticsView::OnCaseIDSelectionChanged(const QString& caseID)

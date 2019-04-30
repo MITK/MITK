@@ -22,11 +22,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkAbstractSemanticRelationsStorageModel.h"
 #include "QmitkLesionTreeItem.h"
 
-// c++
-#include <memory>
-
 /*
-* @brief 
+* @brief The 'QmitkLesionTreeModel' is a subclass of 'QmitkAbstractSemanticRelationsStorageModel' and provides
+*        functionality to serve as a tree model.
+*        The tree model creates a new top-level tree item for each lesion that is stored inside the semantic relations storage.
+*        Each lesion tree item contains lesion data that can be display inside a tree view. The lesion data
+*        consists of a lesion with with its UID, name and lesion class. The name or UID is used for the top-level tree items.
+*        Additionally the lesion data contains two vectors which define the lesion presence (bool) and the lesion volume (double)
+*        for each control-point - information type pair. The lesion presence will be used inside this model for the tree items.
+*        The volume is used inside another tree model.
+*
+*        The model holds the last segmentation that is added to the data storage to support the process of defining a new lesion
+*        (and linking it with the latest segmentation) (see 'NodeAdded').
+*        Furthermore the model is able to accept a 'QList' of currently selected data nodes and to use it to change the background
+*        color of each lesion tree item that is connected to this data node(s). This helps to see which lesion is already found and
+*        defined for a given (set of) data node(s).
 */
 class MITKSEMANTICRELATIONSUI_EXPORT QmitkLesionTreeModel : public QmitkAbstractSemanticRelationsStorageModel
 {

@@ -132,7 +132,7 @@ QVariant QmitkLesionTreeModel::data(const QModelIndex& index, int role) const
         const auto lesionPresence = currentItem->GetData().GetLesionPresence();
         if (index.column() - 1 > static_cast<int>(lesionPresence.size()))
         {
-          return "";
+          return "N/A";
         }
 
         return QVariant(lesionPresence.at(index.column() - 1));
@@ -232,7 +232,7 @@ void QmitkLesionTreeModel::AddLesion(const mitk::SemanticTypes::Lesion& lesion)
   mitk::LesionData lesionData(lesion);
   mitk::ComputeLesionPresence(lesionData, m_CaseID);
 
-  // add the 1. level lesion item to the root item
+  // add the top-level lesion item to the root item
   std::shared_ptr<QmitkLesionTreeItem> newLesionTreeItem = std::make_shared<QmitkLesionTreeItem>(lesionData);
   m_RootItem->AddChild(newLesionTreeItem);
 }

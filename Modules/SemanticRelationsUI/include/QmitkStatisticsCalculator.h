@@ -26,17 +26,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk core
 #include <mitkDataStorage.h>
-#include <mitkDataNode.h>
 #include <mitkWeakPointer.h>
 
 // mitk image statistics ui module
 #include <QmitkImageStatisticsCalculationJob.h>
 
-// itk
-#include <itkImage.h>
-
 /*
-* @brief 
+* @brief This class provides functions to compute the lesion volume of a given lesion.
+*        A lesion can be defined by a specific segmentation at each control-point - information type pair.
+*        This segmentation and its parent image will be used inside the private 'GetSegmentationMaskVolume' function.
+*        This function in turn uses the image statistics module (the 'ImageStatisticsContainerManager') to retrieve
+*        the specific statistics values from a statistics node. However, if the statistics are not found,
+*        a new 'QmitkImageStatisticsCalculationJob' is started. If the job is finished and the statistics are calculated,
+*        a new statistics node is added to the data storage (or an existing statistics data node is updated).
 */
 class MITKSEMANTICRELATIONSUI_EXPORT QmitkStatisticsCalculator : public QObject
 {
@@ -67,7 +69,7 @@ private:
 
   void OnStatisticsCalculationEnds();
 
-  QmitkImageStatisticsCalculationJob * m_CalculationJob;
+  QmitkImageStatisticsCalculationJob* m_CalculationJob;
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
   mitk::DataNode::Pointer m_ImageNode;
   mitk::DataNode::Pointer m_SegmentationNode;

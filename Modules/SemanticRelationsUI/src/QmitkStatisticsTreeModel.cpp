@@ -133,7 +133,7 @@ QVariant QmitkStatisticsTreeModel::data(const QModelIndex& index, int role) cons
         {
           return QString::fromStdString(m_InformationTypes.at(index.row()));
         }
-        return "No information type";
+        return "N/A";
       }
       else
       {
@@ -143,7 +143,7 @@ QVariant QmitkStatisticsTreeModel::data(const QModelIndex& index, int role) cons
         {
           return QVariant(lesionVolume.at(index.row()*m_ControlPoints.size() + (index.column() - 1)));
         }
-        return "No lesion volume";
+        return "N/A";
       }
     }
   }
@@ -187,13 +187,6 @@ void QmitkStatisticsTreeModel::DataStorageChanged()
   }
 }
 
-void QmitkStatisticsTreeModel::NodeRemoved(const mitk::DataNode*)
-{
-  emit beginResetModel();
-  UpdateModelData();
-  emit endResetModel();
-}
-
 void QmitkStatisticsTreeModel::NodeAdded(const mitk::DataNode*)
 {
   emit beginResetModel();
@@ -202,6 +195,13 @@ void QmitkStatisticsTreeModel::NodeAdded(const mitk::DataNode*)
 }
 
 void QmitkStatisticsTreeModel::NodeChanged(const mitk::DataNode*)
+{
+  emit beginResetModel();
+  UpdateModelData();
+  emit endResetModel();
+}
+
+void QmitkStatisticsTreeModel::NodeRemoved(const mitk::DataNode*)
 {
   emit beginResetModel();
   UpdateModelData();

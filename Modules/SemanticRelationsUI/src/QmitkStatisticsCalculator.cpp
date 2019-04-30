@@ -24,9 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSemanticRelationsDataStorageAccess.h>
 #include <mitkSemanticRelationsInference.h>
 
-// mitk core module
-#include <mitkImageAccessByItk.h>
-
 // mitk image statistics module
 #include <mitkImageStatisticsContainerManager.h>
 #include <mitkImageStatisticsContainerNodeHelper.h>

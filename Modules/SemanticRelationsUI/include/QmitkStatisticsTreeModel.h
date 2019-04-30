@@ -21,10 +21,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkSemanticRelationsUIExports.h"
 #include "QmitkAbstractSemanticRelationsStorageModel.h"
 #include "QmitkLesionTreeItem.h"
-#include <QmitkStatisticsCalculator.h>
+#include "QmitkStatisticsCalculator.h"
 
 /*
-* @brief
+* @brief The 'QmitkStatisticsTreeModel' is a subclass of 'QmitkAbstractSemanticRelationsStorageModel' and provides
+*        functionality to serve as a tree model.
+*        The tree model creates a new top-level tree item for each lesion that is stored inside the semantic relations storage.
+*        The top-level lesion tree items hold child items for each information type.
+*        Each lesion tree item contains lesion data that can be display inside a tree view. The lesion data
+*        consists of a lesion with with its UID, name and lesion class. The name or UID is used for the top-level tree items.
+*        Additionally the lesion data contains two vectors which define the lesion presence (bool) and the lesion volume (double)
+*        for each control-point - information type pair. The lesion volume will be used inside this model for the child items.
+*        The presence is used inside another tree model.
+*
+*        The model uses the 'QmitkStatisticsCalculator' to start the lesion volume calculation for each lesion.
+*        This calculator is able to find an existing lesion volume or to trigger the computation of the required statistics.
+*        If the required statistics are newly computed and added as a statistics container to the data storage,
+*        this model will be notified about this event (see 'NodeAdded', 'NodeChanged' and 'NodeRemoved') and will update
+*        its lesion tree items.
 */
 class MITKSEMANTICRELATIONSUI_EXPORT QmitkStatisticsTreeModel : public QmitkAbstractSemanticRelationsStorageModel
 {

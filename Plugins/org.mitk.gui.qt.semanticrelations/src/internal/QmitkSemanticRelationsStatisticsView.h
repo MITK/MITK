@@ -19,16 +19,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations plugin
 #include "ui_QmitkSemanticRelationsStatisticsControls.h"
-#include "QmitkStatisticsTreeModel.h"
 
 // semantic relations module
 #include <mitkSemanticTypes.h>
+
+// semantic relations ui module
+#include "QmitkStatisticsTreeModel.h"
 
 // mitk qt gui common plugin
 #include <QmitkAbstractView.h>
 
 /*
-* @brief
+* @brief The QmitkSemanticRelationsStatisticsView is an MITK view to combine and show the statistics tree view of the 'SemanticRelationsUI'-module.
+*        It observes the semantic relations storage and displays the currently available case IDs in a combo box.
+*        A 'QmitkStatisticsTreeModel' is created and set as the model of a QTreeView.
 */
 class QmitkSemanticRelationsStatisticsView : public QmitkAbstractView, public mitk::ISemanticRelationsObserver
 {

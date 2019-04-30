@@ -230,7 +230,7 @@ void QmitkLesionTreeModel::AddLesion(const mitk::SemanticTypes::Lesion& lesion)
 
   // create new lesion tree item data and modify it according to the control point data
   mitk::LesionData lesionData(lesion);
-  mitk::GenerateAdditionalLesionData(dataStorage, lesionData, m_CaseID);
+  mitk::ComputeLesionPresence(lesionData, m_CaseID);
 
   // add the 1. level lesion item to the root item
   std::shared_ptr<QmitkLesionTreeItem> newLesionTreeItem = std::make_shared<QmitkLesionTreeItem>(lesionData);

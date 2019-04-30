@@ -23,14 +23,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSemanticTypes.h"
 #include "mitkLesionData.h"
 
-// mitk core
-#include <mitkDataStorage.h>
-
 /*
 * @brief Provides helper functions that are needed to work with lesions.
 *
 *   These functions help to generate new lesions, check for existing lesions or provide functionality
-*   to find existing lesion class types.
+*   to generate new and find existing lesion class types.
 */
 namespace mitk
 {
@@ -67,12 +64,12 @@ namespace mitk
   */
   MITKSEMANTICRELATIONS_EXPORT SemanticTypes::LesionClass FindExistingLesionClass(const std::string& lesionClassType, const std::vector<SemanticTypes::LesionClass>& allLesionClasses);
   /**
-  * @brief Generate and store additional lesion data such as lesion presence and lesion volume for each control point.
+  * @brief Compute and store lesion presence for all available control points and information types.
   *
   * @param  lesionData          The lesion data that holds the lesion and will hold the additional lesion data.
   * @param  caseID              The current case ID.
   */
-  MITKSEMANTICRELATIONS_EXPORT void GenerateAdditionalLesionData(DataStorage* dataStorage, LesionData& lesionData, const SemanticTypes::CaseID& caseID);
+  MITKSEMANTICRELATIONS_EXPORT void ComputeLesionPresence(LesionData& lesionData, const SemanticTypes::CaseID& caseID);
 } // namespace mitk
 
 #endif // MITKLESIONMANAGER_H

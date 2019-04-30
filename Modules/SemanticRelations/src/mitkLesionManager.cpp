@@ -16,11 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations module
 #include "mitkLesionManager.h"
-#include "mitkSemanticRelationException.h"
-#include "mitkSemanticRelationsDataStorageAccess.h"
-#include "mitkSemanticRelationsInference.h"
 #include "mitkRelationStorage.h"
-#include "mitkStatisticsCalculator.h"
+#include "mitkSemanticRelationException.h"
+#include "mitkSemanticRelationsInference.h"
 #include "mitkUIDGeneratorBoost.h"
 
 mitk::SemanticTypes::Lesion mitk::GenerateNewLesion(const std::string& lesionClassType/* = ""*/)
@@ -78,21 +76,17 @@ mitk::SemanticTypes::LesionClass mitk::FindExistingLesionClass(const std::string
   return lesionClass;
 }
 
-void mitk::GenerateAdditionalLesionData(DataStorage* dataStorage, LesionData& lesionData, const SemanticTypes::CaseID& caseID)
+void mitk::ComputeLesionPresence(LesionData& lesionData, const SemanticTypes::CaseID& caseID)
 {
   std::vector<bool> lesionPresence;
-  std::vector<double> lesionVolume;
   SemanticTypes::Lesion lesion = lesionData.GetLesion();
   bool presence = false;
-  double volume = 0.0;
-
   SemanticTypes::ControlPointVector controlPoints = RelationStorage::GetAllControlPointsOfCase(caseID);
   // sort the vector of control points for the timeline
   std::sort(controlPoints.begin(), controlPoints.end());
   SemanticTypes::InformationTypeVector informationTypes = mitk::RelationStorage::GetAllInformationTypesOfCase(caseID);
   for (const auto& informationType : informationTypes)
   {
-
     for (const auto& controlPoint : controlPoints)
     {
       try
@@ -104,25 +98,9 @@ void mitk::GenerateAdditionalLesionData(DataStorage* dataStorage, LesionData& le
         presence = false;
       }
 
-      SemanticRelationsDataStorageAccess semanticRelationsDataStorageAccess(dataStorage);
-      mitk::DataNode::Pointer specificSegmentation;
-      try
-      {
-        specificSegmentation = semanticRelationsDataStorageAccess.GetSpecificSegmentation(caseID, controlPoint, informationType, lesion);
-        // compute mask volume of the specific segmentation
-        mitk::StatisticsCalculator statisticsCalculator;
-        volume = statisticsCalculator.GetSegmentationMaskVolume(specificSegmentation);
-      }
-      catch (SemanticRelationException&)
-      {
-        volume = 0.0;
-      }
-
       lesionPresence.push_back(presence);
-      lesionVolume.push_back(volume);
     }
   }
 
   lesionData.SetLesionPresence(lesionPresence);
-  lesionData.SetLesionVolume(lesionVolume);
 }

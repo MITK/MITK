@@ -36,6 +36,15 @@ struct InputParameters
   std::string imageType;
 };
 
+struct BandpassSettings
+{
+  float highPass;
+  float lowPass;
+  float alphaLow;
+  float alphaHigh;
+  float speedOfSound;
+};
+
 struct CropSettings
 {
   int above;
@@ -61,6 +70,7 @@ struct BModeSettings
 struct ProcessSettings
 {
   bool DoBeamforming;
+  bool DoBandpass;
   bool DoCropping;
   bool DoResampling;
   bool DoBmode;
@@ -147,7 +157,7 @@ TiXmlElement* getRootChild(TiXmlElement* root, std::string childName)
   return nullptr;
 }
 
-void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSettings::Pointer *bfSet, CropSettings& cropSet, ResampleSettings& resSet, BModeSettings& bmodeSet, ProcessSettings& processSet)
+void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSettings::Pointer *bfSet, BandpassSettings& bandpassSet, CropSettings& cropSet, ResampleSettings& resSet, BModeSettings& bmodeSet, ProcessSettings& processSet)
 {
   MITK_INFO << "Loading configuration File \"" << xmlFile << "\"";
   TiXmlDocument doc(xmlFile);
@@ -228,6 +238,18 @@ void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSetti
         Algorithm
       );
     }
+    if (elemName == "Bandpass")
+    {
+      processSet.DoBandpass = std::stoi(elem->Attribute("do"));
+      if (!processSet.DoBandpass)
+        continue;
+
+      bandpassSet.highPass = std::stof(elem->Attribute("highPass"));
+      bandpassSet.lowPass = std::stof(elem->Attribute("lowPass"));
+      bandpassSet.alphaLow = std::stof(elem->Attribute("alphaLow"));
+      bandpassSet.alphaHigh = std::stof(elem->Attribute("alphaHigh"));
+      bandpassSet.speedOfSound = std::stof(elem->Attribute("speedOfSound"));
+    }
     if (elemName == "Cropping")
     {
       processSet.DoCropping = std::stoi(elem->Attribute("do"));
@@ -273,6 +295,7 @@ int main(int argc, char * argv[])
   auto input = parseInput(argc, argv);
 
   mitk::BeamformingSettings::Pointer bfSettings;
+  BandpassSettings bandpassSettings{5,10,1,1,1540};
   BModeSettings bmodeSettings{ mitk::PhotoacousticFilterService::BModeMethod::EnvelopeDetection, false };
   CropSettings cropSettings{ 0,0,0,0,0,0 };
   ResampleSettings resSettings{ 0.15 };
@@ -281,7 +304,7 @@ int main(int argc, char * argv[])
   MITK_INFO << "Parsing settings XML...";
   try
   {
-    ParseXML(input.settingsFile, input, &bfSettings, cropSettings, resSettings, bmodeSettings, processSettings);
+    ParseXML(input.settingsFile, input, &bfSettings, bandpassSettings, cropSettings, resSettings, bmodeSettings, processSettings);
   }
   catch (mitk::Exception e)
   {
@@ -313,6 +336,12 @@ int main(int argc, char * argv[])
     MITK_INFO(input.verbose) << "Beamforming input image...";
     output = m_FilterService->ApplyBeamforming(output, bfSettings);
     MITK_INFO(input.verbose) << "Beamforming input image...[Done]";
+  }
+  if (processSettings.DoBandpass)
+  {
+    MITK_INFO(input.verbose) << "Bandpassing input image...";
+    output = m_FilterService->ApplyBandpassFilter(output, bandpassSettings.highPass*1e6, bandpassSettings.lowPass*1e6, bandpassSettings.alphaHigh, bandpassSettings.alphaLow, 1, bandpassSettings.speedOfSound, true);
+    MITK_INFO(input.verbose) << "Bandpassing input image...[Done]";
   }
   if (processSettings.DoCropping)
   {

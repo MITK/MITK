@@ -182,6 +182,9 @@ TODO Std move to abort interaction of scroll/pan/zoom
         <condition name="check_can_rotate" inverted="true" />
         <action name="endRotation"/>
       </transition>
+      <transition event_class="InternalEvent" event_variant="LeaveRenderWindow" target="start">
+        <action name="endRotation"/>
+      </transition>
       <transition event_class="InteractionEvent" event_variant="PlaneUP" target="rotationPossible">
         <action name="ScrollOneUp"/>
         <action name="updateStatusbar"/>

@@ -29,6 +29,12 @@ namespace mitk
 {
   /**
   * @brief This class holds the data of each lesion in the lesion tree view.
+  *        The data is the lesion itself with its UID, name and lesion class
+  *        as well as two vectors for
+  *        - lesion presence: bool value for each control-point
+  *                           inside the semantic relations storage
+  *        - lesion volume: double value for each control-point  - information type pair
+  *                         inside the semantic relations storage
   *
   */
   class MITKSEMANTICRELATIONS_EXPORT LesionData

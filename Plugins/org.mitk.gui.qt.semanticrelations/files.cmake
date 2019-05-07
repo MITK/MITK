@@ -12,12 +12,14 @@ set(INTERNAL_CPP_FILES
   QmitkLesionInfoWidget.cpp
   QmitkSemanticRelationsContextMenu.cpp
   QmitkSemanticRelationsNodeSelectionDialog.cpp
+  QmitkSemanticRelationsStatisticsView.cpp
   QmitkSemanticRelationsView.cpp
 )
 
 set(UI_FILES
   src/internal/QmitkLesionInfoWidgetControls.ui
   src/internal/QmitkSemanticRelationsControls.ui
+  src/internal/QmitkSemanticRelationsStatisticsControls.ui
 )
 
 set(MOC_H_FILES
@@ -33,11 +35,13 @@ set(MOC_H_FILES
   src/internal/QmitkLesionInfoWidget.h
   src/internal/QmitkSemanticRelationsContextMenu.h
   src/internal/QmitkSemanticRelationsNodeSelectionDialog.h
+  src/internal/QmitkSemanticRelationsStatisticsView.h
   src/internal/QmitkSemanticRelationsView.h
 )
 
 set(CACHED_RESOURCE_FILES
   resources/SemanticRelations_48.png
+  resources/SemanticRelationsStatistics_48.png
   plugin.xml
 )
 

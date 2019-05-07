@@ -142,6 +142,48 @@ mitk::SemanticTypes::LesionVector mitk::SemanticRelationsInference::GetAllLesion
   return allLesions;
 }
 
+mitk::SemanticTypes::LesionVector mitk::SemanticRelationsInference::GetAllLesionsOfInformationType(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType)
+{
+  SemanticTypes::LesionVector allLesions = RelationStorage::GetAllLesionsOfCase(caseID);
+
+  // filter the lesions: use only those, where the associated data is connected to image data that refers to the given information type using a lambda function
+  auto lambda = [&caseID, &informationType](const SemanticTypes::Lesion& lesion)
+  {
+    return !SpecificImageExists(caseID, lesion, informationType);
+  };
+
+  allLesions.erase(std::remove_if(allLesions.begin(), allLesions.end(), lambda), allLesions.end());
+
+  return allLesions;
+}
+
+mitk::SemanticTypes::LesionVector mitk::SemanticRelationsInference::GetAllSpecificLesions(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::InformationType& informationType)
+{
+  auto allLesionsOfControlPoint = GetAllLesionsOfControlPoint(caseID, controlPoint);
+  auto allLesionsOfInformationType = GetAllLesionsOfInformationType(caseID, informationType);
+  SemanticTypes::LesionVector allLesionsIntersection;
+
+  auto lessThan = [](const SemanticTypes::Lesion& lesionLeft, const SemanticTypes::Lesion& lesionRight)
+  {
+    return lesionLeft.UID < lesionRight.UID;
+  };
+
+  auto equal = [](const SemanticTypes::Lesion& lesionLeft, const SemanticTypes::Lesion& lesionRight)
+  {
+    return lesionLeft.UID == lesionRight.UID;
+  };
+
+  std::sort(allLesionsOfControlPoint.begin(), allLesionsOfControlPoint.end(), lessThan);
+  std::sort(allLesionsOfInformationType.begin(), allLesionsOfInformationType.end(), lessThan);
+  SemanticTypes::IDVector allImageIDsIntersection;
+  // set_intersection removes duplicated nodes
+  std::set_intersection(allLesionsOfControlPoint.begin(), allLesionsOfControlPoint.end(),
+    allLesionsOfInformationType.begin(), allLesionsOfInformationType.end(),
+    std::back_inserter(allLesionsIntersection), equal);
+
+  return allLesionsIntersection;
+}
+
 bool mitk::SemanticRelationsInference::IsRepresentingALesion(const DataNode* segmentationNode)
 {
   SemanticTypes::Lesion representedLesion;

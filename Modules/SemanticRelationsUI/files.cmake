@@ -12,6 +12,8 @@ set(CPP_FILES
   QmitkPatientTableInspector.cpp
   QmitkPatientTableModel.cpp
   QmitkSemanticRelationsUIHelper.cpp
+  QmitkStatisticsCalculator.cpp
+  QmitkStatisticsTreeModel.cpp
   QmitkTableItemThumbnailDelegate.cpp
 )
 
@@ -24,6 +26,8 @@ set(MOC_H_FILES
  include/QmitkPatientTableHeaderView.h
  include/QmitkPatientTableInspector.h
  include/QmitkPatientTableModel.h
+ include/QmitkStatisticsCalculator.h
+ include/QmitkStatisticsTreeModel.h
  include/QmitkTableItemThumbnailDelegate.h
 )
 

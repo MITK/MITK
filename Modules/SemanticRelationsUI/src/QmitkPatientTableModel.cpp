@@ -190,6 +190,16 @@ void QmitkPatientTableModel::SetData()
   // sort the vector of examination periods for the timeline
   mitk::SortExaminationPeriods(m_ExaminationPeriods, m_ControlPoints);
 
+  // rename examination periods according to their new order
+  std::string examinationPeriodName = "Baseline";
+  for (int i = 0; i < m_ExaminationPeriods.size(); ++i)
+  {
+    auto& examinationPeriod = m_ExaminationPeriods.at(i);
+    examinationPeriod.name = examinationPeriodName;
+    mitk::RelationStorage::RenameExaminationPeriod(m_CaseID, examinationPeriod);
+    examinationPeriodName = "Follow-up " + std::to_string(i);
+  }
+
   // get all information types points of current case
   m_InformationTypes = mitk::RelationStorage::GetAllInformationTypesOfCase(m_CaseID);
 

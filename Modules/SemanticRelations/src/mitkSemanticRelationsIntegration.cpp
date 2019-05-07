@@ -365,7 +365,6 @@ void mitk::SemanticRelationsIntegration::SetControlPointOfImage(const DataNode* 
 
   ClearControlPoints(caseID);
   NotifyObserver(caseID);
-
 }
 
 void mitk::SemanticRelationsIntegration::AddControlPointAndLinkImage(const DataNode* imageNode, const SemanticTypes::ControlPoint& controlPoint, bool checkConsistence)
@@ -464,6 +463,19 @@ void mitk::SemanticRelationsIntegration::AddExaminationPeriod(const SemanticType
   else
   {
     RelationStorage::AddExaminationPeriod(caseID, examinationPeriod);
+  }
+}
+
+void mitk::SemanticRelationsIntegration::RenameExaminationPeriod(const SemanticTypes::CaseID& caseID, const SemanticTypes::ExaminationPeriod& examinationPeriod)
+{
+  if (SemanticRelationsInference::InstanceExists(caseID, examinationPeriod))
+  {
+    RelationStorage::RenameExaminationPeriod(caseID, examinationPeriod);
+    NotifyObserver(caseID);
+  }
+  else
+  {
+    mitkThrowException(SemanticRelationException) << "The examination period " << examinationPeriod.UID << " to overwrite does not exist for the given case.";
   }
 }
 

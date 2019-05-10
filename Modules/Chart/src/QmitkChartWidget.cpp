@@ -314,7 +314,7 @@ void QmitkChartWidget::Impl::SetPieLabels(const std::vector<std::string> &pieLab
     {
       auto dataY = element->GetYData();
       element->SetPieLabels(ConvertVectorToQList(pieLabels));
-      if (dataY.size() != pieLabels.size())
+      if (static_cast<unsigned>(dataY.size()) != pieLabels.size())
       {
         MITK_INFO << "data has " << dataY.size() << " entries whereas pie labels have " << pieLabels.size()
                   << " entries. Unnamed pie labels automatically get a numerical label.";

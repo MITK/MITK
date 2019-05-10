@@ -126,8 +126,7 @@ namespace mitk
     {
       return it->second;
     }
-    ImageStatisticsContainer::ImageStatisticsObject* a = new ImageStatisticsContainer::ImageStatisticsObject();
-    return *a;
+    mitkThrow() << "StatisticsObject for timeStep " << timeStep << " not found!";
   }
 
   void ImageStatisticsContainer::SetStatisticsForTimeStep(TimeStepType timeStep, ImageStatisticsObject statistics)
@@ -223,8 +222,11 @@ namespace mitk
     {
       for (unsigned int i = 0; i < container->GetTimeSteps(); i++)
       {
-        auto statisticKeys = container->GetStatisticsForTimeStep(i).GetCustomStatisticNames();
-        customKeys.insert(statisticKeys.cbegin(), statisticKeys.cend());
+        if(container->TimeStepExists(i))
+        {
+          auto statisticKeys = container->GetStatisticsForTimeStep(i).GetCustomStatisticNames();
+          customKeys.insert(statisticKeys.cbegin(), statisticKeys.cend());
+        }
       }
     }
 

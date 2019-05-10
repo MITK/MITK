@@ -338,9 +338,12 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
       {
         QString timeStepLabel = "[" + QString::number(i) + "] " +
                                 QString::number(statistic->GetTimeGeometry()->TimeStepToTimePoint(i)) + " ms";
-        auto statisticsItem = new QmitkImageStatisticsTreeItem(
-          statistic->GetStatisticsForTimeStep(i), m_StatisticNames, timeStepLabel, lastParent);
-        lastParent->appendChild(statisticsItem);
+        if (statistic->TimeStepExists(i))
+        {
+          auto statisticsItem = new QmitkImageStatisticsTreeItem(
+                statistic->GetStatisticsForTimeStep(i), m_StatisticNames, timeStepLabel, lastParent);
+          lastParent->appendChild(statisticsItem);
+        }
       }
       hasMultipleTimesteps = true;
     }

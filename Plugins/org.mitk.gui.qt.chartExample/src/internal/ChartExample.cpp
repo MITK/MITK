@@ -270,14 +270,16 @@ void ChartExample::ShowYErrorOptions(bool show)
 
 void ChartExample::AdaptZoomX()
 {
-  m_Controls.m_Chart->UpdateMinMaxValueXView(m_Controls.m_doubleSpinBox_minZoomX->value(),
+  m_Controls.m_Chart->SetMinMaxValueXView(m_Controls.m_doubleSpinBox_minZoomX->value(),
                                              m_Controls.m_doubleSpinBox_maxZoomX->value());
+  m_Controls.m_Chart->Show();
 }
 
 void ChartExample::AdaptZoomY()
 {
-  m_Controls.m_Chart->UpdateMinMaxValueYView(m_Controls.m_doubleSpinBox_minZoomY->value(),
+  m_Controls.m_Chart->SetMinMaxValueYView(m_Controls.m_doubleSpinBox_minZoomY->value(),
                                              m_Controls.m_doubleSpinBox_maxZoomY->value());
+  m_Controls.m_Chart->Show();
 }
 
 void ChartExample::AdaptDataGUI(const QString &chartType)

@@ -40,6 +40,11 @@ class QmitkChartData : public QObject
   Q_PROPERTY(QVariant m_UsePercentageInPieChart READ GetUsePercentageInPieChart WRITE SetUsePercentageInPieChart NOTIFY SignalUsePercentageInPieChartChanged);
   Q_PROPERTY(QVariant m_DataPointSize READ GetDataPointSize WRITE SetDataPointSize NOTIFY SignalDataPointSizeChanged);
   Q_PROPERTY(QVariant m_StackedData READ GetStackedData WRITE SetStackedData NOTIFY SignalStackedDataChanged);
+  Q_PROPERTY(QVariant m_MinValueXView READ GetMinValueXView WRITE SetMinValueXView NOTIFY SignalMinValueXViewChanged);
+  Q_PROPERTY(QVariant m_MaxValueXView READ GetMaxValueXView WRITE SetMaxValueXView NOTIFY SignalMaxValueXViewChanged);
+  Q_PROPERTY(QVariant m_MinValueYView READ GetMinValueYView WRITE SetMinValueYView NOTIFY SignalMinValueYViewChanged);
+  Q_PROPERTY(QVariant m_MaxValueYView READ GetMaxValueYView WRITE SetMaxValueYView NOTIFY SignalMaxValueYViewChanged);
+
 public:
   QmitkChartData();
 
@@ -89,6 +94,34 @@ public:
   Q_INVOKABLE QVariant GetStackedData() const { return m_StackedData; };
   Q_INVOKABLE void SetStackedData(const QVariant& stackedData) { m_StackedData = stackedData; emit SignalStackedDataChanged(m_StackedData); };
 
+   Q_INVOKABLE QVariant GetMinValueXView() const { return m_MinValueXView; };
+  Q_INVOKABLE void SetMinValueXView(const QVariant &minValueXView)
+  {
+    m_MinValueXView = minValueXView;
+    emit SignalMinValueXViewChanged(m_MinValueXView);
+  };
+
+     Q_INVOKABLE QVariant GetMaxValueXView() const { return m_MaxValueXView; };
+  Q_INVOKABLE void SetMaxValueXView(const QVariant &maxValueXView)
+  {
+    m_MaxValueXView = maxValueXView;
+    emit SignalMaxValueXViewChanged(m_MaxValueXView);
+  };
+
+     Q_INVOKABLE QVariant GetMinValueYView() const { return m_MinValueYView; };
+  Q_INVOKABLE void SetMinValueYView(const QVariant &minValueYView)
+  {
+    m_MinValueYView = minValueYView;
+    emit SignalMinValueYViewChanged(m_MinValueYView);
+  };
+
+     Q_INVOKABLE QVariant GetMaxValueYView() const { return m_MaxValueYView; };
+  Q_INVOKABLE void SetMaxValueYView(const QVariant &maxValueYView)
+  {
+    m_MaxValueYView = maxValueYView;
+    emit SignalMaxValueYViewChanged(m_MaxValueYView);
+  };
+
 signals:
   void SignalYAxisLabelChanged(const QVariant label);
   void SignalXAxisLabelChanged(const QVariant label);
@@ -102,6 +135,10 @@ signals:
   void SignalUsePercentageInPieChartChanged(const QVariant usePercentageInPieChart);
   void SignalDataPointSizeChanged(const QVariant showDataPoints);
   void SignalStackedDataChanged(const QVariant stackedData);
+  void SignalMinValueXViewChanged(const QVariant minValueXView);
+  void SignalMaxValueXViewChanged(const QVariant maxValueXView);
+  void SignalMinValueYViewChanged(const QVariant minValueYView);
+  void SignalMaxValueYViewChanged(const QVariant maxValueYView);
 
 private:
   QVariant m_xAxisLabel;
@@ -118,6 +155,10 @@ private:
   QVariant m_numberDatasets;
   QVariant m_DataPointSize = 0;
   QVariant m_StackedData;
+  QVariant m_MinValueXView;
+  QVariant m_MaxValueXView;
+  QVariant m_MinValueYView;
+  QVariant m_MaxValueYView;
 };
 
 #endif  //QmitkC3Data_h

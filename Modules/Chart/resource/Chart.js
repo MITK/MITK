@@ -14,6 +14,10 @@ var dataLabels=[];
 var pieDataLabels=[];
 var xs = {};
 
+var minValueX;
+var maxValueX;
+var minValueY;
+var maxValueY;
 var dataColors = {};
 var chartTypes = {};
 var lineStyle = {};
@@ -63,7 +67,6 @@ window.onload = function()
         yErrorValuesPlus[count] = yErrorsTempPlus;
         yErrorValuesMinus[count] = yErrorsTempMinus;
 		pieDataLabels[count] = pieDataLabelsTemp;
-    
 
         var tempLineStyle = '';
 
@@ -86,6 +89,11 @@ window.onload = function()
       }
     }
 	var theme = chartData.m_themeName;
+	minValueX = chartData.m_MinValueXView;
+	minValueY = chartData.m_MinValueYView;
+	maxValueX = chartData.m_MaxValueXView;
+	maxValueY = chartData.m_MaxValueYView;
+
 	setThemeColors(theme);
     generateChart(chartData);
   });
@@ -327,6 +335,9 @@ function generateChart(chartData)
   }
 
   Plotly.newPlot('chart', data, layout, {displayModeBar: false, responsive: true});
+
+  UpdateMinMaxValueXView(minValueX, maxValueX);
+  UpdateMinMaxValueYView(minValueY, maxValueY);
 }
 
 /**

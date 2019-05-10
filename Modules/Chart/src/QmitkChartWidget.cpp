@@ -93,6 +93,10 @@ public:
   void SetShowDataPoints(bool showDataPoints = false);
 
   void SetChartType(const std::string &label, QmitkChartWidget::ChartType chartType);
+
+  void SetMinMaxValueXView(double minValueX, double maxValueX);
+  void SetMinMaxValueYView(double minValueY, double maxValueY);
+
   QList<QVariant> ConvertErrorVectorToQList(const std::vector<double> &error);
   QList<QVariant> ConvertVectorToQList(const std::vector<std::string> &vec);
 
@@ -427,6 +431,16 @@ void QmitkChartWidget::Impl::SetChartType(const std::string &label, QmitkChartWi
   }
 }
 
+void QmitkChartWidget::Impl::SetMinMaxValueXView(double minValueX, double maxValueX) {
+  m_C3Data.SetMinValueXView(minValueX);
+  m_C3Data.SetMaxValueXView(maxValueX);
+}
+
+void QmitkChartWidget::Impl::SetMinMaxValueYView(double minValueY, double maxValueY) {
+  m_C3Data.SetMinValueYView(minValueY);
+  m_C3Data.SetMaxValueYView(maxValueY);
+}
+
 QList<QVariant> QmitkChartWidget::Impl::ConvertErrorVectorToQList(const std::vector<double> &error)
 {
   QList<QVariant> errorConverted;
@@ -696,20 +710,14 @@ void QmitkChartWidget::SetShowErrorBars(bool showErrorBars)
   m_Impl->SetShowErrorBars(showErrorBars);
 }
 
-void QmitkChartWidget::UpdateMinMaxValueXView(double minValueX, double maxValueX)
+void QmitkChartWidget::SetMinMaxValueXView(double minValueX, double maxValueX)
 {
-  QString minMaxValueXString = QString::fromStdString(std::to_string(minValueX)) + QString(",");
-  minMaxValueXString += QString::fromStdString(std::to_string(maxValueX));
-  const QString command = QString("UpdateMinMaxValueXView(" + minMaxValueXString + ")");
-  m_Impl->CallJavaScriptFuntion(command);
+  m_Impl->SetMinMaxValueXView(minValueX, maxValueX);
 }
 
-void QmitkChartWidget::UpdateMinMaxValueYView(double minValueY, double maxValueY)
+void QmitkChartWidget::SetMinMaxValueYView(double minValueY, double maxValueY)
 {
-  QString minMaxValueYString = QString::fromStdString(std::to_string(minValueY)) + QString(",");
-  minMaxValueYString += QString::fromStdString(std::to_string(maxValueY));
-  const QString command = QString("UpdateMinMaxValueYView(" + minMaxValueYString + ")");
-  m_Impl->CallJavaScriptFuntion(command);
+  m_Impl->SetMinMaxValueYView(minValueY, maxValueY);
 }
 
 void QmitkChartWidget::Reload()

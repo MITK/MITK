@@ -155,22 +155,8 @@ mitk::SemanticTypes::ExaminationPeriod mitk::FindExaminationPeriod(const Semanti
   return SemanticTypes::ExaminationPeriod();
 }
 
-mitk::SemanticTypes::ExaminationPeriod mitk::FindExaminationPeriod(const DataNode* dataNode)
+mitk::SemanticTypes::ExaminationPeriod mitk::FindFittingExaminationPeriod(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint)
 {
-  SemanticTypes::CaseID caseID = "";
-  SemanticTypes::InformationType informationType;
-  SemanticTypes::ControlPoint controlPoint;
-  try
-  {
-    caseID = GetCaseIDFromDataNode(dataNode);
-    informationType = GetDICOMModalityFromDataNode(dataNode);
-    controlPoint = GetDICOMDateFromDataNode(dataNode);
-  }
-  catch (SemanticRelationException& e)
-  {
-    mitkReThrow(e) << "Cannot find an examination period. ";
-  }
-
   SemanticTypes::ExaminationPeriod specificExaminationPeriod;
   SemanticTypes::ControlPoint specificControlPoint;
   // find the closest control point
@@ -191,7 +177,24 @@ mitk::SemanticTypes::ExaminationPeriod mitk::FindExaminationPeriod(const DataNod
 
   // find the containing examination period
   auto allExaminationPeriods = RelationStorage::GetAllExaminationPeriodsOfCase(caseID);
-  return FindExaminationPeriod(specificControlPoint, allExaminationPeriods);
+  return FindContainingExaminationPeriod(specificControlPoint, allExaminationPeriods);
+}
+
+mitk::SemanticTypes::ExaminationPeriod mitk::FindFittingExaminationPeriod(const DataNode* dataNode)
+{
+  SemanticTypes::CaseID caseID = "";
+  SemanticTypes::ControlPoint controlPoint;
+  try
+  {
+    caseID = GetCaseIDFromDataNode(dataNode);
+    controlPoint = GetDICOMDateFromDataNode(dataNode);
+  }
+  catch (SemanticRelationException& e)
+  {
+    mitkReThrow(e) << "Cannot find an examination period. ";
+  }
+
+  return FindFittingExaminationPeriod(caseID, controlPoint);
 }
 
 void mitk::SortExaminationPeriods(SemanticTypes::ExaminationPeriodVector& allExaminationPeriods, const SemanticTypes::ControlPointVector& allControlPoints)

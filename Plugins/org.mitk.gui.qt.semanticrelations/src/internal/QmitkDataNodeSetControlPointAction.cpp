@@ -16,9 +16,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations plugin
 #include "QmitkDataNodeSetControlPointAction.h"
+#include "QmitkDataNodeRemoveFromSemanticRelationsAction.h"
 
 // semantic relations module
+#include <mitkControlPointManager.h>
 #include <mitkDICOMHelper.h>
+#include <mitkSemanticRelationsDataStorageAccess.h>
 #include <mitkSemanticRelationException.h>
 #include <mitkSemanticRelationsInference.h>
 #include <mitkUIDGeneratorBoost.h>
@@ -26,11 +29,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 // semantic relations UI module
 #include "QmitkControlPointDialog.h"
 
-// mitk gui common plugin
-#include <mitkDataNodeSelection.h>
-
 // qt
 #include <QInputDialog>
+#include <QMessageBox>
 
 QmitkDataNodeSetControlPointAction::QmitkDataNodeSetControlPointAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite)
   : QAction(parent)
@@ -67,6 +68,11 @@ void QmitkDataNodeSetControlPointAction::OnActionTriggered(bool /*checked*/)
     return;
   }
 
+  if (m_DataStorage.IsExpired())
+  {
+    return;
+  }
+
   auto dataNode = GetSelectedNode();
   if (dataNode.IsNull())
   {
@@ -90,13 +96,85 @@ void QmitkDataNodeSetControlPointAction::OnActionTriggered(bool /*checked*/)
                                              userSelectedDate.month(),
                                              userSelectedDate.day());
 
+  mitk::SemanticTypes::InformationType informationType;
+  mitk::SemanticTypes::ExaminationPeriod examinationPeriod;
+  mitk::SemanticRelationsDataStorageAccess::DataNodeVector allSpecificImages;
+  try
+  {
+    mitk::SemanticTypes::CaseID caseID = mitk::GetCaseIDFromDataNode(dataNode);
+    informationType = mitk::SemanticRelationsInference::GetInformationTypeOfImage(dataNode);
+    // see if the examination period - information type cell is already taken
+    examinationPeriod = mitk::FindFittingExaminationPeriod(caseID, controlPoint);
+    auto semanticRelationsDataStorageAccess = mitk::SemanticRelationsDataStorageAccess(m_DataStorage.Lock());
+    try
+    {
+      allSpecificImages = semanticRelationsDataStorageAccess.GetAllSpecificImages(caseID, informationType, examinationPeriod);
+    }
+    catch (const mitk::SemanticRelationException&)
+    {
+      // just continue since an exception means that there is no specific image
+    }
+  }
+  catch (const mitk::SemanticRelationException& e)
+  {
+    std::stringstream exceptionMessage; exceptionMessage << e;
+    QMessageBox msgBox(QMessageBox::Warning,
+      "Could not set the control point.",
+      "The program wasn't able to correctly set the control point.\n"
+      "Reason:\n" + QString::fromStdString(exceptionMessage.str() + "\n"));
+    msgBox.exec();
+  }
+
+  if (!allSpecificImages.empty())
+  {
+    // examination period - information type cell is already taken
+    // ask if cell should be overwritten
+    QMessageBox::StandardButton answerButton =
+      QMessageBox::question(nullptr,
+        "Specific image already exists.",
+        QString::fromStdString("Force overwriting existing image " + informationType + " at " + examinationPeriod.name + "?"),
+        QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+
+    if (answerButton == QMessageBox::Yes)
+    {
+      try
+      {
+        // remove already existent images at specific cell
+        for (const auto& specificImage : allSpecificImages)
+        {
+          RemoveFromSemanticRelationsAction::Run(m_SemanticRelationsIntegration.get(), m_DataStorage.Lock(), specificImage);
+        }
+      }
+      catch (const mitk::SemanticRelationException& e)
+      {
+        std::stringstream exceptionMessage; exceptionMessage << e;
+        QMessageBox msgBox(QMessageBox::Warning,
+          "Could not set the control point.",
+          "The program wasn't able to correctly set the control point.\n"
+          "Reason:\n" + QString::fromStdString(exceptionMessage.str() + "\n"));
+        msgBox.exec();
+      }
+    }
+    else
+    {
+      // else case is: no overwriting
+      return;
+    }
+  }
+
+  // specific image does not exist or has been removed; setting the control point should work
   try
   {
     m_SemanticRelationsIntegration->UnlinkImageFromControlPoint(dataNode);
     m_SemanticRelationsIntegration->SetControlPointOfImage(dataNode, controlPoint);
   }
-  catch (const mitk::SemanticRelationException&)
+  catch (const mitk::SemanticRelationException& e)
   {
-    return;
+    std::stringstream exceptionMessage; exceptionMessage << e;
+    QMessageBox msgBox(QMessageBox::Warning,
+      "Could not set the control point.",
+      "The program wasn't able to correctly set the control point.\n"
+      "Reason:\n" + QString::fromStdString(exceptionMessage.str() + "\n"));
+    msgBox.exec();
   }
 }

@@ -77,19 +77,33 @@ namespace mitk
   *
   * @param controlPoint           The control point of which the examination period should be found.
   * @param allExaminationPeriods  All currently known examination periods of a specific case.
+  *
+  * @return The examination period that contains the given control point.
   */
-  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ExaminationPeriod FindExaminationPeriod(const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::ExaminationPeriodVector& allExaminationPeriods);
+  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ExaminationPeriod FindContainingExaminationPeriod(const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::ExaminationPeriodVector& allExaminationPeriods);
+  /**
+  * @brief Return the examination period to which the given data node belongs.
+  *        The control point is used to find an already existing or the closest control point in the semantic relations storage.
+  *        If such a control point is found, the 'FindClosestControlPoint'-function with this control point as an argument is used
+  *        to actually find the corresponding examination period.
+  *
+  * @param caseID           The current case identifier is defined by the given string.
+  * @param controlPoint           The control point of which the examination period should be found.
+  *
+  * @return The examination period that fits the given data node.
+  */
+  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ExaminationPeriod FindFittingExaminationPeriod(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint);
   /**
   * @brief Return the examination period to which the given data node belongs.
   *        The DICOM date of the data node is used to find an already existing or the closest control point in the semantic relations storage.
-  *        If such a control point is found, the 'FindExaminationPeriod'-function with this control point as an argument is used
+  *        If such a control point is found, the 'FindFittingExaminationPeriod'-function with this control point as an argument is used
   *        to actually find the corresponding examination period.
   *
   * @param datanode   A data node pointer, whose date should be included in the newly generated control point.
   *
   * @return The examination period that contains the given data node.
   */
-  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ExaminationPeriod FindExaminationPeriod(const DataNode* dataNode);
+  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ExaminationPeriod FindFittingExaminationPeriod(const DataNode* dataNode);
   /**
   * @brief Sort the given vector of examination periods.
   *        Each examination period has a vector of control point UIDs (stored in chronological order).

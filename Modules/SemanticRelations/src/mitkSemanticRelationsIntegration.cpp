@@ -344,7 +344,7 @@ void mitk::SemanticRelationsIntegration::SetControlPointOfImage(const DataNode* 
       // find closest control point to add the new control point to the correct examination period
       SemanticTypes::ControlPoint closestControlPoint = FindClosestControlPoint(controlPoint, allControlPoints);
       SemanticTypes::ExaminationPeriodVector allExaminationPeriods = RelationStorage::GetAllExaminationPeriodsOfCase(caseID);
-      SemanticTypes::ExaminationPeriod examinationPeriod = FindExaminationPeriod(closestControlPoint, allExaminationPeriods);
+      SemanticTypes::ExaminationPeriod examinationPeriod = FindContainingExaminationPeriod(closestControlPoint, allExaminationPeriods);
       if (examinationPeriod.UID.empty())
       {
         // no closest control point (exceed threshold) or no examination period found

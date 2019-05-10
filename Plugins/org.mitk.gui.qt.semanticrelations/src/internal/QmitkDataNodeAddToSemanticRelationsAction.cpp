@@ -72,7 +72,7 @@ namespace AddToSemanticRelationsAction
       mitk::SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(image);
       informationType = GetDICOMModalityFromDataNode(image);
       // see if the examination period - information type cell is already taken
-      examinationPeriod = FindExaminationPeriod(image);
+      examinationPeriod = FindFittingExaminationPeriod(image);
       auto semanticRelationsDataStorageAccess = mitk::SemanticRelationsDataStorageAccess(dataStorage);
       try
       {
@@ -130,7 +130,7 @@ namespace AddToSemanticRelationsAction
       }
     }
 
-    // specific image does not exists or has been removed; adding the image should work
+    // specific image does not exist or has been removed; adding the image should work
     try
     {
       semanticRelationsIntegration->AddImage(image);

@@ -46,12 +46,14 @@ void ChartExample::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.m_doubleSpinBox_maxZoomX, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoomX);
   connect(m_Controls.m_doubleSpinBox_minZoomY, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoomY);
   connect(m_Controls.m_doubleSpinBox_maxZoomY, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoomY);
+  connect(m_Controls.m_comboBoxChartType, &QComboBox::currentTextChanged, this, &ChartExample::AdaptDataGUI);
 
   m_Controls.m_groupBoxErrors->setVisible(false);
   m_Controls.m_groupBoxXErrors->setVisible(false);
   m_Controls.m_groupBoxYErrors->setVisible(false);
   m_Controls.m_lineEditDataXVector->setVisible(false);
   m_Controls.m_lineEditDataXVector->setText("0;1;2;3;4;5;6;7;8;9");
+  ResetDataGUI();
 
   m_Controls.m_doubleSpinBox_maxZoomX->setValue(10);
   m_Controls.m_doubleSpinBox_maxZoomY->setValue(10);
@@ -140,7 +142,7 @@ void ChartExample::ClearChart()
   m_Controls.m_plainTextEditDataView->clear();
 }
 
-std::vector<double> ChartExample::ConvertToVector(const QString &data, QChar delimiter) const
+std::vector<double> ChartExample::ConvertToDoubleVector(const QString &data, QChar delimiter) const
 {
   std::vector<double> output;
   if (data.isEmpty())
@@ -155,10 +157,25 @@ std::vector<double> ChartExample::ConvertToVector(const QString &data, QChar del
   return output;
 }
 
+std::vector<std::string> ChartExample::ConvertToStringVector(const QString &data, QChar delimiter) const
+{
+  std::vector<std::string> output;
+  if (data.isEmpty())
+  {
+    return output;
+  }
+
+  for (const QString entry : data.split(delimiter))
+  {
+    output.push_back(entry.toStdString());
+  }
+  return output;
+}
+
 void ChartExample::AddData()
 {
   QString data = m_Controls.m_lineEditDataYVector->text();
-  auto dataY = ConvertToVector(data);
+  auto dataY = ConvertToDoubleVector(data);
 
   auto chartType = m_ChartNameToChartType.at(m_Controls.m_comboBoxChartType->currentText().toStdString());
   std::string dataLabel = m_Controls.m_lineEditDataLabel->text().toStdString();
@@ -168,7 +185,7 @@ void ChartExample::AddData()
   if (m_Controls.m_checkBoxEnableDataX->isChecked())
   {
     QString lineEditDataX = m_Controls.m_lineEditDataXVector->text();
-    auto dataX = ConvertToVector(lineEditDataX);
+    auto dataX = ConvertToDoubleVector(lineEditDataX);
     if (dataX.size() != dataY.size())
     {
       mitkThrow() << "data x and y size have to be equal";
@@ -187,19 +204,28 @@ void ChartExample::AddData()
     m_Controls.m_Chart->SetColor(dataLabel, dataColor);
   }
 
+  if (chartType == QmitkChartWidget::ChartType::pie)
+  {
+    QString pieLabelsData = m_Controls.m_lineEditPieDataLabel->text();
+    if (!pieLabelsData.isEmpty())
+    {
+      auto pieLabels = ConvertToStringVector(pieLabelsData);
+      m_Controls.m_Chart->SetPieLabels(pieLabels, dataLabel);
+    }
+  }
 
   if (m_Controls.m_checkBoxEnableErrors->isChecked())
   {
     if (m_Controls.m_checkBoxEnableXErrors->isChecked())
     {
-      auto errorsPlus = ConvertToVector(m_Controls.m_lineEditXErrorPlus->text());
-      auto errorsMinus = ConvertToVector(m_Controls.m_lineEditXErrorMinus->text());
+      auto errorsPlus = ConvertToDoubleVector(m_Controls.m_lineEditXErrorPlus->text());
+      auto errorsMinus = ConvertToDoubleVector(m_Controls.m_lineEditXErrorMinus->text());
       m_Controls.m_Chart->SetXErrorBars(m_Controls.m_lineEditDataLabel->text().toStdString(), errorsPlus, errorsMinus);
     }
     if (m_Controls.m_checkBoxEnableYErrors->isChecked())
     {
-      auto errorsPlus = ConvertToVector(m_Controls.m_lineEditYErrorPlus->text());
-      auto errorsMinus = ConvertToVector(m_Controls.m_lineEditYErrorMinus->text());
+      auto errorsPlus = ConvertToDoubleVector(m_Controls.m_lineEditYErrorPlus->text());
+      auto errorsMinus = ConvertToDoubleVector(m_Controls.m_lineEditYErrorMinus->text());
       m_Controls.m_Chart->SetYErrorBars(m_Controls.m_lineEditDataLabel->text().toStdString(), errorsPlus, errorsMinus);
     }
   }
@@ -242,7 +268,8 @@ void ChartExample::ShowYErrorOptions(bool show)
   m_Controls.m_groupBoxYErrors->setVisible(show);
 }
 
-void ChartExample::AdaptZoomX() {
+void ChartExample::AdaptZoomX()
+{
   m_Controls.m_Chart->UpdateMinMaxValueXView(m_Controls.m_doubleSpinBox_minZoomX->value(),
                                              m_Controls.m_doubleSpinBox_maxZoomX->value());
 }
@@ -251,6 +278,35 @@ void ChartExample::AdaptZoomY()
 {
   m_Controls.m_Chart->UpdateMinMaxValueYView(m_Controls.m_doubleSpinBox_minZoomY->value(),
                                              m_Controls.m_doubleSpinBox_maxZoomY->value());
+}
+
+void ChartExample::AdaptDataGUI(const QString &chartType)
+{
+  ResetDataGUI();
+  auto chartTypeEnum = m_ChartNameToChartType.at(chartType.toStdString());
+  if (chartTypeEnum == QmitkChartWidget::ChartType::pie)
+  {
+    m_Controls.m_labelPieData->setVisible(true);
+    m_Controls.m_lineEditPieDataLabel->setVisible(true);
+    m_Controls.m_labelColor->setVisible(false);
+    m_Controls.m_lineEditColor->setVisible(false);
+  }
+  else if (chartTypeEnum == QmitkChartWidget::ChartType::line || chartTypeEnum == QmitkChartWidget::ChartType::area ||
+           chartTypeEnum == QmitkChartWidget::ChartType::area_spline ||
+           chartTypeEnum == QmitkChartWidget::ChartType::spline)
+  {
+    m_Controls.m_labelLineStyle->setVisible(true);
+    m_Controls.m_comboBoxLineStyle->setVisible(true);
+  }
+}
+
+void ChartExample::ResetDataGUI() {
+  m_Controls.m_labelPieData->setVisible(false);
+  m_Controls.m_lineEditPieDataLabel->setVisible(false);
+  m_Controls.m_labelColor->setVisible(true);
+  m_Controls.m_lineEditColor->setVisible(true);
+  m_Controls.m_labelLineStyle->setVisible(false);
+  m_Controls.m_comboBoxLineStyle->setVisible(false);
 }
 
 std::vector<double> ChartExample::GenerateRandomNumbers(unsigned int amount, double max) const
@@ -267,8 +323,8 @@ std::vector<double> ChartExample::GenerateRandomNumbers(unsigned int amount, dou
   return data;
 }
 
-std::map<double, double> ChartExample::CreateMap(std::vector<double> keys,
-                                                 std::vector<double> values) const {
+std::map<double, double> ChartExample::CreateMap(std::vector<double> keys, std::vector<double> values) const
+{
   std::map<double, double> aMap;
   std::transform(keys.begin(), keys.end(), values.begin(), std::inserter(aMap, aMap.end()), [](double a, double b) {
     return std::make_pair(a, b);
@@ -293,7 +349,8 @@ std::string ChartExample::ConvertToText(std::vector<double> numbers, std::string
   return aString;
 }
 
-std::string ChartExample::ConvertToText(std::map<double, double> numbers, std::string delimiter) const {
+std::string ChartExample::ConvertToText(std::map<double, double> numbers, std::string delimiter) const
+{
   std::ostringstream oss;
   oss.precision(3);
 

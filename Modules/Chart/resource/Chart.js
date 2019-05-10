@@ -11,6 +11,7 @@ var yErrorValuesMinus=[];
 var xValues=[];
 var yValues=[];
 var dataLabels=[];
+var pieDataLabels=[];
 var xs = {};
 
 var dataColors = {};
@@ -40,6 +41,8 @@ window.onload = function()
         let xErrorsTempMinus = channel.objects[propertyName].m_XErrorDataMinus;
         let yErrorsTempPlus = channel.objects[propertyName].m_YErrorDataPlus;
         let yErrorsTempMinus = channel.objects[propertyName].m_YErrorDataMinus;  
+		let pieDataLabelsTemp = channel.objects[propertyName].m_PieLabels;
+
         let dataLabel = channel.objects[propertyName].m_Label;
         dataLabels.push(dataLabel);
 
@@ -59,6 +62,7 @@ window.onload = function()
         xErrorValuesMinus[count] = xErrorsTempMinus;
         yErrorValuesPlus[count] = yErrorsTempPlus;
         yErrorValuesMinus[count] = yErrorsTempMinus;
+		pieDataLabels[count] = pieDataLabelsTemp;
     
 
         var tempLineStyle = '';
@@ -167,6 +171,12 @@ function generatePlotData(){
       type: chartType,
       name: dataLabels[index],
     };
+	if (chartType=="pie"){
+		trace["values"] = yValues[index].slice(1);
+		if (typeof pieDataLabels[index] !== 'undefined' && pieDataLabels[index].length > 0){
+		  trace["labels"] = pieDataLabels[index];
+		}
+	}
 
 	  if(typeof xErrorValuesPlus[index] !== 'undefined'){
 		  if(typeof xErrorValuesMinus[index] !== 'undefined' && xErrorValuesMinus[index].length > 0)

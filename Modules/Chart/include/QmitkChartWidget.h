@@ -150,6 +150,12 @@ public:
   void SetXAxisLabel(const std::string& label);
 
   void SetYAxisLabel(const std::string& label);
+
+   /*!
+   * \brief Sets labels for pie chart data.
+   * \note in AddData1D, the label still has to be given that acts as a unique id. However, the label is omitted then.
+   */
+  void SetPieLabels(const std::vector<std::string> &pieLabels, const std::string &label);
   /*!
   * \brief Sets a title for the chart.
   */

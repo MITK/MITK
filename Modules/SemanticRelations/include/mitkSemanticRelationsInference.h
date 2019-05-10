@@ -193,9 +193,21 @@ namespace mitk
     *
     * @param caseID   The current case identifier is defined by the given string.
     * @param lesion   A lesion with a UID that identifies the corresponding lesion instance.
-    * @return         A vector of IDs identifying images that identify images that are related to the given lesion.
+    * @return         A vector of IDs identifying images that are related to the given lesion.
     */
     MITKSEMANTICRELATIONS_EXPORT SemanticTypes::IDVector GetAllImageIDsOfLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion);
+    /**
+    * @brief  Return a vector of all image IDs that identify images that are related to the given examination period.
+    *         If the examination period is not used by and image, an empty vector is returned.
+    *
+    * @pre    The UID of the examination period has to exist for an examination period instance.
+    * @throw  SemanticRelationException, if UID of the examination period does not exist for an examination period instance (this can be checked via 'InstanceExists').
+    *
+    * @param caseID               The current case identifier is defined by the given string.
+    * @param examinationPeriod    An examination period with a UID that identifies the corresponding examination period instance.
+    * @return                     A vector of IDs identifying images that are related to the given examination period.
+    */
+    MITKSEMANTICRELATIONS_EXPORT SemanticTypes::IDVector GetAllImageIDsOfExaminationPeriod(const SemanticTypes::CaseID& caseID, const SemanticTypes::ExaminationPeriod& examinationPeriod);
     /**
     * @brief  Return the control point of a data node.
     *         If the data node is not linked to a control point or the data node refers to a non-existing control point,
@@ -211,11 +223,11 @@ namespace mitk
     /**
     * @brief Return a vector of all control points that are valid for the given case, given a specific lesion
     *
-    * @param caseID           The current case identifier is defined by the given string.
-    * @param lesion           A specific lesion which has to be available at a returned (found) control point:
-    *                         Only those control points are returned for which an associated data has a segmentation that references the given lesion.
-    *                         If the lesion does not exists, an empty vector is returned.
-    * @return                 A vector of control points.
+    * @param caseID   The current case identifier is defined by the given string.
+    * @param lesion   A specific lesion which has to be available at a returned (found) control point:
+    *                 Only those control points are returned for which an associated data has a segmentation that references the given lesion.
+    *                 If the lesion does not exists, an empty vector is returned.
+    * @return         A vector of control points.
     */
     MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ControlPointVector GetAllControlPointsOfLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion);
     /**

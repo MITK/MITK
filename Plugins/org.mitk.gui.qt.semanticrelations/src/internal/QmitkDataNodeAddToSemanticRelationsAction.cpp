@@ -16,12 +16,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations plugin
 #include "QmitkDataNodeAddToSemanticRelationsAction.h"
+#include "QmitkDataNodeRemoveFromSemanticRelationsAction.h"
 
 // semantic relations module
+#include <mitkControlPointManager.h>
 #include <mitkDICOMHelper.h>
 #include <mitkNodePredicates.h>
+#include <mitkSemanticRelationsDataStorageAccess.h>
 #include <mitkSemanticRelationException.h>
 #include <mitkSemanticRelationsInference.h>
+#include <mitkRelationStorage.h>
 #include <mitkUIDGeneratorBoost.h>
 
 // mitk gui common plugin
@@ -36,7 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // namespace that contains the concrete action
 namespace AddToSemanticRelationsAction
 {
-  void Run(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, const mitk::DataStorage* dataStorage, const mitk::DataNode* dataNode)
+  void Run(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, mitk::DataStorage* dataStorage, const mitk::DataNode* dataNode)
   {
     if (nullptr == dataNode)
     {
@@ -45,7 +49,7 @@ namespace AddToSemanticRelationsAction
 
     if (mitk::NodePredicates::GetImagePredicate()->CheckNode(dataNode))
     {
-      AddImage(semanticRelationsIntegration, dataNode);
+      AddImage(semanticRelationsIntegration, dataStorage, dataNode);
     }
     else if (mitk::NodePredicates::GetSegmentationPredicate()->CheckNode(dataNode))
     {
@@ -53,16 +57,82 @@ namespace AddToSemanticRelationsAction
     }
   }
 
-  void AddImage(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, const mitk::DataNode* image)
+  void AddImage(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, mitk::DataStorage* dataStorage, const mitk::DataNode* image)
   {
     if (nullptr == image)
     {
       return;
     }
 
+    mitk::SemanticTypes::InformationType informationType;
+    mitk::SemanticTypes::ExaminationPeriod examinationPeriod;
+    mitk::SemanticRelationsDataStorageAccess::DataNodeVector allSpecificImages;
     try
     {
-      // add the image to the semantic relations storage
+      mitk::SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(image);
+      informationType = GetDICOMModalityFromDataNode(image);
+      // see if the examination period - information type cell is already taken
+      examinationPeriod = FindExaminationPeriod(image);
+      auto semanticRelationsDataStorageAccess = mitk::SemanticRelationsDataStorageAccess(dataStorage);
+      try
+      {
+        allSpecificImages = semanticRelationsDataStorageAccess.GetAllSpecificImages(caseID, informationType, examinationPeriod);
+      }
+      catch (const mitk::SemanticRelationException&)
+      {
+        // just continue since an exception means that there is no specific image
+      }
+    }
+    catch (const mitk::SemanticRelationException& e)
+    {
+      std::stringstream exceptionMessage; exceptionMessage << e;
+      QMessageBox msgBox(QMessageBox::Warning,
+        "Could not add the selected image.",
+        "The program wasn't able to correctly add the selected images.\n"
+        "Reason:\n" + QString::fromStdString(exceptionMessage.str() + "\n"));
+      msgBox.exec();
+    }
+
+    if (!allSpecificImages.empty())
+    {
+      // examination period - information type cell is already taken
+      // ask if cell should be overwritten
+      QMessageBox::StandardButton answerButton =
+        QMessageBox::question(nullptr,
+          "Specific image already exists.",
+          QString::fromStdString("Force overwriting existing image " + informationType + " at " + examinationPeriod.name + "?"),
+          QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+
+      if (answerButton == QMessageBox::Yes)
+      {
+        try
+        {
+          // remove already existent images at specific cell
+          for (const auto& specificImage : allSpecificImages)
+          {
+            RemoveFromSemanticRelationsAction::Run(semanticRelationsIntegration, dataStorage, specificImage);
+          }
+        }
+        catch (const mitk::SemanticRelationException& e)
+        {
+          std::stringstream exceptionMessage; exceptionMessage << e;
+          QMessageBox msgBox(QMessageBox::Warning,
+            "Could not add the selected image.",
+            "The program wasn't able to correctly add the selected images.\n"
+            "Reason:\n" + QString::fromStdString(exceptionMessage.str() + "\n"));
+          msgBox.exec();
+        }
+      }
+      else
+      {
+        // else case is: no overwriting
+        return;
+      }
+    }
+
+    // specific image does not exists or has been removed; adding the image should work
+    try
+    {
       semanticRelationsIntegration->AddImage(image);
     }
     catch (const mitk::SemanticRelationException& e)
@@ -71,13 +141,12 @@ namespace AddToSemanticRelationsAction
       QMessageBox msgBox(QMessageBox::Warning,
         "Could not add the selected image.",
         "The program wasn't able to correctly add the selected images.\n"
-        "Reason:\n" + QString::fromStdString(exceptionMessage.str()));
+        "Reason:\n" + QString::fromStdString(exceptionMessage.str() + "\n"));
       msgBox.exec();
-      return;
     }
   }
 
-  void AddSegmentation(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, const mitk::DataStorage* dataStorage, const mitk::DataNode* segmentation)
+  void AddSegmentation(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, mitk::DataStorage* dataStorage, const mitk::DataNode* segmentation)
   {
     if (nullptr == segmentation)
     {
@@ -96,11 +165,10 @@ namespace AddToSemanticRelationsAction
     if (parentNodes->empty())
     {
       // segmentation without corresponding image will not be added
-      std::stringstream exceptionMessage; exceptionMessage << "No parent image found";
       QMessageBox msgBox(QMessageBox::Warning,
         "Could not add the selected segmentation.",
         "The program wasn't able to correctly add the selected segmentation.\n"
-        "Reason:\n" + QString::fromStdString(exceptionMessage.str()));
+        "Reason: No parent image found");
       msgBox.exec();
       return;
     }
@@ -143,7 +211,7 @@ namespace AddToSemanticRelationsAction
     // add the parent node if not already existent
     if (!mitk::SemanticRelationsInference::InstanceExists(parentNodes->front()))
     {
-      AddImage(semanticRelationsIntegration, parentNodes->front());
+      AddImage(semanticRelationsIntegration, dataStorage, parentNodes->front());
     }
 
     try

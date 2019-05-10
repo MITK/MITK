@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // semantic relations module
 #include "mitkControlPointManager.h"
 #include "mitkDICOMHelper.h"
+#include "mitkRelationStorage.h"
 #include "mitkSemanticRelationException.h"
 #include "mitkUIDGeneratorBoost.h"
 
@@ -152,6 +153,45 @@ mitk::SemanticTypes::ExaminationPeriod mitk::FindExaminationPeriod(const Semanti
   }
 
   return SemanticTypes::ExaminationPeriod();
+}
+
+mitk::SemanticTypes::ExaminationPeriod mitk::FindExaminationPeriod(const DataNode* dataNode)
+{
+  SemanticTypes::CaseID caseID = "";
+  SemanticTypes::InformationType informationType;
+  SemanticTypes::ControlPoint controlPoint;
+  try
+  {
+    caseID = GetCaseIDFromDataNode(dataNode);
+    informationType = GetDICOMModalityFromDataNode(dataNode);
+    controlPoint = GetDICOMDateFromDataNode(dataNode);
+  }
+  catch (SemanticRelationException& e)
+  {
+    mitkReThrow(e) << "Cannot find an examination period. ";
+  }
+
+  SemanticTypes::ExaminationPeriod specificExaminationPeriod;
+  SemanticTypes::ControlPoint specificControlPoint;
+  // find the closest control point
+  auto allControlPoints = RelationStorage::GetAllControlPointsOfCase(caseID);
+  auto existingControlPoint = FindExistingControlPoint(controlPoint, allControlPoints);
+  if (!existingControlPoint.UID.empty())
+  {
+    specificControlPoint = existingControlPoint;
+  }
+  else
+  {
+    auto closestControlPoint = FindClosestControlPoint(controlPoint, allControlPoints);
+    if (!closestControlPoint.UID.empty())
+    {
+      specificControlPoint = closestControlPoint;
+    }
+  }
+
+  // find the containing examination period
+  auto allExaminationPeriods = RelationStorage::GetAllExaminationPeriodsOfCase(caseID);
+  return FindExaminationPeriod(specificControlPoint, allExaminationPeriods);
 }
 
 void mitk::SortExaminationPeriods(SemanticTypes::ExaminationPeriodVector& allExaminationPeriods, const SemanticTypes::ControlPointVector& allControlPoints)

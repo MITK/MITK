@@ -88,6 +88,16 @@ namespace mitk
     */
     DataNodeVector GetAllImagesOfCase(const SemanticTypes::CaseID& caseID) const;
     /**
+    * @brief  Return a vector of all images that are specified by the given vector of image IDs.
+    *
+    * @pre    The data storage member has to be valid (!nullptr).
+    * @throw  SemanticRelationException, if the data storage member is invalid (==nullptr).
+    *
+    * @param imageIDs   A vector of image IDs that represent the images in the data storage.
+    * @return           A vector of data nodes representing images.
+    */
+    DataNodeVector GetAllImagesByID(const SemanticTypes::IDVector& imageIDs) const;
+    /**
     * @brief Return a vector of all images that are connected to those segmentations that are linked to the given lesion.
     *         If the lesion is not referred to by any segmentation, an empty vector is returned.
     *
@@ -100,7 +110,7 @@ namespace mitk
     */
     DataNodeVector GetAllImagesOfLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const;
     /**
-    * @brief  Return a vector of all image nodes that are defined with the given information type and with the given control point.
+    * @brief  Return a vector of all image nodes that are defined with the given control point and the given information type.
     *
     * @pre    The UID of the control point has to exist for a control point instance.
     *         The information type has to exist for the given case (and is therefore used by at least one data node).
@@ -110,11 +120,21 @@ namespace mitk
     * @param caseID             The current case identifier is defined by the given string.
     * @param controlPoint       A control point with a UID that identifies the corresponding control point instance.
     * @param informationType    An information type that identifies the corresponding information type instance.
-    * @return                   A vector of image nodes that are defined with the given information type with the given control point.
+    * @return                   A vector of image nodes that are defined with the given control point and the given information type.
     */
     DataNodeVector GetAllSpecificImages(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::InformationType& informationType) const;
     /**
-    * @brief Return a vector of all segmentation nodes that are defined with the given information type and with the given control point.
+    * @brief  Return a vector of all image nodes that are defined with the given information type and the given examination period.
+    *         The function uses the 'SemanticRelationsInference::GetAllImageIDsOfExaminationPeriod'-function to retrieve the imageIDs of the examination period and
+    *         then compares the information type of all these images against the given information type.
+    *
+    * @param informationType      An information type that identifies the corresponding information type instance.
+    * @param examinationPeriod    An examination period that identifies the corresponding examination period instance.
+    * @return                     A vector of image nodes that are defined with the given information type with the given control point.
+    */
+    DataNodeVector GetAllSpecificImages(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType, const SemanticTypes::ExaminationPeriod& examinationPeriod) const;
+    /**
+    * @brief Return a vector of all segmentation nodes that are defined with the given control point and the given information type.
     *        The function uses the 'GetAllSpecificImages'-function to retrieve the specific images and then searches for the derived nodes (segmentation child nodes).
     *
     * @pre    The UID of the control point has to exist for a control point instance.
@@ -125,7 +145,7 @@ namespace mitk
     * @param caseID             The current case identifier is defined by the given string.
     * @param controlPoint       A control point with a UID that identifies the corresponding control point instance.
     * @param informationType    An information type that identifies the corresponding information type instance.
-    * @return                   A vector of segmentation nodes that are defined with the given information type with the given control point.
+    * @return                   A vector of segmentation nodes that are defined with the given control point and the given information type.
     */
     DataNodeVector GetAllSpecificSegmentations(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::InformationType& informationType) const;
     /**

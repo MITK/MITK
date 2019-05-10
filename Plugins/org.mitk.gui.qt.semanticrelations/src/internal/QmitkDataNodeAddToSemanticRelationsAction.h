@@ -27,10 +27,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace AddToSemanticRelationsAction
 {
-  MITK_GUI_SEMANTICRELATIONS_EXPORT void Run(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, const mitk::DataStorage* dataStorage, const mitk::DataNode* image);
+  MITK_GUI_SEMANTICRELATIONS_EXPORT void Run(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, mitk::DataStorage* dataStorage, const mitk::DataNode* image);
   
-  void AddImage(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, const mitk::DataNode* image);
-  void AddSegmentation(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, const mitk::DataStorage* dataStorage, const mitk::DataNode* segmentation);
+  void AddImage(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, mitk::DataStorage* dataStorage, const mitk::DataNode* image);
+  void AddSegmentation(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, mitk::DataStorage* dataStorage, const mitk::DataNode* segmentation);
 }
 
 class MITK_GUI_SEMANTICRELATIONS_EXPORT QmitkDataNodeAddToSemanticRelationsAction : public QAction, public QmitkAbstractSemanticRelationsAction

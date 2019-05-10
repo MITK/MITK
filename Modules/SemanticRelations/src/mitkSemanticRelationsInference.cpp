@@ -357,6 +357,28 @@ mitk::SemanticTypes::IDVector mitk::SemanticRelationsInference::GetAllImageIDsOf
   return allImageIDsOfLesion;
 }
 
+mitk::SemanticTypes::IDVector mitk::SemanticRelationsInference::GetAllImageIDsOfExaminationPeriod(const SemanticTypes::CaseID& caseID, const SemanticTypes::ExaminationPeriod& examinationPeriod)
+{
+  if (!InstanceExists(caseID, examinationPeriod))
+  {
+    mitkThrowException(SemanticRelationException) << "Could not find an existing examination period for the given caseID " << caseID << " and examination period " << examinationPeriod.name << ".";
+  }
+
+  SemanticTypes::IDVector allImageIDsOfExaminationPeriod;
+  // 1. get all control point UIDs of the examination period
+  // 2. get all images of each control points to find all images of the examination period
+  auto allControlPoints = RelationStorage::GetAllControlPointsOfCase(caseID);
+  SemanticTypes::ControlPoint controlPoint;
+  for (const auto& controlPointUID : examinationPeriod.controlPointUIDs)
+  {
+    controlPoint = GetControlPointByUID(controlPointUID, allControlPoints);
+    auto allImageIDsOfControlPoint = RelationStorage::GetAllImageIDsOfControlPoint(caseID, controlPoint);
+    allImageIDsOfExaminationPeriod.insert(allImageIDsOfExaminationPeriod.end(), allImageIDsOfControlPoint.begin(), allImageIDsOfControlPoint.end());
+  }
+
+  return allImageIDsOfExaminationPeriod;
+}
+
 mitk::SemanticTypes::ControlPoint mitk::SemanticRelationsInference::GetControlPointOfImage(const DataNode* imageNode)
 {
   if (nullptr == imageNode)

@@ -344,7 +344,7 @@ void mitk::SemanticRelationsIntegration::SetControlPointOfImage(const DataNode* 
       // find closest control point to add the new control point to the correct examination period
       SemanticTypes::ControlPoint closestControlPoint = FindClosestControlPoint(controlPoint, allControlPoints);
       SemanticTypes::ExaminationPeriodVector allExaminationPeriods = RelationStorage::GetAllExaminationPeriodsOfCase(caseID);
-      SemanticTypes::ExaminationPeriod examinationPeriod = FindExaminationPeriod(closestControlPoint, allExaminationPeriods);
+      SemanticTypes::ExaminationPeriod examinationPeriod = FindContainingExaminationPeriod(closestControlPoint, allExaminationPeriods);
       if (examinationPeriod.UID.empty())
       {
         // no closest control point (exceed threshold) or no examination period found
@@ -365,7 +365,6 @@ void mitk::SemanticRelationsIntegration::SetControlPointOfImage(const DataNode* 
 
   ClearControlPoints(caseID);
   NotifyObserver(caseID);
-
 }
 
 void mitk::SemanticRelationsIntegration::AddControlPointAndLinkImage(const DataNode* imageNode, const SemanticTypes::ControlPoint& controlPoint, bool checkConsistence)
@@ -464,6 +463,19 @@ void mitk::SemanticRelationsIntegration::AddExaminationPeriod(const SemanticType
   else
   {
     RelationStorage::AddExaminationPeriod(caseID, examinationPeriod);
+  }
+}
+
+void mitk::SemanticRelationsIntegration::RenameExaminationPeriod(const SemanticTypes::CaseID& caseID, const SemanticTypes::ExaminationPeriod& examinationPeriod)
+{
+  if (SemanticRelationsInference::InstanceExists(caseID, examinationPeriod))
+  {
+    RelationStorage::RenameExaminationPeriod(caseID, examinationPeriod);
+    NotifyObserver(caseID);
+  }
+  else
+  {
+    mitkThrowException(SemanticRelationException) << "The examination period " << examinationPeriod.UID << " to overwrite does not exist for the given case.";
   }
 }
 

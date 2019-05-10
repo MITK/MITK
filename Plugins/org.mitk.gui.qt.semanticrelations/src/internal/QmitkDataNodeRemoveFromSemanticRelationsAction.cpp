@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // namespace that contains the concrete action
 namespace RemoveFromSemanticRelationsAction
 {
-  void Run(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, const mitk::DataStorage* dataStorage, const mitk::DataNode* dataNode)
+  void Run(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, mitk::DataStorage* dataStorage, const mitk::DataNode* dataNode)
   {
     if (nullptr == dataNode)
     {
@@ -47,7 +47,7 @@ namespace RemoveFromSemanticRelationsAction
     }
   }
 
-  void RemoveImage(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, const mitk::DataStorage* dataStorage, const mitk::DataNode* image)
+  void RemoveImage(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, mitk::DataStorage* dataStorage, const mitk::DataNode* image)
   {
     if (nullptr == image)
     {

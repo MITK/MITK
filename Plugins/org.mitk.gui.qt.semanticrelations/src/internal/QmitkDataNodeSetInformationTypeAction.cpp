@@ -16,16 +16,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations plugin
 #include "QmitkDataNodeSetInformationTypeAction.h"
+#include "QmitkDataNodeRemoveFromSemanticRelationsAction.h"
 
 // semantic relations module
+#include <mitkControlPointManager.h>
+#include <mitkDICOMHelper.h>
+#include <mitkSemanticRelationsDataStorageAccess.h>
 #include <mitkSemanticRelationException.h>
 #include <mitkSemanticRelationsInference.h>
 
-// mitk gui common plugin
-#include <mitkDataNodeSelection.h>
-
 // qt
 #include <QInputDialog>
+#include <QMessageBox>
 
 QmitkDataNodeSetInformationTypeAction::QmitkDataNodeSetInformationTypeAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite)
   : QAction(parent)
@@ -62,6 +64,11 @@ void QmitkDataNodeSetInformationTypeAction::OnActionTriggered(bool /*checked*/)
     return;
   }
 
+  if (m_DataStorage.IsExpired())
+  {
+    return;
+  }
+
   auto dataNode = GetSelectedNode();
   if (dataNode.IsNull())
   {
@@ -80,12 +87,85 @@ void QmitkDataNodeSetInformationTypeAction::OnActionTriggered(bool /*checked*/)
     return;
   }
 
+  mitk::SemanticTypes::InformationType informationType = inputDialog->textValue().toStdString();
+
+  mitk::SemanticTypes::ExaminationPeriod examinationPeriod;
+  mitk::SemanticTypes::ControlPoint controlPoint;
+  mitk::SemanticRelationsDataStorageAccess::DataNodeVector allSpecificImages;
   try
   {
-    m_SemanticRelationsIntegration->SetInformationType(dataNode, inputDialog->textValue().toStdString());
+    mitk::SemanticTypes::CaseID caseID = mitk::GetCaseIDFromDataNode(dataNode);
+    controlPoint = mitk::SemanticRelationsInference::GetControlPointOfImage(dataNode);
+    // see if the examination period - information type cell is already taken
+    examinationPeriod = mitk::FindFittingExaminationPeriod(caseID, controlPoint);
+    auto semanticRelationsDataStorageAccess = mitk::SemanticRelationsDataStorageAccess(m_DataStorage.Lock());
+    try
+    {
+      allSpecificImages = semanticRelationsDataStorageAccess.GetAllSpecificImages(caseID, informationType, examinationPeriod);
+    }
+    catch (const mitk::SemanticRelationException&)
+    {
+      // just continue since an exception means that there is no specific image
+    }
   }
-  catch (const mitk::SemanticRelationException&)
+  catch (const mitk::SemanticRelationException& e)
   {
-    return;
+    std::stringstream exceptionMessage; exceptionMessage << e;
+    QMessageBox msgBox(QMessageBox::Warning,
+      "Could not set the information type.",
+      "The program wasn't able to correctly set the information type.\n"
+      "Reason:\n" + QString::fromStdString(exceptionMessage.str() + "\n"));
+    msgBox.exec();
+  }
+
+  if (!allSpecificImages.empty())
+  {
+    // examination period - information type cell is already taken
+    // ask if cell should be overwritten
+    QMessageBox::StandardButton answerButton =
+      QMessageBox::question(nullptr,
+        "Specific image already exists.",
+        QString::fromStdString("Force overwriting existing image " + informationType + " at " + examinationPeriod.name + "?"),
+        QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+
+    if (answerButton == QMessageBox::Yes)
+    {
+      try
+      {
+        // remove already existent images at specific cell
+        for (const auto& specificImage : allSpecificImages)
+        {
+          RemoveFromSemanticRelationsAction::Run(m_SemanticRelationsIntegration.get(), m_DataStorage.Lock(), specificImage);
+        }
+      }
+      catch (const mitk::SemanticRelationException& e)
+      {
+        std::stringstream exceptionMessage; exceptionMessage << e;
+        QMessageBox msgBox(QMessageBox::Warning,
+          "Could not set the information type.",
+          "The program wasn't able to correctly set the information type.\n"
+          "Reason:\n" + QString::fromStdString(exceptionMessage.str() + "\n"));
+        msgBox.exec();
+      }
+    }
+    else
+    {
+      // else case is: no overwriting
+      return;
+    }
+  }
+
+  try
+  {
+    m_SemanticRelationsIntegration->SetInformationType(dataNode, informationType);
+  }
+  catch (const mitk::SemanticRelationException& e)
+  {
+    std::stringstream exceptionMessage; exceptionMessage << e;
+    QMessageBox msgBox(QMessageBox::Warning,
+      "Could not set the information type.",
+      "The program wasn't able to correctly set the information type.\n"
+      "Reason:\n" + QString::fromStdString(exceptionMessage.str() + "\n"));
+    msgBox.exec();
   }
 }

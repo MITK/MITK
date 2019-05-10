@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // semantic relations module
 #include "mitkControlPointManager.h"
 #include "mitkDICOMHelper.h"
+#include "mitkRelationStorage.h"
 #include "mitkSemanticRelationException.h"
 #include "mitkUIDGeneratorBoost.h"
 
@@ -152,6 +153,48 @@ mitk::SemanticTypes::ExaminationPeriod mitk::FindExaminationPeriod(const Semanti
   }
 
   return SemanticTypes::ExaminationPeriod();
+}
+
+mitk::SemanticTypes::ExaminationPeriod mitk::FindFittingExaminationPeriod(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint)
+{
+  SemanticTypes::ExaminationPeriod specificExaminationPeriod;
+  SemanticTypes::ControlPoint specificControlPoint;
+  // find the closest control point
+  auto allControlPoints = RelationStorage::GetAllControlPointsOfCase(caseID);
+  auto existingControlPoint = FindExistingControlPoint(controlPoint, allControlPoints);
+  if (!existingControlPoint.UID.empty())
+  {
+    specificControlPoint = existingControlPoint;
+  }
+  else
+  {
+    auto closestControlPoint = FindClosestControlPoint(controlPoint, allControlPoints);
+    if (!closestControlPoint.UID.empty())
+    {
+      specificControlPoint = closestControlPoint;
+    }
+  }
+
+  // find the containing examination period
+  auto allExaminationPeriods = RelationStorage::GetAllExaminationPeriodsOfCase(caseID);
+  return FindContainingExaminationPeriod(specificControlPoint, allExaminationPeriods);
+}
+
+mitk::SemanticTypes::ExaminationPeriod mitk::FindFittingExaminationPeriod(const DataNode* dataNode)
+{
+  SemanticTypes::CaseID caseID = "";
+  SemanticTypes::ControlPoint controlPoint;
+  try
+  {
+    caseID = GetCaseIDFromDataNode(dataNode);
+    controlPoint = GetDICOMDateFromDataNode(dataNode);
+  }
+  catch (SemanticRelationException& e)
+  {
+    mitkReThrow(e) << "Cannot find an examination period. ";
+  }
+
+  return FindFittingExaminationPeriod(caseID, controlPoint);
 }
 
 void mitk::SortExaminationPeriods(SemanticTypes::ExaminationPeriodVector& allExaminationPeriods, const SemanticTypes::ControlPointVector& allControlPoints)

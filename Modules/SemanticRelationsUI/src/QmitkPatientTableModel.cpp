@@ -80,7 +80,7 @@ int QmitkPatientTableModel::columnCount(const QModelIndex& parent/* = QModelInde
     return 0;
   }
 
-  return m_ControlPoints.size();
+  return m_ExaminationPeriods.size();
 }
 
 QVariant QmitkPatientTableModel::data(const QModelIndex& index, int role/* = Qt::DisplayRole*/) const
@@ -97,7 +97,7 @@ QVariant QmitkPatientTableModel::data(const QModelIndex& index, int role/* = Qt:
   }
 
   if (index.row() < 0 || index.row() >= static_cast<int>(m_InformationTypes.size())
-   || index.column() < 0 || index.column() >= static_cast<int>(m_ControlPoints.size()))
+   || index.column() < 0 || index.column() >= static_cast<int>(m_ExaminationPeriods.size()))
   {
     return QVariant();
   }
@@ -190,6 +190,16 @@ void QmitkPatientTableModel::SetData()
   // sort the vector of examination periods for the timeline
   mitk::SortExaminationPeriods(m_ExaminationPeriods, m_ControlPoints);
 
+  // rename examination periods according to their new order
+  std::string examinationPeriodName = "Baseline";
+  for (int i = 0; i < m_ExaminationPeriods.size(); ++i)
+  {
+    auto& examinationPeriod = m_ExaminationPeriods.at(i);
+    examinationPeriod.name = examinationPeriodName;
+    mitk::RelationStorage::RenameExaminationPeriod(m_CaseID, examinationPeriod);
+    examinationPeriodName = "Follow-up " + std::to_string(i);
+  }
+
   // get all information types points of current case
   m_InformationTypes = mitk::RelationStorage::GetAllInformationTypesOfCase(m_CaseID);
 
@@ -219,16 +229,6 @@ void QmitkPatientTableModel::SetHeaderModel()
     standardItems.push_back(examinationPeriodItem);
     rootItem->appendColumn(standardItems);
     standardItems.clear();
-
-    const auto& currentControlPoints = examinationPeriod.controlPointUIDs;
-    for (const auto& controlPointUID : currentControlPoints)
-    {
-      const auto& controlPoint = mitk::GetControlPointByUID(controlPointUID, m_ControlPoints);
-      QStandardItem* controlPointItem = new QStandardItem(QString::fromStdString(controlPoint.ToString()));
-      standardItems.push_back(controlPointItem);
-      examinationPeriodItem->appendColumn(standardItems);
-      standardItems.clear();
-    }
   }
 
   m_HeaderModel->setItem(0, 0, rootItem);
@@ -315,28 +315,40 @@ mitk::DataNode* QmitkPatientTableModel::GetCurrentDataNode(const QModelIndex& in
     return nullptr;
   }
 
-  mitk::SemanticTypes::ControlPoint currentControlPoint = m_ControlPoints.at(index.column());
-  mitk::SemanticTypes::InformationType currentInformationType = m_InformationTypes.at(index.row());
-  try
+  auto examinationPeriod = m_ExaminationPeriods.at(index.column());
+  auto currentInformationType = m_InformationTypes.at(index.row());
+  auto controlPointsOfExaminationPeriod = examinationPeriod.controlPointUIDs;
+  for (const auto& controlPointUID : controlPointsOfExaminationPeriod)
   {
-    std::vector<mitk::DataNode::Pointer> filteredDataNodes;
-    if ("Image" == m_SelectedNodeType)
+    auto currentControlPoint = mitk::GetControlPointByUID(controlPointUID, m_ControlPoints);
+    try
     {
-      filteredDataNodes = m_SemanticRelationsDataStorageAccess->GetAllSpecificImages(m_CaseID, currentControlPoint, currentInformationType);
-    }
-    else if ("Segmentation" == m_SelectedNodeType)
-    {
-      filteredDataNodes = m_SemanticRelationsDataStorageAccess->GetAllSpecificSegmentations(m_CaseID, currentControlPoint, currentInformationType);
-    }
+      std::vector<mitk::DataNode::Pointer> filteredDataNodes;
+      if ("Image" == m_SelectedNodeType)
+      {
+        filteredDataNodes = m_SemanticRelationsDataStorageAccess->GetAllSpecificImages(m_CaseID, currentControlPoint, currentInformationType);
+      }
+      else if ("Segmentation" == m_SelectedNodeType)
+      {
+        filteredDataNodes = m_SemanticRelationsDataStorageAccess->GetAllSpecificSegmentations(m_CaseID, currentControlPoint, currentInformationType);
+      }
 
-    if (filteredDataNodes.empty())
+      if (filteredDataNodes.empty())
+      {
+        // try next control point
+        continue;
+      }
+      else
+      {
+        // found a specific image
+        return filteredDataNodes.front();
+      }
+    }
+    catch (const mitk::SemanticRelationException&)
     {
       return nullptr;
     }
-    return filteredDataNodes.front();
   }
-  catch (const mitk::SemanticRelationException&)
-  {
-    return nullptr;
-  }
+  // could not find a specif image
+  return nullptr;
 }

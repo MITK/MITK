@@ -1321,6 +1321,38 @@ void mitk::RelationStorage::AddExaminationPeriod(const SemanticTypes::CaseID& ca
   propertyList->SetProperty(examinationPeriod.UID, newExaminationPeriodVectorProperty);
 }
 
+void mitk::RelationStorage::RenameExaminationPeriod(const SemanticTypes::CaseID& caseID, const SemanticTypes::ExaminationPeriod& examinationPeriod)
+{
+  PropertyList::Pointer propertyList = GetStorageData(caseID);
+  if (nullptr == propertyList)
+  {
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    return;
+  }
+  // retrieve a vector property that contains the data of the given examination period
+  VectorProperty<std::string>* examinationPeriodDataVectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty(examinationPeriod.UID));
+  if (nullptr == examinationPeriodDataVectorProperty)
+  {
+    MITK_DEBUG << "Could not find examination period " << examinationPeriod.UID << " in the storage. Cannot rename the examination period.";
+    return;
+  }
+
+  std::vector<std::string> examinationPeriodDataVectorPropertyValue = examinationPeriodDataVectorProperty->GetValue();
+  // an examination period has an arbitrary number of vector values (name and control point UIDs) (at least one for the name)
+  if (examinationPeriodDataVectorPropertyValue.size() < 1)
+  {
+    MITK_DEBUG << "Incorrect examination period storage. At least one (1) name has to be stored.";
+    return;
+  }
+  else
+  {
+    // set the first vector value - the name
+    examinationPeriodDataVectorPropertyValue[0] = examinationPeriod.name;
+    // store the modified vector value
+    examinationPeriodDataVectorProperty->SetValue(examinationPeriodDataVectorPropertyValue);
+  }
+}
+
 void mitk::RelationStorage::AddControlPointToExaminationPeriod(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::ExaminationPeriod& examinationPeriod)
 {
   PropertyList::Pointer propertyList = GetStorageData(caseID);

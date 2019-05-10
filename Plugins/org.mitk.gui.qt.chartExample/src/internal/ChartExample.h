@@ -42,6 +42,7 @@ protected:
   virtual void SetFocus() override;
 
   void CreateChart();
+  void UpdateChart();
   void ClearChart();
 
   void AddData();

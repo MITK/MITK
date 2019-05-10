@@ -21,26 +21,72 @@ var foregroundColor = 'black';
 
 var dataProperties = {};
 
+var chartData = null;
+
+
 // Important loading function. This will be executed at first in this whole script.
 // Fetching data from QWebChannel and storing them for display purposes.
 window.onload = function()
 {
   initHeight();
+  
+	 /**
+	 * Adds handler for Qt signal emitted from QmitkChartxyData.
+	 * Changes for single traces like value changes in a line plot are handled here.
+	 */
+	function handleDataChangeEvents(registeredChannelObject)
+	{
+	  registeredChannelObject.SignalDiagramTypeChanged.connect(function(newValue){
+		console.log("diagram type changed");
+		console.log(newValue);
+	  });
+
+	  registeredChannelObject.SignalLineStyleChanged.connect(function(newValue){
+		console.log("line style changed");
+		console.log(newValue);
+	  });
+	}
+
+	/**
+	 * Adds handler for Qt signal emitted from QmitkChartData.
+	 * Changes for the whole chart like title are handled here.
+	 */
+	function handleChartChangeEvents(registeredChannelObject)
+	{
+	  registeredChannelObject.SignalXAxisLabelChanged.connect(function(newValue){
+		console.log("label changed");
+		console.log(newValue);
+		var layout = {
+		  xaxis: {
+			title: {
+			text: newValue
+			}
+		  }
+		}
+		Plotly.relayout('chart', layout);
+	  });
+		
+	}
 
   new QWebChannel(qt.webChannelTransport, function(channel) {
     chartData = channel.objects.chartData;
 
+	handleChartChangeEvents(chartData);
+	
     let count = 0;
     for(let propertyName in channel.objects) {
       if (propertyName != 'chartData')
       {
-        let xDataTemp = channel.objects[propertyName].m_XData;
-        let yDataTemp = channel.objects[propertyName].m_YData;
-        let xErrorsTempPlus = channel.objects[propertyName].m_XErrorDataPlus;
-        let xErrorsTempMinus = channel.objects[propertyName].m_XErrorDataMinus;
-        let yErrorsTempPlus = channel.objects[propertyName].m_YErrorDataPlus;
-        let yErrorsTempMinus = channel.objects[propertyName].m_YErrorDataMinus;  
-        let dataLabel = channel.objects[propertyName].m_Label;
+		let chartXYData = channel.objects[propertyName];
+		handleDataChangeEvents(chartXYData);
+
+        let xDataTemp = chartXYData.m_XData;
+        let yDataTemp = chartXYData.m_YData;
+        let xErrorsTempPlus = chartXYData.m_XErrorDataPlus;
+        let xErrorsTempMinus = chartXYData.m_XErrorDataMinus;
+        let yErrorsTempPlus = chartXYData.m_YErrorDataPlus;
+        let yErrorsTempMinus = chartXYData.m_YErrorDataMinus;
+        let dataLabel = chartXYData.m_Label;
         dataLabels.push(dataLabel);
 
         console.log("loading datalabel: "+dataLabel);
@@ -59,11 +105,11 @@ window.onload = function()
         xErrorValuesMinus[count] = xErrorsTempMinus;
         yErrorValuesPlus[count] = yErrorsTempPlus;
         yErrorValuesMinus[count] = yErrorsTempMinus;
-    
+
 
         var tempLineStyle = '';
 
-        if (channel.objects[propertyName].m_LineStyleName == "solid")
+        if (chartXYData.m_LineStyleName == "solid")
         {
           tempLineStyle = ''
         }
@@ -73,8 +119,8 @@ window.onload = function()
         }
 
         dataProperties[dataLabel] = {
-            "color" : channel.objects[propertyName].m_Color,
-            "chartType": channel.objects[propertyName].m_ChartType,
+            "color" : chartXYData.m_Color,
+            "chartType": chartXYData.m_ChartType,
             "style": tempLineStyle
         }
 
@@ -126,7 +172,7 @@ function generateErrorBarsAsymmetric(errorsPlus, errorsMinus, visible){
 	let errorObject = generateErrorBars(errorsPlus, visible);
 	errorObject["arrayminus"] = errorsMinus;
 	errorObject["symmetric"] = false;
-	
+
 	return errorObject;
 }
 
@@ -136,7 +182,7 @@ function generateStackPlotData(){
   for (let index = 0; index < dataLabels.length; index++){
 	let inputType = dataProperties[dataLabels[index]]["chartType"];
     let chartType = getPlotlyChartType(inputType);
-	
+
     let trace = {
       x: xValues[index].slice(1),
       y: yValues[index].slice(1),
@@ -160,7 +206,7 @@ function generatePlotData(){
 
     let inputType = dataProperties[dataLabels[index]]["chartType"];
     let chartType = getPlotlyChartType(inputType);
-	
+
     let trace = {
       x: xValues[index].slice(1),
       y: yValues[index].slice(1),
@@ -176,7 +222,7 @@ function generatePlotData(){
 			trace["error_x"] = generateErrorBars(xErrorValuesPlus[index], chartData.m_ShowErrorBars);
 		  }
 	  }
-	  
+
 	  if(typeof yErrorValuesPlus[index] !== 'undefined'){
 		  if(typeof yErrorValuesMinus[index] !== 'undefined' && yErrorValuesMinus[index].length > 0)
 		  {
@@ -189,9 +235,9 @@ function generatePlotData(){
     // ===================== CHART TYPE OPTIONS HANDLING ===========
     // initialize line object
     trace["line"] = {}
-	
+
 	trace["line"]["color"] = dataProperties[dataLabels[index]]["color"]
-    if (chartType == "scatter"){  
+    if (chartType == "scatter"){
     } else if (chartType == "area"){
       trace["fill"] = 'tozeroy'
     } else if (chartType == "spline"){
@@ -303,11 +349,11 @@ function generateChart(chartData)
 		}
 	}
   };
-  
+
   if (chartData.m_StackedData){
 	  layout["barmode"] = 'stack';
-  } 
-  
+  }
+
   if (chartData.m_YAxisScale){
       layout.yaxis["type"] = "log"
   }
@@ -316,7 +362,7 @@ function generateChart(chartData)
     layout.xaxis.rangeslider = {}; // adds range slider below x axis
   }
 
-  Plotly.newPlot('chart', data, layout, {displayModeBar: false, responsive: true});
+    Plotly.plot('chart', data, layout, {displayModeBar: false, responsive: true});
 }
 
 /**

@@ -36,6 +36,7 @@ void ChartExample::CreateQtPartControl(QWidget *parent)
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(parent);
   connect(m_Controls.m_buttonCreateChart, &QPushButton::clicked, this, &ChartExample::CreateChart);
+  connect(m_Controls.m_buttonUpdateChart, &QPushButton::clicked, this, &ChartExample::UpdateChart);
   connect(m_Controls.m_buttonClearChart, &QPushButton::clicked, this, &ChartExample::ClearChart);
   connect(m_Controls.m_buttonAddData, &QPushButton::clicked, this, &ChartExample::AddData);
   connect(m_Controls.m_checkBoxEnableDataX, &QCheckBox::toggled, this, &ChartExample::ShowXData);
@@ -134,6 +135,12 @@ void ChartExample::CreateChart()
   m_Controls.m_Chart->Show(showSubchart);
 }
 
+void ChartExample::UpdateChart() {
+  // Test update mechanism
+  m_Controls.m_Chart->SetLineStyle("test0", QmitkChartWidget::LineStyle::dashed);
+  m_Controls.m_Chart->SetXAxisLabel("Test Label");
+}
+
 void ChartExample::ClearChart()
 {
   m_Controls.m_Chart->Clear();
@@ -186,7 +193,6 @@ void ChartExample::AddData()
   {
     m_Controls.m_Chart->SetColor(dataLabel, dataColor);
   }
-
 
   if (m_Controls.m_checkBoxEnableErrors->isChecked())
   {
@@ -242,7 +248,8 @@ void ChartExample::ShowYErrorOptions(bool show)
   m_Controls.m_groupBoxYErrors->setVisible(show);
 }
 
-void ChartExample::AdaptZoomX() {
+void ChartExample::AdaptZoomX()
+{
   m_Controls.m_Chart->UpdateMinMaxValueXView(m_Controls.m_doubleSpinBox_minZoomX->value(),
                                              m_Controls.m_doubleSpinBox_maxZoomX->value());
 }
@@ -267,8 +274,8 @@ std::vector<double> ChartExample::GenerateRandomNumbers(unsigned int amount, dou
   return data;
 }
 
-std::map<double, double> ChartExample::CreateMap(std::vector<double> keys,
-                                                 std::vector<double> values) const {
+std::map<double, double> ChartExample::CreateMap(std::vector<double> keys, std::vector<double> values) const
+{
   std::map<double, double> aMap;
   std::transform(keys.begin(), keys.end(), values.begin(), std::inserter(aMap, aMap.end()), [](double a, double b) {
     return std::make_pair(a, b);
@@ -293,7 +300,8 @@ std::string ChartExample::ConvertToText(std::vector<double> numbers, std::string
   return aString;
 }
 
-std::string ChartExample::ConvertToText(std::map<double, double> numbers, std::string delimiter) const {
+std::string ChartExample::ConvertToText(std::map<double, double> numbers, std::string delimiter) const
+{
   std::ostringstream oss;
   oss.precision(3);
 

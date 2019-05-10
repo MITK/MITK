@@ -355,7 +355,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>420</width>
+        <width>225</width>
         <height>236</height>
        </rect>
       </property>
@@ -506,6 +506,14 @@
       </layout>
      </widget>
      <widget class="QWidget" name="page_3">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>100</width>
+        <height>30</height>
+       </rect>
+      </property>
       <attribute name="label">
        <string>Zoom</string>
       </attribute>
@@ -557,6 +565,16 @@
      </property>
      <property name="text">
       <string>Create chart</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="m_buttonUpdateChart">
+     <property name="toolTip">
+      <string>Do image processing</string>
+     </property>
+     <property name="text">
+      <string>Update chart</string>
      </property>
     </widget>
    </item>

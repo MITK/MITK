@@ -44,7 +44,6 @@ namespace mitk
     * @brief sets the data members to their initial values
     */
     LesionData(const SemanticTypes::Lesion& lesion = SemanticTypes::Lesion());
-    ~LesionData();
 
     SemanticTypes::Lesion GetLesion() const { return m_Lesion; };
     SemanticTypes::ID GetLesionUID() const { return m_Lesion.UID; }

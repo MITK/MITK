@@ -45,8 +45,8 @@ mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelations
     mitkThrowException(SemanticRelationException) << "Not a valid data storage.";
   }
 
-  std::vector<std::string> allSegmentationIDsOfCase = RelationStorage::GetAllSegmentationIDsOfCase(caseID);
-  std::vector<DataNode::Pointer> allSegmentationsOfCase;
+  SemanticTypes::IDVector allSegmentationIDsOfCase = RelationStorage::GetAllSegmentationIDsOfCase(caseID);
+  DataNodeVector allSegmentationsOfCase;
   // get all segmentation nodes of the current data storage
   // only those nodes are respected, that are currently held in the data storage
   DataStorage::SetOfObjects::ConstPointer segmentationNodes = m_DataStorage.Lock()->GetSubset(NodePredicates::GetSegmentationPredicate());
@@ -54,12 +54,12 @@ mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelations
   {
     DataNode* segmentationNode = it->Value();
 
-    std::string caseID;
-    std::string segmentationID;
+    SemanticTypes::CaseID currentCaseID;
+    SemanticTypes::ID segmentationID;
     try
     {
       // find the corresponding segmentation node for the given segmentation ID
-      caseID = GetCaseIDFromDataNode(segmentationNode);
+      currentCaseID = GetCaseIDFromDataNode(segmentationNode);
       segmentationID = GetIDFromDataNode(segmentationNode);
     }
     catch (SemanticRelationException&)
@@ -70,7 +70,7 @@ mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelations
       continue;
     }
 
-    if (caseID == caseID && (std::find(allSegmentationIDsOfCase.begin(), allSegmentationIDsOfCase.end(), segmentationID) != allSegmentationIDsOfCase.end()))
+    if (caseID == currentCaseID && (std::find(allSegmentationIDsOfCase.begin(), allSegmentationIDsOfCase.end(), segmentationID) != allSegmentationIDsOfCase.end()))
     {
       // found current image node in the storage, add it to the return vector
       allSegmentationsOfCase.push_back(segmentationNode);
@@ -117,8 +117,8 @@ mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelations
     mitkThrowException(SemanticRelationException) << "Not a valid data storage.";
   }
 
-  std::vector<std::string> allImageIDsOfCase = RelationStorage::GetAllImageIDsOfCase(caseID);
-  std::vector<DataNode::Pointer> allImagesOfCase;
+  SemanticTypes::IDVector allImageIDsOfCase = RelationStorage::GetAllImageIDsOfCase(caseID);
+  DataNodeVector allImagesOfCase;
   // get all image nodes of the current data storage
   // only those nodes are respected, that are currently held in the data storage
   DataStorage::SetOfObjects::ConstPointer imageNodes = m_DataStorage.Lock()->GetSubset(NodePredicates::GetImagePredicate());
@@ -126,12 +126,12 @@ mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelations
   {
     DataNode* imageNode = it->Value();
 
-    std::string caseID;
-    std::string imageID;
+    SemanticTypes::CaseID currentCaseID;
+    SemanticTypes::ID imageID;
     try
     {
       // find the corresponding image node for the given segmentation ID
-      caseID = GetCaseIDFromDataNode(imageNode);
+      currentCaseID = GetCaseIDFromDataNode(imageNode);
       imageID = GetIDFromDataNode(imageNode);
     }
     catch (SemanticRelationException&)
@@ -142,7 +142,7 @@ mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelations
       continue;
     }
 
-    if (caseID == caseID && (std::find(allImageIDsOfCase.begin(), allImageIDsOfCase.end(), imageID) != allImageIDsOfCase.end()))
+    if (caseID == currentCaseID && (std::find(allImageIDsOfCase.begin(), allImageIDsOfCase.end(), imageID) != allImageIDsOfCase.end()))
     {
       // found current image node in the storage, add it to the return vector
       allImagesOfCase.push_back(imageNode);
@@ -240,12 +240,12 @@ mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelations
     }
     else
     {
-      mitkThrowException(SemanticRelationException) << "Could not find an existing information type for the given caseID " << caseID << " and information type " << informationType;
+      mitkThrowException(SemanticRelationException) << "Could not find an existing information type for the given caseID " << caseID << " and information type " << informationType << ".";
     }
   }
   else
   {
-    mitkThrowException(SemanticRelationException) << "Could not find an existing control point for the given caseID " << caseID << " and control point " << controlPoint.UID;
+    mitkThrowException(SemanticRelationException) << "Could not find an existing control point for the given caseID " << caseID << " and control point " << controlPoint.UID << ".";
   }
 }
 
@@ -270,12 +270,12 @@ mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelations
     }
     else
     {
-      mitkThrowException(SemanticRelationException) << "Could not find an existing examination period for the given caseID " << caseID << " and examination period " << examinationPeriod.name;
+      mitkThrowException(SemanticRelationException) << "Could not find an existing examination period for the given caseID " << caseID << " and examination period " << examinationPeriod.name << ".";
     }
   }
   else
   {
-    mitkThrowException(SemanticRelationException) << "Could not find an existing information type for the given caseID " << caseID << " and information type " << informationType;
+    mitkThrowException(SemanticRelationException) << "Could not find an existing information type for the given caseID " << caseID << " and information type " << informationType << ".";
   }
 }
 
@@ -294,7 +294,7 @@ mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelations
   }
   catch (SemanticRelationException& e)
   {
-    mitkReThrow(e) << "Cannot get the specific segmentation";
+    mitkReThrow(e) << "Cannot get the specific segmentation.";
   }
 
   DataNodeVector allSpecificSegmentations;
@@ -326,7 +326,7 @@ mitk::DataNode::Pointer mitk::SemanticRelationsDataStorageAccess::GetSpecificSeg
   }
   catch (SemanticRelationException& e)
   {
-      mitkReThrow(e) << "Cannot get the specific segmentation";
+      mitkReThrow(e) << "Cannot get the specific segmentation.";
   }
 
   for (const auto& segmentationNode : allSpecificSegmentations)

@@ -350,7 +350,7 @@ void mitk::SemanticRelationsIntegration::SetControlPointOfImage(const DataNode* 
         // no closest control point (exceed threshold) or no examination period found
         // create a new examination period for this control point and add it to the storage
         examinationPeriod.UID = UIDGeneratorBoost::GenerateUID();
-        examinationPeriod.name = "New examination period " + std::to_string(allExaminationPeriods.size());
+        examinationPeriod.name = "New examination period";
         AddExaminationPeriod(caseID, examinationPeriod);
       }
 
@@ -449,7 +449,6 @@ void mitk::SemanticRelationsIntegration::UnlinkImageFromControlPoint(const DataN
     mitkReThrow(e) << "Cannot unlink the given image data node from its control point.";
   }
 
-  SemanticTypes::ControlPoint controlPoint = RelationStorage::GetControlPointOfImage(caseID, imageID);
   RelationStorage::UnlinkImageFromControlPoint(caseID, imageID);
   ClearControlPoints(caseID);
 }
@@ -557,7 +556,7 @@ void mitk::SemanticRelationsIntegration::RemoveInformationTypeFromImage(const Da
   RelationStorage::RemoveInformationTypeFromImage(caseID, imageID);
 
   // check for further references to the removed information type
-  std::vector<std::string> allImageIDsVectorValue = RelationStorage::GetAllImageIDsOfCase(caseID);
+  SemanticTypes::IDVector allImageIDsVectorValue = RelationStorage::GetAllImageIDsOfCase(caseID);
   for (const auto& otherImageID : allImageIDsVectorValue)
   {
     SemanticTypes::InformationType otherInformationType = RelationStorage::GetInformationTypeOfImage(caseID, otherImageID);
@@ -587,11 +586,11 @@ void mitk::SemanticRelationsIntegration::ClearControlPoints(const SemanticTypes:
 {
   SemanticTypes::ControlPointVector allControlPointsOfCase = RelationStorage::GetAllControlPointsOfCase(caseID);
 
-  std::vector<std::string> allImageIDsVectorValue = RelationStorage::GetAllImageIDsOfCase(caseID);
+  SemanticTypes::IDVector allImageIDsVectorValue = RelationStorage::GetAllImageIDsOfCase(caseID);
   SemanticTypes::ControlPointVector referencedControlPoints;
   for (const auto& imageID : allImageIDsVectorValue)
   {
-    auto controlPointOfImage = RelationStorage::GetControlPointOfImage(caseID, imageID);
+    SemanticTypes::ControlPoint controlPointOfImage = RelationStorage::GetControlPointOfImage(caseID, imageID);
     referencedControlPoints.push_back(controlPointOfImage);
   }
 
@@ -603,10 +602,10 @@ void mitk::SemanticRelationsIntegration::ClearControlPoints(const SemanticTypes:
                       referencedControlPoints.begin(), referencedControlPoints.end(),
                       std::inserter(nonReferencedControlPoints, nonReferencedControlPoints.begin()));
 
-  auto allExaminationPeriods = RelationStorage::GetAllExaminationPeriodsOfCase(caseID);
+  SemanticTypes::ExaminationPeriodVector allExaminationPeriods = RelationStorage::GetAllExaminationPeriodsOfCase(caseID);
   for (const auto& controlPoint : nonReferencedControlPoints)
   {
-    const auto& examinationPeriod = FindExaminationPeriod(controlPoint, allExaminationPeriods);
+    const SemanticTypes::ExaminationPeriod& examinationPeriod = FindContainingExaminationPeriod(controlPoint, allExaminationPeriods);
     RelationStorage::RemoveControlPointFromExaminationPeriod(caseID, controlPoint, examinationPeriod);
     RelationStorage::RemoveControlPoint(caseID, controlPoint);
   }

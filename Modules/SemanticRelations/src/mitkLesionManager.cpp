@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::SemanticTypes::Lesion mitk::GenerateNewLesion(const std::string& lesionClassType/* = ""*/)
 {
   SemanticTypes::Lesion lesion;
-  lesion.UID = mitk::UIDGeneratorBoost::GenerateUID();
+  lesion.UID = UIDGeneratorBoost::GenerateUID();
   lesion.name = "New lesion";
   lesion.lesionClass = GenerateNewLesionClass(lesionClassType);
 
@@ -34,7 +34,7 @@ mitk::SemanticTypes::Lesion mitk::GenerateNewLesion(const std::string& lesionCla
 mitk::SemanticTypes::LesionClass mitk::GenerateNewLesionClass(const std::string& lesionClassType/* = ""*/)
 {
   SemanticTypes::LesionClass lesionClass;
-  lesionClass.UID = mitk::UIDGeneratorBoost::GenerateUID();
+  lesionClass.UID = UIDGeneratorBoost::GenerateUID();
   lesionClass.classType = lesionClassType;
 
   return lesionClass;
@@ -79,12 +79,12 @@ mitk::SemanticTypes::LesionClass mitk::FindExistingLesionClass(const std::string
 void mitk::ComputeLesionPresence(LesionData& lesionData, const SemanticTypes::CaseID& caseID)
 {
   std::vector<bool> lesionPresence;
-  SemanticTypes::Lesion lesion = lesionData.GetLesion();
+  auto lesion = lesionData.GetLesion();
   bool presence = false;
-  SemanticTypes::ControlPointVector controlPoints = RelationStorage::GetAllControlPointsOfCase(caseID);
+  auto controlPoints = RelationStorage::GetAllControlPointsOfCase(caseID);
   // sort the vector of control points for the timeline
   std::sort(controlPoints.begin(), controlPoints.end());
-  SemanticTypes::InformationTypeVector informationTypes = mitk::RelationStorage::GetAllInformationTypesOfCase(caseID);
+  auto informationTypes = RelationStorage::GetAllInformationTypesOfCase(caseID);
   for (const auto& informationType : informationTypes)
   {
     for (const auto& controlPoint : controlPoints)

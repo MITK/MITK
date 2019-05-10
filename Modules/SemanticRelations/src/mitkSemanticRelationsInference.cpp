@@ -275,7 +275,7 @@ bool mitk::SemanticRelationsInference::IsLesionPresentAtControlPoint(const Seman
 
   for (const auto& imageIDOfLesion : allImageIDsOfLesion)
   {
-    auto imageControlPoint = mitk::RelationStorage::GetControlPointOfImage(caseID, imageIDOfLesion);
+    auto imageControlPoint = RelationStorage::GetControlPointOfImage(caseID, imageIDOfLesion);
     if (imageControlPoint.date == controlPoint.date)
     {
       return true;
@@ -301,13 +301,13 @@ bool mitk::SemanticRelationsInference::InstanceExists(const DataNode* dataNode)
 
   if (NodePredicates::GetImagePredicate()->CheckNode(dataNode))
   {
-    std::vector<std::string> allImageIDsOfCase = RelationStorage::GetAllImageIDsOfCase(caseID);
+    SemanticTypes::IDVector allImageIDsOfCase = RelationStorage::GetAllImageIDsOfCase(caseID);
     return std::find(allImageIDsOfCase.begin(), allImageIDsOfCase.end(), dataNodeID) != allImageIDsOfCase.end();
   }
 
   if (NodePredicates::GetSegmentationPredicate()->CheckNode(dataNode))
   {
-    std::vector<std::string> allSegmentationIDsOfCase = RelationStorage::GetAllSegmentationIDsOfCase(caseID);
+    SemanticTypes::IDVector allSegmentationIDsOfCase = RelationStorage::GetAllSegmentationIDsOfCase(caseID);
     return std::find(allSegmentationIDsOfCase.begin(), allSegmentationIDsOfCase.end(), dataNodeID) != allSegmentationIDsOfCase.end();
   }
 

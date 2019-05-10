@@ -22,11 +22,6 @@ mitk::LesionData::LesionData(const SemanticTypes::Lesion& lesion/* = SemanticTyp
   m_Lesion = lesion;
 }
 
-mitk::LesionData::~LesionData()
-{
-  // nothing here
-}
-
 void mitk::LesionData::SetLesion(const SemanticTypes::Lesion& lesion)
 {
   m_Lesion = lesion;

@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkSemanticRelationsExports.h>
 
 // semantic relations module
-#include "mitkSemanticTypes.h"
 #include "mitkLesionData.h"
 
 /*
@@ -70,6 +69,7 @@ namespace mitk
   * @param  caseID              The current case ID.
   */
   MITKSEMANTICRELATIONS_EXPORT void ComputeLesionPresence(LesionData& lesionData, const SemanticTypes::CaseID& caseID);
+
 } // namespace mitk
 
 #endif // MITKLESIONMANAGER_H

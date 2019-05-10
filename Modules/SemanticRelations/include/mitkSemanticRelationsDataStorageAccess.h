@@ -60,6 +60,7 @@ namespace mitk
     * @throw  SemanticRelationException, if the data storage member is invalid (==nullptr).
     *
     * @param caseID   The current case identifier is defined by the given string.
+    *
     * @return         A vector of data nodes representing segmentations.
     */
     DataNodeVector GetAllSegmentationsOfCase(const SemanticTypes::CaseID& caseID) const;
@@ -74,6 +75,7 @@ namespace mitk
     *
     * @param caseID   The current case identifier is defined by the given string.
     * @param lesion   A lesion with a UID that identifies the corresponding lesion instance.
+    *
     * @return         A vector of data nodes representing segmentations that define the given lesion.
     */
     DataNodeVector GetAllSegmentationsOfLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const;
@@ -84,6 +86,7 @@ namespace mitk
     * @throw  SemanticRelationException, if the data storage member is invalid (==nullptr).
     *
     * @param caseID   The current case identifier is defined by the given string.
+    *
     * @return         A vector of data nodes representing images.
     */
     DataNodeVector GetAllImagesOfCase(const SemanticTypes::CaseID& caseID) const;
@@ -94,6 +97,7 @@ namespace mitk
     * @throw  SemanticRelationException, if the data storage member is invalid (==nullptr).
     *
     * @param imageIDs   A vector of image IDs that represent the images in the data storage.
+    *
     * @return           A vector of data nodes representing images.
     */
     DataNodeVector GetAllImagesByID(const SemanticTypes::IDVector& imageIDs) const;
@@ -106,6 +110,7 @@ namespace mitk
     *
     * @param caseID   The current case identifier is defined by the given string.
     * @param lesion   A lesion with a UID that identifies the corresponding lesion instance.
+    *
     * @return         A vector of data nodes representing images on which the lesions are visible.
     */
     DataNodeVector GetAllImagesOfLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const;
@@ -120,6 +125,7 @@ namespace mitk
     * @param caseID             The current case identifier is defined by the given string.
     * @param controlPoint       A control point with a UID that identifies the corresponding control point instance.
     * @param informationType    An information type that identifies the corresponding information type instance.
+    *
     * @return                   A vector of image nodes that are defined with the given control point and the given information type.
     */
     DataNodeVector GetAllSpecificImages(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::InformationType& informationType) const;
@@ -130,6 +136,7 @@ namespace mitk
     *
     * @param informationType      An information type that identifies the corresponding information type instance.
     * @param examinationPeriod    An examination period that identifies the corresponding examination period instance.
+    *
     * @return                     A vector of image nodes that are defined with the given information type with the given control point.
     */
     DataNodeVector GetAllSpecificImages(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType, const SemanticTypes::ExaminationPeriod& examinationPeriod) const;
@@ -145,6 +152,7 @@ namespace mitk
     * @param caseID             The current case identifier is defined by the given string.
     * @param controlPoint       A control point with a UID that identifies the corresponding control point instance.
     * @param informationType    An information type that identifies the corresponding information type instance.
+    *
     * @return                   A vector of segmentation nodes that are defined with the given control point and the given information type.
     */
     DataNodeVector GetAllSpecificSegmentations(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::InformationType& informationType) const;
@@ -163,6 +171,7 @@ namespace mitk
     * @param controlPoint       A control point with a UID that identifies the corresponding control point instance.
     * @param informationType    An information type that identifies the corresponding information type instance.
     * @param lesion             A lesion with a UID that identifies the corresponding lesion instance.
+    *
     * @return                   A single segmentation node that is defined with the given information type, the given control point and is representing the given lesion.
     */
     DataNode::Pointer GetSpecificSegmentation(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint,

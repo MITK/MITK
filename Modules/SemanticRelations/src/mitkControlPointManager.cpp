@@ -33,7 +33,7 @@ mitk::SemanticTypes::ControlPoint mitk::GenerateControlPoint(const DataNode* dat
   }
   catch (SemanticRelationException& e)
   {
-    mitkReThrow(e) << "Cannot generate a control point from the DICOM tag of the given data node";
+    mitkReThrow(e) << "Cannot generate a control point from the DICOM tag of the given data node.";
   }
 
   controlPoint.UID = UIDGeneratorBoost::GenerateUID();
@@ -139,7 +139,7 @@ mitk::SemanticTypes::ControlPoint mitk::FindClosestControlPoint(const SemanticTy
   return SemanticTypes::ControlPoint();
 }
 
-mitk::SemanticTypes::ExaminationPeriod mitk::FindExaminationPeriod(const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::ExaminationPeriodVector& allExaminationPeriods)
+mitk::SemanticTypes::ExaminationPeriod mitk::FindContainingExaminationPeriod(const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::ExaminationPeriodVector& allExaminationPeriods)
 {
   for (const auto& examinationPeriod : allExaminationPeriods)
   {
@@ -191,7 +191,7 @@ mitk::SemanticTypes::ExaminationPeriod mitk::FindFittingExaminationPeriod(const 
   }
   catch (SemanticRelationException& e)
   {
-    mitkReThrow(e) << "Cannot find an examination period. ";
+    mitkReThrow(e) << "Cannot find an examination period.";
   }
 
   return FindFittingExaminationPeriod(caseID, controlPoint);

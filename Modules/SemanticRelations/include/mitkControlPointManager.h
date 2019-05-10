@@ -56,6 +56,8 @@ namespace mitk
   *
   * @param controlPoint       The control point to check for existence.
   * @param allControlPoints   The vector of already existing control points.
+  *
+  * @return The existing control point.
   */
   MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ControlPoint FindExistingControlPoint(const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::ControlPointVector& allControlPoints);
   /**
@@ -65,6 +67,8 @@ namespace mitk
   *
   * @param controlPoint       The control point to check for distance.
   * @param allControlPoints   The vector of already existing control points.
+  *
+  * @return The closest control point.
   */
   MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ControlPoint FindClosestControlPoint(const SemanticTypes::ControlPoint& controlPoint, SemanticTypes::ControlPointVector& allControlPoints);
   /**

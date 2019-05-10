@@ -60,7 +60,7 @@ protected:
 private:
   void FillRandomDataValues();
   std::vector<double> GenerateRandomNumbers(unsigned int amount, double max) const;
-  std::vector<double> ConvertToVector(const QString& data, QChar delimiter=';') const;
+  std::vector<double> ConvertToDoubleVector(const QString &data, QChar delimiter = ';') const;
   std::vector<std::string> ConvertToStringVector(const QString &data, QChar delimiter = ';') const;
   std::map<double, double> CreateMap(std::vector<double> keys, std::vector<double> values) const;
   std::string ConvertToText(std::vector<double> numbers, std::string delimiter = ";") const;

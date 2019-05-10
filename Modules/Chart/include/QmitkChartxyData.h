@@ -33,6 +33,8 @@ class QmitkChartxyData : public QObject
   Q_PROPERTY(QList<QVariant> m_XErrorDataMinus READ GetXErrorDataMinus WRITE SetXErrorDataMinus NOTIFY SignalErrorDataChanged);
   Q_PROPERTY(QList<QVariant> m_YErrorDataPlus READ GetYErrorDataPlus WRITE SetYErrorDataPlus NOTIFY SignalErrorDataChanged);
   Q_PROPERTY(QList<QVariant> m_YErrorDataMinus READ GetYErrorDataMinus WRITE SetYErrorDataMinus NOTIFY SignalErrorDataChanged);
+  Q_PROPERTY(
+    QList<QVariant> m_PieLabels READ GetPieLabels WRITE SetPieLabels NOTIFY SignalPieLabelsChanged);
   Q_PROPERTY(QVariant m_ChartType READ GetChartType WRITE SetChartType NOTIFY SignalDiagramTypeChanged);
   Q_PROPERTY(QVariant m_Color READ GetColor WRITE SetColor NOTIFY SignalColorChanged);
   Q_PROPERTY(QVariant m_Label READ GetLabel WRITE SetLabel NOTIFY SignalLabelChanged);
@@ -67,6 +69,9 @@ public:
   Q_INVOKABLE QVariant GetLabel() const { return m_Label; };
   Q_INVOKABLE void SetLabel(const QVariant& label) { m_Label = label; };
 
+  Q_INVOKABLE QList<QVariant> GetPieLabels() const { return m_PieLabels; };
+  Q_INVOKABLE void SetPieLabels(const QList<QVariant> &pieLabels) { m_PieLabels = pieLabels; };
+
   Q_INVOKABLE QVariant GetColor() const { return m_Color; };
   Q_INVOKABLE void SetColor(const QVariant& color) { m_Color = color; };
 
@@ -88,6 +93,7 @@ signals:
   void SignalDiagramTypeChanged(const QVariant diagramType);
   void SignalColorChanged(const QVariant color);
   void SignalLabelChanged(const QVariant label);
+  void SignalPieLabelsChanged(const QList<QVariant> pieLabels);
   void SignalLineStyleChanged(const QVariant lineStyle);
 
 private:
@@ -98,6 +104,7 @@ private:
   QList<QVariant> m_YErrorDataPlus;
   QList<QVariant> m_YErrorDataMinus;
   QVariant         m_Label;
+  QList<QVariant> m_PieLabels;
   QVariant         m_ChartType;
   QVariant         m_Color;
   QVariant         m_LineStyleName;

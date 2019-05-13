@@ -296,7 +296,6 @@ void QmitkRenderWindowMenu::leaveEvent( QEvent * /*e*/ )
   MITK_DEBUG << "menu leaveEvent";
 
   m_Entered = false;
-  smoothHide();
 }
 
 /* This method is responsible for non fluttering of
@@ -369,7 +368,7 @@ void QmitkRenderWindowMenu::OnSettingsButton( bool  /*checked*/ )
   if( m_Settings == NULL )
     this->CreateSettingsWidget();
 
-  QPoint point = this->mapToGlobal( m_SettingsButton->geometry().topLeft() );
+  QPoint point = this->mapToGlobal( m_SettingsButton->geometry().bottomLeft() );
   m_Settings->setVisible( true );
   m_Settings->exec( point );
 }

@@ -46,7 +46,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkSimpleContourExtractorImageFilter.h>
 #include <itkCannyEdgeDetectionImageFilter.h>
 
-static const int NUMBER_FIDUCIALS_NEEDED = 8; 
+static const int NUMBER_FIDUCIALS_NEEDED = 8;
 
 QmitkUSNavigationStepCtUsRegistration::QmitkUSNavigationStepCtUsRegistration(QWidget *parent) :
   QmitkUSAbstractNavigationStep(parent),
@@ -113,7 +113,7 @@ void QmitkUSNavigationStepCtUsRegistration::OnUpdate()
 
 void QmitkUSNavigationStepCtUsRegistration::OnSettingsChanged(const itk::SmartPointer<mitk::DataNode> settingsNode)
 {
- 
+
 }
 
 QString QmitkUSNavigationStepCtUsRegistration::GetTitle()
@@ -221,7 +221,7 @@ void QmitkUSNavigationStepCtUsRegistration::InitializeImageFilters()
   m_LaplacianFilter1 = LaplacianRecursiveGaussianImageFilterType::New();
   m_LaplacianFilter2 = LaplacianRecursiveGaussianImageFilterType::New();
 
-  //Initialize binary hole filling filter 
+  //Initialize binary hole filling filter
   m_HoleFillingFilter = VotingBinaryIterativeHoleFillingImageFilterType::New();
   VotingBinaryIterativeHoleFillingImageFilterType::InputSizeType radius;
   radius.Fill(1);

@@ -6,12 +6,12 @@
           class="USNavigation"
           icon="resources/icon.xpm" /> -->
     <view id="org.mitk.views.usmarkerplacement"
-          name="IGT EchoTrack"
+          name="IGT USTrackingNavigation"
           category="IGT"
           class="QmitkUSNavigationMarkerPlacement"
           icon="resources/icon_US_navigation.svg" />
     <view id="org.mitk.views.ultrasoundcalibration"
-          name="IGT EchoTrack Calibration"
+          name="IGT USTrackingNavigation Calibration"
           category="IGT"
           class="QmitkUltrasoundCalibration"
           icon="resources/icon_US_calibration.svg" />

@@ -218,7 +218,7 @@ bool QmitkUSNavigationStepMarkerIntervention::OnActivateStep()
 
   // get target node from data storage and make sure that it contains data
   m_TargetNode = this->GetNamedDerivedNode(QmitkUSNavigationMarkerPlacement::DATANAME_TARGETSURFACE,
-	  QmitkUSNavigationMarkerPlacement::DATANAME_TUMOUR);
+    QmitkUSNavigationMarkerPlacement::DATANAME_TUMOUR);
   if (m_TargetNode.IsNull() || m_TargetNode->GetData() == 0)
   {
     mitkThrow() << "Target node (" << QmitkUSNavigationMarkerPlacement::DATANAME_TARGETSURFACE << ") must not be null.";

@@ -87,7 +87,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.volumevisualization:OFF
   org.mitk.gui.qt.eventrecorder:OFF
   org.mitk.gui.qt.xnat:OFF
-  org.mitk.gui.qt.igt.app.echotrack:OFF
+  org.mitk.gui.qt.igt.app.ultrasoundtrackingnavigation:OFF
   org.mitk.gui.qt.spectrocamrecorder:OFF
   org.mitk.gui.qt.classificationsegmentation:OFF
   org.mitk.gui.qt.overlaymanager:OFF

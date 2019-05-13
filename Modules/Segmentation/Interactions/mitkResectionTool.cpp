@@ -5,6 +5,7 @@
 #include <vtkPolyData.h>
 
 #include <mitkImageAccessByItk.h>
+#include <mitkImageCaster.h>
 #include <mitkITKImageImport.h>
 #include <mitkProgressBar.h>
 #include <mitkResectionFilter.h>
@@ -65,7 +66,10 @@ void ResectionTool::OnMousePressed(StateMachineAction* action, InteractionEvent*
 void ResectionTool::OnMouseReleased(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   RenderingManager::GetInstance()->RequestUpdateAll();
-  auto pointCount = m_FeedbackContour->GetNumberOfVertices();
+
+  unsigned int targetTimeStep = interactionEvent->GetSender()->GetSliceNavigationController()->GetTime()->GetPos();
+
+  auto pointCount = m_FeedbackContour->GetNumberOfVertices(targetTimeStep);
   if (pointCount < 3) {
     return;
   }
@@ -129,7 +133,9 @@ vtkMatrix4x4* getWorldToViewTransform(vtkRenderer* renderer)
 
 void ResectionTool::Resect(ResectionType type)
 {
-  auto pointCount = m_FeedbackContour->GetNumberOfVertices();
+  unsigned int targetTimeStep = m_LastEventSender->GetSliceNavigationController()->GetTime()->GetPos();
+
+  auto pointCount = m_FeedbackContour->GetNumberOfVertices(targetTimeStep);
   if (pointCount < 3) {
     return;
   }
@@ -137,12 +143,16 @@ void ResectionTool::Resect(ResectionType type)
   vtkSmartPointer<vtkPoints> points = vtkPoints::New();
   points->Resize(pointCount);
   for (int i = 0; i < pointCount; i++) {
-    Point3D contourVertex = m_FeedbackContour->GetVertexAt(i)->Coordinates;
+    Point3D contourVertex = m_FeedbackContour->GetVertexAt(i, targetTimeStep)->Coordinates;
     points->InsertNextPoint(contourVertex.GetDataPointer());
   }
 
   DataNode* workingData = m_ToolManager->GetWorkingData().front();
   Image::Pointer segmentation = dynamic_cast<Image*>(workingData->GetData());
+  if (segmentation->GetDimension() > 3) {
+    Image::Pointer mitkImage3d = mitk::Image::New();
+    AccessFixedDimensionByItk_n(segmentation, extract3Dfrom4DByItk, 4U, (segmentation, targetTimeStep));
+  }
   vtkMatrix4x4* worldView = getWorldToViewTransform(m_LastEventSender->GetVtkRenderer());
   AccessByItk_n(segmentation, AccessResectFilter, (points, worldView, type));
   segmentation->Modified();
@@ -151,6 +161,7 @@ void ResectionTool::Resect(ResectionType type)
   SurfaceCreator::SurfaceCreationArgs surfaceArgs;
   surfaceArgs.recreate = true;
   surfaceArgs.outputStorage = m_ToolManager->GetDataStorage();
+  surfaceArgs.timestep = targetTimeStep;
   surfaceCreator->setArgs(surfaceArgs);
   surfaceCreator->setInput(workingData);
 

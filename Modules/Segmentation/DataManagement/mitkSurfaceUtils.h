@@ -5,6 +5,7 @@
 #include <mitkDataNode.h>
 #include <mitkDataStorage.h>
 #include <mitkEnumerationProperty.h>
+#include <mitkImage.h>
 
 #include <vtkPolyData.h>
 
@@ -40,6 +41,7 @@ public:
     DataStorage::Pointer outputStorage = nullptr;
     bool overwrite = true;
     DataNode::Pointer removeOnComplete = nullptr; // Node will be removed after creating and adding new model
+    int timestep = -1;
   };
 
   class SurfaceCreationTypeProperty : public EnumerationProperty
@@ -112,6 +114,8 @@ protected:
 
   DataNode::Pointer createModel();
   DataNode::Pointer recreateModel();
+
+  static Image::Pointer extract3D(Image::Pointer multiDimImage, int targetTimeStep);
 
   DataNode::Pointer m_Input;
   DataNode::Pointer m_Output;

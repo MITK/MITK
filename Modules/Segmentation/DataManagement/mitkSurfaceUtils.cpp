@@ -4,6 +4,7 @@
 
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
+#include <mitkImageCaster.h>
 #include <mitkProgressBar.h>
 #include "mitkShowSegmentationAsAgtkSurface.h"
 #include "mitkShowSegmentationAsSurface.h"
@@ -90,7 +91,7 @@ DataNode::Pointer SurfaceCreator::createModel()
   }
 
   Surface::Pointer surface = Surface::New();
-  surface->SetVtkPolyData(result);
+  surface->SetVtkPolyData(result, std::max(0, m_Args.timestep));
 
   DataNode::Pointer node = DataNode::New();
 
@@ -180,7 +181,7 @@ std::string SurfaceCreator::generateLogStr()
   if (m_Output != nullptr) {
     mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(m_Output->GetData());
     if (surface != nullptr) {
-      result += std::to_string(surface->GetVtkPolyData()->GetNumberOfPolys());
+      result += std::to_string(surface->GetVtkPolyData(std::max(0, m_Args.timestep))->GetNumberOfPolys());
     } else {
       result += "-1";
     }
@@ -252,6 +253,7 @@ DataNode::Pointer SurfaceCreator::recreateModel()
     args.removeOnComplete = previousModel;
     args.outputStorage = m_Args.outputStorage;
     args.overwrite = false;
+    args.timestep = m_Args.timestep;
 
     m_Args = args;
     return createModel();
@@ -271,15 +273,31 @@ DataNode::Pointer SurfaceCreator::recreateModel()
   args.outputStorage = m_Args.outputStorage;
   args.overwrite = false;
   args.removeOnComplete = previousModel;
+  args.timestep = m_Args.timestep;
 
   m_Args = args;
 
   return createModel();
 }
 
+Image::Pointer SurfaceCreator::extract3D(Image::Pointer multiDimImage, int targetTimeStep)
+{
+  Image::Pointer mitkImage3d = mitk::Image::New();
+  AccessFixedDimensionByItk_n(multiDimImage, extract3Dfrom4DByItk, 4U, (mitkImage3d, targetTimeStep));
+  return mitkImage3d;
+}
+
 vtkSmartPointer<vtkPolyData> SurfaceCreator::createModelMitk(DataNode::Pointer segNode, SurfaceCreator::SurfaceCreationArgs args)
 {
   Image::Pointer image(dynamic_cast<Image*>(segNode->GetData()));
+  if (image->GetDimension() > 3) {
+    int targetTimeStep = args.timestep;
+    if (targetTimeStep < 0) {
+      MITK_WARN << "Timestep for 3d model was not selected. Fallbacking to first timestep.";
+      targetTimeStep = 0;
+    }
+    image = extract3D(image, targetTimeStep);
+  }
 
   ShowSegmentationAsSurface::Pointer surfaceFilter = ShowSegmentationAsSurface::New();
 
@@ -318,6 +336,14 @@ vtkSmartPointer<vtkPolyData> SurfaceCreator::createModelMitk(DataNode::Pointer s
 vtkSmartPointer<vtkPolyData> SurfaceCreator::createModelAgtk(DataNode::Pointer segNode, SurfaceCreationArgs args)
 {
   Image::Pointer image(dynamic_cast<Image*>(segNode->GetData()));
+  if (image->GetDimension() > 3) {
+    int targetTimeStep = args.timestep;
+    if (targetTimeStep < 0) {
+      MITK_WARN << "Timestep for 3d model was not selected. Fallbacking to first timestep.";
+      targetTimeStep = 0;
+    }
+    image = extract3D(image, targetTimeStep);
+  }
 
   ShowSegmentationAsAgtkSurface::SurfaceComputingParameters surfaceParams;
   surfaceParams.blurSigma = .3f;

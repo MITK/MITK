@@ -231,8 +231,8 @@ void QmitkUSDeviceManagerWidget::OnDeviceSelectionChanged(
     .ToString();
   m_Controls->m_BtnRemove->setEnabled(deviceClass ==
     "org.mitk.modules.us.USVideoDevice" || deviceClass == "IGTL Client");
-  m_Controls->m_BtnEdit->setEnabled((deviceClass == "org.mitk.modules.us.USVideoDevice") && (isActive.compare("false") == 0) ||
-                                    (deviceClass == "IGTL Client") && (isActive.compare("false") == 0));
+  m_Controls->m_BtnEdit->setEnabled(((deviceClass == "org.mitk.modules.us.USVideoDevice") && (isActive.compare("false") == 0)) ||
+                                    ((deviceClass == "IGTL Client") && (isActive.compare("false") == 0)));
 }
 
 void QmitkUSDeviceManagerWidget::DisconnectAllDevices()

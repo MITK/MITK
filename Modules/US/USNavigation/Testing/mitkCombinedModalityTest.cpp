@@ -54,7 +54,7 @@ public:
     source->SetTrackingDevice(tracker);
     source->Connect();
     source->StartTracking();
-    return mitk::USCombinedModality::New(usDevice.GetPointer(), source.GetPointer(), "MBI", "EchoTrack");
+    return mitk::USCombinedModality::New(usDevice.GetPointer(), source.GetPointer(), false);
   }
 
   static void TestInstantiation()
@@ -139,7 +139,7 @@ public:
     source->SetTrackingDevice(tracker);
     source->Connect();
     source->StartTracking();
-    mitk::USCombinedModality::Pointer modality = mitk::USCombinedModality::New(usDevice.GetPointer(), source.GetPointer(), "MBI", "EchoTrack");
+    mitk::USCombinedModality::Pointer modality = mitk::USCombinedModality::New(usDevice.GetPointer(), source.GetPointer(), false);
 
     MITK_TEST_CONDITION(source->GetOutput(0) == modality->GetNavigationDataSource()->GetOutput(0),
                         "Navigation data output of the Combined Modality should be the same as the source output as no filters are active.")

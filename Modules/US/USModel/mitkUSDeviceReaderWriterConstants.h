@@ -29,6 +29,9 @@ const static char* TAG_CROPPING = "CROPPING";
 
 const static char* ATTR_FILEVERS = "filevers";
 const static char* ATTR_TYPE = "type";
+const static char* ATTR_HOST = "host";
+const static char* ATTR_PORT = "port";
+const static char* ATTR_SERVER = "server";
 const static char* ATTR_NAME = "name";
 const static char* ATTR_MANUFACTURER = "manufacturer";
 const static char* ATTR_MODEL = "model";

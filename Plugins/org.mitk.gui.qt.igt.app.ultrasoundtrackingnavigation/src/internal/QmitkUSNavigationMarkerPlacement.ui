@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkUSNavigationMarkerPlacement</class>
+ <widget class="QWidget" name="QmitkUSNavigationMarkerPlacement">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>562</width>
+    <height>446</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="currentIndex">
+      <number>1</number>
+     </property>
+     <widget class="QWidget" name="tab_2">
+      <attribute name="title">
+       <string>Initialization</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QmitkUSNavigationStepCombinedModality" name="m_CombinedModalityCreationWidget" native="true"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>Navigation Control</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QToolBox" name="navigationSteps">
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <widget class="QWidget" name="page_CtToUsRegistration">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>520</width>
+            <height>257</height>
+           </rect>
+          </property>
+          <attribute name="label">
+           <string>CT-to-US Registration</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <item>
+            <widget class="QPushButton" name="m_initializeCtToUsRegistration">
+             <property name="text">
+              <string>Initialize</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QmitkUSNavigationStepCtUsRegistration" name="m_CtToUsRegistrationWidget" native="true"/>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="page_3">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>98</width>
+            <height>57</height>
+           </rect>
+          </property>
+          <attribute name="label">
+           <string>Target</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <item>
+            <widget class="QPushButton" name="m_initializeTargetMarking">
+             <property name="text">
+              <string>Initialize</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QmitkUSNavigationStepTumourSelection" name="m_TargetMarkingWidget" native="true"/>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="page_4">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>98</width>
+            <height>57</height>
+           </rect>
+          </property>
+          <attribute name="label">
+           <string>Critical Structures</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_6">
+           <item>
+            <widget class="QPushButton" name="m_initializeCritStructureMarking">
+             <property name="text">
+              <string>Initialize</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QmitkUSNavigationStepZoneMarking" name="m_CriticalStructuresWidget" native="true"/>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="page_2">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>98</width>
+            <height>57</height>
+           </rect>
+          </property>
+          <attribute name="label">
+           <string>Needle Insertion</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_7">
+           <item>
+            <widget class="QPushButton" name="m_initializeNavigation">
+             <property name="text">
+              <string>Initialize</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QmitkUSNavigationStepPunctuationIntervention" name="m_NavigationWidget" native="true"/>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_3">
+      <attribute name="title">
+       <string>Settings</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_8">
+       <item>
+        <widget class="QmitkUSNavigationCombinedSettingsWidget" name="m_settingsWidget" native="true"/>
+       </item>
+       <item>
+        <widget class="Line" name="line">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QCheckBox" name="m_enableNavigationLayout">
+           <property name="text">
+            <string>Enable Navigation Render Window Layout with RenderWindow</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="m_RenderWindowSelection">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>3</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="m_RefreshView">
+           <property name="text">
+            <string>Refresh view</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="Line" name="line_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="finishExperimentButton">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Finish Experiment</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="startExperimentButton">
+         <property name="text">
+          <string>Start New Experiment</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="runningLabel">
+     <property name="maximumSize">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkUSNavigationStepCombinedModality</class>
+   <extends>QWidget</extends>
+   <header>src/internal/NavigationStepWidgets/QmitkUSNavigationStepCombinedModality.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkUSNavigationStepTumourSelection</class>
+   <extends>QWidget</extends>
+   <header>src/internal/NavigationStepWidgets/QmitkUSNavigationStepTumourSelection.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkUSNavigationStepZoneMarking</class>
+   <extends>QWidget</extends>
+   <header>src/internal/NavigationStepWidgets/QmitkUSNavigationStepZoneMarking.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkUSNavigationStepPunctuationIntervention</class>
+   <extends>QWidget</extends>
+   <header>src/internal/NavigationStepWidgets/QmitkUSNavigationStepPunctuationIntervention.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkUSNavigationCombinedSettingsWidget</class>
+   <extends>QWidget</extends>
+   <header>src/internal/SettingsWidgets/QmitkUSNavigationCombinedSettingsWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkUSNavigationStepCtUsRegistration</class>
+   <extends>QWidget</extends>
+   <header location="global">src/internal/NavigationStepWidgets/QmitkUSNavigationStepCtUsRegistration.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+ <slots>
+  <slot>OnStartExperiment()</slot>
+  <slot>OnFinishExperiment()</slot>
+ </slots>
+</ui>

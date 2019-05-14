@@ -317,8 +317,53 @@ namespace mitk {
 
     void GrabImage();
 
-    virtual void SetSpacing(double xSpacing, double ySpacing);
+    /**
+    * \brief Returns all probes for this device or an empty vector it no probes were set
+    * Returns a std::vector of all probes that exist for this device if there were probes set while creating or modifying this USVideoDevice.
+    * Otherwise it returns an empty vector. Therefore always check if vector is filled, before using it!
+    */
+    virtual std::vector<mitk::USProbe::Pointer> GetAllProbes() = 0;
 
+    /**
+    * \brief Cleans the std::vector containing all configured probes.
+    */
+    virtual void DeleteAllProbes() {};
+
+    /**
+    * \brief Return current active probe for this USDevice
+    * Returns a pointer to the probe that is currently in use. If there were probes set while creating or modifying this USDevice.
+    * Returns null otherwise
+    */
+    virtual mitk::USProbe::Pointer GetCurrentProbe() = 0;
+
+    /**
+    \brief adds a new probe to the device
+    */
+    virtual void AddNewProbe(mitk::USProbe::Pointer /*probe*/) {};
+
+    /**
+    * \brief get the probe by its name
+    * Returns a  pointer to the probe identified by the given name. If no probe of given name exists for this Device 0 is returned.
+    */
+    virtual mitk::USProbe::Pointer GetProbeByName(std::string name) = 0;
+
+    /**
+    * \brief Removes the Probe with the given name
+    */
+    virtual void RemoveProbeByName(std::string /*name*/) {};
+
+    /**
+    * \brief Sets the first existing probe or the default probe of the ultrasound device
+    * as the current probe of it.
+    */
+    virtual void SetDefaultProbeAsCurrentProbe() {};
+
+    /**
+    * \brief Sets the probe with the given name as current probe if the named probe exists.
+    */
+    virtual void SetCurrentProbe(std::string /*probename*/) {};
+
+    virtual void SetSpacing(double xSpacing, double ySpacing);
 
   protected:
 

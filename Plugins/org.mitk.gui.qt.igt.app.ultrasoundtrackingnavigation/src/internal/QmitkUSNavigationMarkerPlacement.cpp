@@ -90,9 +90,9 @@ QmitkUSNavigationMarkerPlacement::QmitkUSNavigationMarkerPlacement()
     m_MarkerIndex(1),
     m_SceneNumber(1),
     m_WarnOverlay(mitk::TextAnnotation2D::New()),
+    m_ToolVisualizationFilter(nullptr),
     m_NavigationDataSource(nullptr),
     m_CurrentStorage(nullptr),
-    m_ToolVisualizationFilter(nullptr),
     m_ImageStreamNode(nullptr),
     ui(new Ui::QmitkUSNavigationMarkerPlacement)
 {

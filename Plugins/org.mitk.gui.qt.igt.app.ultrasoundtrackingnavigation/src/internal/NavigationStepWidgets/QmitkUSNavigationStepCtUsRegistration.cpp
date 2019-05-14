@@ -113,7 +113,7 @@ void QmitkUSNavigationStepCtUsRegistration::OnUpdate()
 
 void QmitkUSNavigationStepCtUsRegistration::OnSettingsChanged(const itk::SmartPointer<mitk::DataNode> settingsNode)
 {
-
+  Q_UNUSED(settingsNode);
 }
 
 QString QmitkUSNavigationStepCtUsRegistration::GetTitle()
@@ -765,7 +765,7 @@ void QmitkUSNavigationStepCtUsRegistration::AddTransformedPointsToDataStorage()
 double QmitkUSNavigationStepCtUsRegistration::CalculateMeanFRE()
 {
   double meanFRE = 0.0;
-  for (int counter = 0; counter < m_GroundTruthProtocolFRE.size(); ++counter)
+  for (unsigned int counter = 0; counter < m_GroundTruthProtocolFRE.size(); ++counter)
   {
     meanFRE += m_GroundTruthProtocolFRE[counter];
   }
@@ -777,7 +777,7 @@ double QmitkUSNavigationStepCtUsRegistration::CalculateStandardDeviationOfFRE(do
 {
   double variance = 0.0;
 
-  for (int counter = 0; counter < m_GroundTruthProtocolFRE.size(); ++counter)
+  for (unsigned int counter = 0; counter < m_GroundTruthProtocolFRE.size(); ++counter)
   {
     variance += ((meanFRE - m_GroundTruthProtocolFRE[counter]) * (meanFRE - m_GroundTruthProtocolFRE[counter]));
   }
@@ -896,7 +896,7 @@ bool QmitkUSNavigationStepCtUsRegistration::EliminateFiducialCandidatesByEuclide
     return false;
   }
 
-  for (int counter = 0; counter < m_CentroidsOfFiducialCandidates.size(); ++counter)
+  for (unsigned int counter = 0; counter < m_CentroidsOfFiducialCandidates.size(); ++counter)
   {
     int amountOfAcceptedFiducials = 0;
     mitk::Point3D fiducialCentroid(m_CentroidsOfFiducialCandidates.at(counter));
@@ -907,7 +907,7 @@ bool QmitkUSNavigationStepCtUsRegistration::EliminateFiducialCandidatesByEuclide
     // Configuration C: 15.86mm and 59.0mm (20 mm distance between fiducial centers)
     //
     // increase the amountOfAcceptedFiducials.
-    for (int position = 0; position < m_CentroidsOfFiducialCandidates.size(); ++position)
+    for (unsigned int position = 0; position < m_CentroidsOfFiducialCandidates.size(); ++position)
     {
       if (position == counter)
       {
@@ -969,7 +969,7 @@ void QmitkUSNavigationStepCtUsRegistration::ClassifyFiducialCandidates()
   std::vector<std::vector<double>> distanceVectorsFiducials;
   this->CalculateDistancesBetweenFiducials(distanceVectorsFiducials);
 
-  for (int counter = 0; counter < distanceVectorsFiducials.size(); ++counter)
+  for (unsigned int counter = 0; counter < distanceVectorsFiducials.size(); ++counter)
   {
     int distanceA = 0;      // => 10,00mm distance
     int distanceB = 0;      // => 14,14mm distance
@@ -979,7 +979,7 @@ void QmitkUSNavigationStepCtUsRegistration::ClassifyFiducialCandidates()
     int distanceF = 0;      // => 28,28mm distance
 
     std::vector<double> &distances = distanceVectorsFiducials.at(counter);
-    for (int number = 0; number < distances.size(); ++number)
+    for (unsigned int number = 0; number < distances.size(); ++number)
     {
       double &distance = distances.at(number);
       switch (ui->fiducialMarkerConfigurationComboBox->currentIndex())
@@ -1083,10 +1083,10 @@ void QmitkUSNavigationStepCtUsRegistration::ClassifyFiducialCandidates()
     // possible occurrence of other fiducial candidates that have an distance equal to
     // one of the distances A - E. However, false fiducial candidates outside
     // the fiducial marker does not have the right distance configuration:
-    if ((distanceA >= 2 && distanceD >= 2 && distanceE >= 2 && distanceF >= 1 ||
-      distanceA >= 1 && distanceB >= 2 && distanceC >= 1 && distanceD >= 2 && distanceE >= 1 ||
-      distanceB >= 2 && distanceD >= 4 && distanceF >= 1 ||
-      distanceA >= 1 && distanceB >= 1 && distanceD >= 3 && distanceE >= 1 && distanceF >= 1) == false)
+    if (((distanceA >= 2 && distanceD >= 2 && distanceE >= 2 && distanceF >= 1) ||
+      (distanceA >= 1 && distanceB >= 2 && distanceC >= 1 && distanceD >= 2 && distanceE >= 1) ||
+      (distanceB >= 2 && distanceD >= 4 && distanceF >= 1) ||
+      (distanceA >= 1 && distanceB >= 1 && distanceD >= 3 && distanceE >= 1 && distanceF >= 1)) == false)
     {
       MITK_INFO << "Detected fiducial candidate with unknown distance configuration.";
       fiducialCandidatesToBeRemoved.push_back(counter);
@@ -1159,7 +1159,7 @@ void QmitkUSNavigationStepCtUsRegistration::NumerateFiducialMarks()
     m_MarkerFloatingImageCoordinateSystemPointSet->Clear();
   }
 
-  for (int counter = 1; counter <= m_FiducialMarkerCentroids.size(); ++counter)
+  for (unsigned int counter = 1; counter <= m_FiducialMarkerCentroids.size(); ++counter)
   {
     m_MarkerFloatingImageCoordinateSystemPointSet->InsertPoint(counter - 1, m_FiducialMarkerCentroids.at(counter));
   }
@@ -1177,11 +1177,11 @@ void QmitkUSNavigationStepCtUsRegistration::CalculateDistancesBetweenFiducials(s
 {
   std::vector<double> distancesBetweenFiducials;
 
-  for (int i = 0; i < m_CentroidsOfFiducialCandidates.size(); ++i)
+  for (unsigned int i = 0; i < m_CentroidsOfFiducialCandidates.size(); ++i)
   {
     distancesBetweenFiducials.clear();
     mitk::Point3D fiducialCentroid(m_CentroidsOfFiducialCandidates.at(i));
-    for (int n = 0; n < m_CentroidsOfFiducialCandidates.size(); ++n)
+    for (unsigned int n = 0; n < m_CentroidsOfFiducialCandidates.size(); ++n)
     {
       mitk::Point3D otherCentroid(m_CentroidsOfFiducialCandidates.at(n));
       distancesBetweenFiducials.push_back(fiducialCentroid.EuclideanDistanceTo(otherCentroid));
@@ -1197,10 +1197,10 @@ void QmitkUSNavigationStepCtUsRegistration::CalculateDistancesBetweenFiducials(s
     distanceVectorsFiducials.push_back(distancesBetweenFiducials);
   }
 
-  for (int i = 0; i < distanceVectorsFiducials.size(); ++i)
+  for (unsigned int i = 0; i < distanceVectorsFiducials.size(); ++i)
   {
     MITK_INFO << "Vector " << i << ":";
-    for (int k = 0; k < distanceVectorsFiducials.at(i).size(); ++k)
+    for (unsigned int k = 0; k < distanceVectorsFiducials.at(i).size(); ++k)
     {
       MITK_INFO << distanceVectorsFiducials.at(i).at(k);
     }
@@ -1209,7 +1209,7 @@ void QmitkUSNavigationStepCtUsRegistration::CalculateDistancesBetweenFiducials(s
 
 bool QmitkUSNavigationStepCtUsRegistration::FindFiducialNo1(std::vector<std::vector<double>>& distanceVectorsFiducials)
 {
-  for (int i = 0; i < distanceVectorsFiducials.size(); ++i)
+  for (unsigned int i = 0; i < distanceVectorsFiducials.size(); ++i)
   {
     std::vector<double> &distances = distanceVectorsFiducials.at(i);
     if (distances.size() < NUMBER_FIDUCIALS_NEEDED - 1 )
@@ -1250,7 +1250,7 @@ bool QmitkUSNavigationStepCtUsRegistration::FindFiducialNo2And3()
   mitk::Vector3D vectorFiducial1ToFiducialA;
   mitk::Vector3D vectorFiducial1ToFiducialB;
 
-  for (int i = 0; i < m_CentroidsOfFiducialCandidates.size(); ++i)
+  for (unsigned int i = 0; i < m_CentroidsOfFiducialCandidates.size(); ++i)
   {
     mitk::Point3D fiducialCentroid(m_CentroidsOfFiducialCandidates.at(i));
     double distance = fiducialNo1.EuclideanDistanceTo(fiducialCentroid);
@@ -1264,7 +1264,7 @@ bool QmitkUSNavigationStepCtUsRegistration::FindFiducialNo2And3()
     }
   }
 
-  for (int i = 0; i < m_CentroidsOfFiducialCandidates.size(); ++i)
+  for (unsigned int i = 0; i < m_CentroidsOfFiducialCandidates.size(); ++i)
   {
     mitk::Point3D fiducialCentroid(m_CentroidsOfFiducialCandidates.at(i));
     double distance = fiducialNo1.EuclideanDistanceTo(fiducialCentroid);
@@ -1326,7 +1326,7 @@ bool QmitkUSNavigationStepCtUsRegistration::FindFiducialNo4(std::vector<std::vec
   double characteristicDistanceBWithLowerMargin = this->GetCharacteristicDistanceBWithLowerMargin();
   double characteristicDistanceBWithUpperMargin = this->GetCharacteristicDistanceBWithUpperMargin();
 
-  for (int i = 0; i < distanceVectorsFiducials.size(); ++i)
+  for (unsigned int i = 0; i < distanceVectorsFiducials.size(); ++i)
   {
     std::vector<double> &distances = distanceVectorsFiducials.at(i);
     if (distances.size() < NUMBER_FIDUCIALS_NEEDED - 1)
@@ -1362,7 +1362,7 @@ bool QmitkUSNavigationStepCtUsRegistration::FindFiducialNo5()
 
   mitk::Point3D fiducialNo2(m_FiducialMarkerCentroids.at(2));
 
-  for (int counter = 0; counter < m_CentroidsOfFiducialCandidates.size(); ++counter)
+  for (unsigned int counter = 0; counter < m_CentroidsOfFiducialCandidates.size(); ++counter)
   {
     mitk::Point3D fiducialCentroid(m_CentroidsOfFiducialCandidates.at(counter));
     double distance = fiducialNo2.EuclideanDistanceTo(fiducialCentroid);
@@ -1391,7 +1391,7 @@ bool QmitkUSNavigationStepCtUsRegistration::FindFiducialNo6()
 
   mitk::Point3D fiducialNo5(m_FiducialMarkerCentroids.at(5));
 
-  for (int counter = 0; counter < m_CentroidsOfFiducialCandidates.size(); ++counter)
+  for (unsigned int counter = 0; counter < m_CentroidsOfFiducialCandidates.size(); ++counter)
   {
     mitk::Point3D fiducialCentroid(m_CentroidsOfFiducialCandidates.at(counter));
     double distance = fiducialNo5.EuclideanDistanceTo(fiducialCentroid);
@@ -1420,7 +1420,7 @@ bool QmitkUSNavigationStepCtUsRegistration::FindFiducialNo7()
 
   mitk::Point3D fiducialNo8(m_FiducialMarkerCentroids.at(8));
 
-  for (int counter = 0; counter < m_CentroidsOfFiducialCandidates.size(); ++counter)
+  for (unsigned int counter = 0; counter < m_CentroidsOfFiducialCandidates.size(); ++counter)
   {
     mitk::Point3D fiducialCentroid(m_CentroidsOfFiducialCandidates.at(counter));
     double distance = fiducialNo8.EuclideanDistanceTo(fiducialCentroid);
@@ -1449,7 +1449,7 @@ bool QmitkUSNavigationStepCtUsRegistration::FindFiducialNo8()
 
   mitk::Point3D fiducialNo3(m_FiducialMarkerCentroids.at(3));
 
-  for (int counter = 0; counter < m_CentroidsOfFiducialCandidates.size(); ++counter)
+  for (unsigned int counter = 0; counter < m_CentroidsOfFiducialCandidates.size(); ++counter)
   {
     mitk::Point3D fiducialCentroid(m_CentroidsOfFiducialCandidates.at(counter));
     double distance = fiducialNo3.EuclideanDistanceTo(fiducialCentroid);
@@ -1971,7 +1971,7 @@ void QmitkUSNavigationStepCtUsRegistration::OnEvaluateGroundTruthFiducialLocaliz
   this->CreatePointsToTransformForGroundTruthProtocol();
   m_GroundTruthProtocolTransformedPoints.clear();
 
-  for (int cycleNo = 0; cycleNo < m_ImagesGroundTruthProtocol.size(); ++cycleNo)
+  for (unsigned int cycleNo = 0; cycleNo < m_ImagesGroundTruthProtocol.size(); ++cycleNo)
   {
     m_FloatingImage = m_ImagesGroundTruthProtocol.at(cycleNo);
     this->SetFloatingImageGeometryInformation(m_FloatingImage.GetPointer());

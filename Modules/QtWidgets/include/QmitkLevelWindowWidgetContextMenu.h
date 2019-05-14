@@ -79,6 +79,10 @@ public:
   /// lets this object know about the LevelWindowManager to get all images and tell about changes
   void setLevelWindowManager(mitk::LevelWindowManager* levelWindowManager);
 
+signals:
+
+  void RequestUpdate();
+
 protected:
 
   /// ID of preset selected in contextmenu

@@ -42,6 +42,7 @@ QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget* parent, 
   m_IsObserverTagSet = true;
 
   m_Contextmenu = new QmitkLevelWindowWidgetContextMenu(this); // true);
+  connect(m_Contextmenu, &QmitkLevelWindowWidgetContextMenu::RequestUpdate, this, &QmitkLineEditLevelWindowWidget::RequestUpdate);
 
   auto  layout = new QVBoxLayout( this );
   layout->setMargin(0);
@@ -152,7 +153,7 @@ void QmitkLineEditLevelWindowWidget::SetLevelValue()
   double level = m_LevelInput->text().toDouble();
   m_LevelWindow.SetLevelWindow(level, m_LevelWindow.GetWindow());
   m_Manager->SetLevelWindow(m_LevelWindow);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  emit RequestUpdate();
 }
 
 //read the windowInput and change window and slider when the button "ENTER" was pressed in the windowInput-LineEdit
@@ -161,7 +162,7 @@ void QmitkLineEditLevelWindowWidget::SetWindowValue()
   double window = m_WindowInput->text().toDouble();
   m_LevelWindow.SetLevelWindow(m_LevelWindow.GetLevel(), window);
   m_Manager->SetLevelWindow(m_LevelWindow);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  emit RequestUpdate();
 }
 
 void QmitkLineEditLevelWindowWidget::contextMenuEvent( QContextMenuEvent * )

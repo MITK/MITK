@@ -31,6 +31,9 @@ public:
   QmitkLevelWindowWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
   mitk::LevelWindowManager* GetManager();
 
+signals:
+  void RequestUpdate();
+
 public slots:
   void SetDataStorage( mitk::DataStorage* ds );
 

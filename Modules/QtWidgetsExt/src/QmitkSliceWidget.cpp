@@ -61,6 +61,7 @@ QmitkSliceWidget::QmitkSliceWidget(QWidget* parent, const char* name,
       m_RenderWindow->GetSliceNavigationController()->GetSlice(),
       "navigation");
 
+  connect(levelWindow, &QmitkLevelWindowWidget::RequestUpdate, this, &QmitkSliceWidget::UpdateGL);
   SetLevelWindowEnabled(true);
 }
 

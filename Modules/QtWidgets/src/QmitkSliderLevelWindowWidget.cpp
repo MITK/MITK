@@ -51,6 +51,7 @@ QmitkSliderLevelWindowWidget::QmitkSliderLevelWindowWidget( QWidget * parent, Qt
   m_MoveHeight = height() - 25;
   m_ScaleVisible = true;
   m_Contextmenu = new QmitkLevelWindowWidgetContextMenu(this); //, true);
+  connect(m_Contextmenu, &QmitkLevelWindowWidgetContextMenu::RequestUpdate, this, &QmitkSliderLevelWindowWidget::RequestUpdate);
 
   //setBackgroundMode( Qt::NoBackground );
 
@@ -383,7 +384,7 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent )
         m_LevelWindow.SetLevelWindow( level, window );
       }
       m_Manager->SetLevelWindow(m_LevelWindow);
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      emit RequestUpdate();
     }
   }
 }

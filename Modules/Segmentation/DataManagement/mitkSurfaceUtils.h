@@ -6,6 +6,7 @@
 #include <mitkDataStorage.h>
 #include <mitkEnumerationProperty.h>
 #include <mitkImage.h>
+#include <mitkSurface.h>
 
 #include <vtkPolyData.h>
 
@@ -122,10 +123,12 @@ protected:
 
   SurfaceCreationArgs m_Args;
 
-  vtkSmartPointer<vtkPolyData> createModelMitk(DataNode::Pointer segNode, SurfaceCreator::SurfaceCreationArgs args);
-  vtkSmartPointer<vtkPolyData> createModelAgtk(DataNode::Pointer segNode, SurfaceCreator::SurfaceCreationArgs args);
+  vtkSmartPointer<vtkPolyData> createModelMitk(Image::Pointer segNode, SurfaceCreator::SurfaceCreationArgs args);
+  vtkSmartPointer<vtkPolyData> createModelAgtk(Image::Pointer segNode, SurfaceCreator::SurfaceCreationArgs args);
 
   itk::ProgressAccumulator::Pointer m_ProgressAccumulator;
+
+  Surface::Pointer m_4dRecreateSurface;
 
 };
 }

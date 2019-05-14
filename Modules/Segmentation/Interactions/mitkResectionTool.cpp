@@ -149,12 +149,15 @@ void ResectionTool::Resect(ResectionType type)
 
   DataNode* workingData = m_ToolManager->GetWorkingData().front();
   Image::Pointer segmentation = dynamic_cast<Image*>(workingData->GetData());
+  Image::Pointer mitkImage3d = Image::New();
   if (segmentation->GetDimension() > 3) {
-    Image::Pointer mitkImage3d = mitk::Image::New();
-    AccessFixedDimensionByItk_n(segmentation, extract3Dfrom4DByItk, 4U, (segmentation, targetTimeStep));
+    AccessFixedDimensionByItk_n(segmentation, extract3Dfrom4DByItk, 4U, (mitkImage3d, targetTimeStep));
+  } else {
+    mitkImage3d = segmentation;
   }
   vtkMatrix4x4* worldView = getWorldToViewTransform(m_LastEventSender->GetVtkRenderer());
-  AccessByItk_n(segmentation, AccessResectFilter, (points, worldView, type));
+  AccessByItk_n(mitkImage3d, AccessResectFilter, (points, worldView, type));
+  AccessFixedDimensionByItk_n(mitkImage3d, paste3Dto4DByItk, 3U, (segmentation, targetTimeStep));
   segmentation->Modified();
 
   SurfaceCreator::Pointer surfaceCreator = SurfaceCreator::New();

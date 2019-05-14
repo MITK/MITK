@@ -94,6 +94,12 @@ namespace mitk
     image3d->InitializeByItk<OutputImageType>(extractor->GetOutput());
     image3d->SetVolume(extractor->GetOutput()->GetBufferPointer());
   }
+
+  template<typename TPixel, unsigned int VImageDimension = 3U>
+  void paste3Dto4DByItk(itk::Image<TPixel, VImageDimension>* itkImage3d, mitk::Image* image4d, unsigned int t)
+  {
+    image4d->SetVolume(itkImage3d->GetBufferPointer(), t);
+  }
 }
 
 #endif // MITKIMAGECASTER_H

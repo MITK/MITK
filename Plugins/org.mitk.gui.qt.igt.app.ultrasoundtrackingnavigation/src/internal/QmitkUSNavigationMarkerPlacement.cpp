@@ -70,7 +70,6 @@ QmitkUSNavigationMarkerPlacement::QmitkUSNavigationMarkerPlacement()
     m_ImageAndNavigationDataLoggingTimer(new QTimer(this)),
     m_StdMultiWidget(nullptr),
     m_CombinedModality(nullptr),
-    m_ImageStreamNode(nullptr),
     m_ReinitAlreadyDone(false),
     m_IsExperimentRunning(false),
     m_CurrentApplicationName(),
@@ -93,8 +92,9 @@ QmitkUSNavigationMarkerPlacement::QmitkUSNavigationMarkerPlacement()
     m_WarnOverlay(mitk::TextAnnotation2D::New()),
     m_NavigationDataSource(nullptr),
     m_CurrentStorage(nullptr),
-    ui(new Ui::QmitkUSNavigationMarkerPlacement),
-    m_ToolVisualizationFilter(nullptr)
+    m_ToolVisualizationFilter(nullptr),
+    m_ImageStreamNode(nullptr),
+    ui(new Ui::QmitkUSNavigationMarkerPlacement)
 {
   connect(m_UpdateTimer, SIGNAL(timeout()), this, SLOT(OnTimeout()));
   connect(
@@ -315,7 +315,6 @@ void QmitkUSNavigationMarkerPlacement::OnInitializeNavigation()
   // test if it is tracked US, if yes add visualization filter
   if (m_CombinedModality->GetIsTrackedUltrasoundActive())
   {
-    mitk::TrackedUltrasound *test = dynamic_cast<mitk::TrackedUltrasound *>(this->m_CombinedModality.GetPointer());
     m_InstrumentNode = mitk::DataNode::New();
     m_InstrumentNode->SetName("Tracked US Instrument");
     m_InstrumentNode->SetData(

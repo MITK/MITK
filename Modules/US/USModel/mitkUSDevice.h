@@ -339,7 +339,7 @@ namespace mitk {
     /**
     \brief adds a new probe to the device
     */
-    virtual void AddNewProbe(mitk::USProbe::Pointer probe) {};
+    virtual void AddNewProbe(mitk::USProbe::Pointer /*probe*/) {};
 
     /**
     * \brief get the probe by its name
@@ -350,7 +350,7 @@ namespace mitk {
     /**
     * \brief Removes the Probe with the given name
     */
-    virtual void RemoveProbeByName(std::string name) {};
+    virtual void RemoveProbeByName(std::string /*name*/) {};
 
     /**
     * \brief Sets the first existing probe or the default probe of the ultrasound device
@@ -361,7 +361,7 @@ namespace mitk {
     /**
     * \brief Sets the probe with the given name as current probe if the named probe exists.
     */
-    virtual void SetCurrentProbe(std::string probename) {};
+    virtual void SetCurrentProbe(std::string /*probename*/) {};
 
     virtual void SetSpacing(double xSpacing, double ySpacing);
 

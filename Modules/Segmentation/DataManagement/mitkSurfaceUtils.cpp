@@ -4,6 +4,7 @@
 
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
+#include <mitkImageCaster.h>
 #include <mitkProgressBar.h>
 #include "mitkShowSegmentationAsAgtkSurface.h"
 #include "mitkShowSegmentationAsSurface.h"
@@ -79,18 +80,41 @@ DataNode::Pointer SurfaceCreator::createModel()
 
   vtkSmartPointer<vtkPolyData> result;
 
-  switch (m_Args.creationType) {
-    default:
-    case SurfaceCreationType::MITK:
-      result = createModelMitk(m_Input, m_Args);
-      break;
-    case SurfaceCreationType::AGTK:
-      result = createModelAgtk(m_Input, m_Args);
-      break;
+  Image::Pointer image(dynamic_cast<Image*>(m_Input->GetData()));
+  int minTimeStep = 0;
+  int maxTimeStep = 1;
+  if (image->GetDimension() > 3) {
+    if (m_Args.timestep >= 0) {
+      minTimeStep = m_Args.timestep;
+      maxTimeStep = m_Args.timestep + 1;
+    } else {
+      minTimeStep = 0;
+      maxTimeStep = image->GetDimension(3);
+    }
   }
 
-  Surface::Pointer surface = Surface::New();
-  surface->SetVtkPolyData(result);
+  Surface::Pointer surface;
+  if (m_4dRecreateSurface == nullptr) {
+    surface = Surface::New();
+  } else {
+    surface = m_4dRecreateSurface;
+  }
+
+  for (int curTimeStep = minTimeStep; curTimeStep < maxTimeStep; curTimeStep++) {
+    Image::Pointer image3d = extract3D(image, curTimeStep);
+
+    switch (m_Args.creationType) {
+      default:
+      case SurfaceCreationType::MITK:
+        result = createModelMitk(image3d, m_Args);
+        break;
+      case SurfaceCreationType::AGTK:
+        result = createModelAgtk(image3d, m_Args);
+        break;
+    }
+
+    surface->SetVtkPolyData(result, curTimeStep);
+  }
 
   DataNode::Pointer node = DataNode::New();
 
@@ -144,6 +168,7 @@ SurfaceCreator::SurfaceCreator()
 {
   m_Input = nullptr;
   m_Output = nullptr;
+  m_4dRecreateSurface = nullptr;
 
   m_ProgressAccumulator = itk::ProgressAccumulator::New();
 }
@@ -178,9 +203,17 @@ std::string SurfaceCreator::generateLogStr()
 
   result += "\"polygons\":";
   if (m_Output != nullptr) {
-    mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(m_Output->GetData());
+    Surface::Pointer surface = dynamic_cast<Surface*>(m_Output->GetData());
+    Image::Pointer image     = dynamic_cast<Image*>(m_Input->GetData());
     if (surface != nullptr) {
-      result += std::to_string(surface->GetVtkPolyData()->GetNumberOfPolys());
+      unsigned int polygonCount = 0;
+      for (int timestep = 0; timestep < image->GetDimension(3); timestep++) {
+        vtkPolyData* polyData = surface->GetVtkPolyData(timestep);
+        if (polyData != nullptr) {
+          polygonCount += polyData->GetNumberOfPolys();
+        }
+      }
+      result += std::to_string(polygonCount);
     } else {
       result += "-1";
     }
@@ -229,10 +262,12 @@ DataNode::Pointer SurfaceCreator::recreateModel()
   }
 
   DataNode::Pointer previousModel = nullptr;
+  Surface::Pointer previousSurface = nullptr;
 
   auto childs = m_Args.outputStorage->GetDerivations(m_Input);
   for (const auto& children : *childs) {
-    if (dynamic_cast<Surface*>(children->GetData()) != nullptr) {
+    previousSurface = dynamic_cast<Surface*>(children->GetData());
+    if (previousSurface != nullptr) {
       previousModel = children;
       break;
     }
@@ -252,9 +287,16 @@ DataNode::Pointer SurfaceCreator::recreateModel()
     args.removeOnComplete = previousModel;
     args.outputStorage = m_Args.outputStorage;
     args.overwrite = false;
+    args.timestep = m_Args.timestep;
 
     m_Args = args;
     return createModel();
+  }
+
+  Image::Pointer image = dynamic_cast<Image*>(m_Input->GetData());
+  // Case for recreating only one timestep from 3d model for 4d seg
+  if (image && image->GetDimension() > 3 && m_Args.timestep >= 0) {
+    m_4dRecreateSurface = previousSurface;
   }
 
   SurfaceCreationArgs args;
@@ -271,16 +313,25 @@ DataNode::Pointer SurfaceCreator::recreateModel()
   args.outputStorage = m_Args.outputStorage;
   args.overwrite = false;
   args.removeOnComplete = previousModel;
+  args.timestep = m_Args.timestep;
 
   m_Args = args;
 
   return createModel();
 }
 
-vtkSmartPointer<vtkPolyData> SurfaceCreator::createModelMitk(DataNode::Pointer segNode, SurfaceCreator::SurfaceCreationArgs args)
+Image::Pointer SurfaceCreator::extract3D(Image::Pointer multiDimImage, int targetTimeStep)
 {
-  Image::Pointer image(dynamic_cast<Image*>(segNode->GetData()));
+  if (multiDimImage->GetDimension() == 3) {
+    return multiDimImage;
+  }
+  Image::Pointer mitkImage3d = mitk::Image::New();
+  AccessFixedDimensionByItk_n(multiDimImage, extract3Dfrom4DByItk, 4U, (mitkImage3d, targetTimeStep));
+  return mitkImage3d;
+}
 
+vtkSmartPointer<vtkPolyData> SurfaceCreator::createModelMitk(Image::Pointer image, SurfaceCreator::SurfaceCreationArgs args)
+{
   ShowSegmentationAsSurface::Pointer surfaceFilter = ShowSegmentationAsSurface::New();
 
   ShowSegmentationAsSurface::InputImageType::Pointer itkImage;
@@ -315,9 +366,8 @@ vtkSmartPointer<vtkPolyData> SurfaceCreator::createModelMitk(DataNode::Pointer s
   return surfaceFilter->GetOutput();
 }
 
-vtkSmartPointer<vtkPolyData> SurfaceCreator::createModelAgtk(DataNode::Pointer segNode, SurfaceCreationArgs args)
+vtkSmartPointer<vtkPolyData> SurfaceCreator::createModelAgtk(Image::Pointer image, SurfaceCreationArgs args)
 {
-  Image::Pointer image(dynamic_cast<Image*>(segNode->GetData()));
 
   ShowSegmentationAsAgtkSurface::SurfaceComputingParameters surfaceParams;
   surfaceParams.blurSigma = .3f;

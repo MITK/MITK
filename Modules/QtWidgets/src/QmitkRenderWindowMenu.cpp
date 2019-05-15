@@ -1043,12 +1043,3 @@ void QmitkRenderWindowMenu::updateWindows()
     m_MultiWidget->crosshairManager->updateAllWindows();
   }
 }
-
-void QmitkRenderWindowMenu::resetThickSlice()
-{
-  if (m_Renderer.IsNotNull()) {
-    m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices", mitk::ResliceMethodProperty::New(0));
-    m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices.num", mitk::IntProperty::New(0));
-    m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices.showarea", mitk::BoolProperty::New(false));
-  }
-}

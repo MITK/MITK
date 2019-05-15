@@ -111,8 +111,6 @@ public:
 
   void updateAllWindows();
 
-  void resetThickSlice();
-
 protected:
   // overloaded move handler
   virtual void moveEvent(QMoveEvent* event) override;

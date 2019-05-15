@@ -47,6 +47,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCameraController.h>
 #include <mitkDataNodePickingEventObserver.h>
 #include <mitkStandaloneDataStorage.h>
+#include <mitkResliceMethodProperty.h>
 
 #include <vtkRendererCollection.h>
 #include <vtkTextProperty.h>
@@ -2617,6 +2618,10 @@ void QmitkStdMultiWidget::resetThickSlice()
 {
   unsigned int size = 4;
   for (int i = 0; i < size; i++) {
-    GetRenderWindow(i)->resetThickSlice();
+    mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(GetRenderWindow(i)->GetVtkRenderWindow());
+
+    renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices", mitk::ResliceMethodProperty::New(0));
+    renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices.num", mitk::IntProperty::New(0));
+    renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices.showarea", mitk::BoolProperty::New(false));
   }
 }

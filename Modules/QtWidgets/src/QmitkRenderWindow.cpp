@@ -622,10 +622,3 @@ void QmitkRenderWindow::updateAllWindows()
     m_MenuWidget->updateWindows();
   }
 }
-
-void QmitkRenderWindow::resetThickSlice()
-{
-  if (m_MenuWidget) {
-    m_MenuWidget->resetThickSlice();
-  }
-}

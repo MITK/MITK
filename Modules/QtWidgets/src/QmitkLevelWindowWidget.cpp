@@ -25,7 +25,9 @@ QmitkLevelWindowWidget::QmitkLevelWindowWidget(QWidget* parent, Qt::WindowFlags 
   m_Manager = mitk::LevelWindowManager::New();
 
   SliderLevelWindowWidget->setLevelWindowManager(m_Manager.GetPointer());
+  connect(SliderLevelWindowWidget, &QmitkSliderLevelWindowWidget::RequestUpdate, this, &QmitkLevelWindowWidget::RequestUpdate);
   LineEditLevelWindowWidget->setLevelWindowManager(m_Manager.GetPointer());
+  connect(LineEditLevelWindowWidget, &QmitkLineEditLevelWindowWidget::RequestUpdate, this, &QmitkLevelWindowWidget::RequestUpdate);
 }
 
 

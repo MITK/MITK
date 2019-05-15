@@ -267,6 +267,7 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mit
   connect(mitkWidget2, &QmitkRenderWindow::resized, this, &QmitkStdMultiWidget::OnWindowResized);
   connect(mitkWidget3, &QmitkRenderWindow::resized, this, &QmitkStdMultiWidget::OnWindowResized);
   connect(mitkWidget4, &QmitkRenderWindow::resized, this, &QmitkStdMultiWidget::OnWindowResized);
+  connect(levelWindowWidget, &QmitkLevelWindowWidget::RequestUpdate, this, &QmitkStdMultiWidget::RequestUpdate);
 }
 
 QWidget* QmitkStdMultiWidget::createShadowWidget(QWidget* parent)
@@ -1554,6 +1555,7 @@ void QmitkStdMultiWidget::EnableStandardLevelWindow()
   levelWindowWidget->disconnect(this);
   levelWindowWidget->SetDataStorage(mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->GetDataStorage());
   levelWindowWidget->show();
+  connect(levelWindowWidget, &QmitkLevelWindowWidget::RequestUpdate, this, &QmitkStdMultiWidget::RequestUpdate);
 }
 
 void QmitkStdMultiWidget::DisableStandardLevelWindow()

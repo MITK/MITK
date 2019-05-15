@@ -68,6 +68,10 @@ public:
   /// returns the manager who is responsible to collect and deliver changes on Level/Window
   mitk::LevelWindowManager* GetManager();
 
+signals:
+
+  void RequestUpdate();
+
 private:
 
   /// creates the contextmenu for this widget from class QmitkLevelWindowWidgetContextMenu

@@ -69,7 +69,7 @@ void QmitkLevelWindowWidgetContextMenu::setPreset(QAction* presetAction)
     }
     m_LevelWindow.SetLevelWindow(dlevel, dwindow);
     m_Manager->SetLevelWindow(m_LevelWindow);
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    emit RequestUpdate();
   }
 }
 
@@ -98,28 +98,28 @@ void QmitkLevelWindowWidgetContextMenu::useAllGreyvaluesFromImage()
 {
   m_LevelWindow.SetToImageRange(m_Manager->GetCurrentImage());
   m_Manager->SetLevelWindow(m_LevelWindow);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  emit RequestUpdate();
 }
 
 void QmitkLevelWindowWidgetContextMenu::useOptimizedLevelWindow()
 {
   m_LevelWindow.SetAuto(m_Manager->GetCurrentImage(),false,false);
   m_Manager->SetLevelWindow(m_LevelWindow);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  emit RequestUpdate();
 }
 
 void QmitkLevelWindowWidgetContextMenu::setDefaultLevelWindow()
 {
   m_LevelWindow.ResetDefaultLevelWindow();
   m_Manager->SetLevelWindow(m_LevelWindow);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  emit RequestUpdate();
 }
 
 void QmitkLevelWindowWidgetContextMenu::setMaximumWindow()
 {
   m_LevelWindow.SetToMaxWindowSize();
   m_Manager->SetLevelWindow(m_LevelWindow);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  emit RequestUpdate();
 }
 
 void QmitkLevelWindowWidgetContextMenu::setDefaultScaleRange()
@@ -127,7 +127,7 @@ void QmitkLevelWindowWidgetContextMenu::setDefaultScaleRange()
   m_LevelWindow.ResetDefaultRangeMinMax();
   m_LevelWindow.SetLevelWindow(m_LevelWindow.GetLevel(), m_LevelWindow.GetWindow());
   m_Manager->SetLevelWindow(m_LevelWindow);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  emit RequestUpdate();
 }
 
 void QmitkLevelWindowWidgetContextMenu::changeScaleRange()
@@ -140,7 +140,7 @@ void QmitkLevelWindowWidgetContextMenu::changeScaleRange()
     m_LevelWindow.SetRangeMinMax(changeRange.getLowerLimit(), changeRange.getUpperLimit());
     m_LevelWindow.SetLevelWindow(m_LevelWindow.GetLevel(), m_LevelWindow.GetWindow());
     m_Manager->SetLevelWindow(m_LevelWindow);
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    emit RequestUpdate();
   }
 }
 

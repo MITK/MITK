@@ -336,8 +336,12 @@ function generateChart(chartData)
 
   Plotly.newPlot('chart', data, layout, {displayModeBar: false, responsive: true});
 
+if (minValueX !== null && maxValueX !== null){
   UpdateMinMaxValueXView(minValueX, maxValueX);
+}
+  if (minValueY !== null && maxValueY !== null){
   UpdateMinMaxValueYView(minValueY, maxValueY);
+}
 }
 
 /**

@@ -3,7 +3,6 @@ document.body.style.backgroundColor = 'rgb(240, 240, 240)';
 const minHeight = 255;
 var chart;
 
-var chartData;
 var xErrorValuesPlus=[];
 var xErrorValuesMinus=[];
 var yErrorValuesPlus=[];

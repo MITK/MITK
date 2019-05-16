@@ -27,6 +27,7 @@ class QmitkChartxyData : public QObject
 {
   Q_OBJECT
 
+  Q_PROPERTY(QVariant m_LabelCount READ GetLabelCount CONSTANT);
   Q_PROPERTY(QList<QVariant> m_YData READ GetYData WRITE SetYData NOTIFY SignalYDataChanged);
   Q_PROPERTY(QList<QVariant> m_XData READ GetXData WRITE SetXData NOTIFY SignalXDataChanged);
   Q_PROPERTY(
@@ -45,9 +46,12 @@ class QmitkChartxyData : public QObject
 public:
   explicit QmitkChartxyData(const QMap<QVariant, QVariant> &data,
                             const QVariant &label,
-                            const QVariant &diagramType); // Constructor for Data2D (x:y=1:2, 2:6, 3:7)
+                            const QVariant &diagramType,
+                            const QVariant &position); // Constructor for Data2D (x:y=1:2, 2:6, 3:7)
 
   void SetData(const QMap<QVariant, QVariant> &data);
+
+  Q_INVOKABLE QVariant GetLabelCount() const { return m_LabelCount; }
 
   Q_INVOKABLE QList<QVariant> GetYData() const { return m_YData; };
   Q_INVOKABLE void SetYData(const QList<QVariant> &yData)
@@ -136,6 +140,8 @@ signals:
   void SignalLineStyleChanged(const QVariant lineStyle);
 
 private:
+  /** js needs to know which label position in the list QmitkChartWidget::Impl::m_C3xyData it has for updating the values*/
+  const QVariant m_LabelCount;
   QList<QVariant> m_YData;
   QList<QVariant> m_XData;
   QList<QVariant> m_XErrorDataPlus;

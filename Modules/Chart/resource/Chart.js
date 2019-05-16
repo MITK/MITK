@@ -53,18 +53,48 @@ window.onload = function()
 	function handleChartChangeEvents(registeredChannelObject)
 	{
 	  registeredChannelObject.SignalXAxisLabelChanged.connect(function(newValue){
-		console.log("label changed");
-		console.log(newValue);
 		var layout = {
 		  xaxis: {
 			title: {
 			text: newValue
-			}
+			},
+			color: foregroundColor
 		  }
 		}
 		Plotly.relayout('chart', layout);
 	  });
-		
+
+	  registeredChannelObject.SignalYAxisLabelChanged.connect(function(newValue){
+		var layout = {
+		  yaxis: {
+			title: {
+			text: newValue
+			},
+			color: foregroundColor
+		  }
+		}
+		Plotly.relayout('chart', layout);
+	  });
+
+	  registeredChannelObject.SignalTitleChanged.connect(function(newValue){
+		var layout = {
+		      title: {
+				text:newValue,
+				font: {
+					color: foregroundColor
+				}
+			  }
+		}
+		Plotly.relayout('chart', layout);
+	  });
+
+	  registeredChannelObject.SignalLegendPositionChanged.connect(function(newValue){
+		let legendPosition = generateLegendPosition(chartData.m_LegendPosition);
+		var layout = {
+				legend: legendPosition
+		}
+		Plotly.relayout('chart', layout);
+	  });
 	}
 
   new QWebChannel(qt.webChannelTransport, function(channel) {

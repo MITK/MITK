@@ -1,0 +1,12 @@
+--- a/Modules/ThirdParty/VNL/src/vxl/vcl/vcl_compiler.h	2018-08-09 02:55:29.000000000 +0400
++++ b/Modules/ThirdParty/VNL/src/vxl/vcl/vcl_compiler.h	2019-05-15 10:43:50.811648495 +0400
+@@ -98,7 +98,8 @@
+ #   define VCL_GCC_80
+ #  endif
+ # else
+-#  error "Dunno about this gcc"
++#  define VCL_GCC_8
++#  define VCL_GCC_83
+ # endif
+ #endif
+ 

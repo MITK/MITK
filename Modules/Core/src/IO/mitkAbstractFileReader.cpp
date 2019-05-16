@@ -176,7 +176,7 @@ us::ServiceRegistration<IFileReader> AbstractFileReader::RegisterService(us::Mod
 
   if (this->GetMimeType()->GetName().empty())
   {
-    MITK_WARN << "Not registering reader due to empty MIME type.";
+    //MITK_WARN << "Not registering reader due to empty MIME type.";
     return us::ServiceRegistration<IFileReader>();
   }
 

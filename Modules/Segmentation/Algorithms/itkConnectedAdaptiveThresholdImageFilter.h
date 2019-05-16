@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __itkConnectedAdaptiveThresholdImageFilter_h
 
 #include "itkImage.h"
-#include "itkConnectedThresholdImageFilter.h"
+#include "itkConnectedThresholdImageFilter1.h"
 
 
 namespace itk

@@ -150,8 +150,8 @@ private:
   QList<QVariant> m_YErrorDataMinus;
   QVariant m_Label;
   QVariant m_ChartType;
-  QVariant m_Color;
-  QVariant m_LineStyleName;
+  QVariant m_Color = "";
+  QVariant m_LineStyleName = "solid";
 };
 
 #endif // QmitkC3xyData_h

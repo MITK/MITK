@@ -121,7 +121,8 @@ private:
   std::map<QmitkChartWidget::AxisScale, std::string> m_AxisScaleToName;
 };
 
-std::string QmitkChartWidget::Impl::GetThemeName() const {
+std::string QmitkChartWidget::Impl::GetThemeName() const
+{
   return m_C3Data.GetThemeName().toString().toStdString();
 }
 
@@ -498,7 +499,7 @@ void QmitkChartWidget::Impl::InitializeJavaScriptChart()
 {
   auto alreadyRegisteredObjects = m_WebChannel->registeredObjects();
   auto alreadyRegisteredObjectsValues = alreadyRegisteredObjects.values();
-  //only register objects that have not been registered yet
+  // only register objects that have not been registered yet
   if (alreadyRegisteredObjectsValues.indexOf(&m_C3Data) == -1)
   {
     m_WebChannel->registerObject(QStringLiteral("chartData"), &m_C3Data);
@@ -531,7 +532,8 @@ std::string QmitkChartWidget::Impl::GetUniqueLabelName(const QList<QVariant> &la
   return currentLabel.toStdString();
 }
 
-QmitkChartWidget::QmitkChartWidget(QWidget *parent) : QWidget(parent), m_Impl(new Impl(this)) {
+QmitkChartWidget::QmitkChartWidget(QWidget *parent) : QWidget(parent), m_Impl(new Impl(this))
+{
   connect(this, &QmitkChartWidget::PageSuccessfullyLoaded, this, &QmitkChartWidget::OnPageSuccessfullyLoaded);
 }
 
@@ -650,7 +652,8 @@ void QmitkChartWidget::OnLoadFinished(bool isLoadSuccessful)
   }
 }
 
-void QmitkChartWidget::OnPageSuccessfullyLoaded() {
+void QmitkChartWidget::OnPageSuccessfullyLoaded()
+{
   auto themeName = m_Impl->GetThemeName();
   QString command;
   if (themeName == "dark")
@@ -665,7 +668,8 @@ void QmitkChartWidget::OnPageSuccessfullyLoaded() {
   m_Impl->CallJavaScriptFuntion(command);
 }
 
-std::string QmitkChartWidget::convertBooleanValue(bool value) const {
+std::string QmitkChartWidget::convertBooleanValue(bool value) const
+{
   std::stringstream converter;
   converter << std::boolalpha << value;
   return converter.str();
@@ -695,13 +699,14 @@ void QmitkChartWidget::SetShowErrorBars(bool showErrorBars)
 
 void QmitkChartWidget::UpdateMinMaxValueXView(double minValueX, double maxValueX)
 {
-  QString minMaxValueXString = QString::fromStdString(std::to_string(minValueX))+QString(",");
+  QString minMaxValueXString = QString::fromStdString(std::to_string(minValueX)) + QString(",");
   minMaxValueXString += QString::fromStdString(std::to_string(maxValueX));
   const QString command = QString("UpdateMinMaxValueXView(" + minMaxValueXString + ")");
   m_Impl->CallJavaScriptFuntion(command);
 }
 
-void QmitkChartWidget::UpdateMinMaxValueYView(double minValueY, double maxValueY) {
+void QmitkChartWidget::UpdateMinMaxValueYView(double minValueY, double maxValueY)
+{
   QString minMaxValueYString = QString::fromStdString(std::to_string(minValueY)) + QString(",");
   minMaxValueYString += QString::fromStdString(std::to_string(maxValueY));
   const QString command = QString("UpdateMinMaxValueYView(" + minMaxValueYString + ")");

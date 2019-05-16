@@ -39,6 +39,8 @@ public:
 protected:
   virtual void CreateQtPartControl(QWidget *parent) override;
 
+  void CreateConnectionsForGUIElements();
+
   virtual void SetFocus() override;
 
   void CreateChart();

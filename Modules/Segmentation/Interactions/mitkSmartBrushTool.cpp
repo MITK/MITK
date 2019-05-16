@@ -424,7 +424,7 @@ void mitk::SmartBrushTool::MouseMovedImpl(const mitk::PlaneGeometry* planeGeomet
     itk::Image<float, 3>::SizeType imageSize = m_OriginalImage->GetLargestPossibleRegion().GetSize();
 
     for (int i = 0; i < 3; i++) {
-      if (brushStart[i] >= imageSize[i]) {
+      if (brushStart[i] >= (int)imageSize[i]) {
         return; // Brush outside of image
       }
     }
@@ -435,7 +435,7 @@ void mitk::SmartBrushTool::MouseMovedImpl(const mitk::PlaneGeometry* planeGeomet
         brushSize[i] += brushStart[i];
         brushStart[i] = 0;
       }
-      if ((brushStart[i] + brushSize[i]) >= imageSize[i]) {
+      if ((brushStart[i] + brushSize[i]) >= (int)imageSize[i]) {
         brushSize[i] -= (brushStart[i] + brushSize[i]) - imageSize[i];
       }
     }
@@ -594,7 +594,7 @@ void mitk::SmartBrushTool::CheckIfCurrentSliceHasChanged(const mitk::PlaneGeomet
     rescaleFilter->SetOutputMaximum(1.f);
     rescaleFilter->SetWindowMinimum(levelWindow.GetLowerWindowBound());
     rescaleFilter->SetWindowMaximum(levelWindow.GetUpperWindowBound());
-    rescaleFilter->SetInPlace(true);
+    rescaleFilter->SetInPlace(false);
     rescaleFilter->Update();
     m_OriginalImage = rescaleFilter->GetOutput();
 

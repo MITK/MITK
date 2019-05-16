@@ -287,6 +287,8 @@ public slots:
 
   void ResetCrosshair();
 
+  void resetThickSlice();
+
 signals:
 
   void LeftMouseClicked(mitk::Point3D pointValue);

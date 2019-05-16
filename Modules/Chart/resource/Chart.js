@@ -35,14 +35,51 @@ window.onload = function()
 	 */
 	function handleDataChangeEvents(registeredChannelObject)
 	{
+	  let position = registeredChannelObject.m_LabelCount;
 	  registeredChannelObject.SignalDiagramTypeChanged.connect(function(newValue){
 		console.log("diagram type changed");
 		console.log(newValue);
+		let updateDiagramType = generateTraceByChartType(newValue);
+		Plotly.restyle('chart', updateDiagramType, position);
 	  });
 
 	  registeredChannelObject.SignalLineStyleChanged.connect(function(newValue){
 		console.log("line style changed");
 		console.log(newValue);
+		var dashValue;
+		if (newValue == "dashed"){
+			dashValue = "dot";
+		}
+		else {
+			dashValue = "solid";
+		}
+		updateDash = {
+				line : {
+					"dash" : dashValue
+				}
+			}
+
+		Plotly.restyle('chart', updateDash, position);
+	  });
+
+	  registeredChannelObject.SignalColorChanged.connect(function(newValue){
+		var updateColor={
+			marker:{
+				"color" : newValue
+			},
+			line:{
+				"color" : newValue
+			}
+		}
+		Plotly.restyle('chart', updateColor, position);
+	  });
+
+	  registeredChannelObject.SignalXDataChanged.connect(function(newValue){
+		console.log("xdata changed");
+	  });
+
+	  registeredChannelObject.SignalYDataChanged.connect(function(newValue){
+		console.log("ydata changed");
 	  });
 	}
 

@@ -100,6 +100,9 @@ public:
   */
   void AddData1D(const std::vector<double>& data1D, const std::string& label, ChartType chartType = ChartType::bar);
 
+  void UpdateData1D(const std::vector<double> &data1D, const std::string &label);
+  void UpdateData2D(const std::map<double, double> &data2D, const std::string &label);
+
   /*!
   * \brief Adds 2D data to the widget. Call repeatedly for displaying multiple charts.
   * \details each entry represents a data point: key: value --> x-value: y-value.

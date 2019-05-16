@@ -219,6 +219,13 @@ void QmitkChartWidget::Impl::AddData2D(const std::map<double, double> &data2D,
     SetShowDataPoints(true);
     MITK_INFO << "Enabling data points for all because of scatter plot";
   }
+  unsigned int sizeOfC3xyData = static_cast<unsigned int>(m_C3xyData.size());
+  m_C3xyData.push_back(std::make_unique<QmitkChartxyData>(data2DConverted,
+                                                          QVariant(QString::fromStdString(uniqueLabel)),
+                                                          QVariant(QString::fromStdString(chartTypeName)),
+                                                          QVariant(sizeOfC3xyData)));
+}
+
 void QmitkChartWidget::Impl::UpdateData1D(const std::vector<double> &data1D, const std::string &label)
 {
   std::map<double, double> transformedData2D;
@@ -245,8 +252,6 @@ void QmitkChartWidget::Impl::UpdateData2D(const std::map<double, double> &data2D
     }
     element->SetData(data2DConverted);
   }
-  m_C3xyData.push_back(std::make_unique<QmitkChartxyData>(
-    data2DConverted, QVariant(QString::fromStdString(uniqueLabel)), QVariant(QString::fromStdString(chartTypeName))));
 }
 
 void QmitkChartWidget::Impl::RemoveData(const std::string &label)

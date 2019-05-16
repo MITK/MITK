@@ -237,20 +237,36 @@ function generateStackPlotData(){
   return data;
 }
 
+function generateTraceByChartType(chartType){
+	let plotlyChartType = getPlotlyChartType(chartType);
+
+	let trace = {
+      type: plotlyChartType,
+    };
+	trace["line"] = {}
+	if (plotlyChartType == "area"){
+      trace["fill"] = 'tozeroy'
+    } else if (plotlyChartType == "spline"){
+      trace["line"]["shape"] = 'spline'
+    } else if (plotlyChartType == "scatterOnly"){
+      trace["mode"] = 'markers';
+    } else if (plotlyChartType == "area-spline"){
+      trace["fill"] = 'tozeroy'
+      trace["line"]["shape"] = 'spline'
+    }
+
+	return trace;
+}
+
 function generatePlotData(){
   let data = [];
 
   for (let index = 0; index < dataLabels.length; index++){
+	let trace = generateTraceByChartType(dataProperties[dataLabels[index]]["chartType"]);
 
-    let inputType = dataProperties[dataLabels[index]]["chartType"];
-    let chartType = getPlotlyChartType(inputType);
-
-    let trace = {
-      x: xValues[index].slice(1),
-      y: yValues[index].slice(1),
-      type: chartType,
-      name: dataLabels[index],
-    };
+	trace["x"] = xValues[index].slice(1);
+	trace["y"] = yValues[index].slice(1);
+	trace["name"] = dataLabels[index];
 
 	  if(typeof xErrorValuesPlus[index] !== 'undefined'){
 		  if(typeof xErrorValuesMinus[index] !== 'undefined' && xErrorValuesMinus[index].length > 0)
@@ -271,21 +287,7 @@ function generatePlotData(){
 	  }
 
     // ===================== CHART TYPE OPTIONS HANDLING ===========
-    // initialize line object
-    trace["line"] = {}
-
 	trace["line"]["color"] = dataProperties[dataLabels[index]]["color"]
-    if (chartType == "scatter"){
-    } else if (chartType == "area"){
-      trace["fill"] = 'tozeroy'
-    } else if (chartType == "spline"){
-      trace["line"]["shape"] = 'spline'
-    } else if (chartType == "scatterOnly"){
-      trace["mode"] = 'markers';
-    } else if (chartType == "area-spline"){
-      trace["fill"] = 'tozeroy'
-      trace["line"]["shape"] = 'spline'
-    }
 
     // handle marker visibility/size/color
     trace["marker"] = {size: chartData.m_DataPointSize, color: dataProperties[dataLabels[index]]["color"]}

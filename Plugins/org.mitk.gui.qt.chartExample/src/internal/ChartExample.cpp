@@ -143,7 +143,8 @@ void ChartExample::CreateChart()
 void ChartExample::UpdateChart() {
   // Test update mechanism
   m_Controls.m_Chart->SetLineStyle("test0", QmitkChartWidget::LineStyle::dashed);
-  m_Controls.m_Chart->SetXAxisLabel("Test Label");
+  m_Controls.m_Chart->SetChartType("test0", QmitkChartWidget::ChartType::spline);
+  m_Controls.m_Chart->SetColor("test0", "violet");
 }
 
 void ChartExample::ClearChart()

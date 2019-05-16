@@ -32,6 +32,8 @@ void QmitkChartxyData::SetData(const QMap<QVariant, QVariant>& data)
 		m_XData.push_back(entry.first);
 		m_YData.push_back(entry.second);
 	}
+  emit SignalXDataChanged(m_XData);
+  emit SignalYDataChanged(m_YData);
 }
 
 void QmitkChartxyData::ClearData()

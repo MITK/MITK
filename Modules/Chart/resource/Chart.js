@@ -167,6 +167,45 @@ function generateErrorBars(errors, visible){
 	return errorObject;
 }
 
+/**
+ * Generate legend position  object
+ *
+ * @param legendPosition the string of the legendPosition enum from QmitkChartWidget
+ * @return legend position object
+ */
+function generateLegendPosition(legendPosition){
+  if (legendPosition == "bottomMiddle"){
+	  var legendX = 0.5;
+	  var legendY = -0.75;
+  }
+  else if (legendPosition == "bottomRight"){
+	  var legendX = 1;
+	  var legendY = 0;
+  }
+  else if (legendPosition == "topRight"){
+	  var legendX = 1;
+	  var legendY = 1;
+  }
+  else if (legendPosition == "topLeft"){
+	  var legendX = 0;
+	  var legendY = 1;
+  }
+  else if (legendPosition == "middleRight"){
+	  var legendX = 1;
+	  var legendY = 0.5;
+  }
+
+	let legendPositionObject = {
+		x: legendX,
+		y: legendY,
+		font : {
+			color: foregroundColor
+		}
+	}
+
+	return legendPositionObject;
+}
+
 function generateErrorBarsAsymmetric(errorsPlus, errorsMinus, visible){
 	let errorObject = generateErrorBars(errorsPlus, visible);
 	errorObject["arrayminus"] = errorsMinus;
@@ -291,26 +330,8 @@ function generateChart(chartData)
   //=============================== STYLE ========================
   let marginTop = chartData.m_chartTitle == undefined ? 10 : 50;
 
-  if (chartData.m_LegendPosition == "bottomMiddle"){
-	  var legendX = 0.5;
-	  var legendY = -0.75;
-  }
-  else if (chartData.m_LegendPosition == "bottomRight"){
-	  var legendX = 1;
-	  var legendY = 0;
-  }
-  else if (chartData.m_LegendPosition == "topRight"){
-	  var legendX = 1;
-	  var legendY = 1;
-  }
-  else if (chartData.m_LegendPosition == "topLeft"){
-	  var legendX = 0;
-	  var legendY = 1;
-  }
-  else if (chartData.m_LegendPosition == "middleRight"){
-	  var legendX = 1;
-	  var legendY = 0.5;
-  }
+  let legendPosition = generateLegendPosition(chartData.m_LegendPosition);
+
   var layout = {
 	  paper_bgcolor : backgroundColor,
 	  plot_bgcolor : backgroundColor,
@@ -340,13 +361,7 @@ function generateChart(chartData)
       pad: 4
     },
 	showlegend: chartData.m_ShowLegend,
-	legend: {
-		x: legendX,
-		y: legendY,
-		font : {
-			color: foregroundColor
-		}
-	}
+	legend: legendPosition
   };
 
   if (chartData.m_StackedData){

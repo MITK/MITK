@@ -88,6 +88,7 @@ void ChartExample::CreateConnectionsForGUIElements()
   connect(m_Controls.m_doubleSpinBox_maxZoomX, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoomX);
   connect(m_Controls.m_doubleSpinBox_minZoomY, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoomY);
   connect(m_Controls.m_doubleSpinBox_maxZoomY, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoomY);
+  connect(m_Controls.m_comboBoxLegendPosition, &QComboBox::currentTextChanged, this, &ChartExample::OnLegendPositionChanged);
 }
 
 void ChartExample::FillRandomDataValues()
@@ -340,4 +341,10 @@ QmitkChartWidget::ColorTheme ChartExample::GetColorTheme() const
     }
   }
   return QmitkChartWidget::ColorTheme::darkstyle;
+}
+
+void ChartExample::OnLegendPositionChanged() {
+  auto legendPosition =
+    m_LegendPositionNameToLegendPositionType.at(m_Controls.m_comboBoxLegendPosition->currentText().toStdString());
+  m_Controls.m_Chart->SetLegendPosition(legendPosition);
 }

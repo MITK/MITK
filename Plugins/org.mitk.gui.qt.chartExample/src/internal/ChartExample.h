@@ -65,6 +65,7 @@ private:
   std::string ConvertToText(std::vector<double> numbers, std::string delimiter = ";") const;
   std::string ConvertToText(std::map<double, double> numbers, std::string delimiter = ";") const;
   QmitkChartWidget::ColorTheme GetColorTheme() const;
+  void OnLegendPositionChanged();
 
   std::map<std::string, QmitkChartWidget::ChartType> m_ChartNameToChartType;
   std::map<std::string, QmitkChartWidget::LineStyle> m_LineNameToLineType;

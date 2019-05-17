@@ -63,9 +63,9 @@ void vtkInternalOpenGLRenderWindow::Render()
 void vtkInternalOpenGLRenderWindow::SetFramebufferObject(QOpenGLFramebufferObject *fbo)
 {
   this->SetFrontBuffer(GL_COLOR_ATTACHMENT0);
-  this->SetFrontRightBuffer(GL_COLOR_ATTACHMENT0);
+  this->SetFrontLeftBuffer(GL_COLOR_ATTACHMENT0);
+  this->SetBackBuffer(GL_COLOR_ATTACHMENT0);
   this->SetBackLeftBuffer(GL_COLOR_ATTACHMENT0);
-  this->SetBackRightBuffer(GL_COLOR_ATTACHMENT0);
 
   QSize fboSize = fbo->size();
   this->SetSize(fboSize.width(), fboSize.height());

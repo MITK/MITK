@@ -43,6 +43,7 @@ protected:
 
   double Distance(itk::Image<float, 3>::IndexType a, itk::Image<float, 3>::IndexType b);
   float CalcChange(itk::Image<float, 3>::IndexType x, float xValue);
+  inline float FabsWithNaN(float a, float b);
 
   SmartBrushStrokeFilter(const SmartBrushStrokeFilter&);
   void operator=(const SmartBrushStrokeFilter&);
@@ -76,10 +77,19 @@ double SmartBrushStrokeFilter<TImageType>::Distance(itk::Image<float, 3>::IndexT
   return p1.EuclideanDistanceTo(p0);
 }
 
+// If one of values is NaN returns 1.f
+// If both of values are NaN returns 0.f
+// If none of values are NaN returns fabs
+template <typename TImageType>
+float SmartBrushStrokeFilter<TImageType>::FabsWithNaN(float a, float b)
+{
+  return (!isnan(a) && !isnan(b)) ? fabs(a - b) : (isnan(a) + isnan(b)) % 2;
+}
+
 template <typename TImageType>
 float SmartBrushStrokeFilter<TImageType>::CalcChange(itk::Image<float, 3>::IndexType x, float xValue)
 {
-  return BETA_MAX * pow(1 - fabs(m_TargetIntensity - xValue), K_MIN + (K_MAX - K_MIN) * m_Sensitivity)
+  return BETA_MAX * pow(1 - FabsWithNaN(m_TargetIntensity, xValue), K_MIN + (K_MAX - K_MIN) * m_Sensitivity)
     * std::max((m_Radius - Distance(x, m_Center)) / m_Radius, 0.);
 }
 

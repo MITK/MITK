@@ -50,7 +50,7 @@ void IntelligentBinaryClosingFilter<TInputImage, TOutputImage>::GenerateData()
 
   // set up structuring element for closing
   StructuringElementType seClosing;
-  unsigned long radius[ImageDimension];
+  itk::SizeValueType radius[ImageDimension];
   const typename InputImageType::SpacingType spacing = input->GetSpacing();
   for (unsigned int d=0; d<ImageDimension; d++)
   { // closing works in voxel coordinates, so use spacing (and add 0.5 for correct rounding - cast just truncates)

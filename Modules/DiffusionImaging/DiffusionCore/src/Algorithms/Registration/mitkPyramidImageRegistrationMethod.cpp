@@ -20,32 +20,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 
 mitk::PyramidImageRegistrationMethod::PyramidImageRegistrationMethod()
-  : m_FixedImage(NULL),
-    m_MovingImage(NULL),
-    m_CrossModalityRegistration(true),
-    m_UseAffineTransform(true),
-    m_UseWindowedSincInterpolator(false),
-    m_UseNearestNeighborInterpolator(false),
-    m_UseMask(false),
-    m_EstimatedParameters(0),
-    m_InitialParameters(0),
-    m_Verbose(false)
+  : m_FixedImage(nullptr),
+  m_MovingImage(nullptr),
+  m_CrossModalityRegistration(true),
+  m_UseAffineTransform(true),
+  m_UseWindowedSincInterpolator(false),
+  m_UseNearestNeighborInterpolator(false),
+  m_UseMask(false),
+  m_EstimatedParameters(nullptr),
+  m_InitialParameters(0),
+  m_Verbose(false)
 {
 
 }
 
 mitk::PyramidImageRegistrationMethod::~PyramidImageRegistrationMethod()
 {
-  if( m_EstimatedParameters != NULL)
+  if (m_EstimatedParameters != nullptr)
   {
-    delete [] m_EstimatedParameters;
+    delete[] m_EstimatedParameters;
   }
 
 }
 
 void mitk::PyramidImageRegistrationMethod::SetFixedImage(mitk::Image::Pointer fixed)
 {
-  if( fixed.IsNotNull() )
+  if (fixed.IsNotNull())
   {
     m_FixedImage = fixed;
   }
@@ -53,7 +53,7 @@ void mitk::PyramidImageRegistrationMethod::SetFixedImage(mitk::Image::Pointer fi
 
 void mitk::PyramidImageRegistrationMethod::SetMovingImage(mitk::Image::Pointer moving)
 {
-  if( moving.IsNotNull() )
+  if (moving.IsNotNull())
   {
     m_MovingImage = moving;
   }
@@ -67,20 +67,20 @@ void mitk::PyramidImageRegistrationMethod::SetFixedImageMask(mitk::Image::Pointe
 
 void mitk::PyramidImageRegistrationMethod::Update()
 {
-  if( m_MovingImage.IsNull() )
+  if (m_MovingImage.IsNull())
   {
     mitkThrow() << " Moving image is null";
   }
 
-  if( m_FixedImage.IsNull() )
+  if (m_FixedImage.IsNull())
   {
     mitkThrow() << " Moving image is null";
   }
 
   unsigned int allowedDimension = 3;
 
-  if( m_FixedImage->GetDimension() != allowedDimension ||
-      m_MovingImage->GetDimension() != allowedDimension )
+  if (m_FixedImage->GetDimension() != allowedDimension ||
+    m_MovingImage->GetDimension() != allowedDimension)
   {
     mitkThrow() << " Only 3D Images supported.";
   }
@@ -90,7 +90,7 @@ void mitk::PyramidImageRegistrationMethod::Update()
   // pixel type combinations!
   // AccessTwoImagesFixedDimensionByItk( m_FixedImage, m_MovingImage, RegisterTwoImages, 3);
   // in helper: TypeSubset : short, float
-  AccessTwoImagesFixedDimensionTypeSubsetByItk( m_FixedImage, m_MovingImage, RegisterTwoImagesV4, 3);
+  AccessTwoImagesFixedDimensionTypeSubsetByItk(m_FixedImage, m_MovingImage, RegisterTwoImagesV4, 3);
 
 }
 
@@ -98,7 +98,7 @@ mitk::PyramidImageRegistrationMethod::TransformMatrixType mitk::PyramidImageRegi
 ::GetLastRotationMatrix()
 {
   TransformMatrixType output;
-  if( m_EstimatedParameters == NULL )
+  if (m_EstimatedParameters == nullptr)
   {
     output.set_identity();
     return output;
@@ -107,15 +107,15 @@ mitk::PyramidImageRegistrationMethod::TransformMatrixType mitk::PyramidImageRegi
   typedef itk::MatrixOffsetTransformBase< double, 3, 3> BaseTransformType;
   BaseTransformType::Pointer base_transform = BaseTransformType::New();
 
-  if( this->m_UseAffineTransform )
+  if (this->m_UseAffineTransform)
   {
     typedef itk::AffineTransform< double > TransformType;
     TransformType::Pointer transform = TransformType::New();
 
-    TransformType::ParametersType affine_params( TransformType::ParametersDimension );
-    this->GetParameters( &affine_params[0] );
+    TransformType::ParametersType affine_params(TransformType::ParametersDimension);
+    this->GetParameters(&affine_params[0]);
 
-    transform->SetParameters( affine_params );
+    transform->SetParameters(affine_params);
     base_transform = transform;
   }
   else
@@ -123,10 +123,10 @@ mitk::PyramidImageRegistrationMethod::TransformMatrixType mitk::PyramidImageRegi
     typedef itk::Euler3DTransform< double > RigidTransformType;
     RigidTransformType::Pointer rtransform = RigidTransformType::New();
 
-    RigidTransformType::ParametersType rigid_params( RigidTransformType::ParametersDimension  );
-    this->GetParameters( &rigid_params[0] );
+    RigidTransformType::ParametersType rigid_params(RigidTransformType::ParametersDimension);
+    this->GetParameters(&rigid_params[0]);
 
-    rtransform->SetParameters( rigid_params );
+    rtransform->SetParameters(rigid_params);
 
     base_transform = rtransform;
   }
@@ -142,7 +142,7 @@ mitk::Image::Pointer mitk::PyramidImageRegistrationMethod
   mitk::Image::Pointer output = mitk::Image::New();
   //output->Initialize( this->m_FixedImage );
 
-  AccessFixedDimensionByItk_1( this->m_MovingImage, ResampleMitkImage, 3, output );
+  AccessFixedDimensionByItk_1(this->m_MovingImage, ResampleMitkImage, 3, output);
 
   return output;
 
@@ -154,24 +154,24 @@ mitk::Image::Pointer mitk::PyramidImageRegistrationMethod::GetResampledMovingIma
 
 
   unsigned int dim = 12;
-  if( !m_UseAffineTransform )
+  if (!m_UseAffineTransform)
     dim = 6;
 
-  if (m_EstimatedParameters == NULL)
+  if (m_EstimatedParameters == nullptr)
     m_EstimatedParameters = new double[dim];
 
   double tmpParams[12];
   // save and set temporal transformation values
-  for( unsigned int i=0; i<dim; i++)
+  for (unsigned int i = 0; i<dim; i++)
   {
     tmpParams[i] = m_EstimatedParameters[i];
     m_EstimatedParameters[i] = transform[i];
   }
 
-  AccessFixedDimensionByItk_1( movingImage, ResampleMitkImage, 3, output );
+  AccessFixedDimensionByItk_1(movingImage, ResampleMitkImage, 3, output);
 
   // Restore old values
-  for( unsigned int i=0; i<dim; i++)
+  for (unsigned int i = 0; i<dim; i++)
   {
     m_EstimatedParameters[i] = tmpParams[i];
   }
@@ -218,7 +218,7 @@ RegisterTwoImagesV4(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image
   // initial parameter dimension ( affine = default )
   unsigned int paramDim = 12;
   typename BaseTransformType::Pointer transform;
-  if( m_UseAffineTransform )
+  if (m_UseAffineTransform)
   {
     transform = AffineTransformType::New();
   }
@@ -231,7 +231,7 @@ RegisterTwoImagesV4(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image
   typename BaseTransformType::ParametersType initialParams(paramDim);
 
   initialParams.Fill(0);
-  if( m_UseAffineTransform )
+  if (m_UseAffineTransform)
   {
     initialParams[0] = initialParams[4] = initialParams[8] = 1;
   }
@@ -244,16 +244,16 @@ RegisterTwoImagesV4(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image
 
   try
   {
-    caster_f->SetInput(0, referenceImage );
-    caster_m->SetInput(0, movingImage );
+    caster_f->SetInput(0, referenceImage);
+    caster_m->SetInput(0, movingImage);
 
     caster_f->Update();
     caster_m->Update();
 
   }
-  catch( const itk::ExceptionObject &/*e*/ )
+  catch (const itk::ExceptionObject &/*e*/)
   {
-    return ;
+    return;
   }
 
   // [Prepare Registration]
@@ -263,7 +263,7 @@ RegisterTwoImagesV4(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image
   unsigned int max_schedule_val = 8;
   const unsigned int min_required_image_size = 12;
   typename ItkImageTypeFixed::RegionType::SizeType image_size = referenceImage->GetLargestPossibleRegion().GetSize();
-  unsigned int min_value = std::min( image_size[0], std::min( image_size[1], image_size[2]));
+  unsigned int min_value = std::min(image_size[0], std::min(image_size[1], image_size[2]));
 
   // Adapt also the optimizer settings to the number of levels
   float optmaxstep = 10;
@@ -271,7 +271,7 @@ RegisterTwoImagesV4(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image
   unsigned int iterations = 40;
   unsigned int convergence_win_size = 8;
   double convergence_tolerance = 1e-5;
-  while( max_schedule_val > 1.0 && (min_value / max_schedule_val < min_required_image_size) )
+  while (max_schedule_val > 1.0 && (min_value / max_schedule_val < min_required_image_size))
   {
     max_schedule_val /= 2;
     max_pyramid_lvl--;
@@ -285,12 +285,12 @@ RegisterTwoImagesV4(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image
   shrink_factors.Fill(1);
 
   shrink_factors[0] = max_schedule_val;
-  for( unsigned int i=1; i<max_pyramid_lvl; i++)
+  for (unsigned int i = 1; i<max_pyramid_lvl; i++)
   {
-    shrink_factors[i] = std::max( shrink_factors[i-1]/2, 1ul);
+    shrink_factors[i] = std::max(shrink_factors[i - 1] / 2, itk::SizeValueType(1));
   }
 
-  if(m_Verbose)
+  if (m_Verbose)
   {
     MITK_INFO("dw.pyramid.reg") << "  : Pyramid size set to : " << max_pyramid_lvl;
   }
@@ -300,15 +300,15 @@ RegisterTwoImagesV4(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image
   //  (i) Use the scales estimator ( depends on metric )
   typename OptimizerType::Pointer optimizer = OptimizerType::New();
   typename BaseMetricType::Pointer base_metric;
-  if( m_CrossModalityRegistration )
+  if (m_CrossModalityRegistration)
   {
     typename MIMetricType::Pointer metric = MIMetricType::New();
 
     typename itk::RegistrationParameterScalesFromPhysicalShift< MIMetricType >::Pointer mi_estimator =
-             itk::RegistrationParameterScalesFromPhysicalShift< MIMetricType >::New();
-    mi_estimator->SetMetric( metric );
+      itk::RegistrationParameterScalesFromPhysicalShift< MIMetricType >::New();
+    mi_estimator->SetMetric(metric);
 
-    optimizer->SetScalesEstimator( mi_estimator );
+    optimizer->SetScalesEstimator(mi_estimator);
 
     base_metric = metric;
   }
@@ -317,52 +317,52 @@ RegisterTwoImagesV4(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image
     typename NCMetricType::Pointer metric = NCMetricType::New();
 
     typename itk::RegistrationParameterScalesFromPhysicalShift< NCMetricType >::Pointer nc_estimator =
-             itk::RegistrationParameterScalesFromPhysicalShift< NCMetricType >::New();
+      itk::RegistrationParameterScalesFromPhysicalShift< NCMetricType >::New();
 
-    nc_estimator->SetMetric( metric );
+    nc_estimator->SetMetric(metric);
 
-    optimizer->SetScalesEstimator( nc_estimator );
+    optimizer->SetScalesEstimator(nc_estimator);
 
     base_metric = metric;
   }
 
-  optimizer->SetDoEstimateLearningRateOnce( false );
-  optimizer->SetDoEstimateLearningRateAtEachIteration( true );
-  optimizer->SetNumberOfIterations( iterations );
-  optimizer->SetConvergenceWindowSize( convergence_win_size );
-  optimizer->SetMaximumStepSizeInPhysicalUnits( optmaxstep );
-  optimizer->SetMinimumConvergenceValue( convergence_tolerance );
+  optimizer->SetDoEstimateLearningRateOnce(false);
+  optimizer->SetDoEstimateLearningRateAtEachIteration(true);
+  optimizer->SetNumberOfIterations(iterations);
+  optimizer->SetConvergenceWindowSize(convergence_win_size);
+  optimizer->SetMaximumStepSizeInPhysicalUnits(optmaxstep);
+  optimizer->SetMinimumConvergenceValue(convergence_tolerance);
 
   // line search options
-  optimizer->SetEpsilon( 1e-3 );
-  optimizer->SetLowerLimit( 0.3 );
-  optimizer->SetUpperLimit( 1.7 );
-  optimizer->SetMaximumLineSearchIterations( 20 );
+  optimizer->SetEpsilon(1e-3);
+  optimizer->SetLowerLimit(0.3);
+  optimizer->SetUpperLimit(1.7);
+  optimizer->SetMaximumLineSearchIterations(20);
 
   // add observer tag if verbose
   unsigned long vopt_tag = 0;
-  if(m_Verbose)
+  if (m_Verbose)
   {
     MITK_INFO << "  :: Starting at " << initialParams;
 
     OptimizerIterationCommandv4< OptimizerType >::Pointer iterationObserver =
-        OptimizerIterationCommandv4<OptimizerType>::New();
+      OptimizerIterationCommandv4<OptimizerType>::New();
 
-    vopt_tag = optimizer->AddObserver( itk::IterationEvent(), iterationObserver );
+    vopt_tag = optimizer->AddObserver(itk::IterationEvent(), iterationObserver);
   }
 
 
   // Initializing by Geometry
-  if( !m_UseAffineTransform && m_InitializeByGeometry )
+  if (!m_UseAffineTransform && m_InitializeByGeometry)
   {
     typedef itk::CenteredVersorTransformInitializer< ItkImageTypeFixed, ItkImageTypeMoving> TransformInitializerType;
-    typename TransformInitializerType::TransformType::Pointer rigidTransform = TransformInitializerType::TransformType::New() ;
+    typename TransformInitializerType::TransformType::Pointer rigidTransform = TransformInitializerType::TransformType::New();
     MITK_INFO << "Initializer starting at : " << rigidTransform->GetParameters();
 
     typename TransformInitializerType::Pointer initializer = TransformInitializerType::New();
-    initializer->SetTransform( rigidTransform);
-    initializer->SetFixedImage( referenceImage.GetPointer() );
-    initializer->SetMovingImage( movingImage.GetPointer() );
+    initializer->SetTransform(rigidTransform);
+    initializer->SetFixedImage(referenceImage.GetPointer());
+    initializer->SetMovingImage(movingImage.GetPointer());
     initializer->MomentsOn();
     initializer->InitializeTransform();
 
@@ -374,24 +374,24 @@ RegisterTwoImagesV4(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image
 
   // [Prepare Registration]
   //  Masking (Optional)
-  if( m_UseMask )
+  if (m_UseMask)
   {
     typedef itk::Image<unsigned char, 3> BinaryImageType;
     BinaryImageType::Pointer itkFixedImageMask = BinaryImageType::New();
     itk::ImageMaskSpatialObject< 3 >::Pointer fixedMaskSpatialObject = itk::ImageMaskSpatialObject< 3 >::New();
 
-    CastToItkImage( m_FixedImageMask, itkFixedImageMask);
+    CastToItkImage(m_FixedImageMask, itkFixedImageMask);
     itk::NotImageFilter<BinaryImageType, BinaryImageType>::Pointer notFilter = itk::NotImageFilter<BinaryImageType, BinaryImageType>::New();
     notFilter->SetInput(itkFixedImageMask);
     notFilter->Update();
-    fixedMaskSpatialObject->SetImage( notFilter->GetOutput() );
-    base_metric->SetFixedImageMask( fixedMaskSpatialObject );
+    fixedMaskSpatialObject->SetImage(notFilter->GetOutput());
+    base_metric->SetFixedImageMask(fixedMaskSpatialObject);
   }
 
 
-  if( m_EstimatedParameters != NULL)
+  if (m_EstimatedParameters != nullptr)
   {
-    delete [] m_EstimatedParameters;
+    delete[] m_EstimatedParameters;
   }
 
   m_EstimatedParameters = new double[paramDim];
@@ -401,32 +401,32 @@ RegisterTwoImagesV4(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image
 
   // [Prepare Registration]
   //  combine all components to set-up registration
-  if( m_UseAffineTransform )
+  if (m_UseAffineTransform)
   {
 
     typename RegistrationType::Pointer registration = RegistrationType::New();
 
-    registration->SetFixedImage( 0, caster_f->GetOutput() );
-    registration->SetMovingImage( 0, caster_m->GetOutput() );
-    registration->SetMetric( base_metric );
-    registration->SetOptimizer( optimizer );
-    registration->SetMovingInitialTransform( transform.GetPointer() );
+    registration->SetFixedImage(0, caster_f->GetOutput());
+    registration->SetMovingImage(0, caster_m->GetOutput());
+    registration->SetMetric(base_metric);
+    registration->SetOptimizer(optimizer);
+    registration->SetMovingInitialTransform(transform.GetPointer());
     registration->SetNumberOfLevels(max_pyramid_lvl);
-    registration->SetShrinkFactorsPerLevel( shrink_factors );
+    registration->SetShrinkFactorsPerLevel(shrink_factors);
 
     // observe the pyramid level change in order to adapt parameters
     typename PyramidOptControlCommandv4<RegistrationType>::Pointer pyramid_observer =
-        PyramidOptControlCommandv4<RegistrationType>::New();
-    unsigned int pyramid_tag =  registration->AddObserver( itk::InitializeEvent(), pyramid_observer );
+      PyramidOptControlCommandv4<RegistrationType>::New();
+    unsigned int pyramid_tag = registration->AddObserver(itk::InitializeEvent(), pyramid_observer);
 
 
     try
     {
       registration->Update();
     }
-    catch( const itk::ExceptionObject &e)
+    catch (const itk::ExceptionObject &e)
     {
-      registration->Print( std::cout );
+      registration->Print(std::cout);
 
       MITK_ERROR << "[Registration Update] Caught ITK exception: ";
       MITK_ERROR("itk.exception") << e.what();
@@ -437,19 +437,19 @@ RegisterTwoImagesV4(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image
     // [Post Registration]
     //   Retrieve the last transformation parameters from the performed registration task
     typename BaseTransformType::ParametersType finalParameters = registration->GetOptimizer()->GetCurrentPosition();
-    for( unsigned int i=0; i<paramDim; i++)
+    for (unsigned int i = 0; i<paramDim; i++)
     {
       m_EstimatedParameters[i] = finalParameters[i];
     }
 
-    if( m_Verbose )
+    if (m_Verbose)
     {
       MITK_INFO("Params") << optimizer->GetValue() << " :: " << finalParameters;
     }
 
-    if( pyramid_tag )
+    if (pyramid_tag)
     {
-      registration->RemoveObserver( pyramid_tag );
+      registration->RemoveObserver(pyramid_tag);
     }
 
   }
@@ -460,27 +460,27 @@ RegisterTwoImagesV4(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image
 
     typename RigidRegistrationType::Pointer registration = RigidRegistrationType::New();
 
-    registration->SetFixedImage( 0, caster_f->GetOutput() );
-    registration->SetMovingImage( 0, caster_m->GetOutput() );
-    registration->SetMetric( base_metric );
-    registration->SetOptimizer( optimizer );
-    registration->SetMovingInitialTransform( transform.GetPointer() );
+    registration->SetFixedImage(0, caster_f->GetOutput());
+    registration->SetMovingImage(0, caster_m->GetOutput());
+    registration->SetMetric(base_metric);
+    registration->SetOptimizer(optimizer);
+    registration->SetMovingInitialTransform(transform.GetPointer());
     registration->SetNumberOfLevels(max_pyramid_lvl);
-    registration->SetShrinkFactorsPerLevel( shrink_factors );
+    registration->SetShrinkFactorsPerLevel(shrink_factors);
 
     // observe the pyramid level change in order to adapt parameters
     typename PyramidOptControlCommandv4<RigidRegistrationType>::Pointer pyramid_observer =
-        PyramidOptControlCommandv4<RigidRegistrationType>::New();
-    unsigned int pyramid_tag =  registration->AddObserver( itk::InitializeEvent(), pyramid_observer );
+      PyramidOptControlCommandv4<RigidRegistrationType>::New();
+    unsigned int pyramid_tag = registration->AddObserver(itk::InitializeEvent(), pyramid_observer);
 
 
     try
     {
       registration->Update();
     }
-    catch( const itk::ExceptionObject &e)
+    catch (const itk::ExceptionObject &e)
     {
-      registration->Print( std::cout );
+      registration->Print(std::cout);
 
       MITK_ERROR << "[Registration Update] Caught ITK exception: ";
       MITK_ERROR("itk.exception") << e.what();
@@ -491,32 +491,32 @@ RegisterTwoImagesV4(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image
     // [Post Registration]
     //   Retrieve the last transformation parameters from the performed registration task
     typename BaseTransformType::ParametersType finalParameters = registration->GetOptimizer()->GetCurrentPosition();
-    for( unsigned int i=0; i<paramDim; i++)
+    for (unsigned int i = 0; i<paramDim; i++)
     {
       m_EstimatedParameters[i] = finalParameters[i];
     }
 
-    if( m_Verbose )
+    if (m_Verbose)
     {
       MITK_INFO("Params") << optimizer->GetValue() << " :: " << finalParameters;
     }
 
-    if( pyramid_tag )
+    if (pyramid_tag)
     {
-      registration->RemoveObserver( pyramid_tag );
+      registration->RemoveObserver(pyramid_tag);
     }
 
   }
 
-  if( m_Verbose )
+  if (m_Verbose)
   {
     MITK_INFO("Termination") << optimizer->GetStopConditionDescription();
   }
 
   // remove optimizer tag if used
-  if( vopt_tag )
+  if (vopt_tag)
   {
-    optimizer->RemoveObserver( vopt_tag );
+    optimizer->RemoveObserver(vopt_tag);
   }
 
 
@@ -527,8 +527,8 @@ RegisterTwoImagesV4(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image
 
 template< typename TPixel, unsigned int VDimension>
 void mitk::PyramidImageRegistrationMethod::
-ResampleMitkImage( itk::Image<TPixel, VDimension>* itkImage,
-                        mitk::Image::Pointer& outputImage )
+ResampleMitkImage(itk::Image<TPixel, VDimension>* itkImage,
+  mitk::Image::Pointer& outputImage)
 {
   typedef typename itk::Image< TPixel, VDimension> ImageType;
   typedef typename itk::ResampleImageFilter<  ImageType, ImageType, double> ResampleImageFilterType;
@@ -545,20 +545,20 @@ ResampleMitkImage( itk::Image<TPixel, VDimension>* itkImage,
   typename WindowedSincInterpolatorType::Pointer sinc_interpolator = WindowedSincInterpolatorType::New();
 
   typename ImageType::Pointer reference_image = ImageType::New();
-  CastToItkImage(m_FixedImage,reference_image);
+  CastToItkImage(m_FixedImage, reference_image);
 
   typedef itk::MatrixOffsetTransformBase< double, 3, 3> BaseTransformType;
   BaseTransformType::Pointer base_transform = BaseTransformType::New();
 
-  if( this->m_UseAffineTransform )
+  if (this->m_UseAffineTransform)
   {
     typedef itk::AffineTransform< double > TransformType;
     TransformType::Pointer transform = TransformType::New();
 
-    TransformType::ParametersType affine_params( TransformType::ParametersDimension );
-    this->GetParameters( &affine_params[0] );
+    TransformType::ParametersType affine_params(TransformType::ParametersDimension);
+    this->GetParameters(&affine_params[0]);
 
-    transform->SetParameters( affine_params );
+    transform->SetParameters(affine_params);
 
     base_transform = transform;
   }
@@ -568,30 +568,30 @@ ResampleMitkImage( itk::Image<TPixel, VDimension>* itkImage,
     typedef itk::Euler3DTransform< double > RigidTransformType;
     RigidTransformType::Pointer rtransform = RigidTransformType::New();
 
-    RigidTransformType::ParametersType rigid_params( RigidTransformType::ParametersDimension  );
-    this->GetParameters( &rigid_params[0] );
+    RigidTransformType::ParametersType rigid_params(RigidTransformType::ParametersDimension);
+    this->GetParameters(&rigid_params[0]);
 
-    rtransform->SetParameters( rigid_params );
+    rtransform->SetParameters(rigid_params);
 
     base_transform = rtransform;
   }
 
   typename ResampleImageFilterType::Pointer resampler = ResampleImageFilterType::New();
 
-  resampler->SetInterpolator( linear_interpolator );
-  if( m_UseWindowedSincInterpolator )
-    resampler->SetInterpolator( sinc_interpolator );
-  if ( m_UseNearestNeighborInterpolator)
-    resampler->SetInterpolator ( nn_interpolator );
+  resampler->SetInterpolator(linear_interpolator);
+  if (m_UseWindowedSincInterpolator)
+    resampler->SetInterpolator(sinc_interpolator);
+  if (m_UseNearestNeighborInterpolator)
+    resampler->SetInterpolator(nn_interpolator);
 
   //resampler->SetNumberOfThreads(1);
 
-  resampler->SetInput( itkImage );
-  resampler->SetTransform( base_transform );
-  resampler->SetReferenceImage( reference_image );
+  resampler->SetInput(itkImage);
+  resampler->SetTransform(base_transform);
+  resampler->SetReferenceImage(reference_image);
   resampler->UseReferenceImageOn();
 
   resampler->Update();
 
-  mitk::GrabItkImageMemory( resampler->GetOutput(), outputImage);
+  mitk::GrabItkImageMemory(resampler->GetOutput(), outputImage);
 }

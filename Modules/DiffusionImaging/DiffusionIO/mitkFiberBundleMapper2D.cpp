@@ -167,7 +167,7 @@ void mitk::FiberBundleMapper2D::Update(mitk::BaseRenderer * renderer)
         }
 }
 
-void mitk::FiberBundleMapper2D::UpdateShaderParameter(mitk::BaseRenderer * renderer)
+void mitk::FiberBundleMapper2D::UpdateShaderParameter(mitk::BaseRenderer * )
 {
   // See new vtkShaderCallback
 }
@@ -253,9 +253,6 @@ void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
   localStorage->m_PointActor->SetMapper(localStorage->m_FiberMapper);
   localStorage->m_PointActor->GetProperty()->ShadingOn();
   localStorage->m_PointActor->GetProperty()->SetLineWidth(m_LineWidth);
-
-  // Applying shading properties
-  this->ApplyShaderProperties(renderer);
 
   // We have been modified => save this for next Update()
   localStorage->m_LastUpdateTime.Modified();

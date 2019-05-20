@@ -36,7 +36,6 @@ set(mitk_modules
   QtWidgets
   QtWidgetsExt
   QtWidgetsWeb
-  QmlItems
   SegmentationUI
   DiffusionImaging
   GPGPU

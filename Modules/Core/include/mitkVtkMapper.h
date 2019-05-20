@@ -120,9 +120,9 @@ class MITKCORE_EXPORT VtkMapper : public Mapper
     }
 
     /**
-    * \brief SHADERTODO
+    * \deprecatedSince{2017_08}
     */
-    void ApplyShaderProperties( mitk::BaseRenderer* );
+    DEPRECATED(void ApplyShaderProperties( mitk::BaseRenderer* )){};
 
     /**
     * \brief Apply color and opacity properties read from the PropertyList.

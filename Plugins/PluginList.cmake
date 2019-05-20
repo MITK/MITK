@@ -18,7 +18,6 @@ set(MITK_PLUGINS
   #org.mitk.gui.qt.moviemaker:OFF
   #org.mitk.gui.qt.pointsetinteractionmultispectrum:OFF
   #org.mitk.gui.qt.python:OFF
-  #org.mitk.gui.qt.simulation:OFF
   #org.mitk.gui.qt.tubegraph:OFF
   #org.mitk.gui.qt.ugvisualization:OFF
   #org.mitk.gui.qt.ultrasound:OFF
@@ -30,7 +29,6 @@ set(MITK_PLUGINS
   #org.mitk.gui.qt.igtexamples:OFF
   #org.mitk.gui.qt.datamanagerlight:OFF
   #org.mitk.gui.qt.dicom:OFF
-  #org.mitk.simulation:OFF
   #org.mitk.gui.qt.dicominspector:OFF
   #org.mitk.gui.qt.dosevisualization:OFF
   #org.mitk.gui.qt.openigtlink:OFF

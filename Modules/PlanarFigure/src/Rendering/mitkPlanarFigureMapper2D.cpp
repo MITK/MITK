@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarLine.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
+#include "vtkTextProperty.h"
 
 #include "mitkOverlay.h"
 #include "mitkTextOverlay2D.h"
@@ -43,9 +44,6 @@ mitk::PlanarFigureMapper2D::PlanarFigureMapper2D()
   , m_NodeModifiedObserverAdded(false)
   , m_Initialized(false)
 {
-  m_AnnotationOverlay = mitk::TextOverlay2D::New();
-  m_QuantityOverlay = mitk::TextOverlay2D::New();
-
   this->InitializeDefaultPlanarFigureProperties();
 }
 
@@ -65,7 +63,7 @@ void mitk::PlanarFigureMapper2D::ApplyColorAndOpacityProperties(mitk::BaseRender
   // Check for opacity prop and use it for rendering if it exists
   GetDataNode()->GetOpacity(rgba[3], renderer, "opacity");
 
-  glColor4fv(rgba);
+  this->m_Pen->SetColorF((double)rgba[0], (double)rgba[1], (double)rgba[2], (double)rgba[3]);
 }
 
 void mitk::PlanarFigureMapper2D::Initialize(mitk::BaseRenderer* renderer)
@@ -86,11 +84,10 @@ void mitk::PlanarFigureMapper2D::MitkRender( mitk::BaseRenderer* renderer, mitk:
   if (!this->m_Initialized) {
     this->Initialize(renderer);
   }
+
+  vtkOpenGLContextDevice2D::SafeDownCast(this->m_Context->GetDevice())->Begin(renderer->GetVtkRenderer());
+
   bool visible = true;
-
-  m_AnnotationOverlay->SetVisibility( false, renderer );
-
-  m_QuantityOverlay->SetVisibility( false, renderer );
 
   GetDataNode()->GetVisibility(visible, renderer, "visible");
   if ( !visible ) return;
@@ -142,11 +139,6 @@ void mitk::PlanarFigureMapper2D::MitkRender( mitk::BaseRenderer* renderer, mitk:
 
   // Apply visual appearance properties from the PropertyList
   ApplyColorAndOpacityProperties( renderer );
-
-  // Enable line antialiasing
-  glEnable( GL_LINE_SMOOTH );
-  glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
-  glEnable(GL_DEPTH_TEST);
 
   // Get properties from node (if present)
   const mitk::DataNode* node=this->GetDataNode();
@@ -202,7 +194,6 @@ void mitk::PlanarFigureMapper2D::MitkRender( mitk::BaseRenderer* renderer, mitk:
     RenderQuantities(planarFigure, renderer, anchorPoint, annotationOffset, globalOpacity, lineDisplayMode);
   }
 
-  glLineWidth( 1.0f );
   this->m_Context->GetDevice()->End();
 }
 
@@ -267,8 +258,6 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(
     {
       orientation = mitk::TextOrientation::TextRigth;
     }
-
-    m_AnnotationOverlay->SetOrientation(orientation);
   }
   else
   {
@@ -289,15 +278,12 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(
 
   // now paint all the points in one run
 
-  //glBegin( GL_LINE_STRIP );
   float* points = new float[pointlist.size()*2];
   for (int i = 0; i < pointlist.size(); ++i) {
-    //glVertex3f( (*pointIter)[0], (*pointIter)[1], PLANAR_OFFSET );
     points[i * 2]     = pointlist[i][0];
     points[i * 2 + 1] = pointlist[i][1];
   }
   this->m_Context->DrawPoly(points, pointlist.size());
-  //glEnd();
 
   anchorPoint = rightMostPoint;
 }
@@ -393,7 +379,7 @@ void mitk::PlanarFigureMapper2D::TransformObjectToDisplay(
   objectGeometry->Map( point2D, point3D );
 
   // Project 3D world point onto display geometry
-  renderer->WorldToDisplay( point3D, displayPoint );
+  renderer->WorldToView( point3D, displayPoint );
 }
 
 
@@ -421,8 +407,8 @@ void mitk::PlanarFigureMapper2D::DrawMarker(
     point, displayPoint,
     objectGeometry, rendererGeometry, renderer );
 
-  glColor4f( markerColor[0], markerColor[1], markerColor[2], markerOpacity );
-  glLineWidth( lineWidth );
+  this->m_Context->GetPen()->SetColorF((double)markerColor[0], (double)markerColor[1], (double)markerColor[2], markerOpacity);
+  this->m_Context->GetPen()->SetWidth(lineWidth);
 
   switch ( shape )
   {
@@ -431,13 +417,11 @@ void mitk::PlanarFigureMapper2D::DrawMarker(
     {
       // Paint filled square
 
-      // Disable line antialiasing (does not look nice for squares)
-      glDisable( GL_LINE_SMOOTH );
       if ( markerOpacity > 0 ) {
         m_Context->DrawRect(displayPoint[0] - 4, displayPoint[1] - 4, 8, 8);
       }
       // Paint outline
-      glColor4f( lineColor[0], lineColor[1], lineColor[2], lineOpacity );
+      this->m_Context->GetPen()->SetColorF((double)lineColor[0], (double)lineColor[1], (double)lineColor[2], (double)lineOpacity);
 
       float* outline = new float[8];
       outline[0] = displayPoint[0] - 4;
@@ -462,7 +446,8 @@ void mitk::PlanarFigureMapper2D::DrawMarker(
 
   case PlanarFigureControlPointStyleProperty::Circle:
     {
-      float radius = 4.0;
+      // TODO: This code can not be reached using the properties provided in the GUI
+      /*float radius = 4.0;
 
       if ( markerOpacity > 0 )
       {
@@ -489,7 +474,7 @@ void mitk::PlanarFigureMapper2D::DrawMarker(
         float y = displayPoint[1] + radius * (float)sin( angleRad );
         glVertex3f(x, y, 1.f);
       }
-      glEnd();
+      glEnd();*/
       break;
     }
 
@@ -865,7 +850,7 @@ void mitk::PlanarFigureMapper2D::RenderControlPoints( const mitk::PlanarFigure *
 }
 
 void mitk::PlanarFigureMapper2D::RenderAnnotations( mitk::PlanarFigure * planarFigure,
-                                                    mitk::BaseRenderer * renderer,
+                                                    mitk::BaseRenderer* renderer,
                                                     const std::string name,
                                                     const mitk::Point2D anchorPoint,
                                                     float globalOpacity,
@@ -880,76 +865,54 @@ void mitk::PlanarFigureMapper2D::RenderAnnotations( mitk::PlanarFigure * planarF
     return;
   }
 
-  m_AnnotationOverlay->SetText( name );
+  vtkTextProperty* textProp = vtkTextProperty::New();
+  textProp->SetFontSize(m_AnnotationSize);
+  textProp->SetFontFamilyAsString(m_AnnotationFontFamily.c_str());
+  textProp->SetJustificationToLeft();
+  textProp->SetOpacity(globalOpacity);
+  textProp->SetShadow(0);
+  textProp->SetBold(m_DrawAnnotationBold);
+  textProp->SetItalic(m_DrawAnnotationItalic);
 
-  /*
-  m_AnnotationOverlay->SetColor( m_LineColor[lineDisplayMode][0],
-                                 m_LineColor[lineDisplayMode][1],
-                                 m_LineColor[lineDisplayMode][2] );
-                                 */
-
-  m_AnnotationOverlay->SetColor(1, 1, 0);
-
-  m_AnnotationOverlay->SetOpacity( globalOpacity );
-  m_AnnotationOverlay->SetFontSize( m_AnnotationSize*m_DevicePixelRatio );
-  m_AnnotationOverlay->SetBoolProperty( "drawShadow", m_AnnotationsShadow );
-  m_AnnotationOverlay->SetVisibility( true, renderer );
-
-  m_AnnotationOverlay->SetStringProperty( "font.family", m_AnnotationFontFamily );
-  m_AnnotationOverlay->SetBoolProperty("font.bold", m_DrawAnnotationBold);
-  m_AnnotationOverlay->SetBoolProperty("font.italic", m_DrawAnnotationItalic);
-
+  mitk::Point2D offset;
+  offset.Fill(5);
+  mitk::Point2D scaledAnchorPoint;
   if (planarFigure->IsAnnotationsDetached()) {
-
-    Point2D displayPoint;
     this->TransformObjectToDisplay(
-      planarFigure->GetAnnotationsPosition(), displayPoint,
+      planarFigure->GetAnnotationsPosition(), scaledAnchorPoint,
       planarFigurePlaneGeometry, rendererPlaneGeometry, renderer );
 
-    displayPoint[0] = displayPoint[0] * m_DevicePixelRatio;
-    displayPoint[1] = displayPoint[1] * m_DevicePixelRatio;
+    scaledAnchorPoint[0] = scaledAnchorPoint[0] * m_DevicePixelRatio;
+    scaledAnchorPoint[1] = scaledAnchorPoint[1] * m_DevicePixelRatio;
 
-    m_AnnotationOverlay->SetPosition2D(displayPoint);
-    m_AnnotationOverlay->SetOrientation(mitk::TextOrientation::TextRigth);
-
-    mitk::Point2D offset_;
-    offset_[0] = -planarFigure->GetAnnotaionsBoundingBox().Size[1] / 2.0;
-    offset_[1] = -planarFigure->GetAnnotaionsBoundingBox().Size[1] / 2.0;
-    m_AnnotationOverlay->SetOffsetVector(offset_);
+    offset[0] = -planarFigure->GetAnnotaionsBoundingBox().Size[1] / 2.0;
+    offset[1] = -planarFigure->GetAnnotaionsBoundingBox().Size[1] / 2.0;
   } else {
-    mitk::Point2D offset;
-    offset.Fill(5);
+    scaledAnchorPoint[0] = anchorPoint[0] * m_DevicePixelRatio;
+    scaledAnchorPoint[1] = anchorPoint[1] * m_DevicePixelRatio;
 
-    mitk::Point2D scaledAnchorPoint;
-    scaledAnchorPoint[0] = anchorPoint[0]*m_DevicePixelRatio;
-    scaledAnchorPoint[1] = anchorPoint[1]*m_DevicePixelRatio;
-
-    offset[0] = offset[0]*m_DevicePixelRatio;
-    offset[1] = offset[1]*m_DevicePixelRatio;
-
-    m_AnnotationOverlay->SetPosition2D( scaledAnchorPoint );
-    m_AnnotationOverlay->SetOffsetVector(offset);
+    offset[0] = offset[0] * m_DevicePixelRatio;
+    offset[1] = offset[1] * m_DevicePixelRatio;
   }
 
-  //m_AnnotationOverlay->Update( renderer );
-  //m_AnnotationOverlay->Paint( renderer );
+  if (m_DrawShadow) {
+    textProp->SetColor(0.0, 0.0, 0.0);
+    this->m_Context->ApplyTextProp(textProp);
+    this->m_Context->DrawString(scaledAnchorPoint[0]+offset[0]+1, scaledAnchorPoint[1]+offset[1]-1, name.c_str());
+  }
+
+  textProp->SetColor(1.0, 1.0, 0.0);
+  this->m_Context->ApplyTextProp(textProp);
+  this->m_Context->DrawString(scaledAnchorPoint[0]+offset[0], scaledAnchorPoint[1]+offset[1], name.c_str());
+  
+
   annotationOffset -= 15.0;
-//  annotationOffset -= m_AnnotationOverlay->GetBoundsOnDisplay( renderer ).Size[1];
-
-  mitk::Overlay::Bounds bounds = m_AnnotationOverlay->GetBoundsOnDisplay(renderer);
-  mitk::TextOrientation orientation = m_AnnotationOverlay->GetOrientation();
-
-  if (!planarFigure->IsAnnotationsDetached() && orientation == mitk::TextOrientation::TextLeft)
-  {
-    bounds.Position[0] -= bounds.Size[0];
-  }
-  planarFigure->SetAnnotaionsBoundingBox(bounds);
-
-
+  //annotationOffset -= m_AnnotationOverlay->GetBoundsOnDisplay( renderer ).Size[1];
+  textProp->Delete();
 }
 
 void mitk::PlanarFigureMapper2D::RenderQuantities( const mitk::PlanarFigure * planarFigure,
-                                                   mitk::BaseRenderer * renderer,
+                                                   mitk::BaseRenderer * ,
                                                    const mitk::Point2D anchorPoint,
                                                    double &annotationOffset,
                                                    float globalOpacity,
@@ -981,23 +944,17 @@ void mitk::PlanarFigureMapper2D::RenderQuantities( const mitk::PlanarFigure * pl
     }
   }
 
-  m_QuantityOverlay->SetColor( m_AnnotationColor[lineDisplayMode][0],
-                               m_AnnotationColor[lineDisplayMode][1],
-                               m_AnnotationColor[lineDisplayMode][2] );
+  vtkTextProperty* textProp = vtkTextProperty::New();
+  textProp->SetFontSize(m_AnnotationSize);
+  textProp->SetFontFamilyAsString(m_AnnotationFontFamily.c_str());
+  textProp->SetJustificationToLeft();
+  textProp->SetOpacity(globalOpacity);
+  textProp->SetShadow(0);
+  textProp->SetBold(m_DrawAnnotationBold);
+  textProp->SetItalic(m_DrawAnnotationItalic);
 
-  m_QuantityOverlay->SetOpacity( globalOpacity );
-  m_QuantityOverlay->SetFontSize( m_AnnotationSize*m_DevicePixelRatio );
-  m_QuantityOverlay->SetBoolProperty( "drawShadow", m_DrawShadow );
-  m_QuantityOverlay->SetVisibility( true, renderer );
-
-  m_QuantityOverlay->SetStringProperty("font.family", m_AnnotationFontFamily);
-  m_QuantityOverlay->SetBoolProperty("font.bold", m_DrawAnnotationBold);
-  m_QuantityOverlay->SetBoolProperty("font.italic", m_DrawAnnotationItalic);
-
-  m_QuantityOverlay->SetText( quantityString.str().c_str() );
   mitk::Point2D offset;
   offset.Fill(5);
-  offset[1]+=annotationOffset;
 
   mitk::Point2D scaledAnchorPoint;
   scaledAnchorPoint[0] = anchorPoint[0]*m_DevicePixelRatio;
@@ -1006,13 +963,19 @@ void mitk::PlanarFigureMapper2D::RenderQuantities( const mitk::PlanarFigure * pl
   offset[0] = offset[0]*m_DevicePixelRatio;
   offset[1] = offset[1]*m_DevicePixelRatio;
 
-  m_QuantityOverlay->SetPosition2D( scaledAnchorPoint );
-  m_QuantityOverlay->SetOffsetVector(offset);
+  if (m_DrawShadow) {
+    textProp->SetColor(0.0, 0.0, 0.0);
+    this->m_Context->ApplyTextProp(textProp);
+    this->m_Context->DrawString(scaledAnchorPoint[0]+offset[0]+1, scaledAnchorPoint[1]+offset[1]-1, quantityString.str().c_str());
+  }
+  textProp->SetColor(m_AnnotationColor[lineDisplayMode][0], m_AnnotationColor[lineDisplayMode][1], m_AnnotationColor[lineDisplayMode][2]);
+  this->m_Context->ApplyTextProp(textProp);
+  this->m_Context->DrawString(scaledAnchorPoint[0]+offset[0], scaledAnchorPoint[1]+offset[1], quantityString.str().c_str());
 
-  //m_QuantityOverlay->Update(renderer);
-  //m_QuantityOverlay->Paint( renderer );
-//  annotationOffset -= m_QuantityOverlay->GetBoundsOnDisplay( renderer ).Size[1];
   annotationOffset -= 15.0;
+//  annotationOffset -= m_QuantityOverlay->GetBoundsOnDisplay( renderer ).Size[1];
+
+  textProp->Delete();
 }
 
 void mitk::PlanarFigureMapper2D::RenderLines( const PlanarFigureDisplayMode lineDisplayMode,
@@ -1022,8 +985,6 @@ void mitk::PlanarFigureMapper2D::RenderLines( const PlanarFigureDisplayMode line
                                               const mitk::PlaneGeometry * rendererPlaneGeometry,
                                               const mitk::BaseRenderer * renderer)
 {
-  glLineStipple(1, 0x00FF);
-
   // If we want to draw an outline, we do it here
   if ( m_DrawOutline )
   {
@@ -1038,13 +999,13 @@ void mitk::PlanarFigureMapper2D::RenderLines( const PlanarFigureDisplayMode line
     colorVector[3] = opacity;
 
     // set the color and opacity here as it is common for all outlines
-    glColor4fv( colorVector );
-    glLineWidth(m_OutlineWidth);
+    this->m_Context->GetPen()->SetColorF((double)color[0], (double)color[1], (double)color[2]);
+    this->m_Context->GetPen()->SetWidth(m_OutlineWidth);
 
     if (m_DrawDashed)
-      glEnable(GL_LINE_STIPPLE);
+      this->m_Context->GetPen()->SetLineType(vtkPen::DASH_LINE);
     else
-      glDisable(GL_LINE_STIPPLE);
+      this->m_Context->GetPen()->SetLineType(vtkPen::SOLID_LINE);
 
     // Draw the outline for all polylines if requested
     this->DrawMainLines( planarFigure,
@@ -1053,12 +1014,12 @@ void mitk::PlanarFigureMapper2D::RenderLines( const PlanarFigureDisplayMode line
                          rendererPlaneGeometry,
                          renderer );
 
-    glLineWidth( m_HelperlineWidth );
+    this->m_Context->GetPen()->SetWidth(m_HelperlineWidth);
 
     if (m_DrawHelperDashed)
-      glEnable(GL_LINE_STIPPLE);
+      this->m_Context->GetPen()->SetLineType(vtkPen::DASH_LINE);
     else
-      glDisable(GL_LINE_STIPPLE);
+      this->m_Context->GetPen()->SetLineType(vtkPen::SOLID_LINE);
 
     // Draw the outline for all helper objects if requested
     this->DrawHelperLines( planarFigure,
@@ -1066,8 +1027,6 @@ void mitk::PlanarFigureMapper2D::RenderLines( const PlanarFigureDisplayMode line
                            planarFigurePlaneGeometry,
                            rendererPlaneGeometry,
                            renderer );
-
-    glEnable(GL_LINE_STIPPLE);
 
     this->DrawAnnotationHelperLine(
       planarFigure,
@@ -1097,13 +1056,13 @@ void mitk::PlanarFigureMapper2D::RenderLines( const PlanarFigureDisplayMode line
     shadow[3] = shadowOpacity;
 
     // set the color and opacity here as it is common for all shadows
-    glColor4fv( shadow );
-    glLineWidth( m_OutlineWidth * m_ShadowWidthFactor );
+    this->m_Context->GetPen()->SetColorF(0, 0, 0, shadowOpacity);
+    this->m_Context->GetPen()->SetWidth(m_OutlineWidth * m_ShadowWidthFactor);
 
     if (m_DrawDashed)
-      glEnable(GL_LINE_STIPPLE);
+      this->m_Context->GetPen()->SetLineType(vtkPen::DASH_LINE);
     else
-      glDisable(GL_LINE_STIPPLE);
+      this->m_Context->GetPen()->SetLineType(vtkPen::SOLID_LINE);
 
     // Draw the outline for all polylines if requested
     this->DrawMainLines( planarFigure,
@@ -1112,12 +1071,12 @@ void mitk::PlanarFigureMapper2D::RenderLines( const PlanarFigureDisplayMode line
                          rendererPlaneGeometry,
                          renderer );
 
-    glLineWidth( m_HelperlineWidth );
+    this->m_Context->GetPen()->SetWidth(m_HelperlineWidth);
 
     if (m_DrawHelperDashed)
-      glEnable(GL_LINE_STIPPLE);
+      this->m_Context->GetPen()->SetLineType(vtkPen::DASH_LINE);
     else
-      glDisable(GL_LINE_STIPPLE);
+      this->m_Context->GetPen()->SetLineType(vtkPen::SOLID_LINE);
 
     // Draw the outline for all helper objects if requested
     this->DrawHelperLines( planarFigure,
@@ -1125,8 +1084,6 @@ void mitk::PlanarFigureMapper2D::RenderLines( const PlanarFigureDisplayMode line
                            planarFigurePlaneGeometry,
                            rendererPlaneGeometry,
                            renderer );
-
-    glEnable(GL_LINE_STIPPLE);
 
     this->DrawAnnotationHelperLine(
       planarFigure,
@@ -1144,21 +1101,14 @@ void mitk::PlanarFigureMapper2D::RenderLines( const PlanarFigureDisplayMode line
     const float* color = m_LineColor[lineDisplayMode];
     const float opacity = m_LineOpacity[lineDisplayMode];
 
-    // convert to a float array that also contains opacity, faster GL
-    float* colorVector = new float[4];
-    colorVector[0] = color[0];
-    colorVector[1] = color[1];
-    colorVector[2] = color[2];
-    colorVector[3] = opacity;
-
     // set the color and opacity here as it is common for all mainlines
-    glColor4fv( colorVector );
-    glLineWidth( m_LineWidth );
+    this->m_Context->GetPen()->SetColorF((double)color[0], (double)color[1], (double)color[2], (double)opacity);
+    this->m_Context->GetPen()->SetWidth(m_LineWidth);
 
     if (m_DrawDashed)
-      glEnable(GL_LINE_STIPPLE);
+      this->m_Context->GetPen()->SetLineType(vtkPen::DASH_LINE);
     else
-      glDisable(GL_LINE_STIPPLE);
+      this->m_Context->GetPen()->SetLineType(vtkPen::SOLID_LINE);
 
     // Draw the main line for all polylines
     this->DrawMainLines( planarFigure,
@@ -1170,22 +1120,15 @@ void mitk::PlanarFigureMapper2D::RenderLines( const PlanarFigureDisplayMode line
 
     const float* helperColor = m_HelperlineColor[lineDisplayMode];
     const float helperOpacity = m_HelperlineOpacity[lineDisplayMode];
-    // convert to a float array that also contains opacity, faster GL
-    float* helperColorVector = new float[4];
-    helperColorVector[0] = helperColor[0];
-    helperColorVector[1] = helperColor[1];
-    helperColorVector[2] = helperColor[2];
-    helperColorVector[3] = helperOpacity;
 
     // we only set the color for the helperlines as the linewidth is unchanged
-    glColor4fv( helperColorVector );
-
-    glLineWidth( m_HelperlineWidth );
+    this->m_Context->GetPen()->SetColorF((double)helperColor[0], (double)helperColor[1], (double)helperColor[2], (double)helperOpacity);
+    this->m_Context->GetPen()->SetWidth(m_HelperlineWidth);
 
     if (m_DrawHelperDashed)
-      glEnable(GL_LINE_STIPPLE);
+      this->m_Context->GetPen()->SetLineType(vtkPen::DASH_LINE);
     else
-      glDisable(GL_LINE_STIPPLE);
+      this->m_Context->GetPen()->SetLineType(vtkPen::SOLID_LINE);
 
     // Draw helper objects
     this->DrawHelperLines( planarFigure,
@@ -1202,12 +1145,8 @@ void mitk::PlanarFigureMapper2D::RenderLines( const PlanarFigureDisplayMode line
       planarFigurePlaneGeometry,
       rendererPlaneGeometry,
       renderer);
-
-    // cleanup
-    delete[] colorVector;
-    delete[] helperColorVector;
   }
 
   if ( m_DrawDashed || m_DrawHelperDashed )
-    glDisable(GL_LINE_STIPPLE);
+    this->m_Context->GetPen()->SetLineType(vtkPen::SOLID_LINE);
 }

@@ -27,8 +27,6 @@ macro(mitkMacroFindDependency dep)
   # Prefer config mode first because it finds external
   # <proj>Config.cmake files pointed at by <proj>_DIR variables.
   # Otherwise, existing Find<proj>.cmake files could fail.
-  # (e.g. in the case of GLEW and the FindGLEW.cmake file shipped
-  # with CMake).
   find_package(${_mitk_fd_dep} ${ARGN}
     QUIET
     CONFIG

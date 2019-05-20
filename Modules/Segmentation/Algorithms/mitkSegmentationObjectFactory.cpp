@@ -27,8 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkContourSetVtkMapper3D.h"
 #include "mitkContourVtkMapper3D.h"
 
-#include <mitkVtkGLMapperWrapper.h>
-
 mitk::SegmentationObjectFactory::SegmentationObjectFactory()
 :CoreObjectFactoryBase()
 {

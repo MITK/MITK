@@ -127,7 +127,7 @@ void mitk::VolumeMapperVtkSmart3D::createMapper(vtkImageData* imageData)
 }
 
 void mitk::VolumeMapperVtkSmart3D::createVolume()
-{    
+{
   m_Volume->VisibilityOff();
   m_Volume->SetMapper(m_SmartVolumeMapper);
   m_Volume->SetProperty(m_VolumeProperty);
@@ -152,7 +152,7 @@ void mitk::VolumeMapperVtkSmart3D::UpdateTransferFunctions(mitk::BaseRenderer *r
   if (isBinary)
   {
     colorTransferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
-    
+
     float rgb[3];
     if (!GetDataNode()->GetColor(rgb, renderer))
       rgb[0] = rgb[1] = rgb[2] = 1;
@@ -208,7 +208,7 @@ void mitk::VolumeMapperVtkSmart3D::UpdateRenderMode(mitk::BaseRenderer *renderer
     m_SmartVolumeMapper->SetBlendMode(blendMode);
   else if (usemip)
     m_SmartVolumeMapper->SetBlendMode(vtkSmartVolumeMapper::MAXIMUM_INTENSITY_BLEND);
-      
+
   // shading parameter
   if (m_SmartVolumeMapper->GetRequestedRenderMode() == vtkSmartVolumeMapper::GPURenderMode)
   {

@@ -125,7 +125,6 @@ void QmitkMITKSurfaceMaterialEditorView::RefreshPropertiesList()
 
   if(observerAllocated)
   {
-    observedProperty->RemoveObserver( observerIndex );
     observerAllocated=false;
   }
 
@@ -138,7 +137,7 @@ void QmitkMITKSurfaceMaterialEditorView::RefreshPropertiesList()
 //    if(shaderEnum.IsNotNull())
 //    {
 //      shaderState = shaderEnum->GetValueAsString();
-// 
+//
 //      itk::MemberCommand<QmitkMITKSurfaceMaterialEditorView>::Pointer propertyModifiedCommand = itk::MemberCommand<QmitkMITKSurfaceMaterialEditorView>::New();
 //      propertyModifiedCommand->SetCallbackFunction(this, &QmitkMITKSurfaceMaterialEditorView::shaderEnumChange);
 //      observerIndex = shaderEnum->AddObserver(itk::ModifiedEvent(), propertyModifiedCommand);

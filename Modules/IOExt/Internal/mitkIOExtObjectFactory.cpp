@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkMeshMapper2D.h"
 #include "mitkMeshVtkMapper3D.h"
 #include "mitkMesh.h"
-#include "mitkGPUVolumeMapperVtkSmart3D.h"
+#include "mitkVolumeMapperVtkSmart3D.h"
 #include "mitkUnstructuredGridMapper2D.h"
 #include "mitkUnstructuredGridVtkMapper3D.h"
 #include "mitkVtkGLMapperWrapper.h"

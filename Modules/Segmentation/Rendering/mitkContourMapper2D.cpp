@@ -22,8 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProperties.h"
 #include "mitkContour.h"
 #include <vtkLinearTransform.h>
-
-#include "mitkGL.h"
+#include "vtk_glew.h"
 
 mitk::ContourMapper2D::ContourMapper2D()
 {
@@ -33,9 +32,19 @@ mitk::ContourMapper2D::~ContourMapper2D()
 {
 }
 
+void mitk::ContourMapper2D::ApplyColorAndOpacityProperties(mitk::BaseRenderer* renderer, vtkActor* /*actor*/)
+{
+  float rgba[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+  // Check for color prop and use it for rendering if it exists
+  GetDataNode()->GetColor(rgba, renderer, "color");
+  // Check for opacity prop and use it for rendering if is exists
+  GetDataNode()->GetOpacity(rgba[3], renderer, "opacity");
 
-void mitk::ContourMapper2D::Paint(mitk::BaseRenderer * renderer)
-  {
+  glColor4fv(rgba);
+}
+
+void mitk::ContourMapper2D::MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type)
+{
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");
 

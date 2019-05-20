@@ -46,8 +46,7 @@ mitk::FeedbackContourTool::FeedbackContourTool(const char* type)
   m_FeedbackContourNode->SetProperty("draw-in-3d", BoolProperty::New(false));
   m_FeedbackContourNode->SetProperty("contour.check-distance", BoolProperty::New(false));
 
-  m_FeedbackContourNode->SetMapper(mitk::BaseRenderer::Standard3D,
-      mitk::VtkGLMapperWrapper::New(mitk::ContourModelGLMapper2D::New().GetPointer()));
+  m_FeedbackContourNode->SetMapper(mitk::BaseRenderer::Standard3D, mitk::ContourModelGLMapper2D::New().GetPointer());
 
   SetFeedbackContourColorDefault();
 }

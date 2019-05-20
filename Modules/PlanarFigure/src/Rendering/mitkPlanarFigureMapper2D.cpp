@@ -18,11 +18,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarFigureMapper2D.h"
 
 #include "mitkBaseRenderer.h"
-#include "mitkPlaneGeometry.h"
 #include "mitkColorProperty.h"
+#include "mitkGL.h" //TODO GLGLGLGLGL
+#include "vtkContext2D.h"
+#include "vtkContextDevice2D.h"
+#include "vtkOpenGLContextDevice2D.h"
 #include "mitkPlanarLine.h"
+#include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
-#include "mitkGL.h"
 
 #include "mitkOverlay.h"
 #include "mitkTextOverlay2D.h"
@@ -38,6 +41,7 @@ mitk::PlanarFigureMapper2D::PlanarFigureMapper2D()
   : m_NodeModified(true)
   , m_NodeModifiedObserverTag(0)
   , m_NodeModifiedObserverAdded(false)
+  , m_Initialized(false)
 {
   m_AnnotationOverlay = mitk::TextOverlay2D::New();
   m_QuantityOverlay = mitk::TextOverlay2D::New();
@@ -53,8 +57,35 @@ mitk::PlanarFigureMapper2D::~PlanarFigureMapper2D()
   }
 }
 
-void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
+void mitk::PlanarFigureMapper2D::ApplyColorAndOpacityProperties(mitk::BaseRenderer* renderer, vtkActor* /*actor*/)
 {
+  float rgba[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+  // Check for color prop and use it for rendering if it exists
+  GetDataNode()->GetColor(rgba, renderer, "color");
+  // Check for opacity prop and use it for rendering if it exists
+  GetDataNode()->GetOpacity(rgba[3], renderer, "opacity");
+
+  glColor4fv(rgba);
+}
+
+void mitk::PlanarFigureMapper2D::Initialize(mitk::BaseRenderer* renderer)
+{
+  vtkOpenGLContextDevice2D* device = nullptr;
+  device = vtkOpenGLContextDevice2D::New();
+  if (device) {
+    this->m_Context->Begin(device);
+    device->Delete();
+    this->m_Initialized = true;
+  } else {
+  }
+}
+
+void mitk::PlanarFigureMapper2D::MitkRender( mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type )
+{
+  if (type != mitk::VtkPropRenderer::Overlay) return;
+  if (!this->m_Initialized) {
+    this->Initialize(renderer);
+  }
   bool visible = true;
 
   m_AnnotationOverlay->SetVisibility( false, renderer );
@@ -172,6 +203,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   }
 
   glLineWidth( 1.0f );
+  this->m_Context->GetDevice()->End();
 }
 
 
@@ -257,12 +289,15 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(
 
   // now paint all the points in one run
 
-  glBegin( GL_LINE_STRIP );
-  for ( auto pointIter = pointlist.cbegin(); pointIter!=pointlist.cend(); pointIter++ )
-  {
-    glVertex3f( (*pointIter)[0], (*pointIter)[1], PLANAR_OFFSET );
+  //glBegin( GL_LINE_STRIP );
+  float* points = new float[pointlist.size()*2];
+  for (int i = 0; i < pointlist.size(); ++i) {
+    //glVertex3f( (*pointIter)[0], (*pointIter)[1], PLANAR_OFFSET );
+    points[i * 2]     = pointlist[i][0];
+    points[i * 2 + 1] = pointlist[i][1];
   }
-  glEnd();
+  this->m_Context->DrawPoly(points, pointlist.size());
+  //glEnd();
 
   anchorPoint = rightMostPoint;
 }
@@ -399,7 +434,7 @@ void mitk::PlanarFigureMapper2D::DrawMarker(
       // Disable line antialiasing (does not look nice for squares)
       glDisable( GL_LINE_SMOOTH );
       if ( markerOpacity > 0 ) {
-        m_Context->DrawRect(displayPoint[0] - 4, displayPointer[1] - 4, 8, 8);
+        m_Context->DrawRect(displayPoint[0] - 4, displayPoint[1] - 4, 8, 8);
       }
       // Paint outline
       glColor4f( lineColor[0], lineColor[1], lineColor[2], lineOpacity );
@@ -896,8 +931,8 @@ void mitk::PlanarFigureMapper2D::RenderAnnotations( mitk::PlanarFigure * planarF
     m_AnnotationOverlay->SetOffsetVector(offset);
   }
 
-  m_AnnotationOverlay->Update( renderer );
-  m_AnnotationOverlay->Paint( renderer );
+  //m_AnnotationOverlay->Update( renderer );
+  //m_AnnotationOverlay->Paint( renderer );
   annotationOffset -= 15.0;
 //  annotationOffset -= m_AnnotationOverlay->GetBoundsOnDisplay( renderer ).Size[1];
 
@@ -974,8 +1009,8 @@ void mitk::PlanarFigureMapper2D::RenderQuantities( const mitk::PlanarFigure * pl
   m_QuantityOverlay->SetPosition2D( scaledAnchorPoint );
   m_QuantityOverlay->SetOffsetVector(offset);
 
-  m_QuantityOverlay->Update(renderer);
-  m_QuantityOverlay->Paint( renderer );
+  //m_QuantityOverlay->Update(renderer);
+  //m_QuantityOverlay->Paint( renderer );
 //  annotationOffset -= m_QuantityOverlay->GetBoundsOnDisplay( renderer ).Size[1];
   annotationOffset -= 15.0;
 }

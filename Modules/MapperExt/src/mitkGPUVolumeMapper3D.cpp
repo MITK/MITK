@@ -75,7 +75,7 @@ void mitk::GPUVolumeMapper3D::MitkRenderVolumetricGeometry(mitk::BaseRenderer* r
 
 bool mitk::GPUVolumeMapper3D::InitGPU(mitk::BaseRenderer* /*renderer*/)
 {
-  return false; // TODO 18922
+  return false;
 }
 
 void mitk::GPUVolumeMapper3D::InitCPU(mitk::BaseRenderer* renderer)
@@ -304,25 +304,6 @@ void mitk::GPUVolumeMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *rende
 
   // UpdateTransferFunctions
   UpdateTransferFunctions( renderer );
-
-  vtkVolumeMapper* activeMapper = nullptr;
-  if (ls->m_rayInitialized) {
-    activeMapper = ls->m_MapperRAY;
-  } else if (ls->m_gpuInitialized) {
-    activeMapper = ls->m_MapperGPU;
-  } else {
-    activeMapper = ls->m_MapperCPU;
-  }
-  if (m_Clipping && m_ClippingPlanes) {
-    activeMapper->SetClippingPlanes(m_ClippingPlanes);
-  } else {
-    if (m_ClippingPlanes) {
-      auto actualPlanes = activeMapper->GetClippingPlanes();
-      if (actualPlanes && actualPlanes->GetNumberOfItems() > 0) {
-        activeMapper->RemoveAllClippingPlanes();
-      }
-    }
-  }
 }
 
 void mitk::GPUVolumeMapper3D::GenerateDataGPU( mitk::BaseRenderer * /*renderer*/ )

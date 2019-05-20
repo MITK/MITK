@@ -53,12 +53,12 @@ mitk::Mapper::Pointer mitk::SegmentationObjectFactory::CreateMapper(mitk::DataNo
     std::string classname("ContourModel");
     if( dynamic_cast<mitk::Contour*>(node->GetData())!=NULL )
     {
-      newMapper = mitk::VtkGLMapperWrapper::New(mitk::ContourMapper2D::New().GetPointer());
+      newMapper = mitk::ContourMapper2D::New().GetPointer();
       newMapper->SetDataNode(node);
     }
     else if( dynamic_cast<mitk::ContourSet*>(node->GetData())!=NULL )
     {
-      newMapper = mitk::VtkGLMapperWrapper::New(mitk::ContourSetMapper2D::New().GetPointer());
+      newMapper = mitk::ContourSetMapper2D::New().GetPointer();
       newMapper->SetDataNode(node);
     }
   }

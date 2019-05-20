@@ -380,14 +380,14 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel* r
         //a diamond around the point
         //begin from upper left corner and paint clockwise
 
-        rectPts[0] = pt2d[0] - pointsize
-        rectPts[1] = pt2d[1] + pointsize
-        rectPts[2] = pt2d[0] + pointsize
-        rectPts[3] = pt2d[1] + pointsize
-        rectPts[4] = pt2d[0] + pointsize
-        rectPts[5] = pt2d[1] - pointsize
-        rectPts[6] = pt2d[0] - pointsize
-        rectPts[7] = pt2d[1] - pointsize
+        rectPts[0] = pt2d[0] - pointsize;
+        rectPts[1] = pt2d[1] + pointsize;
+        rectPts[2] = pt2d[0] + pointsize;
+        rectPts[3] = pt2d[1] + pointsize;
+        rectPts[4] = pt2d[0] + pointsize;
+        rectPts[5] = pt2d[1] - pointsize;
+        rectPts[6] = pt2d[0] - pointsize;
+        rectPts[7] = pt2d[1] - pointsize;
         this->m_Context->DrawPolygon(rectPts, 4);
       }
       //------------------------------------

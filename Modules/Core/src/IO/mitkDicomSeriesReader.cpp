@@ -2374,7 +2374,7 @@ void DicomSeriesReader::sortIntoBlocks(std::list<StringContainer>& imageBlocks,
   for (unsigned int block = 0; block < numberOfBlocks; ++block)
   {
     StringContainer filesOfCurrentBlock;
-    for (int i = block * numberOfFilesInBlock; i < block * numberOfFilesInBlock + numberOfFilesInBlock; ++i) {
+    for (unsigned int i = block * numberOfFilesInBlock; i < block * numberOfFilesInBlock + numberOfFilesInBlock; ++i) {
       filesOfCurrentBlock.push_back(presortedFilenames[i]);
     }
 

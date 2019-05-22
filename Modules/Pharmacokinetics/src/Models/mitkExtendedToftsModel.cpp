@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vnl/algo/vnl_fft_1d.h>
 #include <fstream>
 
-const std::string mitk::ExtendedToftsModel::MODEL_DISPLAY_NAME = "Tofts Model";
+const std::string mitk::ExtendedToftsModel::MODEL_DISPLAY_NAME = "Extended Tofts Model";
 
 const std::string mitk::ExtendedToftsModel::NAME_PARAMETER_Ktrans = "KTrans";
 const std::string mitk::ExtendedToftsModel::NAME_PARAMETER_ve = "ve";

@@ -213,8 +213,6 @@ void mitk::EnhancedPointSetVtkMapper3D::ApplyColorAndOpacityProperties(
     vtkActor* a = aIt->second.first;
     assert(a != NULL);
 
-    SetVtkMapperImmediateModeRendering(a->GetMapper());
-
     /* update properties */
     // visibility
     bool pointVisibility = true;

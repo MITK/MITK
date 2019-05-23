@@ -40,8 +40,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkVolumeProperty.h>
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
-#include <vtkVolumeRayCastCompositeFunction.h>
-#include <vtkVolumeRayCastMIPFunction.h>
 #include <vtkFiniteDifferenceGradientEstimator.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>

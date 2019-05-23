@@ -48,7 +48,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkGPUInfoList.h"
 #include "vtkGPUInfo.h"
 
-vtkInstantiatorNewMacro(vtkMitkGPUVolumeRayCastMapper);
 vtkCxxSetObjectMacro(vtkMitkGPUVolumeRayCastMapper, MaskInput, vtkImageData);
 vtkCxxSetObjectMacro(vtkMitkGPUVolumeRayCastMapper, TransformedInput, vtkImageData);
 

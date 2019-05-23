@@ -539,10 +539,6 @@ void mitk::PointSetVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *ren
 
   // create new vtk render objects (e.g. sphere for a point)
 
-  SetVtkMapperImmediateModeRendering(m_VtkSelectedPolyDataMapper);
-  SetVtkMapperImmediateModeRendering(m_VtkSelectedAreaPolyDataMapper);
-  SetVtkMapperImmediateModeRendering(m_VtkUnselectedPolyDataMapper);
-
   BaseLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
   bool needGenerateData = ls->IsGenerateDataRequired( renderer, this, GetDataNode() );
 

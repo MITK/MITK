@@ -208,9 +208,6 @@ namespace mitk
 
   void PlaneGeometryDataVtkMapper3D::GenerateDataForRenderer(BaseRenderer* renderer)
   {
-    SetVtkMapperImmediateModeRendering(m_EdgeMapper);
-    SetVtkMapperImmediateModeRendering(m_BackgroundMapper);
-
     // Remove all actors from the assembly, and re-initialize it with the
     // edge actor
     m_ImageAssembly->GetParts()->RemoveAllItems();
@@ -499,8 +496,6 @@ namespace mitk
             if ( m_ImageActors.count( imageMapper ) == 0 )
             {
               dataSetMapper = vtkDataSetMapper::New();
-              //Enable rendering without copying the image.
-              dataSetMapper->ImmediateModeRenderingOn();
 
               texture = vtkNeverTranslucentTexture::New();
               texture->RepeatOff();

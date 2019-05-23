@@ -115,15 +115,15 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
       localStorage->m_LayerTextureVector.push_back(vtkSmartPointer<vtkNeverTranslucentTexture>::New());
       localStorage->m_LevelWindowFilterVector.push_back(vtkSmartPointer<vtkMitkLevelWindowFilter>::New());
       localStorage->m_LayerMapperVector.push_back(vtkSmartPointer<vtkPolyDataMapper>::New());
-      localStorage->m_LayerActorVector.push_back(vtkSmartPointer<vtkActor>::New());
+      //localStorage->m_LayerActorVector.push_back(vtkSmartPointer<vtkActor>::New());
 
       //do not repeat the texture (the image)
       localStorage->m_LayerTextureVector[lidx]->RepeatOff();
 
       //set corresponding mappers for the actors
-      localStorage->m_LayerActorVector[lidx]->SetMapper( localStorage->m_LayerMapperVector[lidx] );
+      //localStorage->m_LayerActorVector[lidx]->SetMapper( localStorage->m_LayerMapperVector[lidx] );
 
-      localStorage->m_Actors->AddPart( localStorage->m_LayerActorVector[lidx] );
+      //localStorage->m_Actors->AddPart( localStorage->m_LayerActorVector[lidx] );
     }
 
     localStorage->m_Actors->AddPart( localStorage->m_OutlineShadowActor );
@@ -266,9 +266,9 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
     }
 
     //set the texture for the actor
-    localStorage->m_LayerActorVector[lidx]->SetTexture(localStorage->m_LayerTextureVector[lidx]);
+    //localStorage->m_LayerActorVector[lidx]->SetTexture(localStorage->m_LayerTextureVector[lidx]);
 
-    localStorage->m_LayerActorVector[lidx]->GetProperty()->SetOpacity(opacity);
+    //localStorage->m_LayerActorVector[lidx]->GetProperty()->SetOpacity(opacity);
   }
 
   if (image->GetActiveLabel())
@@ -476,7 +476,7 @@ void mitk::LabelSetImageVtkMapper2D::ApplyOpacity( mitk::BaseRenderer* renderer,
   LocalStorage* localStorage = this->GetLocalStorage( renderer );
   float opacity = 1.0f;
   this->GetDataNode()->GetOpacity( opacity, renderer, "opacity" );
-  localStorage->m_LayerActorVector[layer]->GetProperty()->SetOpacity(opacity);
+  //localStorage->m_LayerActorVector[layer]->GetProperty()->SetOpacity(opacity);
   localStorage->m_OutlineActor->GetProperty()->SetOpacity(opacity);
   localStorage->m_OutlineShadowActor->GetProperty()->SetOpacity(opacity);
 }
@@ -642,9 +642,9 @@ void mitk::LabelSetImageVtkMapper2D::TransformActor(mitk::BaseRenderer* renderer
   for (int lidx=0; lidx<localStorage->m_NumberOfLayers ; ++lidx)
   {
     //transform the plane/contour (the actual actor) to the corresponding view (axial, coronal or saggital)
-    localStorage->m_LayerActorVector[lidx]->SetUserTransform(trans);
+    //localStorage->m_LayerActorVector[lidx]->SetUserTransform(trans);
     //transform the origin to center based coordinates, because MITK is center based.
-    localStorage->m_LayerActorVector[lidx]->SetPosition( -0.5*localStorage->m_mmPerPixel[0], -0.5*localStorage->m_mmPerPixel[1], 0.0);
+    //localStorage->m_LayerActorVector[lidx]->SetPosition( -0.5*localStorage->m_mmPerPixel[0], -0.5*localStorage->m_mmPerPixel[1], 0.0);
   }
   //same for outline actor
   localStorage->m_OutlineActor->SetUserTransform(trans);

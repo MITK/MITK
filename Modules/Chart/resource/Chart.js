@@ -74,8 +74,19 @@ window.onload = function()
 		Plotly.restyle('chart', updateColor, position);
 	  });
 
-	  registeredChannelObject.SignalXDataChanged.connect(function(newValue){
-		console.log("xdata changed");
+	  registeredChannelObject.SignalDataChanged.connect(function(newValue){
+		console.log("data changed for label " + registeredChannelObject.m_Label);
+
+		let xDataTemp = registeredChannelObject.m_XData;
+		let yDataTemp = registeredChannelObject.m_YData;
+
+		let trace = generateTraceByChartType(registeredChannelObject.m_ChartType);
+
+		trace["x"] = [xDataTemp];
+		trace["y"] = [yDataTemp];
+		trace["name"] = registeredChannelObject.m_Label;
+
+		Plotly.restyle('chart', trace, position);
 	  });
 
 	  registeredChannelObject.SignalYDataChanged.connect(function(newValue){

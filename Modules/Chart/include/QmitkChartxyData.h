@@ -28,8 +28,8 @@ class QmitkChartxyData : public QObject
   Q_OBJECT
 
   Q_PROPERTY(QVariant m_LabelCount READ GetLabelCount CONSTANT);
-  Q_PROPERTY(QList<QVariant> m_YData READ GetYData WRITE SetYData NOTIFY SignalYDataChanged);
-  Q_PROPERTY(QList<QVariant> m_XData READ GetXData WRITE SetXData NOTIFY SignalXDataChanged);
+  Q_PROPERTY(QList<QVariant> m_YData READ GetYData WRITE SetYData NOTIFY SignalDataChanged);
+  Q_PROPERTY(QList<QVariant> m_XData READ GetXData WRITE SetXData NOTIFY SignalDataChanged);
   Q_PROPERTY(
     QList<QVariant> m_XErrorDataPlus READ GetXErrorDataPlus WRITE SetXErrorDataPlus NOTIFY SignalErrorDataChanged);
   Q_PROPERTY(
@@ -57,14 +57,14 @@ public:
   Q_INVOKABLE void SetYData(const QList<QVariant> &yData)
   {
     m_YData = yData;
-    emit SignalYDataChanged(yData);
+    emit SignalDataChanged(yData);
   };
 
   Q_INVOKABLE QList<QVariant> GetXData() const { return m_XData; };
   Q_INVOKABLE void SetXData(const QList<QVariant> &xData)
   {
     m_XData = xData;
-    emit SignalXDataChanged(xData);
+    emit SignalDataChanged(xData);
   };
 
   Q_INVOKABLE QList<QVariant> GetXErrorDataPlus() const { return m_XErrorDataPlus; };
@@ -131,8 +131,7 @@ public:
   void ClearData();
 
 signals:
-  void SignalYDataChanged(const QList<QVariant> yData);
-  void SignalXDataChanged(const QList<QVariant> xData);
+  void SignalDataChanged(const QList<QVariant> data);
   void SignalErrorDataChanged(const QList<QVariant> errorData);
   void SignalDiagramTypeChanged(const QVariant diagramType);
   void SignalColorChanged(const QVariant color);

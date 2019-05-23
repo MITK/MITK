@@ -100,7 +100,18 @@ public:
   */
   void AddData1D(const std::vector<double>& data1D, const std::string& label, ChartType chartType = ChartType::bar);
 
+   /*!
+   * \brief Updates data of an existing label
+   * \param data1D the 1D data , \sa AddData1D
+   * \param label the (existing) label
+   * \note if the label does not exist, nothing happens
+   */
   void UpdateData1D(const std::vector<double> &data1D, const std::string &label);
+
+  /*!
+   * \sa UpdateData1D
+   * \sa AddData2D
+   */
   void UpdateData2D(const std::map<double, double> &data2D, const std::string &label);
 
   /*!

@@ -25,15 +25,15 @@ QmitkChartxyData::QmitkChartxyData(const QMap<QVariant, QVariant> &data,
   SetData(data);
 }
 
-void QmitkChartxyData::SetData(const QMap<QVariant, QVariant>& data)
+void QmitkChartxyData::SetData(const QMap<QVariant, QVariant> &data)
 {
-	for (const auto& entry : data.toStdMap())
-	{
-		m_XData.push_back(entry.first);
-		m_YData.push_back(entry.second);
-	}
-  emit SignalXDataChanged(m_XData);
-  emit SignalYDataChanged(m_YData);
+  ClearData();
+  for (const auto &entry : data.toStdMap())
+  {
+    m_XData.push_back(entry.first);
+    m_YData.push_back(entry.second);
+  }
+  emit SignalDataChanged(m_YData);
 }
 
 void QmitkChartxyData::ClearData()

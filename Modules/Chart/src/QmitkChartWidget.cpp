@@ -57,6 +57,8 @@ public:
 
   void RemoveData(const std::string &label);
 
+  void UpdateLabel(const std::string &existingLabel, const std::string &newLabel);
+
   void ClearData();
 
   void SetColor(const std::string &label, const std::string &colorName);
@@ -276,6 +278,16 @@ void QmitkChartWidget::Impl::ClearData()
     m_WebChannel->deregisterObject(xyData.get());
   }
   m_C3xyData.clear();
+}
+
+void QmitkChartWidget::Impl::UpdateLabel(const std::string &existingLabel, const std::string &newLabel) {
+  auto element = GetDataElementByLabel(existingLabel);
+  if (element)
+  {
+    auto definedLabels = GetDataLabels(m_C3xyData);
+    auto uniqueLabel = GetUniqueLabelName(definedLabels, newLabel);
+    element->SetLabel(QString::fromStdString(uniqueLabel));
+  }
 }
 
 void QmitkChartWidget::Impl::SetColor(const std::string &label, const std::string &colorName)
@@ -577,6 +589,10 @@ void QmitkChartWidget::UpdateData2D(const std::map<double, double> &data2D, cons
 void QmitkChartWidget::RemoveData(const std::string &label)
 {
   m_Impl->RemoveData(label);
+}
+
+void QmitkChartWidget::UpdateLabel(const std::string &existingLabel, const std::string &newLabel) {
+  m_Impl->UpdateLabel(existingLabel, newLabel);
 }
 
 void QmitkChartWidget::SetXAxisLabel(const std::string &label)

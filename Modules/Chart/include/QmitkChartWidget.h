@@ -135,6 +135,8 @@ public:
   */
   void RemoveData(const std::string& label);
 
+  void UpdateLabel(const std::string& existingLabel, const std::string& newLabel);
+
   /*!
   * \brief Sets the color of one data entry (identifier is previously assigned label)
   * \details the color name can be "red" or a hex number (#FF0000).

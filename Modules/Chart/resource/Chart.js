@@ -89,8 +89,11 @@ window.onload = function()
 		Plotly.restyle('chart', trace, position);
 	  });
 
-	  registeredChannelObject.SignalYDataChanged.connect(function(newValue){
-		console.log("ydata changed");
+	  registeredChannelObject.SignalLabelChanged.connect(function(newValue){
+		let trace = {
+			  name: newValue
+			};
+		Plotly.restyle('chart', trace, position);
 	  });
 	}
 

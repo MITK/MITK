@@ -155,6 +155,8 @@ void ChartExample::UpdateChart() {
   m_Controls.m_Chart->SetLineStyle("test0", QmitkChartWidget::LineStyle::dashed);
   m_Controls.m_Chart->SetChartType("test0", QmitkChartWidget::ChartType::spline);
   m_Controls.m_Chart->SetColor("test0", "violet");
+  m_Controls.m_Chart->UpdateData2D({{0, 1}, {0.1, 2}, {0.2, 3}, {8, -2} }, "test0");
+  m_Controls.m_Chart->UpdateLabel("test0", "newLabel");
 }
 
 void ChartExample::ClearChart()

@@ -82,7 +82,6 @@ public:
   void SetThemeName(ColorTheme style);
 
   void SetLegendPosition(LegendPosition position);
-  void SetChartTypeByLabel(const std::string &label, QmitkChartWidget::ChartType chartType);
 
   void Show(bool showSubChart);
 
@@ -354,21 +353,6 @@ void QmitkChartWidget::Impl::SetThemeName(QmitkChartWidget::ColorTheme style)
 {
   const std::string themeName(m_ColorThemeToName.at(style));
   m_C3Data.SetThemeName(QString::fromStdString(themeName));
-}
-
-void QmitkChartWidget::Impl::SetChartTypeByLabel(const std::string &label, QmitkChartWidget::ChartType chartType)
-{
-  auto element = GetDataElementByLabel(label);
-  if (element)
-  {
-    if (chartType == ChartType::scatter)
-    {
-      SetShowDataPoints(true);
-      MITK_INFO << "Enabling data points for all because of scatter plot";
-    }
-    auto chartTypeName = ConvertChartTypeToString(chartType);
-    element->SetChartType(QVariant(QString::fromStdString(chartTypeName)));
-  }
 }
 
 void QmitkChartWidget::Impl::SetLegendPosition(QmitkChartWidget::LegendPosition legendPosition)

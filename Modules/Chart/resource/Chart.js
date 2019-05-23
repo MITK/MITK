@@ -37,15 +37,11 @@ window.onload = function()
 	{
 	  let position = registeredChannelObject.m_LabelCount;
 	  registeredChannelObject.SignalDiagramTypeChanged.connect(function(newValue){
-		console.log("diagram type changed");
-		console.log(newValue);
 		let updateDiagramType = generateTraceByChartType(newValue);
 		Plotly.restyle('chart', updateDiagramType, position);
 	  });
 
 	  registeredChannelObject.SignalLineStyleChanged.connect(function(newValue){
-		console.log("line style changed");
-		console.log(newValue);
 		var dashValue;
 		if (newValue == "dashed"){
 			dashValue = "dot";

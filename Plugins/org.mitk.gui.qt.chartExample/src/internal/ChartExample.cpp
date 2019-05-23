@@ -35,17 +35,7 @@ void ChartExample::CreateQtPartControl(QWidget *parent)
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(parent);
-  connect(m_Controls.m_buttonCreateChart, &QPushButton::clicked, this, &ChartExample::CreateChart);
-  connect(m_Controls.m_buttonClearChart, &QPushButton::clicked, this, &ChartExample::ClearChart);
-  connect(m_Controls.m_buttonAddData, &QPushButton::clicked, this, &ChartExample::AddData);
-  connect(m_Controls.m_checkBoxEnableDataX, &QCheckBox::toggled, this, &ChartExample::ShowXData);
-  connect(m_Controls.m_checkBoxEnableErrors, &QCheckBox::toggled, this, &ChartExample::ShowErrorOptions);
-  connect(m_Controls.m_checkBoxEnableXErrors, &QCheckBox::toggled, this, &ChartExample::ShowXErrorOptions);
-  connect(m_Controls.m_checkBoxEnableYErrors, &QCheckBox::toggled, this, &ChartExample::ShowYErrorOptions);
-  connect(m_Controls.m_doubleSpinBox_minZoomX, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoomX);
-  connect(m_Controls.m_doubleSpinBox_maxZoomX, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoomX);
-  connect(m_Controls.m_doubleSpinBox_minZoomY, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoomY);
-  connect(m_Controls.m_doubleSpinBox_maxZoomY, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoomY);
+  CreateConnectionsForGUIElements();
   connect(m_Controls.m_comboBoxChartType, &QComboBox::currentTextChanged, this, &ChartExample::AdaptDataGUI);
 
   m_Controls.m_groupBoxErrors->setVisible(false);
@@ -86,6 +76,32 @@ void ChartExample::CreateQtPartControl(QWidget *parent)
   m_LegendPositionNameToLegendPositionType.emplace("middle right", QmitkChartWidget::LegendPosition::middleRight);
 }
 
+void ChartExample::CreateConnectionsForGUIElements()
+{
+  connect(m_Controls.m_buttonCreateChart, &QPushButton::clicked, this, &ChartExample::CreateChart);
+  connect(m_Controls.m_buttonUpdateChart, &QPushButton::clicked, this, &ChartExample::UpdateChart);
+  connect(m_Controls.m_buttonClearChart, &QPushButton::clicked, this, &ChartExample::ClearChart);
+  connect(m_Controls.m_buttonAddData, &QPushButton::clicked, this, &ChartExample::AddData);
+  connect(m_Controls.m_checkBoxEnableDataX, &QCheckBox::toggled, this, &ChartExample::ShowXData);
+  connect(m_Controls.m_checkBoxEnableErrors, &QCheckBox::toggled, this, &ChartExample::ShowErrorOptions);
+  connect(m_Controls.m_checkBoxEnableXErrors, &QCheckBox::toggled, this, &ChartExample::ShowXErrorOptions);
+  connect(m_Controls.m_checkBoxEnableYErrors, &QCheckBox::toggled, this, &ChartExample::ShowYErrorOptions);
+  connect(m_Controls.m_doubleSpinBox_minZoomX, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoomX);
+  connect(m_Controls.m_doubleSpinBox_maxZoomX, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoomX);
+  connect(m_Controls.m_doubleSpinBox_minZoomY, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoomY);
+  connect(m_Controls.m_doubleSpinBox_maxZoomY, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoomY);
+  connect(m_Controls.m_comboBoxLegendPosition, &QComboBox::currentTextChanged, this, &ChartExample::OnLegendPositionChanged);
+  connect(m_Controls.m_lineEditTitle, &QLineEdit::editingFinished, this, &ChartExample::OnTitleChanged);
+  connect(m_Controls.m_lineEditXAxisLabel, &QLineEdit::editingFinished, this, &ChartExample::OnXAxisLabelChanged);
+  connect(m_Controls.m_lineEditYAxisLabel, &QLineEdit::editingFinished, this, &ChartExample::OnYAxisLabelChanged);
+  connect(
+    m_Controls.m_comboBoxYAxisScale, &QComboBox::currentTextChanged, this, &ChartExample::OnYAxisScaleChanged);
+  connect(m_Controls.m_checkBoxShowLegend, &QCheckBox::stateChanged, this, &ChartExample::OnShowLegendChanged);
+  connect(m_Controls.m_checkBoxStackedData, &QCheckBox::stateChanged, this, &ChartExample::OnStackedDataChanged);
+  connect(m_Controls.m_checkBoxShowDataPoints, &QCheckBox::stateChanged, this, &ChartExample::OnShowDataPointsChanged);
+  connect(m_Controls.m_checkBoxShowSubchart, &QCheckBox::stateChanged, this, &ChartExample::OnShowSubchartChanged);
+}
+
 void ChartExample::FillRandomDataValues()
 {
   std::vector<double> numbers = GenerateRandomNumbers(10, 10.0);
@@ -122,7 +138,7 @@ void ChartExample::CreateChart()
   auto showDataPoints = m_Controls.m_checkBoxShowDataPoints->isChecked();
   auto stackedData = m_Controls.m_checkBoxStackedData->isChecked();
   auto showSubchart = m_Controls.m_checkBoxShowSubchart->isChecked();
-  auto title = m_Controls.title->text().toStdString();
+  auto title = m_Controls.m_lineEditTitle->text().toStdString();
 
   m_Controls.m_Chart->SetTitle(title);
   m_Controls.m_Chart->SetYAxisScale(dataYAxisScaleType);
@@ -134,6 +150,15 @@ void ChartExample::CreateChart()
   m_Controls.m_Chart->SetShowDataPoints(showDataPoints);
   m_Controls.m_Chart->SetStackedData(stackedData);
   m_Controls.m_Chart->Show(showSubchart);
+}
+
+void ChartExample::UpdateChart() {
+  // Test update mechanism
+  m_Controls.m_Chart->SetLineStyle("test0", QmitkChartWidget::LineStyle::dashed);
+  m_Controls.m_Chart->SetChartType("test0", QmitkChartWidget::ChartType::spline);
+  m_Controls.m_Chart->SetColor("test0", "violet");
+  m_Controls.m_Chart->UpdateData2D({{0, 1}, {0.1, 2}, {0.2, 3}, {8, -2} }, "test0");
+  m_Controls.m_Chart->UpdateLabel("test0", "newLabel");
 }
 
 void ChartExample::ClearChart()
@@ -385,4 +410,46 @@ QmitkChartWidget::ColorTheme ChartExample::GetColorTheme() const
     }
   }
   return QmitkChartWidget::ColorTheme::darkstyle;
+}
+
+void ChartExample::OnLegendPositionChanged(const QString &newText)
+{
+  auto legendPosition = m_LegendPositionNameToLegendPositionType.at(newText.toStdString());
+  m_Controls.m_Chart->SetLegendPosition(legendPosition);
+}
+
+void ChartExample::OnTitleChanged() {
+  auto newTitle = m_Controls.m_lineEditTitle->text();
+  m_Controls.m_Chart->SetTitle(newTitle.toStdString());
+}
+
+void ChartExample::OnXAxisLabelChanged() {
+  auto newXAxisLabel = m_Controls.m_lineEditXAxisLabel->text();
+  m_Controls.m_Chart->SetXAxisLabel(newXAxisLabel.toStdString());
+}
+
+void ChartExample::OnYAxisLabelChanged() {
+  auto newYAxisLabel = m_Controls.m_lineEditYAxisLabel->text();
+  m_Controls.m_Chart->SetYAxisLabel(newYAxisLabel.toStdString());
+}
+
+void ChartExample::OnYAxisScaleChanged(const QString &newYAxisScale) {
+  auto yAxisScale = m_AxisScaleNameToAxisScaleType.at(newYAxisScale.toStdString());
+  m_Controls.m_Chart->SetYAxisScale(yAxisScale);
+}
+
+void ChartExample::OnShowLegendChanged(int newState) {
+  m_Controls.m_Chart->SetShowLegend(newState == Qt::Checked);
+}
+
+void ChartExample::OnStackedDataChanged(int newState) {
+  m_Controls.m_Chart->SetStackedData(newState == Qt::Checked);
+}
+
+void ChartExample::OnShowDataPointsChanged(int newState) {
+  m_Controls.m_Chart->SetShowDataPoints(newState == Qt::Checked);
+}
+
+void ChartExample::OnShowSubchartChanged(int newState) {
+  m_Controls.m_Chart->SetShowSubchart(newState == Qt::Checked);
 }

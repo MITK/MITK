@@ -39,9 +39,12 @@ public:
 protected:
   virtual void CreateQtPartControl(QWidget *parent) override;
 
+  void CreateConnectionsForGUIElements();
+
   virtual void SetFocus() override;
 
   void CreateChart();
+  void UpdateChart();
   void ClearChart();
 
   void AddData();
@@ -66,6 +69,15 @@ private:
   std::string ConvertToText(std::vector<double> numbers, std::string delimiter = ";") const;
   std::string ConvertToText(std::map<double, double> numbers, std::string delimiter = ";") const;
   QmitkChartWidget::ColorTheme GetColorTheme() const;
+  void OnLegendPositionChanged(const QString &newPosition);
+  void OnTitleChanged();
+  void OnXAxisLabelChanged();
+  void OnYAxisLabelChanged();
+  void OnYAxisScaleChanged(const QString &newYAxisScale);
+  void OnShowLegendChanged(int newState);
+  void OnStackedDataChanged(int newState);
+  void OnShowDataPointsChanged(int newState);
+  void OnShowSubchartChanged(int newState);
 
   std::map<std::string, QmitkChartWidget::ChartType> m_ChartNameToChartType;
   std::map<std::string, QmitkChartWidget::LineStyle> m_LineNameToLineType;

@@ -3,7 +3,6 @@ document.body.style.backgroundColor = 'rgb(240, 240, 240)';
 const minHeight = 255;
 var chart;
 
-var chartData;
 var xErrorValuesPlus=[];
 var xErrorValuesMinus=[];
 var yErrorValuesPlus=[];
@@ -26,28 +25,177 @@ var foregroundColor = 'black';
 
 var dataProperties = {};
 
+var chartData = null;
+
+
 // Important loading function. This will be executed at first in this whole script.
 // Fetching data from QWebChannel and storing them for display purposes.
 window.onload = function()
 {
   initHeight();
+  
+	 /**
+	 * Adds handler for Qt signal emitted from QmitkChartxyData.
+	 * Changes for single traces like value changes in a line plot are handled here.
+	 */
+	function handleDataChangeEvents(registeredChannelObject)
+	{
+	  let position = registeredChannelObject.m_LabelCount;
+	  registeredChannelObject.SignalDiagramTypeChanged.connect(function(newValue){
+		let updateDiagramType = generateTraceByChartType(newValue);
+		Plotly.restyle('chart', updateDiagramType, position);
+	  });
+
+	  registeredChannelObject.SignalLineStyleChanged.connect(function(newValue){
+		var dashValue;
+		if (newValue == "dashed"){
+			dashValue = "dot";
+		}
+		else {
+			dashValue = "solid";
+		}
+		updateDash = {
+				line : {
+					"dash" : dashValue
+				}
+			}
+
+		Plotly.restyle('chart', updateDash, position);
+	  });
+
+	  registeredChannelObject.SignalColorChanged.connect(function(newValue){
+		var updateColor={
+			marker:{
+				"color" : newValue
+			},
+			line:{
+				"color" : newValue
+			}
+		}
+		Plotly.restyle('chart', updateColor, position);
+	  });
+
+	  registeredChannelObject.SignalDataChanged.connect(function(newValue){
+		console.log("data changed for label " + registeredChannelObject.m_Label);
+
+		let xDataTemp = registeredChannelObject.m_XData;
+		let yDataTemp = registeredChannelObject.m_YData;
+
+		let trace = generateTraceByChartType(registeredChannelObject.m_ChartType);
+
+		trace["x"] = [xDataTemp];
+		trace["y"] = [yDataTemp];
+		trace["name"] = registeredChannelObject.m_Label;
+
+		Plotly.restyle('chart', trace, position);
+	  });
+
+	  registeredChannelObject.SignalLabelChanged.connect(function(newValue){
+		let trace = {
+			  name: newValue
+			};
+		Plotly.restyle('chart', trace, position);
+	  });
+	}
+
+	/**
+	 * Adds handler for Qt signal emitted from QmitkChartData.
+	 * Changes for the whole chart like title are handled here.
+	 */
+	function handleChartChangeEvents(registeredChannelObject)
+	{
+	  registeredChannelObject.SignalXAxisLabelChanged.connect(function(newValue){
+		var layout = {
+		  xaxis: {
+			title: {
+			text: newValue
+			},
+			color: foregroundColor
+		  }
+		}
+		Plotly.relayout('chart', layout);
+	  });
+
+	  registeredChannelObject.SignalYAxisLabelChanged.connect(function(newValue){
+		var layout = {
+		  yaxis: {
+			title: {
+			text: newValue
+			},
+			color: foregroundColor
+		  }
+		}
+		Plotly.relayout('chart', layout);
+	  });
+
+	  registeredChannelObject.SignalTitleChanged.connect(function(newValue){
+		var layout = {
+		      title: {
+				text:newValue,
+				font: {
+					color: foregroundColor
+				}
+			  }
+		}
+		Plotly.relayout('chart', layout);
+	  });
+
+	  registeredChannelObject.SignalLegendPositionChanged.connect(function(newValue){
+		let legendPosition = generateLegendPosition(chartData.m_LegendPosition);
+		var layout = {
+				legend: legendPosition
+		}
+		Plotly.relayout('chart', layout);
+	  });
+
+	  registeredChannelObject.SignalYAxisScaleChanged.connect(function(newValue){
+		var layout = {
+			yaxis : {
+				type : newValue
+			}
+		};
+		Plotly.relayout('chart', layout);
+	  });
+
+	  registeredChannelObject.SignalShowLegendChanged.connect(function(newValue){
+		var layout = {
+			showlegend : newValue
+		};
+		Plotly.relayout('chart', layout);
+	  });
+
+	  registeredChannelObject.SignalShowSubchartChanged.connect(function(newValue){
+		var layout = {
+			xaxis : {}
+		};
+		if (newValue){
+			layout.xaxis.rangeslider = {}; // adds range slider below x axis
+		}
+		Plotly.relayout('chart', layout);
+	  });
+
+	}
 
   new QWebChannel(qt.webChannelTransport, function(channel) {
     chartData = channel.objects.chartData;
 
+	handleChartChangeEvents(chartData);
+	
     let count = 0;
     for(let propertyName in channel.objects) {
       if (propertyName != 'chartData')
       {
-        let xDataTemp = channel.objects[propertyName].m_XData;
-        let yDataTemp = channel.objects[propertyName].m_YData;
-        let xErrorsTempPlus = channel.objects[propertyName].m_XErrorDataPlus;
-        let xErrorsTempMinus = channel.objects[propertyName].m_XErrorDataMinus;
-        let yErrorsTempPlus = channel.objects[propertyName].m_YErrorDataPlus;
-        let yErrorsTempMinus = channel.objects[propertyName].m_YErrorDataMinus;  
-		let pieDataLabelsTemp = channel.objects[propertyName].m_PieLabels;
+		let chartXYData = channel.objects[propertyName];
+		handleDataChangeEvents(chartXYData);
 
-        let dataLabel = channel.objects[propertyName].m_Label;
+        let xDataTemp = chartXYData.m_XData;
+        let yDataTemp = chartXYData.m_YData;
+        let xErrorsTempPlus = chartXYData.m_XErrorDataPlus;
+		let pieDataLabelsTemp = chartXYData.m_PieLabels;
+        let xErrorsTempMinus = chartXYData.m_XErrorDataMinus;
+        let yErrorsTempPlus = chartXYData.m_YErrorDataPlus;
+        let yErrorsTempMinus = chartXYData.m_YErrorDataMinus;
+        let dataLabel = chartXYData.m_Label;
         dataLabels.push(dataLabel);
 
         console.log("loading datalabel: "+dataLabel);
@@ -68,9 +216,10 @@ window.onload = function()
         yErrorValuesMinus[count] = yErrorsTempMinus;
 		pieDataLabels[count] = pieDataLabelsTemp;
 
+
         var tempLineStyle = '';
 
-        if (channel.objects[propertyName].m_LineStyleName == "solid")
+        if (chartXYData.m_LineStyleName == "solid")
         {
           tempLineStyle = ''
         }
@@ -80,8 +229,8 @@ window.onload = function()
         }
 
         dataProperties[dataLabel] = {
-            "color" : channel.objects[propertyName].m_Color,
-            "chartType": channel.objects[propertyName].m_ChartType,
+            "color" : chartXYData.m_Color,
+            "chartType": chartXYData.m_ChartType,
             "style": tempLineStyle
         }
 
@@ -134,11 +283,50 @@ function generateErrorBars(errors, visible){
 	return errorObject;
 }
 
+/**
+ * Generate legend position  object
+ *
+ * @param legendPosition the string of the legendPosition enum from QmitkChartWidget
+ * @return legend position object
+ */
+function generateLegendPosition(legendPosition){
+  if (legendPosition == "bottomMiddle"){
+	  var legendX = 0.5;
+	  var legendY = -0.75;
+  }
+  else if (legendPosition == "bottomRight"){
+	  var legendX = 1;
+	  var legendY = 0;
+  }
+  else if (legendPosition == "topRight"){
+	  var legendX = 1;
+	  var legendY = 1;
+  }
+  else if (legendPosition == "topLeft"){
+	  var legendX = 0;
+	  var legendY = 1;
+  }
+  else if (legendPosition == "middleRight"){
+	  var legendX = 1;
+	  var legendY = 0.5;
+  }
+
+	let legendPositionObject = {
+		x: legendX,
+		y: legendY,
+		font : {
+			color: foregroundColor
+		}
+	}
+
+	return legendPositionObject;
+}
+
 function generateErrorBarsAsymmetric(errorsPlus, errorsMinus, visible){
 	let errorObject = generateErrorBars(errorsPlus, visible);
 	errorObject["arrayminus"] = errorsMinus;
 	errorObject["symmetric"] = false;
-	
+
 	return errorObject;
 }
 
@@ -148,7 +336,7 @@ function generateStackPlotData(){
   for (let index = 0; index < dataLabels.length; index++){
 	let inputType = dataProperties[dataLabels[index]]["chartType"];
     let chartType = getPlotlyChartType(inputType);
-	
+
     let trace = {
       x: xValues[index].slice(1),
       y: yValues[index].slice(1),
@@ -165,21 +353,37 @@ function generateStackPlotData(){
   return data;
 }
 
+function generateTraceByChartType(chartType){
+	let plotlyChartType = getPlotlyChartType(chartType);
+
+	let trace = {
+      type: plotlyChartType,
+    };
+	trace["line"] = {}
+	if (plotlyChartType == "area"){
+      trace["fill"] = 'tozeroy'
+    } else if (plotlyChartType == "spline"){
+      trace["line"]["shape"] = 'spline'
+    } else if (plotlyChartType == "scatterOnly"){
+      trace["mode"] = 'markers';
+    } else if (plotlyChartType == "area-spline"){
+      trace["fill"] = 'tozeroy'
+      trace["line"]["shape"] = 'spline'
+    }
+
+	return trace;
+}
+
 function generatePlotData(){
   let data = [];
 
   for (let index = 0; index < dataLabels.length; index++){
+	let trace = generateTraceByChartType(dataProperties[dataLabels[index]]["chartType"]);
 
-    let inputType = dataProperties[dataLabels[index]]["chartType"];
-    let chartType = getPlotlyChartType(inputType);
-	
-    let trace = {
-      x: xValues[index].slice(1),
-      y: yValues[index].slice(1),
-      type: chartType,
-      name: dataLabels[index],
-    };
-	if (chartType=="pie"){
+	trace["x"] = xValues[index].slice(1);
+	trace["y"] = yValues[index].slice(1);
+	trace["name"] = dataLabels[index];
+	if (dataProperties[dataLabels[index]]["chartType"]=="pie"){
 		trace["values"] = yValues[index].slice(1);
 		if (typeof pieDataLabels[index] !== 'undefined' && pieDataLabels[index].length > 0){
 		  trace["labels"] = pieDataLabels[index];
@@ -194,7 +398,7 @@ function generatePlotData(){
 			trace["error_x"] = generateErrorBars(xErrorValuesPlus[index], chartData.m_ShowErrorBars);
 		  }
 	  }
-	  
+
 	  if(typeof yErrorValuesPlus[index] !== 'undefined'){
 		  if(typeof yErrorValuesMinus[index] !== 'undefined' && yErrorValuesMinus[index].length > 0)
 		  {
@@ -205,21 +409,7 @@ function generatePlotData(){
 	  }
 
     // ===================== CHART TYPE OPTIONS HANDLING ===========
-    // initialize line object
-    trace["line"] = {}
-	
 	trace["line"]["color"] = dataProperties[dataLabels[index]]["color"]
-    if (chartType == "scatter"){  
-    } else if (chartType == "area"){
-      trace["fill"] = 'tozeroy'
-    } else if (chartType == "spline"){
-      trace["line"]["shape"] = 'spline'
-    } else if (chartType == "scatterOnly"){
-      trace["mode"] = 'markers';
-    } else if (chartType == "area-spline"){
-      trace["fill"] = 'tozeroy'
-      trace["line"]["shape"] = 'spline'
-    }
 
     // handle marker visibility/size/color
     trace["marker"] = {size: chartData.m_DataPointSize, color: dataProperties[dataLabels[index]]["color"]}
@@ -264,26 +454,8 @@ function generateChart(chartData)
   //=============================== STYLE ========================
   let marginTop = chartData.m_chartTitle == undefined ? 10 : 50;
 
-  if (chartData.m_LegendPosition == "bottomMiddle"){
-	  var legendX = 0.5;
-	  var legendY = -0.75;
-  }
-  else if (chartData.m_LegendPosition == "bottomRight"){
-	  var legendX = 1;
-	  var legendY = 0;
-  }
-  else if (chartData.m_LegendPosition == "topRight"){
-	  var legendX = 1;
-	  var legendY = 1;
-  }
-  else if (chartData.m_LegendPosition == "topLeft"){
-	  var legendX = 0;
-	  var legendY = 1;
-  }
-  else if (chartData.m_LegendPosition == "middleRight"){
-	  var legendX = 1;
-	  var legendY = 0.5;
-  }
+  let legendPosition = generateLegendPosition(chartData.m_LegendPosition);
+
   var layout = {
 	  paper_bgcolor : backgroundColor,
 	  plot_bgcolor : backgroundColor,
@@ -313,19 +485,13 @@ function generateChart(chartData)
       pad: 4
     },
 	showlegend: chartData.m_ShowLegend,
-	legend: {
-		x: legendX,
-		y: legendY,
-		font : {
-			color: foregroundColor
-		}
-	}
+	legend: legendPosition
   };
-  
+
   if (chartData.m_StackedData){
 	  layout["barmode"] = 'stack';
-  } 
-  
+  }
+
   if (chartData.m_YAxisScale){
       layout.yaxis["type"] = "log"
   }
@@ -334,7 +500,7 @@ function generateChart(chartData)
     layout.xaxis.rangeslider = {}; // adds range slider below x axis
   }
 
-  Plotly.newPlot('chart', data, layout, {displayModeBar: false, responsive: true});
+    Plotly.plot('chart', data, layout, {displayModeBar: false, responsive: true});
 
 if (minValueX !== null && maxValueX !== null){
   UpdateMinMaxValueXView(minValueX, maxValueX);

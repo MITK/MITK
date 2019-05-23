@@ -81,7 +81,6 @@ public:
   std::string GetThemeName() const;
   void SetThemeName(ColorTheme style);
 
-  void SetChartType(QmitkChartWidget::ChartType chartType);
   void SetLegendPosition(LegendPosition position);
   void SetChartTypeByLabel(const std::string &label, QmitkChartWidget::ChartType chartType);
 
@@ -355,18 +354,6 @@ void QmitkChartWidget::Impl::SetThemeName(QmitkChartWidget::ColorTheme style)
 {
   const std::string themeName(m_ColorThemeToName.at(style));
   m_C3Data.SetThemeName(QString::fromStdString(themeName));
-}
-
-void QmitkChartWidget::Impl::SetChartType(QmitkChartWidget::ChartType chartType)
-{
-  for (auto iterator = m_C3xyData.begin(); iterator != m_C3xyData.end(); ++iterator)
-  {
-    SetChartTypeByLabel((*iterator)->GetLabel().toString().toStdString(), chartType);
-  }
-
-  auto chartTypeName = ConvertChartTypeToString(chartType);
-  const QString command = QString::fromStdString("transformView('" + chartTypeName + "')");
-  CallJavaScriptFuntion(command);
 }
 
 void QmitkChartWidget::Impl::SetChartTypeByLabel(const std::string &label, QmitkChartWidget::ChartType chartType)
@@ -689,11 +676,6 @@ std::string QmitkChartWidget::convertBooleanValue(bool value) const
   std::stringstream converter;
   converter << std::boolalpha << value;
   return converter.str();
-}
-
-void QmitkChartWidget::SetChartTypeForAllDataAndReload(ChartType type)
-{
-  m_Impl->SetChartType(type);
 }
 
 void QmitkChartWidget::SetTheme(ColorTheme themeEnabled)

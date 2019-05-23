@@ -172,10 +172,6 @@ public:
   void SetTitle(const std::string &title);
 
   /*!
-  * \brief Changes the chart type for all data entries and reloads the chart
-  */
-  void SetChartTypeForAllDataAndReload(ChartType type);
-  /*!
   * \brief Sets the chart type for a data entry
   * \details for available types, see ChartType
   * \note If an unknown label is given, nothing happens.

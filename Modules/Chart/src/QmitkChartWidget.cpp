@@ -92,6 +92,8 @@ public:
 
   void SetShowDataPoints(bool showDataPoints = false);
 
+  void SetShowSubchart(bool showSubChart);
+
   void SetChartType(const std::string &label, QmitkChartWidget::ChartType chartType);
   QList<QVariant> ConvertErrorVectorToQList(const std::vector<double> &error);
 
@@ -120,6 +122,8 @@ private:
   std::map<QmitkChartWidget::LineStyle, std::string> m_LineStyleToName;
   std::map<QmitkChartWidget::AxisScale, std::string> m_AxisScaleToName;
 };
+
+
 
 std::string QmitkChartWidget::Impl::GetThemeName() const
 {
@@ -402,6 +406,10 @@ void QmitkChartWidget::Impl::SetShowDataPoints(bool showDataPoints)
   }
 }
 
+void QmitkChartWidget::Impl::SetShowSubchart(bool showSubChart) {
+  m_C3Data.SetShowSubchart(showSubChart);
+}
+
 void QmitkChartWidget::Impl::SetChartType(const std::string &label, QmitkChartWidget::ChartType chartType)
 {
   auto element = GetDataElementByLabel(label);
@@ -655,13 +663,6 @@ void QmitkChartWidget::OnPageSuccessfullyLoaded()
   m_Impl->CallJavaScriptFuntion(command);
 }
 
-std::string QmitkChartWidget::convertBooleanValue(bool value) const
-{
-  std::stringstream converter;
-  converter << std::boolalpha << value;
-  return converter.str();
-}
-
 void QmitkChartWidget::SetTheme(ColorTheme themeEnabled)
 {
   m_Impl->SetThemeName(themeEnabled);
@@ -669,9 +670,7 @@ void QmitkChartWidget::SetTheme(ColorTheme themeEnabled)
 
 void QmitkChartWidget::SetShowSubchart(bool showSubChart)
 {
-  QString subChartString = QString::fromStdString(convertBooleanValue(showSubChart));
-  const QString command = QString("SetShowSubchart(" + subChartString + ")");
-  m_Impl->CallJavaScriptFuntion(command);
+  m_Impl->SetShowSubchart(showSubChart);
 }
 
 void QmitkChartWidget::SetShowErrorBars(bool showErrorBars)

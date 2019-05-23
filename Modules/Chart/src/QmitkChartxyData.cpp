@@ -40,4 +40,8 @@ void QmitkChartxyData::ClearData()
 {
   this->m_YData.clear();
   this->m_XData.clear();
+  this->m_XErrorDataPlus.clear();
+  this->m_XErrorDataMinus.clear();
+  this->m_YErrorDataPlus.clear();
+  this->m_YErrorDataMinus.clear();
 }

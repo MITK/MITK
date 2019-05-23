@@ -126,7 +126,7 @@ public:
   /**
    * \brief Clears the Data.
    *
-   * This function clears the data.
+   * This function clears the data (including error data).
    */
   void ClearData();
 

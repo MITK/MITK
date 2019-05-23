@@ -355,7 +355,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>225</width>
+        <width>437</width>
         <height>236</height>
        </rect>
       </property>
@@ -385,7 +385,7 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="title"/>
+          <widget class="QLineEdit" name="m_lineEditTitle"/>
          </item>
          <item row="1" column="0">
           <widget class="QLabel" name="label_3">
@@ -510,8 +510,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>100</width>
-        <height>30</height>
+        <width>437</width>
+        <height>177</height>
        </rect>
       </property>
       <attribute name="label">

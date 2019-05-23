@@ -132,6 +132,33 @@ window.onload = function()
 		}
 		Plotly.relayout('chart', layout);
 	  });
+
+	  registeredChannelObject.SignalYAxisScaleChanged.connect(function(newValue){
+		var layout = {
+			yaxis : {
+				type : newValue
+			}
+		};
+		Plotly.relayout('chart', layout);
+	  });
+
+	  registeredChannelObject.SignalShowLegendChanged.connect(function(newValue){
+		var layout = {
+			showlegend : newValue
+		};
+		Plotly.relayout('chart', layout);
+	  });
+
+	  registeredChannelObject.SignalShowSubchartChanged.connect(function(newValue){
+		var layout = {
+			xaxis : {}
+		};
+		if (newValue){
+			layout.xaxis.rangeslider = {}; // adds range slider below x axis
+		}
+		Plotly.relayout('chart', layout);
+	  });
+
 	}
 
   new QWebChannel(qt.webChannelTransport, function(channel) {

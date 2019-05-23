@@ -89,6 +89,15 @@ void ChartExample::CreateConnectionsForGUIElements()
   connect(m_Controls.m_doubleSpinBox_minZoomY, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoomY);
   connect(m_Controls.m_doubleSpinBox_maxZoomY, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoomY);
   connect(m_Controls.m_comboBoxLegendPosition, &QComboBox::currentTextChanged, this, &ChartExample::OnLegendPositionChanged);
+  connect(m_Controls.m_lineEditTitle, &QLineEdit::editingFinished, this, &ChartExample::OnTitleChanged);
+  connect(m_Controls.m_lineEditXAxisLabel, &QLineEdit::editingFinished, this, &ChartExample::OnXAxisLabelChanged);
+  connect(m_Controls.m_lineEditYAxisLabel, &QLineEdit::editingFinished, this, &ChartExample::OnYAxisLabelChanged);
+  connect(
+    m_Controls.m_comboBoxYAxisScale, &QComboBox::currentTextChanged, this, &ChartExample::OnYAxisScaleChanged);
+  connect(m_Controls.m_checkBoxShowLegend, &QCheckBox::stateChanged, this, &ChartExample::OnShowLegendChanged);
+  connect(m_Controls.m_checkBoxStackedData, &QCheckBox::stateChanged, this, &ChartExample::OnStackedDataChanged);
+  connect(m_Controls.m_checkBoxShowDataPoints, &QCheckBox::stateChanged, this, &ChartExample::OnShowDataPointsChanged);
+  connect(m_Controls.m_checkBoxShowSubchart, &QCheckBox::stateChanged, this, &ChartExample::OnShowSubchartChanged);
 }
 
 void ChartExample::FillRandomDataValues()
@@ -127,7 +136,7 @@ void ChartExample::CreateChart()
   auto showDataPoints = m_Controls.m_checkBoxShowDataPoints->isChecked();
   auto stackedData = m_Controls.m_checkBoxStackedData->isChecked();
   auto showSubchart = m_Controls.m_checkBoxShowSubchart->isChecked();
-  auto title = m_Controls.title->text().toStdString();
+  auto title = m_Controls.m_lineEditTitle->text().toStdString();
 
   m_Controls.m_Chart->SetTitle(title);
   m_Controls.m_Chart->SetYAxisScale(dataYAxisScaleType);
@@ -343,8 +352,44 @@ QmitkChartWidget::ColorTheme ChartExample::GetColorTheme() const
   return QmitkChartWidget::ColorTheme::darkstyle;
 }
 
-void ChartExample::OnLegendPositionChanged() {
-  auto legendPosition =
-    m_LegendPositionNameToLegendPositionType.at(m_Controls.m_comboBoxLegendPosition->currentText().toStdString());
+void ChartExample::OnLegendPositionChanged(const QString &newText)
+{
+  auto legendPosition = m_LegendPositionNameToLegendPositionType.at(newText.toStdString());
   m_Controls.m_Chart->SetLegendPosition(legendPosition);
+}
+
+void ChartExample::OnTitleChanged() {
+  auto newTitle = m_Controls.m_lineEditTitle->text();
+  m_Controls.m_Chart->SetTitle(newTitle.toStdString());
+}
+
+void ChartExample::OnXAxisLabelChanged() {
+  auto newXAxisLabel = m_Controls.m_lineEditXAxisLabel->text();
+  m_Controls.m_Chart->SetXAxisLabel(newXAxisLabel.toStdString());
+}
+
+void ChartExample::OnYAxisLabelChanged() {
+  auto newYAxisLabel = m_Controls.m_lineEditYAxisLabel->text();
+  m_Controls.m_Chart->SetYAxisLabel(newYAxisLabel.toStdString());
+}
+
+void ChartExample::OnYAxisScaleChanged(const QString &newYAxisScale) {
+  auto yAxisScale = m_AxisScaleNameToAxisScaleType.at(newYAxisScale.toStdString());
+  m_Controls.m_Chart->SetYAxisScale(yAxisScale);
+}
+
+void ChartExample::OnShowLegendChanged(int newState) {
+  m_Controls.m_Chart->SetShowLegend(newState == Qt::Checked);
+}
+
+void ChartExample::OnStackedDataChanged(int newState) {
+  m_Controls.m_Chart->SetStackedData(newState == Qt::Checked);
+}
+
+void ChartExample::OnShowDataPointsChanged(int newState) {
+  m_Controls.m_Chart->SetShowDataPoints(newState == Qt::Checked);
+}
+
+void ChartExample::OnShowSubchartChanged(int newState) {
+  m_Controls.m_Chart->SetShowSubchart(newState == Qt::Checked);
 }

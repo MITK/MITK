@@ -43,7 +43,7 @@ class MITKQTWIDGETS_EXPORT QmitkRenderWindow: public QVTKWidget, public mitk::Re
 public:
 
   QmitkRenderWindow(QWidget *parent = 0, QString name = "unnamed renderwindow", mitk::VtkPropRenderer* renderer = NULL,
-                    mitk::RenderingManager* renderingManager = NULL,mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard);
+                    mitk::RenderingManager* renderingManager = NULL,mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard, bool useFXAA = true);
   virtual ~QmitkRenderWindow();
 
   /**

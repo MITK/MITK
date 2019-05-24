@@ -102,7 +102,7 @@ namespace mitk
     /** Standard class typedefs. */
     mitkClassMacroItkParent(BaseRenderer, itk::Object);
 
-    BaseRenderer(const char* name = nullptr, vtkRenderWindow * renWin = nullptr, mitk::RenderingManager* rm = nullptr,RenderingMode::Type mode = RenderingMode::Standard);
+    BaseRenderer(const char* name = nullptr, vtkRenderWindow * renWin = nullptr, mitk::RenderingManager* rm = nullptr,RenderingMode::Type mode = RenderingMode::Standard, bool useFXAA = true);
 
     //##Documentation
     //## @brief MapperSlotId defines which kind of mapper (e.g., 2D or 3D) shoud be used.

@@ -40,7 +40,7 @@
 QmitkRenderWindow::QmitkRenderWindow(QWidget *parent,
   QString name,
   mitk::VtkPropRenderer* /*renderer*/,
-  mitk::RenderingManager* renderingManager, mitk::BaseRenderer::RenderingMode::Type renderingMode) :
+  mitk::RenderingManager* renderingManager, mitk::BaseRenderer::RenderingMode::Type renderingMode, bool useFXAA) :
   QVTKWidget(parent), m_ResendQtEvents(true), m_MenuWidget(NULL), m_MenuWidgetActivated(false), m_LayoutIndex(0), 
   m_FullScreenMode(false),
   m_WindowPlaneIsSelected(false),

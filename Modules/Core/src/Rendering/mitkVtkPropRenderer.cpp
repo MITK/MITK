@@ -56,8 +56,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTransform.h>
 #include <vtkInteractorStyleTrackballCamera.h>
 
-mitk::VtkPropRenderer::VtkPropRenderer(const char* name, vtkRenderWindow * renWin, mitk::RenderingManager* rm, mitk::BaseRenderer::RenderingMode::Type renderingMode)
-  : BaseRenderer(name, renWin, rm, renderingMode),
+mitk::VtkPropRenderer::VtkPropRenderer(const char* name, vtkRenderWindow * renWin, mitk::RenderingManager* rm, mitk::BaseRenderer::RenderingMode::Type renderingMode, bool useFXAA)
+  : BaseRenderer(name, renWin, rm, renderingMode, useFXAA),
   m_CameraInitializedForMapperID(0)
 {
   didCount = false;

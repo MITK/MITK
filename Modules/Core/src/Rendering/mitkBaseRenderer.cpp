@@ -94,7 +94,7 @@ vtkRenderWindow* mitk::BaseRenderer::GetRenderWindowByName(const std::string& na
   return nullptr;
 }
 
-mitk::BaseRenderer::BaseRenderer(const char* name, vtkRenderWindow * renWin, mitk::RenderingManager* rm, RenderingMode::Type renderingMode)
+mitk::BaseRenderer::BaseRenderer(const char* name, vtkRenderWindow * renWin, mitk::RenderingManager* rm, RenderingMode::Type renderingMode, bool useFXAA)
   : m_RenderWindow(nullptr)
   , m_VtkRenderer(nullptr)
   , m_MapperID(defaultMapper)
@@ -185,6 +185,7 @@ mitk::BaseRenderer::BaseRenderer(const char* name, vtkRenderWindow * renWin, mit
   m_CameraController->SetRenderer(this);
 
   m_VtkRenderer = vtkRenderer::New();
+  m_VtkRenderer->UseFXAAOn();
 
   if (renderingMode == RenderingMode::DepthPeeling)
   {

@@ -51,10 +51,16 @@ public slots:
   void ResetPreferencesAndGUI();
 
   /**
-   * @brief ChangeRenderingMode slot to chose the rendering mode via QComboBox.
+   * @brief ChangeRenderingMode slot to choose the rendering mode via QComboBox.
    * @param i index of the box.
    */
   void ChangeRenderingMode(int i);
+
+  /**
+   * @brief ChangeUseFXAA slot to enable FXAA via QCheckBox
+   * @param enabled checkbox state.
+   */
+  void ChangeUseFXAA(int enabled);
 
   /**
    * @brief OnWidgetComboBoxChanged slot called when the QComboBox to chose the widget was modified.
@@ -68,6 +74,11 @@ protected:
    * @brief m_CurrentRenderingMode String for the rendering mode.
    */
   std::string m_CurrentRenderingMode;
+
+  /**
+   * @brief m_UseFXAA Bool for the FXAA
+   */
+  bool m_UseFXAA;
 
   /**
    * @brief m_WidgetBackgroundColor1 the background colors.

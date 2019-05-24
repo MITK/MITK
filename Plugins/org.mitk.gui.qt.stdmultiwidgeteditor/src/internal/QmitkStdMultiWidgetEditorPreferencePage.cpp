@@ -29,7 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkStdMultiWidgetEditorPreferencePage::QmitkStdMultiWidgetEditorPreferencePage()
   : m_Preferences(nullptr),
     m_Ui(new Ui::QmitkStdMultiWidgetEditorPreferencePage),
-    m_Control(nullptr)
+    m_Control(nullptr),
+    m_UseFXAA(true)
 {
 }
 
@@ -59,6 +60,9 @@ void QmitkStdMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
 
   QObject::connect( m_Ui->m_RenderingMode, SIGNAL(activated(int) )
                     , this, SLOT( ChangeRenderingMode(int) ) );
+
+  QObject::connect( m_Ui->UseFXAA_checkBox, &QCheckBox::stateChanged
+                    , this, &QmitkStdMultiWidgetEditorPreferencePage::ChangeUseFXAA);
 
   QObject::connect( m_Ui->m_RenderWindowDecorationColor, SIGNAL( clicked() )
                     , this, SLOT( ColorChooserButtonClicked() ) );
@@ -107,6 +111,7 @@ bool QmitkStdMultiWidgetEditorPreferencePage::PerformOk()
   // deleted mouse mode "PACS"
   //m_Preferences->PutBool("PACS like mouse interaction", m_Ui->m_PACSLikeMouseMode->isChecked());
   m_Preferences->PutInt("Rendering Mode", m_Ui->m_RenderingMode->currentIndex());
+  m_Preferences->PutBool("Use FXAA", m_Ui->UseFXAA_checkBox->checkState() == Qt::Checked);
   int rotationStep = m_Ui->m_RotationStep->value();
   m_Preferences->PutInt("Rotation Step", rotationStep);
   mitk::DisplayInteractor::SetClockRotationSpeed(rotationStep);
@@ -152,6 +157,8 @@ void QmitkStdMultiWidgetEditorPreferencePage::Update()
   //m_Ui->m_PACSLikeMouseMode->setChecked(m_Preferences->GetBool("PACS like mouse interaction", false));
   int mode= m_Preferences->GetInt("Rendering Mode", 2);
   m_Ui->m_RenderingMode->setCurrentIndex(mode);
+  bool m_UseFXAA = m_Preferences->GetInt("Use FXAA", true);
+  m_Ui->UseFXAA_checkBox->setCheckState(m_UseFXAA ? Qt::Checked : Qt::Unchecked);
   m_Ui->m_CrosshairGapSize->setValue(m_Preferences->GetInt("crosshair gap size", 32));
   m_Ui->m_RotationStep->setValue(m_Preferences->GetInt("Rotation Step", 90));
 }
@@ -252,4 +259,9 @@ void QmitkStdMultiWidgetEditorPreferencePage::ChangeRenderingMode(int i)
   {
     m_CurrentRenderingMode = "DepthPeeling";
   }
+}
+
+void QmitkStdMultiWidgetEditorPreferencePage::ChangeUseFXAA(int enabled)
+{
+  m_UseFXAA = enabled == Qt::Checked;
 }

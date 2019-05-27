@@ -14,12 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkPlanarFigureMapper2D.h"
+
+#include <array>
+
+#include <vtkBrush.h>
 
 #include "mitkBaseRenderer.h"
 #include "mitkColorProperty.h"
-#include "mitkGL.h" //TODO GLGLGLGLGL
 #include "vtkContext2D.h"
 #include "vtkContextDevice2D.h"
 #include "vtkOpenGLContextDevice2D.h"
@@ -44,6 +46,9 @@ mitk::PlanarFigureMapper2D::PlanarFigureMapper2D()
   , m_NodeModifiedObserverAdded(false)
   , m_Initialized(false)
 {
+  m_AnnotationOverlay = mitk::TextOverlay2D::New();
+  m_QuantityOverlay   = mitk::TextOverlay2D::New();
+
   this->InitializeDefaultPlanarFigureProperties();
 }
 
@@ -68,12 +73,14 @@ void mitk::PlanarFigureMapper2D::ApplyColorAndOpacityProperties(mitk::BaseRender
 
 void mitk::PlanarFigureMapper2D::Initialize(mitk::BaseRenderer* renderer)
 {
+  this->m_Pen = vtkSmartPointer<vtkPen>::New();
   vtkOpenGLContextDevice2D* device = nullptr;
   device = vtkOpenGLContextDevice2D::New();
   if (device) {
     this->m_Context->Begin(device);
     device->Delete();
     this->m_Initialized = true;
+    this->m_Context->ApplyPen(this->m_Pen);
   } else {
   }
 }
@@ -258,6 +265,8 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(
     {
       orientation = mitk::TextOrientation::TextRigth;
     }
+
+    m_AnnotationOverlay->SetOrientation(orientation);
   }
   else
   {
@@ -356,6 +365,8 @@ void mitk::PlanarFigureMapper2D::DrawAnnotationHelperLine(
     renderer->GetViewportSize()[1]
   );
 
+  auto lineType = this->m_Context->GetPen()->GetLineType();
+  this->m_Context->GetPen()->SetLineType(vtkPen::DASH_LINE);
   this->PaintPolyLine(
     helperPolyLine,
     false,
@@ -364,6 +375,7 @@ void mitk::PlanarFigureMapper2D::DrawAnnotationHelperLine(
     rendererPlaneGeometry,
     renderer
   );
+  this->m_Context->GetPen()->SetLineType(lineType);
 }
 
 void mitk::PlanarFigureMapper2D::TransformObjectToDisplay(
@@ -422,59 +434,34 @@ void mitk::PlanarFigureMapper2D::DrawMarker(
       }
       // Paint outline
       this->m_Context->GetPen()->SetColorF((double)lineColor[0], (double)lineColor[1], (double)lineColor[2], (double)lineOpacity);
+      
+      std::array<float, 8> outline = { {
+          static_cast<float>(displayPoint[0] - 4),
+          static_cast<float>(displayPoint[1] - 4),
+          static_cast<float>(displayPoint[0] - 4),
+          static_cast<float>(displayPoint[1] + 4),
+          static_cast<float>(displayPoint[0] + 4),
+          static_cast<float>(displayPoint[1] + 4),
+          static_cast<float>(displayPoint[0] + 4),
+          static_cast<float>(displayPoint[1] - 4),
+      } };
 
-      float* outline = new float[8];
-      outline[0] = displayPoint[0] - 4;
-      outline[1] = displayPoint[1] - 4;
-      outline[2] = outline[0];
-      outline[3] = displayPoint[1] + 4;
-      outline[4] = displayPoint[0] + 4;
-      outline[5] = outline[3];
-      outline[6] = outline[4];
-      outline[7] = outline[1];
+      m_Context->DrawLines(outline.data(), 4);
 
-      m_Context->DrawLines(outline, 4);
-
-      /*glBegin( GL_LINE_LOOP );
-      glVertex3f( displayPoint[0] - 4, displayPoint[1] - 4, PLANAR_OFFSET );
-      glVertex3f( displayPoint[0] - 4, displayPoint[1] + 4, PLANAR_OFFSET );
-      glVertex3f( displayPoint[0] + 4, displayPoint[1] + 4, PLANAR_OFFSET );
-      glVertex3f( displayPoint[0] + 4, displayPoint[1] - 4, PLANAR_OFFSET );
-      glEnd();*/
       break;
     }
 
   case PlanarFigureControlPointStyleProperty::Circle:
     {
-      // TODO: This code can not be reached using the properties provided in the GUI
-      /*float radius = 4.0;
+      float radius = 4.f;
+      float outlineWidth = 1.f;
 
-      if ( markerOpacity > 0 )
-      {
-        // Paint filled circle
-        glBegin( GL_POLYGON );
-        for ( int angle = 0; angle < 8; ++angle )
-        {
-          float angleRad = angle * (float) 3.14159 / 4.0;
-          float x = displayPoint[0] + radius * (float)cos( angleRad );
-          float y = displayPoint[1] + radius * (float)sin( angleRad );
-          glVertex3f(x, y, PLANAR_OFFSET);
-        }
-        glEnd();
-      }
+      // Paint ellipse
+      m_Context->GetPen()->SetColorF(.1f, .1f, .1f);
+      m_Context->GetPen()->SetWidth(outlineWidth);
+      m_Context->GetBrush()->SetColorF((double)lineColor[0], (double)lineColor[1], (double)lineColor[2], (double)markerOpacity);
+      m_Context->DrawEllipse(displayPoint[0], displayPoint[1], radius, radius);
 
-      // Paint outline
-      glColor3f( .1, .1, .1 );
-      glLineWidth( 1.0f );
-      glBegin( GL_LINE_LOOP );
-      for ( int angle = 0; angle < 8; ++angle )
-      {
-        float angleRad = angle * (float) 3.14159 / 4.0;
-        float x = displayPoint[0] + radius * (float)cos( angleRad );
-        float y = displayPoint[1] + radius * (float)sin( angleRad );
-        glVertex3f(x, y, 1.f);
-      }
-      glEnd();*/
       break;
     }
 
@@ -865,14 +852,22 @@ void mitk::PlanarFigureMapper2D::RenderAnnotations( mitk::PlanarFigure * planarF
     return;
   }
 
-  vtkTextProperty* textProp = vtkTextProperty::New();
-  textProp->SetFontSize(m_AnnotationSize);
-  textProp->SetFontFamilyAsString(m_AnnotationFontFamily.c_str());
-  textProp->SetJustificationToLeft();
-  textProp->SetOpacity(globalOpacity);
-  textProp->SetShadow(0);
-  textProp->SetBold(m_DrawAnnotationBold);
-  textProp->SetItalic(m_DrawAnnotationItalic);
+  m_AnnotationOverlay->SetText(name);
+
+  /*
+  m_AnnotationOverlay->SetColor( m_LineColor[lineDisplayMode][0],
+  m_LineColor[lineDisplayMode][1],
+  m_LineColor[lineDisplayMode][2] );
+  */
+
+  m_AnnotationOverlay->SetOpacity(globalOpacity);
+  m_AnnotationOverlay->SetFontSize(m_AnnotationSize*m_DevicePixelRatio);
+  m_AnnotationOverlay->SetBoolProperty("drawShadow", m_AnnotationsShadow);
+  m_AnnotationOverlay->SetVisibility(true, renderer);
+
+  m_AnnotationOverlay->SetStringProperty("font.family", m_AnnotationFontFamily);
+  m_AnnotationOverlay->SetBoolProperty("font.bold", m_DrawAnnotationBold);
+  m_AnnotationOverlay->SetBoolProperty("font.italic", m_DrawAnnotationItalic);
 
   mitk::Point2D offset;
   offset.Fill(5);
@@ -887,6 +882,8 @@ void mitk::PlanarFigureMapper2D::RenderAnnotations( mitk::PlanarFigure * planarF
 
     offset[0] = -planarFigure->GetAnnotaionsBoundingBox().Size[1] / 2.0;
     offset[1] = -planarFigure->GetAnnotaionsBoundingBox().Size[1] / 2.0;
+
+    m_AnnotationOverlay->SetOrientation(mitk::TextOrientation::TextRigth);
   } else {
     scaledAnchorPoint[0] = anchorPoint[0] * m_DevicePixelRatio;
     scaledAnchorPoint[1] = anchorPoint[1] * m_DevicePixelRatio;
@@ -895,24 +892,28 @@ void mitk::PlanarFigureMapper2D::RenderAnnotations( mitk::PlanarFigure * planarF
     offset[1] = offset[1] * m_DevicePixelRatio;
   }
 
-  if (m_DrawShadow) {
-    textProp->SetColor(0.0, 0.0, 0.0);
-    this->m_Context->ApplyTextProp(textProp);
-    this->m_Context->DrawString(scaledAnchorPoint[0]+offset[0]+1, scaledAnchorPoint[1]+offset[1]-1, name.c_str());
-  }
+  m_AnnotationOverlay->SetPosition2D(scaledAnchorPoint);
+  m_AnnotationOverlay->SetOffsetVector(offset);
 
-  textProp->SetColor(1.0, 1.0, 0.0);
-  this->m_Context->ApplyTextProp(textProp);
-  this->m_Context->DrawString(scaledAnchorPoint[0]+offset[0], scaledAnchorPoint[1]+offset[1], name.c_str());
-  
+  m_AnnotationOverlay->SetColor(1.0, 1.0, 0.0);
+  m_AnnotationOverlay->Update(renderer);
+  m_AnnotationOverlay->Paint(renderer);
 
   annotationOffset -= 15.0;
   //annotationOffset -= m_AnnotationOverlay->GetBoundsOnDisplay( renderer ).Size[1];
-  textProp->Delete();
+
+  mitk::Overlay::Bounds bounds = m_AnnotationOverlay->GetBoundsOnDisplay(renderer);
+  mitk::TextOrientation orientation = m_AnnotationOverlay->GetOrientation();
+
+  if (!planarFigure->IsAnnotationsDetached() && orientation == mitk::TextOrientation::TextLeft)
+  {
+    bounds.Position[0] -= bounds.Size[0];
+  }
+  planarFigure->SetAnnotaionsBoundingBox(bounds);
 }
 
 void mitk::PlanarFigureMapper2D::RenderQuantities( const mitk::PlanarFigure * planarFigure,
-                                                   mitk::BaseRenderer * ,
+                                                   mitk::BaseRenderer* renderer,
                                                    const mitk::Point2D anchorPoint,
                                                    double &annotationOffset,
                                                    float globalOpacity,
@@ -944,14 +945,16 @@ void mitk::PlanarFigureMapper2D::RenderQuantities( const mitk::PlanarFigure * pl
     }
   }
 
-  vtkTextProperty* textProp = vtkTextProperty::New();
-  textProp->SetFontSize(m_AnnotationSize);
-  textProp->SetFontFamilyAsString(m_AnnotationFontFamily.c_str());
-  textProp->SetJustificationToLeft();
-  textProp->SetOpacity(globalOpacity);
-  textProp->SetShadow(0);
-  textProp->SetBold(m_DrawAnnotationBold);
-  textProp->SetItalic(m_DrawAnnotationItalic);
+  m_QuantityOverlay->SetOpacity(globalOpacity);
+  m_QuantityOverlay->SetFontSize(m_AnnotationSize*m_DevicePixelRatio);
+  m_QuantityOverlay->SetBoolProperty("drawShadow", m_DrawShadow);
+  m_QuantityOverlay->SetVisibility(true, renderer);
+
+  m_QuantityOverlay->SetStringProperty("font.family", m_AnnotationFontFamily);
+  m_QuantityOverlay->SetBoolProperty("font.bold", m_DrawAnnotationBold);
+  m_QuantityOverlay->SetBoolProperty("font.italic", m_DrawAnnotationItalic);
+
+  m_QuantityOverlay->SetText(quantityString.str().c_str());
 
   mitk::Point2D offset;
   offset.Fill(5);
@@ -963,19 +966,18 @@ void mitk::PlanarFigureMapper2D::RenderQuantities( const mitk::PlanarFigure * pl
   offset[0] = offset[0]*m_DevicePixelRatio;
   offset[1] = offset[1]*m_DevicePixelRatio;
 
-  if (m_DrawShadow) {
-    textProp->SetColor(0.0, 0.0, 0.0);
-    this->m_Context->ApplyTextProp(textProp);
-    this->m_Context->DrawString(scaledAnchorPoint[0]+offset[0]+1, scaledAnchorPoint[1]+offset[1]-1, quantityString.str().c_str());
-  }
-  textProp->SetColor(m_AnnotationColor[lineDisplayMode][0], m_AnnotationColor[lineDisplayMode][1], m_AnnotationColor[lineDisplayMode][2]);
-  this->m_Context->ApplyTextProp(textProp);
-  this->m_Context->DrawString(scaledAnchorPoint[0]+offset[0], scaledAnchorPoint[1]+offset[1], quantityString.str().c_str());
+  m_QuantityOverlay->SetPosition2D(scaledAnchorPoint);
+  m_QuantityOverlay->SetOffsetVector(offset);
+
+  m_QuantityOverlay->SetColor(m_AnnotationColor[lineDisplayMode][0],
+    m_AnnotationColor[lineDisplayMode][1],
+    m_AnnotationColor[lineDisplayMode][2]);
+
+  m_QuantityOverlay->Update(renderer);
+  m_QuantityOverlay->Paint(renderer);
 
   annotationOffset -= 15.0;
 //  annotationOffset -= m_QuantityOverlay->GetBoundsOnDisplay( renderer ).Size[1];
-
-  textProp->Delete();
 }
 
 void mitk::PlanarFigureMapper2D::RenderLines( const PlanarFigureDisplayMode lineDisplayMode,
@@ -990,13 +992,6 @@ void mitk::PlanarFigureMapper2D::RenderLines( const PlanarFigureDisplayMode line
   {
     const float* color = m_OutlineColor[lineDisplayMode];
     const float opacity = m_OutlineOpacity[lineDisplayMode];
-
-    // convert to a float array that also contains opacity, faster GL
-    float* colorVector = new float[4];
-    colorVector[0] = color[0];
-    colorVector[1] = color[1];
-    colorVector[2] = color[2];
-    colorVector[3] = opacity;
 
     // set the color and opacity here as it is common for all outlines
     this->m_Context->GetPen()->SetColorF((double)color[0], (double)color[1], (double)color[2]);
@@ -1034,9 +1029,6 @@ void mitk::PlanarFigureMapper2D::RenderLines( const PlanarFigureDisplayMode line
       planarFigurePlaneGeometry,
       rendererPlaneGeometry,
       renderer);
-
-    // cleanup
-    delete[] colorVector;
   }
 
   // If we want to draw a shadow, we do it here
@@ -1047,13 +1039,6 @@ void mitk::PlanarFigureMapper2D::RenderLines( const PlanarFigureDisplayMode line
     float shadowOpacity = 0.0f;
     if( opacity > 0.2f )
       shadowOpacity = opacity - 0.2f;
-
-    // convert to a float array that also contains opacity, faster GL
-    float* shadow = new float[4];
-    shadow[0] = 0;
-    shadow[1] = 0;
-    shadow[2] = 0;
-    shadow[3] = shadowOpacity;
 
     // set the color and opacity here as it is common for all shadows
     this->m_Context->GetPen()->SetColorF(0, 0, 0, shadowOpacity);
@@ -1091,9 +1076,6 @@ void mitk::PlanarFigureMapper2D::RenderLines( const PlanarFigureDisplayMode line
       planarFigurePlaneGeometry,
       rendererPlaneGeometry,
       renderer);
-
-    // cleanup
-    delete[] shadow;
   }
 
   // set this in brackets to avoid duplicate variables in the same scope
@@ -1136,8 +1118,6 @@ void mitk::PlanarFigureMapper2D::RenderLines( const PlanarFigureDisplayMode line
       planarFigurePlaneGeometry,
       rendererPlaneGeometry,
       renderer );
-
-    glEnable(GL_LINE_STIPPLE);
 
     this->DrawAnnotationHelperLine(
       planarFigure,

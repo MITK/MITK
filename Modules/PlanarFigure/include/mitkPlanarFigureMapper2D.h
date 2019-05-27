@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkMapper.h"
 #include "mitkPlanarFigure.h"
 #include "mitkPlanarFigureControlPointStyleProperty.h"
+#include "mitkTextOverlay2D.h"
 #include "vtkNew.h"
 #include "vtkPen.h"
 
@@ -330,6 +331,9 @@ private:
 
   // Bool flag that indicates if a node modified observer was added
   bool m_NodeModifiedObserverAdded;
+
+  itk::SmartPointer<mitk::TextOverlay2D> m_AnnotationOverlay;
+  itk::SmartPointer<mitk::TextOverlay2D> m_QuantityOverlay;
 
   vtkNew<vtkContext2D> m_Context;
   vtkSmartPointer<vtkPen> m_Pen;

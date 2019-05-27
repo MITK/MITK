@@ -192,10 +192,10 @@ void QmitkImageNavigatorView::RenderWindowPartActivated(mitk::IRenderWindowPart*
 
 void QmitkImageNavigatorView::UpdateStatusBar()
 {
-  if (m_IRenderWindowPart != nullptr)
+  if (m_IRenderWindowPart != nullptr) if (QmitkRenderWindow* renderWindow = m_IRenderWindowPart->GetActiveQmitkRenderWindow())
   {
     mitk::Point3D position = m_IRenderWindowPart->GetSelectedPosition();
-    mitk::BaseRenderer::Pointer renderer = mitk::BaseRenderer::GetInstance(m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetVtkRenderWindow());
+    mitk::BaseRenderer::Pointer renderer = mitk::BaseRenderer::GetInstance(renderWindow->GetVtkRenderWindow());
     mitk::TNodePredicateDataType<mitk::Image>::Pointer isImageData = mitk::TNodePredicateDataType<mitk::Image>::New();
 
     mitk::DataStorage::SetOfObjects::ConstPointer nodes = this->GetDataStorage()->GetSubset(isImageData).GetPointer();
@@ -490,14 +490,14 @@ void QmitkImageNavigatorView::OnMillimetreCoordinateValueChanged()
 
 void QmitkImageNavigatorView::OnRefetch()
 {
-  if (m_IRenderWindowPart)
+  if (m_IRenderWindowPart) if (QmitkRenderWindow* renderWindow = m_IRenderWindowPart->GetActiveQmitkRenderWindow())
   {
-    mitk::BaseGeometry::ConstPointer geometry = m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetInputWorldGeometry3D();
-    mitk::TimeGeometry::ConstPointer timeGeometry = m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetInputWorldTimeGeometry();
+    mitk::BaseGeometry::ConstPointer geometry = renderWindow->GetSliceNavigationController()->GetInputWorldGeometry3D();
+    mitk::TimeGeometry::ConstPointer timeGeometry = renderWindow->GetSliceNavigationController()->GetInputWorldTimeGeometry();
 
     if (geometry.IsNull() && timeGeometry.IsNotNull())
     {
-      mitk::TimeStepType timeStep = m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetTime()->GetPos();
+      mitk::TimeStepType timeStep = renderWindow->GetSliceNavigationController()->GetTime()->GetPos();
       geometry = timeGeometry->GetGeometryForTimeStep(timeStep);
     }
 
@@ -628,6 +628,5 @@ void QmitkImageNavigatorView::OnRefetch()
     }
 
     this->SetBorderColors();
-
   }
 }

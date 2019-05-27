@@ -1492,7 +1492,7 @@ void QmitkStdMultiWidget::changeLayoutToAxialLeft2DRight(int state)
   this->UpdateAllWidgets();
 }
 
-void QmitkStdMultiWidget::SetDataStorage( mitk::DataStorage* ds )
+void QmitkStdMultiWidget::SetDataStorage(mitk::DataStorage* ds)
 {
   mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->SetDataStorage(ds);
   mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow())->SetDataStorage(ds);
@@ -1588,16 +1588,16 @@ void QmitkStdMultiWidget::ForceImmediateUpdate()
   m_RenderingManager->ForceImmediateUpdate(mitkWidget4->GetRenderWindow());
 }
 
-void QmitkStdMultiWidget::wheelEvent( QWheelEvent * e )
+void QmitkStdMultiWidget::wheelEvent(QWheelEvent* e)
 {
   emit WheelMoved( e );
 }
 
-void QmitkStdMultiWidget::mousePressEvent(QMouseEvent * e)
+void QmitkStdMultiWidget::mousePressEvent(QMouseEvent*)
 {
 }
 
-void QmitkStdMultiWidget::moveEvent( QMoveEvent* e )
+void QmitkStdMultiWidget::moveEvent(QMoveEvent* e)
 {
   QWidget::moveEvent( e );
 
@@ -1818,6 +1818,10 @@ void QmitkStdMultiWidget::setSelectionMode(bool selection)
 void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
 {
   m_PendingCrosshairPositionEvent = false;
+
+  if (this->m_DataStorage.IsNull()) {
+    return;
+  }
 
   // find image with highest layer
   mitk::TNodePredicateDataType<mitk::Image>::Pointer isImageData = mitk::TNodePredicateDataType<mitk::Image>::New();
@@ -2509,6 +2513,10 @@ std::vector<QmitkStdMultiWidget::FunctionSet> QmitkStdMultiWidget::getFuncSetDis
 
 void QmitkStdMultiWidget::setAnnotationVisibility(std::vector<bool>& visibility)
 {
+  if (this->m_DataStorage.IsNull()) {
+    return;
+  }
+
   mitk::TNodePredicateDataType<mitk::Image>::Pointer isImageData = mitk::TNodePredicateDataType<mitk::Image>::New();
   mitk::DataStorage::SetOfObjects::ConstPointer nodes = this->m_DataStorage->GetSubset(isImageData).GetPointer();
 

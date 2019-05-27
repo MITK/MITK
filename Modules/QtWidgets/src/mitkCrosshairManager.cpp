@@ -118,6 +118,9 @@ void mitkCrosshairManager::setDefaultProperties(mitk::DataNode::Pointer crosshai
 void mitkCrosshairManager::addPlaneCrosshair(QmitkRenderWindow* window, bool render2d, bool render3d)
 {
   auto dataStorage = window->GetRenderer()->GetDataStorage();
+  if (dataStorage.IsNull()) {
+    return;
+  }
   // Viewer mode
   if (m_ShowSelected) {
     if (m_Selected == nullptr || window == m_Selected) {
@@ -133,13 +136,12 @@ void mitkCrosshairManager::addPlaneCrosshair(QmitkRenderWindow* window, bool ren
     dataStorage->Add(crosshair);
   } else {
     // Display all planes from other windows
-    for (int i = 0; i < m_ManagedWindows.size(); i++) {
+    for (unsigned int i = 0; i < m_ManagedWindows.size(); i++) {
       auto otherWindow = m_ManagedWindows[i];
       // Do not add planes from 3d windows
       if (otherWindow->isWindow3d()) {
         continue;
       }
-
       mitk::DataNode::Pointer crosshair = otherWindow->GetRenderer()->GetCurrentWorldPlaneGeometryNode();
       setDefaultProperties(crosshair);
       if (m_UseWindowsColors && i < m_WindowsColors.size()) {
@@ -160,6 +162,10 @@ void mitkCrosshairManager::addPlaneCrosshair(QmitkRenderWindow* window, bool ren
 void mitkCrosshairManager::addPointCrosshair(QmitkRenderWindow* window)
 {
   auto dataStorage = window->GetRenderer()->GetDataStorage();
+  if (dataStorage.IsNull()) {
+    return;
+  }
+
   mitk::DataNode::Pointer crosshair;
 
   // Viewer mode
@@ -276,10 +282,12 @@ void mitkCrosshairManager::addCrosshair(QmitkRenderWindow* window)
 void mitkCrosshairManager::removeCrosshair(QmitkRenderWindow* window)
 {
   auto dataStorage = window->GetRenderer()->GetDataStorage();
-  auto crosshairsToRemove = dataStorage->GetSubset(m_CrosshairPredicate);
-  for (auto node : *crosshairsToRemove) {
-    node->SetBoolProperty("Crosshair.Render 2D", false);
-    dataStorage->Remove(node);
+  if (dataStorage.IsNotNull()) {
+    auto crosshairsToRemove = dataStorage->GetSubset(m_CrosshairPredicate);
+    for (auto node : *crosshairsToRemove) {
+      node->SetBoolProperty("Crosshair.Render 2D", false);
+      dataStorage->Remove(node);
+    }
   }
 }
 

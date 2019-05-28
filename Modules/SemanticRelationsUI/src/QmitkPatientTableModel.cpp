@@ -180,15 +180,11 @@ void QmitkPatientTableModel::NodePredicateChanged()
 
 void QmitkPatientTableModel::SetData()
 {
-  // get all control points of current case
-  m_ControlPoints = mitk::RelationStorage::GetAllControlPointsOfCase(m_CaseID);
-  // sort the vector of control points for the timeline
-  std::sort(m_ControlPoints.begin(), m_ControlPoints.end());
-
   // get all examination periods of current case
   m_ExaminationPeriods = mitk::RelationStorage::GetAllExaminationPeriodsOfCase(m_CaseID);
-  // sort the vector of examination periods for the timeline
-  mitk::SortExaminationPeriods(m_ExaminationPeriods, m_ControlPoints);
+
+  // sort all examination periods for the timeline
+  mitk::SortAllExaminationPeriods(m_CaseID, m_ExaminationPeriods);
 
   // rename examination periods according to their new order
   std::string examinationPeriodName = "Baseline";
@@ -320,7 +316,7 @@ mitk::DataNode* QmitkPatientTableModel::GetCurrentDataNode(const QModelIndex& in
   auto controlPointsOfExaminationPeriod = examinationPeriod.controlPointUIDs;
   for (const auto& controlPointUID : controlPointsOfExaminationPeriod)
   {
-    auto currentControlPoint = mitk::GetControlPointByUID(controlPointUID, m_ControlPoints);
+    auto currentControlPoint = mitk::GetControlPointByUID(m_CaseID, controlPointUID);
     try
     {
       std::vector<mitk::DataNode::Pointer> filteredDataNodes;

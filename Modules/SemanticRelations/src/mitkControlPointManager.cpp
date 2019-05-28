@@ -40,13 +40,14 @@ mitk::SemanticTypes::ControlPoint mitk::GenerateControlPoint(const DataNode* dat
   return controlPoint;
 }
 
-mitk::SemanticTypes::ControlPoint mitk::GetControlPointByUID(const SemanticTypes::ID& controlPointUID, const std::vector<SemanticTypes::ControlPoint>& allControlPoints)
+mitk::SemanticTypes::ControlPoint mitk::GetControlPointByUID(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& controlPointUID)
 {
   auto lambda = [&controlPointUID](const SemanticTypes::ControlPoint& currentControlPoint)
   {
     return currentControlPoint.UID == controlPointUID;
   };
 
+  SemanticTypes::ControlPointVector allControlPoints = RelationStorage::GetAllControlPointsOfCase(caseID);
   const auto existingControlPoint = std::find_if(allControlPoints.begin(), allControlPoints.end(), lambda);
 
   mitk::SemanticTypes::ControlPoint controlPoint;
@@ -58,8 +59,9 @@ mitk::SemanticTypes::ControlPoint mitk::GetControlPointByUID(const SemanticTypes
   return controlPoint;
 }
 
-mitk::SemanticTypes::ControlPoint mitk::FindExistingControlPoint(const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::ControlPointVector& allControlPoints)
+mitk::SemanticTypes::ControlPoint mitk::FindExistingControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint)
 {
+  SemanticTypes::ControlPointVector allControlPoints = RelationStorage::GetAllControlPointsOfCase(caseID);
   for (const auto& currentControlPoint : allControlPoints)
   {
     if (controlPoint.date == currentControlPoint.date)
@@ -71,8 +73,9 @@ mitk::SemanticTypes::ControlPoint mitk::FindExistingControlPoint(const SemanticT
   return SemanticTypes::ControlPoint();
 }
 
-mitk::SemanticTypes::ControlPoint mitk::FindClosestControlPoint(const SemanticTypes::ControlPoint& controlPoint, SemanticTypes::ControlPointVector& allControlPoints)
+mitk::SemanticTypes::ControlPoint mitk::FindClosestControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint)
 {
+  SemanticTypes::ControlPointVector allControlPoints = RelationStorage::GetAllControlPointsOfCase(caseID);
   if (allControlPoints.empty())
   {
     return SemanticTypes::ControlPoint();
@@ -82,7 +85,7 @@ mitk::SemanticTypes::ControlPoint mitk::FindClosestControlPoint(const SemanticTy
   std::sort(allControlPoints.begin(), allControlPoints.end());
   // new control point does not match an existing control point
   // check if the control point is close to an already existing control point
-  std::vector<SemanticTypes::ControlPoint>::const_iterator it;
+  SemanticTypes::ControlPointVector::const_iterator it;
   for (it = allControlPoints.begin(); it != allControlPoints.end(); ++it)
   {
     if (controlPoint.date < it->date)
@@ -139,8 +142,9 @@ mitk::SemanticTypes::ControlPoint mitk::FindClosestControlPoint(const SemanticTy
   return SemanticTypes::ControlPoint();
 }
 
-mitk::SemanticTypes::ExaminationPeriod mitk::FindContainingExaminationPeriod(const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::ExaminationPeriodVector& allExaminationPeriods)
+mitk::SemanticTypes::ExaminationPeriod mitk::FindContainingExaminationPeriod(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint)
 {
+  SemanticTypes::ExaminationPeriodVector allExaminationPeriods = RelationStorage::GetAllExaminationPeriodsOfCase(caseID);
   for (const auto& examinationPeriod : allExaminationPeriods)
   {
     for (const auto& UID : examinationPeriod.controlPointUIDs)
@@ -160,15 +164,14 @@ mitk::SemanticTypes::ExaminationPeriod mitk::FindFittingExaminationPeriod(const 
   SemanticTypes::ExaminationPeriod specificExaminationPeriod;
   SemanticTypes::ControlPoint specificControlPoint;
   // find the closest control point
-  auto allControlPoints = RelationStorage::GetAllControlPointsOfCase(caseID);
-  auto existingControlPoint = FindExistingControlPoint(controlPoint, allControlPoints);
+  SemanticTypes::ControlPoint existingControlPoint = FindExistingControlPoint(caseID, controlPoint);
   if (!existingControlPoint.UID.empty())
   {
     specificControlPoint = existingControlPoint;
   }
   else
   {
-    auto closestControlPoint = FindClosestControlPoint(controlPoint, allControlPoints);
+    auto closestControlPoint = FindClosestControlPoint(caseID, controlPoint);
     if (!closestControlPoint.UID.empty())
     {
       specificControlPoint = closestControlPoint;
@@ -176,8 +179,7 @@ mitk::SemanticTypes::ExaminationPeriod mitk::FindFittingExaminationPeriod(const 
   }
 
   // find the containing examination period
-  auto allExaminationPeriods = RelationStorage::GetAllExaminationPeriodsOfCase(caseID);
-  return FindContainingExaminationPeriod(specificControlPoint, allExaminationPeriods);
+  return FindContainingExaminationPeriod(caseID, specificControlPoint);
 }
 
 mitk::SemanticTypes::ExaminationPeriod mitk::FindFittingExaminationPeriod(const DataNode* dataNode)
@@ -197,9 +199,13 @@ mitk::SemanticTypes::ExaminationPeriod mitk::FindFittingExaminationPeriod(const 
   return FindFittingExaminationPeriod(caseID, controlPoint);
 }
 
-void mitk::SortExaminationPeriods(SemanticTypes::ExaminationPeriodVector& allExaminationPeriods, const SemanticTypes::ControlPointVector& allControlPoints)
+void mitk::SortAllExaminationPeriods(const SemanticTypes::CaseID& caseID, SemanticTypes::ExaminationPeriodVector& allExaminationPeriods)
 {
-  auto lambda = [allControlPoints](const SemanticTypes::ExaminationPeriod& leftExaminationPeriod, const SemanticTypes::ExaminationPeriod& rightExaminationPeriod)
+  SemanticTypes::ControlPointVector controlPoints = RelationStorage::GetAllControlPointsOfCase(caseID);
+  // sort the vector of control points for the timeline
+  std::sort(controlPoints.begin(), controlPoints.end());
+
+  auto lambda = [&caseID](const SemanticTypes::ExaminationPeriod& leftExaminationPeriod, const SemanticTypes::ExaminationPeriod& rightExaminationPeriod)
   {
     if (leftExaminationPeriod.controlPointUIDs.empty())
     {
@@ -212,8 +218,8 @@ void mitk::SortExaminationPeriods(SemanticTypes::ExaminationPeriodVector& allExa
     }
     const auto leftUID = leftExaminationPeriod.controlPointUIDs.front();
     const auto rightUID = rightExaminationPeriod.controlPointUIDs.front();
-    const auto& leftControlPoint = GetControlPointByUID(leftUID, allControlPoints);
-    const auto& rightControlPoint = GetControlPointByUID(rightUID, allControlPoints);
+    const auto& leftControlPoint = GetControlPointByUID(caseID, leftUID);
+    const auto& rightControlPoint = GetControlPointByUID(caseID, rightUID);
 
     return leftControlPoint.date < rightControlPoint.date;
   };

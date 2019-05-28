@@ -367,11 +367,10 @@ mitk::SemanticTypes::IDVector mitk::SemanticRelationsInference::GetAllImageIDsOf
   SemanticTypes::IDVector allImageIDsOfExaminationPeriod;
   // 1. get all control point UIDs of the examination period
   // 2. get all images of each control points to find all images of the examination period
-  auto allControlPoints = RelationStorage::GetAllControlPointsOfCase(caseID);
   SemanticTypes::ControlPoint controlPoint;
   for (const auto& controlPointUID : examinationPeriod.controlPointUIDs)
   {
-    controlPoint = GetControlPointByUID(controlPointUID, allControlPoints);
+    controlPoint = GetControlPointByUID(caseID, controlPointUID);
     auto allImageIDsOfControlPoint = RelationStorage::GetAllImageIDsOfControlPoint(caseID, controlPoint);
     allImageIDsOfExaminationPeriod.insert(allImageIDsOfExaminationPeriod.end(), allImageIDsOfControlPoint.begin(), allImageIDsOfControlPoint.end());
   }

@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIDataStorageService.h>
 
 #include "internal/org_mitk_gui_common_Activator.h"
-#include "internal/mitkDataStorageEditorInputFactory.h"
 
 #include <QIcon>
 
@@ -74,16 +73,6 @@ berry::Object* DataStorageEditorInput::GetAdapter(const QString& adapterType) co
   }
   return nullptr;
 }
-
-//QString DataStorageEditorInput::GetFactoryId() const
-//{
-//  return DataStorageEditorInputFactory::GetFactoryId();
-//}
-
-//void DataStorageEditorInput::SaveState(const berry::IMemento::Pointer& memento) const
-//{
-//  return DataStorageEditorInputFactory::SaveState(memento, this);
-//}
 
 bool DataStorageEditorInput::operator==(const berry::Object* o) const
 {

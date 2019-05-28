@@ -377,11 +377,8 @@ void QmitkStdMultiWidget::InitializeWidget(bool showPlanesIn3d)
     ->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
   mitkWidget3->GetSliceNavigationController()
     ->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
-  //mitkWidget4->GetSliceNavigationController()
-  //  ->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
 
   m_MouseModeSwitcher = mitk::MouseModeSwitcher::New(mitkWidget1->GetRenderer());
-  //m_MouseModeSwitcher->AddRenderer(mitkWidget1->GetRenderer()->GetName());
   m_MouseModeSwitcher->AddRenderer(mitkWidget2->GetRenderer());
   m_MouseModeSwitcher->AddRenderer(mitkWidget3->GetRenderer());
   m_MouseModeSwitcher->AddRenderer(mitkWidget4->GetRenderer());

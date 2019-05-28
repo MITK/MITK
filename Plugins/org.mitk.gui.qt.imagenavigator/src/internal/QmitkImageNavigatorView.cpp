@@ -34,6 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCompositePixelValueToString.h>
 
 const std::string QmitkImageNavigatorView::VIEW_ID = "org.mitk.views.imagenavigator";
+const char* QmitkImageNavigatorView::PART_NAME = QT_TRANSLATE_NOOP("Plugin Title", "Image Navigator");
 
 
 static mitk::DataNode::Pointer GetTopLayerNode(const mitk::DataStorage::SetOfObjects::ConstPointer nodes, const mitk::Point3D &position, mitk::BaseRenderer* renderer)

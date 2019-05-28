@@ -57,6 +57,7 @@ class REGISTRATION_EXPORT QmitkPointBasedRegistrationView : public QmitkFunction
 public:
 
   static const std::string VIEW_ID;
+  static const char* PART_NAME;
 
   /*!
   \brief Default constructor

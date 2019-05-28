@@ -105,6 +105,8 @@ class MITK_QT_COMMON QmitkAbstractView : public berry::QtViewPart
 {
 
 public:
+  // Part name. Expected to be overridden
+  static const char* PART_NAME;
 
   /**
    * Describes the strategies to be used for getting a mitk::IRenderWindowPart

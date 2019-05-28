@@ -32,6 +32,8 @@ QString QmitkPointSetInteractionView::TR_ADD_POINTSET = QLabel::tr("Add point se
 QString QmitkPointSetInteractionView::TR_ENTER_NAME = QLabel::tr("Enter name for the new point set");
 QString QmitkPointSetInteractionView::TR_POINTSET = QLabel::tr("PointSet");
 
+const char* QmitkPointSetInteractionView::PART_NAME = QT_TRANSLATE_NOOP("Plugin Title", "PointSet Interaction");
+
 QmitkPointSetInteractionView::QmitkPointSetInteractionView( QObject* /*parent*/ )
 : m_Controls(0)
 {

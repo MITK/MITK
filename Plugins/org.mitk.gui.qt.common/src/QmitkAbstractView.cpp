@@ -186,6 +186,8 @@ public:
 
 };
 
+const char* QmitkAbstractView::PART_NAME = "NO_NAME";
+
 QmitkAbstractView::QmitkAbstractView()
   : d(new QmitkAbstractViewPrivate(this))
 {

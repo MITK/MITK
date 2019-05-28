@@ -53,6 +53,8 @@ class BASICIMAGEPROCESSING_EXPORT QmitkBasicImageProcessing : public QmitkAbstra
 
 public:
 
+  static const char* PART_NAME;
+
   /*!
   \brief default constructor
   */

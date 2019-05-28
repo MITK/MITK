@@ -46,6 +46,7 @@ class QmitkGeometryToolsView : public QmitkAbstractView
   public:
 
     static const std::string VIEW_ID;
+    static const char* PART_NAME;
 
 public slots:
 protected slots:

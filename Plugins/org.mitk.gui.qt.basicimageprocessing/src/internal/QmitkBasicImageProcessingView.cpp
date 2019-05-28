@@ -99,6 +99,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkShiftScaleImageFilter.h>
 
 
+const char* QmitkBasicImageProcessing::PART_NAME = QT_TRANSLATE_NOOP("Plugin Title", "BasicImageProcessing");
+
 // Convenient Definitions
 typedef itk::Image<short, 3>                                                            ImageType;
 typedef itk::Image<unsigned char, 3>                                                    SegmentationImageType;

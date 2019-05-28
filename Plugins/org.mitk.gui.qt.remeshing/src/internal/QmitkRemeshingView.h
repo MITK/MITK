@@ -26,6 +26,8 @@ class QmitkRemeshingView : public QmitkAbstractView
   Q_OBJECT
 
 public:
+  static const char* PART_NAME;
+
   QmitkRemeshingView();
   ~QmitkRemeshingView();
 

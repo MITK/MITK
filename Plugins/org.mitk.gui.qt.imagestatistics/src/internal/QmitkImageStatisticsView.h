@@ -54,6 +54,7 @@ private:
   typedef itk::SimpleMemberCommand< QmitkImageStatisticsView > ITKCommandType;
 
 public:
+  static const char* PART_NAME;
 
   /*!
   \brief default constructor */

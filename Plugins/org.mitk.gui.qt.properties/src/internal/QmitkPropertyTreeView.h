@@ -39,6 +39,7 @@ class QmitkPropertyTreeView : public QmitkAbstractView, public mitk::IRenderWind
 
 public:
   static const std::string VIEW_ID;
+  static const char* PART_NAME;
 
   berryObjectMacro(QmitkPropertyTreeView);
 

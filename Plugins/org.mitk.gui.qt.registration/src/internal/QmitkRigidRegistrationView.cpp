@@ -48,6 +48,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryISelectionService.h"
 
 const std::string QmitkRigidRegistrationView::VIEW_ID = "org.mitk.views.rigidregistration";
+const char* QmitkRigidRegistrationView::PART_NAME = QT_TRANSLATE_NOOP("Plugin Title", "RigidRegistration");
 
 using namespace berry;
 
@@ -220,7 +221,7 @@ QmitkRigidRegistrationView::~QmitkRigidRegistrationView()
 
 void QmitkRigidRegistrationView::CreateQtPartControl(QWidget* parent)
 {
-  SetPartName(QAction::tr("RigidRegistration"));
+  SetPartName(QApplication::translate("Plugin Title", PART_NAME));
 
   m_Controls.setupUi(parent);
   m_Controls.m_ManualFrame->hide();

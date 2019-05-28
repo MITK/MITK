@@ -47,6 +47,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLogoOverlay.h>
 
 const std::string QmitkOverlayManagerView::VIEW_ID = "org.mitk.views.overlaymanager";
+const char* QmitkOverlayManagerView::PART_NAME = QT_TRANSLATE_NOOP("Plugin Title", "Overlay Manager");
 
 QmitkOverlayManagerView::QmitkOverlayManagerView()
   : m_Parent(nullptr),
@@ -73,7 +74,7 @@ void QmitkOverlayManagerView::SetFocus()
 
 void QmitkOverlayManagerView::CreateQtPartControl( QWidget *parent )
 {
-  SetPartName(QAction::tr("Overlay Manager"));
+  SetPartName(QApplication::translate("Plugin Title", PART_NAME));
 
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
@@ -236,7 +237,7 @@ void QmitkOverlayManagerView::OnPropertyNameChanged(const itk::EventObject&)
 
     if (nameProperty != NULL)
     {
-      QString partName = "Properties (";
+      QString partName = QApplication::translate("Plugin Title", PART_NAME) + "(";
       partName.append(QString::fromStdString(nameProperty->GetValueAsString())).append(')');
       this->SetPartName(partName);
     }

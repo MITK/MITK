@@ -16,33 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryPartInfo.h"
 
+#include <QApplication>
+
 namespace berry
 {
 
-// TODO ism temporary translate
-// it hart to find point, when plugin name read from file
-const QString PartInfo::plugingTranslateNames[] = { 
-  QObject::tr("BasicImageProcessing"),   
-  QObject::tr("Clipping Plane"),
-  QObject::tr("Display"),
-  QObject::tr("Data Manager"),
-  QObject::tr("Image Navigator"),
-  QObject::tr("LiverSegmentation"),
-  QObject::tr("Measurement"),
-  QObject::tr("PointSet Interaction"),
-  QObject::tr("RegionGrowing Segmentation"),
-  QObject::tr("Segmentation"),
-  QObject::tr("Segmentation Utilities"),
-  QObject::tr("Statistics"),
-  QObject::tr("Vascular Structure Segmentation"),
-  QObject::tr("Volume Visualization")
-};
-
 PartInfo::PartInfo()
 {
-  plugingSrcNames << "BasicImageProcessing" << "Clipping Plane" << "Display" << "Data Manager" << "Image Navigator" << "LiverSegmentation" <<
-    "Measurement" << "PointSet Interaction" << "RegionGrowing Segmentation" << "Segmentation" << "Segmentation Utilities" <<
-    "Statistics" << "Vascular Structure Segmentation" << "Volume Visualization";
 }
 
 PartInfo::PartInfo(IPresentablePart::Pointer part)
@@ -52,18 +32,12 @@ PartInfo::PartInfo(IPresentablePart::Pointer part)
 
 void PartInfo::Set(IPresentablePart::Pointer part)
 {
-  name = part->GetName();
+  name = QApplication::translate("Plugin Title", part->GetName().toStdString().c_str());
   title = part->GetTitle();
   contentDescription = part->GetTitleStatus();
   image = part->GetTitleImage();
   toolTip = part->GetTitleToolTip();
 
-  for (int i=0; i<plugingSrcNames.size(); i++) {
-    if (plugingSrcNames[i].compare(QString(part->GetName().toUtf8().constData())) == 0) {
-      name = plugingTranslateNames[i];
-    }
-  }
-  
   dirty = part->IsDirty();
 }
 

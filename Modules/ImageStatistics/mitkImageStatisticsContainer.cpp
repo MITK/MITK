@@ -222,8 +222,11 @@ namespace mitk
     {
       for (unsigned int i = 0; i < container->GetTimeSteps(); i++)
       {
-        auto statisticKeys = container->GetStatisticsForTimeStep(i).GetCustomStatisticNames();
-        customKeys.insert(statisticKeys.cbegin(), statisticKeys.cend());
+        if(container->TimeStepExists(i))
+        {
+          auto statisticKeys = container->GetStatisticsForTimeStep(i).GetCustomStatisticNames();
+          customKeys.insert(statisticKeys.cbegin(), statisticKeys.cend());
+        }
       }
     }
 

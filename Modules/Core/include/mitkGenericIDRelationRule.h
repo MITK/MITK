@@ -19,11 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPropertyRelationRuleBase.h"
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4251)
-#endif
-
 namespace mitk
 {
   /**This rule class can be used for relations that are only defined on the ID-layer and
@@ -54,6 +49,8 @@ namespace mitk
     /** Returns an ID string that identifies the rule class */
     RuleIDType GetRuleID() const override;
 
+    bool IsAbstract() const override;
+
     /** Returns a human readable string that can be used to describe the rule. Does not need to be unique.*/
     std::string GetDisplayName() const override;
 
@@ -63,6 +60,9 @@ namespace mitk
     /** Returns a human readable string that can be used to describe the role of a destination in context of the rule
      * instance.*/
     std::string GetDestinationRoleName() const override;
+
+    /** Pass through to base implementation of PropertyRelationRuleBase. See PropertyRelationRuleBase::connect documentation for more information. */
+    RelationUIDType Connect(IPropertyOwner *source, const IPropertyProvider *destination) const;
 
   protected:
     GenericIDRelationRule(const RuleIDType &ruleIDTag);
@@ -120,6 +120,8 @@ namespace mitk
     @remark Disconnect() ensures that sourece is valid and only invokes if instance exists.*/
     void Disconnect_datalayer(IPropertyOwner *source, const InstanceIDType &instanceID) const override;
 
+    virtual bool IsSupportedRuleID(const RuleIDType& ruleID) const override;
+
     itk::LightObject::Pointer InternalClone() const override;
 
   private:
@@ -130,9 +132,5 @@ namespace mitk
   };
 
 } // namespace mitk
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 #endif

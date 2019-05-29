@@ -43,8 +43,8 @@ int main(int argc, char* argv[])
   parser.setArgumentPrefix("--", "-");
 
   parser.beginGroup("1. Mandatory arguments:");
-  parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input:", "input image", us::Any(), false);
-  parser.addArgument("", "o", mitkCommandLineParser::OutputFile, "Output:", "output image", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::String, "Input:", "input image", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output:", "output image", us::Any(), false, false, false, mitkCommandLineParser::Output);
   parser.addArgument("type", "", mitkCommandLineParser::Int, "Type:", "0 (TotalVariation), 1 (Gauss), 2 (NLM)", 0);
   parser.endGroup();
 

@@ -47,6 +47,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 //micro service to get the ToolManager instance
 #include "mitkToolManagerProvider.h"
 
+#include <mitkWorkbenchUtil.h>
+#include <regex>
+
 const std::string QmitkSegmentationView::VIEW_ID = "org.mitk.views.segmentation";
 
 QmitkSegmentationView::QmitkSegmentationView()
@@ -460,7 +463,7 @@ void QmitkSegmentationView::OnPatientComboBoxSelectionChanged( const mitk::DataN
    }
    else
    {
-      this->UpdateWarningLabel(tr("Please load an image!"));
+      this->UpdateWarningLabel(tr("Please select an image!"));
       this->SetToolSelectionBoxesEnabled( false );
    }
 }
@@ -511,7 +514,7 @@ void QmitkSegmentationView::OnSegmentationComboBoxSelectionChanged(const mitk::D
       }
       else if (!refNode || !this->CheckForSameGeometry(node, refNode))
       {
-         this->UpdateWarningLabel(tr("Please select or load the according patient image!"));
+         this->UpdateWarningLabel(tr("Please select the matching patient image!"));
       }
    }
 
@@ -679,14 +682,10 @@ void QmitkSegmentationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*
 void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
 {
    QmitkRenderWindow* selectedRenderWindow = 0;
-   QmitkRenderWindow* axialRenderWindow =
-      this->GetRenderWindowPart(OPEN)->GetQmitkRenderWindow("axial");
-   QmitkRenderWindow* sagittalRenderWindow =
-      this->GetRenderWindowPart(OPEN)->GetQmitkRenderWindow("sagittal");
-   QmitkRenderWindow* coronalRenderWindow =
-      this->GetRenderWindowPart(OPEN)->GetQmitkRenderWindow("coronal");
-   QmitkRenderWindow* _3DRenderWindow =
-      this->GetRenderWindowPart(OPEN)->GetQmitkRenderWindow("3d");
+   QmitkRenderWindow* axialRenderWindow = GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetQmitkRenderWindow("axial");
+   QmitkRenderWindow* sagittalRenderWindow = GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetQmitkRenderWindow("sagittal");
+   QmitkRenderWindow* coronalRenderWindow = GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetQmitkRenderWindow("coronal");
+   QmitkRenderWindow* _3DRenderWindow = GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetQmitkRenderWindow("3d");
    bool PlanarFigureInitializedWindow = false;
 
    // find initialized renderwindow
@@ -876,7 +875,7 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataNode* node)
     // node is actually a multi label segmentation,
     // but its outline property can be set in the 'single label' segmentation preference page as well
     node->SetProperty("labelset.contour.active", drawOutline);
-    node->SetProperty("opacity", mitk::FloatProperty::New(drawOutline->GetValue() ? 1.0f : 0.3f));
+    //node->SetProperty("opacity", mitk::FloatProperty::New(drawOutline->GetValue() ? 1.0f : 0.3f));
     node->SetProperty("volumerendering", volumeRendering);
     // force render window update to show outline
     node->GetData()->Modified();
@@ -890,7 +889,7 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataNode* node)
     {
       node->SetProperty("outline binary", drawOutline);
       node->SetProperty("outline width", mitk::FloatProperty::New(2.0));
-      node->SetProperty("opacity", mitk::FloatProperty::New(drawOutline->GetValue() ? 1.0f : 0.3f));
+      //node->SetProperty("opacity", mitk::FloatProperty::New(drawOutline->GetValue() ? 1.0f : 0.3f));
       node->SetProperty("volumerendering", volumeRendering);
       // force render window update to show outline
       node->GetData()->Modified();
@@ -966,7 +965,7 @@ void QmitkSegmentationView::UpdateWarningLabel(QString text)
       m_Controls->lblSegmentationWarnings->hide();
    else
       m_Controls->lblSegmentationWarnings->show();
-   m_Controls->lblSegmentationWarnings->setText(text);
+   m_Controls->lblSegmentationWarnings->setText("<font color=\"red\">" + text + "</font>");
 }
 
 void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
@@ -980,7 +979,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls->patImageSelector->SetDataStorage(GetDataStorage());
    m_Controls->patImageSelector->SetPredicate(m_IsAPatientImagePredicate);
 
-   UpdateWarningLabel(tr("Please load an image"));
+   UpdateWarningLabel(tr("Please select an image"));
 
    if (m_Controls->patImageSelector->GetSelectedNode().IsNotNull())
    {
@@ -1000,11 +999,32 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    toolManager->SetDataStorage(*(GetDataStorage()));
    toolManager->InitializeTools();
 
+   QString segTools2D = tr("Add Subtract Correction Paint Wipe 'Region Growing' Fill Erase 'Live Wire' '2D Fast Marching'");
+   QString segTools3D = tr("Threshold 'UL Threshold' Otsu 'Fast Marching 3D' 'Region Growing 3D' Watershed Picking");
+
+   std::regex extSegTool2DRegEx("SegTool2D$");
+   std::regex extSegTool3DRegEx("SegTool3D$");
+
+   auto tools = toolManager->GetTools();
+
+   for (const auto &tool : tools)
+   {
+     if (std::regex_search(tool->GetNameOfClass(), extSegTool2DRegEx))
+     {
+       segTools2D.append(QString(" '%1'").arg(tool->GetName()));
+     }
+     else if (std::regex_search(tool->GetNameOfClass(), extSegTool3DRegEx))
+     {
+       segTools3D.append(QString(" '%1'").arg(tool->GetName()));
+     }
+   }
+
    // all part of open source MITK
    m_Controls->m_ManualToolSelectionBox2D->setEnabled(true);
    m_Controls->m_ManualToolSelectionBox2D->SetGenerateAccelerators(true);
    m_Controls->m_ManualToolSelectionBox2D->SetToolGUIArea( m_Controls->m_ManualToolGUIContainer2D );
-   m_Controls->m_ManualToolSelectionBox2D->SetDisplayedToolGroups(tr("Add Subtract Correction Paint Wipe 'Region Growing' Fill Erase 'Live Wire' '2D Fast Marching'").toStdString());
+
+   m_Controls->m_ManualToolSelectionBox2D->SetDisplayedToolGroups(segTools2D.toStdString());
    m_Controls->m_ManualToolSelectionBox2D->SetLayoutColumns(3);
    m_Controls->m_ManualToolSelectionBox2D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
    connect( m_Controls->m_ManualToolSelectionBox2D, SIGNAL(ToolSelected(int)), this, SLOT(OnManualTool2DSelected(int)) );
@@ -1014,7 +1034,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls->m_ManualToolSelectionBox3D->SetGenerateAccelerators(true);
    m_Controls->m_ManualToolSelectionBox3D->SetToolGUIArea( m_Controls->m_ManualToolGUIContainer3D );
    //specify tools to be added to 3D Tool area
-   m_Controls->m_ManualToolSelectionBox3D->SetDisplayedToolGroups(tr("Threshold 'UL Threshold' Otsu 'Fast Marching 3D' 'Region Growing 3D' Watershed Picking").toStdString());
+   m_Controls->m_ManualToolSelectionBox3D->SetDisplayedToolGroups(segTools3D.toStdString());
    m_Controls->m_ManualToolSelectionBox3D->SetLayoutColumns(3);
    m_Controls->m_ManualToolSelectionBox3D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
 
@@ -1103,17 +1123,16 @@ void QmitkSegmentationView::ResetMouseCursor()
 
 void QmitkSegmentationView::SetMouseCursor( const us::ModuleResource& resource, int hotspotX, int hotspotY )
 {
-   if (!resource) return;
-
    // Remove previously set mouse cursor
-   if ( m_MouseCursorSet )
-   {
-      mitk::ApplicationCursor::GetInstance()->PopCursor();
-   }
+   if (m_MouseCursorSet)
+      this->ResetMouseCursor();
 
-   us::ModuleResourceStream cursor(resource, std::ios::binary);
-   mitk::ApplicationCursor::GetInstance()->PushCursor( cursor, hotspotX, hotspotY );
-   m_MouseCursorSet = true;
+   if (resource)
+   {
+     us::ModuleResourceStream cursor(resource, std::ios::binary);
+     mitk::ApplicationCursor::GetInstance()->PushCursor(cursor, hotspotX, hotspotY);
+     m_MouseCursorSet = true;
+   }
 }
 
 void QmitkSegmentationView::SetToolSelectionBoxesEnabled(bool status)

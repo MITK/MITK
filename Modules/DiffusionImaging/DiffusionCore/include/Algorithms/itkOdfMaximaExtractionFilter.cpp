@@ -213,12 +213,14 @@ void OdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
 
   ImageRegionConstIterator< CoefficientImageType > cit(ShCoeffImage, outputRegionForThread );
 
+  boost::progress_display disp(outputRegionForThread.GetSize()[0]*outputRegionForThread.GetSize()[1]*outputRegionForThread.GetSize()[2]);
   OdfType odf;
   while( !cit.IsAtEnd() )
   {
     typename CoefficientImageType::IndexType idx3 = cit.GetIndex();
     if (m_MaskImage->GetPixel(idx3)==0)
     {
+      ++disp;
       ++cit;
       continue;
     }
@@ -239,6 +241,7 @@ void OdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
     }
     if (max<0.0001)
     {
+      ++disp;
       ++cit;
       continue;
     }
@@ -348,6 +351,7 @@ void OdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
       }
     }
     m_NumDirectionsImage->SetPixel(idx3, num);
+    ++disp;
     ++cit;
   }
   MITK_INFO << "Thread " << threadID << " finished extraction";

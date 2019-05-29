@@ -20,5 +20,5 @@ mitk_create_plugin(EXPORT_DIRECTIVE BERRY_UI_QT
                         EXPORTED_INCLUDE_SUFFIXES ${PLUGIN_exported_include_suffixes})
 
 if(MITK_USE_Qt5)
-  target_link_libraries(${PLUGIN_TARGET} PUBLIC Qt5::Widgets)
+  target_link_libraries(${PLUGIN_TARGET} PUBLIC Qt5::Widgets Qt5::PrintSupport Qt5::Svg)
 endif()

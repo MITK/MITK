@@ -50,19 +50,19 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("", "a", mitkCommandLineParser::InputFile, "Anchor tractogram:", "anchor tracts in one tractogram file", us::Any());
-  parser.addArgument("", "p", mitkCommandLineParser::InputFile, "Input peaks:", "input peak image", us::Any(), false);
-  parser.addArgument("", "c", mitkCommandLineParser::StringList, "Candidates:", "Folder(s) or file list of candidate tracts", us::Any(), false);
-  parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output folder:", "output folder", us::Any(), false);
+  parser.addArgument("", "a", mitkCommandLineParser::String, "Anchor tractogram:", "anchor tracts in one tractogram file", us::Any(), true, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("", "p", mitkCommandLineParser::String, "Input peaks:", "input peak image", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("", "c", mitkCommandLineParser::StringList, "Candidates:", "Folder(s) or file list of candidate tracts", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output folder:", "output folder", us::Any(), false, false, false, mitkCommandLineParser::Output);
 
-  parser.addArgument("reference_mask_folders", "", mitkCommandLineParser::StringList, "Reference Mask Folder(s):", "Folder(s) or file list containing reference tract masks for accuracy evaluation");
-  parser.addArgument("reference_peaks_folders", "", mitkCommandLineParser::StringList, "Reference Peaks Folder(s):", "Folder(s) or file list containing reference peak images for accuracy evaluation");
+  parser.addArgument("reference_mask_folders", "", mitkCommandLineParser::StringList, "Reference Mask Folder(s):", "Folder(s) or file list containing reference tract masks for accuracy evaluation", true, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("reference_peaks_folders", "", mitkCommandLineParser::StringList, "Reference Peaks Folder(s):", "Folder(s) or file list containing reference peak images for accuracy evaluation", true, false, false, mitkCommandLineParser::Input);
   
-  parser.addArgument("mask", "", mitkCommandLineParser::InputFile, "Mask image:", "scoring is only performed inside the mask image");
+  parser.addArgument("mask", "", mitkCommandLineParser::String, "Mask image:", "scoring is only performed inside the mask image", us::Any(), true, false, false, mitkCommandLineParser::Input);
   parser.addArgument("greedy_add", "", mitkCommandLineParser::Bool, "Greedy:", "if enabled, the candidate tracts are not jointly fitted to the residual image but one after the other employing a greedy scheme", false);
   parser.addArgument("lambda", "", mitkCommandLineParser::Float, "Lambda:", "modifier for regularization", 0.1);
   parser.addArgument("filter_outliers", "", mitkCommandLineParser::Bool, "Filter outliers:", "perform second optimization run with an upper weight bound based on the first weight estimation (99% quantile)", false);
-  parser.addArgument("regu", "", mitkCommandLineParser::String, "Regularization:", "MSM, Variance, VoxelVariance, Lasso, GroupLasso, GroupVariance, NONE (default)");
+  parser.addArgument("regu", "", mitkCommandLineParser::String, "Regularization:", "MSM; Variance; VoxelVariance; Lasso; GroupLasso; GroupVariance; NONE", std::string("NONE"));
   parser.addArgument("use_num_streamlines", "", mitkCommandLineParser::Bool, "Use number of streamlines as score:", "Don't fit candidates, simply use number of streamlines per candidate as score", false);
   parser.addArgument("use_weights", "", mitkCommandLineParser::Bool, "Use input weights as score:", "Don't fit candidates, simply use first input streamline weight per candidate as score", false);
   parser.addArgument("filter_zero_weights", "", mitkCommandLineParser::Bool, "Filter zero-weights", "Remove streamlines with weight 0 from candidates", false);

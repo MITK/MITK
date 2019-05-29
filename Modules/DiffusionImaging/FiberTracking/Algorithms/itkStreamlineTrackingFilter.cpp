@@ -51,39 +51,11 @@ StreamlineTrackingFilter
   , m_MaskImage(nullptr)
   , m_ExclusionRegions(nullptr)
   , m_OutputProbabilityMap(nullptr)
-  , m_MinVoxelSize(-1)
-  , m_AngularThresholdDeg(-1)
-  , m_StepSizeVox(-1)
-  , m_SamplingDistanceVox(-1)
-  , m_AngularThreshold(-1)
-  , m_StepSize(0)
-  , m_MaxLength(10000)
-  , m_MinTractLength(20.0)
-  , m_MaxTractLength(400.0)
-  , m_SeedsPerVoxel(1)
-  , m_AvoidStop(true)
-  , m_RandomSampling(false)
-  , m_SamplingDistance(-1)
-  , m_DeflectionMod(1.0)
-  , m_OnlyForwardSamples(true)
-  , m_UseStopVotes(true)
-  , m_NumberOfSamples(30)
-  , m_NumPreviousDirections(1)
-  , m_MaxNumTracts(-1)
   , m_Verbose(true)
-  , m_LoopCheck(-1)
   , m_DemoMode(false)
-  , m_Random(true)
-  , m_UseOutputProbabilityMap(false)
   , m_CurrentTracts(0)
   , m_Progress(0)
   , m_StopTracking(false)
-  , m_InterpolateMasks(true)
-  , m_TrialsPerSeed(10)
-  , m_EndpointConstraint(EndpointConstraints::NONE)
-  , m_IntroduceDirectionsFromPrior(true)
-  , m_TrackingPriorAsMask(true)
-  , m_TrackingPriorWeight(1.0)
   , m_TrackingPriorHandler(nullptr)
 {
   this->SetNumberOfRequiredInputs(0);
@@ -94,8 +66,8 @@ std::string StreamlineTrackingFilter::GetStatusText()
   std::string status = "Seedpoints processed: " + boost::lexical_cast<std::string>(m_Progress) + "/" + boost::lexical_cast<std::string>(m_SeedPoints.size());
   if (m_SeedPoints.size()>0)
     status += " (" + boost::lexical_cast<std::string>(100*m_Progress/m_SeedPoints.size()) + "%)";
-  if (m_MaxNumTracts>0)
-    status += "\nFibers accepted: " + boost::lexical_cast<std::string>(m_CurrentTracts) + "/" + boost::lexical_cast<std::string>(m_MaxNumTracts);
+  if (m_Parameters->m_MaxNumFibers>0)
+    status += "\nFibers accepted: " + boost::lexical_cast<std::string>(m_CurrentTracts) + "/" + boost::lexical_cast<std::string>(m_Parameters->m_MaxNumFibers);
   else
     status += "\nFibers accepted: " + boost::lexical_cast<std::string>(m_CurrentTracts);
 
@@ -105,48 +77,16 @@ std::string StreamlineTrackingFilter::GetStatusText()
 void StreamlineTrackingFilter::BeforeTracking()
 {
   m_StopTracking = false;
-  m_TrackingHandler->SetRandom(m_Random);
+  m_TrackingHandler->SetParameters(m_Parameters);
   m_TrackingHandler->InitForTracking();
   m_FiberPolyData = PolyDataType::New();
   m_Points = vtkSmartPointer< vtkPoints >::New();
   m_Cells = vtkSmartPointer< vtkCellArray >::New();
 
-  itk::Vector< double, 3 > imageSpacing = m_TrackingHandler->GetSpacing();
-
-  if(imageSpacing[0]<imageSpacing[1] && imageSpacing[0]<imageSpacing[2])
-    m_MinVoxelSize = imageSpacing[0];
-  else if (imageSpacing[1] < imageSpacing[2])
-    m_MinVoxelSize = imageSpacing[1];
-  else
-    m_MinVoxelSize = imageSpacing[2];
-
-  if (m_StepSizeVox<mitk::eps)
-    m_StepSize = 0.5*m_MinVoxelSize;
-  else
-    m_StepSize = m_StepSizeVox*m_MinVoxelSize;
-
-  if (m_AngularThresholdDeg<0)
-  {
-    if  (m_StepSize/m_MinVoxelSize<=0.966)  // minimum 15° for automatic estimation
-      m_AngularThreshold = std::cos( 0.5 * itk::Math::pi * m_StepSize/m_MinVoxelSize );
-    else
-      m_AngularThreshold = std::cos( 0.5 * itk::Math::pi * 0.966 );
-  }
-  else
-    m_AngularThreshold = std::cos( m_AngularThresholdDeg*itk::Math::pi/180.0 );
-  m_TrackingHandler->SetAngularThreshold(m_AngularThreshold);
-
   if (m_TrackingPriorHandler!=nullptr)
   {
-    m_TrackingPriorHandler->SetRandom(m_Random);
     m_TrackingPriorHandler->InitForTracking();
-    m_TrackingPriorHandler->SetAngularThreshold(m_AngularThreshold);
   }
-
-  if (m_SamplingDistanceVox<mitk::eps)
-    m_SamplingDistance = m_MinVoxelSize*0.25;
-  else
-    m_SamplingDistance = m_SamplingDistanceVox * m_MinVoxelSize;
 
   m_PolyDataContainer.clear();
   for (unsigned int i=0; i<this->GetNumberOfThreads(); i++)
@@ -155,7 +95,8 @@ void StreamlineTrackingFilter::BeforeTracking()
     m_PolyDataContainer.push_back(poly);
   }
 
-  if (m_UseOutputProbabilityMap)
+  auto imageSpacing = m_TrackingHandler->GetSpacing();
+  if (m_Parameters->m_OutputProbMap)
   {
     m_OutputProbabilityMap = ItkDoubleImgType::New();
     m_OutputProbabilityMap->SetSpacing(imageSpacing);
@@ -244,15 +185,15 @@ void StreamlineTrackingFilter::BeforeTracking()
   m_MaskInterpolator->SetInputImage(m_MaskImage);
 
   // Autosettings for endpoint constraints
-  if (m_EndpointConstraint==EndpointConstraints::NONE && m_TargetImageSet && m_SeedImageSet)
+  if (m_Parameters->m_EpConstraints==EndpointConstraints::NONE && m_TargetImageSet && m_SeedImageSet)
   {
     MITK_INFO << "No endpoint constraint chosen but seed and target image set --> setting constraint to EPS_IN_SEED_AND_TARGET";
-    m_EndpointConstraint = EndpointConstraints::EPS_IN_SEED_AND_TARGET;
+    m_Parameters->m_EpConstraints = EndpointConstraints::EPS_IN_SEED_AND_TARGET;
   }
-  else if (m_EndpointConstraint==EndpointConstraints::NONE && m_TargetImageSet)
+  else if (m_Parameters->m_EpConstraints==EndpointConstraints::NONE && m_TargetImageSet)
   {
     MITK_INFO << "No endpoint constraint chosen but target image set --> setting constraint to EPS_IN_TARGET";
-    m_EndpointConstraint = EndpointConstraints::EPS_IN_TARGET;
+    m_Parameters->m_EpConstraints = EndpointConstraints::EPS_IN_TARGET;
   }
 
   // Check if endpoint constraints are valid
@@ -274,48 +215,48 @@ void StreamlineTrackingFilter::BeforeTracking()
   if (m_DemoMode)
     omp_set_num_threads(1);
 
-  if (m_TrackingHandler->GetMode()==mitk::TrackingDataHandler::MODE::DETERMINISTIC)
+  if (m_Parameters->m_Mode==mitk::TrackingDataHandler::MODE::DETERMINISTIC)
     std::cout << "StreamlineTracking - Mode: deterministic" << std::endl;
-  else if(m_TrackingHandler->GetMode()==mitk::TrackingDataHandler::MODE::PROBABILISTIC)
+  else if(m_Parameters->m_Mode==mitk::TrackingDataHandler::MODE::PROBABILISTIC)
   {
     std::cout << "StreamlineTracking - Mode: probabilistic" << std::endl;
-    std::cout << "StreamlineTracking - Trials per seed: " << m_TrialsPerSeed << std::endl;
+    std::cout << "StreamlineTracking - Trials per seed: " << m_Parameters->m_TrialsPerSeed << std::endl;
   }
   else
     std::cout << "StreamlineTracking - Mode: ???" << std::endl;
 
-  if (m_EndpointConstraint==EndpointConstraints::NONE)
+  if (m_Parameters->m_EpConstraints==EndpointConstraints::NONE)
     std::cout << "StreamlineTracking - Endpoint constraint: NONE" << std::endl;
-  else if (m_EndpointConstraint==EndpointConstraints::EPS_IN_TARGET)
+  else if (m_Parameters->m_EpConstraints==EndpointConstraints::EPS_IN_TARGET)
     std::cout << "StreamlineTracking - Endpoint constraint: EPS_IN_TARGET" << std::endl;
-  else if (m_EndpointConstraint==EndpointConstraints::EPS_IN_TARGET_LABELDIFF)
+  else if (m_Parameters->m_EpConstraints==EndpointConstraints::EPS_IN_TARGET_LABELDIFF)
     std::cout << "StreamlineTracking - Endpoint constraint: EPS_IN_TARGET_LABELDIFF" << std::endl;
-  else if (m_EndpointConstraint==EndpointConstraints::EPS_IN_SEED_AND_TARGET)
+  else if (m_Parameters->m_EpConstraints==EndpointConstraints::EPS_IN_SEED_AND_TARGET)
     std::cout << "StreamlineTracking - Endpoint constraint: EPS_IN_SEED_AND_TARGET" << std::endl;
-  else if (m_EndpointConstraint==EndpointConstraints::MIN_ONE_EP_IN_TARGET)
+  else if (m_Parameters->m_EpConstraints==EndpointConstraints::MIN_ONE_EP_IN_TARGET)
     std::cout << "StreamlineTracking - Endpoint constraint: MIN_ONE_EP_IN_TARGET" << std::endl;
-  else if (m_EndpointConstraint==EndpointConstraints::ONE_EP_IN_TARGET)
+  else if (m_Parameters->m_EpConstraints==EndpointConstraints::ONE_EP_IN_TARGET)
     std::cout << "StreamlineTracking - Endpoint constraint: ONE_EP_IN_TARGET" << std::endl;
-  else if (m_EndpointConstraint==EndpointConstraints::NO_EP_IN_TARGET)
+  else if (m_Parameters->m_EpConstraints==EndpointConstraints::NO_EP_IN_TARGET)
     std::cout << "StreamlineTracking - Endpoint constraint: NO_EP_IN_TARGET" << std::endl;
 
-  std::cout << "StreamlineTracking - Angular threshold: " << m_AngularThreshold << " (" << 180*std::acos( m_AngularThreshold )/itk::Math::pi << "°)" << std::endl;
-  std::cout << "StreamlineTracking - Stepsize: " << m_StepSize << "mm (" << m_StepSize/m_MinVoxelSize << "*vox)" << std::endl;
-  std::cout << "StreamlineTracking - Seeds per voxel: " << m_SeedsPerVoxel << std::endl;
-  std::cout << "StreamlineTracking - Max. tract length: " << m_MaxTractLength << "mm" << std::endl;
-  std::cout << "StreamlineTracking - Min. tract length: " << m_MinTractLength << "mm" << std::endl;
-  std::cout << "StreamlineTracking - Max. num. tracts: " << m_MaxNumTracts << std::endl;
-  std::cout << "StreamlineTracking - Loop check: " << m_LoopCheck << "°" << std::endl;
+  std::cout << "StreamlineTracking - Angular threshold: " << m_Parameters->GetAngularThresholdDot() << "°" << std::endl;
+  std::cout << "StreamlineTracking - Stepsize: " << m_Parameters->GetStepSizeMm() << "mm (" << m_Parameters->GetStepSizeMm()/m_Parameters->GetMinVoxelSizeMm() << "*vox)" << std::endl;
+  std::cout << "StreamlineTracking - Seeds per voxel: " << m_Parameters->m_SeedsPerVoxel << std::endl;
+  std::cout << "StreamlineTracking - Max. tract length: " << m_Parameters->m_MaxTractLengthMm << "mm" << std::endl;
+  std::cout << "StreamlineTracking - Min. tract length: " << m_Parameters->m_MinTractLengthMm << "mm" << std::endl;
+  std::cout << "StreamlineTracking - Max. num. tracts: " << m_Parameters->m_MaxNumFibers << std::endl;
+  std::cout << "StreamlineTracking - Loop check: " << m_Parameters->GetLoopCheckDeg() << "°" << std::endl;
 
-  std::cout << "StreamlineTracking - Num. neighborhood samples: " << m_NumberOfSamples << std::endl;
-  std::cout << "StreamlineTracking - Max. sampling distance: " << m_SamplingDistance << "mm (" << m_SamplingDistance/m_MinVoxelSize << "*vox)" << std::endl;
-  std::cout << "StreamlineTracking - Deflection modifier: " << m_DeflectionMod << std::endl;
+  std::cout << "StreamlineTracking - Num. neighborhood samples: " << m_Parameters->m_NumSamples << std::endl;
+  std::cout << "StreamlineTracking - Max. sampling distance: " << m_Parameters->GetSamplingDistanceMm() << "mm (" << m_Parameters->GetSamplingDistanceMm()/m_Parameters->GetMinVoxelSizeMm() << "*vox)" << std::endl;
+  std::cout << "StreamlineTracking - Deflection modifier: " << m_Parameters->m_DeflectionMod << std::endl;
 
-  std::cout << "StreamlineTracking - Use stop votes: " << m_UseStopVotes << std::endl;
-  std::cout << "StreamlineTracking - Only frontal samples: " << m_OnlyForwardSamples << std::endl;
+  std::cout << "StreamlineTracking - Use stop votes: " << m_Parameters->m_StopVotes << std::endl;
+  std::cout << "StreamlineTracking - Only frontal samples: " << m_Parameters->m_OnlyForwardSamples << std::endl;
 
   if (m_TrackingPriorHandler!=nullptr)
-    std::cout << "StreamlineTracking - Using directional prior for tractography (w=" << m_TrackingPriorWeight << ")" << std::endl;
+    std::cout << "StreamlineTracking - Using directional prior for tractography (w=" << m_Parameters->m_Weight << ")" << std::endl;
 
   if (m_DemoMode)
   {
@@ -328,28 +269,28 @@ void StreamlineTrackingFilter::BeforeTracking()
 
 void StreamlineTrackingFilter::CalculateNewPosition(itk::Point<float, 3>& pos, vnl_vector_fixed<float, 3>& dir)
 {
-  pos[0] += dir[0]*m_StepSize;
-  pos[1] += dir[1]*m_StepSize;
-  pos[2] += dir[2]*m_StepSize;
+  pos[0] += dir[0]*m_Parameters->GetStepSizeMm();
+  pos[1] += dir[1]*m_Parameters->GetStepSizeMm();
+  pos[2] += dir[2]*m_Parameters->GetStepSizeMm();
 }
 
-std::vector< vnl_vector_fixed<float,3> > StreamlineTrackingFilter::CreateDirections(int NPoints)
+std::vector< vnl_vector_fixed<float,3> > StreamlineTrackingFilter::CreateDirections(unsigned int NPoints)
 {
   std::vector< vnl_vector_fixed<float,3> > pointshell;
 
   if (NPoints<2)
     return pointshell;
 
-  std::vector< float > theta; theta.resize(NPoints);
+  std::vector< double > theta; theta.resize(NPoints);
 
-  std::vector< float > phi; phi.resize(NPoints);
+  std::vector< double > phi; phi.resize(NPoints);
 
-  float C = sqrt(4*itk::Math::pi);
+  auto C = sqrt(4*itk::Math::pi);
 
   phi[0] = 0.0;
   phi[NPoints-1] = 0.0;
 
-  for(int i=0; i<NPoints; i++)
+  for(unsigned int i=0; i<NPoints; i++)
   {
     theta[i] = acos(-1.0+2.0*i/(NPoints-1.0)) - itk::Math::pi / 2.0;
     if( i>0 && i<NPoints-1)
@@ -360,12 +301,12 @@ std::vector< vnl_vector_fixed<float,3> > StreamlineTrackingFilter::CreateDirecti
   }
 
 
-  for(int i=0; i<NPoints; i++)
+  for(unsigned int i=0; i<NPoints; i++)
   {
     vnl_vector_fixed<float,3> d;
-    d[0] = cos(theta[i]) * cos(phi[i]);
-    d[1] = cos(theta[i]) * sin(phi[i]);
-    d[2] = sin(theta[i]);
+    d[0] = static_cast<float>(cos(theta[i]) * cos(phi[i]));
+    d[1] = static_cast<float>(cos(theta[i]) * sin(phi[i]));
+    d[2] = static_cast<float>(sin(theta[i]));
     pointshell.push_back(d);
   }
 
@@ -383,7 +324,7 @@ vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(const itk::P
   }
   vnl_vector_fixed<float,3> direction; direction.fill(0);
 
-  if (mitk::imv::IsInsideMask<float>(pos, m_InterpolateMasks, m_MaskInterpolator) && !mitk::imv::IsInsideMask<float>(pos, m_InterpolateMasks, m_StopInterpolator))
+  if (mitk::imv::IsInsideMask<float>(pos, m_Parameters->m_InterpolateRoiImages, m_MaskInterpolator) && !mitk::imv::IsInsideMask<float>(pos, m_Parameters->m_InterpolateRoiImages, m_StopInterpolator))
     direction = m_TrackingHandler->ProposeDirection(pos, olddirs, oldIndex); // get direction proposal at current streamline position
   else
     return direction;
@@ -393,33 +334,33 @@ vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(const itk::P
   if (!olddirs.empty())
   {
     vnl_vector_fixed<float,3> olddir = olddirs.back();
-    std::vector< vnl_vector_fixed<float,3> > probeVecs = CreateDirections(m_NumberOfSamples);
+    std::vector< vnl_vector_fixed<float,3> > probeVecs = CreateDirections(m_Parameters->m_NumSamples);
     itk::Point<float, 3> sample_pos;
-    int alternatives = 1;
+    unsigned int alternatives = 1;
     for (unsigned int i=0; i<probeVecs.size(); i++)
     {
       vnl_vector_fixed<float,3> d;
       bool is_stop_voter = false;
-      if (m_Random && m_RandomSampling)
+      if (!m_Parameters->m_FixRandomSeed && m_Parameters->m_RandomSampling)
       {
-        d[0] = m_TrackingHandler->GetRandDouble(-0.5, 0.5);
-        d[1] = m_TrackingHandler->GetRandDouble(-0.5, 0.5);
-        d[2] = m_TrackingHandler->GetRandDouble(-0.5, 0.5);
+        d[0] = static_cast<float>(m_TrackingHandler->GetRandDouble(-0.5, 0.5));
+        d[1] = static_cast<float>(m_TrackingHandler->GetRandDouble(-0.5, 0.5));
+        d[2] = static_cast<float>(m_TrackingHandler->GetRandDouble(-0.5, 0.5));
         d.normalize();
-        d *= m_TrackingHandler->GetRandDouble(0,m_SamplingDistance);
+        d *= static_cast<float>(m_TrackingHandler->GetRandDouble(0, static_cast<double>(m_Parameters->GetSamplingDistanceMm())));
       }
       else
       {
         d = probeVecs.at(i);
         float dot = dot_product(d, olddir);
-        if (m_UseStopVotes && dot>0.7)
+        if (m_Parameters->m_StopVotes && dot>0.7f)
         {
           is_stop_voter = true;
           possible_stop_votes++;
         }
-        else if (m_OnlyForwardSamples && dot<0)
+        else if (m_Parameters->m_OnlyForwardSamples && dot<0)
           continue;
-        d *= m_SamplingDistance;
+        d *= m_Parameters->GetSamplingDistanceMm();
       }
 
       sample_pos[0] = pos[0] + d[0];
@@ -427,16 +368,16 @@ vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(const itk::P
       sample_pos[2] = pos[2] + d[2];
 
       vnl_vector_fixed<float,3> tempDir; tempDir.fill(0.0);
-      if (mitk::imv::IsInsideMask<float>(sample_pos, m_InterpolateMasks, m_MaskInterpolator))
+      if (mitk::imv::IsInsideMask<float>(sample_pos, m_Parameters->m_InterpolateRoiImages, m_MaskInterpolator))
         tempDir = m_TrackingHandler->ProposeDirection(sample_pos, olddirs, oldIndex); // sample neighborhood
-      if (tempDir.magnitude()>mitk::eps)
+      if (tempDir.magnitude()>static_cast<float>(mitk::eps))
       {
         direction += tempDir;
 
         if(m_DemoMode)
           m_SamplingPointset->InsertPoint(i, sample_pos);
       }
-      else if (m_AvoidStop && olddir.magnitude()>0.5) // out of white matter
+      else if (m_Parameters->m_AvoidStop && olddir.magnitude()>0.5f) // out of white matter
       {
         if (is_stop_voter)
           stop_votes++;
@@ -444,7 +385,7 @@ vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(const itk::P
           m_StopVotePointset->InsertPoint(i, sample_pos);
 
         float dot = dot_product(d, olddir);
-        if (dot >= 0.0) // in front of plane defined by pos and olddir
+        if (dot >= 0.0f) // in front of plane defined by pos and olddir
           d = -d + 2*dot*olddir; // reflect
         else
           d = -d; // invert
@@ -455,12 +396,12 @@ vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(const itk::P
         sample_pos[2] = pos[2] + d[2];
         alternatives++;
         vnl_vector_fixed<float,3> tempDir; tempDir.fill(0.0);
-        if (mitk::imv::IsInsideMask<float>(sample_pos, m_InterpolateMasks, m_MaskInterpolator))
+        if (mitk::imv::IsInsideMask<float>(sample_pos, m_Parameters->m_InterpolateRoiImages, m_MaskInterpolator))
           tempDir = m_TrackingHandler->ProposeDirection(sample_pos, olddirs, oldIndex); // sample neighborhood
 
-        if (tempDir.magnitude()>mitk::eps)  // are we back in the white matter?
+        if (tempDir.magnitude()>static_cast<float>(mitk::eps))  // are we back in the white matter?
         {
-          direction += d * m_DeflectionMod;         // go into the direction of the white matter
+          direction += d * m_Parameters->m_DeflectionMod;         // go into the direction of the white matter
           direction += tempDir;  // go into the direction of the white matter direction at this location
 
           if(m_DemoMode)
@@ -484,7 +425,7 @@ vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(const itk::P
   }
 
   bool valid = false;
-  if (direction.magnitude()>0.001 && (possible_stop_votes==0 || (float)stop_votes/possible_stop_votes<0.5) )
+  if (direction.magnitude()>0.001f && (possible_stop_votes==0 || static_cast<float>(stop_votes)/possible_stop_votes<0.5f) )
   {
     direction.normalize();
     valid = true;
@@ -492,18 +433,18 @@ vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(const itk::P
   else
     direction.fill(0);
 
-  if (m_TrackingPriorHandler!=nullptr && (m_IntroduceDirectionsFromPrior || valid))
+  if (m_TrackingPriorHandler!=nullptr && (m_Parameters->m_NewDirectionsFromPrior || valid))
   {
     vnl_vector_fixed<float,3> prior = m_TrackingPriorHandler->ProposeDirection(pos, olddirs, oldIndex);
-    if (prior.magnitude()>0.001)
+    if (prior.magnitude()>0.001f)
     {
       prior.normalize();
       if (dot_product(prior,direction)<0)
         prior *= -1;
-      direction = (1.0f-m_TrackingPriorWeight) * direction + m_TrackingPriorWeight * prior;
+      direction = (1.0f-m_Parameters->m_Weight) * direction + m_Parameters->m_Weight * prior;
       direction.normalize();
     }
-    else if (m_TrackingPriorAsMask)
+    else if (m_Parameters->m_RestrictToPrior)
       direction.fill(0.0);
   }
 
@@ -515,10 +456,10 @@ float StreamlineTrackingFilter::FollowStreamline(itk::Point<float, 3> pos, vnl_v
 {
   vnl_vector_fixed<float,3> zero_dir; zero_dir.fill(0.0);
   std::deque< vnl_vector_fixed<float,3> > last_dirs;
-  for (unsigned int i=0; i<m_NumPreviousDirections-1; i++)
+  for (unsigned int i=0; i<m_Parameters->m_NumPreviousDirections-1; i++)
     last_dirs.push_back(zero_dir);
 
-  for (int step=0; step< m_MaxLength/2; step++)
+  for (int step=0; step< 5000; step++)
   {
     itk::Index<3> oldIndex;
     m_TrackingHandler->WorldToIndex(pos, oldIndex);
@@ -526,7 +467,7 @@ float StreamlineTrackingFilter::FollowStreamline(itk::Point<float, 3> pos, vnl_v
     // get new position
     CalculateNewPosition(pos, dir);
 
-    if (m_ExclusionRegions.IsNotNull() && mitk::imv::IsInsideMask<float>(pos, m_InterpolateMasks, m_ExclusionInterpolator))
+    if (m_ExclusionRegions.IsNotNull() && mitk::imv::IsInsideMask<float>(pos, m_Parameters->m_InterpolateRoiImages, m_ExclusionInterpolator))
     {
       exclude = true;
       return tractLength;
@@ -547,15 +488,15 @@ float StreamlineTrackingFilter::FollowStreamline(itk::Point<float, 3> pos, vnl_v
       fib->push_back(pos);
       container->push_back(dir);
     }
-    tractLength +=  m_StepSize;
+    tractLength +=  m_Parameters->GetStepSizeMm();
 
-    if (m_LoopCheck>=0 && CheckCurvature(container, front)>m_LoopCheck)
+    if (m_Parameters->GetLoopCheckDeg()>=0 && CheckCurvature(container, front)>m_Parameters->GetLoopCheckDeg())
       return tractLength;
 
-    if (tractLength>m_MaxTractLength)
+    if (tractLength>m_Parameters->m_MaxTractLengthMm)
       return tractLength;
 
-    if (m_DemoMode && !m_UseOutputProbabilityMap) // CHECK: warum sind die samplingpunkte der streamline in der visualisierung immer einen schritt voras?
+    if (m_DemoMode && !m_Parameters->m_OutputProbMap) // CHECK: warum sind die samplingpunkte der streamline in der visualisierung immer einen schritt voras?
     {
 #pragma omp critical
       {
@@ -570,13 +511,13 @@ float StreamlineTrackingFilter::FollowStreamline(itk::Point<float, 3> pos, vnl_v
     }
 
     last_dirs.push_back(dir);
-    if (last_dirs.size()>m_NumPreviousDirections)
+    if (last_dirs.size()>m_Parameters->m_NumPreviousDirections)
       last_dirs.pop_front();
     dir = GetNewDirection(pos, last_dirs, oldIndex);
 
     while (m_PauseTracking){}
 
-    if (dir.magnitude()<0.0001)
+    if (dir.magnitude()<0.0001f)
       return tractLength;
   }
   return tractLength;
@@ -587,7 +528,7 @@ float StreamlineTrackingFilter::CheckCurvature(DirectionContainer* fib, bool fro
 {
   if (fib->size()<8)
     return 0;
-  float m_Distance = std::max(m_MinVoxelSize*4, m_StepSize*8);
+  float m_Distance = std::max(m_Parameters->GetMinVoxelSizeMm()*4, m_Parameters->GetStepSizeMm()*8);
   float dist = 0;
 
   std::vector< vnl_vector_fixed< float, 3 > > vectors;
@@ -597,10 +538,10 @@ float StreamlineTrackingFilter::CheckCurvature(DirectionContainer* fib, bool fro
   if (front)
   {
     int c = 0;
-    while(dist<m_Distance && c<(int)fib->size()-1)
+    while(dist<m_Distance && c<static_cast<int>(fib->size())-1)
     {
-      dist += m_StepSize;
-      vnl_vector_fixed< float, 3 > v = fib->at(c);
+      dist += m_Parameters->GetStepSizeMm();
+      vnl_vector_fixed< float, 3 > v = fib->at(static_cast<unsigned int>(c));
       if (dot_product(v,meanV)<0)
         v = -v;
       vectors.push_back(v);
@@ -610,11 +551,11 @@ float StreamlineTrackingFilter::CheckCurvature(DirectionContainer* fib, bool fro
   }
   else
   {
-    int c = fib->size()-1;
+    int c = static_cast<int>(fib->size())-1;
     while(dist<m_Distance && c>=0)
     {
-      dist += m_StepSize;
-      vnl_vector_fixed< float, 3 > v = fib->at(c);
+      dist += m_Parameters->GetStepSizeMm();
+      vnl_vector_fixed< float, 3 > v = fib->at(static_cast<unsigned int>(c));
       if (dot_product(v,meanV)<0)
         v = -v;
       vectors.push_back(v);
@@ -627,14 +568,24 @@ float StreamlineTrackingFilter::CheckCurvature(DirectionContainer* fib, bool fro
   for (unsigned int c=0; c<vectors.size(); c++)
   {
     float angle = std::fabs(dot_product(meanV, vectors.at(c)));
-    if (angle>1.0)
+    if (angle>1.0f)
       angle = 1.0;
-    dev += acos(angle)*180/itk::Math::pi;
+    dev += acos(angle)*180.0f/static_cast<float>(itk::Math::pi);
   }
   if (vectors.size()>0)
     dev /= vectors.size();
 
   return dev;
+}
+
+std::shared_ptr<mitk::StreamlineTractographyParameters> StreamlineTrackingFilter::GetParameters() const
+{
+  return m_Parameters;
+}
+
+void StreamlineTrackingFilter::SetParameters(std::shared_ptr< mitk::StreamlineTractographyParameters > Parameters)
+{
+  m_Parameters = Parameters;
 }
 
 void StreamlineTrackingFilter::SetTrackingPriorHandler(mitk::TrackingDataHandler *TrackingPriorHandler)
@@ -663,14 +614,14 @@ void StreamlineTrackingFilter::GetSeedPointsFromSeedImage()
       itk::Point<float> worldPos;
       m_SeedImage->TransformContinuousIndexToPhysicalPoint(start, worldPos);
 
-      if ( mitk::imv::IsInsideMask<float>(worldPos, m_InterpolateMasks, m_MaskInterpolator) )
+      if ( mitk::imv::IsInsideMask<float>(worldPos, m_Parameters->m_InterpolateRoiImages, m_MaskInterpolator) )
       {
         m_SeedPoints.push_back(worldPos);
-        for (int s = 1; s < m_SeedsPerVoxel; s++)
+        for (unsigned int s = 1; s < m_Parameters->m_SeedsPerVoxel; s++)
         {
-          start[0] = index[0] + m_TrackingHandler->GetRandDouble(-0.5, 0.5);
-          start[1] = index[1] + m_TrackingHandler->GetRandDouble(-0.5, 0.5);
-          start[2] = index[2] + m_TrackingHandler->GetRandDouble(-0.5, 0.5);
+          start[0] = index[0] + static_cast<float>(m_TrackingHandler->GetRandDouble(-0.5, 0.5));
+          start[1] = index[1] + static_cast<float>(m_TrackingHandler->GetRandDouble(-0.5, 0.5));
+          start[2] = index[2] + static_cast<float>(m_TrackingHandler->GetRandDouble(-0.5, 0.5));
 
           itk::Point<float> worldPos;
           m_SeedImage->TransformContinuousIndexToPhysicalPoint(start, worldPos);
@@ -680,22 +631,28 @@ void StreamlineTrackingFilter::GetSeedPointsFromSeedImage()
     }
     ++sit;
   }
+  if (m_SeedPoints.empty())
+    mitkThrow() << "No valid seed point in seed image! Is your seed image registered with the image you are tracking on?";
 }
 
 void StreamlineTrackingFilter::GenerateData()
 {
   this->BeforeTracking();
-  if (m_Random)
+  if (!m_Parameters->m_FixRandomSeed)
     std::random_shuffle(m_SeedPoints.begin(), m_SeedPoints.end());
 
   m_CurrentTracts = 0;
-  int num_seeds = m_SeedPoints.size();
+  int num_seeds = static_cast<int>(m_SeedPoints.size());
   itk::Index<3> zeroIndex; zeroIndex.Fill(0);
   m_Progress = 0;
   int i = 0;
   int print_interval = num_seeds/100;
   if (print_interval<100)
     m_Verbose=false;
+
+  unsigned int trials_per_seed = 1;
+  if(m_Parameters->m_Mode==mitk::TrackingDataHandler::MODE::PROBABILISTIC)
+    trials_per_seed = m_Parameters->m_TrialsPerSeed;
 
 #pragma omp parallel
   while (i<num_seeds && !m_StopTracking)
@@ -712,23 +669,23 @@ void StreamlineTrackingFilter::GenerateData()
     else if (m_Verbose && i%print_interval==0)
 #pragma omp critical
     {
-      m_Progress += print_interval;
+      m_Progress += static_cast<unsigned int>(print_interval);
       std::cout << "                                                                                                     \r";
-      if (m_MaxNumTracts>0)
-        std::cout << "Tried: " << m_Progress << "/" << num_seeds << " | Accepted: " << m_CurrentTracts << "/" << m_MaxNumTracts << '\r';
+      if (m_Parameters->m_MaxNumFibers>0)
+        std::cout << "Tried: " << m_Progress << "/" << num_seeds << " | Accepted: " << m_CurrentTracts << "/" << m_Parameters->m_MaxNumFibers << '\r';
       else
         std::cout << "Tried: " << m_Progress << "/" << num_seeds << " | Accepted: " << m_CurrentTracts << '\r';
       cout.flush();
     }
 
-    const itk::Point<float> worldPos = m_SeedPoints.at(temp_i);
+    const itk::Point<float> worldPos = m_SeedPoints.at(static_cast<unsigned int>(temp_i));
 
-    for (unsigned int trials=0; trials<m_TrialsPerSeed; ++trials)
+    for (unsigned int trials=0; trials<trials_per_seed; ++trials)
     {
       FiberType fib;
       DirectionContainer direction_container;
       float tractLength = 0;
-      unsigned int counter = 0;
+      unsigned long counter = 0;
 
       // get starting direction
       vnl_vector_fixed<float,3> dir; dir.fill(0.0);
@@ -736,11 +693,11 @@ void StreamlineTrackingFilter::GenerateData()
       dir = GetNewDirection(worldPos, olddirs, zeroIndex) * 0.5f;
 
       bool exclude = false;
-      if (m_ExclusionRegions.IsNotNull() && mitk::imv::IsInsideMask<float>(worldPos, m_InterpolateMasks, m_ExclusionInterpolator))
+      if (m_ExclusionRegions.IsNotNull() && mitk::imv::IsInsideMask<float>(worldPos, m_Parameters->m_InterpolateRoiImages, m_ExclusionInterpolator))
         exclude = true;
 
       bool success = false;
-      if (dir.magnitude()>0.0001 && !exclude)
+      if (dir.magnitude()>0.0001f && !exclude)
       {
         // forward tracking
         tractLength = FollowStreamline(worldPos, dir, &fib, &direction_container, 0, false, exclude);
@@ -752,21 +709,21 @@ void StreamlineTrackingFilter::GenerateData()
 
         counter = fib.size();
 
-        if (tractLength>=m_MinTractLength && counter>=2 && !exclude)
+        if (tractLength>=m_Parameters->m_MinTractLengthMm && counter>=2 && !exclude)
         {
 #pragma omp critical
           if ( IsValidFiber(&fib) )
           {
             if (!m_StopTracking)
             {
-              if (!m_UseOutputProbabilityMap)
+              if (!m_Parameters->m_OutputProbMap)
                 m_Tractogram.push_back(fib);
               else
                 FiberToProbmap(&fib);
               m_CurrentTracts++;
               success = true;
             }
-            if (m_MaxNumTracts > 0 && m_CurrentTracts>=static_cast<unsigned int>(m_MaxNumTracts))
+            if (m_Parameters->m_MaxNumFibers > 0 && m_CurrentTracts>=static_cast<unsigned int>(m_Parameters->m_MaxNumFibers))
             {
               if (!m_StopTracking)
               {
@@ -779,7 +736,7 @@ void StreamlineTrackingFilter::GenerateData()
         }
       }
 
-      if (success || m_TrackingHandler->GetMode()!=mitk::TrackingDataHandler::PROBABILISTIC)
+      if (success || m_Parameters->m_Mode!=MODE::PROBABILISTIC)
         break;  // we only try one seed point multiple times if we use a probabilistic tracker and have not found a valid streamline yet
 
     }// trials per seed
@@ -791,83 +748,83 @@ void StreamlineTrackingFilter::GenerateData()
 
 bool StreamlineTrackingFilter::IsValidFiber(FiberType* fib)
 {
-  if (m_EndpointConstraint==EndpointConstraints::NONE)
+  if (m_Parameters->m_EpConstraints==EndpointConstraints::NONE)
   {
     return true;
   }
-  else if (m_EndpointConstraint==EndpointConstraints::EPS_IN_TARGET)
+  else if (m_Parameters->m_EpConstraints==EndpointConstraints::EPS_IN_TARGET)
   {
     if (m_TargetImageSet)
     {
-      if ( mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMasks, m_TargetInterpolator)
-           && mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMasks, m_TargetInterpolator) )
+      if ( mitk::imv::IsInsideMask<float>(fib->front(), m_Parameters->m_InterpolateRoiImages, m_TargetInterpolator)
+           && mitk::imv::IsInsideMask<float>(fib->back(), m_Parameters->m_InterpolateRoiImages, m_TargetInterpolator) )
         return true;
       return false;
     }
     else
       mitkThrow() << "No target image set but endpoint constraint EPS_IN_TARGET chosen!";
   }
-  else if (m_EndpointConstraint==EndpointConstraints::EPS_IN_TARGET_LABELDIFF)
+  else if (m_Parameters->m_EpConstraints==EndpointConstraints::EPS_IN_TARGET_LABELDIFF)
   {
     if (m_TargetImageSet)
     {
       float v1 = mitk::imv::GetImageValue<float>(fib->front(), false, m_TargetInterpolator);
       float v2 = mitk::imv::GetImageValue<float>(fib->back(), false, m_TargetInterpolator);
-      if ( v1>0.0 && v2>0.0 && v1!=v2  )
+      if ( v1>0.0f && v2>0.0f && v1!=v2  )
         return true;
       return false;
     }
     else
       mitkThrow() << "No target image set but endpoint constraint EPS_IN_TARGET_LABELDIFF chosen!";
   }
-  else if (m_EndpointConstraint==EndpointConstraints::EPS_IN_SEED_AND_TARGET)
+  else if (m_Parameters->m_EpConstraints==EndpointConstraints::EPS_IN_SEED_AND_TARGET)
   {
     if (m_TargetImageSet && m_SeedImageSet)
     {
-      if ( mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMasks, m_SeedInterpolator)
-           && mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMasks, m_TargetInterpolator) )
+      if ( mitk::imv::IsInsideMask<float>(fib->front(), m_Parameters->m_InterpolateRoiImages, m_SeedInterpolator)
+           && mitk::imv::IsInsideMask<float>(fib->back(), m_Parameters->m_InterpolateRoiImages, m_TargetInterpolator) )
         return true;
-      if ( mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMasks, m_SeedInterpolator)
-           && mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMasks, m_TargetInterpolator) )
+      if ( mitk::imv::IsInsideMask<float>(fib->back(), m_Parameters->m_InterpolateRoiImages, m_SeedInterpolator)
+           && mitk::imv::IsInsideMask<float>(fib->front(), m_Parameters->m_InterpolateRoiImages, m_TargetInterpolator) )
         return true;
       return false;
     }
     else
       mitkThrow() << "No target or seed image set but endpoint constraint EPS_IN_SEED_AND_TARGET chosen!";
   }
-  else if (m_EndpointConstraint==EndpointConstraints::MIN_ONE_EP_IN_TARGET)
+  else if (m_Parameters->m_EpConstraints==EndpointConstraints::MIN_ONE_EP_IN_TARGET)
   {
     if (m_TargetImageSet)
     {
-      if ( mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMasks, m_TargetInterpolator)
-           || mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMasks, m_TargetInterpolator) )
+      if ( mitk::imv::IsInsideMask<float>(fib->front(), m_Parameters->m_InterpolateRoiImages, m_TargetInterpolator)
+           || mitk::imv::IsInsideMask<float>(fib->back(), m_Parameters->m_InterpolateRoiImages, m_TargetInterpolator) )
         return true;
       return false;
     }
     else
       mitkThrow() << "No target image set but endpoint constraint MIN_ONE_EP_IN_TARGET chosen!";
   }
-  else if (m_EndpointConstraint==EndpointConstraints::ONE_EP_IN_TARGET)
+  else if (m_Parameters->m_EpConstraints==EndpointConstraints::ONE_EP_IN_TARGET)
   {
     if (m_TargetImageSet)
     {
-      if ( mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMasks, m_TargetInterpolator)
-           && !mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMasks, m_TargetInterpolator) )
+      if ( mitk::imv::IsInsideMask<float>(fib->front(), m_Parameters->m_InterpolateRoiImages, m_TargetInterpolator)
+           && !mitk::imv::IsInsideMask<float>(fib->back(), m_Parameters->m_InterpolateRoiImages, m_TargetInterpolator) )
         return true;
-      if ( !mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMasks, m_TargetInterpolator)
-           && mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMasks, m_TargetInterpolator) )
+      if ( !mitk::imv::IsInsideMask<float>(fib->back(), m_Parameters->m_InterpolateRoiImages, m_TargetInterpolator)
+           && mitk::imv::IsInsideMask<float>(fib->front(), m_Parameters->m_InterpolateRoiImages, m_TargetInterpolator) )
         return true;
       return false;
     }
     else
       mitkThrow() << "No target image set but endpoint constraint ONE_EP_IN_TARGET chosen!";
   }
-  else if (m_EndpointConstraint==EndpointConstraints::NO_EP_IN_TARGET)
+  else if (m_Parameters->m_EpConstraints==EndpointConstraints::NO_EP_IN_TARGET)
   {
     if (m_TargetImageSet)
     {
-      if ( mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMasks, m_TargetInterpolator)
-           || mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMasks, m_TargetInterpolator) )
+      if ( mitk::imv::IsInsideMask<float>(fib->front(), m_Parameters->m_InterpolateRoiImages, m_TargetInterpolator)
+           || mitk::imv::IsInsideMask<float>(fib->back(), m_Parameters->m_InterpolateRoiImages, m_TargetInterpolator) )
         return false;
       return true;
     }
@@ -930,7 +887,7 @@ void StreamlineTrackingFilter::AfterTracking()
 {
   if (m_Verbose)
     std::cout << "                                                                                                     \r";
-  if (!m_UseOutputProbabilityMap)
+  if (!m_Parameters->m_OutputProbMap)
   {
     MITK_INFO << "Reconstructed " << m_Tractogram.size() << " fibers.";
     MITK_INFO << "Generating polydata ";
@@ -965,17 +922,17 @@ void StreamlineTrackingFilter::SetDicomProperties(mitk::FiberBundle::Pointer fib
   std::string algo_code_value = "-";
   std::string algo_code_meaning = "-";
 
-  if (m_TrackingHandler->GetMode()==mitk::TrackingDataHandler::DETERMINISTIC && dynamic_cast<mitk::TrackingHandlerTensor*>(m_TrackingHandler) && !m_TrackingHandler->GetInterpolate())
+  if ( m_Parameters->m_Mode==MODE::DETERMINISTIC && dynamic_cast<mitk::TrackingHandlerTensor*>(m_TrackingHandler) && !m_Parameters->m_InterpolateTractographyData)
   {
     algo_code_value = "sup181_ee04";
     algo_code_meaning = "FACT";
   }
-  else if (m_TrackingHandler->GetMode()==mitk::TrackingDataHandler::DETERMINISTIC)
+  else if (m_Parameters->m_Mode==MODE::DETERMINISTIC)
   {
     algo_code_value = "sup181_ee01";
     algo_code_meaning = "Deterministic";
   }
-  else if (m_TrackingHandler->GetMode()==mitk::TrackingDataHandler::PROBABILISTIC)
+  else if (m_Parameters->m_Mode==MODE::PROBABILISTIC)
   {
     algo_code_value = "sup181_ee02";
     algo_code_meaning = "Probabilistic";

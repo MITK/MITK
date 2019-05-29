@@ -35,8 +35,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRawShModel.h>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
+#include <boost/property_tree/json_parser.hpp>
 #include <limits>
 #include <MitkFiberTrackingExports.h>
+#include <itkMersenneTwisterRandomVariateGenerator.h>
 
 namespace mitk
 {
@@ -61,7 +63,8 @@ namespace mitk
     enum AcquisitionType : int
     {
       SingleShotEpi,
-      SpinEcho
+      ConventionalSpinEcho,
+      FastSpinEcho,
     };
 
     SignalGenerationParameters()
@@ -69,24 +72,28 @@ namespace mitk
       , m_SignalScale(100)
       , m_tEcho(100)
       , m_tRep(4000)
+      , m_tInv(0)
       , m_tLine(1)
       , m_tInhom(50)
+      , m_EchoTrainLength(8)
       , m_ReversePhase(false)
       , m_PartialFourier(1.0)
-      , m_NoiseVariance(0.001)
+      , m_NoiseVariance(0.001f)
       , m_NumberOfCoils(1)
       , m_CoilSensitivityProfile(SignalGenerationParameters::COIL_CONSTANT)
+      , m_CoilSensitivity(0.3f)
       , m_SimulateKspaceAcquisition(false)
       , m_AxonRadius(0)
       , m_DoDisablePartialVolume(false)
       , m_Spikes(0)
       , m_SpikeAmplitude(1)
       , m_KspaceLineOffset(0)
-      , m_EddyStrength(300)
+      , m_EddyStrength(0.002f)
       , m_Tau(70)
       , m_CroppingFactor(1)
       , m_Drift(0.06)
       , m_DoAddGibbsRinging(false)
+      , m_ZeroRinging(0)
       , m_DoSimulateRelaxation(true)
       , m_DoAddMotion(false)
       , m_DoRandomizeMotion(true)
@@ -118,13 +125,16 @@ namespace mitk
     float                               m_SignalScale;              ///< Scaling factor for output signal (before noise is added).
     float                               m_tEcho;                    ///< Echo time TE.
     float                               m_tRep;                     ///< Echo time TR.
+    float                               m_tInv;                       ///< Inversion time
     float                               m_tLine;                    ///< k-space line readout time (dwell time).
     float                               m_tInhom;                   ///< T2'
+    unsigned int                        m_EchoTrainLength;          ///< Only relevant for Fast Spin Echo sequence (number of k-space lines acquired with one RF pulse)
     bool                                m_ReversePhase;             ///< If true, the phase readout direction will be inverted (-y instead of y)
     float                               m_PartialFourier;           ///< Partial fourier factor (0.5-1)
     float                               m_NoiseVariance;            ///< Variance of complex gaussian noise
-    int                                 m_NumberOfCoils;            ///< Number of coils in multi-coil acquisition
+    unsigned int                        m_NumberOfCoils;            ///< Number of coils in multi-coil acquisition
     CoilSensitivityProfile              m_CoilSensitivityProfile;   ///< Choose between constant, linear or exponential sensitivity profile of the used coils
+    float                               m_CoilSensitivity;          ///< signal remaining in slice center
     bool                                m_SimulateKspaceAcquisition;///< Flag to enable/disable k-space acquisition simulation
     double                              m_AxonRadius;               ///< Determines compartment volume fractions (0 == automatic axon radius estimation)
     bool                                m_DoDisablePartialVolume;   ///< Disable partial volume effects. Each voxel is either all fiber or all non-fiber.
@@ -138,6 +148,7 @@ namespace mitk
     float                               m_CroppingFactor;           ///< FOV size in y-direction is multiplied by this factor. Causes aliasing artifacts.
     float                               m_Drift;                    ///< Global signal decrease by the end of the acquisition.
     bool                                m_DoAddGibbsRinging;        ///< Add Gibbs ringing artifact
+    int                                 m_ZeroRinging;              ///< If > 0, ringing is simulated by by setting the defined percentage of higher frequencies to 0 in k-space. Otherwise, the input to the k-space simulation is generated with twice the resolution and cropped during k-space simulation (much slower).
     bool                                m_DoSimulateRelaxation;     ///< Add T2 relaxation effects
     bool                                m_DoAddMotion;              ///< Enable motion artifacts.
     bool                                m_DoRandomizeMotion;        ///< Toggles between random and linear motion.
@@ -160,6 +171,7 @@ namespace mitk
     GradientType GetGradientDirection(unsigned int i);
     std::vector< int > GetBvalues();                         ///< Returns a vector with all unique b-values (determined by the gradient magnitudes)
     double GetBvalue();
+    void ApplyDirectionMatrix();
 
   protected:
 
@@ -230,7 +242,7 @@ namespace mitk
       , m_AfterSimulationMessage("")
       , m_BvalsFile("")
       , m_BvecsFile("")
-      , m_CheckOutputVolumeFractionsBox(false)
+      , m_OutputAdditionalImages(false)
       , m_CheckAdvancedSignalOptionsBox(false)
       , m_DoAddNoise(false)
       , m_DoAddGhosts(false)
@@ -257,7 +269,7 @@ namespace mitk
 
     /** member variables that store the check-state of GUI checkboxes */
     // image generation
-    bool                m_CheckOutputVolumeFractionsBox;
+    bool                m_OutputAdditionalImages;
     bool                m_CheckAdvancedSignalOptionsBox;
     bool                m_DoAddNoise;
     bool                m_DoAddGhosts;
@@ -312,10 +324,11 @@ namespace mitk
     void UpdateSignalModels();
     void ClearFiberParameters();
     void ClearSignalParameters();
+    void ApplyDirectionMatrix();
 
     void PrintSelf();                           ///< Print parameters to stdout.
     void SaveParameters(std::string filename);  ///< Save image generation parameters to .ffp file.
-    void LoadParameters(std::string filename);  ///< Load image generation parameters from .ffp file.
+    void LoadParameters(std::string filename, bool fix_seed=false);  ///< Load image generation parameters from .ffp file.
     template< class ParameterType >
     ParameterType ReadVal(boost::property_tree::ptree::value_type const& v, std::string tag, ParameterType defaultValue, bool essential=false);
     std::string                         m_MissingTags;

@@ -52,7 +52,8 @@ static void PerformHeaderAnalysis( mitk::DiffusionHeaderDICOMFileReader::DICOMHe
 
 mitk::DiffusionDICOMFileReader::DiffusionDICOMFileReader()
 {
-
+  m_ApplyRotationToGradients = true;
+  m_ResolveMosaic = true;
 }
 
 mitk::DiffusionDICOMFileReader::~DiffusionDICOMFileReader()
@@ -156,6 +157,7 @@ bool mitk::DiffusionDICOMFileReader
     mitk::CastToMitkImage( helper.LoadToVector<short, 3>( filenames ), output_image );
   }
 
+  mitk::DiffusionPropertyHelper::SetApplyMatrixToGradients(output_image, m_ApplyRotationToGradients);
   mitk::DiffusionPropertyHelper::InitializeImage(output_image);
   output_image->SetProperty("diffusion.dicom.importname", mitk::StringProperty::New( helper.GetOutputName(filenames) ) );
 

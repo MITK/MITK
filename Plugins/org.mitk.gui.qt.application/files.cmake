@@ -1,5 +1,21 @@
 set(SRC_CPP_FILES
+  QmitkAbstractDataNodeAction.cpp
   QmitkCloseProjectAction.cpp
+  QmitkDataNodeColorAction.cpp
+  QmitkDataNodeColorMapAction.cpp
+  QmitkDataNodeComponentAction.cpp
+  QmitkDataNodeContextMenu.cpp
+  QmitkDataNodeGlobalReinitAction.cpp
+  QmitkDataNodeHideAllAction.cpp
+  QmitkDataNodeOpacityAction.cpp
+  QmitkDataNodeOpenInAction.cpp
+  QmitkDataNodeReinitAction.cpp
+  QmitkDataNodeRemoveAction.cpp
+  QmitkDataNodeShowDetailsAction.cpp
+  QmitkDataNodeShowSelectedNodesAction.cpp
+  QmitkDataNodeSurfaceRepresentationAction.cpp
+  QmitkDataNodeTextureInterpolationAction.cpp
+  QmitkDataNodeToggleVisibilityAction.cpp
   QmitkDefaultDropTargetListener.cpp
   QmitkFileExitAction.cpp
   QmitkFileOpenAction.cpp
@@ -18,7 +34,23 @@ set(INTERNAL_CPP_FILES
 )
 
 set(MOC_H_FILES
+  src/QmitkAbstractDataNodeAction.h
   src/QmitkCloseProjectAction.h
+  src/QmitkDataNodeColorAction.h
+  src/QmitkDataNodeColorMapAction.h
+  src/QmitkDataNodeComponentAction.h
+  src/QmitkDataNodeGlobalReinitAction.h
+  src/QmitkDataNodeContextMenu.h
+  src/QmitkDataNodeHideAllAction.h
+  src/QmitkDataNodeOpacityAction.h
+  src/QmitkDataNodeOpenInAction.h
+  src/QmitkDataNodeReinitAction.h
+  src/QmitkDataNodeRemoveAction.h
+  src/QmitkDataNodeShowDetailsAction.h
+  src/QmitkDataNodeShowSelectedNodesAction.h
+  src/QmitkDataNodeSurfaceRepresentationAction.h
+  src/QmitkDataNodeTextureInterpolationAction.h
+  src/QmitkDataNodeToggleVisibilityAction.h
   src/QmitkFileExitAction.h
   src/QmitkFileOpenAction.h
   src/QmitkFileSaveAction.h

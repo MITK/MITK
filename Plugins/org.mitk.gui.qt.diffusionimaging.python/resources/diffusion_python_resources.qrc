@@ -1,6 +1,0 @@
-<RCC>
-    <qresource prefix="/QmitkDiffusionImaging">
-        <file>dipy_reconstructions.py</file>
-        <file>tractseg.py</file>
-    </qresource>
-</RCC>

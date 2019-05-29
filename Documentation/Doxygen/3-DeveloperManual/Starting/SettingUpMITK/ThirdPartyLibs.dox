@@ -15,6 +15,10 @@ http://www.cs.umd.edu/~mount/ANN/
 
 http://www.boost.org/
 
+\par C++ REST SDK
+
+https://github.com/Microsoft/cpprestsdk/
+
 \par CppUnit
 
 http://sourceforge.net/projects/cppunit/
@@ -121,7 +125,7 @@ http://www.vtk.org/
 
 \par zlib
 
-https://github.com/commontk/zlib
+https://github.com/madler/zlib/
 
 \par libSVM
 http://www.csie.ntu.edu.tw/~cjlin/libsvm/

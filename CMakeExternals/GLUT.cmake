@@ -36,6 +36,7 @@ if(MITK_USE_GLUT)
          URL_MD5 918ffbddcffbac83c218bc52355b6d5a
          PATCH_COMMAND ${patch_cmd}
          CMAKE_GENERATOR ${gen}
+         CMAKE_GENERATOR_PLATFORM ${gen_platform}
          CMAKE_ARGS
            ${ep_common_args}
            ${additional_args}

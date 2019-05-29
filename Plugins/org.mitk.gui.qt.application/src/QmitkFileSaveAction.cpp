@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkWorkbenchUtil.h>
 #include <mitkDataNodeSelection.h>
+#include <mitkIDataStorageService.h>
 
 #include <berryISelectionService.h>
 #include <berryINullSelectionListener.h>
@@ -30,6 +31,67 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFileDialog>
 #include <QMessageBox>
 
+namespace
+{
+  mitk::DataStorage::Pointer GetDataStorage()
+  {
+    auto context = mitk::org_mitk_gui_qt_application_Activator::GetContext();
+
+    if (nullptr == context)
+      return nullptr;
+
+    auto dataStorageServiceReference = context->getServiceReference<mitk::IDataStorageService>();
+
+    if (!dataStorageServiceReference)
+      return nullptr;
+
+    auto dataStorageService = context->getService<mitk::IDataStorageService>(dataStorageServiceReference);
+
+    if (nullptr == dataStorageService)
+      return nullptr;
+
+    auto dataStorageReference = dataStorageService->GetDataStorage();
+
+    if (dataStorageReference.IsNull())
+      return nullptr;
+
+    return dataStorageReference->GetDataStorage();
+  }
+
+  QString GetParentPath(mitk::DataNode::Pointer dataNode)
+  {
+    if (dataNode.IsNull())
+      return "";
+
+    auto dataStorage = GetDataStorage();
+
+    if (dataStorage.IsNull())
+      return "";
+
+    auto sources = dataStorage->GetSources(dataNode);
+
+    if (sources.IsNull() || sources->empty())
+      return "";
+
+    const auto &parentNode = sources->front();
+
+    if (parentNode.IsNull())
+      return "";
+
+    auto data = parentNode->GetData();
+
+    if (nullptr != data)
+    {
+      auto pathProperty = data->GetConstProperty("path");
+
+      if (pathProperty.IsNotNull())
+        return QFileInfo(QString::fromStdString(pathProperty->GetValueAsString())).canonicalPath();
+    }
+
+    return GetParentPath(parentNode);
+  }
+}
+
 class QmitkFileSaveActionPrivate
 {
 private:
@@ -37,7 +99,7 @@ private:
   void HandleSelectionChanged(const berry::IWorkbenchPart::Pointer& /*part*/,
                               const berry::ISelection::ConstPointer& selection)
   {
-    this->setEnabled(selection);
+    this->SetEnabled(selection);
   }
 
   QScopedPointer<berry::ISelectionListener> m_SelectionListener;
@@ -58,20 +120,20 @@ public:
     }
   }
 
-  void init ( berry::IWorkbenchWindow* window, QmitkFileSaveAction* action )
+  void Init(berry::IWorkbenchWindow* window, QAction* action)
   {
     m_Window = berry::IWorkbenchWindow::Pointer(window);
     m_Action = action;
 
-    action->setText("&Save...");
-    action->setToolTip("Save data objects (images, surfaces,...)");
+    m_Action->setText("&Save...");
+    m_Action->setToolTip("Save data objects (images, surfaces,...)");
 
     berry::ISelectionService* selectionService = m_Window.Lock()->GetSelectionService();
-    setEnabled(selectionService->GetSelection());
+    SetEnabled(selectionService->GetSelection());
 
     selectionService->AddSelectionListener(m_SelectionListener.data());
 
-    QObject::connect(action, SIGNAL(triggered(bool)), action, SLOT(Run()));
+    QObject::connect(m_Action, SIGNAL(triggered(bool)), m_Action, SLOT(Run()));
   }
 
   berry::IPreferences::Pointer GetPreferences() const
@@ -84,35 +146,34 @@ public:
     return berry::IPreferences::Pointer(nullptr);
   }
 
-  QString getLastFileSavePath() const
+  QString GetLastFileSavePath() const
   {
     berry::IPreferences::Pointer prefs = GetPreferences();
-    if(prefs.IsNotNull())
+    if (prefs.IsNotNull())
     {
       return prefs->Get("LastFileSavePath", "");
     }
     return QString();
   }
 
-  void setLastFileSavePath(const QString& path) const
+  void SetLastFileSavePath(const QString& path) const
   {
     berry::IPreferences::Pointer prefs = GetPreferences();
-    if(prefs.IsNotNull())
+    if (prefs.IsNotNull())
     {
       prefs->Put("LastFileSavePath", path);
       prefs->Flush();
     }
   }
 
-  void setEnabled(berry::ISelection::ConstPointer selection)
+  void SetEnabled(berry::ISelection::ConstPointer selection)
   {
     mitk::DataNodeSelection::ConstPointer nodeSelection = selection.Cast<const mitk::DataNodeSelection>();
     if (nodeSelection.IsNotNull() && !selection->IsEmpty())
     {
       bool enable = false;
       std::list<mitk::DataNode::Pointer> dataNodes = nodeSelection->GetSelectedDataNodes();
-      for (std::list<mitk::DataNode::Pointer>::const_iterator nodeIter = dataNodes.begin(),
-           nodeIterEnd = dataNodes.end(); nodeIter != nodeIterEnd; ++nodeIter)
+      for (std::list<mitk::DataNode::Pointer>::const_iterator nodeIter = dataNodes.begin(), nodeIterEnd = dataNodes.end(); nodeIter != nodeIterEnd; ++nodeIter)
       {
         if ((*nodeIter)->GetData() != nullptr)
         {
@@ -133,23 +194,26 @@ public:
 };
 
 QmitkFileSaveAction::QmitkFileSaveAction(berry::IWorkbenchWindow::Pointer window)
-  : QAction(nullptr), d(new QmitkFileSaveActionPrivate)
+  : QAction(tr("Save..."))
+  , d(new QmitkFileSaveActionPrivate)
 {
-  d->init(window.GetPointer(), this);
+  d->Init(window.GetPointer(), this);
 }
 
-QmitkFileSaveAction::QmitkFileSaveAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window)
-  : QAction(nullptr), d(new QmitkFileSaveActionPrivate)
+QmitkFileSaveAction::QmitkFileSaveAction(const QIcon& icon, berry::IWorkbenchWindow::Pointer window)
+  : QAction(tr("Save..."))
+  , d(new QmitkFileSaveActionPrivate)
 {
-  d->init(window.GetPointer(), this);
-  this->setIcon(icon);
+  d->Init(window.GetPointer(), this);
+  setIcon(icon);
 }
 
 QmitkFileSaveAction::QmitkFileSaveAction(const QIcon& icon, berry::IWorkbenchWindow* window)
-  : QAction(nullptr), d(new QmitkFileSaveActionPrivate)
+  : QAction(tr("Save..."))
+  , d(new QmitkFileSaveActionPrivate)
 {
-  d->init(window, this);
-  this->setIcon(icon);
+  d->Init(window, this);
+  setIcon(icon);
 }
 
 QmitkFileSaveAction::~QmitkFileSaveAction()
@@ -158,7 +222,7 @@ QmitkFileSaveAction::~QmitkFileSaveAction()
 
 void QmitkFileSaveAction::Run()
 {
-  // Get the list of selected base data objects
+  // get the list of selected base data objects
   mitk::DataNodeSelection::ConstPointer selection = d->m_Window.Lock()->GetSelectionService()->GetSelection().Cast<const mitk::DataNodeSelection>();
   if (selection.IsNull() || selection->IsEmpty())
   {
@@ -170,8 +234,7 @@ void QmitkFileSaveAction::Run()
 
   std::vector<const mitk::BaseData*> data;
   QStringList names;
-  for (std::list<mitk::DataNode::Pointer>::const_iterator nodeIter = dataNodes.begin(),
-       nodeIterEnd = dataNodes.end(); nodeIter != nodeIterEnd; ++nodeIter)
+  for (std::list<mitk::DataNode::Pointer>::const_iterator nodeIter = dataNodes.begin(), nodeIterEnd = dataNodes.end(); nodeIter != nodeIterEnd; ++nodeIter)
   {
     data.push_back((*nodeIter)->GetData());
     std::string name;
@@ -179,14 +242,32 @@ void QmitkFileSaveAction::Run()
     names.push_back(QString::fromStdString(name));
   }
 
+  QString path;
+
+  if (1 == data.size())
+  {
+    if (nullptr != data[0])
+    {
+      auto pathProperty = data[0]->GetConstProperty("path");
+
+      if (pathProperty.IsNotNull())
+        path = QFileInfo(QString::fromStdString(pathProperty->GetValueAsString())).canonicalPath();
+    }
+
+    if (path.isEmpty())
+      path = GetParentPath(dataNodes.front());
+  }
+
+  if (path.isEmpty())
+    path = d->GetLastFileSavePath();
+
   try
   {
-    QStringList fileNames = QmitkIOUtil::Save(data, names, d->getLastFileSavePath(),
-                                              d->m_Action->parentWidget());
+    auto setPathProperty = true;
+    auto fileNames = QmitkIOUtil::Save(data, names, path, d->m_Action->parentWidget(), setPathProperty);
+
     if (!fileNames.empty())
-    {
-      d->setLastFileSavePath(QFileInfo(fileNames.back()).absolutePath());
-    }
+      d->SetLastFileSavePath(QFileInfo(fileNames.back()).absolutePath());
   }
   catch (const mitk::Exception& e)
   {

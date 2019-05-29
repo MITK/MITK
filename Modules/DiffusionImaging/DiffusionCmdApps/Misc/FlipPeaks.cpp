@@ -36,8 +36,8 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input", "input image", us::Any(), false);
-  parser.addArgument("", "o", mitkCommandLineParser::OutputFile, "Output", "output image", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::String, "Input", "input image", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output", "output image", us::Any(), false, false, false, mitkCommandLineParser::Output);
   parser.addArgument("", "x", mitkCommandLineParser::Bool, "Flip x", "flip along x-axis");
   parser.addArgument("", "y", mitkCommandLineParser::Bool, "Flip y", "flip along y-axis");
   parser.addArgument("", "z", mitkCommandLineParser::Bool, "Flip z", "flip along z-axis");

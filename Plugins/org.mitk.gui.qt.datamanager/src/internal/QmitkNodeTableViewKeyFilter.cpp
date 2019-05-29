@@ -15,75 +15,103 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkNodeTableViewKeyFilter.h"
-
-#include <QKeyEvent>
-#include <QKeySequence>
 #include "../QmitkDataManagerView.h"
+
+// mitk gui qt application plugin
+#include <QmitkDataNodeGlobalReinitAction.h>
+#include <QmitkDataNodeHideAllAction.h>
+#include <QmitkDataNodeReinitAction.h>
+#include <QmitkDataNodeRemoveAction.h>
+#include <QmitkDataNodeShowDetailsAction.h>
+#include <QmitkDataNodeToggleVisibilityAction.h>
 
 #include "berryIPreferencesService.h"
 #include "berryPlatform.h"
 
-QmitkNodeTableViewKeyFilter::QmitkNodeTableViewKeyFilter( QObject* _DataManagerView )
-: QObject(_DataManagerView)
+// qt
+#include <QKeyEvent>
+#include <QKeySequence>
+
+QmitkNodeTableViewKeyFilter::QmitkNodeTableViewKeyFilter(QObject *dataManagerView, mitk::DataStorage *dataStorage)
+  : QObject(dataManagerView), m_DataStorage(dataStorage)
 {
   m_PreferencesService = berry::Platform::GetPreferencesService();
 }
 
-bool QmitkNodeTableViewKeyFilter::eventFilter( QObject *obj, QEvent *event )
+bool QmitkNodeTableViewKeyFilter::eventFilter(QObject *obj, QEvent *event)
 {
-  QmitkDataManagerView* _DataManagerView = qobject_cast<QmitkDataManagerView*>(this->parent());
-  if (event->type() == QEvent::KeyPress && _DataManagerView)
+  if (m_DataStorage.IsExpired())
   {
-    berry::IPreferences::Pointer nodeTableKeyPrefs = m_PreferencesService->GetSystemPreferences()->Node("/DataManager/Hotkeys");
+    // standard event processing
+    return QObject::eventFilter(obj, event);
+  }
 
-    QKeySequence _MakeAllInvisible = QKeySequence(nodeTableKeyPrefs->Get("Make all nodes invisible", "Ctrl+, V"));
-    QKeySequence _ToggleVisibility = QKeySequence(nodeTableKeyPrefs->Get("Toggle visibility of selected nodes", "V"));
-    QKeySequence _DeleteSelectedNodes = QKeySequence(nodeTableKeyPrefs->Get("Delete selected nodes", "Del"));
-    QKeySequence _Reinit = QKeySequence(nodeTableKeyPrefs->Get("Reinit selected nodes", "R"));
-    QKeySequence _GlobalReinit = QKeySequence(nodeTableKeyPrefs->Get("Global Reinit", "Ctrl+, R"));
-    QKeySequence _ShowInfo = QKeySequence(nodeTableKeyPrefs->Get("Show Node Information", "Ctrl+, I"));
+  auto dataStorage = m_DataStorage.Lock();
+
+  QmitkDataManagerView *dataManagerView = qobject_cast<QmitkDataManagerView *>(this->parent());
+  if (event->type() == QEvent::KeyPress && dataManagerView)
+  {
+    berry::IPreferences::Pointer nodeTableKeyPrefs =
+      m_PreferencesService->GetSystemPreferences()->Node("/DataManager/Hotkeys");
+
+    QKeySequence makeAllInvisible = QKeySequence(nodeTableKeyPrefs->Get("Make all nodes invisible", "Ctrl+V"));
+    QKeySequence toggleVisibility = QKeySequence(nodeTableKeyPrefs->Get("Toggle visibility of selected nodes", "V"));
+    QKeySequence deleteSelectedNodes = QKeySequence(nodeTableKeyPrefs->Get("Delete selected nodes", "Del"));
+    QKeySequence reinit = QKeySequence(nodeTableKeyPrefs->Get("Reinit selected nodes", "R"));
+    QKeySequence globalReinit = QKeySequence(nodeTableKeyPrefs->Get("Global reinit", "Ctrl+R"));
+    QKeySequence showInfo = QKeySequence(nodeTableKeyPrefs->Get("Show node information", "Ctrl+I"));
 
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-
-    QKeySequence _KeySequence = QKeySequence(keyEvent->modifiers(), keyEvent->key());
+    QKeySequence keySequence = QKeySequence(keyEvent->modifiers() + keyEvent->key());
     // if no modifier was pressed the sequence is now empty
-    if(_KeySequence.isEmpty())
-      _KeySequence = QKeySequence(keyEvent->key());
+    if (keySequence.isEmpty())
+    {
+      keySequence = QKeySequence(keyEvent->key());
+    }
 
-    if(_KeySequence == _MakeAllInvisible)
+    auto selectedNodes = AbstractDataNodeAction::GetSelectedNodes(dataManagerView->GetSite());
+    if (keySequence == makeAllInvisible)
     {
-      // trigger deletion of selected node(s)
-      _DataManagerView->MakeAllNodesInvisible(true);
-      // return true: this means the delete key event is not send to the table
+      if (selectedNodes.empty())
+      {
+        // if no nodes are selected, hide all nodes of the data storage
+        auto nodeset = dataStorage->GetAll();
+        for (auto it = nodeset->Begin(); it != nodeset->End(); ++it)
+        {
+          mitk::DataNode* node = it->Value();
+          if (nullptr != node)
+          {
+            selectedNodes.push_back(node);
+          }
+        }
+      }
+
+      HideAllAction::Run(selectedNodes);
       return true;
     }
-    else if(_KeySequence == _DeleteSelectedNodes)
+    if (keySequence == deleteSelectedNodes)
     {
-      // trigger deletion of selected node(s)
-      _DataManagerView->RemoveSelectedNodes(true);
-      // return true: this means the delete key event is not send to the table
+      RemoveAction::Run(dataManagerView->GetSite(), dataStorage, selectedNodes);
       return true;
     }
-    else if(_KeySequence == _ToggleVisibility)
+    if (keySequence == toggleVisibility)
     {
-      // trigger deletion of selected node(s)
-      _DataManagerView->ToggleVisibilityOfSelectedNodes(true);
-      // return true: this means the delete key event is not send to the table
+      ToggleVisibilityAction::Run(dataManagerView->GetSite(), dataStorage, selectedNodes);
       return true;
     }
-    else if(_KeySequence == _Reinit)
+    if (keySequence == reinit)
     {
-      _DataManagerView->ReinitSelectedNodes(true);
+      ReinitAction::Run(dataManagerView->GetSite(), dataStorage, selectedNodes);
       return true;
     }
-    else if(_KeySequence == _GlobalReinit)
+    if (keySequence == globalReinit)
     {
-      _DataManagerView->GlobalReinit(true);
+      GlobalReinitAction::Run(dataManagerView->GetSite(), dataStorage);
       return true;
     }
-    else if(_KeySequence == _ShowInfo)
+    if (keySequence == showInfo)
     {
-      _DataManagerView->ShowInfoDialogForSelectedNodes(true);
+      ShowDetailsAction::Run(selectedNodes);
       return true;
     }
   }

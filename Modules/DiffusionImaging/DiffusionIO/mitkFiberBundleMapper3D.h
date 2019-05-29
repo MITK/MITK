@@ -79,7 +79,6 @@ private:
   int     m_TubeSides;
   int     m_LineWidth;
   float   m_RibbonWidth;
-  bool    m_Lighting;
   vtkSmartPointer<vtkPolyData> m_FiberPolyData;
   mitk::FiberBundle* m_FiberBundle;
 };

@@ -112,28 +112,28 @@ void setupParser(mitkCommandLineParser& parser)
     parser.endGroup();
     parser.beginGroup("Required I/O parameters");
     parser.addArgument(
-        "input", "i", mitkCommandLineParser::InputFile, "Input file", "input 3D+t image file", us::Any(), false);
+        "input", "i", mitkCommandLineParser::File, "Input file", "input 3D+t image file", us::Any(), false, false, false, mitkCommandLineParser::Input);
     parser.addArgument("output",
         "o",
-        mitkCommandLineParser::OutputFile,
+        mitkCommandLineParser::File,
         "Output file template",
         "where to save the output parameter images. The specified path will be used as template to determine the format (via extension) and the name \"root\". For each parameter a suffix will be added to the name.",
         us::Any(),
-        false);
+        false, false, false, mitkCommandLineParser::Output);
     parser.endGroup();
 
     parser.beginGroup("AIF parameters");
     parser.addArgument(
-      "aifmask", "n", mitkCommandLineParser::InputFile, "AIF mask file", "Mask that defines the spatial image region that should be used as AIF for models that need one. Must have the same geometry as the AIF input image!", us::Any());
+      "aifmask", "n", mitkCommandLineParser::File, "AIF mask file", "Mask that defines the spatial image region that should be used as AIF for models that need one. Must have the same geometry as the AIF input image!", us::Any(), true, false, false, mitkCommandLineParser::Input);
     parser.addArgument(
-      "aifimage", "a", mitkCommandLineParser::InputFile, "AIF image file", "3D+t image that defines the image that containes the AIF signal. If this flag is not set and the model needs a AIF, the CLI will assume that the AIF is encoded in the normal image. Must have the same geometry as the AIF mask!", us::Any());
+      "aifimage", "a", mitkCommandLineParser::File, "AIF image file", "3D+t image that defines the image that containes the AIF signal. If this flag is not set and the model needs a AIF, the CLI will assume that the AIF is encoded in the normal image. Must have the same geometry as the AIF mask!", us::Any(), true, false, false, mitkCommandLineParser::Input);
     parser.addArgument(
       "hematocrit", "h", mitkCommandLineParser::Float, "Hematocrit Level", "Value needed for correct AIF computation. Only needed if model needs an AIF. Default value is 0.45.", us::Any(0.45));
     parser.endGroup();
 
     parser.beginGroup("Optional parameters");
     parser.addArgument(
-        "mask", "m", mitkCommandLineParser::InputFile, "Mask file", "Mask that defines the spatial image region that should be fitted. Must have the same geometry as the input image!", us::Any());
+        "mask", "m", mitkCommandLineParser::File, "Mask file", "Mask that defines the spatial image region that should be fitted. Must have the same geometry as the input image!", us::Any(), true, false, false, mitkCommandLineParser::Input);
     parser.addArgument(
         "verbose", "v", mitkCommandLineParser::Bool, "Verbose Output", "Whether to produce verbose output");
     parser.addArgument(

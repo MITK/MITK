@@ -1,24 +1,22 @@
 set(SRC_CPP_FILES
   berrySingleNodeSelection.cpp
-  QmitkDataManagerView.cpp
-  QmitkDataManagerPreferencePage.cpp
   QmitkDataManagerHotkeysPrefPage.cpp
+  QmitkDataManagerPreferencePage.cpp
+  QmitkDataManagerView.cpp
 )
 
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
-  QmitkNodeTableViewKeyFilter.cpp
-  QmitkInfoDialog.cpp
   QmitkDataManagerItemDelegate.cpp
+  QmitkNodeTableViewKeyFilter.cpp
 )
 
 set(MOC_H_FILES
-  src/QmitkDataManagerView.h
-  src/QmitkDataManagerPreferencePage.h
   src/QmitkDataManagerHotkeysPrefPage.h
-  src/internal/QmitkNodeTableViewKeyFilter.h
-  src/internal/QmitkInfoDialog.h
+  src/QmitkDataManagerPreferencePage.h
+  src/QmitkDataManagerView.h
   src/internal/QmitkDataManagerItemDelegate.h
+  src/internal/QmitkNodeTableViewKeyFilter.h
   src/internal/mitkPluginActivator.h
 )
 

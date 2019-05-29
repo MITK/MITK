@@ -1,0 +1,65 @@
+--- OpenIGTLink/Source/CMakeLists.txt.original	2017-06-28 12:28:12.000000000 +0200
++++ OpenIGTLink/Source/CMakeLists.txt	2019-03-31 04:04:46.392945177 +0200
+@@ -71,12 +71,11 @@
+   igtlTransformMessage.cxx
+   )
+
+-SET(OpenIGTLink_INCLUDE_FILES)
+-IF( MSVC OR ${CMAKE_GENERATOR} MATCHES "Xcode" )
+-  LIST(APPEND OpenIGTLink_INCLUDE_FILES
++SET(OpenIGTLink_INCLUDE_FILES
+     igtlutil/igtl_header.h
+     igtlutil/igtl_image.h
+     igtlutil/igtl_position.h
++    igtlutil/igtl_status.h
+     igtlutil/igtl_transform.h
+     igtlutil/igtl_types.h
+     igtlutil/igtl_util.h
+@@ -117,7 +116,6 @@
+     igtlWindows.h
+     igtlCommon.h
+   )
+-ENDIF()
+
+ # Add support for OpenIGTLink version 2
+ IF (${OpenIGTLink_PROTOCOL_VERSION} GREATER "1" )
+@@ -150,7 +148,7 @@
+     igtlBindMessage.cxx
+     igtlNDArrayMessage.cxx
+     )
+-  IF( MSVC OR ${CMAKE_GENERATOR} MATCHES "Xcode" )
++
+     LIST(APPEND OpenIGTLink_INCLUDE_FILES
+       igtlutil/igtl_colortable.h
+       igtlutil/igtl_imgmeta.h
+@@ -180,7 +178,6 @@
+       igtlBindMessage.h
+       igtlNDArrayMessage.h
+       )
+-  ENDIF()
+ ENDIF()
+
+ # Add support for OpenIGTLink version 3
+@@ -191,14 +188,13 @@
+     igtlutil/igtl_command.c
+     igtlutil/igtl_query.c
+     )
+-  IF( MSVC OR ${CMAKE_GENERATOR} MATCHES "Xcode" )
++
+     LIST(APPEND OpenIGTLink_INCLUDE_FILES
+       igtlCommandMessage.h
+       igtlQueryMessage.h
+       igtlutil/igtl_command.h
+       igtlutil/igtl_query.h
+       )
+-  ENDIF()
+ ENDIF()
+
+ ADD_LIBRARY(OpenIGTLink ${OpenIGTLink_SOURCES} ${OpenIGTLink_INCLUDE_FILES})
+@@ -227,4 +223,4 @@
+ INSTALL(TARGETS OpenIGTLink EXPORT OpenIGTLink
+   RUNTIME DESTINATION ${OpenIGTLink_INSTALL_BIN_DIR} COMPONENT RuntimeLibraries
+   LIBRARY DESTINATION ${OpenIGTLink_INSTALL_LIB_DIR} COMPONENT RuntimeLibraries
+-  ARCHIVE DESTINATION ${OpenIGTLink_INSTALL_LIB_DIR} COMPONENT Development)
+\ No newline at end of file
++  ARCHIVE DESTINATION ${OpenIGTLink_INSTALL_LIB_DIR} COMPONENT Development)

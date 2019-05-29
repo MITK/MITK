@@ -58,22 +58,25 @@ Specify various ROI and mask images to constrain the tractography process.
 
 \section StrTrackUserManualParameters Tractography Parameters
 
-- Mode: Toggle between deterministic and probabilistic tractography. Peak tracking only supports deterministic mode. The probabilistic method simply samples the output direction from the discrete probability ditribution provided by the discretized ODF.
+- Mode: Toggle between deterministic and probabilistic tractography (also affects tracking prior proposals). The probabilistic method simply samples the output direction from the discrete probability ditribution provided by the discretized ODF. Probabilistic peak tracking does not derive probabilities from the data but simply adds a normally distributed jitter to the proposed direction.
 - Sharpen ODFs: If you are using dODF images as input, it is advisable to sharpen the ODFs (min-max normalize and raise to the power of 4). This is not necessary (and not recommended) for CSD fODFs, since they are naturally much sharper.
 - Cutoff: If the streamline reaches a position with an FA value or peak magnitude lower than the speciefied threshold, tracking is terminated. Typical values are 0.2 for FA/GFA and 0.1 for CSD peaks.
 - FA/GFA image used to determine streamline termination. If no image is specified, the FA/GFA image is automatically calculated from the input image. If multiple tensor images are used as input, it is recommended to provide such an image since the FA maps calculated from the individual input tensor images can not provide a suitable termination criterion.
 - ODF Cutoff: Additional threshold on the ODF magnitude. This is useful in case of CSD fODF tractography. For fODFs a good default value is 0.1, for normalized dODFs, e.g. Q-ball ODFs, this threshold should be very low (0.00025) or 0.
 - Step Size: The algorithm proceeds along the streamline with a fixed stepsize. Default is 0.5*minSpacing.
 - Min. Tract Length: Shorter fibers are discarded.
-- Angular threshold: Maximum angle between two successive steps (in degree). Default is 90° * step_size. For probabilistic tractography, candidate directions exceeding this threshold have probability 0, i.e. the respective ODF value is set to zero. The probabilities of the valid directions are normalized to sum to 1.
+- Max. Tract Length: Longer fibers are discarded.
+- Angular Threshold: Maximum angle between two successive steps (in degree). Default is 90° * step_size. For probabilistic tractography, candidate directions exceeding this threshold have probability 0, i.e. the respective ODF value is set to zero. The probabilities of the valid directions are normalized to sum to 1.
 - Loop Check: Stop streamline if the threshold on the angular stdev over the last 4 voxel lengths is exceeded. -1 = no loop check.
 - f and g values to balance between FACT [2] and TEND [3,4] tracking (only for tensor based tractography). For further information please refer to [2,3]
+- Peak Jitter: Used for probabilistic peak tractography. Since no probability are provided by the data, a gausian jitter is added to the peaks. The value influences the standard deviataion of the gaussian (dir[i] += normal(0, peak_jitter*|dir[i]|)).
 
 \section StrTrackUserManualTractographyPrior Tractography Prior
 It is possible to use a peak image as prior for tractography on arbitrary other input images. The local progression direction is determined as the weighted average between the direction obtained from the prior and the input data.
 - Weight: Weighting factor between prior and input data directions. A weight of zero means that no prior iformation is used. With a weight of one, tractography is performed directly on the prior directions itself.
 - Restrict to Prior: The prior image is used as tractography mask. Voxels without prior peaks are excluded.
 - New Directions from Prior: By default, the prior is used even if there is no valid direction found in the data. If unchecked, the prior cannot create directions where there are none in the data.
+- Flip directions: Internally flips prior directions. This might be necessary depending on the input data.
 
 \section StrTrackUserManualDataHandling Data Handling
 - Flip directions: Internally flips progression directions. This might be necessary depending on the input data.

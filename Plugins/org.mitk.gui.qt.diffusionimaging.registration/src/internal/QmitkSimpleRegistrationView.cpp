@@ -144,6 +144,13 @@ void QmitkSimpleRegistrationView::OnRegResultIsAvailable(mitk::MAPRegistrationWr
   if (m_RegistrationType==0 && !m_Controls->m_ResampleBox->isChecked())
   {
     image = mitk::ImageMappingHelper::refineGeometry(movingImage, spResultRegistration, true);
+
+    mitk::DiffusionPropertyHelper::CopyProperties(movingImage, image, true);
+    auto reg = spResultRegistration->GetRegistration();
+    typedef mitk::DiffusionImageCorrectionFilter CorrectionFilterType;
+    CorrectionFilterType::Pointer corrector = CorrectionFilterType::New();
+    corrector->SetImage( image );
+    corrector->CorrectDirections( mitk::MITKRegistrationHelper::getAffineMatrix(reg, false)->GetMatrix().GetVnlMatrix() );
   }
   else
   {

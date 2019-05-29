@@ -52,7 +52,7 @@ mitk::ModelBase::ModelResultType mitk::InterpolateSignalToNewTimeGrid(const Mode
 
     for(mitk::ModelBase::TimeGridType::const_iterator posOTime = outputGrid.begin(); posOTime != outputGrid.end(); ++posResult, ++posOTime)
     {
-        while(*posOTime > *posITime && posITime!=inputGrid.end())
+        while(posITime!=inputGrid.end() && *posOTime > *posITime)
       { //forward in the input grid until the current output point
         //is between last and the current input point.
         lastValue = *posValue;

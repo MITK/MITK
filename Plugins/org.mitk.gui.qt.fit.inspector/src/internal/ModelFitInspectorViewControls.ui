@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>721</width>
-    <height>852</height>
+    <height>865</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -19,7 +19,7 @@
   <property name="windowTitle">
    <string>QmitkTemplate</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,4,0,0,0">
    <property name="spacing">
     <number>5</number>
    </property>
@@ -71,7 +71,7 @@
       <bool>true</bool>
      </property>
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -90,6 +90,36 @@
       <string/>
      </property>
     </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <spacer name="horizontalSpacer_5">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnFullPlot">
+       <property name="text">
+        <string>Full screen plot</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="flat">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QTabWidget" name="tabWidget">
@@ -652,15 +682,15 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>QmitkPlotWidget</class>
-   <extends>QWidget</extends>
-   <header>QmitkPlotWidget.h</header>
-  </customwidget>
-  <customwidget>
    <class>QmitkSingleNodeSelectionWidget</class>
    <extends>QWidget</extends>
    <header location="global">QmitkSingleNodeSelectionWidget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkPlotWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkPlotWidget.h</header>
   </customwidget>
   <customwidget>
    <class>QmitkFitParameterWidget</class>

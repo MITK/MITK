@@ -275,6 +275,30 @@ void mitk::SignalGenerationParameters::SetGradienDirections(mitk::DiffusionPrope
   }
 }
 
+void mitk::SignalGenerationParameters::ApplyDirectionMatrix()
+{
+  auto imageRotationMatrix = m_ImageDirection.GetVnlMatrix();
+  
+  GradientListType rotated_gradients;
+  for(auto g : m_GradientDirections)
+  {
+    vnl_vector<double> vec = g.GetVnlVector();
+    vec = vec.pre_multiply(imageRotationMatrix);
+
+    GradientType g2;
+    g2[0] = vec[0];
+    g2[1] = vec[1];
+    g2[2] = vec[2];
+    rotated_gradients.push_back(g2);
+  }
+  m_GradientDirections = rotated_gradients;
+}
+
+void mitk::FiberfoxParameters::ApplyDirectionMatrix()
+{
+  m_SignalGen.ApplyDirectionMatrix();
+  UpdateSignalModels();
+}
 
 void mitk::FiberfoxParameters::SaveParameters(std::string filename)
 {
@@ -347,10 +371,12 @@ void mitk::FiberfoxParameters::SaveParameters(std::string filename)
   parameters.put("fiberfox.image.partialfourier", m_SignalGen.m_PartialFourier);
   parameters.put("fiberfox.image.noisevariance", m_SignalGen.m_NoiseVariance);
   parameters.put("fiberfox.image.trep", m_SignalGen.m_tRep);
+  parameters.put("fiberfox.image.tinv", m_SignalGen.m_tInv);
   parameters.put("fiberfox.image.signalScale", m_SignalGen.m_SignalScale);
   parameters.put("fiberfox.image.tEcho", m_SignalGen.m_tEcho);
   parameters.put("fiberfox.image.tLine", m_SignalGen.m_tLine);
   parameters.put("fiberfox.image.tInhom", m_SignalGen.m_tInhom);
+  parameters.put("fiberfox.image.echoTrainLength", m_SignalGen.m_EchoTrainLength);
   parameters.put("fiberfox.image.simulatekspace", m_SignalGen.m_SimulateKspaceAcquisition);
   parameters.put("fiberfox.image.axonRadius", m_SignalGen.m_AxonRadius);
   parameters.put("fiberfox.image.doSimulateRelaxation", m_SignalGen.m_DoSimulateRelaxation);
@@ -374,6 +400,7 @@ void mitk::FiberfoxParameters::SaveParameters(std::string filename)
   parameters.put("fiberfox.image.artifacts.motionvolumes", m_Misc.m_MotionVolumesBox);
 
   parameters.put("fiberfox.image.artifacts.addringing", m_SignalGen.m_DoAddGibbsRinging);
+  parameters.put("fiberfox.image.artifacts.zeroringing", m_SignalGen.m_ZeroRinging);
   parameters.put("fiberfox.image.artifacts.addnoise", m_Misc.m_DoAddNoise);
   parameters.put("fiberfox.image.artifacts.addghosts", m_Misc.m_DoAddGhosts);
   parameters.put("fiberfox.image.artifacts.addaliasing", m_Misc.m_DoAddAliasing);
@@ -382,7 +409,7 @@ void mitk::FiberfoxParameters::SaveParameters(std::string filename)
   parameters.put("fiberfox.image.artifacts.doAddDistortions", m_Misc.m_DoAddDistortions);
   parameters.put("fiberfox.image.artifacts.doAddDrift", m_SignalGen.m_DoAddDrift);
 
-  parameters.put("fiberfox.image.outputvolumefractions", m_Misc.m_CheckOutputVolumeFractionsBox);
+  parameters.put("fiberfox.image.outputvolumefractions", m_Misc.m_OutputAdditionalImages);
   parameters.put("fiberfox.image.showadvanced", m_Misc.m_CheckAdvancedSignalOptionsBox);
   parameters.put("fiberfox.image.signalmodelstring", m_Misc.m_SignalModelString);
   parameters.put("fiberfox.image.artifactmodelstring", m_Misc.m_ArtifactModelString);
@@ -595,9 +622,19 @@ void mitk::FiberfoxParameters::GenerateGradientHalfShell()
   UpdateSignalModels();
 }
 
-void mitk::FiberfoxParameters::LoadParameters(std::string filename)
+void mitk::FiberfoxParameters::LoadParameters(std::string filename, bool fix_seed)
 {
-  srand(time(0));
+  itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer randgen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
+  if (fix_seed)
+  {
+    srand(0);
+    randgen->SetSeed(0);
+  }
+  else
+  {
+    srand(time(0));
+    randgen->SetSeed();
+  }
   m_MissingTags = "";
   if(filename.empty()) { return; }
 
@@ -666,7 +703,7 @@ void mitk::FiberfoxParameters::LoadParameters(std::string filename)
       m_Misc.m_SignalModelString = ReadVal<std::string>(v1,"signalmodelstring", m_Misc.m_SignalModelString);
       m_Misc.m_ArtifactModelString = ReadVal<std::string>(v1,"artifactmodelstring", m_Misc.m_ArtifactModelString);
       m_Misc.m_OutputPath = ReadVal<std::string>(v1,"outpath", m_Misc.m_OutputPath);
-      m_Misc.m_CheckOutputVolumeFractionsBox = ReadVal<bool>(v1,"outputvolumefractions", m_Misc.m_CheckOutputVolumeFractionsBox);
+      m_Misc.m_OutputAdditionalImages = ReadVal<bool>(v1,"outputvolumefractions", m_Misc.m_OutputAdditionalImages);
       m_Misc.m_CheckAdvancedSignalOptionsBox = ReadVal<bool>(v1,"showadvanced", m_Misc.m_CheckAdvancedSignalOptionsBox);
       m_Misc.m_DoAddDistortions = ReadVal<bool>(v1,"artifacts.doAddDistortions", m_Misc.m_DoAddDistortions);
       m_Misc.m_DoAddNoise = ReadVal<bool>(v1,"artifacts.addnoise", m_Misc.m_DoAddNoise);
@@ -700,15 +737,17 @@ void mitk::FiberfoxParameters::LoadParameters(std::string filename)
 
       m_SignalGen.m_AcquisitionType = (SignalGenerationParameters::AcquisitionType)ReadVal<int>(v1,"acquisitiontype", m_SignalGen.m_AcquisitionType);
       m_SignalGen.m_CoilSensitivityProfile = (SignalGenerationParameters::CoilSensitivityProfile)ReadVal<int>(v1,"coilsensitivityprofile", m_SignalGen.m_CoilSensitivityProfile);
-      m_SignalGen.m_NumberOfCoils = ReadVal<int>(v1,"numberofcoils", m_SignalGen.m_NumberOfCoils);
+      m_SignalGen.m_NumberOfCoils = ReadVal<unsigned int>(v1,"numberofcoils", m_SignalGen.m_NumberOfCoils);
       m_SignalGen.m_ReversePhase = ReadVal<bool>(v1,"reversephase", m_SignalGen.m_ReversePhase);
       m_SignalGen.m_PartialFourier = ReadVal<float>(v1,"partialfourier", m_SignalGen.m_PartialFourier);
       m_SignalGen.m_NoiseVariance = ReadVal<float>(v1,"noisevariance", m_SignalGen.m_NoiseVariance);
       m_SignalGen.m_tRep = ReadVal<float>(v1,"trep", m_SignalGen.m_tRep);
+      m_SignalGen.m_tInv = ReadVal<float>(v1,"tinv", m_SignalGen.m_tInv);
       m_SignalGen.m_SignalScale = ReadVal<float>(v1,"signalScale", m_SignalGen.m_SignalScale);
       m_SignalGen.m_tEcho = ReadVal<float>(v1,"tEcho", m_SignalGen.m_tEcho);
       m_SignalGen.m_tLine = ReadVal<float>(v1,"tLine", m_SignalGen.m_tLine);
       m_SignalGen.m_tInhom = ReadVal<float>(v1,"tInhom", m_SignalGen.m_tInhom);
+      m_SignalGen.m_EchoTrainLength = ReadVal<unsigned int>(v1,"echoTrainLength", m_SignalGen.m_EchoTrainLength);
       m_SignalGen.m_SimulateKspaceAcquisition = ReadVal<bool>(v1,"simulatekspace", m_SignalGen.m_SimulateKspaceAcquisition);
 
       m_SignalGen.m_AxonRadius = ReadVal<double>(v1,"axonRadius", m_SignalGen.m_AxonRadius);
@@ -720,6 +759,7 @@ void mitk::FiberfoxParameters::LoadParameters(std::string filename)
       m_SignalGen.m_CroppingFactor = ReadVal<float>(v1,"artifacts.aliasingfactor", m_SignalGen.m_CroppingFactor);
       m_SignalGen.m_Drift = ReadVal<float>(v1,"artifacts.drift", m_SignalGen.m_Drift);
       m_SignalGen.m_DoAddGibbsRinging = ReadVal<bool>(v1,"artifacts.addringing", m_SignalGen.m_DoAddGibbsRinging);
+      m_SignalGen.m_ZeroRinging = ReadVal<int>(v1,"artifacts.zeroringing", m_SignalGen.m_ZeroRinging);
       m_SignalGen.m_DoSimulateRelaxation = ReadVal<bool>(v1,"doSimulateRelaxation", m_SignalGen.m_DoSimulateRelaxation);
       m_SignalGen.m_DoDisablePartialVolume = ReadVal<bool>(v1,"doDisablePartialVolume", m_SignalGen.m_DoDisablePartialVolume);
       m_SignalGen.m_DoAddMotion = ReadVal<bool>(v1,"artifacts.doAddMotion", m_SignalGen.m_DoAddMotion);
@@ -760,7 +800,6 @@ void mitk::FiberfoxParameters::LoadParameters(std::string filename)
         m_SignalGen.SetGradienDirections(gradients);
       }
 
-
       m_Misc.m_MotionVolumesBox = ReadVal<std::string>(v1,"artifacts.motionvolumes", m_Misc.m_MotionVolumesBox);
       m_SignalGen.m_MotionVolumes.clear();
 
@@ -769,7 +808,7 @@ void mitk::FiberfoxParameters::LoadParameters(std::string filename)
         m_SignalGen.m_MotionVolumes.push_back(0);
         for ( size_t i=1; i < m_SignalGen.GetNumVolumes(); ++i )
         {
-          m_SignalGen.m_MotionVolumes.push_back( bool( rand()%2 ) );
+          m_SignalGen.m_MotionVolumes.push_back( bool( randgen->GetIntegerVariate()%2 ) );
         }
         MITK_DEBUG << "mitkFiberfoxParameters.cpp: Case m_Misc.m_MotionVolumesBox == \"random\".";
       }

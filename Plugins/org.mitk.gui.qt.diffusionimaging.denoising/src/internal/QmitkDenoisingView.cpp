@@ -193,9 +193,8 @@ void QmitkDenoisingView::StartDenoising()
   }
   }
 
-  mitk::DiffusionPropertyHelper::SetGradientContainer(denoised_image, mitk::DiffusionPropertyHelper::GetGradientContainer(input_image) );
-  mitk::DiffusionPropertyHelper::SetReferenceBValue(denoised_image, mitk::DiffusionPropertyHelper::GetReferenceBValue(input_image) );
-  mitk::DiffusionPropertyHelper::InitializeImage(denoised_image);
+  mitk::DiffusionPropertyHelper::CopyProperties(input_image, denoised_image, true);
+  mitk::DiffusionPropertyHelper::InitializeImage( denoised_image );
 
   denoised_image_node->SetData( denoised_image );
   GetDataStorage()->Add(denoised_image_node, m_ImageNode);

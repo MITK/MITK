@@ -3,6 +3,19 @@
   iconAccentColor = #2067bd <- This line is parsed by MITK
 */
 
+font.warning {
+  color: red;
+  font-weight: bold;
+}
+
+font.normal {
+  color: #000000;
+}
+
+font.highlight {
+  color: #2067bd;
+}
+
 berry--QCTabBar::tab {
     background: palette(window);
     min-height: 24px;

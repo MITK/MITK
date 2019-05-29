@@ -80,7 +80,7 @@ protected:
   /**
    * Adds the enumeration types
    */
-  virtual void AddTypes();
+  void AddTypes();
 
 private:
 

@@ -169,9 +169,10 @@ void QmitkNavigationDataPlayerView::OnSetMicroservice(){
       currentDummyTool->SetIdentifier(name.str());
       m_ToolStorage->AddTool(currentDummyTool);
     }
-    m_Player->RegisterAsMicroservice();
     m_ToolStorage->SetName("NavigationDataPlayer Tool Storage");
-    m_ToolStorage->SetSourceID(m_Player->GetMicroserviceID());
+    m_Player->SetToolMetaDataCollection(m_ToolStorage);
+    m_Player->RegisterAsMicroservice();
+    m_ToolStorage->SetSourceID(m_Player->GetMicroserviceID()); //DEPRECATED / not needed anymore because NavigationDataSource now holds a member of its tool storage. Only left for backward compatibility.
     m_ToolStorage->RegisterAsMicroservice();
   } else {
     if (m_ToolStorage.IsNotNull()) m_ToolStorage->UnRegisterMicroservice();

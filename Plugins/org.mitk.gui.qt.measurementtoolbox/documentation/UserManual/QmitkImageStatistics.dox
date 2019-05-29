@@ -28,7 +28,7 @@ This view provides an easy interface to quickly compute some features of a whole
 
 \section QmitkImageStatisticsUserManualUsage Usage
 
-After selection of an image or a binary mask of an image in the datamanager, the Image Statistics view shows some statistical information. If a mask is selected, the name of the mask and the name of the image, to which the mask is applied, are shown at the top. For time data the current time step is used for the selected mask and the selected image. If the total number of time steps on the selected mask is less than the current time step, the last time step of the mask is used. If a mask is selected, its used time step will be displayed next to its name like this: (t=0).
+After loading of an image or a binary mask of an image in the datamanager, the Image Statistics view shows some statistical information on the selected image. If a mask is selected, the name of the mask and the name of the image, to which the mask is applied, are shown in the respective combo boxes. For time data the current time step is used for the selected mask and the selected image. If the total number of time steps on the selected mask is less than the current time step, the last time step of the mask is used. If a mask is selected, its used time step will be displayed next to its name like this: (t=0).
 
 Check "Ignore zero-valued voxels" to hide voxels with grayvalue zero.
 
@@ -36,7 +36,7 @@ Below it is the statistics window which displays the calculated statistical feat
 
 Beneath the statistics window is the histogram window, which shows the histogram of the current selection.
 
-At top of the histogram window are two radiobuttons. Toggle one of them to either show the histogram as a barchart or as a lineplot.
+At top of the histogram window are two checkboxes, one "Show Subchart" and other is "Use default bins". Below that is #bins spinbox. One can uncheck the "Use default bins" checkbox to change the number of bins.
 
 Use mousewheel to zoom in and out the histogram. With the left mouse button the histogram is pannable in zoomed state.
 

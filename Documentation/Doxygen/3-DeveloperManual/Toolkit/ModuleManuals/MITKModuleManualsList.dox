@@ -16,6 +16,7 @@ The modules are shared libraries that provide functionality that can be used by 
   \li \subpage PAModulePage
   \li \subpage AnnotationModulePage
   \li \subpage ChartModule
+  \li \subpage RESTModule
 
 \section MITKModuleManualsListPageAdditionalInformation Additional Information on Certain Modules
 

@@ -238,13 +238,9 @@ void mitk::SlicedGeometry3D::InitializePlanes(const mitk::BaseGeometry *geometry
 
   mitk::AffineTransform3D::MatrixType matrix = geometry3D->GetIndexToWorldTransform()->GetMatrix();
   matrix.GetVnlMatrix().normalize_columns();
-  mitk::AffineTransform3D::MatrixType::InternalMatrixType inverseMatrix = matrix.GetInverse();
+  mitk::AffineTransform3D::MatrixType::InternalMatrixType inverseMatrix = matrix.GetTranspose();
 
-  int dominantAxis = itk::Function::Max3(
-      inverseMatrix[0][worldAxis],
-      inverseMatrix[1][worldAxis],
-      inverseMatrix[2][worldAxis]);
-
+  int dominantAxis = planeGeometry->CalculateDominantAxes(inverseMatrix).at(worldAxis);
   ScalarType viewSpacing = geometry3D->GetSpacing()[dominantAxis];
 
   /// Although the double value returned by GetExtent() holds a round number,

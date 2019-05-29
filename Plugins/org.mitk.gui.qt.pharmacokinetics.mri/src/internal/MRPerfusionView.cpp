@@ -316,6 +316,9 @@ void MRPerfusionView::OnModellingButtonClicked()
   //check if all static parameters set
   if (m_selectedModelFactory.IsNotNull() && CheckModelSettings())
   {
+    m_HasGeneratedNewInput = false;
+    m_HasGeneratedNewInputAIF = false;
+
     mitk::ParameterFitImageGeneratorBase::Pointer generator = NULL;
     mitk::modelFit::ModelFitInfo::Pointer fitSession = NULL;
 
@@ -850,9 +853,7 @@ void MRPerfusionView::GenerateAIFbasedModelFit_PixelBased(mitk::modelFit::ModelF
   typename TParameterizer::Pointer modelParameterizer =
     TParameterizer::New();
 
-  mitk::Image::Pointer concentrationImage;
-  mitk::DataNode::Pointer concentrationNode;
-  GetConcentrationImage(concentrationImage, concentrationNode, false);
+  PrepareConcentrationImage();
 
   mitk::AIFBasedModelBase::AterialInputFunctionType aif;
   mitk::AIFBasedModelBase::AterialInputFunctionType aifTimeGrid;
@@ -885,14 +886,14 @@ void MRPerfusionView::GenerateAIFbasedModelFit_PixelBased(mitk::modelFit::ModelF
     roiUID = mitk::EnsureModelFitUID(this->m_selectedMaskNode);
   }
 
-  fitGenerator->SetDynamicImage(concentrationImage);
+  fitGenerator->SetDynamicImage(this->m_inputImage);
   fitGenerator->SetFitFunctor(fitFunctor);
 
   generator = fitGenerator.GetPointer();
 
   //Create model info
   modelFitInfo = mitk::modelFit::CreateFitInfoFromModelParameterizer(modelParameterizer,
-    concentrationNode->GetData(), mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED(), this->GetFitName(),
+    this->m_inputImage, mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED(), this->GetFitName(),
                  roiUID);
 
   mitk::ScalarListLookupTable::ValueType infoSignal;
@@ -922,9 +923,7 @@ void MRPerfusionView::GenerateAIFbasedModelFit_ROIBased(
   typename TParameterizer::Pointer modelParameterizer =
     TParameterizer::New();
 
-  mitk::Image::Pointer concentrationImage;
-  mitk::DataNode::Pointer concentrationNode;
-  GetConcentrationImage(concentrationImage, concentrationNode, false);
+  PrepareConcentrationImage();
 
   mitk::AIFBasedModelBase::AterialInputFunctionType aif;
   mitk::AIFBasedModelBase::AterialInputFunctionType aifTimeGrid;
@@ -948,7 +947,7 @@ void MRPerfusionView::GenerateAIFbasedModelFit_ROIBased(
   mitk::MaskedDynamicImageStatisticsGenerator::Pointer signalGenerator =
     mitk::MaskedDynamicImageStatisticsGenerator::New();
   signalGenerator->SetMask(m_selectedMask);
-  signalGenerator->SetDynamicImage(concentrationImage);
+  signalGenerator->SetDynamicImage(this->m_inputImage);
   signalGenerator->Generate();
 
   mitk::MaskedDynamicImageStatisticsGenerator::ResultType roiSignal = signalGenerator->GetMean();
@@ -961,7 +960,7 @@ void MRPerfusionView::GenerateAIFbasedModelFit_ROIBased(
   fitGenerator->SetMask(m_selectedMask);
   fitGenerator->SetFitFunctor(fitFunctor);
   fitGenerator->SetSignal(roiSignal);
-  fitGenerator->SetTimeGrid(mitk::ExtractTimeGrid(concentrationImage));
+  fitGenerator->SetTimeGrid(mitk::ExtractTimeGrid(this->m_inputImage));
 
   generator = fitGenerator.GetPointer();
 
@@ -969,7 +968,7 @@ void MRPerfusionView::GenerateAIFbasedModelFit_ROIBased(
 
   //Create model info
   modelFitInfo = mitk::modelFit::CreateFitInfoFromModelParameterizer(modelParameterizer,
-    concentrationNode->GetData(), mitk::ModelFitConstants::FIT_TYPE_VALUE_ROIBASED(), this->GetFitName(),
+    this->m_inputImage, mitk::ModelFitConstants::FIT_TYPE_VALUE_ROIBASED(), this->GetFitName(),
                  roiUID);
 
   mitk::ScalarListLookupTable::ValueType infoSignal;
@@ -1004,8 +1003,18 @@ void MRPerfusionView::DoFit(const mitk::modelFit::ModelFitInfo* fitSession,
 
   /////////////////////////
   //create job and put it into the thread pool
+  mitk::modelFit::ModelFitResultNodeVectorType additionalNodes;
+  if (m_HasGeneratedNewInput)
+  {
+    additionalNodes.push_back(m_inputNode);
+  }
+  if (m_HasGeneratedNewInputAIF)
+  {
+    additionalNodes.push_back(m_inputAIFNode);
+  }
+
   ParameterFitBackgroundJob* pJob = new ParameterFitBackgroundJob(generator, fitSession,
-      this->m_selectedNode);
+      this->m_selectedNode, additionalNodes);
   pJob->setAutoDelete(true);
 
   connect(pJob, SIGNAL(Error(QString)), this, SLOT(OnJobError(QString)));
@@ -1022,7 +1031,7 @@ void MRPerfusionView::DoFit(const mitk::modelFit::ModelFitInfo* fitSession,
   threadPool->start(pJob);
 }
 
-MRPerfusionView::MRPerfusionView() : m_FittingInProgress(false)
+MRPerfusionView::MRPerfusionView() : m_FittingInProgress(false), m_HasGeneratedNewInput(false), m_HasGeneratedNewInputAIF(false)
 {
   m_selectedImage = NULL;
   m_selectedMask = NULL;
@@ -1075,6 +1084,9 @@ void MRPerfusionView::OnJobResultsAreAvailable(mitk::modelFit::ModelFitResultNod
   //(handles the correct generation of the nodes and their properties)
   
   mitk::modelFit::StoreResultsInDataStorage(this->GetDataStorage(), results, pJob->GetParentNode());
+  //this stores the concentration image and AIF concentration image, if generated for this fit in the storage.
+  //if not generated for this fit, relevant nodes are empty.
+  mitk::modelFit::StoreResultsInDataStorage(this->GetDataStorage(), pJob->GetAdditionalRelevantNodes(), pJob->GetParentNode());
 
 
 
@@ -1106,7 +1118,7 @@ void MRPerfusionView::InitModelComboBox() const
   this->m_Controls.comboModel->setCurrentIndex(0);
 };
 
-mitk::DataNode::Pointer MRPerfusionView::AddConcentrationImage(mitk::Image* image,
+mitk::DataNode::Pointer MRPerfusionView::GenerateConcentrationNode(mitk::Image* image,
     const std::string& nodeName) const
 {
   if (!image)
@@ -1117,14 +1129,10 @@ mitk::DataNode::Pointer MRPerfusionView::AddConcentrationImage(mitk::Image* imag
   mitk::DataNode::Pointer result = mitk::DataNode::New();
 
   result->SetData(image);
-
   result->SetName(nodeName);
-
   result->SetVisibility(true);
 
   mitk::EnsureModelFitUID(result);
-
-  this->GetDataStorage()->Add(result, m_selectedNode);
 
   return result;
 };
@@ -1149,8 +1157,7 @@ mitk::Image::Pointer MRPerfusionView::ConvertConcentrationImage(bool AIFMode)
   concentrationGen->SetAbsoluteSignalEnhancement(m_Controls.radioButton_absoluteEnhancement->isChecked());
   concentrationGen->SetRelativeSignalEnhancement(m_Controls.radioButton_relativeEnchancement->isChecked());
   concentrationGen->SetUsingT1Map(m_Controls.radioButtonUsingT1->isChecked());
-
-
+  
   if (IsTurboFlashSequenceFlag())
   {
     if (AIFMode)
@@ -1174,7 +1181,7 @@ mitk::Image::Pointer MRPerfusionView::ConvertConcentrationImage(bool AIFMode)
       //Convert Flipangle from degree to radiant
       double alpha = m_Controls.FlipangleSpinBox->value()/360*2* boost::math::constants::pi<double>();
       concentrationGen->SetFlipAngle(alpha);
-       }
+  }
   else
   {
     concentrationGen->SetFactor(m_Controls.factorSpinBox->value());
@@ -1260,11 +1267,9 @@ void MRPerfusionView::GetAIF(mitk::AIFBasedModelBase::AterialInputFunctionType& 
       this->m_selectedAIFImage = m_selectedImage;
     }
 
-    mitk::Image::Pointer concentrationImage;
-    mitk::DataNode::Pointer concentrationNode;
-    this->GetConcentrationImage(concentrationImage, concentrationNode, true);
+    this->PrepareAIFConcentrationImage();
 
-    aifGenerator->SetDynamicImage(concentrationImage);
+    aifGenerator->SetDynamicImage(this->m_inputAIFImage);
 
     aif = aifGenerator->GetAterialInputFunction();
     aifTimeGrid = aifGenerator->GetAterialInputFunctionTimeGrid();
@@ -1273,7 +1278,6 @@ void MRPerfusionView::GetAIF(mitk::AIFBasedModelBase::AterialInputFunctionType& 
   {
     mitkThrow() << "Cannot generate AIF. View is in a invalide state. No AIF mode selected.";
   }
-
 }
 
 
@@ -1308,73 +1312,71 @@ void MRPerfusionView::LoadAIFfromFile()
     Tokenizer tok(line1);
     vec1.assign(tok.begin(), tok.end());
 
-    //        if (vec1.size() < 3) continue;
-
     this->AIFinputGrid.push_back(convertToDouble(vec1[0]));
     this->AIFinputFunction.push_back(convertToDouble(vec1[1]));
-
   }
-
 }
 
-void MRPerfusionView::GetConcentrationImage(mitk::Image::Pointer& concentrationImage,
-    mitk::DataNode::Pointer& concentrationNode, bool AIFMode)
+void MRPerfusionView::PrepareConcentrationImage()
 {
-  if (this->m_Controls.radioButtonNoConversion->isChecked())
+  mitk::Image::Pointer concentrationImage = this->m_selectedImage;
+  mitk::DataNode::Pointer concentrationNode = this->m_selectedNode;
+  m_HasGeneratedNewInput = false;
+
+  if (!this->m_Controls.radioButtonNoConversion->isChecked())
   {
-    if (this->m_Controls.checkDedicatedAIFImage->isChecked() && AIFMode)
-    {
-      concentrationImage = this->m_selectedAIFImage;
-      concentrationNode = this->m_selectedAIFImageNode;
-    }
-    else
-    {
-      concentrationImage = this->m_selectedImage;
-      concentrationNode = this->m_selectedNode;
-    }
+    concentrationImage = this->ConvertConcentrationImage(false);
+    concentrationNode = GenerateConcentrationNode(concentrationImage, "Concentration");
+    m_HasGeneratedNewInput = true;
   }
-  else
+
+  m_inputImage = concentrationImage;
+  m_inputNode = concentrationNode;
+
+  mitk::EnsureModelFitUID(concentrationNode);
+}
+
+void MRPerfusionView::PrepareAIFConcentrationImage()
+{
+  mitk::Image::Pointer concentrationImage = this->m_selectedImage;
+  mitk::DataNode::Pointer concentrationNode = this->m_selectedNode;
+  m_HasGeneratedNewInputAIF = false;
+
+  if (this->m_Controls.checkDedicatedAIFImage->isChecked())
   {
-    if (AIFMode && !IsTurboFlashSequenceFlag() && !this->m_Controls.checkDedicatedAIFImage->isChecked())
+    concentrationImage = this->m_selectedAIFImage;
+    concentrationNode = this->m_selectedAIFImageNode;
+  }
+
+  if (!this->m_Controls.radioButtonNoConversion->isChecked())
+  {
+    if (!IsTurboFlashSequenceFlag() && !this->m_Controls.checkDedicatedAIFImage->isChecked())
     {
-      //we can directly use the input image/node for the AIF
       if (m_inputImage.IsNull())
       {
         mitkThrow() <<
-                    "Cannot get AIF concentration image. Invalid view state. Input image is not defined yet, but should be.";
+          "Cannot get AIF concentration image. Invalid view state. Input image is not defined yet, but should be.";
       }
 
+      //we can directly use the concentration input image/node (generated by GetConcentrationImage) also for the AIF
       concentrationImage = this->m_inputImage;
       concentrationNode = this->m_inputNode;
     }
     else
     {
-      concentrationImage = this->ConvertConcentrationImage(AIFMode);
-
-      if (AIFMode)
-      {
-        concentrationNode = AddConcentrationImage(concentrationImage, "AIF Concentration");
-      }
-      else
-      {
-        concentrationNode = AddConcentrationImage(concentrationImage, "Concentration");
-      }
+      concentrationImage = this->ConvertConcentrationImage(true);
+      concentrationNode = GenerateConcentrationNode(concentrationImage, "AIF Concentration");
+      m_HasGeneratedNewInputAIF = true;
     }
   }
 
-  if (AIFMode)
-  {
-    m_inputAIFImage = concentrationImage;
-    m_inputAIFNode = concentrationNode;
-  }
-  else
-  {
-    m_inputImage = concentrationImage;
-    m_inputNode = concentrationNode;
-  }
+  m_inputAIFImage = concentrationImage;
+  m_inputAIFNode = concentrationNode;
 
   mitk::EnsureModelFitUID(concentrationNode);
 }
+
+
 
 mitk::ModelFitFunctorBase::Pointer MRPerfusionView::CreateDefaultFitFunctor(
   const mitk::ModelParameterizerBase* parameterizer) const

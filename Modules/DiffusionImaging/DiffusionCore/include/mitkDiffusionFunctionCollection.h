@@ -61,6 +61,16 @@ public:
     return itkPoint;
   }
 
+  template< class TType >
+  static itk::Vector<float, 3> GetItkVector(double point[3])
+  {
+    itk::Vector<TType, 3> itkVector;
+    itkVector[0] = static_cast<TType>(point[0]);
+    itkVector[1] = static_cast<TType>(point[1]);
+    itkVector[2] = static_cast<TType>(point[2]);
+    return itkVector;
+  }
+
   template< class TPixelType, class TOutPixelType=TPixelType >
   static TOutPixelType GetImageValue(const itk::Point<float, 3>& itkP, bool interpolate, typename itk::LinearInterpolateImageFunction< itk::Image< TPixelType, 3 >, float >::Pointer interpolator)
   {
@@ -112,6 +122,63 @@ public:
     return false;
   }
 
+  template< class TType=float >
+  static vnl_matrix_fixed< TType, 3, 3 > GetRotationMatrixVnl(TType rx, TType ry, TType rz)
+  {
+    rx = rx*itk::Math::pi/180;
+    ry = ry*itk::Math::pi/180;
+    rz = rz*itk::Math::pi/180;
+
+    vnl_matrix_fixed< TType, 3, 3 > rotX; rotX.set_identity();
+    rotX[1][1] = cos(rx);
+    rotX[2][2] = rotX[1][1];
+    rotX[1][2] = -sin(rx);
+    rotX[2][1] = -rotX[1][2];
+
+    vnl_matrix_fixed< TType, 3, 3 > rotY; rotY.set_identity();
+    rotY[0][0] = cos(ry);
+    rotY[2][2] = rotY[0][0];
+    rotY[0][2] = sin(ry);
+    rotY[2][0] = -rotY[0][2];
+
+    vnl_matrix_fixed< TType, 3, 3 > rotZ; rotZ.set_identity();
+    rotZ[0][0] = cos(rz);
+    rotZ[1][1] = rotZ[0][0];
+    rotZ[0][1] = -sin(rz);
+    rotZ[1][0] = -rotZ[0][1];
+
+    vnl_matrix_fixed< TType, 3, 3 > rot = rotZ*rotY*rotX;
+    return rot;
+  }
+
+  template< class TType=float >
+  static itk::Matrix< TType, 3, 3 > GetRotationMatrixItk(TType rx, TType ry, TType rz)
+  {
+    rx = rx*itk::Math::pi/180;
+    ry = ry*itk::Math::pi/180;
+    rz = rz*itk::Math::pi/180;
+
+    itk::Matrix< TType, 3, 3 > rotX; rotX.SetIdentity();
+    rotX[1][1] = cos(rx);
+    rotX[2][2] = rotX[1][1];
+    rotX[1][2] = -sin(rx);
+    rotX[2][1] = -rotX[1][2];
+
+    itk::Matrix< TType, 3, 3 > rotY; rotY.SetIdentity();
+    rotY[0][0] = cos(ry);
+    rotY[2][2] = rotY[0][0];
+    rotY[0][2] = sin(ry);
+    rotY[2][0] = -rotY[0][2];
+
+    itk::Matrix< TType, 3, 3 > rotZ; rotZ.SetIdentity();
+    rotZ[0][0] = cos(rz);
+    rotZ[1][1] = rotZ[0][0];
+    rotZ[0][1] = -sin(rz);
+    rotZ[1][0] = -rotZ[0][1];
+
+    itk::Matrix< TType, 3, 3 > rot = rotZ*rotY*rotX;
+    return rot;
+  }
 };
 
 class MITKDIFFUSIONCORE_EXPORT convert

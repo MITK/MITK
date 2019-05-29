@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="/org.mitk.gui.qt.common">
+    <file>times.svg</file>
+  </qresource>
+</RCC>

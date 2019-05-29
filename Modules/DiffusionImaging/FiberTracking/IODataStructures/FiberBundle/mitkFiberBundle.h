@@ -36,6 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTransform.h>
 #include <vtkFloatArray.h>
 #include <itkScalableAffineTransform.h>
+#include <mitkDiffusionFunctionCollection.h>
 
 namespace mitk {
 
@@ -95,7 +96,36 @@ public:
     void TransformFibers(double rx, double ry, double rz, double tx, double ty, double tz);
     void TransformFibers(itk::ScalableAffineTransform< mitk::ScalarType >::Pointer transform);
     void RemoveDir(vnl_vector_fixed<double,3> dir, double threshold);
-    itk::Point<float, 3> TransformPoint(vnl_vector_fixed< double, 3 > point, double rx, double ry, double rz, double tx, double ty, double tz);
+
+    template< class TType=float >
+    void TransformPoint(itk::Point<TType, 3>& point, itk::Matrix< TType, 3, 3>& rot, TType& tx, TType& ty, TType& tz)
+    {
+      mitk::Point3D center = this->GetGeometry()->GetCenter();
+
+      point[0] -= center[0];
+      point[1] -= center[1];
+      point[2] -= center[2];
+      point = rot*point;
+      point[0] += center[0]+tx;
+      point[1] += center[1]+ty;
+      point[2] += center[2]+tz;
+    }
+
+    template< class TType=float >
+    void TransformPoint(itk::Point<TType, 3>& point, TType rx, TType ry, TType rz, TType tx, TType ty, TType tz)
+    {
+      auto rot = mitk::imv::GetRotationMatrixItk<TType>(rx, ry, rz);
+      mitk::Point3D center = this->GetGeometry()->GetCenter();
+
+      point[0] -= center[0];
+      point[1] -= center[1];
+      point[2] -= center[2];
+      point = rot*point;
+      point[0] += center[0]+tx;
+      point[1] += center[1]+ty;
+      point[2] += center[2]+tz;
+    }
+
     itk::Matrix< double, 3, 3 > TransformMatrix(itk::Matrix< double, 3, 3 > m, double rx, double ry, double rz);
 
     // add/subtract fibers

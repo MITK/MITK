@@ -186,7 +186,7 @@ namespace mitk
 
     /**
       * \brief  */
-    mitk::Image::Pointer CreateLabelMask(PixelType index);
+    mitk::Image::Pointer CreateLabelMask(PixelType index, bool useActiveLayer = true, unsigned int layer = 0);
 
     /**
      * @brief Initialize a new mitk::LabelSetImage by an given image.
@@ -302,9 +302,6 @@ namespace mitk
 
     template <typename ImageType>
     void MaskStampProcessing(ImageType *input, mitk::Image *mask, bool forceOverwrite);
-
-    template <typename ImageType>
-    void CreateLabelMaskProcessing(ImageType *input, mitk::Image *mask, PixelType index);
 
     template <typename LabelSetImageType, typename ImageType>
     void InitializeByLabeledImageProcessing(LabelSetImageType *input, ImageType *other);

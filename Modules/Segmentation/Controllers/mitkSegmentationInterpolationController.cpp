@@ -46,7 +46,8 @@ mitk::SegmentationInterpolationController *mitk::SegmentationInterpolationContro
   }
 }
 
-mitk::SegmentationInterpolationController::SegmentationInterpolationController() : m_BlockModified(false)
+mitk::SegmentationInterpolationController::SegmentationInterpolationController()
+  : m_BlockModified(false), m_2DInterpolationActivated(false)
 {
 }
 

@@ -14,31 +14,40 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKNODETABLEVIEWKEYFILTER_H_
-#define QMITKNODETABLEVIEWKEYFILTER_H_
+#ifndef QMITKNODETABLEVIEWKEYFILTER_H
+#define QMITKNODETABLEVIEWKEYFILTER_H
+
+// mitk core
+#include <mitkDataStorage.h>
+#include <mitkWeakPointer.h>
 
 #include <QObject>
 
-namespace berry {
-struct IPreferencesService;
+namespace berry
+{
+  struct IPreferencesService;
 }
 
-///
-/// A small class which "eats" all Del-Key-pressed events on the node table.
-/// When the Del Key is pressed selected nodes should be removed.
-///
+/**
+* @brief A small class which receives key-pressed events on the node table.
+*/
 class QmitkNodeTableViewKeyFilter : public QObject
 {
   Q_OBJECT
-public:
-  QmitkNodeTableViewKeyFilter(QObject* _DataManagerView = nullptr);
-protected:
-  bool eventFilter(QObject *obj, QEvent *event) override;
 
-  ///
-  /// The Preferences Service to retrieve and store preferences.
-  ///
-  berry::IPreferencesService* m_PreferencesService;
+public:
+
+  QmitkNodeTableViewKeyFilter(QObject *dataManagerView, mitk::DataStorage *dataStorage);
+
+protected:
+
+  virtual bool eventFilter(QObject *obj, QEvent *event) override;
+  /**
+   * @brief The Preferences Service to retrieve and store preferences.
+   */
+  berry::IPreferencesService *m_PreferencesService;
+
+  mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
 };
 
-#endif // QMITKNODETABLEVIEWKEYFILTER_H_
+#endif // QMITKNODETABLEVIEWKEYFILTER_H

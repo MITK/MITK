@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+  <extension point="org.blueberry.ui.editors">
+    <editor id="org.mitk.editors.mxnmultiwidget"
+			name="MxN Display"
+			class="QmitkMxNMultiWidgetEditor"
+			extensions="mitk"
+			icon="resources/MxNMultiWidgetEditor.svg"/>
+  </extension>
+
+  <extension point="org.blueberry.ui.preferencePages">
+    <page id="org.mitk.MxNMultiWidgetEditorPreferencePage"
+		  name="MxN Multi Widget Editor"
+		  class="QmitkMxNMultiWidgetEditorPreferencePage"
+		  category="org.mitk.EditorsPreferencePage">
+      <keywordreference id="org.mitk.MxNMultiWidgetEditorPreferencePageKeywords"/>
+    </page>
+  </extension>
+
+  <extension point="org.blueberry.ui.keywords">
+    <keyword id="org.mitk.MxNMultiWidgetEditorPreferencePageKeywords" label="zooming panning constraint"/>
+    <keyword id="org.mitk.MxNMultiWidgetEditorPreferencePageKeywords" label="show level window widget"/>
+    <keyword id="org.mitk.MxNMultiWidgetEditorPreferencePageKeywords" label="pacs like mouse interaction select left mouse button action"/>
+    <keyword id="org.mitk.MxNMultiWidgetEditorPreferencePageKeywords" label="rendering mode standard multisampling enable antialiasing depth peeling"/>
+    <keyword id="org.mitk.MxNMultiWidgetEditorPreferencePageKeywords" label="crosshair gap size background decoration color corner annotation"/>
+  </extension>
+</plugin>

@@ -42,21 +42,12 @@ public:
   vnl_vector_fixed<float,3> ProposeDirection(const itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex) override;  ///< predicts next progression direction at the given position
   bool WorldToIndex(itk::Point<float, 3>& pos, itk::Index<3>& index) override;
 
-  void SetPeakThreshold(float thr){ m_PeakThreshold = thr; }
   void SetPeakImage( PeakImgType::Pointer image ){ m_PeakImage = image; DataModified(); }
-  void SetApplyDirectionMatrix( bool applyDirectionMatrix ){ m_ApplyDirectionMatrix = applyDirectionMatrix; }
 
   itk::Vector<double, 3> GetSpacing() override{ return spacing3; }
   itk::Point<float,3> GetOrigin() override{ return origin3; }
   itk::Matrix<double, 3, 3> GetDirection() override{ return direction3; }
   itk::ImageRegion<3> GetLargestPossibleRegion() override{ return imageRegion3; }
-  void SetMode( MODE m ) override
-  {
-    if (m==MODE::DETERMINISTIC)
-      m_Mode = m;
-    else
-      mitkThrow() << "Peak tracker is only implemented for deterministic mode.";
-  }
 
 protected:
 
@@ -65,18 +56,14 @@ protected:
   vnl_vector_fixed<float,3> GetDirection(itk::Index<3> idx3, int dirIdx);
 
   PeakImgType::ConstPointer m_PeakImage;
-  float m_PeakThreshold;
   int m_NumDirs;
 
   itk::Vector<double, 3> spacing3;
   itk::Point<float, 3> origin3;
   itk::Matrix<double, 3, 3> direction3;
   itk::ImageRegion<3> imageRegion3;
-  vnl_matrix_fixed<float,3,3> m_FloatImageRotation;
 
   ItkUcharImgType::Pointer m_DummyImage;
-
-  bool    m_ApplyDirectionMatrix;
 };
 
 }

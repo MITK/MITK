@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //#define MBILOG_ENABLE_DEBUG 1
 
+#include <QmitkStyleManager.h>
 #include "QmitkToolSelectionBox.h"
 #include "QmitkToolGUI.h"
 #include "mitkBaseRenderer.h"
@@ -245,6 +246,10 @@ void QmitkToolSelectionBox::SetOrUnsetButtonForActiveTool()
     {
       // create and reparent new GUI (if any)
       itk::Object::Pointer possibleGUI = tool->GetGUI("Qmitk", "GUI").GetPointer(); // prefix and postfix
+
+      if (possibleGUI.IsNull())
+        possibleGUI = tool->GetGUI("", "GUI").GetPointer();
+
       QmitkToolGUI *gui = dynamic_cast<QmitkToolGUI *>(possibleGUI.GetPointer());
 
       //!
@@ -555,19 +560,29 @@ void QmitkToolSelectionBox::RecreateButtons()
     }
     else
     {
-      us::ModuleResourceStream resourceStream(iconResource, std::ios::binary);
+      auto isSVG = "svg" == iconResource.GetSuffix();
+      auto openmode = isSVG ? std::ios_base::in : std::ios_base::binary;
+
+      us::ModuleResourceStream resourceStream(iconResource, openmode);
       resourceStream.seekg(0, std::ios::end);
       std::ios::pos_type length = resourceStream.tellg();
       resourceStream.seekg(0, std::ios::beg);
 
       char *data = new char[length];
       resourceStream.read(data, length);
-      QPixmap pixmap;
-      pixmap.loadFromData(QByteArray::fromRawData(data, length));
-      QIcon *icon = new QIcon(pixmap);
-      delete[] data;
 
-      button->setIcon(*icon);
+      if (isSVG)
+      {
+        button->setIcon(QmitkStyleManager::ThemeIcon(QByteArray::fromRawData(data, length)));
+      }
+      else
+      {
+        QPixmap pixmap;
+        pixmap.loadFromData(QByteArray::fromRawData(data, length));
+        button->setIcon(QIcon(pixmap));
+      }
+
+      delete[] data;
 
       if (m_ShowNames)
       {

@@ -8,6 +8,7 @@ set(MODULE_TESTS
   mitkAnisotropicIterativeClosestPointRegistrationTest.cpp
   mitkUnstructuredGridClusteringFilterTest.cpp
   mitkUnstructuredGridToUnstructuredGridFilterTest.cpp
+  mitkCropTimestepsImageFilterTest.cpp
 )
 
 set(MODULE_CUSTOM_TESTS

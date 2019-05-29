@@ -37,13 +37,14 @@ struct InputParameters
   std::string inputFilename;
   std::string outputFileStruct; // "E:/mydata/awesome_exp_unmixed/a" will be saved as "a_HbO2_SU_.nrrd", "a_Hb_SU_.nrrd" and "a_sO2_.nrrd";
   std::string inputAlg;
+  std::string outputFileNumber;
   mitkCommandLineParser::StringContainerType inputWavelengths;
   mitkCommandLineParser::StringContainerType inputWeights;
 };
 
 InputParameters parseInput(int argc, char *argv[])
 {
-  MITK_INFO << "Parsing arguments...";
+  //MITK_INFO << "Parsing arguments...";
   mitkCommandLineParser parser;
 
   parser.setCategory("MITK-Photoacoustics");
@@ -56,16 +57,23 @@ InputParameters parseInput(int argc, char *argv[])
   parser.beginGroup("Required parameters");
   parser.addArgument("inputFilename",
                      "i",
-                     mitkCommandLineParser::InputDirectory,
+                     mitkCommandLineParser::Directory,
                      "Input Filename (NAME.nrrd)",
                      "input filename",
                      us::Any(),
                      false);
   parser.addArgument("outputFileStruct",
                      "o",
-                     mitkCommandLineParser::OutputDirectory,
-                     "Input save name (name without ending!)",
-                     "input save name",
+                     mitkCommandLineParser::Directory,
+                     "Output save name (name without ending!)",
+                     "Output save name",
+                     us::Any(),
+                     false);
+  parser.addArgument("outputFileNumber",
+                     "n",
+                     mitkCommandLineParser::String,
+                     "Output file number",
+                     "Output save number",
                      us::Any(),
                      false);
   parser.addArgument("inputWavelengths",
@@ -97,10 +105,11 @@ InputParameters parseInput(int argc, char *argv[])
   if (argc == 0)
     exit(-1);
 
-  for (int i = 0; i < argc; ++i)
-  {
-    MITK_INFO << argv[i];
-  }
+  //for (int i = 0; i < argc; ++i)
+  //{
+  //  MITK_INFO << argv[i];
+  //}
+
 
   if (parsedArgs.count("inputFilename"))
   { 
@@ -121,6 +130,16 @@ InputParameters parseInput(int argc, char *argv[])
   {
     MITK_ERROR << "Error: No output";
     mitkThrow() << "Error: No output";
+  }
+
+  if (parsedArgs.count("outputFileNumber"))
+  {
+    input.outputFileNumber = us::any_cast<std::string>(parsedArgs["outputFileNumber"]);
+  }
+  else
+  {
+    MITK_ERROR << "Error: No output number";
+    mitkThrow() << "Error: No output number";
   }
 
   if (parsedArgs.count("inputWavelengths"))
@@ -147,7 +166,7 @@ InputParameters parseInput(int argc, char *argv[])
     input.inputWeights = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["inputWeights"]);
   }
 
-  MITK_INFO << "Parsing arguments...[Done]";
+  //MITK_INFO << "Parsing arguments...[Done]";
   return input;
 }
 
@@ -207,6 +226,8 @@ int main(int argc, char *argv[])
 
   std::string algo = input.inputAlg;
   std::string outputDir = input.outputFileStruct;
+  std::string outputNumber = input.outputFileNumber;
+
   auto inputWls = input.inputWavelengths;
 
   std::vector<int> wavelengths;
@@ -214,7 +235,7 @@ int main(int argc, char *argv[])
   {
     int wl = std::stoi(inputWls[s]);
     wavelengths.push_back(wl);
-    MITK_INFO << "Wavelength: " << wl << "\n";
+    //MITK_INFO << "Wavelength: " << wl << "\n";
   }
 
   mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter;
@@ -228,7 +249,7 @@ int main(int argc, char *argv[])
     {
       int w = std::stoi(inputW[s]);
       Weights.push_back(w);
-      MITK_INFO << "Weights: " << w << "\n";
+      //MITK_INFO << "Weights: " << w << "\n";
     }
 
     m_SpectralUnmixingFilter = GetFilterInstance(algo, Weights);
@@ -247,7 +268,7 @@ int main(int argc, char *argv[])
   for (unsigned int wIdx = 0; wIdx < wavelengths.size(); ++wIdx)
   {
     m_SpectralUnmixingFilter->AddWavelength(wavelengths[wIdx]);
-    MITK_INFO << wavelengths[wIdx];
+    //MITK_INFO << wavelengths[wIdx];
   }
 
   //to add a batch processing: loop for a dir start here; don't forget to set a counter to the three output savenames!!!
@@ -263,10 +284,10 @@ int main(int argc, char *argv[])
   output1->SetSpacing(m_inputImage->GetGeometry()->GetSpacing());
   output2->SetSpacing(m_inputImage->GetGeometry()->GetSpacing());
 
-  std::string unmixingOutputHbO2 = outputDir + "_HbO2_SU_.nrrd";
-  std::string unmixingOutputHb = outputDir + "_Hb_SU_.nrrd";
-  mitk::IOUtil::Save(output1, unmixingOutputHbO2);
-  mitk::IOUtil::Save(output2, unmixingOutputHb);
+  std::string unmixingOutputHbO2 = outputDir + "HbO2." + outputNumber + ".nrrd";
+  std::string unmixingOutputHb = outputDir + "Hb." + outputNumber + ".nrrd";
+  //mitk::IOUtil::Save(output1, unmixingOutputHbO2);
+  //mitk::IOUtil::Save(output2, unmixingOutputHb);
 
   auto m_sO2 = mitk::pa::SpectralUnmixingSO2::New();
   m_sO2->Verbose(false);
@@ -277,10 +298,15 @@ int main(int argc, char *argv[])
   m_sO2->Update();
 
   mitk::Image::Pointer sO2 = m_sO2->GetOutput(0);
+  mitk::Image::Pointer tHb = m_sO2->GetOutput(1);
   sO2->SetSpacing(m_inputImage->GetGeometry()->GetSpacing());
+  tHb->SetSpacing(m_inputImage->GetGeometry()->GetSpacing());
 
-  std::string outputSo2 = outputDir + "_sO2_.nrrd";
+  std::string outputSo2 = outputDir + "sO2." + outputNumber + ".nrrd";
   mitk::IOUtil::Save(sO2, outputSo2);
+
+  std::string outputTHb = outputDir + "tHb." + outputNumber + ".nrrd";
+  mitk::IOUtil::Save(tHb, outputTHb);
 
   m_sO2 = nullptr;
   m_SpectralUnmixingFilter = nullptr;

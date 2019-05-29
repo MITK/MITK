@@ -50,9 +50,9 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("tractogram", "", mitkCommandLineParser::InputFile, "", "", us::Any(), false);
-  parser.addArgument("mask", "", mitkCommandLineParser::InputFile, "", "", us::Any(), false);
-  parser.addArgument("peaks", "", mitkCommandLineParser::InputFile, "", "", us::Any());
+  parser.addArgument("tractogram", "", mitkCommandLineParser::String, "", "", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("mask", "", mitkCommandLineParser::String, "", "", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("peaks", "", mitkCommandLineParser::String, "", "", us::Any(), true, false, false, mitkCommandLineParser::Input);
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)

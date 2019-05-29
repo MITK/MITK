@@ -38,6 +38,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <functional>
 #include <mitkIOUtil.h>
 
+#define GPU_BATCH_SIZE 32
+
 const std::string PAImageProcessing::VIEW_ID = "org.mitk.views.paimageprocessing";
 
 PAImageProcessing::PAImageProcessing() : m_ResampleSpacing(0), m_UseLogfilter(false), m_FilterBank(mitk::PhotoacousticFilterService::New())
@@ -879,7 +881,7 @@ mitk::BeamformingSettings::Pointer PAImageProcessing::CreateBeamformingSettings(
 
   return mitk::BeamformingSettings::New(pitchInMeters,
     speedOfSound, timeSpacing, angle, isPAImage, samplesPerLine, reconstructionLines,
-    image->GetDimensions(), reconstructionDepth, useGPU, 16, delay, apod,
+    image->GetDimensions(), reconstructionDepth, useGPU, GPU_BATCH_SIZE, delay, apod,
     apodizatonArraySize, algorithm);
 }
 

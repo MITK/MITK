@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageAccessByItk.h>
 #include <mitkImagePixelReadAccessor.h>
 #include <mitkPixelTypeMultiplex.h>
+#include <mitkImageStatisticsContainer.h>
 #include "mitkIntensityProfile.h"
 
 using namespace mitk;
@@ -52,6 +53,11 @@ static void ReadPixel(const PixelType&, Image::Pointer image, const itk::Index<3
 
 static IntensityProfile::Pointer ComputeIntensityProfile(Image::Pointer image, itk::PolyLineParametricPath<3>::Pointer path)
 {
+  if (image->GetDimension() == 4)
+  {
+    mitkThrow() << "computation of intensity profiles not supported for 4D images";
+  }
+
   IntensityProfile::Pointer intensityProfile = IntensityProfile::New();
   itk::PolyLineParametricPath<3>::InputType input = path->StartOfInput();
   BaseGeometry* imageGeometry = image->GetGeometry();
@@ -338,7 +344,7 @@ IntensityProfile::Pointer mitk::CreateIntensityProfileFromVector(const std::vect
   return result;
 }
 
-void mitk::ComputeIntensityProfileStatistics(IntensityProfile::ConstPointer intensityProfile, ImageStatisticsCalculator::StatisticsContainer::Pointer stats)
+void mitk::ComputeIntensityProfileStatistics(IntensityProfile::ConstPointer intensityProfile, ImageStatisticsContainer::ImageStatisticsObject& stats)
 {
   typedef std::vector<IntensityProfile::MeasurementType> StatsVecType;
 
@@ -348,7 +354,7 @@ void mitk::ComputeIntensityProfileStatistics(IntensityProfile::ConstPointer inte
   IntensityProfile::MeasurementType max;
   mitk::ComputeGlobalMinimum( intensityProfile, min );
   mitk::ComputeGlobalMaximum( intensityProfile, max );
-  StatsVecType::size_type numSamples = statsVec.size();
+  auto numSamples = static_cast<mitk::ImageStatisticsContainer::VoxelCountType>(statsVec.size());
 
   double mean = 0.0;
   double rms = 0.0;
@@ -358,8 +364,8 @@ void mitk::ComputeIntensityProfileStatistics(IntensityProfile::ConstPointer inte
     mean += val;
     rms += val*val;
   }
-  mean /= numSamples;
-  rms /= numSamples;
+  mean /= static_cast<double>(numSamples);
+  rms /= static_cast<double>(numSamples);
 
   double var = 0.0;
   for ( StatsVecType::const_iterator it = statsVec.begin(); it != statsVec.end(); ++it )
@@ -367,14 +373,15 @@ void mitk::ComputeIntensityProfileStatistics(IntensityProfile::ConstPointer inte
     double diff = *it - mean;
     var += diff*diff;
   }
-  var /= ( numSamples - 1 );
+  var /= (static_cast<double>(numSamples) - 1 );
 
   rms = sqrt( rms );
 
-  stats->SetMin( static_cast<double>( min ) );
-  stats->SetMax( static_cast<double>( max ) );
-  stats->SetN( numSamples );
-  stats->SetMean( mean );
-  stats->SetVariance( var );
-  stats->SetRMS( rms );
+  stats.AddStatistic(mitk::ImageStatisticsConstants::MINIMUM(), min);
+  stats.AddStatistic(mitk::ImageStatisticsConstants::MAXIMUM(), max);
+  stats.AddStatistic(mitk::ImageStatisticsConstants::NUMBEROFVOXELS(), numSamples);
+  stats.AddStatistic(mitk::ImageStatisticsConstants::MEAN(), mean);
+  stats.AddStatistic(mitk::ImageStatisticsConstants::STANDARDDEVIATION(), sqrt(var));
+  stats.AddStatistic(mitk::ImageStatisticsConstants::VARIANCE(), var);
+  stats.AddStatistic(mitk::ImageStatisticsConstants::RMS(), rms);
 }

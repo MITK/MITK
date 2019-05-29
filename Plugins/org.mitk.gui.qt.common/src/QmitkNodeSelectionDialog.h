@@ -14,10 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef QMITK_NODE_SELECTION_DIALOG_H
 #define QMITK_NODE_SELECTION_DIALOG_H
-
 
 #include <mitkDataStorage.h>
 #include <mitkWeakPointer.h>

@@ -9,3 +9,4 @@ MITK uses icons from various sources. Please respect their licenses.
 - [The Python Logo](https://www.python.org/community/logos/) ([PSF Trademark Usage Policy 1.5.0](https://www.python.org/psf/trademarks/))
 - [Tango](http://tango.freedesktop.org/Tango_Desktop_Project) (Public Domain)
 - [XNAT](https://www.xnat.org/) (Creative Commons Attribution 3.0 Unported)
+- [FlatIcon] (https://www.freepik.com/) (CC 3.0 BY)

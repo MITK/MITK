@@ -56,8 +56,8 @@ int main(int argc, char* argv[])
   parser.setArgumentPrefix("--", "-");
 
   parser.beginGroup("1. Mandatory arguments:");
-  parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input:", "Input fiber bundle (.fib, .trk, .tck)", us::Any(), false);
-  parser.addArgument("", "o", mitkCommandLineParser::OutputFile, "Output:", "Output fiber bundle (.fib, .trk)", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::String, "Input:", "Input fiber bundle (.fib, .trk, .tck)", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output:", "Output fiber bundle (.fib, .trk)", us::Any(), false, false, false, mitkCommandLineParser::Output);
   parser.endGroup();
 
   parser.beginGroup("2. Resampling:");
@@ -70,7 +70,8 @@ int main(int argc, char* argv[])
   parser.beginGroup("3. Filtering:");
   parser.addArgument("min_length", "", mitkCommandLineParser::Float, "Minimum length:", "Minimum fiber length (in mm)");
   parser.addArgument("max_length", "", mitkCommandLineParser::Float, "Maximum length:", "Maximum fiber length (in mm)");
-  parser.addArgument("max_angle", "", mitkCommandLineParser::Float, "Maximum angle:", "Maximum angular STDEV over 1cm (in degree)");
+  parser.addArgument("max_angle", "", mitkCommandLineParser::Float, "Maximum angle:", "Maximum angular STDEV (in degree) over given distance");
+  parser.addArgument("max_angle_dist", "", mitkCommandLineParser::Float, "Distance:", "Distance in mm", 10);
   parser.addArgument("remove", "", mitkCommandLineParser::Bool, "Remove fibers exceeding curvature threshold:", "If false, only the high curvature parts are removed");
   parser.addArgument("subsample", "", mitkCommandLineParser::Float, "Randomly select fraction of streamlines:", "Randomly select the specified fraction of streamlines from the input tractogram");
   parser.addArgument("random_subsample", "", mitkCommandLineParser::Bool, "Randomly seed subsampling:", "Randomly seed subsampling. Else, use seed 0.");
@@ -133,6 +134,10 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("max_length"))
     maxFiberLength = us::any_cast<float>(parsedArgs["max_length"]);
 
+  float max_angle_dist = 10;
+  if (parsedArgs.count("max_angle_dist"))
+    max_angle_dist = us::any_cast<float>(parsedArgs["max_angle_dist"]);
+
   float maxAngularDev = -1;
   if (parsedArgs.count("max_angle"))
     maxAngularDev = us::any_cast<float>(parsedArgs["max_angle"]);
@@ -193,7 +198,7 @@ int main(int argc, char* argv[])
       auto filter = itk::FiberCurvatureFilter::New();
       filter->SetInputFiberBundle(fib);
       filter->SetAngularDeviation(maxAngularDev);
-      filter->SetDistance(10);
+      filter->SetDistance(max_angle_dist);
       filter->SetRemoveFibers(remove);
       filter->Update();
       fib = filter->GetOutputFiberBundle();

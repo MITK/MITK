@@ -113,7 +113,7 @@ void QmitkToFUtilView::SetFocus()
 void QmitkToFUtilView::Activated()
 {
   //get the current RenderWindowPart or open a new one if there is none
-  if (this->GetRenderWindowPart(OPEN))
+  if (this->GetRenderWindowPart(mitk::WorkbenchUtil::IRenderWindowPartStrategy::OPEN))
   {
     mitk::ILinkedRenderWindowPart* linkedRenderWindowPart = dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart());
     if (linkedRenderWindowPart == 0)

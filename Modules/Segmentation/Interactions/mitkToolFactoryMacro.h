@@ -15,10 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #define MITK_TOOL_MACRO(EXPORT_SPEC, CLASS_NAME, DESCRIPTION)                                                          \
-  \
 class EXPORT_SPEC CLASS_NAME##Factory : public ::itk::ObjectFactoryBase                                                \
-  \
-{                                                                                                                 \
+{                                                                                                                      \
   public:                                                                                                              \
     /* ITK typedefs */                                                                                                 \
     typedef CLASS_NAME##Factory Self;                                                                                  \
@@ -27,8 +25,8 @@ class EXPORT_SPEC CLASS_NAME##Factory : public ::itk::ObjectFactoryBase         
     typedef itk::SmartPointer<const Self> ConstPointer;                                                                \
                                                                                                                        \
     /* Methods from ObjectFactoryBase */                                                                               \
-    virtual const char *GetITKSourceVersion() const override { return ITK_SOURCE_VERSION; }                                     \
-    virtual const char *GetDescription() const override { return DESCRIPTION; }                                                 \
+    virtual const char *GetITKSourceVersion() const override { return ITK_SOURCE_VERSION; }                            \
+    virtual const char *GetDescription() const override { return DESCRIPTION; }                                        \
     /* Method for class instantiation. */                                                                              \
     itkFactorylessNewMacro(Self);                                                                                      \
                                                                                                                        \
@@ -42,13 +40,15 @@ class EXPORT_SPEC CLASS_NAME##Factory : public ::itk::ObjectFactoryBase         
         "mitkTool", #CLASS_NAME, DESCRIPTION, 1, itk::CreateObjectFunction<CLASS_NAME>::New());                        \
     }                                                                                                                  \
                                                                                                                        \
-    ~CLASS_NAME##Factory() {}                                                                                          \
+    ~CLASS_NAME##Factory()                                                                                             \
+    {                                                                                                                  \
+      itk::ObjectFactoryBase::UnRegisterFactory(this);                                                                 \
+    }                                                                                                                  \
   private:                                                                                                             \
     CLASS_NAME##Factory(const Self &); /* purposely not implemented */                                                 \
     void operator=(const Self &);      /* purposely not implemented */                                                 \
-  \
 };                                                                                                                     \
-  \
+                                                                                                                       \
 class CLASS_NAME##RegistrationMethod                                                                                   \
   {                                                                                                                    \
   public:                                                                                                              \
@@ -68,14 +68,12 @@ class CLASS_NAME##RegistrationMethod                                            
   private:                                                                                                             \
     CLASS_NAME##Factory::Pointer m_Factory;                                                                            \
   };                                                                                                                   \
-  \
+                                                                                                                       \
 static CLASS_NAME##RegistrationMethod somestaticinitializer_##CLASS_NAME;
 
 #define MITK_DERIVED_SM_TOOL_MACRO(EXPORT_SPEC, BASE_CLASS, CLASS_NAME, DESCRIPTION)                                   \
-  \
 class EXPORT_SPEC CLASS_NAME##Tool : public BASE_CLASS                                                                 \
-  \
-{                                                                                                                 \
+{                                                                                                                      \
   public:                                                                                                              \
     typedef CLASS_NAME##Tool Self;                                                                                     \
     typedef BASE_CLASS Superclass;                                                                                     \
@@ -108,18 +106,15 @@ class EXPORT_SPEC CLASS_NAME##Tool : public BASE_CLASS                          
     }                                                                                                                  \
                                                                                                                        \
     ~CLASS_NAME##Tool() {}                                                                                             \
-  \
 };                                                                                                                     \
-  \
+                                                                                                                       \
 MITK_TOOL_MACRO(EXPORT_SPEC, CLASS_NAME##Tool, DESCRIPTION);
 
 /* GUI classes are _not_ exported! */
 
 #define MITK_TOOL_GUI_MACRO(EXPORT_SPEC, CLASS_NAME, DESCRIPTION)                                                      \
-  \
 class EXPORT_SPEC CLASS_NAME##Factory : public ::itk::ObjectFactoryBase                                                \
-  \
-{                                                                                                                 \
+{                                                                                                                      \
   public:                                                                                                              \
     /* ITK typedefs */                                                                                                 \
     typedef CLASS_NAME##Factory Self;                                                                                  \
@@ -128,8 +123,8 @@ class EXPORT_SPEC CLASS_NAME##Factory : public ::itk::ObjectFactoryBase         
     typedef itk::SmartPointer<const Self> ConstPointer;                                                                \
                                                                                                                        \
     /* Methods from ObjectFactoryBase */                                                                               \
-    virtual const char *GetITKSourceVersion() const override { return ITK_SOURCE_VERSION; }                                     \
-    virtual const char *GetDescription() const override { return DESCRIPTION; }                                                 \
+    virtual const char *GetITKSourceVersion() const override { return ITK_SOURCE_VERSION; }                            \
+    virtual const char *GetDescription() const override { return DESCRIPTION; }                                        \
     /* Method for class instantiation. */                                                                              \
     itkFactorylessNewMacro(Self);                                                                                      \
                                                                                                                        \
@@ -143,13 +138,15 @@ class EXPORT_SPEC CLASS_NAME##Factory : public ::itk::ObjectFactoryBase         
         #CLASS_NAME, #CLASS_NAME, DESCRIPTION, 1, itk::CreateObjectFunction<CLASS_NAME>::New());                       \
     }                                                                                                                  \
                                                                                                                        \
-    ~CLASS_NAME##Factory() {}                                                                                          \
+    ~CLASS_NAME##Factory()                                                                                             \
+    {                                                                                                                  \
+      itk::ObjectFactoryBase::UnRegisterFactory(this);                                                                 \
+    }                                                                                                                  \
   private:                                                                                                             \
     CLASS_NAME##Factory(const Self &); /* purposely not implemented */                                                 \
     void operator=(const Self &);      /* purposely not implemented */                                                 \
-  \
 };                                                                                                                     \
-  \
+                                                                                                                       \
 class CLASS_NAME##RegistrationMethod                                                                                   \
   {                                                                                                                    \
   public:                                                                                                              \
@@ -169,32 +166,22 @@ class CLASS_NAME##RegistrationMethod                                            
   private:                                                                                                             \
     CLASS_NAME##Factory::Pointer m_Factory;                                                                            \
   };                                                                                                                   \
-  \
+                                                                                                                       \
 static CLASS_NAME##RegistrationMethod somestaticinitializer_##CLASS_NAME;
 
 #define MITK_EXTERNAL_TOOL_GUI_HEADER_MACRO(EXPORT_SPEC, CLASS_NAME, DESCRIPTION)                                      \
-  \
 extern "C"                                                                                                             \
-  {                                                                                                                    \
-    \
-EXPORT_SPEC itk::ObjectFactoryBase *                                                                                   \
-      itkLoad();                                                                                                       \
-  \
+{                                                                                                                      \
+  EXPORT_SPEC itk::ObjectFactoryBase* itkLoad();                                                                       \
 }
 
 #define MITK_EXTERNAL_TOOL_GUI_CPP_MACRO(EXPORT_SPEC, CLASS_NAME, DESCRIPTION)                                         \
-  \
 MITK_TOOL_GUI_MACRO(EXPORT_SPEC, CLASS_NAME, DESCRIPTION)                                                              \
-  \
 extern "C"                                                                                                             \
+{                                                                                                                      \
+  EXPORT_SPEC itk::ObjectFactoryBase* itkLoad()                                                                        \
   {                                                                                                                    \
-    \
-EXPORT_SPEC itk::ObjectFactoryBase *                                                                                   \
-      itkLoad()                                                                                                        \
-    {                                                                                                                  \
-      static CLASS_NAME##Factory::Pointer p = CLASS_NAME##Factory::New();                                              \
-      return p;                                                                                                        \
-    \
-}                                                                                                               \
-  \
+    static CLASS_NAME##Factory::Pointer p = CLASS_NAME##Factory::New();                                                \
+    return p;                                                                                                          \
+  }                                                                                                                    \
 }

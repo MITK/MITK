@@ -23,10 +23,11 @@ if(MITK_USE_OpenIGTLink)
     endif()
 
     ExternalProject_Add(${proj}
-       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/OpenIGTLink-54df50de.tar.gz
-       URL_MD5 b9fd8351b059f4ec615f2dfd74ab2458
-       PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/OpenIGTLink-54df50de.patch
+       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/OpenIGTLink-release-3.0.tar.gz
+       URL_MD5 0a759655da037f6df2087dd2690d1ae2
+       PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/OpenIGTLink-92bc3d7b.patch
        CMAKE_GENERATOR ${gen}
+       CMAKE_GENERATOR_PLATFORM ${gen_platform}
        CMAKE_ARGS
          ${ep_common_args}
          ${additional_cmake_args}

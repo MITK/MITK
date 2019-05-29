@@ -55,10 +55,14 @@ set(CACHED_RESOURCE_FILES
   resources/syntheticdata.png
   resources/fieldmap.png
   resources/models.png
+  resources/download.png
+  resources/right.png
+  resources/stop.png
+  resources/upload.png
 )
 
 set(QRC_FILES
-  resources/QmitkDiffusionImaging.qrc
+    resources/QmitkFiberfox.qrc
 )
 
 

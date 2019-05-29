@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKSLIDERLEVELWINDOW_WIDGET
-#define QMITKSLIDERLEVELWINDOW_WIDGET
+#ifndef QMITKSLIDERLEVELWINDOWWIDGET_H
+#define QMITKSLIDERLEVELWINDOWWIDGET_H
 
 #include <MitkQtWidgetsExports.h>
 
@@ -89,26 +89,22 @@ public:
   /// destructor
   ~QmitkSliderLevelWindowWidget() override;
 
-  /*!
-  *  data structure which stores the values manipulated
-  *  by a QmitkSliderLevelWindowWidget
-  */
+  /// sets the manager who is responsible to collect and deliver changes on Level/Window
+  void SetLevelWindowManager(mitk::LevelWindowManager *levelWindowManager);
+
+  /// sets the DataStorage which holds all image-nodes
+  void SetDataStorage(mitk::DataStorage *ds);
+
+  /// returns the manager who is responsible to collect and deliver changes on Level/Window
+  mitk::LevelWindowManager *GetManager();
+
   mitk::LevelWindow m_LevelWindow;
 
   /// manager who is responsible to collect and deliver changes on Level/Window
   mitk::LevelWindowManager::Pointer m_Manager;
 
-  /// sets the manager who is responsible to collect and deliver changes on Level/Window
-  void setLevelWindowManager(mitk::LevelWindowManager *levelWindowManager);
-
-  /// sets the DataStorage which holds all image-nodes
-  void setDataStorage(mitk::DataStorage *ds);
-
-  /// returns the manager who is responsible to collect and deliver changes on Level/Window
-  mitk::LevelWindowManager *GetManager();
-
 private:
-  /// creates the contextmenu for this widget from class QmitkLevelWindowWidgetContextMenu
+  /// creates the context menu for this widget from class QmitkLevelWindowWidgetContextMenu
   void contextMenuEvent(QContextMenuEvent *) override;
 
   /// change notifications from the mitkLevelWindowManager
@@ -116,7 +112,7 @@ private:
 
 protected:
   /// recalculate the size and position of the slider bar
-  virtual void update();
+  virtual void Update();
 
   /*!
   * helper for drawing the component
@@ -143,7 +139,7 @@ protected:
   QFont m_Font;
 
   /*!
-  *  data structure which creates the contextmenu for QmitkLineEditLevelWindowWidget
+  *  data structure which creates the context menu for QmitkLineEditLevelWindowWidget
   */
   QmitkLevelWindowWidgetContextMenu *m_Contextmenu;
 
@@ -153,11 +149,11 @@ protected:
   void paintEvent(QPaintEvent *e) override;
 
   /*!
-  * method implements the component behaviour
+  * method implements the component behavior
   *
   * checks if cursor is on upper or lower bound of slider bar and changes cursor symbol
   *
-  * checks if left mouse button is pressed and if CTRL is pressed and changes sliderbar in movedirection accordingly
+  * checks if left mouse button is pressed and if CTRL is pressed and changes sliderbar in move-direction accordingly
   */
   void mouseMoveEvent(QMouseEvent *mouseEvent) override;
 
@@ -182,12 +178,15 @@ protected:
   */
   void resizeEvent(QResizeEvent *event) override;
 
-protected slots:
+protected Q_SLOTS:
 
-  /// hides the scale if "Hide Scale" is selected in contextmenu
-  void hideScale();
+  /** @brief Hide the scale if "Hide Scale" is selected in the context menu
+  */
+  void HideScale();
 
-  /// shows the scale if "Show Scale" is selected in contextmenu
-  void showScale();
+  /** @brief Shows the scale if "Show Scale" is selected in the context menu
+  */
+  void ShowScale();
 };
-#endif // QMITKSLIDERLEVELWINDOW_WIDGET
+
+#endif // QMITKSLIDERLEVELWINDOWWIDGET_H

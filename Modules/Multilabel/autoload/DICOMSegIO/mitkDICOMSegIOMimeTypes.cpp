@@ -124,10 +124,6 @@ namespace mitk
   std::string MitkDICOMSEGIOMimeTypes::DICOMSEG_MIMETYPE_NAME()
   {
     // create a unique and sensible name for this mime type
-    static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".image.dicom.seg";
-    return name;
+    return IOMimeTypes::DEFAULT_BASE_NAME() + ".image.dicom.seg";
   }
-
-
-
 }

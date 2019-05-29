@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkImageFileReader.h"
 #include <mitkIOUtil.h>
 #include <mitkLocaleSwitch.h>
+#include <itkMersenneTwisterRandomVariateGenerator.h>
 
 template< class D, class T >
 mitk::TeemDiffusionTensor3DReconstructionImageFilter<D,T>
@@ -85,11 +86,12 @@ void
 mitk::TeemDiffusionTensor3DReconstructionImageFilter<D,T>
 ::Update()
 {
+  itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer randgen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
+  randgen->SetSeed();
 
   // save input image to nrrd file in temp-folder
   char filename[512];
-  srand((unsigned)time(0));
-  int random_integer = rand();
+  int random_integer = randgen->GetIntegerVariate();
   sprintf( filename, "dwi_%d.nhdr",random_integer);
 
   try

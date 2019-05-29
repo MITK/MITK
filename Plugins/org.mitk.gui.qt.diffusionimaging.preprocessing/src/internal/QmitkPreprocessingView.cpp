@@ -1065,6 +1065,7 @@ void QmitkPreprocessingView::UpdateDwiBValueMapRounder(int i)
   if ( ! isDiffusionImage ) { return; }
 
   UpdateBValueTableWidget(i);
+  UpdateGradientDetails();
 }
 
 void QmitkPreprocessingView::
@@ -1211,6 +1212,93 @@ void QmitkPreprocessingView::CleanBValueTableWidget()
   m_Controls->m_B_ValueMap_TableWidget->setItem(0,1,new QTableWidgetItem("-"));
 }
 
+void QmitkPreprocessingView::UpdateGradientDetails()
+{
+  mitk::DataNode::Pointer node = m_Controls->m_SelctedImageComboBox->GetSelectedNode();
+  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if ( image == nullptr ) { return; }
+
+  bool isDiffusionImage(false);
+
+  isDiffusionImage = PropHelper::IsDiffusionWeightedImage(image);
+
+  if ( ! isDiffusionImage )
+  {
+    m_Controls->m_WorkingGradientsText->clear();
+    m_Controls->m_OriginalGradientsText->clear();
+    return;
+  }
+
+  auto gradientContainer = PropHelper::GetGradientContainer(image);
+  QString text = "";
+  for (unsigned int j=0; j<gradientContainer->Size(); j++)
+  {
+    auto g = gradientContainer->at(j);
+    g = g.normalize();
+    text += QString::number(g[0]);
+    if (j<gradientContainer->Size()-1)
+      text += " ";
+    else
+      text += "\n";
+  }
+  for (unsigned int j=0; j<gradientContainer->Size(); j++)
+  {
+    auto g = gradientContainer->at(j);
+    g = g.normalize();
+    text += QString::number(g[1]);
+    if (j<gradientContainer->Size()-1)
+      text += " ";
+    else
+      text += "\n";
+  }
+  for (unsigned int j=0; j<gradientContainer->Size(); j++)
+  {
+    auto g = gradientContainer->at(j);
+    g = g.normalize();
+    text += QString::number(g[2]);
+    if (j<gradientContainer->Size()-1)
+      text += " ";
+    else
+      text += "\n";
+  }
+
+  m_Controls->m_WorkingGradientsText->setPlainText(text);
+
+  gradientContainer = PropHelper::GetOriginalGradientContainer(image);
+  text = "";
+  for (unsigned int j=0; j<gradientContainer->Size(); j++)
+  {
+    auto g = gradientContainer->at(j);
+    g = g.normalize();
+    text += QString::number(g[0]);
+    if (j<gradientContainer->Size()-1)
+      text += " ";
+    else
+      text += "\n";
+  }
+  for (unsigned int j=0; j<gradientContainer->Size(); j++)
+  {
+    auto g = gradientContainer->at(j);
+    g = g.normalize();
+    text += QString::number(g[1]);
+    if (j<gradientContainer->Size()-1)
+      text += " ";
+    else
+      text += "\n";
+  }
+  for (unsigned int j=0; j<gradientContainer->Size(); j++)
+  {
+    auto g = gradientContainer->at(j);
+    g = g.normalize();
+    text += QString::number(g[2]);
+    if (j<gradientContainer->Size()-1)
+      text += " ";
+    else
+      text += "\n";
+  }
+  m_Controls->m_OriginalGradientsText->setPlainText(text);
+}
+
 void QmitkPreprocessingView::UpdateBValueTableWidget(int)
 {
   mitk::DataNode::Pointer node = m_Controls->m_SelctedImageComboBox->GetSelectedNode();
@@ -1330,6 +1418,7 @@ void QmitkPreprocessingView::OnImageSelectionChanged()
 
   UpdateBValueTableWidget(m_Controls->m_B_ValueMap_Rounder_SpinBox->value());
   DoUpdateInterpolationGui(m_Controls->m_ResampleTypeBox->currentIndex());
+  UpdateGradientDetails();
 
   m_Controls->m_HeaderSpacingX->setValue(image->GetGeometry()->GetSpacing()[0]);
   m_Controls->m_HeaderSpacingY->setValue(image->GetGeometry()->GetSpacing()[1]);
@@ -1425,8 +1514,7 @@ void QmitkPreprocessingView::DoClearRotationOfGradients()
 
   mitk::Image::Pointer newDwi = image->Clone();
 
-  PropHelper::InitializeImage( newDwi );
-  PropHelper::ClearMeasurementFrameAndRotationMatrixFromGradients(newDwi);
+  PropHelper::SetApplyMatrixToGradients(newDwi, false);
 
   mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
   imageNode->SetData( newDwi );
@@ -1670,6 +1758,7 @@ void QmitkPreprocessingView::DoReduceGradientDirections()
   // update the b-value widget to remove the modified number of gradients used for extraction
   this->CleanBValueTableWidget();
   this->UpdateBValueTableWidget(0);
+  this->UpdateGradientDetails();
 }
 
 void QmitkPreprocessingView::MergeDwis()

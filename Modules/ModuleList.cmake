@@ -24,6 +24,7 @@ set(MITK_MODULES
   Gizmo
   GraphAlgorithms
   Multilabel
+  Chart
   ImageStatistics
   ContourModel
   SurfaceInterpolation
@@ -31,7 +32,7 @@ set(MITK_MODULES
   PlanarFigureSegmentation
   QtWidgets
   QtWidgetsExt
-  Chart
+  ImageStatisticsUI
   SegmentationUI
   MatchPointRegistration
   MatchPointRegistrationUI
@@ -70,6 +71,8 @@ set(MITK_MODULES
   BoundingShape
   RenderWindowManager
   RenderWindowManagerUI
+  SemanticRelations
+  SemanticRelationsUI
   CEST
   BasicImageProcessing
   ModelFit
@@ -77,6 +80,8 @@ set(MITK_MODULES
   Pharmacokinetics
   PharmacokineticsUI
   DICOMPM
+  REST
+  RESTService
 )
 
 if(MITK_ENABLE_PIC_READER)

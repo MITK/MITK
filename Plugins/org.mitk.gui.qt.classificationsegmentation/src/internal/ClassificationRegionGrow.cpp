@@ -54,8 +54,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkStructureTensorEigenvalueImageFilter.h>
 #include <itkLineHistogramBasedMassImageFilter.h>
 #include <mitkHistogramGenerator.h>
-#include <mitkImageStatisticsHolder.h>
-#include <mitkImageStatisticsCalculator.h>
 
 #include <itkImageRegionConstIteratorWithIndex.h>
 #include <itkImageRegionConstIterator.h>
@@ -188,13 +186,6 @@ void ClassificationRegionGrow::OnInitializeSession(const mitk::DataNode *)
 
 void ClassificationRegionGrow::ProcessFeatureImages(const mitk::Image::Pointer & raw_image)
 {
-  typedef itk::Image<double,3> DoubleImageType;
-  typedef itk::Image<short,3> ShortImageType;
-  typedef itk::ConstNeighborhoodIterator<DoubleImageType> NeighborhoodType; // Neighborhood iterator to access image
-  typedef itk::Functor::NeighborhoodFirstOrderStatistics<NeighborhoodType, double> FunctorType;
-  typedef itk::NeighborhoodFunctorImageFilter<DoubleImageType, DoubleImageType, FunctorType> FOSFilerType;
-  typedef FOSFilerType::MaskImageType MaskImageType;
-
   // RAW
   if (m_Controls.UseIntensity->isChecked()) {
     m_FeatureImageVector.push_back(raw_image);
@@ -421,9 +412,6 @@ void ClassificationRegionGrow::TrainClassifier(const mitk::Image::Pointer & raw_
 {
   typedef itk::Image<double, 3> DoubleImageType;
   typedef itk::Image<short, 3> ShortImageType;
-  typedef itk::ConstNeighborhoodIterator<DoubleImageType> NeighborhoodType; // Neighborhood iterator to access image
-  typedef itk::Functor::NeighborhoodFirstOrderStatistics<NeighborhoodType, double> FunctorType;
-  typedef itk::NeighborhoodFunctorImageFilter<DoubleImageType, DoubleImageType, FunctorType> FOSFilerType;
 
   DoubleImageType::Pointer input;
   ShortImageType::Pointer mask;

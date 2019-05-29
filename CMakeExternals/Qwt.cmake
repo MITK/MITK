@@ -38,6 +38,7 @@ if(NOT DEFINED ${proj}_DIR)
      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Qwt-6.1.0.patch
        COMMAND ${CMAKE_COMMAND} -Dproj=${proj} -Dproj_target:STRING=qwt -P ${CMAKE_CURRENT_LIST_DIR}/GenerateDefaultCMakeBuildSystem.cmake
      CMAKE_GENERATOR ${gen}
+     CMAKE_GENERATOR_PLATFORM ${gen_platform}
      CMAKE_ARGS
        ${ep_common_args}
        ${additional_cmake_args}

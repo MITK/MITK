@@ -12,8 +12,9 @@ MITK_CREATE_MODULE(
   #AUTOLOAD_WITH MitkCore
   INCLUDE_DIRS PUBLIC include
   INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
-  PACKAGE_DEPENDS ITK|ITKFFT+ITKImageCompose+ITKImageIntensity OpenCV 
+  PACKAGE_DEPENDS ITK|ITKFFT+ITKImageCompose+ITKImageIntensity OpenCV tinyxml
 )
 
 add_subdirectory(test)
 add_subdirectory(MitkPABeamformingTool)
+add_subdirectory(MitkPAResampleCropTool)

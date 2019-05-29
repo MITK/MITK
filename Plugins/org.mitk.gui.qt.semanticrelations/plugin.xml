@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.semanticrelations"
+          name="Semantic Relations"
+          class="QmitkSemanticRelationsView"
+		  icon="resources/SemanticRelations_48.png" />
+  </extension>
+
+</plugin>

@@ -34,74 +34,36 @@ namespace mitk
   {
   }
 
-  void PlaneGeometry::EnsurePerpendicularNormal(mitk::AffineTransform3D *transform)
+  bool PlaneGeometry::CheckRotationMatrix(mitk::AffineTransform3D *transform, double epsilon)
   {
-    /** \brief ensure column(2) of indexToWorldTransform-matrix to be perpendicular to plane, keep length and
-     * handedness.
-     */
+    bool rotation = true;
 
-    VnlVector normal = vnl_cross_3d(transform->GetMatrix().GetVnlMatrix().get_column(0),
-                                    transform->GetMatrix().GetVnlMatrix().get_column(1));
-    normal.normalize(); // Now normal is a righthand normal unit vector, perpendicular to the plane.
+    auto matrix = transform->GetMatrix().GetVnlMatrix();
+    matrix.normalize_columns();
 
-    ScalarType len = transform->GetMatrix().GetVnlMatrix().get_column(2).two_norm();
-    if (len == 0)
+    auto det = vnl_determinant(matrix);
+    if (fabs(det-1.0) > epsilon)
     {
-      len = 1;
-    }
-    normal *= len;
-
-    // Get the existing normal vector zed:
-    vnl_vector_fixed<double, 3> zed = transform->GetMatrix().GetVnlMatrix().get_column(2);
-
-    /** If det(matrix)<0, multiply normal vector by (-1) to keep geometry lefthanded. */
-    if (vnl_determinant(transform->GetMatrix().GetVnlMatrix()) < 0)
-    {
-      MITK_DEBUG << "EnsurePerpendicularNormal(): Lefthanded geometry preserved, rh-normal: [ " << normal << " ],";
-      normal *= (-1.0);
-      MITK_DEBUG << "lh-normal: [ " << normal << " ], original vector zed is: [ " << zed << " ]";
+      MITK_WARN << "Invalid rotation matrix! Determinant != 1 (" << det << ")";
+      rotation = false;
     }
 
-    // Now lets compare and only replace if necessary and only then warn the user:
-
-    // float epsilon is precise enough here, but we need to respect numerical condition:
-    // Higham, N., 2002, Accuracy and Stability of Numerical Algorithms,
-    // SIAM, page 37, 2nd edition:
-    double feps = std::numeric_limits<float>::epsilon();
-    double zedsMagnitude = zed.two_norm();
-    feps = feps * zedsMagnitude * 2;
-
-    /** Check if normal (3. column) was perpendicular: If not, replace with calculated normal vector: */
-    if (normal != zed)
+    vnl_matrix_fixed<double, 3, 3> id; id.set_identity();
+    auto should_be_id = matrix*matrix.transpose();
+    should_be_id -= id;
+    auto max = should_be_id.absolute_value_max();
+    if (max > epsilon)
     {
-      vnl_vector_fixed<double, 3> parallel;
-      for (unsigned int i = 0; i < 3; ++i)
-      {
-        parallel[i] = normal[i] / zed[i]; // Remember linear algebra: checking for parallelity.
-      }
-      // Checking if really not paralell i.e. non-colinear vectors by comparing these floating point numbers:
-      if ((parallel[0] + feps < parallel[1] || feps + parallel[1] < parallel[0]) &&
-          (parallel[0] + feps < parallel[2] || feps + parallel[2] < parallel[0]))
-      {
-        MITK_WARN
-          << "EnsurePerpendicularNormal(): Plane geometry was _/askew/_, so here it gets rectified by substituting"
-          << " the 3rd column of the indexToWorldMatrix with an appropriate normal vector: [ " << normal
-          << " ], original vector zed was: [ " << zed << " ].";
+      MITK_WARN << "Invalid rotation matrix! R*R^T != ID. Max value: " << max << " (should be 0)";
+      rotation = false;
+    }
 
-        Matrix3D matrix = transform->GetMatrix();
-        matrix.GetVnlMatrix().set_column(2, normal);
-        transform->SetMatrix(matrix);
-      }
-    }
-    else
-    {
-      // Nothing to do, 3rd column of indexToWorldTransformMatrix already was perfectly perpendicular.
-    }
+    return rotation;
   }
 
   void PlaneGeometry::CheckIndexToWorldTransform(mitk::AffineTransform3D *transform)
   {
-    EnsurePerpendicularNormal(transform);
+    CheckRotationMatrix(transform);
   }
 
   void PlaneGeometry::CheckBounds(const BoundingBox::BoundsArrayType &bounds)
@@ -379,6 +341,43 @@ namespace mitk
     this->SetOrigin(origin);
   }
 
+  std::vector< int > PlaneGeometry::CalculateDominantAxes(mitk::AffineTransform3D::MatrixType::InternalMatrixType& rotation_matrix)
+  {
+    std::vector< int > axes;
+
+    bool dominant_axis_error = false;
+    for (int i = 0; i < 3; ++i)
+    {
+      int dominantAxis = itk::Function::Max3(
+          rotation_matrix[0][i],
+          rotation_matrix[1][i],
+          rotation_matrix[2][i]
+      );
+
+      for (int j=0; j<i; ++j)
+        if (axes[j] == dominantAxis)
+        {
+          dominant_axis_error = true;
+          break;
+        }
+      if (dominant_axis_error)
+        break;
+
+      axes.push_back(dominantAxis);
+    }
+
+    if (dominant_axis_error)
+    {
+      MITK_DEBUG << "Error during dominant axis calculation. Using default.";
+      MITK_DEBUG << "This is either caused by an imperfect rotation matrix or if the rotation is axactly 45° around one or more axis.";
+      axes.clear();
+      for (int i = 0; i < 3; ++i)
+        axes.push_back(i);
+    }
+
+    return axes;
+  }
+
   void PlaneGeometry::InitializeStandardPlane(const BaseGeometry *geometry3D,
                                               PlaneOrientation planeorientation,
                                               ScalarType zPosition,
@@ -396,24 +395,19 @@ namespace mitk
     mitk::AffineTransform3D::MatrixType matrix = geometry3D->GetIndexToWorldTransform()->GetMatrix();
 
     matrix.GetVnlMatrix().normalize_columns();
-    mitk::AffineTransform3D::MatrixType::InternalMatrixType inverseMatrix = matrix.GetInverse();
+    mitk::AffineTransform3D::MatrixType::InternalMatrixType inverseMatrix = matrix.GetTranspose();
 
     /// The index of the sagittal, coronal and axial axes in the reference geometry.
-    int axes[3];
+    auto axes = CalculateDominantAxes(inverseMatrix);
     /// The direction of the sagittal, coronal and axial axes in the reference geometry.
     /// +1 means that the direction is straight, i.e. greater index translates to greater
     /// world coordinate. -1 means that the direction is inverted.
     int directions[3];
     ScalarType extents[3];
     ScalarType spacings[3];
-    for (int i = 0; i < 3; ++i)
+    for (int i=0; i<3; ++i)
     {
-      int dominantAxis = itk::Function::Max3(
-          inverseMatrix[0][i],
-          inverseMatrix[1][i],
-          inverseMatrix[2][i]
-      );
-      axes[i] = dominantAxis;
+      int dominantAxis = axes.at(i);
       directions[i] = itk::Function::Sign(inverseMatrix[dominantAxis][i]);
       extents[i] = geometry3D->GetExtent(dominantAxis);
       spacings[i] = geometry3D->GetSpacing()[dominantAxis];
@@ -514,10 +508,7 @@ namespace mitk
     mitk::AffineTransform3D::MatrixType::InternalMatrixType inverseMatrix = matrix.GetInverse();
 
     /// The index of the sagittal, coronal and axial axes in the reference geometry.
-    int dominantAxis = itk::Function::Max3(
-        inverseMatrix[0][worldAxis],
-        inverseMatrix[1][worldAxis],
-        inverseMatrix[2][worldAxis]);
+    int dominantAxis = CalculateDominantAxes(inverseMatrix).at(worldAxis);
 
     ScalarType zPosition = top ? 0.5 : geometry3D->GetExtent(dominantAxis) - 0.5;
 

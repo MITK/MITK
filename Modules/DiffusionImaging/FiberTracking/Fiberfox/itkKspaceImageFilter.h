@@ -75,13 +75,16 @@ namespace itk{
 
     itkSetMacro( SpikesPerSlice, unsigned int )     ///< Number of spikes per slice. Corresponding parameter in fiberfox parameter object specifies the number of spikes for the whole image and can thus not be used here.
     itkSetMacro( Z, double )                        ///< Slice position, necessary for eddy current simulation.
-    itkSetMacro( UseConstantRandSeed, bool )        ///< Use constant seed for random generator for reproducible results. ONLY USE FOR TESTING PURPOSES!
-    itkSetMacro( Rotation, VectorType )
+    itkSetMacro( RandSeed, int )                  ///< Use constant seed for random generator for reproducible results.
     itkSetMacro( Translation, VectorType )
+    itkSetMacro( RotationMatrix, MatrixType )
     itkSetMacro( Zidx, int )
+    itkSetMacro( StoreTimings, bool )
     itkSetMacro( FiberBundle, FiberBundle::Pointer )
     itkSetMacro( CoilPosition, VectorType )
     itkGetMacro( KSpaceImage, typename InputImageType::Pointer )    ///< k-space magnitude image
+    itkGetMacro( TickImage, typename InputImageType::Pointer )    ///< k-space readout ordering encoded in the voxels
+    itkGetMacro( RfImage, typename InputImageType::Pointer )    ///< time passed since last RF pulse encoded per voxel
     itkGetMacro( SpikeLog, std::string )
 
     void SetParameters( FiberfoxParameters* param ){ m_Parameters = param; }
@@ -105,16 +108,21 @@ namespace itk{
     FiberfoxParameters*                     m_Parameters;
     std::vector< float >                    m_T2;
     std::vector< float >                    m_T1;
+    std::vector< float >                    m_T1Relax;
     std::vector< InputImagePointerType >    m_CompartmentImages;
     itk::Vector<double,3>                   m_DiffusionGradientDirection;
     float                                   m_Z;
     int                                     m_Zidx;
-    bool                                    m_UseConstantRandSeed;
+    int                                     m_RandSeed;
+    itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
     unsigned int                            m_SpikesPerSlice;
     FiberBundle::Pointer                    m_FiberBundle;
     float                                   m_Gamma;
-    VectorType                              m_Rotation;     ///< used to find correct point in frequency map (head motion)
     VectorType                              m_Translation;  ///< used to find correct point in frequency map (head motion)
+    MatrixType                              m_RotationMatrix;
+    float                                   m_TransX;
+    float                                   m_TransY;
+    float                                   m_TransZ;
 
     bool                                    m_IsBaseline;
     vcl_complex<ScalarType>                 m_Spike;
@@ -123,11 +131,21 @@ namespace itk{
 
     float                                   m_CoilSensitivityFactor;
     typename InputImageType::Pointer        m_KSpaceImage;
-    typename InputImageType::Pointer        m_TimeFromEchoImage;
-    typename InputImageType::Pointer        m_ReadoutTimeImage;
+    typename InputImageType::Pointer        m_TickImage;
+    typename InputImageType::Pointer        m_RfImage;
     AcquisitionType*                        m_ReadoutScheme;
 
-    itk::LinearInterpolateImageFunction< itk::Image< float, 3 >, float >::Pointer   m_FmapInterpolator;
+    typename itk::Image< ScalarType, 2 >::Pointer m_MovedFmap;
+    int                                     ringing_lines_x;
+    int                                     ringing_lines_y;
+    float                                   kxMax;
+    float                                   kyMax;
+    float                                   xMax;
+    float                                   yMax;
+    float                                   yMaxFov;
+    float                                   yMaxFov_half;
+    float                                   numPix;
+    bool                                    m_StoreTimings;
 
   private:
 

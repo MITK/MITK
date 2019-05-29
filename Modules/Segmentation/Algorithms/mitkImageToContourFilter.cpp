@@ -29,6 +29,7 @@ mitk::ImageToContourFilter::ImageToContourFilter()
 {
   this->m_UseProgressBar = false;
   this->m_ProgressStepSize = 1;
+  this->m_SliceGeometry = nullptr;
 }
 
 mitk::ImageToContourFilter::~ImageToContourFilter()

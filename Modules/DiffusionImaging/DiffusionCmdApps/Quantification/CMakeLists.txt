@@ -15,7 +15,6 @@ if(BUILD_DiffusionQuantificationCmdApps OR MITK_BUILD_ALL_APPS)
     DiffusionIndices^^
     QballReconstruction^^
     TensorReconstruction^^
-    TensorDerivedMapsExtraction^^
     DiffusionKurtosisFit^^
     MultishellMethods^^
     )

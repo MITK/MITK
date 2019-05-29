@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/QmitkFiberprocessing">
+        <file>FiberBundle.png</file>
+        <file>circle.png</file>
+        <file>polygon.png</file>
+    </qresource>
+</RCC>

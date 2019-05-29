@@ -30,4 +30,19 @@
 
   </extension>
 
+
+
+    <extension point="org.blueberry.ui.keywords">
+
+    <keyword label="segmentation" id="org.mitk.views.brainextraction.Keyword"/>
+    <keyword label="segmentation" id="org.mitk.views.tractseg.Keyword"/>
+    <keyword label="fiber" id="org.mitk.views.tractseg.Keyword"/>
+    <keyword label="bundle" id="org.mitk.views.tractseg.Keyword"/>
+    <keyword label="tract" id="org.mitk.views.tractseg.Keyword"/>
+    <keyword label="TOM" id="org.mitk.views.tractseg.Keyword"/>
+    <keyword label="map" id="org.mitk.views.tractseg.Keyword"/>
+    <keyword label="orientation" id="org.mitk.views.tractseg.Keyword"/>
+
+    </extension>
+
 </plugin>

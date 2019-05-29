@@ -224,7 +224,7 @@ namespace mitk
     std::string m_EventConfig;
 
     Tool();             // purposely hidden
-    Tool(const char *); // purposely hidden
+    Tool(const char *, const us::Module *interactorModule = nullptr); // purposely hidden
     ~Tool() override;
 
     void Notify(InteractionEvent *interactionEvent, bool isHandled) override;
@@ -262,6 +262,8 @@ namespace mitk
     std::string m_InteractorType;
 
     std::map<us::ServiceReferenceU, EventConfig> m_DisplayInteractorConfigs;
+
+    const us::Module *m_InteractorModule;
   };
 
 } // namespace

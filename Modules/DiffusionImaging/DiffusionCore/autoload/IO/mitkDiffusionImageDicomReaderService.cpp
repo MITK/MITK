@@ -77,6 +77,7 @@ DiffusionImageDicomReaderService()
   : mitk::AbstractFileReader( CustomMimeType( mitk::DiffusionCoreIOMimeTypes::DWI_DICOM_MIMETYPE() ), mitk::DiffusionCoreIOMimeTypes::DWI_DICOM_MIMETYPE_DESCRIPTION() )
 {
   Options defaultOptions;
+  defaultOptions["Apply image rotation to gradients"] = true;
   defaultOptions["Load recursive"] = false;
   defaultOptions["Split mosaic"] = true;
   this->SetDefaultOptions(defaultOptions);
@@ -202,6 +203,7 @@ std::vector<itk::SmartPointer<mitk::BaseData> > DiffusionImageDicomReaderService
       gdcmReader->SetResolveMosaic( split_mosaic );
       gdcmReader->AddSortingElement( tagSorter );
       gdcmReader->SetInputFiles( complete_list );
+      gdcmReader->SetApplyRotationToGradients(us::any_cast<bool>(options["Apply image rotation to gradients"]));
       try
       {
         gdcmReader->AnalyzeInputFiles();
@@ -268,7 +270,6 @@ std::vector<itk::SmartPointer<mitk::BaseData> > DiffusionImageDicomReaderService
           val = gdcmReader->frame_of_reference_uids().at(o);
           loaded_image->GetPropertyList()->SetStringProperty("DICOM.frame_of_reference_uid",val.c_str());
         }
-
         result_images.push_back(loaded_image.GetPointer());
       }
 

@@ -29,8 +29,10 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.extapplication:OFF
   org.mitk.gui.qt.common:ON
   org.mitk.gui.qt.stdmultiwidgeteditor:ON
+  org.mitk.gui.qt.mxnmultiwidgeteditor:OFF
   org.mitk.gui.qt.common.legacy:OFF
   org.mitk.gui.qt.cmdlinemodules:OFF
+  org.mitk.gui.qt.chartExample:OFF
   org.mitk.gui.qt.diffusionimagingapp:OFF
   org.mitk.gui.qt.datamanager:ON
   org.mitk.gui.qt.datamanagerlight:OFF
@@ -50,7 +52,6 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.diffusionimaging.preprocessing:OFF
   org.mitk.gui.qt.diffusionimaging.reconstruction:OFF
   org.mitk.gui.qt.diffusionimaging.registration:OFF
-  org.mitk.gui.qt.diffusionimaging.tbss:OFF
   org.mitk.gui.qt.diffusionimaging.tractography:OFF
   org.mitk.gui.qt.diffusionimaging.python:OFF
   org.mitk.gui.qt.dosevisualization:OFF
@@ -72,6 +73,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.segmentation:OFF
   org.mitk.gui.qt.aicpregistration:OFF
   org.mitk.gui.qt.renderwindowmanager:OFF
+  org.mitk.gui.qt.semanticrelations:OFF
   org.mitk.gui.qt.toftutorial:OFF
   org.mitk.gui.qt.tofutil:OFF
   org.mitk.gui.qt.tubegraph:OFF
@@ -85,7 +87,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.volumevisualization:OFF
   org.mitk.gui.qt.eventrecorder:OFF
   org.mitk.gui.qt.xnat:OFF
-  org.mitk.gui.qt.igt.app.echotrack:OFF
+  org.mitk.gui.qt.igt.app.ultrasoundtrackingnavigation:OFF
   org.mitk.gui.qt.spectrocamrecorder:OFF
   org.mitk.gui.qt.classificationsegmentation:OFF
   org.mitk.gui.qt.overlaymanager:OFF

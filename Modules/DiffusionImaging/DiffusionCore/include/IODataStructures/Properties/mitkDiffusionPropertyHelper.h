@@ -49,7 +49,6 @@ namespace mitk
     static bool IsDiffusionWeightedImage(const mitk::Image *);
     static bool IsDiffusionWeightedImage(const mitk::DataNode* node);
 
-    static void ClearMeasurementFrameAndRotationMatrixFromGradients(mitk::Image* image);
     static void CopyProperties(mitk::Image* source, mitk::Image* target, bool ignore_original_gradients=false);
 
     static ImageType::Pointer GetItkVectorImage(Image *image);
@@ -60,6 +59,8 @@ namespace mitk
     static GradientDirectionsContainerType::Pointer GetOriginalGradientContainer(const mitk::Image *);
     static GradientDirectionsContainerType::Pointer GetGradientContainer(const mitk::Image *);
 
+    static void SetApplyMatrixToGradients(mitk::Image* image, bool apply);
+    static void SetApplyMfToGradients(mitk::Image* image, bool apply);
     static void SetMeasurementFrame(mitk::Image* image, MeasurementFrameType mf);
     static void SetReferenceBValue(mitk::Image* image, float b_value);
     static void SetBValueMap(mitk::Image* image, BValueMapType map);
@@ -90,7 +91,8 @@ namespace mitk
     static const std::string REFERENCEBVALUEPROPERTYNAME;
     static const std::string BVALUEMAPPROPERTYNAME;
     static const std::string MODALITY;
-    static const std::string KEEP_ORIGINAL_DIRECTIONS;
+    static const std::string APPLY_MATRIX_TO_GRADIENTS;
+    static const std::string APPLY_MF_TO_GRADIENTS;
 
     /**
     * \brief Apply the previously set MeasurementFrame and the image rotation matrix to all gradients

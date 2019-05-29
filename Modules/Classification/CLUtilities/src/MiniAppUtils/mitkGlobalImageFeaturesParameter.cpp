@@ -34,16 +34,16 @@ static bool fileExists(const std::string& filename)
 void mitk::cl::GlobalImageFeaturesParameter::AddParameter(mitkCommandLineParser &parser)
 {
   // Required Parameter
-  parser.addArgument("image",   "i", mitkCommandLineParser::InputImage, "Input Image", "Path to the input image file", us::Any(), false);
-  parser.addArgument("mask", "m", mitkCommandLineParser::InputImage, "Input Mask", "Path to the mask Image that specifies the area over for the statistic (Values = 1)", us::Any(), false);
-  parser.addArgument("morph-mask", "morph", mitkCommandLineParser::InputImage, "Morphological Image Mask", "Path to the mask Image that specifies the area over for the statistic (Values = 1)", us::Any());
-  parser.addArgument("output",  "o", mitkCommandLineParser::OutputFile, "Output text file", "Path to output file. The output statistic is appended to this file.", us::Any(), false);
+  parser.addArgument("image",   "i", mitkCommandLineParser::Image, "Input Image", "Path to the input image file", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("mask", "m", mitkCommandLineParser::Image, "Input Mask", "Path to the mask Image that specifies the area over for the statistic (Values = 1)", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("morph-mask", "morph", mitkCommandLineParser::Image, "Morphological Image Mask", "Path to the mask Image that specifies the area over for the statistic (Values = 1)", us::Any(), true, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("output",  "o", mitkCommandLineParser::File, "Output text file", "Path to output file. The output statistic is appended to this file.", us::Any(), false, false, false, mitkCommandLineParser::Output);
 
   // Optional Parameter
-  parser.addArgument("logfile",    "log",         mitkCommandLineParser::InputFile, "Text Logfile", "Path to the location of the target log file. ", us::Any());
-  parser.addArgument("save-image", "save-image",  mitkCommandLineParser::OutputFile, "Output Image", "If spezified, the image that is used for the analysis is saved to this location.", us::Any());
-  parser.addArgument("save-mask", "save-mask",    mitkCommandLineParser::OutputFile, "Output Image", "If spezified, the mask that is used for the analysis is saved to this location. ", us::Any());
-  parser.addArgument("save-image-screenshots", "save-screenshot", mitkCommandLineParser::OutputFile, "Output Image", "If spezified,  a screenshot of each slice is saved. Specify an EXISTING folder with prefix (for example ~/demo/ or ~/demo/image-", us::Any());
+  parser.addArgument("logfile",    "log",         mitkCommandLineParser::File, "Text Logfile", "Path to the location of the target log file. ", us::Any(), true, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("save-image", "save-image",  mitkCommandLineParser::File, "Output Image", "If spezified, the image that is used for the analysis is saved to this location.", us::Any(), true, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("save-mask", "save-mask",    mitkCommandLineParser::File, "Output Image", "If spezified, the mask that is used for the analysis is saved to this location. ", us::Any(), true, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("save-image-screenshots", "save-screenshot", mitkCommandLineParser::File, "Output Image", "If spezified,  a screenshot of each slice is saved. Specify an EXISTING folder with prefix (for example ~/demo/ or ~/demo/image-", us::Any(), true, false, false, mitkCommandLineParser::Output);
 
   parser.addArgument("header",            "head",    mitkCommandLineParser::Bool, "Add Header (Labels) to output", "", us::Any());
   parser.addArgument("first-line-header", "fl-head", mitkCommandLineParser::Bool, "Add Header (Labels) to first line of output", "", us::Any());

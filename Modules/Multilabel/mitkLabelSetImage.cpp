@@ -18,7 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageAccessByItk.h"
 #include "mitkImageCast.h"
-#include "mitkImageReadAccessor.h"
+#include "mitkImagePixelReadAccessor.h"
+#include "mitkImagePixelWriteAccessor.h"
 #include "mitkInteractionConst.h"
 #include "mitkLookupTableProperty.h"
 #include "mitkPadImageFilter.h"
@@ -41,6 +42,26 @@ template <typename TPixel, unsigned int VDimensions>
 void SetToZero(itk::Image<TPixel, VDimensions> *source)
 {
   source->FillBuffer(0);
+}
+
+template <unsigned int VImageDimension = 3>
+void CreateLabelMaskProcessing(mitk::Image *layerImage, mitk::Image *mask, mitk::LabelSet::PixelType index)
+{
+  mitk::ImagePixelReadAccessor<mitk::LabelSet::PixelType, VImageDimension> readAccessor(layerImage);
+  mitk::ImagePixelWriteAccessor<mitk::LabelSet::PixelType, VImageDimension> writeAccessor(mask);
+
+  std::size_t numberOfPixels = 1;
+  for (int dim = 0; dim < static_cast<int>(VImageDimension); ++dim)
+    numberOfPixels *= static_cast<std::size_t>(readAccessor.GetDimension(dim));
+
+  auto src = readAccessor.GetData();
+  auto dest = writeAccessor.GetData();
+
+  for (std::size_t i = 0; i < numberOfPixels; ++i)
+  {
+    if (index == *(src + i))
+      *(dest + i) = 1;
+  }
 }
 
 mitk::LabelSetImage::LabelSetImage()
@@ -80,6 +101,9 @@ mitk::LabelSetImage::LabelSetImage(const mitk::LabelSetImage &other)
     mitk::Image::Pointer liClone = other.GetLayerImage(i)->Clone();
     m_LayerContainer.push_back(liClone);
   }
+
+  // Add some DICOM Tags as properties to segmentation image
+  DICOMSegmentationPropertyHandler::DeriveDICOMSegmentationProperties(this);
 }
 
 void mitk::LabelSetImage::OnLabelSetModified()
@@ -548,32 +572,50 @@ void mitk::LabelSetImage::MaskStamp(mitk::Image *mask, bool forceOverwrite)
   }
 }
 
-mitk::Image::Pointer mitk::LabelSetImage::CreateLabelMask(PixelType index)
+mitk::Image::Pointer mitk::LabelSetImage::CreateLabelMask(PixelType index, bool useActiveLayer, unsigned int layer)
 {
-  mitk::Image::Pointer mask = mitk::Image::New();
+  auto previousActiveLayer = this->GetActiveLayer();
+  auto mask = mitk::Image::New();
+
   try
   {
     mask->Initialize(this);
 
-    unsigned int byteSize = sizeof(LabelSetImage::PixelType);
+    auto byteSize = sizeof(LabelSetImage::PixelType);
     for (unsigned int dim = 0; dim < mask->GetDimension(); ++dim)
-    {
       byteSize *= mask->GetDimension(dim);
+
+    {
+      ImageWriteAccessor accessor(mask);
+      memset(accessor.GetData(), 0, byteSize);
     }
 
-    mitk::ImageWriteAccessor *accessor = new mitk::ImageWriteAccessor(static_cast<mitk::Image *>(mask));
-    memset(accessor->GetData(), 0, byteSize);
-    delete accessor;
+    if (!useActiveLayer)
+      this->SetActiveLayer(layer);
 
-    auto geometry = this->GetTimeGeometry()->Clone();
-    mask->SetTimeGeometry(geometry);
-
-    AccessByItk_2(this, CreateLabelMaskProcessing, mask, index);
+    if (4 == this->GetDimension())
+    {
+      ::CreateLabelMaskProcessing<4>(this, mask, index);
+    }
+    else if (3 == this->GetDimension())
+    {
+      ::CreateLabelMaskProcessing(this, mask, index);
+    }
+    else
+    {
+      mitkThrow();
+    }
   }
   catch (...)
   {
+    if (!useActiveLayer)
+      this->SetActiveLayer(previousActiveLayer);
+
     mitkThrow() << "Could not create a mask out of the selected label.";
   }
+
+  if (!useActiveLayer)
+    this->SetActiveLayer(previousActiveLayer);
 
   return mask;
 }
@@ -700,33 +742,6 @@ void mitk::LabelSetImage::MaskStampProcessing(ImageType *itkImage, mitk::Image *
   }
 
   this->Modified();
-}
-
-template <typename ImageType>
-void mitk::LabelSetImage::CreateLabelMaskProcessing(ImageType *itkImage, mitk::Image *mask, PixelType index)
-{
-  typename ImageType::Pointer itkMask;
-  mitk::CastToItkImage(mask, itkMask);
-
-  typedef itk::ImageRegionConstIterator<ImageType> SourceIteratorType;
-  typedef itk::ImageRegionIterator<ImageType> TargetIteratorType;
-
-  SourceIteratorType sourceIter(itkImage, itkImage->GetLargestPossibleRegion());
-  sourceIter.GoToBegin();
-
-  TargetIteratorType targetIter(itkMask, itkMask->GetLargestPossibleRegion());
-  targetIter.GoToBegin();
-
-  while (!sourceIter.IsAtEnd())
-  {
-    PixelType sourceValue = sourceIter.Get();
-    if (sourceValue == index)
-    {
-      targetIter.Set(1);
-    }
-    ++sourceIter;
-    ++targetIter;
-  }
 }
 
 template <typename ImageType>

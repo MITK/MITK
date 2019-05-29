@@ -130,9 +130,9 @@ int main(int argc, char* argv[])
   mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
 
-  parser.addArgument("image", "i", mitkCommandLineParser::InputImage, "Input Image", "", us::Any(),false);
-  parser.addArgument("mask", "m", mitkCommandLineParser::InputImage, "Input Image", "", us::Any(),false);
-  parser.addArgument("output", "o", mitkCommandLineParser::InputImage, "Output Image", "", us::Any(),false);
+  parser.addArgument("image", "i", mitkCommandLineParser::Image, "Input Image", "", us::Any(),false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("mask", "m", mitkCommandLineParser::Image, "Input Image", "", us::Any(),false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("output", "o", mitkCommandLineParser::Image, "Output Image", "", us::Any(),false, false, false, mitkCommandLineParser::Input);
 
   // Miniapp Infos
   parser.setCategory("Classification Tools");

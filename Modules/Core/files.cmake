@@ -126,7 +126,6 @@ set(CPP_FILES
   DataManagement/mitkNodePredicateProperty.cpp
   DataManagement/mitkNodePredicateDataProperty.cpp
   DataManagement/mitkNodePredicateSource.cpp
-  DataManagement/mitkNodePredicateUID.cpp
   DataManagement/mitkNumericConstants.cpp
   DataManagement/mitkPlaneGeometry.cpp
   DataManagement/mitkPlaneGeometryData.cpp
@@ -163,6 +162,7 @@ set(CPP_FILES
   DataManagement/mitkStringProperty.cpp
   DataManagement/mitkSurface.cpp
   DataManagement/mitkSurfaceOperation.cpp
+  DataManagement/mitkSourceImageRelationRule.cpp
   DataManagement/mitkThinPlateSplineCurvedGeometry.cpp
   DataManagement/mitkTimeGeometry.cpp
   DataManagement/mitkTransferFunction.cpp
@@ -188,6 +188,9 @@ set(CPP_FILES
   Interactions/mitkDispatcher.cpp
   Interactions/mitkDisplayCoordinateOperation.cpp
   Interactions/mitkDisplayInteractor.cpp
+  Interactions/mitkDisplayActionEventBroadcast.cpp
+  Interactions/mitkDisplayActionEventFunctions.cpp
+  Interactions/mitkDisplayActionEventHandler.cpp
   Interactions/mitkEventConfig.cpp
   Interactions/mitkEventFactory.cpp
   Interactions/mitkEventRecorder.cpp
@@ -198,6 +201,7 @@ set(CPP_FILES
   Interactions/mitkInteractionEventObserver.cpp
   Interactions/mitkInteractionKeyEvent.cpp
   Interactions/mitkInteractionPositionEvent.cpp
+  Interactions/mitkInteractionSchemeSwitcher.cpp
   Interactions/mitkInternalEvent.cpp
   Interactions/mitkMouseDoubleClickEvent.cpp
   Interactions/mitkMouseModeSwitcher.cpp
@@ -212,6 +216,7 @@ set(CPP_FILES
   Interactions/mitkStateMachineContainer.cpp
   Interactions/mitkStateMachineState.cpp
   Interactions/mitkStateMachineTransition.cpp
+  Interactions/mitkStdDisplayActionEventHandler.cpp
   Interactions/mitkVtkEventAdapter.cpp
   Interactions/mitkVtkInteractorStyle.cxx
   Interactions/mitkXML2EventParser.cpp

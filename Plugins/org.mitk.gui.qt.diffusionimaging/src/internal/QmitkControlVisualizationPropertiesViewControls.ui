@@ -508,14 +508,14 @@ QGroupBox {
          <item>
           <widget class="QToolButton" name="m_SetColor2">
            <property name="toolTip">
-            <string>Reset to Default Coloring</string>
+            <string>Select Fiber Color</string>
            </property>
            <property name="text">
             <string/>
            </property>
            <property name="icon">
             <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-             <normaloff>:/QmitkDiffusionImaging/color64.gif</normaloff>:/QmitkDiffusionImaging/color64.gif</iconset>
+             <normaloff>:/QmitkDiffusionImaging/color64.png</normaloff>:/QmitkDiffusionImaging/color64.png</iconset>
            </property>
           </widget>
          </item>
@@ -853,14 +853,14 @@ p, li { white-space: pre-wrap; }
          <item row="0" column="0">
           <widget class="QToolButton" name="m_SetColor1">
            <property name="toolTip">
-            <string>Reset to Default Coloring</string>
+            <string>Select Fiber Color</string>
            </property>
            <property name="text">
             <string/>
            </property>
            <property name="icon">
             <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-             <normaloff>:/QmitkDiffusionImaging/color64.gif</normaloff>:/QmitkDiffusionImaging/color64.gif</iconset>
+             <normaloff>:/QmitkDiffusionImaging/color64.png</normaloff>:/QmitkDiffusionImaging/color64.png</iconset>
            </property>
           </widget>
          </item>

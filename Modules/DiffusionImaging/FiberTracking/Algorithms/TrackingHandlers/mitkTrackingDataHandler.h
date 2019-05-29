@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/random/mersenne_twister.hpp>
 #include <mitkDiffusionFunctionCollection.h>
 #include <itkLinearInterpolateImageFunction.h>
+#include <mitkStreamlineTractographyParameters.h>
 
 namespace mitk
 {
@@ -39,11 +40,6 @@ class MITKFIBERTRACKING_EXPORT TrackingDataHandler
 
 public:
 
-  enum MODE {
-    DETERMINISTIC,
-    PROBABILISTIC
-  };
-
   TrackingDataHandler();
   virtual ~TrackingDataHandler(){}
 
@@ -54,6 +50,7 @@ public:
   typedef itk::Image<float, 3>          ItkFloatImgType;
   typedef itk::Image<double, 3>         ItkDoubleImgType;
   typedef vnl_vector_fixed< float, 3 >  TrackingDirectionType;
+  typedef mitk::StreamlineTractographyParameters::MODE MODE;
 
   virtual TrackingDirectionType ProposeDirection(const itk::Point<float, 3>& pos, std::deque< TrackingDirectionType >& olddirs, itk::Index<3>& oldIndex) = 0;  ///< predicts next progression direction at the given position
 
@@ -63,20 +60,12 @@ public:
   virtual itk::Matrix<double, 3, 3> GetDirection() = 0;
   virtual itk::ImageRegion<3> GetLargestPossibleRegion() = 0;
   virtual bool WorldToIndex(itk::Point<float, 3>& pos, itk::Index<3>& index) = 0;
-  virtual void SetMode(MODE m) = 0;
-  MODE GetMode() const { return m_Mode; }
 
-  void SetInterpolate( bool interpolate ){ m_Interpolate = interpolate; }
-  bool GetInterpolate() const { return m_Interpolate; }
-
-  void SetAngularThreshold( float a ){ m_AngularThreshold = a; }
-  void SetFlipX( bool f ){ m_FlipX = f; }
-  void SetFlipY( bool f ){ m_FlipY = f; }
-  void SetFlipZ( bool f ){ m_FlipZ = f; }
-  void SetRandom( bool random )
+  void SetParameters(std::shared_ptr< mitk::StreamlineTractographyParameters > parameters)
   {
-    m_Random = random;
-    if (!random)
+    m_Parameters = parameters;
+
+    if (m_Parameters->m_FixRandomSeed)
     {
       m_Rng.seed(0);
       std::srand(0);
@@ -94,27 +83,37 @@ public:
   {
     return m_RngItk->GetUniformVariate(a, b);
   }
-  bool GetFlipX() const { return m_FlipX; }
-  bool GetFlipY() const { return m_FlipY; }
-  bool GetFlipZ() const { return m_FlipZ; }
 
 protected:
 
-  float               m_AngularThreshold;
-  bool                m_Interpolate;
-  bool                m_FlipX;
-  bool                m_FlipY;
-  bool                m_FlipZ;
-  MODE                m_Mode;
+  void CalculateMinVoxelSize()
+  {
+    itk::Vector< double, 3 > imageSpacing = this->GetSpacing();
+    float minVoxelSize = 0;
+    if(imageSpacing[0]<imageSpacing[1] && imageSpacing[0]<imageSpacing[2])
+      minVoxelSize = static_cast<float>(imageSpacing[0]);
+    else if (imageSpacing[1] < imageSpacing[2])
+      minVoxelSize = static_cast<float>(imageSpacing[1]);
+    else
+      minVoxelSize = static_cast<float>(imageSpacing[2]);
+
+    if (m_Parameters==nullptr)
+      mitkThrow() << "No tractography parameter opbect set!";
+
+    m_Parameters->SetMinVoxelSizeMm(minVoxelSize);
+  }
+
   BoostRngType        m_Rng;
   ItkRngType::Pointer m_RngItk;
   bool                m_NeedsDataInit;
-  bool                m_Random;
+  std::shared_ptr< mitk::StreamlineTractographyParameters > m_Parameters;
 
   void DataModified()
   {
     m_NeedsDataInit = true;
   }
+
+  vnl_matrix_fixed<float,3,3> m_FloatImageRotation;
 
 };
 

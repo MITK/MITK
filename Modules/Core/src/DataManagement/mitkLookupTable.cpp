@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <Colortables/PETColor.h>
 #include <mitkLookupTableProperty.h>
 
-const char *const mitk::LookupTable::typenameList[] = {
+std::vector<std::string> mitk::LookupTable::typenameList = {
   "Grayscale",
   "Inverse Grayscale",
   "Hot Iron",
@@ -45,11 +45,10 @@ const char *const mitk::LookupTable::typenameList[] = {
   "Legacy Rainbow Color",
   "Multilabel",
   "PET Color",
-  "PET 20",
-  "END_OF_ARRAY" // Do not add typenames after this entry (see QmitkDataManagerView::ColormapMenuAboutToShow())
+  "PET 20"
 };
 
-mitk::LookupTable::LookupTable() : m_Window(0.0), m_Level(0.0), m_Opacity(1.0), m_type(mitk::LookupTable::GRAYSCALE)
+mitk::LookupTable::LookupTable() : m_Window(0.0), m_Level(0.0), m_Opacity(1.0), m_Type(mitk::LookupTable::GRAYSCALE)
 {
   m_LookupTable = vtkSmartPointer<vtkLookupTable>::New();
   this->BuildGrayScaleLookupTable();
@@ -78,7 +77,7 @@ void mitk::LookupTable::SetVtkLookupTable(vtkSmartPointer<vtkLookupTable> lut)
 
 void mitk::LookupTable::SetType(const mitk::LookupTable::LookupTableType type)
 {
-  if (m_type == type)
+  if (m_Type == type)
     return;
 
   switch (type)
@@ -130,33 +129,34 @@ void mitk::LookupTable::SetType(const mitk::LookupTable::LookupTableType type)
       return;
   }
 
-  m_type = type;
+  m_Type = type;
 }
 
 void mitk::LookupTable::SetType(const std::string &typeName)
 {
-  int i = 0;
-  std::string lutType = this->typenameList[i];
-
-  while (lutType != "END_OF_ARRAY")
+  for (size_t i = 0; i < typenameList.size(); ++i)
   {
-    if (lutType == typeName)
+    if (typenameList.at(i) == typeName)
     {
       this->SetType(static_cast<mitk::LookupTable::LookupTableType>(i));
     }
 
-    lutType = this->typenameList[++i];
   }
 }
 
 mitk::LookupTable::LookupTableType mitk::LookupTable::GetActiveType() const
 {
-  return m_type;
+  return m_Type;
 }
 
 std::string mitk::LookupTable::GetActiveTypeAsString() const
 {
-  return std::string(typenameList[(int)m_type]);
+  if (static_cast<unsigned int>(m_Type) < typenameList.size())
+  {
+    return typenameList.at(m_Type);
+  }
+
+  return "";
 }
 
 void mitk::LookupTable::ChangeOpacityForAll(float opacity)

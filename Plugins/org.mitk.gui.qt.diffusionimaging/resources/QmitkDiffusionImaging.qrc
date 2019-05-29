@@ -12,9 +12,6 @@
         <file>glyphson_C.png</file>
         <file>glyphson_S.png</file>
         <file>glyphson_T.png</file>
-        <file>color24.gif</file>
-        <file>color48.gif</file>
-        <file>color64.gif</file>
         <file>crosshair.png</file>
         <file>paint2.png</file>
         <file>reset.png</file>
@@ -29,5 +26,6 @@
         <file>segmentation.svg</file>
         <file>sh.png</file>
         <file>tensor.png</file>
+        <file>color64.png</file>
     </qresource>
 </RCC>

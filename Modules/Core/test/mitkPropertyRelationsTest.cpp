@@ -42,11 +42,11 @@ class mitkPropertyRelationsTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 private:
-  mitk::PropertyRelationRuleBase::Pointer rule1;
-  mitk::PropertyRelationRuleBase::Pointer rule2;
-  mitk::PropertyRelationRuleBase::Pointer rule3;
-  mitk::PropertyRelationRuleBase::Pointer rule4;
-  mitk::PropertyRelationRuleBase::Pointer unkownRule;
+  mitk::GenericIDRelationRule::Pointer rule1;
+  mitk::GenericIDRelationRule::Pointer rule2;
+  mitk::GenericIDRelationRule::Pointer rule3;
+  mitk::GenericIDRelationRule::Pointer rule4;
+  mitk::GenericIDRelationRule::Pointer unkownRule;
 
   mitk::DataNode::Pointer unRelated;
   mitk::DataNode::Pointer destination;

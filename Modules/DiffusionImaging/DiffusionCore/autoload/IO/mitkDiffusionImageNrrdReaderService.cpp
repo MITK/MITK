@@ -70,6 +70,9 @@ namespace mitk
   DiffusionImageNrrdReaderService()
     : mitk::AbstractFileReader( CustomMimeType( mitk::DiffusionCoreIOMimeTypes::DWI_NRRD_MIMETYPE() ), mitk::DiffusionCoreIOMimeTypes::DWI_NRRD_MIMETYPE_DESCRIPTION() )
   {
+    Options defaultOptions;
+    defaultOptions["Apply image rotation to gradients"] = true;
+    this->SetDefaultOptions(defaultOptions);
     m_ServiceReg = this->RegisterService();
   }
 
@@ -218,6 +221,7 @@ namespace mitk
         mitk::DiffusionPropertyHelper::SetMeasurementFrame(outputForCache, MeasurementFrame);
         mitk::DiffusionPropertyHelper::SetBValueMap(outputForCache, BValueMap);
         mitk::DiffusionPropertyHelper::SetReferenceBValue(outputForCache, BValue);
+        mitk::DiffusionPropertyHelper::SetApplyMatrixToGradients(outputForCache, us::any_cast<bool>(this->GetOptions()["Apply image rotation to gradients"]));
         mitk::DiffusionPropertyHelper::InitializeImage(outputForCache);
 
         // Since we have already read the tree, we can store it in a cache variable

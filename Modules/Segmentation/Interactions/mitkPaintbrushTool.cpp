@@ -27,8 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLabelSetImage.h"
 #include "mitkLevelWindowProperty.h"
 
-#define ROUND(a) ((a) > 0 ? (int)((a) + 0.5) : -(int)(0.5 - (a)))
-
 int mitk::PaintbrushTool::m_Size = 1;
 
 mitk::PaintbrushTool::PaintbrushTool(int paintingPixelValue)
@@ -344,19 +342,16 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent *interactionEvent, 
 
   m_WorkingSlice->GetGeometry()->WorldToIndex(worldCoordinates, indexCoordinates);
 
-  MITK_DEBUG << "Mouse at W " << worldCoordinates << std::endl;
-  MITK_DEBUG << "Mouse at I " << indexCoordinates << std::endl;
-
   // round to nearest voxel center (abort if this hasn't changed)
   if (m_Size % 2 == 0) // even
   {
-    indexCoordinates[0] = ROUND(indexCoordinates[0]); // /*+ 0.5*/) + 0.5;
-    indexCoordinates[1] = ROUND(indexCoordinates[1]); // /*+ 0.5*/ ) + 0.5;
+    indexCoordinates[0] = std::round(indexCoordinates[0]);
+    indexCoordinates[1] = std::round(indexCoordinates[1]);
   }
   else // odd
   {
-    indexCoordinates[0] = ROUND(indexCoordinates[0]);
-    indexCoordinates[1] = ROUND(indexCoordinates[1]);
+    indexCoordinates[0] = std::round(indexCoordinates[0]);
+    indexCoordinates[1] = std::round(indexCoordinates[1]);
   }
 
   static Point3D lastPos; // uninitialized: if somebody finds out how this can be initialized in a one-liner, tell me
@@ -367,29 +362,25 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent *interactionEvent, 
   }
   else
   {
-    MITK_DEBUG << "." << std::flush;
     return;
   }
 
-  MITK_DEBUG << "Mouse at C " << indexCoordinates;
+  int t = positionEvent->GetSender()->GetTimeStep();
 
-  int timestep = positionEvent->GetSender()->GetTimeStep();
-
-  ContourModel::Pointer contour = ContourModel::New();
-  contour->Expand(timestep + 1);
-  contour->SetClosed(true, timestep);
+  auto contour = ContourModel::New();
+  contour->SetClosed(true);
 
   auto it = m_MasterContour->Begin();
   auto end = m_MasterContour->End();
 
   while (it != end)
   {
-    Point3D point = (*it)->Coordinates;
+    auto point = (*it)->Coordinates;
     point[0] += indexCoordinates[0];
     point[1] += indexCoordinates[1];
 
-    contour->AddVertex(point, timestep);
-    it++;
+    contour->AddVertex(point);
+    ++it;
   }
 
   if (leftMouseButtonPressed)
@@ -409,7 +400,7 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent *interactionEvent, 
 
     // m_PaintingPixelValue only decides whether to paint or erase
     mitk::ContourModelUtils::FillContourInSlice(
-      contour, timestep, m_WorkingSlice, image, m_PaintingPixelValue * activeColor);
+      contour, m_WorkingSlice, image, m_PaintingPixelValue * activeColor);
 
     m_WorkingNode->SetData(m_WorkingSlice);
     m_WorkingNode->Modified();
@@ -461,7 +452,7 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent *interactionEvent, 
 
       contour->AddVertex(vertex);
 
-      mitk::ContourModelUtils::FillContourInSlice(contour, timestep, m_WorkingSlice, image, m_PaintingPixelValue * activeColor);
+      mitk::ContourModelUtils::FillContourInSlice(contour, m_WorkingSlice, image, m_PaintingPixelValue * activeColor);
       m_WorkingNode->SetData(m_WorkingSlice);
       m_WorkingNode->Modified();
     }
@@ -480,7 +471,7 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent *interactionEvent, 
   displayContour->Clear();
 
   ContourModel::Pointer tmp =
-    FeedbackContourTool::BackProjectContourFrom2DSlice(m_WorkingSlice->GetGeometry(), /*displayContour*/ contour);
+    FeedbackContourTool::BackProjectContourFrom2DSlice(m_WorkingSlice->GetGeometry(), contour);
 
   // copy transformed contour into display contour
   it = tmp->Begin();
@@ -490,7 +481,7 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent *interactionEvent, 
   {
     Point3D point = (*it)->Coordinates;
 
-    displayContour->AddVertex(point, timestep);
+    displayContour->AddVertex(point, t);
     it++;
   }
 

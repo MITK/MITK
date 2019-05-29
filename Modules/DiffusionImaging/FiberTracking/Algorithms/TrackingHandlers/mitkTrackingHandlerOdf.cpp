@@ -25,10 +25,7 @@ namespace mitk
 {
 
 TrackingHandlerOdf::TrackingHandlerOdf()
-  : m_GfaThreshold(0.2)
-  , m_OdfThreshold(0.1)
-  , m_SharpenOdfs(false)
-  , m_NumProbSamples(1)
+  : m_NumProbSamples(1)
   , m_OdfFromTensor(false)
 {
   m_GfaInterpolator = itk::LinearInterpolateImageFunction< itk::Image< float, 3 >, float >::New();
@@ -60,6 +57,13 @@ void TrackingHandlerOdf::InitForTracking()
         m_OdfHemisphereIndices.push_back(i);
     m_OdfFloatDirs.set_size(m_OdfHemisphereIndices.size(), 3);
 
+    auto double_dir = m_OdfImage->GetDirection().GetVnlMatrix();
+    for (int r=0; r<3; r++)
+      for (int c=0; c<3; c++)
+      {
+        m_FloatImageRotation[r][c] = double_dir[r][c];
+      }
+
     for (unsigned int i=0; i<m_OdfHemisphereIndices.size(); i++)
     {
       m_OdfFloatDirs[i][0] = odf.GetDirection(m_OdfHemisphereIndices[i])[0];
@@ -78,15 +82,22 @@ void TrackingHandlerOdf::InitForTracking()
       m_GfaImage = gfaFilter->GetOutput();
     }
 
+    this->CalculateMinVoxelSize();
     m_NeedsDataInit = false;
+  }
+
+  if (m_OdfFromTensor)
+  {
+    m_Parameters->m_OdfCutoff = 0;
+    m_Parameters->m_SharpenOdfs = false;
   }
 
   m_GfaInterpolator->SetInputImage(m_GfaImage);
   m_OdfInterpolator->SetInputImage(m_OdfImage);
 
-  std::cout << "TrackingHandlerOdf - GFA threshold: " << m_GfaThreshold << std::endl;
-  std::cout << "TrackingHandlerOdf - ODF threshold: " << m_OdfThreshold << std::endl;
-  if (m_SharpenOdfs)
+  std::cout << "TrackingHandlerOdf - GFA threshold: " << m_Parameters->m_Cutoff << std::endl;
+  std::cout << "TrackingHandlerOdf - ODF threshold: " << m_Parameters->m_OdfCutoff << std::endl;
+  if (m_Parameters->m_SharpenOdfs)
     std::cout << "TrackingHandlerOdf - Sharpening ODfs" << std::endl;
 }
 
@@ -106,12 +117,12 @@ int TrackingHandlerOdf::SampleOdf(vnl_vector< float >& probs, vnl_vector< float 
       boost::random::variate_generator<boost::random::mt19937&, boost::random::discrete_distribution<int,float>> sampler(m_Rng, dist);
       sampled_idx = sampler();
     }
-    if (probs[sampled_idx]>max_prob && probs[sampled_idx]>m_OdfThreshold && fabs(angles[sampled_idx])>=m_AngularThreshold)
+    if (probs[sampled_idx]>max_prob && probs[sampled_idx]>m_Parameters->m_OdfCutoff && fabs(angles[sampled_idx])>=m_Parameters->GetAngularThresholdDot())
     {
       max_prob = probs[sampled_idx];
       max_sample_idx = sampled_idx;
     }
-    else if ( (probs[sampled_idx]<=m_OdfThreshold || fabs(angles[sampled_idx])<m_AngularThreshold) && trials<50) // we allow 50 trials to exceed the ODF threshold
+    else if ( (probs[sampled_idx]<=m_Parameters->m_OdfCutoff || fabs(angles[sampled_idx])<m_Parameters->GetAngularThresholdDot()) && trials<50) // we allow 50 trials to exceed the ODF threshold
       i--;
   }
 
@@ -140,18 +151,18 @@ vnl_vector_fixed<float,3> TrackingHandlerOdf::ProposeDirection(const itk::Point<
     return output_direction;
 
   // check GFA threshold for termination
-  float gfa = mitk::imv::GetImageValue<float>(pos, m_Interpolate, m_GfaInterpolator);
-  if (gfa<m_GfaThreshold)
+  float gfa = mitk::imv::GetImageValue<float>(pos, m_Parameters->m_InterpolateTractographyData, m_GfaInterpolator);
+  if (gfa<m_Parameters->m_Cutoff)
     return output_direction;
 
   vnl_vector_fixed<float,3> last_dir;
   if (!olddirs.empty())
     last_dir = olddirs.back();
 
-  if (!m_Interpolate && oldIndex==idx)
+  if (!m_Parameters->m_InterpolateTractographyData && oldIndex==idx)
     return last_dir;
 
-  ItkOdfImageType::PixelType odf_values = mitk::imv::GetImageValue<ItkOdfImageType::PixelType>(pos, m_Interpolate, m_OdfInterpolator);
+  ItkOdfImageType::PixelType odf_values = mitk::imv::GetImageValue<ItkOdfImageType::PixelType>(pos, m_Parameters->m_InterpolateTractographyData, m_OdfInterpolator);
   vnl_vector< float > probs; probs.set_size(m_OdfHemisphereIndices.size());
   vnl_vector< float > angles; angles.set_size(m_OdfHemisphereIndices.size()); angles.fill(1.0);
 
@@ -177,7 +188,7 @@ vnl_vector_fixed<float,3> TrackingHandlerOdf::ProposeDirection(const itk::Point<
     c++;
   }
 
-  if (m_SharpenOdfs)
+  if (m_Parameters->m_SharpenOdfs)
   {
     // sharpen ODF
     probs -= min_odf_val;
@@ -193,14 +204,14 @@ vnl_vector_fixed<float,3> TrackingHandlerOdf::ProposeDirection(const itk::Point<
   }
 
   // no previous direction
-  if (max_odf_val>m_OdfThreshold && (olddirs.empty() || last_dir.magnitude()<=0.5))
+  if (max_odf_val>m_Parameters->m_OdfCutoff && (olddirs.empty() || last_dir.magnitude()<=0.5))
   {
-    if (m_Mode==MODE::DETERMINISTIC)  // return maximum peak
+    if (m_Parameters->m_Mode==MODE::DETERMINISTIC)  // return maximum peak
     {
       output_direction = m_OdfFloatDirs.get_row(max_idx_d);
       return output_direction * max_odf_val;
     }
-    else if (m_Mode==MODE::PROBABILISTIC) // sample from complete ODF
+    else if (m_Parameters->m_Mode==MODE::PROBABILISTIC) // sample from complete ODF
     {
       int max_sample_idx = SampleOdf(probs, angles);
       if (max_sample_idx>=0)
@@ -208,17 +219,17 @@ vnl_vector_fixed<float,3> TrackingHandlerOdf::ProposeDirection(const itk::Point<
       return output_direction;
     }
   }
-  else if (max_odf_val<=m_OdfThreshold) // return (0,0,0)
+  else if (max_odf_val<=m_Parameters->m_OdfCutoff) // return (0,0,0)
   {
     return output_direction;
   }
 
   // correct previous direction
-  if (m_FlipX)
+  if (m_Parameters->m_FlipX)
     last_dir[0] *= -1;
-  if (m_FlipY)
+  if (m_Parameters->m_FlipY)
     last_dir[1] *= -1;
-  if (m_FlipZ)
+  if (m_Parameters->m_FlipZ)
     last_dir[2] *= -1;
 
   // calculate angles between previous direction and ODF directions
@@ -233,7 +244,7 @@ vnl_vector_fixed<float,3> TrackingHandlerOdf::ProposeDirection(const itk::Point<
     float abs_angle = fabs(angle);
 
     odf_val *= abs_angle; // weight probabilities according to deviation from last direction
-    if (m_Mode==MODE::DETERMINISTIC && odf_val>max_prob && odf_val>m_OdfThreshold)
+    if (m_Parameters->m_Mode==MODE::DETERMINISTIC && odf_val>max_prob && odf_val>m_Parameters->m_OdfCutoff)
     {
       // use maximum peak of the ODF weighted with the directional prior
       max_prob = odf_val;
@@ -242,7 +253,7 @@ vnl_vector_fixed<float,3> TrackingHandlerOdf::ProposeDirection(const itk::Point<
         d *= -1;
       output_direction = odf_val*d;
     }
-    else if (m_Mode==MODE::PROBABILISTIC)
+    else if (m_Parameters->m_Mode==MODE::PROBABILISTIC)
     {
       // update ODF probabilties with the ODF values pow(abs_angle, m_DirPriorPower)
       probs[i] = odf_val;
@@ -251,7 +262,7 @@ vnl_vector_fixed<float,3> TrackingHandlerOdf::ProposeDirection(const itk::Point<
   }
 
   // do probabilistic sampling
-  if (m_Mode==MODE::PROBABILISTIC && probs_sum>0.0001)
+  if (m_Parameters->m_Mode==MODE::PROBABILISTIC && probs_sum>0.0001)
   {
     int max_sample_idx = SampleOdf(probs, angles);
     if (max_sample_idx>=0)
@@ -269,18 +280,20 @@ vnl_vector_fixed<float,3> TrackingHandlerOdf::ProposeDirection(const itk::Point<
   {
     output_direction.normalize();
     float a = dot_product(output_direction, last_dir);
-    if (a<m_AngularThreshold)
+    if (a<m_Parameters->GetAngularThresholdDot())
       output_direction.fill(0);
   }
   else
     output_direction.fill(0);
 
-  if (m_FlipX)
+  if (m_Parameters->m_FlipX)
     output_direction[0] *= -1;
-  if (m_FlipY)
+  if (m_Parameters->m_FlipY)
     output_direction[1] *= -1;
-  if (m_FlipZ)
+  if (m_Parameters->m_FlipZ)
     output_direction[2] *= -1;
+  if (m_Parameters->m_ApplyDirectionMatrix)
+    output_direction = m_FloatImageRotation*output_direction;
 
   return output_direction;
 }

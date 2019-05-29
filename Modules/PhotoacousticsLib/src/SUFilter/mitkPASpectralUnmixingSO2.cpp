@@ -24,8 +24,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::pa::SpectralUnmixingSO2::SpectralUnmixingSO2()
 {
   this->SetNumberOfIndexedInputs(2);
-  this->SetNumberOfIndexedOutputs(1);
+  this->SetNumberOfIndexedOutputs(2);
   this->SetNthOutput(0, mitk::Image::New());
+  this->SetNthOutput(1, mitk::Image::New());
+
 }
 
 mitk::pa::SpectralUnmixingSO2::~SpectralUnmixingSO2()
@@ -61,8 +63,13 @@ void mitk::pa::SpectralUnmixingSO2::GenerateData()
   const float* inputDataArrayHb = ((const float*)readAccessHb.GetData());
 
   auto output = GetOutput(0);
+  auto output1 = GetOutput(1);
+
   mitk::ImageWriteAccessor writeOutput(output);
   float* writeBuffer = (float *)writeOutput.GetData();
+
+  mitk::ImageWriteAccessor writeOutput1(output1);
+  float* writeBuffer1 = (float *)writeOutput1.GetData();
 
   for (unsigned int x = 0; x < xDim; x++)
   {
@@ -75,6 +82,8 @@ void mitk::pa::SpectralUnmixingSO2::GenerateData()
         float pixelHbO2 = inputDataArrayHbO2[pixelNumber];
         float resultSO2 = CalculateSO2(pixelHb, pixelHbO2);
         writeBuffer[(xDim*yDim * z) + x * yDim + y] = resultSO2;
+        float resultTHb = CalculateTHb(pixelHb, pixelHbO2);
+        writeBuffer1[(xDim*yDim * z) + x * yDim + y] = resultTHb;
       }
     }
   }
@@ -138,6 +147,21 @@ float mitk::pa::SpectralUnmixingSO2::CalculateSO2(float Hb, float HbO2)
       return 0;
     }
     else return result;
+  }
+}
+
+float mitk::pa::SpectralUnmixingSO2::CalculateTHb(float Hb, float HbO2)
+{
+  float result = (Hb + HbO2);
+
+  if (result != result)
+  {
+    MITK_WARN(m_Verbose) << "SO2 VALUE NAN! WILL BE SET TO ZERO!";
+    return 0;
+  }
+  else
+  {
+    return result;
   }
 }
 

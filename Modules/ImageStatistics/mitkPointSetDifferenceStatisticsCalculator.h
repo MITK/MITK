@@ -97,7 +97,7 @@ protected:
   */
   void ComputeStatistics();
 
-  mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer m_Statistics; ///< struct holding the statistics
+  mitk::ImageStatisticsContainer::ImageStatisticsObject m_Statistics; ///< struct holding the statistics
   std::vector<double> m_DifferencesVector; ///< vector holding the differences between the corresponding points
   std::vector<double> m_SquaredDifferencesVector; ///< vector holding the squared differences between the corresponding points
   mitk::PointSet::Pointer m_PointSet1; ///< first point set used for comparison

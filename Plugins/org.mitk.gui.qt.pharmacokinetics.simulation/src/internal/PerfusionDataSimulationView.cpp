@@ -41,7 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOneTissueCompartmentModel.h"
 #include "mitkOneTissueCompartmentModelParameterizer.h"
 #include "mitkOneTissueCompartmentModelFactory.h"
-#include "mitkPerfusionDataGenerator.h"
+#include "mitkModelSignalImageGenerator.h"
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
@@ -553,7 +553,7 @@ void PerfusionDataSimulationView::OnGenerateDataButtonClicked()
 
 mitk::Image::Pointer PerfusionDataSimulationView::Generate2CXModelData()
 {
-mitk::PerfusionDataGenerator::Pointer generator = mitk::PerfusionDataGenerator::New();
+mitk::ModelSignalImageGenerator::Pointer generator = mitk::ModelSignalImageGenerator::New();
 mitk::TwoCompartmentExchangeModelParameterizer::Pointer modelParameterizer = mitk::TwoCompartmentExchangeModelParameterizer::New();
 
 /** @todo #2  necessary? Generator need to have a map with Parameters in order of Model in order to pass vector parameters correctly to Model.
@@ -583,11 +583,7 @@ modelParameterizer->SetAIF(this->m_AterialInputFunction);
 modelParameterizer->SetAIFTimeGrid(this->m_TimeGrid);
 modelParameterizer->SetDefaultTimeGrid(this->m_TimeGrid);
 
-mitk::ModelDataGenerationFunctor::Pointer m_ComputationFunctor = mitk::ModelDataGenerationFunctor::New();
-
-m_ComputationFunctor->SetModelParameterizer(modelParameterizer);
-
-generator->SetFunctor(m_ComputationFunctor);
+generator->SetParameterizer(modelParameterizer);
 
 mitk::Image::Pointer generatedImage = generator->GetGeneratedImage();
 
@@ -646,7 +642,7 @@ return resultImage;
  */
 mitk::Image::Pointer PerfusionDataSimulationView::GenerateNumeric2CXModelData()
 {
-mitk::PerfusionDataGenerator::Pointer generator = mitk::PerfusionDataGenerator::New();
+mitk::ModelSignalImageGenerator::Pointer generator = mitk::ModelSignalImageGenerator::New();
 mitk::NumericTwoCompartmentExchangeModelParameterizer::Pointer modelParameterizer = mitk::NumericTwoCompartmentExchangeModelParameterizer::New();
 
 for(ParameterMapType::const_iterator pos = this->m_ParameterImageMap.begin(); pos != this->m_ParameterImageMap.end(); ++pos)
@@ -674,11 +670,7 @@ modelParameterizer->SetAIFTimeGrid(this->m_TimeGrid);
 modelParameterizer->SetDefaultTimeGrid(this->m_TimeGrid);
 modelParameterizer->SetODEINTStepSize(0.05);
 
-mitk::ModelDataGenerationFunctor::Pointer m_ComputationFunctor = mitk::ModelDataGenerationFunctor::New();
-
-m_ComputationFunctor->SetModelParameterizer(modelParameterizer);
-
-generator->SetFunctor(m_ComputationFunctor);
+generator->SetParameterizer(modelParameterizer);
 
 mitk::Image::Pointer generatedImage = generator->GetGeneratedImage();
 
@@ -735,7 +727,7 @@ return resultImage;
 
 mitk::Image::Pointer PerfusionDataSimulationView::GenerateETModelData()
 {
-mitk::PerfusionDataGenerator::Pointer generator = mitk::PerfusionDataGenerator::New();
+mitk::ModelSignalImageGenerator::Pointer generator = mitk::ModelSignalImageGenerator::New();
 mitk::ExtendedToftsModelParameterizer::Pointer modelParameterizer = mitk::ExtendedToftsModelParameterizer::New();
 
 for(ParameterMapType::const_iterator pos = this->m_ParameterImageMap.begin(); pos != this->m_ParameterImageMap.end(); ++pos)
@@ -759,11 +751,7 @@ modelParameterizer->SetAIF(this->m_AterialInputFunction);
 modelParameterizer->SetAIFTimeGrid(this->m_TimeGrid);
 modelParameterizer->SetDefaultTimeGrid(this->m_TimeGrid);
 
-mitk::ModelDataGenerationFunctor::Pointer m_ComputationFunctor = mitk::ModelDataGenerationFunctor::New();
-
-m_ComputationFunctor->SetModelParameterizer(modelParameterizer);
-
-generator->SetFunctor(m_ComputationFunctor);
+generator->SetParameterizer(modelParameterizer);
 
 mitk::Image::Pointer generatedImage = generator->GetGeneratedImage();
 
@@ -821,7 +809,7 @@ return resultImage;
 
 mitk::Image::Pointer PerfusionDataSimulationView::Generate2TCModelData()
 {
-mitk::PerfusionDataGenerator::Pointer generator = mitk::PerfusionDataGenerator::New();
+mitk::ModelSignalImageGenerator::Pointer generator = mitk::ModelSignalImageGenerator::New();
 mitk::TwoTissueCompartmentModelParameterizer::Pointer modelParameterizer = mitk::TwoTissueCompartmentModelParameterizer::New();
 
 
@@ -854,11 +842,7 @@ modelParameterizer->SetAIF(this->m_AterialInputFunction);
 modelParameterizer->SetAIFTimeGrid(this->m_TimeGrid);
 modelParameterizer->SetDefaultTimeGrid(this->m_TimeGrid);
 
-mitk::ModelDataGenerationFunctor::Pointer m_ComputationFunctor = mitk::ModelDataGenerationFunctor::New();
-
-m_ComputationFunctor->SetModelParameterizer(modelParameterizer);
-
-generator->SetFunctor(m_ComputationFunctor);
+generator->SetParameterizer(modelParameterizer);
 
 mitk::Image::Pointer generatedImage = generator->GetGeneratedImage();
 
@@ -915,7 +899,7 @@ return resultImage;
 
 mitk::Image::Pointer PerfusionDataSimulationView::Generate1TCModelData()
 {
-mitk::PerfusionDataGenerator::Pointer generator = mitk::PerfusionDataGenerator::New();
+mitk::ModelSignalImageGenerator::Pointer generator = mitk::ModelSignalImageGenerator::New();
 mitk::OneTissueCompartmentModelParameterizer::Pointer modelParameterizer = mitk::OneTissueCompartmentModelParameterizer::New();
 
 
@@ -936,11 +920,7 @@ modelParameterizer->SetAIF(this->m_AterialInputFunction);
 modelParameterizer->SetAIFTimeGrid(this->m_TimeGrid);
 modelParameterizer->SetDefaultTimeGrid(this->m_TimeGrid);
 
-mitk::ModelDataGenerationFunctor::Pointer m_ComputationFunctor = mitk::ModelDataGenerationFunctor::New();
-
-m_ComputationFunctor->SetModelParameterizer(modelParameterizer);
-
-generator->SetFunctor(m_ComputationFunctor);
+generator->SetParameterizer(modelParameterizer);
 
 mitk::Image::Pointer generatedImage = generator->GetGeneratedImage();
 

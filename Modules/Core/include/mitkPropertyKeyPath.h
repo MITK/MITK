@@ -24,10 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkCoreExports.h>
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4251)
-#endif
 namespace mitk
 {
   /** @brief Class that can be used to specify nested or wild carded property keys. E.g.
@@ -218,9 +214,5 @@ namespace mitk
   /** returns the correct property name for a given PropertyKeyPath instance. */
   MITKCORE_EXPORT std::string PropertyKeyPathToPropertyName(const PropertyKeyPath &tagPath);
 } // namespace mitk
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 #endif

@@ -48,6 +48,7 @@ if(MITK_USE_OpenCV)
       URL ${opencv_url}
       URL_MD5 ${opencv_url_md5}
       CMAKE_GENERATOR ${gen}
+      CMAKE_GENERATOR_PLATFORM ${gen_platform}
       CMAKE_ARGS
       ${ep_common_args}
       -DBUILD_TESTS:BOOL=OFF

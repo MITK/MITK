@@ -47,6 +47,11 @@ public:
     m_ResolveMosaic = flag;
   }
 
+  void SetApplyRotationToGradients( bool apply )
+  {
+    m_ApplyRotationToGradients = apply;
+  }
+
   std::string GetStudyName(int i){ return m_Study_names.at(i); }
   std::string GetSeriesName(int i){ return m_Series_names.at(i); }
 
@@ -72,6 +77,7 @@ protected:
   std::vector< std::string > m_Series_names;
 
   bool m_ResolveMosaic;
+  bool m_ApplyRotationToGradients;
 
   std::vector< std::string > m_sop_instance_uids;
   std::vector< std::string > m_frame_of_reference_uids;

@@ -119,10 +119,10 @@ namespace mitk {
 
     vtkProp* GetVtkProp(mitk::BaseRenderer* renderer) override
     {
-      vtkPropAssembly* assembly = vtkPropAssembly::New();
-      assembly->AddPart( m_OdfMapper->GetVtkProp(renderer));
-      assembly->AddPart( m_ImgMapper->GetVtkProp(renderer));
-      return assembly;
+      m_PropAssembly = vtkSmartPointer<vtkPropAssembly>::New();
+      m_PropAssembly->AddPart( m_OdfMapper->GetVtkProp(renderer));
+      m_PropAssembly->AddPart( m_ImgMapper->GetVtkProp(renderer));
+      return m_PropAssembly;
     }
 
   protected:
@@ -150,6 +150,7 @@ namespace mitk {
 
     mitk::OdfVtkMapper2D<float,ODF_SAMPLING_SIZE>::Pointer m_OdfMapper;
     mitk::CopyImageMapper2D::Pointer m_ImgMapper;
+    vtkSmartPointer<vtkPropAssembly> m_PropAssembly;
 
   };
 

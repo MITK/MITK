@@ -106,9 +106,9 @@ QmitkDataStorageTreeModelInternalItem *QmitkDataStorageTreeModelInternalItem::Ge
   return m_Parent;
 }
 
-mitk::DataNode* QmitkDataStorageTreeModelInternalItem::GetDataNode() const
+mitk::DataNode::Pointer QmitkDataStorageTreeModelInternalItem::GetDataNode() const
 {
-  return m_DataNode;
+  return m_DataNode.Lock();
 }
 
 void QmitkDataStorageTreeModelInternalItem::InsertChild(QmitkDataStorageTreeModelInternalItem *item, int index)

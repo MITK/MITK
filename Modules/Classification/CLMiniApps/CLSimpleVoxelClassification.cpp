@@ -48,8 +48,8 @@ int main(int argc, char* argv[])
   parser.setArgumentPrefix("--", "-");
   // Add command line argument names
   parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Show options");
-  parser.addArgument("loadFile", "l", mitkCommandLineParser::InputFile,
-                     "DataCollection File");
+  parser.addArgument("loadFile", "l", mitkCommandLineParser::File,
+                     "DataCollection File", "", us::Any(), true, false, false, mitkCommandLineParser::Input);
   parser.addArgument(
         "colIds", "c", mitkCommandLineParser::String,
         "Patient Identifiers from DataCollection used for training");
@@ -65,8 +65,8 @@ int main(int argc, char* argv[])
                      "number of trees");
   parser.addArgument("configName", "n", mitkCommandLineParser::String,
                      "human readable name for configuration");
-  parser.addArgument("output", "o", mitkCommandLineParser::OutputDirectory,
-                     "output folder for results");
+  parser.addArgument("output", "o", mitkCommandLineParser::Directory,
+                     "output folder for results", "", us::Any(), true, false, false, mitkCommandLineParser::Input);
 
   parser.addArgument("classmap", "m", mitkCommandLineParser::String,
                      "name of class that is to be learnt");

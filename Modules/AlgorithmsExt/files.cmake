@@ -27,6 +27,7 @@ set(CPP_FILES
   mitkUnstructuredGridClusteringFilter.cpp
   mitkUnstructuredGridToUnstructuredGridFilter.cpp
   mitkSurfaceToPointSetFilter.cpp
+  mitkCropTimestepsImageFilter.cpp
 )
 
 if(WIN32)

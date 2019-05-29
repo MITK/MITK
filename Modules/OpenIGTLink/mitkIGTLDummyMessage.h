@@ -26,12 +26,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-/** Documentation
-* \class IGTLDummyMessage
-* \brief This class is a dummy message to show the how to implement a new message
-* type
+/**
+ * \class IGTLDummyMessage
+ * \brief This class is a dummy message to show how to implement a new message type
 */
-class MITKOPENIGTLINK_EXPORT IGTLDummyMessage: public igtl::StringMessage
+class MITKOPENIGTLINK_EXPORT IGTLDummyMessage : public igtl::StringMessage
 {
 public:
   typedef IGTLDummyMessage                     Self;
@@ -39,24 +38,24 @@ public:
   typedef igtl::SmartPointer<Self>             Pointer;
   typedef igtl::SmartPointer<const Self>       ConstPointer;
 
-  igtlTypeMacro( mitk::IGTLDummyMessage, igtl::StringMessage );
-  igtlNewMacro( mitk::IGTLDummyMessage );
+  igtlTypeMacro( mitk::IGTLDummyMessage, igtl::StringMessage )
+  igtlNewMacro( mitk::IGTLDummyMessage )
 
 public:
   /**
    * Set dummy string
-  */
+   */
   void SetDummyString( const std::string& dummyString );
 
   /**
    * Get dummy string
-  */
+   */
   std::string GetDummyString();
 
   /**
    * Returns a clone of itself
-  */
-  igtl::MessageBase::Pointer Clone();
+   */
+  igtl::MessageBase::Pointer Clone() ;
 
 protected:
   IGTLDummyMessage();
@@ -65,9 +64,7 @@ protected:
   std::string m_dummyString;
 };
 
-
-mitkIGTMessageCloneClassMacro(IGTLDummyMessage, DummyMsgCloneHandler);
-
+mitkIGTMessageCloneClassMacro(IGTLDummyMessage, DummyMsgCloneHandler)
 
 } // namespace mitk
 

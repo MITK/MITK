@@ -185,13 +185,15 @@ mitk::BaseRenderer::BaseRenderer(const char* name, vtkRenderWindow * renWin, mit
   m_CameraController->SetRenderer(this);
 
   m_VtkRenderer = vtkRenderer::New();
-  m_VtkRenderer->UseFXAAOn();
+  if (useFXAA) {
+    m_VtkRenderer->UseFXAAOn();
+  }
 
   if (renderingMode == RenderingMode::DepthPeeling)
   {
     m_VtkRenderer->SetUseDepthPeeling(1);
-    m_VtkRenderer->SetMaximumNumberOfPeels(8);
-    m_VtkRenderer->SetOcclusionRatio(0.0);
+    m_VtkRenderer->SetMaximumNumberOfPeels(20);
+    m_VtkRenderer->SetOcclusionRatio(0.);
   }
 
   if (mitk::VtkLayerController::GetInstance(m_RenderWindow) == nullptr)

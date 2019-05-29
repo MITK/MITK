@@ -157,7 +157,7 @@ void QmitkStdMultiWidgetEditorPreferencePage::Update()
   //m_Ui->m_PACSLikeMouseMode->setChecked(m_Preferences->GetBool("PACS like mouse interaction", false));
   int mode= m_Preferences->GetInt("Rendering Mode", 2);
   m_Ui->m_RenderingMode->setCurrentIndex(mode);
-  bool m_UseFXAA = m_Preferences->GetInt("Use FXAA", true);
+  bool m_UseFXAA = m_Preferences->GetBool("Use FXAA", true);
   m_Ui->UseFXAA_checkBox->setCheckState(m_UseFXAA ? Qt::Checked : Qt::Unchecked);
   m_Ui->m_CrosshairGapSize->setValue(m_Preferences->GetInt("crosshair gap size", 32));
   m_Ui->m_RotationStep->setValue(m_Preferences->GetInt("Rotation Step", 90));

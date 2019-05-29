@@ -403,7 +403,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
   this->TransformActor( renderer );
 
-  if (!binaryOutline) { 
+  if (!binaryOutline) {
     // Connect the mapper with the input texture. This is the standard case.
     //setup the textured plane
     this->GeneratePlane( renderer, sliceBounds );
@@ -698,7 +698,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
   bool isBinaryImage(false);
   if (!node->GetBoolProperty("binary", isBinaryImage) && image->GetPixelType().GetNumberOfComponents() == 1)
   {
-    // Check if this is Secondary Capture Image. 
+    // Check if this is Secondary Capture Image.
     // Make sure that it's not a binary image and that it will not be included in bounding box
     std::string sopClassUid = "";
     if (image) {

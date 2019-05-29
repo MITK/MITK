@@ -103,7 +103,7 @@ mitk::LabelSetImage::LabelSetImage(const mitk::LabelSetImage &other)
   }
 
   // Add some DICOM Tags as properties to segmentation image
-  DICOMSegmentationPropertyHandler::DeriveDICOMSegmentationProperties(this);
+  DICOMSegmentationPropertyHelper::DeriveDICOMSegmentationProperties(this);
 }
 
 void mitk::LabelSetImage::OnLabelSetModified()

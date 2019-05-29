@@ -62,7 +62,7 @@ mitk::Label::Label() : PropertyList()
   if (GetProperty("layer") == nullptr)
     SetLayer(0);
 
-  DICOMSegmentationPropertyHandler::SetDICOMSegmentProperties(this);
+  DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(this);
 }
 
 mitk::Label::Label(const Label &other) : PropertyList(other)

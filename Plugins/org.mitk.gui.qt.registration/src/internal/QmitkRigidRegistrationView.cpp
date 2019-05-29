@@ -51,6 +51,26 @@ const std::string QmitkRigidRegistrationView::VIEW_ID = "org.mitk.views.rigidreg
 
 using namespace berry;
 
+namespace
+{
+  const mitk::ScalarType SLIDER_SENCITIVITY = 0.1;
+
+  mitk::Vector3D computeRange(mitk::DataNode::Pointer fixedNode, mitk::DataNode::Pointer node)
+  {
+    auto movingImage = dynamic_cast<mitk::Image*>(fixedNode->GetData());
+    auto fixedImage = dynamic_cast<mitk::Image*>(node->GetData());
+
+    mitk::Vector3D range;
+    range[0] = movingImage->GetLargestPossibleRegion().GetSize()[0] + fixedImage->GetLargestPossibleRegion().GetSize()[0];
+    range[1] = movingImage->GetLargestPossibleRegion().GetSize()[1] + fixedImage->GetLargestPossibleRegion().GetSize()[1];
+    range[2] = movingImage->GetLargestPossibleRegion().GetSize()[2] + fixedImage->GetLargestPossibleRegion().GetSize()[2];
+
+    range /= SLIDER_SENCITIVITY;
+
+    return range;
+  }
+}
+
 struct SelListenerRigidRegistration : ISelectionListener
 {
   berryObjectMacro(SelListenerRigidRegistration);
@@ -80,7 +100,6 @@ struct SelListenerRigidRegistration : ISelectionListener
           m_View->m_Controls.m_UseMaskingCB->hide();
           m_View->m_Controls.m_OpacityLabel->setEnabled(false);
           m_View->m_Controls.m_OpacitySlider->setEnabled(false);
-          m_View->m_Controls.label->setEnabled(false);
           m_View->m_Controls.label_2->setEnabled(false);
           m_View->m_Controls.m_ShowRedGreenValues->setEnabled(false);
           m_View->m_Controls.m_SwitchImages->hide();
@@ -128,9 +147,17 @@ struct SelListenerRigidRegistration : ISelectionListener
                 m_View->m_Controls.m_UseMaskingCB->show();
                 m_View->m_Controls.m_OpacityLabel->setEnabled(true);
                 m_View->m_Controls.m_OpacitySlider->setEnabled(true);
-                m_View->m_Controls.label->setEnabled(true);
                 m_View->m_Controls.label_2->setEnabled(true);
                 m_View->m_Controls.m_ShowRedGreenValues->setEnabled(true);
+
+                auto range = computeRange(fixedNode, node);
+                m_View->m_Controls.m_XTransSlider->setMaximum(range[0]);
+                m_View->m_Controls.m_YTransSlider->setMaximum(range[1]);
+                m_View->m_Controls.m_ZTransSlider->setMaximum(range[2]);
+
+                m_View->m_Controls.m_XTransSlider->setMinimum(-range[0]);
+                m_View->m_Controls.m_YTransSlider->setMinimum(-range[1]);
+                m_View->m_Controls.m_ZTransSlider->setMinimum(-range[2]);
               }
             }
             else
@@ -180,7 +207,8 @@ QmitkRigidRegistrationView::QmitkRigidRegistrationView(QObject * /*parent*/, con
   m_FixedDimension(0),
   m_MovingDimension(0),
   m_PresetSelected(false),
-  m_PresetNotLoaded(false)
+  m_PresetNotLoaded(false),
+  m_ContourHelperNode(nullptr)
 {
   m_TranslateSliderPos[0] = 0;
   m_TranslateSliderPos[1] = 0;
@@ -204,6 +232,10 @@ QmitkRigidRegistrationView::QmitkRigidRegistrationView(QObject * /*parent*/, con
 
   this->GetDataStorage()->RemoveNodeEvent.AddListener(mitk::MessageDelegate1<QmitkRigidRegistrationView,
     const mitk::DataNode*> ( this, &QmitkRigidRegistrationView::DataNodeHasBeenRemoved ));
+
+  m_Timer = new QTimer(this);
+  m_Timer->setInterval(1000);
+  m_Timer->setSingleShot(true);
 }
 
 QmitkRigidRegistrationView::~QmitkRigidRegistrationView()
@@ -216,6 +248,19 @@ QmitkRigidRegistrationView::~QmitkRigidRegistrationView()
 
   this->GetDataStorage()->RemoveNodeEvent.RemoveListener(mitk::MessageDelegate1<QmitkRigidRegistrationView,
     const mitk::DataNode*> ( this, &QmitkRigidRegistrationView::DataNodeHasBeenRemoved ));
+
+  if (m_ContourHelperNode) {
+    this->GetDataStorage()->Remove(m_ContourHelperNode);
+    m_ContourHelperNode = nullptr;
+  }
+
+  if (m_Timer) {
+    if (m_Timer->isActive()) {
+      m_Timer->stop();
+    }
+    delete m_Timer;
+    m_Timer = nullptr;
+  }
 }
 
 void QmitkRigidRegistrationView::CreateQtPartControl(QWidget* parent)
@@ -232,7 +277,6 @@ void QmitkRigidRegistrationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_UseMaskingCB->hide();
   m_Controls.m_OpacityLabel->setEnabled(false);
   m_Controls.m_OpacitySlider->setEnabled(false);
-  m_Controls.label->setEnabled(false);
   m_Controls.label_2->setEnabled(false);
   m_Controls.m_ShowRedGreenValues->setEnabled(false);
   m_Controls.m_SwitchImages->hide();
@@ -347,7 +391,12 @@ void QmitkRigidRegistrationView::CreateConnections()
   //connect(m_Controls.m_UseMovingImageMask, SIGNAL(toggled(bool)), this, SLOT(UseMovingMaskImageChecked(bool)));
   connect(m_Controls.m_RigidTransform, SIGNAL(currentChanged(int)), this, SLOT(TabChanged(int)));
   connect(m_Controls.m_OpacitySlider, SIGNAL(valueChanged(int)), this, SLOT(OpacityUpdate(int)));
-  connect(m_Controls.m_ContourSlider, SIGNAL(sliderReleased()), this, SLOT(ShowContour()));
+
+  connect(m_Timer, &QTimer::timeout, [this] { ShowContour(); });
+  connect(m_Controls.m_ContourSlider, &QSlider::valueChanged, this, [this] (int threshold) {
+    m_Controls.m_ThresholdLabel->setText(QString::number(threshold));
+    m_Timer->start();
+  });
 
   connect(m_Controls.m_CalculateTransformation, SIGNAL(clicked()), this, SLOT(Calculate()));
   connect(m_Controls.m_UndoTransformation,SIGNAL(clicked()),this,SLOT(UndoTransformation()));
@@ -491,7 +540,6 @@ void QmitkRigidRegistrationView::DataNodeHasBeenRemoved(const mitk::DataNode* no
     m_Controls.m_MovingLabel->hide();
     m_Controls.m_OpacityLabel->setEnabled(false);
     m_Controls.m_OpacitySlider->setEnabled(false);
-    m_Controls.label->setEnabled(false);
     m_Controls.label_2->setEnabled(false);
     m_Controls.m_ShowRedGreenValues->setEnabled(false);
     m_Controls.m_SwitchImages->hide();
@@ -825,10 +873,6 @@ void QmitkRigidRegistrationView::ShowContour()
   if(m_FixedNode.IsNull() || !show)
     return;
 
-
-  // Update the label next to the slider
-  m_Controls.m_ThresholdLabel->setText(QString::number(threshold));
-
   mitk::Image::Pointer image = dynamic_cast<mitk::Image *>(m_FixedNode->GetData());
 
   typedef itk::Image<float,3> FloatImageType;
@@ -925,6 +969,7 @@ void QmitkRigidRegistrationView::OpacityUpdate(float opacity)
 
 void QmitkRigidRegistrationView::OpacityUpdate(int opacity)
 {
+  m_Controls.label_2->setText(QString::number(opacity) + QString("%"));
   float fValue = ((float)opacity)/100.0f;
   this->OpacityUpdate(fValue);
 }
@@ -944,11 +989,10 @@ void QmitkRigidRegistrationView::Translate(int* translateVector)
   if (m_MovingNode.IsNotNull())
   {
     mitk::Vector3D translateVec;
-    mitk::ScalarType sliderSensitivity = 0.1;
 
-    translateVec[0] = sliderSensitivity * (translateVector[0] - m_TranslateSliderPos[0]);
-    translateVec[1] = sliderSensitivity * (translateVector[1] - m_TranslateSliderPos[1]);
-    translateVec[2] = sliderSensitivity * (translateVector[2] - m_TranslateSliderPos[2]);
+    translateVec[0] = SLIDER_SENCITIVITY * (translateVector[0] - m_TranslateSliderPos[0]);
+    translateVec[1] = SLIDER_SENCITIVITY * (translateVector[1] - m_TranslateSliderPos[1]);
+    translateVec[2] = SLIDER_SENCITIVITY * (translateVector[2] - m_TranslateSliderPos[2]);
 
     m_TranslateSliderPos[0] = translateVector[0];
     m_TranslateSliderPos[1] = translateVector[1];

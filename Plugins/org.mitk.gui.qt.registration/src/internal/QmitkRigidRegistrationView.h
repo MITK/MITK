@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKRIGIDREGISTRATION_H
 #define QMITKRIGIDREGISTRATION_H
 
+#include <QTimer>
+
 #include "QmitkFunctionality.h"
 #include "ui_QmitkRigidRegistrationViewControls.h"
 
@@ -331,6 +333,7 @@ protected:
     bool m_PresetNotLoaded;
 
     QmitkStepperAdapter*      m_TimeStepperAdapter;
+    QTimer* m_Timer;
 };
 
 #endif //QMITKRigidREGISTRATION_H

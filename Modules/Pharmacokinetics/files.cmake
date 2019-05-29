@@ -52,8 +52,13 @@ set(CPP_FILES
 )
 
 set(HXX_FILES
+mitkDICOMSegmentationConstants.h
+
 )
 
 
 set(MOC_H_FILES
 )
+
+
+

@@ -20,16 +20,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleContext.h>
 #include <usServiceEvent.h>
 
-#include "mitkDICOMSegmentationIO.h"
+#include "mitkDICOMPMIO.h"
 
-#include <mitkDICOMSegIOMimeTypes.h>
+#include "mitkDICOMPMIOMimeTypes.h"
 
 namespace mitk
 {
   /**
   \brief Registers services for multilabel dicom module.
   */
-  class DICOMQIIOActivator : public us::ModuleActivator
+  class DICOMPMIOActivator : public us::ModuleActivator
   {
     std::vector<AbstractFileIO *> m_FileIOs;
 
@@ -39,7 +39,7 @@ namespace mitk
       us::ServiceProperties props;
       props[us::ServiceConstants::SERVICE_RANKING()] = 10;
 
-      std::vector<mitk::CustomMimeType *> mimeTypes = mitk::MitkDICOMSEGIOMimeTypes::Get();
+      std::vector<mitk::CustomMimeType *> mimeTypes = mitk::MitkDICOMPMIOMimeTypes::Get();
       for (std::vector<mitk::CustomMimeType *>::const_iterator mimeTypeIter = mimeTypes.begin(),
         iterEnd = mimeTypes.end();
         mimeTypeIter != iterEnd;
@@ -47,8 +47,7 @@ namespace mitk
       {
         context->RegisterService(*mimeTypeIter, props);
       }
-
-      m_FileIOs.push_back(new DICOMSegmentationIO());
+      m_FileIOs.push_back(new DICOMPMIO());
     }
     void Unload(us::ModuleContext *) override
     {
@@ -60,4 +59,4 @@ namespace mitk
   };
 }
 
-US_EXPORT_MODULE_ACTIVATOR(mitk::DICOMQIIOActivator)
+US_EXPORT_MODULE_ACTIVATOR(mitk::DICOMPMIOActivator)

@@ -69,6 +69,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImage.h>
 #include <itkImageRegionIterator.h>
 
+//#include <mitkDICOMPMPropertyHelper.h>
+//#include <mitkDICOMQIPropertyHelper.h>
+
 
 const std::string MRPerfusionView::VIEW_ID = "org.mitk.gui.qt.pharmacokinetics.mri";
 
@@ -1062,7 +1065,7 @@ MRPerfusionView::MRPerfusionView() : m_FittingInProgress(false), m_HasGeneratedN
 
 void MRPerfusionView::OnJobFinished()
 {
-  this->m_Controls.infoBox->append(QString("Fitting finished"));
+  this->m_Controls.infoBox->append(QString("Fitting finished."));
   this->m_FittingInProgress = false;
   this->UpdateGUIControls();
 };
@@ -1079,13 +1082,14 @@ void MRPerfusionView::OnJobResultsAreAvailable(mitk::modelFit::ModelFitResultNod
 {
   //Store the resulting parameter fit image via convenience helper function in data storage
   //(handles the correct generation of the nodes and their properties)
+  
   mitk::modelFit::StoreResultsInDataStorage(this->GetDataStorage(), results, pJob->GetParentNode());
   //this stores the concentration image and AIF concentration image, if generated for this fit in the storage.
   //if not generated for this fit, relevant nodes are empty.
   mitk::modelFit::StoreResultsInDataStorage(this->GetDataStorage(), pJob->GetAdditionalRelevantNodes(), pJob->GetParentNode());
 
-  m_Controls.errorMessageLabel->setText("");
-  m_Controls.errorMessageLabel->hide();
+
+
 };
 
 void MRPerfusionView::OnJobProgress(double progress)

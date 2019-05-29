@@ -1,0 +1,6 @@
+MITK_CREATE_MODULE(DICOMPM
+  DEPENDS MitkCore MitkDICOMReader MitkModelFit MitkDICOMQI
+  PACKAGE_DEPENDS
+    PRIVATE DCMTK
+)
+add_subdirectory(autoload/DICOMPMIO)

@@ -134,7 +134,7 @@ void mitk::LabelSet::AddLabel(mitk::Label *label)
   UpdateLookupTable(pixelValue);
 
   // add DICOM information of the label
-  DICOMSegmentationPropertyHandler::SetDICOMSegmentProperties(newLabel);
+  DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(newLabel);
 
   itk::SimpleMemberCommand<LabelSet>::Pointer command = itk::SimpleMemberCommand<LabelSet>::New();
   command->SetCallbackFunction(this, &LabelSet::OnLabelModified);
@@ -164,7 +164,7 @@ void mitk::LabelSet::RenameLabel(PixelType pixelValue, const std::string &name, 
   label->SetColor(color);
 
   // change DICOM information of the label
-  DICOMSegmentationPropertyHandler::SetDICOMSegmentProperties(label);
+  DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(label);
 }
 
 void mitk::LabelSet::SetLookupTable(mitk::LookupTable *lut)

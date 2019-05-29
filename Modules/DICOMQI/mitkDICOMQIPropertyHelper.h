@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef DICOMQIPROPERTYHANDLER_H_
-#define DICOMQIPROPERTYHANDLER_H_
+#ifndef DICOMQIPROPERTYHELPER_H_
+#define DICOMQIPROPERTYHELPER_H_
 
 #include <mitkDICOMTag.h>
 #include <mitkBaseData.h>
@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class MITKDICOMQI_EXPORT DICOMQIPropertyHandler
+  class MITKDICOMQI_EXPORT DICOMQIPropertyHelper
   {
   public:
     static void DeriveDICOMSourceProperties(const BaseData *sourceDICOMImage, BaseData *derivedDICOMImage);

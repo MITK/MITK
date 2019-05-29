@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMSegmentationIO.h"
 
-#include "mitkDICOMQIIOMimeTypes.h"
+#include "mitkDICOMSegIOMimeTypes.h"
 #include "mitkDICOMSegmentationConstants.h"
 #include <mitkDICOMDCMTKTagScanner.h>
 #include <mitkDICOMIOHelper.h>
@@ -45,7 +45,7 @@ namespace mitk
 {
   DICOMSegmentationIO::DICOMSegmentationIO()
     : AbstractFileIO(LabelSetImage::GetStaticNameOfClass(),
-      mitk::MitkDICOMQIIOMimeTypes::DICOMSEG_MIMETYPE_NAME(),
+      mitk::MitkDICOMSEGIOMimeTypes::DICOMSEG_MIMETYPE_NAME(),
       "DICOM Segmentation")
   {
     AbstractFileWriter::SetRanking(10);
@@ -459,6 +459,7 @@ namespace mitk
     const std::string output;
     dcmqi::JSONSegmentationMetaInformationHandler handler;
 
+ 
     // 1. Metadata attributes that will be listed in the resulting DICOM SEG object
     std::string contentCreatorName;
     if (!image->GetPropertyList()->GetStringProperty(GeneratePropertyNameForDICOMTag(0x0070, 0x0084).c_str(),

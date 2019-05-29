@@ -14,22 +14,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef DICOMPMPROPERTYHELPER_H_
-#define DICOMPMPROPERTYHELPER_H_
+#ifndef DICOMSEGMENTATIONPROPERTYHELPER_H_
+#define DICOMSEGMENTATIONPROPERTYHELPER_H_
 
 #include <mitkDICOMTag.h>
-#include <mitkLabel.h>
-#include <mitkLabelSetImage.h>
+#include <mitkBaseData.h>
 
-#include <MitkMultilabelExports.h>
+#include <MitkDICOMQIExports.h>
 
 namespace mitk
 {
-  class MITKMULTILABEL_EXPORT DICOMSegmentationPropertyHelper
+  class MITKDICOMQI_EXPORT DICOMPMPropertyHelper
   {
   public:
-    static void DeriveDICOMSegmentationProperties(LabelSetImage* dicomSegImage);
-    static void SetDICOMSegmentProperties(Label *label);
+    static void DeriveDICOMPMProperties(BaseData *derivedDICOMImage);
+
   };
-}
+} // namespace mitk
 #endif

@@ -78,7 +78,7 @@ mitk::LabelSetImage::LabelSetImage()
   m_ExteriorLabel->SetValue(0);
 
   // Add some DICOM Tags as properties to segmentation image
-  DICOMSegmentationPropertyHandler::DeriveDICOMSegmentationProperties(this);
+  DICOMSegmentationPropertyHelper::DeriveDICOMSegmentationProperties(this);
 }
 
 mitk::LabelSetImage::LabelSetImage(const mitk::LabelSetImage &other)
@@ -153,7 +153,7 @@ void mitk::LabelSetImage::Initialize(const mitk::Image *other)
   }
 
   // Transfer some general DICOM properties from the source image to derived image (e.g. Patient information,...)
-  DICOMQIPropertyHandler::DeriveDICOMSourceProperties(other, this);
+  DICOMQIPropertyHelper::DeriveDICOMSourceProperties(other, this);
 
   // Add a inital LabelSet ans corresponding image data to the stack
   AddLayer();

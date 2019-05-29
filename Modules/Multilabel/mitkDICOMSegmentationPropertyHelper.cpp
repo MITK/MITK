@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  void DICOMSegmentationPropertyHandler::DeriveDICOMSegmentationProperties(LabelSetImage* dicomSegImage)
+  void DICOMSegmentationPropertyHelper::DeriveDICOMSegmentationProperties(LabelSetImage* dicomSegImage)
   {
     PropertyList::Pointer propertyList = dicomSegImage->GetPropertyList();
 
@@ -70,7 +70,7 @@ namespace mitk
     }
   }
 
-  void DICOMSegmentationPropertyHandler::SetDICOMSegmentProperties(Label *label)
+  void DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(Label *label)
   {
     PropertyList::Pointer propertyList = PropertyList::New();
 

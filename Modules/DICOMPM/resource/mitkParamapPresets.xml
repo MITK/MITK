@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+* Source
+
+*Coding schemes:
+  http://dicom.nema.org/medical/dicom/current/output/chtml/part16/PS3.16.html
+
+-->
+
+<mitkParamapPresets file_version="0.1" >
+<!--
+Tracer Kinetic Models
+http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4101.html
+-->
+  <preset name="Standard Tofts Model">
+    <type code_value="126340" coding_scheme="DCM" code_name="Standard Tofts Model"/>
+  </preset>
+  <preset name="Extended Tofts Model">
+    <type code_value="126341" coding_scheme="DCM" code_name="Extended Tofts Model"/>
+  </preset>
+  <preset name="First Pass Leakage Profile (FPLP) Model">
+    <type code_value="126343" coding_scheme="DCM" code_name="First Pass Leakage Profile (FPLP) Model"/>
+  </preset>
+  <preset name="Shutter-Speed Model (SSM)">
+    <type code_value="126344" coding_scheme="DCM" code_name="Shutter-Speed Model (SSM)"/>
+  </preset>
+  <preset name="Gamma Capillary Transit Time (GCTT) Model">
+    <type code_value="126345" coding_scheme="DCM" code_name="Gamma Capillary Transit Time (GCTT) Model"/>
+  </preset>
+  <preset name="Adiabatic Tissue Homogeneity (ATH) Model">
+    <type code_value="126346" coding_scheme="DCM" code_name="Adiabatic Tissue Homogeneity (ATH) Model"/>
+  </preset>
+  <preset name="Two Compartment Exchange (2CX) Model">
+    <type code_value="126347" coding_scheme="DCM" code_name="Two Compartment Exchange (2CX) Model"/>
+  </preset>
+<!--
+Perfusion Measurement Methods
+http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4102.html
+-->
+  <preset name="Perfusion analysis by Arterial Spin Labeling MR technique">
+    <type code_value="126302" coding_scheme="DCM" code_name="Perfusion analysis by Arterial Spin Labeling MR technique"/>
+  </preset>
+  <preset name="Perfusion analysis by Susceptibility MR technique">
+    <type code_value="126303" coding_scheme="DCM" code_name="Perfusion analysis by Susceptibility MR technique"/>
+  </preset>
+  <preset name="Perfusion analysis by Susceptibility MR technique">
+    <type code_value="126303" coding_scheme="DCM" code_name="Perfusion analysis by Susceptibility MR technique"/>
+  </preset>
+<!--
+Arterial Input Function Measurement Methods
+http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4103.html
+-->
+  <preset name="AIF Ignored">
+    <type code_value="126360" coding_scheme="DCM" code_name="AIF Ignored"/>
+  </preset>
+  <preset name="Population Averaged AIF">
+    <type code_value="126361" coding_scheme="DCM" code_name="Population Averaged AIF"/>
+  </preset>
+  <preset name="User-defined AIF ROI">
+    <type code_value="126362" coding_scheme="DCM" code_name="User-defined AIF ROI"/>
+  </preset>
+  <preset name="Automatically Detected AIF ROI">
+    <type code_value="126363" coding_scheme="DCM" code_name="Automatically Detected AIF ROI"/>
+  </preset>
+  <preset name="Blind Estimation of AIF">
+    <type code_value="126364" coding_scheme="DCM" code_name="Blind Estimation of AIF"/>
+  </preset>
+<!--
+Bolus Arrival Time Derivation Methods
+http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4104.html
+-->
+  <preset name="Temporal Derivative Exceeds Threshold">
+    <type code_value="126373" coding_scheme="DCM" code_name="Temporal Derivative Exceeds Threshold"/>
+  </preset>
+  <preset name="Time of Peak Concentration">
+    <type code_value="126370" coding_scheme="DCM" code_name="Time of Peak Concentration"/>
+  </preset>
+  <preset name="Time of Leading Half-Peak Concentration">
+    <type code_value="126372" coding_scheme="DCM" code_name="Time of Leading Half-Peak Concentration"/>
+  </preset>
+<!--
+Perfusion Analysis Methods
+http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4105.html
+-->
+  <preset name="Least Mean Square (LMS) deconvolution">
+    <type code_value="126310" coding_scheme="DCM" code_name="Least Mean Square (LMS) deconvolution"/>
+  </preset>
+  <preset name="Singular Value Decomposition (SVD) deconvolution">
+    <type code_value="126311" coding_scheme="DCM" code_name="Singular Value Decomposition (SVD) deconvolution"/>
+  </preset>
+<!--
+Perfusion Analysis Methods
+http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4105.html
+-->
+  <preset name="Model-free concentration-time quantitification">
+    <type code_value="126342" coding_scheme="DCM" code_name="Model-free concentration-time quantitification"/>
+  </preset>
+<!--
+Tracer Kinetic Model Parameters
+http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4107.html
+-->
+  <preset name="KTrans">
+    <type code_value="126312" coding_scheme="DCM" code_name="KTrans"/>
+  </preset>
+  <preset name="kep">
+    <type code_value="126313" coding_scheme="DCM" code_name="kep"/>
+  </preset>
+  <preset name="ve">
+    <type code_value="126314" coding_scheme="DCM" code_name="ve"/>
+  </preset>
+  <preset name="tau_m">
+    <type code_value="126330" coding_scheme="DCM" code_name="tau_m"/>
+  </preset>
+  <preset name="vp">
+    <type code_value="126331" coding_scheme="DCM" code_name="vp"/>
+  </preset>
+<!--
+Perfusion Model Parameters
+http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4108.html
+-->
+  <preset name="Regional Cerebral Blood Flow">
+    <type code_value="113055" coding_scheme="DCM" code_name="Regional Cerebral Blood Flow"/>
+  </preset>
+  <preset name="Regional Blood Flow">
+    <type code_value="126390" coding_scheme="DCM" code_name="Regional Blood Flow"/>
+  </preset>
+  <preset name="Regional Cerebral Blood Volume">
+    <type code_value="113056" coding_scheme="DCM" code_name="Regional Cerebral Blood Volume"/>
+  </preset>
+  <preset name="Regional Blood Volume">
+    <type code_value="126391" coding_scheme="DCM" code_name="Regional Blood Volume"/>
+  </preset>
+  <preset name="Mean Transit Time">
+    <type code_value="113052" coding_scheme="DCM" code_name="Mean Transit Time"/>
+  </preset>
+  <preset name="Time To Peak">
+    <type code_value="113069" coding_scheme="DCM" code_name="Time To Peak"/>
+  </preset>
+  <preset name="Oxygen Extraction Fraction">
+    <type code_value="126392" coding_scheme="DCM" code_name="Oxygen Extraction Fraction"/>
+  </preset>
+  <preset name="Tmax">
+    <type code_value="113084" coding_scheme="DCM" code_name="Tmax"/>
+  </preset>
+<!--
+Model-Independent Dynamic Contrast Analysis Parameters
+http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4109.html
+-->
+  <preset name="IAUC">
+    <type code_value="126320" coding_scheme="DCM" code_name="IAUC"/>
+  </preset>
+  <preset name="IAUC60">
+    <type code_value="126321" coding_scheme="DCM" code_name="IAUC60"/>
+  </preset>
+  <preset name="IAUC90">
+    <type code_value="126322" coding_scheme="DCM" code_name="IAUC90"/>
+  </preset>
+  <preset name="IAUC190">
+    <type code_value="126323" coding_scheme="DCM" code_name="IAUC180"/>
+  </preset>
+  <preset name="IAUCBN">
+    <type code_value="126324" coding_scheme="DCM" code_name="IAUCBN"/>
+  </preset>
+  <preset name="IAUC60BN">
+    <type code_value="126325" coding_scheme="DCM" code_name="IAUC60BN"/>
+  </preset>
+  <preset name="IAUC90BN">
+    <type code_value="126326" coding_scheme="DCM" code_name="IAUC90BN"/>
+  </preset>
+  <preset name="IAUC180BN">
+    <type code_value="126327" coding_scheme="DCM" code_name="IAUC90BN"/>
+  </preset>
+  <preset name="Time of Peak Concentration">
+    <type code_value="126370" coding_scheme="DCM" code_name="Time of Peak Concentration"/>
+  </preset>
+  <preset name="Time of Leading Half-Peak Concentration">
+    <type code_value="126372" coding_scheme="DCM" code_name="Time of Leading Half-Peak Concentration"/>
+  </preset>
+  <preset name="Bolus Arrival Time">
+    <type code_value="126371" coding_scheme="DCM" code_name="Bolus Arrival Time"/>
+  </preset>
+  <preset name="Time To Peak">
+    <type code_value="113069" coding_scheme="DCM" code_name="Time To Peak"/>
+  </preset>
+  <preset name="Temporal Derivative Threshold">
+    <type code_value="126374" coding_scheme="DCM" code_name="Temporal Derivative Threshold"/>
+  </preset>
+  <preset name="Maximum Slope">
+    <type code_value="126375" coding_scheme="DCM" code_name="Maximum Slope"/>
+  </preset>
+  <preset name="Time To Peak">
+    <type code_value="126376" coding_scheme="DCM" code_name="Maximum Difference"/>
+  </preset>
+  <preset name="Tracer Concentration">
+    <type code_value="126377" coding_scheme="DCM" code_name="Tracer Concentration"/>
+  </preset>
+  <!--
+Tracer Kinetic Modeling Covariates
+http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4110.html
+-->
+  <preset name="Hematocrit">
+    <type code_value="20570-8" coding_scheme="DCM" code_name="Hematocrit"/>
+  </preset>
+
+  <!--
+Contrast Characteristics
+http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4111.html
+-->
+  <preset name="Contrast Longitudinal Relaxivity">
+    <type code_value="126380" coding_scheme="DCM" code_name="Contrast Longitudinal Relaxivity"/>
+  </preset>  
+  
+</mitkParamapPresets>

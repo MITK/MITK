@@ -84,15 +84,6 @@ void mitk::VolumeMapperVtkSmart3D::SetDefaultProperties(mitk::DataNode *node, mi
   mitk::Image::Pointer image = dynamic_cast<mitk::Image *>(node->GetData());
   if (image.IsNotNull() && image->IsInitialized())
   {
-    if ((overwrite) || (node->GetProperty("levelwindow", renderer) == nullptr))
-    {
-      mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
-      mitk::LevelWindow levelwindow;
-      levelwindow.SetAuto(image);
-      levWinProp->SetLevelWindow(levelwindow);
-      node->SetProperty("levelwindow", levWinProp, renderer);
-    }
-
     if ((overwrite) || (node->GetProperty("TransferFunction", renderer) == nullptr))
     {
       // add a default transfer function

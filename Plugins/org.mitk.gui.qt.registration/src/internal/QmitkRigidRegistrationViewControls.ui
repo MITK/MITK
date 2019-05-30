@@ -168,13 +168,6 @@
              <item row="7" column="0" colspan="2">
               <layout class="QHBoxLayout" name="_3">
                <item>
-                <widget class="QLabel" name="label">
-                 <property name="text">
-                  <string>0%</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
                 <widget class="QLabel" name="m_OpacityLabel">
                  <property name="text">
                   <string>Moving Image Opacity:</string>
@@ -689,12 +682,6 @@
                          <property name="toolTip">
                           <string/>
                          </property>
-                         <property name="minimum">
-                          <number>-10000</number>
-                         </property>
-                         <property name="maximum">
-                          <number>10000</number>
-                         </property>
                          <property name="orientation">
                           <enum>Qt::Horizontal</enum>
                          </property>
@@ -702,12 +689,6 @@
                        </item>
                        <item>
                         <widget class="QSlider" name="m_YTransSlider">
-                         <property name="minimum">
-                          <number>-10000</number>
-                         </property>
-                         <property name="maximum">
-                          <number>10000</number>
-                         </property>
                          <property name="orientation">
                           <enum>Qt::Horizontal</enum>
                          </property>
@@ -715,12 +696,6 @@
                        </item>
                        <item>
                         <widget class="QSlider" name="m_ZTransSlider">
-                         <property name="minimum">
-                          <number>-10000</number>
-                         </property>
-                         <property name="maximum">
-                          <number>10000</number>
-                         </property>
                          <property name="orientation">
                           <enum>Qt::Horizontal</enum>
                          </property>

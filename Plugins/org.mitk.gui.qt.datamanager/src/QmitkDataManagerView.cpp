@@ -88,6 +88,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderingModeProperty.h"
 
 const QString QmitkDataManagerView::VIEW_ID = "org.mitk.views.datamanager";
+const char* QmitkDataManagerView::PART_NAME = QT_TRANSLATE_NOOP("Plugin Title", "Data Manager");
 
 QString QmitkDataManagerView::TR_GLOBAL_REINIT = QAction::tr("Global Reinit");
 QString QmitkDataManagerView::TR_REMOVE = QAction::tr("Remove");

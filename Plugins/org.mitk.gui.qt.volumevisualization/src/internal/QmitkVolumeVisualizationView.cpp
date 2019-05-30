@@ -44,8 +44,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QToolTip>
 
-const std::string QmitkVolumeVisualizationView::VIEW_ID =
-"org.mitk.views.volumevisualization";
+const std::string QmitkVolumeVisualizationView::VIEW_ID = "org.mitk.views.volumevisualization";
+const char* QmitkVolumeVisualizationView::PART_NAME = QT_TRANSLATE_NOOP("Plugin Title", "Volume Visualization");
 
 enum RenderMode
 {

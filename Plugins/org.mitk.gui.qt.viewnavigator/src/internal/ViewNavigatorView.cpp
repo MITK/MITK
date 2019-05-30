@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QVBoxLayout>
 
 const std::string ViewNavigatorView::VIEW_ID = "org.mitk.views.viewnavigatorview";
+const char* ViewNavigatorView::PART_NAME = QT_TRANSLATE_NOOP("Plugin Title", "View Navigator");
 
 void ViewNavigatorView::SetFocus()
 {
@@ -33,6 +34,7 @@ void ViewNavigatorView::SetFocus()
 
 void ViewNavigatorView::CreateQtPartControl( QWidget *parent )
 {
+  SetPartName(QApplication::translate("Plugin Title", PART_NAME));
   parent->setLayout(new QVBoxLayout);
   parent->layout()->setContentsMargins(0, 0, 0, 0);
   m_ViewNavigatorWidget = new QmitkViewNavigatorWidget(this->GetSite()->GetWorkbenchWindow(), parent);

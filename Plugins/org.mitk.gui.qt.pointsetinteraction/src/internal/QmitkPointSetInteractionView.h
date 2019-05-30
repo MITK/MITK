@@ -40,6 +40,7 @@ public:
   static QString TR_ENTER_NAME;
   static QString TR_POINTSET;
 
+  static const char* PART_NAME;
 
   QmitkPointSetInteractionView(QObject *parent=0);
   virtual ~QmitkPointSetInteractionView();

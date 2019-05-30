@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usGetModuleContext.h>
 
 const std::string QmitkGeometryToolsView::VIEW_ID = "org.mitk.views.geometrytools";
+const char* QmitkGeometryToolsView::PART_NAME = QT_TRANSLATE_NOOP("Plugin Title", "Geometry Tools");
 
 void QmitkGeometryToolsView::SetFocus()
 {
@@ -39,7 +40,7 @@ void QmitkGeometryToolsView::SetFocus()
 
 void QmitkGeometryToolsView::CreateQtPartControl( QWidget *parent )
 {
-  SetPartName(QObject::tr("Geometry Tools"));
+  SetPartName(QApplication::translate("Plugin Title", PART_NAME));
 
   m_Controls.setupUi( parent );
   connect( m_Controls.m_AddInteractor, SIGNAL(clicked()), this, SLOT(AddInteractor()) );

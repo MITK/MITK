@@ -54,6 +54,8 @@ class QmitkOverlayManagerView : public QmitkAbstractView, public mitk::IRenderWi
 public:
 
   static const std::string VIEW_ID;
+  static const char* PART_NAME;
+
   QmitkOverlayManagerView();
   ~QmitkOverlayManagerView();
 

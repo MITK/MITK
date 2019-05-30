@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <memory>
 
 const std::string QmitkPropertyTreeView::VIEW_ID = "org.mitk.views.properties";
+const char* QmitkPropertyTreeView::PART_NAME = QT_TRANSLATE_NOOP("Plugin Title", "Properties");
 
 QmitkPropertyTreeView::QmitkPropertyTreeView()
   : m_Parent(nullptr),
@@ -325,7 +326,7 @@ void QmitkPropertyTreeView::OnPropertyNameChanged(const itk::EventObject&)
 
     if (nameProperty != NULL)
     {
-      QString partName = QAction::tr("Properties") + " (";
+      QString partName = QApplication::translate("Plugin Title", PART_NAME) + " (";
       partName.append(QString::fromStdString(nameProperty->GetValueAsString())).append(')');
       this->SetPartName(partName);
     }
@@ -350,7 +351,7 @@ void QmitkPropertyTreeView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, c
   {
     m_SelectedNode = NULL;
 
-    this->SetPartName(QAction::tr("Properties"));
+    this->SetPartName(QApplication::translate("Plugin Title", PART_NAME));
     m_Model->SetPropertyList(NULL);
     m_Delegate->SetPropertyList(NULL);
 

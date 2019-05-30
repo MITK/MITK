@@ -57,6 +57,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 const std::string QmitkPointBasedRegistrationView::VIEW_ID = "org.mitk.views.pointbasedregistration";
+const char* QmitkPointBasedRegistrationView::PART_NAME = QT_TRANSLATE_NOOP("Plugin Title", "PointBasedRegistration");
 
 using namespace berry;
 
@@ -265,7 +266,7 @@ QmitkPointBasedRegistrationView::~QmitkPointBasedRegistrationView()
 
 void QmitkPointBasedRegistrationView::CreateQtPartControl(QWidget* parent)
 {
-  SetPartName(QAction::tr("PointBasedRegistration"));
+  SetPartName(QApplication::translate("Plugin Title", PART_NAME));
 
   m_Controls.setupUi(parent);
   m_Parent->setEnabled(false);

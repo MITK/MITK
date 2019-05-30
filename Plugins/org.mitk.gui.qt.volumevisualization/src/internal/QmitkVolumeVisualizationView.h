@@ -56,6 +56,7 @@ public:
   virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes) override;
 
   static const std::string VIEW_ID;
+  static const char* PART_NAME;
 
 
 protected slots:

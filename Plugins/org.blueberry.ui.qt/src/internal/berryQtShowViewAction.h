@@ -44,9 +44,6 @@ private:
 
   IViewDescriptor::Pointer m_Desc;
 
-  static const QMap<QString, QString> plugingTranslateNames;
-  QStringList plugingSrcNames;
-
 public:
 
   QtShowViewAction(IWorkbenchWindow::Pointer window, IViewDescriptor::Pointer desc) ;

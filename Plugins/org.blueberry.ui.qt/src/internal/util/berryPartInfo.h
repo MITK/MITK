@@ -33,9 +33,6 @@ struct PartInfo {
      QIcon image;
      bool dirty;
 
-     static const QString plugingTranslateNames[];
-     QStringList plugingSrcNames;
-
      PartInfo();
 
      PartInfo(IPresentablePart::Pointer part);

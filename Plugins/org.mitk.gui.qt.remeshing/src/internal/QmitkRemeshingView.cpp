@@ -36,6 +36,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <algorithm>
 #include <limits>
 
+const char* QmitkRemeshingView::PART_NAME = QT_TRANSLATE_NOOP("Plugin Title", "Remeshing");
+
 QmitkRemeshingView::QmitkRemeshingView()
 {
 }
@@ -46,7 +48,7 @@ QmitkRemeshingView::~QmitkRemeshingView()
 
 void QmitkRemeshingView::CreateQtPartControl(QWidget* parent)
 {
-  SetPartName(QObject::tr("Remeshing"));
+  SetPartName(QApplication::translate("Plugin Title", PART_NAME));
 
   m_Controls.setupUi(parent);
 

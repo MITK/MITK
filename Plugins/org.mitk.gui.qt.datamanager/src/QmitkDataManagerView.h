@@ -60,7 +60,7 @@ class MITK_QT_DATAMANAGER QmitkDataManagerView : public QmitkAbstractView
 
 public:
 
-
+  static const char* PART_NAME;
   static const QString VIEW_ID; // = "org.mitk.extapp.defaultperspective"
 
   static QString TR_GLOBAL_REINIT;

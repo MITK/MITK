@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSphericalTransform.h>
 
 #include <vnl/vnl_quaternion.h>
-#include <vnl/vnl_quaternion.txx>
+#include <vnl/vnl_quaternion.hxx>
 
 #include <fstream>
 

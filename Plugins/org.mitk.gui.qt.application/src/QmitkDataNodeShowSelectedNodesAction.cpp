@@ -47,10 +47,12 @@ void QmitkDataNodeShowSelectedNodesAction::OnActionTriggered(bool /*checked*/)
     return;
   }
 
+  auto dataStorage = m_DataStorage.Lock();
+
   mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
 
   auto dataNodes = GetSelectedNodes();
-  auto nodeset = m_DataStorage.Lock()->GetAll();
+  auto nodeset = dataStorage->GetAll();
   for (auto& node : *nodeset)
   {
     if (node.IsNotNull())
@@ -59,7 +61,7 @@ void QmitkDataNodeShowSelectedNodesAction::OnActionTriggered(bool /*checked*/)
       if(node->GetData() == nullptr)
       {
         node->SetVisibility(true, baseRenderer);
-        mitk::DataStorage::SetOfObjects::ConstPointer derivations = m_DataStorage.Lock()->GetDerivations(node);
+        mitk::DataStorage::SetOfObjects::ConstPointer derivations = dataStorage->GetDerivations(node);
         for (mitk::DataStorage::SetOfObjects::const_iterator iter = derivations->begin(); iter != derivations->end(); ++iter)
         {
           (*iter)->SetVisibility(true, baseRenderer);

@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
 
-class vtkPolyDataMapper;
+class vtkOpenGLPolyDataMapper;
 class vtkAppendPolyData;
 class vtkActor;
 class vtkTubeFilter;
@@ -55,7 +55,7 @@ protected:
 
   virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
 
-  vtkSmartPointer<vtkPolyDataMapper> m_VtkPolyDataMapper;
+  vtkSmartPointer<vtkOpenGLPolyDataMapper> m_VtkPolyDataMapper;
   vtkSmartPointer<vtkTubeFilter>     m_TubeFilter;
 
   vtkSmartPointer<vtkAppendPolyData> m_VtkPointList;

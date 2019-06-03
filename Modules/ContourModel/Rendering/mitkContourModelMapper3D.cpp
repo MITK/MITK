@@ -235,7 +235,7 @@ mitk::ContourModelMapper3D::LocalStorage* mitk::ContourModelMapper3D::GetLocalSt
 
 mitk::ContourModelMapper3D::LocalStorage::LocalStorage()
 {
-  m_Mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  m_Mapper = vtkSmartPointer<vtkOpenGLPolyDataMapper>::New();
   m_Actor = vtkSmartPointer<vtkActor>::New();
   m_OutlinePolyData = vtkSmartPointer<vtkPolyData>::New();
   m_TubeFilter = vtkSmartPointer<vtkTubeFilter>::New();

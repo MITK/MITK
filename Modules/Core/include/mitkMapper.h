@@ -134,7 +134,7 @@ namespace mitk {
     /** \brief Responsible for calling the appropriate render functions.
     *   To be implemented in sub-classes.
     */
-    virtual void MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type) = 0;
+    virtual void MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type, vtkInformation* info = nullptr) = 0;
 
     /**
     * \brief Apply specific color and opacity properties read from the PropertyList.

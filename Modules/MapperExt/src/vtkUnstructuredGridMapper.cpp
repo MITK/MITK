@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
-#include "vtkPolyDataMapper.h"
+#include "vtkOpenGLPolyDataMapper.h"
 #include "vtkScalarsToColors.h"
 #include "vtkUnstructuredGrid.h"
 
@@ -112,7 +112,7 @@ void vtkUnstructuredGridMapper::Render(vtkRenderer *ren, vtkActor *act)
   if ( this->PolyDataMapper == 0 )
     {
     vtkGeometryFilter *gf = vtkGeometryFilter::New();
-    vtkPolyDataMapper *pm = vtkPolyDataMapper::New();
+    vtkOpenGLPolyDataMapper *pm = vtkOpenGLPolyDataMapper::New();
     pm->SetInputConnection(gf->GetOutputPort());
 
     this->GeometryExtractor = gf;

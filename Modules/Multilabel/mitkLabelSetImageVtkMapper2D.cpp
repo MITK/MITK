@@ -47,7 +47,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkImageReslice.h>
 #include <vtkPlaneSource.h>
 #include <vtkPolyData.h>
-#include <vtkPolyDataMapper.h>
+#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkCellArray.h>
 #include <vtkCamera.h>
 //#include <vtkOpenGLTexture.h>
@@ -114,7 +114,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
       localStorage->m_ReslicerVector.push_back(mitk::ExtractSliceFilter::New());
       localStorage->m_LayerTextureVector.push_back(vtkSmartPointer<vtkNeverTranslucentTexture>::New());
       localStorage->m_LevelWindowFilterVector.push_back(vtkSmartPointer<vtkMitkLevelWindowFilter>::New());
-      localStorage->m_LayerMapperVector.push_back(vtkSmartPointer<vtkPolyDataMapper>::New());
+      localStorage->m_LayerMapperVector.push_back(vtkSmartPointer<vtkOpenGLPolyDataMapper>::New());
       localStorage->m_LayerActorVector.push_back(vtkSmartPointer<vtkActor>::New());
 
       //do not repeat the texture (the image)
@@ -689,7 +689,7 @@ mitk::LabelSetImageVtkMapper2D::LocalStorage::LocalStorage()
   m_OutlinePolyData = vtkSmartPointer<vtkPolyData>::New();
   m_EmptyPolyData = vtkSmartPointer<vtkPolyData>::New();
   m_OutlineActor = vtkSmartPointer<vtkActor>::New();
-  m_OutlineMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  m_OutlineMapper = vtkSmartPointer<vtkOpenGLPolyDataMapper>::New();
   m_OutlineShadowActor = vtkSmartPointer<vtkActor>::New();
 
   m_NumberOfLayers = 0;

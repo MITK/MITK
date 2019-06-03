@@ -43,7 +43,7 @@ void mitk::ContourMapper2D::ApplyColorAndOpacityProperties(mitk::BaseRenderer* r
   glColor4fv(rgba);
 }
 
-void mitk::ContourMapper2D::MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type)
+void mitk::ContourMapper2D::MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type, vtkInformation* info)
 {
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");

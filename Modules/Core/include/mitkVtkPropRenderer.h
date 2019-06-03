@@ -73,7 +73,7 @@ public:
   // Render - called by vtkMitkRenderProp, returns the number of props rendered
   enum RenderType{Opaque,Translucent,Overlay,Volumetric};
 
-  int Render(RenderType type);
+  int Render(RenderType type, vtkInformation* info);
 
   /** \brief This methods contains all method neceassary before a VTK Render() call */
   virtual void PrepareRender();

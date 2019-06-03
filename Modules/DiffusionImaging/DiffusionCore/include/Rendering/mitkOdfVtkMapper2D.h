@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkPropAssembly.h"
 #include "vtkAppendPolyData.h"
 #include "vtkActor.h"
-#include "vtkPolyDataMapper.h"
+#include "vtkOpenGLPolyDataMapper.h"
 #include "vtkPlane.h"
 #include "vtkCutter.h"
 #include "vtkClipPolyData.h"
@@ -94,7 +94,7 @@ public:
         std::vector< vtkSmartPointer<vtkPropAssembly> >       m_PropAssemblies;
         std::vector< vtkSmartPointer<vtkAppendPolyData> >     m_OdfsPlanes;
         std::vector< vtkSmartPointer<vtkActor> >              m_OdfsActors;
-        std::vector< vtkSmartPointer<vtkPolyDataMapper> >     m_OdfsMappers;
+        std::vector< vtkSmartPointer<vtkOpenGLPolyDataMapper> >     m_OdfsMappers;
         vtkSmartPointer< vtkPolyData >                        m_TemplateOdf;
 
         itk::TimeStamp                      m_LastUpdateTime;

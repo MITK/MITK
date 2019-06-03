@@ -85,7 +85,7 @@ void mitk::PlanarFigureMapper2D::Initialize(mitk::BaseRenderer* renderer)
   }
 }
 
-void mitk::PlanarFigureMapper2D::MitkRender( mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type )
+void mitk::PlanarFigureMapper2D::MitkRender( mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type, vtkInformation* info)
 {
   if (type != mitk::VtkPropRenderer::Overlay) return;
   if (!this->m_Initialized) {

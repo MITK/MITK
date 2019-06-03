@@ -104,7 +104,7 @@ public:
     /**
        * @brief m_Mapper VTK mapper for all types of 2D polydata e.g. werewolves.
        */
-    vtkSmartPointer<vtkPolyDataMapper> m_Mapper;
+    vtkSmartPointer<vtkOpenGLPolyDataMapper> m_Mapper;
     /**
        * @brief m_Cutter Filter to cut out the 2D slice.
        */
@@ -117,12 +117,12 @@ public:
     /**
      * @brief m_NormalMapper Mapper for the normals.
      */
-    vtkSmartPointer<vtkPolyDataMapper> m_NormalMapper;
+    vtkSmartPointer<vtkOpenGLPolyDataMapper> m_NormalMapper;
 
     /**
      * @brief m_InverseNormalMapper Mapper for the inverse normals.
      */
-    vtkSmartPointer<vtkPolyDataMapper> m_InverseNormalMapper;
+    vtkSmartPointer<vtkOpenGLPolyDataMapper> m_InverseNormalMapper;
 
     /**
      * @brief m_NormalGlyph Glyph for creating normals.

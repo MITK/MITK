@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTextOverlay3D.h"
 #include <vtkTextProperty.h>
-#include <vtkPolyDataMapper.h>
+#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkFollower.h>
 #include <vtkVectorText.h>
@@ -51,8 +51,8 @@ mitk::TextOverlay3D::LocalStorage::LocalStorage()
   m_textSource = vtkSmartPointer<vtkVectorText>::New();
 
   // Create a mapper
-  vtkSmartPointer<vtkPolyDataMapper> mapper =
-    vtkSmartPointer<vtkPolyDataMapper>::New();
+  vtkSmartPointer<vtkOpenGLPolyDataMapper> mapper =
+    vtkSmartPointer<vtkOpenGLPolyDataMapper>::New();
   mapper->SetInputConnection( m_textSource->GetOutputPort() );
 
   // Create a subclass of vtkActor: a vtkFollower that remains facing the camera

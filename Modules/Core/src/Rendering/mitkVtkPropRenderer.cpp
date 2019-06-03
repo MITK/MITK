@@ -155,7 +155,7 @@ bool mitk::VtkPropRenderer::SetWorldGeometryToDataStorageBounds()
 
 Called by the vtkMitkRenderProp in order to start MITK rendering process.
 */
-int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
+int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type, vtkInformation* info)
 {
   //Update all overlays in any case
   this->UpdateOverlays();
@@ -174,7 +174,7 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
   for ( auto it = m_MappersMap.cbegin(); it != m_MappersMap.cend(); it++)
   {
     Mapper * mapper = (*it).second;
-    mapper->MitkRender(this, type);
+    mapper->MitkRender(this, type, info);
   }
 
   //Update overlays in case a mapper has changed them

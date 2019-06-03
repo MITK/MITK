@@ -48,7 +48,7 @@ namespace mitk {
     /**
     * reimplemented from Baseclass
     */
-    virtual void MitkRender(BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type) override;
+    virtual void MitkRender(BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type, vtkInformation* info = nullptr) override;
 
     static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 

@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkLinearTransform.h>
 #include <vtkMapper.h>
 #include <vtkPropAssembly.h>
-#include <vtkPolyDataMapper.h>
+#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkProp3DCollection.h>
 
 class vtkProp;
@@ -69,7 +69,7 @@ class MITKCORE_EXPORT VtkMapper : public Mapper
     *
     * Called by mitk::VtkPropRenderer::Render
     */
-    void MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type) override;
+    void MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type, vtkInformation* info = nullptr) override;
 
     /** \brief Checks visibility and renders the overlay */
     virtual void MitkRenderOverlay(BaseRenderer* renderer);

@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 #include <vtkProperty2D.h>
 #include <vtkActor2D.h>
-#include <vtkPolyDataMapper2D.h>
+#include <vtkOpenGLPolyDataMapper2D.h>
 #include <vtkViewport.h>
 
 
@@ -36,7 +36,7 @@ vtkMitkRectangleProp::vtkMitkRectangleProp():
   m_OriginX(0),
   m_OriginY(0)
 {
-  vtkSmartPointer<vtkPolyDataMapper2D> mapper = vtkSmartPointer<vtkPolyDataMapper2D>::New();
+  vtkSmartPointer<vtkOpenGLPolyDataMapper2D> mapper = vtkSmartPointer<vtkOpenGLPolyDataMapper2D>::New();
   m_PolyData = vtkSmartPointer<vtkPolyData>::New();
 
   vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();

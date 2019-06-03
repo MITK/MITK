@@ -27,7 +27,7 @@ class vtkActor2D;
 class vtkPropAssembly;
 class vtkFloatArray;
 class vtkCellArray;
-class vtkPolyDataMapper2D;
+class vtkOpenGLPolyDataMapper2D;
 
 namespace mitk {
 
@@ -90,9 +90,9 @@ public:
     vtkSmartPointer<vtkActor2D> m_CrosshairActor;
     vtkSmartPointer<vtkActor2D> m_CrosshairHelperLineActor;
     vtkSmartPointer<vtkActor2D> m_ArrowActor;
-    vtkSmartPointer<vtkPolyDataMapper2D> m_HelperLinesmapper;
-    vtkSmartPointer<vtkPolyDataMapper2D> m_Arrowmapper;
-    vtkSmartPointer<vtkPolyDataMapper2D> m_Mapper;
+    vtkSmartPointer<vtkOpenGLPolyDataMapper2D> m_HelperLinesmapper;
+    vtkSmartPointer<vtkOpenGLPolyDataMapper2D> m_Arrowmapper;
+    vtkSmartPointer<vtkOpenGLPolyDataMapper2D> m_Mapper;
     vtkSmartPointer<vtkPropAssembly> m_CrosshairAssembly;
   };
 

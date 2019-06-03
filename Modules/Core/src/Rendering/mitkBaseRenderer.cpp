@@ -41,7 +41,7 @@
 #include <vtkCamera.h>
 
 #include <vtkProperty.h>
-#include <vtkPolyDataMapper.h>
+#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkActor.h>
 
 mitk::BaseRenderer::BaseRendererMapType mitk::BaseRenderer::baseRendererMap;
@@ -192,7 +192,7 @@ mitk::BaseRenderer::BaseRenderer(const char* name, vtkRenderWindow * renWin, mit
   if (renderingMode == RenderingMode::DepthPeeling)
   {
     m_VtkRenderer->SetUseDepthPeeling(1);
-    m_VtkRenderer->SetMaximumNumberOfPeels(20);
+    m_VtkRenderer->SetMaximumNumberOfPeels(8);
     m_VtkRenderer->SetOcclusionRatio(0.);
   }
 

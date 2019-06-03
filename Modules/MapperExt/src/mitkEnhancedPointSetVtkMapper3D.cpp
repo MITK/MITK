@@ -38,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkConeSource.h>
 #include <vtkCylinderSource.h>
 #include <vtkProperty.h>
-#include <vtkPolyDataMapper.h>
+#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkTransformPolyDataFilter.h>
 
 #include <vtkPolyDataAlgorithm.h>
@@ -133,7 +133,7 @@ void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkObjects()
     if (newPoint)  // point did not exist before, we have to create vtk objects for it
     { // create actor and mapper for the new point
       a = vtkActor::New();
-      vtkPolyDataMapper* m = vtkPolyDataMapper::New();
+      vtkPolyDataMapper* m = vtkOpenGLPolyDataMapper::New();
       a->SetMapper(m);
       m->UnRegister( NULL );
       aIt = m_PointActors.insert(std::make_pair(pointID, std::make_pair(a, data.pointSpec))).first;  // insert element and update actormap iterator to point to new element
@@ -171,7 +171,7 @@ void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkObjects()
         source = m_SphereSources[pointID];
         break;
       }
-      vtkPolyDataMapper* m = dynamic_cast<vtkPolyDataMapper*>(a->GetMapper());
+      vtkOpenGLPolyDataMapper* m = dynamic_cast<vtkOpenGLPolyDataMapper*>(a->GetMapper());
       assert(m != NULL);
       m->SetInputConnection(source->GetOutputPort());
       aIt->second.second = data.pointSpec; // update point spec in actormap

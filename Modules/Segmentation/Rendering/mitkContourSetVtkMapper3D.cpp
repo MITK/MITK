@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCellArray.h>
 #include <vtkAppendPolyData.h>
 #include <vtkPolyData.h>
-#include <vtkPolyDataMapper.h>
+#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkFollower.h>
 #include <vtkAssembly.h>
 #include <vtkProp3DCollection.h>
@@ -38,13 +38,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include <vtkProperty.h>
-#include <vtkPolyDataMapper.h>
 #include <stdlib.h>
 
 
 mitk::ContourSetVtkMapper3D::ContourSetVtkMapper3D()
 {
-  m_VtkPolyDataMapper = vtkPolyDataMapper::New();
+  m_VtkPolyDataMapper = vtkOpenGLPolyDataMapper::New();
   m_Actor = vtkActor::New();
   m_Actor->SetMapper(m_VtkPolyDataMapper);
 

@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
 #include <vtkCellArray.h>
-#include <vtkPolyDataMapper.h>
+#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkActor.h>
 #include <vtkProperty.h>
 #include <vtkTubeFilter.h>
@@ -149,7 +149,7 @@ bool mitk::SplineVtkMapper3D::SplinesAreAvailable()
 vtkPolyData* mitk::SplineVtkMapper3D::GetSplinesPolyData()
 {
   if ( m_SplinesAvailable )
-    return ( dynamic_cast<vtkPolyDataMapper*>( m_SplinesActor->GetMapper() ) )->GetInput();
+    return ( dynamic_cast<vtkOpenGLPolyDataMapper*>( m_SplinesActor->GetMapper() ) )->GetInput();
   else
     return NULL;
 }
@@ -217,7 +217,7 @@ void mitk::SplineVtkMapper3D::UpdateSpline()
     //profileTubes->SetInput(profileData);
     //profileTubes->SetRadius(.005);
 
-    vtkPolyDataMapper* profileMapper = vtkPolyDataMapper::New();
+    vtkOpenGLPolyDataMapper* profileMapper = vtkOpenGLPolyDataMapper::New();
     profileMapper->SetInputData( profileData );
 
     m_SplinesActor->SetMapper( profileMapper );

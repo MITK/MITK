@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPropAssembly.h>
 
 class vtkActor;
-class vtkPolyDataMapper;
+class vtkOpenGLPolyDataMapper;
 class vtkPlaneSource;
 class vtkImageData;
 class vtkLookupTable;
@@ -153,7 +153,7 @@ public:
 
     vtkSmartPointer<vtkPropAssembly> m_Actors;
     /** \brief Mapper of a 2D render window. */
-    vtkSmartPointer<vtkPolyDataMapper> m_Mapper;
+    vtkSmartPointer<vtkOpenGLPolyDataMapper> m_Mapper;
     vtkSmartPointer<vtkImageExtractComponents> m_VectorComponentExtractor;
     /** \brief Current slice of a 2D render window.*/
     vtkSmartPointer<vtkImageData> m_ReslicedImage;
@@ -186,7 +186,7 @@ public:
     /** \brief An actor for the outline shadow*/
     vtkSmartPointer<vtkActor> m_OutlineShadowActor;
     /** \brief A mapper for the outline */
-    vtkSmartPointer<vtkPolyDataMapper> m_OutlineMapper;
+    vtkSmartPointer<vtkOpenGLPolyDataMapper> m_OutlineMapper;
 
     /** \brief Timestamp of last update of stored data. */
     itk::TimeStamp m_LastUpdateTime;

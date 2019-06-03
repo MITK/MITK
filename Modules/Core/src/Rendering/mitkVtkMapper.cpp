@@ -24,7 +24,8 @@ mitk::VtkMapper::~VtkMapper()
 {
 }
 
-void mitk::VtkMapper::MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type){
+void mitk::VtkMapper::MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type, vtkInformation* info){
+  GetVtkProp(renderer)->SetPropertyKeys(info);
   switch(type)
   {
   case mitk::VtkPropRenderer::Opaque: this->MitkRenderOpaqueGeometry(renderer); break;

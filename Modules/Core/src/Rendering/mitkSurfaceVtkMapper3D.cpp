@@ -36,7 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkActor.h>
 #include <vtkProperty.h>
 #include <vtkPolyData.h>
-#include <vtkPolyDataMapper.h>
+#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkPointData.h>
 #include <vtkPlaneCollection.h>

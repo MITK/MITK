@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkMaskedGlyph3D.h>
 #include <vtkActor.h>
-#include <vtkPolyDataMapper.h>
+#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkArrowSource.h>
 #include <vtkLineSource.h>
 #include <vtkImageData.h>
@@ -39,7 +39,7 @@ mitk::VectorImageVtkGlyphMapper3D::VectorImageVtkGlyphMapper3D()
   m_MaximumNumberOfPoints = 5000;
   m_GlyphType = ArrowGlyph;
   m_Glyph3DGenerator = vtkMaskedGlyph3D::New();
-  m_Glyph3DMapper = vtkPolyDataMapper::New();
+  m_Glyph3DMapper = vtkOpenGLPolyDataMapper::New();
   m_Glyph3DActor = vtkActor::New();
 }
 

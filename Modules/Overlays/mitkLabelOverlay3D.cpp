@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkLabelOverlay3D.h"
 #include <vtkTextProperty.h>
-#include <vtkPolyDataMapper.h>
+#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkPointData.h>
 #include <vtkStringArray.h>
 #include <vtkPolyData.h>

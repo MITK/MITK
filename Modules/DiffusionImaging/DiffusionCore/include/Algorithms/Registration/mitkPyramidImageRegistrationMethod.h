@@ -207,7 +207,7 @@ public:
 
     ParametersType params(dim);
 
-    params.SetData(m_EstimatedParameters);
+    params.SetDataSameSize(m_EstimatedParameters);
     return params;
   }
 

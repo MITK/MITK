@@ -373,7 +373,7 @@ mitk::ContourModelMapper2D::LocalStorage* mitk::ContourModelMapper2D::GetLocalSt
 
 mitk::ContourModelMapper2D::LocalStorage::LocalStorage()
 {
-  m_Mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  m_Mapper = vtkSmartPointer<vtkOpenGLPolyDataMapper>::New();
   m_Actor = vtkSmartPointer<vtkActor>::New();
   m_OutlinePolyData = vtkSmartPointer<vtkPolyData>::New();
 

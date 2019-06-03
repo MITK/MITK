@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 
 class vtkActor;
-class vtkPolyDataMapper;
+class vtkOpenGLPolyDataMapper;
 class vtkPlaneSource;
 class vtkImageData;
 class vtkLookupTable;
@@ -95,7 +95,7 @@ public:
     vtkSmartPointer<vtkPropAssembly> m_Actors;
 
     std::vector< vtkSmartPointer<vtkActor> > m_LayerActorVector;
-    std::vector< vtkSmartPointer<vtkPolyDataMapper> > m_LayerMapperVector;
+    std::vector< vtkSmartPointer<vtkOpenGLPolyDataMapper> > m_LayerMapperVector;
     std::vector< vtkSmartPointer<vtkImageData> > m_ReslicedImageVector;
     std::vector< vtkSmartPointer<vtkNeverTranslucentTexture> > m_LayerTextureVector;
 
@@ -110,7 +110,7 @@ public:
     /** \brief An actor for the outline shadow*/
     vtkSmartPointer<vtkActor> m_OutlineShadowActor;
     /** \brief A mapper for the outline */
-    vtkSmartPointer<vtkPolyDataMapper> m_OutlineMapper;
+    vtkSmartPointer<vtkOpenGLPolyDataMapper> m_OutlineMapper;
 
     /** \brief Timestamp of last update of stored data. */
     itk::TimeStamp m_LastDataUpdateTime;

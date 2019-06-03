@@ -41,7 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class vtkActor;
 class vtkAssembly;
 class vtkFollower;
-class vtkPolyDataMapper;
+class vtkOpenGLPolyDataMapper;
 class vtkPropAssembly;
 
 namespace mitk {
@@ -79,10 +79,10 @@ protected:
 
   vtkActor *m_SpheresActor;
   vtkActor *m_ContourActor;
-  vtkPolyDataMapper* m_ContourMapper;
-  vtkPolyDataMapper* m_SpheresMapper;
+  vtkOpenGLPolyDataMapper* m_ContourMapper;
+  vtkOpenGLPolyDataMapper* m_SpheresMapper;
 
-  vtkPolyDataMapper* m_TextVtkPolyDataMapper;
+  vtkOpenGLPolyDataMapper* m_TextVtkPolyDataMapper;
 
   vtkAppendPolyData *m_Spheres;
   vtkPolyData *m_Contour;

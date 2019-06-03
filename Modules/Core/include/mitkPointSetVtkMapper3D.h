@@ -29,7 +29,7 @@ class vtkPropAssembly;
 class vtkAppendPolyData;
 class vtkPolyData;
 class vtkTubeFilter;
-class vtkPolyDataMapper;
+class vtkOpenGLPolyDataMapper;
 class vtkTransformPolyDataFilter;
 
 namespace mitk {
@@ -147,9 +147,9 @@ namespace mitk {
 
     vtkSmartPointer<vtkTransformPolyDataFilter> m_VtkPointsTransformer;
 
-    vtkSmartPointer<vtkPolyDataMapper> m_VtkSelectedPolyDataMapper;
-    vtkSmartPointer<vtkPolyDataMapper> m_VtkSelectedAreaPolyDataMapper;
-    vtkSmartPointer<vtkPolyDataMapper> m_VtkUnselectedPolyDataMapper;
+    vtkSmartPointer<vtkOpenGLPolyDataMapper> m_VtkSelectedPolyDataMapper;
+    vtkSmartPointer<vtkOpenGLPolyDataMapper> m_VtkSelectedAreaPolyDataMapper;
+    vtkSmartPointer<vtkOpenGLPolyDataMapper> m_VtkUnselectedPolyDataMapper;
 
     vtkSmartPointer<vtkActor> m_SelectedActor;
     vtkSmartPointer<vtkActor> m_SelectedAreaActor;

@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkLesionTreeModel::QmitkLesionTreeModel(QObject* parent/* = nullptr*/)
   : QmitkAbstractSemanticRelationsStorageModel(parent)
+  , m_LastSegmentation(nullptr)
   , m_RootItem(std::make_shared<QmitkLesionTreeItem>(mitk::LesionData()))
 {
   // nothing here

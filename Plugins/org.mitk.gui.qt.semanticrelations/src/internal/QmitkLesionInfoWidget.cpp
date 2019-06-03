@@ -244,8 +244,11 @@ void QmitkLesionInfoWidget::OnLinkToSegmentation(mitk::SemanticTypes::Lesion sel
   // set the last added segmentation node as pre-selected data node
   const mitk::DataNode* lastSegmentation = m_StorageModel->GetLastSegmentation();
   QList<mitk::DataNode::Pointer> selectedDataNodes;
-  selectedDataNodes.push_back(const_cast<mitk::DataNode*>(lastSegmentation));
-  dialog->SetCurrentSelection(selectedDataNodes);
+  if (nullptr != lastSegmentation)
+  {
+    selectedDataNodes.push_back(const_cast<mitk::DataNode*>(lastSegmentation));
+    dialog->SetCurrentSelection(selectedDataNodes);
+  }
 
   int dialogReturnValue = dialog->exec();
   if (QDialog::Rejected == dialogReturnValue)

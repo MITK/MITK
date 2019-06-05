@@ -26,11 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 void mitk::VolumeMapperVtkSmart3D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
 {
-  if (this->GetDataNode()->GetMTime() < this->GetMTime())
-  {
-    return;
-  }
-
   bool value;
   this->GetDataNode()->GetBoolProperty("volumerendering", value, renderer);
   if (!value)
@@ -109,6 +104,10 @@ void mitk::VolumeMapperVtkSmart3D::SetDefaultProperties(mitk::DataNode *node, mi
   }
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
+}
+
+void mitk::VolumeMapperVtkSmart3D::setClippingPlanes(vtkPlanes* planes) {
+  m_SmartVolumeMapper->SetClippingPlanes(planes);
 }
 
 vtkImageData* mitk::VolumeMapperVtkSmart3D::GetInputImage()

@@ -103,10 +103,6 @@ QVariant QmitkPatientTableModel::data(const QModelIndex& index, int role/* = Qt:
   }
 
   mitk::DataNode* dataNode = GetCurrentDataNode(index);
-  if (nullptr == dataNode)
-  {
-    return QVariant();
-  }
 
   if (Qt::DecorationRole == role)
   {
@@ -115,16 +111,10 @@ QVariant QmitkPatientTableModel::data(const QModelIndex& index, int role/* = Qt:
     {
       return QVariant(it->second);
     }
-  }
 
-  if (QmitkDataNodeRole == role)
-  {
-    return QVariant::fromValue<mitk::DataNode::Pointer>(mitk::DataNode::Pointer(dataNode));
-  }
-
-  if (QmitkDataNodeRawPointerRole == role)
-  {
-    return QVariant::fromValue<mitk::DataNode*>(dataNode);
+    auto emptyPixmap = QPixmap(120, 120);
+    emptyPixmap.fill(Qt::darkGray);
+    return emptyPixmap;
   }
 
   if (Qt::BackgroundColorRole == role)
@@ -136,6 +126,16 @@ QVariant QmitkPatientTableModel::data(const QModelIndex& index, int role/* = Qt:
     }
 
     return QVariant(QColor(Qt::transparent));
+  }
+
+  if (QmitkDataNodeRole == role)
+  {
+    return QVariant::fromValue<mitk::DataNode::Pointer>(mitk::DataNode::Pointer(dataNode));
+  }
+
+  if (QmitkDataNodeRawPointerRole == role)
+  {
+    return QVariant::fromValue<mitk::DataNode*>(dataNode);
   }
 
   return QVariant();

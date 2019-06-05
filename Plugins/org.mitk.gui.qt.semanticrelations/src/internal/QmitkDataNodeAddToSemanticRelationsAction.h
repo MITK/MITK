@@ -27,6 +27,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace AddToSemanticRelationsAction
 {
+  /**
+  * @brief The function checks whether the given node is an image or a segmentation and calls the corresponding add function.
+  *        The corresponding add functions will add the data node to the semantic relations storage.
+  *        If an image is added, the 'AddImage' function will check if another image at the fitting control-point - information type cell
+  *        already exists. If so, the user is prompted to overwrite the existing image or abort the process.
+  *        If the user wants to overwrite the existing image, the image and it's corresponding segmentation nodes will be removed from the semantic relations storage.
+  *        If a segmentation is added, the parent image node will also be to the semantic relations storage. If the segmentation does not contain the required DICOM information,
+  *        the DICOM information of the parent data will be transfered to the segmentation data.
+  *
+  * @pre    The given semantic relations integration has to be valid (!nullptr).
+  * @pre    The given dataStorage has to be valid (!nullptr).
+  * @pre    The given dataNode has to be valid (!nullptr).
+  *         The function simply returns if the preconditions are not met.
+  *
+  * @throw  SemanticRelationException re-thrown.
+  *
+  * @param semanticRelationsIntegration   An instance of the semantic relations integration that should be used to perform the node adding.
+  * @param dataStorage                    The data storage to use for to remove the existing image and to check for the parent image node of a segmentation.
+  * @param dataNode                       The data node to add.
+  */
   MITK_GUI_SEMANTICRELATIONS_EXPORT void Run(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, mitk::DataStorage* dataStorage, const mitk::DataNode* image);
   
   void AddImage(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, mitk::DataStorage* dataStorage, const mitk::DataNode* image);

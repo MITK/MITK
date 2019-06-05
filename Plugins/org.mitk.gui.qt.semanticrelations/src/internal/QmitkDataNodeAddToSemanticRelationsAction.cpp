@@ -42,28 +42,39 @@ namespace AddToSemanticRelationsAction
 {
   void Run(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, mitk::DataStorage* dataStorage, const mitk::DataNode* dataNode)
   {
-    if (nullptr == dataNode)
+    if (nullptr == semanticRelationsIntegration
+     || nullptr == dataStorage
+     || nullptr == dataNode)
     {
       return;
     }
 
     if (mitk::NodePredicates::GetImagePredicate()->CheckNode(dataNode))
     {
-      AddImage(semanticRelationsIntegration, dataStorage, dataNode);
+      try
+      {
+        AddImage(semanticRelationsIntegration, dataStorage, dataNode);
+      }
+      catch (mitk::SemanticRelationException& e)
+      {
+        mitkReThrow(e);
+      }
     }
     else if (mitk::NodePredicates::GetSegmentationPredicate()->CheckNode(dataNode))
     {
-      AddSegmentation(semanticRelationsIntegration, dataStorage, dataNode);
+      try
+      {
+        AddSegmentation(semanticRelationsIntegration, dataStorage, dataNode);
+      }
+      catch (mitk::SemanticRelationException& e)
+      {
+        mitkReThrow(e);
+      }
     }
   }
 
   void AddImage(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, mitk::DataStorage* dataStorage, const mitk::DataNode* image)
   {
-    if (nullptr == image)
-    {
-      return;
-    }
-
     mitk::SemanticTypes::InformationType informationType;
     mitk::SemanticTypes::ExaminationPeriod examinationPeriod;
     mitk::SemanticRelationsDataStorageAccess::DataNodeVector allSpecificImages;
@@ -83,14 +94,9 @@ namespace AddToSemanticRelationsAction
         // just continue since an exception means that there is no specific image
       }
     }
-    catch (const mitk::SemanticRelationException& e)
+    catch (mitk::SemanticRelationException& e)
     {
-      std::stringstream exceptionMessage; exceptionMessage << e;
-      QMessageBox msgBox(QMessageBox::Warning,
-        "Could not add the selected image.",
-        "The program wasn't able to correctly add the selected images.\n"
-        "Reason:\n" + QString::fromStdString(exceptionMessage.str() + "\n"));
-      msgBox.exec();
+      mitkReThrow(e);
     }
 
     if (!allSpecificImages.empty())
@@ -113,14 +119,10 @@ namespace AddToSemanticRelationsAction
             RemoveFromSemanticRelationsAction::Run(semanticRelationsIntegration, dataStorage, specificImage);
           }
         }
-        catch (const mitk::SemanticRelationException& e)
+        catch (mitk::SemanticRelationException& e)
         {
-          std::stringstream exceptionMessage; exceptionMessage << e;
-          QMessageBox msgBox(QMessageBox::Warning,
-            "Could not add the selected image.",
-            "The program wasn't able to correctly add the selected images.\n"
-            "Reason:\n" + QString::fromStdString(exceptionMessage.str() + "\n"));
-          msgBox.exec();
+          mitkReThrow(e);
+          return;
         }
       }
       else
@@ -135,14 +137,9 @@ namespace AddToSemanticRelationsAction
     {
       semanticRelationsIntegration->AddImage(image);
     }
-    catch (const mitk::SemanticRelationException& e)
+    catch (mitk::SemanticRelationException& e)
     {
-      std::stringstream exceptionMessage; exceptionMessage << e;
-      QMessageBox msgBox(QMessageBox::Warning,
-        "Could not add the selected image.",
-        "The program wasn't able to correctly add the selected images.\n"
-        "Reason:\n" + QString::fromStdString(exceptionMessage.str() + "\n"));
-      msgBox.exec();
+      mitkReThrow(e);
     }
   }
 
@@ -189,23 +186,16 @@ namespace AddToSemanticRelationsAction
         caseID = mitk::GetCaseIDFromDataNode(parentNodes->front());
         nodeID = mitk::GetIDFromDataNode(parentNodes->front());
       }
-      catch (const mitk::SemanticRelationException& e)
+      catch (mitk::SemanticRelationException& e)
       {
-        std::stringstream exceptionMessage; exceptionMessage << e;
-        QMessageBox msgBox(QMessageBox::Warning,
-          "Could not add the selected segmentation.",
-          "The program wasn't able to correctly add the selected segmentation.\n"
-          "Reason:\n" + QString::fromStdString(exceptionMessage.str()));
-        msgBox.exec();
+        mitkReThrow(e);
         return;
       }
 
       // transfer DICOM tags to the segmentation node
-      baseData->SetProperty(caseIDPropertyName,
-        mitk::TemporoSpatialStringProperty::New(caseID));
+      baseData->SetProperty(caseIDPropertyName, mitk::TemporoSpatialStringProperty::New(caseID));
       // add UID to distinguish between different segmentations of the same parent node
-      baseData->SetProperty(nodeIDPropertyName,
-        mitk::TemporoSpatialStringProperty::New(nodeID + mitk::UIDGeneratorBoost::GenerateUID()));
+      baseData->SetProperty(nodeIDPropertyName, mitk::TemporoSpatialStringProperty::New(nodeID + mitk::UIDGeneratorBoost::GenerateUID()));
     }
 
     // add the parent node if not already existent
@@ -219,15 +209,9 @@ namespace AddToSemanticRelationsAction
       // add the segmentation with its parent image to the semantic relations storage
       semanticRelationsIntegration->AddSegmentation(segmentation, parentNodes->front());
     }
-    catch (const mitk::SemanticRelationException& e)
+    catch (mitk::SemanticRelationException& e)
     {
-      std::stringstream exceptionMessage; exceptionMessage << e;
-      QMessageBox msgBox(QMessageBox::Warning,
-        "Could not add the selected segmentation.",
-        "The program wasn't able to correctly add the selected segmentation.\n"
-        "Reason:\n" + QString::fromStdString(exceptionMessage.str()));
-      msgBox.exec();
-      return;
+      mitkReThrow(e);
     }
   }
 }

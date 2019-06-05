@@ -32,28 +32,39 @@ namespace RemoveFromSemanticRelationsAction
 {
   void Run(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, mitk::DataStorage* dataStorage, const mitk::DataNode* dataNode)
   {
-    if (nullptr == dataNode)
+    if (nullptr == semanticRelationsIntegration
+     || nullptr == dataStorage
+     || nullptr == dataNode)
     {
       return;
     }
 
     if (mitk::NodePredicates::GetImagePredicate()->CheckNode(dataNode))
     {
-      RemoveImage(semanticRelationsIntegration, dataStorage, dataNode);
+      try
+      {
+        RemoveImage(semanticRelationsIntegration, dataStorage, dataNode);
+      }
+      catch (mitk::SemanticRelationException& e)
+      {
+        mitkReThrow(e);
+      }
     }
     else if (mitk::NodePredicates::GetSegmentationPredicate()->CheckNode(dataNode))
     {
-      RemoveSegmentation(semanticRelationsIntegration, dataNode);
+      try
+      {
+        RemoveSegmentation(semanticRelationsIntegration, dataNode);
+      }
+      catch (mitk::SemanticRelationException& e)
+      {
+        mitkReThrow(e);
+      }
     }
   }
 
   void RemoveImage(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, mitk::DataStorage* dataStorage, const mitk::DataNode* image)
   {
-    if (nullptr == image)
-    {
-      return;
-    }
-
     try
     {
       // remove each corresponding segmentation from the semantic relations storage
@@ -65,41 +76,22 @@ namespace RemoveFromSemanticRelationsAction
       // remove the image from the semantic relations storage
       semanticRelationsIntegration->RemoveImage(image);
     }
-    catch (const mitk::SemanticRelationException& e)
+    catch (mitk::SemanticRelationException& e)
     {
-      std::stringstream exceptionMessage; exceptionMessage << e;
-      QMessageBox msgBox;
-      msgBox.setWindowTitle("Could not remove the selected image.");
-      msgBox.setText("The program wasn't able to correctly remove the selected image.\n"
-        "Reason:\n" + QString::fromStdString(exceptionMessage.str()));
-      msgBox.setIcon(QMessageBox::Warning);
-      msgBox.exec();
-      return;
+      mitkReThrow(e);
     }
   }
 
   void RemoveSegmentation(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, const mitk::DataNode* segmentation)
   {
-    if (nullptr == segmentation)
-    {
-      return;
-    }
-
     try
     {
       // remove the segmentation from the semantic relations storage
       semanticRelationsIntegration->RemoveSegmentation(segmentation);
     }
-    catch (const mitk::SemanticRelationException& e)
+    catch (mitk::SemanticRelationException& e)
     {
-      std::stringstream exceptionMessage; exceptionMessage << e;
-      QMessageBox msgBox;
-      msgBox.setWindowTitle("Could not remove the selected segmentation.");
-      msgBox.setText("The program wasn't able to correctly remove the selected segmentation.\n"
-        "Reason:\n" + QString::fromStdString(exceptionMessage.str()));
-      msgBox.setIcon(QMessageBox::Warning);
-      msgBox.exec();
-      return;
+      mitkReThrow(e);
     }
   }
 }

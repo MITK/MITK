@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // semantic relations module
 #include <mitkDICOMHelper.h>
 #include <mitkNodePredicates.h>
+#include <mitkSemanticRelationException.h>
 #include <mitkSemanticRelationsInference.h>
 #include <mitkRelationStorage.h>
 
@@ -39,6 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // qt
 #include <QMenu>
+#include <QMessageBox>
 #include <QTreeView>
 
 const std::string QmitkSemanticRelationsView::VIEW_ID = "org.mitk.views.semanticrelations";
@@ -139,6 +141,21 @@ void QmitkSemanticRelationsView::NodeRemoved(const mitk::DataNode* dataNode)
 
   if (mitk::SemanticRelationsInference::InstanceExists(dataNode))
   {
+    try
+    {
+      RemoveFromSemanticRelationsAction::Run(GetDataStorage(), dataNode);
+      mitk::SemanticTypes::CaseID caseID = mitk::GetCaseIDFromDataNode(dataNode);
+      RemoveFromComboBox(caseID);
+    }
+    catch (const mitk::SemanticRelationException& e)
+    {
+      std::stringstream exceptionMessage; exceptionMessage << e;
+      QMessageBox msgBox(QMessageBox::Warning,
+        "Could not remove the data node(s).",
+        "The program wasn't able to correctly remove the selected data node(s).\n"
+        "Reason:\n" + QString::fromStdString(exceptionMessage.str() + "\n"));
+      msgBox.exec();
+    }
     // no observer needed for the integration; simply use a temporary instance for removing
     mitk::SemanticRelationsIntegration semanticRelationsIntegration;
     RemoveFromSemanticRelationsAction::Run(&semanticRelationsIntegration, GetDataStorage(), dataNode);
@@ -185,6 +202,21 @@ void QmitkSemanticRelationsView::OnNodesAdded(std::vector<mitk::DataNode*> nodes
   mitk::SemanticTypes::CaseID caseID = "";
   for (mitk::DataNode* dataNode : nodes)
   {
+    try
+    {
+      AddToSemanticRelationsAction::Run(GetDataStorage(), dataNode);
+      caseID = mitk::GetCaseIDFromDataNode(dataNode);
+      AddToComboBox(caseID);
+    }
+    catch (const mitk::SemanticRelationException& e)
+    {
+      std::stringstream exceptionMessage; exceptionMessage << e;
+      QMessageBox msgBox(QMessageBox::Warning,
+        "Could not add the data node(s).",
+        "The program wasn't able to correctly add the selected data node(s).\n"
+        "Reason:\n" + QString::fromStdString(exceptionMessage.str() + "\n"));
+      msgBox.exec();
+    }
     // no observer needed for the integration; simply use a temporary instance for adding
     mitk::SemanticRelationsIntegration semanticRelationsIntegration;
     AddToSemanticRelationsAction::Run(&semanticRelationsIntegration, GetDataStorage(), dataNode);

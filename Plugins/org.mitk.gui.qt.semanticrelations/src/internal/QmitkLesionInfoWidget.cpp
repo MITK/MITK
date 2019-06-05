@@ -287,7 +287,19 @@ void QmitkLesionInfoWidget::OnLinkToSegmentation(mitk::SemanticTypes::Lesion sel
   // if the segmentation is not contained in the semantic relations, add it
   if (!mitk::SemanticRelationsInference::InstanceExists(selectedDataNode))
   {
-    AddToSemanticRelationsAction::Run(m_SemanticRelationsIntegration.get(), dataStorage, selectedDataNode);
+    try
+    {
+      AddToSemanticRelationsAction::Run(dataStorage, selectedDataNode);
+    }
+    catch (const mitk::SemanticRelationException& e)
+    {
+      std::stringstream exceptionMessage; exceptionMessage << e;
+      QMessageBox msgBox(QMessageBox::Warning,
+        "Could not link the selected lesion.",
+        "The program wasn't able to correctly link the selected lesion with the selected segmentation.\n"
+        "Reason:\n" + QString::fromStdString(exceptionMessage.str() + "\n"));
+      msgBox.exec();
+    }
   }
 
   // link the segmentation

@@ -156,11 +156,6 @@ void QmitkSemanticRelationsView::NodeRemoved(const mitk::DataNode* dataNode)
         "Reason:\n" + QString::fromStdString(exceptionMessage.str() + "\n"));
       msgBox.exec();
     }
-    // no observer needed for the integration; simply use a temporary instance for removing
-    mitk::SemanticRelationsIntegration semanticRelationsIntegration;
-    RemoveFromSemanticRelationsAction::Run(&semanticRelationsIntegration, GetDataStorage(), dataNode);
-    mitk::SemanticTypes::CaseID caseID = mitk::GetCaseIDFromDataNode(dataNode);
-    RemoveFromComboBox(caseID);
   }
 }
 
@@ -217,11 +212,6 @@ void QmitkSemanticRelationsView::OnNodesAdded(std::vector<mitk::DataNode*> nodes
         "Reason:\n" + QString::fromStdString(exceptionMessage.str() + "\n"));
       msgBox.exec();
     }
-    // no observer needed for the integration; simply use a temporary instance for adding
-    mitk::SemanticRelationsIntegration semanticRelationsIntegration;
-    AddToSemanticRelationsAction::Run(&semanticRelationsIntegration, GetDataStorage(), dataNode);
-    caseID = mitk::GetCaseIDFromDataNode(dataNode);
-    AddToComboBox(caseID);
   }
 }
 

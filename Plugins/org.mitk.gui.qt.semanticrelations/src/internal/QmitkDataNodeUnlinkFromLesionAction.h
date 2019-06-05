@@ -19,18 +19,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_mitk_gui_qt_semanticrelations_Export.h>
 
-// mitk gui qt semanticrelations plugin
-#include "QmitkAbstractSemanticRelationsAction.h"
+// mitk gui qt application plugin
+#include <QmitkAbstractDataNodeAction.h>
 
 // qt
 #include <QAction>
 
 namespace UnlinkFromLesionAction
 {
-  MITK_GUI_SEMANTICRELATIONS_EXPORT void Run(const mitk::DataNode* dataNode, mitk::SemanticRelationsIntegration* semanticRelationsIntegration);
+  MITK_GUI_SEMANTICRELATIONS_EXPORT void Run(const mitk::DataNode* dataNode);
 }
 
-class MITK_GUI_SEMANTICRELATIONS_EXPORT QmitkDataNodeUnlinkFromLesionAction : public QAction, public QmitkAbstractSemanticRelationsAction
+class MITK_GUI_SEMANTICRELATIONS_EXPORT QmitkDataNodeUnlinkFromLesionAction : public QAction, public QmitkAbstractDataNodeAction
 {
   Q_OBJECT
 
@@ -38,8 +38,6 @@ public:
 
   QmitkDataNodeUnlinkFromLesionAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
   QmitkDataNodeUnlinkFromLesionAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
-
-  virtual ~QmitkDataNodeUnlinkFromLesionAction() override;
 
 private Q_SLOTS:
 

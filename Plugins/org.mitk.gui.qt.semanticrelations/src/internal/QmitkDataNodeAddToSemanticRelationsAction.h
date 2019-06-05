@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <org_mitk_gui_qt_semanticrelations_Export.h>
 
 // mitk gui qt application plugin
-#include "QmitkAbstractSemanticRelationsAction.h"
+#include <QmitkAbstractDataNodeAction.h>
 
 // qt
 #include <QAction>
@@ -36,24 +36,22 @@ namespace AddToSemanticRelationsAction
   *        If a segmentation is added, the parent image node will also be to the semantic relations storage. If the segmentation does not contain the required DICOM information,
   *        the DICOM information of the parent data will be transfered to the segmentation data.
   *
-  * @pre    The given semantic relations integration has to be valid (!nullptr).
   * @pre    The given dataStorage has to be valid (!nullptr).
   * @pre    The given dataNode has to be valid (!nullptr).
   *         The function simply returns if the preconditions are not met.
   *
   * @throw  SemanticRelationException re-thrown.
   *
-  * @param semanticRelationsIntegration   An instance of the semantic relations integration that should be used to perform the node adding.
   * @param dataStorage                    The data storage to use for to remove the existing image and to check for the parent image node of a segmentation.
   * @param dataNode                       The data node to add.
   */
-  MITK_GUI_SEMANTICRELATIONS_EXPORT void Run(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, mitk::DataStorage* dataStorage, const mitk::DataNode* image);
+  MITK_GUI_SEMANTICRELATIONS_EXPORT void Run(mitk::DataStorage* dataStorage, const mitk::DataNode* image);
   
-  void AddImage(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, mitk::DataStorage* dataStorage, const mitk::DataNode* image);
-  void AddSegmentation(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, mitk::DataStorage* dataStorage, const mitk::DataNode* segmentation);
+  void AddImage(mitk::DataStorage* dataStorage, const mitk::DataNode* image);
+  void AddSegmentation(mitk::DataStorage* dataStorage, const mitk::DataNode* segmentation);
 }
 
-class MITK_GUI_SEMANTICRELATIONS_EXPORT QmitkDataNodeAddToSemanticRelationsAction : public QAction, public QmitkAbstractSemanticRelationsAction
+class MITK_GUI_SEMANTICRELATIONS_EXPORT QmitkDataNodeAddToSemanticRelationsAction : public QAction, public QmitkAbstractDataNodeAction
 {
   Q_OBJECT
 
@@ -61,8 +59,6 @@ public:
 
   QmitkDataNodeAddToSemanticRelationsAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
   QmitkDataNodeAddToSemanticRelationsAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
-
-  virtual ~QmitkDataNodeAddToSemanticRelationsAction() override;
 
 private Q_SLOTS:
 

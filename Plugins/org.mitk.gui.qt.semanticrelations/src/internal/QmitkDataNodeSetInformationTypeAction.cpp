@@ -21,9 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 // semantic relations module
 #include <mitkControlPointManager.h>
 #include <mitkDICOMHelper.h>
-#include <mitkSemanticRelationsDataStorageAccess.h>
 #include <mitkSemanticRelationException.h>
+#include <mitkSemanticRelationsDataStorageAccess.h>
 #include <mitkSemanticRelationsInference.h>
+#include <mitkSemanticRelationsIntegration.h>
 
 // qt
 #include <QInputDialog>
@@ -31,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkDataNodeSetInformationTypeAction::QmitkDataNodeSetInformationTypeAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite)
   : QAction(parent)
-  , QmitkAbstractSemanticRelationsAction(workbenchPartSite)
+  , QmitkAbstractDataNodeAction(workbenchPartSite)
 {
   setText(tr("Set information type"));
   m_Parent = parent;
@@ -40,16 +41,11 @@ QmitkDataNodeSetInformationTypeAction::QmitkDataNodeSetInformationTypeAction(QWi
 
 QmitkDataNodeSetInformationTypeAction::QmitkDataNodeSetInformationTypeAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite)
   : QAction(parent)
-  , QmitkAbstractSemanticRelationsAction(berry::IWorkbenchPartSite::Pointer(workbenchPartSite))
+  , QmitkAbstractDataNodeAction(berry::IWorkbenchPartSite::Pointer(workbenchPartSite))
 {
   setText(tr("Set information type"));
   m_Parent = parent;
   InitializeAction();
-}
-
-QmitkDataNodeSetInformationTypeAction::~QmitkDataNodeSetInformationTypeAction()
-{
-  // nothing here
 }
 
 void QmitkDataNodeSetInformationTypeAction::InitializeAction()
@@ -59,15 +55,12 @@ void QmitkDataNodeSetInformationTypeAction::InitializeAction()
 
 void QmitkDataNodeSetInformationTypeAction::OnActionTriggered(bool /*checked*/)
 {
-  if (nullptr == m_SemanticRelationsIntegration)
-  {
-    return;
-  }
-
   if (m_DataStorage.IsExpired())
   {
     return;
   }
+
+  auto dataStorage = m_DataStorage.Lock();
 
   auto dataNode = GetSelectedNode();
   if (dataNode.IsNull())
@@ -98,7 +91,7 @@ void QmitkDataNodeSetInformationTypeAction::OnActionTriggered(bool /*checked*/)
     controlPoint = mitk::SemanticRelationsInference::GetControlPointOfImage(dataNode);
     // see if the examination period - information type cell is already taken
     examinationPeriod = mitk::FindFittingExaminationPeriod(caseID, controlPoint);
-    auto semanticRelationsDataStorageAccess = mitk::SemanticRelationsDataStorageAccess(m_DataStorage.Lock());
+    auto semanticRelationsDataStorageAccess = mitk::SemanticRelationsDataStorageAccess(dataStorage);
     try
     {
       allSpecificImages = semanticRelationsDataStorageAccess.GetAllSpecificImages(caseID, informationType, examinationPeriod);
@@ -135,7 +128,7 @@ void QmitkDataNodeSetInformationTypeAction::OnActionTriggered(bool /*checked*/)
         // remove already existent images at specific cell
         for (const auto& specificImage : allSpecificImages)
         {
-          RemoveFromSemanticRelationsAction::Run(m_SemanticRelationsIntegration.get(), m_DataStorage.Lock(), specificImage);
+          RemoveFromSemanticRelationsAction::Run(dataStorage, specificImage);
         }
       }
       catch (const mitk::SemanticRelationException& e)
@@ -155,9 +148,10 @@ void QmitkDataNodeSetInformationTypeAction::OnActionTriggered(bool /*checked*/)
     }
   }
 
+  mitk::SemanticRelationsIntegration semanticRelationsIntegration;
   try
   {
-    m_SemanticRelationsIntegration->SetInformationType(dataNode, informationType);
+    semanticRelationsIntegration.SetInformationType(dataNode, informationType);
   }
   catch (const mitk::SemanticRelationException& e)
   {

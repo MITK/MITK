@@ -28,7 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations module
 #include <mitkDICOMHelper.h>
-#include <mitkSemanticRelationsDataStorageAccess.h>
 #include <mitkSemanticRelationsInference.h>
 
 // qt

@@ -23,8 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDICOMHelper.h>
 #include <mitkNodePredicates.h>
 #include <mitkSemanticRelationsDataStorageAccess.h>
-#include <mitkSemanticRelationException.h>
 #include <mitkSemanticRelationsInference.h>
+#include <mitkSemanticRelationsIntegration.h>
+#include <mitkSemanticRelationException.h>
 #include <mitkRelationStorage.h>
 #include <mitkUIDGeneratorBoost.h>
 
@@ -40,10 +41,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 // namespace that contains the concrete action
 namespace AddToSemanticRelationsAction
 {
-  void Run(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, mitk::DataStorage* dataStorage, const mitk::DataNode* dataNode)
+  void Run(mitk::DataStorage* dataStorage, const mitk::DataNode* dataNode)
   {
-    if (nullptr == semanticRelationsIntegration
-     || nullptr == dataStorage
+    if (nullptr == dataStorage
      || nullptr == dataNode)
     {
       return;
@@ -53,7 +53,7 @@ namespace AddToSemanticRelationsAction
     {
       try
       {
-        AddImage(semanticRelationsIntegration, dataStorage, dataNode);
+        AddImage(dataStorage, dataNode);
       }
       catch (mitk::SemanticRelationException& e)
       {
@@ -64,7 +64,7 @@ namespace AddToSemanticRelationsAction
     {
       try
       {
-        AddSegmentation(semanticRelationsIntegration, dataStorage, dataNode);
+        AddSegmentation(dataStorage, dataNode);
       }
       catch (mitk::SemanticRelationException& e)
       {
@@ -73,7 +73,7 @@ namespace AddToSemanticRelationsAction
     }
   }
 
-  void AddImage(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, mitk::DataStorage* dataStorage, const mitk::DataNode* image)
+  void AddImage(mitk::DataStorage* dataStorage, const mitk::DataNode* image)
   {
     mitk::SemanticTypes::InformationType informationType;
     mitk::SemanticTypes::ExaminationPeriod examinationPeriod;
@@ -116,7 +116,7 @@ namespace AddToSemanticRelationsAction
           // remove already existent images at specific cell
           for (const auto& specificImage : allSpecificImages)
           {
-            RemoveFromSemanticRelationsAction::Run(semanticRelationsIntegration, dataStorage, specificImage);
+            RemoveFromSemanticRelationsAction::Run(dataStorage, specificImage);
           }
         }
         catch (mitk::SemanticRelationException& e)
@@ -133,9 +133,10 @@ namespace AddToSemanticRelationsAction
     }
 
     // specific image does not exist or has been removed; adding the image should work
+    mitk::SemanticRelationsIntegration semanticRelationsIntegration;
     try
     {
-      semanticRelationsIntegration->AddImage(image);
+      semanticRelationsIntegration.AddImage(image);
     }
     catch (mitk::SemanticRelationException& e)
     {
@@ -143,7 +144,7 @@ namespace AddToSemanticRelationsAction
     }
   }
 
-  void AddSegmentation(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, mitk::DataStorage* dataStorage, const mitk::DataNode* segmentation)
+  void AddSegmentation(mitk::DataStorage* dataStorage, const mitk::DataNode* segmentation)
   {
     if (nullptr == segmentation)
     {
@@ -201,13 +202,14 @@ namespace AddToSemanticRelationsAction
     // add the parent node if not already existent
     if (!mitk::SemanticRelationsInference::InstanceExists(parentNodes->front()))
     {
-      AddImage(semanticRelationsIntegration, dataStorage, parentNodes->front());
+      AddImage(dataStorage, parentNodes->front());
     }
 
+    mitk::SemanticRelationsIntegration semanticRelationsIntegration;
     try
     {
       // add the segmentation with its parent image to the semantic relations storage
-      semanticRelationsIntegration->AddSegmentation(segmentation, parentNodes->front());
+      semanticRelationsIntegration.AddSegmentation(segmentation, parentNodes->front());
     }
     catch (mitk::SemanticRelationException& e)
     {
@@ -218,7 +220,7 @@ namespace AddToSemanticRelationsAction
 
 QmitkDataNodeAddToSemanticRelationsAction::QmitkDataNodeAddToSemanticRelationsAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite)
   : QAction(parent)
-  , QmitkAbstractSemanticRelationsAction(workbenchPartSite)
+  , QmitkAbstractDataNodeAction(workbenchPartSite)
 {
   setText(tr("Add to semantic relations"));
   InitializeAction();
@@ -226,15 +228,10 @@ QmitkDataNodeAddToSemanticRelationsAction::QmitkDataNodeAddToSemanticRelationsAc
 
 QmitkDataNodeAddToSemanticRelationsAction::QmitkDataNodeAddToSemanticRelationsAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite)
   : QAction(parent)
-  , QmitkAbstractSemanticRelationsAction(berry::IWorkbenchPartSite::Pointer(workbenchPartSite))
+  , QmitkAbstractDataNodeAction(berry::IWorkbenchPartSite::Pointer(workbenchPartSite))
 {
   setText(tr("Add to semantic relations"));
   InitializeAction();
-}
-
-QmitkDataNodeAddToSemanticRelationsAction::~QmitkDataNodeAddToSemanticRelationsAction()
-{
-  // nothing here
 }
 
 void QmitkDataNodeAddToSemanticRelationsAction::InitializeAction()
@@ -244,16 +241,11 @@ void QmitkDataNodeAddToSemanticRelationsAction::InitializeAction()
 
 void QmitkDataNodeAddToSemanticRelationsAction::OnActionTriggered(bool /*checked*/)
 {
-  if (nullptr == m_SemanticRelationsIntegration)
-  {
-    return;
-  }
-
   if (m_DataStorage.IsExpired())
   {
     return;
   }
 
   auto dataNode = GetSelectedNode();
-  AddToSemanticRelationsAction::Run(m_SemanticRelationsIntegration.get(), m_DataStorage.Lock(), dataNode);
+  AddToSemanticRelationsAction::Run(m_DataStorage.Lock(), dataNode);
 }

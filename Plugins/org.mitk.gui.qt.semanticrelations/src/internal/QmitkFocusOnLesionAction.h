@@ -17,7 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKLESIONSHOWINACTION_H
 #define QMITKLESIONSHOWINACTION_H
 
-#include "QmitkAbstractDataNodeAction.h"
+// mitk gui qt application plugin
+#include <QmitkAbstractDataNodeAction.h>
 
 // semantic relations module
 #include <mitkSemanticTypes.h>

@@ -1,6 +1,5 @@
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
-  QmitkAbstractSemanticRelationsAction.cpp
   QmitkDataNodeAddToSemanticRelationsAction.cpp
   QmitkDataNodeRemoveFromSemanticRelationsAction.cpp
   QmitkDataNodeUnlinkFromLesionAction.cpp

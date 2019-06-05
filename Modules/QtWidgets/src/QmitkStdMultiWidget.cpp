@@ -377,11 +377,8 @@ void QmitkStdMultiWidget::InitializeWidget(bool showPlanesIn3d)
     ->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
   mitkWidget3->GetSliceNavigationController()
     ->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
-  //mitkWidget4->GetSliceNavigationController()
-  //  ->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
 
   m_MouseModeSwitcher = mitk::MouseModeSwitcher::New(mitkWidget1->GetRenderer());
-  //m_MouseModeSwitcher->AddRenderer(mitkWidget1->GetRenderer()->GetName());
   m_MouseModeSwitcher->AddRenderer(mitkWidget2->GetRenderer());
   m_MouseModeSwitcher->AddRenderer(mitkWidget3->GetRenderer());
   m_MouseModeSwitcher->AddRenderer(mitkWidget4->GetRenderer());
@@ -470,7 +467,6 @@ QSplitter* QmitkStdMultiWidget::GetMainSplit()
 QmitkStdMultiWidget::~QmitkStdMultiWidget()
 {
   DisablePositionTracking();
-  //DisableNavigationControllerEventListening();
 
   m_TimeNavigationController->Disconnect(mitkWidget1->GetSliceNavigationController());
   m_TimeNavigationController->Disconnect(mitkWidget2->GetSliceNavigationController());
@@ -2643,7 +2639,7 @@ QWidget* QmitkStdMultiWidget::getShadowWidget4() const
 void QmitkStdMultiWidget::resetThickSlice()
 {
   unsigned int size = 4;
-  for (int i = 0; i < size; i++) {
+  for (unsigned int i = 0; i < size; i++) {
     mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(GetRenderWindow(i)->GetVtkRenderWindow());
 
     renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices", mitk::ResliceMethodProperty::New(0));

@@ -140,26 +140,25 @@ namespace mitk
 	// Convert itk PM images to dicom image
 	MITK_INFO << "Writing PM image: " << path << std::endl;
 	try
-    {
-    // convert from unique to raw pointer
-      vector<DcmDataset*> rawVecDataset;
-      for (const auto& dcmDataSet : dcmDatasetsSourceImage)
-        rawVecDataset.push_back(dcmDataSet.get());
+	  {
+	    // convert from unique to raw pointer
+	    vector<DcmDataset*> rawVecDataset;
+	    for ( const auto& dcmDataSet : dcmDatasetsSourceImage ) { rawVecDataset.push_back( dcmDataSet.get() ); }
         
-        std::unique_ptr<dcmqi::ParaMapConverter> PMconverter(new dcmqi::ParaMapConverter());
-        std::unique_ptr<DcmDataset> PMresult (PMconverter->itkimage2paramap(itkParamapImage, rawVecDataset, tmpMetaInfoFile));
-		    // Write dicom file
-        DcmFileFormat dcmFileFormat(PMresult.get());
-		std::string filePath = path.substr(0, path.find_last_of("."));
-		filePath = filePath + ".dcm";
-		dcmFileFormat.saveFile(filePath.c_str(), EXS_LittleEndianExplicit);
+	    std::unique_ptr<dcmqi::ParaMapConverter> PMconverter(new dcmqi::ParaMapConverter());
+	    std::unique_ptr<DcmDataset> PMresult (PMconverter->itkimage2paramap(itkParamapImage, rawVecDataset, tmpMetaInfoFile));
+	    // Write dicom file
+	    DcmFileFormat dcmFileFormat(PMresult.get());
+	    std::string filePath = path.substr(0, path.find_last_of("."));
+	    filePath = filePath + ".dcm";
+	    dcmFileFormat.saveFile(filePath.c_str(), EXS_LittleEndianExplicit);
 
-	}
+	  }
 	catch (const std::exception &e)
-	{
+	  {
 		MITK_ERROR << "An error occurred during writing the DICOM Paramap: " << e.what() << endl;
 		return;
-	}
+	  }
 	
   }
   

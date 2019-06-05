@@ -580,5 +580,3 @@ MITKCORE_EXPORT MBI_STD::ostream& operator<<( MBI_STD::ostream& o, mitk::DataNod
 
 
 #endif /* DATATREENODE_H_HEADER_INCLUDED_C1E14338 */
-
-

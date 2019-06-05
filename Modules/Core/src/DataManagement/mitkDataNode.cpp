@@ -419,22 +419,37 @@ void mitk::DataNode::SetVisibility(bool visible, const mitk::BaseRenderer* rende
 
 void mitk::DataNode::SetOpacity(float opacity, const mitk::BaseRenderer* renderer, const char* propertyKey)
 {
-  mitk::FloatProperty::Pointer prop;
-  prop = mitk::FloatProperty::New(opacity);
-  GetPropertyList(renderer)->SetProperty(propertyKey, prop);
+  auto pList = GetPropertyList(renderer);
+  mitk::FloatProperty::Pointer prop =
+      dynamic_cast<mitk::FloatProperty*>(pList->GetProperty(propertyKey));
+  if (prop) {
+    prop->SetValue(opacity);
+  } else {
+    prop = mitk::FloatProperty::New(opacity);
+    pList->SetProperty(propertyKey, prop);
+  }
 }
 
 void mitk::DataNode::SetLevelWindow(mitk::LevelWindow levelWindow, const mitk::BaseRenderer* renderer, const char* propertyKey)
 {
-  mitk::LevelWindowProperty::Pointer prop;
-  prop = mitk::LevelWindowProperty::New(levelWindow);
-  GetPropertyList(renderer)->SetProperty(propertyKey, prop);
+  auto pList = GetPropertyList(renderer);
+  mitk::LevelWindowProperty::Pointer prop =
+      dynamic_cast<mitk::LevelWindowProperty*>(pList->GetProperty(propertyKey));
+  if (prop) {
+    prop->SetValue(levelWindow);
+    // Only because Autoplan level window synchronization needs an even we fire NodeChanged here
+    Modified();
+  } else {
+    prop = mitk::LevelWindowProperty::New(levelWindow);
+    pList->SetProperty(propertyKey, prop);
+  }
 }
 
 void mitk::DataNode::SetIntProperty(const char* propertyKey, int intValue, const mitk::BaseRenderer* renderer)
 {
   GetPropertyList(renderer)->SetProperty(propertyKey, mitk::IntProperty::New(intValue));
 }
+
 void mitk::DataNode::SetBoolProperty( const char* propertyKey, bool boolValue, const mitk::BaseRenderer* renderer/*=NULL*/ )
 {
   GetPropertyList(renderer)->SetProperty(propertyKey, mitk::BoolProperty::New(boolValue));
@@ -535,32 +550,6 @@ void mitk::DataNode::SetSelected(bool selected, const mitk::BaseRenderer* render
     InvokeEvent( event );
   }
 }
-
-/*
-class SelectedEvent : public itk::ModifiedEvent
-{
-public:
-  typedef SelectedEvent Self;
-  typedef itk::ModifiedEvent Superclass;
-
-  SelectedEvent(DataNode* dataNode)
-    { m_DataNode = dataNode; };
-  DataNode* GetDataNode()
-    { return m_DataNode; };
-  virtual const char * GetEventName() const
-    { return "SelectedEvent"; }
-  virtual bool CheckEvent(const ::itk::EventObject* e) const
-    { return dynamic_cast<const Self*>(e); }
-  virtual ::itk::EventObject* MakeObject() const
-    { return new Self(m_DataNode); }
-private:
-  DataNode* m_DataNode;
-  SelectedEvent(const Self& event)
-    { m_DataNode = event.m_DataNode; };
-  void operator=(const Self& event)
-  { m_DataNode = event.m_DataNode; }
-};
-*/
 
 bool mitk::DataNode::IsSelected(const mitk::BaseRenderer* renderer)
 {

@@ -153,22 +153,18 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     return;
   }
 
-
   //set main input for ExtractSliceFilter
   localStorage->m_Reslicer->SetInput(input);
   localStorage->m_Reslicer->SetWorldGeometry(worldGeometry);
   localStorage->m_Reslicer->SetTimeStep( this->GetTimestep() );
 
-
   //set the transformation of the image to adapt reslice axis
   localStorage->m_Reslicer->SetResliceTransformByGeometry( input->GetTimeGeometry()->GetGeometryForTimeStep( this->GetTimestep() ) );
-
 
   //is the geometry of the slice based on the input image or the worldgeometry?
   bool inPlaneResampleExtentByGeometry = false;
   datanode->GetBoolProperty("in plane resample extent by geometry", inPlaneResampleExtentByGeometry, renderer);
   localStorage->m_Reslicer->SetInPlaneResampleExtentByGeometry(inPlaneResampleExtentByGeometry);
-
 
   // Initialize the interpolation mode for resampling; switch to nearest
   // neighbor if the input image is too small.
@@ -206,7 +202,6 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   //is done.
   localStorage->m_Reslicer->SetVtkOutputRequest(true);
 
-
   //Thickslicing
   int thickSlicesMode = 0;
   int thickSlicesNum = 1;
@@ -242,8 +237,8 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
     Vector3D normInIndex, normal;
 
-
-    const mitk::AbstractTransformGeometry* abstractGeometry = dynamic_cast< const AbstractTransformGeometry * >(worldGeometry);
+    const mitk::AbstractTransformGeometry* abstractGeometry =
+        dynamic_cast< const AbstractTransformGeometry * >(worldGeometry);
     if(abstractGeometry != NULL)
         normal = abstractGeometry->GetPlane()->GetNormal();
     else{
@@ -269,7 +264,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     localStorage->m_TSFilter->SetThickSliceMode( thickSlicesMode-1 );
     localStorage->m_TSFilter->SetInputData( localStorage->m_Reslicer->GetVtkOutput() );
 
-    //vtkFilter=>mitkFilter=>vtkFilter update mechanism will fail without calling manually
+    //vtkFilter => mitkFilter => vtkFilter update mechanism will fail without calling manually
     localStorage->m_Reslicer->Modified();
     localStorage->m_Reslicer->Update();
 
@@ -608,7 +603,6 @@ void mitk::ImageVtkMapper2D::ApplyColorTransferFunction(mitk::BaseRenderer *rend
 
 void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
 {
-
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");
 
@@ -635,24 +629,12 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
     return;
   }
 
-  const DataNode *node = this->GetDataNode();
   data->UpdateOutputInformation();
-  LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
-
-  //check if something important has changed and we need to rerender
-  if ( (localStorage->m_LastUpdateTime < node->GetMTime()) //was the node modified?
-       || (localStorage->m_LastUpdateTime < data->GetPipelineMTime()) //Was the data modified?
-       || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometryUpdateTime()) //was the geometry modified?
-       || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime())
-       || (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
-       || (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
-  {
-    this->GenerateDataForRenderer( renderer );
-  }
+  GenerateDataForRenderer( renderer );
 
   // since we have checked that nothing important has changed, we can set
   // m_LastUpdateTime to the current time
-  localStorage->m_LastUpdateTime.Modified();
+  m_LSH.GetLocalStorage(renderer)->m_LastUpdateTime.Modified();
 }
 
 void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)

@@ -1,0 +1,32 @@
+<config>
+  <!--   Set a maximal number of points here:
+  <param name="MaxPoints" value="4"/>
+  -->
+  <event_variant class="InternalEvent" name="EnoughPoints">
+    <attribute name="SignalName" value="MaxNumberOfPoints"/>
+  </event_variant>
+  <event_variant class="InternalEvent" name="NotEnoughPoints">
+    <attribute name="SignalName" value="haslessthen3points"/>
+  </event_variant>
+  <event_variant class="InteractionKeyEvent" name="Abort">
+    <attribute name="Key" value="Escape"/>
+  </event_variant>
+  <event_variant class="MousePressEvent" name="DeletePoint">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+    <attribute name="Modifiers" value="alt"/>
+  </event_variant>
+  <event_variant class="MousePressEvent" name="AddPointClick">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+    <attribute name="Modifiers" value="shift"/>
+  </event_variant>
+  <event_variant class="MousePressEvent" name="StartMove">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="CheckSelected"/>
+  <event_variant class="MouseReleaseEvent" name="EndMovement">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="PointMove">
+    <attribute name="ButtonState" value="LeftMouseButton"/>
+  </event_variant>
+</config>

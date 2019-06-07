@@ -104,7 +104,20 @@ void mitk::ContourTool::OnMouseMoved( StateMachineAction*, InteractionEvent* int
   ContourModel* contour = FeedbackContourTool::GetFeedbackContour();
   mitk::Point3D point;
   if (interactionEvent->GetSender()->GetMapperID() == mitk::BaseRenderer::Standard3D) {
-    point = positionEvent->GetPositionInWorld();
+    Point2D mousePosition = positionEvent->GetPointerPositionOnScreen();
+    double displayPoint[3];
+
+    displayPoint[0] = mousePosition[0];
+    displayPoint[1] = mousePosition[1];
+    displayPoint[2] = 0.0;
+
+    vtkRenderer* renderer = positionEvent->GetSender()->GetVtkRenderer();
+    renderer->SetDisplayPoint(displayPoint);
+    renderer->DisplayToWorld();
+    double* world = renderer->GetWorldPoint();
+    for (int i = 0; i < 3; i++) {
+      point[i] = world[i] / world[3];
+    }
   }
   else {
     point = positionEvent->GetPlanePositionInWorld();

@@ -72,7 +72,7 @@ class MITKLEGACYGL_EXPORT GLMapper : public Mapper
     * Note: The enumeration is disregarded, since OpenGL rendering only needs a
     * single render pass.
     */
-    void MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type) override;
+    void MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type, vtkInformation* info = nullptr) override;
 
    /** \brief Returns  whether this is a vtk-based mapper
    *  \return false, since all mappers deriving from this class are OpenGL mappers

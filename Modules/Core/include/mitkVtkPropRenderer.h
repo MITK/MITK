@@ -66,14 +66,14 @@ public:
 
   mitkClassMacro(VtkPropRenderer,BaseRenderer);
   mitkNewMacro3Param(VtkPropRenderer, const char*, vtkRenderWindow *, mitk::RenderingManager* );
-  mitkNewMacro4Param(VtkPropRenderer, const char*, vtkRenderWindow *, mitk::RenderingManager*, mitk::BaseRenderer::RenderingMode::Type );
+  mitkNewMacro5Param(VtkPropRenderer, const char*, vtkRenderWindow *, mitk::RenderingManager*, mitk::BaseRenderer::RenderingMode::Type, bool);
 
   typedef std::map<int,Mapper*> MappersMapType;
 
   // Render - called by vtkMitkRenderProp, returns the number of props rendered
   enum RenderType{Opaque,Translucent,Overlay,Volumetric};
 
-  int Render(RenderType type);
+  int Render(RenderType type, vtkInformation* info);
 
   /** \brief This methods contains all method neceassary before a VTK Render() call */
   virtual void PrepareRender();
@@ -168,7 +168,7 @@ in order to get a vtkTextProperty. This property enables the setup of font, font
   static bool useImmediateModeRendering();
 
 protected:
-  VtkPropRenderer( const char* name = "VtkPropRenderer", vtkRenderWindow * renWin = nullptr, mitk::RenderingManager* rm = nullptr, mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard );
+  VtkPropRenderer( const char* name = "VtkPropRenderer", vtkRenderWindow * renWin = nullptr, mitk::RenderingManager* rm = nullptr, mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard, bool useFXAA = true );
   virtual ~VtkPropRenderer();
   virtual void Update() override;
 

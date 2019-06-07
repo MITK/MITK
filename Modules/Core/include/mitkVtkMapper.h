@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDataNode.h"
 #include "mitkVtkPropRenderer.h"
 #include "mitkLocalStorageHandler.h"
-#include "mitkIShaderRepository.h"
 #include <mitkCoreServices.h>
 
 #include <vtkProp3D.h>
@@ -33,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkLinearTransform.h>
 #include <vtkMapper.h>
 #include <vtkPropAssembly.h>
-#include <vtkPolyDataMapper.h>
+#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkProp3DCollection.h>
 
 class vtkProp;
@@ -57,12 +56,6 @@ class MITKCORE_EXPORT VtkMapper : public Mapper
 
     virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer) = 0;
 
-    /** \brief Re-issues all drawing commands required to describe
-    * the entire scene each time a new frame is required,
-    * regardless of actual changes.
-    */
-    static void SetVtkMapperImmediateModeRendering(vtkMapper *mapper);
-
      /**
      * \brief Returns whether this is an vtk-based mapper
      * \deprecatedSince{2013_03} All mappers of superclass VTKMapper are vtk based, use a dynamic_cast instead
@@ -76,7 +69,7 @@ class MITKCORE_EXPORT VtkMapper : public Mapper
     *
     * Called by mitk::VtkPropRenderer::Render
     */
-    void MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type) override;
+    void MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type, vtkInformation* info = nullptr) override;
 
     /** \brief Checks visibility and renders the overlay */
     virtual void MitkRenderOverlay(BaseRenderer* renderer);
@@ -121,9 +114,9 @@ class MITKCORE_EXPORT VtkMapper : public Mapper
     }
 
     /**
-    * \brief SHADERTODO
+    * \deprecatedSince{2017_08}
     */
-    void ApplyShaderProperties( mitk::BaseRenderer* renderer);
+    DEPRECATED(void ApplyShaderProperties( mitk::BaseRenderer* )){};
 
     /**
     * \brief Apply color and opacity properties read from the PropertyList.
@@ -146,16 +139,10 @@ class MITKCORE_EXPORT VtkMapper : public Mapper
     {
     public:
 
-      mitk::IShaderRepository::ShaderProgram::Pointer m_ShaderProgram;
       itk::TimeStamp m_ModifiedTimeStamp;
 
       VtkMapperLocalStorage()
       {
-        IShaderRepository* shaderRepo = CoreServices::GetShaderRepository();
-        if (shaderRepo)
-        {
-          m_ShaderProgram = shaderRepo->CreateShaderProgram();
-        }
       }
 
       ~VtkMapperLocalStorage()

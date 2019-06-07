@@ -38,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPoints.h>
 #include <vtkTriangle.h>
 #include <vtkPolyData.h>
-#include <vtkPolyDataMapper2D.h>
+#include <vtkOpenGLPolyDataMapper2D.h>
 
 ///
 #include <set>
@@ -711,9 +711,9 @@ mitk::PlaneGeometryDataMapper2D::LocalStorage::LocalStorage()
   m_ArrowActor = vtkSmartPointer <vtkActor2D>::New();
   m_CrosshairHelperLineActor = vtkSmartPointer <vtkActor2D>::New();
 
-  m_HelperLinesmapper = vtkSmartPointer<vtkPolyDataMapper2D>::New();
-  m_Mapper = vtkSmartPointer<vtkPolyDataMapper2D>::New();
-  m_Arrowmapper = vtkSmartPointer<vtkPolyDataMapper2D>::New();
+  m_HelperLinesmapper = vtkSmartPointer<vtkOpenGLPolyDataMapper2D>::New();
+  m_Mapper = vtkSmartPointer<vtkOpenGLPolyDataMapper2D>::New();
+  m_Arrowmapper = vtkSmartPointer<vtkOpenGLPolyDataMapper2D>::New();
 
   m_CrosshairActor->SetMapper(m_Mapper);
   m_ArrowActor->SetMapper(m_Arrowmapper);

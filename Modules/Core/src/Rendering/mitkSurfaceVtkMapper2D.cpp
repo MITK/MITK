@@ -44,7 +44,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // constructor LocalStorage
 mitk::SurfaceVtkMapper2D::LocalStorage::LocalStorage()
 {
-  m_Mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  m_Mapper = vtkSmartPointer<vtkOpenGLPolyDataMapper>::New();
   m_Mapper->ScalarVisibilityOff();
   m_Actor = vtkSmartPointer<vtkActor>::New();
   m_PropAssembly = vtkSmartPointer <vtkAssembly>::New();
@@ -75,11 +75,11 @@ mitk::SurfaceVtkMapper2D::LocalStorage::LocalStorage()
   m_InverseNormalGlyph->SetVectorModeToUseNormal();
   m_InverseNormalGlyph->OrientOn();
 
-  m_NormalMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  m_NormalMapper = vtkSmartPointer<vtkOpenGLPolyDataMapper>::New();
   m_NormalMapper->SetInputConnection(m_NormalGlyph->GetOutputPort());
   m_NormalMapper->ScalarVisibilityOff();
 
-  m_InverseNormalMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  m_InverseNormalMapper = vtkSmartPointer<vtkOpenGLPolyDataMapper>::New();
   m_InverseNormalMapper->SetInputConnection(m_NormalGlyph->GetOutputPort());
   m_InverseNormalMapper->ScalarVisibilityOff();
 

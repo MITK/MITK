@@ -61,7 +61,7 @@ void mitk::VtkGLMapperWrapper::ApplyColorAndOpacityProperties(mitk::BaseRenderer
   m_MitkGLMapper->ApplyColorAndOpacityProperties(renderer,actor);
 }
 
-void mitk::VtkGLMapperWrapper::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type)
+void mitk::VtkGLMapperWrapper::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type, vtkInformation* info)
 {
   if(type != mitk::VtkPropRenderer::Opaque)
     return;

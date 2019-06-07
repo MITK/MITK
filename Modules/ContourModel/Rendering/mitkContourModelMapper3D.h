@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include "mitkContourModelToVtkPolyDataFilter.h"
 
 #include <vtkSmartPointer.h>
-#include <vtkPolyDataMapper.h>
+#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkActor.h>
 #include <vtkProp.h>
 #include <vtkPolyData.h>
@@ -67,7 +67,7 @@ namespace mitk {
       /** \brief Actor of a 2D render window. */
       vtkSmartPointer<vtkActor> m_Actor;
       /** \brief Mapper of a 2D render window. */
-      vtkSmartPointer<vtkPolyDataMapper> m_Mapper;
+      vtkSmartPointer<vtkOpenGLPolyDataMapper> m_Mapper;
 
       vtkSmartPointer<vtkTubeFilter> m_TubeFilter;
 

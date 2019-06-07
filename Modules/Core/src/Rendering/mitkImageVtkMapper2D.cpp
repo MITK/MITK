@@ -48,7 +48,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkImageReslice.h>
 #include <vtkImageChangeInformation.h>
 #include <vtkPlaneSource.h>
-#include <vtkPolyDataMapper.h>
+#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkCellArray.h>
 #include <vtkCamera.h>
 #include <vtkColorTransferFunction.h>
@@ -121,8 +121,6 @@ vtkProp* mitk::ImageVtkMapper2D::GetVtkProp(mitk::BaseRenderer* renderer)
 void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
-
-  SetVtkMapperImmediateModeRendering(localStorage->m_Mapper);
 
   mitk::Image *input = const_cast< mitk::Image * >( this->GetInput() );
   mitk::DataNode* datanode = this->GetDataNode();
@@ -400,7 +398,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
   this->TransformActor( renderer );
 
-  if (!binaryOutline) { 
+  if (!binaryOutline) {
     // Connect the mapper with the input texture. This is the standard case.
     //setup the textured plane
     this->GeneratePlane( renderer, sliceBounds );
@@ -682,7 +680,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
   bool isBinaryImage(false);
   if (!node->GetBoolProperty("binary", isBinaryImage) && image->GetPixelType().GetNumberOfComponents() == 1)
   {
-    // Check if this is Secondary Capture Image. 
+    // Check if this is Secondary Capture Image.
     // Make sure that it's not a binary image and that it will not be included in bounding box
     std::string sopClassUid = "";
     if (image) {
@@ -893,7 +891,7 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_DefaultLookupTable = vtkSmartPointer<vtkLookupTable>::New();
   m_BinaryLookupTable = vtkSmartPointer<vtkLookupTable>::New();
   m_ColorLookupTable = vtkSmartPointer<vtkLookupTable>::New();
-  m_Mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  m_Mapper = vtkSmartPointer<vtkOpenGLPolyDataMapper>::New();
   m_Actor = vtkSmartPointer<vtkActor>::New();
   m_Actors = vtkSmartPointer<vtkPropAssembly>::New();
   m_Reslicer = mitk::ExtractSliceFilter::New();
@@ -902,7 +900,7 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_ReslicedImage = vtkSmartPointer<vtkImageData>::New();
   m_EmptyPolyData = vtkSmartPointer<vtkPolyData>::New();
   m_OutlineActor = vtkSmartPointer<vtkActor>::New();
-  m_OutlineMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  m_OutlineMapper = vtkSmartPointer<vtkOpenGLPolyDataMapper>::New();
   m_OutlineShadowActor = vtkSmartPointer<vtkActor>::New();
 
   m_OutlineActor->SetMapper(m_OutlineMapper);

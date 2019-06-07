@@ -33,11 +33,11 @@ class ContourSet;
  *
  * @ingroup Mapper
  */
-class MITKSEGMENTATION_EXPORT ContourSetMapper2D : public GLMapper
+class MITKSEGMENTATION_EXPORT ContourSetMapper2D : public Mapper
 {
 public:
 
-    mitkClassMacro(ContourSetMapper2D, GLMapper);
+    mitkClassMacro(ContourSetMapper2D, Mapper);
 
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
@@ -45,7 +45,9 @@ public:
     /**
      * reimplemented from Baseclass
      */
-    virtual void Paint(mitk::BaseRenderer * renderer) override;
+    virtual void MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type, vtkInformation* info = nullptr) override;
+
+    void ApplyColorAndOpacityProperties(mitk::BaseRenderer* renderer, vtkActor* actor = nullptr);
 
     /**
      * return a refernce of the rendered data object

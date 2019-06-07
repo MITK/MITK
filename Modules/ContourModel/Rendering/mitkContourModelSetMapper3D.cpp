@@ -100,7 +100,7 @@ void mitk::ContourModelSetMapper3D::GenerateDataForRenderer( mitk::BaseRenderer 
       polyData->SetPoints(points);
       polyData->SetLines(cells);
 
-      vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+      vtkSmartPointer<vtkOpenGLPolyDataMapper> mapper = vtkSmartPointer<vtkOpenGLPolyDataMapper>::New();
       vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
       actor->SetMapper(mapper);
 

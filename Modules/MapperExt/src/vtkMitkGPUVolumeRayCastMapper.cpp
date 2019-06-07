@@ -30,10 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "vtkMitkGPUVolumeRayCastMapper.h"
 
-// Only with VTK 5.6 or above
-#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
-
-
 #include "vtkImageData.h"
 #include "vtkPointData.h"
 #include "vtkCellData.h"
@@ -52,7 +48,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkGPUInfoList.h"
 #include "vtkGPUInfo.h"
 
-vtkInstantiatorNewMacro(vtkMitkGPUVolumeRayCastMapper);
 vtkCxxSetObjectMacro(vtkMitkGPUVolumeRayCastMapper, MaskInput, vtkImageData);
 vtkCxxSetObjectMacro(vtkMitkGPUVolumeRayCastMapper, TransformedInput, vtkImageData);
 
@@ -650,5 +645,3 @@ void vtkMitkGPUVolumeRayCastMapper::ClipCroppingRegionPlanes()
     ++i;
     }
 }
-
-#endif

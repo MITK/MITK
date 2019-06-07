@@ -264,11 +264,12 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     berry::IPreferences::Pointer prefs = this->GetPreferences();
 
     mitk::BaseRenderer::RenderingMode::Type renderingMode = static_cast<mitk::BaseRenderer::RenderingMode::Type>(prefs->GetInt( "Rendering Mode" , 2 ));
+    bool useFXAA = prefs->GetBool("Use FXAA", true);
 
     QString planeProperty("Plane Visibility 3D");
     bool planeVisibility3D = prefs->GetBool(planeProperty, true);
 
-    d->m_StdMultiWidget = new QmitkStdMultiWidget(parent, 0, 0, renderingMode, "stdmulti", planeVisibility3D);
+    d->m_StdMultiWidget = new QmitkStdMultiWidget(parent, 0, 0, renderingMode, useFXAA, "stdmulti", planeVisibility3D);
     d->m_RenderWindows.insert("axial", d->m_StdMultiWidget->GetRenderWindow1());
     d->m_RenderWindows.insert("sagittal", d->m_StdMultiWidget->GetRenderWindow2());
     d->m_RenderWindows.insert("coronal", d->m_StdMultiWidget->GetRenderWindow3());

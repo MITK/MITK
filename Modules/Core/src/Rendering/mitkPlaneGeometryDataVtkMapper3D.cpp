@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkImageData.h>
 #include <vtkLinearTransform.h>
 #include <vtkPolyData.h>
-#include <vtkPolyDataMapper.h>
+#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkProp3DCollection.h>
 #include <vtkProperty.h>
 #include <vtkTransformPolyDataFilter.h>
@@ -47,7 +47,7 @@ namespace mitk
     m_DataStorage(NULL)
   {
     m_EdgeTuber = vtkTubeFilter::New();
-    m_EdgeMapper = vtkPolyDataMapper::New();
+    m_EdgeMapper = vtkOpenGLPolyDataMapper::New();
 
     m_SurfaceCreator = PlaneGeometryDataToSurfaceFilter::New();
     m_SurfaceCreatorBoundingBox = BoundingBox::New();
@@ -62,7 +62,7 @@ namespace mitk
     m_EdgeTransformer = vtkTransformPolyDataFilter::New();
     m_NormalsTransformer = vtkTransformPolyDataFilter::New();
     m_EdgeActor = vtkActor::New();
-    m_BackgroundMapper = vtkPolyDataMapper::New();
+    m_BackgroundMapper = vtkOpenGLPolyDataMapper::New();
     m_BackgroundActor = vtkActor::New();
     m_Prop3DAssembly = vtkAssembly::New();
     m_ImageAssembly = vtkAssembly::New();
@@ -112,9 +112,9 @@ namespace mitk
     m_FrontHedgeHog = vtkHedgeHog::New();
     m_BackHedgeHog  = vtkHedgeHog::New();
 
-    m_FrontNormalsMapper = vtkPolyDataMapper::New();
+    m_FrontNormalsMapper = vtkOpenGLPolyDataMapper::New();
     m_FrontNormalsMapper->SetInputConnection( m_FrontHedgeHog->GetOutputPort());
-    m_BackNormalsMapper = vtkPolyDataMapper::New();
+    m_BackNormalsMapper = vtkOpenGLPolyDataMapper::New();
 
     m_Prop3DAssembly->AddPart( m_EdgeActor );
     m_Prop3DAssembly->AddPart( m_ImageAssembly );
@@ -208,9 +208,6 @@ namespace mitk
 
   void PlaneGeometryDataVtkMapper3D::GenerateDataForRenderer(BaseRenderer* renderer)
   {
-    SetVtkMapperImmediateModeRendering(m_EdgeMapper);
-    SetVtkMapperImmediateModeRendering(m_BackgroundMapper);
-
     // Remove all actors from the assembly, and re-initialize it with the
     // edge actor
     m_ImageAssembly->GetParts()->RemoveAllItems();
@@ -398,7 +395,7 @@ namespace mitk
 
       // Add black background for all images (which may be transparent)
       m_BackgroundMapper->SetInputData( surface->GetVtkPolyData() );
-      m_ImageAssembly->AddPart( m_BackgroundActor );
+      //m_ImageAssembly->AddPart( m_BackgroundActor );
 
       LayerSortedActorList layerSortedActors;
 
@@ -499,8 +496,6 @@ namespace mitk
             if ( m_ImageActors.count( imageMapper ) == 0 )
             {
               dataSetMapper = vtkDataSetMapper::New();
-              //Enable rendering without copying the image.
-              dataSetMapper->ImmediateModeRenderingOn();
 
               texture = vtkNeverTranslucentTexture::New();
               texture->RepeatOff();

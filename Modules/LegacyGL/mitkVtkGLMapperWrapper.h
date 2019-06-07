@@ -61,7 +61,7 @@ namespace mitk {
 
     virtual void ApplyColorAndOpacityProperties(mitk::BaseRenderer* renderer, vtkActor * actor) override;
 
-    void MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type) override;
+    void MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type, vtkInformation* info = nullptr) override;
 
     virtual void Update(BaseRenderer *renderer) override;
 

@@ -20,16 +20,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 #include <MitkPlanarFigureExports.h>
-#include "mitkGLMapper.h"
+#include "mitkMapper.h"
 #include "mitkPlanarFigure.h"
 #include "mitkPlanarFigureControlPointStyleProperty.h"
+#include "mitkTextOverlay2D.h"
+#include "vtkNew.h"
+#include "vtkPen.h"
+
+class vtkContext2D;
 
 namespace mitk {
 
 class BaseRenderer;
 class Contour;
-class TextOverlay2D;
-
 
 /**
 * \brief OpenGL-based mapper to render display sub-class instances of mitk::PlanarFigure
@@ -107,11 +110,11 @@ class TextOverlay2D;
 * @ingroup MitkPlanarFigureModule
 */
 
-class MITKPLANARFIGURE_EXPORT PlanarFigureMapper2D : public GLMapper
+class MITKPLANARFIGURE_EXPORT PlanarFigureMapper2D : public Mapper
 {
 public:
 
-  mitkClassMacro(PlanarFigureMapper2D, GLMapper);
+  mitkClassMacro(PlanarFigureMapper2D, Mapper);
 
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
@@ -119,10 +122,16 @@ public:
   /**
   * reimplemented from Baseclass
   */
-  virtual void Paint(BaseRenderer * renderer) override;
+  virtual void MitkRender(BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type, vtkInformation* info) override;
 
 
   static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
+
+
+  /** \brief Apply color and opacity properties read from the PropertyList.
+  * The actor is not used in the GLMappers. Called by mapper subclasses.
+  */
+  virtual void ApplyColorAndOpacityProperties(mitk::BaseRenderer* renderer, vtkActor* actor = nullptr) override;
 
 
 protected:
@@ -269,7 +278,10 @@ protected:
   */
   void OnNodeModified();
 
+  void Initialize(mitk::BaseRenderer* renderer);
+
 private:
+
   bool m_IsSelected;
   bool m_IsHovering;
   bool m_DrawOutline;
@@ -315,12 +327,16 @@ private:
   // Observer-tag for listening to itk::ModifiedEvents on the DataNode
   unsigned long m_NodeModifiedObserverTag;
 
+  bool m_Initialized;
+
   // Bool flag that indicates if a node modified observer was added
   bool m_NodeModifiedObserverAdded;
 
   itk::SmartPointer<mitk::TextOverlay2D> m_AnnotationOverlay;
   itk::SmartPointer<mitk::TextOverlay2D> m_QuantityOverlay;
 
+  vtkNew<vtkContext2D> m_Context;
+  vtkSmartPointer<vtkPen> m_Pen;
 };
 
 } // namespace mitk

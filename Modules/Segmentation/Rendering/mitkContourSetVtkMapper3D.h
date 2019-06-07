@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkPolyData.h>
 
-class vtkPolyDataMapper;
+class vtkOpenGLPolyDataMapper;
 class vtkAppendPolyData;
 class vtkActor;
 class vtkTubeFilter;
@@ -57,7 +57,7 @@ class MITKSEGMENTATION_EXPORT ContourSetVtkMapper3D : public VtkMapper
 
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
 
-    vtkPolyDataMapper* m_VtkPolyDataMapper;
+    vtkOpenGLPolyDataMapper* m_VtkPolyDataMapper;
     vtkTubeFilter*     m_TubeFilter;
 
     vtkPolyData *m_ContourSet;

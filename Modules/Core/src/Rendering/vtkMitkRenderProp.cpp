@@ -45,12 +45,12 @@ void vtkMitkRenderProp::SetPropRenderer(mitk::VtkPropRenderer::Pointer propRende
 
 int vtkMitkRenderProp::RenderOpaqueGeometry(vtkViewport* /*viewport*/)
 {
-  return m_VtkPropRenderer->Render(mitk::VtkPropRenderer::Opaque);
+  return m_VtkPropRenderer->Render(mitk::VtkPropRenderer::Opaque, GetPropertyKeys());
 }
 
 int vtkMitkRenderProp::RenderOverlay(vtkViewport* /*viewport*/)
 {
-  return m_VtkPropRenderer->Render(mitk::VtkPropRenderer::Overlay);
+  return m_VtkPropRenderer->Render(mitk::VtkPropRenderer::Overlay, GetPropertyKeys());
 }
 
 void vtkMitkRenderProp::ReleaseGraphicsResources(vtkWindow* window)
@@ -104,10 +104,10 @@ int vtkMitkRenderProp::HasTranslucentPolygonalGeometry()
 
 int vtkMitkRenderProp::RenderTranslucentPolygonalGeometry( vtkViewport * )
 {
-  return m_VtkPropRenderer->Render(mitk::VtkPropRenderer::Translucent);
+  return m_VtkPropRenderer->Render(mitk::VtkPropRenderer::Translucent, GetPropertyKeys());
 }
 int vtkMitkRenderProp::RenderVolumetricGeometry( vtkViewport * )
 {
-  return m_VtkPropRenderer->Render(mitk::VtkPropRenderer::Volumetric);
+  return m_VtkPropRenderer->Render(mitk::VtkPropRenderer::Volumetric, GetPropertyKeys());
 }
 

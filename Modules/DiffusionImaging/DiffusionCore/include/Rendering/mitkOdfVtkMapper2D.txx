@@ -128,9 +128,9 @@ mitk::OdfVtkMapper2D<T,N>::LocalStorage::LocalStorage()
     m_OdfsActors[1]->GetProperty()->SetInterpolationToGouraud();
     m_OdfsActors[2]->GetProperty()->SetInterpolationToGouraud();
 
-    m_OdfsMappers.push_back(vtkPolyDataMapper::New());
-    m_OdfsMappers.push_back(vtkPolyDataMapper::New());
-    m_OdfsMappers.push_back(vtkPolyDataMapper::New());
+    m_OdfsMappers.push_back(vtkOpenGLPolyDataMapper::New());
+    m_OdfsMappers.push_back(vtkOpenGLPolyDataMapper::New());
+    m_OdfsMappers.push_back(vtkOpenGLPolyDataMapper::New());
 
     vtkLookupTable *lut = vtkLookupTable::New();
 

@@ -34,7 +34,7 @@ mitk::RenderWindowBase::RenderWindowBase( )
 
 * or short: within constructors and destructors classes are not polymorph.
 */
-void mitk::RenderWindowBase::Initialize( mitk::RenderingManager* renderingManager, const char* name,mitk::BaseRenderer::RenderingMode::Type renderingMode )
+void mitk::RenderWindowBase::Initialize( mitk::RenderingManager* renderingManager, const char* name,mitk::BaseRenderer::RenderingMode::Type renderingMode, bool useFXAA )
 {
   if ( renderingManager == NULL )
   {
@@ -43,7 +43,7 @@ void mitk::RenderWindowBase::Initialize( mitk::RenderingManager* renderingManage
 
   if(m_Renderer.IsNull())
   {
-      m_Renderer = mitk::VtkPropRenderer::New( name , GetVtkRenderWindow(), renderingManager,renderingMode );
+      m_Renderer = mitk::VtkPropRenderer::New( name, GetVtkRenderWindow(), renderingManager, renderingMode, useFXAA);
   }
 
   m_Renderer->InitRenderer(this->GetVtkRenderWindow());

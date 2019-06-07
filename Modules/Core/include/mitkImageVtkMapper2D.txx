@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vtkPoints.h>
-#include <vtkPolyDataMapper.h>
+#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkCellArray.h>
 #include <vtkPolyData.h>
 

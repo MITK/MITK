@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkVtkScalarModeProperty.h>
 #include <mitkClippingProperty.h>
 #include <mitkSmartPointerProperty.h>
-#include <mitkIShaderRepository.h>
 #include <mitkExtractSliceFilter.h>
 #include <mitkImageSliceSelector.h>
 #include <mitkCoreServices.h>
@@ -37,7 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkActor.h>
 #include <vtkProperty.h>
 #include <vtkPolyData.h>
-#include <vtkPolyDataMapper.h>
+#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkPointData.h>
 #include <vtkPlaneCollection.h>
@@ -290,9 +289,7 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer,
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
-  // Applying shading properties
   Superclass::ApplyColorAndOpacityProperties( renderer, ls->m_Actor ) ;
-  this->ApplyShaderProperties(renderer);
   // VTK Properties
   ApplyMitkPropertiesToVtkProperty( this->GetDataNode(), ls->m_Actor->GetProperty(), renderer );
 
@@ -499,12 +496,6 @@ void mitk::SurfaceVtkMapper3D::SetDefaultPropertiesForVtkProperty(mitk::DataNode
     node->AddProperty("material.edgeColor", mitk::ColorProperty::New(0.5f, 0.5f, 0.5f), renderer, overwrite);
   }
 
-  // Shaders
-  IShaderRepository* shaderRepo = CoreServices::GetShaderRepository();
-  if (shaderRepo)
-  {
-    shaderRepo->AddDefaultProperties(node, renderer, overwrite);
-  }
 }
 
 void mitk::SurfaceVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)

@@ -33,11 +33,9 @@ set(mitk_modules
   SurfaceInterpolation
   Segmentation
   PlanarFigureSegmentation
-  OpenViewCore
   QtWidgets
   QtWidgetsExt
   QtWidgetsWeb
-  QmlItems
   SegmentationUI
   DiffusionImaging
   GPGPU
@@ -58,14 +56,12 @@ set(mitk_modules
   US
   USUI
   DicomUI
-  Simulation
   Remeshing
   Python
   QtPython
   Persistence
   OpenIGTLinkUI
   IGTUI
-  VtkShaders
   DicomRT
   RTUI
   IOExt

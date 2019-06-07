@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkContourModelToSurfaceFilter.h"
 
 #include <vtkSmartPointer.h>
-#include <vtkPolyDataMapper.h>
+#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkActor.h>
 #include <vtkAssembly.h>
 #include <vtkProp.h>

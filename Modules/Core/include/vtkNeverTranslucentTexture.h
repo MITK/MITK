@@ -55,7 +55,7 @@ class MITKCORE_EXPORT vtkNeverTranslucentTexture : public vtkOpenGLTexture
 public:
 
   static vtkNeverTranslucentTexture* New();
-  vtkTypeMacro(vtkNeverTranslucentTexture, vtkTexture);
+  vtkTypeMacro(vtkNeverTranslucentTexture, vtkOpenGLTexture);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**

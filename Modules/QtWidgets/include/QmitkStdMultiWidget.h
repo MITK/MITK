@@ -60,7 +60,7 @@ private:
   void UpdateAnnotationFonts();
 
 public:
-  QmitkStdMultiWidget(QWidget* parent = 0, Qt::WindowFlags f = 0, mitk::RenderingManager* renderingManager = 0, mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard, const QString& name = "stdmulti", bool crosshairVisibility3D = true);
+  QmitkStdMultiWidget(QWidget* parent = 0, Qt::WindowFlags f = 0, mitk::RenderingManager* renderingManager = 0, mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard, bool useFXAA = true, const QString& name = "stdmulti", bool crosshairVisibility3D = true);
   virtual ~QmitkStdMultiWidget();
 
   mitk::SliceNavigationController*

@@ -33,8 +33,17 @@ mitk::ContourSetMapper2D::~ContourSetMapper2D()
 {
 }
 
+void mitk::ContourSetMapper2D::ApplyColorAndOpacityProperties(mitk::BaseRenderer* renderer, vtkActor* /*actor*/)
+{
+  float rgba[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+  // Check for color prop and use it for rendering if it exists
+  GetDataNode()->GetColor(rgba, renderer, "color");
+  // Check for opacity prop and use it for rendering if it exists
+  GetDataNode()->GetOpacity(rgba[3], renderer, "opacity");
 
-void mitk::ContourSetMapper2D::Paint(mitk::BaseRenderer * renderer)
+  glColor4fv(rgba);
+}
+void mitk::ContourSetMapper2D::MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type, vtkInformation* info)
 {
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");

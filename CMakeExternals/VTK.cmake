@@ -79,13 +79,10 @@ if(NOT DEFINED VTK_DIR)
     )
   endif()
 
-  set(VTK_URL http://www.vtk.org/files/release/8.0/VTK-8.0.1.tar.gz)
-  set(VTK_URL_MD5 692d09ae8fadc97b59d35cab429b261a)
-
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}
-    URL ${VTK_URL}
-    URL_MD5 ${VTK_URL_MD5}
+    URL http://www.vtk.org/files/release/8.0/VTK-8.0.1.tar.gz
+    URL_MD5 692d09ae8fadc97b59d35cab429b261a
     PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VtkCornerAnnotation.patch
       COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VtkContourRepresentation.patch
     CMAKE_GENERATOR ${gen}
@@ -99,7 +96,7 @@ if(NOT DEFINED VTK_DIR)
         -DModule_vtkTestingRendering:BOOL=ON
         -DVTK_MAKE_INSTANTIATORS:BOOL=ON
         -DVTK_USE_CXX11_FEATURES:BOOL=ON
-        -DVTK_RENDERING_BACKEND:STRING=OpenGL
+        -DVTK_RENDERING_BACKEND:STRING=OpenGL2
         -DVTK_SMP_IMPLEMENTATION_TYPE=OpenMP
         ${additional_cmake_args}
     CMAKE_CACHE_ARGS

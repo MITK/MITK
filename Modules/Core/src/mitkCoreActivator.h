@@ -22,8 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIFileWriter.h>
 #include <mitkAbstractFileIO.h>
 
-#include <mitkIShaderRepository.h>
-
 #include <mitkPlanePositionManager.h>
 #include <mitkPropertyAliases.h>
 #include <mitkPropertyDescriptions.h>
@@ -61,8 +59,6 @@ private:
   void RegisterVtkReaderWriter();
 
   void RegisterLegacyWriter();
-
-  std::unique_ptr<us::ServiceTracker<mitk::IShaderRepository> > m_ShaderRepositoryTracker;
 
   //mitk::RenderingManager::Pointer m_RenderingManager;
   std::unique_ptr<mitk::PlanePositionManagerService> m_PlanePositionManager;

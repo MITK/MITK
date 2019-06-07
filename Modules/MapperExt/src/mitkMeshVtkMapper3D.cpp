@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include <vtkProperty.h>
-#include <vtkPolyDataMapper.h>
+#include <vtkOpenGLPolyDataMapper.h>
 #include <stdlib.h>
 
 const mitk::Mesh* mitk::MeshVtkMapper3D::GetInput()
@@ -61,11 +61,11 @@ mitk::MeshVtkMapper3D::MeshVtkMapper3D()
   m_Contour = vtkPolyData::New();
 
   m_SpheresActor = vtkActor::New();
-  m_SpheresMapper = vtkPolyDataMapper::New();
+  m_SpheresMapper = vtkOpenGLPolyDataMapper::New();
   m_SpheresActor->SetMapper(m_SpheresMapper);
 
   m_ContourActor = vtkActor::New();
-  m_ContourMapper = vtkPolyDataMapper::New();
+  m_ContourMapper = vtkOpenGLPolyDataMapper::New();
   m_ContourActor->SetMapper(m_ContourMapper);
   m_ContourActor->GetProperty()->SetAmbient(1.0);
 
@@ -193,9 +193,6 @@ void mitk::MeshVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer* rendere
     }
 
   }
-
-  SetVtkMapperImmediateModeRendering(m_ContourMapper);
-  SetVtkMapperImmediateModeRendering(m_SpheresMapper);
 
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");

@@ -41,7 +41,7 @@
 #include <vtkCamera.h>
 
 #include <vtkProperty.h>
-#include <vtkPolyDataMapper.h>
+#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkActor.h>
 
 mitk::BaseRenderer::BaseRendererMapType mitk::BaseRenderer::baseRendererMap;
@@ -94,7 +94,7 @@ vtkRenderWindow* mitk::BaseRenderer::GetRenderWindowByName(const std::string& na
   return nullptr;
 }
 
-mitk::BaseRenderer::BaseRenderer(const char* name, vtkRenderWindow * renWin, mitk::RenderingManager* rm, RenderingMode::Type renderingMode)
+mitk::BaseRenderer::BaseRenderer(const char* name, vtkRenderWindow * renWin, mitk::RenderingManager* rm, RenderingMode::Type renderingMode, bool useFXAA)
   : m_RenderWindow(nullptr)
   , m_VtkRenderer(nullptr)
   , m_MapperID(defaultMapper)
@@ -185,12 +185,15 @@ mitk::BaseRenderer::BaseRenderer(const char* name, vtkRenderWindow * renWin, mit
   m_CameraController->SetRenderer(this);
 
   m_VtkRenderer = vtkRenderer::New();
+  if (useFXAA) {
+    m_VtkRenderer->UseFXAAOn();
+  }
 
   if (renderingMode == RenderingMode::DepthPeeling)
   {
     m_VtkRenderer->SetUseDepthPeeling(1);
     m_VtkRenderer->SetMaximumNumberOfPeels(8);
-    m_VtkRenderer->SetOcclusionRatio(0.0);
+    m_VtkRenderer->SetOcclusionRatio(0.);
   }
 
   if (mitk::VtkLayerController::GetInstance(m_RenderWindow) == nullptr)
@@ -747,6 +750,26 @@ void mitk::BaseRenderer::WorldToDisplay(const Point3D& worldIndex, Point2D& disp
   return;
 }
 
+void mitk::BaseRenderer::WorldToView(const mitk::Point3D& worldIndex, mitk::Point2D &viewPoint) const
+{
+  double world[4], *view;
+
+  world[0] = worldIndex[0];
+  world[1] = worldIndex[1];
+  world[2] = worldIndex[2];
+  world[3] = 1.0;
+
+  this->GetVtkRenderer()->SetWorldPoint(world);
+  this->GetVtkRenderer()->WorldToView();
+  view = this->GetVtkRenderer()->GetViewPoint();
+  this->GetVtkRenderer()->ViewToNormalizedViewport(view[0], view[1], view[2]);
+
+  viewPoint[0] = view[0] * this->GetViewportSize()[0];
+  viewPoint[1] = view[1] * this->GetViewportSize()[1];
+
+  return;
+}
+
 void mitk::BaseRenderer::PlaneToDisplay(const Point2D& planePointInMM, Point2D& displayPoint) const
 {
   Point3D worldPoint;
@@ -754,6 +777,15 @@ void mitk::BaseRenderer::PlaneToDisplay(const Point2D& planePointInMM, Point2D& 
   this->WorldToDisplay(worldPoint, displayPoint);
 
   return;
+}
+
+void mitk::BaseRenderer::PlaneToView(const Point2D& planePointInMM, Point2D& viewPoint) const
+{
+  Point3D worldPoint;
+  this->m_CurrentWorldPlaneGeometry->Map(planePointInMM, worldPoint);
+  this->WorldToView(worldPoint, viewPoint);
+
+  return; 
 }
 
 double mitk::BaseRenderer::GetScaleFactorMMPerDisplayUnit() const

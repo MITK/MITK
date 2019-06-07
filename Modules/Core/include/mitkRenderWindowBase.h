@@ -65,7 +65,7 @@ protected:
   RenderWindowBase();
 
   // helper functions: within constructors and destructors classes are not polymorph.
-  void Initialize( mitk::RenderingManager* renderingManager = NULL, const char* name = "unnamed renderer",mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard );
+  void Initialize( mitk::RenderingManager* renderingManager = NULL, const char* name = "unnamed renderer",mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard, bool useFXAA = true );
   void Destroy();
 
   mitk::VtkPropRenderer::Pointer m_Renderer;

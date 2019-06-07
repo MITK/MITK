@@ -33,8 +33,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Shader
 #include <mitkCoreServices.h>
-#include <mitkIShaderRepository.h>
-#include <mitkShaderProperty.h>
 
 #include <vtkSmartPointer.h>
 #include <mitkRenderingModeProperty.h>

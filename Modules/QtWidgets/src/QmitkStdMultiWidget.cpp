@@ -65,7 +65,7 @@ void QmitkStdMultiWidget::UpdateAnnotationFonts()
   }
 }
 
-QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mitk::RenderingManager* renderingManager, mitk::BaseRenderer::RenderingMode::Type renderingMode, const QString& name, bool crosshairVisibility3D)
+QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mitk::RenderingManager* renderingManager, mitk::BaseRenderer::RenderingMode::Type renderingMode, bool useFXAA, const QString& name, bool crosshairVisibility3D)
   : QWidget(parent, f),
   mitkWidget1(NULL),
   mitkWidget2(NULL),
@@ -199,24 +199,29 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mit
   mitkWidgetLayout4->addWidget(m_ShadowWidgets[3]);
   m_ShadowWidgets[3]->hide();
 
+  mitk::BaseRenderer::RenderingMode::Type renderingMode2D = renderingMode;
+  if (renderingMode2D == mitk::BaseRenderer::RenderingMode::Type::DepthPeeling) {
+    renderingMode2D = mitk::BaseRenderer::RenderingMode::Type::Standard;
+  }
+
   //Create RenderWindows 1
-  mitkWidget1 = new QmitkRenderWindow(mitkWidget1Container, name + ".widget1", NULL, m_RenderingManager, renderingMode);
+  mitkWidget1 = new QmitkRenderWindow(mitkWidget1Container, name + ".widget1", NULL, m_RenderingManager, renderingMode2D, useFXAA);
   mitkWidget1->SetLayoutIndex( AXIAL );
   mitkWidgetLayout1->addWidget(mitkWidget1);
 
   //Create RenderWindows 2
-  mitkWidget2 = new QmitkRenderWindow(mitkWidget2Container, name + ".widget2", NULL, m_RenderingManager, renderingMode);
+  mitkWidget2 = new QmitkRenderWindow(mitkWidget2Container, name + ".widget2", NULL, m_RenderingManager, renderingMode2D, useFXAA);
   mitkWidget2->setEnabled( true );
   mitkWidget2->SetLayoutIndex( SAGITTAL );
   mitkWidgetLayout2->addWidget(mitkWidget2);
 
   //Create RenderWindows 3
-  mitkWidget3 = new QmitkRenderWindow(mitkWidget3Container, name + ".widget3", NULL, m_RenderingManager, renderingMode);
+  mitkWidget3 = new QmitkRenderWindow(mitkWidget3Container, name + ".widget3", NULL, m_RenderingManager, renderingMode2D, useFXAA);
   mitkWidget3->SetLayoutIndex( CORONAL );
   mitkWidgetLayout3->addWidget(mitkWidget3);
 
   //Create RenderWindows 4
-  mitkWidget4 = new QmitkRenderWindow(mitkWidget4Container, name + ".widget4", NULL, m_RenderingManager, renderingMode);
+  mitkWidget4 = new QmitkRenderWindow(mitkWidget4Container, name + ".widget4", NULL, m_RenderingManager, renderingMode, useFXAA);
   mitkWidget4->SetLayoutIndex( THREE_D );
   mitkWidgetLayout4->addWidget(mitkWidget4);
 

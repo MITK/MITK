@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPlane.h>
 #include <vtkPointData.h>
 #include <vtkPoints.h>
-#include <vtkPolyDataMapper.h>
+#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
 #include <vtkSampleFunction.h>
@@ -263,7 +263,7 @@ void mitk::TubeGraphVtkMapper3D::GeneratePolyDataForFurcation(mitk::TubeGraphVer
   sphereSource->Update();
 
   // generate a actor with a mapper for the sphere
-  vtkSmartPointer<vtkPolyDataMapper> sphereMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  vtkSmartPointer<vtkOpenGLPolyDataMapper> sphereMapper = vtkSmartPointer<vtkOpenGLPolyDataMapper>::New();
   vtkSmartPointer<vtkActor> sphereActor = vtkSmartPointer<vtkActor>::New();
 
   sphereMapper->SetInputConnection(sphereSource->GetOutputPort());
@@ -403,7 +403,7 @@ void mitk::TubeGraphVtkMapper3D::GeneratePolyDataForTube(mitk::TubeGraphEdge& ed
   tubeFilter->GetOutput()->GetPointData()->SetActiveScalars( "colorScalars" );
 
   // generate a actor with a mapper for the
-  vtkSmartPointer<vtkPolyDataMapper> tubeMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  vtkSmartPointer<vtkOpenGLPolyDataMapper> tubeMapper = vtkSmartPointer<vtkOpenGLPolyDataMapper>::New();
   vtkSmartPointer<vtkActor> tubeActor = vtkSmartPointer<vtkActor>::New();
 
   tubeMapper->SetInputConnection(tubeFilter->GetOutputPort());
@@ -633,7 +633,7 @@ void mitk::TubeGraphVtkMapper3D::ClipPolyData(mitk::TubeGraphVertex& vertex, con
     //contour->SetInputConnection(sample->GetOutputPort());
     //contour->SetValue( 0, 0.25);
 
-    //vtkSmartPointer<vtkPolyDataMapper> impMapper =  vtkSmartPointer<vtkPolyDataMapper>::New();
+    //vtkSmartPointer<vtkOpenGLPolyDataMapper> impMapper =  vtkSmartPointer<vtkOpenGLPolyDataMapper>::New();
     //impMapper->SetInputConnection (contour->GetOutputPort());
     //impMapper->ScalarVisibilityOff();
     //vtkSmartPointer<vtkActor> impActor = vtkSmartPointer<vtkActor>::New();
@@ -648,7 +648,7 @@ void mitk::TubeGraphVtkMapper3D::ClipPolyData(mitk::TubeGraphVertex& vertex, con
 
   for (std::map<TubeGraph::TubeDescriptorType ,vtkSmartPointer<vtkImplicitBoolean> >::iterator itClipStructure = cylinderForClipping.begin(); itClipStructure != cylinderForClipping.end(); itClipStructure++)
   {
-    vtkSmartPointer<vtkPolyDataMapper> sphereMapper = dynamic_cast<vtkPolyDataMapper*>(ls->m_vtkSpheresActorMap[vertexDesc]->GetMapper());
+    vtkSmartPointer<vtkOpenGLPolyDataMapper> sphereMapper = dynamic_cast<vtkOpenGLPolyDataMapper*>(ls->m_vtkSpheresActorMap[vertexDesc]->GetMapper());
 
     if(sphereMapper != NULL)
     {
@@ -676,7 +676,7 @@ void mitk::TubeGraphVtkMapper3D::ClipPolyData(mitk::TubeGraphVertex& vertex, con
       if (itClipStructure->first != toBeClippedTube)
       {
 
-        vtkSmartPointer<vtkPolyDataMapper> tubeMapper = dynamic_cast<vtkPolyDataMapper*>(ls->m_vtkTubesActorMap[toBeClippedTube]->GetMapper());
+        vtkSmartPointer<vtkOpenGLPolyDataMapper> tubeMapper = dynamic_cast<vtkOpenGLPolyDataMapper*>(ls->m_vtkTubesActorMap[toBeClippedTube]->GetMapper());
 
         if (tubeMapper != NULL)
         {

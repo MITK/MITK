@@ -102,7 +102,7 @@ namespace mitk
     /** Standard class typedefs. */
     mitkClassMacroItkParent(BaseRenderer, itk::Object);
 
-    BaseRenderer(const char* name = nullptr, vtkRenderWindow * renWin = nullptr, mitk::RenderingManager* rm = nullptr,RenderingMode::Type mode = RenderingMode::Standard);
+    BaseRenderer(const char* name = nullptr, vtkRenderWindow * renWin = nullptr, mitk::RenderingManager* rm = nullptr,RenderingMode::Type mode = RenderingMode::Standard, bool useFXAA = true);
 
     //##Documentation
     //## @brief MapperSlotId defines which kind of mapper (e.g., 2D or 3D) shoud be used.
@@ -432,6 +432,16 @@ namespace mitk
     //## @brief This method converts a 3D world index to the display point
     //## using the geometry of the renderWindow.
     void WorldToDisplay(const Point3D& worldIndex, Point2D& displayPoint) const;
+
+    //##Documentation
+    //## @brief This method converts a 3D world index to the point on the viewport
+    //## using the geometry of the renderWindow.
+    void WorldToView(const Point3D& worldIndex, Point2D& viewPoint) const;
+
+    //##Documentation
+    //## @brief This method converts a 2D plane coordinate to the point on the viewport
+    //## using the geometry of the renderWindow.
+    void PlaneToView(const Point2D& planePointInMM, Point2D& viewPoint) const;
 
     //##Documentation
     //## @brief This method converts a 2D plane coordinate to the display point

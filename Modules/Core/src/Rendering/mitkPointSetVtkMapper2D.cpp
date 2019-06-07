@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //vtk includes
 #include <vtkActor.h>
 #include <vtkPropAssembly.h>
-#include <vtkPolyDataMapper.h>
+#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkTransform.h>
 #include <vtkGlyph3D.h>
 #include <vtkTransformFilter.h>
@@ -77,9 +77,9 @@ mitk::PointSetVtkMapper2D::LocalStorage::LocalStorage()
   m_ContourActor = vtkSmartPointer <vtkActor>::New();
 
   // mappers
-  m_VtkUnselectedPolyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-  m_VtkSelectedPolyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-  m_VtkContourPolyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  m_VtkUnselectedPolyDataMapper = vtkSmartPointer<vtkOpenGLPolyDataMapper>::New();
+  m_VtkSelectedPolyDataMapper = vtkSmartPointer<vtkOpenGLPolyDataMapper>::New();
+  m_VtkContourPolyDataMapper = vtkSmartPointer<vtkOpenGLPolyDataMapper>::New();
 
   // propassembly
   m_PropAssembly = vtkSmartPointer <vtkPropAssembly>::New();

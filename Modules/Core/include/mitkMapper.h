@@ -123,7 +123,7 @@ namespace mitk {
      /** \brief Returns whether this is an vtk-based mapper
     * \deprecatedSince{2013_03} All mappers of superclass VTKMapper are vtk based, use a dynamic_cast instead
     */
-    virtual bool IsVtkBased() const = 0;
+    virtual bool IsVtkBased() const { return true; }
 
 
     /** \brief Calls the time step of the input data for the specified renderer and checks
@@ -134,7 +134,7 @@ namespace mitk {
     /** \brief Responsible for calling the appropriate render functions.
     *   To be implemented in sub-classes.
     */
-    virtual void MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type) = 0;
+    virtual void MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type, vtkInformation* info = nullptr) = 0;
 
     /**
     * \brief Apply specific color and opacity properties read from the PropertyList.

@@ -42,7 +42,8 @@ public:
   // Description
   // Evaluate plane equation for point x[3].
   double EvaluateFunction(double x[3]) override;
-  double EvaluateFunction(double x, double y, double z);
+  void EvaluateFunction(vtkDataArray* input, vtkDataArray* output) override;
+  double EvaluateFunction(double x, double y, double z) override;
 
   // Description
   // Evaluate function gradient at point x[3].

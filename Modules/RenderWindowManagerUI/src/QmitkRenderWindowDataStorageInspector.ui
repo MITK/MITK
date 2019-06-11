@@ -34,7 +34,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QListView" name="renderWindowListView"/>
+    <widget class="QTreeView" name="renderWindowTreeView"/>
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout">
@@ -45,14 +45,14 @@
        </property>
       </widget>
      </item>
-	 <item row="0" column="2" colspan="2">
+     <item row="0" column="2" colspan="2">
       <widget class="QPushButton" name="pushButtonSetAsBaseLayer">
        <property name="text">
         <string>Set as base layer</string>
        </property>
       </widget>
      </item>
-	 <item row="1" column="0">
+     <item row="1" column="0">
       <widget class="QRadioButton" name="radioButtonAxial">
        <property name="text">
         <string>Axial</string>
@@ -62,7 +62,7 @@
        </property>
       </widget>
      </item>
-	 <item row="1" column="1">
+     <item row="1" column="1">
       <widget class="QRadioButton" name="radioButtonCoronal">
        <property name="text">
         <string>Coronal</string>

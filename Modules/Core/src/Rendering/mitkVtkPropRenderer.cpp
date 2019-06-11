@@ -398,32 +398,32 @@ void mitk::VtkPropRenderer::MakeCurrent()
 
 void mitk::VtkPropRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mitk::Point3D& worldPoint) const
 {
-  if (this->GetRenderWindow()->GetNeverRendered() != 0)
-      return; // somebody called picking before we ever rendered; cannot have enough information yet
+  PickWorldPoint(displayPoint, worldPoint, m_PickingMode);
 
-  switch (m_PickingMode)
-  {
-  case (WorldPointPicking) :
-  {
-    m_WorldPointPicker->Pick(displayPoint[0], displayPoint[1], 0, m_VtkRenderer);
-    vtk2itk(m_WorldPointPicker->GetPickPosition(), worldPoint);
-    break;
-  }
-  case (PointPicking) :
-  {
-    m_PointPicker->Pick(displayPoint[0], displayPoint[1], 0, m_VtkRenderer);
-    vtk2itk(m_PointPicker->GetPickPosition(), worldPoint);
-    break;
-  }
-  case(CellPicking) :
-  {
-    m_CellPicker->Pick(displayPoint[0], displayPoint[1], 0, m_VtkRenderer);
-    vtk2itk(m_CellPicker->GetPickPosition(), worldPoint);
-    break;
-  }
-  }
   //todo: is this picking in 2D renderwindows?
   //    Superclass::PickWorldPoint(displayPoint, worldPoint);
+}
+
+void mitk::VtkPropRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mitk::Point3D& worldPoint, PickingMode mode) const
+{
+  if (this->GetRenderWindow()->GetNeverRendered() != 0) {
+      return; // somebody called picking before we ever rendered; cannot have enough information yet
+  }
+
+  switch (mode) {
+    case WorldPointPicking:
+      m_WorldPointPicker->Pick(displayPoint[0], displayPoint[1], 0, m_VtkRenderer);
+      vtk2itk(m_WorldPointPicker->GetPickPosition(), worldPoint);
+      break;
+    case PointPicking:
+      m_PointPicker->Pick(displayPoint[0], displayPoint[1], 0, m_VtkRenderer);
+      vtk2itk(m_PointPicker->GetPickPosition(), worldPoint);
+      break;
+    case CellPicking:
+      m_CellPicker->Pick(displayPoint[0], displayPoint[1], 0, m_VtkRenderer);
+      vtk2itk(m_CellPicker->GetPickPosition(), worldPoint);
+      break;
+  }
 }
 
 mitk::DataNode *

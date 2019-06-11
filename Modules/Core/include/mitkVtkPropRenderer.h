@@ -91,22 +91,8 @@ public:
   virtual void InitSize(int w, int h) override;
   virtual void Resize(int w, int h) override;
 
-  // Picking
-  enum PickingMode{ WorldPointPicking, PointPicking, CellPicking};
-  /** \brief  Set the picking mode.
-  This method is used to set the picking mode for 3D object picking. The user can select one of
-  the three options WorldPointPicking, PointPicking and CellPicking. The first option uses the zBuffer
-  from graphics rendering, the second uses the 3D points from the closest surface mesh, and the third
-  option uses the cells   of that mesh. The last option is the slowest, the first one the fastest.
-  However, the first option cannot use transparent data object and the tolerance of the picked position
-  to the selected point should be considered. PointPicking also need a tolerance around the picking
-  position to select the closest point in the mesh. The CellPicker performs very well, if the
-  foreground surface part (i.e. the surfacepart that is closest to the scene's cameras) needs to be
-  picked. */
-  itkSetEnumMacro( PickingMode, PickingMode );
-  itkGetEnumMacro( PickingMode, PickingMode );
-
   virtual void PickWorldPoint(const Point2D& displayPoint, Point3D& worldPoint) const override;
+  virtual void PickWorldPoint(const Point2D& displayPoint, Point3D& worldPoint, PickingMode mode) const override;
   virtual mitk::DataNode *PickObject( const Point2D &displayPosition, Point3D &worldPosition ) const override;
 
   /**
@@ -196,8 +182,6 @@ private:
   vtkWorldPointPicker     * m_WorldPointPicker;
   vtkPointPicker          * m_PointPicker;
   vtkCellPicker           * m_CellPicker;
-
-  PickingMode               m_PickingMode;
 
   // Explicit use of SmartPointer to avoid circular #includes
   itk::SmartPointer< mitk::Mapper > m_CurrentWorldPlaneGeometryMapper;

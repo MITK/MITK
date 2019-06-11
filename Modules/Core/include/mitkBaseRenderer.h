@@ -85,6 +85,14 @@ namespace mitk
       };
     };
 
+    enum PickingMode {
+      WorldPointPicking,
+      PointPicking,
+      CellPicking,
+    };
+    itkSetEnumMacro(PickingMode, PickingMode);
+    itkGetEnumMacro(PickingMode, PickingMode);
+
     typedef std::map<vtkRenderWindow*, BaseRenderer*> BaseRendererMapType;
     static BaseRendererMapType baseRendererMap;
 
@@ -337,7 +345,8 @@ namespace mitk
     //## @warning Has to be overwritten in subclasses for the 3D-case.
     //##
     //## Implemented here only for 2D-rendering
-    virtual void PickWorldPoint(const Point2D& diplayPosition, Point3D& worldPosition) const = 0;
+    virtual void PickWorldPoint(const Point2D& displayPosition, Point3D& worldPosition) const = 0;
+    virtual void PickWorldPoint(const Point2D& displayPosition, Point3D& worldPosition, PickingMode mode) const = 0;
 
     /** \brief Determines the object (mitk::DataNode) closest to the current
     * position by means of picking
@@ -479,6 +488,8 @@ namespace mitk
     //##Documentation
     //## @brief MapperSlotId to use. Defines which kind of mapper (e.g., 2D or 3D) shoud be used.
     MapperSlotId m_MapperID;
+
+    PickingMode m_PickingMode;
 
     //##Documentation
     //## @brief The DataStorage that is used for rendering.

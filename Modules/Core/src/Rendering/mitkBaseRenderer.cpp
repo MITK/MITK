@@ -708,7 +708,7 @@ void mitk::BaseRenderer::DisplayToWorld(const Point2D& displayPoint, Point3D& wo
   }
   else if (m_MapperID == BaseRenderer::Standard3D)
   {
-    PickWorldPoint(displayPoint, worldIndex); //Seems to be the same code as above, but subclasses may contain different implementations.
+    PickWorldPoint(displayPoint, worldIndex, PickingMode::CellPicking); //Seems to be the same code as above, but subclasses may contain different implementations.
   }
 
   return;

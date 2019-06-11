@@ -153,6 +153,8 @@ in order to get a vtkTextProperty. This property enables the setup of font, font
 
   static bool useImmediateModeRendering();
 
+  vtkInformation* lastInfo;
+
 protected:
   VtkPropRenderer( const char* name = "VtkPropRenderer", vtkRenderWindow * renWin = nullptr, mitk::RenderingManager* rm = nullptr, mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard, bool useFXAA = true );
   virtual ~VtkPropRenderer();

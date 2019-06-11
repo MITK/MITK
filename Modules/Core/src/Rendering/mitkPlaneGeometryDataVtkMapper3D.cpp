@@ -545,6 +545,11 @@ namespace mitk
               // do not use a VTK lookup table (we do that ourselves in m_LevelWindowFilter)
               texture->MapColorScalarsThroughLookupTableOff();
 
+              VtkPropRenderer* propRenderer = dynamic_cast<VtkPropRenderer*>(renderer);
+              if (propRenderer != nullptr) {
+                imageActor->SetPropertyKeys(propRenderer->lastInfo);
+              }
+
               //re-use properties from the 2D image mapper
               imageActor->SetProperty( localStorage->m_Actor->GetProperty() );
               imageActor->GetProperty()->SetAmbient(0.5);

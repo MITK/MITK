@@ -61,6 +61,7 @@ mitk::VtkPropRenderer::VtkPropRenderer(const char* name, vtkRenderWindow * renWi
   m_CameraInitializedForMapperID(0)
 {
   didCount = false;
+  lastInfo = nullptr;
 
   m_WorldPointPicker = vtkWorldPointPicker::New();
 
@@ -165,6 +166,8 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type, vtkInf
 
   if (m_DataStorage.IsNull())
     return 0;
+
+  lastInfo = info;
 
   // Update mappers and prepare mapper queue
   if (type == VtkPropRenderer::Opaque)

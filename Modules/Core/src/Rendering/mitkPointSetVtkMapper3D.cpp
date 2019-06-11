@@ -38,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTransform.h>
 #include <vtkTransformPolyDataFilter.h>
 #include <vtkPolyDataAlgorithm.h>
-#include <math.h> 
+#include <math.h>
 #include <stdlib.h>
 #include <vtkMatrix4x4.h>
 
@@ -131,7 +131,7 @@ void mitk::PointSetVtkMapper3D::CreateEdgeObjectsBetweenPoints(itk::Point<float>
   vtkSmartPointer<vtkCylinderSource> cylinder = vtkSmartPointer<vtkCylinderSource>::New();
   cylinder->SetRadius(m_ContourRadius);
   cylinder->SetCenter(0, 0, 0);
-          
+
   cylinder->SetHeight(h);
   cylinder->SetResolution(20);
   transformFilter->SetInputConnection(cylinder->GetOutputPort());
@@ -280,7 +280,7 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
 
   //check if the list for the PointDataContainer is the same size as the PointsContainer. Is not, then the points were inserted manually and can not be visualized according to the PointData (selected/unselected)
   bool pointDataBroken = (itkPointSet->GetPointData()->Size() != itkPointSet->GetPoints()->Size());
-  
+
   //now add an object for each point in data
   mitk::PointSet::PointDataContainer::Iterator pointDataIter = itkPointSet->GetPointData()->Begin();
   for (ptIdx=0; ptIdx < nbPoints; ++ptIdx) // pointDataIter moved at end of loop
@@ -307,7 +307,7 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
 
       //MouseOrientation Tool (PositionTracker)
       if(isInputDevice)
-      {         
+      {
         sphere->SetThetaResolution(10);
         sphere->SetPhiResolution(10);
       }
@@ -587,6 +587,14 @@ void mitk::PointSetVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *ren
   m_UnselectedActor->SetVisibility( showPoints && !m_VertexRendering);
   m_SelectedActor->SetVisibility( showPoints && !m_VertexRendering);
   m_SelectedAreaActor->SetVisibility(showPoints && !m_VertexRendering);
+
+  VtkPropRenderer* propRenderer = dynamic_cast<VtkPropRenderer*>(renderer);
+  if (propRenderer != nullptr) {
+    m_UnselectedActor->SetPropertyKeys(propRenderer->lastInfo);
+    m_SelectedActor->SetPropertyKeys(propRenderer->lastInfo);
+    m_SelectedAreaActor->SetPropertyKeys(propRenderer->lastInfo);
+    m_ContourActor->SetPropertyKeys(propRenderer->lastInfo);
+  }
 
   bool showContour = false;
   this->GetDataNode()->GetBoolProperty("show contour", showContour);

@@ -82,13 +82,15 @@ private Q_SLOTS:
   void OnLinkToSegmentation(mitk::SemanticTypes::Lesion);
   void OnSetLesionName(mitk::SemanticTypes::Lesion);
   void OnSetLesionClass(mitk::SemanticTypes::Lesion);
-  void OnPropagateLesion(mitk::SemanticTypes::Lesion);
+  void OnCreateNewSegmentation(mitk::SemanticTypes::Lesion);
   void OnRemoveLesion(mitk::SemanticTypes::Lesion);
 
 private:
 
   void Initialize();
   void SetUpConnections();
+
+  void LinkSegmentationToLesion(const mitk::DataNode* selectedDataNode, mitk::SemanticTypes::Lesion selectedLesion);
 
   Ui::QmitkLesionInfoWidgetControls m_Controls;
   QmitkLesionTreeModel* m_StorageModel;

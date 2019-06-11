@@ -30,8 +30,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSemanticRelationsInference.h>
 #include <mitkRelationStorage.h>
 
-// registration ontology module
-//#include <mitkLesionPropagation.h>
+// segmentation
+#include <mitkLabelSetImage.h>
+#include <QmitkNewSegmentationDialog.h>
 
 // qt
 #include <QCompleter>
@@ -205,10 +206,10 @@ void QmitkLesionInfoWidget::OnLesionListContextMenuRequested(const QPoint& pos)
   connect(setLesionClass, &QAction::triggered, [this, selectedLesion] { OnSetLesionClass(selectedLesion); });
   menu->addAction(setLesionClass);
 
-  QAction* propageLesionToImage = new QAction("Propagate lesion to image", this);
-  propageLesionToImage->setEnabled(true);
-  connect(propageLesionToImage, &QAction::triggered, [this, selectedLesion] { OnPropagateLesion(selectedLesion); });
-  menu->addAction(propageLesionToImage);
+  QAction* createNewSegmentation = new QAction("Create new lesion", this);
+  createNewSegmentation->setEnabled(true);
+  connect(createNewSegmentation, &QAction::triggered, [this, selectedLesion] { OnCreateNewSegmentation(selectedLesion); });
+  menu->addAction(createNewSegmentation);
 
   QAction* removeLesion = new QAction("Remove lesion", this);
   removeLesion->setEnabled(true);
@@ -284,38 +285,7 @@ void QmitkLesionInfoWidget::OnLinkToSegmentation(mitk::SemanticTypes::Lesion sel
     return;
   }
 
-  // if the segmentation is not contained in the semantic relations, add it
-  if (!mitk::SemanticRelationsInference::InstanceExists(selectedDataNode))
-  {
-    try
-    {
-      AddToSemanticRelationsAction::Run(dataStorage, selectedDataNode);
-    }
-    catch (const mitk::SemanticRelationException& e)
-    {
-      std::stringstream exceptionMessage; exceptionMessage << e;
-      QMessageBox msgBox(QMessageBox::Warning,
-        "Could not link the selected lesion.",
-        "The program wasn't able to correctly link the selected lesion with the selected segmentation.\n"
-        "Reason:\n" + QString::fromStdString(exceptionMessage.str() + "\n"));
-      msgBox.exec();
-    }
-  }
-
-  // link the segmentation
-  try
-  {
-    m_SemanticRelationsIntegration->LinkSegmentationToLesion(selectedDataNode, selectedLesion);
-  }
-  catch (const mitk::SemanticRelationException& e)
-  {
-    std::stringstream exceptionMessage; exceptionMessage << e;
-    QMessageBox msgBox(QMessageBox::Warning,
-      "Could not link the selected lesion.",
-      "The program wasn't able to correctly link the selected lesion with the selected segmentation.\n"
-      "Reason:\n" + QString::fromStdString(exceptionMessage.str()));
-    msgBox.exec();
-  }
+  LinkSegmentationToLesion(selectedDataNode, selectedLesion);
 }
 
 void QmitkLesionInfoWidget::OnSetLesionName(mitk::SemanticTypes::Lesion selectedLesion)
@@ -374,7 +344,7 @@ void QmitkLesionInfoWidget::OnSetLesionClass(mitk::SemanticTypes::Lesion selecte
   m_SemanticRelationsIntegration->OverwriteLesion(m_CaseID, selectedLesion);
 }
 
-void QmitkLesionInfoWidget::OnPropagateLesion(mitk::SemanticTypes::Lesion selectedLesion)
+void QmitkLesionInfoWidget::OnCreateNewSegmentation(mitk::SemanticTypes::Lesion selectedLesion)
 {
   if (m_DataStorage.IsExpired())
   {
@@ -383,7 +353,7 @@ void QmitkLesionInfoWidget::OnPropagateLesion(mitk::SemanticTypes::Lesion select
 
   auto dataStorage = m_DataStorage.Lock();
 
-  QmitkSemanticRelationsNodeSelectionDialog* dialog = new QmitkSemanticRelationsNodeSelectionDialog(this, "Select data node to propagate the selected lesion.", "");
+  QmitkSemanticRelationsNodeSelectionDialog* dialog = new QmitkSemanticRelationsNodeSelectionDialog(this, "Select image to segment lesion on.", "");
   dialog->setWindowTitle("Select image node");
   dialog->SetDataStorage(dataStorage);
   dialog->SetNodePredicate(mitk::NodePredicates::GetImagePredicate());
@@ -410,37 +380,59 @@ void QmitkLesionInfoWidget::OnPropagateLesion(mitk::SemanticTypes::Lesion select
   {
     QMessageBox msgBox(QMessageBox::Warning,
       "No valid image node selected.",
-      "In order to propagate the selected lesion to an image, please specify a valid image node.");
+      "In order to create a new segmentation, please specify a valid image node.");
     msgBox.exec();
     return;
   }
 
-  mitk::BaseData* baseData = selectedDataNode->GetData();
-  if (nullptr == baseData)
+  mitk::Image* selectedImage = dynamic_cast<mitk::Image*>(selectedDataNode->GetData());
+  if (nullptr == selectedImage)
   {
     QMessageBox msgBox(QMessageBox::Warning,
-      "No valid base data.",
-      "In order to propagate the selected lesion to an image, please specify a valid image node.");
+      "No valid image.",
+      "In order to create a new segmentation, please specify a valid image node.");
     msgBox.exec();
     return;
   }
 
+  mitk::LabelSetImage::Pointer segmentation = mitk::LabelSetImage::New();
   try
   {
-    /*
-    auto allSegmentationsOfLesion = m_SemanticRelationsDataStorageAccess->GetAllSegmentationsOfLesion(m_CaseID, selectedLesion);
-    mitk::FindClosestSegmentationMask();
-    */
+    segmentation->Initialize(selectedImage);
   }
-  catch (const mitk::SemanticRelationException& e)
+  catch (mitk::Exception& e)
   {
     std::stringstream exceptionMessage; exceptionMessage << e;
     QMessageBox msgBox(QMessageBox::Warning,
-      "Could not propagate the selected lesion.",
-      "The program wasn't able to correctly propagate the selected lesion to the selected image.\n"
+      "Could not initialize segmentation.",
+      "The segmentation could not be correctly initialized with the selected image geometry.\n"
       "Reason:\n" + QString::fromStdString(exceptionMessage.str()));
     msgBox.exec();
+    return;
   }
+
+  auto segmentationDialog = new QmitkNewSegmentationDialog(this);
+  segmentationDialog->setWindowTitle("New lesion segmentation");
+
+  dialogReturnValue = segmentationDialog->exec();
+  if (dialogReturnValue == QDialog::Rejected)
+  {
+    return;
+  }
+
+  QString segmentatioName = segmentationDialog->GetSegmentationName();
+  if (segmentatioName.isEmpty())
+  {
+    segmentatioName = "Unnamed";
+  }
+  segmentation->GetActiveLabelSet()->AddLabel(segmentatioName.toStdString(), segmentationDialog->GetColor());
+
+  mitk::DataNode::Pointer segmentationNode = mitk::DataNode::New();
+  segmentationNode->SetData(segmentation);
+  segmentationNode->SetName(segmentatioName.toStdString());
+  dataStorage->Add(segmentationNode, selectedDataNode);
+
+  LinkSegmentationToLesion(segmentationNode, selectedLesion);
 }
 
 void QmitkLesionInfoWidget::OnRemoveLesion(mitk::SemanticTypes::Lesion selectedLesion)
@@ -455,6 +447,49 @@ void QmitkLesionInfoWidget::OnRemoveLesion(mitk::SemanticTypes::Lesion selectedL
     QMessageBox msgBox(QMessageBox::Warning,
       "Could not remove the selected lesion.",
       "The program wasn't able to correctly remove the selected lesion from the semantic relations model.\n"
+      "Reason:\n" + QString::fromStdString(exceptionMessage.str()));
+    msgBox.exec();
+  }
+}
+
+void QmitkLesionInfoWidget::LinkSegmentationToLesion(const mitk::DataNode* selectedDataNode, mitk::SemanticTypes::Lesion selectedLesion)
+{
+  if (m_DataStorage.IsExpired())
+  {
+    return;
+  }
+
+  auto dataStorage = m_DataStorage.Lock();
+
+  // if the segmentation is not contained in the semantic relations, add it
+  if (!mitk::SemanticRelationsInference::InstanceExists(selectedDataNode))
+  {
+    try
+    {
+      AddToSemanticRelationsAction::Run(dataStorage, selectedDataNode);
+    }
+    catch (const mitk::SemanticRelationException& e)
+    {
+      std::stringstream exceptionMessage; exceptionMessage << e;
+      QMessageBox msgBox(QMessageBox::Warning,
+        "Could not link the selected lesion.",
+        "The program wasn't able to correctly link the selected lesion with the selected segmentation.\n"
+        "Reason:\n" + QString::fromStdString(exceptionMessage.str() + "\n"));
+      msgBox.exec();
+    }
+  }
+
+  // link the segmentation
+  try
+  {
+    m_SemanticRelationsIntegration->LinkSegmentationToLesion(selectedDataNode, selectedLesion);
+  }
+  catch (const mitk::SemanticRelationException& e)
+  {
+    std::stringstream exceptionMessage; exceptionMessage << e;
+    QMessageBox msgBox(QMessageBox::Warning,
+      "Could not link the selected lesion.",
+      "The program wasn't able to correctly link the selected lesion with the selected segmentation.\n"
       "Reason:\n" + QString::fromStdString(exceptionMessage.str()));
     msgBox.exec();
   }

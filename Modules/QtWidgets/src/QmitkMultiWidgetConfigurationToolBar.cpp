@@ -59,7 +59,7 @@ void QmitkMultiWidgetConfigurationToolBar::AddButtons()
 void QmitkMultiWidgetConfigurationToolBar::OnSetLayout()
 {
   m_LayoutSelectionPopup->setWindowFlags(Qt::Popup);
-  m_LayoutSelectionPopup->move(this->cursor().pos());
+  m_LayoutSelectionPopup->move(this->cursor().pos().x() - m_LayoutSelectionPopup->width(), this->cursor().pos().y());
   m_LayoutSelectionPopup->show();
 }
 

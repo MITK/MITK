@@ -165,6 +165,44 @@ namespace mitk
     vec_units[1] = vec_mm[1] * (1.0 / (GetExtentInMM(1) / GetExtent(1)));
   }
 
+  std::vector<int> PlaneGeometry::CalculateDominantAxes(mitk::AffineTransform3D::MatrixType::InternalMatrixType& rotation_matrix)
+  {
+    std::vector<int> axes;
+
+    bool dominant_axis_error = false;
+    for (int i = 0; i < 3; ++i) {
+      int dominantAxis = itk::Function::Max3(
+        rotation_matrix[0][i],
+        rotation_matrix[1][i],
+        rotation_matrix[2][i]
+      );
+
+      for (int j = 0; j < i; ++j) {
+        if (axes[j] == dominantAxis) {
+          dominant_axis_error = true;
+          break;
+        }
+      }
+
+      if (dominant_axis_error) {
+        break;
+      }
+
+      axes.push_back(dominantAxis);
+    }
+
+    if (dominant_axis_error) {
+      MITK_DEBUG << "Error during dominant axis calculation. Using default.";
+      MITK_DEBUG << "This is either caused by an imperfect rotation matrix or if the rotation is axactly 45° around one or more axis.";
+      axes.clear();
+      for (int i = 0; i < 3; ++i) {
+        axes.push_back(i);
+      }
+    }
+
+    return axes;
+  }
+
   void PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width,
                                               ScalarType height,
                                               const Vector3D &spacing,
@@ -404,10 +442,10 @@ namespace mitk
     mitk::AffineTransform3D::MatrixType matrix = geometry3D->GetIndexToWorldTransform()->GetMatrix();
 
     matrix.GetVnlMatrix().normalize_columns();
-    mitk::AffineTransform3D::MatrixType::InternalMatrixType inverseMatrix = matrix.GetInverse();
+    mitk::AffineTransform3D::MatrixType::InternalMatrixType inverseMatrix = matrix.GetTranspose();
 
     /// The index of the sagittal, coronal and axial axes in the reference geometry.
-    int axes[3];
+    auto axes = CalculateDominantAxes(inverseMatrix);
     /// The direction of the sagittal, coronal and axial axes in the reference geometry.
     /// +1 means that the direction is straight, i.e. greater index translates to greater
     /// world coordinate. -1 means that the direction is inverted.
@@ -416,12 +454,7 @@ namespace mitk
     ScalarType spacings[3];
     for (int i = 0; i < 3; ++i)
     {
-      int dominantAxis = itk::Function::Max3(
-          inverseMatrix[0][i],
-          inverseMatrix[1][i],
-          inverseMatrix[2][i]
-      );
-      axes[i] = dominantAxis;
+      int dominantAxis = axes.at(i);
       directions[i] = itk::Function::Sign(inverseMatrix[dominantAxis][i]);
       extents[i] = geometry3D->GetExtent(dominantAxis);
       spacings[i] = geometry3D->GetSpacing()[dominantAxis];
@@ -523,13 +556,10 @@ namespace mitk
     mitk::AffineTransform3D::ConstPointer affineTransform = geometry3D->GetIndexToWorldTransform();
     mitk::AffineTransform3D::MatrixType matrix = affineTransform->GetMatrix();
     matrix.GetVnlMatrix().normalize_columns();
-    mitk::AffineTransform3D::MatrixType::InternalMatrixType inverseMatrix = matrix.GetInverse();
+    mitk::AffineTransform3D::MatrixType::InternalMatrixType inverseMatrix = matrix.GetTranspose();
 
     /// The index of the sagittal, coronal and axial axes in the reference geometry.
-    int dominantAxis = itk::Function::Max3(
-        inverseMatrix[0][worldAxis],
-        inverseMatrix[1][worldAxis],
-        inverseMatrix[2][worldAxis]);
+    int dominantAxis = CalculateDominantAxes(inverseMatrix).at(worldAxis);
 
     ScalarType zPosition = top ? 0.5 : geometry3D->GetExtent(dominantAxis) - 0.5;
 

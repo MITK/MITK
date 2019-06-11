@@ -554,6 +554,8 @@ namespace mitk {
     BaseGeometry *GetReferenceGeometry() const;
     bool HasReferenceGeometry() const;
 
+    static std::vector<int> CalculateDominantAxes(mitk::AffineTransform3D::MatrixType::InternalMatrixType& rotation_matrix);
+
   protected:
     PlaneGeometry();
 

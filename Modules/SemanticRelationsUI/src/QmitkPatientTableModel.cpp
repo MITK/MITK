@@ -113,7 +113,7 @@ QVariant QmitkPatientTableModel::data(const QModelIndex& index, int role/* = Qt:
     }
 
     auto emptyPixmap = QPixmap(120, 120);
-    emptyPixmap.fill(Qt::darkGray);
+    emptyPixmap.fill(Qt::transparent);
     return emptyPixmap;
   }
 

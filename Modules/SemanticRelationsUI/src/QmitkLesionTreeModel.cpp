@@ -136,7 +136,12 @@ QVariant QmitkLesionTreeModel::data(const QModelIndex& index, int role) const
           return "N/A";
         }
 
-        return QVariant(lesionPresence.at(index.column() - 1));
+        if (lesionPresence.at(index.column() - 1))
+        {
+          return QString::fromStdString("present");
+        }
+
+        return QString::fromStdString("not present");
       }
     }
   }

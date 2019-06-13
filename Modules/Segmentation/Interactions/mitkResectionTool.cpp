@@ -4,11 +4,13 @@
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
 
+#include <itkMaskImageFilter.h>
+
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCaster.h>
 #include <mitkITKImageImport.h>
 #include <mitkProgressBar.h>
-#include <mitkResectionFilter.h>
+#include <mitkResectionMaskFilter.h>
 #include <mitkSurfaceUtils.h>
 #include <mitkToolManager.h>
 
@@ -92,21 +94,40 @@ void ResectionTool::Activated()
   stateChanged.Send(m_State);
 }
 
-template<typename TPixel, unsigned int VImageDimension>
-void AccessResectFilter(const itk::Image<TPixel, VImageDimension>* itkImage, vtkSmartPointer<vtkPoints> points, vtkSmartPointer<vtkMatrix4x4> viewMatrix, ResectionTool::ResectionType resectionType)
+template<typename TPixel, unsigned int VImageDimension = 3U>
+void CreateMask(const itk::Image<TPixel, VImageDimension>* itkImage, vtkSmartPointer<vtkPoints> points, vtkSmartPointer<vtkMatrix4x4> viewMatrix, itk::Image<char, 3>::Pointer& outputMask)
 {
-  using ResectionFilter = mitk::ResectionFilter<itk::Image<TPixel, VImageDimension>>;
-  typename ResectionFilter::Pointer resBuilder = ResectionFilter::New();
+  using ResectionMaskFilter = mitk::ResectionMaskFilter<itk::Image<TPixel, VImageDimension>>;
+  typename ResectionMaskFilter::Pointer resBuilder = ResectionMaskFilter::New();
   resBuilder->SetInputPoints(points);
   resBuilder->setViewportMatrix(viewMatrix);
   resBuilder->SetInput(itkImage);
-  if (resectionType == ResectionTool::ResectionType::INSIDE) {
-    resBuilder->setRegionType(ResectionFilter::ResectionRegionType::INSIDE);
-  } else { // if (resectionType == ResectionTool::ResectionType::OUTSIDE
-    resBuilder->setRegionType(ResectionFilter::ResectionRegionType::OUTSIDE);
-  }
-  resBuilder->InPlaceOn();
+  resBuilder->InPlaceOff();
   resBuilder->Update();
+  outputMask = resBuilder->GetOutput();
+}
+
+template<typename TPixel, unsigned int VImageDimension = 3U>
+void GetMinimumValue(const itk::Image<TPixel, VImageDimension>* itkImage, float& min)
+{
+  typename itk::MinimumMaximumImageCalculator<itk::Image<TPixel, VImageDimension>>::Pointer minMaxCalculator =
+    itk::MinimumMaximumImageCalculator<itk::Image<TPixel, VImageDimension>>::New();
+  minMaxCalculator->SetImage(itkImage);
+  minMaxCalculator->ComputeMinimum();
+  min = (float)minMaxCalculator->GetMinimum();
+}
+
+template<typename TPixel, unsigned int VImageDimension = 3U>
+void ResectByMask(const itk::Image<TPixel, VImageDimension>* itkImage, itk::Image<char, 3>::Pointer mask, char maskValue, float fillValue)
+{
+  typedef itk::MaskImageFilter<itk::Image<TPixel, VImageDimension>, itk::Image<char, 3>> MaskFilterType;
+  typename MaskFilterType::Pointer maskFilter = MaskFilterType::New();
+  maskFilter->SetInput(itkImage);
+  maskFilter->SetMaskImage(mask);
+  maskFilter->SetOutsideValue(fillValue);
+  maskFilter->SetMaskingValue(maskValue);
+  maskFilter->InPlaceOn();
+  maskFilter->Update();
 }
 
 vtkMatrix4x4* getWorldToViewTransform(vtkRenderer* renderer)
@@ -156,25 +177,98 @@ void ResectionTool::Resect(ResectionType type)
     mitkImage3d = segmentation;
   }
   vtkMatrix4x4* worldView = getWorldToViewTransform(m_LastEventSender->GetVtkRenderer());
-  AccessByItk_n(mitkImage3d, AccessResectFilter, (points, worldView, type));
-  AccessFixedDimensionByItk_n(mitkImage3d, paste3Dto4DByItk, 3U, (segmentation, targetTimeStep));
-  segmentation->Modified();
+  itk::Image<char, 3>::Pointer resectionMask;
+  AccessFixedDimensionByItk_n(mitkImage3d, CreateMask, 3U, (points, worldView, resectionMask));
 
-  SurfaceCreator::Pointer surfaceCreator = SurfaceCreator::New();
-  SurfaceCreator::SurfaceCreationArgs surfaceArgs;
-  surfaceArgs.recreate = true;
-  surfaceArgs.outputStorage = m_ToolManager->GetDataStorage();
-  surfaceArgs.timestep = targetTimeStep;
-  surfaceCreator->setArgs(surfaceArgs);
-  surfaceCreator->setInput(workingData);
+  float minValue;
+  AccessFixedDimensionByItk_n(mitkImage3d, GetMinimumValue, 3U, (minValue));
 
-  CommandProgressUpdate::Pointer progressCommand = CommandProgressUpdate::New();
-  surfaceCreator->AddObserver(itk::ProgressEvent(), progressCommand);
+  switch (type)
+  {
+  case mitk::ResectionTool::INSIDE:
+  case mitk::ResectionTool::OUTSIDE: {
+    if (type == ResectionTool::ResectionType::INSIDE) {
+      AccessFixedDimensionByItk_n(mitkImage3d, ResectByMask, 3U, (resectionMask, 0, minValue));
+    }
+    else if (type == ResectionTool::ResectionType::OUTSIDE) {
+      AccessFixedDimensionByItk_n(mitkImage3d, ResectByMask, 3U, (resectionMask, 1, minValue));
+    }
 
-  mitk::ProgressBar::GetInstance()->Reset();
-  mitk::ProgressBar::GetInstance()->AddStepsToDo(100);
+    AccessFixedDimensionByItk_n(mitkImage3d, paste3Dto4DByItk, 3U, (segmentation, targetTimeStep));
+    segmentation->Modified();
 
-  surfaceCreator->Update();
+    SurfaceCreator::Pointer surfaceCreator = SurfaceCreator::New();
+    SurfaceCreator::SurfaceCreationArgs surfaceArgs;
+    surfaceArgs.recreate = true;
+    surfaceArgs.outputStorage = m_ToolManager->GetDataStorage();
+    surfaceArgs.timestep = targetTimeStep;
+    surfaceCreator->setArgs(surfaceArgs);
+    surfaceCreator->setInput(workingData);
+
+    CommandProgressUpdate::Pointer progressCommand = CommandProgressUpdate::New();
+    surfaceCreator->AddObserver(itk::ProgressEvent(), progressCommand);
+
+    mitk::ProgressBar::GetInstance()->Reset();
+    mitk::ProgressBar::GetInstance()->AddStepsToDo(100);
+
+    surfaceCreator->Update();
+    break;
+  }
+  case mitk::ResectionTool::DIVIDE: {
+    auto outsideClone = mitkImage3d->Clone();
+    AccessFixedDimensionByItk_n(mitkImage3d, ResectByMask, 3U, (resectionMask, 0, minValue));
+    AccessFixedDimensionByItk_n(outsideClone, ResectByMask, 3U, (resectionMask, 1, minValue));
+
+    auto outsideSegmentation = segmentation->Clone();
+    AccessFixedDimensionByItk_n(mitkImage3d, paste3Dto4DByItk, 3U, (segmentation, targetTimeStep));
+    AccessFixedDimensionByItk_n(outsideClone, paste3Dto4DByItk, 3U, (outsideSegmentation, targetTimeStep));
+    segmentation->Modified();
+    outsideSegmentation->Modified();
+
+    std::string baseName = workingData->GetName();
+    std::string baseCaption = "";
+    workingData->GetStringProperty("caption", baseCaption);
+    workingData->SetName(baseName + " (1)");
+    workingData->SetStringProperty("caption", (baseCaption + " (1)").c_str());
+
+    mitk::ProgressBar::GetInstance()->Reset();
+    mitk::ProgressBar::GetInstance()->AddStepsToDo(200);
+
+    SurfaceCreator::Pointer surfaceCreator = SurfaceCreator::New();
+    SurfaceCreator::SurfaceCreationArgs surfaceArgs;
+    surfaceArgs.recreate = true;
+    surfaceArgs.outputStorage = m_ToolManager->GetDataStorage();
+    surfaceArgs.timestep = targetTimeStep;
+    surfaceCreator->setArgs(surfaceArgs);
+    surfaceCreator->setInput(workingData);
+
+    CommandProgressUpdate::Pointer progressCommand = CommandProgressUpdate::New();
+    unsigned long progressTag = surfaceCreator->AddObserver(itk::ProgressEvent(), progressCommand);
+
+    surfaceCreator->Update();
+
+    mitk::DataNode::Pointer outsideNode = workingData->Clone();
+    outsideNode->SetData(outsideClone);
+    outsideNode->ConcatenatePropertyList(workingData->GetPropertyList()->Clone(), true);
+
+    outsideNode->SetName(baseName + " (2)");
+    outsideNode->SetStringProperty("caption", (baseCaption + " (2)").c_str());
+
+    auto parents = m_ToolManager->GetDataStorage()->GetSources(workingData);
+    mitk::DataNode* parent = (parents->size() > 0) ? parents->at(0) : nullptr;
+    m_ToolManager->GetDataStorage()->Add(outsideNode, parent);
+
+    surfaceCreator->RemoveObserver(progressTag);
+    CommandProgressUpdate::Pointer secondProgressCommand = CommandProgressUpdate::New();
+    surfaceCreator->AddObserver(itk::ProgressEvent(), secondProgressCommand);
+
+    surfaceCreator->setInput(outsideNode);
+
+    surfaceCreator->Update();
+    break;
+  }
+  }
+
 
   mitk::ProgressBar::GetInstance()->Reset();
 

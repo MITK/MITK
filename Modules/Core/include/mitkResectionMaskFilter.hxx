@@ -17,22 +17,20 @@
 namespace mitk
 {
 template <typename TImageType>
-ResectionFilter<TImageType>::ResectionFilter()
+ResectionMaskFilter<TImageType>::ResectionMaskFilter()
 {
   m_Logger = itk::Logger::New();
   m_ImplicitDistance = mitk::ImplicitPolyDataSweepDistance::New();
   m_ProgressAccumulator = itk::ProgressAccumulator::New();
-
-  m_RegionType = ResectionRegionType::INSIDE;
 }
 
 template <typename TImageType>
-ResectionFilter<TImageType>::~ResectionFilter()
+ResectionMaskFilter<TImageType>::~ResectionMaskFilter()
 {
 }
 
 template <typename TImageType>
-void ResectionFilter<TImageType>::GenerateData()
+void ResectionMaskFilter<TImageType>::GenerateData()
 {
   typename TImageType::ConstPointer input = this->GetInput();
   m_Logger->Info("Start\n");
@@ -54,7 +52,7 @@ void ResectionFilter<TImageType>::GenerateData()
 }
 
 template <typename TImageType>
-bool ResectionFilter<TImageType>::setupIntersection()
+bool ResectionMaskFilter<TImageType>::setupIntersection()
 {
   if (!m_InputPoints) {
     return false;
@@ -69,7 +67,7 @@ bool ResectionFilter<TImageType>::setupIntersection()
 }
 
 template <typename TImageType>
-void ResectionFilter<TImageType>::computeIntersection()
+void ResectionMaskFilter<TImageType>::computeIntersection()
 {
   typename TImageType::ConstPointer input = this->GetInput();
 
@@ -81,12 +79,7 @@ void ResectionFilter<TImageType>::computeIntersection()
   deform->SetInput(input);
   deform->SetRegion(region);
   deform->SetImplicitFunction(m_ImplicitDistance);
-  if (m_RegionType == ResectionRegionType::INSIDE) {
-    deform->SetRegionType(ImplicitFieldFilter::ResectionRegionType::INSIDE);
-  } else { // if (m_RegionType == ResectionRegionType::OUTSIDE
-    deform->SetRegionType(ImplicitFieldFilter::ResectionRegionType::OUTSIDE);
-  }
-  if (!itk::InPlaceImageFilter<TImageType, TImageType>::GetInPlace()) {
+  if (!itk::InPlaceImageFilter<TImageType, itk::Image<char, 3>>::GetInPlace()) {
     deform->InPlaceOff();
   }
   deform->Update();
@@ -95,7 +88,7 @@ void ResectionFilter<TImageType>::computeIntersection()
 }
 
 template <typename TImageType>
-void ResectionFilter<TImageType>::PrintSelf(std::ostream& os, itk::Indent indent) const
+void ResectionMaskFilter<TImageType>::PrintSelf(std::ostream& os, itk::Indent indent) const
 {
   Superclass::PrintSelf(os, indent);
   os << std::endl;
@@ -104,13 +97,7 @@ void ResectionFilter<TImageType>::PrintSelf(std::ostream& os, itk::Indent indent
 }
 
 template <typename TImageType>
-void ResectionFilter<TImageType>::setRegionType(ResectionRegionType type)
-{
-  m_RegionType = type;
-}
-
-template <typename TImageType>
-void ResectionFilter<TImageType>::setViewportMatrix(vtkMatrix4x4* matrix)
+void ResectionMaskFilter<TImageType>::setViewportMatrix(vtkMatrix4x4* matrix)
 {
   m_ViewportMatrix = matrix;
 }

@@ -31,4 +31,5 @@ protected:
 private:
   QPushButton* m_CutInsideButton;
   QPushButton* m_CutOutsideButton;
+  QPushButton* m_DivideButton;
 };

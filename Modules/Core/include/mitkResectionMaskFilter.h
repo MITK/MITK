@@ -16,33 +16,27 @@
 namespace mitk
 {
 template <typename TImageType>
-class ResectionFilter : public itk::InPlaceImageFilter < TImageType, TImageType >
+class ResectionMaskFilter : public itk::InPlaceImageFilter < TImageType, itk::Image<char, 3> >
   {
 public:
-  enum ResectionRegionType {
-    INSIDE,
-    OUTSIDE,
-  };
-
-  typedef ResectionFilter Self;
-  typedef itk::InPlaceImageFilter < TImageType, TImageType > Superclass;
+  typedef ResectionMaskFilter Self;
+  typedef itk::InPlaceImageFilter < TImageType, itk::Image<char, 3> > Superclass;
   typedef itk::SmartPointer<Self> Pointer;
   typedef itk::SmartPointer<const Self> ConstPointer;
   typedef typename TImageType::PixelType ImagePixelType;
 
   itkNewMacro(Self);
-  itkTypeMacro(ResectionFilter, itk::InPlaceImageFilter);
+  itkTypeMacro(ResectionMaskFilter, itk::InPlaceImageFilter);
 
   itkSetObjectMacro(Logger, itk::Logger);
 
   itkSetObjectMacro(InputPoints, vtkPoints);
 
-  void setRegionType(ResectionRegionType type);
   void setViewportMatrix(vtkMatrix4x4* matrix);
 
 protected:
-  ResectionFilter();
-   ~ResectionFilter()ITK_OVERRIDE;
+  ResectionMaskFilter();
+   ~ResectionMaskFilter()ITK_OVERRIDE;
 
   virtual void GenerateData() ITK_OVERRIDE;
   virtual void PrintSelf(std::ostream& os, itk::Indent indent) const override;
@@ -56,15 +50,14 @@ protected:
   vtkSmartPointer<vtkPoints> m_InputPoints;
   vtkSmartPointer<vtkMatrix4x4> m_ViewportMatrix;
   vtkSmartPointer<mitk::ImplicitPolyDataSweepDistance> m_ImplicitDistance;
-  ResectionRegionType m_RegionType;
 
   itk::ProgressAccumulator::Pointer m_ProgressAccumulator;
 
 private:
-  ResectionFilter(const Self&);
+  ResectionMaskFilter(const Self&);
   void operator=(const Self&);
 };
 
 }
-#include "mitkResectionFilter.hxx"
+#include "mitkResectionMaskFilter.hxx"
 

@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkRenderWindowDataStorageTreeModel::QmitkRenderWindowDataStorageTreeModel(QObject* parent /*= nullptr*/)
   : QmitkAbstractDataStorageModel(parent)
+  , m_Root(nullptr)
 {
   m_RenderWindowLayerController = std::make_unique<mitk::RenderWindowLayerController>();
   ResetTree();
@@ -48,84 +49,87 @@ void QmitkRenderWindowDataStorageTreeModel::NodePredicateChanged()
 
 void QmitkRenderWindowDataStorageTreeModel::NodeAdded(const mitk::DataNode* node)
 {
-  /*
   for (const auto renderer : m_ControlledRenderer)
   {
-    // add a node to each render window
+    // add the node to each render window
     mitk::RenderWindowLayerUtilities::SetRenderWindowProperties(const_cast<mitk::DataNode*>(node), renderer);
   }
-  */
+
   if (!m_BaseRenderer.IsExpired())
   {
     auto baseRenderer = m_BaseRenderer.Lock();
-    AddNodeInternal(node, nullptr);
+    AddNodeInternal(node, baseRenderer);
   }
 }
 
 void QmitkRenderWindowDataStorageTreeModel::NodeChanged(const mitk::DataNode* node)
 {
-  auto treeItem = m_Root->Find(node);
-  if (nullptr != treeItem)
+  auto item = m_Root->Find(node);
+  if (nullptr != item)
   {
-    auto parentTreeItem = treeItem->GetParent();
+    auto parentItem = item->GetParent();
     // as the root node should not be removed one should always have a parent item
-    if (nullptr == parentTreeItem)
+    if (nullptr == parentItem)
     {
       return;
     }
 
-    QModelIndex index = this->createIndex(treeItem->GetIndex(), 0, treeItem);
+    auto index = createIndex(item->GetIndex(), 0, item);
     emit dataChanged(index, index);
   }
 }
 
-void QmitkRenderWindowDataStorageTreeModel::NodeRemoved(const mitk::DataNode* /*node*/)
+void QmitkRenderWindowDataStorageTreeModel::NodeRemoved(const mitk::DataNode* node)
 {
-  // #TODO
-  // update model data to create a new list without the removed data node
-  UpdateModelData();
+  RemoveNodeInternal(node);
 }
 
 QModelIndex QmitkRenderWindowDataStorageTreeModel::index(int row, int column, const QModelIndex& parent) const
 {
-  if (!hasIndex(row, column, parent))
+  auto item = GetItemByIndex(parent);
+  if (nullptr != item)
+  {
+    item = item->GetChild(row);
+  }
+
+  if (nullptr == item)
   {
     return QModelIndex();
   }
 
-  auto childItem = GetItemByIndex(parent)->GetChild(row);
-  if (nullptr != childItem)
-  {
-    return createIndex(row, column, childItem);
-  }
-
-  return QModelIndex();
+  return createIndex(row, column, item);
 }
 
 QModelIndex QmitkRenderWindowDataStorageTreeModel::parent(const QModelIndex& parent) const
 {
-  if (!parent.isValid() || !m_Root)
+  auto item = GetItemByIndex(parent);
+  if (nullptr != item)
+  {
+    item = item->GetParent();
+  }
+
+  if(nullptr == item)
   {
     return QModelIndex();
   }
 
-  auto parentItem = GetItemByIndex(parent)->GetParent();
-  if(nullptr == parentItem)
+  if (item == m_Root)
   {
     return QModelIndex();
   }
 
-  if (parentItem == m_Root.get())
-  {
-    return QModelIndex();
-  }
-
-  return this->createIndex(parentItem->GetIndex(), 0, parentItem);
+  return createIndex(item->GetIndex(), 0, item);
 }
 
 int QmitkRenderWindowDataStorageTreeModel::rowCount(const QModelIndex& parent /*= QModelIndex()*/) const
 {
-  return GetItemByIndex(parent)->GetChildCount();
+  auto item = GetItemByIndex(parent);
+  if (nullptr == item)
+  {
+    return 0;
+  }
+
+  return item->GetChildCount();
 }
 
 int QmitkRenderWindowDataStorageTreeModel::columnCount(const QModelIndex&/* parent = QModelIndex()*/) const
@@ -153,13 +157,13 @@ QVariant QmitkRenderWindowDataStorageTreeModel::data(const QModelIndex& index, i
     return QVariant();
   }
 
-  auto treeItem = GetItemByIndex(index);
-  if (nullptr == treeItem)
+  auto item = GetItemByIndex(index);
+  if (nullptr == item)
   {
     return QVariant();
   }
 
-  auto dataNode = treeItem->GetDataNode();
+  auto dataNode = item->GetDataNode();
   if (nullptr == dataNode)
   {
     return QVariant();
@@ -219,13 +223,13 @@ bool QmitkRenderWindowDataStorageTreeModel::setData(const QModelIndex& index, co
     return false;
   }
 
-  auto treeItem = GetItemByIndex(index);
-  if (nullptr == treeItem)
+  auto item = GetItemByIndex(index);
+  if (nullptr == item)
   {
     return false;
   }
 
-  auto dataNode = treeItem->GetDataNode();
+  auto dataNode = item->GetDataNode();
   if (nullptr == dataNode)
   {
     return false;
@@ -262,13 +266,13 @@ Qt::ItemFlags QmitkRenderWindowDataStorageTreeModel::flags(const QModelIndex& in
     return Qt::ItemIsDropEnabled;
   }
 
-  auto treeItem = GetItemByIndex(index);
-  if (nullptr == treeItem)
+  auto item = GetItemByIndex(index);
+  if (nullptr == item)
   {
     return Qt::NoItemFlags;
   }
 
-  const auto dataNode = treeItem->GetDataNode();
+  const auto dataNode = item->GetDataNode();
   if (m_NodePredicate.IsNull() || m_NodePredicate->CheckNode(dataNode))
   {
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
@@ -314,7 +318,7 @@ QMimeData* QmitkRenderWindowDataStorageTreeModel::mimeData(const QModelIndexList
   return mimeData;
 }
 
-bool QmitkRenderWindowDataStorageTreeModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int /*row*/, int column, const QModelIndex& parent)
+bool QmitkRenderWindowDataStorageTreeModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int /*row*/, int /*column*/, const QModelIndex& parent)
 {
   if (m_BaseRenderer.IsExpired())
   {
@@ -333,31 +337,28 @@ bool QmitkRenderWindowDataStorageTreeModel::dropMimeData(const QMimeData* data, 
     return false;
   }
 
-  if (column > 0)
+  if (!parent.isValid())
   {
     return false;
   }
 
-  if (parent.isValid())
+  int layer = -1;
+  auto dataNode = this->data(parent, QmitkDataNodeRawPointerRole).value<mitk::DataNode*>();
+  if (nullptr != dataNode)
   {
-    int layer = -1;
-    auto dataNode = this->data(parent, QmitkDataNodeRawPointerRole).value<mitk::DataNode*>();
-    if (nullptr != dataNode)
-    {
-      dataNode->GetIntProperty("layer", layer, baseRenderer);
-    }
-
-    auto dataNodeList = QmitkMimeTypes::ToDataNodePtrList(data);
-    for (const auto& dataNode : dataNodeList)
-    {
-      m_RenderWindowLayerController->MoveNodeToPosition(dataNode, layer, baseRenderer);
-    }
-
-    UpdateModelData();
-    return true;
+    dataNode->GetIntProperty("layer", layer, baseRenderer);
   }
 
-  return false;
+  auto dataNodeList = QmitkMimeTypes::ToDataNodePtrList(data);
+  for (const auto& dataNode : dataNodeList)
+  {
+    m_RenderWindowLayerController->MoveNodeToPosition(dataNode, layer, baseRenderer);
+  }
+
+  ResetTree();
+  UpdateModelData();
+  AdjustLayerProperty();
+  return true;
 }
 
 void QmitkRenderWindowDataStorageTreeModel::SetControlledRenderer(mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer)
@@ -365,29 +366,28 @@ void QmitkRenderWindowDataStorageTreeModel::SetControlledRenderer(mitk::RenderWi
   m_RenderWindowLayerController->SetControlledRenderer(controlledRenderer);
   m_ControlledRenderer = controlledRenderer;
 
-  /*
-  if (!m_DataStorage.IsExpired())
+  ResetTree();
+  if (m_DataStorage.IsExpired())
   {
-    auto dataStorage = m_DataStorage.Lock();
-    mitk::DataStorage::SetOfObjects::ConstPointer allDataNodes = dataStorage->GetAll();
-    for (mitk::DataStorage::SetOfObjects::ConstIterator it = allDataNodes->Begin(); it != allDataNodes->End(); ++it)
-    {
-      mitk::DataNode::Pointer dataNode = it->Value();
-      if (dataNode.IsNull())
-      {
-        continue;
-      }
+    return;
+  }
 
-      for (const auto& renderer : controlledRenderer)
-      {
-        if (nullptr != renderer)
-        {
-          AddNodeInternal(dataNode, renderer);
-        }
-      }
+  auto dataStorage = m_DataStorage.Lock();
+
+  for (const auto& renderer : controlledRenderer)
+  {
+    if (nullptr == renderer)
+    {
+      continue;
+    }
+
+    auto allDataNodes = dataStorage->GetAll();
+    for (const auto& dataNode : *allDataNodes)
+    {
+      // add the node to each render window
+      mitk::RenderWindowLayerUtilities::SetRenderWindowProperties(dataNode, renderer);
     }
   }
-  */
 }
 
 void QmitkRenderWindowDataStorageTreeModel::SetCurrentRenderer(mitk::BaseRenderer* baseRenderer)
@@ -416,9 +416,16 @@ mitk::BaseRenderer* QmitkRenderWindowDataStorageTreeModel::GetCurrentRenderer() 
 
 void QmitkRenderWindowDataStorageTreeModel::ResetTree()
 {
+  beginResetModel();
+  if (nullptr != m_Root)
+  {
+    m_Root->Delete();
+  }
+  endResetModel();
+
   mitk::DataNode::Pointer rootDataNode = mitk::DataNode::New();
   rootDataNode->SetName("Data Storage");
-  m_Root.reset(new QmitkDataStorageTreeModelInternalItem(rootDataNode));
+  m_Root = new QmitkDataStorageTreeModelInternalItem(rootDataNode);
 }
 
 void QmitkRenderWindowDataStorageTreeModel::UpdateModelData()
@@ -430,53 +437,71 @@ void QmitkRenderWindowDataStorageTreeModel::UpdateModelData()
     {
       auto baseRenderer = m_BaseRenderer.Lock();
 
-      /*
       mitk::NodePredicateAnd::Pointer combinedNodePredicate = mitk::RenderWindowLayerUtilities::GetRenderWindowPredicate(baseRenderer);
       auto filteredDataNodes = dataStorage->GetSubset(combinedNodePredicate);
-      */
-      auto filteredDataNodes = dataStorage->GetAll();
       for (const auto& dataNode : *filteredDataNodes)
       {
-        AddNodeInternal(dataNode, nullptr);
+        AddNodeInternal(dataNode, baseRenderer);
       }
     }
   }
 }
 
+void QmitkRenderWindowDataStorageTreeModel::AdjustLayerProperty()
+{
+  if (m_BaseRenderer.IsExpired())
+  {
+    return;
+  }
+
+  auto baseRenderer = m_BaseRenderer.Lock();
+
+  std::vector<QmitkDataStorageTreeModelInternalItem*> treeAsVector;
+  TreeToVector(m_Root, treeAsVector);
+
+  int i = treeAsVector.size() - 1;
+  for (auto it = treeAsVector.begin(); it != treeAsVector.end(); ++it)
+  {
+    auto dataNode = (*it)->GetDataNode();
+    dataNode->SetIntProperty("layer", i, baseRenderer);
+    --i;
+  }
+}
+
+void QmitkRenderWindowDataStorageTreeModel::TreeToVector(QmitkDataStorageTreeModelInternalItem* parent, std::vector<QmitkDataStorageTreeModelInternalItem*>& treeAsVector) const
+{
+  QmitkDataStorageTreeModelInternalItem* item;
+  for (int i = 0; i < parent->GetChildCount(); ++i)
+  {
+    item = parent->GetChild(i);
+    TreeToVector(item, treeAsVector);
+    treeAsVector.push_back(item);
+  }
+}
+
 void QmitkRenderWindowDataStorageTreeModel::AddNodeInternal(const mitk::DataNode* dataNode, const mitk::BaseRenderer* renderer)
 {
-  if (nullptr == dataNode)
+  if (nullptr == dataNode
+   || m_DataStorage.IsExpired()
+   || nullptr != m_Root->Find(dataNode))
   {
-    return;
-  }
-
-  if (m_DataStorage.IsExpired())
-  {
-    return;
-  }
-
-  auto dataStorage = m_DataStorage.Lock();
-
-  if (m_Root->Find(dataNode) != 0)
-  {
-    // node already contained in the tree
     return;
   }
 
   // find out if we have a root node
-  auto parentTreeItem = m_Root.get();
+  auto parentItem = m_Root;
   QModelIndex index;
-  mitk::DataNode* parentDataNode = GetParentNode(dataNode);
+  auto parentDataNode = GetParentNode(dataNode);
 
   if (nullptr != parentDataNode) // no top level data node
   {
-    parentTreeItem = m_Root->Find(parentDataNode); // find the corresponding tree item
-    if (nullptr == parentTreeItem)
+    parentItem = m_Root->Find(parentDataNode);
+    if (nullptr == parentItem)
     {
       // parent node not contained in the tree; add it
       NodeAdded(parentDataNode);
-      parentTreeItem = m_Root->Find(parentDataNode);
-      if (nullptr == parentTreeItem)
+      parentItem = m_Root->Find(parentDataNode);
+      if (nullptr == parentItem)
       {
         // could not find and add the parent tree; abort
         return;
@@ -484,16 +509,16 @@ void QmitkRenderWindowDataStorageTreeModel::AddNodeInternal(const mitk::DataNode
     }
 
     // get the index of this parent with the help of the grand parent
-    index = this->createIndex(parentTreeItem->GetIndex(), 0, parentTreeItem);
+    index = createIndex(parentItem->GetIndex(), 0, parentItem);
   }
 
   int firstRowWithASiblingBelow = 0;
   int nodeLayer = -1;
   dataNode->GetIntProperty("layer", nodeLayer, renderer);
-  for (const auto& siblingTreeItem : parentTreeItem->GetChildren())
+  for (const auto& siblingItem : parentItem->GetChildren())
   {
     int siblingLayer = -1;
-    auto siblingNode = siblingTreeItem->GetDataNode();
+    auto siblingNode = siblingItem->GetDataNode();
     if (nullptr != siblingNode)
     {
       siblingNode->GetIntProperty("layer", siblingLayer, renderer);
@@ -507,10 +532,39 @@ void QmitkRenderWindowDataStorageTreeModel::AddNodeInternal(const mitk::DataNode
 
   beginInsertRows(index, firstRowWithASiblingBelow, firstRowWithASiblingBelow);
   auto newNode = new QmitkDataStorageTreeModelInternalItem(const_cast<mitk::DataNode*>(dataNode));
-  parentTreeItem->InsertChild(newNode, firstRowWithASiblingBelow);
-  m_TreeItems.push_back(newNode);
-
+  parentItem->InsertChild(newNode, firstRowWithASiblingBelow);
   endInsertRows();
+}
+
+void QmitkRenderWindowDataStorageTreeModel::RemoveNodeInternal(const mitk::DataNode* dataNode)
+{
+  if (nullptr == dataNode
+   || nullptr == m_Root)
+  {
+    return;
+  }
+
+  auto item = m_Root->Find(dataNode);
+  if (nullptr == item)
+  {
+    return;
+  }
+
+  auto parentItem = item->GetParent();
+  auto parentIndex = GetIndexByItem(parentItem);
+
+  auto children = item->GetChildren();
+  beginRemoveRows(parentIndex, item->GetIndex(), item->GetIndex());
+  parentItem->RemoveChild(item);
+  delete item;
+  endRemoveRows();
+
+  if (!children.empty())
+  {
+    // rebuild tree because children could not be at the top level
+    ResetTree();
+    UpdateModelData();
+  }
 }
 
 mitk::DataNode* QmitkRenderWindowDataStorageTreeModel::GetParentNode(const mitk::DataNode* node) const
@@ -534,12 +588,18 @@ QmitkDataStorageTreeModelInternalItem* QmitkRenderWindowDataStorageTreeModel::Ge
 {
   if (index.isValid())
   {
-    auto item = static_cast<QmitkDataStorageTreeModelInternalItem*>(index.internalPointer());
-    if (nullptr != item)
-    {
-      return item;
-    }
+    return static_cast<QmitkDataStorageTreeModelInternalItem*>(index.internalPointer());
   }
 
-  return m_Root.get();
+  return m_Root;
+}
+
+QModelIndex QmitkRenderWindowDataStorageTreeModel::GetIndexByItem(QmitkDataStorageTreeModelInternalItem* item) const
+{
+  if (item == m_Root)
+  {
+    return QModelIndex();
+  }
+
+  return createIndex(item->GetIndex(), 0, item);
 }

@@ -92,23 +92,43 @@ private:
 
   void ResetTree();
   void UpdateModelData();
-
   /**
-  * @brief ...
+  * @brief Adjust the layer property according to the current tree.
+  *        The function will set the "layer" property of each underlying data node so that it fits the
+  *        the actual hierarchy represented by the current tree.
+  */
+  void AdjustLayerProperty();
+  /**
+  * @brief Fill a vector of tree items in a depth-first order (child-first).
+  */
+  void TreeToVector(QmitkDataStorageTreeModelInternalItem* parent, std::vector<QmitkDataStorageTreeModelInternalItem*>& treeAsVector) const;
+  /**
+  * @brief Add the given data node to the tree of the given renderer.
+  *        The given renderer specifies the "layer"-property that is used for adding the new tree item
+  *        to the tree. The "layer"-property may be different for each renderer resulting in a
+  *        different tree for each renderer.
   *
   * @param dataNode   The data node that should be added.
   * @param renderer   The base renderer to which the data node should be added.
   */
   void AddNodeInternal(const mitk::DataNode* dataNode, const mitk::BaseRenderer* renderer);
+  /**
+  * @brief Remove the tree item that contains the given data node. Removing an item may
+  *        leave the child items of the removed item without a parent. In this case
+  *        the children have to be moved inside the tree so the tree has to be rebuild
+  *        according to the current status of the data storage.
+  *
+  * @param dataNode   The data node that should be removed.
+  */
+  void RemoveNodeInternal(const mitk::DataNode* dataNode);
 
   mitk::DataNode* GetParentNode(const mitk::DataNode* node) const;
   QmitkDataStorageTreeModelInternalItem* GetItemByIndex(const QModelIndex& index) const;
-
-  std::list<const QmitkDataStorageTreeModelInternalItem*> m_TreeItems;
+  QModelIndex GetIndexByItem(QmitkDataStorageTreeModelInternalItem* item) const;
 
   std::unique_ptr<mitk::RenderWindowLayerController> m_RenderWindowLayerController;
   mitk::RenderWindowLayerUtilities::RendererVector m_ControlledRenderer;
-  std::unique_ptr<QmitkDataStorageTreeModelInternalItem> m_Root;
+  QmitkDataStorageTreeModelInternalItem* m_Root;
   mitk::WeakPointer<mitk::BaseRenderer> m_BaseRenderer;
 
 };

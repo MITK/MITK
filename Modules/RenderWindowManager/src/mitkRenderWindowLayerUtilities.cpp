@@ -66,3 +66,27 @@ mitk::NodePredicateAnd::Pointer mitk::RenderWindowLayerUtilities::GetRenderWindo
 
   return renderWindowPredicate;
 }
+
+void mitk::RenderWindowLayerUtilities::SetRenderWindowProperties(mitk::DataNode* dataNode, const BaseRenderer* renderer)
+{
+  dataNode->SetBoolProperty("fixedLayer", true, renderer);
+  // use visibility of existing renderer or common renderer
+  // common renderer is used if renderer-specific property does not exist
+  bool visible = false;
+  bool visibilityProperty = dataNode->GetVisibility(visible, renderer);
+  if (true == visibilityProperty)
+  {
+    // found a visibility property
+    dataNode->SetVisibility(visible, renderer);
+  }
+
+  // use layer of existing renderer or common renderer
+  // common renderer is used if renderer-specific property does not exist
+  int layer = -1;
+  bool layerProperty = dataNode->GetIntProperty("layer", layer, renderer);
+  if (true == layerProperty)
+  {
+    // found a layer property
+    dataNode->SetIntProperty("layer", layer, renderer);
+  }
+}

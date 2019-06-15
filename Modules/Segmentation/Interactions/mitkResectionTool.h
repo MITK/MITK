@@ -19,6 +19,7 @@ public:
   enum ResectionType {
     INSIDE,
     OUTSIDE,
+    DIVIDE,
   };
 
   enum ResectionState {

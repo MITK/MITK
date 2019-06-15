@@ -12,14 +12,9 @@
 namespace mitk
 {
 template <typename TImageType>
-class ImplicitFieldImageFilter : public itk::InPlaceImageFilter < TImageType, TImageType >
+class ImplicitFieldImageFilter : public itk::InPlaceImageFilter < TImageType, itk::Image<char, 3> >
 {
 public:
-  enum ResectionRegionType {
-    INSIDE,
-    OUTSIDE,
-  };
-
   /** Standard class typedefs. */
   typedef ImplicitFieldImageFilter Self;
   typedef itk::InPlaceImageFilter< TImageType, TImageType > Superclass;
@@ -36,7 +31,6 @@ public:
 
   void SetRegion(ImageRegionType region);
   void SetImplicitFunction(vtkImplicitFunction* f);
-  void SetRegionType(ResectionRegionType type);
 
 protected:
   ImplicitFieldImageFilter();
@@ -49,8 +43,6 @@ protected:
 private:
   ImageRegionType m_Region;
   vtkSmartPointer<vtkImplicitFunction> m_ImplFunc;
-  ResectionRegionType m_RegionType;
-  ImagePixelType m_MinimumPixelValue;
 
   ImplicitFieldImageFilter(const Self &); //purposely not implemented
   void operator=(const Self &);  //purposely not implemented

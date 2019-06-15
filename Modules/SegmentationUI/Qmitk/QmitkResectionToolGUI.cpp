@@ -18,6 +18,11 @@ QmitkResectionToolGUI::QmitkResectionToolGUI() :
   connect(m_CutOutsideButton, &QPushButton::clicked,
       [this](bool checked) {m_ResectionTool->Resect(mitk::ResectionTool::ResectionType::OUTSIDE); });
 
+  m_DivideButton = new QPushButton(tr("Divide"), this);
+  mainLayout->addWidget(m_DivideButton);
+  connect(m_DivideButton, &QPushButton::clicked,
+    [this](bool checked) {m_ResectionTool->Resect(mitk::ResectionTool::ResectionType::DIVIDE); });
+
   connect(this, &QmitkResectionToolGUI::NewToolAssociated,
       this, &QmitkResectionToolGUI::OnNewToolAssociated);
 }
@@ -48,4 +53,5 @@ void QmitkResectionToolGUI::OnToolStateChanged(mitk::ResectionTool::ResectionSta
   bool enable = state == mitk::ResectionTool::ResectionState::CONTOUR_AVAILABLE;
   m_CutInsideButton->setEnabled(enable);
   m_CutOutsideButton->setEnabled(enable);
+  m_DivideButton->setEnabled(enable);
 }

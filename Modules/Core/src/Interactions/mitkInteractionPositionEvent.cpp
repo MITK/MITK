@@ -40,7 +40,13 @@ mitk::Point3D mitk::InteractionPositionEvent::GetPlanePositionInWorld() const
 {
   const PlaneGeometry* planeGeometry = GetSender()->GetCurrentWorldPlaneGeometry();
   mitk::Point2D position;
-  planeGeometry->Map(GetPositionInWorld(), position);
+  mitk::Point3D worldPos;
+  if (GetSender()->GetMapperID() == BaseRenderer::Standard2D) {
+    worldPos = GetPositionInWorld();
+  } else {
+    GetSender()->PickWorldPoint(m_PointerPosition, worldPos, BaseRenderer::PickingMode::WorldPointPicking);
+  }
+  planeGeometry->Map(worldPos, position);
   mitk::Point3D point;
   planeGeometry->Map(position, point);
 

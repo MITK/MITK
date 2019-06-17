@@ -260,6 +260,7 @@ void mitk::SmartBrushTool::OnMouseReleased(StateMachineAction*, InteractionEvent
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(interactionEvent);
   if (!positionEvent) return;
 
+  m_WorkingSlice = nullptr;
   RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -685,7 +686,7 @@ void mitk::SmartBrushTool::OnToolManagerWorkingDataModified()
 {
   // Here we simply set the current working slice to null. The next time the mouse is moved
   // within a renderwindow a new slice will be extracted from the new working data
-  m_WorkingSlice = nullptr;
+  //m_WorkingSlice = nullptr;
 }
 
 mitk::Point2D mitk::SmartBrushTool::upperLeft(mitk::Point2D p)

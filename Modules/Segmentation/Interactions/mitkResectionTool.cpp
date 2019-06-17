@@ -188,10 +188,10 @@ void ResectionTool::Resect(ResectionType type)
   case mitk::ResectionTool::INSIDE:
   case mitk::ResectionTool::OUTSIDE: {
     if (type == ResectionTool::ResectionType::INSIDE) {
-      AccessFixedDimensionByItk_n(mitkImage3d, ResectByMask, 3U, (resectionMask, 0, minValue));
+      AccessFixedDimensionByItk_n(mitkImage3d, ResectByMask, 3U, (resectionMask, 1, minValue));
     }
     else if (type == ResectionTool::ResectionType::OUTSIDE) {
-      AccessFixedDimensionByItk_n(mitkImage3d, ResectByMask, 3U, (resectionMask, 1, minValue));
+      AccessFixedDimensionByItk_n(mitkImage3d, ResectByMask, 3U, (resectionMask, 0, minValue));
     }
 
     AccessFixedDimensionByItk_n(mitkImage3d, paste3Dto4DByItk, 3U, (segmentation, targetTimeStep));

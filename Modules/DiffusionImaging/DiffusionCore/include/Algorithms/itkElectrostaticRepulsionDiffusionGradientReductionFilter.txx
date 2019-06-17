@@ -34,6 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 #endif
 
 #include "itkElectrostaticRepulsionDiffusionGradientReductionFilter.h"
+#include <itkMersenneTwisterRandomVariateGenerator.h>
 #include <ctime>
 #include <itkImageRegionIterator.h>
 #include <itkImageRegion.h>

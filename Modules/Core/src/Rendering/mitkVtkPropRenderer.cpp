@@ -58,7 +58,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::VtkPropRenderer::VtkPropRenderer(const char* name, vtkRenderWindow * renWin, mitk::RenderingManager* rm, mitk::BaseRenderer::RenderingMode::Type renderingMode, bool useFXAA)
   : BaseRenderer(name, renWin, rm, renderingMode, useFXAA),
-  m_CameraInitializedForMapperID(0)
+  m_CameraInitializedForMapperID(0),
+  m_Paths(nullptr)
 {
   didCount = false;
   lastInfo = nullptr;
@@ -122,7 +123,7 @@ mitk::VtkPropRenderer::~VtkPropRenderer()
 
 void mitk::VtkPropRenderer::SetDataStorage(mitk::DataStorage* storage)
 {
-  if (storage == NULL)
+  if (storage == NULL || storage == m_DataStorage)
     return;
 
   BaseRenderer::SetDataStorage(storage);
@@ -525,8 +526,8 @@ void mitk::VtkPropRenderer::UpdatePaths()
     return;
   }
 
-  if (GetMTime() > m_PathTime ||
-      (m_Paths != nullptr && m_Paths->GetMTime() > m_PathTime))
+  //if (GetMTime() > m_PathTime ||
+  //    (m_Paths != nullptr && m_Paths->GetMTime() > m_PathTime))
   {
     // Create the list to hold all the paths
     m_Paths = vtkSmartPointer<vtkAssemblyPaths>::New();
@@ -537,10 +538,9 @@ void mitk::VtkPropRenderer::UpdatePaths()
          ++iter)
     {
       vtkSmartPointer<vtkAssemblyPath> onePath = vtkSmartPointer<vtkAssemblyPath>::New();
-      Mapper* mapper = (*iter)->GetMapper(BaseRenderer::Standard3D);
-      if (mapper)
+      if (Mapper* mapper = (*iter)->GetMapper(BaseRenderer::Standard3D))
       {
-        VtkMapper* vtkmapper = dynamic_cast<VtkMapper*>(mapper);
+        if (VtkMapper* vtkmapper = dynamic_cast<VtkMapper*>(mapper))
         {
           vtkProp* prop = vtkmapper->GetVtkProp(this);
           if (prop && prop->GetVisibility())
@@ -553,7 +553,7 @@ void mitk::VtkPropRenderer::UpdatePaths()
       }
     }
 
-    m_PathTime.Modified();
+    //m_PathTime.Modified();
   }
 }
 

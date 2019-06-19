@@ -168,7 +168,7 @@ protected:
 private:
 
   vtkSmartPointer<vtkAssemblyPaths> m_Paths;
-  vtkTimeStamp m_PathTime;
+  //vtkTimeStamp m_PathTime;
 
   // prepare all mitk::mappers for rendering
   void PrepareMapperQueue();

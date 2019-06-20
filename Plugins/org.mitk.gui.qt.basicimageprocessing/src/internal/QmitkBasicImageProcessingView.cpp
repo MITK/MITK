@@ -41,6 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageTimeSelector.h"
 #include "mitkVectorImageMapper2D.h"
 #include "mitkProperties.h"
+#include "mitkNodePredicateNot.h"
 
 // Includes for image casting between ITK and MITK
 #include "mitkImageCast.h"
@@ -1447,8 +1448,10 @@ bool QmitkBasicImageProcessing::isLastNode(const mitk::DataNode* node)
 {
   bool nodeFound = false;
   int imageNodesCount = 0;
-  
-  auto nodes = GetDataStorage()->GetSubset(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)));
+
+  auto nodes = GetDataStorage()->GetSubset(
+                 mitk::NodePredicateNot::New(
+                   mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true))));
   for (auto loaded_node : *nodes)
   {
     auto data = loaded_node->GetData();
@@ -1458,14 +1461,14 @@ bool QmitkBasicImageProcessing::isLastNode(const mitk::DataNode* node)
       // Ignore nodes without data
       continue;
     }
-    
+
     if (loaded_node == node)
     {
       nodeFound = true;
     }
     imageNodesCount++;
   }
-  
+
   return (imageNodesCount == 1 && nodeFound);
 }
 

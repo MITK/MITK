@@ -383,6 +383,11 @@ void mitk::BaseRenderer::SetTimeStep(unsigned int timeStep)
 {
   if (m_TimeStep != timeStep)
   {
+    auto nodes = m_DataStorage->GetAll();
+    for (int i = 0; i < nodes->size(); i++) {
+      nodes->at(i)->SetIntProperty("Image.Displayed Timestep", timeStep);
+    }
+
     m_TimeStep = timeStep;
     m_TimeStepUpdateTime.Modified();
 

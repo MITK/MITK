@@ -73,6 +73,7 @@ if(MITK_USE_CTK)
         -DQt5_DIR=${Qt5_DIR}
         -DGit_EXECUTABLE:FILEPATH=${GIT_EXECUTABLE}
         -DGIT_EXECUTABLE:FILEPATH=${GIT_EXECUTABLE}
+        -DCTK_BUILD_QTDESIGNER_PLUGINS:BOOL=OFF
         -DCTK_LIB_CommandLineModules/Backend/LocalProcess:BOOL=ON
         -DCTK_LIB_CommandLineModules/Frontend/QtGui:BOOL=ON
         -DCTK_LIB_PluginFramework:BOOL=ON

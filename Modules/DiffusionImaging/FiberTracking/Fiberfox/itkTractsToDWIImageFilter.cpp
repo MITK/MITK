@@ -1048,6 +1048,8 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             continue;
 
           float fiberWeight = m_FiberBundleTransformed->GetFiberWeight(i);
+          if (fiberWeight == 0)
+            continue;
 
           int numPoints = -1;
           std::vector< itk::Vector<double, 3> > points_copy;

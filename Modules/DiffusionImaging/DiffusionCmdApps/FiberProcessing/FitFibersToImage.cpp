@@ -53,9 +53,10 @@ int main(int argc, char* argv[])
   parser.addArgument("max_iter", "", mitkCommandLineParser::Int, "Max. iterations:", "maximum number of optimizer iterations", 20);
   parser.addArgument("bundle_based", "", mitkCommandLineParser::Bool, "Bundle based fit:", "fit one weight per input tractogram/bundle, not for each fiber", false);
   parser.addArgument("min_g", "", mitkCommandLineParser::Float, "Min. g:", "lower termination threshold for gradient magnitude", 1e-5);
-  parser.addArgument("lambda", "", mitkCommandLineParser::Float, "Lambda:", "modifier for regularization", 0.1);
+  parser.addArgument("lambda", "", mitkCommandLineParser::Float, "Lambda:", "modifier for regularization", 1.0);
   parser.addArgument("save_res", "", mitkCommandLineParser::Bool, "Save Residuals:", "save residual images", false);
   parser.addArgument("save_weights", "", mitkCommandLineParser::Bool, "Save Weights:", "save fiber weights in a separate text file", false);
+  parser.addArgument("filter_zero", "", mitkCommandLineParser::Bool, "Filter Zero Weights:", "filter fibers with zero weight", false);
   parser.addArgument("filter_outliers", "", mitkCommandLineParser::Bool, "Filter outliers:", "perform second optimization run with an upper weight bound based on the first weight estimation (99% quantile)", false);
   parser.addArgument("join_tracts", "", mitkCommandLineParser::Bool, "Join output tracts:", "outout tracts are merged into a single tractogram", false);
   parser.addArgument("regu", "", mitkCommandLineParser::String, "Regularization:", "MSM; Variance; VoxelVariance; Lasso; GroupLasso; GroupVariance; NONE", std::string("VoxelVariance"));
@@ -75,6 +76,10 @@ int main(int argc, char* argv[])
   bool save_residuals = false;
   if (parsedArgs.count("save_res"))
     save_residuals = us::any_cast<bool>(parsedArgs["save_res"]);
+
+  bool filter_zero = false;
+  if (parsedArgs.count("filter_zero"))
+    filter_zero = us::any_cast<bool>(parsedArgs["filter_zero"]);
 
   bool save_weights = false;
   if (parsedArgs.count("save_weights"))
@@ -96,7 +101,7 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("min_g"))
     g_tol = us::any_cast<float>(parsedArgs["min_g"]);
 
-  float lambda = 0.1;
+  float lambda = 1.0;
   if (parsedArgs.count("lambda"))
     lambda = us::any_cast<float>(parsedArgs["lambda"]);
 
@@ -252,33 +257,49 @@ int main(int argc, char* argv[])
       {
         std::string name = fib_names.at(bundle);
         name = ist::GetFilenameWithoutExtension(name);
-        mitk::IOUtil::Save(output_tracts.at(bundle), outRoot + name + "_fitted.fib");
-
-        if (save_weights)
+        auto fib = output_tracts.at(bundle);
+        if (filter_zero)
+          fib = fib->FilterByWeights(0.0);
+        if (fib->GetNumFibers()>0)
         {
-          ofstream logfile;
-          logfile.open (outRoot + name + "_weights.txt");
-          for (unsigned int f=0; f<output_tracts.at(bundle)->GetNumFibers(); ++f)
-            logfile << output_tracts.at(bundle)->GetFiberWeight(f) << "\n";
-          logfile.close();
+          fib->ColorFibersByFiberWeights(false, true);
+          mitk::IOUtil::Save(fib, outRoot + name + "_fitted.fib");
+
+          if (save_weights)
+          {
+            ofstream logfile;
+            logfile.open (outRoot + name + "_weights.txt");
+            for (unsigned int f=0; f<output_tracts.at(bundle)->GetNumFibers(); ++f)
+              logfile << output_tracts.at(bundle)->GetFiberWeight(f) << "\n";
+            logfile.close();
+          }
         }
+        else
+          MITK_INFO << "Output contains no fibers!";
       }
     }
     else
     {
       mitk::FiberBundle::Pointer out = mitk::FiberBundle::New();
       out = out->AddBundles(output_tracts);
-      out->ColorFibersByFiberWeights(false, true);
-      mitk::IOUtil::Save(out, outRoot + "_fitted.fib");
-
-      if (save_weights)
+      if (filter_zero)
+        out = out->FilterByWeights(0.0); 
+      if (out->GetNumFibers()>0)
       {
-        ofstream logfile;
-        logfile.open (outRoot + "_weights.txt");
-        for (unsigned int f=0; f<out->GetNumFibers(); ++f)
-          logfile << out->GetFiberWeight(f) << "\n";
-        logfile.close();
+        out->ColorFibersByFiberWeights(false, true);
+        mitk::IOUtil::Save(out, outRoot + "_fitted.fib");
+
+        if (save_weights)
+        {
+          ofstream logfile;
+          logfile.open (outRoot + "_weights.txt");
+          for (unsigned int f=0; f<out->GetNumFibers(); ++f)
+            logfile << out->GetFiberWeight(f) << "\n";
+          logfile.close();
+        }
       }
+      else
+        MITK_INFO << "Output contains no fibers!";
     }
   }
   catch (itk::ExceptionObject e)

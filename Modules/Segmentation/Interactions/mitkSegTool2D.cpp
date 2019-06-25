@@ -237,6 +237,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Plane
   extractor->SetWorldGeometry( planeGeometry );
   extractor->SetVtkOutputRequest(false);
   extractor->SetResliceTransformByGeometry( image->GetTimeGeometry()->GetGeometryForTimeStep( timeStep ) );
+  extractor->SetInPlaneResampleExtentByGeometry(true);
 
   extractor->Modified();
   extractor->Update();
@@ -368,6 +369,7 @@ void mitk::SegTool2D::WriteSliceToVolume(mitk::SegTool2D::SliceInformation slice
   extractor->SetWorldGeometry( sliceInfo.plane );
   extractor->SetVtkOutputRequest(false);
   extractor->SetResliceTransformByGeometry( image->GetGeometry( sliceInfo.timestep ) );
+  extractor->SetInPlaneResampleExtentByGeometry(true);
 
   extractor->Modified();
   extractor->Update();

@@ -408,11 +408,18 @@ void mitk::PaintbrushTool::MouseMovedImpl(const mitk::PlaneGeometry* planeGeomet
   ContourModel::VertexIterator it = m_MasterContour->Begin();
   ContourModel::VertexIterator end = m_MasterContour->End();
 
+  Point3D roundedWorldPoint;
+  m_WorkingSlice->GetGeometry()->IndexToWorld(indexCoordinates, roundedWorldPoint);
+
   while (it != end)
   {
     Point3D point = (*it)->Coordinates;
-    point[0] += indexCoordinates[0];
-    point[1] += indexCoordinates[1];
+
+    Point3D worldPoint = roundedWorldPoint;
+
+    offsetPointForContour(worldPoint, point);
+
+    m_WorkingSlice->GetGeometry()->WorldToIndex(worldPoint, point);
 
     contour->AddVertex(point);
     it++;
@@ -435,7 +442,7 @@ void mitk::PaintbrushTool::MouseMovedImpl(const mitk::PlaneGeometry* planeGeomet
       const mitk::Point3D& currentPos = indexCoordinates;
       mitk::Point3D direction;
       mitk::Point3D vertex;
-      mitk::Point3D normal;
+      mitk::Point3D normalOffset;
 
       direction[0] = indexCoordinates[0] - m_LastPosition[0];
       direction[1] = indexCoordinates[1] - m_LastPosition[1];
@@ -446,32 +453,47 @@ void mitk::PaintbrushTool::MouseMovedImpl(const mitk::PlaneGeometry* planeGeomet
       direction[2] = direction.GetVnlVector().normalize()[2];
 
       // 90 degrees rotation of direction
-      normal[0] = -1.0 * direction[1];
-      normal[1] = direction[0];
+      normalOffset[0] = -1.0 * direction[1] * radius;
+      normalOffset[1] = direction[0] * radius;
 
       contour->Clear();
 
-      // upper left corner
-      vertex[0] = m_LastPosition[0] + (normal[0] * radius);
-      vertex[1] = m_LastPosition[1] + (normal[1] * radius);
+      Point3D worldLastPosition;
+      m_WorkingSlice->GetGeometry()->IndexToWorld(m_LastPosition, worldLastPosition);
+
+      Point3D worldCurrentPosition;
+      m_WorkingSlice->GetGeometry()->IndexToWorld(currentPos, worldCurrentPosition);
+
+      Point3D worldVertex;
+
+      // Upper left corner
+      worldVertex = worldLastPosition;
+      offsetPointForContour(worldVertex, normalOffset);
+      m_WorkingSlice->GetGeometry()->WorldToIndex(worldVertex, vertex);
 
       contour->AddVertex(vertex);
 
-      // upper right corner
-      vertex[0] = currentPos[0] + (normal[0] * radius);
-      vertex[1] = currentPos[1] + (normal[1] * radius);
+      // Upper right corner
+      worldVertex = worldCurrentPosition;
+      offsetPointForContour(worldVertex, normalOffset);
+      m_WorkingSlice->GetGeometry()->WorldToIndex(worldVertex, vertex);
 
       contour->AddVertex(vertex);
 
-      // lower right corner
-      vertex[0] = currentPos[0] - (normal[0] * radius);
-      vertex[1] = currentPos[1] - (normal[1] * radius);
+      normalOffset[0] = -normalOffset[0];
+      normalOffset[1] = -normalOffset[1];
+
+      // Lower right corner
+      worldVertex = worldCurrentPosition;
+      offsetPointForContour(worldVertex, normalOffset);
+      m_WorkingSlice->GetGeometry()->WorldToIndex(worldVertex, vertex);
 
       contour->AddVertex(vertex);
 
-      // lower left corner
-      vertex[0] = m_LastPosition[0] - (normal[0] * radius);
-      vertex[1] = m_LastPosition[1] - (normal[1] * radius);
+      // Lower left corner
+      worldVertex = worldLastPosition;
+      offsetPointForContour(worldVertex, normalOffset);
+      m_WorkingSlice->GetGeometry()->WorldToIndex(worldVertex, vertex);
 
       contour->AddVertex(vertex);
 
@@ -551,10 +573,10 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const mitk::PlaneGeomet
       return;
     }
 
-    if (m_WorkingImage != image) 
+    if (m_WorkingImage != image)
     {
       // observe Modified() event of image
-      if (m_WorkingImage && m_ImageObserverTag) 
+      if (m_WorkingImage && m_ImageObserverTag)
       {
         m_WorkingImage->RemoveObserver(m_ImageObserverTag);
       }
@@ -572,7 +594,7 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const mitk::PlaneGeomet
         m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(planeGeometry, image, m_LastTimeStep)->Clone();
         m_WorkingNode->ReplaceProperty( "color", workingNode->GetProperty("color") );
         m_WorkingNode->SetData(m_WorkingSlice);
-
+        resampleDecomposition(m_WorkingImage, m_WorkingSlice);
     }
     else
     {
@@ -587,6 +609,7 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const mitk::PlaneGeomet
             m_WorkingNode = nullptr;
             m_CurrentPlane = const_cast<PlaneGeometry*>(planeGeometry);
             m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(planeGeometry, image, m_LastTimeStep)->Clone();
+            resampleDecomposition(m_WorkingImage, m_WorkingSlice);
 
             m_WorkingNode = mitk::DataNode::New();
             m_WorkingNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( mitk::LevelWindow(0, 1) ) );

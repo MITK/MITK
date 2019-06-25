@@ -381,12 +381,17 @@ void mitk::SmartBrushTool::MouseMovedImpl(const mitk::PlaneGeometry* planeGeomet
 
   auto planeSpacing = planeGeometry->GetSpacing();
 
+  Point3D roundedWorldPoint;
+  m_WorkingSlice->GetGeometry()->IndexToWorld(indexCoordinates, roundedWorldPoint);
+
   while (it != end) {
     Point3D point = (*it)->Coordinates;
     point[0] /= planeSpacing[0] / m_MinSpacing;
     point[1] /= planeSpacing[1] / m_MinSpacing;
-    point[0] += indexCoordinates[0];
-    point[1] += indexCoordinates[1];
+
+    Point3D worldPoint = roundedWorldPoint;
+    offsetPointForContour(worldPoint, point);
+    m_WorkingSlice->GetGeometry()->WorldToIndex(worldPoint, point);
 
     contour->AddVertex(point);
     it++;
@@ -633,6 +638,7 @@ void mitk::SmartBrushTool::CheckIfCurrentSliceHasChanged(const mitk::PlaneGeomet
   if (m_CurrentPlane.IsNull() || m_WorkingSlice.IsNull()) {
     m_CurrentPlane = const_cast<PlaneGeometry*>(planeGeometry);
     m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(planeGeometry, image, m_LastTimeStep)->Clone();
+    resampleDecomposition(m_WorkingImage, m_WorkingSlice);
     m_WorkingNode->ReplaceProperty("color", workingNode->GetProperty("color"));
     m_WorkingNode->SetData(m_WorkingSlice);
   } else {
@@ -652,6 +658,7 @@ void mitk::SmartBrushTool::CheckIfCurrentSliceHasChanged(const mitk::PlaneGeomet
 
       m_CurrentPlane = const_cast<PlaneGeometry*>(planeGeometry);
       m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(planeGeometry, image, m_LastTimeStep)->Clone();
+      resampleDecomposition(m_WorkingImage, m_WorkingSlice);
 
       m_WorkingNode = mitk::DataNode::New();
       m_WorkingNode->SetProperty("levelwindow", mitk::LevelWindowProperty::New(mitk::LevelWindow(0, 1)));

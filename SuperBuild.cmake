@@ -103,6 +103,7 @@ endif()
 #-----------------------------------------------------------------------------
 
 include(ExternalProject)
+include(mitkMacroQueryCustomEPVars)
 
 set(ep_prefix "${CMAKE_BINARY_DIR}/ep")
 set_property(DIRECTORY PROPERTY EP_PREFIX ${ep_prefix})

@@ -37,6 +37,8 @@ if(NOT DEFINED GDCM_DIR)
     )
   endif()
 
+  mitk_query_custom_ep_vars()
+
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/gdcm-2.6.3.tar.bz2
@@ -48,10 +50,13 @@ if(NOT DEFINED GDCM_DIR)
        ${ep_common_args}
        ${additional_args}
        -DGDCM_BUILD_SHARED_LIBS:BOOL=ON
+       ${${proj}_CUSTOM_CMAKE_ARGS}
      CMAKE_CACHE_ARGS
        ${ep_common_cache_args}
+       ${${proj}_CUSTOM_CMAKE_CACHE_ARGS}
      CMAKE_CACHE_DEFAULT_ARGS
        ${ep_common_cache_default_args}
+       ${${proj}_CUSTOM_CMAKE_CACHE_DEFAULT_ARGS}
      DEPENDS ${proj_DEPENDENCIES}
     )
   set(GDCM_DIR ${ep_prefix})

@@ -62,6 +62,8 @@ if(MITK_USE_OpenCV)
       )
     endif()
 
+    mitk_query_custom_ep_vars()
+
     set(opencv_url ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/opencv-3.4.1.tar.gz)
     set(opencv_url_md5 a0b7a47899e67b3490ea31edc4f6e8e6)
     ExternalProject_Add(${proj}
@@ -82,10 +84,13 @@ if(MITK_USE_OpenCV)
         -DWITH_IPP:BOOL=OFF
         -DBUILD_IPP_IW:BOOL=OFF
         ${additional_cmake_args}
+        ${${proj}_CUSTOM_CMAKE_ARGS}
       CMAKE_CACHE_ARGS
         ${ep_common_cache_args}
+        ${${proj}_CUSTOM_CMAKE_CACHE_ARGS}
       CMAKE_CACHE_DEFAULT_ARGS
         ${ep_common_cache_default_args}
+        ${${proj}_CUSTOM_CMAKE_CACHE_DEFAULT_ARGS}
       DEPENDS ${proj_DEPENDENCIES}
     )
 

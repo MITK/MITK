@@ -81,7 +81,7 @@ namespace mitk
     // - target image
 
     // tractography
-    MODE m_Mode;
+    MODE m_Mode= MODE::DETERMINISTIC;
     bool m_SharpenOdfs = false;
     float m_Cutoff = 0.1;
     // - fa/gfa image

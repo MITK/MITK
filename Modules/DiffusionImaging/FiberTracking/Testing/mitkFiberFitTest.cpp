@@ -162,7 +162,7 @@ public:
   void Fit1()
   {
     omp_set_num_threads(1);
-    fitter->SetLambda(0.1);
+//    fitter->SetLambda(0.1);
     fitter->SetFilterOutliers(false);
     fitter->SetRegularization(VnlCostFunction::NONE);
     fitter->Update();
@@ -174,12 +174,14 @@ public:
     CompareFibs(test, ref, "NONE_fitted.fib");
     CompareImages(fitter->GetFittedImage(), "NONE_fitted_image.nrrd");
     CompareImages(fitter->GetResidualImage(), "NONE_residual_image.nrrd");
+    CompareImages(fitter->GetOverexplainedImage(), "NONE_underexplained_image.nrrd");
+    CompareImages(fitter->GetUnderexplainedImage(), "NONE_overexplained_image.nrrd");
   }
 
   void Fit2()
   {
     omp_set_num_threads(1);
-    fitter->SetLambda(0.1);
+//    fitter->SetLambda(0.1);
     fitter->SetFilterOutliers(false);
     fitter->SetRegularization(VnlCostFunction::MSM);
     fitter->Update();
@@ -191,12 +193,14 @@ public:
     CompareFibs(test, ref, "MSM_fitted.fib");
     CompareImages(fitter->GetFittedImage(), "MSM_fitted_image.nrrd");
     CompareImages(fitter->GetResidualImage(), "MSM_residual_image.nrrd");
+    CompareImages(fitter->GetOverexplainedImage(), "MSM_underexplained_image.nrrd");
+    CompareImages(fitter->GetUnderexplainedImage(), "MSM_overexplained_image.nrrd");
   }
 
   void Fit3()
   {
     omp_set_num_threads(1);
-    fitter->SetLambda(0.1);
+//    fitter->SetLambda(0.1);
     fitter->SetFilterOutliers(false);
     fitter->SetRegularization(VnlCostFunction::VARIANCE);
     fitter->Update();
@@ -208,12 +212,14 @@ public:
     CompareFibs(test, ref, "MSE_fitted.fib");
     CompareImages(fitter->GetFittedImage(), "MSE_fitted_image.nrrd");
     CompareImages(fitter->GetResidualImage(), "MSE_residual_image.nrrd");
+    CompareImages(fitter->GetOverexplainedImage(), "MSE_underexplained_image.nrrd");
+    CompareImages(fitter->GetUnderexplainedImage(), "MSE_overexplained_image.nrrd");
   }
 
   void Fit4()
   {
     omp_set_num_threads(1);
-    fitter->SetLambda(0.1);
+    fitter->SetLambda(100);
     fitter->SetFilterOutliers(false);
     fitter->SetRegularization(VnlCostFunction::VOXEL_VARIANCE);
     fitter->Update();
@@ -225,12 +231,13 @@ public:
     CompareFibs(test, ref, "LocalMSE_fitted.fib");
     CompareImages(fitter->GetFittedImage(), "LocalMSE_fitted_image.nrrd");
     CompareImages(fitter->GetResidualImage(), "LocalMSE_residual_image.nrrd");
+    CompareImages(fitter->GetOverexplainedImage(), "LocalMSE_underexplained_image.nrrd");
+    CompareImages(fitter->GetUnderexplainedImage(), "LocalMSE_overexplained_image.nrrd");
   }
 
   void Fit5()
   {
     omp_set_num_threads(1);
-    fitter->SetLambda(0.1);
     fitter->SetFilterOutliers(false);
     fitter->SetRegularization(VnlCostFunction::GROUP_VARIANCE);
     fitter->Update();
@@ -242,12 +249,14 @@ public:
     CompareFibs(test, ref, "GroupMSE_fitted.fib");
     CompareImages(fitter->GetFittedImage(), "GroupMSE_fitted_image.nrrd");
     CompareImages(fitter->GetResidualImage(), "GroupMSE_residual_image.nrrd");
+    CompareImages(fitter->GetOverexplainedImage(), "GroupMSE_underexplained_image.nrrd");
+    CompareImages(fitter->GetUnderexplainedImage(), "GroupMSE_overexplained_image.nrrd");
   }
 
   void Fit6()
   {
     omp_set_num_threads(1);
-    fitter->SetLambda(10);
+    fitter->SetLambda(1000);
     fitter->SetFilterOutliers(false);
     fitter->SetRegularization(VnlCostFunction::GROUP_LASSO);
     fitter->Update();
@@ -259,6 +268,8 @@ public:
     CompareFibs(test, ref, "GroupLasso_fitted.fib");
     CompareImages(fitter->GetFittedImage(), "GroupLasso_fitted_image.nrrd");
     CompareImages(fitter->GetResidualImage(), "GroupLasso_residual_image.nrrd");
+    CompareImages(fitter->GetOverexplainedImage(), "GroupLasso_underexplained_image.nrrd");
+    CompareImages(fitter->GetUnderexplainedImage(), "GroupLasso_overexplained_image.nrrd");
   }
 
 };

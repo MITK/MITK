@@ -45,6 +45,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itksys/SystemTools.hxx"
 
+#include <QApplication>
+#include <QFuture>
+#include <QtConcurrent/QtConcurrent>
+
 #include "AutoplanLogging.h"
 
 mitk::SceneIO::SceneIO()
@@ -201,7 +205,15 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
   Poco::Zip::Decompress unzipper( file, Poco::Path( m_WorkingDirectory ) );
   unzipper.EError += Poco::Delegate<SceneIO, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string> >(this, &SceneIO::OnUnzipError);
   unzipper.EOk    += Poco::Delegate<SceneIO, std::pair<const Poco::Zip::ZipLocalFileHeader, const Poco::Path> >(this, &SceneIO::OnUnzipOk);
-  unzipper.decompressAllFiles();
+
+  QFuture<void> future = QtConcurrent::run([this, &unzipper]() {
+    unzipper.decompressAllFiles();
+  });
+  
+  while (!future.isFinished()) {
+    qApp->processEvents();
+  }
+
   unzipper.EError -= Poco::Delegate<SceneIO, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string> >(this, &SceneIO::OnUnzipError);
   unzipper.EOk    -= Poco::Delegate<SceneIO, std::pair<const Poco::Zip::ZipLocalFileHeader, const Poco::Path> >(this, &SceneIO::OnUnzipOk);
 

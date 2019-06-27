@@ -100,11 +100,16 @@ class MITKSEGMENTATION_EXPORT FeedbackContourTool : public SegTool2D
     */
     void FillContourInSlice( ContourModel* projectedContour, unsigned int timeStep, Image* sliceImage, int paintingPixelValue = 1 );
 
+    void resampleDecomposition(Image* image, Image* plane);
+    Vector3D::ValueType projectRatio(Vector3D a, Vector3D b);
+    void offsetPointForContour(Point3D& worldPoint, Point3D planeOffset);
+
     ContourModel::Pointer      m_FeedbackContour;
     DataNode::Pointer m_FeedbackContourNode;
     bool                  m_FeedbackContourVisible;
 
-
+    Vector3D m_PlaneRightDecomposition;
+    Vector3D m_PlaneUpDecomposition;
 };
 
 } // namespace

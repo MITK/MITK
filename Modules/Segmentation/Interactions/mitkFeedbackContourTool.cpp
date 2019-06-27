@@ -132,3 +132,65 @@ void mitk::FeedbackContourTool::FillContourInSlice( ContourModel* projectedConto
 {
   mitk::ContourModelUtils::FillContourInSlice(projectedContour, timeStep, sliceImage, paintingPixelValue);
 }
+
+void mitk::FeedbackContourTool::resampleDecomposition(mitk::Image* image, mitk::Image* plane)
+{
+  m_PlaneUpDecomposition.Fill(0.);
+  m_PlaneRightDecomposition.Fill(0.);
+
+  mitk::Vector3D imageSpacing = image->GetGeometry()->GetSpacing();
+  //std::cout << "Image Spacing: " << imageSpacing << "\n";
+
+  mitk::Vector3D temp;
+  temp = image->GetGeometry()->GetAxisVector(0);
+  temp.Normalize();
+  mitk::Vector3D imageX = temp * imageSpacing[0];
+  temp = image->GetGeometry()->GetAxisVector(1);
+  temp.Normalize();
+  mitk::Vector3D imageY = temp * imageSpacing[1];
+  temp = image->GetGeometry()->GetAxisVector(2);
+  temp.Normalize();
+  mitk::Vector3D imageZ = temp * imageSpacing[2];
+  //std::cout << "Image X: " << imageX << "\n";
+  //std::cout << "Image Y: " << imageY << "\n";
+  //std::cout << "Image Z: " << imageZ << "\n";
+
+  mitk::Vector3D planeSpacing = plane->GetGeometry()->GetSpacing();
+  //std::cout << "Plane Spacing: " << planeSpacing << "\n";
+
+  temp = plane->GetGeometry()->GetAxisVector(0);
+  temp.Normalize();
+  mitk::Vector3D planeX = temp * planeSpacing[0];
+  temp = plane->GetGeometry()->GetAxisVector(1);
+  temp.Normalize();
+  mitk::Vector3D planeY = temp * planeSpacing[1];
+  //std::cout << "Plane X: " << planeX << "\n";
+  //std::cout << "Plane Y: " << planeY << "\n";
+
+  m_PlaneRightDecomposition[0] = projectRatio(imageX, planeX) * planeSpacing[0];
+  m_PlaneRightDecomposition[1] = projectRatio(imageY, planeX) * planeSpacing[0];
+  m_PlaneRightDecomposition[2] = projectRatio(imageZ, planeX) * planeSpacing[0];
+  //std::cout << "Plane Right: " << m_PlaneRightDecomposition << "\n";
+
+  m_PlaneUpDecomposition[0] = projectRatio(imageX, planeY) * planeSpacing[1];
+  m_PlaneUpDecomposition[1] = projectRatio(imageY, planeY) * planeSpacing[1];
+  m_PlaneUpDecomposition[2] = projectRatio(imageZ, planeY) * planeSpacing[1];
+  //std::cout << "Plane Up: " << m_PlaneUpDecomposition << "\n\n";
+}
+
+mitk::Vector3D::ValueType mitk::FeedbackContourTool::projectRatio(mitk::Vector3D a, mitk::Vector3D b)
+{
+  // operator* means dot for itk vectors cause reasons
+  return (a * b) / (b.GetSquaredNorm());
+}
+
+void mitk::FeedbackContourTool::offsetPointForContour(Point3D& worldPoint, Point3D planeOffset)
+{
+  worldPoint[0] += planeOffset[0] * m_PlaneRightDecomposition[0];
+  worldPoint[1] += planeOffset[0] * m_PlaneRightDecomposition[1];
+  worldPoint[2] += planeOffset[0] * m_PlaneRightDecomposition[2];
+
+  worldPoint[0] += planeOffset[1] * m_PlaneUpDecomposition[0];
+  worldPoint[1] += planeOffset[1] * m_PlaneUpDecomposition[1];
+  worldPoint[2] += planeOffset[1] * m_PlaneUpDecomposition[2];
+}

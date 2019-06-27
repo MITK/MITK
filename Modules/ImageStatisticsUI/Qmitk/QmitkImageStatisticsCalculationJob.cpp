@@ -215,7 +215,7 @@ void QmitkImageStatisticsCalculationJob::run()
           tempHistogram = calculator->GetStatistics()->GetStatisticsForTimeStep(i).m_Histogram;
           this->m_HistogramVector.push_back(tempHistogram);
         }
-      } catch (mitk::Exception) {
+      } catch (mitk::Exception&) {
         MITK_WARN << ":-(";
       }
 

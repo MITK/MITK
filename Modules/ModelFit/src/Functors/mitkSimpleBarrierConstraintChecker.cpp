@@ -174,7 +174,7 @@ mitk::SimpleBarrierConstraintChecker::CalcPenalty(const ParametersType& paramete
     transformedTermValue *= -1;
   }
 
-  double barrierSize = abs((double)(constraint.width));
+  double barrierSize = std::abs(static_cast<double>(constraint.width));
 
   //Check if it would be the maximum penalty anyway.
   if (transformedTermValue <= 0)

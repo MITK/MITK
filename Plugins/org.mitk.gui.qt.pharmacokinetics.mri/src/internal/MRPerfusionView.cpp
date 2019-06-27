@@ -554,10 +554,6 @@ bool MRPerfusionView::CheckModelSettings() const
           ok = ok && (m_Controls.ComboT1Map->GetSelectedNode().IsNotNull());
 
         }
-        else if (this->m_Controls.radioButtonNoConversion->isChecked())
-        {
-          ok = ok;
-        }
         else
         {
           ok = false;
@@ -603,10 +599,6 @@ bool MRPerfusionView::CheckModelSettings() const
         ok = ok && (m_Controls.RelaxivitySpinBox->value() > 0);
         ok = ok && (m_Controls.ComboT1Map->GetSelectedNode().IsNotNull());
 
-      }
-      else if (this->m_Controls.radioButtonNoConversion->isChecked())
-      {
-        ok = ok;
       }
       else
       {

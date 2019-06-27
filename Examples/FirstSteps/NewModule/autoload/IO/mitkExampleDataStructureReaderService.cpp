@@ -75,7 +75,7 @@ namespace mitk
       MITK_INFO << "Example file read";
     }
 
-    catch (mitk::Exception e)
+    catch (const mitk::Exception& e)
     {
       MITK_ERROR << e.GetDescription();
     }

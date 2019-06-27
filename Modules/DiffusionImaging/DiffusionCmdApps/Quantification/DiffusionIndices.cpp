@@ -174,7 +174,7 @@ int main(int argc, char* argv[])
     else
       std::cout << "Diffusion index " << index << " not supported for supplied file type.";
   }
-  catch (itk::ExceptionObject e)
+  catch (const itk::ExceptionObject& e)
   {
     std::cout << e;
     return EXIT_FAILURE;

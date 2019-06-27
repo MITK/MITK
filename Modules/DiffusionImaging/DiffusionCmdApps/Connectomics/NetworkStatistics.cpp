@@ -550,7 +550,7 @@ int main(int argc, char* argv[])
 
     return EXIT_SUCCESS;
   }
-  catch (itk::ExceptionObject e)
+  catch (const itk::ExceptionObject& e)
   {
     std::cout << e;
     return EXIT_FAILURE;

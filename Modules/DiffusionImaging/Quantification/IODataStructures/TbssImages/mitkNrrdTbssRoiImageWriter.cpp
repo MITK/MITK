@@ -104,9 +104,9 @@ void mitk::NrrdTbssRoiImageWriter::GenerateData()
   {
     nrrdWriter->Update();
   }
-  catch (itk::ExceptionObject e)
+  catch (const itk::ExceptionObject& e)
   {
-    std::cout << e << std::endl;
+    std::cout << e.GetDescription() << std::endl;
   }
 
   m_Success = true;

@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
         else
             std::cout << "File type currently not supported!";
     }
-    catch (itk::ExceptionObject e)
+    catch (const itk::ExceptionObject& e)
     {
         std::cout << e;
         return EXIT_FAILURE;

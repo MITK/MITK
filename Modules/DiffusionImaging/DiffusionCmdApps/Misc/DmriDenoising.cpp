@@ -215,7 +215,7 @@ int main(int argc, char* argv[])
     else
       mitk::IOUtil::Save(denoised_image, outImage);
   }
-  catch (itk::ExceptionObject e)
+  catch (const itk::ExceptionObject& e)
   {
     std::cout << e;
     return EXIT_FAILURE;

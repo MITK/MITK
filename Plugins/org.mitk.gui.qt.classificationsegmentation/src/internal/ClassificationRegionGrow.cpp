@@ -528,7 +528,7 @@ void ClassificationRegionGrow::PredictSegmentation(const mitk::Image::Pointer & 
   {
     auto currentLocation = m_SegmentedOrganLocations.back();
     m_SegmentedOrganLocations.pop_back();
-    std::size_t cValue = std::abs(mask->GetPixel(currentLocation));
+    std::size_t cValue = mask->GetPixel(currentLocation);
     resultSegmentation->SetPixel(currentLocation, cValue);
     usedLocation->SetPixel(currentLocation, 1000);
     while (listOfStacks.size() < cValue+1)

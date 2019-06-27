@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
   }
   //! [do processing]
 
-  catch (itk::ExceptionObject e)
+  catch (const itk::ExceptionObject& e)
   {
     MITK_ERROR << e;
     return EXIT_FAILURE;

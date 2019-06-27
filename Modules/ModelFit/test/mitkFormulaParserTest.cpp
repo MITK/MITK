@@ -20,25 +20,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 using namespace mitk;
 
 #define TEST_NOTHROW(expression, MSG) \
-	do \
-	{ \
-		MITK_TEST_OUTPUT_NO_ENDL(<< MSG) \
-		bool test_caught = false; \
-		try \
-		{ \
-			expression; \
-		} \
-		catch(...) \
-		{ \
-			test_caught = true; \
-			MITK_TEST_FAILED_MSG(<< "An unwanted exception was thrown"); \
-		} \
-		if(!test_caught) \
-		{ \
-			MITK_TEST_OUTPUT(<< " [PASSED]") \
-			mitk::TestManager::GetInstance()->TestPassed(); \
-		} \
-	} while(0)
+    do \
+    { \
+        MITK_TEST_OUTPUT_NO_ENDL(<< MSG) \
+        bool test_caught = false; \
+        try \
+        { \
+            expression; \
+        } \
+        catch(...) \
+        { \
+            test_caught = true; \
+            MITK_TEST_FAILED_MSG(<< "An unwanted exception was thrown"); \
+        } \
+        if(!test_caught) \
+        { \
+            MITK_TEST_OUTPUT(<< " [PASSED]") \
+            mitk::TestManager::GetInstance()->TestPassed(); \
+        } \
+    } while(0)
 
 /*!
  *	@author Sascha Diatschuk
@@ -163,31 +163,31 @@ public:
     // exp
     TEST_NOTHROW(d = parser->parse("exp(1)"),
       "Testing if exp throws an unwanted exception");
-    MITK_TEST_CONDITION_REQUIRED(abs(d - 2.71828182846) < eps,
+    MITK_TEST_CONDITION_REQUIRED(std::abs(d - 2.71828182846) < eps,
       "Testing if exp produces the correct result");
 
     // sin
     TEST_NOTHROW(d = parser->parse("sin(1.57079632679)"),
       "Testing if sin throws an unwanted exception");
-    MITK_TEST_CONDITION_REQUIRED(abs(d - 1) < eps,
+    MITK_TEST_CONDITION_REQUIRED(std::abs(d - 1) < eps,
       "Testing if sin produces the correct result");
 
     // cos
     TEST_NOTHROW(d = parser->parse("cos(3.14159265359)"),
       "Testing if cos throws an unwanted exception");
-    MITK_TEST_CONDITION_REQUIRED(abs(d + 1) < eps,
+    MITK_TEST_CONDITION_REQUIRED(std::abs(d + 1) < eps,
       "Testing if cos produces the correct result");
 
     // tan
     TEST_NOTHROW(d = parser->parse("tan(0.46364760899)"),
       "Testing if tan throws an unwanted exception");
-    MITK_TEST_CONDITION_REQUIRED(abs(d - 0.5) < eps,
+    MITK_TEST_CONDITION_REQUIRED(std::abs(d - 0.5) < eps,
       "Testing if tan produces the correct result");
 
     // sind
     TEST_NOTHROW(d = parser->parse("sind(145)"),
       "Testing if sind throws an unwanted exception");
-    MITK_TEST_CONDITION_REQUIRED(abs(d - 0.57357643635) < eps,
+    MITK_TEST_CONDITION_REQUIRED(std::abs(d - 0.57357643635) < eps,
       "Testing if sind produces the correct result");
 
     // cosd
@@ -199,18 +199,18 @@ public:
     // tand
     TEST_NOTHROW(d = parser->parse("tand(15)"),
       "Testing if tand throws an unwanted exception");
-    MITK_TEST_CONDITION_REQUIRED(abs(d - 0.26794919243) < eps,
+    MITK_TEST_CONDITION_REQUIRED(std::abs(d - 0.26794919243) < eps,
       "Testing if tand produces the correct result");
 
     // fresnelS
     TEST_NOTHROW(d = parser->parse("fresnelS(1)"),
       "Testing if fresnelS throws an unwanted exception");
-    MITK_TEST_CONDITION_REQUIRED(abs(d - 0.310268) < eps,
+    MITK_TEST_CONDITION_REQUIRED(std::abs(d - 0.310268) < eps,
       "Testing if fresnelS produces the correct result");
 
     TEST_NOTHROW(d = parser->parse("fresnelC(1)"),
       "Testing if fresnelC throws an unwanted exception");
-    MITK_TEST_CONDITION_REQUIRED(abs(d - 0.904524) < eps,
+    MITK_TEST_CONDITION_REQUIRED(std::abs(d - 0.904524) < eps,
       "Testing if fresnelC produces the correct result");
 
     delete parser;

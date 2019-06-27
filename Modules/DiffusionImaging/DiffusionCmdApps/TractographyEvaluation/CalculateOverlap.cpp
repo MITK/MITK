@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
     else
       MITK_INFO << "Overlap<<" << fib->GetOverlap(itk_mask);
   }
-  catch (itk::ExceptionObject e)
+  catch (const itk::ExceptionObject& e)
   {
     std::cout << e;
     return EXIT_FAILURE;

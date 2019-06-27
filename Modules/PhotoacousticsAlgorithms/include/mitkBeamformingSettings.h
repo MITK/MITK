@@ -77,16 +77,16 @@ namespace mitk {
     */
     static bool SettingsChangedOpenCL(const BeamformingSettings::Pointer lhs, const BeamformingSettings::Pointer rhs)
     {
-      return !((abs(lhs->GetAngle() - rhs->GetAngle()) < 0.01f) && // 0.01 degree error margin
+      return !((std::abs(lhs->GetAngle() - rhs->GetAngle()) < 0.01f) && // 0.01 degree error margin
         (lhs->GetApod() == rhs->GetApod()) &&
         (lhs->GetDelayCalculationMethod() == rhs->GetDelayCalculationMethod()) &&
         (lhs->GetIsPhotoacousticImage() == rhs->GetIsPhotoacousticImage()) &&
-        (abs(lhs->GetPitchInMeters() - rhs->GetPitchInMeters()) < 0.000001f) && // 0.0001 mm error margin
+        (std::abs(lhs->GetPitchInMeters() - rhs->GetPitchInMeters()) < 0.000001f) && // 0.0001 mm error margin
         (lhs->GetReconstructionLines() == rhs->GetReconstructionLines()) &&
         (lhs->GetSamplesPerLine() == rhs->GetSamplesPerLine()) &&
         (lhs->GetReconstructionDepth() == rhs->GetReconstructionDepth()) &&
-        (abs(lhs->GetSpeedOfSound() - rhs->GetSpeedOfSound()) < 0.01f) &&
-        (abs(lhs->GetTimeSpacing() - rhs->GetTimeSpacing()) < 0.00000000001f) && //0.01 ns error margin
+        (std::abs(lhs->GetSpeedOfSound() - rhs->GetSpeedOfSound()) < 0.01f) &&
+        (std::abs(lhs->GetTimeSpacing() - rhs->GetTimeSpacing()) < 0.00000000001f) && //0.01 ns error margin
         (lhs->GetTransducerElements() == rhs->GetTransducerElements()));
     }
 

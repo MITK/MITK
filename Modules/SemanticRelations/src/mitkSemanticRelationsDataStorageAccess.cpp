@@ -93,7 +93,7 @@ mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelations
     DataNodeVector allSegmentationsOfLesion = GetAllSegmentationsOfCase(caseID);
 
     // filter all segmentations: check for semantic relation with the given lesion using a lambda function
-    auto lambda = [&lesion, this](DataNode::Pointer segmentation)
+    auto lambda = [&lesion](DataNode::Pointer segmentation)
     {
       try
       {
@@ -193,7 +193,7 @@ mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelations
       // control point exists, information type exists, retrieve all images from the storage
       DataNodeVector allImagesOfCase = GetAllImagesOfCase(caseID);
       // filter all images to remove the ones with a different control point and information type using a lambda function
-      auto lambda = [&controlPoint, &informationType, this](DataNode::Pointer imageNode)
+      auto lambda = [&controlPoint, &informationType](DataNode::Pointer imageNode)
       {
         return (informationType != SemanticRelationsInference::GetInformationTypeOfImage(imageNode))
             || (controlPoint.date != SemanticRelationsInference::GetControlPointOfImage(imageNode).date);

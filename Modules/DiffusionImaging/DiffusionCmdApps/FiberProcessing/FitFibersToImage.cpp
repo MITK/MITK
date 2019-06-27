@@ -302,7 +302,7 @@ int main(int argc, char* argv[])
         MITK_INFO << "Output contains no fibers!";
     }
   }
-  catch (itk::ExceptionObject e)
+  catch (const itk::ExceptionObject& e)
   {
     std::cout << e;
     return EXIT_FAILURE;

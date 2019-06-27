@@ -41,7 +41,7 @@ namespace mitk
   *   In order for most functions to work the case ID has to be used as a parameter.
   *   If not, these functions do nothing.
   *
-  *   The class implements the ISemanticRelationsObservable interface to allow observers to 
+  *   The class implements the ISemanticRelationsObservable interface to allow observers to
   *   be informed about changes in the semantic relation storage.
   */
   class MITKSEMANTICRELATIONS_EXPORT SemanticRelationsIntegration : public ISemanticRelationsObservable
@@ -64,7 +64,9 @@ namespace mitk
     * @param observer   The concrete observer to unregister.
     */
     virtual void RemoveObserver(ISemanticRelationsObserver* observer) override;
-  
+
+    virtual ~SemanticRelationsIntegration() {}
+
     /************************************************************************/
     /* functions to add / remove instances / attributes                     */
     /************************************************************************/

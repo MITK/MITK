@@ -746,7 +746,7 @@ if(NOT MSVC_VERSION)
     -Wstrict-null-sentinel
     #-Wold-style-cast
     #-Wsign-promo
-
+    -Wno-error=deprecated-copy
     -Wno-array-bounds
 
     -fdiagnostics-show-option

@@ -169,9 +169,9 @@ endif()
 
 # Set C++ compiler flags
 if(NOT MSVC)
-  foreach(_cxxflag  -Werror -Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align
-                    -Wwrite-strings -Woverloaded-virtual -Wnon-virtual-dtor -Wold-style-cast
-                    -Wstrict-null-sentinel -Wsign-promo -fdiagnostics-show-option)
+  foreach(_cxxflag -Werror -Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align
+                   -Wwrite-strings -Woverloaded-virtual -Wnon-virtual-dtor -Wold-style-cast
+                   -Wstrict-null-sentinel -Wsign-promo -fdiagnostics-show-option -Wno-error=deprecated-copy)
     usFunctionCheckCompilerFlags(${_cxxflag} US_CXX_FLAGS)
   endforeach()
 endif()

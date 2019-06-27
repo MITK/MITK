@@ -144,7 +144,7 @@ void QmitkXnatTreeBrowserView::ToggleConnection()
     session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(
           mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
   }
-  catch (std::invalid_argument)
+  catch (std::invalid_argument&)
   {
     mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->CreateXnatSession();
 

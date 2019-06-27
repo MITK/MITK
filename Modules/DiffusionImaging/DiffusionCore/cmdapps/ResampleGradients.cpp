@@ -224,7 +224,7 @@ int main(int argc, char* argv[])
         mitk::IOUtil::Save(newImage, "application/vnd.mitk.nii.gz", outFileName);  //save as nifti image
 
     }
-    catch (itk::ExceptionObject e)
+    catch (const itk::ExceptionObject& e)
     {
         std::cout << e;
         return EXIT_FAILURE;

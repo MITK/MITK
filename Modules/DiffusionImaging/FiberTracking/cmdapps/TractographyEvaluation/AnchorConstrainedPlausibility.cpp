@@ -556,7 +556,7 @@ int main(int argc, char* argv[])
     MITK_INFO << "Plausibility estimation took " << h << "h, " << m << "m and " << s << "s";
     logfile.close();
   }
-  catch (itk::ExceptionObject e)
+  catch (const itk::ExceptionObject& e)
   {
     std::cout << e;
     return EXIT_FAILURE;

@@ -74,9 +74,9 @@ void mitk::NrrdTensorImageWriter::Write()
   {
     nrrdWriter->Update();
   }
-  catch (itk::ExceptionObject e)
+  catch (const itk::ExceptionObject& e)
   {
-    std::cout << e << std::endl;
+    std::cout << e.GetDescription() << std::endl;
   }
 }
 

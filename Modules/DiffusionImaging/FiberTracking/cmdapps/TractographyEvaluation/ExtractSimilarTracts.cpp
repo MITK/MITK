@@ -218,7 +218,7 @@ int main(int argc, char* argv[])
     MITK_INFO << "Streamlines remaining in candidate tractogram: " << fib->GetNumFibers();
     mitk::IOUtil::Save(fib, out_root + "candidate_tractogram.trk");
   }
-  catch (itk::ExceptionObject e)
+  catch (const itk::ExceptionObject& e)
   {
     std::cout << e;
     return EXIT_FAILURE;

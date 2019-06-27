@@ -461,7 +461,7 @@ void QmitkDiffusionTensorEstimation::TensorVolumesLoadButton()
     {
       tensorReader->Update();
     }
-    catch (itk::ExceptionObject e)
+    catch (const itk::ExceptionObject& e)
     {
       std::cout << e << std::endl;
     }
@@ -571,7 +571,7 @@ void QmitkDiffusionTensorEstimation::OdfVolumesLoadButton()
     {
       OdfReader->Update();
     }
-    catch (itk::ExceptionObject e)
+    catch (const itk::ExceptionObject& e)
     {
       MBI_LOG << e;
     }
@@ -834,7 +834,7 @@ void QmitkDiffusionTensorEstimation::DirectionVolumesLoadButton()
     {
       reader->Update();
     }
-    catch (itk::ExceptionObject e)
+    catch (const itk::ExceptionObject& e)
     {
       MBI_INFO << e << std::endl;
     }
@@ -2420,7 +2420,7 @@ void QmitkDiffusionTensorEstimation::DiffusionVolumeSaveButton()
   {
     nrrdWriter->Update();
   }
-  catch (itk::ExceptionObject e)
+  catch (const itk::ExceptionObject& e)
   {
     MBI_INFO << e;
   }
@@ -2464,7 +2464,7 @@ void QmitkDiffusionTensorEstimation::DiffusionVolumesLoadButton()
 
       TreeChanged();
     }
-    catch (itk::ExceptionObject e)
+    catch (const itk::ExceptionObject& e)
     {
       MBI_INFO << e;
     }

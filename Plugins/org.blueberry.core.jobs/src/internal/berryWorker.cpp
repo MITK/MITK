@@ -55,7 +55,7 @@ void Worker::JobRunnable::run()
        // java thread.interrupted
        throw FinallyThrowException();
 
-     } catch(FinallyThrowException)
+     } catch(FinallyThrowException&)
       {
          RunMethodFinallyExecution(result);
        }

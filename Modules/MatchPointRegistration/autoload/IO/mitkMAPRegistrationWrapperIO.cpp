@@ -177,9 +177,9 @@ namespace mitk
       {
         writer->write(pReg,data);
       }
-      catch (itk::ExceptionObject e)
+      catch (const itk::ExceptionObject& e)
       {
-        std::cout << e << std::endl;
+        std::cout << e.what() << std::endl;
         throw;
       }
 

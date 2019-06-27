@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
     if (out_image.IsNotNull())
       mitk::IOUtil::Save(out_image, outImage);
   }
-  catch (itk::ExceptionObject e)
+  catch (const itk::ExceptionObject& e)
   {
     std::cout << e;
     return EXIT_FAILURE;

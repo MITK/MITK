@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
     if (extractor->GetPositives().at(0)->GetNumFibers()>=min_fibers)
       mitk::IOUtil::Save(extractor->GetPositives().at(0), outFib);
   }
-  catch (itk::ExceptionObject e)
+  catch (const itk::ExceptionObject& e)
   {
     std::cout << e;
     return EXIT_FAILURE;

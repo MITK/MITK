@@ -95,9 +95,9 @@ mitk::TeemDiffusionTensor3DReconstructionImageFilter<D,T>
   {
     mitk::IOUtil::Save(m_Input, filename);
   }
-  catch (itk::ExceptionObject e)
+  catch (const itk::ExceptionObject& e)
   {
-    std::cout << e << std::endl;
+    std::cout << e.GetDescription() << std::endl;
   }
 
   file_replace(filename,"vector","list");

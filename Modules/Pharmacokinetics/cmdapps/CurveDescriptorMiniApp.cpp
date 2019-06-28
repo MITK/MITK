@@ -230,7 +230,7 @@ int main(int argc, char* argv[])
     }
     catch (const itk::ExceptionObject& e)
     {
-        MITK_ERROR << e;
+        MITK_ERROR << e.what();
         return EXIT_FAILURE;
     }
     catch (std::exception e)

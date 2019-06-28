@@ -189,6 +189,8 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel* r
 
     mitk::ScalarType maxDiff = 0.25;
 
+    std::vector<float> linePoints;
+
     while ( pointsIt != renderingContour->IteratorEnd(timestep) )
     {
       lastPt2d = pt2d;
@@ -224,11 +226,11 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel* r
          if (showSegments)
          {
             //lastPt2d is not valid in first step
-            if( !(pointsIt == renderingContour->IteratorBegin(timestep)) )
-            {
-              this->m_Context->GetPen()->SetWidth(lineWidth);
-              this->m_Context->DrawLine(pt2d[0], pt2d[1], lastPt2d[0], lastPt2d[1]);
-              this->m_Context->GetPen()->SetWidth(1);
+            if( !(pointsIt == renderingContour->IteratorBegin(timestep)) ) {
+              linePoints.push_back(pt2d[0]);
+              linePoints.push_back(pt2d[1]);
+              linePoints.push_back(lastPt2d[0]);
+              linePoints.push_back(lastPt2d[1]);
             }
          }
 
@@ -348,10 +350,17 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel* r
       vtk2itk(vtkp,p);
       renderer->WorldToDisplay(p, pt2d);
 
-      this->m_Context->GetPen()->SetWidth(lineWidth);
-      this->m_Context->DrawLine(lastPt2d[0], lastPt2d[1], pt2d[0], pt2d[1]);
-      this->m_Context->GetPen()->SetWidth(1);
+      linePoints.push_back(lastPt2d[0]);
+      linePoints.push_back(lastPt2d[1]);
+      linePoints.push_back(pt2d[0]);
+      linePoints.push_back(pt2d[1]);
     }
+
+    // TODO: Move to line strip, which is not supported by vtk by default
+    // Draw lines
+    this->m_Context->GetPen()->SetWidth(lineWidth);
+    this->m_Context->DrawLines(linePoints.data(), linePoints.size() / 2);
+    this->m_Context->GetPen()->SetWidth(1);
 
     //draw selected vertex if exists
     if(renderingContour->GetSelectedVertex())

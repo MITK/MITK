@@ -97,7 +97,7 @@ int main(int argc, char* argv[])
   }
   catch (const itk::ExceptionObject& e)
   {
-    std::cout << e;
+    std::cout << e.what();
     return EXIT_FAILURE;
   }
   catch (std::exception e)

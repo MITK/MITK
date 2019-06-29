@@ -419,9 +419,6 @@ SliceNavigationController::SendSlice()
 
       // send crosshair event
       crosshairPositionEvent.Send();
-
-      // Request rendering update for all views
-      this->GetRenderingManager()->RequestUpdateAll();
     }
   }
 }

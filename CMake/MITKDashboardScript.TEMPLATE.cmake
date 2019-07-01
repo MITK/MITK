@@ -23,7 +23,6 @@ set(CTEST_DASHBOARD_ROOT "/opt/dartclients")
 # For Windows, e.g.
 #set(CTEST_CMAKE_COMMAND "cmake")
 #set(CTEST_CMAKE_GENERATOR "Visual Studio 15 2017")
-#set(CTEST_CMAKE_GENERATOR_PLATFORM "x64")
 #set(CTEST_DASHBOARD_ROOT "C:/dartclients")
 
 # The directory containing the Qt binaries

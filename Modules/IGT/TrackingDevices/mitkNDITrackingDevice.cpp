@@ -544,7 +544,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
   {
     SetVolume(this->m_Data);
   }
-  catch (mitk::IGTHardwareException e)
+  catch (const mitk::IGTHardwareException& e)
   {
     MITK_WARN << e.GetDescription();
   }

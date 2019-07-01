@@ -51,8 +51,10 @@ if(NOT DEFINED ITK_DIR)
 
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
-     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-4.13.1.tar.xz
-     URL_MD5 bc7296e7faccdcb5656a7669d4d875d2
+     UPDATE_COMMAND ""
+     # ITK 4.13.2 + GCC9 patch
+     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/ITK_a092294.tar.gz
+     URL_MD5 5e3f39105917d992d5079be473994bc6
      CMAKE_GENERATOR ${gen}
      CMAKE_GENERATOR_PLATFORM ${gen_platform}
      CMAKE_ARGS

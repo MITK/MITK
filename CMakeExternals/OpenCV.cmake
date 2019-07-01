@@ -25,8 +25,6 @@ if(MITK_USE_OpenCV)
       #-DBUILD_NEW_PYTHON_SUPPORT:BOOL=OFF
       )
 
-    # 12-05-02, muellerm, added QT usage by OpenCV if QT is used in MITK
-    # 12-09-11, muellerm, removed automatic usage again, since this will struggle with the MITK Qt application object
     if(MITK_USE_Qt5)
       list(APPEND additional_cmake_args
         -DWITH_QT:BOOL=OFF
@@ -41,8 +39,11 @@ if(MITK_USE_OpenCV)
         )
     endif()
 
+    mitk_query_custom_ep_vars()
+
     set(opencv_url ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/opencv-3.4.2.tar.gz)
     set(opencv_url_md5 8aba51c788cac3583bb39a0c24a5888f)
+
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${opencv_url}
@@ -50,21 +51,24 @@ if(MITK_USE_OpenCV)
       CMAKE_GENERATOR ${gen}
       CMAKE_GENERATOR_PLATFORM ${gen_platform}
       CMAKE_ARGS
-      ${ep_common_args}
-      -DBUILD_TESTS:BOOL=OFF
-      -DBUILD_DOCS:BOOL=OFF
-      -DBUILD_EXAMPLES:BOOL=OFF
-      -DBUILD_DOXYGEN_DOCS:BOOL=OFF
-      -DWITH_CUDA:BOOL=OFF
-      -DWITH_VTK:BOOL=OFF
-      -DENABLE_CXX11:BOOL=ON
-      -DWITH_IPP:BOOL=OFF
-      -DBUILD_IPP_IW:BOOL=OFF
-      ${additional_cmake_args}
+        ${ep_common_args}
+        -DBUILD_TESTS:BOOL=OFF
+        -DBUILD_DOCS:BOOL=OFF
+        -DBUILD_EXAMPLES:BOOL=OFF
+        -DBUILD_DOXYGEN_DOCS:BOOL=OFF
+        -DWITH_CUDA:BOOL=OFF
+        -DWITH_VTK:BOOL=OFF
+        -DENABLE_CXX11:BOOL=ON
+        -DWITH_IPP:BOOL=OFF
+        -DBUILD_IPP_IW:BOOL=OFF
+        ${additional_cmake_args}
+        ${${proj}_CUSTOM_CMAKE_ARGS}
       CMAKE_CACHE_ARGS
-      ${ep_common_cache_args}
+        ${ep_common_cache_args}
+        ${${proj}_CUSTOM_CMAKE_CACHE_ARGS}
       CMAKE_CACHE_DEFAULT_ARGS
-      ${ep_common_cache_default_args}
+        ${ep_common_cache_default_args}
+        ${${proj}_CUSTOM_CMAKE_CACHE_DEFAULT_ARGS}
       DEPENDS ${proj_DEPENDENCIES}
       )
 

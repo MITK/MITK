@@ -44,6 +44,7 @@ tramp
 
 # Visual Studio / VS Code
 .vs/
+out/
 CMakeSettings.json
 
 ########## OS specific

@@ -35,6 +35,12 @@ struct QmitkCtkPythonShellData
 QmitkCtkPythonShell::QmitkCtkPythonShell(QWidget* parent)
     : ctkPythonConsole(parent), d( new QmitkCtkPythonShellData )
 {
+  this->setWelcomeTextColor(Qt::green);
+  this->setPromptColor(Qt::gray);
+  this->setStdinTextColor(Qt::white);
+  this->setCommandTextColor(Qt::white);
+  this->setOutputTextColor(Qt::white);
+
   MITK_DEBUG("QmitkCtkPythonShell") << "retrieving  IPythonService";
   us::ModuleContext* context = us::GetModuleContext();
   d->m_PythonServiceRef = context->GetServiceReference<mitk::IPythonService>();

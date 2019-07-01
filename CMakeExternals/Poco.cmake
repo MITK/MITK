@@ -22,6 +22,8 @@ if(MITK_USE_Poco)
       )
     endif()
 
+    mitk_query_custom_ep_vars()
+
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/poco-1.9.0.tar.gz
@@ -51,10 +53,13 @@ if(MITK_USE_Poco)
         -DENABLE_POCODOC:BOOL=OFF
         -DENABLE_PAGECOMPILER:BOOL=OFF
         -DENABLE_PAGECOMPILER_FILE2PAGE:BOOL=OFF
+        ${${proj}_CUSTOM_CMAKE_ARGS}
       CMAKE_CACHE_ARGS
         ${ep_common_cache_args}
+        ${${proj}_CUSTOM_CMAKE_CACHE_ARGS}
       CMAKE_CACHE_DEFAULT_ARGS
         ${ep_common_cache_default_args}
+        ${${proj}_CUSTOM_CMAKE_CACHE_DEFAULT_ARGS}
       DEPENDS ${proj_DEPENDENCIES}
      )
 

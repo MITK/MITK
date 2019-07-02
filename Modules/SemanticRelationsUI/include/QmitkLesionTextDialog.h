@@ -33,8 +33,6 @@ public:
 
   QmitkLesionTextDialog(QWidget *parent = nullptr);
 
-  virtual ~QmitkLesionTextDialog();
-
   void SetLineEditText(const std::string& lineEditText);
   QString GetLineEditText() const;
 

@@ -64,7 +64,15 @@ namespace mitk
     *        The data nodes must not be 'helper objects'. The must have set a 'fixed layer' property for the given renderer.
     */
     MITKRENDERWINDOWMANAGER_EXPORT NodePredicateAnd::Pointer GetRenderWindowPredicate(const BaseRenderer* renderer);
-
+    /**
+    * @brief Set renderer-specific properties to mark a data node as 'managed by the specific renderer'.
+    *        In order for a renderer to manage a data node, the 'fixedLayer' property has to be set for the given renderer.
+    *        Additionally, the 'visible' and the 'layer' property are set and allow to individually render a set of nodes
+    *        with a specific renderer.
+    *        The last two mentioned properties are set so that they initially have the same value as the corresponding
+    *        global property.
+    */
+    MITKRENDERWINDOWMANAGER_EXPORT void SetRenderWindowProperties(mitk::DataNode* dataNode, const BaseRenderer* renderer);
   } // namespace RenderWindowLayerUtilities
 } // namespace mitk
 

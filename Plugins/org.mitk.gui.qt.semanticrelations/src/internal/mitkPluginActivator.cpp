@@ -15,7 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkPluginActivator.h"
+#include "QmitkSemanticRelationsStatisticsView.h"
 #include "QmitkSemanticRelationsView.h"
+
 #include <mitkPersistenceService.h>
 
 namespace mitk
@@ -25,6 +27,7 @@ namespace mitk
     mitk::PersistenceService::LoadModule();
 
     BERRY_REGISTER_EXTENSION_CLASS(QmitkSemanticRelationsView, context)
+    BERRY_REGISTER_EXTENSION_CLASS(QmitkSemanticRelationsStatisticsView, context)
   }
 
   void SemanticRelationsActivator::stop(ctkPluginContext *context) { Q_UNUSED(context) }

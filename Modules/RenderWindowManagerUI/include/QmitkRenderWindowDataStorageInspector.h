@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #ifndef QMITKRENDERWINDOWDATASTORAGEINSPECTOR_H
-#define QMITKRENDERWINDOWDATASTORAGEWINSPECTOR_H
+#define QMITKRENDERWINDOWDATASTORAGEINSPECTOR_H
 
 // render window manager UI module
 #include "MitkRenderWindowManagerUIExports.h"
@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // render window manager module
 #include <mitkRenderWindowLayerController.h>
 #include <mitkRenderWindowViewDirectionController.h>
-#include <QmitkRenderWindowDataStorageListModel.h>
+#include <QmitkRenderWindowDataStorageTreeModel.h>
 
 // qt widgets module
 #include <QmitkAbstractDataStorageInspector.h>
@@ -73,6 +73,8 @@ public:
 
 private Q_SLOTS:
 
+  void ModelRowsInserted(const QModelIndex& parent, int start, int end);
+
   void SetAsBaseLayer();
 
   void ResetRenderer();
@@ -86,7 +88,7 @@ private:
 
   Ui::QmitkRenderWindowDataStorageInspector m_Controls;
 
-  std::unique_ptr<QmitkRenderWindowDataStorageListModel> m_StorageModel;
+  std::unique_ptr<QmitkRenderWindowDataStorageTreeModel> m_StorageModel;
   std::unique_ptr<mitk::RenderWindowLayerController> m_RenderWindowLayerController;
   std::unique_ptr<mitk::RenderWindowViewDirectionController> m_RenderWindowViewDirectionController;
 };

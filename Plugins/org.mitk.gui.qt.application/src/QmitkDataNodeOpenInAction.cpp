@@ -14,20 +14,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-// semantic relations plugin
+// mitk gui qt application plugin
 #include "QmitkDataNodeOpenInAction.h"
 
 // mitk core
 #include <mitkImage.h>
 #include <mitkRenderingManager.h>
 
-// mitk gui common plugin
-#include <mitkDataNodeSelection.h>
-
 // qt
 #include <QMessageBox>
-
-// qt
 #include <QMenu>
 
 QmitkDataNodeOpenInAction::QmitkDataNodeOpenInAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite)
@@ -44,11 +39,6 @@ QmitkDataNodeOpenInAction::QmitkDataNodeOpenInAction(QWidget* parent, berry::IWo
 {
   setText(tr("Open in"));
   InitializeAction();
-}
-
-QmitkDataNodeOpenInAction::~QmitkDataNodeOpenInAction()
-{
-  // nothing here
 }
 
 void QmitkDataNodeOpenInAction::SetControlledRenderer(RendererVector controlledRenderer)
@@ -75,9 +65,16 @@ void QmitkDataNodeOpenInAction::OnMenuAboutToShow()
   menu()->clear();
   QAction* action;
 
+  QStringList rendererNames;
   for (const auto& renderer : m_ControlledRenderer)
   {
-    action = menu()->addAction(QString::fromStdString(renderer->GetName()));
+    rendererNames.append(renderer->GetName());
+  }
+
+  rendererNames.sort();
+  for (const auto& rendererName : rendererNames)
+  {
+    action = menu()->addAction(rendererName);
     connect(action, &QAction::triggered, this, &QmitkDataNodeOpenInAction::OnActionTriggered);
   }
 }
@@ -118,7 +115,7 @@ void QmitkDataNodeOpenInAction::SetControlledRenderer()
     mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
   mitk::BaseRenderer *baseRenderer = nullptr;
   m_ControlledRenderer.clear();
-  for (const auto &renderWindow : allRegisteredRenderWindows)
+  for (const auto& renderWindow : allRegisteredRenderWindows)
   {
     baseRenderer = mitk::BaseRenderer::GetInstance(renderWindow);
     if (nullptr != baseRenderer)

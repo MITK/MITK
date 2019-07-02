@@ -38,8 +38,6 @@ public:
   QmitkDataNodeOpenInAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
   QmitkDataNodeOpenInAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
 
-  virtual ~QmitkDataNodeOpenInAction() override;
-
   void SetControlledRenderer(RendererVector controlledRenderer);
 
 private Q_SLOTS:

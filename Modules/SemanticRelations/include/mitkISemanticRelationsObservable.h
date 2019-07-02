@@ -19,8 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkISemanticRelationsObserver.h"
 
-#include "mitkSemanticTypes.h"
-
 namespace mitk
 {
   /*
@@ -34,22 +32,22 @@ namespace mitk
     /*
     * @brief Adds the given concrete observer to a container that holds all currently registered observer.
     *
-    * @par observer   The concrete observer to register.
+    * @param observer   The concrete observer to register.
     */
     virtual void AddObserver(ISemanticRelationsObserver* observer) = 0;
     /*
     * @brief Removes the given concrete observer from the container that holds all currently registered observer.
     *
-    * @par observer   The concrete observer to unregister.
+    * @param observer   The concrete observer to unregister.
     */
     virtual void RemoveObserver(ISemanticRelationsObserver* observer) = 0;
     /*
     * @brief Updates all concrete observer in the container that holds all currently registered observer.
     *        The caseID can be used to only update the observer, if the caseID fulfills a certain condition.
     *
-    * @par  caseID    A caseID that identifies the currently active patient / case.
+    * @param  caseID    A caseID that identifies the currently active patient / case.
     */
-    virtual void NotifyObserver(const mitk::SemanticTypes::CaseID& caseID) const = 0;
+    virtual void NotifyObserver(const SemanticTypes::CaseID& caseID) const = 0;
 
   }; // class ISemanticRelationsObservable
 } // namespace mitk

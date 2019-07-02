@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // semantic relations module
 #include <mitkControlPointManager.h>
 #include <mitkLesionManager.h>
+#include <mitkNodePredicates.h>
 #include <mitkSemanticRelationException.h>
 #include <mitkSemanticRelationsInference.h>
 #include <mitkRelationStorage.h>
@@ -29,12 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkLesionTreeModel::QmitkLesionTreeModel(QObject* parent/* = nullptr*/)
   : QmitkAbstractSemanticRelationsStorageModel(parent)
+  , m_LastSegmentation(nullptr)
   , m_RootItem(std::make_shared<QmitkLesionTreeItem>(mitk::LesionData()))
-{
-  // nothing here
-}
-
-QmitkLesionTreeModel::~QmitkLesionTreeModel()
 {
   // nothing here
 }
@@ -136,29 +133,15 @@ QVariant QmitkLesionTreeModel::data(const QModelIndex& index, int role) const
         const auto lesionPresence = currentItem->GetData().GetLesionPresence();
         if (index.column() - 1 > static_cast<int>(lesionPresence.size()))
         {
-          return "";
+          return "N/A";
         }
 
-        return QVariant(lesionPresence.at(index.column() - 1));
-      }
-    }
-    // parent is not the root item -> 2. item of a lesion entry
-    else
-    {
-      // display role fills the first columns with the property name "Volume"
-      if (0 == index.column())
-      {
-        return "Volume";
-      }
-      else
-      {
-        // display role fills other columns with the lesion volume info
-        const auto lesionVolume= currentItem->GetData().GetLesionVolume();
-        if (index.column() - 1 > static_cast<int>(lesionVolume.size()))
+        if (lesionPresence.at(index.column() - 1))
         {
-          return "";
+          return QString::fromStdString("present");
         }
-        return QVariant(lesionVolume.at(index.column() - 1));
+
+        return QString::fromStdString("not present");
       }
     }
   }
@@ -207,6 +190,19 @@ QVariant QmitkLesionTreeModel::headerData(int section, Qt::Orientation orientati
   return QVariant();
 }
 
+const mitk::DataNode* QmitkLesionTreeModel::GetLastSegmentation() const
+{
+  return m_LastSegmentation;
+}
+
+void QmitkLesionTreeModel::NodeAdded(const mitk::DataNode* dataNode)
+{
+  if (mitk::NodePredicates::GetSegmentationPredicate()->CheckNode(dataNode))
+  {
+    m_LastSegmentation = dataNode;
+  }
+}
+
 void QmitkLesionTreeModel::SetData()
 {
   m_RootItem = std::make_shared<QmitkLesionTreeItem>(mitk::LesionData());
@@ -231,17 +227,20 @@ void QmitkLesionTreeModel::SetLesionData()
 
 void QmitkLesionTreeModel::AddLesion(const mitk::SemanticTypes::Lesion& lesion)
 {
+  if (m_DataStorage.IsExpired())
+  {
+    return;
+  }
+
+  auto dataStorage = m_DataStorage.Lock();
+
   // create new lesion tree item data and modify it according to the control point data
   mitk::LesionData lesionData(lesion);
-  mitk::GenerateAdditionalLesionData(lesionData, m_CaseID);
+  mitk::ComputeLesionPresence(lesionData, m_CaseID);
 
-  // add the 1. level lesion item to the root item
+  // add the top-level lesion item to the root item
   std::shared_ptr<QmitkLesionTreeItem> newLesionTreeItem = std::make_shared<QmitkLesionTreeItem>(lesionData);
   m_RootItem->AddChild(newLesionTreeItem);
-
-  // add the 2. level lesion item to the 1. level lesion item
-  std::shared_ptr<QmitkLesionTreeItem> newChildItem = std::make_shared<QmitkLesionTreeItem>(lesionData);
-  newLesionTreeItem->AddChild(newChildItem);
 }
 
 void QmitkLesionTreeModel::SetSelectedDataNodesPresence()

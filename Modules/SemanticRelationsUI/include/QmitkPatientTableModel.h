@@ -122,9 +122,8 @@ private:
   std::map<mitk::DataNode::ConstPointer, QPixmap> m_PixmapMap;
   std::map<mitk::DataNode::ConstPointer, bool> m_LesionPresence;
 
-  mitk::SemanticTypes::InformationTypeVector m_InformationTypes;
-  mitk::SemanticTypes::ControlPointVector m_ControlPoints;
   mitk::SemanticTypes::ExaminationPeriodVector m_ExaminationPeriods;
+  mitk::SemanticTypes::InformationTypeVector m_InformationTypes;
   mitk::SemanticRelationsDataStorageAccess::DataNodeVector m_CurrentDataNodes;
   std::string m_SelectedNodeType;
 

@@ -51,11 +51,6 @@ QmitkLesionTextDialog::QmitkLesionTextDialog(QWidget* parent)
   setMinimumSize(250, 100);
 }
 
-QmitkLesionTextDialog::~QmitkLesionTextDialog()
-{
-  // nothing here
-}
-
 void QmitkLesionTextDialog::SetLineEditText(const std::string& lineEditText)
 {
   m_LineEdit->setText(QString::fromStdString(lineEditText));

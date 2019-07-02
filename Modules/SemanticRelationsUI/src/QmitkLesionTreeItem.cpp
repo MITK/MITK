@@ -25,11 +25,6 @@ QmitkLesionTreeItem::QmitkLesionTreeItem(mitk::LesionData lesionData/* = mitk::L
   m_ItemData = lesionData;
 }
 
-QmitkLesionTreeItem::~QmitkLesionTreeItem()
-{
-  // nothing here
-}
-
 void QmitkLesionTreeItem::SetParent(ParentPointer parent)
 {
   m_ParentItem = parent;

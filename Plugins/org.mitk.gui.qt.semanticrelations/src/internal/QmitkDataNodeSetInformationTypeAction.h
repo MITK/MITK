@@ -18,12 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QMITKDATANODESETINFORMATIONTYPEACTION_H
 
 // mitk gui qt application plugin
-#include "QmitkAbstractSemanticRelationsAction.h"
+#include <QmitkAbstractDataNodeAction.h>
 
 // qt
 #include <QAction>
 
-class QmitkDataNodeSetInformationTypeAction : public QAction, public QmitkAbstractSemanticRelationsAction
+class QmitkDataNodeSetInformationTypeAction : public QAction, public QmitkAbstractDataNodeAction
 {
   Q_OBJECT
 
@@ -31,8 +31,6 @@ public:
 
   QmitkDataNodeSetInformationTypeAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
   QmitkDataNodeSetInformationTypeAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
-
-  virtual ~QmitkDataNodeSetInformationTypeAction() override;
 
 private Q_SLOTS:
 

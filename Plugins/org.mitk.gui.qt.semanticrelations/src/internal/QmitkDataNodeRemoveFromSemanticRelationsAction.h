@@ -20,20 +20,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <org_mitk_gui_qt_semanticrelations_Export.h>
 
 // mitk gui qt application plugin
-#include "QmitkAbstractSemanticRelationsAction.h"
+#include <QmitkAbstractDataNodeAction.h>
 
 // qt
 #include <QAction>
 
 namespace RemoveFromSemanticRelationsAction
 {
-  MITK_GUI_SEMANTICRELATIONS_EXPORT void Run(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, const mitk::DataNode* dataNode);
+  /**
+  * @brief The function checks whether the given node is an image or a segmentation and calls the corresponding remove function.
+  *        The corresponding remove functions will remove the data node from the semantic relations storage.
+  *        If an image is removed, the child segmentation nodes will also be removed from the semantic relations storage.
+  *
+  * @pre    The given dataStorage has to be valid (!nullptr).
+  * @pre    The given dataNode has to be valid (!nullptr).
+  *         The function simply returns if the preconditions are not met.
+  *
+  * @throw  SemanticRelationException re-thrown.
+  *
+  * @param dataStorage                    The data storage to use to check for the child segmentation nodes of an image.
+  * @param dataNode                       The data node to remove.
+  */
+  MITK_GUI_SEMANTICRELATIONS_EXPORT void Run(mitk::DataStorage* dataStorage, const mitk::DataNode* dataNode);
 
-  void RemoveImage(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, const mitk::DataNode* image);
-  void RemoveSegmentation(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, const mitk::DataNode* segmentation);
+  void RemoveImage(mitk::DataStorage* dataStorage, const mitk::DataNode* image);
+  void RemoveSegmentation(const mitk::DataNode* segmentation);
 }
 
-class MITK_GUI_SEMANTICRELATIONS_EXPORT QmitkDataNodeRemoveFromSemanticRelationsAction : public QAction, public QmitkAbstractSemanticRelationsAction
+class MITK_GUI_SEMANTICRELATIONS_EXPORT QmitkDataNodeRemoveFromSemanticRelationsAction : public QAction, public QmitkAbstractDataNodeAction
 {
   Q_OBJECT
 
@@ -41,8 +55,6 @@ public:
 
   QmitkDataNodeRemoveFromSemanticRelationsAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
   QmitkDataNodeRemoveFromSemanticRelationsAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
-
-  virtual ~QmitkDataNodeRemoveFromSemanticRelationsAction() override;
 
 private Q_SLOTS:
 

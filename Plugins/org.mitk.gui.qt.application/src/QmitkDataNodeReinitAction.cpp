@@ -36,14 +36,17 @@ namespace ReinitAction
       return;
     }
 
-    auto renderWindow = mitk::WorkbenchUtil::GetRenderWindowPart(workbenchPartSite->GetPage(), mitk::WorkbenchUtil::NONE);
-    if (nullptr == renderWindow)
+    if (workbenchPartSite.IsNotNull())
     {
-      renderWindow = mitk::WorkbenchUtil::OpenRenderWindowPart(workbenchPartSite->GetPage(), false);
+      auto renderWindow = mitk::WorkbenchUtil::GetRenderWindowPart(workbenchPartSite->GetPage(), mitk::WorkbenchUtil::NONE);
       if (nullptr == renderWindow)
       {
-        // no render window available
-        return;
+        renderWindow = mitk::WorkbenchUtil::OpenRenderWindowPart(workbenchPartSite->GetPage(), false);
+        if (nullptr == renderWindow)
+        {
+          // no render window available
+          return;
+        }
       }
     }
 

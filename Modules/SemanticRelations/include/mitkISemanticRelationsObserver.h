@@ -33,7 +33,7 @@ namespace mitk
     *        The caseID can be used to get access to a certain patient (case),
     *        whose data should be used for updating.
     *
-    * @par caseID    The current case ID to identify the currently active patient / case.
+    * @param caseID    The current case ID to identify the currently active patient / case.
     */
     virtual void Update(const mitk::SemanticTypes::CaseID& caseID) = 0;
 

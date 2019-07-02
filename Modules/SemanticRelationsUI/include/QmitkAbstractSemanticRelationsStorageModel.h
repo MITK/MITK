@@ -43,10 +43,11 @@ public:
   virtual ~QmitkAbstractSemanticRelationsStorageModel();
 
   /*
-  * @brief Update this model with the data from the semantic relations.
+  * @brief Update this model with the data from the semantic relations,
+  *        if the case ID is equal to the currently selected case ID of the table model.
   *
   *       Overridden from 'ISemanticRelationsObserver'.
-  *       In order for the Update-function to be called, this model has to be added as a observer of SemanticRelation
+  *       In order for the Update-function to be called, this model has to be added as an observer of SemanticRelation
   *       (e.g. m_SemanticRelations->AddObserver(m_SemanticRelationsStorageModel);)
   *
   * @par caseID    The current case ID to identify the currently active patient / case.
@@ -78,11 +79,6 @@ public:
   void SetDataNodeSelection(const QList<mitk::DataNode::Pointer>& dataNodeSelection);
 
   const QList<mitk::DataNode::Pointer>& GetSelectedDataNodes() const { return m_SelectedDataNodes; };
-  /*
-  * @brief Update the semantic relations storage model with the current data from the semantic relations model,
-  *        if the case ID is equal to the currently selected case ID of the table model.
-  */
-  void UpdateModelData(const mitk::SemanticTypes::CaseID& caseID);
   /*
   * @brief Update the semantic relations storage model with the current data from the semantic relations model
   *        and the current case ID.

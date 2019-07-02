@@ -30,6 +30,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk
 #include <mitkDataStorage.h>
 
+// berry
+#include <berryIWorkbenchPartSite.h>
+
 // qt
 #include <QWidget>
 
@@ -52,8 +55,7 @@ public:
   static const QBrush SELECTED_BACKGROUND_COLOR;
   static const QBrush CONNECTED_BACKGROUND_COLOR;
 
-  QmitkLesionInfoWidget(mitk::DataStorage* dataStorage, QWidget* parent = nullptr);
-  ~QmitkLesionInfoWidget();
+  QmitkLesionInfoWidget(mitk::DataStorage* dataStorage, berry::IWorkbenchPartSite::Pointer workbenchPartSite, QWidget* parent = nullptr);
 
   void SetCaseID(const mitk::SemanticTypes::CaseID& caseID);
 
@@ -80,7 +82,7 @@ private Q_SLOTS:
   void OnLinkToSegmentation(mitk::SemanticTypes::Lesion);
   void OnSetLesionName(mitk::SemanticTypes::Lesion);
   void OnSetLesionClass(mitk::SemanticTypes::Lesion);
-  void OnPropagateLesion(mitk::SemanticTypes::Lesion);
+  void OnCreateNewSegmentation(mitk::SemanticTypes::Lesion);
   void OnRemoveLesion(mitk::SemanticTypes::Lesion);
 
 private:
@@ -88,12 +90,15 @@ private:
   void Initialize();
   void SetUpConnections();
 
+  void LinkSegmentationToLesion(const mitk::DataNode* selectedDataNode, mitk::SemanticTypes::Lesion selectedLesion);
+
   Ui::QmitkLesionInfoWidgetControls m_Controls;
   QmitkLesionTreeModel* m_StorageModel;
 
   mitk::SemanticTypes::CaseID m_CaseID;
 
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
+  berry::IWorkbenchPartSite::WeakPtr m_WorkbenchPartSite;
   std::unique_ptr<mitk::SemanticRelationsDataStorageAccess> m_SemanticRelationsDataStorageAccess;
   std::unique_ptr<mitk::SemanticRelationsIntegration> m_SemanticRelationsIntegration;
 

@@ -40,13 +40,14 @@ mitk::SemanticTypes::LesionClass mitk::GenerateNewLesionClass(const std::string&
   return lesionClass;
 }
 
-mitk::SemanticTypes::Lesion mitk::GetLesionByUID(const SemanticTypes::ID& lesionUID, const std::vector<SemanticTypes::Lesion>& allLesions)
+mitk::SemanticTypes::Lesion mitk::GetLesionByUID(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& lesionUID)
 {
   auto lambda = [&lesionUID](const SemanticTypes::Lesion& currentLesion)
   {
     return currentLesion.UID == lesionUID;
   };
 
+  SemanticTypes::LesionVector allLesions = RelationStorage::GetAllLesionsOfCase(caseID);
   const auto existingLesion = std::find_if(allLesions.begin(), allLesions.end(), lambda);
 
   SemanticTypes::Lesion lesion;
@@ -58,13 +59,14 @@ mitk::SemanticTypes::Lesion mitk::GetLesionByUID(const SemanticTypes::ID& lesion
   return lesion;
 }
 
-mitk::SemanticTypes::LesionClass mitk::FindExistingLesionClass(const std::string& lesionClassType, const std::vector<SemanticTypes::LesionClass>& allLesionClasses)
+mitk::SemanticTypes::LesionClass mitk::FindExistingLesionClass(const SemanticTypes::CaseID& caseID, const std::string& lesionClassType)
 {
   auto lambda = [&lesionClassType](const SemanticTypes::LesionClass& currentLesionClass)
   {
     return currentLesionClass.classType == lesionClassType;
   };
 
+  SemanticTypes::LesionClassVector allLesionClasses = SemanticRelationsInference::GetAllLesionClassesOfCase(caseID);
   const auto existingLesionClass = std::find_if(allLesionClasses.begin(), allLesionClasses.end(), lambda);
 
   SemanticTypes::LesionClass lesionClass;

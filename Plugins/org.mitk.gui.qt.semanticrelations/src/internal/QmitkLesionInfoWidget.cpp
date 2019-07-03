@@ -332,7 +332,7 @@ void QmitkLesionInfoWidget::OnSetLesionClass(mitk::SemanticTypes::Lesion selecte
 
   // retrieve the new input lesion class type and check for an already existing lesion class types
   std::string newLesionClassType = inputDialog->GetLineEditText().toStdString();
-  mitk::SemanticTypes::LesionClass existingLesionClass = mitk::FindExistingLesionClass(newLesionClassType, allLesionClasses);
+  mitk::SemanticTypes::LesionClass existingLesionClass = mitk::FindExistingLesionClass(m_CaseID, newLesionClassType);
   if (existingLesionClass.UID.empty())
   {
     // could not find lesion class information for the new lesion class type

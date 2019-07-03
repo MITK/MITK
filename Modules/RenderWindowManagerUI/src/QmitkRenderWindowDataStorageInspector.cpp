@@ -141,7 +141,7 @@ void QmitkRenderWindowDataStorageInspector::SetActiveRenderWindow(const QString&
   }
 }
 
-void QmitkRenderWindowDataStorageInspector::ModelRowsInserted(const QModelIndex& parent, int start, int end)
+void QmitkRenderWindowDataStorageInspector::ModelRowsInserted(const QModelIndex& parent, int /*start*/, int /*end*/)
 {
   m_Controls.renderWindowTreeView->setExpanded(parent, true);
 }

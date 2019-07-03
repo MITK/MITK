@@ -188,7 +188,7 @@ void QmitkPatientTableModel::SetData()
 
   // rename examination periods according to their new order
   std::string examinationPeriodName = "Baseline";
-  for (int i = 0; i < m_ExaminationPeriods.size(); ++i)
+  for (size_t i = 0; i < m_ExaminationPeriods.size(); ++i)
   {
     auto& examinationPeriod = m_ExaminationPeriods.at(i);
     examinationPeriod.name = examinationPeriodName;

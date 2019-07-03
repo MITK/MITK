@@ -249,8 +249,7 @@ void QmitkStatisticsTreeModel::AddLesion(const mitk::SemanticTypes::Lesion& lesi
   std::shared_ptr<QmitkLesionTreeItem> newLesionTreeItem = std::make_shared<QmitkLesionTreeItem>(lesionData);
   m_RootItem->AddChild(newLesionTreeItem);
 
-  auto informationTypeSize = m_InformationTypes.size();
-  for (int i = 0; i < informationTypeSize; ++i)
+  for (size_t i = 0; i < m_InformationTypes.size(); ++i)
   {
     std::shared_ptr<QmitkLesionTreeItem> volumeItem = std::make_shared<QmitkLesionTreeItem>(lesionData);
     newLesionTreeItem->AddChild(volumeItem);

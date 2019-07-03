@@ -47,21 +47,21 @@ namespace mitk
   /**
   * @brief Find and return a whole lesion including its lesion class given a specific lesion UID.
   *
-  * @param  lesionUID     The lesion UID as string.
-  * @param  allLesions    All currently known lesions of a specific case.
+  * @param caseID         The current case identifier is defined by the given string.
+  * @param lesionUID      The lesion UID as string.
   *
   * @return   The lesion with its UID and the lesion class.
   */
-  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::Lesion GetLesionByUID(const SemanticTypes::ID& lesionUID, const std::vector<SemanticTypes::Lesion>& allLesions);
+  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::Lesion GetLesionByUID(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& lesionUID);
   /**
   * @brief Find and return the whole lesion class including its UID given a specific lesion class type.
   *
+  * @param caseID             The current case identifier is defined by the given string.
   * @param  lesionClassType   The lesion class type as string.
-  * @param  allLesionClasses  All currently known lesion classes of a specific case.
   *
   * @return   The lesion class with its UID and the class type.
   */
-  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::LesionClass FindExistingLesionClass(const std::string& lesionClassType, const std::vector<SemanticTypes::LesionClass>& allLesionClasses);
+  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::LesionClass FindExistingLesionClass(const SemanticTypes::CaseID& caseID, const std::string& lesionClassType);
   /**
   * @brief Compute and store lesion presence for all available control points and information types.
   *

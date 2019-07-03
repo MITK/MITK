@@ -84,22 +84,18 @@ void mitk::ComputeLesionPresence(LesionData& lesionData, const SemanticTypes::Ca
   auto controlPoints = RelationStorage::GetAllControlPointsOfCase(caseID);
   // sort the vector of control points for the timeline
   std::sort(controlPoints.begin(), controlPoints.end());
-  auto informationTypes = RelationStorage::GetAllInformationTypesOfCase(caseID);
-  for (const auto& informationType : informationTypes)
+  for (const auto& controlPoint : controlPoints)
   {
-    for (const auto& controlPoint : controlPoints)
+    try
     {
-      try
-      {
-        presence = SemanticRelationsInference::IsLesionPresentAtControlPoint(caseID, lesion, controlPoint);
-      }
-      catch (SemanticRelationException&)
-      {
-        presence = false;
-      }
-
-      lesionPresence.push_back(presence);
+      presence = SemanticRelationsInference::IsLesionPresentAtControlPoint(caseID, lesion, controlPoint);
     }
+    catch (SemanticRelationException&)
+    {
+      presence = false;
+    }
+
+    lesionPresence.push_back(presence);
   }
 
   lesionData.SetLesionPresence(lesionPresence);

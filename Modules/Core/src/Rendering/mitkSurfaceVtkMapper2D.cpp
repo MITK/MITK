@@ -40,6 +40,285 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkReverseSense.h>
 #include <vtkArrowSource.h>
 #include <vtkTransformPolyDataFilter.h>
+#include <vtkSphereTree.h>
+#include <vtkSMPThreadLocal.h>
+#include <vtkSMPThreadLocalObject.h>
+#include <vtkNonMergingPointLocator.h>
+#include <vtkGenericCell.h>
+#include <vtkDoubleArray.h>
+#include <vtkSMPTools.h>
+#include <vtkMultiPieceDataSet.h>
+#include <vtkCellData.h>
+#include <vtkAppendPolyData.h>
+
+struct vtkLocalDataType
+{
+  vtkPolyData* Output;
+  vtkNonMergingPointLocator* Locator;
+  vtkCellData* NewVertsData;
+  vtkCellData* NewLinesData;
+  vtkCellData* NewPolysData;
+
+  vtkLocalDataType()
+    : Output(nullptr)
+    , Locator(nullptr)
+  {
+  }
+};
+
+struct PlaneCutFunctor {
+  vtkPolyData* polyData;
+
+  vtkDataSet* Input;
+  vtkPoints* InPoints;
+  int PointsType;
+  vtkDataObject* Output;
+  vtkPlane* Plane;
+  vtkSphereTree* SphereTree;
+  const unsigned char* Selected;
+  unsigned char* InOutArray;
+
+  vtkSMPThreadLocal<vtkDoubleArray*> CellScalars;
+  vtkSMPThreadLocalObject<vtkGenericCell> Cell;
+  vtkSMPThreadLocalObject<vtkPoints> NewPts;
+  vtkSMPThreadLocalObject<vtkCellArray> NewVerts;
+  vtkSMPThreadLocalObject<vtkCellArray> NewLines;
+  vtkSMPThreadLocalObject<vtkCellArray> NewPolys;
+
+  vtkSMPThreadLocal<vtkLocalDataType> LocalData;
+
+  double* Origin;
+  double* Normal;
+  vtkIdType NumSelected;
+  bool Interpolate;
+  bool GeneratePolygons;
+
+  void SetInPoints(vtkPoints* inPts)
+  {
+    this->InPoints = inPts;
+    inPts->Register(nullptr);
+    this->PointsType = this->InPoints->GetDataType();
+  }
+
+  void operator() (vtkIdType cellId, vtkIdType endCellId)
+  {
+    vtkLocalDataType& localData = this->LocalData.Local();
+    vtkPointLocator* loc = localData.Locator;
+
+    vtkGenericCell* cell = this->Cell.Local();
+    vtkDoubleArray* cellScalars = this->CellScalars.Local();
+    vtkPointData* inPD = this->Input->GetPointData();
+    vtkCellData* inCD = this->Input->GetCellData();
+
+    vtkPolyData* output = localData.Output;
+    vtkPointData* outPD = nullptr;
+
+    vtkCellArray* newVerts = this->NewVerts.Local();
+    vtkCellArray* newLines = this->NewLines.Local();
+    vtkCellArray* newPolys = this->NewPolys.Local();
+
+    vtkCellData* newVertsData = nullptr;
+    vtkCellData* newLinesData = nullptr;
+    vtkCellData* newPolysData = localData.NewPolysData;
+
+    vtkCellData* tmpOutCD = nullptr;
+    outPD = output->GetPointData();
+
+    double* s;
+    int i, numPts;
+    vtkPoints* cellPoints;
+    const unsigned char* selected = this->Selected + cellId;
+
+    for (; cellId < endCellId; ++cellId) {
+      if ((*selected++) != 0) {
+
+        this->Input->GetCell(cellId, cell);
+        numPts = cell->GetNumberOfPoints();
+        cellScalars->SetNumberOfTuples(numPts);
+        s = cellScalars->GetPointer(0);
+        cellPoints = cell->GetPoints();
+
+        for (i = 0; i < numPts; i++) {
+          *s++ = this->Plane->FunctionValue(cellPoints->GetPoint(i));
+        }
+
+        tmpOutCD = newPolysData;
+        cell->Contour(0., cellScalars, loc, newVerts, newLines, newPolys, inPD, outPD, inCD, cellId, tmpOutCD);
+      }
+    }
+  }
+
+  PlaneCutFunctor(vtkDataSet* input, vtkDataObject* output,
+      vtkPlane* plane, vtkSphereTree* tree,
+      double* origin, double* normal)
+  {
+    this->Input = input;
+    this->InPoints = nullptr;
+    this->Output = output;
+    this->Plane = plane;
+    this->SphereTree = tree;
+    this->InOutArray = nullptr;
+    this->Origin = origin;
+    this->Normal = normal;
+
+    this->polyData = vtkPolyData::SafeDownCast(input);
+    if (this->polyData->NeedToBuildCells()) {
+      this->polyData->BuildCells();
+    }
+    this->SetInPoints(this->polyData->GetPoints());
+  }
+
+  virtual ~PlaneCutFunctor()
+  {
+    vtkSMPThreadLocal<vtkLocalDataType>::iterator dataIter = this->LocalData.begin();
+    while (dataIter != this->LocalData.end()) {
+      (*dataIter).NewVertsData->Delete();
+      (*dataIter).NewLinesData->Delete();
+      (*dataIter).NewPolysData->Delete();
+      ++dataIter;
+    }
+
+    vtkSMPThreadLocal<vtkDoubleArray*>::iterator cellScalarsIter = this->CellScalars.begin();
+    while (cellScalarsIter != this->CellScalars.end()) {
+      (*cellScalarsIter)->Delete();
+      ++cellScalarsIter;
+    }
+
+    dataIter = this->LocalData.begin();
+    while (dataIter != this->LocalData.end()) {
+      (*dataIter).Output->Delete();
+      (*dataIter).Locator->Delete();
+      ++dataIter;
+    }
+
+    if (this->InPoints) {
+      this->InPoints->Delete();
+    }
+
+    delete[] this->InOutArray;
+  }
+
+  void BuildAccelerationStructure()
+  {
+    this->Selected = this->SphereTree->SelectPlane(this->Origin, this->Normal, this->NumSelected);
+  }
+
+  static void Execute(vtkDataSet* input, vtkDataObject* output,
+      vtkPlane* plane, vtkSphereTree* tree,
+      double* origin, double* normal)
+  {
+    vtkIdType numCells = input->GetNumberOfCells();
+    PlaneCutFunctor functor(input, output, plane, tree, origin, normal);
+    functor.BuildAccelerationStructure();
+    vtkSMPTools::For(0, numCells, functor);
+  }
+  
+  // Called at the start of each thread
+  void Initialize()
+  {
+    vtkLocalDataType& localData = this->LocalData.Local();
+
+    localData.Output = vtkPolyData::New();
+    vtkPolyData* output = localData.Output;
+
+    localData.Locator = vtkNonMergingPointLocator::New();
+    vtkPointLocator* locator = localData.Locator;
+
+    vtkIdType numCells = this->Input->GetNumberOfCells();
+
+    vtkPoints*& newPts = this->NewPts.Local();
+    newPts->SetDataType(VTK_FLOAT);
+    output->SetPoints(newPts);
+
+    vtkIdType estimatedSize = static_cast<vtkIdType>(sqrt(static_cast<double>(numCells)));
+    estimatedSize = estimatedSize / 1024 * 1024; // Multiple of 1024
+    estimatedSize = (estimatedSize < 1024 ? 1024 : estimatedSize);
+
+    newPts->Allocate(estimatedSize, estimatedSize);
+
+    // Bounds are not important for non-merging locator
+    double bounds[6];
+    bounds[0] = bounds[2] = bounds[4] = (VTK_FLOAT_MIN);
+    bounds[1] = bounds[3] = bounds[5] = (VTK_FLOAT_MAX);
+    locator->InitPointInsertion(newPts, bounds, this->Input->GetNumberOfPoints());
+
+    vtkCellArray*& newVerts = this->NewVerts.Local();
+    newVerts->Allocate(estimatedSize, estimatedSize);
+    output->SetVerts(newVerts);
+
+    vtkCellArray*& newLines = this->NewLines.Local();
+    newLines->Allocate(estimatedSize, estimatedSize);
+    output->SetLines(newLines);
+
+    vtkCellArray*& newPolys = this->NewPolys.Local();
+    newPolys->Allocate(estimatedSize, estimatedSize);
+    output->SetPolys(newPolys);
+
+    vtkDoubleArray*& cellScalars = this->CellScalars.Local();
+    cellScalars = vtkDoubleArray::New();
+    cellScalars->SetNumberOfComponents(1);
+    cellScalars->Allocate(VTK_CELL_SIZE);
+
+    vtkPointData* outPd = output->GetPointData();
+    vtkCellData* outCd = output->GetCellData();
+    vtkPointData* inPd = this->Input->GetPointData();
+    vtkCellData* inCd = this->Input->GetCellData();
+
+    outPd->InterpolateAllocate(inPd, estimatedSize, estimatedSize);
+    outCd->CopyAllocate(inCd, estimatedSize, estimatedSize);
+
+    localData.NewVertsData = vtkCellData::New();
+    localData.NewLinesData = vtkCellData::New();
+    localData.NewPolysData = vtkCellData::New();
+    localData.NewVertsData->CopyAllocate(outCd);
+    localData.NewLinesData->CopyAllocate(outCd);
+    localData.NewPolysData->CopyAllocate(outCd);
+  }
+
+  // Called after all threads are finished
+  void Reduce()
+  {
+    // Recover multipiece output
+    vtkMultiPieceDataSet* mp = vtkMultiPieceDataSet::SafeDownCast(this->Output);
+
+    // Remove useless FieldData Array from multipiece
+    // Created by automatic pass data in pipeline
+    vtkFieldData* mpFieldData = mp->GetFieldData();
+    for (int i = mpFieldData->GetNumberOfArrays() - 1; i >= 0; i--) {
+      mpFieldData->RemoveArray(i);
+    }
+
+    // Create the final multi-piece
+    int count = 0;
+    vtkSMPThreadLocal<vtkLocalDataType>::iterator outIter = this->LocalData.begin();
+    while (outIter != this->LocalData.end()) {
+      vtkPolyData* output = (*outIter).Output;
+      mp->SetPiece(count++, output);
+      output->GetFieldData()->PassData(this->Input->GetFieldData());
+      ++outIter;
+    }
+
+    outIter = this->LocalData.begin();
+    while (outIter != this->LocalData.end()) {
+      vtkPolyData* output = (*outIter).Output;
+      vtkCellArray* newVerts = output->GetVerts();
+      vtkCellArray* newLines = output->GetLines();
+      vtkCellArray* newPolys = output->GetPolys();
+      vtkCellData* outCD = output->GetCellData();
+      vtkCellData* newVertsData = (*outIter).NewVertsData;
+      vtkCellData* newLinesData = (*outIter).NewLinesData;
+      vtkCellData* newPolysData = (*outIter).NewPolysData;
+
+      // Reconstruct cell data
+      outCD->CopyData(newVertsData, 0, newVerts->GetNumberOfCells(), 0);
+      vtkIdType offset = newVerts->GetNumberOfCells();
+      outCD->CopyData(newLinesData, offset, newLines->GetNumberOfCells(), 0);
+      offset += newLines->GetNumberOfCells();
+      outCD->CopyData(newPolysData, offset, newPolys->GetNumberOfCells(), 0);
+      ++outIter;
+    }
+  }
+};
 
 // constructor LocalStorage
 mitk::SurfaceVtkMapper2D::LocalStorage::LocalStorage()
@@ -50,46 +329,7 @@ mitk::SurfaceVtkMapper2D::LocalStorage::LocalStorage()
   m_PropAssembly = vtkSmartPointer <vtkAssembly>::New();
   m_PropAssembly->AddPart( m_Actor );
   m_CuttingPlane = vtkSmartPointer<vtkPlane>::New();
-  m_Cutter = vtkSmartPointer<vtkCutter>::New();
-  m_Cutter->SetCutFunction(m_CuttingPlane);
-  m_Mapper->SetInputConnection( m_Cutter->GetOutputPort() );
-
-  m_NormalGlyph = vtkSmartPointer<vtkGlyph3D>::New();
-
-  m_InverseNormalGlyph = vtkSmartPointer<vtkGlyph3D>::New();
-
-  // Source for the glyph filter
-  m_ArrowSource = vtkSmartPointer<vtkArrowSource>::New();
-  //set small default values for fast rendering
-  m_ArrowSource->SetTipRadius(0.05);
-  m_ArrowSource->SetTipLength(0.20);
-  m_ArrowSource->SetTipResolution(5);
-  m_ArrowSource->SetShaftResolution(5);
-  m_ArrowSource->SetShaftRadius(0.01);
-
-  m_NormalGlyph->SetSourceConnection(m_ArrowSource->GetOutputPort());
-  m_NormalGlyph->SetVectorModeToUseNormal();
-  m_NormalGlyph->OrientOn();
-
-  m_InverseNormalGlyph->SetSourceConnection(m_ArrowSource->GetOutputPort());
-  m_InverseNormalGlyph->SetVectorModeToUseNormal();
-  m_InverseNormalGlyph->OrientOn();
-
-  m_NormalMapper = vtkSmartPointer<vtkOpenGLPolyDataMapper>::New();
-  m_NormalMapper->SetInputConnection(m_NormalGlyph->GetOutputPort());
-  m_NormalMapper->ScalarVisibilityOff();
-
-  m_InverseNormalMapper = vtkSmartPointer<vtkOpenGLPolyDataMapper>::New();
-  m_InverseNormalMapper->SetInputConnection(m_NormalGlyph->GetOutputPort());
-  m_InverseNormalMapper->ScalarVisibilityOff();
-
-  m_NormalActor = vtkSmartPointer<vtkActor>::New();
-  m_NormalActor->SetMapper(m_NormalMapper);
-
-  m_InverseNormalActor = vtkSmartPointer<vtkActor>::New();
-  m_InverseNormalActor->SetMapper(m_InverseNormalMapper);
-
-  m_ReverseSense = vtkSmartPointer<vtkReverseSense>::New();
+  m_SphereTree = nullptr;
 }
 
 // destructor LocalStorage
@@ -216,47 +456,30 @@ void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *rend
   vtkSmartPointer<vtkTransformPolyDataFilter> filter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
   filter->SetTransform(vtktransform);
   filter->SetInputData(inputPolyData);
-  localStorage->m_Cutter->SetInputConnection(filter->GetOutputPort());
-  localStorage->m_Cutter->Update();
 
-  bool generateNormals = false;
-  node->GetBoolProperty("draw normals 2D", generateNormals);
-  if(generateNormals)
-  {
-    localStorage->m_NormalGlyph->SetInputConnection( localStorage->m_Cutter->GetOutputPort() );
-    localStorage->m_NormalGlyph->Update();
-
-    localStorage->m_NormalMapper->SetInputConnection( localStorage->m_NormalGlyph->GetOutputPort() );
-
-    localStorage->m_PropAssembly->AddPart( localStorage->m_NormalActor );
+  // Build Sphere Tree
+  if (localStorage->m_SphereTree == nullptr) {
+    localStorage->m_SphereTree = vtkSmartPointer<vtkSphereTree>::New();
+    if (inputPolyData->NeedToBuildCells()) {
+      inputPolyData->BuildCells();
+    }
+    // Should be OK to init with polydata only once. Mitk logic recreates mappers when data changes.
+    localStorage->m_SphereTree->SetDataSet(inputPolyData);
   }
-  else
-  {
-    localStorage->m_NormalGlyph->SetInputConnection( NULL );
-    localStorage->m_PropAssembly->RemovePart( localStorage->m_NormalActor );
+  localStorage->m_SphereTree->Build();
+
+  // Iterate over cells and map them onto polyData
+  vtkSmartPointer<vtkMultiPieceDataSet> outputPolyData = vtkSmartPointer<vtkMultiPieceDataSet>::New();
+  PlaneCutFunctor::Execute(inputPolyData, outputPolyData, localStorage->m_CuttingPlane, localStorage->m_SphereTree, origin, normal);
+
+  vtkSmartPointer<vtkAppendPolyData> appendFilter = vtkSmartPointer<vtkAppendPolyData>::New();
+  for (unsigned int i = 0; i < outputPolyData->GetNumberOfPieces(); i++) {
+    appendFilter->AddInputDataObject(outputPolyData->GetPieceAsDataObject(i));
   }
 
-  bool generateInverseNormals = false;
-  node->GetBoolProperty("invert normals", generateInverseNormals);
-  if(generateInverseNormals)
-  {
+  appendFilter->Update();
 
-    localStorage->m_ReverseSense->SetInputConnection( localStorage->m_Cutter->GetOutputPort() );
-    localStorage->m_ReverseSense->ReverseCellsOff();
-    localStorage->m_ReverseSense->ReverseNormalsOn();
-
-    localStorage->m_InverseNormalGlyph->SetInputConnection( localStorage->m_ReverseSense->GetOutputPort() );
-    localStorage->m_InverseNormalGlyph->Update();
-
-    localStorage->m_InverseNormalMapper->SetInputConnection( localStorage->m_InverseNormalGlyph->GetOutputPort() );
-
-    localStorage->m_PropAssembly->AddPart( localStorage->m_InverseNormalActor );
-  }
-  else
-  {
-    localStorage->m_ReverseSense->SetInputConnection( NULL );
-    localStorage->m_PropAssembly->RemovePart( localStorage->m_InverseNormalActor );
-  }
+  localStorage->m_Mapper->SetInputData(appendFilter->GetOutput());
 }
 
 void mitk::SurfaceVtkMapper2D::ApplyAllProperties(mitk::BaseRenderer* renderer)
@@ -282,8 +505,6 @@ void mitk::SurfaceVtkMapper2D::ApplyAllProperties(mitk::BaseRenderer* renderer)
   //Pass properties to VTK
   localStorage->m_Actor->GetProperty()->SetColor(color[0], color[1], color[2]);
   localStorage->m_Actor->GetProperty()->SetOpacity(opacity);
-  localStorage->m_NormalActor->GetProperty()->SetOpacity(opacity);
-  localStorage->m_InverseNormalActor->GetProperty()->SetOpacity(opacity);
   localStorage->m_Actor->GetProperty()->SetLineWidth(lineWidth);
   //By default, the cutter will also copy/compute normals of the cut
   //to the output polydata. The normals will influence the
@@ -340,28 +561,6 @@ void mitk::SurfaceVtkMapper2D::ApplyAllProperties(mitk::BaseRenderer* renderer)
 
     localStorage->m_Mapper->SetScalarRange(scalarsMin,scalarsMax);
   }
-
-  //color for inverse normals
-  float inverseNormalsColor[3]= { 1.0f, 0.0f, 0.0f };
-  node->GetColor(inverseNormalsColor, renderer, "back color");
-  localStorage->m_InverseNormalActor->GetProperty()->SetColor(inverseNormalsColor[0],
-      inverseNormalsColor[1], inverseNormalsColor[2]);
-
-  //color for normals
-  float normalsColor[3]= { 0.0f, 1.0f, 0.0f };
-  node->GetColor(normalsColor, renderer, "front color");
-  localStorage->m_NormalActor->GetProperty()->SetColor(normalsColor[0],
-      normalsColor[1], normalsColor[2]);
-
-  //normals scaling
-  float normalScaleFactor = 10.0f;
-  node->GetFloatProperty( "front normal lenth (px)", normalScaleFactor, renderer );
-  localStorage->m_NormalGlyph->SetScaleFactor(normalScaleFactor);
-
-  //inverse normals scaling
-  float inverseNormalScaleFactor = 10.0f;
-  node->GetFloatProperty( "back normal lenth (px)", inverseNormalScaleFactor, renderer );
-  localStorage->m_InverseNormalGlyph->SetScaleFactor(inverseNormalScaleFactor);
 }
 
 void mitk::SurfaceVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
@@ -370,18 +569,6 @@ void mitk::SurfaceVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::
   node->AddProperty( "line width", FloatProperty::New(2.0f), renderer, overwrite );
   aliases->AddAlias( "line width", "Surface.2D.Line Width", "Surface");
   node->AddProperty( "scalar mode", VtkScalarModeProperty::New(), renderer, overwrite );
-  node->AddProperty( "draw normals 2D", BoolProperty::New(false), renderer, overwrite );
-  aliases->AddAlias( "draw normals 2D", "Surface.2D.Normals.Draw Normals", "Surface");
-  node->AddProperty( "invert normals", BoolProperty::New(false), renderer, overwrite );
-  aliases->AddAlias( "invert normals", "Surface.2D.Normals.Draw Inverse Normals", "Surface");
-  node->AddProperty( "front color", ColorProperty::New(0.0, 1.0, 0.0), renderer, overwrite );
-  aliases->AddAlias( "front color", "Surface.2D.Normals.Normals Color", "Surface");
-  node->AddProperty( "back color", ColorProperty::New(1.0, 0.0, 0.0), renderer, overwrite );
-  aliases->AddAlias( "back color", "Surface.2D.Normals.Inverse Normals Color", "Surface");
-  node->AddProperty( "front normal lenth (px)", FloatProperty::New(10.0), renderer, overwrite );
-  aliases->AddAlias( "front normal lenth (px)", "Surface.2D.Normals.Normals Scale Factor", "Surface");
-  node->AddProperty( "back normal lenth (px)", FloatProperty::New(10.0), renderer, overwrite );
-  aliases->AddAlias( "back normal lenth (px)", "Surface.2D.Normals.Inverse Normals Scale Factor", "Surface");
   node->AddProperty( "layer", IntProperty::New(100), renderer, overwrite);
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

@@ -32,6 +32,7 @@ class vtkLookupTable;
 class vtkGlyph3D;
 class vtkArrowSource;
 class vtkReverseSense;
+class vtkSphereTree;
 
 namespace mitk {
 
@@ -94,55 +95,15 @@ public:
      */
     vtkSmartPointer<vtkActor> m_Actor;
     /**
-     * @brief m_NormalActor actor for the normals.
-     */
-    vtkSmartPointer<vtkActor> m_NormalActor;
-    /**
-     * @brief m_InverseNormalActor actor for the inverse normals.
-     */
-    vtkSmartPointer<vtkActor> m_InverseNormalActor;
-    /**
        * @brief m_Mapper VTK mapper for all types of 2D polydata e.g. werewolves.
        */
     vtkSmartPointer<vtkOpenGLPolyDataMapper> m_Mapper;
-    /**
-       * @brief m_Cutter Filter to cut out the 2D slice.
-       */
-    vtkSmartPointer<vtkCutter> m_Cutter;
+
+    vtkSmartPointer<vtkSphereTree> m_SphereTree;
     /**
        * @brief m_CuttingPlane The plane where to cut off the 2D slice.
        */
     vtkSmartPointer<vtkPlane> m_CuttingPlane;
-
-    /**
-     * @brief m_NormalMapper Mapper for the normals.
-     */
-    vtkSmartPointer<vtkOpenGLPolyDataMapper> m_NormalMapper;
-
-    /**
-     * @brief m_InverseNormalMapper Mapper for the inverse normals.
-     */
-    vtkSmartPointer<vtkOpenGLPolyDataMapper> m_InverseNormalMapper;
-
-    /**
-     * @brief m_NormalGlyph Glyph for creating normals.
-     */
-    vtkSmartPointer<vtkGlyph3D> m_NormalGlyph;
-
-    /**
-     * @brief m_InverseNormalGlyph Glyph for creating inverse normals.
-     */
-    vtkSmartPointer<vtkGlyph3D> m_InverseNormalGlyph;
-
-    /**
-     * @brief m_ArrowSource Arrow representation of the normals.
-     */
-    vtkSmartPointer<vtkArrowSource> m_ArrowSource;
-
-    /**
-     * @brief m_ReverseSense Filter to invert the normals.
-     */
-    vtkSmartPointer<vtkReverseSense> m_ReverseSense;
 
     /** \brief Default constructor of the local storage. */
     LocalStorage();

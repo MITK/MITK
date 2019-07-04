@@ -1,4 +1,5 @@
 {
-  "phabricator.uri": "https://phabricator.mitk.org/",
-  "base": "git:merge-base(origin/master)"
+  "base": "git:merge-base(origin/master)",
+  "history.immutable": true,
+  "phabricator.uri": "https://phabricator.mitk.org/"
 }

@@ -334,10 +334,11 @@ endforeach()
 if(MITK_USE_Python)
   list(APPEND mitk_optional_cache_args
        -DMITK_USE_Python:BOOL=${MITK_USE_Python}
-       -DPYTHON_EXECUTABLE:FILEPATH=${PYTHON_EXECUTABLE}
-       -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
-       -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
-       -DPYTHON_INCLUDE_DIR2:PATH=${PYTHON_INCLUDE_DIR2}
+       "-DPython3_EXECUTABLE:FILEPATH=${Python3_EXECUTABLE}"
+       "-DPython3_INCLUDE_DIR:PATH=${Python3_INCLUDE_DIR}"
+       "-DPython3_LIBRARY:FILEPATH=${Python3_LIBRARY}"
+       "-DPython3_STDLIB:FILEPATH=${Python3_STDLIB}"
+       "-DPython3_SITELIB:FILEPATH=${Python3_SITELIB}"
       )
 endif()
 

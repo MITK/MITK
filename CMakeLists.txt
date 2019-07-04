@@ -364,12 +364,13 @@ endif()
 
 if(MITK_USE_Python)
   set(MITK_USE_ZLIB ON)
-  find_package(PythonLibs 3 REQUIRED)
-  find_package(PythonInterp 3 REQUIRED)
+  find_package(Python3 COMPONENTS Interpreter REQUIRED)
+  find_package(Python3 COMPONENTS Development REQUIRED)
 
-  if ( NOT PYTHON_VERSION_STRING VERSION_EQUAL PYTHONLIBS_VERSION_STRING)
-    message(SEND_ERROR "Inconsistent python versions found: interpreter ${PYTHON_VERSION_STRING} vs. libs ${PYTHONLIBS_VERSION_STRING}" )
-  endif()
+  string(REPLACE "\\" "/" Python3_STDARCH "${Python3_STDARCH}")
+  string(REPLACE "\\" "/" Python3_SITELIB "${Python3_SITELIB}")
+  
+  #find_package(Python3 COMPONENTS NumPy) # does not work, therefore use own script. maybe change later.
   find_package(Numpy REQUIRED)
 endif()
 

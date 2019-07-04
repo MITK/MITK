@@ -79,7 +79,7 @@ if(WIN32)
   set(BLUEBERRY_RUNTIME_DIR "${CTEST_BINARY_DIRECTORY}/MITK-build/bin/plugins/${CTEST_BUILD_CONFIGURATION}")
 
   set(PYTHON_BINARY_DIRS "${CTEST_BINARY_DIRECTORY}/ep/src/CTK-build/CMakeExternals/Install/bin")
-  get_filename_component(_python_dir "${PYTHON_EXECUTABLE}" DIRECTORY)
+  get_filename_component(_python_dir "${Python3_EXECUTABLE}" DIRECTORY)
   list(APPEND PYTHON_BINARY_DIRS "${_python_dir}")
 
   set(CTEST_PATH "${CTEST_PATH};${CTEST_BINARY_DIRECTORY}/ep/bin;${QT_BINARY_DIR};${BLUEBERRY_RUNTIME_DIR};${OPENCV_BIN_DIR};${PYTHON_BINARY_DIRS}")

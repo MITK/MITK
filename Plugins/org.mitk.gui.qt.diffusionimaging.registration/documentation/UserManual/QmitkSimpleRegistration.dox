@@ -1,6 +1,0 @@
-/**
-\page org_mitk_views_simpleregistrationview Registration
-
-This view enables the simple rigid or affine registration of two images. It is also possible to transform a tractogram with a registration object obtained from a previous registration of two images.
-
-*/

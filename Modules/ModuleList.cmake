@@ -66,8 +66,7 @@ set(MITK_MODULES
   XNAT
   TubeGraph
   BiophotonicsHardware
-  DiffusionImaging
-  TumorInvasionAnalysis
+# TumorInvasionAnalysis
   BoundingShape
   RenderWindowManager
   RenderWindowManagerUI

@@ -24,7 +24,12 @@ set(CTEST_DASHBOARD_ROOT "/opt/dartclients")
 #set(CTEST_CMAKE_COMMAND "cmake")
 #set(CTEST_CMAKE_GENERATOR "Visual Studio 16 2019")
 #set(CTEST_CMAKE_GENERATOR_PLATFORM "x64")
-#set(CTEST_DASHBOARD_ROOT "C:/dartclients")
+#set(CTEST_DASHBOARD_ROOT "D:/dc")
+
+set(MITK_EXTENSIONS # "<repo>|<branch/tag/commit>|<src dir>"
+# "https://phabricator.mitk.org/source/mitk-projecttemplate.git|master|MITK-ProjectTemplate"
+# "https://phabricator.mitk.org/source/mitk-diffusion.git|master|MITK-Diffusion"
+)
 
 # The directory containing the Qt binaries
 set(QT5_INSTALL_PREFIX "/home/user/Qt/5.11.4/gcc_64")

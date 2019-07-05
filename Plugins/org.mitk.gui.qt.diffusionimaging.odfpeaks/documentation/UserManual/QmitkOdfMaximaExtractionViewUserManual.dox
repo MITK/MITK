@@ -1,9 +1,0 @@
-/**
-\page org_mitk_views_odfmaximaextraction ODF Peak Extraction
-
-This view provides the user interface to extract the principal diffusion direction of tensors and the peaks of spherical harmonic ODFs using gradient descent optimization.
-
-The output peaks can for example be used for streamline tractography.
-
-
-*/

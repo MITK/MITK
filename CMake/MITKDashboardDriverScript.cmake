@@ -91,7 +91,7 @@ endif()
 set(CTEST_CONFIGURATION_TYPE ${CTEST_BUILD_CONFIGURATION})
 
 if(empty_binary_directory)
-  message("Directory ${CTEST_BINARY_DIRECTORY} cleaned !")
+  message("Clean \"${CTEST_BINARY_DIRECTORY}\"")
   ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY})
 endif()
 
@@ -233,6 +233,37 @@ function(run_ctest)
 
   ctest_start(${model})
 
+  if(MITK_EXTENSIONS)
+    foreach(extension ${MITK_EXTENSIONS})
+      if(extension MATCHES "([^|]+)\\|([^|]+)\\|(.+)")
+        set(extension_repo ${CMAKE_MATCH_1})
+        set(extension_tag ${CMAKE_MATCH_2})
+        set(extension_source_dir ${CMAKE_MATCH_3})
+        if(NOT EXISTS "${CTEST_DASHBOARD_ROOT}/${extension_source_dir}")
+          message("Clone ${extension_repo} (${extension_tag})")
+          execute_process(
+            COMMAND ${CTEST_GIT_COMMAND} clone -b ${extension_tag} ${extension_repo} ${extension_source_dir}
+            WORKING_DIRECTORY ${CTEST_DASHBOARD_ROOT})
+        else()
+          message("Update ${extension_repo} (${extension_tag})")
+          execute_process(
+            COMMAND ${CTEST_GIT_COMMAND} fetch origin ${extension_tag}
+            WORKING_DIRECTORY "${CTEST_DASHBOARD_ROOT}/${extension_source_dir}"
+            RESULT_VARIABLE exit_code)
+
+          if(exit_code EQUAL 0)
+            execute_process(
+              COMMAND ${CTEST_GIT_COMMAND} reset --hard FETCH_HEAD
+              WORKING_DIRECTORY "${CTEST_DASHBOARD_ROOT}/${extension_source_dir}")
+          else()
+            message(FATAL_ERROR "Could not update ${extension_repo} (${extension_tag})")
+          endif()
+        endif()
+      endif()
+    endforeach()
+  endif()
+
+  message("Update ${GIT_REPOSITORY} (${GIT_BRANCH})")
   ctest_update(SOURCE "${CTEST_CHECKOUT_DIR}" RETURN_VALUE res)
 
   if(res LESS 0)
@@ -303,6 +334,10 @@ ${INITIAL_CMAKECACHE_OPTIONS}
 
     set_property(GLOBAL PROPERTY SubProject SuperBuild)
     set_property(GLOBAL PROPERTY Label SuperBuild)
+
+    if(MITK_EXTENSIONS)
+      set(SUPERBUILD_CONFIG_OPTIONS -D MITK_EXTENSION_DIRS:STRING=${MITK_EXTENSION_DIRS})
+    endif()
 
     ctest_configure(BUILD "${CTEST_BINARY_DIRECTORY}" RETURN_VALUE res OPTIONS "${SUPERBUILD_CONFIG_OPTIONS}")
 

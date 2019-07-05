@@ -109,12 +109,6 @@ else()
 endif()
 set(ENV{CTEST_USE_LAUNCHERS_DEFAULT} ${CTEST_USE_LAUNCHERS})
 
-# Remove this if block after all dartclients work
-if(DEFINED ADDITIONNAL_CMAKECACHE_OPTION)
-  message(WARNING "Rename ADDITIONNAL to ADDITIONAL in your dartlclient script: ${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}")
-  set(ADDITIONAL_CMAKECACHE_OPTION ${ADDITIONNAL_CMAKECACHE_OPTION})
-endif()
-
 if(NOT DEFINED MITK_BUILD_CONFIGURATION)
   set(MITK_BUILD_CONFIGURATION "All")
 endif()
@@ -146,6 +140,17 @@ MITK_INITIAL_CACHE_FILE:INTERNAL=${mitk_cache_file}
 ")
 endif()
 
+if(MITK_EXTENSIONS)
+  set(MITK_EXTENSION_DIRS "")
+  foreach(extension ${MITK_EXTENSIONS})
+    if(extension MATCHES "[^|]+\\|[^|]+\\|(.+)")
+      if(MITK_EXTENSION_DIRS)
+        set(MITK_EXTENSION_DIRS "${MITK_EXTENSION_DIRS};")
+      endif()
+      set(MITK_EXTENSION_DIRS "${MITK_EXTENSION_DIRS}${CTEST_DASHBOARD_ROOT}/${CMAKE_MATCH_1}")
+    endif()
+  endforeach()
+endif()
 
 #
 # Download and include dashboard driver script

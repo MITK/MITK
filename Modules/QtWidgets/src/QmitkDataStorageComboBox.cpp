@@ -184,20 +184,29 @@ void QmitkDataStorageComboBox::RemoveNode(int index)
   {
     // remove itk::Event observer
     mitk::DataNode *dataNode = m_Nodes.at(index);
-    // get name property first
-    mitk::BaseProperty *nameProperty = dataNode->GetProperty("name");
-    // if prop exists remove modified listener
-    if (nameProperty)
+
+    // remove observer from data node property list
+    mitk::PropertyList* dataNodePropertyList = dataNode->GetPropertyList();
+    if (nullptr != dataNodePropertyList)
     {
-      nameProperty->RemoveObserver(m_NodesModifiedObserverTags[index]);
-      // remove name property map
-      m_PropertyToNode.erase(dataNode);
+      dataNodePropertyList->RemoveObserver(m_DataNodePropertyListObserverTags[index]);
+      // remove observer tags from lists
+      m_DataNodePropertyListObserverTags.erase(m_DataNodePropertyListObserverTags.begin() + index);
     }
-    // then remove delete listener on the node itself
-    dataNode->RemoveObserver(m_NodesDeleteObserverTags[index]);
-    // remove observer tags from lists
-    m_NodesModifiedObserverTags.erase(m_NodesModifiedObserverTags.begin() + index);
-    m_NodesDeleteObserverTags.erase(m_NodesDeleteObserverTags.begin() + index);
+
+    // remove observer from base data property list
+    mitk::BaseData* baseData = dynamic_cast<mitk::BaseData*>(dataNode->GetData());
+    if (nullptr != baseData)
+    {
+      mitk::PropertyList* baseDataPropertyList = baseData->GetPropertyList();
+      if (nullptr != dataNodePropertyList)
+      {
+        baseDataPropertyList->RemoveObserver(m_BaseDatapropertyListObserverTags[index]);
+        // remove observer tags from lists
+        m_BaseDatapropertyListObserverTags.erase(m_BaseDatapropertyListObserverTags.begin() + index);
+      }
+    }
+
     // remove node from node vector
     m_Nodes.erase(m_Nodes.begin() + index);
     // remove node name from combobox
@@ -234,39 +243,18 @@ void QmitkDataStorageComboBox::SetAutoSelectNewItems(bool autoSelectNewItems)
   m_AutoSelectNewNodes = autoSelectNewItems;
 }
 
-void QmitkDataStorageComboBox::OnDataNodeDeleteOrModified(const itk::Object *caller, const itk::EventObject &event)
+void QmitkDataStorageComboBox::OnPropertyListChanged(const itk::Object *caller, const itk::EventObject &event)
 {
   if (!m_BlockEvents)
   {
     m_BlockEvents = true;
 
-    // check if we have a modified event (if not it is a delete event)
+    // check if we have a modified event
     const itk::ModifiedEvent *modifiedEvent = dynamic_cast<const itk::ModifiedEvent *>(&event);
-
-    // when node was modified reset text
     if (modifiedEvent)
     {
-      const mitk::BaseProperty *nameProperty = dynamic_cast<const mitk::BaseProperty *>(caller);
-
-      // node name changed, set it
-      // but first of all find associated node
-      for (auto it = m_PropertyToNode.begin(); it != m_PropertyToNode.end(); ++it)
-      {
-        // property is found take node
-        if (it->second == nameProperty)
-        {
-          // looks strange but when calling setnode with the same node, that means the node gets updated
-          this->SetNode(it->first, it->first);
-          break;
-        }
-      }
-    }
-    else
-    {
-      const mitk::DataNode *constDataNode = dynamic_cast<const mitk::DataNode *>(caller);
-      if (constDataNode)
-        // node will be deleted, remove it
-        this->RemoveNode(constDataNode);
+      const mitk::PropertyList *propertyList = dynamic_cast<const mitk::PropertyList *>(caller);
+      UpdateComboBoxText(propertyList);
     }
 
     m_BlockEvents = false;
@@ -331,7 +319,6 @@ void QmitkDataStorageComboBox::InsertNode(int index, const mitk::DataNode *dataN
 
   // const cast because we need non const nodes
   mitk::DataNode *nonConstDataNode = const_cast<mitk::DataNode *>(dataNode);
-  std::string itemName = "unnamed node";
   if (!changedNode)
   {
     // break on duplicated nodes (that doesn't make sense to have duplicates in the combobox)
@@ -339,28 +326,45 @@ void QmitkDataStorageComboBox::InsertNode(int index, const mitk::DataNode *dataN
       return;
 
     // add modified observer
-    itk::MemberCommand<QmitkDataStorageComboBox>::Pointer modifiedCommand =
+    itk::MemberCommand<QmitkDataStorageComboBox>::Pointer propertyListChangedCommand =
       itk::MemberCommand<QmitkDataStorageComboBox>::New();
-    modifiedCommand->SetCallbackFunction(this, &QmitkDataStorageComboBox::OnDataNodeDeleteOrModified);
+    propertyListChangedCommand->SetCallbackFunction(this, &QmitkDataStorageComboBox::OnPropertyListChanged);
 
-    // add modified observer for the name property
-    // first try retrieving the name property of the data node
-    mitk::BaseProperty *nameProperty = nonConstDataNode->GetProperty("name");
-    if (nameProperty)
+    // add observer for the data node property list
+    mitk::PropertyList* dataNodePropertyList = nonConstDataNode->GetPropertyList();
+    if (nullptr != dataNodePropertyList)
     {
-      m_NodesModifiedObserverTags.push_back(nameProperty->AddObserver(itk::ModifiedEvent(), modifiedCommand));
-      m_PropertyToNode[nonConstDataNode] = nameProperty;
-      itemName = nameProperty->GetValueAsString();
+      m_DataNodePropertyListObserverTags.push_back(dataNodePropertyList->AddObserver(itk::ModifiedEvent(),
+        propertyListChangedCommand));
     }
-    // if there is no name node save an invalid value for the observer tag (-1)
     else
-      m_NodesModifiedObserverTags.push_back(-1);
+    {
+      // fill vector with invalid value
+      m_DataNodePropertyListObserverTags.push_back(-1);
+    }
 
-    // add delete observer
-    itk::MemberCommand<QmitkDataStorageComboBox>::Pointer deleteCommand =
-      itk::MemberCommand<QmitkDataStorageComboBox>::New();
-    deleteCommand->SetCallbackFunction(this, &QmitkDataStorageComboBox::OnDataNodeDeleteOrModified);
-    m_NodesDeleteObserverTags.push_back(nonConstDataNode->AddObserver(itk::DeleteEvent(), modifiedCommand));
+    mitk::PropertyList* baseDataPropertyList;
+    //add observer for the base data property list
+    mitk::BaseData* baseData = dynamic_cast<mitk::BaseData*>(nonConstDataNode->GetData());
+    if (nullptr != baseData)
+    {
+      baseDataPropertyList = baseData->GetPropertyList();
+      if (nullptr != baseDataPropertyList)
+      {
+        m_BaseDatapropertyListObserverTags.push_back(baseDataPropertyList->AddObserver(itk::ModifiedEvent(),
+          propertyListChangedCommand));
+      }
+      else
+      {
+        // fill vector with invalid value
+        m_BaseDatapropertyListObserverTags.push_back(-1);
+      }
+    }
+    else
+    {
+      // fill vector with invalid value
+      m_BaseDatapropertyListObserverTags.push_back(-1);
+    }
   }
 
   // add node to the vector
@@ -371,7 +375,7 @@ void QmitkDataStorageComboBox::InsertNode(int index, const mitk::DataNode *dataN
 
   if (addNewNode)
   {
-    this->addItem(QString::fromStdString(itemName));
+    this->addItem(QString::fromStdString(nonConstDataNode->GetName()));
     // select new node if m_AutoSelectNewNodes is true or if we have just added the first node
     if (m_AutoSelectNewNodes || m_Nodes.size() == 1)
       this->setCurrentIndex(index);
@@ -379,7 +383,7 @@ void QmitkDataStorageComboBox::InsertNode(int index, const mitk::DataNode *dataN
   else
   {
     // update text in combobox
-    this->setItemText(index, QString::fromStdString(itemName));
+    this->setItemText(index, QString::fromStdString(nonConstDataNode->GetName()));
   }
 }
 
@@ -420,6 +424,35 @@ void QmitkDataStorageComboBox::Reset()
     {
       // add node to the node vector and to the combobox
       this->AddNode(nodeIt.Value().GetPointer());
+    }
+  }
+}
+
+void QmitkDataStorageComboBox::UpdateComboBoxText(const mitk::PropertyList* propertyList)
+{
+  mitk::PropertyList* dataNodePropertyList;
+  mitk::PropertyList* baseDataPropertyList;
+  mitk::BaseData* baseData;
+  for (const auto& node : m_Nodes)
+  {
+    dataNodePropertyList = node->GetPropertyList();
+
+    baseData = dynamic_cast<mitk::BaseData*>(node->GetData());
+    if (nullptr != baseData)
+    {
+      baseDataPropertyList = baseData->GetPropertyList();
+    }
+
+    if (propertyList == dataNodePropertyList
+     || propertyList == baseDataPropertyList)
+    {
+      // if one of the property list is the one that has just been modified
+      // get the node's index and set its text to the node name
+      // the node name might have been changed, depending on the modified property list
+      auto index = Find(node);
+      // update text in combobox
+      this->setItemText(index, QString::fromStdString(node->GetName()));
+      return;
     }
   }
 }

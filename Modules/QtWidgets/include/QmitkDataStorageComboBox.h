@@ -133,10 +133,9 @@ public:
   ///
   virtual void SetAutoSelectNewItems(bool autoSelectNewItems);
   ///
-  /// \brief Called when a node is deleted or the name property of the node was modified. Calls RemoveNode or SetNode
-  /// then.
+  /// \brief Called when the name property of the node was modified.
   ///
-  virtual void OnDataNodeDeleteOrModified(const itk::Object *caller, const itk::EventObject &event);
+  virtual void OnPropertyListChanged(const itk::Object *caller, const itk::EventObject &event);
 
 signals:
   ///
@@ -185,6 +184,8 @@ protected:
   ///
   virtual void Reset();
 
+  virtual void UpdateComboBoxText(const mitk::PropertyList*);
+
 protected:
   ///
   /// Pointer to the DataStorage from which the nodes are selected (remember: in BlueBerry there
@@ -204,20 +205,14 @@ protected:
   std::vector<mitk::DataNode *> m_Nodes;
 
   ///
-  /// \brief Holds the tags of the node-modified observers. (must be updated every time m_Nodes changes)
+  /// \brief Holds the tags of the data node property observers.
   ///
-  std::vector<long> m_NodesModifiedObserverTags;
+  std::vector<long> m_DataNodePropertyListObserverTags;
 
   ///
-  /// \brief Holds the tags of the node-modified observers. (must be updated every time m_Nodes changes)
+  /// \brief Holds the tags of the base data property observers.
   ///
-  std::vector<long> m_NodesDeleteObserverTags;
-
-  ///
-  /// \brief Maps a a specific node to (Name-)property. This is needed because we have to find the associated node
-  /// whenever the name property of a node changed.
-  ///
-  std::map<mitk::DataNode *, const mitk::BaseProperty *> m_PropertyToNode;
+  std::vector<long> m_BaseDatapropertyListObserverTags;
 
   ///
   /// \brief Event function guard. Each function which is called by an event mechanism

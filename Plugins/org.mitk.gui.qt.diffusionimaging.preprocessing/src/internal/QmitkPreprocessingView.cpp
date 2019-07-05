@@ -175,14 +175,14 @@ void QmitkPreprocessingView::CreateConnections()
     connect( (QObject*)(m_Controls->m_ClearRotationButton), SIGNAL(clicked()), this, SLOT(DoClearRotationOfGradients()) );
     connect( (QObject*)(m_Controls->m_ModifyHeader), SIGNAL(clicked()), this, SLOT(DoApplyHeader()) );
     connect( (QObject*)(m_Controls->m_AlignImageButton), SIGNAL(clicked()), this, SLOT(DoAlignImages()) );
-
-
-
-    connect( (QObject*)(m_Controls->m_SelctedImageComboBox), SIGNAL(OnSelectionChanged(const mitk::DataNode*)),
-             this, SLOT(OnImageSelectionChanged()) );
+    connect( (QObject*)(m_Controls->m_SelctedImageComboBox), SIGNAL(OnSelectionChanged(const mitk::DataNode*)), this, SLOT(OnImageSelectionChanged()) );
 
     m_Controls->m_NormalizationMaskBox->SetZeroEntryText("--");
 
+    QFont f("monospace");
+    f.setStyleHint(QFont::Monospace);
+    m_Controls->m_OriginalGradientsText->setFont(f);
+    m_Controls->m_WorkingGradientsText->setFont(f);
   }
 }
 
@@ -1235,6 +1235,8 @@ void QmitkPreprocessingView::UpdateGradientDetails()
   {
     auto g = gradientContainer->at(j);
     g = g.normalize();
+    if (g[0]>=0)
+      text += " ";
     text += QString::number(g[0]);
     if (j<gradientContainer->Size()-1)
       text += " ";
@@ -1245,6 +1247,8 @@ void QmitkPreprocessingView::UpdateGradientDetails()
   {
     auto g = gradientContainer->at(j);
     g = g.normalize();
+    if (g[1]>=0)
+      text += " ";
     text += QString::number(g[1]);
     if (j<gradientContainer->Size()-1)
       text += " ";
@@ -1255,6 +1259,8 @@ void QmitkPreprocessingView::UpdateGradientDetails()
   {
     auto g = gradientContainer->at(j);
     g = g.normalize();
+    if (g[2]>=0)
+      text += " ";
     text += QString::number(g[2]);
     if (j<gradientContainer->Size()-1)
       text += " ";
@@ -1270,6 +1276,8 @@ void QmitkPreprocessingView::UpdateGradientDetails()
   {
     auto g = gradientContainer->at(j);
     g = g.normalize();
+    if (g[0]>=0)
+      text += " ";
     text += QString::number(g[0]);
     if (j<gradientContainer->Size()-1)
       text += " ";
@@ -1280,6 +1288,8 @@ void QmitkPreprocessingView::UpdateGradientDetails()
   {
     auto g = gradientContainer->at(j);
     g = g.normalize();
+    if (g[1]>=0)
+      text += " ";
     text += QString::number(g[1]);
     if (j<gradientContainer->Size()-1)
       text += " ";
@@ -1290,6 +1300,8 @@ void QmitkPreprocessingView::UpdateGradientDetails()
   {
     auto g = gradientContainer->at(j);
     g = g.normalize();
+    if (g[2]>=0)
+      text += " ";
     text += QString::number(g[2]);
     if (j<gradientContainer->Size()-1)
       text += " ";

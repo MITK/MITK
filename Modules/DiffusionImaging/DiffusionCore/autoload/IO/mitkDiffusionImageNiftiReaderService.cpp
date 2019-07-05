@@ -46,6 +46,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLocaleSwitch.h>
 #include "mitkIOUtil.h"
 #include <mitkDiffusionFunctionCollection.h>
+#include <vtkNIFTIImageReader.h>
+#include <vtkNIFTIImageHeader.h>
+#include <vtkImageIterator.h>
 
 namespace mitk
 {
@@ -206,13 +209,86 @@ void DiffusionImageNiftiReaderService::InternalRead()
         // create reader and read file
         typedef itk::Image<DiffusionPixelType,4> ImageType4D;
         itk::NiftiImageIO::Pointer io2 = itk::NiftiImageIO::New();
-        typedef itk::ImageFileReader<ImageType4D> FileReaderType;
-        FileReaderType::Pointer reader = FileReaderType::New();
-        reader->SetFileName( this->GetInputLocation() );
-        reader->SetImageIO(io2);
-        reader->Update();
-        ImageType4D::Pointer img4 = reader->GetOutput();
 
+        ImageType4D::Pointer img4 = ImageType4D::New();
+        if (io2->CanReadFile(this->GetInputLocation().c_str()))
+        {
+          typedef itk::ImageFileReader<ImageType4D> FileReaderType;
+          FileReaderType::Pointer reader = FileReaderType::New();
+          reader->SetFileName( this->GetInputLocation() );
+          reader->SetImageIO(io2);
+          reader->Update();
+          img4 = reader->GetOutput();
+        }
+        else
+        {
+          vtkSmartPointer<vtkNIFTIImageReader> reader = vtkSmartPointer<vtkNIFTIImageReader>::New();
+          if (reader->CanReadFile(this->GetInputLocation().c_str()))
+          {
+            reader->SetFileName(this->GetInputLocation().c_str());
+            reader->SetTimeAsVector(true);
+            reader->Update();
+            auto vtk_image = reader->GetOutput();
+            auto header = reader->GetNIFTIHeader();
+            auto dim = header->GetDim(0);
+            auto matrix = reader->GetQFormMatrix();
+            if (matrix == nullptr)
+              matrix = reader->GetSFormMatrix();
+            itk::Matrix<double, 4, 4> direction; direction.SetIdentity();
+            itk::Matrix<double, 4, 4> ras_lps; ras_lps.SetIdentity();
+            ras_lps[0][0] = -1;
+            ras_lps[1][1] = -1;
+            if (matrix != nullptr)
+            {
+              for (int r=0; r<dim; r++)
+                  for (int c=0; c<dim; c++)
+                      direction[r][c] = matrix->GetElement(r, c);
+            }
+            direction = direction*ras_lps;
+
+            itk::Vector< double, 4 > spacing; spacing.Fill(1.0);
+            vtk_image->GetSpacing(spacing.GetDataPointer());
+
+            itk::Point< double, 4 > origin; origin.Fill(0.0);
+            vtk_image->GetOrigin(origin.GetDataPointer());
+
+            itk::ImageRegion< 4 > region;
+            for (int i=0; i<4; ++i)
+              if (i<dim)
+                region.SetSize(i, header->GetDim(i+1));
+              else
+                region.SetSize(i, 1);
+
+            img4->SetSpacing( spacing );
+            img4->SetOrigin( origin );
+            img4->SetDirection( direction );
+            img4->SetRegions( region );
+            img4->Allocate();
+            img4->FillBuffer(0);
+
+            switch (header->GetDim(0)) {
+            case 4:
+              for (int g=0; g<header->GetDim(4); g++)
+                for (int z=0; z<header->GetDim(3); z++)
+                  for (int y=0; y<header->GetDim(2); y++)
+                    for (int x=0; x<header->GetDim(1); x++)
+                    {
+                      double val = vtk_image->GetScalarComponentAsDouble(x, y, z, g);
+
+                      ImageType4D::IndexType idx;
+                      idx[0] = x;
+                      idx[1] = y;
+                      idx[2] = z;
+                      idx[3] = g;
+                      img4->SetPixel(idx, val);
+                    }
+              break;
+            default:
+              mitkThrow() << "Image dimension " << header->GetDim(0) << " not supported!";
+              break;
+            }
+          }
+        }
 
         // convert 4D file to vector image
         itkVectorImage = VectorImageType::New();

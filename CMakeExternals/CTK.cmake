@@ -15,7 +15,7 @@ if(MITK_USE_CTK)
 
   if(NOT DEFINED CTK_DIR)
 
-    set(revision_tag 6c0eddaa)
+    set(revision_tag b93e8dca)
 
     set(ctk_optional_cache_args )
     if(MITK_USE_Python)
@@ -58,7 +58,7 @@ if(MITK_USE_CTK)
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
-      URL_MD5 c8025c0009d5dd207cd442eadca409b4
+      URL_MD5 C86289F25E79B0C5C12E424BD706388F
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}

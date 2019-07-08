@@ -415,6 +415,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
   // We have been modified => save this for next Update()
   localStorage->m_LastUpdateTime.Modified();
+  localStorage->m_RenderedBefore = true;
 }
 
 void mitk::ImageVtkMapper2D::ApplyLevelWindow(mitk::BaseRenderer *renderer)
@@ -633,6 +634,7 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
   // since we have checked that nothing important has changed, we can set
   // m_LastUpdateTime to the current time
   m_LSH.GetLocalStorage(renderer)->m_LastUpdateTime.Modified();
+  m_LSH.GetLocalStorage(renderer)->m_RenderedBefore = true;
 }
 
 void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
@@ -902,6 +904,7 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_OutlineActor = vtkSmartPointer<vtkActor>::New();
   m_OutlineMapper = vtkSmartPointer<vtkOpenGLPolyDataMapper>::New();
   m_OutlineShadowActor = vtkSmartPointer<vtkActor>::New();
+  m_RenderedBefore = false;
 
   m_OutlineActor->SetMapper(m_OutlineMapper);
   m_OutlineShadowActor->SetMapper(m_OutlineMapper);

@@ -159,7 +159,7 @@ public slots:
   ///
   /// \brief Slot for signal when user wants to set a node as current selected node.
   ///
-  void SetSelectedNode(mitk::DataNode::Pointer item);
+  void SetSelectedNode(const mitk::DataNode::Pointer& node);
 
 protected:
   ///
@@ -183,6 +183,8 @@ protected:
   /// \brief Reset function whenever data storage or predicate changes.
   ///
   virtual void Reset();
+
+  void RemoveNodeAndPropertyLists(int index);
 
   virtual void UpdateComboBoxText(const mitk::PropertyList*);
 

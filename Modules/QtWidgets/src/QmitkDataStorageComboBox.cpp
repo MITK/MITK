@@ -182,33 +182,7 @@ void QmitkDataStorageComboBox::RemoveNode(int index)
 {
   if (this->HasIndex(index))
   {
-    // remove itk::Event observer
-    mitk::DataNode *dataNode = m_Nodes.at(index);
-
-    // remove observer from data node property list
-    mitk::PropertyList* dataNodePropertyList = dataNode->GetPropertyList();
-    if (nullptr != dataNodePropertyList)
-    {
-      dataNodePropertyList->RemoveObserver(m_DataNodePropertyListObserverTags[index]);
-      // remove observer tags from lists
-      m_DataNodePropertyListObserverTags.erase(m_DataNodePropertyListObserverTags.begin() + index);
-    }
-
-    // remove observer from base data property list
-    mitk::BaseData* baseData = dynamic_cast<mitk::BaseData*>(dataNode->GetData());
-    if (nullptr != baseData)
-    {
-      mitk::PropertyList* baseDataPropertyList = baseData->GetPropertyList();
-      if (nullptr != dataNodePropertyList)
-      {
-        baseDataPropertyList->RemoveObserver(m_BaseDatapropertyListObserverTags[index]);
-        // remove observer tags from lists
-        m_BaseDatapropertyListObserverTags.erase(m_BaseDatapropertyListObserverTags.begin() + index);
-      }
-    }
-
-    // remove node from node vector
-    m_Nodes.erase(m_Nodes.begin() + index);
+    RemoveNodeAndPropertyLists(index);
     // remove node name from combobox
     this->removeItem(index);
   }
@@ -229,7 +203,15 @@ void QmitkDataStorageComboBox::SetNode(int index, const mitk::DataNode *dataNode
 {
   if (this->HasIndex(index))
   {
-    this->InsertNode(index, dataNode);
+    // if node is identical, we only update the name in the QComboBoxItem
+    if (dataNode == m_Nodes.at(index))
+    {
+      this->setItemText(index, QString::fromStdString(dataNode->GetName()));
+    }
+    else
+    {
+      this->InsertNode(index, dataNode);
+    }
   }
 }
 
@@ -274,9 +256,9 @@ void QmitkDataStorageComboBox::OnCurrentIndexChanged(int index)
     emit OnSelectionChanged(nullptr);
 }
 
-void QmitkDataStorageComboBox::SetSelectedNode(mitk::DataNode::Pointer item)
+void QmitkDataStorageComboBox::SetSelectedNode(const mitk::DataNode::Pointer& node)
 {
-  int index = this->Find(item);
+  int index = this->Find(node);
   if (index == -1)
   {
     MITK_INFO << "QmitkDataStorageComboBox: item not available";
@@ -426,6 +408,37 @@ void QmitkDataStorageComboBox::Reset()
       this->AddNode(nodeIt.Value().GetPointer());
     }
   }
+}
+
+void QmitkDataStorageComboBox::RemoveNodeAndPropertyLists(int index)
+{
+  // remove itk::Event observer
+  mitk::DataNode *dataNode = m_Nodes.at(index);
+
+  // remove observer from data node property list
+  mitk::PropertyList* dataNodePropertyList = dataNode->GetPropertyList();
+  if (nullptr != dataNodePropertyList)
+  {
+    dataNodePropertyList->RemoveObserver(m_DataNodePropertyListObserverTags[index]);
+    // remove observer tags from lists
+    m_DataNodePropertyListObserverTags.erase(m_DataNodePropertyListObserverTags.begin() + index);
+  }
+
+  // remove observer from base data property list
+  mitk::BaseData* baseData = dynamic_cast<mitk::BaseData*>(dataNode->GetData());
+  if (nullptr != baseData)
+  {
+    mitk::PropertyList* baseDataPropertyList = baseData->GetPropertyList();
+    if (nullptr != dataNodePropertyList)
+    {
+      baseDataPropertyList->RemoveObserver(m_BaseDatapropertyListObserverTags[index]);
+      // remove observer tags from lists
+      m_BaseDatapropertyListObserverTags.erase(m_BaseDatapropertyListObserverTags.begin() + index);
+    }
+  }
+
+  // remove node from node vector
+  m_Nodes.erase(m_Nodes.begin() + index);
 }
 
 void QmitkDataStorageComboBox::UpdateComboBoxText(const mitk::PropertyList* propertyList)

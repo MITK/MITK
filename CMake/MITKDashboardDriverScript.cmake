@@ -256,7 +256,7 @@ function(run_ctest)
 
           if(exit_code EQUAL 0)
             execute_process(
-              COMMAND ${CTEST_GIT_COMMAND} diff --quiet HEAD FETCH_HEAD)
+              COMMAND ${CTEST_GIT_COMMAND} diff --quiet HEAD FETCH_HEAD
               WORKING_DIRECTORY "${working_dir}"
               RESULT_VARIABLE exit_code)
 

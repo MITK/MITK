@@ -369,7 +369,7 @@ if(MITK_USE_Python)
 
   string(REPLACE "\\" "/" Python3_STDARCH "${Python3_STDARCH}")
   string(REPLACE "\\" "/" Python3_SITELIB "${Python3_SITELIB}")
-  
+
   #find_package(Python3 COMPONENTS NumPy) # does not work, therefore use own script. maybe change later.
   find_package(Numpy REQUIRED)
 endif()
@@ -469,7 +469,7 @@ list(APPEND CTEST_PROJECT_SUBPROJECTS
   MITK-CoreUI
   MITK-IGT
   MITK-ToF
-  MITK-DTI
+  MITK-Diffusion
   MITK-Modules # all modules not contained in a specific subproject
   MITK-Plugins # all plugins not contained in a specific subproject
   MITK-Examples

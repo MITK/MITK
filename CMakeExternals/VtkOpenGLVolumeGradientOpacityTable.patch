@@ -1,0 +1,12 @@
+diff --git a/Rendering/VolumeOpenGL2/vtkOpenGLVolumeGradientOpacityTable.h b/Rendering/VolumeOpenGL2/vtkOpenGLVolumeGradientOpacityTable.h
+--- a/Rendering/VolumeOpenGL2/vtkOpenGLVolumeGradientOpacityTable.h
++++ b/Rendering/VolumeOpenGL2/vtkOpenGLVolumeGradientOpacityTable.h
+@@ -81,7 +81,7 @@
+ 
+     if(gradientOpacity->GetMTime() > this->BuildTime ||
+        this->TextureObject->GetMTime() > this->BuildTime ||
+-       this->LastSampleDistance != sampleDistance ||
++       //this->LastSampleDistance != sampleDistance ||
+        needUpdate || !this->TextureObject->GetHandle())
+     {
+       int const idealW = gradientOpacity->EstimateMinNumberOfSamples(this->LastRange[0],

@@ -148,6 +148,8 @@ public:
   class MITKCORE_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
   {
   public:
+    bool m_RenderedBefore;
+
     /** \brief Actor of a 2D render window. */
     vtkSmartPointer<vtkActor> m_Actor;
 

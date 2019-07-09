@@ -329,7 +329,9 @@ void QmitkRenderWindow::AdjustRenderWindowMenuVisibility(const QPoint& /*pos*/)
 
 void QmitkRenderWindow::HideRenderWindowMenu()
 {
-  // DEPRECATED METHOD
+  if (m_MenuWidget) {
+    m_MenuWidget->hide();
+  }
 }
 
 void QmitkRenderWindow::OnChangeLayoutDesign(int layoutDesignIndex)

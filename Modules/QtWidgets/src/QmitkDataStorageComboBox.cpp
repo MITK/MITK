@@ -443,8 +443,8 @@ void QmitkDataStorageComboBox::RemoveNodeAndPropertyLists(int index)
 
 void QmitkDataStorageComboBox::UpdateComboBoxText(const mitk::PropertyList* propertyList)
 {
-  mitk::PropertyList* dataNodePropertyList;
-  mitk::PropertyList* baseDataPropertyList;
+  mitk::PropertyList* dataNodePropertyList = nullptr;
+  mitk::PropertyList* baseDataPropertyList = nullptr;
   mitk::BaseData* baseData;
   for (const auto& node : m_Nodes)
   {

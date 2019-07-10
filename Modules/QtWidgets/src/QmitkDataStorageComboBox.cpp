@@ -65,14 +65,14 @@ QmitkDataStorageComboBox::~QmitkDataStorageComboBox()
 
 int QmitkDataStorageComboBox::Find(const mitk::DataNode *dataNode) const
 {
-  int index = -1;
+  std::iterator_traits<mitk::DataNode*>::difference_type index = -1;
 
   auto nodeIt = std::find(m_Nodes.begin(), m_Nodes.end(), dataNode);
 
   if (nodeIt != m_Nodes.end())
     index = std::distance(m_Nodes.begin(), nodeIt);
 
-  return index;
+  return static_cast<int>(index);
 }
 
 mitk::DataStorage::Pointer QmitkDataStorageComboBox::GetDataStorage() const

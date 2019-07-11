@@ -174,6 +174,11 @@ void QmitkMxNMultiWidgetEditor::OnSynchronize(bool synchronized)
   m_Impl->m_MxNMultiWidget->Synchronize(synchronized);
 }
 
+void QmitkMxNMultiWidgetEditor::OnInteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme)
+{
+  m_Impl->m_MxNMultiWidget->SetInteractionScheme(scheme);
+}
+
 //////////////////////////////////////////////////////////////////////////
 // PRIVATE
 //////////////////////////////////////////////////////////////////////////
@@ -197,13 +202,17 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
     m_Impl->m_MxNMultiWidget = new QmitkMxNMultiWidget(parent, 0, 0, renderingMode);
 
-    // create left toolbar: interaction scheme toolbar to switch how the render window navigation behaves
+    // create left toolbar: interaction scheme toolbar to switch how the render window navigation behaves in PACS mode
     if (nullptr == m_Impl->m_InteractionSchemeToolBar)
     {
       m_Impl->m_InteractionSchemeToolBar = new QmitkInteractionSchemeToolBar(parent);
       layout->addWidget(m_Impl->m_InteractionSchemeToolBar);
     }
     m_Impl->m_InteractionSchemeToolBar->SetInteractionEventHandler(m_Impl->m_MxNMultiWidget->GetInteractionEventHandler());
+
+    // show / hide PACS mouse mode interaction scheme toolbar
+    bool PACSInteractionScheme = preferences->GetBool("PACS like mouse interaction", false);
+    m_Impl->m_InteractionSchemeToolBar->setVisible(PACSInteractionScheme);
 
     // add center widget: the mxn multi widget
     layout->addWidget(m_Impl->m_MxNMultiWidget);
@@ -242,6 +251,13 @@ void QmitkMxNMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
   // zooming and panning preferences
   bool constrainedZooming = preferences->GetBool("Use constrained zooming and panning", true);
   mitk::RenderingManager::GetInstance()->SetConstrainedPanningZooming(constrainedZooming);
+
+  bool PACSInteractionScheme = preferences->GetBool("PACS like mouse interaction", false);
+  OnInteractionSchemeChanged(PACSInteractionScheme ?
+    mitk::InteractionSchemeSwitcher::PACSStandard :
+    mitk::InteractionSchemeSwitcher::MITKStandard);
+
+  m_Impl->m_InteractionSchemeToolBar->setVisible(PACSInteractionScheme);
 
   mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(GetDataStorage());
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

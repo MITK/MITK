@@ -36,6 +36,11 @@ mitk::InteractionSchemeSwitcher::~InteractionSchemeSwitcher()
 
 void mitk::InteractionSchemeSwitcher::SetInteractionScheme(mitk::InteractionEventHandler* interactionEventHandler, InteractionScheme interactionScheme)
 {
+  if (nullptr == interactionEventHandler)
+  {
+    return;
+  }
+
   switch (interactionScheme)
   {
     // MITK MODE

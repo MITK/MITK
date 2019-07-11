@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // berry
 #include <berryIPartListener.h>
 
+#include <mitkInteractionSchemeSwitcher.h>
+
 #include <memory>
 
 class QmitkMxNMultiWidget;
@@ -96,6 +98,7 @@ private Q_SLOTS:
 
   void OnLayoutSet(int row, int column);
   void OnSynchronize(bool synchronized);
+  void OnInteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme);
 
 private:
   /**

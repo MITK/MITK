@@ -621,6 +621,7 @@ void mitk::ContourModel::InitializeEmpty()
 
   m_SelectedVertex = nullptr;
   this->m_lineInterpolation = ContourModel::LINEAR;
+  this->m_Initialized = true;
 }
 
 

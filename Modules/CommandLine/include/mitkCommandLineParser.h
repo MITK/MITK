@@ -376,7 +376,7 @@ public:
    */
   void changeParameterGroup(std::string name, std::string tooltip);
 
-private:
+protected:
   class ctkInternal;
   ctkInternal *Internal;
 

@@ -433,7 +433,7 @@ map<string, us::Any> mitkCommandLineParser::parseArguments(const StringContainer
     if (!argument.compare("--version"))
     {
       std::cout << "Git commit hash: " << MITK_REVISION << std::endl;
-      std::cout << "Git branch name: " << MITK_REVISION_NAME << std::endl;
+      std::cout << "Git branch name: " << MITK_REVISION_NAME << "\n" << std::endl;
     }
 
     if (!argument.compare("--xml") || !argument.compare("-xml") || !argument.compare("--XML") ||

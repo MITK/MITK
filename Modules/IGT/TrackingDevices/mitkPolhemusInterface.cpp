@@ -51,6 +51,7 @@ bool mitk::PolhemusInterface::SetupDevice()
   pdiMDat.Append(PDI_MODATA_FRAMECOUNT);
   pdiMDat.Append(PDI_MODATA_POS);
   pdiMDat.Append(PDI_MODATA_ORI);
+  pdiMDat.Append(PDI_MODATA_DISTLEV);
   m_pdiDev->SetSDataList(-1, pdiMDat);
 
   CPDIbiterr cBE;
@@ -267,6 +268,7 @@ std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::Pars
 
     PDWORD pFC = (PDWORD)(&pBuf[i]);
     PFLOAT pPno = (PFLOAT)(&pBuf[i + 4]);
+    PINT pDistLevel = (PINT)(&pBuf[i + 28]);
 
     mitk::PolhemusInterface::trackingData currentTrackingData;
 
@@ -281,6 +283,7 @@ std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::Pars
     double rollAngle = pPno[5] / 180 * itk::Math::pi;
     vnl_quaternion<double> eulerQuat(rollAngle, elevationAngle, azimuthAngle);
     currentTrackingData.rot = eulerQuat;
+    currentTrackingData.distortionLevel = *pDistLevel;
 
     returnValue.push_back(currentTrackingData);
     i += shSize;

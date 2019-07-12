@@ -56,6 +56,7 @@ namespace mitk
       mitk::Point3D pos;
       mitk::Quaternion rot;
       BYTE id;
+      int distortionLevel;
     };
 
     /**

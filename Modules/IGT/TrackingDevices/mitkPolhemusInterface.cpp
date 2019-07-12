@@ -288,7 +288,7 @@ std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::Pars
   return returnValue;
 }
 
-void mitk::PolhemusInterface::SetHemisphereTrackingEnabled(bool _HeisphereTrackingEnabeled, int _tool)
+void mitk::PolhemusInterface::SetHemisphereTrackingEnabled(bool _HemisphereTrackingEnabled, int _tool)
 {
   //only if connection is ready!
   if (!this->m_pdiDev->CnxReady())
@@ -300,8 +300,8 @@ void mitk::PolhemusInterface::SetHemisphereTrackingEnabled(bool _HeisphereTracki
   }
 
   //HemisphereTracking is switched on by SetSHemiTrack(-1). "-1" means for all sensors.
-  //To switch heisphere tracking of, you need to set a hemisphere vector e.g. by calling SetSHemisphere(-1, { (float)1,0,0 })
-  if (_HeisphereTrackingEnabeled)
+  //To switch hemisphere tracking off, you need to set a hemisphere vector e.g. by calling SetSHemisphere(-1, { (float)1,0,0 })
+  if (_HemisphereTrackingEnabled)
   {
     m_pdiDev->SetSHemiTrack(_tool);
     if (_tool != -1)

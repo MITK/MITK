@@ -90,7 +90,7 @@ public:
   QWidget* getShadowWidget2() const;
   QWidget* getShadowWidget3() const;
   QWidget* getShadowWidget4() const;
-  
+
   void setDisplayPositionText(bool draw = true);
 
   /**

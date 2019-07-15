@@ -2393,13 +2393,43 @@ void QmitkStdMultiWidget::SetDecorationColor(unsigned int widgetNumber, mitk::Co
 
 void QmitkStdMultiWidget::ResetCrosshair()
 {
-  if (m_DataStorage.IsNotNull())
-  {
-    m_RenderingManager->InitializeViewsByBoundingObjects(m_DataStorage);
-    //m_RenderingManager->InitializeViews( m_DataStorage->ComputeVisibleBoundingGeometry3D() );
-    // reset interactor to normal slicing
-    this->SetWidgetPlaneMode(PLANE_MODE_SLICING);
+  if (m_DataStorage.IsNull()) {
+    return;
   }
+
+  // Get currently selected serie
+  mitk::BoolProperty::Pointer selProperty(mitk::BoolProperty::New(true));
+  mitk::NodePredicateProperty::Pointer selPredicate = mitk::NodePredicateProperty::New("series_selected", selProperty);
+  mitk::DataStorage::SetOfObjects::ConstPointer selNodes = m_DataStorage->GetSubset(selPredicate);
+  mitk::DataNode* selNode = nullptr;
+  if (selNodes->size() > 0) {
+    selNode = selNodes->at(0);
+  }
+
+  if (selNode == nullptr) {
+    // No series. Try to fallback at segmentation geometries
+    mitk::BoolProperty::Pointer selProperty(mitk::BoolProperty::New(true));
+    mitk::NodePredicateProperty::Pointer selPredicate = mitk::NodePredicateProperty::New("selected", selProperty);
+    mitk::DataStorage::SetOfObjects::ConstPointer selNodes = m_DataStorage->GetSubset(selPredicate);
+    if (selNodes->size() > 0) {
+      selNode = selNodes->at(0);
+    }
+  }
+
+  if (selNode != nullptr) {
+    mitk::BaseData::Pointer baseData = selNode->GetData();
+    if (!baseData.IsNotNull() || !baseData->GetTimeGeometry()->IsValid()) {
+      return;
+    }
+
+    m_RenderingManager->InitializeViews(baseData->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+  } else {
+    // No selected segmentations. Can't decide on geometry to reset to. Do global reinit
+    m_RenderingManager->InitializeViewsByBoundingObjects(m_DataStorage);
+  }
+
+  // Reset interactor to normal slicing
+  this->SetWidgetPlaneMode(PLANE_MODE_SLICING);
 
   ResetTransformation(this->GetRenderWindow1()->GetRenderer());
   ResetTransformation(this->GetRenderWindow2()->GetRenderer());
@@ -2586,7 +2616,7 @@ void QmitkStdMultiWidget::setShadowWidget1Visible(bool visible) const
       (!visible && m_ShadowWidgets[0]->isVisible())) {
     m_ShadowWidgets[0]->setVisible(visible);
     mitkWidget1->setVisible(!visible);
-  } 
+  }
 
   m_ShadowWidgetVisible[0] = visible;
 }

@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "MitkQtWidgetsExports.h"
 
+#include <mitkInteractionSchemeSwitcher.h>
 #include <QToolBar>
 
 // mitk qtwidgets
@@ -42,11 +43,13 @@ Q_SIGNALS:
 
   void LayoutSet(int row, int column);
   void Synchronized(bool synchronized);
+  void InteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme);
 
 protected Q_SLOTS:
 
   void OnSetLayout();
   void OnSynchronize();
+  void OnInteractionSchemeChanged();
 
 private:
 
@@ -54,6 +57,7 @@ private:
   void AddButtons();
 
   QAction* m_SynchronizeAction;
+  QAction* m_InteractionSchemeChangeAction;
 
   QmitkMultiWidgetLayoutSelectionWidget* m_LayoutSelectionPopup;
 

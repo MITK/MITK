@@ -176,6 +176,15 @@ void QmitkMxNMultiWidgetEditor::OnSynchronize(bool synchronized)
 
 void QmitkMxNMultiWidgetEditor::OnInteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme)
 {
+  if (mitk::InteractionSchemeSwitcher::PACSStandard == scheme)
+  {
+    m_Impl->m_InteractionSchemeToolBar->setVisible(true);
+  }
+  else
+  {
+    m_Impl->m_InteractionSchemeToolBar->setVisible(false);
+  }
+
   m_Impl->m_MxNMultiWidget->SetInteractionScheme(scheme);
 }
 
@@ -229,6 +238,7 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
     connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::LayoutSet, this, &QmitkMxNMultiWidgetEditor::OnLayoutSet);
     connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::Synchronized, this, &QmitkMxNMultiWidgetEditor::OnSynchronize);
+    connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::InteractionSchemeChanged, this, &QmitkMxNMultiWidgetEditor::OnInteractionSchemeChanged);
 
     m_Impl->m_MultiWidgetDecorationManager = std::make_unique<QmitkMultiWidgetDecorationManager>(m_Impl->m_MxNMultiWidget);
 
@@ -256,8 +266,6 @@ void QmitkMxNMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
   OnInteractionSchemeChanged(PACSInteractionScheme ?
     mitk::InteractionSchemeSwitcher::PACSStandard :
     mitk::InteractionSchemeSwitcher::MITKStandard);
-
-  m_Impl->m_InteractionSchemeToolBar->setVisible(PACSInteractionScheme);
 
   mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(GetDataStorage());
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

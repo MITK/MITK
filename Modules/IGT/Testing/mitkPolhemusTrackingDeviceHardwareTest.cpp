@@ -54,7 +54,7 @@ public:
       MITK_INFO << "Frame " << i;
       for (size_t j = 0; j < lastFrame.size(); j++)
       {
-        MITK_INFO << "[" << j << "]" << " Pos:" << lastFrame.at(j).pos << " Rot:" << lastFrame.at(j).rot;
+        MITK_INFO << "[" << j << "]" << " Pos: " << lastFrame.at(j).pos << " Rot: " << lastFrame.at(j).rot << " DistortionLevel: " << lastFrame.at(j).distortionLevel;
       }
     }
 

@@ -159,7 +159,7 @@ public:
 
     m_Service
       ->SendJSONRequest(
-        U("https://jsonplaceholder.typicode.com/posts/1"), mitk::IRESTManager::RequestType::Put, &web::json::value())
+        U("https://jsonplaceholder.typicode.com/posts/1"), mitk::IRESTManager::RequestType::Put)
       .then([&](pplx::task<web::json::value> resultTask) {
         try
         {

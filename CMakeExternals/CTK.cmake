@@ -22,7 +22,7 @@ if(MITK_USE_CTK)
       list(APPEND ctk_optional_cache_args
            -DCTK_LIB_Scripting/Python/Widgets:BOOL=ON
            -DCTK_ENABLE_Python_Wrapping:BOOL=OFF
-           -DCTK_APP_ctkSimplePythonShell:BOOL=ON
+           -DCTK_APP_ctkSimplePythonShell:BOOL=OFF
            "-DPYTHON_EXECUTABLE:FILEPATH=${Python3_EXECUTABLE}"
            "-DPYTHON_INCLUDE_DIR:PATH=${Python3_INCLUDE_DIR}"
            "-DPYTHON_LIBRARY:FILEPATH=${Python3_LIBRARY}"
@@ -84,7 +84,7 @@ if(MITK_USE_CTK)
         -DCTK_PLUGIN_org.commontk.configadmin:BOOL=ON
         -DCTK_USE_GIT_PROTOCOL:BOOL=OFF
         -DDCMTK_DIR:PATH=${DCMTK_DIR}
-        -DPythonQt_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/PythonQt_fae23012.tar.gz # From https://github.com/kislinsk/PythonQt.git
+        -DPythonQt_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/PythonQt_fae23012.tar.gz
         ${${proj}_CUSTOM_CMAKE_ARGS}
       CMAKE_CACHE_ARGS
         ${ep_common_cache_args}

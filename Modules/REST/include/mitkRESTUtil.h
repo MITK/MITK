@@ -19,12 +19,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkRESTExports.h>
 #include <cpprest/asyncrt_utils.h>
+#include <map>
+
 
 namespace mitk
 {
   class MITKREST_EXPORT RESTUtil
   {
   public:
+
+    typedef std::map<utility::string_t, utility::string_t> ParamMap;
+
     /**
      * @brief Converts the given std::wstring into a std::string representation
      */

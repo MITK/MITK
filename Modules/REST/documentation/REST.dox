@@ -88,7 +88,7 @@ The following example shows how to send requests from a client perspective:
     {
       //Call the send request method which starts the actual request
       managerService
-        ->SendRequest(_XPLATSTR("https://jsonplaceholder.typicode.com/posts/1"))
+        ->SendRequest(U("https://jsonplaceholder.typicode.com/posts/1"))
         .then([=](pplx::task<web::json::value> resultTask)/*It is important to use task-based continuation*/ {
           try
           {

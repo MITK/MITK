@@ -18,9 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkIRESTObserver_h
 
 #include <MitkRESTExports.h>
-
+#include <mitkRESTUtil.h>
 #include <cpprest/json.h>
 #include <cpprest/uri.h>
+#include <cpprest/http_client.h>
 
 namespace mitk
 {
@@ -38,9 +39,13 @@ namespace mitk
      * @brief Called if there's an incoming request for the observer, observer implements how to handle request
      *
      * @param data the data of the incoming request
+	 * @param method the http method of the incoming request
      * @return the modified data
      */
-    virtual web::json::value Notify(const web::uri &uri, const web::json::value &data) = 0;
+    virtual web::http::http_response Notify(const web::uri &uri,
+                                            const web::json::value &data,
+                                            const web::http::method &method,
+                                            const mitk::RESTUtil::ParamMap &headers) = 0;
 
 
   private:

@@ -629,7 +629,21 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
   }
 
   data->UpdateOutputInformation();
-  GenerateDataForRenderer( renderer );
+
+  const DataNode* node = this->GetDataNode();
+  LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
+
+  // Check if something important has changed and we need to rerender
+  if ((localStorage->m_LastUpdateTime < node->GetMTime()) ||
+      (localStorage->m_LastUpdateTime < data->GetPipelineMTime()) ||
+      (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometryUpdateTime()) ||
+      (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime()) ||
+      (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) ||
+      (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) ||
+      (localStorage->m_LastUpdateTime < data->GetPropertyList()->GetMTime())) {
+    GenerateDataForRenderer(renderer);
+  }
+
 
   // since we have checked that nothing important has changed, we can set
   // m_LastUpdateTime to the current time

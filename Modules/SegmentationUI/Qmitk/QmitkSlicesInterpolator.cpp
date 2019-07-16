@@ -439,6 +439,12 @@ void QmitkSlicesInterpolator::OnInterpolationMethodChanged(int index)
       this->On3DInterpolationActivated(false);
       this->Show3DInterpolationResult(false);
       m_Interpolator->Activate2DInterpolation(false);
+
+      if (m_DataStorage->Exists(m_3DContourNode))
+        m_DataStorage->Remove(m_3DContourNode);
+      if (m_DataStorage->Exists(m_InterpolatedSurfaceNode))
+        m_DataStorage->Remove(m_InterpolatedSurfaceNode);
+
       break;
 
     case 1: // 2D
@@ -876,6 +882,24 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
     segSurface->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(true));
     segSurface->SetProperty( "3DInterpolationResult", mitk::BoolProperty::New(true));
     segSurface->SetVisibility(false);
+
+    // Remove current 3D model
+    mitk::DataNode::Pointer previousModel = nullptr;
+    mitk::Surface::Pointer previousSurface = nullptr;
+    auto childs = m_DataStorage->GetDerivations(segmentationNode);
+    for (const auto& children : *childs) {
+      previousSurface = dynamic_cast<mitk::Surface*>(children->GetData());
+      if (previousSurface != nullptr) {
+        previousModel = children;
+        break;
+      }
+    }
+
+    if (previousModel) {
+      m_DataStorage->Remove(previousModel);
+    }
+
+    // Add new 3D model
     m_DataStorage->Add(segSurface, segmentationNode);
     this->Show3DInterpolationResult(false);
     emit SignalCreated3dInterpolation();

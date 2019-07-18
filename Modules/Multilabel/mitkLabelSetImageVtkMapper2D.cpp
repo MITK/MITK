@@ -558,7 +558,8 @@ void mitk::LabelSetImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
     localStorage->m_LastDataUpdateTime.Modified();
   }
   else if ( (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
-            || (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
+            || (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList(renderer)->GetMTime())
+            || (localStorage->m_LastPropertyUpdateTime < image->GetPropertyList()->GetMTime()))
   {
 
     // The previous update was interrupted because of no intersection between image and world geometry

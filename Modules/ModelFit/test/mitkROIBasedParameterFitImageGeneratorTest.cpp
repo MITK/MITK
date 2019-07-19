@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkLevenbergMarquardtModelFitFunctor.h"
 
-#include "mitkTestArtifactGenerator.h"
+#include "mitkTestDynamicImageGenerator.h"
 
 int mitkROIBasedParameterFitImageGeneratorTest(int  /*argc*/, char*[] /*argv[]*/)
 {

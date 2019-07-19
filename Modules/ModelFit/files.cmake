@@ -57,7 +57,7 @@ set(CPP_FILES
   Models/mitkT2DecayModel.cpp
   Models/mitkT2DecayModelFactory.cpp
   Models/mitkT2DecayModelParameterizer.cpp  
-  TestingHelper/mitkTestArtifactGenerator.cpp
+  TestingHelper/mitkTestDynamicImageGenerator.cpp
   TestingHelper/mitkTestModel.cpp
   TestingHelper/mitkTestModelFactory.cpp
 )

@@ -444,49 +444,70 @@ mitk::DataNode::Pointer QmitkImageStatisticsView::GetNodeForStatisticsContainer(
   mitkThrow() << "No DataNode is found which holds the given statistics container!";
 }
 
+void QmitkImageStatisticsView::HandleExistingStatistics(mitk::Image::ConstPointer image,
+                                                        mitk::BaseData::ConstPointer mask,
+                                                        mitk::ImageStatisticsContainer::Pointer statistic)
+{
+  auto imageStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(
+    this->GetDataStorage(), image, mask);
+
+  // if statistics base data already exist: add to existing node
+  if (imageStatistics)
+  {
+    auto node = GetNodeForStatisticsContainer(imageStatistics);
+    node->SetData(statistic);
+  }
+  // statistics base data does not exist: add new node
+  else
+  {
+    auto statisticsNodeName = GenerateStatisticsNodeName(m_selectedImageNode, m_selectedMaskNode);
+    auto statisticsNode = mitk::CreateImageStatisticsNode(statistic, statisticsNodeName);
+    this->GetDataStorage()->Add(statisticsNode);
+  }
+}
+
+void QmitkImageStatisticsView::SetupRelationRules(mitk::ImageStatisticsContainer::Pointer statistic,
+                                                  mitk::BaseData::ConstPointer mask)
+{
+  auto imageRule = mitk::StatisticsToImageRelationRule::New();
+  imageRule->Connect(statistic, m_CalculationJob->GetStatisticsImage());
+
+  if (mask)
+  {
+    auto maskRule = mitk::StatisticsToMaskRelationRule::New();
+    maskRule->Connect(statistic, mask);
+  }
+}
+
 void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
 {
   mitk::StatusBar::GetInstance()->Clear();
 
   auto image = m_CalculationJob->GetStatisticsImage();
 
-  if (this->m_CalculationJob->GetStatisticsUpdateSuccessFlag())
+  // get mask
+  mitk::BaseData::ConstPointer mask = nullptr;
+  if (m_CalculationJob->GetMaskImage())
+  {
+    mask = m_CalculationJob->GetMaskImage();
+  }
+  else if (m_CalculationJob->GetPlanarFigure())
+  {
+    mask = m_CalculationJob->GetPlanarFigure();
+  }
+
+  // get current statistics
+  auto currentImageStatistics =
+    mitk::ImageStatisticsContainerManager::GetImageStatistics(this->GetDataStorage(), image, mask);
+
+  if (this->m_CalculationJob->GetStatisticsUpdateSuccessFlag()) // case: calculation was successfull
   {
     auto statistic = m_CalculationJob->GetStatisticsData();
 
-    mitk::BaseData::ConstPointer mask = nullptr;
-    auto imageRule = mitk::StatisticsToImageRelationRule::New();
-    imageRule->Connect(statistic, image);
+    SetupRelationRules(statistic, mask);
 
-    if (m_CalculationJob->GetMaskImage())
-    {
-      auto maskRule = mitk::StatisticsToMaskRelationRule::New();
-      mask = m_CalculationJob->GetMaskImage();
-      maskRule->Connect(statistic, mask);
-    }
-    else if (m_CalculationJob->GetPlanarFigure())
-    {
-      auto planarFigureRule = mitk::StatisticsToMaskRelationRule::New();
-      mask = m_CalculationJob->GetPlanarFigure();
-      planarFigureRule->Connect(statistic, mask);
-    }
-
-    auto imageStatistics =
-      mitk::ImageStatisticsContainerManager::GetImageStatistics(this->GetDataStorage(), image, mask);
-
-    // if statistics base data already exist: add to existing node
-    if (imageStatistics)
-    {
-      auto node = GetNodeForStatisticsContainer(imageStatistics);
-      node->SetData(statistic);
-    }
-    // statistics base data does not exist: add new node
-    else
-    {
-      auto statisticsNodeName = GenerateStatisticsNodeName(m_selectedImageNode, m_selectedMaskNode);
-      auto statisticsNode = mitk::CreateImageStatisticsNode(statistic, statisticsNodeName);
-      this->GetDataStorage()->Add(statisticsNode);
-    }
+    // checks for existing statistic, and add it to data manager
+    HandleExistingStatistics(image, mask, statistic);
 
     if (!m_selectedPlanarFigure || m_selectedPlanarFigure->IsClosed())
     {
@@ -495,13 +516,15 @@ void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
   }
   else // case: calculation was not successfull
   {
-    // handle histogramm
+    // handle histogram
     HistogramType::ConstPointer emptyHistogram = HistogramType::New();
     this->FillHistogramWidget({emptyHistogram}, {m_selectedImageNode->GetName()});
 
     // handle statistics
     mitk::ImageStatisticsContainer::Pointer statistic = mitk::ImageStatisticsContainer::New();
     statistic->SetTimeGeometry(const_cast<mitk::TimeGeometry *>(image->GetTimeGeometry()));
+
+	// add empty histogram to stastistics for all timesteps
     for (unsigned int i = 0; i < image->GetTimeSteps(); ++i)
     {
       auto statisticObject = mitk::ImageStatisticsContainer::ImageStatisticsObject();
@@ -509,38 +532,9 @@ void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
       statistic->SetStatisticsForTimeStep(i, statisticObject);
     }
 
-    auto imageRule = mitk::StatisticsToImageRelationRule::New();
-    imageRule->Connect(statistic, image);
-    // get mask
-    mitk::BaseData::ConstPointer mask = nullptr;
-    if (m_CalculationJob->GetMaskImage())
-    {
-      mask = m_CalculationJob->GetMaskImage();
-    }
-    else if (m_CalculationJob->GetPlanarFigure())
-    {
-      mask = m_CalculationJob->GetPlanarFigure();
-    }
+    SetupRelationRules(statistic, mask);
 
-    auto maskRule = mitk::StatisticsToMaskRelationRule::New();
-    maskRule->Connect(statistic, mask);
-
-    auto imageStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(
-      this->GetDataStorage(), image, mask); // TODO: maybe with mask
-
-    // if statistics base data already exist: add to existing node
-    if (imageStatistics)
-    {
-      auto node = GetNodeForStatisticsContainer(imageStatistics);
-      node->SetData(statistic);
-    }
-    // statistics base data does not exist: add new node
-    else
-    {
-      auto statisticsNodeName = GenerateStatisticsNodeName(m_selectedImageNode, m_selectedMaskNode);
-      auto statisticsNode = mitk::CreateImageStatisticsNode(statistic, statisticsNodeName);
-      this->GetDataStorage()->Add(statisticsNode);
-    }
+    HandleExistingStatistics(image, mask, statistic);
 
     mitk::StatusBar::GetInstance()->DisplayErrorText(m_CalculationJob->GetLastErrorMessage().c_str());
     m_Controls.widget_histogram->setEnabled(false);

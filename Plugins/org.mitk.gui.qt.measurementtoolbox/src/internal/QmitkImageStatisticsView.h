@@ -104,7 +104,15 @@ protected:
 private:
 
   std::string GenerateStatisticsNodeName(mitk::DataNode::ConstPointer image, mitk::DataNode::ConstPointer mask);
+
+  void HandleExistingStatistics(mitk::Image::ConstPointer image,
+                                mitk::BaseData::ConstPointer mask,
+                                mitk::ImageStatisticsContainer::Pointer);
+
+  void SetupRelationRules(mitk::ImageStatisticsContainer::Pointer, mitk::BaseData::ConstPointer mask);
+
   mitk::DataNode::Pointer GetNodeForStatisticsContainer(mitk::ImageStatisticsContainer::ConstPointer container);
+
   typedef itk::SimpleMemberCommand< QmitkImageStatisticsView > ITKCommandType;
   QmitkImageStatisticsCalculationJob * m_CalculationJob = nullptr;
   mitk::DataNode::ConstPointer m_selectedImageNode = nullptr, m_selectedMaskNode = nullptr;

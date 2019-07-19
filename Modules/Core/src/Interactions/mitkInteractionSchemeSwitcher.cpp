@@ -17,11 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkInteractionSchemeSwitcher.h"
 
 // us
-#include "usGetModuleContext.h"
-#include "usModuleContext.h"
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
 
 // mitk core
-#include "mitkInteractionEventObserver.h"
+#include <mitkInteractionEventObserver.h>
 #include <mitkExceptionMacro.h>
 
 mitk::InteractionSchemeSwitcher::InteractionSchemeSwitcher()
@@ -94,6 +94,10 @@ void mitk::InteractionSchemeSwitcher::SetInteractionScheme(mitk::InteractionEven
       interactionEventHandler->SetEventConfig("DisplayConfigPACS.xml");
       interactionEventHandler->AddEventConfig("DisplayConfigPACSZoom.xml");
       break;
+    }
+    default:
+    {
+      interactionEventHandler->SetEventConfig("DisplayConfigMITK.xml");
     }
   }
 

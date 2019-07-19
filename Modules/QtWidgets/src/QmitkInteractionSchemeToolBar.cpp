@@ -45,9 +45,13 @@ void QmitkInteractionSchemeToolBar::SetInteractionEventHandler(mitk::Interaction
   }
 
   m_InteractionEventHandler = interactionEventHandler;
-  if (nullptr != m_InteractionEventHandler)
+  try
   {
     m_InteractionSchemeSwitcher->SetInteractionScheme(m_InteractionEventHandler, InteractionScheme::PACSStandard);
+  }
+  catch (const mitk::Exception&)
+  {
+    return;
   }
 }
 
@@ -74,9 +78,13 @@ void QmitkInteractionSchemeToolBar::OnInteractionSchemeChanged()
   {
     InteractionScheme interactionScheme = static_cast<InteractionScheme>(action->data().toInt());
 
-    if (m_InteractionEventHandler)
+    try
     {
       m_InteractionSchemeSwitcher->SetInteractionScheme(m_InteractionEventHandler, interactionScheme);
+    }
+    catch (const mitk::Exception&)
+    {
+      return;
     }
   }
 }

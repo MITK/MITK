@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk core
 #include "mitkInteractionEventObserver.h"
+#include <mitkExceptionMacro.h>
 
 mitk::InteractionSchemeSwitcher::InteractionSchemeSwitcher()
   : m_InteractionScheme(MITKStandard)
@@ -38,7 +39,7 @@ void mitk::InteractionSchemeSwitcher::SetInteractionScheme(mitk::InteractionEven
 {
   if (nullptr == interactionEventHandler)
   {
-    return;
+    mitkThrow() << "Not a valid interaction event handler to set the interaction scheme.";
   }
 
   switch (interactionScheme)

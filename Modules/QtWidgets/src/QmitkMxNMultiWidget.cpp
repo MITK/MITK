@@ -163,7 +163,14 @@ void QmitkMxNMultiWidget::SetInteractionScheme(mitk::InteractionSchemeSwitcher::
 {
   auto interactionSchemeSwitcher = mitk::InteractionSchemeSwitcher::New();
   auto interactionEventHandler = GetInteractionEventHandler();
-  interactionSchemeSwitcher->SetInteractionScheme(interactionEventHandler, scheme);
+  try
+  {
+    interactionSchemeSwitcher->SetInteractionScheme(interactionEventHandler, scheme);
+  }
+  catch (const mitk::Exception&)
+  {
+    return;
+  }
 }
 
 QmitkMxNMultiWidget::RenderWindowWidgetMap QmitkMxNMultiWidget::GetRenderWindowWidgets() const

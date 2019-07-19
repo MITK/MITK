@@ -48,14 +48,23 @@ std::vector<std::string> mitk::LookupTable::typenameList = {
   "PET 20"
 };
 
-mitk::LookupTable::LookupTable() : m_Window(0.0), m_Level(0.0), m_Opacity(1.0), m_Type(mitk::LookupTable::GRAYSCALE)
+mitk::LookupTable::LookupTable()
+  : m_LookupTable(vtkSmartPointer<vtkLookupTable>::New())
+  , m_Window(0.0)
+  , m_Level(0.0)
+  , m_Opacity(1.0)
+  , m_Type(mitk::LookupTable::GRAYSCALE)
 {
-  m_LookupTable = vtkSmartPointer<vtkLookupTable>::New();
   this->BuildGrayScaleLookupTable();
 }
 
 mitk::LookupTable::LookupTable(const LookupTable &other)
-  : itk::DataObject(), m_LookupTable(vtkSmartPointer<vtkLookupTable>::New())
+  : itk::DataObject()
+  , m_LookupTable(vtkSmartPointer<vtkLookupTable>::New())
+  , m_Window(other.m_Window)
+  , m_Level(other.m_Level)
+  , m_Opacity(other.m_Opacity)
+  , m_Type(other.m_Type)
 {
   m_LookupTable->DeepCopy(other.m_LookupTable);
 }
@@ -140,7 +149,6 @@ void mitk::LookupTable::SetType(const std::string &typeName)
     {
       this->SetType(static_cast<mitk::LookupTable::LookupTableType>(i));
     }
-
   }
 }
 

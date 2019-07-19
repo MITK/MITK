@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataStorage.h>
 #include <mitkDisplayActionEventBroadcast.h>
 #include <mitkDisplayActionEventHandler.h>
+#include <mitkInteractionSchemeSwitcher.h>
 
 // qt
 #include <QWidget>
@@ -78,6 +79,7 @@ public:
 
   void ResetLayout(int row, int column);
   void Synchronize(bool synchronized);
+  void SetInteractionScheme(mitk::InteractionSchemeSwitcher::InteractionScheme scheme);
 
   RenderWindowWidgetMap GetRenderWindowWidgets() const;
   RenderWindowWidgetPointer GetRenderWindowWidget(int row, int column) const;

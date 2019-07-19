@@ -45,15 +45,19 @@ void QmitkMultiWidgetConfigurationToolBar::AddButtons()
 {
   QAction* setLayoutAction = new QAction(QIcon(":/Qmitk/mwLayout.png"), tr("Set multi widget layout"), this);
   connect(setLayoutAction, &QAction::triggered, this, &QmitkMultiWidgetConfigurationToolBar::OnSetLayout);
-
   QToolBar::addAction(setLayoutAction);
 
   m_SynchronizeAction = new QAction(QIcon(":/Qmitk/mwSynchronized.png"), tr("Desynchronize render windows"), this);
   m_SynchronizeAction->setCheckable(true);
   m_SynchronizeAction->setChecked(true);
   connect(m_SynchronizeAction, &QAction::triggered, this, &QmitkMultiWidgetConfigurationToolBar::OnSynchronize);
-
   QToolBar::addAction(m_SynchronizeAction);
+
+  m_InteractionSchemeChangeAction = new QAction(QIcon(":/Qmitk/mwMITK.png"), tr("Change to PACS interaction"), this);
+  m_InteractionSchemeChangeAction->setCheckable(true);
+  m_InteractionSchemeChangeAction->setChecked(false);
+  connect(m_InteractionSchemeChangeAction, &QAction::triggered, this, &QmitkMultiWidgetConfigurationToolBar::OnInteractionSchemeChanged);
+  QToolBar::addAction(m_InteractionSchemeChangeAction);
 }
 
 void QmitkMultiWidgetConfigurationToolBar::OnSetLayout()
@@ -79,4 +83,23 @@ void QmitkMultiWidgetConfigurationToolBar::OnSynchronize()
 
   m_SynchronizeAction->setChecked(synchronized);
   emit Synchronized(synchronized);
+}
+
+void QmitkMultiWidgetConfigurationToolBar::OnInteractionSchemeChanged()
+{
+  bool PACSInteractionScheme = m_InteractionSchemeChangeAction->isChecked();
+  if (PACSInteractionScheme)
+  {
+    m_InteractionSchemeChangeAction->setIcon(QIcon(":/Qmitk/mwPACS.png"));
+    m_InteractionSchemeChangeAction->setText(tr("Change to MITK interaction"));
+    emit InteractionSchemeChanged(mitk::InteractionSchemeSwitcher::PACSStandard);
+  }
+  else
+  {
+    m_InteractionSchemeChangeAction->setIcon(QIcon(":/Qmitk/mwMITK.png"));
+    m_InteractionSchemeChangeAction->setText(tr("Change to PACS interaction"));
+    emit InteractionSchemeChanged(mitk::InteractionSchemeSwitcher::MITKStandard);
+  }
+
+  m_InteractionSchemeChangeAction->setChecked(PACSInteractionScheme);
 }

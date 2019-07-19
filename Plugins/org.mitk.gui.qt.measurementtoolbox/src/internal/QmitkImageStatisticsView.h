@@ -103,7 +103,7 @@ protected:
 
 private:
 
-  std::string GenerateStatisticsNodeName(mitk::DataNode::ConstPointer image, mitk::DataNode::ConstPointer mask);
+  std::string GenerateStatisticsNodeName();
 
   void HandleExistingStatistics(mitk::Image::ConstPointer image,
                                 mitk::BaseData::ConstPointer mask,

@@ -411,8 +411,7 @@ void QmitkImageStatisticsView::ResetGUIDefault()
   m_Controls.checkBox_ignoreZero->setChecked(false);
 }
 
-std::string QmitkImageStatisticsView::GenerateStatisticsNodeName(mitk::DataNode::ConstPointer image,
-                                                                 mitk::DataNode::ConstPointer mask)
+std::string QmitkImageStatisticsView::GenerateStatisticsNodeName()
 {
   auto statisticsNodeName = m_selectedImageNode->GetName();
   if (m_selectedMaskNode)
@@ -460,7 +459,7 @@ void QmitkImageStatisticsView::HandleExistingStatistics(mitk::Image::ConstPointe
   // statistics base data does not exist: add new node
   else
   {
-    auto statisticsNodeName = GenerateStatisticsNodeName(m_selectedImageNode, m_selectedMaskNode);
+    auto statisticsNodeName = GenerateStatisticsNodeName();
     auto statisticsNode = mitk::CreateImageStatisticsNode(statistic, statisticsNodeName);
     this->GetDataStorage()->Add(statisticsNode);
   }
@@ -517,7 +516,7 @@ void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
   else // case: calculation was not successfull
   {
     // handle histogram
-    HistogramType::ConstPointer emptyHistogram = HistogramType::New();
+    const HistogramType* emptyHistogram = HistogramType::New();
     this->FillHistogramWidget({emptyHistogram}, {m_selectedImageNode->GetName()});
 
     // handle statistics

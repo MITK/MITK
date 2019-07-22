@@ -263,9 +263,7 @@ namespace mitk
     vtkSmartPointer<vtkLookupTable> m_LookupTable;
 
     float m_Window;
-
     float m_Level;
-
     float m_Opacity;
 
     LookupTableType m_Type;

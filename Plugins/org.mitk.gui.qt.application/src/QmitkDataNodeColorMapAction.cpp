@@ -117,7 +117,7 @@ void QmitkDataNodeColorMapAction::OnActionTriggered(bool /*checked*/)
       continue;
     }
 
-    mitk::LookupTable::Pointer renderWindowSpecificLutTab = lookupTable->Clone();
+    mitk::LookupTable::Pointer renderWindowSpecificLuT = lookupTable->Clone();
 
     QAction* senderAction = qobject_cast<QAction*>(QObject::sender());
     if (nullptr == senderAction)
@@ -127,8 +127,8 @@ void QmitkDataNodeColorMapAction::OnActionTriggered(bool /*checked*/)
 
     // set lookup table type defined by the action string
     std::string activatedItem = senderAction->text().toStdString();
-    renderWindowSpecificLutTab->SetType(activatedItem);
-    dataNode->SetProperty("LookupTable", mitk::LookupTableProperty::New(renderWindowSpecificLutTab), baseRenderer);
+    renderWindowSpecificLuT->SetType(activatedItem);
+    dataNode->SetProperty("LookupTable", mitk::LookupTableProperty::New(renderWindowSpecificLuT), baseRenderer);
 
     if (mitk::LookupTable::LookupTableType::MULTILABEL == lookupTable->GetActiveType())
     {

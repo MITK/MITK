@@ -159,6 +159,20 @@ void QmitkMxNMultiWidget::Synchronize(bool synchronized)
   m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplaySetLevelWindowEvent(nullptr, mitk::ScalarType(), mitk::ScalarType()), actionFunction);
 }
 
+void QmitkMxNMultiWidget::SetInteractionScheme(mitk::InteractionSchemeSwitcher::InteractionScheme scheme)
+{
+  auto interactionSchemeSwitcher = mitk::InteractionSchemeSwitcher::New();
+  auto interactionEventHandler = GetInteractionEventHandler();
+  try
+  {
+    interactionSchemeSwitcher->SetInteractionScheme(interactionEventHandler, scheme);
+  }
+  catch (const mitk::Exception&)
+  {
+    return;
+  }
+}
+
 QmitkMxNMultiWidget::RenderWindowWidgetMap QmitkMxNMultiWidget::GetRenderWindowWidgets() const
 {
   return m_RenderWindowWidgets;
@@ -359,7 +373,7 @@ void QmitkMxNMultiWidget::InitializeDisplayActionEventHandling()
 {
   m_DisplayActionEventBroadcast = mitk::DisplayActionEventBroadcast::New();
   m_DisplayActionEventBroadcast->LoadStateMachine("DisplayInteraction.xml");
-  m_DisplayActionEventBroadcast->SetEventConfig("DisplayConfigPACS.xml");
+  m_DisplayActionEventBroadcast->SetEventConfig("DisplayConfigMITK.xml");
 
   m_DisplayActionEventHandler = std::make_unique<mitk::DisplayActionEventHandler>();
   m_DisplayActionEventHandler->SetObservableBroadcast(m_DisplayActionEventBroadcast);

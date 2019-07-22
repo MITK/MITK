@@ -90,10 +90,24 @@ namespace mitk
 
     /**
     * @brief Set the current interaction scheme of the given interaction event handler
+    *
+    *        The interaction event handler is able to accept xml-configuration files that will define the interaction scheme.
+    *        Based on the given interaction scheme different configuration files are loaded into the interaction event handler.
+    *        The interaction scheme can be a variant of the MITK-mouse mode or the PACS-mouse mode (see 'enum InteractionScheme').
+    *        The default is 'MITKStandard'.
+    *        If the interaction scheme has been changed, an 'InteractionSchemeChangedEvent' will be invoked.
+    *
+    * @pre    The interaction event handler has to be valid (!nullptr).
+    * @throw  mitk::Exception, if the interaction event handler is invalid (==nullptr).
+    *
+    * @param interactionEventHandler  The interaction event handler that defines the interaction scheme via configuration files
+    * @param interactionScheme        The interaction scheme that should be used for the currently active interaction event handler.
     */
     void SetInteractionScheme(mitk::InteractionEventHandler* interactionEventHandler, InteractionScheme interactionScheme);
     /**
     * @brief Return the current interaction scheme
+    *
+    * @return The currently set InteractionScheme
     */
     InteractionScheme GetInteractionScheme() const { return m_InteractionScheme; };
 

@@ -17,11 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkInteractionSchemeSwitcher.h"
 
 // us
-#include "usGetModuleContext.h"
-#include "usModuleContext.h"
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
 
 // mitk core
-#include "mitkInteractionEventObserver.h"
+#include <mitkInteractionEventObserver.h>
+#include <mitkExceptionMacro.h>
 
 mitk::InteractionSchemeSwitcher::InteractionSchemeSwitcher()
   : m_InteractionScheme(MITKStandard)
@@ -36,6 +37,11 @@ mitk::InteractionSchemeSwitcher::~InteractionSchemeSwitcher()
 
 void mitk::InteractionSchemeSwitcher::SetInteractionScheme(mitk::InteractionEventHandler* interactionEventHandler, InteractionScheme interactionScheme)
 {
+  if (nullptr == interactionEventHandler)
+  {
+    mitkThrow() << "Not a valid interaction event handler to set the interaction scheme.";
+  }
+
   switch (interactionScheme)
   {
     // MITK MODE
@@ -88,6 +94,10 @@ void mitk::InteractionSchemeSwitcher::SetInteractionScheme(mitk::InteractionEven
       interactionEventHandler->SetEventConfig("DisplayConfigPACS.xml");
       interactionEventHandler->AddEventConfig("DisplayConfigPACSZoom.xml");
       break;
+    }
+    default:
+    {
+      interactionEventHandler->SetEventConfig("DisplayConfigMITK.xml");
     }
   }
 

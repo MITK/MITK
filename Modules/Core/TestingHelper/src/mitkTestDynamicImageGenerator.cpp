@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkTestArtifactGenerator.h"
+#include "mitkTestDynamicImageGenerator.h"
 #include "mitkArbitraryTimeGeometry.h"
 #include "mitkImageCast.h"
 

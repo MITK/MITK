@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkMaskedDynamicImageStatisticsGenerator.h"
 
-#include "mitkTestArtifactGenerator.h"
+#include "mitkTestDynamicImageGenerator.h"
 
 int mitkMaskedDynamicImageStatisticsGeneratorTest(int  /*argc*/, char*[] /*argv[]*/)
 {

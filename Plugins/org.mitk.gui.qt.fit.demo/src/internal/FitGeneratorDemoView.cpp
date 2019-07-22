@@ -37,7 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateOr.h>
 
-#include <mitkTestArtifactGenerator.h>
+#include <mitkTestDynamicImageGenerator.h>
 
 #include <iostream>
 

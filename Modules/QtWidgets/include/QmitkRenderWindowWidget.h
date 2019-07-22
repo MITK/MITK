@@ -32,13 +32,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QHBoxLayout>
 
 /**
-* @brief The 'QmitkRenderWindowWidget' is a QWidget that holds a render window
+* @brief The 'QmitkRenderWindowWidget' is a QFrame that holds a render window
 *        and some associates properties, like a crosshair (pointset) and decorations.
 *        Decorations are corner annotation (text and color) or background color and can be set using this class.
 *        The 'QmitkRenderWindowWidget' is used inside the 'QmitkMxNMultiWidget', where a map contains
 *        several render window widgets to create the MxN display.
 */
-class MITKQTWIDGETS_EXPORT QmitkRenderWindowWidget : public QWidget
+class MITKQTWIDGETS_EXPORT QmitkRenderWindowWidget : public QFrame
 {
   Q_OBJECT
 

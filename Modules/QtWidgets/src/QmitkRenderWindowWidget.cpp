@@ -26,7 +26,7 @@ QmitkRenderWindowWidget::QmitkRenderWindowWidget(QWidget* parent/* = nullptr*/,
                                                  const QString& widgetName/* = ""*/,
                                                  mitk::DataStorage* dataStorage/* = nullptr*/,
                                                  mitk::BaseRenderer::RenderingMode::Type renderingMode/* = mitk::BaseRenderer::RenderingMode::Standard*/)
-  : QWidget(parent)
+  : QFrame(parent)
   , m_WidgetName(widgetName)
   , m_DataStorage(dataStorage)
   , m_RenderWindow(nullptr)
@@ -225,6 +225,8 @@ void QmitkRenderWindowWidget::InitializeDecorations()
   // initialize decoration color, rectangle and annotation text
   float white[3] = { 1.0f, 1.0f, 1.0f };
   m_DecorationColor = white;
+
+  setStyleSheet("border: 2px solid white");
 
   m_CornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
   m_CornerAnnotation->SetText(0, "Sagittal");

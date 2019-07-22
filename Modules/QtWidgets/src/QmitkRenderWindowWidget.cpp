@@ -108,18 +108,17 @@ bool QmitkRenderWindowWidget::IsGradientBackgroundOn() const
 void QmitkRenderWindowWidget::SetDecorationColor(const mitk::Color& color)
 {
   m_DecorationColor = color;
-  m_RectangleProp->SetColor(m_DecorationColor[0], m_DecorationColor[1], m_DecorationColor[2]);
   m_CornerAnnotation->GetTextProperty()->SetColor(color[0], color[1], color[2]);
 }
 
 void QmitkRenderWindowWidget::ShowColoredRectangle(bool show)
 {
-  m_RectangleProp->SetVisibility(show);
+  // Not implemented for now. Colored rectangle is defined via qt border stylesheet
 }
 
 bool QmitkRenderWindowWidget::IsColoredRectangleVisible() const
 {
-  return m_RectangleProp->GetVisibility() > 0;
+  return false;
 }
 
 void QmitkRenderWindowWidget::ShowCornerAnnotation(bool show)
@@ -226,12 +225,6 @@ void QmitkRenderWindowWidget::InitializeDecorations()
   // initialize decoration color, rectangle and annotation text
   float white[3] = { 1.0f, 1.0f, 1.0f };
   m_DecorationColor = white;
-  m_RectangleProp = vtkSmartPointer<vtkMitkRectangleProp>::New();
-  m_RectangleProp->SetColor(m_DecorationColor[0], m_DecorationColor[1], m_DecorationColor[2]);
-  if (0 == vtkRenderer->HasViewProp(m_RectangleProp))
-  {
-    vtkRenderer->AddViewProp(m_RectangleProp);
-  }
 
   m_CornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
   m_CornerAnnotation->SetText(0, "Sagittal");

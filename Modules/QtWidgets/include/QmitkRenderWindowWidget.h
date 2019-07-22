@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // qt
 #include <QWidget>
 #include <QHBoxLayout>
+#include <QMouseEvent>
 
 /**
 * @brief The 'QmitkRenderWindowWidget' is a QFrame that holds a render window
@@ -82,6 +83,10 @@ public:
   bool IsRenderWindowMenuActivated() const;
 
   void ActivateCrosshair(bool activate);
+
+Q_SIGNALS:
+
+  void MouseEvent(QMouseEvent* e);
 
 private:
 

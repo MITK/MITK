@@ -211,7 +211,26 @@ QmitkRenderWindow* QmitkMxNMultiWidget::GetRenderWindow(const QString& widgetNam
 
 void QmitkMxNMultiWidget::SetActiveRenderWindowWidget(RenderWindowWidgetPointer activeRenderWindowWidget)
 {
+  if (m_ActiveRenderWindowWidget == activeRenderWindowWidget)
+  {
+    return;
+  }
+
+  // reset the decoration color of the previously active render window widget
+  if (nullptr != m_ActiveRenderWindowWidget)
+  {
+    m_ActiveRenderWindowWidget->setStyleSheet("border: 2px solid white");
+  }
+
+  // set the new decoration color of the currently active render window widget
   m_ActiveRenderWindowWidget = activeRenderWindowWidget;
+  if (nullptr != m_ActiveRenderWindowWidget)
+  {
+    m_ActiveRenderWindowWidget->setStyleSheet("border: 2px solid #FF6464");
+  }
+
+
+  emit ActiveRenderWindowChanged();
 }
 
 QmitkMxNMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::GetActiveRenderWindowWidget() const
@@ -329,8 +348,21 @@ void QmitkMxNMultiWidget::wheelEvent(QWheelEvent* e)
   emit WheelMoved(e);
 }
 
-void QmitkMxNMultiWidget::mousePressEvent(QMouseEvent* /*e*/)
+void QmitkMxNMultiWidget::mousePressEvent(QMouseEvent* e)
 {
+  if (QEvent::MouseButtonPress != e->type())
+  {
+    return;
+  }
+
+  auto renderWindowWidget = dynamic_cast<QmitkRenderWindowWidget*>(this->sender());
+  if (nullptr == renderWindowWidget)
+  {
+    return;
+  }
+
+  auto renderWindowWidgetPointer = GetRenderWindowWidget(renderWindowWidget->GetWidgetName());
+  SetActiveRenderWindowWidget(renderWindowWidgetPointer);
 }
 
 void QmitkMxNMultiWidget::moveEvent(QMoveEvent* e)
@@ -353,6 +385,12 @@ void QmitkMxNMultiWidget::InitializeGUI()
   setLayout(m_MxNMultiWidgetLayout);
 
   FillMultiWidgetLayout();
+
+  auto firstRenderWindowWidget = GetFirstRenderWindowWidget();
+  if (nullptr != firstRenderWindowWidget)
+  {
+    SetActiveRenderWindowWidget(firstRenderWindowWidget);
+  }
 }
 
 void QmitkMxNMultiWidget::InitializeDisplayActionEventHandling()
@@ -369,11 +407,13 @@ void QmitkMxNMultiWidget::InitializeDisplayActionEventHandling()
 
 void QmitkMxNMultiWidget::CreateRenderWindowWidget()
 {
-  // create the render window widget and connect signals / slots
+  // create the render window widget and connect signal / slot
   QString renderWindowWidgetName = GetNameFromIndex(m_RenderWindowWidgets.size());
   RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, m_DataStorage);
   renderWindowWidget->SetCornerAnnotationText(renderWindowWidgetName.toStdString());
 
+  connect(renderWindowWidget.get(), &QmitkRenderWindowWidget::MouseEvent,
+    this, &QmitkMxNMultiWidget::mousePressEvent);
   // store the newly created render window widget with the UID
   m_RenderWindowWidgets.insert(std::make_pair(renderWindowWidgetName, renderWindowWidget));
 }
@@ -404,7 +444,6 @@ void QmitkMxNMultiWidget::FillMultiWidgetLayout()
       if (nullptr != renderWindowWidget)
       {
         m_MxNMultiWidgetLayout->addWidget(renderWindowWidget.get(), row, column);
-        SetActiveRenderWindowWidget(renderWindowWidget);
       }
     }
   }

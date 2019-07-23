@@ -1,0 +1,12 @@
+diff --git a/Rendering/VolumeOpenGL2/vtkSmartVolumeMapper.cxx b/Rendering/VolumeOpenGL2/vtkSmartVolumeMapper.cxx
+--- a/Rendering/VolumeOpenGL2/vtkSmartVolumeMapper.cxx
++++ b/Rendering/VolumeOpenGL2/vtkSmartVolumeMapper.cxx
+@@ -90,6 +90,8 @@ vtkSmartVolumeMapper::vtkSmartVolumeMapper()
+   this->RayCastMapper->LockSampleDistanceToInputSpacingOn();
+   this->GPUMapper->LockSampleDistanceToInputSpacingOn();
+ 
++  this->GPUMapper->UseJitteringOn();
++
+   // Default to the default mode - which will use the best option that
+   // is supported by the hardware
+   this->RequestedRenderMode = vtkSmartVolumeMapper::DefaultRenderMode;

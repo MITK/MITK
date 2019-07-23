@@ -86,6 +86,7 @@ if(NOT DEFINED VTK_DIR)
     PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VtkCornerAnnotation.patch
       COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VtkContourRepresentation.patch
       COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VtkOpenGLVolumeGradientOpacityTable.patch
+      COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VtkJittering.patch
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS
         ${ep_common_args}

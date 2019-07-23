@@ -126,6 +126,9 @@ namespace mitk
     m_ImageMapperDeletedCommand = MemberCommandType::New();
     m_ImageMapperDeletedCommand->SetCallbackFunction(
         this, &PlaneGeometryDataVtkMapper3D::ImageMapperDeletedCallback );
+
+    // Use zbuffer shift for resolving plane geometries
+    vtkMapper::SetResolveCoincidentTopology(VTK_RESOLVE_SHIFT_ZBUFFER);
   }
 
   PlaneGeometryDataVtkMapper3D::~PlaneGeometryDataVtkMapper3D()
@@ -527,8 +530,13 @@ namespace mitk
 
             // Set poly data new each time its object changes (e.g. when
             // switching between planar and curved geometries)
-            if ( (dataSetMapper != NULL) && (dataSetMapper->GetInput() != surface->GetVtkPolyData()) )
-            {
+            if ( (dataSetMapper != NULL) && (dataSetMapper->GetInput() != surface->GetVtkPolyData()) ) {
+              // Offset binary planes in front of images
+              bool binary = true;
+              imageMapper->GetDataNode()->GetBoolProperty("binary", binary);
+              dataSetMapper->SetResolveCoincidentTopologyPolygonOffsetParameters(1.0, 0.0);
+              dataSetMapper->SetRelativeCoincidentTopologyZShift(binary ? -.001 : 0.0);
+
               dataSetMapper->SetInputData( surface->GetVtkPolyData() );
             }
 

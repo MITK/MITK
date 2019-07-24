@@ -1,0 +1,89 @@
+diff --git a/Rendering/Core/vtkDataSetMapper.cxx b/Rendering/Core/vtkDataSetMapper.cxx
+--- a/Rendering/Core/vtkDataSetMapper.cxx
++++ b/Rendering/Core/vtkDataSetMapper.cxx
+@@ -96,6 +96,7 @@ void vtkDataSetMapper::Render(vtkRenderer *ren, vtkActor *act)
+     vtkDataSetSurfaceFilter *gf = vtkDataSetSurfaceFilter::New();
+     vtkPolyDataMapper *pm = vtkPolyDataMapper::New();
+     pm->SetInputConnection(gf->GetOutputPort());
++    pm->SetRelativeCoincidentTopologyZShift(this->RelativeCoincidentTopologyZShift);
+ 
+     this->GeometryExtractor = gf;
+     this->PolyDataMapper = pm;
+diff --git a/Rendering/Core/vtkMapper.cxx b/Rendering/Core/vtkMapper.cxx"
+index 919f8ce..9f869c4 100644
+--- a/Rendering/Core/vtkMapper.cxx
++++ b/Rendering/Core/vtkMapper.cxx
+@@ -87,6 +87,7 @@ vtkMapper::vtkMapper()
+   this->CoincidentLineFactor = 0.0;
+   this->CoincidentLineOffset = 0.0;
+   this->CoincidentPointOffset = 0.0;
++  this->RelativeCoincidentTopologyZShift = 0.0;
+ }
+ 
+ vtkMapper::~vtkMapper()
+@@ -192,11 +193,16 @@ void vtkMapper::SetResolveCoincidentTopologyZShift(double val)
+   vtkMapperGlobalResolveCoincidentTopologyZShift = val;
+ }
+ 
+-double vtkMapper::GetResolveCoincidentTopologyZShift()
++double vtkMapper::GetGlobalResolveCoincidentTopologyZShift()
+ {
+   return vtkMapperGlobalResolveCoincidentTopologyZShift;
+ }
+ 
++double vtkMapper::GetResolveCoincidentTopologyZShift()
++{
++  return vtkMapperGlobalResolveCoincidentTopologyZShift + this->RelativeCoincidentTopologyZShift;
++}
++
+ void vtkMapper::SetResolveCoincidentTopologyPolygonOffsetParameters(
+                                             double factor, double units)
+ {
+@@ -235,6 +241,14 @@ void vtkMapper::GetRelativeCoincidentTopologyPolygonOffsetParameters(
+   units = this->CoincidentPolygonOffset;
+ }
+ 
++void vtkMapper::SetRelativeCoincidentTopologyZShift(double shift) {
++  this->RelativeCoincidentTopologyZShift = shift;
++}
++
++void vtkMapper::GetRelativeCoincidentTopologyZShift(double& shift) {
++  shift = this->RelativeCoincidentTopologyZShift;
++}
++
+ void vtkMapper::GetCoincidentTopologyPolygonOffsetParameters(
+                            double& factor, double& units)
+ {
+diff --git a/Rendering/Core/vtkMapper.h b/Rendering/Core/vtkMapper.h
+index e33c1dc..3175f24 100644
+--- a/Rendering/Core/vtkMapper.h
++++ b/Rendering/Core/vtkMapper.h
+@@ -446,6 +446,9 @@ public:
+   void GetCoincidentTopologyPointOffsetParameter(double& units);
+   //@}
+ 
++  void SetRelativeCoincidentTopologyZShift(double shift);
++  void GetRelativeCoincidentTopologyZShift(double& shift);
++
+   //@{
+   /**
+    * Used when ResolveCoincidentTopology is set to PolygonOffset. The polygon
+@@ -464,7 +467,8 @@ public:
+    * ShiftZBuffer. This is a global variable.
+    */
+   static void SetResolveCoincidentTopologyZShift(double val);
+-  static double GetResolveCoincidentTopologyZShift();
++  static double GetGlobalResolveCoincidentTopologyZShift();
++  double GetResolveCoincidentTopologyZShift();
+   //@}
+ 
+   /**
+@@ -634,6 +638,8 @@ protected:
+   double CoincidentLineOffset;
+   double CoincidentPointOffset;
+ 
++  double RelativeCoincidentTopologyZShift;
++
+ private:
+   vtkMapper(const vtkMapper&) VTK_DELETE_FUNCTION;
+   void operator=(const vtkMapper&) VTK_DELETE_FUNCTION;

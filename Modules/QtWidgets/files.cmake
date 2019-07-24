@@ -2,6 +2,7 @@ file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURREN
 
 set(CPP_FILES
   QmitkAbstractDataStorageModel.cpp
+  QmitkAbstractMultiWidget.cpp
   QmitkApplicationCursor.cpp
   QmitkDataStorageComboBox.cpp
   QmitkDataStorageDefaultListModel.cpp
@@ -62,6 +63,7 @@ set(CPP_FILES
 
 set(MOC_H_FILES
   include/QmitkAbstractDataStorageModel.h
+  include/QmitkAbstractMultiWidget.h
   include/QmitkDataStorageComboBox.h
   include/QmitkDataStorageTableModel.h
   include/QmitkDataStorageTreeModel.h

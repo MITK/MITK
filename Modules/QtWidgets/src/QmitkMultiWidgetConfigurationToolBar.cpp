@@ -16,8 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkMultiWidgetConfigurationToolBar.h"
 
-QmitkMultiWidgetConfigurationToolBar::QmitkMultiWidgetConfigurationToolBar()
-  : QToolBar()
+// mitk qt widgets module
+#include "QmitkAbstractMultiWidget.h"
+#include "QmitkMultiWidgetLayoutSelectionWidget.h"
+
+QmitkMultiWidgetConfigurationToolBar::QmitkMultiWidgetConfigurationToolBar(QmitkAbstractMultiWidget* multiWidget)
+  : QToolBar(multiWidget)
+  , m_MultiWidget(multiWidget)
 {
   QToolBar::setOrientation(Qt::Vertical);
   QToolBar::setIconSize(QSize(17, 17));
@@ -58,9 +63,12 @@ void QmitkMultiWidgetConfigurationToolBar::AddButtons()
 
 void QmitkMultiWidgetConfigurationToolBar::OnSetLayout()
 {
-  m_LayoutSelectionPopup->setWindowFlags(Qt::Popup);
-  m_LayoutSelectionPopup->move(this->cursor().pos().x() - m_LayoutSelectionPopup->width(), this->cursor().pos().y());
-  m_LayoutSelectionPopup->show();
+  if (nullptr != m_MultiWidget)
+  {
+    m_LayoutSelectionPopup->setWindowFlags(Qt::Popup);
+    m_LayoutSelectionPopup->move(this->cursor().pos().x() - m_LayoutSelectionPopup->width(), this->cursor().pos().y());
+    m_LayoutSelectionPopup->show();
+  }
 }
 
 void QmitkMultiWidgetConfigurationToolBar::OnSynchronize()

@@ -16,9 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkRenderWindowWidget.h"
 
-// mitk qt widgets
-#include <QmitkMxNMultiWidget.h>
-
 // vtk
 #include <vtkTextProperty.h>
 

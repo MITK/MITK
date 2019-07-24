@@ -1,0 +1,147 @@
+/*===================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center,
+Division of Medical Image Computing.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
+
+#ifndef QMITKABSTRACTMULTIWIDGET_H
+#define QMITKABSTRACTMULTIWIDGET_H
+
+// mitk qt widgets module
+#include "MitkQtWidgetsExports.h"
+
+// mitk core
+#include <mitkBaseRenderer.h>
+#include <mitkInteractionSchemeSwitcher.h>
+#include <mitkPoint.h>
+
+// qt
+#include <QWidget>
+
+// c++
+#include <map>
+#include <memory>
+
+class QmitkRenderWindow;
+class QmitkRenderWindowWidget;
+
+namespace mitk
+{
+  class DataStorage;
+  class InteractionEventHandler;
+  class RenderingManager;
+}
+
+/**
+* @brief The 'QmitkAbstractMultiWidget' is a 'QWidget' that can be subclassed to display multiple render windows at once.
+*        Render windows can dynamically be added and removed to change the layout of the multi widget.
+*        A subclass of this multi widget can be used inside a 'QmitkAbstractMultiWidgetEditor'.
+*
+*        The class uses the 'DisplayActionEventBroadcast' and 'DisplayActionEventHandler' classes to
+*        load a state machine and set an event configuration.
+*
+*        Using the 'Synchronize' function the user can enable or disable the synchronization of display action events.
+*        See 'DisplayActionEventFunctions'-class for the different synchronized and non-synchronized functions used.
+*/
+class MITKQTWIDGETS_EXPORT QmitkAbstractMultiWidget : public QWidget
+{
+  Q_OBJECT
+
+public:
+
+  using RenderWindowWidgetPointer = std::shared_ptr<QmitkRenderWindowWidget>;
+  using RenderWindowWidgetMap = std::map<QString, std::shared_ptr<QmitkRenderWindowWidget>>;
+  using RenderWindowHash = QHash<QString, QmitkRenderWindow*>;
+
+  QmitkAbstractMultiWidget(QWidget* parent = 0,
+                           Qt::WindowFlags f = 0,
+                           mitk::RenderingManager* renderingManager = nullptr,
+                           mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard,
+                           const QString& multiWidgetName = "multiwidget");
+
+  virtual ~QmitkAbstractMultiWidget();
+  
+  virtual void InitializeMultiWidget() = 0;
+  virtual void MultiWidgetOpened() { }
+  virtual void MultiWidgetClosed() { }
+
+  virtual void SetDataStorage(mitk::DataStorage* dataStorage);
+  mitk::DataStorage* GetDataStorage() const;
+
+  int GetRowCount() const;
+  int GetColumnCount() const;
+  virtual void SetLayout(int row, int column);
+
+  virtual void Synchronize(bool synchronized);
+  virtual void SetInteractionScheme(mitk::InteractionSchemeSwitcher::InteractionScheme scheme);
+
+  mitk::InteractionEventHandler* GetInteractionEventHandler();
+
+  RenderWindowWidgetMap GetRenderWindowWidgets() const;
+  RenderWindowWidgetPointer GetRenderWindowWidget(int row, int column) const;
+  RenderWindowWidgetPointer GetRenderWindowWidget(const QString& widgetName) const;
+  RenderWindowHash GetRenderWindows() const;
+  QmitkRenderWindow* GetRenderWindow(int row, int column) const;
+  QmitkRenderWindow* GetRenderWindow(const QString& widgetName) const;
+
+  virtual void SetActiveRenderWindowWidget(RenderWindowWidgetPointer activeRenderWindowWidget);
+  RenderWindowWidgetPointer GetActiveRenderWindowWidget() const;
+  RenderWindowWidgetPointer GetFirstRenderWindowWidget() const;
+  RenderWindowWidgetPointer GetLastRenderWindowWidget() const;
+  
+  virtual QString GetNameFromIndex(int row, int column) const;
+  virtual QString GetNameFromIndex(size_t index) const;
+
+  unsigned int GetNumberOfRenderWindowWidgets() const;
+
+  void RequestUpdate(const QString& widgetName);
+  void RequestUpdateAll();
+  void ForceImmediateUpdate(const QString& widgetName);
+  void ForceImmediateUpdateAll();
+
+  virtual void SetSelectedPosition(const mitk::Point3D& newPosition, const QString& widgetName) = 0;
+  virtual const mitk::Point3D GetSelectedPosition(const QString& widgetName) const = 0;
+
+Q_SIGNALS:
+
+  void ActiveRenderWindowChanged();
+
+protected:
+
+  virtual void AddRenderWindowWidget(const QString& widgetName, RenderWindowWidgetPointer renderWindowWidget);
+  virtual void RemoveRenderWindowWidget();
+
+private:
+
+  /**
+  * @brief This function will be called by the function 'SetLayout' and
+  *        can be implemented and customized in the subclasses.
+  */
+  virtual void SetLayoutImpl() = 0;
+  /**
+  * @brief This function will be called by the function 'Synchronize' and
+  *        can be implemented and customized in the subclasses.
+  */
+  virtual void SynchronizeImpl() = 0;
+  /**
+  * @brief This function will be called by the function 'SetInteractionScheme' and
+  *        can be implemented and customized in the subclasses.
+  */
+  virtual void SetInteractionSchemeImpl() = 0;
+
+  struct Impl;
+  std::unique_ptr<Impl> m_Impl;
+
+};
+
+#endif // QMITKABSTRACTMULTIWIDGET_H

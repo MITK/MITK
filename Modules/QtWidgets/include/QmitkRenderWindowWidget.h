@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCornerAnnotation.h>
 
 // qt
-#include <QWidget>
+#include <QFrame>
 #include <QHBoxLayout>
 #include <QMouseEvent>
 
@@ -36,8 +36,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 * @brief The 'QmitkRenderWindowWidget' is a QFrame that holds a render window
 *        and some associates properties, like a crosshair (pointset) and decorations.
 *        Decorations are corner annotation (text and color) or background color and can be set using this class.
-*        The 'QmitkRenderWindowWidget' is used inside the 'QmitkMxNMultiWidget', where a map contains
-*        several render window widgets to create the MxN display.
+*        The 'QmitkRenderWindowWidget' is used inside a 'QmitkAbstractMultiWidget', where a map contains
+*        several render window widgets to create the multi widget display.
 */
 class MITKQTWIDGETS_EXPORT QmitkRenderWindowWidget : public QFrame
 {

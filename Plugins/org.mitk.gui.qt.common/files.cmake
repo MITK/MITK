@@ -1,4 +1,5 @@
 set(SRC_CPP_FILES
+  QmitkAbstractMultiWidgetEditor.cpp
   QmitkAbstractRenderEditor.cpp
   QmitkAbstractView.cpp
   QmitkDataNodeSelectionProvider.cpp
@@ -9,6 +10,7 @@ set(SRC_CPP_FILES
   QmitkNodeSelectionDialog.cpp
   QmitkAbstractNodeSelectionWidget.cpp
   QmitkMultiNodeSelectionWidget.cpp
+  QmitkMultiWidgetDecorationManager.cpp
   QmitkNodeSelectionPreferenceHelper.cpp
   QmitkNodeSelectionButton.cpp
   QmitkSimpleTextOverlayWidget.cpp
@@ -33,6 +35,7 @@ set(UI_FILES
 )
 
 set(MOC_H_FILES
+  src/QmitkAbstractMultiWidgetEditor.h
   src/QmitkAbstractRenderEditor.h
   src/QmitkDnDFrameWidget.h
   src/QmitkSelectionServiceConnector.h

@@ -16,14 +16,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkMultiWidgetDecorationManager.h"
 
-// org_mitk_gui_common
+// org mitk gui common plugin
 #include <mitkIRenderWindowPart.h>
 
 // mitk annotation module
 #include <mitkManualPlacementAnnotationRenderer.h>
 
 // mitk qt widgets module
-#include "QmitkRenderWindowWidget.h"
+#include <QmitkRenderWindowWidget.h>
 
 // vtk
 #include <vtkQImageToImageSource.h>

@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk core
 #include <mitkBaseRenderer.h>
+#include <mitkInteractionSchemeSwitcher.h>
 #include <mitkPoint.h>
 
 // qt
@@ -42,9 +43,9 @@ namespace mitk
 }
 
 /**
-* @brief The 'QmitkAbstractMultiWidget' is a 'QWidget' that is can be subclassed to display multiple render windows at once.
+* @brief The 'QmitkAbstractMultiWidget' is a 'QWidget' that can be subclassed to display multiple render windows at once.
 *        Render windows can dynamically be added and removed to change the layout of the multi widget.
-*        A subclass of this multi widget can be used inside an 'QmitkAbstractMultiWidgetEditor'.
+*        A subclass of this multi widget can be used inside a 'QmitkAbstractMultiWidgetEditor'.
 */
 class MITKQTWIDGETS_EXPORT QmitkAbstractMultiWidget : public QWidget
 {
@@ -56,14 +57,6 @@ public:
   using RenderWindowWidgetMap = std::map<QString, std::shared_ptr<QmitkRenderWindowWidget>>;
   using RenderWindowHash = QHash<QString, QmitkRenderWindow*>;
 
-  enum
-  {
-    AXIAL,
-    SAGITTAL,
-    CORONAL,
-    THREE_D
-  };
-
   QmitkAbstractMultiWidget(QWidget* parent = 0,
                            Qt::WindowFlags f = 0,
                            mitk::RenderingManager* renderingManager = nullptr,
@@ -72,15 +65,20 @@ public:
 
   virtual ~QmitkAbstractMultiWidget();
   
-  void SetDataStorage(mitk::DataStorage* dataStorage);
+  virtual void InitializeMultiWidget() = 0;
+  virtual void MultiWidgetOpened() { }
+  virtual void MultiWidgetClosed() { }
+
+  virtual void SetDataStorage(mitk::DataStorage* dataStorage);
   mitk::DataStorage* GetDataStorage() const;
 
-  void SetRowCount(int row);
   int GetRowCount() const;
-  void SetColumnCount(int column);
   int GetColumnCount() const;
-  void SetLayout(int row, int column);
-  void Synchronize(bool synchronized);
+  virtual void SetLayout(int row, int column);
+
+  virtual void Synchronize(bool synchronized);
+  virtual void SetInteractionScheme(mitk::InteractionSchemeSwitcher::InteractionScheme scheme);
+
   mitk::InteractionEventHandler* GetInteractionEventHandler();
 
   RenderWindowWidgetMap GetRenderWindowWidgets() const;
@@ -90,16 +88,13 @@ public:
   QmitkRenderWindow* GetRenderWindow(int row, int column) const;
   QmitkRenderWindow* GetRenderWindow(const QString& widgetName) const;
 
-  void SetActiveRenderWindowWidget(RenderWindowWidgetPointer activeRenderWindowWidget);
+  virtual void SetActiveRenderWindowWidget(RenderWindowWidgetPointer activeRenderWindowWidget);
   RenderWindowWidgetPointer GetActiveRenderWindowWidget() const;
   RenderWindowWidgetPointer GetFirstRenderWindowWidget() const;
   RenderWindowWidgetPointer GetLastRenderWindowWidget() const;
   
-  void AddRenderWindowWidget(const QString& widgetName, RenderWindowWidgetPointer renderWindowWidget);
-  void RemoveRenderWindowWidget();
-
-  QString GetNameFromIndex(int row, int column) const;
-  QString GetNameFromIndex(size_t index) const;
+  virtual QString GetNameFromIndex(int row, int column) const;
+  virtual QString GetNameFromIndex(size_t index) const;
 
   unsigned int GetNumberOfRenderWindowWidgets() const;
 
@@ -108,52 +103,31 @@ public:
   void ForceImmediateUpdate(const QString& widgetName);
   void ForceImmediateUpdateAll();
 
-  const mitk::Point3D GetSelectedPosition(const QString& widgetName) const;
+  virtual void SetSelectedPosition(const mitk::Point3D& newPosition, const QString& widgetName) = 0;
+  virtual const mitk::Point3D GetSelectedPosition(const QString& widgetName) const = 0;
 
-public Q_SLOTS:
+protected:
 
-  /**
-  * @brief Listener to the CrosshairPositionEvent
-  *
-  *   Ensures the CrosshairPositionEvent is handled only once and at the end of the Qt-Event loop
-  */
-  void HandleCrosshairPositionEvent();
-  /**
-  * @brief Receives the signal from HandleCrosshairPositionEvent, executes the StatusBar update
-  *
-  */
-  void HandleCrosshairPositionEventDelayed();
-
-  void SetSelectedPosition(const mitk::Point3D& newPosition, const QString& widgetName);
-
-  void ResetCrosshair();
-
-  // mouse events
-  void wheelEvent(QWheelEvent* e) override;
-
-  void mousePressEvent(QMouseEvent* e) override;
-
-  void moveEvent(QMoveEvent* e) override;
-
-Q_SIGNALS:
-
-  void WheelMoved(QWheelEvent *);
-  void Moved();
+  virtual void AddRenderWindowWidget(const QString& widgetName, RenderWindowWidgetPointer renderWindowWidget);
+  virtual void RemoveRenderWindowWidget();
 
 private:
 
-  virtual void InitializeGUI() = 0;
-
   /**
   * @brief This function will be called by the function 'SetLayout' and
-  *        needs to be implemented and customized in the subclasses.
+  *        can be implemented and customized in the subclasses.
   */
   virtual void SetLayoutImpl() = 0;
-
-  int m_PlaneMode;
-
-  bool m_PendingCrosshairPositionEvent;
-  bool m_CrosshairNavigationEnabled;
+  /**
+  * @brief This function will be called by the function 'Synchronize' and
+  *        can be implemented and customized in the subclasses.
+  */
+  virtual void SynchronizeImpl() = 0;
+  /**
+  * @brief This function will be called by the function 'SetInteractionScheme' and
+  *        can be implemented and customized in the subclasses.
+  */
+  virtual void SetInteractionSchemeImpl() = 0;
 
   struct Impl;
   std::unique_ptr<Impl> m_Impl;

@@ -22,16 +22,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 // org mitk gui qt common plugin
 #include <QmitkAbstractRenderEditor.h>
 
+// mitk core
+#include <mitkInteractionSchemeSwitcher.h>
+
+// berry
+#include <berryIPartListener.h>
+
 // c++
 #include <memory>
 
 class QmitkAbstractMultiWidget;
 
-class MITK_QT_COMMON QmitkAbstractMultiWidgetEditor : public QmitkAbstractRenderEditor
+class MITK_QT_COMMON QmitkAbstractMultiWidgetEditor : public QmitkAbstractRenderEditor, public berry::IPartListener
 {
   Q_OBJECT
 
 public:
+
+  static const QString EDITOR_ID;
 
   QmitkAbstractMultiWidgetEditor();
   virtual ~QmitkAbstractMultiWidgetEditor() override;
@@ -69,6 +77,18 @@ public:
   */
   virtual QStringList GetDecorations() const override;
   /**
+  * @brief Overridden from berry::IPartListener
+  */
+  berry::IPartListener::Events::Types GetPartEventTypes() const override;
+  /**
+  * @brief Overridden from berry::IPartListener
+  */
+  void PartOpened(const berry::IWorkbenchPartReference::Pointer& partRef) override;
+  /**
+  * @brief Overridden from berry::IPartListener
+  */
+  void PartClosed(const berry::IWorkbenchPartReference::Pointer& partRef) override;
+  /**
   * @brief Retrieve a QmitkRenderWindow by it's index.
   */
   virtual QmitkRenderWindow* GetQmitkRenderWindowByIndex(int index) const;
@@ -102,6 +122,7 @@ public Q_SLOTS:
   */
   void OnLayoutChanged(int row, int column);
   void OnSynchronize(bool synchronized);
+  void OnInteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme);
 
 private:
 

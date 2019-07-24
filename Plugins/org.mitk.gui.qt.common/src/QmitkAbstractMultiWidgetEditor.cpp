@@ -16,14 +16,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkAbstractMultiWidgetEditor.h"
 
-#include <berryIWorkbenchPartConstants.h>
-
 // mitk qt widgets module
 #include <QmitkAbstractMultiWidget.h>
 #include <QmitkRenderWindowWidget.h>
 
-// custom multi widget editor plugin
-//#include "QmitkMultiWidgetDecorationManager.h"
+// mitk gui qt common plugin
+#include "QmitkMultiWidgetDecorationManager.h"
+
+// berry
+#include <berryIWorkbenchPartConstants.h>
+
+const QString QmitkAbstractMultiWidgetEditor::EDITOR_ID = "org.mitk.editors.abstractmultiwidget";
 
 struct QmitkAbstractMultiWidgetEditor::Impl final
 {
@@ -31,7 +34,7 @@ struct QmitkAbstractMultiWidgetEditor::Impl final
 
   QmitkAbstractMultiWidget* m_MultiWidget;
 
-  //std::unique_ptr<QmitkMultiWidgetDecorationManager> m_MultiWidgetDecorationManager;
+  std::unique_ptr<QmitkMultiWidgetDecorationManager> m_MultiWidgetDecorationManager;
 };
 
 QmitkAbstractMultiWidgetEditor::Impl::Impl()
@@ -109,17 +112,46 @@ void QmitkAbstractMultiWidgetEditor::SetSelectedPosition(const mitk::Point3D& po
 
 void QmitkAbstractMultiWidgetEditor::EnableDecorations(bool enable, const QStringList& decorations)
 {
-  //m_Impl->m_MultiWidgetDecorationManager->ShowDecorations(enable, decorations);
+  m_Impl->m_MultiWidgetDecorationManager->ShowDecorations(enable, decorations);
 }
 
 bool QmitkAbstractMultiWidgetEditor::IsDecorationEnabled(const QString& decoration) const
 {
-  return false;// m_Impl->m_MultiWidgetDecorationManager->IsDecorationVisible(decoration);
+  return m_Impl->m_MultiWidgetDecorationManager->IsDecorationVisible(decoration);
 }
 
 QStringList QmitkAbstractMultiWidgetEditor::GetDecorations() const
 {
-  return QStringList();// m_Impl->m_MultiWidgetDecorationManager->GetDecorations();
+  return m_Impl->m_MultiWidgetDecorationManager->GetDecorations();
+}
+
+berry::IPartListener::Events::Types QmitkAbstractMultiWidgetEditor::GetPartEventTypes() const
+{
+  return Events::CLOSED | Events::OPENED;
+}
+
+void QmitkAbstractMultiWidgetEditor::PartOpened(const berry::IWorkbenchPartReference::Pointer& partRef)
+{
+  if (partRef->GetId() == QmitkAbstractMultiWidgetEditor::EDITOR_ID)
+  {
+    const auto& multiWidget = GetMultiWidget();
+    if (nullptr != multiWidget)
+    {
+      multiWidget->MultiWidgetOpened();
+    }
+  }
+}
+
+void QmitkAbstractMultiWidgetEditor::PartClosed(const berry::IWorkbenchPartReference::Pointer& partRef)
+{
+  if (partRef->GetId() == QmitkAbstractMultiWidgetEditor::EDITOR_ID)
+  {
+    const auto& multiWidget = GetMultiWidget();
+    if (nullptr != multiWidget)
+    {
+      multiWidget->MultiWidgetClosed();
+    }
+  }
 }
 
 QmitkRenderWindow* QmitkAbstractMultiWidgetEditor::GetQmitkRenderWindowByIndex(int index) const
@@ -149,6 +181,7 @@ QmitkRenderWindow* QmitkAbstractMultiWidgetEditor::GetQmitkRenderWindowByIndex(i
 void QmitkAbstractMultiWidgetEditor::SetMultiWidget(QmitkAbstractMultiWidget* multiWidget)
 {
   m_Impl->m_MultiWidget = multiWidget;
+  m_Impl->m_MultiWidgetDecorationManager.reset(new QmitkMultiWidgetDecorationManager(multiWidget));
 }
 
 QmitkAbstractMultiWidget* QmitkAbstractMultiWidgetEditor::GetMultiWidget() const
@@ -194,5 +227,14 @@ void QmitkAbstractMultiWidgetEditor::OnLayoutChanged(int row, int column)
    if (nullptr != multiWidget)
    {
      multiWidget->Synchronize(synchronized);
+   }
+ }
+
+ void QmitkAbstractMultiWidgetEditor::OnInteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme)
+ {
+   const auto& multiWidget = GetMultiWidget();
+   if (nullptr != multiWidget)
+   {
+     multiWidget->SetInteractionScheme(scheme);
    }
  }

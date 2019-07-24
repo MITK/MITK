@@ -37,25 +37,56 @@ QmitkCustomMultiWidget::~QmitkCustomMultiWidget()
   // nothing here
 }
 
-void QmitkCustomMultiWidget::InitializeRenderWindowWidgets()
+void QmitkCustomMultiWidget::InitializeMultiWidget()
 {
   SetLayout(1, 1);
+}
+
+void QmitkCustomMultiWidget::SetSelectedPosition(const mitk::Point3D& newPosition, const QString& widgetName)
+{
+  RenderWindowWidgetPointer renderWindowWidget;
+  if (widgetName.isNull())
+  {
+    renderWindowWidget = GetActiveRenderWindowWidget();
+  }
+  else
+  {
+    renderWindowWidget = GetRenderWindowWidget(widgetName);
+  }
+
+  if (nullptr != renderWindowWidget)
+  {
+    renderWindowWidget->GetSliceNavigationController()->SelectSliceByPoint(newPosition);
+    renderWindowWidget->RequestUpdate();
+    return;
+  }
+
+  MITK_ERROR << "Position can not be set for an unknown render window widget.";
+}
+
+const mitk::Point3D QmitkCustomMultiWidget::GetSelectedPosition(const QString& /*widgetName*/) const
+{
+  // see T26208
+  return mitk::Point3D();
+}
+
+void QmitkCustomMultiWidget::wheelEvent(QWheelEvent* e)
+{
+  emit WheelMoved(e);
+}
+
+void QmitkCustomMultiWidget::moveEvent(QMoveEvent* e)
+{
+  QWidget::moveEvent(e);
+
+  // it is necessary to readjust the position of the overlays as the MultiWidget has moved
+  // unfortunately it's not done by QmitkRenderWindow::moveEvent -> must be done here
+  emit Moved();
 }
 
 //////////////////////////////////////////////////////////////////////////
 // PRIVATE
 //////////////////////////////////////////////////////////////////////////
-void QmitkCustomMultiWidget::InitializeGUI()
-{
-  delete m_GridLayout;
-  m_GridLayout = new QGridLayout(this);
-  m_GridLayout->setContentsMargins(0, 0, 0, 0);
-  setLayout(m_GridLayout);
-
-  FillMultiWidgetLayout();
-  resize(QSize(364, 477).expandedTo(minimumSizeHint()));
-}
-
 void QmitkCustomMultiWidget::SetLayoutImpl()
 {
   int requiredRenderWindowWidgets = GetRowCount() * GetColumnCount();
@@ -75,15 +106,26 @@ void QmitkCustomMultiWidget::SetLayoutImpl()
     ++difference;
   }
 
-  InitializeGUI();
+  InitializeLayout();
 }
 
-void QmitkCustomMultiWidget::CreateRenderWindowWidget(const std::string& cornerAnnotation/* = ""*/)
+void QmitkCustomMultiWidget::InitializeLayout()
+{
+  delete m_GridLayout;
+  m_GridLayout = new QGridLayout(this);
+  m_GridLayout->setContentsMargins(0, 0, 0, 0);
+  setLayout(m_GridLayout);
+
+  FillMultiWidgetLayout();
+  resize(QSize(364, 477).expandedTo(minimumSizeHint()));
+}
+
+void QmitkCustomMultiWidget::CreateRenderWindowWidget()
 {
   // create the render window widget and connect signals / slots
-  QString renderWindowWidgetName = GetNameFromIndex(GetRenderWindowWidgets().size());
+  QString renderWindowWidgetName = GetNameFromIndex(GetNumberOfRenderWindowWidgets());
   RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage());
-  renderWindowWidget->SetCornerAnnotationText(renderWindowWidgetName.toStdString()/*cornerAnnotation*/);
+  renderWindowWidget->SetCornerAnnotationText(renderWindowWidgetName.toStdString());
 
   AddRenderWindowWidget(renderWindowWidgetName, renderWindowWidget);
 }

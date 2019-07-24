@@ -136,7 +136,7 @@ void QmitkCustomMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     layout->addWidget(multiWidget);
 
     multiWidget->SetDataStorage(GetDataStorage());
-    dynamic_cast<QmitkCustomMultiWidget*>(multiWidget)->InitializeRenderWindowWidgets();
+    dynamic_cast<QmitkCustomMultiWidget*>(multiWidget)->InitializeMultiWidget();
 
     // create right toolbar: configuration toolbar to change the render window widget layout
     if (nullptr == m_Impl->m_ConfigurationToolBar)

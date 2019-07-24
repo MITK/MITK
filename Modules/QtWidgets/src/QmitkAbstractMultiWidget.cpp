@@ -24,15 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDisplayActionEventBroadcast.h>
 #include <mitkDisplayActionEventFunctions.h>
 #include <mitkDisplayActionEventHandler.h>
-#include <mitkImage.h>
-#include <mitkNodePredicateDataType.h>
-#include <mitkPixelTypeMultiplex.h>
-#include <mitkUIDGenerator.h>
 
 // qt
-#include <QGridLayout>
 #include <QMouseEvent>
-#include <QTimer>
 
 // c++
 #include <iomanip>
@@ -121,7 +115,6 @@ struct QmitkAbstractMultiWidget::Impl final
   RenderWindowWidgetMap m_RenderWindowWidgets;
   RenderWindowWidgetPointer m_ActiveRenderWindowWidget;
 
-  QGridLayout* m_CustomMultiWidgetLayout;
   int m_MultiWidgetRows;
   int m_MultiWidgetColumns;
 
@@ -137,7 +130,6 @@ QmitkAbstractMultiWidget::Impl::Impl(mitk::RenderingManager* renderingManager,
   , m_RenderingManager(renderingManager)
   , m_RenderingMode(renderingMode)
   , m_MultiWidgetName(multiWidgetName)
-  , m_CustomMultiWidgetLayout(nullptr)
   , m_MultiWidgetRows(0)
   , m_MultiWidgetColumns(0)
   , m_DisplayActionEventBroadcast(nullptr)
@@ -152,9 +144,6 @@ QmitkAbstractMultiWidget::QmitkAbstractMultiWidget(QWidget* parent,
                                                    mitk::BaseRenderer::RenderingMode::Type renderingMode/* = mitk::BaseRenderer::RenderingMode::Standard*/,
                                                    const QString& multiWidgetName/* = "multiwidget"*/)
   : QWidget(parent, f)
-  , m_PlaneMode(0)
-  , m_PendingCrosshairPositionEvent(false)
-  , m_CrosshairNavigationEnabled(false)
   , m_Impl(std::make_unique<Impl>(renderingManager, renderingMode, multiWidgetName))
 {
   // nothing here
@@ -172,19 +161,9 @@ mitk::DataStorage* QmitkAbstractMultiWidget::GetDataStorage() const
   return m_Impl->m_DataStorage;
 }
 
-void QmitkAbstractMultiWidget::SetRowCount(int row)
-{
-  m_Impl->m_MultiWidgetRows = row;
-}
-
 int QmitkAbstractMultiWidget::GetRowCount() const
 {
   return m_Impl->m_MultiWidgetRows;
-}
-
-void QmitkAbstractMultiWidget::SetColumnCount(int column)
-{
-  m_Impl->m_MultiWidgetColumns = column ;
 }
 
 int QmitkAbstractMultiWidget::GetColumnCount() const
@@ -196,13 +175,29 @@ void QmitkAbstractMultiWidget::SetLayout(int row, int column)
 {
   m_Impl->m_MultiWidgetRows = row;
   m_Impl->m_MultiWidgetColumns = column;
-
   SetLayoutImpl();
 }
 
 void QmitkAbstractMultiWidget::Synchronize(bool synchronized)
 {
   m_Impl->Synchronize(synchronized);
+  SynchronizeImpl();
+}
+
+void QmitkAbstractMultiWidget::SetInteractionScheme(mitk::InteractionSchemeSwitcher::InteractionScheme scheme)
+{
+  auto interactionSchemeSwitcher = mitk::InteractionSchemeSwitcher::New();
+  auto interactionEventHandler = GetInteractionEventHandler();
+  try
+  {
+    interactionSchemeSwitcher->SetInteractionScheme(interactionEventHandler, scheme);
+  }
+  catch (const mitk::Exception&)
+  {
+    return;
+  }
+
+  SetInteractionSchemeImpl();
 }
 
 mitk::InteractionEventHandler* QmitkAbstractMultiWidget::GetInteractionEventHandler()
@@ -294,27 +289,6 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkAbstractMultiWidget::Ge
   }
 }
 
-void QmitkAbstractMultiWidget::AddRenderWindowWidget(const QString& widgetName, RenderWindowWidgetPointer renderWindowWidget)
-{
-  m_Impl->m_RenderWindowWidgets.insert(std::make_pair(widgetName, renderWindowWidget));
-}
-
-void QmitkAbstractMultiWidget::RemoveRenderWindowWidget()
-{
-  auto iterator = m_Impl->m_RenderWindowWidgets.find(GetNameFromIndex(GetRenderWindowWidgets().size() - 1));
-  if (iterator == m_Impl->m_RenderWindowWidgets.end())
-  {
-    return;
-  }
-
-  // disconnect each signal of this render window widget
-  QmitkRenderWindowWidget* renderWindowWidgetToRemove = iterator->second.get();
-  disconnect(renderWindowWidgetToRemove, 0, 0, 0);
-
-  // erase the render window from the map
-  m_Impl->m_RenderWindowWidgets.erase(iterator);
-}
-
 QString QmitkAbstractMultiWidget::GetNameFromIndex(int row, int column) const
 {
   if (0 <= row && m_Impl->m_MultiWidgetRows > row && 0 <= column && m_Impl->m_MultiWidgetColumns > column)
@@ -374,189 +348,23 @@ void QmitkAbstractMultiWidget::ForceImmediateUpdateAll()
   }
 }
 
-const mitk::Point3D QmitkAbstractMultiWidget::GetSelectedPosition(const QString& widgetName) const
+void QmitkAbstractMultiWidget::AddRenderWindowWidget(const QString& widgetName, RenderWindowWidgetPointer renderWindowWidget)
 {
-  /*
-  const mitk::PlaneGeometry *plane1 = mitkWidget1->GetSliceNavigationController()->GetCurrentPlaneGeometry();
-  const mitk::PlaneGeometry *plane2 = mitkWidget2->GetSliceNavigationController()->GetCurrentPlaneGeometry();
-  const mitk::PlaneGeometry *plane3 = mitkWidget3->GetSliceNavigationController()->GetCurrentPlaneGeometry();
-
-  mitk::Line3D line;
-  if ((plane1 != NULL) && (plane2 != NULL) && (plane1->IntersectionLine(plane2, line)))
-  {
-  mitk::Point3D point;
-  if ((plane3 != NULL) && (plane3->IntersectionPoint(line, point)))
-  {
-  return point;
-  }
-  }
-  // TODO BUG POSITIONTRACKER;
-  mitk::Point3D p;
-  return p;
-  // return m_LastLeftClickPositionSupplier->GetCurrentPoint();
-  */
-  return mitk::Point3D();
+  m_Impl->m_RenderWindowWidgets.insert(std::make_pair(widgetName, renderWindowWidget));
 }
 
-//////////////////////////////////////////////////////////////////////////
-// PUBLIC SLOTS
-//////////////////////////////////////////////////////////////////////////
-void QmitkAbstractMultiWidget::HandleCrosshairPositionEvent()
+void QmitkAbstractMultiWidget::RemoveRenderWindowWidget()
 {
-  /*
-  if (!m_PendingCrosshairPositionEvent)
+  auto iterator = m_Impl->m_RenderWindowWidgets.find(GetNameFromIndex(GetRenderWindowWidgets().size() - 1));
+  if (iterator == m_Impl->m_RenderWindowWidgets.end())
   {
-    m_PendingCrosshairPositionEvent = true;
-    QTimer::singleShot(0, this, SLOT(HandleCrosshairPositionEventDelayed()));
-  }
-  */
-}
-
-void QmitkAbstractMultiWidget::HandleCrosshairPositionEventDelayed()
-{
-  /*
-  m_PendingCrosshairPositionEvent = false;
-
-  // find image with highest layer
-  mitk::TNodePredicateDataType<mitk::Image>::Pointer isImageData = mitk::TNodePredicateDataType<mitk::Image>::New();
-  mitk::DataStorage::SetOfObjects::ConstPointer nodes = this->m_DataStorage->GetSubset(isImageData).GetPointer();
-
-  mitk::DataNode::Pointer node;
-  mitk::DataNode::Pointer topSourceNode;
-  mitk::Image::Pointer image;
-  bool isBinary = false;
-  node = this->GetTopLayerNode(nodes);
-  int component = 0;
-  if (node.IsNotNull())
-  {
-    node->GetBoolProperty("binary", isBinary);
-    if (isBinary)
-    {
-      mitk::DataStorage::SetOfObjects::ConstPointer sourcenodes = m_DataStorage->GetSources(node, NULL, true);
-      if (!sourcenodes->empty())
-      {
-        topSourceNode = this->GetTopLayerNode(sourcenodes);
-      }
-      if (topSourceNode.IsNotNull())
-      {
-        image = dynamic_cast<mitk::Image *>(topSourceNode->GetData());
-        topSourceNode->GetIntProperty("Image.Displayed Component", component);
-      }
-      else
-      {
-        image = dynamic_cast<mitk::Image *>(node->GetData());
-        node->GetIntProperty("Image.Displayed Component", component);
-      }
-    }
-    else
-    {
-      image = dynamic_cast<mitk::Image *>(node->GetData());
-      node->GetIntProperty("Image.Displayed Component", component);
-    }
-  }
-
-  mitk::Point3D crosshairPos = this->GetCrossPosition();
-  std::string statusText;
-  std::stringstream stream;
-  itk::Index<3> p;
-  mitk::BaseRenderer *baseRenderer = GetRenderWindow()->GetSliceNavigationController()->GetRenderer();
-  unsigned int timestep = baseRenderer->GetTimeStep();
-
-  if (image.IsNotNull() && (image->GetTimeSteps() > timestep))
-  {
-    image->GetGeometry()->WorldToIndex(crosshairPos, p);
-    stream.precision(2);
-    stream << "Position: <" << std::fixed << crosshairPos[0] << ", " << std::fixed << crosshairPos[1] << ", "
-      << std::fixed << crosshairPos[2] << "> mm";
-    stream << "; Index: <" << p[0] << ", " << p[1] << ", " << p[2] << "> ";
-
-    mitk::ScalarType pixelValue;
-
-    mitkPixelTypeMultiplex5(mitk::FastSinglePixelAccess,
-      image->GetChannelDescriptor().GetPixelType(),
-      image,
-      image->GetVolumeData(baseRenderer->GetTimeStep()),
-      p,
-      pixelValue,
-      component);
-
-    if (fabs(pixelValue) > 1000000 || fabs(pixelValue) < 0.01)
-    {
-      stream << "; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: " << std::scientific << pixelValue << "  ";
-    }
-    else
-    {
-      stream << "; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: " << pixelValue << "  ";
-    }
-  }
-  else
-  {
-    stream << "No image information at this position!";
-  }
-
-  statusText = stream.str();
-  mitk::StatusBar::GetInstance()->DisplayGreyValueText(statusText.c_str());
-  */
-}
-
-void QmitkAbstractMultiWidget::SetSelectedPosition(const mitk::Point3D& newPosition, const QString& widgetName)
-{
-  // #TODO: check parameter and see if this should be implemented here
-  /*
-  RenderWindowWidgetPointer renderWindowWidget;
-  if (widgetName.isNull())
-  {
-    renderWindowWidget = GetActiveRenderWindowWidget();
-  }
-  else
-  {
-    renderWindowWidget = GetRenderWindowWidget(widgetName);
-  }
-
-  if (nullptr != renderWindowWidget)
-  {
-    renderWindowWidget->GetSliceNavigationController()->SelectSliceByPoint(newPosition);
-    renderWindowWidget->RequestUpdate();
     return;
   }
 
-  MITK_ERROR << "Position can not be set for an unknown render window widget.";
-  */
-}
+  // disconnect each signal of this render window widget
+  RenderWindowWidgetPointer renderWindowWidgetToRemove = iterator->second;
+  disconnect(renderWindowWidgetToRemove.get(), 0, 0, 0);
 
-void QmitkAbstractMultiWidget::ResetCrosshair()
-{
-  // #TODO: new concept: we do not want to initialize all views;
-  //        we do not want to rely on the geometry planes
-  /*
-  if (m_DataStorage.IsNotNull())
-  {
-    m_RenderingManager->InitializeViewsByBoundingObjects(m_DataStorage);
-    // m_RenderingManager->InitializeViews( m_DataStorage->ComputeVisibleBoundingGeometry3D() );
-    // reset interactor to normal slicing
-    SetWidgetPlaneMode(PLANE_MODE_SLICING);
-  }
-  */
-}
-
-//////////////////////////////////////////////////////////////////////////
-// MOUSE EVENTS
-//////////////////////////////////////////////////////////////////////////
-void QmitkAbstractMultiWidget::wheelEvent(QWheelEvent* e)
-{
-  emit WheelMoved(e);
-}
-
-void QmitkAbstractMultiWidget::mousePressEvent(QMouseEvent* e)
-{
-  // nothing here
-}
-
-void QmitkAbstractMultiWidget::moveEvent(QMoveEvent* e)
-{
-  QWidget::moveEvent(e);
-
-  // it is necessary to readjust the position of the overlays as the MultiWidget has moved
-  // unfortunately it's not done by QmitkRenderWindow::moveEvent -> must be done here
-  emit Moved();
+  // erase the render window from the map
+  m_Impl->m_RenderWindowWidgets.erase(iterator);
 }

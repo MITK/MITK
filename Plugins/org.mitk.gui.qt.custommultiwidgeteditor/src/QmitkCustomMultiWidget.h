@@ -44,20 +44,40 @@ public:
 
   virtual ~QmitkCustomMultiWidget() override;
   
-  void InitializeRenderWindowWidgets();
+  virtual void InitializeMultiWidget() override;
+
+  virtual void SetSelectedPosition(const mitk::Point3D& newPosition, const QString& widgetName) override;
+  virtual const mitk::Point3D GetSelectedPosition(const QString& widgetName) const override;
+
+public Q_SLOTS:
+
+  // mouse events
+  virtual void wheelEvent(QWheelEvent* e) override;
+
+  virtual void moveEvent(QMoveEvent* e) override;
+
+Q_SIGNALS:
+
+  void WheelMoved(QWheelEvent *);
+  void Moved();
 
 private:
 
   /**
   * @brief Overridden from QmitkAbstractMultiWidget
   */
-  virtual void InitializeGUI() override;
+  virtual void SetLayoutImpl() override;
   /**
   * @brief Overridden from QmitkAbstractMultiWidget
   */
-  virtual void SetLayoutImpl() override;
+  virtual void SynchronizeImpl() override { }
+  /**
+  * @brief Overridden from QmitkAbstractMultiWidget
+  */
+  virtual void SetInteractionSchemeImpl() override { }
 
-  void CreateRenderWindowWidget(const std::string& cornerAnnotation = "");
+  void InitializeLayout();
+  void CreateRenderWindowWidget();
   void FillMultiWidgetLayout();
 
   QGridLayout* m_GridLayout;

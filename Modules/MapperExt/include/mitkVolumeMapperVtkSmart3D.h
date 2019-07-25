@@ -70,6 +70,9 @@ namespace mitk
     
     void UpdateTransferFunctions(mitk::BaseRenderer *renderer);
     void UpdateRenderMode(mitk::BaseRenderer *renderer);
+
+    vtkSmartPointer<vtkPiecewiseFunction> m_BinaryOpacityTransferFunction;
+    vtkSmartPointer<vtkPiecewiseFunction> m_BinaryGradientTransferFunction;
   };
 
 } // namespace mitk

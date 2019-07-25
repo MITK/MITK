@@ -158,8 +158,8 @@ void mitk::VolumeMapperVtkSmart3D::UpdateTransferFunctions(mitk::BaseRenderer *r
     colorTransferFunction->AddRGBPoint(0, rgb[0], rgb[1], rgb[2]);
     colorTransferFunction->Modified();
 
-    opacityTransferFunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
-    gradientTransferFunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
+    opacityTransferFunction = m_BinaryOpacityTransferFunction;
+    gradientTransferFunction = m_BinaryGradientTransferFunction;
   }
   else
   {
@@ -244,6 +244,13 @@ mitk::VolumeMapperVtkSmart3D::VolumeMapperVtkSmart3D()
   m_SmartVolumeMapper->SetBlendModeToComposite();
   m_VolumeProperty = vtkSmartPointer<vtkVolumeProperty>::New();
   m_Volume = vtkSmartPointer<vtkVolume>::New();
+
+  m_BinaryOpacityTransferFunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
+  m_BinaryOpacityTransferFunction->AddPoint(0, 0.0);
+  m_BinaryOpacityTransferFunction->AddPoint(1, 1.0);
+
+  m_BinaryGradientTransferFunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
+  m_BinaryGradientTransferFunction->AddPoint(0.0, 1.0);
 }
 
 mitk::VolumeMapperVtkSmart3D::~VolumeMapperVtkSmart3D()

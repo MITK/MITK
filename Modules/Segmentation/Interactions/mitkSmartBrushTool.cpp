@@ -33,7 +33,8 @@ mitk::SmartBrushTool::SmartBrushTool() :
   m_ImageObserverTag(0),
   m_LastTimeStep(0),
   m_IsReferencePointSet(false),
-  m_Sensitivity(50)
+  m_Sensitivity(50),
+  m_OriginalImage(nullptr)
 {
   m_MasterContour = ContourModel::New();
   m_MasterContour->Initialize();
@@ -43,9 +44,7 @@ mitk::SmartBrushTool::SmartBrushTool() :
   m_WorkingNode->SetProperty("levelwindow", mitk::LevelWindowProperty::New(mitk::LevelWindow(0, 1)));
   m_WorkingNode->SetProperty("binary", mitk::BoolProperty::New(true));
 
-
   m_SmartBrushStrokeFilter = SmartBrushStrokeFilter<InternalImageType>::New();
-
 }
 
 mitk::SmartBrushTool::~SmartBrushTool()
@@ -418,7 +417,7 @@ void mitk::SmartBrushTool::MouseMovedImpl(const mitk::PlaneGeometry* planeGeomet
   m_FeedbackContourNode->GetData()->Modified();
 
   // Apply filter
-  if (leftMouseButtonPressed) {
+  if (leftMouseButtonPressed && m_OriginalImage != nullptr) {
     itk::Image<float, 3>::SizeType brushSize;
     brushSize.Fill(2 * m_Radius + 1);
 

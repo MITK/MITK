@@ -141,16 +141,18 @@ void mitk::FeedbackContourTool::resampleDecomposition(mitk::Image* image, mitk::
   mitk::Vector3D imageSpacing = image->GetGeometry()->GetSpacing();
   //std::cout << "Image Spacing: " << imageSpacing << "\n";
 
-  mitk::Vector3D temp;
-  temp = image->GetGeometry()->GetAxisVector(0);
-  temp.Normalize();
-  mitk::Vector3D imageX = temp * imageSpacing[0];
-  temp = image->GetGeometry()->GetAxisVector(1);
-  temp.Normalize();
-  mitk::Vector3D imageY = temp * imageSpacing[1];
-  temp = image->GetGeometry()->GetAxisVector(2);
-  temp.Normalize();
-  mitk::Vector3D imageZ = temp * imageSpacing[2];
+  mitk::Vector3D imageNormX = image->GetGeometry()->GetAxisVector(0);
+  imageNormX.Normalize();
+  mitk::Vector3D imageX = imageNormX * imageSpacing[0];
+
+  mitk::Vector3D imageNormY = image->GetGeometry()->GetAxisVector(1);
+  imageNormY.Normalize();
+  mitk::Vector3D imageY = imageNormY * imageSpacing[1];
+
+  mitk::Vector3D imageNormZ = image->GetGeometry()->GetAxisVector(2);
+  imageNormZ.Normalize();
+  mitk::Vector3D imageZ = imageNormZ * imageSpacing[2];
+
   //std::cout << "Image X: " << imageX << "\n";
   //std::cout << "Image Y: " << imageY << "\n";
   //std::cout << "Image Z: " << imageZ << "\n";
@@ -158,6 +160,7 @@ void mitk::FeedbackContourTool::resampleDecomposition(mitk::Image* image, mitk::
   mitk::Vector3D planeSpacing = plane->GetGeometry()->GetSpacing();
   //std::cout << "Plane Spacing: " << planeSpacing << "\n";
 
+  mitk::Vector3D temp;
   temp = plane->GetGeometry()->GetAxisVector(0);
   temp.Normalize();
   mitk::Vector3D planeX = temp * planeSpacing[0];
@@ -167,14 +170,22 @@ void mitk::FeedbackContourTool::resampleDecomposition(mitk::Image* image, mitk::
   //std::cout << "Plane X: " << planeX << "\n";
   //std::cout << "Plane Y: " << planeY << "\n";
 
-  m_PlaneRightDecomposition[0] = projectRatio(imageX, planeX) * planeSpacing[0];
-  m_PlaneRightDecomposition[1] = projectRatio(imageY, planeX) * planeSpacing[0];
-  m_PlaneRightDecomposition[2] = projectRatio(imageZ, planeX) * planeSpacing[0];
-  //std::cout << "Plane Right: " << m_PlaneRightDecomposition << "\n";
+  mitk::Vector3D projectionRight;
+  projectionRight[0] = projectRatio(imageX, planeX);
+  projectionRight[1] = projectRatio(imageY, planeX);
+  projectionRight[2] = projectRatio(imageZ, planeX);
 
-  m_PlaneUpDecomposition[0] = projectRatio(imageX, planeY) * planeSpacing[1];
-  m_PlaneUpDecomposition[1] = projectRatio(imageY, planeY) * planeSpacing[1];
-  m_PlaneUpDecomposition[2] = projectRatio(imageZ, planeY) * planeSpacing[1];
+  mitk::Vector3D projectionUp;
+  projectionUp[0] = projectRatio(imageX, planeY);
+  projectionUp[1] = projectRatio(imageY, planeY);
+  projectionUp[2] = projectRatio(imageZ, planeY);
+
+  for (int i = 0; i < 3; i++) {
+    m_PlaneRightDecomposition[i] = (projectionRight[0] * imageNormX[i] + projectionRight[1] * imageNormY[i] + projectionRight[2] * imageNormZ[i]) * planeSpacing[0];
+    m_PlaneUpDecomposition[i]    = (projectionUp[0] * imageNormX[i] + projectionUp[1] * imageNormY[i] + projectionUp[2] * imageNormZ[i]) * planeSpacing[1];
+  }
+
+  //std::cout << "Plane Right: " << m_PlaneRightDecomposition << "\n";
   //std::cout << "Plane Up: " << m_PlaneUpDecomposition << "\n\n";
 }
 

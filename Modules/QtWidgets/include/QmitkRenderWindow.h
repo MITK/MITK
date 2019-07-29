@@ -28,7 +28,7 @@
 #include "mitkBaseRenderer.h"
 #include "mitkInteractionEventConst.h"
 
-class QmitkStdMultiWidget;
+class QmitkAbstractMultiWidget;
 class QDragEnterEvent;
 class QDropEvent;
 class QInputEvent;
@@ -59,7 +59,7 @@ public:
    * reached through to the widget's parent.
    *
    * This reaching through to the parent was implicitly required by QmitkMaterialWidget / QmitkMaterialShowCase.
-   *QmitkStdMultiWidget
+   *
    * The default behaviour of QmitkRenderWindow is now to clear the "accepted" flag
    * of Qt events after they were handled by QVTKWidget. This way parents can also
    * handle events.
@@ -80,7 +80,7 @@ public:
   void HideRenderWindowMenu();
 
   // Activate or Deactivate MenuWidget.
-  void ActivateMenuWidget(bool state, QmitkStdMultiWidget *stdMultiWidget = nullptr);
+  void ActivateMenuWidget(bool state, QmitkAbstractMultiWidget *multiWidget = nullptr);
 
   bool GetActivateMenuWidgetFlag() { return m_MenuWidgetActivated; }
   // Get it from the QVTKWidget parent
@@ -129,7 +129,7 @@ protected:
 signals:
 
   void ResetView();
-  // \brief int parameters are enum from QmitkStdMultiWidget
+
   void ChangeCrosshairRotationMode(int);
 
   void SignalLayoutDesignChanged(int layoutDesignIndex);

@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QTimer>
 
-#include "QmitkStdMultiWidget.h"
+#include "QmitkAbstractMultiWidget.h"
 
 //#include"iconClose.xpm"
 #include "iconCrosshairMode.xpm"
@@ -51,14 +51,14 @@ unsigned int QmitkRenderWindowMenu::m_DefaultThickMode(1);
 QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent,
                                              Qt::WindowFlags,
                                              mitk::BaseRenderer *b,
-                                             QmitkStdMultiWidget *mw)
+                                             QmitkAbstractMultiWidget *mw)
   : QWidget(nullptr, Qt::Tool | Qt::FramelessWindowHint),
 
 #else
 QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent,
                                              Qt::WindowFlags f,
                                              mitk::BaseRenderer *b,
-                                             QmitkStdMultiWidget *mw)
+  QmitkAbstractMultiWidget *mw)
   : QWidget(parent, f),
 #endif
 
@@ -774,19 +774,9 @@ void QmitkRenderWindowMenu::SetCrossHairVisibility(bool state)
 {
   if (m_Renderer.IsNotNull())
   {
-    mitk::DataNode *n;
-    if (this->m_MultiWidget)
+    if (nullptr != m_MultiWidget)
     {
-      n = this->m_MultiWidget->GetWidgetPlane1();
-      if (n)
-        n->SetVisibility(state);
-      n = this->m_MultiWidget->GetWidgetPlane2();
-      if (n)
-        n->SetVisibility(state);
-      n = this->m_MultiWidget->GetWidgetPlane3();
-      if (n)
-        n->SetVisibility(state);
-      m_Renderer->GetRenderingManager()->RequestUpdateAll();
+      m_MultiWidget->SetCrosshairVisibility(state);
     }
   }
 }
@@ -845,42 +835,10 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
 
   // Show hide crosshairs
   {
-    bool currentState = true;
-
-    if (m_Renderer.IsNotNull())
-    {
-      mitk::DataStorage *ds = m_Renderer->GetDataStorage();
-      mitk::DataNode *n;
-      if (ds)
-      {
-        n = this->m_MultiWidget->GetWidgetPlane1();
-        if (n)
-        {
-          bool v;
-          if (n->GetVisibility(v, nullptr))
-            currentState &= v;
-        }
-        n = this->m_MultiWidget->GetWidgetPlane2();
-        if (n)
-        {
-          bool v;
-          if (n->GetVisibility(v, nullptr))
-            currentState &= v;
-        }
-        n = this->m_MultiWidget->GetWidgetPlane3();
-        if (n)
-        {
-          bool v;
-          if (n->GetVisibility(v, nullptr))
-            currentState &= v;
-        }
-      }
-    }
-
     QAction *showHideCrosshairVisibilityAction = new QAction(crosshairModesMenu);
     showHideCrosshairVisibilityAction->setText("Show crosshair");
     showHideCrosshairVisibilityAction->setCheckable(true);
-    showHideCrosshairVisibilityAction->setChecked(currentState);
+    showHideCrosshairVisibilityAction->setChecked(m_MultiWidget->GetCrosshairVisibility());
     crosshairModesMenu->addAction(showHideCrosshairVisibilityAction);
     connect(showHideCrosshairVisibilityAction, SIGNAL(toggled(bool)), this, SLOT(SetCrossHairVisibility(bool)));
   }

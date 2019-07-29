@@ -231,7 +231,7 @@ void QmitkRenderWindow::showEvent(QShowEvent *event)
   QTimer::singleShot(0, this, SIGNAL(moved()));
 }
 
-void QmitkRenderWindow::ActivateMenuWidget(bool state, QmitkStdMultiWidget *stdMultiWidget)
+void QmitkRenderWindow::ActivateMenuWidget(bool state, QmitkAbstractMultiWidget *multiWidget)
 {
   m_MenuWidgetActivated = state;
 
@@ -248,7 +248,7 @@ void QmitkRenderWindow::ActivateMenuWidget(bool state, QmitkStdMultiWidget *stdM
   else if (m_MenuWidgetActivated && !m_MenuWidget)
   {
     // create render window MenuBar for split, close Window or set new setting.
-    m_MenuWidget = new QmitkRenderWindowMenu(this, nullptr, m_Renderer, stdMultiWidget);
+    m_MenuWidget = new QmitkRenderWindowMenu(this, nullptr, m_Renderer, multiWidget);
     m_MenuWidget->SetLayoutIndex(m_LayoutIndex);
 
     // create Signal/Slot Connection

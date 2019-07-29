@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QToolButton>
 #include <QWidget>
 
-class QmitkStdMultiWidget;
+class QmitkAbstractMultiWidget;
 
 /**
  * \ingroup QmitkModule
@@ -49,7 +49,7 @@ class QmitkStdMultiWidget;
  * QmitkRenderWindow.
  *
  * \sa QmitkRenderWindow
- * \sa QmitkStdMultiWidget
+ * \sa QmitkAbstractMultiWidget
  *
  */
 class MITKQTWIDGETS_EXPORT QmitkRenderWindowMenu : public QWidget
@@ -60,7 +60,7 @@ public:
   QmitkRenderWindowMenu(QWidget *parent = nullptr,
                         Qt::WindowFlags f = nullptr,
                         mitk::BaseRenderer *b = nullptr,
-                        QmitkStdMultiWidget *mw = nullptr);
+                        QmitkAbstractMultiWidget *mw = nullptr);
   ~QmitkRenderWindowMenu() override;
 
   /*! Return visibility of settings menu. The menu is connected with m_SettingsButton and includes
@@ -125,7 +125,7 @@ signals:
 
   void ResetView(); // == "global reinit"
 
-  // \brief int parameters are enum from QmitkStdMultiWidget
+  // \brief int parameters are enum from QmitkAbstractMultiWidget
   void ChangeCrosshairRotationMode(int);
 
   /*! emit signal, when layout design changed by the setting menu.*/
@@ -164,7 +164,7 @@ protected slots:
   void OnFullScreenButton(bool checked);
 
   /*! Slot for opening setting menu. The slot is connected to the clicked() event of m_SettingsButton.
-  The settings menu includes differen layout directions (axial, coronal, saggital and 3D) as well all layout design
+  The settings menu includes different layout directions (axial, coronal, sagittal and 3D) as well all layout design
   (standard layout, 2D images top, 3D bottom ..)*/
   void OnSettingsButton(bool checked);
 
@@ -325,7 +325,7 @@ protected:
 private:
   mitk::BaseRenderer::Pointer m_Renderer;
 
-  QmitkStdMultiWidget *m_MultiWidget;
+  QmitkAbstractMultiWidget *m_MultiWidget;
 
   ///
   /// a timer for the auto rotate action

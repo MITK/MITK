@@ -27,6 +27,7 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
                                          const QString& multiWidgetName/* = "mxnmulti"*/)
   : QmitkAbstractMultiWidget(parent, f, renderingManager, renderingMode, multiWidgetName)
   , m_GridLayout(nullptr)
+  , m_CrosshairVisibility(false)
 {
   // nothing here
 }
@@ -38,12 +39,12 @@ void QmitkMxNMultiWidget::InitializeMultiWidget()
 
 void QmitkMxNMultiWidget::MultiWidgetOpened()
 {
-  ActivateAllCrosshairs(true);
+  SetCrosshairVisibility(true);
 }
 
 void QmitkMxNMultiWidget::MultiWidgetClosed()
 {
-  ActivateAllCrosshairs(false);
+  SetCrosshairVisibility(false);
 }
 
 void QmitkMxNMultiWidget::SetActiveRenderWindowWidget(RenderWindowWidgetPointer activeRenderWindowWidget)
@@ -97,13 +98,15 @@ const mitk::Point3D QmitkMxNMultiWidget::GetSelectedPosition(const QString& /*wi
   return mitk::Point3D();
 }
 
-void QmitkMxNMultiWidget::ActivateAllCrosshairs(bool activate)
+void QmitkMxNMultiWidget::SetCrosshairVisibility(bool activate)
 {
   auto renderWindowWidgets = GetRenderWindowWidgets();
   for (const auto& renderWindowWidget : renderWindowWidgets)
   {
     renderWindowWidget.second->ActivateCrosshair(activate);
   }
+
+  m_CrosshairVisibility = activate;
 }
 
 //////////////////////////////////////////////////////////////////////////

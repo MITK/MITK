@@ -69,7 +69,7 @@ void QmitkMxNMultiWidgetEditor::OnLayoutSet(int row, int column)
   if (nullptr != multiWidget)
   {
     multiWidget->SetLayout(row, column);
-    multiWidget->ActivateAllCrosshairs(true);
+    multiWidget->SetCrosshairVisibility(true);
     FirePropertyChange(berry::IWorkbenchPartConstants::PROP_INPUT);
   }
 }

@@ -57,7 +57,8 @@ public:
   virtual void SetSelectedPosition(const mitk::Point3D& newPosition, const QString& widgetName) override;
   virtual const mitk::Point3D GetSelectedPosition(const QString& widgetName) const override;
 
-  void ActivateAllCrosshairs(bool activate);
+  virtual void SetCrosshairVisibility(bool activate) override;
+  virtual bool GetCrosshairVisibility() override { return m_CrosshairVisibility; }
 
 public Q_SLOTS:
 
@@ -82,6 +83,7 @@ private:
   void FillMultiWidgetLayout();
 
   QGridLayout* m_GridLayout;
+  bool m_CrosshairVisibility;
 
 };
 

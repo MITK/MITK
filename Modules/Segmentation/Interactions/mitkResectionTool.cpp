@@ -170,12 +170,14 @@ void ResectionTool::Resect(ResectionType type)
 
   DataNode* workingData = m_ToolManager->GetWorkingData().front();
   Image::Pointer segmentation = dynamic_cast<Image*>(workingData->GetData());
+
   Image::Pointer mitkImage3d = Image::New();
   if (segmentation->GetDimension() > 3) {
     AccessFixedDimensionByItk_n(segmentation, extract3Dfrom4DByItk, 4U, (mitkImage3d, targetTimeStep));
   } else {
-    mitkImage3d = segmentation;
+    mitkImage3d = segmentation->Clone();
   }
+
   vtkMatrix4x4* worldView = getWorldToViewTransform(m_LastEventSender->GetVtkRenderer());
   itk::Image<char, 3>::Pointer resectionMask;
   AccessFixedDimensionByItk_n(mitkImage3d, CreateMask, 3U, (points, worldView, resectionMask));
@@ -189,8 +191,7 @@ void ResectionTool::Resect(ResectionType type)
   case mitk::ResectionTool::OUTSIDE: {
     if (type == ResectionTool::ResectionType::INSIDE) {
       AccessFixedDimensionByItk_n(mitkImage3d, ResectByMask, 3U, (resectionMask, 1, minValue));
-    }
-    else if (type == ResectionTool::ResectionType::OUTSIDE) {
+    } else if (type == ResectionTool::ResectionType::OUTSIDE) {
       AccessFixedDimensionByItk_n(mitkImage3d, ResectByMask, 3U, (resectionMask, 0, minValue));
     }
 
@@ -268,7 +269,6 @@ void ResectionTool::Resect(ResectionType type)
     break;
   }
   }
-
 
   mitk::ProgressBar::GetInstance()->Reset();
 

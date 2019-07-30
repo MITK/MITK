@@ -36,7 +36,6 @@ set(MITK_MODULES
   MatchPointRegistration
   MatchPointRegistrationUI
   Classification
-  GPGPU
   OpenIGTLink
   IGTBase
   IGT

@@ -47,7 +47,7 @@ public:
   web::http::http_response Notify(const web::uri &,
                                   const web::json::value &,
                                   const web::http::method &,
-                                  const mitk::RESTUtil::ParamMap &headers) override
+                                  const mitk::RESTUtil::ParamMap &) override
   {
     auto response = web::http::http_response();
     response.set_body(m_Data);

@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <memory>
 
 class QmitkAbstractMultiWidget;
+class QmitkLevelWindowWidget;
 
 class MITK_QT_COMMON QmitkAbstractMultiWidgetEditor : public QmitkAbstractRenderEditor, public berry::IPartListener
 {
@@ -114,6 +115,8 @@ public:
   * @brief Return the number of columns of the underlying multi widget.
   */
   virtual int GetColumnCount() const;
+
+  virtual QmitkLevelWindowWidget GetLevelWindowWidget() const = 0;
 
 public Q_SLOTS:
   /**

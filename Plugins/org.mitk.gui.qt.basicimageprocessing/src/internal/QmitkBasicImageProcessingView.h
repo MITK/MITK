@@ -83,7 +83,7 @@ public:
   virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes) override;
 
 protected:
-  
+
   virtual void NodeRemoved(const mitk::DataNode* node) override;
 
   protected slots:
@@ -141,7 +141,7 @@ private:
   static const QString TR_PARAM2;
 
   bool isLastNode(const mitk::DataNode* node);
-  
+
   /*
   * After a one image operation, reset the "one image ops" panel
   */

@@ -173,7 +173,10 @@ QmitkBasicImageProcessing::QmitkBasicImageProcessing()
 : QmitkAbstractView(),
   m_Controls(NULL),
   m_SelectedImageNode(NULL),
-  m_TimeStepperAdapter(NULL)
+  m_TimeStepperAdapter(NULL),
+  m_SelectedAction(ActionType::NOACTIONSELECTED),
+  m_SelectedOperation(OperationType::TWOIMAGESNOACTIONSELECTED),
+  m_SelectedInterpolation(InterpolationType::LINEAR)
 {
 }
 
@@ -1474,8 +1477,11 @@ bool QmitkBasicImageProcessing::isLastNode(const mitk::DataNode* node)
 
 void QmitkBasicImageProcessing::NodeRemoved(const mitk::DataNode* node)
 {
-  if (isLastNode(node))
-  {
+  if (isLastNode(node) || m_SelectedImageNode == node) {
+    m_SelectedImageNode = nullptr;
+    ResetOneImageOpPanel();
+    ResetTwoImageOpPanel();
+    ResetParameterPanel();
     m_Controls->leImage1->setText(TR_SELECT_IMAGE);
   }
 }

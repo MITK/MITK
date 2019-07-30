@@ -5,7 +5,6 @@ set(MITK_MODULES
   Core
   CommandLine
   AppUtil
-  RDF
   LegacyIO
   DataTypesExt
   Annotation

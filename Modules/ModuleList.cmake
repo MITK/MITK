@@ -28,7 +28,6 @@ set(MITK_MODULES
   ContourModel
   SurfaceInterpolation
   Segmentation
-  PlanarFigureSegmentation
   QtWidgets
   QtWidgetsExt
   ImageStatisticsUI

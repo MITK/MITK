@@ -4,7 +4,6 @@ mitkFunctionAddExternalProject(NAME OpenIGTLink OFF)
 
 mitkFunctionAddExternalProject(NAME tinyxml     ON  ADVANCED)
 mitkFunctionAddExternalProject(NAME GDCM        ON  ADVANCED)
-mitkFunctionAddExternalProject(NAME GLUT        OFF ADVANCED)
 mitkFunctionAddExternalProject(NAME Raptor2     OFF ADVANCED)
 mitkFunctionAddExternalProject(NAME Eigen       ON  ADVANCED DOC "Use the Eigen library")
 mitkFunctionAddExternalProject(NAME ANN         ON  ADVANCED DOC "Use Approximate Nearest Neighbor Library")

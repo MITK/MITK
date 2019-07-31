@@ -74,11 +74,7 @@ public:
   bool IsDecorationVisible(const QString &decoration) const;
   QStringList GetDecorations() const;
 
-private:
-
   void SetupLogo(const char* path);
-  vtkSmartPointer<vtkImageData> GetVtkLogo(const char* path);
-  void SetLogo(vtkSmartPointer<vtkImageData> vtkLogo);
   void ShowLogo(bool show);
   bool IsLogoVisible() const;
 
@@ -134,6 +130,11 @@ private:
   void ShowAllCornerAnnotations(bool show);
   bool IsCornerAnnotationVisible(const QString& widgetID) const;
   bool AreAllCornerAnnotationsVisible() const;
+
+private:
+
+  vtkSmartPointer<vtkImageData> GetVtkLogo(const char* path);
+  void SetLogo(vtkSmartPointer<vtkImageData> vtkLogo);
 
   QmitkAbstractMultiWidget* m_MultiWidget;
   mitk::LogoAnnotation::Pointer m_LogoAnnotation;

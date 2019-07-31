@@ -78,11 +78,16 @@ void QmitkMultiWidgetDecorationManager::DecorationPreferencesChanged(const berry
     currentNode = currentNode->Parent().GetPointer();
   }
 
+  /*
   QmitkMultiWidgetDecorationManager::Colormap colormap = static_cast<QmitkMultiWidgetDecorationManager::Colormap>(preferences->GetInt("Render window widget colormap", 0));
   SetColormap(colormap);
+  */
 
   // show colored rectangle
   ShowAllColoredRectangles(true);
+
+  // show all gradient background
+  ShowAllGradientBackgrounds(true);
 
   // show corner annotations
   ShowAllCornerAnnotations(true);
@@ -151,9 +156,7 @@ QStringList QmitkMultiWidgetDecorationManager::GetDecorations() const
   return decorations;
 }
 
-//////////////////////////////////////////////////////////////////////////
-// PRIVATE
-//////////////////////////////////////////////////////////////////////////
+
 void QmitkMultiWidgetDecorationManager::SetupLogo(const char* path)
 {
   m_LogoAnnotation->SetOpacity(0.5);
@@ -165,34 +168,6 @@ void QmitkMultiWidgetDecorationManager::SetupLogo(const char* path)
   vtkSmartPointer<vtkImageData> vtkLogo = GetVtkLogo(path);
 
   SetLogo(vtkLogo);
-}
-
-vtkSmartPointer<vtkImageData> QmitkMultiWidgetDecorationManager::GetVtkLogo(const char* path)
-{
-  QImage* qimage = new QImage(path);
-  vtkSmartPointer<vtkQImageToImageSource> qImageToVtk;
-  qImageToVtk = vtkSmartPointer<vtkQImageToImageSource>::New();
-
-  qImageToVtk->SetQImage(qimage);
-  qImageToVtk->Update();
-  vtkSmartPointer<vtkImageData> vtkLogo = qImageToVtk->GetOutput();
-  return vtkLogo;
-}
-
-void QmitkMultiWidgetDecorationManager::SetLogo(vtkSmartPointer<vtkImageData> vtkLogo)
-{
-  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = m_MultiWidget->GetLastRenderWindowWidget();
-  if (nullptr != renderWindowWidget && m_LogoAnnotation.IsNotNull())
-  {
-    mitk::ManualPlacementAnnotationRenderer::AddAnnotation(m_LogoAnnotation.GetPointer(), renderWindowWidget->GetRenderWindow()->GetRenderer());
-    m_LogoAnnotation->SetLogoImage(vtkLogo);
-    mitk::BaseRenderer *renderer = mitk::BaseRenderer::GetInstance(renderWindowWidget->GetRenderWindow()->GetVtkRenderWindow());
-    m_LogoAnnotation->Update(renderer);
-    renderWindowWidget->RequestUpdate();
-    return;
-  }
-
-  MITK_ERROR << "Logo can not be set for an unknown widget.";
 }
 
 void QmitkMultiWidgetDecorationManager::ShowLogo(bool show)
@@ -217,13 +192,13 @@ void QmitkMultiWidgetDecorationManager::SetColormap(QmitkMultiWidgetDecorationMa
 {
   switch (colormap)
   {
-  case Colormap::BlackAndWhite:
-  {
-    FillAllGradientBackgroundColorsWithBlack();
-    float white[3] = { 1.0f, 1.0f, 1.0f };
-    SetAllDecorationColors(white);
-    break;
-  }
+    case Colormap::BlackAndWhite:
+    {
+      FillAllGradientBackgroundColorsWithBlack();
+      float white[3] = { 1.0f, 1.0f, 1.0f };
+      SetAllDecorationColors(white);
+      break;
+    }
   }
 }
 
@@ -458,4 +433,35 @@ bool QmitkMultiWidgetDecorationManager::AreAllCornerAnnotationsVisible() const
   }
 
   return allTrue;
+}
+
+//////////////////////////////////////////////////////////////////////////
+// PRIVATE
+//////////////////////////////////////////////////////////////////////////
+vtkSmartPointer<vtkImageData> QmitkMultiWidgetDecorationManager::GetVtkLogo(const char* path)
+{
+  QImage* qimage = new QImage(path);
+  vtkSmartPointer<vtkQImageToImageSource> qImageToVtk;
+  qImageToVtk = vtkSmartPointer<vtkQImageToImageSource>::New();
+
+  qImageToVtk->SetQImage(qimage);
+  qImageToVtk->Update();
+  vtkSmartPointer<vtkImageData> vtkLogo = qImageToVtk->GetOutput();
+  return vtkLogo;
+}
+
+void QmitkMultiWidgetDecorationManager::SetLogo(vtkSmartPointer<vtkImageData> vtkLogo)
+{
+  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = m_MultiWidget->GetLastRenderWindowWidget();
+  if (nullptr != renderWindowWidget && m_LogoAnnotation.IsNotNull())
+  {
+    mitk::ManualPlacementAnnotationRenderer::AddAnnotation(m_LogoAnnotation.GetPointer(), renderWindowWidget->GetRenderWindow()->GetRenderer());
+    m_LogoAnnotation->SetLogoImage(vtkLogo);
+    mitk::BaseRenderer *renderer = mitk::BaseRenderer::GetInstance(renderWindowWidget->GetRenderWindow()->GetVtkRenderWindow());
+    m_LogoAnnotation->Update(renderer);
+    renderWindowWidget->RequestUpdate();
+    return;
+  }
+
+  MITK_ERROR << "Logo can not be set for an unknown widget.";
 }

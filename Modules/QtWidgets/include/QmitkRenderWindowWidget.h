@@ -25,21 +25,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataStorage.h>
 #include <mitkPointSet.h>
 #include <mitkRenderWindow.h>
-#include <vtkCornerAnnotation.h>
 
 // qt
 #include <QFrame>
 #include <QHBoxLayout>
 #include <QMouseEvent>
 
+class vtkCornerAnnotation;
+class vtkMitkRectangleProp;
+
 /**
 * @brief The 'QmitkRenderWindowWidget' is a QFrame that holds a render window
 *        and some associates properties, like a crosshair (pointset) and decorations.
-*        Decorations are corner annotation (text and color) or background color and can be set using this class.
+*        Decorations are corner annotation (text and color), frame color or background color
+*        and can be set using this class.
 *        The 'QmitkRenderWindowWidget' is used inside a 'QmitkAbstractMultiWidget', where a map contains
 *        several render window widgets to create the multi widget display.
 */
-class MITKQTWIDGETS_EXPORT QmitkRenderWindowWidget : public QFrame
+class MITKQTWIDGETS_EXPORT QmitkRenderWindowWidget : public QWidget
 {
   Q_OBJECT
 
@@ -110,6 +113,8 @@ private:
   std::pair<mitk::Color, mitk::Color> m_GradientBackgroundColors;
   mitk::Color m_DecorationColor;
   vtkSmartPointer<vtkCornerAnnotation> m_CornerAnnotation;
+  vtkSmartPointer<vtkMitkRectangleProp> m_RectangleProp;
+
 };
 
 #endif // QMITKRENDERWINDOWWIDGET_H

@@ -176,7 +176,7 @@ QmitkUSNavigationCalibrationsDataModel::QmitkUSNavigationCalibrationsDataModel(Q
         return QIcon(":/USNavigation/process-stop.png");
       }
     }
-    else { return QVariant::Invalid; }
+    break;
   }
 
   case Qt::EditRole:

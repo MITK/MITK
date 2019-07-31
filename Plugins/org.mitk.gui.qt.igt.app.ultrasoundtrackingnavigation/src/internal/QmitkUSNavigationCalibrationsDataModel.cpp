@@ -149,8 +149,6 @@ QmitkUSNavigationCalibrationsDataModel::QmitkUSNavigationCalibrationsDataModel(Q
     {
       return QVariant(QBrush(QColor(255, 125, 125)));
     }
-
-    break;
   }
 
   case Qt::FontRole:
@@ -176,7 +174,7 @@ QmitkUSNavigationCalibrationsDataModel::QmitkUSNavigationCalibrationsDataModel(Q
         return QIcon(":/USNavigation/process-stop.png");
       }
     }
-    else { return QVariant::Invalid; }
+    break;
   }
 
   case Qt::EditRole:

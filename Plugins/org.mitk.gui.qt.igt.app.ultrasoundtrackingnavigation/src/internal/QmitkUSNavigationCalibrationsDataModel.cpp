@@ -149,8 +149,6 @@ QmitkUSNavigationCalibrationsDataModel::QmitkUSNavigationCalibrationsDataModel(Q
     {
       return QVariant(QBrush(QColor(255, 125, 125)));
     }
-
-    break;
   }
 
   case Qt::FontRole:

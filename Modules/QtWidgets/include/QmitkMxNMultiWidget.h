@@ -23,11 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class QGridLayout;
 
-namespace mitk
-{
-  class RenderingManager;
-}
-
 /**
 * @brief The 'QmitkMxNMultiWidget' is a 'QmitkAbstractMultiWidget' that is used to display multiple render windows at once.
 *        Render windows can dynamically be added and removed to change the layout of the multi widget. This
@@ -40,7 +35,7 @@ class MITKQTWIDGETS_EXPORT QmitkMxNMultiWidget : public QmitkAbstractMultiWidget
 
 public:
 
-  QmitkMxNMultiWidget(QWidget* parent = 0,
+  QmitkMxNMultiWidget(QWidget* parent = nullptr,
                       Qt::WindowFlags f = 0,
                       mitk::RenderingManager* renderingManager = nullptr,
                       mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard,
@@ -58,7 +53,7 @@ public:
   virtual const mitk::Point3D GetSelectedPosition(const QString& widgetName) const override;
 
   virtual void SetCrosshairVisibility(bool activate) override;
-  virtual bool GetCrosshairVisibility() override { return m_CrosshairVisibility; }
+  virtual bool GetCrosshairVisibility() const override { return m_CrosshairVisibility; }
 
 public Q_SLOTS:
 

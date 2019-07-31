@@ -89,7 +89,7 @@ void QmitkMxNMultiWidgetEditor::SetFocus()
 void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 {
   auto multiWidget = GetMultiWidget();
-  if (nullptr == multiWidget|| nullptr == dynamic_cast<QmitkMxNMultiWidgetEditor*>(multiWidget))
+  if (nullptr == multiWidget)
   {
     QHBoxLayout* layout = new QHBoxLayout(parent);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -97,7 +97,7 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     berry::IBerryPreferences* preferences = dynamic_cast<berry::IBerryPreferences*>(GetPreferences().GetPointer());
     mitk::BaseRenderer::RenderingMode::Type renderingMode = static_cast<mitk::BaseRenderer::RenderingMode::Type>(preferences->GetInt("Rendering Mode", 0));
 
-    multiWidget = new QmitkMxNMultiWidget(parent, 0, 0, renderingMode);
+    multiWidget = new QmitkMxNMultiWidget(parent, 0, nullptr, renderingMode);
 
     // create left toolbar: interaction scheme toolbar to switch how the render window navigation behaves
     if (nullptr == m_Impl->m_InteractionSchemeToolBar)

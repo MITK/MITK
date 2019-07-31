@@ -40,6 +40,8 @@ public:
   QmitkMxNMultiWidgetEditor();
   virtual ~QmitkMxNMultiWidgetEditor() override;
 
+  virtual QmitkLevelWindowWidget* GetLevelWindowWidget() const override { return nullptr; }
+
   virtual void OnLayoutSet(int row, int column) override;
 
 private:

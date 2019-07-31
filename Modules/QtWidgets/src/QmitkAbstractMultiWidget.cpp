@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk qt widgets module
 #include "QmitkAbstractMultiWidget.h"
+#include "QmitkLevelWindowWidget.h"
 #include "QmitkRenderWindowWidget.h"
 
 // mitk core

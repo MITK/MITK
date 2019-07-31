@@ -116,7 +116,7 @@ public:
   */
   virtual int GetColumnCount() const;
 
-  virtual QmitkLevelWindowWidget GetLevelWindowWidget() const = 0;
+  virtual QmitkLevelWindowWidget* GetLevelWindowWidget() const = 0;
 
 public Q_SLOTS:
   /**

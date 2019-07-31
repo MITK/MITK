@@ -113,7 +113,7 @@ public:
   virtual const mitk::Point3D GetSelectedPosition(const QString& widgetName) const = 0;
 
   virtual void SetCrosshairVisibility(bool visible) = 0;
-  virtual bool GetCrosshairVisibility() = 0;
+  virtual bool GetCrosshairVisibility() const = 0;
 
 Q_SIGNALS:
 

@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkAbstractView.h>
 #include <QmitkImageStatisticsCalculationJob.h>
 #include <mitkImageStatisticsContainer.h>
+#include <QmitkNodeSelectionDialog.h>
 
 #include <mitkILifecycleAwarePart.h>
 #include <berryIPartListener.h>
@@ -74,6 +75,7 @@ protected:
   void OnImageSelectorChanged();
   void OnMaskSelectorChanged();
 
+  void CalculateOrGetStatisticsNew();
   void CalculateOrGetStatistics();
   void CalculateStatistics(const mitk::Image* image,
                            const mitk::Image* mask = nullptr,
@@ -97,6 +99,8 @@ protected:
   void OnCheckBoxIgnoreZeroStateChanged(int state);
   void OnSliderWidgetHistogramChanged(double value);
   void OnSliderWidgetIntensityProfileChanged();
+  void OnButtonSelectionPressed();
+  void OnDialogSelectionChanged();
 
   // member variable
   Ui::QmitkImageStatisticsViewControls m_Controls;
@@ -105,9 +109,12 @@ private:
   typedef itk::SimpleMemberCommand< QmitkImageStatisticsView > ITKCommandType;
   QmitkImageStatisticsCalculationJob * m_CalculationJob = nullptr;
   mitk::DataNode::ConstPointer m_selectedImageNode = nullptr, m_selectedMaskNode = nullptr;
-
+  QmitkNodeSelectionDialog* m_SelectionDialog = nullptr;
   mitk::PlanarFigure::Pointer m_selectedPlanarFigure=nullptr;
   long m_PlanarFigureObserverTag;
   bool m_ForceRecompute = false;
+  std::vector<mitk::DataNode::Pointer> m_selectedMaskNodes;
+  std::vector<mitk::DataNode::Pointer> m_selectedImageNodes;
+  std::vector<mitk::ImageStatisticsContainer::ConstPointer> m_StatisticsForSelection;
 };
 #endif // QmitkImageStatisticsView_H__INCLUDED

@@ -62,19 +62,8 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
           or use another option in the future, we do not forget to remove our
           copy of the FindBoost module again. ]]
 
-  set(url "${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_1_68_0.7z")
-  set(md5 ae25f29cdb82cf07e8e26187ddf7d330)
-
-  if(WIN32)
-    #[[ See Task T25540 for details. Can be removed with Boost version greater
-        1.68. In case the patch fails a "cd ." is executed to force the return
-        return value to be 0 (success). We need this because we reuse the
-        extracted source files and patching an already patched file returns
-        an error code that we can ignore. ]]
-    set(patch_cmd ${PATCH_COMMAND} --binary -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Boost.patch || cd .)
-  endif()
-
-
+  set(url "${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_1_70_0.tar.gz")
+  set(md5 fea771fe8176828fabf9c09242ee8c26)
 
   if(MITK_USE_Boost_LIBRARIES)
 
@@ -95,19 +84,21 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
         #[[ Use just the major version in the toolset name. ]]
         set(bootstrap_args vc${VISUAL_STUDIO_VERSION_MAJOR})
 
-      elseif(VISUAL_STUDIO_VERSION_MAJOR EQUAL 14 AND VISUAL_STUDIO_VERSION_MINOR GREATER 0)
+      elseif(VISUAL_STUDIO_VERSION_MAJOR EQUAL 14 AND VISUAL_STUDIO_VERSION_MINOR LESS 20)
 
-        #[[ There is no generic way of deducing the Boost toolset from the
-            current minor version of Visual Studio 2017. All we can do for now
-            is to assume that for all versions greater than 14.10 and less
-            than 15.0 toolset vc141 is the right choice. ]]
+        #[[ Assume Visual Studio 2017. ]]
         set(bootstrap_args vc${VISUAL_STUDIO_VERSION_MAJOR}1)
+
+      elseif(VISUAL_STUDIO_VERSION_MAJOR EQUAL 14 AND VISUAL_STUDIO_VERSION_MINOR LESS 30)
+
+        #[[ Assume Visual Studio 2019. ]]
+        set(bootstrap_args vc${VISUAL_STUDIO_VERSION_MAJOR}2)
 
       else()
 
         #[[ Fallback to the generic case. Be prepared to add another elseif
             branch above for future versions of Visual Studio. ]]
-        set(bootstrap_args vc${VISUAL_STUDIO_VERSION_MAJOR}${VISUAL_STUDIO_VERSION_MINOR})
+        set(bootstrap_args vc${VISUAL_STUDIO_VERSION_MAJOR})
 
       endif()
 

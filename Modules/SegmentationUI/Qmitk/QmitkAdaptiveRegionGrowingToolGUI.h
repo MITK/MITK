@@ -30,7 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkAdaptiveRegionGrowingTool.h"
 
-class QmitkStdMultiWidget;
 class DataNode;
 class QmitkAdaptiveRegionGrowingToolGUIControls;
 
@@ -62,12 +61,6 @@ public:
 
   ///** \brief Method to set the default data storage.*/
   virtual void SetDataStorage(mitk::DataStorage *dataStorage);
-
-  /**
-   * @brief Method to set the used multiwidget.
-   * @param multiWidget
-   */
-  void SetMultiWidget(QmitkStdMultiWidget *multiWidget);
 
   /**
    * @brief Method to set the name of a data node.
@@ -174,9 +167,6 @@ protected:
 
   /** \brief Destructor. */
   ~QmitkAdaptiveRegionGrowingToolGUI() override;
-
-  // Pointer to the main widget to be able to reach the renderer
-  QmitkStdMultiWidget *m_MultiWidget;
 
   mitk::DataStorage *m_DataStorage;
 

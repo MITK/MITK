@@ -731,7 +731,13 @@ set(MITK_EXE_LINKER_FLAGS )
 set(MITK_SHARED_LINKER_FLAGS )
 
 if(MITK_USE_OpenMP)
-  find_package(OpenMP COMPONENTS CXX REQUIRED)
+  find_package(OpenMP REQUIRED COMPONENTS CXX)
+else()
+  find_package(OpenMP QUIET COMPONENTS CXX)
+
+  if(OpenMP_FOUND)
+    set(MITK_USE_OpenMP ON CACHE BOOL "" FORCE)
+  endif()
 endif()
 
 if(WIN32)

@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef PARAMAPRPRESETS_H_HEADER
+#ifndef PARAMAPPRESETS_H_HEADER
 #define PARAMAPPRESETS_H_HEADER
 
 #include <MitkDICOMPMExports.h>

@@ -11,7 +11,12 @@ mitkFunctionAddExternalProject(NAME CppUnit     ON  ADVANCED DOC "Use CppUnit fo
 mitkFunctionAddExternalProject(NAME PCRE        OFF ADVANCED NO_PACKAGE)
 
 mitkFunctionAddExternalProject(NAME HDF5        ON ADVANCED)
-mitkFunctionAddExternalProject(NAME OpenMP      ON)
+
+if(APPLE)
+  mitkFunctionAddExternalProject(NAME OpenMP    OFF)
+else()
+  mitkFunctionAddExternalProject(NAME OpenMP    ON)
+endif()
 
 # -----------------------------------------
 # The following external projects must be

@@ -25,6 +25,7 @@ if(MITK_USE_${proj})
     ExternalProject_Add(${proj}
       GIT_REPOSITORY https://github.com/Microsoft/cpprestsdk.git
       GIT_TAG v2.10.10
+      PATCH_COMMAND ${PATCH_COMMAND} -d "${ep_prefix}/src/cpprestsdk/Release/libs/websocketpp" -N -p1 -i "${CMAKE_CURRENT_LIST_DIR}/${proj}.patch"
       SOURCE_SUBDIR Release
       CMAKE_ARGS ${ep_common_args}
       CMAKE_CACHE_ARGS ${cmake_cache_args}

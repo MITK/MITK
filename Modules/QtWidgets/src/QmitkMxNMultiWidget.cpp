@@ -47,6 +47,13 @@ void QmitkMxNMultiWidget::MultiWidgetClosed()
   SetCrosshairVisibility(false);
 }
 
+QmitkRenderWindow* QmitkMxNMultiWidget::GetRenderWindow(const mitk::BaseRenderer::ViewDirection& viewDirection) const
+{
+  // currently no mapping between view directions and render windows
+  // simply return the currently active render window
+  return GetActiveRenderWindowWidget()->GetRenderWindow();
+}
+
 void QmitkMxNMultiWidget::SetActiveRenderWindowWidget(RenderWindowWidgetPointer activeRenderWindowWidget)
 {
   auto currentActiveRenderWindowWidget = GetActiveRenderWindowWidget();

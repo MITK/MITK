@@ -91,6 +91,17 @@ QmitkRenderWindow* QmitkAbstractMultiWidgetEditor::GetQmitkRenderWindow(const QS
   return multiWidget->GetRenderWindow(id);
 }
 
+QmitkRenderWindow* QmitkAbstractMultiWidgetEditor::GetQmitkRenderWindow(const mitk::BaseRenderer::ViewDirection& viewDirection) const
+{
+  const auto& multiWidget = GetMultiWidget();
+  if (nullptr == multiWidget)
+  {
+    return nullptr;
+  }
+
+  return multiWidget->GetRenderWindow(viewDirection);
+}
+
 mitk::Point3D QmitkAbstractMultiWidgetEditor::GetSelectedPosition(const QString& id/* = QString()*/) const
 {
   const auto& multiWidget = GetMultiWidget();

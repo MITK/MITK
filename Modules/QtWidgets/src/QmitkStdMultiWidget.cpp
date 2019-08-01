@@ -146,6 +146,11 @@ void QmitkStdMultiWidget::InitializeMultiWidget()
   ActivateMenuWidget(true);
 }
 
+QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow(const mitk::BaseRenderer::ViewDirection& viewDirection) const
+{
+  return GetRenderWindow(static_cast<unsigned int>(viewDirection));
+}
+
 void QmitkStdMultiWidget::SetSelectedPosition(const mitk::Point3D& newPosition, const QString& /*widgetName*/)
 {
   GetRenderWindow1()->GetSliceNavigationController()->SelectSliceByPoint(newPosition);
@@ -155,7 +160,7 @@ void QmitkStdMultiWidget::SetSelectedPosition(const mitk::Point3D& newPosition, 
   RequestUpdateAll();
 }
 
-const mitk::Point3D QmitkStdMultiWidget::GetSelectedPosition(const QString& widgetName) const
+const mitk::Point3D QmitkStdMultiWidget::GetSelectedPosition(const QString& /*widgetName*/) const
 {
   const mitk::PlaneGeometry* plane1 = GetRenderWindow1()->GetSliceNavigationController()->GetCurrentPlaneGeometry();
   const mitk::PlaneGeometry* plane2 = GetRenderWindow2()->GetSliceNavigationController()->GetCurrentPlaneGeometry();
@@ -743,7 +748,7 @@ void QmitkStdMultiWidget::CreateRenderWindowWidgets()
   renderWindow1->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
   renderWindowWidget1->SetDecorationColor(GetDecorationColor(0));
   renderWindowWidget1->SetCornerAnnotationText("Axial");
-  renderWindowWidget1->GetRenderWindow()->SetLayoutIndex(AXIAL);
+  renderWindowWidget1->GetRenderWindow()->SetLayoutIndex(static_cast<unsigned int>(ViewDirection::AXIAL));
   AddRenderWindowWidget(renderWindowWidgetName, renderWindowWidget1);
 
   // create sagittal render window (widget)
@@ -754,7 +759,7 @@ void QmitkStdMultiWidget::CreateRenderWindowWidgets()
   renderWindowWidget2->SetDecorationColor(GetDecorationColor(1));
   renderWindowWidget2->setStyleSheet("border: 0px");
   renderWindowWidget2->SetCornerAnnotationText("Sagittal");
-  renderWindowWidget2->GetRenderWindow()->SetLayoutIndex(SAGITTAL);
+  renderWindowWidget2->GetRenderWindow()->SetLayoutIndex(static_cast<unsigned int>(ViewDirection::SAGITTAL));
   AddRenderWindowWidget(renderWindowWidgetName, renderWindowWidget2);
 
   // create coronal render window (widget)
@@ -764,7 +769,7 @@ void QmitkStdMultiWidget::CreateRenderWindowWidgets()
   renderWindow3->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Frontal);
   renderWindowWidget3->SetDecorationColor(GetDecorationColor(2));
   renderWindowWidget3->SetCornerAnnotationText("Coronal");
-  renderWindowWidget3->GetRenderWindow()->SetLayoutIndex(CORONAL);
+  renderWindowWidget3->GetRenderWindow()->SetLayoutIndex(static_cast<unsigned int>(ViewDirection::CORONAL));
   AddRenderWindowWidget(renderWindowWidgetName, renderWindowWidget3);
 
   // create 3D render window (widget)
@@ -774,8 +779,8 @@ void QmitkStdMultiWidget::CreateRenderWindowWidgets()
   renderWindow4->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Original);
   renderWindowWidget4->SetDecorationColor(GetDecorationColor(3));
   renderWindowWidget4->SetCornerAnnotationText("3D");
+  renderWindowWidget4->GetRenderWindow()->SetLayoutIndex(static_cast<unsigned int>(ViewDirection::THREE_D));
   mitk::BaseRenderer::GetInstance(renderWindowWidget4->GetRenderWindow()->GetRenderWindow())->SetMapperID(mitk::BaseRenderer::Standard3D);
-  renderWindowWidget4->GetRenderWindow()->SetLayoutIndex(THREE_D);
   AddRenderWindowWidget(renderWindowWidgetName, renderWindowWidget4);
 
   SetActiveRenderWindowWidget(renderWindowWidget1);

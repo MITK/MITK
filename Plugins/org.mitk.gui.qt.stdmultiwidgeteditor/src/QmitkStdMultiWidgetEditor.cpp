@@ -341,6 +341,7 @@ void QmitkStdMultiWidgetEditor::GetPreferenceDecorations(const berry::IBerryPref
   for (const auto& renderWindowWidget : renderWindowWidgets)
   {
     QString widgetName = "widget" + QString::number(i + 1);
+
     auto upper = preferences->Get(widgetName + " first background color", hexBlack);
     auto lower = preferences->Get(widgetName + " second background color", hexBlack);
     renderWindowWidget.second->SetGradientBackgroundColors(HexColorToMitkColor(upper), HexColorToMitkColor(lower));

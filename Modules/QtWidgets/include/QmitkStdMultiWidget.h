@@ -44,14 +44,6 @@ public:
     PLANE_MODE_SWIVEL
   };
 
-  enum
-  {
-    AXIAL = 0,
-    SAGITTAL,
-    CORONAL,
-    THREE_D
-  };
-
   QmitkStdMultiWidget(QWidget *parent = nullptr,
                       Qt::WindowFlags f = 0,
                       mitk::RenderingManager *renderingManager = nullptr,
@@ -61,6 +53,8 @@ public:
   ~QmitkStdMultiWidget() override;
 
   virtual void InitializeMultiWidget() override;
+
+  virtual QmitkRenderWindow* GetRenderWindow(const mitk::BaseRenderer::ViewDirection& viewDirection) const override;
 
   virtual void SetSelectedPosition(const mitk::Point3D& newPosition, const QString& widgetName) override;
   virtual const mitk::Point3D GetSelectedPosition(const QString& widgetName) const override;

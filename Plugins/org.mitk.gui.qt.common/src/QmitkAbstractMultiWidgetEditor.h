@@ -62,6 +62,10 @@ public:
   /**
   * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
   */
+  virtual QmitkRenderWindow* GetQmitkRenderWindow(const mitk::BaseRenderer::ViewDirection& viewDirection) const override;
+  /**
+  * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
+  */
   virtual mitk::Point3D GetSelectedPosition(const QString& id = QString()) const override;
   /**
   * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
@@ -92,7 +96,7 @@ public:
   */
   virtual void PartClosed(const berry::IWorkbenchPartReference::Pointer& partRef) override;
   /**
-  * @brief Retrieve a QmitkRenderWindow by it's index.
+  * @brief Retrieve a QmitkRenderWindow by its index.
   */
   virtual QmitkRenderWindow* GetQmitkRenderWindowByIndex(int index) const;
   /**

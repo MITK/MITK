@@ -258,7 +258,7 @@ mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelations
       // examination period exists, information type exists, retrieve all imageIDs from the storage
       auto allImageIDsOfExaminationPeriod = SemanticRelationsInference::GetAllImageIDsOfExaminationPeriod(caseID, examinationPeriod);
       // filter all images to remove the ones with a different information type using a lambda function
-      auto lambda = [&caseID, &informationType, this](SemanticTypes::ID imageID)
+      auto lambda = [&caseID, &informationType](SemanticTypes::ID imageID)
       {
         return (informationType != RelationStorage::GetInformationTypeOfImage(caseID, imageID));
       };

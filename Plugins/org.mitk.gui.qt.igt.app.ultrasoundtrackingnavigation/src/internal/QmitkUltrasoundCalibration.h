@@ -21,9 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkAbstractView.h>
 
-// QT
-//#include <QTimer>
-
 // MITK
 #include <mitkIGTLClient.h>
 #include <mitkNavigationDataToIGTLMessageFilter.h>
@@ -77,7 +74,6 @@ protected slots:
    * \brief Triggered, when the user has clicked "select Devices".
    *
    */
-  // void OnSelectDevice(mitk::USCombinedModality::Pointer);
   void OnDeviceSelected();
   void OnDeviceDeselected();
 
@@ -336,12 +332,6 @@ protected:
   int m_currentPoint;
   std::vector<mitk::Point3D> m_allReferencePoints;
   std::vector<double> m_allErrors;
-
-  /**
-   * \brief Pointset containing points along the needle's prohected path. Only used for visualization. The first point
-   * is the needle tip.
-   */
-  // mitk::PointSet::Pointer m_NeedlePathPoints;
 
   /**
    * \brief Creates a Pointset that projects the needle's path

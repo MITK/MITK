@@ -30,7 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <mitkVector.h>
-//#include <mitkPointSetWriter.h>
 #include "mitkIOUtil.h"
 #include "mitkIRenderingManager.h"
 #include <mitkBaseData.h>
@@ -90,18 +89,11 @@ QmitkUltrasoundCalibration::~QmitkUltrasoundCalibration()
     combinedModality->GetUltrasoundDevice()->RemovePropertyChangedListener(m_USDeviceChanged);
   }
   m_Timer->stop();
-  // Sleep(500); //This might be problematic... seems like sometimes some ressources are still in use at calling time.
 
   this->OnStopCalibrationProcess();
 
   this->OnStopPlusCalibration();
 
-  /*mitk::DataNode::Pointer node = this->GetDataStorage()->GetNamedNode("Tool Calibration Points");
-  if (node.IsNotNull())this->GetDataStorage()->Remove(node);
-  node = this->GetDataStorage()->GetNamedNode("Image Calibration Points");
-  if (node.IsNotNull())this->GetDataStorage()->Remove(node);
-  node = this->GetDataStorage()->GetNamedNode("US Image Stream");
-  if (node.IsNotNull())this->GetDataStorage()->Remove(node);*/
   mitk::DataNode::Pointer node = this->GetDataStorage()->GetNamedNode("Needle Path");
   if (node.IsNotNull())
     this->GetDataStorage()->Remove(node);
@@ -162,7 +154,7 @@ void QmitkUltrasoundCalibration::CreateQtPartControl(QWidget *parent)
 
   // General & Device Selection
   connect(m_Timer, SIGNAL(timeout()), this, SLOT(Update()));
-  // connect(m_Controls.m_ToolBox, SIGNAL(currentChanged(int)), this, SLOT(OnTabSwitch(int)));
+
   // Calibration
   connect(m_Controls.m_CalibBtnFreeze, SIGNAL(clicked()), this, SLOT(SwitchFreeze())); // Freeze
   connect(m_Controls.m_CalibBtnAddPoint,
@@ -222,9 +214,6 @@ void QmitkUltrasoundCalibration::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.m_SpacingAddPoint, SIGNAL(clicked()), this, SLOT(OnAddSpacingPoint()));
   connect(m_Controls.m_CalculateSpacing, SIGNAL(clicked()), this, SLOT(OnCalculateSpacing()));
 
-  // connect( m_Controls.m_CombinedModalityManagerWidget,
-  // SIGNAL(SignalCombinedModalitySelected(mitk::USCombinedModality::Pointer)),
-  //  this, SLOT(OnSelectDevice(mitk::USCombinedModality::Pointer)) );
   connect(m_Controls.m_CombinedModalityManagerWidget, SIGNAL(SignalReadyForNextStep()), this, SLOT(OnDeviceSelected()));
   connect(m_Controls.m_CombinedModalityManagerWidget,
           SIGNAL(SignalNoLongerReadyForNextStep()),
@@ -283,17 +272,12 @@ void QmitkUltrasoundCalibration::OnTabSwitch(int index)
   }
 }
 
-// void QmitkUltrasoundCalibration::OnSelectDevice(mitk::USCombinedModality::Pointer combinedModality)
 void QmitkUltrasoundCalibration::OnDeviceSelected()
 {
   mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality;
   combinedModality = m_Controls.m_CombinedModalityManagerWidget->GetSelectedCombinedModality();
   if (combinedModality.IsNotNull())
   {
-    // m_Tracker = m_CombinedModality->GetNavigationDataSource();
-
-    // Construct Pipeline
-    // this->m_NeedleProjectionFilter->SetInput(0, m_Tracker->GetOutput(0));
     combinedModality->GetUltrasoundDevice()->AddPropertyChangedListener(m_USDeviceChanged);
 
     m_Controls.m_StartCalibrationButton->setEnabled(true);
@@ -420,8 +404,6 @@ void QmitkUltrasoundCalibration::OnStartCalibrationProcess()
   }
 
   m_Tracker = m_CombinedModality->GetNavigationDataSource();
-
-  // QString curDepth = service.getProperty(QString::fromStdString(mitk::USDevice::US_PROPKEY_BMODE_DEPTH)).toString();
 
   // Construct Pipeline
   this->m_NeedleProjectionFilter->SetInput(0, m_Tracker->GetOutput(0));
@@ -630,7 +612,7 @@ void QmitkUltrasoundCalibration::OnGetPlusCalibration()
           dynamic_cast<igtl::TransformMessage *>(m_TransformDeviceSource->GetOutput()->GetMessage().GetPointer());
         if (msg == nullptr || msg.IsNull())
         {
-          MITK_INFO << "Received message could not be casted to TransformMessage. Skipping..";
+          MITK_INFO << "Received message could not be casted to TransformMessage. Skipping...";
           continue;
         }
         else
@@ -796,16 +778,6 @@ void QmitkUltrasoundCalibration::OnCalibration()
   translationFloat[0] = m->GetElement(0, 3);
   translationFloat[1] = m->GetElement(1, 3);
   translationFloat[2] = m->GetElement(2, 3);
-
-  // mitk::DataNode::Pointer CalibPointsImage = mitk::DataNode::New();
-  // CalibPointsImage->SetName("Calibration Points Image");
-  // CalibPointsImage->SetData(m_CalibPointsImage);
-  // this->GetDataStorage()->Add(CalibPointsImage);
-
-  // mitk::DataNode::Pointer CalibPointsTracking = mitk::DataNode::New();
-  // CalibPointsTracking->SetName("Calibration Points Tracking");
-  // CalibPointsTracking->SetData(m_CalibPointsTool);
-  // this->GetDataStorage()->Add(CalibPointsTracking);
 
   mitk::PointSet::Pointer ImagePointsTransformed = m_CalibPointsImage->Clone();
   this->ApplyTransformToPointSet(ImagePointsTransformed, transform);
@@ -1174,9 +1146,6 @@ void QmitkUltrasoundCalibration::OnReset()
 
 void QmitkUltrasoundCalibration::Update()
 {
-  // QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
-  // if (nodes.empty()) return;
-
   // Update Tracking Data
   std::vector<mitk::NavigationData::Pointer> *datas = new std::vector<mitk::NavigationData::Pointer>();
   datas->push_back(m_Tracker->GetOutput());
@@ -1184,17 +1153,6 @@ void QmitkUltrasoundCalibration::Update()
   m_Controls.m_CalibTrackingStatus->Refresh();
   m_Controls.m_EvalTrackingStatus->SetNavigationDatas(datas);
   m_Controls.m_EvalTrackingStatus->Refresh();
-
-  /*
-  if (m_Image.IsNotNull() && m_Image->IsInitialized())
-  {
-    m_Node->SetData(m_Image);
-  }
-  else
-  {
-    m_Image = m_CombinedModality->GetOutput();
-    m_Node->SetData(m_Image);
-  }*/
 
   m_CombinedModality->Modified();
   m_CombinedModality->Update();

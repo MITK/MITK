@@ -185,22 +185,14 @@ endif()
 # Additional MITK Options (also shown during superbuild)
 #-----------------------------------------------------------------------------
 
-macro(env_option name doc value)
-  set(_value $ENV{${name}})
-  if("${_value}" STREQUAL "")
-    set(_value ${value})
-  endif()
-  option(${name} "${doc}" ${_value})
-endmacro()
-
 # -----------------------------------------
 # General build options
 option(BUILD_SHARED_LIBS "Build MITK with shared libraries" ON)
 option(WITH_COVERAGE "Enable/Disable coverage" OFF)
 option(BUILD_TESTING "Test the project" ON)
 
-env_option(MITK_BUILD_ALL_APPS "Build all MITK applications" OFF)
-env_option(MITK_BUILD_EXAMPLES "Build the MITK Examples" OFF)
+option(MITK_BUILD_ALL_APPS "Build all MITK applications" OFF)
+option(MITK_BUILD_EXAMPLES "Build the MITK Examples" OFF)
 option(MITK_ENABLE_PIC_READER "Enable support for reading the DKFZ pic file format." ON)
 
 mark_as_advanced(MITK_BUILD_ALL_APPS
@@ -210,7 +202,7 @@ mark_as_advanced(MITK_BUILD_ALL_APPS
 # -----------------------------------------
 # Qt version related variables
 
-env_option(MITK_USE_Qt5 "Use Qt 5 library" ON)
+option(MITK_USE_Qt5 "Use Qt 5 library" ON)
 
 if(MITK_USE_Qt5)
   set(MITK_QT5_MINIMUM_VERSION 5.11.1)
@@ -290,8 +282,9 @@ endforeach()
 # external projects build via the
 # MITK superbuild
 
-env_option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
-env_option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
+option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
+option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
+option(MITK_USE_OpenMP "Use OpenMP" OFF)
 
 #-----------------------------------------------------------------------------
 # Build configurations
@@ -730,28 +723,6 @@ set(MITK_CXX_FLAGS_RELEASE )
 set(MITK_EXE_LINKER_FLAGS )
 set(MITK_SHARED_LINKER_FLAGS )
 
-if(MITK_USE_OpenMP)
-  find_package(OpenMP REQUIRED COMPONENTS CXX)
-else()
-  find_package(OpenMP QUIET COMPONENTS CXX)
-
-  if(OpenMP_FOUND)
-    set(MITK_USE_OpenMP ON CACHE BOOL "" FORCE)
-  elseif(APPLE AND OpenMP_libomp_LIBRARY AND NOT OpenMP_CXX_LIB_NAMES)
-    set(OpenMP_CXX_LIB_NAMES libomp CACHE STRING "" FORCE)
-    get_filename_component(openmp_lib_dir "${OpenMP_libomp_LIBRARY}" DIRECTORY)
-    set(openmp_include_dir "${openmp_lib_dir}/../include")
-    if(EXISTS "${openmp_include_dir}")
-      get_filename_component(openmp_include_dir "${openmp_include_dir}" REALPATH)
-      set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp -I${openmp_include_dir}" CACHE STRING "" FORCE)
-      find_package(OpenMP QUIET COMPONENTS CXX)
-      if(OpenMP_FOUND)
-        set(MITK_USE_OpenMP ON CACHE BOOL "" FORCE)
-      endif()
-    endif()
-  endif()
-endif()
-
 if(WIN32)
   set(MITK_CXX_FLAGS "${MITK_CXX_FLAGS} -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN -DNOMINMAX")
   mitkFunctionCheckCompilerFlags("/wd4005" MITK_CXX_FLAGS) # warning C4005: macro redefinition
@@ -901,6 +872,28 @@ endif()
 
 if(MITK_USE_OpenCL)
   find_package(OpenCL REQUIRED)
+endif()
+
+if(MITK_USE_OpenMP)
+  find_package(OpenMP REQUIRED COMPONENTS CXX)
+else()
+  find_package(OpenMP QUIET COMPONENTS CXX)
+
+  if(OpenMP_FOUND)
+    set(MITK_USE_OpenMP ON CACHE BOOL "" FORCE)
+  elseif(APPLE AND OpenMP_libomp_LIBRARY AND NOT OpenMP_CXX_LIB_NAMES)
+    set(OpenMP_CXX_LIB_NAMES libomp CACHE STRING "" FORCE)
+    get_filename_component(openmp_lib_dir "${OpenMP_libomp_LIBRARY}" DIRECTORY)
+    set(openmp_include_dir "${openmp_lib_dir}/../include")
+    if(EXISTS "${openmp_include_dir}")
+      get_filename_component(openmp_include_dir "${openmp_include_dir}" REALPATH)
+      set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp -I${openmp_include_dir}" CACHE STRING "" FORCE)
+      find_package(OpenMP QUIET COMPONENTS CXX)
+      if(OpenMP_FOUND)
+        set(MITK_USE_OpenMP ON CACHE BOOL "" FORCE)
+      endif()
+    endif()
+  endif()
 endif()
 
 # Qt support

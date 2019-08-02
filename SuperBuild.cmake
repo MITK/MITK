@@ -257,16 +257,14 @@ set(mitk_cmake_boolean_args
   BUILD_SHARED_LIBS
   WITH_COVERAGE
   BUILD_TESTING
-
   MITK_BUILD_ALL_PLUGINS
   MITK_BUILD_ALL_APPS
   MITK_BUILD_EXAMPLES
-
   MITK_USE_Qt5
   MITK_USE_SYSTEM_Boost
   MITK_USE_BLUEBERRY
   MITK_USE_OpenCL
-
+  MITK_USE_OpenMP
   MITK_ENABLE_PIC_READER
   )
 
@@ -340,6 +338,12 @@ if(MITK_USE_Python)
        "-DPython3_STDLIB:FILEPATH=${Python3_STDLIB}"
        "-DPython3_SITELIB:FILEPATH=${Python3_SITELIB}"
       )
+endif()
+
+if(OPENSSL_ROOT_DIR)
+  list(APPEND mitk_optional_cache_args
+    "-DOPENSSL_ROOT_DIR:PATH=${OPENSSL_ROOT_DIR}"
+  )
 endif()
 
 if(Eigen_INCLUDE_DIR)

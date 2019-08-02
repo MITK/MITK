@@ -1,5 +1,7 @@
 #include "mitkSurfaceUtils.h"
 
+#include <chrono>
+
 #include <vtkCallbackCommand.h>
 
 #include <mitkImageAccessByItk.h>
@@ -7,6 +9,7 @@
 #include <mitkImageCaster.h>
 #include <mitkProgressBar.h>
 #include "mitkShowSegmentationAsAgtkSurface.h"
+#include "mitkShowSegmentationAsElasticNetSurface.h"
 #include "mitkShowSegmentationAsSurface.h"
 
 #include <AutoplanLogging.h>
@@ -100,6 +103,7 @@ DataNode::Pointer SurfaceCreator::createModel()
     surface = m_4dRecreateSurface;
   }
 
+  auto t1 = std::chrono::high_resolution_clock::now();
   for (int curTimeStep = minTimeStep; curTimeStep < maxTimeStep; curTimeStep++) {
     Image::Pointer image3d = extract3D(image, curTimeStep);
 
@@ -111,10 +115,17 @@ DataNode::Pointer SurfaceCreator::createModel()
       case SurfaceCreationType::AGTK:
         result = createModelAgtk(image3d, m_Args);
         break;
+      case SurfaceCreationType::ELASTIC_NET:
+        result = createModelElasticNet(image3d, m_Args);
+        break;
     }
 
     surface->SetVtkPolyData(result, curTimeStep);
   }
+  auto t2 = std::chrono::high_resolution_clock::now();
+
+  auto duration = std::chrono::duration_cast<std::chrono::seconds>(t2 - t1).count();
+  MITK_INFO << "Model generation took " << duration << " seconds.";
 
   DataNode::Pointer node = DataNode::New();
 
@@ -419,4 +430,21 @@ vtkSmartPointer<vtkPolyData> SurfaceCreator::createModelAgtk(Image::Pointer imag
   return surfaceBuilder->GetOutput();
 }
 
+vtkSmartPointer<vtkPolyData> SurfaceCreator::createModelElasticNet(Image::Pointer image, SurfaceCreationArgs args)
+{
+  ShowSegmentationAsElasticNetSurface::SurfaceComputingParameters surfaceParams;
+  surfaceParams.elasticNetIterations = args.elasticIterations;
+  ShowSegmentationAsElasticNetSurface::Pointer surfaceBuilder = ShowSegmentationAsElasticNetSurface::New();
+  surfaceBuilder->setArgs(args, surfaceParams);
+
+  ShowSegmentationAsElasticNetSurface::InputImageType::Pointer itkImage;
+  CastToItkImage(image, itkImage);
+  surfaceBuilder->SetInput(itkImage);
+
+  m_ProgressAccumulator->RegisterInternalFilter(surfaceBuilder, 1.f);
+
+  surfaceBuilder->Update();
+
+  return surfaceBuilder->GetOutput();
+}
 }

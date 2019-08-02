@@ -29,6 +29,7 @@ public:
   enum SurfaceCreationType {
     MITK,
     AGTK,
+    ELASTIC_NET,
   };
 
   struct SurfaceCreationArgs {
@@ -43,6 +44,7 @@ public:
     bool overwrite = true;
     DataNode::Pointer removeOnComplete = nullptr; // Node will be removed after creating and adding new model
     int timestep = -1;
+    int elasticIterations = 1;
   };
 
   class SurfaceCreationTypeProperty : public EnumerationProperty
@@ -125,6 +127,7 @@ protected:
 
   vtkSmartPointer<vtkPolyData> createModelMitk(Image::Pointer segNode, SurfaceCreator::SurfaceCreationArgs args);
   vtkSmartPointer<vtkPolyData> createModelAgtk(Image::Pointer segNode, SurfaceCreator::SurfaceCreationArgs args);
+  vtkSmartPointer<vtkPolyData> createModelElasticNet(Image::Pointer segNode, SurfaceCreator::SurfaceCreationArgs args);
 
   itk::ProgressAccumulator::Pointer m_ProgressAccumulator;
 

@@ -65,7 +65,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkUltrasoundCalibration::VIEW_ID = "org.mitk.views.ultrasoundcalibration";
 
 QmitkUltrasoundCalibration::QmitkUltrasoundCalibration()
-  : m_USDeviceChanged(this, &QmitkUltrasoundCalibration::OnUSDepthChanged), m_PhantomConfigurationPointSet(nullptr)
+  : m_PhantomConfigurationPointSet(nullptr),
+    m_USDeviceChanged(this, &QmitkUltrasoundCalibration::OnUSDepthChanged)
 {
   ctkPluginContext *pluginContext = mitk::PluginActivator::GetContext();
 

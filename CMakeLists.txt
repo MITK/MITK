@@ -356,15 +356,16 @@ if(MITK_USE_cpprestsdk)
 endif()
 
 if(MITK_USE_Python)
-  set(MITK_USE_ZLIB ON)
-  find_package(Python3 COMPONENTS Interpreter REQUIRED)
-  find_package(Python3 COMPONENTS Development REQUIRED)
+  set(MITK_USE_ZLIB ON CACHE BOOL "" FORCE)
+
+  if(APPLE AND CMAKE_FRAMEWORK_PATH AND CMAKE_FRAMEWORK_PATH MATCHES "python3\\.?([0-9]+)")
+    find_package(Python3 3.${CMAKE_MATCH_1} EXACT REQUIRED COMPONENTS Interpreter Development NumPy)
+  else()
+    find_package(Python3 REQUIRED COMPONENTS Interpreter Development NumPy)
+  endif()
 
   string(REPLACE "\\" "/" Python3_STDARCH "${Python3_STDARCH}")
   string(REPLACE "\\" "/" Python3_SITELIB "${Python3_SITELIB}")
-
-  #find_package(Python3 COMPONENTS NumPy) # does not work, therefore use own script. maybe change later.
-  find_package(Numpy REQUIRED)
 endif()
 
 if(BUILD_TESTING AND NOT MITK_USE_CppUnit)

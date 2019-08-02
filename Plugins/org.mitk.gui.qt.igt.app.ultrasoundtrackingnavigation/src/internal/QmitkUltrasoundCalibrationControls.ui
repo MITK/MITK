@@ -39,8 +39,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>362</width>
-        <height>845</height>
+        <width>356</width>
+        <height>812</height>
        </rect>
       </property>
       <attribute name="label">
@@ -67,8 +67,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>362</width>
-        <height>845</height>
+        <width>450</width>
+        <height>798</height>
        </rect>
       </property>
       <attribute name="label">
@@ -91,7 +91,7 @@
        <item row="0" column="0">
         <widget class="QTabWidget" name="tabWidget">
          <property name="currentIndex">
-          <number>2</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="m_Spacing">
           <attribute name="title">
@@ -850,8 +850,8 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>362</width>
-        <height>845</height>
+        <width>356</width>
+        <height>812</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1108,8 +1108,8 @@ p, li { white-space: pre-wrap; }
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>132</width>
-                <height>61</height>
+                <width>246</width>
+                <height>88</height>
                </rect>
               </property>
               <attribute name="label">
@@ -1153,8 +1153,8 @@ p, li { white-space: pre-wrap; }
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>102</width>
-                <height>171</height>
+                <width>183</width>
+                <height>232</height>
                </rect>
               </property>
               <attribute name="label">

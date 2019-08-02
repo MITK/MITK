@@ -340,6 +340,12 @@ if(MITK_USE_Python)
       )
 endif()
 
+if(OPENSSL_ROOT_DIR)
+  list(APPEND mitk_optional_cache_args
+    "-DOPENSSL_ROOT_DIR:PATH=${OPENSSL_ROOT_DIR}"
+  )
+endif()
+
 if(Eigen_INCLUDE_DIR)
     list(APPEND mitk_optional_cache_args
       -DEigen_INCLUDE_DIR:PATH=${Eigen_INCLUDE_DIR}

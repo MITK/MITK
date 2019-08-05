@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <QmitkDataNodeShowSelectedNodesAction.h>
+#include <mitkNodePredicateFirstLevel.h>
 
 // mitk core
 #include <mitkRenderingManager.h>
@@ -52,21 +53,14 @@ void QmitkDataNodeShowSelectedNodesAction::OnActionTriggered(bool /*checked*/)
   mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
 
   auto dataNodes = GetSelectedNodes();
-  auto nodeset = dataStorage->GetAll();
-  for (auto& node : *nodeset)
+  mitk::NodePredicateFirstLevel::Pointer nodeFirstLevelFilterPredicate = mitk::NodePredicateFirstLevel::New(dataStorage);
+  auto nodesetFirstLevel = dataStorage->GetSubset(nodeFirstLevelFilterPredicate);
+
+  for (auto& node : *nodesetFirstLevel)
   {
-    if (node.IsNotNull())
+    if (node.IsNotNull() && node->GetData() != nullptr)
     {
       node->SetVisibility(dataNodes.contains(node), baseRenderer);
-      if(node->GetData() == nullptr)
-      {
-        node->SetVisibility(true, baseRenderer);
-        mitk::DataStorage::SetOfObjects::ConstPointer derivations = dataStorage->GetDerivations(node);
-        for (mitk::DataStorage::SetOfObjects::const_iterator iter = derivations->begin(); iter != derivations->end(); ++iter)
-        {
-          (*iter)->SetVisibility(true, baseRenderer);
-        }
-      }
     }
   }
 

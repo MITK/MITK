@@ -77,7 +77,7 @@ CMake will present you a couple of options, these are the most important ones:
    specify them here.
  - <tt><b>MITK_USE_OpenCV</b></tt> Build MITK code which depends on OpenCV (this
    will download and build OpenCV 2.4)
- - <tt><b>MITK_USE_Python</b></tt> Enables Python wrapping in MITK. This will also
+ - <tt><b>MITK_USE_Python3</b></tt> Enables Python wrapping in MITK. This will also
    configure ITK, VTK, and OpenCV (if enabled) to build Python wrappers.
  - <tt><b>MITK_USE_Qt5</b></tt> Build MITK code which depends on Qt 5
 

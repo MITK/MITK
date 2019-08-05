@@ -5,7 +5,7 @@ MITK_CREATE_MODULE( PythonService
     PRIVATE src/PythonService
   DEPENDS PUBLIC MitkPython
   PACKAGE_DEPENDS
-    PUBLIC Qt5|Widgets CTK|CTKScriptingPythonCore+CTKScriptingPythonWidgets
+    PUBLIC Qt5|Widgets CTK|CTKScriptingPythonCore+CTKScriptingPythonWidgets Python3|NumPy
     AUTOLOAD_WITH MitkPython
 )
 

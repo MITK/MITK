@@ -18,26 +18,20 @@ if(MITK_USE_CTK)
     set(revision_tag da3fd76)
 
     set(ctk_optional_cache_args )
-    if(MITK_USE_Python)
+    if(MITK_USE_Python3)
       list(APPEND ctk_optional_cache_args
            -DCTK_LIB_Scripting/Python/Widgets:BOOL=ON
            -DCTK_ENABLE_Python_Wrapping:BOOL=OFF
            -DCTK_APP_ctkSimplePythonShell:BOOL=OFF
-           "-DPYTHON_EXECUTABLE:FILEPATH=${Python3_EXECUTABLE}"
            "-DPYTHON_INCLUDE_DIR:PATH=${Python3_INCLUDE_DIR}"
-           "-DPYTHON_LIBRARY:FILEPATH=${Python3_LIBRARY}"
+           "-DPYTHON_LIBRARY:FILEPATH=${Python3_LIBRARY_RELEASE}"
       )
     else()
       list(APPEND ctk_optional_cache_args
            -DCTK_LIB_Scripting/Python/Widgets:BOOL=OFF
            -DCTK_ENABLE_Python_Wrapping:BOOL=OFF
            -DCTK_APP_ctkSimplePythonShell:BOOL=OFF
-      )
-    endif()
-
-    if(NOT MITK_USE_Python)
-      list(APPEND ctk_optional_cache_args
-        -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=d
+           -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=d
       )
     endif()
 

@@ -1,4 +1,4 @@
-if(MITK_USE_Python)
+if(MITK_USE_Python3)
   mitkFunctionCheckCompilerFlags("/wd4273" CMAKE_CXX_FLAGS)
 
   set(OpenCV_DEP )

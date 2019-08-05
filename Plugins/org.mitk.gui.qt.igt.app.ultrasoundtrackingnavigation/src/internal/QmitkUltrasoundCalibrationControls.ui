@@ -101,7 +101,7 @@
            <item row="0" column="0">
             <widget class="QLabel" name="label_49">
              <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;1. Freeze the US-Image.&lt;/p&gt;&lt;p&gt;2. Mark two points in the US-Image of which you know &lt;br/&gt;they are exactly 30mm apart in horizontal direction.&lt;/p&gt;&lt;p&gt;3. Marktwo more points in the US-Image of which you &lt;br/&gt;know they are exactly 20mm apart vertical direction.&lt;/p&gt;&lt;p&gt;4. Now you can click the &amp;quot;Calculate Spacing&amp;quot;-Button. &lt;br/&gt;The spacing is calculated and applied to the US-Image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;1. Freeze the US image.&lt;/p&gt;&lt;p&gt;2. Mark two points in the US image of which you know &lt;br/&gt;they are exactly 30mm apart in horizontal direction.&lt;/p&gt;&lt;p&gt;3. Mark two more points in the US image of which you &lt;br/&gt;know they are exactly 20mm apart vertical direction.&lt;/p&gt;&lt;p&gt;4. Now you can click the &amp;quot;Calculate Spacing&amp;quot; button. &lt;br/&gt;The spacing is calculated and applied to the US image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -180,7 +180,7 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Slowly move a tracking tool into the image plane of the ultrasound. As soon as it becomes visible, click &amp;quot;freeze&amp;quot; and mark the point on the screen by moving the Crosshair to the pont in the US image (best: click in 2D Axial view).&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Slowly move a tracking tool into the image plane of the ultrasound. As soon as it becomes visible, click &amp;quot;freeze&amp;quot; and mark the point on the screen by moving the crosshairs to the point in the US image (best: click in 2D axial view).&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Do this with as many points as necessary, then click calibrate to perform calibration.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="wordWrap">
@@ -786,9 +786,9 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;1. Setup the Connection to PLUS&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;2. Start fCal with the EchoTrackCalibration Config file&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;3. Connect fcal to MITK, once it connected successfully you can click the &amp;quot;Start Streaming&amp;quot; Button below&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;4. Now follow the steps in fCal and don't forget to save the Calibration in the end&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;2. Start fCal with the EchoTrackCalibration config file&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;3. Connect fcal to MITK, once it connected successfully you can click the &amp;quot;Start Streaming&amp;quot; button below&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;4. Now follow the steps in fCal and don't forget to save the calibration in the end&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;5. Finish fCal&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="wordWrap">
@@ -814,9 +814,9 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;1. Start a PLUS Server with the configfile you saved in the final step of fCal&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;2. Once the Server connected to MITK click the &amp;quot;Start Streaming&amp;quot; Button below&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;3. Now Click the &amp;quot;Get Calibration from PLUS&amp;quot;Button below&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;1. Start a PLUS Server with the config file you saved in the final step of fCal&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;2. Once the Server connected to MITK click the &amp;quot;Start Streaming&amp;quot; button below&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;3. Now Click the &amp;quot;Get Calibration from PLUS&amp;quot; button below&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;4. You can now save the calibration&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="wordWrap">
@@ -892,7 +892,7 @@ p, li { white-space: pre-wrap; }
            <item row="2" column="0">
             <widget class="QLabel" name="label_8">
              <property name="text">
-              <string>Push the needle forward until it becomes visible in the Image</string>
+              <string>Push the needle forward until it becomes visible in the image</string>
              </property>
              <property name="wordWrap">
               <bool>true</bool>
@@ -909,7 +909,7 @@ p, li { white-space: pre-wrap; }
            <item row="4" column="0">
             <widget class="QLabel" name="label_9">
              <property name="text">
-              <string>Mark the visible needle tip with the crosshair</string>
+              <string>Mark the visible needle tip with the crosshairs</string>
              </property>
             </widget>
            </item>

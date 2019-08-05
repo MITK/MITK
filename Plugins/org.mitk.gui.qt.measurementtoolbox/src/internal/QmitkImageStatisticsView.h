@@ -72,11 +72,11 @@ protected:
   /** \brief Required for berry::IPartListener */
   virtual Events::Types GetPartEventTypes() const override { return Events::CLOSED; }
 
-  void OnImageSelectorChanged();
-  void OnMaskSelectorChanged();
+  //void OnImageSelectorChanged();
+  //void OnMaskSelectorChanged();
 
   void CalculateOrGetStatisticsNew();
-  void CalculateOrGetStatistics();
+  //void CalculateOrGetStatistics();
   void CalculateStatistics(const mitk::Image* image,
                            const mitk::Image* mask = nullptr,
                            const mitk::PlanarFigure* maskPlanarFigure = nullptr);
@@ -89,7 +89,7 @@ protected:
   void ResetGUI();
   void ResetGUIDefault();
 
-  void PrepareDataStorageComboBoxes();
+  //void PrepareDataStorageComboBoxes();
   /*!
   \brief method for creating the connections of main and control widget */
   virtual void CreateConnections();
@@ -97,8 +97,8 @@ protected:
   void OnStatisticsCalculationEnds();
   void OnRequestHistogramUpdate(unsigned int nBins);
   void OnCheckBoxIgnoreZeroStateChanged(int state);
-  void OnSliderWidgetHistogramChanged(double value);
-  void OnSliderWidgetIntensityProfileChanged();
+  //void OnSliderWidgetHistogramChanged(double value);
+  //void OnSliderWidgetIntensityProfileChanged();
   void OnButtonSelectionPressed();
   void OnDialogSelectionChanged();
 

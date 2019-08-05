@@ -847,8 +847,16 @@ void QmitkUltrasoundCalibration::OnLoadPhantomConfiguration()
   m_Controls.m_CalibBtnSavePhantomCalibration->setEnabled(false);
 
   // open phantom configuration
-  std::string fileName = QFileDialog::getOpenFileName(nullptr, "Load phantom configuration", "", "*.mps").toStdString();
-  m_PhantomConfigurationPointSet = dynamic_cast<mitk::PointSet *>(mitk::IOUtil::Load(fileName).at(0).GetPointer());
+  QString fileName = QFileDialog::getOpenFileName(nullptr, "Load phantom configuration", "", "*.mps");
+
+  // dialog closed or selection canceled
+  if (fileName.isNull())
+  {
+    return;
+  }
+
+  m_PhantomConfigurationPointSet = dynamic_cast<mitk::PointSet *>(mitk::IOUtil::Load(fileName.toStdString()).at(0).GetPointer());
+
   // transform phantom fiducials to tracking space
   mitk::NavigationData::Pointer currentSensorData = this->m_Tracker->GetOutput(0)->Clone();
 

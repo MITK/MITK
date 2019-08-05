@@ -15,7 +15,7 @@ if(MITK_USE_CTK)
 
   if(NOT DEFINED CTK_DIR)
 
-    set(revision_tag da3fd76)
+    set(revision_tag "kislinsk_fix-pythonlibs-handling") # Switch back to official CTK repo when PR874 was merged
 
     set(ctk_optional_cache_args )
     if(MITK_USE_Python3)
@@ -52,7 +52,7 @@ if(MITK_USE_CTK)
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
-      URL_MD5 A413BE11D3E9970E0EBB71181A5F2B90
+      URL_MD5 2ef6dd6dfcefd0aee905f256116b026f
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}

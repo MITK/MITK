@@ -15,29 +15,23 @@ if(MITK_USE_CTK)
 
   if(NOT DEFINED CTK_DIR)
 
-    set(revision_tag da3fd76)
+    set(revision_tag "kislinsk_fix-pythonlibs-handling") # Switch back to official CTK repo when PR874 was merged
 
     set(ctk_optional_cache_args )
-    if(MITK_USE_Python)
+    if(MITK_USE_Python3)
       list(APPEND ctk_optional_cache_args
            -DCTK_LIB_Scripting/Python/Widgets:BOOL=ON
            -DCTK_ENABLE_Python_Wrapping:BOOL=OFF
            -DCTK_APP_ctkSimplePythonShell:BOOL=OFF
-           "-DPYTHON_EXECUTABLE:FILEPATH=${Python3_EXECUTABLE}"
            "-DPYTHON_INCLUDE_DIR:PATH=${Python3_INCLUDE_DIR}"
-           "-DPYTHON_LIBRARY:FILEPATH=${Python3_LIBRARY}"
+           "-DPYTHON_LIBRARY:FILEPATH=${Python3_LIBRARY_RELEASE}"
       )
     else()
       list(APPEND ctk_optional_cache_args
            -DCTK_LIB_Scripting/Python/Widgets:BOOL=OFF
            -DCTK_ENABLE_Python_Wrapping:BOOL=OFF
            -DCTK_APP_ctkSimplePythonShell:BOOL=OFF
-      )
-    endif()
-
-    if(NOT MITK_USE_Python)
-      list(APPEND ctk_optional_cache_args
-        -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=d
+           -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=d
       )
     endif()
 
@@ -58,7 +52,7 @@ if(MITK_USE_CTK)
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
-      URL_MD5 A413BE11D3E9970E0EBB71181A5F2B90
+      URL_MD5 49e1652cc505bdf3f77210976df97d63
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}

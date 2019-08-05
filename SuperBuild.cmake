@@ -52,8 +52,6 @@ endif()
 
 get_property(external_projects GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS)
 
-list(REMOVE_ITEM external_projects Python)
-list(REMOVE_ITEM external_projects OpenMP)
 if(MITK_CTEST_SCRIPT_MODE)
   # Write a file containing the list of enabled external project targets.
   # This file can be read by a ctest script to separately build projects.
@@ -189,7 +187,7 @@ set(ep_common_args
 set(DCMTK_CMAKE_DEBUG_POSTFIX )
 
 # python libraries wont work with it
-if(NOT MITK_USE_Python)
+if(NOT MITK_USE_Python3)
   list(APPEND ep_common_args -DCMAKE_DEBUG_POSTFIX:STRING=d)
   set(DCMTK_CMAKE_DEBUG_POSTFIX d)
 endif()
@@ -329,9 +327,9 @@ foreach(type RUNTIME ARCHIVE LIBRARY)
 endforeach()
 
 # Optional python variables
-if(MITK_USE_Python)
+if(MITK_USE_Python3)
   list(APPEND mitk_optional_cache_args
-       -DMITK_USE_Python:BOOL=${MITK_USE_Python}
+       -DMITK_USE_Python3:BOOL=${MITK_USE_Python3}
        "-DPython3_EXECUTABLE:FILEPATH=${Python3_EXECUTABLE}"
        "-DPython3_INCLUDE_DIR:PATH=${Python3_INCLUDE_DIR}"
        "-DPython3_LIBRARY:FILEPATH=${Python3_LIBRARY}"

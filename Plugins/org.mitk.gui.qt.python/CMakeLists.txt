@@ -1,4 +1,4 @@
-if(MITK_USE_Python)
+if(MITK_USE_Python3)
 
 project(org_mitk_gui_qt_python)
 

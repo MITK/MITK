@@ -285,6 +285,7 @@ endforeach()
 option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
 option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
 option(MITK_USE_OpenMP "Use OpenMP" OFF)
+option(MITK_USE_Python3 "Use Python 3" OFF)
 
 #-----------------------------------------------------------------------------
 # Build configurations
@@ -355,7 +356,7 @@ if(MITK_USE_cpprestsdk)
   set(MITK_USE_Boost_LIBRARIES ${MITK_USE_Boost_LIBRARIES} CACHE STRING "A semi-colon separated list of required Boost libraries" FORCE)
 endif()
 
-if(MITK_USE_Python)
+if(MITK_USE_Python3)
   set(MITK_USE_ZLIB ON CACHE BOOL "" FORCE)
 
   if(APPLE AND CMAKE_FRAMEWORK_PATH AND CMAKE_FRAMEWORK_PATH MATCHES "python3\\.?([0-9]+)")
@@ -364,8 +365,11 @@ if(MITK_USE_Python)
     find_package(Python3 REQUIRED COMPONENTS Interpreter Development NumPy)
   endif()
 
-  string(REPLACE "\\" "/" Python3_STDARCH "${Python3_STDARCH}")
-  string(REPLACE "\\" "/" Python3_SITELIB "${Python3_SITELIB}")
+  if(WIN32)
+    string(REPLACE "\\" "/" Python3_STDARCH "${Python3_STDARCH}")
+    string(REPLACE "\\" "/" Python3_STDLIB "${Python3_STDLIB}")
+    string(REPLACE "\\" "/" Python3_SITELIB "${Python3_SITELIB}")
+  endif()
 endif()
 
 if(BUILD_TESTING AND NOT MITK_USE_CppUnit)

@@ -9,7 +9,6 @@ mitkFunctionAddExternalProject(NAME CppUnit ON ADVANCED DOC "Use CppUnit for uni
 mitkFunctionAddExternalProject(NAME PCRE OFF ADVANCED NO_PACKAGE)
 mitkFunctionAddExternalProject(NAME HDF5 ON ADVANCED)
 mitkFunctionAddExternalProject(NAME SWIG OFF ADVANCED NO_PACKAGE DEPENDS PCRE)
-mitkFunctionAddExternalProject(NAME Python OFF)
 mitkFunctionAddExternalProject(NAME OpenCV OFF)
 mitkFunctionAddExternalProject(NAME Vigra OFF DEPENDS HDF5)
 mitkFunctionAddExternalProject(NAME ITK ON NO_CACHE DEPENDS HDF5)

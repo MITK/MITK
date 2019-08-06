@@ -110,48 +110,92 @@ void ShowSegmentationAsElasticNetSurface::createNodes()
 
 void ShowSegmentationAsElasticNetSurface::linkNodes()
 {
+  InputImageType::RegionType region = m_Input->GetLargestPossibleRegion();
+
   for (const auto& node : m_SurfaceNodes) {
     InputImageType::IndexType index = node->parent->pos;
     // Left
     if (index[0] > 0) {
       std::shared_ptr<SurfaceCube> cube = m_SurfaceCubes->get(index[0] - 1, index[1], index[2]);
       if (cube != nullptr) {
-        node->neighbours[0] = cube->child;
+        bool edge = false;
+        edge |= getPixel(index[0] - 1, index[1],     index[2],     region) > 0;
+        edge |= getPixel(index[0] - 1, index[1],     index[2] - 1, region) > 0;
+        edge |= getPixel(index[0] - 1, index[1] - 1, index[2],     region) > 0;
+        edge |= getPixel(index[0] - 1, index[1] - 1, index[2] - 1, region) > 0;
+        if (edge) {
+          node->neighbours[0] = cube->child;
+        }
       }
     }
     // Right
     if (index[0] < m_SurfaceCubes->getXSize() - 1) {
       std::shared_ptr<SurfaceCube> cube = m_SurfaceCubes->get(index[0] + 1, index[1], index[2]);
       if (cube != nullptr) {
-        node->neighbours[1] = cube->child;
+        bool edge = false;
+        edge |= getPixel(index[0], index[1],     index[2],     region) > 0;
+        edge |= getPixel(index[0], index[1],     index[2] - 1, region) > 0;
+        edge |= getPixel(index[0], index[1] - 1, index[2],     region) > 0;
+        edge |= getPixel(index[0], index[1] - 1, index[2] - 1, region) > 0;
+        if (edge) {
+          node->neighbours[1] = cube->child;
+        }
       }
     }
     // Bottom
     if (index[1] > 0) {
       std::shared_ptr<SurfaceCube> cube = m_SurfaceCubes->get(index[0], index[1] - 1, index[2]);
       if (cube != nullptr) {
-        node->neighbours[2] = cube->child;
+        bool edge = false;
+        edge |= getPixel(index[0],     index[1] - 1, index[2],     region) > 0;
+        edge |= getPixel(index[0],     index[1] - 1, index[2] - 1, region) > 0;
+        edge |= getPixel(index[0] - 1, index[1] - 1, index[2],     region) > 0;
+        edge |= getPixel(index[0] - 1, index[1] - 1, index[2] - 1, region) > 0;
+        if (edge) {
+          node->neighbours[2] = cube->child;
+        }
       }
     }
     // Top
     if (index[1] < m_SurfaceCubes->getYSize() - 1) {
       std::shared_ptr<SurfaceCube> cube = m_SurfaceCubes->get(index[0], index[1] + 1, index[2]);
       if (cube != nullptr) {
-        node->neighbours[3] = cube->child;
+        bool edge = false;
+        edge |= getPixel(index[0],     index[1], index[2],     region) > 0;
+        edge |= getPixel(index[0],     index[1], index[2] - 1, region) > 0;
+        edge |= getPixel(index[0] - 1, index[1], index[2],     region) > 0;
+        edge |= getPixel(index[0] - 1, index[1], index[2] - 1, region) > 0;
+        if (edge) {
+          node->neighbours[3] = cube->child;
+        }
       }
     }
     // Back
     if (index[2] > 0) {
       std::shared_ptr<SurfaceCube> cube = m_SurfaceCubes->get(index[0], index[1], index[2] - 1);
       if (cube != nullptr) {
-        node->neighbours[4] = cube->child;
+        bool edge = false;
+        edge |= getPixel(index[0],     index[1],     index[2] - 1, region) > 0;
+        edge |= getPixel(index[0],     index[1] - 1, index[2] - 1, region) > 0;
+        edge |= getPixel(index[0] - 1, index[1],     index[2] - 1, region) > 0;
+        edge |= getPixel(index[0] - 1, index[1] - 1, index[2] - 1, region) > 0;
+        if (edge) {
+          node->neighbours[4] = cube->child;
+        }
       }
     }
     // Front
     if (index[2] < m_SurfaceCubes->getZSize() - 1) {
       std::shared_ptr<SurfaceCube> cube = m_SurfaceCubes->get(index[0], index[1], index[2] + 1);
       if (cube != nullptr) {
-        node->neighbours[5] = cube->child;
+        bool edge = false;
+        edge |= getPixel(index[0],     index[1],     index[2], region) > 0;
+        edge |= getPixel(index[0] - 1, index[1],     index[2], region) > 0;
+        edge |= getPixel(index[0],     index[1] - 1, index[2], region) > 0;
+        edge |= getPixel(index[0] - 1, index[1] - 1, index[2], region) > 0;
+        if (edge) {
+          node->neighbours[5] = cube->child;
+        }
       }
     }
   }

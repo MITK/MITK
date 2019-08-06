@@ -14,8 +14,8 @@
 
  ===================================================================*/
 
-#ifndef QMITKRENDERWINDOW_H_HEADER_INCLUDED_C1C40D66
-#define QMITKRENDERWINDOW_H_HEADER_INCLUDED_C1C40D66
+#ifndef QMITKRENDERWINDOW_H
+#define QMITKRENDERWINDOW_H
 
 #include "mitkRenderWindowBase.h"
 
@@ -28,7 +28,6 @@
 #include "mitkBaseRenderer.h"
 #include "mitkInteractionEventConst.h"
 
-class QmitkAbstractMultiWidget;
 class QDragEnterEvent;
 class QDropEvent;
 class QInputEvent;
@@ -69,26 +68,25 @@ public:
   virtual void SetResendQtEvents(bool resend);
 
   // Set Layout Index to define the Layout Type
-  void SetLayoutIndex(unsigned int layoutIndex);
+  void SetLayoutIndex(QmitkRenderWindowMenu::LayoutIndex layoutIndex);
 
   // Get Layout Index to define the Layout Type
-  unsigned int GetLayoutIndex();
+  QmitkRenderWindowMenu::LayoutIndex GetLayoutIndex();
 
   // MenuWidget need to update the Layout Design List when Layout had changed
-  void LayoutDesignListChanged(int layoutDesignIndex);
-
-  void HideRenderWindowMenu();
+  void LayoutDesignListChanged(QmitkRenderWindowMenu::LayoutDesign layoutDesign);
 
   // Activate or Deactivate MenuWidget.
-  void ActivateMenuWidget(bool state, QmitkAbstractMultiWidget *multiWidget = nullptr);
+  void ActivateMenuWidget(bool state);
 
   bool GetActivateMenuWidgetFlag() { return m_MenuWidgetActivated; }
   // Get it from the QVTKWidget parent
   vtkRenderWindow *GetVtkRenderWindow() override { return GetRenderWindow(); }
+
   vtkRenderWindowInteractor *GetVtkRenderWindowInteractor() override { return nullptr; }
-  void FullScreenMode(bool state);
 
 protected:
+
   // overloaded move handler
   void moveEvent(QMoveEvent *event) override;
   // overloaded show handler
@@ -126,24 +124,22 @@ protected:
 
   void AdjustRenderWindowMenuVisibility(const QPoint &pos);
 
-signals:
+Q_SIGNALS:
+
+  void LayoutDesignChanged(QmitkRenderWindowMenu::LayoutDesign);
 
   void ResetView();
 
-  void ChangeCrosshairRotationMode(int);
+  void CrosshairRotationModeChanged(int);
 
-  void SignalLayoutDesignChanged(int layoutDesignIndex);
+  void CrosshairVisibilityChanged(bool);
 
   void moved();
 
   /// \brief Emits a signal to say that this window has had the following nodes dropped on it.
   void NodesDropped(QmitkRenderWindow *thisWindow, std::vector<mitk::DataNode *> nodes);
 
-protected slots:
-
-  void OnChangeLayoutDesign(int layoutDesignIndex);
-
-  void OnWidgetPlaneModeChanged(int);
+private Q_SLOTS:
 
   void DeferredHideMenu();
 
@@ -158,15 +154,17 @@ private:
   mitk::InteractionEvent::MouseButtons GetButtonState(QWheelEvent *we) const;
   std::string GetKeyLetter(QKeyEvent *ke) const;
   int GetDelta(QWheelEvent *we) const;
+
   bool m_ResendQtEvents;
 
   QmitkRenderWindowMenu *m_MenuWidget;
 
   bool m_MenuWidgetActivated;
 
-  unsigned int m_LayoutIndex;
+  QmitkRenderWindowMenu::LayoutIndex m_LayoutIndex;
 
   vtkSmartPointer<vtkGenericOpenGLRenderWindow> m_InternalRenderWindow;
+
 };
 
-#endif
+#endif // QMITKRENDERWINDOW_H

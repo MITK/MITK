@@ -26,6 +26,7 @@ set(CPP_FILES
   QmitkMouseModeSwitcher.cpp
   QmitkMimeTypes.cpp
   QmitkMultiWidgetConfigurationToolBar.cpp
+  QmitkMultiWidgetLayoutManager.cpp
   QmitkMultiWidgetLayoutSelectionWidget.cpp
   QmitkNodeDescriptor.cpp
   QmitkColoredNodeDescriptor.cpp
@@ -82,6 +83,7 @@ set(MOC_H_FILES
   include/QmitkMemoryUsageIndicatorView.h
   include/QmitkMouseModeSwitcher.h
   include/QmitkMultiWidgetConfigurationToolBar.h
+  include/QmitkMultiWidgetLayoutManager.h
   include/QmitkMultiWidgetLayoutSelectionWidget.h
   include/QmitkNodeDescriptor.h
   include/QmitkColoredNodeDescriptor.h

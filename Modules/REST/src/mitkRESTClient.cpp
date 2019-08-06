@@ -36,6 +36,28 @@ mitk::RESTClient::RESTClient()
 
 mitk::RESTClient::~RESTClient() {}
 
+void mitk::RESTClient::CheckResponseContentType(web::http::http_response &response)
+{
+  auto status = response.status_code();
+
+  if (status_codes::OK != status)
+  {
+    MITK_WARN << "Status: " << status;
+    MITK_WARN << "Response: " << mitk::RESTUtil::convertToUtf8(response.to_string());
+    mitkThrow() << mitk::RESTUtil::convertToUtf8(response.to_string());
+  }
+
+  auto requestContentType = response.headers().content_type();
+  MITK_DEBUG << "Content Type: " << mitk::RESTUtil::convertToUtf8(requestContentType);
+  MITK_DEBUG << "Body: " << mitk::RESTUtil::convertToUtf8(response.to_string());
+  if (requestContentType.find(U("json")) != std::wstring::npos)
+  {
+    MITK_DEBUG << "Caution! The given response content type was '" << mitk::RESTUtil::convertToUtf8(requestContentType)
+               << "' but contains 'json'. So we awesome the answer actually contains a JSON message.";
+    response.headers().set_content_type(U("application/json"));
+  }
+}
+
 pplx::task<web::json::value> mitk::RESTClient::Get(const web::uri &uri,
                                                    const std::map<utility::string_t, utility::string_t> headers)
 {
@@ -51,26 +73,15 @@ pplx::task<web::json::value> mitk::RESTClient::Get(const web::uri &uri,
     try
     {
       auto response = responseTask.get();
-      auto status = response.status_code();
 
-      if (status_codes::OK != status)
-      {
-        MITK_INFO << status;
-        MITK_INFO << mitk::RESTUtil::convertToUtf8(response.to_string());
-        mitkThrow();
-	  }
-	  
-      auto requestContentType = response.headers().content_type();
-
-      if (U("application/json") != requestContentType)
-        response.headers().set_content_type(U("application/json"));
+      CheckResponseContentType(response);
 
       return response.extract_json().get();
     }
-    catch (std::exception &e)
+    catch (const std::exception &e)
     {
       MITK_INFO << e.what();
-      mitkThrow() << "Getting response went wrong";
+      mitkThrow() << "Getting response went wrong: " << e.what();
     }
   });
 }
@@ -99,7 +110,11 @@ pplx::task<web::json::value> mitk::RESTClient::Get(const web::uri &uri,
       auto status = response.status_code();
 
       if (status_codes::OK != status)
-        mitkThrow() << "GET ended up with response " << RESTUtil::convertToUtf8(response.to_string());
+      {
+        MITK_INFO << status;
+        MITK_INFO << mitk::RESTUtil::convertToUtf8(response.to_string());
+        mitkThrow() << mitk::RESTUtil::convertToUtf8(response.to_string());
+      }
 
       return response.body().read_to_end(*fileBuffer);
     })
@@ -121,17 +136,8 @@ pplx::task<web::json::value> mitk::RESTClient::Put(const web::uri &uri, const we
     try
     {
       auto response = responseTask.get();
-      auto status = response.status_code();
 
-      if (status_codes::OK != status)
-        mitkThrow();
-
-      // Parse content type to application/json if it isn't already. This is
-      // important if the content type is e.g. application/dicom+json.
-      auto requestContentType = response.headers().content_type();
-
-      if (U("application/json") != requestContentType)
-        response.headers().set_content_type(U("application/json"));
+      CheckResponseContentType(response);
 
       return response.extract_json().get();
     }
@@ -187,21 +193,8 @@ pplx::task<web::json::value> mitk::RESTClient::ExecutePost(const web::uri &uri, 
     try
     {
       auto response = responseTask.get();
-      auto status = response.status_code();
-      auto requestContentType = response.headers().content_type();
-      MITK_INFO << status;
 
-      if (status_codes::OK != status)
-        mitkThrow();
-
-      MITK_INFO << mitk::RESTUtil::convertToUtf8(requestContentType);
-      if (U("application/json") != requestContentType)
-      {
-        auto json = web::json::value::object();
-        json[U("test")] = web::json::value(17);
-        response.set_body(json); // use random json object in response body to perform return value (Linux Fix)
-        response.headers().set_content_type(U("application/json"));
-      }
+      CheckResponseContentType(response);
 
       return response.extract_json().get();
     }

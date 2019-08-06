@@ -57,6 +57,10 @@ public:
   virtual void SetCrosshairVisibility(bool activate) override;
   virtual bool GetCrosshairVisibility() const override { return m_CrosshairVisibility; }
 
+  virtual void ResetCrosshair() override;
+
+  virtual void SetWidgetPlaneMode(int userMode) override;
+
 public Q_SLOTS:
 
   // mouse events
@@ -75,9 +79,7 @@ private:
   virtual void SynchronizeImpl() override { }
   virtual void SetInteractionSchemeImpl() override { }
 
-  void InitializeLayout();
   void CreateRenderWindowWidget();
-  void FillMultiWidgetLayout();
 
   QGridLayout* m_GridLayout;
   bool m_CrosshairVisibility;

@@ -108,10 +108,10 @@ private:
   void GetPreferenceDecorations(const berry::IBerryPreferences *preferences);
   /**
    * @brief GetColorForWidget helper method to convert a saved color string to mitk::Color.
-   * @param widgetColorInHex color in hex format (#12356) where each digit is in the form (0-F).
+   * @param hexColor color in hex format (#12356) where each digit is in the form (0-F).
    * @return the color in mitk format.
    */
-  mitk::Color HexColorToMitkColor(const QString& widgetColorInHex);
+  mitk::Color HexColorToMitkColor(const QString& hexColor);
   /**
    * @brief MitkColorToHex Convert an mitk::Color to hex string.
    * @param color mitk format.

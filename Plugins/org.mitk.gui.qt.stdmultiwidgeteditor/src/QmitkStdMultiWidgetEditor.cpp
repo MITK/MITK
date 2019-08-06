@@ -77,11 +77,11 @@ void QmitkStdMultiWidgetEditor::PartClosed(const berry::IWorkbenchPartReference:
 {
   if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
   {
-    const auto& multiWidget = GetMultiWidget();
+    const auto& multiWidget = dynamic_cast<QmitkStdMultiWidget*>(GetMultiWidget());
     if (nullptr != multiWidget)
     {
-      //multiWidget->RemovePlanesFromDataStorage();
-      //multiWidget->ActivateRenderWindowMenu(false);
+      multiWidget->RemovePlanesFromDataStorage();
+      multiWidget->ActivateMenuWidget(false);
     }
   }
 }
@@ -90,11 +90,11 @@ void QmitkStdMultiWidgetEditor::PartOpened(const berry::IWorkbenchPartReference:
 {
   if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
   {
-    const auto& multiWidget = GetMultiWidget();
+    const auto& multiWidget = dynamic_cast<QmitkStdMultiWidget*>(GetMultiWidget());
     if (nullptr != multiWidget)
     {
-      //multiWidget->AddPlanesToDataStorage();
-      //multiWidget->ActivateRenderWindowMenu(true);
+      multiWidget->AddPlanesToDataStorage();
+      multiWidget->ActivateMenuWidget(true);
     }
   }
 }
@@ -103,10 +103,10 @@ void QmitkStdMultiWidgetEditor::PartHidden(const berry::IWorkbenchPartReference:
 {
   if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
   {
-    const auto& multiWidget = GetMultiWidget();
+    const auto& multiWidget = dynamic_cast<QmitkStdMultiWidget*>(GetMultiWidget());
     if (nullptr != multiWidget)
     {
-      //multiWidget->ActivateRenderWindowMenu(false);
+      multiWidget->ActivateMenuWidget(false);
     }
   }
 }
@@ -115,10 +115,10 @@ void QmitkStdMultiWidgetEditor::PartVisible(const berry::IWorkbenchPartReference
 {
   if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
   {
-    const auto& multiWidget = GetMultiWidget();
+    const auto& multiWidget = dynamic_cast<QmitkStdMultiWidget*>(GetMultiWidget());
     if (nullptr != multiWidget)
     {
-      //multiWidget->ActivateRenderWindowMenu(true);
+      multiWidget->ActivateMenuWidget(true);
     }
   }
 }
@@ -206,18 +206,16 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     if (nullptr == m_Impl->m_InteractionSchemeToolBar)
     {
       m_Impl->m_InteractionSchemeToolBar = new QmitkInteractionSchemeToolBar(parent);
-      //layout->addWidget(m_Impl->m_InteractionSchemeToolBar);
+      layout->addWidget(m_Impl->m_InteractionSchemeToolBar);
     }
     m_Impl->m_InteractionSchemeToolBar->SetInteractionEventHandler(multiWidget->GetInteractionEventHandler());
-
-
-    // add center widget: the std multi widget
-    layout->addWidget(multiWidget);
 
     multiWidget->SetDataStorage(GetDataStorage());
     multiWidget->InitializeMultiWidget();
     SetMultiWidget(multiWidget);
   }
+
+  layout->addWidget(multiWidget);
 
   // create level window slider on the right side
   if (nullptr == m_Impl->m_LevelWindowWidget)
@@ -233,16 +231,7 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     m_Impl->m_LevelWindowWidget->setMaximumWidth(50);
   }
 
-  /*
-  auto splitter = new QSplitter(parent);
-  splitter->addWidget(multiWidget);
-  splitter->addWidget(m_Impl->m_LevelWindowWidget);
-  //layout->
-  splitter->show();
-  */
-
-
-  //d->m_StdMultiWidget->EnableNavigationControllerEventListening();
+  layout->addWidget(m_Impl->m_LevelWindowWidget);
 
   m_Impl->m_MultiWidgetDecorationManager = std::make_unique<QmitkMultiWidgetDecorationManager>(multiWidget);
 
@@ -335,16 +324,28 @@ void QmitkStdMultiWidgetEditor::GetPreferenceDecorations(const berry::IBerryPref
     return;
   }
 
-  QmitkAbstractMultiWidget::RenderWindowWidgetMap renderWindowWidgets = multiWidget->GetRenderWindowWidgets();
-  int i = 0;
   auto hexBlack = "#000000";
+  auto gradientBlack = "#191919";
+  auto gradientGray = "#7F7F7F";
+
+  auto renderWindowWidgets = multiWidget->GetRenderWindowWidgets();
+  int i = 0;
   for (const auto& renderWindowWidget : renderWindowWidgets)
   {
-    QString widgetName = "widget" + QString::number(i + 1);
+    QString widgetName = renderWindowWidget.second->GetWidgetName();
 
-    auto upper = preferences->Get(widgetName + " first background color", hexBlack);
-    auto lower = preferences->Get(widgetName + " second background color", hexBlack);
-    renderWindowWidget.second->SetGradientBackgroundColors(HexColorToMitkColor(upper), HexColorToMitkColor(lower));
+    if (mitk::BaseRenderer::Standard3D == mitk::BaseRenderer::GetInstance(renderWindowWidget.second->GetRenderWindow()->GetVtkRenderWindow())->GetMapperID())
+    {
+      auto upper = preferences->Get(widgetName + " first background color", gradientBlack);
+      auto lower = preferences->Get(widgetName + " second background color", gradientGray);
+      renderWindowWidget.second->SetGradientBackgroundColors(HexColorToMitkColor(upper), HexColorToMitkColor(lower));
+    }
+    else
+    {
+      auto upper = preferences->Get(widgetName + " first background color", hexBlack);
+      auto lower = preferences->Get(widgetName + " second background color", hexBlack);
+      renderWindowWidget.second->SetGradientBackgroundColors(HexColorToMitkColor(upper), HexColorToMitkColor(lower));
+    }
 
     auto defaultDecorationColor = multiWidget->GetDecorationColor(i);
     auto decorationColor = preferences->Get(widgetName + " decoration color", MitkColorToHex(defaultDecorationColor));
@@ -358,17 +359,17 @@ void QmitkStdMultiWidgetEditor::GetPreferenceDecorations(const berry::IBerryPref
   }
 }
 
-mitk::Color QmitkStdMultiWidgetEditor::HexColorToMitkColor(const QString& widgetColorInHex)
+mitk::Color QmitkStdMultiWidgetEditor::HexColorToMitkColor(const QString& hexColor)
 {
-  QColor qColor(widgetColorInHex);
+  QColor qColor(hexColor);
   mitk::Color returnColor;
   float colorMax = 255.0f;
-  if (widgetColorInHex.isEmpty()) // default value
+  if (hexColor.isEmpty()) // default value
   {
     returnColor[0] = 1.0;
     returnColor[1] = 1.0;
     returnColor[2] = 1.0;
-    MITK_ERROR << "Using default color for unknown widget " << qPrintable(widgetColorInHex);
+    MITK_ERROR << "Using default color for unknown hex color " << qPrintable(hexColor);
   }
   else
   {

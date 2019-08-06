@@ -52,6 +52,7 @@ public:
     QWidget* parent = nullptr,
     const QString& widgetName = "",
     mitk::DataStorage* dataStorage = nullptr,
+    mitk::RenderingManager* renderingManager = nullptr,
     mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard
   );
 

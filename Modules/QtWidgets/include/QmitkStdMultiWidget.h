@@ -25,8 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <qsplitter.h>
 #include <qwidget.h>
 
-class QHBoxLayout;
-
 /**
 * @brief The 'QmitkStdMultiWidget' is a 'QmitkAbstractMultiWidget' that is used to display multiple render windows at once.
 *        Render windows are predefined in a 2x2 design with 3 different 2D view planes and a 3D render window.
@@ -36,13 +34,6 @@ class MITKQTWIDGETS_EXPORT QmitkStdMultiWidget : public QmitkAbstractMultiWidget
   Q_OBJECT
 
 public:
-
-  enum
-  {
-    PLANE_MODE_SLICING = 0,
-    PLANE_MODE_ROTATION,
-    PLANE_MODE_SWIVEL
-  };
 
   QmitkStdMultiWidget(QWidget *parent = nullptr,
                       Qt::WindowFlags f = 0,
@@ -59,24 +50,23 @@ public:
   virtual void SetSelectedPosition(const mitk::Point3D& newPosition, const QString& widgetName) override;
   virtual const mitk::Point3D GetSelectedPosition(const QString& widgetName) const override;
 
-  virtual void SetCrosshairVisibility(bool) override { };
-  virtual bool GetCrosshairVisibility() const override { return true; }
+  virtual void SetCrosshairVisibility(bool) override;
+  virtual bool GetCrosshairVisibility() const override;
+
+  virtual void ResetCrosshair() override;
+
+  virtual void SetWidgetPlaneMode(int mode) override;
 
   mitk::SliceNavigationController* GetTimeNavigationController();
 
   void AddPlanesToDataStorage();
   void RemovePlanesFromDataStorage();
 
-
   /** \brief Listener to the CrosshairPositionEvent
 
     Ensures the CrosshairPositionEvent is handled only once and at the end of the Qt-Event loop
   */
   void HandleCrosshairPositionEvent();
-
-  void ActivateMenuWidget(bool state);
-
-  bool IsMenuWidgetEnabled() const;
 
   /**
    * @brief Convenience method to get a render window widget.
@@ -118,8 +108,9 @@ public:
 public Q_SLOTS:
 
   // mouse events
-  virtual void wheelEvent(QWheelEvent* e) override;
+  virtual void mousePressEvent(QMouseEvent*) override;
   virtual void moveEvent(QMoveEvent* e) override;
+  virtual void wheelEvent(QWheelEvent* e) override;
 
   /// Receives the signal from HandleCrosshairPositionEvent, executes the StatusBar update
   void HandleCrosshairPositionEventDelayed();
@@ -134,34 +125,16 @@ public Q_SLOTS:
 
   void SetWidgetPlanesVisibility(bool visible, mitk::BaseRenderer *renderer = nullptr);
 
-  void SetWidgetPlanesLocked(bool locked);
-
-  void SetWidgetPlanesRotationLocked(bool locked);
-
-  void SetWidgetPlanesRotationLinked(bool link);
-
-  void SetWidgetPlaneMode(int mode);
-
-  //void SetWidgetPlaneModeToSlicing(bool activate);
-
-  //void SetWidgetPlaneModeToRotation(bool activate);
-
-  //void SetWidgetPlaneModeToSwivel(bool activate);
-
-  void ResetCrosshair();
-
 Q_SIGNALS:
 
   void LeftMouseClicked(mitk::Point3D pointValue);
   void WheelMoved(QWheelEvent *);
-  void WidgetPlanesRotationLinked(bool);
   void WidgetPlanesRotationEnabled(bool);
   void ViewsInitialized();
   void WidgetPlaneModeSlicing(bool);
   void WidgetPlaneModeRotation(bool);
   void WidgetPlaneModeSwivel(bool);
   void WidgetPlaneModeChange(int);
-  void WidgetNotifyNewCrossHairMode(int);
   void Moved();
 
 private:
@@ -171,16 +144,8 @@ private:
   virtual void SetInteractionSchemeImpl() override { }
 
   void CreateRenderWindowWidgets();
-  void InitializeLayout();
 
-  void UpdateAllWidgets();
-
-  void HideAllWidgetToolbars();
-
-  QHBoxLayout* hBoxLayout;
-
-  mitk::RenderingManager *m_RenderingManager;
-  mitk::SliceNavigationController *m_TimeNavigationController;
+  mitk::SliceNavigationController* m_TimeNavigationController;
 
   /**
   * @brief The 3 helper objects which contain the plane geometry.
@@ -205,18 +170,7 @@ private:
    */
   mitk::Color m_DecorationColorWidget4;
 
-  QSplitter* m_MainSplit;
-  QSplitter* m_LayoutSplit;
-  QSplitter* m_SubSplit1;
-  QSplitter* m_SubSplit2;
-
-  QWidget* mitkWidget1Container;
-  QWidget* mitkWidget2Container;
-  QWidget* mitkWidget3Container;
-  QWidget* mitkWidget4Container;
-
   bool m_PendingCrosshairPositionEvent;
-  bool m_CrosshairNavigationEnabled;
 
 };
 

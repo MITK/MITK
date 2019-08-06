@@ -19,29 +19,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkStdMultiWidget.h"
 #include "QmitkRenderWindowWidget.h"
 
-#include <QHBoxLayout>
-#include <QList>
-#include <QMouseEvent>
-#include <QTimer>
-#include <qsplitter.h>
-
-#include "mitkImagePixelReadAccessor.h"
-#include "mitkPixelTypeMultiplex.h"
+// mitk core
 #include <mitkCameraController.h>
 #include <mitkImage.h>
+#include <mitkImagePixelReadAccessor.h>
 #include <mitkInteractionConst.h>
 #include <mitkLine.h>
 #include <mitkNodePredicateBase.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
+#include <mitkPixelTypeMultiplex.h>
 #include <mitkPlaneGeometryDataMapper2D.h>
 #include <mitkPointSet.h>
 #include <mitkProperties.h>
 #include <mitkStatusBar.h>
 #include <mitkVtkLayerController.h>
+
+// qt
+#include <QList>
+#include <QMouseEvent>
+#include <QTimer>
+
+// vtk
 #include <vtkSmartPointer.h>
 
+// c++
 #include <iomanip>
 
 QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget *parent,
@@ -50,46 +53,10 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget *parent,
                                          mitk::BaseRenderer::RenderingMode::Type renderingMode/* = mitk::BaseRenderer::RenderingMode::Standard*/,
                                          const QString &name/* = "stdmulti"*/)
   : QmitkAbstractMultiWidget(parent, f, renderingManager, renderingMode, name)
-  , hBoxLayout(nullptr)
-  , m_RenderingManager(renderingManager)
   , m_TimeNavigationController(nullptr)
-  , m_PlaneMode(PLANE_MODE_SLICING)
-  , m_MainSplit(nullptr)
-  , m_LayoutSplit(nullptr)
-  , m_SubSplit1(nullptr)
-  , m_SubSplit2(nullptr)
   , m_PendingCrosshairPositionEvent(false)
-  , m_CrosshairNavigationEnabled(false)
 {
-  // use the global RenderingManager if none was specified
-  if (m_RenderingManager == nullptr)
-  {
-    m_RenderingManager = mitk::RenderingManager::GetInstance();
-  }
-  m_TimeNavigationController = m_RenderingManager->GetTimeNavigationController();
-
-  // create SignalSlot Connection
-  /*
-  connect(m_RenderWindow1, SIGNAL(SignalLayoutDesignChanged(int)), this, SLOT(OnLayoutDesignChanged(int)));
-  connect(m_RenderWindow1, SIGNAL(ResetView()), this, SLOT(ResetCrosshair()));
-  connect(m_RenderWindow1, SIGNAL(ChangeCrosshairRotationMode(int)), this, SLOT(SetWidgetPlaneMode(int)));
-  connect(this, SIGNAL(WidgetNotifyNewCrossHairMode(int)), m_RenderWindow1, SLOT(OnWidgetPlaneModeChanged(int)));
-
-  connect(m_RenderWindow2, SIGNAL(SignalLayoutDesignChanged(int)), this, SLOT(OnLayoutDesignChanged(int)));
-  connect(m_RenderWindow2, SIGNAL(ResetView()), this, SLOT(ResetCrosshair()));
-  connect(m_RenderWindow2, SIGNAL(ChangeCrosshairRotationMode(int)), this, SLOT(SetWidgetPlaneMode(int)));
-  connect(this, SIGNAL(WidgetNotifyNewCrossHairMode(int)), m_RenderWindow2, SLOT(OnWidgetPlaneModeChanged(int)));
-
-  connect(m_RenderWindow3, SIGNAL(SignalLayoutDesignChanged(int)), this, SLOT(OnLayoutDesignChanged(int)));
-  connect(m_RenderWindow3, SIGNAL(ResetView()), this, SLOT(ResetCrosshair()));
-  connect(m_RenderWindow3, SIGNAL(ChangeCrosshairRotationMode(int)), this, SLOT(SetWidgetPlaneMode(int)));
-  connect(this, SIGNAL(WidgetNotifyNewCrossHairMode(int)), m_RenderWindow3, SLOT(OnWidgetPlaneModeChanged(int)));
-
-  connect(m_RenderWindow4, SIGNAL(SignalLayoutDesignChanged(int)), this, SLOT(OnLayoutDesignChanged(int)));
-  connect(m_RenderWindow4, SIGNAL(ResetView()), this, SLOT(ResetCrosshair()));
-  connect(m_RenderWindow4, SIGNAL(ChangeCrosshairRotationMode(int)), this, SLOT(SetWidgetPlaneMode(int)));
-  connect(this, SIGNAL(WidgetNotifyNewCrossHairMode(int)), m_RenderWindow4, SLOT(OnWidgetPlaneModeChanged(int)));
-  */
+  m_TimeNavigationController = GetRenderingManager()->GetTimeNavigationController();
 }
 
 QmitkStdMultiWidget::~QmitkStdMultiWidget()
@@ -102,12 +69,12 @@ QmitkStdMultiWidget::~QmitkStdMultiWidget()
 
 void QmitkStdMultiWidget::InitializeMultiWidget()
 {
-  SetLayout(2, 2);
-
-  // Yellow is default color for widget4
+  // yellow is default color for widget4
   m_DecorationColorWidget4[0] = 1.0f;
   m_DecorationColorWidget4[1] = 1.0f;
   m_DecorationColorWidget4[2] = 0.0f;
+
+  SetLayout(2, 2);
 
   // transfer colors in WorldGeometry-Nodes of the associated Renderer
   mitk::IntProperty::Pointer layer;
@@ -137,9 +104,6 @@ void QmitkStdMultiWidget::InitializeMultiWidget()
     mitk::BaseRenderer::GetInstance(GetRenderWindow4()->GetRenderWindow())->GetCurrentWorldPlaneGeometryNode();
   layer = mitk::IntProperty::New(1000);
   m_ParentNodeForGeometryPlanes->SetProperty("layer", layer);
-
-  // Set plane mode (slicing/rotation behavior) to slicing (default)
-  m_PlaneMode = PLANE_MODE_SLICING;
 
   AddDisplayPlaneSubTree();
 
@@ -178,6 +142,86 @@ const mitk::Point3D QmitkStdMultiWidget::GetSelectedPosition(const QString& /*wi
   }
 
   return mitk::Point3D();
+}
+
+void QmitkStdMultiWidget::SetCrosshairVisibility(bool visible)
+{
+  if (m_PlaneNode1.IsNotNull())
+  {
+    m_PlaneNode1->SetVisibility(visible);
+  }
+  if (m_PlaneNode2.IsNotNull())
+  {
+    m_PlaneNode2->SetVisibility(visible);
+  }
+  if (m_PlaneNode3.IsNotNull())
+  {
+    m_PlaneNode3->SetVisibility(visible);
+  }
+
+  RequestUpdateAll();
+}
+
+bool QmitkStdMultiWidget::GetCrosshairVisibility() const
+{
+  bool crosshairVisibility = true;
+
+  if (m_PlaneNode1.IsNotNull())
+  {
+    bool visibilityProperty = false;
+    m_PlaneNode1->GetVisibility(visibilityProperty, nullptr);
+    crosshairVisibility &= visibilityProperty;
+  }
+
+  if (m_PlaneNode2.IsNotNull())
+  {
+    bool visibilityProperty = false;
+    crosshairVisibility &= m_PlaneNode2->GetVisibility(visibilityProperty, nullptr);
+    crosshairVisibility &= visibilityProperty;
+  }
+
+  if (m_PlaneNode3.IsNotNull())
+  {
+    bool visibilityProperty = false;
+    crosshairVisibility &= m_PlaneNode3->GetVisibility(visibilityProperty, nullptr);
+    crosshairVisibility &= visibilityProperty;
+  }
+
+  return crosshairVisibility;
+}
+
+void QmitkStdMultiWidget::ResetCrosshair()
+{
+  auto dataStorage = GetDataStorage();
+  if (nullptr == dataStorage)
+  {
+    return;
+  }
+
+  GetRenderingManager()->InitializeViewsByBoundingObjects(dataStorage);
+
+  SetWidgetPlaneMode(mitk::InteractionSchemeSwitcher::MITKStandard);
+}
+
+void QmitkStdMultiWidget::SetWidgetPlaneMode(int userMode)
+{
+  MITK_DEBUG << "Changing crosshair mode to " << userMode;
+
+  switch (userMode)
+  {
+  case 0:
+    SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKStandard);
+    break;
+  case 1:
+    SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKRotationUncoupled);
+    break;
+  case 2:
+    SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKRotationCoupled);
+    break;
+  case 3:
+    SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKSwivel);
+    break;
+  }
 }
 
 mitk::SliceNavigationController* QmitkStdMultiWidget::GetTimeNavigationController()
@@ -228,19 +272,6 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEvent()
     m_PendingCrosshairPositionEvent = true;
     QTimer::singleShot(0, this, SLOT(HandleCrosshairPositionEventDelayed()));
   }
-}
-
-void QmitkStdMultiWidget::ActivateMenuWidget(bool state)
-{
-  GetRenderWindow1()->ActivateMenuWidget(state, this);
-  GetRenderWindow2()->ActivateMenuWidget(state, this);
-  GetRenderWindow3()->ActivateMenuWidget(state, this);
-  GetRenderWindow4()->ActivateMenuWidget(state, this);
-}
-
-bool QmitkStdMultiWidget::IsMenuWidgetEnabled() const
-{
-  return GetRenderWindow1()->GetActivateMenuWidgetFlag();
 }
 
 QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow(unsigned int number) const
@@ -404,18 +435,23 @@ mitk::Color QmitkStdMultiWidget::GetDecorationColor(unsigned int widgetNumber)
   }
 }
 
-void QmitkStdMultiWidget::wheelEvent(QWheelEvent *e)
+void QmitkStdMultiWidget::mousePressEvent(QMouseEvent*)
 {
-  emit WheelMoved(e);
+  // nothing here, but necessary for mouse interactions (.xml-configuration files)
 }
 
-void QmitkStdMultiWidget::moveEvent(QMoveEvent *e)
+void QmitkStdMultiWidget::moveEvent(QMoveEvent* e)
 {
   QWidget::moveEvent(e);
 
   // it is necessary to readjust the position of the Annotation as the StdMultiWidget has moved
   // unfortunately it's not done by QmitkRenderWindow::moveEvent -> must be done here
   emit Moved();
+}
+
+void QmitkStdMultiWidget::wheelEvent(QWheelEvent* e)
+{
+  emit WheelMoved(e);
 }
 
 void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
@@ -633,97 +669,7 @@ void QmitkStdMultiWidget::SetWidgetPlanesVisibility(bool visible, mitk::BaseRend
   {
     m_PlaneNode3->SetVisibility(visible, renderer);
   }
-  m_RenderingManager->RequestUpdateAll();
-}
-
-void QmitkStdMultiWidget::SetWidgetPlanesLocked(bool locked)
-{
-  // do your job and lock or unlock slices.
-  GetRenderWindow1()->GetSliceNavigationController()->SetSliceLocked(locked);
-  GetRenderWindow2()->GetSliceNavigationController()->SetSliceLocked(locked);
-  GetRenderWindow3()->GetSliceNavigationController()->SetSliceLocked(locked);
-}
-
-void QmitkStdMultiWidget::SetWidgetPlanesRotationLocked(bool locked)
-{
-  // do your job and lock or unlock slices.
-  GetRenderWindow1()->GetSliceNavigationController()->SetSliceRotationLocked(locked);
-  GetRenderWindow2()->GetSliceNavigationController()->SetSliceRotationLocked(locked);
-  GetRenderWindow3()->GetSliceNavigationController()->SetSliceRotationLocked(locked);
-}
-
-void QmitkStdMultiWidget::SetWidgetPlanesRotationLinked(bool link)
-{
-  emit WidgetPlanesRotationLinked(link);
-}
-
-void QmitkStdMultiWidget::SetWidgetPlaneMode(int userMode)
-{
-  /*
-  MITK_DEBUG << "Changing crosshair mode to " << userMode;
-
-  emit WidgetNotifyNewCrossHairMode(userMode);
-  // Convert user interface mode to actual mode
-  {
-  switch (userMode)
-  {
-  case 0:
-  m_MouseModeSwitcher->SetInteractionScheme(mitk::MouseModeSwitcher::InteractionScheme::MITK);
-  break;
-  case 1:
-  m_MouseModeSwitcher->SetInteractionScheme(mitk::MouseModeSwitcher::InteractionScheme::ROTATION);
-  break;
-
-  case 2:
-  m_MouseModeSwitcher->SetInteractionScheme(mitk::MouseModeSwitcher::InteractionScheme::ROTATIONLINKED);
-  break;
-
-  case 3:
-  m_MouseModeSwitcher->SetInteractionScheme(mitk::MouseModeSwitcher::InteractionScheme::SWIVEL);
-  break;
-  }
-  }
-  */
-}
-
-/*
-void QmitkStdMultiWidget::SetWidgetPlaneModeToSlicing(bool activate)
-{
-if (activate)
-{
-this->SetWidgetPlaneMode(PLANE_MODE_SLICING);
-}
-}
-
-void QmitkStdMultiWidget::SetWidgetPlaneModeToRotation(bool activate)
-{
-if (activate)
-{
-this->SetWidgetPlaneMode(PLANE_MODE_ROTATION);
-}
-}
-
-void QmitkStdMultiWidget::SetWidgetPlaneModeToSwivel(bool activate)
-{
-if (activate)
-{
-this->SetWidgetPlaneMode(PLANE_MODE_SWIVEL);
-}
-}
-*/
-
-void QmitkStdMultiWidget::ResetCrosshair()
-{
-  auto dataStorage = GetDataStorage();
-  if (nullptr == dataStorage)
-  {
-    return;
-  }
-
-  m_RenderingManager->InitializeViewsByBoundingObjects(dataStorage);
-  // m_RenderingManager->InitializeViews( m_DataStorage->ComputeVisibleBoundingGeometry3D() );
-  // reset interactor to normal slicing
-  SetWidgetPlaneMode(PLANE_MODE_SLICING);
+  GetRenderingManager()->RequestUpdateAll();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -732,54 +678,54 @@ void QmitkStdMultiWidget::ResetCrosshair()
 void QmitkStdMultiWidget::SetLayoutImpl()
 {
   CreateRenderWindowWidgets();
-  InitializeLayout();
+  GetMultiWidgetLayoutManager()->OnLayoutDesignChanged(QmitkMultiWidgetLayoutManager::LayoutDesign::DEFAULT);
 
   // Initialize views as axial, sagittal, coronal to all data objects in DataStorage
   auto geo = GetDataStorage()->ComputeBoundingGeometry3D(GetDataStorage()->GetAll());
-  mitk::RenderingManager::GetInstance()->InitializeViews(geo);
+  GetRenderingManager()->InitializeViews(geo);
 }
 
 void QmitkStdMultiWidget::CreateRenderWindowWidgets()
 {
   // create axial render window (widget)
   QString renderWindowWidgetName = GetNameFromIndex(0, 0);
-  RenderWindowWidgetPointer renderWindowWidget1 = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage());
+  RenderWindowWidgetPointer renderWindowWidget1 = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage(), GetRenderingManager());
   auto renderWindow1 = renderWindowWidget1->GetRenderWindow();
   renderWindow1->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
   renderWindowWidget1->SetDecorationColor(GetDecorationColor(0));
   renderWindowWidget1->SetCornerAnnotationText("Axial");
-  renderWindowWidget1->GetRenderWindow()->SetLayoutIndex(static_cast<unsigned int>(ViewDirection::AXIAL));
+  renderWindowWidget1->GetRenderWindow()->SetLayoutIndex(ViewDirection::AXIAL);
   AddRenderWindowWidget(renderWindowWidgetName, renderWindowWidget1);
 
   // create sagittal render window (widget)
   renderWindowWidgetName = GetNameFromIndex(0, 1);
-  RenderWindowWidgetPointer renderWindowWidget2 = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage());
+  RenderWindowWidgetPointer renderWindowWidget2 = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage(), GetRenderingManager());
   auto renderWindow2 = renderWindowWidget2->GetRenderWindow();
   renderWindow2->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
   renderWindowWidget2->SetDecorationColor(GetDecorationColor(1));
   renderWindowWidget2->setStyleSheet("border: 0px");
   renderWindowWidget2->SetCornerAnnotationText("Sagittal");
-  renderWindowWidget2->GetRenderWindow()->SetLayoutIndex(static_cast<unsigned int>(ViewDirection::SAGITTAL));
+  renderWindowWidget2->GetRenderWindow()->SetLayoutIndex(ViewDirection::SAGITTAL);
   AddRenderWindowWidget(renderWindowWidgetName, renderWindowWidget2);
 
   // create coronal render window (widget)
   renderWindowWidgetName = GetNameFromIndex(1, 0);
-  RenderWindowWidgetPointer renderWindowWidget3 = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage());
+  RenderWindowWidgetPointer renderWindowWidget3 = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage(), GetRenderingManager());
   auto renderWindow3 = renderWindowWidget3->GetRenderWindow();
   renderWindow3->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Frontal);
   renderWindowWidget3->SetDecorationColor(GetDecorationColor(2));
   renderWindowWidget3->SetCornerAnnotationText("Coronal");
-  renderWindowWidget3->GetRenderWindow()->SetLayoutIndex(static_cast<unsigned int>(ViewDirection::CORONAL));
+  renderWindowWidget3->GetRenderWindow()->SetLayoutIndex(ViewDirection::CORONAL);
   AddRenderWindowWidget(renderWindowWidgetName, renderWindowWidget3);
 
   // create 3D render window (widget)
   renderWindowWidgetName = GetNameFromIndex(1, 1);
-  RenderWindowWidgetPointer renderWindowWidget4 = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage());
+  RenderWindowWidgetPointer renderWindowWidget4 = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage(), GetRenderingManager());
   auto renderWindow4 = renderWindowWidget4->GetRenderWindow();
   renderWindow4->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Original);
   renderWindowWidget4->SetDecorationColor(GetDecorationColor(3));
   renderWindowWidget4->SetCornerAnnotationText("3D");
-  renderWindowWidget4->GetRenderWindow()->SetLayoutIndex(static_cast<unsigned int>(ViewDirection::THREE_D));
+  renderWindowWidget4->GetRenderWindow()->SetLayoutIndex(ViewDirection::THREE_D);
   mitk::BaseRenderer::GetInstance(renderWindowWidget4->GetRenderWindow()->GetRenderWindow())->SetMapperID(mitk::BaseRenderer::Standard3D);
   AddRenderWindowWidget(renderWindowWidgetName, renderWindowWidget4);
 
@@ -798,55 +744,25 @@ void QmitkStdMultiWidget::CreateRenderWindowWidgets()
   renderWindow2->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
   renderWindow3->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
   //renderWindow4->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
-}
 
-void QmitkStdMultiWidget::InitializeLayout()
-{
-  // create layouts
-  hBoxLayout = new QHBoxLayout(this);
-  hBoxLayout->setContentsMargins(0, 0, 0, 0);
-  setLayout(hBoxLayout);
-  hBoxLayout->setMargin(0);
+  auto layoutManager = GetMultiWidgetLayoutManager();
+  connect(renderWindow1, &QmitkRenderWindow::LayoutDesignChanged, layoutManager, &QmitkMultiWidgetLayoutManager::OnLayoutDesignChanged);
+  connect(renderWindow1, &QmitkRenderWindow::ResetView, this, &QmitkStdMultiWidget::ResetCrosshair);
+  connect(renderWindow1, &QmitkRenderWindow::CrosshairVisibilityChanged, this, &QmitkStdMultiWidget::SetCrosshairVisibility);
+  connect(renderWindow1, &QmitkRenderWindow::CrosshairRotationModeChanged, this, &QmitkStdMultiWidget::SetWidgetPlaneMode);
 
-  // create main split
-  m_MainSplit = new QSplitter(this);
-  hBoxLayout->addWidget(m_MainSplit);
+  connect(renderWindow2, &QmitkRenderWindow::LayoutDesignChanged, layoutManager, &QmitkMultiWidgetLayoutManager::OnLayoutDesignChanged);
+  connect(renderWindow2, &QmitkRenderWindow::ResetView, this, &QmitkStdMultiWidget::ResetCrosshair);
+  connect(renderWindow2, &QmitkRenderWindow::CrosshairVisibilityChanged, this, &QmitkStdMultiWidget::SetCrosshairVisibility);
+  connect(renderWindow2, &QmitkRenderWindow::CrosshairRotationModeChanged, this, &QmitkStdMultiWidget::SetWidgetPlaneMode);
 
-  // create vertical layout split and add to the main split
-  m_LayoutSplit = new QSplitter(Qt::Vertical, m_MainSplit);
-  m_MainSplit->addWidget(m_LayoutSplit);
+  connect(renderWindow3, &QmitkRenderWindow::LayoutDesignChanged, layoutManager, &QmitkMultiWidgetLayoutManager::OnLayoutDesignChanged);
+  connect(renderWindow3, &QmitkRenderWindow::ResetView, this, &QmitkStdMultiWidget::ResetCrosshair);
+  connect(renderWindow3, &QmitkRenderWindow::CrosshairVisibilityChanged, this, &QmitkStdMultiWidget::SetCrosshairVisibility);
+  connect(renderWindow3, &QmitkRenderWindow::CrosshairRotationModeChanged, this, &QmitkStdMultiWidget::SetWidgetPlaneMode);
 
-  // create m_SubSplit1 and m_SubSplit2
-  m_SubSplit1 = new QSplitter(m_LayoutSplit);
-  m_SubSplit2 = new QSplitter(m_LayoutSplit);
-
-  m_SubSplit1->addWidget(GetRenderWindowWidget(0, 0).get());
-  m_SubSplit1->addWidget(GetRenderWindowWidget(0, 1).get());
-  m_SubSplit2->addWidget(GetRenderWindowWidget(1, 0).get());
-  m_SubSplit2->addWidget(GetRenderWindowWidget(1, 1).get());
-
-  resize(QSize(364, 477).expandedTo(minimumSizeHint()));
-}
-
-void QmitkStdMultiWidget::UpdateAllWidgets()
-{
-  GetRenderWindow1()->resize(mitkWidget1Container->frameSize().width() - 1, mitkWidget1Container->frameSize().height());
-  GetRenderWindow1()->resize(mitkWidget1Container->frameSize().width(), mitkWidget1Container->frameSize().height());
-
-  GetRenderWindow2()->resize(mitkWidget2Container->frameSize().width() - 1, mitkWidget2Container->frameSize().height());
-  GetRenderWindow2()->resize(mitkWidget2Container->frameSize().width(), mitkWidget2Container->frameSize().height());
-
-  GetRenderWindow3()->resize(mitkWidget3Container->frameSize().width() - 1, mitkWidget3Container->frameSize().height());
-  GetRenderWindow3()->resize(mitkWidget3Container->frameSize().width(), mitkWidget3Container->frameSize().height());
-
-  GetRenderWindow4()->resize(mitkWidget4Container->frameSize().width() - 1, mitkWidget4Container->frameSize().height());
-  GetRenderWindow4()->resize(mitkWidget4Container->frameSize().width(), mitkWidget4Container->frameSize().height());
-}
-
-void QmitkStdMultiWidget::HideAllWidgetToolbars()
-{
-  GetRenderWindow1()->HideRenderWindowMenu();
-  GetRenderWindow2()->HideRenderWindowMenu();
-  GetRenderWindow3()->HideRenderWindowMenu();
-  GetRenderWindow4()->HideRenderWindowMenu();
+  connect(renderWindow4, &QmitkRenderWindow::LayoutDesignChanged, layoutManager, &QmitkMultiWidgetLayoutManager::OnLayoutDesignChanged);
+  connect(renderWindow4, &QmitkRenderWindow::ResetView, this, &QmitkStdMultiWidget::ResetCrosshair);
+  connect(renderWindow4, &QmitkRenderWindow::CrosshairVisibilityChanged, this, &QmitkStdMultiWidget::SetCrosshairVisibility);
+  connect(renderWindow4, &QmitkRenderWindow::CrosshairRotationModeChanged, this, &QmitkStdMultiWidget::SetWidgetPlaneMode);
 }

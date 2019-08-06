@@ -24,10 +24,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkRenderWindowWidget::QmitkRenderWindowWidget(QWidget* parent/* = nullptr*/,
                                                  const QString& widgetName/* = ""*/,
                                                  mitk::DataStorage* dataStorage/* = nullptr*/,
+                                                 mitk::RenderingManager* renderingManager/* = nullptr*/,
                                                  mitk::BaseRenderer::RenderingMode::Type renderingMode/* = mitk::BaseRenderer::RenderingMode::Standard*/)
   : QWidget(parent)
   , m_WidgetName(widgetName)
   , m_DataStorage(dataStorage)
+  , m_RenderingManager(renderingManager)
   , m_RenderWindow(nullptr)
   , m_RenderingMode(renderingMode)
   , m_PointSetNode(nullptr)
@@ -179,13 +181,21 @@ void QmitkRenderWindowWidget::InitializeGUI()
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   setContentsMargins(0, 0, 0, 0);
 
-  // create render window for this render window widget
-  m_RenderingManager = mitk::RenderingManager::GetInstance();
-  //m_RenderingManager = mitk::RenderingManager::New();
+  if (nullptr == m_DataStorage)
+  {
+    return;
+  }
+
+  if (nullptr == m_RenderingManager)
+  {
+    return;
+  }
+
   m_RenderingManager->SetDataStorage(m_DataStorage);
 
+  // create render window for this render window widget
   m_RenderWindow = new QmitkRenderWindow(this, m_WidgetName, nullptr, m_RenderingManager, m_RenderingMode);
-  m_RenderWindow->SetLayoutIndex(mitk::SliceNavigationController::Sagittal);
+  m_RenderWindow->SetLayoutIndex(mitk::BaseRenderer::ViewDirection::SAGITTAL);
   m_RenderWindow->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
   m_RenderWindow->GetSliceNavigationController()->SetRenderingManager(m_RenderingManager);
   m_RenderWindow->GetSliceNavigationController()->SetCrosshairEvent.AddListener(mitk::MessageDelegate1<QmitkRenderWindowWidget, mitk::Point3D>(this, &QmitkRenderWindowWidget::SetCrosshair));
@@ -251,5 +261,5 @@ void QmitkRenderWindowWidget::InitializeDecorations()
 void QmitkRenderWindowWidget::SetCrosshair(mitk::Point3D selectedPoint)
 {
   m_PointSet->SetPoint(1, selectedPoint, 0);
-  mitk::RenderingManager::GetInstance()->RequestUpdate(m_RenderWindow->GetRenderWindow());
+  m_RenderingManager->RequestUpdate(m_RenderWindow->GetRenderWindow());
 }

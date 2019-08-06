@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk qt widgets module
 #include "QmitkAbstractMultiWidget.h"
 #include "QmitkLevelWindowWidget.h"
+#include "QmitkMultiWidgetLayoutManager.h"
 #include "QmitkRenderWindowWidget.h"
 
 // mitk core
@@ -34,7 +35,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 struct QmitkAbstractMultiWidget::Impl final
 {
-  Impl(mitk::RenderingManager* renderingManager,
+  Impl(QmitkAbstractMultiWidget* multiWidget,
+       mitk::RenderingManager* renderingManager,
        mitk::BaseRenderer::RenderingMode::Type renderingMode,
        const QString& multiWidgetName);
 
@@ -122,9 +124,11 @@ struct QmitkAbstractMultiWidget::Impl final
   // interaction
   mitk::DisplayActionEventBroadcast::Pointer m_DisplayActionEventBroadcast;
   std::unique_ptr<mitk::DisplayActionEventHandler> m_DisplayActionEventHandler;
+  QmitkMultiWidgetLayoutManager* m_LayoutManager;
 };
 
-QmitkAbstractMultiWidget::Impl::Impl(mitk::RenderingManager* renderingManager,
+QmitkAbstractMultiWidget::Impl::Impl(QmitkAbstractMultiWidget* multiWidget,
+                                     mitk::RenderingManager* renderingManager,
                                      mitk::BaseRenderer::RenderingMode::Type renderingMode,
                                      const QString& multiWidgetName)
   : m_DataStorage(nullptr)
@@ -135,6 +139,7 @@ QmitkAbstractMultiWidget::Impl::Impl(mitk::RenderingManager* renderingManager,
   , m_MultiWidgetColumns(0)
   , m_DisplayActionEventBroadcast(nullptr)
   , m_DisplayActionEventHandler(nullptr)
+  , m_LayoutManager(new QmitkMultiWidgetLayoutManager(multiWidget))
 {
   InitializeDisplayActionEventHandling();
 }
@@ -145,7 +150,7 @@ QmitkAbstractMultiWidget::QmitkAbstractMultiWidget(QWidget* parent,
                                                    mitk::BaseRenderer::RenderingMode::Type renderingMode/* = mitk::BaseRenderer::RenderingMode::Standard*/,
                                                    const QString& multiWidgetName/* = "multiwidget"*/)
   : QWidget(parent, f)
-  , m_Impl(std::make_unique<Impl>(renderingManager, renderingMode, multiWidgetName))
+  , m_Impl(std::make_unique<Impl>(this, renderingManager, renderingMode, multiWidgetName))
 {
   // nothing here
 }
@@ -160,6 +165,17 @@ void QmitkAbstractMultiWidget::SetDataStorage(mitk::DataStorage* dataStorage)
 mitk::DataStorage* QmitkAbstractMultiWidget::GetDataStorage() const
 {
   return m_Impl->m_DataStorage;
+}
+
+mitk::RenderingManager* QmitkAbstractMultiWidget::GetRenderingManager() const
+{
+  // use the global rendering manager if none was specified
+  if (m_Impl->m_RenderingManager == nullptr)
+  {
+    return mitk::RenderingManager::GetInstance();
+  }
+
+  return m_Impl->m_RenderingManager;
 }
 
 int QmitkAbstractMultiWidget::GetRowCount() const
@@ -211,6 +227,40 @@ QmitkAbstractMultiWidget::RenderWindowWidgetMap QmitkAbstractMultiWidget::GetRen
   return m_Impl->m_RenderWindowWidgets;
 }
 
+QmitkAbstractMultiWidget::RenderWindowWidgetMap QmitkAbstractMultiWidget::Get2DRenderWindowWidgets() const
+{
+  RenderWindowWidgetMap renderWindowWidgets2D;
+
+  auto renderWindowWidgets = GetRenderWindowWidgets();
+  for (const auto& renderWindowWidget : renderWindowWidgets)
+  {
+    auto renderWindow = renderWindowWidget.second->GetRenderWindow();
+    if(mitk::BaseRenderer::Standard2D == mitk::BaseRenderer::GetInstance(renderWindow->GetVtkRenderWindow())->GetMapperID())
+    {
+      renderWindowWidgets2D.insert(std::make_pair(renderWindowWidget.first, renderWindowWidget.second));
+    }
+  }
+
+  return renderWindowWidgets2D;
+}
+
+QmitkAbstractMultiWidget::RenderWindowWidgetMap QmitkAbstractMultiWidget::Get3DRenderWindowWidgets() const
+{
+  RenderWindowWidgetMap renderWindowWidgets3D;
+
+  auto renderWindowWidgets = GetRenderWindowWidgets();
+  for (const auto& renderWindowWidget : renderWindowWidgets)
+  {
+    auto renderWindow = renderWindowWidget.second->GetRenderWindow();
+    if (mitk::BaseRenderer::Standard3D == mitk::BaseRenderer::GetInstance(renderWindow->GetVtkRenderWindow())->GetMapperID())
+    {
+      renderWindowWidgets3D.insert(std::make_pair(renderWindowWidget.first, renderWindowWidget.second));
+    }
+  }
+
+  return renderWindowWidgets3D;
+}
+
 QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkAbstractMultiWidget::GetRenderWindowWidget(int row, int column) const
 {
   return GetRenderWindowWidget(GetNameFromIndex(row, column));
@@ -222,6 +272,20 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkAbstractMultiWidget::Ge
   if (it != m_Impl->m_RenderWindowWidgets.end())
   {
     return it->second;
+  }
+
+  return nullptr;
+}
+
+QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkAbstractMultiWidget::GetRenderWindowWidget(const QmitkRenderWindow* renderWindow) const
+{
+  auto renderWindowWidgets = GetRenderWindowWidgets();
+  for (const auto& renderWindowWidget : renderWindowWidgets)
+  {
+    if (renderWindowWidget.second->GetRenderWindow() == renderWindow)
+    {
+      return renderWindowWidget.second;
+    }
   }
 
   return nullptr;
@@ -348,6 +412,25 @@ void QmitkAbstractMultiWidget::ForceImmediateUpdateAll()
   {
     renderWindowWidget.second->ForceImmediateUpdate();
   }
+}
+
+void QmitkAbstractMultiWidget::ActivateMenuWidget(bool state)
+{
+  for (const auto& renderWindowWidget : m_Impl->m_RenderWindowWidgets)
+  {
+    auto renderWindow = renderWindowWidget.second->GetRenderWindow();
+    renderWindow->ActivateMenuWidget(state);
+  }
+}
+
+bool QmitkAbstractMultiWidget::IsMenuWidgetEnabled() const
+{
+  return m_Impl->m_ActiveRenderWindowWidget->GetRenderWindow()->GetActivateMenuWidgetFlag();
+}
+
+QmitkMultiWidgetLayoutManager* QmitkAbstractMultiWidget::GetMultiWidgetLayoutManager() const
+{
+  return m_Impl->m_LayoutManager;
 }
 
 void QmitkAbstractMultiWidget::AddRenderWindowWidget(const QString& widgetName, RenderWindowWidgetPointer renderWindowWidget)

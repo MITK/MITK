@@ -35,6 +35,8 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
 void QmitkMxNMultiWidget::InitializeMultiWidget()
 {
   SetLayout(1, 1);
+
+  ActivateMenuWidget(true);
 }
 
 void QmitkMxNMultiWidget::MultiWidgetOpened()
@@ -116,6 +118,46 @@ void QmitkMxNMultiWidget::SetCrosshairVisibility(bool activate)
   m_CrosshairVisibility = activate;
 }
 
+void QmitkMxNMultiWidget::ResetCrosshair()
+{
+  auto dataStorage = GetDataStorage();
+  if (nullptr == dataStorage)
+  {
+    return;
+  }
+
+  auto renderingManager = GetRenderingManager();
+  if (nullptr == renderingManager)
+  {
+    return;
+  }
+
+  renderingManager->InitializeViewsByBoundingObjects(dataStorage);
+
+  SetWidgetPlaneMode(mitk::InteractionSchemeSwitcher::MITKStandard);
+}
+
+void QmitkMxNMultiWidget::SetWidgetPlaneMode(int userMode)
+{
+  MITK_DEBUG << "Changing crosshair mode to " << userMode;
+
+  switch (userMode)
+  {
+  case 0:
+    SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKStandard);
+    break;
+  case 1:
+    SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKRotationUncoupled);
+    break;
+  case 2:
+    SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKRotationCoupled);
+    break;
+  case 3:
+    SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKSwivel);
+    break;
+  }
+}
+
 //////////////////////////////////////////////////////////////////////////
 // PUBLIC SLOTS
 // MOUSE EVENTS
@@ -173,49 +215,30 @@ void QmitkMxNMultiWidget::SetLayoutImpl()
     ++difference;
   }
 
-  InitializeLayout();
-}
-
-void QmitkMxNMultiWidget::InitializeLayout()
-{
-  delete m_GridLayout;
-  m_GridLayout = new QGridLayout(this);
-  m_GridLayout->setContentsMargins(0, 0, 0, 0);
-  setLayout(m_GridLayout);
-
-  FillMultiWidgetLayout();
-  resize(QSize(364, 477).expandedTo(minimumSizeHint()));
-
   auto firstRenderWindowWidget = GetFirstRenderWindowWidget();
   if (nullptr != firstRenderWindowWidget)
   {
     SetActiveRenderWindowWidget(firstRenderWindowWidget);
   }
+
+  GetMultiWidgetLayoutManager()->OnLayoutDesignChanged(QmitkMultiWidgetLayoutManager::LayoutDesign::DEFAULT);
 }
 
 void QmitkMxNMultiWidget::CreateRenderWindowWidget()
 {
   // create the render window widget and connect signal / slot
   QString renderWindowWidgetName = GetNameFromIndex(GetNumberOfRenderWindowWidgets());
-  RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage());
+  RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage(), GetRenderingManager());
   renderWindowWidget->SetCornerAnnotationText(renderWindowWidgetName.toStdString());
 
   connect(renderWindowWidget.get(), &QmitkRenderWindowWidget::MouseEvent, this, &QmitkMxNMultiWidget::mousePressEvent);
 
   AddRenderWindowWidget(renderWindowWidgetName, renderWindowWidget);
-}
 
-void QmitkMxNMultiWidget::FillMultiWidgetLayout()
-{
-  for (int row = 0; row < GetRowCount(); ++row)
-  {
-    for (int column = 0; column < GetColumnCount(); ++column)
-    {
-      RenderWindowWidgetPointer renderWindowWidget = GetRenderWindowWidget(row, column);
-      if (nullptr != renderWindowWidget)
-      {
-        m_GridLayout->addWidget(renderWindowWidget.get(), row, column);
-      }
-    }
-  }
+  auto renderWindow = renderWindowWidget->GetRenderWindow();
+  auto layoutManager = GetMultiWidgetLayoutManager();
+  connect(renderWindow, &QmitkRenderWindow::LayoutDesignChanged, layoutManager, &QmitkMultiWidgetLayoutManager::OnLayoutDesignChanged);
+  connect(renderWindow, &QmitkRenderWindow::ResetView, this, &QmitkMxNMultiWidget::ResetCrosshair);
+  connect(renderWindow, &QmitkRenderWindow::CrosshairVisibilityChanged, this, &QmitkMxNMultiWidget::SetCrosshairVisibility);
+  connect(renderWindow, &QmitkRenderWindow::CrosshairRotationModeChanged, this, &QmitkMxNMultiWidget::SetWidgetPlaneMode);
 }

@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <map>
 #include <memory>
 
+class QmitkMultiWidgetLayoutManager;
 class QmitkRenderWindow;
 class QmitkRenderWindowWidget;
 
@@ -79,6 +80,8 @@ public:
   virtual void SetDataStorage(mitk::DataStorage* dataStorage);
   mitk::DataStorage* GetDataStorage() const;
 
+  mitk::RenderingManager* QmitkAbstractMultiWidget::GetRenderingManager() const;
+
   int GetRowCount() const;
   int GetColumnCount() const;
   virtual void SetLayout(int row, int column);
@@ -89,8 +92,11 @@ public:
   mitk::InteractionEventHandler* GetInteractionEventHandler();
 
   RenderWindowWidgetMap GetRenderWindowWidgets() const;
+  RenderWindowWidgetMap Get2DRenderWindowWidgets() const;
+  RenderWindowWidgetMap Get3DRenderWindowWidgets() const;
   RenderWindowWidgetPointer GetRenderWindowWidget(int row, int column) const;
   RenderWindowWidgetPointer GetRenderWindowWidget(const QString& widgetName) const;
+  RenderWindowWidgetPointer GetRenderWindowWidget(const QmitkRenderWindow* renderWindow) const;
   RenderWindowHash GetRenderWindows() const;
   QmitkRenderWindow* GetRenderWindow(int row, int column) const;
   QmitkRenderWindow* GetRenderWindow(const QString& widgetName) const;
@@ -116,6 +122,15 @@ public:
 
   virtual void SetCrosshairVisibility(bool visible) = 0;
   virtual bool GetCrosshairVisibility() const = 0;
+
+  virtual void ResetCrosshair() = 0;
+
+  virtual void SetWidgetPlaneMode(int mode) = 0;
+
+  virtual void ActivateMenuWidget(bool state);
+  virtual bool QmitkAbstractMultiWidget::IsMenuWidgetEnabled() const;
+
+  QmitkMultiWidgetLayoutManager* GetMultiWidgetLayoutManager() const;
 
 Q_SIGNALS:
 

@@ -339,14 +339,21 @@ void QmitkImageStatisticsView::CalculateOrGetStatisticsNew()
 				m_Controls.sliderWidget_histogram->setVisible(false);
 			}
 
-			for (auto maskNode : m_selectedMaskNodes)
+			for (int i=0;i<m_selectedMaskNodes.size()+1;i++)
 			{
-				MITK_INFO << "Mask recognized check";
-				mitk::Image* mask = dynamic_cast<mitk::Image*>(maskNode->GetData());
-				mitk::PlanarFigure* maskPF;
-				auto imageGeometry = image->GetGeometry();
+				mitk::Image* mask = nullptr;
+				mitk::PlanarFigure* maskPF = nullptr;
+				mitk::DataNode::Pointer maskNode;
+				mitk::BaseGeometry* imageGeometry;
+				if (m_selectedMaskNodes.size())
+				{
+					maskNode = m_selectedMaskNodes[i];
+					MITK_INFO << "Mask recognized check";
+					mask = dynamic_cast<mitk::Image*>(maskNode->GetData());
+					imageGeometry = image->GetGeometry();
+				}
 
-				if (mask == nullptr)
+				if (m_selectedMaskNodes.size()&&mask == nullptr)
 				{
 					MITK_INFO << "Planar Figure recognized check";
 					maskPF = dynamic_cast<mitk::PlanarFigure*>(maskNode->GetData());
@@ -374,7 +381,7 @@ void QmitkImageStatisticsView::CalculateOrGetStatisticsNew()
 					MITK_INFO << "Mask geometry found check";
 					//if (imageGeometry == maskGeometry)//this
 					//{
-						MITK_INFO << "Mask fits image check";
+						//MITK_INFO << "Mask fits image check";
 						imageStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(this->GetDataStorage(), image, mask);
 					//}
 				}
@@ -383,7 +390,7 @@ void QmitkImageStatisticsView::CalculateOrGetStatisticsNew()
 					MITK_INFO<<"Only image check";
 					imageStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(this->GetDataStorage(), image);
 				}
-				//here
+				//here only calculates when at least one mask selected
 				bool imageStatisticsOlderThanInputs = false;
 				if (imageStatistics &&
 					(imageStatistics->GetMTime() < image->GetMTime() || (mask && imageStatistics->GetMTime() < mask->GetMTime()) ||

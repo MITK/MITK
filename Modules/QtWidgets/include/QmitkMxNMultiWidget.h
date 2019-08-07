@@ -21,12 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkQtWidgetsExports.h"
 #include "QmitkAbstractMultiWidget.h"
 
-class QGridLayout;
-
 /**
 * @brief The 'QmitkMxNMultiWidget' is a 'QmitkAbstractMultiWidget' that is used to display multiple render windows at once.
 *        Render windows can dynamically be added and removed to change the layout of the multi widget. This
-*        is done by using the 'ResetLayout'-function to define a layout. This will automatically add or remove
+*        is done by using the 'SetLayout'-function to define a layout. This will automatically add or remove
 *        the appropriate number of render window widgets.
 */
 class MITKQTWIDGETS_EXPORT QmitkMxNMultiWidget : public QmitkAbstractMultiWidget
@@ -81,7 +79,6 @@ private:
 
   void CreateRenderWindowWidget();
 
-  QGridLayout* m_GridLayout;
   bool m_CrosshairVisibility;
 
 };

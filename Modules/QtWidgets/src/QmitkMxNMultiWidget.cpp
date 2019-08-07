@@ -26,7 +26,6 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
                                          mitk::BaseRenderer::RenderingMode::Type renderingMode/* = mitk::BaseRenderer::RenderingMode::Standard*/,
                                          const QString& multiWidgetName/* = "mxnmulti"*/)
   : QmitkAbstractMultiWidget(parent, f, renderingManager, renderingMode, multiWidgetName)
-  , m_GridLayout(nullptr)
   , m_CrosshairVisibility(false)
 {
   // nothing here

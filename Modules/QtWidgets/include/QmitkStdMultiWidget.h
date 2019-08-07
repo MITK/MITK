@@ -21,10 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkQtWidgetsExports.h"
 #include "QmitkAbstractMultiWidget.h"
 
-#include <QFrame>
-#include <qsplitter.h>
-#include <qwidget.h>
-
 /**
 * @brief The 'QmitkStdMultiWidget' is a 'QmitkAbstractMultiWidget' that is used to display multiple render windows at once.
 *        Render windows are predefined in a 2x2 design with 3 different 2D view planes and a 3D render window.
@@ -127,14 +123,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 
-  void LeftMouseClicked(mitk::Point3D pointValue);
   void WheelMoved(QWheelEvent *);
-  void WidgetPlanesRotationEnabled(bool);
-  void ViewsInitialized();
-  void WidgetPlaneModeSlicing(bool);
-  void WidgetPlaneModeRotation(bool);
-  void WidgetPlaneModeSwivel(bool);
-  void WidgetPlaneModeChange(int);
   void Moved();
 
 private:

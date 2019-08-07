@@ -99,7 +99,7 @@ public:
   RenderWindowWidgetPointer GetRenderWindowWidget(const QmitkRenderWindow* renderWindow) const;
   RenderWindowHash GetRenderWindows() const;
   QmitkRenderWindow* GetRenderWindow(int row, int column) const;
-  QmitkRenderWindow* GetRenderWindow(const QString& widgetName) const;
+  virtual QmitkRenderWindow* GetRenderWindow(const QString& widgetName) const;
   virtual QmitkRenderWindow* GetRenderWindow(const ViewDirection& viewDirection) const = 0;
 
   virtual void SetActiveRenderWindowWidget(RenderWindowWidgetPointer activeRenderWindowWidget);

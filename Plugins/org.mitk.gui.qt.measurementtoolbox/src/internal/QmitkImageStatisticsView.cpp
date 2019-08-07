@@ -130,6 +130,8 @@ void QmitkImageStatisticsView::OnButtonSelectionPressed()
 
 void QmitkImageStatisticsView::OnDialogSelectionChanged()
 {
+	m_selectedImageNodes.resize(0);
+	m_selectedMaskNodes.resize(0);
 	QList<mitk::DataNode::Pointer> selectedNodeList = m_SelectionDialog->GetSelectedNodes();
 	std::vector<mitk::DataNode::Pointer> selectedNodes(selectedNodeList.toVector().toStdVector());
 	auto isImagePredicate = mitk::GetImageStatisticsImagePredicate();
@@ -339,7 +341,7 @@ void QmitkImageStatisticsView::CalculateOrGetStatisticsNew()
 				m_Controls.sliderWidget_histogram->setVisible(false);
 			}
 
-			for (int i=0;i<m_selectedMaskNodes.size()+1;i++)
+			for (int i = 0; i < m_selectedMaskNodes.size() + 1; i++)
 			{
 				mitk::Image* mask = nullptr;
 				mitk::PlanarFigure* maskPF = nullptr;
@@ -351,6 +353,7 @@ void QmitkImageStatisticsView::CalculateOrGetStatisticsNew()
 					MITK_INFO << "Mask recognized check";
 					mask = dynamic_cast<mitk::Image*>(maskNode->GetData());
 					imageGeometry = image->GetGeometry();
+					i++;
 				}
 
 				if (m_selectedMaskNodes.size()&&mask == nullptr)
@@ -358,8 +361,8 @@ void QmitkImageStatisticsView::CalculateOrGetStatisticsNew()
 					MITK_INFO << "Planar Figure recognized check";
 					maskPF = dynamic_cast<mitk::PlanarFigure*>(maskNode->GetData());
 					auto maskPFGeometry = maskPF->GetGeometry();
-					if (imageGeometry == maskPFGeometry)
-					{
+					//if (imageGeometry == maskPFGeometry) //crashes
+					//{
 						m_selectedPlanarFigure = maskPF;
 						ITKCommandType::Pointer changeListener = ITKCommandType::New();
 						changeListener->SetCallbackFunction(this, &QmitkImageStatisticsView::CalculateOrGetStatisticsNew);
@@ -371,7 +374,7 @@ void QmitkImageStatisticsView::CalculateOrGetStatisticsNew()
 						}
 						imageStatistics =
 							mitk::ImageStatisticsContainerManager::GetImageStatistics(this->GetDataStorage(), image, maskPF);
-					}
+					//}
 				}
 				else if (mask)
 				{
@@ -379,9 +382,9 @@ void QmitkImageStatisticsView::CalculateOrGetStatisticsNew()
 					m_selectedMaskNode = maskNode;
 					auto maskGeometry = mask->GetGeometry();
 					MITK_INFO << "Mask geometry found check";
-					//if (imageGeometry == maskGeometry)//this
+					//if (imageGeometry == maskGeometry) //doesnt activate
 					//{
-						//MITK_INFO << "Mask fits image check";
+						MITK_INFO << "Mask fits image check";
 						imageStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(this->GetDataStorage(), image, mask);
 					//}
 				}
@@ -390,7 +393,7 @@ void QmitkImageStatisticsView::CalculateOrGetStatisticsNew()
 					MITK_INFO<<"Only image check";
 					imageStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(this->GetDataStorage(), image);
 				}
-				//here only calculates when at least one mask selected
+
 				bool imageStatisticsOlderThanInputs = false;
 				if (imageStatistics &&
 					(imageStatistics->GetMTime() < image->GetMTime() || (mask && imageStatistics->GetMTime() < mask->GetMTime()) ||
@@ -400,6 +403,7 @@ void QmitkImageStatisticsView::CalculateOrGetStatisticsNew()
 				}
 				if (imageStatistics)
 				{
+					MITK_INFO << "Bins recalculated check";
 					// triggers recomputation when switched between images and the newest one has not 100 bins (default)
 					auto calculatedBins = imageStatistics->GetStatisticsForTimeStep(0).m_Histogram.GetPointer()->Size();
 					if (calculatedBins != 100)
@@ -425,7 +429,7 @@ void QmitkImageStatisticsView::CalculateOrGetStatisticsNew()
 						{
 							auto histogram = imageStatistics->GetStatisticsForTimeStep(0).m_Histogram.GetPointer();
 							std::string imageNodeName = imageNode->GetName();
-							this->FillHistogramWidget({ histogram }, { imageNodeName });
+							//this->FillHistogramWidget({ histogram }, { imageNodeName });
 						}
 					}
 				}
@@ -649,7 +653,7 @@ void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
 
     if (!m_selectedPlanarFigure || m_selectedPlanarFigure->IsClosed())
     {
-      this->FillHistogramWidget({m_CalculationJob->GetTimeStepHistogram()}, {m_selectedImageNode->GetName()});
+      //this->FillHistogramWidget({m_CalculationJob->GetTimeStepHistogram()}, {m_selectedImageNode->GetName()});
     }
   }
 

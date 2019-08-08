@@ -343,25 +343,27 @@ void QmitkImageStatisticsView::CalculateOrGetStatisticsNew()
 
 			for (int i = 0; i < m_selectedMaskNodes.size() + 1; i++)
 			{
+				MITK_INFO << "Mask function check";
 				mitk::Image* mask = nullptr;
 				mitk::PlanarFigure* maskPF = nullptr;
 				mitk::DataNode::Pointer maskNode;
 				mitk::BaseGeometry* imageGeometry;
-				if (m_selectedMaskNodes.size())
+				if (m_selectedMaskNodes.size())//do this if there is any mask selected
 				{
 					maskNode = m_selectedMaskNodes[i];
 					MITK_INFO << "Mask recognized check";
 					mask = dynamic_cast<mitk::Image*>(maskNode->GetData());
 					imageGeometry = image->GetGeometry();
-					i++;
+					if ((i+1) == m_selectedMaskNodes.size())
+						i++;
 				}
 
-				if (m_selectedMaskNodes.size()&&mask == nullptr)
+				if (m_selectedMaskNodes.size()&&mask == nullptr) //do this if there is a mask selected but it´s a planar figure
 				{
 					MITK_INFO << "Planar Figure recognized check";
 					maskPF = dynamic_cast<mitk::PlanarFigure*>(maskNode->GetData());
 					auto maskPFGeometry = maskPF->GetGeometry();
-					//if (imageGeometry == maskPFGeometry) //crashes
+					//if (imageGeometry == maskPFGeometry) //doesnt activate
 					//{
 						m_selectedPlanarFigure = maskPF;
 						ITKCommandType::Pointer changeListener = ITKCommandType::New();
@@ -376,7 +378,7 @@ void QmitkImageStatisticsView::CalculateOrGetStatisticsNew()
 							mitk::ImageStatisticsContainerManager::GetImageStatistics(this->GetDataStorage(), image, maskPF);
 					//}
 				}
-				else if (mask)
+				else if (mask) //do this if the mask is a binary mask (no need for selected: either is PF(case above) or still nullptr from before)
 				{
 					MITK_INFO << "Mask not PF check";
 					m_selectedMaskNode = maskNode;
@@ -388,7 +390,7 @@ void QmitkImageStatisticsView::CalculateOrGetStatisticsNew()
 						imageStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(this->GetDataStorage(), image, mask);
 					//}
 				}
-				else
+				else //do this if there is no mask selected
 				{
 					MITK_INFO<<"Only image check";
 					imageStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(this->GetDataStorage(), image);
@@ -417,6 +419,8 @@ void QmitkImageStatisticsView::CalculateOrGetStatisticsNew()
 				{
 					CalculateStatistics(image, mask, maskPF);
 					MITK_INFO << "Statistics computed check";
+					m_selectedMaskNode = nullptr;
+					m_selectedPlanarFigure = nullptr;
 				}
 				// statistics already computed
 				else
@@ -579,7 +583,7 @@ void QmitkImageStatisticsView::ComputeAndDisplayIntensityProfile(mitk::Image *im
   m_Controls.groupBox_intensityProfile->setVisible(true);
   m_Controls.widget_intensityProfile->Reset();
   m_Controls.widget_intensityProfile->SetIntensityProfile(intensityProfile.GetPointer(),
-                                                          "Intensity Profile of " /*+ m_selectedImageNode->GetName()*/);
+                                                          "Intensity Profile of " + m_selectedImageNode->GetName());
 }
 
 void QmitkImageStatisticsView::ResetGUI()
@@ -603,6 +607,7 @@ void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
 
   if (this->m_CalculationJob->GetStatisticsUpdateSuccessFlag())
   {
+	MITK_INFO << "Statistics successful check";
     auto statistic = m_CalculationJob->GetStatisticsData();
     auto image = m_CalculationJob->GetStatisticsImage();
     mitk::BaseData::ConstPointer mask = nullptr;

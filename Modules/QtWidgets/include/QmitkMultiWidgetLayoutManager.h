@@ -53,9 +53,19 @@ public:
 
   QmitkMultiWidgetLayoutManager(QmitkAbstractMultiWidget* multiwidget);
 
+  /**
+  * @brief This function is called by render window widgets. Given a specific
+  *        layout design the layout of the multi widget data member is set with this method.
+  */
   void OnLayoutDesignChanged(LayoutDesign layoutDesign);
-
-private:
+  /**
+  * @brief Allow setting the current render window widget without relying on the sending object.
+  *
+  *    Calling 'OnLayoutDesignChanged' will overwrite the current render window widget but using the public
+  *    layout setter the current render window widget cna be defined using the function.
+  *    This is necessary for layouts that work with a specific selected render window widget.
+  */
+  void SetCurrentRenderWindowWidget(QmitkRenderWindowWidget* renderWindowWidget);
 
   void SetDefaultLayout();
   void SetAll2DTop3DBottomLayout();
@@ -73,6 +83,8 @@ private:
   void SetAllVerticalLayout();
 
   void RemoveOneLayout();
+
+private:
 
   QmitkAbstractMultiWidget* m_MultiWidget;
   QmitkRenderWindowWidget* m_CurrentRenderWindowWidget;

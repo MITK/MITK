@@ -104,6 +104,11 @@ void QmitkMultiWidgetLayoutManager::OnLayoutDesignChanged(LayoutDesign layoutDes
   };
 }
 
+void QmitkMultiWidgetLayoutManager::SetCurrentRenderWindowWidget(QmitkRenderWindowWidget* renderWindowWidget)
+{
+  m_CurrentRenderWindowWidget = renderWindowWidget;
+}
+
 void QmitkMultiWidgetLayoutManager::SetDefaultLayout()
 {
   MITK_INFO << "Set default layout" << std::endl;

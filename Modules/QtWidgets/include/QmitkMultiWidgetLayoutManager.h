@@ -46,7 +46,9 @@ public:
     ONE_TOP_3D_BOTTOM,
     ONE_LEFT_3D_RIGHT,
     ALL_HORIZONTAL,
-    ALL_VERTICAL
+    ALL_VERTICAL,
+    REMOVE_ONE,
+    NONE
   };
 
   QmitkMultiWidgetLayoutManager(QmitkAbstractMultiWidget* multiwidget);
@@ -61,14 +63,16 @@ private:
 
   void SetOneBigLayout();
 
-  void SetOnly2DLayoutHorizontal();
-  void SetOnly2DLayoutVertical();
+  void SetOnly2DHorizontalLayout();
+  void SetOnly2DVerticalLayout();
 
   void SetOneTop3DBottomLayout();
   void SetOneLeft3DRightLayout();
 
-  void SetAllHorizontal();
-  void SetAllVertical();
+  void SetAllHorizontalLayout();
+  void SetAllVerticalLayout();
+
+  void RemoveOneLayout();
 
   QmitkAbstractMultiWidget* m_MultiWidget;
   QmitkRenderWindowWidget* m_CurrentRenderWindowWidget;

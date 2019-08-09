@@ -44,6 +44,8 @@ void QmitkMultiWidgetLayoutManager::OnLayoutDesignChanged(LayoutDesign layoutDes
   auto renderWindow = dynamic_cast<QmitkRenderWindow*>(QObject::sender());
   m_CurrentRenderWindowWidget = m_MultiWidget->GetRenderWindowWidget(renderWindow).get();
 
+  m_MultiWidget->ActivateMenuWidget(false);
+
   switch (layoutDesign)
   {
   case LayoutDesign::DEFAULT:
@@ -68,12 +70,12 @@ void QmitkMultiWidgetLayoutManager::OnLayoutDesignChanged(LayoutDesign layoutDes
   }
   case LayoutDesign::ONLY_2D_HORIZONTAL:
   {
-    SetOnly2DLayoutHorizontal();
+    SetOnly2DHorizontalLayout();
     break;
   }
   case LayoutDesign::ONLY_2D_VERTICAL:
   {
-    SetOnly2DLayoutVertical();
+    SetOnly2DVerticalLayout();
     break;
   }
   case LayoutDesign::ONE_TOP_3D_BOTTOM:
@@ -88,22 +90,46 @@ void QmitkMultiWidgetLayoutManager::OnLayoutDesignChanged(LayoutDesign layoutDes
   }
   case LayoutDesign::ALL_HORIZONTAL:
   {
-    SetAllHorizontal();
+    SetAllHorizontalLayout();
     break;
   }
   case LayoutDesign::ALL_VERTICAL:
   {
-    SetAllVertical();
+    SetAllVerticalLayout();
+    break;
+  }
+  case LayoutDesign::REMOVE_ONE:
+  {
+    RemoveOneLayout();
     break;
   }
   };
+
+  m_MultiWidget->ActivateMenuWidget(true);
+
+  if (LayoutDesign::REMOVE_ONE == layoutDesign)
+  {
+    auto allRenderWindows = m_MultiWidget->GetRenderWindows();
+    for (auto& renderWindow : allRenderWindows)
+    {
+      renderWindow->SetLayoutDesign(LayoutDesign::NONE);
+    }
+
+    m_CurrentRenderWindowWidget->GetRenderWindow()->SetLayoutDesign(LayoutDesign::REMOVE_ONE);
+  }
+  else
+  {
+    auto allRenderWindows = m_MultiWidget->GetRenderWindows();
+    for (auto& renderWindow : allRenderWindows)
+    {
+      renderWindow->SetLayoutDesign(layoutDesign);
+    }
+  }
 }
 
 void QmitkMultiWidgetLayoutManager::SetDefaultLayout()
 {
   MITK_INFO << "Set default layout" << std::endl;
-
-  m_MultiWidget->ActivateMenuWidget(false);
 
   delete m_MultiWidget->layout();
 
@@ -127,26 +153,17 @@ void QmitkMultiWidgetLayoutManager::SetDefaultLayout()
       splitterSizeColumn.push_back(1000);
       auto renderWindowWidget = m_MultiWidget->GetRenderWindowWidget(row, column);
       splitter->addWidget(renderWindowWidget.get());
+      renderWindowWidget->show();
     }
     splitter->setSizes(splitterSizeColumn);
   }
 
   mainSplit->setSizes(splitterSizeRow);
-
-  m_MultiWidget->ActivateMenuWidget(true);
-
-  auto allRenderWindows = m_MultiWidget->GetRenderWindows();
-  for (auto& renderWindow : allRenderWindows)
-  {
-    renderWindow->LayoutDesignListChanged(LayoutDesign::DEFAULT);
-  }
 }
 
 void QmitkMultiWidgetLayoutManager::SetAll2DTop3DBottomLayout()
 {
   MITK_INFO << "Set all 2D top and 3D bottom layout" << std::endl;
-
-  m_MultiWidget->ActivateMenuWidget(false);
 
   delete m_MultiWidget->layout();
 
@@ -164,6 +181,7 @@ void QmitkMultiWidgetLayoutManager::SetAll2DTop3DBottomLayout()
   for (const auto& renderWindowWidget : all2DRenderWindowWidgets)
   {
     subSplit2D->addWidget(renderWindowWidget.second.get());
+    renderWindowWidget.second->show();
     splitterSize.push_back(1000);
   }
   subSplit2D->setSizes(splitterSize);
@@ -174,6 +192,7 @@ void QmitkMultiWidgetLayoutManager::SetAll2DTop3DBottomLayout()
   for (const auto& renderWindowWidget : all3DRenderWindowWidgets)
   {
     subSplit3D->addWidget(renderWindowWidget.second.get());
+    renderWindowWidget.second->show();
     splitterSize.push_back(1000);
   }
   subSplit3D->setSizes(splitterSize);
@@ -183,21 +202,11 @@ void QmitkMultiWidgetLayoutManager::SetAll2DTop3DBottomLayout()
   splitterSize.push_back(600);
   splitterSize.push_back(1000);
   mainSplit->setSizes(splitterSize);
-
-  m_MultiWidget->ActivateMenuWidget(true);
-
-  auto allRenderWindows = m_MultiWidget->GetRenderWindows();
-  for (auto& renderWindow : allRenderWindows)
-  {
-    renderWindow->LayoutDesignListChanged(LayoutDesign::ALL_2D_TOP_3D_BOTTOM);
-  }
 }
 
 void QmitkMultiWidgetLayoutManager::SetAll2DLeft3DRightLayout()
 {
   MITK_INFO << "Set all 2D left and 3D right layout" << std::endl;
-
-  m_MultiWidget->ActivateMenuWidget(false);
 
   delete m_MultiWidget->layout();
 
@@ -215,6 +224,7 @@ void QmitkMultiWidgetLayoutManager::SetAll2DLeft3DRightLayout()
   for (const auto& renderWindowWidget : all2DRenderWindowWidgets)
   {
     subSplit2D->addWidget(renderWindowWidget.second.get());
+    renderWindowWidget.second->show();
     splitterSize.push_back(1000);
   }
   subSplit2D->setSizes(splitterSize);
@@ -225,6 +235,7 @@ void QmitkMultiWidgetLayoutManager::SetAll2DLeft3DRightLayout()
   for (const auto& renderWindowWidget : all3DRenderWindowWidgets)
   {
     subSplit3D->addWidget(renderWindowWidget.second.get());
+    renderWindowWidget.second->show();
     splitterSize.push_back(1000);
   }
   subSplit3D->setSizes(splitterSize);
@@ -234,22 +245,12 @@ void QmitkMultiWidgetLayoutManager::SetAll2DLeft3DRightLayout()
   splitterSize.push_back(600);
   splitterSize.push_back(1000);
   mainSplit->setSizes(splitterSize);
-
-  m_MultiWidget->ActivateMenuWidget(true);
-
-  auto allRenderWindows = m_MultiWidget->GetRenderWindows();
-  for (auto& renderWindow : allRenderWindows)
-  {
-    renderWindow->LayoutDesignListChanged(LayoutDesign::ALL_2D_LEFT_3D_RIGHT);
-  }
 }
 
 void QmitkMultiWidgetLayoutManager::SetOneBigLayout()
 {
   MITK_INFO << "Set single 2D layout" << std::endl;
 
-  m_MultiWidget->ActivateMenuWidget(false);
-
   delete m_MultiWidget->layout();
 
   auto hBoxLayout = new QHBoxLayout(m_MultiWidget);
@@ -260,21 +261,12 @@ void QmitkMultiWidgetLayoutManager::SetOneBigLayout()
   auto mainSplit = new QSplitter(m_MultiWidget);
   hBoxLayout->addWidget(mainSplit);
   mainSplit->addWidget(m_CurrentRenderWindowWidget);
-
-  m_MultiWidget->ActivateMenuWidget(true);
-
-  auto allRenderWindows = m_MultiWidget->GetRenderWindows();
-  for (auto& renderWindow : allRenderWindows)
-  {
-    renderWindow->LayoutDesignListChanged(LayoutDesign::ONE_BIG);
-  }
+  m_CurrentRenderWindowWidget->show();
 }
 
-void QmitkMultiWidgetLayoutManager::SetOnly2DLayoutHorizontal()
+void QmitkMultiWidgetLayoutManager::SetOnly2DHorizontalLayout()
 {
   MITK_INFO << "Set only 2D layout" << std::endl;
-
-  m_MultiWidget->ActivateMenuWidget(false);
 
   delete m_MultiWidget->layout();
 
@@ -291,24 +283,15 @@ void QmitkMultiWidgetLayoutManager::SetOnly2DLayoutHorizontal()
   for (const auto& renderWindowWidget : all2DRenderWindowWidgets)
   {
     mainSplit->addWidget(renderWindowWidget.second.get());
+    renderWindowWidget.second->show();
     splitterSize.push_back(1000);
   }
   mainSplit->setSizes(splitterSize);
-
-  m_MultiWidget->ActivateMenuWidget(true);
-
-  auto allRenderWindows = m_MultiWidget->GetRenderWindows();
-  for (auto& renderWindow : allRenderWindows)
-  {
-    renderWindow->LayoutDesignListChanged(LayoutDesign::ONLY_2D_HORIZONTAL);
-  }
 }
 
-void QmitkMultiWidgetLayoutManager::SetOnly2DLayoutVertical()
+void QmitkMultiWidgetLayoutManager::SetOnly2DVerticalLayout()
 {
   MITK_INFO << "Set only 2D layout" << std::endl;
-
-  m_MultiWidget->ActivateMenuWidget(false);
 
   delete m_MultiWidget->layout();
 
@@ -325,25 +308,16 @@ void QmitkMultiWidgetLayoutManager::SetOnly2DLayoutVertical()
   for (const auto& renderWindowWidget : all2DRenderWindowWidgets)
   {
     mainSplit->addWidget(renderWindowWidget.second.get());
+    renderWindowWidget.second->show();
     splitterSize.push_back(1000);
   }
   mainSplit->setSizes(splitterSize);
-
-  m_MultiWidget->ActivateMenuWidget(true);
-
-  auto allRenderWindows = m_MultiWidget->GetRenderWindows();
-  for (auto& renderWindow : allRenderWindows)
-  {
-    renderWindow->LayoutDesignListChanged(LayoutDesign::ONLY_2D_VERTICAL);
-  }
 }
 
 void QmitkMultiWidgetLayoutManager::SetOneTop3DBottomLayout()
 {
   MITK_INFO << "Set one 2D top and 3D bottom layout" << std::endl;
 
-  m_MultiWidget->ActivateMenuWidget(false);
-
   delete m_MultiWidget->layout();
 
   auto hBoxLayout = new QHBoxLayout(m_MultiWidget);
@@ -355,6 +329,7 @@ void QmitkMultiWidgetLayoutManager::SetOneTop3DBottomLayout()
   hBoxLayout->addWidget(mainSplit);
 
   mainSplit->addWidget(m_CurrentRenderWindowWidget);
+  m_CurrentRenderWindowWidget->show();
 
   auto subSplit3D = new QSplitter(mainSplit);
   QList<int> splitterSize;
@@ -362,6 +337,7 @@ void QmitkMultiWidgetLayoutManager::SetOneTop3DBottomLayout()
   for (const auto& renderWindowWidget : all3DRenderWindowWidgets)
   {
     subSplit3D->addWidget(renderWindowWidget.second.get());
+    renderWindowWidget.second->show();
     splitterSize.push_back(1000);
   }
   subSplit3D->setSizes(splitterSize);
@@ -371,22 +347,11 @@ void QmitkMultiWidgetLayoutManager::SetOneTop3DBottomLayout()
   splitterSize.push_back(1000);
   splitterSize.push_back(1000);
   mainSplit->setSizes(splitterSize);
-
-  m_MultiWidget->ActivateMenuWidget(true);
-
-  auto allRenderWindows = m_MultiWidget->GetRenderWindows();
-  for (auto& renderWindow : allRenderWindows)
-  {
-    renderWindow->LayoutDesignListChanged(LayoutDesign::ONE_TOP_3D_BOTTOM);
-
-  }
 }
 
 void QmitkMultiWidgetLayoutManager::SetOneLeft3DRightLayout()
 {
   MITK_INFO << "Set one 2D left and 3D right layout" << std::endl;
-
-  m_MultiWidget->ActivateMenuWidget(false);
 
   delete m_MultiWidget->layout();
 
@@ -399,6 +364,7 @@ void QmitkMultiWidgetLayoutManager::SetOneLeft3DRightLayout()
   hBoxLayout->addWidget(mainSplit);
 
   mainSplit->addWidget(m_CurrentRenderWindowWidget);
+  m_CurrentRenderWindowWidget->show();
 
   auto subSplit3D = new QSplitter(Qt::Vertical, mainSplit);
   QList<int> splitterSize;
@@ -406,6 +372,7 @@ void QmitkMultiWidgetLayoutManager::SetOneLeft3DRightLayout()
   for (const auto& renderWindowWidget : all3DRenderWindowWidgets)
   {
     subSplit3D->addWidget(renderWindowWidget.second.get());
+    renderWindowWidget.second->show();
     splitterSize.push_back(1000);
   }
   subSplit3D->setSizes(splitterSize);
@@ -415,21 +382,11 @@ void QmitkMultiWidgetLayoutManager::SetOneLeft3DRightLayout()
   splitterSize.push_back(1000);
   splitterSize.push_back(1000);
   mainSplit->setSizes(splitterSize);
-
-  m_MultiWidget->ActivateMenuWidget(true);
-
-  auto allRenderWindows = m_MultiWidget->GetRenderWindows();
-  for (auto& renderWindow : allRenderWindows)
-  {
-    renderWindow->LayoutDesignListChanged(LayoutDesign::ONE_LEFT_3D_RIGHT);
-  }
 }
 
-void QmitkMultiWidgetLayoutManager::SetAllHorizontal()
+void QmitkMultiWidgetLayoutManager::SetAllHorizontalLayout()
 {
   MITK_INFO << "Set default layout" << std::endl;
-
-  m_MultiWidget->ActivateMenuWidget(false);
 
   delete m_MultiWidget->layout();
 
@@ -448,27 +405,18 @@ void QmitkMultiWidgetLayoutManager::SetAllHorizontal()
     if (nullptr != renderWindowWidget.second)
     {
       mainSplit->addWidget(renderWindowWidget.second.get());
+      renderWindowWidget.second->show();
       splitterSize.push_back(1000);
     }
   }
 
-  // set size for splitter
+  // set size for main splitter
   mainSplit->setSizes(splitterSize);
-
-  m_MultiWidget->ActivateMenuWidget(true);
-
-  auto allRenderWindows = m_MultiWidget->GetRenderWindows();
-  for (auto& renderWindow : allRenderWindows)
-  {
-    renderWindow->LayoutDesignListChanged(LayoutDesign::ALL_HORIZONTAL);
-  }
 }
 
-void QmitkMultiWidgetLayoutManager::SetAllVertical()
+void QmitkMultiWidgetLayoutManager::SetAllVerticalLayout()
 {
   MITK_INFO << "Set all vertical" << std::endl;
-
-  m_MultiWidget->ActivateMenuWidget(false);
 
   delete m_MultiWidget->layout();
 
@@ -485,17 +433,17 @@ void QmitkMultiWidgetLayoutManager::SetAllVertical()
   for (const auto& renderWindowWidget : allRenderWindowWidgets)
   {
     mainSplit->addWidget(renderWindowWidget.second.get());
+    renderWindowWidget.second->show();
     splitterSize.push_back(1000);
   }
 
   // set size for splitter
   mainSplit->setSizes(splitterSize);
+}
 
-  m_MultiWidget->ActivateMenuWidget(true);
+void QmitkMultiWidgetLayoutManager::RemoveOneLayout()
+{
+  MITK_INFO << "Remove single render window" << std::endl;
 
-  auto allRenderWindows = m_MultiWidget->GetRenderWindows();
-  for (auto& renderWindow : allRenderWindows)
-  {
-    renderWindow->LayoutDesignListChanged(LayoutDesign::ALL_VERTICAL);
-  }
+  m_CurrentRenderWindowWidget->hide();
 }

@@ -127,6 +127,7 @@ void QmitkRenderWindowMenu::UpdateLayoutDesignList(LayoutDesign layoutDesign)
   m_OneLeft3DRightLayoutAction->setEnabled(true);
   m_AllHorizontalLayoutAction->setEnabled(true);
   m_AllVerticalLayoutAction->setEnabled(true);
+  m_RemoveOneLayoutAction->setEnabled(true);
 
   switch (m_LayoutDesign)
   {
@@ -178,6 +179,11 @@ void QmitkRenderWindowMenu::UpdateLayoutDesignList(LayoutDesign layoutDesign)
   case LayoutDesign::ALL_VERTICAL:
   {
     m_AllVerticalLayoutAction->setEnabled(false);
+    break;
+  }
+  case LayoutDesign::REMOVE_ONE:
+  {
+    m_RemoveOneLayoutAction->setEnabled(false);
     break;
   }
   }
@@ -303,6 +309,9 @@ void QmitkRenderWindowMenu::CreateSettingsWidget()
   m_AllVerticalLayoutAction = new QAction("All vertical", m_LayoutActionsMenu);
   m_AllVerticalLayoutAction->setDisabled(false);
 
+  m_RemoveOneLayoutAction = new QAction("Remove this", m_LayoutActionsMenu);
+  m_RemoveOneLayoutAction->setDisabled(false);
+
   m_LayoutActionsMenu->addAction(m_DefaultLayoutAction);
   m_LayoutActionsMenu->addAction(m_All2DTop3DBottomLayoutAction);
   m_LayoutActionsMenu->addAction(m_All2DLeft3DRightLayoutAction);
@@ -313,6 +322,7 @@ void QmitkRenderWindowMenu::CreateSettingsWidget()
   m_LayoutActionsMenu->addAction(m_OneLeft3DRightLayoutAction);
   m_LayoutActionsMenu->addAction(m_AllHorizontalLayoutAction);
   m_LayoutActionsMenu->addAction(m_AllVerticalLayoutAction);
+  m_LayoutActionsMenu->addAction(m_RemoveOneLayoutAction);
 
   m_LayoutActionsMenu->setVisible(false);
 
@@ -326,6 +336,7 @@ void QmitkRenderWindowMenu::CreateSettingsWidget()
   connect(m_OneLeft3DRightLayoutAction, &QAction::triggered, [this]() { this->OnSetLayout(LayoutDesign::ONE_LEFT_3D_RIGHT); });
   connect(m_AllHorizontalLayoutAction, &QAction::triggered, [this]() { this->OnSetLayout(LayoutDesign::ALL_HORIZONTAL); });
   connect(m_AllVerticalLayoutAction, &QAction::triggered, [this]() { this->OnSetLayout(LayoutDesign::ALL_VERTICAL); });
+  connect(m_RemoveOneLayoutAction, &QAction::triggered, [this]() { this->OnSetLayout(LayoutDesign::REMOVE_ONE); });
 }
 
 void QmitkRenderWindowMenu::ChangeFullScreenIcon()

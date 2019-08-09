@@ -181,6 +181,7 @@ protected:
   QAction* m_OneLeft3DRightLayoutAction;
   QAction* m_AllHorizontalLayoutAction;
   QAction* m_AllVerticalLayoutAction;
+  QAction* m_RemoveOneLayoutAction;
 
   QLabel *m_TSLabel;
 

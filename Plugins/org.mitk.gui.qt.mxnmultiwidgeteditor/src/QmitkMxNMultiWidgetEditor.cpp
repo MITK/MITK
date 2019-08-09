@@ -55,8 +55,11 @@ QmitkMxNMultiWidgetEditor::Impl::Impl()
 // QmitkMxNMultiWidgetEditor
 //////////////////////////////////////////////////////////////////////////
 QmitkMxNMultiWidgetEditor::QmitkMxNMultiWidgetEditor()
-  : m_Impl(std::make_unique<Impl>())
-{}
+  : QmitkAbstractMultiWidgetEditor()
+  , m_Impl(std::make_unique<Impl>())
+{
+  // nothing here
+}
 
 QmitkMxNMultiWidgetEditor::~QmitkMxNMultiWidgetEditor()
 {
@@ -68,9 +71,8 @@ void QmitkMxNMultiWidgetEditor::OnLayoutSet(int row, int column)
   const auto& multiWidget = dynamic_cast<QmitkMxNMultiWidget*>(GetMultiWidget());
   if (nullptr != multiWidget)
   {
-    multiWidget->SetLayout(row, column);
     multiWidget->SetCrosshairVisibility(true);
-    FirePropertyChange(berry::IWorkbenchPartConstants::PROP_INPUT);
+    QmitkAbstractMultiWidgetEditor::OnLayoutSet(row, column);
   }
 }
 

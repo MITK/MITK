@@ -54,14 +54,18 @@ QmitkStdMultiWidgetEditor::Impl::Impl()
   : m_InteractionSchemeToolBar(nullptr)
   , m_LevelWindowWidget(nullptr)
 {
+  // nothing here
 }
 
 //////////////////////////////////////////////////////////////////////////
 // QmitkStdMultiWidgetEditor
 //////////////////////////////////////////////////////////////////////////
 QmitkStdMultiWidgetEditor::QmitkStdMultiWidgetEditor()
-  : m_Impl(std::make_unique<Impl>())
-{}
+  : QmitkAbstractMultiWidgetEditor()
+  , m_Impl(std::make_unique<Impl>())
+{
+  // nothing here
+}
 
 QmitkStdMultiWidgetEditor::~QmitkStdMultiWidgetEditor()
 {
@@ -177,7 +181,7 @@ void QmitkStdMultiWidgetEditor::OnInteractionSchemeChanged(mitk::InteractionSche
     m_Impl->m_InteractionSchemeToolBar->setVisible(false);
   }
 
-  multiWidget->SetInteractionScheme(scheme);
+  QmitkAbstractMultiWidgetEditor::OnInteractionSchemeChanged(scheme);
 }
 
 void QmitkStdMultiWidgetEditor::SetFocus()

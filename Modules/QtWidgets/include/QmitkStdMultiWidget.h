@@ -41,6 +41,7 @@ public:
 
   virtual void InitializeMultiWidget() override;
 
+  virtual QmitkRenderWindow* GetRenderWindow(const QString& widgetName) const override;
   virtual QmitkRenderWindow* GetRenderWindow(const mitk::BaseRenderer::ViewDirection& viewDirection) const override;
 
   virtual void SetSelectedPosition(const mitk::Point3D& newPosition, const QString& widgetName) override;

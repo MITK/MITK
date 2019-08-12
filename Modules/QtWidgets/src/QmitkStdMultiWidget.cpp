@@ -108,6 +108,32 @@ void QmitkStdMultiWidget::InitializeMultiWidget()
   AddDisplayPlaneSubTree();
 }
 
+QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow(const QString& widgetName) const
+{
+  if ("axial" == widgetName)
+  {
+    return GetRenderWindow1();
+  }
+
+  if ("sagittal" == widgetName)
+  {
+    return GetRenderWindow2();
+  }
+
+  if ("coronal" == widgetName)
+  {
+    return GetRenderWindow3();
+  }
+
+  if ("3d" == widgetName)
+  {
+    return GetRenderWindow4();
+  }
+
+
+  return QmitkAbstractMultiWidget::GetRenderWindow(widgetName);
+}
+
 QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow(const mitk::BaseRenderer::ViewDirection& viewDirection) const
 {
   return GetRenderWindow(static_cast<unsigned int>(viewDirection));

@@ -45,6 +45,7 @@ public:
   virtual void MultiWidgetOpened() override;
   virtual void MultiWidgetClosed() override;
 
+  virtual QmitkRenderWindow* GetRenderWindow(const QString& widgetName) const override;
   virtual QmitkRenderWindow* GetRenderWindow(const mitk::BaseRenderer::ViewDirection& viewDirection) const override;
 
   virtual void SetActiveRenderWindowWidget(RenderWindowWidgetPointer activeRenderWindowWidget) override;

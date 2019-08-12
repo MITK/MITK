@@ -48,6 +48,16 @@ void QmitkMxNMultiWidget::MultiWidgetClosed()
   SetCrosshairVisibility(false);
 }
 
+QmitkRenderWindow* QmitkMxNMultiWidget::GetRenderWindow(const QString& widgetName) const
+{
+  if ("axial" == widgetName || "sagittal" == widgetName || "coronal" == widgetName || "3d" == widgetName)
+  {
+    return GetActiveRenderWindowWidget()->GetRenderWindow();
+  }
+
+  return QmitkAbstractMultiWidget::GetRenderWindow(widgetName);
+}
+
 QmitkRenderWindow* QmitkMxNMultiWidget::GetRenderWindow(const mitk::BaseRenderer::ViewDirection& viewDirection) const
 {
   // currently no mapping between view directions and render windows

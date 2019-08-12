@@ -78,6 +78,7 @@ set(MITK_MODULES
   DICOMPM
   REST
   RESTService
+  DICOMweb
 )
 
 if(MITK_ENABLE_PIC_READER)

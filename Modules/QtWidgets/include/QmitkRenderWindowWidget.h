@@ -32,7 +32,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMouseEvent>
 
 class vtkCornerAnnotation;
-class vtkMitkRectangleProp;
 
 /**
 * @brief The 'QmitkRenderWindowWidget' is a QFrame that holds a render window
@@ -42,7 +41,7 @@ class vtkMitkRectangleProp;
 *        The 'QmitkRenderWindowWidget' is used inside a 'QmitkAbstractMultiWidget', where a map contains
 *        several render window widgets to create the multi widget display.
 */
-class MITKQTWIDGETS_EXPORT QmitkRenderWindowWidget : public QWidget
+class MITKQTWIDGETS_EXPORT QmitkRenderWindowWidget : public QFrame
 {
   Q_OBJECT
 
@@ -114,7 +113,6 @@ private:
   std::pair<mitk::Color, mitk::Color> m_GradientBackgroundColors;
   mitk::Color m_DecorationColor;
   vtkSmartPointer<vtkCornerAnnotation> m_CornerAnnotation;
-  vtkSmartPointer<vtkMitkRectangleProp> m_RectangleProp;
 
 };
 

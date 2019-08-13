@@ -76,7 +76,10 @@ void QmitkMxNMultiWidget::SetActiveRenderWindowWidget(RenderWindowWidgetPointer 
   // reset the decoration color of the previously active render window widget
   if (nullptr != currentActiveRenderWindowWidget)
   {
-    currentActiveRenderWindowWidget->setStyleSheet("border: 2px solid white");
+    auto decorationColor = currentActiveRenderWindowWidget->GetDecorationColor();
+    QColor hexColor(decorationColor[0] * 255, decorationColor[1] * 255, decorationColor[2] * 255);
+    currentActiveRenderWindowWidget->setStyleSheet("border: 2px solid " + hexColor.name(QColor::HexRgb));
+
   }
 
   // set the new decoration color of the currently active render window widget

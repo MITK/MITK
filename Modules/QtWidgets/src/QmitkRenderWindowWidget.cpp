@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // vtk
 #include <vtkCornerAnnotation.h>
-#include <vtkMitkRectangleProp.h>
 #include <vtkTextProperty.h>
 
 QmitkRenderWindowWidget::QmitkRenderWindowWidget(QWidget* parent/* = nullptr*/,
@@ -26,7 +25,7 @@ QmitkRenderWindowWidget::QmitkRenderWindowWidget(QWidget* parent/* = nullptr*/,
                                                  mitk::DataStorage* dataStorage/* = nullptr*/,
                                                  mitk::RenderingManager* renderingManager/* = nullptr*/,
                                                  mitk::BaseRenderer::RenderingMode::Type renderingMode/* = mitk::BaseRenderer::RenderingMode::Standard*/)
-  : QWidget(parent)
+  : QFrame(parent)
   , m_WidgetName(widgetName)
   , m_DataStorage(dataStorage)
   , m_RenderingManager(renderingManager)
@@ -110,17 +109,26 @@ void QmitkRenderWindowWidget::SetDecorationColor(const mitk::Color& color)
 {
   m_DecorationColor = color;
   m_CornerAnnotation->GetTextProperty()->SetColor(m_DecorationColor[0], m_DecorationColor[1], m_DecorationColor[2]);
-  m_RectangleProp->SetColor(m_DecorationColor[0], m_DecorationColor[1], m_DecorationColor[2]);
+
+  QColor hexColor(m_DecorationColor[0] * 255, m_DecorationColor[1] * 255, m_DecorationColor[2] * 255);
+  setStyleSheet("border: 2px solid " + hexColor.name(QColor::HexRgb));
 }
 
 void QmitkRenderWindowWidget::ShowColoredRectangle(bool show)
 {
-  m_RectangleProp->SetVisibility(show);
+  if (show)
+  {
+    setFrameStyle(QFrame::Box | QFrame::Plain);
+  }
+  else
+  {
+    setFrameStyle(NoFrame);
+  }
 }
 
 bool QmitkRenderWindowWidget::IsColoredRectangleVisible() const
 {
-  return m_RectangleProp->GetVisibility() > 0;
+  return frameStyle() > 0;
 }
 
 void QmitkRenderWindowWidget::ShowCornerAnnotation(bool show)
@@ -239,7 +247,9 @@ void QmitkRenderWindowWidget::InitializeDecorations()
   float white[3] = { 1.0f, 1.0f, 1.0f };
   m_DecorationColor = white;
 
-  setStyleSheet("border: 2px solid white");
+  setFrameStyle(QFrame::Box | QFrame::Plain);
+  QColor hexColor(m_DecorationColor[0] * 255, m_DecorationColor[1] * 255, m_DecorationColor[2] * 255);
+  setStyleSheet("border: 2px solid " + hexColor.name(QColor::HexRgb));
 
   m_CornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
   m_CornerAnnotation->SetText(0, "Sagittal");
@@ -248,13 +258,6 @@ void QmitkRenderWindowWidget::InitializeDecorations()
   if (0 == vtkRenderer->HasViewProp(m_CornerAnnotation))
   {
     vtkRenderer->AddViewProp(m_CornerAnnotation);
-  }
-
-  m_RectangleProp = vtkSmartPointer<vtkMitkRectangleProp>::New();
-  m_RectangleProp->SetColor(m_DecorationColor[0], m_DecorationColor[1], m_DecorationColor[2]);
-  if (0 == vtkRenderer->HasViewProp(m_RectangleProp))
-  {
-    vtkRenderer->AddViewProp(m_RectangleProp);
   }
 }
 

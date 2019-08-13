@@ -1903,7 +1903,9 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
       setViewDirectionAnnontation(image, p[i], axisIndices[i]);
     }
 
-    {
+    bool value = false;
+    node->GetBoolProperty("volumerendering", value);
+    if (value) {
       std::string text = "";
       if (m_displayPositionInfo && timeSteps > 1) {
         text += "T: " + std::to_string(timestep + 1) + "/" + std::to_string(timeSteps);

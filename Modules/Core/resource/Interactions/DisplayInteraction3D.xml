@@ -3,5 +3,11 @@
         <transition event_class="InteractionPositionEvent" event_variant="DoubleClick" target="start">
           <action name="doubleClick"/>
         </transition>
+        <transition event_class="InteractionEvent" event_variant="TimeUp" target="start">
+            <action name="ScrollTimeOneUp"/>
+        </transition>
+        <transition event_class="InteractionEvent" event_variant="TimeDown" target="start">
+            <action name="ScrollTimeOneDown"/>
+        </transition>
     </state>
 </statemachine>

@@ -24,8 +24,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
 
+void mitk::VolumeMapperVtkSmart3D::initialize()
+{
+  if (!m_Volume->GetMapper() || this->GetTimestep() != m_TimeStep) {
+    createMapper(GetInputImage());
+    createVolume();
+    createVolumeProperty();
+  }
+}
+
 void mitk::VolumeMapperVtkSmart3D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
 {
+  initialize();
+
   bool value;
   this->GetDataNode()->GetBoolProperty("volumerendering", value, renderer);
   if (!value)
@@ -45,13 +56,7 @@ void mitk::VolumeMapperVtkSmart3D::GenerateDataForRenderer(mitk::BaseRenderer *r
 
 vtkProp* mitk::VolumeMapperVtkSmart3D::GetVtkProp(mitk::BaseRenderer *renderer)
 {
-  if (!m_Volume->GetMapper())
-  {
-    createMapper(GetInputImage());
-    createVolume();
-    createVolumeProperty();
-  }
-
+  initialize();
   return m_Volume;
 }
 
@@ -106,7 +111,9 @@ void mitk::VolumeMapperVtkSmart3D::SetDefaultProperties(mitk::DataNode *node, mi
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 
-void mitk::VolumeMapperVtkSmart3D::setClippingPlanes(vtkPlanes* planes) {
+void mitk::VolumeMapperVtkSmart3D::setClippingPlanes(vtkPlanes* planes)
+{
+  initialize();
   m_SmartVolumeMapper->SetClippingPlanes(planes);
 }
 
@@ -116,11 +123,14 @@ vtkImageData* mitk::VolumeMapperVtkSmart3D::GetInputImage()
   vtkImageData* img = input->GetVtkImageData(this->GetTimestep());
   img->SetSpacing(1,1,1);
 
+  m_TimeStep = this->GetTimestep();
+
   return img;
 }
 
 void mitk::VolumeMapperVtkSmart3D::createMapper(vtkImageData* imageData)
 {
+  m_SmartVolumeMapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
   m_SmartVolumeMapper->SetBlendModeToComposite();
   m_SmartVolumeMapper->SetInputData(imageData);
 }
@@ -235,13 +245,12 @@ void mitk::VolumeMapperVtkSmart3D::UpdateRenderMode(mitk::BaseRenderer *renderer
   }
 }
 
-mitk::VolumeMapperVtkSmart3D::VolumeMapperVtkSmart3D()
+mitk::VolumeMapperVtkSmart3D::VolumeMapperVtkSmart3D() :
+  m_TimeStep(0)
 {
   vtkObjectFactory::RegisterFactory(vtkRenderingOpenGL2ObjectFactory::New());
   vtkObjectFactory::RegisterFactory(vtkRenderingVolumeOpenGL2ObjectFactory::New());
 
-  m_SmartVolumeMapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
-  m_SmartVolumeMapper->SetBlendModeToComposite();
   m_VolumeProperty = vtkSmartPointer<vtkVolumeProperty>::New();
   m_Volume = vtkSmartPointer<vtkVolume>::New();
 

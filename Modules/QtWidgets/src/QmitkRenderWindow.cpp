@@ -207,7 +207,7 @@ void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
   mitk::MouseWheelEvent::Pointer mWheelEvent = mitk::MouseWheelEvent::New(m_Renderer, displayPos, GetButtonState(we),
       GetModifiers(we), GetDelta(we));
 
-  if (!this->HandleEvent(mWheelEvent.GetPointer()))
+  if (!this->HandleEvent(mWheelEvent.GetPointer()) && !(we->modifiers() & Qt::CTRL))
   {
     QVTKWidget::wheelEvent(we);
   }

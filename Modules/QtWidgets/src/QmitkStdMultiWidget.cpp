@@ -382,6 +382,8 @@ void QmitkStdMultiWidget::InitializeWidget(bool showPlanesIn3d)
     ->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
   mitkWidget3->GetSliceNavigationController()
     ->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
+  mitkWidget4->GetSliceNavigationController()
+    ->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
 
   m_MouseModeSwitcher = mitk::MouseModeSwitcher::New(mitkWidget1->GetRenderer());
   m_MouseModeSwitcher->AddRenderer(mitkWidget2->GetRenderer());
@@ -1899,6 +1901,20 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
 
       setCornerAnnotationMaxText(2, axisIndices[i], maxPosText.c_str());
       setViewDirectionAnnontation(image, p[i], axisIndices[i]);
+    }
+
+    bool value = false;
+    node->GetBoolProperty("volumerendering", value);
+    if (value) {
+      std::string text = "";
+      if (m_displayPositionInfo && timeSteps > 1) {
+        text += "T: " + std::to_string(timestep + 1) + "/" + std::to_string(timeSteps);
+      }
+      setCornerAnnotation(2, 3, text.c_str());
+
+      std::string maxPosText = "";
+      maxPosText += "T: " + std::to_string(timeSteps) + "/" + std::to_string(timeSteps);
+      setCornerAnnotationMaxText(2, 3, maxPosText.c_str());
     }
 
     unsigned long newImageMTime = image->GetMTime();

@@ -63,10 +63,13 @@ namespace mitk
     void createVolume();
     void createVolumeProperty();
     vtkImageData* GetInputImage();
+    void initialize();
 
     vtkSmartPointer<vtkVolume> m_Volume;
     vtkSmartPointer<vtkSmartVolumeMapper> m_SmartVolumeMapper;
     vtkSmartPointer<vtkVolumeProperty> m_VolumeProperty;
+
+    int m_TimeStep;
     
     void UpdateTransferFunctions(mitk::BaseRenderer *renderer);
     void UpdateRenderMode(mitk::BaseRenderer *renderer);

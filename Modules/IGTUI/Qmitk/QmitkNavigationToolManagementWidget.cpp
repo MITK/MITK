@@ -83,7 +83,8 @@ void QmitkNavigationToolManagementWidget::OnLoadTool()
       m_DataStorage->Remove(readTool->GetDataNode());
     }
     UpdateToolTable();
-}
+    mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(m_DataStorage);
+  }
 }
 
 void QmitkNavigationToolManagementWidget::OnSaveTool()

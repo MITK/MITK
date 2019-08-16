@@ -298,6 +298,7 @@ void QmitkNavigationToolManagementWidget::OnLoadStorage()
     tempStorage->SetName(myPath.getFileName()); //set the filename as name for the storage, so the user can identify it
     this->LoadStorage(tempStorage);
     emit NewStorageAdded(m_NavigationToolStorage,myPath.getFileName());
+    mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(m_DataStorage);
   }
 }
 

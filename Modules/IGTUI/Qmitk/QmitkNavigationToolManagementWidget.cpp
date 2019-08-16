@@ -280,22 +280,25 @@ void QmitkNavigationToolManagementWidget::OnLoadStorage()
   if (filename == "") return;
 
   QmitkIGTCommonHelper::SetLastFileLoadPathByFileName(QString::fromStdString(filename));
+
+  mitk::NavigationToolStorage::Pointer tempStorage = nullptr;
+
   try
   {
-    mitk::NavigationToolStorage::Pointer tempStorage = myDeserializer->Deserialize(filename);
-
-    if (tempStorage.IsNull()) MessageBox("Error" + myDeserializer->GetErrorMessage());
-    else
-    {
-      Poco::Path myPath = Poco::Path(filename.c_str());
-      tempStorage->SetName(myPath.getFileName()); //set the filename as name for the storage, so the user can identify it
-      this->LoadStorage(tempStorage);
-      emit NewStorageAdded(m_NavigationToolStorage,myPath.getFileName());
-    }
+    tempStorage = myDeserializer->Deserialize(filename);
   }
   catch (const mitk::Exception& exception)
   {
     MessageBox(exception.GetDescription());
+  }
+
+  if (tempStorage.IsNotNull())
+  {
+    Poco::Path myPath = Poco::Path(filename.c_str());
+    tempStorage->SetName(myPath.getFileName()); //set the filename as name for the storage, so the user can identify it
+    this->LoadStorage(tempStorage);
+    emit NewStorageAdded(m_NavigationToolStorage,myPath.getFileName());
+    mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(m_DataStorage);
   }
 }
 

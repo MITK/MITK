@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <numeric>
 
-
 // Blueberry
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
@@ -35,12 +34,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qt
 #include <QMessageBox>
-#include <qfiledialog.h>
+#include <QFileDialog>
+#include <QFileInfo>
 
-//vtk
+// vtk
 #include <vtkSphereSource.h>
-
-
 
 const std::string QmitkIGTNavigationToolCalibration::VIEW_ID = "org.mitk.views.igtnavigationtoolcalibration";
 
@@ -51,10 +49,10 @@ QmitkIGTNavigationToolCalibration::QmitkIGTNavigationToolCalibration()
 
 QmitkIGTNavigationToolCalibration::~QmitkIGTNavigationToolCalibration()
 {
-//The following code is required due to a bug in the point list widget.
-//If this is removed, MITK crashes when closing the view:
-m_Controls.m_RegistrationLandmarkWidget->SetPointSetNode(nullptr);
-m_Controls.m_CalibrationLandmarkWidget->SetPointSetNode(nullptr);
+  //The following code is required due to a bug in the point list widget.
+  //If this is removed, MITK crashes when closing the view:
+  m_Controls.m_RegistrationLandmarkWidget->SetPointSetNode(nullptr);
+  m_Controls.m_CalibrationLandmarkWidget->SetPointSetNode(nullptr);
 
   //clean up data storage
   this->GetDataStorage()->Remove(m_ToolTipPointPreview);
@@ -318,11 +316,9 @@ void QmitkIGTNavigationToolCalibration::OnComputePivot()
   QString resultString;
   if (myPivotCalibration->ComputePivotResult())
   {
-
     mitk::NavigationData::Pointer markerTransformationTrackingCoordinates = m_PivotPoses.at(0);
 
     //Get computed pivot transfromation in tool coordinates
-
 
     mitk::NavigationData::Pointer ToolTipToTool = mitk::NavigationData::New();
     ToolTipToTool->SetPosition(myPivotCalibration->GetResultPivotPoint());
@@ -728,9 +724,17 @@ void QmitkIGTNavigationToolCalibration::SaveCalibratedTool()
     calibratedTool->SetToolControlPoints(this->m_CalibrationLandmarks);
     calibratedTool->SetToolLandmarks(this->m_RegistrationLandmarks);
     mitk::NavigationToolWriter::Pointer myWriter = mitk::NavigationToolWriter::New();
-    std::string filename = QFileDialog::getSaveFileName(nullptr,tr("Save Navigation Tool"), "/", "*.IGTTool").toUtf8().data();
-    if (filename == "") return;
-    if (myWriter->DoWrite(filename, calibratedTool)) MITK_INFO << "Saved calibrated tool to file " << filename;
+    QString filename = QFileDialog::getSaveFileName(nullptr,tr("Save Navigation Tool"), "/", "*.IGTTool");
+    if (filename.isEmpty()) return;
+
+    // ensure that file suffix is set
+    QFileInfo file(filename);
+    if (file.suffix().isEmpty())
+    {
+      filename += ".IGTTool";
+    }
+
+    if (myWriter->DoWrite(filename.toStdString(), calibratedTool)) MITK_INFO << "Saved calibrated tool to file " << filename;
     else MITK_WARN << "Can't write tool to file " << filename;
   }
   else

@@ -121,6 +121,8 @@ private:
   std::vector<std::shared_ptr<SurfaceNode>> m_SurfaceNodes;
 
   short getPixel(int x, int y, int z, InputImageType::RegionType region);
+  bool isEdge(InputImageType::RegionType region, int indX, int indY, int indZ, int alongAxis);
+
   void checkAndCreateTriangle(vtkSmartPointer<vtkCellArray> triangles, std::shared_ptr<SurfaceNode> node, int neighbourA, int neighbourB);
 };
 

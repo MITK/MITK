@@ -108,6 +108,45 @@ void ShowSegmentationAsElasticNetSurface::createNodes()
   }
 }
 
+bool ShowSegmentationAsElasticNetSurface::isEdge(InputImageType::RegionType region, int indX, int indY, int indZ, int alongAxis)
+{
+  bool edge = false;
+
+  short segmentationCount = 0;
+
+  short pixels[4];
+  for (int i = 0; i < 2; i++) {
+    for (int j = 0; j < 2; j++) {
+      int x = indX;
+      int y = indY;
+      int z = indZ;
+
+      if (alongAxis == 0) {
+        y += -1 * i;
+        z += -1 * j;
+      } else if (alongAxis == 1) {
+        x += -1 * i;
+        z += -1 * j;
+      } else {
+        x += -1 * i;
+        y += -1 * j;
+      }
+
+      short pixel = getPixel(x, y, z, region);
+      segmentationCount += pixel > 0;
+      pixels[i*2+j] = pixel;
+    }
+  }
+
+  // Check flatness
+  if (segmentationCount == 2) {
+    return pixels[0] != pixels[3];
+  }
+  edge = segmentationCount > 0 && segmentationCount < 4;
+
+  return edge;
+}
+
 void ShowSegmentationAsElasticNetSurface::linkNodes()
 {
   InputImageType::RegionType region = m_Input->GetLargestPossibleRegion();
@@ -118,12 +157,7 @@ void ShowSegmentationAsElasticNetSurface::linkNodes()
     if (index[0] > 0) {
       std::shared_ptr<SurfaceCube> cube = m_SurfaceCubes->get(index[0] - 1, index[1], index[2]);
       if (cube != nullptr) {
-        bool edge = false;
-        edge |= getPixel(index[0] - 1, index[1],     index[2],     region) > 0;
-        edge |= getPixel(index[0] - 1, index[1],     index[2] - 1, region) > 0;
-        edge |= getPixel(index[0] - 1, index[1] - 1, index[2],     region) > 0;
-        edge |= getPixel(index[0] - 1, index[1] - 1, index[2] - 1, region) > 0;
-        if (edge) {
+        if (isEdge(region, index[0] - 1, index[1], index[2], 0)) {
           node->neighbours[0] = cube->child;
         }
       }
@@ -132,12 +166,7 @@ void ShowSegmentationAsElasticNetSurface::linkNodes()
     if (index[0] < m_SurfaceCubes->getXSize() - 1) {
       std::shared_ptr<SurfaceCube> cube = m_SurfaceCubes->get(index[0] + 1, index[1], index[2]);
       if (cube != nullptr) {
-        bool edge = false;
-        edge |= getPixel(index[0], index[1],     index[2],     region) > 0;
-        edge |= getPixel(index[0], index[1],     index[2] - 1, region) > 0;
-        edge |= getPixel(index[0], index[1] - 1, index[2],     region) > 0;
-        edge |= getPixel(index[0], index[1] - 1, index[2] - 1, region) > 0;
-        if (edge) {
+        if (isEdge(region, index[0], index[1], index[2], 0)) {
           node->neighbours[1] = cube->child;
         }
       }
@@ -146,12 +175,7 @@ void ShowSegmentationAsElasticNetSurface::linkNodes()
     if (index[1] > 0) {
       std::shared_ptr<SurfaceCube> cube = m_SurfaceCubes->get(index[0], index[1] - 1, index[2]);
       if (cube != nullptr) {
-        bool edge = false;
-        edge |= getPixel(index[0],     index[1] - 1, index[2],     region) > 0;
-        edge |= getPixel(index[0],     index[1] - 1, index[2] - 1, region) > 0;
-        edge |= getPixel(index[0] - 1, index[1] - 1, index[2],     region) > 0;
-        edge |= getPixel(index[0] - 1, index[1] - 1, index[2] - 1, region) > 0;
-        if (edge) {
+        if (isEdge(region, index[0], index[1] - 1, index[2], 1)) {
           node->neighbours[2] = cube->child;
         }
       }
@@ -160,12 +184,7 @@ void ShowSegmentationAsElasticNetSurface::linkNodes()
     if (index[1] < m_SurfaceCubes->getYSize() - 1) {
       std::shared_ptr<SurfaceCube> cube = m_SurfaceCubes->get(index[0], index[1] + 1, index[2]);
       if (cube != nullptr) {
-        bool edge = false;
-        edge |= getPixel(index[0],     index[1], index[2],     region) > 0;
-        edge |= getPixel(index[0],     index[1], index[2] - 1, region) > 0;
-        edge |= getPixel(index[0] - 1, index[1], index[2],     region) > 0;
-        edge |= getPixel(index[0] - 1, index[1], index[2] - 1, region) > 0;
-        if (edge) {
+        if (isEdge(region, index[0], index[1], index[2], 1)) {
           node->neighbours[3] = cube->child;
         }
       }
@@ -174,12 +193,7 @@ void ShowSegmentationAsElasticNetSurface::linkNodes()
     if (index[2] > 0) {
       std::shared_ptr<SurfaceCube> cube = m_SurfaceCubes->get(index[0], index[1], index[2] - 1);
       if (cube != nullptr) {
-        bool edge = false;
-        edge |= getPixel(index[0],     index[1],     index[2] - 1, region) > 0;
-        edge |= getPixel(index[0],     index[1] - 1, index[2] - 1, region) > 0;
-        edge |= getPixel(index[0] - 1, index[1],     index[2] - 1, region) > 0;
-        edge |= getPixel(index[0] - 1, index[1] - 1, index[2] - 1, region) > 0;
-        if (edge) {
+        if (isEdge(region, index[0], index[1], index[2] - 1, 2)) {
           node->neighbours[4] = cube->child;
         }
       }
@@ -188,12 +202,7 @@ void ShowSegmentationAsElasticNetSurface::linkNodes()
     if (index[2] < m_SurfaceCubes->getZSize() - 1) {
       std::shared_ptr<SurfaceCube> cube = m_SurfaceCubes->get(index[0], index[1], index[2] + 1);
       if (cube != nullptr) {
-        bool edge = false;
-        edge |= getPixel(index[0],     index[1],     index[2], region) > 0;
-        edge |= getPixel(index[0] - 1, index[1],     index[2], region) > 0;
-        edge |= getPixel(index[0],     index[1] - 1, index[2], region) > 0;
-        edge |= getPixel(index[0] - 1, index[1] - 1, index[2], region) > 0;
-        if (edge) {
+        if (isEdge(region, index[0], index[1], index[2], 2)) {
           node->neighbours[5] = cube->child;
         }
       }
@@ -256,7 +265,8 @@ void ShowSegmentationAsElasticNetSurface::checkAndCreateTriangle(vtkSmartPointer
   }
 
   // Check triangle in quad
-  if (node->neighbours[neighbourA]->neighbours[neighbourB] == nullptr) {
+  if (node->neighbours[neighbourA]->neighbours[neighbourB] == nullptr ||
+      node->neighbours[neighbourB]->neighbours[neighbourA] == nullptr) {
     return;
   }
 

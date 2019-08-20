@@ -138,10 +138,6 @@ bool ShowSegmentationAsElasticNetSurface::isEdge(InputImageType::RegionType regi
     }
   }
 
-  // Check flatness
-  if (segmentationCount == 2) {
-    return pixels[0] != pixels[3];
-  }
   edge = segmentationCount > 0 && segmentationCount < 4;
 
   return edge;
@@ -210,6 +206,49 @@ void ShowSegmentationAsElasticNetSurface::linkNodes()
   }
 }
 
+Point3D ShowSegmentationAsElasticNetSurface::rayExit(Point3D origin, Vector3D direction, Point3D min, Point3D max)
+{
+  Vector3D tmax;
+  Vector3D div;
+  div[0] = 1. / direction[0];
+  div[1] = 1. / direction[1];
+  div[2] = 1. / direction[2];
+  Point3D aabb[2];
+  aabb[0] = min;
+  aabb[1] = max;
+
+  tmax[0] = (aabb[div[0] > 0][0] - origin[0]) * div[0];
+  tmax[1] = (aabb[div[1] > 0][1] - origin[1]) * div[1];
+  tmax[2] = (aabb[div[2] > 0][2] - origin[2]) * div[2];
+
+  return origin + std::min(std::min(tmax[0], tmax[1]), tmax[2]) * direction;
+}
+
+Point3D ShowSegmentationAsElasticNetSurface::offsetPoint(Point3D point, Vector3D direction, Point3D min, Point3D max)
+{
+  Point3D result = point;
+  result += direction;
+
+  bool insideCube = true;
+  for (int i = 0; i < 3; i++) {
+    if (result[i] < min[i] || result[i] > max[i]) {
+      insideCube = false;
+      break;
+    }
+  }
+
+  if (insideCube) {
+    return result;
+  }
+
+  // Calculate intersection with cube
+  Vector3D normDir = direction;
+  normDir.Normalize();
+  result = rayExit(point, normDir, min, max);
+
+  return result;
+}
+
 void ShowSegmentationAsElasticNetSurface::relaxNodes()
 {
   Vector3D spacing = m_Input->GetSpacing();
@@ -244,32 +283,72 @@ void ShowSegmentationAsElasticNetSurface::relaxNodes()
 
   // Apply relaxation force
   for (const auto& node : m_SurfaceNodes) {
-    node->pos += node->relaxationForce; // No idea about number
-
     // Clamp inside surface cube
     Point3D cubeCenter;
     m_Input->TransformIndexToPhysicalPoint(node->parent->pos, cubeCenter);
     cubeCenter -= offset;
+    Point3D min, max;
     for (int i = 0; i < 3; i++) {
-      node->pos[i] = node->pos[i] < cubeCenter[i] - spacing[i] ? cubeCenter[i] - spacing[i] : node->pos[i];
-      node->pos[i] = node->pos[i] > cubeCenter[i] + spacing[i] ? cubeCenter[i] + spacing[i] : node->pos[i];
+      min[i] = cubeCenter[i] - abs(spacing[i]);
+      max[i] = cubeCenter[i] + abs(spacing[i]);
     }
+
+    node->pos = offsetPoint(node->pos, node->relaxationForce, min, max);
   }
 }
 
 void ShowSegmentationAsElasticNetSurface::checkAndCreateTriangle(vtkSmartPointer<vtkCellArray> triangles, std::shared_ptr<SurfaceNode> node, int neighbourA, int neighbourB)
 {
+  InputImageType::RegionType region = m_Input->GetLargestPossibleRegion();
   // Check nodes exists
   if (node->neighbours[neighbourA] == nullptr || node->neighbours[neighbourB] == nullptr) {
     return;
   }
 
-  // Check triangle in quad
+  // Check triangle in quad neighbourhood
   if (node->neighbours[neighbourA]->neighbours[neighbourB] == nullptr ||
       node->neighbours[neighbourB]->neighbours[neighbourA] == nullptr) {
     return;
   }
 
+  // Check triangle on surface
+  std::shared_ptr<SurfaceNode> nodes[4];
+  nodes[0] = node;
+  nodes[1] = node->neighbours[neighbourA];
+  nodes[2] = node->neighbours[neighbourB];
+  nodes[3] = node->neighbours[neighbourA]->neighbours[neighbourB];
+
+  int mainAxis = 0;
+  for (int i = 1; i < 3; i++) {
+    if (nodes[0]->parent->pos[i] == nodes[1]->parent->pos[i] &&
+        nodes[0]->parent->pos[i] == nodes[2]->parent->pos[i] &&
+        nodes[0]->parent->pos[i] == nodes[3]->parent->pos[i]) {
+      mainAxis = i;
+      break;
+    }
+  }
+
+  InputImageType::IndexType maxIndex;
+  for (int i = 0; i < 3; i++) {
+    maxIndex[i] = nodes[0]->parent->pos[i];
+    for (int j = 1; j < 4; j++) {
+      maxIndex[i] = std::max(maxIndex[i], nodes[j]->parent->pos[i]);
+    }
+  }
+
+  InputImageType::IndexType targetIndex;
+  targetIndex[0] = maxIndex[0] - 1;
+  targetIndex[1] = maxIndex[1] - 1;
+  targetIndex[2] = maxIndex[2] - 1;
+  short pixel0 = getPixel(targetIndex[0], targetIndex[1], targetIndex[2], region);
+  targetIndex[mainAxis] += 1;
+  short pixel1 = getPixel(targetIndex[0], targetIndex[1], targetIndex[2], region);
+
+  if (pixel0 == pixel1) {
+    return;
+  }
+
+  // Generate triangle
   vtkIdType triangle[3];
   triangle[0] = node->index;
   triangle[1] = node->neighbours[neighbourA]->index;
@@ -309,6 +388,7 @@ vtkSmartPointer<vtkPolyData> ShowSegmentationAsElasticNetSurface::triangulateNod
   vtkSmartPointer<vtkPolyDataNormals> normalsFilter = vtkSmartPointer<vtkPolyDataNormals>::New();
   normalsFilter->SetInputData(data);
   normalsFilter->SetFeatureAngle(60.0);
+  normalsFilter->NonManifoldTraversalOn();
   normalsFilter->Update();
 
   data = normalsFilter->GetOutput();

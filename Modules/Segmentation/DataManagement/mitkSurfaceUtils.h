@@ -45,6 +45,7 @@ public:
     DataNode::Pointer removeOnComplete = nullptr; // Node will be removed after creating and adding new model
     int timestep = -1;
     int elasticIterations = 1;
+    double elasticRelaxation = 0.;
   };
 
   class SurfaceCreationTypeProperty : public EnumerationProperty

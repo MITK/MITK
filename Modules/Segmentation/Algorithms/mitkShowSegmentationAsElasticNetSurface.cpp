@@ -16,9 +16,17 @@ void ShowSegmentationAsElasticNetSurface::GenerateData()
   createSurfaceCubes();
   createNodes();
   linkNodes();
+
+  Vector3D spacing = m_Input->GetSpacing();
+  double length = spacing.GetNorm() * (1 - m_FilterArgs.elasticNetRelaxation);
   for (int i = 0; i < m_FilterArgs.elasticNetIterations; i++) {
+    m_LastMaxRelaxation = 0.;
     relaxNodes();
+    if (m_FilterArgs.elasticNetRelaxation > 0. && m_LastMaxRelaxation < length) {
+      break;
+    }
   }
+
   m_Output = triangulateNodes();
 }
 
@@ -238,6 +246,7 @@ Point3D ShowSegmentationAsElasticNetSurface::offsetPoint(Point3D point, Vector3D
   }
 
   if (insideCube) {
+    m_LastMaxRelaxation = std::max(m_LastMaxRelaxation, direction.GetNorm());
     return result;
   }
 
@@ -246,6 +255,7 @@ Point3D ShowSegmentationAsElasticNetSurface::offsetPoint(Point3D point, Vector3D
   normDir.Normalize();
   result = rayExit(point, normDir, min, max);
 
+  m_LastMaxRelaxation = std::max(m_LastMaxRelaxation, (result - point).GetNorm());
   return result;
 }
 
@@ -388,7 +398,6 @@ vtkSmartPointer<vtkPolyData> ShowSegmentationAsElasticNetSurface::triangulateNod
   vtkSmartPointer<vtkPolyDataNormals> normalsFilter = vtkSmartPointer<vtkPolyDataNormals>::New();
   normalsFilter->SetInputData(data);
   normalsFilter->SetFeatureAngle(60.0);
-  normalsFilter->NonManifoldTraversalOn();
   normalsFilter->Update();
 
   data = normalsFilter->GetOutput();

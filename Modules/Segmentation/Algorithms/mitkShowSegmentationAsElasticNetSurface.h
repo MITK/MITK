@@ -32,6 +32,7 @@ public:
   {
     int elasticNetIterations = 10;
     BridgeTipType bridgeTip = BridgeTipType::Pointy; // Doesn't work at the moment
+    double elasticNetRelaxation = -1.;
   };
 
   virtual void Update() override { this->UpdateOutputData(nullptr); }
@@ -127,6 +128,8 @@ private:
   Point3D rayExit(Point3D origin, Vector3D direction, Point3D min, Point3D max);
 
   void checkAndCreateTriangle(vtkSmartPointer<vtkCellArray> triangles, std::shared_ptr<SurfaceNode> node, int neighbourA, int neighbourB);
+
+  double m_LastMaxRelaxation = -1.;
 };
 
 }

@@ -434,6 +434,7 @@ vtkSmartPointer<vtkPolyData> SurfaceCreator::createModelElasticNet(Image::Pointe
 {
   ShowSegmentationAsElasticNetSurface::SurfaceComputingParameters surfaceParams;
   surfaceParams.elasticNetIterations = args.elasticIterations;
+  surfaceParams.elasticNetRelaxation = args.elasticRelaxation;
   ShowSegmentationAsElasticNetSurface::Pointer surfaceBuilder = ShowSegmentationAsElasticNetSurface::New();
   surfaceBuilder->setArgs(args, surfaceParams);
 

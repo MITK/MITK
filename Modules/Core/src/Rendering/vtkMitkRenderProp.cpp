@@ -16,12 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "vtkMitkRenderProp.h"
 
-#include <vtkLODProp3D.h>
 #include <vtkObjectFactory.h>
 #include <vtkPropAssembly.h>
+#include <vtkInformation.h>
 
 #include "mitkVtkMapper.h"
-//#include "mitkGLMapper.h"
 
 vtkStandardNewMacro(vtkMitkRenderProp);
 
@@ -40,6 +39,16 @@ double *vtkMitkRenderProp::GetBounds()
 void vtkMitkRenderProp::SetPropRenderer(mitk::VtkPropRenderer::Pointer propRenderer)
 {
   this->m_VtkPropRenderer = propRenderer;
+}
+
+void vtkMitkRenderProp::SetPropertyKeys(vtkInformation *keys)
+{
+  // store information as a regular vtkProp
+  Superclass::SetPropertyKeys(keys);
+  if (m_VtkPropRenderer != nullptr)
+  {
+    m_VtkPropRenderer->SetPropertyKeys(keys);
+  }
 }
 
 int vtkMitkRenderProp::RenderOpaqueGeometry(vtkViewport * /*viewport*/)
@@ -72,17 +81,11 @@ int vtkMitkRenderProp::GetNumberOfPaths()
   return m_VtkPropRenderer->GetNumberOfPaths();
 }
 
-// BUG (#1551) added method depth peeling
 int vtkMitkRenderProp::HasTranslucentPolygonalGeometry()
 {
-  typedef std::map<int, mitk::Mapper *> MappersMapType;
-  const MappersMapType mappersMap = m_VtkPropRenderer->GetMappersMap();
-  for (auto it = mappersMap.cbegin(); it != mappersMap.cend(); ++it)
+  for (auto &mapEntry : m_VtkPropRenderer->GetMappersMap())
   {
-    mitk::Mapper *mapper = (*it).second;
-
-    const mitk::VtkMapper::Pointer vtkMapper = dynamic_cast<mitk::VtkMapper *>(mapper);
-    if (vtkMapper)
+    if (auto vtkMapper = dynamic_cast<mitk::VtkMapper *>(mapEntry.second))
     {
       // Due to VTK 5.2 bug, we need to initialize the Paths object in vtkPropAssembly
       // manually (see issue #8186 committed to VTK's Mantis issue tracker)

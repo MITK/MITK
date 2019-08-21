@@ -85,6 +85,9 @@ namespace mitk
       Volumetric
     };
 
+    /** \brief store/propagate vtkInformation during rendering */
+    void SetPropertyKeys(vtkInformation *info);
+
     int Render(RenderType type);
 
     /** \brief This methods contains all method neceassary before a VTK Render() call */
@@ -212,6 +215,9 @@ namespace mitk
     // prepare all mitk::mappers for rendering
     void PrepareMapperQueue();
 
+    /** \brief Propagate vtkInformation object to all VTK-based mappers */
+    void PropagateRenderInfoToMappers();
+
     /** \brief Set parallel projection, remove the interactor and the lights of VTK. */
     bool Initialize2DvtkCamera();
 
@@ -238,6 +244,14 @@ namespace mitk
     vtkRenderer *m_TextRenderer;
     typedef std::map<unsigned int, vtkTextActor *> TextMapType;
     TextMapType m_TextCollection;
+
+   /** \brief Information passed from VTK's rendering to props.
+
+       Used e.g. by vtkDualDepthPeelingPass to pass information.
+       Not passing this to all the MITK generated vktProps will
+       essentially break VTK's depth peeling / transparency.
+    */
+    vtkInformation* m_VtkRenderInfo = nullptr;
   };
 } // namespace mitk
 

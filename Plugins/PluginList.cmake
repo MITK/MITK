@@ -39,15 +39,24 @@ set(MITK_PLUGINS
   #Testing/org.blueberry.core.runtime.tests:ON
   #Testing/org.blueberry.osgi.tests:ON
 
+  org.mitk.gui.common:ON
+
+  org.mitk.gui.qt.common:ON
+  org.mitk.gui.qt.common.legacy:OFF
+
   org.mitk.gui.qt.overlaymanager:ON
+
   #org.mitk.gui.qt.segmentation:ON
+
   org.mitk.gui.qt.viewnavigator:ON
   org.mitk.gui.qt.registration:OFF
+
   #org.mitk.gui.qt.toftutorial:OFF
+
   org.mitk.gui.qt.volumevisualization:OFF
   org.mitk.gui.qt.pointsetinteraction:OFF
   org.mitk.core.services:ON
-  org.mitk.gui.common:ON
+
   org.mitk.planarfigure:ON
   org.mitk.core.ext:OFF
   org.mitk.core.jobs:OFF
@@ -56,10 +65,10 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.coreapplication:OFF
   org.mitk.gui.qt.ext:OFF
   org.mitk.gui.qt.extapplication:OFF
-  org.mitk.gui.qt.common:ON
   org.mitk.gui.qt.stdmultiwidgeteditor:ON
-  org.mitk.gui.qt.common.legacy:OFF
+
   #org.mitk.gui.qt.cmdlinemodules:OFF
+
   org.mitk.gui.qt.diffusionimagingapp:OFF
   org.mitk.gui.qt.datamanager:ON
   org.mitk.gui.qt.properties:ON
@@ -70,6 +79,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.imagenavigator:ON
   org.mitk.gui.qt.remeshing:ON
   org.mitk.gui.qt.imagestatistics:ON
+
   #org.mitk.gui.qt.tofutil:OFF
   #org.mitk.gui.qt.igttracking:OFF
   #org.mitk.gui.qt.aicpregistration:OFF

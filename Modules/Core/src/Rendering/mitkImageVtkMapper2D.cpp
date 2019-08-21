@@ -204,7 +204,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   int thickSlicesMode = 0;
   int thickSlicesNum = 1;
   // Thick slices parameters
-  if( input->GetPixelType().GetNumberOfComponents() == 1 ) // for now only single component are allowed
+  //if( input->GetPixelType().GetNumberOfComponents() == 1 ) // for now only single component are allowed // AUT-4269
   {
     DataNode *dn=renderer->GetCurrentWorldPlaneGeometryNode();
     if(dn)
@@ -260,7 +260,18 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     // executed even though the input geometry information did not change; this
     // is necessary when the input /em data, but not the /em geometry changes.
     localStorage->m_TSFilter->SetThickSliceMode( thickSlicesMode-1 );
-    localStorage->m_TSFilter->SetInputData( localStorage->m_Reslicer->GetVtkOutput() );
+
+    int displayedComponent = 0;
+    auto numberOfComponents = input->GetPixelType().GetNumberOfComponents();
+    if (datanode->GetIntProperty("Image.Displayed Component", displayedComponent, renderer) && numberOfComponents > 1) {
+      localStorage->m_VectorComponentExtractor->SetComponents(displayedComponent);
+      localStorage->m_VectorComponentExtractor->SetInputData(localStorage->m_Reslicer->GetVtkOutput());
+      localStorage->m_VectorComponentExtractor->Update();
+
+      localStorage->m_TSFilter->SetInputData(localStorage->m_VectorComponentExtractor->GetOutput());
+    } else {
+      localStorage->m_TSFilter->SetInputData(localStorage->m_Reslicer->GetVtkOutput());
+    }
 
     //vtkFilter => mitkFilter => vtkFilter update mechanism will fail without calling manually
     localStorage->m_Reslicer->Modified();
@@ -318,8 +329,6 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     localStorage->m_LevelWindowFilter->SetClippingBounds(textureClippingBounds);
   }
 
-  //get the number of scalar components to distinguish between different image types
-  int numberOfComponents = localStorage->m_ReslicedImage->GetNumberOfScalarComponents();
   //get the binary property
   bool binary = false;
   bool binaryOutline = false;
@@ -372,7 +381,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
 
   int displayedComponent = 0;
-
+  int numberOfComponents = localStorage->m_ReslicedImage->GetNumberOfScalarComponents();  //get the number of scalar components to distinguish between different image types
   if (datanode->GetIntProperty("Image.Displayed Component", displayedComponent, renderer) && numberOfComponents > 1)
   {
     localStorage->m_VectorComponentExtractor->SetComponents(displayedComponent);

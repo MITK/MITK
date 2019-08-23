@@ -592,7 +592,7 @@ void mitk::DisplayActionEventBroadcast::Scroll(StateMachineAction* /*stateMachin
   m_CurrentDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
 
   // propagate scroll event with computed geometry values
-  InvokeEvent(DisplayScrollEvent(interactionEvent, sliceDelta));
+  InvokeEvent(DisplayScrollEvent(interactionEvent, sliceDelta, m_AutoRepeat));
 }
 
 void mitk::DisplayActionEventBroadcast::ScrollOneUp(StateMachineAction* /*stateMachineAction*/, InteractionEvent* interactionEvent)
@@ -604,7 +604,7 @@ void mitk::DisplayActionEventBroadcast::ScrollOneUp(StateMachineAction* /*stateM
   }
 
   // propagate scroll event with a single slice delta (increase)
-  InvokeEvent(DisplayScrollEvent(interactionEvent, sliceDelta));
+  InvokeEvent(DisplayScrollEvent(interactionEvent, sliceDelta, m_AutoRepeat));
 }
 
 void mitk::DisplayActionEventBroadcast::ScrollOneDown(StateMachineAction* /*stateMachineAction*/, InteractionEvent* interactionEvent)
@@ -616,7 +616,7 @@ void mitk::DisplayActionEventBroadcast::ScrollOneDown(StateMachineAction* /*stat
   }
 
   // propagate scroll event with a single slice delta (decrease)
-  InvokeEvent(DisplayScrollEvent(interactionEvent, sliceDelta));
+  InvokeEvent(DisplayScrollEvent(interactionEvent, sliceDelta, m_AutoRepeat));
 }
 
 void mitk::DisplayActionEventBroadcast::AdjustLevelWindow(StateMachineAction* /*stateMachineAction*/, InteractionEvent* interactionEvent)

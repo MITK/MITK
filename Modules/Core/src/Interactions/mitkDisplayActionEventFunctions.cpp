@@ -123,6 +123,7 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Scro
         sliceStepper = sliceNavigationController->GetTime();
       }
 
+      sliceStepper->SetAutoRepeat(displayActionEvent->GetAutoRepeat());
       sliceStepper->MoveSlice(displayActionEvent->GetSliceDelta());
     }
   };
@@ -309,6 +310,7 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Scro
             sliceStepper = sliceNavigationController->GetTime();
           }
 
+          sliceStepper->SetAutoRepeat(displayActionEvent->GetAutoRepeat());
           sliceStepper->MoveSlice(displayActionEvent->GetSliceDelta());
         }
       }

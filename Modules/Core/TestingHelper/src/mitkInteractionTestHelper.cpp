@@ -154,7 +154,7 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
       rw->GetSliceNavigationController()->ConnectGeometryTimeEvent(rm->GetTimeNavigationController(), false);
       rm->GetTimeNavigationController()->ConnectGeometryTimeEvent(rw->GetSliceNavigationController(), false);
 
-      // add to list of kown render windows
+      // add to list of known render windows
       m_RenderWindowList.push_back(rw);
     }
 
@@ -162,9 +162,8 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
     //    mitkWidget1->GetSliceNavigationController()
     //      ->ConnectGeometrySendEvent(mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
 
-    //########### register display interactor to handle scroll events ##################
-    // use MouseModeSwitcher to ensure that the statemachine of DisplayInteractor is loaded correctly
-    m_MouseModeSwitcher = mitk::MouseModeSwitcher::New();
+    // register interaction event obserer to handle scroll events
+    InitializeDisplayActionEventHandling();
   }
   else
   {
@@ -173,6 +172,13 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
 
   // WARNING assumes a 3D window exists !!!!
   this->AddDisplayPlaneSubTree();
+}
+
+void mitk::InteractionTestHelper::InitializeDisplayActionEventHandling()
+{
+  m_DisplayActionEventBroadcast = mitk::DisplayActionEventBroadcast::New();
+  m_DisplayActionEventBroadcast->LoadStateMachine("DisplayInteraction.xml");
+  m_DisplayActionEventBroadcast->SetEventConfig("DisplayConfigMITK.xml");
 }
 
 mitk::InteractionTestHelper::~InteractionTestHelper()

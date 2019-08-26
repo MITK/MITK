@@ -33,6 +33,11 @@ QmitkInteractionSchemeToolBar::QmitkInteractionSchemeToolBar(QWidget* parent/* =
   m_InteractionSchemeSwitcher = mitk::InteractionSchemeSwitcher::New();
 }
 
+QmitkInteractionSchemeToolBar::~QmitkInteractionSchemeToolBar()
+{
+  // nothing here
+}
+
 void QmitkInteractionSchemeToolBar::SetInteractionEventHandler(mitk::InteractionEventHandler::Pointer interactionEventHandler)
 {
   if (interactionEventHandler == m_InteractionEventHandler)
@@ -41,13 +46,16 @@ void QmitkInteractionSchemeToolBar::SetInteractionEventHandler(mitk::Interaction
   }
 
   m_InteractionEventHandler = interactionEventHandler;
-  try
+  if (nullptr != m_InteractionSchemeSwitcher)
   {
-    m_InteractionSchemeSwitcher->SetInteractionScheme(m_InteractionEventHandler, InteractionScheme::PACSStandard);
-  }
-  catch (const mitk::Exception&)
-  {
-    return;
+    try
+    {
+      m_InteractionSchemeSwitcher->SetInteractionScheme(m_InteractionEventHandler, InteractionScheme::PACSStandard);
+    }
+    catch (const mitk::Exception&)
+    {
+      return;
+    }
   }
 }
 
@@ -62,25 +70,23 @@ void QmitkInteractionSchemeToolBar::AddButton(InteractionScheme interactionSchem
   QToolBar::addAction(action);
 }
 
-QmitkInteractionSchemeToolBar::~QmitkInteractionSchemeToolBar()
-{
-  // nothing here
-}
-
 void QmitkInteractionSchemeToolBar::OnInteractionSchemeChanged()
 {
   QAction* action = dynamic_cast<QAction*>(sender());
-  if (action)
+  if (nullptr != action)
   {
     InteractionScheme interactionScheme = static_cast<InteractionScheme>(action->data().toInt());
 
-    try
+    if (nullptr != m_InteractionSchemeSwitcher)
     {
-      m_InteractionSchemeSwitcher->SetInteractionScheme(m_InteractionEventHandler, interactionScheme);
-    }
-    catch (const mitk::Exception&)
-    {
-      return;
+      try
+      {
+        m_InteractionSchemeSwitcher->SetInteractionScheme(m_InteractionEventHandler, interactionScheme);
+      }
+      catch (const mitk::Exception&)
+      {
+        return;
+      }
     }
   }
 }

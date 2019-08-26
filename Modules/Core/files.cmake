@@ -209,7 +209,6 @@ set(CPP_FILES
   Interactions/mitkInteractionSchemeSwitcher.cpp
   Interactions/mitkInternalEvent.cpp
   Interactions/mitkMouseDoubleClickEvent.cpp
-  Interactions/mitkMouseModeSwitcher.cpp
   Interactions/mitkMouseMoveEvent.cpp
   Interactions/mitkMousePressEvent.cpp
   Interactions/mitkMouseReleaseEvent.cpp

@@ -1,5 +1,7 @@
 #include <MitkSegmentationExports.h>
 
+#include <vtkFloatArray.h>
+
 #include <mitkSurface.h>
 
 #include "mitkSurfaceUtils.h"
@@ -127,7 +129,8 @@ private:
   Point3D offsetPoint(Point3D point, Vector3D direction, Point3D min, Point3D max);
   Point3D rayExit(Point3D origin, Vector3D direction, Point3D min, Point3D max);
 
-  void checkAndCreateTriangle(vtkSmartPointer<vtkCellArray> triangles, std::shared_ptr<SurfaceNode> node, int neighbourA, int neighbourB);
+  bool checkAndCreateTriangle(vtkSmartPointer<vtkCellArray> triangles, std::vector<Vector3D>* triangleNormals, std::shared_ptr<SurfaceNode> node, int neighbourA, int neighbourB);
+  Vector3D getTriangleNormal(std::shared_ptr<SurfaceNode> node, int neighbourA, int neighbourB);
 
   double m_LastMaxRelaxation = -1.;
 };

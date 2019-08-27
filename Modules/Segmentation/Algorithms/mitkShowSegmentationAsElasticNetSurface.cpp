@@ -1,6 +1,7 @@
 #include "mitkShowSegmentationAsElasticNetSurface.h"
 #include <itkImageRegionIteratorWithIndex.h>
 
+#include <vtkPointData.h>
 #include <vtkPolyDataNormals.h>
 
 namespace mitk
@@ -307,18 +308,18 @@ void ShowSegmentationAsElasticNetSurface::relaxNodes()
   }
 }
 
-void ShowSegmentationAsElasticNetSurface::checkAndCreateTriangle(vtkSmartPointer<vtkCellArray> triangles, std::shared_ptr<SurfaceNode> node, int neighbourA, int neighbourB)
+bool ShowSegmentationAsElasticNetSurface::checkAndCreateTriangle(vtkSmartPointer<vtkCellArray> triangles, std::vector<Vector3D>* triangleNormals, std::shared_ptr<SurfaceNode> node, int neighbourA, int neighbourB)
 {
   InputImageType::RegionType region = m_Input->GetLargestPossibleRegion();
   // Check nodes exists
   if (node->neighbours[neighbourA] == nullptr || node->neighbours[neighbourB] == nullptr) {
-    return;
+    return false;
   }
 
   // Check triangle in quad neighbourhood
   if (node->neighbours[neighbourA]->neighbours[neighbourB] == nullptr ||
       node->neighbours[neighbourB]->neighbours[neighbourA] == nullptr) {
-    return;
+    return false;
   }
 
   // Check triangle on surface
@@ -355,52 +356,120 @@ void ShowSegmentationAsElasticNetSurface::checkAndCreateTriangle(vtkSmartPointer
   short pixel1 = getPixel(targetIndex[0], targetIndex[1], targetIndex[2], region);
 
   if (pixel0 == pixel1) {
-    return;
+    return false;
   }
+
+  bool reverseOrder = pixel0 <= 0;
 
   // Generate triangle
   vtkIdType triangle[3];
-  triangle[0] = node->index;
-  triangle[1] = node->neighbours[neighbourA]->index;
-  triangle[2] = node->neighbours[neighbourB]->index;
+  Point3D points[3];
+  if (reverseOrder) {
+    triangle[0] = node->neighbours[neighbourB]->index;
+    triangle[1] = node->neighbours[neighbourA]->index;
+    triangle[2] = node->index;
+    points[0] = node->neighbours[neighbourB]->pos;
+    points[1] = node->neighbours[neighbourA]->pos;
+    points[2] = node->pos;
+  } else {
+    triangle[0] = node->index;
+    triangle[1] = node->neighbours[neighbourA]->index;
+    triangle[2] = node->neighbours[neighbourB]->index;
+    points[0] = node->pos;
+    points[1] = node->neighbours[neighbourA]->pos;
+    points[2] = node->neighbours[neighbourB]->pos;
+  }
+
   triangles->InsertNextCell(3, triangle);
+
+  Vector3D surfaceNormal;
+  Vector3D u = points[1] - points[0];
+  Vector3D v = points[2] - points[0];
+
+  surfaceNormal[0] = u[1] * v[2] - u[2] * v[1];
+  surfaceNormal[1] = u[2] * v[0] - u[0] * v[2];
+  surfaceNormal[2] = u[0] * v[1] - u[1] * v[0];
+  surfaceNormal.Normalize();
+
+  triangleNormals->push_back(surfaceNormal);
+
+  return true;
+}
+
+Vector3D ShowSegmentationAsElasticNetSurface::getTriangleNormal(std::shared_ptr<SurfaceNode> node, int neighbourA, int neighbourB)
+{
+  Vector3D result;
+  Point3D orig = node->pos;
+  Point3D a = node->neighbours[neighbourA]->pos;
+  Point3D b = node->neighbours[neighbourB]->pos;
+  Vector3D u = a - orig;
+  Vector3D v = b - orig;
+
+  result[0] = u[1] * v[2] - u[2] * v[1];
+  result[1] = u[2] * v[0] - u[0] * v[2];
+  result[2] = u[0] * v[1] - u[1] * v[0];
+
+  result.Normalize();
+
+  return result;
 }
 
 vtkSmartPointer<vtkPolyData> ShowSegmentationAsElasticNetSurface::triangulateNodes()
 {
+  InputImageType::RegionType region = m_Input->GetLargestPossibleRegion();
+
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   vtkSmartPointer<vtkCellArray> triangles = vtkSmartPointer<vtkCellArray>::New();
+  std::vector<Vector3D> triangleNormals;
 
-  for (const auto& node : m_SurfaceNodes) {
+  // Create triangles
+  for (int i = 0; i < m_SurfaceNodes.size(); i++) {
+    std::shared_ptr<SurfaceNode> node = m_SurfaceNodes[i];
+
     // Insert node point
     points->InsertNextPoint(node->pos[0], node->pos[1], node->pos[2]);
 
     // Create neighbours triangles
     // Only consider 6 triangles out of 12 to not create overlapping triangles on next node
-    // Center -> Left -> Back
-    checkAndCreateTriangle(triangles, node, 0, 4);
-    // Center -> Right -> Front
-    checkAndCreateTriangle(triangles, node, 1, 5);
-    // Center -> Top -> Back
-    checkAndCreateTriangle(triangles, node, 3, 4);
-    // Center -> Bottom -> Front
-    checkAndCreateTriangle(triangles, node, 2, 5);
+    // Center -> Back -> Left
+    checkAndCreateTriangle(triangles, &triangleNormals, node, 4, 0);
+    // Center -> Front -> Right
+    checkAndCreateTriangle(triangles, &triangleNormals, node, 5, 1);
+    // Center -> Back -> Top
+    checkAndCreateTriangle(triangles, &triangleNormals, node, 4, 3);
+    // Center -> Front -> Bottom
+    checkAndCreateTriangle(triangles, &triangleNormals, node, 5, 2);
     // Center -> Right -> Top
-    checkAndCreateTriangle(triangles, node, 1, 3);
+    checkAndCreateTriangle(triangles, &triangleNormals, node, 1, 3);
     // Center -> Left -> Bottom
-    checkAndCreateTriangle(triangles, node, 0, 2);
+    checkAndCreateTriangle(triangles, &triangleNormals, node, 0, 2);
+  }
+
+  // Create vertex Normals
+  std::vector<Vector3D> vertexNormals(m_SurfaceNodes.size());
+  triangles->InitTraversal();
+  vtkSmartPointer<vtkIdList> triangle = vtkIdList::New();
+  while (triangles->GetNextCell(triangle)) {
+    Vector3D normal = triangleNormals[(triangles->GetTraversalLocation() / 4) - 1];
+    for (int i = 0; i < 3; i++) {
+      vertexNormals[triangle->GetId(i)] += normal;
+    }
+  }
+
+  // Normalize vertex normals and push to vtk format
+  vtkSmartPointer<vtkFloatArray> normals = vtkFloatArray::New();
+  normals->SetNumberOfComponents(3);
+  normals->SetNumberOfTuples(vertexNormals.size());
+  for (int i = 0; i < vertexNormals.size(); i++) {
+    Vector3D normal = vertexNormals[i];
+    normal.Normalize();
+    normals->SetTuple3(i, normal[0], normal[1], normal[2]);
   }
 
   vtkSmartPointer<vtkPolyData> data = vtkSmartPointer<vtkPolyData>::New();
   data->SetPoints(points);
   data->SetPolys(triangles);
-
-  vtkSmartPointer<vtkPolyDataNormals> normalsFilter = vtkSmartPointer<vtkPolyDataNormals>::New();
-  normalsFilter->SetInputData(data);
-  normalsFilter->SetFeatureAngle(60.0);
-  normalsFilter->Update();
-
-  data = normalsFilter->GetOutput();
+  data->GetPointData()->SetNormals(normals);
 
   return data;
 }

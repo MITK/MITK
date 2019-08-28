@@ -158,7 +158,7 @@ void vtkApplyLookupTableOnRGBA(vtkMitkLevelWindowFilter* self,
                                T*)
 {
   vtkImageIterator<T> inputIt(inData, outExt);
-  vtkImageIterator<T> outputIt(outData, outExt);
+  vtkImageIterator<unsigned char> outputIt(outData, outExt);
   vtkLookupTable* lookupTable;
   const int maxC = inData->GetNumberOfScalarComponents();
 
@@ -182,8 +182,8 @@ void vtkApplyLookupTableOnRGBA(vtkMitkLevelWindowFilter* self,
   while (!outputIt.IsAtEnd())
   {
     T* inputSI = inputIt.BeginSpan();
-    T* outputSI = outputIt.BeginSpan();
-    T* outputSIEnd = outputIt.EndSpan();
+    unsigned char* outputSI = outputIt.BeginSpan();
+    unsigned char* outputSIEnd = outputIt.EndSpan();
 
     if( y >= clippingBounds[2] && y < clippingBounds[3] )
     {

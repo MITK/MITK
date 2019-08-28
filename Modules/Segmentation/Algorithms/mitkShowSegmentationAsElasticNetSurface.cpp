@@ -4,6 +4,32 @@
 #include <vtkPointData.h>
 #include <vtkPolyDataNormals.h>
 
+#define ELASTIC_NET_PRINT_TIME
+#ifdef ELASTIC_NET_PRINT_TIME
+#include <chrono>
+std::chrono::time_point<std::chrono::steady_clock> timePoint;
+std::chrono::time_point<std::chrono::steady_clock> initialTime;
+
+void initTime()
+{
+  initialTime = std::chrono::steady_clock::now();
+  timePoint = initialTime;
+}
+double getLastTimeInMs()
+{
+  std::chrono::time_point<std::chrono::steady_clock> currentTimePoint = std::chrono::steady_clock::now();
+  auto diff = currentTimePoint - timePoint;
+  timePoint = currentTimePoint;
+  return std::chrono::duration<double, std::milli>(diff).count();
+}
+double getOverallTimeInMs()
+{
+  std::chrono::time_point<std::chrono::steady_clock> currentTimePoint = std::chrono::steady_clock::now();
+  auto diff = currentTimePoint - initialTime;
+  return std::chrono::duration<double, std::milli>(diff).count();
+}
+#endif
+
 namespace mitk
 {
 
@@ -14,68 +40,114 @@ ShowSegmentationAsElasticNetSurface::ShowSegmentationAsElasticNetSurface()
 
 void ShowSegmentationAsElasticNetSurface::GenerateData()
 {
+#ifdef ELASTIC_NET_PRINT_TIME
+  initTime();
+#endif
+  calcRegion();
+#ifdef ELASTIC_NET_PRINT_TIME
+  std::cout << "Time to find region:\t" << getLastTimeInMs() << " ms\n";
+#endif
   createSurfaceCubes();
+#ifdef ELASTIC_NET_PRINT_TIME
+  std::cout << "Surface cube creation time:\t" << getLastTimeInMs() << " ms\n";
+#endif
   createNodes();
+#ifdef ELASTIC_NET_PRINT_TIME
+  std::cout << "Nodes creation time:\t" << getLastTimeInMs() << " ms\n";
+#endif
   linkNodes();
+#ifdef ELASTIC_NET_PRINT_TIME
+  std::cout << "Nodes linking time:\t" << getLastTimeInMs() << " ms\n";
+  double totalRelaxationTime = 0.;
+#endif
 
   Vector3D spacing = m_Input->GetSpacing();
   double length = spacing.GetNorm() * (1 - m_FilterArgs.elasticNetRelaxation);
   for (int i = 0; i < m_FilterArgs.elasticNetIterations; i++) {
     m_LastMaxRelaxation = 0.;
     relaxNodes();
+#ifdef ELASTIC_NET_PRINT_TIME
+    double iterationTime = getLastTimeInMs();
+    std::cout << "\tRelaxation iteration time:\t" << iterationTime << " ms\n";
+    totalRelaxationTime += iterationTime;
+#endif
     if (m_FilterArgs.elasticNetRelaxation > 0. && m_LastMaxRelaxation < length) {
       break;
     }
   }
 
+#ifdef ELASTIC_NET_PRINT_TIME
+  std::cout << "Total Relaxation time:\t" << totalRelaxationTime << " ms\n";
+#endif
+  // Triangulation prints own time
   m_Output = triangulateNodes();
+#ifdef ELASTIC_NET_PRINT_TIME
+  std::cout << "Overall time:\t" << getOverallTimeInMs() << " ms\n";
+#endif
 }
 
-short ShowSegmentationAsElasticNetSurface::getPixel(int x, int y, int z, InputImageType::RegionType region)
+short ShowSegmentationAsElasticNetSurface::getPixel(int x, int y, int z)
 {
   InputImageType::IndexType index;
-  index[0] = x;
-  index[1] = y;
-  index[2] = z;
+  index[0] = x + m_LocalRegionOrigin[0];
+  index[1] = y + m_LocalRegionOrigin[1];
+  index[2] = z + m_LocalRegionOrigin[2];
 
-  if (!region.IsInside(index)) {
+  if (!m_LocalRegion.IsInside(index)) {
     return -1;
   }
 
   return m_Input->GetPixel(index);
 }
 
-void ShowSegmentationAsElasticNetSurface::createSurfaceCubes()
+void ShowSegmentationAsElasticNetSurface::calcRegion()
 {
   InputImageType::RegionType region = m_Input->GetLargestPossibleRegion();
-  InputImageType::SizeType dim = region.GetSize();
+  itk::ImageRegionConstIteratorWithIndex<InputImageType> it(m_Input, region);
+  InputImageType::IndexType minIndex = region.GetUpperIndex();
+  InputImageType::IndexType maxIndex = region.GetIndex();
+
+  for (it.GoToBegin(); !it.IsAtEnd(); ++it) {
+    if (it.Get() > 0) {
+      InputImageType::IndexType index = it.GetIndex();
+
+      for (size_t i = 0; i < 3; ++i) {
+        minIndex[i] = std::min(minIndex[i], index[i]);
+        maxIndex[i] = std::max(maxIndex[i], index[i]);
+      }
+    }
+  }
+
+  region.SetIndex(minIndex);
+  region.SetUpperIndex(maxIndex);
+
+  m_LocalRegion = region;
+  m_LocalRegionOrigin = m_LocalRegion.GetIndex();
+}
+
+void ShowSegmentationAsElasticNetSurface::createSurfaceCubes()
+{
+  InputImageType::SizeType dim = m_LocalRegion.GetSize();
   m_SurfaceCubes = std::make_unique<SurfaceCubeData>(dim[0] + 1, dim[1] + 1, dim[2] + 1);
 
-  char neighbours[8];
+  short oldNeighboursCount = 0;
+  short newNeighboursCount = 0;
   for (int x = 0; x <= dim[0]; x++) {
     for (int y = 0; y <= dim[1]; y++) {
+      oldNeighboursCount = 0;
       for (int z = 0; z <= dim[2]; z++) {
-        neighbours[0] = getPixel(x - 1, y - 1, z - 1, region);
-        neighbours[1] = getPixel(x - 1, y    , z - 1, region);
-        neighbours[2] = getPixel(x,     y - 1, z - 1, region);
-        neighbours[3] = getPixel(x,     y,     z - 1, region);
-        neighbours[4] = getPixel(x - 1, y - 1, z,     region);
-        neighbours[5] = getPixel(x - 1, y    , z,     region);
-        neighbours[6] = getPixel(x,     y - 1, z,     region);
-        neighbours[7] = getPixel(x,     y,     z,     region);
+        newNeighboursCount = 0;
+        newNeighboursCount += getPixel(x - 1, y - 1, z) > 0;
+        newNeighboursCount += getPixel(x - 1, y    , z) > 0;
+        newNeighboursCount += getPixel(x,     y - 1, z) > 0;
+        newNeighboursCount += getPixel(x,     y,     z) > 0;
 
-        bool hasZeroes       = false;
-        bool hasOutside      = false;
-        bool hasSegmentation = false;
-
-        for (int i = 0; i < 8; i++) {
-          hasZeroes       |= neighbours[i] == 0;
-          hasOutside      |= neighbours[i] < 0;
-          hasSegmentation |= neighbours[i] > 0;
-        }
-        if (hasSegmentation && (hasZeroes || hasOutside)) {
+        short totalCount = oldNeighboursCount + newNeighboursCount;
+        if (totalCount > 0 && totalCount < 8) {
           m_SurfaceCubes->set(x, y, z, std::make_shared<SurfaceCube>());
         }
+
+        oldNeighboursCount = newNeighboursCount;
       }
     }
   }
@@ -102,9 +174,9 @@ void ShowSegmentationAsElasticNetSurface::createNodes()
         cube->child = node;
 
         InputImageType::IndexType index;
-        index[0] = x;
-        index[1] = y;
-        index[2] = z;
+        index[0] = x + m_LocalRegionOrigin[0];
+        index[1] = y + m_LocalRegionOrigin[1];
+        index[2] = z + m_LocalRegionOrigin[2];
         Point3D point;
         m_Input->TransformIndexToPhysicalPoint(index, point);
         point -= offset;
@@ -117,13 +189,12 @@ void ShowSegmentationAsElasticNetSurface::createNodes()
   }
 }
 
-bool ShowSegmentationAsElasticNetSurface::isEdge(InputImageType::RegionType region, int indX, int indY, int indZ, int alongAxis)
+bool ShowSegmentationAsElasticNetSurface::isEdge(int indX, int indY, int indZ, int alongAxis)
 {
   bool edge = false;
 
   short segmentationCount = 0;
 
-  short pixels[4];
   for (int i = 0; i < 2; i++) {
     for (int j = 0; j < 2; j++) {
       int x = indX;
@@ -141,9 +212,8 @@ bool ShowSegmentationAsElasticNetSurface::isEdge(InputImageType::RegionType regi
         y += -1 * j;
       }
 
-      short pixel = getPixel(x, y, z, region);
+      short pixel = getPixel(x, y, z);
       segmentationCount += pixel > 0;
-      pixels[i*2+j] = pixel;
     }
   }
 
@@ -154,15 +224,13 @@ bool ShowSegmentationAsElasticNetSurface::isEdge(InputImageType::RegionType regi
 
 void ShowSegmentationAsElasticNetSurface::linkNodes()
 {
-  InputImageType::RegionType region = m_Input->GetLargestPossibleRegion();
-
   for (const auto& node : m_SurfaceNodes) {
     InputImageType::IndexType index = node->parent->pos;
     // Left
     if (index[0] > 0) {
       std::shared_ptr<SurfaceCube> cube = m_SurfaceCubes->get(index[0] - 1, index[1], index[2]);
       if (cube != nullptr) {
-        if (isEdge(region, index[0] - 1, index[1], index[2], 0)) {
+        if (isEdge(index[0] - 1, index[1], index[2], 0)) {
           node->neighbours[0] = cube->child;
         }
       }
@@ -171,7 +239,7 @@ void ShowSegmentationAsElasticNetSurface::linkNodes()
     if (index[0] < m_SurfaceCubes->getXSize() - 1) {
       std::shared_ptr<SurfaceCube> cube = m_SurfaceCubes->get(index[0] + 1, index[1], index[2]);
       if (cube != nullptr) {
-        if (isEdge(region, index[0], index[1], index[2], 0)) {
+        if (isEdge(index[0], index[1], index[2], 0)) {
           node->neighbours[1] = cube->child;
         }
       }
@@ -180,7 +248,7 @@ void ShowSegmentationAsElasticNetSurface::linkNodes()
     if (index[1] > 0) {
       std::shared_ptr<SurfaceCube> cube = m_SurfaceCubes->get(index[0], index[1] - 1, index[2]);
       if (cube != nullptr) {
-        if (isEdge(region, index[0], index[1] - 1, index[2], 1)) {
+        if (isEdge(index[0], index[1] - 1, index[2], 1)) {
           node->neighbours[2] = cube->child;
         }
       }
@@ -189,7 +257,7 @@ void ShowSegmentationAsElasticNetSurface::linkNodes()
     if (index[1] < m_SurfaceCubes->getYSize() - 1) {
       std::shared_ptr<SurfaceCube> cube = m_SurfaceCubes->get(index[0], index[1] + 1, index[2]);
       if (cube != nullptr) {
-        if (isEdge(region, index[0], index[1], index[2], 1)) {
+        if (isEdge(index[0], index[1], index[2], 1)) {
           node->neighbours[3] = cube->child;
         }
       }
@@ -198,7 +266,7 @@ void ShowSegmentationAsElasticNetSurface::linkNodes()
     if (index[2] > 0) {
       std::shared_ptr<SurfaceCube> cube = m_SurfaceCubes->get(index[0], index[1], index[2] - 1);
       if (cube != nullptr) {
-        if (isEdge(region, index[0], index[1], index[2] - 1, 2)) {
+        if (isEdge(index[0], index[1], index[2] - 1, 2)) {
           node->neighbours[4] = cube->child;
         }
       }
@@ -207,7 +275,7 @@ void ShowSegmentationAsElasticNetSurface::linkNodes()
     if (index[2] < m_SurfaceCubes->getZSize() - 1) {
       std::shared_ptr<SurfaceCube> cube = m_SurfaceCubes->get(index[0], index[1], index[2] + 1);
       if (cube != nullptr) {
-        if (isEdge(region, index[0], index[1], index[2], 2)) {
+        if (isEdge(index[0], index[1], index[2], 2)) {
           node->neighbours[5] = cube->child;
         }
       }
@@ -296,7 +364,13 @@ void ShowSegmentationAsElasticNetSurface::relaxNodes()
   for (const auto& node : m_SurfaceNodes) {
     // Clamp inside surface cube
     Point3D cubeCenter;
-    m_Input->TransformIndexToPhysicalPoint(node->parent->pos, cubeCenter);
+
+    InputImageType::IndexType index;
+    index[0] = node->parent->pos[0] + m_LocalRegionOrigin[0];
+    index[1] = node->parent->pos[1] + m_LocalRegionOrigin[1];
+    index[2] = node->parent->pos[2] + m_LocalRegionOrigin[2];
+
+    m_Input->TransformIndexToPhysicalPoint(index, cubeCenter);
     cubeCenter -= offset;
     Point3D min, max;
     for (int i = 0; i < 3; i++) {
@@ -310,7 +384,6 @@ void ShowSegmentationAsElasticNetSurface::relaxNodes()
 
 bool ShowSegmentationAsElasticNetSurface::checkAndCreateTriangle(vtkSmartPointer<vtkCellArray> triangles, std::vector<Vector3D>* triangleNormals, std::shared_ptr<SurfaceNode> node, int neighbourA, int neighbourB)
 {
-  InputImageType::RegionType region = m_Input->GetLargestPossibleRegion();
   // Check nodes exists
   if (node->neighbours[neighbourA] == nullptr || node->neighbours[neighbourB] == nullptr) {
     return false;
@@ -351,9 +424,9 @@ bool ShowSegmentationAsElasticNetSurface::checkAndCreateTriangle(vtkSmartPointer
   targetIndex[0] = maxIndex[0] - 1;
   targetIndex[1] = maxIndex[1] - 1;
   targetIndex[2] = maxIndex[2] - 1;
-  short pixel0 = getPixel(targetIndex[0], targetIndex[1], targetIndex[2], region);
+  short pixel0 = getPixel(targetIndex[0], targetIndex[1], targetIndex[2]);
   targetIndex[mainAxis] += 1;
-  short pixel1 = getPixel(targetIndex[0], targetIndex[1], targetIndex[2], region);
+  short pixel1 = getPixel(targetIndex[0], targetIndex[1], targetIndex[2]);
 
   if (pixel0 == pixel1) {
     return false;
@@ -416,8 +489,6 @@ Vector3D ShowSegmentationAsElasticNetSurface::getTriangleNormal(std::shared_ptr<
 
 vtkSmartPointer<vtkPolyData> ShowSegmentationAsElasticNetSurface::triangulateNodes()
 {
-  InputImageType::RegionType region = m_Input->GetLargestPossibleRegion();
-
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   vtkSmartPointer<vtkCellArray> triangles = vtkSmartPointer<vtkCellArray>::New();
   std::vector<Vector3D> triangleNormals;
@@ -444,7 +515,9 @@ vtkSmartPointer<vtkPolyData> ShowSegmentationAsElasticNetSurface::triangulateNod
     // Center -> Left -> Bottom
     checkAndCreateTriangle(triangles, &triangleNormals, node, 0, 2);
   }
-
+#ifdef ELASTIC_NET_PRINT_TIME
+  std::cout << "Triangulation time:\t" << getLastTimeInMs() << " ms\n";
+#endif
   // Create vertex Normals
   std::vector<Vector3D> vertexNormals(m_SurfaceNodes.size());
   triangles->InitTraversal();
@@ -465,6 +538,10 @@ vtkSmartPointer<vtkPolyData> ShowSegmentationAsElasticNetSurface::triangulateNod
     normal.Normalize();
     normals->SetTuple3(i, normal[0], normal[1], normal[2]);
   }
+
+#ifdef ELASTIC_NET_PRINT_TIME
+  std::cout << "Normals generation time:\t" << getLastTimeInMs() << " ms\n";
+#endif
 
   vtkSmartPointer<vtkPolyData> data = vtkSmartPointer<vtkPolyData>::New();
   data->SetPoints(points);

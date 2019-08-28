@@ -70,6 +70,7 @@ private:
 
   itk::ProgressAccumulator::Pointer m_ProgressAccumulator;
 
+  void calcRegion();
   void createSurfaceCubes();
   void createNodes();
   void linkNodes();
@@ -123,8 +124,8 @@ private:
   std::unique_ptr<SurfaceCubeData> m_SurfaceCubes;
   std::vector<std::shared_ptr<SurfaceNode>> m_SurfaceNodes;
 
-  short getPixel(int x, int y, int z, InputImageType::RegionType region);
-  bool isEdge(InputImageType::RegionType region, int indX, int indY, int indZ, int alongAxis);
+  short getPixel(int x, int y, int z);
+  bool isEdge(int indX, int indY, int indZ, int alongAxis);
 
   Point3D offsetPoint(Point3D point, Vector3D direction, Point3D min, Point3D max);
   Point3D rayExit(Point3D origin, Vector3D direction, Point3D min, Point3D max);
@@ -133,6 +134,8 @@ private:
   Vector3D getTriangleNormal(std::shared_ptr<SurfaceNode> node, int neighbourA, int neighbourB);
 
   double m_LastMaxRelaxation = -1.;
+  InputImageType::RegionType m_LocalRegion;
+  InputImageType::IndexType m_LocalRegionOrigin;
 };
 
 }

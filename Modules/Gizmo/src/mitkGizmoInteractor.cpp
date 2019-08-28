@@ -298,8 +298,7 @@ void mitk::GizmoInteractor::ApplyTranslationToManipulatedObject(const Vector3D &
   }
 
   manipulatedGeometry->ExecuteOperation(m_FinalDoOperation.get());
-  m_ManipulatedObjectGeometry->SetIdentity();
-  m_ManipulatedObjectGeometry->Compose(manipulatedGeometry->GetIndexToWorldTransform());
+  m_ManipulatedObjectGeometry->SetIndexToWorldTransform(manipulatedGeometry->GetIndexToWorldTransform());
 }
 
 void mitk::GizmoInteractor::ApplyEqualScalingToManipulatedObject(double scalingFactor)
@@ -314,8 +313,7 @@ void mitk::GizmoInteractor::ApplyEqualScalingToManipulatedObject(double scalingF
   }
 
   manipulatedGeometry->ExecuteOperation(m_FinalDoOperation.get());
-  m_ManipulatedObjectGeometry->SetIdentity();
-  m_ManipulatedObjectGeometry->Compose(manipulatedGeometry->GetIndexToWorldTransform());
+  m_ManipulatedObjectGeometry->SetIndexToWorldTransform(manipulatedGeometry->GetIndexToWorldTransform());
 }
 
 void mitk::GizmoInteractor::ApplyRotationToManipulatedObject(double angle_deg)
@@ -331,8 +329,7 @@ void mitk::GizmoInteractor::ApplyRotationToManipulatedObject(double angle_deg)
   }
 
   manipulatedGeometry->ExecuteOperation(m_FinalDoOperation.get());
-  m_ManipulatedObjectGeometry->SetIdentity();
-  m_ManipulatedObjectGeometry->Compose(manipulatedGeometry->GetIndexToWorldTransform());
+  m_ManipulatedObjectGeometry->SetIndexToWorldTransform(manipulatedGeometry->GetIndexToWorldTransform());
 }
 
 void mitk::GizmoInteractor::FeedUndoStack(StateMachineAction *, InteractionEvent *)

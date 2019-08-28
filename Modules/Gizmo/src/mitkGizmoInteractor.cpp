@@ -199,6 +199,12 @@ void mitk::GizmoInteractor::DecideInteraction(StateMachineAction *, InteractionE
     case Gizmo::ScaleX:
     case Gizmo::ScaleY:
     case Gizmo::ScaleZ:
+      // Implementation note: Why didn't we implement per-axis scaling yet?
+      // When this was implemented, the mitk::ScaleOperation was able to only describe
+      // uniform scaling around a central point. Since we use operations for all modifications
+      // in order to have undo/redo working, any axis-specific scaling should also
+      // use operations.
+      // Consequence: enhance ScaleOperation when there is need to have scaling per axis.
       decision = InternalEvent::New(interactionEvent->GetSender(), this, "ScaleEqually");
       break;
     default:

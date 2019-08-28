@@ -80,6 +80,8 @@ namespace mitk
 
     void ResetPickedTubes();
 
+	mitk::Point3D GetLastPickedPosition();
+
   protected:
     TubeGraphDataInteractor();
     ~TubeGraphDataInteractor() override;
@@ -118,6 +120,7 @@ namespace mitk
     TubeGraph::TubeDescriptorType m_SecondLastPickedTube;
     ActivationMode m_ActivationMode;
     ActionMode m_ActionMode;
+    mitk::TubeElement* m_LastPickedElement;
   };
 }
 #endif

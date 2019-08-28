@@ -36,9 +36,7 @@ mitk::TubeGraphDataInteractor::TubeGraphDataInteractor()
 {
 }
 
-mitk::TubeGraphDataInteractor::~TubeGraphDataInteractor()
-{
-}
+mitk::TubeGraphDataInteractor::~TubeGraphDataInteractor() {}
 
 void mitk::TubeGraphDataInteractor::ConnectActionsAndFunctions()
 {
@@ -79,10 +77,13 @@ bool mitk::TubeGraphDataInteractor::CheckOverTube(const InteractionEvent *intera
   auto *picker = new mitk::TubeGraphPicker();
   picker->SetTubeGraph(m_TubeGraph);
 
-  TubeGraph::TubeDescriptorType tubeDescriptor = picker->GetPickedTube(positionEvent->GetPositionInWorld()).first;
+  auto pickedTube = picker->GetPickedTube(positionEvent->GetPositionInWorld());
+
+  TubeGraph::TubeDescriptorType tubeDescriptor = pickedTube.first;
 
   if (tubeDescriptor != TubeGraph::ErrorId)
   {
+    m_LastPickedElement = pickedTube.second;
     m_SecondLastPickedTube = m_LastPickedTube;
     m_LastPickedTube = tubeDescriptor;
     return true;
@@ -277,4 +278,9 @@ void mitk::TubeGraphDataInteractor::ResetPickedTubes()
 {
   m_LastPickedTube = TubeGraph::ErrorId;
   m_SecondLastPickedTube = TubeGraph::ErrorId;
+}
+
+mitk::Point3D mitk::TubeGraphDataInteractor::GetLastPickedPosition()
+{
+  return m_LastPickedElement->GetCoordinates();
 }

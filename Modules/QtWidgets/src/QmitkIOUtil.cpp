@@ -39,6 +39,40 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <algorithm>
 
+namespace
+{
+#if defined(_WIN32) || defined(_WIN64)
+    QString s_InvalidFilenameCharacters("<>:\"/\\|?*");
+#else
+    QString s_InvalidFilenameCharacters("/");
+#endif
+
+  // Return 'true' if the specified filename contains characters not accepted by the file system.
+  //
+  // This test is not exhaustive but just excluding the most common problems.
+  bool IsIllegalFilename(const QString &fullFilename)
+  {
+    QFileInfo fi(fullFilename);
+    auto filename = fi.fileName();
+
+    for (auto &ch : s_InvalidFilenameCharacters)
+    {
+      if (filename.contains(ch))
+      {
+        return true;
+      }
+    }
+
+    if (filename.startsWith(' ' || filename.endsWith(' ')))
+    {
+      return true;
+    }
+
+    return false;
+  }
+
+} // unnamed namespace
+
 struct QmitkIOUtil::Impl
 {
   struct ReaderOptionsDialogFunctor : public ReaderOptionsFunctorBase
@@ -244,6 +278,17 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData *> &data,
 
     // Ask the user for a file name
     QString nextName = QFileDialog::getSaveFileName(parent, dialogTitle, fileName, filterString, &selectedFilter);
+
+    if (IsIllegalFilename(nextName))
+    {
+      QMessageBox::warning(
+        parent,
+        "Saving not possible",
+        QString("File \"%2\" contains invalid characters.\n\nPlease avoid any of %1")
+          .arg(s_InvalidFilenameCharacters.split("", QString::SkipEmptyParts).join(" "))
+          .arg(nextName));
+      continue;
+    }
 
     if (nextName.isEmpty())
     {

@@ -120,7 +120,7 @@ namespace mitk
     TubeGraph::TubeDescriptorType m_SecondLastPickedTube;
     ActivationMode m_ActivationMode;
     ActionMode m_ActionMode;
-    mitk::TubeElement* m_LastPickedElement;
+    mitk::TubeElement *m_LastPickedElement = 0;
   };
 }
 #endif

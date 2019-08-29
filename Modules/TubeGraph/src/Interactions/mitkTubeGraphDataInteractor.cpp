@@ -282,5 +282,8 @@ void mitk::TubeGraphDataInteractor::ResetPickedTubes()
 
 mitk::Point3D mitk::TubeGraphDataInteractor::GetLastPickedPosition()
 {
-  return m_LastPickedElement->GetCoordinates();
+  if (m_LastPickedElement)
+    return m_LastPickedElement->GetCoordinates();
+  else
+    return mitk::Point3D();
 }

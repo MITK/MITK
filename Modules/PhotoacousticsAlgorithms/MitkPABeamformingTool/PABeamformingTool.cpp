@@ -299,7 +299,7 @@ int main(int argc, char * argv[])
   BModeSettings bmodeSettings{ mitk::PhotoacousticFilterService::BModeMethod::EnvelopeDetection, false };
   CropSettings cropSettings{ 0,0,0,0,0,0 };
   ResampleSettings resSettings{ 0.15 };
-  ProcessSettings processSettings{ true, false, false };
+  ProcessSettings processSettings{ false, false, false, false, false };
 
   MITK_INFO << "Parsing settings XML...";
   try
@@ -337,37 +337,37 @@ int main(int argc, char * argv[])
     output = m_FilterService->ApplyBeamforming(output, bfSettings);
     MITK_INFO(input.verbose) << "Beamforming input image...[Done]";
   }
+  if (processSettings.DoCropping)
+  {
+    int err;
+    MITK_INFO(input.verbose) << "Applying Crop filter to image...";
+    output = m_FilterService->ApplyCropping(output,
+      cropSettings.above, cropSettings.below, cropSettings.right, cropSettings.left, cropSettings.zStart, cropSettings.zEnd, &err);
+    MITK_INFO(input.verbose) << "Applying Crop filter to image...[Done]";
+  }
   if (processSettings.DoBandpass)
   {
     MITK_INFO(input.verbose) << "Bandpassing input image...";
     output = m_FilterService->ApplyBandpassFilter(output, bandpassSettings.highPass*1e6, bandpassSettings.lowPass*1e6, bandpassSettings.alphaHigh, bandpassSettings.alphaLow, 1, bandpassSettings.speedOfSound, true);
     MITK_INFO(input.verbose) << "Bandpassing input image...[Done]";
   }
-  if (processSettings.DoCropping)
-  {
-    int err;
-    MITK_INFO(input.verbose) << "Applying Crop filter to image...";
-    output = m_FilterService->ApplyCropping(output, 
-      cropSettings.above, cropSettings.below, cropSettings.right, cropSettings.left, cropSettings.zStart, cropSettings.zEnd, &err);
-    MITK_INFO(input.verbose) << "Applying Crop filter to image...[Done]";
-  }
-  if (processSettings.DoResampling)
-  {
-    double spacing[3] = {output->GetGeometry()->GetSpacing()[0]*output->GetDimension(0)/resSettings.dimX, resSettings.spacing, output->GetGeometry()->GetSpacing()[2]};
-    MITK_INFO(input.verbose) << "Applying Resample filter to image...";
-    output = m_FilterService->ApplyResampling(output, spacing);
-    if (output->GetDimension(0) != resSettings.dimX)
-    {
-      double dim[3] = {(double)resSettings.dimX, (double)output->GetDimension(1), (double)output->GetDimension(2)};
-      output = m_FilterService->ApplyResamplingToDim(output, dim);
-    }
-    MITK_INFO(input.verbose) << "Applying Resample filter to image...[Done]";
-  }
   if (processSettings.DoBmode)
   {
     MITK_INFO(input.verbose) << "Applying BModeFilter to image...";
     output = m_FilterService->ApplyBmodeFilter(output, bmodeSettings.method, bmodeSettings.UseLogFilter);
     MITK_INFO(input.verbose) << "Applying BModeFilter to image...[Done]";
+  }
+  if (processSettings.DoResampling)
+  {
+    double spacing[3] = { output->GetGeometry()->GetSpacing()[0] * output->GetDimension(0) / resSettings.dimX, resSettings.spacing, output->GetGeometry()->GetSpacing()[2] };
+    MITK_INFO(input.verbose) << "Applying Resample filter to image...";
+    output = m_FilterService->ApplyResampling(output, spacing);
+    if (output->GetDimension(0) != resSettings.dimX)
+    {
+      double dim[3] = { (double)resSettings.dimX, (double)output->GetDimension(1), (double)output->GetDimension(2) };
+      output = m_FilterService->ApplyResamplingToDim(output, dim);
+    }
+    MITK_INFO(input.verbose) << "Applying Resample filter to image...[Done]";
   }
 
   MITK_INFO(input.verbose) << "Saving image...";

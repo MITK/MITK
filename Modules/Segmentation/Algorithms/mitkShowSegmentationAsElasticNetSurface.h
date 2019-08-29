@@ -129,6 +129,14 @@ private:
   InputImageType::IndexType m_LocalRegionOrigin;
 
   void checkAbort();
+
+  class vtkSMPCreateSurfaceCubesOp
+  {
+  public:
+    ShowSegmentationAsElasticNetSurface* parent;
+    InputImageType::SizeType dim;
+    void operator()(vtkIdType begin, vtkIdType end);
+  };
   };
 
 }

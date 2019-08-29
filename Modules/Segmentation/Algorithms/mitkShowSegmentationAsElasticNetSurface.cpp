@@ -143,32 +143,40 @@ void ShowSegmentationAsElasticNetSurface::calcRegion()
   m_LocalRegionOrigin = m_LocalRegion.GetIndex();
 }
 
-void ShowSegmentationAsElasticNetSurface::createSurfaceCubes()
+void ShowSegmentationAsElasticNetSurface::vtkSMPCreateSurfaceCubesOp::operator()(vtkIdType begin, vtkIdType end)
 {
-  InputImageType::SizeType dim = m_LocalRegion.GetSize();
-  m_SurfaceCubes = std::make_unique<SurfaceCubeData>(dim[0] + 1, dim[1] + 1, dim[2] + 1);
-
   short oldNeighboursCount = 0;
   short newNeighboursCount = 0;
-  for (int x = 0; x <= dim[0]; x++) {
+  for (int x = begin; x < end; x++) {
     for (int y = 0; y <= dim[1]; y++) {
       oldNeighboursCount = 0;
       for (int z = 0; z <= dim[2]; z++) {
         newNeighboursCount = 0;
-        newNeighboursCount += getPixel(x - 1, y - 1, z) > 0;
-        newNeighboursCount += getPixel(x - 1, y    , z) > 0;
-        newNeighboursCount += getPixel(x,     y - 1, z) > 0;
-        newNeighboursCount += getPixel(x,     y,     z) > 0;
+        newNeighboursCount += parent->getPixel(x - 1, y - 1, z) > 0;
+        newNeighboursCount += parent->getPixel(x - 1, y    , z) > 0;
+        newNeighboursCount += parent->getPixel(x,     y - 1, z) > 0;
+        newNeighboursCount += parent->getPixel(x,     y,     z) > 0;
 
         short totalCount = oldNeighboursCount + newNeighboursCount;
         if (totalCount > 0 && totalCount < 8) {
-          m_SurfaceCubes->set(x, y, z, std::make_shared<SurfaceCube>());
+          parent->m_SurfaceCubes->set(x, y, z, std::make_shared<SurfaceCube>());
         }
 
         oldNeighboursCount = newNeighboursCount;
       }
     }
   }
+}
+
+void ShowSegmentationAsElasticNetSurface::createSurfaceCubes()
+{
+  InputImageType::SizeType dim = m_LocalRegion.GetSize();
+  m_SurfaceCubes = std::make_unique<SurfaceCubeData>(dim[0] + 1, dim[1] + 1, dim[2] + 1);
+
+  vtkSMPCreateSurfaceCubesOp func;
+  func.parent = this;
+  func.dim = dim;
+  vtkSMPTools::For(0, dim[0] + 1, func);
 }
 
 void ShowSegmentationAsElasticNetSurface::createNodes()

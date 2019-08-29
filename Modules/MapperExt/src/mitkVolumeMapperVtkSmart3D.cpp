@@ -120,10 +120,13 @@ void mitk::VolumeMapperVtkSmart3D::setClippingPlanes(vtkPlanes* planes)
 vtkImageData* mitk::VolumeMapperVtkSmart3D::GetInputImage()
 {
   mitk::Image *input = const_cast<mitk::Image *>(static_cast<const mitk::Image *>(this->GetDataNode()->GetData()));
-  vtkImageData* img = input->GetVtkImageData(this->GetTimestep());
-  img->SetSpacing(1,1,1);
-
   m_TimeStep = this->GetTimestep();
+  int maxTime = input->GetTimeSteps() - 1;
+  vtkImageData* img = input->GetVtkImageData(m_TimeStep < maxTime? m_TimeStep : maxTime);
+
+  if (img) {
+    img->SetSpacing(1,1,1);
+  }
 
   return img;
 }

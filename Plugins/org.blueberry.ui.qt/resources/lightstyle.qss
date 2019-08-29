@@ -74,3 +74,8 @@ QWidget#StandaloneViewForm {
 QWidget#PageCompositeControlWidget {
     margin: 3px;
 }
+
+QWidget[overImage=true]{ /* For nubmer of slices */
+  color: #ffffff;
+  background-color: rgba(0,0,0,100);
+}

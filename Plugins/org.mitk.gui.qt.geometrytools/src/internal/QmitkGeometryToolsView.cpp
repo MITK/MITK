@@ -33,6 +33,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkGeometryToolsView::VIEW_ID = "org.mitk.views.geometrytools";
 const char* QmitkGeometryToolsView::PART_NAME = QT_TRANSLATE_NOOP("Plugin Title", "Geometry Tools");
 
+QmitkGeometryToolsView::~QmitkGeometryToolsView()
+{
+  auto ds = this->GetDataStorage();
+  auto allNodes = ds->GetAll();
+  for (auto node : *allNodes) {
+    bool isActive(false);
+    if (node->GetBoolProperty("AffineBaseDataInteractor3D", isActive) && isActive) {
+      node->SetBoolProperty("AffineBaseDataInteractor3D", false);
+      node->SetDataInteractor(nullptr);
+    }
+  }
+}
+
 void QmitkGeometryToolsView::SetFocus()
 {
   m_Controls.m_AddInteractor->setFocus();
@@ -74,6 +87,11 @@ void QmitkGeometryToolsView::OnSelectionChanged( berry::IWorkbenchPart::Pointer 
   {
     if( node.IsNotNull() )
     {
+      mitk::BaseData::Pointer basedata = node->GetData();
+      if (basedata.IsNotNull() && basedata->GetTimeGeometry()->IsValid())
+      {
+        mitk::RenderingManager::GetInstance()->InitializeViews(basedata->GetTimeGeometry());
+      }
       m_Controls.m_AddInteractor->setEnabled( true );
       return;
     }
@@ -140,6 +158,7 @@ void QmitkGeometryToolsView::AddInteractor()
       affineDataInteractor->SetDataNode(node);
 
       node->SetBoolProperty("pickable", true);
+      node->SetBoolProperty("AffineBaseDataInteractor3D", true);
       node->SetFloatProperty("AffineBaseDataInteractor3D.Translation Step Size", m_Controls.m_TranslationStep->value());
       node->SetFloatProperty("AffineBaseDataInteractor3D.Rotation Step Size", m_Controls.m_RotationStep->value());
       node->SetFloatProperty("AffineBaseDataInteractor3D.Scale Step Size", m_Controls.m_ScaleFactor->value());

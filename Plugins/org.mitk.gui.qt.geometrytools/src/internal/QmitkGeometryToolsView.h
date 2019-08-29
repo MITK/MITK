@@ -45,6 +45,8 @@ class QmitkGeometryToolsView : public QmitkAbstractView
 
   public:
 
+    ~QmitkGeometryToolsView();
+
     static const std::string VIEW_ID;
     static const char* PART_NAME;
 

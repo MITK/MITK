@@ -56,6 +56,7 @@ public:
   void LowerSliceBoundChanged();
   void SliceBoundsEnabled();
 
+  void ChangedProbe();
   void UseResampling();
   void UseLogfilter();
   void SetResampling();
@@ -193,7 +194,7 @@ signals:
   void result(mitk::Image::Pointer, std::string nameExtension);
 
 public:
-  void setConfig(unsigned int CutAbove, unsigned int CutBelow, unsigned int CutSliceFirst, unsigned int CutSliceLast);
+  void setConfig(unsigned int CutAbove, unsigned int CutBelow, unsigned int CutRight, unsigned int CutLeft, unsigned int CutSliceFirst, unsigned int CutSliceLast);
   void setInputImage(mitk::Image::Pointer image);
   void setFilterBank(mitk::PhotoacousticFilterService::Pointer filterBank)
   {
@@ -205,6 +206,8 @@ protected:
 
   unsigned int m_CutAbove;
   unsigned int m_CutBelow;
+  unsigned int m_CutRight;
+  unsigned int m_CutLeft;
   unsigned int m_CutSliceLast;
   unsigned int m_CutSliceFirst;
 

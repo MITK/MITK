@@ -58,6 +58,7 @@ void PAImageProcessing::CreateQtPartControl(QWidget *parent)
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(parent);
   connect(m_Controls.buttonApplyBModeFilter, SIGNAL(clicked()), this, SLOT(StartBmodeThread()));
+  connect(m_Controls.Geometry, SIGNAL(currentIndexChanged(int)), this, SLOT(ChangedProbe()));
   connect(m_Controls.DoResampling, SIGNAL(clicked()), this, SLOT(UseResampling()));
   connect(m_Controls.Logfilter, SIGNAL(clicked()), this, SLOT(UseLogfilter()));
   connect(m_Controls.ResamplingValue, SIGNAL(valueChanged(double)), this, SLOT(SetResampling()));
@@ -101,6 +102,19 @@ void PAImageProcessing::CreateQtPartControl(QWidget *parent)
 #endif
 
   UseImageSpacing();
+  ChangedProbe();
+}
+
+void PAImageProcessing::ChangedProbe()
+{
+  if (m_Controls.Geometry->currentText() == "Concave")
+  {
+    m_Controls.ProbeRadius->setEnabled(true);
+  }
+  else
+  {
+    m_Controls.ProbeRadius->setEnabled(false);
+  }
 }
 
 void PAImageProcessing::UseSignalDelay()
@@ -244,7 +258,7 @@ void PAImageProcessing::BatchProcessing()
             BFconfig->GetTimeSpacing(), BFconfig->GetAngle(), BFconfig->GetIsPhotoacousticImage(), BFconfig->GetSamplesPerLine(),
             BFconfig->GetReconstructionLines(), image->GetDimensions(), BFconfig->GetReconstructionDepth(),
             BFconfig->GetUseGPU(), BFconfig->GetGPUBatchSize(), BFconfig->GetDelayCalculationMethod(), BFconfig->GetApod(),
-            BFconfig->GetApodizationArraySize(), BFconfig->GetAlgorithm());
+            BFconfig->GetApodizationArraySize(), BFconfig->GetAlgorithm(), BFconfig->GetGeometry(), BFconfig->GetProbeRadius());
         }
       }
 
@@ -268,7 +282,7 @@ void PAImageProcessing::BatchProcessing()
       m_Controls.ProgressInfo->setText("cropping image");
 
       int errCode = 0;
-      image = m_FilterBank->ApplyCropping(image, m_Controls.CutoffAbove->value(), m_Controls.CutoffBelow->value(), 0, 0, 0, 0, &errCode);
+      image = m_FilterBank->ApplyCropping(image, m_Controls.CutoffAbove->value(), m_Controls.CutoffBelow->value(), m_Controls.CutoffRight->value(), m_Controls.CutoffLeft->value(), 0, 0, &errCode);
 
       if (errCode == -1)
       {
@@ -582,9 +596,9 @@ void PAImageProcessing::StartCropThread()
       connect(thread, &CropThread::finished, thread, &QObject::deleteLater);
 
       if(m_Controls.Partial->isChecked())
-        thread->setConfig(m_Controls.CutoffAbove->value(), m_Controls.CutoffBelow->value(), m_Controls.boundLow->value(), m_Controls.boundHigh->value());
+        thread->setConfig(m_Controls.CutoffAbove->value(), m_Controls.CutoffBelow->value(), m_Controls.CutoffRight->value(), m_Controls.CutoffLeft->value(), m_Controls.boundLow->value(), m_Controls.boundHigh->value());
       else
-        thread->setConfig(m_Controls.CutoffAbove->value(), m_Controls.CutoffBelow->value(), 0, image->GetDimension(2) - 1);
+        thread->setConfig(m_Controls.CutoffAbove->value(), m_Controls.CutoffBelow->value(), m_Controls.CutoffRight->value(), m_Controls.CutoffLeft->value(), 0, image->GetDimension(2) - 1);
 
       thread->setInputImage(image);
       thread->setFilterBank(m_FilterBank);
@@ -879,10 +893,21 @@ mitk::BeamformingSettings::Pointer PAImageProcessing::CreateBeamformingSettings(
 
   float reconstructionDepth = m_Controls.ReconstructionDepth->value() / 1000.f; // [m]
 
+  mitk::BeamformingSettings::ProbeGeometry geometry = mitk::BeamformingSettings::ProbeGeometry::Linear;
+  if ("Linear" == m_Controls.Apodization->currentText())
+  {
+    mitk::BeamformingSettings::ProbeGeometry geometry = mitk::BeamformingSettings::ProbeGeometry::Linear;
+  }
+  else if ("Concave" == m_Controls.Apodization->currentText())
+  {
+    mitk::BeamformingSettings::ProbeGeometry geometry = mitk::BeamformingSettings::ProbeGeometry::Concave;
+  }
+  float probeRadius = m_Controls.ProbeRadius->value(); // [deg]
+
   return mitk::BeamformingSettings::New(pitchInMeters,
     speedOfSound, timeSpacing, angle, isPAImage, samplesPerLine, reconstructionLines,
     image->GetDimensions(), reconstructionDepth, useGPU, GPU_BATCH_SIZE, delay, apod,
-    apodizatonArraySize, algorithm);
+    apodizatonArraySize, algorithm, geometry, probeRadius);
 }
 
 void PAImageProcessing::EnableControls()
@@ -1018,7 +1043,7 @@ void BeamformingThread::run()
       m_BFconfig->GetTimeSpacing(), m_BFconfig->GetAngle(), m_BFconfig->GetIsPhotoacousticImage(), m_BFconfig->GetSamplesPerLine(),
       m_BFconfig->GetReconstructionLines(), m_InputImage->GetDimensions(), m_BFconfig->GetReconstructionDepth(),
       m_BFconfig->GetUseGPU(), m_BFconfig->GetGPUBatchSize(), m_BFconfig->GetDelayCalculationMethod(), m_BFconfig->GetApod(),
-      m_BFconfig->GetApodizationArraySize(), m_BFconfig->GetAlgorithm());
+      m_BFconfig->GetApodizationArraySize(), m_BFconfig->GetAlgorithm(), m_BFconfig->GetGeometry(), m_BFconfig->GetProbeRadius());
   }
 
   mitk::Image::Pointer resultImage;
@@ -1074,10 +1099,9 @@ void CropThread::run()
 {
   mitk::Image::Pointer resultImage;
 
-
   int errCode = 0;
 
-  resultImage = m_FilterBank->ApplyCropping(m_InputImage, m_CutAbove, m_CutBelow, 0, 0, m_CutSliceFirst, (m_InputImage->GetDimension(2) - 1)  - m_CutSliceLast, &errCode);
+  resultImage = m_FilterBank->ApplyCropping(m_InputImage, m_CutAbove, m_CutBelow, m_CutRight, m_CutLeft, m_CutSliceFirst, (m_InputImage->GetDimension(2) - 1)  - m_CutSliceLast, &errCode);
   if (errCode == -1)
   {
     emit result(nullptr, "_cropped");
@@ -1086,10 +1110,13 @@ void CropThread::run()
   emit result(resultImage, "_cropped");
 }
 
-void CropThread::setConfig(unsigned int CutAbove, unsigned int CutBelow, unsigned int CutSliceFirst, unsigned int CutSliceLast)
+void CropThread::setConfig(unsigned int CutAbove, unsigned int CutBelow, unsigned int CutRight, unsigned int CutLeft, unsigned int CutSliceFirst, unsigned int CutSliceLast)
 {
   m_CutAbove = CutAbove;
   m_CutBelow = CutBelow;
+  m_CutRight = CutRight;
+  m_CutLeft = CutLeft;
+
   m_CutSliceLast = CutSliceLast;
   m_CutSliceFirst = CutSliceFirst;
 }

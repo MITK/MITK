@@ -32,7 +32,9 @@ mitk::BeamformingSettings::BeamformingSettings(float pitchInMeters,
   DelayCalc delayCalculationMethod,
   Apodization apod,
   unsigned int apodizationArraySize,
-  BeamformingAlgorithm algorithm
+  BeamformingAlgorithm algorithm,
+  ProbeGeometry geometry,
+  float probeRadius
 ) :
   m_PitchInMeters(pitchInMeters),
   m_SpeedOfSound(speedOfSound),
@@ -47,7 +49,9 @@ mitk::BeamformingSettings::BeamformingSettings(float pitchInMeters,
   m_DelayCalculationMethod(delayCalculationMethod),
   m_Apod(apod),
   m_ApodizationArraySize(apodizationArraySize),
-  m_Algorithm(algorithm)
+  m_Algorithm(algorithm),
+  m_Geometry(geometry),
+  m_ProbeRadius(probeRadius)
 {
   if (inputDim == nullptr)
   {

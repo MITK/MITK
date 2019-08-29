@@ -281,7 +281,6 @@ mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyBandpassFilter(
     bandpassFilter->Update();
     return bandpassFilter->GetOutput();
   }
-
   catch (mitk::Exception &e)
   {
     std::string errorMessage = "Caught unexpected exception ";

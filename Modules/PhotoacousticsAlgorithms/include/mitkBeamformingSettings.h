@@ -54,6 +54,12 @@ namespace mitk {
     */
     enum BeamformingAlgorithm { DMAS, DAS, sDMAS };
 
+    /** \brief Available geometries for Probes:
+    * - Linear
+    * - Concave
+    */
+    enum ProbeGeometry { Linear, Concave};
+
     itkGetConstMacro(PitchInMeters, float);
     itkGetConstMacro(SpeedOfSound, float);
     itkGetConstMacro(TimeSpacing, float);
@@ -71,6 +77,8 @@ namespace mitk {
     itkGetConstMacro(ApodizationArraySize, int);
     itkGetConstMacro(Algorithm, BeamformingAlgorithm);
     itkGetConstMacro(ReconstructionDepth, float);
+    itkGetConstMacro(Geometry, ProbeGeometry);
+    itkGetConstMacro(ProbeRadius, float);
 
     /** \brief function for mitk::PhotoacousticOCLBeamformingFilter to check whether buffers need to be updated
     * this method only checks parameters relevant for the openCL implementation
@@ -80,6 +88,8 @@ namespace mitk {
       return !((abs(lhs->GetAngle() - rhs->GetAngle()) < 0.01f) && // 0.01 degree error margin
         (lhs->GetApod() == rhs->GetApod()) &&
         (lhs->GetDelayCalculationMethod() == rhs->GetDelayCalculationMethod()) &&
+        (lhs->GetGeometry() == rhs->GetGeometry()) &&
+        (abs(lhs->GetProbeRadius() - rhs->GetProbeRadius()) < 0.001f) && 
         (lhs->GetIsPhotoacousticImage() == rhs->GetIsPhotoacousticImage()) &&
         (abs(lhs->GetPitchInMeters() - rhs->GetPitchInMeters()) < 0.000001f) && // 0.0001 mm error margin
         (lhs->GetReconstructionLines() == rhs->GetReconstructionLines()) &&
@@ -104,7 +114,9 @@ namespace mitk {
       DelayCalc delayCalculationMethod,
       Apodization apod,
       unsigned int apodizationArraySize,
-      BeamformingAlgorithm algorithm)
+      BeamformingAlgorithm algorithm,
+      ProbeGeometry geometry,
+      float probeRadius)
     {
       Pointer smartPtr = new BeamformingSettings(pitchInMeters,
         speedOfSound,
@@ -120,7 +132,9 @@ namespace mitk {
         delayCalculationMethod,
         apod,
         apodizationArraySize,
-        algorithm);
+        algorithm,
+        geometry,
+        probeRadius);
       smartPtr->UnRegister();
       return smartPtr;
     }
@@ -143,7 +157,9 @@ namespace mitk {
       DelayCalc delayCalculationMethod,
       Apodization apod,
       unsigned int apodizationArraySize,
-      BeamformingAlgorithm algorithm
+      BeamformingAlgorithm algorithm,
+      ProbeGeometry geometry,
+      float probeRadius
     );
 
     ~BeamformingSettings();
@@ -213,6 +229,14 @@ namespace mitk {
     /** \brief Sets the used beamforming algorithm.
     */
     BeamformingAlgorithm m_Algorithm;
+
+    /** \brief Sets the used probe geometry
+    */
+    ProbeGeometry m_Geometry;
+
+    /** \brief Sets the radius of the curved probe
+    */
+    float m_ProbeRadius;
   };
 }
 #endif //MITK_BEAMFORMING_SETTINGS

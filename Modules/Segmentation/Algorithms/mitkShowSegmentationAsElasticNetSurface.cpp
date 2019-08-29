@@ -35,7 +35,13 @@ namespace mitk
 
 ShowSegmentationAsElasticNetSurface::ShowSegmentationAsElasticNetSurface()
 {
-  m_ProgressAccumulator = itk::ProgressAccumulator::New();
+}
+
+void ShowSegmentationAsElasticNetSurface::checkAbort()
+{
+  if (GetAbortGenerateData()) {
+    throw itk::ProcessAborted();
+  }
 }
 
 void ShowSegmentationAsElasticNetSurface::GenerateData()
@@ -43,19 +49,28 @@ void ShowSegmentationAsElasticNetSurface::GenerateData()
 #ifdef ELASTIC_NET_PRINT_TIME
   initTime();
 #endif
+  UpdateProgress(0.f);
   calcRegion();
+  checkAbort();
+  UpdateProgress(.06f);
 #ifdef ELASTIC_NET_PRINT_TIME
   std::cout << "Time to find region:\t" << getLastTimeInMs() << " ms\n";
 #endif
   createSurfaceCubes();
+  checkAbort();
+  UpdateProgress(.57f);
 #ifdef ELASTIC_NET_PRINT_TIME
   std::cout << "Surface cube creation time:\t" << getLastTimeInMs() << " ms\n";
 #endif
   createNodes();
+  checkAbort();
+  UpdateProgress(.63f);
 #ifdef ELASTIC_NET_PRINT_TIME
   std::cout << "Nodes creation time:\t" << getLastTimeInMs() << " ms\n";
 #endif
   linkNodes();
+  checkAbort();
+  UpdateProgress(.68f);
 #ifdef ELASTIC_NET_PRINT_TIME
   std::cout << "Nodes linking time:\t" << getLastTimeInMs() << " ms\n";
   double totalRelaxationTime = 0.;
@@ -66,6 +81,7 @@ void ShowSegmentationAsElasticNetSurface::GenerateData()
   for (int i = 0; i < m_FilterArgs.elasticNetIterations; i++) {
     m_LastMaxRelaxation = 0.;
     relaxNodes();
+    checkAbort();
 #ifdef ELASTIC_NET_PRINT_TIME
     double iterationTime = getLastTimeInMs();
     std::cout << "\tRelaxation iteration time:\t" << iterationTime << " ms\n";
@@ -75,12 +91,14 @@ void ShowSegmentationAsElasticNetSurface::GenerateData()
       break;
     }
   }
-
+  UpdateProgress(.87f);
+  checkAbort();
 #ifdef ELASTIC_NET_PRINT_TIME
   std::cout << "Total Relaxation time:\t" << totalRelaxationTime << " ms\n";
 #endif
   // Triangulation prints own time
   m_Output = triangulateNodes();
+  UpdateProgress(1.f);
 #ifdef ELASTIC_NET_PRINT_TIME
   std::cout << "Overall time:\t" << getOverallTimeInMs() << " ms\n";
 #endif

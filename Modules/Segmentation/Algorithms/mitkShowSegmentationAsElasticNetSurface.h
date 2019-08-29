@@ -1,6 +1,7 @@
 #include <MitkSegmentationExports.h>
 
 #include <vtkFloatArray.h>
+#include <vtkSMPTools.h>
 
 #include <mitkSurface.h>
 
@@ -23,17 +24,9 @@ public:
   static const unsigned int DIM = 3;
   typedef itk::Image<unsigned char, 3> InputImageType;
 
-  enum class BridgeTipType
-  {
-    Flat,
-    Pointy,
-    Bridge,
-  };
-
   struct SurfaceComputingParameters
   {
-    int elasticNetIterations = 10;
-    BridgeTipType bridgeTip = BridgeTipType::Pointy; // Doesn't work at the moment
+    int elasticNetIterations = 15;
     double elasticNetRelaxation = -1.;
   };
 
@@ -67,8 +60,6 @@ protected:
 private:
   ShowSegmentationAsElasticNetSurface(const Self&);
   void operator=(const Self&);
-
-  itk::ProgressAccumulator::Pointer m_ProgressAccumulator;
 
   void calcRegion();
   void createSurfaceCubes();
@@ -136,7 +127,9 @@ private:
   double m_LastMaxRelaxation = -1.;
   InputImageType::RegionType m_LocalRegion;
   InputImageType::IndexType m_LocalRegionOrigin;
-};
+
+  void checkAbort();
+  };
 
 }
 

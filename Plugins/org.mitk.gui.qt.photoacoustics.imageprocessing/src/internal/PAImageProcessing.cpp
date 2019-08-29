@@ -894,15 +894,15 @@ mitk::BeamformingSettings::Pointer PAImageProcessing::CreateBeamformingSettings(
   float reconstructionDepth = m_Controls.ReconstructionDepth->value() / 1000.f; // [m]
 
   mitk::BeamformingSettings::ProbeGeometry geometry = mitk::BeamformingSettings::ProbeGeometry::Linear;
-  if ("Linear" == m_Controls.Apodization->currentText())
+  if ("Linear" == m_Controls.Geometry->currentText())
   {
-    mitk::BeamformingSettings::ProbeGeometry geometry = mitk::BeamformingSettings::ProbeGeometry::Linear;
+    geometry = mitk::BeamformingSettings::ProbeGeometry::Linear;
   }
-  else if ("Concave" == m_Controls.Apodization->currentText())
+  else if ("Concave" == m_Controls.Geometry->currentText())
   {
-    mitk::BeamformingSettings::ProbeGeometry geometry = mitk::BeamformingSettings::ProbeGeometry::Concave;
+    geometry = mitk::BeamformingSettings::ProbeGeometry::Concave;
   }
-  float probeRadius = m_Controls.ProbeRadius->value(); // [deg]
+  float probeRadius = m_Controls.ProbeRadius->value()/1000.f; // [m]
 
   return mitk::BeamformingSettings::New(pitchInMeters,
     speedOfSound, timeSpacing, angle, isPAImage, samplesPerLine, reconstructionLines,

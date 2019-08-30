@@ -305,18 +305,19 @@ void QmitkNavigationToolManagementWidget::OnLoadStorage()
 
 void QmitkNavigationToolManagementWidget::OnSaveStorage()
 {
-    QFileDialog *fileDialog = new QFileDialog;
-    fileDialog->setDefaultSuffix("IGTToolStorage");
-    QString suffix = "IGT Tool Storage (*.IGTToolStorage)";
-    // Set default file name to LastFileSavePath + storage name
-    QString defaultFileName = QmitkIGTCommonHelper::GetLastFileSavePath() + "/" + QString::fromStdString(m_NavigationToolStorage->GetName());
-    QString filename  = fileDialog->getSaveFileName(nullptr, tr("Save Navigation Tool Storage"), defaultFileName, suffix, &suffix);
+  QFileDialog *fileDialog = new QFileDialog;
+  fileDialog->setDefaultSuffix("IGTToolStorage");
+  QString suffix = "IGT Tool Storage (*.IGTToolStorage)";
+  // Set default file name to LastFileSavePath + storage name
+  QString defaultFileName = QmitkIGTCommonHelper::GetLastFileSavePath() + "/" + QString::fromStdString(m_NavigationToolStorage->GetName());
+  QString filename  = fileDialog->getSaveFileName(nullptr, tr("Save Navigation Tool Storage"), defaultFileName, suffix, &suffix);
 
-    if (filename.isEmpty()) return; //canceled by the user
+  if (filename.isEmpty()) return; //canceled by the user
 
-    // check file suffix
-    QFileInfo file(filename);
-    if(file.suffix().isEmpty()) filename += ".IGTToolStorage";
+  // check file suffix
+  QFileInfo file(filename);
+  if(file.suffix().isEmpty()) filename += ".IGTToolStorage";
+
   //serialize tool storage
   mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
 

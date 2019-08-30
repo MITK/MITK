@@ -107,8 +107,7 @@ public:
     mitk::NavigationToolStorage::Pointer storage = mitk::NavigationToolStorageTestHelper::CreateTestData_StorageWithOneTool();
 
     //test serialization
-    bool success = m_Serializer->Serialize(m_FileName1,storage);
-    CPPUNIT_ASSERT_MESSAGE("Testing serialization of tool storage with tool registrations",success);
+    CPPUNIT_ASSERT_NO_THROW_MESSAGE("Testing serialization of tool storage with tool registrations", m_Serializer->Serialize(m_FileName1,storage));
 
     //test deserialization of the same file
     mitk::NavigationToolStorage::Pointer readStorage = m_Deserializer->Deserialize(m_FileName1);

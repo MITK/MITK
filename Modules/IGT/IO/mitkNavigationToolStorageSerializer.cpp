@@ -50,7 +50,7 @@ mitk::NavigationToolStorageSerializer::~NavigationToolStorageSerializer()
   }
 }
 
-bool mitk::NavigationToolStorageSerializer::Serialize(std::string filename, mitk::NavigationToolStorage::Pointer storage)
+void mitk::NavigationToolStorageSerializer::Serialize(const std::string& filename, mitk::NavigationToolStorage::Pointer storage)
 {
   //save every tool to temp directory
   mitk::NavigationToolWriter::Pointer myToolWriter = mitk::NavigationToolWriter::New();
@@ -84,9 +84,7 @@ bool mitk::NavigationToolStorageSerializer::Serialize(std::string filename, mitk
   }
  zipper.close();
  file.close();
-
- return true;
- }
+}
 
 std::string mitk::NavigationToolStorageSerializer::convertIntToString(int i)
  {

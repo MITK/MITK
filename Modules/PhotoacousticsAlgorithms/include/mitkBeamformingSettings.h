@@ -234,7 +234,7 @@ namespace mitk {
     */
     ProbeGeometry m_Geometry;
 
-    /** \brief Sets the radius of the curved probe
+    /** \brief Sets the radius of the curved probe [m]
     */
     float m_ProbeRadius;
   };

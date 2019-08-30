@@ -93,25 +93,28 @@ void mitk::BeamformingUtils::DASQuadraticLine(
     config->GetPitchInMeters() * inputL / config->GetTransducerElements();
   float apod_mult = 1;
 
+  float probeRadius = config->GetProbeRadius();
+  bool concave = config->GetGeometry() == mitk::BeamformingSettings::ProbeGeometry::Concave;
+  float elementHeight = 0;
+
   short usedLines = (maxLine - minLine);
 
-  float percentOfImageReconstructed = (float)(config->GetReconstructionDepth()) /
-    (float)(inputS * config->GetSpeedOfSound() * config->GetTimeSpacing() / (float)(2 - (int)config->GetIsPhotoacousticImage()));
-  percentOfImageReconstructed = percentOfImageReconstructed <= 1 ? percentOfImageReconstructed : 1;
+  float totalSamples_i = (float)(config->GetReconstructionDepth()) / (float)(config->GetSpeedOfSound() * config->GetTimeSpacing());
+  totalSamples_i = totalSamples_i <= inputS ? totalSamples_i : inputS;
 
   l_i = (float)line / outputL * inputL;
 
   for (short sample = 0; sample < outputS; ++sample)
   {
-    s_i = (float)sample / outputS * inputS / (float)(2 - (int)config->GetIsPhotoacousticImage()) * percentOfImageReconstructed;
+    s_i = (float)sample / outputS * totalSamples_i;
 
     part = part_multiplicator*s_i;
 
     if (part < 1)
       part = 1;
 
-    maxLine = (short)std::min((l_i + part) + 1, inputL);
-    minLine = (short)std::max((l_i - part), 0.0f);
+    maxLine = std::round(std::min((l_i + part) + 1, inputL));
+    minLine = std::round(std::max((l_i - part), 0.0f));
     usedLines = (maxLine - minLine);
 
     apod_mult = (float)apodArraySize / (float)usedLines;
@@ -121,7 +124,11 @@ void mitk::BeamformingUtils::DASQuadraticLine(
 
     for (short l_s = minLine; l_s < maxLine; ++l_s)
     {
-      AddSample = delayMultiplicator * pow((l_s - l_i), 2) + s_i + (1 - config->GetIsPhotoacousticImage())*s_i;
+      if (concave)
+      {
+        elementHeight = (probeRadius - std::cos(((abs(inputL / 2.f - l_s)*config->GetPitchInMeters()) / (2 * itk::Math::pi*probeRadius)) * 2 * itk::Math::pi)*probeRadius) / (config->GetSpeedOfSound()*config->GetTimeSpacing());
+      }
+      AddSample = delayMultiplicator * pow((l_s - l_i), 2) + (s_i - elementHeight) + (1 - config->GetIsPhotoacousticImage())*s_i;
       if (AddSample < inputS && AddSample >= 0)
         output[sample*(short)outputL + line] += input[l_s + AddSample*(short)inputL] *
         apodisation[(short)((l_s - minLine)*apod_mult)];
@@ -151,39 +158,46 @@ void mitk::BeamformingUtils::DASSphericalLine(
   float l_i = 0;
   float s_i = 0;
 
-  float part = 0.07 * inputL;
+  float part = 0.07 * inputL; // just a default value
   float tan_phi = std::tan(config->GetAngle() / 360 * 2 * itk::Math::pi);
   float part_multiplicator = tan_phi * config->GetTimeSpacing() *
     config->GetSpeedOfSound() / config->GetPitchInMeters() * inputL / (float)config->GetTransducerElements();
   float apod_mult = 1;
 
+  float probeRadius = config->GetProbeRadius();
+  bool concave = config->GetGeometry() == mitk::BeamformingSettings::ProbeGeometry::Concave;
+  float elementHeight = 0;
+
   short usedLines = (maxLine - minLine);
 
-  float percentOfImageReconstructed = (float)(config->GetReconstructionDepth()) /
-    (float)(inputS * config->GetSpeedOfSound() * config->GetTimeSpacing() / (float)(2 - (int)config->GetIsPhotoacousticImage()));
-  percentOfImageReconstructed = percentOfImageReconstructed <= 1 ? percentOfImageReconstructed : 1;
+  float totalSamples_i = (float)(config->GetReconstructionDepth()) / (float)(config->GetSpeedOfSound() * config->GetTimeSpacing());
+  totalSamples_i = totalSamples_i <= inputS ? totalSamples_i : inputS;
 
   l_i = (float)line / outputL * inputL;
 
   for (short sample = 0; sample < outputS; ++sample)
   {
-    s_i = (float)sample / outputS * inputS / (float)(2 - (int)config->GetIsPhotoacousticImage()) * percentOfImageReconstructed;
+    s_i = (float)sample / outputS * totalSamples_i;
 
     part = part_multiplicator*s_i;
 
     if (part < 1)
       part = 1;
 
-    maxLine = (short)std::min((l_i + part) + 1, inputL);
-    minLine = (short)std::max((l_i - part), 0.0f);
+    maxLine = std::round(std::min((l_i + part) + 1, inputL));
+    minLine = std::round(std::max((l_i - part), 0.0f));
     usedLines = (maxLine - minLine);
 
     apod_mult = (float)apodArraySize / (float)usedLines;
 
     for (short l_s = minLine; l_s < maxLine; ++l_s)
     {
+      if (concave) 
+      {
+        elementHeight = (probeRadius - std::cos(((abs(inputL / 2.f - l_s)*config->GetPitchInMeters()) / (2 * itk::Math::pi*probeRadius)) * 2 * itk::Math::pi)*probeRadius) / (config->GetSpeedOfSound()*config->GetTimeSpacing());
+      }
       AddSample = (int)sqrt(
-        pow(s_i, 2)
+        pow(s_i-elementHeight, 2)
         +
         pow((1 / (config->GetTimeSpacing()*config->GetSpeedOfSound()) *
         (((float)l_s - l_i)*config->GetPitchInMeters()*(float)config->GetTransducerElements()) / inputL), 2)
@@ -223,26 +237,30 @@ void mitk::BeamformingUtils::DMASQuadraticLine(
     config->GetSpeedOfSound() / config->GetPitchInMeters() * inputL / (float)config->GetTransducerElements();
   float apod_mult = 1;
 
+  float probeRadius = config->GetProbeRadius();
+  bool concave = config->GetGeometry() == mitk::BeamformingSettings::ProbeGeometry::Concave;
+  float elementHeight = 0;
+
   float mult = 0;
   short usedLines = (maxLine - minLine);
 
-  float percentOfImageReconstructed = (float)(config->GetReconstructionDepth()) /
-    (float)(inputS * config->GetSpeedOfSound() * config->GetTimeSpacing() / (float)(2 - (int)config->GetIsPhotoacousticImage()));
-  percentOfImageReconstructed = percentOfImageReconstructed <= 1 ? percentOfImageReconstructed : 1;
+  float totalSamples_i = (float)(config->GetReconstructionDepth()) /
+    (float)(config->GetSpeedOfSound() * config->GetTimeSpacing());
+  totalSamples_i = totalSamples_i <= inputS ? totalSamples_i : inputS;
 
   l_i = (float)line / outputL * inputL;
 
   for (short sample = 0; sample < outputS; ++sample)
   {
-    s_i = (float)sample / outputS * inputS / (float)(2 - (int)config->GetIsPhotoacousticImage()) * percentOfImageReconstructed;
+    s_i = (float)sample / outputS * totalSamples_i;
 
     part = part_multiplicator*s_i;
 
     if (part < 1)
       part = 1;
 
-    maxLine = (short)std::min((l_i + part) + 1, inputL);
-    minLine = (short)std::max((l_i - part), 0.0f);
+    maxLine = std::round(std::min((l_i + part) + 1, inputL));
+    minLine = std::round(std::max((l_i - part), 0.0f));
     usedLines = (maxLine - minLine);
 
     apod_mult = (float)apodArraySize / (float)usedLines;
@@ -254,7 +272,11 @@ void mitk::BeamformingUtils::DMASQuadraticLine(
     short* AddSample = new short[maxLine - minLine];
     for (short l_s = 0; l_s < maxLine - minLine; ++l_s)
     {
-      AddSample[l_s] = (short)(delayMultiplicator * pow((minLine + l_s - l_i), 2) + s_i) +
+      if (concave)
+      {
+        elementHeight = (probeRadius - std::cos(((abs(inputL / 2.f - l_s)*config->GetPitchInMeters()) / (2 * itk::Math::pi*probeRadius)) * 2 * itk::Math::pi)*probeRadius) / (config->GetSpeedOfSound()*config->GetTimeSpacing());
+      }
+      AddSample[l_s] = (short)(delayMultiplicator * pow((minLine + l_s - l_i), 2) + (s_i - elementHeight)) +
         (1 - config->GetIsPhotoacousticImage())*s_i;
     }
 
@@ -311,27 +333,31 @@ void mitk::BeamformingUtils::DMASSphericalLine(
     config->GetSpeedOfSound() / config->GetPitchInMeters() * inputL / (float)config->GetTransducerElements();
   float apod_mult = 1;
 
+  float probeRadius = config->GetProbeRadius();
+  bool concave = config->GetGeometry() == mitk::BeamformingSettings::ProbeGeometry::Concave;
+  float elementHeight = 0;
+
   float mult = 0;
 
   short usedLines = (maxLine - minLine);
 
-  float percentOfImageReconstructed = (float)(config->GetReconstructionDepth()) /
-    (float)(inputS * config->GetSpeedOfSound() * config->GetTimeSpacing() / (float)(2 - (int)config->GetIsPhotoacousticImage()));
-  percentOfImageReconstructed = percentOfImageReconstructed <= 1 ? percentOfImageReconstructed : 1;
+  float totalSamples_i = (float)(config->GetReconstructionDepth()) /
+    (float)(config->GetSpeedOfSound() * config->GetTimeSpacing());
+  totalSamples_i = totalSamples_i <= inputS ? totalSamples_i : inputS;
 
   l_i = (float)line / outputL * inputL;
 
   for (short sample = 0; sample < outputS; ++sample)
   {
-    s_i = (float)sample / outputS * inputS / (float)(2 - (int)config->GetIsPhotoacousticImage()) * percentOfImageReconstructed;
+    s_i = (float)sample / outputS * totalSamples_i;
 
     part = part_multiplicator*s_i;
 
     if (part < 1)
       part = 1;
 
-    maxLine = (short)std::min((l_i + part) + 1, inputL);
-    minLine = (short)std::max((l_i - part), 0.0f);
+    maxLine = std::round(std::min((l_i + part) + 1, inputL));
+    minLine = std::round(std::max((l_i - part), 0.0f));
     usedLines = (maxLine - minLine);
 
     apod_mult = (float)apodArraySize / (float)usedLines;
@@ -340,8 +366,12 @@ void mitk::BeamformingUtils::DMASSphericalLine(
     short* AddSample = new short[maxLine - minLine];
     for (short l_s = 0; l_s < maxLine - minLine; ++l_s)
     {
+      if (concave)
+      {
+        elementHeight = (probeRadius - std::cos(((abs(inputL / 2.f - l_s)*config->GetPitchInMeters()) / (2 * itk::Math::pi*probeRadius)) * 2 * itk::Math::pi)*probeRadius) / (config->GetSpeedOfSound()*config->GetTimeSpacing());
+      }
       AddSample[l_s] = (short)sqrt(
-        pow(s_i, 2)
+        pow(s_i - elementHeight, 2)
         +
         pow((1 / (config->GetTimeSpacing()*config->GetSpeedOfSound()) *
         (((float)minLine + (float)l_s - l_i)*config->GetPitchInMeters()*(float)config->GetTransducerElements()) / inputL), 2)
@@ -402,26 +432,30 @@ void mitk::BeamformingUtils::sDMASQuadraticLine(
     config->GetPitchInMeters() * inputL / (float)config->GetTransducerElements();
   float apod_mult = 1;
 
+  float probeRadius = config->GetProbeRadius();
+  bool concave = config->GetGeometry() == mitk::BeamformingSettings::ProbeGeometry::Concave;
+  float elementHeight = 0;
+
   float mult = 0;
   short usedLines = (maxLine - minLine);
 
-  float percentOfImageReconstructed = (float)(config->GetReconstructionDepth()) /
-    (float)(inputS * config->GetSpeedOfSound() * config->GetTimeSpacing() / (float)(2 - (int)config->GetIsPhotoacousticImage()));
-  percentOfImageReconstructed = percentOfImageReconstructed <= 1 ? percentOfImageReconstructed : 1;
+  float totalSamples_i = (float)(config->GetReconstructionDepth()) /
+    (float)(config->GetSpeedOfSound() * config->GetTimeSpacing());
+  totalSamples_i = totalSamples_i <= inputS ? totalSamples_i : inputS;
 
   l_i = (float)line / outputL * inputL;
 
   for (short sample = 0; sample < outputS; ++sample)
   {
-    s_i = (float)sample / outputS * inputS / (float)(2 - (int)config->GetIsPhotoacousticImage()) * percentOfImageReconstructed;
+    s_i = (float)sample / outputS * totalSamples_i;
 
     part = part_multiplicator*s_i;
 
     if (part < 1)
       part = 1;
 
-    maxLine = (short)std::min((l_i + part) + 1, inputL);
-    minLine = (short)std::max((l_i - part), 0.0f);
+    maxLine = std::round(std::min((l_i + part) + 1, inputL));
+    minLine = std::round(std::max((l_i - part), 0.0f));
     usedLines = (maxLine - minLine);
 
     apod_mult = (float)apodArraySize / (float)usedLines;
@@ -433,7 +467,11 @@ void mitk::BeamformingUtils::sDMASQuadraticLine(
     short* AddSample = new short[maxLine - minLine];
     for (short l_s = 0; l_s < maxLine - minLine; ++l_s)
     {
-      AddSample[l_s] = (short)(delayMultiplicator * pow((minLine + l_s - l_i), 2) + s_i) +
+      if (concave)
+      {
+        elementHeight = (probeRadius - std::cos(((abs(inputL / 2.f - l_s)*config->GetPitchInMeters()) / (2 * itk::Math::pi*probeRadius)) * 2 * itk::Math::pi)*probeRadius) / (config->GetSpeedOfSound()*config->GetTimeSpacing());
+      }
+      AddSample[l_s] = (short)(delayMultiplicator * pow((minLine + l_s - l_i), 2) + (s_i - elementHeight)) +
         (1 - config->GetIsPhotoacousticImage())*s_i;
     }
 
@@ -493,27 +531,31 @@ void mitk::BeamformingUtils::sDMASSphericalLine(
     config->GetPitchInMeters() * inputL / (float)config->GetTransducerElements();
   float apod_mult = 1;
 
+  float probeRadius = config->GetProbeRadius();
+  bool concave = config->GetGeometry() == mitk::BeamformingSettings::ProbeGeometry::Concave;
+  float elementHeight = 0;
+
   float mult = 0;
 
   short usedLines = (maxLine - minLine);
 
-  float percentOfImageReconstructed = (float)(config->GetReconstructionDepth()) /
-    (float)(inputS * config->GetSpeedOfSound() * config->GetTimeSpacing() / (float)(2 - (int)config->GetIsPhotoacousticImage()));
-  percentOfImageReconstructed = percentOfImageReconstructed <= 1 ? percentOfImageReconstructed : 1;
+  float totalSamples_i = (float)(config->GetReconstructionDepth()) /
+    (float)(config->GetSpeedOfSound() * config->GetTimeSpacing());
+  totalSamples_i = totalSamples_i <= inputS ? totalSamples_i : inputS;
 
   l_i = (float)line / outputL * inputL;
 
   for (short sample = 0; sample < outputS; ++sample)
   {
-    s_i = (float)sample / outputS * inputS / (float)(2 - (int)config->GetIsPhotoacousticImage()) * percentOfImageReconstructed;
+    s_i = (float)sample / outputS * totalSamples_i;
 
     part = part_multiplicator*s_i;
 
     if (part < 1)
       part = 1;
 
-    maxLine = (short)std::min((l_i + part) + 1, inputL);
-    minLine = (short)std::max((l_i - part), 0.0f);
+    maxLine = std::round(std::min((l_i + part) + 1, inputL));
+    minLine = std::round(std::max((l_i - part), 0.0f));
     usedLines = (maxLine - minLine);
 
     apod_mult = (float)apodArraySize / (float)usedLines;
@@ -522,8 +564,12 @@ void mitk::BeamformingUtils::sDMASSphericalLine(
     short* AddSample = new short[maxLine - minLine];
     for (short l_s = 0; l_s < maxLine - minLine; ++l_s)
     {
+      if (concave)
+      {
+        elementHeight = (probeRadius - std::cos(((abs(inputL / 2.f - l_s)*config->GetPitchInMeters()) / (2 * itk::Math::pi*probeRadius)) * 2 * itk::Math::pi)*probeRadius) / (config->GetSpeedOfSound()*config->GetTimeSpacing());
+      }
       AddSample[l_s] = (short)sqrt(
-        pow(s_i, 2)
+        pow(s_i - elementHeight, 2)
         +
         pow((1 / (config->GetTimeSpacing()*config->GetSpeedOfSound()) *
         (((float)minLine + (float)l_s - l_i)*config->GetPitchInMeters()*(float)config->GetTransducerElements()) / inputL), 2)

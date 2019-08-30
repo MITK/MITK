@@ -417,7 +417,7 @@ void QmitkNavigationToolManagementWidget::UpdateToolTable()
   }
 }
 
-void QmitkNavigationToolManagementWidget::MessageBox(std::string s)
+void QmitkNavigationToolManagementWidget::MessageBox(const std::string& s)
 {
   QMessageBox msgBox;
   msgBox.setText(s.c_str());

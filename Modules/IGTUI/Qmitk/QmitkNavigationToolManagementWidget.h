@@ -105,7 +105,7 @@ protected:
   bool m_edit;
 
   //############## private help methods #######################
-  void MessageBox(std::string s);
+  void MessageBox(const std::string &s);
   void UpdateToolTable();
   void DisableStorageControls();
   void EnableStorageControls();

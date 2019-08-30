@@ -127,6 +127,8 @@ void mitk::BeamformingUtils::DASQuadraticLine(
       if (concave)
       {
         elementHeight = (probeRadius - std::cos(((abs(inputL / 2.f - l_s)*config->GetPitchInMeters()) / (2 * itk::Math::pi*probeRadius)) * 2 * itk::Math::pi)*probeRadius) / (config->GetSpeedOfSound()*config->GetTimeSpacing());
+        delayMultiplicator = pow((1 / (config->GetTimeSpacing()*config->GetSpeedOfSound()) *
+          (config->GetPitchInMeters()*config->GetTransducerElements()) / inputL), 2) / (s_i - elementHeight) / 2;
       }
       AddSample = delayMultiplicator * pow((l_s - l_i), 2) + (s_i - elementHeight) + (1 - config->GetIsPhotoacousticImage())*s_i;
       if (AddSample < inputS && AddSample >= 0)
@@ -275,6 +277,8 @@ void mitk::BeamformingUtils::DMASQuadraticLine(
       if (concave)
       {
         elementHeight = (probeRadius - std::cos(((abs(inputL / 2.f - l_s)*config->GetPitchInMeters()) / (2 * itk::Math::pi*probeRadius)) * 2 * itk::Math::pi)*probeRadius) / (config->GetSpeedOfSound()*config->GetTimeSpacing());
+        delayMultiplicator = pow((1 / (config->GetTimeSpacing()*config->GetSpeedOfSound()) *
+          (config->GetPitchInMeters()*config->GetTransducerElements()) / inputL), 2) / (s_i - elementHeight) / 2;
       }
       AddSample[l_s] = (short)(delayMultiplicator * pow((minLine + l_s - l_i), 2) + (s_i - elementHeight)) +
         (1 - config->GetIsPhotoacousticImage())*s_i;
@@ -470,6 +474,8 @@ void mitk::BeamformingUtils::sDMASQuadraticLine(
       if (concave)
       {
         elementHeight = (probeRadius - std::cos(((abs(inputL / 2.f - l_s)*config->GetPitchInMeters()) / (2 * itk::Math::pi*probeRadius)) * 2 * itk::Math::pi)*probeRadius) / (config->GetSpeedOfSound()*config->GetTimeSpacing());
+        delayMultiplicator = pow((1 / (config->GetTimeSpacing()*config->GetSpeedOfSound()) *
+          (config->GetPitchInMeters()*config->GetTransducerElements()) / inputL), 2) / (s_i - elementHeight) / 2;
       }
       AddSample[l_s] = (short)(delayMultiplicator * pow((minLine + l_s - l_i), 2) + (s_i - elementHeight)) +
         (1 - config->GetIsPhotoacousticImage())*s_i;

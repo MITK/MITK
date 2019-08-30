@@ -268,9 +268,9 @@ void mitk::LevelWindow::SetAuto(const mitk::Image *image,
   if (image == nullptr || !image->IsInitialized())
     return;
 
-  if ((image->GetPixelType().GetComponentType() == 9) || (image->GetPixelType().GetComponentType() == 10))
+  if (itk::ImageIOBase::IOComponentType::FLOAT == image->GetPixelType().GetComponentType()
+  ||  itk::ImageIOBase::IOComponentType::DOUBLE == image->GetPixelType().GetComponentType())
   {
-    // Floating image
     m_IsFloatingImage = true;
   }
   else

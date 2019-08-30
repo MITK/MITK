@@ -72,19 +72,7 @@ mitk::TrackingTool* mitk::VirtualTrackingDevice::AddTool(const char* toolName)
   m_AllTools.push_back(t);
   return t;
 }
-mitk::TrackingTool *mitk::VirtualTrackingDevice::AddTool(mitk::NavigationTool::Pointer tool)
-{
-  mitk::VirtualTrackingTool::Pointer t = mitk::VirtualTrackingTool::New();
-  t->SetToolName(tool->GetToolName());
-  t->SetVelocity(0.1);
-  t->SetToolTipPosition(tool->GetToolTipPosition(), tool->GetToolAxisOrientation());
-  t->SetOrientation(tool->GetToolAxisOrientation());
 
-  this->InitializeSpline(t);
-  MutexLockHolder lock(*m_ToolsMutex); // lock and unlock the mutex
-  m_AllTools.push_back(t);
-  return t;
-}
 
 bool mitk::VirtualTrackingDevice::StartTracking()
 {

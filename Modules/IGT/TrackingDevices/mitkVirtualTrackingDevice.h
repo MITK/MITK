@@ -110,7 +110,7 @@ namespace mitk
     */
     TrackingTool* AddTool(const char* toolName);
 
-    TrackingTool *AddTool(mitk::NavigationTool::Pointer tool);
+
     /**
     * \brief Set the tracking volume bounds
     *

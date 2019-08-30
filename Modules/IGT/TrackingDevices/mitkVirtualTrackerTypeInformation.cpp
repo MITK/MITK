@@ -56,13 +56,15 @@ namespace mitk
     {
       mitk::NavigationTool::Pointer thisNavigationTool = navigationTools->GetTool(i);
       toolCorrespondencesInToolStorage->push_back(i);
-      bool toolAddSuccess = thisDevice->AddTool(navigationTools->GetTool(i));
+      bool toolAddSuccess = thisDevice->AddTool(thisNavigationTool->GetToolName().c_str());
       if (!toolAddSuccess)
       {
         //todo error handling
         errorMessage->append("Can't add tool, is the toolfile valid?");
         return nullptr;
       }
+      thisDevice->GetTool(i)->SetToolTipPosition(thisNavigationTool->GetToolTipPosition(),
+                                                 thisNavigationTool->GetToolAxisOrientation());
     }
     returnValue->SetTrackingDevice(thisDevice);
     return returnValue;

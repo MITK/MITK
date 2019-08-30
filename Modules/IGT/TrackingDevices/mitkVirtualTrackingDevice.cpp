@@ -73,6 +73,7 @@ mitk::TrackingTool* mitk::VirtualTrackingDevice::AddTool(const char* toolName)
   return t;
 }
 
+
 bool mitk::VirtualTrackingDevice::StartTracking()
 {
   if (this->GetState() != Ready)

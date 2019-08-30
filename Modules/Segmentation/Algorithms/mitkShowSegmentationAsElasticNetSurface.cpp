@@ -4,7 +4,7 @@
 #include <vtkPointData.h>
 #include <vtkPolyDataNormals.h>
 
-#define ELASTIC_NET_PRINT_TIME
+//#define ELASTIC_NET_PRINT_TIME
 #ifdef ELASTIC_NET_PRINT_TIME
 #include <chrono>
 std::chrono::time_point<std::chrono::steady_clock> timePoint;
@@ -171,7 +171,7 @@ void ShowSegmentationAsElasticNetSurface::vtkSMPCreateSurfaceCubesOp::operator()
 void ShowSegmentationAsElasticNetSurface::createSurfaceCubes()
 {
   InputImageType::SizeType dim = m_LocalRegion.GetSize();
-  m_SurfaceCubes = std::make_unique<SurfaceCubeData>(dim[0] + 1, dim[1] + 1, dim[2] + 1);
+  m_SurfaceCubes = std::unique_ptr<SurfaceCubeData>(new SurfaceCubeData(dim[0] + 1, dim[1] + 1, dim[2] + 1));
 
   vtkSMPCreateSurfaceCubesOp func;
   func.parent = this;

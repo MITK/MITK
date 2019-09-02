@@ -120,6 +120,7 @@ mitk::BaseRenderer::BaseRenderer(const char* name, vtkRenderWindow * renWin, mit
   , m_EmptyWorldGeometry(true)
   , m_NumberOfVisibleLODEnabledMappers(0)
   , m_StudyUID()
+  , m_ConstrainZoomingAndPanning(false)
 {
   m_Bounds[0] = 0;
   m_Bounds[1] = 0;

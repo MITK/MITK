@@ -1669,6 +1669,7 @@ const mitk::Point3D QmitkStdMultiWidget::GetCrossPosition() const
   }
   // TODO BUG POSITIONTRACKER;
   mitk::Point3D p;
+  p.Fill(0);
   return p;
   //return m_LastLeftClickPositionSupplier->GetCurrentPoint();
 }

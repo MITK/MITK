@@ -142,7 +142,7 @@ namespace mitk
     unsigned long                m_ObserverTag;
     bool                         m_IsObserverTagSet;
     unsigned long                m_PropertyModifiedTag;
-    Image*                 m_CurrentImage;
+    Image*                       m_CurrentImage;
     bool                         m_IsPropertyModifiedTagSet;
     bool                         m_SettingImgForLvlWinProp;
   };

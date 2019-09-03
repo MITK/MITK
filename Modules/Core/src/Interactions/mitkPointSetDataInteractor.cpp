@@ -95,7 +95,7 @@ void mitk::PointSetDataInteractor::AddPoint(StateMachineAction* stateMachineActi
     {
       PointOperation *undoOp = new mitk::PointOperation( OpREMOVE,timeInMs, itkPoint, position);
       // 4) Do and Undo Operations are combined in an Operation event which also contains the target of the operations (here m_PointSet)
-      OperationEvent *operationEvent = new OperationEvent(m_PointSet, doOp, undoOp, "Add point");
+      OperationEvent *operationEvent = new OperationEvent(m_PointSet, doOp, undoOp, "Add point", GetDataNode());
       // 5) Store the Operation in the UndoController
       OperationEvent::IncCurrObjectEventId();
       m_UndoController->SetOperationEvent(operationEvent);
@@ -195,7 +195,7 @@ void mitk::PointSetDataInteractor::RemovePoint(StateMachineAction*, InteractionE
       if (m_UndoEnabled)  //write to UndoMechanism
       {
         PointOperation* undoOp = new mitk::PointOperation(OpINSERT,timeInMs, itkPoint, position);
-        OperationEvent *operationEvent = new OperationEvent(m_PointSet, doOp, undoOp, "Remove point");
+        OperationEvent *operationEvent = new OperationEvent(m_PointSet, doOp, undoOp, "Remove point", GetDataNode());
         mitk::OperationEvent::IncCurrObjectEventId();
         m_UndoController->SetOperationEvent(operationEvent);
       }
@@ -483,7 +483,7 @@ void mitk::PointSetDataInteractor::FinishMove(StateMachineAction*, InteractionEv
           //calculate the old Position from the already moved position - m_SumVec
           mitk::Point3D undoPoint = ( itkPoint - m_SumVec );
           PointOperation* undoOp = new mitk::PointOperation(OpMOVE,timeInMs, undoPoint, position);
-          OperationEvent *operationEvent =  new OperationEvent(m_PointSet, doOp, undoOp, "Move point");
+          OperationEvent *operationEvent =  new OperationEvent(m_PointSet, doOp, undoOp, "Move point", GetDataNode());
           OperationEvent::IncCurrObjectEventId();
           m_UndoController->SetOperationEvent(operationEvent);
         }

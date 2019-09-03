@@ -87,13 +87,16 @@ mitk::Operation* mitk::OperationEvent::GetOperation()
 }
 
 mitk::OperationEvent::OperationEvent(OperationActor* destination,
-                                     Operation* operation, Operation* undoOperation,
-                                     std::string description)
+                                     Operation* operation,
+                                     Operation* undoOperation,
+                                     std::string description,
+                                     mitk::DataNode* parentNode)
 : UndoStackItem(description),
   m_Destination(destination),
   m_Operation(operation),
   m_UndoOperation(undoOperation),
-  m_Invalid(false)
+  m_Invalid(false),
+  m_ParentNode(parentNode)
 {
   //connect to delete event
   if (itk::Object* object = dynamic_cast<itk::Object*>( m_Destination ))

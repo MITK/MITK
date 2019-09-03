@@ -298,6 +298,7 @@ void QmitkStdMultiWidget::InitializeWidget(bool showPlanesIn3d)
   crosshairManager->setUseCrosshairGap(true);
   crosshairManager->setCrosshairGap(32);
   crosshairManager->setSingleDataStorage(true);
+  crosshairManager->setParent(this);
 
   //Make all black and overwrite renderwindow 4
   this->FillGradientBackgroundWithBlack();
@@ -490,8 +491,6 @@ QmitkStdMultiWidget::~QmitkStdMultiWidget()
     textProp[i]->Delete();
     ren[i]->Delete();
   }
-
-  delete crosshairManager;
 }
 
 void QmitkStdMultiWidget::RemovePlanesFromDataStorage()

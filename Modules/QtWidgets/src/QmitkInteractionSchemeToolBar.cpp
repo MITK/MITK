@@ -34,6 +34,11 @@ QmitkInteractionSchemeToolBar::QmitkInteractionSchemeToolBar(QWidget* parent/* =
   m_InteractionSchemeSwitcher = mitk::InteractionSchemeSwitcher::New();
 }
 
+QmitkInteractionSchemeToolBar::~QmitkInteractionSchemeToolBar()
+{
+  // nothing here
+}
+
 void QmitkInteractionSchemeToolBar::SetInteractionEventHandler(mitk::InteractionEventHandler::Pointer interactionEventHandler)
 {
   if (interactionEventHandler == m_InteractionEventHandler)
@@ -42,13 +47,16 @@ void QmitkInteractionSchemeToolBar::SetInteractionEventHandler(mitk::Interaction
   }
 
   m_InteractionEventHandler = interactionEventHandler;
-  try
+  if (nullptr != m_InteractionSchemeSwitcher)
   {
-    m_InteractionSchemeSwitcher->SetInteractionScheme(m_InteractionEventHandler, InteractionScheme::PACSStandard);
-  }
-  catch (const mitk::Exception&)
-  {
-    return;
+    try
+    {
+      m_InteractionSchemeSwitcher->SetInteractionScheme(m_InteractionEventHandler, InteractionScheme::PACSStandard);
+    }
+    catch (const mitk::Exception&)
+    {
+      return;
+    }
   }
 }
 
@@ -59,19 +67,14 @@ void QmitkInteractionSchemeToolBar::AddButton(InteractionScheme interactionSchem
   action->setActionGroup(m_ActionGroup);
   action->setChecked(on);
   action->setData(interactionScheme);
-  connect(action, SIGNAL(triggered()), this, SLOT(OnInteractionSchemeChanged()));
+  connect(action, &QAction::triggered, this, &QmitkInteractionSchemeToolBar::OnInteractionSchemeChanged);
   QToolBar::addAction(action);
-}
-
-QmitkInteractionSchemeToolBar::~QmitkInteractionSchemeToolBar()
-{
-  // nothing here
 }
 
 void QmitkInteractionSchemeToolBar::OnInteractionSchemeChanged()
 {
   QAction* action = dynamic_cast<QAction*>(sender());
-  if (action)
+  if (nullptr != action)
   {
     for (auto actionIter : m_ActionGroup->actions())
     {
@@ -88,13 +91,16 @@ void QmitkInteractionSchemeToolBar::OnInteractionSchemeChanged()
       interactionScheme = InteractionScheme::PACSBase;
     }
 
-    try
+    if (nullptr != m_InteractionSchemeSwitcher)
     {
-      m_InteractionSchemeSwitcher->SetInteractionScheme(m_InteractionEventHandler, interactionScheme);
-    }
-    catch (const mitk::Exception&)
-    {
-      return;
+      try
+      {
+        m_InteractionSchemeSwitcher->SetInteractionScheme(m_InteractionEventHandler, interactionScheme);
+      }
+      catch (const mitk::Exception&)
+      {
+        return;
+      }
     }
   }
 }

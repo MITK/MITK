@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOperation.h"
 #include "mitkOperationActor.h"
 #include "mitkUndoModel.h"
+#include "mitkDataNode.h"
 #include <string>
 #include <list>
 
@@ -137,7 +138,7 @@ class MITKCORE_EXPORT OperationEvent : public UndoStackItem
 {
 public:
   //## @brief default constructor
-  OperationEvent(OperationActor* destination, Operation* operation, Operation* undoOperation, std::string description = "" );
+  OperationEvent(OperationActor* destination, Operation* operation, Operation* undoOperation, std::string description = "", mitk::DataNode* m_ParentNode = nullptr);
 
   //## @brief default destructor
   //##
@@ -163,6 +164,8 @@ public:
   //## @brief returns true if the destination still is present
   //## and false if it already has been deleted
   virtual bool IsValid();
+
+  mitk::DataNode* getParentNode() { return m_ParentNode; }
 
 protected:
 
@@ -190,6 +193,8 @@ private:
 
   //## stores if destination is valid or already has been freed
   bool m_Invalid;
+
+  mitk::DataNode* m_ParentNode;
 };
 
 } //namespace mitk

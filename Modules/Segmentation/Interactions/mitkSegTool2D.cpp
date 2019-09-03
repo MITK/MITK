@@ -383,7 +383,7 @@ void mitk::SegTool2D::WriteSliceToVolume(mitk::SegTool2D::SliceInformation slice
   DiffSliceOperation* doOperation = new DiffSliceOperation(image, extractor->GetOutput(),dynamic_cast<SlicedGeometry3D*>(sliceInfo.slice->GetGeometry()), sliceInfo.timestep, sliceInfo.plane);
 
   //create an operation event for the undo stack
-  OperationEvent* undoStackItem = new OperationEvent( DiffSliceOperationApplier::GetInstance(), doOperation, undoOperation, "Segmentation" );
+  OperationEvent* undoStackItem = new OperationEvent( DiffSliceOperationApplier::GetInstance(), doOperation, undoOperation, "Segmentation", m_ToolManager->GetWorkingData(0));
 
   //add it to the undo controller
   UndoStackItem::IncCurrObjectEventId();

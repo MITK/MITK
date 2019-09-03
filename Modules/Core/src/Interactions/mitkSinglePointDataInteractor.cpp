@@ -71,7 +71,7 @@ void mitk::SinglePointDataInteractor::AddPoint(StateMachineAction* /*stateMachin
 
     if ( m_UndoEnabled )
     {
-      OperationEvent *operationEvent =  new OperationEvent(m_PointSet, doOp, undoOp, "Move point");
+      OperationEvent *operationEvent =  new OperationEvent(m_PointSet, doOp, undoOp, "Move point", GetDataNode());
       OperationEvent::IncCurrObjectEventId();
 
       m_UndoController->SetOperationEvent(operationEvent);

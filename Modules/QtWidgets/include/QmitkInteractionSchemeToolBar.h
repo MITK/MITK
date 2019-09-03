@@ -39,7 +39,7 @@ public:
 
   void SetInteractionEventHandler(mitk::InteractionEventHandler::Pointer interactionEventHandler);
 
-protected Q_SLOT:
+protected Q_SLOTS:
 
   void AddButton(InteractionScheme id, const QString& toolName, const QIcon& icon, bool on = false);
   void OnInteractionSchemeChanged();

@@ -66,7 +66,7 @@ void QmitkInteractionSchemeToolBar::AddButton(InteractionScheme interactionSchem
   action->setActionGroup(m_ActionGroup);
   action->setChecked(on);
   action->setData(interactionScheme);
-  connect(action, SIGNAL(triggered()), this, SLOT(OnInteractionSchemeChanged()));
+  connect(action, &QAction::triggered, this, &QmitkInteractionSchemeToolBar::OnInteractionSchemeChanged);
   QToolBar::addAction(action);
 }
 

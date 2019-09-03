@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::LevelWindowManager::LevelWindowManager()
 : m_DataStorage(NULL)
 , m_LevelWindowProperty(NULL)
+, m_NodeMarkedToDelete(NULL)
 , m_AutoTopMost(true)
 , m_IsObserverTagSet(false)
 , m_CurrentImage(NULL)

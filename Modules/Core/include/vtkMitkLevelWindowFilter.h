@@ -21,6 +21,7 @@ class vtkScalarsToColors;
 class vtkPiecewiseFunction;
 #include <vtkImageData.h>
 #include <vtkThreadedImageAlgorithm.h>
+#include <vtkSmartPointer.h>
 
 #include <MitkCoreExports.h>
 /** Documentation
@@ -91,7 +92,7 @@ protected:
 
 private:
   /** m_LookupTable contains the lookup table for the RGB level window.*/
-  vtkScalarsToColors* m_LookupTable;
+  vtkSmartPointer<vtkScalarsToColors> m_LookupTable;
   /** The transfer function to map the scalar to alpha (4th component of the RGBA output value) */
   vtkPiecewiseFunction* m_OpacityFunction;
   /** m_MinOpacity contains the lower bound for the alpha level window.*/

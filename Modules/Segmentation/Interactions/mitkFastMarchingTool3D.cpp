@@ -259,7 +259,8 @@ void mitk::FastMarchingTool3D::Deactivated()
 
 void mitk::FastMarchingTool3D::Initialize()
 {
-  m_ReferenceImage = dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData());
+  mitk::DataNode::Pointer referenceNode = m_ToolManager->GetReferenceData(0);
+  m_ReferenceImage = dynamic_cast<mitk::Image*>(referenceNode->GetData());
   if(m_ReferenceImage->GetTimeGeometry()->CountTimeSteps() > 1)
   {
     mitk::ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
@@ -268,7 +269,14 @@ void mitk::FastMarchingTool3D::Initialize()
     timeSelector->UpdateLargestPossibleRegion();
     m_ReferenceImage = timeSelector->GetOutput();
   }
-  CastToItkImage(m_ReferenceImage, m_ReferenceImageAsITK);
+  if (m_ReferenceImage->GetPixelType().GetNumberOfComponents() == 1) {
+    CastToItkImage(m_ReferenceImage, m_ReferenceImageAsITK);
+  } else {
+    int displayedComponent;
+    referenceNode->GetIntProperty("Image.Displayed Component", displayedComponent);
+    CastToItkImageSingleComponent(m_ReferenceImage, m_ReferenceImageAsITK, displayedComponent);
+
+  }
   m_SmoothFilter->SetInput( m_ReferenceImageAsITK );
   m_NeedUpdate = true;
 }

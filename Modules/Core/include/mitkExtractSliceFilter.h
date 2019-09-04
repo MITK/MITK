@@ -20,25 +20,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "MitkCoreExports.h"
 #include "mitkImageToImageFilter.h"
-#include <vtkSmartPointer.h>
 
 #include <vtkImageReslice.h>
 #include <vtkMatrix4x4.h>
 #include <vtkImageData.h>
 #include <vtkPoints.h>
+#include <vtkSmartPointer.h>
 #include <vtkTransform.h>
 #include <vtkAbstractTransform.h>
 
 namespace mitk
 {
   /**
-  \brief ExtractSliceFilter extracts a 2D abitrary oriented slice from a 3D volume.
+  \brief ExtractSliceFilter extracts a 2D arbitrary oriented slice from a 3D volume.
 
   The filter can reslice in all orthogonal planes such as sagittal, coronal and axial,
-  and is also able to reslice a abitrary oriented oblique plane.
+  and is also able to reslice a arbitrary oriented oblique plane.
   Curved planes are specified via an AbstractTransformGeometry as the input worldgeometry.
 
-  The convinient workflow is:
+  Additionally this filter extracts the specified component of a multi-component input image.
+  This is done only if the caller rqeuests an mitk::Image output ('m_VtkOutputRequested' set to false).
+  The default component to be extracted is '0'.
+
+  The convenient workflow is:
   1. Set an image as input.
   2. Set the worldPlaneGeometry. This defines a grid where the slice is being extracted
   3. And then start the pipeline.
@@ -46,8 +50,8 @@ namespace mitk
   There are a few more properties that can be set to modify the behavior of the slicing.
   The properties are:
   - interpolation mode either Nearestneighbor, Linear or Cubic.
-  - a transform this is a convinient way to adapt the reslice axis for the case
-  that the image is transformed e.g. rotated.
+  - a transform this is a convenient way to adapt the reslice axis for the case
+    that the image is transformed e.g. rotated.
   - time step the time step in a times volume.
   - resample by geometry wether the resampling grid corresponds to the specs of the
   worldgeometry or is directly derived from the input image
@@ -56,6 +60,7 @@ namespace mitk
   - interpolation mode Nearestneighbor.
   - a transform NULL (No transform is set).
   - time step 0.
+  - component 0.
   - resample by geometry false (Corresponds to input image).
   */
   class MITKCORE_EXPORT ExtractSliceFilter : public ImageToImageFilter
@@ -74,8 +79,12 @@ namespace mitk
        this->Modified(); }
 
     /** \brief Set the time step in the 4D volume */
-    void SetTimeStep( unsigned int timestep){ this->m_TimeStep = timestep; }
-    unsigned int GetTimeStep(){ return this->m_TimeStep; }
+    void SetTimeStep( unsigned int timestep) { m_TimeStep = timestep; }
+    unsigned int GetTimeStep() { return m_TimeStep; }
+
+    /** \brief Set the component of an image to be extracted */
+    void SetComponent(unsigned int component) { m_Component = component; }
+    unsigned int GetComponent() { return m_Component; }
 
     /** \brief Set a transform for the reslice axes.
     * This transform is needed if the image volume itself is transformed. (Effects the reslice axis)
@@ -173,6 +182,8 @@ namespace mitk
     bool m_VtkOutputRequested;
 
     double m_BackgroundLevel;
+
+    unsigned int m_Component;
   };
 }
 

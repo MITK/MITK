@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkImage.h>
 #include <itkVectorImage.h>
+#include <itkVectorIndexSelectionCastImageFilter.h>
 
 namespace mitk
 {
@@ -63,6 +64,24 @@ namespace mitk
    */
   template <typename TPixelType, unsigned int VImageDimension>
   extern void MITKCORE_EXPORT CastToItkImage(const mitk::Image * mitkImage, itk::SmartPointer<itk::VectorImage<TPixelType,VImageDimension> >& itkOutputImage);
+
+  template <typename TPixelType, unsigned int VImageDimension>
+  void CastToItkImageSingleComponent(const mitk::Image* mitkImage, itk::SmartPointer<itk::Image<TPixelType, VImageDimension> >& itkOutputImage, int component)
+  {
+    if (mitkImage->GetPixelType().GetNumberOfComponents() == 1) {
+      CastToItkImage(mitkImage, itkOutputImage);
+    } else {
+      typename itk::VectorImage<TPixelType, VImageDimension>::Pointer temp = itk::VectorImage<TPixelType, VImageDimension>::New();
+      CastToItkImage(mitkImage, temp);
+
+      using ComponentFilterType = itk::VectorIndexSelectionCastImageFilter<itk::VectorImage<TPixelType, VImageDimension>, itk::Image<TPixelType, VImageDimension>>;
+      typename ComponentFilterType::Pointer componentFilter = ComponentFilterType::New();
+      componentFilter->SetIndex(component);
+      componentFilter->SetInput(temp);
+      componentFilter->Update();
+      itkOutputImage = componentFilter->GetOutput();
+    }
+  }
 
   /**
    * @brief Cast an itk::Image (with a specific type) to an mitk::Image.

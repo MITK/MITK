@@ -13,14 +13,17 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
+
 #include "mitkExtractSliceFilter.h"
-#include <vtkImageData.h>
-#include <vtkSmartPointer.h>
-#include <vtkLinearTransform.h>
-#include <vtkImageChangeInformation.h>
+
 #include <mitkAbstractTransformGeometry.h>
-#include <vtkGeneralTransform.h>
 #include <mitkPlaneClipping.h>
+
+#include <vtkGeneralTransform.h>
+#include <vtkImageChangeInformation.h>
+#include <vtkImageData.h>
+#include <vtkImageExtractComponents.h>
+#include <vtkLinearTransform.h>
 
 mitk::ExtractSliceFilter::ExtractSliceFilter(vtkImageReslice* reslicer ){
   if(reslicer == nullptr){
@@ -43,6 +46,7 @@ mitk::ExtractSliceFilter::ExtractSliceFilter(vtkImageReslice* reslicer ){
   m_ZMax = 0;
   m_VtkOutputRequested = false;
   m_BackgroundLevel = -32768.0;
+  m_Component = 0;
 }
 
 mitk::ExtractSliceFilter::~ExtractSliceFilter(){
@@ -116,7 +120,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
     return;
   }
 
-  /*================#BEGIN setup vtkImageRslice properties================*/
+  /*================#BEGIN setup vtkImageReslice properties================*/
   Point3D origin;
   Vector3D right, bottom, normal;
   double widthInMM, heightInMM;
@@ -174,7 +178,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
   else{
     if ( planeGeometry != nullptr )
     {
-      //if the worldGeomatry is a PlaneGeometry everthing is straight forward
+      //if the worldGeomatry is a PlaneGeometry everything is straight forward
 
       origin = planeGeometry->GetOrigin();
       right  = planeGeometry->GetAxisVector( 0 );
@@ -224,7 +228,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
       origin += right * ( m_OutPutSpacing[0] * 0.5 );
       origin += bottom * ( m_OutPutSpacing[1] * 0.5 );
 
-      //set the tranform for reslicing.
+      //set the transform for reslicing.
       // Use inverse transform of the input geometry for reslicing the 3D image.
       // This is needed if the image volume already transformed
       if(m_ResliceTransform.IsNotNull())
@@ -262,7 +266,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
 
   /*setup the plane where vktImageReslice extracts the slice*/
 
-  //ResliceAxesOrigin is the ancor point of the plane
+  //ResliceAxesOrigin is the anchor point of the plane
   double originInVtk[3];
   itk2vtk(origin, originInVtk);
   m_Reslicer->SetResliceAxesOrigin(originInVtk);
@@ -337,34 +341,48 @@ void mitk::ExtractSliceFilter::GenerateData(){
 
   m_Reslicer->SetOutputSpacing( m_OutPutSpacing[0], m_OutPutSpacing[1], m_ZSpacing );
 
-  //TODO check the following lines, they are responsible wether vtk error outputs appear or not
+  //TODO check the following lines, they are responsible whether vtk error outputs appear or not
   m_Reslicer->UpdateWholeExtent(); //this produces a bad allocation error for 2D images
   //m_Reslicer->GetOutput()->UpdateInformation();
   //m_Reslicer->GetOutput()->SetUpdateExtentToWholeExtent();
 
   //start the pipeline
   m_Reslicer->Update();
-
-  /*================ #END setup vtkImageRslice properties================*/
+  /*================ #END setup vtkImageReslice properties================*/
 
   if(m_VtkOutputRequested){
-    return;
-    //no converting to mitk
+    //no conversion to mitk
     //no mitk geometry will be set, as the output is vtkImageData only!!!
+    //no image component will be extracted, as the caller might need the whole multi-component image as vtk output
+    return;
   }
   else
   {
-    /*================ #BEGIN Get the slice from vtkImageReslice and convert it to mit::Image================*/
-    vtkImageData* reslicedImage;
-    reslicedImage = m_Reslicer->GetOutput();
+   auto reslicedImage = vtkSmartPointer<vtkImageData>::New();
+   reslicedImage = m_Reslicer->GetOutput();
 
-    if(!reslicedImage)
+    if(nullptr == reslicedImage)
     {
       itkWarningMacro(<<"Reslicer returned empty image");
       return;
     }
 
-    mitk::Image::Pointer resultImage = this->GetOutput();
+    /*================ #BEGIN Extract component from image slice ================*/
+    int numberOfScalarComponent = reslicedImage->GetNumberOfScalarComponents();
+    if (numberOfScalarComponent > 1 && static_cast<unsigned int>(numberOfScalarComponent) >= m_Component)
+    {
+      // image has more than one component, extract the correct component information with the given 'component' parameter
+      auto vectorComponentExtractor = vtkSmartPointer<vtkImageExtractComponents>::New();
+      vectorComponentExtractor->SetInputData(reslicedImage);
+      vectorComponentExtractor->SetComponents(m_Component);
+      vectorComponentExtractor->Update();
+
+      reslicedImage = vectorComponentExtractor->GetOutput();
+    }
+    /*================ #END Extract component from image slice ================*/
+
+    /*================ #BEGIN Convert the slice to an mitk::Image ================*/
+    mitk::Image::Pointer resultImage = GetOutput();
 
     //initialize resultimage with the specs of the vtkImageData object returned from vtkImageReslice
     if (reslicedImage->GetDataDimension() == 1)
@@ -402,7 +420,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
 
     /*At this point we have to adjust the geometry because the origin isn't correct.
     The wrong origin is related to the rotation of the current world geometry plane.
-    This causes errors on transfering world to index coordinates. We just shift the
+    This causes errors on transferring world to index coordinates. We just shift the
     origin in each direction about the amount of the expanding (needed while rotating
     the plane).
     */
@@ -431,7 +449,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
     boundsCopy[3] =  yMax - yMin;
     resultImage->GetGeometry()->SetBounds(boundsCopy);
 
-    /*================ #END Get the slice from vtkImageReslice and convert it to mitk Image================*/
+    /*================ #END Convert the slice to an mitk::Image ================*/
   }
 }
 

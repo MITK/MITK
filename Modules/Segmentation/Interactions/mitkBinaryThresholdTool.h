@@ -61,7 +61,7 @@ namespace mitk
     BinaryThresholdTool(); // purposely hidden
     virtual ~BinaryThresholdTool();
 
-    virtual void runItkThreshold(Image::Pointer feedbackImage3D, Image::Pointer previewImage, unsigned int timeStep) override;
+    virtual void runItkThreshold(Image::Pointer imageToThreshold, Image::Pointer previewImage) override;
     virtual void updateThresholdValue() override;
   };
 

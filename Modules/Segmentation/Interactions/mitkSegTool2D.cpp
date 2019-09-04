@@ -209,20 +209,24 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation (const Image* slice, const Imag
 }
 
 
-mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const InteractionPositionEvent* positionEvent, const Image* image)
+mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const InteractionPositionEvent* positionEvent, const Image* image, unsigned int component /*= 0*/)
 {
-  if (!positionEvent) return NULL;
+  if (!positionEvent) {
+    return nullptr;
+  }
 
   assert( positionEvent->GetSender() ); // sure, right?
-  unsigned int timeStep = positionEvent->GetSender()->GetTimeStep( image ); // get the timestep of the visible part (time-wise) of the image
+  unsigned int timeStep = positionEvent->GetSender()->GetTimeStep(image); // get the timestep of the visible part (time-wise) of the image
 
-  return this->GetAffectedImageSliceAs2DImage(positionEvent->GetSender()->GetCurrentWorldPlaneGeometry(), image, timeStep);
+  return this->GetAffectedImageSliceAs2DImage(positionEvent->GetSender()->GetCurrentWorldPlaneGeometry(), image, timeStep, component);
 }
 
 
-mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const PlaneGeometry* planeGeometry, const Image* image, unsigned int timeStep)
+mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const PlaneGeometry* planeGeometry, const Image* image, unsigned int timeStep, unsigned int component /*= 0*/)
 {
-  if ( !image || !planeGeometry ) return NULL;
+  if (!image || !planeGeometry) {
+    return nullptr;
+  }
 
   //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
   vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
@@ -236,7 +240,10 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Plane
   extractor->SetTimeStep( timeStep );
   extractor->SetWorldGeometry( planeGeometry );
   extractor->SetVtkOutputRequest(false);
-  extractor->SetResliceTransformByGeometry( image->GetTimeGeometry()->GetGeometryForTimeStep( timeStep ) );
+  extractor->SetResliceTransformByGeometry(image->GetTimeGeometry()->GetGeometryForTimeStep(timeStep));
+  // additionally extract the given component
+  // default is 0; the extractor checks for multi-component images
+  extractor->SetComponent(component);
   extractor->SetInPlaneResampleExtentByGeometry(true);
 
   extractor->Modified();
@@ -251,10 +258,14 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Plane
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedWorkingSlice(const InteractionPositionEvent* positionEvent)
 {
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-  if ( !workingNode ) return NULL;
+  if (!workingNode) {
+    return nullptr;
+  }
 
   Image* workingImage = dynamic_cast<Image*>(workingNode->GetData());
-  if ( !workingImage ) return NULL;
+  if (!workingImage) {
+    return nullptr;
+  }
 
   return GetAffectedImageSliceAs2DImage( positionEvent, workingImage );
 }
@@ -263,12 +274,22 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedWorkingSlice(const InteractionP
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const InteractionPositionEvent* positionEvent)
 {
   DataNode* referenceNode( m_ToolManager->GetReferenceData(0) );
-  if ( !referenceNode ) return NULL;
+  if (!referenceNode) {
+    return nullptr;
+  }
 
   Image* referenceImage = dynamic_cast<Image*>(referenceNode->GetData());
-  if ( !referenceImage ) return NULL;
+  if (!referenceImage) {
+    return nullptr;
+  }
 
-  return GetAffectedImageSliceAs2DImage( positionEvent, referenceImage );
+  int displayedComponent = 0;
+  if (referenceNode->GetIntProperty("Image.Displayed Component", displayedComponent)) {
+    // found the displayed component
+    return GetAffectedImageSliceAs2DImage(positionEvent, referenceImage, displayedComponent);
+  } else {
+    return GetAffectedImageSliceAs2DImage(positionEvent, referenceImage);
+  }
 }
 
 void mitk::SegTool2D::WriteBackSegmentationResult (const InteractionPositionEvent* positionEvent, Image* slice)

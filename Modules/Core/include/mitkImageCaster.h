@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkCastImageFilter.h>
 #include <itkExtractImageFilter.h>
 #include <itkImage.h>
+#include <itkVectorIndexSelectionCastImageFilter.h>
 
 #include <vtkRenderWindow.h>
 
@@ -93,6 +94,23 @@ namespace mitk
 
     image3d->InitializeByItk<OutputImageType>(extractor->GetOutput());
     image3d->SetVolume(extractor->GetOutput()->GetBufferPointer());
+  }
+
+  template<typename TPixel, unsigned int VImageDimension>
+  void extractComponentFromVectorByItk(itk::VectorImage<TPixel, VImageDimension>* itkVectorImage, mitk::Image* mitkImage, int component)
+  {
+    typedef itk::VectorImage<TPixel, VImageDimension> InputImageType;
+    typedef itk::Image<TPixel, VImageDimension> OutputImageType;
+    typedef itk::VectorIndexSelectionCastImageFilter<InputImageType, OutputImageType> ComponentFilterType;
+
+    typename ComponentFilterType::Pointer extractor = ComponentFilterType::New();
+
+    extractor->SetInput(itkVectorImage);
+    extractor->SetIndex(component);
+    extractor->Update();
+
+    mitkImage->InitializeByItk<OutputImageType>(extractor->GetOutput());
+    mitkImage->SetVolume(extractor->GetOutput()->GetBufferPointer());
   }
 
   template<typename TPixel, unsigned int VImageDimension = 3U>

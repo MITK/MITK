@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToolManager.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkImageCast.h"
+#include "mitkImageCaster.h"
 #include "mitkITKImageImport.h"
 #include "mitkRenderingManager.h"
 #include <mitkSliceNavigationController.h>
@@ -100,8 +101,16 @@ void mitk::WatershedTool::DoIt()
   mitk::Image::Pointer output;
 
   try {
+    int displayedComponent = 0;
+    referenceData->GetIntProperty("Image.Displayed Component", displayedComponent);
+
     // create and run itk filter pipeline
-    AccessByItk_1(input.GetPointer(),ITKWatershed,output);
+    if (input->GetPixelType().GetNumberOfComponents() > 1) {
+      mitk::Image::Pointer temp = mitk::Image::New();
+      AccessVectorPixelTypeByItk_n(input, mitk::extractComponentFromVectorByItk, (temp, displayedComponent));
+      input = temp;
+    }
+    AccessByItk_1(input.GetPointer(), ITKWatershed, output);
 
     // create a new datanode for output
     mitk::DataNode::Pointer dataNode = mitk::DataNode::New();

@@ -92,7 +92,7 @@ void mitk::BinaryThresholdTool::updateThresholdValue()
   ThresholdingValueChanged.Send(m_CurrentLowerThresholdValue);
 }
 
-void mitk::BinaryThresholdTool::runItkThreshold(Image::Pointer feedbackImage3D, Image::Pointer previewImage, unsigned int timeStep)
+void mitk::BinaryThresholdTool::runItkThreshold(Image::Pointer imageToThreshold, Image::Pointer previewImage)
 {
-  AccessByItk_n(feedbackImage3D, ITKThresholding, (previewImage, m_CurrentLowerThresholdValue, m_SensibleMaximumThresholdValue, timeStep));
+  AccessByItk_n(imageToThreshold, ITKThresholding, (previewImage, m_CurrentLowerThresholdValue, m_SensibleMaximumThresholdValue));
 }

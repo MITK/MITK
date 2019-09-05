@@ -579,16 +579,20 @@ void mitk::SmartBrushTool::CheckIfCurrentSliceHasChanged(const mitk::PlaneGeomet
     m_StrokeBuffer = inputThresholdFilter->GetOutput();
 
     m_OriginalImage = InternalImageType::New();
+
+    int displayedComponent = 0;
+    refNode->GetIntProperty("Image.Displayed Component", displayedComponent);
+
     if (referenceImage->GetDimension() == 4) {
       int curTimeStep = m_Windows.front()->GetSliceNavigationController()->GetTime()->GetPos();
 
       Image::Pointer mitkImage3d = mitk::Image::New();
       AccessFixedDimensionByItk_n(referenceImage, extract3Dfrom4DByItk, 4U, (mitkImage3d, curTimeStep));
-      mitk::CastToItkImage(mitkImage3d, m_OriginalImage);
+      mitk::CastToItkImageSingleComponent(mitkImage3d, m_OriginalImage, displayedComponent);
     } else {
-      mitk::CastToItkImage(referenceImage, m_OriginalImage);
+      mitk::CastToItkImageSingleComponent(referenceImage, m_OriginalImage, displayedComponent);
     }
-
+    
     mitk::LevelWindow levelWindow;
     refNode->GetLevelWindow(levelWindow);
 

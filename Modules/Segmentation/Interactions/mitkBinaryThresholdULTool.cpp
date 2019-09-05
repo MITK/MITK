@@ -16,6 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBinaryThresholdULTool.h"
 
+#include <itkBinaryThresholdImageFilter.h>
+#include <itkImageRegionIterator.h>
+
 #include "mitkToolManager.h"
 
 #include "mitkLevelWindowProperty.h"
@@ -27,11 +30,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSliceNavigationController.h>
 
 #include "mitkImageCast.h"
+#include "mitkImageCaster.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkImageStatisticsHolder.h"
 #include "mitkImageTimeSelector.h"
-#include <itkImageRegionIterator.h>
-#include <itkBinaryThresholdImageFilter.h>
 #include "mitkMaskAndCutRoiImageFilter.h"
 #include "mitkPadImageFilter.h"
 #include "mitkLabelSetImage.h"
@@ -284,7 +286,7 @@ void mitk::BinaryThresholdULTool::OnRoiDataChanged()
 }
 
 template <typename TPixel, unsigned int VImageDimension>
-void mitk::BinaryThresholdULTool::ITKThresholding(itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image::Pointer segmentation, double lower, double upper, unsigned int timeStep)
+void mitk::BinaryThresholdULTool::ITKThresholding(itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image::Pointer segmentation, double lower, double upper)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<mitk::Tool::DefaultSegmentationDataType, VImageDimension> SegmentationType;
@@ -305,6 +307,10 @@ void mitk::BinaryThresholdULTool::UpdatePreview()
 {
   mitk::Image::Pointer thresholdImage = dynamic_cast<mitk::Image*> (m_NodeForThresholding->GetData());
   mitk::Image::Pointer previewImage = dynamic_cast<mitk::Image*> (m_ThresholdFeedbackNode->GetData());
+
+  int displayedComponent = 0;
+  m_NodeForThresholding->GetIntProperty("Image.Displayed Component", displayedComponent);
+
   if(thresholdImage && previewImage)
   {
     for (unsigned int timeStep = 0; timeStep < thresholdImage->GetTimeSteps(); ++timeStep)
@@ -315,13 +321,19 @@ void mitk::BinaryThresholdULTool::UpdatePreview()
       timeSelector->UpdateLargestPossibleRegion();
       Image::Pointer feedBackImage3D = timeSelector->GetOutput();
 
-      runItkThreshold(feedBackImage3D, previewImage, timeStep);
+      if (feedBackImage3D->GetPixelType().GetNumberOfComponents() > 1) {
+        mitk::Image::Pointer temp = mitk::Image::New();
+        AccessVectorPixelTypeByItk_n(feedBackImage3D, mitk::extractComponentFromVectorByItk, (temp, displayedComponent));
+        feedBackImage3D = temp;
+      }
+
+      runItkThreshold(feedBackImage3D, previewImage);
     }
     RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 
-void mitk::BinaryThresholdULTool::runItkThreshold(Image::Pointer feedbackImage3D, Image::Pointer previewImage, unsigned int timeStep)
+void mitk::BinaryThresholdULTool::runItkThreshold(Image::Pointer imageToThreshold, Image::Pointer previewImage)
 {
-  AccessByItk_n(feedbackImage3D, ITKThresholding, (previewImage, m_CurrentLowerThresholdValue, m_CurrentUpperThresholdValue, timeStep));
+  AccessByItk_n(imageToThreshold, ITKThresholding, (previewImage, m_CurrentLowerThresholdValue, m_CurrentUpperThresholdValue));
 }

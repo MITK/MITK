@@ -71,7 +71,7 @@ namespace mitk
     virtual ~BinaryThresholdULTool();
 
     virtual void SetupPreviewNode();
-    virtual void runItkThreshold(Image::Pointer feedbackImage3D, Image::Pointer previewImage, unsigned int timeStep);
+    virtual void runItkThreshold(Image::Pointer imageToThreshold, Image::Pointer previewImage);
     virtual void updateThresholdValue();
 
     void UpdatePreview();
@@ -93,8 +93,7 @@ namespace mitk
       VImageDimension>* originalImage,
       mitk::Image::Pointer segmentation,
       double lower,
-      double upper,
-      unsigned int timeStep
+      double upper
     );
   };
 

@@ -37,6 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkOrImageFilter.h"
 #include "mitkImageCast.h"
+#include "mitkImageCaster.h"
 #include "QmitkConfirmSegmentationDialog.h"
 
 #include "mitkPixelTypeMultiplex.h"
@@ -237,8 +238,6 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
 
             if(image->GetGeometry()->IsIndexInside(currentIndex))
             {
-                int component = 0;
-                m_InputImageNode->GetIntProperty("Image.Displayed Component", component);
               mitkPixelTypeMultiplex4(mitk::FastSinglePixelAccess,image->GetChannelDescriptor().GetPixelType(),image,NULL,currentIndex,pixelValues[pos]);
 
               pos++;
@@ -360,25 +359,32 @@ void QmitkAdaptiveRegionGrowingToolGUI::RunSegmentation()
 
   mitk::Image::Pointer orgImage = dynamic_cast<mitk::Image*> (m_InputImageNode->GetData());
 
-  if (orgImage.IsNotNull())
-  {
-      if (orgImage->GetDimension() == 4)
-      {
+  int displayedComponent = 0;
+  m_InputImageNode->GetIntProperty("Image.Displayed Component", displayedComponent);
+
+  if (orgImage.IsNotNull()) {
+      if (orgImage->GetDimension() == 4) {
           mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
           timeSelector->SetInput(orgImage);
           timeSelector->SetTimeNr( timeStep );
           timeSelector->UpdateLargestPossibleRegion();
           mitk::Image* timedImage = timeSelector->GetOutput();
-          AccessByItk_2( timedImage , StartRegionGrowing, timedImage->GetGeometry(), seedPoint);
-      }
-      else if (orgImage->GetDimension() == 3)
-      {
+          if (timedImage->GetPixelType().GetNumberOfComponents() > 1) {
+            mitk::Image::Pointer temp = mitk::Image::New();
+            AccessVectorPixelTypeByItk_n(timedImage, mitk::extractComponentFromVectorByItk, (temp, displayedComponent));
+            timedImage = temp;
+          }
+          AccessByItk_2(timedImage, StartRegionGrowing, timedImage->GetGeometry(), seedPoint);
+      } else if (orgImage->GetDimension() == 3) {
+          if (orgImage->GetPixelType().GetNumberOfComponents() > 1) {
+            mitk::Image::Pointer temp = mitk::Image::New();
+            AccessVectorPixelTypeByItk_n(orgImage, mitk::extractComponentFromVectorByItk, (temp, displayedComponent));
+            orgImage = temp;
+          }
           //QApplication::setOverrideCursor(QCursor(Qt::WaitCursor)); //set the cursor to waiting
           AccessByItk_2(orgImage, StartRegionGrowing, orgImage->GetGeometry(), seedPoint);
           //QApplication::restoreOverrideCursor();//reset cursor
-      }
-      else
-      {
+      } else {
           QApplication::restoreOverrideCursor();//reset cursor
           QMessageBox::information( NULL, tr("Adaptive Region Growing functionality"),
             tr("Only images of dimension 3 or 4 can be processed!"));
@@ -738,8 +744,11 @@ void QmitkAdaptiveRegionGrowingToolGUI::ConfirmSegmentation()
 template<typename TPixel, unsigned int VImageDimension>
 void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImageDimension>* itkImage)
 {
-  mitk::Image::Pointer originalSegmentation = dynamic_cast<mitk::Image*>(this->m_RegionGrow3DTool->
-                                                                         GetTargetSegmentationNode()->GetData());
+  mitk::DataNode::Pointer targetSegmentation = m_RegionGrow3DTool->GetTargetSegmentationNode();
+  mitk::Image::Pointer originalSegmentation = dynamic_cast<mitk::Image*>(targetSegmentation->GetData());
+  
+  int displayedComponent = 0;
+  m_InputImageNode->GetIntProperty("Image.Displayed Component", displayedComponent);
 
   int timeStep = mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1") )->GetTimeStep();
 
@@ -751,17 +760,14 @@ void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImag
 
     //select single 3D volume if we have more than one time step
     typename SegmentationType::Pointer originalSegmentationInITK = SegmentationType::New();
-    if(originalSegmentation->GetTimeGeometry()->CountTimeSteps() > 1)
-    {
+    if(originalSegmentation->GetTimeGeometry()->CountTimeSteps() > 1) {
       mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
       timeSelector->SetInput( originalSegmentation );
       timeSelector->SetTimeNr( timeStep );
       timeSelector->UpdateLargestPossibleRegion();
-      CastToItkImage( timeSelector->GetOutput(), originalSegmentationInITK );
-    }
-    else //use original
-    {
-      CastToItkImage( originalSegmentation, originalSegmentationInITK );
+      CastToItkImage(timeSelector->GetOutput(), originalSegmentationInITK);
+    } else { // Use original
+      CastToItkImage(originalSegmentation, originalSegmentationInITK);
     }
 
     //Fill current preiview image in segmentation image
@@ -797,6 +803,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImag
 
 
     //combine current working segmentation image with our region growing result
+    originalSegmentation->InitializeByItk<SegmentationType>(originalSegmentationInITK);
     originalSegmentation->SetVolume( (void*)(originalSegmentationInITK->GetPixelContainer()->GetBufferPointer()), timeStep);
 
     originalSegmentation->Modified();

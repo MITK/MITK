@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkILifecycleAwarePart.h>
 #include <berryIPartListener.h>
 #include <mitkPropertyRelations.h>
+#include <QmitkImageStatisticsCalculationRunnable.h>
 
 /*!
 \brief QmitkImageStatisticsView is a bundle that allows statistics calculation from images. Three modes
@@ -116,5 +117,6 @@ private:
   std::vector<mitk::DataNode::Pointer> m_selectedMaskNodes;
   std::vector<mitk::DataNode::Pointer> m_selectedImageNodes;
   std::vector<mitk::ImageStatisticsContainer::ConstPointer> m_StatisticsForSelection;
+  std::vector<QmitkImageStatisticsCalculationRunnable*> m_Runnables;
 };
 #endif // QmitkImageStatisticsView_H__INCLUDED

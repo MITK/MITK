@@ -34,6 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkStatisticsToImageRelationRule.h>
 #include <mitkStatisticsToMaskRelationRule.h>
 #include <mitkStatusBar.h>
+#include <qthreadpool.h>
 
 #include "mitkImageStatisticsContainerManager.h"
 #include <mitkPlanarFigureInteractor.h>
@@ -679,12 +680,15 @@ void QmitkImageStatisticsView::CalculateStatistics(const mitk::Image *image,
                                                    const mitk::Image *mask,
                                                    const mitk::PlanarFigure *maskPlanarFigure)
 {
-  this->m_CalculationJob->Initialize(image, mask, maskPlanarFigure);
-
+	auto runnable = new QmitkImageStatisticsCalculationRunnable();
+	runnable->Initialize(image, mask, maskPlanarFigure);
+	runnable->setAutoDelete(false);
+	m_Runnables.push_back(runnable);
   try
   {
     // Compute statistics
-    this->m_CalculationJob->start();
+    //this->m_CalculationJob->start();
+	QThreadPool::globalInstance()->start(runnable);
     m_Controls.label_currentlyComputingStatistics->setVisible(true);
   }
   catch (const mitk::Exception &e)

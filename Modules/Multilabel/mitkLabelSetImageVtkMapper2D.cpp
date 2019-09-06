@@ -276,7 +276,11 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
     int pixelValue = image->GetActiveLabel()->GetValue();
     //MITK_INFO << "pixValue VTK " << pixelValue;
     //generate contours/outlines
-    localStorage->m_OutlinePolyData = localStorage->m_LayerMapperVector[image->GetActiveLayer()]->GetInput();
+    if (contourAll || contourActive) {
+      localStorage->m_OutlinePolyData = localStorage->m_LayerMapperVector[image->GetActiveLayer()]->GetInput();
+    } else {
+      localStorage->m_OutlinePolyData = this->CreateOutlinePolyData(renderer, localStorage->m_ReslicedImageVector[image->GetActiveLayer()], pixelValue);
+    }
     localStorage->m_OutlineActor->SetVisibility(true);
     localStorage->m_OutlineShadowActor->SetVisibility(true);
     const mitk::Color& color = image->GetActiveLabel()->GetColor();

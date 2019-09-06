@@ -79,11 +79,7 @@ void mitk::OCLDelayCalculation::Execute()
   }
 
   // This calculation is the same for all kernels, so for performance reasons simply perform it here instead of within the kernels
-  if (m_Conf->GetDelayCalculationMethod() == BeamformingSettings::DelayCalc::QuadApprox)
-    m_DelayMultiplicatorRaw = pow(1 / (m_Conf->GetTimeSpacing()*m_Conf->GetSpeedOfSound()) *
-      m_Conf->GetPitchInMeters() * (float)m_Conf->GetTransducerElements() / (float)m_Conf->GetInputDim()[0], 2) / 2;
-  else if (m_Conf->GetDelayCalculationMethod() == BeamformingSettings::DelayCalc::Spherical)
-    m_DelayMultiplicatorRaw = 1 / (m_Conf->GetTimeSpacing()*m_Conf->GetSpeedOfSound()) *
+  m_DelayMultiplicatorRaw = 1 / (m_Conf->GetTimeSpacing()*m_Conf->GetSpeedOfSound()) *
     (m_Conf->GetPitchInMeters()*(float)m_Conf->GetTransducerElements());
 
   // as openCL does not support bool as a kernel argument, we need to buffer this value in a char...
@@ -107,7 +103,6 @@ void mitk::OCLDelayCalculation::Execute()
   clErr |= clSetKernelArg(this->m_PixelCalculation, 6, sizeof(cl_char), &(this->m_IsPAImage));
   clErr |= clSetKernelArg(this->m_PixelCalculation, 7, sizeof(cl_float), &(this->m_DelayMultiplicatorRaw));
   clErr |= clSetKernelArg(this->m_PixelCalculation, 8, sizeof(cl_float), &(totalSamples_i));
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 9, sizeof(cl_float), &(probeRadius));
 
   CHECK_OCL_ERR(clErr);
 
@@ -130,10 +125,7 @@ bool mitk::OCLDelayCalculation::Initialize()
 
   if (OclFilter::Initialize())
   {
-    if (m_Conf->GetDelayCalculationMethod() == BeamformingSettings::DelayCalc::QuadApprox)
-      this->m_PixelCalculation = clCreateKernel(this->m_ClProgram, "ckDelayCalculationQuad", &clErr);
-    if (m_Conf->GetDelayCalculationMethod() == BeamformingSettings::DelayCalc::Spherical)
-      this->m_PixelCalculation = clCreateKernel(this->m_ClProgram, "ckDelayCalculationSphe", &clErr);
+    this->m_PixelCalculation = clCreateKernel(this->m_ClProgram, "ckDelayCalculationSphe", &clErr);
     buildErr |= CHECK_OCL_ERR(clErr);
   }
   return (OclFilter::IsInitialized() && buildErr);

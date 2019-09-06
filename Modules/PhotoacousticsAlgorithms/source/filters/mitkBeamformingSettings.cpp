@@ -29,7 +29,6 @@ mitk::BeamformingSettings::BeamformingSettings(float pitchInMeters,
   float reconstructionDepth,
   bool useGPU,
   unsigned int GPUBatchSize,
-  DelayCalc delayCalculationMethod,
   Apodization apod,
   unsigned int apodizationArraySize,
   BeamformingAlgorithm algorithm,
@@ -46,7 +45,6 @@ mitk::BeamformingSettings::BeamformingSettings(float pitchInMeters,
   m_ReconstructionDepth(reconstructionDepth),
   m_UseGPU(useGPU),
   m_GPUBatchSize(GPUBatchSize),
-  m_DelayCalculationMethod(delayCalculationMethod),
   m_Apod(apod),
   m_ApodizationArraySize(apodizationArraySize),
   m_Algorithm(algorithm),
@@ -72,10 +70,35 @@ mitk::BeamformingSettings::BeamformingSettings(float pitchInMeters,
     m_ApodizationFunction = mitk::BeamformingUtils::BoxFunction(GetApodizationArraySize());
     break;
   }
-
   m_InputDim = new unsigned int[3]{ inputDim[0], inputDim[1], inputDim[2] };
-
   m_TransducerElements = m_InputDim[0];
+
+  m_ElementHeights = new float[m_TransducerElements];
+  m_ElementPositions = new float[m_TransducerElements];
+
+  if (m_Geometry == ProbeGeometry::Concave)
+  {
+    float openingAngle = (m_TransducerElements * m_PitchInMeters) / (probeRadius * 2 * itk::Math::pi) * 2 * itk::Math::pi;
+    m_VerticalExtent = std::sin(openingAngle / 2.f) * probeRadius * 2.f;
+
+    float elementAngle = 0;
+
+    for (unsigned int i = 0; i < m_TransducerElements; ++i)
+    {
+      elementAngle = ((i- m_TransducerElements /2.f) * m_PitchInMeters) / (probeRadius * 2 * itk::Math::pi) * 2 * itk::Math::pi;
+      m_ElementHeights[i] = probeRadius - std::cos(elementAngle) * probeRadius;
+      m_ElementPositions[i] = m_VerticalExtent/2.f + std::sin(elementAngle) * probeRadius;
+    }
+  }
+  else
+  {
+    m_VerticalExtent = m_PitchInMeters * m_TransducerElements;
+    for (unsigned int i = 0; i < m_TransducerElements; ++i)
+    {
+      m_ElementHeights[i] = 0;
+      m_ElementPositions[i] = i * m_PitchInMeters;
+    }
+  }
 }
 
 mitk::BeamformingSettings::~BeamformingSettings()
@@ -95,6 +118,21 @@ mitk::BeamformingSettings::~BeamformingSettings()
     delete[] m_InputDim;
     MITK_INFO << "Deleting input dim...[Done]";
   }
+
+  if (m_ElementHeights != nullptr)
+  {
+    MITK_INFO << "Deleting input dim...";
+    delete[] m_ElementHeights;
+    MITK_INFO << "Deleting input dim...[Done]";
+  }
+
+  if (m_ElementPositions != nullptr)
+  {
+    MITK_INFO << "Deleting input dim...";
+    delete[] m_ElementHeights;
+    MITK_INFO << "Deleting input dim...[Done]";
+  }
+
 
   MITK_INFO << "Destructing beamforming settings...[Done]";
 }

@@ -257,7 +257,7 @@ void PAImageProcessing::BatchProcessing()
           BFconfig = mitk::BeamformingSettings::New(BFconfig->GetPitchInMeters(), BFconfig->GetSpeedOfSound(),
             BFconfig->GetTimeSpacing(), BFconfig->GetAngle(), BFconfig->GetIsPhotoacousticImage(), BFconfig->GetSamplesPerLine(),
             BFconfig->GetReconstructionLines(), image->GetDimensions(), BFconfig->GetReconstructionDepth(),
-            BFconfig->GetUseGPU(), BFconfig->GetGPUBatchSize(), BFconfig->GetDelayCalculationMethod(), BFconfig->GetApod(),
+            BFconfig->GetUseGPU(), BFconfig->GetGPUBatchSize(), BFconfig->GetApod(),
             BFconfig->GetApodizationArraySize(), BFconfig->GetAlgorithm(), BFconfig->GetGeometry(), BFconfig->GetProbeRadius());
         }
       }
@@ -845,8 +845,6 @@ mitk::BeamformingSettings::Pointer PAImageProcessing::CreateBeamformingSettings(
   else if ("sDMAS" == m_Controls.BFAlgorithm->currentText())
     algorithm = mitk::BeamformingSettings::BeamformingAlgorithm::sDMAS;
 
-  mitk::BeamformingSettings::DelayCalc delay = mitk::BeamformingSettings::DelayCalc::Spherical;
-
   mitk::BeamformingSettings::Apodization apod = mitk::BeamformingSettings::Apodization::Box;
   if ("Von Hann" == m_Controls.Apodization->currentText())
   {
@@ -906,7 +904,7 @@ mitk::BeamformingSettings::Pointer PAImageProcessing::CreateBeamformingSettings(
 
   return mitk::BeamformingSettings::New(pitchInMeters,
     speedOfSound, timeSpacing, angle, isPAImage, samplesPerLine, reconstructionLines,
-    image->GetDimensions(), reconstructionDepth, useGPU, GPU_BATCH_SIZE, delay, apod,
+    image->GetDimensions(), reconstructionDepth, useGPU, GPU_BATCH_SIZE, apod,
     apodizatonArraySize, algorithm, geometry, probeRadius);
 }
 
@@ -1042,7 +1040,7 @@ void BeamformingThread::run()
     m_BFconfig = mitk::BeamformingSettings::New(m_BFconfig->GetPitchInMeters(), m_BFconfig->GetSpeedOfSound(),
       m_BFconfig->GetTimeSpacing(), m_BFconfig->GetAngle(), m_BFconfig->GetIsPhotoacousticImage(), m_BFconfig->GetSamplesPerLine(),
       m_BFconfig->GetReconstructionLines(), m_InputImage->GetDimensions(), m_BFconfig->GetReconstructionDepth(),
-      m_BFconfig->GetUseGPU(), m_BFconfig->GetGPUBatchSize(), m_BFconfig->GetDelayCalculationMethod(), m_BFconfig->GetApod(),
+      m_BFconfig->GetUseGPU(), m_BFconfig->GetGPUBatchSize(), m_BFconfig->GetApod(),
       m_BFconfig->GetApodizationArraySize(), m_BFconfig->GetAlgorithm(), m_BFconfig->GetGeometry(), m_BFconfig->GetProbeRadius());
   }
 

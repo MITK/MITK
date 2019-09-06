@@ -35,12 +35,6 @@ namespace mitk {
     mitkClassMacroItkParent(BeamformingSettings, itk::Object);
     itkCloneMacro(Self);
 
-    /** \brief Available delay calculation methods:
-    * - Spherical delay for best results.
-    * - DEPRECATED quadratic Taylor approximation for slightly faster results with hardly any quality loss.
-    */
-    enum DelayCalc { QuadApprox, Spherical };
-
     /** \brief Available apodization functions:
     * - Hamming function.
     * - Von-Hann function.
@@ -71,7 +65,6 @@ namespace mitk {
     itkGetConstMacro(InputDim, const unsigned int*);
     itkGetConstMacro(UseGPU, bool);
     itkGetConstMacro(GPUBatchSize, unsigned int);
-    itkGetConstMacro(DelayCalculationMethod, DelayCalc);
     itkGetConstMacro(ApodizationFunction, const float*);
     itkGetConstMacro(Apod, Apodization);
     itkGetConstMacro(ApodizationArraySize, int);
@@ -79,6 +72,9 @@ namespace mitk {
     itkGetConstMacro(ReconstructionDepth, float);
     itkGetConstMacro(Geometry, ProbeGeometry);
     itkGetConstMacro(ProbeRadius, float);
+    itkGetConstMacro(ElementHeights, float*);
+    itkGetConstMacro(ElementPositions, float*);
+    itkGetConstMacro(VerticalExtent, float);
 
     /** \brief function for mitk::PhotoacousticOCLBeamformingFilter to check whether buffers need to be updated
     * this method only checks parameters relevant for the openCL implementation
@@ -87,7 +83,6 @@ namespace mitk {
     {
       return !((abs(lhs->GetAngle() - rhs->GetAngle()) < 0.01f) && // 0.01 degree error margin
         (lhs->GetApod() == rhs->GetApod()) &&
-        (lhs->GetDelayCalculationMethod() == rhs->GetDelayCalculationMethod()) &&
         (lhs->GetGeometry() == rhs->GetGeometry()) &&
         (abs(lhs->GetProbeRadius() - rhs->GetProbeRadius()) < 0.001f) && 
         (lhs->GetIsPhotoacousticImage() == rhs->GetIsPhotoacousticImage()) &&
@@ -111,7 +106,6 @@ namespace mitk {
       float reconstructionDepth,
       bool useGPU,
       unsigned int GPUBatchSize,
-      DelayCalc delayCalculationMethod,
       Apodization apod,
       unsigned int apodizationArraySize,
       BeamformingAlgorithm algorithm,
@@ -129,7 +123,6 @@ namespace mitk {
         reconstructionDepth,
         useGPU,
         GPUBatchSize,
-        delayCalculationMethod,
         apod,
         apodizationArraySize,
         algorithm,
@@ -154,7 +147,6 @@ namespace mitk {
       float reconstructionDepth,
       bool useGPU,
       unsigned int GPUBatchSize,
-      DelayCalc delayCalculationMethod,
       Apodization apod,
       unsigned int apodizationArraySize,
       BeamformingAlgorithm algorithm,
@@ -212,10 +204,6 @@ namespace mitk {
     /** \brief Sets the amount of image slices in batches when GPU is used
     */
 
-    /** \brief Sets how the delays for beamforming should be calculated.
-    */
-    DelayCalc m_DelayCalculationMethod;
-
     const float* m_ApodizationFunction;
 
     /** \brief Sets the used apodization function.
@@ -237,6 +225,18 @@ namespace mitk {
     /** \brief Sets the radius of the curved probe [m]
     */
     float m_ProbeRadius;
+
+    /** 
+    */
+    float *m_ElementHeights;
+
+    /**
+    */
+    float *m_ElementPositions;
+
+    /**
+    */
+    float m_VerticalExtent;
   };
 }
 #endif //MITK_BEAMFORMING_SETTINGS

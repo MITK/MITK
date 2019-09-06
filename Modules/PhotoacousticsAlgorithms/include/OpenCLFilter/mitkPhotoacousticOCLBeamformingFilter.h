@@ -118,8 +118,7 @@ namespace mitk
     mitk::OCLUsedLinesCalculation::Pointer m_UsedLinesCalculation;
     mitk::OCLDelayCalculation::Pointer m_DelayCalculation;
 
-    cl_mem m_ApodizationBuffer;
-    cl_mem m_MemoryLocationsBuffer;
+    cl_mem m_ApodizationBuffer; 
     cl_mem m_DelaysBuffer;
     cl_mem m_UsedLinesBuffer;
   };

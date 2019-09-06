@@ -77,7 +77,7 @@ void mitk::BeamformingFilter::GenerateOutputInformation()
     return;
 
   mitk::Vector3D spacing;
-  spacing[0] = m_Conf->GetPitchInMeters() * m_Conf->GetTransducerElements() * 1000 / m_Conf->GetReconstructionLines();
+  spacing[0] = m_Conf->GetVerticalExtent() / m_Conf->GetReconstructionLines() * 1000;
   float desiredYSpacing = m_Conf->GetReconstructionDepth() * 1000 / m_Conf->GetSamplesPerLine();
   float maxYSpacing = m_Conf->GetSpeedOfSound() * m_Conf->GetTimeSpacing() * input->GetDimension(1) / m_Conf->GetSamplesPerLine() * 1000;
   spacing[1] = desiredYSpacing < maxYSpacing ? desiredYSpacing : maxYSpacing;
@@ -138,59 +138,26 @@ void mitk::BeamformingFilter::GenerateData()
       // every line will be beamformed in a seperate thread
       if (m_Conf->GetAlgorithm() == BeamformingSettings::BeamformingAlgorithm::DAS)
       {
-        if (m_Conf->GetDelayCalculationMethod() == BeamformingSettings::DelayCalc::QuadApprox)
+        for (short line = 0; line < outputDim[0]; ++line)
         {
-          for (short line = 0; line < outputDim[0]; ++line)
-          {
-            threads[line] = std::thread(&BeamformingUtils::DASQuadraticLine, m_InputData,
-              m_OutputData, inputDim, outputDim, line, m_Conf);
-          }
-        }
-        else if (m_Conf->GetDelayCalculationMethod() == BeamformingSettings::DelayCalc::Spherical)
-        {
-          for (short line = 0; line < outputDim[0]; ++line)
-          {
-            threads[line] = std::thread(&BeamformingUtils::DASSphericalLine, m_InputData,
-              m_OutputData, inputDim, outputDim, line, m_Conf);
-          }
+          threads[line] = std::thread(&BeamformingUtils::DASSphericalLine, m_InputData,
+            m_OutputData, inputDim, outputDim, line, m_Conf);
         }
       }
       else if (m_Conf->GetAlgorithm() == BeamformingSettings::BeamformingAlgorithm::DMAS)
       {
-        if (m_Conf->GetDelayCalculationMethod() == BeamformingSettings::DelayCalc::QuadApprox)
+        for (short line = 0; line < outputDim[0]; ++line)
         {
-          for (short line = 0; line < outputDim[0]; ++line)
-          {
-            threads[line] = std::thread(&BeamformingUtils::DMASQuadraticLine, m_InputData,
-              m_OutputData, inputDim, outputDim, line, m_Conf);
-          }
-        }
-        else if (m_Conf->GetDelayCalculationMethod() == BeamformingSettings::DelayCalc::Spherical)
-        {
-          for (short line = 0; line < outputDim[0]; ++line)
-          {
-            threads[line] = std::thread(&BeamformingUtils::DMASSphericalLine, m_InputData,
-              m_OutputData, inputDim, outputDim, line, m_Conf);
-          }
+          threads[line] = std::thread(&BeamformingUtils::DMASSphericalLine, m_InputData,
+            m_OutputData, inputDim, outputDim, line, m_Conf);
         }
       }
       else if (m_Conf->GetAlgorithm() == BeamformingSettings::BeamformingAlgorithm::sDMAS)
       {
-        if (m_Conf->GetDelayCalculationMethod() == BeamformingSettings::DelayCalc::QuadApprox)
+        for (short line = 0; line < outputDim[0]; ++line)
         {
-          for (short line = 0; line < outputDim[0]; ++line)
-          {
-            threads[line] = std::thread(&BeamformingUtils::sDMASQuadraticLine, m_InputData,
-              m_OutputData, inputDim, outputDim, line, m_Conf);
-          }
-        }
-        else if (m_Conf->GetDelayCalculationMethod() == BeamformingSettings::DelayCalc::Spherical)
-        {
-          for (short line = 0; line < outputDim[0]; ++line)
-          {
-            threads[line] = std::thread(&BeamformingUtils::sDMASSphericalLine, m_InputData,
-              m_OutputData, inputDim, outputDim, line, m_Conf);
-          }
+          threads[line] = std::thread(&BeamformingUtils::sDMASSphericalLine, m_InputData,
+            m_OutputData, inputDim, outputDim, line, m_Conf);
         }
       }
       // wait for all lines to finish

@@ -46,6 +46,11 @@ QmitkGeometryToolsView::~QmitkGeometryToolsView()
   }
 }
 
+QmitkGeometryToolsView::QmitkGeometryToolsView() :
+  m_CurrentGeometry(nullptr)
+{
+}
+
 void QmitkGeometryToolsView::SetFocus()
 {
   m_Controls.m_AddInteractor->setFocus();
@@ -88,9 +93,10 @@ void QmitkGeometryToolsView::OnSelectionChanged( berry::IWorkbenchPart::Pointer 
     if( node.IsNotNull() )
     {
       mitk::BaseData::Pointer basedata = node->GetData();
-      if (basedata.IsNotNull() && basedata->GetTimeGeometry()->IsValid())
+      if (basedata.IsNotNull() && basedata->GetTimeGeometry()->IsValid() && m_CurrentGeometry != basedata->GetTimeGeometry())
       {
-        mitk::RenderingManager::GetInstance()->InitializeViews(basedata->GetTimeGeometry());
+        m_CurrentGeometry = basedata->GetTimeGeometry();
+        mitk::RenderingManager::GetInstance()->InitializeViews(m_CurrentGeometry, mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
       }
       m_Controls.m_AddInteractor->setEnabled( true );
       return;

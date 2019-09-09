@@ -44,7 +44,7 @@ class QmitkGeometryToolsView : public QmitkAbstractView
   Q_OBJECT
 
   public:
-
+    QmitkGeometryToolsView();
     ~QmitkGeometryToolsView();
 
     static const std::string VIEW_ID;
@@ -105,6 +105,8 @@ protected:
                                      const QList<mitk::DataNode::Pointer>& nodes ) override;
 
     Ui::QmitkGeometryToolsViewControls m_Controls;
+
+    mitk::TimeGeometry::Pointer m_CurrentGeometry;
 };
 
 #endif // QmitkGeometryToolsView_h

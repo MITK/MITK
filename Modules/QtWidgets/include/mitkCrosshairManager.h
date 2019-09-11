@@ -99,7 +99,6 @@ public:
 
 signals:
   void crosshairModeChanged(CrosshairMode mode);
-  void savePlaneVisibilityIn3D(bool visibility);
 
 private:
   void addCrosshair(QmitkRenderWindow* window);

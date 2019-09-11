@@ -313,7 +313,8 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
     d->m_StdMultiWidget->GetRenderWindow4()->updateAllWindows();
 
-    connect(d->m_StdMultiWidget, &QmitkStdMultiWidget::savePlaneVisibility3D, this, [berryprefs, planeProperty] (bool state) {
+    connect(this, &QmitkStdMultiWidgetEditor::destroyed, this, [this, berryprefs, planeProperty] () {
+      auto state = d->m_StdMultiWidget->crosshairManager->getShowPlanesIn3D();
       berryprefs->PutBool(planeProperty, state);
     });
   }

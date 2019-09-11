@@ -303,8 +303,6 @@ signals:
   void WidgetNotifyNewCrossHairMode(int);
   void Moved();
 
-  void savePlaneVisibility3D(bool visibility);
-
 public:
 
   /** Define RenderWindow (public)*/

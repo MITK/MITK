@@ -472,7 +472,7 @@ QSplitter* QmitkStdMultiWidget::GetMainSplit()
 
 QmitkStdMultiWidget::~QmitkStdMultiWidget()
 {
-  emit savePlaneVisibility3D(crosshairManager->getShowPlanesIn3D());
+  emit saveCrosshairPreferences(crosshairManager->getShowPlanesIn3D(), crosshairManager->getCrosshairMode());
 
   DisablePositionTracking();
 

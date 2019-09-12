@@ -398,8 +398,6 @@ void QmitkStdMultiWidget::InitializeWidget(bool showPlanesIn3d)
   for (unsigned int i = 0; i < 4; i++) {
     crosshairManager->addWindow(GetRenderWindow(i));
   }
-
-  connect(crosshairManager, &mitkCrosshairManager::savePlaneVisibilityIn3D, this, &QmitkStdMultiWidget::savePlaneVisibility3D);
 }
 
 void QmitkStdMultiWidget::FillGradientBackgroundWithBlack()
@@ -474,6 +472,8 @@ QSplitter* QmitkStdMultiWidget::GetMainSplit()
 
 QmitkStdMultiWidget::~QmitkStdMultiWidget()
 {
+  emit saveCrosshairPreferences(crosshairManager->getShowPlanesIn3D(), crosshairManager->getCrosshairMode());
+
   DisablePositionTracking();
 
   m_TimeNavigationController->Disconnect(mitkWidget1->GetSliceNavigationController());

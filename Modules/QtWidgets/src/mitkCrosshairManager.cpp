@@ -24,7 +24,6 @@ mitkCrosshairManager::mitkCrosshairManager(const QString& parentWidget) :
 
 mitkCrosshairManager::~mitkCrosshairManager()
 {
-  emit savePlaneVisibilityIn3D(m_ShowPlanesIn3d);
 }
 
 void mitkCrosshairManager::setCrosshairMode(CrosshairMode mode)

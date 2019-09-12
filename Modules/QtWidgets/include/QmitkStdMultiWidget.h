@@ -302,6 +302,7 @@ signals:
   void WidgetPlaneModeChange(int);
   void WidgetNotifyNewCrossHairMode(int);
   void Moved();
+  void savePlaneVisibility3D(bool visibility);
 
 public:
 

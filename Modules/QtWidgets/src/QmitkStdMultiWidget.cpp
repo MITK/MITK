@@ -472,6 +472,8 @@ QSplitter* QmitkStdMultiWidget::GetMainSplit()
 
 QmitkStdMultiWidget::~QmitkStdMultiWidget()
 {
+  emit savePlaneVisibility3D(crosshairManager->getShowPlanesIn3D());
+
   DisablePositionTracking();
 
   m_TimeNavigationController->Disconnect(mitkWidget1->GetSliceNavigationController());

@@ -65,6 +65,7 @@ private:
   void createSurfaceCubes();
   void createNodes();
   void linkNodes();
+  void splitNodes();
   void relaxNodes();
   vtkSmartPointer<vtkPolyData> triangulateNodes();
 
@@ -77,7 +78,7 @@ private:
   struct SurfaceNode {
     std::shared_ptr<SurfaceCube> parent;
     Point3D pos; // World position
-    std::shared_ptr<SurfaceNode> neighbours[6]; // Order: Left, Right, Bottom, Top, Back, Front
+    std::shared_ptr<SurfaceNode> neighbours[12]; // Order: Left, Right, Bottom, Top, Back, Front, second set for splitting neighbours
     Vector3D relaxationForce;
     int index;
   };

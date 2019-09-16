@@ -69,10 +69,9 @@ __kernel void ckDMAS(
           {
             s_2 = dSource[(int)(globalPosZ * inputL * inputS + Delay2 * inputL + l_s2)];
             
-            mult = apodArray[(int)((l_s2 - minLine)*apod_mult)] * s_2
-              * apod_1 * s_1;
+            mult = apodArray[(int)((l_s2 - minLine)*apod_mult)] * s_2 * apod_1 * s_1;
               
-            output += sqrt(fabs(mult)) * ((mult > 0) - (mult < 0));
+            output += sqrt(fabs(mult)) * sign(mult);
           }
         }
       }
@@ -115,11 +114,6 @@ __kernel void ckDMAS_g(
   {
     int AddSample1 = 0;
     int AddSample2 = 0;
-    float l_i = 0;
-    float l_p = 0;
-    float s_i = 0;
-
-    float apod_mult = 1;
     
     float output = 0;
     
@@ -127,15 +121,17 @@ __kernel void ckDMAS_g(
     float s_2 = 0;
     float apod_1 = 0;
 
-    l_i = (float)globalPosX / outputL * inputL;
-    l_p = (float)globalPosX / outputL * horizontalExtent;
-    s_i = (float)globalPosY / outputS * totalSamples_i;
+    float l_i = (float)globalPosX / outputL * inputL;
+    float l_p = (float)globalPosX / outputL * horizontalExtent;
+    float s_i = (float)globalPosY / outputS * totalSamples_i;
 
     unsigned short curUsedLines = usedLines[globalPosY * 3 * outputL + 3 * globalPosX];
     unsigned short minLine = usedLines[globalPosY * 3 * outputL + 3 * globalPosX + 1];
     unsigned short maxLine = usedLines[globalPosY * 3 *outputL + 3 * globalPosX + 2];
 
-    apod_mult = (float)apodArraySize / curUsedLines;
+    float apod_mult = (float)apodArraySize / curUsedLines;
+
+    float multiplication = 0;
 
     for (int l_s1 = minLine; l_s1 < maxLine; ++l_s1)
     {
@@ -160,17 +156,14 @@ __kernel void ckDMAS_g(
           if (AddSample2 < inputS && AddSample2 >= 0)
           {
             s_2 = dSource[(int)(globalPosZ * inputL * inputS + AddSample2 * inputL + l_s2)];
-            mult = apodArray[(int)((l_s2 - minLine)*apod_mult)] * s_2
-              * apod_1 * s_1;
+            multiplication = apodArray[(int)((l_s2 - minLine)*apod_mult)] * s_2 * apod_1 * s_1;
               
-            output += sqrt(fabs(mult)) * ((mult > 0) - (mult < 0));
+            output += sqrt(fabs(multiplication)) * sign(multiplication);
           }
-            output += dSource[l_s1 + AddSample1*inputL] *
-            apodArray[(int)((l_s1 - minLine)*apod_mult)];
         }
       }
       else
-            --curUsedLines;
+        --curUsedLines;
     }
     dDest[ globalPosZ * outputL * outputS + globalPosY * outputL + globalPosX ] = output / (float)(pow((float)curUsedLines, 2) - (curUsedLines - 1));
   }

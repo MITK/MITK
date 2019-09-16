@@ -52,7 +52,7 @@ __kernel void cksDMAS(
     
     float s_1 = 0;
     float s_2 = 0;
-    float sign = 0;
+    float dSign = 0;
     float apod_1 = 0;
 
     for (short l_s1 = minLine; l_s1 < maxLine; ++l_s1)
@@ -62,7 +62,7 @@ __kernel void cksDMAS(
       {
         s_1 = dSource[(int)(globalPosZ * inputL * inputS + Delay1 * inputL + l_s1)];
         apod_1 = apodArray[(int)((l_s1 - minLine)*apod_mult)];
-        sign += s_1;
+        dSign += s_1;
         
         for (short l_s2 = l_s1 + 1; l_s2 < maxLine; ++l_s2)
         {
@@ -71,8 +71,7 @@ __kernel void cksDMAS(
           {
             s_2 = dSource[(int)(globalPosZ * inputL * inputS + Delay2 * inputL + l_s2)];
             
-            mult = apodArray[(int)((l_s2 - minLine)*apod_mult)] * s_2
-              * apod_1 * s_1;
+            mult = apodArray[(int)((l_s2 - minLine)*apod_mult)] * s_2 * apod_1 * s_1;
               
             output += sqrt(fabs(mult)) * ((mult > 0) - (mult < 0));
           }
@@ -82,7 +81,7 @@ __kernel void cksDMAS(
         --curUsedLines;
     }
 
-    dDest[ globalPosZ * outputL * outputS + globalPosY * outputL + globalPosX ] = output / (float)(curUsedLines * curUsedLines - (curUsedLines - 1)) * ((sign > 0) - (sign < 0));
+    dDest[ globalPosZ * outputL * outputS + globalPosY * outputL + globalPosX ] = output / (float)(curUsedLines * curUsedLines - (curUsedLines - 1)) * sign(dSign);
   }
 }
 
@@ -117,28 +116,25 @@ __kernel void cksDMAS_g(
   {
     int AddSample1 = 0;
     int AddSample2 = 0;
-    float l_i = 0;
-    float l_p = 0;
-    float s_i = 0;
-
-    float apod_mult = 1;
     
     float output = 0;
     
     float s_1 = 0;
     float s_2 = 0;
-    float sign = 0;
     float apod_1 = 0;
 
-    l_i = (float)globalPosX / outputL * inputL;
-    l_p = (float)globalPosX / outputL * horizontalExtent;
-    s_i = (float)globalPosY / outputS * totalSamples_i;
+    float l_i = (float)globalPosX / outputL * inputL;
+    float l_p = (float)globalPosX / outputL * horizontalExtent;
+    float s_i = (float)globalPosY / outputS * totalSamples_i;
 
     unsigned short curUsedLines = usedLines[globalPosY * 3 * outputL + 3 * globalPosX];
     unsigned short minLine = usedLines[globalPosY * 3 * outputL + 3 * globalPosX + 1];
     unsigned short maxLine = usedLines[globalPosY * 3 *outputL + 3 * globalPosX + 2];
 
-    apod_mult = (float)apodArraySize / curUsedLines;
+    float apod_mult = (float)apodArraySize / curUsedLines;
+    float dSign = 0;
+
+    float multiplication = 0;
 
     for (int l_s1 = minLine; l_s1 < maxLine; ++l_s1)
     {
@@ -152,7 +148,7 @@ __kernel void cksDMAS_g(
       {
         s_1 = dSource[(int)(globalPosZ * inputL * inputS + AddSample1 * inputL + l_s1)];
         apod_1 = apodArray[(int)((l_s1 - minLine)*apod_mult)];
-        sign += s_1;
+        dSign += s_1;
         
         for (int l_s2 = minLine; l_s2 < maxLine; ++l_s2)
         {
@@ -164,18 +160,15 @@ __kernel void cksDMAS_g(
           if (AddSample2 < inputS && AddSample2 >= 0)
           {
             s_2 = dSource[(int)(globalPosZ * inputL * inputS + AddSample2 * inputL + l_s2)];
-            mult = apodArray[(int)((l_s2 - minLine)*apod_mult)] * s_2
-              * apod_1 * s_1;
+            multiplication = apodArray[(int)((l_s2 - minLine)*apod_mult)] * s_2 * apod_1 * s_1;
               
-            output += sqrt(fabs(mult)) * ((mult > 0) - (mult < 0));
+            output += sqrt(fabs(multiplication)) * sign(multiplication);
           }
-            output += dSource[l_s1 + AddSample1*inputL] *
-            apodArray[(int)((l_s1 - minLine)*apod_mult)];
         }
       }
       else
-            --curUsedLines;
+        --curUsedLines;
     }
-    dDest[ globalPosZ * outputL * outputS + globalPosY * outputL + globalPosX ] = output / (float)(pow((float)curUsedLines, 2) - (curUsedLines - 1)) * ((sign > 0) - (sign < 0));
+    dDest[ globalPosZ * outputL * outputS + globalPosY * outputL + globalPosX ] = output / (float)(pow((float)curUsedLines, 2) - (curUsedLines - 1)) * sign(dSign);
   }
 }

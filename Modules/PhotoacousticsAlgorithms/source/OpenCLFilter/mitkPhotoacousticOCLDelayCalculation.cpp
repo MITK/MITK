@@ -79,11 +79,7 @@ void mitk::OCLDelayCalculation::Execute()
   }
 
   // This calculation is the same for all kernels, so for performance reasons simply perform it here instead of within the kernels
-  if (m_Conf->GetDelayCalculationMethod() == BeamformingSettings::DelayCalc::QuadApprox)
-    m_DelayMultiplicatorRaw = pow(1 / (m_Conf->GetTimeSpacing()*m_Conf->GetSpeedOfSound()) *
-      m_Conf->GetPitchInMeters() * (float)m_Conf->GetTransducerElements() / (float)m_Conf->GetInputDim()[0], 2) / 2;
-  else if (m_Conf->GetDelayCalculationMethod() == BeamformingSettings::DelayCalc::Spherical)
-    m_DelayMultiplicatorRaw = 1 / (m_Conf->GetTimeSpacing()*m_Conf->GetSpeedOfSound()) *
+  m_DelayMultiplicatorRaw = 1 / (m_Conf->GetTimeSpacing()*m_Conf->GetSpeedOfSound()) *
     (m_Conf->GetPitchInMeters()*(float)m_Conf->GetTransducerElements());
 
   // as openCL does not support bool as a kernel argument, we need to buffer this value in a char...
@@ -92,9 +88,12 @@ void mitk::OCLDelayCalculation::Execute()
   unsigned int reconstructionLines = this->m_Conf->GetReconstructionLines();
   unsigned int samplesperLine = this->m_Conf->GetSamplesPerLine();
 
-  float percentOfImageReconstructed = (float)(m_Conf->GetReconstructionDepth()) /
-    (float)(m_Conf->GetInputDim()[1] * m_Conf->GetSpeedOfSound() * m_Conf->GetTimeSpacing() / (float)(2 - (int)m_Conf->GetIsPhotoacousticImage()));
-  percentOfImageReconstructed = percentOfImageReconstructed <= 1 ? percentOfImageReconstructed : 1;
+  float totalSamples_i = (float)(m_Conf->GetReconstructionDepth()) / (float)(m_Conf->GetSpeedOfSound() * m_Conf->GetTimeSpacing());
+  totalSamples_i = totalSamples_i <= m_Conf->GetInputDim()[1] ? totalSamples_i : m_Conf->GetInputDim()[1];
+
+  float probeRadius = m_Conf->GetGeometry() == mitk::BeamformingSettings::ProbeGeometry::Concave ? 0 : m_Conf->GetProbeRadius(); 
+  float mult1 = m_Conf->GetPitchInMeters() / (2 * itk::Math::pi*probeRadius) * 2 * itk::Math::pi;
+  float mult2 = probeRadius / (m_Conf->GetSpeedOfSound()*m_Conf->GetTimeSpacing());
 
   clErr = clSetKernelArg(this->m_PixelCalculation, 1, sizeof(cl_mem), &(this->m_UsedLines));
   clErr |= clSetKernelArg(this->m_PixelCalculation, 2, sizeof(cl_uint), &(this->m_Conf->GetInputDim()[0]));
@@ -103,7 +102,7 @@ void mitk::OCLDelayCalculation::Execute()
   clErr |= clSetKernelArg(this->m_PixelCalculation, 5, sizeof(cl_uint), &(samplesperLine));
   clErr |= clSetKernelArg(this->m_PixelCalculation, 6, sizeof(cl_char), &(this->m_IsPAImage));
   clErr |= clSetKernelArg(this->m_PixelCalculation, 7, sizeof(cl_float), &(this->m_DelayMultiplicatorRaw));
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 8, sizeof(cl_float), &(percentOfImageReconstructed));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 8, sizeof(cl_float), &(totalSamples_i));
 
   CHECK_OCL_ERR(clErr);
 
@@ -126,10 +125,7 @@ bool mitk::OCLDelayCalculation::Initialize()
 
   if (OclFilter::Initialize())
   {
-    if (m_Conf->GetDelayCalculationMethod() == BeamformingSettings::DelayCalc::QuadApprox)
-      this->m_PixelCalculation = clCreateKernel(this->m_ClProgram, "ckDelayCalculationQuad", &clErr);
-    if (m_Conf->GetDelayCalculationMethod() == BeamformingSettings::DelayCalc::Spherical)
-      this->m_PixelCalculation = clCreateKernel(this->m_ClProgram, "ckDelayCalculationSphe", &clErr);
+    this->m_PixelCalculation = clCreateKernel(this->m_ClProgram, "ckDelayCalculationSphe", &clErr);
     buildErr |= CHECK_OCL_ERR(clErr);
   }
   return (OclFilter::IsInitialized() && buildErr);

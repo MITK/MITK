@@ -31,25 +31,13 @@ namespace mitk {
   {
   public:
 
-    /** \brief Function to perform beamforming on CPU for a single line, using DAS and quadratic delay
-   */
-    static void DASQuadraticLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, const mitk::BeamformingSettings::Pointer config);
-
     /** \brief Function to perform beamforming on CPU for a single line, using DAS and spherical delay
     */
     static void DASSphericalLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, const mitk::BeamformingSettings::Pointer config);
 
-    /** \brief Function to perform beamforming on CPU for a single line, using DMAS and quadratic delay
-    */
-    static void DMASQuadraticLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, const mitk::BeamformingSettings::Pointer config);
-
     /** \brief Function to perform beamforming on CPU for a single line, using DMAS and spherical delay
     */
     static void DMASSphericalLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, const mitk::BeamformingSettings::Pointer config);
-
-    /** \brief Function to perform beamforming on CPU for a single line, using signed DMAS and quadratic delay
-    */
-    static void sDMASQuadraticLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, const mitk::BeamformingSettings::Pointer config);
 
     /** \brief Function to perform beamforming on CPU for a single line, using signed DMAS and spherical delay
     */
@@ -69,6 +57,10 @@ namespace mitk {
     * @param samples the resolution at which the window is created
     */
     static float* BoxFunction(int samples);
+
+    /** \brief 
+    */
+    static unsigned short* MinMaxLines(const mitk::BeamformingSettings::Pointer config);
 
   protected:
     BeamformingUtils();

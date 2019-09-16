@@ -755,11 +755,9 @@ void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImag
   if (originalSegmentation)
   {
     typedef itk::Image<TPixel, VImageDimension> InputImageType;
-    typedef itk::Image<mitk::Tool::DefaultSegmentationDataType, VImageDimension> SegmentationType;
-
 
     //select single 3D volume if we have more than one time step
-    typename SegmentationType::Pointer originalSegmentationInITK = SegmentationType::New();
+    typename InputImageType::Pointer originalSegmentationInITK = InputImageType::New();
     if(originalSegmentation->GetTimeGeometry()->CountTimeSteps() > 1) {
       mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
       timeSelector->SetInput( originalSegmentation );
@@ -772,7 +770,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImag
 
     //Fill current preiview image in segmentation image
     originalSegmentationInITK->FillBuffer(0);
-    itk::ImageRegionIterator<SegmentationType> itOutput( originalSegmentationInITK, originalSegmentationInITK->GetLargestPossibleRegion() );
+    itk::ImageRegionIterator<InputImageType> itOutput( originalSegmentationInITK, originalSegmentationInITK->GetLargestPossibleRegion() );
     itk::ImageRegionIterator<InputImageType> itInput( itkImage, itkImage->GetLargestPossibleRegion() );
     itOutput.GoToBegin();
     itInput.GoToBegin();
@@ -803,8 +801,8 @@ void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImag
 
 
     //combine current working segmentation image with our region growing result
-    originalSegmentation->InitializeByItk<SegmentationType>(originalSegmentationInITK);
-    originalSegmentation->SetVolume( (void*)(originalSegmentationInITK->GetPixelContainer()->GetBufferPointer()), timeStep);
+    originalSegmentation->InitializeByItk<InputImageType>(originalSegmentationInITK);
+    originalSegmentation->SetVolume(originalSegmentationInITK->GetPixelContainer()->GetBufferPointer(), timeStep);
 
     originalSegmentation->Modified();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();

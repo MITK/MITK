@@ -52,15 +52,15 @@ void QmitkDataNodeShowSelectedNodesAction::OnActionTriggered(bool /*checked*/)
 
   mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
 
-  auto dataNodes = GetSelectedNodes();
-  mitk::NodePredicateFirstLevel::Pointer nodeFirstLevelFilterPredicate = mitk::NodePredicateFirstLevel::New(dataStorage);
-  auto nodesetFirstLevel = dataStorage->GetSubset(nodeFirstLevelFilterPredicate);
+  auto selectedNodes = GetSelectedNodes();
 
-  for (auto& node : *nodesetFirstLevel)
+  auto allNodes = dataStorage->GetAll();
+
+  for (auto& node : *allNodes)
   {
-    if (node.IsNotNull() && node->GetData() != nullptr)
+    if (node.IsNotNull() && node->GetData() != nullptr && strcmp(node->GetData()->GetNameOfClass(), "PlaneGeometryData"))
     {
-      node->SetVisibility(dataNodes.contains(node), baseRenderer);
+      node->SetVisibility(selectedNodes.contains(node), baseRenderer);
     }
   }
 

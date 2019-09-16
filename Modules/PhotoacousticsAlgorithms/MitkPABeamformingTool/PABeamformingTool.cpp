@@ -205,6 +205,17 @@ void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSetti
       else
         mitkThrow() << "Apodization incorrectly defined in settings";
 
+      std::string geomStr = elem->Attribute("geometry");
+      mitk::BeamformingSettings::ProbeGeometry ProbeGeometry = mitk::BeamformingSettings::ProbeGeometry::Linear;
+      if (geomStr == "linear")
+        ProbeGeometry = mitk::BeamformingSettings::ProbeGeometry::Linear;
+      else if(geomStr == "concave")
+        ProbeGeometry = mitk::BeamformingSettings::ProbeGeometry::Concave;
+      else
+        mitkThrow() << "geometry incorrectly defined in settings";
+
+      float radius = std::stof(elem->Attribute("radiusInMm"));
+
       unsigned int ApodizationArraySize = std::stoi(elem->Attribute("apodizationArraySize"));
 
       std::string algorithmStr = elem->Attribute("algorithm");
@@ -216,9 +227,7 @@ void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSetti
       else if (algorithmStr == "sDMAS")
         Algorithm = mitk::BeamformingSettings::BeamformingAlgorithm::sDMAS;
       else
-      {
         mitkThrow() << "Beamforming algorithm incorrectly defined in settings";
-      }
 
       *bfSet = mitk::BeamformingSettings::New(
         (float)(input.inputImage->GetGeometry()->GetSpacing()[0] / 1000),
@@ -232,10 +241,11 @@ void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSetti
         ReconstructionDepth,
         UseGPU,
         GPUBatchSize,
-        mitk::BeamformingSettings::DelayCalc::Spherical,
         Apodization,
         ApodizationArraySize,
-        Algorithm
+        Algorithm,
+        ProbeGeometry,
+        radius
       );
     }
     if (elemName == "Bandpass")

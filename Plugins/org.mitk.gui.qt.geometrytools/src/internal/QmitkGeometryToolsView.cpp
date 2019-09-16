@@ -38,10 +38,17 @@ QmitkGeometryToolsView::~QmitkGeometryToolsView()
   auto ds = this->GetDataStorage();
   auto allNodes = ds->GetAll();
   for (auto node : *allNodes) {
-    bool isActive(false);
-    if (node->GetBoolProperty("AffineBaseDataInteractor3D", isActive) && isActive) {
-      node->SetBoolProperty("AffineBaseDataInteractor3D", false);
-      node->SetDataInteractor(nullptr);
+    if (node) {
+      auto it = m_Pickables.find(node->GetName());
+      if (it != m_Pickables.end()) {
+        node->SetBoolProperty("pickable", it->second);
+      }
+
+      bool isActive(false);
+      if (node->GetBoolProperty("AffineBaseDataInteractor3D", isActive) && isActive) {
+        node->SetBoolProperty("AffineBaseDataInteractor3D", false);
+        node->SetDataInteractor(nullptr);
+      }
     }
   }
 }
@@ -88,16 +95,18 @@ void QmitkGeometryToolsView::OnUsageInfoBoxChanged(bool flag)
 void QmitkGeometryToolsView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
                                              const QList<mitk::DataNode::Pointer>& nodes )
 {
+  auto allNodes = this->GetDataStorage()->GetAll();
+  for (auto node : *allNodes) {
+    if (node) {
+      node->SetBoolProperty("pickable", false);
+    }
+  }
+
   foreach( mitk::DataNode::Pointer node, nodes )
   {
     if( node.IsNotNull() )
     {
-      mitk::BaseData::Pointer basedata = node->GetData();
-      if (basedata.IsNotNull() && basedata->GetTimeGeometry()->IsValid() && m_CurrentGeometry != basedata->GetTimeGeometry())
-      {
-        m_CurrentGeometry = basedata->GetTimeGeometry();
-        mitk::RenderingManager::GetInstance()->InitializeViews(m_CurrentGeometry, mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
-      }
+      node->SetBoolProperty("pickable", true);
       m_Controls.m_AddInteractor->setEnabled( true );
       return;
     }
@@ -163,6 +172,10 @@ void QmitkGeometryToolsView::AddInteractor()
 
       affineDataInteractor->SetDataNode(node);
 
+      bool pickable(false);
+      node->GetBoolProperty("pickable", pickable);
+      m_Pickables[node->GetName()] = pickable;
+
       node->SetBoolProperty("pickable", true);
       node->SetBoolProperty("AffineBaseDataInteractor3D", true);
       node->SetFloatProperty("AffineBaseDataInteractor3D.Translation Step Size", m_Controls.m_TranslationStep->value());
@@ -182,6 +195,10 @@ void QmitkGeometryToolsView::RemoveInteractor()
   {
     if( (node.IsNotNull()) && (node->GetDataInteractor().IsNotNull()) )
     {
+      auto it = m_Pickables.find(node->GetName());
+      if (it != m_Pickables.end()) {
+        node->SetBoolProperty("pickable", it->second);
+      }
       node->SetDataInteractor(nullptr);
     }
   }

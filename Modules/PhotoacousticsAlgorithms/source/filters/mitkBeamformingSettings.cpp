@@ -49,7 +49,8 @@ mitk::BeamformingSettings::BeamformingSettings(float pitchInMeters,
   m_ApodizationArraySize(apodizationArraySize),
   m_Algorithm(algorithm),
   m_Geometry(geometry),
-  m_ProbeRadius(probeRadius)
+  m_ProbeRadius(probeRadius),
+  m_MinMaxLines(nullptr)
 {
   if (inputDim == nullptr)
   {
@@ -79,7 +80,7 @@ mitk::BeamformingSettings::BeamformingSettings(float pitchInMeters,
   if (m_Geometry == ProbeGeometry::Concave)
   {
     float openingAngle = (m_TransducerElements * m_PitchInMeters) / (probeRadius * 2 * itk::Math::pi) * 2 * itk::Math::pi;
-    m_VerticalExtent = std::sin(openingAngle / 2.f) * probeRadius * 2.f;
+    m_HorizontalExtent = std::sin(openingAngle / 2.f) * probeRadius * 2.f;
 
     float elementAngle = 0;
 
@@ -87,12 +88,12 @@ mitk::BeamformingSettings::BeamformingSettings(float pitchInMeters,
     {
       elementAngle = ((i- m_TransducerElements /2.f) * m_PitchInMeters) / (probeRadius * 2 * itk::Math::pi) * 2 * itk::Math::pi;
       m_ElementHeights[i] = probeRadius - std::cos(elementAngle) * probeRadius;
-      m_ElementPositions[i] = m_VerticalExtent/2.f + std::sin(elementAngle) * probeRadius;
+      m_ElementPositions[i] = m_HorizontalExtent/2.f + std::sin(elementAngle) * probeRadius;
     }
   }
   else
   {
-    m_VerticalExtent = m_PitchInMeters * m_TransducerElements;
+    m_HorizontalExtent = m_PitchInMeters * m_TransducerElements;
     for (unsigned int i = 0; i < m_TransducerElements; ++i)
     {
       m_ElementHeights[i] = 0;
@@ -118,21 +119,23 @@ mitk::BeamformingSettings::~BeamformingSettings()
     delete[] m_InputDim;
     MITK_INFO << "Deleting input dim...[Done]";
   }
-
-  if (m_ElementHeights != nullptr)
+  if (m_ElementHeights != nullptr || m_ElementPositions != nullptr)
   {
-    MITK_INFO << "Deleting input dim...";
-    delete[] m_ElementHeights;
-    MITK_INFO << "Deleting input dim...[Done]";
+    MITK_INFO << "Deleting element geometry...";
+    if (m_ElementHeights != nullptr)
+      delete[] m_ElementHeights;
+
+    if (m_ElementPositions != nullptr)
+      delete[] m_ElementPositions;
+    MITK_INFO << "Destructing beamforming settings...[Done]";
   }
+  if (m_MinMaxLines)
+    delete[] m_MinMaxLines;
+}
 
-  if (m_ElementPositions != nullptr)
-  {
-    MITK_INFO << "Deleting input dim...";
-    delete[] m_ElementHeights;
-    MITK_INFO << "Deleting input dim...[Done]";
-  }
-
-
-  MITK_INFO << "Destructing beamforming settings...[Done]";
+unsigned short* mitk::BeamformingSettings::GetMinMaxLines()
+{
+  if (!m_MinMaxLines)
+    m_MinMaxLines = mitk::BeamformingUtils::MinMaxLines(this);
+  return m_MinMaxLines;
 }

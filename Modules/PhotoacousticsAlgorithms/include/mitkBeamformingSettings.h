@@ -74,7 +74,7 @@ namespace mitk {
     itkGetConstMacro(ProbeRadius, float);
     itkGetConstMacro(ElementHeights, float*);
     itkGetConstMacro(ElementPositions, float*);
-    itkGetConstMacro(VerticalExtent, float);
+    itkGetConstMacro(HorizontalExtent, float);
 
     /** \brief function for mitk::PhotoacousticOCLBeamformingFilter to check whether buffers need to be updated
     * this method only checks parameters relevant for the openCL implementation
@@ -131,6 +131,8 @@ namespace mitk {
       smartPtr->UnRegister();
       return smartPtr;
     }
+
+    unsigned short* GetMinMaxLines();
 
   protected:
 
@@ -236,7 +238,11 @@ namespace mitk {
 
     /**
     */
-    float m_VerticalExtent;
+    float m_HorizontalExtent;
+
+    /**
+    */
+    unsigned short* m_MinMaxLines;
   };
 }
 #endif //MITK_BEAMFORMING_SETTINGS

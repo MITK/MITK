@@ -68,6 +68,131 @@ float* mitk::BeamformingUtils::BoxFunction(int samples)
   return ApodWindow;
 }
 
+unsigned short* mitk::BeamformingUtils::MinMaxLines(const mitk::BeamformingSettings::Pointer config)
+{
+  int outputL = (int)config->GetReconstructionLines();
+  int outputS = (int)config->GetSamplesPerLine();
+
+  unsigned short* dDest = new unsigned short[outputL * outputS * 2];
+
+  int inputL = (int)config->GetInputDim()[0];
+  int inputS = (int)config->GetInputDim()[1];
+  
+  float horizontalExtent = config->GetHorizontalExtent();
+  float verticalExtent = config->GetReconstructionDepth();
+
+  float probeRadius = config->GetProbeRadius();
+  float* elementHeights = config->GetElementHeights();
+  float* elementPositions = config->GetElementPositions();
+
+  float cos_deg = std::cos(config->GetAngle() / 2.f / 360 * 2 * itk::Math::pi);
+
+  float cos = 0;
+  float a = 0;
+  float d = 0;
+
+  for (int x = 0; x < outputL; ++x)
+  {
+    for (int y = 0; y < outputS; ++y)
+    {
+      float l_p = (float)x / outputL * horizontalExtent;
+      float s_p = (float)y / (float)outputS * verticalExtent;
+
+      int maxLine = inputL;
+      int minLine = 0;
+
+      for (int l_s = 0; l_s < inputL; l_s += 32)
+      {
+        a = sqrt((probeRadius - s_p)*(probeRadius - s_p) + (l_p - horizontalExtent / 2)*(l_p - horizontalExtent / 2));
+        d = sqrt((s_p - elementHeights[l_s])*(s_p - elementHeights[l_s]) + (l_p - elementPositions[l_s])*(l_p - elementPositions[l_s]));
+        cos = (d*d + probeRadius * probeRadius - a * a) / (2 * probeRadius*d);
+
+        if (cos > cos_deg)
+        {
+          minLine = l_s - 32;
+          if (minLine < 0)
+            minLine = 0;
+          break;
+        }
+      }
+      for (int l_s = minLine; l_s < inputL; l_s += 8)
+      {
+        a = sqrt((probeRadius - s_p)*(probeRadius - s_p) + (l_p - horizontalExtent / 2)*(l_p - horizontalExtent / 2));
+        d = sqrt((s_p - elementHeights[l_s])*(s_p - elementHeights[l_s]) + (l_p - elementPositions[l_s])*(l_p - elementPositions[l_s]));
+        cos = (d*d + probeRadius * probeRadius - a * a) / (2 * probeRadius*d);
+
+        if (cos > cos_deg)
+        {
+          minLine = l_s - 8;
+          if (minLine < 0)
+            minLine = 0;
+          break;
+        }
+      }
+      for (int l_s = minLine; l_s < inputL; l_s += 1)
+      {
+        a = sqrt((probeRadius - s_p)*(probeRadius - s_p) + (l_p - horizontalExtent / 2)*(l_p - horizontalExtent / 2));
+        d = sqrt((s_p - elementHeights[l_s])*(s_p - elementHeights[l_s]) + (l_p - elementPositions[l_s])*(l_p - elementPositions[l_s]));
+        cos = (d*d + probeRadius * probeRadius - a * a) / (2 * probeRadius*d);
+
+        if (cos > cos_deg)
+        {
+          minLine = l_s;
+          break;
+        }
+      }
+
+      for (int l_s = inputL; l_s >= 0; l_s -= 32)
+      {
+        a = sqrt((probeRadius - s_p)*(probeRadius - s_p) + (l_p - horizontalExtent / 2)*(l_p - horizontalExtent / 2));
+        d = sqrt((s_p - elementHeights[l_s])*(s_p - elementHeights[l_s]) + (l_p - elementPositions[l_s])*(l_p - elementPositions[l_s]));
+        cos = (d*d + probeRadius * probeRadius - a * a) / (2 * probeRadius*d);
+        cos = 0;
+
+        if (cos > cos_deg)
+        {
+          maxLine = l_s + 32;
+          if (maxLine > inputL)
+            minLine = inputL;
+          break;
+        }
+      }
+      for (int l_s = maxLine; l_s >= 0; l_s -= 8)
+      {
+        a = sqrt((probeRadius - s_p)*(probeRadius - s_p) + (l_p - horizontalExtent / 2)*(l_p - horizontalExtent / 2));
+        d = sqrt((s_p - elementHeights[l_s])*(s_p - elementHeights[l_s]) + (l_p - elementPositions[l_s])*(l_p - elementPositions[l_s]));
+        cos = (d*d + probeRadius * probeRadius - a * a) / (2 * probeRadius*d);
+        cos = 0;
+
+        if (cos > cos_deg)
+        {
+          maxLine = l_s + 8;
+          if (maxLine > inputL)
+            minLine = inputL;
+          break;
+        }
+      }
+      for (int l_s = maxLine; l_s >= 0; l_s -= 1)
+      {
+        a = sqrt((probeRadius - s_p)*(probeRadius - s_p) + (l_p - horizontalExtent / 2)*(l_p - horizontalExtent / 2));
+        d = sqrt((s_p - elementHeights[l_s])*(s_p - elementHeights[l_s]) + (l_p - elementPositions[l_s])*(l_p - elementPositions[l_s]));
+        cos = (d*d + probeRadius * probeRadius - a * a) / (2 * probeRadius*d);
+        cos = 0;
+
+        if (cos > cos_deg)
+        {
+          maxLine = l_s;
+          break;
+        }
+      }
+
+      dDest[y * 2 * outputL + 2 * x] = (unsigned short)minLine; //minLine
+      dDest[y * 2 * outputL + 2 * x + 1] = (unsigned short)maxLine; //maxLine
+    }
+  }
+  return dDest;
+}
+
 void mitk::BeamformingUtils::DASSphericalLine(
   float* input, float* output, float inputDim[2], float outputDim[2],
   const short& line, const mitk::BeamformingSettings::Pointer config)
@@ -91,10 +216,6 @@ void mitk::BeamformingUtils::DASSphericalLine(
   float l_p = 0;
   float s_i = 0;
 
-  float part = 0.07 * inputL; // just a default value
-  float tan_phi = std::tan(config->GetAngle() / 360 * 2 * itk::Math::pi);
-  float part_multiplicator = tan_phi * config->GetTimeSpacing() *
-    config->GetSpeedOfSound() / config->GetPitchInMeters() * inputL / (float)config->GetTransducerElements();
   float apod_mult = 1;
 
   float probeRadius = config->GetProbeRadius();
@@ -105,19 +226,14 @@ void mitk::BeamformingUtils::DASSphericalLine(
   totalSamples_i = totalSamples_i <= inputS ? totalSamples_i : inputS;
 
   l_i = (float)line / outputL * inputL;
-  l_p = (float)line / outputL * config->GetVerticalExtent();
+  l_p = (float)line / outputL * config->GetHorizontalExtent();
 
   for (short sample = 0; sample < outputS; ++sample)
   {
     s_i = (float)sample / outputS * totalSamples_i;
 
-    part = part_multiplicator*s_i;
-
-    if (part < 1)
-      part = 1;
-
-    maxLine = std::round(std::min((l_i + part) + 1, inputL));
-    minLine = std::round(std::max((l_i - part), 0.0f));
+    minLine = config->GetMinMaxLines()[2*sample*(short)outputL + 2*line];
+    maxLine = config->GetMinMaxLines()[2*sample*(short)outputL + 2*line + 1];
     usedLines = (maxLine - minLine);
 
     apod_mult = (float)apodArraySize / (float)usedLines;
@@ -161,10 +277,6 @@ void mitk::BeamformingUtils::DMASSphericalLine(
   float l_p = 0;
   float s_i = 0;
 
-  float part = 0.07 * inputL;
-  float tan_phi = std::tan(config->GetAngle() / 360 * 2 * itk::Math::pi);
-  float part_multiplicator = tan_phi * config->GetTimeSpacing() *
-    config->GetSpeedOfSound() / config->GetPitchInMeters() * inputL / (float)config->GetTransducerElements();
   float apod_mult = 1;
 
   float probeRadius = config->GetProbeRadius();
@@ -178,19 +290,14 @@ void mitk::BeamformingUtils::DMASSphericalLine(
   totalSamples_i = totalSamples_i <= inputS ? totalSamples_i : inputS;
 
   l_i = (float)line / outputL * inputL;
-  l_p = (float)line / outputL * config->GetVerticalExtent();
+  l_p = (float)line / outputL * config->GetHorizontalExtent();
 
   for (short sample = 0; sample < outputS; ++sample)
   {
     s_i = (float)sample / outputS * totalSamples_i;
 
-    part = part_multiplicator*s_i;
-
-    if (part < 1)
-      part = 1;
-
-    maxLine = std::round(std::min((l_i + part) + 1, inputL));
-    minLine = std::round(std::max((l_i - part), 0.0f));
+    minLine = config->GetMinMaxLines()[2 * sample*(short)outputL + 2 * line];
+    maxLine = config->GetMinMaxLines()[2 * sample*(short)outputL + 2 * line + 1];
     usedLines = (maxLine - minLine);
 
     apod_mult = (float)apodArraySize / (float)usedLines;
@@ -257,10 +364,6 @@ void mitk::BeamformingUtils::sDMASSphericalLine(
   float l_p = 0;
   float s_i = 0;
 
-  float part = 0.07 * inputL;
-  float tan_phi = std::tan(config->GetAngle() / 360 * 2 * itk::Math::pi);
-  float part_multiplicator = tan_phi * config->GetTimeSpacing() * config->GetSpeedOfSound() /
-    config->GetPitchInMeters() * inputL / (float)config->GetTransducerElements();
   float apod_mult = 1;
 
   float probeRadius = config->GetProbeRadius();
@@ -276,19 +379,14 @@ void mitk::BeamformingUtils::sDMASSphericalLine(
   totalSamples_i = totalSamples_i <= inputS ? totalSamples_i : inputS;
 
   l_i = (float)line / outputL * inputL;
-  l_p = (float)line / outputL * config->GetVerticalExtent();
+  l_p = (float)line / outputL * config->GetHorizontalExtent();
 
   for (short sample = 0; sample < outputS; ++sample)
   {
     s_i = (float)sample / outputS * totalSamples_i;
 
-    part = part_multiplicator*s_i;
-
-    if (part < 1)
-      part = 1;
-
-    maxLine = std::round(std::min((l_i + part) + 1, inputL));
-    minLine = std::round(std::max((l_i - part), 0.0f));
+    minLine = config->GetMinMaxLines()[2 * sample*(short)outputL + 2 * line];
+    maxLine = config->GetMinMaxLines()[2 * sample*(short)outputL + 2 * line + 1];
     usedLines = (maxLine - minLine);
 
     apod_mult = (float)apodArraySize / (float)usedLines;

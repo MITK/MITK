@@ -83,3 +83,95 @@ __kernel void ckDMAS(
     dDest[ globalPosZ * outputL * outputS + globalPosY * outputL + globalPosX ] = output / (float)(curUsedLines * curUsedLines - (curUsedLines - 1));
   }
 }
+
+__kernel void ckDMAS_g(
+  __global float* dSource, // input image
+  __global float* dDest, // output buffer
+  __global float* elementHeights,
+  __global float* elementPositions,
+  __constant float* apodArray,
+  unsigned short apodArraySize,
+  unsigned int inputL,
+  unsigned int inputS,
+  int Slices,
+  int outputL,
+  int outputS,
+  float angle,
+  float probeRadius,
+  float totalSamples_i,
+  float horizontalExtent,
+  float mult,
+  char isPAImage,
+  __global unsigned short* usedLines // parameters
+)
+{
+  // get thread identifier
+  int globalPosX = get_global_id(0);
+  int globalPosY = get_global_id(1);
+  int globalPosZ = get_global_id(2);
+
+  // terminate non-valid threads
+  if ( globalPosX < outputL && globalPosY < outputS && globalPosZ < Slices )
+  {
+    int AddSample1 = 0;
+    int AddSample2 = 0;
+    float l_i = 0;
+    float l_p = 0;
+    float s_i = 0;
+
+    float apod_mult = 1;
+    
+    float output = 0;
+    
+    float s_1 = 0;
+    float s_2 = 0;
+    float apod_1 = 0;
+
+    l_i = (float)globalPosX / outputL * inputL;
+    l_p = (float)globalPosX / outputL * horizontalExtent;
+    s_i = (float)globalPosY / outputS * totalSamples_i;
+
+    unsigned short curUsedLines = usedLines[globalPosY * 3 * outputL + 3 * globalPosX];
+    unsigned short minLine = usedLines[globalPosY * 3 * outputL + 3 * globalPosX + 1];
+    unsigned short maxLine = usedLines[globalPosY * 3 *outputL + 3 * globalPosX + 2];
+
+    apod_mult = (float)apodArraySize / curUsedLines;
+
+    for (int l_s1 = minLine; l_s1 < maxLine; ++l_s1)
+    {
+      AddSample1 = (int)sqrt(
+        pow(s_i-elementHeights[l_s1]*mult, 2)
+        +
+        pow(mult * (l_p - elementPositions[l_s1]), 2)
+      ) + (1 - isPAImage)*s_i;
+      
+      if (AddSample1 < inputS && AddSample1 >= 0)
+      {
+        s_1 = dSource[(int)(globalPosZ * inputL * inputS + AddSample1 * inputL + l_s1)];
+        apod_1 = apodArray[(int)((l_s1 - minLine)*apod_mult)];
+        
+        for (int l_s2 = minLine; l_s2 < maxLine; ++l_s2)
+        {
+          AddSample2 = (int)sqrt(
+            pow(s_i-elementHeights[l_s2]*mult, 2)
+            +
+            pow(mult * (l_p - elementPositions[l_s2]), 2)
+          ) + (1 - isPAImage)*s_i;
+          if (AddSample2 < inputS && AddSample2 >= 0)
+          {
+            s_2 = dSource[(int)(globalPosZ * inputL * inputS + AddSample2 * inputL + l_s2)];
+            mult = apodArray[(int)((l_s2 - minLine)*apod_mult)] * s_2
+              * apod_1 * s_1;
+              
+            output += sqrt(fabs(mult)) * ((mult > 0) - (mult < 0));
+          }
+            output += dSource[l_s1 + AddSample1*inputL] *
+            apodArray[(int)((l_s1 - minLine)*apod_mult)];
+        }
+      }
+      else
+            --curUsedLines;
+    }
+    dDest[ globalPosZ * outputL * outputS + globalPosY * outputL + globalPosX ] = output / (float)(pow((float)curUsedLines, 2) - (curUsedLines - 1));
+  }
+}

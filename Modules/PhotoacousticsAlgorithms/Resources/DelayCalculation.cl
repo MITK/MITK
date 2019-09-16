@@ -30,6 +30,7 @@ __kernel void ckDelayCalculationSphe(  __global unsigned short *gDest,
 
   if (globalPosX * 2 < outputL && globalPosY < outputS)
   {
+    float l_i = 0; // we calculate the delays relative to line zero
     float s_i = (float)globalPosY / (float)outputS * totalSamples_i;
     float l_s = (float)globalPosX / (float)outputL * (float)inputL; // the currently calculated line
       

@@ -77,7 +77,7 @@ void mitk::BeamformingFilter::GenerateOutputInformation()
     return;
 
   mitk::Vector3D spacing;
-  spacing[0] = m_Conf->GetVerticalExtent() / m_Conf->GetReconstructionLines() * 1000;
+  spacing[0] = m_Conf->GetHorizontalExtent() / m_Conf->GetReconstructionLines() * 1000;
   float desiredYSpacing = m_Conf->GetReconstructionDepth() * 1000 / m_Conf->GetSamplesPerLine();
   float maxYSpacing = m_Conf->GetSpeedOfSound() * m_Conf->GetTimeSpacing() * input->GetDimension(1) / m_Conf->GetSamplesPerLine() * 1000;
   spacing[1] = desiredYSpacing < maxYSpacing ? desiredYSpacing : maxYSpacing;

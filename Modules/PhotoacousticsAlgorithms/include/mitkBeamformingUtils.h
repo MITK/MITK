@@ -58,6 +58,10 @@ namespace mitk {
     */
     static float* BoxFunction(int samples);
 
+    /** \brief 
+    */
+    static unsigned short* MinMaxLines(const mitk::BeamformingSettings::Pointer config);
+
   protected:
     BeamformingUtils();
 

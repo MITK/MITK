@@ -39,6 +39,9 @@ namespace mitk
 
     void Update();
 
+    void SetElementHeightsBuffer(cl_mem elementHeightsBuffer);
+    void SetElementPositionsBuffer(cl_mem elementPositionsBuffer);
+
   protected:
 
     /** Constructor */
@@ -73,6 +76,8 @@ namespace mitk
     BeamformingSettings::Pointer m_Conf;
     float m_part;
     size_t m_ChunkSize[3];
+    cl_mem m_ElementHeightsBuffer;
+    cl_mem m_ElementPositionsBuffer;
   };
 }
 #endif

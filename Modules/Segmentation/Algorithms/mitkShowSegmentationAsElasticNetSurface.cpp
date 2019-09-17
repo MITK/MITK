@@ -4,7 +4,7 @@
 #include <vtkPointData.h>
 #include <vtkPolyDataNormals.h>
 
-#define ELASTIC_NET_PRINT_TIME
+//#define ELASTIC_NET_PRINT_TIME
 #ifdef ELASTIC_NET_PRINT_TIME
 #include <chrono>
 std::chrono::time_point<std::chrono::steady_clock> timePoint;

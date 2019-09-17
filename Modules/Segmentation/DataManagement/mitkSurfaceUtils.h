@@ -44,8 +44,8 @@ public:
     bool overwrite = true;
     DataNode::Pointer removeOnComplete = nullptr; // Node will be removed after creating and adding new model
     int timestep = -1;
-    int elasticIterations = 1;
-    double elasticRelaxation = 0.;
+    int elasticIterations = 10;
+    float elasticRelaxation = -1.f;
   };
 
   class SurfaceCreationTypeProperty : public EnumerationProperty

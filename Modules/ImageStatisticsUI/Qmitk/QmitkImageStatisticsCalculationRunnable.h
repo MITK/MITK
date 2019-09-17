@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //QT headers
 #include <QThread>
 #include <qrunnable.h>
-
+#include <qobject.h>
 
 //mitk headers
 #include "mitkImage.h"
@@ -38,9 +38,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 				   to run the image statistics calculation in a background thread keeping the gui usable.
   */
 
-class MITKIMAGESTATISTICSUI_EXPORT QmitkImageStatisticsCalculationRunnable : public QRunnable
+class MITKIMAGESTATISTICSUI_EXPORT QmitkImageStatisticsCalculationRunnable : public QObject, public QRunnable
 {
-
+	Q_OBJECT
 public:
 
 	typedef itk::Statistics::Histogram<double> HistogramType;
@@ -87,6 +87,8 @@ public:
 	void run() override;
 
 	std::string GetLastErrorMessage() const;
+signals:
+	void finished();
 
 private:
 	mitk::Image::ConstPointer m_StatisticsImage;                         ///< member variable holds the input image for which the statistics need to be calculated.

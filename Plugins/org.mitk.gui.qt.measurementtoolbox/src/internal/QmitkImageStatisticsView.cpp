@@ -84,11 +84,6 @@ void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
 
 void QmitkImageStatisticsView::CreateConnections()
 {
-  connect(this->m_CalculationJob,
-          &QmitkImageStatisticsCalculationJob::finished,
-          this,
-          &QmitkImageStatisticsView::OnStatisticsCalculationEnds,
-          Qt::QueuedConnection);
   connect(this->m_Controls.checkBox_ignoreZero,
           &QCheckBox::stateChanged,
           this,
@@ -605,26 +600,26 @@ void QmitkImageStatisticsView::ResetGUIDefault()
 void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
 {
   mitk::StatusBar::GetInstance()->Clear();
-
-  if (this->m_CalculationJob->GetStatisticsUpdateSuccessFlag())
+  auto runnable = m_Runnables[0];
+  m_Runnables.erase(m_Runnables.begin());
+  if (runnable->GetStatisticsUpdateSuccessFlag())
   {
-	MITK_INFO << "Statistics successful check";
-    auto statistic = m_CalculationJob->GetStatisticsData();
-    auto image = m_CalculationJob->GetStatisticsImage();
+    auto statistic = runnable->GetStatisticsData();
+    auto image = runnable->GetStatisticsImage();
     mitk::BaseData::ConstPointer mask = nullptr;
     auto imageRule = mitk::StatisticsToImageRelationRule::New();
     imageRule->Connect(statistic, image);
 
-    if (m_CalculationJob->GetMaskImage())
+    if (runnable->GetMaskImage())
     {
       auto maskRule = mitk::StatisticsToMaskRelationRule::New();
-      mask = m_CalculationJob->GetMaskImage();
+      mask = runnable->GetMaskImage();
       maskRule->Connect(statistic, mask);
     }
-    else if (m_CalculationJob->GetPlanarFigure())
+    else if (runnable->GetPlanarFigure())
     {
       auto planarFigureRule = mitk::StatisticsToMaskRelationRule::New();
-      mask = m_CalculationJob->GetPlanarFigure();
+      mask = runnable->GetPlanarFigure();
       planarFigureRule->Connect(statistic, mask);
     }
 
@@ -664,7 +659,7 @@ void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
   }
 
   {
-    mitk::StatusBar::GetInstance()->DisplayErrorText(m_CalculationJob->GetLastErrorMessage().c_str());
+    mitk::StatusBar::GetInstance()->DisplayErrorText(runnable->GetLastErrorMessage().c_str());
     m_Controls.widget_histogram->setEnabled(false);
   }
   m_Controls.label_currentlyComputingStatistics->setVisible(false);
@@ -684,10 +679,10 @@ void QmitkImageStatisticsView::CalculateStatistics(const mitk::Image *image,
 	runnable->Initialize(image, mask, maskPlanarFigure);
 	runnable->setAutoDelete(false);
 	m_Runnables.push_back(runnable);
+	connect(runnable, &QmitkImageStatisticsCalculationRunnable::finished, this, &QmitkImageStatisticsView::OnStatisticsCalculationEnds, Qt::QueuedConnection);
   try
   {
     // Compute statistics
-    //this->m_CalculationJob->start();
 	QThreadPool::globalInstance()->start(runnable);
     m_Controls.label_currentlyComputingStatistics->setVisible(true);
   }

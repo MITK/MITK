@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIgnorePixelMaskGenerator.h>
 
 QmitkImageStatisticsCalculationRunnable::QmitkImageStatisticsCalculationRunnable()
-	: QRunnable()
+	: QObject(), QRunnable()
 	, m_StatisticsImage(nullptr)
 	, m_BinaryMask(nullptr)
 	, m_PlanarFigureMask(nullptr)
@@ -222,4 +222,5 @@ void QmitkImageStatisticsCalculationRunnable::run()
 
 		}
 	}
+	emit finished();
 }

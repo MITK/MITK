@@ -872,7 +872,7 @@ mitk::BeamformingSettings::Pointer PAImageProcessing::CreateBeamformingSettings(
   {
     timeSpacing = image->GetGeometry()->GetSpacing()[1] / 1000000.0f;
     MITK_INFO << "Calculated Scan Depth of " << (image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] /
-      1000000) * speedOfSound * 100 / 2 << "cm";
+      1000000) * speedOfSound * 100 << "cm";
   }
   else
   {

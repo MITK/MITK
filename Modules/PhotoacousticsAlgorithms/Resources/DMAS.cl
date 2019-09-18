@@ -95,8 +95,6 @@ __kernel void ckDMAS_g(
   int Slices,
   int outputL,
   int outputS,
-  float angle,
-  float probeRadius,
   float totalSamples_i,
   float horizontalExtent,
   float mult,

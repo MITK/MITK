@@ -75,8 +75,6 @@ __kernel void ckDAS_g(
   int Slices,
   int outputL,
   int outputS,
-  float angle,
-  float probeRadius,
   float totalSamples_i,
   float horizontalExtent,
   float mult,

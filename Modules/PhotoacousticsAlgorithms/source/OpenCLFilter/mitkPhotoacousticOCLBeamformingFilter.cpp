@@ -180,13 +180,11 @@ void mitk::PhotoacousticOCLBeamformingFilter::Execute()
     clErr |= clSetKernelArg(this->m_PixelCalculation, 8, sizeof(cl_int), &(m_inputSlices));
     clErr |= clSetKernelArg(this->m_PixelCalculation, 9, sizeof(cl_int), &(reconstructionLines));
     clErr |= clSetKernelArg(this->m_PixelCalculation, 10, sizeof(cl_int), &(samplesPerLine));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 11, sizeof(cl_float), &(angle));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 12, sizeof(cl_float), &(probeRadius));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 13, sizeof(cl_float), &(totalSamples_i));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 14, sizeof(cl_float), &(horizontalExtent));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 15, sizeof(cl_float), &(mult));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 16, sizeof(cl_char), &(isPAImage));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 17, sizeof(cl_mem), &(this->m_UsedLinesBuffer));
+    clErr |= clSetKernelArg(this->m_PixelCalculation, 11, sizeof(cl_float), &(totalSamples_i));
+    clErr |= clSetKernelArg(this->m_PixelCalculation, 12, sizeof(cl_float), &(horizontalExtent));
+    clErr |= clSetKernelArg(this->m_PixelCalculation, 13, sizeof(cl_float), &(mult));
+    clErr |= clSetKernelArg(this->m_PixelCalculation, 14, sizeof(cl_char), &(isPAImage));
+    clErr |= clSetKernelArg(this->m_PixelCalculation, 15, sizeof(cl_mem), &(this->m_UsedLinesBuffer));
   }
   // execute the filter on a 2D/3D NDRange
   if (m_OutputDim[2] == 1 || m_ChunkSize[2] == 1)

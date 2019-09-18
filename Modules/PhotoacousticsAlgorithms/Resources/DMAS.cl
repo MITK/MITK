@@ -121,7 +121,6 @@ __kernel void ckDMAS_g(
     float s_2 = 0;
     float apod_1 = 0;
 
-    float l_i = (float)globalPosX / outputL * inputL;
     float l_p = (float)globalPosX / outputL * horizontalExtent;
     float s_i = (float)globalPosY / outputS * totalSamples_i;
 

@@ -93,7 +93,6 @@ __kernel void ckDAS_g(
   if ( globalPosX < outputL && globalPosY < outputS && globalPosZ < Slices )
   {
     int AddSample = 0;
-    float l_i = 0;
     float l_p = 0;
     float s_i = 0;
 
@@ -101,7 +100,6 @@ __kernel void ckDAS_g(
     
     float output = 0;
 
-    l_i = (float)globalPosX / outputL * inputL;
     l_p = (float)globalPosX / outputL * horizontalExtent;
     s_i = (float)globalPosY / outputS * totalSamples_i;
 

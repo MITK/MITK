@@ -163,8 +163,6 @@ void mitk::PhotoacousticOCLBeamformingFilter::Execute()
   {
     int reconstructionLines = this->m_Conf->GetReconstructionLines();
     int samplesPerLine = this->m_Conf->GetSamplesPerLine();
-    float angle = this->m_Conf->GetAngle();
-    float probeRadius = this->m_Conf->GetProbeRadius();
     float totalSamples_i = (float)(m_Conf->GetReconstructionDepth()) / (float)(m_Conf->GetSpeedOfSound() * m_Conf->GetTimeSpacing());
     totalSamples_i = totalSamples_i <= m_Conf->GetInputDim()[1] ? totalSamples_i : m_Conf->GetInputDim()[1];
     float horizontalExtent = m_Conf->GetHorizontalExtent();

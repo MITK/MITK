@@ -76,7 +76,6 @@ unsigned short* mitk::BeamformingUtils::MinMaxLines(const mitk::BeamformingSetti
   unsigned short* dDest = new unsigned short[outputL * outputS * 2];
 
   int inputL = (int)config->GetInputDim()[0];
-  int inputS = (int)config->GetInputDim()[1];
   
   float horizontalExtent = config->GetHorizontalExtent();
   float verticalExtent = config->GetReconstructionDepth();
@@ -212,20 +211,16 @@ void mitk::BeamformingUtils::DASSphericalLine(
   short AddSample = 0;
   short maxLine = 0;
   short minLine = 0;
-  float l_i = 0;
   float l_p = 0;
   float s_i = 0;
 
   float apod_mult = 1;
-
-  float probeRadius = config->GetProbeRadius();
 
   short usedLines = (maxLine - minLine);
 
   float totalSamples_i = (float)(config->GetReconstructionDepth()) / (float)(config->GetSpeedOfSound() * config->GetTimeSpacing());
   totalSamples_i = totalSamples_i <= inputS ? totalSamples_i : inputS;
 
-  l_i = (float)line / outputL * inputL;
   l_p = (float)line / outputL * config->GetHorizontalExtent();
 
   for (short sample = 0; sample < outputS; ++sample)
@@ -273,13 +268,10 @@ void mitk::BeamformingUtils::DMASSphericalLine(
 
   short maxLine = 0;
   short minLine = 0;
-  float l_i = 0;
   float l_p = 0;
   float s_i = 0;
 
   float apod_mult = 1;
-
-  float probeRadius = config->GetProbeRadius();
 
   float mult = 0;
 
@@ -289,7 +281,6 @@ void mitk::BeamformingUtils::DMASSphericalLine(
     (float)(config->GetSpeedOfSound() * config->GetTimeSpacing());
   totalSamples_i = totalSamples_i <= inputS ? totalSamples_i : inputS;
 
-  l_i = (float)line / outputL * inputL;
   l_p = (float)line / outputL * config->GetHorizontalExtent();
 
   for (short sample = 0; sample < outputS; ++sample)
@@ -360,15 +351,10 @@ void mitk::BeamformingUtils::sDMASSphericalLine(
 
   short maxLine = 0;
   short minLine = 0;
-  float l_i = 0;
   float l_p = 0;
   float s_i = 0;
 
   float apod_mult = 1;
-
-  float probeRadius = config->GetProbeRadius();
-  bool concave = config->GetGeometry() == mitk::BeamformingSettings::ProbeGeometry::Concave;
-  float elementHeight = 0;
 
   float mult = 0;
 
@@ -378,7 +364,6 @@ void mitk::BeamformingUtils::sDMASSphericalLine(
     (float)(config->GetSpeedOfSound() * config->GetTimeSpacing());
   totalSamples_i = totalSamples_i <= inputS ? totalSamples_i : inputS;
 
-  l_i = (float)line / outputL * inputL;
   l_p = (float)line / outputL * config->GetHorizontalExtent();
 
   for (short sample = 0; sample < outputS; ++sample)

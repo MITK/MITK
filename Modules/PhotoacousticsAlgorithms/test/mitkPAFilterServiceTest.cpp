@@ -72,10 +72,11 @@ public:
       yDim * (0.0125 / 1000000) * (1500),
       false,
       16,
-      mitk::BeamformingSettings::DelayCalc::Spherical,
       mitk::BeamformingSettings::Apodization::Box,
       128,
-      mitk::BeamformingSettings::BeamformingAlgorithm::DAS);
+      mitk::BeamformingSettings::BeamformingAlgorithm::DAS,
+      mitk::BeamformingSettings::ProbeGeometry::Linear,
+      0);
 
     return outputSettings;
   }

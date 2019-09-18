@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCastToFloatImageFilter.h>
 
 #include <itksys/SystemTools.hxx>
-#include <tinyxml\tinyxml.h>
+#include <tinyxml/tinyxml.h>
 
 struct InputParameters
 {
@@ -58,7 +58,7 @@ struct CropSettings
 struct ResampleSettings
 {
   double spacing;
-  int dimX;
+  unsigned int dimX;
 };
 
 struct BModeSettings
@@ -184,7 +184,6 @@ void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSetti
       if (!processSet.DoBeamforming)
         continue;
 
-      float PitchInMeters = std::stof(elem->Attribute("pitchInMeters"));
       float SpeedOfSound = std::stof(elem->Attribute("speedOfSound"));
       float Angle = std::stof(elem->Attribute("angle"));
       bool IsPhotoacousticImage = std::stoi(elem->Attribute("isPhotoacousticImage"));
@@ -291,7 +290,7 @@ void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSetti
       std::string methodStr = elem->Attribute("method");
       if (methodStr == "EnvelopeDetection")
         bmodeSet.method = mitk::PhotoacousticFilterService::BModeMethod::EnvelopeDetection;
-      else if (elem->Attribute("method") == "Abs")
+      else if (methodStr == "Abs")
         bmodeSet.method = mitk::PhotoacousticFilterService::BModeMethod::Abs;
       else
         mitkThrow() << "BMode method incorrectly set in configuration file";
@@ -308,7 +307,7 @@ int main(int argc, char * argv[])
   BandpassSettings bandpassSettings{5,10,1,1,1540};
   BModeSettings bmodeSettings{ mitk::PhotoacousticFilterService::BModeMethod::EnvelopeDetection, false };
   CropSettings cropSettings{ 0,0,0,0,0,0 };
-  ResampleSettings resSettings{ 0.15 };
+  ResampleSettings resSettings{ 0.15 , 256};
   ProcessSettings processSettings{ false, false, false, false, false };
 
   MITK_INFO << "Parsing settings XML...";

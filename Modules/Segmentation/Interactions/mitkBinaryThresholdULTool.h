@@ -77,6 +77,7 @@ namespace mitk
     void UpdatePreview();
     void CreateNewSegmentationFromThreshold(DataNode* node);
     void OnRoiDataChanged();
+    void SetupPreviewProperties();
 
     DataNode::Pointer m_ThresholdFeedbackNode;
     DataNode::Pointer m_OriginalImageNode;

@@ -55,11 +55,7 @@ mitk::BinaryThresholdULTool::BinaryThresholdULTool()
   m_CurrentUpperThresholdValue(1)
 {
   m_ThresholdFeedbackNode = DataNode::New();
-  m_ThresholdFeedbackNode->SetProperty( "color", ColorProperty::New(0.0, 1.0, 0.0) );
-  m_ThresholdFeedbackNode->SetProperty( "name", StringProperty::New("Thresholding feedback") );
-  m_ThresholdFeedbackNode->SetProperty( "opacity", FloatProperty::New(0.3) );
-  m_ThresholdFeedbackNode->SetProperty("binary", BoolProperty::New(true));
-  m_ThresholdFeedbackNode->SetProperty( "helper object", BoolProperty::New(true) );
+  SetupPreviewProperties();
 }
 
 mitk::BinaryThresholdULTool::~BinaryThresholdULTool()
@@ -148,6 +144,15 @@ void mitk::BinaryThresholdULTool::CancelThresholding()
   m_ToolManager->ActivateTool(-1);
 }
 
+void mitk::BinaryThresholdULTool::SetupPreviewProperties()
+{
+  m_ThresholdFeedbackNode->SetProperty("color", ColorProperty::New(0.0, 1.0, 0.0) );
+  m_ThresholdFeedbackNode->SetProperty("name", StringProperty::New("Thresholding feedback") );
+  m_ThresholdFeedbackNode->SetProperty("opacity", FloatProperty::New(0.3) );
+  m_ThresholdFeedbackNode->SetProperty("binary", BoolProperty::New(true));
+  m_ThresholdFeedbackNode->SetProperty("helper object", BoolProperty::New(true) );
+}
+
 void mitk::BinaryThresholdULTool::SetupPreviewNode()
 {
   if (m_NodeForThresholding.IsNotNull())
@@ -162,10 +167,12 @@ void mitk::BinaryThresholdULTool::SetupPreviewNode()
       if (workingimage)
       {
         m_ThresholdFeedbackNode->SetData(workingimage->Clone());
+        // Set properties again. Props are cleared on data type change
+        SetupPreviewProperties();
 
         //Let's paint the feedback node green...
         mitk::LabelSetImage::Pointer previewImage = dynamic_cast<mitk::LabelSetImage*> (m_ThresholdFeedbackNode->GetData());
-        if (previewImage) 
+        if (previewImage)
         {
           itk::RGBPixel<float> pixel;
           pixel[0] = 0.0f;

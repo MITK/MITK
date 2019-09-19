@@ -1,5 +1,7 @@
 #include "mitkSurfaceUtils.h"
 
+#include <chrono>
+
 #include <vtkCallbackCommand.h>
 
 #include <mitkImageAccessByItk.h>
@@ -7,6 +9,7 @@
 #include <mitkImageCaster.h>
 #include <mitkProgressBar.h>
 #include "mitkShowSegmentationAsAgtkSurface.h"
+#include "mitkShowSegmentationAsElasticNetSurface.h"
 #include "mitkShowSegmentationAsSurface.h"
 
 #include <AutoplanLogging.h>
@@ -53,6 +56,7 @@ void SurfaceCreator::SurfaceCreationTypeProperty::AddSurfaceCreationTypes()
 {
   AddEnum("MITK", static_cast<IdType>(SurfaceCreationType::MITK));
   AddEnum("AGTK", static_cast<IdType>(SurfaceCreationType::AGTK));
+  AddEnum("ElasticNet", static_cast<IdType>(SurfaceCreationType::ELASTIC_NET));
 }
 
 itk::LightObject::Pointer SurfaceCreator::SurfaceCreationTypeProperty::InternalClone() const
@@ -65,9 +69,15 @@ itk::LightObject::Pointer SurfaceCreator::SurfaceCreationTypeProperty::InternalC
 DataNode::Pointer SurfaceCreator::createModel()
 {
   m_Input->SetProperty("Surface Type", SurfaceCreationTypeProperty::New(m_Args.creationType));
-  m_Input->SetProperty("Surface Type.Smooth", BoolProperty::New(m_Args.smooth));
-  m_Input->SetProperty("Surface Type.Decimation", FloatProperty::New(m_Args.decimation * m_Args.decimationRate));
-  m_Input->SetProperty("Surface Type.Light Smoothing", BoolProperty::New(m_Args.lightSmoothing));
+
+  if (m_Args.creationType == SurfaceCreationType::ELASTIC_NET) {
+    m_Input->SetProperty("Surface Type.Elastic Iterations", IntProperty::New(m_Args.elasticIterations));
+    m_Input->SetProperty("Surface Type.Elastic Relaxation", FloatProperty::New(m_Args.elasticRelaxation));
+  } else {
+    m_Input->SetProperty("Surface Type.Smooth", BoolProperty::New(m_Args.smooth));
+    m_Input->SetProperty("Surface Type.Decimation", FloatProperty::New(m_Args.decimation * m_Args.decimationRate));
+    m_Input->SetProperty("Surface Type.Light Smoothing", BoolProperty::New(m_Args.lightSmoothing));
+  }
 
   if (m_Args.outputStorage != nullptr && m_Args.overwrite) {
     auto childs = m_Args.outputStorage->GetDerivations(m_Input);
@@ -100,6 +110,7 @@ DataNode::Pointer SurfaceCreator::createModel()
     surface = m_4dRecreateSurface;
   }
 
+  auto t1 = std::chrono::high_resolution_clock::now();
   for (int curTimeStep = minTimeStep; curTimeStep < maxTimeStep; curTimeStep++) {
     Image::Pointer image3d = extract3D(image, curTimeStep);
 
@@ -111,10 +122,17 @@ DataNode::Pointer SurfaceCreator::createModel()
       case SurfaceCreationType::AGTK:
         result = createModelAgtk(image3d, m_Args);
         break;
+      case SurfaceCreationType::ELASTIC_NET:
+        result = createModelElasticNet(image3d, m_Args);
+        break;
     }
 
     surface->SetVtkPolyData(result, curTimeStep);
   }
+  auto t2 = std::chrono::high_resolution_clock::now();
+
+  auto duration = std::chrono::duration_cast<std::chrono::seconds>(t2 - t1).count();
+  MITK_INFO << "Model generation took " << duration << " seconds.";
 
   DataNode::Pointer node = DataNode::New();
 
@@ -159,9 +177,15 @@ void SurfaceCreator::populateCreationProperties(mitk::DataNode::Pointer segNode)
   }
 
   segNode->SetProperty("Surface Type", SurfaceCreationTypeProperty::New(m_Args.creationType));
-  segNode->SetProperty("Surface Type.Smooth", BoolProperty::New(m_Args.smooth));
-  segNode->SetProperty("Surface Type.Decimation", FloatProperty::New(m_Args.decimation * m_Args.decimationRate));
-  segNode->SetProperty("Surface Type.Light Smoothing", BoolProperty::New(m_Args.lightSmoothing));
+
+  if (m_Args.creationType == SurfaceCreationType::ELASTIC_NET) {
+    m_Input->SetProperty("Surface Type.Elastic Iterations", IntProperty::New(m_Args.elasticIterations));
+    m_Input->SetProperty("Surface Type.Elastic Relaxation", FloatProperty::New(m_Args.elasticRelaxation));
+  } else {
+    segNode->SetProperty("Surface Type.Smooth", BoolProperty::New(m_Args.smooth));
+    segNode->SetProperty("Surface Type.Decimation", FloatProperty::New(m_Args.decimation * m_Args.decimationRate));
+    segNode->SetProperty("Surface Type.Light Smoothing", BoolProperty::New(m_Args.lightSmoothing));
+  }
 }
 
 SurfaceCreator::SurfaceCreator()
@@ -303,17 +327,23 @@ DataNode::Pointer SurfaceCreator::recreateModel()
   args.creationType = (SurfaceCreationType)dynamic_cast<SurfaceCreationTypeProperty*>(surfTypeProp)->GetSurfaceCreationType();
   previousModel->GetOpacity(args.opacity, nullptr);
 
-  args.decimationRate = 0.f;
-  m_Input->GetFloatProperty("Surface Type.Decimation", args.decimationRate);
-  args.decimation = args.decimationRate > .0001f;
-  args.smooth = true;
-  m_Input->GetBoolProperty("Surface Type.Smooth", args.smooth);
-  args.lightSmoothing = false;
-  m_Input->GetBoolProperty("Surface Type.Light Smoothing", args.lightSmoothing);
-  args.outputStorage = m_Args.outputStorage;
-  args.overwrite = false;
   args.removeOnComplete = previousModel;
   args.timestep = m_Args.timestep;
+  args.overwrite = false;
+  args.outputStorage = m_Args.outputStorage;
+
+  if (args.creationType == SurfaceCreationType::ELASTIC_NET) {
+    m_Input->GetIntProperty("Surface Type.Elastic Iterations", args.elasticIterations);
+    m_Input->GetFloatProperty("Surface Type.Elastic Relaxation", args.elasticRelaxation);
+  } else {
+    args.decimationRate = 0.f;
+    m_Input->GetFloatProperty("Surface Type.Decimation", args.decimationRate);
+    args.decimation = args.decimationRate > .0001f;
+    args.smooth = true;
+    m_Input->GetBoolProperty("Surface Type.Smooth", args.smooth);
+    args.lightSmoothing = false;
+    m_Input->GetBoolProperty("Surface Type.Light Smoothing", args.lightSmoothing);
+  }
 
   m_Args = args;
 
@@ -419,4 +449,22 @@ vtkSmartPointer<vtkPolyData> SurfaceCreator::createModelAgtk(Image::Pointer imag
   return surfaceBuilder->GetOutput();
 }
 
+vtkSmartPointer<vtkPolyData> SurfaceCreator::createModelElasticNet(Image::Pointer image, SurfaceCreationArgs args)
+{
+  ShowSegmentationAsElasticNetSurface::SurfaceComputingParameters surfaceParams;
+  surfaceParams.elasticNetIterations = args.elasticIterations;
+  surfaceParams.elasticNetRelaxation = args.elasticRelaxation;
+  ShowSegmentationAsElasticNetSurface::Pointer surfaceBuilder = ShowSegmentationAsElasticNetSurface::New();
+  surfaceBuilder->setArgs(args, surfaceParams);
+
+  ShowSegmentationAsElasticNetSurface::InputImageType::Pointer itkImage;
+  CastToItkImage(image, itkImage);
+  surfaceBuilder->SetInput(itkImage);
+
+  m_ProgressAccumulator->RegisterInternalFilter(surfaceBuilder, 1.f);
+
+  surfaceBuilder->Update();
+
+  return surfaceBuilder->GetOutput();
+}
 }

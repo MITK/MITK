@@ -20,6 +20,7 @@ set(CPP_FILES
   Algorithms/mitkShapeBasedInterpolationAlgorithm.cpp
   Algorithms/mitkShowSegmentationAsAgtkSurface.cpp
   Algorithms/mitkShowSegmentationAsSmoothedSurface.cpp
+  Algorithms/mitkShowSegmentationAsElasticNetSurface.cpp
   Algorithms/mitkShowSegmentationAsSurface.cpp
   Algorithms/mitkVtkImageOverwrite.cpp
   Controllers/mitkSegmentationInterpolationController.cpp

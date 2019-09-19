@@ -372,8 +372,20 @@ void QmitkImageStatisticsView::ResetGUIDefault()
 void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
 {
   mitk::StatusBar::GetInstance()->Clear();
-  auto runnable = m_Runnables[0];
-  m_Runnables.erase(m_Runnables.begin());
+  int i = 0;
+  bool finishedThreadFound = false;
+  QmitkImageStatisticsCalculationRunnable* runnable;
+  while(!finishedThreadFound && i < m_Runnables.size())
+  {
+	  if (m_Runnables[i]->GetStatisticsUpdateSuccessFlag())
+	  {
+		  runnable = m_Runnables[i];
+		  finishedThreadFound = true;
+		  i--;
+	  }
+	  i++;
+  }
+  m_Runnables.erase(m_Runnables.begin()+i);
   if (runnable->GetStatisticsUpdateSuccessFlag())
   {
     auto statistic = runnable->GetStatisticsData();

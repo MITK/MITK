@@ -173,31 +173,17 @@ void mitk::OtsuTool3D::RunSegmentation(int regions, bool useValley, int numberOf
 
 void mitk::OtsuTool3D::ConfirmSegmentation()
 {
-  mitk::LabelSetImage::Pointer resultImage = mitk::LabelSetImage::New();
-  resultImage->InitializeByLabeledImage(dynamic_cast<mitk::Image*>(m_BinaryPreviewNode->GetData()));
-
-  auto targetSeg = GetTargetSegmentationNode();
-  if (0 == strcmp(targetSeg->GetData()->GetNameOfClass(), resultImage->GetNameOfClass())) {
-    targetSeg->SetData(resultImage);
-  } else {
-    auto propList = targetSeg->GetPropertyList();
-    
-    std::string name = "No Name!", caption = "No Name!";
-    mitk::ColorProperty::Pointer color;
-    float opacity = 1.f;
-    propList->GetStringProperty("name", name);
-    propList->GetStringProperty("caption", caption);
-    propList->GetFloatProperty("opacity", opacity);
-    color = dynamic_cast<mitk::ColorProperty*>(propList->GetProperty("color"));
-
-    targetSeg->SetData(resultImage);
-
-    targetSeg->SetStringProperty("name", name.c_str());
-    targetSeg->SetStringProperty("caption", caption.c_str());
-    targetSeg->SetFloatProperty("opactity", opacity);
-    targetSeg->SetProperty("color", color);
+  if (dynamic_cast<mitk::LabelSetImage*>(GetTargetSegmentationNode()->GetData()) != nullptr)
+  {
+    mitk::LabelSetImage::Pointer resultImage = mitk::LabelSetImage::New();
+    resultImage->InitializeByLabeledImage(dynamic_cast<mitk::Image*>(m_BinaryPreviewNode->GetData()));
+    GetTargetSegmentationNode()->SetData(resultImage);
   }
-   
+  else
+  {
+    GetTargetSegmentationNode()->SetData(m_BinaryPreviewNode->GetData());
+  }
+
   m_ToolManager->ActivateTool(-1);
 }
 

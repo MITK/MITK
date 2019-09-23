@@ -107,6 +107,8 @@ protected:
     Ui::QmitkGeometryToolsViewControls m_Controls;
 
     mitk::TimeGeometry::Pointer m_CurrentGeometry;
+
+    std::map<std::string, bool> m_Pickables;
 };
 
 #endif // QmitkGeometryToolsView_h

@@ -401,12 +401,13 @@ template<typename TPixel, unsigned int VImageDimension>
 void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(itk::Image<TPixel, VImageDimension>* itkImage, mitk::BaseGeometry* imageGeometry, mitk::PointSet::PointType seedPoint)
 {
   typedef itk::Image<TPixel, VImageDimension> InputImageType;
+  typedef itk::Image<SegmentationPixelType, VImageDimension> SegmentationType;
   typedef typename InputImageType::IndexType IndexType;
-  typedef itk::ConnectedAdaptiveThresholdImageFilter<InputImageType, InputImageType> RegionGrowingFilterType;
+  typedef itk::ConnectedAdaptiveThresholdImageFilter<InputImageType, SegmentationType> RegionGrowingFilterType;
   typename RegionGrowingFilterType::Pointer regionGrower = RegionGrowingFilterType::New();
-  typedef itk::MinimumMaximumImageCalculator<InputImageType> MinMaxValueFilterType;
-  typedef itk::BinaryThresholdImageFilter< InputImageType, InputImageType > ThresholdFilterType;
-  typedef itk::MaskImageFilter< InputImageType, InputImageType, InputImageType > MaskImageFilterType;
+  typedef itk::MinimumMaximumImageCalculator<SegmentationType> MinMaxValueFilterType;
+  typedef itk::BinaryThresholdImageFilter<SegmentationType, SegmentationType> ThresholdFilterType;
+  typedef itk::MaskImageFilter<SegmentationType, SegmentationType, SegmentationType> MaskImageFilterType;
 
   if ( !imageGeometry->IsInside(seedPoint) )
   {
@@ -492,6 +493,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(itk::Image<TPixel, VI
   newNode->SetProperty("color", mitk::ColorProperty::New(0.0,1.0,0.0));
   newNode->SetProperty("layer", mitk::IntProperty::New(1));
   newNode->SetProperty("opacity", mitk::FloatProperty::New(0.7));
+  newNode->SetProperty("binary", mitk::BoolProperty::New(true));
 
   //delete the old image, if there was one:
   mitk::DataNode::Pointer binaryNode = m_DataStorage->GetNamedNode(m_NAMEFORLABLEDSEGMENTATIONIMAGE);
@@ -501,8 +503,8 @@ void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(itk::Image<TPixel, VI
   m_DataStorage->Add( newNode, m_InputImageNode );
 
 
-  typename InputImageType::Pointer inputImageItk;
-  mitk::CastToItkImage< InputImageType >( resultImage, inputImageItk );
+  typename SegmentationType::Pointer inputImageItk;
+  mitk::CastToItkImage<SegmentationType>( resultImage, inputImageItk );
   //volume rendering preview masking
   typename ThresholdFilterType::Pointer thresholdFilter = ThresholdFilterType::New();
   thresholdFilter->SetInput( inputImageItk );
@@ -530,7 +532,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(itk::Image<TPixel, VI
   maskFilter->UpdateLargestPossibleRegion();
 
   mitk::Image::Pointer mitkMask;
-  mitk::CastToMitkImage< InputImageType >( maskFilter->GetOutput(), mitkMask );
+  mitk::CastToMitkImage<SegmentationType>( maskFilter->GetOutput(), mitkMask );
   mitk::DataNode::Pointer maskedNode = mitk::DataNode::New();
   maskedNode->SetData( mitkMask );
 
@@ -725,9 +727,24 @@ void QmitkAdaptiveRegionGrowingToolGUI::ConfirmSegmentation()
     return;
   }
 
+  mitk::DataNode::Pointer targetSegmentation = m_RegionGrow3DTool->GetTargetSegmentationNode();
+  mitk::Image::Pointer originalSegmentation = dynamic_cast<mitk::Image*>(targetSegmentation->GetData());
+  mitk::Image::Pointer previewImage = dynamic_cast<mitk::Image*>(newNode->GetData());
 
-  mitk::Image* img = dynamic_cast<mitk::Image*>(newNode->GetData());
-  AccessByItk(img, ITKThresholding);
+  // Select single 3D volume if we have more than one time step
+  if(originalSegmentation->GetTimeGeometry()->CountTimeSteps() > 1) {
+    int timeStep = mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))->GetTimeStep();
+    mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+    timeSelector->SetInput( originalSegmentation );
+    timeSelector->SetTimeNr( timeStep );
+    timeSelector->UpdateLargestPossibleRegion();
+    AccessByItk_1(timeSelector->GetOutput(), ITKThresholding, previewImage);
+  } else { // Use original
+    AccessByItk_1(originalSegmentation, ITKThresholding, previewImage);
+  }
+
+  originalSegmentation->Modified();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   // disable volume rendering preview after the segmentation node was created
   this->EnableVolumeRendering(false);
@@ -742,71 +759,53 @@ void QmitkAdaptiveRegionGrowingToolGUI::ConfirmSegmentation()
 }
 
 template<typename TPixel, unsigned int VImageDimension>
-void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImageDimension>* itkImage)
+void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImageDimension>* inputSegmentation, mitk::Image* computedSegmentation)
 {
-  mitk::DataNode::Pointer targetSegmentation = m_RegionGrow3DTool->GetTargetSegmentationNode();
-  mitk::Image::Pointer originalSegmentation = dynamic_cast<mitk::Image*>(targetSegmentation->GetData());
-  
+  if (computedSegmentation == nullptr) {
+    return;
+  }
+
   int displayedComponent = 0;
   m_InputImageNode->GetIntProperty("Image.Displayed Component", displayedComponent);
 
-  int timeStep = mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1") )->GetTimeStep();
+  typedef itk::Image<TPixel, VImageDimension> InputImageType;
+  typedef itk::Image<unsigned char, VImageDimension> SegmentationType;
 
-  if (originalSegmentation)
+  typename SegmentationType::Pointer computedSegmentationInITK = SegmentationType::New();
+  mitk::CastToItkImage<SegmentationType>(computedSegmentation, computedSegmentationInITK);
+
+  //Fill current preiview image in segmentation image
+  inputSegmentation->FillBuffer(0);
+  itk::ImageRegionIterator<InputImageType> itOriginal(inputSegmentation, inputSegmentation->GetLargestPossibleRegion());
+  itk::ImageRegionIterator<SegmentationType> itComputed(computedSegmentationInITK, computedSegmentationInITK->GetLargestPossibleRegion());
+  itOriginal.GoToBegin();
+  itComputed.GoToBegin();
+
+  //calculate threhold from slider value
+  int currentTreshold = 0;
+  if (m_CurrentRGDirectionIsUpwards)
   {
-    typedef itk::Image<TPixel, VImageDimension> InputImageType;
-
-    //select single 3D volume if we have more than one time step
-    typename InputImageType::Pointer originalSegmentationInITK = InputImageType::New();
-    if(originalSegmentation->GetTimeGeometry()->CountTimeSteps() > 1) {
-      mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-      timeSelector->SetInput( originalSegmentation );
-      timeSelector->SetTimeNr( timeStep );
-      timeSelector->UpdateLargestPossibleRegion();
-      CastToItkImage(timeSelector->GetOutput(), originalSegmentationInITK);
-    } else { // Use original
-      CastToItkImage(originalSegmentation, originalSegmentationInITK);
-    }
-
-    //Fill current preiview image in segmentation image
-    originalSegmentationInITK->FillBuffer(0);
-    itk::ImageRegionIterator<InputImageType> itOutput( originalSegmentationInITK, originalSegmentationInITK->GetLargestPossibleRegion() );
-    itk::ImageRegionIterator<InputImageType> itInput( itkImage, itkImage->GetLargestPossibleRegion() );
-    itOutput.GoToBegin();
-    itInput.GoToBegin();
-
-    //calculate threhold from slider value
-    int currentTreshold = 0;
-    if (m_CurrentRGDirectionIsUpwards)
-    {
-      currentTreshold = m_UPPERTHRESHOLD - m_Controls.m_PreviewSlider->value() + 1;
-    }
-    else
-    {
-      currentTreshold = m_Controls.m_PreviewSlider->value() - m_LOWERTHRESHOLD;
-    }
-
-    //iterate over image and set pixel in segmentation according to thresholded labeled image
-    while( !itOutput.IsAtEnd() && !itInput.IsAtEnd() )
-    {
-      //Use threshold slider to determine if pixel is set to 1
-      if( itInput.Value() != 0 && itInput.Value() >= currentTreshold )
-      {
-        itOutput.Set( 1 );
-      }
-
-      ++itOutput;
-      ++itInput;
-    }
-
-
-    //combine current working segmentation image with our region growing result
-    originalSegmentation->InitializeByItk<InputImageType>(originalSegmentationInITK);
-    originalSegmentation->SetVolume(originalSegmentationInITK->GetPixelContainer()->GetBufferPointer(), timeStep);
-
-    originalSegmentation->Modified();
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    currentTreshold = m_UPPERTHRESHOLD - m_Controls.m_PreviewSlider->value() + 1;
   }
+  else
+  {
+    currentTreshold = m_Controls.m_PreviewSlider->value() - m_LOWERTHRESHOLD;
+  }
+
+  //iterate over image and set pixel in segmentation according to thresholded labeled image
+  while(!itOriginal.IsAtEnd() && !itComputed.IsAtEnd()) {
+    //Use threshold slider to determine if pixel is set to 1
+    if(itComputed.Value() != 0) {
+      if ((!m_CurrentRGDirectionIsUpwards && itComputed.Value() >= currentTreshold) ||
+          (m_CurrentRGDirectionIsUpwards && itComputed.Value() < currentTreshold)) {
+        itOriginal.Set(1);
+      }
+    }
+
+    ++itOriginal;
+    ++itComputed;
+  }
+
 }
 
 void QmitkAdaptiveRegionGrowingToolGUI::EnableControls(bool enable)

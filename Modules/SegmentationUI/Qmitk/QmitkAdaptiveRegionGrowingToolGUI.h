@@ -58,6 +58,8 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
+  typedef unsigned char SegmentationPixelType;
+
   QmitkAdaptiveRegionGrowingToolGUI(QWidget* parent=0);
 
   /** \brief Method to create the connections for the component. This Method is obligatory even if no connections is needed*/
@@ -219,8 +221,8 @@ private:
   template < typename TPixel, unsigned int VImageDimension >
   void StartRegionGrowing(itk::Image< TPixel, VImageDimension >* itkImage, mitk::BaseGeometry* imageGeometry, mitk::PointSet::PointType seedPoint);
 
-  template < typename TPixel, unsigned int VImageDimension >
-  void ITKThresholding( itk::Image< TPixel, VImageDimension >* inputImage );
+  template <typename TPixel, unsigned int VImageDimension>
+  void ITKThresholding(itk::Image<TPixel, VImageDimension>* inputSegmentation, mitk::Image* computedSegmentation);
 
   void InitializeLevelWindow();
 

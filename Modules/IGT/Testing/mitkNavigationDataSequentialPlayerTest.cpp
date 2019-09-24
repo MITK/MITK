@@ -142,7 +142,7 @@ public:
       unsigned int invalidSnapshot = 1000;
       myTestPlayer2->GoToSnapshot(invalidSnapshot);
     }
-    catch(mitk::IGTException)
+    catch(mitk::IGTException&)
     {
       exceptionThrown2=true;
     }

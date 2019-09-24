@@ -123,7 +123,7 @@ void QmitkUSControlsCustomVideoDeviceWidget::OnCropAreaChanged()
     m_ControlInterface->UpdateProbeCropping(cropping);
     m_Cropping = cropping;
   }
-  catch (mitk::Exception e)
+  catch (mitk::Exception&)
   {
     m_ControlInterface->SetCropArea(m_Cropping); // reset to last valid crop
     m_ControlInterface->UpdateProbeCropping(m_Cropping);

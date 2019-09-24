@@ -161,7 +161,7 @@ void QmitkIGTPlayerWidget::OnPlayButtonClicked(bool checked)
         {
           navigationDataSet = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::Load(m_CmpFilename.toStdString())[0].GetPointer());
         }
-        catch(mitk::IGTException)
+        catch(mitk::IGTException& e)
         {
           std::string errormessage = "Error during start playing. Invalid or wrong file?";
           QMessageBox::warning(nullptr, "IGTPlayer: Error", errormessage.c_str());
@@ -178,7 +178,7 @@ void QmitkIGTPlayerWidget::OnPlayButtonClicked(bool checked)
           {
             m_RealTimePlayer->StartPlaying();
           }
-          catch(mitk::IGTException)
+          catch(mitk::IGTException& e)
           {
             std::string errormessage = "Error during start playing. Invalid or wrong file?";
             QMessageBox::warning(nullptr, "IGTPlayer: Error", errormessage.c_str());
@@ -194,7 +194,7 @@ void QmitkIGTPlayerWidget::OnPlayButtonClicked(bool checked)
           {
             m_SequentialPlayer->SetNavigationDataSet(navigationDataSet);
           }
-          catch(mitk::IGTException)
+          catch(mitk::IGTException& e)
           {
             std::string errormessage = "Error during start playing. Invalid or wrong file type?";
             QMessageBox::warning(nullptr, "IGTPlayer: Error", errormessage.c_str());

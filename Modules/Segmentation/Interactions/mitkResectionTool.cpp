@@ -216,37 +216,28 @@ void ResectionTool::Resect(ResectionType type)
     break;
   }
   case mitk::ResectionTool::DIVIDE: {
+    auto insideClone = mitkImage3d->Clone();
     auto outsideClone = mitkImage3d->Clone();
-    AccessFixedDimensionByItk_n(mitkImage3d, ResectByMask, 3U, (resectionMask, 0, minValue));
+    AccessFixedDimensionByItk_n(insideClone, ResectByMask, 3U, (resectionMask, 0, minValue));
     AccessFixedDimensionByItk_n(outsideClone, ResectByMask, 3U, (resectionMask, 1, minValue));
 
+    auto insideSegmentation = segmentation->Clone();
     auto outsideSegmentation = segmentation->Clone();
-    AccessFixedDimensionByItk_n(mitkImage3d, paste3Dto4DByItk, 3U, (segmentation, targetTimeStep));
+    AccessFixedDimensionByItk_n(insideClone, paste3Dto4DByItk, 3U, (insideSegmentation, targetTimeStep));
     AccessFixedDimensionByItk_n(outsideClone, paste3Dto4DByItk, 3U, (outsideSegmentation, targetTimeStep));
-    segmentation->Modified();
+    insideSegmentation->Modified();
     outsideSegmentation->Modified();
 
     std::string baseName = workingData->GetName();
     std::string baseCaption = "";
     workingData->GetStringProperty("caption", baseCaption);
-    workingData->SetName(baseName + " (1)");
-    workingData->SetStringProperty("caption", (baseCaption + " (1)").c_str());
 
-    mitk::ProgressBar::GetInstance()->Reset();
-    mitk::ProgressBar::GetInstance()->AddStepsToDo(200);
+    mitk::DataNode::Pointer insideNode = workingData->Clone();
+    insideNode->SetData(insideClone);
+    insideNode->ConcatenatePropertyList(workingData->GetPropertyList()->Clone(), true);
 
-    SurfaceCreator::Pointer surfaceCreator = SurfaceCreator::New();
-    SurfaceCreator::SurfaceCreationArgs surfaceArgs;
-    surfaceArgs.recreate = true;
-    surfaceArgs.outputStorage = m_ToolManager->GetDataStorage();
-    surfaceArgs.timestep = targetTimeStep;
-    surfaceCreator->setArgs(surfaceArgs);
-    surfaceCreator->setInput(workingData);
-
-    CommandProgressUpdate::Pointer progressCommand = CommandProgressUpdate::New();
-    unsigned long progressTag = surfaceCreator->AddObserver(itk::ProgressEvent(), progressCommand);
-
-    surfaceCreator->Update();
+    insideNode->SetName(baseName + " (1)");
+    insideNode->SetStringProperty("caption", (baseCaption + " (1)").c_str());
 
     mitk::DataNode::Pointer outsideNode = workingData->Clone();
     outsideNode->SetData(outsideClone);
@@ -257,7 +248,23 @@ void ResectionTool::Resect(ResectionType type)
 
     auto parents = m_ToolManager->GetDataStorage()->GetSources(workingData);
     mitk::DataNode* parent = (parents->size() > 0) ? parents->at(0) : nullptr;
+    m_ToolManager->GetDataStorage()->Add(insideNode, parent);
     m_ToolManager->GetDataStorage()->Add(outsideNode, parent);
+
+    mitk::ProgressBar::GetInstance()->Reset();
+    mitk::ProgressBar::GetInstance()->AddStepsToDo(200);
+
+    SurfaceCreator::Pointer surfaceCreator = SurfaceCreator::New();
+    SurfaceCreator::SurfaceCreationArgs surfaceArgs;
+    surfaceArgs.outputStorage = m_ToolManager->GetDataStorage();
+    surfaceArgs.timestep = targetTimeStep;
+    surfaceCreator->setArgs(surfaceArgs);
+    surfaceCreator->setInput(insideNode);
+
+    CommandProgressUpdate::Pointer progressCommand = CommandProgressUpdate::New();
+    unsigned long progressTag = surfaceCreator->AddObserver(itk::ProgressEvent(), progressCommand);
+
+    surfaceCreator->Update();
 
     surfaceCreator->RemoveObserver(progressTag);
     CommandProgressUpdate::Pointer secondProgressCommand = CommandProgressUpdate::New();

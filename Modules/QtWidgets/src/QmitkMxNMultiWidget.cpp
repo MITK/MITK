@@ -233,7 +233,7 @@ void QmitkMxNMultiWidget::SetLayoutImpl()
     SetActiveRenderWindowWidget(firstRenderWindowWidget);
   }
 
-  GetMultiWidgetLayoutManager()->OnLayoutDesignChanged(QmitkMultiWidgetLayoutManager::LayoutDesign::DEFAULT);
+  GetMultiWidgetLayoutManager()->SetLayoutDesign(QmitkMultiWidgetLayoutManager::LayoutDesign::DEFAULT);
 }
 
 void QmitkMxNMultiWidget::CreateRenderWindowWidget()
@@ -249,7 +249,7 @@ void QmitkMxNMultiWidget::CreateRenderWindowWidget()
 
   auto renderWindow = renderWindowWidget->GetRenderWindow();
   auto layoutManager = GetMultiWidgetLayoutManager();
-  connect(renderWindow, &QmitkRenderWindow::LayoutDesignChanged, layoutManager, &QmitkMultiWidgetLayoutManager::OnLayoutDesignChanged);
+  connect(renderWindow, &QmitkRenderWindow::LayoutDesignChanged, layoutManager, &QmitkMultiWidgetLayoutManager::SetLayoutDesign);
   connect(renderWindow, &QmitkRenderWindow::ResetView, this, &QmitkMxNMultiWidget::ResetCrosshair);
   connect(renderWindow, &QmitkRenderWindow::CrosshairVisibilityChanged, this, &QmitkMxNMultiWidget::SetCrosshairVisibility);
   connect(renderWindow, &QmitkRenderWindow::CrosshairRotationModeChanged, this, &QmitkMxNMultiWidget::SetWidgetPlaneMode);

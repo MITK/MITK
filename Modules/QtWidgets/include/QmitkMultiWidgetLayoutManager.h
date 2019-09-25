@@ -57,12 +57,12 @@ public:
   * @brief This function is called by render window widgets. Given a specific
   *        layout design the layout of the multi widget data member is set with this method.
   */
-  void OnLayoutDesignChanged(LayoutDesign layoutDesign);
+  void SetLayoutDesign(LayoutDesign layoutDesign);
   /**
   * @brief Allow setting the current render window widget without relying on the sending object.
   *
-  *    Calling 'OnLayoutDesignChanged' will overwrite the current render window widget but using the public
-  *    layout setter the current render window widget cna be defined using the function.
+  *    Calling 'SetLayoutDesign' will overwrite the current render window widget but using the public
+  *    layout setter the current render window widget can be defined using the function.
   *    This is necessary for layouts that work with a specific selected render window widget.
   */
   void SetCurrentRenderWindowWidget(QmitkRenderWindowWidget* renderWindowWidget);

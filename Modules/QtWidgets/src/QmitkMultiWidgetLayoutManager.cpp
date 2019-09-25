@@ -33,7 +33,7 @@ QmitkMultiWidgetLayoutManager::QmitkMultiWidgetLayoutManager(QmitkAbstractMultiW
   // nothing here
 }
 
-void QmitkMultiWidgetLayoutManager::OnLayoutDesignChanged(LayoutDesign layoutDesign)
+void QmitkMultiWidgetLayoutManager::SetLayoutDesign(LayoutDesign layoutDesign)
 {
   if (nullptr == m_MultiWidget)
   {

@@ -358,7 +358,7 @@ void QmitkMultiWidgetLayoutManager::SetOnly2DVerticalLayout()
 
 void QmitkMultiWidgetLayoutManager::SetOneTop3DBottomLayout()
 {
-  MITK_INFO << "Set one 2D top and 3D bottom layout" << std::endl;
+  MITK_INFO << "Set one top and all 3D bottom layout" << std::endl;
 
   m_MultiWidget->ActivateMenuWidget(false);
 
@@ -403,7 +403,7 @@ void QmitkMultiWidgetLayoutManager::SetOneTop3DBottomLayout()
 
 void QmitkMultiWidgetLayoutManager::SetOneLeft3DRightLayout()
 {
-  MITK_INFO << "Set one 2D left and 3D right layout" << std::endl;
+  MITK_INFO << "Set one left and all 3D right layout" << std::endl;
 
   m_MultiWidget->ActivateMenuWidget(false);
 

@@ -144,8 +144,6 @@ private:
   mitk::DataNode::Pointer m_PlaneNode2;
   mitk::DataNode::Pointer m_PlaneNode3;
 
-  int m_PlaneMode;
-
   /**
    * @brief m_ParentNodeForGeometryPlanes This helper object is added to the datastorage
    * and contains the 3 planes for displaying the image geometry (crosshair and 3D planes).

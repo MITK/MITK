@@ -25,8 +25,15 @@ class QmitkAbstractMultiWidget;
 class QmitkRenderWindowWidget;
 
 /**
-* @brief
+* @brief The layout manager provides different layout-functions that can modify the layout of an QmitkAbstractMultiWidget.
 *
+*   The constructor is used with the specific multi widget that should be modified. The function 'SetLayoutDesign'
+*   can then be used to modify the layout of the multi widget. The function needs to be called with the signal-slot
+*   syntax from a 'QmitkRenderWindow' since it retrieves the specific render window and sets it as the current render window.
+*   Some layouts work with a specific render window (e.g. ONE_BIG / SetOneBigLayout()), so the current render window is
+*   then used by these layout functions.
+*   The publicly accessible layout functions can also be called directly but in order to work the current render window
+*   needs to be set before by using 'SetCurrentRenderWindowWidget'.
 *
 */
 class MITKQTWIDGETS_EXPORT QmitkMultiWidgetLayoutManager : public QObject
@@ -67,21 +74,51 @@ public:
   */
   void SetCurrentRenderWindowWidget(QmitkRenderWindowWidget* renderWindowWidget);
 
+  /**
+  * @brief The default layout shows all render windows in a rectangle.
+  */
   void SetDefaultLayout();
+  /**
+  * @brief All 2D render windows are spread horizontally above all 3D render windows.
+  */
   void SetAll2DTop3DBottomLayout();
+  /**
+  * @brief All 2D render windows are spread vertically beneath all 3D render windows.
+  */
   void SetAll2DLeft3DRightLayout();
-
+  /**
+  * @brief The current render window is displayed as a single 'full screen' render window.
+  */
   void SetOneBigLayout();
-
+  /**
+  * @brief All 2D render windows are spread horizontally, no 3D render windows.
+  */
   void SetOnly2DHorizontalLayout();
+  /**
+  * @brief All 2D render windows are spread vertically, no 3D render windows.
+  */
   void SetOnly2DVerticalLayout();
-
+  /**
+  * @brief The current render window is put above all 3D render windows, which are spread
+  *        horizontally below the current render window.
+  */
   void SetOneTop3DBottomLayout();
+  /**
+  * @brief The current render window is put beneath all 3D render windows, which are spread
+  *        vertically beneath the current render window.
+  */
   void SetOneLeft3DRightLayout();
-
+  /**
+  * @brief All 2D and 3D render windows are spread horizontally.
+  */
   void SetAllHorizontalLayout();
+  /**
+  * @brief All 2D and 3D render windows are spread vertically.
+  */
   void SetAllVerticalLayout();
-
+  /**
+  * @brief Hide the current render window.
+  */
   void RemoveOneLayout();
 
 private:

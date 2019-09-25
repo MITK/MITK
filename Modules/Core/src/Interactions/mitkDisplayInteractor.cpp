@@ -513,7 +513,7 @@ void mitk::DisplayInteractor::SetCrosshair(mitk::StateMachineAction *, mitk::Int
   const BaseRenderer::Pointer sender = interactionEvent->GetSender();
   auto renWindows = sender->GetRenderingManager()->GetAllRegisteredRenderWindows();
   InteractionPositionEvent* positionEvent = static_cast<InteractionPositionEvent*>(interactionEvent);
-  Point3D pos = positionEvent->GetPositionInWorld();
+  Point3D pos = positionEvent->GetPlanePositionInWorld();
 
   for(auto renWin : renWindows)
   {

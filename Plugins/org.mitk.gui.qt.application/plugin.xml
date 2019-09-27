@@ -2,9 +2,11 @@
 <?eclipse version="3.0"?>
 <plugin>
 
+  <!--
   <extension point="org.blueberry.ui.preferencePages">
     <page id="org.mitk.EditorsPreferencePage" name="Editors" class="QmitkEditorsPreferencePage"/>
   </extension>
+  -->
 
   <extension point="org.blueberry.ui.handlers">
     <handler

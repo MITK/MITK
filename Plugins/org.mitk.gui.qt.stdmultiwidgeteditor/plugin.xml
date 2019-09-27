@@ -12,8 +12,8 @@
   </extension>
 
   <extension point="org.blueberry.ui.preferencePages">
-    <page id="org.mitk.StdMultiWidgetEditorPreferencePage" name="Standard Multi Widget"
-      class="QmitkStdMultiWidgetEditorPreferencePage" category="org.mitk.EditorsPreferencePage">
+    <page id="org.mitk.StdMultiWidgetEditorPreferencePage" name="Editor"
+      class="QmitkStdMultiWidgetEditorPreferencePage"> <!--category="org.mitk.EditorsPreferencePage"-->
       <keywordreference id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords"/>
     </page>
   </extension>

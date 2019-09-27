@@ -1323,9 +1323,9 @@ void QmitkUltrasoundCalibration::OnFreezeClicked()
 {
   if (m_CombinedModality->GetIsFreezed())
   {
-    // device was already frozen so we need to delete all Spacing points because they need to be collected all at once
-    // no need to check if all four points are already collected, because if thats the case you can no longer click the
-    // Freeze Button
+    // device was already frozen so we need to delete all spacing points because they need to be collected all at once
+    // no need to check if all four points are already collected, because if that's the case you can no longer click the
+    // Freeze button
     m_SpacingPoints->Clear();
     m_Controls.m_SpacingPointsList->clear();
     m_SpacingPointsCount = 0;

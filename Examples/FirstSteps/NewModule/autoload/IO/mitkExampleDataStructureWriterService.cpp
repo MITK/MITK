@@ -86,7 +86,7 @@ void mitk::ExampleDataStructureWriterService::Write()
     MITK_INFO << "Example Data Structure has been written";
   }
 
-  catch (mitk::Exception e)
+  catch (const mitk::Exception& e)
   {
     MITK_ERROR << e.GetDescription();
   }

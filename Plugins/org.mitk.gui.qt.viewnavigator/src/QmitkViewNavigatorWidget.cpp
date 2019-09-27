@@ -580,7 +580,7 @@ void QmitkViewNavigatorWidget::ItemClicked(const QModelIndex &index)
                 mitk::QtViewItem* vItem = dynamic_cast< mitk::QtViewItem* >(item);
                 page->ShowView(vItem->m_View->GetId());
             }
-            catch (berry::PartInitException e)
+            catch (const berry::PartInitException& e)
             {
                 BERRY_ERROR << "Error: " << e.what() << std::endl;
             }
@@ -597,7 +597,7 @@ void QmitkViewNavigatorWidget::SaveCurrentPerspectiveAs()
                                    berry::UIElement::Pointer());
     FillTreeList();
   }
-  catch(const berry::NotHandledException)
+  catch(const berry::NotHandledException&)
   {}
   catch(const berry::CommandException& e)
   {

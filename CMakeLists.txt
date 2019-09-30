@@ -1025,7 +1025,7 @@ if(BUILD_TESTING)
     try
       {")
   set(CMAKE_TESTDRIVER_AFTER_TESTMAIN "    }
-      catch( std::exception & excp )
+      catch ( const std::exception & excp  )
         {
         fprintf(stderr,\"%s\\n\",excp.what());
         return EXIT_FAILURE;

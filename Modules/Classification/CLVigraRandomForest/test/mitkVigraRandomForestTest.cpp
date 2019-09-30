@@ -192,9 +192,9 @@ public:
     fr->Parse();
     try{
       fr->Update();
-    }catch(itk::ExceptionObject& ex){
+    }catch ( const itk::ExceptionObject& ex ){
       cout << "Exception caught!" << std::endl;
-      cout << ex << std::endl;
+      cout << ex.GetDescription() << std::endl;
     }
 
     typename itk::CSVArray2DDataObject<T>::Pointer p = fr->GetOutput();
@@ -254,9 +254,9 @@ public:
     fr->Parse();
     try{
       fr->Update();
-    }catch(itk::ExceptionObject& ex){
+    }catch ( const itk::ExceptionObject& ex ){
       cout << "Exception caught!" << std::endl;
-      cout << ex << std::endl;
+      cout << ex.GetDescription() << std::endl;
     }
 
     typename itk::CSVArray2DDataObject<T>::Pointer p = fr->GetOutput();

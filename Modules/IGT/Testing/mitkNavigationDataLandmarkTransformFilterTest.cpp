@@ -484,7 +484,7 @@ class mitkNavigationDataLandmarkTransformFilterTestClass
       myFilter->SetSourceLandmarks(refSet);
       myFilter->SetTargetLandmarks(movSet);
       }
-    catch(itk::ExceptionObject)
+    catch(itk::ExceptionObject&)
       {
       exceptionThrown = true;
       }

@@ -109,7 +109,7 @@ class mitkNavigationDataSourceTestClass
       {
       myFilter->GetOutputIndex("nonsense name");
       }
-    catch(std::invalid_argument e)
+    catch(std::invalid_argument&)
       {
       exceptionThrown=true;
       }
@@ -122,7 +122,7 @@ class mitkNavigationDataSourceTestClass
       mitk::NavigationData::Pointer graftObject;
       myFilter->GraftNthOutput(100,graftObject);
       }
-    catch(itk::ExceptionObject e)
+    catch(itk::ExceptionObject&)
       {
       exceptionThrown=true;
       }

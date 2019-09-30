@@ -212,7 +212,7 @@ static void TestWrongInputs()
   {
     nd->CopyInformation(nullptr);
   }
-  catch(itk::ExceptionObject e)
+  catch(itk::ExceptionObject&)
   {
     success = true;
   }
@@ -225,7 +225,7 @@ static void TestWrongInputs()
   {
     nd->Graft(nullptr);
   }
-  catch(itk::ExceptionObject e)
+  catch(itk::ExceptionObject&)
   {
     success = true;
   }

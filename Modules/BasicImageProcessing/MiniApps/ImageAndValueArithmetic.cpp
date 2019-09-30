@@ -30,7 +30,7 @@ static bool ConvertToBool(std::map<std::string, us::Any> &data, std::string name
   try {
     return us::any_cast<bool>(data[name]);
   }
-  catch (us::BadAnyCastException &)
+  catch ( const us::BadAnyCastException & )
   {
     return false;
   }

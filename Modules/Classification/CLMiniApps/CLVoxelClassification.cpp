@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
         {
           allConfig.ReadFile(argv[i]);
         }
-        catch (std::exception &e)
+        catch ( const std::exception &e )
         {
           MITK_INFO << e.what();
         }
@@ -464,7 +464,7 @@ int main(int argc, char* argv[])
     time(&lastTimePoint);
     timingFile.close();
   }
-  catch (std::string s)
+  catch ( const std::string s )
   {
     MITK_INFO << s;
     return 0;

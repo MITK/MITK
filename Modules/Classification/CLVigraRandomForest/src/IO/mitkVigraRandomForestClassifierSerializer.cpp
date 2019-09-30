@@ -53,7 +53,7 @@ std::string mitk::VigraRandomForestClassifierSerializer::Serialize()
   {
     mitk::IOUtil::Save(const_cast<mitk::VigraRandomForestClassifier*>( data ),fullname);
   }
-  catch (std::exception& e)
+  catch ( const std::exception& e )
   {
     MITK_ERROR << " Error serializing object at " << (const void*) this->m_Data
               << " to "

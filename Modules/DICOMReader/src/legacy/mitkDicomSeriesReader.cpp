@@ -207,11 +207,11 @@ namespace mitk
         }
       }
     }
-    catch (itk::MemoryAllocationError &e)
+    catch ( const itk::MemoryAllocationError &e )
     {
       MITK_ERROR << "Out of memory. Cannot load DICOM series: " << e.what();
     }
-    catch (std::exception &e)
+    catch ( const std::exception &e )
     {
       MITK_ERROR << "Error encountered when loading DICOM series:" << e.what();
     }
@@ -1039,7 +1039,7 @@ namespace mitk
     {
       result = IDifyTagValue(tagValueMap[tag] ? tagValueMap[tag] : std::string(""));
     }
-    catch (std::exception &)
+    catch ( const std::exception & )
     {
       // we are happy with even nothing, this will just group images of a series
       // MITK_WARN << "Could not access tag " << tag << ": " << e.what();
@@ -1175,7 +1175,7 @@ namespace mitk
         return unsortedFilenames;
       }
     }
-    catch (std::logic_error &)
+    catch ( const std::logic_error & )
     {
       MITK_WARN << "Sorting error. Leaving series unsorted.";
       return unsortedFilenames;
@@ -1655,7 +1655,7 @@ namespace mitk
       MITK_DEBUG << "  3D+t: " << (imageBlockDescriptor.HasMultipleTimePoints() ? "Yes" : "No");
       MITK_DEBUG << "--------------------------------------------------------------------------------";
     }
-    catch (std::exception &e)
+    catch ( const std::exception &e )
     {
       // reset locale then throw up
       std::cin.imbue(previousCppLocale);

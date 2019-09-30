@@ -33,7 +33,7 @@ mitk::USImage::USImage(mitk::Image::Pointer image) : mitk::Image()
   mitk::ImageReadAccessor imgA(image, image->GetVolumeData(0));
   this->SetVolume(imgA.GetData());
   }
-  catch(mitk::Exception e)
+  catch(mitk::Exception& e)
   {
   mitkReThrow(e) << "Cannot access image data while constructing US image";
   }

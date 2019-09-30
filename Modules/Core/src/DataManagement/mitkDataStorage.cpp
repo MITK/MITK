@@ -344,9 +344,9 @@ mitk::TimeGeometry::ConstPointer mitk::DataStorage::ComputeBoundingGeometry3D(co
             }
           }
         }
-        catch (itk::ExceptionObject &e)
+        catch ( const itk::ExceptionObject &e )
         {
-          MITK_ERROR << e << std::endl;
+          MITK_ERROR << e.GetDescription() << std::endl;
         }
       }
     }

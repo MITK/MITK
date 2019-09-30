@@ -51,7 +51,7 @@ static void ItkThresholdFilter(const itk::Image<TPixel, VDimensions> *image,
   {
     output = mitk::GrabItkImageMemory(thresholder->GetOutput());
   }
-  catch (itk::ExceptionObject &)
+  catch ( const itk::ExceptionObject & )
   {
     MITK_TEST_FAILED_MSG(<< "Thresholding computation failed");
   }

@@ -55,7 +55,7 @@ std::string mitk::ContourModelSetSerializer::Serialize()
     writer.SetInput(contourSet);
     writer.Write();
   }
-  catch (std::exception &e)
+  catch ( const std::exception &e )
   {
     MITK_ERROR << " Error serializing object at " << (const void *)this->m_Data << " to " << fullname << ": "
                << e.what();

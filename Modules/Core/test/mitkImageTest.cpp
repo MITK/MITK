@@ -188,7 +188,7 @@ int mitkImageTest(int argc, char *argv[])
     mitk::ImageReadAccessor imgMemAcc(imgMem);
     p = (int *)imgMemAcc.GetData();
   }
-  catch (mitk::Exception &e)
+  catch ( const mitk::Exception &e )
   {
     MITK_ERROR << e.what();
   }
@@ -205,7 +205,7 @@ int mitkImageTest(int argc, char *argv[])
     mitk::ImageReadAccessor imgMemAcc(imgMem);
     p2 = (int *)imgMemAcc.GetData();
   }
-  catch (mitk::Exception &e)
+  catch ( const mitk::Exception &e )
   {
     MITK_ERROR << e.what();
   }
@@ -228,7 +228,7 @@ int mitkImageTest(int argc, char *argv[])
     mitk::ImageReadAccessor imgMemAcc(imgMem, imgMem->GetSliceData(dim[2] / 2));
     p2 = (int *)imgMemAcc.GetData();
   }
-  catch (mitk::Exception &e)
+  catch ( const mitk::Exception &e )
   {
     MITK_ERROR << e.what();
   }
@@ -264,7 +264,7 @@ int mitkImageTest(int argc, char *argv[])
     mitk::ImageReadAccessor imgMemAcc(imgMem);
     imgMem->SetVolume(imgMemAcc.GetData());
   }
-  catch (mitk::Exception &e)
+  catch ( const mitk::Exception &e )
   {
     MITK_ERROR << e.what();
   }
@@ -297,7 +297,7 @@ int mitkImageTest(int argc, char *argv[])
     mitk::ImageReadAccessor imgMemAcc(imgMem);
     p = (int *)imgMemAcc.GetData();
   }
-  catch (mitk::Exception &e)
+  catch ( const mitk::Exception &e )
   {
     MITK_ERROR << e.what();
   }
@@ -311,7 +311,7 @@ int mitkImageTest(int argc, char *argv[])
     mitk::ImageReadAccessor imgMemAcc(imgMem);
     p = (int *)imgMemAcc.GetData();
   }
-  catch (mitk::Exception &e)
+  catch ( const mitk::Exception &e )
   {
     MITK_ERROR << e.what();
   }
@@ -368,7 +368,7 @@ int mitkImageTest(int argc, char *argv[])
     vecImg = nullptr;
     MITK_TEST_CONDITION_REQUIRED(vecImg.IsNull(), "testing destruction!");
   }
-  catch (mitk::Exception &e)
+  catch ( const mitk::Exception &e )
   {
     MITK_ERROR << e.what();
   }
@@ -502,7 +502,7 @@ int mitkImageTest(int argc, char *argv[])
       mitk::CastToItkImage(image, itkimage);
       MITK_TEST_CONDITION_REQUIRED(itkimage.IsNotNull(), "Test conversion to itk::Image!");
     }
-    catch (std::exception &e)
+    catch ( const std::exception &e )
     {
       MITK_INFO << e.what();
     }

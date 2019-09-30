@@ -72,7 +72,7 @@ void mitk::CoreObjectFactory::UnRegisterExtraFactory(CoreObjectFactoryBase *fact
   {
     m_ExtraFactories.erase(factory);
   }
-  catch (std::exception const &e)
+  catch ( const std::exception &e )
   {
     MITK_ERROR << "Caugt exception while unregistering: " << e.what();
   }

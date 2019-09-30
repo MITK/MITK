@@ -40,9 +40,9 @@ int mitkImageSliceSelectorTest(int argc, char *argv[])
     std::cout << "[TEST DONE]" << std::endl;
     return EXIT_SUCCESS;
   }
-  catch (itk::ExceptionObject &ex)
+  catch ( const itk::ExceptionObject &ex )
   {
-    std::cout << "Exception: " << ex << "[FAILED]" << std::endl;
+    std::cout << "Exception: " << ex.GetDescription() << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
 

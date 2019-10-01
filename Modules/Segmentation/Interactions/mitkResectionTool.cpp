@@ -257,6 +257,7 @@ void ResectionTool::Resect(ResectionType type)
     SurfaceCreator::Pointer surfaceCreator = SurfaceCreator::New();
     SurfaceCreator::SurfaceCreationArgs surfaceArgs;
     surfaceArgs.outputStorage = m_ToolManager->GetDataStorage();
+    surfaceArgs.recreate = true;
     surfaceArgs.timestep = targetTimeStep;
     surfaceCreator->setArgs(surfaceArgs);
     surfaceCreator->setInput(insideNode);

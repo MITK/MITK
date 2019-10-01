@@ -297,10 +297,6 @@ DataNode::Pointer SurfaceCreator::recreateModel()
     }
   }
 
-  if (previousModel == nullptr) {
-    return nullptr;
-  }
-
   BaseProperty* surfTypeProp = m_Input->GetProperty("Surface Type");
 
   if (surfTypeProp == nullptr || dynamic_cast<SurfaceCreationTypeProperty*>(surfTypeProp) == nullptr) {
@@ -325,7 +321,11 @@ DataNode::Pointer SurfaceCreator::recreateModel()
 
   SurfaceCreationArgs args;
   args.creationType = (SurfaceCreationType)dynamic_cast<SurfaceCreationTypeProperty*>(surfTypeProp)->GetSurfaceCreationType();
-  previousModel->GetOpacity(args.opacity, nullptr);
+  if (previousModel != nullptr) {
+    previousModel->GetOpacity(args.opacity, nullptr);
+  } else {
+    args.opacity = 1.f;
+  }
 
   args.removeOnComplete = previousModel;
   args.timestep = m_Args.timestep;

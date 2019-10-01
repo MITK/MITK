@@ -2,9 +2,11 @@
 <plugin>
 
   <extension point="org.blueberry.ui.preferencePages">
+    <!--
     <page id="org.mitk.InputDevicesPreferencePage" name="Input Devices" class="QmitkInputDevicesPrefPage">
       <keywordreference id="org.mitk.InputDevicesPreferencePageKeywords"/>
     </page>
+    -->
     <page id="org.mitk.ConfigPreferencePage" name="Mitk Configuration"
           class="QmitkConfigPreferencePage" >
     </page>
@@ -13,11 +15,13 @@
     </page>
   </extension>
 
+  <!--
   <extension point="org.blueberry.ui.keywords">
     <keyword id="org.mitk.InputDevicesPreferencePageKeywords" label="3D mouse"/>
     <keyword id="org.mitk.InputDevicesPreferencePageKeywords" label="WiiMote"/>
     <keyword id="org.mitk.InputDevicesPreferencePageKeywords" label="Input Devices"/>>
   </extension>
+  -->
 
   <extension point="org.blueberry.ui.views">
     <view

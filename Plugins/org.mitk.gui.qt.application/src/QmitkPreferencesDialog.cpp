@@ -45,11 +45,11 @@ QmitkPreferencesDialog* QmitkPreferencesDialog::activeDialog = nullptr;
 namespace {
   const QHash<QString, QString> translationsMap = QHash<QString, QString>(
     { {"General",               QObject::tr("General")}
-    , {"Editors",               QObject::tr("Editors")}
-    , {"Standard Milti Widget", QObject::tr("Standard Milti Widget")}
+    //, {"Editors",               QObject::tr("Editors")}
+    //, {"Standard Milti Widget", QObject::tr("Standard Milti Widget")}
     , {"Data Manager",          QObject::tr("Data Manager")}
     , {"Hotkeys",               QObject::tr("Hotkeys")}
-    , {"Input Devices",         QObject::tr("Input Devices")}
+    //, {"Input Devices",         QObject::tr("Input Devices")}
     , {"Language",              QObject::tr("Language")}
     , {"Logging",               QObject::tr("Logging")}
     , {"Mitk Configuration",    QObject::tr("Mitk Configuration")}
@@ -58,7 +58,7 @@ namespace {
     , {"Segmentation",          QObject::tr("Segmentation")}
     , {"Segmentation Manager",  QObject::tr("Segmentation Manager")}
     , {"Series Tags",           QObject::tr("Series Tags")} 
-    , {"Standard Multi Widget", QObject::tr("Standard Multi Widget") }  
+    , {"Editor",                QObject::tr("Editor") }
     , {"Navigation",            QObject::tr("Navigation") }
     , {"User Data",             QObject::tr("User Data") } });
   const QList<QString> mandatorySettings = QList<QString>(

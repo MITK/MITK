@@ -76,11 +76,14 @@ void PerfusionCurveDescriptionParameterView::OnSelectionChanged(
     m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
   }
 
+  m_Controls.lableSelectedImage->setText("No series selected.");
+
   if (m_selectedImage.IsNotNull())
   {
     if (m_selectedImage->GetTimeGeometry()->CountTimeSteps() > 1)
     {
       m_Controls.btnCalculateParameters->setEnabled(true);
+      m_Controls.lableSelectedImage->setText((this->m_selectedNode->GetName()).c_str());
     }
     else
     {

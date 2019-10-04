@@ -266,32 +266,6 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
       mitk::IDataStorageService* storageService = mitk::PluginActivator::getContext()->getService<mitk::IDataStorageService>(serviceReference);
       mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
 
-      //special handling of Philips 3D US DICOM.
-      //Copied from DICOMSeriesReaderService
-      if (!seriesToLoad.empty() && mitk::DicomSeriesReader::IsPhilips3DDicom(seriesToLoad.front()))
-      {
-          MITK_INFO << "it is a Philips3D US Dicom file" << std::endl;
-          mitk::LocaleSwitch localeSwitch("C");
-          std::locale previousCppLocale(std::cin.getloc());
-          std::locale l("C");
-          std::cin.imbue(l);
-
-          mitk::DataNode::Pointer node = mitk::DataNode::New();
-          mitk::DicomSeriesReader::StringContainer stringvec;
-          stringvec.push_back(seriesToLoad.front());
-          if (mitk::DicomSeriesReader::LoadDicomSeries(stringvec, *node))
-          {
-              mitk::BaseData::Pointer data = node->GetData();
-              mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New(itksys::SystemTools::GetFilenameName(seriesToLoad.front()));
-              data->GetPropertyList()->SetProperty("name", nameProp);
-              node->SetProperty("name", nameProp);
-              dataStorage->Add(node);
-          }
-          std::cin.imbue(previousCppLocale);
-          return;
-      }
-
-      //Normal DICOM handling (It wasn't a Philips 3D US)
       mitk::DICOMFileReaderSelector::Pointer selector = mitk::DICOMFileReaderSelector::New();
 
       selector->LoadBuiltIn3DConfigs();

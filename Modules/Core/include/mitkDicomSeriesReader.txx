@@ -33,7 +33,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTimeProbesCollectorBase.h>
 #include <itkMetaDataDictionary.h>
 
-#include <itkGDCMImageIO.h>
 #include <itkImage.h>
 #include <itkMetaDataObject.h>
 #include <itkImageSeriesWriter.h>
@@ -53,21 +52,21 @@ inline void AddMetaDataToDictionary(itk::MetaDataDictionary& fromDict, DicomTagT
 {
   typedef itk::MetaDataDictionary DictionaryType;
   typedef itk::MetaDataObject<std::string> MetaDataStringType;
-  
+
   DictionaryType::ConstIterator itr = fromDict.Begin();
   DictionaryType::ConstIterator end = fromDict.End();
-  
+
   StringLookupTable valueList;
   while (itr != end)
   {
     itk::MetaDataObjectBase::Pointer entry = itr->second;
-    
+
     MetaDataStringType::Pointer entryvalue = dynamic_cast<MetaDataStringType*>(entry.GetPointer());
     if (entryvalue)
     {
       std::string tagkey = itr->first;
       std::string tagvalue = entryvalue->GetMetaDataObjectValue();
-      
+
       list[tagkey].SetTableValue(list[tagkey].GetLookupTable().size(), tagvalue);
     }
 
@@ -139,13 +138,8 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK4D( std::list<StringContainer>& 
     image = preLoadedImageBlock;
   }
 
-  if (imageBlockDescriptor.GetSlicesInfo().empty()) {
-    gdcm::Scanner scanner;
-    ScanForSliceInformation(imageBlockDescriptor.GetFilenames(), scanner);
-    CopyMetaDataToImageProperties( imageBlocks, scanner.GetMappings(), io, imageBlockDescriptor, image);
-  } else {
-    CopyMetaDataToImageProperties( imageBlocks, io, imageBlockDescriptor, image);
-  }
+  assert (!imageBlockDescriptor.GetSlicesInfo().empty());
+  CopyMetaDataToImageProperties( imageBlocks, io, imageBlockDescriptor, image);
 
   MITK_DEBUG << "Volume dimension: [" << image->GetDimension(0) << ", "
     << image->GetDimension(1) << ", "
@@ -196,22 +190,19 @@ void DicomSeriesReader::dumpITKImageToDICOM(ImageType* itkImage, const std::vect
   typedef itk::Image<typename ImageType::PixelType, InputDimension> InputImageType;
   typedef itk::Image<typename ImageType::PixelType, OutputDimension> OutputImageType;
   typedef itk::NumericSeriesFileNames OutputNamesGeneratorType;
-  
+
   typedef itk::ImageSeriesWriter<InputImageType, OutputImageType> SeriesWriterType;
-  
+
   typename SeriesWriterType::Pointer seriesWriter = SeriesWriterType::New();
-  
+
   seriesWriter->SetInput(itkImage);
-  
-  typedef itk::GDCMImageIO ImageIOType;
-  
-  ImageIOType::Pointer gdcmIO = ImageIOType::New();
-  
-  seriesWriter->SetImageIO(gdcmIO);
+
+  auto dcmIO = DcmIoType::New();
+  seriesWriter->SetImageIO(dcmIO);
 
   boost::filesystem::path currentPath = dumpFilePath;
   boost::filesystem::create_directories(currentPath);
-  
+
   OutputNamesGeneratorType::Pointer outputNames = OutputNamesGeneratorType::New();
   std::string seriesFormat(currentPath.string());
   seriesFormat = seriesFormat + "IM%06d.dcm";
@@ -220,9 +211,9 @@ void DicomSeriesReader::dumpITKImageToDICOM(ImageType* itkImage, const std::vect
   const int array_size = dictionary.size();
   outputNames->SetEndIndex(array_size);
   seriesWriter->SetFileNames(outputNames->GetFileNames());
-  
+
   seriesWriter->SetMetaDataDictionaryArray(&dictionary);
-  
+
   try
   {
     seriesWriter->Update();
@@ -244,9 +235,11 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
   typedef itk::Image<PixelType, 3> ImageType;
   typedef itk::ImageSeriesReader<ImageType> ReaderType;
 
-  io = DcmIoType::New();
   typename ReaderType::Pointer reader = ReaderType::New();
 
+  if (!io) {
+  }
+  io = itk::GDCMImageIO::New();
   reader->SetImageIO(io);
   reader->ReverseOrderOff();
 

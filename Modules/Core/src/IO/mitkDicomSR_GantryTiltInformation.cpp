@@ -76,10 +76,9 @@ DicomSeriesReader::GantryTiltInformation::GantryTiltInformation(
   */
 
   Vector3Dd normal = itk::CrossProduct(right, up);
-  Point3Dd pointAlongNormal = origin2 + normal;
 
-  double numerator = itk::CrossProduct( pointAlongNormal - origin2 , origin2 - origin1 ).GetSquaredNorm();
-  double denominator = (pointAlongNormal - origin2).GetSquaredNorm();
+  double numerator = itk::CrossProduct( normal, origin2 - origin1 ).GetSquaredNorm();
+  double denominator = normal.GetSquaredNorm();
 
   double distance = sqrt(numerator / denominator);
 

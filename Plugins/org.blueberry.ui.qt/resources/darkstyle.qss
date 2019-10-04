@@ -43,9 +43,9 @@ QWidget:disabled {
 }
 
 QWidget[overImage=true]{ /* For nubmer of slices */
-  color: #3cb7fa;
+  color: #3cc7ff;
   font-weight: bold;
-  background-color:rgba(0,0,0,0);
+  background-color: rgba(0,0,0,0);
 }
 
 QStackedWidget {

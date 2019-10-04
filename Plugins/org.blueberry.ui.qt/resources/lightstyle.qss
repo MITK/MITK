@@ -78,4 +78,5 @@ QWidget#PageCompositeControlWidget {
 QWidget[overImage=true]{ /* For nubmer of slices */
   color: #ffffff;
   background-color: rgba(0,0,0,100);
+  border-radius: 3px;
 }

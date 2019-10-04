@@ -43,23 +43,6 @@ std::vector<itk::SmartPointer<BaseData> > DicomSeriesReaderService::Read()
   std::cin.imbue(l);
 
   std::string fileName = this->GetLocalFileName();
-  if (  DicomSeriesReader::IsPhilips3DDicom(fileName) )
-  {
-    MITK_INFO << "it is a Philips3D US Dicom file" << std::endl;
-    DataNode::Pointer node = DataNode::New();
-    mitk::DicomSeriesReader::StringContainer stringvec;
-    stringvec.push_back(fileName);
-    if (DicomSeriesReader::LoadDicomSeries(stringvec, *node))
-    {
-      BaseData::Pointer data = node->GetData();
-      StringProperty::Pointer nameProp = StringProperty::New(itksys::SystemTools::GetFilenameName(fileName));
-      data->GetPropertyList()->SetProperty("name", nameProp);
-      result.push_back(data);
-    }
-    std::cin.imbue(previousCppLocale);
-    return result;
-
-  }
 
   DicomSeriesReader::FileNamesGrouping imageBlocks = DicomSeriesReader::GetSeries(itksys::SystemTools::GetFilenamePath(fileName));
   const unsigned int size = imageBlocks.size();
@@ -75,11 +58,11 @@ std::vector<itk::SmartPointer<BaseData> > DicomSeriesReaderService::Read()
     const std::string &uid = n_it->first;
     DataNode::Pointer node = DataNode::New();
 
-    const DicomSeriesReader::ImageBlockDescriptor& imageBlockDescriptor( n_it->second );
+    const DicomSeriesReader::ImageBlockDescriptor& imageBlockDescriptor( *n_it->second );
 
     MITK_INFO << "--------------------------------------------------------------------------------";
     MITK_INFO << "DicomSeriesReader: Loading DICOM series " << outputIndex << ": Series UID " << imageBlockDescriptor.GetSeriesInstanceUID() << std::endl;
-    MITK_INFO << "  " << imageBlockDescriptor.GetFilenames().size() << " '" << imageBlockDescriptor.GetModality() << "' files (" << imageBlockDescriptor.GetSOPClassUIDAsString() << ") loaded into 1 mitk::Image";
+    MITK_INFO << "  " << imageBlockDescriptor.size() << " '" << imageBlockDescriptor.GetModality() << "' files (" << imageBlockDescriptor.GetSOPClassUIDAsString() << ") loaded into 1 mitk::Image";
     MITK_INFO << "  multi-frame: " << (imageBlockDescriptor.IsMultiFrameImage()?"Yes":"No");
     MITK_INFO << "  reader support: " << DicomSeriesReader::ReaderImplementationLevelToString(imageBlockDescriptor.GetReaderImplementationLevel());
     MITK_INFO << "  pixel spacing type: " << DicomSeriesReader::PixelSpacingInterpretationToString( imageBlockDescriptor.GetPixelSpacingType() );
@@ -87,7 +70,7 @@ std::vector<itk::SmartPointer<BaseData> > DicomSeriesReaderService::Read()
     MITK_INFO << "  3D+t: " << (imageBlockDescriptor.HasMultipleTimePoints()?"Yes":"No");
     MITK_INFO << "--------------------------------------------------------------------------------";
 
-    if (DicomSeriesReader::LoadDicomSeries(n_it->second.GetFilenames(), *node, true, true, true))
+    if (DicomSeriesReader::LoadDicomSeries(n_it->second->GetFilenames(), *node, true, true, true))
     {
       BaseData::Pointer data = node->GetData();
       PropertyList::Pointer dataProps = data->GetPropertyList();

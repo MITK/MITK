@@ -77,6 +77,8 @@ public:
 
   void OnInteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme);
 
+  void ShowLevelWindowWidget(bool show);
+
 private:
   /**
   * @brief Overridden from QmitkAbstractRenderEditor
@@ -118,8 +120,6 @@ private:
    * @return String in hex (#RRGGBB).
    */
   QString MitkColorToHex(const mitk::Color& color);
-
-  void ShowLevelWindowWidget(bool show);
 
   struct Impl;
   std::unique_ptr<Impl> m_Impl;

@@ -184,6 +184,21 @@ void QmitkStdMultiWidgetEditor::OnInteractionSchemeChanged(mitk::InteractionSche
   QmitkAbstractMultiWidgetEditor::OnInteractionSchemeChanged(scheme);
 }
 
+void QmitkStdMultiWidgetEditor::ShowLevelWindowWidget(bool show)
+{
+  if (show)
+  {
+    m_Impl->m_LevelWindowWidget->disconnect(this);
+    m_Impl->m_LevelWindowWidget->SetDataStorage(GetDataStorage());
+    m_Impl->m_LevelWindowWidget->show();
+  }
+  else
+  {
+    m_Impl->m_LevelWindowWidget->disconnect(this);
+    m_Impl->m_LevelWindowWidget->hide();
+  }
+}
+
 void QmitkStdMultiWidgetEditor::SetFocus()
 {
   const auto& multiWidget = GetMultiWidget();
@@ -392,19 +407,4 @@ QString QmitkStdMultiWidgetEditor::MitkColorToHex(const mitk::Color& color)
   returnColor.setGreen(static_cast<int>(color[1] * colorMax + 0.5));
   returnColor.setBlue(static_cast<int>(color[2] * colorMax + 0.5));
   return returnColor.name();
-}
-
-void QmitkStdMultiWidgetEditor::ShowLevelWindowWidget(bool show)
-{
-  if (show)
-  {
-    m_Impl->m_LevelWindowWidget->disconnect(this);
-    m_Impl->m_LevelWindowWidget->SetDataStorage(GetDataStorage());
-    m_Impl->m_LevelWindowWidget->show();
-  }
-  else
-  {
-    m_Impl->m_LevelWindowWidget->disconnect(this);
-    m_Impl->m_LevelWindowWidget->hide();
-  }
 }

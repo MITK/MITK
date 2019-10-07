@@ -80,7 +80,7 @@ public:
   virtual void SetDataStorage(mitk::DataStorage* dataStorage);
   mitk::DataStorage* GetDataStorage() const;
 
-  mitk::RenderingManager* QmitkAbstractMultiWidget::GetRenderingManager() const;
+  mitk::RenderingManager* GetRenderingManager() const;
 
   int GetRowCount() const;
   int GetColumnCount() const;
@@ -128,7 +128,7 @@ public:
   virtual void SetWidgetPlaneMode(int mode) = 0;
 
   virtual void ActivateMenuWidget(bool state);
-  virtual bool QmitkAbstractMultiWidget::IsMenuWidgetEnabled() const;
+  virtual bool IsMenuWidgetEnabled() const;
 
   QmitkMultiWidgetLayoutManager* GetMultiWidgetLayoutManager() const;
 

@@ -186,6 +186,10 @@ void QmitkRenderWindowMenu::UpdateLayoutDesignList(LayoutDesign layoutDesign)
     m_RemoveOneLayoutAction->setEnabled(false);
     break;
   }
+    case LayoutDesign::NONE:
+  {
+    break;
+  }
   }
 }
 

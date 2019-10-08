@@ -101,6 +101,10 @@ void QmitkMultiWidgetLayoutManager::SetLayoutDesign(LayoutDesign layoutDesign)
     RemoveOneLayout();
     break;
   }
+  case LayoutDesign::NONE:
+  {
+    break;
+  }
   };
 }
 
@@ -233,7 +237,7 @@ void QmitkMultiWidgetLayoutManager::SetAll2DLeft3DRightLayout()
   }
   subSplit2D->setSizes(splitterSize);
 
-  auto subSplit3D = new QSplitter( mainSplit);
+  auto subSplit3D = new QSplitter(mainSplit);
   splitterSize.clear();
   auto all3DRenderWindowWidgets = m_MultiWidget->Get3DRenderWindowWidgets();
   for (const auto& renderWindowWidget : all3DRenderWindowWidgets)

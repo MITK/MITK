@@ -41,6 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageTimeSelector.h"
 #include "mitkVectorImageMapper2D.h"
 #include "mitkProperties.h"
+#include "mitkLevelWindowProperty.h"
 
 // Includes for image casting between ITK and MITK
 #include "mitkImageCast.h"

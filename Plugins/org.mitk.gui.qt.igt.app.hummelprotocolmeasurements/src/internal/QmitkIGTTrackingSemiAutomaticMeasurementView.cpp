@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk
 #include "QmitkIGTTrackingSemiAutomaticMeasurementView.h"
-#include "QmitkStdMultiWidget.h"
 
 // Qt
 #include <QMessageBox>
@@ -119,9 +118,14 @@ void QmitkIGTTrackingSemiAutomaticMeasurementView::CreateQtPartControl(QWidget *
   m_Controls->m_StopTracking->setEnabled(false);
 }
 
-void QmitkIGTTrackingSemiAutomaticMeasurementView::StdMultiWidgetAvailable(QmitkStdMultiWidget &stdMultiWidget)
+void QmitkIGTTrackingSemiAutomaticMeasurementView::MultiWidgetAvailable(QmitkAbstractMultiWidget &multiWidget)
 {
-  m_MultiWidget = &stdMultiWidget;
+  m_MultiWidget = dynamic_cast<QmitkStdMultiWidget*>(&multiWidget);
+}
+
+void QmitkIGTTrackingSemiAutomaticMeasurementView::MultiWidgetNotAvailable()
+{
+  m_MultiWidget = nullptr;
 }
 
 void QmitkIGTTrackingSemiAutomaticMeasurementView::OnUseReferenceToggled(bool state)
@@ -137,11 +141,6 @@ void QmitkIGTTrackingSemiAutomaticMeasurementView::OnUseReferenceToggled(bool st
     m_Controls->m_ReferenceBox->setEnabled(false);
     m_Controls->m_SetReference->setEnabled(false);
   }
-}
-
-void QmitkIGTTrackingSemiAutomaticMeasurementView::StdMultiWidgetNotAvailable()
-{
-  m_MultiWidget = nullptr;
 }
 
 mitk::NavigationToolStorage::Pointer QmitkIGTTrackingSemiAutomaticMeasurementView::ReadStorage(std::string file)

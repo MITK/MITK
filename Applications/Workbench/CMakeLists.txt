@@ -1,10 +1,5 @@
 project(Workbench)
 
-set(_app_options)
-if(MITK_SHOW_CONSOLE_WINDOW)
-  list(APPEND _app_options SHOW_CONSOLE)
-endif()
-
 # Create a cache entry for the provisioning file which is used to export
 # the file name in the MITKConfig.cmake file. This will keep external projects
 # which rely on this file happy.
@@ -35,7 +30,6 @@ mitkFunctionCreateBlueBerryApplication(
   NAME MitkWorkbench
   DESCRIPTION "MITK Workbench"
   EXCLUDE_PLUGINS ${_exclude_plugins}
-  ${_app_options}
 )
 
 # Add meta dependencies (e.g. on auto-load modules from depending modules)

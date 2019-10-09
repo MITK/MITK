@@ -1,10 +1,5 @@
 project(Solstice)
 
-set(_app_options)
-if(MITK_SHOW_CONSOLE_WINDOW)
-  list(APPEND _app_options SHOW_CONSOLE)
-endif()
-
 set(MITK_EXTAPP_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/MitkWorkbench.provisioning")
 
 # Plug-ins listed below will not be
@@ -23,7 +18,6 @@ FunctionCreateBlueBerryApplication(
   NAME MitkSolstice
   DESCRIPTION "MITK Workbench"
   EXCLUDE_PLUGINS ${_exclude_plugins}
-  ${_app_options}
 )
 
 add_executable(${OSGI_APP} MACOSX_BUNDLE "src/application/berryMain.cpp")

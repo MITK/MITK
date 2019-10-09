@@ -29,9 +29,5 @@ mitkFunctionCreateBlueBerryApplication(
   ${_app_options}
 )
 
-mitk_use_modules(TARGET MitkCoreApp
-  MODULES MitkAppUtil
-)
-
 # subproject support
 add_dependencies(MITK-CoreUI MitkCoreApp)

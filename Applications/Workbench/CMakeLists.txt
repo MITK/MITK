@@ -37,7 +37,6 @@ mitkFunctionCreateBlueBerryApplication(
   EXCLUDE_PLUGINS ${_exclude_plugins}
   ${_app_options}
 )
-mitk_use_modules(TARGET MitkWorkbench MODULES MitkAppUtil)
 
 # Add meta dependencies (e.g. on auto-load modules from depending modules)
 if(TARGET ${CMAKE_PROJECT_NAME}-autoload)

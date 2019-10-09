@@ -88,8 +88,6 @@ mitkFunctionCreateBlueBerryApplication(
   ${_app_options}
 )
 
-mitk_use_modules(TARGET ${DIFFUSIONAPP_NAME} MODULES MitkAppUtil)
-
 # Add meta dependencies (e.g. on auto-load modules from depending modules)
 if(TARGET ${CMAKE_PROJECT_NAME}-autoload)
   add_dependencies(${DIFFUSIONAPP_NAME} ${CMAKE_PROJECT_NAME}-autoload)

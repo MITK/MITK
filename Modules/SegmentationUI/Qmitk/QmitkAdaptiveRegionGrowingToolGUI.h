@@ -58,8 +58,6 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  typedef unsigned char SegmentationPixelType;
-
   QmitkAdaptiveRegionGrowingToolGUI(QWidget* parent=0);
 
   /** \brief Method to create the connections for the component. This Method is obligatory even if no connections is needed*/
@@ -202,6 +200,9 @@ private:
   mitk::ScalarType m_LOWERTHRESHOLD; //Hounsfield value
   mitk::ScalarType m_UPPERTHRESHOLD; //Hounsfield value
   mitk::ScalarType m_SeedPointValueMean;
+
+  mitk::ScalarType m_RGMINIMUM; //Region Growing value
+  mitk::ScalarType m_RGMAXIMUM; //Region Growing value
 
   void RemoveHelperNodes();
 

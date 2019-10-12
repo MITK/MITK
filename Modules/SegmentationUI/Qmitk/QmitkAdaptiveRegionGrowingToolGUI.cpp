@@ -29,7 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageStatisticsHolder.h"
 
 #include <itkConnectedAdaptiveThresholdImageFilter.h>
-#include <itkMinimumMaximumImageCalculator.h>
 #include <itkBinaryThresholdImageFilter.h>
 #include "itkNumericTraits.h"
 #include <itkImageIterator.h>
@@ -215,7 +214,6 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
       {
           m_CurrentRGDirectionIsUpwards = false;
       }
-
       // Initializing the region by the area around the seedpoint
       m_SeedPointValueMean = 0;
 
@@ -401,13 +399,11 @@ template<typename TPixel, unsigned int VImageDimension>
 void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(itk::Image<TPixel, VImageDimension>* itkImage, mitk::BaseGeometry* imageGeometry, mitk::PointSet::PointType seedPoint)
 {
   typedef itk::Image<TPixel, VImageDimension> InputImageType;
-  typedef itk::Image<SegmentationPixelType, VImageDimension> SegmentationType;
   typedef typename InputImageType::IndexType IndexType;
-  typedef itk::ConnectedAdaptiveThresholdImageFilter<InputImageType, SegmentationType> RegionGrowingFilterType;
+  typedef itk::ConnectedAdaptiveThresholdImageFilter<InputImageType, InputImageType> RegionGrowingFilterType;
   typename RegionGrowingFilterType::Pointer regionGrower = RegionGrowingFilterType::New();
-  typedef itk::MinimumMaximumImageCalculator<SegmentationType> MinMaxValueFilterType;
-  typedef itk::BinaryThresholdImageFilter<SegmentationType, SegmentationType> ThresholdFilterType;
-  typedef itk::MaskImageFilter<SegmentationType, SegmentationType, SegmentationType> MaskImageFilterType;
+  typedef itk::BinaryThresholdImageFilter<InputImageType, InputImageType> ThresholdFilterType;
+  typedef itk::MaskImageFilter<InputImageType, InputImageType, InputImageType> MaskImageFilterType;
 
   if ( !imageGeometry->IsInside(seedPoint) )
   {
@@ -419,8 +415,6 @@ void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(itk::Image<TPixel, VI
 
   IndexType seedIndex;
   imageGeometry->WorldToIndex( seedPoint, seedIndex);// convert world coordinates to image indices
-
-
 
   if (m_SeedpointValue>m_UPPERTHRESHOLD || m_SeedpointValue<m_LOWERTHRESHOLD)
   {
@@ -462,25 +456,17 @@ void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(itk::Image<TPixel, VI
   }
 
   mitk::Image::Pointer resultImage = mitk::ImportItkImage(regionGrower->GetOutput())->Clone();
-  //initialize slider
-  m_Controls.m_PreviewSlider->setMinimum(m_LOWERTHRESHOLD);
 
-  mitk::ScalarType max = m_SeedpointValue + resultImage->GetStatistics()->GetScalarValueMax();
-  if (max < m_UPPERTHRESHOLD)
-    m_Controls.m_PreviewSlider->setMaximum(max);
-  else
-    m_Controls.m_PreviewSlider->setMaximum(m_UPPERTHRESHOLD);
+  m_RGMINIMUM = resultImage->GetStatistics()->GetScalarValueMin() != 0 ? resultImage->GetStatistics()->GetScalarValueMin() : 1;
+  m_RGMAXIMUM = resultImage->GetStatistics()->GetScalarValueMax();
+
+  //initialize slider
+  m_Controls.m_PreviewSlider->setMinimum(m_RGMINIMUM);
+  m_Controls.m_PreviewSlider->setMaximum(m_RGMAXIMUM);
+  m_Controls.m_PreviewSlider->setValue((m_RGMAXIMUM - m_RGMINIMUM) / 2.0);
 
   this->m_DetectedLeakagePoint = regionGrower->GetLeakagePoint();
 
-  if(m_CurrentRGDirectionIsUpwards)
-  {
-    m_Controls.m_PreviewSlider->setValue(m_SeedPointValueMean-1);
-  }
-  else
-  {
-    m_Controls.m_PreviewSlider->setValue(m_SeedPointValueMean+1);
-  }
   this->m_SliderInitialized = true;
 
   //create new node and then delete the old one if there is one
@@ -493,7 +479,6 @@ void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(itk::Image<TPixel, VI
   newNode->SetProperty("color", mitk::ColorProperty::New(0.0,1.0,0.0));
   newNode->SetProperty("layer", mitk::IntProperty::New(1));
   newNode->SetProperty("opacity", mitk::FloatProperty::New(0.7));
-  newNode->SetProperty("binary", mitk::BoolProperty::New(true));
 
   //delete the old image, if there was one:
   mitk::DataNode::Pointer binaryNode = m_DataStorage->GetNamedNode(m_NAMEFORLABLEDSEGMENTATIONIMAGE);
@@ -502,9 +487,8 @@ void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(itk::Image<TPixel, VI
   // now add result to data tree
   m_DataStorage->Add( newNode, m_InputImageNode );
 
-
-  typename SegmentationType::Pointer inputImageItk;
-  mitk::CastToItkImage<SegmentationType>( resultImage, inputImageItk );
+  typename InputImageType::Pointer inputImageItk;
+  mitk::CastToItkImage<InputImageType>( resultImage, inputImageItk );
   //volume rendering preview masking
   typename ThresholdFilterType::Pointer thresholdFilter = ThresholdFilterType::New();
   thresholdFilter->SetInput( inputImageItk );
@@ -532,7 +516,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(itk::Image<TPixel, VI
   maskFilter->UpdateLargestPossibleRegion();
 
   mitk::Image::Pointer mitkMask;
-  mitk::CastToMitkImage<SegmentationType>( maskFilter->GetOutput(), mitkMask );
+  mitk::CastToMitkImage<InputImageType>( maskFilter->GetOutput(), mitkMask );
   mitk::DataNode::Pointer maskedNode = mitk::DataNode::New();
   maskedNode->SetData( mitkMask );
 
@@ -572,30 +556,8 @@ void QmitkAdaptiveRegionGrowingToolGUI::InitializeLevelWindow()
   mitk::ScalarType* level = new mitk::ScalarType(0.0);
   mitk::ScalarType* window = new mitk::ScalarType(1.0);
 
-  int upper;
-  if (m_CurrentRGDirectionIsUpwards)
-  {
-    upper = m_UPPERTHRESHOLD - m_SeedpointValue;
-  }
-  else
-  {
-    upper = m_SeedpointValue - m_LOWERTHRESHOLD;
-  }
-
-  tempLevelWindow.SetRangeMinMax(mitk::ScalarType(0), mitk::ScalarType(upper));
-
-  //get the suggested threshold from the detected leakage-point and adjust the slider
-
-  if (m_CurrentRGDirectionIsUpwards)
-  {
-    this->m_Controls.m_PreviewSlider->setValue(m_SeedpointValue);
-    *level = m_UPPERTHRESHOLD - (m_SeedpointValue) + 0.5;
-  }
-  else
-  {
-    this->m_Controls.m_PreviewSlider->setValue(m_SeedpointValue);
-    *level = (m_SeedpointValue) - m_LOWERTHRESHOLD + 0.5;
-  }
+  tempLevelWindow.SetRangeMinMax(mitk::ScalarType(m_RGMINIMUM), mitk::ScalarType(m_RGMAXIMUM));
+  *level = (m_RGMAXIMUM - m_RGMINIMUM) / 2.0;
 
   tempLevelWindow.SetLevelWindow(*level, *window);
   newNode->SetLevelWindow(tempLevelWindow, NULL, "levelwindow");
@@ -608,7 +570,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::InitializeLevelWindow()
   static int lastSliderPosition = 0;
   if ((this->m_SeedpointValue + this->m_DetectedLeakagePoint - 1) == lastSliderPosition)
   {
-    this->ChangeLevelWindow(lastSliderPosition);
+    //this->ChangeLevelWindow(lastSliderPosition);
   }
   lastSliderPosition = this->m_SeedpointValue + this->m_DetectedLeakagePoint-1;
 
@@ -635,18 +597,18 @@ void QmitkAdaptiveRegionGrowingToolGUI::ChangeLevelWindow(double newValue)
 
     newNode->GetLevelWindow(tempLevelWindow, NULL, "levelwindow"); //get the levelWindow associated with the preview
 
-    mitk::ScalarType level;// = this->m_UPPERTHRESHOLD - newValue + 0.5;
+    mitk::ScalarType level;
     mitk::ScalarType* window = new mitk::ScalarType(1);
 
     //adjust the levelwindow according to the position of the slider (newvalue)
     if (m_CurrentRGDirectionIsUpwards)
     {
-      level = m_UPPERTHRESHOLD - newValue + 0.5;
+      level = m_RGMAXIMUM - newValue + 0.5;
       tempLevelWindow.SetLevelWindow(level, *window);
     }
     else
     {
-      level = newValue - m_LOWERTHRESHOLD +0.5;
+      level = newValue - m_RGMINIMUM + 0.5;
       tempLevelWindow.SetLevelWindow(level, *window);
     }
 
@@ -769,15 +731,14 @@ void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImag
   m_InputImageNode->GetIntProperty("Image.Displayed Component", displayedComponent);
 
   typedef itk::Image<TPixel, VImageDimension> InputImageType;
-  typedef itk::Image<unsigned char, VImageDimension> SegmentationType;
 
-  typename SegmentationType::Pointer computedSegmentationInITK = SegmentationType::New();
-  mitk::CastToItkImage<SegmentationType>(computedSegmentation, computedSegmentationInITK);
+  typename InputImageType::Pointer computedSegmentationInITK = InputImageType::New();
+  mitk::CastToItkImage<InputImageType>(computedSegmentation, computedSegmentationInITK);
 
   //Fill current preiview image in segmentation image
   inputSegmentation->FillBuffer(0);
   itk::ImageRegionIterator<InputImageType> itOriginal(inputSegmentation, inputSegmentation->GetLargestPossibleRegion());
-  itk::ImageRegionIterator<SegmentationType> itComputed(computedSegmentationInITK, computedSegmentationInITK->GetLargestPossibleRegion());
+  itk::ImageRegionIterator<InputImageType> itComputed(computedSegmentationInITK, computedSegmentationInITK->GetLargestPossibleRegion());
   itOriginal.GoToBegin();
   itComputed.GoToBegin();
 
@@ -785,27 +746,23 @@ void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImag
   int currentTreshold = 0;
   if (m_CurrentRGDirectionIsUpwards)
   {
-    currentTreshold = m_UPPERTHRESHOLD - m_Controls.m_PreviewSlider->value() + 1;
+    currentTreshold = m_RGMAXIMUM - m_Controls.m_PreviewSlider->value() + 1;
   }
   else
   {
-    currentTreshold = m_Controls.m_PreviewSlider->value() - m_LOWERTHRESHOLD;
+    currentTreshold = m_Controls.m_PreviewSlider->value() - m_RGMINIMUM;
   }
 
   //iterate over image and set pixel in segmentation according to thresholded labeled image
   while(!itOriginal.IsAtEnd() && !itComputed.IsAtEnd()) {
     //Use threshold slider to determine if pixel is set to 1
-    if(itComputed.Value() != 0) {
-      if ((!m_CurrentRGDirectionIsUpwards && itComputed.Value() >= currentTreshold) ||
-          (m_CurrentRGDirectionIsUpwards && itComputed.Value() < currentTreshold)) {
-        itOriginal.Set(1);
-      }
+    if(itComputed.Value() != 0 && itComputed.Value() > currentTreshold) {
+      itOriginal.Set(1);
     }
 
     ++itOriginal;
     ++itComputed;
   }
-
 }
 
 void QmitkAdaptiveRegionGrowingToolGUI::EnableControls(bool enable)

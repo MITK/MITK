@@ -318,37 +318,6 @@ namespace mitk
           {
             pluginsToStart.push_back(url.toString());
           }
-          // foreach(QUrl pluginUrl, provInfo.getPluginsToInstall())
-          //{
-          // TODO for "uninstall", we need a proper configuration agent, e.g. a dedicated
-          // plug-in for provisioning of the platform
-          /*
-          if (forcePluginOverwrite)
-          {
-            uninstallPugin(pluginUrl, context);
-          }
-          */
-          // try
-          //{
-          // MITK_INFO(consoleLog) << "Installing CTK plug-in from: " << pluginUrl.toString().toStdString();
-          /*
-          QSharedPointer<ctkPlugin> plugin = context->installPlugin(pluginUrl);
-          if (pluginsToStart.contains(pluginUrl))
-          {
-            m_CTKPluginsToStart << plugin->getPluginId();
-          }
-          */
-          /*
-        }
-        catch (const ctkPluginException& e)
-        {
-          QString errorMsg;
-          QDebug dbg(&errorMsg);
-          dbg << e.printStackTrace();
-          BERRY_ERROR << qPrintable(errorMsg);
-        }
-        */
-          //}
         }
       }
       else
@@ -369,12 +338,15 @@ namespace mitk
     }
   };
 
-  BaseApplication::BaseApplication(int argc, char **argv) : Application(), d(new Impl(argc, argv))
+  BaseApplication::BaseApplication(int argc, char **argv)
+    : Application(),
+      d(new Impl(argc, argv))
   {
   }
 
   BaseApplication::~BaseApplication()
   {
+    delete d;
   }
 
   void BaseApplication::printHelp(const std::string & /*name*/, const std::string & /*value*/)
@@ -389,88 +361,94 @@ namespace mitk
 
   void BaseApplication::setApplicationName(const QString &name)
   {
-    if (qApp)
-    {
+    if (nullptr != qApp)
       qApp->setApplicationName(name);
-    }
+
     d->m_AppName = name;
   }
 
   QString BaseApplication::getApplicationName() const
   {
-    if (qApp)
-    {
-      return qApp->applicationName();
-    }
-    return d->m_AppName;
+    return nullptr != qApp
+      ? qApp->applicationName()
+      : d->m_AppName;
   }
 
   void BaseApplication::setOrganizationName(const QString &name)
   {
-    if (qApp)
-    {
+    if (nullptr != qApp)
       qApp->setOrganizationName(name);
-    }
+
     d->m_OrgaName = name;
   }
 
   QString BaseApplication::getOrganizationName() const
   {
-    if (qApp)
-      return qApp->organizationName();
-    return d->m_OrgaName;
+    return nullptr != qApp
+      ? qApp->organizationName()
+      : d->m_OrgaName;
   }
 
   void BaseApplication::setOrganizationDomain(const QString &domain)
   {
-    if (qApp)
-    {
+    if (nullptr != qApp)
       qApp->setOrganizationDomain(domain);
-    }
+
     d->m_OrgaDomain = domain;
   }
 
   QString BaseApplication::getOrganizationDomain() const
   {
-    if (qApp)
-      return qApp->organizationDomain();
-    return d->m_OrgaDomain;
+    return nullptr != qApp
+      ? qApp->organizationDomain()
+      : d->m_OrgaDomain;
   }
 
   void BaseApplication::setSingleMode(bool singleMode)
   {
-    if (qApp)
+    if (nullptr != qApp)
       return;
+
     d->m_SingleMode = singleMode;
   }
 
-  bool BaseApplication::getSingleMode() const { return d->m_SingleMode; }
-  void BaseApplication::setSafeMode(bool safeMode)
+  bool BaseApplication::getSingleMode() const
   {
-    if (qApp && !d->m_QApp)
-      return;
-    d->m_SafeMode = safeMode;
-    if (d->m_QApp)
-    {
-      if (getSingleMode())
-      {
-        static_cast<QmitkSingleApplication *>(d->m_QApp)->setSafeMode(safeMode);
-      }
-      else
-      {
-        static_cast<QmitkSafeApplication *>(d->m_QApp)->setSafeMode(safeMode);
-      }
-    }
+    return d->m_SingleMode;
   }
 
-  bool BaseApplication::getSafeMode() const { return d->m_SafeMode; }
+  void BaseApplication::setSafeMode(bool safeMode)
+  {
+    if (nullptr != qApp && nullptr == d->m_QApp)
+      return;
+
+    d->m_SafeMode = safeMode;
+
+    nullptr == d->m_QApp && getSingleMode()
+      ? static_cast<QmitkSingleApplication *>(d->m_QApp)->setSafeMode(safeMode)
+      : static_cast<QmitkSafeApplication *>(d->m_QApp)->setSafeMode(safeMode);
+  }
+
+  bool BaseApplication::getSafeMode() const
+  {
+    return d->m_SafeMode;
+  }
+
   void BaseApplication::setPreloadLibraries(const QStringList &libraryBaseNames)
   {
     d->m_PreloadLibs = libraryBaseNames;
   }
 
-  QStringList BaseApplication::getPreloadLibraries() const { return d->m_PreloadLibs; }
-  void BaseApplication::setProvisioningFilePath(const QString &filePath) { d->m_ProvFile = filePath; }
+  QStringList BaseApplication::getPreloadLibraries() const
+  {
+    return d->m_PreloadLibs;
+  }
+
+  void BaseApplication::setProvisioningFilePath(const QString &filePath)
+  {
+    d->m_ProvFile = filePath;
+  }
+
   QString BaseApplication::getProvisioningFilePath() const
   {
     QString provFilePath = d->m_ProvFile;
@@ -527,14 +505,14 @@ namespace mitk
 
   void BaseApplication::initializeQt()
   {
-    if (qApp)
+    if (nullptr != qApp)
       return;
 
     // If previously parameters have been set we have to store them
     // to hand them through to the application
-    QString appName = this->getApplicationName();
-    QString orgName = this->getOrganizationName();
-    QString orgDomain = this->getOrganizationDomain();
+    auto appName = this->getApplicationName();
+    auto orgName = this->getOrganizationName();
+    auto orgDomain = this->getOrganizationDomain();
 
     // Create a QCoreApplication instance
     this->getQApplication();
@@ -661,9 +639,7 @@ namespace mitk
 
   QCoreApplication *BaseApplication::getQApplication() const
   {
-    QCoreApplication *qCoreApp = qApp;
-
-    if (nullptr == qCoreApp)
+    if (nullptr == qApp)
     {
       vtkOpenGLRenderWindow::SetGlobalMaximumNumberOfMultiSamples(0);
 
@@ -677,20 +653,12 @@ namespace mitk
 
       QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 
-      if (this->getSingleMode())
-      {
-        qCoreApp = new QmitkSingleApplication(d->m_Argc, d->m_Argv, getSafeMode());
-      }
-      else
-      {
-        auto safeApp = new QmitkSafeApplication(d->m_Argc, d->m_Argv);
-        safeApp->setSafeMode(d->m_SafeMode);
-        qCoreApp = safeApp;
-      }
-      d->m_QApp = qCoreApp;
+      d->m_QApp = this->getSingleMode()
+        ? static_cast<QCoreApplication*>(new QmitkSingleApplication(d->m_Argc, d->m_Argv, this->getSafeMode()))
+        : static_cast<QCoreApplication*>(new QmitkSafeApplication(d->m_Argc, d->m_Argv, this->getSafeMode()));
     }
 
-    return qCoreApp;
+    return qApp;
   }
 
   void BaseApplication::initializeLibraryPaths()
@@ -755,11 +723,11 @@ namespace mitk
 
     Poco::Util::Option newInstanceOption(
       ARG_NEWINSTANCE.toStdString(), "", "forces a new instance of this application");
-    newInstanceOption.callback(Poco::Util::OptionCallback<Impl>(d.data(), &Impl::handleBooleanOption));
+    newInstanceOption.callback(Poco::Util::OptionCallback<Impl>(d, &Impl::handleBooleanOption));
     options.addOption(newInstanceOption);
 
     Poco::Util::Option cleanOption(ARG_CLEAN.toStdString(), "", "cleans the plugin cache");
-    cleanOption.callback(Poco::Util::OptionCallback<Impl>(d.data(), &Impl::handleClean));
+    cleanOption.callback(Poco::Util::OptionCallback<Impl>(d, &Impl::handleClean));
     options.addOption(cleanOption);
 
     Poco::Util::Option productOption(ARG_PRODUCT.toStdString(), "", "the id of the product to be launched");
@@ -781,7 +749,7 @@ namespace mitk
     options.addOption(storageDirOption);
 
     Poco::Util::Option consoleLogOption(ARG_CONSOLELOG.toStdString(), "", "log messages to the console");
-    consoleLogOption.callback(Poco::Util::OptionCallback<Impl>(d.data(), &Impl::handleBooleanOption));
+    consoleLogOption.callback(Poco::Util::OptionCallback<Impl>(d, &Impl::handleBooleanOption));
     options.addOption(consoleLogOption);
 
     Poco::Util::Option debugOption(ARG_DEBUG.toStdString(), "", "enable debug mode");
@@ -790,13 +758,13 @@ namespace mitk
 
     Poco::Util::Option forcePluginOption(
       ARG_FORCE_PLUGIN_INSTALL.toStdString(), "", "force installing plug-ins with same symbolic name");
-    forcePluginOption.callback(Poco::Util::OptionCallback<Impl>(d.data(), &Impl::handleBooleanOption));
+    forcePluginOption.callback(Poco::Util::OptionCallback<Impl>(d, &Impl::handleBooleanOption));
     options.addOption(forcePluginOption);
 
     Poco::Util::Option preloadLibsOption(ARG_PRELOAD_LIBRARY.toStdString(), "", "preload a library");
     preloadLibsOption.argument("<library>")
       .repeatable(true)
-      .callback(Poco::Util::OptionCallback<Impl>(d.data(), &Impl::handlePreloadLibraryOption));
+      .callback(Poco::Util::OptionCallback<Impl>(d, &Impl::handlePreloadLibraryOption));
     options.addOption(preloadLibsOption);
 
     Poco::Util::Option testPluginOption(ARG_TESTPLUGIN.toStdString(), "", "the plug-in to be tested");
@@ -809,17 +777,17 @@ namespace mitk
 
     Poco::Util::Option noRegistryCacheOption(
       ARG_NO_REGISTRY_CACHE.toStdString(), "", "do not use a cache for the registry");
-    noRegistryCacheOption.callback(Poco::Util::OptionCallback<Impl>(d.data(), &Impl::handleBooleanOption));
+    noRegistryCacheOption.callback(Poco::Util::OptionCallback<Impl>(d, &Impl::handleBooleanOption));
     options.addOption(noRegistryCacheOption);
 
     Poco::Util::Option noLazyRegistryCacheLoadingOption(
       ARG_NO_LAZY_REGISTRY_CACHE_LOADING.toStdString(), "", "do not use lazy cache loading for the registry");
-    noLazyRegistryCacheLoadingOption.callback(Poco::Util::OptionCallback<Impl>(d.data(), &Impl::handleBooleanOption));
+    noLazyRegistryCacheLoadingOption.callback(Poco::Util::OptionCallback<Impl>(d, &Impl::handleBooleanOption));
     options.addOption(noLazyRegistryCacheLoadingOption);
 
     Poco::Util::Option registryMultiLanguageOption(
       ARG_REGISTRY_MULTI_LANGUAGE.toStdString(), "", "enable multi-language support for the registry");
-    registryMultiLanguageOption.callback(Poco::Util::OptionCallback<Impl>(d.data(), &Impl::handleBooleanOption));
+    registryMultiLanguageOption.callback(Poco::Util::OptionCallback<Impl>(d, &Impl::handleBooleanOption));
     options.addOption(registryMultiLanguageOption);
 
   Poco::Util::Option splashScreenOption(ARG_SPLASH_IMAGE.toStdString(), "", "optional picture to use as a splash screen");

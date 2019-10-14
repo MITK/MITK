@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class MITKAPPUTIL_EXPORT QmitkSafeApplication : public QApplication
 {
 public:
-  QmitkSafeApplication(int &argc, char **argv);
+  QmitkSafeApplication(int &argc, char **argv, bool safeMode = true);
 
   /**
    * Reimplement notify to catch unhandled exceptions and open an error message.

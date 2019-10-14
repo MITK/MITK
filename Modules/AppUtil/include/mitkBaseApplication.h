@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QHash>
 #include <QScopedPointer>
-#include <QSharedPointer>
 #include <QString>
 #include <QTranslator>
 
@@ -327,7 +326,7 @@ namespace mitk
 
 private:
     struct Impl;
-    QScopedPointer<Impl> d;
+    Impl* d;
   };
 }
 

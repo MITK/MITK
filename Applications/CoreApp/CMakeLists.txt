@@ -1,10 +1,5 @@
 project(CoreApp)
 
-set(_app_options)
-if(MITK_SHOW_CONSOLE_WINDOW)
-  list(APPEND _app_options SHOW_CONSOLE)
-endif()
-
 # Create a cache entry for the provisioning file which is used to export
 # the file name in the MITKConfig.cmake file. This will keep external projects
 # which rely on this file happy.
@@ -26,11 +21,6 @@ mitkFunctionCreateBlueBerryApplication(
   NAME MitkCoreApp
   DESCRIPTION "MITK - CoreApp Application"
   PLUGINS ${_plugins}
-  ${_app_options}
-)
-
-mitk_use_modules(TARGET MitkCoreApp
-  MODULES MitkAppUtil
 )
 
 # subproject support

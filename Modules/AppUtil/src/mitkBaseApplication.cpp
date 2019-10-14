@@ -137,10 +137,14 @@ namespace mitk
   {
     ctkProperties m_FWProps;
 
-    QScopedPointer<QCoreApplication> m_QApp;
+    QCoreApplication* m_QApp;
 
     int m_Argc;
     char **m_Argv;
+
+#ifdef Q_OS_MAC
+    std::vector<char*> m_Argv_macOS;
+#endif
 
     QString m_AppName;
     QString m_OrgaName;
@@ -156,38 +160,43 @@ namespace mitk
     QString m_ProvFile;
 
     Impl(int argc, char **argv)
-      : m_Argc(argc), m_Argv(argv), m_SingleMode(false), m_SafeMode(true),
-        m_Splashscreen(nullptr), m_SplashscreenClosingCallback(nullptr)
+      : m_Argc(argc),
+        m_Argv(argv),
+#ifdef Q_OS_MAC
+        m_Argv_macOS(),
+#endif
+        m_SingleMode(false),
+        m_SafeMode(true),
+        m_Splashscreen(nullptr),
+        m_SplashscreenClosingCallback(nullptr)
     {
 #ifdef Q_OS_MAC
-      /*
-       * This is a workaround for bug 19080:
-       * On macOS the prosess serial number is passed as an commandline argument (-psn_<NUMBER>)
-       * if the application is started via the.app bundle.
-       * This option is unknown, which causes a Poco exception.
-       * Since this is done by the system we have to manually remove the argument here.
-       */
+      /* On macOS the process serial number is passed as an command line argument (-psn_<NUMBER>)
+         if the application is started the first time via the .app bundle. This option causes a
+         Poco exception. We remove it, if present. */
 
-      int newArgc = m_Argc - 1;
-      char **newArgs = new char *[newArgc];
-      bool argFound(false);
-      for (int i = 0; i < m_Argc; ++i)
+      m_Argv_macOS.reserve(argc);
+
+      const char psn[] = "-psn";
+
+      for (decltype(argc) i = 0; i < argc; ++i)
       {
-        if (QString::fromLatin1(m_Argv[i]).contains("-psn"))
-        {
-          argFound = true;
-        }
-        else
-        {
-          newArgs[i] = m_Argv[i];
-        }
+        if (0 == strncmp(argv[i], psn, sizeof(psn)))
+          continue;
+
+        m_Argv_macOS.push_back(argv[i]);
       }
-      if (argFound)
-      {
-        m_Argc = newArgc;
-        m_Argv = newArgs;
-      }
+
+      m_Argc = static_cast<decltype(m_Argc)>(m_Argv_macOS.size());
+      m_Argv = m_Argv_macOS.data();
 #endif
+    }
+
+    ~Impl()
+    {
+      delete m_SplashscreenClosingCallback;
+      delete m_Splashscreen;
+      delete m_QApp;
     }
 
     QVariant getProperty(const QString &property) const
@@ -366,14 +375,6 @@ namespace mitk
 
   BaseApplication::~BaseApplication()
   {
-    if (d->m_Splashscreen != nullptr)
-    {
-      delete(d->m_Splashscreen);
-    }
-    if (d->m_SplashscreenClosingCallback != nullptr)
-    {
-      delete(d->m_SplashscreenClosingCallback);
-    }
   }
 
   void BaseApplication::printHelp(const std::string & /*name*/, const std::string & /*value*/)
@@ -453,11 +454,11 @@ namespace mitk
     {
       if (getSingleMode())
       {
-        static_cast<QmitkSingleApplication *>(d->m_QApp.data())->setSafeMode(safeMode);
+        static_cast<QmitkSingleApplication *>(d->m_QApp)->setSafeMode(safeMode);
       }
       else
       {
-        static_cast<QmitkSafeApplication *>(d->m_QApp.data())->setSafeMode(safeMode);
+        static_cast<QmitkSafeApplication *>(d->m_QApp)->setSafeMode(safeMode);
       }
     }
   }
@@ -629,7 +630,7 @@ namespace mitk
       // In the latter case, a path to a temporary directory for
       // the new application's storage directory is returned.
       storageDir = handleNewAppInstance(
-        static_cast<QtSingleApplication *>(d->m_QApp.data()), d->m_Argc, d->m_Argv, ARG_NEWINSTANCE);
+        static_cast<QtSingleApplication *>(d->m_QApp), d->m_Argc, d->m_Argv, ARG_NEWINSTANCE);
     }
 
     if (storageDir.isEmpty())
@@ -686,7 +687,7 @@ namespace mitk
         safeApp->setSafeMode(d->m_SafeMode);
         qCoreApp = safeApp;
       }
-      d->m_QApp.reset(qCoreApp);
+      d->m_QApp = qCoreApp;
     }
 
     return qCoreApp;

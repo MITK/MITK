@@ -172,8 +172,8 @@ void QmitkMatchPoint::OnLoadAlgorithmButtonPushed()
     m_spSelectedTargetMaskNode = nullptr;
     m_spSelectedMovingMaskData = nullptr;
     m_spSelectedMovingMaskNode = nullptr;
-    m_Controls.targetMaskNodeSelector->SetCurrentSelection(QmitkAbstractViewSelectionProvider::NodeList());
-    m_Controls.movingMaskNodeSelector->SetCurrentSelection(QmitkAbstractViewSelectionProvider::NodeList());
+    m_Controls.targetMaskNodeSelector->SetCurrentSelection(QmitkAbstractNodeSelectionWidget::NodeList());
+    m_Controls.movingMaskNodeSelector->SetCurrentSelection(QmitkAbstractNodeSelectionWidget::NodeList());
   }
 
 

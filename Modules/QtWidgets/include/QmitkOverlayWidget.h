@@ -31,7 +31,7 @@ class MITKQTWIDGETS_EXPORT QmitkOverlayWidget : public QWidget
 
 public:
   explicit QmitkOverlayWidget(QWidget* parent = nullptr);
-  virtual ~QmitkOverlayWidget();
+  ~QmitkOverlayWidget() override;
 
   bool isTransparentForMouseEvents() const;
   void setTransparentForMouseEvents(bool transparent = true);

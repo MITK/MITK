@@ -47,7 +47,7 @@ class MITKQTWIDGETS_EXPORT QmitkAbstractDataStorageModel : public QAbstractItemM
 
 public:
 
-  virtual ~QmitkAbstractDataStorageModel();
+  ~QmitkAbstractDataStorageModel() override;
   /*
   * @brief Sets the data storage and adds listener for node events.
   *

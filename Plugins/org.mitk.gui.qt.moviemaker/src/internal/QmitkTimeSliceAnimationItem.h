@@ -23,7 +23,7 @@ class QmitkTimeSliceAnimationItem : public QmitkAnimationItem
 {
 public:
   explicit QmitkTimeSliceAnimationItem(int from = 0, int to = 0, bool reverse = false, double duration = 2.0, double delay = 0.0, bool startWithPrevious = false);
-  virtual ~QmitkTimeSliceAnimationItem();
+  ~QmitkTimeSliceAnimationItem() override;
 
   int GetFrom() const;
   void SetFrom(int from);

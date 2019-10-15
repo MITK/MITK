@@ -70,7 +70,7 @@ public:
                          mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard,
                          const QString& multiWidgetName = "mxnmulti");
 
-  virtual ~QmitkMxNMultiWidget() = default;
+  ~QmitkMxNMultiWidget() override = default;
   
   void SetDataStorage(mitk::DataStorage* dataStorage);
   void InitializeRenderWindowWidgets();

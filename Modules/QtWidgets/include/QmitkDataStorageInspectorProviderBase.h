@@ -35,11 +35,11 @@ template <class TInspector>
 class QmitkDataStorageInspectorProviderBase : public mitk::IDataStorageInspectorProvider
 {
 public:
-  virtual QmitkAbstractDataStorageInspector* CreateInspector() const override;
+  QmitkAbstractDataStorageInspector* CreateInspector() const override;
 
-  virtual std::string GetInspectorID() const override;
-  virtual std::string GetInspectorDisplayName() const override;
-  virtual std::string GetInspectorDescription() const override;
+  std::string GetInspectorID() const override;
+  std::string GetInspectorDisplayName() const override;
+  std::string GetInspectorDescription() const override;
 
   us::ServiceRegistration<mitk::IDataStorageInspectorProvider> RegisterService(
     us::ModuleContext *context = us::GetModuleContext());
@@ -48,7 +48,7 @@ public:
 
   QmitkDataStorageInspectorProviderBase(const std::string& id);
   QmitkDataStorageInspectorProviderBase(const std::string& id, const std::string& displayName, const std::string& desc= "" );
-  virtual ~QmitkDataStorageInspectorProviderBase();
+  ~QmitkDataStorageInspectorProviderBase() override;
 
 protected:
   QmitkDataStorageInspectorProviderBase(const QmitkDataStorageInspectorProviderBase &other);

@@ -120,7 +120,7 @@ namespace mitk
     @remark Disconnect() ensures that sourece is valid and only invokes if instance exists.*/
     void Disconnect_datalayer(IPropertyOwner *source, const InstanceIDType &instanceID) const override;
 
-    virtual bool IsSupportedRuleID(const RuleIDType& ruleID) const override;
+    bool IsSupportedRuleID(const RuleIDType& ruleID) const override;
 
     itk::LightObject::Pointer InternalClone() const override;
 

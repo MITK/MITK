@@ -81,7 +81,7 @@ namespace mitk
     const = 0;
 
     ModelFactoryBase();
-    virtual ~ModelFactoryBase();
+    ~ModelFactoryBase() override;
 
   private:
 

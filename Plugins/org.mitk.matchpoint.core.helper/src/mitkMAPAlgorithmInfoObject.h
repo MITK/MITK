@@ -43,7 +43,7 @@ public:
 
   const ::map::deployment::DLLInfo* GetInfo() const;
 
-  bool operator==(const berry::Object* obj) const;
+  bool operator==(const berry::Object* obj) const override;
 
 private:
 

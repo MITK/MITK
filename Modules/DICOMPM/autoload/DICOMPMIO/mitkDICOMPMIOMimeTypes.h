@@ -37,8 +37,8 @@ namespace mitk
     {
     public:
       MitkDICOMPMMimeType();
-      virtual bool AppliesTo(const std::string &path) const override;
-      virtual MitkDICOMPMMimeType *Clone() const override;
+      bool AppliesTo(const std::string &path) const override;
+      MitkDICOMPMMimeType *Clone() const override;
     };
 
     static MitkDICOMPMMimeType DICOMPM_MIMETYPE();

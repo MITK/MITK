@@ -36,7 +36,7 @@ public:
 class BinaryValueminusOneToIndexMapper : public virtual ValueToIndexMapper
 {
 public:
-  unsigned char operator() (unsigned char value) const
+  unsigned char operator() (unsigned char value) const override
   {
     return value-1;
   }

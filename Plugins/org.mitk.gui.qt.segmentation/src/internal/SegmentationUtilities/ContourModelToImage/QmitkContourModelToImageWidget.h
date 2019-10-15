@@ -50,7 +50,7 @@ public:
   explicit QmitkContourModelToImageWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = nullptr);
 
   /** @brief Defaul destructor. */
-  ~QmitkContourModelToImageWidget();
+  ~QmitkContourModelToImageWidget() override;
 
 private slots:
 

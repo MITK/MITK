@@ -29,7 +29,7 @@ class org_mitk_matchpoint_core_helper_Activator :
 public:
 
     org_mitk_matchpoint_core_helper_Activator();
-    ~org_mitk_matchpoint_core_helper_Activator();
+    ~org_mitk_matchpoint_core_helper_Activator() override;
 
     void start(ctkPluginContext* context) override;
     void stop(ctkPluginContext* context) override;

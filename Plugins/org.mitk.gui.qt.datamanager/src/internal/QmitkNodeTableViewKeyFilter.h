@@ -41,7 +41,7 @@ public:
 
 protected:
 
-  virtual bool eventFilter(QObject *obj, QEvent *event) override;
+  bool eventFilter(QObject *obj, QEvent *event) override;
   /**
    * @brief The Preferences Service to retrieve and store preferences.
    */

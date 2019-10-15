@@ -44,9 +44,9 @@ class MITKPHARMACOKINETICSUI_EXPORT DescriptionParameterBackgroundJob : public Q
 
 public:
   DescriptionParameterBackgroundJob(mitk::DescriptionParameterImageGeneratorBase* generator, mitk::DataNode* parentNode = NULL);
-    ~DescriptionParameterBackgroundJob();
+    ~DescriptionParameterBackgroundJob() override;
 
-		void run();
+		void run() override;
 
     /**Returns the node (if defined), that is the parent object for the results of the job.
     May be null.*/

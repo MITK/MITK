@@ -47,7 +47,7 @@ namespace mitk
 
   protected:
     DescriptionParameterImageGeneratorBase();
-    virtual ~DescriptionParameterImageGeneratorBase();
+    ~DescriptionParameterImageGeneratorBase() override;
 
     virtual bool HasOutdatedResult() const;
 

@@ -61,7 +61,7 @@ namespace mitk
 
   protected:
     PlotDataCurve();
-    virtual ~PlotDataCurve() = default;
+    ~PlotDataCurve() override = default;
 
   private:
     /** values of the curve */

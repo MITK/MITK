@@ -58,7 +58,7 @@ namespace mitk
     IndexedValueFunctorBase()
     {};
 
-    ~IndexedValueFunctorBase()
+    ~IndexedValueFunctorBase() override
     {};
 
   };

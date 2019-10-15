@@ -43,7 +43,7 @@ class MITKQTWIDGETS_EXPORT QmitkDataStorageSimpleTreeModel : public QmitkAbstrac
 
 public:
   QmitkDataStorageSimpleTreeModel(QObject *parent);
-  virtual ~QmitkDataStorageSimpleTreeModel();
+  ~QmitkDataStorageSimpleTreeModel() override;
 
   // override from 'QmitkAbstractDataStorageModel'
   /*

@@ -34,17 +34,17 @@ public:
   using FitVectorType = std::vector<mitk::modelFit::ModelFitInfo::ConstPointer>;
 
   QmitkFitPlotDataModel(QObject* parent = NULL);
-  virtual ~QmitkFitPlotDataModel() {};
+  ~QmitkFitPlotDataModel() override {};
 
   const mitk::ModelFitPlotData* GetPlotData() const;
   const std::string& GetXName() const;
 
-  virtual Qt::ItemFlags flags(const QModelIndex& index) const;
-  virtual QVariant data(const QModelIndex& index, int role) const;
-  virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
-  virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
-  virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
-  virtual bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
+  Qt::ItemFlags flags(const QModelIndex& index) const override;
+  QVariant data(const QModelIndex& index, int role) const override;
+  QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+  int rowCount(const QModelIndex& parent = QModelIndex()) const override;
+  int columnCount(const QModelIndex& parent = QModelIndex()) const override;
+  bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
 
 public Q_SLOTS:
 

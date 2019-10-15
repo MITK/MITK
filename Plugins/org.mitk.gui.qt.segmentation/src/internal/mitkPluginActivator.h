@@ -30,7 +30,7 @@ namespace mitk
   public:
 
     PluginActivator();
-    ~PluginActivator();
+    ~PluginActivator() override;
 
     void start(ctkPluginContext *context) override;
     void stop(ctkPluginContext *context) override;

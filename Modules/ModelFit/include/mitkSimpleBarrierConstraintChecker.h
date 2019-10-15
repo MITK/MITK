@@ -73,11 +73,11 @@ namespace mitk
       {};
     };
 
-    virtual PenaltyArrayType GetPenalties(const ParametersType& parameters) const override;
+    PenaltyArrayType GetPenalties(const ParametersType& parameters) const override;
 
-    virtual unsigned int GetNumberOfConstraints() const override;
+    unsigned int GetNumberOfConstraints() const override;
 
-    virtual PenaltyValueType GetFailedConstraintValue() const override;
+    PenaltyValueType GetFailedConstraintValue() const override;
 
     /** Sets a lower barrier for one parameter*/
     void SetLowerBarrier(ParameterIndexType parameterID, BarrierValueType barrier,
@@ -119,7 +119,7 @@ namespace mitk
     {
     }
 
-    ~SimpleBarrierConstraintChecker() {}
+    ~SimpleBarrierConstraintChecker() override {}
 
   private:
     PenaltyValueType m_MaxConstraintPenalty;

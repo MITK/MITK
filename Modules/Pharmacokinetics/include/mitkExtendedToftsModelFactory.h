@@ -42,7 +42,7 @@ namespace mitk
 
     ExtendedToftsModelFactory();
 
-    virtual ~ExtendedToftsModelFactory() override;
+    ~ExtendedToftsModelFactory() override;
 
   private:
 

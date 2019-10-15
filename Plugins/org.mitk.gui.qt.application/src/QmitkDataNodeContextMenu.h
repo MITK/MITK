@@ -54,7 +54,7 @@ public:
 
   QmitkDataNodeContextMenu(berry::IWorkbenchPartSite::Pointer workbenchPartSite, QWidget* parent = nullptr);
 
-  virtual ~QmitkDataNodeContextMenu() override;
+  ~QmitkDataNodeContextMenu() override;
 
   void SetDataStorage(mitk::DataStorage* dataStorage);
   void SetBaseRenderer(mitk::BaseRenderer* baseRenderer);

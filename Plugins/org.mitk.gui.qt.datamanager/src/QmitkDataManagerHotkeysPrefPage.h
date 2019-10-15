@@ -38,24 +38,24 @@ struct MITK_QT_DATAMANAGER QmitkDataManagerHotkeysPrefPage : public QObject, pub
 public:
   QmitkDataManagerHotkeysPrefPage();
 
-  virtual void Init(berry::IWorkbench::Pointer workbench) override;
+  void Init(berry::IWorkbench::Pointer workbench) override;
 
-  virtual void CreateQtControl(QWidget* parent) override;
+  void CreateQtControl(QWidget* parent) override;
 
-  virtual QWidget* GetQtControl() const override;
+  QWidget* GetQtControl() const override;
 
   /**
   * @brief \see IPreferencePage::PerformOk()
   */
-  virtual bool PerformOk() override;
+  bool PerformOk() override;
   /**
   * @brief \see IPreferencePage::PerformCancel()
   */
-  virtual void PerformCancel() override;
+  void PerformCancel() override;
   /**
   * @brief \see IPreferencePage::Update()
   */
-  virtual void Update() override;
+  void Update() override;
 
 protected:
   /**

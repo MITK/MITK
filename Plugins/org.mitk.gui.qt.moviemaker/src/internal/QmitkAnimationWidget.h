@@ -27,7 +27,7 @@ class QmitkAnimationWidget : public QWidget
 
 public:
   explicit QmitkAnimationWidget(QWidget* parent = nullptr);
-  virtual ~QmitkAnimationWidget();
+  ~QmitkAnimationWidget() override;
 
   virtual void SetAnimationItem(QmitkAnimationItem* animationItem) = 0;
 };

@@ -43,11 +43,11 @@ namespace mitk
       typedef CurveDescriptionParameterBase::DescriptionParameterNamesType ParameterNamesType;
       using GridArrayType = SimpleFunctorBase::GridArrayType;
 
-    virtual SimpleFunctorBase::OutputPixelVectorType Compute(const InputPixelVectorType & value) const override;
+    SimpleFunctorBase::OutputPixelVectorType Compute(const InputPixelVectorType & value) const override;
 
-    virtual unsigned int GetNumberOfOutputs() const override;
+    unsigned int GetNumberOfOutputs() const override;
 
-    virtual GridArrayType GetGrid() const override;
+    GridArrayType GetGrid() const override;
     itkSetMacro(Grid, GridArrayType);
 
     ParameterNamesType GetDescriptionParameterNames() const;
@@ -64,7 +64,7 @@ namespace mitk
 
   protected:
     CurveParameterFunctor();
-    ~CurveParameterFunctor();
+    ~CurveParameterFunctor() override;
 
   private:
     typedef std::map<ParameterNameType, CurveDescriptionParameterBase::Pointer> DescriptionParameterMapType;

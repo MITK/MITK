@@ -85,7 +85,7 @@ namespace mitk
 
   protected:
     ParameterFitImageGeneratorBase() {};
-    virtual ~ParameterFitImageGeneratorBase() {};
+    ~ParameterFitImageGeneratorBase() override {};
 
     virtual bool HasOutdatedResult() const;
     /** Check if the fit can be generated and all needed inputs are valid.

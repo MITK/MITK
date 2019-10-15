@@ -33,7 +33,7 @@ class QmitkSegmentationUtilitiesView : public QmitkAbstractView, public mitk::IR
 
 public:
   QmitkSegmentationUtilitiesView();
-  ~QmitkSegmentationUtilitiesView();
+  ~QmitkSegmentationUtilitiesView() override;
 
   void CreateQtPartControl(QWidget* parent) override;
   void SetFocus() override;

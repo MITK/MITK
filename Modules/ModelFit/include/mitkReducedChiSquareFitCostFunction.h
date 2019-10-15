@@ -21,14 +21,14 @@ namespace mitk
 
     protected:
 
-        virtual MeasureType CalcMeasure(const ParametersType &parameters, const SignalType& signal) const;
+        MeasureType CalcMeasure(const ParametersType &parameters, const SignalType& signal) const override;
 
         ReducedChiSquareFitCostFunction()
         {
 
         }
 
-        ~ReducedChiSquareFitCostFunction(){}
+        ~ReducedChiSquareFitCostFunction() override{}
 
     };
 

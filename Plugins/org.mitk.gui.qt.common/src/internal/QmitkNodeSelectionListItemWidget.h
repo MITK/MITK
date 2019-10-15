@@ -32,7 +32,7 @@ class MITK_QT_COMMON QmitkNodeSelectionListItemWidget : public QWidget
 
 public:
   explicit QmitkNodeSelectionListItemWidget(QWidget* parent = nullptr);
-  ~QmitkNodeSelectionListItemWidget();
+  ~QmitkNodeSelectionListItemWidget() override;
 
   const mitk::DataNode* GetSelectedNode() const;
 
@@ -47,7 +47,7 @@ protected Q_SLOTS:
   void OnClearSelection();
 
 protected:
-  virtual bool eventFilter(QObject *obj, QEvent *ev) override;
+  bool eventFilter(QObject *obj, QEvent *ev) override;
 
   Ui_QmitkNodeSelectionListItemWidget m_Controls;
 };

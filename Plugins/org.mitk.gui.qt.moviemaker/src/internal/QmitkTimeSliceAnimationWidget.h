@@ -32,7 +32,7 @@ class QmitkTimeSliceAnimationWidget : public QmitkAnimationWidget
 
 public:
   explicit QmitkTimeSliceAnimationWidget(QWidget* parent = nullptr);
-  ~QmitkTimeSliceAnimationWidget();
+  ~QmitkTimeSliceAnimationWidget() override;
 
   void SetAnimationItem(QmitkAnimationItem* sliceAnimationItem) override;
 

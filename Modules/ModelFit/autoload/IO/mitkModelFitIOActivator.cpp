@@ -55,7 +55,7 @@ public:
     mitk::CoreServices::GetPropertyPersistence()->AddInfo(ppi, true);
   }
 
-  void Load(us::ModuleContext* /*context*/)
+  void Load(us::ModuleContext* /*context*/) override
   {
     //register relevant properties
     registerProperty(mitk::ModelFitConstants::UID_PROPERTY_NAME(), "data_uid", "UID used to identify data in an MITK session.");
@@ -88,7 +88,7 @@ public:
     registerProperty(mitk::ModelFitConstants::FIT_STATIC_PARAMETERS_PROPERTY_NAME(), "modelfit_fit_staticParameters", "Value identifies the model type.", PropertyPersistenceDeserialization::deserializeXMLToScalarListLookupTableProperty, PropertyPersistenceSerialization::serializeScalarListLookupTablePropertyToXML);
   }
 
-  void Unload(us::ModuleContext* )
+  void Unload(us::ModuleContext* ) override
   {
   }
 

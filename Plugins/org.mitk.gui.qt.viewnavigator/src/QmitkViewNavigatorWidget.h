@@ -47,7 +47,7 @@ public:
 
     QmitkViewNavigatorWidget (berry::IWorkbenchWindow::Pointer window,
                               QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
-    virtual ~QmitkViewNavigatorWidget();
+    ~QmitkViewNavigatorWidget() override;
 
     virtual void CreateQtPartControl(QWidget *parent);
     void setFocus();

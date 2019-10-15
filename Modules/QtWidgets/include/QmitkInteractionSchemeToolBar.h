@@ -39,7 +39,7 @@ public:
   using InteractionScheme = mitk::InteractionSchemeSwitcher::InteractionScheme;
 
   QmitkInteractionSchemeToolBar(QWidget* parent = nullptr);
-  virtual ~QmitkInteractionSchemeToolBar() override;
+  ~QmitkInteractionSchemeToolBar() override;
 
   void SetInteractionEventHandler(mitk::InteractionEventHandler::Pointer interactionEventHandler);
 

@@ -48,12 +48,12 @@ namespace mitk
     * @par  interactionEvent    The event that was observed and triggered this notification.
     * @par  isHandled           Flag that indicates if a 'DataInteractor' has already handled the event.
     */
-    virtual void Notify(InteractionEvent* interactionEvent, bool isHandled) override;
+    void Notify(InteractionEvent* interactionEvent, bool isHandled) override;
 
   protected:
 
     DisplayActionEventBroadcast();
-    virtual ~DisplayActionEventBroadcast() override;
+    ~DisplayActionEventBroadcast() override;
 
     /**
     * @brief Connects the action names used in the state machine pattern with functions implemented within this InteractionEventObserver.
@@ -63,7 +63,7 @@ namespace mitk
     * @brief This function is executed when a config object is set / changed (via 'SetEventConfig' or 'AddEventConfig' in 'InteractionEventObserver').
     *     It is used to read out the parameters set in the configuration file and to set the member variables accordingly.
     */
-    virtual void ConfigurationChanged() override;
+    void ConfigurationChanged() override;
     /**
     * @brief Filters the event resp. the sender of the event.
     *
@@ -72,7 +72,7 @@ namespace mitk
     *
     * @return   True, if the sender of the event is a valid sender and the sending renderer is a 2D-renderer. False, if not.
     */
-    virtual bool FilterEvents(InteractionEvent* interactionEvent, DataNode* dataNode) override;
+    bool FilterEvents(InteractionEvent* interactionEvent, DataNode* dataNode) override;
 
     //////////////////////////////////////////////////////////////////////////
     // Functions to react to interaction events (actions)

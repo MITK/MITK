@@ -49,13 +49,13 @@ namespace mitk
     using StatisticsMapType = std::map < std::string, StatisticsVariantType>;
     using StatisticsKeyType = std::string;
 
-    virtual void SetRequestedRegionToLargestPossibleRegion() override {}
+    void SetRequestedRegionToLargestPossibleRegion() override {}
 
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override { return false; }
+    bool RequestedRegionIsOutsideOfTheBufferedRegion() override { return false; }
 
-    virtual bool VerifyRequestedRegion() override { return true; }
+    bool VerifyRequestedRegion() override { return true; }
 
-    virtual void SetRequestedRegion(const itk::DataObject*) override {}
+    void SetRequestedRegion(const itk::DataObject*) override {}
 
     /**
     @brief Container class for storing the computed image statistics.
@@ -149,7 +149,7 @@ namespace mitk
 
   protected:
     ImageStatisticsContainer();
-    virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
+    void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
   private:
     itk::LightObject::Pointer InternalClone() const override;

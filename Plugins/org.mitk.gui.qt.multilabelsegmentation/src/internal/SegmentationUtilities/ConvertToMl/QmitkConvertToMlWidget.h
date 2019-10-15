@@ -26,7 +26,7 @@ class QmitkConvertToMlWidget : public QmitkSegmentationUtilityWidget
 
 public:
   explicit QmitkConvertToMlWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = nullptr);
-  ~QmitkConvertToMlWidget();
+  ~QmitkConvertToMlWidget() override;
 
 private slots:
   void SelectionChanged();

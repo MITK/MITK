@@ -80,14 +80,14 @@ public:
     ParametersType::size_type GetFailedParameter() const;
 protected:
 
-    virtual MeasureType CalcMeasure(const ParametersType &parameters, const SignalType& signal) const;
+    MeasureType CalcMeasure(const ParametersType &parameters, const SignalType& signal) const override;
 
     MVConstrainedCostFunctionDecorator() : m_FailureThreshold(1e15), m_ActivateFailureThreshold(true),
       m_EvaluationCount(0), m_PenaltyCount(0), m_FailureCount(0), m_LastFailedParameter(-1)
     {
     }
 
-    ~MVConstrainedCostFunctionDecorator(){}
+    ~MVConstrainedCostFunctionDecorator() override{}
 
     ConstraintCheckerBase::ConstPointer m_ConstraintChecker;
     MVModelFitCostFunction::ConstPointer m_WrappedCostFunction;

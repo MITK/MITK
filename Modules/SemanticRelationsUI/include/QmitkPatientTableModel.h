@@ -47,21 +47,21 @@ class QmitkPatientTableModel : public QmitkAbstractSemanticRelationsStorageModel
 public:
 
   QmitkPatientTableModel(QObject* parent = nullptr);
-  ~QmitkPatientTableModel();
+  ~QmitkPatientTableModel() override;
 
   //////////////////////////////////////////////////////////////////////////
   // overridden functions from QAbstractItemModel
   //////////////////////////////////////////////////////////////////////////
-  virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
-  virtual QModelIndex parent(const QModelIndex& child) const override;
+  QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
+  QModelIndex parent(const QModelIndex& child) const override;
 
-  virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
-  virtual int columnCount(const QModelIndex& parent = QModelIndex()) const override;
+  int rowCount(const QModelIndex& parent = QModelIndex()) const override;
+  int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
-  virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
-  virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-  virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
+  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+  Qt::ItemFlags flags(const QModelIndex& index) const override;
   //////////////////////////////////////////////////////////////////////////
   /// end override
   /////////////////////////////////////////////////////////////////////////
@@ -71,17 +71,17 @@ public:
 protected:
 
   // the following functions have to be overridden...
-  virtual void NodePredicateChanged() override;
+  void NodePredicateChanged() override;
   // but are not implemented in this model
-  virtual void NodeAdded(const mitk::DataNode*) override { }
-  virtual void NodeChanged(const mitk::DataNode*) override { }
-  virtual void NodeRemoved(const mitk::DataNode*) override { }
+  void NodeAdded(const mitk::DataNode*) override { }
+  void NodeChanged(const mitk::DataNode*) override { }
+  void NodeRemoved(const mitk::DataNode*) override { }
   /**
   * @brief Overridden from 'QmitkAbstractSemanticRelationsStorageModel': This function retrieves all control points
   *        and information types of the current case and stores them to define the header of the table.
   *        Furthermore all images are retrieved and the pixmap of the images are generated and stored.
   */
-  virtual void SetData() override;
+  void SetData() override;
 
 private:
 

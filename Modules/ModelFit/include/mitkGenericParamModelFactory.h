@@ -39,7 +39,7 @@ namespace mitk
     virtual ParametersType GetDefaultInitialParameterization() const override;
 
   protected:
-    virtual ModelParameterizerBase::Pointer DoCreateParameterizer(const modelFit::ModelFitInfo* fit)
+    ModelParameterizerBase::Pointer DoCreateParameterizer(const modelFit::ModelFitInfo* fit)
     const override;
 
     GenericParamModelFactory();

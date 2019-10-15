@@ -42,15 +42,15 @@ class MITK_QT_COMMON QmitkSingleNodeSelectionWidget : public QmitkAbstractNodeSe
 
 public:
   explicit QmitkSingleNodeSelectionWidget(QWidget* parent = nullptr);
-  ~QmitkSingleNodeSelectionWidget();
+  ~QmitkSingleNodeSelectionWidget() override;
 
   mitk::DataNode::Pointer GetSelectedNode() const;
 
   using NodeList = QmitkAbstractNodeSelectionWidget::NodeList;
 
 public Q_SLOTS:
-  virtual void SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes) override;
-  virtual void SetCurrentSelection(NodeList selectedNodes) override;
+  void SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes) override;
+  void SetCurrentSelection(NodeList selectedNodes) override;
 
 protected Q_SLOTS:
   virtual void OnClearSelection();

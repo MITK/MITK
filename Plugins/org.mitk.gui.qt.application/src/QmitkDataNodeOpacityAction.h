@@ -34,7 +34,7 @@ public:
   QmitkDataNodeOpacityAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
   QmitkDataNodeOpacityAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
 
-  virtual void InitializeWithDataNode(const mitk::DataNode* dataNode) override;
+  void InitializeWithDataNode(const mitk::DataNode* dataNode) override;
 
 private Q_SLOTS:
 
@@ -43,7 +43,7 @@ private Q_SLOTS:
 
 protected:
 
-  virtual void InitializeAction() override;
+  void InitializeAction() override;
 
   QSlider* m_OpacitySlider;
 

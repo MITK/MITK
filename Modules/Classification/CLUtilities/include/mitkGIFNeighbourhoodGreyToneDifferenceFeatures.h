@@ -77,17 +77,17 @@ namespace mitk
     /**
     * \brief Calculates the Cooccurence-Matrix based features for this class.
     */
-    virtual FeatureListType CalculateFeatures(const Image::Pointer & image, const Image::Pointer &feature);
+    FeatureListType CalculateFeatures(const Image::Pointer & image, const Image::Pointer &feature) override;
 
     /**
     * \brief Returns a list of the names of all features that are calculated from this class
     */
-    virtual FeatureNameListType GetFeatureNames();
+    FeatureNameListType GetFeatureNames() override;
 
-    virtual std::string GetCurrentFeatureEncoding() override;
+    std::string GetCurrentFeatureEncoding() override;
 
-    virtual void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList);
-    virtual void AddArguments(mitkCommandLineParser &parser);
+    void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList) override;
+    void AddArguments(mitkCommandLineParser &parser) override;
 
     itkSetMacro(Range, int);
     itkGetConstMacro(Range, int);

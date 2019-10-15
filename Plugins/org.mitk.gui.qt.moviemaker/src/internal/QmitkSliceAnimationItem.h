@@ -23,7 +23,7 @@ class QmitkSliceAnimationItem : public QmitkAnimationItem
 {
 public:
   explicit QmitkSliceAnimationItem(int renderWindow = 0, int from = 0, int to = 0, bool reverse = false, double duration = 2.0, double delay = 0.0, bool startWithPrevious = false);
-  virtual ~QmitkSliceAnimationItem();
+  ~QmitkSliceAnimationItem() override;
 
   int GetRenderWindow() const;
   void SetRenderWindow(int renderWindow);

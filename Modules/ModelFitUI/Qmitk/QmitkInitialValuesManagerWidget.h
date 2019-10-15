@@ -47,7 +47,7 @@ class MITKMODELFITUI_EXPORT QmitkInitialValuesManagerWidget : public QWidget
 
 public:
   QmitkInitialValuesManagerWidget(QWidget* parent = 0);
-  ~QmitkInitialValuesManagerWidget();
+  ~QmitkInitialValuesManagerWidget() override;
 
   /** Returns the current set initial values of the model.*/
   mitk::ModelTraitsInterface::ParametersType getInitialValues() const;

@@ -47,7 +47,7 @@ namespace mitk
     * its infrastructure.
     * It also checks if event is to be accepted when it already has been processed by a DataInteractor.
     */
-    virtual void Notify(InteractionEvent *interactionEvent, bool isHandled) override;
+    void Notify(InteractionEvent *interactionEvent, bool isHandled) override;
 
   protected:
 

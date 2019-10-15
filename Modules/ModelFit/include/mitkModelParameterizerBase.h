@@ -87,7 +87,7 @@ namespace mitk
 
     ModelParameterizerBase();
 
-    virtual ~ModelParameterizerBase();
+    ~ModelParameterizerBase() override;
 
     InitialParameterizationDelegateBase::ConstPointer m_InitialDelegate;
 

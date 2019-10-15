@@ -36,7 +36,7 @@ public:
     /**
     * \brief DicomEventHandler destructor.
     */
-    virtual ~DicomEventHandler();
+    ~DicomEventHandler() override;
 
     /**
     * \brief Subscribes slots in this class.

@@ -57,7 +57,7 @@ public:
 
 protected:
     MaskedDynamicImageStatisticsGenerator();
-    ~MaskedDynamicImageStatisticsGenerator();
+    ~MaskedDynamicImageStatisticsGenerator() override;
 
     template <typename TPixel, unsigned int VDim>
     void DoCalculateStatistics(const itk::Image<TPixel, VDim>* image);

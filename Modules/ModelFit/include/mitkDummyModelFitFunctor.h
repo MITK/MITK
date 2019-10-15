@@ -45,7 +45,7 @@ namespace mitk
     itkSetMacro(DerivativeStepLength, double);
     itkGetMacro(DerivativeStepLength, double);
 
-    virtual ParameterNamesType GetCriterionNames() const;
+    ParameterNamesType GetCriterionNames() const override;
 
   protected:
 
@@ -54,20 +54,20 @@ namespace mitk
 
     DummyModelFitFunctor();
 
-    ~DummyModelFitFunctor();
+    ~DummyModelFitFunctor() override;
 
-    virtual ParametersType DoModelFit(const SignalType& value, const ModelBase* model,
+    ParametersType DoModelFit(const SignalType& value, const ModelBase* model,
                                       const ModelBase::ParametersType& initialParameters,
-                                      DebugParameterMapType& debugParameters) const;
+                                      DebugParameterMapType& debugParameters) const override;
 
-    virtual OutputPixelArrayType GetCriteria(const ModelBase* model, const ParametersType& parameters,
-        const SignalType& sample) const;
+    OutputPixelArrayType GetCriteria(const ModelBase* model, const ParametersType& parameters,
+        const SignalType& sample) const override;
 
     /** Generator function that instantiates and parameterizes the cost function that should be used by the fit functor*/
     virtual MVModelFitCostFunction::Pointer GenerateCostFunction(const SignalType& value,
         const ModelBase* model) const;
 
-    virtual ParameterNamesType DefineDebugParameterNames() const;
+    ParameterNamesType DefineDebugParameterNames() const override;
 
   private:
     double m_DerivativeStepLength;

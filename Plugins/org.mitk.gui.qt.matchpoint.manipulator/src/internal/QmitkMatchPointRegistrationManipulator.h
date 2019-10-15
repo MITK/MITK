@@ -52,9 +52,9 @@ public:
   berryObjectMacro(QmitkMatchPointRegistrationManipulator)
 
   QmitkMatchPointRegistrationManipulator();
-  ~QmitkMatchPointRegistrationManipulator();
+  ~QmitkMatchPointRegistrationManipulator() override;
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  void CreateQtPartControl(QWidget *parent) override;
 
   protected slots:
 
@@ -79,15 +79,15 @@ public:
 
 protected:
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
+  void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
     const QList<mitk::DataNode::Pointer>& nodes) override;
 
-  virtual void NodeRemoved(const mitk::DataNode* node) override;
+  void NodeRemoved(const mitk::DataNode* node) override;
 
-  virtual void SetFocus();
+  void SetFocus() override;
 
-  virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart);
-  virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart);
+  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
 
   Ui::MatchPointRegistrationManipulatorControls m_Controls;
 

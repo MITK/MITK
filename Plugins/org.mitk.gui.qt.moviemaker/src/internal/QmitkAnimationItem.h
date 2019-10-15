@@ -36,7 +36,7 @@ public:
   };
 
   explicit QmitkAnimationItem(const QString& widgetKey, double duration = 2.0, double delay = 0.0, bool startWithPrevious = false);
-  virtual ~QmitkAnimationItem();
+  ~QmitkAnimationItem() override;
 
   QString GetWidgetKey() const;
   void SetWidgetKey(const QString& widgetKey);

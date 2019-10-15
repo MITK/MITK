@@ -51,7 +51,7 @@ namespace mitk
     ModelBasedValueFunctorBase()
     {};
 
-    ~ModelBasedValueFunctorBase()
+    ~ModelBasedValueFunctorBase() override
     {};
 
   };

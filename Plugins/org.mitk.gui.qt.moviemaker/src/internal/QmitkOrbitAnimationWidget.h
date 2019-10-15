@@ -32,7 +32,7 @@ class QmitkOrbitAnimationWidget : public QmitkAnimationWidget
 
 public:
   explicit QmitkOrbitAnimationWidget(QWidget* parent = nullptr);
-  ~QmitkOrbitAnimationWidget();
+  ~QmitkOrbitAnimationWidget() override;
 
   void SetAnimationItem(QmitkAnimationItem* orbitAnimationItem) override;
 

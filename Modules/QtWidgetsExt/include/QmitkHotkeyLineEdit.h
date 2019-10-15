@@ -47,7 +47,7 @@ protected Q_SLOTS:
 
 protected:
 
-  virtual void keyPressEvent(QKeyEvent* event) override;
+  void keyPressEvent(QKeyEvent* event) override;
   void Init();
 
   QKeySequence m_KeySequence;

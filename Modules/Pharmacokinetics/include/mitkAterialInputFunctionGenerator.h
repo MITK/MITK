@@ -78,7 +78,7 @@ namespace mitk
       this->SetDefaultHematocritLevel();
     };
 
-    ~AterialInputFunctionGenerator() {};
+    ~AterialInputFunctionGenerator() override {};
 
     //template <typename TPixel, unsigned int VDim>
     //void DoCalculateAIF(itk::Image<TPixel, VDim>* image);

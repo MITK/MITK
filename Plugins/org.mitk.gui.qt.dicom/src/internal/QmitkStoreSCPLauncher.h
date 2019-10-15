@@ -38,7 +38,7 @@ public:
     /**
     * \brief QmitkStoreSCPLauncher constructor.
     */
-    virtual ~QmitkStoreSCPLauncher();
+    ~QmitkStoreSCPLauncher() override;
 
 public slots:
 

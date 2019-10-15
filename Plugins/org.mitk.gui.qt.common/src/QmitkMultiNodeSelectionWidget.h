@@ -60,8 +60,8 @@ public:
   void SetSelectionCheckFunction(const SelectionCheckFunctionType &checkFunction);
 
 public Q_SLOTS:
-  virtual void SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes) override;
-  virtual void SetCurrentSelection(NodeList selectedNodes) override;
+  void SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes) override;
+  void SetCurrentSelection(NodeList selectedNodes) override;
   void OnEditSelection();
 
 protected Q_SLOTS:

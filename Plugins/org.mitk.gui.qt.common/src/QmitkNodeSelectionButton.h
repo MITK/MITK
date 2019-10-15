@@ -37,7 +37,7 @@ class MITK_QT_COMMON QmitkNodeSelectionButton : public QPushButton
 
 public:
   explicit QmitkNodeSelectionButton(QWidget *parent = nullptr);
-  ~QmitkNodeSelectionButton();
+  ~QmitkNodeSelectionButton() override;
 
   const mitk::DataNode* GetSelectedNode() const;
 

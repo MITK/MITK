@@ -91,7 +91,7 @@ namespace mitk
 
     ModelFitFunctorBase();
 
-    ~ModelFitFunctorBase();
+    ~ModelFitFunctorBase() override;
 
     /**Internal Method called by Compute to get the final criterion values thar dove the fit.
      must be implemented be concrete functor classes.*/

@@ -62,7 +62,7 @@ class MITK_QT_COMMON QmitkSelectionServiceConnector : public QObject
 public:
 
   QmitkSelectionServiceConnector();
-  ~QmitkSelectionServiceConnector();
+  ~QmitkSelectionServiceConnector() override;
 
   /*
   * @brief 	Create a selection listener and add it to the list of selection listener of the given selection service.

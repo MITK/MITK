@@ -53,12 +53,12 @@ namespace mitk
     /**@pre The Number of paremeters must be between 1 and 10.*/
     itkSetClampMacro(NumberOfParameters, ParametersSizeType, 1, 10);
 
-    virtual mitk::ModelBase::FunctionStringType GetFunctionString() const override;
+    mitk::ModelBase::FunctionStringType GetFunctionString() const override;
 
     using Superclass::GenerateParameterizedModel;
     virtual ModelBasePointer GenerateParameterizedModel(const IndexType& currentPosition) const;
 
-    virtual StaticParameterMapType GetGlobalStaticParameters() const override;
+    StaticParameterMapType GetGlobalStaticParameters() const override;
 
     virtual ParametersType GetDefaultInitialParameterization() const override;
 

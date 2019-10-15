@@ -60,7 +60,7 @@ namespace mitk
     itkSetObjectMacro(Functor, FunctorType);
     itkGetObjectMacro(Functor, FunctorType);
 
-    virtual double GetProgress() const override;
+    double GetProgress() const override;
 
   protected:
     PixelBasedDescriptionParameterImageGenerator() : m_Progress(0)
@@ -70,7 +70,7 @@ namespace mitk
       m_DynamicImage = NULL;
     };
 
-    ~PixelBasedDescriptionParameterImageGenerator() {};
+    ~PixelBasedDescriptionParameterImageGenerator() override {};
 
     template <typename TPixel, unsigned int VDim>
     void DoParameterCalculation(itk::Image<TPixel, VDim>* image);
@@ -80,9 +80,9 @@ namespace mitk
 
     void onFitProgressEvent(::itk::Object* caller, const ::itk::EventObject& eventObject);
 
-    virtual bool HasOutdatedResult() const override;
-    virtual void CheckValidInputs() const override;
-    virtual void DoParameterCalculationAndGetResults(ParameterImageMapType& parameterImages) override;
+    bool HasOutdatedResult() const override;
+    void CheckValidInputs() const override;
+    void DoParameterCalculationAndGetResults(ParameterImageMapType& parameterImages) override;
 
   private:
     Image::Pointer m_DynamicImage;

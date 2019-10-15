@@ -40,7 +40,7 @@ class MITKMODELFITUI_EXPORT QmitkSimpleBarrierManagerWidget : public QWidget
 
 public:
   QmitkSimpleBarrierManagerWidget(QWidget* parent = 0);
-  ~QmitkSimpleBarrierManagerWidget();
+  ~QmitkSimpleBarrierManagerWidget() override;
 
 signals:
   void ConstraintChanged(mitk::SimpleBarrierConstraintChecker::Constraint constraint);

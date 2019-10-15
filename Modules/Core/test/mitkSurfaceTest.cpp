@@ -72,7 +72,7 @@ private:
   int m_Timestep;
 
 public:
-  void setUp()
+  void setUp() override
   {
     m_Surface = mitk::Surface::New();
     m_CloneSurface = m_Surface->Clone();
@@ -89,7 +89,7 @@ public:
     m_Timestep = 0;
   }
 
-  void tearDown()
+  void tearDown() override
   {
     m_Surface = nullptr;
     m_CloneSurface = nullptr;

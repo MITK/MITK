@@ -46,7 +46,7 @@ public:
     typedef Superclass::SignalType SignalType;
     typedef Superclass::ParametersType ParametersType;
 
-    virtual PenaltyValueType GetPenaltySum(const ParametersType &parameters) const;
+    PenaltyValueType GetPenaltySum(const ParametersType &parameters) const override;
 
 protected:
 
@@ -54,7 +54,7 @@ protected:
     {
     }
 
-    ~ConstraintCheckerBase(){}
+    ~ConstraintCheckerBase() override{}
 
 private:
     ConstraintCheckerBase(const ConstraintCheckerBase& source);

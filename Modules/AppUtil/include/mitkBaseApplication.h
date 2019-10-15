@@ -84,43 +84,43 @@ namespace mitk
   public:
     // Command line arguments
 
-    static QString ARG_NEWINSTANCE;
-    static QString ARG_CLEAN;
-    static QString ARG_APPLICATION;
-    static QString ARG_PRODUCT;
-    static QString ARG_HOME;
-    static QString ARG_STORAGE_DIR;
-    static QString ARG_PLUGIN_CACHE;
-    static QString ARG_PLUGIN_DIRS;
-    static QString ARG_FORCE_PLUGIN_INSTALL;
-    static QString ARG_PRELOAD_LIBRARY;
-    static QString ARG_PROVISIONING;
-    static QString ARG_DEBUG;
+    static const QString ARG_NEWINSTANCE;
+    static const QString ARG_CLEAN;
+    static const QString ARG_APPLICATION;
+    static const QString ARG_PRODUCT;
+    static const QString ARG_HOME;
+    static const QString ARG_STORAGE_DIR;
+    static const QString ARG_PLUGIN_CACHE;
+    static const QString ARG_PLUGIN_DIRS;
+    static const QString ARG_FORCE_PLUGIN_INSTALL;
+    static const QString ARG_PRELOAD_LIBRARY;
+    static const QString ARG_PROVISIONING;
+    static const QString ARG_DEBUG;
 
-    static QString ARG_CONSOLELOG;
-    static QString ARG_TESTPLUGIN;
-    static QString ARG_TESTAPPLICATION;
+    static const QString ARG_CONSOLELOG;
+    static const QString ARG_TESTPLUGIN;
+    static const QString ARG_TESTAPPLICATION;
 
-    static QString ARG_NO_REGISTRY_CACHE;
-    static QString ARG_NO_LAZY_REGISTRY_CACHE_LOADING;
-    static QString ARG_REGISTRY_MULTI_LANGUAGE;
+    static const QString ARG_NO_REGISTRY_CACHE;
+    static const QString ARG_NO_LAZY_REGISTRY_CACHE_LOADING;
+    static const QString ARG_REGISTRY_MULTI_LANGUAGE;
 
-    static QString ARG_SPLASH_IMAGE;
+    static const QString ARG_SPLASH_IMAGE;
 
-    static QString ARG_XARGS;
+    static const QString ARG_XARGS;
 
     // BlueBerry specific Plugin Framework properties
 
-    static QString PROP_NEWINSTANCE;
-    static QString PROP_FORCE_PLUGIN_INSTALL;
-    static QString PROP_NO_REGISTRY_CACHE;
-    static QString PROP_NO_LAZY_REGISTRY_CACHE_LOADING;
-    static QString PROP_REGISTRY_MULTI_LANGUAGE;
+    static const QString PROP_NEWINSTANCE;
+    static const QString PROP_FORCE_PLUGIN_INSTALL;
+    static const QString PROP_NO_REGISTRY_CACHE;
+    static const QString PROP_NO_LAZY_REGISTRY_CACHE_LOADING;
+    static const QString PROP_REGISTRY_MULTI_LANGUAGE;
 
-    static QString PROP_PRODUCT;
-    static QString PROP_APPLICATION;
-    static QString PROP_TESTPLUGIN;
-    static QString PROP_TESTAPPLICATION;
+    static const QString PROP_PRODUCT;
+    static const QString PROP_APPLICATION;
+    static const QString PROP_TESTPLUGIN;
+    static const QString PROP_TESTAPPLICATION;
 
     BaseApplication(int argc, char **argv);
     ~BaseApplication() override;

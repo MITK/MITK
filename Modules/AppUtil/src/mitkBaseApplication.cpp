@@ -47,44 +47,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QVTKOpenGLWidget.h>
 #include <vtkGenericOpenGLRenderWindow.h>
 
-namespace mitk
+namespace
 {
-  QString BaseApplication::ARG_NEWINSTANCE = "BlueBerry.newInstance";
-  QString BaseApplication::ARG_CLEAN = "BlueBerry.clean";
-  QString BaseApplication::ARG_APPLICATION = "BlueBerry.application";
-  QString BaseApplication::ARG_PRODUCT = "BlueBerry.product";
-  QString BaseApplication::ARG_HOME = "BlueBerry.home";
-  QString BaseApplication::ARG_STORAGE_DIR = "BlueBerry.storageDir";
-  QString BaseApplication::ARG_PLUGIN_CACHE = "BlueBerry.plugin_cache_dir";
-  QString BaseApplication::ARG_PLUGIN_DIRS = "BlueBerry.plugin_dirs";
-  QString BaseApplication::ARG_FORCE_PLUGIN_INSTALL = "BlueBerry.forcePlugins";
-  QString BaseApplication::ARG_PRELOAD_LIBRARY = "BlueBerry.preloadLibrary";
-  QString BaseApplication::ARG_PROVISIONING = "BlueBerry.provisioning";
-  QString BaseApplication::ARG_DEBUG = "BlueBerry.debug";
-  QString BaseApplication::ARG_CONSOLELOG = "BlueBerry.consoleLog";
-  QString BaseApplication::ARG_TESTPLUGIN = "BlueBerry.testplugin";
-  QString BaseApplication::ARG_TESTAPPLICATION = "BlueBerry.testapplication";
-
-  QString BaseApplication::ARG_SPLASH_IMAGE = "BlueBerry.splashscreen";
-
-  QString BaseApplication::ARG_NO_REGISTRY_CACHE = "BlueBerry.noRegistryCache";
-  QString BaseApplication::ARG_NO_LAZY_REGISTRY_CACHE_LOADING = "BlueBerry.noLazyRegistryCacheLoading";
-  QString BaseApplication::ARG_REGISTRY_MULTI_LANGUAGE = "BlueBerry.registryMultiLanguage";
-
-  QString BaseApplication::ARG_XARGS = "xargs";
-
-  QString BaseApplication::PROP_NEWINSTANCE = BaseApplication::ARG_NEWINSTANCE;
-  QString BaseApplication::PROP_FORCE_PLUGIN_INSTALL = BaseApplication::ARG_FORCE_PLUGIN_INSTALL;
-  QString BaseApplication::PROP_NO_REGISTRY_CACHE = BaseApplication::ARG_NO_REGISTRY_CACHE;
-  QString BaseApplication::PROP_NO_LAZY_REGISTRY_CACHE_LOADING = BaseApplication::ARG_NO_LAZY_REGISTRY_CACHE_LOADING;
-  QString BaseApplication::PROP_REGISTRY_MULTI_LANGUAGE = BaseApplication::ARG_REGISTRY_MULTI_LANGUAGE;
-
-  QString BaseApplication::PROP_PRODUCT = "blueberry.product";
-  QString BaseApplication::PROP_APPLICATION = "blueberry.application";
-  QString BaseApplication::PROP_TESTPLUGIN = "BlueBerry.testplugin";
-  QString BaseApplication::PROP_TESTAPPLICATION = "BlueBerry.testapplication";
-
-  static void outputQtMessage(QtMsgType type, const QMessageLogContext &, const QString &msg)
+  void outputQtMessage(QtMsgType type, const QMessageLogContext&, const QString& msg)
   {
     auto message = msg.toStdString();
 
@@ -115,6 +80,44 @@ namespace mitk
         break;
     }
   }
+}
+
+namespace mitk
+{
+  const QString BaseApplication::ARG_NEWINSTANCE = "BlueBerry.newInstance";
+  const QString BaseApplication::ARG_CLEAN = "BlueBerry.clean";
+  const QString BaseApplication::ARG_APPLICATION = "BlueBerry.application";
+  const QString BaseApplication::ARG_PRODUCT = "BlueBerry.product";
+  const QString BaseApplication::ARG_HOME = "BlueBerry.home";
+  const QString BaseApplication::ARG_STORAGE_DIR = "BlueBerry.storageDir";
+  const QString BaseApplication::ARG_PLUGIN_CACHE = "BlueBerry.plugin_cache_dir";
+  const QString BaseApplication::ARG_PLUGIN_DIRS = "BlueBerry.plugin_dirs";
+  const QString BaseApplication::ARG_FORCE_PLUGIN_INSTALL = "BlueBerry.forcePlugins";
+  const QString BaseApplication::ARG_PRELOAD_LIBRARY = "BlueBerry.preloadLibrary";
+  const QString BaseApplication::ARG_PROVISIONING = "BlueBerry.provisioning";
+  const QString BaseApplication::ARG_DEBUG = "BlueBerry.debug";
+  const QString BaseApplication::ARG_CONSOLELOG = "BlueBerry.consoleLog";
+  const QString BaseApplication::ARG_TESTPLUGIN = "BlueBerry.testplugin";
+  const QString BaseApplication::ARG_TESTAPPLICATION = "BlueBerry.testapplication";
+
+  const QString BaseApplication::ARG_SPLASH_IMAGE = "BlueBerry.splashscreen";
+
+  const QString BaseApplication::ARG_NO_REGISTRY_CACHE = "BlueBerry.noRegistryCache";
+  const QString BaseApplication::ARG_NO_LAZY_REGISTRY_CACHE_LOADING = "BlueBerry.noLazyRegistryCacheLoading";
+  const QString BaseApplication::ARG_REGISTRY_MULTI_LANGUAGE = "BlueBerry.registryMultiLanguage";
+
+  const QString BaseApplication::ARG_XARGS = "xargs";
+
+  const QString BaseApplication::PROP_NEWINSTANCE = BaseApplication::ARG_NEWINSTANCE;
+  const QString BaseApplication::PROP_FORCE_PLUGIN_INSTALL = BaseApplication::ARG_FORCE_PLUGIN_INSTALL;
+  const QString BaseApplication::PROP_NO_REGISTRY_CACHE = BaseApplication::ARG_NO_REGISTRY_CACHE;
+  const QString BaseApplication::PROP_NO_LAZY_REGISTRY_CACHE_LOADING = BaseApplication::ARG_NO_LAZY_REGISTRY_CACHE_LOADING;
+  const QString BaseApplication::PROP_REGISTRY_MULTI_LANGUAGE = BaseApplication::ARG_REGISTRY_MULTI_LANGUAGE;
+
+  const QString BaseApplication::PROP_PRODUCT = "blueberry.product";
+  const QString BaseApplication::PROP_APPLICATION = "blueberry.application";
+  const QString BaseApplication::PROP_TESTPLUGIN = "BlueBerry.testplugin";
+  const QString BaseApplication::PROP_TESTAPPLICATION = "BlueBerry.testapplication";
 
   class SplashCloserCallback : public QRunnable
   {

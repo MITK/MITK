@@ -29,8 +29,8 @@ QmitkRenderWindowWidget::QmitkRenderWindowWidget(QWidget* parent/* = nullptr*/,
   , m_WidgetName(widgetName)
   , m_DataStorage(dataStorage)
   , m_RenderingManager(renderingManager)
-  , m_RenderWindow(nullptr)
   , m_RenderingMode(renderingMode)
+  , m_RenderWindow(nullptr)
   , m_PointSetNode(nullptr)
   , m_PointSet(nullptr)
 {

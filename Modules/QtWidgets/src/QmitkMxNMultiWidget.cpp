@@ -58,7 +58,7 @@ QmitkRenderWindow* QmitkMxNMultiWidget::GetRenderWindow(const QString& widgetNam
   return QmitkAbstractMultiWidget::GetRenderWindow(widgetName);
 }
 
-QmitkRenderWindow* QmitkMxNMultiWidget::GetRenderWindow(const mitk::BaseRenderer::ViewDirection& viewDirection) const
+QmitkRenderWindow* QmitkMxNMultiWidget::GetRenderWindow(const mitk::BaseRenderer::ViewDirection& /*viewDirection*/) const
 {
   // currently no mapping between view directions and render windows
   // simply return the currently active render window

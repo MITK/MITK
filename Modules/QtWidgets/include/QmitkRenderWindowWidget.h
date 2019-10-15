@@ -102,10 +102,10 @@ private:
   QHBoxLayout* m_Layout;
 
   mitk::DataStorage* m_DataStorage;
-  QmitkRenderWindow* m_RenderWindow;
-
   mitk::RenderingManager::Pointer m_RenderingManager;
   mitk::BaseRenderer::RenderingMode::Type m_RenderingMode;
+
+  QmitkRenderWindow* m_RenderWindow;
 
   mitk::DataNode::Pointer m_PointSetNode;
   mitk::PointSet::Pointer m_PointSet;

@@ -30,10 +30,10 @@ class CustomPage : public QWebEnginePage
 {
 public:
   CustomPage(QObject *parent = 0) : QWebEnginePage(parent) {}
-  virtual void javaScriptConsoleMessage(JavaScriptConsoleMessageLevel /*level*/,
+  void javaScriptConsoleMessage(JavaScriptConsoleMessageLevel /*level*/,
                                         const QString &message,
                                         int lineNumber,
-                                        const QString & /*sourceID*/)
+                                        const QString & /*sourceID*/) override
   {
     MITK_INFO << "JS > " << lineNumber << ": " << message.toStdString();
   }

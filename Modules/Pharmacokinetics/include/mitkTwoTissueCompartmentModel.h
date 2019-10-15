@@ -63,28 +63,28 @@ namespace mitk
 
     static const unsigned int NUMBER_OF_PARAMETERS;
 
-    virtual std::string GetModelDisplayName() const override;
+    std::string GetModelDisplayName() const override;
 
-    virtual std::string GetModelType() const override;
+    std::string GetModelType() const override;
 
-    virtual ParameterNamesType GetParameterNames() const override;
-    virtual ParametersSizeType  GetNumberOfParameters() const override;
+    ParameterNamesType GetParameterNames() const override;
+    ParametersSizeType  GetNumberOfParameters() const override;
 
-    virtual ParamterUnitMapType GetParameterUnits() const override;
+    ParamterUnitMapType GetParameterUnits() const override;
 
   protected:
     TwoTissueCompartmentModel();
-    virtual ~TwoTissueCompartmentModel();
+    ~TwoTissueCompartmentModel() override;
 
     /**
      * Actual implementation of the clone method. This method should be reimplemeted
      * in subclasses to clone the extra required parameters.
      */
-    virtual itk::LightObject::Pointer InternalClone() const;
+    itk::LightObject::Pointer InternalClone() const override;
 
-    virtual ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
+    ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
 
-    virtual void PrintSelf(std::ostream& os, ::itk::Indent indent) const;
+    void PrintSelf(std::ostream& os, ::itk::Indent indent) const override;
 
   private:
 

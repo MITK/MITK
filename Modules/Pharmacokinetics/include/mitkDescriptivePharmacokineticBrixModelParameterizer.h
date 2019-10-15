@@ -61,22 +61,22 @@ namespace mitk
     /* Returns the global static parameters for the model.
      * @remark this default implementation assumes no global static parameters exist.
      * Thus an empty map is returned.*/
-    virtual StaticParameterMapType GetGlobalStaticParameters() const;
+    StaticParameterMapType GetGlobalStaticParameters() const override;
 
     /* Returns the local static parameters for the model at the given index.
      * @remark this default implementation assumes no local static parameters exist.
      * Thus an empty map is returned.*/
-    virtual StaticParameterMapType GetLocalStaticParameters(const IndexType& currentPosition) const;
+    StaticParameterMapType GetLocalStaticParameters(const IndexType& currentPosition) const override;
 
     /** This function returns the default parameterization (e.g. initial parametrization for fitting)
      defined by the model developer for  for the given model.*/
-    virtual ParametersType GetDefaultInitialParameterization() const;
+    ParametersType GetDefaultInitialParameterization() const override;
 
   protected:
 
     DescriptivePharmacokineticBrixModelParameterizer();
 
-    virtual ~DescriptivePharmacokineticBrixModelParameterizer();
+    ~DescriptivePharmacokineticBrixModelParameterizer() override;
 
     /**injection time Tau in minutes [min]*/
     double m_Tau;

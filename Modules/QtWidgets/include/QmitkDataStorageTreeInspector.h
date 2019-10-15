@@ -36,14 +36,14 @@ class MITKQTWIDGETS_EXPORT QmitkDataStorageTreeInspector : public QmitkAbstractD
 public:
   QmitkDataStorageTreeInspector(QWidget* parent = nullptr);
 
-  virtual QAbstractItemView* GetView() override;
-  virtual const QAbstractItemView* GetView() const override;
+  QAbstractItemView* GetView() override;
+  const QAbstractItemView* GetView() const override;
 
-  virtual void SetSelectionMode(SelectionMode mode) override;
-  virtual SelectionMode GetSelectionMode() const override;
+  void SetSelectionMode(SelectionMode mode) override;
+  SelectionMode GetSelectionMode() const override;
 
 protected:
-  virtual void Initialize() override;
+  void Initialize() override;
 
   QmitkAbstractDataStorageModel* m_StorageModel;
   Ui_QmitkDataStorageTreeInspector m_Controls;

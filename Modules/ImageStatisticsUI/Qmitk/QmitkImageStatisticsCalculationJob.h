@@ -50,7 +50,7 @@ public:
   QmitkImageStatisticsCalculationJob();
   /*!
   /brief standard destructor. */
-  ~QmitkImageStatisticsCalculationJob();
+  ~QmitkImageStatisticsCalculationJob() override;
 
   /*!
   /brief Initializes the object with necessary data. */

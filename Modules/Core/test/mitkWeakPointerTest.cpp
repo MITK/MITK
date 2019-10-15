@@ -46,14 +46,14 @@ private:
   itk::Object::Pointer m_SmartPointer;
 
 public:
-  void setUp()
+  void setUp() override
   {
     m_SmartPointer = itk::Object::New();
     m_WeakPointer = m_SmartPointer;
     m_WeakPointer2 = m_WeakPointer;
   }
 
-  void tearDown()
+  void tearDown() override
   {
     m_SmartPointer = nullptr;
     m_WeakPointer = nullptr;

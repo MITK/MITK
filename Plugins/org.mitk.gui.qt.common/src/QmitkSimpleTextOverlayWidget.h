@@ -30,13 +30,13 @@ class MITK_QT_COMMON QmitkSimpleTextOverlayWidget : public QmitkOverlayWidget
 
 public:
   explicit QmitkSimpleTextOverlayWidget(QWidget* parent = nullptr);
-  virtual ~QmitkSimpleTextOverlayWidget();
+  ~QmitkSimpleTextOverlayWidget() override;
 
   QString GetOverlayText() const;
   void SetOverlayText(const QString& text);
 
 protected:
-  virtual void paintEvent(QPaintEvent* event) override;
+  void paintEvent(QPaintEvent* event) override;
 
 private:
   QString m_Text;

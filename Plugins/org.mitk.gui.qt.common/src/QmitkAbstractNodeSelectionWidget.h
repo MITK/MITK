@@ -39,7 +39,7 @@ class MITK_QT_COMMON QmitkAbstractNodeSelectionWidget : public QWidget
 
 public:
   explicit QmitkAbstractNodeSelectionWidget(QWidget* parent = nullptr);
-  virtual ~QmitkAbstractNodeSelectionWidget();
+  ~QmitkAbstractNodeSelectionWidget() override;
 
   /**
   * @brief Sets the data storage that will be used /monitored by widget.

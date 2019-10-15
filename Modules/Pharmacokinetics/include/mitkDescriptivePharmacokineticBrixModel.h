@@ -72,48 +72,48 @@ namespace mitk
     itkSetMacro(S0, double);
     itkGetConstReferenceMacro(S0, double);
 
-    virtual std::string GetModelDisplayName() const override;
+    std::string GetModelDisplayName() const override;
 
-    virtual std::string GetModelType() const override;
+    std::string GetModelType() const override;
 
-    virtual std::string GetXAxisName() const override;
+    std::string GetXAxisName() const override;
 
-    virtual std::string GetXAxisUnit() const override;
+    std::string GetXAxisUnit() const override;
 
-    virtual std::string GetYAxisName() const override;
+    std::string GetYAxisName() const override;
 
-    virtual std::string GetYAxisUnit() const override;
+    std::string GetYAxisUnit() const override;
 
-    virtual ParameterNamesType GetParameterNames() const override;
+    ParameterNamesType GetParameterNames() const override;
 
-    virtual ParametersSizeType  GetNumberOfParameters() const override;
+    ParametersSizeType  GetNumberOfParameters() const override;
 
-    virtual ParamterUnitMapType GetParameterUnits() const override;
+    ParamterUnitMapType GetParameterUnits() const override;
 
 
-    virtual ParameterNamesType GetStaticParameterNames() const override;
-    virtual ParametersSizeType GetNumberOfStaticParameters() const override;
-    virtual ParamterUnitMapType GetStaticParameterUnits() const override;
+    ParameterNamesType GetStaticParameterNames() const override;
+    ParametersSizeType GetNumberOfStaticParameters() const override;
+    ParamterUnitMapType GetStaticParameterUnits() const override;
 
   protected:
     DescriptivePharmacokineticBrixModel();
-    virtual ~DescriptivePharmacokineticBrixModel();
+    ~DescriptivePharmacokineticBrixModel() override;
 
     /**
      * Actual implementation of the clone method. This method should be reimplemeted
      * in subclasses to clone the extra required parameters.
      */
-    virtual itk::LightObject::Pointer InternalClone() const;
+    itk::LightObject::Pointer InternalClone() const override;
 
-    virtual ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
+    ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
 
-    virtual void SetStaticParameter(const ParameterNameType& name,
+    void SetStaticParameter(const ParameterNameType& name,
                                     const StaticParameterValuesType& values) override;
-    virtual StaticParameterValuesType GetStaticParameterValue(const ParameterNameType& name) const
+    StaticParameterValuesType GetStaticParameterValue(const ParameterNameType& name) const
     override;
 
 
-    virtual void PrintSelf(std::ostream& os, ::itk::Indent indent) const;
+    void PrintSelf(std::ostream& os, ::itk::Indent indent) const override;
 
   private:
     /**injection time Tau in minutes [min]*/

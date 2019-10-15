@@ -57,7 +57,7 @@ public:
 
         QmitkMatchPointRegistrationVisualizer();
 
-    virtual void CreateQtPartControl(QWidget* parent);
+    void CreateQtPartControl(QWidget* parent) override;
 
     /** Returns the registration currently handled by the plugin.
      * May return nullptr, if no registration is selected/handled by
@@ -81,11 +81,11 @@ public:
     void OnColorInterpolationChecked(bool);
 
 protected:
-    virtual void SetFocus();
+    void SetFocus() override;
 
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
-    virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
-        const QList<mitk::DataNode::Pointer>& nodes);
+    void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
+        const QList<mitk::DataNode::Pointer>& nodes) override;
 
     void ActualizeRegInfo(mitk::MAPRegistrationWrapper* currentReg);
 

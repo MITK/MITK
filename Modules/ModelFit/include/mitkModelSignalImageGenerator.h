@@ -43,7 +43,7 @@ namespace mitk
     protected:
         ModelSignalImageGenerator()
         {};
-        ~ModelSignalImageGenerator()
+        ~ModelSignalImageGenerator() override
         {};
 
         template <typename TPixel, unsigned int VDim>

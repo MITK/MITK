@@ -59,7 +59,7 @@ namespace mitk
     /** Returns the global static parameters for the model.
     * @remark this default implementation assumes only AIF and its timegrid as static parameters.
     * Reimplement in derived classes to change this behavior.*/
-    virtual StaticParameterMapType GetGlobalStaticParameters() const
+    StaticParameterMapType GetGlobalStaticParameters() const override
     {
       StaticParameterMapType result;
       StaticParameterValuesType valuesAIF = mitk::convertArrayToParameter(this->m_AIF);
@@ -77,7 +77,7 @@ namespace mitk
     AIFBasedModelParameterizerBase()
     {};
 
-    virtual ~AIFBasedModelParameterizerBase()
+    ~AIFBasedModelParameterizerBase() override
     {};
 
 

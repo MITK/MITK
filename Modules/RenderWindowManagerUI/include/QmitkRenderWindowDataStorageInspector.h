@@ -47,19 +47,19 @@ public:
   /**
   * @brief See 'QmitkAbstractDataStorageInspector'
   */
-  virtual QAbstractItemView* GetView() override;
+  QAbstractItemView* GetView() override;
   /**
   * @brief See 'QmitkAbstractDataStorageInspector'
   */
-  virtual const QAbstractItemView* GetView() const override;
+  const QAbstractItemView* GetView() const override;
   /**
   * @brief See 'QmitkAbstractDataStorageInspector'
   */
-  virtual void SetSelectionMode(SelectionMode mode) override;
+  void SetSelectionMode(SelectionMode mode) override;
   /**
   * @brief See 'QmitkAbstractDataStorageInspector'
   */
-  virtual SelectionMode GetSelectionMode() const override;
+  SelectionMode GetSelectionMode() const override;
   /**
   * @brief Set the controlled base renderer.
   */
@@ -83,7 +83,7 @@ private Q_SLOTS:
 
 private:
 
-  virtual void Initialize() override;
+  void Initialize() override;
   void SetUpConnections();
 
   Ui::QmitkRenderWindowDataStorageInspector m_Controls;

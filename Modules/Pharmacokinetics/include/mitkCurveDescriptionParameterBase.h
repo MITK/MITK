@@ -66,7 +66,7 @@ class MITKPHARMACOKINETICS_EXPORT CurveDescriptionParameterBase : public itk::Ob
     virtual DescriptionParameterResultsType ComputeCurveDescriptionParameter(const CurveType& curve, const CurveGridType& grid) const = 0;
 
     CurveDescriptionParameterBase();
-    virtual ~CurveDescriptionParameterBase();
+    ~CurveDescriptionParameterBase() override;
 
   private:
 

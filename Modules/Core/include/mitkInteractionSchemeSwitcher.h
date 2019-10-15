@@ -114,7 +114,7 @@ namespace mitk
   protected:
 
     InteractionSchemeSwitcher();
-    virtual ~InteractionSchemeSwitcher() override;
+    ~InteractionSchemeSwitcher() override;
 
   private:
 

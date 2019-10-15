@@ -47,9 +47,9 @@ public:
   /** */
   ParameterFitBackgroundJob(mitk::ParameterFitImageGeneratorBase* generator, const mitk::modelFit::ModelFitInfo* fitInfo, mitk::DataNode* parentNode, mitk::modelFit::ModelFitResultNodeVectorType additionalRelevantNodes);
 
-  ~ParameterFitBackgroundJob();
+  ~ParameterFitBackgroundJob() override;
 
-		void run();
+		void run() override;
 
     /**Returns the node (if defined), that is the parent object for the results of the job.
     May be null.*/

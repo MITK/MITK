@@ -59,41 +59,41 @@ namespace mitk
 
     static const std::string NAME_STATIC_PARAMETER_number;
 
-    virtual std::string GetModelDisplayName() const override;
+    std::string GetModelDisplayName() const override;
 
-    virtual std::string GetModelType() const override;
+    std::string GetModelType() const override;
 
-    virtual FunctionStringType GetFunctionString() const override;
+    FunctionStringType GetFunctionString() const override;
     itkSetStringMacro(FunctionString);
 
     /**@pre The Number of paremeters must be between 1 and 10.*/
     itkSetClampMacro(NumberOfParameters, ParametersSizeType, 1, 10);
 
-    virtual std::string GetXName() const override;
+    std::string GetXName() const override;
 
-    virtual ParameterNamesType GetParameterNames() const override;
+    ParameterNamesType GetParameterNames() const override;
 
-    virtual ParametersSizeType  GetNumberOfParameters() const override;
+    ParametersSizeType  GetNumberOfParameters() const override;
 
-    virtual ParameterNamesType GetStaticParameterNames() const override;
+    ParameterNamesType GetStaticParameterNames() const override;
 
-    virtual ParametersSizeType GetNumberOfStaticParameters() const override;
+    ParametersSizeType GetNumberOfStaticParameters() const override;
 
   protected:
     GenericParamModel();
-    virtual ~GenericParamModel() {};
+    ~GenericParamModel() override {};
 
     /**
      * Actual implementation of the clone method. This method should be reimplemeted
      * in subclasses to clone the extra required parameters.
      */
-    virtual itk::LightObject::Pointer InternalClone() const;
+    itk::LightObject::Pointer InternalClone() const override;
 
-    virtual ModelResultType ComputeModelfunction(const ParametersType& parameters) const;
+    ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
 
-    virtual void SetStaticParameter(const ParameterNameType& name,
-                                    const StaticParameterValuesType& values);
-    virtual StaticParameterValuesType GetStaticParameterValue(const ParameterNameType& name) const;
+    void SetStaticParameter(const ParameterNameType& name,
+                                    const StaticParameterValuesType& values) override;
+    StaticParameterValuesType GetStaticParameterValue(const ParameterNameType& name) const override;
 
   private:
     /**Function string that should be parsed when computing the model function.*/

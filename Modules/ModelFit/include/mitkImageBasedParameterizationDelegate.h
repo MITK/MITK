@@ -37,8 +37,8 @@ public:
     /** Returns the parameterization (e.g. initial parametrization for fitting) that should be used.
    If no ParameterizationDelegate is set (see SetInitialParameterizationDelegate()) it will just return
    the result of GetInitialParameterization().*/
-    virtual ParametersType GetInitialParameterization() const override;
-    virtual ParametersType GetInitialParameterization(const IndexType& currentPosition) const override;
+    ParametersType GetInitialParameterization() const override;
+    ParametersType GetInitialParameterization(const IndexType& currentPosition) const override;
 
     /** Adds an image as a source for the initial value of a parameter.
      * @param image Pointer to the image that is the value source.
@@ -56,7 +56,7 @@ protected:
 
     ImageBasedParameterizationDelegate();
 
-    virtual ~ImageBasedParameterizationDelegate();
+    ~ImageBasedParameterizationDelegate() override;
 
 private:
 

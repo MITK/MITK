@@ -41,7 +41,7 @@ public:
   using FitVectorType = std::vector<mitk::modelFit::ModelFitInfo::ConstPointer>;
 
   QmitkFitPlotDataWidget(QWidget* parent = 0);
-  ~QmitkFitPlotDataWidget();
+  ~QmitkFitPlotDataWidget() override;
 
   const mitk::ModelFitPlotData* GetPlotData() const;
   const std::string& GetXName() const;

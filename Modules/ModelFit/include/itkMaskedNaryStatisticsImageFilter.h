@@ -88,9 +88,9 @@ public:
 #endif
 protected:
   MaskedNaryStatisticsImageFilter();
-  virtual ~MaskedNaryStatisticsImageFilter() {}
+  ~MaskedNaryStatisticsImageFilter() override {}
 
-  void GenerateData();
+  void GenerateData() override;
 
 private:
   MaskedNaryStatisticsImageFilter(const Self &); //purposely not implemented

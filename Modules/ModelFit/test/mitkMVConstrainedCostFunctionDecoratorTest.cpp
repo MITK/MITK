@@ -38,7 +38,7 @@ public:
 
 protected:
 
-    virtual MeasureType CalcMeasure(const ParametersType &parameters, const SignalType& signal) const
+    MeasureType CalcMeasure(const ParametersType &parameters, const SignalType& signal) const override
     {
       MeasureType result = signal;
       result[0] = parameters[0];
@@ -52,7 +52,7 @@ protected:
       m_calls = 0;
     }
 
-    ~TestCostFunction(){}
+    ~TestCostFunction() override{}
 };
 
 int mitkMVConstrainedCostFunctionDecoratorTest(int  /*argc*/, char*[] /*argv[]*/)

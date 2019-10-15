@@ -96,7 +96,7 @@ public:
 protected:
 
     ConcentrationCurveGenerator();
-     ~ConcentrationCurveGenerator();
+     ~ConcentrationCurveGenerator() override;
 
     template<class Tpixel>
     mitk::Image::Pointer convertToConcentration(const mitk::Image* inputImage, const mitk::Image* baselineImage);

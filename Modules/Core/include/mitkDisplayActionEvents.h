@@ -38,11 +38,11 @@ namespace mitk
 
     DisplayActionEvent() : m_InteractionEvent(nullptr) {}
     DisplayActionEvent(InteractionEvent* interactionEvent) : m_InteractionEvent(interactionEvent) {}
-    virtual ~DisplayActionEvent() {}
-    virtual const char* GetEventName() const override { return "DisplayActionEvent"; }
-    virtual bool CheckEvent(const itk::EventObject* e) const override
+    ~DisplayActionEvent() override {}
+    const char* GetEventName() const override { return "DisplayActionEvent"; }
+    bool CheckEvent(const itk::EventObject* e) const override
                                                      { return dynamic_cast<const Self*>(e) != nullptr; }
-    virtual itk::EventObject* MakeObject() const override { return new Self(m_InteractionEvent); }
+    itk::EventObject* MakeObject() const override { return new Self(m_InteractionEvent); }
     InteractionEvent* GetInteractionEvent() const { return m_InteractionEvent; }
     BaseRenderer* GetSender() const
     {
@@ -67,11 +67,11 @@ namespace mitk
       , m_MoveVector(moveVector)
     {
     }
-    virtual ~DisplayMoveEvent() {}
-    virtual const char* GetEventName() const override { return "DisplayMoveEvent"; }
-    virtual bool CheckEvent(const itk::EventObject* e) const override
+    ~DisplayMoveEvent() override {}
+    const char* GetEventName() const override { return "DisplayMoveEvent"; }
+    bool CheckEvent(const itk::EventObject* e) const override
                                                      { return dynamic_cast<const Self*>(e) != nullptr; }
-    virtual itk::EventObject* MakeObject() const override { return new Self(GetInteractionEvent(), m_MoveVector); }
+    itk::EventObject* MakeObject() const override { return new Self(GetInteractionEvent(), m_MoveVector); }
     const Vector2D& GetMoveVector() const { return m_MoveVector; }
     DisplayMoveEvent(const Self& s) : Superclass(s), m_MoveVector(s.GetMoveVector()) {};
 
@@ -91,11 +91,11 @@ namespace mitk
       , m_Position(position)
     {
     }
-    virtual ~DisplaySetCrosshairEvent() {}
-    virtual const char* GetEventName() const override { return "DisplaySetCrosshairEvent"; }
-    virtual bool CheckEvent(const itk::EventObject* e) const override
+    ~DisplaySetCrosshairEvent() override {}
+    const char* GetEventName() const override { return "DisplaySetCrosshairEvent"; }
+    bool CheckEvent(const itk::EventObject* e) const override
                                                      { return dynamic_cast<const Self*>(e) != nullptr; }
-    virtual itk::EventObject* MakeObject() const override { return new Self(GetInteractionEvent(), m_Position); }
+    itk::EventObject* MakeObject() const override { return new Self(GetInteractionEvent(), m_Position); }
     const Point3D& GetPosition() const { return m_Position; }
     DisplaySetCrosshairEvent(const Self& s) : Superclass(s), m_Position(s.GetPosition()) {};
 
@@ -116,11 +116,11 @@ namespace mitk
       , m_StartCoordinate(startCoordinate)
     {
     }
-    virtual ~DisplayZoomEvent() {}
-    virtual const char* GetEventName() const override { return "DisplayZoomEvent"; }
-    virtual bool CheckEvent(const itk::EventObject* e) const override
+    ~DisplayZoomEvent() override {}
+    const char* GetEventName() const override { return "DisplayZoomEvent"; }
+    bool CheckEvent(const itk::EventObject* e) const override
                                                      { return dynamic_cast<const Self*>(e) != nullptr; }
-    virtual itk::EventObject* MakeObject() const override { return new Self(GetInteractionEvent(), m_ZoomFactor, m_StartCoordinate); }
+    itk::EventObject* MakeObject() const override { return new Self(GetInteractionEvent(), m_ZoomFactor, m_StartCoordinate); }
     float GetZoomFactor() const { return m_ZoomFactor; }
     const Point2D& GetStartCoordinate() const { return m_StartCoordinate; }
     DisplayZoomEvent(const Self& s) : Superclass(s), m_ZoomFactor(s.GetZoomFactor()), m_StartCoordinate(s.GetStartCoordinate()) {};
@@ -142,11 +142,11 @@ namespace mitk
       , m_SliceDelta(sliceDelta)
     {
     }
-    virtual ~DisplayScrollEvent() {}
-    virtual const char* GetEventName() const override { return "DisplayScrollEvent"; }
-    virtual bool CheckEvent(const itk::EventObject* e) const override
+    ~DisplayScrollEvent() override {}
+    const char* GetEventName() const override { return "DisplayScrollEvent"; }
+    bool CheckEvent(const itk::EventObject* e) const override
                                                      { return dynamic_cast<const Self*>(e) != nullptr; }
-    virtual itk::EventObject* MakeObject() const override { return new Self(GetInteractionEvent(), m_SliceDelta); }
+    itk::EventObject* MakeObject() const override { return new Self(GetInteractionEvent(), m_SliceDelta); }
     int GetSliceDelta() const { return m_SliceDelta; }
     DisplayScrollEvent(const Self& s) : Superclass(s), m_SliceDelta(s.GetSliceDelta()) {};
 
@@ -167,13 +167,13 @@ namespace mitk
       , m_Window(window)
     {
     }
-    virtual ~DisplaySetLevelWindowEvent() {}
-    virtual const char* GetEventName() const override { return "DisplaySetLevelWindowEvent"; }
-    virtual bool CheckEvent(const itk::EventObject* e) const override
+    ~DisplaySetLevelWindowEvent() override {}
+    const char* GetEventName() const override { return "DisplaySetLevelWindowEvent"; }
+    bool CheckEvent(const itk::EventObject* e) const override
     {
       return dynamic_cast<const Self*>(e) != nullptr;
     }
-    virtual itk::EventObject* MakeObject() const override { return new Self(GetInteractionEvent(), m_Level, m_Window); }
+    itk::EventObject* MakeObject() const override { return new Self(GetInteractionEvent(), m_Level, m_Window); }
     ScalarType GetLevel() const { return m_Level; }
     ScalarType GetWindow() const { return m_Window; }
     DisplaySetLevelWindowEvent(const Self& s) : Superclass(s), m_Level(s.GetLevel()), m_Window(s.GetWindow()) {};

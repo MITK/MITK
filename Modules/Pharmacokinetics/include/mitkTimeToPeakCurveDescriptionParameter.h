@@ -32,7 +32,7 @@ public:
 
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
-    virtual DescriptionParameterNamesType GetDescriptionParameterName() const override;
+    DescriptionParameterNamesType GetDescriptionParameterName() const override;
 
 
 protected:
@@ -40,9 +40,9 @@ protected:
     static const std::string PARAMETER_TIME_NAME;
 
     TimeToPeakCurveDescriptionParameter();
-    virtual ~TimeToPeakCurveDescriptionParameter();
+    ~TimeToPeakCurveDescriptionParameter() override;
 
-    virtual DescriptionParameterResultsType ComputeCurveDescriptionParameter(const CurveType& curve, const CurveGridType& grid) const override;
+    DescriptionParameterResultsType ComputeCurveDescriptionParameter(const CurveType& curve, const CurveGridType& grid) const override;
 };
 
 

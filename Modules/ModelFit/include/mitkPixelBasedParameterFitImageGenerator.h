@@ -75,15 +75,15 @@ public:
     itkGetMacro(TimeGridByParameterizer, bool);
     itkBooleanMacro(TimeGridByParameterizer);
 
-    virtual double GetProgress() const override;
+    double GetProgress() const override;
 
-    virtual ParameterNamesType GetParameterNames() const override;
+    ParameterNamesType GetParameterNames() const override;
 
-    virtual ParameterNamesType GetDerivedParameterNames() const override;
+    ParameterNamesType GetDerivedParameterNames() const override;
 
-    virtual ParameterNamesType GetCriterionNames() const override;
+    ParameterNamesType GetCriterionNames() const override;
 
-    virtual ParameterNamesType GetEvaluationParameterNames() const override;
+    ParameterNamesType GetEvaluationParameterNames() const override;
 
 protected:
   PixelBasedParameterFitImageGenerator() : m_Progress(0), m_TimeGridByParameterizer(false)
@@ -93,7 +93,7 @@ protected:
     m_DynamicImage = nullptr;
   };
 
-  ~PixelBasedParameterFitImageGenerator() = default;
+  ~PixelBasedParameterFitImageGenerator() override = default;
 
     template <typename TPixel, unsigned int VDim>
     void DoParameterFit(itk::Image<TPixel, VDim>* image);
@@ -103,9 +103,9 @@ protected:
 
     void onFitProgressEvent(::itk::Object* caller, const ::itk::EventObject& eventObject);
 
-    virtual bool HasOutdatedResult() const;
-    virtual void CheckValidInputs() const;
-    virtual void DoFitAndGetResults(ParameterImageMapType& parameterImages, ParameterImageMapType& derivedParameterImages, ParameterImageMapType& criterionImages, ParameterImageMapType& evaluationParameterImages);
+    bool HasOutdatedResult() const override;
+    void CheckValidInputs() const override;
+    void DoFitAndGetResults(ParameterImageMapType& parameterImages, ParameterImageMapType& derivedParameterImages, ParameterImageMapType& criterionImages, ParameterImageMapType& evaluationParameterImages) override;
 
 private:
     Image::Pointer m_DynamicImage;

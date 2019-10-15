@@ -41,7 +41,7 @@ namespace mitk
 
     StandardToftsModelFactory();
 
-    virtual ~StandardToftsModelFactory() override;
+    ~StandardToftsModelFactory() override;
 
   private:
 

@@ -35,15 +35,15 @@ namespace mitk
                    ConcreteModelFactoryBase<DescriptivePharmacokineticBrixModel>);
     itkFactorylessNewMacro(Self);
 
-    virtual ParametersType GetDefaultInitialParameterization() const;
+    ParametersType GetDefaultInitialParameterization() const override;
 
   protected:
-    virtual ModelParameterizerBase::Pointer DoCreateParameterizer(const modelFit::ModelFitInfo* fit)
-    const;
+    ModelParameterizerBase::Pointer DoCreateParameterizer(const modelFit::ModelFitInfo* fit)
+    const override;
 
     DescriptivePharmacokineticBrixModelFactory();
 
-    virtual ~DescriptivePharmacokineticBrixModelFactory();
+    ~DescriptivePharmacokineticBrixModelFactory() override;
 
   private:
 

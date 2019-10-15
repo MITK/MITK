@@ -51,15 +51,15 @@ namespace  mitk
     itkSetConstObjectMacro(ModelParameterizer, ModelParameterizerBase);
     itkGetConstObjectMacro(ModelParameterizer, ModelParameterizerBase);
 
-    virtual SimpleFunctorBase::OutputPixelVectorType Compute(const InputPixelVectorType & value) const override;
+    SimpleFunctorBase::OutputPixelVectorType Compute(const InputPixelVectorType & value) const override;
 
-    virtual unsigned int GetNumberOfOutputs() const override;
+    unsigned int GetNumberOfOutputs() const override;
 
-    virtual GridArrayType GetGrid() const override;
+    GridArrayType GetGrid() const override;
 
   protected:
     ModelDataGenerationFunctor();
-    virtual ~ModelDataGenerationFunctor();
+    ~ModelDataGenerationFunctor() override;
 
   private:
     ModelParameterizerBase::ConstPointer m_ModelParameterizer;

@@ -133,7 +133,7 @@ private:
   }
 
 public:
-  void setUp()
+  void setUp() override
   {
     m_RefPointSet = mitk::PointSet::New();
 
@@ -149,7 +149,7 @@ public:
     m_RefPoint[2] = 29.6502;
   }
 
-  void tearDown()
+  void tearDown() override
   {
     m_RefPoint[0] = 0;
     m_RefPoint[1] = 0;

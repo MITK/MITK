@@ -24,14 +24,14 @@ public:
 
 protected:
 
-    virtual MeasureType CalcMeasure(const ParametersType &parameters, const SignalType& signal) const;
+    MeasureType CalcMeasure(const ParametersType &parameters, const SignalType& signal) const override;
 
     ChiSquareFitCostFunction()
     {
 
     }
 
-    ~ChiSquareFitCostFunction(){}
+    ~ChiSquareFitCostFunction() override{}
 
 };
 }

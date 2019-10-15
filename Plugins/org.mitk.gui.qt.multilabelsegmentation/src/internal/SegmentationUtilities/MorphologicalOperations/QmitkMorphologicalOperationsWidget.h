@@ -28,7 +28,7 @@ class QmitkMorphologicalOperationsWidget : public QmitkSegmentationUtilityWidget
 
 public:
   explicit QmitkMorphologicalOperationsWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = nullptr);
-  ~QmitkMorphologicalOperationsWidget();
+  ~QmitkMorphologicalOperationsWidget() override;
 
 public slots:
   void OnClosingButtonClicked();

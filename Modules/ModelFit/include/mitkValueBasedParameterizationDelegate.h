@@ -54,8 +54,8 @@ namespace mitk
     /** Returns the parameterization (e.g. initial parametrization for fitting) that should be used.
      If no ParameterizationDelegate is set (see SetInitialParameterizationDelegate()) it will just return
      the result of GetInitialParameterization().*/
-    virtual ParametersType GetInitialParameterization() const;
-    virtual ParametersType GetInitialParameterization(const IndexType& currentPosition) const;
+    ParametersType GetInitialParameterization() const override;
+    ParametersType GetInitialParameterization(const IndexType& currentPosition) const override;
 
   protected:
 
@@ -63,7 +63,7 @@ namespace mitk
 
     ValueBasedParameterizationDelegate();
 
-    virtual ~ValueBasedParameterizationDelegate();
+    ~ValueBasedParameterizationDelegate() override;
 
   private:
 

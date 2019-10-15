@@ -34,7 +34,7 @@ class MITK_QT_SEGMENTATION QmitkThresholdAction : public QObject, public mitk::I
 
 public:
   QmitkThresholdAction();
-  ~QmitkThresholdAction();
+  ~QmitkThresholdAction() override;
 
   // IContextMenuAction
   void Run(const QList<mitk::DataNode::Pointer> &selectedNodes) override;

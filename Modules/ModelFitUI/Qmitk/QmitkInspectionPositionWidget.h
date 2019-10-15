@@ -41,7 +41,7 @@ public:
   using FitVectorType = std::vector<mitk::modelFit::ModelFitInfo::ConstPointer>;
 
   QmitkInspectionPositionWidget(QWidget* parent = 0);
-  ~QmitkInspectionPositionWidget();
+  ~QmitkInspectionPositionWidget() override;
 
   mitk::Point3D GetCurrentPosition() const;
 

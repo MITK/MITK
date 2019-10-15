@@ -65,7 +65,7 @@ public:
    /**
     * \brief QmitkDicomBrowser destructor.
     */
-    virtual ~QmitkDicomBrowser();
+    ~QmitkDicomBrowser() override;
 
    /**
     * \brief Init initialize the editor.

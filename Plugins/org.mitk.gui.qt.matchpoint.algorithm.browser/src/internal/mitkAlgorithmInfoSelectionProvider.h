@@ -39,12 +39,12 @@ public:
 
   AlgorithmInfoSelectionProvider();
 
-  void AddSelectionChangedListener(berry::ISelectionChangedListener* listener);
+  void AddSelectionChangedListener(berry::ISelectionChangedListener* listener) override;
 
-  void RemoveSelectionChangedListener( berry::ISelectionChangedListener* listener);
+  void RemoveSelectionChangedListener( berry::ISelectionChangedListener* listener) override;
 
-  berry::ISelection::ConstPointer GetSelection() const;
-  void SetSelection(const berry::ISelection::ConstPointer& selection);
+  berry::ISelection::ConstPointer GetSelection() const override;
+  void SetSelection(const berry::ISelection::ConstPointer& selection) override;
 
   MAPAlgorithmInfoSelection::ConstPointer GetInfoSelection() const;
   void SetInfoSelection(MAPAlgorithmInfoSelection::ConstPointer selection);

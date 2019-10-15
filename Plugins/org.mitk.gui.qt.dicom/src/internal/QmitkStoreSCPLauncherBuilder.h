@@ -36,7 +36,7 @@ public:
     /**
     * \brief QmitkStoreSCPLauncherBuilder destructor.
     */
-    virtual ~QmitkStoreSCPLauncherBuilder();
+    ~QmitkStoreSCPLauncherBuilder() override;
 
     /**
     * \brief Adds port to this object.

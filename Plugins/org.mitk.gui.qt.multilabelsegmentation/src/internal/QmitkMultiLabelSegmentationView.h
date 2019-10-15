@@ -41,19 +41,19 @@ public:
   static const std::string VIEW_ID;
 
   QmitkMultiLabelSegmentationView();
-  virtual ~QmitkMultiLabelSegmentationView();
+  ~QmitkMultiLabelSegmentationView() override;
 
   typedef std::map<mitk::DataNode *, unsigned long> NodeTagMapType;
 
   // GUI setup
-  void CreateQtPartControl(QWidget *parent);
+  void CreateQtPartControl(QWidget *parent) override;
 
   // ILifecycleAwarePart interface
 public:
-  void Activated();
-  void Deactivated();
-  void Visible();
-  void Hidden();
+  void Activated() override;
+  void Deactivated() override;
+  void Visible() override;
+  void Hidden() override;
 
   virtual int GetSizeFlags(bool width);
   virtual int ComputePreferredSize(bool width,
@@ -134,7 +134,7 @@ protected:
 
   void OnLooseLabelSetConnection();
 
-  void SetFocus();
+  void SetFocus() override;
 
   void UpdateControls();
 

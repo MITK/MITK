@@ -35,12 +35,12 @@ namespace mitk
         mitkClassMacro(ScalarListLookupTablePropertySerializer, BasePropertySerializer);
         itkNewMacro(Self);
 
-        virtual TiXmlElement* Serialize();
-        virtual BaseProperty::Pointer Deserialize(TiXmlElement* element);
+        TiXmlElement* Serialize() override;
+        BaseProperty::Pointer Deserialize(TiXmlElement* element) override;
 
     protected:
         ScalarListLookupTablePropertySerializer() {}
-        virtual ~ScalarListLookupTablePropertySerializer() {}
+        ~ScalarListLookupTablePropertySerializer() override {}
     };
 
   namespace PropertyPersistenceSerialization

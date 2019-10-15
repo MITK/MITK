@@ -40,7 +40,7 @@ class MITKQTWIDGETS_EXPORT QmitkAbstractDataStorageInspector : public QWidget
   Q_OBJECT
 
 public:
-  virtual ~QmitkAbstractDataStorageInspector();
+  ~QmitkAbstractDataStorageInspector() override;
 
   /**
   * @brief Sets the data storage that will be used /monitored by the widget.

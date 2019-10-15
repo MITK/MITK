@@ -63,7 +63,7 @@ public:
 
 private:
     ImageGenerationHelper(): m_DimX(0), m_DimY(0), m_DimZ(0) {};
-    ~ImageGenerationHelper(){};
+    ~ImageGenerationHelper() override{};
 
     mitk::Image::Pointer GenerateTestFrame(unsigned int timePointIndex);
     unsigned int m_DimX, m_DimY, m_DimZ;

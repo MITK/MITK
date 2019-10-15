@@ -35,7 +35,7 @@ class QmitkSegmentationUtilityWidget : public QWidget
 
 public:
   explicit QmitkSegmentationUtilityWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = nullptr);
-  virtual ~QmitkSegmentationUtilityWidget();
+  ~QmitkSegmentationUtilityWidget() override;
 
   /** \brief Usually called only from QmitkSegmentationUtilitiesView::RenderWindowPartActivated() and QmitkSegmentationUtilitiesView::RenderWindowPartDeactivated().
    */

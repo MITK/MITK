@@ -41,7 +41,7 @@ public:
   explicit QmitkSurfaceToImageWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = nullptr);
 
   /** @brief Defaul destructor. */
-  ~QmitkSurfaceToImageWidget();
+  ~QmitkSurfaceToImageWidget() override;
 
 private slots:
 

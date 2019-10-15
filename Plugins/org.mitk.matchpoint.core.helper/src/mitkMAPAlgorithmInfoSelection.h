@@ -44,22 +44,22 @@ public:
   MAPAlgorithmInfoSelection(AlgorithmInfoType::ConstPointer info);
   MAPAlgorithmInfoSelection(const AlgorithmInfoVectorType& infos);
 
-  virtual Object::Pointer GetFirstElement() const;
-  virtual iterator Begin() const;
-  virtual iterator End() const;
+  Object::Pointer GetFirstElement() const override;
+  iterator Begin() const override;
+  iterator End() const override;
 
-  virtual int Size() const;
+  int Size() const override;
 
-  virtual ContainerType::Pointer ToVector() const;
+  ContainerType::Pointer ToVector() const override;
 
   AlgorithmInfoVectorType GetSelectedAlgorithmInfo() const;
 
   /**
    * @see berry::ISelection::IsEmpty()
    */
-  bool IsEmpty() const;
+  bool IsEmpty() const override;
 
-  bool operator==(const berry::Object* obj) const;
+  bool operator==(const berry::Object* obj) const override;
 
 protected:
 

@@ -17,15 +17,15 @@ namespace  mitk
 
         itkFactorylessNewMacro(Self);
         itkCloneMacro(Self);
-        virtual DescriptionParameterNamesType GetDescriptionParameterName() const override;
+        DescriptionParameterNamesType GetDescriptionParameterName() const override;
 
     protected:
         static const std::string PARAMETER_NAME;
 
         AreaUnderFirstMomentDescriptionParameter();
-        virtual ~AreaUnderFirstMomentDescriptionParameter();
+        ~AreaUnderFirstMomentDescriptionParameter() override;
 
-        virtual DescriptionParameterResultsType ComputeCurveDescriptionParameter(const CurveType& curve, const CurveGridType& grid) const override;
+        DescriptionParameterResultsType ComputeCurveDescriptionParameter(const CurveType& curve, const CurveGridType& grid) const override;
 
     };
 }

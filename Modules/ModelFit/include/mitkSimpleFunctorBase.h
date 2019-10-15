@@ -59,7 +59,7 @@ namespace mitk
 
     SimpleFunctorBase();
 
-    virtual ~SimpleFunctorBase();
+    ~SimpleFunctorBase() override;
 
   };
 

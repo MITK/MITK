@@ -36,10 +36,10 @@ namespace itk
 
     protected:
       MultiHistogramFilter();
-      ~MultiHistogramFilter(){};
+      ~MultiHistogramFilter() override{};
 
-      virtual void ThreadedGenerateData(const OutputImageRegionType & outputRegionForThread, ThreadIdType threadId) override;
-      virtual void BeforeThreadedGenerateData(void) override;
+      void ThreadedGenerateData(const OutputImageRegionType & outputRegionForThread, ThreadIdType threadId) override;
+      void BeforeThreadedGenerateData(void) override;
 
 
       using itk::ProcessObject::MakeOutput;

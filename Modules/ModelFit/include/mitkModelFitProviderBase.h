@@ -37,20 +37,20 @@ namespace mitk
   {
   public:
     /** Returns an instance of the model factory that is represented by the provider.*/
-    virtual itk::SmartPointer<ModelFactoryBase> GenerateFactory() const override;
+    itk::SmartPointer<ModelFactoryBase> GenerateFactory() const override;
 
     /** Returns the grid of the model variable extracted from the fit info. The default implementation
      returns a time grid extracted from the time geometry of the fitInfo->inputImage. Reimplement for
      other models/fits to generate other variable grids.
      @pre fitInfo is a valid instance for the model fit.
     */
-    virtual ModelBase::TimeGridType GetVariableGrid(const modelFit::ModelFitInfo* fitInfo) const override;
+    ModelBase::TimeGridType GetVariableGrid(const modelFit::ModelFitInfo* fitInfo) const override;
 
     us::ServiceRegistration<IModelFitProvider> RegisterService(us::ModuleContext *context = us::GetModuleContext());
     void UnregisterService();
 
     ModelFitProviderBase();
-    virtual ~ModelFitProviderBase();
+    ~ModelFitProviderBase() override;
 
   protected:
 

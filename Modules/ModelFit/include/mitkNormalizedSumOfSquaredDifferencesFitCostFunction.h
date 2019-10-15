@@ -42,13 +42,13 @@ public:
 
 protected:
 
-    virtual MeasureType CalcMeasure(const ParametersType &parameters, const SignalType& signal) const;
+    MeasureType CalcMeasure(const ParametersType &parameters, const SignalType& signal) const override;
 
     NormalizedSumOfSquaredDifferencesFitCostFunction()
     {
     }
 
-    ~NormalizedSumOfSquaredDifferencesFitCostFunction(){}
+    ~NormalizedSumOfSquaredDifferencesFitCostFunction() override{}
 };
 
 }

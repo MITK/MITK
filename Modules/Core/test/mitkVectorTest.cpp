@@ -96,7 +96,7 @@ private:
   mitk::ScalarType m_Epsilon;
 
 public:
-  void setUp()
+  void setUp() override
   {
     m_ItkVector_1[0] = 4.6;
     m_ItkVector_1[1] = 9.76543;
@@ -138,7 +138,7 @@ public:
     m_Epsilon = 0.000001;
   }
 
-  void tearDown()
+  void tearDown() override
   {
     m_ItkVector_1.Fill(0);
     m_ItkVector_2.Fill(0);

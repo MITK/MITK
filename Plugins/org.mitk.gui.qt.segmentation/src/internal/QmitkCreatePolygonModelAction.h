@@ -32,7 +32,7 @@ class MITK_QT_SEGMENTATION QmitkCreatePolygonModelAction : public QObject, publi
 
 public:
   QmitkCreatePolygonModelAction();
-  ~QmitkCreatePolygonModelAction();
+  ~QmitkCreatePolygonModelAction() override;
 
   // IContextMenuAction
   void Run(const QList<mitk::DataNode::Pointer> &selectedNodes) override;

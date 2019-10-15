@@ -44,7 +44,7 @@ public:
   explicit QmitkImageMaskingWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = nullptr);
 
   /** @brief Defaul destructor. */
-  ~QmitkImageMaskingWidget();
+  ~QmitkImageMaskingWidget() override;
 
 private slots:
 

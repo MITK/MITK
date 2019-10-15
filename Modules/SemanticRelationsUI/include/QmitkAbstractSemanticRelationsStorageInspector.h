@@ -36,7 +36,7 @@ class MITKSEMANTICRELATIONSUI_EXPORT QmitkAbstractSemanticRelationsStorageInspec
 
 public:
 
-  virtual ~QmitkAbstractSemanticRelationsStorageInspector();
+  ~QmitkAbstractSemanticRelationsStorageInspector() override;
 
   /**
   * @brief Extends the abstract base class to allow setting the current case ID which is needed to access the

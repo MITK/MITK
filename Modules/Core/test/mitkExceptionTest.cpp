@@ -130,7 +130,7 @@ public:
     }
   }
 
-  void setUp()
+  void setUp() override
   {
     m_ExceptionThrown = false;
     m_MessageText = "";
@@ -139,7 +139,7 @@ public:
     m_Line = -1;
   }
 
-  void tearDown()
+  void tearDown() override
   {
     m_ExceptionThrown = false;
     m_MessageText = "";

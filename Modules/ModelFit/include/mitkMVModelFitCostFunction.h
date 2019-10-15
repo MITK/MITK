@@ -44,13 +44,13 @@ public:
     typedef Superclass::MeasureType MeasureType;
     typedef Superclass::DerivativeType DerivativeType;
 
-    void SetSample(const SignalType &sampleSet);
+    void SetSample(const SignalType &sampleSet) override;
 
-    MeasureType GetValue(const ParametersType& parameter) const;
-    void GetDerivative (const ParametersType &parameters, DerivativeType &derivative) const;
+    MeasureType GetValue(const ParametersType& parameter) const override;
+    void GetDerivative (const ParametersType &parameters, DerivativeType &derivative) const override;
 
-    unsigned int GetNumberOfValues (void) const;
-    unsigned int GetNumberOfParameters (void) const;
+    unsigned int GetNumberOfValues (void) const override;
+    unsigned int GetNumberOfParameters (void) const override;
 
     itkSetConstObjectMacro(Model, ModelBase);
     itkGetConstObjectMacro(Model, ModelBase);
@@ -66,7 +66,7 @@ protected:
     {
     }
 
-    ~MVModelFitCostFunction(){}
+    ~MVModelFitCostFunction() override{}
 
     SignalType m_Sample;
 

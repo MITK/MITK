@@ -47,7 +47,7 @@ class MITKSEMANTICRELATIONSUI_EXPORT QmitkStatisticsCalculator : public QObject
 public:
 
   QmitkStatisticsCalculator();
-  ~QmitkStatisticsCalculator();
+  ~QmitkStatisticsCalculator() override;
 
   void SetDataStorage(mitk::DataStorage* dataStorage) { m_DataStorage = dataStorage; }
   /**

@@ -61,13 +61,13 @@ namespace mitk
     itkSetMacro(AterialInputFunctionValues, AterialInputFunctionType);
     itkSetMacro(AterialInputFunctionTimeGrid, TimeGridType);
 
-    virtual std::string GetXAxisName() const override;
+    std::string GetXAxisName() const override;
 
-    virtual std::string GetXAxisUnit() const override;
+    std::string GetXAxisUnit() const override;
 
-    virtual std::string GetYAxisName() const override;
+    std::string GetYAxisName() const override;
 
-    virtual std::string GetYAxisUnit() const override;
+    std::string GetYAxisUnit() const override;
 
     /** Returns the TimeGrid used for the AIF. Either the externally set AIF time grid
      * or the time grid of the model if nothing is set.*/
@@ -78,27 +78,27 @@ namespace mitk
      * if currentTimeGrid.Size() = 0 , the Original AIF will be returned*/
     const AterialInputFunctionType GetAterialInputFunction(TimeGridType currentTimeGrid) const;
 
-    virtual ParameterNamesType GetStaticParameterNames() const override;
-    virtual ParametersSizeType GetNumberOfStaticParameters() const override;
-    virtual ParamterUnitMapType GetStaticParameterUnits() const override;
+    ParameterNamesType GetStaticParameterNames() const override;
+    ParametersSizeType GetNumberOfStaticParameters() const override;
+    ParamterUnitMapType GetStaticParameterUnits() const override;
 
 
   protected:
     AIFBasedModelBase();
-    virtual ~AIFBasedModelBase();
+    ~AIFBasedModelBase() override;
 
     /** Reimplementation that checks if AIF and timegrid settings are valid.
      * @param [out] error Set internally to indicate the error reason if method returns false. Is used by GetSignal() for the
      * exception comment.
      * @return Returns true if the model is valid and can compute a signal. Otherwise it returns false.*/
-    virtual bool ValidateModel(std::string& error) const override;
+    bool ValidateModel(std::string& error) const override;
 
-    virtual void PrintSelf(std::ostream& os, ::itk::Indent indent) const;
+    void PrintSelf(std::ostream& os, ::itk::Indent indent) const override;
 
-    virtual void SetStaticParameter(const ParameterNameType& name,
+    void SetStaticParameter(const ParameterNameType& name,
                                     const StaticParameterValuesType& values) override;
 
-    virtual StaticParameterValuesType GetStaticParameterValue(const ParameterNameType& name) const
+    StaticParameterValuesType GetStaticParameterValue(const ParameterNameType& name) const
     override;
 
     TimeGridType m_AterialInputFunctionTimeGrid;

@@ -53,7 +53,7 @@ namespace mitk
       m_StdActionFunction = stdFunctionAction;
     }
 
-    virtual void Execute(Object*, const itk::EventObject& event) override
+    void Execute(Object*, const itk::EventObject& event) override
     {
       if (m_StdFilterFunction && m_StdActionFunction)
       {
@@ -64,7 +64,7 @@ namespace mitk
       }
     }
 
-    virtual void Execute(const Object*, const itk::EventObject& event) override
+    void Execute(const Object*, const itk::EventObject& event) override
     {
       if (m_StdFilterFunction && m_StdActionFunction)
       {
@@ -84,7 +84,7 @@ namespace mitk
       , m_StdActionFunction(nullptr)
     {}
 
-    virtual ~StdFunctionCommand() {}
+    ~StdFunctionCommand() override {}
 
   private:
     ITK_DISALLOW_COPY_AND_ASSIGN(StdFunctionCommand);

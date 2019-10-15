@@ -116,7 +116,7 @@ public:
 #endif
 protected:
   MultiOutputNaryFunctorImageFilter();
-  virtual ~MultiOutputNaryFunctorImageFilter() {}
+  ~MultiOutputNaryFunctorImageFilter() override {}
 
   /** MultiOutputNaryFunctorImageFilter can be implemented as a multi threaded filter.
    * Therefore, this implementation provides a ThreadedGenerateData() routine
@@ -129,7 +129,7 @@ protected:
    * \sa ImageToImageFilter::ThreadedGenerateData(),
    *     ImageToImageFilter::GenerateData()  */
   void ThreadedGenerateData(const OutputImageRegionType & outputRegionForThread,
-                            ThreadIdType threadId);
+                            ThreadIdType threadId) override;
 
   /** Methods actualize the output settings of the filter according to the current functor*/
   void ActualizeOutputs();

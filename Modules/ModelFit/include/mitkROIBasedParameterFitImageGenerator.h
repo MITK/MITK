@@ -78,15 +78,15 @@ public:
     itkSetObjectMacro(ModelParameterizer, ParameterizerType);
     itkGetObjectMacro(ModelParameterizer, ParameterizerType);
 
-    virtual double GetProgress() const override;
+    double GetProgress() const override;
 
-    virtual ParameterNamesType GetParameterNames() const override;
+    ParameterNamesType GetParameterNames() const override;
 
-    virtual ParameterNamesType GetDerivedParameterNames() const override;
+    ParameterNamesType GetDerivedParameterNames() const override;
 
-    virtual ParameterNamesType GetCriterionNames() const override;
+    ParameterNamesType GetCriterionNames() const override;
 
-    virtual ParameterNamesType GetEvaluationParameterNames() const override;
+    ParameterNamesType GetEvaluationParameterNames() const override;
 
 protected:
   ROIBasedParameterFitImageGenerator() : m_Progress(0)
@@ -94,16 +94,16 @@ protected:
     m_Mask = nullptr;
   };
 
-  virtual ~ROIBasedParameterFitImageGenerator() override = default;
+  ~ROIBasedParameterFitImageGenerator() override = default;
 
     template <typename TPixel, unsigned int VDim>
     void DoImageGeneration(itk::Image<TPixel, VDim>* image, double value);
 
     void onFitProgressEvent(::itk::Object* caller, const ::itk::EventObject& eventObject);
 
-    virtual bool HasOutdatedResult() const override;
-    virtual void CheckValidInputs() const override;
-    virtual void DoFitAndGetResults(ParameterImageMapType& parameterImages, ParameterImageMapType& derivedParameterImages, ParameterImageMapType& criterionImages, ParameterImageMapType& evaluationParameterImages) override;
+    bool HasOutdatedResult() const override;
+    void CheckValidInputs() const override;
+    void DoFitAndGetResults(ParameterImageMapType& parameterImages, ParameterImageMapType& derivedParameterImages, ParameterImageMapType& criterionImages, ParameterImageMapType& evaluationParameterImages) override;
 
 private:
     Image::Pointer m_Mask;

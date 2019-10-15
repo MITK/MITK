@@ -46,10 +46,10 @@ public:
   QmitkImageStatisticsView(QObject *parent = nullptr, const char *name = nullptr);
   /*!
   \brief default destructor */
-  virtual ~QmitkImageStatisticsView();
+  ~QmitkImageStatisticsView() override;
   /*!
   \brief method for creating the widget containing the application   controls, like sliders, buttons etc. */
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
   /*!
   \brief  Is called from the selection mechanism once the data manager selection has changed*/
   void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &selectedNodes) override;
@@ -59,17 +59,17 @@ public:
 protected:
   using HistogramType = mitk::ImageStatisticsContainer::HistogramType;
 
-  virtual void Activated() override;
-  virtual void Deactivated() override;
-  virtual void Visible() override;
-  virtual void Hidden() override;
-  virtual void SetFocus() override;
+  void Activated() override;
+  void Deactivated() override;
+  void Visible() override;
+  void Hidden() override;
+  void SetFocus() override;
 
   /** \brief Is called right before the view closes (before the destructor) */
-  virtual void PartClosed(const berry::IWorkbenchPartReference::Pointer&) override;
+  void PartClosed(const berry::IWorkbenchPartReference::Pointer&) override;
  
   /** \brief Required for berry::IPartListener */
-  virtual Events::Types GetPartEventTypes() const override { return Events::CLOSED; }
+  Events::Types GetPartEventTypes() const override { return Events::CLOSED; }
 
   void OnImageSelectorChanged();
   void OnMaskSelectorChanged();

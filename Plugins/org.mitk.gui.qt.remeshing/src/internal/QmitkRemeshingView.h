@@ -26,7 +26,7 @@ class QmitkRemeshingView : public QmitkAbstractView
 
 public:
   QmitkRemeshingView();
-  ~QmitkRemeshingView();
+  ~QmitkRemeshingView() override;
 
   void CreateQtPartControl(QWidget* parent) override;
   void SetFocus() override;

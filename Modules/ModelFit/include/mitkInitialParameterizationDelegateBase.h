@@ -56,7 +56,7 @@ namespace mitk
 
     InitialParameterizationDelegateBase();
 
-    virtual ~InitialParameterizationDelegateBase();
+    ~InitialParameterizationDelegateBase() override;
 
   private:
 

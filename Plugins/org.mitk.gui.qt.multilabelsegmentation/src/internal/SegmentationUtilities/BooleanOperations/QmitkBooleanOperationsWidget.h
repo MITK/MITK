@@ -27,7 +27,7 @@ class QmitkBooleanOperationsWidget : public QmitkSegmentationUtilityWidget
 
 public:
   explicit QmitkBooleanOperationsWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = nullptr);
-  ~QmitkBooleanOperationsWidget();
+  ~QmitkBooleanOperationsWidget() override;
 
 private slots:
   void OnSelectionChanged(unsigned int index, const mitk::DataNode* selection);

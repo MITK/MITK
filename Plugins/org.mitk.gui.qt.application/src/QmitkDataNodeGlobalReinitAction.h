@@ -46,7 +46,7 @@ private Q_SLOTS:
 
 private:
 
-  virtual void InitializeAction() override;
+  void InitializeAction() override;
 
 };
 

@@ -43,7 +43,7 @@ public:
     m_RegisteredProviders.push_back(std::unique_ptr<IModelFitProvider>(provider));
   }
 
-  virtual void Load(us::ModuleContext* context) override
+  void Load(us::ModuleContext* context) override
   {
     m_RegisteredProviders.clear();
     RegisterProvider<mitk::ModelFitProviderBase<mitk::GenericParamModelFactory> >(context);
@@ -51,7 +51,7 @@ public:
     RegisterProvider<mitk::ModelFitProviderBase<mitk::T2DecayModelFactory> >(context);
   }
 
-  virtual void Unload(us::ModuleContext* ) override
+  void Unload(us::ModuleContext* ) override
   {
   }
 

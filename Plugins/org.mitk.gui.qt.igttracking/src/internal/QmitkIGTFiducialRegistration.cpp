@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk
 #include "QmitkIGTFiducialRegistration.h"
+#include <QmitkRenderWindow.h>
 
 // Qt
 #include <QMessageBox>

@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryISelectionListener.h>
 
 #include <QmitkFunctionality.h>
+#include <QmitkStdMultiWidget.h>
 
 #include "ui_QmitkIGTTrackingDataEvaluationViewControls.h"
 #include "mitkHummelProtocolEvaluation.h"
@@ -52,8 +53,8 @@ class QmitkIGTTrackingDataEvaluationView : public QmitkFunctionality
 
     virtual void CreateQtPartControl(QWidget *parent);
 
-    virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-    virtual void StdMultiWidgetNotAvailable();
+    virtual void MultiWidgetAvailable(QmitkAbstractMultiWidget &multiWidget) override;
+    virtual void MultiWidgetNotAvailable() override;
 
   protected slots:
 

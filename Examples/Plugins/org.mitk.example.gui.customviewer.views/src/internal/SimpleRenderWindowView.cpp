@@ -97,6 +97,15 @@ QmitkRenderWindow *SimpleRenderWindowView::GetQmitkRenderWindow(const QString &i
   return 0;
 }
 
+QmitkRenderWindow *SimpleRenderWindowView::GetQmitkRenderWindow(const mitk::BaseRenderer::ViewDirection &viewDirection) const
+{
+  if (viewDirection == mitk::BaseRenderer::ViewDirection::AXIAL)
+  {
+    return m_RenderWindow;
+  }
+  return 0;
+}
+
 mitk::Point3D SimpleRenderWindowView::GetSelectedPosition(const QString & /*id*/) const
 {
   const mitk::PlaneGeometry *pg = m_RenderWindow->GetSliceNavigationController()->GetCurrentPlaneGeometry();

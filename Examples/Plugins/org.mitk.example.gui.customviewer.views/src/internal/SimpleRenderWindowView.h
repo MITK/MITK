@@ -61,9 +61,6 @@ public:
    */
   QmitkRenderWindow *GetActiveQmitkRenderWindow() const override;
 
-  /**
-   * \see mitk::IRenderWindowPart::GetRenderWindows()
-   */
   QHash<QString, QmitkRenderWindow *> GetRenderWindows() const;
 
   /**
@@ -71,15 +68,17 @@ public:
    */
   QHash<QString, QmitkRenderWindow *> GetQmitkRenderWindows() const override;
 
-  /**
-   * \see mitk::IRenderWindowPart::GetRenderWindow(QString)
-   */
   QmitkRenderWindow *GetRenderWindow(const QString &id) const;
 
   /**
    * \see mitk::IRenderWindowPart::GetQmitkRenderWindow(QString)
    */
   QmitkRenderWindow *GetQmitkRenderWindow(const QString &id) const override;
+
+  /**
+  * \see mitk::IRenderWindowPart::GetQmitkRenderWindow(mitk::BaseRenderer::ViewDirection)
+  */
+  QmitkRenderWindow *GetQmitkRenderWindow(const mitk::BaseRenderer::ViewDirection &viewDirection) const override;
 
   /**
    * \see mitk::IRenderWindowPart::GetSelectionPosition()

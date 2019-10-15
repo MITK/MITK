@@ -26,6 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class ctkPluginContext;
 class ctkPluginFramework;
+
+class QCoreApplication;
 class QTranslator;
 
 namespace mitk

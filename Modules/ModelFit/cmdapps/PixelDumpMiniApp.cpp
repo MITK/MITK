@@ -60,7 +60,7 @@ typedef std::vector<mitk::ScalarType> DumpedValuesType;
 
 struct DumpIndexCompare
 {
-  bool operator() (const DumpIndexType& lhs, const DumpIndexType& rhs)
+  bool operator() (const DumpIndexType& lhs, const DumpIndexType& rhs) const
   {
     if (lhs[0] < rhs[0])
     {

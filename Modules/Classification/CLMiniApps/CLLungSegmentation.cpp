@@ -188,7 +188,7 @@ int main(int argc, char* argv[])
   mitk::Image::Pointer rawMask = resultImage->CreateLabelMask(offset);
   mitk::Image::Pointer pickedMask;
 
-  AccessByItk_1(rawMask, StartRegionGrowing, pickedMask);
+  AccessFixedTypeByItk_n(rawMask, StartRegionGrowing, (mitk::LabelSet::PixelType), (2)(3), (pickedMask));
 
   mitk::MorphologicalOperations::FillHoles(pickedMask);
   mitk::MorphologicalOperations::Closing(pickedMask, 5, mitk::MorphologicalOperations::StructuralElementType::Ball);

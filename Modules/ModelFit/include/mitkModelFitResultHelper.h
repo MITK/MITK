@@ -56,7 +56,7 @@ namespace mitk
 
     MITKMODELFIT_EXPORT ModelFitResultNodeVectorType CreateResultNodeMap(const ModelFitResultImageMapType& results, const ModelFitResultImageMapType& derivedResults, const ModelFitResultImageMapType& criterionResults, const ModelFitResultImageMapType& evaluationResults, const ModelFitInfo* fitInfo);
 
-    MITKMODELFIT_EXPORT void StoreResultsInDataStorage(DataStorage* storage, const ModelFitResultNodeVectorType& resultNodes, DataNode* parentNode = NULL);
+    MITKMODELFIT_EXPORT void StoreResultsInDataStorage(DataStorage* storage, const ModelFitResultNodeVectorType& resultNodes, DataNode* parentNode = nullptr);
 
   }
 

@@ -120,7 +120,7 @@ mitk::CurveParameterFunctor::GetDescriptionParameterNames() const
 const mitk::CurveDescriptionParameterBase*
 mitk::CurveParameterFunctor::GetDescriptionParameterFunction(const std::string& parameterName) const
 {
-  const CurveDescriptionParameterBase* result = NULL;
+  const CurveDescriptionParameterBase* result = nullptr;
 
   DescriptionParameterMapType::const_iterator pos = m_DescriptorMap.find(parameterName);
 

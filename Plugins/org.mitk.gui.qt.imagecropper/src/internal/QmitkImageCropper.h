@@ -67,7 +67,7 @@ public:
   /*!
   @brief Constructor. Called by SampleApp (or other apps that use functionalities)
   */
-  QmitkImageCropper(QObject *parent = 0);
+  QmitkImageCropper(QObject *parent = nullptr);
 
   ~QmitkImageCropper() override;
 

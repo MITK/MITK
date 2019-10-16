@@ -39,7 +39,7 @@ class MITKQTPYTHON_EXPORT QmitkPythonSnippets: public QWidget
     /// build ui here
     /// the snippets will be loaded from _AutoSaveFileName if not empty and readable
     /// otherwise the default snippets will be loaded
-    QmitkPythonSnippets( const QString& _AutoSaveFileName="", QWidget* parent=0 );
+    QmitkPythonSnippets( const QString& _AutoSaveFileName="", QWidget* parent=nullptr );
     ///
     /// delete d pointer
     ~QmitkPythonSnippets() override;

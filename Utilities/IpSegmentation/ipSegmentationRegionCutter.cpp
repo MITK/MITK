@@ -98,7 +98,7 @@ tCutResult ipMITKSegmentationGetCutPoints( mitkIpPicDescriptor *seg, mitkIpPicDe
   res.numPoints = 0;
   res.absMin = 0;
   res.cutIt = false;
-  res.deleteCurve = 0;
+  res.deleteCurve = nullptr;
 
   if (!history) return res;                  // no history!
   if (*((mitkIpUInt2_t*)history->data + ofs) == 0) return res;  // ofs not inside known history

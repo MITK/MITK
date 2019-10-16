@@ -402,7 +402,7 @@ void QmitkMxNMultiWidget::DestroyRenderWindowWidget()
 
   // disconnect each signal of this render window widget
   RenderWindowWidgetPointer renderWindowWidgetToRemove = iterator->second;
-  disconnect(renderWindowWidgetToRemove.get(), 0, 0, 0);
+  disconnect(renderWindowWidgetToRemove.get(), nullptr, nullptr, nullptr);
 
   // erase the render window from the map
   m_RenderWindowWidgets.erase(iterator);

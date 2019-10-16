@@ -23,7 +23,7 @@ ipMITKSegmentationCreateGrowerHistory( mitkIpPicDescriptor *seg, int startOfs, m
 {
   std::queue<int> ofsQueue;
 
-  if (!seg) return 0;
+  if (!seg) return nullptr;
   if (!histBuffer) {
     histBuffer = mitkIpPicCopyHeader( seg, histBuffer );
     histBuffer->type = mitkIpPicUInt;
@@ -39,14 +39,14 @@ ipMITKSegmentationCreateGrowerHistory( mitkIpPicDescriptor *seg, int startOfs, m
       histBuffer->n[1] = seg->n[1];
       mitkIpUInt4_t size = _mitkIpPicSize( histBuffer );
       histBuffer->data = realloc( histBuffer->data, size );
-      if (histBuffer->data == 0) return 0;
+      if (histBuffer->data == nullptr) return nullptr;
       memset( histBuffer->data, 0, size );  // clear buffer
     }
   }
 
   // create a clear buffer to check wether a point has already been visited
   // (seg cannot be modifier and histBuffer can contain any value)
-  mitkIpPicDescriptor *flagBuffer = mitkIpPicCopyHeader( seg, 0 );
+  mitkIpPicDescriptor *flagBuffer = mitkIpPicCopyHeader( seg, nullptr );
   mitkIpUInt4_t size = _mitkIpPicSize( flagBuffer );
   flagBuffer->data = malloc( size );
   memset( flagBuffer->data, 0, size );

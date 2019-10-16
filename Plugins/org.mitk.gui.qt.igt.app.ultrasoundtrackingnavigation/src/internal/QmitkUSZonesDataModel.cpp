@@ -262,7 +262,7 @@ bool QmitkUSZonesDataModel::setData ( const QModelIndex & index, const QVariant 
     {
       curNode->SetFloatProperty(mitk::USZonesInteractor::DATANODE_PROPERTY_SIZE, value.toFloat());
 
-      if (curNode->GetData() != 0)
+      if (curNode->GetData() != nullptr)
       {
         curNode->SetFloatProperty(mitk::USZonesInteractor::DATANODE_PROPERTY_SIZE, value.toFloat());
         mitk::USZonesInteractor::UpdateSurface(curNode);

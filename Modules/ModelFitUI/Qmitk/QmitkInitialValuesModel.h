@@ -36,7 +36,7 @@ class MITKMODELFITUI_EXPORT QmitkInitialValuesModel : public QAbstractTableModel
   Q_OBJECT
 
 public:
-  QmitkInitialValuesModel(QObject* parent = NULL);
+  QmitkInitialValuesModel(QObject* parent = nullptr);
   ~QmitkInitialValuesModel() override {};
 
   /** Sets the names and the values of the initial parameter set for the model.

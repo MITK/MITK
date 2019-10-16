@@ -27,21 +27,21 @@ mitk::modelFit::Parameter::Pointer mitk::modelFit::ExtractParameterFromData(cons
 {
   if (!data)
   {
-    return NULL;
+    return nullptr;
   }
 
   mitk::modelFit::Parameter::Pointer param = mitk::modelFit::Parameter::New();
 
   if (!data->GetPropertyList()->GetStringProperty(mitk::ModelFitConstants::PARAMETER_NAME_PROPERTY_NAME().c_str(), param->name))
   {
-    return NULL;
+    return nullptr;
   };
 
   param->image = dynamic_cast<const mitk::Image*>(data);
 
   if(!(param->image))
   {
-    return NULL;
+    return nullptr;
   }
 
   std::string typeString;

@@ -207,10 +207,10 @@ void QmitkVolumeVisualizationView::UpdateInterface()
     m_Controls->m_RenderMode->setCurrentIndex(0);
     m_Controls->m_RenderMode->setEnabled(false);
 
-    m_Controls->m_TransferFunctionWidget->SetDataNode(0);
+    m_Controls->m_TransferFunctionWidget->SetDataNode(nullptr);
     m_Controls->m_TransferFunctionWidget->setEnabled(false);
 
-    m_Controls->m_TransferFunctionGeneratorWidget->SetDataNode(0);
+    m_Controls->m_TransferFunctionGeneratorWidget->SetDataNode(nullptr);
     m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(false);
     return;
   }
@@ -231,10 +231,10 @@ void QmitkVolumeVisualizationView::UpdateInterface()
     m_Controls->m_RenderMode->setCurrentIndex(0);
     m_Controls->m_RenderMode->setEnabled(false);
 
-    m_Controls->m_TransferFunctionWidget->SetDataNode(0);
+    m_Controls->m_TransferFunctionWidget->SetDataNode(nullptr);
     m_Controls->m_TransferFunctionWidget->setEnabled(false);
 
-    m_Controls->m_TransferFunctionGeneratorWidget->SetDataNode(0);
+    m_Controls->m_TransferFunctionGeneratorWidget->SetDataNode(nullptr);
     m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(false);
     return;
   }

@@ -41,10 +41,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QApplication>
 
 QmitkFunctionality::QmitkFunctionality()
- : m_Parent(0)
+ : m_Parent(nullptr)
  , m_Active(false)
  , m_Visible(false)
- , m_SelectionProvider(0)
+ , m_SelectionProvider(nullptr)
  , m_DataStorageServiceTracker(QmitkCommonLegacyActivator::GetContext())
  , m_HandlesMultipleDataStorages(false)
  , m_InDataStorageChanged(false)
@@ -67,7 +67,7 @@ QmitkFunctionality::GetDataStorage() const
 {
   mitk::IDataStorageService* service = m_DataStorageServiceTracker.getService();
 
-  if (service != 0)
+  if (service != nullptr)
   {
     if(m_HandlesMultipleDataStorages)
       return service->GetActiveDataStorage()->GetDataStorage();
@@ -75,31 +75,31 @@ QmitkFunctionality::GetDataStorage() const
       return service->GetDefaultDataStorage()->GetDataStorage();
   }
 
-  return 0;
+  return nullptr;
 }
 
 mitk::DataStorage::Pointer QmitkFunctionality::GetDefaultDataStorage() const
 {
   mitk::IDataStorageService* service = m_DataStorageServiceTracker.getService();
 
-  if (service != 0)
+  if (service != nullptr)
   {
     return service->GetDefaultDataStorage()->GetDataStorage();
   }
 
-  return 0;
+  return nullptr;
 }
 
 mitk::IDataStorageReference::Pointer QmitkFunctionality::GetDataStorageReference() const
 {
   mitk::IDataStorageService* dsService = m_DataStorageServiceTracker.getService();
 
-  if (dsService != 0)
+  if (dsService != nullptr)
   {
     return dsService->GetDataStorage();
   }
 
-  return mitk::IDataStorageReference::Pointer(0);
+  return mitk::IDataStorageReference::Pointer(nullptr);
 }
 
 void QmitkFunctionality::CreatePartControl(QWidget* parent)
@@ -271,7 +271,7 @@ void QmitkFunctionality::DataStorageChanged()
 
 QmitkStdMultiWidget* QmitkFunctionality::GetActiveStdMultiWidget( bool reCreateWidget )
 {
-  QmitkStdMultiWidget* activeStdMultiWidget = 0;
+  QmitkStdMultiWidget* activeStdMultiWidget = nullptr;
 
   berry::IEditorPart::Pointer editor =
     this->GetSite()->GetPage()->GetActiveEditor();
@@ -344,7 +344,7 @@ berry::IPreferences::Pointer QmitkFunctionality::GetPreferences() const
   berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
   // const_cast workaround for bad programming: const uncorrectness this->GetViewSite() should be const
   QString id = "/" + (const_cast<QmitkFunctionality*>(this))->GetViewSite()->GetId();
-  return prefService != nullptr ? prefService->GetSystemPreferences()->Node(id): berry::IPreferences::Pointer(0);
+  return prefService != nullptr ? prefService->GetSystemPreferences()->Node(id): berry::IPreferences::Pointer(nullptr);
 }
 
 void QmitkFunctionality::Visible()

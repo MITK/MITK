@@ -62,7 +62,7 @@ protected slots:
   void OnRiskZoneViolated(const mitk::DataNode *, mitk::Point3D);
 
 public:
-  explicit QmitkUSNavigationStepMarkerIntervention(QWidget *parent = 0);
+  explicit QmitkUSNavigationStepMarkerIntervention(QWidget *parent = nullptr);
   ~QmitkUSNavigationStepMarkerIntervention() override;
 
   bool OnStartStep() override;

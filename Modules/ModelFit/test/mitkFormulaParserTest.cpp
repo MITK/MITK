@@ -49,9 +49,9 @@ public:
   static void TestConstructor()
   {
     std::map<std::string, double> varMap;
-    FormulaParser *nullParser = NULL, *parser = NULL;
+    FormulaParser *nullParser = nullptr, *parser = nullptr;
 
-    TEST_NOTHROW(nullParser = new FormulaParser(NULL),
+    TEST_NOTHROW(nullParser = new FormulaParser(nullptr),
       "Testing constructor with NULL argument");
     TEST_NOTHROW(parser = new FormulaParser(&varMap),
       "Testing constructor with valid argument");
@@ -63,7 +63,7 @@ public:
   static void TestLookupVariable()
   {
     // variable map is NULL
-    FormulaParser *nullParser = new FormulaParser(NULL);
+    FormulaParser *nullParser = new FormulaParser(nullptr);
     MITK_TEST_FOR_EXCEPTION(FormulaParserException, nullParser->lookupVariable("test"));
     delete nullParser;
 

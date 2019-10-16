@@ -42,7 +42,7 @@ class MITKMODELFITUI_EXPORT QmitkFitParameterWidget : public QWidget
 public:
   using FitVectorType = std::vector<mitk::modelFit::ModelFitInfo::ConstPointer>;
 
-  QmitkFitParameterWidget(QWidget* parent = 0);
+  QmitkFitParameterWidget(QWidget* parent = nullptr);
   ~QmitkFitParameterWidget() override;
 
   const FitVectorType& getFits() const;

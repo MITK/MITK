@@ -86,10 +86,10 @@ void FitGeneratorDemoView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*s
 
   QList<mitk::DataNode::Pointer> dataNodes = this->GetDataManagerSelection();
 
-  m_selectedNode = NULL;
-  m_selectedImage = NULL;
-  m_selectedMaskNode = NULL;
-  m_selectedMask = NULL;
+  m_selectedNode = nullptr;
+  m_selectedImage = nullptr;
+  m_selectedMaskNode = nullptr;
+  m_selectedMask = nullptr;
 
   if (!dataNodes.empty())
   {
@@ -220,8 +220,8 @@ void FitGeneratorDemoView::Generate()
 
 FitGeneratorDemoView::FitGeneratorDemoView()
 {
-  m_selectedImage = NULL;
-  m_selectedNode = NULL;
+  m_selectedImage = nullptr;
+  m_selectedNode = nullptr;
 
 }
 

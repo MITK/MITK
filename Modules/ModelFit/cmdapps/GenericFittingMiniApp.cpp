@@ -240,8 +240,8 @@ void generateModelFit_ROIBased(
 
 void doFitting()
 {
-        mitk::ParameterFitImageGeneratorBase::Pointer generator = NULL;
-        mitk::modelFit::ModelFitInfo::Pointer fitSession = NULL;
+        mitk::ParameterFitImageGeneratorBase::Pointer generator = nullptr;
+        mitk::modelFit::ModelFitInfo::Pointer fitSession = nullptr;
 
         ::itk::CStyleCommand::Pointer command = ::itk::CStyleCommand::New();
         command->SetCallback(onFitEvent);

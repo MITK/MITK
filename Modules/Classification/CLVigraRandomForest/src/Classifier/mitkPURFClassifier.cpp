@@ -284,7 +284,7 @@ ITK_THREAD_RETURN_TYPE mitk::PURFClassifier::TrainTreesCallback(void * arg)
     data->m_mutex->Unlock();
   }
 
-  return NULL;
+  return nullptr;
 
 }
 
@@ -337,7 +337,7 @@ ITK_THREAD_RETURN_TYPE mitk::PURFClassifier::PredictCallback(void * arg)
   data->m_RandomForest.predictProbabilities(split_features, split_probability);
 
 
-  return NULL;
+  return nullptr;
 
 }
 

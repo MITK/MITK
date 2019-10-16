@@ -27,7 +27,7 @@ QmitkFunctionalitySelectionProvider::QmitkFunctionalitySelectionProvider( QmitkF
 
 QmitkFunctionalitySelectionProvider::~QmitkFunctionalitySelectionProvider()
 {
-  m_Functionality = 0;
+  m_Functionality = nullptr;
 }
 
 void QmitkFunctionalitySelectionProvider::AddSelectionChangedListener( berry::ISelectionChangedListener* listener )

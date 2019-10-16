@@ -501,13 +501,13 @@ void QmitkIGTNavigationToolCalibration::OnCalibrateToolAxis()
   if (!m_ComputedToolTipTransformation)
   {
     MITK_ERROR << "Please compute tool tip first.";
-    QMessageBox::information(NULL, "Error", "Please compute / specifiy tool tip first");
+    QMessageBox::information(nullptr, "Error", "Please compute / specifiy tool tip first");
     return;
   }
   if (!m_AxisCalibration_ToolToCalibrate || !m_AxisCalibration_NavDataCalibratingTool)
   {
     MITK_ERROR << "Please record position first.";
-    QMessageBox::information(NULL, "Error", "Please record position first");
+    QMessageBox::information(nullptr, "Error", "Please record position first");
     return;
   }
 

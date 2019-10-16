@@ -46,7 +46,7 @@ class MITKMODELFITUI_EXPORT QmitkInitialValuesManagerWidget : public QWidget
   Q_OBJECT
 
 public:
-  QmitkInitialValuesManagerWidget(QWidget* parent = 0);
+  QmitkInitialValuesManagerWidget(QWidget* parent = nullptr);
   ~QmitkInitialValuesManagerWidget() override;
 
   /** Returns the current set initial values of the model.*/

@@ -83,7 +83,7 @@ namespace itk
 
     //check if mask image is set and generate iterator if mask is valid
     typedef ImageRegionConstIterator< TMaskImage > MaskImageRegionIteratorType;
-    MaskImageRegionIteratorType* pMaskIterator = NULL;
+    MaskImageRegionIteratorType* pMaskIterator = nullptr;
 
     if (m_Mask.IsNotNull())
     {

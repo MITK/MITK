@@ -40,7 +40,7 @@ class MITKMODELFITUI_EXPORT QmitkFitPlotDataWidget : public QWidget
 public:
   using FitVectorType = std::vector<mitk::modelFit::ModelFitInfo::ConstPointer>;
 
-  QmitkFitPlotDataWidget(QWidget* parent = 0);
+  QmitkFitPlotDataWidget(QWidget* parent = nullptr);
   ~QmitkFitPlotDataWidget() override;
 
   const mitk::ModelFitPlotData* GetPlotData() const;

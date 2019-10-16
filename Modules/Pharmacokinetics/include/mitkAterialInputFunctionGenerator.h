@@ -73,8 +73,8 @@ namespace mitk
   protected:
     AterialInputFunctionGenerator()
     {
-      m_Mask = NULL;
-      m_DynamicImage = NULL;
+      m_Mask = nullptr;
+      m_DynamicImage = nullptr;
       this->SetDefaultHematocritLevel();
     };
 

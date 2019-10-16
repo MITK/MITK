@@ -380,7 +380,7 @@ void QmitkUSNavigationStepPlacementPlanning::OnFreeze(bool freeze)
   }
   else
   {
-    m_PointMarkInteractor->SetDataNode(0);
+    m_PointMarkInteractor->SetDataNode(nullptr);
   }
 
   if (!freeze)
@@ -565,7 +565,7 @@ void QmitkUSNavigationStepPlacementPlanning::UpdateTargetColors()
   m_TargetNode->SetColor(1, 1, 1);
 
   mitk::BaseData *targetNodeData = m_TargetNode->GetData();
-  if (targetNodeData == 0)
+  if (targetNodeData == nullptr)
   {
     return;
   }
@@ -639,7 +639,7 @@ void QmitkUSNavigationStepPlacementPlanning::ReinitNodeDisplacementFilter()
        it != m_PlannedTargetNodes.end();
        ++it)
   {
-    if (it->IsNotNull() && (*it)->GetData() != 0)
+    if (it->IsNotNull() && (*it)->GetData() != nullptr)
     {
       m_NodeDisplacementFilter->AddNode(*it);
     }
@@ -648,7 +648,7 @@ void QmitkUSNavigationStepPlacementPlanning::ReinitNodeDisplacementFilter()
        it != m_PlannedNeedlePaths.end();
        ++it)
   {
-    if (it->IsNotNull() && (*it)->GetData() != 0)
+    if (it->IsNotNull() && (*it)->GetData() != nullptr)
     {
       m_NodeDisplacementFilter->AddNode(*it);
     }

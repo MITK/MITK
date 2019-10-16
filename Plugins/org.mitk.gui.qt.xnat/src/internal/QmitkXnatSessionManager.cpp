@@ -31,17 +31,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ctkXnatException.h"
 
 QmitkXnatSessionManager::QmitkXnatSessionManager()
-  : m_Session(0)
+  : m_Session(nullptr)
 {
 }
 
 QmitkXnatSessionManager::~QmitkXnatSessionManager()
 {
-  if(m_SessionRegistration != 0)
+  if(m_SessionRegistration != nullptr)
   {
     m_SessionRegistration.Unregister();
   }
-  if(m_Session != 0)
+  if(m_Session != nullptr)
   {
     delete m_Session;
   }
@@ -102,5 +102,5 @@ void QmitkXnatSessionManager::CloseXnatSession()
   m_SessionRegistration.Unregister();
   m_SessionRegistration = 0;
   delete m_Session;
-  m_Session = 0;
+  m_Session = nullptr;
 }

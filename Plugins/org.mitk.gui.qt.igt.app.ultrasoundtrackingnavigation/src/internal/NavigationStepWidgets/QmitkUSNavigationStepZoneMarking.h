@@ -65,7 +65,7 @@ protected slots:
   void OnShowListClicked(int state);
 
 public:
-  explicit QmitkUSNavigationStepZoneMarking(QWidget *parent = 0);
+  explicit QmitkUSNavigationStepZoneMarking(QWidget *parent = nullptr);
   ~QmitkUSNavigationStepZoneMarking() override;
 
   /**

@@ -36,7 +36,7 @@ class MITKMODELFITUI_EXPORT QmitkSimpleBarrierModel : public QAbstractTableModel
   Q_OBJECT
 
 public:
-  QmitkSimpleBarrierModel(QObject* parent = NULL);
+  QmitkSimpleBarrierModel(QObject* parent = nullptr);
   ~QmitkSimpleBarrierModel() override {};
 
   /** Sets the data handled by the model and resets the modified flag

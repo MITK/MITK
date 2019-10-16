@@ -28,7 +28,7 @@ class QmitkUSNavigationCalibrationUpdateDepthDelegate : public QStyledItemDelega
   Q_OBJECT
 
 public:
-  explicit QmitkUSNavigationCalibrationUpdateDepthDelegate(QObject* parent = 0);
+  explicit QmitkUSNavigationCalibrationUpdateDepthDelegate(QObject* parent = nullptr);
   ~QmitkUSNavigationCalibrationUpdateDepthDelegate() override;
 
   void SetControlInterfaceBMode(mitk::USControlInterfaceBMode::Pointer controlInterfaceBMode);

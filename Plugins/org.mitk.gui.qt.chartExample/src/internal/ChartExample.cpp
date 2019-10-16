@@ -339,7 +339,7 @@ void ChartExample::ResetDataGUI() {
 std::vector<double> ChartExample::GenerateRandomNumbers(unsigned int amount, double max) const
 {
   QRandomGenerator gen;
-  gen.seed(time(NULL));
+  gen.seed(time(nullptr));
 
   std::vector<double> data;
   for (unsigned int i = 0; i < amount; i++)

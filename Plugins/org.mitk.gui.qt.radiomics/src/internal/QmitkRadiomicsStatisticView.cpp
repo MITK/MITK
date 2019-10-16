@@ -205,8 +205,8 @@ void QmitkRadiomicsStatistic::executeButtonPressed()
 {
   QmitkDataStorageComboBox * cb_image = dynamic_cast<QmitkDataStorageComboBox *>(m_Controls->m_InputImageGroup->layout()->itemAt(1)->widget());
   QmitkDataStorageComboBox * cb_maskimage = dynamic_cast<QmitkDataStorageComboBox *>(m_Controls->m_InputImageGroup->layout()->itemAt(3)->widget());
-  mitk::BaseData* baseDataRawImage = NULL;
-  mitk::BaseData* baseDataMaskImage = NULL;
+  mitk::BaseData* baseDataRawImage = nullptr;
+  mitk::BaseData* baseDataMaskImage = nullptr;
 
   mitk::Image::Pointer raw_image;
   mitk::Image::Pointer mask_image;
@@ -220,7 +220,7 @@ void QmitkRadiomicsStatistic::executeButtonPressed()
     baseDataRawImage = (cb_image->GetSelectedNode()->GetData());
     baseDataMaskImage = (cb_maskimage->GetSelectedNode()->GetData());
   }
-  if ((baseDataRawImage != NULL) && (baseDataMaskImage != NULL))
+  if ((baseDataRawImage != nullptr) && (baseDataMaskImage != nullptr))
   {
     raw_image = dynamic_cast<mitk::Image *>(baseDataRawImage);
     mask_image = dynamic_cast<mitk::Image *>(baseDataMaskImage);
@@ -245,7 +245,7 @@ void QmitkRadiomicsStatistic::executeButtonPressed()
     auto parameter = this->GenerateParameters();
 
     mitkUI::GIFConfigurationPanel* gifPanel = dynamic_cast<mitkUI::GIFConfigurationPanel*>(m_Controls->m_FeaturesGroup->layout()->itemAt(i)->widget());
-    if (gifPanel == NULL)
+    if (gifPanel == nullptr)
       continue;
     gifPanel->CalculateFeaturesUsingParameters(raw_image, mask_image, parameter, stats);
   }

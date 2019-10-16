@@ -82,7 +82,7 @@ protected slots:
   void OnRemoveCurrentTargetClicked();
 
 public:
-  explicit QmitkUSNavigationStepPlacementPlanning(QWidget *parent = 0);
+  explicit QmitkUSNavigationStepPlacementPlanning(QWidget *parent = nullptr);
   ~QmitkUSNavigationStepPlacementPlanning() override;
 
   QString GetTitle() override;

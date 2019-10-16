@@ -62,7 +62,7 @@ bool QmitkPythonVariableStackTableModel::dropMimeData(const QMimeData * data, Qt
         foreach(node, dataNodeList)
         {
           mitk::Image* mitkImage = dynamic_cast<mitk::Image*>(node->GetData());
-          MITK_DEBUG("QmitkPythonVariableStackTableModel") << "mitkImage is not null " << (mitkImage != 0? "true": "false");
+          MITK_DEBUG("QmitkPythonVariableStackTableModel") << "mitkImage is not null " << (mitkImage != nullptr? "true": "false");
 
           QRegExp rx("^\\d");
           QString varName(node->GetName().c_str());

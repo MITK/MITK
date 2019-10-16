@@ -399,7 +399,7 @@ void PAImageProcessing::StartBeamformingThread()
   if (!node)
   {
     // Nothing selected. Inform the user and return
-    QMessageBox::information(NULL, "Template", "Please load and select an image before starting image processing.");
+    QMessageBox::information(nullptr, "Template", "Please load and select an image before starting image processing.");
     return;
   }
 
@@ -504,7 +504,7 @@ void PAImageProcessing::StartBmodeThread()
   if (!node)
   {
     // Nothing selected. Inform the user and return
-    QMessageBox::information(NULL, "Template", "Please load and select an image before starting image processing.");
+    QMessageBox::information(nullptr, "Template", "Please load and select an image before starting image processing.");
     return;
   }
 
@@ -563,7 +563,7 @@ void PAImageProcessing::StartCropThread()
   if (!node)
   {
     // Nothing selected. Inform the user and return
-    QMessageBox::information(NULL, "Template", "Please load and select an image before starting image cropping.");
+    QMessageBox::information(nullptr, "Template", "Please load and select an image before starting image cropping.");
     return;
   }
 
@@ -621,7 +621,7 @@ void PAImageProcessing::StartBandpassThread()
   if (!node)
   {
     // Nothing selected. Inform the user and return
-    QMessageBox::information(NULL, "Template", "Please load and select an image before applying a bandpass filter.");
+    QMessageBox::information(nullptr, "Template", "Please load and select an image before applying a bandpass filter.");
     return;
   }
 

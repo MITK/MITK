@@ -42,7 +42,7 @@ protected slots:
   void OnCalibrationsLoadButtonClicked();
 
 public:
-  explicit QmitkUSCombinedModalityEditWidget(QWidget *parent = 0);
+  explicit QmitkUSCombinedModalityEditWidget(QWidget *parent = nullptr);
   ~QmitkUSCombinedModalityEditWidget() override;
 
   void SetCombinedModality(mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality);

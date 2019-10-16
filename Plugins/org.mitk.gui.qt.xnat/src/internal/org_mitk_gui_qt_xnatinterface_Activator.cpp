@@ -59,8 +59,8 @@ void org_mitk_gui_qt_xnatinterface_Activator::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
   Q_UNUSED(us::GetModuleContext())
-  this->m_Context = 0;
-  this->m_ModuleContext = 0;
+  this->m_Context = nullptr;
+  this->m_ModuleContext = nullptr;
 }
 
 }

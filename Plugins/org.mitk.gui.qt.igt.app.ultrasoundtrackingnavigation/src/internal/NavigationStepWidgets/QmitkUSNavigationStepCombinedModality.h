@@ -76,7 +76,7 @@ protected slots:
   void OnDisconnectButtonClicked();
 
 public:
-  explicit QmitkUSNavigationStepCombinedModality(QWidget *parent = 0);
+  explicit QmitkUSNavigationStepCombinedModality(QWidget *parent = nullptr);
   ~QmitkUSNavigationStepCombinedModality() override;
 
   bool OnStartStep() override;

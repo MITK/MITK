@@ -40,7 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 using namespace berry;
 
 QmitkXnatConnectionPreferencePage::QmitkXnatConnectionPreferencePage()
-  : m_Control(0)
+  : m_Control(nullptr)
 {
 }
 

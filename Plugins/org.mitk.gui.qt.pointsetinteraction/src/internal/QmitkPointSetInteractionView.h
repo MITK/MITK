@@ -39,7 +39,7 @@ class QmitkPointSetInteractionView : public QmitkAbstractView, public mitk::IRen
 public:
   static const std::string VIEW_ID;
 
-  QmitkPointSetInteractionView(QObject *parent=0);
+  QmitkPointSetInteractionView(QObject *parent=nullptr);
   ~QmitkPointSetInteractionView() override;
 
 

@@ -26,7 +26,7 @@ class QmitkUSNavigationCalibrationRemoveDelegate : public QStyledItemDelegate
   Q_OBJECT
 
 public:
-  explicit QmitkUSNavigationCalibrationRemoveDelegate(QObject* parent = 0);
+  explicit QmitkUSNavigationCalibrationRemoveDelegate(QObject* parent = nullptr);
   ~QmitkUSNavigationCalibrationRemoveDelegate() override;
 
   /**

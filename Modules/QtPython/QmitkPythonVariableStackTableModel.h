@@ -36,7 +36,7 @@ public:
   static const QString MITK_IMAGE_VAR_NAME;
   static const QString MITK_SURFACE_VAR_NAME;
 
-  QmitkPythonVariableStackTableModel(QObject *parent = 0);
+  QmitkPythonVariableStackTableModel(QObject *parent = nullptr);
   ~QmitkPythonVariableStackTableModel() override;
 
   int rowCount(const QModelIndex &parent = QModelIndex()) const override;

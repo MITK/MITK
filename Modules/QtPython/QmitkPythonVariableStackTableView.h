@@ -33,7 +33,7 @@ class MITKQTPYTHON_EXPORT QmitkPythonVariableStackTableView : public QTableView
   Q_OBJECT
 
 public:
-  QmitkPythonVariableStackTableView(QWidget *parent = 0);
+  QmitkPythonVariableStackTableView(QWidget *parent = nullptr);
   ~QmitkPythonVariableStackTableView() override;
 
   void SetDataStorage(mitk::DataStorage* _DataStorage);

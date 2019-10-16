@@ -65,9 +65,9 @@ namespace mitk
   protected:
     PixelBasedDescriptionParameterImageGenerator() : m_Progress(0)
     {
-      m_InternalMask = NULL;
-      m_Mask = NULL;
-      m_DynamicImage = NULL;
+      m_InternalMask = nullptr;
+      m_Mask = nullptr;
+      m_DynamicImage = nullptr;
     };
 
     ~PixelBasedDescriptionParameterImageGenerator() override {};

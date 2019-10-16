@@ -64,7 +64,7 @@ mitkUI::GIFConfigurationPanel::GIFConfigurationPanel(QWidget * parent, mitk::Abs
     {
 
       QCheckBox * argumentBox = new QCheckBox;
-      QWidget * secondWidget = NULL;
+      QWidget * secondWidget = nullptr;
       argumentBox->setText(longarg);
 
       mitkCommandLineParser::Type type = us::any_cast<mitkCommandLineParser::Type>(argument["valuetype"]);
@@ -148,7 +148,7 @@ mitkUI::GIFConfigurationPanel::CalculateFeaturesUsingParameters(const mitk::Imag
     for (int i = 0; i < m_GroupBoxArguments->layout()->count(); i+=2)
     {
       QCheckBox * argumentBox = dynamic_cast<QCheckBox* >(m_GroupBoxArguments->layout()->itemAt(i)->widget());
-      if (argumentBox != NULL)
+      if (argumentBox != nullptr)
       {
         if (argumentBox->isChecked() == false)
         {
@@ -162,25 +162,25 @@ mitkUI::GIFConfigurationPanel::CalculateFeaturesUsingParameters(const mitk::Imag
         QSpinBox * paramInt = dynamic_cast<QSpinBox*>(m_GroupBoxArguments->layout()->itemAt(i + 1)->widget());
         QDoubleSpinBox * paramFloat = dynamic_cast<QDoubleSpinBox*>(m_GroupBoxArguments->layout()->itemAt(i + 1)->widget());
 
-        if (paramBool == NULL && paramText == NULL && paramInt == NULL && paramFloat == NULL)
+        if (paramBool == nullptr && paramText == nullptr && paramInt == nullptr && paramFloat == nullptr)
         {
           continue;
         }
 
         us::Any value;
-        if (paramBool != NULL)
+        if (paramBool != nullptr)
         {
           value = us::Any(paramBool->isChecked());
         }
-        if (paramText != NULL)
+        if (paramText != nullptr)
         {
           value = us::Any(paramText->text().toStdString());
         }
-        if (paramInt != NULL)
+        if (paramInt != nullptr)
         {
           value = us::Any(paramInt->value());
         }
-        if (paramFloat != NULL)
+        if (paramFloat != nullptr)
         {
           value = us::Any(float(paramFloat->value()));
         }

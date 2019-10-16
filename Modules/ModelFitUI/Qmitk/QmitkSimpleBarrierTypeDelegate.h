@@ -32,7 +32,7 @@ class MITKMODELFITUI_EXPORT QmitkSimpleBarrierTypeDelegate : public QStyledItemD
 
 public:
 
-  QmitkSimpleBarrierTypeDelegate(QObject* parent = 0);
+  QmitkSimpleBarrierTypeDelegate(QObject* parent = nullptr);
 
   QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option
                         , const QModelIndex& index) const override;

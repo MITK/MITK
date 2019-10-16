@@ -39,7 +39,7 @@ class MITKMODELFITUI_EXPORT QmitkSimpleBarrierManagerWidget : public QWidget
   Q_OBJECT
 
 public:
-  QmitkSimpleBarrierManagerWidget(QWidget* parent = 0);
+  QmitkSimpleBarrierManagerWidget(QWidget* parent = nullptr);
   ~QmitkSimpleBarrierManagerWidget() override;
 
 signals:

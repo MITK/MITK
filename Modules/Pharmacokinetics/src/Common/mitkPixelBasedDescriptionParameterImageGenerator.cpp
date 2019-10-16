@@ -180,7 +180,7 @@ void mitk::PixelBasedDescriptionParameterImageGenerator::DoParameterCalculationA
   }
   else
   {
-    this->m_InternalMask = NULL;
+    this->m_InternalMask = nullptr;
   }
 
   AccessFixedDimensionByItk(m_DynamicImage, mitk::PixelBasedDescriptionParameterImageGenerator::DoParameterCalculation, 4);

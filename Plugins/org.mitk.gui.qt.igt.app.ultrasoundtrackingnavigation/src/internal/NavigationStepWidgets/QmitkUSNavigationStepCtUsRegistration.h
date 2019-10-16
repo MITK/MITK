@@ -73,7 +73,7 @@ class QmitkUSNavigationStepCtUsRegistration : public QmitkUSAbstractNavigationSt
   Q_OBJECT
 
 public:
-  explicit QmitkUSNavigationStepCtUsRegistration(QWidget *parent = 0);
+  explicit QmitkUSNavigationStepCtUsRegistration(QWidget *parent = nullptr);
   ~QmitkUSNavigationStepCtUsRegistration() override;
 
   /**

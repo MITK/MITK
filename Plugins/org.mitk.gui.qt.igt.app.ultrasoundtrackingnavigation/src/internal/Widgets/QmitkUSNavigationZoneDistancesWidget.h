@@ -47,7 +47,7 @@ signals:
   void SignalZoneViolated(const mitk::DataNode*, mitk::Point3D);
 
 public:
-  explicit QmitkUSNavigationZoneDistancesWidget(QWidget *parent = 0);
+  explicit QmitkUSNavigationZoneDistancesWidget(QWidget *parent = nullptr);
   ~QmitkUSNavigationZoneDistancesWidget() override;
 
   /**

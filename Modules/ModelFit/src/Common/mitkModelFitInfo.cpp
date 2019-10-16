@@ -58,7 +58,7 @@ mitk::modelFit::ModelFitInfo::GetParameter(const std::string& name,
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 
 
@@ -126,14 +126,14 @@ mitk::modelFit::CreateFitInfoFromNode(const ModelFitInfo::UIDType& uid,
 {
   if (!storage)
   {
-    return NULL;
+    return nullptr;
   }
 
   mitk::DataStorage::SetOfObjects::ConstPointer nodes = GetNodesOfFit(uid, storage);
 
   if (nodes.IsNull() || nodes->empty())
   {
-    return NULL;
+    return nullptr;
   }
 
   mitk::DataNode::ConstPointer node = nodes->GetElement(
@@ -141,7 +141,7 @@ mitk::modelFit::CreateFitInfoFromNode(const ModelFitInfo::UIDType& uid,
 
   if (!node->GetData())
   {
-    return NULL;
+    return nullptr;
   }
 
   ModelFitInfo::Pointer fit = ModelFitInfo::New();
@@ -157,7 +157,7 @@ mitk::modelFit::CreateFitInfoFromNode(const ModelFitInfo::UIDType& uid,
   catch (const ModelFitException& e)
   {
     MITK_ERROR << e.what();
-    return NULL;
+    return nullptr;
   }
 
   // Either a function string or a function class must exist
@@ -180,7 +180,7 @@ mitk::modelFit::CreateFitInfoFromNode(const ModelFitInfo::UIDType& uid,
                  << mitk::ModelFitConstants::MODEL_FUNCTION_PROPERTY_NAME()
                  << "'and '" << mitk::ModelFitConstants::MODEL_FUNCTION_CLASS_PROPERTY_NAME()
                  << "' are both empty or missing. One of these is required.";
-      return NULL;
+      return nullptr;
     }
   }
 
@@ -226,7 +226,7 @@ mitk::modelFit::CreateFitInfoFromNode(const ModelFitInfo::UIDType& uid,
   catch (const ModelFitException& e)
   {
     MITK_ERROR << e.what();
-    return NULL;
+    return nullptr;
   }
 
   if (storage)
@@ -236,7 +236,7 @@ mitk::modelFit::CreateFitInfoFromNode(const ModelFitInfo::UIDType& uid,
     if (inputNode.IsNull())
     {
       MITK_ERROR << "Cannot create valid model fit info. input node cannot be found.";
-      return NULL;
+      return nullptr;
     }
 
     mitk::Image::Pointer inputImage = dynamic_cast<mitk::Image*>(inputNode->GetData());
@@ -244,7 +244,7 @@ mitk::modelFit::CreateFitInfoFromNode(const ModelFitInfo::UIDType& uid,
     if (inputImage.IsNull())
     {
       MITK_ERROR << "Cannot create valid model fit info. input node does not contain an image.";
-      return NULL;
+      return nullptr;
     }
 
     fit->inputImage = inputImage;
@@ -269,7 +269,7 @@ mitk::BaseData* inputImage, const std::string& fitType, const std::string& fitNa
 {
   if (!usedParameterizer)
   {
-    return NULL;
+    return nullptr;
   }
 
   UIDGenerator generator("FitUID_");
@@ -398,7 +398,7 @@ mitk::modelFit::GetNodesOfFit(const ModelFitInfo::UIDType& fitUID, const mitk::D
 {
   if (!storage)
   {
-    return NULL;
+    return nullptr;
   }
 
   mitk::NodePredicateDataProperty::Pointer predicate = mitk::NodePredicateDataProperty::New(

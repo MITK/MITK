@@ -33,7 +33,7 @@ class QmitkUSNavigationCalibrationsDataModel : public QAbstractTableModel
   Q_OBJECT
 
 public:
-  explicit QmitkUSNavigationCalibrationsDataModel(QObject *parent = 0);
+  explicit QmitkUSNavigationCalibrationsDataModel(QObject *parent = nullptr);
   ~QmitkUSNavigationCalibrationsDataModel() override;
 
   void SetCombinedModality(itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice> combinedModality);

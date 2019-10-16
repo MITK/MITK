@@ -31,7 +31,7 @@ const std::string QmitkPointSetInteractionView::VIEW_ID = "org.mitk.views.points
 
 
 QmitkPointSetInteractionView::QmitkPointSetInteractionView( QObject* /*parent*/ )
-: m_Controls(0)
+: m_Controls(nullptr)
 {
 }
 

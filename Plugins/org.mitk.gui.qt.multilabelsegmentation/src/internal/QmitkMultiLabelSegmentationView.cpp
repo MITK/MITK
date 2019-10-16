@@ -1090,7 +1090,7 @@ void QmitkMultiLabelSegmentationView::RenderWindowPartActivated(mitk::IRenderWin
 void QmitkMultiLabelSegmentationView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* /*renderWindowPart*/)
 {
   m_ToolManager->ActivateTool(-1);
-  m_IRenderWindowPart = 0;
+  m_IRenderWindowPart = nullptr;
   m_Parent->setEnabled(false);
 }
 

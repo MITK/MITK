@@ -33,7 +33,7 @@ class MITKMODELFITUI_EXPORT QmitkFitPlotDataModel : public QAbstractTableModel
 public:
   using FitVectorType = std::vector<mitk::modelFit::ModelFitInfo::ConstPointer>;
 
-  QmitkFitPlotDataModel(QObject* parent = NULL);
+  QmitkFitPlotDataModel(QObject* parent = nullptr);
   ~QmitkFitPlotDataModel() override {};
 
   const mitk::ModelFitPlotData* GetPlotData() const;

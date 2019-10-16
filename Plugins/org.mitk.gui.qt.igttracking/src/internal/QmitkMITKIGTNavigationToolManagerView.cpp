@@ -31,7 +31,7 @@ const std::string QmitkMITKIGTNavigationToolManagerView::VIEW_ID = "org.mitk.vie
 
 QmitkMITKIGTNavigationToolManagerView::QmitkMITKIGTNavigationToolManagerView()
   : QmitkAbstractView()
-  , m_Controls(0)
+  , m_Controls(nullptr)
 {
 }
 

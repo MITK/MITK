@@ -70,7 +70,7 @@ int QmitkDataStorageTreeModelInternalItem::IndexOfChild(const QmitkDataStorageTr
 
 QmitkDataStorageTreeModelInternalItem *QmitkDataStorageTreeModelInternalItem::GetChild(int index) const
 {
-  return (m_Children.size() > 0 && index >= 0 && index < (int)m_Children.size()) ? m_Children.at(index) : 0;
+  return (m_Children.size() > 0 && index >= 0 && index < (int)m_Children.size()) ? m_Children.at(index) : nullptr;
 }
 
 void QmitkDataStorageTreeModelInternalItem::AddChild(QmitkDataStorageTreeModelInternalItem *item)
@@ -84,7 +84,7 @@ void QmitkDataStorageTreeModelInternalItem::RemoveChild(QmitkDataStorageTreeMode
   if (it != m_Children.end())
   {
     m_Children.erase(it);
-    item->SetParent(0);
+    item->SetParent(nullptr);
   }
 }
 

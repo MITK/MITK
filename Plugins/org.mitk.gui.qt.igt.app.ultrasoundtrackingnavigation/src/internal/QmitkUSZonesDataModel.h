@@ -36,7 +36,7 @@ class QmitkUSZonesDataModel : public QAbstractTableModel
 public:
   typedef std::vector<mitk::DataNode::Pointer> DataNodeVector;
 
-  explicit QmitkUSZonesDataModel(QObject *parent = 0);
+  explicit QmitkUSZonesDataModel(QObject *parent = nullptr);
   ~QmitkUSZonesDataModel() override;
 
   /**

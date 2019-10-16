@@ -102,9 +102,9 @@ int mitkMVConstrainedCostFunctionDecoratorTest(int  /*argc*/, char*[] /*argv[]*/
   //Tests
 
   //check freshly created checker; 
-  MITK_TEST_CONDITION_REQUIRED(decorator->GetWrappedCostFunction() == NULL,
+  MITK_TEST_CONDITION_REQUIRED(decorator->GetWrappedCostFunction() == nullptr,
 								 "Testing GetWrappedCostFunction for new decorator.");
-  MITK_TEST_CONDITION_REQUIRED(decorator->GetConstraintChecker() == NULL,
+  MITK_TEST_CONDITION_REQUIRED(decorator->GetConstraintChecker() == nullptr,
 								 "Testing GetWrappedCostFunction for new decorator.");
   MITK_TEST_CONDITION_REQUIRED(decorator->GetFailureThreshold() == defaultMaxPenalty,
 								 "Testing GetWrappedCostFunction for new decorator.");
@@ -112,7 +112,7 @@ int mitkMVConstrainedCostFunctionDecoratorTest(int  /*argc*/, char*[] /*argv[]*/
   MITK_TEST_FOR_EXCEPTION(mitk::Exception, decorator->GetValue(p1));
   decorator->SetWrappedCostFunction(innerCF);
   MITK_TEST_FOR_EXCEPTION(mitk::Exception, decorator->GetValue(p1));
-  decorator->SetWrappedCostFunction(NULL);
+  decorator->SetWrappedCostFunction(nullptr);
   decorator->SetConstraintChecker(checker);
   MITK_TEST_FOR_EXCEPTION(mitk::Exception, decorator->GetValue(p1));
   decorator->SetWrappedCostFunction(innerCF);

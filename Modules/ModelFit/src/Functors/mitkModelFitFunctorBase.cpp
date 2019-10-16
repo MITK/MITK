@@ -161,7 +161,7 @@ const mitk::SVModelFitCostFunction*
 mitk::ModelFitFunctorBase::GetEvaluationParameterCostFunction(const std::string& parameterName)
 const
 {
-  const SVModelFitCostFunction* result = NULL;
+  const SVModelFitCostFunction* result = nullptr;
 
   m_Mutex.Lock();
 

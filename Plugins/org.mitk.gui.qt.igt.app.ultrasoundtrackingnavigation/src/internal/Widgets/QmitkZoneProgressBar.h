@@ -38,7 +38,7 @@ public:
    * \param maxRange the progress bar will be empty for distances greater or equal to this distance
    * \param warnRange the progess bar will change its color for distances smaller than this distance
    */
-  explicit QmitkZoneProgressBar(QString name, int maxRange, int warnRange, QWidget *parent = 0);
+  explicit QmitkZoneProgressBar(QString name, int maxRange, int warnRange, QWidget *parent = nullptr);
 
   /**
    * @param value the current distance to the zone

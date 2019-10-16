@@ -49,8 +49,8 @@ std::vector<mitk::DataNode*> QmitkFunctionality::DataNodeSelectionToVector(mitk:
   if(currentSelection.IsNull())
     return selectedNodes;
 
-  mitk::DataNodeObject* _DataNodeObject = 0;
-  mitk::DataNode* _DataNode = 0;
+  mitk::DataNodeObject* _DataNodeObject = nullptr;
+  mitk::DataNode* _DataNode = nullptr;
 
   for(mitk::DataNodeSelection::iterator it = currentSelection->Begin();
     it != currentSelection->End(); ++it)

@@ -32,7 +32,7 @@ class MITKMODELFITUI_EXPORT QmitkInitialValuesTypeDelegate : public QStyledItemD
 
 public:
 
-  QmitkInitialValuesTypeDelegate(QObject* parent = 0);
+  QmitkInitialValuesTypeDelegate(QObject* parent = nullptr);
 
   QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option
                         , const QModelIndex& index) const override;

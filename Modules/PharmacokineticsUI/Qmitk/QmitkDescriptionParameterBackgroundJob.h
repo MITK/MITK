@@ -43,7 +43,7 @@ class MITKPHARMACOKINETICSUI_EXPORT DescriptionParameterBackgroundJob : public Q
     Q_OBJECT
 
 public:
-  DescriptionParameterBackgroundJob(mitk::DescriptionParameterImageGeneratorBase* generator, mitk::DataNode* parentNode = NULL);
+  DescriptionParameterBackgroundJob(mitk::DescriptionParameterImageGeneratorBase* generator, mitk::DataNode* parentNode = nullptr);
     ~DescriptionParameterBackgroundJob() override;
 
 		void run() override;

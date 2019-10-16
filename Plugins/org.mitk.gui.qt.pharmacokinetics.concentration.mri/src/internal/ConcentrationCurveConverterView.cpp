@@ -343,10 +343,10 @@ mitk::Image::Pointer ConcentrationCurveConverterView::ConvertT2ConcentrationImga
 
 void ConcentrationCurveConverterView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,const QList<mitk::DataNode::Pointer>& selectedNodes ){
 
-    m_selectedNode = NULL;
-    m_selectedImage = NULL;
-    m_selectedBaselineNode = NULL;
-    m_selectedBaselineImage = NULL;
+    m_selectedNode = nullptr;
+    m_selectedImage = nullptr;
+    m_selectedBaselineNode = nullptr;
+    m_selectedBaselineImage = nullptr;
 
     m_Controls.timeserieslabel->setText("No (valid) series selected.");
     m_Controls.BaselineImageLabel->setText("No (valid) baseline image selected.");

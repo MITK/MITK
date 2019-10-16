@@ -65,7 +65,7 @@ protected slots:
   void OnDeleteButtonClicked();
 
 public:
-  explicit QmitkUSNavigationStepTumourSelection(QWidget* parent = 0);
+  explicit QmitkUSNavigationStepTumourSelection(QWidget* parent = nullptr);
   ~QmitkUSNavigationStepTumourSelection() override;
 
   void SetTargetSelectionOptional (bool t);

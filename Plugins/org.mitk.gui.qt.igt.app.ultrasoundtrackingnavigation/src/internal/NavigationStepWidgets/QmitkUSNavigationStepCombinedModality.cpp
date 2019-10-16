@@ -210,7 +210,7 @@ void QmitkUSNavigationStepCombinedModality::OnCombinedModalityCreationExit()
 void QmitkUSNavigationStepCombinedModality::OnCombinedModalityEditExit()
 {
   this->SetCombinedModalityEditWidgetEnabled(false);
-  ui->combinedModalityEditWidget->SetCombinedModality(0);
+  ui->combinedModalityEditWidget->SetCombinedModality(nullptr);
 }
 
 void QmitkUSNavigationStepCombinedModality::OnDeleteButtonClicked()
@@ -365,7 +365,7 @@ bool QmitkUSNavigationStepCombinedModality::UpdateCalibrationState()
 mitk::AbstractUltrasoundTrackerDevice::Pointer QmitkUSNavigationStepCombinedModality::GetSelectedCombinedModality()
 {
   // nothing more to do if no device is selected at the moment
-  if (!ui->combinedModalityListWidget->GetIsServiceSelected()) { return 0; }
+  if (!ui->combinedModalityListWidget->GetIsServiceSelected()) { return nullptr; }
 
   mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality = ui->combinedModalityListWidget->GetSelectedService<mitk::AbstractUltrasoundTrackerDevice>();
 

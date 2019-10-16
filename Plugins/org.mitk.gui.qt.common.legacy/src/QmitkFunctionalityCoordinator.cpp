@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIZombieViewPart.h>
 
 QmitkFunctionalityCoordinator::QmitkFunctionalityCoordinator()
-  : m_StandaloneFuntionality(0)
+  : m_StandaloneFuntionality(nullptr)
 {
 }
 
@@ -115,11 +115,11 @@ void QmitkFunctionalityCoordinator::PartClosed( const berry::IWorkbenchPartRefer
     if(_QmitkFunctionality.IsNotNull())
     {
       // deactivate on close ( the standalone functionality may still be activated  )
-      this->DeactivateStandaloneFunctionality(partRef.GetPointer(), 0);
+      this->DeactivateStandaloneFunctionality(partRef.GetPointer(), nullptr);
 
       // and set pointer to 0
       if(m_StandaloneFuntionality == partRef.GetPointer())
-        m_StandaloneFuntionality = 0;
+        m_StandaloneFuntionality = nullptr;
 
       m_Functionalities.erase(_QmitkFunctionality.GetPointer()); // remove as opened functionality
 
@@ -195,7 +195,7 @@ void QmitkFunctionalityCoordinator::ActivateStandaloneFunctionality( berry::IWor
 void QmitkFunctionalityCoordinator::DeactivateStandaloneFunctionality(berry::IWorkbenchPartReference* partRef,
                                                                       berry::IWorkbenchPartReference* newRef)
 {
-  if (partRef == 0) return;
+  if (partRef == nullptr) return;
 
   QmitkFunctionality* functionality = dynamic_cast<QmitkFunctionality*>(partRef->GetPart(false).GetPointer());
   if(functionality && functionality->IsActivated())

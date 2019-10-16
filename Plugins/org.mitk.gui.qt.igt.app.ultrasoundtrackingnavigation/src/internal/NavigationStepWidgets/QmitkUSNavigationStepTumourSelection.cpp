@@ -116,7 +116,7 @@ bool QmitkUSNavigationStepTumourSelection::OnStopStep()
 
     dataStorage->ChangedNodeEvent.RemoveListener(m_ListenerChangeNode);
     dataStorage->Remove(m_TumourNode);
-    m_TumourNode = 0;
+    m_TumourNode = nullptr;
   }
 
   MITK_INFO("QmitkUSAbstractNavigationStep")("QmitkUSNavigationStepTumourSelection")
@@ -166,12 +166,12 @@ bool QmitkUSNavigationStepTumourSelection::OnActivateStep()
 
 bool QmitkUSNavigationStepTumourSelection::OnDeactivateStep()
 {
-  m_Interactor->SetDataNode(0);
+  m_Interactor->SetDataNode(nullptr);
 
   bool value;
   if (m_TumourNode.IsNotNull() && !(m_TumourNode->GetBoolProperty("zone.created", value) && value))
   {
-    m_TumourNode->SetData(0);
+    m_TumourNode->SetData(nullptr);
   }
 
   // make sure that imaging isn't freezed anymore
@@ -289,7 +289,7 @@ void QmitkUSNavigationStepTumourSelection::OnSetCombinedModality()
   }
   else
   {
-    m_NavigationDataSource = 0;
+    m_NavigationDataSource = nullptr;
   }
 
   ui->freezeImageButton->SetCombinedModality(combinedModality, m_ReferenceSensorIndex);

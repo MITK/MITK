@@ -291,7 +291,7 @@ void QmitkIGTTrackingLabView::OnAddRegistrationTrackingFiducial()
 
   if( nd.IsNull() || !nd->IsDataValid())
   {
-    QMessageBox::warning( 0, "Invalid tracking data", "Navigation data is not available or invalid!", QMessageBox::Ok );
+    QMessageBox::warning( nullptr, "Invalid tracking data", "Navigation data is not available or invalid!", QMessageBox::Ok );
     return;
   }
 

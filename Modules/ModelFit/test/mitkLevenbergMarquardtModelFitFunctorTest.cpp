@@ -58,7 +58,7 @@ int mitkLevenbergMarquardtModelFitFunctorTest(int  /*argc*/, char*[] /*argv[]*/)
 
   //Test functor for sample1
 
-  MITK_TEST_FOR_EXCEPTION(::itk::ExceptionObject, testFunctor->GetNumberOfOutputs(NULL));
+  MITK_TEST_FOR_EXCEPTION(::itk::ExceptionObject, testFunctor->GetNumberOfOutputs(nullptr));
 
   CPPUNIT_ASSERT_MESSAGE("Check number of outputs with model set.", 4 == testFunctor->GetNumberOfOutputs(model));
 

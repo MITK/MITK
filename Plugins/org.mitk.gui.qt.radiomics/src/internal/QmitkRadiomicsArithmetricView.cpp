@@ -109,7 +109,7 @@ void QmitkRadiomicsArithmetric::CreateConnections()
 mitk::Image::Pointer QmitkRadiomicsArithmetric::GetFirstImage()
 {
   QmitkDataStorageComboBox * cb_image = dynamic_cast<QmitkDataStorageComboBox *>(m_Controls->m_InputImageGroup->layout()->itemAt(1)->widget());
-  mitk::BaseData* baseDataRawImage = NULL;
+  mitk::BaseData* baseDataRawImage = nullptr;
 
   mitk::Image::Pointer raw_image;
   std::string nodeName;
@@ -118,7 +118,7 @@ mitk::Image::Pointer QmitkRadiomicsArithmetric::GetFirstImage()
     baseDataRawImage = (cb_image->GetSelectedNode()->GetData());
     nodeName = cb_image->GetSelectedNode()->GetName();
   }
-  if ((baseDataRawImage != NULL))
+  if ((baseDataRawImage != nullptr))
   {
     raw_image = dynamic_cast<mitk::Image *>(baseDataRawImage);
   }
@@ -126,14 +126,14 @@ mitk::Image::Pointer QmitkRadiomicsArithmetric::GetFirstImage()
     QMessageBox msgBox;
     msgBox.setText("Please specify the images that shlould be used.");
     msgBox.exec();
-    return NULL;
+    return nullptr;
   }
   if (raw_image.IsNull())
   {
     QMessageBox msgBox;
     msgBox.setText("Error during processing the specified images.");
     msgBox.exec();
-    return NULL;
+    return nullptr;
   }
 
   return raw_image;
@@ -142,7 +142,7 @@ mitk::Image::Pointer QmitkRadiomicsArithmetric::GetFirstImage()
 mitk::Image::Pointer QmitkRadiomicsArithmetric::GetSecondImage()
 {
   QmitkDataStorageComboBox * cb_image = dynamic_cast<QmitkDataStorageComboBox *>(m_Controls->secondImageWidget->layout()->itemAt(1)->widget());
-  mitk::BaseData* baseDataRawImage = NULL;
+  mitk::BaseData* baseDataRawImage = nullptr;
 
   mitk::Image::Pointer raw_image;
   std::string nodeName;
@@ -151,7 +151,7 @@ mitk::Image::Pointer QmitkRadiomicsArithmetric::GetSecondImage()
     baseDataRawImage = (cb_image->GetSelectedNode()->GetData());
     nodeName = cb_image->GetSelectedNode()->GetName();
   }
-  if ((baseDataRawImage != NULL))
+  if ((baseDataRawImage != nullptr))
   {
     raw_image = dynamic_cast<mitk::Image *>(baseDataRawImage);
   }
@@ -159,14 +159,14 @@ mitk::Image::Pointer QmitkRadiomicsArithmetric::GetSecondImage()
     QMessageBox msgBox;
     msgBox.setText("Please specify the second images that should be used.");
     msgBox.exec();
-    return NULL;
+    return nullptr;
   }
   if (raw_image.IsNull())
   {
     QMessageBox msgBox;
     msgBox.setText("Error during processing the specified images.");
     msgBox.exec();
-    return NULL;
+    return nullptr;
   }
 
   return raw_image;

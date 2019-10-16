@@ -34,29 +34,29 @@ class QmitkUSNavigationCalibrationsDataModel : public QAbstractTableModel
 
 public:
   explicit QmitkUSNavigationCalibrationsDataModel(QObject *parent = 0);
-  ~QmitkUSNavigationCalibrationsDataModel() override override;
+  ~QmitkUSNavigationCalibrationsDataModel() override;
 
   void SetCombinedModality(itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice> combinedModality);
 
   void OnDeviceChanged(const std::string&, const std::string&);
 
   /** \brief Return number of rows of the model. */
-  int rowCount ( const QModelIndex & parent = QModelIndex() ) const override override;
+  int rowCount ( const QModelIndex & parent = QModelIndex() ) const override;
 
   /** \brief Return number of columns (3) of the model. */
-  int columnCount ( const QModelIndex & parent = QModelIndex() ) const override override;
+  int columnCount ( const QModelIndex & parent = QModelIndex() ) const override;
 
   /** \brief Return names for the columns, numbers for the rows and invalid for DisplayRole. */
-  QVariant headerData ( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const override override;
+  QVariant headerData ( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const override;
 
   /** \brief Return selectable and enabled for column 1 (size); selectable, enabled and editable for every other column. */
-  Qt::ItemFlags flags ( const QModelIndex & index ) const override override;
+  Qt::ItemFlags flags ( const QModelIndex & index ) const override;
 
   /** \brief Return model data of the selected cell. */
-  QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const override override;
+  QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const override;
 
   /** \brief Set model data for the selected cell. */
-  bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole ) override override;
+  bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole ) override;
 
   using QAbstractTableModel::removeRows;
   /** \brief Remove given rows from the model.

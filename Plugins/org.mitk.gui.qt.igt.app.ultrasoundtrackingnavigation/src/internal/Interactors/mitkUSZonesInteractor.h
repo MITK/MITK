@@ -64,19 +64,19 @@ namespace mitk
 
   protected:
     USZonesInteractor();
-    ~USZonesInteractor() override override override;
+    ~USZonesInteractor() override;
 
     /**
      * \brief Connects the functions from the state machine to methods of this class.
      */
-    void ConnectActionsAndFunctions() override override override;
+    void ConnectActionsAndFunctions() override;
 
     /**
      * \brief Sets empty surface as data for the new data node.
      * This is necessary as data nodes without data do not work
      * with data interactors.
      */
-    void DataNodeChanged() override override override;
+    void DataNodeChanged() override;
 
     /**
      * \brief Sets origin of the data node to the coordinates of the position event.

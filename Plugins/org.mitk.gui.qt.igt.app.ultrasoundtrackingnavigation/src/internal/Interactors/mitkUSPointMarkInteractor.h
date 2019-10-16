@@ -41,7 +41,7 @@ namespace mitk
     static void UpdateSurface(itk::SmartPointer<mitk::DataNode>);
 
     USPointMarkInteractor();
-    ~USPointMarkInteractor() override override;
+    ~USPointMarkInteractor() override;
 
     /**
      * \brief Connects the functions from the state machine to methods of this class.

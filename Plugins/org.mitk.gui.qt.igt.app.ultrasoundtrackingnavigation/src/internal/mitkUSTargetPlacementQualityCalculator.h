@@ -76,7 +76,7 @@ public:
 
 protected:
   USTargetPlacementQualityCalculator();
-  ~USTargetPlacementQualityCalculator() override override;
+  ~USTargetPlacementQualityCalculator() override;
 
   vtkSmartPointer<vtkPolyData> GetTransformedPolydata();
 

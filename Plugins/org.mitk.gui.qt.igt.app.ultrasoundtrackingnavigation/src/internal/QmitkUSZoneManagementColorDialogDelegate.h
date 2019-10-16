@@ -27,12 +27,12 @@ class QmitkUSZoneManagementColorDialogDelegate : public QStyledItemDelegate
 
 public:
   explicit QmitkUSZoneManagementColorDialogDelegate(QObject* parent = 0);
-  ~QmitkUSZoneManagementColorDialogDelegate() override override;
+  ~QmitkUSZoneManagementColorDialogDelegate() override;
 
   /**
    * \brief A QColorDialog is opened on double click events.
    */
-  bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index) override override;
+  bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index) override;
 };
 
 #endif // QMITKUSZONEMANAGEMENTCOLORDIALOGDELEGATE_H

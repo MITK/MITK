@@ -119,7 +119,7 @@ public:
 
 protected:
   USNavigationTargetUpdateFilter();
-  ~USNavigationTargetUpdateFilter() override override;
+  ~USNavigationTargetUpdateFilter() override;
 
   void UpdateTargetScores();
 

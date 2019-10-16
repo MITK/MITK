@@ -63,9 +63,9 @@ public:
 
 protected:
   USNavigationTargetOcclusionFilter();
-  ~USNavigationTargetOcclusionFilter() override override;
+  ~USNavigationTargetOcclusionFilter() override;
 
-  void GenerateData() override override;
+  void GenerateData() override;
 
   /**
    * \brief Returns the vtk poly data of the target structure.

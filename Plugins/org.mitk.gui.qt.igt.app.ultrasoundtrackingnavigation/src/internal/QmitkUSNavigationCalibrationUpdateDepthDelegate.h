@@ -29,7 +29,7 @@ class QmitkUSNavigationCalibrationUpdateDepthDelegate : public QStyledItemDelega
 
 public:
   explicit QmitkUSNavigationCalibrationUpdateDepthDelegate(QObject* parent = 0);
-  ~QmitkUSNavigationCalibrationUpdateDepthDelegate() override override;
+  ~QmitkUSNavigationCalibrationUpdateDepthDelegate() override;
 
   void SetControlInterfaceBMode(mitk::USControlInterfaceBMode::Pointer controlInterfaceBMode);
 
@@ -39,7 +39,7 @@ public:
    * SetControlInterfaceBMode(). If no control interface was set (or it is
    * null) the QEvent gets ignored.
    */
-  bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index) override override;
+  bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index) override;
 
 private:
   mitk::USControlInterfaceBMode::Pointer m_ControlInterfaceBMode;

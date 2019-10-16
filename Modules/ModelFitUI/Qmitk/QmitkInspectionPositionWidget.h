@@ -40,7 +40,7 @@ class MITKMODELFITUI_EXPORT QmitkInspectionPositionWidget : public QWidget
 public:
   using FitVectorType = std::vector<mitk::modelFit::ModelFitInfo::ConstPointer>;
 
-  QmitkInspectionPositionWidget(QWidget* parent = 0);
+  QmitkInspectionPositionWidget(QWidget* parent = nullptr);
   ~QmitkInspectionPositionWidget() override;
 
   mitk::Point3D GetCurrentPosition() const;

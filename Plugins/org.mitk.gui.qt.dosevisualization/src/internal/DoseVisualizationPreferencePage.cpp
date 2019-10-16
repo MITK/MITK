@@ -36,7 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "org_mitk_gui_qt_dosevisualization_Activator.h"
 
 DoseVisualizationPreferencePage::DoseVisualizationPreferencePage()
-  : m_MainControl(0), m_Controls(0), m_referenceDoseChanged(false), m_presetMapChanged(false), m_globalVisChanged(false)
+  : m_MainControl(nullptr), m_Controls(nullptr), m_referenceDoseChanged(false), m_presetMapChanged(false), m_globalVisChanged(false)
 {
 
 }

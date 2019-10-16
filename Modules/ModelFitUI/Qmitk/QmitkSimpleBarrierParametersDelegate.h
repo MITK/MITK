@@ -36,7 +36,7 @@ class MITKMODELFITUI_EXPORT QmitkSimpleBarrierParametersDelegate : public QStyle
 
 public:
 
-  QmitkSimpleBarrierParametersDelegate(QObject* parent = 0);
+  QmitkSimpleBarrierParametersDelegate(QObject* parent = nullptr);
 
   void paint(QPainter* painter, const QStyleOptionViewItem& option
              , const QModelIndex& index) const override;

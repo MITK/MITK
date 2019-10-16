@@ -192,7 +192,7 @@ void PerfusionDataSimulationView::OnSimulationConfigurationChanged()
 
 void PerfusionDataSimulationView::OnModellSet(int index)
 {
-  m_selectedModelFactory = NULL;
+  m_selectedModelFactory = nullptr;
 
   if (index > 0)
   {
@@ -206,10 +206,10 @@ void PerfusionDataSimulationView::OnModellSet(int index)
     }
   }
 
-  bool isToftsFactory = dynamic_cast<mitk::ExtendedToftsModelFactory*>(m_selectedModelFactory.GetPointer()) != NULL;
-  bool is2CXMFactory = dynamic_cast<mitk::TwoCompartmentExchangeModelFactory*>(m_selectedModelFactory.GetPointer()) != NULL || dynamic_cast<mitk::NumericTwoCompartmentExchangeModelFactory*>(m_selectedModelFactory.GetPointer()) != NULL;
-  bool is2TCMFactory = dynamic_cast<mitk::TwoTissueCompartmentModelFactory*>(m_selectedModelFactory.GetPointer()) != NULL;
-  bool is1TCMFactory = dynamic_cast<mitk::OneTissueCompartmentModelFactory*>(m_selectedModelFactory.GetPointer()) != NULL;
+  bool isToftsFactory = dynamic_cast<mitk::ExtendedToftsModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
+  bool is2CXMFactory = dynamic_cast<mitk::TwoCompartmentExchangeModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr || dynamic_cast<mitk::NumericTwoCompartmentExchangeModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
+  bool is2TCMFactory = dynamic_cast<mitk::TwoTissueCompartmentModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
+  bool is1TCMFactory = dynamic_cast<mitk::OneTissueCompartmentModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
 
   m_Controls.groupBox_TM->setVisible(isToftsFactory);
   m_Controls.groupBox_2CXM->setVisible(is2CXMFactory );
@@ -237,10 +237,10 @@ bool PerfusionDataSimulationView::CheckModelSettings()
 
     }
 
-    bool isToftsFactory = dynamic_cast<mitk::ExtendedToftsModelFactory*>(m_selectedModelFactory.GetPointer()) != NULL;
-    bool is2CXMFactory = dynamic_cast<mitk::TwoCompartmentExchangeModelFactory*>(m_selectedModelFactory.GetPointer()) != NULL || dynamic_cast<mitk::NumericTwoCompartmentExchangeModelFactory*>(m_selectedModelFactory.GetPointer()) != NULL;
-    bool is2TCMFactory = dynamic_cast<mitk::TwoTissueCompartmentModelFactory*>(m_selectedModelFactory.GetPointer()) != NULL;
-    bool is1TCMFactory = dynamic_cast<mitk::OneTissueCompartmentModelFactory*>(m_selectedModelFactory.GetPointer()) != NULL;
+    bool isToftsFactory = dynamic_cast<mitk::ExtendedToftsModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
+    bool is2CXMFactory = dynamic_cast<mitk::TwoCompartmentExchangeModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr || dynamic_cast<mitk::NumericTwoCompartmentExchangeModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
+    bool is2TCMFactory = dynamic_cast<mitk::TwoTissueCompartmentModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
+    bool is1TCMFactory = dynamic_cast<mitk::OneTissueCompartmentModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
 
 
     if(isToftsFactory)
@@ -503,11 +503,11 @@ void PerfusionDataSimulationView::OnGenerateDataButtonClicked()
 {
     mitk::Image::Pointer m_DynamicImage = mitk::Image::New();
 
-    bool isToftsFactory = dynamic_cast<mitk::ExtendedToftsModelFactory*>(m_selectedModelFactory.GetPointer()) != NULL;
-    bool isPhysBrixFactory = dynamic_cast<mitk::TwoCompartmentExchangeModelFactory*>(m_selectedModelFactory.GetPointer()) != NULL;
-    bool isNumPhysBrixFactory = dynamic_cast<mitk::NumericTwoCompartmentExchangeModelFactory*>(m_selectedModelFactory.GetPointer()) != NULL;
-    bool is2TCMFactory = dynamic_cast<mitk::TwoTissueCompartmentModelFactory*>(m_selectedModelFactory.GetPointer()) != NULL;
-    bool is1TCMFactory = dynamic_cast<mitk::OneTissueCompartmentModelFactory*>(m_selectedModelFactory.GetPointer()) != NULL;
+    bool isToftsFactory = dynamic_cast<mitk::ExtendedToftsModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
+    bool isPhysBrixFactory = dynamic_cast<mitk::TwoCompartmentExchangeModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
+    bool isNumPhysBrixFactory = dynamic_cast<mitk::NumericTwoCompartmentExchangeModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
+    bool is2TCMFactory = dynamic_cast<mitk::TwoTissueCompartmentModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
+    bool is1TCMFactory = dynamic_cast<mitk::OneTissueCompartmentModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
 
 
     if(isToftsFactory)
@@ -980,7 +980,7 @@ PerfusionDataSimulationView::PerfusionDataSimulationView()
      m_Sigma = 0;
      m_CNR=0;
      m_MaxConcentration=0;
-     m_selectedModelFactory = NULL;
+     m_selectedModelFactory = nullptr;
 
 
      mitk::ModelFactoryBase::Pointer factory = mitk::ExtendedToftsModelFactory::New().GetPointer();

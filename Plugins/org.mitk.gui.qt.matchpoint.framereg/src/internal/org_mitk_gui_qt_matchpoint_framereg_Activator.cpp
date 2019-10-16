@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkMatchPointFrameCorrection.h"
 
-ctkPluginContext* org_mitk_gui_qt_matchpoint_framereg_Activator::m_Context = 0;
+ctkPluginContext* org_mitk_gui_qt_matchpoint_framereg_Activator::m_Context = nullptr;
 
 void org_mitk_gui_qt_matchpoint_framereg_Activator::start(ctkPluginContext* context)
 {
@@ -31,7 +31,7 @@ void org_mitk_gui_qt_matchpoint_framereg_Activator::stop(ctkPluginContext* conte
 {
     Q_UNUSED(context)
 
-        m_Context = 0;
+        m_Context = nullptr;
 }
 
 ctkPluginContext* org_mitk_gui_qt_matchpoint_framereg_Activator::GetContext()

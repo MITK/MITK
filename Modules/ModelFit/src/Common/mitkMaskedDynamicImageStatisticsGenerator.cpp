@@ -23,8 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::MaskedDynamicImageStatisticsGenerator::MaskedDynamicImageStatisticsGenerator()
 {
-  m_Mask = NULL;
-  m_DynamicImage = NULL;
+  m_Mask = nullptr;
+  m_DynamicImage = nullptr;
 };
 
 mitk::MaskedDynamicImageStatisticsGenerator::~MaskedDynamicImageStatisticsGenerator(){};
@@ -156,7 +156,7 @@ void mitk::MaskedDynamicImageStatisticsGenerator::Generate()
   }
   else
   {
-    this->m_InternalMask = NULL;
+    this->m_InternalMask = nullptr;
   }
 
   AccessFixedDimensionByItk(m_DynamicImage, mitk::MaskedDynamicImageStatisticsGenerator::DoCalculateStatistics, 4);

@@ -67,8 +67,8 @@ void PerfusionCurveDescriptionParameterView::OnSelectionChanged(
 
   if (dataNodes.empty())
   {
-    m_selectedNode = NULL;
-    m_selectedImage = NULL;
+    m_selectedNode = nullptr;
+    m_selectedImage = nullptr;
   }
   else
   {
@@ -102,9 +102,9 @@ void PerfusionCurveDescriptionParameterView::OnSelectionChanged(
 
 PerfusionCurveDescriptionParameterView::PerfusionCurveDescriptionParameterView()
 {
-  m_selectedNode = NULL;
-  m_selectedImage = NULL;
-  m_selectedMask = NULL;
+  m_selectedNode = nullptr;
+  m_selectedImage = nullptr;
+  m_selectedMask = nullptr;
 }
 
 void PerfusionCurveDescriptionParameterView::InitParameterList()

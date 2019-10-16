@@ -90,8 +90,8 @@ void QmitkRadiomicsMaskProcessing::executeButtonIntervalBasedMaskClearning()
 {
   QmitkDataStorageComboBox * cb_image = dynamic_cast<QmitkDataStorageComboBox *>(m_Controls->m_InputImageGroup->layout()->itemAt(1)->widget());
   QmitkDataStorageComboBox * cb_maskimage = dynamic_cast<QmitkDataStorageComboBox *>(m_Controls->m_InputImageGroup->layout()->itemAt(3)->widget());
-  mitk::BaseData* baseDataRawImage = NULL;
-  mitk::BaseData* baseDataMaskImage = NULL;
+  mitk::BaseData* baseDataRawImage = nullptr;
+  mitk::BaseData* baseDataMaskImage = nullptr;
 
   mitk::Image::Pointer raw_image;
   mitk::Image::Pointer mask_image;
@@ -103,7 +103,7 @@ void QmitkRadiomicsMaskProcessing::executeButtonIntervalBasedMaskClearning()
     baseDataMaskImage = (cb_maskimage->GetSelectedNode()->GetData());
     nodeName = cb_maskimage->GetSelectedNode()->GetName();
   }
-  if ((baseDataRawImage != NULL) && (baseDataMaskImage != NULL))
+  if ((baseDataRawImage != nullptr) && (baseDataMaskImage != nullptr))
   {
     raw_image = dynamic_cast<mitk::Image *>(baseDataRawImage);
     mask_image = dynamic_cast<mitk::Image *>(baseDataMaskImage);
@@ -145,8 +145,8 @@ void QmitkRadiomicsMaskProcessing::executeButtonMaskOutlierRemoval()
 {
   QmitkDataStorageComboBox * cb_image = dynamic_cast<QmitkDataStorageComboBox *>(m_Controls->m_InputImageGroup->layout()->itemAt(1)->widget());
   QmitkDataStorageComboBox * cb_maskimage = dynamic_cast<QmitkDataStorageComboBox *>(m_Controls->m_InputImageGroup->layout()->itemAt(3)->widget());
-  mitk::BaseData* baseDataRawImage = NULL;
-  mitk::BaseData* baseDataMaskImage = NULL;
+  mitk::BaseData* baseDataRawImage = nullptr;
+  mitk::BaseData* baseDataMaskImage = nullptr;
 
   mitk::Image::Pointer raw_image;
   mitk::Image::Pointer mask_image;
@@ -158,7 +158,7 @@ void QmitkRadiomicsMaskProcessing::executeButtonMaskOutlierRemoval()
     baseDataMaskImage = (cb_maskimage->GetSelectedNode()->GetData());
     nodeName = cb_maskimage->GetSelectedNode()->GetName();
   }
-  if ((baseDataRawImage != NULL) && (baseDataMaskImage != NULL))
+  if ((baseDataRawImage != nullptr) && (baseDataMaskImage != nullptr))
   {
     raw_image = dynamic_cast<mitk::Image *>(baseDataRawImage);
     mask_image = dynamic_cast<mitk::Image *>(baseDataMaskImage);

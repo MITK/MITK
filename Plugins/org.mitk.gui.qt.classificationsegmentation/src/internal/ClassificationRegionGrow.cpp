@@ -342,7 +342,7 @@ void ClassificationRegionGrow::DoAutomSegmentation()
   QmitkDataStorageComboBox * cb_maskimage = dynamic_cast<QmitkDataStorageComboBox *>(m_Controls.m_MaskImageLayout->itemAt(1)->widget());
   mitk::Image::Pointer raw_image;
   mitk::Image::Pointer mask_image;
-  if ((cb_image != NULL) || (cb_maskimage != NULL))
+  if ((cb_image != nullptr) || (cb_maskimage != nullptr))
   {
     raw_image = dynamic_cast<mitk::Image *>(cb_image->GetSelectedNode()->GetData());
     mask_image = dynamic_cast<mitk::Image *>(cb_maskimage->GetSelectedNode()->GetData());

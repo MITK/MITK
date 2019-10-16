@@ -104,7 +104,7 @@ protected slots:
   void OnDataChanged(const QModelIndex& topLeft, const QModelIndex& /*bottomRight*/);
 
 public:
-  explicit QmitkUSZoneManagementWidget(QWidget* parent = 0);
+  explicit QmitkUSZoneManagementWidget(QWidget* parent = nullptr);
   ~QmitkUSZoneManagementWidget() override;
 
   /**

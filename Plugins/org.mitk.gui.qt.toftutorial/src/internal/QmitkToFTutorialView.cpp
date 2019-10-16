@@ -38,7 +38,7 @@ const std::string QmitkToFTutorialView::VIEW_ID = "org.mitk.views.toftutorial";
 
 QmitkToFTutorialView::QmitkToFTutorialView()
 : QmitkAbstractView()
-, m_Controls( 0 )
+, m_Controls( nullptr )
 {
 }
 

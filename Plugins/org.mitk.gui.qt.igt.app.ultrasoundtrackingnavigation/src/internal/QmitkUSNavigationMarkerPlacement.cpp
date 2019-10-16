@@ -749,7 +749,7 @@ void QmitkUSNavigationMarkerPlacement::ReinitOnImage()
     {
       // make a reinit on the ultrasound image
       mitk::IRenderWindowPart *renderWindow = this->GetRenderWindowPart();
-      if (renderWindow != NULL && image->GetTimeGeometry()->IsValid())
+      if (renderWindow != nullptr && image->GetTimeGeometry()->IsValid())
       {
         renderWindow->GetRenderingManager()->InitializeViews(
           image->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
@@ -825,6 +825,6 @@ void QmitkUSNavigationMarkerPlacement::UpdateToolStorage()
   {
     MITK_WARN << "Found a tool storage, but it has not the same number of tools like the NavigationDataSource. This "
                  "storage won't be used because it isn't the right one.";
-    m_CurrentStorage = NULL;
+    m_CurrentStorage = nullptr;
   }
 }

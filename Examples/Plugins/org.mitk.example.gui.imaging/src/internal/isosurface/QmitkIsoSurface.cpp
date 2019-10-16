@@ -72,7 +72,7 @@ void QmitkIsoSurface::CreateConnections()
 void QmitkIsoSurface::ImageSelected(const mitk::DataNode *item)
 {
   // nothing selected (nullptr selection)
-  if (item == 0 || item->GetData() == 0)
+  if (item == nullptr || item->GetData() == nullptr)
     return;
 
   m_MitkImage = dynamic_cast<mitk::Image *>(item->GetData());

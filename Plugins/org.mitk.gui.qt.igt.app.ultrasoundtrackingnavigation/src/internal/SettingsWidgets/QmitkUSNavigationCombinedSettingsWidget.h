@@ -36,7 +36,7 @@ protected slots:
   void OnApplicationChanged(int);
 
 public:
-  explicit QmitkUSNavigationCombinedSettingsWidget(QWidget *parent = 0);
+  explicit QmitkUSNavigationCombinedSettingsWidget(QWidget *parent = nullptr);
   ~QmitkUSNavigationCombinedSettingsWidget() override;
   void OnSetSettingsNode(itk::SmartPointer<mitk::DataNode> settingsNode, bool overwriteValues) override;
 

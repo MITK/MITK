@@ -116,7 +116,7 @@ std::vector<std::string> mitk::NavigationDataCSVSequentialPlayer::GetFileContent
 
   //save old locale
   char * oldLocale;
-  oldLocale = setlocale(LC_ALL, 0);
+  oldLocale = setlocale(LC_ALL, nullptr);
 
   //define own locale
   std::locale C("C");

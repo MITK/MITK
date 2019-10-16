@@ -39,7 +39,7 @@ class MITKQTPYTHON_EXPORT QmitkCtkPythonShell : public ctkPythonConsole
   Q_OBJECT
 
 public:
-  QmitkCtkPythonShell(QWidget* parent = 0);
+  QmitkCtkPythonShell(QWidget* parent = nullptr);
   ~QmitkCtkPythonShell() override;
 public slots:
   void Paste( const QString& command );

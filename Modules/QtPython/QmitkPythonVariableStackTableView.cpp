@@ -52,7 +52,7 @@ void QmitkPythonVariableStackTableView::SetDataStorage(mitk::DataStorage *_DataS
 
 void QmitkPythonVariableStackTableView::OnVariableStackDoubleClicked(const QModelIndex &index)
 {
-    if( m_DataStorage.IsNull() || m_PythonService == 0 )
+    if( m_DataStorage.IsNull() || m_PythonService == nullptr )
     {
         MITK_ERROR << "QmitkPythonVariableStackTableView not configured correctly. Quit";
         return;

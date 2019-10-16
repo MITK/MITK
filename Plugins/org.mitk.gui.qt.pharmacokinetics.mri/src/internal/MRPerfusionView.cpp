@@ -209,18 +209,18 @@ void MRPerfusionView::UpdateGUIControls()
   m_Controls.checkBox_Constraints->setEnabled(m_modelConstraints.IsNotNull());
 
   bool isDescBrixFactory = dynamic_cast<mitk::DescriptivePharmacokineticBrixModelFactory*>
-                           (m_selectedModelFactory.GetPointer()) != NULL;
+                           (m_selectedModelFactory.GetPointer()) != nullptr;
   bool isToftsFactory = dynamic_cast<mitk::StandardToftsModelFactory*>
-                        (m_selectedModelFactory.GetPointer()) != NULL ||
+                        (m_selectedModelFactory.GetPointer()) != nullptr ||
                          dynamic_cast<mitk::ExtendedToftsModelFactory*>
-                                  (m_selectedModelFactory.GetPointer()) != NULL;
+                                  (m_selectedModelFactory.GetPointer()) != nullptr;
   bool is2CXMFactory = dynamic_cast<mitk::TwoCompartmentExchangeModelFactory*>
-                       (m_selectedModelFactory.GetPointer()) != NULL ||
+                       (m_selectedModelFactory.GetPointer()) != nullptr ||
                        dynamic_cast<mitk::NumericTwoCompartmentExchangeModelFactory*>
-                       (m_selectedModelFactory.GetPointer()) != NULL;
+                       (m_selectedModelFactory.GetPointer()) != nullptr;
 
   bool isNum2CXMFactory = dynamic_cast<mitk::NumericTwoCompartmentExchangeModelFactory*>
-                          (m_selectedModelFactory.GetPointer()) != NULL;
+                          (m_selectedModelFactory.GetPointer()) != nullptr;
 
   m_Controls.groupAIF->setVisible(isToftsFactory || is2CXMFactory);
   m_Controls.groupDescBrix->setVisible(isDescBrixFactory);
@@ -245,7 +245,7 @@ void MRPerfusionView::UpdateGUIControls()
 
 void MRPerfusionView::OnModellSet(int index)
 {
-  m_selectedModelFactory = NULL;
+  m_selectedModelFactory = nullptr;
 
   if (index > 0)
   {
@@ -319,21 +319,21 @@ void MRPerfusionView::OnModellingButtonClicked()
     m_HasGeneratedNewInput = false;
     m_HasGeneratedNewInputAIF = false;
 
-    mitk::ParameterFitImageGeneratorBase::Pointer generator = NULL;
-    mitk::modelFit::ModelFitInfo::Pointer fitSession = NULL;
+    mitk::ParameterFitImageGeneratorBase::Pointer generator = nullptr;
+    mitk::modelFit::ModelFitInfo::Pointer fitSession = nullptr;
 
     bool isDescBrixFactory = dynamic_cast<mitk::DescriptivePharmacokineticBrixModelFactory*>
-                             (m_selectedModelFactory.GetPointer()) != NULL;
+                             (m_selectedModelFactory.GetPointer()) != nullptr;
     bool is3LinearFactory = dynamic_cast<mitk::ThreeStepLinearModelFactory*>
-                             (m_selectedModelFactory.GetPointer()) != NULL;
+                             (m_selectedModelFactory.GetPointer()) != nullptr;
     bool isExtToftsFactory = dynamic_cast<mitk::ExtendedToftsModelFactory*>
-                          (m_selectedModelFactory.GetPointer()) != NULL;
+                          (m_selectedModelFactory.GetPointer()) != nullptr;
     bool isStanToftsFactory = dynamic_cast<mitk::StandardToftsModelFactory*>
-                          (m_selectedModelFactory.GetPointer()) != NULL;
+                          (m_selectedModelFactory.GetPointer()) != nullptr;
     bool is2CXMFactory = dynamic_cast<mitk::TwoCompartmentExchangeModelFactory*>
-                         (m_selectedModelFactory.GetPointer()) != NULL;
+                         (m_selectedModelFactory.GetPointer()) != nullptr;
     bool isNum2CXMFactory = dynamic_cast<mitk::NumericTwoCompartmentExchangeModelFactory*>
-                            (m_selectedModelFactory.GetPointer()) != NULL;
+                            (m_selectedModelFactory.GetPointer()) != nullptr;
 
     if (isDescBrixFactory)
     {
@@ -440,8 +440,8 @@ void MRPerfusionView::OnModellingButtonClicked()
 void MRPerfusionView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
     const QList<mitk::DataNode::Pointer>& selectedNodes)
 {
-  m_selectedMaskNode = NULL;
-  m_selectedMask = NULL;
+  m_selectedMaskNode = nullptr;
+  m_selectedMask = nullptr;
 
   m_Controls.errorMessageLabel->setText("");
   m_Controls.masklabel->setText("No (valid) mask selected.");
@@ -471,8 +471,8 @@ void MRPerfusionView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source
   }
   else
   {
-    this->m_selectedNode = NULL;
-    this->m_selectedImage = NULL;
+    this->m_selectedNode = nullptr;
+    this->m_selectedImage = nullptr;
     this->m_Controls.initialValuesManager->setReferenceImageGeometry(nullptr);
   }
 
@@ -514,17 +514,17 @@ bool MRPerfusionView::CheckModelSettings() const
   if (m_selectedModelFactory.IsNotNull())
   {
     bool isDescBrixFactory = dynamic_cast<mitk::DescriptivePharmacokineticBrixModelFactory*>
-                             (m_selectedModelFactory.GetPointer()) != NULL;
+                             (m_selectedModelFactory.GetPointer()) != nullptr;
     bool is3LinearFactory = dynamic_cast<mitk::ThreeStepLinearModelFactory*>
-                             (m_selectedModelFactory.GetPointer()) != NULL;
+                             (m_selectedModelFactory.GetPointer()) != nullptr;
     bool isToftsFactory = dynamic_cast<mitk::StandardToftsModelFactory*>
-                          (m_selectedModelFactory.GetPointer()) != NULL||
+                          (m_selectedModelFactory.GetPointer()) != nullptr||
                           dynamic_cast<mitk::ExtendedToftsModelFactory*>
-                          (m_selectedModelFactory.GetPointer()) != NULL;
+                          (m_selectedModelFactory.GetPointer()) != nullptr;
     bool is2CXMFactory = dynamic_cast<mitk::TwoCompartmentExchangeModelFactory*>
-                         (m_selectedModelFactory.GetPointer()) != NULL;
+                         (m_selectedModelFactory.GetPointer()) != nullptr;
     bool isNum2CXMFactory = dynamic_cast<mitk::NumericTwoCompartmentExchangeModelFactory*>
-                            (m_selectedModelFactory.GetPointer()) != NULL;
+                            (m_selectedModelFactory.GetPointer()) != nullptr;
 
     if (isDescBrixFactory)
     {
@@ -1025,8 +1025,8 @@ void MRPerfusionView::DoFit(const mitk::modelFit::ModelFitInfo* fitSession,
 
 MRPerfusionView::MRPerfusionView() : m_FittingInProgress(false), m_HasGeneratedNewInput(false), m_HasGeneratedNewInputAIF(false)
 {
-  m_selectedImage = NULL;
-  m_selectedMask = NULL;
+  m_selectedImage = nullptr;
+  m_selectedMask = nullptr;
 
   mitk::ModelFactoryBase::Pointer factory =
     mitk::DescriptivePharmacokineticBrixModelFactory::New().GetPointer();

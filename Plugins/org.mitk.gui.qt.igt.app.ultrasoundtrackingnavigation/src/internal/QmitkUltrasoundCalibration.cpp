@@ -690,13 +690,13 @@ void QmitkUltrasoundCalibration::OnStopCalibrationProcess()
   m_Timer->stop();
 
   this->GetDataStorage()->Remove(m_Node);
-  m_Node = 0;
+  m_Node = nullptr;
 
   this->GetDataStorage()->Remove(m_CalibNode);
-  m_CalibNode = 0;
+  m_CalibNode = nullptr;
 
   this->GetDataStorage()->Remove(m_WorldNode);
-  m_WorldNode = 0;
+  m_WorldNode = nullptr;
 
   m_Controls.m_ToolBox->setCurrentIndex(0);
 }

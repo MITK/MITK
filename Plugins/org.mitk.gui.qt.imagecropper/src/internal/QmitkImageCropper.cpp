@@ -63,7 +63,7 @@ PURPOSE.  See the above copyright notices for more information.
 const std::string QmitkImageCropper::VIEW_ID = "org.mitk.views.qmitkimagecropper";
 
 QmitkImageCropper::QmitkImageCropper(QObject *)
-  : m_ParentWidget(0),
+  : m_ParentWidget(nullptr),
   m_ImageNode(nullptr),
   m_CroppingObject(nullptr),
   m_CroppingObjectNode(nullptr),

@@ -80,7 +80,7 @@ void QmitkThresholdAction::Run(const QList<DataNode::Pointer> &selectedNodes)
 
       m_ThresholdingToolManager->SetReferenceData(nullptr);
       m_ThresholdingToolManager->ActivateTool(-1);
-      m_SelectedNode = 0;
+      m_SelectedNode = nullptr;
     }
   }
 

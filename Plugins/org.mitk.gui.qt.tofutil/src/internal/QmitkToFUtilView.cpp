@@ -116,7 +116,7 @@ void QmitkToFUtilView::Activated()
   if (this->GetRenderWindowPart(mitk::WorkbenchUtil::IRenderWindowPartStrategy::OPEN))
   {
     mitk::ILinkedRenderWindowPart* linkedRenderWindowPart = dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart());
-    if (linkedRenderWindowPart == 0)
+    if (linkedRenderWindowPart == nullptr)
     {
       MITK_ERROR << "No linked render window part avaiable!!!";
     }
@@ -221,7 +221,7 @@ void QmitkToFUtilView::ResetGUIToDefault()
   if(this->GetRenderWindowPart())
   {
     mitk::ILinkedRenderWindowPart* linkedRenderWindowPart = dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart());
-    if(linkedRenderWindowPart == 0)
+    if(linkedRenderWindowPart == nullptr)
     {
       MITK_ERROR << "No linked render window part avaiable!!!";
     }

@@ -60,7 +60,7 @@ public:
 
   /** Sets the navigation tool of the needle for the meta data (tool axis etc.)*/
   void SetNeedleMetaData(mitk::NavigationTool::Pointer needleNavigationTool);
-  explicit QmitkUSNavigationStepPunctuationIntervention(QWidget *parent = 0);
+  explicit QmitkUSNavigationStepPunctuationIntervention(QWidget *parent = nullptr);
   ~QmitkUSNavigationStepPunctuationIntervention() override;
 
   bool OnStartStep() override;

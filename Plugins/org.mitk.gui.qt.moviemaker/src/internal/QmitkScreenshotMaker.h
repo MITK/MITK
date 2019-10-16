@@ -48,7 +48,7 @@ class QmitkScreenshotMaker: public QmitkAbstractView, public mitk::IRenderWindow
 
 public:
   /** \brief Constructor. */
-  QmitkScreenshotMaker(QObject *parent=0, const char *name=0);
+  QmitkScreenshotMaker(QObject *parent=nullptr, const char *name=nullptr);
 
   /** \brief Destructor. */
   ~QmitkScreenshotMaker() override;

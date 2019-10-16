@@ -31,7 +31,7 @@ class QmitkFileListWidget : public QWidget, public Ui::QmitkPathListWidget
   Q_OBJECT
 
 public:
-  QmitkFileListWidget(QWidget* parent=0);
+  QmitkFileListWidget(QWidget* parent=nullptr);
 
   /**
    * \brief Get all file entries.

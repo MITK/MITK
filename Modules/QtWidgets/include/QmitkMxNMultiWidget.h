@@ -64,8 +64,8 @@ public:
   using RenderWindowWidgetMap = std::map<QString, std::shared_ptr<QmitkRenderWindowWidget>>;
   using RenderWindowHash = QHash<QString, QmitkRenderWindow*>;
 
-  QmitkMxNMultiWidget(QWidget* parent = 0,
-                         Qt::WindowFlags f = 0,
+  QmitkMxNMultiWidget(QWidget* parent = nullptr,
+                         Qt::WindowFlags f = nullptr,
                          mitk::RenderingManager* renderingManager = nullptr,
                          mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard,
                          const QString& multiWidgetName = "mxnmulti");

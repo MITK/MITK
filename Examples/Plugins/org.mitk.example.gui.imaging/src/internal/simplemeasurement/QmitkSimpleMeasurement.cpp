@@ -184,7 +184,7 @@ void QmitkSimpleMeasurement::OnSelectionChanged(berry::IWorkbenchPart::Pointer /
   if (nodes.size() > 0)
     selectedNode = nodes.front();
 
-  mitk::PointSet *pointSet = 0;
+  mitk::PointSet *pointSet = nullptr;
   if (selectedNode.IsNotNull())
     pointSet = dynamic_cast<mitk::PointSet *>(selectedNode->GetData());
 

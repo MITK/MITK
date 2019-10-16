@@ -35,7 +35,7 @@ class MITKQTWIDGETS_EXPORT QmitkMultiWidgetLayoutSelectionWidget : public QWidge
 
 public:
 
-  QmitkMultiWidgetLayoutSelectionWidget(QWidget* parent = 0);
+  QmitkMultiWidgetLayoutSelectionWidget(QWidget* parent = nullptr);
 
 Q_SIGNALS:
 

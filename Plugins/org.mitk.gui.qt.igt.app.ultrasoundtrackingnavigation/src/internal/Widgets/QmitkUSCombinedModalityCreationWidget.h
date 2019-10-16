@@ -52,7 +52,7 @@ protected slots:
   void OnSelectedUltrasoundOrTrackingDevice();
 
 public:
-  explicit QmitkUSCombinedModalityCreationWidget(QWidget *parent = 0);
+  explicit QmitkUSCombinedModalityCreationWidget(QWidget *parent = nullptr);
   ~QmitkUSCombinedModalityCreationWidget() override;
 
 private:

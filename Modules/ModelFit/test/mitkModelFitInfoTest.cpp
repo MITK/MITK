@@ -196,7 +196,7 @@ int mitkModelFitInfoTest(int  /*argc*/, char*[] /*argv[]*/)
 
   mitk::StandaloneDataStorage::Pointer storage = generateModelFitTestStorage();
 
-  MITK_TEST_CONDITION_REQUIRED(mitk::modelFit::CreateFitInfoFromNode("Fit1",NULL).IsNull(),
+  MITK_TEST_CONDITION_REQUIRED(mitk::modelFit::CreateFitInfoFromNode("Fit1",nullptr).IsNull(),
 								 "Testing if CreateFitInfoFromNode returns NULL for invalid node.");
 
 	MITK_TEST_CONDITION_REQUIRED(mitk::modelFit::CreateFitInfoFromNode("invalide_UID",storage).IsNull(),
@@ -246,7 +246,7 @@ int mitkModelFitInfoTest(int  /*argc*/, char*[] /*argv[]*/)
   MITK_TEST_CONDITION_REQUIRED(mitk::modelFit::GetNodesOfFit("unkown_fit",storage)->Size() == 0,
     "Testing if GetNodesOfFit works correctly for unkown fits.");
 
-  MITK_TEST_CONDITION_REQUIRED(mitk::modelFit::GetNodesOfFit("unkown_fit",NULL).IsNull(),
+  MITK_TEST_CONDITION_REQUIRED(mitk::modelFit::GetNodesOfFit("unkown_fit",nullptr).IsNull(),
     "Testing if GetNodesOfFit works correctly for illegal calls.");
 
   testNode = storage->GetNamedNode("Input");
@@ -257,12 +257,12 @@ int mitkModelFitInfoTest(int  /*argc*/, char*[] /*argv[]*/)
     uidSet.find("Fit2")!=uidSet.end(),
     "Testing if GetFitUIDsOfNode works correctly.");
 
-  uidSet = mitk::modelFit::GetFitUIDsOfNode(NULL,storage);
+  uidSet = mitk::modelFit::GetFitUIDsOfNode(nullptr,storage);
 
   MITK_TEST_CONDITION_REQUIRED(uidSet.size() == 0,
     "Testing if GetFitUIDsOfNode works correctly with invalid node.");
 
-  uidSet = mitk::modelFit::GetFitUIDsOfNode(testNode,NULL);
+  uidSet = mitk::modelFit::GetFitUIDsOfNode(testNode,nullptr);
 
   MITK_TEST_CONDITION_REQUIRED(uidSet.size() == 0,
     "Testing if GetFitUIDsOfNode works correctly with invalid storage.");

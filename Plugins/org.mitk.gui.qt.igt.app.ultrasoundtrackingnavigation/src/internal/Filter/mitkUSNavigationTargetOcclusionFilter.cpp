@@ -72,7 +72,7 @@ void mitk::USNavigationTargetOcclusionFilter::GenerateData()
   const mitk::NavigationData* nd = this->GetInput(m_StartPositionInput);
 
   // set every value to -1 if there is no (valid) navigation data
-  if ( nd == 0 || ! nd->IsDataValid() )
+  if ( nd == nullptr || ! nd->IsDataValid() )
   {
     float intersection = -1;
     for ( vtkIdType n = 0; n < numberOfPoints; n++ )
@@ -183,7 +183,7 @@ vtkSmartPointer<vtkPolyData> mitk::USNavigationTargetOcclusionFilter::GetVtkPoly
   }
 
   vtkSmartPointer<vtkPolyData> targetSurfaceVtk = targetSurface->GetVtkPolyData();
-  if( targetSurfaceVtk == 0 )
+  if( targetSurfaceVtk == nullptr )
   {
     MITK_WARN("USNavigationTargetOcclusionFilter") << "VtkPolyData of the mitk::Surface of the data node must not be null.";
     return nullptr;

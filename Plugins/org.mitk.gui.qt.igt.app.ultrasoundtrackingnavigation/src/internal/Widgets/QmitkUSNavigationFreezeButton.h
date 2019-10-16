@@ -45,7 +45,7 @@ protected slots:
   void OnFreezeButtonToggle();
 
 public:
-  explicit QmitkUSNavigationFreezeButton(QWidget* parent = 0);
+  explicit QmitkUSNavigationFreezeButton(QWidget* parent = nullptr);
   ~QmitkUSNavigationFreezeButton() override;
 
   /**

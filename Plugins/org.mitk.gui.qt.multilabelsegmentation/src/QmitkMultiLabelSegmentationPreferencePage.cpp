@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryPlatform.h>
 
 QmitkMultiLabelSegmentationPreferencePage::QmitkMultiLabelSegmentationPreferencePage()
-: m_MainControl(0)
+: m_MainControl(nullptr)
 , m_Initializing(false)
 {
 

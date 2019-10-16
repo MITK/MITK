@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkNavigationDataPlayerView::VIEW_ID = "org.mitk.views.navigationdataplayer";
 
 QmitkNavigationDataPlayerView::QmitkNavigationDataPlayerView()
-  : m_Controls( 0 )
+  : m_Controls( nullptr )
 {
 }
 
@@ -99,7 +99,7 @@ void QmitkNavigationDataPlayerView::OnOpenFile()
   catch ( const mitk::Exception &e )
   {
     MITK_WARN("NavigationDataPlayerView") << "could not open file " << fileName.toStdString();
-    QMessageBox::critical(0, "Error Reading File", "The file '" + fileName
+    QMessageBox::critical(nullptr, "Error Reading File", "The file '" + fileName
                           +"' could not be read.\n" + e.GetDescription() );
     return;
   }

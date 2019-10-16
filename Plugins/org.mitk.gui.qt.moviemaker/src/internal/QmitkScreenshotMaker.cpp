@@ -64,7 +64,7 @@ QmitkScreenshotMaker::QmitkScreenshotMaker(QObject *parent, const char * /*name*
   : QmitkAbstractView(),
     m_Controls(nullptr),
     m_BackgroundColor(QColor(0,0,0)),
-    m_SelectedNode(0)
+    m_SelectedNode(nullptr)
 {
   parentWidget = parent;
 }
@@ -347,7 +347,7 @@ void QmitkScreenshotMaker::GenerateHR3DAtlasScreenshots(QString fileName, QStrin
 vtkCamera* QmitkScreenshotMaker::GetCam()
 {
   mitk::BaseRenderer* renderer = this->GetRenderWindowPart(mitk::WorkbenchUtil::IRenderWindowPartStrategy::OPEN)->GetQmitkRenderWindow("3d")->GetRenderer();
-  vtkCamera* cam = 0;
+  vtkCamera* cam = nullptr;
   const mitk::VtkPropRenderer *propRenderer = dynamic_cast<const mitk::VtkPropRenderer * >( renderer );
   if (propRenderer)
   {

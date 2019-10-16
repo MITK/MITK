@@ -88,7 +88,7 @@ void QmitkRadiomicsTransformation::CreateConnections()
 void QmitkRadiomicsTransformation::executeButtonMultiResolutionPressed()
 {
   QmitkDataStorageComboBox * cb_image = dynamic_cast<QmitkDataStorageComboBox *>(m_Controls->m_InputImageGroup->layout()->itemAt(1)->widget());
-  mitk::BaseData* baseDataRawImage = NULL;
+  mitk::BaseData* baseDataRawImage = nullptr;
 
   mitk::Image::Pointer raw_image;
   std::string nodeName;
@@ -97,7 +97,7 @@ void QmitkRadiomicsTransformation::executeButtonMultiResolutionPressed()
     baseDataRawImage = (cb_image->GetSelectedNode()->GetData());
     nodeName = cb_image->GetSelectedNode()->GetName();
   }
-  if ((baseDataRawImage != NULL))
+  if ((baseDataRawImage != nullptr))
   {
     raw_image = dynamic_cast<mitk::Image *>(baseDataRawImage);
   }
@@ -133,7 +133,7 @@ void QmitkRadiomicsTransformation::executeButtonMultiResolutionPressed()
 void QmitkRadiomicsTransformation::executeButtonWaveletPressed()
 {
   QmitkDataStorageComboBox * cb_image = dynamic_cast<QmitkDataStorageComboBox *>(m_Controls->m_InputImageGroup->layout()->itemAt(1)->widget());
-  mitk::BaseData* baseDataRawImage = NULL;
+  mitk::BaseData* baseDataRawImage = nullptr;
 
   mitk::Image::Pointer raw_image;
   std::string nodeName;
@@ -142,7 +142,7 @@ void QmitkRadiomicsTransformation::executeButtonWaveletPressed()
     baseDataRawImage = (cb_image->GetSelectedNode()->GetData());
     nodeName = cb_image->GetSelectedNode()->GetName();
   }
-  if ((baseDataRawImage != NULL))
+  if ((baseDataRawImage != nullptr))
   {
     raw_image = dynamic_cast<mitk::Image *>(baseDataRawImage);
   }
@@ -214,7 +214,7 @@ void QmitkRadiomicsTransformation::executeButtonWaveletPressed()
 void QmitkRadiomicsTransformation::executeButtonLoGPressed()
 {
   QmitkDataStorageComboBox * cb_image = dynamic_cast<QmitkDataStorageComboBox *>(m_Controls->m_InputImageGroup->layout()->itemAt(1)->widget());
-  mitk::BaseData* baseDataRawImage = NULL;
+  mitk::BaseData* baseDataRawImage = nullptr;
 
   mitk::Image::Pointer raw_image;
   std::string nodeName;
@@ -223,7 +223,7 @@ void QmitkRadiomicsTransformation::executeButtonLoGPressed()
     baseDataRawImage = (cb_image->GetSelectedNode()->GetData());
     nodeName = cb_image->GetSelectedNode()->GetName();
   }
-  if ((baseDataRawImage != NULL))
+  if ((baseDataRawImage != nullptr))
   {
     raw_image = dynamic_cast<mitk::Image *>(baseDataRawImage);
   }
@@ -254,7 +254,7 @@ void QmitkRadiomicsTransformation::executeButtonLoGPressed()
 void QmitkRadiomicsTransformation::executeButtonResamplingPressed()
 {
   QmitkDataStorageComboBox * cb_image = dynamic_cast<QmitkDataStorageComboBox *>(m_Controls->m_InputImageGroup->layout()->itemAt(1)->widget());
-  mitk::BaseData* baseDataRawImage = NULL;
+  mitk::BaseData* baseDataRawImage = nullptr;
 
   mitk::Image::Pointer raw_image;
   std::string nodeName;
@@ -263,7 +263,7 @@ void QmitkRadiomicsTransformation::executeButtonResamplingPressed()
     baseDataRawImage = (cb_image->GetSelectedNode()->GetData());
     nodeName = cb_image->GetSelectedNode()->GetName();
   }
-  if ((baseDataRawImage != NULL))
+  if ((baseDataRawImage != nullptr))
   {
     raw_image = dynamic_cast<mitk::Image *>(baseDataRawImage);
   }

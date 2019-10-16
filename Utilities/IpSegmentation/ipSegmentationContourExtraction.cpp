@@ -70,7 +70,7 @@ float* tmGetContour4N( const mitkIpPicDescriptor *seg, int startOfs, int &numPts
   if (dir==4) return result;  // no contour pixel
 
   bool finished = false;
-  if (result==0) {
+  if (result==nullptr) {
     resSize = 2048;
     result = (float*)malloc( resSize*2*sizeof(float) );
   }
@@ -143,7 +143,7 @@ float* tmGetContour8N( const mitkIpPicDescriptor *seg, int startOfs, int &numPts
   }
 
   bool finished = false;
-  if (result==0) {
+  if (result==nullptr) {
     resSize = 2048;
     result = (float*)malloc( resSize*2*sizeof(float) );
   }

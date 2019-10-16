@@ -114,7 +114,7 @@ QmitkSegmentationView::~QmitkSegmentationView()
     mitk::PlanePositionManagerService* service = context->getService<mitk::PlanePositionManagerService>(ppmRef);
     service->RemoveAllPlanePositions();
     context->ungetService(ppmRef);
-    SetToolManagerSelection(0, 0);
+    SetToolManagerSelection(nullptr, nullptr);
   }
 
   delete m_Controls;
@@ -681,7 +681,7 @@ void QmitkSegmentationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*
 
 void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
 {
-   QmitkRenderWindow* selectedRenderWindow = 0;
+   QmitkRenderWindow* selectedRenderWindow = nullptr;
    QmitkRenderWindow* axialRenderWindow = GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetQmitkRenderWindow("axial");
    QmitkRenderWindow* sagittalRenderWindow = GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetQmitkRenderWindow("sagittal");
    QmitkRenderWindow* coronalRenderWindow = GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetQmitkRenderWindow("coronal");

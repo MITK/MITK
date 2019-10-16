@@ -100,7 +100,7 @@ void QmitkMITKSurfaceMaterialEditorView::InitPreviewWindow()
 
   m_DataTree = mitk::StandaloneDataStorage::New();
 
-  m_DataTree->Add( m_DataNode , (mitk::DataNode *)0 );
+  m_DataTree->Add( m_DataNode , (mitk::DataNode *)nullptr );
 
   m_Controls->m_PreviewRenderWindow->GetRenderer()->SetDataStorage( m_DataTree );
   m_Controls->m_PreviewRenderWindow->GetRenderer()->SetMapperID( mitk::BaseRenderer::Standard3D );
@@ -117,7 +117,7 @@ void QmitkMITKSurfaceMaterialEditorView::RefreshPropertiesList()
   mitk::PropertyList* DstPL = DstND->GetPropertyList();
 
 
-  m_Controls->m_ShaderPropertyList->SetPropertyList( 0 );
+  m_Controls->m_ShaderPropertyList->SetPropertyList( nullptr );
 
   DstPL->Clear();
 

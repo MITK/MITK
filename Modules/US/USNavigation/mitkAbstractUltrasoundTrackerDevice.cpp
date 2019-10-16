@@ -146,7 +146,7 @@ mitk::AffineTransform3D::Pointer mitk::AbstractUltrasoundTrackerDevice::GetCalib
 
   if (calibrationIterator == m_Calibrations.end())
   {
-    return 0;
+    return nullptr;
   }
 
   return calibrationIterator->second;

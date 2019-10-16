@@ -197,7 +197,7 @@ void mitk::USNavigationTargetUpdateFilter::UpdateTargetScores()
         for (std::vector<mitk::DataNode::Pointer>::iterator it = m_ControlNodesVector.begin();
           it != m_ControlNodesVector.end(); ++it)
         {
-          if ( (*it)->GetData() == 0 || (*it)->GetData()->GetGeometry() == 0 )
+          if ( (*it)->GetData() == nullptr || (*it)->GetData()->GetGeometry() == nullptr )
           {
             mitkThrow() << "Control data node and geometry of the node must not be null.";
           }
@@ -239,7 +239,7 @@ vtkSmartPointer<vtkPolyData> mitk::USNavigationTargetUpdateFilter::GetVtkPolyDat
   }
 
   vtkSmartPointer<vtkPolyData> targetSurfaceVtk = targetSurface->GetVtkPolyData();
-  if( targetSurfaceVtk == 0 )
+  if( targetSurfaceVtk == nullptr )
   {
     mitkThrow() << "VtkPolyData of the mitk::Surface of the data node must not be null.";
   }

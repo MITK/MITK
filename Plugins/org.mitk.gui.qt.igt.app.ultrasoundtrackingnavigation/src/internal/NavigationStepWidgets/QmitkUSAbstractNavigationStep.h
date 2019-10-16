@@ -90,7 +90,7 @@ public:
   static const char* DATANAME_IMAGESTREAM;
   static const char* DATANAME_BASENODE;
 
-  explicit QmitkUSAbstractNavigationStep(QWidget *parent = 0);
+  explicit QmitkUSAbstractNavigationStep(QWidget *parent = nullptr);
   ~QmitkUSAbstractNavigationStep() override;
 
   /**

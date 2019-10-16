@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-ctkPluginContext* org_mitk_gui_qt_ultrasound_Activator::m_Context = 0;
+ctkPluginContext* org_mitk_gui_qt_ultrasound_Activator::m_Context = nullptr;
 
 void org_mitk_gui_qt_ultrasound_Activator::start(ctkPluginContext* context)
 {
@@ -31,7 +31,7 @@ void org_mitk_gui_qt_ultrasound_Activator::start(ctkPluginContext* context)
 
 void org_mitk_gui_qt_ultrasound_Activator::stop(ctkPluginContext* context)
 {
-  m_Context = 0;
+  m_Context = nullptr;
 
   Q_UNUSED(context)
 }

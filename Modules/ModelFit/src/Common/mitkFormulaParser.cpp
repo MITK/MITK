@@ -276,7 +276,7 @@ namespace mitk
 
   FormulaParser::ValueType FormulaParser::lookupVariable(const std::string var)
   {
-    if (m_Variables == NULL)
+    if (m_Variables == nullptr)
     {
       mitkThrowException(FormulaParserException) << "Map of variables is empty";
     }

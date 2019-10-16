@@ -53,7 +53,7 @@ protected slots:
   void OnCancel();
 
 public:
-  explicit QmitkUSNavigationAbstractSettingsWidget(QWidget *parent = 0);
+  explicit QmitkUSNavigationAbstractSettingsWidget(QWidget *parent = nullptr);
   ~QmitkUSNavigationAbstractSettingsWidget() override;
 
   /**

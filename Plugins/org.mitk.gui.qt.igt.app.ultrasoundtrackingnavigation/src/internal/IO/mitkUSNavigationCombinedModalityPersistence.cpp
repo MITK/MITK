@@ -161,7 +161,7 @@ mitk::USCombinedModality::Pointer mitk::USNavigationCombinedModalityPersistence:
     }
   }
 
-  return 0;
+  return nullptr;
 }
 
 mitk::USDevice::Pointer mitk::USNavigationCombinedModalityPersistence::GetUSDevice(std::string manufacturer, std::string model, std::string comment)
@@ -187,7 +187,7 @@ mitk::USDevice::Pointer mitk::USNavigationCombinedModalityPersistence::GetUSDevi
     }
   }
 
-  return 0;
+  return nullptr;
 }
 
 mitk::NavigationDataSource::Pointer mitk::USNavigationCombinedModalityPersistence::GetNavigationDataSource(std::string name)
@@ -209,5 +209,5 @@ mitk::NavigationDataSource::Pointer mitk::USNavigationCombinedModalityPersistenc
     }
   }
 
-  return 0;
+  return nullptr;
 }

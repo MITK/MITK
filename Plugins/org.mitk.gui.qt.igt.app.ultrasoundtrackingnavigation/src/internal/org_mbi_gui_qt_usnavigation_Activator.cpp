@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVirtualTrackingDevice.h"
 
 namespace mitk {
-  ctkPluginContext* org_mbi_gui_qt_usnavigation_Activator::m_Context = 0;
+  ctkPluginContext* org_mbi_gui_qt_usnavigation_Activator::m_Context = nullptr;
 
   void org_mbi_gui_qt_usnavigation_Activator::start(ctkPluginContext* context)
   {
@@ -42,8 +42,8 @@ namespace mitk {
 
   void org_mbi_gui_qt_usnavigation_Activator::stop(ctkPluginContext*)
   {
-    m_USCombinedModalityPersistence = 0;
-    m_Context = 0;
+    m_USCombinedModalityPersistence = nullptr;
+    m_Context = nullptr;
   }
 
   ctkPluginContext *org_mbi_gui_qt_usnavigation_Activator::GetContext()

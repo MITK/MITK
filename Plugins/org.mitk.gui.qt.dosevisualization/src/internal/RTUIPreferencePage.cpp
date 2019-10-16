@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //-----------------------------------------------------------------------------
 RTUIPreferencePage::RTUIPreferencePage()
-  : m_MainControl(0), m_Controls(0)
+  : m_MainControl(nullptr), m_Controls(nullptr)
 {
 
 }

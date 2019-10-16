@@ -26,7 +26,7 @@ class QmitkUSZoneManagementColorDialogDelegate : public QStyledItemDelegate
   Q_OBJECT
 
 public:
-  explicit QmitkUSZoneManagementColorDialogDelegate(QObject* parent = 0);
+  explicit QmitkUSZoneManagementColorDialogDelegate(QObject* parent = nullptr);
   ~QmitkUSZoneManagementColorDialogDelegate() override;
 
   /**

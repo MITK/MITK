@@ -83,7 +83,7 @@ void mitk::USZonesInteractor::ConnectActionsAndFunctions()
 void mitk::USZonesInteractor::DataNodeChanged()
 {
   mitk::DataNode::Pointer dataNode = this->GetDataNode();
-  if (dataNode.IsNotNull() && dataNode->GetData() == 0)
+  if (dataNode.IsNotNull() && dataNode->GetData() == nullptr)
   {
     dataNode->SetData(mitk::Surface::New());
   }

@@ -38,7 +38,7 @@ class MITKMODELFITUI_EXPORT QmitkFitParameterModel : public QAbstractTableModel
 public:
   using FitVectorType = std::vector<mitk::modelFit::ModelFitInfo::ConstPointer>;
 
-  QmitkFitParameterModel(QObject* parent = NULL);
+  QmitkFitParameterModel(QObject* parent = nullptr);
   ~QmitkFitParameterModel() override {};
 
   const FitVectorType& getFits() const;

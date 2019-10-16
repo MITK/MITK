@@ -209,7 +209,7 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     berry::IBerryPreferences* preferences = dynamic_cast<berry::IBerryPreferences*>(GetPreferences().GetPointer());
     mitk::BaseRenderer::RenderingMode::Type renderingMode = static_cast<mitk::BaseRenderer::RenderingMode::Type>(preferences->GetInt("Rendering Mode", 0));
 
-    m_Impl->m_MxNMultiWidget = new QmitkMxNMultiWidget(parent, 0, 0, renderingMode);
+    m_Impl->m_MxNMultiWidget = new QmitkMxNMultiWidget(parent, nullptr, nullptr, renderingMode);
 
     // create left toolbar: interaction scheme toolbar to switch how the render window navigation behaves in PACS mode
     if (nullptr == m_Impl->m_InteractionSchemeToolBar)

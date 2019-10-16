@@ -31,8 +31,8 @@ namespace mitk
     {
     public:
       ExampleDataStructureMimeType();
-      virtual bool AppliesTo(const std::string &path) const override;
-      virtual ExampleDataStructureMimeType *Clone() const override;
+      bool AppliesTo(const std::string &path) const override;
+      ExampleDataStructureMimeType *Clone() const override;
     };
 
     static ExampleDataStructureMimeType EXAMPLE_MIMETYPE();

@@ -100,7 +100,7 @@ public:
             unsigned int outPos = x + y * newXDim + z * newXDim * newYDim;
             CPPUNIT_ASSERT_MESSAGE(std::string("expected " + std::to_string(data[origPos])
               + " but was " + std::to_string(outputData[outPos])),
-              abs((float)outputData[outPos] - (float)data[origPos]) < mitk::eps);
+              std::abs((float)outputData[outPos] - (float)data[origPos]) < mitk::eps);
           }
         }
       }

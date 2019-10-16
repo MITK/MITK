@@ -65,7 +65,7 @@ namespace mitk {
       * \brief Constructor sets number of input images to two and number of output images to one, respectively.
       */
       SpectralUnmixingSO2();
-      virtual ~SpectralUnmixingSO2();
+      ~SpectralUnmixingSO2() override;
 
       std::vector<int> m_SO2Settings;
       bool m_Verbose = false;
@@ -75,7 +75,7 @@ namespace mitk {
       * \brief Inherit from the "ImageToImageFilter" Superclass. Herain it calls InitializeOutputs and the CheckPreConditions
       * methods and enables pixelwise access to the inputs to calculate the oxygen saturation via the "calculate SO2" method.
       */
-      virtual void GenerateData() override;
+      void GenerateData() override;
 
       /**
       * \brief Initialized output images with the same size like the input image. The pixel type is set to float.

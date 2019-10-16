@@ -67,7 +67,7 @@ public:
       const float* outputData = (const float*)readAccess.GetData();
       for (unsigned int i = 0; i < DATA_DIM*DATA_DIM*DATA_DIM; ++i)
       {
-        CPPUNIT_ASSERT_MESSAGE(std::string("expected " + std::to_string(data[i]) + " but was " + std::to_string(outputData[i])), abs(outputData[i] - data[i]) < mitk::eps);
+        CPPUNIT_ASSERT_MESSAGE(std::string("expected " + std::to_string(data[i]) + " but was " + std::to_string(outputData[i])), std::abs(outputData[i] - data[i]) < mitk::eps);
       }
     }
   }

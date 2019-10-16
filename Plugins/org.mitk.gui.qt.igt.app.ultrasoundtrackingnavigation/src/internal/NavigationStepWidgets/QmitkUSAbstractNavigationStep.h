@@ -91,7 +91,7 @@ public:
   static const char* DATANAME_BASENODE;
 
   explicit QmitkUSAbstractNavigationStep(QWidget *parent = 0);
-  ~QmitkUSAbstractNavigationStep();
+  ~QmitkUSAbstractNavigationStep() override;
 
   /**
    * \brief Getter for the title of the navigation step.

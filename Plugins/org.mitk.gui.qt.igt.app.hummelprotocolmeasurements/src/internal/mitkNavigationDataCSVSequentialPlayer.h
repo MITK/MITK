@@ -103,18 +103,18 @@ namespace mitk
     * \brief Used for pipeline update just to tell the pipeline
     * that we always have to update
     */
-    virtual void UpdateOutputInformation();
+    void UpdateOutputInformation() override;
 
     int GetNumberOfSnapshots();
 
   protected:
     NavigationDataCSVSequentialPlayer();
-    virtual ~NavigationDataCSVSequentialPlayer();
+    ~NavigationDataCSVSequentialPlayer() override;
 
     ///
     /// do the work here
     ///
-    virtual void GenerateData();
+    void GenerateData() override;
 
     std::string m_FileName;
 

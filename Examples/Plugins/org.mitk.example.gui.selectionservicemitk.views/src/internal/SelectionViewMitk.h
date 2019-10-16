@@ -41,7 +41,7 @@ public:
   SelectionViewMitk();
 
 protected:
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
   void SetFocus() override;
 

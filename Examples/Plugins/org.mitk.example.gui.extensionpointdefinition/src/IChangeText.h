@@ -25,7 +25,7 @@ struct org_mitk_example_gui_extensionpointdefinition_EXPORT IChangeText : public
 {
   berryObjectMacro(IChangeText)
 
-    virtual ~IChangeText();
+    ~IChangeText() override;
 
   virtual QString ChangeText(const QString &s) = 0;
 };

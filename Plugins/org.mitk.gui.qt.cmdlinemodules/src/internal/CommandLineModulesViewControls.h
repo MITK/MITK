@@ -34,7 +34,7 @@ class CommandLineModulesViewControls : public QWidget, public Ui_CommandLineModu
 public:
 
   CommandLineModulesViewControls(QWidget *parent = nullptr);
-  virtual ~CommandLineModulesViewControls();
+  ~CommandLineModulesViewControls() override;
 
   void SetAdvancedWidgetsVisible(const bool& isVisible);
 

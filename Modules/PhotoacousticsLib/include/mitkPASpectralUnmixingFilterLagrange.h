@@ -31,7 +31,7 @@ namespace mitk {
 
     protected:
       SpectralUnmixingFilterLagrange();
-      virtual ~SpectralUnmixingFilterLagrange();
+      ~SpectralUnmixingFilterLagrange() override;
  
     private:
 

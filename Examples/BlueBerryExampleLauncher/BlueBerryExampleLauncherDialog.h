@@ -33,7 +33,7 @@ class BlueBerryExampleLauncherDialog : public QDialog
 
 public:
   explicit BlueBerryExampleLauncherDialog(QWidget *parent = nullptr);
-  ~BlueBerryExampleLauncherDialog();
+  ~BlueBerryExampleLauncherDialog() override;
 
   QString getDemoConfiguration();
 

@@ -36,7 +36,7 @@ namespace mitk
 
     /** This function returns the default parameterization (e.g. initial parametrization for fitting)
      defined by the model developer for  for the given model.*/
-    virtual ParametersType GetDefaultInitialParameterization() const override;
+    ParametersType GetDefaultInitialParameterization() const override;
 
   protected:
     ModelParameterizerBase::Pointer DoCreateParameterizer(const modelFit::ModelFitInfo* fit)
@@ -44,7 +44,7 @@ namespace mitk
 
     GenericParamModelFactory();
 
-    virtual ~GenericParamModelFactory();
+    ~GenericParamModelFactory() override;
 
   private:
 

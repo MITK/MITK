@@ -87,7 +87,7 @@ protected:
    * \brief Constructs an empty XML tree and starts the real time clock.
    */
   USNavigationExperimentLogging();
-  virtual ~USNavigationExperimentLogging();
+  ~USNavigationExperimentLogging() override;
 
   void AddCurrentTimeAttributes(Poco::AutoPtr<Poco::XML::Element>);
 

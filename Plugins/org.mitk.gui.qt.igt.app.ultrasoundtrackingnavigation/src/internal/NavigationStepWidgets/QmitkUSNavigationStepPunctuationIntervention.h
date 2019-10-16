@@ -61,21 +61,21 @@ public:
   /** Sets the navigation tool of the needle for the meta data (tool axis etc.)*/
   void SetNeedleMetaData(mitk::NavigationTool::Pointer needleNavigationTool);
   explicit QmitkUSNavigationStepPunctuationIntervention(QWidget *parent = 0);
-  ~QmitkUSNavigationStepPunctuationIntervention();
+  ~QmitkUSNavigationStepPunctuationIntervention() override;
 
-  virtual bool OnStartStep();
-  virtual bool OnRestartStep();
-  virtual bool OnFinishStep();
+  bool OnStartStep() override;
+  bool OnRestartStep() override;
+  bool OnFinishStep() override;
 
-  virtual bool OnActivateStep();
-  virtual void OnUpdate();
+  bool OnActivateStep() override;
+  void OnUpdate() override;
 
-  virtual void OnSettingsChanged(const itk::SmartPointer<mitk::DataNode>);
+  void OnSettingsChanged(const itk::SmartPointer<mitk::DataNode>) override;
 
-  virtual QString GetTitle();
-  virtual bool GetIsRestartable();
+  QString GetTitle() override;
+  bool GetIsRestartable() override;
 
-  virtual FilterVector GetFilter();
+  FilterVector GetFilter() override;
 
 signals:
 
@@ -91,7 +91,7 @@ protected slots:
   void OnShowToolAxisEnabled(int enabled);
 
 protected:
-  virtual void OnSetCombinedModality();
+  void OnSetCombinedModality() override;
 
   void ClearZones();
   void UpdateBodyMarkerStatus(mitk::NavigationData::Pointer bodyMarker);

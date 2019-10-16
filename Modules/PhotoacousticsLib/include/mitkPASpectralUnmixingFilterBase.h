@@ -117,7 +117,7 @@ namespace mitk {
       * \brief Constructor creats proptery calculater smart pointer new()
       */
       SpectralUnmixingFilterBase();
-      virtual ~SpectralUnmixingFilterBase();
+      ~SpectralUnmixingFilterBase() override;
 
       /**
       * \brief The subclasses will override the mehtod to calculate the spectral unmixing result vector.
@@ -161,7 +161,7 @@ namespace mitk {
       * CheckPreConditions methods and enables pixelwise access to do spectral unmixing with the "SpectralUnmixingAlgorithm"
       * method. In the end the method writes the results into the new MITK output images.
       */
-      virtual void GenerateData() override;
+      void GenerateData() override;
 
       /*
       * \brief Creats a Matrix with number of chromophores colums and number of wavelengths rows so matrix element (i,j) contains 

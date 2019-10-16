@@ -40,18 +40,18 @@ public:
   static const std::string VIEW_ID;
 
   QmitkSimpleExampleView();
-  ~QmitkSimpleExampleView();
+  ~QmitkSimpleExampleView() override;
 
 private:
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
   /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
 
-  virtual void RenderWindowPartActivated(mitk::IRenderWindowPart *renderWindowPart) override;
-  virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart *renderWindowPart) override;
+  void RenderWindowPartActivated(mitk::IRenderWindowPart *renderWindowPart) override;
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart *renderWindowPart) override;
 
   /**
    * return the renderwindow of which the movie shall be created, what depends on the combo box

@@ -37,12 +37,12 @@ protected slots:
 
 public:
   explicit QmitkUSNavigationCombinedSettingsWidget(QWidget *parent = 0);
-  ~QmitkUSNavigationCombinedSettingsWidget();
-  virtual void OnSetSettingsNode(itk::SmartPointer<mitk::DataNode> settingsNode, bool overwriteValues);
+  ~QmitkUSNavigationCombinedSettingsWidget() override;
+  void OnSetSettingsNode(itk::SmartPointer<mitk::DataNode> settingsNode, bool overwriteValues) override;
 
 protected:
-  virtual void OnSaveProcessing();
-  virtual void OnLoadSettingsProcessing();
+  void OnSaveProcessing() override;
+  void OnLoadSettingsProcessing() override;
 
   QString InteractionNameToFile(const QString& name) const;
 

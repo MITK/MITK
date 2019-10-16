@@ -50,11 +50,11 @@ namespace itk
     typename TMaskImageType::Pointer m_ImageMask;
     double m_InnerScale, m_OuterScale;
 
-    void GenerateData();
-    void GenerateOutputInformation();
+    void GenerateData() override;
+    void GenerateOutputInformation() override;
 
     StructureTensorEigenvalueImageFilter();
-    virtual ~StructureTensorEigenvalueImageFilter();
+    ~StructureTensorEigenvalueImageFilter() override;
   };
 }
 

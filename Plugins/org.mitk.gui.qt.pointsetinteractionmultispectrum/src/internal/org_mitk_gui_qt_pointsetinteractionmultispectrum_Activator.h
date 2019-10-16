@@ -31,8 +31,8 @@ class org_mitk_gui_qt_pointsetinteractionmultispectrum_Activator :
 
 public:
 
-  void start(ctkPluginContext* context);
-  void stop(ctkPluginContext* context);
+  void start(ctkPluginContext* context) override;
+  void stop(ctkPluginContext* context) override;
 
 }; // org_mitk_gui_qt_pointsetinteractionmultispectrum_Activator
 

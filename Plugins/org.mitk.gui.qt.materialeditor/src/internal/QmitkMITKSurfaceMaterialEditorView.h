@@ -56,9 +56,9 @@ class QmitkMITKSurfaceMaterialEditorView : public QmitkAbstractView
   static const std::string VIEW_ID;
 
   QmitkMITKSurfaceMaterialEditorView();
-  virtual ~QmitkMITKSurfaceMaterialEditorView();
+  ~QmitkMITKSurfaceMaterialEditorView() override;
 
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
   /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
@@ -66,9 +66,9 @@ class QmitkMITKSurfaceMaterialEditorView : public QmitkAbstractView
   ///
   /// Sets the focus to an internal widget.
   ///
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
 protected slots:
 

@@ -35,10 +35,10 @@ namespace mitk
 
     ExampleDataStructureReaderService(const ExampleDataStructureReaderService &other);
     ExampleDataStructureReaderService();
-    virtual ~ExampleDataStructureReaderService();
+    ~ExampleDataStructureReaderService() override;
 
     using AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData>> Read() override;
+    std::vector<itk::SmartPointer<BaseData>> Read() override;
 
   private:
     ExampleDataStructureReaderService *Clone() const override;

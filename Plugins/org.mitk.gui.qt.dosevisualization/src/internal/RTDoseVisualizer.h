@@ -67,7 +67,7 @@ class RTDoseVisualizer : public QmitkAbstractView
 public:
 
   RTDoseVisualizer();
-  virtual ~RTDoseVisualizer();
+  ~RTDoseVisualizer() override;
   static const std::string VIEW_ID;
   static const std::string ISO_LINE_NODE_NAME;
 
@@ -105,13 +105,13 @@ public:
 
 protected:
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void SetFocus();
+  void SetFocus() override;
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-    const QList<mitk::DataNode::Pointer>& nodes );
+  void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
+    const QList<mitk::DataNode::Pointer>& nodes ) override;
 
   void PrepareDoseNode(mitk::DataNode* doseNode) const;
 

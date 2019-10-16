@@ -76,13 +76,13 @@ protected:
   *	@param[in,out] parent	The parent QWidget, as this class itself is not a QWidget
   *							subclass.
   */
-  void CreateQtPartControl(QWidget* parent);
+  void CreateQtPartControl(QWidget* parent) override;
 
   /*!
   *	@brief	Sets the focus to the plot curve button. Gets called by the framework to set the
   *			focus on the right widget.
   */
-  void SetFocus();
+  void SetFocus() override;
 
   template <typename TParameterizer>
   void GenerateModelFit_ROIBased(mitk::modelFit::ModelFitInfo::Pointer& modelFitInfo,
@@ -111,8 +111,8 @@ protected:
 
   /*! \brief called by QmitkFunctionality when DataManager's selection has changed
   */
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
-                                  const QList<mitk::DataNode::Pointer>& selectedNodes);
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
+                                  const QList<mitk::DataNode::Pointer>& selectedNodes) override;
 
   // Variables
 

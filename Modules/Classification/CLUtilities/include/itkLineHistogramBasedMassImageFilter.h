@@ -44,14 +44,14 @@ namespace itk
     typename TMaskImageType::Pointer m_BinaryContour;
     vnl_vector<double> m_CenterOfMask;
 
-    void ThreadedGenerateData(const typename Superclass::OutputImageRegionType &outputRegionForThread, ThreadIdType threadId);
-    void BeforeThreadedGenerateData();
+    void ThreadedGenerateData(const typename Superclass::OutputImageRegionType &outputRegionForThread, ThreadIdType threadId) override;
+    void BeforeThreadedGenerateData() override;
     //  void GenerateOutputInformation();
 
     vnl_vector<double> GetCenterOfMass(const TMaskImageType * maskImage);
 
     LineHistogramBasedMassImageFilter();
-    virtual ~LineHistogramBasedMassImageFilter();
+    ~LineHistogramBasedMassImageFilter() override;
   };
 }
 

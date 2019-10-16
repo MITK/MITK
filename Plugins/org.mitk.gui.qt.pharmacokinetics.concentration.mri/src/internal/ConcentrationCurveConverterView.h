@@ -63,13 +63,13 @@ protected:
 	 *	@param[in,out] parent	The parent QWidget, as this class itself is not a QWidget
 	 *							subclass.
 	 */
-	void CreateQtPartControl(QWidget* parent);
+	void CreateQtPartControl(QWidget* parent) override;
 
 	/*!
 	 *	@brief	Sets the focus to the plot curve button. Gets called by the framework to set the
 	 *			focus on the right widget.
 	 */
-	void SetFocus();
+	void SetFocus() override;
 
     /*! Helper method that adds an concentration image as child node to the current m_selectedNode and returns this new child node.*/
     mitk::DataNode::Pointer AddConcentrationImage(mitk::Image* image, std::string nodeName) const;
@@ -77,8 +77,8 @@ protected:
 
   /*! \brief called by QmitkFunctionality when DataManager's selection has changed
   */
-  virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-    const QList<mitk::DataNode::Pointer>& nodes);
+  void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
+    const QList<mitk::DataNode::Pointer>& nodes) override;
 
 	// Variables
 

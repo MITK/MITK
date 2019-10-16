@@ -52,7 +52,7 @@ class QmitkCmdLineModuleRunner : public QWidget
 public:
 
   QmitkCmdLineModuleRunner(QWidget *parent = nullptr);
-  virtual ~QmitkCmdLineModuleRunner();
+  ~QmitkCmdLineModuleRunner() override;
 
   /**
    * \brief Sets the manager on this object, and must be called immediately

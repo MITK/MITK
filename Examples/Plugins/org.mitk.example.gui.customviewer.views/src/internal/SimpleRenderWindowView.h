@@ -45,7 +45,7 @@ public:
    */
   SimpleRenderWindowView();
 
-  ~SimpleRenderWindowView();
+  ~SimpleRenderWindowView() override;
 
   /**
    *  String based view identifier.

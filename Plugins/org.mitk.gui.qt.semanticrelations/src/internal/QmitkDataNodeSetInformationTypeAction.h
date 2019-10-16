@@ -38,7 +38,7 @@ private Q_SLOTS:
 
 protected:
 
-  virtual void InitializeAction() override;
+  void InitializeAction() override;
 
   QWidget* m_Parent;
 

@@ -33,7 +33,7 @@ class MultiplePerspectives : public QObject, public berry::IApplication
 
 public:
   MultiplePerspectives();
-  ~MultiplePerspectives();
+  ~MultiplePerspectives() override;
 
   QVariant Start(berry::IApplicationContext *context) override;
   void Stop() override;

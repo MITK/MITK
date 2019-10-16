@@ -54,14 +54,14 @@ public:
 
   static const std::string VIEW_ID;
 
-  virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
-  virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
-  virtual void RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart) override;
 
 protected:
 
-  virtual void SetFocus() override;
-  virtual void CreateQtPartControl(QWidget* parent) override;
+  void SetFocus() override;
+  void CreateQtPartControl(QWidget* parent) override;
 
 private Q_SLOTS:
 
@@ -85,9 +85,9 @@ private:
   * QItemSeletionModel is changed, a selection changed event is fired. All plugins (views), that subclass the
   * QmitkAbstractView will be informed about the selection changed via the OnSelectionChanged-function.
   */
-  virtual QItemSelectionModel* GetDataNodeSelectionModel() const override;
+  QItemSelectionModel* GetDataNodeSelectionModel() const override;
 
-  virtual void NodeRemoved(const mitk::DataNode* dataNode) override;
+  void NodeRemoved(const mitk::DataNode* dataNode) override;
 
   void AddToComboBox(const mitk::SemanticTypes::CaseID& caseID);
   void RemoveFromComboBox(const mitk::SemanticTypes::CaseID& caseID);

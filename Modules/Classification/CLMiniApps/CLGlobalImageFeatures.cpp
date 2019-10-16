@@ -81,7 +81,7 @@ public:
 
   }
 protected:
-  charT do_decimal_point() const { return m_Sep; }
+  charT do_decimal_point() const override { return m_Sep; }
 private:
   charT m_Sep;
 };

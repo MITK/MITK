@@ -49,12 +49,12 @@ public:
 
   /** This function returns the default parameterization (e.g. initial parametrization for fitting)
    defined by the model developer for  for the given model.*/
-  virtual ParametersType GetDefaultInitialParameterization() const;
+  ParametersType GetDefaultInitialParameterization() const override;
 
 protected:
   ThreeStepLinearModelParameterizer(){};
 
-  virtual ~ThreeStepLinearModelParameterizer(){};
+  ~ThreeStepLinearModelParameterizer() override{};
 
 private:
 

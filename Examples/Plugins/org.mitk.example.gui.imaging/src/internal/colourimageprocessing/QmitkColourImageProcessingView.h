@@ -36,11 +36,11 @@ public:
   QmitkColourImageProcessingView();
 
 private:
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part,
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part,
                                   const QList<mitk::DataNode::Pointer> &nodes) override;
 
 private slots:

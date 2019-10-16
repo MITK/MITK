@@ -31,11 +31,11 @@ namespace mitk {
 
     protected:
       SpectralUnmixingFilterSimplex();
-      virtual ~SpectralUnmixingFilterSimplex();
+      ~SpectralUnmixingFilterSimplex() override;
 
     private:
 
-      virtual Eigen::VectorXf SpectralUnmixingAlgorithm(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix,
+      Eigen::VectorXf SpectralUnmixingAlgorithm(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix,
         Eigen::VectorXf inputVector) override;
 
       int factorial(int n);

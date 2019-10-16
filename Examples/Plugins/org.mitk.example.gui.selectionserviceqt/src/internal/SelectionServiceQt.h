@@ -40,7 +40,7 @@ class SelectionServiceQt : public QObject, public berry::IApplication
 
 public:
   SelectionServiceQt();
-  ~SelectionServiceQt();
+  ~SelectionServiceQt() override;
 
   QVariant Start(berry::IApplicationContext *context) override;
   void Stop() override;

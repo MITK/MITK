@@ -45,11 +45,11 @@ namespace itk
     typename TMaskImageType::Pointer m_ImageMask;
     double m_Sigma;
 
-    void GenerateData();
-    void GenerateOutputInformation();
+    void GenerateData() override;
+    void GenerateOutputInformation() override;
 
     HessianMatrixEigenvalueImageFilter();
-    virtual ~HessianMatrixEigenvalueImageFilter();
+    ~HessianMatrixEigenvalueImageFilter() override;
   };
 }
 

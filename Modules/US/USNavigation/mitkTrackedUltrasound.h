@@ -45,7 +45,7 @@ namespace mitk {
 
     mitkClassMacro(TrackedUltrasound, mitk::AbstractUltrasoundTrackerDevice);
     mitkNewMacro3Param(TrackedUltrasound, USDevice::Pointer, itk::SmartPointer<NavigationDataSource>, bool);
-    virtual AffineTransform3D::Pointer GetUSPlaneTransform();
+    AffineTransform3D::Pointer GetUSPlaneTransform() override;
 
 
 
@@ -54,7 +54,7 @@ namespace mitk {
     TrackedUltrasound(  USDevice::Pointer usDevice,
                         itk::SmartPointer<NavigationDataSource> trackingDevice,
                         bool trackedUltrasoundActive = true );
-    virtual ~TrackedUltrasound();
+    ~TrackedUltrasound() override;
 
     /**
     * \brief Grabs the next frame from the input.

@@ -25,9 +25,9 @@ class Step8 : public Step6
   Q_OBJECT
 public:
   Step8(int argc, char *argv[], QWidget *parent = nullptr);
-  ~Step8() {}
+  ~Step8() override override {}
 protected:
-  virtual void SetupWidgets() override;
+  void SetupWidgets() override;
 protected slots:
 };
 #endif // DOXYGEN_IGNORE

@@ -25,7 +25,7 @@ class ChangeTextRegistry : public berry::Object
 {
 public:
   ChangeTextRegistry();
-  ~ChangeTextRegistry();
+  ~ChangeTextRegistry() override;
 
   /**
    * Return an "change text" descriptor with the given extension id. If no "change text" exists,

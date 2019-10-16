@@ -42,7 +42,7 @@ public:
 
   static const std::string VIEW_ID;
 
-  virtual ~QmitkSemanticRelationsStatisticsView() override;
+  ~QmitkSemanticRelationsStatisticsView() override;
 
   /*
   * @brief Update the view with the data from the semantic relations.
@@ -53,12 +53,12 @@ public:
   *
   * @par caseID    The current case ID to identify the currently active patient / case.
   */
-  virtual void Update(const mitk::SemanticTypes::CaseID& caseID) override;
+  void Update(const mitk::SemanticTypes::CaseID& caseID) override;
 
 protected:
 
-  virtual void SetFocus() override;
-  virtual void CreateQtPartControl(QWidget* parent) override;
+  void SetFocus() override;
+  void CreateQtPartControl(QWidget* parent) override;
 
 private Q_SLOTS:
 

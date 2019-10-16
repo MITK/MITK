@@ -84,7 +84,7 @@ namespace mitk {
       return !((std::abs(lhs->GetAngle() - rhs->GetAngle()) < 0.01f) && // 0.01 degree error margin
         (lhs->GetApod() == rhs->GetApod()) &&
         (lhs->GetGeometry() == rhs->GetGeometry()) &&
-        (abs(lhs->GetProbeRadius() - rhs->GetProbeRadius()) < 0.001f) && 
+        (std::abs(lhs->GetProbeRadius() - rhs->GetProbeRadius()) < 0.001f) && 
         (lhs->GetIsPhotoacousticImage() == rhs->GetIsPhotoacousticImage()) &&
         (std::abs(lhs->GetPitchInMeters() - rhs->GetPitchInMeters()) < 0.000001f) && // 0.0001 mm error margin
         (lhs->GetReconstructionLines() == rhs->GetReconstructionLines()) &&
@@ -156,7 +156,7 @@ namespace mitk {
       float probeRadius
     );
 
-    ~BeamformingSettings();
+    ~BeamformingSettings() override;
 
     /** \brief Pitch of the used transducer in [m].
     */

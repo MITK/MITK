@@ -33,7 +33,7 @@ class MinimalApplication : public QObject, public berry::IApplication
 
 public:
   MinimalApplication();
-  ~MinimalApplication();
+  ~MinimalApplication() override;
 
   QVariant Start(berry::IApplicationContext *context) override;
   void Stop() override;

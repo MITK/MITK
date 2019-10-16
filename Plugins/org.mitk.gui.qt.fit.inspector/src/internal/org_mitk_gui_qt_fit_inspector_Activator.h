@@ -28,8 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
       Q_INTERFACES(ctkPluginActivator)
     public:
 
-        void start(ctkPluginContext* context);
-        void stop(ctkPluginContext* context);
+        void start(ctkPluginContext* context) override;
+        void stop(ctkPluginContext* context) override;
 
     }; // org_mitk_modelfit_visualization_Activator
 

@@ -132,7 +132,7 @@ namespace mitk
        */
       Volume(double* data, unsigned int xDim, unsigned int yDim, unsigned int zDim, double spacing);
       Volume(mitk::Image::Pointer image);
-      virtual ~Volume();
+      ~Volume() override;
 
       const int NUMBER_OF_SPATIAL_DIMENSIONS = 3;
 

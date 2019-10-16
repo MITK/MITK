@@ -84,7 +84,7 @@ namespace mitk {
 
     protected:
       SpectralUnmixingFilterVigra();
-      virtual ~SpectralUnmixingFilterVigra();
+      ~SpectralUnmixingFilterVigra() override;
 
       /**
       * \brief overrides the baseclass method with a mehtod to calculate the spectral unmixing result vector. Herain it first converts the
@@ -96,7 +96,7 @@ namespace mitk {
       * so the pixelvalue of the first wavelength is stored in inputVector[0] and so on.
       * @throws if the algorithmName is not a member of the enum VigraAlgortihmType
       */
-      virtual Eigen::VectorXf SpectralUnmixingAlgorithm(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix,
+      Eigen::VectorXf SpectralUnmixingAlgorithm(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix,
         Eigen::VectorXf inputVector) override;
 
     private:

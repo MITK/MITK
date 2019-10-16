@@ -53,7 +53,7 @@ protected slots:
 
 public:
   explicit QmitkUSCombinedModalityCreationWidget(QWidget *parent = 0);
-  ~QmitkUSCombinedModalityCreationWidget();
+  ~QmitkUSCombinedModalityCreationWidget() override;
 
 private:
   Ui::QmitkUSCombinedModalityCreationWidget *ui;

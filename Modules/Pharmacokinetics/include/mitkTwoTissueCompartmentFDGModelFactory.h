@@ -36,13 +36,13 @@ namespace mitk
     typedef Superclass::ModelParameterizerType ModelParameterizerType;
 
     ConstraintCheckerBase::Pointer CreateDefaultConstraints() const override;
-    virtual ParametersType GetDefaultInitialParameterization() const;
+    ParametersType GetDefaultInitialParameterization() const override;
 
   protected:
 
     TwoTissueCompartmentFDGModelFactory();
 
-    virtual ~TwoTissueCompartmentFDGModelFactory();
+    ~TwoTissueCompartmentFDGModelFactory() override;
 
   private:
 

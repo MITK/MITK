@@ -41,19 +41,19 @@ namespace mitk
     static void UpdateSurface(itk::SmartPointer<mitk::DataNode>);
 
     USPointMarkInteractor();
-    virtual ~USPointMarkInteractor();
+    ~USPointMarkInteractor() override override;
 
     /**
      * \brief Connects the functions from the state machine to methods of this class.
      */
-    virtual void ConnectActionsAndFunctions() override;
+    void ConnectActionsAndFunctions() override;
 
     /**
      * \brief Sets empty surface as data for the new data node.
      * This is necessary as data nodes without data do not work
      * with data interactors.
      */
-    virtual void DataNodeChanged() override;
+    void DataNodeChanged() override;
 
     /**
      * \brief Set current position as origin to the data node.

@@ -46,7 +46,7 @@ protected slots:
 
 public:
   explicit QmitkUSNavigationFreezeButton(QWidget* parent = 0);
-  ~QmitkUSNavigationFreezeButton();
+  ~QmitkUSNavigationFreezeButton() override;
 
   /**
    * \brief Setter for the combined modality to be freezed by this button.

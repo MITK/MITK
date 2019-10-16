@@ -32,14 +32,14 @@ namespace mitk
     typedef mitk::ExampleDataStructure InputType;
 
     ExampleDataStructureWriterService();
-    virtual ~ExampleDataStructureWriterService();
+    ~ExampleDataStructureWriterService() override;
 
     using AbstractFileWriter::Write;
-    virtual void Write() override;
+    void Write() override;
 
   protected:
     ExampleDataStructureWriterService(const ExampleDataStructureWriterService &other);
-    virtual mitk::ExampleDataStructureWriterService *Clone() const override;
+    mitk::ExampleDataStructureWriterService *Clone() const override;
   };
 
 } // end of namespace mitk

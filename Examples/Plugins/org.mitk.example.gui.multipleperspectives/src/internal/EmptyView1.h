@@ -32,9 +32,9 @@ public:
 
   EmptyView1();
 
-  virtual ~EmptyView1();
+  ~EmptyView1() override;
 
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
 protected:
   void SetFocus() override;

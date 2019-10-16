@@ -73,20 +73,20 @@ protected:
 	 *	@param[in,out] parent	The parent QWidget, as this class itself is not a QWidget
 	 *							subclass.
 	 */
-	void CreateQtPartControl(QWidget* parent);
+	void CreateQtPartControl(QWidget* parent) override;
 
 	/*!
 	 *	@brief	Sets the focus to the plot curve button. Gets called by the framework to set the
 	 *			focus on the right widget.
 	 */
-	void SetFocus();
+	void SetFocus() override;
 
   /** Configures the passed functor according to the selected image and parameters*/
   void ConfigureFunctor(mitk::CurveParameterFunctor* functor) const;
 
   /*! \brief called by QmitkFunctionality when DataManager's selection has changed
   */
-  virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
+  void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
     const QList<mitk::DataNode::Pointer>& nodes) override;
 
 	// Variables

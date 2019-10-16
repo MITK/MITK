@@ -100,7 +100,7 @@ public:
 
     for (int i = 0; i < length; ++i)
     {
-      CPPUNIT_ASSERT_MESSAGE(std::string("Input array already not correct: " + std::to_string(inputArray[i])), abs(inputArray[i]) < 1e-5f);
+      CPPUNIT_ASSERT_MESSAGE(std::string("Input array already not correct: " + std::to_string(inputArray[i])), std::abs(inputArray[i]) < 1e-5f);
     }
 
     auto output = m_PhotoacousticFilterService->ApplyBeamforming(testImage, m_BeamformingSettings);
@@ -110,7 +110,7 @@ public:
 
     for (int i = 0; i < length; ++i)
     {
-      CPPUNIT_ASSERT_MESSAGE(std::string("Output array not correct: " + std::to_string(abs(outputArray[i]))), abs(outputArray[i]) < 1e-5f);
+      CPPUNIT_ASSERT_MESSAGE(std::string("Output array not correct: " + std::to_string(std::abs(outputArray[i]))), std::abs(outputArray[i]) < 1e-5f);
     }
   }
 

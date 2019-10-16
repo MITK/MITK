@@ -52,13 +52,13 @@ namespace mitk {
 
     mitkClassMacro(USCombinedModality, mitk::AbstractUltrasoundTrackerDevice);
     mitkNewMacro3Param(USCombinedModality, USDevice::Pointer, itk::SmartPointer<NavigationDataSource>, bool);
-    virtual AffineTransform3D::Pointer GetUSPlaneTransform();
+    AffineTransform3D::Pointer GetUSPlaneTransform() override;
 
   protected:
     USCombinedModality( USDevice::Pointer usDevice,
                         itk::SmartPointer<NavigationDataSource> trackingDevice,
                         bool trackedUltrasoundActive = false );
-    virtual ~USCombinedModality();
+    ~USCombinedModality() override;
 
     /**
     * \brief Grabs the next frame from the input.

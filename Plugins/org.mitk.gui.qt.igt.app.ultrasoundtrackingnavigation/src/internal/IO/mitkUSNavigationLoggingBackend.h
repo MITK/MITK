@@ -34,7 +34,7 @@ namespace mitk {
     public:
 
       USNavigationLoggingBackend();
-      virtual ~USNavigationLoggingBackend();
+      ~USNavigationLoggingBackend() override override;
 
       /** \brief Set file path und name for the output file.
        * The file will be opened and all log messages will be directed there from then on.
@@ -49,7 +49,7 @@ namespace mitk {
        *
        *  \param logMessage Logging message.
        */
-      virtual void ProcessMessage(const mbilog::LogMessage &logMessage );
+      void ProcessMessage(const mbilog::LogMessage &logMessage ) override override;
 
       /** @return Returns all messages of the category "USNavigationLogging" since the last call of ClearNavigationMessages(). */
       std::vector<std::string> GetNavigationMessages();
@@ -61,7 +61,7 @@ namespace mitk {
       /** Clears the internally stored navigation messages of the category "USNavigationLogging". */
       void ClearNavigationMessages();
 
-      mbilog::OutputType GetOutputType(void) const;
+      mbilog::OutputType GetOutputType(void) const override override;
 
     private:
       std::ofstream m_OutputStream;

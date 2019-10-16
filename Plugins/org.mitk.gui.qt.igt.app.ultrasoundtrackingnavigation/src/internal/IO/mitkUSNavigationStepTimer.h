@@ -85,7 +85,7 @@ public:
 
 protected:
   USNavigationStepTimer();
-  virtual ~USNavigationStepTimer();
+  ~USNavigationStepTimer() override;
 
   struct DurationForIndex {
     unsigned int index;

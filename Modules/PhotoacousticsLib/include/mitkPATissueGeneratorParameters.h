@@ -152,7 +152,7 @@ namespace mitk {
 
     protected:
       TissueGeneratorParameters();
-      ~TissueGeneratorParameters();
+      ~TissueGeneratorParameters() override;
 
     private:
 

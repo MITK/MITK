@@ -77,7 +77,7 @@ public:
     * QmitkUSAbstractCustomWidget::SetDevice() was called.
     */
   QmitkUSControlsCustomDiPhASDeviceWidget();
-  ~QmitkUSControlsCustomDiPhASDeviceWidget();
+  ~QmitkUSControlsCustomDiPhASDeviceWidget() override override;
 
   /**
     * Getter for the device class of mitk:USDiPhASDevice.

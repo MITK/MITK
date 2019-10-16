@@ -77,17 +77,17 @@ protected slots:
 
 public:
   explicit QmitkUSNavigationStepCombinedModality(QWidget *parent = 0);
-  ~QmitkUSNavigationStepCombinedModality();
+  ~QmitkUSNavigationStepCombinedModality() override;
 
-  virtual bool OnStartStep();
-  virtual bool OnRestartStep();
-  virtual bool OnFinishStep();
+  bool OnStartStep() override;
+  bool OnRestartStep() override;
+  bool OnFinishStep() override;
 
-  virtual bool OnActivateStep();
-  virtual void OnUpdate();
+  bool OnActivateStep() override;
+  void OnUpdate() override;
 
-  virtual QString GetTitle();
-  virtual bool GetIsRestartable();
+  QString GetTitle() override;
+  bool GetIsRestartable() override;
 
   mitk::AbstractUltrasoundTrackerDevice::Pointer GetSelectedCombinedModality();
 

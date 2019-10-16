@@ -62,7 +62,7 @@ protected:
    * @see QmitkAbstractView
    *
    */
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part,
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part,
                                   const QList<mitk::DataNode::Pointer> &nodes) override;
   //! [MITK Selection Listener method]
 

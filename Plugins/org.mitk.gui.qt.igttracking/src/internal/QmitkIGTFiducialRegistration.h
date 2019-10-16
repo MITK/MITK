@@ -40,14 +40,14 @@ class QmitkIGTFiducialRegistration : public QmitkAbstractView
 
   public:
 
-    virtual void SetFocus() override;
+    void SetFocus() override;
 
     static const std::string VIEW_ID;
 
-    virtual void CreateQtPartControl(QWidget *parent) override;
+    void CreateQtPartControl(QWidget *parent) override;
 
     QmitkIGTFiducialRegistration();
-    virtual ~QmitkIGTFiducialRegistration();
+    ~QmitkIGTFiducialRegistration() override;
 
   public slots:
 

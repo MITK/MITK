@@ -59,7 +59,7 @@ protected:
   /**
     * \brief The destructor stores combined modalities by calling mitk::USNavigationCombinedModalityPersistence::StoreCurrentDevices().
     */
-  ~USNavigationCombinedModalityPersistence();
+  ~USNavigationCombinedModalityPersistence() override;
 private:
   void OnServiceEvent(const us::ServiceEvent event);
 

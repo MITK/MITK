@@ -35,7 +35,7 @@ class QtObjectTableModel: public QAbstractItemModel
 public:
 
   QtObjectTableModel(QObject* parent = nullptr);
-  ~QtObjectTableModel();
+  ~QtObjectTableModel() override;
 
   QModelIndex index(int row, int column, const QModelIndex& parent =
       QModelIndex()) const override;

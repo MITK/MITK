@@ -39,9 +39,9 @@ public:
   static const std::string VIEW_ID;
 
   QmitkPAUSViewerView();
-  virtual ~QmitkPAUSViewerView();
+  ~QmitkPAUSViewerView() override;
 
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
   void InitWindows();
 
   void SetPADataStorage(mitk::StandaloneDataStorage::Pointer paStore);
@@ -62,9 +62,9 @@ protected:
   mitk::BaseRenderer::Pointer m_PARenderer;
   mitk::BaseRenderer::Pointer m_USRenderer;
 
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>&) override;
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>&) override;
 
   Ui::QmitkPAUSViewerViewControls* m_Controls;
   QmitkPAUSViewerView** m_UltrasoundReference;

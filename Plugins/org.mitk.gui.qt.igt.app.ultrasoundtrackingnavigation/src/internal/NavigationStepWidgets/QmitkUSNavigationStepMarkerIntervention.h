@@ -63,25 +63,25 @@ protected slots:
 
 public:
   explicit QmitkUSNavigationStepMarkerIntervention(QWidget *parent = 0);
-  ~QmitkUSNavigationStepMarkerIntervention();
+  ~QmitkUSNavigationStepMarkerIntervention() override;
 
-  virtual bool OnStartStep();
-  virtual bool OnStopStep();
-  virtual bool OnFinishStep();
+  bool OnStartStep() override;
+  bool OnStopStep() override;
+  bool OnFinishStep() override;
 
-  virtual bool OnActivateStep();
-  virtual bool OnDeactivateStep();
-  virtual void OnUpdate();
+  bool OnActivateStep() override;
+  bool OnDeactivateStep() override;
+  void OnUpdate() override;
 
-  virtual void OnSettingsChanged(const itk::SmartPointer<mitk::DataNode> settingsNode);
+  void OnSettingsChanged(const itk::SmartPointer<mitk::DataNode> settingsNode) override;
 
-  virtual QString GetTitle();
-  virtual bool GetIsRestartable();
+  QString GetTitle() override;
+  bool GetIsRestartable() override;
 
-  virtual FilterVector GetFilter();
+  FilterVector GetFilter() override;
 
 protected:
-  virtual void OnSetCombinedModality();
+  void OnSetCombinedModality() override;
 
   void ClearZones();
   void UpdateTargetCoordinates(mitk::DataNode *);

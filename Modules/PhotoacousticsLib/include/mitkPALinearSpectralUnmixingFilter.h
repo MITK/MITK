@@ -80,7 +80,7 @@ namespace mitk {
 
     protected:
       LinearSpectralUnmixingFilter();
-      virtual ~LinearSpectralUnmixingFilter();
+      ~LinearSpectralUnmixingFilter() override;
  
       /**
       * \brief overrides the baseclass method with a mehtod to calculate the spectral unmixing result vector. Herain the class performs the
@@ -92,7 +92,7 @@ namespace mitk {
       * @throws if the algorithmName is not a member of the enum VigraAlgortihmType
       * @throws if one chooses the ldlt/llt solver which doens't work yet
       */
-      virtual Eigen::VectorXf SpectralUnmixingAlgorithm(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> endmemberMatrix,
+      Eigen::VectorXf SpectralUnmixingAlgorithm(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> endmemberMatrix,
         Eigen::VectorXf inputVector) override;
 
     private:

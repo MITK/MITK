@@ -41,24 +41,24 @@ class QmitkSimpleMeasurement : public QmitkAbstractView, public mitk::IZombieVie
 
 public:
   QmitkSimpleMeasurement();
-  virtual ~QmitkSimpleMeasurement();
+  ~QmitkSimpleMeasurement() override;
 
 private:
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part,
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part,
                                   const QList<mitk::DataNode::Pointer> &nodes) override;
 
-  virtual void NodeRemoved(const mitk::DataNode *node) override;
+  void NodeRemoved(const mitk::DataNode *node) override;
 
-  virtual void Activated() override;
-  virtual void Deactivated() override;
-  virtual void Visible() override;
-  virtual void Hidden() override;
+  void Activated() override;
+  void Deactivated() override;
+  void Visible() override;
+  void Hidden() override;
 
-  virtual void ActivatedZombieView(berry::SmartPointer<berry::IWorkbenchPartReference> zombieView) override;
+  void ActivatedZombieView(berry::SmartPointer<berry::IWorkbenchPartReference> zombieView) override;
 
 private slots:
 

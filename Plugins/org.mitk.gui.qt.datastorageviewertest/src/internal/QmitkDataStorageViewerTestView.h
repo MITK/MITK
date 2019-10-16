@@ -41,9 +41,9 @@ public:
 
 protected:
 
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
-  virtual void CreateQtPartControl(QWidget* parent) override;
+  void CreateQtPartControl(QWidget* parent) override;
 
 private Q_SLOTS:
 

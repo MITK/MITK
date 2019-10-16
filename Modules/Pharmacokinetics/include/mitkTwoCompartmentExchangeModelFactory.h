@@ -33,7 +33,7 @@ namespace mitk
 
     TwoCompartmentExchangeModelFactory();
 
-    virtual ~TwoCompartmentExchangeModelFactory();
+    ~TwoCompartmentExchangeModelFactory() override;
 
   private:
 

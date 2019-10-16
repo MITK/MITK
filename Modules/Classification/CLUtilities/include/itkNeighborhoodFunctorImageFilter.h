@@ -94,12 +94,12 @@ protected:
         m_BoundsCondition = static_cast< ImageBoundaryConditionPointerType >( &m_DefaultBoundaryCondition );
         this->SetNumberOfIndexedOutputs(FunctorType::OutputCount);
     }
-    ~NeighborhoodFunctorImageFilter(){}
+    ~NeighborhoodFunctorImageFilter() override{}
 
-    void BeforeThreadedGenerateData();
+    void BeforeThreadedGenerateData() override;
 
     void ThreadedGenerateData(const OutputImageRegionType & outputRegionForThread,
-                              ThreadIdType threadId);
+                              ThreadIdType threadId) override;
 
 
     /** NeighborhoodFunctorImageFilter needs a larger input requested

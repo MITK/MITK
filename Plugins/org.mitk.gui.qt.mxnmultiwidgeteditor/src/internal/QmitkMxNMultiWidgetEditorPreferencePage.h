@@ -33,7 +33,7 @@ class QmitkMxNMultiWidgetEditorPreferencePage : public QObject, public berry::IQ
 public:
 
   QmitkMxNMultiWidgetEditorPreferencePage();
-  ~QmitkMxNMultiWidgetEditorPreferencePage();
+  ~QmitkMxNMultiWidgetEditorPreferencePage() override;
 
   void Init(berry::IWorkbench::Pointer) override;
   void CreateQtControl(QWidget* parent) override;

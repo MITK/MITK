@@ -49,14 +49,14 @@ public:
   /**
    * Standard destructor.
    */
-  virtual ~DicomView();
+  ~DicomView() override;
 
   /**
    * Creates the view control widgets provided by the QmitkDicomExternalDataWidget class.
    * Widgets associated with unused functionality are being removed and DICOM import and data
    * storage transfer funcionality being connected to the appropriate slots.
    */
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
 protected Q_SLOTS:
 

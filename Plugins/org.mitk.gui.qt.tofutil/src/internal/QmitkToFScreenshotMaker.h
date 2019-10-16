@@ -44,11 +44,11 @@ public:
   static const std::string VIEW_ID;
 
   QmitkToFScreenshotMaker();
-  ~QmitkToFScreenshotMaker();
+  ~QmitkToFScreenshotMaker() override;
 
   void SetFocus() override;
 
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
 
 protected slots:

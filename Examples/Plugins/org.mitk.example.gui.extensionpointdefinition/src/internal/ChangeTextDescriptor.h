@@ -38,7 +38,7 @@ public:
   /**
    * Default destructor
    */
-  ~ChangeTextDescriptor();
+  ~ChangeTextDescriptor() override;
 
   /**
    * Creates an instance of "ChangeText" defined in the descriptor.

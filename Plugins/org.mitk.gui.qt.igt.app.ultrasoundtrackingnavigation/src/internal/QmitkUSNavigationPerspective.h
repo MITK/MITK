@@ -34,7 +34,7 @@ class QmitkUSNavigationPerspective : public QObject, public berry::IPerspectiveF
 public:
   QmitkUSNavigationPerspective();
 
-  virtual void CreateInitialLayout (berry::IPageLayout::Pointer layout);
+  void CreateInitialLayout (berry::IPageLayout::Pointer layout) override;
 };
 
 #endif // QMITKUSNAVIGATIONPERSPECTIVE_H

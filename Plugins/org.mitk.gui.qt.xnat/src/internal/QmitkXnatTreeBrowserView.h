@@ -55,11 +55,11 @@ class QmitkXnatTreeBrowserView : public QmitkAbstractView
 public:
 
   QmitkXnatTreeBrowserView();
-  ~QmitkXnatTreeBrowserView();
+  ~QmitkXnatTreeBrowserView() override;
 
   static const QString VIEW_ID;
 
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
   enum SearchMethod {
     ProjectLevel = 0,
@@ -105,7 +105,7 @@ protected slots:
 
 protected:
 
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
   Ui::QmitkXnatTreeBrowserViewControls m_Controls;
 

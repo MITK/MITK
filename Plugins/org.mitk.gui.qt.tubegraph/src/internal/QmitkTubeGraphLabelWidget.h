@@ -29,7 +29,7 @@ public:
 
   QmitkTubeGraphLabelWidget(QWidget* parent = nullptr);
   //QmitkTubeGraphLabelWidget(QWidget* parent = 0, const char* name = 0, mitk::Color* color = 0 /*TODO*/);
-  virtual ~QmitkTubeGraphLabelWidget();
+  ~QmitkTubeGraphLabelWidget() override;
 
   void SetLabelName(QString name);
   QString GetLabelName();

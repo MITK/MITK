@@ -40,25 +40,25 @@ public:
 
   QmitkFunctionalitySelectionProvider(QmitkFunctionality* _Functionality);
 
-  virtual ~QmitkFunctionalitySelectionProvider();
+  ~QmitkFunctionalitySelectionProvider() override;
 
   //# ISelectionProvider methods
   ///
   /// \see ISelectionProvider::AddSelectionChangedListener()
   ///
-  virtual void AddSelectionChangedListener(berry::ISelectionChangedListener* listener) override;
+  void AddSelectionChangedListener(berry::ISelectionChangedListener* listener) override;
   ///
   /// \see ISelectionProvider::GetSelection()
   ///
-  virtual berry::ISelection::ConstPointer GetSelection() const override;
+  berry::ISelection::ConstPointer GetSelection() const override;
   ///
   /// \see ISelectionProvider::RemoveSelectionChangedListener()
   ///
-  virtual void RemoveSelectionChangedListener(berry::ISelectionChangedListener* listener) override;
+  void RemoveSelectionChangedListener(berry::ISelectionChangedListener* listener) override;
   ///
   /// \see ISelectionProvider::SetSelection()
   ///
-  virtual void SetSelection(const berry::ISelection::ConstPointer& selection) override;
+  void SetSelection(const berry::ISelection::ConstPointer& selection) override;
   ///
   /// Sends the nodes as selected to the workbench
   ///

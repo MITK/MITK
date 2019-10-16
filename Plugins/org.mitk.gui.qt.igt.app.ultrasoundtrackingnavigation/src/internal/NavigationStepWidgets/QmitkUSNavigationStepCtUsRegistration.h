@@ -74,51 +74,51 @@ class QmitkUSNavigationStepCtUsRegistration : public QmitkUSAbstractNavigationSt
 
 public:
   explicit QmitkUSNavigationStepCtUsRegistration(QWidget *parent = 0);
-  ~QmitkUSNavigationStepCtUsRegistration();
+  ~QmitkUSNavigationStepCtUsRegistration() override;
 
   /**
    * \brief Initialization of the data storage nodes.
    * \return always true
    */
-  virtual bool OnStartStep();
+  bool OnStartStep() override;
 
   /**
    * \brief Resets widget and filter and removes nodes from the data storage.
    * \return always true
    */
-  virtual bool OnStopStep();
+  bool OnStopStep() override;
 
   /**
    * \brief There is nothing to be done.
    * \return always true
    */
-  virtual bool OnFinishStep();
+  bool OnFinishStep() override;
 
   /**
    * \brief Selects input for the node displacement filter and emits "ReadyForNextStep" signal.
    * The input selection cannot be done earlier.
    * \return
    */
-  virtual bool OnActivateStep();
+  bool OnActivateStep() override;
 
-  virtual bool OnDeactivateStep();
+  bool OnDeactivateStep() override;
 
   /**
    * \brief Updates the tracking validity status and the combined modality.
    */
-  virtual void OnUpdate();
+  void OnUpdate() override;
 
   /**
    * The property "settings.interaction-concept" is used.
    */
-  virtual void OnSettingsChanged(const itk::SmartPointer<mitk::DataNode> settingsNode);
+  void OnSettingsChanged(const itk::SmartPointer<mitk::DataNode> settingsNode) override;
 
-  virtual QString GetTitle();
+  QString GetTitle() override;
 
   /**
    * @return a node displacement filter for the zone surfaces
    */
-  virtual FilterVector GetFilter();
+  FilterVector GetFilter() override;
 
   void OnCalculateTRE(mitk::Point3D centroidOfTargetInUSImage);
 
@@ -127,7 +127,7 @@ signals:
   void GetCursorPosition();
 
 protected:
-  virtual void OnSetCombinedModality();
+  void OnSetCombinedModality() override;
 
   void UnsetFloatingImageGeometry();
   void SetFloatingImageGeometryInformation(mitk::Image* image);

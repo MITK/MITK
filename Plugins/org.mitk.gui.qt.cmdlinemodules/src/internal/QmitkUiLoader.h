@@ -35,7 +35,7 @@ class QmitkUiLoader : public ctkCmdLineModuleQtUiLoader
 
 public:
   QmitkUiLoader(const mitk::DataStorage* dataStorage, QObject *parent=nullptr);
-  virtual ~QmitkUiLoader();
+  ~QmitkUiLoader() override;
 
   /**
    * \brief Returns the list of available widgets in ctkCmdLineModuleQtGuiLoader and also QmitkDataStorageComboBoxWithSelectNone.
@@ -48,7 +48,7 @@ public:
    * otherwise delegates to base class.
    * \see ctkCmdLineModuleQtGuiLoader::createWidget()
    */
-  virtual QWidget* createWidget(const QString & className, QWidget * parent = nullptr, const QString & name = QString() ) override;
+  QWidget* createWidget(const QString & className, QWidget * parent = nullptr, const QString & name = QString() ) override;
 
 private:
 

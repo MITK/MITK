@@ -34,8 +34,8 @@ namespace mitk
     typedef TModelParameterizer ModelParameterizerType;
 
   protected:
-    virtual ModelParameterizerBase::Pointer DoCreateParameterizer(const modelFit::ModelFitInfo* fit)
-    const
+    ModelParameterizerBase::Pointer DoCreateParameterizer(const modelFit::ModelFitInfo* fit)
+    const override
     {
       mitk::ModelParameterizerBase::Pointer result;
 
@@ -60,7 +60,7 @@ namespace mitk
     {
     };
 
-    virtual ~ConcreteAIFBasedModelFactory()
+    ~ConcreteAIFBasedModelFactory() override
     {
     };
 

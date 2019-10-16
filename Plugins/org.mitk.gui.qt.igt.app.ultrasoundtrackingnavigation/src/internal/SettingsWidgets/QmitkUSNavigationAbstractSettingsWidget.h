@@ -54,7 +54,7 @@ protected slots:
 
 public:
   explicit QmitkUSNavigationAbstractSettingsWidget(QWidget *parent = 0);
-  ~QmitkUSNavigationAbstractSettingsWidget();
+  ~QmitkUSNavigationAbstractSettingsWidget() override;
 
   /**
    * \brief Loads the settings.

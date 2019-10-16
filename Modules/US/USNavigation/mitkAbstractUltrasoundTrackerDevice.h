@@ -228,7 +228,7 @@ namespace mitk {
     AbstractUltrasoundTrackerDevice( USDevice::Pointer usDevice,
                                      itk::SmartPointer<NavigationDataSource> trackingDevice,
                                      bool trackedUltrasoundActive );
-    virtual ~AbstractUltrasoundTrackerDevice();
+    ~AbstractUltrasoundTrackerDevice() override;
 
 
     /**
@@ -236,7 +236,7 @@ namespace mitk {
     * Must be implemented by the derived class.
     * This method is called internally, whenever Update() is invoked by an Output.
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     std::string GetIdentifierForCurrentCalibration();
     std::string GetIdentifierForCurrentProbe();

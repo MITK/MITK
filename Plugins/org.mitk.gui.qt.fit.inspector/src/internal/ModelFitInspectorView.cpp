@@ -210,8 +210,8 @@ void ModelFitInspectorView::OnScaleToDataYClicked()
 {
   auto minmax = this->m_PlotCurves.GetYMinMax();
 
-  auto min = minmax.first - abs(minmax.first) * 0.01;
-  auto max = minmax.second + abs(minmax.second) * 0.01;
+  auto min = minmax.first - std::abs(minmax.first) * 0.01;
+  auto max = minmax.second + std::abs(minmax.second) * 0.01;
 
   m_Controls.sbFixMin->setValue(min);
   m_Controls.sbFixMax->setValue(max);
@@ -221,8 +221,8 @@ void ModelFitInspectorView::OnScaleToDataXClicked()
 {
   auto minmax = this->m_PlotCurves.GetXMinMax();
 
-  auto min = minmax.first - abs(minmax.first) * 0.01;
-  auto max = minmax.second + abs(minmax.second) * 0.01;
+  auto min = minmax.first - std::abs(minmax.first) * 0.01;
+  auto max = minmax.second + std::abs(minmax.second) * 0.01;
 
   m_Controls.sbFixMin_x->setValue(min);
   m_Controls.sbFixMax_x->setValue(max);

@@ -56,7 +56,7 @@ namespace mitk
       return constraints.GetPointer();
     };
 
-    virtual ParametersType GetDefaultInitialParameterization() const
+    ParametersType GetDefaultInitialParameterization() const override
     {
         typename ModelParameterizerType::Pointer modelParameterizer =
           ModelParameterizerType::New();
@@ -70,7 +70,7 @@ namespace mitk
     {
     };
 
-    virtual ~TwoTissueCompartmentModelFactoryBase()
+    ~TwoTissueCompartmentModelFactoryBase() override
     {
     };
 

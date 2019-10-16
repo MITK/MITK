@@ -33,17 +33,17 @@ namespace mitk
     mitkClassMacroItkParent(T2DecayModelFactory, ConcreteModelFactoryBase<T2DecayModel>);
     itkFactorylessNewMacro(Self);
 
-    virtual ParametersType GetDefaultInitialParameterization() const override;
+    ParametersType GetDefaultInitialParameterization() const override;
 
     ConstraintCheckerBase::Pointer CreateDefaultConstraints() const override;
 
   protected:
-    virtual ModelParameterizerBase::Pointer DoCreateParameterizer(const modelFit::ModelFitInfo* fit)
-    const;
+    ModelParameterizerBase::Pointer DoCreateParameterizer(const modelFit::ModelFitInfo* fit)
+    const override;
 
     T2DecayModelFactory();
 
-    virtual ~T2DecayModelFactory();
+    ~T2DecayModelFactory() override;
 
   private:
 

@@ -42,7 +42,7 @@ class CommandLineModulesPreferencesPage : public QObject, public berry::IQtPrefe
 
 public:
   CommandLineModulesPreferencesPage();
-  ~CommandLineModulesPreferencesPage();
+  ~CommandLineModulesPreferencesPage() override;
 
   /**
    * \brief Called by framework to initialise this preference page, but currently does nothing.
@@ -65,17 +65,17 @@ public:
   /**
    * \see IPreferencePage::PerformOk
    */
-  virtual bool PerformOk() override;
+  bool PerformOk() override;
 
   /**
    * \see IPreferencePage::PerformCancel
    */
-  virtual void PerformCancel() override;
+  void PerformCancel() override;
 
   /**
    * \see IPreferencePage::Update
    */
-  virtual void Update() override;
+  void Update() override;
 
 public slots:
 

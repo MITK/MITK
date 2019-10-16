@@ -31,7 +31,7 @@ public:
   explicit QmitkAddNewPropertyDialog(mitk::Annotation::Pointer overlay,
                                      mitk::BaseRenderer::Pointer renderer = nullptr,
                                      QWidget *parent = nullptr);
-  ~QmitkAddNewPropertyDialog();
+  ~QmitkAddNewPropertyDialog() override;
 
 private slots:
   void AddNewProperty();

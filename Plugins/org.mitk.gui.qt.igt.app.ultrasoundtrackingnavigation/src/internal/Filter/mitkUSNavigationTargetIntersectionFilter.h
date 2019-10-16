@@ -77,7 +77,7 @@ public:
 
 protected:
   USNavigationTargetIntersectionFilter();
-  virtual ~USNavigationTargetIntersectionFilter();
+  ~USNavigationTargetIntersectionFilter() override override;
 
   itk::SmartPointer<mitk::Surface> m_TargetSurface;
   vtkSmartPointer<vtkPolyData>     m_TargetSurfaceVtk;

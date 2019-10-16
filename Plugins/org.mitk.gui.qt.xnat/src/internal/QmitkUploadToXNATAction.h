@@ -30,7 +30,7 @@ class XNAT_EXPORT QmitkUploadToXNATAction : public QObject, public mitk::IContex
 public:
 
   QmitkUploadToXNATAction();
-  virtual ~QmitkUploadToXNATAction();
+  ~QmitkUploadToXNATAction() override;
 
   //interface methods
   void Run( const QList<mitk::DataNode::Pointer>& selectedNodes ) override;

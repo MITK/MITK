@@ -96,7 +96,7 @@ namespace mitk
 
   protected:
     SurfaceModifier();
-    ~SurfaceModifier();
+    ~SurfaceModifier() override;
 
     mitk::Point3D PerturbePoint(
       mitk::Point3D point, double varianceX, double varianceY, double varianceZ);

@@ -35,7 +35,7 @@ namespace mitk
     using ModelParameterizerType = Superclass::ModelParameterizerType;
 
     ConstraintCheckerBase::Pointer CreateDefaultConstraints() const override;
-    virtual ParametersType GetDefaultInitialParameterization() const override;
+    ParametersType GetDefaultInitialParameterization() const override;
 
   protected:
 

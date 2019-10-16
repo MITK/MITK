@@ -48,7 +48,7 @@ signals:
 
 public:
   explicit QmitkUSNavigationZoneDistancesWidget(QWidget *parent = 0);
-  ~QmitkUSNavigationZoneDistancesWidget();
+  ~QmitkUSNavigationZoneDistancesWidget() override;
 
   /**
    * \brief Set the key for the data node float property holding the radius of a zone.

@@ -105,7 +105,7 @@ protected slots:
 
 public:
   explicit QmitkUSZoneManagementWidget(QWidget* parent = 0);
-  ~QmitkUSZoneManagementWidget();
+  ~QmitkUSZoneManagementWidget() override;
 
   /**
    * \brief Sets the state machine file for being used by the mitk::USZonesInteractor

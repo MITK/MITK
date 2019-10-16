@@ -44,9 +44,9 @@ public:
   static const std::string VIEW_ID;
 
   QmitkNavigationDataPlayerView();
-  virtual ~QmitkNavigationDataPlayerView();
+  ~QmitkNavigationDataPlayerView() override;
 
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
   void SetFocus() override;
 
   /**

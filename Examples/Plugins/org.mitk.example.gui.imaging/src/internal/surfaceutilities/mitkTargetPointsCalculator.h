@@ -68,7 +68,7 @@ namespace mitk
 
   protected:
     TargetPointsCalculator();
-    ~TargetPointsCalculator();
+    ~TargetPointsCalculator() override;
 
     typedef itk::Image<unsigned char, 3> ImageType;
 

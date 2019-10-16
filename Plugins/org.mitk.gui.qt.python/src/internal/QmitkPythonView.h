@@ -43,19 +43,19 @@ public:
   ///
   /// \brief Standard dtor.
   ///
-  virtual ~QmitkPythonView();
+  ~QmitkPythonView() override;
 
 protected:
 
   ///
   /// \brief Create the view here.
   ///
-  virtual void CreateQtPartControl(QWidget* parent);
+  void CreateQtPartControl(QWidget* parent) override;
 
   ///
   /// focus on load image
   ///
-  void SetFocus();
+  void SetFocus() override;
 
 private:
   QmitkPythonViewData* d;

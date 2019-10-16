@@ -28,7 +28,7 @@ class QmitkTubeGraphLabelGroupWidget : public QWidget
 
 public:
     QmitkTubeGraphLabelGroupWidget(QWidget *parent = nullptr, const char* name = nullptr);
-    virtual ~QmitkTubeGraphLabelGroupWidget();
+    ~QmitkTubeGraphLabelGroupWidget() override;
 
     void SetGroupName(QString name);
     QString GetGroupName();

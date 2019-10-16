@@ -48,7 +48,7 @@ public:
   /**
    * Standard destructor.
    */
-  ~CustomViewerWorkbenchWindowAdvisor();
+  ~CustomViewerWorkbenchWindowAdvisor() override;
 
   /**
    * Customizes the workbench window, i.e. arrange a perspectives tab-bar according to the

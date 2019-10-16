@@ -48,14 +48,14 @@ class QmitkIGTTutorialView : public QmitkAbstractView
   static const std::string VIEW_ID;
 
   QmitkIGTTutorialView();
-  virtual ~QmitkIGTTutorialView();
+  ~QmitkIGTTutorialView() override;
 
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
   /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
 
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
 protected slots:
 

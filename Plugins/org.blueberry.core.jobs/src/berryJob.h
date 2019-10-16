@@ -554,7 +554,7 @@ public:
    * @return <code>true</code> if the job manager should schedule this job
    *   and <code>false</code> otherwise
    */
-  virtual bool ShouldSchedule() override;
+  bool ShouldSchedule() override;
 
   /**
    * Requests that this job be suspended.  If the job is currently waiting to be run, it
@@ -603,7 +603,7 @@ protected:
    * Subclasses may override this method to perform additional work when
    * a cancellation request is made.  This default implementation does nothing.
    */
-  virtual void Canceling() override;
+  void Canceling() override;
 
   /**
    * Executes this job.  Returns the result of the execution.
@@ -631,7 +631,7 @@ protected:
    * @see #ASYNC_FINISH
    * @see #Done(IStatus)
    */
-  virtual IStatus::Pointer Run(IProgressMonitor::Pointer myProgressMonitor) override = 0;
+  IStatus::Pointer Run(IProgressMonitor::Pointer myProgressMonitor) override = 0;
 
 };
 

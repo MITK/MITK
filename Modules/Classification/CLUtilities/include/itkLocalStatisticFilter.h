@@ -24,14 +24,14 @@ namespace itk
 
     protected:
       LocalStatisticFilter();
-      ~LocalStatisticFilter(){};
+      ~LocalStatisticFilter() override{};
 
-      virtual void ThreadedGenerateData(const OutputImageRegionType & outputRegionForThread, ThreadIdType threadId);
-      virtual void BeforeThreadedGenerateData(void);
+      void ThreadedGenerateData(const OutputImageRegionType & outputRegionForThread, ThreadIdType threadId) override;
+      void BeforeThreadedGenerateData(void) override;
 
 
       using itk::ProcessObject::MakeOutput;
-      virtual itk::ProcessObject::DataObjectPointer MakeOutput(itk::ProcessObject::DataObjectPointerArraySizeType /*idx*/) override;
+      itk::ProcessObject::DataObjectPointer MakeOutput(itk::ProcessObject::DataObjectPointerArraySizeType /*idx*/) override;
 
       void CreateOutputImage(InputImagePointer input, OutputImagePointer output);
 

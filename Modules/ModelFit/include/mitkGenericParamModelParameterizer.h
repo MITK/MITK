@@ -56,16 +56,16 @@ namespace mitk
     mitk::ModelBase::FunctionStringType GetFunctionString() const override;
 
     using Superclass::GenerateParameterizedModel;
-    virtual ModelBasePointer GenerateParameterizedModel(const IndexType& currentPosition) const;
+    ModelBasePointer GenerateParameterizedModel(const IndexType& currentPosition) const override;
 
     StaticParameterMapType GetGlobalStaticParameters() const override;
 
-    virtual ParametersType GetDefaultInitialParameterization() const override;
+    ParametersType GetDefaultInitialParameterization() const override;
 
   protected:
 
     GenericParamModelParameterizer();
-    virtual ~GenericParamModelParameterizer();
+    ~GenericParamModelParameterizer() override;
 
     mitk::ModelBase::FunctionStringType m_FunctionString;
 

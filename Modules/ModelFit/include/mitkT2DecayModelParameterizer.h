@@ -49,12 +49,12 @@ namespace mitk
 
     typedef Superclass::IndexType IndexType;
 
-    virtual ParametersType GetDefaultInitialParameterization() const override;
+    ParametersType GetDefaultInitialParameterization() const override;
 
   protected:
     T2DecayModelParameterizer();
 
-    virtual ~T2DecayModelParameterizer();
+    ~T2DecayModelParameterizer() override;
 
   private:
 

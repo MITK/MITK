@@ -43,7 +43,7 @@ protected slots:
 
 public:
   explicit QmitkUSCombinedModalityEditWidget(QWidget *parent = 0);
-  ~QmitkUSCombinedModalityEditWidget();
+  ~QmitkUSCombinedModalityEditWidget() override override;
 
   void SetCombinedModality(mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality);
 

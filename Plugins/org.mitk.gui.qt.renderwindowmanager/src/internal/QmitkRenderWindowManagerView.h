@@ -43,15 +43,15 @@ public:
 
   static const std::string VIEW_ID;
 
-  virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
-  virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
-  virtual void RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart) override;
 
 protected:
 
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
-  virtual void CreateQtPartControl(QWidget* parent) override;
+  void CreateQtPartControl(QWidget* parent) override;
 
 private Q_SLOTS:
 
@@ -75,7 +75,7 @@ private:
   QAbstractItemView* m_InspectorView;
   QmitkDataNodeContextMenu* m_DataNodeContextMenu;
 
-  virtual QItemSelectionModel* GetDataNodeSelectionModel() const override;
+  QItemSelectionModel* GetDataNodeSelectionModel() const override;
 };
 
 #endif // QMITKRENDERWINDOWMANAGERVIEW_H

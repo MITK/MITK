@@ -126,9 +126,9 @@ public:
   static const char *DATANAME_REACHED_TARGETS;
 
   explicit QmitkUSNavigationMarkerPlacement();
-  ~QmitkUSNavigationMarkerPlacement();
+  ~QmitkUSNavigationMarkerPlacement() override override;
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  void CreateQtPartControl(QWidget *parent) override override;
 
   static const std::string VIEW_ID;
 
@@ -138,7 +138,7 @@ protected:
   /**
   * \brief A reinit on the ultrasound image is performed every time the view gets the focus.
   */
-  virtual void SetFocus();
+  void SetFocus() override override;
 
   /**
   * \brief Helper function which performs a reinit on the ultrasound image.

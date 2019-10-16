@@ -75,13 +75,13 @@ void mitk::PhotoacousticBModeFilter::GenerateData()
   if (!m_UseLogFilter)
     for (unsigned int i = 0; i < size; ++i)
     {
-      OutputData[i] = abs(InputData[i]);
+      OutputData[i] = std::abs(InputData[i]);
     }
   else
   {
     for (unsigned int i = 0; i < size; ++i)
     {
-      OutputData[i] = log(abs(InputData[i]));
+      OutputData[i] = log(std::abs(InputData[i]));
     }
   }
 

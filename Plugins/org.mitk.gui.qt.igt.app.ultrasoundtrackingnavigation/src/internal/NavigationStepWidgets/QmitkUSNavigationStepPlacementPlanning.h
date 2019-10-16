@@ -83,23 +83,23 @@ protected slots:
 
 public:
   explicit QmitkUSNavigationStepPlacementPlanning(QWidget *parent = 0);
-  ~QmitkUSNavigationStepPlacementPlanning();
+  ~QmitkUSNavigationStepPlacementPlanning() override;
 
-  virtual QString GetTitle();
-  virtual FilterVector GetFilter();
+  QString GetTitle() override;
+  FilterVector GetFilter() override;
 
 protected:
-  virtual bool OnStartStep();
-  virtual bool OnStopStep();
-  virtual bool OnRestartStep();
-  virtual bool OnFinishStep();
+  bool OnStartStep() override;
+  bool OnStopStep() override;
+  bool OnRestartStep() override;
+  bool OnFinishStep() override;
 
-  virtual bool OnActivateStep();
-  virtual bool OnDeactivateStep();
-  virtual void OnUpdate();
+  bool OnActivateStep() override;
+  bool OnDeactivateStep() override;
+  void OnUpdate() override;
 
-  virtual void OnSettingsChanged(const itk::SmartPointer<mitk::DataNode> settingsNode);
-  virtual void OnSetCombinedModality();
+  void OnSettingsChanged(const itk::SmartPointer<mitk::DataNode> settingsNode) override;
+  void OnSetCombinedModality() override;
 
   void CreateTargetNodesIfNecessary();
   void UpdateTargetCoordinates(mitk::DataNode *);

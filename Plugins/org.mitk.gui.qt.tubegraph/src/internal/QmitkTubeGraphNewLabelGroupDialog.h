@@ -39,7 +39,7 @@ class QmitkTubeGraphNewLabelGroupDialog : public QDialog
 public:
 
   QmitkTubeGraphNewLabelGroupDialog(QWidget* parent = nullptr);
-  virtual ~QmitkTubeGraphNewLabelGroupDialog();
+  ~QmitkTubeGraphNewLabelGroupDialog() override;
 
   mitk::TubeGraphProperty::LabelGroup* GetLabelGroup();
 

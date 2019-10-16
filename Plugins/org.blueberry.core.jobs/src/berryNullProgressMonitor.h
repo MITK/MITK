@@ -52,7 +52,7 @@ public:
    *
    * @see IProgressMonitor#BeginTask(std::string, int)
    */
-  virtual void BeginTask(const std::string& name, int totalWork) override;
+  void BeginTask(const std::string& name, int totalWork) override;
 
   /**
    * This implementation does nothing.
@@ -61,7 +61,7 @@ public:
    *
    * @see IProgressMonitor#Done()
    */
-  virtual void Done() override;
+  void Done() override;
 
   /**
    * This implementation does nothing.
@@ -69,7 +69,7 @@ public:
    *
    * @see IProgressMonitor#InternalWorked(double)
    */
-  virtual void InternalWorked(double work) override;
+  void InternalWorked(double work) override;
 
   /**
    * This implementation returns the value of the internal
@@ -80,7 +80,7 @@ public:
    * @see IProgressMonitor#IsCanceled()
    * @see IProgressMonitor#SetCanceled(bool)
    */
-  virtual bool IsCanceled() override;
+  bool IsCanceled() override;
 
   /**
    * This implementation sets the value of an internal state variable.
@@ -90,7 +90,7 @@ public:
    * @see IProgressMonitor#IsCanceled()
    * @see IProgressMonitor#SetCanceled(bool)
    */
-  virtual void SetCanceled(bool cancelled) override;
+  void SetCanceled(bool cancelled) override;
 
   /**
    * This implementation does nothing.
@@ -99,7 +99,7 @@ public:
    *
    * @see IProgressMonitor#SetTaskName(const std::string&)
    */
-  virtual void SetTaskName(const std::string& name) override;
+  void SetTaskName(const std::string& name) override;
 
   /**
    * This implementation does nothing.
@@ -108,7 +108,7 @@ public:
    *
    * @see IProgressMonitor#SubTask(const std::string&)
    */
-  virtual void SubTask(const std::string& name) override;
+  void SubTask(const std::string& name) override;
 
   /**
    * This implementation does nothing.
@@ -117,7 +117,7 @@ public:
    *
    * @see IProgressMonitor#Worked(int)
    */
-  virtual void Worked(int work) override;
+  void Worked(int work) override;
 
 private:
 

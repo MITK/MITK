@@ -32,11 +32,11 @@ namespace mitk
 
   protected:
 
-    ModelParameterizerBase::Pointer DoCreateParameterizer(const modelFit::ModelFitInfo* fit) const;
+    ModelParameterizerBase::Pointer DoCreateParameterizer(const modelFit::ModelFitInfo* fit) const override;
 
     NumericTwoCompartmentExchangeModelFactory();
 
-    virtual ~NumericTwoCompartmentExchangeModelFactory();
+    ~NumericTwoCompartmentExchangeModelFactory() override;
 
   private:
 

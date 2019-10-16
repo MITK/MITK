@@ -43,14 +43,14 @@ public:
   /*!
   \brief default destructor
   */
-  virtual ~QmitkRadiomicsArithmetric();
+  ~QmitkRadiomicsArithmetric() override;
 
   /*!
   \brief method for creating the widget containing the application controls, like sliders, buttons etc.
   */
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
   /*!
   \brief method for creating the connections of main and control widget
@@ -60,7 +60,7 @@ public:
   /*!
   \brief Invoked when the DataManager selection changed
   */
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
 
   protected slots:

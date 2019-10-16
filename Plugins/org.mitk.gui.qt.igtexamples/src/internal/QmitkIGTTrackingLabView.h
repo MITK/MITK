@@ -69,11 +69,11 @@ QmitkIGTTrackingLabView();
 /**
 \brief default destructor
 */
-virtual ~QmitkIGTTrackingLabView();
+~QmitkIGTTrackingLabView() override;
 
-virtual void CreateQtPartControl(QWidget *parent) override;
+void CreateQtPartControl(QWidget *parent) override;
 
-virtual void SetFocus() override;
+void SetFocus() override;
 
 protected slots:
 

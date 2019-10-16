@@ -95,15 +95,15 @@ public:
   void ChangedSOSBeamforming();
 
 protected:
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
   /** \brief called by QmitkFunctionality when DataManager's selection has changed.
   *  On a change some parameters are internally updated to calculate bounds for GUI elements as the slice selector for beamforming or
   *  the bandpass filter settings.
   */
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
     const QList<mitk::DataNode::Pointer>& nodes) override;
 
   /** \brief Instance of the GUI controls

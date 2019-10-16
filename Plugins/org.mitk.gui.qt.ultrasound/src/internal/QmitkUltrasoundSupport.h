@@ -53,14 +53,14 @@ class QmitkUltrasoundSupport : public QmitkAbstractView
 
 public:
 
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
   static const std::string VIEW_ID;
 
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
   QmitkUltrasoundSupport();
-  virtual ~QmitkUltrasoundSupport();
+  ~QmitkUltrasoundSupport() override;
 
   public slots:
   /*

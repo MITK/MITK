@@ -37,7 +37,7 @@ class QmitkCmdLineModuleMenuComboBox : public ctkMenuComboBox {
 public:
 
   QmitkCmdLineModuleMenuComboBox(QWidget* parent = nullptr);
-  virtual ~QmitkCmdLineModuleMenuComboBox();
+  ~QmitkCmdLineModuleMenuComboBox() override;
 
   /**
    * \brief Inject the module manager, so that this widget can

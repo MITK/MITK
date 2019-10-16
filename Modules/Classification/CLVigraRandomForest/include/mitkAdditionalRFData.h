@@ -17,16 +17,16 @@ namespace mitk
   class NoRFData : public AdditionalRFDataAbstract
   {
   public:
-    virtual void NoFunction() { return; }
-    virtual ~NoRFData() {};
+    void NoFunction() override { return; }
+    ~NoRFData() override {};
   };
 
   class PURFData : public AdditionalRFDataAbstract
   {
   public:
     vigra::ArrayVector<double> m_Kappa;
-    virtual void NoFunction();
-    virtual ~PURFData() {};
+    void NoFunction() override;
+    ~PURFData() override {};
   };
 }
 

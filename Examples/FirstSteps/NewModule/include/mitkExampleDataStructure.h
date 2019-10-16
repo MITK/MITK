@@ -33,11 +33,11 @@ namespace mitk
   {
   public:
     // virtual methods that need to be implemented
-    virtual void UpdateOutputInformation() override;
-    virtual void SetRequestedRegionToLargestPossibleRegion() override;
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
-    virtual bool VerifyRequestedRegion() override;
-    virtual void SetRequestedRegion(const itk::DataObject *) override;
+    void UpdateOutputInformation() override;
+    void SetRequestedRegionToLargestPossibleRegion() override;
+    bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
+    bool VerifyRequestedRegion() override;
+    void SetRequestedRegion(const itk::DataObject *) override;
 
     // Macros
     mitkClassMacro(ExampleDataStructure, BaseData);
@@ -63,7 +63,7 @@ namespace mitk
 
   protected:
     ExampleDataStructure();
-    virtual ~ExampleDataStructure();
+    ~ExampleDataStructure() override;
 
     // this string is the data stored in this example data structure
     std::string m_Data;

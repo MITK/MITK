@@ -53,7 +53,7 @@ class QmitkCESTStatisticsView : public QmitkAbstractView, public mitk::IRenderWi
     QmitkCESTStatisticsView(QObject *parent = nullptr, const char *name = nullptr);
     /*!
     \brief default destructor */
-    virtual ~QmitkCESTStatisticsView();
+    ~QmitkCESTStatisticsView() override;
 
   protected slots:
 
@@ -74,15 +74,15 @@ class QmitkCESTStatisticsView : public QmitkAbstractView, public mitk::IRenderWi
 
   protected:
 
-    virtual void CreateQtPartControl(QWidget *parent) override;
+    void CreateQtPartControl(QWidget *parent) override;
 
-    virtual void SetFocus() override;
+    void SetFocus() override;
 
-    virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart);
-    virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart);
+    void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+    void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
 
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
-    virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
+    void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
                                      const QList<mitk::DataNode::Pointer>& nodes ) override;
 
     /// parse string and set data vector returns true if succesfull

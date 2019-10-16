@@ -43,7 +43,7 @@ namespace mitk {
 
     protected:
       VesselDrawer();
-      virtual ~VesselDrawer();
+      ~VesselDrawer() override;
 
     private:
     };

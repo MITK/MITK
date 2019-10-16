@@ -39,14 +39,14 @@ namespace mitk
 		 *					first loaded.
 		 *	@param context	The corresponding CTK plug-in context in which the plug-in is loaded.
 		 */
-		void start(ctkPluginContext* context);
+		void start(ctkPluginContext* context) override;
 
 		/*!
 		 *	@brief			Deregisters the plug-in. Gets called by the framework when the plug-in
 		 *					is unloaded.
 		 *	@param context	The corresponding CTK plug-in context in which the plug-in was loaded.
 		 */
-		void stop(ctkPluginContext* context);
+		void stop(ctkPluginContext* context) override;
 	};
 }
 

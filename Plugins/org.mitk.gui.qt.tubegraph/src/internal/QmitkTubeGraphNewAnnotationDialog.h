@@ -32,7 +32,7 @@ class QmitkTubeGraphNewAnnotationDialog : public QDialog
 public:
 
   QmitkTubeGraphNewAnnotationDialog(QWidget* parent = nullptr);
-  virtual ~QmitkTubeGraphNewAnnotationDialog();
+  ~QmitkTubeGraphNewAnnotationDialog() override;
 
   QString GetAnnotationName();
   QString GetAnnotationDescription();

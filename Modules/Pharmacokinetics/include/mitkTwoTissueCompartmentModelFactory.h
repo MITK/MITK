@@ -36,7 +36,7 @@ namespace mitk
 
     TwoTissueCompartmentModelFactory();
 
-    virtual ~TwoTissueCompartmentModelFactory();
+    ~TwoTissueCompartmentModelFactory() override;
 
   private:
 

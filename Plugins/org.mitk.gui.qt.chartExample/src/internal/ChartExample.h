@@ -37,11 +37,11 @@ public:
   static const std::string VIEW_ID;
 
 protected:
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
   void CreateConnectionsForGUIElements();
 
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
   void CreateChart();
   void UpdateChart();

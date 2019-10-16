@@ -59,7 +59,7 @@ class QmitkUSControlsCustomVideoDeviceWidget : public QmitkUSAbstractCustomWidge
 public:
 
   QmitkUSControlsCustomVideoDeviceWidget();
-  ~QmitkUSControlsCustomVideoDeviceWidget();
+  ~QmitkUSControlsCustomVideoDeviceWidget() override override;
 
   /**
     * Getter for the device class of mitk:USVideoDevice.

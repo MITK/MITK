@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QSet>
+#include <QString>
 
 // ITK
 #include <itksys/SystemTools.hxx>
@@ -74,7 +75,43 @@ struct QmitkIOUtil::Impl
       }
     }
   };
-};
+
+  //! Filename characters that are not valid - depending on the platform (Windows, Posix)
+  static QString s_InvalidFilenameCharacters;
+
+  //! Return 'true' when:
+  //!  - the specified filename contains characters not accepted by the file system (see s_InvalidFilenameCharacters)
+  //!  - filename starts or ends in space characters
+  //!
+  //! This test is not exhaustive but just excluding the most common problems.
+  static bool IsIllegalFilename(const QString &fullFilename)
+  {
+    QFileInfo fi(fullFilename);
+    auto filename = fi.fileName();
+
+    for (const auto &ch : s_InvalidFilenameCharacters)
+    {
+      if (filename.contains(ch))
+      {
+        return true;
+      }
+    }
+
+    if (filename.startsWith(' ' || filename.endsWith(' ')))
+    {
+      return true;
+    }
+
+    return false;
+  }
+
+}; // Impl
+
+#if defined(_WIN32) || defined(_WIN64)
+  QString QmitkIOUtil::Impl::s_InvalidFilenameCharacters = "<>:\"/\\|?*";
+#else
+  QString QmitkIOUtil::Impl::s_InvalidFilenameCharacters = "/";
+#endif
 
 struct MimeTypeComparison : public std::unary_function<mitk::MimeType, bool>
 {
@@ -244,6 +281,17 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData *> &data,
 
     // Ask the user for a file name
     QString nextName = QFileDialog::getSaveFileName(parent, dialogTitle, fileName, filterString, &selectedFilter);
+
+    if (Impl::IsIllegalFilename(nextName))
+    {
+      QMessageBox::warning(
+        parent,
+        "Saving not possible",
+        QString("File \"%2\" contains invalid characters.\n\nPlease avoid any of \"%1\"")
+          .arg(Impl::s_InvalidFilenameCharacters.split("", QString::SkipEmptyParts).join(" "))
+          .arg(nextName));
+      continue;
+    }
 
     if (nextName.isEmpty())
     {

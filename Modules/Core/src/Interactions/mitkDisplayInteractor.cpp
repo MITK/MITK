@@ -524,13 +524,6 @@ void mitk::DisplayInteractor::SetCrosshair(mitk::StateMachineAction *, mitk::Int
       BaseRenderer::GetInstance(renWin)->GetSliceNavigationController()->SelectSliceByPoint(pos);
     }
   }
-
-  // TODO: Get crosshair manager, which is not available in MitkCore
-  //if (crosshairManager->getShowPlanesIn3D()) {
-  RenderingManager::GetInstance()->RequestUpdateAll();
-  //} else {
-  //  RenderingManager::GetInstance()->RequestUpdateAll(RenderingManager::RequestType::REQUEST_UPDATE_2DWINDOWS);
-  //}
 }
 
 void mitk::DisplayInteractor::Zoom(StateMachineAction*, InteractionEvent* interactionEvent)

@@ -404,7 +404,14 @@ void mitkCrosshairManager::updateCrosshairsPositions()
   // Only recreate point mode
   if (m_CrosshairMode != CrosshairMode::POINT) {
     for (auto& window : m_ManagedWindows) {
-      window->GetRenderer()->RequestUpdate();
+      if (mitk::BaseRenderer::GetInstance(window->GetVtkRenderWindow())->GetMapperID() == mitk::BaseRenderer::Standard2D) {
+        window->GetRenderer()->RequestUpdate();
+        continue;
+      }
+      
+      if (m_ShowPlanesIn3d) {
+        window->GetRenderer()->RequestUpdate();
+      }
     }
     return;
   }

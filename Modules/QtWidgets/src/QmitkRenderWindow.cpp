@@ -98,6 +98,7 @@ bool QmitkRenderWindow::event(QEvent* e)
     case QEvent::MouseMove:
     {
       auto me = static_cast<QMouseEvent *>(e);
+      this->AdjustRenderWindowMenuVisibility(me->pos());
       mitkEvent = mitk::MouseMoveEvent::New(m_Renderer, GetMousePosition(me), GetButtonState(me), GetModifiers(me));
       break;
     }

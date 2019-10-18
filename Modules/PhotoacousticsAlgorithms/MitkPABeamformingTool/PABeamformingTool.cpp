@@ -185,17 +185,25 @@ void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSetti
         continue;
 
       float SpeedOfSound = std::stof(elem->Attribute("speedOfSoundMeterPerSecond"));
-      float PitchMilliMeter = std::stof(elem->Attribute("pitchMilliMeter"));
+      float PitchMeter = std::stof(elem->Attribute("pitchMilliMeter"))/1000;
       float TimeSpacingMicroSecond = (float)(input.inputImage->GetGeometry()->GetSpacing()[1] / 1000000);
-      if (std::stof(elem->Attribute("timeSpacingMicroSecond")) > 0)
+
+      if (std::stof(elem->Attribute("timeSpacingMicroSecond")) > 0) {
         TimeSpacingMicroSecond = std::stof(elem->Attribute("timeSpacingMicroSecond"));
+        MITK_INFO << "TIME: " << TimeSpacingMicroSecond;
+      }
 
       float Angle = std::stof(elem->Attribute("apodizationAngle"));
       bool IsPhotoacousticImage = true;
-      if (elem->Attribute("imageType") == "US")
+      if (elem->Attribute("imageType") == "US") {
         IsPhotoacousticImage = false;
+        MITK_INFO << "US IMAGE";
+      }
+
       unsigned int SamplesPerLine = std::stoi(elem->Attribute("reconstructedYDimension"));
       unsigned int ReconstructionLines = std::stoi(elem->Attribute("reconstructedXDimension"));
+
+
       float ReconstructionDepth = std::stof(elem->Attribute("reconstructionDepthMeter"));
       bool UseGPU = std::stoi(elem->Attribute("useGPU"));
       unsigned int GPUBatchSize = std::stoi(elem->Attribute("GPUBatchSize"));
@@ -220,7 +228,7 @@ void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSetti
       else
         mitkThrow() << "geometry incorrectly defined in settings";
 
-      float radius = std::stof(elem->Attribute("radiusMilliMeter"));
+      float radius = std::stof(elem->Attribute("radiusMilliMeter"))/1000;
 
       unsigned int ApodizationArraySize = ReconstructionLines;
 
@@ -236,7 +244,7 @@ void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSetti
         mitkThrow() << "Beamforming algorithm incorrectly defined in settings";
 
       *bfSet = mitk::BeamformingSettings::New(
-        PitchMilliMeter,
+        PitchMeter,
         SpeedOfSound,
         TimeSpacingMicroSecond,
         Angle,

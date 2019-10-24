@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkITKImageImport.h>
 #include <mitkImageToContourModelFilter.h>
-#include <mitkImagePixelReadAccessor.h>
 
 #include <itkBinaryFillholeImageFilter.h>
 #include <itkConnectedThresholdImageFilter.h>

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImage.h"
 #include "mitkIOMimeTypes.h"
-#include "mitkImageVtkReadAccessor.h"
+#include "mitkImageVtkAccessor.h"
 
 #include <vtkXMLImageDataReader.h>
 #include <vtkXMLImageDataWriter.h>
@@ -116,8 +116,9 @@ void ImageVtkXmlIO::Write()
     writer->SetFileName(this->GetOutputLocation().c_str());
   }
 
-  ImageVtkReadAccessor vtkReadAccessor(Image::ConstPointer(input), NULL, input->GetVtkImageData());
-  writer->SetInputData(const_cast<vtkImageData*>(vtkReadAccessor.GetVtkImageData()));
+  ImageVtkAccessor accessor(Image::Pointer(const_cast<Image*>(input)));
+  ImageAccessLock lock(&accessor);
+  writer->SetInputData(accessor.getVtkImageData());
 
   if (writer->Write() == 0 || writer->GetErrorCode() != 0 )
   {

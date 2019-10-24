@@ -26,8 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMersenneTwisterRandomVariateGenerator.h>
 #include <mitkToFCompositeFilter.h>
 #include <itkMedianImageFilter.h>
-#include <mitkImagePixelReadAccessor.h>
-
+#include <mitkImageRegionAccessor.h>
 
 /**Documentation
 *  \brief test for the class "ToFCompositeFilter".
@@ -84,11 +83,11 @@ static bool ApplyTemporalMedianFilter(mitk::Image::Pointer& image, ItkImageType_
       curIdx3D[0] = i; curIdx3D[1] = j;
       curIdx2D[0] = i; curIdx2D[1] = j;
       //gather all distances for one pixel
-      mitk::ImagePixelReadAccessor<ToFScalarType,3> imageAcces(image, image->GetVolumeData());
+      mitk::ImageRegionAccessor imageAcces(image);
       for(unsigned int k = 0; k < nbSlices; k++)
       {
         curIdx3D[2] = k;
-        allDistances.push_back(imageAcces.GetPixelByIndex(curIdx3D));
+        allDistances.push_back(*(ToFScalarType*)imageAcces.getPixel(curIdx3D));
       }
 
       //sort distances and compute median

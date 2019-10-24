@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataNode.h>
 #include <mitkProperties.h>
 #include <mitkColorProperty.h>
+#include <mitkImageVtkAccessor.h>
 #include <mitkLookupTableProperty.h>
 #include <mitkVtkRepresentationProperty.h>
 #include <mitkVtkInterpolationProperty.h>
@@ -355,15 +356,17 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer,
       MITK_WARN << "3D Textures are not supported by VTK and MITK. The first slice of the volume will be used instead!";
       mitk::ImageSliceSelector::Pointer sliceselector = mitk::ImageSliceSelector::New();
       sliceselector->SetSliceNr(0);
-      sliceselector->SetChannelNr(0);
       sliceselector->SetTimeNr(0);
       sliceselector->SetInput(miktTexture);
       sliceselector->Update();
-      vtkTxture->SetInputData(sliceselector->GetOutput()->GetVtkImageData());
+      Image::Pointer slice = sliceselector->GetOutput();
+      ImageVtkAccessor accessor(slice);
+      vtkTxture->SetInputData(accessor.getVtkImageData());
     }
     else //or just use the 2D image
     {
-      vtkTxture->SetInputData(miktTexture->GetVtkImageData());
+      ImageVtkAccessor accessor(miktTexture);
+      vtkTxture->SetInputData(accessor.getVtkImageData());
     }
     //pass the texture to the actor
     ls->m_Actor->SetTexture(vtkTxture);

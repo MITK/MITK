@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkITKImageImport.h>
 #include <mitkImageCast.h>
 #include <mitkImageAccessByItk.h>
+#include <mitkImageVtkAccessor.h>
 
 // ITK
 #include <itkLabelStatisticsImageFilter.h>
@@ -126,9 +127,13 @@ mitk::GIFVolumetricStatistics::FeatureListType mitk::GIFVolumetricStatistics::Ca
 
   vtkSmartPointer<vtkImageMarchingCubes> mesher = vtkSmartPointer<vtkImageMarchingCubes>::New();
   vtkSmartPointer<vtkMassProperties> stats = vtkSmartPointer<vtkMassProperties>::New();
-  mesher->SetInputData(mask->GetVtkImageData());
-  stats->SetInputConnection(mesher->GetOutputPort());
-  stats->Update();
+  mitk::ImageVtkAccessor accessor(mask);
+  {
+    mitk::ImageAccessLock lock(&accessor);
+    mesher->SetInputData(accessor.getVtkImageData());
+    stats->SetInputConnection(mesher->GetOutputPort());
+    stats->Update();
+  }
 
   double pi = vnl_math::pi;
 

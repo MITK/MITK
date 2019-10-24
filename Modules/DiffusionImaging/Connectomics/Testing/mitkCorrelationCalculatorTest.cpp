@@ -24,9 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK includes
 #include "mitkCorrelationCalculator.h"
 #include <mitkImage.h>
-#include <mitkImagePixelWriteAccessor.h>
 #include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
+#include <mitkImageRegionAccessor.h>
 
 // VTK includes
 #include <vtkDebugLeaks.h>
@@ -126,7 +126,7 @@ public:
       }
     }
 
-    mitk::ImagePixelWriteAccessor<int,4> writeAccess( tsTestImage );
+    mitk::ImageRegionAccessor writeAccess (tsTestImage);
 
     //fill time series image with similar time series in each parcel
     for( int loop(0); loop < 270; ++loop)
@@ -144,15 +144,15 @@ public:
 
       if( mitk::Equal(parcellationTestImage->GetPixel(parcellationIndex), 1) )
       {
-        writeAccess.SetPixelByIndex(timeSeriesIndex, 1 + loop);
+        *(int*)writeAccess.getPixel(timeSeriesIndex) = 1 + loop;
       }
       else if( mitk::Equal(parcellationTestImage->GetPixel(parcellationIndex), 2) )
       {
-        writeAccess.SetPixelByIndex(timeSeriesIndex, 1 + (loop % 13 - loop % 11) );
+        *(int*)writeAccess.getPixel(timeSeriesIndex) = 1 + (loop % 13 - loop % 11);
       }
       else
       {
-        writeAccess.SetPixelByIndex(timeSeriesIndex, 1 + ( loop - loop % 2) );
+        *(int*)writeAccess.getPixel(timeSeriesIndex) = 1 + (loop - loop % 2);
       }
     }
 

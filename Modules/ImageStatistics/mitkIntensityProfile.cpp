@@ -19,8 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkPolyLineParametricPath.h>
 #include <itkWindowedSincInterpolateImageFunction.h>
 #include <mitkImageAccessByItk.h>
-#include <mitkImagePixelReadAccessor.h>
 #include <mitkPixelTypeMultiplex.h>
+#include <mitkImageVtkAccessor.h>
 #include "mitkIntensityProfile.h"
 
 using namespace mitk;
@@ -32,15 +32,13 @@ static void ReadPixel(const PixelType&, Image::Pointer image, const itk::Index<3
   {
   case 2:
     {
-      ImagePixelReadAccessor<T, 2> readAccess(image, image->GetSliceData(0));
-      *returnValue = readAccess.GetPixelByIndex(reinterpret_cast<const itk::Index<2>&>(index));
+      *returnValue = mitk::UnlockedSinglePixelAccess(image, index, 0);
       break;
     }
 
   case 3:
     {
-      ImagePixelReadAccessor<T, 3> readAccess(image, image->GetVolumeData(0));
-      *returnValue = readAccess.GetPixelByIndex(index);
+      *returnValue = mitk::UnlockedSinglePixelAccess(image, index, 0);
       break;
     }
 

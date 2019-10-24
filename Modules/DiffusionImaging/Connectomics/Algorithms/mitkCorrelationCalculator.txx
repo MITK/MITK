@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLog.h>
 #include <mitkImageCast.h>
 #include <mitkImageAccessByItk.h>
-#include <mitkImagePixelReadAccessor.h>
+#include <mitkImageRegionAccessor.h>
 
 #include <itkImageRegionConstIteratorWithIndex.h>
 
@@ -122,7 +122,7 @@ void mitk::CorrelationCalculator<T>::DoWholeCorrelation(  )
       one.resize(numberOfSteps);
       two.resize(numberOfSteps);
 
-      mitk::ImagePixelReadAccessor<T, 4> readAccess(m_TimeSeriesImage);
+      mitk::ImageRegionAccessor readAccess(m_TimeSeriesImage);
 
       itk::Index<4> idx_i;
       itk::Index<4> idx_j;
@@ -139,8 +139,8 @@ void mitk::CorrelationCalculator<T>::DoWholeCorrelation(  )
       {
         idx_i[3] = timestep;
         idx_j[3] = timestep;
-        one[timestep] = readAccess.GetPixelByIndex(idx_i);
-        two[timestep] = readAccess.GetPixelByIndex(idx_j);
+        one[timestep] = *(T*)readAccess.getPixel(idx_i);
+        two[timestep] = *(T*)readAccess.getPixel(idx_j);
       }
 
       m_CorrelationMatrix[i][j] = mitk::CorrelationCalculator<T>::CalculatePearsonCorrelationCoefficient( one, two );
@@ -290,8 +290,8 @@ void mitk::CorrelationCalculator<T>::ExtractAllAverageTimeSeries( itk::Image<TPi
     mitk::Point3D tempPoint;
 
     m_TimeSeriesImage->GetGeometry()->IndexToWorld( itkIndex3D, tempPoint );
-    mitk::ImagePixelReadAccessor<int, 3> readAccess(m_ParcellationImage);
-    int value( std::floor( readAccess.GetPixelByWorldCoordinates( tempPoint ) + 0.5 ) );
+    mitk::ImageRegionAccessor readAccess(m_ParcellationImage);
+    int value( std::floor( *(int*)readAccess.getPixel(itkIndex3D) + 0.5 ) );
 
     if(storage.count(value) == 0)
     {

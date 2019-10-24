@@ -44,9 +44,6 @@ class MITKCORE_EXPORT ImageSliceSelector : public SubImageSelector
   itkGetConstMacro(TimeNr,int);
   itkSetMacro(TimeNr,int);
 
-  itkGetConstMacro(ChannelNr,int);
-  itkSetMacro(ChannelNr,int);
-
 protected:
   virtual void GenerateOutputInformation() override;
 
@@ -61,9 +58,6 @@ protected:
   int m_SliceNr;
 
   int m_TimeNr;
-
-  int m_ChannelNr;
-
 };
 
 } // namespace mitk

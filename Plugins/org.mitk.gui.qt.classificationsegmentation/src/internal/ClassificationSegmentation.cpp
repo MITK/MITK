@@ -763,8 +763,7 @@ mitk::DataNode::Pointer ClassificationSegmentation::AddAsDataNode(const mitk::Ba
     {
       mitk::Image::Pointer target_image = dynamic_cast<mitk::Image*>(node->GetData());
       mitk::Image::Pointer source_image = dynamic_cast<mitk::Image*>(data_.GetPointer());
-      mitk::ImageReadAccessor ra(source_image);
-      target_image->SetImportVolume(const_cast<void *>(ra.GetData()));
+      target_image->SetImportVolume(const_cast<void *>(source_image->GetVolumeData()->GetData()));
       this->RequestRenderWindowUpdate();
     }
 

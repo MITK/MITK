@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkMatrix4x4.h>
 
 #include <mitkImageAccessByItk.h>
+#include <mitkImageVtkAccessor.h>
 #include <mitkInstantiateAccessFunctions.h>
 #include <itkImageRegionIterator.h>
 #include <itkNumericTraits.h>
@@ -154,9 +155,10 @@ void mitk::LabeledImageToSurfaceFilter::GenerateData()
     int tstart=outputRegion.GetIndex(3);
     int tmax=tstart+outputRegion.GetSize(3); //GetSize()==1 - will aber 0 haben, wenn nicht zeitaufgeloet
     int t;
-    for( t=tstart; t < tmax; ++t)
-    {
-      vtkImageData *vtkimagedata =  image->GetVtkImageData( t );
+    mitk::ImageVtkAccessor accessor(image);
+    mitk::ImageAccessLock lock(&accessor);
+    for(t=tstart; t < tmax; ++t) {
+      vtkImageData *vtkimagedata =  accessor.getVtkImageData(t);
       CreateSurface( t,vtkimagedata,surface.GetPointer(), it->first );
     }
     m_IdxToLabels[ currentOutputIndex ] = it->first;

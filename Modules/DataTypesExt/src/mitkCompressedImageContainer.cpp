@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkCompressedImageContainer.h"
-#include "mitkImageReadAccessor.h"
+#include "mitkImageRegionAccessor.h"
 
 #include "itk_zlib.h"
 
@@ -76,6 +76,8 @@ void mitk::CompressedImageContainer::SetImage( Image* image )
     m_NumberOfTimeSteps = image->GetDimension(3);
   }
 
+  ImageRegionAccessor imgAcc(image);
+  ImageAccessLock lock(&imgAcc);
   for (unsigned int timestep = 0; timestep < m_NumberOfTimeSteps; ++timestep)
   {
     // allocate a buffer as specified by zlib
@@ -89,10 +91,9 @@ void mitk::CompressedImageContainer::SetImage( Image* image )
                << "Attempting to compress " << m_OneTimeStepImageSizeInBytes << " image bytes into a buffer of size " << bufferSize << std::endl;
     }
 
-    ImageReadAccessor imgAcc(image, image->GetVolumeData(timestep));
     ::Bytef* dest(byteBuffer);
     ::uLongf destLen(bufferSize);
-    ::Bytef* source( (unsigned char*) imgAcc.GetData() );
+    ::Bytef* source( (unsigned char*)imgAcc.getData(timestep));
     ::uLongf sourceLen( m_OneTimeStepImageSizeInBytes );
     int zlibRetVal = ::compress(dest, &destLen, source, sourceLen);
     if (itk::Object::GetDebug())
@@ -139,13 +140,14 @@ mitk::Image::Pointer mitk::CompressedImageContainer::GetImage()
 
   image->Initialize( *m_PixelType, m_ImageDimension, dims ); // this IS needed, right ?? But it does allocate memory -> does create one big lump of memory (also in windows)
 
+  ImageRegionAccessor imgAcc(image);
+  ImageAccessLock lock(&imgAcc);
   unsigned int timeStep(0);
   for (auto iter = m_ByteBuffers.begin();
        iter != m_ByteBuffers.end();
        ++iter, ++timeStep)
   {
-    ImageReadAccessor imgAcc(image, image->GetVolumeData(timeStep));
-    ::Bytef* dest( (unsigned char*) imgAcc.GetData() );
+    ::Bytef* dest( (unsigned char*)imgAcc.getData(timeStep));
     ::uLongf destLen(m_OneTimeStepImageSizeInBytes);
     ::Bytef* source( iter->first );
     ::uLongf sourceLen( iter->second );

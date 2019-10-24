@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkOclUtils.h"
 
-#include <mitkImageReadAccessor.h>
 #include <fstream>
 
 mitk::OclImage::OclImage() : m_gpuImage(NULL), m_context(NULL), m_bufferSize(0), m_gpuModified(false), m_cpuModified(false),
@@ -133,8 +132,9 @@ int mitk::OclImage::TransferDataToGPU(cl_command_queue gpuComQueue)
 
       if( this->m_formatSupported )
       {
-        mitk::ImageReadAccessor accessor(m_Image);
-        clErr = clEnqueueWriteImage( gpuComQueue, m_gpuImage, CL_TRUE, origin, region, 0, 0, accessor.GetData(), 0, NULL, NULL);
+        mitk::ImageRegionAccessor accessor(m_Image);
+        mitk::ImageAccessLock lock(&accessor);
+        clErr = clEnqueueWriteImage( gpuComQueue, m_gpuImage, CL_TRUE, origin, region, 0, 0, accessor.getData(), 0, NULL, NULL);
       }
       else
       {

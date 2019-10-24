@@ -144,7 +144,7 @@ namespace mitk{
     mitkImage->GetGeometry(timeStep)->SetSpacing(this->GetOutput()->GetGeometry()->GetSpacing());
     mitkImage->GetGeometry(timeStep)->SetOrigin(this->GetOutput()->GetGeometry()->GetOrigin());
     mitkImage->GetGeometry(timeStep)->SetIndexToWorldTransform(this->GetOutput()->GetGeometry()->GetIndexToWorldTransform());
-    mitkImage->SetImportVolume(this->GetOutput()->GetData(), timeStep);
+    mitkImage->SetImportVolume(this->GetOutput()->GetVolumeData()->GetData(), timeStep);
 
     mitkImage->Modified();
     mitkImage->Update();

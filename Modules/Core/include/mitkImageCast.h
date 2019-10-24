@@ -111,7 +111,7 @@ namespace mitk
       mitkoutputimage = mitk::Image::New();
     }
     mitkoutputimage->InitializeByItk(itkimage);
-    mitkoutputimage->SetChannel(itkimage->GetBufferPointer());
+    mitkoutputimage->SetVolume(itkimage->GetBufferPointer());
   }
 }
 

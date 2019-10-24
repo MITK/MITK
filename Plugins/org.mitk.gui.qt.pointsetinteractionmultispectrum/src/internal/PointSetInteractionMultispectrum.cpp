@@ -35,7 +35,6 @@
 
 //mitk image
 #include <mitkImage.h>
-#include <mitkImagePixelReadAccessor.h>
 
 // MITK
 #include "mitkITKImageImport.h"
@@ -287,4 +286,3 @@ void PointSetInteractionMultispectrum::PlotReflectance(mitk::PointSet::Pointer m
   }
 
 }
-

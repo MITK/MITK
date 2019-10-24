@@ -21,11 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingMacros.h>
 #include <mitkImageStatisticsHolder.h>
 #include "mitkImageGenerator.h"
-#include "mitkImageReadAccessor.h"
 #include "mitkException.h"
 #include "mitkPixelTypeMultiplex.h"
-#include "mitkImagePixelReadAccessor.h"
 #include "mitkIOUtil.h"
+#include "mitkImageVtkAccessor.h"
 
 #include "mitkImageSliceSelector.h"
 
@@ -48,7 +47,8 @@ bool ImageVtkDataReferenceCheck(const char* fname) {
     mitk::Image::Pointer image = mitk::IOUtil::LoadImage(filename);
     MITK_TEST_CONDITION_REQUIRED(image.IsNotNull(), "Non-NULL image")
 
-    vtkImageData* vtk = image->GetVtkImageData();
+    mitk::ImageVtkAccessor accessor(image);
+    vtkImageData* vtk = accessor.getVtkImageData();
 
     if(vtk == NULL)
       return false;
@@ -100,8 +100,6 @@ void TestRandomPixelAccess( const mitk::PixelType /*ptype*/, mitk::Image::Pointe
   MITK_INFO << "Testing access outside of the image";
   unsigned int dim = image->GetDimension();
   if(dim == 3 || dim == 4){
-    mitk::ImagePixelReadAccessor<T,3> imAccess3(image,image->GetVolumeData(0));
-
     // Comparison ?>=0 not needed since all position[i] and timestep are unsigned int
     // (position[0]>=0 && position[1] >=0 && position[2]>=0 && timestep>=0)
     // bug-11978 : we still need to catch index with negative values
@@ -112,13 +110,17 @@ void TestRandomPixelAccess( const mitk::PixelType /*ptype*/, mitk::Image::Pointe
       MITK_WARN << "Given position ("<< point << ") is out of image range, returning 0." ;
     }
     else {
-      value = static_cast<mitk::ScalarType>(imAccess3.GetPixelByWorldCoordinates(point));
+      mitk::ImageRegionAccessor acc(image);
+      itk::Index<3> itkIndex;
+      image->GetGeometry()->WorldToIndex(position, itkIndex);
+      value = static_cast<mitk::ScalarType>(*(T*)acc.getPixel(itkIndex));
       MITK_TEST_CONDITION( (value >= imageMin && value <= imageMax), "Value returned is between max/min");
     }
     itk::Index<3> itkIndex;
     image->GetGeometry()->WorldToIndex(position, itkIndex);
     MITK_TEST_FOR_EXCEPTION_BEGIN(mitk::Exception);
-    imAccess3.GetPixelByIndexSafe(itkIndex);
+    mitk::ImageRegionAccessor acc(image);
+    acc.getPixel(itkIndex);
     MITK_TEST_FOR_EXCEPTION_END(mitk::Exception);
   }
   MITK_INFO << imageMin << " "<< imageMax << " "<< value << "";
@@ -185,8 +187,7 @@ int mitkImageTest(int argc, char* argv[])
   int *p2 = NULL;
   try
   {
-    mitk::ImageReadAccessor imgMemAcc(imgMem);
-    p = (int*)imgMemAcc.GetData();
+    p = (int*)imgMem->GetVolumeData()->GetData();
   }
   catch (mitk::Exception& e)
   {
@@ -202,8 +203,7 @@ int mitkImageTest(int argc, char* argv[])
   // Getting it again and compare with filled values:
   try
   {
-    mitk::ImageReadAccessor imgMemAcc(imgMem);
-    p2 = (int*)imgMemAcc.GetData();
+    p2 = (int*)imgMem->GetVolumeData()->GetData();
   }
   catch (mitk::Exception &e)
   {
@@ -225,8 +225,7 @@ int mitkImageTest(int argc, char* argv[])
 
   try
   {
-    mitk::ImageReadAccessor imgMemAcc(imgMem, imgMem->GetSliceData(dim[2]/2));
-    p2 = (int*)imgMemAcc.GetData();
+    p2 = (int*)imgMem->GetSliceData(dim[2]/2)->GetData();
   }
   catch (mitk::Exception& e)
   {
@@ -260,8 +259,7 @@ int mitkImageTest(int argc, char* argv[])
   // Setting volume again:
   try
   {
-    mitk::ImageReadAccessor imgMemAcc(imgMem);
-    imgMem->SetVolume(imgMemAcc.GetData());
+    imgMem->SetVolume(imgMem->GetVolumeData()->GetData());
   }
   catch (mitk::Exception& e)
   {
@@ -289,8 +287,7 @@ int mitkImageTest(int argc, char* argv[])
 
   try
   {
-    mitk::ImageReadAccessor imgMemAcc(imgMem);
-    p = (int*)imgMemAcc.GetData();
+    p = (int*)imgMem->GetVolumeData()->GetData();
   }
   catch (mitk::Exception& e)
   {
@@ -303,8 +300,7 @@ int mitkImageTest(int argc, char* argv[])
 
   try
   {
-    mitk::ImageReadAccessor imgMemAcc(imgMem);
-    p = (int*)imgMemAcc.GetData();
+    p = (int*)imgMem->GetVolumeData()->GetData();
   }
   catch (mitk::Exception& e)
   {
@@ -332,31 +328,6 @@ int mitkImageTest(int argc, char* argv[])
   MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetGeometry()->GetSpacing(), spacing), "Testing correctness of changed spacing via GetGeometry()->GetSpacing(): ");
   MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetSlicedGeometry()->GetPlaneGeometry(0)->GetSpacing(), spacing), "Testing correctness of changed spacing via GetSlicedGeometry()->GetPlaneGeometry(0)->GetSpacing(): ");
 
-  mitk::Image::Pointer vecImg = mitk::Image::New();
-  try
-  {
-    mitk::ImageReadAccessor imgMemAcc(imgMem);
-    vecImg->Initialize( imgMem->GetPixelType(), *imgMem->GetGeometry(), 2 /* #channels */, 0 /*tDim*/ );
-    vecImg->SetImportChannel(const_cast<void*>(imgMemAcc.GetData()), 0, mitk::Image::CopyMemory );
-    vecImg->SetImportChannel(const_cast<void*>(imgMemAcc.GetData()), 1, mitk::Image::CopyMemory );
-
-    mitk::ImageReadAccessor vecImgAcc(vecImg);
-    mitk::ImageReadAccessor vecImgAcc0(vecImg, vecImg->GetChannelData(0));
-    mitk::ImageReadAccessor vecImgAcc1(vecImg, vecImg->GetChannelData(1));
-
-    MITK_TEST_CONDITION_REQUIRED(vecImgAcc0.GetData() != NULL && vecImgAcc1.GetData() != NULL, "Testing set and return of channel data!");
-
-    MITK_TEST_CONDITION_REQUIRED( vecImg->IsValidSlice(0,0,1) , "");
-    MITK_TEST_OUTPUT(<< " Testing whether CopyMemory worked");
-    MITK_TEST_CONDITION_REQUIRED(imgMemAcc.GetData() != vecImgAcc.GetData(), "");
-    MITK_TEST_OUTPUT(<< " Testing destruction after SetImportChannel");
-    vecImg = NULL;
-    MITK_TEST_CONDITION_REQUIRED(vecImg.IsNull() , "testing destruction!");
-  }
-  catch (mitk::Exception& e)
-  {
-    MITK_ERROR << e.what();
-  }
   //-----------------
   MITK_TEST_OUTPUT(<< "Testing initialization via vtkImageData");
   MITK_TEST_OUTPUT(<< " Setting up vtkImageData");
@@ -393,7 +364,8 @@ int mitkImageTest(int argc, char* argv[])
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(origin2,vtkoriginAsMitkPoint), "");
 
   MITK_TEST_OUTPUT(<< " Testing if vtkOrigin is (0, 0, 0). This behaviour is due to historical development of MITK. Aslo see bug 5050!");
-  vtkImageData* vtkImage = imgMem->GetVtkImageData();
+  mitk::ImageVtkAccessor acc(imgMem);
+  vtkImageData* vtkImage = acc.getVtkImageData();
   auto vtkOrigin = vtkImage->GetOrigin();
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(vtkOrigin[0], 0), "testing vtkOrigin[0] to be 0");
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(vtkOrigin[1], 0), "testing vtkOrigin[1] to be 0");

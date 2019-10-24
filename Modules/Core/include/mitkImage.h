@@ -18,9 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKIMAGE_H_HEADER_INCLUDED_C1C2FCD2
 #define MITKIMAGE_H_HEADER_INCLUDED_C1C2FCD2
 
+#include <condition_variable>
 #include <string>
 #include <vector>
 #include <map>
+#include <mutex>
 
 #include <MitkCoreExports.h>
 #include "mitkSlicedData.h"
@@ -30,8 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProportionalTimeGeometry.h>
 #include "mitkImageDataItem.h"
 #include "mitkImageDescriptor.h"
-#include "mitkImageAccessorBase.h"
-#include "mitkImageVtkAccessor.h"
+#include "mitkImageAccessLock.h"
 #include <mitkProperties.h>
 #include <mitkLookupTables.h>
 #include <mitkLookupTableProperty.h>
@@ -89,12 +90,11 @@ class MITKCORE_EXPORT Image : public SlicedData
 {
   friend class SubImageSelector;
 
-  friend class ImageAccessorBase;
+  friend class ImageRegionAccessor;
+  friend class ImageAccessLock;
   friend class ImageVtkAccessor;
   friend class ImageVtkReadAccessor;
   friend class ImageVtkWriteAccessor;
-  friend class ImageReadAccessor;
-  friend class ImageWriteAccessor;
 
 public:
   mitkClassMacro(Image, SlicedData);
@@ -126,6 +126,8 @@ public:
   void SetMetaDataDictionary(DicomTagToValueList& array);
 
 public:
+
+
   //##Documentation
   //## @brief Returns the PixelType of channel @a n.
   const mitk::PixelType GetPixelType(int n = 0) const;
@@ -141,13 +143,6 @@ public:
   //## @sa GetDimensions()
   unsigned int GetDimension(int i) const;
 
-  /** @brief Get the data vector of the complete image, i.e., of all channels linked together.
-
-  If you only want to access a slice, volume at a specific time or single channel
-  use one of the SubImageSelector classes.
-   \deprecatedSince{2012_09} Please use image accessors instead: See Doxygen/Related-Pages/Concepts/Image. This method can be replaced by ImageWriteAccessor::GetData() or ImageReadAccessor::GetData() */
-  DEPRECATED(virtual void* GetData());
-
 public:
   /** @brief Get the pixel value at one specific index position.
 
@@ -162,11 +157,6 @@ public:
   DEPRECATED(double GetPixelValueByWorldCoordinate(const mitk::Point3D& position, unsigned int timestep = 0, unsigned int component=0));
 
   //##Documentation
-  //## @brief Get a volume at a specific time @a t of channel @a n as a vtkImageData.
-  virtual vtkImageData* GetVtkImageData(int t = 0, int n = 0);
-  virtual const vtkImageData* GetVtkImageData(int t = 0, int n = 0) const;
-
-  //##Documentation
   //## @brief Get the complete image, i.e., all channels linked together, as a @a mitkIpPicDescriptor.
   //##
   //## If you only want to access a slice, volume at a specific time or single channel
@@ -174,29 +164,8 @@ public:
   //virtual mitkIpPicDescriptor* GetPic();
 
   //##Documentation
-  //## @brief Check whether slice @a s at time @a t in channel @a n is set
-  virtual bool IsSliceSet(int s = 0, int t = 0, int n = 0) const override;
-
-  //##Documentation
   //## @brief Check whether volume at time @a t in channel @a n is set
   virtual bool IsVolumeSet(int t = 0, int n = 0) const override;
-
-  //##Documentation
-  //## @brief Check whether the channel @a n is set
-  virtual bool IsChannelSet(int n = 0) const override;
-
-  //##Documentation
-  //## @brief Set @a data as slice @a s at time @a t in channel @a n. It is in
-  //## the responsibility of the caller to ensure that the data vector @a data
-  //## is really a slice (at least is not smaller than a slice), since there is
-  //## no chance to check this.
-  //##
-  //## The data is copied to an array managed by the image. If the image shall
-  //## reference the data, use SetImportSlice with ImportMemoryManagementType
-  //## set to ReferenceMemory. For importing ITK images use of mitk::
-  //## ITKImageImport is recommended.
-  //## @sa SetPicSlice, SetImportSlice, SetImportVolume
-  virtual bool SetSlice(const void *data, int s = 0, int t = 0, int n = 0);
 
   //##Documentation
   //## @brief Set @a data as volume at time @a t in channel @a n. It is in
@@ -211,28 +180,7 @@ public:
   //## @sa SetPicVolume, SetImportVolume
   virtual bool SetVolume(const void *data, int t = 0, int n = 0);
 
-  //##Documentation
-  //## @brief Set @a data in channel @a n. It is in
-  //## the responsibility of the caller to ensure that the data vector @a data
-  //## is really a channel (at least is not smaller than a channel), since there is
-  //## no chance to check this.
-  //##
-  //## The data is copied to an array managed by the image. If the image shall
-  //## reference the data, use SetImportChannel with ImportMemoryManagementType
-  //## set to ReferenceMemory. For importing ITK images use of mitk::
-  //## ITKImageImport is recommended.
-  //## @sa SetPicChannel, SetImportChannel
-  virtual bool SetChannel(const void *data, int n = 0);
-
-  //##Documentation
-  //## @brief Set @a data as slice @a s at time @a t in channel @a n. It is in
-  //## the responsibility of the caller to ensure that the data vector @a data
-  //## is really a slice (at least is not smaller than a slice), since there is
-  //## no chance to check this.
-  //##
-  //## The data is managed according to the parameter \a importMemoryManagement.
-  //## @sa SetPicSlice
-  virtual bool SetImportSlice(void *data, int s = 0, int t = 0, int n = 0, ImportMemoryManagementType importMemoryManagement = CopyMemory );
+  virtual void SetSlice(const void* data, int s = 0, int t = 0, int n = 0);
 
   //##Documentation
   //## @brief Set @a data as volume at time @a t in channel @a n. It is in
@@ -243,16 +191,6 @@ public:
   //## The data is managed according to the parameter \a importMemoryManagement.
   //## @sa SetPicVolume
   virtual bool SetImportVolume(void *data, int t = 0, int n = 0, ImportMemoryManagementType importMemoryManagement = CopyMemory );
-
-  //##Documentation
-  //## @brief Set @a data in channel @a n. It is in
-  //## the responsibility of the caller to ensure that the data vector @a data
-  //## is really a channel (at least is not smaller than a channel), since there is
-  //## no chance to check this.
-  //##
-  //## The data is managed according to the parameter \a importMemoryManagement.
-  //## @sa SetPicChannel
-  virtual bool SetImportChannel(void *data, int n = 0, ImportMemoryManagementType importMemoryManagement = CopyMemory );
 
   //##Documentation
   //## initialize new (or re-initialize) image information
@@ -503,17 +441,8 @@ public:
   /**
   * @warning for internal use only
   */
-  virtual ImageDataItemPointer GetSliceData(int s = 0, int t = 0, int n = 0, void *data = nullptr, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
-
-  /**
-  * @warning for internal use only
-  */
   virtual ImageDataItemPointer GetVolumeData(int t = 0, int n = 0, void *data = nullptr, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
-
-  /**
-  * @warning for internal use only
-  */
-  virtual ImageDataItemPointer GetChannelData(int n = 0, void *data = nullptr, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
+  virtual ImageDataItemPointer GetSliceData(int s = 0, int t = 0, int n = 0) const;
 
   /**
   \brief (DEPRECATED) Get the minimum for scalar images
@@ -542,7 +471,6 @@ public:
   \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
   */
   DEPRECATED (ScalarType GetScalarValueMinNoRecompute( unsigned int t = 0 ) const);
-
   /**
   \brief (DEPRECATED) Get the second smallest value for scalar images, but do not recompute it first
 
@@ -612,6 +540,13 @@ public:
 
 protected:
 
+  bool canAddAccessLock(ImageAccessLock* lock);
+  void addAccessLock(ImageAccessLock* lock);
+  void removeAccessLock(ImageAccessLock* lock);
+
+  std::condition_variable m_ImageAccessLockRemoved;
+  std::mutex m_ImageAccessLockRemovedMutex;
+
   mitkCloneMacro(Self);
 
   typedef itk::MutexLockHolder<itk::SimpleFastMutexLock> MutexHolder;
@@ -626,11 +561,7 @@ protected:
 
   virtual void Expand( unsigned int timeSteps ) override;
 
-  virtual ImageDataItemPointer AllocateSliceData(int s = 0, int t = 0, int n = 0, void *data = nullptr, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
-
   virtual ImageDataItemPointer AllocateVolumeData(int t = 0, int n = 0, void *data = nullptr, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
-
-  virtual ImageDataItemPointer AllocateChannelData(int n = 0, void *data = nullptr, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
   Image();
 
@@ -645,10 +576,9 @@ protected:
 
   virtual void PrintSelf(std::ostream& os, itk::Indent indent) const override;
 
-  mutable ImageDataItemPointerArray m_Channels;
   mutable ImageDataItemPointerArray m_Volumes;
-  mutable ImageDataItemPointerArray m_Slices;
   mutable itk::SimpleFastMutexLock m_ImageDataArraysLock;
+  mutable ImageDataItemPointer m_Data;
 
   unsigned int m_Dimension;
 
@@ -657,7 +587,6 @@ protected:
   ImageDescriptor::Pointer m_ImageDescriptor;
 
   size_t *m_OffsetTable;
-  ImageDataItemPointer m_CompleteData;
 
   // Image statistics Holder replaces the former implementation directly inside this class
   friend class ImageStatisticsHolder;
@@ -665,29 +594,16 @@ protected:
 
 private:
 
-  ImageDataItemPointer GetSliceData_unlocked(int s, int t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const;
   ImageDataItemPointer GetVolumeData_unlocked(int t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const;
-  ImageDataItemPointer GetChannelData_unlocked(int n, void *data, ImportMemoryManagementType importMemoryManagement) const;
-
-  ImageDataItemPointer AllocateSliceData_unlocked(int s, int t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const;
   ImageDataItemPointer AllocateVolumeData_unlocked(int t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const;
-  ImageDataItemPointer AllocateChannelData_unlocked(int n, void *data, ImportMemoryManagementType importMemoryManagement) const;
 
-  bool IsSliceSet_unlocked(int s, int t, int n) const;
   bool IsVolumeSet_unlocked(int t, int n) const;
-  bool IsChannelSet_unlocked(int n) const;
 
-  /** Stores all existing ImageReadAccessors */
-  mutable std::vector<ImageAccessorBase*> m_Readers;
-  /** Stores all existing ImageWriteAccessors */
-  mutable std::vector<ImageAccessorBase*> m_Writers;
-  /** Stores all existing ImageVtkAccessors */
-  mutable std::vector<ImageAccessorBase*> m_VtkReaders;
+  mutable std::vector<ImageAccessLock*> m_ReaderLocks;
+  mutable std::vector<ImageAccessLock*> m_WriterLocks;
 
   /** A mutex, which needs to be locked to manage m_Readers and m_Writers */
   itk::SimpleFastMutexLock m_ReadWriteLock;
-  /** A mutex, which needs to be locked to manage m_VtkReaders */
-  itk::SimpleFastMutexLock m_VtkReadersLock;
 
   mutable mitk::ReaderType::DictionaryArrayType m_MetaDataDictionaryArray;
 };

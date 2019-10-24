@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkGeometry3D.h>
 #include <mitkRotationOperation.h>
 #include <mitkInteractionConst.h>
-#include <mitkImagePixelReadAccessor.h>
+#include <mitkImageRegionAccessor.h>
 
 #include <itkImage.h>
 #include <itkImageRegionIterator.h>
@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 
 
+#include <mitkImageVtkAccessor.h>
 
 
 int ObliquePlaneTestVolumeSize = 128;
@@ -91,11 +92,8 @@ static void OverwriteObliquePlaneTest(mitk::Image* workingImage, mitk::Image* re
   overwriter->Modified();
   overwriter->Update();
 
-  typedef mitk::ImagePixelReadAccessor< unsigned short, 3 > ReadAccessorType;
-  ReadAccessorType refImgReadAccessor( refImg );
-  ReadAccessorType workingImgReadAccessor( workingImage );
-
-
+  mitk::ImageRegionAccessor refImgReadAccessor( refImg );
+  mitk::ImageRegionAccessor workingImgReadAccessor( workingImage );
 
   /* ============= check ref == working ============*/
   bool areSame = true;
@@ -107,7 +105,7 @@ static void OverwriteObliquePlaneTest(mitk::Image* workingImage, mitk::Image* re
       id[1] = y;
       for (int z = 0; z < ObliquePlaneTestVolumeSize ; ++z){
         id[2] = z;
-        areSame = refImgReadAccessor.GetPixelByIndex(id) == workingImgReadAccessor.GetPixelByIndex(id);
+        areSame = *(unsigned short*)refImgReadAccessor.getPixel(id) == *(unsigned short*)workingImgReadAccessor.getPixel(id);
         if(!areSame)
           goto stop;
       }
@@ -132,7 +130,9 @@ stop:
 
   mitk::Image::Pointer sliceInMitk = slicer2->GetOutput();
   vtkSmartPointer<vtkImageData> slice2 = vtkSmartPointer<vtkImageData>::New();
-  slice2 = sliceInMitk->GetVtkImageData();
+
+  mitk::ImageVtkAccessor acc(sliceInMitk);
+  slice2 = acc.getVtkImageData();
 
 
   /* ============= overwrite slice ============*/
@@ -158,7 +158,7 @@ stop:
       id[1] = y;
       for (int z = 0; z < ObliquePlaneTestVolumeSize ; ++z){
         id[2] = z;
-        areSame = refImgReadAccessor.GetPixelByIndex(id) == workingImgReadAccessor.GetPixelByIndex(id);
+        areSame = *(unsigned short*)refImgReadAccessor.getPixel(id) == *(unsigned short*)workingImgReadAccessor.getPixel(id);
         if(!areSame)
           goto stop2;
       }
@@ -209,7 +209,7 @@ stop2:
       id[1] = y;
       for ( z = 0; z < ObliquePlaneTestVolumeSize ; ++z){
         id[2] = z;
-        areSame = refImgReadAccessor.GetPixelByIndex(id) == workingImgReadAccessor.GetPixelByIndex(id);
+        areSame = *(unsigned short*)refImgReadAccessor.getPixel(id) == *(unsigned short*)workingImgReadAccessor.getPixel(id);
         if(!areSame)
           goto stop3;
       }

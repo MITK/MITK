@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderingManager.h"
 #include "mitkSegTool2D.h"
 #include <mitkVtkImageOverwrite.h>
+#include <mitkImageVtkAccessor.h>
 
 // VTK
 #include <vtkSmartPointer.h>
@@ -42,7 +43,7 @@ void mitk::DiffSliceOperationApplier::ExecuteOperation( Operation* operation )
     return;
 
 
-  //chak if the operation is valid
+  // Check if the operation is valid
   if(imageOperation->IsValid())
   {
     //the actual overwrite filter (vtk)
@@ -50,7 +51,8 @@ void mitk::DiffSliceOperationApplier::ExecuteOperation( Operation* operation )
 
     mitk::Image::Pointer slice = imageOperation->GetSlice();
     //Set the slice as 'input'
-    reslice->SetInputSlice(const_cast<vtkImageData*>(slice->GetVtkImageData()));
+    ImageVtkAccessor accessor(slice);
+    reslice->SetInputSlice(const_cast<vtkImageData*>(accessor.getVtkImageData()));
 
     //set overwrite mode to true to write back to the image volume
     reslice->SetOverwriteMode(true);

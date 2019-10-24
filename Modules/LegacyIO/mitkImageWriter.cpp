@@ -20,8 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include "mitkImageTimeSelector.h"
 #include "mitkImageAccessByItk.h"
-#include "mitkImageReadAccessor.h"
 #include <mitkLocaleSwitch.h>
+#include <mitkImageVtkAccessor.h>
 
 #include <itkImageIOBase.h>
 #include <itkImageIOFactory.h>
@@ -110,11 +110,14 @@ void mitk::ImageWriter::SetDefaultExtension()
 #include <vtkXMLImageDataWriter.h>
 static void writeVti(const char * filename, mitk::Image* image, int t=0)
 {
-   vtkXMLImageDataWriter * vtkwriter = vtkXMLImageDataWriter::New();
-   vtkwriter->SetFileName( filename );
-   vtkwriter->SetInputData(image->GetVtkImageData(t));
-   vtkwriter->Write();
-   vtkwriter->Delete();
+  mitk::ImageVtkAccessor accessor(image);
+  mitk::ImageAccessLock lock(&accessor);
+
+  vtkXMLImageDataWriter * vtkwriter = vtkXMLImageDataWriter::New();
+  vtkwriter->SetFileName( filename );
+  vtkwriter->SetInputData(accessor.getVtkImageData(t));
+  vtkwriter->Write();
+  vtkwriter->Delete();
 }
 
 #include <itkRGBAPixel.h>
@@ -227,8 +230,9 @@ void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& fileNa
    imageIO->SetIORegion(ioRegion);
    imageIO->SetFileName(fileName);
 
-   ImageReadAccessor imageAccess(image);
-   imageIO->Write(imageAccess.GetData());
+   ImageRegionAccessor accessor(image);
+   ImageAccessLock lock(&accessor);
+   imageIO->Write(accessor.getData());
 }
 
 void mitk::ImageWriter::GenerateData()

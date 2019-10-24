@@ -20,8 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkMitkThickSlicesFilter.h>
 
-#include "mitkImageWriteAccessor.h"
 #include "mitkImage.h"
+#include <mitkImageVtkAccessor.h>
 
 #include <vtkImageData.h>
 #include <vtkPointData.h>
@@ -44,8 +44,7 @@ public:
 
     for( int i=min; i<=max; ++i )
     {
-      mitk::ImageWriteAccessor writeAccess( testImage, testImage->GetSliceData( i-min ) );
-      memset( writeAccess.GetData(), i, buffer_size );
+      memset( testImage->GetSliceData(i-min)->GetData(), i, buffer_size );
     }
 
     return testImage;
@@ -89,7 +88,8 @@ int vtkMitkThickSlicesFilterTest(int, char* [])
   // 111111111
   // 222222222
   mitk::Image::Pointer testImage1 = vtkMitkThickSlicesFilterTestHelper::CreateTestImage( 0, 2 );
-  thickSliceFilter->SetInputData( testImage1->GetVtkImageData() );
+  mitk::ImageVtkAccessor acc1(testImage1);
+  thickSliceFilter->SetInputData( acc1.getVtkImageData() );
 
 
   // MaxIP
@@ -134,7 +134,8 @@ int vtkMitkThickSlicesFilterTest(int, char* [])
   // 888888888
 
   mitk::Image::Pointer testImage2 = vtkMitkThickSlicesFilterTestHelper::CreateTestImage( 3, 8 );
-  thickSliceFilter->SetInputData( testImage2->GetVtkImageData() );
+  mitk::ImageVtkAccessor acc2(testImage2);
+  thickSliceFilter->SetInputData( acc2.getVtkImageData() );
 
 
   // MaxIP
@@ -171,4 +172,3 @@ int vtkMitkThickSlicesFilterTest(int, char* [])
 
   MITK_TEST_END()
 }
-

@@ -121,7 +121,7 @@ void mitk::ItkImageFileReader::GenerateData()
   imageIO->Read( buffer );
 
   image->Initialize( MakePixelType(imageIO), ndim, dimensions );
-  image->SetImportChannel( buffer, 0, Image::ManageMemory );
+  image->SetImportVolume( buffer, 0, Image::ManageMemory );
 
   // access direction of itk::Image and include spacing
   mitk::Matrix3D matrix;

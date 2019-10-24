@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include "mitkTransferFunctionProperty.h"
 #include "mitkImageTimeSelector.h"
+#include <mitkImageVtkAccessor.h>
 
 #include "mitkImageStatisticsHolder.h"
 
@@ -40,7 +41,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkConfirmSegmentationDialog.h"
 
 #include "mitkPixelTypeMultiplex.h"
-#include "mitkImagePixelReadAccessor.h"
 
 #include "mitkImageCast.h"
 
@@ -172,8 +172,9 @@ void QmitkAdaptiveRegionGrowingToolGUI::SetInputImageNode(mitk::DataNode* node)
 template <typename TPixel>
 static void AccessPixel(mitk::PixelType /*ptype*/, const mitk::Image::Pointer im, mitk::Point3D p, int & val)
 {
-  mitk::ImagePixelReadAccessor<TPixel,3> access(im);
-  val = access.GetPixelByWorldCoordinates(p);
+  itk::Index<3> itkIndex;
+  im->GetGeometry()->WorldToIndex(p, itkIndex);
+  val = mitk::UnlockedSinglePixelAccess(im, itkIndex, 0, 0);
 }
 
 void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
@@ -236,7 +237,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
 
             if(image->GetGeometry()->IsIndexInside(currentIndex))
             {
-              mitkPixelTypeMultiplex4(mitk::FastSinglePixelAccess,image->GetChannelDescriptor().GetPixelType(),image,NULL,currentIndex,pixelValues[pos]);
+              pixelValues[pos] = mitk::UnlockedSinglePixelAccess(image, currentIndex, 0);
 
               pos++;
             }

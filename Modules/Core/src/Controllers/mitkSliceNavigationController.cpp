@@ -37,7 +37,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkStatusBar.h"
 #include "mitkImage.h"
 #include "mitkPixelTypeMultiplex.h"
-#include "mitkImagePixelReadAccessor.h"
 
 #include "mitkApplyTransformMatrixOperation.h"
 

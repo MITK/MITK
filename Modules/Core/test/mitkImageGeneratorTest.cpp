@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include "mitkImageStatisticsHolder.h"
 #include "mitkImageGenerator.h"
-#include "mitkImageReadAccessor.h"
 
 int mitkImageGeneratorTest(int /*argc*/, char* /*argv*/[])
 {
@@ -91,8 +90,7 @@ int mitkImageGeneratorTest(int /*argc*/, char* /*argv*/[])
     const unsigned int* image3DcBuffer = nullptr;
     try
     {
-      mitk::ImageReadAccessor readAccess( image3Dc );
-      image3DcBuffer = static_cast<const unsigned int*>( readAccess.GetData() );
+      image3DcBuffer = static_cast<const unsigned int*>(image3Dc->GetVolumeData()->GetData());
     }
     catch(...)
     {

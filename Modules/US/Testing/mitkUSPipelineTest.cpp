@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSVideoDevice.h"
 #include "mitkTestingMacros.h"
 #include "mitkUSImageToUSImageFilter.h"
-#include <mitkImageWriteAccessor.h>
 
 // START TESTFILER
 // This is an specialization of the USImageToUSImageFIlter
@@ -49,9 +48,8 @@ See LICENSE.txt or http://www.mitk.org for details.
       try
       {
         mitk::Image::Pointer image = ni.GetPointer();
-        mitk::ImageWriteAccessor imgA(image, image->GetVolumeData(0));
         result->Initialize(image);
-        result->SetImportVolume(imgA.GetData());
+        result->SetImportVolume(imgA->GetVolumeData()->GetData());
         mitk::USImageMetadata::Pointer meta = ni->GetMetadata();
         meta->SetDeviceComment("Test");
         result->SetMetadata(meta);

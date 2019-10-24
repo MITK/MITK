@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestFixture.h>
 #include <mitkImageToIGTLMessageFilter.h>
 #include <mitkImageGenerator.h>
-#include <mitkImageReadAccessor.h>
 
 #include <igtlImageMessage.h>
 
@@ -96,8 +95,7 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("Output Buffer was null", outputBuffer != nullptr);
 
-    mitk::ImageReadAccessor readAccess(m_TestImage, m_TestImage->GetChannelData(0));
-    const void* inputBuffer = readAccess.GetData();
+    void* inputBuffer = m_TestImage->GetVolumeData()->GetData();
 
     CPPUNIT_ASSERT_MESSAGE("Input Buffer was null", inputBuffer != nullptr);
 

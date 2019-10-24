@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOverwriteSliceImageFilter.h"
 #include "mitkOverwriteDirectedPlaneImageFilter.h"
 #include "mitkMorphologicalOperations.h"
+#include <mitkImageVtkAccessor.h>
 
 #include "usGetModuleContext.h"
 
@@ -378,7 +379,8 @@ void mitk::SegTool2D::WriteSliceToVolume(mitk::SegTool2D::SliceInformation slice
   vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
 
   //Set the slice as 'input'
-  reslice->SetInputSlice(sliceInfo.slice->GetVtkImageData());
+  ImageVtkAccessor accessor(sliceInfo.slice);
+  reslice->SetInputSlice(accessor.getVtkImageData());
 
   //set overwrite mode to true to write back to the image volume
   reslice->SetOverwriteMode(true);
@@ -397,7 +399,7 @@ void mitk::SegTool2D::WriteSliceToVolume(mitk::SegTool2D::SliceInformation slice
 
   //the image was modified within the pipeline, but not marked so
   image->Modified();
-  image->GetVtkImageData()->Modified();
+  //image->GetVtkImageData()->Modified();
 
   /*============= BEGIN undo/redo feature block ========================*/
   //specify the undo operation with the edited slice

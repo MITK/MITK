@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImage.h"
 #include "mitkIOMimeTypes.h"
-#include "mitkImageVtkReadAccessor.h"
+#include "mitkImageVtkAccessor.h"
 
 #include <vtkStructuredPointsReader.h>
 #include <vtkStructuredPointsWriter.h>
@@ -88,9 +88,10 @@ void ImageVtkLegacyIO::Write()
   {
     writer->SetFileTypeToBinary();
   }
-
-  ImageVtkReadAccessor vtkReadAccessor(Image::ConstPointer(input), NULL, input->GetVtkImageData());
-  writer->SetInputData(const_cast<vtkImageData*>(vtkReadAccessor.GetVtkImageData()));
+  Image::Pointer imagePointer = const_cast<Image*>(input);
+  ImageVtkAccessor vtkAccessor(imagePointer);
+  ImageAccessLock lock(&vtkAccessor);
+  writer->SetInputData(const_cast<vtkImageData*>(vtkAccessor.getVtkImageData()));
 
   if (writer->Write() == 0 || writer->GetErrorCode() != 0 )
   {

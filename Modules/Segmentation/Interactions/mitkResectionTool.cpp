@@ -8,6 +8,7 @@
 
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCaster.h>
+#include <mitkImageTimeSelector.h>
 #include <mitkITKImageImport.h>
 #include <mitkProgressBar.h>
 #include <mitkResectionMaskFilter.h>
@@ -173,7 +174,11 @@ void ResectionTool::Resect(ResectionType type)
 
   Image::Pointer mitkImage3d = Image::New();
   if (segmentation->GetDimension() > 3) {
-    AccessFixedDimensionByItk_n(segmentation, extract3Dfrom4DByItk, 4U, (mitkImage3d, targetTimeStep));
+    ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
+    timeSelector->SetInput(segmentation);
+    timeSelector->SetTimeNr(targetTimeStep);
+    timeSelector->UpdateLargestPossibleRegion();
+    mitkImage3d = timeSelector->GetOutput();
   } else {
     mitkImage3d = segmentation->Clone();
   }

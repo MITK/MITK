@@ -20,10 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkInteractionConst.h"
 #include "mitkRenderingManager.h"
 #include "mitkImageCast.h"
-#include "mitkImageReadAccessor.h"
 #include "mitkLookupTableProperty.h"
 #include "mitkPadImageFilter.h"
 
+#include <vtkPointData.h>
 #include <vtkTransform.h>
 #include <vtkTransformPolyDataFilter.h>
 #include <vtkCell.h>
@@ -153,25 +153,14 @@ void mitk::LabelSetImage::RemoveLayer()
   this->Modified();
 }
 
-template<typename TPixel, unsigned int VDimensions>
-void SetToZero(itk::Image< TPixel, VDimensions> * source)
-{
-  source->FillBuffer(0);
-}
-
 unsigned int mitk::LabelSetImage::AddLayer(mitk::LabelSet::Pointer lset)
 {
   mitk::Image::Pointer newImage = mitk::Image::New();
   newImage->Initialize( this->GetPixelType(), this->GetDimension(), this->GetDimensions(), this->GetImageDescriptor()->GetNumberOfChannels() );
   newImage->SetTimeGeometry(this->GetTimeGeometry()->Clone());
 
-  if (newImage->GetDimension() < 4)
-  {
-    AccessByItk(newImage, SetToZero);
-  }
-  else
-  {
-    AccessFixedDimensionByItk(newImage, SetToZero, 4);
+  for (unsigned int t = 0; t < newImage->GetTimeSteps(); t++) {
+    newImage->GetVolumeData(t)->getVtkImageData(newImage)->GetPointData()->GetScalars()->Fill(0.);
   }
 
   unsigned int newLabelSetId = this->AddLayer(newImage, lset);
@@ -487,10 +476,12 @@ mitk::Image::Pointer mitk::LabelSetImage::CreateLabelMask(PixelType index)
       byteSize *= mask->GetDimension(dim);
     }
 
-    mitk::ImageWriteAccessor* accessor = new mitk::ImageWriteAccessor(static_cast<mitk::Image*>(mask));
-    memset(accessor->GetData(), 0, byteSize);
-    delete accessor;
-
+    mitk::ImageRegionAccessor accessor(mask);
+    {
+      mitk::ImageAccessLock lock(&accessor, true);
+      memset(accessor.getData(), 0, byteSize);
+    }
+    
     auto geometry = this->GetTimeGeometry()->Clone();
     mask->SetTimeGeometry(geometry);
 
@@ -519,9 +510,11 @@ void mitk::LabelSetImage::InitializeByLabeledImage(mitk::Image::Pointer image)
       byteSize *= image->GetDimension(dim);
     }
 
-    mitk::ImageWriteAccessor* accessor = new mitk::ImageWriteAccessor(static_cast<mitk::Image*>(this));
-    memset(accessor->GetData(), 0, byteSize);
-    delete accessor;
+    mitk::ImageRegionAccessor accessor(this);
+    {
+      mitk::ImageAccessLock lock(&accessor, true);
+      memset(accessor.getData(), 0, byteSize);
+    }
 
     auto geometry = image->GetTimeGeometry()->Clone();
     this->SetTimeGeometry(geometry);

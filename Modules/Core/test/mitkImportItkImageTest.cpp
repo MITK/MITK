@@ -17,8 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestingMacros.h"
 #include "mitkITKImageImport.h"
 #include "mitkImageCast.h"
-
-#include "mitkImagePixelReadAccessor.h"
+#include "mitkImageRegionAccessor.h"
 
 #include <itkImageRegionConstIteratorWithIndex.h>
 #include <itkRandomImageSource.h>
@@ -188,13 +187,23 @@ void Assert_ItkImageImportRandomValuesSucceded_ReturnsTrue()
   itk::ImageRegionConstIteratorWithIndex< ImageType > iter( itkImage, itkImage->GetLargestPossibleRegion() );
   iter.GoToBegin();
 
-  mitk::ImagePixelReadAccessor< TPixel, VDimension > readAccessor( output_import );
+  mitk::ImageRegionAccessor acc(output_import);
 
   bool difference = false;
   while( !iter.IsAtEnd() )
   {
     TPixel ref = iter.Get();
-    TPixel val = readAccessor.GetPixelByIndex( iter.GetIndex() );
+    itk::Index<3> idx;
+    auto globalIdx = iter.GetIndex();
+    idx[0] = globalIdx[0];
+    idx[1] = globalIdx[1];
+    idx[2] = globalIdx[2];
+    TPixel val;
+    if (VDimension == 3) {
+      val = *(TPixel*)acc.getPixel(idx);
+    } else {
+      val = *(TPixel*)acc.getPixel(idx, globalIdx[3]);
+    }
 
     difference |= ( ref != val );
     if( difference )
@@ -233,13 +242,23 @@ void Assert_ItkImageImportSucceded_ReturnsTrue()
   itk::ImageRegionConstIteratorWithIndex< ImageType > iter( itkImage, itkImage->GetLargestPossibleRegion() );
   iter.GoToBegin();
 
-  mitk::ImagePixelReadAccessor< TPixel, VDimension > readAccessor( output_import );
+  mitk::ImageRegionAccessor acc(output_import);
 
   bool difference = false;
   while( !iter.IsAtEnd() )
   {
     TPixel ref = iter.Get();
-    TPixel val = readAccessor.GetPixelByIndex( iter.GetIndex() );
+    itk::Index<3> idx;
+    auto globalIdx = iter.GetIndex();
+    idx[0] = globalIdx[0];
+    idx[1] = globalIdx[1];
+    idx[2] = globalIdx[2];
+    TPixel val;
+    if (VDimension == 3) {
+      val = *(TPixel*)acc.getPixel(idx);
+    } else {
+      val = *(TPixel*)acc.getPixel(idx, globalIdx[3]);
+    }
 
     difference |= ( ref != val );
     if( difference )

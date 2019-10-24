@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include <itkMersenneTwisterRandomVariateGenerator.h>
 #include <itkImageRegionIterator.h>
-#include "mitkImageWriteAccessor.h"
+#include <vtkPointData.h>
 
 namespace mitk {
 /**
@@ -104,22 +104,16 @@ public:
                           reference->GetDimension(),
                           reference->GetDimensions() );
 
-      //get a pointer to the image buffer to write into
-      TPixelType* imageBuffer = NULL;
+      //fill the buffer with the specifed value
       try
       {
-        mitk::ImageWriteAccessor writeAccess( output );
-        imageBuffer = static_cast<TPixelType*>( writeAccess.GetData() );
+        for (int t = 0; t < output->GetTimeSteps(); t++) {
+          output->GetVolumeData(t)->getVtkImageData(output)->GetPointData()->GetScalars()->Fill(fill_value);
+        }
       }
       catch(...)
       {
         MITK_ERROR << "Write access not granted on mitk::Image.";
-      }
-
-      // fill the buffer with the specifed value
-      for(unsigned int i = 0; i < output->GetVolumeData(0)->GetSize(); i++)
-      {
-         imageBuffer[i] = fill_value;
       }
 
       return output;
@@ -188,8 +182,7 @@ public:
         TPixelType* imageBuffer = nullptr;
         try
         {
-          mitk::ImageWriteAccessor writeAccess( output );
-          imageBuffer = static_cast<TPixelType*>( writeAccess.GetData() );
+          imageBuffer = (TPixelType*)output->GetVolumeData()->GetData();
         }
         catch(...)
         {

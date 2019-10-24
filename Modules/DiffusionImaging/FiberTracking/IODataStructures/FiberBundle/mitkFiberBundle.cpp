@@ -21,8 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPlanarCircle.h>
 #include <mitkPlanarPolygon.h>
 #include <mitkPlanarFigureComposite.h>
-#include "mitkImagePixelReadAccessor.h"
 #include <mitkPixelTypeMultiplex.h>
+#include <mitkImageRegionAccessor.h>
 
 #include <vtkPointData.h>
 #include <vtkDataArray.h>
@@ -569,7 +569,7 @@ void mitk::FiberBundle::ColorFibersByScalarMap(const mitk::PixelType, mitk::Imag
     m_FiberColors->SetNumberOfComponents(4);
     m_FiberColors->SetName("FIBER_COLORS");
 
-    mitk::ImagePixelReadAccessor<TPixel,3> readimage(image, image->GetVolumeData(0));
+    mitk::ImageRegionAccessor readimage(image);
 
     unsigned char rgba[4] = {0,0,0,0};
     vtkPoints* pointSet = m_FiberPolyData->GetPoints();
@@ -587,7 +587,9 @@ void mitk::FiberBundle::ColorFibersByScalarMap(const mitk::PixelType, mitk::Imag
         px[0] = pointSet->GetPoint(i)[0];
         px[1] = pointSet->GetPoint(i)[1];
         px[2] = pointSet->GetPoint(i)[2];
-        double pixelValue = readimage.GetPixelByWorldCoordinates(px);
+        itk::Index<3> idx;
+        image->GetGeometry()->WorldToIndex(px, idx);
+        double pixelValue = *(TPixel*)readimage.getPixel(idx);
 
         double color[3];
         lookupTable->GetColor(1-pixelValue, color);

@@ -49,13 +49,12 @@ public:
   virtual ~SubImageSelector();
 
 protected:
-  mitk::Image::ImageDataItemPointer GetSliceData(int s = 0, int t = 0, int n = 0);
   mitk::Image::ImageDataItemPointer GetVolumeData(int t = 0, int n = 0);
-  mitk::Image::ImageDataItemPointer GetChannelData(int n = 0);
+  mitk::Image::ImageDataItemPointer GetSliceData(int s = 0, int t = 0, int n = 0);
 
-  void SetSliceItem(mitk::Image::ImageDataItemPointer dataItem, int s = 0, int t = 0, int n = 0);
+  void SetSliceData(void* data, int s = 0, int t = 0, int n = 0);
+
   void SetVolumeItem(mitk::Image::ImageDataItemPointer dataItem, int t = 0, int n = 0);
-  void SetChannelItem(mitk::Image::ImageDataItemPointer dataItem, int n = 0);
 };
 
 } // namespace mitk

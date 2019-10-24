@@ -7,6 +7,7 @@
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
 #include <mitkImageCaster.h>
+#include <mitkImageTimeSelector.h>
 #include <mitkProgressBar.h>
 #include "mitkShowSegmentationAsAgtkSurface.h"
 #include "mitkShowSegmentationAsElasticNetSurface.h"
@@ -355,8 +356,11 @@ Image::Pointer SurfaceCreator::extract3D(Image::Pointer multiDimImage, int targe
   if (multiDimImage->GetDimension() == 3) {
     return multiDimImage;
   }
-  Image::Pointer mitkImage3d = mitk::Image::New();
-  AccessFixedDimensionByItk_n(multiDimImage, extract3Dfrom4DByItk, 4U, (mitkImage3d, targetTimeStep));
+  ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
+  timeSelector->SetInput(multiDimImage);
+  timeSelector->SetTimeNr(targetTimeStep);
+  timeSelector->UpdateLargestPossibleRegion();
+  Image::Pointer mitkImage3d = timeSelector->GetOutput();
   return mitkImage3d;
 }
 

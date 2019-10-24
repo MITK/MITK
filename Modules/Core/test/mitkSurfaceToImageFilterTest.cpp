@@ -16,8 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkTestingMacros.h>
 #include <mitkIOUtil.h>
-#include <mitkImagePixelReadAccessor.h>
-#include <mitkImageWriteAccessor.h>
+#include <mitkImageRegionAccessor.h>
 
 #include "mitkSurfaceToImageFilter.h"
 
@@ -93,22 +92,22 @@ public:
     surfaceToImageFilter->SetImage(additionalInputImage);
     surfaceToImageFilter->Update();
 
-    mitk::ImagePixelReadAccessor<unsigned char,3> outputReader(surfaceToImageFilter->GetOutput());
+    mitk::ImageRegionAccessor outputReader(surfaceToImageFilter->GetOutput());
     itk::Index<3> idx;
     bool valuesCorrect = true;
     //Values outside the ball should be 0
-    idx[0] =  0; idx[1] =  0, idx[2] =  0; valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 0);
-    idx[0] =  0; idx[1] = 15, idx[2] = 15; valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 0);
-    idx[0] = 15; idx[1] = 15, idx[2] =  0; valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 0);
-    idx[0] = 15; idx[1] =  0, idx[2] = 15; valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 0);
-    idx[0] =  5; idx[1] =  9, idx[2] = 23; valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 0);
+    idx[0] =  0; idx[1] =  0, idx[2] =  0; valuesCorrect = valuesCorrect && (*(unsigned char*)outputReader.getPixel(idx) == 0);
+    idx[0] =  0; idx[1] = 15, idx[2] = 15; valuesCorrect = valuesCorrect && (*(unsigned char*)outputReader.getPixel(idx) == 0);
+    idx[0] = 15; idx[1] = 15, idx[2] =  0; valuesCorrect = valuesCorrect && (*(unsigned char*)outputReader.getPixel(idx) == 0);
+    idx[0] = 15; idx[1] =  0, idx[2] = 15; valuesCorrect = valuesCorrect && (*(unsigned char*)outputReader.getPixel(idx) == 0);
+    idx[0] =  5; idx[1] =  9, idx[2] = 23; valuesCorrect = valuesCorrect && (*(unsigned char*)outputReader.getPixel(idx) == 0);
     //Values inside the ball should be 1
-    idx[0] = 15; idx[1] = 15, idx[2] = 15; valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 1);
-    idx[0] = 31; idx[1] = 15, idx[2] = 15; valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 1);
-    idx[0] =  2; idx[1] = 15, idx[2] = 15; valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 1);
-    idx[0] = 15; idx[1] = 15, idx[2] =  2; valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 1);
-    idx[0] = 15; idx[1] =  2, idx[2] = 15; valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 1);
-    idx[0] =  6; idx[1] =  9, idx[2] = 23; valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 1);
+    idx[0] = 15; idx[1] = 15, idx[2] = 15; valuesCorrect = valuesCorrect && (*(unsigned char*)outputReader.getPixel(idx) == 1);
+    idx[0] = 31; idx[1] = 15, idx[2] = 15; valuesCorrect = valuesCorrect && (*(unsigned char*)outputReader.getPixel(idx) == 1);
+    idx[0] =  2; idx[1] = 15, idx[2] = 15; valuesCorrect = valuesCorrect && (*(unsigned char*)outputReader.getPixel(idx) == 1);
+    idx[0] = 15; idx[1] = 15, idx[2] =  2; valuesCorrect = valuesCorrect && (*(unsigned char*)outputReader.getPixel(idx) == 1);
+    idx[0] = 15; idx[1] =  2, idx[2] = 15; valuesCorrect = valuesCorrect && (*(unsigned char*)outputReader.getPixel(idx) == 1);
+    idx[0] =  6; idx[1] =  9, idx[2] = 23; valuesCorrect = valuesCorrect && (*(unsigned char*)outputReader.getPixel(idx) == 1);
 
     CPPUNIT_ASSERT_MESSAGE("SurfaceToImageFilter_BallSurfaceAsInput_OutputCorrect", valuesCorrect == true);
   }
@@ -130,14 +129,13 @@ public:
     unsigned int size = sizeof(unsigned char);
     for (unsigned int i = 0; i < secondStep->GetDimension(); ++i)
       size *= secondStep->GetDimension(i);
-    mitk::ImageWriteAccessor accessor( secondStep );
-    memset( accessor.GetData(), 1, size );
+    memset( secondStep->GetVolumeData()->GetData(), 1, size );
     additionalInputImage->GetTimeGeometry()->Expand(2);
     additionalInputImage->GetGeometry(1)->SetSpacing(secondStep->GetGeometry()->GetSpacing());
     additionalInputImage->GetGeometry(1)->SetOrigin(secondStep->GetGeometry()->GetOrigin());
     additionalInputImage->GetGeometry(1)->SetIndexToWorldTransform(secondStep->GetGeometry()->GetIndexToWorldTransform());
-    additionalInputImage->SetImportVolume(secondStep->GetData(),0);
-    additionalInputImage->SetImportVolume(secondStep->GetData(),1);
+    additionalInputImage->SetImportVolume(secondStep->GetVolumeData(),0);
+    additionalInputImage->SetImportVolume(secondStep->GetVolumeData(),1);
 
     //Arrange the filter
     surfaceToImageFilter->MakeOutputBinaryOn();
@@ -146,29 +144,27 @@ public:
 
     surfaceToImageFilter->Update();
 
-    mitk::ImagePixelReadAccessor<unsigned char,4> outputReader(surfaceToImageFilter->GetOutput());
-    itk::Index<4> idx;
+    mitk::ImageRegionAccessor outputReader(surfaceToImageFilter->GetOutput());
+    itk::Index<3> idx;
     bool valuesCorrect = true;
     //Values outside the ball should be 0
-    idx[0] =  0; idx[1] =  0, idx[2] =  0; idx[3] = 0; valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 0);
-    idx[0] =  0; idx[1] = 15, idx[2] = 15; idx[3] = 0; valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 0);
-    idx[0] = 15; idx[1] = 15, idx[2] =  0; idx[3] = 0; valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 0);
-    idx[0] = 15; idx[1] =  0, idx[2] = 15; idx[3] = 0; valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 0);
-    idx[0] =  5; idx[1] =  9, idx[2] = 23; idx[3] = 0; valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 0);
-    //Values inside the ball should be 1   hould be 1
-    idx[0] = 15; idx[1] = 15, idx[2] = 15; idx[3] = 0; valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 1);
-    idx[0] = 31; idx[1] = 15, idx[2] = 15; idx[3] = 0; valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 1);
-    idx[0] =  2; idx[1] = 15, idx[2] = 15; idx[3] = 0; valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 1);
-    idx[0] = 15; idx[1] = 15, idx[2] =  2; idx[3] = 0; valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 1);
-    idx[0] = 15; idx[1] =  2, idx[2] = 15; idx[3] = 0; valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 1);
-    idx[0] =  6; idx[1] =  9, idx[2] = 23; idx[3] = 0; valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 1);
-    //Values inside the ball but in the second timestep hould be 0
-    idx[0] = 15; idx[1] = 15, idx[2] = 15; idx[3] = 1; valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 0);
-    idx[0] = 31; idx[1] = 15, idx[2] = 15; idx[3] = 1; valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 0);
-    idx[0] =  2; idx[1] = 15, idx[2] = 15; idx[3] = 1; valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 0);
-    idx[0] = 15; idx[1] = 15, idx[2] =  2; idx[3] = 1; valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 0);
-    idx[0] = 15; idx[1] =  2, idx[2] = 15; idx[3] = 1; valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 0);
-    idx[0] =  6; idx[1] =  9, idx[2] = 23; idx[3] = 1; valuesCorrect = valuesCorrect && (outputReader.GetPixelByIndex(idx) == 0);
+    idx[0] =  0; idx[1] =  0, idx[2] =  0; valuesCorrect = valuesCorrect && (*(unsigned char*)outputReader.getPixel(idx) == 0);
+    idx[0] =  0; idx[1] = 15, idx[2] = 15; valuesCorrect = valuesCorrect && (*(unsigned char*)outputReader.getPixel(idx) == 0);
+    idx[0] = 15; idx[1] = 15, idx[2] =  0; valuesCorrect = valuesCorrect && (*(unsigned char*)outputReader.getPixel(idx) == 0);
+    idx[0] = 15; idx[1] =  0, idx[2] = 15; valuesCorrect = valuesCorrect && (*(unsigned char*)outputReader.getPixel(idx) == 0);
+    idx[0] =  5; idx[1] =  9, idx[2] = 23; valuesCorrect = valuesCorrect && (*(unsigned char*)outputReader.getPixel(idx) == 0);
+    //Values inside the ball should be 1   hould be 1    idx[0] = 15; idx[1] = 15, idx[2] = 15; idx[3] = 0; valuesCorrect = valuesCorrect && (outputReader.GetPixel(idx) == 1);
+    idx[0] = 31; idx[1] = 15, idx[2] = 15; valuesCorrect = valuesCorrect && (*(unsigned char*)outputReader.getPixel(idx) == 1);
+    idx[0] =  2; idx[1] = 15, idx[2] = 15; valuesCorrect = valuesCorrect && (*(unsigned char*)outputReader.getPixel(idx) == 1);
+    idx[0] = 15; idx[1] = 15, idx[2] =  2; valuesCorrect = valuesCorrect && (*(unsigned char*)outputReader.getPixel(idx) == 1);
+    idx[0] = 15; idx[1] =  2, idx[2] = 15; valuesCorrect = valuesCorrect && (*(unsigned char*)outputReader.getPixel(idx) == 1);
+    idx[0] =  6; idx[1] =  9, idx[2] = 23; valuesCorrect = valuesCorrect && (*(unsigned char*)outputReader.getPixel(idx) == 1);
+    //Values inside the ball but in the second timestep hould be 0    idx[0] = 15; idx[1] = 15, idx[2] = 15; idx[3] = 1; valuesCorrect = valuesCorrect && (outputReader.GetPixel(idx) == 0);
+    idx[0] = 31; idx[1] = 15, idx[2] = 15; valuesCorrect = valuesCorrect && (*(unsigned char*)outputReader.getPixel(idx,1) == 0);
+    idx[0] =  2; idx[1] = 15, idx[2] = 15; valuesCorrect = valuesCorrect && (*(unsigned char*)outputReader.getPixel(idx,1) == 0);
+    idx[0] = 15; idx[1] = 15, idx[2] =  2; valuesCorrect = valuesCorrect && (*(unsigned char*)outputReader.getPixel(idx,1) == 0);
+    idx[0] = 15; idx[1] =  2, idx[2] = 15; valuesCorrect = valuesCorrect && (*(unsigned char*)outputReader.getPixel(idx,1) == 0);
+    idx[0] =  6; idx[1] =  9, idx[2] = 23; valuesCorrect = valuesCorrect && (*(unsigned char*)outputReader.getPixel(idx,1) == 0);
 
     CPPUNIT_ASSERT_MESSAGE("SurfaceToImageFilter_BallSurfaceAsInput_Output4DCorrect", valuesCorrect == true);
   }

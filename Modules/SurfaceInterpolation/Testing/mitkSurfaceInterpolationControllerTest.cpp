@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkDebugLeaks.h>
 
 #include "mitkImageTimeSelector.h"
-#include "mitkImagePixelWriteAccessor.h"
 
 class mitkSurfaceInterpolationControllerTestSuite : public mitk::TestFixture
 {

@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkStandaloneDataStorage.h>
 #include <mitkImageCast.h>
 #include <mitkImageAccessByItk.h>
+#include <mitkImageVtkAccessor.h>
 
 #include <vtkImageViewer.h>
 #include <vtkRenderWindowInteractor.h>
@@ -69,7 +70,8 @@ int main( int /*argc*/, char ** argv )
   vtkRenderWindowInteractor* renderWindowInteractor
       =vtkRenderWindowInteractor ::New();
   viewer->SetupInteractor(renderWindowInteractor);
-  viewer->SetInputData(mitkImage->GetVtkImageData());
+  mitk::ImageVtkAccessor accessor(mitkImage);
+  viewer->SetInputData(accessor.getVtkImageData());
   viewer->Render();
   viewer->SetColorWindow(255);
   viewer->SetColorLevel(128);

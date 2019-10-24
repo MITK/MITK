@@ -1,45 +1,26 @@
-/*===================================================================
+#pragma once
 
-The Medical Imaging Interaction Toolkit (MITK)
-
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
-All rights reserved.
-
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
-
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
-
-#ifndef MITKIMAGEVTKACCESSOR_H
-#define MITKIMAGEVTKACCESSOR_H
-
-#include "mitkImageVtkWriteAccessor.h"
+#include "mitkNumericConstants.h"
+#include "mitkImageRegionAccessor.h"
 
 namespace mitk {
 
-/**
- * @brief ImageVtkAccessor class provides any image read access which is required by Vtk methods
- * @ingroup Data
- * @deprecatedSince{2014_10} Use ImageVtkWriteAccessor instead
- */
-class ImageVtkAccessor : public ImageVtkWriteAccessor
+MITKCORE_EXPORT ScalarType UnlockedSinglePixelAccess(itk::SmartPointer<Image> im, itk::Index<3> idx, int timestep, int component = 0);
+
+// Doesn't work with regions, only whole data can be accessed
+class MITKCORE_EXPORT ImageVtkAccessor : public ImageRegionAccessor
 {
-protected:
-
-  ImageVtkAccessor(
-      ImagePointer iP,
-      const ImageDataItem* iDI
-      );
-
 public:
+  void setRegion(int dim, int min, int max) override {};
+  void* getPixel(int index, int timestep) override { return nullptr; }
+  void* getData(int timestep) override { return nullptr; };
 
-  DEPRECATED(static ImageVtkAccessor* New(ImagePointer, const ImageDataItem*));
+  vtkImageData* getVtkImageData(int timestep = 0);
+
+  ImageVtkAccessor(itk::SmartPointer<Image> image);
+  ~ImageVtkAccessor();
+protected:
+  std::vector<vtkImageData*> m_TimeVolumes;
 };
 
 }
-
-#endif // MITKIMAGEVTKACCESSOR_H

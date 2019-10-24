@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include <itkImage.h>
 #include <mitkImageCast.h>
-#include <mitkImageReadAccessor.h>
 
 
 
@@ -963,10 +962,8 @@ mitk::Image::Pointer mitkColourImageProcessor::combineRGBAImage( mitk::Image::Po
   // Order access to a whole Image object
   try
   {
-    mitk::ImageReadAccessor img1(input1);
-    const unsigned char* data1 = (const unsigned char*) img1.GetData();
-    mitk::ImageReadAccessor img2(input2);
-    const unsigned char* data2 = (const unsigned char*) img2.GetData();
+    const unsigned char* data1 = (const unsigned char*) input1->GetVolumeData()->GetData();
+    const unsigned char* data2 = (const unsigned char*) input2->GetVolumeData()->GetData();
 
     unsigned int *dim = input1->GetDimensions();
 

@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkMorphologicalOperations.h"
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
-#include <mitkImageReadAccessor.h>
 #include <mitkImageTimeSelector.h>
 
 #include <itkBinaryBallStructuringElement.h>
@@ -58,8 +57,9 @@ void mitk::MorphologicalOperations::Closing(mitk::Image::Pointer& image, int fac
 
       AccessByItk_3(img3D, itkClosing, img3D, factor, structuralElement);
 
-      mitk::ImageReadAccessor accessor(img3D);
-      image->SetVolume(accessor.GetData(), t);
+      mitk::ImageRegionAccessor accessor(img3D);
+      mitk::ImageAccessLock lock(&accessor);
+      image->SetVolume(accessor.getData(), t);
     }
   }
   else
@@ -93,8 +93,9 @@ void mitk::MorphologicalOperations::Erode(mitk::Image::Pointer& image, int facto
 
       AccessByItk_3(img3D, itkErode,  img3D, factor, structuralElement);
 
-      mitk::ImageReadAccessor accessor(img3D);
-      image->SetVolume(accessor.GetData(), t);
+      mitk::ImageRegionAccessor accessor(img3D);
+      mitk::ImageAccessLock lock(&accessor);
+      image->SetVolume(accessor.getData(), t);
     }
   }
   else
@@ -128,8 +129,9 @@ void mitk::MorphologicalOperations::Dilate(mitk::Image::Pointer& image, int fact
 
       AccessByItk_3(img3D, itkDilate, img3D, factor, structuralElement);
 
-      mitk::ImageReadAccessor accessor(img3D);
-      image->SetVolume(accessor.GetData(), t);
+      mitk::ImageRegionAccessor accessor(img3D);
+      mitk::ImageAccessLock lock(&accessor);
+      image->SetVolume(accessor.getData(), t);
     }
   }
   else
@@ -163,8 +165,9 @@ void mitk::MorphologicalOperations::Opening(mitk::Image::Pointer& image, int fac
 
       AccessByItk_3(img3D, itkOpening, img3D, factor, structuralElement);
 
-      mitk::ImageReadAccessor accessor(img3D);
-      image->SetVolume(accessor.GetData(), t);
+      mitk::ImageRegionAccessor accessor(img3D);
+      mitk::ImageAccessLock lock(&accessor);
+      image->SetVolume(accessor.getData(), t);
     }
   }
   else
@@ -198,8 +201,9 @@ void mitk::MorphologicalOperations::FillHoles(mitk::Image::Pointer &image)
 
       AccessByItk_1(img3D, itkFillHoles, img3D);
 
-      mitk::ImageReadAccessor accessor(img3D);
-      image->SetVolume(accessor.GetData(), t);
+      mitk::ImageRegionAccessor accessor(img3D);
+      mitk::ImageAccessLock lock(&accessor);
+      image->SetVolume(accessor.getData(), t);
     }
   }
   else
@@ -233,8 +237,9 @@ void mitk::MorphologicalOperations::RemoveFragments(mitk::Image::Pointer& image,
 
       AccessByItk_2(img3D, itkRemoveFragments, percent, img3D);
 
-      mitk::ImageReadAccessor accessor(img3D);
-      image->SetVolume(accessor.GetData(), t);
+      mitk::ImageRegionAccessor accessor(img3D);
+      mitk::ImageAccessLock lock(&accessor);
+      image->SetVolume(accessor.getData(), t);
     }
   } else
   {
@@ -267,8 +272,9 @@ void mitk::MorphologicalOperations::WeightedMedian(mitk::Image::Pointer& image, 
 
       AccessByItk_3(img3D, itkWeightedMedian, img3D, factor, centerWeight);
 
-      mitk::ImageReadAccessor accessor(img3D);
-      image->SetVolume(accessor.GetData(), t);
+      mitk::ImageRegionAccessor accessor(img3D);
+      mitk::ImageAccessLock lock(&accessor);
+      image->SetVolume(accessor.getData(), t);
     }
   } else
   {

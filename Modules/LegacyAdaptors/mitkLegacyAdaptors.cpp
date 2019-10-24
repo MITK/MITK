@@ -14,9 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 #include "mitkLegacyAdaptors.h"
-#include <mitkImageWriteAccessor.h>
+#include <mitkImageRegionAccessor.h>
 
-mitkIpPicDescriptor* mitk::CastToIpPicDescriptor(mitk::Image::Pointer refImg, mitk::ImageWriteAccessor* imageAccess, mitkIpPicDescriptor* picDesc)
+mitkIpPicDescriptor* mitk::CastToIpPicDescriptor(mitk::Image::Pointer refImg, mitk::ImageRegionAccessor* imageAccess, mitkIpPicDescriptor* picDesc)
 {
   const mitk::ImageDescriptor::Pointer imDesc = refImg->GetImageDescriptor();
 
@@ -34,13 +34,13 @@ mitkIpPicDescriptor* mitk::CastToIpPicDescriptor(mitk::Image::Pointer refImg, mi
   picDesc->bpe = refImg->GetPixelType().GetBpe();
   if(imageAccess != nullptr)
   {
-    picDesc->data = imageAccess->GetData();
+    picDesc->data = imageAccess->getData();
   }
 
   return picDesc;
 }
 
-mitkIpPicDescriptor* mitk::CastToIpPicDescriptor(itk::SmartPointer<mitk::ImageDataItem> refItem, mitk::ImageWriteAccessor* imageAccess, mitkIpPicDescriptor *picDesc)
+mitkIpPicDescriptor* mitk::CastToIpPicDescriptor(itk::SmartPointer<mitk::ImageDataItem> refItem, mitk::ImageRegionAccessor* imageAccess, mitkIpPicDescriptor *picDesc)
 {
   // initialize dimension information
   for (unsigned int i=0; i<8; i++)
@@ -59,7 +59,7 @@ mitkIpPicDescriptor* mitk::CastToIpPicDescriptor(itk::SmartPointer<mitk::ImageDa
   picDesc->bpe = refItem->GetPixelType().GetBpe();
   if(imageAccess != nullptr)
   {
-    picDesc->data = imageAccess->GetData();
+    picDesc->data = imageAccess->getData();
   }
 
   return picDesc;
@@ -82,8 +82,9 @@ mitkIpPicDescriptor* mitk::CastToIpPicDescriptor(mitk::Image::Pointer refImg, mi
 
   picDesc->type = CastToIpPicType( refImg->GetPixelType().GetComponentType() );
   picDesc->bpe = refImg->GetPixelType().GetBpe();
-  mitk::ImageWriteAccessor imAccess(refImg);
-  picDesc->data = imAccess.GetData();
+  mitk::ImageRegionAccessor imAccess(refImg);
+  mitk::ImageAccessLock lock(&imAccess);
+  picDesc->data = imAccess.getData();
 
   return picDesc;
 }

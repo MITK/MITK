@@ -28,6 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLookupTable.h>
 #include <mitkLookupTableProperty.h>
 
+#include <mitkImageVtkAccessor.h>
+
 
 /*
 * Constructor. Doesn't do anything...
@@ -110,7 +112,9 @@ void mitk::VectorImageVtkGlyphMapper3D::GenerateDataForRenderer( mitk::BaseRende
     return ;
   }
 
-  vtkImageData* vtkImage = mitkImage->GetVtkImageData();
+  ImageVtkAccessor accessor(mitkImage);
+  ImageAccessLock lock(&accessor);
+  vtkImageData* vtkImage = accessor.getVtkImageData();
 
   //
   // make sure, that we have point data with more than 1 component (as vectors)

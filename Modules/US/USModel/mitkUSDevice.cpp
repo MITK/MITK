@@ -15,7 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkUSDevice.h"
-#include "mitkImageReadAccessor.h"
 
 // US Control Interfaces
 #include "mitkUSControlInterfaceProbes.h"
@@ -593,9 +592,7 @@ void mitk::USDevice::GenerateData()
       m_Image->GetDimensions());
   }
 
-  mitk::ImageReadAccessor inputReadAccessor(m_Image,
-    m_Image->GetSliceData(0, 0, 0));
-  output->SetSlice(inputReadAccessor.GetData());
+  output->SetSlice(m_Image->GetSliceData()->GetData());
   output->SetGeometry(m_Image->GetGeometry());
   m_ImageMutex->Unlock();
 };

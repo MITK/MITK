@@ -15,7 +15,6 @@ set(CPP_FILES
   Algorithms/mitkDataNodeSource.cpp
   Algorithms/mitkExtractSliceFilter.cpp
   Algorithms/mitkHistogramGenerator.cpp
-  Algorithms/mitkImageChannelSelector.cpp
   Algorithms/mitkImageSliceSelector.cpp
   Algorithms/mitkImageSource.cpp
   Algorithms/mitkImageTimeSelector.cpp
@@ -71,7 +70,7 @@ set(CPP_FILES
   DataManagement/mitkGeometryData.cpp
   DataManagement/mitkGeometryTransformHolder.cpp
   DataManagement/mitkGroupTagProperty.cpp
-  DataManagement/mitkImageAccessorBase.cpp
+  DataManagement/mitkImageAccessLock.cpp
   DataManagement/mitkImageCaster.cpp
   DataManagement/mitkImageCastPart1.cpp
   DataManagement/mitkImageCastPart2.cpp
@@ -80,12 +79,9 @@ set(CPP_FILES
   DataManagement/mitkImage.cpp
   DataManagement/mitkImageDataItem.cpp
   DataManagement/mitkImageDescriptor.cpp
-  DataManagement/mitkImageReadAccessor.cpp
+  DataManagement/mitkImageRegionAccessor.cpp
   DataManagement/mitkImageStatisticsHolder.cpp
   DataManagement/mitkImageVtkAccessor.cpp
-  DataManagement/mitkImageVtkReadAccessor.cpp
-  DataManagement/mitkImageVtkWriteAccessor.cpp
-  DataManagement/mitkImageWriteAccessor.cpp
   DataManagement/mitkIntPropertyExtension.cpp
   DataManagement/mitkIPersistenceService.cpp
   DataManagement/mitkIPropertyAliases.cpp

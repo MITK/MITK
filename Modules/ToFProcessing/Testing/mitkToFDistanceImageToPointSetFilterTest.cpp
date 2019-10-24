@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkToFProcessingCommon.h>
 #include <mitkToFTestingCommon.h>
 #include <mitkNumericTypes.h>
-#include <mitkImagePixelReadAccessor.h>
+#include <mitkImageRegionAccessor.h>
 
 #include <itkImage.h>
 #include <itkImageRegionIterator.h>
@@ -198,15 +198,16 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
   filter->SetReconstructionMode(true);
   mitk::PointSet::Pointer expectedResult = mitk::PointSet::New();
   unsigned int counter = 0;
-  mitk::ImagePixelReadAccessor<float,2> imageAcces(image, image->GetSliceData(0));
+  mitk::ImageRegionAccessor imageAcces(image);
   for (unsigned int j=0; j<dimY; j++)
   {
     for (unsigned int i=0; i<dimX; i++)
     {
-      itk::Index<2> index;
+      itk::Index<3> index;
       index[0] = i;
       index[1] = j;
-      float distance = imageAcces.GetPixelByIndex(index);
+      index[2] = 0;
+      float distance = *(float*)imageAcces.getPixel(index);
       mitk::Point3D coordinate = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i,j,distance,focalLengthX,focalLengthY,principalPoint[0],principalPoint[1]);
       expectedResult->InsertPoint(counter,coordinate);
       counter++;

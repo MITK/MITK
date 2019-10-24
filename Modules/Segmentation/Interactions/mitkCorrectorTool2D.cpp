@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToolManager.h"
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
-#include "mitkImageReadAccessor.h"
 #include "mitkAbstractTransformGeometry.h"
 #include "mitkLabelSetImage.h"
 
@@ -184,8 +183,9 @@ void mitk::CorrectorTool2D::OnMouseReleased( StateMachineAction*, InteractionEve
 
   mitk::Image::Pointer resultSlice = mitk::Image::New();
   resultSlice->Initialize(algorithm->GetOutput());
-  mitk::ImageReadAccessor imAccess(algorithm->GetOutput());
-  resultSlice->SetVolume(imAccess.GetData());
+  mitk::ImageRegionAccessor accessor(algorithm->GetOutput());
+  mitk::ImageAccessLock lock(&accessor);
+  resultSlice->SetVolume(accessor.getData());
 
   this->WriteBackSegmentationResult(positionEvent, resultSlice);
 }

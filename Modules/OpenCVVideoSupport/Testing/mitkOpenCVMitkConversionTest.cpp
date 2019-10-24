@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkITKImageImport.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkIOUtil.h>
-#include "mitkImageReadAccessor.h"
 #include "mitkImageSliceSelector.h"
 
 // itk includes
@@ -224,8 +223,7 @@ void ConvertCVMatForthAndBack(mitk::Image::Pointer inputForCVMat, std::string im
 
   // initialize the image with the input image, since we want to test equality and OpenCV does not feature geometries and spacing
   mitk::Image::Pointer result = inputForCVMat->Clone();
-  mitk::ImageReadAccessor resultAcc(toMitkConverter->GetOutput(), toMitkConverter->GetOutput()->GetSliceData());
-  result->SetImportSlice(const_cast<void*>(resultAcc.GetData()));
+  result->SetImportSlice(const_cast<void*>(toMitkConverter->GetOutput()->GetSliceData()->GetData()));
 
   if( result->GetPixelType().GetNumberOfComponents() == 1 )
   {
@@ -279,8 +277,7 @@ void ConvertIplImageForthAndBack(mitk::Image::Pointer inputForIpl, std::string i
 
   // initialize the image with the input image, since we want to test equality and OpenCV does not feature geometries and spacing
   mitk::Image::Pointer result = inputForIpl->Clone();
-  mitk::ImageReadAccessor resultAcc(toMitkConverter->GetOutput(), toMitkConverter->GetOutput()->GetSliceData());
-  result->SetImportSlice(const_cast<void*>(resultAcc.GetData()));
+  result->SetImportSlice(const_cast<void*>(toMitkConverter->GetOutput()->GetSliceData()->GetData()));
 
   if( result->GetPixelType().GetNumberOfComponents() == 1 )
   {

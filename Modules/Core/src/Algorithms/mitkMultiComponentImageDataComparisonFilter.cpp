@@ -16,8 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk includes
 #include "mitkMultiComponentImageDataComparisonFilter.h"
-#include "mitkImageReadAccessor.h"
-#include "mitkImagePixelReadAccessor.h"
+#include "mitkImageAccessLock.h"
 
 // other includes
 // #include <omp.h>
@@ -141,21 +140,22 @@ namespace mitk
   template <typename TPixel >
   void mitk::MultiComponentImageDataComparisonFilter::CompareMultiComponentImage( const Image* testImage, const Image* validImage )
   {
-
     unsigned int noOfTimes = validImage->GetDimension(3);
     unsigned int noOfPixels = validImage->GetDimension(0)*validImage->GetDimension(1)*validImage->GetDimension(2);
     unsigned int noOfComponents = validImage->GetPixelType().GetNumberOfComponents();
 
+    ImageRegionAccessor readAccTImage(const_cast<Image*>(testImage));
+    ImageAccessLock tLock(&readAccTImage);
+
+    ImageRegionAccessor readAccVImage(const_cast<Image*>(validImage));
+    ImageAccessLock vLock(&readAccVImage);
+
     for( unsigned int t = 0; t < noOfTimes; ++t)
     {
-
-      ImageReadAccessor readAccTImage(testImage, testImage->GetVolumeData(t));
-      ImageReadAccessor readAccVImage(validImage, validImage->GetVolumeData(t));
-
       for( unsigned int p = 0; p < noOfPixels*noOfComponents; ++p )
       {
-        TPixel vDataItem = static_cast<TPixel*>(const_cast<void*>(readAccVImage.GetData()))[p];
-        TPixel tDataItem = static_cast<TPixel*>(const_cast<void*>(readAccTImage.GetData()))[p];
+        TPixel vDataItem = static_cast<TPixel*>(const_cast<void*>(readAccVImage.getData(t)))[p];
+        TPixel tDataItem = static_cast<TPixel*>(const_cast<void*>(readAccTImage.getData(t)))[p];
 
         if( std::abs( static_cast<double>(tDataItem - vDataItem) )>m_Tolerance )
         {
@@ -167,7 +167,7 @@ namespace mitk
           double min = std::min(m_CompareDetails->m_MinimumDifference,
             std::abs( static_cast<double>(tDataItem - vDataItem) ));
 
-          if(min != 0.0f)                                 // a difference of zero is not a difference!
+          if(min != 0.0f) // A difference of zero is not a difference!
             m_CompareDetails->m_MinimumDifference = min;
 
           m_CompareDetails->m_TotalDifference += std::abs(static_cast<double>(tDataItem - vDataItem) );

@@ -19,6 +19,7 @@
 #include "mitkInteractionPositionEvent.h"
 #include "mitkCameraController.h"
 #include "mitkPropertyList.h"
+#include "mitkImageVtkAccessor.h"
 #include <mitkAbstractTransformGeometry.h>
 #include <string.h>
 // level window
@@ -36,7 +37,6 @@
 #include "mitkLine.h"
 
 // Rotation
-#include <mitkImagePixelReadAccessor.h>
 #include <mitkRotationOperation.h>
 #include "rotate_cursor.xpm"
 #include "mitkInteractionConst.h"
@@ -1004,14 +1004,7 @@ void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::
     }
     else
     {
-      mitk::ScalarType pixelValue;
-      mitkPixelTypeMultiplex5(mitk::FastSinglePixelAccess,
-        image3D->GetChannelDescriptor().GetPixelType(),
-        image3D,
-        image3D->GetVolumeData(posEvent->GetSender()->GetTimeStep()),
-        p,
-        pixelValue,
-        component);
+      mitk::ScalarType pixelValue = mitk::UnlockedSinglePixelAccess(image3D, p, posEvent->GetSender()->GetTimeStep(), component);
       statusBar->DisplayImageInfo(worldposition, p, posEvent->GetSender()->GetTime(), pixelValue);
     }
   }

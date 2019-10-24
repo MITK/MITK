@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkITKImageImport_txx
 #define __mitkITKImageImport_txx
 #include "mitkITKImageImport.h"
-#include "mitkImageReadAccessor.h"
+#include <mitkImageAccessLock.h>
 
 template <class TInputImage>
 mitk::ITKImageImport<TInputImage>::ITKImageImport()
@@ -80,7 +80,7 @@ void mitk::ITKImageImport<TInputImage>::GenerateData()
   InputImageConstPointer input  = this->GetInput();
   mitk::Image::Pointer output = this->GetOutput();
 
-  output->SetImportChannel((void*)input->GetBufferPointer(), 0, mitk::Image::ReferenceMemory);
+  output->SetImportVolume((void*)input->GetBufferPointer(), 0, mitk::Image::ReferenceMemory);
 }
 
 template <class TInputImage>
@@ -116,7 +116,7 @@ void mitk::ITKImageImport<TInputImage>::SetNthOutput(DataObjectPointerArraySizeT
     InputImageConstPointer input = this->GetInput();
     mitk::Image::Pointer currentOutput = this->GetOutput();
     if(input.IsNotNull() && currentOutput.IsNotNull())
-      currentOutput->SetChannel(input->GetBufferPointer());
+      currentOutput->SetVolume(input->GetBufferPointer());
   }
   Superclass::SetNthOutput(idx, output);
 }
@@ -165,8 +165,10 @@ mitk::Image::Pointer mitk::GrabItkImageMemory(ItkOutputImageType* itkimage, mitk
     if( mitkImage->IsInitialized() )
     {
       // check the data pointer, for that, we need to ignore the lock of the mitkImage
-      mitk::ImageReadAccessor read_probe( mitk::Image::Pointer(mitkImage), nullptr, mitk::ImageAccessorBase::IgnoreLock );
-      if( itkimage->GetBufferPointer() == read_probe.GetData() )
+	  mitk::Image::Pointer mitkImagePointer = mitkImage;
+      mitk::ImageRegionAccessor read_probe(mitkImage);
+	  mitk::ImageAccessLock lock(&read_probe, false);
+      if( itkimage->GetBufferPointer() == read_probe.getData() )
         return resultImage;
     }
 

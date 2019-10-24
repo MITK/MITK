@@ -23,16 +23,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include <mitkIpPic.h>
 //#include "mitkPixelType.h"
 #include "mitkImageDescriptor.h"
-//#include "mitkImageVtkAccessor.h"
 
 class vtkImageData;
 
 namespace mitk {
 
   class PixelType;
-  class ImageVtkReadAccessor;
-  class ImageVtkWriteAccessor;
-
+  class ImageVtkAccessor;
   class Image;
 
 
@@ -52,13 +49,6 @@ namespace mitk {
   //## @ingroup Data
   class MITKCORE_EXPORT ImageDataItem : public itk::LightObject
   {
-
-  friend class ImageAccessorBase;
-  friend class ImageWriteAccessor;
-  friend class ImageReadAccessor;
-
-  template <class TPixel, unsigned int VDimension>
-  friend class ImagePixelAccessor;
 
   friend class Image;
 
@@ -90,9 +80,7 @@ namespace mitk {
 
     ImageDataItem(const ImageDataItem &other);
 
-   /**
-   \deprecatedSince{2012_09} Please use image accessors instead: See Doxygen/Related-Pages/Concepts/Image. This method can be replaced by ImageWriteAccessor::GetData() or ImageReadAccessor::GetData() */
-    DEPRECATED(void* GetData() const)
+    void* GetData() const
     {
       return m_Data;
     }
@@ -142,6 +130,8 @@ namespace mitk {
       return returnValue;
     }
 
+    vtkImageData* getVtkImageData(ImagePointer iP);
+
     ImageDataItem::ConstPointer GetParent() const
     {
       return m_Parent;
@@ -153,8 +143,7 @@ namespace mitk {
      *                            See bug 5050 for detailed information.
      * @return Pointer of type ImageVtkReadAccessor
      */
-    ImageVtkReadAccessor* GetVtkImageAccessor(ImageConstPointer) const;
-    ImageVtkWriteAccessor* GetVtkImageAccessor(ImagePointer);
+    ImageVtkAccessor* GetVtkImageAccessor(ImagePointer);
 
     // Returns if image data should be deleted on destruction of ImageDataItem.
     bool GetManageMemory() const
@@ -179,8 +168,7 @@ namespace mitk {
     bool m_ManageMemory;
 
     mutable vtkImageData* m_VtkImageData;
-    mutable ImageVtkReadAccessor* m_VtkImageReadAccessor;
-    ImageVtkWriteAccessor* m_VtkImageWriteAccessor;
+    mutable ImageVtkAccessor* m_VtkImageAccessor;
     size_t m_Offset;
 
     bool m_IsComplete;

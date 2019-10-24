@@ -21,13 +21,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 // other
 #include <mitkExtractSliceFilter.h>
 #include <mitkImage.h>
-#include <mitkImagePixelWriteAccessor.h>
-#include <mitkImagePixelReadAccessor.h>
+#include <mitkImageRegionAccessor.h>
 #include <mitkIOUtil.h>
 #include <mitkSliceNavigationController.h>
 #include <mitkSegmentationInterpolationController.h>
 #include <mitkTool.h>
 #include <mitkVtkImageOverwrite.h>
+#include <mitkImageRegionAccessor.h>
+#include <mitkImageVtkAccessor.h>
 
 class mitkSegmentationInterpolationTestSuite : public mitk::TestFixture
 {
@@ -63,7 +64,7 @@ private:
 
         itk::Index<3> currentPoint;
         {
-            mitk::ImagePixelWriteAccessor<mitk::Tool::DefaultSegmentationDataType, 3> writeAccessor(m_SegmentationImage);
+            mitk::ImageRegionAccessor writeAccessor(m_SegmentationImage);
 
             // Fill 3x3 slice
             currentPoint[dim] = m_CenterPoint[dim] - 1;
@@ -73,12 +74,12 @@ private:
                 {
                     currentPoint[(dim+1)%3] = m_CenterPoint[(dim+1)%3] + i;
                     currentPoint[(dim+2)%3] = m_CenterPoint[(dim+2)%3] + j;
-                    writeAccessor.SetPixelByIndexSafe(currentPoint, 1);
+                    *(unsigned char*)writeAccessor.getPixel(currentPoint) = 1;
                 }
             }
             // Now i=j=1, set point two slices up
             currentPoint[dim] = m_CenterPoint[dim] + 1;
-            writeAccessor.SetPixelByIndexSafe(currentPoint, 1);
+            *(unsigned char*)writeAccessor.getPixel(currentPoint) = 1;
         }
 
     //        mitk::IOUtil::Save(m_SegmentationImage, "SOME PATH");
@@ -100,7 +101,7 @@ private:
 
         // Write result into segmentation image
         vtkSmartPointer<mitkVtkImageOverwrite> reslicer = vtkSmartPointer<mitkVtkImageOverwrite>::New();
-        reslicer->SetInputSlice(interpolationResult->GetSliceData()->GetVtkImageAccessor(interpolationResult)->GetVtkImageData());
+        reslicer->SetInputSlice(interpolationResult->GetSliceData()->GetVtkImageAccessor(interpolationResult)->getVtkImageData());
         reslicer->SetOverwriteMode(true);
         reslicer->Modified();
         mitk::ExtractSliceFilter::Pointer extractor =  mitk::ExtractSliceFilter::New(reslicer);
@@ -115,7 +116,7 @@ private:
     //        mitk::IOUtil::Save(m_SegmentationImage, "SOME PATH");
 
         // Check a 4x4 square, the center of which needs to be filled
-        mitk::ImagePixelReadAccessor<mitk::Tool::DefaultSegmentationDataType, 3> readAccess(m_SegmentationImage);
+        mitk::ImageRegionAccessor readAccess(m_SegmentationImage);
         currentPoint = m_CenterPoint;
 
         for (int i=-1; i<=2; ++i)
@@ -127,11 +128,11 @@ private:
 
                 if (i == -1 || i == 2 || j == -1 || j == 2)
                 {
-                    CPPUNIT_ASSERT_MESSAGE("Have false positive segmentation.", readAccess.GetPixelByIndexSafe(currentPoint) == 0);
+                    CPPUNIT_ASSERT_MESSAGE("Have false positive segmentation.", *(unsigned short*)readAccess.getPixel(currentPoint) == 0);
                 }
                 else
                 {
-                    CPPUNIT_ASSERT_MESSAGE("Have false negative segmentation.", readAccess.GetPixelByIndexSafe(currentPoint) == 1);
+                    CPPUNIT_ASSERT_MESSAGE("Have false negative segmentation.", *(unsigned short*)readAccess.getPixel(currentPoint) == 1);
                 }
             }
         }
@@ -162,8 +163,7 @@ public:
         {
             size *= m_SegmentationImage->GetDimension(dim);
         }
-        mitk::ImageWriteAccessor imageAccessor(m_SegmentationImage);
-        memset(imageAccessor.GetData(), 0, size);
+        memset(m_SegmentationImage->GetVolumeData()->GetData(), 0, size);
 
         // Work in the center of the image (Pic3D)
         m_CenterPoint = {{ 127, 127, 25 }};

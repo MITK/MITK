@@ -21,8 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIOUtil.h>
 #include <mitkToFCameraMITKPlayerDevice.h>
 #include <mitkToFConfig.h>
-#include <mitkImagePixelReadAccessor.h>
-
+#include <mitkImageRegionAccessor.h>
 static bool CompareImages(mitk::Image::Pointer mitkImage, cv::Mat openCVImage)
 {
   float equal = true;
@@ -30,15 +29,16 @@ static bool CompareImages(mitk::Image::Pointer mitkImage, cv::Mat openCVImage)
   {
     equal = false;
   }
-  mitk::ImagePixelReadAccessor<float,2> imageAcces(mitkImage, mitkImage->GetSliceData(0));
+  mitk::ImageRegionAccessor imageAcces(mitkImage);
   for(int i=0; i<openCVImage.cols; i++)
   {
     for(int j=0; j<openCVImage.rows; j++)
     {
-      itk::Index<2> currentIndex;
+      itk::Index<3> currentIndex;
       currentIndex[0] = i;
       currentIndex[1] = j;
-      float mitkImageValue = imageAcces.GetPixelByIndex(currentIndex);
+      currentIndex[2] = 0;
+      float mitkImageValue = *(float*)imageAcces.getPixel(currentIndex);
       float openCVImageValue = openCVImage.at<float>(j,i);
       if (!mitk::Equal(mitkImageValue,openCVImageValue))
       {
@@ -97,5 +97,3 @@ int mitkToFOpenCVImageGrabberTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_END();
 
 }
-
-

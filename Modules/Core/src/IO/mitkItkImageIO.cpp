@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkItkImageIO.h"
 
 #include <mitkImage.h>
-#include <mitkImageReadAccessor.h>
+#include <mitkImageAccessLock.h>
 #include <mitkCustomMimeType.h>
 #include <mitkIOMimeTypes.h>
 #include <mitkLocaleSwitch.h>
@@ -288,7 +288,7 @@ std::vector<BaseData::Pointer> ItkImageIO::Read()
   m_ImageIO->Read( buffer );
 
   image->Initialize( MakePixelType(m_ImageIO), ndim, dimensions );
-  image->SetImportChannel( buffer, 0, Image::ManageMemory );
+  image->SetImportVolume( buffer, 0, Image::ManageMemory );
 
   const itk::MetaDataDictionary& dictionary = m_ImageIO->GetMetaDataDictionary();
 
@@ -613,8 +613,11 @@ void ItkImageIO::Write()
 
       itk::EncapsulateMetaData<std::string>(m_ImageIO->GetMetaDataDictionary(), key, value);
     }
-    ImageReadAccessor imageAccess(image);
-    m_ImageIO->Write(imageAccess.GetData());
+    Image::Pointer imagePointer = const_cast<Image*>(image);
+    ImageRegionAccessor accessor(imagePointer);
+    ImageAccessLock lock(&accessor);
+
+    m_ImageIO->Write(accessor.getData());
   }
   catch (const std::exception& e)
   {

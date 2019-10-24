@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkToFConfig.h>
 #include <mitkIOUtil.h>
 #include <mitkImageGenerator.h>
-#include <mitkImageReadAccessor.h>
 
 class mitkToFNrrdImageWriterTestSuite : public mitk::TestFixture
 {
@@ -98,8 +97,7 @@ public:
     m_ToFNrrdImageWriter->Open(); //open file/stream
     for(unsigned int i = 0; i < m_NumberOfFrames ; ++i)
     {
-      mitk::ImageReadAccessor distAcc(m_GroundTruthDepthImage, m_GroundTruthDepthImage->GetSliceData(i, 0, 0));
-      distanceArray = (float*)distAcc.GetData();
+      distanceArray = (float*) m_GroundTruthDepthImage->GetSliceData(i)->GetData();
 
       //write (or add) the three slices to the file
       m_ToFNrrdImageWriter->Add(distanceArray, NULL, NULL);
@@ -127,10 +125,8 @@ public:
     m_ToFNrrdImageWriter->Open(); //open file/stream
     for(unsigned int i = 0; i < m_NumberOfFrames ; ++i)
     {
-      mitk::ImageReadAccessor distAcc(m_GroundTruthDepthImage, m_GroundTruthDepthImage->GetSliceData(i, 0, 0));
-      mitk::ImageReadAccessor amplAcc(m_GroundTruthAmplitudeImage, m_GroundTruthAmplitudeImage->GetSliceData(i, 0, 0));
-      distanceArray = (float*)distAcc.GetData();
-      amplitudeArray = (float*)amplAcc.GetData();
+      distanceArray = (float*)m_GroundTruthDepthImage->GetSliceData(i)->GetData();
+      amplitudeArray = (float*)m_GroundTruthAmplitudeImage->GetSliceData(i)->GetData();
 
       //write (or add) the three slices to the file
       m_ToFNrrdImageWriter->Add(distanceArray, amplitudeArray, NULL);
@@ -161,10 +157,8 @@ public:
     m_ToFNrrdImageWriter->Open(); //open file/stream
     for(unsigned int i = 0; i < m_NumberOfFrames ; ++i)
     {
-      mitk::ImageReadAccessor distAcc(m_GroundTruthDepthImage, m_GroundTruthDepthImage->GetSliceData(i, 0, 0));
-      mitk::ImageReadAccessor intensityAcc(m_GroundTruthIntensityImage, m_GroundTruthIntensityImage->GetSliceData(i, 0, 0));
-      distanceArray = (float*)distAcc.GetData();
-      intensityArray = (float*)intensityAcc.GetData();
+      distanceArray = (float*) m_GroundTruthDepthImage->GetSliceData(i)->GetData();
+      intensityArray = (float*) m_GroundTruthIntensityImage->GetSliceData(i)->GetData();
 
       //write (or add) the three slices to the file
       m_ToFNrrdImageWriter->Add(distanceArray, NULL, intensityArray);
@@ -198,13 +192,9 @@ public:
     m_ToFNrrdImageWriter->Open(); //open file/stream
     for(unsigned int i = 0; i < m_NumberOfFrames ; ++i)
     {
-      mitk::ImageReadAccessor distAcc(m_GroundTruthDepthImage, m_GroundTruthDepthImage->GetSliceData(i, 0, 0));
-      mitk::ImageReadAccessor intensityAcc(m_GroundTruthIntensityImage, m_GroundTruthIntensityImage->GetSliceData(i, 0, 0));
-      mitk::ImageReadAccessor amplAcc(m_GroundTruthAmplitudeImage, m_GroundTruthAmplitudeImage->GetSliceData(i, 0, 0));
-
-      distanceArray = (float*)distAcc.GetData();
-      intensityArray = (float*)intensityAcc.GetData();
-      amplitudeArray = (float*)amplAcc.GetData();
+      distanceArray = (float*)m_GroundTruthDepthImage->GetSliceData(i)->GetData();
+      intensityArray = (float*)m_GroundTruthIntensityImage->GetSliceData(i)->GetData();
+      amplitudeArray = (float*)m_GroundTruthAmplitudeImage->GetSliceData(i)->GetData();
 
       //write (or add) the three slices to the file
       m_ToFNrrdImageWriter->Add(distanceArray, amplitudeArray, intensityArray);

@@ -28,8 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateDataType.h>
 #include <mitkStatusBar.h>
 #include <mitkPixelTypeMultiplex.h>
-#include <mitkImagePixelReadAccessor.h>
 #include <mitkNodePredicateProperty.h>
+#include <mitkImageVtkAccessor.h>
 
 #include <mitkCompositePixelValueToString.h>
 
@@ -260,15 +260,7 @@ void QmitkImageNavigatorView::UpdateStatusBar()
         {
           itk::Index<3> p;
           image3D->GetGeometry()->WorldToIndex(position, p);
-          mitk::ScalarType pixelValue;
-          mitkPixelTypeMultiplex5(
-            mitk::FastSinglePixelAccess,
-            image3D->GetChannelDescriptor().GetPixelType(),
-            image3D,
-            image3D->GetVolumeData(renderer->GetTimeStep()),
-            p,
-            pixelValue,
-            component);
+          mitk::ScalarType pixelValue = mitk::UnlockedSinglePixelAccess(image3D, p, renderer->GetTimeStep(), component);
           statusBar->DisplayImageInfo(position, p, renderer->GetTime(), pixelValue);
         }
       }

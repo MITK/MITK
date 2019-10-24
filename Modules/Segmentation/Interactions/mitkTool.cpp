@@ -18,8 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDisplayInteractor.h"
 #include "mitkProperties.h"
-#include "mitkImageReadAccessor.h"
-#include "mitkImageWriteAccessor.h"
 #include "mitkLabelSetImage.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkLookupTableProperty.h"
@@ -272,9 +270,10 @@ mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode( Image* original
       byteSize *= segmentation->GetDimension(dim);
     }
 
-    mitk::ImageWriteAccessor writeAccess(segmentation.GetPointer(), segmentation->GetVolumeData(0));
+    mitk::ImageRegionAccessor accessor(segmentation.GetPointer());
+    mitk::ImageAccessLock lock(&accessor, true);
 
-    memset( writeAccess.GetData(), 0, byteSize );
+    memset(accessor.getData(), 0, byteSize);
   }
   else
   {
@@ -284,11 +283,10 @@ mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode( Image* original
       byteSize *= segmentation->GetDimension(dim);
     }
 
-    for( unsigned int volumeNumber = 0; volumeNumber < segmentation->GetDimension(3); volumeNumber++)
-    {
-      mitk::ImageWriteAccessor writeAccess(segmentation.GetPointer(), segmentation->GetVolumeData(volumeNumber));
-
-      memset( writeAccess.GetData(), 0, byteSize );
+    mitk::ImageRegionAccessor accessor(segmentation.GetPointer());
+    mitk::ImageAccessLock lock(&accessor, true);
+    for(unsigned int volumeNumber = 0; volumeNumber < segmentation->GetDimension(3); volumeNumber++) {
+      memset(accessor.getData(volumeNumber), 0, byteSize);
     }
   }
 

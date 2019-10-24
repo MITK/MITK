@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestingMacros.h"
 #include "mitkITKImageImport.h"
 
-#include "mitkImagePixelReadAccessor.h"
 
 #include <itkThresholdImageFilter.h>
 
@@ -96,8 +95,7 @@ bool Assert_ItkImportWithinAccessByItkSucceded_ReturnsTrue()
   AccessByItk_2(input, ItkThresholdFilter, output, threshold );
 //! [OutOfScopeCall]
 
-  mitk::ImagePixelReadAccessor< TPixel, 3 > readAccessor( output );
-  const TPixel* output_data = readAccessor.GetData();
+  TPixel* output_data = (TPixel*)output->GetVolumeData()->GetData();
 
   bool equal = true;
   for( unsigned int i=0; i<27; i++)

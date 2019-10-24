@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkColorProperty.h"
 #include "mitkVtkPropRenderer.h"
 #include "mitkRenderingManager.h"
+#include <mitkImageVtkAccessor.h>
 
 #include <vtkActor.h>
 #include <vtkProperty.h>
@@ -207,7 +208,8 @@ bool mitk::GPUVolumeMapper3D::IsRenderable(mitk::BaseRenderer* renderer)
   if ( !input || !input->IsInitialized() )
     return false;
 
-  vtkImageData *inputData = input->GetVtkImageData( this->GetTimestep() );
+  mitk::ImageVtkAccessor accessor(input);
+  vtkImageData *inputData = accessor.getVtkImageData(this->GetTimestep());
 
   if(inputData==NULL)
     return false;
@@ -280,7 +282,8 @@ void mitk::GPUVolumeMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *rende
   InitVtkMapper( renderer );
 
   mitk::Image *input = const_cast< mitk::Image * >( this->GetInput() );
-  vtkImageData *inputData = input->GetVtkImageData( this->GetTimestep() );
+  mitk::ImageVtkAccessor accessor(input);
+  vtkImageData *inputData = accessor.getVtkImageData(this->GetTimestep());
   m_UnitSpacingImageFilter->SetInputData( inputData );
 
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);

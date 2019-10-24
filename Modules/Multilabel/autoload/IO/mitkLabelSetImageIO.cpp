@@ -216,8 +216,9 @@ void LabelSetImageIO::Write()
     }
     // end label set specific meta data
 
-    ImageReadAccessor imageAccess(inputVector);
-    nrrdImageIo->Write(imageAccess.GetData());
+    ImageRegionAccessor accessor(inputVector);
+    ImageAccessLock lock(&accessor);
+    nrrdImageIo->Write(accessor.getData());
   }
   catch (const std::exception& e)
   {
@@ -324,7 +325,7 @@ std::vector<BaseData::Pointer> LabelSetImageIO::Read()
   nrrdImageIO->Read(buffer);
 
   image->Initialize(MakePixelType(nrrdImageIO), ndim, dimensions);
-  image->SetImportChannel(buffer, 0, Image::ManageMemory);
+  image->SetImportVolume(buffer, 0, Image::ManageMemory);
 
   // access direction of itk::Image and include spacing
   mitk::Matrix3D matrix;

@@ -31,8 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <QmitkRenderingManager.h>
 
-#include <mitkImageReadAccessor.h>
-
 #include <vtkRenderWindowInteractor.h>
 
 const std::string QmitkODFDetailsView::VIEW_ID = "org.mitk.views.odfdetails";
@@ -214,8 +212,7 @@ void QmitkODFDetailsView::UpdateOdf()
         const mitk::QBallImage* qball_image = dynamic_cast< mitk::QBallImage* >( m_ImageNode->GetData() );
 
         // get access to the qball image data with explicitely allowing exceptions if memory locked
-        mitk::ImageReadAccessor readAccess( qball_image, qball_image->GetVolumeData(0), mitk::ImageAccessorBase::ExceptionIfLocked );
-        const float* qball_cPtr = static_cast< const float*>(readAccess.GetData());
+        const float* qball_cPtr = static_cast< const float*>(qball_image->GetVolumeData()->GetData());
 
         OdfVectorImgType::IndexType ind;
         ind[0] = (int)(index[0]+0.5);
@@ -276,8 +273,7 @@ void QmitkODFDetailsView::UpdateOdf()
       try
       {
         // get access to the qball image data with explicitely allowing exceptions if memory locked
-        mitk::ImageReadAccessor readAccess( qball_image, qball_image->GetVolumeData(0), mitk::ImageAccessorBase::ExceptionIfLocked );
-        const float* qball_cPtr = static_cast< const float*>(readAccess.GetData());
+        const float* qball_cPtr = static_cast< const float*>(qball_image->GetVolumeData()->GetData());
 
         TensorImageType::IndexType ind;
         ind[0] = (int)(index[0]+0.5);

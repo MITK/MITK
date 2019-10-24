@@ -150,7 +150,8 @@ void mitk::ContourModelUtils::FillContourInSlice( ContourModel* projectedContour
       // prepare the binary image's voxel grid
       vtkSmartPointer<vtkImageData> whiteImage =
           vtkSmartPointer<vtkImageData>::New();
-      whiteImage->DeepCopy(sliceImage->GetVtkImageData());
+      ImageVtkAccessor accessor(sliceImage);
+      whiteImage->DeepCopy(accessor.getVtkImageData());
 
       // fill the image with foreground voxels:
       unsigned char inval = 255;
@@ -184,7 +185,7 @@ void mitk::ContourModelUtils::FillContourInSlice( ContourModel* projectedContour
       //Fill according to painting value
       vtkSmartPointer<vtkImageLogic> booleanOperation = vtkSmartPointer<vtkImageLogic>::New();
 
-      booleanOperation->SetInput2Data(sliceImage->GetVtkImageData());
+      booleanOperation->SetInput2Data(accessor.getVtkImageData());
       booleanOperation->SetOperationToOr();
       booleanOperation->SetOutputTrueValue(1.0);
 

@@ -30,7 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionPropertyHelper.h>
 
 #include "mitkDiffusionImageCorrectionFilter.h"
-#include <mitkImageWriteAccessor.h>
 #include <mitkProperties.h>
 
 #include <vector>
@@ -75,7 +74,7 @@ void mitk::DWIHeadMotionCorrectionFilter::GenerateData()
 
   mitk::Image::Pointer b0Image = mitk::Image::New();
   b0Image->InitializeByItk( b0_extractor->GetOutput() );
-  b0Image->SetImportChannel( b0_extractor->GetOutput()->GetBufferPointer(),
+  b0Image->SetImportVolume( b0_extractor->GetOutput()->GetBufferPointer(),
                              mitk::Image::CopyMemory );
 
   // (2.1) Use the extractor to access the extracted b0 volumes
@@ -138,9 +137,9 @@ void mitk::DWIHeadMotionCorrectionFilter::GenerateData()
         }
 
       // import volume to the inter-results
-      mitk::ImageWriteAccessor imac(registrationMethod->GetResampledMovingImage());
-      registeredB0Image->SetImportVolume( imac.GetData(),
-        i, 0, mitk::Image::ReferenceMemory );
+      mitk::ImageRegionAccessor accessor(registrationMethod->GetResampledMovingImage());
+      mitk::ImageAccessLock lock(&accessor, true);
+      registeredB0Image->SetImportVolume(accessor.getData(), i, 0, mitk::Image::ReferenceMemory);
       }
 
     // use the accumulateImageFilter as provided by the ItkAccumulateFilter method in the header file
@@ -168,7 +167,7 @@ void mitk::DWIHeadMotionCorrectionFilter::GenerateData()
 
   mitk::Image::Pointer splittedImage = mitk::Image::New();
   splittedImage->InitializeByItk( split_filter->GetOutput() );
-  splittedImage->SetImportChannel( split_filter->GetOutput()->GetBufferPointer(),
+  splittedImage->SetImportVolume( split_filter->GetOutput()->GetBufferPointer(),
                                    mitk::Image::CopyMemory );
 
 
@@ -209,9 +208,9 @@ void mitk::DWIHeadMotionCorrectionFilter::GenerateData()
   // insert the first unweighted reference as the first volume
   // in own scope to release the accessor asap after copy
   {
-    mitk::ImageWriteAccessor imac(b0referenceImage);
-    registeredWeighted->SetImportVolume( imac.GetData(),
-      0,0, mitk::Image::CopyMemory );
+    mitk::ImageRegionAccessor accessor(b0referenceImage);
+    mitk::ImageAccessLock lock(&accessor);
+    registeredWeighted->SetImportVolume(accessor.getData(),0,0, mitk::Image::CopyMemory);
   }
 
 
@@ -253,9 +252,9 @@ void mitk::DWIHeadMotionCorrectionFilter::GenerateData()
     }
 
     // allow expansion
-    mitk::ImageWriteAccessor imac(weightedRegistrationMethod->GetResampledMovingImage());
-    registeredWeighted->SetImportVolume( imac.GetData(),
-      i+1, 0, mitk::Image::CopyMemory);
+    mitk::ImageRegionAccessor accessor(weightedRegistrationMethod->GetResampledMovingImage());
+    mitk::ImageAccessLock lock(&accessor);
+    registeredWeighted->SetImportVolume(accessor.getData(),i+1, 0, mitk::Image::CopyMemory);
 
     estimated_transforms.push_back( weightedRegistrationMethod->GetLastRotationMatrix() );
   }

@@ -15,7 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkImageToIGTLMessageFilter.h"
-#include "mitkImageReadAccessor.h"
 #include "itkByteSwapper.h"
 #include "igtlImageMessage.h"
 
@@ -156,8 +155,7 @@ void mitk::ImageToIGTLMessageFilter::GenerateData()
     void* out = imgMsg->GetScalarPointer();
     {
       // Scoped, so that readAccess will be released ASAP.
-      mitk::ImageReadAccessor readAccess(img, img->GetChannelData(0));
-      const void* in = readAccess.GetData();
+      void* in = img->GetVolumeData()->GetData();
 
       memcpy(out, in, num_pixel * type.GetSize());
     }

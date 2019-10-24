@@ -23,8 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "PythonPath.h"
 #include <vtkPolyData.h>
 #include <mitkRenderingManager.h>
-#include <mitkImageReadAccessor.h>
-#include <mitkImageWriteAccessor.h>
 #include <numpy/arrayobject.h>
 #include <mitkExceptionMacro.h>
 
@@ -289,8 +287,7 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
   mitk::PixelType pixelType = image->GetPixelType();
   itk::ImageIOBase::IOPixelType ioPixelType = image->GetPixelType().GetPixelType();
   PyObject* npyArray = NULL;
-  mitk::ImageReadAccessor racc(image);
-  void* array = (void*) racc.GetData();
+  void* array = (void*) image->GetVolumeData()->GetData();
 
   mitk::Vector3D xDirection;
   mitk::Vector3D yDirection;
@@ -689,8 +686,7 @@ bool mitk::PythonService::CopyToPythonAsCvImage( mitk::Image* image, const std::
   PyObject *pyDict = PyModule_GetDict(pyMod);
   mitk::PixelType pixelType = image->GetPixelType();
   PyObject* npyArray = NULL;
-  mitk::ImageReadAccessor racc(image);
-  void* array = (void*) racc.GetData();
+  void* array = (void*) image->GetVolumeData()->GetData();
 
   // save the total number of elements here (since the numpy array is one dimensional)
   npy_intp* npy_dims = new npy_intp[1];
@@ -823,8 +819,7 @@ mitk::Image::Pointer mitk::PythonService::CopyCvImageFromPython( const std::stri
   //mitkImage->SetChannel(py_data->data);
 
   {
-    mitk::ImageWriteAccessor ra(mitkImage);
-    char* data = (char*)(ra.GetData());
+    char* data = (char*)mitkImage->GetVolumeData()->GetData();
     memcpy(data, (void*)py_data->data, dimensions[0] * dimensions[1] * pixelType.GetSize());
   }
 
@@ -952,4 +947,3 @@ bool mitk::PythonService::PythonErrorOccured() const
 {
   return m_ErrorOccured;
 }
-

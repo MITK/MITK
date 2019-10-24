@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkIpPic.h>
 #include "mitkImage.h"
-#include "mitkImageWriteAccessor.h"
 
 /** \file mitkLegacyAdaptors.h
   *
@@ -40,7 +39,7 @@ namespace mitk
 
    Meant to support legacy code, which was base on mitkIpPicDescriptor types. Please remind that such code should be migrated towards ITK/VTK solutions.
  */
-  MITKLEGACYADAPTORS_EXPORT mitkIpPicDescriptor* CastToIpPicDescriptor(mitk::Image::Pointer, mitk::ImageWriteAccessor*, mitkIpPicDescriptor* picDesc);
+  MITKLEGACYADAPTORS_EXPORT mitkIpPicDescriptor* CastToIpPicDescriptor(mitk::Image::Pointer, mitk::ImageRegionAccessor*, mitkIpPicDescriptor* picDesc);
 
   /**
     \brief Constructs a legacy mitkIpPicDescriptor from mitk::ImageDataItem
@@ -49,7 +48,7 @@ namespace mitk
     Simply calling ipPicFree( desc ) will delete the data and so will the ImageDataItem try when it get deleted. Simplest way to avoid the duplicate
     deletion attempt is to set the desc->data manually to NULL before calling the ipPicFree() on the descriptor
   */
-  MITKLEGACYADAPTORS_EXPORT mitkIpPicDescriptor* CastToIpPicDescriptor(itk::SmartPointer<mitk::ImageDataItem>, mitk::ImageWriteAccessor*, mitkIpPicDescriptor *picDesc );
+  MITKLEGACYADAPTORS_EXPORT mitkIpPicDescriptor* CastToIpPicDescriptor(itk::SmartPointer<mitk::ImageDataItem>, mitk::ImageRegionAccessor*, mitkIpPicDescriptor *picDesc );
 
  /**
    \brief Constructs a deprecated legacy mitkIpPicDescriptor from mitk::Image

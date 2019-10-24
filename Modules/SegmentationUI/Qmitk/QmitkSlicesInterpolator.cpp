@@ -25,8 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDiffImageApplier.h"
 #include <mitkExtractSliceFilter.h>
 #include <mitkImageTimeSelector.h>
-#include <mitkImageReadAccessor.h>
-#include <mitkImageWriteAccessor.h>
 #include "mitkInteractionConst.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkOperationEvent.h"
@@ -42,6 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUndoController.h"
 #include <mitkUnstructuredGridClusteringFilter.h>
 #include <mitkVtkImageOverwrite.h>
+#include <mitkImageVtkAccessor.h>
 
 #include <itkCommand.h>
 
@@ -665,7 +664,7 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
 
     // Set slice as input
     mitk::Image::Pointer slice = dynamic_cast<mitk::Image*>(m_FeedbackNode->GetData());
-    reslice->SetInputSlice(slice->GetSliceData()->GetVtkImageAccessor(slice)->GetVtkImageData());
+    reslice->SetInputSlice(slice->GetSliceData()->GetVtkImageAccessor(slice)->getVtkImageData());
     //set overwrite mode to true to write back to the image volume
     reslice->SetOverwriteMode(true);
     reslice->Modified();
@@ -683,7 +682,7 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
 
     //the image was modified within the pipeline, but not marked so
     m_Segmentation->Modified();
-    m_Segmentation->GetVtkImageData()->Modified();
+    //m_Segmentation->GetVtkImageData()->Modified();
 
     m_FeedbackNode->SetData(NULL);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -717,7 +716,8 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
     // Create scope for ImageWriteAccessor so that the accessor is destroyed
     // after the image is initialized. Otherwise later image access will lead to an error
     {
-      mitk::ImageWriteAccessor imAccess(diffImage);
+      mitk::ImageRegionAccessor imAccess(diffImage);
+      mitk::ImageAccessLock lock(&imAccess);
 
       // Set all pixels to zero
       mitk::PixelType pixelType (mitk::MakeScalarPixelType<mitk::Tool::DefaultSegmentationDataType>());
@@ -728,7 +728,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
         pixelType = mitk::MakeScalarPixelType<unsigned char>();
       }
 
-      memset( imAccess.GetData(), 0, (pixelType.GetBpe() >> 3) * diffImage->GetDimension(0) * diffImage->GetDimension(1) * diffImage->GetDimension(2) );
+      memset( imAccess.getData(), 0, (pixelType.GetBpe() >> 3) * diffImage->GetDimension(0) * diffImage->GetDimension(1) * diffImage->GetDimension(2) );
     }
 
 
@@ -763,7 +763,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
         vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
 
         //set overwrite mode to true to write back to the image volume
-        reslice->SetInputSlice(interpolation->GetSliceData()->GetVtkImageAccessor(interpolation)->GetVtkImageData());
+        reslice->SetInputSlice(interpolation->GetSliceData()->GetVtkImageAccessor(interpolation)->getVtkImageData());
         reslice->SetOverwriteMode(true);
         reslice->Modified();
 
@@ -854,8 +854,9 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
     mitk::Image::Pointer newSeg = s2iFilter->GetOutput();
 
     unsigned int timestep = m_LastSNC->GetTime()->GetPos();
-    mitk::ImageReadAccessor readAccess(newSeg, newSeg->GetVolumeData(timestep));
-    const void* cPointer = readAccess.GetData();
+    mitk::ImageRegionAccessor accessor(newSeg);
+    mitk::ImageAccessLock lock(&accessor);
+    const void* cPointer = accessor.getData(timestep);
 
     if (currSeg && cPointer)
     {

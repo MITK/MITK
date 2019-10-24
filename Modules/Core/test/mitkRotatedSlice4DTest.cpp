@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageTimeSelector.h"
 #include "mitkExtractSliceFilter.h"
 #include "time.h"
-#include "mitkImagePixelReadAccessor.h"
 #include "mitkTestingMacros.h"
 #include "mitkIOUtil.h"
 #include "mitkRotationOperation.h"

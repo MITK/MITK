@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkImageToSurfaceFilter.h>
 #include "mitkException.h"
+#include "mitkImageVtkAccessor.h"
+
 #include <vtkCommand.h>
 #include <vtkCallbackCommand.h>
 #include <vtkImageData.h>
@@ -209,7 +211,10 @@ void mitk::ImageToSurfaceFilter::GenerateData()
   int t;
   for( t=tstart; t < tmax; ++t)
   {
-    vtkImageData *vtkimagedata =  image->GetVtkImageData(t);
+    Image::Pointer imagePointer = image;
+    ImageVtkAccessor accessor(imagePointer);
+    ImageAccessLock lock(&accessor);
+    vtkImageData *vtkimagedata = accessor.getVtkImageData(t);
     CreateSurface(t,vtkimagedata,surface,m_Threshold);
   }
 }

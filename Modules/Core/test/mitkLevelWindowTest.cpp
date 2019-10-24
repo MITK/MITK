@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkLevelWindow.h"
 #include <mitkImage.h>
-#include "mitkImageWriteAccessor.h"
 
 /*
 * Reseting the Levelwindow to default values:
@@ -827,8 +826,7 @@ int mitkLevelWindowTest(int, char* [])
   //image->DebugOn();
 
   image->Initialize( mitk::MakePixelType<int, int, 1>(), 3, dim);
-  mitk::ImageWriteAccessor imAccess(image);
-  int *p = (int*)imAccess.GetData();
+  int *p = (int*)image->GetVolumeData()->GetData();
 
   int size = dim[0]*dim[1]*dim[2];
   int i;

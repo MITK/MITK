@@ -107,16 +107,9 @@ bool mitk::SlicedData::RequestedRegionIsOutsideOfTheBufferedRegion()
   const SizeType& largestPossibleRegionSize
     = GetLargestPossibleRegion().GetSize();
 
-  // are whole channels requested?
   int c, cEnd;
   c=requestedRegionIndex[4];
   cEnd=c+static_cast<long>(requestedRegionSize[4]);
-  if(requestedRegionSize[3] == largestPossibleRegionSize[3])
-  {
-    for (; c< cEnd; ++c)
-      if(IsChannelSet(c)==false) return true;
-    return false;
-  }
 
   // are whole volumes requested?
   int t, tEnd;
@@ -129,15 +122,6 @@ bool mitk::SlicedData::RequestedRegionIsOutsideOfTheBufferedRegion()
         if(IsVolumeSet(t, c)==false) return true;
     return false;
   }
-
-  // ok, only slices are requested. Check if they are available.
-  int s, sEnd;
-  s=requestedRegionIndex[2];
-  sEnd=s+static_cast<long>(requestedRegionSize[2]);
-  for (; c< cEnd; ++c)
-    for (; t< tEnd; ++t)
-      for (; s< sEnd; ++s)
-        if(IsSliceSet(s, t, c)==false) return true;
 
   return false;
 }

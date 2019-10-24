@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkAbstractTransformGeometry.h>
 #include <mitkPlaneClipping.h>
+#include <mitkImageVtkAccessor.h>
 
 #include <vtkGeneralTransform.h>
 #include <vtkImageChangeInformation.h>
@@ -245,6 +246,9 @@ void mitk::ExtractSliceFilter::GenerateData(){
       return;
     }
   }
+  Image::Pointer inputPointer = input;
+  mitk::ImageVtkAccessor accessor(inputPointer);
+  mitk::ImageAccessLock lock(&accessor);
 
   if(m_ResliceTransform.IsNotNull()){
     //if the resliceTransform is set the reslice axis are recalculated.
@@ -254,14 +258,14 @@ void mitk::ExtractSliceFilter::GenerateData(){
     unitSpacingImageFilter->ReleaseDataFlagOn();
 
     unitSpacingImageFilter->SetOutputSpacing( 1.0, 1.0, 1.0 );
-    unitSpacingImageFilter->SetInputData( input->GetVtkImageData(m_TimeStep) );
+    unitSpacingImageFilter->SetInputData(accessor.getVtkImageData(m_TimeStep));
 
     m_Reslicer->SetInputConnection(unitSpacingImageFilter->GetOutputPort() );
   }
   else
   {
     //if no tranform is set the image can be used directly
-    m_Reslicer->SetInputData(input->GetVtkImageData(m_TimeStep));
+    m_Reslicer->SetInputData(accessor.getVtkImageData(m_TimeStep));
   }
 
   /*setup the plane where vktImageReslice extracts the slice*/

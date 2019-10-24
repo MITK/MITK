@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTransferFunctionProperty.h"
 #include "mitkTransferFunctionInitializer.h"
 #include "mitkLevelWindowProperty.h"
+#include <mitkImageVtkAccessor.h>
 #include <vtkObjectFactory.h>
 #include <vtkRenderingOpenGL2ObjectFactory.h>
 #include <vtkRenderingVolumeOpenGL2ObjectFactory.h>
@@ -122,7 +123,8 @@ vtkImageData* mitk::VolumeMapperVtkSmart3D::GetInputImage()
   mitk::Image *input = const_cast<mitk::Image *>(static_cast<const mitk::Image *>(this->GetDataNode()->GetData()));
   m_TimeStep = this->GetTimestep();
   int maxTime = input->GetTimeSteps() - 1;
-  vtkImageData* img = input->GetVtkImageData(m_TimeStep < maxTime? m_TimeStep : maxTime);
+  mitk::ImageVtkAccessor accessor(input);
+  vtkImageData* img = accessor.getVtkImageData(m_TimeStep < maxTime ? m_TimeStep : maxTime);
 
   if (img) {
     img->SetSpacing(1,1,1);

@@ -19,9 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkContourModelSet.h>
 #include <mitkContourModelUtils.h>
 #include <mitkExtractSliceFilter.h>
-#include <mitkImageWriteAccessor.h>
 #include <mitkProgressBar.h>
 #include <mitkTimeHelper.h>
+#include <mitkImageVtkAccessor.h>
+#include <mitkImageRegionAccessor.h>
 
 #include <mitkVtkImageOverwrite.h>
 
@@ -224,7 +225,8 @@ void mitk::ContourModelSetToImageFilter::GenerateData()
     mitk::ContourModelUtils::FillContourInSlice(projectedContour, slice);
 
     // 4. Write slice back into image volume
-    reslice->SetInputSlice(slice->GetVtkImageData());
+    ImageVtkAccessor accessor(slice);
+    reslice->SetInputSlice(accessor.getVtkImageData());
 
     //set overwrite mode to true to write back to the image volume
     reslice->SetOverwriteMode(true);
@@ -242,7 +244,7 @@ void mitk::ContourModelSetToImageFilter::GenerateData()
   }
 
   outputImage->Modified();
-  outputImage->GetVtkImageData()->Modified();
+  //outputImage->GetVtkImageData()->Modified();
 }
 
 void mitk::ContourModelSetToImageFilter::InitializeOutputEmpty()
@@ -258,9 +260,10 @@ void mitk::ContourModelSetToImageFilter::InitializeOutputEmpty()
       byteSize *= output->GetDimension(dim);
     }
 
-    mitk::ImageWriteAccessor writeAccess(output, output->GetVolumeData(0));
+    mitk::ImageRegionAccessor accessor(output);
+    mitk::ImageAccessLock lock(&accessor, true);
 
-    memset( writeAccess.GetData(), 0, byteSize );
+    memset(accessor.getData(), 0, byteSize);
   }
   else
   {
@@ -270,11 +273,10 @@ void mitk::ContourModelSetToImageFilter::InitializeOutputEmpty()
       byteSize *= output->GetDimension(dim);
     }
 
-    for( unsigned int volumeNumber = 0; volumeNumber < output->GetDimension(3); volumeNumber++)
-    {
-      mitk::ImageWriteAccessor writeAccess(output, output->GetVolumeData(volumeNumber));
-
-      memset( writeAccess.GetData(), 0, byteSize );
+    mitk::ImageRegionAccessor accessor(output);
+    mitk::ImageAccessLock lock(&accessor, true);
+    for( unsigned int volumeNumber = 0; volumeNumber < output->GetDimension(3); volumeNumber++) {
+      memset(accessor.getData(volumeNumber), 0, byteSize);
     }
   }
 }

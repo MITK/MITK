@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkToFDistanceImageToSurfaceFilter.h>
 
 #include <mitkImage.h>
-#include <mitkImagePixelReadAccessor.h>
+#include <mitkImageRegionAccessor.h>
 #include <mitkSurface.h>
 #include <mitkToFProcessingCommon.h>
 #include <mitkNumericTypes.h>
@@ -71,16 +71,17 @@ int mitkKinectReconstructionTest(int  argc , char* argv[])
     int xDimension = (int)kinectImage->GetDimension(0);
     int yDimension = (int)kinectImage->GetDimension(1);
     int pointCount = 0;
-    mitk::ImagePixelReadAccessor<float,2> imageAcces(kinectImage, kinectImage->GetSliceData(0));
+    mitk::ImageRegionAccessor imageAcces(kinectImage);
     for (int j=0; j<yDimension; j++)
     {
       for (int i=0; i<xDimension; i++)
       {
-        itk::Index<2> pixel;
+        itk::Index<3> pixel;
         pixel[0] = i;
         pixel[1] = j;
+        pixel[2] = 0;
 
-        mitk::ToFProcessingCommon::ToFScalarType distance = (double)imageAcces.GetPixelByIndex(pixel);
+        mitk::ToFProcessingCommon::ToFScalarType distance = *(float*)imageAcces.getPixel(pixel);
 
         mitk::Point3D currentPoint;
         currentPoint = mitk::ToFProcessingCommon::KinectIndexToCartesianCoordinates(i,j,distance,focalLength[0],focalLength[1],principalPoint[0],principalPoint[1]);

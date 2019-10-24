@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageCast.h"
 #include "mitkImageTimeSelector.h"
 #include <mitkExtractSliceFilter.h>
-#include "mitkImageReadAccessor.h"
 //#include <mitkPlaneGeometry.h>
 
 #include "mitkShapeBasedInterpolationAlgorithm.h"
@@ -220,8 +219,9 @@ void mitk::SegmentationInterpolationController::SetChangedSlice( const Image* sl
 
   //mitkIpPicDescriptor* rawSlice = const_cast<Image*>(sliceDiff)->GetSliceData()->GetPicDescriptor(); // we promise not to change anything!
 
-  mitk::ImageReadAccessor readAccess(sliceDiff);
-  unsigned char* rawSlice = (unsigned char*) readAccess.GetData();
+  mitk::ImageRegionAccessor accessor(const_cast<mitk::Image*>(sliceDiff));
+  mitk::ImageAccessLock lock(&accessor);
+  unsigned char* rawSlice = (unsigned char*)accessor.getData();
   if (!rawSlice) return;
 
   AccessFixedDimensionByItk_1( sliceDiff, ScanChangedSlice, 2, SetChangedSliceOptions(sliceDimension, sliceIndex, dim0, dim1, timeStep, rawSlice) );
@@ -335,11 +335,12 @@ void mitk::SegmentationInterpolationController::ScanWholeVolume( const itk::Imag
   if (!volume) return;
   if ( timeStep >= m_SegmentationCountInSlice.size() ) return;
 
-  ImageReadAccessor readAccess(volume, volume->GetVolumeData(timeStep));
+  ImageRegionAccessor accessor(const_cast<Image*>(volume));
+  ImageAccessLock lock(&accessor);
 
   for (unsigned int slice = 0; slice < volume->GetDimension(2); ++slice)
   {
-    const DATATYPE* rawVolume = static_cast<const DATATYPE*>( readAccess.GetData() ); // we again promise not to change anything, we'll just count
+    const DATATYPE* rawVolume = static_cast<const DATATYPE*>(accessor.getData(timeStep)); // we again promise not to change anything, we'll just count
     const DATATYPE* rawSlice = rawVolume + ( volume->GetDimension(0) * volume->GetDimension(1) * slice );
 
     ScanChangedSlice<DATATYPE>( nullptr, SetChangedSliceOptions(2, slice, 0, 1, timeStep, rawSlice) );

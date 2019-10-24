@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
+#include <mitkImageVtkAccessor.h>
 
 // itk
 #include <itkBinaryThresholdImageFilter.h>
@@ -174,7 +175,9 @@ void mitk::LabelSetImageToSurfaceFilter::InternalProcessing( const itk::Image<TP
   this->GetInput()->GetGeometry()->IndexToWorld(origin, origin);
   newGeometry->SetOrigin(origin);
 
-  vtkImageData* vtkimage = const_cast<vtkImageData*>(m_ResultImage->GetVtkImageData(0));
+  mitk::ImageVtkAccessor accessor(m_ResultImage);
+  mitk::ImageAccessLock lock(&accessor);
+  vtkImageData* vtkimage = accessor.getVtkImageData(0);
 
   vtkSmartPointer<vtkImageChangeInformation> indexCoordinatesImageFilter = vtkSmartPointer<vtkImageChangeInformation>::New();
   indexCoordinatesImageFilter->SetInputData(vtkimage);

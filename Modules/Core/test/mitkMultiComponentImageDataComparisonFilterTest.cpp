@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk includes
 #include "mitkTestingMacros.h"
 #include "mitkMultiComponentImageDataComparisonFilter.h"
-#include "mitkImageReadAccessor.h"
 #include "mitkIOUtil.h"
 
 #include "itkNumericTraits.h"
@@ -61,8 +60,7 @@ int mitkMultiComponentImageDataComparisonFilterTest(int /*argc*/, char* argv[])
   MITK_TEST_CONDITION_REQUIRED(testObject->GetResult(), "Testing filter processing with equal image data");
 
   // now change some of the data and check if the response is correct
-  mitk::ImageReadAccessor imgAcc(testImg2);
-  unsigned char* imgData = (unsigned char*) imgAcc.GetData();
+  unsigned char* imgData = (unsigned char*) testImg2->GetVolumeData()->GetData();
   imgData[10] += 1;
   imgData[20] += 2;
   imgData[30] += 3;

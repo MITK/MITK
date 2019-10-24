@@ -13,8 +13,6 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#include <mitkImageReadAccessor.h>
-#include <mitkImageWriteAccessor.h>
 #include <mitkCommonPythonTest.h>
 
 #include "SimpleITK.h"
@@ -31,8 +29,7 @@ sitk::Image mitk::MitkToSimpleItkImage( mitk::Image* image )
   const mitk::Vector3D spacing = image->GetGeometry()->GetSpacing();
   mitk::Point3D origin = image->GetGeometry()->GetOrigin();
   mitk::PixelType pixelType = image->GetPixelType();
-  mitk::ImageReadAccessor ra(image);
-  void* buffer = (void*) ra.GetData();
+  void* buffer = (void*) image->GetVolumeData()->GetData();
   sitk::ImportImageFilter importer;
 
   std::vector<double> sitkSpacing;
@@ -142,9 +139,7 @@ mitk::Image::Pointer mitk::SimpleItkToMitkImage( sitk::Image& sitkImage )
   for(size_t i = 0; i < sitkSize.size(); ++i )
     size *= sitkSize[i];
 
-  mitk::ImageWriteAccessor wa(image);
-
-  memcpy(wa.GetData(),buffer, size);
+  memcpy(image->GetVolumeData()->GetData(),buffer, size);
 
   return image;
 }

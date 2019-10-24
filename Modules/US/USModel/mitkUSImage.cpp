@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSImage.h"
 #include <mitkStringProperty.h>
 #include <mitkProperties.h>
-#include <mitkImageReadAccessor.h>
 
 
 mitk::USImage::USImage() : mitk::Image()
@@ -30,8 +29,7 @@ mitk::USImage::USImage(mitk::Image::Pointer image) : mitk::Image()
   try
   {
   this->Initialize(image);
-  mitk::ImageReadAccessor imgA(image, image->GetVolumeData(0));
-  this->SetVolume(imgA.GetData());
+  this->SetVolume(image->GetVolumeData()->GetData());
   }
   catch(mitk::Exception e)
   {
@@ -70,4 +68,3 @@ void mitk::USImage::SetMetadata(mitk::USImageMetadata::Pointer metadata){
   this->SetProperty(mitk::USImageMetadata::PROP_PROBE_FREQUENCY, mitk::StringProperty::New(metadata->GetProbeFrequency()));
   this->SetProperty(mitk::USImageMetadata::PROP_ZOOM, mitk::StringProperty::New(metadata->GetZoom()));
 }
-

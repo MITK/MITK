@@ -41,7 +41,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDiffusionCoreIOMimeTypes.h"
 
 #include <mitkITKImageImport.h>
-#include <mitkImageWriteAccessor.h>
 #include <mitkImageDataItem.h>
 #include "mitkIOUtil.h"
 #include <mitkLocaleSwitch.h>

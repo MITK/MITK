@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk includes
 #include "mitkIOUtil.h"
 #include <mitkIpPic.h>
-#include "mitkImageReadAccessor.h"
 
 namespace mitk
 {
@@ -283,13 +282,11 @@ void ToFCameraMITKPlayerController::UpdateCamera()
   {
     if(!this->m_ToFImageType)
     {
-      ImageReadAccessor rgbAcc(m_RGBImage, m_RGBImage->GetSliceData(m_CurrentFrame));
-      memcpy(m_RGBArray, rgbAcc.GetData(), m_NumberOfRGBBytes );
+      memcpy(m_RGBArray, m_RGBImage->GetSliceData(m_CurrentFrame)->GetData(), m_NumberOfRGBBytes );
     }
     else if(this->m_ToFImageType)
     {
-      ImageReadAccessor rgbAcc(m_RGBImage, m_RGBImage->GetVolumeData(m_CurrentFrame));
-      memcpy(m_RGBArray, rgbAcc.GetData(), m_NumberOfRGBBytes);
+      memcpy(m_RGBArray, m_RGBImage->GetVolumeData(m_CurrentFrame)->GetData(), m_NumberOfRGBBytes);
     }
   }
   itksys::SystemTools::Delay(50);
@@ -299,13 +296,11 @@ void ToFCameraMITKPlayerController::AccessData(int frame, Image::Pointer image, 
 {
   if(!this->m_ToFImageType)
   {
-    ImageReadAccessor imgAcc(image, image->GetSliceData(frame));
-    memcpy(data, imgAcc.GetData(), this->m_NumberOfBytes );
+    memcpy(data, image->GetSliceData(frame)->GetData(), this->m_NumberOfBytes );
   }
   else if(this->m_ToFImageType)
   {
-    ImageReadAccessor imgAcc(image, image->GetVolumeData(frame));
-    memcpy(data, imgAcc.GetData(), this->m_NumberOfBytes);
+    memcpy(data, image->GetVolumeData(frame)->GetData(), this->m_NumberOfBytes);
   }
 }
 

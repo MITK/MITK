@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataStorage.h>
 #include <mitkDataNode.h>
 #include <mitkImage.h>
-#include <mitkImagePixelReadAccessor.h>
+#include <mitkImageRegionAccessor.h>
 #include <mitkInteractionPositionEvent.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkMousePressEvent.h>
@@ -70,15 +70,16 @@ void QmitkFreeSurferParcellationHandler::Notify(InteractionEvent *interactionEve
           int value = 0;
           try
           {
+            mitk::ImageRegionAccessor readAccess(image);
+            itk::Index<3> idx;
+            image->GetGeometry()->WorldToIndex(worldposition, idx);
             if( typeStr == "int" )
             {
-              ImagePixelReadAccessor<int, 3> readAccess( image );
-              value = static_cast<int>( readAccess.GetPixelByWorldCoordinates( worldposition ) );
+              value = static_cast<int>( *(int*)readAccess.getPixel( idx ) );
             }
             else if( typeStr == "unsigned_char" )
             {
-              ImagePixelReadAccessor<unsigned char, 3> readAccess( image );
-              value = static_cast<int>( readAccess.GetPixelByWorldCoordinates( worldposition ) );
+              value = static_cast<int>( *(unsigned char*)readAccess.getPixel( idx ) );
             }
             else
             {

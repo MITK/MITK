@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSCombinedModality.h"
 #include "mitkUSDevice.h"
 #include "mitkNavigationDataSource.h"
-#include "mitkImageReadAccessor.h"
 #include <mitkNavigationDataSmoothingFilter.h>
 #include <mitkNavigationDataDelayFilter.h>
 #include "mitkTrackingDeviceSource.h"
@@ -382,8 +381,7 @@ void mitk::USCombinedModality::GenerateData()
   if (!output->IsInitialized()) { output->Initialize(image); }
 
   //now update image data
-  mitk::ImageReadAccessor inputReadAccessor(image, image->GetSliceData(0, 0, 0));
-  output->SetSlice(inputReadAccessor.GetData()); //copy image data
+  output->SetSlice(image->GetSliceData()->GetData()); //copy image data
   output->GetGeometry()->SetSpacing(image->GetGeometry()->GetSpacing()); //copy spacing because this might also change
 
   //and update calibration (= transformation of the image)

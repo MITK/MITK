@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPicHelper.h"
 #include "mitkLegacyAdaptors.h"
 
-#include "mitkImageWriteAccessor.h"
 #include "mitkCustomMimeType.h"
 
 #include <mitkIpPic.h>
@@ -192,7 +191,7 @@ void mitk::PicFileReader::FillImage(Image::Pointer output)
     mitkIpPicDescriptor* header = mitkIpPicCopyHeader(pic, NULL);
     header->data = tsv->value;
     ConvertHandedness(header);
-    output->SetChannel(header->data, 1);
+    output->SetVolume(header->data, 1);
     header->data = NULL;
     mitkIpPicFree(header);
     mitkIpPicDelTag( pic, "VELOCITY" );
@@ -201,7 +200,7 @@ void mitk::PicFileReader::FillImage(Image::Pointer output)
   // Copy the memory to avoid mismatches of malloc() and delete[].
   // mitkIpPicGet will always allocate a new memory block with malloc(),
   // but MITK Images delete the data via delete[].
-  output->SetImportChannel(pic->data, 0, Image::CopyMemory);
+  output->SetImportVolume(pic->data, 0, Image::CopyMemory);
   pic->data = nullptr;
   mitkIpPicFree(pic);
 }

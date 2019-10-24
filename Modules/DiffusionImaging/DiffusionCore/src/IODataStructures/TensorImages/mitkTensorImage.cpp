@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTensorImage.h"
 #include "mitkImageDataItem.h"
 #include "mitkImageCast.h"
+#include <mitkImageVtkAccessor.h>
 
 #include "itkDiffusionTensor3D.h"
 #include "itkTensorToRgbImageFilter.h"
@@ -35,24 +36,6 @@ mitk::TensorImage::TensorImage() : Image()
 mitk::TensorImage::~TensorImage()
 {
 
-}
-
-vtkImageData* mitk::TensorImage::GetVtkImageData(int t, int n)
-{
-  if(m_RgbImage.IsNull())
-  {
-    ConstructRgbImage();
-  }
-  return m_RgbImage->GetVtkImageData(t,n);
-}
-
-const vtkImageData*mitk::TensorImage::GetVtkImageData(int t, int n) const
-{
-  if(m_RgbImage.IsNull())
-  {
-    ConstructRgbImage();
-  }
-  return m_RgbImage->GetVtkImageData(t,n);
 }
 
 void mitk::TensorImage::ConstructRgbImage() const
@@ -74,5 +57,6 @@ void mitk::TensorImage::ConstructRgbImage() const
 
 vtkImageData* mitk::TensorImage::GetNonRgbVtkImageData(int t, int n)
 {
-  return Superclass::GetVtkImageData(t,n);
+  mitk::ImageVtkAccessor accessor(this);
+  return accessor.getVtkImageData(t);
 }

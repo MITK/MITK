@@ -15,7 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkTbssRoiAnalysisWidget.h"
-#include "mitkImagePixelReadAccessor.h"
 #include "mitkPixelTypeMultiplex.h"
 
 #include <qwt_plot_marker.h>
@@ -817,14 +816,12 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(const mitk::PixelType ptype, T
   m_PlottingFiberBundle = true;
 
   this->Clear();
-  auto it = tracts.begin();
-
 
   std::vector< std::vector <mitk::ScalarType > > profiles;
 
-  mitk::ImagePixelReadAccessor<T,3> imAccess(img,img->GetVolumeData(0));
+  mitk::ImageRegionAccessor imAccess(img);
 
-  it = tracts.begin();
+  auto it = tracts.begin();
   while(it != tracts.end())
   {
 
@@ -836,9 +833,11 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(const mitk::PixelType ptype, T
     while(tractIt != tract.end())
     {
       PointType p = *tractIt;
+      itk::Index<3> idx;
+      img->GetGeometry()->WorldToIndex(p, idx);
 
       // Get value from image
-      profile.push_back( (mitk::ScalarType) imAccess.GetPixelByWorldCoordinates(p) );
+      profile.push_back( (mitk::ScalarType) *(T*)imAccess.getPixel(idx) );
 
       ++tractIt;
     }
@@ -961,7 +960,3 @@ QmitkTbssRoiAnalysisWidget::~QmitkTbssRoiAnalysisWidget()
   delete m_PlotPicker;
 
 }
-
-
-
-

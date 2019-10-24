@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImage.h"
 #include "mitkHistogramMatching.h"
-#include "mitkImageWriteAccessor.h"
 
 int mitkHistogramMatchingTest(int /*argc*/, char* /*argv*/[])
 {
@@ -32,8 +31,7 @@ int mitkHistogramMatchingTest(int /*argc*/, char* /*argv*/[])
 
   try
   {
-    mitk::ImageWriteAccessor imgB(image);
-    int* p = (int*) imgB.GetData();
+    int* p = (int*) image->GetVolumeData()->GetData();
 
     int size = dim[0]*dim[1]*dim[2];
     int i;
@@ -62,8 +60,7 @@ int mitkHistogramMatchingTest(int /*argc*/, char* /*argv*/[])
 
   try
   {
-    mitk::ImageWriteAccessor imgB(image2);
-    int* p2 = (int*) imgB.GetData();
+    int* p2 = (int*) image2->GetVolumeData()->GetData();
 
     int size2 = dim2[0]*dim2[1]*dim2[2];
     int i2;

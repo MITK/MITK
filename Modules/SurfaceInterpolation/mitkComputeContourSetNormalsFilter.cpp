@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkComputeContourSetNormalsFilter.h"
+#include "mitkImageVtkAccessor.h"
 
-#include "mitkImagePixelReadAccessor.h"
 #include "mitkIOUtil.h"
 
 mitk::ComputeContourSetNormalsFilter::ComputeContourSetNormalsFilter()
@@ -158,13 +158,11 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
           {
             if (m_SegmentationBinaryImage->GetImageDescriptor()->GetChannelDescriptor().GetPixelType().GetComponentType() == itk::ImageIOBase::UCHAR)
             {
-              mitk::ImagePixelReadAccessor<unsigned char> readAccess(m_SegmentationBinaryImage);
-              val = readAccess.GetPixelByIndexSafe(idx);
+              val = (unsigned char)mitk::UnlockedSinglePixelAccess(m_SegmentationBinaryImage, idx, 0);
             }
             else if (m_SegmentationBinaryImage->GetImageDescriptor()->GetChannelDescriptor().GetPixelType().GetComponentType() == itk::ImageIOBase::USHORT)
             {
-              mitk::ImagePixelReadAccessor<unsigned short> readAccess(m_SegmentationBinaryImage);
-              val = readAccess.GetPixelByIndexSafe(idx);
+              val = (unsigned short)mitk::UnlockedSinglePixelAccess(m_SegmentationBinaryImage, idx, 0);
             }
           }
           catch (mitk::Exception e)

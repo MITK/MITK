@@ -57,6 +57,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProperties.h"
 #include "mitkAbstractTransformGeometry.h"
 #include <mitkLookupTableProperty.h>
+#include <mitkImageVtkAccessor.h>
 
 const mitk::Image * mitk::VectorImageMapper2D::GetInput( void )
 {
@@ -82,7 +83,9 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
   if ( input.IsNull() )
     return ;
 
-  vtkImageData* vtkImage = input->GetVtkImageData( this->GetCurrentTimeStep( input, renderer ) );
+  mitk::ImageVtkAccessor accessor(input);
+  mitk::ImageAccessLock lock(&accessor);
+  vtkImageData* vtkImage = accessor.getVtkImageData(this->GetCurrentTimeStep(input, renderer));
 
   //
   // set up the cutter orientation according to the current geometry of

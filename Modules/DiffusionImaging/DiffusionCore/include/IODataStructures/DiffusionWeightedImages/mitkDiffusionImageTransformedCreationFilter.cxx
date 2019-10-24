@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDiffusionImageCorrectionFilter.h"
 
 #include "mitkImageCast.h"
-#include "mitkImageWriteAccessor.h"
 #include "mitkImageTimeSelector.h"
 #include "mitkProperties.h"
 #include "mitkIOUtil.h"
@@ -85,8 +84,7 @@ static void ResampleImage( typename ItkImageType::Pointer itk_reference,
   current_resampled->SetImportChannel( resampler->GetOutput()->GetBufferPointer(),
                                        mitk::Image::CopyMemory );
 
-  mitk::ImageWriteAccessor imac( current_resampled );
-  output_target->SetImportVolume( imac.GetData(),
+  output_target->SetImportVolume( current_resampled->GetVolumeData()->GetData(),
                                   position, 0, mitk::Image::CopyMemory );
 
 }

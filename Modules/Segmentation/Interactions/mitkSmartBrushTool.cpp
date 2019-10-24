@@ -14,6 +14,7 @@
 #include "mitkAbstractTransformGeometry.h"
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCaster.h>
+#include <mitkImageTimeSelector.h>
 #include "mitkImageToItk.h"
 #include "mitkITKImageImport.h"
 #include "mitkLevelWindowProperty.h"
@@ -561,8 +562,11 @@ void mitk::SmartBrushTool::CheckIfCurrentSliceHasChanged(const mitk::PlaneGeomet
     if (m_WorkingImage->GetDimension() == 4) {
       int curTimeStep = m_Windows.front()->GetSliceNavigationController()->GetTime()->GetPos();
 
-      Image::Pointer mitkImage3d = mitk::Image::New();
-      AccessFixedDimensionByItk_n(m_WorkingImage, extract3Dfrom4DByItk, 4U, (mitkImage3d, curTimeStep));
+      ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
+      timeSelector->SetInput(m_WorkingImage);
+      timeSelector->SetTimeNr(curTimeStep);
+      timeSelector->UpdateLargestPossibleRegion();
+      Image::Pointer mitkImage3d = timeSelector->GetOutput();
       mitk::CastToItkImage(mitkImage3d, origSegmentation);
     } else {
       mitk::CastToItkImage(m_WorkingImage, origSegmentation);
@@ -586,8 +590,11 @@ void mitk::SmartBrushTool::CheckIfCurrentSliceHasChanged(const mitk::PlaneGeomet
     if (referenceImage->GetDimension() == 4) {
       int curTimeStep = m_Windows.front()->GetSliceNavigationController()->GetTime()->GetPos();
 
-      Image::Pointer mitkImage3d = mitk::Image::New();
-      AccessFixedDimensionByItk_n(referenceImage, extract3Dfrom4DByItk, 4U, (mitkImage3d, curTimeStep));
+      ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
+      timeSelector->SetInput(referenceImage);
+      timeSelector->SetTimeNr(curTimeStep);
+      timeSelector->UpdateLargestPossibleRegion();
+      Image::Pointer mitkImage3d = timeSelector->GetOutput();
       mitk::CastToItkImageSingleComponent(mitkImage3d, m_OriginalImage, displayedComponent);
     } else {
       mitk::CastToItkImageSingleComponent(referenceImage, m_OriginalImage, displayedComponent);

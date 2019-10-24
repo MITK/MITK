@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include "mitkGeometry3D.h"
 #include "mitkStatusBar.h"
-#include "mitkImageReadAccessor.h"
 #include "mitkPlaneGeometry.h"
 
 #include <itkImageRegionConstIterator.h>
@@ -68,8 +67,9 @@ void mitk::AutoCropImageFilter::ITKCrop3DImage( itk::Image< TPixel, VImageDimens
   mitk::CastToMitkImage( outputItk, newMitkImage );
   MITK_INFO << "Crop-Output dimension: " << (newMitkImage->GetDimension() == 3) << " Filter-Output dimension: "<<this->GetOutput()->GetDimension()<< " Timestep: " << timestep;
 
-  mitk::ImageReadAccessor newMitkImgAcc(newMitkImage);
-  this->GetOutput()->SetVolume( newMitkImgAcc.GetData(), timestep);
+  mitk::ImageRegionAccessor accessor(newMitkImage);
+  mitk::ImageAccessLock lock(&accessor);
+  this->GetOutput()->SetVolume( accessor.getData(), timestep);
 }
 
 void mitk::AutoCropImageFilter::GenerateOutputInformation()

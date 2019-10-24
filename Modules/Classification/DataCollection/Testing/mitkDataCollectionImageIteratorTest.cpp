@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkImageGenerator.h>
 #include <mitkImageCast.h>
-#include <mitkImagePixelReadAccessor.h>
 #include <mitkImageToItk.h>
 #include <mitkIOUtil.h>
 

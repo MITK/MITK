@@ -17,8 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageSource.h"
 
-#include "mitkImageVtkReadAccessor.h"
-#include "mitkImageVtkWriteAccessor.h"
+#include "mitkImageVtkAccessor.h"
 
 mitk::ImageSource::ImageSource()
 {
@@ -197,12 +196,14 @@ void mitk::ImageSource::PrepareOutputs()
 vtkImageData* mitk::ImageSource::GetVtkImageData()
 {
   Update();
-  return GetOutput()->GetVtkImageData();
+  ImageVtkAccessor accessor(GetOutput());
+  return accessor.getVtkImageData();
 }
 
 const vtkImageData* mitk::ImageSource::GetVtkImageData() const
 {
-  return GetOutput()->GetVtkImageData();
+  ImageVtkAccessor accessor(const_cast<mitk::Image*>(GetOutput()));
+  return accessor.getVtkImageData();
 }
 
 mitkBaseDataSourceGetOutputDefinitions(mitk::ImageSource)

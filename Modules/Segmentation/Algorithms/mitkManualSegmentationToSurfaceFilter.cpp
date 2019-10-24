@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkManualSegmentationToSurfaceFilter.h>
 
+#include <mitkImageVtkAccessor.h>
+
 #include <vtkCommand.h>
 #include <vtkCallbackCommand.h>
 #include <vtkSmartPointer.h>
@@ -62,9 +64,11 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
   m_CurrentProgress = 0.f;
   m_CurrentlyProgressingBuilder = this;
 
+  ImageVtkAccessor accessor(image);
+  ImageAccessLock lock(&accessor);
   for( int t=tstart; t<tmax; ++t )
   {
-    vtkSmartPointer<vtkImageData> vtkimage = image->GetVtkImageData(t);
+    vtkSmartPointer<vtkImageData> vtkimage = accessor.getVtkImageData(t);
 
     // Median -->smooth 3D
     MITK_INFO << (m_MedianFilter3D ? "Applying median..." : "No median filtering");

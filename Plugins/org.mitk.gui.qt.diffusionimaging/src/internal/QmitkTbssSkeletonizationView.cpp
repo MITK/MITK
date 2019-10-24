@@ -26,8 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageFileReader.h>
 
 // mitk
-#include <mitkImagePixelReadAccessor.h>
-#include <mitkImagePixelWriteAccessor.h>
+#include <mitkImageRegionAccessor.h>
 #include <mitkPixelTypeMultiplex.h>
 #include <mitkImage.h>
 
@@ -468,10 +467,9 @@ void QmitkTbssSkeletonizationView::ConvertToItk(mitk::PixelType ptype, mitk::Ima
       // REPLACE THIS METHODE()ConvertToItk) WITH mitk::CastToItk
 
       // iterate through the subjects and copy data to output
+      mitk::ImageRegionAccessor inAcc(image);
       for(int t=0; t<timesteps; t++)
       {
-        mitk::ImagePixelReadAccessor <TPixel,3> inAcc(image,image->GetVolumeData(t));
-
         for(int x=0; x<image->GetDimension(0); x++)
         {
           for(int y=0; y<image->GetDimension(1); y++)
@@ -481,7 +479,7 @@ void QmitkTbssSkeletonizationView::ConvertToItk(mitk::PixelType ptype, mitk::Ima
               itk::Index<3> ix = {x, y, z};
               itk::Index<4> ix4 = {x, y, z, t};
 
-              output->SetPixel(ix4, inAcc.GetPixelByIndex(ix));
+              output->SetPixel(ix4, *(TPixel*)inAcc.getPixel(ix, t));
 
             }
           }

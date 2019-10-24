@@ -56,11 +56,11 @@ ImportMitkImageContainer< TElementIdentifier , TElement >
 template <typename TElementIdentifier, typename TElement>
 void
 ImportMitkImageContainer< TElementIdentifier , TElement >
-::SetImageAccessor(mitk::ImageAccessorBase* imageAccess, size_t noOfBytes)
+::SetImageAccessor(mitk::ImageRegionAccessor* imageAccess, size_t noOfBytes)
 {
   m_imageAccess = imageAccess;
 
-  this->SetImportPointer( (TElement*) m_imageAccess->GetData(), noOfBytes/sizeof(Element), false);
+  this->SetImportPointer( (TElement*) m_imageAccess->getData(), noOfBytes/sizeof(Element), false);
 
   this->Modified();
 }

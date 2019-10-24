@@ -23,10 +23,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageAccessByItk.h>
 #include <mitkStandardFileLocations.h>
 #include <mitkITKImageImport.h>
-#include <mitkImagePixelReadAccessor.h>
 #include <mitkRotationOperation.h>
 #include <mitkInteractionConst.h>
 #include <mitkNumericTypes.h>
+#include <mitkImageRegionAccessor.h>
+#include <mitkImageVtkAccessor.h>
 
 #include <ctime>
 #include <cstdlib>
@@ -577,22 +578,20 @@ public:
     testPoint2DIn2DIndex[0] = testPoint2DInIndex[0];
     testPoint2DIn2DIndex[1] = testPoint2DInIndex[1];
 
-    typedef mitk::ImagePixelReadAccessor< unsigned short, 3 > VolumeReadAccessorType;
-    typedef mitk::ImagePixelReadAccessor< unsigned short, 2 > SliceReadAccessorType;
-    VolumeReadAccessorType VolumeReadAccessor( imageInMitk );
-    SliceReadAccessorType SliceReadAccessor( slice );
+    mitk::ImageRegionAccessor volume(imageInMitk);
 
     //compare the pixelvalues of the defined point in the 3D volume with the value of the resliced image
-    unsigned short valueAt3DVolume = VolumeReadAccessor.GetPixelByIndex( testPoint3DInIndex );
-    unsigned short valueAtSlice = SliceReadAccessor.GetPixelByIndex( testPoint2DIn2DIndex );
+    unsigned short valueAt3DVolume = *(unsigned short*)volume.getPixel(testPoint3DInIndex);
+    unsigned short valueAtSlice = *(unsigned short*)volume.getPixel(testPoint2DInIndex);
 
     //valueAt3DVolume == valueAtSlice is not always working. because of rounding errors
     //indices are shifted
     MITK_TEST_CONDITION(valueAt3DVolume == valueAtSlice, "comparing pixelvalues for orthogonal plane");
 
-
-    vtkSmartPointer<vtkImageData> imageInVtk = imageInMitk->GetVtkImageData();
-    vtkSmartPointer<vtkImageData> sliceInVtk = slice->GetVtkImageData();
+    mitk::ImageVtkAccessor accessorImage(imageInMitk);
+    vtkSmartPointer<vtkImageData> imageInVtk = accessorImage.getVtkImageData();
+    mitk::ImageVtkAccessor accessorSlice(imageInMitk);
+    vtkSmartPointer<vtkImageData> sliceInVtk = accessorSlice.getVtkImageData();
 
     double PixelvalueByMitkOutput = sliceInVtk->GetScalarComponentAsDouble(n1, n2, 0, 0);
     //double valueVTKinImage = imageInVtk->GetScalarComponentAsDouble(testPoint3DInIndex[0], testPoint3DInIndex[1], testPoint3DInIndex[2], 0);
@@ -1021,7 +1020,8 @@ int mitkExtractSliceFilterTest(int /*argc*/, char* /*argv*/[])
     mitk::Image::Pointer pic = mitk::IOUtil::LoadImage(filename);
     vtkSmartPointer<vtkImageReslice> slicer = vtkSmartPointer<vtkImageReslice>::New();
 
-    slicer->SetInput(pic->GetVtkImageData());
+    mitk::ImageVtkAccessor accessor(pic);
+    slicer->SetInput(pic.getVtkImageData());
 
 
     mitk::PlaneGeometry::Pointer obliquePl = mitk::PlaneGeometry::New();

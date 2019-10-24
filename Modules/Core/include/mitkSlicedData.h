@@ -140,9 +140,7 @@ public:
     return m_RequestedRegion;
   }
 
-  virtual bool IsSliceSet(int s = 0, int t = 0, int n = 0) const = 0;
   virtual bool IsVolumeSet(int t = 0, int n = 0) const = 0;
-  virtual bool IsChannelSet(int n = 0) const = 0;
   virtual void CopyInformation(const itk::DataObject *data) override;
 
   //##Documentation

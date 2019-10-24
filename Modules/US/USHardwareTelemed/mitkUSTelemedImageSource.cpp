@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSTelemedImageSource.h"
 #include "mitkUSTelemedSDKHeader.h"
 #include "MITKUSTelemedScanConverterPlugin.h"
-#include "mitkImageReadAccessor.h"
 
 mitk::USTelemedImageSource::USTelemedImageSource()
   : m_Image(mitk::Image::New()),
@@ -67,8 +66,7 @@ void mitk::USTelemedImageSource::GetNextRawImage( mitk::Image::Pointer& image)
 
     // copy contents of the given image into the member variable
     image->Initialize(m_Image->GetPixelType(), m_Image->GetDimension(), m_Image->GetDimensions());
-    mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(0,0,0));
-    image->SetSlice(inputReadAccessor.GetData());
+    image->SetSlice(m_Image->GetSliceData()->GetData());
     image->SetGeometry(m_Image->GetGeometry());
 
     m_ImageMutex->Unlock();

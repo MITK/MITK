@@ -44,10 +44,11 @@ void mitk::ImageSliceSelector::GenerateOutputInformation()
 
 void mitk::ImageSliceSelector::GenerateData()
 {
-  SetSliceItem(GetSliceData(m_SliceNr, m_TimeNr, m_ChannelNr), 0);
+  ImageDataItem::Pointer slice = GetSliceData(m_SliceNr, m_TimeNr);
+  SetSliceData(slice->GetData(), 0);
 }
 
-mitk::ImageSliceSelector::ImageSliceSelector() : m_SliceNr(0), m_TimeNr(0), m_ChannelNr(0)
+mitk::ImageSliceSelector::ImageSliceSelector() : m_SliceNr(0), m_TimeNr(0)
 {
 }
 
@@ -68,7 +69,6 @@ void mitk::ImageSliceSelector::GenerateInputRequestedRegion()
   requestedRegion = output->GetRequestedRegion();
   requestedRegion.SetIndex(2, m_SliceNr);
   requestedRegion.SetIndex(3, m_TimeNr);
-  requestedRegion.SetIndex(4, m_ChannelNr);
   requestedRegion.SetSize(2, 1);
   requestedRegion.SetSize(3, 1);
   requestedRegion.SetSize(4, 1);

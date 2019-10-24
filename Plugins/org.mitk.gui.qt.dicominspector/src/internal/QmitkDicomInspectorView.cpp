@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk
 #include <QmitkRenderWindow.h>
-#include <mitkImagePixelReadAccessor.h>
 #include <mitkPixelTypeMultiplex.h>
 
 // Qt

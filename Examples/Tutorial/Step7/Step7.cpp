@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkSurface.h>
 #include <mitkRenderingManager.h>
+#include <mitkImageVtkAccessor.h>
 
 #include <vtkMarchingCubes.h>
 #include <vtkSTLWriter.h>
@@ -47,7 +48,8 @@ void Step7::StartRegionGrowing()
     m_ResultNode->SetProperty("volumerendering", mitk::BoolProperty::New(false));
 
     vtkMarchingCubes* surfaceCreator = vtkMarchingCubes::New();
-    surfaceCreator->SetInputData(m_ResultImage->GetVtkImageData());
+    mitk::ImageVtkAccessor accessor(m_ResultImage);
+    surfaceCreator->SetInputData(accessor.getVtkImageData());
     surfaceCreator->SetValue(0, 1);
     surfaceCreator->Update();
 

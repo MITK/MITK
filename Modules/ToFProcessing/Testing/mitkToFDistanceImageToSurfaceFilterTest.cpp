@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkToFDistanceImageToSurfaceFilter.h>
 
 #include <mitkImage.h>
-#include <mitkImagePixelReadAccessor.h>
+#include <mitkImageRegionAccessor.h>
 #include <mitkImageGenerator.h>
 #include <mitkSurface.h>
 #include <mitkToFProcessingCommon.h>
@@ -100,13 +100,13 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
   {
     for (unsigned int i=0; i<dimY; i++)
     {
-      itk::Index<2> index = {{ i, j }};
+      itk::Index<3> index = {{ i, j, 0 }};
       float distance = 0.0;
 
       try
       {
-        mitk::ImagePixelReadAccessor<float,2> readAccess(image, image->GetSliceData());
-        distance = readAccess.GetPixelByIndex(index);
+        mitk::ImageRegionAccessor readAccess(image);
+        distance = *(float*)readAccess.getPixel(index);
       }
       catch(mitk::Exception& e)
       {
@@ -181,12 +181,12 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
   {
     for (unsigned int i=0; i<dimY; i++)
     {
-        itk::Index<2> index = {{ i, j }};
+        itk::Index<3> index = {{ i, j, 0 }};
         float distance = 0.0;
         try
         {
-          mitk::ImagePixelReadAccessor<float,2> readAccess(image, image->GetSliceData());
-          distance = readAccess.GetPixelByIndex(index);
+          mitk::ImageRegionAccessor readAccess(image);
+          distance = *(float*)readAccess.getPixel(index);
         }
         catch(mitk::Exception& e)
         {
@@ -323,13 +323,13 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
     ToFPoint3D resultPointBackward =
         mitk::ToFProcessingCommon::CartesianToIndexCoordinates(resultPoint,focalLengthXY,principalPoint);
 
-    itk::Index<2> index = {{ (int) (resultPointBackward[0]+0.5), (int) (resultPointBackward[1]+0.5) }};
+    itk::Index<3> index = {{ (int) (resultPointBackward[0]+0.5), (int) (resultPointBackward[1]+0.5), 0 }};
     float distanceBackward = 0.0;
 
     try
     {
-      mitk::ImagePixelReadAccessor<float,2> readAccess(image, image->GetSliceData());
-      distanceBackward = readAccess.GetPixelByIndex(index);
+      mitk::ImageRegionAccessor readAccess(image);
+      distance = *(float*)readAccess.getPixel(index);
     }
     catch(mitk::Exception& e)
     {
@@ -360,12 +360,12 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
     ToFPoint3D resultPointBackward =
         mitk::ToFProcessingCommon::CartesianToIndexCoordinatesWithInterpixdist(resultPoint,focalLength,interPixelDistance,principalPoint);
 
-    itk::Index<2> pixelIndex = {{ (int) (resultPointBackward[0]+0.5), (int) (resultPointBackward[1]+0.5) }};
+    itk::Index<3> pixelIndex = {{ (int) (resultPointBackward[0]+0.5), (int) (resultPointBackward[1]+0.5), 0 }};
     float distanceBackward = 0.0;
     try
     {
-      mitk::ImagePixelReadAccessor<float,2> readAccess(image, image->GetSliceData());
-      distanceBackward = readAccess.GetPixelByIndex(pixelIndex);
+      mitk::ImageRegionAccessor readAccess(image);
+      distance = *(float*)readAccess.getPixel(pixelIndex);
     }
     catch(mitk::Exception& e)
     {
@@ -386,5 +386,3 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_END();
 
 }
-
-

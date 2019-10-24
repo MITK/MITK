@@ -15,7 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkUSTelemedScanConverterPlugin.h"
-#include "mitkImageWriteAccessor.h"
 
 USTelemedScanConverterPlugin::USTelemedScanConverterPlugin( )
   : m_Plugin(NULL), m_OutputImage(NULL), m_OutputImageMutex(NULL)

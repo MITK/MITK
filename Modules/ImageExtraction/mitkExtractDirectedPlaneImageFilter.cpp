@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProperties.h>
 #include <mitkDataNode.h>
 #include <mitkResliceMethodProperty.h>
+#include <mitkImageVtkAccessor.h>
 #include "vtkMitkThickSlicesFilter.h"
 
 #include <vtkTransform.h>
@@ -101,7 +102,9 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   input->SetRequestedRegion( &requestedRegion );
   input->Update();
 
-  vtkImageData* inputData = input->GetVtkImageData( timestep );
+  ImageVtkAccessor accessor(input);
+  ImageAccessLock lock(&accessor);
+  vtkImageData* inputData = accessor.getVtkImageData(timestep);
 
   if ( inputData == nullptr )
   {

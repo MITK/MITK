@@ -54,7 +54,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCornerAnnotation.h>
 #include <vtkMitkRectangleProp.h>
 #include "mitkPixelTypeMultiplex.h"
-#include "mitkImagePixelReadAccessor.h"
 
 #include <PathUtilities.h>
 

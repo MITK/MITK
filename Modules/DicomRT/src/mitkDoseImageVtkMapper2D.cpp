@@ -731,7 +731,6 @@ void mitk::DoseImageVtkMapper2D::SetDefaultProperties(mitk::DataNode *node,
     sliceSelector->SetInput(image);
     sliceSelector->SetSliceNr(image->GetDimension(2) / 2);
     sliceSelector->SetTimeNr(image->GetDimension(3) / 2);
-    sliceSelector->SetChannelNr(image->GetDimension(4) / 2);
     sliceSelector->Update();
     centralSliceImage = sliceSelector->GetOutput();
     if (centralSliceImage.IsNotNull() && centralSliceImage->IsInitialized())

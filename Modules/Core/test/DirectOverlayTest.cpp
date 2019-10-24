@@ -9,8 +9,6 @@
 #include <itkBinaryThresholdImageFilter.h>
 #include <itkImageFileWriter.h>
 
-#include <mitkImagePixelReadAccessor.h>
-
 //#include <boost/lexical_cast.hpp>
 
 class DirectOverlayTestClass
@@ -251,4 +249,3 @@ int DirectOverlayTest(int argc, char* argv[])
 
   MITK_TEST_END()
 }
-

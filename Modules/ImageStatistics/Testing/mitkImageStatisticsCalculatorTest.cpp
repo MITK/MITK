@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkIOUtil.h>
 #include <mitkImageGenerator.h>
-#include <mitkImagePixelWriteAccessor.h>
+#include <mitkImageRegionAccessor.h>
 
 /**
  * \brief Test class for mitkImageStatisticsCalculator
@@ -397,10 +397,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestImageMaskingNonEmpty()
   std::vector< itk::Index<3U> >::const_iterator indexIter = activated_indices.begin();
 
   // activate voxel in the mask image
-  mitk::ImagePixelWriteAccessor< unsigned char, 3> writeAccess( mask_image );
+  mitk::ImageRegionAccessor writeAccess(mask_image);
   while( indexIter != activated_indices.end() )
   {
-    writeAccess.SetPixelByIndex( (*indexIter++), 1);
+    *(unsigned char*)writeAccess.getPixel(*indexIter++) = 1;
   }
 
   this->VerifyStatistics( ComputeStatistics( m_Image, mask_image ), 127.5, 147.22, 254.5);
@@ -420,8 +420,8 @@ void mitkImageStatisticsCalculatorTestSuite::TestRecomputeOnModifiedMask()
 
   // activate voxel in the mask image
   itk::Index<3U> test_index = {11, 8, 0};
-  mitk::ImagePixelWriteAccessor< unsigned char, 3> writeAccess( mask_image );
-  writeAccess.SetPixelByIndex( test_index, 1);
+  mitk::ImageRegionAccessor writeAccess(mask_image);
+  *(unsigned char*)writeAccess.getPixel(test_index) = 1;
 
   mask_image->Modified();
 

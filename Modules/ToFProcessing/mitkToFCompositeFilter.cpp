@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkToFCompositeFilter.h>
 #include <mitkInstantiateAccessFunctions.h>
-#include "mitkImageReadAccessor.h"
 
 #include <itkImage.h>
 
@@ -63,8 +62,7 @@ void mitk::ToFCompositeFilter::SetInput( unsigned int idx,  mitk::Image* distanc
         {
           cvReleaseImage(&(this->m_IplDistanceImage));
         }
-        ImageReadAccessor distImgAcc(distanceImage, distanceImage->GetSliceData(0,0,0));
-        float* distanceFloatData = (float*) distImgAcc.GetData();
+        float* distanceFloatData = (float*) distanceImage->GetSliceData()->GetData();
         this->m_IplDistanceImage = cvCreateImage(cvSize(this->m_ImageWidth, this->m_ImageHeight), IPL_DEPTH_32F, 1);
         memcpy(this->m_IplDistanceImage->imageData, (void*)distanceFloatData, this->m_ImageSize);
 
@@ -104,21 +102,14 @@ void mitk::ToFCompositeFilter::GenerateData()
     mitk::Image::Pointer inputImage = this->GetInput(idx);
     if (outputImage.IsNotNull()&&inputImage.IsNotNull())
     {
-      ImageReadAccessor inputAcc(inputImage, inputImage->GetSliceData());
       outputImage->CopyInformation(inputImage);
       outputImage->Initialize(inputImage->GetPixelType(),inputImage->GetDimension(),inputImage->GetDimensions());
-      outputImage->SetSlice(inputAcc.GetData());
+      outputImage->SetSlice(inputImage->GetSliceData()->GetData());
     }
   }
-  //mitk::Image::Pointer outputDistanceImage = this->GetOutput();
-  ImageReadAccessor outputAcc(this->GetOutput(), this->GetOutput()->GetSliceData(0, 0, 0) );
-  float* outputDistanceFloatData = (float*) outputAcc.GetData();
-
-  //mitk::Image::Pointer inputDistanceImage = this->GetInput();
-  ImageReadAccessor inputAcc(this->GetInput(), this->GetInput()->GetSliceData(0, 0, 0) );
-
+  float* outputDistanceFloatData = (float*) this->GetOutput()->GetSliceData()->GetData();
   // copy initial distance image to ipl image
-  float* distanceFloatData = (float*)inputAcc.GetData();
+  float* distanceFloatData = (float*) this->GetInput()->GetSliceData()->GetData();
   memcpy(this->m_IplDistanceImage->imageData, (void*)distanceFloatData, this->m_ImageSize);
   if (m_ApplyThresholdFilter||m_ApplyMaskSegmentation)
   {
@@ -177,8 +168,7 @@ void mitk::ToFCompositeFilter::ProcessSegmentation(IplImage* inputIplImage)
   char* segmentationMask;
   if (m_SegmentationMask.IsNotNull())
   {
-    ImageReadAccessor segMaskAcc(m_SegmentationMask, m_SegmentationMask->GetSliceData(0,0,0));
-    segmentationMask = (char*)segMaskAcc.GetData();
+    segmentationMask = (char*)m_SegmentationMask->GetSliceData()->GetData();
   }
   else
   {

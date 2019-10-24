@@ -16,8 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK
 #include <mitkIOUtil.h>
 #include <mitkPixelType.h>
-#include <mitkImagePixelWriteAccessor.h>
-#include <mitkImagePixelReadAccessor.h>
+#include <mitkImageRegionAccessor.h>
+#include <mitkImageRegionAccessor.h>
 #include <mitkImageCast.h>
 #include <mitkPlaneGeometry.h>
 #include <mitkImageWriter.h>
@@ -111,8 +111,7 @@ public:
     mitk::CastToItkImage(grayImage, itkGrayImage);
 
 
-    mitk::ImagePixelWriteAccessor<RGBPixelType,3> writeAcc(rgbImage);
-
+    mitk::ImageRegionAccessor writeAcc(rgbImage);
 
     typedef itk::RescaleIntensityImageFilter< itk::Image<InputPixelType,3>, itk::Image<PixelType,3> > RescaleFilterType;
     RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
@@ -132,7 +131,7 @@ public:
         for (idx[0] =0; (unsigned int)idx[0] < dim[0]; idx[0]++)
         {
           value.Fill(rescaleFilter->GetOutput()->GetPixel(idx));
-          writeAcc.SetPixelByIndex(idx, value);
+          *(RGBPixelType*)writeAcc.getPixel(idx) = value;
         }
       }
     }
@@ -224,7 +223,7 @@ public:
     unsigned int *dim = rgbImage->GetDimensions();
     itk::Image<PixelType,3>::Pointer itkOverlayImage = itk::Image<PixelType,3>::New();
     mitk::CastToItkImage(overlayImage.GetPointer(), itkOverlayImage);
-    mitk::ImagePixelWriteAccessor<RGBPixelType ,3> writeAcc(rgbImage);
+    mitk::ImageRegionAccessor writeAcc(rgbImage);
 
     itk::Index<3> idx;
     itk::RGBPixel<PixelType> value;
@@ -237,11 +236,11 @@ public:
         for (idx[0] =0; (unsigned int)idx[0] < dim[0]; idx[0]++)
         {
           overlayVal = 255*itkOverlayImage->GetPixel(idx);
-          value = writeAcc.GetPixelByIndex(idx);
+          value = *(RGBPixelType*)writeAcc.getPixel(idx);
           value[0] = std::min( (int)(value[0] + overlayVal * color[0]),254*255);
           value[1] =  std::min((int)(value[1] + overlayVal * color[1]),254*255) ;
           value[2] = std::min((int)(value[2] + overlayVal * color[2]),254*255);
-          writeAcc.SetPixelByIndex(idx, value);
+          *(RGBPixelType*)writeAcc.getPixel(idx) = value;
         }
       }
     }
@@ -471,12 +470,11 @@ int main( int argc, char* argv[] )
     // Create 4D Volume image
     if ( volumeFile != "")
     {
-      mitk::ImagePixelReadAccessor<InputPixelType,3> readAc(morphImage);
 
       merged4D->GetGeometry(i)->SetSpacing(referenceImg->GetGeometry()->GetSpacing());
       merged4D->GetGeometry(i)->SetOrigin(referenceImg->GetGeometry()->GetOrigin());
       merged4D->GetGeometry(i)->SetIndexToWorldTransform(referenceImg->GetGeometry()->GetIndexToWorldTransform());
-      merged4D->SetVolume(readAc.GetData(),i);
+      merged4D->SetVolume(morphImage->GetVolumeData()->GetData(),i);
     }
 
     MITK_INFO << "-- Convert to RGB";

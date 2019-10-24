@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImage.h"
 #include "mitkImageDataItem.h"
-#include "mitkImageWriteAccessor.h"
+#include <mitkImageAccessLock.h>
 
 #include <itkImage.h>
 #include <itkImageSource.h>
@@ -93,7 +93,7 @@ protected:
   ImageToItk()
   : m_CopyMemFlag(false)
   , m_Channel(0)
-  , m_Options(mitk::ImageAccessorBase::DefaultBehavior)
+  , m_Options(0)
   {
   }
 

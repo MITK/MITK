@@ -64,8 +64,8 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
   }
   std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing IsSliceSet(): ";
-  if(slice->GetOutput()->IsSliceSet(0)==false)
+  std::cout << "Testing IsVolumeSet(): ";
+  if(slice->GetOutput()->IsVolumeSet(0)==false)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -160,8 +160,8 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
   }
   std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing IsSliceSet(): ";
-  if(slice->GetOutput()->IsSliceSet(0)==false)
+  std::cout << "Testing IsVolumeSet(): ";
+  if(slice->GetOutput()->IsVolumeSet(0)==false)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -190,8 +190,8 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
     }
     std::cout<<"[PASSED]"<<std::endl;
 
-    std::cout << "Testing 3D+t: IsSliceSet(): ";
-    if(slice->GetOutput()->IsSliceSet(0)==false)
+    std::cout << "Testing 3D+t: IsVolumeSet(): ";
+    if(slice->GetOutput()->IsVolumeSet(0)==false)
     {
       std::cout<<"[FAILED]"<<std::endl;
       return EXIT_FAILURE;
@@ -199,7 +199,7 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
     std::cout<<"[PASSED]"<<std::endl;
 
     std::cout << "Testing 3D+t: First slice in reader available: ";
-    if(image->IsSliceSet(0, time)==false)
+    if(image->IsVolumeSet(time)==false)
     {
       std::cout<<"[FAILED]"<<std::endl;
       return EXIT_FAILURE;

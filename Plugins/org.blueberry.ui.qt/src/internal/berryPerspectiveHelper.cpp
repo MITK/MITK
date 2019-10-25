@@ -1153,8 +1153,8 @@ LayoutPart::Pointer PerspectiveHelper::FindPart(const QString& id,
     else if (part->IsPlaceHolder()
              && part.Cast<PartPlaceholder>()->HasWildCard())
     {
-      QRegExp re(id, Qt::CaseInsensitive);
-      if (re.exactMatch(part->GetID()))
+      QRegExp re(part->GetID(), Qt::CaseInsensitive);
+      if (re.exactMatch(id))
       {
         matchingParts.push_back(MatchingPart(part->GetID(), "", part));
       }

@@ -284,12 +284,9 @@ std::vector<BaseData::Pointer> ItkImageIO::Read()
 
   MITK_INFO << "ioRegion: " << ioRegion << std::endl;
   m_ImageIO->SetIORegion( ioRegion );
-  void* buffer = new unsigned char[m_ImageIO->GetImageSizeInBytes()];
-  m_ImageIO->Read( buffer );
-
-  image->Initialize( MakePixelType(m_ImageIO), ndim, dimensions );
-  image->SetImportVolume( buffer, 0, Image::ManageMemory );
-
+  image->Initialize(MakePixelType(m_ImageIO), ndim, dimensions);
+  m_ImageIO->Read(image->GetVolumeData()->GetData());
+  
   const itk::MetaDataDictionary& dictionary = m_ImageIO->GetMetaDataDictionary();
 
   // access direction of itk::Image and include spacing
@@ -380,7 +377,6 @@ std::vector<BaseData::Pointer> ItkImageIO::Read()
 
   image->SetTimeGeometry(timeGeometry);
 
-  buffer = NULL;
   MITK_INFO << "number of image components: "<< image->GetPixelType().GetNumberOfComponents() << std::endl;
 
   for (itk::MetaDataDictionary::ConstIterator iter = dictionary.Begin(), iterEnd = dictionary.End();

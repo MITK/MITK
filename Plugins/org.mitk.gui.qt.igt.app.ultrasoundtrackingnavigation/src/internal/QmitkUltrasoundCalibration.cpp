@@ -736,6 +736,11 @@ void QmitkUltrasoundCalibration::OnAddCalibPoint()
 
 void QmitkUltrasoundCalibration::OnCalibration()
 {
+  if (m_CombinedModality.IsNull())
+  {
+    return;
+  }
+
   // Compute transformation
   vtkSmartPointer<vtkLandmarkTransform> transform = vtkSmartPointer<vtkLandmarkTransform>::New();
 

@@ -18,13 +18,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIGTTimeStamp.h>
 
 mitk::NavigationDataRecorder::NavigationDataRecorder()
+ : m_NumberOfInputs(0),
+   m_NavigationDataSet(nullptr),
+   m_Recording(false),
+   m_StandardizeTime(false),
+   m_StandardizedTimeInitialized(false),
+   m_RecordCountLimit(-1),
+   m_RecordOnlyValidData(false)
 {
-  //set default values
-  m_NumberOfInputs = 0;
-  m_Recording = false;
-  m_StandardizedTimeInitialized = false;
-  m_RecordCountLimit = -1;
-  m_RecordOnlyValidData = false;
+
 }
 
 mitk::NavigationDataRecorder::~NavigationDataRecorder()

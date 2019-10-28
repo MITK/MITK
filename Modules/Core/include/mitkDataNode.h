@@ -481,7 +481,7 @@ public:
    * \brief Convenience method for setting level-window properties
    * (instances of LevelWindowProperty)
    */
-  void SetLevelWindow(mitk::LevelWindow levelWindow, const mitk::BaseRenderer* renderer = nullptr, const char* propertyKey = "levelwindow");
+  void SetLevelWindow(mitk::LevelWindow levelWindow, const mitk::BaseRenderer* renderer = nullptr, const char* propertyKey = "levelwindow", bool isNodeChanged = true);
 
   /**
    * \brief Convenience method for setting int properties (instances of

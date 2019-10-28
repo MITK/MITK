@@ -195,7 +195,7 @@ void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSetti
 
       float Angle = std::stof(elem->Attribute("apodizationAngle"));
       bool IsPhotoacousticImage = true;
-      if (elem->Attribute("imageType") == "US") {
+      if (std::string(elem->Attribute("imageType")).compare("US") == 0) {
         IsPhotoacousticImage = false;
         MITK_INFO << "US IMAGE";
       }

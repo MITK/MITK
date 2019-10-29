@@ -38,7 +38,7 @@ QmitkInfoDialog::QmitkInfoDialog( const QList<mitk::DataNode::Pointer> &_Nodes, 
   m_SearchButton = new QPushButton("Search (F3)", this);
   m_SearchButton->installEventFilter(this);
   m_TextBrowser = new QTextBrowser(this);
-  QPushButton* _CancelButton = new QPushButton("Cancel", this);
+  QPushButton* m_CloseButton = new QPushButton("Close", this);
 
   // SET
   this->setMinimumSize(512, 512);
@@ -50,7 +50,7 @@ QmitkInfoDialog::QmitkInfoDialog( const QList<mitk::DataNode::Pointer> &_Nodes, 
   parentLayout->addWidget(m_KeyWord, 1, 0);
   parentLayout->addWidget(m_SearchButton, 1, 1);
   parentLayout->addWidget(m_TextBrowser, 2, 0, 1, 2);
-  parentLayout->addWidget(_CancelButton, 3, 0, 1, 2);
+  parentLayout->addWidget(m_CloseButton, 3, 0, 1, 2);
 
   QObject::connect( _QmitkDataStorageComboBox, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) )
     , this, SLOT( OnSelectionChanged( const mitk::DataNode* ) ) );
@@ -66,10 +66,10 @@ QmitkInfoDialog::QmitkInfoDialog( const QList<mitk::DataNode::Pointer> &_Nodes, 
   QObject::connect( m_SearchButton, SIGNAL( clicked ( bool ) )
     , this, SLOT( OnSearchButtonClicked( bool ) ) );
 
-  QObject::connect( _CancelButton, SIGNAL( clicked ( bool ) )
+  QObject::connect( m_CloseButton, SIGNAL( clicked ( bool ) )
     , this, SLOT( OnCancelButtonClicked( bool ) ) );
 
-  _CancelButton->setDefault(true);
+  m_CloseButton->setDefault(true);
 
 }
 

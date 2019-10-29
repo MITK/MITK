@@ -1539,7 +1539,7 @@ void QmitkStdMultiWidget::InitPositionTracking()
 // TODO POSITIONTRACKER
 }
 
-void QmitkStdMultiWidget::AddDisplayPlaneSubTree(const std::string& parentWidget)
+void QmitkStdMultiWidget::AddDisplayPlaneSubTree()
 {
   // add the displayed planes of the multiwidget to a node to which the subtree
   // @a planesSubTree points ...

@@ -430,7 +430,7 @@ void mitk::DataNode::SetOpacity(float opacity, const mitk::BaseRenderer* rendere
   }
 }
 
-void mitk::DataNode::SetLevelWindow(mitk::LevelWindow levelWindow, const mitk::BaseRenderer* renderer, const char* propertyKey)
+void mitk::DataNode::SetLevelWindow(mitk::LevelWindow levelWindow, const mitk::BaseRenderer* renderer, const char* propertyKey, bool isNodeChanged)
 {
   auto pList = GetPropertyList(renderer);
   mitk::LevelWindowProperty::Pointer prop =
@@ -438,7 +438,9 @@ void mitk::DataNode::SetLevelWindow(mitk::LevelWindow levelWindow, const mitk::B
   if (prop) {
     prop->SetValue(levelWindow);
     // Only because Autoplan level window synchronization needs an even we fire NodeChanged here
-    Modified();
+    if (isNodeChanged) {
+      Modified();
+    }
   } else {
     prop = mitk::LevelWindowProperty::New(levelWindow);
     pList->SetProperty(propertyKey, prop);

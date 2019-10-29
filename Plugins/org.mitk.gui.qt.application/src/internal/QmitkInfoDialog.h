@@ -36,7 +36,7 @@ public Q_SLOTS:
 
   void OnSelectionChanged(const mitk::DataNode*);
   void OnSearchButtonClicked(bool checked = false);
-  void OnCancelButtonClicked(bool checked = false);
+  void OnCloseButtonClicked(bool checked = false);
   void KeyWordTextChanged(const QString& text);
 
 protected:

@@ -287,11 +287,12 @@ namespace mitk
     void SetMatrixByVectors(const VnlVector &rightVector, const VnlVector &downVector, ScalarType thickness = 1.0);
 
     /**
-    * \brief Change \a transform so that the third column of the
-    * transform-martix is perpendicular to the first two columns
-    *
+    * \brief Check if matrix is a rotation matrix:
+    * - determinant is 1?
+    * - R*R^T is ID?
+    * Output warning otherwise.
     */
-    static void EnsurePerpendicularNormal(AffineTransform3D *transform);
+    static bool CheckRotationMatrix(AffineTransform3D *transform, double epsilon=mitk::eps);
 
     /**
     * \brief Normal of the plane
@@ -554,6 +555,8 @@ namespace mitk
     */
     const BaseGeometry *GetReferenceGeometry() const;
     bool HasReferenceGeometry() const;
+
+    static std::vector< int > CalculateDominantAxes(mitk::AffineTransform3D::MatrixType::InternalMatrixType& rotation_matrix);
 
   protected:
     PlaneGeometry();

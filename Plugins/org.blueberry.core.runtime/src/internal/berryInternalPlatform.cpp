@@ -121,8 +121,11 @@ void InternalPlatform::InitializePluginPaths()
   QMutexLocker lock(&m_Mutex);
 
   // Add search paths for Qt plugins
-  foreach(QString qtPluginPath, m_Context->getProperty(Platform::PROP_QTPLUGIN_PATH).toStringList())
+  for(const auto qtPluginPath : m_Context->getProperty(Platform::PROP_QTPLUGIN_PATH).toStringList())
   {
+    if (qtPluginPath.isEmpty())
+      continue;
+
     if (QFile::exists(qtPluginPath))
     {
       QCoreApplication::addLibraryPath(qtPluginPath);

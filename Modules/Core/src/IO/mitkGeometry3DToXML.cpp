@@ -121,7 +121,7 @@ mitk::Geometry3D::Pointer mitk::Geometry3DToXML::FromXML(TiXmlElement *geometryE
           {
             matrix[r][c] = boost::lexical_cast<double>(string_value);
           }
-          catch (boost::bad_lexical_cast &e)
+          catch ( const boost::bad_lexical_cast &e )
           {
             MITK_ERROR << "Could not parse '" << string_value << "' as number: " << e.what();
             return nullptr;
@@ -166,7 +166,7 @@ mitk::Geometry3D::Pointer mitk::Geometry3DToXML::FromXML(TiXmlElement *geometryE
       {
         offset[d] = boost::lexical_cast<double>(offset_string[d]);
       }
-      catch (boost::bad_lexical_cast &e)
+      catch ( const boost::bad_lexical_cast &e )
       {
         MITK_ERROR << "Could not parse '" << offset_string[d] << "' as number: " << e.what();
         return nullptr;
@@ -216,7 +216,7 @@ mitk::Geometry3D::Pointer mitk::Geometry3DToXML::FromXML(TiXmlElement *geometryE
       {
         bounds[d] = boost::lexical_cast<double>(bounds_string[d]);
       }
-      catch (boost::bad_lexical_cast &e)
+      catch ( const boost::bad_lexical_cast &e )
       {
         MITK_ERROR << "Could not parse '" << bounds_string[d] << "' as number: " << e.what();
         return nullptr;

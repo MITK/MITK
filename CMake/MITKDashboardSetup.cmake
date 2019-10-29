@@ -67,7 +67,7 @@ set(PROJECT_BUILD_DIR "MITK-build")
 
 set(CTEST_PATH "$ENV{PATH}")
 if(WIN32)
-  if("${CTEST_CMAKE_GENERATOR}" MATCHES ".*Win64")
+  if("${CTEST_CMAKE_GENERATOR_PLATFORM}" STREQUAL "x64")
     set(CMAKE_LIBRARY_ARCHITECTURE x64)
   else()
     set(CMAKE_LIBRARY_ARCHITECTURE x86)
@@ -79,7 +79,7 @@ if(WIN32)
   set(BLUEBERRY_RUNTIME_DIR "${CTEST_BINARY_DIRECTORY}/MITK-build/bin/plugins/${CTEST_BUILD_CONFIGURATION}")
 
   set(PYTHON_BINARY_DIRS "${CTEST_BINARY_DIRECTORY}/ep/src/CTK-build/CMakeExternals/Install/bin")
-  get_filename_component(_python_dir ${PYTHON_EXECUTABLE} DIRECTORY)
+  get_filename_component(_python_dir "${Python3_EXECUTABLE}" DIRECTORY)
   list(APPEND PYTHON_BINARY_DIRS "${_python_dir}")
 
   set(CTEST_PATH "${CTEST_PATH};${CTEST_BINARY_DIRECTORY}/ep/bin;${QT_BINARY_DIR};${BLUEBERRY_RUNTIME_DIR};${OPENCV_BIN_DIR};${PYTHON_BINARY_DIRS}")
@@ -108,12 +108,6 @@ else()
   set(CTEST_USE_LAUNCHERS 0)
 endif()
 set(ENV{CTEST_USE_LAUNCHERS_DEFAULT} ${CTEST_USE_LAUNCHERS})
-
-# Remove this if block after all dartclients work
-if(DEFINED ADDITIONNAL_CMAKECACHE_OPTION)
-  message(WARNING "Rename ADDITIONNAL to ADDITIONAL in your dartlclient script: ${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}")
-  set(ADDITIONAL_CMAKECACHE_OPTION ${ADDITIONNAL_CMAKECACHE_OPTION})
-endif()
 
 if(NOT DEFINED MITK_BUILD_CONFIGURATION)
   set(MITK_BUILD_CONFIGURATION "All")
@@ -146,6 +140,17 @@ MITK_INITIAL_CACHE_FILE:INTERNAL=${mitk_cache_file}
 ")
 endif()
 
+if(MITK_EXTENSIONS)
+  set(MITK_EXTENSION_DIRS "")
+  foreach(extension ${MITK_EXTENSIONS})
+    if(extension MATCHES "[^|]+\\|[^|]+\\|(.+)")
+      if(MITK_EXTENSION_DIRS)
+        set(MITK_EXTENSION_DIRS "${MITK_EXTENSION_DIRS};")
+      endif()
+      set(MITK_EXTENSION_DIRS "${MITK_EXTENSION_DIRS}${CTEST_DASHBOARD_ROOT}/${CMAKE_MATCH_1}")
+    endif()
+  endforeach()
+endif()
 
 #
 # Download and include dashboard driver script

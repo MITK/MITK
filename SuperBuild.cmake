@@ -66,7 +66,7 @@ endif()
 
 # A list of "nice" external projects, playing well together with CMake
 set(nice_external_projects ${external_projects})
-list(REMOVE_ITEM nice_external_projects Boost Python)
+list(REMOVE_ITEM nice_external_projects Boost)
 foreach(proj ${nice_external_projects})
   if(MITK_USE_${proj})
     set(EXTERNAL_${proj}_DIR "${${proj}_DIR}" CACHE PATH "Path to ${proj} build directory")
@@ -103,6 +103,7 @@ endif()
 #-----------------------------------------------------------------------------
 
 include(ExternalProject)
+include(mitkMacroQueryCustomEPVars)
 
 set(ep_prefix "${CMAKE_BINARY_DIR}/ep")
 set_property(DIRECTORY PROPERTY EP_PREFIX ${ep_prefix})
@@ -114,6 +115,8 @@ else()
   set(gen "${CMAKE_GENERATOR}")
 endif()
 
+set(gen_platform ${CMAKE_GENERATOR_PLATFORM})
+
 # Use this value where semi-colons are needed in ep_add args:
 set(sep "^^")
 
@@ -122,6 +125,10 @@ set(sep "^^")
 if(MSVC_VERSION)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /bigobj /MP")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj /MP")
+endif()
+
+if(MITK_USE_Boost_LIBRARIES)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_ALL_DYN_LINK")
 endif()
 
 # This is a workaround for passing linker flags
@@ -180,7 +187,7 @@ set(ep_common_args
 set(DCMTK_CMAKE_DEBUG_POSTFIX )
 
 # python libraries wont work with it
-if(NOT MITK_USE_Python)
+if(NOT MITK_USE_Python3)
   list(APPEND ep_common_args -DCMAKE_DEBUG_POSTFIX:STRING=d)
   set(DCMTK_CMAKE_DEBUG_POSTFIX d)
 endif()
@@ -248,16 +255,14 @@ set(mitk_cmake_boolean_args
   BUILD_SHARED_LIBS
   WITH_COVERAGE
   BUILD_TESTING
-
   MITK_BUILD_ALL_PLUGINS
   MITK_BUILD_ALL_APPS
   MITK_BUILD_EXAMPLES
-
   MITK_USE_Qt5
   MITK_USE_SYSTEM_Boost
   MITK_USE_BLUEBERRY
   MITK_USE_OpenCL
-
+  MITK_USE_OpenMP
   MITK_ENABLE_PIC_READER
   )
 
@@ -322,14 +327,27 @@ foreach(type RUNTIME ARCHIVE LIBRARY)
 endforeach()
 
 # Optional python variables
-if(MITK_USE_Python)
+if(MITK_USE_Python3)
   list(APPEND mitk_optional_cache_args
-       -DMITK_USE_Python:BOOL=${MITK_USE_Python}
-       -DPYTHON_EXECUTABLE:FILEPATH=${PYTHON_EXECUTABLE}
-       -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
-       -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
-       -DPYTHON_INCLUDE_DIR2:PATH=${PYTHON_INCLUDE_DIR2}
+       -DMITK_USE_Python3:BOOL=${MITK_USE_Python3}
+       "-DPython3_EXECUTABLE:FILEPATH=${Python3_EXECUTABLE}"
+       "-DPython3_INCLUDE_DIR:PATH=${Python3_INCLUDE_DIR}"
+       "-DPython3_LIBRARY:FILEPATH=${Python3_LIBRARY}"
+       "-DPython3_STDLIB:FILEPATH=${Python3_STDLIB}"
+       "-DPython3_SITELIB:FILEPATH=${Python3_SITELIB}"
       )
+endif()
+
+if(OPENSSL_ROOT_DIR)
+  list(APPEND mitk_optional_cache_args
+    "-DOPENSSL_ROOT_DIR:PATH=${OPENSSL_ROOT_DIR}"
+  )
+endif()
+
+if(CMAKE_FRAMEWORK_PATH)
+  list(APPEND mitk_optional_cache_args
+    "-DCMAKE_FRAMEWORK_PATH:PATH=${CMAKE_FRAMEWORK_PATH}"
+  )
 endif()
 
 if(Eigen_INCLUDE_DIR)
@@ -351,6 +369,7 @@ ExternalProject_Add(${proj}
   LIST_SEPARATOR ${sep}
   DOWNLOAD_COMMAND ""
   CMAKE_GENERATOR ${gen}
+  CMAKE_GENERATOR_PLATFORM ${gen_platform}
   CMAKE_CACHE_ARGS
     # --------------- Build options ----------------
     -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_INSTALL_PREFIX}

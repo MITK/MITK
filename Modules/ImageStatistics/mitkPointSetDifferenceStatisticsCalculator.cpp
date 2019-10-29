@@ -16,11 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkPointSetDifferenceStatisticsCalculator.h"
+#include "mitkImageStatisticsConstants.h"
 
 mitk::PointSetDifferenceStatisticsCalculator::PointSetDifferenceStatisticsCalculator() :
   m_StatisticsCalculated(false)
 {
-  m_Statistics = ImageStatisticsCalculator::StatisticsContainer::New();
   m_PointSet1 = mitk::PointSet::New();
   m_PointSet2 = mitk::PointSet::New();
   //m_Statistics.Reset();
@@ -28,7 +28,6 @@ mitk::PointSetDifferenceStatisticsCalculator::PointSetDifferenceStatisticsCalcul
 
 mitk::PointSetDifferenceStatisticsCalculator::PointSetDifferenceStatisticsCalculator(mitk::PointSet::Pointer pSet1, mitk::PointSet::Pointer pSet2)
 {
-  m_Statistics = ImageStatisticsCalculator::StatisticsContainer::New();
   m_PointSet1 = pSet1;
   m_PointSet2 = pSet2;
   m_StatisticsCalculated = false;
@@ -77,7 +76,7 @@ double mitk::PointSetDifferenceStatisticsCalculator::GetMean()
   {
     this->ComputeStatistics();
   }
-  return m_Statistics->GetMean();
+  return m_Statistics.GetValueConverted<ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MEAN());
 }
 
 double mitk::PointSetDifferenceStatisticsCalculator::GetSD()
@@ -86,7 +85,7 @@ double mitk::PointSetDifferenceStatisticsCalculator::GetSD()
   {
     this->ComputeStatistics();
   }
-  return m_Statistics->GetStd();
+  return m_Statistics.GetValueConverted<ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::STANDARDDEVIATION());
 }
 
 double mitk::PointSetDifferenceStatisticsCalculator::GetVariance()
@@ -95,7 +94,7 @@ double mitk::PointSetDifferenceStatisticsCalculator::GetVariance()
   {
     this->ComputeStatistics();
   }
-  return m_Statistics->GetVariance();
+  return m_Statistics.GetValueConverted<ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::VARIANCE());
 }
 
 double mitk::PointSetDifferenceStatisticsCalculator::GetRMS()
@@ -104,7 +103,7 @@ double mitk::PointSetDifferenceStatisticsCalculator::GetRMS()
   {
     this->ComputeStatistics();
   }
-  return m_Statistics->GetRMS();
+  return m_Statistics.GetValueConverted<ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::RMS());
 }
 
 double mitk::PointSetDifferenceStatisticsCalculator::GetMedian()
@@ -113,7 +112,7 @@ double mitk::PointSetDifferenceStatisticsCalculator::GetMedian()
   {
     this->ComputeStatistics();
   }
-  return m_Statistics->GetMedian();
+  return m_Statistics.GetValueConverted<ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MEDIAN());
 }
 
 double mitk::PointSetDifferenceStatisticsCalculator::GetMax()
@@ -122,7 +121,7 @@ double mitk::PointSetDifferenceStatisticsCalculator::GetMax()
   {
     this->ComputeStatistics();
   }
-  return m_Statistics->GetMax();
+  return m_Statistics.GetValueConverted<ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MAXIMUM());
 }
 
 double mitk::PointSetDifferenceStatisticsCalculator::GetMin()
@@ -131,7 +130,7 @@ double mitk::PointSetDifferenceStatisticsCalculator::GetMin()
   {
     this->ComputeStatistics();
   }
-  return m_Statistics->GetMin();
+  return m_Statistics.GetValueConverted<ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MINIMUM());
 }
 
 double mitk::PointSetDifferenceStatisticsCalculator::GetNumberOfPoints()
@@ -140,7 +139,7 @@ double mitk::PointSetDifferenceStatisticsCalculator::GetNumberOfPoints()
   {
     this->ComputeStatistics();
   }
-  return m_Statistics->GetN();
+  return m_Statistics.GetValueConverted<ImageStatisticsContainer::VoxelCountType>(mitk::ImageStatisticsConstants::NUMBEROFVOXELS());
 }
 
 void mitk::PointSetDifferenceStatisticsCalculator::ComputeStatistics()
@@ -166,7 +165,7 @@ void mitk::PointSetDifferenceStatisticsCalculator::ComputeStatistics()
     std::vector<double> differencesVector;
     mitk::Point3D point1;
     mitk::Point3D point2;
-    int numberOfPoints = m_PointSet1->GetSize();
+    auto numberOfPoints = static_cast<mitk::ImageStatisticsContainer::VoxelCountType>(m_PointSet1->GetSize());
 
     //Iterate over both pointsets in order to compare all points pair-wise
     mitk::PointSet::PointsIterator end = m_PointSet1->End();
@@ -184,13 +183,13 @@ void mitk::PointSetDifferenceStatisticsCalculator::ComputeStatistics()
     }
 
     m_DifferencesVector = differencesVector;
-    mean = mean/numberOfPoints;
-    rms = sqrt(rms/numberOfPoints);
+    mean = mean/static_cast<double>(numberOfPoints);
+    rms = sqrt(rms/ static_cast<double>(numberOfPoints));
     for (std::vector<double>::size_type i=0; i<differencesVector.size(); i++)
     {
       sd+=(differencesVector.at(i)-mean)*(differencesVector.at(i)-mean);
     }
-    double variance = sd/numberOfPoints;
+    double variance = sd/ static_cast<double>(numberOfPoints);
     sd = sqrt(variance);
     std::sort(differencesVector.begin(),differencesVector.end());
     double median = 0.0;
@@ -202,14 +201,14 @@ void mitk::PointSetDifferenceStatisticsCalculator::ComputeStatistics()
     {
       median = differencesVector.at((numberOfPoints-1)/2+1);
     }
-    m_Statistics->SetMean(mean);
-    m_Statistics->SetStd(sd);
-    m_Statistics->SetVariance(variance);
-    m_Statistics->SetRMS(rms);
-    m_Statistics->SetMin(differencesVector.at(0));
-    m_Statistics->SetMax(differencesVector.at(numberOfPoints-1));
-    m_Statistics->SetMedian(median);
-    m_Statistics->SetN(numberOfPoints);
+    m_Statistics.AddStatistic(mitk::ImageStatisticsConstants::MEAN(), mean);
+    m_Statistics.AddStatistic(mitk::ImageStatisticsConstants::STANDARDDEVIATION(), sd);
+    m_Statistics.AddStatistic(mitk::ImageStatisticsConstants::VARIANCE(), sd*sd);
+    m_Statistics.AddStatistic(mitk::ImageStatisticsConstants::RMS(), rms);
+    m_Statistics.AddStatistic(mitk::ImageStatisticsConstants::MINIMUM(), differencesVector.at(0));
+    m_Statistics.AddStatistic(mitk::ImageStatisticsConstants::MAXIMUM(), differencesVector.at(numberOfPoints - 1));
+    m_Statistics.AddStatistic(mitk::ImageStatisticsConstants::MEDIAN(), median);
+    m_Statistics.AddStatistic(mitk::ImageStatisticsConstants::NUMBEROFVOXELS(), numberOfPoints);
 
     m_StatisticsCalculated = true;
   }

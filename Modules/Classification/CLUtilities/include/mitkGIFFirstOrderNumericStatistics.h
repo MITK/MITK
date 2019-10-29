@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkGIFFirstOrderStatistics_h
-#define mitkGIFFirstOrderStatistics_h
+#ifndef mitkGIFFirstNumericOrderStatistics_h
+#define mitkGIFFirstNumericOrderStatistics_h
 
 #include <mitkAbstractGlobalImageFeature.h>
 #include <mitkBaseData.h>
@@ -146,11 +146,11 @@ namespace mitk
     * \brief Returns a list of the names of all features that are calculated from this class
     */
     FeatureNameListType GetFeatureNames() override;
-    virtual std::string GetCurrentFeatureEncoding() override;
+    std::string GetCurrentFeatureEncoding() override;
 
-    virtual void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList);
-    virtual void AddArguments(mitkCommandLineParser &parser);
+    void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList) override;
+    void AddArguments(mitkCommandLineParser &parser) override;
 
   };
 }
-#endif //mitkGIFFirstOrderStatistics_h
+#endif //mitkGIFFirstNumericOrderStatistics_h

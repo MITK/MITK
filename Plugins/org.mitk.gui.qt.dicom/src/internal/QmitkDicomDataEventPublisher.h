@@ -36,7 +36,7 @@ class QmitkDicomDataEventPublisher : public QObject
         /**
         * \brief QmitkDicomDataEventPublisher destructor.
         */
-        virtual ~QmitkDicomDataEventPublisher();
+        ~QmitkDicomDataEventPublisher() override;
 
         /// @brief sets the event admin from given plugin context
         void PublishSignals(ctkPluginContext* context);

@@ -40,8 +40,8 @@ struct QmitkPythonViewData
 QmitkPythonView::QmitkPythonView()
     : d( new QmitkPythonViewData )
 {
-    d->m_PythonVariableStackTableView = 0;
-    d->m_PythonShell = 0;
+    d->m_PythonVariableStackTableView = nullptr;
+    d->m_PythonShell = nullptr;
 }
 
 QmitkPythonView::~QmitkPythonView()

@@ -44,7 +44,7 @@ public:
 
   ListenerView();
 
-  ~ListenerView();
+  ~ListenerView() override;
 
 protected:
   void CreateQtPartControl(QWidget *parent) override;

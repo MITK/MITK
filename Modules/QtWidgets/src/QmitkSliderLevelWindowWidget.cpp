@@ -16,21 +16,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkSliderLevelWindowWidget.h>
 
+// mitk core
+#include <mitkRenderingManager.h>
+
+// mitk qt widgets
+#include <QmitkLevelWindowWidgetContextMenu.h>
+
+// qt
 #include <QCursor>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QToolTip>
 
-#include <QmitkLevelWindowWidgetContextMenu.h>
+// itk
 #include <itkCommand.h>
-#include <mitkRenderingManager.h>
 
+// c++
 #include <cmath>
 
-/**
-* Constructor
-*/
-QmitkSliderLevelWindowWidget::QmitkSliderLevelWindowWidget(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f)
+QmitkSliderLevelWindowWidget::QmitkSliderLevelWindowWidget(QWidget *parent, Qt::WindowFlags f)
+  : QWidget(parent, f)
 {
   m_Manager = mitk::LevelWindowManager::New();
 
@@ -50,12 +55,10 @@ QmitkSliderLevelWindowWidget::QmitkSliderLevelWindowWidget(QWidget *parent, Qt::
 
   m_MoveHeight = height() - 25;
   m_ScaleVisible = true;
-  m_Contextmenu = new QmitkLevelWindowWidgetContextMenu(this); //, true);
-
-  // setBackgroundMode( Qt::NoBackground );
+  m_Contextmenu = new QmitkLevelWindowWidgetContextMenu(this);
 
   this->hide();
-  update();
+  Update();
 }
 
 QmitkSliderLevelWindowWidget::~QmitkSliderLevelWindowWidget()
@@ -67,7 +70,7 @@ QmitkSliderLevelWindowWidget::~QmitkSliderLevelWindowWidget()
   }
 }
 
-void QmitkSliderLevelWindowWidget::setLevelWindowManager(mitk::LevelWindowManager *levelWindowManager)
+void QmitkSliderLevelWindowWidget::SetLevelWindowManager(mitk::LevelWindowManager *levelWindowManager)
 {
   if (m_IsObserverTagSet)
   {
@@ -91,7 +94,7 @@ void QmitkSliderLevelWindowWidget::OnPropertyModified(const itk::EventObject &)
   {
     m_LevelWindow = m_Manager->GetLevelWindow();
     this->show();
-    update();
+    Update();
   }
   catch (...)
   {
@@ -289,9 +292,6 @@ void QmitkSliderLevelWindowWidget::paintEvent(QPaintEvent *itkNotUsed(e))
   p.drawPixmap(0, 0, pm);
 }
 
-/**
-*
-*/
 void QmitkSliderLevelWindowWidget::mouseMoveEvent(QMouseEvent *mouseEvent)
 {
   if (!mouseEvent)
@@ -424,22 +424,15 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent(QMouseEvent *mouseEvent)
     }
   }
 }
+
 void QmitkSliderLevelWindowWidget::enterEvent(QEvent * /*event*/)
 {
-  /*
-  if(event->type() != QEvent::MouseMove)
-    return;*/
-
-  // mouseMoveEvent( static_cast< QMouseEvent* > ( event ) );
   QPoint p = QCursor::pos();
   p = this->mapFromGlobal(p);
   QMouseEvent ev(QEvent::MouseMove, p, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
   this->mouseMoveEvent(&ev);
 }
 
-/**
-*
-*/
 void QmitkSliderLevelWindowWidget::mousePressEvent(QMouseEvent *mouseEvent)
 {
   if (m_LevelWindow.IsFixed())
@@ -465,18 +458,12 @@ void QmitkSliderLevelWindowWidget::mousePressEvent(QMouseEvent *mouseEvent)
   mouseMoveEvent(mouseEvent);
 }
 
-/**
-*
-*/
 void QmitkSliderLevelWindowWidget::resizeEvent(QResizeEvent *event)
 {
   m_MoveHeight = event->size().height() - 25;
-  update();
+  Update();
 }
 
-/**
-*
-*/
 void QmitkSliderLevelWindowWidget::mouseReleaseEvent(QMouseEvent *)
 {
   if (m_LevelWindow.IsFixed())
@@ -484,10 +471,7 @@ void QmitkSliderLevelWindowWidget::mouseReleaseEvent(QMouseEvent *)
   m_MouseDown = false;
 }
 
-/**
-*
-*/
-void QmitkSliderLevelWindowWidget::update()
+void QmitkSliderLevelWindowWidget::Update()
 {
   int rectWidth;
   if (m_ScaleVisible)
@@ -532,34 +516,34 @@ void QmitkSliderLevelWindowWidget::update()
 
 void QmitkSliderLevelWindowWidget::contextMenuEvent(QContextMenuEvent *)
 {
-  m_Contextmenu->setLevelWindowManager(m_Manager.GetPointer());
+  m_Contextmenu->SetLevelWindowManager(m_Manager.GetPointer());
   auto contextMenu = new QMenu(this);
   Q_CHECK_PTR(contextMenu);
   if (m_ScaleVisible)
-    contextMenu->addAction(tr("Hide Scale"), this, SLOT(hideScale()));
+    contextMenu->addAction(tr("Hide Scale"), this, SLOT(HideScale()));
   else
-    contextMenu->addAction(tr("Show Scale"), this, SLOT(showScale()));
+    contextMenu->addAction(tr("Show Scale"), this, SLOT(ShowScale()));
   contextMenu->addSeparator();
-  m_Contextmenu->getContextMenu(contextMenu);
+  m_Contextmenu->GetContextMenu(contextMenu);
 
   // Fix: Bug #13327 we need to reset the m_MouseDown value
   // otherwise the cursor is not correctly restored afterwards
   m_MouseDown = false;
 }
 
-void QmitkSliderLevelWindowWidget::hideScale()
+void QmitkSliderLevelWindowWidget::HideScale()
 {
   m_ScaleVisible = false;
-  update();
+  Update();
 }
 
-void QmitkSliderLevelWindowWidget::showScale()
+void QmitkSliderLevelWindowWidget::ShowScale()
 {
   m_ScaleVisible = true;
-  update();
+  Update();
 }
 
-void QmitkSliderLevelWindowWidget::setDataStorage(mitk::DataStorage *ds)
+void QmitkSliderLevelWindowWidget::SetDataStorage(mitk::DataStorage *ds)
 {
   m_Manager->SetDataStorage(ds);
 }

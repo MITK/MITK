@@ -60,14 +60,14 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkAbstractView
     static const std::string VIEW_ID;
 
     QmitkMITKIGTTrackingToolboxView();
-    virtual ~QmitkMITKIGTTrackingToolboxView();
+    ~QmitkMITKIGTTrackingToolboxView() override;
 
-    virtual void CreateQtPartControl(QWidget *parent) override;
+    void CreateQtPartControl(QWidget *parent) override;
 
     ///
     /// Sets the focus to an internal widget.
     ///
-    virtual void SetFocus() override;
+    void SetFocus() override;
 
   protected slots:
 

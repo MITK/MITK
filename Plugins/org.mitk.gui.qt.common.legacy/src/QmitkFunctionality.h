@@ -88,7 +88,7 @@ public:
   ///
   /// Disconnects all standard event listeners
   ///
-  virtual ~QmitkFunctionality();
+  ~QmitkFunctionality() override;
   ///
   /// Called, when the WorkbenchPart gets closed
   /// by the user directly or by closing the whole

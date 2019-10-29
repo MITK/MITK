@@ -60,6 +60,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIPreferences.h>
 #include <berryPlatform.h>
 
+#include <ImporterUtil.h>
+
 DicomEventHandler::DicomEventHandler()
 {
 }
@@ -86,7 +88,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
       if(modality.compare("RTDOSE",Qt::CaseInsensitive) == 0)
       {
           auto doseReader = mitk::RTDoseReaderService();
-          doseReader.SetInput(listOfFilesForSeries.front().toStdString());
+          doseReader.SetInput(ImporterUtil::getUTF8String(listOfFilesForSeries.front()));
           std::vector<itk::SmartPointer<mitk::BaseData> > readerOutput = doseReader.Read();
           if (!readerOutput.empty()){
             mitk::Image::Pointer doseImage = dynamic_cast<mitk::Image*>(readerOutput.at(0).GetPointer());
@@ -117,7 +119,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
                 //Set reference dose property
                 double referenceDose = prefNode->GetDouble(mitk::RTUIConstants::REFERENCE_DOSE_ID.c_str(), mitk::RTUIConstants::DEFAULT_REFERENCE_DOSE_VALUE);
 
-                mitk::ConfigureNodeAsDoseNode(doseImageNode, mitk::GeneratIsoLevels_Virtuos(), referenceDose, showColorWashGlobal);
+                mitk::ConfigureNodeAsDoseNode(doseImageNode, mitk::GenerateIsoLevels_Virtuos(), referenceDose, showColorWashGlobal);
 
                 ctkServiceReference serviceReference = mitk::PluginActivator::getContext()->getServiceReference<mitk::IDataStorageService>();
                 mitk::IDataStorageService* storageService = mitk::PluginActivator::getContext()->getService<mitk::IDataStorageService>(serviceReference);
@@ -132,7 +134,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
       else if(modality.compare("RTSTRUCT",Qt::CaseInsensitive) == 0)
       {
           auto structReader = mitk::RTStructureSetReaderService();
-          structReader.SetInput(listOfFilesForSeries.front().toStdString());
+          structReader.SetInput(ImporterUtil::getUTF8String(listOfFilesForSeries.front()));
           std::vector<itk::SmartPointer<mitk::BaseData> > readerOutput = structReader.Read();
 
           if (readerOutput.empty()){
@@ -171,7 +173,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
       else if (modality.compare("RTPLAN", Qt::CaseInsensitive) == 0)
       {
           auto planReader = mitk::RTPlanReaderService();
-          planReader.SetInput(listOfFilesForSeries.front().toStdString());
+          planReader.SetInput(ImporterUtil::getUTF8String(listOfFilesForSeries.front()));
           std::vector<itk::SmartPointer<mitk::BaseData> > readerOutput = planReader.Read();
           if (!readerOutput.empty()){
               //there is no image, only the properties are interesting
@@ -196,7 +198,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
 
       while (it.hasNext())
       {
-        seriesToLoad.push_back(it.next().toStdString());
+		  seriesToLoad.push_back(ImporterUtil::getUTF8String(it.next()));
       }
 
       //Get Reference for default data storage.

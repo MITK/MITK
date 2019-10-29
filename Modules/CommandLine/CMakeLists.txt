@@ -3,4 +3,5 @@ MITK_CREATE_MODULE(
     PUBLIC include/
     PRIVATE src/
   SUBPROJECTS MITK-Modules
+  DEPENDS MitkCore
 )

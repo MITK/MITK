@@ -102,7 +102,7 @@ void QmitkUSNewVideoDeviceWidget::OnClickedDone()
   m_Active = false;
 
   // Create Device
-  mitk::USVideoDevice::Pointer newDevice;
+  mitk::USDevice::Pointer newDevice;
   if (m_Controls->m_RadioDeviceSource->isChecked())
   {
     newDevice = mitk::USVideoDevice::New(
@@ -125,14 +125,10 @@ void QmitkUSNewVideoDeviceWidget::OnClickedDone()
     int port = m_Controls->m_OIGTLClientPort->value();
 
     // Create a new USIGTLDevice. The last parameter tells the device that it should be a client.
-    mitk::USIGTLDevice::Pointer device =
-      mitk::USIGTLDevice::New(m_Controls->m_Manufacturer->text().toStdString(),
-      m_Controls->m_Model->text().toStdString(), host, port, false);
-    device->Initialize();
-    emit Finished();
-    // The rest of this method does stuff that is specific to USVideoDevices,
-    // which we don't need. So we return directly.
-    return;
+    newDevice = mitk::USIGTLDevice::New(m_Controls->m_Manufacturer->text().toStdString(),
+                m_Controls->m_Model->text().toStdString(), host, port, false);
+    //New behavior at this position: do not return immediately as it was done in earlier MITK-versions
+    // The IGTL Device can have different probe configurations,  as well.
   }
   else
   {
@@ -140,37 +136,33 @@ void QmitkUSNewVideoDeviceWidget::OnClickedDone()
     int port = m_Controls->m_OIGTLServerPort->value();
 
     // Create a new USIGTLDevice. The last parameter tells the device that it should be a server.
-    mitk::USIGTLDevice::Pointer device =
-      mitk::USIGTLDevice::New(m_Controls->m_Manufacturer->text().toStdString(),
-      m_Controls->m_Model->text().toStdString(), host, port, true);
-    device->Initialize();
-    emit Finished();
-    // The rest of this method does stuff that is specific to USVideoDevices,
-    // which we don't need. So we return directly.
-    return;
+    newDevice = mitk::USIGTLDevice::New(m_Controls->m_Manufacturer->text().toStdString(),
+                m_Controls->m_Model->text().toStdString(), host, port, true);
+    //New behavior at this position: do not return immediately as it was done in earlier MITK-versions
+    // The IGTL Device can have different probe configurations,  as well.
   }
 
-  // get USImageVideoSource from new device
+  //At first: only ckeck, whether it is a USImageVideoSource or not (--> if it a IGTL Client)
+  // Later: perhaps it would be helpful, if the IGTLMessageToUSImageFilter have a region of interest, as well.
   mitk::USImageVideoSource::Pointer imageSource =
     dynamic_cast<mitk::USImageVideoSource*>(
-    newDevice->GetUSImageSource().GetPointer());
-  if (!imageSource)
+      newDevice->GetUSImageSource().GetPointer());
+  if (imageSource.IsNotNull())
   {
-    MITK_ERROR << "There is no USImageVideoSource at the current device.";
-    mitkThrow() << "There is no USImageVideoSource at the current device.";
+
+    // Set Video Options
+    imageSource->SetColorOutput(!m_Controls->m_CheckGreyscale->isChecked());
+
+    // If Resolution override is activated, apply it
+    if (m_Controls->m_CheckResolutionOverride->isChecked())
+    {
+      int width = m_Controls->m_ResolutionWidth->value();
+      int height = m_Controls->m_ResolutionHeight->value();
+      imageSource->OverrideResolution(width, height);
+      imageSource->SetResolutionOverride(true);
+    }
   }
 
-  // Set Video Options
-  imageSource->SetColorOutput(!m_Controls->m_CheckGreyscale->isChecked());
-
-  // If Resolution override is activated, apply it
-  if (m_Controls->m_CheckResolutionOverride->isChecked())
-  {
-    int width = m_Controls->m_ResolutionWidth->value();
-    int height = m_Controls->m_ResolutionHeight->value();
-    imageSource->OverrideResolution(width, height);
-    imageSource->SetResolutionOverride(true);
-  }
   if (m_Controls->m_Probes->count() != 0 ) //there are informations about the probes of the device, so create the probes
   {
     this->AddProbesToDevice(newDevice);
@@ -207,25 +199,24 @@ void QmitkUSNewVideoDeviceWidget::OnClickedFinishedEditing()
     m_TargetDevice->AddNewProbe(probe);
   }
 
+  //At first: only ckeck, whether it is a USImageVideoSource or not (--> if it a IGTL Client)
+  // Later: perhaps it would be helpful, if the IGTLMessageToUSImageFilter have a region of interest, as well.
   mitk::USImageVideoSource::Pointer imageSource =
     dynamic_cast<mitk::USImageVideoSource*>(
     m_TargetDevice->GetUSImageSource().GetPointer());
-  if (!imageSource)
+  if (imageSource.IsNotNull())
   {
-    MITK_ERROR << "There is no USImageVideoSource at the current device.";
-    mitkThrow() << "There is no USImageVideoSource at the current device.";
-  }
+    // Set Video Options
+    imageSource->SetColorOutput(!m_Controls->m_CheckGreyscale->isChecked());
 
-  // Set Video Options
-  imageSource->SetColorOutput(!m_Controls->m_CheckGreyscale->isChecked());
-
-  // If Resolution override is activated, apply it
-  if (m_Controls->m_CheckResolutionOverride->isChecked())
-  {
-    int width = m_Controls->m_ResolutionWidth->value();
-    int height = m_Controls->m_ResolutionHeight->value();
-    imageSource->OverrideResolution(width, height);
-    imageSource->SetResolutionOverride(true);
+    // If Resolution override is activated, apply it
+    if (m_Controls->m_CheckResolutionOverride->isChecked())
+    {
+      int width = m_Controls->m_ResolutionWidth->value();
+      int height = m_Controls->m_ResolutionHeight->value();
+      imageSource->OverrideResolution(width, height);
+      imageSource->SetResolutionOverride(true);
+    }
   }
   CleanUpAfterEditingOfDevice();
   MITK_INFO << "Finished Editing";
@@ -276,14 +267,15 @@ void QmitkUSNewVideoDeviceWidget::OnOpenFileButtonClicked()
 void QmitkUSNewVideoDeviceWidget::EditDevice(mitk::USDevice::Pointer device)
 {
   // If no VideoDevice is given, throw an exception
-  if (device->GetDeviceClass().compare("org.mitk.modules.us.USVideoDevice") !=
-    0)
+  if (device->GetDeviceClass().compare("org.mitk.modules.us.USVideoDevice") != 0 &&
+      device->GetDeviceClass().compare("IGTL Client") != 0)
   {
     // TODO Alert if bad path
     mitkThrow() << "NewVideoDeviceWidget recieved an incompatible device type "
       "to edit. Type was: " << device->GetDeviceClass();
   }
-  m_TargetDevice = static_cast<mitk::USVideoDevice*>(device.GetPointer());
+
+  m_TargetDevice = device;
   m_Active = true;
   m_ConfigProbes.clear();
   m_ConfigProbes = m_TargetDevice->GetAllProbes();
@@ -292,6 +284,9 @@ void QmitkUSNewVideoDeviceWidget::EditDevice(mitk::USDevice::Pointer device)
 
 void QmitkUSNewVideoDeviceWidget::CreateNewDevice()
 {
+
+  //Prevent multiple calls of OnClickedDone()
+  disconnect(m_Controls->m_BtnDone, SIGNAL(clicked()), this, SLOT(OnClickedDone()));
   //Toggle functionality of Btn_Done
   connect(m_Controls->m_BtnDone, SIGNAL(clicked()), this, SLOT(OnClickedDone()));
   m_Controls->m_BtnDone->setText("Add Video Device");
@@ -302,6 +297,7 @@ void QmitkUSNewVideoDeviceWidget::CreateNewDevice()
   m_Controls->m_Comment->setText("None");
 
   m_TargetDevice = nullptr;
+  m_ConfigProbes.clear();
   m_ConfigProbes.clear();
   m_Active = true;
 }
@@ -486,10 +482,10 @@ void QmitkUSNewVideoDeviceWidget::OnSaveButtonClicked()
   mitk::USDeviceWriterXML deviceWriter;
   deviceWriter.SetFilename(fileName.toStdString());
 
-  mitk::USDeviceReaderXML::USVideoDeviceConfigData config;
-  this->CollectUltrasoundVideoDeviceConfigInformation(config);
+  mitk::USDeviceReaderXML::USDeviceConfigData config;
+  this->CollectUltrasoundDeviceConfigInformation(config);
 
-  if (!deviceWriter.WriteUltrasoundVideoDeviceConfiguration(config))
+  if (!deviceWriter.WriteUltrasoundDeviceConfiguration(config))
   {
     QMessageBox msgBox;
     msgBox.setText("Error when writing the configuration to the selected file. Could not write device information.");
@@ -516,7 +512,7 @@ void QmitkUSNewVideoDeviceWidget::OnLoadConfigurationButtonClicked()
     msgBox.exec();
     return;
   }
-  mitk::USDeviceReaderXML::USVideoDeviceConfigData config = deviceReader.GetUSVideoDeviceConfigData();
+  mitk::USDeviceReaderXML::USDeviceConfigData config = deviceReader.GetUSDeviceConfigData();
 
   if( config.fileversion == 1.0 )
   {
@@ -555,6 +551,52 @@ void QmitkUSNewVideoDeviceWidget::OnLoadConfigurationButtonClicked()
       }
       this->OnProbeChanged(m_Controls->m_Probes->currentText());
 
+    }
+    else if (config.deviceType.compare("oigtl") == 0)
+    {
+      //Fill info in metadata groupbox:
+      m_Controls->m_DeviceName->setText(QString::fromStdString(config.deviceName));
+      m_Controls->m_Manufacturer->setText(QString::fromStdString(config.manufacturer));
+      m_Controls->m_Model->setText(QString::fromStdString(config.model));
+      m_Controls->m_Comment->setText(QString::fromStdString(config.comment));
+
+      //Fill info about OpenIGTLink video source:
+      if (config.server)
+      {
+        m_Controls->m_RadioOIGTLServerSource->setChecked(true);
+        m_Controls->m_OIGTLServerHost->setText(QString::fromStdString(config.host));
+        m_Controls->m_OIGTLServerPort->setValue(config.port);
+      }
+      else
+      {
+        m_Controls->m_RadioOIGTLClientSource->setChecked(true);
+        m_Controls->m_OIGTLClientHost->setText(QString::fromStdString(config.host));
+        m_Controls->m_OIGTLClientPort->setValue(config.port);
+      }
+      this->OnDeviceTypeSelection();
+
+      //Fill video options:
+      m_Controls->m_CheckGreyscale->setChecked(config.useGreyscale);
+
+      //Fill override options:
+      m_Controls->m_CheckResolutionOverride->setChecked(config.useResolutionOverride);
+      m_Controls->m_ResolutionWidth->setValue(config.resolutionWidth);
+      m_Controls->m_ResolutionHeight->setValue(config.resolutionHeight);
+
+      //Fill information about probes:
+      m_ConfigProbes.clear();
+      m_ConfigProbes = config.probes;
+
+      m_Controls->m_Probes->clear();
+      m_Controls->m_ProbeNameLineEdit->clear();
+      m_Controls->m_AddDepths->clear();
+      m_Controls->m_Depths->clear();
+
+      for (size_t index = 0; index < m_ConfigProbes.size(); ++index)
+      {
+        m_Controls->m_Probes->addItem(QString::fromStdString(config.probes.at(index)->GetName()));
+      }
+      this->OnProbeChanged(m_Controls->m_Probes->currentText());
     }
     else
     {
@@ -741,7 +783,7 @@ void QmitkUSNewVideoDeviceWidget::CleanUpAfterEditingOfDevice()
   m_ConfigProbes.clear();
 }
 
-void QmitkUSNewVideoDeviceWidget::AddProbesToDevice(mitk::USVideoDevice::Pointer device)
+void QmitkUSNewVideoDeviceWidget::AddProbesToDevice(mitk::USDevice::Pointer device)
 {
   device->DeleteAllProbes();
   for( std::vector<mitk::USProbe::Pointer>::iterator it = m_ConfigProbes.begin();
@@ -766,20 +808,38 @@ mitk::USProbe::Pointer QmitkUSNewVideoDeviceWidget::CheckIfProbeExistsAlready(co
   return nullptr; //no matching probe was found so nullptr is returned
 }
 
-void QmitkUSNewVideoDeviceWidget::CollectUltrasoundVideoDeviceConfigInformation(mitk::USDeviceReaderXML::USVideoDeviceConfigData &config)
+void QmitkUSNewVideoDeviceWidget::CollectUltrasoundDeviceConfigInformation(mitk::USDeviceReaderXML::USDeviceConfigData &config)
 {
   config.fileversion = 1.0;
-  config.deviceType = "video";
+  if (m_Controls->m_RadioDeviceSource->isChecked() || m_Controls->m_RadioFileSource->isChecked())
+  {
+    //Fill info about video source:
+    config.deviceType = "video";
+    config.sourceID = m_Controls->m_DeviceSelector->value();
+    config.filepathVideoSource = m_Controls->m_FilePathSelector->text().toStdString();
+  }
+  else
+  {
+    config.deviceType = "oigtl";
+    if (m_Controls->m_RadioOIGTLServerSource->isChecked())
+    {
+      config.server = true;
+      config.host = m_Controls->m_OIGTLServerHost->text().toStdString();
+      config.port = m_Controls->m_OIGTLServerPort->value();
+    }
+    else
+    {
+      config.server = false;
+      config.host = m_Controls->m_OIGTLClientHost->text().toStdString();
+      config.port = m_Controls->m_OIGTLClientPort->value();
+    }
+  }
 
   //Fill info in metadata groupbox:
   config.deviceName = m_Controls->m_DeviceName->text().toStdString();
   config.manufacturer = m_Controls->m_Manufacturer->text().toStdString();
   config.model = m_Controls->m_Model->text().toStdString();
   config.comment = m_Controls->m_Comment->text().toStdString();
-
-  //Fill info about video source:
-  config.sourceID = m_Controls->m_DeviceSelector->value();
-  config.filepathVideoSource = m_Controls->m_FilePathSelector->text().toStdString();
 
   //Fill video options:
   config.useGreyscale = m_Controls->m_CheckGreyscale->isChecked();

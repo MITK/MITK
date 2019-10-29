@@ -62,7 +62,7 @@ public:
   berryObjectMacro(QmitkMatchPoint)
 
   QmitkMatchPoint();
-  ~QmitkMatchPoint();
+  ~QmitkMatchPoint() override;
 
 protected slots:
 
@@ -72,9 +72,9 @@ protected slots:
   virtual void CreateConnections();
 
   /// \brief Called when the user clicks the GUI button
-  void OnMaskCheckBoxToggeled(bool checked);
   void OnLoadAlgorithmButtonPushed();
   void OnSelectedAlgorithmChanged();
+  void OnNodeSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
   void OnStartRegBtnPushed();
   void OnStopRegBtnPushed();
@@ -92,13 +92,13 @@ protected slots:
   void OnAlgorithmInfo(QString info);
 
 protected:
-  virtual void CreateQtPartControl(QWidget* parent);
+  void CreateQtPartControl(QWidget* parent) override;
 
-  virtual void SetFocus();
+  void SetFocus() override;
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
-                                  const QList<mitk::DataNode::Pointer>& nodes);
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
+                                  const QList<mitk::DataNode::Pointer>& nodes) override;
 
 private:
 
@@ -127,6 +127,11 @@ private:
   * Configures the progress bars according to the chosen algorithm.
   */
   void ConfigureProgressInfos();
+
+  /**
+  Configure the node selectors predicates and informations according to the selected algorithm.
+  */
+  void ConfigureNodeSelectors();
 
   /** Methods returns a list of all nodes in the data manager containing a registration wrapper.
     * The list may be empty.*/

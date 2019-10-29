@@ -32,8 +32,8 @@ namespace mitk
     itkGetConstMacro(UseCtRange, bool);
     itkSetMacro(UseCtRange, bool);
 
-    virtual void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList);
-    virtual void AddArguments(mitkCommandLineParser &parser);
+    void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList) override;
+    void AddArguments(mitkCommandLineParser &parser) override;
 
 
     struct ParameterStruct

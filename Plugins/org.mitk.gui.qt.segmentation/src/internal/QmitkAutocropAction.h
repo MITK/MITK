@@ -32,7 +32,7 @@ class MITK_QT_SEGMENTATION QmitkAutocropAction : public QObject, public mitk::IC
 public:
 
   QmitkAutocropAction();
-  virtual ~QmitkAutocropAction();
+  ~QmitkAutocropAction() override;
 
   //interface methods
   void Run( const QList<mitk::DataNode::Pointer>& selectedNodes ) override;

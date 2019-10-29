@@ -17,16 +17,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkMouseModeSwitcher.h"
 #include <QActionGroup>
 
-QmitkMouseModeSwitcher::QmitkMouseModeSwitcher(QWidget *parent)
-  : QToolBar(parent),
-    m_ActionGroup(new QActionGroup(this)),
-    m_MouseModeSwitcher(nullptr),
-    m_ObserverTag(0),
-    m_InObservationReaction(false)
+QmitkMouseModeSwitcher::QmitkMouseModeSwitcher(QWidget* parent/* = nullptr*/)
+  : QToolBar(parent)
+  , m_ActionGroup(new QActionGroup(this))
+  , m_MouseModeSwitcher(nullptr)
+  , m_ObserverTag(0)
+  , m_ActionButtonBlocked(false)
 {
   QToolBar::setOrientation(Qt::Vertical);
   QToolBar::setIconSize(QSize(17, 17));
-  m_ActionGroup->setExclusive(true); // only one selectable
+  m_ActionGroup->setExclusive(true); // only one selectable action
 
   addButton(mitk::MouseModeSwitcher::MousePointer, tr("Pointer"), QIcon(":/Qmitk/mm_pointer.png"), true); // toggle ON
   addButton(mitk::MouseModeSwitcher::Scroll, tr("Scroll"), QIcon(":/Qmitk/mm_scroll.png"));
@@ -37,18 +37,18 @@ QmitkMouseModeSwitcher::QmitkMouseModeSwitcher(QWidget *parent)
 
 void QmitkMouseModeSwitcher::addButton(MouseMode id, const QString &toolName, const QIcon &icon, bool on)
 {
-  QAction *action = new QAction(icon, toolName, this);
+  QAction* action = new QAction(icon, toolName, this);
   action->setCheckable(true);
   action->setActionGroup(m_ActionGroup);
   action->setChecked(on);
   action->setData(id);
-  connect(action, SIGNAL(triggered()), this, SLOT(modeSelectedByUser()));
+  connect(action, SIGNAL(triggered()), this, SLOT(OnMouseModeChangedViaButton()));
   QToolBar::addAction(action);
 }
 
 QmitkMouseModeSwitcher::~QmitkMouseModeSwitcher()
 {
-  if (m_MouseModeSwitcher)
+  if (nullptr != m_MouseModeSwitcher)
   {
     m_MouseModeSwitcher->RemoveObserver(m_ObserverTag);
   }
@@ -57,7 +57,7 @@ QmitkMouseModeSwitcher::~QmitkMouseModeSwitcher()
 void QmitkMouseModeSwitcher::setMouseModeSwitcher(mitk::MouseModeSwitcher *mms)
 {
   // goodbye / welcome ceremonies
-  if (m_MouseModeSwitcher)
+  if (nullptr != m_MouseModeSwitcher)
   {
     m_MouseModeSwitcher->RemoveObserver(m_ObserverTag);
   }
@@ -66,20 +66,20 @@ void QmitkMouseModeSwitcher::setMouseModeSwitcher(mitk::MouseModeSwitcher *mms)
 
   if (m_MouseModeSwitcher)
   {
-    itk::ReceptorMemberCommand<QmitkMouseModeSwitcher>::Pointer command =
-      itk::ReceptorMemberCommand<QmitkMouseModeSwitcher>::New();
-    command->SetCallbackFunction(this, &QmitkMouseModeSwitcher::OnMouseModeChanged);
+    itk::ReceptorMemberCommand<QmitkMouseModeSwitcher>::Pointer command = itk::ReceptorMemberCommand<QmitkMouseModeSwitcher>::New();
+    command->SetCallbackFunction(this, &QmitkMouseModeSwitcher::OnMouseModeChangedViaCommand);
     m_ObserverTag = m_MouseModeSwitcher->AddObserver(mitk::MouseModeSwitcher::MouseModeChangedEvent(), command);
   }
 }
 
-void QmitkMouseModeSwitcher::modeSelectedByUser()
+void QmitkMouseModeSwitcher::OnMouseModeChangedViaButton()
 {
-  if (m_InObservationReaction)
-    return; // this was NOT actually by the user but by ourselves
+  if (m_ActionButtonBlocked)
+  {
+    return; // blocked, since we change the checked state of the buttons in the callback function
+  }
 
-  QAction *action = dynamic_cast<QAction *>(sender());
-
+  QAction* action = dynamic_cast<QAction*>(sender());
   if (action)
   {
     MouseMode id = static_cast<MouseMode>(action->data().toInt());
@@ -94,16 +94,13 @@ void QmitkMouseModeSwitcher::modeSelectedByUser()
   }
 }
 
-void QmitkMouseModeSwitcher::OnMouseModeChanged(const itk::EventObject &)
+void QmitkMouseModeSwitcher::OnMouseModeChangedViaCommand(const itk::EventObject &)
 {
-  m_InObservationReaction = true;
+  m_ActionButtonBlocked = true;
 
-  // push button graphically
   assert(m_MouseModeSwitcher);
-
   MouseMode activeMode = m_MouseModeSwitcher->GetCurrentMouseMode();
-
-  foreach (QAction *action, m_ActionGroup->actions())
+  foreach(QAction* action, m_ActionGroup->actions())
   {
     if (action->data().toInt() == activeMode)
     {
@@ -111,5 +108,5 @@ void QmitkMouseModeSwitcher::OnMouseModeChanged(const itk::EventObject &)
     }
   }
 
-  m_InObservationReaction = false;
+  m_ActionButtonBlocked = false;
 }

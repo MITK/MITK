@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/ModelFitVisualization">
+        <file>parameter_image.png</file>
+        <file>derived_image.png</file>
+        <file>criterion_image.png</file>
+        <file>eval_image.png</file>
+    </qresource>
+</RCC>

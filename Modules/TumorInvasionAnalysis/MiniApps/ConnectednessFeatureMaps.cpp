@@ -45,22 +45,22 @@ int main(int argc, char *argv[])
   parser.setContributor("MBI");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("input", "i", mitkCommandLineParser::InputImage, "input file");
-  parser.addArgument("seed", "s", mitkCommandLineParser::InputImage, "seed file");
-  parser.addArgument("mask", "m", mitkCommandLineParser::InputImage, "mask file");
+  parser.addArgument("input", "i", mitkCommandLineParser::Image, "input file", "", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("seed", "s", mitkCommandLineParser::Image, "seed file", "", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("mask", "m", mitkCommandLineParser::Image, "mask file", "", us::Any(), false, false, false, mitkCommandLineParser::Input);
   parser.addArgument("mode", "t", mitkCommandLineParser::String, "Mode Feature |  Vector | FeatureVector");
-  parser.addArgument("vector", "v", mitkCommandLineParser::InputImage, "Tensor Image (.dti)");
+  parser.addArgument("vector", "v", mitkCommandLineParser::Image, "Tensor Image (.dti)", "", us::Any(), false, false, false, mitkCommandLineParser::Input);
   parser.addArgument(
-    "confidence", "c", mitkCommandLineParser::InputImage, "confidence map (only when Tensor Images are used)");
-  parser.addArgument("valueImage", "x", mitkCommandLineParser::InputImage, "image of values that are propagated");
+    "confidence", "c", mitkCommandLineParser::Image, "confidence map (only when Tensor Images are used)", "", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("valueImage", "x", mitkCommandLineParser::Image, "image of values that are propagated", "", us::Any(), true, false, false, mitkCommandLineParser::Input);
 
   parser.addArgument("erodeSeed", "a", mitkCommandLineParser::Bool, "apply erosion of seed region");
 
   parser.addArgument("rankFilter", "r", mitkCommandLineParser::Bool, "median filter for propagation");
 
-  parser.addArgument("propMap", "p", mitkCommandLineParser::OutputFile, "[out] propagated map");
-  parser.addArgument("distanceMap", "d", mitkCommandLineParser::OutputFile, "[out] connectedness map");
-  parser.addArgument("euclidDistanceMap", "e", mitkCommandLineParser::OutputFile, "[out] euclid distance map");
+  parser.addArgument("propMap", "p", mitkCommandLineParser::File, "[out] propagated map", "", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("distanceMap", "d", mitkCommandLineParser::File, "[out] connectedness map", "", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("euclidDistanceMap", "e", mitkCommandLineParser::File, "[out] euclid distance map", "", us::Any(), false, false, false, mitkCommandLineParser::Output);
 
   // Parse input parameters
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

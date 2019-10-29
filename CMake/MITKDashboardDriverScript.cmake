@@ -91,7 +91,7 @@ endif()
 set(CTEST_CONFIGURATION_TYPE ${CTEST_BUILD_CONFIGURATION})
 
 if(empty_binary_directory)
-  message("Directory ${CTEST_BINARY_DIRECTORY} cleaned !")
+  message("Clean \"${CTEST_BINARY_DIRECTORY}\"")
   ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY})
 endif()
 
@@ -231,36 +231,55 @@ function(run_ctest)
   set(build_errors 0)
   set(test_errors 0)
 
+  set(force_build ${initial_force_build})
+
   ctest_start(${model})
 
+  if(MITK_EXTENSIONS)
+    foreach(extension ${MITK_EXTENSIONS})
+      if(extension MATCHES "([^|]+)\\|([^|]+)\\|(.+)")
+        set(extension_repo ${CMAKE_MATCH_1})
+        set(extension_tag ${CMAKE_MATCH_2})
+        set(extension_source_dir ${CMAKE_MATCH_3})
+        if(NOT EXISTS "${CTEST_DASHBOARD_ROOT}/${extension_source_dir}")
+          message("Clone ${extension_repo} (${extension_tag})")
+          execute_process(
+            COMMAND ${CTEST_GIT_COMMAND} clone -b ${extension_tag} ${extension_repo} ${extension_source_dir}
+            WORKING_DIRECTORY ${CTEST_DASHBOARD_ROOT})
+        else()
+          set(working_dir "${CTEST_DASHBOARD_ROOT}/${extension_source_dir}")
+          message("Update ${extension_repo} (${extension_tag})")
+          execute_process(
+            COMMAND ${CTEST_GIT_COMMAND} fetch origin ${extension_tag}
+            WORKING_DIRECTORY "${working_dir}"
+            RESULT_VARIABLE exit_code)
+
+          if(exit_code EQUAL 0)
+            execute_process(
+              COMMAND ${CTEST_GIT_COMMAND} diff --quiet HEAD FETCH_HEAD
+              WORKING_DIRECTORY "${working_dir}"
+              RESULT_VARIABLE exit_code)
+
+            if(NOT exit_code EQUAL 0)
+              execute_process(
+                COMMAND ${CTEST_GIT_COMMAND} reset --hard FETCH_HEAD
+                WORKING_DIRECTORY "${working_dir}")
+              set(force_build TRUE)
+            endif()
+          else()
+            message(FATAL_ERROR "Could not update ${extension_repo} (${extension_tag})")
+          endif()
+        endif()
+      endif()
+    endforeach()
+  endif()
+
+  message("Update MITK")
   ctest_update(SOURCE "${CTEST_CHECKOUT_DIR}" RETURN_VALUE res)
 
   if(res LESS 0)
     # update error
     math(EXPR build_errors "${build_errors} + 1")
-  endif()
-
-  set(force_build ${initial_force_build})
-
-  # Check if a forced run was requested
-  set(cdash_remove_rerun_url )
-  if(CDASH_ADMIN_URL_PREFIX)
-    set(cdash_rerun_url "${CDASH_ADMIN_URL_PREFIX}/rerun/${_build_name_escaped}")
-    set(cdash_remove_rerun_url "${CDASH_ADMIN_URL_PREFIX}/rerun/rerun.php?name=${_build_name_escaped}&remove=1")
-    file(DOWNLOAD
-         "${cdash_rerun_url}"
-         "${CTEST_BINARY_DIRECTORY}/tmp.txt"
-         STATUS status
-         )
-    list(GET status 0 error_code)
-    file(READ "${CTEST_BINARY_DIRECTORY}/tmp.txt" rerun_content LIMIT 1)
-    if(NOT error_code AND NOT rerun_content)
-      set(force_build 1)
-    endif()
-  endif()
-
-  if(COMMAND MITK_OVERRIDE_FORCE_BUILD)
-    MITK_OVERRIDE_FORCE_BUILD(force_build)
   endif()
 
   # force a build if this is the first run and the build dir is empty
@@ -303,6 +322,10 @@ ${INITIAL_CMAKECACHE_OPTIONS}
 
     set_property(GLOBAL PROPERTY SubProject SuperBuild)
     set_property(GLOBAL PROPERTY Label SuperBuild)
+
+    if(MITK_EXTENSIONS)
+      set(SUPERBUILD_CONFIG_OPTIONS -D MITK_EXTENSION_DIRS:STRING=${MITK_EXTENSION_DIRS})
+    endif()
 
     ctest_configure(BUILD "${CTEST_BINARY_DIRECTORY}" RETURN_VALUE res OPTIONS "${SUPERBUILD_CONFIG_OPTIONS}")
 

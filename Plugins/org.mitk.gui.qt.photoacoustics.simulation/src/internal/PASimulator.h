@@ -51,7 +51,6 @@ public:
 
   /// \brief Called when the user clicks the GUI button
   void DoImageProcessing();
-  void ClickedGaussBox();
   void ClickedCheckboxFixedSeed();
   void ClickedRandomizePhysicalParameters();
   void OpenFolder();
@@ -61,9 +60,9 @@ public:
 
 protected:
 
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
   Ui::PASimulatorControls m_Controls;
 

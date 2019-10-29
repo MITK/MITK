@@ -215,7 +215,7 @@ namespace mitk
       PET_20
     };
 
-    static const char *const typenameList[];
+    static std::vector<std::string> typenameList;
 
     /**
      *  @brief Set the look-up table type by enum (or integer).
@@ -263,12 +263,10 @@ namespace mitk
     vtkSmartPointer<vtkLookupTable> m_LookupTable;
 
     float m_Window;
-
     float m_Level;
-
     float m_Opacity;
 
-    LookupTableType m_type;
+    LookupTableType m_Type;
 
   private:
     itk::LightObject::Pointer InternalClone() const override;

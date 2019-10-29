@@ -52,7 +52,7 @@ public:
 
 const std::string SimpleRenderWindowView::VIEW_ID = "org.mitk.customviewer.views.simplerenderwindowview";
 
-SimpleRenderWindowView::SimpleRenderWindowView() : m_RenderWindow(0), d(new AbstractRenderWindowViewPrivate)
+SimpleRenderWindowView::SimpleRenderWindowView() : m_RenderWindow(nullptr), d(new AbstractRenderWindowViewPrivate)
 {
 }
 
@@ -85,7 +85,7 @@ QmitkRenderWindow *SimpleRenderWindowView::GetRenderWindow(const QString &id) co
   {
     return m_RenderWindow;
   }
-  return 0;
+  return nullptr;
 }
 
 QmitkRenderWindow *SimpleRenderWindowView::GetQmitkRenderWindow(const QString &id) const
@@ -94,7 +94,7 @@ QmitkRenderWindow *SimpleRenderWindowView::GetQmitkRenderWindow(const QString &i
   {
     return m_RenderWindow;
   }
-  return 0;
+  return nullptr;
 }
 
 mitk::Point3D SimpleRenderWindowView::GetSelectedPosition(const QString & /*id*/) const
@@ -182,5 +182,5 @@ mitk::SliceNavigationController *SimpleRenderWindowView::GetTimeNavigationContro
 {
   if (GetRenderingManager())
     return GetRenderingManager()->GetTimeNavigationController();
-  return 0;
+  return nullptr;
 }

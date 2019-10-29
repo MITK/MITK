@@ -88,7 +88,7 @@ mitk::TrackingDeviceType QmitkTrackingDeviceConfigurationWidgetScanPortsWorker::
   {
     returnValue = tracker->TestConnection();
   }
-  catch (mitk::IGTException)
+  catch (const mitk::IGTException&)
   {
   }//do nothing: there is simply no device on this port
   return returnValue;

@@ -52,11 +52,11 @@ public:
 
 	QmitkIGTNavigationToolCalibration();
 
-  virtual ~QmitkIGTNavigationToolCalibration();
+  ~QmitkIGTNavigationToolCalibration() override;
 
   static const std::string VIEW_ID;
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  void CreateQtPartControl(QWidget *parent) override;
 
   protected slots:
 
@@ -81,7 +81,7 @@ public:
 
 protected:
 
-  virtual void SetFocus();
+  void SetFocus() override;
 
   void UpdateOffsetCoordinates();
 

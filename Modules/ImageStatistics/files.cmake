@@ -1,5 +1,6 @@
 set(CPP_FILES
   mitkImageStatisticsCalculator.cpp
+  mitkImageStatisticsContainer.cpp
   mitkPointSetStatisticsCalculator.cpp
   mitkPointSetDifferenceStatisticsCalculator.cpp
   mitkIntensityProfile.cpp
@@ -11,10 +12,17 @@ set(CPP_FILES
   mitkHistogramStatisticsCalculator.cpp
   mitkMaskUtilities.cpp
   mitkIgnorePixelMaskGenerator.cpp
+  mitkImageStatisticsPredicateHelper.cpp
+  mitkImageStatisticsContainerNodeHelper.cpp
+  mitkImageStatisticsContainerManager.cpp
+  mitkStatisticsToImageRelationRule.cpp
+  mitkStatisticsToMaskRelationRule.cpp
+  mitkImageStatisticsConstants.cpp
 )
 
 set(H_FILES
   mitkImageStatisticsCalculator.h
+  mitkImageStatisticsContainer.h
   mitkPointSetDifferenceStatisticsCalculator.h
   mitkPointSetStatisticsCalculator.h
   mitkExtendedStatisticsImageFilter.h
@@ -30,4 +38,10 @@ set(H_FILES
   mitkIgnorePixelMaskGenerator.h
   mitkMinMaxImageFilterWithIndex.h
   mitkMinMaxLabelmageFilterWithIndex.h
+  mitkImageStatisticsPredicateHelper.h
+  mitkImageStatisticsContainerNodeHelper.h
+  mitkImageStatisticsContainerManager.h
+  mitkStatisticsToImageRelationRule.h
+  mitkStatisticsToMaskRelationRule.h
+  mitkImageStatisticsConstants.h
 )

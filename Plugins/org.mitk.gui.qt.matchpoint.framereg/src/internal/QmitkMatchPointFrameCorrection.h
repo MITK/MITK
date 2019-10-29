@@ -60,7 +60,7 @@ public:
   berryObjectMacro(QmitkMatchPointFrameCorrection)
 
   QmitkMatchPointFrameCorrection();
-  ~QmitkMatchPointFrameCorrection();
+  ~QmitkMatchPointFrameCorrection() override;
 
 protected slots:
 
@@ -95,13 +95,13 @@ protected slots:
   void OnFrameMapped(double progress);
 
 protected:
-  virtual void CreateQtPartControl(QWidget* parent);
+  void CreateQtPartControl(QWidget* parent) override;
 
-  virtual void SetFocus();
+  void SetFocus() override;
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
-                                  const QList<mitk::DataNode::Pointer>& nodes);
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
+                                  const QList<mitk::DataNode::Pointer>& nodes) override;
 
 private:
 

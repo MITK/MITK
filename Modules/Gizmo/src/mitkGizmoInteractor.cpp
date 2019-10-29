@@ -199,6 +199,12 @@ void mitk::GizmoInteractor::DecideInteraction(StateMachineAction *, InteractionE
     case Gizmo::ScaleX:
     case Gizmo::ScaleY:
     case Gizmo::ScaleZ:
+      // Implementation note: Why didn't we implement per-axis scaling yet?
+      // When this was implemented, the mitk::ScaleOperation was able to only describe
+      // uniform scaling around a central point. Since we use operations for all modifications
+      // in order to have undo/redo working, any axis-specific scaling should also
+      // use operations.
+      // Consequence: enhance ScaleOperation when there is need to have scaling per axis.
       decision = InternalEvent::New(interactionEvent->GetSender(), this, "ScaleEqually");
       break;
     default:
@@ -216,13 +222,9 @@ void mitk::GizmoInteractor::MoveAlongAxis(StateMachineAction *, InteractionEvent
     return;
   }
 
-  Vector2D axisVector2D = m_InitialClickPosition2D - m_InitialGizmoCenter2D;
-  axisVector2D.Normalize();
-
-  Vector2D movement2D = positionEvent->GetPointerPositionOnScreen() - m_InitialClickPosition2D;
-  double relativeMovement = movement2D * axisVector2D; // projection
-
-  Vector3D movement3D = relativeMovement * m_AxisOfMovement;
+  Vector3D mouseMovement3D = positionEvent->GetPositionInWorld() - m_InitialClickPosition3D;
+  double projectedMouseMovement3D = mouseMovement3D * m_AxisOfMovement;
+  Vector3D movement3D = projectedMouseMovement3D * m_AxisOfMovement;
 
   ApplyTranslationToManipulatedObject(movement3D);
   RenderingManager::GetInstance()->ForceImmediateUpdateAll();
@@ -298,8 +300,7 @@ void mitk::GizmoInteractor::ApplyTranslationToManipulatedObject(const Vector3D &
   }
 
   manipulatedGeometry->ExecuteOperation(m_FinalDoOperation.get());
-  m_ManipulatedObjectGeometry->SetIdentity();
-  m_ManipulatedObjectGeometry->Compose(manipulatedGeometry->GetIndexToWorldTransform());
+  m_ManipulatedObjectGeometry->SetIndexToWorldTransform(manipulatedGeometry->GetIndexToWorldTransform());
 }
 
 void mitk::GizmoInteractor::ApplyEqualScalingToManipulatedObject(double scalingFactor)
@@ -314,8 +315,7 @@ void mitk::GizmoInteractor::ApplyEqualScalingToManipulatedObject(double scalingF
   }
 
   manipulatedGeometry->ExecuteOperation(m_FinalDoOperation.get());
-  m_ManipulatedObjectGeometry->SetIdentity();
-  m_ManipulatedObjectGeometry->Compose(manipulatedGeometry->GetIndexToWorldTransform());
+  m_ManipulatedObjectGeometry->SetIndexToWorldTransform(manipulatedGeometry->GetIndexToWorldTransform());
 }
 
 void mitk::GizmoInteractor::ApplyRotationToManipulatedObject(double angle_deg)
@@ -331,8 +331,7 @@ void mitk::GizmoInteractor::ApplyRotationToManipulatedObject(double angle_deg)
   }
 
   manipulatedGeometry->ExecuteOperation(m_FinalDoOperation.get());
-  m_ManipulatedObjectGeometry->SetIdentity();
-  m_ManipulatedObjectGeometry->Compose(manipulatedGeometry->GetIndexToWorldTransform());
+  m_ManipulatedObjectGeometry->SetIndexToWorldTransform(manipulatedGeometry->GetIndexToWorldTransform());
 }
 
 void mitk::GizmoInteractor::FeedUndoStack(StateMachineAction *, InteractionEvent *)

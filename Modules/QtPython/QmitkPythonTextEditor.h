@@ -30,7 +30,7 @@ class MITKQTPYTHON_EXPORT QmitkPythonTextEditor : public QWidget
   Q_OBJECT
 
 public:
-  QmitkPythonTextEditor(QWidget *parent = 0);
+  QmitkPythonTextEditor(QWidget *parent = nullptr);
   ~QmitkPythonTextEditor() override;
 public slots:
   void Paste(const QString& command);

@@ -44,7 +44,7 @@ public:
   };
 
   explicit QmitkDataSelectionWidget(QWidget* parent = nullptr);
-  ~QmitkDataSelectionWidget();
+  ~QmitkDataSelectionWidget() override;
 
   unsigned int AddDataStorageComboBox(Predicate predicate);
   unsigned int AddDataStorageComboBox(mitk::NodePredicateBase* predicate = nullptr);

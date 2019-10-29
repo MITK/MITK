@@ -1,0 +1,41 @@
+/**
+\page org_mitk_gui_qt_mitkphenotyping MITK Phenotyping
+
+\tableofcontents
+
+MITK Phenotyping is a selection of algorithms that can be used to extract image-based phenotypes, for example using a radiomics approach. The software is part of the research of the <a href="https://www.dkfz.de/en/mic/index.php">Division of Medical Image Computing</a> of the German Cancer Research Center (DKFZ). MITK Phenotyping is not intended to be a single application, it is rather a collection of the necessary plugins within the offical MITK releases. 
+
+The functionality of MITK Phenotyping can be accessed in different ways: Using the graphical interface using the Plugins listed below, using command line applications, or using one of the programming interfaces. 
+
+\section org_mitk_gui_qt_mitkphenotyping_Tutorials Tutorials 
+\li \subpage org_mitk_views_radiomicstutorial_gui_portal A tutorial on how to use the grapical interface of MITK Phenotying 
+
+\section org_mitk_gui_qt_mitkphenotyping_Views Views
+
+\subsection sub2 Specific Views:
+Views that were developed with the main focus on Radiomics. They still might be used in other use-cases as well: 
+\li \subpage org_mitk_views_radiomicstransformationview : Image transformations like Resampling, Laplacian of Gaussian, and Wavelet Transformations
+\li \subpage org_mitk_views_radiomicsmaskprocessingview : Processing and Cleaning of Masks
+\li \subpage org_mitk_views_radiomicsarithmetricview : Processing images using mathematical operations
+\li \subpage org_mitk_views_radiomicsstatisticview : Calculate Radiomics Features
+
+\subsection sub1 Non-Specific Views:
+This section contains views that are included within MITK Phenotyping, but were developed with a broader application in mind. 
+\li \subpage org_mitk_views_basicimageprocessing : Deprecated plugin for performing different image-related tasks like subtraction, mutliplaction, filtering etc.
+\li \subpage org_mitk_gui_qt_matchpoint_algorithm_browser : Selection of MatchPoint (Registration) Algorithm
+\li \subpage org_mitk_gui_qt_matchpoint_algorithm_control : Configuring and Controlling MatchPoint (Registration) Algorithm
+\li \subpage org_mitk_gui_qt_matchpoint_evaluator : Evaluate the Registration performance using MatchPoint
+\li \subpage org_mitk_gui_qt_matchpoint_manipulator : Adapt a registration calculated using MatchPoint
+\li \subpage org_mitk_gui_qt_matchpoint_mapper : Apply a MatchPoint Registration to a specific image
+\li \subpage org_mitk_gui_qt_matchpoint_visualizer : Visualize a Registration obtained with MatchPoint
+\li \subpage org_mitk_gui_qt_matchpoint_algorithm_batch : Running MatchPoint over multiple images (BatchMode)
+\li \subpage org_mitk_views_multilabelsegmentation : Create and editing of Multilabel-Segmentations.
+\li \subpage org_mitk_views_segmentation : Create simple segmentations
+\li \subpage org_mitk_views_segmentationutilities : Utilities for the processing of simple segmentations. 
+
+\section radiomics_miniapps MiniApps (Command line Tools)
+\li \subpage MiniAppExplainPage Explanation of the Command Line App concept in MITK
+\li \subpage mitkBasicImageProcessingMiniAppsPortalPage : List of common preprocessing MiniApps
+\li \subpage mitkClassificationMiniAppsPortalPage : (Incomplete) list of MITK Classification MiniApps
+
+*/

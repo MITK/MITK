@@ -62,7 +62,7 @@ class MITK_QT_COMMON QmitkSelectionServiceConnector : public QObject
 public:
 
   QmitkSelectionServiceConnector();
-  ~QmitkSelectionServiceConnector();
+  ~QmitkSelectionServiceConnector() override;
 
   /*
   * @brief 	Create a selection listener and add it to the list of selection listener of the given selection service.
@@ -95,6 +95,13 @@ Q_SIGNALS:
   * @par	nodes		A list of data nodes that are newly selected.
   */
   void ServiceSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
+
+  /*
+  * @brief A signal that will be emitted by the private 'ServiceSelectionChanged'-function. If sourcePart has send an invalid selection
+  * (selection pointer was Null).
+  * @par	sourcePart		Part that sent the null selection.
+  */
+  void ServiceNullSelection(const berry::IWorkbenchPart::Pointer& sourcePart);
 
 public Q_SLOTS:
   /*

@@ -52,7 +52,7 @@ const std::string QmitkIGTTrackingDataEvaluationView::VIEW_ID = "org.mitk.views.
 
 QmitkIGTTrackingDataEvaluationView::QmitkIGTTrackingDataEvaluationView()
   : QmitkFunctionality()
-  , m_Controls(0)
+  , m_Controls(nullptr)
   , m_MultiWidget(nullptr)
   , m_scalingfactor(1)
 {
@@ -1044,7 +1044,7 @@ std::vector<std::string> QmitkIGTTrackingDataEvaluationView::GetFileContentLineB
 
   //save old locale
   char * oldLocale;
-  oldLocale = setlocale(LC_ALL, 0);
+  oldLocale = setlocale(LC_ALL, nullptr);
 
   //define own locale
   std::locale C("C");

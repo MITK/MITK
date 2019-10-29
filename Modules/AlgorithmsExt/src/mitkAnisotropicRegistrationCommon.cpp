@@ -49,7 +49,7 @@ void mitk::AnisotropicRegistrationCommon::TransformPoints(vtkPoints *src,
                                                           const Translation &translation)
 {
 #pragma omp parallel for
-  for (vtkIdType i = 0; i < src->GetNumberOfPoints(); ++i)
+  for (int i = 0; i < src->GetNumberOfPoints(); ++i)
   {
     double p_in[3];
     double p_out[3];

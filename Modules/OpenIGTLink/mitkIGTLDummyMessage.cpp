@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::IGTLDummyMessage::IGTLDummyMessage() : StringMessage()
 {
-  this->m_DefaultBodyType = "DUMMY";
 }
 
 mitk::IGTLDummyMessage::~IGTLDummyMessage()

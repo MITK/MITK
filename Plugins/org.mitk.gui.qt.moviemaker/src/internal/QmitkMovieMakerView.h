@@ -39,7 +39,7 @@ public:
   static const std::string VIEW_ID;
 
   QmitkMovieMakerView();
-  ~QmitkMovieMakerView();
+  ~QmitkMovieMakerView() override;
 
   void CreateQtPartControl(QWidget* parent) override;
   void SetFocus() override;

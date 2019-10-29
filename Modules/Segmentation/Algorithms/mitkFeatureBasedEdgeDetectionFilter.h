@@ -57,7 +57,7 @@ namespace mitk
 
     /** Execute a thresholding filter with the given lower and upper bound */
     template <typename TPixel, unsigned int VImageDimension>
-    void ITKThresholding(itk::Image<TPixel, VImageDimension> *originalImage,
+    void ITKThresholding(const itk::Image<TPixel, VImageDimension> *originalImage,
                          double lower,
                          double upper,
                          mitk::Image::Pointer &result);

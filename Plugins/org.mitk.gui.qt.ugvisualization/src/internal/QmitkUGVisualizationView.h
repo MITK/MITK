@@ -47,14 +47,14 @@ class QmitkUGVisualizationView : public QmitkAbstractView
     static const std::string VIEW_ID;
 
     QmitkUGVisualizationView();
-    virtual ~QmitkUGVisualizationView();
+    ~QmitkUGVisualizationView() override;
 
-    virtual void CreateQtPartControl(QWidget *parent) override;
+    void CreateQtPartControl(QWidget *parent) override;
 
     ///
     /// Sets the focus to an internal widget.
     ///
-    virtual void SetFocus() override;
+    void SetFocus() override;
 
   protected slots:
 
@@ -68,7 +68,7 @@ class QmitkUGVisualizationView : public QmitkAbstractView
   protected:
 
     /// \brief called by QmitkAbstractView when DataManager's selection has changed
-    virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
+    void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
     void CreateConnections();
 

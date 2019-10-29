@@ -318,18 +318,18 @@ public:
 
     MITK_TEST_CONDITION_REQUIRED(m_emptyTimeGeometry->TimePointToTimeStep(3.5) == 0,
                                  "Testing TimePointToTimeStep(3.5) with m_emptyTimeGeometry");
-    MITK_TEST_CONDITION_REQUIRED(m_initTimeGeometry->TimePointToTimeStep(3.5) == 0,
+    MITK_TEST_CONDITION_REQUIRED(m_initTimeGeometry->TimePointToTimeStep(3.5) == m_initTimeGeometry->CountTimeSteps(),
                                  "Testing TimePointToTimeStep(3.5) with m_initTimeGeometry");
     MITK_TEST_CONDITION_REQUIRED(m_12345TimeGeometry->TimePointToTimeStep(3.5) == 2,
                                  "Testing TimePointToTimeStep(3.5) with m_12345TimeGeometry");
 
     MITK_TEST_CONDITION_REQUIRED(m_emptyTimeGeometry->TimePointToTimeStep(5.8) == 0,
                                  "Testing TimePointToTimeStep(5.8) with m_emptyTimeGeometry");
-    MITK_TEST_CONDITION_REQUIRED(m_initTimeGeometry->TimePointToTimeStep(5.8) == 0,
+    MITK_TEST_CONDITION_REQUIRED(m_initTimeGeometry->TimePointToTimeStep(5.8) == m_initTimeGeometry->CountTimeSteps(),
                                  "Testing TimePointToTimeStep(5.8) with m_initTimeGeometry");
     MITK_TEST_CONDITION_REQUIRED(m_12345TimeGeometry->TimePointToTimeStep(5.8) == 4,
                                  "Testing TimePointToTimeStep(5.8) with m_12345TimeGeometry");
-    MITK_TEST_CONDITION_REQUIRED(m_12345TimeGeometry->TimePointToTimeStep(5.9) == 0,
+    MITK_TEST_CONDITION_REQUIRED(m_12345TimeGeometry->TimePointToTimeStep(5.9) == m_12345TimeGeometry->CountTimeSteps(),
                                  "Testing TimePointToTimeStep(5.9) with m_12345TimeGeometry");
   }
 

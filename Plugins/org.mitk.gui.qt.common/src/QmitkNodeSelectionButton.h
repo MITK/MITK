@@ -37,16 +37,18 @@ class MITK_QT_COMMON QmitkNodeSelectionButton : public QPushButton
 
 public:
   explicit QmitkNodeSelectionButton(QWidget *parent = nullptr);
-  ~QmitkNodeSelectionButton();
+  ~QmitkNodeSelectionButton() override;
+
+  const mitk::DataNode* GetSelectedNode() const;
 
 public Q_SLOTS :
-  virtual void SetSelectedNode(mitk::DataNode* node);
+  virtual void SetSelectedNode(const mitk::DataNode* node);
   virtual void SetNodeInfo(QString info);
 
 protected:
   void paintEvent(QPaintEvent *p) override;
 
-  mitk::DataNode::Pointer m_SelectedNode;
+  mitk::DataNode::ConstPointer m_SelectedNode;
   QString m_Info;
   bool m_OutDatedThumpNail;
   QPixmap m_ThumpNail;

@@ -93,6 +93,7 @@ CalculateVolumeDensityStatistic(itk::Image<TPixel, VImageDimension>* itkImage, m
   mean /= Nv;
   imgA.GoToBegin();
   maskA.GoToBegin();
+
   while (!imgA.IsAtEnd())
   {
     if (maskA.Get() > 0)
@@ -126,6 +127,8 @@ CalculateVolumeDensityStatistic(itk::Image<TPixel, VImageDimension>* itkImage, m
     ++maskA;
   }
 
+  MITK_INFO << "Volume: " << volume;
+  MITK_INFO << " Mean: " << mean;
   featureList.push_back(std::make_pair(prefix + "Volume integrated intensity", volume* mean));
   featureList.push_back(std::make_pair(prefix + "Volume Moran's I index", Nv / w_ij * moranA / moranB));
   featureList.push_back(std::make_pair(prefix + "Volume Geary's C measure", ( Nv -1 ) / 2 / w_ij * geary/ moranB));
@@ -189,8 +192,6 @@ void calculateMOBB(vtkPointSet *pointset, double &volume, double &surface)
         curMaxY = std::max<double>(p2[1], curMaxY);
         curMinZ = std::min<double>(p2[2], curMinZ);
         curMaxZ = std::max<double>(p2[2], curMaxZ);
-
-        //std::cout << pointID << " (" << p[0] << "|" << p[1] << "|" << p[2] << ") (" << p2[0] << "|" << p2[1] << "|" << p2[2] << ")" << std::endl;
       }
 
       if ((curMaxX - curMinX)*(curMaxY - curMinY)*(curMaxZ - curMinZ) < volume)
@@ -205,7 +206,7 @@ void calculateMOBB(vtkPointSet *pointset, double &volume, double &surface)
   }
 }
 
-void calculateMEE(vtkPointSet *pointset, double &vol, double &surf, double tolerance=0.0000001)
+void calculateMEE(vtkPointSet *pointset, double &vol, double &surf, double tolerance=0.0001)
 {
   // Inspired by https://github.com/smdabdoub/ProkaryMetrics/blob/master/calc/fitting.py
 
@@ -214,6 +215,8 @@ void calculateMEE(vtkPointSet *pointset, double &vol, double &surf, double toler
   Eigen::MatrixXd points(3, numberOfPoints);
   Eigen::MatrixXd Q(3+1, numberOfPoints);
   double p[3];
+
+  std::cout << "Initialize Q " << std::endl;
   for (int i = 0; i < numberOfPoints; ++i)
   {
     pointset->GetPoint(i, p);
@@ -242,6 +245,7 @@ void calculateMEE(vtkPointSet *pointset, double &vol, double &surf, double toler
     Eigen::MatrixXd X = Q*u*Qt;
     Eigen::FullPivHouseholderQR<Eigen::MatrixXd> qr(X);
     Eigen::MatrixXd Xi = qr.solve(Ones);
+
     Eigen::MatrixXd M = Qt * Xi * Q;
 
     double maximumValue = M(0, 0);
@@ -263,6 +267,7 @@ void calculateMEE(vtkPointSet *pointset, double &vol, double &surf, double toler
   }
 
    // U = u
+
   Eigen::MatrixXd Ai = points * u * points.transpose() - points * u *(points * u).transpose();
   Eigen::FullPivHouseholderQR<Eigen::MatrixXd> qr(Ai);
   Eigen::VectorXd ones2(dimension);

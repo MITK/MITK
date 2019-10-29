@@ -52,7 +52,7 @@ namespace mitk
 
     ToFDeviceFactoryManager();
 
-    ~ToFDeviceFactoryManager();
+    ~ToFDeviceFactoryManager() override;
 
     std::vector<std::string> m_RegisteredFactoryNames;
     std::vector<us::ServiceReference<IToFDeviceFactory> > m_RegisteredFactoryRefs;

@@ -34,14 +34,14 @@ class MITK_QT_SEGMENTATION QmitkThresholdAction : public QObject, public mitk::I
 
 public:
   QmitkThresholdAction();
-  ~QmitkThresholdAction();
+  ~QmitkThresholdAction() override;
 
   // IContextMenuAction
-  void Run(const QList<mitk::DataNode::Pointer> &selectedNodes);
-  void SetDataStorage(mitk::DataStorage *dataStorage);
-  void SetSmoothed(bool smoothed);
-  void SetDecimated(bool decimated);
-  void SetFunctionality(berry::QtViewPart *functionality);
+  void Run(const QList<mitk::DataNode::Pointer> &selectedNodes) override;
+  void SetDataStorage(mitk::DataStorage *dataStorage) override;
+  void SetSmoothed(bool smoothed) override;
+  void SetDecimated(bool decimated) override;
+  void SetFunctionality(berry::QtViewPart *functionality) override;
 
   void OnThresholdingToolManagerToolModified();
 

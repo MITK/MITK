@@ -32,14 +32,14 @@ class MITK_QT_SEGMENTATION QmitkConvertSurfaceToLabelAction : public QObject, pu
 public:
 
   QmitkConvertSurfaceToLabelAction();
-  virtual ~QmitkConvertSurfaceToLabelAction();
+  ~QmitkConvertSurfaceToLabelAction() override;
 
   //interface methods
-  void Run( const QList<mitk::DataNode::Pointer>& selectedNodes );
-  void SetDataStorage(mitk::DataStorage* dataStorage);
-  void SetSmoothed(bool smoothed);
-  void SetDecimated(bool decimated);
-  void SetFunctionality(berry::QtViewPart* functionality);
+  void Run( const QList<mitk::DataNode::Pointer>& selectedNodes ) override;
+  void SetDataStorage(mitk::DataStorage* dataStorage) override;
+  void SetSmoothed(bool smoothed) override;
+  void SetDecimated(bool decimated) override;
+  void SetFunctionality(berry::QtViewPart* functionality) override;
 
 protected:
 

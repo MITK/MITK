@@ -78,7 +78,7 @@ class QmitkAICPRegistrationView : public QmitkAbstractView
 
     QmitkAICPRegistrationView();
 
-    ~QmitkAICPRegistrationView();
+    ~QmitkAICPRegistrationView() override;
 
   protected slots:
 
@@ -103,9 +103,9 @@ class QmitkAICPRegistrationView : public QmitkAbstractView
 
   protected:
 
-    virtual void CreateQtPartControl(QWidget *parent) override;
+    void CreateQtPartControl(QWidget *parent) override;
 
-    virtual void SetFocus() override;
+    void SetFocus() override;
 
     Ui::QmitkAICPRegistrationViewControls m_Controls;
 

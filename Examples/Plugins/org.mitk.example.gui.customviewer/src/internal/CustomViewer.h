@@ -42,7 +42,7 @@ public:
   CustomViewer();
 
   /** Standard destructor.*/
-  ~CustomViewer();
+  ~CustomViewer() override;
 
   /** Starts the application.*/
   QVariant Start(berry::IApplicationContext *context) override;

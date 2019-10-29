@@ -31,6 +31,7 @@ namespace itk
   ShortestPathImageFilter<TInputImageType, TOutputImageType>::ShortestPathImageFilter()
     : m_Nodes(nullptr),
       m_Graph_NumberOfNodes(0),
+      m_Graph_fullNeighbors(false),
       m_FullNeighborsMode(false),
       m_MakeOutputImage(true),
       m_StoreVectorOrder(false),
@@ -436,10 +437,10 @@ namespace itk
       CleanUp();
 
       // Calc Number of nodes
-      m_ImageDimensions = TInputImageType::ImageDimension;
+      auto imageDimensions = TInputImageType::ImageDimension;
       const InputImageSizeType &size = this->GetInput()->GetRequestedRegion().GetSize();
       m_Graph_NumberOfNodes = 1;
-      for (NodeNumType i = 0; i < m_ImageDimensions; ++i)
+      for (NodeNumType i = 0; i < imageDimensions; ++i)
         m_Graph_NumberOfNodes = m_Graph_NumberOfNodes * size[i];
 
       // Initialize mainNodeList with that number

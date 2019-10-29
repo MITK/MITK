@@ -44,7 +44,7 @@ public:
   };
 
   QmitkMITKIGTTrackingToolboxViewWorker();
-  ~QmitkMITKIGTTrackingToolboxViewWorker();
+  ~QmitkMITKIGTTrackingToolboxViewWorker() override;
 
   void SetWorkerMethod(WorkerMethod w);
   void SetTrackingDevice(mitk::TrackingDevice::Pointer t);

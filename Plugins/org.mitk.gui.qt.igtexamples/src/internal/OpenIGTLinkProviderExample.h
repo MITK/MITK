@@ -47,7 +47,7 @@ class OpenIGTLinkProviderExample : public QmitkAbstractView
   Q_OBJECT
 
   public:
-    ~OpenIGTLinkProviderExample();
+    ~OpenIGTLinkProviderExample() override;
 
     static const std::string VIEW_ID;
 
@@ -60,9 +60,9 @@ class OpenIGTLinkProviderExample : public QmitkAbstractView
 
   protected:
 
-    virtual void CreateQtPartControl(QWidget *parent) override;
+    void CreateQtPartControl(QWidget *parent) override;
 
-    virtual void SetFocus() override;
+    void SetFocus() override;
 
     void CreatePipeline();
     void DestroyPipeline();

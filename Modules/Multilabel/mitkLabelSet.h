@@ -169,6 +169,8 @@ namespace mitk
     */
     void RemoveAllLabels();
 
+    void SetNextActiveLabel();
+
     /** \brief
     */
     Label *GetActiveLabel() { return GetLabel(m_ActiveLabelValue); }

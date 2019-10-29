@@ -32,14 +32,14 @@ class MITK_QT_SEGMENTATION QmitkConvertToMultiLabelSegmentationAction : public Q
 public:
 
   QmitkConvertToMultiLabelSegmentationAction();
-  virtual ~QmitkConvertToMultiLabelSegmentationAction();
+  ~QmitkConvertToMultiLabelSegmentationAction() override;
 
   //interface methods
-  virtual void Run( const QList<mitk::DataNode::Pointer>& selectedNodes );
-  virtual void SetDataStorage(mitk::DataStorage* dataStorage);
-  virtual void SetFunctionality(berry::QtViewPart* functionality);
-  virtual void SetSmoothed(bool smoothed);
-  virtual void SetDecimated(bool decimated);
+  void Run( const QList<mitk::DataNode::Pointer>& selectedNodes ) override;
+  void SetDataStorage(mitk::DataStorage* dataStorage) override;
+  void SetFunctionality(berry::QtViewPart* functionality) override;
+  void SetSmoothed(bool smoothed) override;
+  void SetDecimated(bool decimated) override;
 
 private:
 

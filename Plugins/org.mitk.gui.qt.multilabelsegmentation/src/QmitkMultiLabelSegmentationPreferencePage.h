@@ -35,28 +35,28 @@ class MITK_QT_SEGMENTATION QmitkMultiLabelSegmentationPreferencePage : public QO
 public:
 
   QmitkMultiLabelSegmentationPreferencePage();
-  ~QmitkMultiLabelSegmentationPreferencePage();
+  ~QmitkMultiLabelSegmentationPreferencePage() override;
 
-  void Init(berry::IWorkbench::Pointer workbench);
+  void Init(berry::IWorkbench::Pointer workbench) override;
 
-  void CreateQtControl(QWidget* widget);
+  void CreateQtControl(QWidget* widget) override;
 
-  QWidget* GetQtControl() const;
+  QWidget* GetQtControl() const override;
 
   ///
   /// \see IPreferencePage::PerformOk()
   ///
-  virtual bool PerformOk();
+  bool PerformOk() override;
 
   ///
   /// \see IPreferencePage::PerformCancel()
   ///
-  virtual void PerformCancel();
+  void PerformCancel() override;
 
   ///
   /// \see IPreferencePage::Update()
   ///
-  virtual void Update();
+  void Update() override;
 
 protected slots:
 

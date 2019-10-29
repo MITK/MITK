@@ -139,8 +139,9 @@ namespace mitk
   * The associated time step is the last step which lower time bound
   * is smaller or equal then the time point.
   * If a negative invalid time point is given always time step 0 is
-  * returned. If an positive invalid time step is given an invalid
-  * time step will be returned.
+  * returned. If a positive invalid time point is given the last time
+  * step will be returned. This is also true for time points that are
+  * exactly on the upper time bound.
   */
     TimeStepType TimePointToTimeStep(TimePointType timePoint) const override;
     /**

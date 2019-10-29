@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkStdMultiWidget.h>
 #include <QmitkVideoBackground.h>
 
-QmitkVideoPlayer::QmitkVideoPlayer() : m_VideoSource(0), m_VideoBackground(new QmitkVideoBackground(m_VideoSource))
+QmitkVideoPlayer::QmitkVideoPlayer() : m_VideoSource(nullptr), m_VideoBackground(new QmitkVideoBackground(m_VideoSource))
 {
 }
 

@@ -71,10 +71,7 @@ mitkFunctionCreateBlueBerryApplication(
 #  PLUGINS ${ALL_REQUIRED_PLUGIN_TARGETS}
   NO_PROVISIONING
   NO_INSTALL
-  SHOW_CONSOLE
 )
-
-mitk_use_modules(TARGET ${PROJECT_NAME} MODULES MitkAppUtil PACKAGES Qt5|Widgets)
 
 add_dependencies(${PROJECT_NAME} ${ALL_REQUIRED_PLUGIN_TARGETS})
 

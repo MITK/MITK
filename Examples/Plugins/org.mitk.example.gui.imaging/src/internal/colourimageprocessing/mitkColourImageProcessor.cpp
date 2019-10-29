@@ -986,7 +986,7 @@ namespace mitk
 
       return CombineRGBAImage(data1, data2, dim[0], dim[1], dim[2]);
     }
-    catch (mitk::Exception &e)
+    catch ( const mitk::Exception &e )
     {
       MITK_ERROR << "mitkColourImageProcessor::combineRGBAImage - No access to image data possible." << e.what();
       return nullptr;

@@ -57,8 +57,6 @@ namespace mitk
     //## @brief Time when Header was last read
     itk::TimeStamp m_ReadHeaderTime;
 
-    int m_StartFileIndex;
-
   protected:
     std::string m_FileName;
     std::string m_RecFileName;

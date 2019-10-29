@@ -30,7 +30,7 @@ namespace mitk
 {
 
 ///
-/// \brief A pseudo-Filter for creating OpenCV images from MITK images with the option of copying data or referencing it
+/// \brief A pseudo-filter for creating OpenCV images from MITK images with the option of copying data or referencing it
 ///
 class MITKOPENCVVIDEOSUPPORT_EXPORT ImageToOpenCVImageFilter : public itk::Object
 {
@@ -59,13 +59,6 @@ class MITKOPENCVVIDEOSUPPORT_EXPORT ImageToOpenCVImageFilter : public itk::Objec
         bool CheckImage(mitk::Image* image);
 
         ///
-        /// RUNS the conversion and returns the produced OpenCVImage.
-        /// !!!ATTENTION!!! Do not forget to release this image again with cvReleaseImage().
-        /// \return the produced OpenCVImage or 0 if an error occured!
-        ///
-        IplImage* GetOpenCVImage();
-
-        ///
         /// RUNS the conversion and returns the produced image as cv::Mat.
         /// \return the produced OpenCVImage or an empty image if an error occured
         ///
@@ -74,7 +67,7 @@ class MITKOPENCVVIDEOSUPPORT_EXPORT ImageToOpenCVImageFilter : public itk::Objec
         //##Documentation
         //## @brief Convenient method to set a certain slice of a 3D or 4D mitk::Image as input to convert it to an openCV image
         //##
-        //## This methods sets the input. Call GetOpenCVMat() or GetOpenCVImage() to get the image.
+        //## This methods sets the input. Call GetOpenCVMat() to get the image.
         //##
         //## @param mitkImage - the image that should be converted to an openCVImage
         //## @param timeStep - the time step, which is converted to openCV
@@ -95,10 +88,10 @@ class MITKOPENCVVIDEOSUPPORT_EXPORT ImageToOpenCVImageFilter : public itk::Objec
         /// Saves if the filter should copy the data or just reference it
         ///
         mitk::WeakPointer<mitk::Image> m_Image;
-        IplImage* m_OpenCVImage;
+        cv::Mat m_OpenCVImage;
 
-  private:
-    ImageSliceSelector::Pointer m_sliceSelector;
+    private:
+        ImageSliceSelector::Pointer m_sliceSelector;
 };
 
 } // namespace

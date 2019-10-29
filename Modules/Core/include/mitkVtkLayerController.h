@@ -27,11 +27,6 @@ class vtkRenderer;
 
 namespace mitk
 {
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4251)
-#endif
-
   /**
    * Manages the VTK layer hierarchy
    * of a vtkRenderWindow.
@@ -118,10 +113,6 @@ namespace mitk
     typedef std::map<const vtkSmartPointer<vtkRenderWindow>, mitk::VtkLayerController *> vtkLayerControllerMapType;
     static vtkLayerControllerMapType s_LayerControllerMap;
   };
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 } // Namespace MITK
 #endif /* mitkVtkLayerController_h */

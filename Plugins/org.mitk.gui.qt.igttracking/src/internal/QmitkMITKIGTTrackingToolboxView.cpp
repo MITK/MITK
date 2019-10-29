@@ -234,6 +234,13 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl(QWidget *parent)
     m_Controls->m_RenderWarningLabel->setVisible(false);
     m_Controls->m_TrackingFrozenLabel->setVisible(false);
 
+
+    //initialize projection buttons
+    //first it is disabled when the tool is connected check box for projection and axis is enabled
+    m_Controls->showHideToolAxisCheckBox->setEnabled(false);
+    m_Controls->showHideToolProjectionCheckBox->setEnabled(false);
+    m_Controls->m_toolselector->setEnabled(false);
+
     //Update List of available models for selected tool.
     std::vector<mitk::TrackingDeviceData> Compatibles;
     if ((m_Controls == nullptr) || //check all these stuff for NULL, latterly this causes crashes from time to time
@@ -295,7 +302,7 @@ void QmitkMITKIGTTrackingToolboxView::OnLoadTools()
   {
     this->ReplaceCurrentToolStorage(myDeserializer->Deserialize(filename.toStdString()), filename.toStdString());
   }
-  catch (mitk::IGTException)
+  catch (mitk::IGTException&)
   {
     std::string errormessage = "Error during loading the tool storage file. Please only load tool storage files created with the NavigationToolManager view.";
     QMessageBox::warning(nullptr, "Tool Storage Loading Error", errormessage.c_str());
@@ -441,7 +448,7 @@ void QmitkMITKIGTTrackingToolboxView::OnShowHideToolProjectionClicked()
     RemoveAllToolProjections();
     m_Controls->showHideToolAxisCheckBox->setEnabled(false);
   }
-  if( m_NeedleProjectionFilter.IsNotNull() )
+  if(m_NeedleProjectionFilter->GetNumberOfInputs())
   {
     m_NeedleProjectionFilter->Update();
   }
@@ -466,7 +473,7 @@ void QmitkMITKIGTTrackingToolboxView::OnShowHideToolAxisClicked()
     m_ShowHideToolAxis = false;
   }
   //Update the filter
-  if( m_NeedleProjectionFilter.IsNotNull() )
+  if(m_NeedleProjectionFilter->GetNumberOfInputs())
   {
     m_NeedleProjectionFilter->Update();
   }
@@ -514,6 +521,14 @@ void QmitkMITKIGTTrackingToolboxView::OnConnect()
   //start worker thread
   m_WorkerThread->start();
   //! [Thread 4]
+
+
+  //enable checkboxes for projection and tool axis
+  m_Controls->showHideToolAxisCheckBox->setEnabled(true);
+  m_Controls->showHideToolProjectionCheckBox->setEnabled(true);
+  m_Controls->m_toolselector->setEnabled(true);
+
+
 
   //disable buttons
   this->m_Controls->m_MainWidget->setEnabled(false);
@@ -1101,7 +1116,7 @@ void QmitkMITKIGTTrackingToolboxView::StartLogging()
     {
       m_loggingFilter->StartRecording();
     }
-    catch (mitk::IGTException)
+    catch (mitk::IGTException&)
     {
       std::string errormessage = "Error during start recording. Recorder already started recording?";
       QMessageBox::warning(nullptr, "IGTPlayer: Error", errormessage.c_str());
@@ -1397,7 +1412,7 @@ void QmitkMITKIGTTrackingToolboxView::LoadUISettings()
       m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
       m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
     }
-    catch (mitk::IGTException e)
+    catch (const mitk::IGTException& e)
     {
       MITK_WARN("QmitkMITKIGTTrackingToolBoxView") << "Error during restoring tools. Problems with file (" << m_ToolStorageFilename.toStdString() << "), please check the file? Error message: "<<e.GetDescription();
       this->OnResetTools(); //if there where errors reset the tool storage to avoid problems later on

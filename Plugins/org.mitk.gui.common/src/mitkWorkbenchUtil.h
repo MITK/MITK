@@ -22,42 +22,58 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDataStorageEditorInput.h"
 
+#include "mitkIRenderWindowPart.h"
+
 #include <berryIWorkbenchPage.h>
 #include <berryIEditorDescriptor.h>
 
 class ctkPluginContext;
 
 namespace mitk {
-
-/**
- * @ingroup org_mitk_gui_common
- *
- * @brief Utility class for loading data, opening editors and other tasks in a MITK Workbench.
- *
- * @note Infering the content type is not yet supported (ignore the comments about it
- *       in the method documentation).
- */
-struct MITK_GUI_COMMON_PLUGIN WorkbenchUtil
-{
-
   /**
-   * Loads the set of given files into the active data storage of the given Workbench window.
+   * @ingroup org_mitk_gui_common
    *
-   * If the window already has an editor open on the active datastorage then that editor
-   * is activated; otherwise the default editor for the "mitk" extension is activated.
+   * @brief Utility class for loading data, opening editors and other tasks in a MITK Workbench.
    *
-   * @param fileNames
-   *            A list of file names with absolute path.
-   * @param wnd
-   *            The Workbench window in which the data will be loaded.
-   * @param openEditor
-   *            Whether an Editor is to be opened on file loading (for cases there is none).
-   *
-   * @see mitk::IOUtil
+   * @note Inferring the content type is not yet supported (ignore the comments about it
+   *       in the method documentation).
    */
-  static void LoadFiles(const QStringList& fileNames, berry::IWorkbenchWindow::Pointer wnd, bool openEditor = true);
+  struct MITK_GUI_COMMON_PLUGIN WorkbenchUtil
+  {
+    /**
+    * Describes the strategies to be used for getting an mitk::IRenderWindowPart instance.
+    */
+    enum IRenderWindowPartStrategy {
 
-  /**
+      // Do nothing.
+      NONE = 0x00000000,
+      // Bring the most recently activated mitk::IRenderWindowPart instance to the front.
+      BRING_TO_FRONT = 0x00000001,
+      // Activate an mitk::IRenderWindowPart part (implies bringing it to the front).
+      ACTIVATE = 0x00000002,
+      // Create an mitk::IRenderWindowPart if none is alredy opened.
+      OPEN = 0x00000004
+    };
+
+    Q_DECLARE_FLAGS(IRenderWindowPartStrategies, IRenderWindowPartStrategy)
+
+    /**
+     * Loads the set of given files into the active data storage of the given Workbench window.
+     *
+     * If the window already has an editor open on the active datastorage then that editor
+     * is activated; otherwise the default editor for the "mitk" extension is activated.
+     *
+     * @param fileNames
+     *            A list of file names with absolute path.
+     * @param wnd
+     *            The Workbench window in which the data will be loaded.
+     * @param openEditor
+     *            Whether an Editor is to be opened on file loading (for cases there is none).
+     *
+     * @see mitk::IOUtil
+     */
+    static void LoadFiles(const QStringList& fileNames, berry::IWorkbenchWindow::Pointer wnd, bool openEditor = true);
+    /**
      * Opens an editor on the given object.
      * <p>
      * If the page already has an editor open on the target object then that
@@ -79,11 +95,8 @@ struct MITK_GUI_COMMON_PLUGIN WorkbenchUtil
      *                if the editor could not be initialized
      * @see IWorkbenchPage#OpenEditor(IEditorInput::Pointer, std::string, bool)
      */
-  static berry::IEditorPart::Pointer OpenEditor(berry::IWorkbenchPage::Pointer page,
-                                                berry::IEditorInput::Pointer input,
-                                                const QString& editorId, bool activate = false);
-
-  /**
+    static berry::IEditorPart::Pointer OpenEditor(berry::IWorkbenchPage::Pointer page, berry::IEditorInput::Pointer input, const QString& editorId, bool activate = false);
+    /**
      * Opens an editor on the given file resource. This method will attempt to
      * resolve the editor based on content-type bindings as well as traditional
      * name/extension bindings if <code>determineContentType</code> is
@@ -108,12 +121,8 @@ struct MITK_GUI_COMMON_PLUGIN WorkbenchUtil
      *                if the editor could not be initialized
      * @see IWorkbenchPage#OpenEditor(IEditorInput::Pointer,std::string,bool)
      */
-  static berry::IEditorPart::Pointer OpenEditor(berry::IWorkbenchPage::Pointer page,
-                                                mitk::DataStorageEditorInput::Pointer input,
-                                                bool activate = false,
-                                                bool determineContentType = false);
-
-  /**
+    static berry::IEditorPart::Pointer OpenEditor(berry::IWorkbenchPage::Pointer page, DataStorageEditorInput::Pointer input, bool activate = false, bool determineContentType = false);
+    /**
      * Returns an editor descriptor appropriate for opening a file resource with
      * the given name.
      * <p>
@@ -145,10 +154,8 @@ struct MITK_GUI_COMMON_PLUGIN WorkbenchUtil
      * @throws PartInitException
      *             if no editor can be found
      */
-  static berry::IEditorDescriptor::Pointer GetEditorDescriptor(
-      const QString& name, bool inferContentType = true);
-
-  /**
+    static berry::IEditorDescriptor::Pointer GetEditorDescriptor(const QString& name, bool inferContentType = true);
+    /**
      * Returns the default editor for a given file. This method will attempt to
      * resolve the editor based on content-type bindings as well as traditional
      * name/extension bindings if <code>determineContentType</code> is
@@ -168,22 +175,40 @@ struct MITK_GUI_COMMON_PLUGIN WorkbenchUtil
      * @return the descriptor of the default editor, or <code>null</code> if
      *         not found
      */
-  static berry::IEditorDescriptor::Pointer GetDefaultEditor(const QString& file,
-                                                            bool determineContentType);
-  /**
-   * Set the "DepartmentLogo" preference using a Qt resource path.
-   *
-   * This is a convenience method to set the preference for a "deparment" logo which is usually
-   * shown in render windows in the MITK workbench.
-   *
-   * @param logoResource A Qt resource path to the logo, e.g. ":/MyLogo.png".
-   * @param context The plugin context of the plug-in containing the logo resource.
-   * @return \c true if the preference was set successfully, \c false otherwise.
-   */
-  static bool SetDepartmentLogoPreference(const QString& logoResource, ctkPluginContext* context);
-
-};
-
+    static berry::IEditorDescriptor::Pointer GetDefaultEditor(const QString& file, bool determineContentType);
+    /**
+    * @brief Returns the currently active mitk::IRenderWindowPart.
+    *
+    * @param page         The page in which the editor will be opened.
+    * @param strategies   Strategies for returning a mitk::IRenderWindowPart instance if there
+    *                     is currently no active one.
+    * @return The active mitk::IRenderWindowPart.
+    */
+    static IRenderWindowPart* GetRenderWindowPart(berry::IWorkbenchPage::Pointer page, IRenderWindowPartStrategies strategies);
+    /**
+    * @brief Uses 'GetRenderWindowPart' to open the a render window part with a certain strategy:
+    *        Calls 'GetRenderWindowPart' with strategy "ACTIVATE | OPEN" if the bool argument is true.
+    *        Calls 'GetRenderWindowPart' with strategy "BRING_TO_FRONT | OPEN" if the bool argument is false.
+    *
+    * @param page         The page in which the editor will be opened.
+    * @param activatedEditor   Determine if the render window part should be activated or just brought to front.
+    * @return The active and opened mitk::IRenderWindowPart.
+    */
+    static IRenderWindowPart* OpenRenderWindowPart(berry::IWorkbenchPage::Pointer page, bool activatedEditor = true);
+    /**
+     * Set the "DepartmentLogo" preference using a Qt resource path.
+     *
+     * This is a convenience method to set the preference for a "department" logo which is usually
+     * shown in render windows in the MITK workbench.
+     *
+     * @param logoResource A Qt resource path to the logo, e.g. ":/MyLogo.png".
+     * @param context The plugin context of the plug-in containing the logo resource.
+     * @return \c true if the preference was set successfully, \c false otherwise.
+     */
+    static bool SetDepartmentLogoPreference(const QString& logoResource, ctkPluginContext* context);
+  };
 }
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(mitk::WorkbenchUtil::IRenderWindowPartStrategies)
 
 #endif // MITKWORKBENCHUTIL_H

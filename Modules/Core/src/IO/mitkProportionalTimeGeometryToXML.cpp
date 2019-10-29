@@ -98,7 +98,7 @@ mitk::ProportionalTimeGeometry::Pointer mitk::ProportionalTimeGeometryToXML::Fro
       stepDuration = std::numeric_limits<TimePointType>::infinity();
     }
   }
-  catch (boost::bad_lexical_cast &e)
+  catch ( const boost::bad_lexical_cast &e )
   {
     MITK_ERROR << "Could not parse string as number: " << e.what();
     return nullptr;

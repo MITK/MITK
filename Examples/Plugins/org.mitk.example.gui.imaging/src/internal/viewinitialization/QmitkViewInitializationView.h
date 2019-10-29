@@ -34,11 +34,11 @@ public:
   static const std::string VIEW_ID;
 
   QmitkViewInitializationView();
-  virtual ~QmitkViewInitializationView();
+  ~QmitkViewInitializationView() override;
 
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
   /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
@@ -50,10 +50,10 @@ private:
 
   void UpdateRendererList();
 
-  virtual void Activated() override;
-  virtual void Deactivated() override;
-  virtual void Visible() override;
-  virtual void Hidden() override;
+  void Activated() override;
+  void Deactivated() override;
+  void Visible() override;
+  void Hidden() override;
 
 private slots:
 

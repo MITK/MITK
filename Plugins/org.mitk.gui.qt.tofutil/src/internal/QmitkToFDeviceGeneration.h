@@ -40,11 +40,11 @@ class QmitkToFDeviceGeneration : public QmitkAbstractView
     static const std::string VIEW_ID;
 
     QmitkToFDeviceGeneration();
-    ~QmitkToFDeviceGeneration();
+    ~QmitkToFDeviceGeneration() override;
 
     void SetFocus() override;
 
-    virtual void CreateQtPartControl(QWidget *parent) override;
+    void CreateQtPartControl(QWidget *parent) override;
 
 
   protected slots:

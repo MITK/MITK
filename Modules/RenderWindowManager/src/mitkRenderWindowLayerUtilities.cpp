@@ -18,11 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderWindowLayerUtilities.h"
 
 // mitk core
-#include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateNot.h>
-#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateProperty.h>
 
-RenderWindowLayerUtilities::LayerStack RenderWindowLayerUtilities::GetLayerStack(const mitk::DataStorage* dataStorage, const mitk::BaseRenderer* renderer, bool withBaseNode)
+mitk::RenderWindowLayerUtilities::LayerStack mitk::RenderWindowLayerUtilities::GetLayerStack(const DataStorage* dataStorage, const BaseRenderer* renderer, bool withBaseNode)
 {
   LayerStack stackedLayers;
   if (nullptr == dataStorage || nullptr == renderer)
@@ -32,18 +31,11 @@ RenderWindowLayerUtilities::LayerStack RenderWindowLayerUtilities::GetLayerStack
   }
 
   int layer = -1;
-  mitk::NodePredicateProperty::Pointer helperObject = mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true));
-  mitk::NodePredicateNot::Pointer notAHelperObject = mitk::NodePredicateNot::New(helperObject);
-
-  mitk::NodePredicateProperty::Pointer fixedLayer = mitk::NodePredicateProperty::New("fixedLayer", mitk::BoolProperty::New(true), renderer);
-
-  // combine node predicates
-  mitk::NodePredicateAnd::Pointer combinedNodePredicate = mitk::NodePredicateAnd::New(notAHelperObject, fixedLayer);
-  mitk::DataStorage::SetOfObjects::ConstPointer filteredDataNodes = dataStorage->GetSubset(combinedNodePredicate);
-
-  for (mitk::DataStorage::SetOfObjects::ConstIterator it = filteredDataNodes->Begin(); it != filteredDataNodes->End(); ++it)
+  NodePredicateAnd::Pointer combinedNodePredicate = GetRenderWindowPredicate(renderer);
+  DataStorage::SetOfObjects::ConstPointer filteredDataNodes = dataStorage->GetSubset(combinedNodePredicate);
+  for (DataStorage::SetOfObjects::ConstIterator it = filteredDataNodes->Begin(); it != filteredDataNodes->End(); ++it)
   {
-    mitk::DataNode::Pointer dataNode = it->Value();
+    DataNode::Pointer dataNode = it->Value();
     if (dataNode.IsNull())
     {
       continue;
@@ -60,4 +52,41 @@ RenderWindowLayerUtilities::LayerStack RenderWindowLayerUtilities::GetLayerStack
     }
   }
   return stackedLayers;
+}
+
+mitk::NodePredicateAnd::Pointer mitk::RenderWindowLayerUtilities::GetRenderWindowPredicate(const BaseRenderer* renderer)
+{
+  NodePredicateAnd::Pointer renderWindowPredicate = NodePredicateAnd::New();
+
+  NodePredicateProperty::Pointer helperObject = NodePredicateProperty::New("helper object", BoolProperty::New(true));
+  NodePredicateProperty::Pointer fixedLayer = NodePredicateProperty::New("fixedLayer", BoolProperty::New(true), renderer);
+
+  renderWindowPredicate->AddPredicate(NodePredicateNot::New(helperObject));
+  renderWindowPredicate->AddPredicate(fixedLayer);
+
+  return renderWindowPredicate;
+}
+
+void mitk::RenderWindowLayerUtilities::SetRenderWindowProperties(mitk::DataNode* dataNode, const BaseRenderer* renderer)
+{
+  dataNode->SetBoolProperty("fixedLayer", true, renderer);
+  // use visibility of existing renderer or common renderer
+  // common renderer is used if renderer-specific property does not exist
+  bool visible = false;
+  bool visibilityProperty = dataNode->GetVisibility(visible, renderer);
+  if (true == visibilityProperty)
+  {
+    // found a visibility property
+    dataNode->SetVisibility(visible, renderer);
+  }
+
+  // use layer of existing renderer or common renderer
+  // common renderer is used if renderer-specific property does not exist
+  int layer = -1;
+  bool layerProperty = dataNode->GetIntProperty("layer", layer, renderer);
+  if (true == layerProperty)
+  {
+    // found a layer property
+    dataNode->SetIntProperty("layer", layer, renderer);
+  }
 }

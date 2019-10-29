@@ -148,7 +148,7 @@ extern "C"
   history data is written to that buffer: the seed pixel gets a 1, all direct neighbours 2 etc. The buffer is
   not cleared in this function and can thus hold history data of several growing processes in different areas.
   */
-extern mitkIpPicDescriptor* ipMITKSegmentationGrowRegion4N( mitkIpPicDescriptor *src, int startOfs, bool relativeBounds, float lowerBound, float upperBound, int maxIterations, mitkIpPicDescriptor *segBuffer, mitkIpPicDescriptor *histBuffer=0 );
+extern mitkIpPicDescriptor* ipMITKSegmentationGrowRegion4N( mitkIpPicDescriptor *src, int startOfs, bool relativeBounds, float lowerBound, float upperBound, int maxIterations, mitkIpPicDescriptor *segBuffer, mitkIpPicDescriptor *histBuffer=nullptr );
 
 /*!
   Same as the other ipMITKSegmentationGrowRegion4N with two additional return values:
@@ -156,7 +156,7 @@ extern mitkIpPicDescriptor* ipMITKSegmentationGrowRegion4N( mitkIpPicDescriptor 
   Take care: if the region could not grow at all (e.g. with fixed borders) contourOfs will be -1 !!!
   startCol holds the color that was used as base if relativeBounds is true
   */
-extern mitkIpPicDescriptor* ipMITKSegmentationGrowRegion4N( mitkIpPicDescriptor *src, int startOfs, bool relativeBounds, float lowerBound, float upperBound, int maxIterations, mitkIpPicDescriptor *segBuffer, int &contourOfs, float &startCol, mitkIpPicDescriptor *histBuffer=0 );
+extern mitkIpPicDescriptor* ipMITKSegmentationGrowRegion4N( mitkIpPicDescriptor *src, int startOfs, bool relativeBounds, float lowerBound, float upperBound, int maxIterations, mitkIpPicDescriptor *segBuffer, int &contourOfs, float &startCol, mitkIpPicDescriptor *histBuffer=nullptr );
 
 /*!
   Replaces the 4 neighbourhood region around startOfs (y*picWidth+x) of the 2D segmented image seg with newValue.
@@ -168,7 +168,7 @@ extern int ipMITKSegmentationReplaceRegion4N( mitkIpPicDescriptor *seg, int star
 /*!
   Same as above, but for the 8 neighbourhood contour.
   */
-extern float* ipMITKSegmentationGetContour8N( const mitkIpPicDescriptor *seg, int startOfs, int &numPoints, int &sizeBuffer, float *pointBuffer=0 );
+extern float* ipMITKSegmentationGetContour8N( const mitkIpPicDescriptor *seg, int startOfs, int &numPoints, int &sizeBuffer, float *pointBuffer=nullptr );
 
 
 typedef struct {

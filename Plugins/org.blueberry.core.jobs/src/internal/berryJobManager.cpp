@@ -459,7 +459,8 @@ void JobManager::ChangeState(InternalJob::Pointer sptr_job, int newState)
     case Job::SLEEPING:
       m_JobQueueSleeping.Remove(sptr_job);
       // assert(false, "Tried to remove a job that wasn't in the queue");
-
+      // this silences the warning but should be checked:
+      // FALLTHRU
     case Job::RUNNING:
     case InternalJob::ABOUT_TO_RUN:
       m_running.remove(sptr_job);

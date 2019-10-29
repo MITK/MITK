@@ -142,7 +142,7 @@ bool mitk::CollectionWriter::ExportCollectionToFolder(DataCollection *dataCollec
           Image::Pointer image = itemCollections->GetMitkImage(s).GetPointer();
           IOUtil::Save(image, fileName.toStdString());
         }
-        catch( const std::exception& e)
+        catch ( const std::exception& e )
         {
           MITK_ERROR << "Caught exception: " << e.what();
         }
@@ -254,7 +254,7 @@ bool mitk::CollectionWriter::SaveCollection(mitk::DataCollection *dataCollection
           Image::Pointer image = itemCollections->GetMitkImage(s).GetPointer();
           IOUtil::Save(image,fileName.toStdString());
         }
-        catch( const std::exception& e)
+        catch ( const std::exception& e )
         {
           MITK_ERROR << "Caught exception: " << e.what();
         }

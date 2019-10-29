@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
   parser.setArgumentPrefix("--", "-");
   // required params
   parser.addArgument("image", "i", mitkCommandLineParser::StringList, "Input Image", "Path to the input images. Mask covers area of all images", us::Any(), false);
-  parser.addArgument("mask", "m", mitkCommandLineParser::InputImage, "Input Mask", "The median of the area covered by this mask will be set to 1", us::Any(), false);
+  parser.addArgument("mask", "m", mitkCommandLineParser::Image, "Input Mask", "The median of the area covered by this mask will be set to 1", us::Any(), false, false, false, mitkCommandLineParser::Input);
 
   // Miniapp Infos
   parser.setCategory("Classification Tools");

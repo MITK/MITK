@@ -42,7 +42,7 @@ const std::string QmitkIGTTrackingSemiAutomaticMeasurementView::VIEW_ID = "org.m
 
 QmitkIGTTrackingSemiAutomaticMeasurementView::QmitkIGTTrackingSemiAutomaticMeasurementView()
   : QmitkFunctionality()
-  , m_Controls(0)
+  , m_Controls(nullptr)
   , m_MultiWidget(nullptr)
 {
   m_NextFile = 0;

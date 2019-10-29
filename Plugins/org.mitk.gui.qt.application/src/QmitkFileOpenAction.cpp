@@ -95,7 +95,7 @@ class QmitkFileOpenActionPrivate
 {
 public:
 
-  void init ( berry::IWorkbenchWindow* window, QmitkFileOpenAction* action )
+  void Init(berry::IWorkbenchWindow* window, QmitkFileOpenAction* action)
   {
     m_Window = window;
     action->setText("&Open File...");
@@ -107,27 +107,27 @@ public:
   berry::IPreferences::Pointer GetPreferences() const
   {
     berry::IPreferencesService* prefService = mitk::PluginActivator::GetInstance()->GetPreferencesService();
-    if (prefService)
+    if (prefService != nullptr)
     {
       return prefService->GetSystemPreferences()->Node("/General");
     }
     return berry::IPreferences::Pointer(nullptr);
   }
 
-  QString getLastFileOpenPath() const
+  QString GetLastFileOpenPath() const
   {
     berry::IPreferences::Pointer prefs = GetPreferences();
-    if(prefs.IsNotNull())
+    if (prefs.IsNotNull())
     {
       return prefs->Get("LastFileOpenPath", "");
     }
     return QString();
   }
 
-  void setLastFileOpenPath(const QString& path) const
+  void SetLastFileOpenPath(const QString& path) const
   {
     berry::IPreferences::Pointer prefs = GetPreferences();
-    if(prefs.IsNotNull())
+    if (prefs.IsNotNull())
     {
       prefs->Put("LastFileOpenPath", path);
       prefs->Flush();
@@ -137,7 +137,7 @@ public:
   bool GetOpenEditor() const
   {
     berry::IPreferences::Pointer prefs = GetPreferences();
-    if(prefs.IsNotNull())
+    if (prefs.IsNotNull())
     {
       return prefs->GetBool("OpenEditor", true);
     }
@@ -148,23 +148,25 @@ public:
 };
 
 QmitkFileOpenAction::QmitkFileOpenAction(berry::IWorkbenchWindow::Pointer window)
-  : QAction(nullptr), d(new QmitkFileOpenActionPrivate)
+  : QAction(nullptr)
+  , d(new QmitkFileOpenActionPrivate)
 {
-  d->init(window.GetPointer(), this);
+  d->Init(window.GetPointer(), this);
 }
 
-QmitkFileOpenAction::QmitkFileOpenAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window)
-  : QAction(nullptr), d(new QmitkFileOpenActionPrivate)
+QmitkFileOpenAction::QmitkFileOpenAction(const QIcon& icon, berry::IWorkbenchWindow::Pointer window)
+  : QAction(nullptr)
+  , d(new QmitkFileOpenActionPrivate)
 {
-  d->init(window.GetPointer(), this);
-  this->setIcon(icon);
+  d->Init(window.GetPointer(), this);
+  setIcon(icon);
 }
 
 QmitkFileOpenAction::QmitkFileOpenAction(const QIcon& icon, berry::IWorkbenchWindow* window)
   : QAction(nullptr), d(new QmitkFileOpenActionPrivate)
 {
-  d->init(window, this);
-  this->setIcon(icon);
+  d->Init(window, this);
+  setIcon(icon);
 }
 
 QmitkFileOpenAction::~QmitkFileOpenAction()
@@ -176,7 +178,7 @@ void QmitkFileOpenAction::Run()
   auto path = GetPathOfFirstSelectedNode();
 
   if (path.isEmpty())
-    path = d->getLastFileOpenPath();
+    path = d->GetLastFileOpenPath();
 
   // Ask the user for a list of files to open
   QStringList fileNames = QFileDialog::getOpenFileNames(nullptr, "Open",
@@ -184,9 +186,10 @@ void QmitkFileOpenAction::Run()
                                                         QmitkIOUtil::GetFileOpenFilterString());
 
   if (fileNames.empty())
+  {
     return;
+  }
 
-  d->setLastFileOpenPath(fileNames.front());
-  mitk::WorkbenchUtil::LoadFiles(fileNames, berry::IWorkbenchWindow::Pointer(d->m_Window),
-                                 d->GetOpenEditor());
+  d->SetLastFileOpenPath(fileNames.front());
+  mitk::WorkbenchUtil::LoadFiles(fileNames, berry::IWorkbenchWindow::Pointer(d->m_Window), d->GetOpenEditor());
 }

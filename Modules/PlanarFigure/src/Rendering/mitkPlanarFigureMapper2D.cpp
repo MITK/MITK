@@ -28,6 +28,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <cmath>
 
+#include <array>
+#include <vector>
+
 mitk::PlanarFigureMapper2D::PlanarFigureMapper2D()
   : m_NodeModified(true), m_NodeModifiedObserverTag(0), m_NodeModifiedObserverAdded(false), m_Initialized(false)
 {
@@ -223,15 +226,17 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(const mitk::PlanarFigure::PolyLin
 
   // now paint all the points in one run
 
-  auto* points = new float[pointlist.size()*2];
+  std::vector<float> points;
+  points.reserve(pointlist.size() * 2);
+
   for (unsigned int i = 0 ; i < pointlist.size() ; ++i)
   {
-    points[i * 2] = pointlist[i][0];
-    points[i * 2 + 1] = pointlist[i][1];
+    points.push_back(pointlist[i][0]);
+    points.push_back(pointlist[i][1]);
   }
 
   if (2 <= pointlist.size())
-    m_Context->DrawPoly(points,pointlist.size());
+    m_Context->DrawPoly(points.data(), pointlist.size());
 
   anchorPoint = rightMostPoint;
 }
@@ -331,17 +336,18 @@ void mitk::PlanarFigureMapper2D::DrawMarker(const mitk::Point2D &point,
       // Paint outline
       this->m_Context->GetPen()->SetColorF((double)lineColor[0], (double)lineColor[1], (double)lineColor[2], (double)lineOpacity);
 
-      auto* outline = new float[8];
-      outline[0] = displayPoint[0] - 4;
-      outline[1] = displayPoint[1] - 4;
-      outline[2] = outline[0];
-      outline[3] = displayPoint[1] + 4;
-      outline[4] = displayPoint[0] + 4;
-      outline[5] = outline[3];
-      outline[6] = outline[4];
-      outline[7] = outline[1];
+      std::array<float, 8> outline = {{
+        static_cast<float>(displayPoint[0] - 4),
+        static_cast<float>(displayPoint[1] - 4),
+        static_cast<float>(displayPoint[0] - 4),
+        static_cast<float>(displayPoint[1] + 4),
+        static_cast<float>(displayPoint[0] + 4),
+        static_cast<float>(displayPoint[1] + 4),
+        static_cast<float>(displayPoint[0] + 4),
+        static_cast<float>(displayPoint[1] - 4)
+      }};
 
-      m_Context->DrawLines(outline, 4);
+      m_Context->DrawLines(outline.data(), 4);
       break;
     }
 
@@ -857,13 +863,6 @@ void mitk::PlanarFigureMapper2D::RenderLines(const PlanarFigureDisplayMode lineD
     const float *color = m_OutlineColor[lineDisplayMode];
     const float opacity = m_OutlineOpacity[lineDisplayMode];
 
-    // convert to a float array that also contains opacity, faster GL
-    auto *colorVector = new float[4];
-    colorVector[0] = color[0];
-    colorVector[1] = color[1];
-    colorVector[2] = color[2];
-    colorVector[3] = opacity;
-
     // set the color and opacity here as it is common for all outlines
 
     this->m_Context->GetPen()->SetColorF((double)color[0], (double)color[1], (double)color[2], opacity);
@@ -886,9 +885,6 @@ void mitk::PlanarFigureMapper2D::RenderLines(const PlanarFigureDisplayMode lineD
 
     // Draw the outline for all helper objects if requested
     this->DrawHelperLines(planarFigure, anchorPoint, planarFigurePlaneGeometry, rendererPlaneGeometry, renderer);
-
-    // cleanup
-    delete[] colorVector;
   }
 
   // If we want to draw a shadow, we do it here
@@ -899,13 +895,6 @@ void mitk::PlanarFigureMapper2D::RenderLines(const PlanarFigureDisplayMode lineD
     float shadowOpacity = 0.0f;
     if (opacity > 0.2f)
       shadowOpacity = opacity - 0.2f;
-
-    // convert to a float array that also contains opacity, faster GL
-    auto *shadow = new float[4];
-    shadow[0] = 0;
-    shadow[1] = 0;
-    shadow[2] = 0;
-    shadow[3] = shadowOpacity;
 
     // set the color and opacity here as it is common for all shadows
     this->m_Context->GetPen()->SetColorF(0, 0, 0, shadowOpacity);
@@ -928,9 +917,6 @@ void mitk::PlanarFigureMapper2D::RenderLines(const PlanarFigureDisplayMode lineD
 
     // Draw the outline for all helper objects if requested
     this->DrawHelperLines(planarFigure, anchorPoint, planarFigurePlaneGeometry, rendererPlaneGeometry, renderer);
-
-    // cleanup
-    delete[] shadow;
   }
 
   // set this in brackets to avoid duplicate variables in the same scope

@@ -21,6 +21,12 @@ SET(H_FILES
   include/mitkPAVesselProperties.h
   include/mitkPASimulationBatchGeneratorParameters.h
   include/mitkPAExceptions.h
+  include/mitkPASpectralUnmixingFilterBase.h
+  include/mitkPALinearSpectralUnmixingFilter.h
+  include/mitkPASpectralUnmixingSO2.h
+  include/mitkPASpectralUnmixingFilterLagrange.h
+  include/mitkPASpectralUnmixingFilterSimplex.h
+  include/mitkPASpectralUnmixingFilterVigra.h
 )
 
 set(CPP_FILES
@@ -45,6 +51,13 @@ set(CPP_FILES
   Utils/ProbeDesign/mitkPAProbe.cpp
   Utils/ProbeDesign/mitkPALightSource.cpp
   Utils/Thread/mitkPAMonteCarloThreadHandler.cpp
+  SUFilter/mitkPASpectralUnmixingFilterBase.cpp
+  SUFilter/mitkPALinearSpectralUnmixingFilter.cpp
+  SUFilter/mitkPASpectralUnmixingSO2.cpp
+  SUFilter/mitkPASpectralUnmixingFilterSimplex.cpp
+  SUFilter/mitkPASpectralUnmixingFilterVigra.cpp
+  SUFilter/mitkPASpectralUnmixingFilterLagrange.cpp
+  Utils/mitkPAVesselDrawer.cpp
 )
 
 set(RESOURCE_FILES

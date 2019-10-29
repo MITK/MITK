@@ -66,6 +66,7 @@ namespace mitk
     * \param[in] planarLine A planar line along which the intensity profile will be evaluated.
     * \param[in] numSamples Number of samples along the planar line (must be at least 2).
     * \param[in] interpolator Image interpolation function which is used to read each sample.
+    * \throw if image is 4D
     *
     * \return The computed intensity profile.
     */
@@ -78,6 +79,7 @@ namespace mitk
     * \param[in] endPoint A point at which the last sample is to be read.
     * \param[in] numSamples Number of samples between startPoint and endPoint (must be at least 2).
     * \param[in] interpolator Image interpolation function which is used to read each sample.
+   * \throw if image is 4D
     *
     * \return The computed intensity profile.
     */
@@ -106,7 +108,7 @@ namespace mitk
     * \param[in] stats An ImageStatisticsCalculator::Statistics object to hold the calculated statistics.
     *
     */
-  MITKIMAGESTATISTICS_EXPORT void ComputeIntensityProfileStatistics(IntensityProfile::ConstPointer intensityProfile, ImageStatisticsCalculator::StatisticsContainer::Pointer stats);
+  MITKIMAGESTATISTICS_EXPORT void ComputeIntensityProfileStatistics(IntensityProfile::ConstPointer intensityProfile, ImageStatisticsContainer::ImageStatisticsObject& stats);
 
   /** \brief Compute center of maximum area under the curve of an intensity profile.
     *

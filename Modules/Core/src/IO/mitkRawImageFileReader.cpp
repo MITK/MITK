@@ -184,10 +184,10 @@ mitk::BaseData::Pointer mitk::RawImageFileReaderService::TypedRead(const std::st
   {
     reader->Update();
   }
-  catch (itk::ExceptionObject &err)
+  catch ( const itk::ExceptionObject &err )
   {
     MITK_ERROR << "An error occurred during the raw image reading process: ";
-    MITK_INFO << err << std::endl;
+    MITK_INFO << err.GetDescription() << std::endl;
   }
 
   mitk::Image::Pointer image = mitk::Image::New();

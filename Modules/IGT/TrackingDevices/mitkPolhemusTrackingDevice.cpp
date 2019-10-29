@@ -207,7 +207,19 @@ void mitk::PolhemusTrackingDevice::TrackTools()
         for (size_t i = 0; i < allTools.size(); i++)
         {
           mitk::PolhemusTool::Pointer currentTool = allTools.at(i);
-          currentTool->SetDataValid(true);
+
+          const int distortionLevel = lastData.at(i).distortionLevel;
+
+          if (distortionLevel == 0)
+          {
+            currentTool->SetDataValid(true);
+          }
+          else
+          {
+            currentTool->SetDataValid(false);
+          }
+
+          currentTool->SetDistortionLevel(distortionLevel);
           currentTool->SetPosition(lastData.at(i).pos);
           currentTool->SetOrientation(lastData.at(i).rot);
           currentTool->SetIGTTimeStamp(mitk::IGTTimeStamp::GetInstance()->GetElapsed());

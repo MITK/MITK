@@ -120,7 +120,7 @@ void QmitkSurfaceToImageWidget::OnSurface2ImagePressed()
     return;
   }
 
-  mitk::Image::Pointer resultImage(0);
+  mitk::Image::Pointer resultImage(nullptr);
   resultImage = this->ConvertSurfaceToImage( image, surface );
 
   if( resultImage.IsNull() )
@@ -163,7 +163,7 @@ mitk::Image::Pointer QmitkSurfaceToImageWidget::ConvertSurfaceToImage( mitk::Ima
   catch(mitk::Exception& e)
   {
     MITK_ERROR << "exception caught: " << e.GetDescription();
-    return 0;
+    return nullptr;
   }
 
   mitk::Image::Pointer resultImage = filter->GetOutput();

@@ -112,7 +112,7 @@ public:
     std::string jsonRevision = "";
     bool hasRevision = parsedPropertyList->GetStringProperty("CEST.Revision", revision);
     parsedPropertyList->GetStringProperty("CEST.Offset", offset);
-    parsedPropertyList->GetStringProperty("CEST.Offsets", offsets);
+    parsedPropertyList->GetStringProperty(mitk::CEST_PROPERTY_NAME_OFFSETS().c_str(), offsets);
     parsedPropertyList->GetStringProperty("CEST.measurements", measurements);
     parsedPropertyList->GetStringProperty("CEST.SamplingType", sampling);
     parsedPropertyList->GetStringProperty("CEST.revision_json", jsonRevision);
@@ -243,7 +243,7 @@ public:
     std::string jsonRevision = "";
     bool hasRevision = parsedPropertyList->GetStringProperty("CEST.Revision", revision);
     parsedPropertyList->GetStringProperty("CEST.Offset", offset);
-    parsedPropertyList->GetStringProperty("CEST.Offsets", offsets);
+    parsedPropertyList->GetStringProperty(mitk::CEST_PROPERTY_NAME_OFFSETS().c_str(), offsets);
     parsedPropertyList->GetStringProperty("CEST.measurements", measurements);
     parsedPropertyList->GetStringProperty("CEST.SamplingType", sampling);
     parsedPropertyList->GetStringProperty("CEST.revision_json", jsonRevision);
@@ -297,7 +297,7 @@ public:
     mitk::CustomTagParser tagParser(m_PathToModule);
     auto parsedPropertyList = tagParser.ParseDicomPropertyString(m_ValidCESTCustomTagAlternatingOffset);
     std::string offsets = "";
-    parsedPropertyList->GetStringProperty("CEST.Offsets", offsets);
+    parsedPropertyList->GetStringProperty(mitk::CEST_PROPERTY_NAME_OFFSETS().c_str(), offsets);
 
     bool offsetsMatch = (offsets == "-300 2 -2 1.86667 -1.86667 1.73333 -1.73333 1.6 -1.6 1.46667 -1.46667 1.33333 -1.33333 1.2 -1.2 1.06667 -1.06667 0.933333 -0.933333 0.8 -0.8 0.666667 -0.666667 0.533333 -0.533333 0.4 -0.4 0.266667 -0.266667 0.133333 -0.133333 0");
 
@@ -308,7 +308,7 @@ public:
     mitk::CustomTagParser tagParser(m_PathToModule);
     auto parsedPropertyList = tagParser.ParseDicomPropertyString(m_ValidCESTCustomTagSingleOffset);
     std::string offsets = "";
-    parsedPropertyList->GetStringProperty("CEST.Offsets", offsets);
+    parsedPropertyList->GetStringProperty(mitk::CEST_PROPERTY_NAME_OFFSETS().c_str(), offsets);
 
     bool offsetsMatch = (offsets == "-300 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2");
 
@@ -330,7 +330,7 @@ public:
     mitk::CustomTagParser tagParser(m_PathToModule);
     auto parsedPropertyList = tagParser.ParseDicomPropertyString(m_ValidCESTCustomTagListOffset);
     std::string offsets = "";
-    parsedPropertyList->GetStringProperty("CEST.Offsets", offsets);
+    parsedPropertyList->GetStringProperty(mitk::CEST_PROPERTY_NAME_OFFSETS().c_str(), offsets);
     std::string referenceString = "-300 -100 -50 -35 -25 -17 -12 -9.5 -8.25 -7 -6.1 -5.4 -4.7 -4 -3.3 -2.7 -2 -1.7 -1.5 -1.1 -0.9 -300 -0.6 -0.4 -0.2 0 0.2 0.4 0.6 0.95 1.1 1.25 1.4 1.55 1.7 1.85 2 2.15 2.3 2.45 2.6 2.75 2.9 3.05 -300 3.2 3.35 3.5 3.65 3.8 3.95 4.1 4.25 4.4 4.7 5.2 6 7 9 12 17 25 35 50 100 -300";
     bool offsetsMatch = (offsets == referenceString);
 

@@ -38,7 +38,7 @@ void QmitkDataStorageSimpleTreeModel::ResetTree()
 {
   mitk::DataNode::Pointer rootDataNode = mitk::DataNode::New();
   rootDataNode->SetName("Data Storage");
-  m_Root = new TreeItem(rootDataNode, 0);
+  m_Root = new TreeItem(rootDataNode, nullptr);
 }
 
 void QmitkDataStorageSimpleTreeModel::DataStorageChanged()
@@ -297,7 +297,7 @@ mitk::DataNode *QmitkDataStorageSimpleTreeModel::GetParentNode(const mitk::DataN
 
 void QmitkDataStorageSimpleTreeModel::AddNodeInternal(const mitk::DataNode *node)
 {
-  if (node == nullptr || m_DataStorage.IsExpired() || !m_DataStorage.Lock()->Exists(node) || m_Root->Find(node) != 0)
+  if (node == nullptr || m_DataStorage.IsExpired() || !m_DataStorage.Lock()->Exists(node) || m_Root->Find(node) != nullptr)
     return;
 
   // find out if we have a root node

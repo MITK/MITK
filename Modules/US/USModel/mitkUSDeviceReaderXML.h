@@ -40,7 +40,7 @@ namespace mitk {
 
     void SetFilename(std::string filename);
 
-    typedef struct USVideoDeviceConfigData_
+    typedef struct USDeviceConfigData_
     {
       double fileversion;
       std::string deviceType;
@@ -48,6 +48,9 @@ namespace mitk {
       std::string manufacturer;
       std::string model;
       std::string comment;
+      std::string host;
+      int port;
+      bool server;
       int numberOfImageStreams;
 
       bool useGreyscale;
@@ -60,17 +63,18 @@ namespace mitk {
 
       std::vector <mitk::USProbe::Pointer> probes;
 
-      USVideoDeviceConfigData_()
+      USDeviceConfigData_()
         : fileversion(0), deviceType("Unknown"), deviceName("Unknown"),
-          manufacturer("Unknown"), comment(""), numberOfImageStreams(1),
+          manufacturer("Unknown"), comment(""), host("localhost"),
+          port(18944), server(false), numberOfImageStreams(1),
           useGreyscale(true), useResolutionOverride(true),
           resolutionWidth(640), resolutionHeight(480), sourceID(0),
           filepathVideoSource(""), opencvPort(0)
         { };
 
-    }USVideoDeviceConfigData;
+    }USDeviceConfigData;
 
-    USVideoDeviceConfigData &GetUSVideoDeviceConfigData();
+    USDeviceConfigData &GetUSDeviceConfigData();
 
   protected:
     USDeviceReaderXML(const USDeviceReaderXML& other);
@@ -93,7 +97,7 @@ namespace mitk {
 
   private:
     std::string m_Filename;
-    USVideoDeviceConfigData m_DeviceConfig;
+    USDeviceConfigData m_DeviceConfig;
   };
 
 } // namespace mitk

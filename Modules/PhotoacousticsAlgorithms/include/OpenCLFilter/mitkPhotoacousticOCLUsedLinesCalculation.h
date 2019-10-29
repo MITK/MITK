@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkOclDataSetToDataSetFilter.h"
 #include <itkObject.h>
-#include "mitkPhotoacousticBeamformingSettings.h"
+#include "mitkBeamformingSettings.h"
 
 namespace mitk
 {
@@ -33,26 +33,19 @@ namespace mitk
 
   class OCLUsedLinesCalculation : public OclDataSetToDataSetFilter, public itk::Object
   {
-
   public:
     mitkClassMacroItkParent(OCLUsedLinesCalculation, itk::Object);
-    itkNewMacro(Self);
+    mitkNewMacro1Param(Self, mitk::BeamformingSettings::Pointer);
 
     void Update();
 
-    /** \brief Sets a new configuration to use.
-    *
-    * @param conf The configuration set to use for the calculation of the used lines.
-    */
-    void SetConfig(BeamformingSettings conf)
-    {
-      m_Conf = conf;
-    }
+    void SetElementHeightsBuffer(cl_mem elementHeightsBuffer);
+    void SetElementPositionsBuffer(cl_mem elementPositionsBuffer);
 
   protected:
 
     /** Constructor */
-    OCLUsedLinesCalculation();
+    OCLUsedLinesCalculation(mitk::BeamformingSettings::Pointer settings);
 
     /** Destructor */
     virtual ~OCLUsedLinesCalculation();
@@ -76,14 +69,15 @@ namespace mitk
 
     int m_sizeThis;
 
-
   private:
     /** The OpenCL kernel for the filter */
     cl_kernel m_PixelCalculation;
 
-    BeamformingSettings m_Conf;
+    BeamformingSettings::Pointer m_Conf;
     float m_part;
     size_t m_ChunkSize[3];
+    cl_mem m_ElementHeightsBuffer;
+    cl_mem m_ElementPositionsBuffer;
   };
 }
 #endif

@@ -40,7 +40,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES Windows)
     execute_process(COMMAND ${vswhere} -latest -property installationPath
       OUTPUT_VARIABLE installationPath
       OUTPUT_STRIP_TRAILING_WHITESPACE)
-    file(TO_CMAKE_PATH ${installationPath} installationPath)
+    file(TO_CMAKE_PATH "${installationPath}" installationPath)
     set(redistPath "${installationPath}/VC/Redist/MSVC")
     file(GLOB redistPath "${installationPath}/VC/Redist/MSVC/*")
     list(LENGTH redistPath length)

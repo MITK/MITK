@@ -3,6 +3,7 @@ set(MODULE_TESTS
   mitkPointSetStatisticsCalculatorTest.cpp
   mitkPointSetDifferenceStatisticsCalculatorTest.cpp
   mitkImageStatisticsTextureAnalysisTest.cpp
+  mitkImageStatisticsContainerManagerTest.cpp
 )
 
 set(MODULE_CUSTOM_TESTS

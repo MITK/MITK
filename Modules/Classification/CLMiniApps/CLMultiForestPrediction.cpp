@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
         {
           allConfig.ReadFile(argv[i]);
         }
-        catch (std::exception &e)
+        catch ( const std::exception &e )
         {
           MITK_INFO << e.what();
         }

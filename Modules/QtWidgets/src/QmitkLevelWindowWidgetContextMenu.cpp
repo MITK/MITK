@@ -14,11 +14,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include <QmitkLevelWindowWidgetContextMenu.h>
+
+// mitk core
+#include <mitkRenderingManager.h>
+
+// mitk qt widgets
 #include "QmitkLevelWindowPresetDefinitionDialog.h"
 #include "QmitkLevelWindowRangeChangeDialog.h"
+
+// qt
 #include <QCursor>
-#include <QmitkLevelWindowWidgetContextMenu.h>
-#include <mitkRenderingManager.h>
 
 QmitkLevelWindowWidgetContextMenu::QmitkLevelWindowWidgetContextMenu(QWidget *parent, Qt::WindowFlags f)
   : QWidget(parent, f)
@@ -32,7 +38,7 @@ QmitkLevelWindowWidgetContextMenu::~QmitkLevelWindowWidgetContextMenu()
   m_LevelWindowPreset->Delete();
 }
 
-void QmitkLevelWindowWidgetContextMenu::setPreset(QAction *presetAction)
+void QmitkLevelWindowWidgetContextMenu::OnSetPreset(const QAction *presetAction)
 {
   QString item = presetAction->text();
   if (!(presetAction == m_PresetAction))
@@ -73,12 +79,12 @@ void QmitkLevelWindowWidgetContextMenu::setPreset(QAction *presetAction)
   }
 }
 
-void QmitkLevelWindowWidgetContextMenu::setLevelWindowManager(mitk::LevelWindowManager *levelWindowManager)
+void QmitkLevelWindowWidgetContextMenu::SetLevelWindowManager(mitk::LevelWindowManager *levelWindowManager)
 {
   m_Manager = levelWindowManager;
 }
 
-void QmitkLevelWindowWidgetContextMenu::addPreset()
+void QmitkLevelWindowWidgetContextMenu::OnAddPreset()
 {
   QmitkLevelWindowPresetDefinitionDialog addPreset(this);
   addPreset.setPresets(m_LevelWindowPreset->getLevelPresets(),
@@ -91,41 +97,41 @@ void QmitkLevelWindowWidgetContextMenu::addPreset()
   }
 }
 
-void QmitkLevelWindowWidgetContextMenu::setFixed()
+void QmitkLevelWindowWidgetContextMenu::OnSetFixed()
 {
   m_LevelWindow.SetFixed(!m_LevelWindow.GetFixed());
   m_Manager->SetLevelWindow(m_LevelWindow);
 }
 
-void QmitkLevelWindowWidgetContextMenu::useAllGreyvaluesFromImage()
+void QmitkLevelWindowWidgetContextMenu::OnUseAllGreyvaluesFromImage()
 {
   m_LevelWindow.SetToImageRange(m_Manager->GetCurrentImage());
   m_Manager->SetLevelWindow(m_LevelWindow);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkLevelWindowWidgetContextMenu::useOptimizedLevelWindow()
+void QmitkLevelWindowWidgetContextMenu::OnUseOptimizedLevelWindow()
 {
   m_LevelWindow.SetAuto(m_Manager->GetCurrentImage(), false, false);
   m_Manager->SetLevelWindow(m_LevelWindow);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkLevelWindowWidgetContextMenu::setDefaultLevelWindow()
+void QmitkLevelWindowWidgetContextMenu::OnSetDefaultLevelWindow()
 {
   m_LevelWindow.ResetDefaultLevelWindow();
   m_Manager->SetLevelWindow(m_LevelWindow);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkLevelWindowWidgetContextMenu::setMaximumWindow()
+void QmitkLevelWindowWidgetContextMenu::OnSetMaximumWindow()
 {
   m_LevelWindow.SetToMaxWindowSize();
   m_Manager->SetLevelWindow(m_LevelWindow);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkLevelWindowWidgetContextMenu::setDefaultScaleRange()
+void QmitkLevelWindowWidgetContextMenu::OnSetDefaultScaleRange()
 {
   m_LevelWindow.ResetDefaultRangeMinMax();
   m_LevelWindow.SetLevelWindow(m_LevelWindow.GetLevel(), m_LevelWindow.GetWindow());
@@ -133,7 +139,7 @@ void QmitkLevelWindowWidgetContextMenu::setDefaultScaleRange()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkLevelWindowWidgetContextMenu::changeScaleRange()
+void QmitkLevelWindowWidgetContextMenu::OnChangeScaleRange()
 {
   QmitkLevelWindowRangeChangeDialog changeRange(this);
   changeRange.setLowerLimit((mitk::ScalarType)m_LevelWindow.GetRangeMin());
@@ -147,44 +153,64 @@ void QmitkLevelWindowWidgetContextMenu::changeScaleRange()
   }
 }
 
-void QmitkLevelWindowWidgetContextMenu::setImage(QAction *imageAction)
+void QmitkLevelWindowWidgetContextMenu::OnSetImage(QAction *imageAction)
 {
-  if (imageAction == m_ImageAction)
-    if (m_Manager->isAutoTopMost() == false)
+  if (imageAction == m_AutoTopmostAction)
+  {
+    if (m_Manager->IsAutoTopMost() == false)
+    {
       m_Manager->SetAutoTopMostImage(true);
+    }
     else
+    {
       m_Manager->SetAutoTopMostImage(false);
+    }
+  }
+  else if(imageAction == m_SelectedImagesAction)
+  {
+    if (m_Manager->IsSelectedImages() == false)
+    {
+      m_Manager->SetSelectedImages(true);
+    }
+    else
+    {
+      m_Manager->SetSelectedImages(false);
+    }
+  }
   else
-    m_Manager->SetLevelWindowProperty(m_Images[imageAction]);
+  {
+    m_Manager->SetLevelWindowProperty(m_Images.at(imageAction));
+  }
 }
 
-void QmitkLevelWindowWidgetContextMenu::getContextMenu(QMenu *contextmenu)
+void QmitkLevelWindowWidgetContextMenu::GetContextMenu(QMenu *contextMenu)
 {
+  if (nullptr == contextMenu)
+  {
+    return;
+  }
+
   try
   {
     m_LevelWindow = m_Manager->GetLevelWindow();
 
-    QMenu *contextMenu = contextmenu;
-    Q_CHECK_PTR(contextMenu);
-    // contextMenu->setCheckable(true);
-    QAction *sliderFixed = contextMenu->addAction(tr("Set Slider Fixed"), this, SLOT(setFixed()));
+    QAction *sliderFixed = contextMenu->addAction(tr("Set slider fixed"), this, &QmitkLevelWindowWidgetContextMenu::OnSetFixed);
     sliderFixed->setCheckable(true);
     sliderFixed->setChecked(m_LevelWindow.IsFixed());
     contextMenu->addSeparator();
-    contextMenu->addAction(tr("Use whole image grey values"), this, SLOT(useAllGreyvaluesFromImage()));
-    contextMenu->addAction(tr("Use optimized levelwindow"), this, SLOT(useOptimizedLevelWindow()));
+    contextMenu->addAction(tr("Use whole image grey values"), this, &QmitkLevelWindowWidgetContextMenu::OnUseAllGreyvaluesFromImage);
+    contextMenu->addAction(tr("Use optimized level-window"), this, &QmitkLevelWindowWidgetContextMenu::OnUseOptimizedLevelWindow);
     contextMenu->addSeparator();
-    contextMenu->addAction(tr("Set Maximum Window"), this, SLOT(setMaximumWindow()));
-    contextMenu->addAction(tr("Default Level/Window"), this, SLOT(setDefaultLevelWindow()));
+    contextMenu->addAction(tr("Set maximum window"), this, &QmitkLevelWindowWidgetContextMenu::OnSetMaximumWindow);
+    contextMenu->addAction(tr("Default level-window"), this, &QmitkLevelWindowWidgetContextMenu::OnSetDefaultLevelWindow);
     contextMenu->addSeparator();
-    contextMenu->addAction(tr("Change Scale Range"), this, SLOT(changeScaleRange()));
-    contextMenu->addAction(tr("Default Scale Range"), this, SLOT(setDefaultScaleRange()));
+    contextMenu->addAction(tr("Change scale range"), this, &QmitkLevelWindowWidgetContextMenu::OnChangeScaleRange);
+    contextMenu->addAction(tr("Default scale range"), this, &QmitkLevelWindowWidgetContextMenu::OnSetDefaultScaleRange);
     contextMenu->addSeparator();
 
     m_PresetSubmenu = new QMenu(this);
-    Q_CHECK_PTR(m_PresetSubmenu);
     m_PresetSubmenu->setTitle("Presets");
-    m_PresetAction = m_PresetSubmenu->addAction(tr("Preset Definition"), this, SLOT(addPreset()));
+    m_PresetAction = m_PresetSubmenu->addAction(tr("Preset definition"), this, &QmitkLevelWindowWidgetContextMenu::OnAddPreset);
     m_PresetSubmenu->addSeparator();
     std::map<std::string, double> preset = m_LevelWindowPreset->getLevelPresets();
     for (auto iter = preset.begin(); iter != preset.end(); iter++)
@@ -192,51 +218,78 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu(QMenu *contextmenu)
       QString item = ((*iter).first.c_str());
       m_PresetSubmenu->addAction(item);
     }
-    connect(m_PresetSubmenu, SIGNAL(triggered(QAction *)), this, SLOT(setPreset(QAction *)));
+
+    connect(m_PresetSubmenu, &QMenu::triggered, this, &QmitkLevelWindowWidgetContextMenu::OnSetPreset);
     contextMenu->addMenu(m_PresetSubmenu);
     contextMenu->addSeparator();
-
     m_ImageSubmenu = new QMenu(this);
     m_ImageSubmenu->setTitle("Images");
-    // m_ImageSubmenu->setCheckable(true);
-    m_ImageAction = m_ImageSubmenu->addAction(tr("Set Topmost Image"));
-    m_ImageAction->setCheckable(true);
-    if (m_Manager->isAutoTopMost())
-      m_ImageAction->setChecked(true);
+
+    // add action for "auto topmost image" action
+    m_AutoTopmostAction = m_ImageSubmenu->addAction(tr("Set topmost image"));
+    m_AutoTopmostAction->setCheckable(true);
+    if (m_Manager->IsAutoTopMost())
+    {
+      m_AutoTopmostAction->setChecked(true);
+    }
+
+    // add action for "selected images" action
     m_ImageSubmenu->addSeparator();
-    Q_CHECK_PTR(m_ImageSubmenu);
+    m_SelectedImagesAction = m_ImageSubmenu->addAction(tr("Use selected images"));
+    m_SelectedImagesAction->setCheckable(true);
+    if (m_Manager->IsSelectedImages())
+    {
+      m_SelectedImagesAction->setChecked(true);
+    }
+
+    // add action for individual images
+    m_ImageSubmenu->addSeparator();
+
     mitk::DataStorage::SetOfObjects::ConstPointer allObjects = m_Manager->GetRelevantNodes();
     for (mitk::DataStorage::SetOfObjects::ConstIterator objectIter = allObjects->Begin();
-         objectIter != allObjects->End();
-         ++objectIter)
+      objectIter != allObjects->End();
+      ++objectIter)
     {
       mitk::DataNode *node = objectIter->Value();
-      if (node)
+      if (nullptr == node)
       {
-        if (node->IsVisible(nullptr) == false)
-          continue;
-        mitk::LevelWindowProperty::Pointer levelWindowProperty =
-          dynamic_cast<mitk::LevelWindowProperty *>(node->GetProperty("levelwindow"));
-        bool isHelperObject = false;
-        node->GetBoolProperty("helper object", isHelperObject);
-        if (levelWindowProperty.IsNotNull() && !isHelperObject)
+        continue;
+      }
+
+      bool isHelperObject = false;
+      node->GetBoolProperty("helper object", isHelperObject);
+
+      if (isHelperObject)
+      {
+        continue;
+      }
+
+      if (!node->IsVisible(nullptr))
+      {
+        continue;
+      }
+
+      mitk::LevelWindowProperty::Pointer levelWindowProperty =
+        dynamic_cast<mitk::LevelWindowProperty *>(node->GetProperty("levelwindow"));
+
+      if (levelWindowProperty.IsNotNull())
+      {
+        std::string name;
+        node->GetName(name);
+        QString item = name.c_str();
+        QAction *id = m_ImageSubmenu->addAction(item);
+        id->setCheckable(true);
+        m_Images[id] = levelWindowProperty;
+        if (levelWindowProperty == m_Manager->GetLevelWindowProperty())
         {
-          std::string name;
-          node->GetName(name);
-          QString item = name.c_str();
-          QAction *id = m_ImageSubmenu->addAction(item);
-          id->setCheckable(true);
-          m_Images[id] = levelWindowProperty;
-          if (levelWindowProperty == m_Manager->GetLevelWindowProperty())
-          {
-            id->setChecked(true);
-          }
+          id->setChecked(true);
         }
       }
     }
-    connect(m_ImageSubmenu, SIGNAL(triggered(QAction *)), this, SLOT(setImage(QAction *)));
-    contextMenu->addMenu(m_ImageSubmenu);
 
+    connect(m_ImageSubmenu, &QMenu::triggered, this, &QmitkLevelWindowWidgetContextMenu::OnSetImage);
+
+    contextMenu->addMenu(m_ImageSubmenu);
     contextMenu->exec(QCursor::pos());
   }
   catch (...)
@@ -244,9 +297,9 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu(QMenu *contextmenu)
   }
 }
 
-void QmitkLevelWindowWidgetContextMenu::getContextMenu()
+void QmitkLevelWindowWidgetContextMenu::GetContextMenu()
 {
   auto contextMenu = new QMenu(this);
-  getContextMenu(contextMenu);
+  GetContextMenu(contextMenu);
   delete contextMenu;
 }

@@ -56,11 +56,11 @@ protected slots:
   void DoImageProcessing();
 
 protected:
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
                                   const QList<mitk::DataNode::Pointer> &nodes) override;
 
   //! [render-window-part-listener]

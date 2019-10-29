@@ -93,8 +93,8 @@ protected:
     itk::Statistics::DenseFrequencyContainer2 > HistogramType;
 
 
-  virtual void CreateQtPartControl(QWidget *parent) override;
-  virtual void SetFocus() override;
+  void CreateQtPartControl(QWidget *parent) override;
+  void SetFocus() override;
 
   mitk::DataNode::Pointer AddAsDataNode(const mitk::BaseData::Pointer & data_, const std::string & name );
 
@@ -103,7 +103,7 @@ protected:
   void PredictSegmentation(const mitk::Image::Pointer & raw_image, const mitk::Image::Pointer & mask_image);
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
+  void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
     const QList<mitk::DataNode::Pointer>& nodes ) override;
 
   Ui::ClassificationRegionGrowControls m_Controls;

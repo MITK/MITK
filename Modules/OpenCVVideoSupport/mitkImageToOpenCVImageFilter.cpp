@@ -23,14 +23,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk{
 
   ImageToOpenCVImageFilter::ImageToOpenCVImageFilter()
-    : m_OpenCVImage(nullptr)
   {
     m_sliceSelector = ImageSliceSelector::New();
   }
 
   ImageToOpenCVImageFilter::~ImageToOpenCVImageFilter()
   {
-    m_OpenCVImage = nullptr;
   }
 
 
@@ -60,14 +58,12 @@ namespace mitk{
     return true;
   }
 
-  IplImage* ImageToOpenCVImageFilter::GetOpenCVImage()
+  cv::Mat ImageToOpenCVImageFilter::GetOpenCVMat()
   {
     auto image = m_Image.Lock();
 
     if(!this->CheckImage(image))
-      return nullptr;
-
-    m_OpenCVImage = (nullptr);
+      return cv::Mat();
 
     try
     {
@@ -79,30 +75,15 @@ namespace mitk{
     }
     catch (const AccessByItkException& e) {
       std::cout << "Caught exception [from AccessFixedTypeByItk]: \n" << e.what() << "\n";
-      return nullptr;
+      return cv::Mat();
     }
     return m_OpenCVImage;
-  }
-
-  cv::Mat ImageToOpenCVImageFilter::GetOpenCVMat()
-  {
-    IplImage* img = this->GetOpenCVImage();
-
-    cv::Mat mat;
-    if( img )
-    {
-      // do not copy data, then release just the header
-      mat = cv::cvarrToMat(img, false);
-      cvReleaseImageHeader( &img );
-    }
-
-    return mat;
   }
 
   template<typename TPixel, unsigned int VImageDimension>
   void ImageToOpenCVImageFilter::ItkImageProcessing( itk::Image<TPixel,VImageDimension>* image )
   {
-    m_OpenCVImage = itk::OpenCVImageBridge::ITKImageToIplImage(image);
+    m_OpenCVImage = itk::OpenCVImageBridge::ITKImageToCVMat(image);
   }
 
   void ImageToOpenCVImageFilter::SetInputFromTimeSlice(Image::Pointer mitkImage, int timeStep, int slice)

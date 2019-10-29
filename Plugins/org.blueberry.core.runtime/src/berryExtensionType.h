@@ -25,7 +25,6 @@ namespace berry {
 
 /**
  * \brief The ExtensionType class manages named types
- * \threadsafe
  *
  * The class associates a type
  * name to a type so that it can be created and destructed
@@ -156,7 +155,6 @@ struct ExtensionTypeIdHelper<T, false>
 } // end namespace internal
 
 /**
- * \threadsafe
  *
  * Registers the type name typeName for the type T. Returns
  * the internal ID used by ExtensionType. Any class or struct that has a

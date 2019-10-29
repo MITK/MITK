@@ -41,9 +41,9 @@ public:
 
 protected:
 
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
-  virtual void CreateQtPartControl(QWidget* parent) override;
+  void CreateQtPartControl(QWidget* parent) override;
 
 private Q_SLOTS:
 
@@ -58,6 +58,7 @@ private Q_SLOTS:
 
   void OnOnlyImages(bool checked);
   void OnOnlyImages2(bool checked);
+  void OnOnlyUneven(bool checked);
 
 private:
 

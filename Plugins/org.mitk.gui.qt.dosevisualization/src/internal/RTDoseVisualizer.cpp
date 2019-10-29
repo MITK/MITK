@@ -535,7 +535,7 @@ void RTDoseVisualizer::PrepareDoseNode( mitk::DataNode* doseNode ) const
   mitk::DoseValueAbs dose;
   mitk::GetReferenceDoseValue(dose);
   auto presetMap = mitk::LoadPresetsMap();
-  auto colorPreset = mitk::GeneratIsoLevels_Virtuos();
+  auto colorPreset = mitk::GenerateIsoLevels_Virtuos();
   auto finding = presetMap.find(mitk::GetSelectedPresetName());
   if (finding != presetMap.end())
   {

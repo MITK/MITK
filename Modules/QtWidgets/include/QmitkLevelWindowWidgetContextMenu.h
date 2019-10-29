@@ -70,52 +70,52 @@ public:
   *
   * input is a prefilled contextmenu to which standard functions will be added
   */
-  void getContextMenu(QMenu *contextmenu);
+  void GetContextMenu(QMenu *contextMenu);
 
   /// returns the contextmenu with standard functions for Level/Window
-  void getContextMenu();
+  void GetContextMenu();
 
   /// lets this object know about the LevelWindowManager to get all images and tell about changes
-  void setLevelWindowManager(mitk::LevelWindowManager *levelWindowManager);
+  void SetLevelWindowManager(mitk::LevelWindowManager *levelWindowManager);
 
 protected:
-  /// ID of preset selected in contextmenu
+
   QAction *m_PresetAction;
+  QAction *m_AutoTopmostAction;
+  QAction *m_SelectedImagesAction;
 
-  /// ID of image selected in contextmenu
-  QAction *m_ImageAction;
-
-protected slots:
+protected Q_SLOTS:
 
   /// sets level and window value of the current image to the values defined for the selected preset
-  void setPreset(QAction *presetAction);
+  void OnSetPreset(const QAction *presetAction);
 
   /// calls the mitkLevelWindow SetAuto method with guessByCentralSlice false, so that the greyvalues from whole image
   /// will be considered
-  void useOptimizedLevelWindow();
+  void OnUseOptimizedLevelWindow();
 
   /// calls the mitkLevelWindow SetToImageRange method, so that the greyvalues from whole image will be used
-  void useAllGreyvaluesFromImage();
+  void OnUseAllGreyvaluesFromImage();
 
   /// sets the level window slider to be fixed
-  void setFixed();
+  void OnSetFixed();
 
   /// adds a new Preset for presets-contextmenu
-  void addPreset();
+  void OnAddPreset();
 
   /// resets the current images Level/Window to its default values
-  void setDefaultLevelWindow();
+  void OnSetDefaultLevelWindow();
 
   /// resets the current images scalerange to its default values
-  void setDefaultScaleRange();
+  void OnSetDefaultScaleRange();
 
   /// changes the current images scalerange
-  void changeScaleRange();
+  void OnChangeScaleRange();
 
   /// sets the selected image or the topmost layer image to the new current image
-  void setImage(QAction *imageAction);
+  void OnSetImage(QAction *imageAction);
 
   /// sets the window to its maximum Size to fit the scalerange
-  void setMaximumWindow();
+  void OnSetMaximumWindow();
 };
-#endif
+
+#endif // QMITKLEVELWINDOWWIDGETCONTEXTMENU_H

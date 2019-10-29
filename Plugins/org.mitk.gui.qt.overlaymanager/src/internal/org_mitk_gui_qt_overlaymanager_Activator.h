@@ -32,8 +32,8 @@ class org_mitk_gui_qt_overlaymanager_Activator :
 public:
   static ctkPluginContext* GetContext();
 
-  void start(ctkPluginContext* context);
-  void stop(ctkPluginContext* context);
+  void start(ctkPluginContext* context) override;
+  void stop(ctkPluginContext* context) override;
 
 private:
   static ctkPluginContext* m_Context;

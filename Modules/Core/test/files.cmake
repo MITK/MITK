@@ -111,7 +111,7 @@ set(MODULE_TESTS
   mitkImageToSurfaceFilterTest.cpp
   mitkEqualTest.cpp
   mitkLineTest.cpp
-  mitkArbitraryTimeGeometryTest
+  mitkArbitraryTimeGeometryTest.cpp
   mitkItkImageIOTest.cpp
   mitkRotatedSlice4DTest.cpp
   mitkLevelWindowManagerCppUnitTest.cpp
@@ -121,6 +121,7 @@ set(MODULE_TESTS
   mitkNodePredicateGeometryTest.cpp
   mitkPreferenceListReaderOptionsFunctorTest.cpp
   mitkGenericIDRelationRuleTest.cpp
+  mitkSourceImageRelationRuleTest.cpp
 )
 
 if(MITK_ENABLE_RENDERING_TESTING)
@@ -173,7 +174,7 @@ set(MODULE_CUSTOM_TESTS
     mitkImageVtkMapper2DTransferFunctionTest.cpp
     mitkImageVtkMapper2DOpacityTransferFunctionTest.cpp
     mitkImageVtkMapper2DLookupTableTest.cpp
-    mitkSurfaceVtkMapper3DTest
+    mitkSurfaceVtkMapper3DTest.cpp
     mitkVolumeCalculatorTest.cpp
     mitkLevelWindowManagerTest.cpp
     mitkPointSetVtkMapper2DTest.cpp

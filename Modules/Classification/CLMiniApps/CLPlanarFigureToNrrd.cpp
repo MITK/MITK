@@ -84,9 +84,9 @@ int main(int argc, char* argv[])
   mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
   // required params
-  parser.addArgument("planar", "p", mitkCommandLineParser::InputDirectory, "Input Polydata", "Path to the input VTK polydata", us::Any(), false);
-  parser.addArgument("image", "i", mitkCommandLineParser::OutputDirectory, "Input Image", "Image which defines the dimensions of the Segmentation", us::Any(), false);
-  parser.addArgument("output", "o", mitkCommandLineParser::InputFile, "Output file", "Output file. ", us::Any(), false);
+  parser.addArgument("planar", "p", mitkCommandLineParser::Directory, "Input Polydata", "Path to the input VTK polydata", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("image", "i", mitkCommandLineParser::Directory, "Input Image", "Image which defines the dimensions of the Segmentation", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file", "Output file. ", us::Any(), false, false, false, mitkCommandLineParser::Input);
   // Miniapp Infos
   parser.setCategory("Classification Tools");
   parser.setTitle("Planar Data to Nrrd Segmentation");
@@ -114,10 +114,9 @@ int main(int argc, char* argv[])
     mitk::PlanarFigureMaskGenerator::Pointer pfMaskGen = mitk::PlanarFigureMaskGenerator::New();
     pfMaskGen->SetPlanarFigure(planar);
     pfMaskGen->SetTimeStep(0);
-    pfMaskGen->SetInputImage(image);
+    pfMaskGen->SetInputImage(image.GetPointer());
 
     mitk::Image::Pointer mask = pfMaskGen->GetMask();
-    mitk::Image::Pointer refImage = pfMaskGen->GetReferenceImage();
     unsigned int axis = pfMaskGen->GetPlanarFigureAxis();
     unsigned int slice = pfMaskGen->GetPlanarFigureSlice();
 

@@ -51,10 +51,10 @@ class MITKQTWIDGETS_EXPORT QmitkDataStorageComboBoxWithSelectNone : public Qmitk
      * \brief Calls base class constructor.
      * \see QmitkDataStorageComboBox
      */
-    QmitkDataStorageComboBoxWithSelectNone( mitk::DataStorage* _DataStorage,
+    QmitkDataStorageComboBoxWithSelectNone( mitk::DataStorage* dataStorage,
                                             const mitk::NodePredicateBase* predicate,
                                             QWidget* parent = nullptr,
-                                            bool autoSelectNewNodes=false);
+                                            bool autoSelectNewNodes = false);
 
     /**
      * \brief Nothing to do.
@@ -72,7 +72,7 @@ class MITKQTWIDGETS_EXPORT QmitkDataStorageComboBoxWithSelectNone : public Qmitk
      * \param dataNode an mitk::DataNode, can be nullptr.
      * \return int -1 if not found, and compared to base class, will add 1 onto the retrieved index.
      */
-    int Find( const mitk::DataNode* dataNode ) const override;
+    int Find(const mitk::DataNode* dataNode) const override;
 
     /**
      * \brief Retrieves the node at a given index, where if index is zero, will always return nullptr.

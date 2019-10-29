@@ -40,25 +40,15 @@ namespace mitk {
     itkCloneMacro(Self)
 
     /**
-     * @brief  Saves a mitk navigation tool storage to a file.
-     * @return Returns true always true since error handling was converted to exception handling.
-     *         The return value is decrepated. Will be changed to void.
+     * @brief Saves a mitk navigation tool storage to a file.
      * @throw mitk::IGTIOException Throws an exception if the given filename cannot be opened for writing or
      *                             if the temp directory is not accessible.
      */
-    bool Serialize(std::string filename, mitk::NavigationToolStorage::Pointer storage);
-
-    /**
-     * @brief This method is decrepated. Exceptions are used for error handling now!
-     * @return Returns always an empty string since error handling was converted to exception handling.
-     */
-    itkGetMacro(ErrorMessage,std::string);
+    void Serialize(const std::string& filename, mitk::NavigationToolStorage::Pointer storage);
 
   protected:
     NavigationToolStorageSerializer();
     ~NavigationToolStorageSerializer() override;
-
-   std::string m_ErrorMessage;
 
    std::string convertIntToString(int i);
 

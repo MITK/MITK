@@ -39,6 +39,10 @@ namespace mitk
 
     mitkSetVectorMacro(Offset, mitk::Vector3D); ///< Get Offset parameter
     mitkGetVectorMacro(Offset, mitk::Vector3D); ///< Set Offset parameter
+    itkSetMacro(Transform6DOF, bool);
+    itkGetMacro(Transform6DOF, bool);
+
+    void SetTransformation( mitk::AffineTransform3D::Pointer transform );
 
     /**
     *\brief Set all filter parameters (Offset) as the PropertyList p
@@ -71,6 +75,11 @@ namespace mitk
     void GenerateData() override;
 
     mitk::Vector3D m_Offset; ///< offset that is added to all inputs
+
+    bool m_Transform6DOF;
+
+    mitk::NavigationData::Pointer m_Transformation;
+
   };
 } // namespace mitk
 #endif /* MITKNAVIGATIONDATATONAVIGATIONDATAFILTER_H_HEADER_INCLUDED_ */

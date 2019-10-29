@@ -36,6 +36,8 @@ The configured command line tools are now available via the drop-down box of the
 \section MiniAppExplainPageAvailableList Available MiniApps
 
 \li \subpage DiffusionMiniApps
+\li \subpage mitkBasicImageProcessingMiniAppsPortalPage
+\li \subpage mitkClassificationMiniAppsPortalPage
 
 \section MiniAppExplainPageTechnicalInformation Technical Information
 

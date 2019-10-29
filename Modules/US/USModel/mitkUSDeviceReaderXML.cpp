@@ -38,7 +38,7 @@ mitk::USDeviceReaderXML::~USDeviceReaderXML()
 {
 }
 
-mitk::USDeviceReaderXML::USVideoDeviceConfigData &mitk::USDeviceReaderXML::GetUSVideoDeviceConfigData()
+mitk::USDeviceReaderXML::USDeviceConfigData &mitk::USDeviceReaderXML::GetUSDeviceConfigData()
 {
   return m_DeviceConfig;
 }
@@ -135,6 +135,9 @@ void mitk::USDeviceReaderXML::ExtractAttributeInformationOfUltrasoundDeviceTag(T
   ultrasoundTag->QueryStringAttribute(ATTR_MODEL, &m_DeviceConfig.model);
   ultrasoundTag->QueryStringAttribute(ATTR_COMMENT, &m_DeviceConfig.comment);
   ultrasoundTag->QueryIntAttribute(ATTR_IMAGESTREAMS, &m_DeviceConfig.numberOfImageStreams);
+  ultrasoundTag->QueryStringAttribute(ATTR_HOST, &m_DeviceConfig.host);
+  ultrasoundTag->QueryIntAttribute(ATTR_PORT, &m_DeviceConfig.port);
+  ultrasoundTag->QueryBoolAttribute(ATTR_SERVER, &m_DeviceConfig.server);
 }
 
 void mitk::USDeviceReaderXML::ExtractAttributeInformationOfGeneralSettingsTag(TiXmlElement *generalSettingsTag)

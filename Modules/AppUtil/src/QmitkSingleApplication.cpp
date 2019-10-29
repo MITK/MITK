@@ -15,7 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkSingleApplication.h"
-
 #include "QmitkSafeNotify.h"
 
 QmitkSingleApplication::QmitkSingleApplication(int &argc, char **argv, bool safeMode)
@@ -25,12 +24,9 @@ QmitkSingleApplication::QmitkSingleApplication(int &argc, char **argv, bool safe
 
 bool QmitkSingleApplication::notify(QObject *receiver, QEvent *event)
 {
-  if (!m_SafeMode)
-  {
-    return QtSingleApplication::notify(receiver, event);
-  }
-
-  return QmitkSafeNotify<QtSingleApplication>(this, receiver, event);
+  return m_SafeMode
+    ? QmitkSafeNotify<QtSingleApplication>(this, receiver, event)
+    : QtSingleApplication::notify(receiver, event);
 }
 
 void QmitkSingleApplication::setSafeMode(bool safeMode)

@@ -83,7 +83,7 @@ namespace mitk
   public:
 
     DICOMImageBlockDescriptor();
-    virtual ~DICOMImageBlockDescriptor();
+    ~DICOMImageBlockDescriptor() override;
 
     DICOMImageBlockDescriptor(const DICOMImageBlockDescriptor& other);
     DICOMImageBlockDescriptor& operator=(const DICOMImageBlockDescriptor& other);
@@ -123,14 +123,14 @@ namespace mitk
     /// Convenience function around GetProperty()
     int GetIntProperty(const std::string& key, int defaultValue) const;
 
-    virtual BaseProperty::ConstPointer GetConstProperty(const std::string &propertyKey,
+    BaseProperty::ConstPointer GetConstProperty(const std::string &propertyKey,
       const std::string &contextName = "",
       bool fallBackOnDefaultContext = true) const override;
 
-    virtual std::vector<std::string> GetPropertyKeys(const std::string &contextName = "",
+    std::vector<std::string> GetPropertyKeys(const std::string &contextName = "",
       bool includeDefaultContext = false) const override;
 
-    virtual std::vector<std::string> GetPropertyContextNames() const override;
+    std::vector<std::string> GetPropertyContextNames() const override;
 
   private:
 

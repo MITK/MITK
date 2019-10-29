@@ -48,21 +48,21 @@ class QmitkScreenshotMaker: public QmitkAbstractView, public mitk::IRenderWindow
 
 public:
   /** \brief Constructor. */
-  QmitkScreenshotMaker(QObject *parent=0, const char *name=0);
+  QmitkScreenshotMaker(QObject *parent=nullptr, const char *name=nullptr);
 
   /** \brief Destructor. */
-  virtual ~QmitkScreenshotMaker();
+  ~QmitkScreenshotMaker() override;
 
   /** \brief Method for creating the widget containing the application
    * controls, like sliders, buttons etc.
    */
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
   //  virtual QWidget * CreateControlWidget(QWidget *parent);
 
   ///
   /// Sets the focus to an internal widget.
   ///
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
   /** \brief Method for creating the connections of main and control widget.
    */
@@ -76,11 +76,11 @@ public:
   ///
   /// Called when a RenderWindowPart becomes available.
   ///
-  virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
   ///
   /// Called when a RenderWindowPart becomes unavailable.
   ///
-  virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
 
   signals:
 
@@ -104,11 +104,14 @@ protected:
 
 private:
 
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
   vtkCamera* GetCam();
   void GenerateHR3DAtlasScreenshots(QString fileName, QString filter = "");
   void GenerateMultiplanarScreenshots(QString fileName);
+
+  mitk::DataNode::Pointer GetTopLayerNode();
+  void MultichannelScreenshot(mitk::VtkPropRenderer* renderer, QString fileName, QString filter);
 
   /*!
   \brief taking a screenshot "from" the specified renderer

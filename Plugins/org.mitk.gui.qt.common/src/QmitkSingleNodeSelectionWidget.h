@@ -33,7 +33,7 @@ class QmitkAbstractDataStorageModel;
 
 /**
 * \class QmitkSingleNodeSelectionWidget
-* \brief Widget that that represents a node selection. It acts like a button. Clicking on it
+* \brief Widget that represents a node selection. It acts like a button. Clicking on it
 * allows to change the selection.
 */
 class MITK_QT_COMMON QmitkSingleNodeSelectionWidget : public QmitkAbstractNodeSelectionWidget
@@ -42,15 +42,15 @@ class MITK_QT_COMMON QmitkSingleNodeSelectionWidget : public QmitkAbstractNodeSe
 
 public:
   explicit QmitkSingleNodeSelectionWidget(QWidget* parent = nullptr);
-  ~QmitkSingleNodeSelectionWidget();
+  ~QmitkSingleNodeSelectionWidget() override;
 
   mitk::DataNode::Pointer GetSelectedNode() const;
 
   using NodeList = QmitkAbstractNodeSelectionWidget::NodeList;
 
 public Q_SLOTS:
-  virtual void SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes) override;
-  virtual void SetCurrentSelection(NodeList selectedNodes) override;
+  void SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes) override;
+  void SetCurrentSelection(NodeList selectedNodes) override;
 
 protected Q_SLOTS:
   virtual void OnClearSelection();
@@ -59,13 +59,13 @@ protected:
   mitk::DataNode::Pointer ExtractCurrentValidSelection(const NodeList& nodes) const;
   NodeList CompileEmitSelection() const;
 
-  virtual bool eventFilter(QObject *obj, QEvent *ev) override;
+  bool eventFilter(QObject *obj, QEvent *ev) override;
   void EditSelection();
-  virtual void UpdateInfo() override;
+  void UpdateInfo() override;
 
-  virtual void OnNodePredicateChanged(mitk::NodePredicateBase* newPredicate) override;
-  virtual void OnDataStorageChanged() override;
-
+  void OnNodePredicateChanged(mitk::NodePredicateBase* newPredicate) override;
+  void OnDataStorageChanged() override;
+  void NodeRemovedFromStorage(const mitk::DataNode* node) override;
 
   NodeList m_ExternalSelection;
   mitk::DataNode::Pointer m_SelectedNode;

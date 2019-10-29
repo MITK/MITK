@@ -5,7 +5,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
-    <LocalDebuggerEnvironment>PATH=@MITK_RUNTIME_PATH_RELDEB@;@CUSTOM_RUNTIME_PATH@;@CMAKE_RUNTIME_OUTPUT_DIRECTORY@\@VS_BUILD_TYPE_RELDEB@;@CMAKE_RUNTIME_OUTPUT_DIRECTORY@\plugins\@VS_BUILD_TYPE_RELDEB@;%PATH%</LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>PATH=@MITK_RUNTIME_PATH_RELWITHDEBINFO@;@CUSTOM_RUNTIME_PATH@;@CMAKE_RUNTIME_OUTPUT_DIRECTORY@\@VS_BUILD_TYPE_RELDEB@;@CMAKE_RUNTIME_OUTPUT_DIRECTORY@\plugins\@VS_BUILD_TYPE_RELDEB@;%PATH%</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -18,7 +18,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
-    <LocalDebuggerEnvironment>PATH=@MITK_RUNTIME_PATH_RELDEB@;@CUSTOM_RUNTIME_PATH@;@CMAKE_RUNTIME_OUTPUT_DIRECTORY@\@VS_BUILD_TYPE_RELDEB@;@CMAKE_RUNTIME_OUTPUT_DIRECTORY@\plugins\@VS_BUILD_TYPE_RELDEB@;%PATH%</LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>PATH=@MITK_RUNTIME_PATH_RELWITHDEBINFO@;@CUSTOM_RUNTIME_PATH@;@CMAKE_RUNTIME_OUTPUT_DIRECTORY@\@VS_BUILD_TYPE_RELDEB@;@CMAKE_RUNTIME_OUTPUT_DIRECTORY@\plugins\@VS_BUILD_TYPE_RELDEB@;%PATH%</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

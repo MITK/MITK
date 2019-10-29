@@ -38,7 +38,7 @@ class QmitkCmdLineModuleFactoryGui
 public:
 
   QmitkCmdLineModuleFactoryGui(const mitk::DataStorage* dataStorage);
-  virtual ~QmitkCmdLineModuleFactoryGui();
+  ~QmitkCmdLineModuleFactoryGui() override;
 
   /**
    * \brief Simply creates QmitkCmdLineModuleGui which is an MITK specific Qt front end.

@@ -42,6 +42,11 @@ tramp
 .org-id-locations
 *_archive
 
+# Visual Studio / VS Code
+.vs/
+out/
+CMakeSettings.json
+
 ########## OS specific
 
 ## Windows files to ignore

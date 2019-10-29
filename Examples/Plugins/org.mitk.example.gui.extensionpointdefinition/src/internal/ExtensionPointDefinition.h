@@ -33,7 +33,7 @@ class ExtensionPointDefinition : public QObject, public berry::IApplication
 
 public:
   ExtensionPointDefinition();
-  ~ExtensionPointDefinition();
+  ~ExtensionPointDefinition() override;
 
   QVariant Start(berry::IApplicationContext *context) override;
   void Stop() override;

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.14.5 FATAL_ERROR)
 
 # Change project and application name to your own
 set(MY_PROJECT_NAME $(project-name))
@@ -126,7 +126,7 @@ endif()
 set(${PROJECT_NAME}_MODULES_PACKAGE_DEPENDS_DIR "${PROJECT_SOURCE_DIR}/CMake/PackageDepends")
 set(MODULES_PACKAGE_DEPENDS_DIRS ${${PROJECT_NAME}_MODULES_PACKAGE_DEPENDS_DIR})
 
-find_package(MITK 2018.04.02 REQUIRED)
+find_package(MITK 2018.04.99 REQUIRED)
 
 if(COMMAND mitkFunctionCheckMitkCompatibility)
   mitkFunctionCheckMitkCompatibility(VERSIONS MITK_VERSION_PLUGIN_SYSTEM 1 REQUIRED)
@@ -258,7 +258,7 @@ if(BUILD_TESTING)
     try
       {")
   set(CMAKE_TESTDRIVER_AFTER_TESTMAIN " }
-      catch( std::exception & excp )
+      catch ( const std::exception & excp  )
         {
         fprintf(stderr,\"%s\\n\",excp.what());
         return EXIT_FAILURE;

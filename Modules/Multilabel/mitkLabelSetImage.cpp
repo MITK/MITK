@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLookupTableProperty.h"
 #include "mitkPadImageFilter.h"
 #include "mitkRenderingManager.h"
+#include "mitkDICOMSegmentationPropertyHelper.h"
+#include "mitkDICOMQIPropertyHelper.h"
 
 #include <vtkCell.h>
 #include <vtkTransform.h>
@@ -74,6 +76,9 @@ mitk::LabelSetImage::LabelSetImage()
   m_ExteriorLabel->SetOpacity(0.0);
   m_ExteriorLabel->SetLocked(false);
   m_ExteriorLabel->SetValue(0);
+
+  // Add some DICOM Tags as properties to segmentation image
+  DICOMSegmentationPropertyHelper::DeriveDICOMSegmentationProperties(this);
 }
 
 mitk::LabelSetImage::LabelSetImage(const mitk::LabelSetImage &other)
@@ -96,6 +101,9 @@ mitk::LabelSetImage::LabelSetImage(const mitk::LabelSetImage &other)
     mitk::Image::Pointer liClone = other.GetLayerImage(i)->Clone();
     m_LayerContainer.push_back(liClone);
   }
+
+  // Add some DICOM Tags as properties to segmentation image
+  DICOMSegmentationPropertyHelper::DeriveDICOMSegmentationProperties(this);
 }
 
 void mitk::LabelSetImage::OnLabelSetModified()
@@ -143,6 +151,9 @@ void mitk::LabelSetImage::Initialize(const mitk::Image *other)
   {
     AccessByItk(this, SetToZero);
   }
+
+  // Transfer some general DICOM properties from the source image to derived image (e.g. Patient information,...)
+  DICOMQIPropertyHelper::DeriveDICOMSourceProperties(other, this);
 
   // Add a inital LabelSet ans corresponding image data to the stack
   AddLayer();

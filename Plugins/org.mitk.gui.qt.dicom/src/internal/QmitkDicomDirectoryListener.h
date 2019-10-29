@@ -44,7 +44,7 @@ public:
     /**
     * \brief QmitkDicomDirectoryListener default destructor.
     */
-    virtual ~QmitkDicomDirectoryListener();
+    ~QmitkDicomDirectoryListener() override;
 
     /**
     * \brief sets listened directory.

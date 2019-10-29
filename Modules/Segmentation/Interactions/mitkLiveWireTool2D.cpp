@@ -29,7 +29,8 @@ namespace mitk
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, LiveWireTool2D, "LiveWire tool");
 }
 
-mitk::LiveWireTool2D::LiveWireTool2D() : SegTool2D("LiveWireTool")
+mitk::LiveWireTool2D::LiveWireTool2D()
+  : SegTool2D("LiveWireTool"), m_CreateAndUseDynamicCosts(false)
 {
 }
 

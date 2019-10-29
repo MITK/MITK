@@ -474,6 +474,7 @@ void QmitkImageNavigatorView::OnRefetch()
     {
       mitk::TimeStepType timeStep = m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetTime()->GetPos();
       geometry = timeGeometry->GetGeometryForTimeStep(timeStep);
+      SetVisibilityOfTimeSlider(timeGeometry->CountTimeSteps());
     }
 
     if (geometry.IsNotNull())
@@ -605,4 +606,11 @@ void QmitkImageNavigatorView::OnRefetch()
     this->SetBorderColors();
 
   }
+}
+
+
+void QmitkImageNavigatorView::SetVisibilityOfTimeSlider(std::size_t timeSteps)
+{
+  m_Controls.m_SliceNavigatorTime->setVisible(timeSteps > 1);
+  m_Controls.m_TimeLabel->setVisible(timeSteps > 1);
 }

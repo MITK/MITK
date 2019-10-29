@@ -100,8 +100,6 @@ namespace itk
   protected:
     IntelligentBinaryClosingFilter();
     ~IntelligentBinaryClosingFilter() override {}
-    IntelligentBinaryClosingFilter(const Self &) {}
-    void operator=(const Self &) {}
     void PrintSelf(std::ostream &os, Indent indent) const override;
 
   private:

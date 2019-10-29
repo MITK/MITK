@@ -76,7 +76,7 @@ int mitkNavigationDataToNavigationDataFilterTest(int /* argc */, char* /*argv*/[
   try {
     myFilter->GetInputIndex("invalidName");
   }
-  catch(std::invalid_argument e) {
+  catch(std::invalid_argument&) {
     throwsException = true;
   }
   MITK_TEST_CONDITION_REQUIRED(throwsException, "testing GetInputIndex(string) invalid string");

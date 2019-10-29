@@ -1,3 +1,5 @@
 {
+  "base": "git:merge-base(origin/master)",
+  "history.immutable": true,
   "phabricator.uri": "https://phabricator.mitk.org/"
 }

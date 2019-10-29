@@ -34,7 +34,7 @@ public:
   static const QString DEFAULT_PERSPECTIVE_ID;
 
   berry::WorkbenchWindowAdvisor *CreateWorkbenchWindowAdvisor(berry::IWorkbenchWindowConfigurer::Pointer) override;
-  ~CustomViewerWorkbenchAdvisor();
+  ~CustomViewerWorkbenchAdvisor() override;
 
   /**
    * Gets the style manager (berry::IQtStyleManager), adds and initializes a Qt-Stylesheet-File (.qss).

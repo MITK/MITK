@@ -30,9 +30,10 @@ function(mitkFunctionConfigureVisualStudioUserProjectFile)
   SET(VS_BUILD_TYPE_DEB debug)
   SET(VS_BUILD_TYPE_REL release)
   SET(VS_BUILD_TYPE_RELDEB relwithdebinfo)
-  mitkFunctionGetLibrarySearchPaths(MITK_RUNTIME_PATH_DEB ${VS_BUILD_TYPE_DEB})
-  mitkFunctionGetLibrarySearchPaths(MITK_RUNTIME_PATH_REL ${VS_BUILD_TYPE_REL})
-  mitkFunctionGetLibrarySearchPaths(MITK_RUNTIME_PATH_RELDEB ${VS_BUILD_TYPE_RELDEB})
+
+  mitkFunctionGetLibrarySearchPaths(MITK_RUNTIME_PATH_DEB ${VS_BUILD_TYPE_DEB} DEBUG)
+  mitkFunctionGetLibrarySearchPaths(MITK_RUNTIME_PATH_REL ${VS_BUILD_TYPE_REL} RELEASE)
+  mitkFunctionGetLibrarySearchPaths(MITK_RUNTIME_PATH_RELWITHDEBINFO ${VS_BUILD_TYPE_RELDEB} RELWITHDEBINFO)
   CONFIGURE_FILE("${MITK_SOURCE_DIR}/CMake/MITK.vcxproj.user.in" ${CMAKE_CURRENT_BINARY_DIR}/${VSUPF_NAME}.vcxproj.user @ONLY)
 
 endfunction()

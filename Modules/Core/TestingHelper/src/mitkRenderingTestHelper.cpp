@@ -301,7 +301,7 @@ void mitk::RenderingTestHelper::AddToStorage(const std::string &filename)
     mitk::RenderingManager::GetInstance()->InitializeViews(
       m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll()));
   }
-  catch (itk::ExceptionObject &e)
+  catch ( const itk::ExceptionObject &e )
   {
     MITK_ERROR << "Failed loading test data '" << filename << "': " << e.what();
   }

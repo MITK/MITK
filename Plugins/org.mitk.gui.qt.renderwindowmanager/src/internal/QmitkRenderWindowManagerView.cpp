@@ -17,15 +17,38 @@ See LICENSE.txt or http://www.mitk.org for details.
 // render window manager plugin
 #include "QmitkRenderWindowManagerView.h"
 
-// blueberry
-#include <berryISelectionService.h>
-#include <berryIWorkbenchWindow.h>
-
 // mitk core
 #include <mitkBaseRenderer.h>
 #include <mitkDataNode.h>
+#include <QmitkRenderWindow.h>
 
 const std::string QmitkRenderWindowManagerView::VIEW_ID = "org.mitk.views.renderwindowmanager";
+
+void QmitkRenderWindowManagerView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
+{
+  if (m_RenderWindowPart != renderWindowPart)
+  {
+    m_RenderWindowPart = renderWindowPart;
+    SetControlledRenderer();
+  }
+}
+
+void QmitkRenderWindowManagerView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart)
+{
+  if (m_RenderWindowPart == renderWindowPart)
+  {
+    m_RenderWindowPart = nullptr;
+    SetControlledRenderer();
+  }
+}
+
+void QmitkRenderWindowManagerView::RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart)
+{
+  if (m_RenderWindowPart == renderWindowPart)
+  {
+    SetControlledRenderer();
+  }
+}
 
 void QmitkRenderWindowManagerView::SetFocus()
 {
@@ -34,81 +57,69 @@ void QmitkRenderWindowManagerView::SetFocus()
 
 void QmitkRenderWindowManagerView::CreateQtPartControl(QWidget* parent)
 {
+  m_Parent = parent;
   // create GUI widgets
   m_Controls.setupUi(parent);
+
   // add custom render window manager UI widget to the 'renderWindowManagerTab'
-  m_RenderWindowManipulatorWidget = new QmitkRenderWindowManipulatorWidget(GetDataStorage(), parent);
-  m_RenderWindowManipulatorWidget->setObjectName(QStringLiteral("m_RenderWindowManipulatorWidget"));
-  m_Controls.verticalLayout->addWidget(m_RenderWindowManipulatorWidget);
+  m_RenderWindowInspector = new QmitkRenderWindowDataStorageInspector(parent);
+  m_RenderWindowInspector->SetDataStorage(GetDataStorage());
+  m_RenderWindowInspector->setObjectName(QStringLiteral("m_RenderWindowManipulatorWidget"));
+  m_Controls.verticalLayout->addWidget(m_RenderWindowInspector);
 
+  // data node context menu and menu actions
+  m_InspectorView = m_RenderWindowInspector->GetView();
+  m_DataNodeContextMenu = new QmitkDataNodeContextMenu(GetSite(), m_InspectorView);
+  m_DataNodeContextMenu->SetDataStorage(GetDataStorage());
+  //m_DataNodeContextMenu->SetSurfaceDecimation(m_SurfaceDecimation);
+
+  // connect objects
+  connect(m_Controls.comboBoxRenderWindowSelection, static_cast<void(QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged), this, &QmitkRenderWindowManagerView::OnRenderWindowSelectionChanged);
+  connect(m_InspectorView, &QAbstractItemView::customContextMenuRequested, m_DataNodeContextMenu, &QmitkDataNodeContextMenu::OnContextMenuRequested);
+
+  m_RenderWindowPart = GetRenderWindowPart();
+  // also sets the controlled renderer
   SetControlledRenderer();
-
-  for (const auto& renderer : m_ControlledRenderer)
-  {
-    m_Controls.comboBoxRenderWindowSelection->addItem(renderer->GetName());
-  }
-
-  OnRenderWindowSelectionChanged(m_Controls.comboBoxRenderWindowSelection->itemText(0));
-
-  connect(m_Controls.comboBoxRenderWindowSelection, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(OnRenderWindowSelectionChanged(const QString&)));
-  connect(m_RenderWindowManipulatorWidget, SIGNAL(AddLayerButtonClicked()), this, SLOT(OnAddLayerButtonClicked()));
 }
 
 void QmitkRenderWindowManagerView::SetControlledRenderer()
 {
-  const mitk::RenderingManager::RenderWindowVector allRegisteredRenderWindows = mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
-  mitk::BaseRenderer* baseRenderer = nullptr;
-  for (const auto &renderWindow : allRegisteredRenderWindows)
+  QHash<QString, QmitkRenderWindow*> renderWindows;
+  if (m_RenderWindowPart != nullptr)
   {
-    baseRenderer = mitk::BaseRenderer::GetInstance(renderWindow);
+    renderWindows = m_RenderWindowPart->GetQmitkRenderWindows();
+  }
+
+  mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer;
+  QStringList rendererNames;
+  m_Controls.comboBoxRenderWindowSelection->clear();
+  mitk::BaseRenderer* baseRenderer = nullptr;
+  for (const auto& renderWindow : renderWindows.values())
+  {
+    baseRenderer = mitk::BaseRenderer::GetInstance(renderWindow->GetVtkRenderWindow());
     if (nullptr != baseRenderer)
     {
-      m_ControlledRenderer.push_back(baseRenderer);
+      controlledRenderer.push_back(baseRenderer);
+      rendererNames.append(baseRenderer->GetName());
     }
   }
 
-  m_RenderWindowManipulatorWidget->SetControlledRenderer(m_ControlledRenderer);
+  m_RenderWindowInspector->SetControlledRenderer(controlledRenderer);
+  rendererNames.sort();
+  m_Controls.comboBoxRenderWindowSelection->addItems(rendererNames);
 }
 
-void QmitkRenderWindowManagerView::OnRenderWindowSelectionChanged(const QString &renderWindowId)
+void QmitkRenderWindowManagerView::OnRenderWindowSelectionChanged(const QString& renderWindowId)
 {
-  m_RenderWindowManipulatorWidget->SetActiveRenderWindow(renderWindowId);
-}
-
-void QmitkRenderWindowManagerView::OnAddLayerButtonClicked()
-{
-  QList<mitk::DataNode::Pointer> nodes = GetDataManagerSelection();
-  for (mitk::DataNode* dataNode : nodes)
+  m_RenderWindowInspector->SetActiveRenderWindow(renderWindowId);
+  mitk::BaseRenderer* selectedRenderer = mitk::BaseRenderer::GetByName(renderWindowId.toStdString());
+  if (nullptr != selectedRenderer)
   {
-    if (nullptr != dataNode)
-    {
-      m_RenderWindowManipulatorWidget->AddLayer(dataNode);
-
-      // get child nodes of the current node
-      mitk::DataStorage::SetOfObjects::ConstPointer derivedNodes = GetDataStorage()->GetDerivations(dataNode, nullptr, false);
-      for (mitk::DataStorage::SetOfObjects::ConstIterator it = derivedNodes->Begin(); it != derivedNodes->End(); ++it)
-      {
-        m_RenderWindowManipulatorWidget->AddLayer(it->Value());
-      }
-    }
+    m_DataNodeContextMenu->SetBaseRenderer(selectedRenderer);
   }
 }
 
-void QmitkRenderWindowManagerView::NodeAdded(const mitk::DataNode* node)
+QItemSelectionModel* QmitkRenderWindowManagerView::GetDataNodeSelectionModel() const
 {
-  bool global = false;
-  node->GetBoolProperty("globalObject_RWM", global);
-  if (global)
-  {
-    // initially insert new point set node into the node list of all render windows
-    // the node object of a new point set won't be visible due to its "helper object" property set to true
-    m_RenderWindowManipulatorWidget->AddLayerToAllRenderer(const_cast<mitk::DataNode*>(node));
-  }
-  else
-  {
-    // initially set new node as invisible in all render windows
-    // this way, each single renderer overwrites the common renderer and the node is invisible
-    // until it is inserted into the node list of a render windows
-    m_RenderWindowManipulatorWidget->HideDataNodeInAllRenderer(node);
-  }
+  return m_InspectorView->selectionModel();
 }

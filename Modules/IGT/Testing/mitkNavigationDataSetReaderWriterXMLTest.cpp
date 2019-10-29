@@ -61,7 +61,7 @@ public:
     pathWrite.insert(pathWrite.end()-4,'2');;//Insert 2: IGT-Data/NavigationDataSet2.xml
     std::ifstream FileTest(pathWrite.c_str());
     if(FileTest){
-      //remove file if it already exists. TODO: Löschen funktioniert nicht!!!! xxxxxxxxxxxxxxxx
+      //remove file if it already exists. TODO: Loeschen funktioniert nicht!!!! xxxxxxxxxxxxxxxx
       FileTest.close();
       std::remove(pathWrite.c_str());
     }
@@ -118,7 +118,7 @@ public:
       std::string file = GetTestDataFilePath("IGT-Data/InvalidVersionNavigationDataTestData.xml");
       mitk::NavigationDataSet::Pointer dataset = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::Load(file)[0].GetPointer());
     }
-    catch(mitk::Exception)
+    catch(mitk::Exception&)
     {
       exceptionThrown3=true;
     }

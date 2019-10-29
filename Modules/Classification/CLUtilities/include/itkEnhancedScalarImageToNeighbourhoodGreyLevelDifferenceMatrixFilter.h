@@ -252,18 +252,18 @@ namespace itk
 
     protected:
       EnhancedScalarImageToNeighbourhoodGreyLevelDifferenceMatrixFilter();
-      virtual ~EnhancedScalarImageToNeighbourhoodGreyLevelDifferenceMatrixFilter() {};
-      virtual void PrintSelf( std::ostream& os, Indent indent ) const ITK_OVERRIDE;
+      ~EnhancedScalarImageToNeighbourhoodGreyLevelDifferenceMatrixFilter() override {};
+      void PrintSelf( std::ostream& os, Indent indent ) const ITK_OVERRIDE;
 
       /** Standard itk::ProcessObject subclass method. */
       typedef DataObject::Pointer DataObjectPointer;
 
       typedef ProcessObject::DataObjectPointerArraySizeType DataObjectPointerArraySizeType;
       using Superclass::MakeOutput;
-      virtual DataObjectPointer MakeOutput( DataObjectPointerArraySizeType idx ) ITK_OVERRIDE;
+      DataObjectPointer MakeOutput( DataObjectPointerArraySizeType idx ) ITK_OVERRIDE;
 
       /** This method causes the filter to generate its output. */
-      virtual void GenerateData() ITK_OVERRIDE;
+      void GenerateData() ITK_OVERRIDE;
 
       /**
       * Normalize the direction of the offset before it is applied.

@@ -344,9 +344,9 @@ mitk::TimeGeometry::ConstPointer mitk::DataStorage::ComputeBoundingGeometry3D(co
             }
           }
         }
-        catch (itk::ExceptionObject &e)
+        catch ( const itk::ExceptionObject &e )
         {
-          MITK_ERROR << e << std::endl;
+          MITK_ERROR << e.GetDescription() << std::endl;
         }
       }
     }
@@ -514,57 +514,71 @@ void mitk::DataStorage::BlockNodeModifiedEvents(bool block)
   m_BlockNodeModifiedEvents = block;
 }
 
-mitk::DataNode::Pointer mitk::FindTopmostVisibleNode(const DataStorage::SetOfObjects* nodes,
-                                                     const Point3D worldposition,
+mitk::DataNode::Pointer mitk::FindTopmostVisibleNode(const DataStorage::SetOfObjects::ConstPointer nodes,
+                                                     const Point3D worldPosition,
                                                      const TimePointType timePoint,
                                                      const BaseRenderer* baseRender)
 {
-  DataNode::Pointer topLayerNode;
-
-  if (nullptr == nodes)
+   if (nodes.IsNull())
+  {
     return nullptr;
+  }
 
+  mitk::DataNode::Pointer topLayerNode = nullptr;
   int maxLayer = std::numeric_limits<int>::min();
 
   for (auto node : *nodes)
   {
     if (node.IsNull())
+    {
       continue;
+    }
 
     bool isHelperObject = false;
     node->GetBoolProperty("helper object", isHelperObject);
-
     if (isHelperObject)
+    {
       continue;
+    }
 
     auto data = node->GetData();
-
     if (nullptr == data)
+    {
       continue;
+    }
 
     auto geometry = data->GetGeometry();
-
-    if (nullptr == geometry || !geometry->IsInside(worldposition))
+    if (nullptr == geometry || !geometry->IsInside(worldPosition))
+    {
       continue;
+    }
 
     auto timeGeometry = data->GetUpdatedTimeGeometry();
-
-    if (timeGeometry == nullptr)
+    if (nullptr == timeGeometry)
+    {
       continue;
+    }
 
     if (!timeGeometry->IsValidTimePoint(timePoint))
+    {
       continue;
+    }
 
     int layer = 0;
-
-    if (!node->GetIntProperty("layer", layer))
+    if (!node->GetIntProperty("layer", layer, baseRender))
+    {
       continue;
+    }
 
     if (layer <= maxLayer)
+    {
       continue;
+    }
 
     if (!node->IsVisible(baseRender))
+    {
       continue;
+    }
 
     topLayerNode = node;
     maxLayer = layer;

@@ -40,7 +40,7 @@ class SelectionServiceMitk : public QObject, public berry::IApplication
 
 public:
   SelectionServiceMitk();
-  ~SelectionServiceMitk();
+  ~SelectionServiceMitk() override;
 
   QVariant Start(berry::IApplicationContext *context) override;
   void Stop() override;

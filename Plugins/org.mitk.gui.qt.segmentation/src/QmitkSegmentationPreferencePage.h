@@ -35,7 +35,7 @@ class MITK_QT_SEGMENTATION QmitkSegmentationPreferencePage : public QObject, pub
 public:
 
   QmitkSegmentationPreferencePage();
-  ~QmitkSegmentationPreferencePage();
+  ~QmitkSegmentationPreferencePage() override;
 
   void Init(berry::IWorkbench::Pointer workbench) override;
 
@@ -46,17 +46,17 @@ public:
   ///
   /// \see IPreferencePage::PerformOk()
   ///
-  virtual bool PerformOk() override;
+  bool PerformOk() override;
 
   ///
   /// \see IPreferencePage::PerformCancel()
   ///
-  virtual void PerformCancel() override;
+  void PerformCancel() override;
 
   ///
   /// \see IPreferencePage::Update()
   ///
-  virtual void Update() override;
+  void Update() override;
 
 protected slots:
 

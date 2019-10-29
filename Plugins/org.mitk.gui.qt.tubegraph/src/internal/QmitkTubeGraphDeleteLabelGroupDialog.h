@@ -31,7 +31,7 @@ class QmitkTubeGraphDeleteLabelGroupDialog : public QDialog
 public:
 
   QmitkTubeGraphDeleteLabelGroupDialog(QWidget* parent = nullptr);
-  virtual ~QmitkTubeGraphDeleteLabelGroupDialog();
+  ~QmitkTubeGraphDeleteLabelGroupDialog() override;
 
   QStringList GetSelectedLabelGroups();
   void SetLabelGroups(const QStringList &labelGroups);

@@ -41,14 +41,14 @@ class QmitkToFTutorialView : public QmitkAbstractView
     static const std::string VIEW_ID;
 
     QmitkToFTutorialView();
-    virtual ~QmitkToFTutorialView();
+    ~QmitkToFTutorialView() override;
 
-    virtual void CreateQtPartControl(QWidget *parent) override;
+    void CreateQtPartControl(QWidget *parent) override;
 
     ///
     /// Sets the focus to an internal widget.
     ///
-    virtual void SetFocus() override;
+    void SetFocus() override;
 
   protected slots:
 

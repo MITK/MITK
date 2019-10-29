@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSurface.h>
 #include <mitkSurfaceToImageFilter.h>
 
-mitk::LabelSetImageSurfaceStampFilter::LabelSetImageSurfaceStampFilter()
+mitk::LabelSetImageSurfaceStampFilter::LabelSetImageSurfaceStampFilter() : m_ForceOverwrite(false)
 {
   this->SetNumberOfIndexedInputs(1);
   this->SetNumberOfRequiredInputs(1);

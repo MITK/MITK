@@ -46,14 +46,14 @@ public:
 
   QmitkVolumeVisualizationView();
 
-  virtual ~QmitkVolumeVisualizationView();
+  ~QmitkVolumeVisualizationView() override;
 
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
   ///
   /// Invoked when the DataManager selection changed
   ///
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes) override;
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes) override;
 
   static const std::string VIEW_ID;
 

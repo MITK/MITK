@@ -3,6 +3,8 @@ set(SRC_CPP_FILES
   QmitkExtWorkbenchWindowAdvisor.cpp
   QmitkExtFileSaveProjectAction.cpp
   QmitkOpenDicomEditorAction.cpp
+  QmitkOpenMxNMultiWidgetEditorAction.cpp
+  QmitkOpenStdMultiWidgetEditorAction.cpp
 )
 
 set(INTERNAL_CPP_FILES
@@ -31,6 +33,8 @@ set(MOC_H_FILES
   src/internal/QmitkInputDevicesPrefPage.h
   src/internal/QmitkModuleView.h
   src/QmitkOpenDicomEditorAction.h
+  src/QmitkOpenMxNMultiWidgetEditorAction.h
+  src/QmitkOpenStdMultiWidgetEditorAction.h
 )
 
 set(CACHED_RESOURCE_FILES

@@ -45,7 +45,7 @@ class QmitkOpenIGTLinkManager : public QmitkAbstractView
     static const std::string VIEW_ID;
 
 	QmitkOpenIGTLinkManager();
-    virtual ~QmitkOpenIGTLinkManager();
+    ~QmitkOpenIGTLinkManager() override;
 
   public slots:
     void NewSourceByWidget(mitk::IGTLDeviceSource::Pointer source, std::string);
@@ -53,9 +53,9 @@ class QmitkOpenIGTLinkManager : public QmitkAbstractView
 
   protected:
 
-    virtual void CreateQtPartControl(QWidget *parent) override;
+    void CreateQtPartControl(QWidget *parent) override;
 
-    virtual void SetFocus() override;
+    void SetFocus() override;
 
     void CreatePipeline();
     void DestroyPipeline();

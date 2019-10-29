@@ -109,6 +109,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateEmptyDistanceImage()
 }
 
 mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImageFromSurfaceFilter()
+  : m_DistanceImageSpacing(0.0), m_DistanceImageDefaultBufferValue(0.0)
 {
   m_DistanceImageVolume = 50000;
   this->m_UseProgressBar = false;

@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkNavigationDataPlayerView::VIEW_ID = "org.mitk.views.navigationdataplayer";
 
 QmitkNavigationDataPlayerView::QmitkNavigationDataPlayerView()
-  : m_Controls( 0 )
+  : m_Controls( nullptr )
 {
 }
 
@@ -99,7 +99,7 @@ void QmitkNavigationDataPlayerView::OnOpenFile()
   catch ( const mitk::Exception &e )
   {
     MITK_WARN("NavigationDataPlayerView") << "could not open file " << fileName.toStdString();
-    QMessageBox::critical(0, "Error Reading File", "The file '" + fileName
+    QMessageBox::critical(nullptr, "Error Reading File", "The file '" + fileName
                           +"' could not be read.\n" + e.GetDescription() );
     return;
   }
@@ -169,9 +169,10 @@ void QmitkNavigationDataPlayerView::OnSetMicroservice(){
       currentDummyTool->SetIdentifier(name.str());
       m_ToolStorage->AddTool(currentDummyTool);
     }
-    m_Player->RegisterAsMicroservice();
     m_ToolStorage->SetName("NavigationDataPlayer Tool Storage");
-    m_ToolStorage->SetSourceID(m_Player->GetMicroserviceID());
+    m_Player->SetToolMetaDataCollection(m_ToolStorage);
+    m_Player->RegisterAsMicroservice();
+    m_ToolStorage->SetSourceID(m_Player->GetMicroserviceID()); //DEPRECATED / not needed anymore because NavigationDataSource now holds a member of its tool storage. Only left for backward compatibility.
     m_ToolStorage->RegisterAsMicroservice();
   } else {
     if (m_ToolStorage.IsNotNull()) m_ToolStorage->UnRegisterMicroservice();

@@ -1,0 +1,30 @@
+/**
+\page org_mitk_views_radiomicstutorial_gui_01_basic GUI based Radiomics Tutorial - Basic handling of MITK 
+
+\subsection Basic handling of MITK 
+
+Open a MITK Workbench which also includes MITK Phenotyping. You should see something similar to figure 1. At the top you'll see a bar (1), (2) with different important operations like open and saving data, different important views (like DICOM Window, Image Navigator and View Navigator), and a list of all Views included in your version (2). Items are grouped, and depending on the width of your screen might be hidden behind small arrows. 
+
+The Data Manager (3) is usually placed at the left, although it could be also open at other positions. It is used to organize open images and other data items. Below it you see the Image Navigator (4) which helps to navigate through the 3D data. It allows to change the position within the data either in real-world coordinates (in mm) or by specifiying a slice number. 
+
+In the center of your application you should see the Displays (5), which will display the images. It usually consists of four views, showing axial, sagittal, coronal and a 3D view of the data. It is possible to rearange the single displays and configure them to your wishes with the three small buttons which will become visible if the mouse is in the upper right corner of display. 
+
+Beside these elements, there are various open views (6). You can close them with the cross and reopen them using the bar at the top (2). It is also possible to rearrange all Views to various positions left, right, above, or below the displays. 
+
+An important view is the "View Navigator". In figure 1 it is hidden behind the Data Manager (3) and could be made visible with a click on the corresponding bar left of the "Data Manager" bar. The View Navigator is an easy and straight forward tool to show all available views and open them. It allows to search through all views. Offering a search function it allows to find views using their name of just searching for a functionality you are looking for. 
+
+\imageMacro{RadiomicsTutorial_GUI_Step1_01_Overview.png,"Overview of MITK Workbench with active MITK Phenotyping",1}
+
+\subsection Loading image data
+In order to calculate the radiomics features using the graphical interface you first need to load the data into the graphical environment. This can be done in different ways. If you want to load an DICOM series, it is sufficient to load a single image if the other images of the series are within the same folder. MITK will then combine all Series DICOM Images to a single 3D Image. 
+
+\li Open an Image using the "Open File" menu item: If you click on the "Open File" item in the "File" menu or the "Open File" button in the top bar you will be presented a standard file dialog of your system. Select the image you want to load and click "Open". 
+
+\li Drag n' Drop: Select the image you want to load with your standard data managing tool, for example with the explorer on windows or finder on Mac. Drag and drop the file into the open MITK Workbench window, the image will then be loaded if possible. If you 
+
+\li DICOM Browser: MITK offers the basic possibiliy to manage and handle DICOM images using the DICOM Browser. You can enable this view by clicking on "DICOM", right of the "Redo"-Button. Within the DICOM Browser, it is possible to read complete folders, and load specific series into the workbench. For more information see \ref org_mitk_gui_qt_dicom .
+
+
+
+
+*/

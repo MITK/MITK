@@ -26,11 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mbilogLogMessage.h"
 #include "mbilogLoggingTypes.h"
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4251)
-#endif
-
 namespace mbilog
 {
   /** \brief Registeres a backend to the mbi logging mechanism. If a backend is registered here, all mbilog messages
@@ -207,10 +202,6 @@ namespace mbilog
   //    Callback m_Callback;
   //  };
 }
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 /** \brief Macros for different message levels. Creates an instance of class PseudoStream with the corresponding message
  * level.

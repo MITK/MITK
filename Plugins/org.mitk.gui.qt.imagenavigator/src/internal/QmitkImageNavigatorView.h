@@ -81,6 +81,7 @@ protected:
   void SetStepSize(int axis);
   void SetStepSize(int axis, double stepSize);
   int  GetClosestAxisIndex(mitk::Vector3D normal);
+  void SetVisibilityOfTimeSlider(std::size_t timeSteps);
 
   Ui::QmitkImageNavigatorViewControls m_Controls;
 

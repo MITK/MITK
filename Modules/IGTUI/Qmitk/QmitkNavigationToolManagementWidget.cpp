@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationToolStorage.h>
 #include <mitkNavigationToolStorageDeserializer.h>
 #include <mitkNavigationToolStorageSerializer.h>
+#include <mitkIGTIOException.h>
 #include <QmitkIGTCommonHelper.h>
 
 //qt headers
@@ -83,7 +84,8 @@ void QmitkNavigationToolManagementWidget::OnLoadTool()
       m_DataStorage->Remove(readTool->GetDataNode());
     }
     UpdateToolTable();
-}
+    mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(m_DataStorage);
+  }
 }
 
 void QmitkNavigationToolManagementWidget::OnSaveTool()
@@ -279,47 +281,57 @@ void QmitkNavigationToolManagementWidget::OnLoadStorage()
   if (filename == "") return;
 
   QmitkIGTCommonHelper::SetLastFileLoadPathByFileName(QString::fromStdString(filename));
+
+  mitk::NavigationToolStorage::Pointer tempStorage = nullptr;
+
   try
   {
-    mitk::NavigationToolStorage::Pointer tempStorage = myDeserializer->Deserialize(filename);
-
-    if (tempStorage.IsNull()) MessageBox("Error" + myDeserializer->GetErrorMessage());
-    else
-    {
-      Poco::Path myPath = Poco::Path(filename.c_str());
-      tempStorage->SetName(myPath.getFileName()); //set the filename as name for the storage, so the user can identify it
-      this->LoadStorage(tempStorage);
-      emit NewStorageAdded(m_NavigationToolStorage,myPath.getFileName());
-    }
+    tempStorage = myDeserializer->Deserialize(filename);
   }
   catch (const mitk::Exception& exception)
   {
     MessageBox(exception.GetDescription());
   }
+
+  if (tempStorage.IsNotNull())
+  {
+    Poco::Path myPath = Poco::Path(filename.c_str());
+    tempStorage->SetName(myPath.getFileName()); //set the filename as name for the storage, so the user can identify it
+    this->LoadStorage(tempStorage);
+    emit NewStorageAdded(m_NavigationToolStorage,myPath.getFileName());
+    mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(m_DataStorage);
+  }
 }
 
 void QmitkNavigationToolManagementWidget::OnSaveStorage()
-  {
-    QFileDialog *fileDialog = new QFileDialog;
-    fileDialog->setDefaultSuffix("IGTToolStorage");
-    QString suffix = "IGT Tool Storage (*.IGTToolStorage)";
-    // Set default file name to LastFileSavePath + storage name
-    QString defaultFileName = QmitkIGTCommonHelper::GetLastFileSavePath() + "/" + QString::fromStdString(m_NavigationToolStorage->GetName());
-    QString filename  = fileDialog->getSaveFileName(nullptr, tr("Save Navigation Tool Storage"), defaultFileName, suffix, &suffix);
+{
+  QFileDialog *fileDialog = new QFileDialog;
+  fileDialog->setDefaultSuffix("IGTToolStorage");
+  QString suffix = "IGT Tool Storage (*.IGTToolStorage)";
+  // Set default file name to LastFileSavePath + storage name
+  QString defaultFileName = QmitkIGTCommonHelper::GetLastFileSavePath() + "/" + QString::fromStdString(m_NavigationToolStorage->GetName());
+  QString filename  = fileDialog->getSaveFileName(nullptr, tr("Save Navigation Tool Storage"), defaultFileName, suffix, &suffix);
 
-    if (filename.isEmpty()) return; //canceled by the user
+  if (filename.isEmpty()) return; //canceled by the user
 
-    // check file suffix
-    QFileInfo file(filename);
-    if(file.suffix().isEmpty()) filename += ".IGTToolStorage";
+  // check file suffix
+  QFileInfo file(filename);
+  if(file.suffix().isEmpty()) filename += ".IGTToolStorage";
+
   //serialize tool storage
   mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
-  if (!mySerializer->Serialize(filename.toStdString(), m_NavigationToolStorage))
+
+  try
   {
-    MessageBox("Error: " + mySerializer->GetErrorMessage());
-    return;
-    QmitkIGTCommonHelper::SetLastFileSavePath(file.absolutePath());
+    mySerializer->Serialize(filename.toStdString(), m_NavigationToolStorage);
   }
+  catch (const mitk::IGTIOException& e)
+  {
+    MessageBox("Error: " + std::string(e.GetDescription()));
+    return;
+  }
+
+  QmitkIGTCommonHelper::SetLastFileSavePath(file.absolutePath());
   Poco::Path myPath = Poco::Path(filename.toStdString());
   m_Controls->m_StorageName->setText(QString::fromStdString(myPath.getFileName()));
 }
@@ -405,7 +417,7 @@ void QmitkNavigationToolManagementWidget::UpdateToolTable()
   }
 }
 
-void QmitkNavigationToolManagementWidget::MessageBox(std::string s)
+void QmitkNavigationToolManagementWidget::MessageBox(const std::string& s)
 {
   QMessageBox msgBox;
   msgBox.setText(s.c_str());

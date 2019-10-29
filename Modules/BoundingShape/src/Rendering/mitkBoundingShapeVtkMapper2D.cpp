@@ -110,7 +110,7 @@ bool mitk::BoundingShapeVtkMapper2D::LocalStorage::IsUpdateRequired(mitk::BaseRe
     return true;
 
   unsigned int sliceNumber = renderer->GetSlice();
- 
+
   if (m_LastSliceNumber != sliceNumber)
     return true;
 
@@ -178,6 +178,7 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
 
   if (needGenerateData)
   {
+
     bool visible = true;
     GetDataNode()->GetVisibility(visible, renderer, "visible");
 
@@ -229,7 +230,7 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
     }
 
     // caculate face normals
-    double result0[3], result1[3], result2[3];
+    double cubeFaceNormal0[3], cubeFaceNormal1[3], cubeFaceNormal2[3];
     double a[3], b[3];
     a[0] = (cornerPoints[5][0] - cornerPoints[6][0]);
     a[1] = (cornerPoints[5][1] - cornerPoints[6][1]);
@@ -239,7 +240,7 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
     b[1] = (cornerPoints[5][1] - cornerPoints[4][1]);
     b[2] = (cornerPoints[5][2] - cornerPoints[4][2]);
 
-    vtkMath::Cross(a, b, result0);
+    vtkMath::Cross(a, b, cubeFaceNormal0);
 
     a[0] = (cornerPoints[0][0] - cornerPoints[6][0]);
     a[1] = (cornerPoints[0][1] - cornerPoints[6][1]);
@@ -249,7 +250,7 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
     b[1] = (cornerPoints[0][1] - cornerPoints[2][1]);
     b[2] = (cornerPoints[0][2] - cornerPoints[2][2]);
 
-    vtkMath::Cross(a, b, result1);
+    vtkMath::Cross(a, b, cubeFaceNormal1);
 
     a[0] = (cornerPoints[2][0] - cornerPoints[7][0]);
     a[1] = (cornerPoints[2][1] - cornerPoints[7][1]);
@@ -259,11 +260,11 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
     b[1] = (cornerPoints[2][1] - cornerPoints[6][1]);
     b[2] = (cornerPoints[2][2] - cornerPoints[6][2]);
 
-    vtkMath::Cross(a, b, result2);
+    vtkMath::Cross(a, b, cubeFaceNormal2);
 
-    vtkMath::Normalize(result0);
-    vtkMath::Normalize(result1);
-    vtkMath::Normalize(result2);
+    vtkMath::Normalize(cubeFaceNormal0);
+    vtkMath::Normalize(cubeFaceNormal1);
+    vtkMath::Normalize(cubeFaceNormal2);
 
     // create cube for rendering bounding box
     auto cube = vtkCubeSource::New();
@@ -310,14 +311,14 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
     origin[1] = planeGeometry->GetOrigin()[1];
     origin[2] = planeGeometry->GetOrigin()[2];
 
-    double normal[3];
-    normal[0] = planeGeometry->GetNormal()[0];
-    normal[1] = planeGeometry->GetNormal()[1];
-    normal[2] = planeGeometry->GetNormal()[2];
+    double displayPlaneNormal[3];
+    displayPlaneNormal[0] = planeGeometry->GetNormal()[0];
+    displayPlaneNormal[1] = planeGeometry->GetNormal()[1];
+    displayPlaneNormal[2] = planeGeometry->GetNormal()[2];
+    vtkMath::Normalize(displayPlaneNormal);
 
-    //    MITK_INFO << "normal1 " << normal[0] << " " << normal[1] << " " << normal[2];
     localStorage->m_CuttingPlane->SetOrigin(origin);
-    localStorage->m_CuttingPlane->SetNormal(normal);
+    localStorage->m_CuttingPlane->SetNormal(displayPlaneNormal);
 
     // add cube polydata to local storage
     localStorage->m_Cutter->SetInputData(polydata);
@@ -349,30 +350,32 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
       double handleSize = ((displaySize[0] + displaySize[1]) / 2.0) * initialHandleSize;
 
       auto appendPoly = vtkSmartPointer<vtkAppendPolyData>::New();
-      unsigned int i = 0;
+      unsigned int handleIdx = 0;
 
       // add handles and their assigned properties to the local storage
       mitk::IntProperty::Pointer activeHandleId =
         dynamic_cast<mitk::IntProperty *>(node->GetProperty("Bounding Shape.Active Handle ID"));
 
+      double angle0 = std::abs(vtkMath::DegreesFromRadians(vtkMath::AngleBetweenVectors(displayPlaneNormal, cubeFaceNormal0)));
+      if (angle0 > 179.0) angle0 -= 180.0;
+      double angle1 = std::abs(vtkMath::DegreesFromRadians(vtkMath::AngleBetweenVectors(displayPlaneNormal, cubeFaceNormal1)));
+      if (angle1 > 179.0) angle1 -= 180.0;
+      double angle2 = std::abs(vtkMath::DegreesFromRadians(vtkMath::AngleBetweenVectors(displayPlaneNormal, cubeFaceNormal2)));
+      if (angle2 > 179.0) angle2 -= 180.0;
+
       bool visible = false;
       bool selected = false;
-      for (auto handle : localStorage->m_Handles)
+      for (auto& handle : localStorage->m_Handles)
       {
-        Point3D handleCenter = m_Impl->HandlePropertyList[i].GetPosition();
+        Point3D handleCenter = m_Impl->HandlePropertyList[handleIdx].GetPosition();
 
         handle->SetRadius(handleSize);
         handle->SetCenter(handleCenter[0], handleCenter[1], handleCenter[2]);
 
-        vtkMath::Normalize(normal);
-        double angle = vtkMath::DegreesFromRadians(acos(vtkMath::Dot(normal, result0)));
-        double angle1 = vtkMath::DegreesFromRadians(acos(vtkMath::Dot(normal, result1)));
-        double angle2 = vtkMath::DegreesFromRadians(acos(vtkMath::Dot(normal, result2)));
-
         // show handles only if the corresponding face is aligned to the render window
-        if ((((std::abs(angle - 0) < 0.001) || (std::abs(angle - 180) < 0.001)) && i != 0 && i != 1) ||
-          (((std::abs(angle1 - 0) < 0.001) || (std::abs(angle1 - 180) < 0.001)) && i != 2 && i != 3) ||
-          (((std::abs(angle2 - 0) < 0.001) || (std::abs(angle2 - 180) < 0.001)) && i != 4 && i != 5))
+        if ( (handleIdx != 0 && handleIdx != 1 && std::abs(angle0) < 0.1) || // handles 0 and 1
+             (handleIdx != 2 && handleIdx != 3 && std::abs(angle1) < 0.1) || // handles 2 and 3
+             (handleIdx != 4 && handleIdx != 5 && std::abs(angle2) < 0.1) )  // handles 4 and 5
         {
           if (activeHandleId == nullptr)
           {
@@ -380,7 +383,7 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
           }
           else
           {
-            if ((activeHandleId->GetValue() != m_Impl->HandlePropertyList[i].GetIndex()))
+            if ((activeHandleId->GetValue() != m_Impl->HandlePropertyList[handleIdx].GetIndex()))
             {
               appendPoly->AddInputConnection(handle->GetOutputPort());
             }
@@ -395,7 +398,7 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
           visible = true;
         }
 
-        i++;
+        ++handleIdx;
       }
 
       if (visible)

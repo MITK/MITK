@@ -89,10 +89,6 @@ namespace itk
     itkSetMacro(RequestedRegion, RegionType);
     itkGetMacro(RequestedRegion, RegionType);
 
-    // Set/Get function for sigma parameter
-    itkSetMacro(UseApproximateGradient, bool);
-    itkGetMacro(UseApproximateGradient, bool);
-
     void SetImage(const TInputImageType *_arg) override;
 
     void SetDynamicCostMap(std::map<int, int> &costMap)
@@ -138,7 +134,7 @@ namespace itk
     UnsignedCharImageType::Pointer m_MaskImage;
     VectorOutputImageType::Pointer m_GradientImage;
 
-    double minCosts;
+    double m_MinCosts;
 
     bool m_UseRepulsivePoints;
 
@@ -150,8 +146,6 @@ namespace itk
     double m_GradientMax;
 
     RegionType m_RequestedRegion;
-
-    bool m_UseApproximateGradient;
 
     bool m_Initialized;
 

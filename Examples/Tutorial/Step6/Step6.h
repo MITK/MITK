@@ -34,7 +34,7 @@ class Step6 : public QWidget
   Q_OBJECT
 public:
   Step6(int argc, char *argv[], QWidget *parent = nullptr);
-  ~Step6() {}
+  ~Step6() override {}
   virtual void Initialize();
 
   virtual int GetThresholdMin();

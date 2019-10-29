@@ -52,12 +52,12 @@ public:
   static const std::string VIEW_ID;
 
   QmitkIGTTrackingSemiAutomaticMeasurementView();
-  virtual ~QmitkIGTTrackingSemiAutomaticMeasurementView();
+  ~QmitkIGTTrackingSemiAutomaticMeasurementView() override;
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void StdMultiWidgetAvailable(QmitkStdMultiWidget &stdMultiWidget);
-  virtual void StdMultiWidgetNotAvailable();
+  void StdMultiWidgetAvailable(QmitkStdMultiWidget &stdMultiWidget) override;
+  void StdMultiWidgetNotAvailable() override;
 
   protected slots:
 
@@ -119,7 +119,7 @@ protected:
   std::fstream m_logFileCSV;
 
   //event filter for key presses
-  bool eventFilter(QObject *obj, QEvent *ev);
+  bool eventFilter(QObject *obj, QEvent *ev) override;
 
   //results members
   mitk::PointSet::Pointer m_MeanPoints;

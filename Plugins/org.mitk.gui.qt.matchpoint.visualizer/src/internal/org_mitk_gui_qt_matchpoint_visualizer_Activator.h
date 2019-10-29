@@ -28,8 +28,8 @@ class org_mitk_gui_qt_matchpoint_visualizer_Activator :
 
 public:
 
-    void start(ctkPluginContext* context);
-    void stop(ctkPluginContext* context);
+    void start(ctkPluginContext* context) override;
+    void stop(ctkPluginContext* context) override;
 
     static ctkPluginContext* GetContext();
 

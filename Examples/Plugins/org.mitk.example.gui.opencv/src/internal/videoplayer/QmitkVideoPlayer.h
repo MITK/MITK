@@ -34,7 +34,7 @@ class QmitkVideoPlayer : public QmitkAbstractView, public mitk::IRenderWindowPar
 
 public:
   QmitkVideoPlayer();
-  virtual ~QmitkVideoPlayer();
+  ~QmitkVideoPlayer() override;
 
 private:
   void CreateQtPartControl(QWidget *parent) override;

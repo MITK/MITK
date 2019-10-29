@@ -30,6 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDataNodeSelection.h"
 #include "mitkIRenderWindowPart.h"
 
+#include <mitkWorkbenchUtil.h>
+
 #include <mitkDataStorage.h>
 #include <mitkRenderingManager.h>
 #include <mitkIDataStorageReference.h>
@@ -98,24 +100,6 @@ class MITK_QT_COMMON QmitkAbstractView : public berry::QtViewPart
 {
 
 public:
-
-  /**
-   * Describes the strategies to be used for getting a mitk::IRenderWindowPart
-   * instance.
-   */
-  enum IRenderWindowPartStrategy {
-
-    /** Do nothing. */
-    NONE           = 0x00000000,
-    /** Bring the most recently activated mitk::IRenderWindowPart instance to the front. */
-    BRING_TO_FRONT = 0x00000001,
-    /** Activate a mitk::IRenderWindowPart part (implies bringing it to the front). */
-    ACTIVATE       = 0x00000002,
-    /** Create a mitk::IRenderWindowPart if none is alredy opened. */
-    OPEN           = 0x00000004
-  };
-
-  Q_DECLARE_FLAGS(IRenderWindowPartStrategies, IRenderWindowPartStrategy)
 
   /**
    * Creates smartpointer typedefs
@@ -222,7 +206,7 @@ protected:
    *        is currently no active one.
    * \return The active mitk::IRenderWindowPart.
    */
-  mitk::IRenderWindowPart* GetRenderWindowPart(IRenderWindowPartStrategies strategies = NONE) const;
+  mitk::IRenderWindowPart* GetRenderWindowPart(mitk::WorkbenchUtil::IRenderWindowPartStrategies strategies = mitk::WorkbenchUtil::NONE) const;
 
   /**
    * Request an update of all render windows of the currently active IRenderWindowPart.
@@ -378,7 +362,5 @@ private:
   const QScopedPointer<QmitkAbstractViewPrivate> d;
 
 };
-
-Q_DECLARE_OPERATORS_FOR_FLAGS(QmitkAbstractView::IRenderWindowPartStrategies)
 
 #endif /*QMITKABSTRACTVIEW_H_*/

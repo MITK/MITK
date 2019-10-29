@@ -18,7 +18,6 @@
     <attribute name="EventButton" value="LeftMouseButton"/>
   </event_variant>
   <event_variant class="MouseMoveEvent" name="Move"/>
-
   <event_variant class="MouseMoveEvent" name="Rotate">
     <attribute name="ButtonState" value="LeftMouseButton"/>
   </event_variant>

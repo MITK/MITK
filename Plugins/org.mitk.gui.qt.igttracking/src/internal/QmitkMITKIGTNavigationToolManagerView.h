@@ -41,11 +41,11 @@ public:
   static const std::string VIEW_ID;
 
   QmitkMITKIGTNavigationToolManagerView();
-  virtual ~QmitkMITKIGTNavigationToolManagerView();
+  ~QmitkMITKIGTNavigationToolManagerView() override;
 
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
   protected slots:
 

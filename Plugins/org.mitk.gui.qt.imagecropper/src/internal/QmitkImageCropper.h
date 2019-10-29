@@ -67,15 +67,15 @@ public:
   /*!
   @brief Constructor. Called by SampleApp (or other apps that use functionalities)
   */
-  QmitkImageCropper(QObject *parent = 0);
+  QmitkImageCropper(QObject *parent = nullptr);
 
-  virtual ~QmitkImageCropper();
+  ~QmitkImageCropper() override;
 
   static const std::string VIEW_ID;
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
   /*!
   @brief Creates the Qt connections needed

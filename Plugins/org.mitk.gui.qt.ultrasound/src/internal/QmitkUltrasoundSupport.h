@@ -53,14 +53,14 @@ class QmitkUltrasoundSupport : public QmitkAbstractView
 
 public:
 
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
   static const std::string VIEW_ID;
 
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
   QmitkUltrasoundSupport();
-  virtual ~QmitkUltrasoundSupport();
+  ~QmitkUltrasoundSupport() override;
 
   public slots:
   /*
@@ -169,6 +169,17 @@ protected:
   QList<ctkServiceReference>    m_CustomWidgetServiceReference;
 
   double m_CurrentDynamicRange;
+
+  /* Spacing calibration variables and methods */
+  mitk::Point3D m_Xpoint1,m_Xpoint2,m_Ypoint1,m_Ypoint2;
+  double m_XSpacing, m_YSpacing;
+  double ComputeSpacing(mitk::Point3D p1, mitk::Point3D p2, double distance);
+  protected slots:
+  void SetXPoint1();
+  void SetXPoint2();
+  void SetYPoint1();
+  void SetYPoint2();
+  void WriteSpacingToDevice();
 };
 
 #endif // UltrasoundSupport_h

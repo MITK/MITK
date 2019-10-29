@@ -24,7 +24,6 @@ mitk::OclDataSetToDataSetFilter::OclDataSetToDataSetFilter()
   m_Output = mitk::OclDataSet::New();
 }
 
-
 mitk::OclDataSetToDataSetFilter::~OclDataSetToDataSetFilter()
 {
 }
@@ -77,6 +76,7 @@ bool mitk::OclDataSetToDataSetFilter::InitExec(cl_kernel ckKernel, unsigned int*
   if (!clBuffOut || (size_t)m_Output->GetBufferSize() != outputDataSize)
   {
     MITK_DEBUG << "Create GPU DataSet call " << uiDataSetWidth << "x" << uiDataSetHeight << "x" << uiDataSetDepth;
+    MITK_INFO << "Create GPU Buffer of size " << outputDataSize * outputBpE / 1024.f / 1024.f << "MB";
     m_Output->SetBpE(outputBpE);
     m_Output->SetBufferSize(outputDataSize);
     clBuffOut = m_Output->CreateGPUBuffer();

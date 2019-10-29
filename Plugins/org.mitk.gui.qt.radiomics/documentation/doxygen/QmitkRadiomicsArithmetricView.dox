@@ -1,0 +1,22 @@
+/**
+\page org_mitk_views_radiomicsarithmetricview Image Arithmetrics
+
+Allows to perform basic arithmetic operations with all images. By default, the resulting image will be of the same type as the first input image. This also means that all operations will be perfomed using the same datatype as the input image. This can lead to rounding errors if an integer data type is used. It is possible to avoid this problem by creating a double-based image as result image by selecting the corresponding option. 
+
+There are three different types of operations: 
+\li Single Image Operations: These are operations that are performed on each voxel value and do not need any additional parameter. Typical operations are calculating the absolute value of an image, or calculating an trigometric value. 
+\li Single Image and Double Value Operation: These are the basic mathematical operations (add, subtract, multiply, and dividive). 
+\li Two Images Operations: Allows to perfom basic operations between two images. 
+
+\subsection sec1 Single Image Operations
+Allows to perfom a arithmetic operation to each voxel of an image independently. Be aware that some operations expect a specific input range. This range is usually not tested for, and it might cause an error if the range if values outside of the expceted range occure. Also, some operations are rather expensive with respect to the calculation time and take some time to finish. 
+
+\subsection sec2 Single Image and Double Value Operation
+Performs a basic mathematical operation (add, subtract, multiply, and divide) between an image and a floating point value. The operation is execuded for each voxel independently. There are two options if the order of the input is relevant (i.e. for subtraction and division) to enable both ways. 
+
+\subsection sec3 Two Image Operations
+This allows to perfom mathematical operations between two images. The second image needs to be specified within this panel. Both images must match in size, it is also assumed (but not checked) that both images share the same geometry. This means that the corresponding voxels of both images share the same geometrical space. 
+
+The first image, that would also be used for other operations, is used as "Image", while the image specified in the panel is used as "Second Image". In general, the first image is also used as first parameter in the mathematical operation. 
+
+*/

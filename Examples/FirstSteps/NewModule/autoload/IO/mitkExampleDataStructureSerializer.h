@@ -28,11 +28,11 @@ namespace mitk
   {
   public:
     mitkClassMacro(ExampleDataStructureSerializer, BaseDataSerializer);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self) virtual std::string Serialize() override;
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self) std::string Serialize() override;
 
   protected:
     ExampleDataStructureSerializer();
-    virtual ~ExampleDataStructureSerializer();
+    ~ExampleDataStructureSerializer() override;
   };
 } // namespace
 #endif

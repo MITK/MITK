@@ -61,13 +61,13 @@ public:
     berryObjectMacro(QmitkMatchPointBrowser)
 
         QmitkMatchPointBrowser();
-    virtual ~QmitkMatchPointBrowser();
+    ~QmitkMatchPointBrowser() override;
 
     /**
     * \brief Called by the framework to indicate that the preferences have changed.
     * \param prefs not used, as we call RetrievePreferenceValues().
     */
-    void OnPreferencesChanged(const berry::IBerryPreferences* prefs);
+    void OnPreferencesChanged(const berry::IBerryPreferences* prefs) override;
 
     protected slots:
 
@@ -85,8 +85,8 @@ public:
     void OnSearchChanged(const QString&);
 
 protected:
-    virtual void CreateQtPartControl(QWidget* parent);
-    virtual void SetFocus();
+    void CreateQtPartControl(QWidget* parent) override;
+    void SetFocus() override;
 
     Ui::MatchPointBrowserControls m_Controls;
 
@@ -96,7 +96,7 @@ protected:
     //! [Qt Selection Provider]
 
 private:
-    void SetSelectionProvider();
+    void SetSelectionProvider() override;
 
     void Error(QString msg);
 
@@ -105,6 +105,9 @@ private:
     * preferences except the temporary folder into member variables.
     */
     void RetrieveAndStorePreferenceValues();
+
+    void OnInvalidDeploymentEvent(const ::itk::Object *, const itk::EventObject &event);
+    void OnValidDeploymentEvent(const ::itk::Object *, const itk::EventObject &event);
 
     /**
     * \brief Called to get hold of the actual preferences node.

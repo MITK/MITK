@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <algorithm>
 
-mitk::Handle::Handle() : m_IsActive(false), m_FaceIndices(4)
+mitk::Handle::Handle() : m_IsActive(false), m_FaceIndices(4), m_Index(0)
 {
   m_Position.Fill(0.0);
 }

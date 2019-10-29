@@ -130,9 +130,6 @@ void mitk::PlanarFigureReader::GenerateData()
   for (TiXmlElement *pfElement = document.FirstChildElement("PlanarFigure"); pfElement != nullptr;
        pfElement = pfElement->NextSiblingElement("PlanarFigure"))
   {
-    if (pfElement == nullptr)
-      continue;
-
     std::string type = pfElement->Attribute("type");
 
     mitk::PlanarFigure::Pointer planarFigure = nullptr;
@@ -311,8 +308,6 @@ void mitk::PlanarFigureReader::GenerateData()
       for (TiXmlElement *vertElement = cpElement->FirstChildElement("Vertex"); vertElement != nullptr;
            vertElement = vertElement->NextSiblingElement("Vertex"))
       {
-        if (vertElement == nullptr)
-          continue;
         int id = 0;
         mitk::Point2D::ValueType x = 0.0;
         mitk::Point2D::ValueType y = 0.0;

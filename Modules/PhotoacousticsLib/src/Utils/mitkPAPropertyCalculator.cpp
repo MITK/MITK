@@ -102,11 +102,11 @@ CalculatePropertyForSpecificWavelength(
   returnValue.mus = musp;
   returnValue.mus = 15;//musp;
 
-  double mua = bloodVolumeFraction*bloodOxygenation*m_SpectralLibMap[MapType::OXYGENATED][wavelength] +
-    bloodVolumeFraction*(1 - bloodOxygenation)*m_SpectralLibMap[MapType::DEOXYGENATED][wavelength] +
-    waterVolumeFraction*m_SpectralLibMap[MapType::WATER][wavelength] +
-    fatVolumeFraction*m_SpectralLibMap[MapType::FATTY][wavelength] +
-    melanosomesVolumeFraction*m_SpectralLibMap[MapType::MELANIN][wavelength];
+  double mua = bloodVolumeFraction*bloodOxygenation*m_SpectralLibMap[ChromophoreType::OXYGENATED][wavelength] +
+    bloodVolumeFraction*(1 - bloodOxygenation)*m_SpectralLibMap[ChromophoreType::DEOXYGENATED][wavelength] +
+    waterVolumeFraction*m_SpectralLibMap[ChromophoreType::WATER][wavelength] +
+    fatVolumeFraction*m_SpectralLibMap[ChromophoreType::FATTY][wavelength] +
+    melanosomesVolumeFraction*m_SpectralLibMap[ChromophoreType::MELANIN][wavelength];
 
   returnValue.mua = mua;
 
@@ -152,4 +152,10 @@ mitk::pa::PropertyCalculator::~PropertyCalculator()
 {
   m_SpectralLibMap.clear();
   m_Valid = false;
+}
+
+double mitk::pa::PropertyCalculator::GetAbsorptionForWavelength(
+  ChromophoreType ChromophoreType, int wavelength)
+{
+  return m_SpectralLibMap[ChromophoreType][wavelength];
 }

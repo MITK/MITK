@@ -17,68 +17,43 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLogMacros.h>
 #include <mitkUIDGenerator.h>
 
-#include <cstdlib>
-#include <iostream>
-#include <cmath>
+#include <iomanip>
 #include <sstream>
-#include <stdexcept>
 
 mitk::UIDGenerator::UIDGenerator(const char *prefix, unsigned int lengthOfRandomPart)
   : m_Prefix(prefix),
     m_LengthOfRandomPart(lengthOfRandomPart),
-    m_RandomGenerator(itk::Statistics::MersenneTwisterRandomVariateGenerator::New())
+    m_Distribution(std::uniform_int_distribution<unsigned long>(0, std::numeric_limits<unsigned long>::max()))
 {
-  if (lengthOfRandomPart < 5)
-  {
-    MITK_ERROR << "To few digits requested (" << lengthOfRandomPart << " digits)";
-    throw std::invalid_argument("To few digits requested");
-  }
-
-  m_RandomGenerator->Initialize();
 }
 
 std::string mitk::UIDGenerator::GetUID()
 {
   std::ostringstream s;
   s << m_Prefix;
-  time_t tt = time(nullptr);
-  tm *t = gmtime(&tt);
+  auto time = std::time(nullptr);
+  auto tm = std::localtime(&time);
 
-  if (t)
+  s << std::put_time(tm, "%Y%m%d%H%M%S");
+
+  std::ostringstream rs;
+
+  static std::random_device rd;        // Will be used to obtain a seed for the random number engine
+  static std::mt19937 generator(rd()); // Standard mersenne_twister_engine seeded with rd()
+
+  while (rs.str().length() < m_LengthOfRandomPart)
   {
-    s << t->tm_year + 1900;
-
-    if (t->tm_mon < 9)
-      s << "0"; // add a 0 for months 1 to 9
-    s << t->tm_mon + 1;
-
-    if (t->tm_mday < 10)
-      s << "0"; // add a 0 for days 1 to 9
-    s << t->tm_mday;
-
-    if (t->tm_hour < 10)
-      s << "0"; // add a 0 for hours 1 to 9
-    s << t->tm_hour;
-
-    if (t->tm_min < 10)
-      s << "0"; // add a 0 for minutes 1 to 9
-    s << t->tm_min;
-
-    if (t->tm_sec < 10)
-      s << "0"; // add a 0 for seconds 1 to 9
-    s << t->tm_sec;
-
-    std::ostringstream rs;
-    rs << (long int)(pow(10.0, double(m_LengthOfRandomPart)) / double(RAND_MAX) *
-                     double(m_RandomGenerator->GetUniformVariate(0, RAND_MAX)));
-
-    for (size_t i = rs.str().length(); i < m_LengthOfRandomPart; ++i) // add zeros for non available digits
-    {
-      s << "0";
-    }
-
-    s << rs.str();
+    rs << m_Distribution(generator);
   }
+
+  auto randomString = rs.str();
+
+  if (randomString.length() > m_LengthOfRandomPart)
+  {
+    randomString = randomString.substr(randomString.length() - m_LengthOfRandomPart);
+  }
+
+  s << randomString;
 
   return s.str();
 }

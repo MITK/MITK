@@ -44,12 +44,12 @@ class QmitkMeasurementView : public QmitkAbstractView
 
     static const std::string VIEW_ID;
     QmitkMeasurementView();
-    virtual ~QmitkMeasurementView();
+    ~QmitkMeasurementView() override;
 
     void CreateQtPartControl(QWidget* parent) override;
     void SetFocus() override;
 
-    virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
+    void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
     void NodeAdded(const mitk::DataNode* node) override;
     void NodeChanged(const mitk::DataNode* node) override;

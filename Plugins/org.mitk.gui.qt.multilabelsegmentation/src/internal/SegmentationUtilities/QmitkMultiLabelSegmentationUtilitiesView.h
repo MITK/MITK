@@ -25,6 +25,8 @@ class QmitkBooleanOperationsWidget;
 class QmitkSurfaceToImageWidget;
 class QmitkImageMaskingWidget;
 class QmitkMorphologicalOperationsWidget;
+class QmitkMorphologicalOperationsWidget;
+class QmitkConvertToMlWidget;
 
 class QmitkMultiLabelSegmentationUtilitiesView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
@@ -32,13 +34,13 @@ class QmitkMultiLabelSegmentationUtilitiesView : public QmitkAbstractView, publi
 
 public:
   QmitkMultiLabelSegmentationUtilitiesView();
-  ~QmitkMultiLabelSegmentationUtilitiesView();
+  ~QmitkMultiLabelSegmentationUtilitiesView() override;
 
-  void CreateQtPartControl(QWidget* parent);
-  void SetFocus();
+  void CreateQtPartControl(QWidget* parent) override;
+  void SetFocus() override;
 
-  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart);
-  void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart);
+  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
 
 private:
   void AddUtilityWidget(QWidget* widget, const QIcon& icon, const QString& text);
@@ -50,6 +52,8 @@ private:
   QmitkSurfaceToImageWidget* m_SurfaceToImageWidget;
 
   QmitkImageMaskingWidget* m_ImageMaskingWidget;
+
+  QmitkConvertToMlWidget* m_ConvertToMlWidget;
 
   Ui::QmitkMultiLabelSegmentationUtilitiesViewControls m_Controls;
 };

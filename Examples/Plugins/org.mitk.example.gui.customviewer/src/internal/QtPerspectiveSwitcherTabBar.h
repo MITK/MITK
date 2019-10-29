@@ -45,7 +45,7 @@ public:
   /**
    * Standard destructor.
    */
-  ~QtPerspectiveSwitcherTabBar();
+  ~QtPerspectiveSwitcherTabBar() override;
 
 private Q_SLOTS:
 

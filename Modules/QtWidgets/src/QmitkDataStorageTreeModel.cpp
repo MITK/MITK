@@ -395,11 +395,11 @@ QMimeData *QmitkDataStorageTreeModel::mimeDataFromModelIndexList(const QModelInd
     TreeItem *treeItem = static_cast<TreeItem *>(indexes.at(i).internalPointer());
 
     dsTreeItemPtrs << reinterpret_cast<quintptr>(treeItem);
-    dsDataNodePtrs << reinterpret_cast<quintptr>(treeItem->GetDataNode());
+    dsDataNodePtrs << reinterpret_cast<quintptr>(treeItem->GetDataNode().GetPointer());
 
     // --------------- deprecated -----------------
     unsigned long long treeItemAddress = reinterpret_cast<unsigned long long>(treeItem);
-    unsigned long long dataNodeAddress = reinterpret_cast<unsigned long long>(treeItem->GetDataNode());
+    unsigned long long dataNodeAddress = reinterpret_cast<unsigned long long>(treeItem->GetDataNode().GetPointer());
     QTextStream(&treeItemAddresses) << treeItemAddress;
     QTextStream(&dataNodeAddresses) << dataNodeAddress;
 

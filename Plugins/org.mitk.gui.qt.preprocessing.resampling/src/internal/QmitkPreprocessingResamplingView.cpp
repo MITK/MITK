@@ -81,9 +81,9 @@ typedef itk::BSplineInterpolateImageFunction<ImageType, double>                 
 
 QmitkPreprocessingResampling::QmitkPreprocessingResampling()
 : QmitkAbstractView(),
-  m_Controls(NULL),
-  m_SelectedImageNode(NULL),
-  m_TimeStepperAdapter(NULL)
+  m_Controls(nullptr),
+  m_SelectedImageNode(nullptr),
+  m_TimeStepperAdapter(nullptr)
 {
 }
 
@@ -93,7 +93,7 @@ QmitkPreprocessingResampling::~QmitkPreprocessingResampling()
 
 void QmitkPreprocessingResampling::CreateQtPartControl(QWidget *parent)
 {
-  if (m_Controls == NULL)
+  if (m_Controls == nullptr)
   {
     m_Controls = new Ui::QmitkPreprocessingResamplingViewControls;
     m_Controls->setupUi(parent);
@@ -258,7 +258,7 @@ void QmitkPreprocessingResampling::StartButtonClicked()
   {
   QString exceptionString = tr("An error occured during image loading:\n");
   exceptionString.append( e.what() );
-    QMessageBox::warning( NULL, "Preprocessing - Resampling: ", exceptionString , QMessageBox::Ok, QMessageBox::NoButton );
+    QMessageBox::warning( nullptr, "Preprocessing - Resampling: ", exceptionString , QMessageBox::Ok, QMessageBox::NoButton );
     this->BusyCursorOff();
     return;
   }
@@ -268,7 +268,7 @@ void QmitkPreprocessingResampling::StartButtonClicked()
   {
     this->BusyCursorOff();
 
-    QMessageBox::warning( NULL, "Preprocessing - Resampling", tr("Input image is broken or not initialized. Returning."), QMessageBox::Ok, QMessageBox::NoButton );
+    QMessageBox::warning( nullptr, "Preprocessing - Resampling", tr("Input image is broken or not initialized. Returning."), QMessageBox::Ok, QMessageBox::NoButton );
     return;
   }
 
@@ -394,7 +394,7 @@ void QmitkPreprocessingResampling::StartButtonClicked()
   catch (...)
   {
     this->BusyCursorOff();
-    QMessageBox::warning(NULL, "Warning", "Problem when applying filter operation. Check your input...");
+    QMessageBox::warning(nullptr, "Warning", "Problem when applying filter operation. Check your input...");
     return;
   }
 

@@ -48,12 +48,12 @@ class QmitkIGTTrackingDataEvaluationView : public QmitkFunctionality
     static const std::string VIEW_ID;
 
     QmitkIGTTrackingDataEvaluationView();
-    virtual ~QmitkIGTTrackingDataEvaluationView();
+    ~QmitkIGTTrackingDataEvaluationView() override;
 
-    virtual void CreateQtPartControl(QWidget *parent);
+    void CreateQtPartControl(QWidget *parent) override;
 
-    virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-    virtual void StdMultiWidgetNotAvailable();
+    void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
+    void StdMultiWidgetNotAvailable() override;
 
   protected slots:
 

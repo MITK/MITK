@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-  ctkPluginContext* PluginActivator::m_Context = 0;
+  ctkPluginContext* PluginActivator::m_Context = nullptr;
 
 void PluginActivator::start(ctkPluginContext* context)
 {
@@ -45,7 +45,7 @@ void PluginActivator::start(ctkPluginContext* context)
 
 void PluginActivator::stop(ctkPluginContext* context)
 {
-  m_Context = 0;
+  m_Context = nullptr;
 
   Q_UNUSED(context)
 }

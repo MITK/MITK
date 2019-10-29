@@ -49,8 +49,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkStructureTensorEigenvalueImageFilter.h>
 #include <itkLineHistogramBasedMassImageFilter.h>
 #include <mitkHistogramGenerator.h>
-#include <mitkImageStatisticsHolder.h>
-#include <mitkImageStatisticsCalculator.h>
 
 #include <itkImageRegionConstIteratorWithIndex.h>
 #include <itkImageRegionConstIterator.h>

@@ -15,6 +15,10 @@ http://www.cs.umd.edu/~mount/ANN/
 
 http://www.boost.org/
 
+\par C++ REST SDK
+
+https://github.com/Microsoft/cpprestsdk/
+
 \par CppUnit
 
 http://sourceforge.net/projects/cppunit/
@@ -34,10 +38,6 @@ http://eigen.tuxfamily.org/index.php?title=Main_Page
 \par GDCM
 
 http://gdcm.sourceforge.net/
-
-\par GLUT
-
-https://www.opengl.org/resources/libraries/glut/
 
 \par HDF5
 
@@ -87,22 +87,6 @@ http://www.qt.io/
 
 http://qwt.sourceforge.net/
 
-\par Rasqal
-
-http://librdf.org/rasqal/
-
-\par Raptor2
-
-http://librdf.org/raptor/
-
-\par Redland
-
-http://librdf.org/
-
-\par SimpleITK
-
-http://www.simpleitk.org/
-
 \par SWIG
 
 http://swig.org/
@@ -121,11 +105,7 @@ http://www.vtk.org/
 
 \par zlib
 
-https://github.com/commontk/zlib
-
-\par libSVM
-http://www.csie.ntu.edu.tw/~cjlin/libsvm/
-
+https://github.com/madler/zlib/
 
 For copyright information on any of the above toolkits see the corresponding home page or the corresponding source folder.
 */

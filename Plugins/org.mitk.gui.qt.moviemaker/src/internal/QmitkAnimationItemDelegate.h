@@ -25,7 +25,7 @@ class QmitkAnimationItemDelegate : public QStyledItemDelegate
 
 public:
   explicit QmitkAnimationItemDelegate(QObject* parent = nullptr);
-  ~QmitkAnimationItemDelegate();
+  ~QmitkAnimationItemDelegate() override;
 
   void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 };

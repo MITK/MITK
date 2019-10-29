@@ -117,15 +117,16 @@ mitk::TimeStepType mitk::ArbitraryTimeGeometry::TimePointToTimeStep(TimePointTyp
 {
   mitk::TimeStepType result = 0;
 
-  if ( timePoint >= GetMinimumTimePoint() )
+  if (timePoint >= GetMinimumTimePoint())
   {
-    for ( auto pos = m_MaximumTimePoints.cbegin(); pos != m_MaximumTimePoints.cend(); ++pos )
+    for (auto pos = m_MaximumTimePoints.cbegin(); pos != m_MaximumTimePoints.cend(); ++pos)
     {
       if (timePoint < *pos)
       {
-        result = pos - m_MaximumTimePoints.begin();
         break;
       }
+
+      ++result;
     }
   }
 

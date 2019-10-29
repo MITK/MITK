@@ -14,14 +14,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKLINEEDITLEVELWINDOWWIDGET
-#define QMITKLINEEDITLEVELWINDOWWIDGET
+#ifndef QMITKLINEEDITLEVELWINDOWWIDGET_H
+#define QMITKLINEEDITLEVELWINDOWWIDGET_H
 
 #include <MitkQtWidgetsExports.h>
 
-#include <QWidget>
-
+// mitk core
 #include <mitkLevelWindowManager.h>
+
+// qt
+#include <QWidget>
 
 class QmitkLevelWindowWidgetContextMenu;
 class QLineEdit;
@@ -59,7 +61,7 @@ public:
   mitk::LevelWindowManager::Pointer m_Manager;
 
   /// sets the manager who is responsible to collect and deliver changes on Level/Window
-  void setLevelWindowManager(mitk::LevelWindowManager *levelWindowManager);
+  void SetLevelWindowManager(mitk::LevelWindowManager *levelWindowManager);
 
   /// sets the DataStorage which holds all image-nodes
   void SetDataStorage(mitk::DataStorage *ds);
@@ -74,24 +76,22 @@ private:
   /// change notifications from the mitkLevelWindowManager
   void OnPropertyModified(const itk::EventObject &e);
 
-public slots:
+public Q_SLOTS:
 
-  /// called when return is pressed in levelinput field
+  /** @brief Read the levelInput and change level and slider when the button "ENTER" was pressed
+  *          in the windowInput-LineEdit.
+  */
   void SetLevelValue();
-
-  /// called when return is pressed in windowinput field
+  /** @brief Read the windowInput and change window and slider when the button "ENTER" was pressed
+  *          in the windowInput-LineEdit.
+  */
   void SetWindowValue();
-
-  // validator to accept only possible values for Level/Window in lineedits
-  // void setValidator();
 
 protected:
   unsigned long m_ObserverTag;
   bool m_IsObserverTagSet;
 
-  /*!
-  *  data structure which creates the contextmenu for QmitkLineEditLevelWindowWidget
-  */
   QmitkLevelWindowWidgetContextMenu *m_Contextmenu;
 };
-#endif // QMITKLINEEDITLEVELWINDOWWIDGET
+
+#endif // QMITKLINEEDITLEVELWINDOWWIDGET_H

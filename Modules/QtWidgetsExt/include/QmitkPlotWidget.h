@@ -51,10 +51,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 * 3. You can modify the behavior of the plot by directly referencing
 *    the QwtPlot instance using the method GetPlot().
 * @see QwtPlot
+* @deprecatedSince{2018_04} Use QmitkChartWidget instead
 */
 
-class MITKQTWIDGETSEXT_EXPORT QmitkPlotWidget : public QWidget
-{
+class MITKQTWIDGETSEXT_EXPORT QmitkPlotWidget
+  : public QWidget
+  {
 private:
   Q_OBJECT
 

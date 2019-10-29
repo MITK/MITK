@@ -1,8 +1,8 @@
-set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.10)
+set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.14.5)
 cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION})
 
 #-----------------------------------------------------------------------------
-# See https://cmake.org/cmake/help/v3.10/manual/cmake-policies.7.html for details
+# See https://cmake.org/cmake/help/v3.14/manual/cmake-policies.7.html for details
 #-----------------------------------------------------------------------------
 
 set(project_policies )
@@ -23,7 +23,7 @@ if(MITK_USE_SUPERBUILD)
   set(MITK_SOURCE_DIR ${PROJECT_SOURCE_DIR})
   set(MITK_BINARY_DIR ${PROJECT_BINARY_DIR})
 else()
-  project(MITK VERSION 2018.04.02)
+  project(MITK VERSION 2018.04.99)
   include_directories(SYSTEM ${MITK_SUPERBUILD_BINARY_DIR})
 endif()
 
@@ -69,6 +69,7 @@ include(mitkFunctionGenerateProjectXml)
 include(mitkFunctionEnableBuildConfiguration)
 include(mitkFunctionWhitelists)
 include(mitkFunctionAddExternalProject)
+include(mitkFunctionAddLibrarySearchPaths)
 
 SUPPRESS_VC_DEPRECATED_WARNINGS()
 
@@ -127,7 +128,7 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
     message(FATAL_ERROR "Apple Clang version must be at least 5.0")
   endif()
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-  # require at least Visual Studio 2015
+  # require at least Visual Studio 2017
   if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.10)
     message(FATAL_ERROR "Microsoft Visual Studio 2017 or newer required")
   endif()
@@ -184,22 +185,14 @@ endif()
 # Additional MITK Options (also shown during superbuild)
 #-----------------------------------------------------------------------------
 
-macro(env_option name doc value)
-  set(_value $ENV{${name}})
-  if("${_value}" STREQUAL "")
-    set(_value ${value})
-  endif()
-  option(${name} "${doc}" ${_value})
-endmacro()
-
 # -----------------------------------------
 # General build options
 option(BUILD_SHARED_LIBS "Build MITK with shared libraries" ON)
 option(WITH_COVERAGE "Enable/Disable coverage" OFF)
 option(BUILD_TESTING "Test the project" ON)
 
-env_option(MITK_BUILD_ALL_APPS "Build all MITK applications" OFF)
-env_option(MITK_BUILD_EXAMPLES "Build the MITK Examples" OFF)
+option(MITK_BUILD_ALL_APPS "Build all MITK applications" OFF)
+option(MITK_BUILD_EXAMPLES "Build the MITK Examples" OFF)
 option(MITK_ENABLE_PIC_READER "Enable support for reading the DKFZ pic file format." ON)
 
 mark_as_advanced(MITK_BUILD_ALL_APPS
@@ -209,10 +202,10 @@ mark_as_advanced(MITK_BUILD_ALL_APPS
 # -----------------------------------------
 # Qt version related variables
 
-env_option(MITK_USE_Qt5 "Use Qt 5 library" ON)
+option(MITK_USE_Qt5 "Use Qt 5 library" ON)
 
 if(MITK_USE_Qt5)
-  set(MITK_QT5_MINIMUM_VERSION 5.11.1)
+  set(MITK_QT5_MINIMUM_VERSION 5.12)
   set(MITK_QT5_COMPONENTS Concurrent OpenGL PrintSupport Script Sql Svg Widgets Xml XmlPatterns WebEngineWidgets UiTools Help LinguistTools)
   if(APPLE)
     list(APPEND MITK_QT5_COMPONENTS DBus)
@@ -226,33 +219,54 @@ if(MITK_USE_Qt5)
       set(_dir_candidates "C:/Qt")
 
       if(CMAKE_GENERATOR MATCHES "^Visual Studio [0-9]+ ([0-9]+)")
-        set(_compiler "msvc${CMAKE_MATCH_1}")
+        set(_compilers "msvc${CMAKE_MATCH_1}")
+      elseif(CMAKE_GENERATOR MATCHES "Ninja")
+        include(mitkFunctionGetMSVCVersion)
+        mitkFunctionGetMSVCVersion()
+        if(VISUAL_STUDIO_PRODUCT_NAME MATCHES "^Visual Studio ([0-9]+)")
+          set(_compilers "msvc${CMAKE_MATCH_1}")
+        endif()
+      endif()
+
+      if(_compilers MATCHES "[0-9]+")
+        if (CMAKE_MATCH_0 EQUAL 2019)
+          list(APPEND _compilers "msvc2017") # Binary compatible to 2019
+        endif()
       endif()
     else()
       set(_dir_candidates ~/Qt)
 
       if(APPLE)
-        set(_compiler clang)
+        set(_compilers clang)
       else()
         list(APPEND _dir_candidates /opt/Qt)
-        set(_compiler gcc)
+        set(_compilers gcc)
       endif()
     endif()
 
     if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-        set(_compiler "${_compiler}_64")
+      foreach(_compiler ${_compilers})
+        list(APPEND _compilers64 "${_compiler}_64")
+      endforeach()
+      set(_compilers ${_compilers64})
     endif()
 
     foreach(_dir_candidate ${_dir_candidates})
       get_filename_component(_dir_candidate ${_dir_candidate} REALPATH)
-      set(_glob_expression "${_dir_candidate}/5.*/${_compiler}")
-      file(GLOB _hints ${_glob_expression})
-      list(SORT _hints)
-      list(APPEND MITK_QT5_HINTS ${_hints})
+      foreach(_compiler ${_compilers})
+        set(_glob_expression "${_dir_candidate}/5.*/${_compiler}")
+        file(GLOB _hints ${_glob_expression})
+        list(SORT _hints)
+        list(APPEND MITK_QT5_HINTS ${_hints})
+      endforeach()
     endforeach()
   endif()
 
   find_package(Qt5 ${MITK_QT5_MINIMUM_VERSION} COMPONENTS ${MITK_QT5_COMPONENTS} REQUIRED HINTS ${MITK_QT5_HINTS})
+
+  if(${Qt5_VERSION} VERSION_GREATER_EQUAL 5.13)
+    message(FATAL_ERROR "Qt version ${Qt5_VERSION_MAJOR}.${Qt5_VERSION_MINOR} is not yet supported. We recommend using the latest long-term support version 5.12.x.")
+  endif()
 endif()
 
 set_property(GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS "")
@@ -272,8 +286,10 @@ endforeach()
 # external projects build via the
 # MITK superbuild
 
-env_option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
-env_option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
+option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
+option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
+option(MITK_USE_OpenMP "Use OpenMP" OFF)
+option(MITK_USE_Python3 "Use Python 3" OFF)
 
 #-----------------------------------------------------------------------------
 # Build configurations
@@ -311,30 +327,53 @@ mitkFunctionFindWhitelists(MITK)
 # Custom dependency logic
 
 option(MITK_USE_SYSTEM_Boost "Use the system Boost" OFF)
+
 set(MITK_USE_Boost_LIBRARIES "" CACHE STRING "A semi-colon separated list of required Boost libraries")
 
-# only windows can't build python in debug mode
-if(MITK_USE_Python AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" AND WIN32)
-  message(WARNING "Disabling Python support. Building MITK Python in debug mode on Windowsis not supported!")
-  set(MITK_USE_Python OFF CACHE BOOL "Use python wrapping in MITK" FORCE)
-  set(MITK_USE_Numpy OFF CACHE BOOL "Use Numpy" FORCE)
-  set(MITK_USE_SimpleITK OFF CACHE BOOL "Use SimpleITK" FORCE)
-elseif(MITK_USE_Python)
-  set(MITK_USE_ZLIB ON)
-  if(NOT MITK_USE_Numpy)
-    message("> Forcing MITK_USE_Numpy to ON because of MITK_USE_Python")
-    set(MITK_USE_Numpy ON CACHE BOOL "Use Numpy" FORCE)
-  endif()
-  if(NOT MITK_USE_SimpleITK)
-    message("> Forcing MITK_USE_SimpleITK to ON because of MITK_USE_Python")
-    set(MITK_USE_SimpleITK ON CACHE BOOL "Use SimpleITK" FORCE)
+if(MITK_USE_cpprestsdk)
+  find_package(OpenSSL QUIET)
+  if(NOT OpenSSL_FOUND)
+    set(openssl_message "Could not find OpenSSL (dependency of C++ REST SDK).\n")
+    if(UNIX)
+      if(APPLE)
+        set(openssl_message "${openssl_message}Please install it using your favorite package management "
+                            "system (i.e. Homebrew or MacPorts).\n")
+      else()
+        set(openssl_message "${openssl_message}Please install the dev package of OpenSSL (i.e. libssl-dev).\n")
+      endif()
+    else()
+      set(openssl_message "${openssl_message}Please install Win32 OpenSSL:\n"
+                          "  https://slproweb.com/products/Win32OpenSSL.html\n")
+    endif()
+    set(openssl_message "${openssl_message}If it still cannot be found, you can hint CMake to find OpenSSL by "
+                        "adding/setting the OPENSSL_ROOT_DIR variable to the root directory of an "
+                        "OpenSSL installation. Make sure to clear variables of partly found "
+                        "versions of OpenSSL before, or they will be mixed up.")
+    message(FATAL_ERROR ${openssl_message})
   endif()
 
-  find_package(PythonLibs REQUIRED)
-  find_package(PythonInterp REQUIRED)
-elseif(MITK_USE_Python AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" AND WIN32)
-  message(WARNING "Disabling Python support. Building MITK Python in debug mode on Windowsis not supported!")
-  set(MITK_USE_Python OFF CACHE BOOL "Use python wrapping in MITK" FORCE)
+  list(APPEND MITK_USE_Boost_LIBRARIES date_time regex system)
+  if(UNIX)
+    list(APPEND MITK_USE_Boost_LIBRARIES atomic chrono filesystem random thread)
+  endif()
+  list(REMOVE_DUPLICATES MITK_USE_Boost_LIBRARIES)
+  set(MITK_USE_Boost_LIBRARIES ${MITK_USE_Boost_LIBRARIES} CACHE STRING "A semi-colon separated list of required Boost libraries" FORCE)
+endif()
+
+if(MITK_USE_Python3)
+  set(MITK_USE_ZLIB ON CACHE BOOL "" FORCE)
+
+  if(APPLE AND CMAKE_FRAMEWORK_PATH AND CMAKE_FRAMEWORK_PATH MATCHES "python3\\.?([0-9]+)")
+    find_package(Python3 3.${CMAKE_MATCH_1} EXACT REQUIRED COMPONENTS Interpreter Development NumPy)
+  else()
+    find_package(Python3 REQUIRED COMPONENTS Interpreter Development NumPy)
+  endif()
+
+  if(WIN32)
+    string(REPLACE "\\" "/" Python3_STDARCH "${Python3_STDARCH}")
+    string(REPLACE "\\" "/" Python3_STDLIB "${Python3_STDLIB}")
+    string(REPLACE "\\" "/" Python3_SITELIB "${Python3_SITELIB}")
+  endif()
 endif()
 
 if(BUILD_TESTING AND NOT MITK_USE_CppUnit)
@@ -432,7 +471,7 @@ list(APPEND CTEST_PROJECT_SUBPROJECTS
   MITK-CoreUI
   MITK-IGT
   MITK-ToF
-  MITK-DTI
+  MITK-Diffusion
   MITK-Modules # all modules not contained in a specific subproject
   MITK-Plugins # all plugins not contained in a specific subproject
   MITK-Examples
@@ -693,20 +732,14 @@ set(MITK_CXX_FLAGS_RELEASE )
 set(MITK_EXE_LINKER_FLAGS )
 set(MITK_SHARED_LINKER_FLAGS )
 
-find_package(OpenMP)
-
-if (OPENMP_FOUND)
-  set(MITK_C_FLAGS "${MITK_C_FLAGS} ${OpenMP_C_FLAGS}")
-  set(MITK_CXX_FLAGS "${MITK_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-endif()
-
 if(WIN32)
-  set(MITK_CXX_FLAGS "${MITK_CXX_FLAGS} -D_WIN32_WINNT=0x0501 -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN -DNOMINMAX")
+  set(MITK_CXX_FLAGS "${MITK_CXX_FLAGS} -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN -DNOMINMAX")
   mitkFunctionCheckCompilerFlags("/wd4005" MITK_CXX_FLAGS) # warning C4005: macro redefinition
   mitkFunctionCheckCompilerFlags("/wd4231" MITK_CXX_FLAGS) # warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
   # the following line should be removed after fixing bug 17637
   mitkFunctionCheckCompilerFlags("/wd4316" MITK_CXX_FLAGS) # warning C4316: object alignment on heap
   mitkFunctionCheckCompilerFlags("/wd4180" MITK_CXX_FLAGS) # warning C4180: qualifier applied to function type has no meaning
+  mitkFunctionCheckCompilerFlags("/wd4251" MITK_CXX_FLAGS) # warning C4251: 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
 endif()
 
 if(APPLE)
@@ -729,7 +762,7 @@ if(NOT MSVC_VERSION)
     -Wstrict-null-sentinel
     #-Wold-style-cast
     #-Wsign-promo
-
+    -Wno-error=deprecated-copy
     -Wno-array-bounds
 
     -fdiagnostics-show-option
@@ -840,26 +873,36 @@ if(MITK_USE_DCMQI)
   find_package(DCMQI REQUIRED)
 endif()
 
-if(MITK_USE_Python)
-  find_package(PythonLibs REQUIRED)
-  find_package(PythonInterp REQUIRED)
-  if(MITK_USE_Numpy)
-    find_package(Numpy REQUIRED)
-  endif()
-endif()
-
 link_directories(${Boost_LIBRARY_DIRS})
 
 if(MITK_USE_OpenIGTLink)
   link_directories(${OpenIGTLink_LIBRARY_DIRS})
 endif()
 
-if(MITK_USE_SimpleITK)
-  link_directories(${SimpleITK_LIBRARY_DIRS})
-endif()
-
 if(MITK_USE_OpenCL)
   find_package(OpenCL REQUIRED)
+endif()
+
+if(MITK_USE_OpenMP)
+  find_package(OpenMP REQUIRED COMPONENTS CXX)
+else()
+  find_package(OpenMP QUIET COMPONENTS CXX)
+
+  if(OpenMP_FOUND)
+    set(MITK_USE_OpenMP ON CACHE BOOL "" FORCE)
+  elseif(APPLE AND OpenMP_libomp_LIBRARY AND NOT OpenMP_CXX_LIB_NAMES)
+    set(OpenMP_CXX_LIB_NAMES libomp CACHE STRING "" FORCE)
+    get_filename_component(openmp_lib_dir "${OpenMP_libomp_LIBRARY}" DIRECTORY)
+    set(openmp_include_dir "${openmp_lib_dir}/../include")
+    if(EXISTS "${openmp_include_dir}")
+      get_filename_component(openmp_include_dir "${openmp_include_dir}" REALPATH)
+      set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp -I${openmp_include_dir}" CACHE STRING "" FORCE)
+      find_package(OpenMP QUIET COMPONENTS CXX)
+      if(OpenMP_FOUND)
+        set(MITK_USE_OpenMP ON CACHE BOOL "" FORCE)
+      endif()
+    endif()
+  endif()
 endif()
 
 # Qt support
@@ -986,7 +1029,7 @@ if(BUILD_TESTING)
     try
       {")
   set(CMAKE_TESTDRIVER_AFTER_TESTMAIN "    }
-      catch( std::exception & excp )
+      catch ( const std::exception & excp  )
         {
         fprintf(stderr,\"%s\\n\",excp.what());
         return EXIT_FAILURE;

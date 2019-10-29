@@ -30,7 +30,7 @@ const std::string mitk::NavigationDataSource::US_PROPKEY_ID = US_INTERFACE_NAME 
 const std::string mitk::NavigationDataSource::US_PROPKEY_ISACTIVE = US_INTERFACE_NAME + ".isActive";
 
 mitk::NavigationDataSource::NavigationDataSource()
-: itk::ProcessObject(), m_Name("NavigationDataSource (no defined type)"), m_IsFrozen(false)
+: itk::ProcessObject(), m_Name("NavigationDataSource (no defined type)"), m_IsFrozen(false), m_ToolMetaDataCollection(mitk::NavigationToolStorage::New())
 {
 }
 
@@ -153,4 +153,17 @@ void mitk::NavigationDataSource::Freeze()
 void mitk::NavigationDataSource::UnFreeze()
 {
   m_IsFrozen = false;
+}
+
+mitk::NavigationTool::Pointer mitk::NavigationDataSource::GetToolMetaData(DataObjectPointerArraySizeType idx)
+{
+  if (idx >= this->GetNumberOfIndexedOutputs()) { return mitk::NavigationTool::New(); }
+  else { return GetToolMetaData(this->GetOutput(idx)->GetName()); }
+}
+
+mitk::NavigationTool::Pointer mitk::NavigationDataSource::GetToolMetaData(const std::string& navDataName)
+{
+  mitk::NavigationTool::Pointer returnValue = m_ToolMetaDataCollection->GetToolByName(navDataName);
+  if (returnValue == nullptr) { returnValue = mitk::NavigationTool::New(); }
+  return returnValue;
 }

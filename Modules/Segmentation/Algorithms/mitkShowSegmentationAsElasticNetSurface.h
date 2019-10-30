@@ -61,7 +61,7 @@ private:
   ShowSegmentationAsElasticNetSurface(const Self&);
   void operator=(const Self&);
 
-  void calcRegion();
+  bool calcRegion();
   void createSurfaceCubes();
   void createNodes();
   void linkNodes();

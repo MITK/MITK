@@ -263,7 +263,7 @@ void QmitkIGTTrackingLabView::OnInitialRegistration()
 
   //############### if activated: ct image is also transformed ##########################
   //transform ct image
-  //todo: Erklären, dass hier AffineTransform3D verwendet wird, weil NavigationData kein Spacing unterstützt!
+  //todo: Explain that AffineTransform3D is used, because NavigationData does not support spacing!
   if(m_Controls.m_ImageActive->isChecked() && m_Controls.m_ImageComboBox->GetSelectedNode().IsNotNull())
   {
     //first we have to store the original ct image transform to compose it with the new transform later

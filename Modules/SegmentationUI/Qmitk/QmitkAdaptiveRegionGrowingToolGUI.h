@@ -223,7 +223,10 @@ private:
   void StartRegionGrowing(itk::Image< TPixel, VImageDimension >* itkImage, mitk::BaseGeometry* imageGeometry, mitk::PointSet::PointType seedPoint);
 
   template <typename TPixel, unsigned int VImageDimension>
-  void ITKThresholding(itk::Image<TPixel, VImageDimension>* inputSegmentation, mitk::Image* computedSegmentation);
+  void ITKThresholding_(itk::Image<TPixel, VImageDimension>* computedSegmentation, mitk::Image* inputSegmentation);
+
+  template <typename TImgPixel, typename TSegPixel, unsigned int VImageDimension>
+  void ITKThresholding(itk::Image<TImgPixel, VImageDimension>* inputSegmentation, mitk::Image* computedSegmentation);
 
   void InitializeLevelWindow();
 

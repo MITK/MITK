@@ -701,9 +701,9 @@ void QmitkAdaptiveRegionGrowingToolGUI::ConfirmSegmentation()
     timeSelector->SetInput( originalSegmentation );
     timeSelector->SetTimeNr( timeStep );
     timeSelector->UpdateLargestPossibleRegion();
-    AccessByItk_1(timeSelector->GetOutput(), ITKThresholding, previewImage);
+    AccessByItk_1(previewImage, ITKThresholding_, timeSelector->GetOutput());
   } else { // Use original
-    AccessByItk_1(originalSegmentation, ITKThresholding, previewImage);
+    AccessByItk_1(previewImage, ITKThresholding_, originalSegmentation);
   }
 
   originalSegmentation->Modified();
@@ -721,8 +721,19 @@ void QmitkAdaptiveRegionGrowingToolGUI::ConfirmSegmentation()
   }
 }
 
-template<typename TPixel, unsigned int VImageDimension>
-void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImageDimension>* inputSegmentation, mitk::Image* computedSegmentation)
+template< typename TPixel, unsigned int VImageDimension>
+void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding_(itk::Image<TPixel, VImageDimension>* computedSegmentation, mitk::Image* inputSegmentation)
+{
+  auto pixelType = inputSegmentation->GetPixelType().GetComponentType();
+  if (pixelType == itk::ImageIOBase::UCHAR) {
+    ITKThresholding<TPixel, unsigned char, VImageDimension>(computedSegmentation, inputSegmentation);
+  } else {
+    ITKThresholding<TPixel, unsigned short, VImageDimension>(computedSegmentation, inputSegmentation);
+  }
+}
+
+template<typename TImgPixel, typename TSegPixel, unsigned int VImageDimension>
+void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TImgPixel, VImageDimension>* computedSegmentation, mitk::Image* inputSegmentation)
 {
   if (computedSegmentation == nullptr) {
     return;
@@ -731,33 +742,34 @@ void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImag
   int displayedComponent = 0;
   m_InputImageNode->GetIntProperty("Image.Displayed Component", displayedComponent);
 
-  typedef itk::Image<TPixel, VImageDimension> InputImageType;
+  typedef itk::Image<TImgPixel, VImageDimension> InputImageType;
+  typedef itk::Image<TSegPixel, VImageDimension> SegmentationType;
 
-  typename InputImageType::Pointer computedSegmentationInITK = InputImageType::New();
-  mitk::CastToItkImage<InputImageType>(computedSegmentation, computedSegmentationInITK);
+  typename SegmentationType::Pointer inputSegmentationInITK = SegmentationType::New();
+  mitk::CastToItkImage<SegmentationType>(inputSegmentation, inputSegmentationInITK);
 
   //Fill current preiview image in segmentation image
-  inputSegmentation->FillBuffer(0);
-  itk::ImageRegionIterator<InputImageType> itOriginal(inputSegmentation, inputSegmentation->GetLargestPossibleRegion());
-  itk::ImageRegionIterator<InputImageType> itComputed(computedSegmentationInITK, computedSegmentationInITK->GetLargestPossibleRegion());
+  inputSegmentationInITK->FillBuffer(0);
+  itk::ImageRegionIterator<InputImageType> itComputed(computedSegmentation, computedSegmentation->GetLargestPossibleRegion());
+  itk::ImageRegionIterator<SegmentationType> itOriginal(inputSegmentationInITK, inputSegmentationInITK->GetLargestPossibleRegion());
   itOriginal.GoToBegin();
   itComputed.GoToBegin();
 
   //calculate threhold from slider value
-  int currentTreshold = 0;
+  int currentThreshold = 0;
   if (m_CurrentRGDirectionIsUpwards)
   {
-    currentTreshold = m_RGMAXIMUM - m_Controls.m_PreviewSlider->value() + 1;
+    currentThreshold = m_RGMAXIMUM - m_Controls.m_PreviewSlider->value() + 1;
   }
   else
   {
-    currentTreshold = m_Controls.m_PreviewSlider->value() - m_RGMINIMUM;
+    currentThreshold = m_Controls.m_PreviewSlider->value() - m_RGMINIMUM;
   }
 
   //iterate over image and set pixel in segmentation according to thresholded labeled image
   while(!itOriginal.IsAtEnd() && !itComputed.IsAtEnd()) {
     //Use threshold slider to determine if pixel is set to 1
-    if(itComputed.Value() != 0 && itComputed.Value() > currentTreshold) {
+    if(itComputed.Value() != 0 && itComputed.Value() > currentThreshold) {
       itOriginal.Set(1);
     }
 

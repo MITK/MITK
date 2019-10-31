@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkAnatomicalStructureColorPresets.h>
 #include "mitkDisplayInteractor.h"
+#include "mitkDisplayActionEventBroadcast.h"
 #include "mitkImageReadAccessor.h"
 #include "mitkImageWriteAccessor.h"
 #include "mitkLevelWindowProperty.h"
@@ -127,18 +128,24 @@ void mitk::Tool::Activated()
   m_DisplayInteractorConfigs.clear();
   std::vector<us::ServiceReference<InteractionEventObserver>> listEventObserver =
     us::GetModuleContext()->GetServiceReferences<InteractionEventObserver>();
-  for (auto it = listEventObserver.begin();
-       it != listEventObserver.end();
-       ++it)
+  for (auto it = listEventObserver.begin(); it != listEventObserver.end(); ++it)
   {
-    auto *displayInteractor =
-      dynamic_cast<DisplayInteractor *>(us::GetModuleContext()->GetService<InteractionEventObserver>(*it));
+    auto displayInteractor = dynamic_cast<DisplayInteractor*>(us::GetModuleContext()->GetService<InteractionEventObserver>(*it));
     if (displayInteractor != nullptr)
     {
       // remember the original configuration
       m_DisplayInteractorConfigs.insert(std::make_pair(*it, displayInteractor->GetEventConfig()));
       // here the alternative configuration is loaded
       displayInteractor->SetEventConfig(m_EventConfig.c_str());
+    }
+
+    auto displayActionEventBroadcast = dynamic_cast<DisplayActionEventBroadcast*>(us::GetModuleContext()->GetService<InteractionEventObserver>(*it));
+    if (displayActionEventBroadcast != nullptr)
+    {
+      // remember the original configuration
+      m_DisplayInteractorConfigs.insert(std::make_pair(*it, displayActionEventBroadcast->GetEventConfig()));
+      // here the alternative configuration is loaded
+      displayActionEventBroadcast->SetEventConfig(m_EventConfig.c_str());
     }
   }
 }
@@ -147,18 +154,22 @@ void mitk::Tool::Deactivated()
 {
   // Re-enabling InteractionEventObservers that have been previously disabled for legacy handling of Tools
   // in new interaction framework
-  for (auto it = m_DisplayInteractorConfigs.begin();
-       it != m_DisplayInteractorConfigs.end();
-       ++it)
+  for (auto it = m_DisplayInteractorConfigs.begin(); it != m_DisplayInteractorConfigs.end(); ++it)
   {
     if (it->first)
     {
-      DisplayInteractor *displayInteractor =
-        static_cast<DisplayInteractor *>(us::GetModuleContext()->GetService<InteractionEventObserver>(it->first));
+      auto displayInteractor = static_cast<DisplayInteractor*>(us::GetModuleContext()->GetService<InteractionEventObserver>(it->first));
       if (displayInteractor != nullptr)
       {
         // here the regular configuration is loaded again
         displayInteractor->SetEventConfig(it->second);
+      }
+
+      auto displayActionEventBroadcast = dynamic_cast<DisplayActionEventBroadcast*>(us::GetModuleContext()->GetService<InteractionEventObserver>(it->first));
+      if (displayActionEventBroadcast != nullptr)
+      {
+        // here the regular configuration is loaded again
+        displayActionEventBroadcast->SetEventConfig(it->second);
       }
     }
   }

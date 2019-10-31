@@ -15,8 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "QmitkAdaptiveRegionGrowingToolGUI.h"
 
-#include "QmitkStdMultiWidget.h"
-
 #include <qmessagebox.h>
 
 #include "mitkITKImageImport.h"
@@ -48,7 +46,6 @@ MITK_TOOL_GUI_MACRO(, QmitkAdaptiveRegionGrowingToolGUI, "")
 
 QmitkAdaptiveRegionGrowingToolGUI::QmitkAdaptiveRegionGrowingToolGUI(QWidget *parent)
   : QmitkToolGUI(),
-    m_MultiWidget(nullptr),
     m_DataStorage(nullptr),
     m_UseVolumeRendering(false),
     m_UpdateSuggestedThreshold(true),
@@ -151,11 +148,6 @@ void QmitkAdaptiveRegionGrowingToolGUI::SetDataNodeNames(std::string labledSegme
 void QmitkAdaptiveRegionGrowingToolGUI::SetDataStorage(mitk::DataStorage *dataStorage)
 {
   m_DataStorage = dataStorage;
-}
-
-void QmitkAdaptiveRegionGrowingToolGUI::SetMultiWidget(QmitkStdMultiWidget *multiWidget)
-{
-  m_MultiWidget = multiWidget;
 }
 
 void QmitkAdaptiveRegionGrowingToolGUI::SetInputImageNode(mitk::DataNode *node)
@@ -618,13 +610,6 @@ void QmitkAdaptiveRegionGrowingToolGUI::InitializeLevelWindow()
   }
   lastSliderPosition = this->m_SeedpointValue + this->m_DetectedLeakagePoint - 1;
 
-  if (m_MultiWidget)
-  {
-    this->m_MultiWidget->levelWindowWidget->GetManager()->SetAutoTopMostImage(false);
-    this->m_MultiWidget->levelWindowWidget->GetManager()->SetLevelWindowProperty(
-      static_cast<mitk::LevelWindowProperty *>(newNode->GetProperty("levelwindow")));
-  }
-
   if (m_UseVolumeRendering)
     this->UpdateVolumeRenderingThreshold((int)(*level + 0.5)); // lower threshold for labeled image
 }
@@ -860,9 +845,6 @@ void QmitkAdaptiveRegionGrowingToolGUI::EnableVolumeRendering(bool enable)
 
   if (node.IsNull())
     return;
-
-  if (m_MultiWidget)
-    m_MultiWidget->SetWidgetPlanesVisibility(!enable);
 
   if (enable)
   {

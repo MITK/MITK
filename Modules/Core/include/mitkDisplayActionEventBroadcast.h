@@ -114,6 +114,10 @@ namespace mitk
 
     void Swivel(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
 
+    void IncreaseTimeStep(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
+
+    void DecreaseTimeStep(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
+
   private:
 
     void UpdateStatusbar(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);

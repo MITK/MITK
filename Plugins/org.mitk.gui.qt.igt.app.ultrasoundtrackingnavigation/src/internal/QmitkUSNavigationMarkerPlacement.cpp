@@ -207,10 +207,8 @@ void QmitkUSNavigationMarkerPlacement::CreateQtPartControl(QWidget *parent)
   // indicate that no experiment is running at start
   ui->runningLabel->setPixmap(m_IconNotRunning);
 
-  connect(ui->m_settingsWidget,
-          SIGNAL(SettingsChanged(itk::SmartPointer<mitk::DataNode>)),
-          this,
-          SLOT(OnSettingsChanged(itk::SmartPointer<mitk::DataNode>)));
+  connect(ui->m_settingsWidget, SIGNAL(SettingsChanged(itk::SmartPointer<mitk::DataNode>)),
+          this, SLOT(OnSettingsChanged(itk::SmartPointer<mitk::DataNode>)));
 }
 
 void QmitkUSNavigationMarkerPlacement::ReInitializeSettingsNodesAndImageStream()
@@ -252,15 +250,16 @@ void QmitkUSNavigationMarkerPlacement::OnActualizeCtToUsRegistrationWidget()
   if (!m_StdMultiWidget)
   {
     // try to get the standard multi widget if it couldn't be got before
-    mitk::IRenderWindowPart *renderWindow = this->GetRenderWindowPart();
+    mitk::IRenderWindowPart *renderWindowPart = this->GetRenderWindowPart();
 
-    QmitkStdMultiWidgetEditor *multiWidgetEditor = dynamic_cast<QmitkStdMultiWidgetEditor *>(renderWindow);
+    QmitkStdMultiWidgetEditor *multiWidgetEditor = dynamic_cast<QmitkStdMultiWidgetEditor *>(renderWindowPart);
 
     // if there is a standard multi widget now, disable the level window and
     // change the layout to 2D up and 3d down
     if (multiWidgetEditor)
     {
-      m_StdMultiWidget = multiWidgetEditor->GetStdMultiWidget();
+      m_StdMultiWidget = dynamic_cast<QmitkStdMultiWidget *>(multiWidgetEditor->GetMultiWidget());
+      multiWidgetEditor->ShowLevelWindowWidget(false);
       SetTwoWindowView();
     }
   }
@@ -280,8 +279,6 @@ void QmitkUSNavigationMarkerPlacement::OnInitializeCtToUsRegistration()
   ui->m_CtToUsRegistrationWidget->Update();
 }
 
-
-
 void QmitkUSNavigationMarkerPlacement::OnInitializeTargetMarking()
 {
   ReInitializeSettingsNodesAndImageStream();
@@ -292,6 +289,7 @@ void QmitkUSNavigationMarkerPlacement::OnInitializeTargetMarking()
   ui->m_TargetMarkingWidget->OnStartStep();
   ui->m_TargetMarkingWidget->Update();
 }
+
 void QmitkUSNavigationMarkerPlacement::OnInitializeCriticalStructureMarking()
 {
   ReInitializeSettingsNodesAndImageStream();
@@ -302,6 +300,7 @@ void QmitkUSNavigationMarkerPlacement::OnInitializeCriticalStructureMarking()
   ui->m_CriticalStructuresWidget->OnStartStep();
   ui->m_CriticalStructuresWidget->Update();
 }
+
 void QmitkUSNavigationMarkerPlacement::OnInitializeNavigation()
 {
   ReInitializeSettingsNodesAndImageStream();
@@ -327,7 +326,6 @@ void QmitkUSNavigationMarkerPlacement::OnInitializeNavigation()
     mitk::Surface::Pointer dummyObject = mitk::Surface::New();
     m_ToolVisualizationFilter->SetRepresentationObject(1, dummyObject);
     m_ToolVisualizationFilter->SetRepresentationObject(2, dummyObject);
-
   }
 }
 
@@ -388,15 +386,16 @@ void QmitkUSNavigationMarkerPlacement::OnTimeout()
   if (!m_StdMultiWidget)
   {
     // try to get the standard multi widget if it couldn't be got before
-    mitk::IRenderWindowPart *renderWindow = this->GetRenderWindowPart();
+    mitk::IRenderWindowPart *renderWindowPart = this->GetRenderWindowPart();
 
-    QmitkStdMultiWidgetEditor *multiWidgetEditor = dynamic_cast<QmitkStdMultiWidgetEditor *>(renderWindow);
+    QmitkStdMultiWidgetEditor *multiWidgetEditor = dynamic_cast<QmitkStdMultiWidgetEditor*>(renderWindowPart);
 
     // if there is a standard multi widget now, disable the level window and
     // change the layout to 2D up and 3d down
     if (multiWidgetEditor)
     {
-      m_StdMultiWidget = multiWidgetEditor->GetStdMultiWidget();
+      m_StdMultiWidget = dynamic_cast<QmitkStdMultiWidget*>(multiWidgetEditor->GetMultiWidget());
+      multiWidgetEditor->ShowLevelWindowWidget(false);
       SetTwoWindowView();
     }
 
@@ -419,15 +418,16 @@ void QmitkUSNavigationMarkerPlacement::OnEnableNavigationLayout()
 {
   MITK_INFO << "Navigation Layout";
   // try to get the standard multi widget if it couldn't be got before
-  mitk::IRenderWindowPart *renderWindow = this->GetRenderWindowPart();
+  mitk::IRenderWindowPart *renderWindowPart = this->GetRenderWindowPart();
 
-  QmitkStdMultiWidgetEditor *multiWidgetEditor = dynamic_cast<QmitkStdMultiWidgetEditor *>(renderWindow);
+  QmitkStdMultiWidgetEditor *multiWidgetEditor = dynamic_cast<QmitkStdMultiWidgetEditor*>(renderWindowPart);
 
   // if there is a standard multi widget now, disable the level window and
   // change the layout to 2D up and 3d down
   if (multiWidgetEditor)
   {
-    m_StdMultiWidget = multiWidgetEditor->GetStdMultiWidget();
+    m_StdMultiWidget = dynamic_cast<QmitkStdMultiWidget*>(multiWidgetEditor->GetMultiWidget());
+    multiWidgetEditor->ShowLevelWindowWidget(false);
     SetTwoWindowView();
   }
 }
@@ -465,31 +465,23 @@ void QmitkUSNavigationMarkerPlacement::SetTwoWindowView()
 {
   if (m_StdMultiWidget)
   {
-    MITK_INFO << "m_StdMultiWidget exists and not null";
-    m_StdMultiWidget->DisableStandardLevelWindow();
     int i, j, k;
     switch (this->ui->m_RenderWindowSelection->value())
     {
       case 1:
-        mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))
-          ->GetCameraController()
-          ->SetViewToCaudal();
+        mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetCameraController()->SetViewToCaudal();
         i = 2;
         j = 3; // other windows
         k = 1;
         break;
       case 2:
-        mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))
-          ->GetCameraController()
-          ->SetViewToSinister();
+        mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetCameraController()->SetViewToSinister();
         i = 1;
         j = 3;
         k = 2;
         break;
       case 3:
-        mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))
-          ->GetCameraController()
-          ->SetViewToAnterior();
+        mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetCameraController()->SetViewToAnterior();
         i = 2;
         j = 1;
         k = 3;
@@ -497,51 +489,35 @@ void QmitkUSNavigationMarkerPlacement::SetTwoWindowView()
       default:
         return;
     }
-    m_StdMultiWidget->changeLayoutTo2DUpAnd3DDown(k);
+
+    // get the render window which is defined by index "k" and set it as "current render window widget"
+    // chose the layout that will set the current 2D window as top render window and the 3D windows as bottom render window
+    auto renderWindowWidget = m_StdMultiWidget->GetRenderWindowWidget(m_StdMultiWidget->GetNameFromIndex(k));
+    m_StdMultiWidget->GetMultiWidgetLayoutManager()->SetCurrentRenderWindowWidget(renderWindowWidget.get());
+    m_StdMultiWidget->GetMultiWidgetLayoutManager()->SetOneTop3DBottomLayout();
+
     ////Crosshair invisible in 3D view
-    this->GetDataStorage()
-      ->GetNamedNode("stdmulti.widget" + std::to_string(i) + ".plane")
-      ->SetBoolProperty("visible",
-                        false,
-                        mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
-    this->GetDataStorage()
-      ->GetNamedNode("stdmulti.widget" + std::to_string(j) + ".plane")
-      ->SetBoolProperty("visible",
-                        false,
-                        mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
-    this->GetDataStorage()
-      ->GetNamedNode("stdmulti.widget" + std::to_string(k) + ".plane")
-      ->SetBoolProperty("visible",
-                        true,
-                        mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
-    this->GetDataStorage()
-      ->GetNamedNode("stdmulti.widget" + std::to_string(i) + ".plane")
+    this->GetDataStorage()->GetNamedNode("stdmulti.widget" + std::to_string(i) + ".plane")
+      ->SetBoolProperty("visible", false, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
+    this->GetDataStorage()->GetNamedNode("stdmulti.widget" + std::to_string(j) + ".plane")
+      ->SetBoolProperty("visible", false, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
+    this->GetDataStorage()->GetNamedNode("stdmulti.widget" + std::to_string(k) + ".plane")
+      ->SetBoolProperty("visible", true, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
+    this->GetDataStorage()->GetNamedNode("stdmulti.widget" + std::to_string(i) + ".plane")
       ->SetIntProperty("Crosshair.Gap Size", 0);
-    this->GetDataStorage()
-      ->GetNamedNode("stdmulti.widget" + std::to_string(j) + ".plane")
+    this->GetDataStorage()->GetNamedNode("stdmulti.widget" + std::to_string(j) + ".plane")
       ->SetIntProperty("Crosshair.Gap Size", 0);
   }
 }
 
 void QmitkUSNavigationMarkerPlacement::OnResetStandardLayout()
 {
-  // reset render windows
-  mitk::DataNode::Pointer widget1 = this->GetDataStorage()->GetNamedNode("stdmulti.widget1.plane");
-  if (widget1.IsNotNull())
+  if (m_StdMultiWidget)
   {
-    widget1->SetVisibility(true);
+    //reset render windows
+    m_StdMultiWidget->SetCrosshairVisibility(true);
+    m_StdMultiWidget->GetMultiWidgetLayoutManager()->SetDefaultLayout();
   }
-  mitk::DataNode::Pointer widget2 = this->GetDataStorage()->GetNamedNode("stdmulti.widget2.plane");
-  if (widget2.IsNotNull())
-  {
-    widget2->SetVisibility(true);
-  }
-  mitk::DataNode::Pointer widget3 = this->GetDataStorage()->GetNamedNode("stdmulti.widget3.plane");
-  if (widget3.IsNotNull())
-  {
-    widget3->SetVisibility(true);
-  }
-  m_StdMultiWidget->changeLayoutToDefault();
 }
 
 void QmitkUSNavigationMarkerPlacement::OnChangeLayoutClicked()
@@ -589,7 +565,7 @@ void QmitkUSNavigationMarkerPlacement::OnStartExperiment()
   MITK_INFO("USNavigationLogging") << "Experiment started: " << m_ExperimentName.toStdString();
   if (ok && !m_ExperimentName.isEmpty())
   {
-    // display error message and call the function recursivly if a directory
+    // display error message and call the function recursively if a directory
     // with the given name already exists
     QDir experimentResultsDir(m_ResultsDirectory + QDir::separator() + m_ExperimentName);
     if (experimentResultsDir.exists())
@@ -748,12 +724,12 @@ void QmitkUSNavigationMarkerPlacement::ReinitOnImage()
     if (image.IsNotNull() && image->IsInitialized())
     {
       // make a reinit on the ultrasound image
-      mitk::IRenderWindowPart *renderWindow = this->GetRenderWindowPart();
-      if (renderWindow != nullptr && image->GetTimeGeometry()->IsValid())
+      mitk::IRenderWindowPart *renderWindowPart = this->GetRenderWindowPart();
+      if (renderWindowPart != nullptr && image->GetTimeGeometry()->IsValid())
       {
-        renderWindow->GetRenderingManager()->InitializeViews(
+        renderWindowPart->GetRenderingManager()->InitializeViews(
           image->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
-        renderWindow->GetRenderingManager()->RequestUpdateAll();
+        renderWindowPart->GetRenderingManager()->RequestUpdateAll();
       }
 
       this->RequestRenderWindowUpdate();

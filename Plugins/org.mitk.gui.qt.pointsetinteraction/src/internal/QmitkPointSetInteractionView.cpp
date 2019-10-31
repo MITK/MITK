@@ -22,10 +22,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryISelectionService.h>
 #include <QInputDialog>
 #include <QLineEdit>
-#include <mitkProperties.h>
-#include <QmitkPointListWidget.h>
+
 #include <mitkDataNodeObject.h>
 #include <mitkDataNodeSelection.h>
+#include <mitkProperties.h>
+
+#include <QmitkPointListWidget.h>
+#include <QmitkRenderWindow.h>
 
 const std::string QmitkPointSetInteractionView::VIEW_ID = "org.mitk.views.pointsetinteraction";
 

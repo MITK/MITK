@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryISelectionListener.h>
 
 #include <QmitkFunctionality.h>
+#include <QmitkStdMultiWidget.h>
 
 //QT
 #include <QTimer>
@@ -56,8 +57,8 @@ public:
 
   void CreateQtPartControl(QWidget *parent) override;
 
-  void StdMultiWidgetAvailable(QmitkStdMultiWidget &stdMultiWidget) override;
-  void StdMultiWidgetNotAvailable() override;
+  virtual void MultiWidgetAvailable(QmitkAbstractMultiWidget &multiWidget) override;
+  virtual void MultiWidgetNotAvailable() override;
 
   protected slots:
 

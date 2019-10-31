@@ -1,6 +1,5 @@
 set(SRC_CPP_FILES
   QmitkMxNMultiWidgetEditor.cpp
-  QmitkMultiWidgetDecorationManager.cpp
 )
 
 set(INTERNAL_CPP_FILES

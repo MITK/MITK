@@ -170,8 +170,8 @@ void QmitkFunctionality::AfterCreateQtPartControl()
 
   // EMULATE INITIAL SELECTION EVENTS
 
-  // by default a a multi widget is always available
-  this->StdMultiWidgetAvailable(*this->GetActiveStdMultiWidget());
+  // by default a multi widget is always available
+  this->MultiWidgetAvailable(*this->GetActiveMultiWidget());
 
   // send datamanager selection
   this->OnSelectionChanged(this->GetDataManagerSelection());
@@ -257,10 +257,10 @@ void QmitkFunctionality::Deactivated()
 {
 }
 
-void QmitkFunctionality::StdMultiWidgetAvailable( QmitkStdMultiWidget&  /*stdMultiWidget*/ )
+void QmitkFunctionality::MultiWidgetAvailable( QmitkAbstractMultiWidget&  /*multiWidget*/ )
 {
 }
-void QmitkFunctionality::StdMultiWidgetNotAvailable()
+void QmitkFunctionality::MultiWidgetNotAvailable()
 {
 }
 
@@ -269,29 +269,27 @@ void QmitkFunctionality::DataStorageChanged()
 
 }
 
-QmitkStdMultiWidget* QmitkFunctionality::GetActiveStdMultiWidget( bool reCreateWidget )
+QmitkAbstractMultiWidget* QmitkFunctionality::GetActiveMultiWidget( bool reCreateWidget )
 {
-  QmitkStdMultiWidget* activeStdMultiWidget = nullptr;
+  QmitkAbstractMultiWidget* activeMultiWidget = nullptr;
 
   berry::IEditorPart::Pointer editor =
     this->GetSite()->GetPage()->GetActiveEditor();
 
-  if (reCreateWidget
-      || editor.Cast<QmitkStdMultiWidgetEditor>().IsNull()
-     )
+  if (reCreateWidget || editor.Cast<QmitkStdMultiWidgetEditor>().IsNull())
   {
     mitk::DataStorageEditorInput::Pointer editorInput(
           new mitk::DataStorageEditorInput( this->GetDataStorageReference() ));
     // open a new multi-widget editor, but do not give it the focus
     berry::IEditorPart::Pointer editor = this->GetSite()->GetPage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID, false, berry::IWorkbenchPage::MATCH_ID);
-    activeStdMultiWidget = editor.Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget();
+    activeMultiWidget = editor.Cast<QmitkStdMultiWidgetEditor>()->GetMultiWidget();
   }
   else if (editor.Cast<QmitkStdMultiWidgetEditor>().IsNotNull())
   {
-    activeStdMultiWidget = editor.Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget();
+    activeMultiWidget = editor.Cast<QmitkStdMultiWidgetEditor>()->GetMultiWidget();
   }
 
-  return activeStdMultiWidget;
+  return activeMultiWidget;
 }
 
 void QmitkFunctionality::HandleException( const char* str, QWidget* parent, bool showDialog ) const
@@ -309,7 +307,7 @@ void QmitkFunctionality::HandleException( std::exception& e, QWidget* parent, bo
   HandleException( e.what(), parent, showDialog );
 }
 
-void QmitkFunctionality::StdMultiWidgetClosed( QmitkStdMultiWidget&  /*stdMultiWidget*/ )
+void QmitkFunctionality::MultiWidgetClosed( QmitkAbstractMultiWidget&  /*multiWidget*/ )
 {
 
 }

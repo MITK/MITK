@@ -773,24 +773,24 @@ void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::
     mitk::DataStorage::SetOfObjects::ConstPointer sourcenodes = baseRenderer->GetDataStorage()->GetSources(node, nullptr, true);
     if (!sourcenodes->empty())
     {
-        topSourceNode = mitk::FindTopmostVisibleNode(sourcenodes, worldposition, globalCurrentTimePoint, baseRenderer);
-     }
-     if (topSourceNode.IsNotNull())
-     {
-        image3D = dynamic_cast<mitk::Image *>(topSourceNode->GetData());
-        topSourceNode->GetIntProperty("Image.Displayed Component", component);
-      }
-      else
-      {
-        image3D = dynamic_cast<mitk::Image *>(node->GetData());
-        node->GetIntProperty("Image.Displayed Component", component);
-      }
-     }
-	  else
-	  {
-	    image3D = dynamic_cast<mitk::Image *>(node->GetData());
-	    node->GetIntProperty("Image.Displayed Component", component);
-	  }
+      topSourceNode = mitk::FindTopmostVisibleNode(sourcenodes, worldposition, globalCurrentTimePoint, baseRenderer);
+    }
+    if (topSourceNode.IsNotNull())
+    {
+      image3D = dynamic_cast<mitk::Image *>(topSourceNode->GetData());
+      topSourceNode->GetIntProperty("Image.Displayed Component", component);
+    }
+    else
+    {
+      image3D = dynamic_cast<mitk::Image *>(node->GetData());
+      node->GetIntProperty("Image.Displayed Component", component);
+    }
+  }
+  else
+  {
+    image3D = dynamic_cast<mitk::Image *>(node->GetData());
+    node->GetIntProperty("Image.Displayed Component", component);
+  }
 
   // get the position and gray value from the image and build up status bar text
   auto statusBar = StatusBar::GetInstance();

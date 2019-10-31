@@ -66,6 +66,8 @@ private:
 
   void SetControlledRenderer();
 
+  void RenderWindowChanged();
+
   QWidget* m_Parent;
   Ui::QmitkRenderWindowManagerControls m_Controls;
 

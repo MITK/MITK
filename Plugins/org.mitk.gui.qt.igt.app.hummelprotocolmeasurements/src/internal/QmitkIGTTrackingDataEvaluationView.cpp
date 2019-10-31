@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk
 #include "QmitkIGTTrackingDataEvaluationView.h"
-#include "QmitkStdMultiWidget.h"
 
 // Qt
 #include <QMessageBox>
@@ -367,12 +366,12 @@ void QmitkIGTTrackingDataEvaluationView::OnOrientationCalculation_CalcOrientandW
   MessageBox("Finished!");
 }
 
-void QmitkIGTTrackingDataEvaluationView::StdMultiWidgetAvailable(QmitkStdMultiWidget &stdMultiWidget)
+void QmitkIGTTrackingDataEvaluationView::MultiWidgetAvailable(QmitkAbstractMultiWidget &multiWidget)
 {
-  m_MultiWidget = &stdMultiWidget;
+  m_MultiWidget = dynamic_cast<QmitkStdMultiWidget*>(&multiWidget);
 }
 
-void QmitkIGTTrackingDataEvaluationView::StdMultiWidgetNotAvailable()
+void QmitkIGTTrackingDataEvaluationView::MultiWidgetNotAvailable()
 {
   m_MultiWidget = nullptr;
 }

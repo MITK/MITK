@@ -14,11 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKMXNMULTIWIDGETDECORATIONMANAGER_H
-#define QMITKMXNMULTIWIDGETDECORATIONMANAGER_H
+#ifndef QMITKMULTIWIDGETDECORATIONMANAGER_H
+#define QMITKMULTIWIDGETDECORATIONMANAGER_H
 
-// mxn multi widget editor
-#include <org_mitk_gui_qt_mxnmultiwidgeteditor_Export.h>
+#include <org_mitk_gui_qt_common_Export.h>
 
 // mitk core
 #include <mitkColorProperty.h>
@@ -26,8 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk annotation
 #include <mitkLogoAnnotation.h>
 
-// mitk qtwidgets
-#include <QmitkMxNMultiWidget.h>
+// mitk qt widgets
+#include <QmitkAbstractMultiWidget.h>
 
 // berry
 #include <berryIBerryPreferences.h>
@@ -45,12 +44,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 *
 *
 */
-class MXNMULTIWIDGETEDITOR_EXPORT QmitkMultiWidgetDecorationManager
+class MITK_QT_COMMON QmitkMultiWidgetDecorationManager
 {
 
 public:
 
-  QmitkMultiWidgetDecorationManager(QmitkMxNMultiWidget* mxnMultiWidget);
+  QmitkMultiWidgetDecorationManager(QmitkAbstractMultiWidget* multiWidget);
 
   enum class Colormap
   {
@@ -75,11 +74,7 @@ public:
   bool IsDecorationVisible(const QString &decoration) const;
   QStringList GetDecorations() const;
 
-private:
-
   void SetupLogo(const char* path);
-  vtkSmartPointer<vtkImageData> GetVtkLogo(const char* path);
-  void SetLogo(vtkSmartPointer<vtkImageData> vtkLogo);
   void ShowLogo(bool show);
   bool IsLogoVisible() const;
 
@@ -117,7 +112,7 @@ private:
   void ShowGradientBackground(const QString& widgetID, bool show);
   void ShowAllGradientBackgrounds(bool show);
   /**
-  * @brief Return a render window (widget) specific background color gradient
+  * @rief Return a render window (widget) specific background color gradient
   *
   * @param widgetID   The widget identifier.
   *
@@ -136,9 +131,14 @@ private:
   bool IsCornerAnnotationVisible(const QString& widgetID) const;
   bool AreAllCornerAnnotationsVisible() const;
 
-  QmitkMxNMultiWidget* m_MxNMultiWidget;
+private:
+
+  vtkSmartPointer<vtkImageData> GetVtkLogo(const char* path);
+  void SetLogo(vtkSmartPointer<vtkImageData> vtkLogo);
+
+  QmitkAbstractMultiWidget* m_MultiWidget;
   mitk::LogoAnnotation::Pointer m_LogoAnnotation;
 
 };
 
-#endif // QMITKMXNMULTIWIDGETDECORATIONMANAGER_H
+#endif // QMITKMULTIWIDGETDECORATIONMANAGER_H

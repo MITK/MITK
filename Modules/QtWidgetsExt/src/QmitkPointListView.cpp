@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkEditPointDialog.h"
 #include "QmitkPointListModel.h"
+#include "QmitkRenderWindow.h"
 #include "QmitkStdMultiWidget.h"
 
 #include "mitkRenderingManager.h"
@@ -80,9 +81,12 @@ const mitk::PointSet *QmitkPointListView::GetPointSet() const
 void QmitkPointListView::SetMultiWidget(QmitkStdMultiWidget *multiWidget)
 {
   m_MultiWidget = multiWidget;
-  this->AddSliceNavigationController(multiWidget->mitkWidget1->GetSliceNavigationController());
-  this->AddSliceNavigationController(multiWidget->mitkWidget2->GetSliceNavigationController());
-  this->AddSliceNavigationController(multiWidget->mitkWidget3->GetSliceNavigationController());
+  if (nullptr != m_MultiWidget)
+  {
+    AddSliceNavigationController(m_MultiWidget->GetRenderWindow1()->GetSliceNavigationController());
+    AddSliceNavigationController(m_MultiWidget->GetRenderWindow2()->GetSliceNavigationController());
+    AddSliceNavigationController(m_MultiWidget->GetRenderWindow3()->GetSliceNavigationController());
+  }
 }
 
 QmitkStdMultiWidget *QmitkPointListView::GetMultiWidget() const

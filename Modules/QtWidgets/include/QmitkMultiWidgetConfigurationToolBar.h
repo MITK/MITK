@@ -20,10 +20,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkQtWidgetsExports.h"
 
 #include <mitkInteractionSchemeSwitcher.h>
+
+// qt
 #include <QToolBar>
 
-// mitk qtwidgets
-#include "QmitkMultiWidgetLayoutSelectionWidget.h"
+class QmitkAbstractMultiWidget;
+class QmitkMultiWidgetLayoutSelectionWidget;
 
 /**
 * @brief 
@@ -36,7 +38,7 @@ class MITKQTWIDGETS_EXPORT QmitkMultiWidgetConfigurationToolBar : public QToolBa
 
 public:
 
-  QmitkMultiWidgetConfigurationToolBar();
+  QmitkMultiWidgetConfigurationToolBar(QmitkAbstractMultiWidget* multiWidget);
   ~QmitkMultiWidgetConfigurationToolBar() override;
 
 Q_SIGNALS:
@@ -55,6 +57,8 @@ private:
 
   void InitializeToolBar();;
   void AddButtons();
+
+  QmitkAbstractMultiWidget* m_MultiWidget;
 
   QAction* m_SynchronizeAction;
   QAction* m_InteractionSchemeChangeAction;

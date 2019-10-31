@@ -79,8 +79,8 @@ void QmitkFunctionalityCoordinator::PartOpened( const berry::IWorkbenchPartRefer
     for (std::set<QmitkFunctionality*>::iterator it = m_Functionalities.begin()
       ; it != m_Functionalities.end(); it++)
     {
-      (*it)->StdMultiWidgetAvailable(*(partRef
-        ->GetPart(false).Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget()));
+      (*it)->MultiWidgetAvailable(*(partRef
+        ->GetPart(false).Cast<QmitkStdMultiWidgetEditor>()->GetMultiWidget()));
     }
   }
   else
@@ -104,8 +104,8 @@ void QmitkFunctionalityCoordinator::PartClosed( const berry::IWorkbenchPartRefer
     for (std::set<QmitkFunctionality*>::iterator it = m_Functionalities.begin()
       ; it != m_Functionalities.end(); it++)
     {
-      (*it)->StdMultiWidgetClosed(*(stdMultiWidgetEditor->GetStdMultiWidget()));
-      (*it)->StdMultiWidgetNotAvailable(); // deprecated call, provided for consistence
+      (*it)->MultiWidgetClosed(*(stdMultiWidgetEditor->GetMultiWidget()));
+      (*it)->MultiWidgetNotAvailable(); // deprecated call, provided for consistence
     }
   }
   else

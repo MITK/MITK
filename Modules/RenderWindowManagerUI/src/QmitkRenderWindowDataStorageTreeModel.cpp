@@ -421,11 +421,11 @@ void QmitkRenderWindowDataStorageTreeModel::ResetTree()
   {
     m_Root->Delete();
   }
-  endResetModel();
 
   mitk::DataNode::Pointer rootDataNode = mitk::DataNode::New();
   rootDataNode->SetName("Data Storage");
   m_Root = new QmitkDataStorageTreeModelInternalItem(rootDataNode);
+  endResetModel();
 }
 
 void QmitkRenderWindowDataStorageTreeModel::UpdateModelData()

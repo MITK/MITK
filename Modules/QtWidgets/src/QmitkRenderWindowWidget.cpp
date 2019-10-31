@@ -16,21 +16,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkRenderWindowWidget.h"
 
-// mitk qt widgets
-#include <QmitkMxNMultiWidget.h>
-
 // vtk
+#include <vtkCornerAnnotation.h>
 #include <vtkTextProperty.h>
 
 QmitkRenderWindowWidget::QmitkRenderWindowWidget(QWidget* parent/* = nullptr*/,
                                                  const QString& widgetName/* = ""*/,
                                                  mitk::DataStorage* dataStorage/* = nullptr*/,
+                                                 mitk::RenderingManager* renderingManager/* = nullptr*/,
                                                  mitk::BaseRenderer::RenderingMode::Type renderingMode/* = mitk::BaseRenderer::RenderingMode::Standard*/)
-  : QWidget(parent)
+  : QFrame(parent)
   , m_WidgetName(widgetName)
   , m_DataStorage(dataStorage)
-  , m_RenderWindow(nullptr)
+  , m_RenderingManager(renderingManager)
   , m_RenderingMode(renderingMode)
+  , m_RenderWindow(nullptr)
   , m_PointSetNode(nullptr)
   , m_PointSet(nullptr)
 {
@@ -108,18 +108,27 @@ bool QmitkRenderWindowWidget::IsGradientBackgroundOn() const
 void QmitkRenderWindowWidget::SetDecorationColor(const mitk::Color& color)
 {
   m_DecorationColor = color;
-  m_RectangleProp->SetColor(m_DecorationColor[0], m_DecorationColor[1], m_DecorationColor[2]);
-  m_CornerAnnotation->GetTextProperty()->SetColor(color[0], color[1], color[2]);
+  m_CornerAnnotation->GetTextProperty()->SetColor(m_DecorationColor[0], m_DecorationColor[1], m_DecorationColor[2]);
+
+  QColor hexColor(m_DecorationColor[0] * 255, m_DecorationColor[1] * 255, m_DecorationColor[2] * 255);
+  setStyleSheet("border: 2px solid " + hexColor.name(QColor::HexRgb));
 }
 
 void QmitkRenderWindowWidget::ShowColoredRectangle(bool show)
 {
-  m_RectangleProp->SetVisibility(show);
+  if (show)
+  {
+    setFrameStyle(QFrame::Box | QFrame::Plain);
+  }
+  else
+  {
+    setFrameStyle(NoFrame);
+  }
 }
 
 bool QmitkRenderWindowWidget::IsColoredRectangleVisible() const
 {
-  return m_RectangleProp->GetVisibility() > 0;
+  return frameStyle() > 0;
 }
 
 void QmitkRenderWindowWidget::ShowCornerAnnotation(bool show)
@@ -178,17 +187,28 @@ void QmitkRenderWindowWidget::InitializeGUI()
   m_Layout->setMargin(0);
   setLayout(m_Layout);
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  setContentsMargins(0, 0, 0, 0);
 
-  // create render window for this render window widget
-  m_RenderingManager = mitk::RenderingManager::GetInstance();
-  //m_RenderingManager = mitk::RenderingManager::New();
+  if (nullptr == m_DataStorage)
+  {
+    return;
+  }
+
+  if (nullptr == m_RenderingManager)
+  {
+    return;
+  }
+
   m_RenderingManager->SetDataStorage(m_DataStorage);
 
+  // create render window for this render window widget
   m_RenderWindow = new QmitkRenderWindow(this, m_WidgetName, nullptr, m_RenderingManager, m_RenderingMode);
-  m_RenderWindow->SetLayoutIndex(mitk::SliceNavigationController::Sagittal);
+  m_RenderWindow->SetLayoutIndex(mitk::BaseRenderer::ViewDirection::SAGITTAL);
   m_RenderWindow->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
   m_RenderWindow->GetSliceNavigationController()->SetRenderingManager(m_RenderingManager);
   m_RenderWindow->GetSliceNavigationController()->SetCrosshairEvent.AddListener(mitk::MessageDelegate1<QmitkRenderWindowWidget, mitk::Point3D>(this, &QmitkRenderWindowWidget::SetCrosshair));
+
+  connect(m_RenderWindow, &QVTKOpenGLWidget::mouseEvent, this, &QmitkRenderWindowWidget::MouseEvent);
 
   mitk::TimeGeometry::ConstPointer timeGeometry = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
   m_RenderingManager->InitializeViews(timeGeometry);
@@ -226,12 +246,10 @@ void QmitkRenderWindowWidget::InitializeDecorations()
   // initialize decoration color, rectangle and annotation text
   float white[3] = { 1.0f, 1.0f, 1.0f };
   m_DecorationColor = white;
-  m_RectangleProp = vtkSmartPointer<vtkMitkRectangleProp>::New();
-  m_RectangleProp->SetColor(m_DecorationColor[0], m_DecorationColor[1], m_DecorationColor[2]);
-  if (0 == vtkRenderer->HasViewProp(m_RectangleProp))
-  {
-    vtkRenderer->AddViewProp(m_RectangleProp);
-  }
+
+  setFrameStyle(QFrame::Box | QFrame::Plain);
+  QColor hexColor(m_DecorationColor[0] * 255, m_DecorationColor[1] * 255, m_DecorationColor[2] * 255);
+  setStyleSheet("border: 2px solid " + hexColor.name(QColor::HexRgb));
 
   m_CornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
   m_CornerAnnotation->SetText(0, "Sagittal");
@@ -246,5 +264,5 @@ void QmitkRenderWindowWidget::InitializeDecorations()
 void QmitkRenderWindowWidget::SetCrosshair(mitk::Point3D selectedPoint)
 {
   m_PointSet->SetPoint(1, selectedPoint, 0);
-  mitk::RenderingManager::GetInstance()->RequestUpdate(m_RenderWindow->GetRenderWindow());
+  m_RenderingManager->RequestUpdate(m_RenderWindow->GetRenderWindow());
 }

@@ -22,6 +22,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataNode.h>
 #include <QmitkRenderWindow.h>
 
+// mitk qt widgets
+#include <QmitkAbstractMultiWidget.h>
+#include <QmitkRenderWindowWidget.h>
+
+// mitk gui qt common plugin
+#include <QmitkAbstractMultiWidgetEditor.h>
+
 const std::string QmitkRenderWindowManagerView::VIEW_ID = "org.mitk.views.renderwindowmanager";
 
 void QmitkRenderWindowManagerView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
@@ -30,6 +37,13 @@ void QmitkRenderWindowManagerView::RenderWindowPartActivated(mitk::IRenderWindow
   {
     m_RenderWindowPart = renderWindowPart;
     SetControlledRenderer();
+
+    // if the render window part is an abstract multi widget editor we can receive the abstract multi widget and listen to the signal
+    auto abstractMultiWidgetEditor = dynamic_cast<QmitkAbstractMultiWidgetEditor*>(m_RenderWindowPart);
+    if (nullptr != abstractMultiWidgetEditor)
+    {
+      connect(abstractMultiWidgetEditor->GetMultiWidget(), &QmitkAbstractMultiWidget::ActiveRenderWindowChanged, this, &QmitkRenderWindowManagerView::RenderWindowChanged);
+    }
   }
 }
 
@@ -37,6 +51,13 @@ void QmitkRenderWindowManagerView::RenderWindowPartDeactivated(mitk::IRenderWind
 {
   if (m_RenderWindowPart == renderWindowPart)
   {
+    // if the render window part is an abstract multi widget editor we need to disconnect the signal before release the render window part
+    auto abstractMultiWidgetEditor = dynamic_cast<QmitkAbstractMultiWidgetEditor*>(m_RenderWindowPart);
+    if (nullptr != abstractMultiWidgetEditor)
+    {
+      disconnect(abstractMultiWidgetEditor->GetMultiWidget(), &QmitkAbstractMultiWidget::ActiveRenderWindowChanged, this, &QmitkRenderWindowManagerView::RenderWindowChanged);
+    }
+
     m_RenderWindowPart = nullptr;
     SetControlledRenderer();
   }
@@ -85,7 +106,7 @@ void QmitkRenderWindowManagerView::CreateQtPartControl(QWidget* parent)
 void QmitkRenderWindowManagerView::SetControlledRenderer()
 {
   QHash<QString, QmitkRenderWindow*> renderWindows;
-  if (m_RenderWindowPart != nullptr)
+  if (nullptr != m_RenderWindowPart)
   {
     renderWindows = m_RenderWindowPart->GetQmitkRenderWindows();
   }
@@ -116,6 +137,28 @@ void QmitkRenderWindowManagerView::OnRenderWindowSelectionChanged(const QString&
   if (nullptr != selectedRenderer)
   {
     m_DataNodeContextMenu->SetBaseRenderer(selectedRenderer);
+  }
+
+  // if the render window part is an abstract multi widget editor we can set the active render window
+  auto abstractMultiWidgetEditor = dynamic_cast<QmitkAbstractMultiWidgetEditor*>(m_RenderWindowPart);
+  if (nullptr != abstractMultiWidgetEditor)
+  {
+
+    auto renderWindowWidget = abstractMultiWidgetEditor->GetMultiWidget()->GetRenderWindowWidget(renderWindowId);
+    abstractMultiWidgetEditor->GetMultiWidget()->SetActiveRenderWindowWidget(renderWindowWidget);
+  }
+}
+
+void QmitkRenderWindowManagerView::RenderWindowChanged()
+{
+  auto abstractMultiWidget = dynamic_cast<QmitkAbstractMultiWidget*>(sender());
+  if (nullptr != abstractMultiWidget)
+  {
+    auto activeRenderWindowWidget = abstractMultiWidget->GetActiveRenderWindowWidget();
+    if (nullptr != activeRenderWindowWidget)
+    {
+      m_Controls.comboBoxRenderWindowSelection->setCurrentText(activeRenderWindowWidget->GetWidgetName());
+    }
   }
 }
 

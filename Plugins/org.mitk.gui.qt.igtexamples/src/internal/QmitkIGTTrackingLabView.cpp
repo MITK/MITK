@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Qmitk
 #include "QmitkIGTTrackingLabView.h"
 
+#include <QmitkRenderWindow.h>
 #include <QmitkNDIConfigurationWidget.h>
 #include <QmitkFiducialRegistrationWidget.h>
 #include <QmitkUpdateTimerWidget.h>

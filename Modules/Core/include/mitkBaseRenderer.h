@@ -105,13 +105,23 @@ namespace mitk
                  RenderingMode::Type mode = RenderingMode::Standard);
 
     //##Documentation
-    //## @brief MapperSlotId defines which kind of mapper (e.g., 2D or 3D) shoud be used.
+    //## @brief MapperSlotId defines which kind of mapper (e.g. 2D or 3D) should be used.
     typedef int MapperSlotId;
 
     enum StandardMapperSlot
     {
       Standard2D = 1,
       Standard3D = 2
+    };
+
+    //##Documentation
+    //## @brief Possible view directions for render windows.
+    enum class ViewDirection
+    {
+      AXIAL = 0,
+      SAGITTAL,
+      CORONAL,
+      THREE_D
     };
 
     virtual void SetDataStorage(DataStorage *storage); ///< set the datastorage that will be used for rendering

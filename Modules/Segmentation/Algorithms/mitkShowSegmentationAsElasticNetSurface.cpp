@@ -50,7 +50,9 @@ void ShowSegmentationAsElasticNetSurface::GenerateData()
   initTime();
 #endif
   UpdateProgress(0.f);
-  calcRegion();
+  if (!calcRegion()) {
+    return;
+  }
   checkAbort();
   UpdateProgress(.06f);
 #ifdef ELASTIC_NET_PRINT_TIME
@@ -119,7 +121,7 @@ short ShowSegmentationAsElasticNetSurface::getPixel(int x, int y, int z)
   return m_Input->GetPixel(index);
 }
 
-void ShowSegmentationAsElasticNetSurface::calcRegion()
+bool ShowSegmentationAsElasticNetSurface::calcRegion()
 {
   InputImageType::RegionType region = m_Input->GetLargestPossibleRegion();
   itk::ImageRegionConstIteratorWithIndex<InputImageType> it(m_Input, region);
@@ -137,11 +139,17 @@ void ShowSegmentationAsElasticNetSurface::calcRegion()
     }
   }
 
+  if (minIndex == region.GetUpperIndex() && maxIndex == region.GetIndex()) {
+    return false;
+  }
+
   region.SetIndex(minIndex);
   region.SetUpperIndex(maxIndex);
 
   m_LocalRegion = region;
   m_LocalRegionOrigin = m_LocalRegion.GetIndex();
+
+  return true;
 }
 
 void ShowSegmentationAsElasticNetSurface::vtkSMPCreateSurfaceCubesOp::operator()(vtkIdType begin, vtkIdType end)

@@ -156,8 +156,8 @@ private:
   QVariant m_Label;
   QList<QVariant> m_PieLabels;
   QVariant m_ChartType;
-  QVariant m_Color = "";
-  QVariant m_LineStyleName = "solid";
+  QVariant m_Color;
+  QVariant m_LineStyleName;
 };
 
 #endif // QmitkC3xyData_h

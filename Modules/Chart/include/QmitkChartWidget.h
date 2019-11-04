@@ -67,6 +67,32 @@ public:
     solid,
     dashed
   };
+  enum class ChartColor {
+    red,
+    orange,
+    yellow,
+    green,
+    blue,
+    purple,
+    brown,
+    magenta,
+    tan,
+    cyan,
+    olive,
+    maroon,
+    navy,
+    aquamarine,
+    turqouise,
+    silver,
+    lime,
+    teal,
+    indigo,
+    violet,
+    pink,
+    black,
+    white,
+    grey
+  };
   enum class AxisScale {
     linear,
     log
@@ -286,6 +312,51 @@ private:
 
   class Impl;
   std::unique_ptr<Impl> m_Impl;
+};
+
+static std::vector<std::string> ChartTypeVector =
+{
+    "bar",
+    "line",
+    "spline",
+    "pie",
+    "area",
+    "are_spline",
+    "scatter"
+};
+
+static std::vector<std::string> LineStyleVector =
+{
+    "solid",
+    "dashed",
+};
+
+static std::vector<std::string> ChartColorVector =
+{
+  "red",
+  "orange",
+  "yellow",
+  "green",
+  "blue",
+  "purple",
+  "brown",
+  "magenta",
+  "tan",
+  "cyan",
+  "olive",
+  "maroon",
+  "navy",
+  "aquamarine",
+  "turqouise",
+  "silver",
+  "lime",
+  "teal",
+  "indigo",
+  "violet",
+  "pink",
+  "black",
+  "white",
+  "grey"
 };
 
 #endif

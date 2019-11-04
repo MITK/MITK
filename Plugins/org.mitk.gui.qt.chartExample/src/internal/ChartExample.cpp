@@ -278,31 +278,21 @@ void ChartExample::AdaptZoomY()
 
 void ChartExample::AdaptDataGUI(const QString &chartType)
 {
-  ResetDataGUI();
-  auto chartTypeEnum = m_ChartNameToChartType.at(chartType.toStdString());
+  auto chartTypeEnum = m_ChartNameToChartType.at(chartType.toLower().toStdString());
   if (chartTypeEnum == QmitkChartWidget::ChartType::pie)
   {
     m_Controls.m_labelPieData->setVisible(true);
     m_Controls.m_lineEditPieDataLabel->setVisible(true);
-    m_Controls.m_labelColor->setVisible(false);
-    m_Controls.m_lineEditColor->setVisible(false);
+    m_Controls.m_labelLineStyle->setVisible(false);
+    m_Controls.m_comboBoxLineStyle->setVisible(false);
   }
-  else if (chartTypeEnum == QmitkChartWidget::ChartType::line || chartTypeEnum == QmitkChartWidget::ChartType::area ||
-           chartTypeEnum == QmitkChartWidget::ChartType::area_spline ||
-           chartTypeEnum == QmitkChartWidget::ChartType::spline)
+  else if (chartTypeEnum != QmitkChartWidget::ChartType::pie)
   {
     m_Controls.m_labelLineStyle->setVisible(true);
     m_Controls.m_comboBoxLineStyle->setVisible(true);
+    m_Controls.m_labelPieData->setVisible(false);
+    m_Controls.m_lineEditPieDataLabel->setVisible(false);
   }
-}
-
-void ChartExample::ResetDataGUI() {
-  m_Controls.m_labelPieData->setVisible(false);
-  m_Controls.m_lineEditPieDataLabel->setVisible(false);
-  m_Controls.m_labelColor->setVisible(true);
-  m_Controls.m_lineEditColor->setVisible(true);
-  m_Controls.m_labelLineStyle->setVisible(false);
-  m_Controls.m_comboBoxLineStyle->setVisible(false);
 }
 
 std::vector<double> ChartExample::GenerateRandomNumbers(unsigned int amount, double max) const

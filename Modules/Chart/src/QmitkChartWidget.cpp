@@ -29,11 +29,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 class CustomPage : public QWebEnginePage
 {
 public:
-  CustomPage(QObject *parent = nullptr) : QWebEnginePage(parent) {}
-  void javaScriptConsoleMessage(JavaScriptConsoleMessageLevel /*level*/,
+  CustomPage(QObject *parent = 0) : QWebEnginePage(parent) {}
+  virtual void javaScriptConsoleMessage(JavaScriptConsoleMessageLevel /*level*/,
                                         const QString &message,
                                         int lineNumber,
-                                        const QString & /*sourceID*/) override
+                                        const QString & /*sourceID*/)
   {
     MITK_INFO << "JS > " << lineNumber << ": " << message.toStdString();
   }
@@ -58,6 +58,8 @@ public:
   void RemoveData(const std::string &label);
 
   void UpdateLabel(const std::string &existingLabel, const std::string &newLabel);
+
+  QmitkChartxyData* GetDataElementByLabel(const std::string& label) const;
 
   void ClearData();
 
@@ -124,7 +126,6 @@ public:
 private:
   using ChartxyDataVector = std::vector<std::unique_ptr<QmitkChartxyData>>;
   std::string GetUniqueLabelName(const QList<QVariant> &labelList, const std::string &label) const;
-  QmitkChartxyData *GetDataElementByLabel(const std::string &label) const;
   QList<QVariant> GetDataLabels(const ChartxyDataVector &c3xyData) const;
 
   QWebChannel *m_WebChannel;
@@ -133,6 +134,7 @@ private:
   QmitkChartData m_C3Data;
   ChartxyDataVector m_C3xyData;
   std::map<QmitkChartWidget::ChartType, std::string> m_ChartTypeToName;
+  std::map<QmitkChartWidget::ChartColor, std::string> m_ChartColorToName;
   std::map<QmitkChartWidget::ColorTheme, std::string> m_ColorThemeToName;
   std::map<QmitkChartWidget::LegendPosition, std::string> m_LegendPositionToName;
   std::map<QmitkChartWidget::LineStyle, std::string> m_LineStyleToName;
@@ -170,6 +172,31 @@ QmitkChartWidget::Impl::Impl(QWidget *parent)
   m_ChartTypeToName.emplace(ChartType::area, "area");
   m_ChartTypeToName.emplace(ChartType::area_spline, "area-spline");
   m_ChartTypeToName.emplace(ChartType::scatter, "scatter");
+
+  m_ChartColorToName.emplace(ChartColor::red, "red");
+  m_ChartColorToName.emplace(ChartColor::orange, "orange");
+  m_ChartColorToName.emplace(ChartColor::yellow, "yellow");
+  m_ChartColorToName.emplace(ChartColor::green, "green");
+  m_ChartColorToName.emplace(ChartColor::blue, "blue");
+  m_ChartColorToName.emplace(ChartColor::purple, "purple");
+  m_ChartColorToName.emplace(ChartColor::brown, "brown");
+  m_ChartColorToName.emplace(ChartColor::magenta, "magenta");
+  m_ChartColorToName.emplace(ChartColor::tan, "tan");
+  m_ChartColorToName.emplace(ChartColor::cyan, "cyan");
+  m_ChartColorToName.emplace(ChartColor::olive, "olive");
+  m_ChartColorToName.emplace(ChartColor::maroon, "maroon");
+  m_ChartColorToName.emplace(ChartColor::navy, "navy");
+  m_ChartColorToName.emplace(ChartColor::aquamarine, "aquamarine");
+  m_ChartColorToName.emplace(ChartColor::turqouise, "turqouise");
+  m_ChartColorToName.emplace(ChartColor::silver, "silver");
+  m_ChartColorToName.emplace(ChartColor::lime, "lime");
+  m_ChartColorToName.emplace(ChartColor::teal, "teal");
+  m_ChartColorToName.emplace(ChartColor::indigo, "indigo");
+  m_ChartColorToName.emplace(ChartColor::violet, "violet");
+  m_ChartColorToName.emplace(ChartColor::pink, "pink");
+  m_ChartColorToName.emplace(ChartColor::black, "black");
+  m_ChartColorToName.emplace(ChartColor::white, "white");
+  m_ChartColorToName.emplace(ChartColor::grey, "grey");
 
   m_LegendPositionToName.emplace(LegendPosition::bottomMiddle, "bottomMiddle");
   m_LegendPositionToName.emplace(LegendPosition::bottomRight, "bottomRight");
@@ -586,12 +613,6 @@ QmitkChartWidget::QmitkChartWidget(QWidget *parent) : QWidget(parent), m_Impl(ne
 }
 
 QmitkChartWidget::~QmitkChartWidget() {}
-
-void QmitkChartWidget::AddData2D(const std::map<double, double> &data2D, const std::string &label, ChartType type)
-{
-  m_Impl->AddData2D(data2D, label, type);
-}
-
 void QmitkChartWidget::SetColor(const std::string &label, const std::string &colorName)
 {
   m_Impl->SetColor(label, colorName);

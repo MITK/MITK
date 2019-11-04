@@ -29,8 +29,8 @@ namespace mitk
     Q_INTERFACES(ctkPluginActivator)
 
   public:
-    void start(ctkPluginContext *context) override;
-    void stop(ctkPluginContext *context) override;
+    void start(ctkPluginContext *context);
+    void stop(ctkPluginContext *context);
 
   }; // org_mitk_gui_qt_chartExample_Activator
 }

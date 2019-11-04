@@ -102,30 +102,6 @@ void ChartExample::CreateConnectionsForGUIElements()
   connect(m_Controls.m_checkBoxShowSubchart, &QCheckBox::stateChanged, this, &ChartExample::OnShowSubchartChanged);
 }
 
-void ChartExample::FillRandomDataValues()
-{
-  std::vector<double> numbers = GenerateRandomNumbers(10, 10.0);
-  std::string text = ConvertToText(numbers);
-  m_Controls.m_lineEditDataYVector->setText(QString::fromStdString(text));
-
-  m_Controls.m_lineEditDataLabel->setText("test" + QString::number(countForUID));
-
-  numbers = GenerateRandomNumbers(10, 10.0);
-  text = ConvertToText(numbers);
-  m_Controls.m_lineEditXErrorPlus->setText(QString::fromStdString(text));
-  numbers = GenerateRandomNumbers(10, 10.0);
-  text = ConvertToText(numbers);
-  m_Controls.m_lineEditXErrorMinus->setText(QString::fromStdString(text));
-  numbers = GenerateRandomNumbers(10, 10.0);
-  text = ConvertToText(numbers);
-  m_Controls.m_lineEditYErrorPlus->setText(QString::fromStdString(text));
-  numbers = GenerateRandomNumbers(10, 10.0);
-  text = ConvertToText(numbers);
-  m_Controls.m_lineEditYErrorMinus->setText(QString::fromStdString(text));
-
-  countForUID++;
-}
-
 void ChartExample::CreateChart()
 {
   auto dataYAxisScaleType =
@@ -152,13 +128,6 @@ void ChartExample::CreateChart()
   m_Controls.m_Chart->Show(showSubchart);
 }
 
-void ChartExample::UpdateChart() {
-  // Test update mechanism
-  m_Controls.m_Chart->SetLineStyle("test0", QmitkChartWidget::LineStyle::dashed);
-  m_Controls.m_Chart->SetChartType("test0", QmitkChartWidget::ChartType::spline);
-  m_Controls.m_Chart->SetColor("test0", "violet");
-  m_Controls.m_Chart->UpdateData2D({{0, 1}, {0.1, 2}, {0.2, 3}, {8, -2} }, "test0");
-  m_Controls.m_Chart->UpdateLabel("test0", "newLabel");
 }
 
 void ChartExample::ClearChart()

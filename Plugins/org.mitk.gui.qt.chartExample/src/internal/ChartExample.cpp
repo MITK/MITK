@@ -191,45 +191,46 @@ std::vector<std::string> ChartExample::ConvertToStringVector(const QString &data
 
 void ChartExample::AddData()
 {
-  QString data = m_Controls.m_lineEditDataYVector->text();
-  auto dataY = ConvertToDoubleVector(data);
+  QString lineEditDataX = m_Controls.m_lineEditDataXVector->text();
+  auto dataX = ConvertToDoubleVector(lineEditDataX);
 
-  auto chartType = m_ChartNameToChartType.at(m_Controls.m_comboBoxChartType->currentText().toStdString());
+  QString lineEditDataY = m_Controls.m_lineEditDataYVector->text();
+  auto dataY = ConvertToDoubleVector(lineEditDataY);
+
   std::string dataLabel = m_Controls.m_lineEditDataLabel->text().toStdString();
-  std::string dataColor = m_Controls.m_lineEditColor->text().toStdString();
-  auto dataLineStyleType = m_LineNameToLineType.at(m_Controls.m_comboBoxLineStyle->currentText().toStdString());
+  auto chartColor = m_ChartNameToChartColor.at(m_Controls.m_comboBoxColor->currentText().toLower().toStdString());
+  auto chartType = m_ChartNameToChartType.at(m_Controls.m_comboBoxChartType->currentText().toLower().toStdString());
+  auto chartStyle = m_LineNameToLineType.at(m_Controls.m_comboBoxLineStyle->currentText().toLower().toStdString());
 
-  if (m_Controls.m_checkBoxEnableDataX->isChecked())
+  if (std::find(labelStorage.begin(), labelStorage.end(), dataLabel) != labelStorage.end())
   {
-    QString lineEditDataX = m_Controls.m_lineEditDataXVector->text();
-    auto dataX = ConvertToDoubleVector(lineEditDataX);
-    if (dataX.size() != dataY.size())
-    {
-      mitkThrow() << "data x and y size have to be equal";
-    }
-    auto dataXandY = CreateMap(dataX, dataY);
-    data = QString::fromStdString(ConvertToText(dataXandY));
+      m_Controls.m_labelInfo->setText("This data already exists");
+      m_Controls.m_labelInfo->setStyleSheet("{color: ##ff0000}");
+      return;
+  }
 
-    m_Controls.m_Chart->AddData2D(dataXandY, dataLabel, chartType);
-  }
-  else
+  if (dataX.size() != dataY.size())
   {
-    m_Controls.m_Chart->AddData1D(dataY, dataLabel, chartType);
+      m_Controls.m_labelInfo->setText("Data x and y size have to be equal");
+      m_Controls.m_labelInfo->setStyleSheet("{color: ##ff0000}");
+      return;
   }
-  if (!dataColor.empty())
-  {
-    m_Controls.m_Chart->SetColor(dataLabel, dataColor);
-  }
+  auto dataXandY = CreateMap(dataX, dataY);
+  QString data = QString::fromStdString(ConvertToText(dataXandY));
+
+  QString pieLabelsData = m_Controls.m_lineEditPieDataLabel->text();
 
   if (chartType == QmitkChartWidget::ChartType::pie)
   {
-    QString pieLabelsData = m_Controls.m_lineEditPieDataLabel->text();
-    if (!pieLabelsData.isEmpty())
-    {
-      auto pieLabels = ConvertToStringVector(pieLabelsData);
-      m_Controls.m_Chart->SetPieLabels(pieLabels, dataLabel);
-    }
+      if (!pieLabelsData.isEmpty())
+      {
+          auto pieLabels = ConvertToStringVector(pieLabelsData);
+          m_Controls.m_Chart->SetPieLabels(pieLabels, dataLabel);
+      }
   }
+  labelStorage.push_back(dataLabel);
+  m_Controls.m_Chart->AddChartExampleData(dataXandY, dataLabel, chartType, chartColor, chartStyle, pieLabelsData);
+  m_Controls.m_comboBoxExistingData->addItem(m_Controls.m_lineEditDataLabel->text());
 
   if (m_Controls.m_checkBoxEnableErrors->isChecked())
   {
@@ -247,22 +248,17 @@ void ChartExample::AddData()
     }
   }
 
-  m_Controls.m_Chart->SetLineStyle(dataLabel, dataLineStyleType);
+  m_Controls.m_Chart->SetLineStyle(dataLabel, chartStyle);
 
   QString dataOverview;
   dataOverview.append(m_Controls.m_lineEditDataLabel->text());
   dataOverview.append("(").append(m_Controls.m_comboBoxChartType->currentText());
-  if (!dataColor.empty())
-  {
-    dataOverview.append(", ").append(dataColor.c_str());
-  }
+
   dataOverview.append(", ").append(m_Controls.m_comboBoxLineStyle->currentText());
   dataOverview.append(")");
   dataOverview.append(":").append(data);
 
   m_Controls.m_plainTextEditDataView->appendPlainText(dataOverview);
-
-  FillRandomDataValues();
 }
 
 void ChartExample::ShowXData(bool show)

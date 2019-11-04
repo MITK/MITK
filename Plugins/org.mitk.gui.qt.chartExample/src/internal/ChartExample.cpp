@@ -20,11 +20,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk
 #include "ChartExample.h"
+#include <QmitkChartxyData.h>
 
 // Qt
 #include <QRandomGenerator>
 
 const std::string ChartExample::VIEW_ID = "org.mitk.views.chartexample";
+
+static std::vector<std::string> labelStorage;
 
 void ChartExample::SetFocus()
 {
@@ -38,22 +41,22 @@ void ChartExample::CreateQtPartControl(QWidget *parent)
   CreateConnectionsForGUIElements();
   connect(m_Controls.m_comboBoxChartType, &QComboBox::currentTextChanged, this, &ChartExample::AdaptDataGUI);
 
+  m_Controls.m_lineEditDataXVector->setText("0;1;2;3;4;5;6;7;8;9");
+  m_Controls.m_lineEditDataYVector->setText("0;1;2;3;4;5;6;7;8;9");
+  m_Controls.m_lineEditDataLabel->setText("Test");
+  m_Controls.m_lineEditXAxisLabel->setText("X-Axis");
+  m_Controls.m_lineEditYAxisLabel->setText("Y-Axis");
+  m_Controls.m_lineEditTitle->setText("Title");
+
+  m_Controls.m_labelPieData->setVisible(false);
+  m_Controls.m_lineEditPieDataLabel->setVisible(false);
+
   m_Controls.m_groupBoxErrors->setVisible(false);
   m_Controls.m_groupBoxXErrors->setVisible(false);
   m_Controls.m_groupBoxYErrors->setVisible(false);
-  m_Controls.m_lineEditDataXVector->setVisible(false);
-  m_Controls.m_lineEditDataXVector->setText("0;1;2;3;4;5;6;7;8;9");
-  ResetDataGUI();
 
   m_Controls.m_doubleSpinBox_maxZoomX->setValue(10);
   m_Controls.m_doubleSpinBox_maxZoomY->setValue(10);
-
-  FillRandomDataValues();
-  auto chartStyle = GetColorTheme();
-  m_Controls.m_Chart->SetTheme(chartStyle);
-
-  m_Controls.m_lineEditXAxisLabel->setText("xLabel");
-  m_Controls.m_lineEditYAxisLabel->setText("yLabel");
 
   m_ChartNameToChartType.emplace("bar", QmitkChartWidget::ChartType::bar);
   m_ChartNameToChartType.emplace("line", QmitkChartWidget::ChartType::line);
@@ -62,6 +65,31 @@ void ChartExample::CreateQtPartControl(QWidget *parent)
   m_ChartNameToChartType.emplace("area", QmitkChartWidget::ChartType::area);
   m_ChartNameToChartType.emplace("area-spline", QmitkChartWidget::ChartType::area_spline);
   m_ChartNameToChartType.emplace("scatter", QmitkChartWidget::ChartType::scatter);
+
+  m_ChartNameToChartColor.emplace("red", QmitkChartWidget::ChartColor::red);
+  m_ChartNameToChartColor.emplace("orange", QmitkChartWidget::ChartColor::orange);
+  m_ChartNameToChartColor.emplace("yellow", QmitkChartWidget::ChartColor::yellow);
+  m_ChartNameToChartColor.emplace("green", QmitkChartWidget::ChartColor::green);
+  m_ChartNameToChartColor.emplace("blue", QmitkChartWidget::ChartColor::blue);
+  m_ChartNameToChartColor.emplace("purple", QmitkChartWidget::ChartColor::purple);
+  m_ChartNameToChartColor.emplace("brown", QmitkChartWidget::ChartColor::brown);
+  m_ChartNameToChartColor.emplace("magenta", QmitkChartWidget::ChartColor::magenta);
+  m_ChartNameToChartColor.emplace("tan", QmitkChartWidget::ChartColor::tan);
+  m_ChartNameToChartColor.emplace("cyan", QmitkChartWidget::ChartColor::cyan);
+  m_ChartNameToChartColor.emplace("olive", QmitkChartWidget::ChartColor::olive);
+  m_ChartNameToChartColor.emplace("maroon", QmitkChartWidget::ChartColor::maroon);
+  m_ChartNameToChartColor.emplace("navy", QmitkChartWidget::ChartColor::navy);
+  m_ChartNameToChartColor.emplace("aquamarine", QmitkChartWidget::ChartColor::aquamarine);
+  m_ChartNameToChartColor.emplace("turquoise", QmitkChartWidget::ChartColor::turqouise);
+  m_ChartNameToChartColor.emplace("silver", QmitkChartWidget::ChartColor::silver);
+  m_ChartNameToChartColor.emplace("lime", QmitkChartWidget::ChartColor::lime);
+  m_ChartNameToChartColor.emplace("teal", QmitkChartWidget::ChartColor::teal);
+  m_ChartNameToChartColor.emplace("indigo", QmitkChartWidget::ChartColor::indigo);
+  m_ChartNameToChartColor.emplace("violet", QmitkChartWidget::ChartColor::violet);
+  m_ChartNameToChartColor.emplace("pink", QmitkChartWidget::ChartColor::pink);
+  m_ChartNameToChartColor.emplace("black", QmitkChartWidget::ChartColor::black);
+  m_ChartNameToChartColor.emplace("white", QmitkChartWidget::ChartColor::white);
+  m_ChartNameToChartColor.emplace("grey", QmitkChartWidget::ChartColor::grey);
 
   m_LineNameToLineType.emplace("solid", QmitkChartWidget::LineStyle::solid);
   m_LineNameToLineType.emplace("dashed", QmitkChartWidget::LineStyle::dashed);
@@ -79,10 +107,10 @@ void ChartExample::CreateQtPartControl(QWidget *parent)
 void ChartExample::CreateConnectionsForGUIElements()
 {
   connect(m_Controls.m_buttonCreateChart, &QPushButton::clicked, this, &ChartExample::CreateChart);
-  connect(m_Controls.m_buttonUpdateChart, &QPushButton::clicked, this, &ChartExample::UpdateChart);
+  connect(m_Controls.m_buttonUpdateData, &QPushButton::clicked, this, &ChartExample::UpdateData);
   connect(m_Controls.m_buttonClearChart, &QPushButton::clicked, this, &ChartExample::ClearChart);
   connect(m_Controls.m_buttonAddData, &QPushButton::clicked, this, &ChartExample::AddData);
-  connect(m_Controls.m_checkBoxEnableDataX, &QCheckBox::toggled, this, &ChartExample::ShowXData);
+  connect(m_Controls.m_comboBoxExistingData, &QComboBox::currentTextChanged, this, &ChartExample::UpdateSelectedData);
   connect(m_Controls.m_checkBoxEnableErrors, &QCheckBox::toggled, this, &ChartExample::ShowErrorOptions);
   connect(m_Controls.m_checkBoxEnableXErrors, &QCheckBox::toggled, this, &ChartExample::ShowXErrorOptions);
   connect(m_Controls.m_checkBoxEnableYErrors, &QCheckBox::toggled, this, &ChartExample::ShowYErrorOptions);
@@ -94,8 +122,7 @@ void ChartExample::CreateConnectionsForGUIElements()
   connect(m_Controls.m_lineEditTitle, &QLineEdit::editingFinished, this, &ChartExample::OnTitleChanged);
   connect(m_Controls.m_lineEditXAxisLabel, &QLineEdit::editingFinished, this, &ChartExample::OnXAxisLabelChanged);
   connect(m_Controls.m_lineEditYAxisLabel, &QLineEdit::editingFinished, this, &ChartExample::OnYAxisLabelChanged);
-  connect(
-    m_Controls.m_comboBoxYAxisScale, &QComboBox::currentTextChanged, this, &ChartExample::OnYAxisScaleChanged);
+  connect(m_Controls.m_comboBoxYAxisScale, &QComboBox::currentTextChanged, this, &ChartExample::OnYAxisScaleChanged);
   connect(m_Controls.m_checkBoxShowLegend, &QCheckBox::stateChanged, this, &ChartExample::OnShowLegendChanged);
   connect(m_Controls.m_checkBoxStackedData, &QCheckBox::stateChanged, this, &ChartExample::OnStackedDataChanged);
   connect(m_Controls.m_checkBoxShowDataPoints, &QCheckBox::stateChanged, this, &ChartExample::OnShowDataPointsChanged);
@@ -156,7 +183,12 @@ void ChartExample::UpdateData()
 void ChartExample::ClearChart()
 {
   m_Controls.m_Chart->Clear();
+
   m_Controls.m_plainTextEditDataView->clear();
+
+  m_Controls.m_comboBoxExistingData->clear();
+
+  labelStorage.clear();
 }
 
 std::vector<double> ChartExample::ConvertToDoubleVector(const QString &data, QChar delimiter) const

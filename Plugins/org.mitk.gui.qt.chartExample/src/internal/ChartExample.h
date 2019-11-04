@@ -37,14 +37,14 @@ public:
   static const std::string VIEW_ID;
 
 protected:
-  void CreateQtPartControl(QWidget *parent) override;
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
   void CreateConnectionsForGUIElements();
 
-  void SetFocus() override;
+  virtual void SetFocus() override;
 
   void CreateChart();
-  void UpdateChart();
+  void UpdateData();
   void ClearChart();
 
   void AddData();
@@ -60,10 +60,8 @@ protected:
   void AdaptDataGUI(const QString &chartType);
 
   void UpdateSelectedData();
-  void ResetDataGUI();
 
 private:
-  void FillRandomDataValues();
   std::vector<double> GenerateRandomNumbers(unsigned int amount, double max) const;
   std::vector<double> ConvertToDoubleVector(const QString &data, QChar delimiter = ';') const;
   std::vector<std::string> ConvertToStringVector(const QString &data, QChar delimiter = ';') const;
@@ -82,6 +80,7 @@ private:
   void OnShowSubchartChanged(int newState);
 
   std::map<std::string, QmitkChartWidget::ChartType> m_ChartNameToChartType;
+  std::map<std::string, QmitkChartWidget::ChartColor> m_ChartNameToChartColor;
   std::map<std::string, QmitkChartWidget::LineStyle> m_LineNameToLineType;
   std::map<std::string, QmitkChartWidget::AxisScale> m_AxisScaleNameToAxisScaleType;
   std::map<std::string, QmitkChartWidget::LegendPosition> m_LegendPositionNameToLegendPositionType;

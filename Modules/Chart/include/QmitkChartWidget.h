@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkChartExports.h>
 
+class QmitkChartxyData;
+
 /*!
 \brief QmitkChartWidget is a widget to display various charts based on the javascript chart library plotly.
 * \details Data is added via AddData1D() or AddData2D().\n
@@ -162,6 +164,8 @@ public:
   void RemoveData(const std::string& label);
 
   void UpdateLabel(const std::string& existingLabel, const std::string& newLabel);
+
+  QmitkChartxyData *GetDataElementByLabel(const std::string& label) const;
 
   /*!
   * \brief Sets the color of one data entry (identifier is previously assigned label)

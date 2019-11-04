@@ -422,3 +422,89 @@ void ChartExample::OnShowDataPointsChanged(int newState) {
 void ChartExample::OnShowSubchartChanged(int newState) {
   m_Controls.m_Chart->SetShowSubchart(newState == Qt::Checked);
 }
+
+void ChartExample::UpdateSelectedData()
+{
+  std::string label = m_Controls.m_comboBoxExistingData->currentText().toStdString();
+  auto data = m_Controls.m_Chart->GetDataElementByLabel(label);
+
+  if (data == nullptr)
+  {
+      return;
+  }
+
+  auto x = data->GetXData();
+  auto y = data->GetYData();
+
+  auto xVector = x.toVector().toStdVector();
+  auto yVector = y.toVector().toStdVector();
+
+  std::string xString;
+  std::string yString;
+
+  for (int i = 0; i < xVector.size(); i++)
+  {
+      xString.append(xVector[i].toString().toStdString());
+      if (i != xVector.size() - 1)
+      {
+          xString.append(";");
+      }
+  }
+
+  for (int i = 0; i < yVector.size(); i++)
+  {
+      yString.append(yVector[i].toString().toStdString());
+      if (i != yVector.size() - 1)
+      {
+          yString.append(";");
+      }
+  }
+
+  auto color = data->GetColor();
+  auto type = data->GetChartType();
+  auto style = data->GetLineStyle();
+
+  int colorIndex = m_Controls.m_Chart->GetIndexByString(color.toString().toStdString());
+  int typeIndex = m_Controls.m_Chart->GetIndexByString(type.toString().toStdString());
+  int styleIndex = m_Controls.m_Chart->GetIndexByString(style.toString().toStdString());
+
+  if (type.toString() == "pie")
+  {
+      m_Controls.m_comboBoxLineStyle->setVisible(false);
+      m_Controls.m_labelLineStyle->setVisible(false);
+      m_Controls.m_lineEditPieDataLabel->setVisible(true);
+      m_Controls.m_labelPieData->setVisible(true);
+
+      auto pieLabels = data->GetPieLabels();
+
+      auto pieLabelsVector = pieLabels.toVector().toStdVector();
+
+      std::string pieLabelsString;
+
+      for (int i = 0; i < pieLabelsVector.size(); i++)
+      {
+          pieLabelsString.append(pieLabelsVector[i].toString().toStdString());
+          if (i != pieLabelsVector.size() - 1)
+          {
+              pieLabelsString.append(";");
+          }
+      }
+
+      m_Controls.m_lineEditPieDataLabel->setText(QString::fromStdString(pieLabelsString));
+  }
+
+  else
+  {
+      m_Controls.m_lineEditPieDataLabel->setVisible(false);
+      m_Controls.m_labelPieData->setVisible(false);
+      m_Controls.m_comboBoxLineStyle->setVisible(true);
+      m_Controls.m_labelLineStyle->setVisible(true);
+      m_Controls.m_comboBoxLineStyle->setCurrentIndex(styleIndex);
+  }
+  m_Controls.m_lineEditDataXVector->setText(QString::fromStdString(xString));
+  m_Controls.m_lineEditDataYVector->setText(QString::fromStdString(yString));
+  m_Controls.m_lineEditDataLabel->setText(QString::fromStdString(label));
+  m_Controls.m_comboBoxColor->setCurrentIndex(colorIndex);
+  m_Controls.m_comboBoxChartType->setCurrentIndex(typeIndex);
+
+}

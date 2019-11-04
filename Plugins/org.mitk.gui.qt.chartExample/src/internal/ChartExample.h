@@ -58,6 +58,8 @@ protected:
   void AdaptZoomY();
 
   void AdaptDataGUI(const QString &chartType);
+
+  void UpdateSelectedData();
   void ResetDataGUI();
 
 private:

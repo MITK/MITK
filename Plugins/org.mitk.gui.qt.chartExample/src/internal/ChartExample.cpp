@@ -128,6 +128,29 @@ void ChartExample::CreateChart()
   m_Controls.m_Chart->Show(showSubchart);
 }
 
+void ChartExample::UpdateData()
+{
+    if (m_Controls.m_comboBoxExistingData->currentText().isEmpty())
+    {
+        m_Controls.m_labelInfo->setText("Please enter a valid Datalabel");
+        m_Controls.m_labelInfo->setStyleSheet("{color: ##ff0000}");
+        return;
+    }
+
+    if (m_Controls.m_lineEditDataLabel->text() != m_Controls.m_comboBoxExistingData->currentText())
+    {
+        return;
+    }
+
+    auto dataLabel = m_Controls.m_lineEditDataLabel->text().toStdString();
+    m_Controls.m_Chart->RemoveData(dataLabel);
+
+    auto it = std::find(labelStorage.begin(), labelStorage.end(), dataLabel);
+    labelStorage.erase(it);
+
+    auto index = m_Controls.m_comboBoxExistingData->findText(QString::fromStdString(dataLabel));
+    m_Controls.m_comboBoxExistingData->removeItem(index);
+    AddData();
 }
 
 void ChartExample::ClearChart()

@@ -299,6 +299,8 @@ public:
 
   QSize sizeHint() const override;
 
+  int GetIndexByString(std::string);
+
 public slots:
   void OnLoadFinished(bool isLoadSuccessful);
   void OnPageSuccessfullyLoaded();

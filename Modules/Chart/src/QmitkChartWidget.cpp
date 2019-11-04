@@ -112,6 +112,8 @@ public:
 
   QSize sizeHint() const;
 
+  int GetIndexByString(std::string);
+
 private:
   using ChartxyDataVector = std::vector<std::unique_ptr<QmitkChartxyData>>;
   std::string GetUniqueLabelName(const QList<QVariant> &labelList, const std::string &label) const;
@@ -750,4 +752,30 @@ void QmitkChartWidget::Reload()
 QSize QmitkChartWidget::sizeHint() const
 {
   return m_Impl->sizeHint();
+}
+int QmitkChartWidget::GetIndexByString(std::string string)
+{
+    int Index = m_Impl->GetIndexByString(string);
+    return Index;
+}
+
+int QmitkChartWidget::Impl::GetIndexByString(std::string string)
+{
+    if (std::find(ChartTypeVector.begin(), ChartTypeVector.end(), string) != ChartTypeVector.end())
+    {
+        std::vector<std::string>::iterator it = std::find(ChartTypeVector.begin(), ChartTypeVector.end(), string);
+        return std::distance(ChartTypeVector.begin(), it);
+    }
+    else if (std::find(LineStyleVector.begin(), LineStyleVector.end(), string) != LineStyleVector.end())
+    {
+        std::vector<std::string>::iterator it = std::find(LineStyleVector.begin(), LineStyleVector.end(), string);
+        return std::distance(LineStyleVector.begin(), it);
+    }
+    else if (std::find(ChartColorVector.begin(), ChartColorVector.end(), string) != ChartColorVector.end())
+    {
+        std::vector<std::string>::iterator it = std::find(ChartColorVector.begin(), ChartColorVector.end(), string);
+        return std::distance(ChartColorVector.begin(), it);
+    }
+
+    return 0;
 }

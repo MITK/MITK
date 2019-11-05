@@ -46,7 +46,7 @@ unsigned int QmitkRenderWindowMenu::m_DefaultThickMode(1);
 
 #ifdef QMITK_USE_EXTERNAL_RENDERWINDOW_MENU
 QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget* parent,
-                                             Qt::WindowFlags flags,
+                                             Qt::WindowFlags,
                                              mitk::BaseRenderer* baseRenderer)
   : QWidget(nullptr, Qt::Tool | Qt::FramelessWindowHint)
 

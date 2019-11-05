@@ -200,7 +200,7 @@ namespace mitk
       const char *name = "VtkPropRenderer",
       vtkRenderWindow *renWin = nullptr,
       mitk::RenderingManager *rm = nullptr,
-      mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard);
+      mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing);
     ~VtkPropRenderer() override;
     void Update() override;
 

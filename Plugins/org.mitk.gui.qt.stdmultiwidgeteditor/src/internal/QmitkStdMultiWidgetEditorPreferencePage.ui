@@ -59,7 +59,12 @@
     <widget class="QComboBox" name="m_RenderingMode">
      <item>
       <property name="text">
-       <string>Standard Rendering</string>
+       <string>No anti-aliasing</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Fast Approximate Anti-Aliasing (FXAA)</string>
       </property>
      </item>
     </widget>

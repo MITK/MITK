@@ -78,7 +78,9 @@ namespace mitk
     {
       enum Type
       {
-        Standard = 0
+        NoAntiAliasing = 0,
+        FastApproximateAntiAliasing = 1 // In contrast to MSAA, FXAA works with depth peeling as it is
+                                        // applied as a post-processing pass.
       };
     };
 
@@ -102,7 +104,7 @@ namespace mitk
     BaseRenderer(const char *name = nullptr,
                  vtkRenderWindow *renWin = nullptr,
                  mitk::RenderingManager *rm = nullptr,
-                 RenderingMode::Type mode = RenderingMode::Standard);
+                 RenderingMode::Type mode = RenderingMode::FastApproximateAntiAliasing);
 
     //##Documentation
     //## @brief MapperSlotId defines which kind of mapper (e.g., 2D or 3D) shoud be used.

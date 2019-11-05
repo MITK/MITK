@@ -85,7 +85,7 @@ namespace mitk
     RenderWindow(vtkRenderWindow *existingRenderWindow = nullptr,
                  const char *name = "unnamed renderer",
                  mitk::RenderingManager *rm = nullptr,
-                 mitk::BaseRenderer::RenderingMode::Type rmtype = mitk::BaseRenderer::RenderingMode::Standard);
+                 mitk::BaseRenderer::RenderingMode::Type rmtype = mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing);
 
     void ResetView();
     vtkRenderWindow *m_vtkRenderWindow;

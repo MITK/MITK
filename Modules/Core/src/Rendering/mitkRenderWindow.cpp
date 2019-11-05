@@ -26,13 +26,15 @@ mitk::RenderWindow::RenderWindow(vtkRenderWindow *renWin,
                                  const char *name,
                                  mitk::RenderingManager *rm,
                                  mitk::BaseRenderer::RenderingMode::Type rmtype)
-  : m_vtkRenderWindow(renWin), m_vtkRenderWindowInteractor(nullptr), m_vtkMitkEventProvider(nullptr)
+  : m_vtkRenderWindow(renWin),
+    m_vtkRenderWindowInteractor(nullptr),
+    m_vtkMitkEventProvider(nullptr)
 {
-  if (m_vtkRenderWindow == nullptr)
+  if (nullptr == m_vtkRenderWindow)
   {
     m_vtkRenderWindow = vtkRenderWindow::New();
-    m_vtkRenderWindow->SetMultiSamples(0);
-    m_vtkRenderWindow->SetAlphaBitPlanes(0);
+    m_vtkRenderWindow->SetMultiSamples(0); // We do not support MSAA as it is incompatible with depth peeling
+    m_vtkRenderWindow->SetAlphaBitPlanes(1); // Necessary for depth peeling
   }
 
   if (m_vtkRenderWindow->GetSize()[0] <= 10)
@@ -45,7 +47,7 @@ mitk::RenderWindow::RenderWindow(vtkRenderWindow *renWin,
   m_vtkRenderWindowInteractor->Initialize();
 
   // initialize from RenderWindowBase
-  Initialize(rm, name, rmtype);
+  this->Initialize(rm, name, rmtype);
 
   m_vtkMitkEventProvider = vtkEventProvider::New();
   m_vtkMitkEventProvider->SetInteractor(this->GetVtkRenderWindowInteractor());

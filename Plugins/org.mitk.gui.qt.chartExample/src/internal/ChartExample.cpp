@@ -160,7 +160,7 @@ void ChartExample::UpdateData()
     if (m_Controls.m_comboBoxExistingData->currentText().isEmpty())
     {
         m_Controls.m_labelInfo->setText("Please enter a valid Datalabel");
-        m_Controls.m_labelInfo->setStyleSheet("{color: ##ff0000}");
+        m_Controls.m_labelInfo->setStyleSheet("color: red;");
         return;
     }
 
@@ -237,14 +237,14 @@ void ChartExample::AddData()
   if (std::find(labelStorage.begin(), labelStorage.end(), dataLabel) != labelStorage.end())
   {
       m_Controls.m_labelInfo->setText("This data already exists");
-      m_Controls.m_labelInfo->setStyleSheet("{color: ##ff0000}");
+      m_Controls.m_labelInfo->setStyleSheet("color: red;");
       return;
   }
 
   if (dataX.size() != dataY.size())
   {
       m_Controls.m_labelInfo->setText("Data x and y size have to be equal");
-      m_Controls.m_labelInfo->setStyleSheet("{color: ##ff0000}");
+      m_Controls.m_labelInfo->setStyleSheet("color: red;");
       return;
   }
   auto dataXandY = CreateMap(dataX, dataY);

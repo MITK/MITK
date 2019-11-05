@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // qt
 #include <QHBoxLayout>
-#include <QSPlitter>
+#include <qsplitter.h>
 
 QmitkMultiWidgetLayoutManager::QmitkMultiWidgetLayoutManager(QmitkAbstractMultiWidget* multiwidget)
   : QObject(multiwidget)

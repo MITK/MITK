@@ -43,12 +43,10 @@ void vtkMitkRenderProp::SetPropRenderer(mitk::VtkPropRenderer::Pointer propRende
 
 void vtkMitkRenderProp::SetPropertyKeys(vtkInformation *keys)
 {
-  // store information as a regular vtkProp
   Superclass::SetPropertyKeys(keys);
-  if (m_VtkPropRenderer != nullptr)
-  {
+
+  if (nullptr != m_VtkPropRenderer)
     m_VtkPropRenderer->SetPropertyKeys(keys);
-  }
 }
 
 int vtkMitkRenderProp::RenderOpaqueGeometry(vtkViewport * /*viewport*/)
@@ -83,23 +81,25 @@ int vtkMitkRenderProp::GetNumberOfPaths()
 
 int vtkMitkRenderProp::HasTranslucentPolygonalGeometry()
 {
-  for (auto &mapEntry : m_VtkPropRenderer->GetMappersMap())
+  for (const auto &mapEntry : m_VtkPropRenderer->GetMappersMap())
   {
-    if (auto vtkMapper = dynamic_cast<mitk::VtkMapper *>(mapEntry.second))
+    auto vtkMapper = dynamic_cast<mitk::VtkMapper*>(mapEntry.second);
+
+    if (nullptr != vtkMapper)
     {
       // Due to VTK 5.2 bug, we need to initialize the Paths object in vtkPropAssembly
       // manually (see issue #8186 committed to VTK's Mantis issue tracker)
       // --> VTK bug resolved on 2008-12-01
-      auto *propAssembly = dynamic_cast<vtkPropAssembly *>(vtkMapper->GetVtkProp(m_VtkPropRenderer));
-      if (propAssembly)
-      {
-        propAssembly->InitPathTraversal();
-      }
+      auto propAssembly = dynamic_cast<vtkPropAssembly *>(vtkMapper->GetVtkProp(m_VtkPropRenderer));
 
-      if (vtkMapper->GetVtkProp(m_VtkPropRenderer)->HasTranslucentPolygonalGeometry() == 1)
+      if (nullptr != propAssembly)
+        propAssembly->InitPathTraversal();
+
+      if (1 == vtkMapper->GetVtkProp(m_VtkPropRenderer)->HasTranslucentPolygonalGeometry())
         return 1;
     }
   }
+
   return 0;
 }
 

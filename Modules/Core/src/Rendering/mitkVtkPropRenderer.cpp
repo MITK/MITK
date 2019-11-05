@@ -266,31 +266,27 @@ void mitk::VtkPropRenderer::PrepareMapperQueue()
 void mitk::VtkPropRenderer::SetPropertyKeys(vtkInformation *info)
 {
   if (info == m_VtkRenderInfo)
-  {
     return;
-  }
 
   m_VtkRenderInfo = info;
-  PropagateRenderInfoToMappers();
+  this->PropagateRenderInfoToMappers();
 }
 
 void mitk::VtkPropRenderer::PropagateRenderInfoToMappers()
 {
   if (m_VtkRenderInfo == nullptr)
-  {
     return;
-  }
 
-  // propagate information to all mappers' vtkProps
-  for (auto &mapEntry : m_MappersMap)
+  for (const auto &mapEntry : m_MappersMap)
   {
-    if (auto vtkMapper = dynamic_cast<mitk::VtkMapper *>(mapEntry.second))
+    auto vtkMapper = dynamic_cast<mitk::VtkMapper*>(mapEntry.second);
+
+    if (nullptr != vtkMapper)
     {
-      vtkProp *prop = vtkMapper->GetVtkProp(this);
-      if (prop)
-      {
+      auto prop = vtkMapper->GetVtkProp(this);
+
+      if (nullptr != prop)
         prop->SetPropertyKeys(m_VtkRenderInfo);
-      }
     }
   }
 }

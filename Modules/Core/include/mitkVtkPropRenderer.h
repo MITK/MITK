@@ -85,7 +85,7 @@ namespace mitk
       Volumetric
     };
 
-    /** \brief store/propagate vtkInformation during rendering */
+    /** \brief Store/propagate vtkInformation during rendering */
     void SetPropertyKeys(vtkInformation *info);
 
     int Render(RenderType type);

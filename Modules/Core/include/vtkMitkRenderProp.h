@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 The MITK rendering process is completely integrated into the VTK rendering pipeline.
 The vtkMitkRenderProp is a custom vtkProp derived class, which implements the rendering interface between MITK and VTK.
-It redirects render() calls to the VtkPropRenderer, which is responsible for rendering of the datatreenodes.
+It redirects VTK's various Render..Geometry() calls to mitk::VtkPropRenderer, which is responsible for rendering of mitk::DataNodes.
 
 \sa rendering
 \ingroup rendering
@@ -37,6 +37,14 @@ public:
   vtkTypeMacro(vtkMitkRenderProp, vtkProp);
 
   void SetPropRenderer(mitk::VtkPropRenderer::Pointer propRenderer);
+
+  /**
+   * \brief Store a vtkInformation object
+   *
+   * This method will forward the vtkInformation object
+   * to the vtkProps of all mitk::VtkMapper
+   */
+  void SetPropertyKeys(vtkInformation *keys) override;
 
   int RenderOpaqueGeometry(vtkViewport *viewport) override;
 
@@ -60,7 +68,6 @@ public:
 
   int GetNumberOfPaths() override;
 
-  // BUG (#1551) added method for depth peeling support
   int HasTranslucentPolygonalGeometry() override;
   int RenderTranslucentPolygonalGeometry(vtkViewport *) override;
   int RenderVolumetricGeometry(vtkViewport *) override;

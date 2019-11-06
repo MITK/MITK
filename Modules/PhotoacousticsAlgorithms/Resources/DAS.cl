@@ -115,8 +115,7 @@ __kernel void ckDAS_g(
         pow(mult * (l_p - elementPositions[l_s]), 2)
       ) + (1 - isPAImage)*s_i;
       if (AddSample < inputS && AddSample >= 0)
-        output += dSource[l_s + AddSample*inputL] *
-        apodArray[(int)((l_s - minLine)*apod_mult)];
+        output += dSource[(int)(globalPosZ * inputL * inputS + l_s + AddSample*inputL)] * apodArray[(int)((l_s - minLine)*apod_mult)];
       else
         --curUsedLines;
     }

@@ -24,86 +24,209 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProperties.h"
 #include "mitkTransferFunction.h"
 #include "mitkVtkScalarModeProperty.h"
+#include <vtkAssembly.h>
+#include <vtkDataSetTriangleFilter.h>
 
-class vtkPointSetSlicer;
+#include "mitkBaseRenderer.h"
+#include "mitkLocalStorageHandler.h"
+#include "mitkVtkMapper.h"
+#include "vtkDataSetMapper.h"
+#include <vtkSmartPointer.h>
+#include "mitkUnstructuredGrid.h"
+
+class vtkAssembly;
+class vtkCutter;
 class vtkPlane;
 class vtkLookupTable;
-class vtkPointSet;
-class vtkScalarsToColors;
-class vtkPiecewiseFunction;
-class vtkAbstractMapper3D;
+class vtkGlyph3D;
+class vtkArrowSource;
+class vtkReverseSense;
+class vtkGeometryFilter;
 
 namespace mitk
 {
-  class BaseRenderer;
+  class Surface;
 
   /**
-   * @brief OpenGL-based mapper to display a 2d cut through a poly data
-   * OpenGL-based mapper to display a 2D cut through a poly data. The result is
-   * normally a line. This class can be added to any data object, which is
-   * rendered in 3D via a vtkPolyData.
+   * @brief Vtk-based mapper for cutting 2D slices out of Surfaces.
+   *
+   * The mapper uses a vtkCutter filter to cut out slices (contours) of the 3D
+   * volume and render these slices as vtkPolyData. The data is transformed
+   * according to its geometry before cutting, to support the geometry concept
+   * of MITK.
+   *
+   * Properties:
+   * \b Surface.2D.Line Width: Thickness of the rendered lines in 2D.
+   * \b Surface.2D.Normals.Draw Normals: enables drawing of normals as 3D arrows
+   * in the 2D render window. The normals are created with a vtkGlyph3D from
+   * the vtkPolyData.
+   * \b Surface.2D.Normals.Draw Inverse Normals: same as normals, but in the
+   * other direction. The inverse normals are computed with a vtkReverseSense
+   * filter.
+   * \b Surface.2D.Normals.(Inverse) Normals Color: Color of the (inverse) normals.
+   * \b Surface.2D.Normals.(Inverse) Normals Scale Factor: Regulates the size of the normals.
+   *
+   * @ingroup Mapper
    */
-  class MITKMAPPEREXT_EXPORT UnstructuredGridMapper2D : public GLMapper
+  class MITKMAPPEREXT_EXPORT UnstructuredGridMapper2D : public VtkMapper
   {
   public:
-    mitkClassMacro(UnstructuredGridMapper2D, GLMapper);
+    mitkClassMacro(UnstructuredGridMapper2D, VtkMapper);
 
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      /**
-       * Renders a cut through a pointset by cutting trough the n-cells,
-       * producing (n-1)-cells.
-       * @param renderer the render to render in.
-       */
-      void Paint(mitk::BaseRenderer *renderer) override;
+    // virtual const mitk::Surface *GetInput() const;
+    virtual const mitk::UnstructuredGrid *GetInput();
 
-    LocalStorageHandler<BaseLocalStorage> m_LSH;
+    /** \brief returns the prop assembly */
+    vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
+
+    /** \brief set the default properties for this mapper */
+    static void SetDefaultProperties(mitk::DataNode *node,
+                                     mitk::BaseRenderer *renderer = nullptr,
+                                     bool overwrite = false);
+
+    /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
+    class LocalStorage : public mitk::Mapper::BaseLocalStorage
+    {
+    public:
+      /** \brief Timestamp of last update of stored data. */
+      itk::TimeStamp m_LastUpdateTime;
+      /**
+       * @brief m_PropAssembly Contains all vtkProps for the final rendering.
+       *
+       * Consists of 3 actors:
+       * The surface cut (the slice from the 3D surface).
+       * The normals and the inverse normals.
+       */
+      vtkSmartPointer<vtkAssembly> m_PropAssembly;
+
+      /**
+       * @brief m_Actor actor for the surface cut.
+       */
+      vtkSmartPointer<vtkActor> m_Actor;
+      /**
+       * @brief m_NormalActor actor for the normals.
+       */
+      vtkSmartPointer<vtkActor> m_NormalActor;
+      /**
+       * @brief m_InverseNormalActor actor for the inverse normals.
+       */
+      vtkSmartPointer<vtkActor> m_InverseNormalActor;
+      /**
+       * @brief m_Mapper VTK mapper for all types of 2D polydata e.g. werewolves.
+       */
+      vtkSmartPointer<vtkPolyDataMapper> m_Mapper;
+      /**
+       * @brief m_Cutter Filter to cut out the 2D slice.
+       */
+      vtkSmartPointer<vtkCutter> m_Cutter;
+      /**
+       * @brief m_CuttingPlane The plane where to cut off the 2D slice.
+       */
+      vtkSmartPointer<vtkPlane> m_CuttingPlane;
+
+      /**
+       * @brief m_NormalMapper Mapper for the normals.
+       */
+      vtkSmartPointer<vtkPolyDataMapper> m_NormalMapper;
+
+      /**
+       * @brief m_InverseNormalMapper Mapper for the inverse normals.
+       */
+      vtkSmartPointer<vtkPolyDataMapper> m_InverseNormalMapper;
+
+      /**
+       * @brief m_NormalGlyph Glyph for creating normals.
+       */
+      vtkSmartPointer<vtkGlyph3D> m_NormalGlyph;
+
+      /**
+       * @brief m_InverseNormalGlyph Glyph for creating inverse normals.
+       */
+      vtkSmartPointer<vtkGlyph3D> m_InverseNormalGlyph;
+
+      /**
+       * @brief m_ArrowSource Arrow representation of the normals.
+       */
+      vtkSmartPointer<vtkArrowSource> m_ArrowSource;
+
+      /**
+       * @brief m_ReverseSense Filter to invert the normals.
+       */
+      vtkSmartPointer<vtkReverseSense> m_ReverseSense;
+
+      /** \brief Default constructor of the local storage. */
+      LocalStorage();
+      /** \brief Default deconstructor of the local storage. */
+      ~LocalStorage() override;
+    };
+
+    /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
+    mitk::LocalStorageHandler<LocalStorage> m_LSH;
+
+    /**
+     * @brief UpdateVtkTransform Overwrite the method of the base class.
+     *
+     * The base class transforms the actor according to the respective
+     * geometry which is correct for most cases. This mapper, however,
+     * uses a vtkCutter to cut out a contour. To cut out the correct
+     * contour, the data has to be transformed beforehand. Else the
+     * current plane geometry will point the cutter to en empty location
+     * (if the surface does have a geometry, which is a rather rare case).
+     */
+    void UpdateVtkTransform(mitk::BaseRenderer * /*renderer*/) override {}
 
   protected:
+    /**
+     * @brief UnstructuredGridMapper2D default constructor.
+     */
     UnstructuredGridMapper2D();
 
+    /**
+     * @brief ~UnstructuredGridMapper2D default destructor.
+     */
     ~UnstructuredGridMapper2D() override;
 
-    void GenerateDataForRenderer(BaseRenderer *) override;
+    /**
+     * @brief GenerateDataForRenderer produces all the data.
+     * @param renderer The respective renderer of the mitkRenderWindow.
+     */
+    void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
     /**
-     * Determines, if the associated BaseData is mapped three-dimensionally (mapper-slot id 2)
-     * with a class convertable to vtkAbstractMapper3D().
-     * @returns nullptr if it is not convertable or the appropriate Mapper otherwise
+     * @brief ResetMapper Called in mitk::Mapper::Update to hide objects.
+     * If TimeSlicedGeometry or time step is not valid, reset the mapper.
+     * so that nothing is displayed e.g. toggle visiblity of the propassembly.
+     *
+     * @param renderer The respective renderer of the mitkRenderWindow.
      */
-    virtual vtkAbstractMapper3D *GetVtkAbstractMapper3D(BaseRenderer *renderer);
+    void ResetMapper(BaseRenderer *renderer) override;
 
     /**
-     * Determines the pointset object to be cut.
-     * returns the pointset if possible, otherwise nullptr.
+     * @brief Updates legacy properties to current behavior/interpretation.
+     * @param properties The property list which should be adapted to new behaviour.
+     *
+     * Whenever a mapper decides to change its property types or its
+     * interpretation of certain values, it should add something to this
+     * method and call it before methods like ApplyProperties();
+     *
+     * This is particularly helpful when dealing with data from
+     * archive/scene files that were created before changes.
      */
-    virtual vtkPointSet *GetVtkPointSet(BaseRenderer *renderer, int time = 0);
+    virtual void FixupLegacyProperties(PropertyList *properties);
 
     /**
-     * Determines the LookupTable used by the associated vtkMapper.
-     * returns the LUT if possible, otherwise nullptr.
+     * @brief ApplyAllProperties Pass all the properties to VTK.
+     * @param renderer The respective renderer of the mitkRenderWindow.
      */
-    virtual vtkScalarsToColors *GetVtkLUT(BaseRenderer *renderer);
+    void ApplyAllProperties(BaseRenderer *renderer);
 
     /**
-     * Checks if this mapper can be used to generate cuts through the associated
-     * base data.
-     * @return true if yes or false if not.
+     * @brief Update Check if data should be generated.
+     * @param renderer The respective renderer of the mitkRenderWindow.
      */
-    virtual bool IsConvertibleToVtkPointSet(BaseRenderer *renderer);
-
-    vtkPlane *m_Plane;
-    vtkPointSetSlicer *m_Slicer;
-    vtkPointSet *m_VtkPointSet;
-    vtkScalarsToColors *m_ScalarsToColors;
-    vtkPiecewiseFunction *m_ScalarsToOpacity;
-
-    mitk::ColorProperty::Pointer m_Color;
-    mitk::IntProperty::Pointer m_LineWidth;
-    mitk::BoolProperty::Pointer m_Outline;
-    mitk::BoolProperty::Pointer m_ScalarVisibility;
-    mitk::VtkScalarModeProperty::Pointer m_ScalarMode;
+    void Update(BaseRenderer *renderer) override;
   };
-
 } // namespace mitk
 #endif /* MitkPointSetSliceLMapper2D_H */

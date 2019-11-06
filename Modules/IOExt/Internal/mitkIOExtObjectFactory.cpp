@@ -37,7 +37,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkUnstructuredGridWriter.h>
 #include <vtkXMLPUnstructuredGridWriter.h>
 #include <vtkXMLUnstructuredGridWriter.h>
-#include "mitkSurfaceVtkMapper2D.h"
 
 mitk::IOExtObjectFactory::IOExtObjectFactory()
   : CoreObjectFactoryBase(),
@@ -103,7 +102,8 @@ mitk::Mapper::Pointer mitk::IOExtObjectFactory::CreateMapper(mitk::DataNode *nod
   }
   else if (id == mitk::BaseRenderer::Standard3D)
   {
-    if ((dynamic_cast<Image *>(data) != nullptr))
+    if ((dynamic_cast<Image *>(data) != nullptr) &&
+        std::string("Image").compare(node->GetData()->GetNameOfClass()) == 0)
     {
       newMapper = mitk::VolumeMapperVtkSmart3D::New();
       newMapper->SetDataNode(node);

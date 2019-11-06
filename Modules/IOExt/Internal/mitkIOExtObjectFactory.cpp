@@ -37,6 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkUnstructuredGridWriter.h>
 #include <vtkXMLPUnstructuredGridWriter.h>
 #include <vtkXMLUnstructuredGridWriter.h>
+#include "mitkSurfaceVtkMapper2D.h"
 
 mitk::IOExtObjectFactory::IOExtObjectFactory()
   : CoreObjectFactoryBase(),
@@ -81,23 +82,28 @@ mitk::Mapper::Pointer mitk::IOExtObjectFactory::CreateMapper(mitk::DataNode *nod
 {
   mitk::Mapper::Pointer newMapper = nullptr;
   mitk::BaseData *data = node->GetData();
-
   if (id == mitk::BaseRenderer::Standard2D)
   {
+
     if ((dynamic_cast<Mesh *>(data) != nullptr))
     {
+
       newMapper = mitk::MeshMapper2D::New();
       newMapper->SetDataNode(node);
     }
     else if ((dynamic_cast<UnstructuredGrid *>(data) != nullptr))
     {
-      newMapper = mitk::VtkGLMapperWrapper::New(mitk::UnstructuredGridMapper2D::New().GetPointer());
+	//CUSTOM MANU - with unstructured grid bug fixing, UnstructuredGridMapper2D isn't a GL mapper anymore, but a vtk mapper - BEGIN
+      //newMapper = mitk::VtkGLMapperWrapper::New(mitk::UnstructuredGridMapper2D::New().GetPointer());
+      newMapper = mitk::UnstructuredGridMapper2D::New();
+    // CUSTOM MANU - with unstructured grid bug fixing, UnstructuredGridMapper2D isn't a GL mapper anymore, but a vtk mapper - END
+
       newMapper->SetDataNode(node);
     }
   }
   else if (id == mitk::BaseRenderer::Standard3D)
   {
-    if ((dynamic_cast<Image *>(data) != nullptr) && std::string("Image").compare(node->GetData()->GetNameOfClass())==0)
+    if ((dynamic_cast<Image *>(data) != nullptr))
     {
       newMapper = mitk::VolumeMapperVtkSmart3D::New();
       newMapper->SetDataNode(node);

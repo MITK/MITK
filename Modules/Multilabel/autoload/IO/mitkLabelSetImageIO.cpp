@@ -319,14 +319,12 @@ std::vector<BaseData::Pointer> LabelSetImageIO::Read()
   ioRegion.SetSize(ioSize);
   ioRegion.SetIndex(ioStart);
 
+  image->Initialize(MakePixelType(nrrdImageIO), ndim, dimensions);
+
   MITK_INFO << "ioRegion: " << ioRegion << std::endl;
   nrrdImageIO->SetIORegion(ioRegion);
-  void* buffer = new unsigned char[nrrdImageIO->GetImageSizeInBytes()];
-  nrrdImageIO->Read(buffer);
-
-  image->Initialize(MakePixelType(nrrdImageIO), ndim, dimensions);
-  image->SetImportVolume(buffer, 0, Image::ManageMemory);
-
+  nrrdImageIO->Read(image->GetVolumeData()->GetData());
+  
   // access direction of itk::Image and include spacing
   mitk::Matrix3D matrix;
   matrix.SetIdentity();
@@ -353,7 +351,6 @@ std::vector<BaseData::Pointer> LabelSetImageIO::Read()
   timeGeometry->Initialize(slicedGeometry, image->GetDimension(3));
   image->SetTimeGeometry(timeGeometry);
 
-  buffer = NULL;
   MITK_INFO << "number of image components: " << image->GetPixelType().GetNumberOfComponents() << std::endl;
 
   const itk::MetaDataDictionary& dictionary = nrrdImageIO->GetMetaDataDictionary();

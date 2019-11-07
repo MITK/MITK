@@ -84,7 +84,6 @@ void PAImageProcessing::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.IsBFImage, SIGNAL(clicked()), this, SLOT(UpdateImageInfo()));
   UpdateSaveBoxes();
   UseSignalDelay();
-  m_Controls.DoResampling->setChecked(false);
   m_Controls.ResamplingValue->setEnabled(false);
   m_Controls.progressBar->setMinimum(0);
   m_Controls.progressBar->setMaximum(100);

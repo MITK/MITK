@@ -137,7 +137,7 @@
              <double>5.000000000000000</double>
             </property>
             <property name="value">
-             <double>1540.000000000000000</double>
+             <double>1500.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -163,6 +163,9 @@
           </item>
           <item row="6" column="1">
            <widget class="QLabel" name="label_19">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'sans-serif'; font-size:14px; color:#222222; background-color:#ffffff;&quot;&gt;At &lt;/span&gt;&lt;span style=&quot; font-family:'sans-serif'; font-size:14px; font-style:italic; color:#222222; background-color:#ffffff;&quot;&gt;α&lt;/span&gt;&lt;span style=&quot; font-family:'sans-serif'; font-size:14px; color:#222222; background-color:#ffffff;&quot;&gt; = 0 it's rectangular, at &lt;/span&gt;&lt;span style=&quot; font-family:'sans-serif'; font-size:14px; font-style:italic; color:#222222; background-color:#ffffff;&quot;&gt;α&lt;/span&gt;&lt;span style=&quot; font-family:'sans-serif'; font-size:14px; color:#222222; background-color:#ffffff;&quot;&gt; = 1 it's a Hann window. Both flanks can be set independently.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="text">
              <string>Tukey Window α High Pass</string>
             </property>
@@ -186,6 +189,9 @@
           </item>
           <item row="7" column="1">
            <widget class="QLabel" name="label_13">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'sans-serif'; font-size:14px; color:#222222; background-color:#ffffff;&quot;&gt;At &lt;/span&gt;&lt;span style=&quot; font-family:'sans-serif'; font-size:14px; font-style:italic; color:#222222; background-color:#ffffff;&quot;&gt;α&lt;/span&gt;&lt;span style=&quot; font-family:'sans-serif'; font-size:14px; color:#222222; background-color:#ffffff;&quot;&gt; = 0 it's rectangular, at &lt;/span&gt;&lt;span style=&quot; font-family:'sans-serif'; font-size:14px; font-style:italic; color:#222222; background-color:#ffffff;&quot;&gt;α&lt;/span&gt;&lt;span style=&quot; font-family:'sans-serif'; font-size:14px; color:#222222; background-color:#ffffff;&quot;&gt; = 1 it's a Hann window. Both flanks can be set independently.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="text">
              <string>Tukey Window α Low Pass</string>
             </property>
@@ -247,7 +253,7 @@
         <attribute name="label">
          <string>Beamforming</string>
         </attribute>
-        <widget class="QWidget" name="">
+        <widget class="QScrollArea" name="scrollArea">
          <property name="geometry">
           <rect>
            <x>10</x>
@@ -256,540 +262,563 @@
            <height>661</height>
           </rect>
          </property>
-         <layout class="QGridLayout" name="gridLayout">
-          <property name="spacing">
-           <number>5</number>
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="scrollAreaWidgetContents">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>299</width>
+            <height>659</height>
+           </rect>
           </property>
-          <item row="6" column="0">
-           <widget class="QComboBox" name="ImageType">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
+          <widget class="QWidget" name="">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>306</width>
+             <height>661</height>
+            </rect>
+           </property>
+           <layout class="QGridLayout" name="gridLayout">
+            <property name="spacing">
+             <number>5</number>
             </property>
-            <item>
-             <property name="text">
-              <string>PA Image</string>
-             </property>
+            <item row="6" column="0">
+             <widget class="QComboBox" name="ImageType">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <item>
+               <property name="text">
+                <string>PA Image</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>US Image</string>
+               </property>
+              </item>
+             </widget>
             </item>
-            <item>
-             <property name="text">
-              <string>US Image</string>
-             </property>
+            <item row="6" column="1">
+             <widget class="QLabel" name="label_10">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;which type of image do you plan to reconstruct?&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string>Raw Data Type</string>
+              </property>
+             </widget>
             </item>
-           </widget>
-          </item>
-          <item row="6" column="1">
-           <widget class="QLabel" name="label_10">
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;which type of image do you plan to reconstruct?&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="text">
-             <string>Raw Data Type</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="0">
-           <widget class="QComboBox" name="BFAlgorithm">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <item>
-             <property name="text">
-              <string>DAS</string>
-             </property>
+            <item row="5" column="0">
+             <widget class="QComboBox" name="BFAlgorithm">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <item>
+               <property name="text">
+                <string>DAS</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>DMAS</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>sDMAS</string>
+               </property>
+              </item>
+             </widget>
             </item>
-            <item>
-             <property name="text">
-              <string>DMAS</string>
-             </property>
+            <item row="7" column="0">
+             <widget class="QComboBox" name="Apodization">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <item>
+               <property name="text">
+                <string>Von Hann</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Hamming</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Box</string>
+               </property>
+              </item>
+             </widget>
             </item>
-            <item>
-             <property name="text">
-              <string>sDMAS</string>
-             </property>
+            <item row="24" column="1">
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>[mm] Transducer Pitch</string>
+              </property>
+             </widget>
             </item>
-           </widget>
-          </item>
-          <item row="7" column="0">
-           <widget class="QComboBox" name="Apodization">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <item>
-             <property name="text">
-              <string>Von Hann</string>
-             </property>
+            <item row="7" column="1">
+             <widget class="QLabel" name="label_16">
+              <property name="text">
+               <string>Apodization Function</string>
+              </property>
+             </widget>
             </item>
-            <item>
-             <property name="text">
-              <string>Hamming</string>
-             </property>
+            <item row="5" column="1">
+             <widget class="QLabel" name="label_4">
+              <property name="text">
+               <string>Beamforming Algorithm</string>
+              </property>
+             </widget>
             </item>
-            <item>
-             <property name="text">
-              <string>Box</string>
-             </property>
+            <item row="18" column="0">
+             <widget class="QLabel" name="label_14">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
             </item>
-           </widget>
-          </item>
-          <item row="24" column="1">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>[mm] Transducer Pitch</string>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="1">
-           <widget class="QLabel" name="label_16">
-            <property name="text">
-             <string>Apodization Function</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="1">
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>Beamforming Algorithm</string>
-            </property>
-           </widget>
-          </item>
-          <item row="18" column="0">
-           <widget class="QLabel" name="label_14">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item row="24" column="0">
-           <widget class="QDoubleSpinBox" name="Pitch">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="decimals">
-             <number>3</number>
-            </property>
-            <property name="minimum">
-             <double>0.010000000000000</double>
-            </property>
-            <property name="maximum">
-             <double>9.000000000000000</double>
-            </property>
-            <property name="singleStep">
-             <double>0.050000000000000</double>
-            </property>
-            <property name="value">
-             <double>0.340000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLabel" name="label_20">
-            <property name="text">
-             <string>Probe Geomentry</string>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="0">
-           <widget class="QDoubleSpinBox" name="Angle">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="decimals">
-             <number>1</number>
-            </property>
-            <property name="minimum">
-             <double>1.000000000000000</double>
-            </property>
-            <property name="maximum">
-             <double>180.000000000000000</double>
-            </property>
-            <property name="value">
-             <double>45.000000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="1">
-           <widget class="QLabel" name="label_9">
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;... of the transducer elements.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="text">
-             <string>[°] Sensitive Angle</string>
-            </property>
-           </widget>
-          </item>
-          <item row="23" column="1">
-           <widget class="QLabel" name="ReconstructionDepthLabel">
-            <property name="text">
-             <string>[mm] Reconstruction Depth</string>
-            </property>
-           </widget>
-          </item>
-          <item row="23" column="0">
-           <widget class="QDoubleSpinBox" name="ReconstructionDepth">
-            <property name="decimals">
-             <number>4</number>
-            </property>
-            <property name="maximum">
-             <double>300.000000000000000</double>
-            </property>
-            <property name="singleStep">
-             <double>0.100000000000000</double>
-            </property>
-            <property name="value">
-             <double>60.000000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QComboBox" name="Geometry">
-            <property name="currentText">
-             <string>Concave</string>
-            </property>
-            <item>
-             <property name="text">
-              <string>Linear</string>
-             </property>
+            <item row="24" column="0">
+             <widget class="QDoubleSpinBox" name="Pitch">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="decimals">
+               <number>3</number>
+              </property>
+              <property name="minimum">
+               <double>0.010000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>9.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.050000000000000</double>
+              </property>
+              <property name="value">
+               <double>0.340000000000000</double>
+              </property>
+             </widget>
             </item>
-            <item>
-             <property name="text">
-              <string>Concave</string>
-             </property>
+            <item row="2" column="1">
+             <widget class="QLabel" name="label_20">
+              <property name="text">
+               <string>Probe Geomentry</string>
+              </property>
+             </widget>
             </item>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QDoubleSpinBox" name="ProbeRadius">
-            <property name="decimals">
-             <number>2</number>
-            </property>
-            <property name="minimum">
-             <double>0.010000000000000</double>
-            </property>
-            <property name="maximum">
-             <double>399.990000000000009</double>
-            </property>
-            <property name="value">
-             <double>40.000000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QLabel" name="label_23">
-            <property name="text">
-             <string>[mm] Concave Probe Radius</string>
-            </property>
-           </widget>
-          </item>
-          <item row="48" column="1">
-           <widget class="QCheckBox" name="UseSignalDelay">
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Some setups' hardware produces signal delays that need to be cropped out of the image before performing beamforming. To do this, select this box.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="text">
-             <string>Consider Hardware Delay [µs]</string>
-            </property>
-            <property name="checked">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="48" column="0">
-           <widget class="QDoubleSpinBox" name="SignalDelay">
-            <property name="singleStep">
-             <double>0.100000000000000</double>
-            </property>
-            <property name="value">
-             <double>1.000000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="49" column="0" colspan="2">
-           <widget class="QCheckBox" name="UseImageSpacing">
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;... from y-spacing in the selected raw data. If this is switched of &amp;quot;Manual Scan Depth&amp;quot; is used.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="text">
-             <string>Automatic Get Depth</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="50" column="1">
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>[mm] Manual Scan Depth</string>
-            </property>
-           </widget>
-          </item>
-          <item row="44" column="0" colspan="2">
-           <widget class="QCheckBox" name="UseGPUBf">
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Using GPU is recommended - It is so much faster.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="text">
-             <string>Compute On GPU</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="27" column="0">
-           <widget class="QSpinBox" name="Lines">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimum">
-             <number>64</number>
-            </property>
-            <property name="maximum">
-             <number>2048</number>
-            </property>
-            <property name="singleStep">
-             <number>128</number>
-            </property>
-            <property name="value">
-             <number>512</number>
-            </property>
-           </widget>
-          </item>
-          <item row="51" column="0">
-           <widget class="QSpinBox" name="ElementCount">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimum">
-             <number>2</number>
-            </property>
-            <property name="maximum">
-             <number>2048</number>
-            </property>
-            <property name="singleStep">
-             <number>64</number>
-            </property>
-            <property name="value">
-             <number>256</number>
-            </property>
-           </widget>
-          </item>
-          <item row="27" column="1">
-           <widget class="QLabel" name="label_7">
-            <property name="text">
-             <string>Reconstructed Lines</string>
-            </property>
-           </widget>
-          </item>
-          <item row="53" column="1">
-           <spacer name="verticalSpacer_3">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="42" column="0" colspan="2">
-           <widget class="QLabel" name="label_22">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Advanced Options</string>
-            </property>
-           </widget>
-          </item>
-          <item row="50" column="0">
-           <widget class="QDoubleSpinBox" name="ScanDepth">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="decimals">
-             <number>4</number>
-            </property>
-            <property name="maximum">
-             <double>300.000000000000000</double>
-            </property>
-            <property name="singleStep">
-             <double>0.100000000000000</double>
-            </property>
-            <property name="value">
-             <double>60.000000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="19" column="0">
-           <widget class="QDoubleSpinBox" name="SpeedOfSound">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="decimals">
-             <number>1</number>
-            </property>
-            <property name="minimum">
-             <double>200.000000000000000</double>
-            </property>
-            <property name="maximum">
-             <double>3000.000000000000000</double>
-            </property>
-            <property name="singleStep">
-             <double>5.000000000000000</double>
-            </property>
-            <property name="value">
-             <double>1500.000000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="52" column="1">
-           <widget class="QLabel" name="label_6">
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;... Good default - change only if you know what you are doing.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="text">
-             <string>Samples</string>
-            </property>
-           </widget>
-          </item>
-          <item row="19" column="1">
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>[m/s] Speed of Sound</string>
-            </property>
-           </widget>
-          </item>
-          <item row="52" column="0">
-           <widget class="QSpinBox" name="Samples">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimum">
-             <number>256</number>
-            </property>
-            <property name="maximum">
-             <number>16384</number>
-            </property>
-            <property name="singleStep">
-             <number>256</number>
-            </property>
-            <property name="value">
-             <number>2048</number>
-            </property>
-           </widget>
-          </item>
-          <item row="51" column="1">
-           <widget class="QLabel" name="label_5">
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set automatically from selected raw data x-Geometry.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="text">
-             <string>Transducer Elements</string>
-            </property>
-           </widget>
-          </item>
-          <item row="41" column="0">
-           <widget class="QLabel" name="label_24">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0" colspan="2">
-           <widget class="QLabel" name="labelWarning4">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>25</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>25</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt; font-weight:600; color:#ff0000;&quot;&gt;Select input data in datamanager!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-           </widget>
-          </item>
-          <item row="40" column="0" colspan="2">
-           <widget class="QPushButton" name="buttonApplyBeamforming">
-            <property name="text">
-             <string>Apply Beamforming</string>
-            </property>
-           </widget>
-          </item>
-          <item row="28" column="1">
-           <widget class="QLabel" name="ProgressInfo">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item row="28" column="0">
-           <widget class="QProgressBar" name="progressBar">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="maximum">
-             <number>100</number>
-            </property>
-            <property name="value">
-             <number>0</number>
-            </property>
-           </widget>
-          </item>
-         </layout>
+            <item row="8" column="0">
+             <widget class="QDoubleSpinBox" name="Angle">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="decimals">
+               <number>1</number>
+              </property>
+              <property name="minimum">
+               <double>1.000000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>180.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>45.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="8" column="1">
+             <widget class="QLabel" name="label_9">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;... of the transducer elements.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string>[°] Sensitive Angle</string>
+              </property>
+             </widget>
+            </item>
+            <item row="23" column="1">
+             <widget class="QLabel" name="ReconstructionDepthLabel">
+              <property name="text">
+               <string>[mm] Reconstruction Depth</string>
+              </property>
+             </widget>
+            </item>
+            <item row="23" column="0">
+             <widget class="QDoubleSpinBox" name="ReconstructionDepth">
+              <property name="decimals">
+               <number>4</number>
+              </property>
+              <property name="maximum">
+               <double>300.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.100000000000000</double>
+              </property>
+              <property name="value">
+               <double>60.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QComboBox" name="Geometry">
+              <property name="currentText">
+               <string>Concave</string>
+              </property>
+              <item>
+               <property name="text">
+                <string>Linear</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Concave</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QDoubleSpinBox" name="ProbeRadius">
+              <property name="decimals">
+               <number>2</number>
+              </property>
+              <property name="minimum">
+               <double>0.010000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>399.990000000000009</double>
+              </property>
+              <property name="value">
+               <double>40.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QLabel" name="label_23">
+              <property name="text">
+               <string>[mm] Concave Probe Radius</string>
+              </property>
+             </widget>
+            </item>
+            <item row="48" column="1">
+             <widget class="QCheckBox" name="UseSignalDelay">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Some setups' hardware produces signal delays that need to be cropped out of the image before performing beamforming. To do this, select this box.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string>Consider Hardware Delay [µs]</string>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="48" column="0">
+             <widget class="QDoubleSpinBox" name="SignalDelay">
+              <property name="singleStep">
+               <double>0.100000000000000</double>
+              </property>
+              <property name="value">
+               <double>1.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="49" column="0" colspan="2">
+             <widget class="QCheckBox" name="UseImageSpacing">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;... from y-spacing in the selected raw data. If this is switched of &amp;quot;Manual Scan Depth&amp;quot; is used.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string>Automatic Get Depth</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="50" column="1">
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>[mm] Manual Scan Depth</string>
+              </property>
+             </widget>
+            </item>
+            <item row="44" column="0" colspan="2">
+             <widget class="QCheckBox" name="UseGPUBf">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Using GPU is recommended - It is so much faster.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string>Compute On GPU</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="27" column="0">
+             <widget class="QSpinBox" name="Lines">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimum">
+               <number>64</number>
+              </property>
+              <property name="maximum">
+               <number>2048</number>
+              </property>
+              <property name="singleStep">
+               <number>128</number>
+              </property>
+              <property name="value">
+               <number>512</number>
+              </property>
+             </widget>
+            </item>
+            <item row="51" column="0">
+             <widget class="QSpinBox" name="ElementCount">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimum">
+               <number>2</number>
+              </property>
+              <property name="maximum">
+               <number>2048</number>
+              </property>
+              <property name="singleStep">
+               <number>64</number>
+              </property>
+              <property name="value">
+               <number>256</number>
+              </property>
+             </widget>
+            </item>
+            <item row="27" column="1">
+             <widget class="QLabel" name="label_7">
+              <property name="text">
+               <string>Reconstructed Lines</string>
+              </property>
+             </widget>
+            </item>
+            <item row="42" column="0" colspan="2">
+             <widget class="QLabel" name="label_22">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>Advanced Options</string>
+              </property>
+             </widget>
+            </item>
+            <item row="50" column="0">
+             <widget class="QDoubleSpinBox" name="ScanDepth">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="decimals">
+               <number>4</number>
+              </property>
+              <property name="maximum">
+               <double>300.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.100000000000000</double>
+              </property>
+              <property name="value">
+               <double>60.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="19" column="0">
+             <widget class="QDoubleSpinBox" name="SpeedOfSound">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="decimals">
+               <number>1</number>
+              </property>
+              <property name="minimum">
+               <double>200.000000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>3000.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>5.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>1500.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="52" column="1">
+             <widget class="QLabel" name="label_6">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;... Good default - change only if you know what you are doing.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string>Samples</string>
+              </property>
+             </widget>
+            </item>
+            <item row="19" column="1">
+             <widget class="QLabel" name="label_2">
+              <property name="text">
+               <string>[m/s] Speed of Sound</string>
+              </property>
+             </widget>
+            </item>
+            <item row="52" column="0">
+             <widget class="QSpinBox" name="Samples">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimum">
+               <number>256</number>
+              </property>
+              <property name="maximum">
+               <number>16384</number>
+              </property>
+              <property name="singleStep">
+               <number>256</number>
+              </property>
+              <property name="value">
+               <number>2048</number>
+              </property>
+             </widget>
+            </item>
+            <item row="51" column="1">
+             <widget class="QLabel" name="label_5">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set automatically from selected raw data x-Geometry.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string>Transducer Elements</string>
+              </property>
+             </widget>
+            </item>
+            <item row="41" column="0">
+             <widget class="QLabel" name="label_24">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0" colspan="2">
+             <widget class="QLabel" name="labelWarning4">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>25</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>25</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt; font-weight:600; color:#ff0000;&quot;&gt;Select input data in datamanager!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+             </widget>
+            </item>
+            <item row="40" column="0" colspan="2">
+             <widget class="QPushButton" name="buttonApplyBeamforming">
+              <property name="text">
+               <string>Apply Beamforming</string>
+              </property>
+             </widget>
+            </item>
+            <item row="28" column="1">
+             <widget class="QLabel" name="ProgressInfo">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="28" column="0">
+             <widget class="QProgressBar" name="progressBar">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="maximum">
+               <number>100</number>
+              </property>
+              <property name="value">
+               <number>0</number>
+              </property>
+             </widget>
+            </item>
+            <item row="53" column="0" colspan="2">
+             <spacer name="verticalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </widget>
         </widget>
        </widget>
        <widget class="QWidget" name="pageCrop">
@@ -798,7 +827,7 @@
           <x>0</x>
           <y>0</y>
           <width>583</width>
-          <height>687</height>
+          <height>732</height>
          </rect>
         </property>
         <attribute name="label">
@@ -809,7 +838,7 @@
           <rect>
            <x>10</x>
            <y>0</y>
-           <width>330</width>
+           <width>301</width>
            <height>301</height>
           </rect>
          </property>
@@ -1151,7 +1180,7 @@
            <x>10</x>
            <y>0</y>
            <width>301</width>
-           <height>143</height>
+           <height>231</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,0">
@@ -1256,6 +1285,19 @@
                <string>Start Batch Processing</string>
               </property>
              </widget>
+            </item>
+            <item row="5" column="0" colspan="4">
+             <spacer name="verticalSpacer">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
             </item>
            </layout>
           </item>

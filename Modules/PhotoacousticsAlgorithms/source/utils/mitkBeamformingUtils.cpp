@@ -80,113 +80,143 @@ unsigned short* mitk::BeamformingUtils::MinMaxLines(const mitk::BeamformingSetti
   float horizontalExtent = config->GetHorizontalExtent();
   float verticalExtent = config->GetReconstructionDepth();
 
-  float probeRadius = config->GetProbeRadius();
-  float* elementHeights = config->GetElementHeights();
-  float* elementPositions = config->GetElementPositions();
+  float partMult = (tan(config->GetAngle() / 360 * 2 * itk::Math::pi) *
+    ((config->GetSpeedOfSound() * config->GetTimeSpacing())) /
+    (config->GetPitchInMeters() * config->GetTransducerElements())) * inputL;
+  float totalSamples_i = (float)(config->GetReconstructionDepth()) / (float)(config->GetSpeedOfSound() * config->GetTimeSpacing());
 
-  float cos_deg = std::cos(config->GetAngle() / 2.f / 360 * 2 * itk::Math::pi);
+  totalSamples_i = totalSamples_i <= config->GetInputDim()[1] ? totalSamples_i : config->GetInputDim()[1];
 
-  float cos = 0;
-  float a = 0;
-  float d = 0;
-
-  for (int x = 0; x < outputL; ++x)
+  if ((int)config->GetGeometry() == 0) // if this is raw data from a linear probe geometry
   {
-    for (int y = 0; y < outputS; ++y)
+    for (int x = 0; x < outputL; ++x)
     {
-      float l_p = (float)x / outputL * horizontalExtent;
-      float s_p = (float)y / (float)outputS * verticalExtent;
-
-      int maxLine = inputL;
-      int minLine = 0;
-
-      for (int l_s = 0; l_s < inputL; l_s += 32)
+      for (int y = 0; y < outputS; ++y)
       {
-        a = sqrt((probeRadius - s_p)*(probeRadius - s_p) + (l_p - horizontalExtent / 2)*(l_p - horizontalExtent / 2));
-        d = sqrt((s_p - elementHeights[l_s])*(s_p - elementHeights[l_s]) + (l_p - elementPositions[l_s])*(l_p - elementPositions[l_s]));
-        cos = (d*d + probeRadius * probeRadius - a * a) / (2 * probeRadius*d);
+        float l_i = (float)x / outputL * inputL;
+        float s_i = (float)y / (float)outputS * totalSamples_i;
 
-        if (cos > cos_deg)
-        {
-          minLine = l_s - 32;
-          if (minLine < 0)
-            minLine = 0;
-          break;
-        }
+        float part = partMult * s_i;
+        if (part < 1)
+          part = 1;
+        unsigned short maxLine = std::min((l_i + part) + 1, (float)inputL);
+        unsigned short minLine = std::max((l_i - part), 0.0f);
+
+        dDest[y * 2 * outputL + 2 * x] = (unsigned short)minLine; //minLine
+        dDest[y * 2 * outputL + 2 * x + 1] = (unsigned short)maxLine; //maxLine
       }
-      for (int l_s = minLine; l_s < inputL; l_s += 8)
+    }
+
+  }
+  else // if this is *not* raw data from a linear probe geometry (currently meaning its a concave geometry)
+  {
+    float probeRadius = config->GetProbeRadius();
+    float* elementHeights = config->GetElementHeights();
+    float* elementPositions = config->GetElementPositions();
+
+    float cos_deg = std::cos(config->GetAngle() / 2.f / 360 * 2 * itk::Math::pi);
+
+    float cos = 0;
+    float a = 0;
+    float d = 0;
+
+    for (int x = 0; x < outputL; ++x)
+    {
+      for (int y = 0; y < outputS; ++y)
       {
-        a = sqrt((probeRadius - s_p)*(probeRadius - s_p) + (l_p - horizontalExtent / 2)*(l_p - horizontalExtent / 2));
-        d = sqrt((s_p - elementHeights[l_s])*(s_p - elementHeights[l_s]) + (l_p - elementPositions[l_s])*(l_p - elementPositions[l_s]));
-        cos = (d*d + probeRadius * probeRadius - a * a) / (2 * probeRadius*d);
+        float l_p = (float)x / outputL * horizontalExtent;
+        float s_p = (float)y / (float)outputS * verticalExtent;
 
-        if (cos > cos_deg)
+        int maxLine = inputL;
+        int minLine = 0;
+
+        for (int l_s = 0; l_s < inputL; l_s += 32)
         {
-          minLine = l_s - 8;
-          if (minLine < 0)
-            minLine = 0;
-          break;
-        }
-      }
-      for (int l_s = minLine; l_s < inputL; l_s += 1)
-      {
-        a = sqrt((probeRadius - s_p)*(probeRadius - s_p) + (l_p - horizontalExtent / 2)*(l_p - horizontalExtent / 2));
-        d = sqrt((s_p - elementHeights[l_s])*(s_p - elementHeights[l_s]) + (l_p - elementPositions[l_s])*(l_p - elementPositions[l_s]));
-        cos = (d*d + probeRadius * probeRadius - a * a) / (2 * probeRadius*d);
+          a = sqrt((probeRadius - s_p)*(probeRadius - s_p) + (l_p - horizontalExtent / 2)*(l_p - horizontalExtent / 2));
+          d = sqrt((s_p - elementHeights[l_s])*(s_p - elementHeights[l_s]) + (l_p - elementPositions[l_s])*(l_p - elementPositions[l_s]));
+          cos = (d*d + probeRadius * probeRadius - a * a) / (2 * probeRadius*d);
 
-        if (cos > cos_deg)
+          if (cos > cos_deg)
+          {
+            minLine = l_s - 32;
+            if (minLine < 0)
+              minLine = 0;
+            break;
+          }
+        }
+        for (int l_s = minLine; l_s < inputL; l_s += 8)
         {
-          minLine = l_s;
-          break;
+          a = sqrt((probeRadius - s_p)*(probeRadius - s_p) + (l_p - horizontalExtent / 2)*(l_p - horizontalExtent / 2));
+          d = sqrt((s_p - elementHeights[l_s])*(s_p - elementHeights[l_s]) + (l_p - elementPositions[l_s])*(l_p - elementPositions[l_s]));
+          cos = (d*d + probeRadius * probeRadius - a * a) / (2 * probeRadius*d);
+
+          if (cos > cos_deg)
+          {
+            minLine = l_s - 8;
+            if (minLine < 0)
+              minLine = 0;
+            break;
+          }
         }
-      }
-
-      for (int l_s = inputL; l_s >= 0; l_s -= 32)
-      {
-        a = sqrt((probeRadius - s_p)*(probeRadius - s_p) + (l_p - horizontalExtent / 2)*(l_p - horizontalExtent / 2));
-        d = sqrt((s_p - elementHeights[l_s])*(s_p - elementHeights[l_s]) + (l_p - elementPositions[l_s])*(l_p - elementPositions[l_s]));
-        cos = (d*d + probeRadius * probeRadius - a * a) / (2 * probeRadius*d);
-        cos = 0;
-
-        if (cos > cos_deg)
+        for (int l_s = minLine; l_s < inputL; l_s += 1)
         {
-          maxLine = l_s + 32;
-          if (maxLine > inputL)
-            minLine = inputL;
-          break;
-        }
-      }
-      for (int l_s = maxLine; l_s >= 0; l_s -= 8)
-      {
-        a = sqrt((probeRadius - s_p)*(probeRadius - s_p) + (l_p - horizontalExtent / 2)*(l_p - horizontalExtent / 2));
-        d = sqrt((s_p - elementHeights[l_s])*(s_p - elementHeights[l_s]) + (l_p - elementPositions[l_s])*(l_p - elementPositions[l_s]));
-        cos = (d*d + probeRadius * probeRadius - a * a) / (2 * probeRadius*d);
-        cos = 0;
+          a = sqrt((probeRadius - s_p)*(probeRadius - s_p) + (l_p - horizontalExtent / 2)*(l_p - horizontalExtent / 2));
+          d = sqrt((s_p - elementHeights[l_s])*(s_p - elementHeights[l_s]) + (l_p - elementPositions[l_s])*(l_p - elementPositions[l_s]));
+          cos = (d*d + probeRadius * probeRadius - a * a) / (2 * probeRadius*d);
 
-        if (cos > cos_deg)
+          if (cos > cos_deg)
+          {
+            minLine = l_s;
+            break;
+          }
+        }
+
+        for (int l_s = inputL; l_s >= 0; l_s -= 32)
         {
-          maxLine = l_s + 8;
-          if (maxLine > inputL)
-            minLine = inputL;
-          break;
-        }
-      }
-      for (int l_s = maxLine; l_s >= 0; l_s -= 1)
-      {
-        a = sqrt((probeRadius - s_p)*(probeRadius - s_p) + (l_p - horizontalExtent / 2)*(l_p - horizontalExtent / 2));
-        d = sqrt((s_p - elementHeights[l_s])*(s_p - elementHeights[l_s]) + (l_p - elementPositions[l_s])*(l_p - elementPositions[l_s]));
-        cos = (d*d + probeRadius * probeRadius - a * a) / (2 * probeRadius*d);
-        cos = 0;
+          a = sqrt((probeRadius - s_p)*(probeRadius - s_p) + (l_p - horizontalExtent / 2)*(l_p - horizontalExtent / 2));
+          d = sqrt((s_p - elementHeights[l_s])*(s_p - elementHeights[l_s]) + (l_p - elementPositions[l_s])*(l_p - elementPositions[l_s]));
+          cos = (d*d + probeRadius * probeRadius - a * a) / (2 * probeRadius*d);
+          cos = 0;
 
-        if (cos > cos_deg)
+          if (cos > cos_deg)
+          {
+            maxLine = l_s + 32;
+            if (maxLine > inputL)
+              minLine = inputL;
+            break;
+          }
+        }
+        for (int l_s = maxLine; l_s >= 0; l_s -= 8)
         {
-          maxLine = l_s;
-          break;
-        }
-      }
+          a = sqrt((probeRadius - s_p)*(probeRadius - s_p) + (l_p - horizontalExtent / 2)*(l_p - horizontalExtent / 2));
+          d = sqrt((s_p - elementHeights[l_s])*(s_p - elementHeights[l_s]) + (l_p - elementPositions[l_s])*(l_p - elementPositions[l_s]));
+          cos = (d*d + probeRadius * probeRadius - a * a) / (2 * probeRadius*d);
+          cos = 0;
 
-      dDest[y * 2 * outputL + 2 * x] = (unsigned short)minLine; //minLine
-      dDest[y * 2 * outputL + 2 * x + 1] = (unsigned short)maxLine; //maxLine
+          if (cos > cos_deg)
+          {
+            maxLine = l_s + 8;
+            if (maxLine > inputL)
+              minLine = inputL;
+            break;
+          }
+        }
+        for (int l_s = maxLine; l_s >= 0; l_s -= 1)
+        {
+          a = sqrt((probeRadius - s_p)*(probeRadius - s_p) + (l_p - horizontalExtent / 2)*(l_p - horizontalExtent / 2));
+          d = sqrt((s_p - elementHeights[l_s])*(s_p - elementHeights[l_s]) + (l_p - elementPositions[l_s])*(l_p - elementPositions[l_s]));
+          cos = (d*d + probeRadius * probeRadius - a * a) / (2 * probeRadius*d);
+          cos = 0;
+
+          if (cos > cos_deg)
+          {
+            maxLine = l_s;
+            break;
+          }
+        }
+        dDest[y * 2 * outputL + 2 * x] = (unsigned short)minLine; //minLine
+        dDest[y * 2 * outputL + 2 * x + 1] = (unsigned short)maxLine; //maxLine
+      }
     }
   }
   return dDest;

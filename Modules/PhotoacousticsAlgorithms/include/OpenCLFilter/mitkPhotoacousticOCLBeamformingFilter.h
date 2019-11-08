@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOclDataSetToDataSetFilter.h"
 #include "mitkBeamformingSettings.h"
 #include "mitkPhotoacousticOCLDelayCalculation.h"
-#include "mitkPhotoacousticOCLUsedLinesCalculation.h"
 
 #include <chrono>
 
@@ -115,12 +114,11 @@ namespace mitk
 
     size_t m_ChunkSize[3];
 
-    mitk::OCLUsedLinesCalculation::Pointer m_UsedLinesCalculation;
     mitk::OCLDelayCalculation::Pointer m_DelayCalculation;
 
     cl_mem m_ApodizationBuffer; 
     cl_mem m_DelaysBuffer;
-    cl_mem m_UsedLinesBuffer;
+
     cl_mem m_ElementHeightsBuffer;
     cl_mem m_ElementPositionsBuffer;
 

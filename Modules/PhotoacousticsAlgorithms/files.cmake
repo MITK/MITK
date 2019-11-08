@@ -17,13 +17,11 @@ set(CPP_FILES
 IF(MITK_USE_OpenCL)
 list(APPEND CPP_FILES
     source/OpenCLFilter/mitkPhotoacousticOCLBeamformingFilter.cpp
-    source/OpenCLFilter/mitkPhotoacousticOCLUsedLinesCalculation.cpp
     source/OpenCLFilter/mitkPhotoacousticOCLDelayCalculation.cpp
 )
 ENDIF(MITK_USE_OpenCL)
 
 set(RESOURCE_FILES
-  UsedLinesCalculation.cl
   DelayCalculation.cl
   DMAS.cl
   DAS.cl

@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 __kernel void ckDAS(
   __global float* dSource, // input image
   __global float* dDest, // output buffer
-  __global unsigned short* usedLines,
   __global unsigned short* delays,
   __constant float* apodArray,
   unsigned short apodArraySize,
@@ -38,9 +37,7 @@ __kernel void ckDAS(
   {	
     float l_i = (float)globalPosX / (float)outputL * (float)inputL;
 
-    unsigned short curUsedLines = usedLines[globalPosY * 3 * outputL + 3 * globalPosX];
-    unsigned short minLine = usedLines[globalPosY * 3 * outputL + 3 * globalPosX + 1];
-    unsigned short maxLine = usedLines[globalPosY * 3 *outputL + 3 * globalPosX + 2];
+    unsigned short curUsedLines = inputL;
     
     float apod_mult = (float)apodArraySize / (float)curUsedLines;
     
@@ -49,11 +46,11 @@ __kernel void ckDAS(
     float output = 0;
     float mult = 0;
     
-    for (short l_s = minLine; l_s < maxLine; ++l_s)
+    for (short l_s = 0; l_s < inputL; ++l_s)
     {
       Delay = delays[globalPosY * (outputL / 2) + (int)(fabs(l_s - l_i)/(float)inputL * (float)outputL)];
       if (Delay < inputS && Delay >= 0) {
-        output += apodArray[(int)((l_s - minLine)*apod_mult)] * dSource[(int)(globalPosZ * inputL * inputS + Delay * inputL + l_s)];
+        output += apodArray[(int)((l_s)*apod_mult)] * dSource[(int)(globalPosZ * inputL * inputS + Delay * inputL + l_s)];
       }
       else
         --curUsedLines;
@@ -78,8 +75,7 @@ __kernel void ckDAS_g(
   float totalSamples_i,
   float horizontalExtent,
   float mult,
-  char isPAImage,
-  __global unsigned short* usedLines // parameters
+  char isPAImage
 )
 {
   // get thread identifier
@@ -93,21 +89,17 @@ __kernel void ckDAS_g(
     int AddSample = 0;
     float l_p = 0;
     float s_i = 0;
-
     float apod_mult = 1;
-    
     float output = 0;
 
     l_p = (float)globalPosX / outputL * horizontalExtent;
     s_i = (float)globalPosY / outputS * totalSamples_i;
 
-    unsigned short curUsedLines = usedLines[globalPosY * 3 * outputL + 3 * globalPosX];
-    unsigned short minLine = usedLines[globalPosY * 3 * outputL + 3 * globalPosX + 1];
-    unsigned short maxLine = usedLines[globalPosY * 3 *outputL + 3 * globalPosX + 2];
+    unsigned short curUsedLines = inputL; 
 
     apod_mult = (float)apodArraySize / curUsedLines;
 
-    for (int l_s = minLine; l_s < maxLine; ++l_s)
+    for (int l_s = 0; l_s < inputL; ++l_s)
     {
       AddSample = (int)sqrt(
         pow(s_i-elementHeights[l_s]*mult, 2)
@@ -115,7 +107,7 @@ __kernel void ckDAS_g(
         pow(mult * (l_p - elementPositions[l_s]), 2)
       ) + (1 - isPAImage)*s_i;
       if (AddSample < inputS && AddSample >= 0)
-        output += dSource[(int)(globalPosZ * inputL * inputS + l_s + AddSample*inputL)] * apodArray[(int)((l_s - minLine)*apod_mult)];
+        output += dSource[(int)(globalPosZ * inputL * inputS + l_s + AddSample*inputL)] * apodArray[(int)((l_s)*apod_mult)];
       else
         --curUsedLines;
     }

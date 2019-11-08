@@ -29,7 +29,6 @@ namespace mitk
   * \brief Class implementing a mitk::OclDataSetToDataSetFilter to calculate the delays used for beamforming.
   *
   *  The class must be given a configuration class instance of mitk::BeamformingSettings for beamforming parameters through mitk::OCLDelayCalculation::SetConfig(BeamformingSettings conf)
-  *  Additionally the output of an instance of mitk::OCLUsedLinesCalculation is needed to calculate the delays.
   */
 
   class OCLDelayCalculation : public OclDataSetToDataSetFilter, public itk::Object
@@ -39,15 +38,6 @@ namespace mitk
     mitkNewMacro1Param(Self, mitk::BeamformingSettings::Pointer);
 
     void Update();
-
-    /** \brief Sets the usedLines buffer object to use for the calculation of the delays.
-    *
-    * @param usedLines An buffer generated as the output of an instance of mitk::OCLUsedLinesCalculation.
-    */
-    void SetInputs(cl_mem usedLines)
-    {
-      m_UsedLines = usedLines;
-    }
 
   protected:
 
@@ -78,7 +68,6 @@ namespace mitk
     cl_kernel m_PixelCalculation;
 
     BeamformingSettings::Pointer m_Conf;
-    cl_mem m_UsedLines;
     unsigned int m_BufferSize;
     float m_DelayMultiplicatorRaw;
     char m_IsPAImage;

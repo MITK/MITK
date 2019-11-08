@@ -15,7 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
  
 __kernel void ckDelayCalculationSphe(  __global unsigned short *gDest,
-                         __global unsigned short *usedLines,
                          unsigned int inputL,
                          unsigned int inputS,
                          unsigned int outputL,

@@ -91,14 +91,13 @@ void mitk::OCLDelayCalculation::Execute()
   float totalSamples_i = (float)(m_Conf->GetReconstructionDepth()) / (float)(m_Conf->GetSpeedOfSound() * m_Conf->GetTimeSpacing());
   totalSamples_i = totalSamples_i <= m_Conf->GetInputDim()[1] ? totalSamples_i : m_Conf->GetInputDim()[1];
 
-  clErr = clSetKernelArg(this->m_PixelCalculation, 1, sizeof(cl_mem), &(this->m_UsedLines));
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 2, sizeof(cl_uint), &(this->m_Conf->GetInputDim()[0]));
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 3, sizeof(cl_uint), &(this->m_Conf->GetInputDim()[1]));
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 4, sizeof(cl_uint), &(reconstructionLines));
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 5, sizeof(cl_uint), &(samplesperLine));
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 6, sizeof(cl_char), &(this->m_IsPAImage));
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 7, sizeof(cl_float), &(this->m_DelayMultiplicatorRaw));
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 8, sizeof(cl_float), &(totalSamples_i));
+  clErr = clSetKernelArg(this->m_PixelCalculation, 1, sizeof(cl_uint), &(this->m_Conf->GetInputDim()[0]));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 2, sizeof(cl_uint), &(this->m_Conf->GetInputDim()[1]));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 3, sizeof(cl_uint), &(reconstructionLines));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 4, sizeof(cl_uint), &(samplesperLine));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 5, sizeof(cl_char), &(this->m_IsPAImage));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 6, sizeof(cl_float), &(this->m_DelayMultiplicatorRaw));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 7, sizeof(cl_float), &(totalSamples_i));
 
   CHECK_OCL_ERR(clErr);
 

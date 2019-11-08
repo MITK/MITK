@@ -89,8 +89,7 @@ void mitk::BeamformingUtils::DASSphericalLine(
   float l_p = 0;
   float s_i = 0;
 
-  short usedLines = inputL;
-  float apod_mult = 1;
+   float apod_mult = 1;
 
   float totalSamples_i = (float)(config->GetReconstructionDepth()) / (float)(config->GetSpeedOfSound() * config->GetTimeSpacing());
   totalSamples_i = totalSamples_i <= inputS ? totalSamples_i : inputS;

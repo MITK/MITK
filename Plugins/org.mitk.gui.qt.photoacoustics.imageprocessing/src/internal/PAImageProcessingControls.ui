@@ -31,15 +31,15 @@
         </sizepolicy>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="pageBandpass">
         <property name="geometry">
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>583</width>
-          <height>732</height>
+          <width>98</width>
+          <height>28</height>
          </rect>
         </property>
         <attribute name="label">
@@ -266,7 +266,7 @@
           <rect>
            <x>10</x>
            <y>0</y>
-           <width>301</width>
+           <width>306</width>
            <height>661</height>
           </rect>
          </property>
@@ -423,7 +423,7 @@
              </sizepolicy>
             </property>
             <property name="decimals">
-             <number>1</number>
+             <number>5</number>
             </property>
             <property name="minimum">
              <double>1.000000000000000</double>
@@ -492,10 +492,10 @@
              <number>2</number>
             </property>
             <property name="minimum">
-             <double>0.010000000000000</double>
+             <double>0.000000000000000</double>
             </property>
             <property name="maximum">
-             <double>399.990000000000009</double>
+             <double>999.990000000000009</double>
             </property>
             <property name="value">
              <double>40.000000000000000</double>
@@ -811,8 +811,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>583</width>
-          <height>732</height>
+          <width>98</width>
+          <height>28</height>
          </rect>
         </property>
         <attribute name="label">
@@ -997,8 +997,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>583</width>
-          <height>732</height>
+          <width>98</width>
+          <height>28</height>
          </rect>
         </property>
         <attribute name="label">
@@ -1168,8 +1168,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>583</width>
-          <height>732</height>
+          <width>98</width>
+          <height>28</height>
          </rect>
         </property>
         <attribute name="label">

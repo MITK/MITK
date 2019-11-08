@@ -114,101 +114,90 @@ unsigned short* mitk::BeamformingUtils::MinMaxLines(const mitk::BeamformingSetti
     float* elementHeights = config->GetElementHeights();
     float* elementPositions = config->GetElementPositions();
 
-    float cos_deg = std::cos(config->GetAngle() / 2.f / 360 * 2 * itk::Math::pi);
+    float sin_deg = std::sin(config->GetAngle() / 360 * 2 * itk::Math::pi);
 
-    float cos = 0;
-    float a = 0;
-    float d = 0;
+    //float cos = 0;
+    //float a = 0;
+    //float d = 0;
+    //MITK_INFO << "probeRadius" <<probeRadius;
+    float x_center_pos = horizontalExtent / 2.0;
+    float y_center_pos = probeRadius;
+    MITK_INFO << "x_center_pos" << x_center_pos;
+    MITK_INFO << "y_center_pos" << y_center_pos;
 
+    int foo =0;
     for (int x = 0; x < outputL; ++x)
     {
       for (int y = 0; y < outputS; ++y)
       {
-        float l_p = (float)x / outputL * horizontalExtent;
-        float s_p = (float)y / (float)outputS * verticalExtent;
+        float x_cm = (float)x / outputL * horizontalExtent; // x*Xspacing
+        float y_cm = (float)y / (float)outputS * verticalExtent; // y*Yspacing
 
         int maxLine = inputL;
         int minLine = 0;
 
-        for (int l_s = 0; l_s < inputL; l_s += 32)
-        {
-          a = sqrt((probeRadius - s_p)*(probeRadius - s_p) + (l_p - horizontalExtent / 2)*(l_p - horizontalExtent / 2));
-          d = sqrt((s_p - elementHeights[l_s])*(s_p - elementHeights[l_s]) + (l_p - elementPositions[l_s])*(l_p - elementPositions[l_s]));
-          cos = (d*d + probeRadius * probeRadius - a * a) / (2 * probeRadius*d);
-
-          if (cos > cos_deg)
-          {
-            minLine = l_s - 32;
-            if (minLine < 0)
-              minLine = 0;
-            break;
-          }
-        }
-        for (int l_s = minLine; l_s < inputL; l_s += 8)
-        {
-          a = sqrt((probeRadius - s_p)*(probeRadius - s_p) + (l_p - horizontalExtent / 2)*(l_p - horizontalExtent / 2));
-          d = sqrt((s_p - elementHeights[l_s])*(s_p - elementHeights[l_s]) + (l_p - elementPositions[l_s])*(l_p - elementPositions[l_s]));
-          cos = (d*d + probeRadius * probeRadius - a * a) / (2 * probeRadius*d);
-
-          if (cos > cos_deg)
-          {
-            minLine = l_s - 8;
-            if (minLine < 0)
-              minLine = 0;
-            break;
-          }
-        }
         for (int l_s = minLine; l_s < inputL; l_s += 1)
         {
-          a = sqrt((probeRadius - s_p)*(probeRadius - s_p) + (l_p - horizontalExtent / 2)*(l_p - horizontalExtent / 2));
-          d = sqrt((s_p - elementHeights[l_s])*(s_p - elementHeights[l_s]) + (l_p - elementPositions[l_s])*(l_p - elementPositions[l_s]));
-          cos = (d*d + probeRadius * probeRadius - a * a) / (2 * probeRadius*d);
+          float x_sensor_pos = elementPositions[l_s];
+          float y_sensor_pos = elementHeights[l_s];
 
-          if (cos > cos_deg)
+          float distance_sensor_target = sqrt((x_cm - x_sensor_pos)*(x_cm - x_sensor_pos)
+                                              + (y_cm - y_sensor_pos)*(y_cm - y_sensor_pos));
+
+          float center_to_sensor_a = y_sensor_pos - y_center_pos;
+          float center_to_sensor_b = x_center_pos - x_sensor_pos;
+          float center_to_sensor_c = -(center_to_sensor_a * x_center_pos + center_to_sensor_b * y_center_pos);
+          float distance_to_sensor_direction = std::fabs((center_to_sensor_a * x_cm
+                                                          + center_to_sensor_b * y_cm
+                                                          + center_to_sensor_c)) /
+                       (sqrt(center_to_sensor_a*center_to_sensor_a + center_to_sensor_b*center_to_sensor_b));
+
+          //a = sqrt((probeRadius - sample_position)*(probeRadius - sample_position)
+          //         + (line_position - horizontalExtent / 2)*(line_position - horizontalExtent / 2));
+          //d = sqrt((sample_position - elementHeights[l_s])*(sample_position - elementHeights[l_s])
+          //         + (line_position - elementPositions[l_s])*(line_position - elementPositions[l_s]));
+          //cos = std::abs((d*d + probeRadius*probeRadius - a*a) / (2 * probeRadius * d));
+  //MITK_INFO << "distance_to_sensor_direction" <<distance_to_sensor_direction;
+
+          if(foo==0)
+          {
+
+            MITK_INFO << "x_sensor_pos" << x_sensor_pos;
+            MITK_INFO << "y_sensor_pos" << y_sensor_pos;
+            MITK_INFO << "distance_sensor_target" << distance_sensor_target;
+            MITK_INFO << "distance_to_sensor_direction" << distance_to_sensor_direction;
+             foo=1;
+          }
+          if (distance_to_sensor_direction < sin_deg*distance_sensor_target)
           {
             minLine = l_s;
             break;
           }
         }
 
-        for (int l_s = inputL; l_s >= 0; l_s -= 32)
+        for (int l_s = maxLine; l_s >= minLine; l_s -= 1)
         {
-          a = sqrt((probeRadius - s_p)*(probeRadius - s_p) + (l_p - horizontalExtent / 2)*(l_p - horizontalExtent / 2));
-          d = sqrt((s_p - elementHeights[l_s])*(s_p - elementHeights[l_s]) + (l_p - elementPositions[l_s])*(l_p - elementPositions[l_s]));
-          cos = (d*d + probeRadius * probeRadius - a * a) / (2 * probeRadius*d);
-          cos = 0;
+          float x_sensor_pos = elementPositions[l_s];
+          float y_sensor_pos = elementHeights[l_s];
 
-          if (cos > cos_deg)
-          {
-            maxLine = l_s + 32;
-            if (maxLine > inputL)
-              minLine = inputL;
-            break;
-          }
-        }
-        for (int l_s = maxLine; l_s >= 0; l_s -= 8)
-        {
-          a = sqrt((probeRadius - s_p)*(probeRadius - s_p) + (l_p - horizontalExtent / 2)*(l_p - horizontalExtent / 2));
-          d = sqrt((s_p - elementHeights[l_s])*(s_p - elementHeights[l_s]) + (l_p - elementPositions[l_s])*(l_p - elementPositions[l_s]));
-          cos = (d*d + probeRadius * probeRadius - a * a) / (2 * probeRadius*d);
-          cos = 0;
+          float distance_sensor_target = sqrt((x_cm - x_sensor_pos)*(x_cm - x_sensor_pos)
+                                              + (y_cm - y_sensor_pos)*(y_cm - y_sensor_pos));
 
-          if (cos > cos_deg)
-          {
-            maxLine = l_s + 8;
-            if (maxLine > inputL)
-              minLine = inputL;
-            break;
-          }
-        }
-        for (int l_s = maxLine; l_s >= 0; l_s -= 1)
-        {
-          a = sqrt((probeRadius - s_p)*(probeRadius - s_p) + (l_p - horizontalExtent / 2)*(l_p - horizontalExtent / 2));
-          d = sqrt((s_p - elementHeights[l_s])*(s_p - elementHeights[l_s]) + (l_p - elementPositions[l_s])*(l_p - elementPositions[l_s]));
-          cos = (d*d + probeRadius * probeRadius - a * a) / (2 * probeRadius*d);
-          cos = 0;
+          float center_pos_x = horizontalExtent / 2.0;
+          float center_pos_y = probeRadius;
+          float center_to_sensor_a = y_sensor_pos - center_pos_y;
+          float center_to_sensor_b = center_pos_x - x_sensor_pos;
+          float center_to_sensor_c = -(center_to_sensor_a * center_pos_x + center_to_sensor_b * center_pos_y);
+          float distance_to_sensor_direction = std::fabs((center_to_sensor_a * x_cm + center_to_sensor_b * y_cm + center_to_sensor_c)) /
+                       (sqrt(center_to_sensor_a*center_to_sensor_a + center_to_sensor_b*center_to_sensor_b));
 
-          if (cos > cos_deg)
+
+          //a = sqrt((probeRadius - sample_position)*(probeRadius - sample_position) + (line_position - horizontalExtent / 2)*(line_position - horizontalExtent / 2));
+          //d = sqrt((sample_position - elementHeights[l_s])*(sample_position - elementHeights[l_s]) + (line_position - elementPositions[l_s])*(line_position - elementPositions[l_s]));
+          //cos = (d*d + probeRadius * probeRadius - a * a) / (2 * probeRadius*d);
+          //cos = 0;
+
+          if (distance_to_sensor_direction < sin_deg*distance_sensor_target)
           {
             maxLine = l_s;
             break;

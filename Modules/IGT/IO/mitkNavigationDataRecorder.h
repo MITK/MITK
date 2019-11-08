@@ -65,7 +65,7 @@ namespace mitk
     itkGetMacro(StandardizeTime, bool);
 
     /**
-    * \brief If set to false, the navigationDatas Timestamp will be used. If set to false, the recorder
+    * \brief If set to false, the navigationdata's timestamp will be used. If set to true, the recorder
     * will generate a timestamp when it copies the data to the navigationdataset.
     */
     itkSetMacro(StandardizeTime, bool);
@@ -82,7 +82,7 @@ namespace mitk
     itkGetMacro(RecordOnlyValidData, bool);
 
     /**
-    * \brief Starts recording NavigationData into the NAvigationDataSet
+    * \brief Starts recording NavigationData into the NavigationDataSet
     */
     virtual void StartRecording();
 
@@ -121,13 +121,13 @@ namespace mitk
 
     bool m_Recording; ///< indicates whether the recording is started or not
 
-    bool m_StandardizeTime; //< indicates whether one should use the timestamps in NavigationData or create new timestamps upon recording
+    bool m_StandardizeTime; ///< indicates whether one should use the timestamps in NavigationData or create new timestamps upon recording
 
-    bool m_StandardizedTimeInitialized; //< set to true the first time start recording is called.
+    bool m_StandardizedTimeInitialized; ///< set to true the first time start recording is called.
 
     int m_RecordCountLimit; ///< limits the number of frames, recording will be stopped if the limit is reached. -1 disables the limit
 
-    bool m_RecordOnlyValidData; //< indicates whether only valid data is recorded
+    bool m_RecordOnlyValidData; ///< indicates whether only valid data is recorded
   };
 }
 #endif // #define _MITK_POINT_SET_SOURCE_H

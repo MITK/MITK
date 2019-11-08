@@ -132,6 +132,8 @@ namespace mitk {
       return smartPtr;
     }
 
+    unsigned short* GetMinMaxLines();
+
   protected:
 
     /**
@@ -237,6 +239,10 @@ namespace mitk {
     /**
     */
     float m_HorizontalExtent;
+
+    /**
+    */
+    unsigned short* m_MinMaxLines;
   };
 }
 #endif //MITK_BEAMFORMING_SETTINGS

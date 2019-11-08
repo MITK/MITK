@@ -49,7 +49,8 @@ mitk::BeamformingSettings::BeamformingSettings(float pitchInMeters,
   m_ApodizationArraySize(apodizationArraySize),
   m_Algorithm(algorithm),
   m_Geometry(geometry),
-  m_ProbeRadius(probeRadius)
+  m_ProbeRadius(probeRadius),
+  m_MinMaxLines(nullptr)
 {
   if (inputDim == nullptr)
   {
@@ -128,4 +129,13 @@ mitk::BeamformingSettings::~BeamformingSettings()
       delete[] m_ElementPositions;
     MITK_INFO << "Destructing beamforming settings...[Done]";
   }
+  if (m_MinMaxLines)
+    delete[] m_MinMaxLines;
+}
+
+unsigned short* mitk::BeamformingSettings::GetMinMaxLines()
+{
+  if (!m_MinMaxLines)
+    m_MinMaxLines = mitk::BeamformingUtils::MinMaxLines(this);
+  return m_MinMaxLines;
 }

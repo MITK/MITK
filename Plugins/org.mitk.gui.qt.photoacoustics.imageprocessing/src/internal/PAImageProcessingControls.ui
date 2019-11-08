@@ -31,7 +31,7 @@
         </sizepolicy>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="pageBandpass">
         <property name="geometry">
@@ -266,7 +266,7 @@
           <rect>
            <x>10</x>
            <y>0</y>
-           <width>306</width>
+           <width>301</width>
            <height>661</height>
           </rect>
          </property>
@@ -492,7 +492,7 @@
              <number>2</number>
             </property>
             <property name="minimum">
-             <double>0.000000000000000</double>
+             <double>0.010000000000000</double>
             </property>
             <property name="maximum">
              <double>399.990000000000009</double>

@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _MITKPHOTOACOUSTICSDELAYCALC_H_
-#define _MITKPHOTOACOUSTICSDELAYCALC_H_
+#ifndef _MITKPHOTOACOUSTICSOCLUSEDLINESCALCULATION_H_
+#define _MITKPHOTOACOUSTICSOCLUSEDLINESCALCULATION_H_
 
 #if defined(PHOTOACOUSTICS_USE_GPU) || DOXYGEN
 
@@ -26,33 +26,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
   /*!
-  * \brief Class implementing a mitk::OclDataSetToDataSetFilter to calculate the delays used for beamforming.
+  * \brief Class implementing a mitk::OclDataSetToDataSetFilter to calculate which lines each sample should use when beamforming.
   *
   *  The class must be given a configuration class instance of mitk::BeamformingSettings for beamforming parameters through mitk::OCLDelayCalculation::SetConfig(BeamformingSettings conf)
-  *  Additionally the output of an instance of mitk::OCLUsedLinesCalculation is needed to calculate the delays.
   */
 
-  class OCLDelayCalculation : public OclDataSetToDataSetFilter, public itk::Object
+  class OCLUsedLinesCalculation : public OclDataSetToDataSetFilter, public itk::Object
   {
   public:
-    mitkClassMacroItkParent(OCLDelayCalculation, itk::Object);
+    mitkClassMacroItkParent(OCLUsedLinesCalculation, itk::Object);
     mitkNewMacro1Param(Self, mitk::BeamformingSettings::Pointer);
 
     void Update();
 
-    /** \brief Sets the usedLines buffer object to use for the calculation of the delays.
-    *
-    * @param usedLines An buffer generated as the output of an instance of mitk::OCLUsedLinesCalculation.
-    */
-    void SetInputs(cl_mem usedLines)
-    {
-      m_UsedLines = usedLines;
-    }
+    void SetElementHeightsBuffer(cl_mem elementHeightsBuffer);
+    void SetElementPositionsBuffer(cl_mem elementPositionsBuffer);
 
   protected:
 
-    OCLDelayCalculation(mitk::BeamformingSettings::Pointer settings);
-    virtual ~OCLDelayCalculation();
+    /** Constructor */
+    OCLUsedLinesCalculation(mitk::BeamformingSettings::Pointer settings);
+
+    /** Destructor */
+    virtual ~OCLUsedLinesCalculation();
 
     /** Initialize the filter */
     bool Initialize();
@@ -78,11 +74,10 @@ namespace mitk
     cl_kernel m_PixelCalculation;
 
     BeamformingSettings::Pointer m_Conf;
-    cl_mem m_UsedLines;
-    unsigned int m_BufferSize;
-    float m_DelayMultiplicatorRaw;
-    char m_IsPAImage;
+    float m_part;
     size_t m_ChunkSize[3];
+    cl_mem m_ElementHeightsBuffer;
+    cl_mem m_ElementPositionsBuffer;
   };
 }
 #endif

@@ -70,6 +70,7 @@ namespace mitk {
     float* m_OutputData;
     float* m_InputData;
     float* m_InputDataPuffer;
+    unsigned short* m_MinMaxLines;
 
     /** \brief Current configuration set
     */

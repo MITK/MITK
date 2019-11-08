@@ -26,6 +26,7 @@ mitk::PhotoacousticOCLBeamformingFilter::PhotoacousticOCLBeamformingFilter(Beamf
   m_InputImage(mitk::Image::New()),
   m_ApodizationBuffer(nullptr),
   m_DelaysBuffer(nullptr),
+  m_UsedLinesBuffer(nullptr),
   m_ElementHeightsBuffer(nullptr),
   m_ElementPositionsBuffer(nullptr)
 {
@@ -45,6 +46,7 @@ mitk::PhotoacousticOCLBeamformingFilter::PhotoacousticOCLBeamformingFilter(Beamf
   m_ChunkSize[1] = 128;
   m_ChunkSize[2] = 8;
 
+  m_UsedLinesCalculation = mitk::OCLUsedLinesCalculation::New(m_Conf);
   m_DelayCalculation = mitk::OCLDelayCalculation::New(m_Conf);
   MITK_INFO << "Instantiating OCL beamforming Filter...[Done]";
 }
@@ -124,8 +126,15 @@ void mitk::PhotoacousticOCLBeamformingFilter::UpdateDataBuffers()
   if (m_ElementPositionsBuffer) clReleaseMemObject(m_ElementPositionsBuffer);
   this->m_ElementPositionsBuffer = clCreateBuffer(gpuContext, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, sizeof(float) * m_Conf->GetTransducerElements(), const_cast<float*>(m_Conf->GetElementPositions()), &clErr);
   CHECK_OCL_ERR(clErr);
+  // calculate used lines
+
+  m_UsedLinesCalculation->SetElementPositionsBuffer(m_ElementPositionsBuffer);
+  m_UsedLinesCalculation->SetElementHeightsBuffer(m_ElementHeightsBuffer);
+  m_UsedLinesCalculation->Update();
+  m_UsedLinesBuffer = m_UsedLinesCalculation->GetGPUOutput()->GetGPUBuffer();
 
   // calculate the Delays
+  m_DelayCalculation->SetInputs(m_UsedLinesBuffer);
   m_DelayCalculation->Update();
 
   m_DelaysBuffer = m_DelayCalculation->GetGPUOutput()->GetGPUBuffer();
@@ -140,14 +149,15 @@ void mitk::PhotoacousticOCLBeamformingFilter::Execute()
     unsigned int reconstructionLines = this->m_Conf->GetReconstructionLines();
     unsigned int samplesPerLine = this->m_Conf->GetSamplesPerLine();
 
-    clErr = clSetKernelArg(this->m_PixelCalculation, 2, sizeof(cl_mem), &(this->m_DelaysBuffer));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 3, sizeof(cl_mem), &(this->m_ApodizationBuffer));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 4, sizeof(cl_ushort), &(this->m_ApodArraySize));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 5, sizeof(cl_uint), &(this->m_Conf->GetInputDim()[0]));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 6, sizeof(cl_uint), &(this->m_Conf->GetInputDim()[1]));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 7, sizeof(cl_uint), &(m_inputSlices));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 8, sizeof(cl_uint), &(reconstructionLines));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 9, sizeof(cl_uint), &(samplesPerLine));
+    clErr = clSetKernelArg(this->m_PixelCalculation, 2, sizeof(cl_mem), &(this->m_UsedLinesBuffer));
+    clErr |= clSetKernelArg(this->m_PixelCalculation, 3, sizeof(cl_mem), &(this->m_DelaysBuffer));
+    clErr |= clSetKernelArg(this->m_PixelCalculation, 4, sizeof(cl_mem), &(this->m_ApodizationBuffer));
+    clErr |= clSetKernelArg(this->m_PixelCalculation, 5, sizeof(cl_ushort), &(this->m_ApodArraySize));
+    clErr |= clSetKernelArg(this->m_PixelCalculation, 6, sizeof(cl_uint), &(this->m_Conf->GetInputDim()[0]));
+    clErr |= clSetKernelArg(this->m_PixelCalculation, 7, sizeof(cl_uint), &(this->m_Conf->GetInputDim()[1]));
+    clErr |= clSetKernelArg(this->m_PixelCalculation, 8, sizeof(cl_uint), &(m_inputSlices));
+    clErr |= clSetKernelArg(this->m_PixelCalculation, 9, sizeof(cl_uint), &(reconstructionLines));
+    clErr |= clSetKernelArg(this->m_PixelCalculation, 10, sizeof(cl_uint), &(samplesPerLine));
   }
   else
   {
@@ -172,6 +182,7 @@ void mitk::PhotoacousticOCLBeamformingFilter::Execute()
     clErr |= clSetKernelArg(this->m_PixelCalculation, 12, sizeof(cl_float), &(horizontalExtent));
     clErr |= clSetKernelArg(this->m_PixelCalculation, 13, sizeof(cl_float), &(mult));
     clErr |= clSetKernelArg(this->m_PixelCalculation, 14, sizeof(cl_char), &(isPAImage));
+    clErr |= clSetKernelArg(this->m_PixelCalculation, 15, sizeof(cl_mem), &(this->m_UsedLinesBuffer));
   }
   // execute the filter on a 2D/3D NDRange
   if (m_OutputDim[2] == 1 || m_ChunkSize[2] == 1)

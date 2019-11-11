@@ -70,12 +70,12 @@ float* mitk::BeamformingUtils::BoxFunction(int samples)
 
 unsigned short* mitk::BeamformingUtils::MinMaxLines(const mitk::BeamformingSettings::Pointer config)
 {
-  int outputL = (int)config->GetReconstructionLines();
-  int outputS = (int)config->GetSamplesPerLine();
+  unsigned int outputL = (unsigned int)config->GetReconstructionLines();
+  unsigned int outputS = (unsigned int)config->GetSamplesPerLine();
 
   unsigned short* dDest = new unsigned short[outputL * outputS * 2];
 
-  int inputL = (int)config->GetInputDim()[0];
+  unsigned int inputL = (unsigned int)config->GetInputDim()[0];
   
   float horizontalExtent = config->GetHorizontalExtent();
   float verticalExtent = config->GetReconstructionDepth();
@@ -89,9 +89,9 @@ unsigned short* mitk::BeamformingUtils::MinMaxLines(const mitk::BeamformingSetti
 
   if ((int)config->GetGeometry() == 0) // if this is raw data from a linear probe geometry
   {
-    for (int x = 0; x < outputL; ++x)
+    for (unsigned int x = 0; x < outputL; ++x)
     {
-      for (int y = 0; y < outputS; ++y)
+      for (unsigned int y = 0; y < outputS; ++y)
       {
         float l_i = (float)x / outputL * inputL;
         float s_i = (float)y / (float)outputS * totalSamples_i;
@@ -116,27 +116,20 @@ unsigned short* mitk::BeamformingUtils::MinMaxLines(const mitk::BeamformingSetti
 
     float sin_deg = std::sin(config->GetAngle() / 360 * 2 * itk::Math::pi);
 
-    //float cos = 0;
-    //float a = 0;
-    //float d = 0;
-    //MITK_INFO << "probeRadius" <<probeRadius;
     float x_center_pos = horizontalExtent / 2.0;
     float y_center_pos = probeRadius;
-    MITK_INFO << "x_center_pos" << x_center_pos;
-    MITK_INFO << "y_center_pos" << y_center_pos;
 
-    int foo =0;
-    for (int x = 0; x < outputL; ++x)
+    for (unsigned int x = 0; x < outputL; ++x)
     {
-      for (int y = 0; y < outputS; ++y)
+      for (unsigned int y = 0; y < outputS; ++y)
       {
         float x_cm = (float)x / outputL * horizontalExtent; // x*Xspacing
         float y_cm = (float)y / (float)outputS * verticalExtent; // y*Yspacing
 
-        int maxLine = inputL;
-        int minLine = 0;
+        unsigned int maxLine = inputL;
+        unsigned int minLine = 0;
 
-        for (int l_s = minLine; l_s < inputL; l_s += 1)
+        for (unsigned int l_s = minLine; l_s <= inputL; l_s += 1)
         {
           float x_sensor_pos = elementPositions[l_s];
           float y_sensor_pos = elementHeights[l_s];
@@ -144,6 +137,7 @@ unsigned short* mitk::BeamformingUtils::MinMaxLines(const mitk::BeamformingSetti
           float distance_sensor_target = sqrt((x_cm - x_sensor_pos)*(x_cm - x_sensor_pos)
                                               + (y_cm - y_sensor_pos)*(y_cm - y_sensor_pos));
 
+          // solving line equation
           float center_to_sensor_a = y_sensor_pos - y_center_pos;
           float center_to_sensor_b = x_center_pos - x_sensor_pos;
           float center_to_sensor_c = -(center_to_sensor_a * x_center_pos + center_to_sensor_b * y_center_pos);
@@ -152,22 +146,6 @@ unsigned short* mitk::BeamformingUtils::MinMaxLines(const mitk::BeamformingSetti
                                                           + center_to_sensor_c)) /
                        (sqrt(center_to_sensor_a*center_to_sensor_a + center_to_sensor_b*center_to_sensor_b));
 
-          //a = sqrt((probeRadius - sample_position)*(probeRadius - sample_position)
-          //         + (line_position - horizontalExtent / 2)*(line_position - horizontalExtent / 2));
-          //d = sqrt((sample_position - elementHeights[l_s])*(sample_position - elementHeights[l_s])
-          //         + (line_position - elementPositions[l_s])*(line_position - elementPositions[l_s]));
-          //cos = std::abs((d*d + probeRadius*probeRadius - a*a) / (2 * probeRadius * d));
-  //MITK_INFO << "distance_to_sensor_direction" <<distance_to_sensor_direction;
-
-          if(foo==0)
-          {
-
-            MITK_INFO << "x_sensor_pos" << x_sensor_pos;
-            MITK_INFO << "y_sensor_pos" << y_sensor_pos;
-            MITK_INFO << "distance_sensor_target" << distance_sensor_target;
-            MITK_INFO << "distance_to_sensor_direction" << distance_to_sensor_direction;
-             foo=1;
-          }
           if (distance_to_sensor_direction < sin_deg*distance_sensor_target)
           {
             minLine = l_s;
@@ -175,7 +153,7 @@ unsigned short* mitk::BeamformingUtils::MinMaxLines(const mitk::BeamformingSetti
           }
         }
 
-        for (int l_s = maxLine; l_s >= minLine; l_s -= 1)
+        for (unsigned int l_s = maxLine - 1; l_s > minLine; l_s -= 1) // start with maxline-1 otherwise elementPositions[] will go out of range
         {
           float x_sensor_pos = elementPositions[l_s];
           float y_sensor_pos = elementHeights[l_s];
@@ -183,19 +161,16 @@ unsigned short* mitk::BeamformingUtils::MinMaxLines(const mitk::BeamformingSetti
           float distance_sensor_target = sqrt((x_cm - x_sensor_pos)*(x_cm - x_sensor_pos)
                                               + (y_cm - y_sensor_pos)*(y_cm - y_sensor_pos));
 
+          // solving line equation
           float center_pos_x = horizontalExtent / 2.0;
           float center_pos_y = probeRadius;
           float center_to_sensor_a = y_sensor_pos - center_pos_y;
           float center_to_sensor_b = center_pos_x - x_sensor_pos;
           float center_to_sensor_c = -(center_to_sensor_a * center_pos_x + center_to_sensor_b * center_pos_y);
-          float distance_to_sensor_direction = std::fabs((center_to_sensor_a * x_cm + center_to_sensor_b * y_cm + center_to_sensor_c)) /
+          float distance_to_sensor_direction = std::fabs((center_to_sensor_a * x_cm
+                                                          + center_to_sensor_b * y_cm
+                                                          + center_to_sensor_c)) /
                        (sqrt(center_to_sensor_a*center_to_sensor_a + center_to_sensor_b*center_to_sensor_b));
-
-
-          //a = sqrt((probeRadius - sample_position)*(probeRadius - sample_position) + (line_position - horizontalExtent / 2)*(line_position - horizontalExtent / 2));
-          //d = sqrt((sample_position - elementHeights[l_s])*(sample_position - elementHeights[l_s]) + (line_position - elementPositions[l_s])*(line_position - elementPositions[l_s]));
-          //cos = (d*d + probeRadius * probeRadius - a * a) / (2 * probeRadius*d);
-          //cos = 0;
 
           if (distance_to_sensor_direction < sin_deg*distance_sensor_target)
           {

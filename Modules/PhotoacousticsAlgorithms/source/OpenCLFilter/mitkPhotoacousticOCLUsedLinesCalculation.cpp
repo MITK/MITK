@@ -92,13 +92,11 @@ void mitk::OCLUsedLinesCalculation::Execute()
     m_part = (tan(m_Conf->GetAngle() / 360 * 2 * itk::Math::pi) *
       ((m_Conf->GetSpeedOfSound() * m_Conf->GetTimeSpacing())) /
       (m_Conf->GetPitchInMeters() * m_Conf->GetTransducerElements())) * m_Conf->GetInputDim()[0];
-
     unsigned int reconLines = this->m_Conf->GetReconstructionLines();
     unsigned int samplesPerLine = this->m_Conf->GetSamplesPerLine();
 
     float totalSamples_i = (float)(m_Conf->GetReconstructionDepth()) / (float)(m_Conf->GetSpeedOfSound() * m_Conf->GetTimeSpacing());
     totalSamples_i = totalSamples_i <= m_Conf->GetInputDim()[1] ? totalSamples_i : m_Conf->GetInputDim()[1];
-
     clErr = clSetKernelArg(this->m_PixelCalculation, 1, sizeof(cl_float), &(this->m_part));
     clErr |= clSetKernelArg(this->m_PixelCalculation, 2, sizeof(cl_uint), &(this->m_Conf->GetInputDim()[0]));
     clErr |= clSetKernelArg(this->m_PixelCalculation, 3, sizeof(cl_uint), &(this->m_Conf->GetInputDim()[1]));
@@ -112,14 +110,14 @@ void mitk::OCLUsedLinesCalculation::Execute()
     unsigned int samplesPerLine = this->m_Conf->GetSamplesPerLine();
 
     float probeRadius = m_Conf->GetProbeRadius();
-    float cos_deg = std::cos(m_Conf->GetAngle()/2.f / 360 * 2 * itk::Math::pi);
+    float sin_deg = std::sin(m_Conf->GetAngle() / 360 * 2 * itk::Math::pi);
 
     float horizontalExtent = m_Conf->GetHorizontalExtent();
     float verticalExtent = m_Conf->GetReconstructionDepth();
 
     clErr = clSetKernelArg(this->m_PixelCalculation, 1, sizeof(cl_mem), &(this->m_ElementHeightsBuffer));
     clErr |= clSetKernelArg(this->m_PixelCalculation, 2, sizeof(cl_mem), &(this->m_ElementPositionsBuffer));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 3, sizeof(cl_float), &(cos_deg));
+    clErr |= clSetKernelArg(this->m_PixelCalculation, 3, sizeof(cl_float), &(sin_deg));
     clErr |= clSetKernelArg(this->m_PixelCalculation, 4, sizeof(cl_float), &(probeRadius));
     clErr |= clSetKernelArg(this->m_PixelCalculation, 5, sizeof(cl_uint), &(this->m_Conf->GetInputDim()[0]));
     clErr |= clSetKernelArg(this->m_PixelCalculation, 6, sizeof(cl_uint), &(this->m_Conf->GetInputDim()[1]));

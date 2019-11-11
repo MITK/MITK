@@ -162,11 +162,9 @@ unsigned short* mitk::BeamformingUtils::MinMaxLines(const mitk::BeamformingSetti
                                               + (y_cm - y_sensor_pos)*(y_cm - y_sensor_pos));
 
           // solving line equation
-          float center_pos_x = horizontalExtent / 2.0;
-          float center_pos_y = probeRadius;
-          float center_to_sensor_a = y_sensor_pos - center_pos_y;
-          float center_to_sensor_b = center_pos_x - x_sensor_pos;
-          float center_to_sensor_c = -(center_to_sensor_a * center_pos_x + center_to_sensor_b * center_pos_y);
+          float center_to_sensor_a = y_sensor_pos - y_center_pos;
+          float center_to_sensor_b = x_center_pos - x_sensor_pos;
+          float center_to_sensor_c = -(center_to_sensor_a * x_center_pos + center_to_sensor_b * y_center_pos);
           float distance_to_sensor_direction = std::fabs((center_to_sensor_a * x_cm
                                                           + center_to_sensor_b * y_cm
                                                           + center_to_sensor_c)) /

@@ -701,19 +701,33 @@ ITK_THREAD_RETURN_TYPE mitk::NDITrackingDevice::ThreadStartTracking(void* pInfoS
   NDITrackingDevice *trackingDevice = (NDITrackingDevice*)pInfo->UserData;
   if (trackingDevice != nullptr)
   {
-    if (trackingDevice->GetOperationMode() == ToolTracking6D)
-      trackingDevice->TrackTools();             // call TrackTools() from the original object
-    else if (trackingDevice->GetOperationMode() == MarkerTracking3D)
-      trackingDevice->TrackMarkerPositions();   // call TrackMarkerPositions() from the original object
-    else if (trackingDevice->GetOperationMode() == ToolTracking5D)
-      trackingDevice->TrackMarkerPositions(); // call TrackMarkerPositions() from the original object
-    else if (trackingDevice->GetOperationMode() == HybridTracking)
+    try
     {
-      trackingDevice->TrackToolsAndMarkers();
+      if (trackingDevice->GetOperationMode() == ToolTracking6D)
+        trackingDevice->TrackTools();             // call TrackTools() from the original object
+      else if (trackingDevice->GetOperationMode() == MarkerTracking3D)
+        trackingDevice->TrackMarkerPositions();   // call TrackMarkerPositions() from the original object
+      else if (trackingDevice->GetOperationMode() == ToolTracking5D)
+        trackingDevice->TrackMarkerPositions(); // call TrackMarkerPositions() from the original object
+      else if (trackingDevice->GetOperationMode() == HybridTracking)
+      {
+        trackingDevice->TrackToolsAndMarkers();
+      }
+    }
+    catch (...)
+    {
+      trackingDevice->m_ExceptionPtr = std::current_exception();
     }
   }
   trackingDevice->m_ThreadID = 0;  // erase thread id, now that this thread will end.
+
+
   return ITK_THREAD_RETURN_VALUE;
+}
+
+std::exception_ptr mitk::NDITrackingDevice::GetTrackingException()
+{
+  return m_ExceptionPtr;
 }
 
 bool mitk::NDITrackingDevice::StartTracking()

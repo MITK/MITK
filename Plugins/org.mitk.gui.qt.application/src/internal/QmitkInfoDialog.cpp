@@ -37,7 +37,7 @@ QmitkInfoDialog::QmitkInfoDialog(const QList<mitk::DataNode::Pointer>& nodes, QW
   m_SearchButton = new QPushButton("Search (F3)", this);
   m_SearchButton->installEventFilter(this);
   m_TextBrowser = new QTextBrowser(this);
-  QPushButton* m_CloseButton = new QPushButton("Close", this);
+  QPushButton* closeButton = new QPushButton("Close", this);
 
   setMinimumSize(512, 512);
   setLayout(parentLayout);
@@ -48,7 +48,7 @@ QmitkInfoDialog::QmitkInfoDialog(const QList<mitk::DataNode::Pointer>& nodes, QW
   parentLayout->addWidget(m_KeyWord, 1, 0);
   parentLayout->addWidget(m_SearchButton, 1, 1);
   parentLayout->addWidget(m_TextBrowser, 2, 0, 1, 2);
-  parentLayout->addWidget(m_CloseButton, 3, 0, 1, 2);
+  parentLayout->addWidget(closeButton, 3, 0, 1, 2);
 
   connect(dataStorageComboBox, &QmitkDataStorageComboBox::OnSelectionChanged, this, &QmitkInfoDialog::OnSelectionChanged);
 
@@ -59,9 +59,9 @@ QmitkInfoDialog::QmitkInfoDialog(const QList<mitk::DataNode::Pointer>& nodes, QW
 
   connect(m_KeyWord, &QLineEdit::textChanged, this, &QmitkInfoDialog::KeyWordTextChanged);
   connect(m_SearchButton, &QPushButton::clicked, this, &QmitkInfoDialog::OnSearchButtonClicked);
-  connect(m_CloseButton, &QPushButton::clicked, this, &QmitkInfoDialog::OnCloseButtonClicked);
+  connect(closeButton, &QPushButton::clicked, this, &QmitkInfoDialog::OnCloseButtonClicked);
 
-  m_CloseButton->setDefault(true);
+  closeButton->setDefault(true);
 }
 
 void QmitkInfoDialog::OnSelectionChanged(const mitk::DataNode* node)

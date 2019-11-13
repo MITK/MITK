@@ -106,7 +106,7 @@ struct QmitkAbstractMultiWidget::Impl final
     m_DisplayActionEventHandler = std::make_unique<mitk::DisplayActionEventHandler>();
     m_DisplayActionEventHandler->SetObservableBroadcast(m_DisplayActionEventBroadcast);
 
-    Synchronize(true);
+    Synchronize(false);
   }
   
   mitk::DataStorage::Pointer m_DataStorage;

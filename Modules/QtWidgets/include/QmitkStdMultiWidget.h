@@ -30,12 +30,12 @@ class MITKQTWIDGETS_EXPORT QmitkStdMultiWidget : public QmitkAbstractMultiWidget
   Q_OBJECT
 
 public:
-
-  QmitkStdMultiWidget(QWidget *parent = nullptr,
-                      Qt::WindowFlags f = 0,
-                      mitk::RenderingManager *renderingManager = nullptr,
-                      mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard,
-                      const QString &name = "stdmulti");
+  QmitkStdMultiWidget(
+    QWidget *parent = nullptr,
+    Qt::WindowFlags f = nullptr,
+    mitk::RenderingManager *renderingManager = nullptr,
+    mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing,
+    const QString &name = "stdmulti");
 
   ~QmitkStdMultiWidget() override;
 

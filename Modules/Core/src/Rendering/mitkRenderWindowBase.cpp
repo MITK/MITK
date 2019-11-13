@@ -43,15 +43,11 @@ void mitk::RenderWindowBase::Initialize(mitk::RenderingManager *renderingManager
                                         const char *name,
                                         mitk::BaseRenderer::RenderingMode::Type renderingMode)
 {
-  if (renderingManager == nullptr)
-  {
+  if (nullptr == renderingManager)
     renderingManager = mitk::RenderingManager::GetInstance();
-  }
 
   if (m_Renderer.IsNull())
-  {
     m_Renderer = mitk::VtkPropRenderer::New(name, GetVtkRenderWindow(), renderingManager, renderingMode);
-  }
 
   m_Renderer->InitRenderer(this->GetVtkRenderWindow());
 

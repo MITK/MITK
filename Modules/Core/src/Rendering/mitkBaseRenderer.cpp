@@ -96,7 +96,7 @@ vtkRenderWindow *mitk::BaseRenderer::GetRenderWindowByName(const std::string &na
 mitk::BaseRenderer::BaseRenderer(const char *name,
                                  vtkRenderWindow *renWin,
                                  mitk::RenderingManager *rm,
-                                 RenderingMode::Type)
+                                 RenderingMode::Type renderingMode)
   : m_RenderWindow(nullptr),
     m_VtkRenderer(nullptr),
     m_MapperID(defaultMapper),
@@ -185,10 +185,17 @@ mitk::BaseRenderer::BaseRenderer(const char *name,
 
   m_VtkRenderer = vtkRenderer::New();
 
-  if (mitk::VtkLayerController::GetInstance(m_RenderWindow) == nullptr)
-  {
+  m_VtkRenderer->UseDepthPeelingOn();
+  m_VtkRenderer->UseDepthPeelingForVolumesOn();
+  m_VtkRenderer->SetMaximumNumberOfPeels(16); // This could be made adjustable in the Preferences
+  m_VtkRenderer->SetOcclusionRatio(0.0);
+
+  if (RenderingMode::FastApproximateAntiAliasing == renderingMode)
+    m_VtkRenderer->UseFXAAOn();
+
+  if (nullptr == mitk::VtkLayerController::GetInstance(m_RenderWindow))
     mitk::VtkLayerController::AddInstance(m_RenderWindow, m_VtkRenderer);
-  }
+
   mitk::VtkLayerController::GetInstance(m_RenderWindow)->InsertSceneRenderer(m_VtkRenderer);
 }
 

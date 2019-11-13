@@ -156,7 +156,7 @@ void QmitkStdMultiWidgetEditorPreferencePage::Update()
   m_Ui->m_EnableFlexibleZooming->setChecked(m_Preferences->GetBool("Use constrained zooming and panning", true));
   m_Ui->m_ShowLevelWindowWidget->setChecked(m_Preferences->GetBool("Show level/window widget", true));
   m_Ui->m_PACSLikeMouseMode->setChecked(m_Preferences->GetBool("PACS like mouse interaction", false));
-  int mode= m_Preferences->GetInt("Rendering Mode",0);
+  int mode = m_Preferences->GetInt("Rendering Mode", 1);
   m_Ui->m_RenderingMode->setCurrentIndex(mode);
   m_Ui->m_CrosshairGapSize->setValue(m_Preferences->GetInt("crosshair gap size", 32));
 }
@@ -254,10 +254,14 @@ void QmitkStdMultiWidgetEditorPreferencePage::OnWidgetComboBoxChanged(int i)
   m_Ui->m_RenderWindowDecorationText->setText(m_WidgetAnnotation[i]);
 }
 
-void QmitkStdMultiWidgetEditorPreferencePage::ChangeRenderingMode(int )
+void QmitkStdMultiWidgetEditorPreferencePage::ChangeRenderingMode(int i)
 {
-  //if( i == 0 )
-  //{
-    m_CurrentRenderingMode = "Standard";
-  //}
+  if (0 == i)
+  {
+    m_CurrentRenderingMode = "No Anti-aliasing";
+  }
+  else if (1 == i)
+  {
+    m_CurrentRenderingMode = "Fast Approximate Anti-Aliasing (FXAA)";
+  }
 }

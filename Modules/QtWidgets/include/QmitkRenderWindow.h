@@ -46,7 +46,7 @@ public:
     const QString &name = "unnamed renderwindow",
     mitk::VtkPropRenderer *renderer = nullptr,
     mitk::RenderingManager *renderingManager = nullptr,
-    mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard);
+    mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing);
   ~QmitkRenderWindow() override;
 
   /**

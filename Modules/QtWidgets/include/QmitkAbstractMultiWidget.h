@@ -68,7 +68,7 @@ public:
   QmitkAbstractMultiWidget(QWidget* parent = 0,
                            Qt::WindowFlags f = 0,
                            mitk::RenderingManager* renderingManager = nullptr,
-                           mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard,
+                           mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing,
                            const QString& multiWidgetName = "multiwidget");
 
   virtual ~QmitkAbstractMultiWidget();

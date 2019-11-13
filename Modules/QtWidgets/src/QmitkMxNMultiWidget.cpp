@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
                                          Qt::WindowFlags f/* = 0*/,
                                          mitk::RenderingManager* renderingManager/* = nullptr*/,
-                                         mitk::BaseRenderer::RenderingMode::Type renderingMode/* = mitk::BaseRenderer::RenderingMode::Standard*/,
+                                         mitk::BaseRenderer::RenderingMode::Type renderingMode/* = mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing*/,
                                          const QString& multiWidgetName/* = "mxnmulti"*/)
   : QmitkAbstractMultiWidget(parent, f, renderingManager, renderingMode, multiWidgetName)
   , m_CrosshairVisibility(false)

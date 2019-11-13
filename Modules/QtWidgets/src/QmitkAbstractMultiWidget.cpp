@@ -147,7 +147,7 @@ QmitkAbstractMultiWidget::Impl::Impl(QmitkAbstractMultiWidget* multiWidget,
 QmitkAbstractMultiWidget::QmitkAbstractMultiWidget(QWidget* parent,
                                                    Qt::WindowFlags f/* = 0*/,
                                                    mitk::RenderingManager* renderingManager/* = nullptr*/,
-                                                   mitk::BaseRenderer::RenderingMode::Type renderingMode/* = mitk::BaseRenderer::RenderingMode::Standard*/,
+                                                   mitk::BaseRenderer::RenderingMode::Type renderingMode/* = mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing*/,
                                                    const QString& multiWidgetName/* = "multiwidget"*/)
   : QWidget(parent, f)
   , m_Impl(std::make_unique<Impl>(this, renderingManager, renderingMode, multiWidgetName))

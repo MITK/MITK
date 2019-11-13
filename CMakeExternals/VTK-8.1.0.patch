@@ -1,0 +1,80 @@
+diff --git a/Rendering/Core/vtkAssembly.cxx b/Rendering/Core/vtkAssembly.cxx
+index 79e4d42b65..b17c74e659 100644
+--- a/Rendering/Core/vtkAssembly.cxx
++++ b/Rendering/Core/vtkAssembly.cxx
+@@ -116,6 +116,7 @@ int vtkAssembly::RenderTranslucentPolygonalGeometry(vtkViewport *ren)
+     vtkProp3D* prop3D = static_cast<vtkProp3D *>(path->GetLastNode()->GetViewProp());
+     if ( prop3D->GetVisibility() )
+     {
++      prop3D->SetPropertyKeys(this->GetPropertyKeys());
+       prop3D->SetAllocatedRenderTime(fraction, ren);
+       prop3D->PokeMatrix(path->GetLastNode()->GetMatrix());
+       renderedSomething += prop3D->RenderTranslucentPolygonalGeometry(ren);
+@@ -143,6 +144,7 @@ int vtkAssembly::HasTranslucentPolygonalGeometry()
+     vtkProp3D* prop3D = static_cast<vtkProp3D *>(path->GetLastNode()->GetViewProp());
+     if ( prop3D->GetVisibility() )
+     {
++      prop3D->SetPropertyKeys(this->GetPropertyKeys());
+       result = prop3D->HasTranslucentPolygonalGeometry();
+     }
+   }
+@@ -175,6 +177,7 @@ int vtkAssembly::RenderVolumetricGeometry(vtkViewport *ren)
+     vtkProp3D* prop3D = static_cast<vtkProp3D *>(path->GetLastNode()->GetViewProp());
+     if (prop3D->GetVisibility())
+     {
++      prop3D->SetPropertyKeys(this->GetPropertyKeys());
+       prop3D->SetAllocatedRenderTime(fraction, ren);
+       prop3D->PokeMatrix(path->GetLastNode()->GetMatrix());
+       renderedSomething += prop3D->RenderVolumetricGeometry(ren);
+@@ -210,6 +213,7 @@ int vtkAssembly::RenderOpaqueGeometry(vtkViewport *ren)
+     vtkProp3D* prop3D = static_cast<vtkProp3D *>(path->GetLastNode()->GetViewProp());
+     if (prop3D->GetVisibility())
+     {
++      prop3D->SetPropertyKeys(this->GetPropertyKeys());
+       prop3D->PokeMatrix(path->GetLastNode()->GetMatrix());
+       prop3D->SetAllocatedRenderTime(fraction, ren);
+       renderedSomething += prop3D->RenderOpaqueGeometry(ren);
+diff --git a/Rendering/Core/vtkPropAssembly.cxx b/Rendering/Core/vtkPropAssembly.cxx
+index 5033c3b66e..405b1a75ab 100644
+--- a/Rendering/Core/vtkPropAssembly.cxx
++++ b/Rendering/Core/vtkPropAssembly.cxx
+@@ -97,6 +97,7 @@ int vtkPropAssembly::RenderTranslucentPolygonalGeometry(vtkViewport *ren)
+     prop = path->GetLastNode()->GetViewProp();
+     if ( prop->GetVisibility() )
+     {
++      prop->SetPropertyKeys(this->GetPropertyKeys());
+       prop->SetAllocatedRenderTime(fraction, ren);
+       prop->PokeMatrix(path->GetLastNode()->GetMatrix());
+       renderedSomething += prop->RenderTranslucentPolygonalGeometry(ren);
+@@ -125,6 +126,7 @@ int vtkPropAssembly::HasTranslucentPolygonalGeometry()
+     prop = path->GetLastNode()->GetViewProp();
+     if ( prop->GetVisibility() )
+     {
++      prop->SetPropertyKeys(this->GetPropertyKeys());
+       result=prop->HasTranslucentPolygonalGeometry();
+     }
+   }
+@@ -154,6 +156,7 @@ int vtkPropAssembly::RenderVolumetricGeometry(vtkViewport *ren)
+     prop = path->GetLastNode()->GetViewProp();
+     if ( prop->GetVisibility() )
+     {
++      prop->SetPropertyKeys(this->GetPropertyKeys());
+       prop->SetAllocatedRenderTime(fraction, ren);
+       prop->PokeMatrix(path->GetLastNode()->GetMatrix());
+       renderedSomething += prop->RenderVolumetricGeometry(ren);
+@@ -186,6 +189,7 @@ int vtkPropAssembly::RenderOpaqueGeometry(vtkViewport *ren)
+     prop = path->GetLastNode()->GetViewProp();
+     if ( prop->GetVisibility() )
+     {
++      prop->SetPropertyKeys(this->GetPropertyKeys());
+       prop->SetAllocatedRenderTime(fraction, ren);
+       prop->PokeMatrix(path->GetLastNode()->GetMatrix());
+       renderedSomething += prop->RenderOpaqueGeometry(ren);
+@@ -217,6 +221,7 @@ int vtkPropAssembly::RenderOverlay(vtkViewport *ren)
+     prop = path->GetLastNode()->GetViewProp();
+     if ( prop->GetVisibility() )
+     {
++      prop->SetPropertyKeys(this->GetPropertyKeys());
+       prop->SetAllocatedRenderTime(fraction, ren);
+       prop->PokeMatrix(path->GetLastNode()->GetMatrix());
+       renderedSomething += prop->RenderOverlay(ren);

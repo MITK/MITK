@@ -40,6 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCamera.h>
 #include <vtkCellPicker.h>
 #include <vtkInteractorStyleTrackballCamera.h>
+#include <vtkInformation.h>
 #include <vtkLight.h>
 #include <vtkLightKit.h>
 #include <vtkLinearTransform.h>
@@ -169,7 +170,11 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
 
   // Update mappers and prepare mapper queue
   if (type == VtkPropRenderer::Opaque)
+  {
     this->PrepareMapperQueue();
+    // Share vtkInformation, there might be new mappers
+    this->PropagateRenderInfoToMappers();
+  }
 
   // go through the generated list and let the sorted mappers paint
   for (auto it = m_MappersMap.cbegin(); it != m_MappersMap.cend(); it++)
@@ -255,6 +260,34 @@ void mitk::VtkPropRenderer::PrepareMapperQueue()
     int nr = (layer << 16) + mapperNo;
     m_MappersMap.insert(std::pair<int, Mapper *>(nr, mapper));
     mapperNo++;
+  }
+}
+
+void mitk::VtkPropRenderer::SetPropertyKeys(vtkInformation *info)
+{
+  if (info == m_VtkRenderInfo)
+    return;
+
+  m_VtkRenderInfo = info;
+  this->PropagateRenderInfoToMappers();
+}
+
+void mitk::VtkPropRenderer::PropagateRenderInfoToMappers()
+{
+  if (m_VtkRenderInfo == nullptr)
+    return;
+
+  for (const auto &mapEntry : m_MappersMap)
+  {
+    auto vtkMapper = dynamic_cast<mitk::VtkMapper*>(mapEntry.second);
+
+    if (nullptr != vtkMapper)
+    {
+      auto prop = vtkMapper->GetVtkProp(this);
+
+      if (nullptr != prop)
+        prop->SetPropertyKeys(m_VtkRenderInfo);
+    }
   }
 }
 

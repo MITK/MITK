@@ -67,7 +67,7 @@ namespace mitk
     void Initialize(
       mitk::RenderingManager *renderingManager = nullptr,
       const char *name = "unnamed renderer",
-      mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard);
+      mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing);
     void Destroy();
 
     mitk::VtkPropRenderer::Pointer m_Renderer;

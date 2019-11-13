@@ -57,7 +57,7 @@ public:
     QWidget *parent = nullptr,
     Qt::WindowFlags f = nullptr,
     mitk::RenderingManager *renderingManager = nullptr,
-    mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard,
+    mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing,
     const QString &name = "stdmulti");
   ~QmitkStdMultiWidget() override;
 

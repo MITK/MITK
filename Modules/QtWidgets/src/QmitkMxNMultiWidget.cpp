@@ -17,6 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkMxNMultiWidget.h"
 #include "QmitkRenderWindowWidget.h"
 
+// mitk core
+#include <mitkDisplayActionEventFunctions.h>
+#include <mitkDisplayActionEventHandlerDesynchronized.h>
+#include <mitkDisplayActionEventHandlerSynchronized.h>
+
 // qt
 #include <QGridLayout>
 
@@ -32,8 +37,13 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
 void QmitkMxNMultiWidget::InitializeMultiWidget()
 {
   SetLayout(1, 1);
-
   ActivateMenuWidget(true);
+  SetDisplayActionEventHandler(std::make_unique<mitk::DisplayActionEventHandlerDesynchronized>());
+  auto displayActionEventHandler = GetDisplayActionEventHandler();
+  if (nullptr != displayActionEventHandler)
+  {
+    displayActionEventHandler->InitActions();
+  }
 }
 
 void QmitkMxNMultiWidget::MultiWidgetOpened()
@@ -44,6 +54,24 @@ void QmitkMxNMultiWidget::MultiWidgetOpened()
 void QmitkMxNMultiWidget::MultiWidgetClosed()
 {
   SetCrosshairVisibility(false);
+}
+
+void QmitkMxNMultiWidget::Synchronize(bool synchronized)
+{
+  if (synchronized)
+  {
+    SetDisplayActionEventHandler(std::make_unique<mitk::DisplayActionEventHandlerSynchronized>());
+  }
+  else
+  {
+    SetDisplayActionEventHandler(std::make_unique<mitk::DisplayActionEventHandlerDesynchronized>());
+  }
+
+  auto displayActionEventHandler = GetDisplayActionEventHandler();
+  if (nullptr != displayActionEventHandler)
+  {
+    displayActionEventHandler->InitActions();
+  }
 }
 
 QmitkRenderWindow* QmitkMxNMultiWidget::GetRenderWindow(const QString& widgetName) const
@@ -77,7 +105,6 @@ void QmitkMxNMultiWidget::SetActiveRenderWindowWidget(RenderWindowWidgetPointer 
     auto decorationColor = currentActiveRenderWindowWidget->GetDecorationColor();
     QColor hexColor(decorationColor[0] * 255, decorationColor[1] * 255, decorationColor[2] * 255);
     currentActiveRenderWindowWidget->setStyleSheet("border: 2px solid " + hexColor.name(QColor::HexRgb));
-
   }
 
   // set the new decoration color of the currently active render window widget
@@ -147,18 +174,18 @@ void QmitkMxNMultiWidget::SetWidgetPlaneMode(int userMode)
 
   switch (userMode)
   {
-  case 0:
-    SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKStandard);
-    break;
-  case 1:
-    SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKRotationUncoupled);
-    break;
-  case 2:
-    SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKRotationCoupled);
-    break;
-  case 3:
-    SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKSwivel);
-    break;
+    case 0:
+      SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKStandard);
+      break;
+    case 1:
+      SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKRotationUncoupled);
+      break;
+    case 2:
+      SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKRotationCoupled);
+      break;
+    case 3:
+      SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKSwivel);
+      break;
   }
 }
 

@@ -52,9 +52,9 @@ void QmitkMultiWidgetConfigurationToolBar::AddButtons()
   connect(setLayoutAction, &QAction::triggered, this, &QmitkMultiWidgetConfigurationToolBar::OnSetLayout);
   QToolBar::addAction(setLayoutAction);
 
-  m_SynchronizeAction = new QAction(QIcon(":/Qmitk/mwSynchronized.png"), tr("Desynchronize render windows"), this);
+  m_SynchronizeAction = new QAction(QIcon(":/Qmitk/mwDesynchronized.png"), tr("Synchronize render windows"), this);
   m_SynchronizeAction->setCheckable(true);
-  m_SynchronizeAction->setChecked(true);
+  m_SynchronizeAction->setChecked(false);
   connect(m_SynchronizeAction, &QAction::triggered, this, &QmitkMultiWidgetConfigurationToolBar::OnSynchronize);
   QToolBar::addAction(m_SynchronizeAction);
 

@@ -43,6 +43,8 @@ public:
   void MultiWidgetOpened() override;
   void MultiWidgetClosed() override;
 
+  void Synchronize(bool synchronized) override;
+
   QmitkRenderWindow* GetRenderWindow(const QString& widgetName) const override;
   QmitkRenderWindow* GetRenderWindow(const mitk::BaseRenderer::ViewDirection& viewDirection) const override;
 
@@ -73,7 +75,6 @@ Q_SIGNALS:
 private:
 
   void SetLayoutImpl() override;
-  void SynchronizeImpl() override { }
   void SetInteractionSchemeImpl() override { }
 
   void CreateRenderWindowWidget();

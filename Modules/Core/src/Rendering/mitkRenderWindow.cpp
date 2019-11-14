@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::RenderWindow::RenderWindow(vtkRenderWindow *renWin,
                                  const char *name,
                                  mitk::RenderingManager *rm,
-                                 mitk::BaseRenderer::RenderingMode::Type rmtype)
+                                 mitk::BaseRenderer::RenderingMode renderingMode)
   : m_vtkRenderWindow(renWin),
     m_vtkRenderWindowInteractor(nullptr),
     m_vtkMitkEventProvider(nullptr)
@@ -47,7 +47,7 @@ mitk::RenderWindow::RenderWindow(vtkRenderWindow *renWin,
   m_vtkRenderWindowInteractor->Initialize();
 
   // initialize from RenderWindowBase
-  this->Initialize(rm, name, rmtype);
+  this->Initialize(rm, name, renderingMode);
 
   m_vtkMitkEventProvider = vtkEventProvider::New();
   m_vtkMitkEventProvider->SetInteractor(this->GetVtkRenderWindowInteractor());

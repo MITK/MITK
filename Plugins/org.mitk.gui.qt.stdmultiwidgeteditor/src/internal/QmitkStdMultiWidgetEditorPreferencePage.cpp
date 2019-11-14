@@ -15,14 +15,52 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include <ui_QmitkStdMultiWidgetEditorPreferencePage.h>
 #include "QmitkStdMultiWidgetEditorPreferencePage.h"
+#include <ui_QmitkStdMultiWidgetEditorPreferencePage.h>
 #include <QmitkStdMultiWidgetEditor.h>
+
+#include <mitkBaseRenderer.h>
 
 #include <berryIPreferencesService.h>
 #include <berryPlatform.h>
 
+#include <vtkRenderWindow.h>
+#include <vtkRendererCollection.h>
+
 #include <QColorDialog>
+
+
+namespace
+{
+  void ChangeRenderingMode(mitk::BaseRenderer::RenderingMode renderingMode)
+  {
+    auto renderingManager = mitk::RenderingManager::GetInstance();
+
+    if (nullptr == renderingManager)
+      return;
+
+    auto renderWindows = renderingManager->GetAllRegisteredRenderWindows();
+
+    for (auto renderWindow : renderWindows)
+    {
+      auto renderers = renderWindow->GetRenderers();
+
+      if (nullptr != renderers)
+      {
+        renderers->InitTraversal();
+        auto renderer = renderers->GetNextItem();
+
+        while (nullptr != renderer)
+        {
+          renderer->SetUseFXAA(mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing == renderingMode);
+          renderer = renderers->GetNextItem();
+        }
+
+        renderingManager->RequestUpdate(renderWindow);
+      }
+    }
+  }
+}
 
 QmitkStdMultiWidgetEditorPreferencePage::QmitkStdMultiWidgetEditorPreferencePage()
   : m_Preferences(nullptr),
@@ -54,9 +92,6 @@ void QmitkStdMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
 
   QObject::connect( m_Ui->m_ResetButton, SIGNAL( clicked() )
                     , this, SLOT( ResetPreferencesAndGUI() ) );
-
-  QObject::connect( m_Ui->m_RenderingMode, SIGNAL(activated(int) )
-                    , this, SLOT( ChangeRenderingMode(int) ) );
 
   QObject::connect( m_Ui->m_RenderWindowDecorationColor, SIGNAL( clicked() )
                     , this, SLOT( ColorChooserButtonClicked() ) );
@@ -108,7 +143,10 @@ bool QmitkStdMultiWidgetEditorPreferencePage::PerformOk()
                          , m_Ui->m_EnableFlexibleZooming->isChecked());
   m_Preferences->PutBool("Show level/window widget", m_Ui->m_ShowLevelWindowWidget->isChecked());
   m_Preferences->PutBool("PACS like mouse interaction", m_Ui->m_PACSLikeMouseMode->isChecked());
-  m_Preferences->PutInt("Rendering Mode", m_Ui->m_RenderingMode->currentIndex());
+
+  auto renderingMode = static_cast<mitk::BaseRenderer::RenderingMode>(m_Ui->m_RenderingMode->currentIndex());
+  m_Preferences->PutInt("Rendering Mode", static_cast<int>(renderingMode));
+  ChangeRenderingMode(renderingMode); // Change the rendering mode now, no restart required
 
   return true;
 }
@@ -156,9 +194,10 @@ void QmitkStdMultiWidgetEditorPreferencePage::Update()
   m_Ui->m_EnableFlexibleZooming->setChecked(m_Preferences->GetBool("Use constrained zooming and panning", true));
   m_Ui->m_ShowLevelWindowWidget->setChecked(m_Preferences->GetBool("Show level/window widget", true));
   m_Ui->m_PACSLikeMouseMode->setChecked(m_Preferences->GetBool("PACS like mouse interaction", false));
-  int mode = m_Preferences->GetInt("Rendering Mode", 1);
-  m_Ui->m_RenderingMode->setCurrentIndex(mode);
   m_Ui->m_CrosshairGapSize->setValue(m_Preferences->GetInt("crosshair gap size", 32));
+
+  auto renderingMode = m_Preferences->GetInt("Rendering Mode", static_cast<int>(mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing));
+  m_Ui->m_RenderingMode->setCurrentIndex(renderingMode);
 }
 
 void QmitkStdMultiWidgetEditorPreferencePage::ColorChooserButtonClicked()
@@ -252,16 +291,4 @@ void QmitkStdMultiWidgetEditorPreferencePage::OnWidgetComboBoxChanged(int i)
   this->SetStyleSheetToColorChooserButton(gradientBackground1, m_Ui->m_ColorButton1);
   this->SetStyleSheetToColorChooserButton(gradientBackground2, m_Ui->m_ColorButton2);
   m_Ui->m_RenderWindowDecorationText->setText(m_WidgetAnnotation[i]);
-}
-
-void QmitkStdMultiWidgetEditorPreferencePage::ChangeRenderingMode(int i)
-{
-  if (0 == i)
-  {
-    m_CurrentRenderingMode = "No Anti-aliasing";
-  }
-  else if (1 == i)
-  {
-    m_CurrentRenderingMode = "Fast Approximate Anti-Aliasing (FXAA)";
-  }
 }

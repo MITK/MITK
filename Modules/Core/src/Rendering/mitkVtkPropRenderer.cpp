@@ -59,8 +59,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::VtkPropRenderer::VtkPropRenderer(const char *name,
                                        vtkRenderWindow *renWin,
-                                       mitk::RenderingManager *rm,
-                                       mitk::BaseRenderer::RenderingMode::Type renderingMode)
+                                       RenderingManager *rm,
+                                       BaseRenderer::RenderingMode renderingMode)
   : BaseRenderer(name, renWin, rm, renderingMode), m_CameraInitializedForMapperID(0)
 {
   didCount = false;

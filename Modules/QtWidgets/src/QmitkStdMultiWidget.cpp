@@ -50,7 +50,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget *parent,
                                          Qt::WindowFlags f/* = 0*/,
                                          mitk::RenderingManager *renderingManager/* = nullptr*/,
-                                         mitk::BaseRenderer::RenderingMode::Type renderingMode/* = mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing*/,
+                                         mitk::BaseRenderer::RenderingMode renderingMode/* = mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing*/,
                                          const QString &name/* = "stdmulti"*/)
   : QmitkAbstractMultiWidget(parent, f, renderingManager, renderingMode, name)
   , m_TimeNavigationController(nullptr)

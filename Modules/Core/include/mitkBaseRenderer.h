@@ -74,14 +74,11 @@ namespace mitk
     *  respective VTK objects. This has to be done at construction time because later
     *  configuring turns out to be not working on most platforms.
     */
-    struct RenderingMode
+    enum class RenderingMode : int
     {
-      enum Type
-      {
-        NoAntiAliasing = 0,
-        FastApproximateAntiAliasing = 1 // In contrast to MSAA, FXAA works with depth peeling as it is
-                                        // applied as a post-processing pass.
-      };
+      NoAntiAliasing = 0,
+      FastApproximateAntiAliasing = 1 // In contrast to MSAA, FXAA works with depth peeling as it is
+                                      // applied in a post-processing pass.
     };
 
     typedef std::map<vtkRenderWindow *, BaseRenderer *> BaseRendererMapType;
@@ -104,7 +101,7 @@ namespace mitk
     BaseRenderer(const char *name = nullptr,
                  vtkRenderWindow *renWin = nullptr,
                  mitk::RenderingManager *rm = nullptr,
-                 RenderingMode::Type mode = RenderingMode::FastApproximateAntiAliasing);
+                 RenderingMode mode = RenderingMode::FastApproximateAntiAliasing);
 
     //##Documentation
     //## @brief MapperSlotId defines which kind of mapper (e.g. 2D or 3D) should be used.

@@ -51,12 +51,6 @@ public slots:
   void ResetPreferencesAndGUI();
 
   /**
-   * @brief ChangeRenderingMode slot to chose the rendering mode via QComboBox.
-   * @param i index of the box.
-   */
-  void ChangeRenderingMode(int i);
-
-  /**
    * @brief OnWidgetComboBoxChanged slot called when the QComboBox to chose the widget was modified.
    * @param i index of the combobox to select the widget (1-4).
    */
@@ -69,11 +63,6 @@ public slots:
   void AnnotationTextChanged(QString text);
 
 protected:
-  /**
-   * @brief m_CurrentRenderingMode String for the rendering mode.
-   */
-  std::string m_CurrentRenderingMode;
-
   /**
    * @brief m_WidgetBackgroundColor1 the background colors.
    *

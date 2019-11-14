@@ -54,7 +54,6 @@ public:
   QScopedPointer<berry::IPartListener> m_PartListener;
 
   QHash<QString, QmitkRenderWindow*> m_RenderWindows;
-
 };
 
 struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
@@ -280,7 +279,8 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
     berry::IPreferences::Pointer prefs = this->GetPreferences();
 
-    mitk::BaseRenderer::RenderingMode::Type renderingMode = static_cast<mitk::BaseRenderer::RenderingMode::Type>(prefs->GetInt( "Rendering Mode" , 0 ));
+    auto renderingMode = static_cast<mitk::BaseRenderer::RenderingMode>(
+      prefs->GetInt("Rendering Mode", static_cast<int>(mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing)));
 
     d->m_StdMultiWidget = new QmitkStdMultiWidget(parent,nullptr,nullptr,renderingMode);
     d->m_RenderWindows.insert("axial", d->m_StdMultiWidget->GetRenderWindow1());

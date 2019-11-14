@@ -44,14 +44,14 @@ namespace mitk
       int height,
       int argc,
       char *argv[],
-      mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::NoAntiAliasing);
+      BaseRenderer::RenderingMode renderingMode = BaseRenderer::RenderingMode::NoAntiAliasing);
 
     /** @brief Generate a rendering test helper object including a render window of the size width * height (in
      * pixel).*/
     RenderingTestHelper(
       int width,
       int height,
-      mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::NoAntiAliasing);
+      BaseRenderer::RenderingMode renderingMode = BaseRenderer::RenderingMode::NoAntiAliasing);
 
     /** Default destructor */
     ~RenderingTestHelper();
@@ -194,7 +194,7 @@ namespace mitk
     void Initialize(
       int width,
       int height,
-      mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::NoAntiAliasing);
+      BaseRenderer::RenderingMode renderingMode = BaseRenderer::RenderingMode::NoAntiAliasing);
 
     /** @brief Prints the opengl information, e.g. version, vendor and extensions,
        *         This function can only be called after an opengl context is active.

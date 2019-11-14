@@ -41,7 +41,7 @@ derived object[..]"
 */
 void mitk::RenderWindowBase::Initialize(mitk::RenderingManager *renderingManager,
                                         const char *name,
-                                        mitk::BaseRenderer::RenderingMode::Type renderingMode)
+                                        mitk::BaseRenderer::RenderingMode renderingMode)
 {
   if (nullptr == renderingManager)
     renderingManager = mitk::RenderingManager::GetInstance();

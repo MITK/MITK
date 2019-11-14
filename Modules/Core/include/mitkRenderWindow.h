@@ -38,9 +38,8 @@ namespace mitk
     mitkClassMacroItkParent(RenderWindow, itk::Object);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self) mitkNewMacro1Param(Self, vtkRenderWindow *);
     mitkNewMacro2Param(Self, vtkRenderWindow *, const char *);
-    mitkNewMacro3Param(Self, vtkRenderWindow *, const char *, mitk::RenderingManager *);
-    mitkNewMacro4Param(
-      Self, vtkRenderWindow *, const char *, mitk::RenderingManager *, mitk::BaseRenderer::RenderingMode::Type);
+    mitkNewMacro3Param(Self, vtkRenderWindow *, const char *, RenderingManager *);
+    mitkNewMacro4Param(Self, vtkRenderWindow *, const char *, RenderingManager *, BaseRenderer::RenderingMode);
 
     ~RenderWindow() override;
 
@@ -84,8 +83,8 @@ namespace mitk
   protected:
     RenderWindow(vtkRenderWindow *existingRenderWindow = nullptr,
                  const char *name = "unnamed renderer",
-                 mitk::RenderingManager *rm = nullptr,
-                 mitk::BaseRenderer::RenderingMode::Type rmtype = mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing);
+                 RenderingManager *rm = nullptr,
+                 BaseRenderer::RenderingMode rmtype = BaseRenderer::RenderingMode::FastApproximateAntiAliasing);
 
     void ResetView();
     vtkRenderWindow *m_vtkRenderWindow;

@@ -37,7 +37,7 @@
 #include "QmitkMimeTypes.h"
 #include "QmitkRenderWindowMenu.h"
 
-QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const QString &name, mitk::VtkPropRenderer *, mitk::RenderingManager *renderingManager, mitk::BaseRenderer::RenderingMode::Type renderingMode)
+QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const QString &name, mitk::VtkPropRenderer *, mitk::RenderingManager *renderingManager, mitk::BaseRenderer::RenderingMode renderingMode)
   : QVTKOpenGLWidget(parent),
     m_ResendQtEvents(true),
     m_MenuWidget(nullptr),

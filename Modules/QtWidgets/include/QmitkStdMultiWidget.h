@@ -130,7 +130,6 @@ Q_SIGNALS:
 private:
 
   virtual void SetLayoutImpl() override;
-  virtual void SynchronizeImpl() override { }
   virtual void SetInteractionSchemeImpl() override { }
 
   void CreateRenderWindowWidgets();

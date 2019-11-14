@@ -22,10 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk core
 #include <mitkDataStorage.h>
-#include <mitkDisplayActionEvents.h>
 #include <mitkDisplayActionEventBroadcast.h>
-#include <mitkDisplayActionEventFunctions.h>
-#include <mitkDisplayActionEventHandler.h>
 
 // qt
 #include <QMouseEvent>
@@ -55,58 +52,11 @@ struct QmitkAbstractMultiWidget::Impl final
     }
   }
 
-  void Synchronize(bool synchronized)
-  {
-    auto allObserverTags = m_DisplayActionEventHandler->GetAllObserverTags();
-    for (auto observerTag : allObserverTags)
-    {
-      m_DisplayActionEventHandler->DisconnectObserver(observerTag);
-    }
-
-    if (synchronized)
-    {
-      mitk::StdFunctionCommand::ActionFunction actionFunction = mitk::DisplayActionEventFunctions::MoveCameraSynchronizedAction();
-      m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplayMoveEvent(nullptr, mitk::Vector2D()), actionFunction);
-
-      actionFunction = mitk::DisplayActionEventFunctions::SetCrosshairSynchronizedAction();
-      m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplaySetCrosshairEvent(nullptr, mitk::Point3D()), actionFunction);
-
-      actionFunction = mitk::DisplayActionEventFunctions::ZoomCameraSynchronizedAction();
-      m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplayZoomEvent(nullptr, 0.0, mitk::Point2D()), actionFunction);
-
-      actionFunction = mitk::DisplayActionEventFunctions::ScrollSliceStepperSynchronizedAction();
-      m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplayScrollEvent(nullptr, 0), actionFunction);
-    }
-    else
-    {
-      mitk::StdFunctionCommand::ActionFunction actionFunction = mitk::DisplayActionEventFunctions::MoveSenderCameraAction();
-      m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplayMoveEvent(nullptr, mitk::Vector2D()), actionFunction);
-
-      actionFunction = mitk::DisplayActionEventFunctions::SetCrosshairAction();
-      m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplaySetCrosshairEvent(nullptr, mitk::Point3D()), actionFunction);
-
-      actionFunction = mitk::DisplayActionEventFunctions::ZoomSenderCameraAction();
-      m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplayZoomEvent(nullptr, 0.0, mitk::Point2D()), actionFunction);
-
-      actionFunction = mitk::DisplayActionEventFunctions::ScrollSliceStepperAction();
-      m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplayScrollEvent(nullptr, 0), actionFunction);
-    }
-
-    // use the standard 'set level window' action for both modes
-    mitk::StdFunctionCommand::ActionFunction actionFunction = mitk::DisplayActionEventFunctions::SetLevelWindowAction();
-    m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplaySetLevelWindowEvent(nullptr, mitk::ScalarType(), mitk::ScalarType()), actionFunction);
-  }
-
   void InitializeDisplayActionEventHandling()
   {
     m_DisplayActionEventBroadcast = mitk::DisplayActionEventBroadcast::New();
     m_DisplayActionEventBroadcast->LoadStateMachine("DisplayInteraction.xml");
     m_DisplayActionEventBroadcast->SetEventConfig("DisplayConfigPACS.xml");
-
-    m_DisplayActionEventHandler = std::make_unique<mitk::DisplayActionEventHandler>();
-    m_DisplayActionEventHandler->SetObservableBroadcast(m_DisplayActionEventBroadcast);
-
-    Synchronize(false);
   }
   
   mitk::DataStorage::Pointer m_DataStorage;
@@ -195,12 +145,6 @@ void QmitkAbstractMultiWidget::SetLayout(int row, int column)
   SetLayoutImpl();
 }
 
-void QmitkAbstractMultiWidget::Synchronize(bool synchronized)
-{
-  m_Impl->Synchronize(synchronized);
-  SynchronizeImpl();
-}
-
 void QmitkAbstractMultiWidget::SetInteractionScheme(mitk::InteractionSchemeSwitcher::InteractionScheme scheme)
 {
   auto interactionSchemeSwitcher = mitk::InteractionSchemeSwitcher::New();
@@ -220,6 +164,17 @@ void QmitkAbstractMultiWidget::SetInteractionScheme(mitk::InteractionSchemeSwitc
 mitk::InteractionEventHandler* QmitkAbstractMultiWidget::GetInteractionEventHandler()
 {
   return m_Impl->m_DisplayActionEventBroadcast.GetPointer();
+}
+
+void QmitkAbstractMultiWidget::SetDisplayActionEventHandler(std::unique_ptr<mitk::DisplayActionEventHandler> displayActionEventHandler)
+{
+  m_Impl->m_DisplayActionEventHandler = std::move(displayActionEventHandler);
+  m_Impl->m_DisplayActionEventHandler->SetObservableBroadcast(m_Impl->m_DisplayActionEventBroadcast);
+}
+
+mitk::DisplayActionEventHandler* QmitkAbstractMultiWidget::GetDisplayActionEventHandler()
+{
+  return m_Impl->m_DisplayActionEventHandler.get();
 }
 
 QmitkAbstractMultiWidget::RenderWindowWidgetMap QmitkAbstractMultiWidget::GetRenderWindowWidgets() const

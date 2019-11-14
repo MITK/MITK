@@ -34,6 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPointSet.h>
 #include <mitkProperties.h>
 #include <mitkStatusBar.h>
+#include <mitkDisplayActionEventHandlerStd.h>
 #include <mitkVtkLayerController.h>
 
 // qt
@@ -106,6 +107,14 @@ void QmitkStdMultiWidget::InitializeMultiWidget()
   m_ParentNodeForGeometryPlanes->SetProperty("layer", layer);
 
   AddDisplayPlaneSubTree();
+
+  SetDisplayActionEventHandler(std::make_unique<mitk::DisplayActionEventHandlerStd>());
+
+  auto displayActionEventHandler = GetDisplayActionEventHandler();
+  if (nullptr != displayActionEventHandler)
+  {
+    displayActionEventHandler->InitActions();
+  }
 }
 
 QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow(const QString& widgetName) const

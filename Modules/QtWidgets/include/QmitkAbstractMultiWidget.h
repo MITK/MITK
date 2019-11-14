@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk core
 #include <mitkBaseRenderer.h>
+#include <mitkDisplayActionEventHandler.h>
 #include <mitkInteractionSchemeSwitcher.h>
 #include <mitkPoint.h>
 
@@ -86,10 +87,12 @@ public:
   int GetColumnCount() const;
   virtual void SetLayout(int row, int column);
 
-  virtual void Synchronize(bool synchronized);
+  virtual void Synchronize(bool synchronized) { };
   virtual void SetInteractionScheme(mitk::InteractionSchemeSwitcher::InteractionScheme scheme);
 
   mitk::InteractionEventHandler* GetInteractionEventHandler();
+  void SetDisplayActionEventHandler(std::unique_ptr<mitk::DisplayActionEventHandler> displayActionEventHandler);
+  mitk::DisplayActionEventHandler* GetDisplayActionEventHandler();
 
   RenderWindowWidgetMap GetRenderWindowWidgets() const;
   RenderWindowWidgetMap Get2DRenderWindowWidgets() const;
@@ -148,11 +151,6 @@ private:
   *        can be implemented and customized in the subclasses.
   */
   virtual void SetLayoutImpl() = 0;
-  /**
-  * @brief This function will be called by the function 'Synchronize' and
-  *        can be implemented and customized in the subclasses.
-  */
-  virtual void SynchronizeImpl() = 0;
   /**
   * @brief This function will be called by the function 'SetInteractionScheme' and
   *        can be implemented and customized in the subclasses.

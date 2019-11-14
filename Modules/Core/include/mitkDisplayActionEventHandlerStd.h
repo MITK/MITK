@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKSTDDISPLAYACTIONEVENTHANDLER_H
-#define MITKSTDDISPLAYACTIONEVENTHANDLER_H
+#ifndef MITKDISPLAYACTIONEVENTHANDLERSTD_H
+#define MITKDISPLAYACTIONEVENTHANDLERSTD_H
 
 #include <MitkCoreExports.h>
 
@@ -24,18 +24,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class MITKCORE_EXPORT StdDisplayActionEventHandler : public DisplayActionEventHandler
+  class MITKCORE_EXPORT DisplayActionEventHandlerStd : public DisplayActionEventHandler
   {
-  public:
+  protected:
 
     /**
-    * @brief Initializes common standard display actions by using the default display action event functions.
+    * @brief Initializes common standard display actions by using mixed synchronized and desynchronized display action event functions.
+    *        Uses:
+    *           - 'SetCrosshairSynchronizedAction'
+    *           - 'MoveSenderCameraAction'
+    *           - 'ZoomSenderCameraAction'
+    *           - 'ScrollSliceStepperAction'
     *
     * @pre    The class' observable (the display action event broadcast) has to be set to connect display events.
     * @throw  mitk::Exception, if the class' observable is null.
     */
-    void InitStdActions();
+    void InitActionsImpl() override;
   };
 } // end namespace mitk
 
-#endif // MITKSTDDISPLAYACTIONEVENTHANDLER_H
+#endif // MITKSTDDISPLAYACTIONEVENTHANDLERSTD_H

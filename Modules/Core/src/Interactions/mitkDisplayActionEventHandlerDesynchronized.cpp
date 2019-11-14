@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkStdDisplayActionEventHandler.h"
+#include "mitkDisplayActionEventHandlerDesynchronized.h"
 
 // mitk core
 #include "mitkDisplayActionEventFunctions.h"
@@ -22,15 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // itk
 #include <itkEventObject.h>
 
-void mitk::StdDisplayActionEventHandler::InitStdActions()
+void mitk::DisplayActionEventHandlerDesynchronized::InitActionsImpl()
 {
-  if (m_ObservableBroadcast.IsExpired())
-  {
-    mitkThrow() << "No display action event broadcast class set to observe. Use 'SetObservableBroadcast' before initializing actions.";
-  }
-
-  auto observableBroadcast = m_ObservableBroadcast.Lock();
-
   StdFunctionCommand::ActionFunction actionFunction = DisplayActionEventFunctions::MoveSenderCameraAction();
   ConnectDisplayActionEvent(DisplayMoveEvent(nullptr, Vector2D()), actionFunction);
 
@@ -42,4 +35,7 @@ void mitk::StdDisplayActionEventHandler::InitStdActions()
 
   actionFunction = DisplayActionEventFunctions::ScrollSliceStepperAction();
   ConnectDisplayActionEvent(DisplayScrollEvent(nullptr, 0), actionFunction);
+
+  actionFunction = mitk::DisplayActionEventFunctions::SetLevelWindowAction();
+  ConnectDisplayActionEvent(mitk::DisplaySetLevelWindowEvent(nullptr, mitk::ScalarType(), mitk::ScalarType()), actionFunction);
 }

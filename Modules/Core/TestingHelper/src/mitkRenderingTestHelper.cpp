@@ -50,21 +50,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::RenderingTestHelper::RenderingTestHelper(int width,
                                                int height,
-                                               mitk::BaseRenderer::RenderingMode::Type renderingMode)
+                                               BaseRenderer::RenderingMode renderingMode)
   : m_AutomaticallyCloseRenderWindow(true)
 {
   this->Initialize(width, height, renderingMode);
 }
 
 mitk::RenderingTestHelper::RenderingTestHelper(
-  int width, int height, int argc, char *argv[], mitk::BaseRenderer::RenderingMode::Type renderingMode)
+  int width, int height, int argc, char *argv[], BaseRenderer::RenderingMode renderingMode)
   : m_AutomaticallyCloseRenderWindow(true)
 {
   this->Initialize(width, height, renderingMode);
   this->SetInputFileNames(argc, argv);
 }
 
-void mitk::RenderingTestHelper::Initialize(int width, int height, mitk::BaseRenderer::RenderingMode::Type renderingMode)
+void mitk::RenderingTestHelper::Initialize(int width, int height, BaseRenderer::RenderingMode renderingMode)
 {
   mitk::UIDGenerator uidGen = mitk::UIDGenerator("UnnamedRenderer_", 8);
   m_RenderWindow = mitk::RenderWindow::New(nullptr, uidGen.GetUID().c_str(), nullptr, renderingMode);

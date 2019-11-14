@@ -72,7 +72,7 @@ namespace mitk
                        const char *,
                        vtkRenderWindow *,
                        mitk::RenderingManager *,
-                       mitk::BaseRenderer::RenderingMode::Type);
+                       mitk::BaseRenderer::RenderingMode);
 
     typedef std::map<int, Mapper *> MappersMapType;
 
@@ -200,7 +200,7 @@ namespace mitk
       const char *name = "VtkPropRenderer",
       vtkRenderWindow *renWin = nullptr,
       mitk::RenderingManager *rm = nullptr,
-      mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing);
+      mitk::BaseRenderer::RenderingMode renderingMode = mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing);
     ~VtkPropRenderer() override;
     void Update() override;
 

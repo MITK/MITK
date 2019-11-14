@@ -54,7 +54,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget *parent,
                                          Qt::WindowFlags f,
                                          mitk::RenderingManager *renderingManager,
-                                         mitk::BaseRenderer::RenderingMode::Type renderingMode,
+                                         mitk::BaseRenderer::RenderingMode renderingMode,
                                          const QString &name)
   : QWidget(parent, f),
     mitkWidget1(nullptr),

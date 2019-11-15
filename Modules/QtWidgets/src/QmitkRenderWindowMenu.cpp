@@ -456,7 +456,7 @@ void QmitkRenderWindowMenu::OnTSNumChanged(int num)
 
     m_TSLabel->setText(QString::number(num * 2 + 1));
     m_Renderer->SendUpdateSlice();
-    m_Renderer->GetRenderingManager()->RequestUpdateAll();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 

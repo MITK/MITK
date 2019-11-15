@@ -22,10 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
                                          Qt::WindowFlags f/* = 0*/,
-                                         mitk::RenderingManager* renderingManager/* = nullptr*/,
-                                         mitk::BaseRenderer::RenderingMode::Type renderingMode/* = mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing*/,
                                          const QString& multiWidgetName/* = "mxnmulti"*/)
-  : QmitkAbstractMultiWidget(parent, f, renderingManager, renderingMode, multiWidgetName)
+  : QmitkAbstractMultiWidget(parent, f, multiWidgetName)
   , m_CrosshairVisibility(false)
 {
   // nothing here
@@ -138,13 +136,7 @@ void QmitkMxNMultiWidget::ResetCrosshair()
     return;
   }
 
-  auto renderingManager = GetRenderingManager();
-  if (nullptr == renderingManager)
-  {
-    return;
-  }
-
-  renderingManager->InitializeViewsByBoundingObjects(dataStorage);
+  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(dataStorage);
 
   SetWidgetPlaneMode(mitk::InteractionSchemeSwitcher::MITKStandard);
 }
@@ -241,7 +233,7 @@ void QmitkMxNMultiWidget::CreateRenderWindowWidget()
 {
   // create the render window widget and connect signal / slot
   QString renderWindowWidgetName = GetNameFromIndex(GetNumberOfRenderWindowWidgets());
-  RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage(), GetRenderingManager());
+  RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage());
   renderWindowWidget->SetCornerAnnotationText(renderWindowWidgetName.toStdString());
 
   connect(renderWindowWidget.get(), &QmitkRenderWindowWidget::MouseEvent, this, &QmitkMxNMultiWidget::mousePressEvent);

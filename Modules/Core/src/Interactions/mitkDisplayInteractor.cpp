@@ -157,7 +157,7 @@ bool mitk::DisplayInteractor::CheckRotationPossible(const mitk::InteractionEvent
 
   const double threshholdDistancePixels = 12.0;
 
-  auto renWindows = interactionEvent->GetSender()->GetRenderingManager()->GetAllRegisteredRenderWindows();
+  auto renWindows = RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
 
   for (auto renWin : renWindows)
   {
@@ -272,7 +272,7 @@ bool mitk::DisplayInteractor::CheckSwivelPossible(const mitk::InteractionEvent *
   const PlaneGeometry *otherGeometry1(nullptr);
   const PlaneGeometry *otherGeometry2(nullptr);
 
-  auto renWindows = interactionEvent->GetSender()->GetRenderingManager()->GetAllRegisteredRenderWindows();
+  auto renWindows = RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
 
   for (auto renWin : renWindows)
   {
@@ -377,7 +377,7 @@ void mitk::DisplayInteractor::Move(StateMachineAction *, InteractionEvent *inter
   moveVector *= sender->GetScaleFactorMMPerDisplayUnit();
 
   sender->GetCameraController()->MoveBy(moveVector);
-  sender->GetRenderingManager()->RequestUpdate(sender->GetRenderWindow());
+  RenderingManager::GetInstance()->RequestUpdate(sender->GetRenderWindow());
   m_LastDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
 }
 
@@ -387,7 +387,7 @@ void mitk::DisplayInteractor::SetCrosshair(mitk::StateMachineAction *, mitk::Int
   Point3D pos = positionEvent->GetPositionInWorld();
 
   const BaseRenderer::Pointer sender = interactionEvent->GetSender();
-  auto renWindows = sender->GetRenderingManager()->GetAllRegisteredRenderWindows();
+  auto renWindows = RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
   for (auto renWin : renWindows)
   {
     if (BaseRenderer::GetInstance(renWin)->GetMapperID() == BaseRenderer::Standard2D && renWin != sender->GetRenderWindow())
@@ -399,7 +399,7 @@ void mitk::DisplayInteractor::SetCrosshair(mitk::StateMachineAction *, mitk::Int
 
 void mitk::DisplayInteractor::IncreaseTimeStep(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  auto sliceNaviController = interactionEvent->GetSender()->GetRenderingManager()->GetTimeNavigationController();
+  auto sliceNaviController = RenderingManager::GetInstance()->GetTimeNavigationController();
   auto stepper = sliceNaviController->GetTime();
   stepper->SetAutoRepeat(true);
   stepper->Next();
@@ -407,7 +407,7 @@ void mitk::DisplayInteractor::IncreaseTimeStep(StateMachineAction *, Interaction
 
 void mitk::DisplayInteractor::DecreaseTimeStep(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  auto sliceNaviController = interactionEvent->GetSender()->GetRenderingManager()->GetTimeNavigationController();
+  auto sliceNaviController = RenderingManager::GetInstance()->GetTimeNavigationController();
   auto stepper = sliceNaviController->GetTime();
   stepper->SetAutoRepeat(true);
   stepper->Previous();
@@ -450,7 +450,7 @@ void mitk::DisplayInteractor::Zoom(StateMachineAction *, InteractionEvent *inter
   {
     const BaseRenderer::Pointer sender = interactionEvent->GetSender();
     sender->GetCameraController()->Zoom(factor, m_StartCoordinateInMM);
-    sender->GetRenderingManager()->RequestUpdate(sender->GetRenderWindow());
+    RenderingManager::GetInstance()->RequestUpdate(sender->GetRenderWindow());
   }
 }
 
@@ -613,7 +613,7 @@ void mitk::DisplayInteractor::AdjustLevelWindow(StateMachineAction *, Interactio
   lv.SetLevelWindow(level, window);
   dynamic_cast<mitk::LevelWindowProperty *>(node->GetProperty("levelwindow"))->SetLevelWindow(lv);
 
-  sender->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::DisplayInteractor::StartRotation(mitk::StateMachineAction *, mitk::InteractionEvent *)

@@ -97,8 +97,7 @@ void mitk::PointSetDataInteractor::AddPoint(StateMachineAction *stateMachineActi
     if (!m_UndoEnabled)
       delete doOp;
 
-    // Request update
-    interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+    RenderingManager::GetInstance()->RequestUpdateAll();
 
     // Check if points form a closed contour now, if so fire an InternalEvent
     IsClosedContour(stateMachineAction, interactionEvent);
@@ -147,7 +146,7 @@ void mitk::PointSetDataInteractor::SelectPoint(StateMachineAction *, Interaction
       if (!m_UndoEnabled)
         delete doOp;
 
-      interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+      RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
 }
@@ -202,7 +201,7 @@ void mitk::PointSetDataInteractor::RemovePoint(StateMachineAction *, Interaction
         this->SelectPoint(m_PointSet->Begin(timeStep)->Index(), timeStep, timeInMs);
       }
     }
-    interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+    RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 
@@ -271,7 +270,7 @@ void mitk::PointSetDataInteractor::MovePoint(StateMachineAction *stateMachineAct
     }
     m_LastPoint = newPoint; // for calculation of the direction vector
     // Update the display
-    interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+    RenderingManager::GetInstance()->RequestUpdateAll();
     IsClosedContour(stateMachineAction, interactionEvent);
   }
 }
@@ -306,7 +305,7 @@ void mitk::PointSetDataInteractor::UnSelectPointAtPosition(StateMachineAction *,
       if (!m_UndoEnabled)
         delete doOp;
 
-      interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+      RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
 }
@@ -361,7 +360,7 @@ void mitk::PointSetDataInteractor::UnSelectAll(mitk::StateMachineAction *, mitk:
     this->UnselectAll(timeStep, timeInMs);
   }
 
-  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::PointSetDataInteractor::UpdatePointSet(mitk::StateMachineAction *, mitk::InteractionEvent *)
@@ -481,7 +480,7 @@ void mitk::PointSetDataInteractor::FinishMove(StateMachineAction *, InteractionE
     }
 
     // Update the display
-    interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+    RenderingManager::GetInstance()->RequestUpdateAll();
   }
   else
   {

@@ -222,7 +222,7 @@ public:
     vtkRenderWindow *renderWindow = vtkRenderWindow::New();
 
     mitk::VtkPropRenderer::Pointer base =
-      mitk::VtkPropRenderer::New("the first renderer", renderWindow, mitk::RenderingManager::GetInstance());
+      mitk::VtkPropRenderer::New("the first renderer", renderWindow);
 
     // with BaseRenderer==Null
     MITK_TEST_CONDITION(!dataNode->IsSelected(), "Testing if this node is not set as selected")

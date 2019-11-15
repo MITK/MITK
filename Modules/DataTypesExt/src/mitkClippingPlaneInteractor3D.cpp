@@ -87,7 +87,7 @@ void mitk::ClippingPlaneInteractor3D::SelectObject(StateMachineAction *, Interac
   // Colorize surface / wireframe dependend on distance from picked point
   this->ColorizeSurface(interactionEvent->GetSender(), 0.0);
 
-  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::ClippingPlaneInteractor3D::DeselectObject(StateMachineAction *, InteractionEvent *interactionEvent)
@@ -102,7 +102,7 @@ void mitk::ClippingPlaneInteractor3D::DeselectObject(StateMachineAction *, Inter
   // Colorize surface / wireframe as inactive
   this->ColorizeSurface(interactionEvent->GetSender(), -1.0);
 
-  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::ClippingPlaneInteractor3D::InitTranslate(StateMachineAction *, InteractionEvent *interactionEvent)
@@ -204,7 +204,7 @@ void mitk::ClippingPlaneInteractor3D::TranslateObject(StateMachineAction *, Inte
   this->GetDataNode()->GetData()->GetGeometry(timeStep)->SetOrigin(
     origin + transformedObjectNormal * (interactionMove * transformedObjectNormal));
 
-  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::ClippingPlaneInteractor3D::RotateObject(StateMachineAction *, InteractionEvent *interactionEvent)
@@ -283,7 +283,7 @@ void mitk::ClippingPlaneInteractor3D::RotateObject(StateMachineAction *, Interac
     if (timeGeometry.IsNotNull())
       timeGeometry->SetTimeStepGeometry(newGeometry, timeStep);
 
-    interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+    RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 

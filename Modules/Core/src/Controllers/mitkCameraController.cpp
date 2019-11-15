@@ -198,8 +198,7 @@ void mitk::CameraController::SetStandardView(mitk::CameraController::StandardVie
     vtkRenderer->ResetCameraClippingRange();
   }
 
-  mitk::RenderingManager *rm = m_Renderer->GetRenderingManager();
-  rm->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::CameraController::MoveCameraToPoint(const mitk::Point2D &planePoint)

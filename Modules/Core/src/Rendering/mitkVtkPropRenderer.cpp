@@ -57,11 +57,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTransform.h>
 #include <vtkWorldPointPicker.h>
 
-mitk::VtkPropRenderer::VtkPropRenderer(const char *name,
-                                       vtkRenderWindow *renWin,
-                                       mitk::RenderingManager *rm,
-                                       mitk::BaseRenderer::RenderingMode::Type renderingMode)
-  : BaseRenderer(name, renWin, rm, renderingMode), m_CameraInitializedForMapperID(0)
+mitk::VtkPropRenderer::VtkPropRenderer(const char *name, vtkRenderWindow *renWin)
+  : BaseRenderer(name, renWin),
+    m_CameraInitializedForMapperID(0)
 {
   didCount = false;
 
@@ -369,7 +367,7 @@ void mitk::VtkPropRenderer::RenderingCallback(vtkObject *caller, unsigned long, 
 void mitk::VtkPropRenderer::Resize(int w, int h)
 {
   BaseRenderer::Resize(w, h);
-  m_RenderingManager->RequestUpdate(this->GetRenderWindow());
+  RenderingManager::GetInstance()->RequestUpdate(this->GetRenderWindow());
 }
 
 void mitk::VtkPropRenderer::InitSize(int w, int h)

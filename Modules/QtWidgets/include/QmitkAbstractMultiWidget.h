@@ -40,7 +40,6 @@ namespace mitk
 {
   class DataStorage;
   class InteractionEventHandler;
-  class RenderingManager;
 }
 
 /**
@@ -67,8 +66,6 @@ public:
 
   QmitkAbstractMultiWidget(QWidget* parent = 0,
                            Qt::WindowFlags f = 0,
-                           mitk::RenderingManager* renderingManager = nullptr,
-                           mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing,
                            const QString& multiWidgetName = "multiwidget");
 
   virtual ~QmitkAbstractMultiWidget();
@@ -79,8 +76,6 @@ public:
 
   virtual void SetDataStorage(mitk::DataStorage* dataStorage);
   mitk::DataStorage* GetDataStorage() const;
-
-  mitk::RenderingManager* GetRenderingManager() const;
 
   int GetRowCount() const;
   int GetColumnCount() const;

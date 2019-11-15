@@ -322,7 +322,7 @@ bool mitk::AffineBaseDataInteractor3D::CheckOverObject(const InteractionEvent *i
   return false;
 }
 
-void mitk::AffineBaseDataInteractor3D::SelectObject(StateMachineAction *, InteractionEvent *interactionEvent)
+void mitk::AffineBaseDataInteractor3D::SelectObject(StateMachineAction *, InteractionEvent *)
 {
   DataNode::Pointer node = this->GetDataNode();
 
@@ -335,12 +335,12 @@ void mitk::AffineBaseDataInteractor3D::SelectObject(StateMachineAction *, Intera
   {
     node->GetPropertyList()->SetProperty("color", selectedColor);
   }
-  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
 
   return;
 }
 
-void mitk::AffineBaseDataInteractor3D::DeselectObject(StateMachineAction *, InteractionEvent *interactionEvent)
+void mitk::AffineBaseDataInteractor3D::DeselectObject(StateMachineAction *, InteractionEvent *)
 {
   DataNode::Pointer node = this->GetDataNode();
 
@@ -354,7 +354,7 @@ void mitk::AffineBaseDataInteractor3D::DeselectObject(StateMachineAction *, Inte
     node->GetPropertyList()->SetProperty("color", selectedColor);
   }
 
-  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
 
   return;
 }
@@ -476,7 +476,7 @@ void mitk::AffineBaseDataInteractor3D::RotateObject(StateMachineAction *, Intera
     if (timeGeometry.IsNotNull())
       timeGeometry->SetTimeStepGeometry(newGeometry, timeStep);
 
-    interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+    RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 

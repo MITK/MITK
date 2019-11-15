@@ -49,20 +49,9 @@ public slots:
    */
   void ResetPreferencesAndGUI();
 
-  /**
-   * @brief ChangeRenderingMode slot to chose the rendering mode via QComboBox.
-   * @param i index of the box.
-   */
-  void ChangeRenderingMode(int i);
-
   void ChangeColormap(int i);
 
 protected:
-  /**
-   * @brief m_CurrentRenderingMode String for the rendering mode.
-   */
-  std::string m_CurrentRenderingMode;
-
   std::string m_CurrentColormap;
 
   /**

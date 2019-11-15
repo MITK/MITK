@@ -36,8 +36,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 struct QmitkAbstractMultiWidget::Impl final
 {
   Impl(QmitkAbstractMultiWidget* multiWidget,
-       mitk::RenderingManager* renderingManager,
-       mitk::BaseRenderer::RenderingMode::Type renderingMode,
        const QString& multiWidgetName);
 
   void SetDataStorage(mitk::DataStorage* dataStorage)
@@ -111,8 +109,6 @@ struct QmitkAbstractMultiWidget::Impl final
   
   mitk::DataStorage::Pointer m_DataStorage;
 
-  mitk::RenderingManager* m_RenderingManager;
-  mitk::BaseRenderer::RenderingMode::Type m_RenderingMode;
   QString m_MultiWidgetName;
 
   RenderWindowWidgetMap m_RenderWindowWidgets;
@@ -128,12 +124,8 @@ struct QmitkAbstractMultiWidget::Impl final
 };
 
 QmitkAbstractMultiWidget::Impl::Impl(QmitkAbstractMultiWidget* multiWidget,
-                                     mitk::RenderingManager* renderingManager,
-                                     mitk::BaseRenderer::RenderingMode::Type renderingMode,
                                      const QString& multiWidgetName)
   : m_DataStorage(nullptr)
-  , m_RenderingManager(renderingManager)
-  , m_RenderingMode(renderingMode)
   , m_MultiWidgetName(multiWidgetName)
   , m_MultiWidgetRows(0)
   , m_MultiWidgetColumns(0)
@@ -146,11 +138,9 @@ QmitkAbstractMultiWidget::Impl::Impl(QmitkAbstractMultiWidget* multiWidget,
 
 QmitkAbstractMultiWidget::QmitkAbstractMultiWidget(QWidget* parent,
                                                    Qt::WindowFlags f/* = 0*/,
-                                                   mitk::RenderingManager* renderingManager/* = nullptr*/,
-                                                   mitk::BaseRenderer::RenderingMode::Type renderingMode/* = mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing*/,
                                                    const QString& multiWidgetName/* = "multiwidget"*/)
   : QWidget(parent, f)
-  , m_Impl(std::make_unique<Impl>(this, renderingManager, renderingMode, multiWidgetName))
+  , m_Impl(std::make_unique<Impl>(this, multiWidgetName))
 {
   // nothing here
 }
@@ -165,17 +155,6 @@ void QmitkAbstractMultiWidget::SetDataStorage(mitk::DataStorage* dataStorage)
 mitk::DataStorage* QmitkAbstractMultiWidget::GetDataStorage() const
 {
   return m_Impl->m_DataStorage;
-}
-
-mitk::RenderingManager* QmitkAbstractMultiWidget::GetRenderingManager() const
-{
-  // use the global rendering manager if none was specified
-  if (m_Impl->m_RenderingManager == nullptr)
-  {
-    return mitk::RenderingManager::GetInstance();
-  }
-
-  return m_Impl->m_RenderingManager;
 }
 
 int QmitkAbstractMultiWidget::GetRowCount() const

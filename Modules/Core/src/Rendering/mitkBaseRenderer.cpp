@@ -94,14 +94,11 @@ vtkRenderWindow *mitk::BaseRenderer::GetRenderWindowByName(const std::string &na
 }
 
 mitk::BaseRenderer::BaseRenderer(const char *name,
-                                 vtkRenderWindow *renWin,
-                                 mitk::RenderingManager *rm,
-                                 RenderingMode::Type renderingMode)
+                                 vtkRenderWindow *renWin)
   : m_RenderWindow(nullptr),
     m_VtkRenderer(nullptr),
     m_MapperID(defaultMapper),
     m_DataStorage(nullptr),
-    m_RenderingManager(rm),
     m_LastUpdateTime(0),
     m_CameraController(nullptr),
     m_SliceNavigationController(nullptr),
@@ -190,7 +187,7 @@ mitk::BaseRenderer::BaseRenderer(const char *name,
   m_VtkRenderer->SetMaximumNumberOfPeels(16); // This could be made adjustable in the Preferences
   m_VtkRenderer->SetOcclusionRatio(0.0);
 
-  if (RenderingMode::FastApproximateAntiAliasing == renderingMode)
+  if (AntiAliasing::FastApproximate == RenderingManager::GetInstance()->GetAntiAliasing())
     m_VtkRenderer->UseFXAAOn();
 
   if (nullptr == mitk::VtkLayerController::GetInstance(m_RenderWindow))
@@ -555,22 +552,17 @@ void mitk::BaseRenderer::DrawOverlayMouse(mitk::Point2D &itkNotUsed(p2d))
 void mitk::BaseRenderer::RequestUpdate()
 {
   SetConstrainZoomingAndPanning(true);
-  m_RenderingManager->RequestUpdate(this->m_RenderWindow);
+  RenderingManager::GetInstance()->RequestUpdate(this->m_RenderWindow);
 }
 
 void mitk::BaseRenderer::ForceImmediateUpdate()
 {
-  m_RenderingManager->ForceImmediateUpdate(this->m_RenderWindow);
+  RenderingManager::GetInstance()->ForceImmediateUpdate(this->m_RenderWindow);
 }
 
 unsigned int mitk::BaseRenderer::GetNumberOfVisibleLODEnabledMappers() const
 {
   return m_NumberOfVisibleLODEnabledMappers;
-}
-
-mitk::RenderingManager *mitk::BaseRenderer::GetRenderingManager() const
-{
-  return m_RenderingManager.GetPointer();
 }
 
 /*!

@@ -162,7 +162,7 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent *event)
   if (m_ProcessingMode == REGULAR || (m_ProcessingMode == PREFERINPUT && eventIsHandled == false))
   {
     if (std::strcmp(p->GetNameOfClass(), "MousePressEvent") == 0)
-      event->GetSender()->GetRenderingManager()->SetRenderWindowFocus(event->GetSender()->GetRenderWindow());
+      RenderingManager::GetInstance()->SetRenderWindowFocus(event->GetSender()->GetRenderWindow());
     m_Interactors.sort(cmp()); // sorts interactors by layer (descending);
 
     // copy the list to prevent iterator invalidation as executing actions

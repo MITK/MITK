@@ -80,8 +80,7 @@ void mitk::SinglePointDataInteractor::AddPoint(StateMachineAction * /*stateMachi
     if (!m_UndoEnabled)
       delete doOp;
 
-    // Request update
-    interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+    RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 

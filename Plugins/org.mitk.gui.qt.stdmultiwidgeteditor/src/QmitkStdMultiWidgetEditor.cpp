@@ -139,7 +139,7 @@ void QmitkStdMultiWidgetEditor::EnableSlicingPlanes(bool enable)
   {
     return;
   }
-  
+
   multiWidget->SetWidgetPlanesVisibility(enable);
 }
 
@@ -218,8 +218,7 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
   auto multiWidget = GetMultiWidget();
   if (nullptr == multiWidget)
   {
-    mitk::BaseRenderer::RenderingMode::Type renderingMode = static_cast<mitk::BaseRenderer::RenderingMode::Type>(preferences->GetInt("Rendering Mode", 0));
-    multiWidget = new QmitkStdMultiWidget(parent, 0, nullptr, renderingMode);
+    multiWidget = new QmitkStdMultiWidget(parent, 0, nullptr);
 
     // create left toolbar: interaction scheme toolbar to switch how the render window navigation behaves (in PACS mode)
     if (nullptr == m_Impl->m_InteractionSchemeToolBar)
@@ -369,7 +368,7 @@ void QmitkStdMultiWidgetEditor::GetPreferenceDecorations(const berry::IBerryPref
     auto defaultDecorationColor = multiWidget->GetDecorationColor(i);
     auto decorationColor = preferences->Get(widgetName + " decoration color", MitkColorToHex(defaultDecorationColor));
     renderWindowWidget.second->SetDecorationColor(HexColorToMitkColor(decorationColor));
-    
+
     auto defaultCornerAnnotation = renderWindowWidget.second->GetCornerAnnotationText();
     auto cornerAnnotation = preferences->Get(widgetName + " corner annotation", QString::fromStdString(defaultCornerAnnotation));
     renderWindowWidget.second->SetCornerAnnotationText(cornerAnnotation.toStdString());

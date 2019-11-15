@@ -118,9 +118,7 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
   auto multiWidget = GetMultiWidget();
   if (nullptr == multiWidget)
   {
-    mitk::BaseRenderer::RenderingMode::Type renderingMode =
-      static_cast<mitk::BaseRenderer::RenderingMode::Type>(preferences->GetInt("Rendering Mode", 0));
-    multiWidget = new QmitkMxNMultiWidget(parent, 0, nullptr, renderingMode);
+    multiWidget = new QmitkMxNMultiWidget(parent, 0, nullptr);
 
     // create left toolbar: interaction scheme toolbar to switch how the render window navigation behaves in PACS mode
     if (nullptr == m_Impl->m_InteractionSchemeToolBar)

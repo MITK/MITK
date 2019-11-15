@@ -39,15 +39,12 @@ derived object[..]"
 
 * or short: within constructors and destructors classes are not polymorph.
 */
-void mitk::RenderWindowBase::Initialize(mitk::RenderingManager *renderingManager,
-                                        const char *name,
-                                        mitk::BaseRenderer::RenderingMode::Type renderingMode)
+void mitk::RenderWindowBase::Initialize(const char *name)
 {
-  if (nullptr == renderingManager)
-    renderingManager = mitk::RenderingManager::GetInstance();
+  auto renderingManager = mitk::RenderingManager::GetInstance();
 
   if (m_Renderer.IsNull())
-    m_Renderer = mitk::VtkPropRenderer::New(name, GetVtkRenderWindow(), renderingManager, renderingMode);
+    m_Renderer = mitk::VtkPropRenderer::New(name, GetVtkRenderWindow());
 
   m_Renderer->InitRenderer(this->GetVtkRenderWindow());
 
@@ -75,7 +72,7 @@ bool mitk::RenderWindowBase::HandleEvent(InteractionEvent *interactionEvent)
 
 void mitk::RenderWindowBase::Destroy()
 {
-  m_Renderer->GetRenderingManager()->RemoveRenderWindow(GetVtkRenderWindow());
+  RenderingManager::GetInstance()->RemoveRenderWindow(GetVtkRenderWindow());
   m_Renderer->GetVtkRenderer()->RemoveViewProp(m_RenderProp);
   m_RenderProp->Delete();
   BaseRenderer::RemoveInstance(this->GetVtkRenderWindow());

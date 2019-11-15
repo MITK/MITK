@@ -64,10 +64,7 @@ namespace mitk
     RenderWindowBase();
 
     // helper functions: within constructors and destructors classes are not polymorph.
-    void Initialize(
-      mitk::RenderingManager *renderingManager = nullptr,
-      const char *name = "unnamed renderer",
-      mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing);
+    void Initialize(const char *name = "unnamed renderer");
     void Destroy();
 
     mitk::VtkPropRenderer::Pointer m_Renderer;

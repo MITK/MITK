@@ -128,10 +128,10 @@ void mitk::PlanarFigureInteractor::MoveCurrentPoint(StateMachineAction *, Intera
   planarFigure->EvaluateFeatures();
 
   // Update rendered scene
-  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void mitk::PlanarFigureInteractor::FinalizeFigure(StateMachineAction *, InteractionEvent *interactionEvent)
+void mitk::PlanarFigureInteractor::FinalizeFigure(StateMachineAction *, InteractionEvent *)
 {
   auto *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
 
@@ -147,16 +147,16 @@ void mitk::PlanarFigureInteractor::FinalizeFigure(StateMachineAction *, Interact
   // Shape might change when figure is finalized, e.g., smoothing of subdivision polygon
   planarFigure->EvaluateFeatures();
 
-  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void mitk::PlanarFigureInteractor::EndInteraction(StateMachineAction *, InteractionEvent *interactionEvent)
+void mitk::PlanarFigureInteractor::EndInteraction(StateMachineAction *, InteractionEvent *)
 {
   auto *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
   GetDataNode()->SetBoolProperty("planarfigure.drawcontrolpoints", true);
   planarFigure->Modified();
   planarFigure->InvokeEvent(EndInteractionPlanarFigureEvent());
-  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 bool mitk::PlanarFigureInteractor::FilterEvents(InteractionEvent *interactionEvent, mitk::DataNode * /*dataNode*/)
@@ -169,7 +169,7 @@ bool mitk::PlanarFigureInteractor::FilterEvents(InteractionEvent *interactionEve
   return true;
 }
 
-void mitk::PlanarFigureInteractor::EndHovering(StateMachineAction *, InteractionEvent *interactionEvent)
+void mitk::PlanarFigureInteractor::EndHovering(StateMachineAction *, InteractionEvent *)
 {
   auto *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
   planarFigure->ResetPreviewContolPoint();
@@ -181,7 +181,7 @@ void mitk::PlanarFigureInteractor::EndHovering(StateMachineAction *, Interaction
   // Set bool property to indicate that planar figure is no longer in "hovering" mode
   GetDataNode()->SetBoolProperty("planarfigure.ishovering", false);
 
-  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::PlanarFigureInteractor::DeleteFigure(StateMachineAction *, InteractionEvent *interactionEvent)
@@ -191,7 +191,7 @@ void mitk::PlanarFigureInteractor::DeleteFigure(StateMachineAction *, Interactio
   GetDataNode()->RemoveAllObservers();
 
   interactionEvent->GetSender()->GetDataStorage()->Remove(GetDataNode());
-  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::PlanarFigureInteractor::PerformPointResetOnSelect(StateMachineAction *, InteractionEvent *)
@@ -361,7 +361,7 @@ void mitk::PlanarFigureInteractor::AddPoint(StateMachineAction *, InteractionEve
   // this->LogPrintPlanarFigureQuantities( planarFigure );
 
   // Update rendered scene
-  renderer->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::PlanarFigureInteractor::AddInitialPoint(StateMachineAction *, InteractionEvent *interactionEvent)
@@ -415,7 +415,7 @@ void mitk::PlanarFigureInteractor::AddInitialPoint(StateMachineAction *, Interac
   GetDataNode()->SetBoolProperty("PlanarFigureInitializedWindow", true, renderer);
 
   // Update rendered scene
-  renderer->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::PlanarFigureInteractor::StartHovering(StateMachineAction *, InteractionEvent *interactionEvent)
@@ -426,7 +426,6 @@ void mitk::PlanarFigureInteractor::StartHovering(StateMachineAction *, Interacti
     return;
 
   auto *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
-  const mitk::BaseRenderer *renderer = interactionEvent->GetSender();
 
   if (!m_IsHovering)
   {
@@ -437,7 +436,7 @@ void mitk::PlanarFigureInteractor::StartHovering(StateMachineAction *, Interacti
     // Set bool property to indicate that planar figure is currently in "hovering" mode
     GetDataNode()->SetBoolProperty("planarfigure.ishovering", true);
 
-    renderer->GetRenderingManager()->RequestUpdateAll();
+    RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 
@@ -468,7 +467,7 @@ void mitk::PlanarFigureInteractor::SetPreviewPointPosition(StateMachineAction *,
     planarFigure->SetPreviewControlPoint(pointProjectedOntoLine);
   }
 
-  renderer->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::PlanarFigureInteractor::HideControlPoints(StateMachineAction *, InteractionEvent * /*interactionEvent*/)
@@ -480,9 +479,7 @@ void mitk::PlanarFigureInteractor::HidePreviewPoint(StateMachineAction *, Intera
 {
   auto *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
   planarFigure->ResetPreviewContolPoint();
-
-  const mitk::BaseRenderer *renderer = interactionEvent->GetSender();
-  renderer->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 bool mitk::PlanarFigureInteractor::CheckFigureHovering(const InteractionEvent *interactionEvent)
@@ -627,7 +624,7 @@ void mitk::PlanarFigureInteractor::RemoveSelectedPoint(StateMachineAction *, Int
 
   GetDataNode()->SetBoolProperty("planarfigure.drawcontrolpoints", true);
   planarFigure->InvokeEvent(EndInteractionPlanarFigureEvent());
-  renderer->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
 
   HandleEvent(mitk::InternalEvent::New(renderer, this, "Dummy-Event"), GetDataNode());
 }

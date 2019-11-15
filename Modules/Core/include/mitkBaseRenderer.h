@@ -69,21 +69,6 @@ namespace mitk
   class MITKCORE_EXPORT BaseRenderer : public itk::Object
   {
   public:
-    /** \brief This rendering mode enumeration is specified at various constructors
-    *  of the Renderer and RenderWindow classes, which autoconfigures the
-    *  respective VTK objects. This has to be done at construction time because later
-    *  configuring turns out to be not working on most platforms.
-    */
-    struct RenderingMode
-    {
-      enum Type
-      {
-        NoAntiAliasing = 0,
-        FastApproximateAntiAliasing = 1 // In contrast to MSAA, FXAA works with depth peeling as it is
-                                        // applied as a post-processing pass.
-      };
-    };
-
     typedef std::map<vtkRenderWindow *, BaseRenderer *> BaseRendererMapType;
     static BaseRendererMapType baseRendererMap;
 
@@ -101,10 +86,7 @@ namespace mitk
     /** Standard class typedefs. */
     mitkClassMacroItkParent(BaseRenderer, itk::Object);
 
-    BaseRenderer(const char *name = nullptr,
-                 vtkRenderWindow *renWin = nullptr,
-                 mitk::RenderingManager *rm = nullptr,
-                 RenderingMode::Type mode = RenderingMode::FastApproximateAntiAliasing);
+    BaseRenderer(const char *name = nullptr, vtkRenderWindow *renWin = nullptr);
 
     //##Documentation
     //## @brief MapperSlotId defines which kind of mapper (e.g. 2D or 3D) should be used.
@@ -373,16 +355,6 @@ namespace mitk
     * rendering enabled */
     unsigned int GetNumberOfVisibleLODEnabledMappers() const;
 
-    ///**
-    //* \brief Setter for the RenderingManager that handles this instance of BaseRenderer
-    //*/
-    // void SetRenderingManager( mitk::RenderingManager* );
-
-    /**
-    * \brief Getter for the RenderingManager that handles this instance of BaseRenderer
-    */
-    virtual mitk::RenderingManager *GetRenderingManager() const;
-
     //##Documentation
     //## @brief This method converts a display point to the 3D world index
     //## using the geometry of the renderWindow.
@@ -447,10 +419,6 @@ namespace mitk
     //##Documentation
     //## @brief The DataStorage that is used for rendering.
     DataStorage::Pointer m_DataStorage;
-
-    //##Documentation
-    //## @brief The RenderingManager that manages this instance
-    RenderingManager::Pointer m_RenderingManager;
 
     //##Documentation
     //## @brief Timestamp of last call of Update().

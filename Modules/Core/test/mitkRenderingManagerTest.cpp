@@ -186,7 +186,7 @@ int mitkRenderingManagerTest(int /* argc */, char * /*argv*/ [])
   myRenderingManager->SetDataStorage(ds);
 
   vtkRenderWindow *vtkRenWin = vtkRenderWindow::New();
-  mitk::VtkPropRenderer::Pointer br = mitk::VtkPropRenderer::New("testingBR", vtkRenWin, myRenderingManager);
+  mitk::VtkPropRenderer::Pointer br = mitk::VtkPropRenderer::New("testingBR", vtkRenWin);
 
   mitk::BaseRenderer::AddInstance(vtkRenWin, br);
   myRenderingManager->AddRenderWindow(vtkRenWin);

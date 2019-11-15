@@ -67,12 +67,7 @@ namespace mitk
 
   public:
     mitkClassMacro(VtkPropRenderer, BaseRenderer);
-    mitkNewMacro3Param(VtkPropRenderer, const char *, vtkRenderWindow *, mitk::RenderingManager *);
-    mitkNewMacro4Param(VtkPropRenderer,
-                       const char *,
-                       vtkRenderWindow *,
-                       mitk::RenderingManager *,
-                       mitk::BaseRenderer::RenderingMode::Type);
+    mitkNewMacro2Param(VtkPropRenderer, const char*, vtkRenderWindow*);
 
     typedef std::map<int, Mapper *> MappersMapType;
 
@@ -196,11 +191,7 @@ namespace mitk
     static bool useImmediateModeRendering();
 
   protected:
-    VtkPropRenderer(
-      const char *name = "VtkPropRenderer",
-      vtkRenderWindow *renWin = nullptr,
-      mitk::RenderingManager *rm = nullptr,
-      mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing);
+    VtkPropRenderer(const char *name = "VtkPropRenderer", vtkRenderWindow *renWin = nullptr);
     ~VtkPropRenderer() override;
     void Update() override;
 

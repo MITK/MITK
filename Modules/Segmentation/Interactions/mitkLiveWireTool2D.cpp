@@ -366,7 +366,7 @@ void mitk::LiveWireTool2D::OnMouseMoved(StateMachineAction *, InteractionEvent *
   m_LiveWireContour = this->m_LiveWireFilter->GetOutput();
   m_LiveWireContourNode->SetData(this->m_LiveWireContour);
 
-  positionEvent->GetSender()->GetRenderingManager()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
+  RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
 }
 
 void mitk::LiveWireTool2D::OnMouseMoveNoDynamicCosts(StateMachineAction *, InteractionEvent *interactionEvent)

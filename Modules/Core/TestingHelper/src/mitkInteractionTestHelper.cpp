@@ -44,7 +44,7 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
   if (loadOkay)
   {
     // get RenderingManager instance
-    mitk::RenderingManager *rm = mitk::RenderingManager::GetInstance();
+    auto rm = mitk::RenderingManager::GetInstance();
 
     // create data storage
     m_DataStorage = mitk::StandaloneDataStorage::New();
@@ -95,8 +95,7 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
       }
 
       // create renderWindow, renderer and dispatcher
-      mitk::RenderWindow::Pointer rw =
-        mitk::RenderWindow::New(nullptr, rendererName, rm); // VtkRenderWindow is created within constructor if nullptr
+      auto rw = RenderWindow::New(nullptr, rendererName); // VtkRenderWindow is created within constructor if nullptr
 
       if (size[0] != 0 && size[1] != 0)
       {

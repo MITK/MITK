@@ -60,6 +60,6 @@ bool mitk::SegmentationInteractor::ChangeActiveLabel(StateMachineAction *, Inter
     // toolManager->WorkingDataModified.Send();
   }
 
-  sender->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
   return true;
 }

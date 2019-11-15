@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProperties.h"
 #include "mitkPropertyList.h"
 #include "mitkTimeGeometry.h"
+#include <mitkAntiAliasing.h>
 
 class vtkRenderWindow;
 class vtkObject;
@@ -290,7 +291,11 @@ namespace mitk
 
     itkGetMacro(FocusedRenderWindow, vtkRenderWindow *)
 
-      itkSetMacro(ConstrainedPanningZooming, bool);
+    itkSetMacro(ConstrainedPanningZooming, bool);
+
+    itkGetMacro(AntiAliasing, AntiAliasing)
+
+    void SetAntiAliasing(AntiAliasing antiAliasing);
 
   protected:
     enum
@@ -365,6 +370,7 @@ namespace mitk
                                     int mapperID);
 
     vtkRenderWindow *m_FocusedRenderWindow;
+    AntiAliasing m_AntiAliasing;
   };
 
 #pragma GCC visibility push(default)

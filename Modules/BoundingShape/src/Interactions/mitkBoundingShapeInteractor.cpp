@@ -288,7 +288,7 @@ bool mitk::BoundingShapeInteractor::CheckOverHandles(const InteractionEvent *int
       this->GetDataNode()->GetPropertyList()->SetProperty(activeHandleIdPropertyName,
                                                           mitk::IntProperty::New(handleNum++));
       this->GetDataNode()->GetData()->Modified();
-      interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+      RenderingManager::GetInstance()->RequestUpdateAll();
       return true;
     }
     else
@@ -302,7 +302,7 @@ bool mitk::BoundingShapeInteractor::CheckOverHandles(const InteractionEvent *int
   return false;
 }
 
-void mitk::BoundingShapeInteractor::SelectHandle(StateMachineAction *, InteractionEvent *interactionEvent)
+void mitk::BoundingShapeInteractor::SelectHandle(StateMachineAction *, InteractionEvent *)
 {
   this->DisableCrosshairNavigation();
   DataNode::Pointer node = this->GetDataNode();
@@ -318,11 +318,11 @@ void mitk::BoundingShapeInteractor::SelectHandle(StateMachineAction *, Interacti
   }
   this->GetDataNode()->GetData()->UpdateOutputInformation(); // Geometry is up-to-date
   this->GetDataNode()->GetData()->Modified();
-  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
   return;
 }
 
-void mitk::BoundingShapeInteractor::DeselectHandles(StateMachineAction *, InteractionEvent *interactionEvent)
+void mitk::BoundingShapeInteractor::DeselectHandles(StateMachineAction *, InteractionEvent *)
 {
   this->DisableCrosshairNavigation();
   DataNode::Pointer node = this->GetDataNode();
@@ -333,7 +333,7 @@ void mitk::BoundingShapeInteractor::DeselectHandles(StateMachineAction *, Intera
   this->GetDataNode()->GetPropertyList()->SetProperty(activeHandleIdPropertyName, mitk::IntProperty::New(-1));
   this->GetDataNode()->GetData()->UpdateOutputInformation(); // Geometry is up-to-date
   this->GetDataNode()->GetData()->Modified();
-  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
 
   return;
 }
@@ -358,7 +358,7 @@ void mitk::BoundingShapeInteractor::SelectObject(StateMachineAction *, Interacti
   return;
 }
 
-void mitk::BoundingShapeInteractor::DeselectObject(StateMachineAction *, InteractionEvent *interactionEvent)
+void mitk::BoundingShapeInteractor::DeselectObject(StateMachineAction *, InteractionEvent *)
 {
   this->EnableCrosshairNavigation(); // enable crosshair interaction and scolling if user is hovering over the object
 
@@ -376,7 +376,7 @@ void mitk::BoundingShapeInteractor::DeselectObject(StateMachineAction *, Interac
 
   this->GetDataNode()->GetData()->UpdateOutputInformation(); // Geometry is up-to-date
   this->GetDataNode()->GetData()->Modified();
-  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
   return;
 }
 

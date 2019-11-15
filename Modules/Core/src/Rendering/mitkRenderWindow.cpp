@@ -16,16 +16,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkRenderWindow.h"
 
-#include "mitkRenderingManager.h"
 #include "mitkVtkEventProvider.h"
 #include "mitkVtkLayerController.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 
-mitk::RenderWindow::RenderWindow(vtkRenderWindow *renWin,
-                                 const char *name,
-                                 mitk::RenderingManager *rm,
-                                 mitk::BaseRenderer::RenderingMode renderingMode)
+mitk::RenderWindow::RenderWindow(vtkRenderWindow *renWin, const char *name)
   : m_vtkRenderWindow(renWin),
     m_vtkRenderWindowInteractor(nullptr),
     m_vtkMitkEventProvider(nullptr)
@@ -47,7 +43,7 @@ mitk::RenderWindow::RenderWindow(vtkRenderWindow *renWin,
   m_vtkRenderWindowInteractor->Initialize();
 
   // initialize from RenderWindowBase
-  this->Initialize(rm, name, renderingMode);
+  this->Initialize(name);
 
   m_vtkMitkEventProvider = vtkEventProvider::New();
   m_vtkMitkEventProvider->SetInteractor(this->GetVtkRenderWindowInteractor());

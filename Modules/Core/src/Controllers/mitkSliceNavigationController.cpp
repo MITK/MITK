@@ -122,24 +122,6 @@ namespace mitk
     }
   }
 
-  RenderingManager *SliceNavigationController::GetRenderingManager() const
-  {
-    mitk::RenderingManager *renderingManager = m_RenderingManager.GetPointer();
-
-    if (renderingManager != nullptr)
-      return renderingManager;
-
-    if ( m_Renderer != nullptr )
-    {
-      renderingManager = m_Renderer->GetRenderingManager();
-
-      if (renderingManager != nullptr)
-        return renderingManager;
-    }
-
-    return mitk::RenderingManager::GetInstance();
-  }
-
   void SliceNavigationController::SetViewDirectionToDefault() { m_ViewDirection = m_DefaultViewDirection; }
   const char *SliceNavigationController::GetViewDirectionAsString() const
   {
@@ -391,9 +373,7 @@ namespace mitk
       if (m_CreatedWorldGeometry.IsNotNull())
       {
         this->InvokeEvent(GeometrySliceEvent(m_CreatedWorldGeometry, m_Slice->GetPos()));
-
-        // Request rendering update for all views
-        this->GetRenderingManager()->RequestUpdateAll();
+        RenderingManager::GetInstance()->RequestUpdateAll();
       }
     }
   }
@@ -405,9 +385,7 @@ namespace mitk
       if (m_CreatedWorldGeometry.IsNotNull())
       {
         this->InvokeEvent(GeometryTimeEvent(m_CreatedWorldGeometry, m_Time->GetPos()));
-
-        // Request rendering update for all views
-        this->GetRenderingManager()->RequestUpdateAll();
+        RenderingManager::GetInstance()->RequestUpdateAll();
       }
     }
   }

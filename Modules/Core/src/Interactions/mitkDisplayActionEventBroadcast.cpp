@@ -255,7 +255,7 @@ bool mitk::DisplayActionEventBroadcast::CheckRotationPossible(const InteractionE
 
   const ScalarType threshholdDistancePixels = 12.0;
 
-  auto allRenderWindows = renderer->GetRenderingManager()->GetAllRegisteredRenderWindows();
+  auto allRenderWindows = RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
   for (auto renderWindow : allRenderWindows)
   {
     SliceNavigationController* snc = BaseRenderer::GetInstance(renderWindow)->GetSliceNavigationController();
@@ -378,7 +378,7 @@ bool mitk::DisplayActionEventBroadcast::CheckSwivelPossible(const InteractionEve
 
   const ScalarType threshholdDistancePixels = 6.0;
 
-  auto allRenderWindows = renderer->GetRenderingManager()->GetAllRegisteredRenderWindows();
+  auto allRenderWindows = RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
   for (auto renderWindow : allRenderWindows)
   {
     SliceNavigationController* snc = BaseRenderer::GetInstance(renderWindow)->GetSliceNavigationController();
@@ -783,17 +783,17 @@ void mitk::DisplayActionEventBroadcast::Swivel(StateMachineAction* /*stateMachin
   return;
 }
 
-void mitk::DisplayActionEventBroadcast::IncreaseTimeStep(StateMachineAction* /*stateMachineAction*/, InteractionEvent* interactionEvent)
+void mitk::DisplayActionEventBroadcast::IncreaseTimeStep(StateMachineAction*, InteractionEvent*)
 {
-  auto sliceNaviController = interactionEvent->GetSender()->GetRenderingManager()->GetTimeNavigationController();
+  auto sliceNaviController = RenderingManager::GetInstance()->GetTimeNavigationController();
   auto stepper = sliceNaviController->GetTime();
   stepper->SetAutoRepeat(true);
   stepper->Next();
 }
 
-void mitk::DisplayActionEventBroadcast::DecreaseTimeStep(StateMachineAction* /*stateMachineAction*/, InteractionEvent* interactionEvent)
+void mitk::DisplayActionEventBroadcast::DecreaseTimeStep(StateMachineAction*, InteractionEvent*)
 {
-  auto sliceNaviController = interactionEvent->GetSender()->GetRenderingManager()->GetTimeNavigationController();
+  auto sliceNaviController = RenderingManager::GetInstance()->GetTimeNavigationController();
   auto stepper = sliceNaviController->GetTime();
   stepper->SetAutoRepeat(true);
   stepper->Previous();

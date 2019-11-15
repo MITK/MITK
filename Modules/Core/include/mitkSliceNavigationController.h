@@ -276,14 +276,6 @@ namespace mitk
      */
     virtual void SendTime();
 
-    /**
-     * \brief Set the RenderingManager to be used
-     *
-     * If \a nullptr, the default RenderingManager will be used.
-     */
-    itkSetObjectMacro(RenderingManager, RenderingManager);
-    mitk::RenderingManager *GetRenderingManager() const;
-
 #pragma GCC visibility push(default)
     itkEventMacro(UpdateEvent, itk::AnyEvent);
 #pragma GCC visibility pop

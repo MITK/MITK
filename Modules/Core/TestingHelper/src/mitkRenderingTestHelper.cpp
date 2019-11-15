@@ -50,24 +50,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::RenderingTestHelper::RenderingTestHelper(int width,
                                                int height,
-                                               BaseRenderer::RenderingMode renderingMode)
+                                               AntiAliasing antiAliasing)
   : m_AutomaticallyCloseRenderWindow(true)
 {
-  this->Initialize(width, height, renderingMode);
+  this->Initialize(width, height, antiAliasing);
 }
 
 mitk::RenderingTestHelper::RenderingTestHelper(
-  int width, int height, int argc, char *argv[], BaseRenderer::RenderingMode renderingMode)
+  int width, int height, int argc, char *argv[], AntiAliasing antiAliasing)
   : m_AutomaticallyCloseRenderWindow(true)
 {
-  this->Initialize(width, height, renderingMode);
+  this->Initialize(width, height, antiAliasing);
   this->SetInputFileNames(argc, argv);
 }
 
-void mitk::RenderingTestHelper::Initialize(int width, int height, BaseRenderer::RenderingMode renderingMode)
+void mitk::RenderingTestHelper::Initialize(int width, int height, AntiAliasing antiAliasing)
 {
+  RenderingManager::GetInstance()->SetAntiAliasing(antiAliasing);
+
   mitk::UIDGenerator uidGen = mitk::UIDGenerator("UnnamedRenderer_", 8);
-  m_RenderWindow = mitk::RenderWindow::New(nullptr, uidGen.GetUID().c_str(), nullptr, renderingMode);
+  m_RenderWindow = mitk::RenderWindow::New(nullptr, uidGen.GetUID().c_str());
 
   m_DataStorage = mitk::StandaloneDataStorage::New();
 

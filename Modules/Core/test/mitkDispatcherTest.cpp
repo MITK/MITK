@@ -36,7 +36,7 @@ int mitkDispatcherTest(int /*argc*/, char * /*argv*/ [])
   // Here BindDispatcherInteractor and Dispatcher should be created automatically
   vtkRenderWindow *renWin = vtkRenderWindow::New();
   mitk::VtkPropRenderer::Pointer renderer =
-    mitk::VtkPropRenderer::New("ContourRenderer", renWin, mitk::RenderingManager::GetInstance());
+    mitk::VtkPropRenderer::New("ContourRenderer", renWin);
 
   mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
   mitk::DataNode::Pointer dn;

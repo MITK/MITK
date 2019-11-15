@@ -37,7 +37,7 @@
 #include "QmitkMimeTypes.h"
 #include "QmitkRenderWindowMenu.h"
 
-QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const QString &name, mitk::VtkPropRenderer *, mitk::RenderingManager *renderingManager, mitk::BaseRenderer::RenderingMode renderingMode)
+QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const QString &name, mitk::VtkPropRenderer *)
   : QVTKOpenGLWidget(parent)
   , m_ResendQtEvents(true)
   , m_MenuWidget(nullptr)
@@ -50,7 +50,7 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const QString &name, mitk:
 
   SetRenderWindow(m_InternalRenderWindow);
 
-  Initialize(renderingManager, name.toStdString().c_str(), renderingMode);
+  Initialize(name.toStdString().c_str());
 
   setFocusPolicy(Qt::StrongFocus);
   setMouseTracking(true);
@@ -266,8 +266,8 @@ void QmitkRenderWindow::leaveEvent(QEvent *e)
 
 void QmitkRenderWindow::resizeGL(int w, int h)
 {
-  this->GetRenderer()->GetRenderingManager()->ForceImmediateUpdate(GetRenderWindow());
   QVTKOpenGLWidget::resizeGL(w, h);
+  mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(GetRenderWindow());
 }
 
 void QmitkRenderWindow::dragEnterEvent(QDragEnterEvent *event)

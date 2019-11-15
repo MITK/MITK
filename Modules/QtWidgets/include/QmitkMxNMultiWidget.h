@@ -35,8 +35,6 @@ public:
 
   QmitkMxNMultiWidget(QWidget* parent = nullptr,
                       Qt::WindowFlags f = 0,
-                      mitk::RenderingManager* renderingManager = nullptr,
-                      mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing,
                       const QString& multiWidgetName = "mxnmulti");
 
   ~QmitkMxNMultiWidget() = default;

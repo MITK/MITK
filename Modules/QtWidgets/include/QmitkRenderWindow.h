@@ -44,9 +44,7 @@ public:
   QmitkRenderWindow(
     QWidget *parent = nullptr,
     const QString &name = "unnamed renderwindow",
-    mitk::VtkPropRenderer *renderer = nullptr,
-    mitk::RenderingManager *renderingManager = nullptr,
-    mitk::BaseRenderer::RenderingMode renderingMode = mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing);
+    mitk::VtkPropRenderer *renderer = nullptr);
   ~QmitkRenderWindow() override;
 
   /**
@@ -108,7 +106,7 @@ protected:
 
   // Overloaded resize handler, see decs in QVTKOpenGLWidget.
   // Basically, we have to ensure the VTK rendering is updated for each change in window size.
-  void resizeGL(int w, int h) Q_DECL_OVERRIDE;
+  void resizeGL(int w, int h) override;
 
   /// \brief Simply says we accept the event type.
   void dragEnterEvent(QDragEnterEvent *event) override;

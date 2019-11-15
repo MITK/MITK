@@ -323,7 +323,7 @@ void QmitkOverlayController::AddOverlay(QmitkOverlay *overlay)
 
     // concatenate local propertyList and propertyList of the RenderingManager
     // local properties have priority as they are not overwritten if preset in both
-    m_PropertyList->ConcatenatePropertyList(m_RenderWindow->GetRenderer()->GetRenderingManager()->GetPropertyList(),
+    m_PropertyList->ConcatenatePropertyList(mitk::RenderingManager::GetInstance()->GetPropertyList(),
                                             false);
 
     // add the overlay to the OverlayContainer in the RenderWindow ...

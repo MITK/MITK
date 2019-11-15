@@ -22,19 +22,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkRenderWindowWidget::QmitkRenderWindowWidget(QWidget* parent/* = nullptr*/,
                                                  const QString& widgetName/* = ""*/,
-                                                 mitk::DataStorage* dataStorage/* = nullptr*/,
-                                                 mitk::RenderingManager* renderingManager/* = nullptr*/,
-                                                 mitk::BaseRenderer::RenderingMode::Type renderingMode/* = mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing*/)
+                                                 mitk::DataStorage* dataStorage/* = nullptr*/)
   : QFrame(parent)
   , m_WidgetName(widgetName)
   , m_DataStorage(dataStorage)
-  , m_RenderingManager(renderingManager)
-  , m_RenderingMode(renderingMode)
   , m_RenderWindow(nullptr)
   , m_PointSetNode(nullptr)
   , m_PointSet(nullptr)
 {
-  InitializeGUI();
+  this->InitializeGUI();
 }
 
 QmitkRenderWindowWidget::~QmitkRenderWindowWidget()
@@ -71,12 +67,12 @@ mitk::SliceNavigationController* QmitkRenderWindowWidget::GetSliceNavigationCont
 
 void QmitkRenderWindowWidget::RequestUpdate()
 {
-  m_RenderingManager->RequestUpdate(m_RenderWindow->GetRenderWindow());
+  mitk::RenderingManager::GetInstance()->RequestUpdate(m_RenderWindow->GetRenderWindow());
 }
 
 void QmitkRenderWindowWidget::ForceImmediateUpdate()
 {
-  m_RenderingManager->ForceImmediateUpdate(m_RenderWindow->GetRenderWindow());
+  mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(m_RenderWindow->GetRenderWindow());
 }
 
 void QmitkRenderWindowWidget::SetGradientBackgroundColors(const mitk::Color& upper, const mitk::Color& lower)
@@ -194,24 +190,18 @@ void QmitkRenderWindowWidget::InitializeGUI()
     return;
   }
 
-  if (nullptr == m_RenderingManager)
-  {
-    return;
-  }
-
-  m_RenderingManager->SetDataStorage(m_DataStorage);
+  mitk::RenderingManager::GetInstance()->SetDataStorage(m_DataStorage);
 
   // create render window for this render window widget
-  m_RenderWindow = new QmitkRenderWindow(this, m_WidgetName, nullptr, m_RenderingManager, m_RenderingMode);
+  m_RenderWindow = new QmitkRenderWindow(this, m_WidgetName, nullptr);
   m_RenderWindow->SetLayoutIndex(mitk::BaseRenderer::ViewDirection::SAGITTAL);
   m_RenderWindow->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
-  m_RenderWindow->GetSliceNavigationController()->SetRenderingManager(m_RenderingManager);
   m_RenderWindow->GetSliceNavigationController()->SetCrosshairEvent.AddListener(mitk::MessageDelegate1<QmitkRenderWindowWidget, mitk::Point3D>(this, &QmitkRenderWindowWidget::SetCrosshair));
 
   connect(m_RenderWindow, &QVTKOpenGLWidget::mouseEvent, this, &QmitkRenderWindowWidget::MouseEvent);
 
   mitk::TimeGeometry::ConstPointer timeGeometry = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
-  m_RenderingManager->InitializeViews(timeGeometry);
+  mitk::RenderingManager::GetInstance()->InitializeViews(timeGeometry);
   m_Layout->addWidget(m_RenderWindow);
 
   // add point set as a crosshair
@@ -264,5 +254,5 @@ void QmitkRenderWindowWidget::InitializeDecorations()
 void QmitkRenderWindowWidget::SetCrosshair(mitk::Point3D selectedPoint)
 {
   m_PointSet->SetPoint(1, selectedPoint, 0);
-  m_RenderingManager->RequestUpdate(m_RenderWindow->GetRenderWindow());
+  mitk::RenderingManager::GetInstance()->RequestUpdate(m_RenderWindow->GetRenderWindow());
 }

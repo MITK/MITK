@@ -38,6 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPluginActivator.h"
 #include "mitkCameraController.h"
 #include "mitkLabelSetImage.h"
+#include "mitkImageTimeSelector.h"
 
 #include <QmitkRenderWindow.h>
 
@@ -225,6 +226,19 @@ void QmitkSegmentationView::CreateNewSegmentation()
          {
            // user clicked cancel or pressed Esc or something similar
            return;
+         }
+
+         if (image->GetDimension() > 3)
+         {
+             auto result = QMessageBox::question(m_Parent, tr("Generate a dynamic mask?"),tr("The selected image has multiple time steps. Should a dynmmic/multi timestep mask be generated (Yes). If you select \"No\" a normal static mask will be generated."));
+             if (result == QMessageBox::NoButton)
+             {
+                 auto selector = mitk::ImageTimeSelector::New();
+                 selector->SetInput(image);
+                 selector->SetTimeNr(0);
+                 selector->Update();
+                 image = selector->GetOutput();
+             }
          }
 
          // ask the user about an organ type and name, add this information to the image's (!) propertylist

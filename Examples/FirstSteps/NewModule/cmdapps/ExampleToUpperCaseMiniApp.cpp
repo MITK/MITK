@@ -143,12 +143,12 @@ int main(int argc, char *argv[])
   }
   //! [do processing]
 
-  catch (const itk::ExceptionObject& e)
+  catch (itk::ExceptionObject& e)
   {
     MITK_ERROR << e;
     return EXIT_FAILURE;
   }
-  catch (std::exception e)
+  catch (std::exception& e)
   {
     MITK_ERROR << e.what();
     return EXIT_FAILURE;

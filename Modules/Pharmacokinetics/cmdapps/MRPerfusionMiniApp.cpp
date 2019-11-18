@@ -865,7 +865,7 @@ int main(int argc, char* argv[])
         MITK_ERROR << e.what();
         return EXIT_FAILURE;
     }
-    catch (std::exception e)
+    catch (const std::exception& e)
     {
         MITK_ERROR << e.what();
         return EXIT_FAILURE;

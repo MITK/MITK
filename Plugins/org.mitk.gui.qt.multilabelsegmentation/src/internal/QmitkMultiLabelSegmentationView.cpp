@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanePositionManager.h"
 #include "mitkPluginActivator.h"
 #include "mitkSegTool2D.h"
+#include "mitkImageTimeSelector.h"
 
 // Qmitk
 #include "QmitkNewSegmentationDialog.h"
@@ -441,8 +442,21 @@ void QmitkMultiLabelSegmentationView::OnNewSegmentationSession()
 
   m_ToolManager->ActivateTool(-1);
 
-  mitk::Image* referenceImage = dynamic_cast<mitk::Image*>(referenceNode->GetData());
+  mitk::Image::ConstPointer referenceImage = dynamic_cast<mitk::Image*>(referenceNode->GetData());
   assert(referenceImage);
+
+  if (referenceImage->GetDimension() > 3)
+  {
+      auto result = QMessageBox::question(m_Parent, tr("Generate a static mask?"), tr("The selected image has multiple time steps. You can either generate a simple/static masks resembling the geometry of the first timestep of the image. Or you can generate a dynamic mask that equals the selected image in geometry and number of timesteps; thus a dynamic mask can change over time (e.g. according to the image)."), tr("Yes, generate a static mask"), tr("No, generate a dynamic mask"), QString(), 0, 0);
+      if (result == 0)
+      {
+          auto selector = mitk::ImageTimeSelector::New();
+          selector->SetInput(referenceImage);
+          selector->SetTimeNr(0);
+          selector->Update();
+          referenceImage = selector->GetOutput();
+      }
+  }
 
   QString newName = QString::fromStdString(referenceNode->GetName());
   newName.append("-labels");

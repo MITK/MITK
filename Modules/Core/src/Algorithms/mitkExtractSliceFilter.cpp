@@ -60,7 +60,7 @@ mitk::ExtractSliceFilter::~ExtractSliceFilter()
 
 void mitk::ExtractSliceFilter::GenerateOutputInformation()
 {
-  Superclass::GenerateOutputInformation();
+  //Superclass::GenerateOutputInformation();
   // TODO try figure out how to set the specs of the slice before it is actually extracted
   /*Image::Pointer output = this->GetOutput();
   Image::ConstPointer input = this->GetInput();
@@ -69,6 +69,173 @@ void mitk::ExtractSliceFilter::GenerateOutputInformation()
   dimensions[0] = m_WorldGeometry->GetExtent(0);
   dimensions[1] = m_WorldGeometry->GetExtent(1);
   output->Initialize(input->GetPixelType(), 2, dimensions, 1);*/
+
+  Image::ConstPointer input = this->GetInput();
+
+  if (!input)
+  {
+    return;
+  }
+
+  if (!m_WorldGeometry)
+  {
+    return;
+  }
+
+
+  Vector3D right, bottom;
+  double widthInMM, heightInMM;
+  Vector2D extent;
+
+  // set the geometry from current worldgeometry for the reusultimage
+  // this is needed that the image has the correct mitk geometry
+  // the sliceGeometry is the Geometry of the result slice
+  PlaneGeometry::Pointer sliceGeometry = m_WorldGeometry->Clone();
+
+  sliceGeometry->GetIndexToWorldTransform()->SetMatrix(m_WorldGeometry->GetIndexToWorldTransform()->GetMatrix());
+
+  // the origin of the worldGeometry is transformed to center based coordinates to be an imageGeometry
+  Point3D sliceOrigin = sliceGeometry->GetOrigin();
+
+  const auto *abstractGeometry =
+    dynamic_cast<const AbstractTransformGeometry *>(m_WorldGeometry);
+
+  const auto *planeGeometry = dynamic_cast<const PlaneGeometry *>(m_WorldGeometry);
+
+  if (abstractGeometry != nullptr)
+  {
+    extent[0] = abstractGeometry->GetParametricExtent(0);
+    extent[1] = abstractGeometry->GetParametricExtent(1);
+
+    widthInMM = abstractGeometry->GetParametricExtentInMM(0);
+    heightInMM = abstractGeometry->GetParametricExtentInMM(1);
+
+    m_OutPutSpacing[0] = widthInMM / extent[0];
+    m_OutPutSpacing[1] = heightInMM / extent[1];
+
+    right = abstractGeometry->GetPlane()->GetAxisVector(0);
+    right.Normalize();
+
+    bottom = abstractGeometry->GetPlane()->GetAxisVector(1);
+    bottom.Normalize();
+  }
+  else
+  {
+    if (planeGeometry != nullptr)
+    {
+      // if the worldGeomatry is a PlaneGeometry everything is straight forward
+      right = planeGeometry->GetAxisVector(0);
+      bottom = planeGeometry->GetAxisVector(1);
+
+      if (m_InPlaneResampleExtentByGeometry)
+      {
+        // Resampling grid corresponds to the current world geometry. This
+        // means that the spacing of the output 2D image depends on the
+        // currently selected world geometry, and *not* on the image itself.
+        extent[0] = m_WorldGeometry->GetExtent(0);
+        extent[1] = m_WorldGeometry->GetExtent(1);
+      }
+      else
+      {
+        const TimeGeometry *inputTimeGeometry = input->GetTimeGeometry();
+        if ((inputTimeGeometry == nullptr) || (inputTimeGeometry->CountTimeSteps() <= 0))
+        {
+          itkWarningMacro(<< "Error reading input image TimeGeometry.");
+          return;
+        }
+
+        // Resampling grid corresponds to the input geometry. This means that
+        // the spacing of the output 2D image is directly derived from the
+        // associated input image, regardless of the currently selected world
+        // geometry.
+        Vector3D rightInIndex, bottomInIndex;
+        inputTimeGeometry->GetGeometryForTimeStep(m_TimeStep)->WorldToIndex(right, rightInIndex);
+        inputTimeGeometry->GetGeometryForTimeStep(m_TimeStep)->WorldToIndex(bottom, bottomInIndex);
+        extent[0] = rightInIndex.GetNorm();
+        extent[1] = bottomInIndex.GetNorm();
+      }
+
+      // Get the extent of the current world geometry and calculate resampling
+      // spacing therefrom.
+      widthInMM = m_WorldGeometry->GetExtentInMM(0);
+      heightInMM = m_WorldGeometry->GetExtentInMM(1);
+
+      m_OutPutSpacing[0] = widthInMM / extent[0];
+      m_OutPutSpacing[1] = heightInMM / extent[1];
+
+      right.Normalize();
+      bottom.Normalize();
+    }
+    else
+    {
+      itkExceptionMacro("mitk::ExtractSliceFilter: No fitting geometry for reslice axis!");
+      return;
+    }
+  }
+
+  /*========== BEGIN setup extent of the slice ==========*/
+  int xMin, xMax, yMin, yMax;
+
+  xMin = yMin = 0;
+  xMax = static_cast<int>(extent[0]);
+  yMax = static_cast<int>(extent[1]);
+
+  if (m_WorldGeometry->GetReferenceGeometry())
+  {
+    double sliceBounds[6];
+    for (auto &sliceBound : sliceBounds)
+    {
+      sliceBound = 0.0;
+    }
+
+    if (this->GetClippedPlaneBounds(m_WorldGeometry->GetReferenceGeometry(), planeGeometry, sliceBounds))
+    {
+      // Calculate output extent (integer values)
+      xMin = static_cast<int>(sliceBounds[0] / m_OutPutSpacing[0] + 0.5);
+      xMax = static_cast<int>(sliceBounds[1] / m_OutPutSpacing[0] + 0.5);
+      yMin = static_cast<int>(sliceBounds[2] / m_OutPutSpacing[1] + 0.5);
+      yMax = static_cast<int>(sliceBounds[3] / m_OutPutSpacing[1] + 0.5);
+    } // ELSE we use the default values
+  }
+
+
+  sliceOrigin += right * (m_OutPutSpacing[0] * 0.5);
+  sliceOrigin += bottom * (m_OutPutSpacing[1] * 0.5);
+
+  // a worldGeometry is no imageGeometry, thus it is manually set to true
+  sliceGeometry->ImageGeometryOn();
+
+  /*At this point we have to adjust the geometry because the origin isn't correct.
+  The wrong origin is related to the rotation of the current world geometry plane.
+  This causes errors on transferring world to index coordinates. We just shift the
+  origin in each direction about the amount of the expanding (needed while rotating
+  the plane).
+  */
+  Vector3D axis0 = sliceGeometry->GetAxisVector(0);
+  Vector3D axis1 = sliceGeometry->GetAxisVector(1);
+  axis0.Normalize();
+  axis1.Normalize();
+
+  // adapt the origin. Note that for orthogonal planes the minima are '0' and thus the origin stays the same.
+  sliceOrigin += (axis0 * (xMin * m_OutPutSpacing[0])) + (axis1 * (yMin * m_OutPutSpacing[1]));
+
+  sliceGeometry->SetOrigin(sliceOrigin);
+
+  /*the bounds as well as the extent of the worldGeometry are not adapted correctly during crosshair rotation.
+  This is only a quick fix and has to be evaluated.
+  The new bounds are set via the max values of the calculated slice extent. It will look like [ 0, x, 0, y, 0, 1].
+  */
+  mitk::BoundingBox::BoundsArrayType boundsCopy;
+  boundsCopy[0] = boundsCopy[2] = boundsCopy[4] = 0;
+  boundsCopy[5] = 1;
+  boundsCopy[1] = xMax - xMin;
+  boundsCopy[3] = yMax - yMin;
+  sliceGeometry->SetBounds(boundsCopy);
+
+  sliceGeometry->Modified();
+
+  Image::Pointer output = this->GetOutput();
+  output->Initialize(input->GetPixelType(), 2, *sliceGeometry);
 }
 
 void mitk::ExtractSliceFilter::GenerateInputRequestedRegion()

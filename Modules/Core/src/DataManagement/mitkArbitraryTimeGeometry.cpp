@@ -20,6 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkGeometry3D.h>
 
+//TODO REMOVE define and its dependent code in this file after test!
+//#define MITK_PERFORMANCE_GEOMETRY_TEST
+
 mitk::ArbitraryTimeGeometry::ArbitraryTimeGeometry() = default;
 
 mitk::ArbitraryTimeGeometry::~ArbitraryTimeGeometry() = default;
@@ -37,7 +40,11 @@ void mitk::ArbitraryTimeGeometry::Initialize()
 
 mitk::TimeStepType mitk::ArbitraryTimeGeometry::CountTimeSteps() const
 {
+#ifdef MITK_PERFORMANCE_GEOMETRY_TEST
+  return static_cast<TimeStepType>(m_MaximumTimePoints.size());
+#else
   return static_cast<TimeStepType>(m_GeometryVector.size());
+#endif
 }
 
 mitk::TimePointType mitk::ArbitraryTimeGeometry::GetMinimumTimePoint() const
@@ -137,7 +144,11 @@ mitk::BaseGeometry::Pointer mitk::ArbitraryTimeGeometry::GetGeometryForTimeStep(
 {
   if ( IsValidTimeStep( timeStep ) )
   {
+#ifdef MITK_PERFORMANCE_GEOMETRY_TEST
+    return m_GeometryVector[0];
+#else
     return m_GeometryVector[timeStep];
+#endif
   }
   else
   {
@@ -162,9 +173,16 @@ mitk::BaseGeometry::Pointer
 mitk::BaseGeometry::Pointer
   mitk::ArbitraryTimeGeometry::GetGeometryCloneForTimeStep( TimeStepType timeStep ) const
 {
+#ifdef MITK_PERFORMANCE_GEOMETRY_TEST
+  if (timeStep >= m_MaximumTimePoints.size())
+    return nullptr;
+  return m_GeometryVector[0]->Clone();
+#else
+
   if ( timeStep >= m_GeometryVector.size() )
     return nullptr;
   return m_GeometryVector[timeStep]->Clone();
+#endif
 }
 
 bool mitk::ArbitraryTimeGeometry::IsValid() const
@@ -190,6 +208,22 @@ void mitk::ArbitraryTimeGeometry::ReserveSpaceForGeometries( TimeStepType number
 
 void mitk::ArbitraryTimeGeometry::Expand( mitk::TimeStepType size )
 {
+#ifdef MITK_PERFORMANCE_GEOMETRY_TEST
+  m_GeometryVector.clear();
+  m_GeometryVector.push_back(Geometry3D::New().GetPointer());
+
+  const mitk::TimeStepType lastIndex = this->CountTimeSteps() - 1;
+  const TimePointType minTP = this->GetMinimumTimePoint(lastIndex);
+  TimePointType maxTP = this->GetMaximumTimePoint(lastIndex);
+  const TimePointType duration = maxTP - minTP;
+
+  for (auto i = 0; i < size; ++i)
+  {
+    m_MinimumTimePoints.push_back(maxTP);
+    maxTP += duration;
+    m_MaximumTimePoints.push_back(maxTP);
+  }
+#else
   m_GeometryVector.reserve( size );
 
   const mitk::TimeStepType lastIndex = this->CountTimeSteps() - 1;
@@ -204,6 +238,7 @@ void mitk::ArbitraryTimeGeometry::Expand( mitk::TimeStepType size )
     maxTP += duration;
     m_MaximumTimePoints.push_back( maxTP );
   }
+#endif
 }
 
 void mitk::ArbitraryTimeGeometry::ReplaceTimeStepGeometries(const BaseGeometry *geometry)
@@ -216,14 +251,22 @@ void mitk::ArbitraryTimeGeometry::ReplaceTimeStepGeometries(const BaseGeometry *
 
 void mitk::ArbitraryTimeGeometry::SetTimeStepGeometry(BaseGeometry *geometry, TimeStepType timeStep)
 {
+#ifdef MITK_PERFORMANCE_GEOMETRY_TEST
+  m_GeometryVector.clear();
+  m_GeometryVector.push_back(geometry);
+#else
+
   assert( timeStep <= m_GeometryVector.size() );
 
   if ( timeStep == m_GeometryVector.size() )
   {
     m_GeometryVector.push_back( geometry );
   }
-
-  m_GeometryVector[timeStep] = geometry;
+  else
+  {
+    m_GeometryVector[timeStep] = geometry;
+  }
+#endif
 }
 
 itk::LightObject::Pointer mitk::ArbitraryTimeGeometry::InternalClone() const
@@ -233,10 +276,14 @@ itk::LightObject::Pointer mitk::ArbitraryTimeGeometry::InternalClone() const
   newTimeGeometry->m_MinimumTimePoints = this->m_MinimumTimePoints;
   newTimeGeometry->m_MaximumTimePoints = this->m_MaximumTimePoints;
   newTimeGeometry->m_GeometryVector.clear();
+#ifdef MITK_PERFORMANCE_GEOMETRY_TEST
+  if (this->m_GeometryVector.size()) newTimeGeometry->m_GeometryVector.push_back(this->m_GeometryVector[0]->Clone());
+#else
   for (TimeStepType i = 0; i < CountTimeSteps(); ++i)
   {
     newTimeGeometry->m_GeometryVector.push_back( this->m_GeometryVector[i]->Clone() );
   }
+#endif
   return parent;
 }
 
@@ -262,7 +309,12 @@ void mitk::ArbitraryTimeGeometry::AppendNewTimeStep(BaseGeometry *geometry,
     }
   }
 
-  m_GeometryVector.push_back( geometry );
+
+#ifdef MITK_PERFORMANCE_GEOMETRY_TEST
+  m_GeometryVector.clear();
+#endif
+
+  m_GeometryVector.push_back(geometry);
   m_MinimumTimePoints.push_back( minimumTimePoint );
   m_MaximumTimePoints.push_back( maximumTimePoint );
 }

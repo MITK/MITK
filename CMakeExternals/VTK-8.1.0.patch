@@ -78,3 +78,26 @@ index 5033c3b66e..405b1a75ab 100644
        prop->SetAllocatedRenderTime(fraction, ren);
        prop->PokeMatrix(path->GetLastNode()->GetMatrix());
        renderedSomething += prop->RenderOverlay(ren);
+diff --git a/Rendering/OpenGL2/vtkOpenGLPolyDataMapper.cxx b/D:/mitk-syk-build/bin/ep/src/VTK/Rendering/OpenGL2/vtkOpenGLPolyDataMapper.cxx
+index d714f01bb4..633eae8aaa 100644
+--- a/Rendering/OpenGL2/vtkOpenGLPolyDataMapper.cxx
++++ b/D:/mitk-syk-build/bin/ep/src/VTK/Rendering/OpenGL2/vtkOpenGLPolyDataMapper.cxx
+@@ -3100,6 +3100,8 @@ void vtkOpenGLPolyDataMapper::BuildBufferObjects(vtkRenderer *ren, vtkActor *act
+   prims[2] =  poly->GetPolys();
+   prims[3] =  poly->GetStrips();
+
++  int interpolation = act->GetProperty()->GetInterpolation();
++
+   // only rebuild what we need to
+   // if the data or mapper or selection state changed
+   // then rebuild the cell arrays
+@@ -3113,7 +3115,8 @@ void vtkOpenGLPolyDataMapper::BuildBufferObjects(vtkRenderer *ren, vtkActor *act
+     'D' << representation <<
+     'E' << this->LastSelectionState <<
+     'F' << poly->GetMTime() <<
+-    'G' << this->GetMTime();
++    'G' << this->GetMTime() <<
++    'H' << interpolation;
+   if (this->CellTextureBuildString != toString.str())
+   {
+     this->BuildCellTextures(ren, act, prims, representation);

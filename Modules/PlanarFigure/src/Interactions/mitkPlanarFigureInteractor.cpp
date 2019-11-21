@@ -475,7 +475,7 @@ void mitk::PlanarFigureInteractor::HideControlPoints(StateMachineAction *, Inter
   GetDataNode()->SetBoolProperty("planarfigure.drawcontrolpoints", false);
 }
 
-void mitk::PlanarFigureInteractor::HidePreviewPoint(StateMachineAction *, InteractionEvent *interactionEvent)
+void mitk::PlanarFigureInteractor::HidePreviewPoint(StateMachineAction *, InteractionEvent *)
 {
   auto *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
   planarFigure->ResetPreviewContolPoint();

@@ -397,7 +397,7 @@ void mitk::DisplayInteractor::SetCrosshair(mitk::StateMachineAction *, mitk::Int
   }
 }
 
-void mitk::DisplayInteractor::IncreaseTimeStep(StateMachineAction *, InteractionEvent *interactionEvent)
+void mitk::DisplayInteractor::IncreaseTimeStep(StateMachineAction *, InteractionEvent *)
 {
   auto sliceNaviController = RenderingManager::GetInstance()->GetTimeNavigationController();
   auto stepper = sliceNaviController->GetTime();
@@ -405,7 +405,7 @@ void mitk::DisplayInteractor::IncreaseTimeStep(StateMachineAction *, Interaction
   stepper->Next();
 }
 
-void mitk::DisplayInteractor::DecreaseTimeStep(StateMachineAction *, InteractionEvent *interactionEvent)
+void mitk::DisplayInteractor::DecreaseTimeStep(StateMachineAction *, InteractionEvent *)
 {
   auto sliceNaviController = RenderingManager::GetInstance()->GetTimeNavigationController();
   auto stepper = sliceNaviController->GetTime();

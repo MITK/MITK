@@ -39,7 +39,7 @@ struct IPersistableElement;
  * Clients implementing this editor input interface must override
  * <code>Object#operator==(const Object*)</code> to answer true
  * for two inputs that are
- * the same. The <code>IWorbenchPage.openEditor</code> APIs are dependent on
+ * the same. The <code>IWorkbenchPage.openEditor</code> APIs are dependent on
  * this to find an editor with the same input.
  * </p>
  * <p>

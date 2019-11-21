@@ -1,0 +1,17 @@
+/**
+\page org_mitkworkbench Using The MITK Workbench
+
+\section QMitkMitkWorkbenchManualOverview  What is the MITK Workbench
+
+The MITK Workbench is used by developers. As such the kind and number of views it contains is highly variable and dependent on the specific build. Typically it contains no special perspectives and whatever views the developer deemed desirable. Be aware, that it may contain views which are work in progress and may behave erratically.
+
+If you have been given such an executable by someone, please refer to the appropriate section of the online documentation for up to date usage information on any module. 
+
+<a href="http://docs.mitk.org/nightly/PluginListPage.html">Nightly online documentation</a>
+
+
+If you are using a nightly installer, the MITK Workbench will contain nearly all views available in MITK and as such most likely will seem confusing. Again the list of modules might be a good starting point if you want to have a rough idea of what could be of interest to you. 
+
+For a basic guide to MITK see \ref MITKUserManualPage .
+
+*/

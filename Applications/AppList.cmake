@@ -4,6 +4,7 @@
 
 option(MITK_BUILD_APP_CoreApp "Build the MITK CoreApp" OFF)
 option(MITK_BUILD_APP_Workbench "Build the MITK Workbench executable" ON)
+option(MITK_BUILD_APP_FlowBench "Build the MITK FlowBench executable" OFF)
 
 # This variable is fed to ctkFunctionSetupPlugins() macro in the
 # top-level MITK CMakeLists.txt file. This allows to automatically
@@ -18,4 +19,5 @@ option(MITK_BUILD_APP_Workbench "Build the MITK Workbench executable" ON)
 set(MITK_APPS
   CoreApp^^MITK_BUILD_APP_CoreApp^^MitkCoreApp
   Workbench^^MITK_BUILD_APP_Workbench^^MitkWorkbench
+  FlowBench^^MITK_BUILD_APP_FlowBench^^MitkFlowBench
 )

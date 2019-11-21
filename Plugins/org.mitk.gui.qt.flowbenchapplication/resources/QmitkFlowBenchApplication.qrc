@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/org.mitk.gui.qt.flowbenchapplication">
+        <file>icon.png</file>
+        <file>perspectives/eye.png</file>
+        <file>perspectives/viewer_icon.png</file>
+    </qresource>
+</RCC>

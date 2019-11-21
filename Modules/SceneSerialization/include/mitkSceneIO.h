@@ -57,6 +57,25 @@ namespace mitk
                                            bool clearStorageFirst = false);
 
     /**
+    * \brief Load a scene of objects from directory.
+    * \return DataStorage with all scene objects and their relations. If loading failed, query GetFailedNodes() and
+    * GetFailedProperties() for more detail.
+    *
+    * Does the same like LoadScene, but assumes that the given filename is the index.xml of the scene and the working directory
+    * is the directory of the given filename. This function can be used to load an already unpacked scene and create objects with
+    * parent/child relations into a DataStorage.
+    *
+    * \param filename full filename of the scene index file
+    * \param storage If given, this DataStorage is used instead of a newly created one
+    * \param clearStorageFirst If set, the provided DataStorage will be cleared before populating it with the loaded
+    * objects
+    */
+    virtual DataStorage::Pointer LoadSceneUnzipped(const std::string &indexfilename,
+      DataStorage *storage = nullptr,
+      bool clearStorageFirst = false);
+
+
+    /**
      * \brief Save a scene of objects to file
      * \return True if complete success, false if any problem occurred. Note that a scene file might still be written if
      false is returned,

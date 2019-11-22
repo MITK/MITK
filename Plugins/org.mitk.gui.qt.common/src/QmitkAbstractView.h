@@ -31,6 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryIPreferences.h>
 
+#include <boost/signals2.hpp>
+
 //# mitk stuff
 #include <org_mitk_gui_qt_common_Export.h>
 
@@ -317,6 +319,9 @@ private:
    */
   virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes);
 
+  //signal from segmentationManager
+  virtual void OnSelectionImageChanged(const mitk::DataNode* node);
+
   /**
    * Called when a <code>NULL</code> selection occurs.
    *
@@ -386,6 +391,7 @@ private:
 
   const QScopedPointer<QmitkAbstractViewPrivate> d;
 
+  boost::signals2::scoped_connection m_CurrentDataChange;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QmitkAbstractView::IRenderWindowPartStrategies)

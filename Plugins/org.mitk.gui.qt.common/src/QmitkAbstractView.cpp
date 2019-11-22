@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkDataNodeSelectionProvider.h"
 #include "internal/QmitkCommonActivator.h"
 #include "internal/QmitkDataNodeItemModel.h"
+#include "QmitkSynchronizeSelectedData.h"
 
 // mitk Includes
 #include <mitkLogMacros.h>
@@ -195,7 +196,6 @@ QmitkAbstractView::QmitkAbstractView()
 
 void QmitkAbstractView::CreatePartControl(QWidget* parent)
 {
-
   // scrollArea
   auto   scrollArea = new QScrollArea;
   //QVBoxLayout* scrollAreaLayout = new QVBoxLayout(scrollArea);
@@ -227,6 +227,9 @@ void QmitkAbstractView::CreatePartControl(QWidget* parent)
   parentQWidget->setLayout(parentLayout);
 
   this->AfterCreateQtPartControl();
+
+  SlotType::slot_type slot = boost::bind(&QmitkAbstractView::OnSelectionImageChanged, this, _1);
+  m_CurrentDataChange = QmitkSynchronizeSelectedData::addObserver(SynchronizeEventType::IMAGE_CHANGE, slot);
 }
 
 void QmitkAbstractView::AfterCreateQtPartControl()
@@ -536,6 +539,10 @@ void QmitkAbstractView::SynchronizeDataManagerSelection() const
 
 void QmitkAbstractView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/,
                                            const QList<mitk::DataNode::Pointer>& /*nodes*/)
+{
+}
+
+void QmitkAbstractView::OnSelectionImageChanged(const mitk::DataNode* node)
 {
 }
 

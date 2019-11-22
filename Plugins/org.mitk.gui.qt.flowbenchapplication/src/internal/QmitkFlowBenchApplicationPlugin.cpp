@@ -124,7 +124,11 @@ void QmitkFlowBenchApplicationPlugin::loadDataFromDisk(const QStringList &argume
       int argumentsAdded = 0;
       for (int i = 0; i < arguments.size(); ++i)
       {
-        if (arguments[i].right(5) == ".mitk")
+        if (arguments[i].startsWith("--flow."))
+        { //By convention no further files are specified as soon as a flow arguments comes.
+          break;
+        }
+        else if (arguments[i].right(5) == ".mitk")
         {
           mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
 

@@ -154,8 +154,6 @@ private:
   QAction* redoAction;
   QAction* imageNavigatorAction;
   QAction* resetPerspAction;
-  QAction* openStdMultiWidgetEditorAction;
-  QAction* openMxNMultiWidgetEditorAction;
 };
 
 #endif /*QMITKFLOWBENCHAPPLICATIONWORKBENCHWINDOWADVISOR_H_*/

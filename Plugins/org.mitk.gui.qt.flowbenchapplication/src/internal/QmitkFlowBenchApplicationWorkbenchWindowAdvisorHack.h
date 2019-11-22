@@ -29,7 +29,6 @@ class QmitkFlowBenchApplicationWorkbenchWindowAdvisorHack : public QObject
     void onUndo();
     void onRedo();
     void onImageNavigator();
-    void onViewNavigator();
     void onEditPreferences();
     void onQuit();
 

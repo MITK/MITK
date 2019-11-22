@@ -32,9 +32,9 @@ set(MITK_EXTENSIONS # "<repo>|<branch/tag/commit>|<src dir>"
 )
 
 # The directory containing the Qt binaries
-set(QT5_INSTALL_PREFIX "/home/user/Qt/5.11.4/gcc_64")
+set(QT5_INSTALL_PREFIX "/home/user/Qt/5.12.6/gcc_64")
 # For Windows, e.g.
-#set(QT5_INSTALL_PREFIX "C:/Qt/5.11.4/msvc2017_64")
+#set(QT5_INSTALL_PREFIX "C:/Qt/5.12.6/msvc2017_64")
 
 set(QT_BINARY_DIR "${QT5_INSTALL_PREFIX}/bin")
 

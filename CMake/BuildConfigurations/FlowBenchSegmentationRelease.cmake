@@ -1,7 +1,8 @@
-include(${CMAKE_CURRENT_LIST_DIR}/SlickSegementationStation.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/FlowBenchSegmentation.cmake)
 
 set(MITK_VTK_DEBUG_LEAKS OFF CACHE BOOL "Enable VTK Debug Leaks" FORCE)
 set(MITK_BUILD_APP_Workbench OFF CACHE BOOL "Build MITK Workbench" FORCE)
+set(MITK_WHITELIST "FlowBenchSegmentation" CACHE STRING "MITK FlowBench Whitelist" FORCE)
 
 find_package(Doxygen REQUIRED)
 

@@ -23,8 +23,35 @@ set(enabled_modules
   QtWidgetsExt
   Segmentation
   SegmentationUI
+  PlanarFigure
+  Annotation
+  IpSegmentation
+  IpFunc
+  SurfaceInterpolation
+  GraphAlgorithms
+  ImageExtraction
+  ImageStatistics
 )
 
 set(enabled_plugins
-  ""
+org.blueberry.core.commands
+org.blueberry.core.expressions
+org.blueberry.core.runtime
+org.blueberry.ui.qt
+org.blueberry.ui.qt.help
+org.blueberry.ui.qt.log
+org.mitk.core.ext
+org.mitk.core.services
+org.mitk.gui.common
+org.mitk.gui.qt.application
+org.mitk.gui.qt.common
+org.mitk.gui.qt.datamanager
+org.mitk.gui.qt.flowbench.segmentation
+org.mitk.gui.qt.flowbenchapplication
+org.mitk.gui.qt.imagenavigator
+org.mitk.gui.qt.multilabelsegmentation
+org.mitk.gui.qt.properties
+org.mitk.gui.qt.segmentation
+org.mitk.gui.qt.stdmultiwidgeteditor
+org.mitk.planarfigure
 )

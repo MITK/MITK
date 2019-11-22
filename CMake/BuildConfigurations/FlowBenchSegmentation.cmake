@@ -4,6 +4,8 @@ set(MITK_CONFIG_PACKAGES
 )
 
 set(MITK_BUILD_APP_FlowBench ON CACHE BOOL "Build MITK FlowBench" FORCE)
+
+set(MITK_WHITELIST "FlowBenchSegmentation" CACHE STRING "MITK FlowBench Whitelist" FORCE)
 	
 set(MITK_CONFIG_PLUGINS
   org.mitk.gui.qt.stdmultiwidgeteditor

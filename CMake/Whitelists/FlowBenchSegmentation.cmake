@@ -1,0 +1,30 @@
+set(enabled_modules
+  Core
+  CppMicroServices
+  DICOMReader
+  DICOMPM
+  DataTypesExt
+  AlgorithmsExt
+  DICOMQI
+  Multilabel
+  SceneSerializationBase
+  DICOMPMIO
+  DICOMReaderServices
+  ContourModel
+  DICOMSegIO
+  LegacyGL
+  MapperExt
+  SceneSerialization
+  LegacyIO
+  IOExt
+  MultilabelIO
+  AppUtil
+  QtWidgets
+  QtWidgetsExt
+  Segmentation
+  SegmentationUI
+)
+
+set(enabled_plugins
+  ""
+)

@@ -8,8 +8,6 @@ set(INTERNAL_CPP_FILES
   QmitkFlowBenchApplicationWorkbenchWindowAdvisor.cpp  
   perspectives/QmitkFlowBenchApplicationPerspective.cpp
   QmitkExtFileSaveProjectAction.cpp
-  QmitkOpenMxNMultiWidgetEditorAction.cpp
-  QmitkOpenStdMultiWidgetEditorAction.cpp
 )
 
 set(MOC_H_FILES
@@ -19,8 +17,6 @@ set(MOC_H_FILES
   src/internal/QmitkFlowBenchApplicationWorkbenchWindowAdvisor.h  
   src/internal/QmitkFlowBenchApplicationWorkbenchWindowAdvisorHack.h
   src/internal/QmitkExtFileSaveProjectAction.h
-  src/internal/QmitkOpenMxNMultiWidgetEditorAction.h
-  src/internal/QmitkOpenStdMultiWidgetEditorAction.h
 )
 
 set(CACHED_RESOURCE_FILES

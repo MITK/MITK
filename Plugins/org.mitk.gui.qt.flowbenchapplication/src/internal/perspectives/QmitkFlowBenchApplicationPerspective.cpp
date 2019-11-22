@@ -30,8 +30,7 @@ void QmitkFlowBenchApplicationPerspective::CreateInitialLayout(berry::IPageLayou
   berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.multilabelsegmentation");
   lo->SetCloseable(false);
 
-  layout->AddView("org.mitk.views.imagenavigator",
-    berry::IPageLayout::RIGHT, 0.7f, editorArea);
+  layout->AddStandaloneView("org.mitk.views.flowbench.control",false, berry::IPageLayout::RIGHT, 0.7f, editorArea);
   lo = layout->GetViewLayout("org.mitk.views.flowbench.control");
   lo->SetCloseable(false);
 

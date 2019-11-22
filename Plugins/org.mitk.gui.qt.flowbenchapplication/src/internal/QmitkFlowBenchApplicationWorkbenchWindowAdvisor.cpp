@@ -47,7 +47,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <internal/berryQtShowViewAction.h>
 #include <internal/berryQtOpenPerspectiveAction.h>
 
-#include <QmitkFileSaveAction.h>
 #include <QmitkFileExitAction.h>
 #include <QmitkCloseProjectAction.h>
 #include <QmitkUndoAction.h>
@@ -328,7 +327,6 @@ QmitkFlowBenchApplicationWorkbenchWindowAdvisor::QmitkFlowBenchApplicationWorkbe
   , lastInput(nullptr)
   , wbAdvisor(wbAdvisor)
   , showViewToolbar(true)
-  , showPerspectiveToolbar(false)
   , showVersionInfo(true)
   , showMitkVersionInfo(true)
   , showMemoryIndicator(true)
@@ -367,11 +365,6 @@ bool QmitkFlowBenchApplicationWorkbenchWindowAdvisor::GetShowMemoryIndicator()
 void QmitkFlowBenchApplicationWorkbenchWindowAdvisor::ShowViewToolbar(bool show)
 {
   showViewToolbar = show;
-}
-
-void QmitkFlowBenchApplicationWorkbenchWindowAdvisor::ShowPerspectiveToolbar(bool show)
-{
-  showPerspectiveToolbar = show;
 }
 
 void QmitkFlowBenchApplicationWorkbenchWindowAdvisor::ShowVersionInfo(bool show)
@@ -423,8 +416,6 @@ void QmitkFlowBenchApplicationWorkbenchWindowAdvisor::PostWindowCreate()
 
   auto basePath = QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/");
 
-  auto fileSaveAction = new QmitkFileSaveAction(berry::QtStyleManager::ThemeIcon(basePath + "document-save.svg"), window);
-  fileSaveAction->setShortcut(QKeySequence::Save);
   fileSaveProjectAction = new QmitkExtFileSaveProjectAction(window);
   fileSaveProjectAction->setIcon(berry::QtStyleManager::ThemeIcon(basePath + "document-save.svg"));
 
@@ -480,7 +471,6 @@ void QmitkFlowBenchApplicationWorkbenchWindowAdvisor::PostWindowCreate()
 
   QMenu* fileMenu = menuBar->addMenu("&File");
   fileMenu->setObjectName("FileMenu");
-  fileMenu->addAction(fileSaveAction);
   fileMenu->addAction(fileSaveProjectAction);
   fileMenu->addSeparator();
 
@@ -594,7 +584,6 @@ void QmitkFlowBenchApplicationWorkbenchWindowAdvisor::PostWindowCreate()
     imageNavigatorAction->setToolTip("Toggle image navigator for navigating through image");
   }
 
-  mainActionsToolBar->addAction(fileSaveProjectAction);
   mainActionsToolBar->addAction(undoAction);
   mainActionsToolBar->addAction(redoAction);
 
@@ -605,17 +594,7 @@ void QmitkFlowBenchApplicationWorkbenchWindowAdvisor::PostWindowCreate()
 
   mainWindow->addToolBar(mainActionsToolBar);
 
-  // ==== Perspective Toolbar ==================================
-  auto   qPerspectiveToolbar = new QToolBar;
-  qPerspectiveToolbar->setObjectName("perspectiveToolBar");
-
-  if (showPerspectiveToolbar)
-  {
-    qPerspectiveToolbar->addActions(perspGroup->actions());
-    mainWindow->addToolBar(qPerspectiveToolbar);
-  }
-  else
-    delete qPerspectiveToolbar;
+  // ==== View Toolbar ==================================
 
   if (showViewToolbar)
   {
@@ -642,8 +621,17 @@ void QmitkFlowBenchApplicationWorkbenchWindowAdvisor::PostWindowCreate()
     for (auto category : categoryViewDescriptorMap.uniqueKeys())
     {
       auto viewDescriptorsInCurrentCategory = categoryViewDescriptorMap.values(category);
+      QList<berry::SmartPointer<berry::IViewDescriptor> > relevantViewDescriptors;
 
-      if (!viewDescriptorsInCurrentCategory.isEmpty())
+      for (auto viewDescriptor : viewDescriptorsInCurrentCategory)
+      {
+        if (viewDescriptor->GetId() != "org.mitk.views.flowbench.control")
+        {
+          relevantViewDescriptors.push_back(viewDescriptor);
+        }
+      }
+
+      if (!relevantViewDescriptors.isEmpty())
       {
         auto toolbar = new QToolBar;
         toolbar->setObjectName(category + " View Toolbar");
@@ -672,7 +660,7 @@ void QmitkFlowBenchApplicationWorkbenchWindowAdvisor::PostWindowCreate()
           });
         }
 
-        for (auto viewDescriptor : viewDescriptorsInCurrentCategory)
+        for (auto viewDescriptor : relevantViewDescriptors)
         {
           auto viewAction = new berry::QtShowViewAction(window, viewDescriptor);
           toolbar->addAction(viewAction);

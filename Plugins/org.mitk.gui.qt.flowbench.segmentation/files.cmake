@@ -5,6 +5,7 @@ set(SRC_CPP_FILES
 set(INTERNAL_CPP_FILES
   org_mitk_gui_qt_flowbench_segmentation_Activator.cpp
   QmitkSegmentationFlowControlView.cpp
+  perspectives/QmitkFlowBenchSegmentationPerspective.cpp
 )
 
 set(UI_FILES
@@ -14,6 +15,7 @@ set(UI_FILES
 set(MOC_H_FILES
   src/internal/org_mitk_gui_qt_flowbench_segmentation_Activator.h
   src/internal/QmitkSegmentationFlowControlView.h
+  src/internal/perspectives/QmitkFlowBenchSegmentationPerspective.h
 )
 
 # list of resource files which can be used by the plug-in
@@ -23,6 +25,7 @@ set(MOC_H_FILES
 set(CACHED_RESOURCE_FILES
   resources/icon.svg
   plugin.xml
+  resources/perspectives/segmentation_icon.svg
 )
 
 # list of Qt .qrc files which contain additional resources

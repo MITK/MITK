@@ -11,15 +11,6 @@
     <product name="MITK FlowBench" application="org.mitk.qt.flowbenchapplication" />
   </extension>
 
-  <extension point="org.blueberry.ui.perspectives">
-    <perspective
-      id="org.mitk.qt.flowbenchapplication.defaultperspective"
-      name="Segmentation"
-      class="QmitkFlowBenchApplicationPerspective"
-      icon="resources/icon_research.xpm">
-    </perspective>
-  </extension>
-
    <extension point="org.blueberry.ui.preferencePages">
      <page
        id="org.blueberry.ui.preferencePages.Style"

@@ -15,22 +15,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef QMITKFLOWBENCHAPPLICATIONPERSPECTIVE_H_
-#define QMITKFLOWBENCHAPPLICATIONPERSPECTIVE_H_
+#ifndef QMITKFLOWBENCHSEGMENTATIONPERSPECTIVE_H_
+#define QMITKFLOWBENCHSEGMENTATIONPERSPECTIVE_H_
 
 #include <berryIPerspectiveFactory.h>
 
-class QmitkFlowBenchApplicationPerspective : public QObject, public berry::IPerspectiveFactory
+class QmitkFlowBenchSegmentationPerspective : public QObject, public berry::IPerspectiveFactory
 {
   Q_OBJECT
   Q_INTERFACES(berry::IPerspectiveFactory)
 
 public:
 
-  QmitkFlowBenchApplicationPerspective();
+  QmitkFlowBenchSegmentationPerspective();
 
   void CreateInitialLayout(berry::IPageLayout::Pointer layout) override;
 
 };
 
-#endif /* QMITKFLOWBENCHAPPLICATIONPERSPECTIVE_H_ */
+#endif /* QMITKFLOWBENCHSEGMENTATIONPERSPECTIVE_H_ */

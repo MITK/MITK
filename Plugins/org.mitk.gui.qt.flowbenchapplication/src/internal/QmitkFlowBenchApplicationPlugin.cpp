@@ -15,7 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkFlowBenchApplicationPlugin.h"
-#include "perspectives/QmitkFlowBenchApplicationPerspective.h"
 #include "QmitkFlowBenchApplication.h"
 
 #include <service/cm/ctkConfigurationAdmin.h>
@@ -66,7 +65,6 @@ void QmitkFlowBenchApplicationPlugin::start(ctkPluginContext* context)
 
   QtWidgetsExtRegisterClasses();
 
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkFlowBenchApplicationPerspective, context);
   BERRY_REGISTER_EXTENSION_CLASS(QmitkFlowBenchApplication, context);
 
   ctkServiceReference cmRef = context->getServiceReference<ctkConfigurationAdmin>();

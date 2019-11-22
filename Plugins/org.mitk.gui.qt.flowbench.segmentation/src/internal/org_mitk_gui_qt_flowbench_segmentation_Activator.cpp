@@ -18,12 +18,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "org_mitk_gui_qt_flowbench_segmentation_Activator.h"
 
 #include "QmitkSegmentationFlowControlView.h"
+#include "perspectives/QmitkFlowBenchSegmentationPerspective.h"
 
 ctkPluginContext* org_mitk_gui_qt_flowbench_segmentation_Activator::m_Context = nullptr;
 
 void org_mitk_gui_qt_flowbench_segmentation_Activator::start(ctkPluginContext* context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentationFlowControlView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkFlowBenchSegmentationPerspective, context);
+
   m_Context = context;
 }
 

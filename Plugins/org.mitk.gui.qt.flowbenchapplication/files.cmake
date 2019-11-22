@@ -6,14 +6,12 @@ set(INTERNAL_CPP_FILES
   QmitkFlowBenchApplicationPlugin.cpp
   QmitkFlowBenchApplicationWorkbenchAdvisor.cpp
   QmitkFlowBenchApplicationWorkbenchWindowAdvisor.cpp  
-  perspectives/QmitkFlowBenchApplicationPerspective.cpp
   QmitkExtFileSaveProjectAction.cpp
 )
 
 set(MOC_H_FILES
   src/internal/QmitkFlowBenchApplication.h
   src/internal/QmitkFlowBenchApplicationPlugin.h
-  src/internal/perspectives/QmitkFlowBenchApplicationPerspective.h
   src/internal/QmitkFlowBenchApplicationWorkbenchWindowAdvisor.h  
   src/internal/QmitkFlowBenchApplicationWorkbenchWindowAdvisorHack.h
   src/internal/QmitkExtFileSaveProjectAction.h
@@ -26,8 +24,6 @@ set(CACHED_RESOURCE_FILES
 # plug-in views in the workbench
   plugin.xml
   resources/icon_research.xpm
-  resources/perspectives/eye.png
-  resources/perspectives/viewer_icon.png
 )
 
 set(QRC_FILES

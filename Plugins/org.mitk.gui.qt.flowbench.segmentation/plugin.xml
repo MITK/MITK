@@ -9,4 +9,13 @@
           icon="resources/icon.svg" />
   </extension>
 
+  <extension point="org.blueberry.ui.perspectives">
+    <perspective
+      id="org.mitk.qt.flowbenchapplication.defaultperspective"
+      name="Segmentation"
+      class="QmitkFlowBenchSegmentationPerspective"
+      icon="resources/perspectives/segmentation_icon.svg">
+    </perspective>
+  </extension>
+
 </plugin>

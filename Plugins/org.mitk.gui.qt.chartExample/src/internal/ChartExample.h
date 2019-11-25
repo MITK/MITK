@@ -49,15 +49,6 @@ protected:
   void UpdateSelectedData();
   void ClearChart();
 
-  void ShowErrorOptions(bool show);
-  void ShowXErrorOptions(bool show);
-  void ShowYErrorOptions(bool show);
-
-  void AdaptZoomX();
-  void AdaptZoomY();
-
-  void AdaptDataGUI(QString chartType);
-
 private:
   std::map<std::string, QmitkChartWidget::ChartType> m_ChartNameToChartType;
   std::map<std::string, QmitkChartWidget::ChartColor> m_ChartNameToChartColor;
@@ -66,6 +57,15 @@ private:
   std::map<std::string, QmitkChartWidget::LegendPosition> m_LegendPositionNameToLegendPositionType;
 
   std::vector<std::string> labelStorage;
+
+  void ShowErrorOptions(bool show);
+  void ShowXErrorOptions(bool show);
+  void ShowYErrorOptions(bool show);
+
+  void AdaptZoomX();
+  void AdaptZoomY();
+
+  void AdaptDataGUI(QString chartType);
 
   void OnLegendPositionChanged(const QString &newPosition);
   void OnTitleChanged();

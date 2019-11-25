@@ -22,12 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ChartExample.h"
 #include <QmitkChartxyData.h>
 
-// Qt
-#include <QRandomGenerator>
-
 const std::string ChartExample::VIEW_ID = "org.mitk.views.chartexample";
-
-static std::vector<std::string> labelStorage;
 
 void ChartExample::SetFocus()
 {
@@ -57,51 +52,6 @@ void ChartExample::CreateQtPartControl(QWidget *parent)
 
   m_Controls.m_doubleSpinBox_maxZoomX->setValue(10);
   m_Controls.m_doubleSpinBox_maxZoomY->setValue(10);
-
-  m_ChartNameToChartType.emplace("bar", QmitkChartWidget::ChartType::bar);
-  m_ChartNameToChartType.emplace("line", QmitkChartWidget::ChartType::line);
-  m_ChartNameToChartType.emplace("spline", QmitkChartWidget::ChartType::spline);
-  m_ChartNameToChartType.emplace("pie", QmitkChartWidget::ChartType::pie);
-  m_ChartNameToChartType.emplace("area", QmitkChartWidget::ChartType::area);
-  m_ChartNameToChartType.emplace("area-spline", QmitkChartWidget::ChartType::area_spline);
-  m_ChartNameToChartType.emplace("scatter", QmitkChartWidget::ChartType::scatter);
-
-  m_ChartNameToChartColor.emplace("red", QmitkChartWidget::ChartColor::red);
-  m_ChartNameToChartColor.emplace("orange", QmitkChartWidget::ChartColor::orange);
-  m_ChartNameToChartColor.emplace("yellow", QmitkChartWidget::ChartColor::yellow);
-  m_ChartNameToChartColor.emplace("green", QmitkChartWidget::ChartColor::green);
-  m_ChartNameToChartColor.emplace("blue", QmitkChartWidget::ChartColor::blue);
-  m_ChartNameToChartColor.emplace("purple", QmitkChartWidget::ChartColor::purple);
-  m_ChartNameToChartColor.emplace("brown", QmitkChartWidget::ChartColor::brown);
-  m_ChartNameToChartColor.emplace("magenta", QmitkChartWidget::ChartColor::magenta);
-  m_ChartNameToChartColor.emplace("tan", QmitkChartWidget::ChartColor::tan);
-  m_ChartNameToChartColor.emplace("cyan", QmitkChartWidget::ChartColor::cyan);
-  m_ChartNameToChartColor.emplace("olive", QmitkChartWidget::ChartColor::olive);
-  m_ChartNameToChartColor.emplace("maroon", QmitkChartWidget::ChartColor::maroon);
-  m_ChartNameToChartColor.emplace("navy", QmitkChartWidget::ChartColor::navy);
-  m_ChartNameToChartColor.emplace("aquamarine", QmitkChartWidget::ChartColor::aquamarine);
-  m_ChartNameToChartColor.emplace("turquoise", QmitkChartWidget::ChartColor::turqouise);
-  m_ChartNameToChartColor.emplace("silver", QmitkChartWidget::ChartColor::silver);
-  m_ChartNameToChartColor.emplace("lime", QmitkChartWidget::ChartColor::lime);
-  m_ChartNameToChartColor.emplace("teal", QmitkChartWidget::ChartColor::teal);
-  m_ChartNameToChartColor.emplace("indigo", QmitkChartWidget::ChartColor::indigo);
-  m_ChartNameToChartColor.emplace("violet", QmitkChartWidget::ChartColor::violet);
-  m_ChartNameToChartColor.emplace("pink", QmitkChartWidget::ChartColor::pink);
-  m_ChartNameToChartColor.emplace("black", QmitkChartWidget::ChartColor::black);
-  m_ChartNameToChartColor.emplace("white", QmitkChartWidget::ChartColor::white);
-  m_ChartNameToChartColor.emplace("grey", QmitkChartWidget::ChartColor::grey);
-
-  m_LineNameToLineType.emplace("solid", QmitkChartWidget::LineStyle::solid);
-  m_LineNameToLineType.emplace("dashed", QmitkChartWidget::LineStyle::dashed);
-
-  m_AxisScaleNameToAxisScaleType.emplace("linear", QmitkChartWidget::AxisScale::linear);
-  m_AxisScaleNameToAxisScaleType.emplace("logarithmic", QmitkChartWidget::AxisScale::log);
-
-  m_LegendPositionNameToLegendPositionType.emplace("bottom middle", QmitkChartWidget::LegendPosition::bottomMiddle);
-  m_LegendPositionNameToLegendPositionType.emplace("bottom right", QmitkChartWidget::LegendPosition::bottomRight);
-  m_LegendPositionNameToLegendPositionType.emplace("top right", QmitkChartWidget::LegendPosition::topRight);
-  m_LegendPositionNameToLegendPositionType.emplace("top left", QmitkChartWidget::LegendPosition::topLeft);
-  m_LegendPositionNameToLegendPositionType.emplace("middle right", QmitkChartWidget::LegendPosition::middleRight);
 }
 
 void ChartExample::CreateConnectionsForGUIElements()
@@ -129,6 +79,80 @@ void ChartExample::CreateConnectionsForGUIElements()
   connect(m_Controls.m_checkBoxShowSubchart, &QCheckBox::stateChanged, this, &ChartExample::OnShowSubchartChanged);
 }
 
+void ChartExample::AddData()
+{
+    QString lineEditDataX = m_Controls.m_lineEditDataXVector->text();
+    QString lineEditDataY = m_Controls.m_lineEditDataYVector->text();
+    auto dataX = ConvertToDoubleVector(lineEditDataX);
+    auto dataY = ConvertToDoubleVector(lineEditDataY);
+    auto dataXandY = CreateMap(dataX, dataY);
+    QString data = QString::fromStdString(ConvertToText(dataXandY));
+
+    QString dataLabel = m_Controls.m_lineEditDataLabel->text();
+    QString chartColor = m_Controls.m_comboBoxColor->currentText();
+    QString chartType = m_Controls.m_comboBoxChartType->currentText();
+    QString chartStyle = m_Controls.m_comboBoxLineStyle->currentText();
+
+    if (std::find(labelStorage.begin(), labelStorage.end(), dataLabel) != labelStorage.end())
+    {
+        m_Controls.m_labelInfo->setText("This data already exists");
+        m_Controls.m_labelInfo->setStyleSheet("color: red;");
+        return;
+    }
+
+    if (dataX.size() != dataY.size())
+    {
+        m_Controls.m_labelInfo->setText("Data x and y size have to be equal");
+        m_Controls.m_labelInfo->setStyleSheet("color: red;");
+        return;
+    }
+
+    QString pieLabelsData = m_Controls.m_lineEditPieDataLabel->text();
+
+    std::string chartTypeAsString = chartType.toStdString();
+    std::string pieAsString = "Pie";
+    if (chartTypeAsString == pieAsString)
+    {
+        if (!pieLabelsData.isEmpty())
+        {
+            auto pieLabels = ConvertToStringVector(pieLabelsData);
+            m_Controls.m_Chart->SetPieLabels(pieLabels, dataLabel.toStdString());
+        }
+    }
+
+    labelStorage.push_back(dataLabel);
+    m_Controls.m_Chart->AddChartExampleData(dataXandY, dataLabel, chartType, chartColor, chartStyle, pieLabelsData);
+    m_Controls.m_comboBoxExistingData->addItem(m_Controls.m_lineEditDataLabel->text());
+
+    if (m_Controls.m_checkBoxEnableErrors->isChecked())
+    {
+        if (m_Controls.m_checkBoxEnableXErrors->isChecked())
+        {
+            auto errorsPlus = ConvertToDoubleVector(m_Controls.m_lineEditXErrorPlus->text());
+            auto errorsMinus = ConvertToDoubleVector(m_Controls.m_lineEditXErrorMinus->text());
+            m_Controls.m_Chart->SetXErrorBars(m_Controls.m_lineEditDataLabel->text().toStdString(), errorsPlus, errorsMinus);
+        }
+        if (m_Controls.m_checkBoxEnableYErrors->isChecked())
+        {
+            auto errorsPlus = ConvertToDoubleVector(m_Controls.m_lineEditYErrorPlus->text());
+            auto errorsMinus = ConvertToDoubleVector(m_Controls.m_lineEditYErrorMinus->text());
+            m_Controls.m_Chart->SetYErrorBars(m_Controls.m_lineEditDataLabel->text().toStdString(), errorsPlus, errorsMinus);
+        }
+    }
+
+    m_Controls.m_Chart->SetLineStyle(dataLabel.toStdString(), chartStyle);
+
+    QString dataOverview;
+    dataOverview.append(m_Controls.m_lineEditDataLabel->text());
+    dataOverview.append("(").append(m_Controls.m_comboBoxChartType->currentText());
+
+    dataOverview.append(", ").append(m_Controls.m_comboBoxLineStyle->currentText());
+    dataOverview.append(")");
+    dataOverview.append(":").append(data);
+
+    m_Controls.m_plainTextEditDataView->appendPlainText(dataOverview);
+}
+
 void ChartExample::CreateChart()
 {
   auto dataYAxisScaleType =
@@ -153,6 +177,8 @@ void ChartExample::CreateChart()
   m_Controls.m_Chart->SetShowDataPoints(showDataPoints);
   m_Controls.m_Chart->SetStackedData(stackedData);
   m_Controls.m_Chart->Show(showSubchart);
+
+  m_Controls.m_Chart->chartExistence = true;
 }
 
 void ChartExample::UpdateData()
@@ -177,125 +203,83 @@ void ChartExample::UpdateData()
 
     auto index = m_Controls.m_comboBoxExistingData->findText(QString::fromStdString(dataLabel));
     m_Controls.m_comboBoxExistingData->removeItem(index);
+
     AddData();
+}
+
+void ChartExample::UpdateSelectedData()
+{
+    std::string label = m_Controls.m_comboBoxExistingData->currentText().toStdString();
+    auto data = m_Controls.m_Chart->GetDataElementByLabel(label);
+
+    if (data == nullptr)
+    {
+        return;
+    }
+
+    auto x = data->GetXData();
+    auto y = data->GetYData();
+
+    auto xVector = x.toVector().toStdVector();
+    auto yVector = y.toVector().toStdVector();
+
+    QString xString = QString::fromStdString(ConvertToText(xVector));
+    QString yString = QString::fromStdString(ConvertToText(yVector));
+
+    auto color = data->GetColor();
+    auto type = data->GetChartType();
+    auto style = data->GetLineStyle();
+
+    int colorIndex = m_Controls.m_Chart->GetIndexByString(color.toString().toStdString());
+    int typeIndex = m_Controls.m_Chart->GetIndexByString(type.toString().toStdString());
+    int styleIndex = m_Controls.m_Chart->GetIndexByString(style.toString().toStdString());
+
+    std::string chartTypeAsString = type.toString().toStdString();
+    std::string pieAsString = "Pie";
+    if (chartTypeAsString == pieAsString)
+    {
+        m_Controls.m_comboBoxLineStyle->setVisible(false);
+        m_Controls.m_labelLineStyle->setVisible(false);
+        m_Controls.m_lineEditPieDataLabel->setVisible(true);
+        m_Controls.m_labelPieData->setVisible(true);
+
+        auto pieLabels = data->GetPieLabels();
+
+        auto pieLabelsVector = pieLabels.toVector().toStdVector();
+
+        QString pieLabelsString = QString::fromStdString(ConvertToText(pieLabelsVector));
+
+        m_Controls.m_lineEditPieDataLabel->setText(pieLabelsString);
+    }
+
+    else
+    {
+        m_Controls.m_lineEditPieDataLabel->setVisible(false);
+        m_Controls.m_labelPieData->setVisible(false);
+        m_Controls.m_comboBoxLineStyle->setVisible(true);
+        m_Controls.m_labelLineStyle->setVisible(true);
+        m_Controls.m_comboBoxLineStyle->setCurrentIndex(styleIndex);
+    }
+
+    m_Controls.m_lineEditDataXVector->setText(xString);
+    m_Controls.m_lineEditDataYVector->setText(yString);
+    m_Controls.m_lineEditDataLabel->setText(QString::fromStdString(label));
+    m_Controls.m_comboBoxColor->setCurrentIndex(colorIndex);
+    m_Controls.m_comboBoxChartType->setCurrentIndex(typeIndex);
+
 }
 
 void ChartExample::ClearChart()
 {
-  m_Controls.m_Chart->Clear();
+  m_Controls.m_Chart->Clear(m_Controls.m_Chart->chartExistence);
 
   m_Controls.m_plainTextEditDataView->clear();
 
   m_Controls.m_comboBoxExistingData->clear();
 
   labelStorage.clear();
-}
 
-std::vector<double> ChartExample::ConvertToDoubleVector(const QString &data, QChar delimiter) const
-{
-  std::vector<double> output;
-  if (data.isEmpty())
-  {
-    return output;
-  }
-
-  for (const QString entry : data.split(delimiter))
-  {
-    output.push_back(entry.toDouble());
-  }
-  return output;
-}
-
-std::vector<std::string> ChartExample::ConvertToStringVector(const QString &data, QChar delimiter) const
-{
-  std::vector<std::string> output;
-  if (data.isEmpty())
-  {
-    return output;
-  }
-
-  for (const QString entry : data.split(delimiter))
-  {
-    output.push_back(entry.toStdString());
-  }
-  return output;
-}
-
-void ChartExample::AddData()
-{
-  QString lineEditDataX = m_Controls.m_lineEditDataXVector->text();
-  auto dataX = ConvertToDoubleVector(lineEditDataX);
-
-  QString lineEditDataY = m_Controls.m_lineEditDataYVector->text();
-  auto dataY = ConvertToDoubleVector(lineEditDataY);
-
-  std::string dataLabel = m_Controls.m_lineEditDataLabel->text().toStdString();
-  auto chartColor = m_ChartNameToChartColor.at(m_Controls.m_comboBoxColor->currentText().toLower().toStdString());
-  auto chartType = m_ChartNameToChartType.at(m_Controls.m_comboBoxChartType->currentText().toLower().toStdString());
-  auto chartStyle = m_LineNameToLineType.at(m_Controls.m_comboBoxLineStyle->currentText().toLower().toStdString());
-
-  if (std::find(labelStorage.begin(), labelStorage.end(), dataLabel) != labelStorage.end())
-  {
-      m_Controls.m_labelInfo->setText("This data already exists");
-      m_Controls.m_labelInfo->setStyleSheet("color: red;");
-      return;
-  }
-
-  if (dataX.size() != dataY.size())
-  {
-      m_Controls.m_labelInfo->setText("Data x and y size have to be equal");
-      m_Controls.m_labelInfo->setStyleSheet("color: red;");
-      return;
-  }
-  auto dataXandY = CreateMap(dataX, dataY);
-  QString data = QString::fromStdString(ConvertToText(dataXandY));
-
-  QString pieLabelsData = m_Controls.m_lineEditPieDataLabel->text();
-
-  if (chartType == QmitkChartWidget::ChartType::pie)
-  {
-      if (!pieLabelsData.isEmpty())
-      {
-          auto pieLabels = ConvertToStringVector(pieLabelsData);
-          m_Controls.m_Chart->SetPieLabels(pieLabels, dataLabel);
-      }
-  }
-  labelStorage.push_back(dataLabel);
-  m_Controls.m_Chart->AddChartExampleData(dataXandY, dataLabel, chartType, chartColor, chartStyle, pieLabelsData);
-  m_Controls.m_comboBoxExistingData->addItem(m_Controls.m_lineEditDataLabel->text());
-
-  if (m_Controls.m_checkBoxEnableErrors->isChecked())
-  {
-    if (m_Controls.m_checkBoxEnableXErrors->isChecked())
-    {
-      auto errorsPlus = ConvertToDoubleVector(m_Controls.m_lineEditXErrorPlus->text());
-      auto errorsMinus = ConvertToDoubleVector(m_Controls.m_lineEditXErrorMinus->text());
-      m_Controls.m_Chart->SetXErrorBars(m_Controls.m_lineEditDataLabel->text().toStdString(), errorsPlus, errorsMinus);
-    }
-    if (m_Controls.m_checkBoxEnableYErrors->isChecked())
-    {
-      auto errorsPlus = ConvertToDoubleVector(m_Controls.m_lineEditYErrorPlus->text());
-      auto errorsMinus = ConvertToDoubleVector(m_Controls.m_lineEditYErrorMinus->text());
-      m_Controls.m_Chart->SetYErrorBars(m_Controls.m_lineEditDataLabel->text().toStdString(), errorsPlus, errorsMinus);
-    }
-  }
-
-  m_Controls.m_Chart->SetLineStyle(dataLabel, chartStyle);
-
-  QString dataOverview;
-  dataOverview.append(m_Controls.m_lineEditDataLabel->text());
-  dataOverview.append("(").append(m_Controls.m_comboBoxChartType->currentText());
-
-  dataOverview.append(", ").append(m_Controls.m_comboBoxLineStyle->currentText());
-  dataOverview.append(")");
-  dataOverview.append(":").append(data);
-
-  m_Controls.m_plainTextEditDataView->appendPlainText(dataOverview);
-}
-
-void ChartExample::ShowXData(bool show)
-{
-  m_Controls.m_lineEditDataXVector->setVisible(show);
+  m_Controls.m_Chart->chartExistence = false;
 }
 
 void ChartExample::ShowErrorOptions(bool show)
@@ -327,99 +311,25 @@ void ChartExample::AdaptZoomY()
   m_Controls.m_Chart->Show();
 }
 
-void ChartExample::AdaptDataGUI(const QString &chartType)
+void ChartExample::AdaptDataGUI(QString chartType)
 {
-  auto chartTypeEnum = m_ChartNameToChartType.at(chartType.toLower().toStdString());
-  if (chartTypeEnum == QmitkChartWidget::ChartType::pie)
+  std::string chartTypeAsString = chartType.toStdString();
+  std::string PieAsString = "Pie";
+  if (chartTypeAsString == PieAsString)
   {
     m_Controls.m_labelPieData->setVisible(true);
     m_Controls.m_lineEditPieDataLabel->setVisible(true);
     m_Controls.m_labelLineStyle->setVisible(false);
     m_Controls.m_comboBoxLineStyle->setVisible(false);
   }
-  else if (chartTypeEnum != QmitkChartWidget::ChartType::pie)
+
+  else
   {
     m_Controls.m_labelLineStyle->setVisible(true);
     m_Controls.m_comboBoxLineStyle->setVisible(true);
     m_Controls.m_labelPieData->setVisible(false);
     m_Controls.m_lineEditPieDataLabel->setVisible(false);
   }
-}
-
-std::vector<double> ChartExample::GenerateRandomNumbers(unsigned int amount, double max) const
-{
-  QRandomGenerator gen;
-  gen.seed(time(nullptr));
-
-  std::vector<double> data;
-  for (unsigned int i = 0; i < amount; i++)
-  {
-    data.push_back(gen.bounded(max));
-  }
-
-  return data;
-}
-
-std::map<double, double> ChartExample::CreateMap(std::vector<double> keys, std::vector<double> values) const
-{
-  std::map<double, double> aMap;
-  std::transform(keys.begin(), keys.end(), values.begin(), std::inserter(aMap, aMap.end()), [](double a, double b) {
-    return std::make_pair(a, b);
-  });
-  return aMap;
-}
-
-std::string ChartExample::ConvertToText(std::vector<double> numbers, std::string delimiter) const
-{
-  std::ostringstream oss;
-  oss.precision(3);
-
-  if (!numbers.empty())
-  {
-    for (auto number : numbers)
-    {
-      oss << number << delimiter;
-    }
-  }
-  auto aString = oss.str();
-  aString.pop_back();
-  return aString;
-}
-
-std::string ChartExample::ConvertToText(std::map<double, double> numbers, std::string delimiter) const
-{
-  std::ostringstream oss;
-  oss.precision(3);
-
-  if (!numbers.empty())
-  {
-    for (const auto keyValue : numbers)
-    {
-      oss << keyValue.first << ":" << keyValue.second << delimiter;
-    }
-  }
-  auto aString = oss.str();
-  aString.pop_back();
-  return aString;
-}
-
-QmitkChartWidget::ColorTheme ChartExample::GetColorTheme() const
-{
-  ctkPluginContext *context = berry::WorkbenchPlugin::GetDefault()->GetPluginContext();
-  ctkServiceReference styleManagerRef = context->getServiceReference<berry::IQtStyleManager>();
-  if (styleManagerRef)
-  {
-    auto styleManager = context->getService<berry::IQtStyleManager>(styleManagerRef);
-    if (styleManager->GetStyle().name == "Dark")
-    {
-      return QmitkChartWidget::ColorTheme::darkstyle;
-    }
-    else
-    {
-      return QmitkChartWidget::ColorTheme::lightstyle;
-    }
-  }
-  return QmitkChartWidget::ColorTheme::darkstyle;
 }
 
 void ChartExample::OnLegendPositionChanged(const QString &newText)
@@ -464,88 +374,75 @@ void ChartExample::OnShowSubchartChanged(int newState) {
   m_Controls.m_Chart->SetShowSubchart(newState == Qt::Checked);
 }
 
-void ChartExample::UpdateSelectedData()
+std::map<double, double> ChartExample::CreateMap(std::vector<double> keys, std::vector<double> values) const
 {
-  std::string label = m_Controls.m_comboBoxExistingData->currentText().toStdString();
-  auto data = m_Controls.m_Chart->GetDataElementByLabel(label);
+    std::map<double, double> aMap;
+    std::transform(keys.begin(), keys.end(), values.begin(), std::inserter(aMap, aMap.end()), [](double a, double b) {
+        return std::make_pair(a, b);
+        });
+    return aMap;
+}
 
-  if (data == nullptr)
-  {
-      return;
-  }
+std::string ChartExample::ConvertToText(std::map<double, double> numbers, std::string delimiter) const
+{
+    std::ostringstream oss;
+    oss.precision(3);
 
-  auto x = data->GetXData();
-  auto y = data->GetYData();
+    if (!numbers.empty())
+    {
+        for (const auto keyValue : numbers)
+        {
+            oss << keyValue.first << ":" << keyValue.second << delimiter;
+        }
+    }
+    auto aString = oss.str();
+    aString.pop_back();
+    return aString;
+}
 
-  auto xVector = x.toVector().toStdVector();
-  auto yVector = y.toVector().toStdVector();
+std::string ChartExample::ConvertToText(std::vector<QVariant> numbers, std::string delimiter) const
+{
+    std::ostringstream oss;
+    oss.precision(3);
 
-  std::string xString;
-  std::string yString;
+    if (!numbers.empty())
+    {
+        for (auto number : numbers)
+        {
+            oss << number.toDouble() << delimiter;
+        }
+    }
+    auto aString = oss.str();
+    aString.pop_back();
+    return aString;
+}
 
-  for (int i = 0; i < xVector.size(); i++)
-  {
-      xString.append(xVector[i].toString().toStdString());
-      if (i != xVector.size() - 1)
-      {
-          xString.append(";");
-      }
-  }
+std::vector<double> ChartExample::ConvertToDoubleVector(const QString& data, QChar delimiter) const
+{
+    std::vector<double> output;
+    if (data.isEmpty())
+    {
+        return output;
+    }
 
-  for (int i = 0; i < yVector.size(); i++)
-  {
-      yString.append(yVector[i].toString().toStdString());
-      if (i != yVector.size() - 1)
-      {
-          yString.append(";");
-      }
-  }
+    for (const QString entry : data.split(delimiter))
+    {
+        output.push_back(entry.toDouble());
+    }
+    return output;
+}
 
-  auto color = data->GetColor();
-  auto type = data->GetChartType();
-  auto style = data->GetLineStyle();
+std::vector<std::string> ChartExample::ConvertToStringVector(const QString& data, QChar delimiter) const
+{
+    std::vector<std::string> output;
+    if (data.isEmpty())
+    {
+        return output;
+    }
 
-  int colorIndex = m_Controls.m_Chart->GetIndexByString(color.toString().toStdString());
-  int typeIndex = m_Controls.m_Chart->GetIndexByString(type.toString().toStdString());
-  int styleIndex = m_Controls.m_Chart->GetIndexByString(style.toString().toStdString());
-
-  if (type.toString() == "pie")
-  {
-      m_Controls.m_comboBoxLineStyle->setVisible(false);
-      m_Controls.m_labelLineStyle->setVisible(false);
-      m_Controls.m_lineEditPieDataLabel->setVisible(true);
-      m_Controls.m_labelPieData->setVisible(true);
-
-      auto pieLabels = data->GetPieLabels();
-
-      auto pieLabelsVector = pieLabels.toVector().toStdVector();
-
-      std::string pieLabelsString;
-
-      for (int i = 0; i < pieLabelsVector.size(); i++)
-      {
-          pieLabelsString.append(pieLabelsVector[i].toString().toStdString());
-          if (i != pieLabelsVector.size() - 1)
-          {
-              pieLabelsString.append(";");
-          }
-      }
-
-      m_Controls.m_lineEditPieDataLabel->setText(QString::fromStdString(pieLabelsString));
-  }
-
-  else
-  {
-      m_Controls.m_lineEditPieDataLabel->setVisible(false);
-      m_Controls.m_labelPieData->setVisible(false);
-      m_Controls.m_comboBoxLineStyle->setVisible(true);
-      m_Controls.m_labelLineStyle->setVisible(true);
-      m_Controls.m_comboBoxLineStyle->setCurrentIndex(styleIndex);
-  }
-  m_Controls.m_lineEditDataXVector->setText(QString::fromStdString(xString));
-  m_Controls.m_lineEditDataYVector->setText(QString::fromStdString(yString));
-  m_Controls.m_lineEditDataLabel->setText(QString::fromStdString(label));
-  m_Controls.m_comboBoxColor->setCurrentIndex(colorIndex);
-  m_Controls.m_comboBoxChartType->setCurrentIndex(typeIndex);
-
+    for (const QString entry : data.split(delimiter))
+    {
+        output.push_back(entry.toStdString());
+    }
+    return output;
 }

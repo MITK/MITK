@@ -43,13 +43,12 @@ protected:
 
   virtual void SetFocus() override;
 
+  void AddData();
   void CreateChart();
   void UpdateData();
+  void UpdateSelectedData();
   void ClearChart();
 
-  void AddData();
-
-  void ShowXData(bool show);
   void ShowErrorOptions(bool show);
   void ShowXErrorOptions(bool show);
   void ShowYErrorOptions(bool show);
@@ -57,18 +56,14 @@ protected:
   void AdaptZoomX();
   void AdaptZoomY();
 
-  void AdaptDataGUI(const QString &chartType);
-
-  void UpdateSelectedData();
+  void AdaptDataGUI(QString chartType);
 
 private:
-  std::vector<double> GenerateRandomNumbers(unsigned int amount, double max) const;
-  std::vector<double> ConvertToDoubleVector(const QString &data, QChar delimiter = ';') const;
-  std::vector<std::string> ConvertToStringVector(const QString &data, QChar delimiter = ';') const;
-  std::map<double, double> CreateMap(std::vector<double> keys, std::vector<double> values) const;
-  std::string ConvertToText(std::vector<double> numbers, std::string delimiter = ";") const;
-  std::string ConvertToText(std::map<double, double> numbers, std::string delimiter = ";") const;
-  QmitkChartWidget::ColorTheme GetColorTheme() const;
+  std::map<std::string, QmitkChartWidget::AxisScale> m_AxisScaleNameToAxisScaleType;
+  std::map<std::string, QmitkChartWidget::LegendPosition> m_LegendPositionNameToLegendPositionType;
+
+  std::vector<QString> labelStorage;
+
   void OnLegendPositionChanged(const QString &newPosition);
   void OnTitleChanged();
   void OnXAxisLabelChanged();
@@ -79,11 +74,11 @@ private:
   void OnShowDataPointsChanged(int newState);
   void OnShowSubchartChanged(int newState);
 
-  std::map<std::string, QmitkChartWidget::ChartType> m_ChartNameToChartType;
-  std::map<std::string, QmitkChartWidget::ChartColor> m_ChartNameToChartColor;
-  std::map<std::string, QmitkChartWidget::LineStyle> m_LineNameToLineType;
-  std::map<std::string, QmitkChartWidget::AxisScale> m_AxisScaleNameToAxisScaleType;
-  std::map<std::string, QmitkChartWidget::LegendPosition> m_LegendPositionNameToLegendPositionType;
+  std::map<double, double> CreateMap(std::vector<double> keys, std::vector<double> values) const;
+  std::string ConvertToText(std::vector<QVariant> numbers, std::string delimiter = ";") const;
+  std::string ConvertToText(std::map<double, double> numbers, std::string delimiter = ";") const;
+  std::vector<double> ConvertToDoubleVector(const QString& data, QChar delimiter = ';') const;
+  std::vector<std::string> ConvertToStringVector(const QString& data, QChar delimiter = ';') const;
 
   unsigned int countForUID = 0;
   Ui::ChartExampleControls m_Controls;

@@ -135,6 +135,8 @@ public:
    */
   void ClearData();
 
+  QmitkChartxyData() {}
+
 signals:
   void SignalDataChanged(const QList<QVariant> data);
   void SignalErrorDataChanged(const QList<QVariant> errorData);

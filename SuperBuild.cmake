@@ -407,6 +407,7 @@ ExternalProject_Add(${proj}
     ${mitk_optional_cache_args}
     -DMITK_USE_SUPERBUILD:BOOL=OFF
     -DMITK_BUILD_CONFIGURATION:STRING=${MITK_BUILD_CONFIGURATION}
+    -DMITK_FAST_TESTING:BOOL=${MITK_FAST_TESTING}
     -DCTEST_USE_LAUNCHERS:BOOL=${CTEST_USE_LAUNCHERS}
     # ----------------- Miscellaneous ---------------
     -DCMAKE_LIBRARY_PATH:PATH=${CMAKE_LIBRARY_PATH}

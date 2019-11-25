@@ -1024,11 +1024,6 @@ if(BUILD_TESTING)
     file(MAKE_DIRECTORY ${MITK_TEST_OUTPUT_DIR})
   endif()
 
-  # Test the external project template
-  if(MITK_USE_BLUEBERRY)
-    include(mitkTestProjectTemplate)
-  endif()
-
   # Test the package target
   include(mitkPackageTest)
 endif()

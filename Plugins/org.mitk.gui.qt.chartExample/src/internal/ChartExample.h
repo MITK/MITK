@@ -59,10 +59,13 @@ protected:
   void AdaptDataGUI(QString chartType);
 
 private:
+  std::map<std::string, QmitkChartWidget::ChartType> m_ChartNameToChartType;
+  std::map<std::string, QmitkChartWidget::ChartColor> m_ChartNameToChartColor;
+  std::map<std::string, QmitkChartWidget::LineStyle> m_LineNameToLineType;
   std::map<std::string, QmitkChartWidget::AxisScale> m_AxisScaleNameToAxisScaleType;
   std::map<std::string, QmitkChartWidget::LegendPosition> m_LegendPositionNameToLegendPositionType;
 
-  std::vector<QString> labelStorage;
+  std::vector<std::string> labelStorage;
 
   void OnLegendPositionChanged(const QString &newPosition);
   void OnTitleChanged();

@@ -133,10 +133,10 @@ void ChartExample::AddData()
     auto dataXandY = CreateMap(dataX, dataY);
     QString data = QString::fromStdString(ConvertToText(dataXandY));
 
-    QString dataLabel = m_Controls.m_lineEditDataLabel->text();
-    QString chartColor = m_Controls.m_comboBoxColor->currentText();
-    QString chartType = m_Controls.m_comboBoxChartType->currentText();
-    QString chartStyle = m_Controls.m_comboBoxLineStyle->currentText();
+    std::string dataLabel = m_Controls.m_lineEditDataLabel->text().toStdString();
+    auto chartType = m_ChartNameToChartType.at(m_Controls.m_comboBoxChartType->currentText().toLower().toStdString());
+    auto chartColor = m_ChartNameToChartColor.at(m_Controls.m_comboBoxColor->currentText().toLower().toStdString());
+    auto chartStyle = m_LineNameToLineType.at(m_Controls.m_comboBoxLineStyle->currentText().toLower().toStdString());
 
     if (std::find(labelStorage.begin(), labelStorage.end(), dataLabel) != labelStorage.end())
     {
@@ -154,14 +154,12 @@ void ChartExample::AddData()
 
     QString pieLabelsData = m_Controls.m_lineEditPieDataLabel->text();
 
-    std::string chartTypeAsString = chartType.toStdString();
-    std::string pieAsString = "Pie";
-    if (chartTypeAsString == pieAsString)
+    if (chartType == QmitkChartWidget::ChartType::pie)
     {
         if (!pieLabelsData.isEmpty())
         {
             auto pieLabels = ConvertToStringVector(pieLabelsData);
-            m_Controls.m_Chart->SetPieLabels(pieLabels, dataLabel.toStdString());
+            m_Controls.m_Chart->SetPieLabels(pieLabels, dataLabel);
         }
     }
 
@@ -185,7 +183,7 @@ void ChartExample::AddData()
         }
     }
 
-    m_Controls.m_Chart->SetLineStyle(dataLabel.toStdString(), chartStyle);
+    m_Controls.m_Chart->SetLineStyle(dataLabel, chartStyle);
 
     QString dataOverview;
     dataOverview.append(m_Controls.m_lineEditDataLabel->text());
@@ -279,9 +277,7 @@ void ChartExample::UpdateSelectedData()
     int typeIndex = m_Controls.m_Chart->GetIndexByString(type.toString().toStdString());
     int styleIndex = m_Controls.m_Chart->GetIndexByString(style.toString().toStdString());
 
-    std::string chartTypeAsString = type.toString().toStdString();
-    std::string pieAsString = "Pie";
-    if (chartTypeAsString == pieAsString)
+    if (type.toString() == "Pie")
     {
         m_Controls.m_comboBoxLineStyle->setVisible(false);
         m_Controls.m_labelLineStyle->setVisible(false);
@@ -358,9 +354,7 @@ void ChartExample::AdaptZoomY()
 
 void ChartExample::AdaptDataGUI(QString chartType)
 {
-  std::string chartTypeAsString = chartType.toStdString();
-  std::string PieAsString = "Pie";
-  if (chartTypeAsString == PieAsString)
+  if (chartType == "Pie")
   {
     m_Controls.m_labelPieData->setVisible(true);
     m_Controls.m_lineEditPieDataLabel->setVisible(true);

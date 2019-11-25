@@ -197,14 +197,17 @@ endmacro()
 option(BUILD_SHARED_LIBS "Build MITK with shared libraries" ON)
 option(WITH_COVERAGE "Enable/Disable coverage" OFF)
 option(BUILD_TESTING "Test the project" ON)
+option(MITK_FAST_TESTING "Disable long-running tests like packaging" OFF)
 
 env_option(MITK_BUILD_ALL_APPS "Build all MITK applications" OFF)
 env_option(MITK_BUILD_EXAMPLES "Build the MITK Examples" OFF)
 option(MITK_ENABLE_PIC_READER "Enable support for reading the DKFZ pic file format." ON)
 
-mark_as_advanced(MITK_BUILD_ALL_APPS
-                 MITK_ENABLE_PIC_READER
-                )
+mark_as_advanced(
+  MITK_FAST_TESTING
+  MITK_BUILD_ALL_APPS
+  MITK_ENABLE_PIC_READER
+)
 
 # -----------------------------------------
 # Qt version related variables
@@ -621,7 +624,7 @@ mark_as_advanced(USE_ITKZLIB)
 if(NOT MITK_FAST_TESTING)
   if(DEFINED MITK_CTEST_SCRIPT_MODE
       AND (MITK_CTEST_SCRIPT_MODE STREQUAL "continuous" OR MITK_CTEST_SCRIPT_MODE STREQUAL "experimental") )
-    set(MITK_FAST_TESTING 1)
+    set(MITK_FAST_TESTING ON)
   endif()
 endif()
 

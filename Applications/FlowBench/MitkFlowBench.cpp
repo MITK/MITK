@@ -26,16 +26,16 @@ int main(int argc, char **argv)
   app.setApplicationName("MITK FlowBench");
   app.setOrganizationName("DKFZ");
 
-  // Preload the org.mitk.gui.qt.ext plug-in (and hence also QmitkExt) to speed
+  // Preload the org.mitk.gui.qt.application plug-in to speed
   // up a clean-cache start. This also works around bugs in older gcc and glibc implementations,
   // which have difficulties with multiple dynamic opening and closing of shared libraries with
   // many global static initializers. It also helps if dependent libraries have weird static
   // initialization methods and/or missing de-initialization code.
   QStringList preloadLibs;
-  preloadLibs << "liborg_mitk_gui_qt_ext";
+  preloadLibs << "org_mitk_gui_qt_application";
   app.setPreloadLibraries(preloadLibs);
 
-  app.setProperty(mitk::BaseApplication::PROP_PRODUCT, "org.mitk.gui.qt.flowbenchapplication.workbench");
+  app.setProperty(mitk::BaseApplication::PROP_PRODUCT, "org.mitk.gui.qt.flowapplication.workbench");
 
   // Run the workbench.
   return app.run();

@@ -46,8 +46,8 @@ org.mitk.gui.common
 org.mitk.gui.qt.application
 org.mitk.gui.qt.common
 org.mitk.gui.qt.datamanager
-org.mitk.gui.qt.flowbench.segmentation
-org.mitk.gui.qt.flowbenchapplication
+org.mitk.gui.qt.flow.segmentation
+org.mitk.gui.qt.flowapplication
 org.mitk.gui.qt.imagenavigator
 org.mitk.gui.qt.multilabelsegmentation
 org.mitk.gui.qt.properties

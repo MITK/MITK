@@ -141,11 +141,6 @@ private:
   std::map<QmitkChartWidget::AxisScale, std::string> m_AxisScaleToName;
 };
 
-std::string QmitkChartWidget::Impl::GetThemeName() const
-{
-  return m_C3Data.GetThemeName().toString().toStdString();
-}
-
 QmitkChartWidget::Impl::Impl(QWidget *parent)
   : m_WebChannel(new QWebChannel(parent)), m_WebEngineView(new QWebEngineView(parent))
 {
@@ -215,6 +210,11 @@ QmitkChartWidget::Impl::Impl(QWidget *parent)
 }
 
 QmitkChartWidget::Impl::~Impl() {}
+
+std::string QmitkChartWidget::Impl::GetThemeName() const
+{
+    return m_C3Data.GetThemeName().toString().toStdString();
+}
 
 std::string CheckForCorrectHex(const std::string &colorName)
 {

@@ -52,6 +52,51 @@ void ChartExample::CreateQtPartControl(QWidget *parent)
 
   m_Controls.m_doubleSpinBox_maxZoomX->setValue(10);
   m_Controls.m_doubleSpinBox_maxZoomY->setValue(10);
+
+  m_ChartNameToChartType.emplace("bar", QmitkChartWidget::ChartType::bar);
+  m_ChartNameToChartType.emplace("line", QmitkChartWidget::ChartType::line);
+  m_ChartNameToChartType.emplace("spline", QmitkChartWidget::ChartType::spline);
+  m_ChartNameToChartType.emplace("pie", QmitkChartWidget::ChartType::pie);
+  m_ChartNameToChartType.emplace("area", QmitkChartWidget::ChartType::area);
+  m_ChartNameToChartType.emplace("area-spline", QmitkChartWidget::ChartType::area_spline);
+  m_ChartNameToChartType.emplace("scatter", QmitkChartWidget::ChartType::scatter);
+
+  m_ChartNameToChartColor.emplace("red", QmitkChartWidget::ChartColor::red);
+  m_ChartNameToChartColor.emplace("orange", QmitkChartWidget::ChartColor::orange);
+  m_ChartNameToChartColor.emplace("yellow", QmitkChartWidget::ChartColor::yellow);
+  m_ChartNameToChartColor.emplace("green", QmitkChartWidget::ChartColor::green);
+  m_ChartNameToChartColor.emplace("blue", QmitkChartWidget::ChartColor::blue);
+  m_ChartNameToChartColor.emplace("purple", QmitkChartWidget::ChartColor::purple);
+  m_ChartNameToChartColor.emplace("brown", QmitkChartWidget::ChartColor::brown);
+  m_ChartNameToChartColor.emplace("magenta", QmitkChartWidget::ChartColor::magenta);
+  m_ChartNameToChartColor.emplace("tan", QmitkChartWidget::ChartColor::tan);
+  m_ChartNameToChartColor.emplace("cyan", QmitkChartWidget::ChartColor::cyan);
+  m_ChartNameToChartColor.emplace("olive", QmitkChartWidget::ChartColor::olive);
+  m_ChartNameToChartColor.emplace("maroon", QmitkChartWidget::ChartColor::maroon);
+  m_ChartNameToChartColor.emplace("navy", QmitkChartWidget::ChartColor::navy);
+  m_ChartNameToChartColor.emplace("aquamarine", QmitkChartWidget::ChartColor::aquamarine);
+  m_ChartNameToChartColor.emplace("turquoise", QmitkChartWidget::ChartColor::turqouise);
+  m_ChartNameToChartColor.emplace("silver", QmitkChartWidget::ChartColor::silver);
+  m_ChartNameToChartColor.emplace("lime", QmitkChartWidget::ChartColor::lime);
+  m_ChartNameToChartColor.emplace("teal", QmitkChartWidget::ChartColor::teal);
+  m_ChartNameToChartColor.emplace("indigo", QmitkChartWidget::ChartColor::indigo);
+  m_ChartNameToChartColor.emplace("violet", QmitkChartWidget::ChartColor::violet);
+  m_ChartNameToChartColor.emplace("pink", QmitkChartWidget::ChartColor::pink);
+  m_ChartNameToChartColor.emplace("black", QmitkChartWidget::ChartColor::black);
+  m_ChartNameToChartColor.emplace("white", QmitkChartWidget::ChartColor::white);
+  m_ChartNameToChartColor.emplace("grey", QmitkChartWidget::ChartColor::grey);
+
+  m_LineNameToLineType.emplace("solid", QmitkChartWidget::LineStyle::solid);
+  m_LineNameToLineType.emplace("dashed", QmitkChartWidget::LineStyle::dashed);
+
+  m_AxisScaleNameToAxisScaleType.emplace("linear", QmitkChartWidget::AxisScale::linear);
+  m_AxisScaleNameToAxisScaleType.emplace("logarithmic", QmitkChartWidget::AxisScale::log);
+
+  m_LegendPositionNameToLegendPositionType.emplace("bottom middle", QmitkChartWidget::LegendPosition::bottomMiddle);
+  m_LegendPositionNameToLegendPositionType.emplace("bottom right", QmitkChartWidget::LegendPosition::bottomRight);
+  m_LegendPositionNameToLegendPositionType.emplace("top right", QmitkChartWidget::LegendPosition::topRight);
+  m_LegendPositionNameToLegendPositionType.emplace("top left", QmitkChartWidget::LegendPosition::topLeft);
+  m_LegendPositionNameToLegendPositionType.emplace("middle right", QmitkChartWidget::LegendPosition::middleRight);
 }
 
 void ChartExample::CreateConnectionsForGUIElements()

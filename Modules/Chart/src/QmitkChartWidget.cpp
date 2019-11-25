@@ -61,7 +61,7 @@ public:
 
   QmitkChartxyData* GetDataElementByLabel(const std::string& label) const;
 
-  void ClearData();
+  void ClearData(bool chartExistence);
 
   void SetColor(const std::string &label, const std::string &colorName);
   void SetLineStyle(const std::string &label, LineStyle style);
@@ -314,12 +314,15 @@ void QmitkChartWidget::Impl::RemoveData(const std::string &label)
   throw std::invalid_argument("Cannot Remove Data because the label does not exist.");
 }
 
-void QmitkChartWidget::Impl::ClearData()
+void QmitkChartWidget::Impl::ClearData(bool chartExistence)
 {
-  for (auto &xyData : m_C3xyData)
-  {
-    m_WebChannel->deregisterObject(xyData.get());
-  }
+    if (chartExistence)
+    {
+        for (auto& xyData : m_C3xyData)
+        {
+            m_WebChannel->deregisterObject(xyData.get());
+        }
+    }
   m_C3xyData.clear();
 }
 
@@ -726,9 +729,9 @@ void QmitkChartWidget::Show(bool showSubChart)
   m_Impl->Show(showSubChart);
 }
 
-void QmitkChartWidget::Clear()
+void QmitkChartWidget::Clear(bool chartExistance)
 {
-  m_Impl->ClearData();
+  m_Impl->ClearData(chartExistance);
   m_Impl->ClearJavaScriptChart();
 }
 

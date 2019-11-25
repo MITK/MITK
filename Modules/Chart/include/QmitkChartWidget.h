@@ -260,7 +260,7 @@ public:
   /*!
   * \brief Clears all data inside and resets the widget.
   */
-  void Clear();
+  void Clear(bool chartExistence);
 
   /*!
   * \brief Sets the theme of the widget.
@@ -306,6 +306,8 @@ public:
   void AddChartExampleData(const std::map<double, double> &data2D, const std::string &label, ChartType type, ChartColor color, LineStyle style, QString pieLabelsData = 0);
 
   int GetIndexByString(std::string);
+
+  bool chartExistence = false;
 
 public slots:
   void OnLoadFinished(bool isLoadSuccessful);

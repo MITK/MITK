@@ -155,6 +155,14 @@ public:
                  const std::string &label,
                  ChartType chartType = ChartType::bar);
 
+  //Add Function for the ChartExample
+  void AddChartExampleData(const std::map<double, double>& data2D,
+                           const std::string& label,
+                           const std::string& type,
+                           const std::string& color,
+                           const std::string& style,
+                           std::string pieLabelsData = 0);
+
   /*!
   * \brief Removes data from the widget, works for 1D and 2D Data
   * \param label the name of the data that is also used as identifier.
@@ -302,13 +310,6 @@ public:
   void Reload();
 
   QSize sizeHint() const override;
-
-  void AddChartExampleData(const std::map<double, double>& data2D,
-                           const std::string& label,
-                           const std::string& type,
-                           const std::string& color,
-                           const std::string& style,
-                           std::string pieLabelsData = 0);
 
   int GetIndexByString(std::string);
 

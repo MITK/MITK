@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 std::unique_ptr<QmitkChartxyData> mitk::ChartExampleTestHelper::GetDataOne()
 {
-    QmitkChartxyData myDataOne;
+    auto myDataOne = std::make_unique<QmitkChartxyData>();
 
     QMap<QVariant, QVariant> data;
 
@@ -30,18 +30,18 @@ std::unique_ptr<QmitkChartxyData> mitk::ChartExampleTestHelper::GetDataOne()
         data.insert(i, i);
     }
 
-    myDataOne.SetData(data);
-    myDataOne.SetLabel("DataOne");
-    myDataOne.SetChartType("bar");
-    myDataOne.SetColor("red");
-    myDataOne.SetLineStyle("solid");
+    myDataOne->SetData(data);
+    myDataOne->SetLabel("DataOne");
+    myDataOne->SetChartType("bar");
+    myDataOne->SetColor("red");
+    myDataOne->SetLineStyle("solid");
 
-    return std::make_unique<QmitkChartxyData>(myDataOne);
+    return std::move(myDataOne);
 }
 
 std::unique_ptr<QmitkChartxyData> mitk::ChartExampleTestHelper::GetDataTwo()
 {
-    QmitkChartxyData myDataTwo;
+    auto myDataTwo = std::make_unique<QmitkChartxyData>();
 
     QMap<QVariant, QVariant> data;
 
@@ -50,18 +50,18 @@ std::unique_ptr<QmitkChartxyData> mitk::ChartExampleTestHelper::GetDataTwo()
         data.insert(i, i);
     }
 
-    myDataTwo.SetData(data);
-    myDataTwo.SetLabel("DataTwo");
-    myDataTwo.SetChartType("bar");
-    myDataTwo.SetColor("green");
-    myDataTwo.SetLineStyle("solid");
+    myDataTwo->SetData(data);
+    myDataTwo->SetLabel("DataTwo");
+    myDataTwo->SetChartType("bar");
+    myDataTwo->SetColor("green");
+    myDataTwo->SetLineStyle("solid");
 
-    return std::make_unique<QmitkChartxyData>(myDataTwo);
+    return std::move(myDataTwo);
 }
 
 std::unique_ptr<QmitkChartxyData> mitk::ChartExampleTestHelper::GetDataThree()
 {
-    QmitkChartxyData myDataThree;
+    auto myDataThree = std::make_unique<QmitkChartxyData>();
 
     QMap<QVariant, QVariant> data;
 
@@ -70,18 +70,18 @@ std::unique_ptr<QmitkChartxyData> mitk::ChartExampleTestHelper::GetDataThree()
         data.insert(i, i);
     }
 
-    myDataThree.SetData(data);
-    myDataThree.SetLabel("DataThree");
-    myDataThree.SetChartType("bar");
-    myDataThree.SetColor("blue");
-    myDataThree.SetLineStyle("solid");
+    myDataThree->SetData(data);
+    myDataThree->SetLabel("DataThree");
+    myDataThree->SetChartType("bar");
+    myDataThree->SetColor("blue");
+    myDataThree->SetLineStyle("solid");
 
-    return std::make_unique<QmitkChartxyData>(myDataThree);
+    return std::move(myDataThree);
 }
 
 std::unique_ptr<QmitkChartxyData> mitk::ChartExampleTestHelper::GetDataFour()
 {
-    QmitkChartxyData myDataFour;
+    auto myDataFour = std::make_unique<QmitkChartxyData>();
 
     QMap<QVariant, QVariant> data;
 
@@ -90,18 +90,18 @@ std::unique_ptr<QmitkChartxyData> mitk::ChartExampleTestHelper::GetDataFour()
         data.insert(i, i);
     }
 
-    myDataFour.SetData(data);
-    myDataFour.SetLabel("DataFour");
-    myDataFour.SetChartType("bar");
-    myDataFour.SetColor("yellow");
-    myDataFour.SetLineStyle("solid");
+    myDataFour->SetData(data);
+    myDataFour->SetLabel("DataFour");
+    myDataFour->SetChartType("bar");
+    myDataFour->SetColor("yellow");
+    myDataFour->SetLineStyle("solid");
 
-    return std::make_unique<QmitkChartxyData>(myDataFour);
+    return std::move(myDataFour);
 }
 
 std::unique_ptr<QmitkChartxyData> mitk::ChartExampleTestHelper::GetDataFive()
 {
-    QmitkChartxyData myDataFive;
+    auto myDataFive = std::make_unique<QmitkChartxyData>();
 
     QMap<QVariant, QVariant> data;
 
@@ -110,13 +110,13 @@ std::unique_ptr<QmitkChartxyData> mitk::ChartExampleTestHelper::GetDataFive()
         data.insert(i, i);
     }
 
-    myDataFive.SetData(data);
-    myDataFive.SetLabel("DataFive");
-    myDataFive.SetChartType("bar");
-    myDataFive.SetColor("black");
-    myDataFive.SetLineStyle("solid");
+    myDataFive->SetData(data);
+    myDataFive->SetLabel("DataFive");
+    myDataFive->SetChartType("bar");
+    myDataFive->SetColor("black");
+    myDataFive->SetLineStyle("solid");
 
-    return std::make_unique<QmitkChartxyData>(myDataFive);
+    return std::move(myDataFive);
 }
 
 QmitkChartWidget::ChartType mitk::ChartExampleTestHelper::ReturnChartTypeByString(std::string chartTypeString)
@@ -301,70 +301,39 @@ QmitkChartWidget::LineStyle mitk::ChartExampleTestHelper::ReturnChartStyleByStri
 
 void mitk::ChartExampleTestHelper::Add(int dataSet)
 {
+    std::unique_ptr<QmitkChartxyData> myData;
     if (dataSet == 1)
     {
-        auto myDataOne = mitk::ChartExampleTestHelper::GetDataOne();
-
-        std::map<double, double> data = mitk::ChartExampleTestHelper::ToStdMap(myDataOne->GetXData(), myDataOne->GetYData());
-        auto label = myDataOne->GetLabel().toString().toStdString();
-        auto type = mitk::ChartExampleTestHelper::ReturnChartTypeByString((myDataOne->GetChartType().toString().toStdString()));
-        auto color = mitk::ChartExampleTestHelper::ReturnChartColorByString((myDataOne->GetColor().toString().toStdString()));
-        auto style = mitk::ChartExampleTestHelper::ReturnChartStyleByString((myDataOne->GetLineStyle().toString().toStdString()));
-
-        qmitkChartWidget.AddChartExampleData(data, label, type, color, style);
+        myData = mitk::ChartExampleTestHelper::GetDataOne();
     }
 
     if (dataSet == 2)
     {
-        auto myDataTwo = mitk::ChartExampleTestHelper::GetDataTwo();
-
-        std::map<double, double> data = mitk::ChartExampleTestHelper::ToStdMap(myDataTwo->GetXData(), myDataTwo->GetYData());
-        auto label = myDataTwo->GetLabel().toString().toStdString();
-        auto type = mitk::ChartExampleTestHelper::ReturnChartTypeByString((myDataTwo->GetChartType().toString().toStdString()));
-        auto color = mitk::ChartExampleTestHelper::ReturnChartColorByString((myDataTwo->GetColor().toString().toStdString()));
-        auto style = mitk::ChartExampleTestHelper::ReturnChartStyleByString((myDataTwo->GetLineStyle().toString().toStdString()));
-
-        qmitkChartWidget.AddChartExampleData(data, label, type, color, style);
+        myData = mitk::ChartExampleTestHelper::GetDataTwo();
     }
 
     if (dataSet == 3)
     {
-        auto myDataThree = mitk::ChartExampleTestHelper::GetDataThree();
-
-        std::map<double, double> data = mitk::ChartExampleTestHelper::ToStdMap(myDataThree->GetXData(), myDataThree->GetYData());
-        auto label = myDataThree->GetLabel().toString().toStdString();
-        auto type = mitk::ChartExampleTestHelper::ReturnChartTypeByString((myDataThree->GetChartType().toString().toStdString()));
-        auto color = mitk::ChartExampleTestHelper::ReturnChartColorByString((myDataThree->GetColor().toString().toStdString()));
-        auto style = mitk::ChartExampleTestHelper::ReturnChartStyleByString((myDataThree->GetLineStyle().toString().toStdString()));
-
-        qmitkChartWidget.AddChartExampleData(data, label, type, color, style);
+        myData = mitk::ChartExampleTestHelper::GetDataThree();
     }
 
     if (dataSet == 4)
     {
-        auto myDataFour = mitk::ChartExampleTestHelper::GetDataFour();
-
-        std::map<double, double> data = mitk::ChartExampleTestHelper::ToStdMap(myDataFour->GetXData(), myDataFour->GetYData());
-        auto label = myDataFour->GetLabel().toString().toStdString();
-        auto type = mitk::ChartExampleTestHelper::ReturnChartTypeByString((myDataFour->GetChartType().toString().toStdString()));
-        auto color = mitk::ChartExampleTestHelper::ReturnChartColorByString((myDataFour->GetColor().toString().toStdString()));
-        auto style = mitk::ChartExampleTestHelper::ReturnChartStyleByString((myDataFour->GetLineStyle().toString().toStdString()));
-
-        qmitkChartWidget.AddChartExampleData(data, label, type, color, style);
+        myData = mitk::ChartExampleTestHelper::GetDataFour();
     }
 
     if (dataSet == 5)
     {
-        auto myDataFive = mitk::ChartExampleTestHelper::GetDataFive();
-
-        std::map<double, double> data = mitk::ChartExampleTestHelper::ToStdMap(myDataFive->GetXData(), myDataFive->GetYData());
-        auto label = myDataFive->GetLabel().toString().toStdString();
-        auto type = mitk::ChartExampleTestHelper::ReturnChartTypeByString((myDataFive->GetChartType().toString().toStdString()));
-        auto color = mitk::ChartExampleTestHelper::ReturnChartColorByString((myDataFive->GetColor().toString().toStdString()));
-        auto style = mitk::ChartExampleTestHelper::ReturnChartStyleByString((myDataFive->GetLineStyle().toString().toStdString()));
-
-        qmitkChartWidget.AddChartExampleData(data, label, type, color, style);
+        myData = mitk::ChartExampleTestHelper::GetDataFive();
     }
+
+    std::map<double, double> data = mitk::ChartExampleTestHelper::ToStdMap(myData->GetXData(), myData->GetYData());
+    auto label = myData->GetLabel().toString().toStdString();
+    auto type = myData->GetChartType().toString().toStdString();
+    auto color = myData->GetColor().toString().toStdString();
+    auto style = myData->GetLineStyle().toString().toStdString();
+
+    qmitkChartWidget.AddChartExampleData(data, label, type, color, style);
 }
 
 std::map<double, double> mitk::ChartExampleTestHelper::ToStdMap(QVariantList xData, QVariantList yData)
@@ -384,5 +353,5 @@ std::map<double, double> mitk::ChartExampleTestHelper::ToStdMap(QVariantList xDa
 void mitk::ChartExampleTestHelper::ClearMemory()
 {
     // Clear the vector
-    qmitkChartWidget.Clear();
+    qmitkChartWidget.Clear(true);
 }

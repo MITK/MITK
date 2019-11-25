@@ -17,9 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITK_CHART_EXAMPLE_TEST_HELPER_H
 #define MITK_CHART_EXAMPLE_TEST_HELPER_H
 
+#include <MitkChartExports.h>
+
 // mitk core
-#include "QmitkChartxyData.h"
-#include "QmitkChartWidget.h"
+#include <QmitkChartxyData.h>
+#include <QmitkChartWidget.h>
 
 // std includes
 #include <map>
@@ -29,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-    class ChartExampleTestHelper
+    class MITKCHART_EXPORT ChartExampleTestHelper
     {
 
     public:

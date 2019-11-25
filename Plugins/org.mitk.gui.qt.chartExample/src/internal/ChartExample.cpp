@@ -134,9 +134,12 @@ void ChartExample::AddData()
     QString data = QString::fromStdString(ConvertToText(dataXandY));
 
     std::string dataLabel = m_Controls.m_lineEditDataLabel->text().toStdString();
-    auto chartType = m_ChartNameToChartType.at(m_Controls.m_comboBoxChartType->currentText().toLower().toStdString());
-    auto chartColor = m_ChartNameToChartColor.at(m_Controls.m_comboBoxColor->currentText().toLower().toStdString());
-    auto chartStyle = m_LineNameToLineType.at(m_Controls.m_comboBoxLineStyle->currentText().toLower().toStdString());
+    std::string chartTypeAsString = m_Controls.m_comboBoxChartType->currentText().toLower().toStdString();
+    auto chartType = m_ChartNameToChartType.at(chartTypeAsString);
+    std::string chartColorAsString = m_Controls.m_comboBoxColor->currentText().toLower().toStdString();
+    auto chartColor = m_ChartNameToChartColor.at(chartColorAsString);
+    std::string chartStyleAsString = m_Controls.m_comboBoxLineStyle->currentText().toLower().toStdString();
+    auto chartStyle = m_LineNameToLineType.at(chartStyleAsString);
 
     if (std::find(labelStorage.begin(), labelStorage.end(), dataLabel) != labelStorage.end())
     {
@@ -164,7 +167,7 @@ void ChartExample::AddData()
     }
 
     labelStorage.push_back(dataLabel);
-    m_Controls.m_Chart->AddChartExampleData(dataXandY, dataLabel, chartType, chartColor, chartStyle, pieLabelsData);
+    m_Controls.m_Chart->AddChartExampleData(dataXandY, dataLabel, chartTypeAsString, chartColorAsString, chartStyleAsString, pieLabelsData.toStdString());
     m_Controls.m_comboBoxExistingData->addItem(m_Controls.m_lineEditDataLabel->text());
 
     if (m_Controls.m_checkBoxEnableErrors->isChecked())
@@ -194,6 +197,8 @@ void ChartExample::AddData()
     dataOverview.append(":").append(data);
 
     m_Controls.m_plainTextEditDataView->appendPlainText(dataOverview);
+
+    m_Controls.m_Chart->chartExistence = false;
 }
 
 void ChartExample::CreateChart()
@@ -307,7 +312,6 @@ void ChartExample::UpdateSelectedData()
     m_Controls.m_lineEditDataLabel->setText(QString::fromStdString(label));
     m_Controls.m_comboBoxColor->setCurrentIndex(colorIndex);
     m_Controls.m_comboBoxChartType->setCurrentIndex(typeIndex);
-
 }
 
 void ChartExample::ClearChart()

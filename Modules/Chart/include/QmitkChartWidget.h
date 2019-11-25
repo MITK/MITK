@@ -303,7 +303,12 @@ public:
 
   QSize sizeHint() const override;
 
-  void AddChartExampleData(const std::map<double, double> &data2D, const std::string &label, ChartType type, ChartColor color, LineStyle style, QString pieLabelsData = 0);
+  void AddChartExampleData(const std::map<double, double>& data2D,
+                           const std::string& label,
+                           const std::string& type,
+                           const std::string& color,
+                           const std::string& style,
+                           std::string pieLabelsData = 0);
 
   int GetIndexByString(std::string);
 

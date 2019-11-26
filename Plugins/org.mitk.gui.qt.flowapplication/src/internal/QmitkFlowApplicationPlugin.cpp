@@ -200,12 +200,6 @@ void QmitkFlowApplicationPlugin::handleIPCMessage(const QByteArray& msg)
   mainWindow->raise();
   mainWindow->activateWindow();
 
-  // Get the preferences for the instantiation behavior
-  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
-  berry::IPreferences::Pointer prefs = prefService->GetSystemPreferences()->Node("/General");
-  bool newInstanceAlways = prefs->GetBool("newInstance.always", false);
-  bool newInstanceScene = prefs->GetBool("newInstance.scene", true);
-
   QStringList args;
   ds >> args;
 

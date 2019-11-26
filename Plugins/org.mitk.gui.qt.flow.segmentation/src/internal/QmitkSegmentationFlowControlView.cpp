@@ -74,7 +74,7 @@ void QmitkSegmentationFlowControlView::CreateQtPartControl(QWidget* parent)
     {
       if (isFlagFound)
       {
-        m_OutputDir = arg.toLatin1();
+        m_OutputDir = arg.toStdString();
         break;
       }
       isFlagFound = arg.startsWith("--flow.outputdir");
@@ -84,7 +84,7 @@ void QmitkSegmentationFlowControlView::CreateQtPartControl(QWidget* parent)
     {
       if (isFlagFound)
       {
-        m_FileExtension = arg.toLatin1();
+        m_FileExtension = arg.toStdString();
         break;
       }
       isFlagFound = arg.startsWith("--flow.outputformat");
@@ -110,17 +110,17 @@ void QmitkSegmentationFlowControlView::UpdateControls()
   m_Controls.btnStoreAndAccept->setEnabled(!nodes->empty());
 };
 
-void QmitkSegmentationFlowControlView::NodeAdded(const mitk::DataNode* node)
+void QmitkSegmentationFlowControlView::NodeAdded(const mitk::DataNode* /*node*/)
 {
   UpdateControls();
 };
 
-void QmitkSegmentationFlowControlView::NodeChanged(const mitk::DataNode* node)
+void QmitkSegmentationFlowControlView::NodeChanged(const mitk::DataNode* /*node*/)
 {
   UpdateControls();
 };
 
-void QmitkSegmentationFlowControlView::NodeRemoved(const mitk::DataNode* node)
+void QmitkSegmentationFlowControlView::NodeRemoved(const mitk::DataNode* /*node*/)
 {
   UpdateControls();
 };

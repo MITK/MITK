@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkAbstractView.h>
 
-#include "ui_ChartExampleControls.h"
+#include "ui_QmitkChartExampleViewControls.h"
 
 /**
   \brief Basic example for use of module mitkChart
@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   \sa QmitkAbstractView
   \ingroup ${plugin_target}_internal
 */
-class ChartExampleView : public QmitkAbstractView
+class QmitkChartExampleView : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -84,7 +84,7 @@ private:
   std::vector<std::string> ConvertToStringVector(const QString& data, QChar delimiter = ';') const;
 
   unsigned int countForUID = 0;
-  Ui::ChartExampleControls m_Controls;
+  Ui::QmitkChartExampleViewControls m_Controls;
 };
 
 #endif // ChartExample_h

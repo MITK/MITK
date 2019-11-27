@@ -22,7 +22,7 @@ namespace mitk
 {
   void org_mitk_gui_qt_chartExample_Activator::start(ctkPluginContext *context)
   {
-    BERRY_REGISTER_EXTENSION_CLASS(ChartExampleView, context)
+    BERRY_REGISTER_EXTENSION_CLASS(QmitkChartExampleView, context)
   }
 
   void org_mitk_gui_qt_chartExample_Activator::stop(ctkPluginContext *context) { Q_UNUSED(context) }

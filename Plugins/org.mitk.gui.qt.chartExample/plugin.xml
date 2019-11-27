@@ -5,7 +5,7 @@
     <view id="org.mitk.views.chartexample"
           name="Chart Example"
 		  category="Quantification"
-          class="ChartExampleView"
+          class="QmitkChartExampleView"
           icon="resources/chart.svg"/>
   </extension>
 

@@ -353,5 +353,5 @@ std::map<double, double> mitk::ChartExampleTestHelper::ToStdMap(QVariantList xDa
 void mitk::ChartExampleTestHelper::ClearMemory()
 {
     // Clear the vector
-    qmitkChartWidget.Clear(true);
+    qmitkChartWidget.Clear();
 }

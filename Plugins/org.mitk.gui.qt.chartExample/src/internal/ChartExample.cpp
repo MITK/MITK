@@ -162,8 +162,6 @@ void ChartExample::AddData()
     dataOverview.append(":").append(data);
 
     m_Controls.m_plainTextEditDataView->appendPlainText(dataOverview);
-
-    m_Controls.m_Chart->chartExistence = false;
 }
 
 void ChartExample::CreateChart()
@@ -190,8 +188,6 @@ void ChartExample::CreateChart()
   m_Controls.m_Chart->SetShowDataPoints(showDataPoints);
   m_Controls.m_Chart->SetStackedData(stackedData);
   m_Controls.m_Chart->Show(showSubchart);
-
-  m_Controls.m_Chart->chartExistence = true;
 }
 
 void ChartExample::UpdateData()
@@ -281,15 +277,13 @@ void ChartExample::UpdateSelectedData()
 
 void ChartExample::ClearChart()
 {
-  m_Controls.m_Chart->Clear(m_Controls.m_Chart->chartExistence);
+  m_Controls.m_Chart->Clear();
 
   m_Controls.m_plainTextEditDataView->clear();
 
   m_Controls.m_comboBoxExistingData->clear();
 
   labelStorage.clear();
-
-  m_Controls.m_Chart->chartExistence = false;
 }
 
 void ChartExample::ShowErrorOptions(bool show)

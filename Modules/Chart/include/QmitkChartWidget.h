@@ -268,7 +268,7 @@ public:
   /*!
   * \brief Clears all data inside and resets the widget.
   */
-  void Clear(bool chartExistence = 0);
+  void Clear();
 
   /*!
   * \brief Sets the theme of the widget.
@@ -312,8 +312,6 @@ public:
   QSize sizeHint() const override;
 
   int GetIndexByString(std::string);
-
-  bool chartExistence = false;
 
 public slots:
   void OnLoadFinished(bool isLoadSuccessful);

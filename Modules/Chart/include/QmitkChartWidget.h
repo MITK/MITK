@@ -268,7 +268,7 @@ public:
   /*!
   * \brief Clears all data inside and resets the widget.
   */
-  void Clear(bool chartExistence);
+  void Clear(bool chartExistence = 0);
 
   /*!
   * \brief Sets the theme of the widget.

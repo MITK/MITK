@@ -69,7 +69,7 @@ public:
 
   QmitkChartxyData* GetDataElementByLabel(const std::string& label) const;
 
-  void ClearData(bool chartExistence);
+  void ClearData(bool chartExistence = 0);
 
   void SetColor(const std::string &label, const std::string &colorName);
   void SetLineStyle(const std::string &label, LineStyle style);

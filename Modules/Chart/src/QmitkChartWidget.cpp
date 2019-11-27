@@ -277,7 +277,7 @@ void QmitkChartWidget::Impl::AddChartExampleData(const std::map<double, double>&
                                                  const std::string& label,
                                                  const std::string& type,
                                                  const std::string& color,
-                                                 const std::string& style,
+                                                 const std::string& lineStyle,
                                                  std::string pieLabelsData)
 {
     QList<QVariant> pieLabelsDataList;
@@ -319,7 +319,7 @@ void QmitkChartWidget::Impl::AddChartExampleData(const std::map<double, double>&
             QVariant(sizeOfC3xyData));
 
     chartData->SetColor(QVariant(QString::fromStdString(color)));
-    chartData->SetLineStyle(QVariant(QString::fromStdString(style)));
+    chartData->SetLineStyle(QVariant(QString::fromStdString(lineStyle)));
     chartData->SetPieLabels(pieLabelsDataList);
 
     m_C3xyData.push_back(std::move(chartData));
@@ -696,10 +696,10 @@ void QmitkChartWidget::AddChartExampleData(const std::map<double, double>& data2
                                            const std::string& label,
                                            const std::string& type,
                                            const std::string& color,
-                                           const std::string& style,
+                                           const std::string& lineStyle,
                                            std::string pieLabelsData)
 {
-    m_Impl->AddChartExampleData(data2D, label, type, color, style, pieLabelsData);
+    m_Impl->AddChartExampleData(data2D, label, type, color, lineStyle, pieLabelsData);
 }
 
 void QmitkChartWidget::UpdateData1D(const std::vector<double> &data1D, const std::string &label)

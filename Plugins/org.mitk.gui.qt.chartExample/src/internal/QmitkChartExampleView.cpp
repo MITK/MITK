@@ -53,9 +53,6 @@ void QmitkChartExampleView::CreateQtPartControl(QWidget *parent)
   m_Controls.m_doubleSpinBox_maxZoomX->setValue(10);
   m_Controls.m_doubleSpinBox_maxZoomY->setValue(10);
 
-  m_LineNameToLineType.emplace("solid", QmitkChartWidget::LineStyle::solid);
-  m_LineNameToLineType.emplace("dashed", QmitkChartWidget::LineStyle::dashed);
-
   m_AxisScaleNameToAxisScaleType.emplace("linear", QmitkChartWidget::AxisScale::linear);
   m_AxisScaleNameToAxisScaleType.emplace("logarithmic", QmitkChartWidget::AxisScale::log);
 
@@ -103,8 +100,7 @@ void QmitkChartExampleView::AddData()
     std::string dataLabel = m_Controls.m_lineEditDataLabel->text().toStdString();
     std::string chartTypeAsString = m_Controls.m_comboBoxChartType->currentText().toLower().toStdString();
     std::string chartColorAsString = m_Controls.m_comboBoxColor->currentText().toLower().toStdString();
-    std::string chartStyleAsString = m_Controls.m_comboBoxLineStyle->currentText().toLower().toStdString();
-    auto chartStyle = m_LineNameToLineType.at(chartStyleAsString);
+    std::string chartLineStyleAsString = m_Controls.m_comboBoxLineStyle->currentText().toLower().toStdString();
 
     if (std::find(labelStorage.begin(), labelStorage.end(), dataLabel) != labelStorage.end())
     {
@@ -132,7 +128,7 @@ void QmitkChartExampleView::AddData()
     }
 
     labelStorage.push_back(dataLabel);
-    m_Controls.m_Chart->AddChartExampleData(dataXandY, dataLabel, chartTypeAsString, chartColorAsString, chartStyleAsString, pieLabelsData.toStdString());
+    m_Controls.m_Chart->AddChartExampleData(dataXandY, dataLabel, chartTypeAsString, chartColorAsString, chartLineStyleAsString, pieLabelsData.toStdString());
     m_Controls.m_comboBoxExistingData->addItem(m_Controls.m_lineEditDataLabel->text());
 
     if (m_Controls.m_checkBoxEnableErrors->isChecked())
@@ -150,8 +146,6 @@ void QmitkChartExampleView::AddData()
             m_Controls.m_Chart->SetYErrorBars(m_Controls.m_lineEditDataLabel->text().toStdString(), errorsPlus, errorsMinus);
         }
     }
-
-    m_Controls.m_Chart->SetLineStyle(dataLabel, chartStyle);
 
     QString dataOverview;
     dataOverview.append(m_Controls.m_lineEditDataLabel->text());

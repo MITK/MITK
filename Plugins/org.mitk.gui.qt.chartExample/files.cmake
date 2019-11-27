@@ -1,7 +1,3 @@
-set(SRC_CPP_FILES
-
-)
-
 set(INTERNAL_CPP_FILES
   org_mitk_gui_qt_chartExample_Activator.cpp
   ChartExample.cpp
@@ -24,14 +20,6 @@ set(CACHED_RESOURCE_FILES
   resources/chart.svg
   plugin.xml
 )
-
-# list of Qt .qrc files which contain additional resources
-# specific to this plugin
-set(QRC_FILES
-
-)
-
-set(CPP_FILES )
 
 foreach(file ${SRC_CPP_FILES})
   set(CPP_FILES ${CPP_FILES} src/${file})

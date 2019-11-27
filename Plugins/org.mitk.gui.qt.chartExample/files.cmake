@@ -1,15 +1,15 @@
 set(INTERNAL_CPP_FILES
   org_mitk_gui_qt_chartExample_Activator.cpp
-  ChartExample.cpp
+  QmitkChartExampleView.cpp
 )
 
 set(UI_FILES
-  src/internal/ChartExampleControls.ui
+  src/internal/QmitkChartExampleViewControls.ui
 )
 
 set(MOC_H_FILES
   src/internal/org_mitk_gui_qt_chartExample_Activator.h
-  src/internal/ChartExample.h
+  src/internal/QmitkChartExampleView.h
 )
 
 # list of resource files which can be used by the plug-in

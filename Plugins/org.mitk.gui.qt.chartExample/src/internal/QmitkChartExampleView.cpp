@@ -19,22 +19,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryWorkbenchPlugin.h>
 
 // Qmitk
-#include "ChartExample.h"
+#include "QmitkChartExampleView.h"
 #include <QmitkChartxyData.h>
 
-const std::string ChartExample::VIEW_ID = "org.mitk.views.chartexample";
+const std::string ChartExampleView::VIEW_ID = "org.mitk.views.chartexample";
 
-void ChartExample::SetFocus()
+void ChartExampleView::SetFocus()
 {
   m_Controls.m_buttonCreateChart->setFocus();
 }
 
-void ChartExample::CreateQtPartControl(QWidget *parent)
+void ChartExampleView::CreateQtPartControl(QWidget *parent)
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(parent);
   CreateConnectionsForGUIElements();
-  connect(m_Controls.m_comboBoxChartType, &QComboBox::currentTextChanged, this, &ChartExample::AdaptDataGUI);
+  connect(m_Controls.m_comboBoxChartType, &QComboBox::currentTextChanged, this, &ChartExampleView::AdaptDataGUI);
 
   m_Controls.m_lineEditDataXVector->setText("0;1;2;3;4;5;6;7;8;9");
   m_Controls.m_lineEditDataYVector->setText("0;1;2;3;4;5;6;7;8;9");
@@ -66,32 +66,32 @@ void ChartExample::CreateQtPartControl(QWidget *parent)
   m_LegendPositionNameToLegendPositionType.emplace("middle right", QmitkChartWidget::LegendPosition::middleRight);
 }
 
-void ChartExample::CreateConnectionsForGUIElements()
+void ChartExampleView::CreateConnectionsForGUIElements()
 {
-  connect(m_Controls.m_buttonCreateChart, &QPushButton::clicked, this, &ChartExample::CreateChart);
-  connect(m_Controls.m_buttonUpdateData, &QPushButton::clicked, this, &ChartExample::UpdateData);
-  connect(m_Controls.m_buttonClearChart, &QPushButton::clicked, this, &ChartExample::ClearChart);
-  connect(m_Controls.m_buttonAddData, &QPushButton::clicked, this, &ChartExample::AddData);
-  connect(m_Controls.m_comboBoxExistingData, &QComboBox::currentTextChanged, this, &ChartExample::UpdateSelectedData);
-  connect(m_Controls.m_checkBoxEnableErrors, &QCheckBox::toggled, this, &ChartExample::ShowErrorOptions);
-  connect(m_Controls.m_checkBoxEnableXErrors, &QCheckBox::toggled, this, &ChartExample::ShowXErrorOptions);
-  connect(m_Controls.m_checkBoxEnableYErrors, &QCheckBox::toggled, this, &ChartExample::ShowYErrorOptions);
-  connect(m_Controls.m_doubleSpinBox_minZoomX, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoomX);
-  connect(m_Controls.m_doubleSpinBox_maxZoomX, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoomX);
-  connect(m_Controls.m_doubleSpinBox_minZoomY, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoomY);
-  connect(m_Controls.m_doubleSpinBox_maxZoomY, &QSpinBox::editingFinished, this, &ChartExample::AdaptZoomY);
-  connect(m_Controls.m_comboBoxLegendPosition, &QComboBox::currentTextChanged, this, &ChartExample::OnLegendPositionChanged);
-  connect(m_Controls.m_lineEditTitle, &QLineEdit::editingFinished, this, &ChartExample::OnTitleChanged);
-  connect(m_Controls.m_lineEditXAxisLabel, &QLineEdit::editingFinished, this, &ChartExample::OnXAxisLabelChanged);
-  connect(m_Controls.m_lineEditYAxisLabel, &QLineEdit::editingFinished, this, &ChartExample::OnYAxisLabelChanged);
-  connect(m_Controls.m_comboBoxYAxisScale, &QComboBox::currentTextChanged, this, &ChartExample::OnYAxisScaleChanged);
-  connect(m_Controls.m_checkBoxShowLegend, &QCheckBox::stateChanged, this, &ChartExample::OnShowLegendChanged);
-  connect(m_Controls.m_checkBoxStackedData, &QCheckBox::stateChanged, this, &ChartExample::OnStackedDataChanged);
-  connect(m_Controls.m_checkBoxShowDataPoints, &QCheckBox::stateChanged, this, &ChartExample::OnShowDataPointsChanged);
-  connect(m_Controls.m_checkBoxShowSubchart, &QCheckBox::stateChanged, this, &ChartExample::OnShowSubchartChanged);
+  connect(m_Controls.m_buttonCreateChart, &QPushButton::clicked, this, &ChartExampleView::CreateChart);
+  connect(m_Controls.m_buttonUpdateData, &QPushButton::clicked, this, &ChartExampleView::UpdateData);
+  connect(m_Controls.m_buttonClearChart, &QPushButton::clicked, this, &ChartExampleView::ClearChart);
+  connect(m_Controls.m_buttonAddData, &QPushButton::clicked, this, &ChartExampleView::AddData);
+  connect(m_Controls.m_comboBoxExistingData, &QComboBox::currentTextChanged, this, &ChartExampleView::UpdateSelectedData);
+  connect(m_Controls.m_checkBoxEnableErrors, &QCheckBox::toggled, this, &ChartExampleView::ShowErrorOptions);
+  connect(m_Controls.m_checkBoxEnableXErrors, &QCheckBox::toggled, this, &ChartExampleView::ShowXErrorOptions);
+  connect(m_Controls.m_checkBoxEnableYErrors, &QCheckBox::toggled, this, &ChartExampleView::ShowYErrorOptions);
+  connect(m_Controls.m_doubleSpinBox_minZoomX, &QSpinBox::editingFinished, this, &ChartExampleView::AdaptZoomX);
+  connect(m_Controls.m_doubleSpinBox_maxZoomX, &QSpinBox::editingFinished, this, &ChartExampleView::AdaptZoomX);
+  connect(m_Controls.m_doubleSpinBox_minZoomY, &QSpinBox::editingFinished, this, &ChartExampleView::AdaptZoomY);
+  connect(m_Controls.m_doubleSpinBox_maxZoomY, &QSpinBox::editingFinished, this, &ChartExampleView::AdaptZoomY);
+  connect(m_Controls.m_comboBoxLegendPosition, &QComboBox::currentTextChanged, this, &ChartExampleView::OnLegendPositionChanged);
+  connect(m_Controls.m_lineEditTitle, &QLineEdit::editingFinished, this, &ChartExampleView::OnTitleChanged);
+  connect(m_Controls.m_lineEditXAxisLabel, &QLineEdit::editingFinished, this, &ChartExampleView::OnXAxisLabelChanged);
+  connect(m_Controls.m_lineEditYAxisLabel, &QLineEdit::editingFinished, this, &ChartExampleView::OnYAxisLabelChanged);
+  connect(m_Controls.m_comboBoxYAxisScale, &QComboBox::currentTextChanged, this, &ChartExampleView::OnYAxisScaleChanged);
+  connect(m_Controls.m_checkBoxShowLegend, &QCheckBox::stateChanged, this, &ChartExampleView::OnShowLegendChanged);
+  connect(m_Controls.m_checkBoxStackedData, &QCheckBox::stateChanged, this, &ChartExampleView::OnStackedDataChanged);
+  connect(m_Controls.m_checkBoxShowDataPoints, &QCheckBox::stateChanged, this, &ChartExampleView::OnShowDataPointsChanged);
+  connect(m_Controls.m_checkBoxShowSubchart, &QCheckBox::stateChanged, this, &ChartExampleView::OnShowSubchartChanged);
 }
 
-void ChartExample::AddData()
+void ChartExampleView::AddData()
 {
     QString lineEditDataX = m_Controls.m_lineEditDataXVector->text();
     QString lineEditDataY = m_Controls.m_lineEditDataYVector->text();
@@ -164,7 +164,7 @@ void ChartExample::AddData()
     m_Controls.m_plainTextEditDataView->appendPlainText(dataOverview);
 }
 
-void ChartExample::CreateChart()
+void ChartExampleView::CreateChart()
 {
   auto dataYAxisScaleType =
     m_AxisScaleNameToAxisScaleType.at(m_Controls.m_comboBoxYAxisScale->currentText().toStdString());
@@ -190,7 +190,7 @@ void ChartExample::CreateChart()
   m_Controls.m_Chart->Show(showSubchart);
 }
 
-void ChartExample::UpdateData()
+void ChartExampleView::UpdateData()
 {
     if (m_Controls.m_comboBoxExistingData->currentText().isEmpty())
     {
@@ -216,7 +216,7 @@ void ChartExample::UpdateData()
     AddData();
 }
 
-void ChartExample::UpdateSelectedData()
+void ChartExampleView::UpdateSelectedData()
 {
     std::string label = m_Controls.m_comboBoxExistingData->currentText().toStdString();
     auto data = m_Controls.m_Chart->GetDataElementByLabel(label);
@@ -275,7 +275,7 @@ void ChartExample::UpdateSelectedData()
     m_Controls.m_comboBoxChartType->setCurrentIndex(typeIndex);
 }
 
-void ChartExample::ClearChart()
+void ChartExampleView::ClearChart()
 {
   m_Controls.m_Chart->Clear();
 
@@ -286,36 +286,36 @@ void ChartExample::ClearChart()
   labelStorage.clear();
 }
 
-void ChartExample::ShowErrorOptions(bool show)
+void ChartExampleView::ShowErrorOptions(bool show)
 {
   m_Controls.m_groupBoxErrors->setVisible(show);
 }
 
-void ChartExample::ShowXErrorOptions(bool show)
+void ChartExampleView::ShowXErrorOptions(bool show)
 {
   m_Controls.m_groupBoxXErrors->setVisible(show);
 }
 
-void ChartExample::ShowYErrorOptions(bool show)
+void ChartExampleView::ShowYErrorOptions(bool show)
 {
   m_Controls.m_groupBoxYErrors->setVisible(show);
 }
 
-void ChartExample::AdaptZoomX()
+void ChartExampleView::AdaptZoomX()
 {
   m_Controls.m_Chart->SetMinMaxValueXView(m_Controls.m_doubleSpinBox_minZoomX->value(),
                                              m_Controls.m_doubleSpinBox_maxZoomX->value());
   m_Controls.m_Chart->Show();
 }
 
-void ChartExample::AdaptZoomY()
+void ChartExampleView::AdaptZoomY()
 {
   m_Controls.m_Chart->SetMinMaxValueYView(m_Controls.m_doubleSpinBox_minZoomY->value(),
                                              m_Controls.m_doubleSpinBox_maxZoomY->value());
   m_Controls.m_Chart->Show();
 }
 
-void ChartExample::AdaptDataGUI(QString chartType)
+void ChartExampleView::AdaptDataGUI(QString chartType)
 {
   if (chartType == "Pie")
   {
@@ -334,49 +334,49 @@ void ChartExample::AdaptDataGUI(QString chartType)
   }
 }
 
-void ChartExample::OnLegendPositionChanged(const QString &newText)
+void ChartExampleView::OnLegendPositionChanged(const QString &newText)
 {
   auto legendPosition = m_LegendPositionNameToLegendPositionType.at(newText.toStdString());
   m_Controls.m_Chart->SetLegendPosition(legendPosition);
 }
 
-void ChartExample::OnTitleChanged() {
+void ChartExampleView::OnTitleChanged() {
   auto newTitle = m_Controls.m_lineEditTitle->text();
   m_Controls.m_Chart->SetTitle(newTitle.toStdString());
 }
 
-void ChartExample::OnXAxisLabelChanged() {
+void ChartExampleView::OnXAxisLabelChanged() {
   auto newXAxisLabel = m_Controls.m_lineEditXAxisLabel->text();
   m_Controls.m_Chart->SetXAxisLabel(newXAxisLabel.toStdString());
 }
 
-void ChartExample::OnYAxisLabelChanged() {
+void ChartExampleView::OnYAxisLabelChanged() {
   auto newYAxisLabel = m_Controls.m_lineEditYAxisLabel->text();
   m_Controls.m_Chart->SetYAxisLabel(newYAxisLabel.toStdString());
 }
 
-void ChartExample::OnYAxisScaleChanged(const QString &newYAxisScale) {
+void ChartExampleView::OnYAxisScaleChanged(const QString &newYAxisScale) {
   auto yAxisScale = m_AxisScaleNameToAxisScaleType.at(newYAxisScale.toStdString());
   m_Controls.m_Chart->SetYAxisScale(yAxisScale);
 }
 
-void ChartExample::OnShowLegendChanged(int newState) {
+void ChartExampleView::OnShowLegendChanged(int newState) {
   m_Controls.m_Chart->SetShowLegend(newState == Qt::Checked);
 }
 
-void ChartExample::OnStackedDataChanged(int newState) {
+void ChartExampleView::OnStackedDataChanged(int newState) {
   m_Controls.m_Chart->SetStackedData(newState == Qt::Checked);
 }
 
-void ChartExample::OnShowDataPointsChanged(int newState) {
+void ChartExampleView::OnShowDataPointsChanged(int newState) {
   m_Controls.m_Chart->SetShowDataPoints(newState == Qt::Checked);
 }
 
-void ChartExample::OnShowSubchartChanged(int newState) {
+void ChartExampleView::OnShowSubchartChanged(int newState) {
   m_Controls.m_Chart->SetShowSubchart(newState == Qt::Checked);
 }
 
-std::map<double, double> ChartExample::CreateMap(std::vector<double> keys, std::vector<double> values) const
+std::map<double, double> ChartExampleView::CreateMap(std::vector<double> keys, std::vector<double> values) const
 {
     std::map<double, double> aMap;
     std::transform(keys.begin(), keys.end(), values.begin(), std::inserter(aMap, aMap.end()), [](double a, double b) {
@@ -385,7 +385,7 @@ std::map<double, double> ChartExample::CreateMap(std::vector<double> keys, std::
     return aMap;
 }
 
-std::string ChartExample::ConvertToText(std::map<double, double> numbers, std::string delimiter) const
+std::string ChartExampleView::ConvertToText(std::map<double, double> numbers, std::string delimiter) const
 {
     std::ostringstream oss;
     oss.precision(3);
@@ -402,7 +402,7 @@ std::string ChartExample::ConvertToText(std::map<double, double> numbers, std::s
     return aString;
 }
 
-std::string ChartExample::ConvertToText(std::vector<QVariant> numbers, std::string delimiter) const
+std::string ChartExampleView::ConvertToText(std::vector<QVariant> numbers, std::string delimiter) const
 {
     std::ostringstream oss;
     oss.precision(3);
@@ -419,7 +419,7 @@ std::string ChartExample::ConvertToText(std::vector<QVariant> numbers, std::stri
     return aString;
 }
 
-std::vector<double> ChartExample::ConvertToDoubleVector(const QString& data, QChar delimiter) const
+std::vector<double> ChartExampleView::ConvertToDoubleVector(const QString& data, QChar delimiter) const
 {
     std::vector<double> output;
     if (data.isEmpty())
@@ -434,7 +434,7 @@ std::vector<double> ChartExample::ConvertToDoubleVector(const QString& data, QCh
     return output;
 }
 
-std::vector<std::string> ChartExample::ConvertToStringVector(const QString& data, QChar delimiter) const
+std::vector<std::string> ChartExampleView::ConvertToStringVector(const QString& data, QChar delimiter) const
 {
     std::vector<std::string> output;
     if (data.isEmpty())

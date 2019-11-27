@@ -53,39 +53,6 @@ void ChartExample::CreateQtPartControl(QWidget *parent)
   m_Controls.m_doubleSpinBox_maxZoomX->setValue(10);
   m_Controls.m_doubleSpinBox_maxZoomY->setValue(10);
 
-  m_ChartNameToChartType.emplace("bar", QmitkChartWidget::ChartType::bar);
-  m_ChartNameToChartType.emplace("line", QmitkChartWidget::ChartType::line);
-  m_ChartNameToChartType.emplace("spline", QmitkChartWidget::ChartType::spline);
-  m_ChartNameToChartType.emplace("pie", QmitkChartWidget::ChartType::pie);
-  m_ChartNameToChartType.emplace("area", QmitkChartWidget::ChartType::area);
-  m_ChartNameToChartType.emplace("area-spline", QmitkChartWidget::ChartType::area_spline);
-  m_ChartNameToChartType.emplace("scatter", QmitkChartWidget::ChartType::scatter);
-
-  m_ChartNameToChartColor.emplace("red", QmitkChartWidget::ChartColor::red);
-  m_ChartNameToChartColor.emplace("orange", QmitkChartWidget::ChartColor::orange);
-  m_ChartNameToChartColor.emplace("yellow", QmitkChartWidget::ChartColor::yellow);
-  m_ChartNameToChartColor.emplace("green", QmitkChartWidget::ChartColor::green);
-  m_ChartNameToChartColor.emplace("blue", QmitkChartWidget::ChartColor::blue);
-  m_ChartNameToChartColor.emplace("purple", QmitkChartWidget::ChartColor::purple);
-  m_ChartNameToChartColor.emplace("brown", QmitkChartWidget::ChartColor::brown);
-  m_ChartNameToChartColor.emplace("magenta", QmitkChartWidget::ChartColor::magenta);
-  m_ChartNameToChartColor.emplace("tan", QmitkChartWidget::ChartColor::tan);
-  m_ChartNameToChartColor.emplace("cyan", QmitkChartWidget::ChartColor::cyan);
-  m_ChartNameToChartColor.emplace("olive", QmitkChartWidget::ChartColor::olive);
-  m_ChartNameToChartColor.emplace("maroon", QmitkChartWidget::ChartColor::maroon);
-  m_ChartNameToChartColor.emplace("navy", QmitkChartWidget::ChartColor::navy);
-  m_ChartNameToChartColor.emplace("aquamarine", QmitkChartWidget::ChartColor::aquamarine);
-  m_ChartNameToChartColor.emplace("turquoise", QmitkChartWidget::ChartColor::turqouise);
-  m_ChartNameToChartColor.emplace("silver", QmitkChartWidget::ChartColor::silver);
-  m_ChartNameToChartColor.emplace("lime", QmitkChartWidget::ChartColor::lime);
-  m_ChartNameToChartColor.emplace("teal", QmitkChartWidget::ChartColor::teal);
-  m_ChartNameToChartColor.emplace("indigo", QmitkChartWidget::ChartColor::indigo);
-  m_ChartNameToChartColor.emplace("violet", QmitkChartWidget::ChartColor::violet);
-  m_ChartNameToChartColor.emplace("pink", QmitkChartWidget::ChartColor::pink);
-  m_ChartNameToChartColor.emplace("black", QmitkChartWidget::ChartColor::black);
-  m_ChartNameToChartColor.emplace("white", QmitkChartWidget::ChartColor::white);
-  m_ChartNameToChartColor.emplace("grey", QmitkChartWidget::ChartColor::grey);
-
   m_LineNameToLineType.emplace("solid", QmitkChartWidget::LineStyle::solid);
   m_LineNameToLineType.emplace("dashed", QmitkChartWidget::LineStyle::dashed);
 
@@ -135,9 +102,7 @@ void ChartExample::AddData()
 
     std::string dataLabel = m_Controls.m_lineEditDataLabel->text().toStdString();
     std::string chartTypeAsString = m_Controls.m_comboBoxChartType->currentText().toLower().toStdString();
-    auto chartType = m_ChartNameToChartType.at(chartTypeAsString);
     std::string chartColorAsString = m_Controls.m_comboBoxColor->currentText().toLower().toStdString();
-    auto chartColor = m_ChartNameToChartColor.at(chartColorAsString);
     std::string chartStyleAsString = m_Controls.m_comboBoxLineStyle->currentText().toLower().toStdString();
     auto chartStyle = m_LineNameToLineType.at(chartStyleAsString);
 
@@ -157,7 +122,7 @@ void ChartExample::AddData()
 
     QString pieLabelsData = m_Controls.m_lineEditPieDataLabel->text();
 
-    if (chartType == QmitkChartWidget::ChartType::pie)
+    if (chartTypeAsString == "Pie")
     {
         if (!pieLabelsData.isEmpty())
         {

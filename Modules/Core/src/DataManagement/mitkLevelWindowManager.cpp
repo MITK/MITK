@@ -276,7 +276,7 @@ void mitk::LevelWindowManager::DataStorageAddedNode( const mitk::DataNode* )
 
   //check if everything is still ok
   if ((m_PropObserverToNode.size() != m_PropObserverToNode2.size()) || (m_PropObserverToNode2.size() != this->GetRelevantNodes()->size()))
-     {mitkThrow() << "Wrong number of observers in Level Window Manager!";}
+     {MITK_WARN << "Wrong number of observers in Level Window Manager!";}
 
 }
 
@@ -322,7 +322,7 @@ void mitk::LevelWindowManager::DataStorageRemovedNode( const mitk::DataNode* rem
 
   //check if everything is still ok
   if ((m_PropObserverToNode.size() != m_PropObserverToNode2.size()) || (m_PropObserverToNode2.size() != (this->GetRelevantNodes()->size()-1)))
-     {mitkThrow() << "Wrong number of observers in Level Window Manager!";}
+     {MITK_WARN << "Wrong number of observers in Level Window Manager!";}
 }
 
 void mitk::LevelWindowManager::UpdateObservers()

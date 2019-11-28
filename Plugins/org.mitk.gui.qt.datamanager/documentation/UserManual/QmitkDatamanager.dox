@@ -46,7 +46,7 @@ Here the user can scale or rotate the medical objects or he can change the cutti
 
 \section QmitkDataManagerSaving Saving Data
 
-There are two ways of saving data from the Datamanger. The user can either save the whole project with all Data-Elements by clicking on "File"->"Save Project"
+There are two ways of saving data from the Datamanager. The user can either save the whole project with all Data-Elements by clicking on "File"->"Save Project"
 or he can save single Data-Elements by right-clicking->"Save", directly on a Data-Element. 
 When saving the whole project, the sorting of Data-Elements is saved as well. By contrast the sorting is lost, when saving a single Data-Element.
 

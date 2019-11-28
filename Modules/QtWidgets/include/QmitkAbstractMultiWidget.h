@@ -82,7 +82,7 @@ public:
   int GetColumnCount() const;
   virtual void SetLayout(int row, int column);
 
-  virtual void Synchronize(bool synchronized) { };
+  virtual void Synchronize(bool) { };
   virtual void SetInteractionScheme(mitk::InteractionSchemeSwitcher::InteractionScheme scheme);
 
   mitk::InteractionEventHandler* GetInteractionEventHandler();

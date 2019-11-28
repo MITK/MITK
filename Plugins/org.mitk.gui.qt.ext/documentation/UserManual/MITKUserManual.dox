@@ -5,17 +5,6 @@ Welcome to the basic MITK user manual. This document tries to give a concise ove
 
 \tableofcontents
 
-\section MITKUserManualPageOverview About MITK
-
-MITK is an open-source framework that was originally developed as a common framework for Ph.D. students in the Division of Medical and Biological Informatics (MBI) at the German Cancer Research Center. MITK aims at supporting the development of leading-edge medical imaging software with a high degree of interaction.
-
-MITK re-uses virtually anything from VTK and ITK. Thus, it is not at all a competitor to VTK or ITK, but an extension, which tries to ease the combination of both and to add features not supported by VTK or ITK.
-
-Research institutes, medical professionals and companies alike can use MITK as a basic framework for their research and even commercial (thorough code research needed) software due to the BSD-like software license.
-
-Research institutes will profit from the high level of integration of ITK and VTK enhanced with data management, advanced visualization and interaction functionality in a single framework that is supported by a wide variety of researchers and developers. You will not have to reinvent the wheel over and over and can concentrate on your work.
-
-Medical Professionals will profit from MITK and the MITK applications by using its basic functionalities for research projects. But nonetheless they will be better off, unless they are programmers themselves, to cooperate with a research institute developing with MITK to get the functionalitiy they need. MITK and the MITK applications are not certified medical products and may be used in a research setting only. They must not be used in patient care.
 
 \section MITKUserManualPageUserInterface The User Interface
 

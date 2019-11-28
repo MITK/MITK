@@ -391,22 +391,23 @@ DicomSeriesReader::DICOMStringToOrientationVectors(const std::string& s, Vector3
     }
   }
 
-  if (dim && dim != 6)
-  {
-    successful = false;
-    MITK_ERROR << "Reader implementation made wrong assumption on tag (0020,0037). Found " << dim << " instead of 6 values.";
-  }
-  else if (dim == 0)
-  {
-    // fill with defaults
-    right.Fill(0.0);
-    right[0] = 1.0;
-
-    up.Fill(0.0);
-    up[1] = 1.0;
-
+  if (dim == 6) {
+    // check for noncollinearity
+    if (std::abs(up[0]*right[1]-up[1]*right[0]) >= mitk::eps || std::abs(up[1]*right[2]-up[2]*right[1]) >= mitk::eps || std::abs(up[0]*right[2]-up[2]*right[0]) >= mitk::eps) {
+      return;
+    }
+    MITK_ERROR << "Tag ImageOrientationPatient(0020,0037) contains collinear vectors, so it is incorrect! Default orientation will be used.";
+  } else {
+    if (dim) {
+      MITK_ERROR << "Tag ImageOrientationPatient(0020,0037) contains only " << dim << " instead of 6 values. Default orientation will be used.";
+    }
     successful = false;
   }
+
+  right.Fill(0);
+  right[0] = 1.0;
+  up.Fill(0);
+  up[1] = 1.0;
 }
 
 

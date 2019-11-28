@@ -51,6 +51,7 @@ public:
 
   //virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent) override;
   void RotateCameraToTransformationAngles();
+  void RotateCameraBack();
   void Mirror(bool horizontal);
   void ResetTransformationAngles();
 
@@ -58,7 +59,6 @@ protected:
   CameraRotationController();
   virtual ~CameraRotationController();
 
-private:
   int m_LastStepperValue;
   int m_ElevateLastStepperValue;
 
@@ -68,7 +68,6 @@ private:
   Stepper::Pointer m_ElevationSlice;
 
   double m_Roll;
-  double m_RollMirror;
   double m_Azimuth;
 };
 

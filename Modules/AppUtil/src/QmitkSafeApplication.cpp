@@ -21,18 +21,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkException.h>
 #include <mitkLogMacros.h>
 
+#include <iostream>
+
 QmitkSafeApplication::QmitkSafeApplication(int& argc, char** argv)
   : QApplication(argc, argv)
 {}
 
 bool QmitkSafeApplication::notify(QObject* receiver, QEvent* event)
 {
-  if (!m_SafeMode)
-  {
-    return QApplication::notify(receiver, event);
-  }
+  bool result = false;
+  try {
+    if (!m_SafeMode)
+    {
+      result = QApplication::notify(receiver, event);
+    }
 
-  return QmitkSafeNotify<QApplication>(this, receiver, event);
+    result = QmitkSafeNotify<QApplication>(this, receiver, event);
+  } catch (const std::exception& ex) {
+    std::cout << ex.what() << std::endl;
+  }
+  return result;
 }
 
 void QmitkSafeApplication::setSafeMode(bool safeMode)

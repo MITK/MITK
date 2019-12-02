@@ -117,19 +117,8 @@ void QmitkChartExampleView::AddData()
         return;
     }
 
-    QString pieLabelsData = m_Controls.m_lineEditPieDataLabel->text();
-
-    if (chartTypeAsString == "Pie")
-    {
-        if (!pieLabelsData.isEmpty())
-        {
-            auto pieLabels = ConvertToStringVector(pieLabelsData);
-            m_Controls.m_Chart->SetPieLabels(pieLabels, dataLabel);
-        }
-    }
-
     labelStorage.push_back(dataLabel);
-    m_Controls.m_Chart->AddChartExampleData(dataXandY, dataLabel, chartTypeAsString, chartColorAsString, chartLineStyleAsString, pieLabelsData.toStdString());
+    m_Controls.m_Chart->AddChartExampleData(dataXandY, dataLabel, chartTypeAsString, chartColorAsString, chartLineStyleAsString, pieLabelsAsString);
     m_Controls.m_comboBoxExistingData->addItem(m_Controls.m_lineEditDataLabel->text());
 
     if (m_Controls.m_checkBoxEnableErrors->isChecked())
@@ -245,9 +234,6 @@ void QmitkChartExampleView::UpdateSelectedData()
     auto type = data->GetChartType();
     auto style = data->GetLineStyle();
 
-    int colorIndex = m_Controls.m_Chart->GetIndexByString(color.toString().toStdString());
-    int typeIndex = m_Controls.m_Chart->GetIndexByString(type.toString().toStdString());
-    int styleIndex = m_Controls.m_Chart->GetIndexByString(style.toString().toStdString());
     if (type.toString() == "pie")
     {
         m_Controls.m_comboBoxLineStyle->setVisible(false);
@@ -255,13 +241,9 @@ void QmitkChartExampleView::UpdateSelectedData()
         m_Controls.m_lineEditPieDataLabel->setVisible(true);
         m_Controls.m_labelPieData->setVisible(true);
 
-        auto pieLabels = data->GetPieLabels();
+        auto pieLabelsString = ConvertToText(data->GetPieLabels());
 
-        auto pieLabelsVector = pieLabels.toVector().toStdVector();
-
-        QString pieLabelsString = QString::fromStdString(ConvertToText(pieLabelsVector));
-
-        m_Controls.m_lineEditPieDataLabel->setText(pieLabelsString);
+        m_Controls.m_lineEditPieDataLabel->setText(QString::fromStdString(pieLabelsString));
     }
 
     else

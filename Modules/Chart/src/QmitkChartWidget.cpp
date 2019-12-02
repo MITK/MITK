@@ -282,24 +282,8 @@ void QmitkChartWidget::Impl::AddChartExampleData(const std::map<double, double>&
                                                  const std::string& type,
                                                  const std::string& color,
                                                  const std::string& lineStyle,
-                                                 std::string pieLabelsData)
+                                                 const std::string& pieLabelsData)
 {
-    QList<QVariant> pieLabelsDataList;
-    while (pieLabelsData.size() != 0)
-    {
-        QVariant oneElement = QString::fromStdString(pieLabelsData.substr(0, pieLabelsData.find(";")));
-        pieLabelsDataList.push_back(oneElement);
-
-        if (pieLabelsData.find(";") != std::string::npos)
-        {
-            pieLabelsData.erase(0, pieLabelsData.find(";") + 1);
-        }
-        else
-        {
-            pieLabelsData.erase(pieLabelsData.begin(), pieLabelsData.end());
-        }
-    }
-
     QMap<QVariant, QVariant> data2DConverted;
     for (const auto& aValue : data2D)
     {
@@ -316,15 +300,37 @@ void QmitkChartWidget::Impl::AddChartExampleData(const std::map<double, double>&
     unsigned int sizeOfC3xyData = static_cast<unsigned int>(m_C3xyData.size());
 
     std::unique_ptr<QmitkChartxyData> chartData =
-        std::make_unique<QmitkChartxyData>(
-            data2DConverted,
-            QVariant(QString::fromStdString(uniqueLabel)),
-            QVariant(QString::fromStdString(type)),
-            QVariant(sizeOfC3xyData));
+                                                    std::make_unique<QmitkChartxyData>(
+                                                    data2DConverted,
+                                                    QVariant(QString::fromStdString(uniqueLabel)),
+                                                    QVariant(QString::fromStdString(type)),
+                                                    QVariant(sizeOfC3xyData));
 
     chartData->SetColor(QVariant(QString::fromStdString(color)));
     chartData->SetLineStyle(QVariant(QString::fromStdString(lineStyle)));
-    chartData->SetPieLabels(pieLabelsDataList);
+
+    if (pieLabelsData != "")
+    {
+        std::string pieLabelsDataWorkingString = pieLabelsData;
+
+        QList<QVariant> pieLabelsDataList;
+        while (pieLabelsDataWorkingString.size() != 0)
+        {
+            QVariant oneElement = QString::fromStdString(pieLabelsDataWorkingString.substr(0, pieLabelsDataWorkingString.find(";")));
+            pieLabelsDataList.push_back(oneElement);
+
+            if (pieLabelsDataWorkingString.find(";") != std::string::npos)
+            {
+                pieLabelsDataWorkingString.erase(0, pieLabelsDataWorkingString.find(";") + 1);
+            }
+            else
+            {
+                pieLabelsDataWorkingString.erase(pieLabelsDataWorkingString.begin(), pieLabelsDataWorkingString.end());
+            }
+        }
+
+        chartData->SetPieLabels(pieLabelsDataList);
+    }
 
     m_C3xyData.push_back(std::move(chartData));
 }
@@ -533,6 +539,7 @@ void QmitkChartWidget::Impl::Show(bool showSubChart)
   {
     MITK_WARN << "no data available for display in chart";
   }
+
   else
   {
     m_C3Data.SetAppearance(showSubChart, m_C3xyData.front()->GetChartType() == QVariant("pie"));
@@ -765,6 +772,8 @@ void QmitkChartWidget::UpdateChartExampleData(const std::map<double, double>& da
                                               const std::string& pieLabelsData)
 {
     m_Impl->UpdateChartExampleData(data2D, label, type, color, lineStyle, pieLabelsData);
+}
+
 void QmitkChartWidget::RemoveData(const std::string &label)
 {
   m_Impl->RemoveData(label);

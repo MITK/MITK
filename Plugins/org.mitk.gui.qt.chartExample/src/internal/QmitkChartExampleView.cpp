@@ -248,8 +248,7 @@ void QmitkChartExampleView::UpdateSelectedData()
     int colorIndex = m_Controls.m_Chart->GetIndexByString(color.toString().toStdString());
     int typeIndex = m_Controls.m_Chart->GetIndexByString(type.toString().toStdString());
     int styleIndex = m_Controls.m_Chart->GetIndexByString(style.toString().toStdString());
-
-    if (type.toString() == "Pie")
+    if (type.toString() == "pie")
     {
         m_Controls.m_comboBoxLineStyle->setVisible(false);
         m_Controls.m_labelLineStyle->setVisible(false);
@@ -323,7 +322,7 @@ void QmitkChartExampleView::AdaptZoomY()
 
 void QmitkChartExampleView::AdaptDataGUI(QString chartType)
 {
-  if (chartType == "Pie")
+  if (chartType == "pie")
   {
     m_Controls.m_labelPieData->setVisible(true);
     m_Controls.m_lineEditPieDataLabel->setVisible(true);

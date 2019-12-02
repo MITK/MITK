@@ -310,7 +310,7 @@ void QmitkChartWidget::Impl::AddChartExampleData(const std::map<double, double>&
 
     auto definedLabels = GetDataLabels(m_C3xyData);
     auto uniqueLabel = GetUniqueLabelName(definedLabels, label);
-    if (type == "Scatter")
+    if (type == "scatter")
     {
         SetShowDataPoints(true);
         MITK_INFO << "Enabling data points for all because of scatter plot";

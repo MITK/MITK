@@ -270,14 +270,14 @@ void QmitkChartExampleView::UpdateSelectedData()
         m_Controls.m_labelPieData->setVisible(false);
         m_Controls.m_comboBoxLineStyle->setVisible(true);
         m_Controls.m_labelLineStyle->setVisible(true);
-        m_Controls.m_comboBoxLineStyle->setCurrentIndex(styleIndex);
+        m_Controls.m_comboBoxLineStyle->setCurrentText(style.toString());
     }
 
     m_Controls.m_lineEditDataXVector->setText(xString);
     m_Controls.m_lineEditDataYVector->setText(yString);
     m_Controls.m_lineEditDataLabel->setText(QString::fromStdString(label));
-    m_Controls.m_comboBoxColor->setCurrentIndex(colorIndex);
-    m_Controls.m_comboBoxChartType->setCurrentIndex(typeIndex);
+    m_Controls.m_comboBoxColor->setCurrentText(color.toString());
+    m_Controls.m_comboBoxChartType->setCurrentText(type.toString());
 }
 
 void QmitkChartExampleView::ClearChart()

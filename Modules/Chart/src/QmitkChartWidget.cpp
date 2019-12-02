@@ -128,8 +128,6 @@ public:
 
   QSize sizeHint() const;
 
-  int GetIndexByString(std::string);
-
 private:
   using ChartxyDataVector = std::vector<std::unique_ptr<QmitkChartxyData>>;
   std::string GetUniqueLabelName(const QList<QVariant> &labelList, const std::string &label) const;

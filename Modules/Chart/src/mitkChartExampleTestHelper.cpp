@@ -342,9 +342,9 @@ std::map<double, double> mitk::ChartExampleTestHelper::ToStdMap(QVariantList xDa
     auto yDataConverted = yData.toVector().toStdVector();
 
     std::map<double, double> data;
-    for (int i = 0; i < xDataConverted.size(); i++)
+    for (size_t i = 0; i < xDataConverted.size(); i++)
     {
-        data.insert_or_assign(xDataConverted[i].toDouble(), yDataConverted[i].toDouble());
+        data.insert(xDataConverted[i].toDouble(), yDataConverted[i].toDouble());
     }
 
     return data;

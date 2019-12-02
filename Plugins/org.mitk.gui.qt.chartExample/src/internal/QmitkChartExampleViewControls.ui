@@ -36,7 +36,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="pageChartSettings">
       <property name="geometry">
@@ -354,122 +354,122 @@
             <widget class="QComboBox" name="m_comboBoxColor">
              <item>
               <property name="text">
-               <string>Red</string>
+               <string>red</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Orange</string>
+               <string>orange</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Yellow</string>
+               <string>yellow</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Green</string>
+               <string>green</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Blue</string>
+               <string>blue</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Purple</string>
+               <string>purple</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Brown</string>
+               <string>brown</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Magenta</string>
+               <string>magenta</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Tan</string>
+               <string>tan</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Cyan</string>
+               <string>cyan</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Olive</string>
+               <string>olive</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Maroon</string>
+               <string>maroon</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Navy</string>
+               <string>navy</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Aquamarine</string>
+               <string>aquamarine</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Turquoise</string>
+               <string>turquoise</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Silver</string>
+               <string>silver</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Lime</string>
+               <string>lime</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Teal</string>
+               <string>teal</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Indigo</string>
+               <string>indigo</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Violet</string>
+               <string>violet</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Pink</string>
+               <string>pink</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Black</string>
+               <string>black</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>White</string>
+               <string>white</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Grey</string>
+               <string>grey</string>
               </property>
              </item>
             </widget>
@@ -484,12 +484,12 @@
              </property>
              <item>
               <property name="text">
-               <string>Solid</string>
+               <string>solid</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Dashed</string>
+               <string>dashed</string>
               </property>
              </item>
             </widget>
@@ -511,37 +511,37 @@
              </property>
              <item>
               <property name="text">
-               <string>Bar</string>
+               <string>bar</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Line</string>
+               <string>line</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Area</string>
+               <string>area</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Pie</string>
+               <string>pie</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Spline</string>
+               <string>spline</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Area-spline</string>
+               <string>area-spline</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Scatter</string>
+               <string>scatter</string>
               </property>
              </item>
             </widget>

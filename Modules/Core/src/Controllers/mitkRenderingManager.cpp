@@ -374,21 +374,15 @@ namespace mitk
 
   bool
     RenderingManager
-    ::InitializeViews(const TimeGeometry * dataGeometry, RequestType type, bool /*preserveRoughOrientationInWorldSpace*/)
+    ::InitializeBoundingBox(TimeGeometry::ConstPointer& timeGeometry)
   {
-    MITK_DEBUG << "initializing views";
-
     bool boundingBoxInitialized = false;
-
-    TimeGeometry::ConstPointer timeGeometry = dataGeometry;
     TimeGeometry::Pointer modifiedGeometry = NULL;
-    if (dataGeometry != NULL)
-    {
-      modifiedGeometry = dataGeometry->Clone();
-    }
 
-    int warningLevel = vtkObject::GetGlobalWarningDisplay();
-    vtkObject::GlobalWarningDisplayOff();
+    if (timeGeometry.IsNotNull())
+    {
+      modifiedGeometry = timeGeometry->Clone();
+    }
 
     if ((timeGeometry.IsNotNull()) && (const_cast<mitk::BoundingBox *>(
       timeGeometry->GetBoundingBoxInWorld())->GetDiagonalLength2() > mitk::eps))
@@ -421,6 +415,50 @@ namespace mitk
     }
 
     timeGeometry = modifiedGeometry;
+
+    return boundingBoxInitialized;
+  }
+
+  bool
+    RenderingManager
+    ::UpdateGeometry(const mitk::TimeGeometry * dataGeometry)
+  {
+    using namespace mitk;
+
+    TimeGeometry::ConstPointer timeGeometry = dataGeometry;
+    if (!InitializeBoundingBox(timeGeometry))
+    {
+      return false;
+    }
+
+    for (auto it = m_RenderWindowList.cbegin(); it != m_RenderWindowList.cend(); ++it)
+    {
+      BaseRenderer *baseRenderer = mitk::BaseRenderer::GetInstance(it->first);
+      SliceNavigationController *nc = baseRenderer->GetSliceNavigationController();
+            // Set geometry for NC
+      nc->SetInputWorldTimeGeometry(timeGeometry);
+      nc->Update();
+    }
+
+    m_TimeNavigationController->SetInputWorldTimeGeometry(timeGeometry);
+    m_TimeNavigationController->Update();
+
+    return true;
+  }
+
+  bool
+    RenderingManager
+    ::InitializeViews(const TimeGeometry * dataGeometry, RequestType type, bool /*preserveRoughOrientationInWorldSpace*/)
+  {
+    MITK_DEBUG << "initializing views";
+
+    int warningLevel = vtkObject::GetGlobalWarningDisplay();
+    vtkObject::GlobalWarningDisplayOff();
+
+    TimeGeometry::ConstPointer timeGeometry = dataGeometry;
+
+    bool boundingBoxInitialized = InitializeBoundingBox(timeGeometry);
+
     RenderWindowList::const_iterator it;
     for (it = m_RenderWindowList.cbegin(); it != m_RenderWindowList.cend(); ++it)
     {

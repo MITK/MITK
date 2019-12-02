@@ -344,7 +344,7 @@ std::map<double, double> mitk::ChartExampleTestHelper::ToStdMap(QVariantList xDa
     std::map<double, double> data;
     for (size_t i = 0; i < xDataConverted.size(); i++)
     {
-        data.insert(xDataConverted[i].toDouble(), yDataConverted[i].toDouble());
+        data.insert(std::make_pair(xDataConverted[i].toDouble(), yDataConverted[i].toDouble()));
     }
 
     return data;

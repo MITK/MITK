@@ -413,6 +413,25 @@ std::string QmitkChartExampleView::ConvertToText(std::vector<QVariant> numbers, 
     return aString;
 }
 
+std::string QmitkChartExampleView::ConvertToText(QVariantList list, std::string delimiter) const
+{
+    std::ostringstream oss;
+    
+    if (!list.isEmpty())
+    {
+        for (auto element : list)
+        {
+            oss << element.toString().toStdString() << delimiter;
+        }
+
+        auto aString = oss.str();
+        aString.pop_back();
+        return aString;
+    }
+
+    return "";
+}
+
 std::vector<double> QmitkChartExampleView::ConvertToDoubleVector(const QString& data, QChar delimiter) const
 {
     std::vector<double> output;

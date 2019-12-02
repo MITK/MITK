@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkChartExports.h>
 
+class QmitkChartxyData;
+
 /*!
 \brief QmitkChartWidget is a widget to display various charts based on the javascript chart library plotly.
 * \details Data is added via AddData1D() or AddData2D().\n
@@ -66,6 +68,32 @@ public:
   enum class LineStyle {
     solid,
     dashed
+  };
+  enum class ChartColor {
+    red,
+    orange,
+    yellow,
+    green,
+    blue,
+    purple,
+    brown,
+    magenta,
+    tan,
+    cyan,
+    olive,
+    maroon,
+    navy,
+    aquamarine,
+    turqouise,
+    silver,
+    lime,
+    teal,
+    indigo,
+    violet,
+    pink,
+    black,
+    white,
+    grey
   };
   enum class AxisScale {
     linear,
@@ -123,9 +151,25 @@ public:
   * \note If the label name already exists, the name is replaced with a unique one by concatenating numbers to it.
   * \warning Pie chart is significantly different than the other chart types. Here, the data given by AddData1D is summed. Each entry represents a different category.
   */
+
+  void UpdateChartExampleData(const std::map<double, double>& data2D,
+                              const std::string& label,
+                              const std::string& type,
+                              const std::string& color,
+                              const std::string& lineStyle,
+                              const std::string& pieLabelsData = 0);
+
   void AddData2D(const std::map<double, double> &data2D,
                  const std::string &label,
                  ChartType chartType = ChartType::bar);
+
+  //Add Function for the ChartExample
+  void AddChartExampleData(const std::map<double, double>& data2D,
+                           const std::string& label,
+                           const std::string& type,
+                           const std::string& color,
+                           const std::string& style,
+                           const std::string& pieLabelsData = 0);
 
   /*!
   * \brief Removes data from the widget, works for 1D and 2D Data
@@ -136,6 +180,8 @@ public:
   void RemoveData(const std::string& label);
 
   void UpdateLabel(const std::string& existingLabel, const std::string& newLabel);
+
+  QmitkChartxyData *GetDataElementByLabel(const std::string& label) const;
 
   /*!
   * \brief Sets the color of one data entry (identifier is previously assigned label)

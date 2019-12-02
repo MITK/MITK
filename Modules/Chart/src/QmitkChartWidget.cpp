@@ -29,11 +29,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 class CustomPage : public QWebEnginePage
 {
 public:
-  CustomPage(QObject *parent = 0) : QWebEnginePage(parent) {}
+  CustomPage(QObject *parent = nullptr) : QWebEnginePage(parent) {}
   virtual void javaScriptConsoleMessage(JavaScriptConsoleMessageLevel /*level*/,
                                         const QString &message,
                                         int lineNumber,
-                                        const QString & /*sourceID*/)
+                                        const QString & /*sourceID*/) override
   {
     MITK_INFO << "JS > " << lineNumber << ": " << message.toStdString();
   }

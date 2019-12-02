@@ -98,9 +98,10 @@ void QmitkChartExampleView::AddData()
     QString data = QString::fromStdString(ConvertToText(dataXandY));
 
     std::string dataLabel = m_Controls.m_lineEditDataLabel->text().toStdString();
-    std::string chartTypeAsString = m_Controls.m_comboBoxChartType->currentText().toLower().toStdString();
-    std::string chartColorAsString = m_Controls.m_comboBoxColor->currentText().toLower().toStdString();
-    std::string chartLineStyleAsString = m_Controls.m_comboBoxLineStyle->currentText().toLower().toStdString();
+    std::string chartTypeAsString = m_Controls.m_comboBoxChartType->currentText().toStdString();
+    std::string chartColorAsString = m_Controls.m_comboBoxColor->currentText().toStdString();
+    std::string chartLineStyleAsString = m_Controls.m_comboBoxLineStyle->currentText().toStdString();
+    std::string pieLabelsAsString = m_Controls.m_lineEditPieDataLabel->text().toStdString();
 
     if (std::find(labelStorage.begin(), labelStorage.end(), dataLabel) != labelStorage.end())
     {

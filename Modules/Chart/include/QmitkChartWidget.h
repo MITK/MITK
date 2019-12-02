@@ -151,6 +151,14 @@ public:
   * \note If the label name already exists, the name is replaced with a unique one by concatenating numbers to it.
   * \warning Pie chart is significantly different than the other chart types. Here, the data given by AddData1D is summed. Each entry represents a different category.
   */
+
+  void UpdateChartExampleData(const std::map<double, double>& data2D,
+                              const std::string& label,
+                              const std::string& type,
+                              const std::string& color,
+                              const std::string& lineStyle,
+                              const std::string& pieLabelsData = 0);
+
   void AddData2D(const std::map<double, double> &data2D,
                  const std::string &label,
                  ChartType chartType = ChartType::bar);
@@ -161,7 +169,7 @@ public:
                            const std::string& type,
                            const std::string& color,
                            const std::string& style,
-                           std::string pieLabelsData = 0);
+                           const std::string& pieLabelsData = 0);
 
   /*!
   * \brief Removes data from the widget, works for 1D and 2D Data

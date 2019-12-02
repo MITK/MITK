@@ -199,16 +199,27 @@ void QmitkChartExampleView::UpdateData()
         return;
     }
 
-    auto dataLabel = m_Controls.m_lineEditDataLabel->text().toStdString();
-    m_Controls.m_Chart->RemoveData(dataLabel);
+    QString lineEditDataX = m_Controls.m_lineEditDataXVector->text();
+    QString lineEditDataY = m_Controls.m_lineEditDataYVector->text();
+    auto dataX = ConvertToDoubleVector(lineEditDataX);
+    auto dataY = ConvertToDoubleVector(lineEditDataY);
+    auto dataXandY = CreateMap(dataX, dataY);
+    QString data = QString::fromStdString(ConvertToText(dataXandY));
 
-    auto it = std::find(labelStorage.begin(), labelStorage.end(), dataLabel);
-    labelStorage.erase(it);
+    std::string dataLabel = m_Controls.m_lineEditDataLabel->text().toStdString();
+    std::string chartTypeAsString = m_Controls.m_comboBoxChartType->currentText().toStdString();
+    std::string chartColorAsString = m_Controls.m_comboBoxColor->currentText().toStdString();
+    std::string chartLineStyleAsString = m_Controls.m_comboBoxLineStyle->currentText().toStdString();
+    std::string pieLabelsAsString = m_Controls.m_lineEditPieDataLabel->text().toStdString();
 
-    auto index = m_Controls.m_comboBoxExistingData->findText(QString::fromStdString(dataLabel));
-    m_Controls.m_comboBoxExistingData->removeItem(index);
+    if (dataX.size() != dataY.size())
+    {
+        m_Controls.m_labelInfo->setText("Data x and y size have to be equal");
+        m_Controls.m_labelInfo->setStyleSheet("color: red;");
+        return;
+    }
 
-    AddData();
+    m_Controls.m_Chart->UpdateChartExampleData(dataXandY, dataLabel, chartTypeAsString, chartColorAsString, chartLineStyleAsString, pieLabelsAsString);
 }
 
 void QmitkChartExampleView::UpdateSelectedData()

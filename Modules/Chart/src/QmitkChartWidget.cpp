@@ -58,10 +58,16 @@ public:
                            const std::string& type,
                            const std::string& color,
                            const std::string& style,
-                           std::string pieLabelsData = 0);
+                           const std::string& pieLabelsData = 0);
 
   void UpdateData1D(const std::vector<double> &data1D, const std::string &label);
   void UpdateData2D(const std::map<double, double> &data2D, const std::string &label);
+  void UpdateChartExampleData(const std::map<double, double>& data2D,
+                              const std::string& label,
+                              const std::string& type,
+                              const std::string& color,
+                              const std::string& lineStyle,
+                              const std::string& pieLabelsData = 0);
 
   void RemoveData(const std::string &label);
 
@@ -351,6 +357,47 @@ void QmitkChartWidget::Impl::UpdateData2D(const std::map<double, double> &data2D
     }
     element->SetData(data2DConverted);
   }
+}
+
+void QmitkChartWidget::Impl::UpdateChartExampleData(const std::map<double, double>& data2D,
+                                                    const std::string& label,
+                                                    const std::string& type,
+                                                    const std::string& color,
+                                                    const std::string& lineStyle,
+                                                    const std::string& pieLabelsData)
+{
+    UpdateData2D(data2D, label);
+
+    auto element = GetDataElementByLabel(label);
+    if (element)
+    {
+        element->SetChartType(QString::fromStdString(type));
+        element->SetColor(QString::fromStdString(color));
+        element->SetLineStyle(QString::fromStdString(lineStyle));
+
+        if (pieLabelsData != "")
+        {
+            std::string pieLabelsDataWorkingString = pieLabelsData;
+
+            QList<QVariant> pieLabelsDataList;
+            while (pieLabelsDataWorkingString.size() != 0)
+            {
+                QVariant oneElement = QString::fromStdString(pieLabelsDataWorkingString.substr(0, pieLabelsDataWorkingString.find(";")));
+                pieLabelsDataList.push_back(oneElement);
+
+                if (pieLabelsDataWorkingString.find(";") != std::string::npos)
+                {
+                    pieLabelsDataWorkingString.erase(0, pieLabelsDataWorkingString.find(";") + 1);
+                }
+                else
+                {
+                    pieLabelsDataWorkingString.erase(pieLabelsDataWorkingString.begin(), pieLabelsDataWorkingString.end());
+                }
+            }
+
+            element->SetPieLabels(pieLabelsDataList);
+        }
+    }
 }
 
 void QmitkChartWidget::Impl::RemoveData(const std::string &label)
@@ -697,7 +744,7 @@ void QmitkChartWidget::AddChartExampleData(const std::map<double, double>& data2
                                            const std::string& type,
                                            const std::string& color,
                                            const std::string& lineStyle,
-                                           std::string pieLabelsData)
+                                           const std::string& pieLabelsData)
 {
     m_Impl->AddChartExampleData(data2D, label, type, color, lineStyle, pieLabelsData);
 }
@@ -712,6 +759,14 @@ void QmitkChartWidget::UpdateData2D(const std::map<double, double> &data2D, cons
   m_Impl->UpdateData2D(data2D, label);
 }
 
+void QmitkChartWidget::UpdateChartExampleData(const std::map<double, double>& data2D,
+                                              const std::string& label,
+                                              const std::string& type,
+                                              const std::string& color,
+                                              const std::string& lineStyle,
+                                              const std::string& pieLabelsData)
+{
+    m_Impl->UpdateChartExampleData(data2D, label, type, color, lineStyle, pieLabelsData);
 void QmitkChartWidget::RemoveData(const std::string &label)
 {
   m_Impl->RemoveData(label);

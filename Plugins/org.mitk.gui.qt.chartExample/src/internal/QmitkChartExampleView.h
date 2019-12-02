@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef ChartExample_h
-#define ChartExample_h
+#ifndef QmitkChartExample_h
+#define QmitkChartExample_h
 
 #include <QmitkAbstractView.h>
 
@@ -85,4 +85,4 @@ private:
   Ui::QmitkChartExampleViewControls m_Controls;
 };
 
-#endif // ChartExample_h
+#endif // QmitkChartExample_h

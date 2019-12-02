@@ -198,6 +198,11 @@ public:
   virtual void Initialize(const mitk::PixelType& type, unsigned int dimension, const unsigned int *dimensions, unsigned int channels = 1);
 
   //##Documentation
+  //## initialize new (or re-initialize) image information with data for geometry
+  void Initialize(const mitk::PixelType& type, unsigned int dimension, const unsigned int *dimensions, unsigned int channels, const Point3D &origin, const Matrix3D &matrix,
+    const Vector3D &spacing);
+
+  //##Documentation
   //## initialize new (or re-initialize) image information by a BaseGeometry
   //##
   //## @param tDim defines the number of time steps for which the Image should be initialized
@@ -296,10 +301,6 @@ public:
    // mitk::PixelType importType = ImportItkPixelType( itkimage::PixelType );
 
 
-    Initialize(MakePixelType<itkImageType>(itkimage->GetNumberOfComponentsPerPixel()),
-      m_Dimension,
-      tmpDimensions,
-      channels);
     const typename itkImageType::SpacingType & itkspacing = itkimage->GetSpacing();
 
     MITK_DEBUG << "ITK spacing " << itkspacing;
@@ -380,25 +381,16 @@ public:
           matrix[i][j] = itkdirection[i][j]*spacing[j];
     }
 
-    // re-initialize PlaneGeometry with origin and direction
-    PlaneGeometry* planeGeometry = static_cast<PlaneGeometry*>(GetSlicedGeometry(0)->GetPlaneGeometry(0));
-    planeGeometry->SetOrigin(origin);
-    planeGeometry->GetIndexToWorldTransform()->SetMatrix(matrix);
-
-    // re-initialize SlicedGeometry3D
-    SlicedGeometry3D* slicedGeometry = GetSlicedGeometry(0);
-    slicedGeometry->InitializeEvenlySpaced(planeGeometry, m_Dimensions[2]);
-    slicedGeometry->SetSpacing(spacing);
-
-    // re-initialize TimeGeometry
-    ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
-    timeGeometry->Initialize(slicedGeometry, m_Dimensions[3]);
-    SetTimeGeometry(timeGeometry);
+    Initialize(MakePixelType<itkImageType>(itkimage->GetNumberOfComponentsPerPixel()),
+      m_Dimension,
+      tmpDimensions,
+      channels,
+      origin,
+      matrix,
+      spacing);
 
     // clean-up
     delete [] tmpDimensions;
-
-    this->Initialize();
   }
 
   //##Documentation

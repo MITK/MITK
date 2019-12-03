@@ -36,7 +36,7 @@ std::unique_ptr<QmitkChartxyData> mitk::ChartExampleTestHelper::GetDataOne()
     myDataOne->SetColor("red");
     myDataOne->SetLineStyle("solid");
 
-    return std::move(myDataOne);
+    return myDataOne;
 }
 
 std::unique_ptr<QmitkChartxyData> mitk::ChartExampleTestHelper::GetDataTwo()
@@ -56,7 +56,7 @@ std::unique_ptr<QmitkChartxyData> mitk::ChartExampleTestHelper::GetDataTwo()
     myDataTwo->SetColor("green");
     myDataTwo->SetLineStyle("solid");
 
-    return std::move(myDataTwo);
+    return myDataTwo;
 }
 
 std::unique_ptr<QmitkChartxyData> mitk::ChartExampleTestHelper::GetDataThree()
@@ -76,7 +76,7 @@ std::unique_ptr<QmitkChartxyData> mitk::ChartExampleTestHelper::GetDataThree()
     myDataThree->SetColor("blue");
     myDataThree->SetLineStyle("solid");
 
-    return std::move(myDataThree);
+    return myDataThree;
 }
 
 std::unique_ptr<QmitkChartxyData> mitk::ChartExampleTestHelper::GetDataFour()
@@ -96,7 +96,7 @@ std::unique_ptr<QmitkChartxyData> mitk::ChartExampleTestHelper::GetDataFour()
     myDataFour->SetColor("yellow");
     myDataFour->SetLineStyle("solid");
 
-    return std::move(myDataFour);
+    return myDataFour;
 }
 
 std::unique_ptr<QmitkChartxyData> mitk::ChartExampleTestHelper::GetDataFive()
@@ -116,7 +116,7 @@ std::unique_ptr<QmitkChartxyData> mitk::ChartExampleTestHelper::GetDataFive()
     myDataFive->SetColor("black");
     myDataFive->SetLineStyle("solid");
 
-    return std::move(myDataFive);
+    return myDataFive;
 }
 
 QmitkChartWidget::ChartType mitk::ChartExampleTestHelper::ReturnChartTypeByString(std::string chartTypeString)

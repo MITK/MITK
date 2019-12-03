@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Blueberry
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
+#include <berryPlatform.h>
 
 #include <itksys/SystemTools.hxx>
 
@@ -69,9 +70,11 @@ void QmitkSegmentationFlowControlView::CreateQtPartControl(QWidget* parent)
 
 
     auto arguments = QCoreApplication::arguments();
+
     bool isFlagFound = false;
     for (auto arg : arguments)
     {
+      std::cout << "arg: " << arg << std::endl;
       if (isFlagFound)
       {
         m_OutputDir = arg.toStdString();

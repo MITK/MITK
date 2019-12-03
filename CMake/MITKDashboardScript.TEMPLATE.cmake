@@ -90,9 +90,9 @@ set(CTEST_BINARY_DIRECTORY "${CTEST_DASHBOARD_ROOT}/MITK-sb-${short_of_ctest_bui
 # to configure the MITK-Superbuild. The
 set(MITK_INITIAL_CACHE "
 # Example how to set a boolean variable in the MITK-Build via this script:
-#SET(MITK_ENABLE_TOF_HARDWARE \"TRUE\" CACHE INTERNAL \"Enable ToF Hardware\")
+#set(MITK_ENABLE_TOF_HARDWARE \"TRUE\" CACHE INTERNAL \"Enable ToF Hardware\")
 # Example how to set a path variable in the MITK-Build via this script:
-#SET(MITK_PMD_LIB \"/home/kilgus/thomas/PMDSDK2/Linux_x86_64/bin/libpmdaccess2.so\" CACHE INTERNAL \"PMD lib\")
+#set(MITK_PMD_LIB \"/home/kilgus/thomas/PMDSDK2/Linux_x86_64/bin/libpmdaccess2.so\" CACHE INTERNAL \"PMD lib\")
 ")
 
 set(ADDITIONAL_CMAKECACHE_OPTION "

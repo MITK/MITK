@@ -41,8 +41,8 @@ if(MITK_USE_OpenCV)
 
     mitk_query_custom_ep_vars()
 
-    set(opencv_url ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/opencv-3.4.2.tar.gz)
-    set(opencv_url_md5 8aba51c788cac3583bb39a0c24a5888f)
+    set(opencv_url ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/opencv-3.4.8.tar.gz)
+    set(opencv_url_md5 5aa8240c28c00a7dacdf51698e0ced77)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}

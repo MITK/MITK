@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Blueberry
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
-#include <berryPlatform.h>
 
 #include <itksys/SystemTools.hxx>
 
@@ -36,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qt
 #include <QMessageBox>
+#include <QDir>
 
 const std::string QmitkSegmentationFlowControlView::VIEW_ID = "org.mitk.views.flow.control";
 
@@ -47,7 +47,7 @@ QmitkSegmentationFlowControlView::QmitkSegmentationFlowControlView()
   nodePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
   m_SegmentationPredicate = nodePredicate;
 
-  m_OutputDir = itksys::SystemTools::GetCurrentWorkingDirectory();
+  m_OutputDir = QString::fromStdString(itksys::SystemTools::GetCurrentWorkingDirectory());
   m_FileExtension = "nrrd";
 }
 
@@ -68,7 +68,6 @@ void QmitkSegmentationFlowControlView::CreateQtPartControl(QWidget* parent)
     m_Controls.labelStored->setVisible(false);
     UpdateControls();
 
-
     auto arguments = QCoreApplication::arguments();
 
     bool isFlagFound = false;
@@ -77,7 +76,7 @@ void QmitkSegmentationFlowControlView::CreateQtPartControl(QWidget* parent)
       std::cout << "arg: " << arg << std::endl;
       if (isFlagFound)
       {
-        m_OutputDir = arg.toStdString();
+        m_OutputDir = arg;
         break;
       }
       isFlagFound = arg.startsWith("--flow.outputdir");
@@ -87,11 +86,13 @@ void QmitkSegmentationFlowControlView::CreateQtPartControl(QWidget* parent)
     {
       if (isFlagFound)
       {
-        m_FileExtension = arg.toStdString();
+        m_FileExtension = arg;
         break;
       }
       isFlagFound = arg.startsWith("--flow.outputformat");
     }
+
+    m_OutputDir = QDir::fromNativeSeparators(m_OutputDir);
 }
 
 void QmitkSegmentationFlowControlView::OnAcceptButtonPushed()
@@ -100,8 +101,9 @@ void QmitkSegmentationFlowControlView::OnAcceptButtonPushed()
 
   for (auto node : *nodes)
   {
-    std::string outputpath = m_OutputDir + "\\" + node->GetName() + "." + m_FileExtension;
-    mitk::IOUtil::Save(node->GetData(), outputpath);
+    QString outputpath = m_OutputDir + "/" + QString::fromStdString(node->GetName()) + "." + m_FileExtension;
+    outputpath = QDir::toNativeSeparators(QDir::cleanPath(outputpath));
+    mitk::IOUtil::Save(node->GetData(), outputpath.toStdString());
   }
 
   m_Controls.labelStored->setVisible(true);

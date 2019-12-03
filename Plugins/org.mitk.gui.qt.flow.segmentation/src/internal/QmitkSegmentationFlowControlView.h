@@ -70,8 +70,8 @@ protected:
 private:
     QWidget *m_Parent;
     mitk::NodePredicateBase::Pointer m_SegmentationPredicate;
-    std::string m_OutputDir;
-    std::string m_FileExtension;
+    QString m_OutputDir;
+    QString m_FileExtension;
 };
 
 #endif // MatchPoint_h

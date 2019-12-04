@@ -289,8 +289,10 @@ void QmitkBasicImageProcessing::SetFocus()
 }
 
 //datamanager selection changed
-void QmitkBasicImageProcessing::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes)
+void QmitkBasicImageProcessing::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& /*nodes*/)
 {
+  auto nodes = this->GetDataManagerSelection();
+
   //any nodes there?
   if (!nodes.empty())
   {

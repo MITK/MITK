@@ -1,21 +1,21 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
+============================================================================*/
 
+/*============================================================================
 
-Raw data from new mathplolib colormaps see:
+Raw data from matplotlib colormaps:
 https://github.com/BIDS/colormap/blob/master/colormaps.py
-===================================================================*/
+
+============================================================================*/
 
 #ifndef _lut_Magma_h_
 #define _lut_Magma_h_
@@ -54,7 +54,7 @@ static const int Magma[256][3] =
   { 254, 215, 153 },{ 254, 216, 154 },{ 253, 218, 156 },{ 253, 220, 158 },{ 253, 222, 160 },{ 253, 224, 161 },{ 253, 226, 163 },
   { 253, 227, 165 },{ 253, 229, 167 },{ 253, 231, 169 },{ 253, 233, 170 },{ 253, 235, 172 },{ 252, 236, 174 },{ 252, 238, 176 },
   { 252, 240, 178 },{ 252, 242, 180 },{ 252, 244, 182 },{ 252, 246, 184 },{ 252, 247, 185 },{ 252, 249, 187 },{ 252, 251, 189 },
-  { 252, 253, 191 } 
+  { 252, 253, 191 }
 };
 
 #endif

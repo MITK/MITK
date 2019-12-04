@@ -1,13 +1,13 @@
 /**
 \page MITKUserManualPage The MITK User Manual
 
-Welcome to the basic MITK user manual. This document tries to give a concise overview of the basic functions of MITK and be an comprehensible guide on using them. 
+Welcome to the basic MITK user manual. This document tries to give a concise overview of the basic functions of MITK and be an comprehensible guide on using them.
 
 \tableofcontents
 
 \section MITKUserManualPageOverview About MITK
 
-MITK is an open-source framework that was originally developed as a common framework for Ph.D. students in the Division of Medical and Biological Informatics (MBI) at the German Cancer Research Center. MITK aims at supporting the development of leading-edge medical imaging software with a high degree of interaction.
+MITK is an open-source framework that was originally developed as a common framework for Ph.D. students at the German Cancer Research Center (DKFZ). MITK aims at supporting the development of leading-edge medical imaging software with a high degree of interaction.
 
 MITK re-uses virtually anything from VTK and ITK. Thus, it is not at all a competitor to VTK or ITK, but an extension, which tries to ease the combination of both and to add features not supported by VTK or ITK.
 
@@ -30,12 +30,12 @@ The datamanager and the \ref MITKUserManualPagePerspectives have their own help 
   - The \ref MITKUserManualPageMemoryUsage
   - The \ref MITKUserManualPageViews
 
-\section MITKUserManualPageMultiWidget Four Window View  
-  
+\section MITKUserManualPageMultiWidget Four Window View
+
 \subsection MITKUserManualPageMultiWidgetOverview Overview
 
 The four window view is the heart of the MITK image viewing. The standard layout is three 2D windows and one 3D window, with the axial window in the top left quarter, the sagittal window in the top right quarter, the coronal window in the lower left quarter and the 3D window in the lower right quarter. The different planes form a crosshair that can be seen in the 3D window.
-  
+
 Once you select a point within the picture, informations about it are displayed at the bottom of the screen.
 
 \subsection MITKUserManualPageMultiWidgetNavigation Navigation
@@ -50,7 +50,7 @@ By moving the cursor to the upper right corner of any window you can activate th
 
 \imageMacro{MITKUserManual_CrosshairModes.png,"Crosshair",8.72}
 
-The crosshair button allows you toggle the crosshair, reset the view and change the behaviour of the planes. 
+The crosshair button allows you toggle the crosshair, reset the view and change the behaviour of the planes.
 
 Activating either of the rotation modes allows you to rotate the planes visible in a 2D window by moving the mouse cursor close to them and click and dragging once it changes to indicate that rotation can be done.
 
@@ -62,11 +62,11 @@ The middle button expands the corresponding window to fullscreen within the four
 \imageMacro{MITKUserManual_ViewsChoices.png,"Layout Choices",5.19}
 
 The right button allows you to choose between many different layouts of the four window view to use the one most suited to your task.
-  
+
 \section MITKUserManualPageMenu Menu
 
 \subsection MITKUserManualPageFile File
-This dialog allows you to save, load and clear entire projects, this includes any nodes in the data manager. 
+This dialog allows you to save, load and clear entire projects, this includes any nodes in the data manager.
 
 \subsection MITKUserManualPageEdit Edit
 This dialog supports undo and redo operations as well as the image navigator, which gives you sliders to navigate through the data quickly.
@@ -104,7 +104,7 @@ The System Load Indicator in the lower right hand corner of the screen gives inf
 Each solution for a specific problem that is self contained is realized as a single view. Thus you can create a workflow for your problem by combining the capabilities of different views to suit your needs.
 One elegant way to do this is by combining views in \ref MITKUserManualPagePerspectives.
 
-By pressing and holding the left mouse button on a views tab you can move it around to suit your needs, even out of the application window. 
+By pressing and holding the left mouse button on a views tab you can move it around to suit your needs, even out of the application window.
 
 \section MITKUserManualPagePerspectives Perspectives
 

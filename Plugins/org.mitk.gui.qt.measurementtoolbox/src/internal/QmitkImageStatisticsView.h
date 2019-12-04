@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QmitkImageStatisticsView_H__INCLUDED
 #define QmitkImageStatisticsView_H__INCLUDED
@@ -67,7 +63,7 @@ protected:
 
   /** \brief Is called right before the view closes (before the destructor) */
   void PartClosed(const berry::IWorkbenchPartReference::Pointer&) override;
- 
+
   /** \brief Required for berry::IPartListener */
   Events::Types GetPartEventTypes() const override { return Events::CLOSED; }
 

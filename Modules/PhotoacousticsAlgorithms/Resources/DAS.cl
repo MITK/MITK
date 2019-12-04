@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 __kernel void ckDAS(
   __global float* dSource, // input image
@@ -35,20 +31,20 @@ __kernel void ckDAS(
 
   // terminate non-valid threads
   if ( globalPosX < outputL && globalPosY < outputS && globalPosZ < Slices )
-  {	
+  {
     float l_i = (float)globalPosX / (float)outputL * (float)inputL;
 
     unsigned short curUsedLines = usedLines[globalPosY * 3 * outputL + 3 * globalPosX];
     unsigned short minLine = usedLines[globalPosY * 3 * outputL + 3 * globalPosX + 1];
     unsigned short maxLine = usedLines[globalPosY * 3 *outputL + 3 * globalPosX + 2];
-    
+
     float apod_mult = (float)apodArraySize / (float)curUsedLines;
-    
+
     unsigned short Delay = 0;
-    
+
     float output = 0;
     float mult = 0;
-    
+
     for (short l_s = minLine; l_s < maxLine; ++l_s)
     {
       Delay = delays[globalPosY * (outputL / 2) + (int)(fabs(l_s - l_i)/(float)inputL * (float)outputL)];
@@ -58,7 +54,7 @@ __kernel void ckDAS(
       else
         --curUsedLines;
     }
-    
+
     dDest[ globalPosZ * outputL * outputS + globalPosY * outputL + globalPosX ] = output / (float)curUsedLines;
   }
 }
@@ -95,7 +91,7 @@ __kernel void ckDAS_g(
     float s_i = 0;
 
     float apod_mult = 1;
-    
+
     float output = 0;
 
     l_p = (float)globalPosX / outputL * horizontalExtent;

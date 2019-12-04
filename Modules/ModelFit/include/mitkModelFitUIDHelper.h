@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #ifndef mitkModelFitUIDHelper_h
@@ -45,7 +41,7 @@ namespace mitk
   NodeUIDType MITKMODELFIT_EXPORT EnsureModelFitUID(mitk::DataNode* node);
 
   /** Helper that checks if the data has the passed UID. Following strategy will be used for the check.
-   1. Checks existance of property "data.uid" and if its content equals the passed uid. 
+   1. Checks existance of property "data.uid" and if its content equals the passed uid.
    2. If 1 fails, it checks the existance of a property for the DICOM tag series instance UID (0x0020, 0x000e) and the equality of its value.
    3. If 2 also fails, return will be false.*/
   bool MITKMODELFIT_EXPORT CheckModelFitUID(const mitk::BaseData* data, const NodeUIDType& uid);

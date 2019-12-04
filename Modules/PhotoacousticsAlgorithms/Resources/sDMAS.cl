@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 __kernel void cksDMAS(
   __global float* dSource, // input image
@@ -35,7 +31,7 @@ __kernel void cksDMAS(
 
   // terminate non-valid threads
   if ( globalPosX < outputL && globalPosY < outputS && globalPosZ < Slices )
-  {	
+  {
     float l_i = (float)globalPosX / (float)outputL * (float)inputL;
 
     unsigned short curUsedLines = usedLines[globalPosY * 3 * outputL + 3 * globalPosX];
@@ -49,7 +45,7 @@ __kernel void cksDMAS(
 
     float output = 0;
     float mult = 0;
-    
+
     float s_1 = 0;
     float s_2 = 0;
     float dSign = 0;
@@ -58,21 +54,21 @@ __kernel void cksDMAS(
     for (short l_s1 = minLine; l_s1 < maxLine; ++l_s1)
     {
       Delay1 = AddSamples[globalPosY * (outputL / 2) + (int)(fabs(l_s1 - l_i)/(float)inputL * (float)outputL)];
-      if (Delay1 < inputS && Delay1 >= 0) 
+      if (Delay1 < inputS && Delay1 >= 0)
       {
         s_1 = dSource[(int)(globalPosZ * inputL * inputS + Delay1 * inputL + l_s1)];
         apod_1 = apodArray[(int)((l_s1 - minLine)*apod_mult)];
         dSign += s_1;
-        
+
         for (short l_s2 = l_s1 + 1; l_s2 < maxLine; ++l_s2)
         {
           Delay2 = AddSamples[globalPosY * (outputL / 2) + (int)(fabs(l_s2 - l_i)/(float)inputL * (float)outputL)];
-          if (Delay2 < inputS && Delay2 >= 0) 
+          if (Delay2 < inputS && Delay2 >= 0)
           {
             s_2 = dSource[(int)(globalPosZ * inputL * inputS + Delay2 * inputL + l_s2)];
-            
+
             mult = apodArray[(int)((l_s2 - minLine)*apod_mult)] * s_2 * apod_1 * s_1;
-              
+
             output += sqrt(fabs(mult)) * ((mult > 0) - (mult < 0));
           }
         }
@@ -114,9 +110,9 @@ __kernel void cksDMAS_g(
   {
     int AddSample1 = 0;
     int AddSample2 = 0;
-    
+
     float output = 0;
-    
+
     float s_1 = 0;
     float s_2 = 0;
     float apod_1 = 0;
@@ -140,13 +136,13 @@ __kernel void cksDMAS_g(
         +
         pow(mult * (l_p - elementPositions[l_s1]), 2)
       ) + (1 - isPAImage)*s_i;
-      
+
       if (AddSample1 < inputS && AddSample1 >= 0)
       {
         s_1 = dSource[(int)(globalPosZ * inputL * inputS + AddSample1 * inputL + l_s1)];
         apod_1 = apodArray[(int)((l_s1 - minLine)*apod_mult)];
         dSign += s_1;
-        
+
         for (int l_s2 = minLine; l_s2 < maxLine; ++l_s2)
         {
           AddSample2 = (int)sqrt(
@@ -158,7 +154,7 @@ __kernel void cksDMAS_g(
           {
             s_2 = dSource[(int)(globalPosZ * inputL * inputS + AddSample2 * inputL + l_s2)];
             multiplication = apodArray[(int)((l_s2 - minLine)*apod_mult)] * s_2 * apod_1 * s_1;
-              
+
             output += sqrt(fabs(multiplication)) * sign(multiplication);
           }
         }

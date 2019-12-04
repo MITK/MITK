@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkFloatingImageToUltrasoundRegistrationFilter.h"
 #include <itkScalableAffineTransform.h>
@@ -54,8 +50,8 @@ void mitk::FloatingImageToUltrasoundRegistrationFilter::InitializeTransformation
 
     m_TransformMarkerCSToSensorCS->SetOffset(translationNDI);
 
-    // Quaternion (x, y, z, r) --> n = (0,0,1) --> q(0,0,sin(90°),cos(90°))
-    mitk::Quaternion qNDI(0, 0, 1, 0); // corresponding to a rotation of 180° around the normal z-axis.
+    // Quaternion (x, y, z, r) --> n = (0,0,1) --> q(0,0,sin(90Â°),cos(90Â°))
+    mitk::Quaternion qNDI(0, 0, 1, 0); // corresponding to a rotation of 180Â° around the normal z-axis.
                                      // .transpose() is needed for changing the rows and the columns of the returned rotation_matrix_transpose
     vnl_matrix_fixed<double, 3, 3> vnl_rotation = qNDI.rotation_matrix_transpose().transpose(); // :-)
     mitk::Matrix3D rotationMatrix;
@@ -80,8 +76,8 @@ void mitk::FloatingImageToUltrasoundRegistrationFilter::InitializeTransformation
 
     m_TransformMarkerCSToSensorCS->SetOffset(translationPolhemus);
 
-    // Quaternion (x, y, z, r) --> n = (1,0,0) --> q(sin(90°),0,0,cos(90°))
-    mitk::Quaternion q1(1, 0, 0, 0); // corresponding to a rotation of 180° around the normal x-axis.
+    // Quaternion (x, y, z, r) --> n = (1,0,0) --> q(sin(90Â°),0,0,cos(90Â°))
+    mitk::Quaternion q1(1, 0, 0, 0); // corresponding to a rotation of 180Â° around the normal x-axis.
     // .transpose() is needed for changing the rows and the columns of the returned rotation_matrix_transpose
     vnl_matrix_fixed<double, 3, 3> vnl_rotation = q1.rotation_matrix_transpose().transpose(); // :-)
     mitk::Matrix3D rotationMatrix;

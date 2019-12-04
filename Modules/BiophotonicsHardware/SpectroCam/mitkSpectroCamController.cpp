@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 #include "mitkSpectroCamController.h"
 #include "mitkLogMacros.h"
 #include <mitkOpenCVToMitkImageFilter.h>
@@ -424,7 +420,7 @@ static void DisplayCameraStream(SpectroCamImage image)
 
       // TODO SW: probably we can get around this memcopy by simply setting data pointer? Not sure.
       cv::Mat data = cv::Mat( image.m_pAcqImage->iSizeY, image.m_pAcqImage->iSizeX, CV_16U);
-      memcpy( data.datastart , image.m_pAcqImage->pImageBuffer , image.m_pAcqImage->iImageSize); //Copy Image from JAI-Format to OCV´s IplImage
+      memcpy( data.datastart , image.m_pAcqImage->pImageBuffer , image.m_pAcqImage->iImageSize); //Copy Image from JAI-Format to OCVÂ´s IplImage
 
 
       //============= From opencv to mitk::Image (VectorImage)

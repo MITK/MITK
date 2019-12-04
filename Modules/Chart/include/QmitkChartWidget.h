@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 #ifndef QmitkC3jsWidget_h
 #define QmitkC3jsWidget_h
 
@@ -236,7 +232,7 @@ public:
    * \note If only error plus is provided, the error bars are symmetrical
    * \param label the name of the data that is also used as identifier.
    * \param errorPlus the error in positive direction
-   * \param errorMinus the error in negative direction. Same as error plus if omitted 
+   * \param errorMinus the error in negative direction. Same as error plus if omitted
    */
   void SetXErrorBars(const std::string &label, const std::vector<double> &errorPlus, const std::vector<double>& errorMinus = std::vector<double>());
 
@@ -287,14 +283,14 @@ public:
 
   /*!
   * \brief Sets whether the subchart shall be shown.
-  * \details Changes the state of the current chart object. 
+  * \details Changes the state of the current chart object.
   * \note Needs to be reloaded with Reload() to display changes.
   */
   void SetShowSubchart(bool showSubChart);
 
   /*!
    * \brief Sets whether the error bars shall be shown.
-   * \details Changes the state of the current chart object. 
+   * \details Changes the state of the current chart object.
    * \note Needs to be reloaded with Reload() to display changes.
    * \param showErrorBars if error bars are displayed or not.
    */

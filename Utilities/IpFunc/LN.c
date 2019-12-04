@@ -1,55 +1,49 @@
-/*****************************************************************************
+/*============================================================================
 
- Copyright (c) 1993-2000,  Div. Medical and Biological Informatics, 
- Deutsches Krebsforschungszentrum, Heidelberg, Germany
+ Copyright (c) German Cancer Research Center (DKFZ)
  All rights reserved.
 
- Redistribution and use in source and binary forms, with or without 
+ Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
 
  - Redistributions of source code must retain the above copyright notice, this
    list of conditions and the following disclaimer.
 
- - Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+ - Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
- - All advertising materials mentioning features or use of this software must 
-   display the following acknowledgement: 
-          
-     "This product includes software developed by the Div. Medical and 
-      Biological Informatics, Deutsches Krebsforschungszentrum, Heidelberg, 
-      Germany."
+ - All advertising materials mentioning features or use of this software must
+   display the following acknowledgement:
 
- - Neither the name of the Deutsches Krebsforschungszentrum nor the names of 
-   its contributors may be used to endorse or promote products derived from 
-   this software without specific prior written permission. 
+     "This product includes software developed by the German Cancer Research
+      Center (DKFZ)."
 
-   THIS SOFTWARE IS PROVIDED BY THE DIVISION MEDICAL AND BIOLOGICAL
-   INFORMATICS AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED
-   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-   OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-   IN NO EVENT SHALL THE DIVISION MEDICAL AND BIOLOGICAL INFORMATICS,
-   THE DEUTSCHES KREBSFORSCHUNGSZENTRUM OR CONTRIBUTORS BE LIABLE FOR 
-   ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-   DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE 
-   GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER 
-   IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN 
-   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ - Neither the name of the German Cancer Research Center (DKFZ) nor the names
+   of its contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
 
- Send comments and/or bug reports to:
-   mbi-software@dkfz-heidelberg.de
+   THIS SOFTWARE IS PROVIDED BY THE GERMAN CANCER RESEARCH CENTER (DKFZ) AND
+   CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+   BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+   FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE GERMAN
+   CANCER RESEARCH CENTER (DKFZ) OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+   INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+   SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+   OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+   DAMAGE.
 
-*****************************************************************************/
+============================================================================*/
 
 /**@file
- *  this function transforms the greyvalues by a ln-function 
+ *  this function transforms the greyvalues by a ln-function
  *  (y = a ln (x+1))
  */
 
-/** @brief transforms the greyvalues by a ln-function 
+/** @brief transforms the greyvalues by a ln-function
  *  (y = a ln (x+1))
  *
  *  @param pic_old   pointer to the original image
@@ -68,7 +62,7 @@ mitkIpPicDescriptor *mitkIpFuncLN ( mitkIpPicDescriptor *pic_old );
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
-  static char *what = { "@(#)mitkIpFuncLN\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)mitkIpFuncLN\t\tGerman Cancer Research Center (DKFZ)\t"__DATE__ };
 #endif
 
 
@@ -86,7 +80,7 @@ mitkIpPicDescriptor *mitkIpFuncLN ( mitkIpPicDescriptor *pic_old );
   for ( i = 0; i < no_elem; i++ )                                            \
     (( type * )pic_new->data )[i] =                                          \
         ( type ) ( a * log ( 1. + (( type * )pic->data )[i] ) );             \
-}                                           
+}
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -117,12 +111,12 @@ mitkIpPicDescriptor *mitkIpFuncLN ( mitkIpPicDescriptor *pic_old )
     {
        pic_new = mitkIpPicCopyHeader ( pic_old, NULL );
        pic_new->data = malloc ( _mitkIpPicSize ( pic_old ) );
-              
+
        if ( ( pic_new != NULL ) && ( pic_new->data != NULL ) )
          {
             mitkIpPicFORALL_1 ( LN, pic_old, max_gv );
          }
-       else 
+       else
          {
             _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
             return ( mitkIpFuncERROR );
@@ -145,37 +139,37 @@ mitkIpPicDescriptor *mitkIpFuncLN ( mitkIpPicDescriptor *pic_old )
             if ( pic_new->data == NULL )
               {
                  mitkIpPicFree ( pic_new );
-                 _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );  
+                 _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
                  return ( mitkIpFuncERROR );
               }
 
             /* transform integer image to unsigned integer image           */
 
             if ( pic_new->bpe == 8 )
-              { 
-                for ( i = 0; i < no_elem; i++ )                     
+              {
+                for ( i = 0; i < no_elem; i++ )
                   (( mitkIpUInt1_t * )pic_new->data )[i] =
                      (( mitkIpInt1_t * )pic_old->data )[i] - min_gv;
-              } 
+              }
 
             else if ( pic_new->bpe == 16 )
-              { 
-                for ( i = 0; i < no_elem; i++ )                     
+              {
+                for ( i = 0; i < no_elem; i++ )
                   (( mitkIpUInt2_t * )pic_new->data )[i] =
                     (( mitkIpInt2_t * )pic_old->data )[i] - min_gv;
-              } 
+              }
 
             else if ( pic_new->bpe == 32 )
-              { 
-                for ( i = 0; i < no_elem; i++ )                     
+              {
+                for ( i = 0; i < no_elem; i++ )
                   (( mitkIpUInt4_t * )pic_new->data )[i] =
                     (( mitkIpInt4_t * )pic_old->data )[i] - min_gv;
-              } 
+              }
 
-            else 
+            else
               {
                  mitkIpPicFree ( pic_new );
-                 _mitkIpFuncSetErrno ( mitkIpFuncTYPE_ERROR ); 
+                 _mitkIpFuncSetErrno ( mitkIpFuncTYPE_ERROR );
                  return ( mitkIpFuncERROR );
               }
 
@@ -188,25 +182,25 @@ mitkIpPicDescriptor *mitkIpFuncLN ( mitkIpPicDescriptor *pic_old )
             pic_new->type = mitkIpPicInt;
 
             if ( pic_new->bpe == 8 )
-              { 
-                for ( i = 0; i < no_elem; i++ )                     
+              {
+                for ( i = 0; i < no_elem; i++ )
                   (( mitkIpInt1_t * )pic_new->data )[i] =
                     (( mitkIpUInt1_t * )pic_new->data )[i] + min_gv;
-              } 
+              }
 
             else if ( pic_new->bpe == 16 )
-              { 
-                for ( i = 0; i < no_elem; i++ )                     
+              {
+                for ( i = 0; i < no_elem; i++ )
                   (( mitkIpInt2_t * )pic_new->data )[i] =
                     (( mitkIpUInt2_t * )pic_new->data )[i] + min_gv;
-              } 
+              }
 
             else if ( pic_new->bpe == 32 )
-              { 
-                for ( i = 0; i < no_elem; i++ )                     
+              {
+                for ( i = 0; i < no_elem; i++ )
                   (( mitkIpInt4_t * )pic_new->data )[i] =
                     (( mitkIpUInt4_t * )pic_new->data )[i] + min_gv;
-              } 
+              }
 
          }
 
@@ -220,8 +214,8 @@ mitkIpPicDescriptor *mitkIpFuncLN ( mitkIpPicDescriptor *pic_old )
     /* Copy Tags */
 
    mitkIpFuncCopyTags(pic_new, pic_old);
-   
-   
+
+
 
    return ( pic_new );
 }

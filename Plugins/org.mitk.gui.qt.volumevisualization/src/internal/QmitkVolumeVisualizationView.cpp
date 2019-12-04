@@ -142,8 +142,10 @@ void QmitkVolumeVisualizationView::OnMitkInternalPreset( int mode )
 }
 
 
-void QmitkVolumeVisualizationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
+void QmitkVolumeVisualizationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& /*nodes*/)
 {
+  auto nodes = this->GetDataManagerSelection();
+
   bool weHadAnImageButItsNotThreeDeeOrFourDee = false;
 
   mitk::DataNode::Pointer node;

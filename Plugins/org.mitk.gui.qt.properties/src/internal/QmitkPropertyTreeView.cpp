@@ -333,8 +333,10 @@ void QmitkPropertyTreeView::OnPropertyNameChanged(const itk::EventObject&)
   }
 }
 
-void QmitkPropertyTreeView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes)
+void QmitkPropertyTreeView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& /*nodes*/)
 {
+  auto nodes = this->GetDataManagerSelection();
+
   mitk::PropertyList* propertyList = m_Model->GetPropertyList();
 
   if (propertyList != NULL)
@@ -444,10 +446,10 @@ void QmitkPropertyTreeView::OnPropertyListChanged(int index)
     : NULL;
 
   QList<mitk::DataNode::Pointer> nodes;
-
+  /*
   if (m_SelectedNode.IsNotNull())
     nodes << m_SelectedNode;
-
+  */
   berry::IWorkbenchPart::Pointer workbenchPart;
 
   this->OnSelectionChanged(workbenchPart, nodes);

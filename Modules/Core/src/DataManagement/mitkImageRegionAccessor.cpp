@@ -25,7 +25,7 @@ ImageRegionAccessor::~ImageRegionAccessor()
 void ImageRegionAccessor::setRegion(int dim, int min, int max)
 {
   assert(max >= min);
-  assert(dim >= 0 && dim < m_Image->GetDimension());
+  assert(dim >= 0 && (unsigned)dim < m_Image->GetDimension());
 
   m_Ranges[dim].min = min;
   m_Ranges[dim].max = max;

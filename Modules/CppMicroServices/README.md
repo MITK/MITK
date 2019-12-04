@@ -42,7 +42,7 @@ The library should compile on many different platforms. Below is a list of teste
 Legal
 -----
 
-Copyright (c) German Cancer Research Center. Licensed under the [Apache License v2.0][apache_license].
+Copyright (c) German Cancer Research Center (DKFZ). Licensed under the [Apache License v2.0][apache_license].
 
 Quick Start
 -----------

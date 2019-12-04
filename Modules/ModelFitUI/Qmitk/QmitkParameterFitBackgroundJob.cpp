@@ -1,20 +1,14 @@
-/*=========================================================================
+/*============================================================================
 
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date$
-Version:   $Revision$
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, Software Development for
-Integrated Diagnostic and Therapy. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-=========================================================================*/
-
+============================================================================*/
 
 #include "QmitkParameterFitBackgroundJob.h"
 #include "mitkModelFitInfo.h"

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 __kernel void ckUsedLines(
   __global unsigned short* dDest, // output buffer
@@ -27,7 +23,7 @@ __kernel void ckUsedLines(
   // get thread identifier
   unsigned int globalPosX = get_global_id(0);
   unsigned int globalPosY = get_global_id(1);
-  
+
   // terminate non-valid threads
   if ( globalPosX < outputL && globalPosY < outputS)
   {
@@ -37,10 +33,10 @@ __kernel void ckUsedLines(
     float part = partMult * s_i;
     if (part < 1)
       part = 1;
-    
+
     unsigned short maxLine = min((l_i + part) + 1, (float)inputL);
     unsigned short minLine = max((l_i - part), 0.0f);
-    
+
     dDest[globalPosY * 3 * outputL + 3 * globalPosX] = (maxLine - minLine); //usedLines
     dDest[globalPosY * 3 * outputL + 3 * globalPosX + 1] = minLine; //minLine
     dDest[globalPosY * 3 * outputL + 3 * globalPosX + 2] = maxLine; //maxLine
@@ -64,7 +60,7 @@ __kernel void ckUsedLines_g(
   // get thread identifier
   unsigned int globalPosX = get_global_id(0);
   unsigned int globalPosY = get_global_id(1);
-  
+
   float x_sensor_pos = 0;
   float y_sensor_pos = 0;
   float center_to_sensor_a = 0;

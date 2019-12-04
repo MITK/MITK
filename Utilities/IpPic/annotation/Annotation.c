@@ -1,3 +1,42 @@
+/*============================================================================
+
+ Copyright (c) German Cancer Research Center (DKFZ)
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are met:
+
+ - Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+ - Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+ - All advertising materials mentioning features or use of this software must
+   display the following acknowledgement:
+
+     "This product includes software developed by the German Cancer Research
+      Center (DKFZ)."
+
+ - Neither the name of the German Cancer Research Center (DKFZ) nor the names
+   of its contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
+
+   THIS SOFTWARE IS PROVIDED BY THE GERMAN CANCER RESEARCH CENTER (DKFZ) AND
+   CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+   BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+   FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE GERMAN
+   CANCER RESEARCH CENTER (DKFZ) OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+   INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+   SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+   OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+   DAMAGE.
+
+============================================================================*/
 
 /*
  * Annotation.c
@@ -9,10 +48,10 @@
  *   a.schroeter
  *
  *---------------------------------------------------------------
- *  COPYRIGHT (c) 1993 by DKFZ (Dept. MBI) Heidelberg, FRG
+ *
  */
 #ifndef lint
-  static char *what = { "@(#)XipAnnotationWidget\tDKFZ (Dept. MBI)\t1993/09/17" };
+  static char *what = { "@(#)XipAnnotationWidget\tGerman Cancer Research Center (DKFZ)\t1993/09/17" };
 #endif
 
 
@@ -154,13 +193,13 @@ static void Initialize( request, new, args, num_args )
 static void getDrawGC( w )
   XipAnnotationWidget w;
 {
-  XGCValues values; 
+  XGCValues values;
   XtGCMask  valueMask;
-    
+
   values.foreground = w->primitive.foreground;
   values.background = w->core.background_pixel;
-  valueMask = GCForeground | GCBackground; 
-    
+  valueMask = GCForeground | GCBackground;
+
   w->annotation.draw_GC = XtGetGC ( (Widget)w, valueMask, &values );
 }
 
@@ -171,7 +210,7 @@ static void Realize( w, valueMask, attributes )
 {
   /*(*xipAnnotationClassRec.core_class.superclass->core_class.realize)
     (w, valueMask, attributes);*/
-             
+
   XtCreateWindow( (Widget)w,
                   InputOutput,
                   CopyFromParent,
@@ -215,7 +254,7 @@ static void Realize( w, valueMask, attributes )
                     0);
     {
       int i;
-    
+
       for( i = 0; i < w->core.width/6; i++ )
         XDrawLine( XtDisplay(w),
                    shape_mask,
@@ -267,7 +306,7 @@ static void Realize( w, valueMask, attributes )
                     0);
     {
       int i;
-    
+
       for( i = 0; i < w->core.width/6; i++ )
         XDrawLine( XtDisplay(w),
                    shape_mask,
@@ -297,7 +336,7 @@ static XtGeometryResult QueryGeometry( w, proposed, answer )
   XtWidgetGeometry *proposed;
   XtWidgetGeometry *answer;
 {
-  
+
   answer->width = (Dimension)256;
   answer->height = (Dimension)120;
   answer->request_mode = CWWidth || CWHeight;
@@ -319,8 +358,8 @@ static void Resize( w )
   /*if( w->core.width > w->annotation.image->width
       || w->core.height > w->annotation.image->height )
     XtWarning( "XipAnnotationWidget resized" );*/
-  
-} 
+
+}
 
 
 static void Redisplay( w, event, region)
@@ -351,7 +390,7 @@ static void Redisplay( w, event, region)
                  0, 0,
                  200, 200 );*/
     }
-} 
+}
 
 static Boolean SetValues( current, request, new, args, num_args )
      XipAnnotationWidget current, request, new;
@@ -364,8 +403,8 @@ static Boolean SetValues( current, request, new, args, num_args )
 
   /*printf( "setv\n" );*/
 
-  return( redraw ); 
-} 
+  return( redraw );
+}
 
 static void activate( w, event )
   XipAnnotationWidget w;
@@ -376,4 +415,4 @@ static void activate( w, event )
     XtCallCallbacks( (Widget)w,
                      XipNactivateCallback,
                      (XtPointer) event );
-} 
+}

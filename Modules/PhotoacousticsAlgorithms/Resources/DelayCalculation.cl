@@ -1,19 +1,15 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
+============================================================================*/
 
-===================================================================*/
- 
 __kernel void ckDelayCalculationSphe(  __global unsigned short *gDest,
                          __global unsigned short *usedLines,
                          unsigned int inputL,
@@ -33,7 +29,7 @@ __kernel void ckDelayCalculationSphe(  __global unsigned short *gDest,
     float l_i = 0; // we calculate the delays relative to line zero
     float s_i = (float)globalPosY / (float)outputS * totalSamples_i;
     float l_s = (float)globalPosX / (float)outputL * (float)inputL; // the currently calculated line
-      
+
     gDest[globalPosY * (outputL / 2) + globalPosX] =
       sqrt(
         pow(s_i, 2)

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKLINEARPHOTOACOUSTICSPECTRALUNMIXINGFILTER_H
 #define MITKLINEARPHOTOACOUSTICSPECTRALUNMIXINGFILTER_H
@@ -81,7 +77,7 @@ namespace mitk {
     protected:
       LinearSpectralUnmixingFilter();
       ~LinearSpectralUnmixingFilter() override;
- 
+
       /**
       * \brief overrides the baseclass method with a mehtod to calculate the spectral unmixing result vector. Herain the class performs the
       * algorithm set by the "SetAlgorithm" method and writes the result into a Eigen vector which is the return value.

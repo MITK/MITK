@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 // Blueberry
 #include <berryISelectionService.h>
@@ -656,7 +652,7 @@ void PAImageProcessing::StartBandpassThread()
       float BPHighPass = 1000000.0f * m_Controls.BPhigh->value(); // [Now in Hz]
       float BPLowPass = 1000000.0f * m_Controls.BPlow->value(); // [Now in Hz]
 
-      thread->setConfig(BPHighPass, BPLowPass, m_Controls.BPFalloffLow->value(), m_Controls.BPFalloffHigh->value(), 
+      thread->setConfig(BPHighPass, BPLowPass, m_Controls.BPFalloffLow->value(), m_Controls.BPFalloffHigh->value(),
         config->GetTimeSpacing(), config->GetSpeedOfSound(), m_Controls.IsBFImage->isChecked());
       thread->setInputImage(image);
       thread->setFilterBank(m_FilterBank);

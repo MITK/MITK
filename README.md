@@ -17,7 +17,7 @@ usage scenarios:
 See the [MITK homepage][mitk] for details.
 
 Supported Platforms
------------------------------
+-------------------
 
 MITK is a cross-platform C++ toolkit and officially supports:
 
@@ -28,14 +28,14 @@ MITK is a cross-platform C++ toolkit and officially supports:
 For details, please read the [Supported Platforms][platforms] page.
 
 License
------------
+-------
 
-Copyright (c) [German Cancer Research Center][dkfz].
+Copyright (c) [German Cancer Research Center (DKFZ)][dkfz]. All rights reserved.
 
-MITK is available as free open-source software under a [BSD-style license][license].
+MITK is available as free open-source software under a [3-clause BSD license][license].
 
 Download
----------
+--------
 
 The MITK source code and binaries for the *MitkWorkbench* application are released regularly according to the [MITK release cycle][release-cycle]. See the [Download][download] page for a list of releases.
 
@@ -46,13 +46,13 @@ The official MITK source code is available in the [MITK Git repository][diffusio
 Active development takes place in the MITK master branch and its usage is advised for advanced users only.
 
 How to Contribute
---------------
+-----------------
 
 Contributions of all kind are happily accepted. However, to make the contribution process as smooth as possible, please read the [How to contribute to MITK][contribute] page if you plan to contribute to MITK.
 
 
 Build Instructions
-------------------------
+------------------
 
 MITK uses [CMake][cmake] to configure a build tree. The following is a crash course about cloning, configuring, and building MITK on a Linux/Unix system:
 
@@ -62,28 +62,27 @@ MITK uses [CMake][cmake] to configure a build tree. The following is a crash cou
     cmake ../MITK
     make -j4
 
-Read the comprehensive [Build Instructions][build] page for details.
+Read the comprehensive [build instructions][build] page for details.
 
 Useful Links
-------------------
+------------
 
  - [Homepage][mitk]
  - [Download][download]
- - [Mailing List][mailinglist]
- - [Bug Tracker][bugs]
-
+ - [Mailing list][mailinglist]
+ - [Issue tracker][bugs]
 
 [logo]: https://github.com/MITK/MITK/raw/master/mitk.png
 [mitk]: http://mitk.org
 [itk]: https://itk.org
-[vtk]: http://vtk.org
+[vtk]: https://vtk.org
 [mitk-overview]: http://docs.mitk.org/nightly/Overview.html
 [mitk-usermanual]: http://docs.mitk.org/nightly/UserManualPortal.html
 [mitk-devmanual]: http://docs.mitk.org/nightly/DeveloperManualPortal.html
 [mitk-apiref]: http://docs.mitk.org/nightly/usergroup0.html
 [platforms]: http://docs.mitk.org/nightly/SupportedPlatformsPage.html
 [dkfz]: https://www.dkfz.de
-[license]: https://github.com/MITK/MITK/blob/master/LICENSE.txt
+[license]: https://github.com/MITK/MITK/blob/master/LICENSE
 [release-cycle]: http://mitk.org/MitkReleaseCycle
 [download]: http://mitk.org/Download
 [diffusion]: https://phabricator.mitk.org/source/mitk/

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <mitkAnatomicalStructureColorPresets.h>
 #include <mitkDICOMTag.h>
@@ -35,7 +31,7 @@ namespace mitk
   void DICOMPMPropertyHelper::DeriveDICOMPMProperties(BaseData *derivedDICOMImage)
   {
     PropertyList::Pointer propertyList = derivedDICOMImage->GetPropertyList();
-    
+
     // Add DICOM Tag (0008, 0060) Modality "PM"
     propertyList->SetProperty(GeneratePropertyNameForDICOMTag(0x0008, 0x0060).c_str(),
                               TemporoSpatialStringProperty::New("PM"));
@@ -53,7 +49,7 @@ namespace mitk
   }
 
 
- 
+
 } // namespace mitk
 
 

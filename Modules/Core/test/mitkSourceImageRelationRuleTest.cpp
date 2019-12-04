@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkSourceImageRelationRule.h"
 
@@ -705,7 +701,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE(
       "Destination uid was not stored with the correct key. Already existing session should be used.", prop);
     CPPUNIT_ASSERT_MESSAGE("Incorrect destination uid was stored.", prop->GetValueAsString() == dest_1->GetUID());
-    
+
     name = "MITK.Relations.1.ruleID";
     prop = source_data_1->GetProperty(name.c_str());
     CPPUNIT_ASSERT_MESSAGE("Incorrect ruleID was stored.", prop->GetValueAsString() == rule->GetRuleID());

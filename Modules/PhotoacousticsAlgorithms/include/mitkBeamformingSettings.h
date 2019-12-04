@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITK_BEAMFORMING_SETTINGS
 #define MITK_BEAMFORMING_SETTINGS
@@ -84,7 +80,7 @@ namespace mitk {
       return !((std::abs(lhs->GetAngle() - rhs->GetAngle()) < 0.01f) && // 0.01 degree error margin
         (lhs->GetApod() == rhs->GetApod()) &&
         (lhs->GetGeometry() == rhs->GetGeometry()) &&
-        (std::abs(lhs->GetProbeRadius() - rhs->GetProbeRadius()) < 0.001f) && 
+        (std::abs(lhs->GetProbeRadius() - rhs->GetProbeRadius()) < 0.001f) &&
         (lhs->GetIsPhotoacousticImage() == rhs->GetIsPhotoacousticImage()) &&
         (std::abs(lhs->GetPitchInMeters() - rhs->GetPitchInMeters()) < 0.000001f) && // 0.0001 mm error margin
         (lhs->GetReconstructionLines() == rhs->GetReconstructionLines()) &&
@@ -228,7 +224,7 @@ namespace mitk {
     */
     float m_ProbeRadius;
 
-    /** 
+    /**
     */
     float *m_ElementHeights;
 

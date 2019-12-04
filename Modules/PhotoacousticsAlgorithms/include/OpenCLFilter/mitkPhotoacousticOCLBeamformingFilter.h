@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef _MITKPHOTOACOUSTICSOCLBEAMFORMER_H_
 #define _MITKPHOTOACOUSTICSOCLBEAMFORMER_H_
@@ -118,7 +114,7 @@ namespace mitk
     mitk::OCLUsedLinesCalculation::Pointer m_UsedLinesCalculation;
     mitk::OCLDelayCalculation::Pointer m_DelayCalculation;
 
-    cl_mem m_ApodizationBuffer; 
+    cl_mem m_ApodizationBuffer;
     cl_mem m_DelaysBuffer;
     cl_mem m_UsedLinesBuffer;
     cl_mem m_ElementHeightsBuffer;

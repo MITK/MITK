@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKUSDiPhASImageSource_H_HEADER_INCLUDED_
 #define MITKUSDiPhASImageSource_H_HEADER_INCLUDED_
@@ -43,12 +39,12 @@ class USDiPhASDevice;
   * The method mitk::USImageSource::GetNextRawImage() is implemented for
   * getting images from the DiPhAS API.
   *
-  * The image data is given to this class from the DiPhAS API by calling 
+  * The image data is given to this class from the DiPhAS API by calling
   * a callback method that writes the image data to an mitk::image
   */
 class USDiPhASImageSource : public USImageSource
 {
-  
+
 public:
   mitkClassMacro(USDiPhASImageSource, USImageSource);
   mitkNewMacro1Param(Self, mitk::USDiPhASDevice*);

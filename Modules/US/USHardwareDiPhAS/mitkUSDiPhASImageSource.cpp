@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 // std dependencies
 #include <ctime>
@@ -106,7 +102,7 @@ void mitk::USDiPhASImageSource::GetNextRawImage(std::vector<mitk::Image::Pointer
     m_UseBModeFilterModified = false;
   }
   if (m_VerticalSpacingModified)
-  { 
+  {
     m_VerticalSpacing = m_VerticalSpacingNext;
     m_VerticalSpacingModified = false;
   }
@@ -511,7 +507,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
               }
             } // the beamformed pa image is flipped by 90 degrees; we need to flip it manually
         }
-        
+
         for (unsigned char i = 0; i < beamformedTotalDatasets; i++) {
           image->SetSlice(&flipme[i*beamformedLines*beamformedSamples], i);
           // set every image to a different slice
@@ -570,7 +566,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
 
     itk::Index<3> pixel = { {
         (itk::Index<3>::IndexValueType)(image->GetDimension(0) / 2),
-        (itk::Index<3>::IndexValueType)(22.0/532.0*m_Device->GetScanMode().reconstructionSamplesPerLine), 
+        (itk::Index<3>::IndexValueType)(22.0/532.0*m_Device->GetScanMode().reconstructionSamplesPerLine),
         0 } }; //22/532*2048 = 84
     if (!m_Pyro->IsSyncDelaySet() &&(image->GetPixelValueByIndex(pixel) < -30)) // #MagicNumber
     {
@@ -720,7 +716,7 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
   // start the recording process
   if (record)
   {
-    m_RecordedImages.clear();  
+    m_RecordedImages.clear();
     m_RawRecordedImages.clear(); // we make sure there are no leftovers
     m_ImageTimestampRecord.clear(); // also for the timestamps
     m_PixelValues.clear(); // aaaand for the pixel values
@@ -792,7 +788,7 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
 
       itk::Index<3> pixel = { {
           (itk::Index<3>::IndexValueType)(m_RecordedImages.at(0)->GetDimension(0) / 2),
-          (itk::Index<3>::IndexValueType)(22.0 / 532.0*m_Device->GetScanMode().reconstructionSamplesPerLine), 
+          (itk::Index<3>::IndexValueType)(22.0 / 532.0*m_Device->GetScanMode().reconstructionSamplesPerLine),
           0 } }; //22/532*2048 = 84
 
       GetPixelValues(pixel, m_PixelValues); // write the Pixelvalues to m_PixelValues
@@ -835,7 +831,7 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
       mitk::IOUtil::Save(USImage, pathUS);
     }
 
-    m_PixelValues.clear();            
+    m_PixelValues.clear();
     m_RawRecordedImages.clear();      // clean up the pixel values
     m_RecordedImages.clear();         // clean up the images
     m_ImageTimestampRecord.clear();   // clean up the timestamps

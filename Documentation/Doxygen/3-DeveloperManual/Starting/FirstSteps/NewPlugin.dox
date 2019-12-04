@@ -13,8 +13,8 @@ A CTK plugin generator for MITK (version 1.2.0)
 
   -h, --help                      Show this help text
   -o, --out-dir                   Output directory (default: /tmp)
-  -l, --license                   Path to a file containing license information (default: :/MITKLicense.txt)
-  -v, --vendor                    The vendor of the generated code (default: DKFZ, Medical and Biological Informatics)
+  -l, --license                   Path to a file containing license information (default: :/COPYRIGHT_HEADER)
+  -v, --vendor                    The vendor of the generated code (default: German Cancer Research Center (DKFZ))
   -q, --quiet                     Do not print additional information
   -y, --confirm-all               Answer all questions with 'yes'
   -u, --check-update              Check for updates and exit
@@ -29,7 +29,7 @@ Plugin options
   -pn, --plugin-name              The plugin's human readable name
 
 Project options
-  --project-copyright             Path to a file containing copyright information (default: :/LICENSE.txt)
+  --project-copyright             Path to a file containing copyright information (default: :/LICENSE)
   --project-name                  The project name
   --project-app-name              The application name
 

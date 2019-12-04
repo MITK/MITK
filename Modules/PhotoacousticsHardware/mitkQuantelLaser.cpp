@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkQuantelLaser.h"
 
@@ -34,10 +30,10 @@ mitk::QuantelLaser::QuantelLaser() :
   m_ShutterOpen(false),
   m_LaserEmission(false),
   m_DeviceName(),
-  m_PortNumber(mitk::SerialCommunication::COM6), 
+  m_PortNumber(mitk::SerialCommunication::COM6),
   m_BaudRate(mitk::SerialCommunication::BaudRate115200),
-  m_DataBits(mitk::SerialCommunication::DataBits8), 
-  m_Parity(mitk::SerialCommunication::None), 
+  m_DataBits(mitk::SerialCommunication::DataBits8),
+  m_Parity(mitk::SerialCommunication::None),
   m_StopBits(mitk::SerialCommunication::StopBits1),
   m_HardwareHandshake(mitk::SerialCommunication::HardwareHandshakeOff),
   m_SerialCommunication(nullptr),
@@ -59,7 +55,7 @@ mitk::QuantelLaser::~QuantelLaser()
     this->CloseConnection();
   }
   /* cleanup stay alive thread */
-  if (m_StayAliveMessageThread.joinable()) 
+  if (m_StayAliveMessageThread.joinable())
     m_StayAliveMessageThread.join();
 
   /* free serial communication interface */
@@ -77,7 +73,7 @@ std::string mitk::QuantelLaser::SendAndReceiveLine(const std::string* input, std
   MITK_INFO << "[Quantel Laser Debug] sending: " << input->c_str();
   if (input == nullptr)
     return "SERIALSENDERROR";
-  
+
   std::string message;
 
   message = *input + '\n';
@@ -199,7 +195,7 @@ mitk::QuantelLaser::LaserState mitk::QuantelLaser::GetState()
     m_State = UNCONNECTED;
     return m_State;
   }
-  
+
   if (!m_SerialCommunication->IsConnected())
   {
     m_State = UNCONNECTED;
@@ -263,7 +259,7 @@ mitk::QuantelLaser::LaserState mitk::QuantelLaser::GetState()
     m_LaserEmission = true;
   }
   else
-  { 
+  {
     m_State = UNCONNECTED;
     m_FlashlampRunning = false;
     m_ShutterOpen = false;
@@ -313,7 +309,7 @@ bool mitk::QuantelLaser::StartFlashing()
   }
   else
     MITK_INFO << "[Quantel Laser Debug] " << "Flashlamps are already running";
-  
+
   return true;
 }
 
@@ -337,7 +333,7 @@ bool mitk::QuantelLaser::StopFlashing()
       m_KeepAlive = false;
     }
     else
-    {  
+    {
       MITK_ERROR << "[Quantel Laser Debug] " << "Cannot Stop flashlamps." << " Laser is telling me: " << answer;
       return false;
     }

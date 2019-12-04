@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
- The Medical Imaging Interaction Toolkit (MITK)
+The Medical Imaging Interaction Toolkit (MITK)
 
- Copyright (c) German Cancer Research Center,
- Division of Medical Image Computing.
- All rights reserved.
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
 
- This software is distributed WITHOUT ANY WARRANTY; without
- even the implied warranty of MERCHANTABILITY or FITNESS FOR
- A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
- See LICENSE.txt or http://www.mitk.org for details.
-
- ===================================================================*/
+============================================================================*/
 
 #include "mitkDisplayActionEventBroadcast.h"
 
@@ -673,7 +669,7 @@ void mitk::DisplayActionEventBroadcast::EndRotation(StateMachineAction* /*stateM
 }
 
 void mitk::DisplayActionEventBroadcast::Rotate(StateMachineAction* /*stateMachineAction*/, InteractionEvent* interactionEvent)
-{  
+{
   const auto* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (nullptr == positionEvent)
   {
@@ -717,7 +713,7 @@ void mitk::DisplayActionEventBroadcast::Rotate(StateMachineAction* /*stateMachin
 }
 
 void mitk::DisplayActionEventBroadcast::Swivel(StateMachineAction* /*stateMachineAction*/, InteractionEvent* interactionEvent)
-{  
+{
   const auto* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (nullptr == positionEvent)
   {

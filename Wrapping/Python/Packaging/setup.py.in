@@ -98,7 +98,7 @@ class build_ext(_build_ext):
 setup(
     name = 'pyMITK',
     version = get_pep386version(),
-    author = 'Medical Image Computing, DKFZ Heidelberg',
+    author = 'German Cancer Research Center (DKFZ)',
     author_email = 'm.goetz@dkfz-heidelberg.de',
     ext_modules=[Extension('pyMITK._pyMITK', [r'@MITK_BINARY_MODULE@'])],
     packages= ['pyMITK'],

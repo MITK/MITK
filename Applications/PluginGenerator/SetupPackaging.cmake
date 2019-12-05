@@ -14,6 +14,7 @@ install(CODE "
      )
 
   include(BundleUtilities)
+  set(BU_CHMOD_BUNDLE_ITEMS ON)
 
   fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/${exec_target}${CMAKE_EXECUTABLE_SUFFIX}\" \"\" \"\${DIRS}\")
 ")

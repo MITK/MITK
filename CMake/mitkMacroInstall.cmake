@@ -193,6 +193,7 @@ macro(_fixup_target)
 
     # use custom version of BundleUtilities
     include(BundleUtilities)
+    set(BU_CHMOD_BUNDLE_ITEMS ON)
 
     fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/${_target_location}\" \"\${PLUGINS}\" \"\${DIRS}\")
 

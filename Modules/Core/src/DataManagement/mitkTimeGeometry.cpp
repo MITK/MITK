@@ -36,7 +36,7 @@ mitk::Point3D mitk::TimeGeometry::GetCornerPointInWorld(int id) const
   assert(id >= 0);
   assert(m_BoundingBox.IsNotNull());
 
-  BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
+  auto& bounds = m_BoundingBox->GetBounds();
 
   Point3D cornerpoint;
   switch (id)
@@ -80,7 +80,7 @@ mitk::Point3D mitk::TimeGeometry::GetCornerPointInWorld(int id) const
 mitk::Point3D mitk::TimeGeometry::GetCornerPointInWorld(bool xFront, bool yFront, bool zFront) const
 {
   assert(m_BoundingBox.IsNotNull());
-  BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
+  auto& bounds = m_BoundingBox->GetBounds();
 
   Point3D cornerpoint;
   cornerpoint[0] = (xFront ? bounds[0] : bounds[1]);
@@ -146,7 +146,7 @@ mitk::ScalarType mitk::TimeGeometry::GetExtentInWorld(unsigned int direction) co
 {
   assert(direction < 3);
   assert(m_BoundingBox.IsNotNull());
-  BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
+  auto& bounds = m_BoundingBox->GetBounds();
   return bounds[direction * 2 + 1] - bounds[direction * 2];
 }
 

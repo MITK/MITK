@@ -181,8 +181,6 @@ namespace mitk
 
     ResliceInterpolation m_InterpolationMode;
 
-    BaseGeometry::ConstPointer m_ResliceTransform;
-
     bool m_InPlaneResampleExtentByGeometry; // Resampling grid corresponds to:  false->image    true->worldgeometry
 
     mitk::ScalarType *m_OutPutSpacing;
@@ -192,6 +190,14 @@ namespace mitk
     double m_BackgroundLevel;
 
     unsigned int m_Component;
+
+  private:
+    BaseGeometry::ConstPointer m_ResliceTransform;
+    /* Axis vectors of the relevant geometry. Set in GenerateOutputInformation() and also used in GenerateData().*/
+    Vector3D m_Right, m_Bottom;
+    /* Bounds of the relevant plane. Set in GenerateOutputInformation() and also used in GenerateData().*/
+    int m_XMin, m_XMax, m_YMin, m_YMax;
+
   };
 }
 

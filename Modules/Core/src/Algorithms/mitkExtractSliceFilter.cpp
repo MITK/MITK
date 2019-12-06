@@ -485,6 +485,10 @@ void mitk::ExtractSliceFilter::GenerateData()
     {
       resultImage->Initialize(reslicedImage);
     }
+
+    // transfer the voxel data
+    resultImage->SetVolume(reslicedImage->GetScalarPointer());
+
     /*================ #END Convert the slice to an mitk::Image ================*/
 
     resultImage->SetGeometry(resultGeometry);

@@ -73,7 +73,6 @@ void QmitkSegmentationFlowControlView::CreateQtPartControl(QWidget* parent)
     bool isFlagFound = false;
     for (auto arg : arguments)
     {
-      std::cout << "arg: " << arg << std::endl;
       if (isFlagFound)
       {
         m_OutputDir = arg;
@@ -89,7 +88,7 @@ void QmitkSegmentationFlowControlView::CreateQtPartControl(QWidget* parent)
         m_FileExtension = arg;
         break;
       }
-      isFlagFound = arg.startsWith("--flow.outputformat");
+      isFlagFound = arg.startsWith("--flow.outputextension");
     }
 
     m_OutputDir = QDir::fromNativeSeparators(m_OutputDir);

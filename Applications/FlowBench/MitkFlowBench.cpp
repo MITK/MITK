@@ -51,7 +51,7 @@ protected:
 };
 
 const QString FlowApplication::ARG_OUTPUTDIR = "flow.outputdir";
-const QString FlowApplication::ARG_OUTPUTFORMAT = "flow.outputformat";
+const QString FlowApplication::ARG_OUTPUTFORMAT = "flow.outputextension";
 
 int main(int argc, char **argv)
 {

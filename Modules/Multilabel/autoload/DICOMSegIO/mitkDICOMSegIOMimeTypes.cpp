@@ -48,19 +48,6 @@ namespace mitk
 
   bool MitkDICOMSEGIOMimeTypes::MitkDICOMSEGMimeType::AppliesTo(const std::string &path) const
   {
-    std::ifstream myfile;
-    myfile.open(path, std::ios::binary);
-    //    myfile.seekg (128);
-    char *buffer = new char[128];
-    myfile.read(buffer, 128);
-    myfile.read(buffer, 4);
-    if (std::string(buffer).compare("DICM") != 0)
-    {
-      delete[] buffer;
-      return false;
-    }
-    delete[] buffer;
-
     bool canRead(CustomMimeType::AppliesTo(path));
 
     // fix for bug 18572
@@ -73,6 +60,21 @@ namespace mitk
     }
     // end fix for bug 18572
 
+    // fix due to T26903
+    // have to clarify T26903 and if this is a suitable solution, before this can be in the master
+    std::ifstream myfile;
+    myfile.open(path, std::ios::binary);
+    //    myfile.seekg (128);
+    char *buffer = new char[128];
+    myfile.read(buffer, 128);
+    myfile.read(buffer, 4);
+    if (std::string(buffer).compare("DICM") != 0)
+    {
+      delete[] buffer;
+      return false;
+    }
+    delete[] buffer;
+    // end fix for T26903 
 
     DcmFileFormat dcmFileFormat;
     OFCondition status = dcmFileFormat.loadFile(path.c_str());

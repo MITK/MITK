@@ -62,12 +62,12 @@ void mitk::ExtractSliceFilter::GenerateOutputInformation()
 {
   Image::ConstPointer input = this->GetInput();
 
-  if (!input)
+  if (input.IsNull())
   {
     return;
   }
 
-  if (!m_WorldGeometry)
+  if (nullptr == m_WorldGeometry)
   {
     return;
   }
@@ -86,10 +86,10 @@ void mitk::ExtractSliceFilter::GenerateOutputInformation()
   // the origin of the worldGeometry is transformed to center based coordinates to be an imageGeometry
   Point3D sliceOrigin = sliceGeometry->GetOrigin();
 
-  const auto *abstractGeometry =
+  auto abstractGeometry =
     dynamic_cast<const AbstractTransformGeometry *>(m_WorldGeometry);
 
-  const auto *planeGeometry = dynamic_cast<const PlaneGeometry *>(m_WorldGeometry);
+  auto planeGeometry = dynamic_cast<const PlaneGeometry *>(m_WorldGeometry);
 
   if (abstractGeometry != nullptr)
   {
@@ -145,7 +145,7 @@ void mitk::ExtractSliceFilter::GenerateOutputInformation()
     }
     else
     {
-      itkExceptionMacro("mitk::ExtractSliceFilter: No fitting geometry for reslice axis!");
+      mitkThrow()<<"mitk::ExtractSliceFilter: No fitting geometry for reslice axis!";
       return;
     }
   }

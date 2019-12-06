@@ -197,9 +197,9 @@ namespace mitk
 
   private:
     BaseGeometry::ConstPointer m_ResliceTransform;
-    /* Axis vectors of the relevant geometry. Set in GenerateOutpurInformation() and also used in GenerateData().*/
+    /* Axis vectors of the relevant geometry. Set in GenerateOutputInformation() and also used in GenerateData().*/
     Vector3D m_Right, m_Bottom;
-    /* Bounds of the relevant plane. Set in GenerateOutpurInformation() and also used in GenerateData().*/
+    /* Bounds of the relevant plane. Set in GenerateOutputInformation() and also used in GenerateData().*/
     int m_XMin, m_XMax, m_YMin, m_YMax;
 
   };

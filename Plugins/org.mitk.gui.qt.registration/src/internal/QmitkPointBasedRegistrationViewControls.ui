@@ -69,7 +69,7 @@
       <string/>
      </property>
      <property name="text">
-      <string>You have to select two images from Data Manager using CTRL + left click!</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Data Manager plugin. &lt;/p&gt;&lt;p&gt;You have to select two images from Data Manager using CTRL + left click! &lt;/p&gt;&lt;p&gt;You have to perform global reinitialization in Data Manager plugin using right click menu.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </item>

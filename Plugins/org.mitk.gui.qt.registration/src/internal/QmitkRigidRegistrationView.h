@@ -96,13 +96,7 @@ class REGISTRATION_EXPORT QmitkRigidRegistrationView : public QmitkFunctionality
     */
     virtual void Deactivated() override;
 
-    virtual void Visible() override;
-    virtual void Hidden() override;
-
     void DataNodeHasBeenRemoved(const mitk::DataNode* node);
-
-  signals:
-    void PresetSelected( QString preset_name );
 
   protected slots:
 
@@ -115,31 +109,6 @@ class REGISTRATION_EXPORT QmitkRigidRegistrationView : public QmitkFunctionality
     * sets the moving Image according to TreeNodeSelector widget
     */
     void MovingSelected(mitk::DataNode::Pointer movingImage);
-
-    /*!
-    * checks if registration is possible
-    */
-    bool CheckCalculate();
-
-    /**
-      \brief Load the preset set within the combo box
-      */
-    void LoadSelectedPreset();
-
-    /*!
-    * \brief Undo the last registration.
-    */
-    void UndoTransformation();
-
-    /*!
-    * \brief Redo the last registration
-    */
-    void RedoTransformation();
-
-    /*!
-    * \brief Adds a new Transformation to the undo list and enables the undo button.
-    */
-    void AddNewTransformationToUndoList();
 
     /*!
     * \brief Translates the moving image in x, y and z direction given by translateVector
@@ -185,11 +154,7 @@ class REGISTRATION_EXPORT QmitkRigidRegistrationView : public QmitkFunctionality
     */
     void EnableContour(bool show);
 
-    /*!
-    * \brief Changes the visibility of the manual registration methods accordingly to the checkbox "Manual Registration" in GUI
-    * @param show if true, then manual registration methods will be shown
-    */
-    void ShowManualRegistrationFrame(bool show);
+    void ShowManualRegistrationFrame();
 
     /*!
     * \brief Sets the selected opacity for moving image
@@ -210,17 +175,7 @@ class REGISTRATION_EXPORT QmitkRigidRegistrationView : public QmitkFunctionality
     */
     void SetImageColor(bool redGreen);
 
-    /*!
-    * \brief Clears the undo and redo lists and sets the undo and redo buttons to disabled.
-    */
-    void ClearTransformationLists();
-
-    void SetUndoEnabled( bool enable );
-
-    void SetRedoEnabled( bool enable );
-
     void CheckCalculateEnabled();
-
     void xTrans_valueChanged( int v );
 
     void yTrans_valueChanged( int v );
@@ -240,15 +195,6 @@ class REGISTRATION_EXPORT QmitkRigidRegistrationView : public QmitkFunctionality
     void zScale_valueChanged( int v );
 
     void MovingImageChanged();
-
-    /*!
-    * \brief Starts the registration process.
-    */
-    void Calculate();
-
-    void SetOptimizerValue( double value );
-
-    void StopOptimizationClicked();
 
     void UpdateTimestep();
 
@@ -278,10 +224,7 @@ class REGISTRATION_EXPORT QmitkRigidRegistrationView : public QmitkFunctionality
     */
     void OnMovingMaskImageChanged(const mitk::DataNode* node);
 
-    void PresetSelectionChanged();
 protected:
-
-    void FillPresetComboBox(const std::list<std::string> &preset);
 
     QScopedPointer<berry::ISelectionListener> m_SelListener;
     berry::IStructuredSelection::ConstPointer m_CurrentSelection;
@@ -310,10 +253,6 @@ protected:
     typedef std::list< GeometryMapType > GeometryMapListType;
     typedef std::list<mitk::Geometry3D::Pointer> GeometryListType;
 
-    GeometryListType m_UndoGeometryList;
-    GeometryMapListType m_UndoChildGeometryList;
-    GeometryListType m_RedoGeometryList;
-    GeometryMapListType m_RedoChildGeometryList;
     bool m_ShowRedGreen;
     float m_Opacity;
     float m_OriginalOpacity;
@@ -328,10 +267,6 @@ protected:
     int m_TranslateSliderPos[3];
     int m_RotateSliderPos[3];
     int m_ScaleSliderPos[3];
-
-    bool m_PresetSelected;
-
-    bool m_PresetNotLoaded;
 
     QmitkStepperAdapter*      m_TimeStepperAdapter;
     QTimer* m_Timer;

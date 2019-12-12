@@ -482,10 +482,10 @@ bool Workbench::RestoreState(IMemento::Pointer memento)
 
       // If we don't know how many plug-ins were loaded last time,
       // assume we are loading half of the installed plug-ins.
-      /*const std::size_t expectedProgressCount =*/
+      /*const std::size_t expectedProgressCount =
       std::max<std::size_t>(1,
           lastProgressCount == -1 ? WorkbenchPlugin::GetDefault()->GetBundleCount() / 2
-          : lastProgressCount);
+          : lastProgressCount);*/
 
       //TODO restore state progress
       //        RunStartupWithProgress(expectedProgressCount, new Runnable() {

@@ -583,7 +583,7 @@ int mitkPlanarFigureIOTest(int /* argc */, char * /*argv*/ [])
   PlanarFigureIOTestClass::VerifyPlanarFigures(originalPlanarFigures, retrievedPlanarFiguresFromMemory);
 
   // empty the originalPlanarFigures
-  originalPlanarFigures.empty();
+  originalPlanarFigures.clear();
 
   // Test if deep-copied and retrieved PlanarFigure objects are the same
   PlanarFigureIOTestClass::VerifyPlanarFigures(copiedPlanarFigures, retrievedPlanarFigures);

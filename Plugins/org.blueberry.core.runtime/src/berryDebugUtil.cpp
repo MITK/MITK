@@ -76,16 +76,6 @@ public:
   }
 };
 
-class AccumulateClassNames: public std::binary_function<QSet<QString>*, const Object*, QSet<QString>*>
-{
-public:
-  QSet<QString>* operator()(QSet<QString>* names, const Object* entry)
-  {
-    names->insert(entry->GetClassName());
-    return names;
-  }
-};
-
 DebugBreakpointManager* DebugUtil::GetBreakpointManager()
 {
   static DebugBreakpointManager breakpointManager;
@@ -304,7 +294,9 @@ void DebugUtil::ResetObjectSummary()
 bool DebugUtil::PrintObjectSummary(bool details)
 {
   QSet<QString> names;
-  std::accumulate(m_TraceIdToObjectMap.begin(), m_TraceIdToObjectMap.end(), &names, AccumulateClassNames());
+
+  for (auto object : m_TraceIdToObjectMap)
+    names.insert(object->GetClassName());
 
   if (!names.isEmpty())
   {

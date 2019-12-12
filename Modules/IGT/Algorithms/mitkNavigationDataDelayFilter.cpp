@@ -30,7 +30,10 @@ void mitk::NavigationDataDelayFilter::GenerateData()
   // This actually compares the number of Navigation Datas in each step and compares it to the current number of inputs.
   // If these values differ, the number of inputrs have changed.
   if ((!m_Buffer.empty()) && (this->GetNumberOfInputs() != m_Buffer.front().second.size()))
-    m_Buffer.swap(decltype(m_Buffer)()); // Clear queue with copy-and-swap idiom
+  {
+    decltype(m_Buffer) tmp;
+    m_Buffer.swap(tmp); // Clear queue with copy-and-swap idiom
+  }
 
   // Put current navigationdatas from input into buffer
   itk::TimeStamp now;

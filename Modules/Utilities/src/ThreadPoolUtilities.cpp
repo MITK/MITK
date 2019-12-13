@@ -111,7 +111,7 @@ namespace Utilities
     }
 
     UniqueLock lockTask(m_taskGuard);
-    const auto taskId = m_id++;
+    const auto taskId = ++m_id;
     m_task.emplace(taskId, task);
     lockTask.unlock();
 
@@ -236,7 +236,7 @@ namespace Utilities
 
   size_t ThreadPool::WaitFirst(const std::set<size_t>& ids, volatile bool * stop)
   {
-    size_t id;
+    size_t id = 0;
     if (ids.empty()) {
       return id;
     }

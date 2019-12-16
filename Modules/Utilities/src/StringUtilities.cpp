@@ -56,6 +56,15 @@ namespace Utilities
 #endif
   }
 
+  std::string convertUTF8ToLocal(const std::string& str)
+  {
+#ifdef _WIN32
+    return strToStr(str, CP_UTF8, CP_ACP);
+#else
+    return str;
+#endif
+  }
+
 #ifdef _WIN32
   std::string convertToUtf8(const std::wstring& wstr)
   {

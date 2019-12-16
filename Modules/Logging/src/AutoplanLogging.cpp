@@ -156,10 +156,10 @@ namespace Logger
     tcpdump = false;
 
 #ifdef _WIN32
-    if(const char* ifAppData = std::getenv("LOCALAPPDATA")) {
-      logsPath = std::string(ifAppData) + "\\DKFZ\\logs\\";
-    }
-    else {
+    
+    if(const wchar_t* appDataPath = _wgetenv(L"LOCALAPPDATA")) {
+      logsPath = Utilities::convertUTF8ToLocal(Utilities::convertToUtf8(appDataPath)) + "\\DKFZ\\logs\\";
+    } else {
       logsPath = "./logs/";
     }
 #else
@@ -360,6 +360,8 @@ namespace Logger
 
     boost::log::add_common_attributes();
     boost::log::core::get()->flush();
+
+    loggerInitialized = true;
   }
 
   void Log::setSource(const std::string& src)

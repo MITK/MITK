@@ -332,12 +332,14 @@ void QmitkScreenshotMaker::GenerateMultiplanar3DHighresScreenshot()
 void QmitkScreenshotMaker::GenerateHR3DAtlasScreenshots(QString fileName, QString filter)
 {
   // only works correctly for 3D RenderWindow
-  this->GetRenderWindowPart()->EnableDecorations(false, QStringList{mitk::IRenderWindowPart::DECORATION_CORNER_ANNOTATION});
-  vtkRenderer* renderer = this->GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderer()->GetVtkRenderer();
-  if (renderer == nullptr)
-    return;
-  this->TakeScreenshot(renderer, this->m_Controls->m_MagFactor->text().toFloat(), fileName, filter);
-  this->GetRenderWindowPart()->EnableDecorations(true, QStringList{mitk::IRenderWindowPart::DECORATION_CORNER_ANNOTATION});
+  auto renderer = this->GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderer()->GetVtkRenderer();
+
+  if (nullptr != renderer)
+  {
+    this->GetRenderWindowPart()->EnableDecorations(false);
+    this->TakeScreenshot(renderer, this->m_Controls->m_MagFactor->text().toFloat(), fileName, filter);
+    this->GetRenderWindowPart()->EnableDecorations(true);
+  }
 }
 
 vtkCamera* QmitkScreenshotMaker::GetCam()

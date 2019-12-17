@@ -91,7 +91,7 @@ void QmitkMultiWidgetDecorationManager::DecorationPreferencesChanged(const berry
 
 void QmitkMultiWidgetDecorationManager::ShowDecorations(bool show, const QStringList& decorations)
 {
-  if (nullptr != m_MultiWidget)
+  if (nullptr == m_MultiWidget)
   {
     return;
   }

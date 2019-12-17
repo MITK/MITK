@@ -184,11 +184,11 @@ set(ep_common_args
   -DCMAKE_MODULE_LINKER_FLAGS:STRING=${CMAKE_MODULE_LINKER_FLAGS}
 )
 
-set(DCMTK_CMAKE_DEBUG_POSTFIX )
+if(MSVC_VERSION)
+  list(APPEND ep_common_args
+    -DCMAKE_DEBUG_POSTFIX:STRING=d
+  )
 
-# python libraries wont work with it
-if(NOT MITK_USE_Python3)
-  list(APPEND ep_common_args -DCMAKE_DEBUG_POSTFIX:STRING=d)
   set(DCMTK_CMAKE_DEBUG_POSTFIX d)
 endif()
 

@@ -193,7 +193,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
     mitk::Point3D seedPoint =
       pointSet
         ->GetPointSet(
-          mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))->GetTimeStep())
+          mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget0"))->GetTimeStep())
         ->GetPoints()
         ->ElementAt(0);
 
@@ -346,7 +346,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::RunSegmentation()
   }
 
   int timeStep =
-    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))->GetTimeStep();
+    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget0"))->GetTimeStep();
 
   if (!(seedPointSet->GetSize(timeStep)))
   {
@@ -738,7 +738,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImag
     dynamic_cast<mitk::Image *>(this->m_RegionGrow3DTool->GetTargetSegmentationNode()->GetData());
 
   int timeStep =
-    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))->GetTimeStep();
+    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget0"))->GetTimeStep();
 
   if (originalSegmentation)
   {

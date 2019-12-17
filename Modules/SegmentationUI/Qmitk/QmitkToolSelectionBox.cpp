@@ -329,9 +329,9 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
     case EnabledWithReferenceAndWorkingDataVisible:
       enabled = referenceNode && workingNode &&
                 referenceNode->IsVisible(
-                  mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))) &&
+                  mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget0"))) &&
                 workingNode->IsVisible(
-                  mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))) &&
+                  mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget0"))) &&
                 isVisible();
       break;
     case EnabledWithReferenceData:

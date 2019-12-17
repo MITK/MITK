@@ -46,7 +46,7 @@ void QmitkOrbitAnimationItem::SetReverse(bool reverse)
 
 void QmitkOrbitAnimationItem::Animate(double s)
 {
-  vtkRenderWindow* renderWindow = mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4");
+  vtkRenderWindow* renderWindow = mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3");
 
   if (renderWindow == nullptr)
     return;

@@ -580,7 +580,7 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositi
     m_WorkingNode->SetProperty("opacity", mitk::FloatProperty::New(0.8));
     m_WorkingNode->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
     m_WorkingNode->SetVisibility(
-      false, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
+      false, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")));
 
     m_ToolManager->GetDataStorage()->Add(m_WorkingNode);
   }

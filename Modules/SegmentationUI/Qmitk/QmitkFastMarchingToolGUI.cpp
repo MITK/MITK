@@ -228,7 +228,7 @@ void QmitkFastMarchingToolGUI::OnNewToolAssociated(mitk::Tool *tool)
 
     // listen to timestep change events
     mitk::BaseRenderer::Pointer renderer;
-    renderer = mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"));
+    renderer = mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget0"));
     if (renderer.IsNotNull() && !m_TimeIsConnected)
     {
       new QmitkStepperAdapter(this, renderer->GetSliceNavigationController()->GetTime(), "stepper");

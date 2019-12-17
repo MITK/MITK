@@ -42,7 +42,7 @@ static void WriteEventXMLConfig(std::ofstream &stream)
       (*rendererIterator).second->GetSliceNavigationController()->GetDefaultViewDirection();
     mitk::BaseRenderer::MapperSlotId mapperID = (*rendererIterator).second->GetMapperID();
 
-    //  <renderer RendererName="stdmulti.widget2" ViewDirection="1" MapperID="1" SizeX="200" SizeY="200" SizeZ="1"/>
+    //  <renderer RendererName="stdmulti.widget1" ViewDirection="1" MapperID="1" SizeX="200" SizeY="200" SizeZ="1"/>
     stream << "  <" << mitk::InteractionEventConst::xmlTagRenderer() << " "
            << mitk::InteractionEventConst::xmlEventPropertyRendererName() << "=\"" << rendererName << "\" "
            << mitk::InteractionEventConst::xmlEventPropertyViewDirection() << "=\"" << viewDirection << "\" "
@@ -160,8 +160,8 @@ void mitk::EventRecorder::StartRecording()
   // <?xml version="1.0"?>
   //  <interactions>
   //   <config>
-  //    <renderer RendererName="stdmulti.widget2" ViewDirection="1"/>
-  //    <renderer RendererName="stdmulti.widget1" ViewDirection="0"/>
+  //    <renderer RendererName="stdmulti.widget1" ViewDirection="1"/>
+  //    <renderer RendererName="stdmulti.widget0" ViewDirection="0"/>
   //     ...
   //   </config>
   //   <events>

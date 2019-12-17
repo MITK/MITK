@@ -109,7 +109,7 @@ void InteractionEventRecorder::RotateView()
   // Rotate the view in 3D to a predefined state which can later be used again in tests
   // this simulates a prior VTK Interaction
 
-  vtkRenderWindow* renderWindow = mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4");
+  vtkRenderWindow* renderWindow = mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3");
 
   if (renderWindow == nullptr)
     return;

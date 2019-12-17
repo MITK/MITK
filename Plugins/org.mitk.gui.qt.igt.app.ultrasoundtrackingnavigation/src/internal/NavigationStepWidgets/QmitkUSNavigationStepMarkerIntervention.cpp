@@ -165,7 +165,7 @@ bool QmitkUSNavigationStepMarkerIntervention::OnStartStep()
   color[2] = 0;
   m_TargetStructureWarnOverlay->SetColor(color);
 
-  mitk::ManualPlacementAnnotationRenderer::AddAnnotation(m_TargetStructureWarnOverlay.GetPointer(), "stdmulti.widget4");
+  mitk::ManualPlacementAnnotationRenderer::AddAnnotation(m_TargetStructureWarnOverlay.GetPointer(), "stdmulti.widget3");
 
   return true;
 }

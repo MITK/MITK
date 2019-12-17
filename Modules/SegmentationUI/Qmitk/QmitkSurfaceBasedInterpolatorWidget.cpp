@@ -73,13 +73,13 @@ QmitkSurfaceBasedInterpolatorWidget::QmitkSurfaceBasedInterpolatorWidget(QWidget
   m_3DContourNode->SetProperty("material.wireframeLineWidth", mitk::FloatProperty::New(2.0f));
   m_3DContourNode->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
   m_3DContourNode->SetVisibility(
+    false, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget0")));
+  m_3DContourNode->SetVisibility(
     false, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
   m_3DContourNode->SetVisibility(
     false, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2")));
   m_3DContourNode->SetVisibility(
     false, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")));
-  m_3DContourNode->SetVisibility(
-    false, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
 
   connect(&m_Watcher, SIGNAL(started()), this, SLOT(StartUpdateInterpolationTimer()));
   connect(&m_Watcher, SIGNAL(finished()), this, SLOT(OnSurfaceInterpolationFinished()));
@@ -123,7 +123,7 @@ void QmitkSurfaceBasedInterpolatorWidget::ShowInterpolationResult(bool status)
 
   if (m_3DContourNode.IsNotNull())
     m_3DContourNode->SetVisibility(
-      status, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
+      status, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")));
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -182,7 +182,7 @@ void QmitkSurfaceBasedInterpolatorWidget::StopUpdateInterpolationTimer()
   m_Timer->stop();
   m_InterpolatedSurfaceNode->SetProperty("color", mitk::ColorProperty::New(255.0, 255.0, 0.0));
   mitk::RenderingManager::GetInstance()->RequestUpdate(
-    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetRenderWindow());
+    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))->GetRenderWindow());
 }
 
 void QmitkSurfaceBasedInterpolatorWidget::ChangeSurfaceColor()
@@ -202,7 +202,7 @@ void QmitkSurfaceBasedInterpolatorWidget::ChangeSurfaceColor()
   }
   m_InterpolatedSurfaceNode->Update();
   mitk::RenderingManager::GetInstance()->RequestUpdate(
-    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetRenderWindow());
+    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))->GetRenderWindow());
 }
 
 void QmitkSurfaceBasedInterpolatorWidget::OnToolManagerWorkingDataModified()

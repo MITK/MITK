@@ -237,8 +237,8 @@ void QmitkPolhemusTrackerWidget::OnStartTracking(bool _success)
   if (!_success)
     return;
   //Rotate mitk standard multi widget, so that the view matches the sensor. Positive x == right, y == front, z == down;
-  mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetCameraController()->SetViewToPosterior();
-  mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetVtkRenderer()->GetActiveCamera()->SetViewUp(0, 0, -1);
+  mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))->GetCameraController()->SetViewToPosterior();
+  mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))->GetVtkRenderer()->GetActiveCamera()->SetViewUp(0, 0, -1);
 
 }
 

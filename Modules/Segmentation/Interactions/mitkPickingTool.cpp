@@ -155,7 +155,7 @@ void mitk::PickingTool::OnPointAdded()
   // Perform region growing/picking
 
   int timeStep =
-    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))->GetTimeStep();
+    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget0"))->GetTimeStep();
 
   mitk::PointSet::PointType seedPoint = m_PointSet->GetPointSet(timeStep)->GetPoints()->Begin().Value();
 

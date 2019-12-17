@@ -110,11 +110,11 @@ const QmitkSliceBasedInterpolatorWidget::ActionToSliceDimensionMapType
   foreach (mitk::SliceNavigationController *slicer, m_ControllerToDeleteObserverTag.keys())
   {
     std::string name = slicer->GetRenderer()->GetName();
-    if (name == "stdmulti.widget1")
+    if (name == "stdmulti.widget0")
       name = "Axial (red window)";
-    else if (name == "stdmulti.widget2")
+    else if (name == "stdmulti.widget1")
       name = "Sagittal (green window)";
-    else if (name == "stdmulti.widget3")
+    else if (name == "stdmulti.widget2")
       name = "Coronal (blue window)";
     actionToSliceDimension[new QAction(QString::fromStdString(name), nullptr)] = slicer;
   }

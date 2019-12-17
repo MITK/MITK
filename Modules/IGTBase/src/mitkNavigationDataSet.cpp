@@ -167,7 +167,7 @@ void mitk::NavigationDataSet::ConvertNavigationDataToPointSet() const
     str << "NavigationData Tool " << toolIndex;
     dn->SetProperty("name", mitk::StringProperty::New(str.str()));
     dn->SetData(_tempPointSet);
-    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetDataStorage()->Add(dn);
+    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))->GetDataStorage()->Add(dn);
   }
 }
 

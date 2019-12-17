@@ -155,10 +155,10 @@ void QmitkMovieMakerView::InitializeRecordMenu()
   m_RecordMenu = new QMenu(m_Ui->recordButton);
 
   QVector<PairOfStrings> renderWindows;
-  renderWindows.push_back(qMakePair(QString("Axial"), QString("stdmulti.widget1")));
-  renderWindows.push_back(qMakePair(QString("Sagittal"), QString("stdmulti.widget2")));
-  renderWindows.push_back(qMakePair(QString("Coronal"), QString("stdmulti.widget3")));
-  renderWindows.push_back(qMakePair(QString("3D"), QString("stdmulti.widget4")));
+  renderWindows.push_back(qMakePair(QString("Axial"), QString("stdmulti.widget0")));
+  renderWindows.push_back(qMakePair(QString("Sagittal"), QString("stdmulti.widget1")));
+  renderWindows.push_back(qMakePair(QString("Coronal"), QString("stdmulti.widget2")));
+  renderWindows.push_back(qMakePair(QString("3D"), QString("stdmulti.widget3")));
 
   Q_FOREACH(const PairOfStrings& renderWindow, renderWindows)
   {

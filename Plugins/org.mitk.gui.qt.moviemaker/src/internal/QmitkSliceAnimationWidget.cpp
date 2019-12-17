@@ -17,7 +17,7 @@ found in the LICENSE file.
 
 static int GetNumberOfSlices(int renderWindow)
 {
-  const QString renderWindowName = QString("stdmulti.widget%1").arg(renderWindow + 1);
+  const QString renderWindowName = QString("stdmulti.widget%1").arg(renderWindow);
   vtkRenderWindow* theRenderWindow = mitk::BaseRenderer::GetRenderWindowByName(renderWindowName.toStdString());
 
   if (theRenderWindow != nullptr)

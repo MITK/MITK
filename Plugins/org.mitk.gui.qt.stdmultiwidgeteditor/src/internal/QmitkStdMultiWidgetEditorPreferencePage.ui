@@ -168,6 +168,11 @@
     <widget class="QComboBox" name="m_RenderWindowChooser">
      <item>
       <property name="text">
+       <string>stdmulti.widget0</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
        <string>stdmulti.widget1</string>
       </property>
      </item>
@@ -179,11 +184,6 @@
      <item>
       <property name="text">
        <string>stdmulti.widget3</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>stdmulti.widget4</string>
       </property>
      </item>
     </widget>

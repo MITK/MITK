@@ -70,6 +70,8 @@ ThrowAwayPattern & operator<<(ThrowAwayPattern&__, T)
 
 namespace Logger
 {
+  static bool loggerInitialized = false;
+
   class MITKLOGGING_EXPORT Options
   {
     private:

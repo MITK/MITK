@@ -62,7 +62,7 @@ public:
 public Q_SLOTS:
 
   void OnContextMenuRequested(const QPoint& pos);
-  void OnExtensionPointActionTriggered(bool);
+  void OnExtensionPointActionTriggered(QAction* action);
 
 private:
 

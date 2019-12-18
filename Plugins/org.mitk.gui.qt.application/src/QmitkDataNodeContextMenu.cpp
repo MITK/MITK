@@ -105,48 +105,50 @@ void QmitkDataNodeContextMenu::InitNodeDescriptors()
 
 void QmitkDataNodeContextMenu::InitDefaultActions()
 {
-  m_GlobalReinitAction = new QmitkDataNodeGlobalReinitAction(m_Parent, m_WorkbenchPartSite.Lock());
+  auto workbenchPartSite = m_WorkbenchPartSite.Lock();
+
+  m_GlobalReinitAction = new QmitkDataNodeGlobalReinitAction(m_Parent, workbenchPartSite);
   m_GlobalReinitAction->setIcon(QIcon(":/org.mitk.gui.qt.datamanager/Refresh_48.png"));
   m_UnknownDataNodeDescriptor->AddAction(m_GlobalReinitAction, true);
   m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, m_GlobalReinitAction));
 
-  m_ReinitAction = new QmitkDataNodeReinitAction(m_Parent, m_WorkbenchPartSite.Lock());
+  m_ReinitAction = new QmitkDataNodeReinitAction(m_Parent, workbenchPartSite);
   m_ReinitAction->setIcon(QIcon(":/org.mitk.gui.qt.datamanager/Refresh_48.png"));
   m_UnknownDataNodeDescriptor->AddAction(m_ReinitAction, true);
   m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, m_ReinitAction));
 
-  QAction* saveAction = new QmitkFileSaveAction(QIcon(":/org.mitk.gui.qt.datamanager/Save_48.png"), m_WorkbenchPartSite.Lock()->GetWorkbenchWindow());
+  QAction* saveAction = new QmitkFileSaveAction(QIcon(":/org.mitk.gui.qt.datamanager/Save_48.png"), workbenchPartSite->GetWorkbenchWindow());
   m_UnknownDataNodeDescriptor->AddAction(saveAction, true);
   m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, saveAction));
 
-  m_RemoveAction = new QmitkDataNodeRemoveAction(m_Parent, m_WorkbenchPartSite.Lock());
+  m_RemoveAction = new QmitkDataNodeRemoveAction(m_Parent, workbenchPartSite);
   m_RemoveAction->setIcon(QIcon(":/org.mitk.gui.qt.datamanager/Remove_48.png"));
   m_UnknownDataNodeDescriptor->AddAction(m_RemoveAction, true);
   m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, m_RemoveAction));
 
-  m_ShowSelectedNodesAction = new QmitkDataNodeShowSelectedNodesAction(m_Parent, m_WorkbenchPartSite.Lock());
+  m_ShowSelectedNodesAction = new QmitkDataNodeShowSelectedNodesAction(m_Parent, workbenchPartSite);
   m_RemoveAction->setIcon(QIcon(":/org.mitk.gui.qt.datamanager/ShowSelectedNode_48.png"));
   m_UnknownDataNodeDescriptor->AddAction(m_ShowSelectedNodesAction, true);
   m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, m_ShowSelectedNodesAction));
 
-  m_ToggleVisibilityAction = new QmitkDataNodeToggleVisibilityAction(m_Parent, m_WorkbenchPartSite.Lock());
+  m_ToggleVisibilityAction = new QmitkDataNodeToggleVisibilityAction(m_Parent, workbenchPartSite);
   m_ToggleVisibilityAction->setIcon(QIcon(":/org.mitk.gui.qt.datamanager/InvertShowSelectedNode_48.png"));
   m_UnknownDataNodeDescriptor->AddAction(m_ToggleVisibilityAction, true);
   m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, m_ToggleVisibilityAction));
 
-  m_ShowDetailsAction = new QmitkDataNodeShowDetailsAction(m_Parent, m_WorkbenchPartSite.Lock());
+  m_ShowDetailsAction = new QmitkDataNodeShowDetailsAction(m_Parent, workbenchPartSite);
   m_ShowDetailsAction->setIcon(QIcon(":/org.mitk.gui.qt.datamanager/ShowDataInfo_48.png"));
   m_UnknownDataNodeDescriptor->AddAction(m_ShowDetailsAction, true);
   m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, m_ShowDetailsAction));
 
-  m_OpacityAction = new QmitkDataNodeOpacityAction(m_Parent, m_WorkbenchPartSite.Lock());
+  m_OpacityAction = new QmitkDataNodeOpacityAction(m_Parent, workbenchPartSite);
   m_UnknownDataNodeDescriptor->AddAction(m_OpacityAction, false);
   m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, m_OpacityAction));
 
-  m_ColorAction = new QmitkDataNodeColorAction(m_Parent, m_WorkbenchPartSite.Lock());
+  m_ColorAction = new QmitkDataNodeColorAction(m_Parent, workbenchPartSite);
   this->AddColorAction(m_ColorAction);
 
-  m_ColormapAction = new QmitkDataNodeColorMapAction(m_Parent, m_WorkbenchPartSite.Lock());
+  m_ColormapAction = new QmitkDataNodeColorMapAction(m_Parent, workbenchPartSite);
   m_ImageDataNodeDescriptor->AddAction(m_ColormapAction);
   m_DescriptorActionList.push_back(std::make_pair(m_ImageDataNodeDescriptor, m_ColormapAction));
 
@@ -156,7 +158,7 @@ void QmitkDataNodeContextMenu::InitDefaultActions()
     m_DescriptorActionList.push_back(std::make_pair(m_DiffusionImageDataNodeDescriptor, m_ColormapAction));
   }
 
-  m_ComponentAction = new QmitkDataNodeComponentAction(m_Parent, m_WorkbenchPartSite.Lock());
+  m_ComponentAction = new QmitkDataNodeComponentAction(m_Parent, workbenchPartSite);
   m_MultiComponentImageDataNodeDescriptor->AddAction(m_ComponentAction, false);
   m_DescriptorActionList.push_back(std::make_pair(m_MultiComponentImageDataNodeDescriptor, m_ComponentAction));
 
@@ -166,7 +168,7 @@ void QmitkDataNodeContextMenu::InitDefaultActions()
     m_DescriptorActionList.push_back(std::make_pair(m_DiffusionImageDataNodeDescriptor, m_ComponentAction));
   }
 
-  m_TextureInterpolationAction = new QmitkDataNodeTextureInterpolationAction(m_Parent, m_WorkbenchPartSite.Lock());
+  m_TextureInterpolationAction = new QmitkDataNodeTextureInterpolationAction(m_Parent, workbenchPartSite);
   m_ImageDataNodeDescriptor->AddAction(m_TextureInterpolationAction, false);
   m_DescriptorActionList.push_back(std::make_pair(m_ImageDataNodeDescriptor, m_TextureInterpolationAction));
 
@@ -182,7 +184,7 @@ void QmitkDataNodeContextMenu::InitDefaultActions()
     m_DescriptorActionList.push_back(std::make_pair(m_SegmentDataNodeDescriptor, m_TextureInterpolationAction));
   }
 
-  m_SurfaceRepresentationAction = new QmitkDataNodeSurfaceRepresentationAction(m_Parent, m_WorkbenchPartSite.Lock());
+  m_SurfaceRepresentationAction = new QmitkDataNodeSurfaceRepresentationAction(m_Parent, workbenchPartSite);
   m_SurfaceDataNodeDescriptor->AddAction(m_SurfaceRepresentationAction, false);
   m_DescriptorActionList.push_back(std::make_pair(m_SurfaceDataNodeDescriptor, m_SurfaceRepresentationAction));
 }
@@ -249,8 +251,8 @@ void QmitkDataNodeContextMenu::OnContextMenuRequested(const QPoint& /*pos*/)
   if (m_WorkbenchPartSite.Expired())
     return;
 
-  auto workbenchPartSite = m_WorkbenchPartSite.Lock();
-  auto selection = workbenchPartSite->GetWorkbenchWindow()->GetSelectionService()->GetSelection().Cast<const mitk::DataNodeSelection>();
+  auto selection = m_WorkbenchPartSite.Lock()->GetWorkbenchWindow()->GetSelectionService()->GetSelection()
+    .Cast<const mitk::DataNodeSelection>();
 
   if (selection.IsNull() || selection->IsEmpty())
     return;

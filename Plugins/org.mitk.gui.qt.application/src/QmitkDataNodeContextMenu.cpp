@@ -232,7 +232,12 @@ void QmitkDataNodeContextMenu::InitExtensionPointActions()
 
     if (nullptr != action)
     {
-      connect(action, &QAction::triggered, this, &QmitkDataNodeContextMenu::OnExtensionPointActionTriggered);
+      // See T26938. We do not know why but without the lambda function indirection, the
+      // connection is lost after the content menu was shown for the first time.
+      connect(action, &QAction::triggered, [action, this]()
+      {
+        this->OnExtensionPointActionTriggered(action);
+      });
 
       m_ConfigElements[action] = customMenuConfig;
       descriptorActionList.push_back(std::make_pair(descriptor, action));
@@ -280,14 +285,13 @@ void QmitkDataNodeContextMenu::OnContextMenuRequested(const QPoint& /*pos*/)
   }
 }
 
-void QmitkDataNodeContextMenu::OnExtensionPointActionTriggered(bool)
+void QmitkDataNodeContextMenu::OnExtensionPointActionTriggered(QAction* action)
 {
-  auto triggeredAction = qobject_cast<QAction*>(sender());
-  auto configElementIter = m_ConfigElements.find(triggeredAction);
+  auto configElementIter = m_ConfigElements.find(action);
 
   if (m_ConfigElements.end() == configElementIter)
   {
-    MITK_WARN << "Associated configuration element for action \"" << triggeredAction->text() << "\" not found.";
+    MITK_WARN << "Associated configuration element for action \"" << action->text() << "\" not found.";
     return;
   }
 

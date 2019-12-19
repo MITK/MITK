@@ -1,0 +1,1058 @@
+diff --git a/Common/DataModel/vtkImageData.cxx b/Common/DataModel/vtkImageData.cxx
+--- a/Common/DataModel/vtkImageData.cxx
++++ b/Common/DataModel/vtkImageData.cxx
+@@ -23,6 +23,8 @@
+ #include "vtkLargeInteger.h"
+ #include "vtkLine.h"
+ #include "vtkMath.h"
++#include "vtkMatrix3x3.h"
++#include "vtkMatrix4x4.h"
+ #include "vtkObjectFactory.h"
+ #include "vtkPixel.h"
+ #include "vtkPointData.h"
+@@ -53,6 +55,12 @@
+     this->Point[idx] = 0.0;
+   }
+ 
++  this->DirectionMatrix = vtkMatrix3x3::New();
++  this->IndexToPhysicalMatrix = vtkMatrix4x4::New();
++  this->PhysicalToIndexMatrix = vtkMatrix4x4::New();
++  this->DirectionMatrix->Identity();
++  this->ComputeTransforms();
++
+   int extent[6] = {0, -1, 0, -1, 0, -1};
+   memcpy(this->Extent, extent, 6*sizeof(int));
+ 
+@@ -79,6 +87,18 @@
+   {
+     this->Voxel->Delete();
+   }
++  if (this->DirectionMatrix)
++  {
++    this->DirectionMatrix->Delete();
++  }
++  if (this->IndexToPhysicalMatrix)
++  {
++    this->IndexToPhysicalMatrix->Delete();
++  }
++  if (this->PhysicalToIndexMatrix)
++  {
++    this->PhysicalToIndexMatrix->Delete();
++  }
+ }
+ 
+ //----------------------------------------------------------------------------
+@@ -96,6 +116,8 @@
+     this->Spacing[i] = sPts->Spacing[i];
+     this->Origin[i] = sPts->Origin[i];
+   }
++  this->DirectionMatrix->DeepCopy(sPts->GetDirectionMatrix());
++  this->ComputeTransforms();
+   this->SetExtent(sPts->GetExtent());
+ }
+ 
+@@ -1136,6 +1158,7 @@
+   this->Superclass::PrintSelf(os,indent);
+ 
+   int idx;
++  const double* direction = this->GetDirectionMatrix()->GetData();
+   const int *dims = this->GetDimensions();
+   const int* extent = this->Extent;
+ 
+@@ -1145,6 +1168,12 @@
+   os << indent << "Origin: (" << this->Origin[0] << ", "
+                               << this->Origin[1] << ", "
+                               << this->Origin[2] << ")\n";
++  os << indent << "Direction: (" << direction[0];
++  for (idx = 1; idx < 9; ++idx)
++  {
++    os << ", " << direction[idx];
++  }
++  os << ")\n";
+   os << indent << "Dimensions: (" << dims[0] << ", "
+                                   << dims[1] << ", "
+                                   << dims[2] << ")\n";
+@@ -2128,6 +2157,8 @@
+     this->Origin[idx] = src->Origin[idx];
+     this->Spacing[idx] = src->Spacing[idx];
+   }
++  this->DirectionMatrix->DeepCopy(src->DirectionMatrix);
++  this->ComputeTransforms();
+   this->SetExtent(src->GetExtent());
+ }
+ 
+@@ -2273,3 +2304,239 @@
+ {
+   return vtkImageData::GetData(v->GetInformationObject(i));
+ }
++
++//----------------------------------------------------------------------------
++void vtkImageData::SetSpacing(double i, double j, double k)
++{
++  vtkDebugMacro(<< this->GetClassName() << " (" << this << "): setting Spacing to (" << i << ","
++    << j << "," << k << ")");
++  if ((this->Spacing[0] != i) || (this->Spacing[1] != j) || (this->Spacing[2] != k))
++  {
++    this->Spacing[0] = i;
++    this->Spacing[1] = j;
++    this->Spacing[2] = k;
++    this->ComputeTransforms();
++    this->Modified();
++  }
++}
++
++//----------------------------------------------------------------------------
++void vtkImageData::SetSpacing(const double ijk[3])
++{
++  this->SetSpacing(ijk[0], ijk[1], ijk[2]);
++}
++
++//----------------------------------------------------------------------------
++void vtkImageData::SetOrigin(double i, double j, double k)
++{
++  vtkDebugMacro(<< this->GetClassName() << " (" << this << "): setting Origin to (" << i << "," << j
++    << "," << k << ")");
++  if ((this->Origin[0] != i) || (this->Origin[1] != j) || (this->Origin[2] != k))
++  {
++    this->Origin[0] = i;
++    this->Origin[1] = j;
++    this->Origin[2] = k;
++    //this->ComputeTransforms();
++    //this->Modified();
++  }
++}
++
++//----------------------------------------------------------------------------
++void vtkImageData::SetOrigin(const double ijk[3])
++{
++  this->SetOrigin(ijk[0], ijk[1], ijk[2]);
++}
++
++//----------------------------------------------------------------------------
++void vtkImageData::SetDirectionMatrix(vtkMatrix3x3* m)
++{
++  vtkMTimeType lastModified = this->GetMTime();
++  vtkSetObjectBodyMacro(DirectionMatrix, vtkMatrix3x3, m);
++  if (lastModified < this->GetMTime())
++  {
++    this->ComputeTransforms();
++  }
++}
++
++//----------------------------------------------------------------------------
++void vtkImageData::SetDirectionMatrix(const double elements[9])
++{
++  this->SetDirectionMatrix(elements[0], elements[1], elements[2], elements[3], elements[4],
++    elements[5], elements[6], elements[7], elements[8]);
++}
++
++//----------------------------------------------------------------------------
++void vtkImageData::SetDirectionMatrix(double e00, double e01, double e02, double e10, double e11,
++  double e12, double e20, double e21, double e22)
++{
++  vtkMatrix3x3* m3 = this->DirectionMatrix;
++  vtkMTimeType lastModified = m3->GetMTime();
++
++  m3->SetElement(0, 0, e00);
++  m3->SetElement(0, 1, e01);
++  m3->SetElement(0, 2, e02);
++  m3->SetElement(1, 0, e10);
++  m3->SetElement(1, 1, e11);
++  m3->SetElement(1, 2, e12);
++  m3->SetElement(2, 0, e20);
++  m3->SetElement(2, 1, e21);
++  m3->SetElement(2, 2, e22);
++
++  if (lastModified < m3->GetMTime())
++  {
++    this->ComputeTransforms();
++    this->Modified();
++  }
++}
++
++//----------------------------------------------------------------------------
++template <typename T1, typename T2>
++inline static void TransformCoordinates(
++  T1 input0, T1 input1, T1 input2, T2 output[3], vtkMatrix4x4* m4)
++{
++  double* mdata = m4->GetData();
++  output[0] = mdata[0] * input0 + mdata[1] * input1 + mdata[2] * input2 + mdata[3];
++  output[1] = mdata[4] * input0 + mdata[5] * input1 + mdata[6] * input2 + mdata[7];
++  output[2] = mdata[8] * input0 + mdata[9] * input1 + mdata[10] * input2 + mdata[11];
++}
++
++// must pass the inverse matrix
++template <typename T1, typename T2>
++inline static void TransformNormal(T1 input0, T1 input1, T1 input2, T2 output[3], vtkMatrix4x4* m4)
++{
++  double* mdata = m4->GetData();
++  output[0] = mdata[0] * input0 + mdata[4] * input1 + mdata[8] * input2;
++  output[1] = mdata[1] * input0 + mdata[5] * input1 + mdata[9] * input2;
++  output[2] = mdata[2] * input0 + mdata[6] * input1 + mdata[10] * input2;
++}
++
++// useful for when the ImageData is not available but the information
++// spacing, origin, direction are
++void vtkImageData::TransformContinuousIndexToPhysicalPoint(double i, double j, double k,
++  double const origin[3], double const spacing[3], double const direction[9], double xyz[3])
++{
++  for (int c = 0; c < 3; ++c)
++  {
++    xyz[c] = i * spacing[0] * direction[c * 3] + j * spacing[1] * direction[c * 3 + 1] +
++      k * spacing[2] * direction[c * 3 + 2] + origin[c];
++  }
++}
++
++//----------------------------------------------------------------------------
++void vtkImageData::TransformContinuousIndexToPhysicalPoint(
++  double i, double j, double k, double xyz[3])
++{
++  TransformCoordinates<double, double>(i, j, k, xyz, this->IndexToPhysicalMatrix);
++}
++
++//----------------------------------------------------------------------------
++void vtkImageData::TransformContinuousIndexToPhysicalPoint(const double ijk[3], double xyz[3])
++{
++
++  TransformCoordinates<double, double>(ijk[0], ijk[1], ijk[2], xyz, this->IndexToPhysicalMatrix);
++}
++
++//----------------------------------------------------------------------------
++void vtkImageData::TransformIndexToPhysicalPoint(int i, int j, int k, double xyz[3])
++{
++  TransformCoordinates<int, double>(i, j, k, xyz, this->IndexToPhysicalMatrix);
++}
++
++//----------------------------------------------------------------------------
++void vtkImageData::TransformIndexToPhysicalPoint(const int ijk[3], double xyz[3])
++{
++  TransformCoordinates<int, double>(ijk[0], ijk[1], ijk[2], xyz, this->IndexToPhysicalMatrix);
++}
++
++//----------------------------------------------------------------------------
++void vtkImageData::TransformPhysicalPointToContinuousIndex(
++  double x, double y, double z, double ijk[3])
++{
++  TransformCoordinates<double, double>(x, y, z, ijk, this->PhysicalToIndexMatrix);
++}
++//----------------------------------------------------------------------------
++void vtkImageData::TransformPhysicalPointToContinuousIndex(const double xyz[3], double ijk[3])
++{
++  TransformCoordinates<double, double>(xyz[0], xyz[1], xyz[2], ijk, this->PhysicalToIndexMatrix);
++}
++
++//----------------------------------------------------------------------------
++void vtkImageData::TransformPhysicalNormalToContinuousIndex(const double xyz[3], double ijk[3])
++{
++  TransformNormal<double, double>(xyz[0], xyz[1], xyz[2], ijk, this->IndexToPhysicalMatrix);
++}
++
++void vtkImageData::TransformPhysicalPlaneToContinuousIndex(
++  double const normal[4], double xnormal[4])
++{
++  // transform the normal, note the inverse matrix is passed in
++  TransformNormal<double, double>(
++    normal[0], normal[1], normal[2], xnormal, this->IndexToPhysicalMatrix);
++  vtkMath::Normalize(xnormal);
++
++  // transform the point
++  double newPt[3];
++  TransformCoordinates<double, double>(-normal[3] * normal[0], -normal[3] * normal[1],
++    -normal[3] * normal[2], newPt, this->PhysicalToIndexMatrix);
++
++  // recompute plane eqn
++  xnormal[3] = -xnormal[0] * newPt[0] - xnormal[1] * newPt[1] - xnormal[2] * newPt[2];
++}
++
++//----------------------------------------------------------------------------
++void vtkImageData::ComputeTransforms()
++{
++  vtkMatrix4x4* m4 = vtkMatrix4x4::New();
++  if (this->DirectionMatrix->IsIdentity())
++  {
++    m4->Zero();
++    m4->SetElement(0, 0, this->Spacing[0]);
++    m4->SetElement(1, 1, this->Spacing[1]);
++    m4->SetElement(2, 2, this->Spacing[2]);
++    m4->SetElement(3, 3, 1);
++  }
++  else
++  {
++    const double* m3 = this->DirectionMatrix->GetData();
++    m4->SetElement(0, 0, m3[0] * this->Spacing[0]);
++    m4->SetElement(0, 1, m3[1] * this->Spacing[1]);
++    m4->SetElement(0, 2, m3[2] * this->Spacing[2]);
++    m4->SetElement(1, 0, m3[3] * this->Spacing[0]);
++    m4->SetElement(1, 1, m3[4] * this->Spacing[1]);
++    m4->SetElement(1, 2, m3[5] * this->Spacing[2]);
++    m4->SetElement(2, 0, m3[6] * this->Spacing[0]);
++    m4->SetElement(2, 1, m3[7] * this->Spacing[1]);
++    m4->SetElement(2, 2, m3[8] * this->Spacing[2]);
++    m4->SetElement(3, 0, 0);
++    m4->SetElement(3, 1, 0);
++    m4->SetElement(3, 2, 0);
++    m4->SetElement(3, 3, 1);
++  }
++  m4->SetElement(0, 3, this->Origin[0]);
++  m4->SetElement(1, 3, this->Origin[1]);
++  m4->SetElement(2, 3, this->Origin[2]);
++
++  this->IndexToPhysicalMatrix->DeepCopy(m4);
++  vtkMatrix4x4::Invert(m4, this->PhysicalToIndexMatrix);
++  m4->Delete();
++}
++
++//----------------------------------------------------------------------------
++void vtkImageData::ComputeIndexToPhysicalMatrix(
++  double const origin[3], double const spacing[3], double const direction[9], double result[16])
++{
++  for (int i = 0; i < 3; ++i)
++  {
++    result[i * 4] = direction[i * 3] * spacing[0];
++    result[i * 4 + 1] = direction[i * 3 + 1] * spacing[1];
++    result[i * 4 + 2] = direction[i * 3 + 2] * spacing[2];
++  }
++
++  result[3] = origin[0];
++  result[7] = origin[1];
++  result[11] = origin[2];
++  result[12] = 0;
++  result[13] = 0;
++  result[14] = 0;
++  result[15] = 1;
++}
+\ No newline at end of file
+diff --git a/Common/DataModel/vtkImageData.h b/Common/DataModel/vtkImageData.h
+--- a/Common/DataModel/vtkImageData.h
++++ b/Common/DataModel/vtkImageData.h
+@@ -32,6 +32,8 @@
+ 
+ class vtkDataArray;
+ class vtkLine;
++class vtkMatrix3x3;
++class vtkMatrix4x4;
+ class vtkPixel;
+ class vtkVertex;
+ class vtkVoxel;
+@@ -330,8 +332,9 @@
+    * Set the spacing (width,height,length) of the cubical cells that
+    * compose the data set.
+    */
+-  vtkSetVector3Macro(Spacing,double);
+   vtkGetVector3Macro(Spacing,double);
++  virtual void SetSpacing(double i, double j, double k);
++  virtual void SetSpacing(const double ijk[3]);
+   //@}
+ 
+   //@{
+@@ -343,10 +346,74 @@
+    * box.
+    * The origin plus spacing determine the position in space of the points.
+    */
+-  vtkSetVector3Macro(Origin,double);
+   vtkGetVector3Macro(Origin,double);
++  virtual void SetOrigin(double i, double j, double k);
++  virtual void SetOrigin(const double ijk[3]);
+   //@}
+ 
++  //@{
++  /**
++   * Set/Get the direction transform of the dataset. The directoin is a 3 by 3
++   * matrix.
++   */
++  vtkGetObjectMacro(DirectionMatrix, vtkMatrix3x3);
++  virtual void SetDirectionMatrix(vtkMatrix3x3* m);
++  virtual void SetDirectionMatrix(const double elements[9]);
++  virtual void SetDirectionMatrix(double e00, double e01, double e02, double e10, double e11,
++      double e12, double e20, double e21, double e22);
++  //@}
++
++  //@{
++  /**
++   * Get the transformation matrix from the index space to the physical space
++   * coordinate system of the dataset. The transform is a 4 by 4 matrix.
++   */
++  vtkGetObjectMacro(IndexToPhysicalMatrix, vtkMatrix4x4);
++  //@}
++
++  //@{
++  /**
++   * Convert coordinates from index space (ijk) to physical space (xyz)
++   */
++  virtual void TransformContinuousIndexToPhysicalPoint(double i, double j, double k, double xyz[3]);
++  virtual void TransformContinuousIndexToPhysicalPoint(const double ijk[3], double xyz[3]);
++  virtual void TransformIndexToPhysicalPoint(int i, int j, int k, double xyz[3]);
++  virtual void TransformIndexToPhysicalPoint(const int ijk[3], double xyz[3]);
++  static void TransformContinuousIndexToPhysicalPoint(double i, double j, double k,
++    double const origin[3], double const spacing[3], double const direction[9], double xyz[3]);
++  //@}
++
++  //@{
++  /**
++   * Get the transformation matrix from the physical space to the index space
++   * coordinate system of the dataset. The transform is a 4 by 4 matrix.
++   */
++  vtkGetObjectMacro(PhysicalToIndexMatrix, vtkMatrix4x4);
++  //@}
++
++  //@{
++  /**
++   * Convert coordinates from physical space (xyz) to index space (ijk)
++   */
++  virtual void TransformPhysicalPointToContinuousIndex(double x, double y, double z, double ijk[3]);
++  virtual void TransformPhysicalPointToContinuousIndex(const double xyz[3], double ijk[3]);
++  //@}
++
++  static void ComputeIndexToPhysicalMatrix(
++    double const origin[3], double const spacing[3], double const direction[9], double result[16]);
++
++  //@{
++  /**
++   * Convert normal from physical space (xyz) to index space (ijk)
++   */
++  virtual void TransformPhysicalNormalToContinuousIndex(const double xyz[3], double ijk[3]);
++  //@}
++
++  /**
++  * Convert a plane form physical to continuous index
++  */
++  virtual void TransformPhysicalPlaneToContinuousIndex(double const pplane[4], double iplane[4]);
++
+   static void SetScalarType(int, vtkInformation* meta_data);
+   static int GetScalarType(vtkInformation* meta_data);
+   static bool HasScalarType(vtkInformation* meta_data);
+@@ -447,6 +514,9 @@
+ 
+   double Origin[3];
+   double Spacing[3];
++  vtkMatrix3x3* DirectionMatrix;
++  vtkMatrix4x4* IndexToPhysicalMatrix;
++  vtkMatrix4x4* PhysicalToIndexMatrix;
+ 
+   int Extent[6];
+ 
+@@ -465,6 +535,9 @@
+   void ComputeIncrements(vtkDataArray *scalars, vtkIdType inc[3]);
+   void CopyOriginAndSpacingFromPipeline(vtkInformation* info);
+ 
++  // for the index to physical methods
++  void ComputeTransforms();
++
+   vtkTimeStamp ExtentComputeTime;
+ 
+   void SetDataDescription(int desc);
+diff --git a/Rendering/Volume/vtkGPUVolumeRayCastMapper.cxx b/Rendering/Volume/vtkGPUVolumeRayCastMapper.cxx
+--- a/Rendering/Volume/vtkGPUVolumeRayCastMapper.cxx
++++ b/Rendering/Volume/vtkGPUVolumeRayCastMapper.cxx
+@@ -23,6 +23,7 @@
+ #include <vtkGPUInfoList.h>
+ #include <vtkImageData.h>
+ #include <vtkImageResample.h>
++#include "vtkMatrix3x3.h"
+ #include <vtkMultiThreader.h>
+ #include <vtkObjectFactory.h>
+ #include <vtkPointData.h>
+@@ -300,11 +301,22 @@
+     double origin[3], spacing[3];
+     clone->GetOrigin(origin);
+     clone->GetSpacing(spacing);
++    double* direction = clone->GetDirectionMatrix()->GetData();
+ 
++    // find the location of the min extent
++    double blockOrigin[3];
++    vtkImageData::TransformContinuousIndexToPhysicalPoint(
++        extents[0], extents[2], extents[4],
++        origin,
++        spacing,
++        direction,
++        blockOrigin);
++
++    // make it so that the clone starts with extent 0,0,0
+     for (int cc=0; cc < 3; cc++)
+     {
+       // Transform the origin and the extents.
+-      origin[cc] = origin[cc] + extents[2*cc]*spacing[cc];
++      origin[cc] = blockOrigin[cc];
+       extents[2*cc+1] -= extents[2*cc];
+       extents[2*cc] = 0;
+     }
+diff --git a/Rendering/VolumeOpenGL2/vtkOpenGLGPUVolumeRayCastMapper.cxx b/Rendering/VolumeOpenGL2/vtkOpenGLGPUVolumeRayCastMapper.cxx
+--- a/Rendering/VolumeOpenGL2/vtkOpenGLGPUVolumeRayCastMapper.cxx
++++ b/Rendering/VolumeOpenGL2/vtkOpenGLGPUVolumeRayCastMapper.cxx
+@@ -303,7 +303,7 @@
+   void CaptureDepthTexture(vtkRenderer* ren, vtkVolume* vol);
+ 
+   // Test if camera is inside the volume geometry
+-  bool IsCameraInside(vtkRenderer* ren, vtkVolume* vol);
++  bool IsCameraInside(vtkRenderer* ren, vtkVolume* vol, double geometry[24]);
+ 
+   // Compute transformation from cell texture-coordinates to point texture-coords
+   // (CTP). Cell data maps correctly to OpenGL cells, point data does not (VTK
+@@ -331,7 +331,7 @@
+   // Update the volume geometry
+   void RenderVolumeGeometry(vtkRenderer* ren,
+                             vtkShaderProgram* prog,
+-                            vtkVolume* vol);
++                            vtkVolume* vol, double geometry[24]);
+ 
+   // Update cropping params to shader
+   void SetCroppingRegions(vtkRenderer* ren, vtkShaderProgram* prog,
+@@ -1306,131 +1306,135 @@
+ 
+ //----------------------------------------------------------------------------
+ bool vtkOpenGLGPUVolumeRayCastMapper::vtkInternal::IsCameraInside(
+-  vtkRenderer* ren, vtkVolume* vol)
++  vtkRenderer* ren, vtkVolume* vol, double geometry[24])
+ {
+-  this->TempMatrix1->DeepCopy(vol->GetMatrix());
+-  this->TempMatrix1->Invert();
++  vtkNew<vtkMatrix4x4> dataToWorld;
++  dataToWorld->DeepCopy(vol->GetMatrix());
+ 
+   vtkCamera* cam = ren->GetActiveCamera();
+-  double camWorldRange[2];
+-  double camWorldPos[4];
+-  double camFocalWorldPoint[4];
+-  double camWorldDirection[4];
+-  double camPos[4];
+-  double camPlaneNormal[4];
+-
+-  cam->GetPosition(camWorldPos);
+-  camWorldPos[3] = 1.0;
+-  this->TempMatrix1->MultiplyPoint( camWorldPos, camPos );
+-
+-  cam->GetFocalPoint(camFocalWorldPoint);
+-  camFocalWorldPoint[3] = 1.0;
+-
+-  // The range (near/far) must also be transformed
+-  // into the local coordinate system.
+-  camWorldDirection[0] = camFocalWorldPoint[0] - camWorldPos[0];
+-  camWorldDirection[1] = camFocalWorldPoint[1] - camWorldPos[1];
+-  camWorldDirection[2] = camFocalWorldPoint[2] - camWorldPos[2];
+-  camWorldDirection[3] = 0.0;
+-
+-  // Compute the normalized near plane normal
+-  this->TempMatrix1->MultiplyPoint(camWorldDirection, camPlaneNormal);
+-
+-  vtkMath::Normalize(camWorldDirection);
+-  vtkMath::Normalize(camPlaneNormal);
+-
+-  double camNearWorldPoint[4];
+-  double camNearPoint[4];
+-
+-  cam->GetClippingRange(camWorldRange);
+-  camNearWorldPoint[0] = camWorldPos[0] + camWorldRange[0] * camWorldDirection[0];
+-  camNearWorldPoint[1] = camWorldPos[1] + camWorldRange[0] * camWorldDirection[1];
+-  camNearWorldPoint[2] = camWorldPos[2] + camWorldRange[0] * camWorldDirection[2];
+-  camNearWorldPoint[3] = 1.;
+-
+-  this->TempMatrix1->MultiplyPoint(camNearWorldPoint, camNearPoint);
++  double planes[24];
++  cam->GetFrustumPlanes(ren->GetTiledAspectRatio(), planes);
+ 
+-  int const result = vtkMath::PlaneIntersectsAABB(this->LoadedBounds,
+-    camPlaneNormal, camNearPoint);
+-
+-  if (result == 0)
+-  {
+-    return true;
++  // convert geometry to world then compare to frustum planes
++  double in[4];
++  in[3] = 1.0;
++  double out[4];
++  double worldGeometry[24];
++  for (int i = 0; i < 8; ++i)
++  {
++    in[0] = geometry[i*3];
++    in[1] = geometry[i*3 + 1];
++    in[2] = geometry[i*3 + 2];
++    dataToWorld->MultiplyPoint(in, out);
++    worldGeometry[i*3]   = out[0]/out[3];
++    worldGeometry[i*3+1] = out[1]/out[3];
++    worldGeometry[i*3+2] = out[2]/out[3];
++  }
++
++  // does the front clipping plane intersect the volume?
++  // true if points are on both sides of the plane
++  bool hasPositive = false;
++  bool hasNegative = false;
++  bool hasZero = false;
++  for (int i = 0; i < 8; ++i)
++  {
++    double val = planes[4*4]*worldGeometry[i*3]
++        + planes[4*4+1]*worldGeometry[i*3+1]
++        + planes[4*4+2]*worldGeometry[i*3+2]
++        + planes[4*4+3];
++    if (val < 0)
++    {
++      hasNegative = true;
++    }
++    else if (val > 0)
++    {
++      hasPositive = true;
++    }
++    else
++    {
++      hasZero = true;
++    }
+   }
+ 
+-  return false;
++  return hasZero || (hasNegative && hasPositive);
+ }
+ 
+ //----------------------------------------------------------------------------
+ void vtkOpenGLGPUVolumeRayCastMapper::vtkInternal::RenderVolumeGeometry(
+-  vtkRenderer* ren, vtkShaderProgram* prog, vtkVolume* vol)
++  vtkRenderer* ren, vtkShaderProgram* prog, vtkVolume* vol, double geometry[24])
+ {
+   if (this->NeedToInitializeResources ||
+       !this->BBoxPolyData ||
+       this->Parent->VolumeTexture->UploadTime > this->BBoxPolyData->GetMTime() ||
+-      this->IsCameraInside(ren, vol) ||
+-      this->CameraWasInsideInLastUpdate)
++      this->CameraWasInsideInLastUpdate ||
++      this->IsCameraInside(ren, vol, geometry))
+   {
+-    vtkNew<vtkTessellatedBoxSource> boxSource;
+-    boxSource->SetBounds(this->LoadedBounds);
+-    boxSource->QuadsOn();
+-    boxSource->SetLevel(0);
+-
+-    vtkNew<vtkDensifyPolyData> densityPolyData;
+-
+-    if (this->IsCameraInside(ren, vol))
+-    {
+-      // Normals should be transformed using the transpose of inverse
+-      // InverseVolumeMat
+-      this->TempMatrix1->DeepCopy(vol->GetMatrix());
+-      this->TempMatrix1->Invert();
++    vtkNew<vtkPolyData> boxSource;
++    {
++      vtkNew<vtkCellArray> cells;
++      vtkNew<vtkPoints> points;
++      points->SetDataTypeToDouble();
++      for (int i = 0; i < 8; ++i)
++      {
++        points->InsertNextPoint(geometry + i*3);
++      }
++      // 6 faces 12 triangles
++      int tris[36] =
++      {
++        0,1,2, 1,3,2,
++        1,5,3, 5,7,3,
++        5,4,7, 4,6,7,
++        4,0,6, 0,2,6,
++        2,3,6, 3,7,6,
++        0,4,1, 1,4,5
++      };
++      for (int i = 0; i < 12; ++i)
++      {
++        cells->InsertNextCell(3);
++        // this code uses a clockwise convention for some reason
++        // no clue why but the ClipConvexPolyData assumes the same
++        // so we add verts as 0 2 1 instead of 0 1 2
++        cells->InsertCellPoint(tris[i*3]);
++        cells->InsertCellPoint(tris[i*3+2]);
++        cells->InsertCellPoint(tris[i*3+1]);
++      }
++      boxSource->SetPoints(points.GetPointer());
++      boxSource->SetPolys(cells.GetPointer());
++    }
++    vtkNew<vtkDensifyPolyData> densifyPolyData;
++    if (this->IsCameraInside(ren, vol, geometry))
++    {
++      vtkNew<vtkMatrix4x4> dataToWorld;
++      dataToWorld->DeepCopy(vol->GetMatrix());
+ 
+       vtkCamera* cam = ren->GetActiveCamera();
+-      double camWorldRange[2];
+-      double camWorldPos[4];
+-      double camFocalWorldPoint[4];
+-      double camWorldDirection[4];
+-      double camPos[4];
+-      double camPlaneNormal[4];
+-
+-      cam->GetPosition(camWorldPos);
+-      camWorldPos[3] = 1.0;
+-      this->TempMatrix1->MultiplyPoint(camWorldPos, camPos);
+-
+-      cam->GetFocalPoint(camFocalWorldPoint);
+-      camFocalWorldPoint[3]=1.0;
+-
+-      // The range (near/far) must also be transformed
+-      // into the local coordinate system.
+-      camWorldDirection[0] = camFocalWorldPoint[0] - camWorldPos[0];
+-      camWorldDirection[1] = camFocalWorldPoint[1] - camWorldPos[1];
+-      camWorldDirection[2] = camFocalWorldPoint[2] - camWorldPos[2];
+-      camWorldDirection[3] = 0.0;
+-
+-      // Compute the normalized near plane normal
+-      this->TempMatrix1->MultiplyPoint(camWorldDirection, camPlaneNormal);
+-
+-      vtkMath::Normalize(camWorldDirection);
+-      vtkMath::Normalize(camPlaneNormal);
+-
+-      double camNearWorldPoint[4];
+-      double camFarWorldPoint[4];
+-      double camNearPoint[4];
+-      double camFarPoint[4];
+-
+-      cam->GetClippingRange(camWorldRange);
+-      camNearWorldPoint[0] = camWorldPos[0] + camWorldRange[0]*camWorldDirection[0];
+-      camNearWorldPoint[1] = camWorldPos[1] + camWorldRange[0]*camWorldDirection[1];
+-      camNearWorldPoint[2] = camWorldPos[2] + camWorldRange[0]*camWorldDirection[2];
+-      camNearWorldPoint[3] = 1.;
+-
+-      camFarWorldPoint[0] = camWorldPos[0] + camWorldRange[1]*camWorldDirection[0];
+-      camFarWorldPoint[1] = camWorldPos[1] + camWorldRange[1]*camWorldDirection[1];
+-      camFarWorldPoint[2] = camWorldPos[2] + camWorldRange[1]*camWorldDirection[2];
+-      camFarWorldPoint[3] = 1.;
+ 
+-      this->TempMatrix1->MultiplyPoint(camNearWorldPoint, camNearPoint);
+-      this->TempMatrix1->MultiplyPoint(camFarWorldPoint, camFarPoint);
++      double fplanes[24];
++      cam->GetFrustumPlanes(ren->GetTiledAspectRatio(), fplanes);
++
++      // have to convert the 5th plane to volume coordinates
++      double pOrigin[4];
++      pOrigin[3] = 1.0;
++      double pNormal[3];
++      for (int i = 0; i < 3; ++i)
++      {
++        pNormal[i] = fplanes[16+i];
++        pOrigin[i] = -fplanes[16+3]*fplanes[16+i];
++      }
++
++      // convert to normal
++      double *dmat = dataToWorld->GetData();
++      dataToWorld->Transpose();
++      double pNormalV[3];
++      pNormalV[0] = pNormal[0]*dmat[0] + pNormal[1]*dmat[1] + pNormal[2]*dmat[2];
++      pNormalV[1] = pNormal[0]*dmat[4] + pNormal[1]*dmat[5] + pNormal[2]*dmat[6];
++      pNormalV[2] = pNormal[0]*dmat[8] + pNormal[1]*dmat[9] + pNormal[2]*dmat[10];
++      vtkMath::Normalize(pNormalV);
++
++      // convert the point
++      dataToWorld->Transpose();
++      dataToWorld->Invert();
++      dataToWorld->MultiplyPoint(pOrigin, pOrigin);
+ 
+       vtkNew<vtkPlane> nearPlane;
+ 
+@@ -1443,44 +1447,44 @@
+       // distance between near and far plane is also very small. In that case,
+       // a minimum offset is chosen. This is chosen based on the typical
+       // epsilon values on x86 systems.
+-      double offset = sqrt(vtkMath::Distance2BetweenPoints(
+-                           camNearPoint, camFarPoint)) / 1000.0;
++      double offset = (cam->GetClippingRange()[1] - cam->GetClippingRange()[0])*0.001;
+       // Minimum offset to avoid floating point precision issues for volumes
+       // with very small spacing
+       double minOffset =  static_cast<double>(
+                          std::numeric_limits<float>::epsilon()) * 1000.0;
+       offset = offset < minOffset ? minOffset : offset;
+ 
+-      camNearPoint[0] += camPlaneNormal[0]*offset;
+-      camNearPoint[1] += camPlaneNormal[1]*offset;
+-      camNearPoint[2] += camPlaneNormal[2]*offset;
++      for (int i = 0; i < 3; ++i)
++      {
++        pOrigin[i] += (pNormalV[i]*offset);
++      }
+ 
+-      nearPlane->SetOrigin( camNearPoint );
+-      nearPlane->SetNormal( camPlaneNormal );
++      nearPlane->SetOrigin(pOrigin);
++      nearPlane->SetNormal(pNormalV);
+ 
+       vtkNew<vtkPlaneCollection> planes;
+       planes->RemoveAllItems();
+       planes->AddItem(nearPlane.GetPointer());
+ 
+       vtkNew<vtkClipConvexPolyData> clip;
+-      clip->SetInputConnection(boxSource->GetOutputPort());
++      clip->SetInputData(boxSource.GetPointer());
+       clip->SetPlanes(planes.GetPointer());
+ 
+-      densityPolyData->SetInputConnection(clip->GetOutputPort());
++      densifyPolyData->SetInputConnection(clip->GetOutputPort());
+ 
+       this->CameraWasInsideInLastUpdate = true;
+     }
+     else
+     {
+-      densityPolyData->SetInputConnection(boxSource->GetOutputPort());
++      densifyPolyData->SetInputData(boxSource.GetPointer());
+       this->CameraWasInsideInLastUpdate = false;
+     }
+ 
+-    densityPolyData->SetNumberOfSubdivisions(2);
+-    densityPolyData->Update();
++    densifyPolyData->SetNumberOfSubdivisions(2);
++    densifyPolyData->Update();
+ 
+     this->BBoxPolyData = vtkSmartPointer<vtkPolyData>::New();
+-    this->BBoxPolyData->ShallowCopy(densityPolyData->GetOutput());
++    this->BBoxPolyData->ShallowCopy(densifyPolyData->GetOutput());
+     vtkPoints* points = this->BBoxPolyData->GetPoints();
+     vtkCellArray* cells = this->BBoxPolyData->GetPolys();
+ 
+@@ -3845,7 +3849,7 @@
+ 
+   // Render volume geometry to trigger render
+   //--------------------------------------------------------------------------
+-  this->Impl->RenderVolumeGeometry(ren, prog, vol);
++  this->Impl->RenderVolumeGeometry(ren, prog, vol, block->VolumeGeometry);
+ 
+   // Undo binds and de-activate buffers
+   //--------------------------------------------------------------------------
+diff --git a/Rendering/VolumeOpenGL2/vtkVolumeShaderComposer.h b/Rendering/VolumeOpenGL2/vtkVolumeShaderComposer.h
+--- a/Rendering/VolumeOpenGL2/vtkVolumeShaderComposer.h
++++ b/Rendering/VolumeOpenGL2/vtkVolumeShaderComposer.h
+@@ -1643,8 +1643,8 @@
+                                         vtkVolume* vtkNotUsed(vol))
+   {
+     return std::string("\
+-      \n    if(any(greaterThan(g_dataPos, in_texMax)) ||\
+-      \n      any(lessThan(g_dataPos, in_texMin)))\
++      \n    if(any(greaterThan(max(g_dirStep, vec3(0.0))*(g_dataPos - in_texMax[0]),vec3(0.0))) ||\
++      \n      any(greaterThan(min(g_dirStep, vec3(0.0))*(g_dataPos - in_texMin[0]),vec3(0.0))))\
+       \n      {\
+       \n      break;\
+       \n      }\
+diff --git a/Rendering/VolumeOpenGL2/vtkVolumeTexture.cxx b/Rendering/VolumeOpenGL2/vtkVolumeTexture.cxx
+--- a/Rendering/VolumeOpenGL2/vtkVolumeTexture.cxx
++++ b/Rendering/VolumeOpenGL2/vtkVolumeTexture.cxx
+@@ -5,6 +5,7 @@
+ #include "vtkDataArray.h"
+ #include "vtkFloatArray.h"
+ #include "vtkImageData.h"
++#include "vtkMatrix3x3.h"
+ #include "vtkMatrix4x4.h"
+ #include "vtkNew.h"
+ #include "vtkOpenGLGPUVolumeRayCastMapper.h"
+@@ -180,6 +181,8 @@
+       ext[2] * this->FullSizeAdjusted[0] + ext[0];
+ 
+     this->ImageDataBlockMap[imData] = block;
++    this->ComputeBounds(block);
++    this->UpdateTextureToDataMatrix(block);
+   }
+ 
+   // Format texture
+@@ -740,3 +743,149 @@
+ 
+   return true;
+ }
++
++void vtkVolumeTexture::ComputeBounds(VolumeBlock* block)
++{
++  vtkImageData* input = block->ImageData;
++  double spacing[3];
++  input->GetSpacing(spacing);
++  input->GetExtent(block->Extents);
++
++  double origin[3];
++  input->GetOrigin(origin);
++
++  double* direction = input->GetDirectionMatrix()->GetData();
++
++  int swapBounds[3];
++  swapBounds[0] = (spacing[0] < 0);
++  swapBounds[1] = (spacing[1] < 0);
++  swapBounds[2] = (spacing[2] < 0);
++
++  // push corners through matrix to get bounding box
++  int iMin, iMax, jMin, jMax, kMin, kMax;
++  int* extent = block->Extents;
++  iMin = extent[0];
++  iMax = extent[1] + this->IsCellData;
++  jMin = extent[2];
++  jMax = extent[3] + this->IsCellData;
++  kMin = extent[4];
++  kMax = extent[5] + this->IsCellData;
++  int ijkCorners[8][3] = {
++    {iMin, jMin, kMin}, {iMax, jMin, kMin}, {iMin, jMax, kMin}, {iMax, jMax, kMin},
++    {iMin, jMin, kMax}, {iMax, jMin, kMax}, {iMin, jMax, kMax}, {iMax, jMax, kMax}
++  };
++  double xMin, xMax, yMin, yMax, zMin, zMax;
++  xMin = yMin = zMin = VTK_DOUBLE_MAX;
++  xMax = yMax = zMax = VTK_DOUBLE_MIN;
++  for (int i = 0; i < 8; ++i)
++  {
++    int* ijkCorner = ijkCorners[i];
++    double* xyz = block->VolumeGeometry + i * 3;
++    vtkImageData::TransformContinuousIndexToPhysicalPoint(
++        ijkCorner[0], ijkCorner[1], ijkCorner[2], origin, spacing, direction, xyz);
++    if (xyz[0] < xMin)
++      xMin = xyz[0];
++    if (xyz[0] > xMax)
++      xMax = xyz[0];
++    if (xyz[1] < yMin)
++      yMin = xyz[1];
++    if (xyz[1] > yMax)
++      yMax = xyz[1];
++    if (xyz[2] < zMin)
++      zMin = xyz[2];
++    if (xyz[2] > zMax)
++      zMax = xyz[2];
++  }
++  block->LoadedBoundsAA[0] = xMin;
++  block->LoadedBoundsAA[1] = xMax;
++  block->LoadedBoundsAA[2] = yMin;
++  block->LoadedBoundsAA[3] = yMax;
++  block->LoadedBoundsAA[4] = zMin;
++  block->LoadedBoundsAA[5] = zMax;
++
++  if (!this->IsCellData)
++  {
++    block->LoadedBounds[0] =
++      origin[0] + static_cast<double>(block->Extents[0 + swapBounds[0]]) * spacing[0];
++    block->LoadedBounds[2] =
++      origin[1] + static_cast<double>(block->Extents[2 + swapBounds[1]]) * spacing[1];
++    block->LoadedBounds[4] =
++      origin[2] + static_cast<double>(block->Extents[4 + swapBounds[2]]) * spacing[2];
++    block->LoadedBounds[1] =
++      origin[0] + static_cast<double>(block->Extents[1 + swapBounds[0]]) * spacing[0];
++    block->LoadedBounds[3] =
++      origin[1] + static_cast<double>(block->Extents[3 + swapBounds[1]]) * spacing[1];
++    block->LoadedBounds[5] =
++      origin[2] + static_cast<double>(block->Extents[5 + swapBounds[2]]) * spacing[2];
++  }
++  // Loaded extents represent cells
++  else
++  {
++    int i = 0;
++    while (i < 3)
++    {
++      block->LoadedBounds[2 * i + swapBounds[i]] =
++        origin[i] + (static_cast<double>(block->Extents[2 * i])) * spacing[i];
++
++      block->LoadedBounds[2 * i + 1 - swapBounds[i]] =
++        origin[i] + (static_cast<double>(block->Extents[2 * i + 1]) + 1.0) * spacing[i];
++
++      i++;
++    }
++  }
++
++  // Update sampling distance
++  block->DatasetStepSize[0] = 1.0 / (block->LoadedBounds[1] - block->LoadedBounds[0]);
++  block->DatasetStepSize[1] = 1.0 / (block->LoadedBounds[3] - block->LoadedBounds[2]);
++  block->DatasetStepSize[2] = 1.0 / (block->LoadedBounds[5] - block->LoadedBounds[4]);
++
++  // Cell step/scale are adjusted per block.
++  // Step should be dependent on the bounds and not on the texture size
++  // since we can have a non-uniform voxel size / spacing / aspect ratio.
++  block->CellStep[0] = (1.f / static_cast<float>(block->Extents[1] - block->Extents[0]));
++  block->CellStep[1] = (1.f / static_cast<float>(block->Extents[3] - block->Extents[2]));
++  block->CellStep[2] = (1.f / static_cast<float>(block->Extents[5] - block->Extents[4]));
++
++  this->CellSpacing[0] = static_cast<float>(spacing[0]);
++  this->CellSpacing[1] = static_cast<float>(spacing[1]);
++  this->CellSpacing[2] = static_cast<float>(spacing[2]);
++}
++
++void vtkVolumeTexture::UpdateTextureToDataMatrix(VolumeBlock* block)
++{
++  // take the 0.0 to 1.0 texture coordinates and map them into
++  // physical/dataset coordinates
++  vtkImageData* input = block->ImageData;
++  double* direction = input->GetDirectionMatrix()->GetData();
++  double origin[3];
++  input->GetOrigin(origin);
++  double spacing[3];
++  input->GetSpacing(spacing);
++
++  auto stepsize = block->DatasetStepSize;
++  vtkMatrix4x4* matrix = block->TextureToDataset.GetPointer();
++  matrix->Identity();
++  double* result = matrix->GetData();
++
++  // Scale diag (1.0 -> world coord width)
++  for (int i = 0; i < 3; ++i)
++  {
++    result[i * 4] = direction[i * 3] / stepsize[0];
++    result[i * 4 + 1] = direction[i * 3 + 1] / stepsize[1];
++    result[i * 4 + 2] = direction[i * 3 + 2] / stepsize[2];
++  }
++
++  double blockOrigin[3];
++  vtkImageData::TransformContinuousIndexToPhysicalPoint(block->Extents[0], block->Extents[2],
++      block->Extents[4], origin, spacing, direction, blockOrigin);
++
++  // Transaltion vec
++  result[3] = blockOrigin[0];
++  result[7] = blockOrigin[1];
++  result[11] = blockOrigin[2];
++
++  auto matrixInv = block->TextureToDatasetInv.GetPointer();
++  matrixInv->DeepCopy(matrix);
++  matrixInv->Invert();
++}
++
+diff --git a/Rendering/VolumeOpenGL2/vtkVolumeTexture.h b/Rendering/VolumeOpenGL2/vtkVolumeTexture.h
+--- a/Rendering/VolumeOpenGL2/vtkVolumeTexture.h
++++ b/Rendering/VolumeOpenGL2/vtkVolumeTexture.h
+@@ -94,12 +94,29 @@
+       TextureObject = tex;
+       TextureSize = texSize;
+       TupleIndex = 0;
++
++      this->Extents[0] = VTK_INT_MAX;
++      this->Extents[1] = VTK_INT_MIN;
++      this->Extents[2] = VTK_INT_MAX;
++      this->Extents[3] = VTK_INT_MIN;
++      this->Extents[4] = VTK_INT_MAX;
++      this->Extents[5] = VTK_INT_MIN;
+     }
+ 
+     vtkImageData* ImageData;
+     vtkTextureObject* TextureObject;
+     Size3 TextureSize;
+     vtkIdType TupleIndex;
++    vtkNew<vtkMatrix4x4> TextureToDataset;
++    vtkNew<vtkMatrix4x4> TextureToDatasetInv;
++
++    float CellStep[3];
++    double DatasetStepSize[3];
++
++    double LoadedBounds[6];
++    double LoadedBoundsAA[6];
++    double VolumeGeometry[24];
++    int Extents[6];
+   };
+ 
+   vtkTypeMacro(vtkVolumeTexture, vtkObject);
+@@ -113,7 +130,7 @@
+   /**
+    *  Set a number of blocks per axis.
+    */
+-  void SetPartitions(int const x, int const y, int const z);
++  void SetPartitions(int const i, int const j, int const k);
+ 
+   /**
+    * Loads the data array into the texture in the case only a single block is
+@@ -150,9 +167,12 @@
+   float Scale[4];
+   float Bias[4];
+   double ScalarRange[4][2];
++  float CellSpacing[3];
+   int InterpolationType;
+   vtkTimeStamp UploadTime;
+ 
++  int IsCellData = 0;
++
+ protected:
+   vtkVolumeTexture();
+   ~vtkVolumeTexture() VTK_OVERRIDE;
+@@ -192,6 +212,9 @@
+    */
+   void ClearBlocks();
+ 
++  void ComputeBounds(VolumeBlock* block);
++  void UpdateTextureToDataMatrix(VolumeBlock* block);
++
+   vtkVolumeTexture(const vtkVolumeTexture&) VTK_DELETE_FUNCTION;
+   void operator=(const vtkVolumeTexture&) VTK_DELETE_FUNCTION;
+ 

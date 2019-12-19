@@ -331,7 +331,7 @@ if(MITK_USE_Python3)
   list(APPEND mitk_optional_cache_args
        -DMITK_USE_Python3:BOOL=${MITK_USE_Python3}
        "-DPython3_EXECUTABLE:FILEPATH=${Python3_EXECUTABLE}"
-       "-DPython3_INCLUDE_DIR:PATH=${Python3_INCLUDE_DIR}"
+       "-DPython3_INCLUDE_DIR:PATH=${Python3_INCLUDE_DIRS}"
        "-DPython3_LIBRARY:FILEPATH=${Python3_LIBRARY}"
        "-DPython3_STDLIB:FILEPATH=${Python3_STDLIB}"
        "-DPython3_SITELIB:FILEPATH=${Python3_SITELIB}"

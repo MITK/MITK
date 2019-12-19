@@ -23,7 +23,7 @@ if(MITK_USE_CTK)
            -DCTK_LIB_Scripting/Python/Widgets:BOOL=ON
            -DCTK_ENABLE_Python_Wrapping:BOOL=OFF
            -DCTK_APP_ctkSimplePythonShell:BOOL=OFF
-           "-DPYTHON_INCLUDE_DIR:PATH=${Python3_INCLUDE_DIR}"
+           "-DPYTHON_INCLUDE_DIR:PATH=${Python3_INCLUDE_DIRS}"
            "-DPYTHON_LIBRARY:FILEPATH=${Python3_LIBRARY_RELEASE}"
       )
     else()

@@ -372,6 +372,16 @@ if(MITK_USE_Python3)
     find_package(Python3 REQUIRED COMPONENTS Interpreter Development NumPy)
   endif()
 
+  # Workaround (https://gitlab.kitware.com/cmake/cmake/issues/20113)
+  if(_Python3_INCLUDE_DIR AND NOT Python3_INCLUDE_DIR)
+    set(Python3_INCLUDE_DIR "${_Python3_INCLUDE_DIR}" CACHE PATH "")
+  endif()
+
+  if(_Python3_NumPy_INCLUDE_DIR AND NOT Python3_NumPy_INCLUDE_DIR)
+    set(Python3_NumPy_INCLUDE_DIR "${_Python3_NumPy_INCLUDE_DIR}" CACHE PATH "")
+  endif()
+  # End of workaround
+
   if(WIN32)
     string(REPLACE "\\" "/" Python3_STDARCH "${Python3_STDARCH}")
     string(REPLACE "\\" "/" Python3_STDLIB "${Python3_STDLIB}")

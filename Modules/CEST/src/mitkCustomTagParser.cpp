@@ -258,24 +258,32 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
   std::string asciiString;
 
   {
+    const std::size_t SUBSTR_LENGTH = 2;
     const std::size_t INPUT_LENGTH = dicomPropertyString.length();
 
-    // We require the input length to be a multiple of 3
-    if (0 != INPUT_LENGTH % 3)
+    if (INPUT_LENGTH < SUBSTR_LENGTH)
       return results;
 
+    const std::size_t MAX_INPUT_OFFSET = INPUT_LENGTH - SUBSTR_LENGTH;
     const int ASCII_MIN = 0;
     const int ASCII_MAX = 127;
 
-    for (std::size_t i = 0; i < INPUT_LENGTH; i += 3)
+    try
     {
-      std::string byte_string = dicomPropertyString.substr(i, 2);
-      int byte_value = std::stoi(byte_string.c_str(), nullptr, 16);
+      for (std::size_t i = 0; i <= MAX_INPUT_OFFSET; i += 3)
+      {
+        std::string byte_string = dicomPropertyString.substr(i, SUBSTR_LENGTH);
+        int byte_value = std::stoi(byte_string.c_str(), nullptr, 16);
 
-      if (ASCII_MIN > byte_value || ASCII_MAX < byte_value)
-        return results;
+        if (ASCII_MIN > byte_value || ASCII_MAX < byte_value)
+          return results;
 
-      asciiString.push_back(static_cast<char>(byte_value));
+        asciiString.push_back(static_cast<char>(byte_value));
+      }
+    }
+    catch (const std::invalid_argument&) // std::stoi() could not perform conversion
+    {
+      return results;
     }
   }
 

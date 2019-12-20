@@ -258,7 +258,7 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
   std::string asciiString;
 
   {
-    const int INPUT_LENGTH = dicomPropertyString.length();
+    const std::size_t INPUT_LENGTH = dicomPropertyString.length();
 
     // We require the input length to be a multiple of 3
     if (0 != INPUT_LENGTH % 3)
@@ -267,7 +267,7 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
     const int ASCII_MIN = 0;
     const int ASCII_MAX = 127;
 
-    for (int i = 0; i < INPUT_LENGTH; i += 3)
+    for (std::size_t i = 0; i < INPUT_LENGTH; i += 3)
     {
       std::string byte_string = dicomPropertyString.substr(i, 2);
       int byte_value = std::stoi(byte_string.c_str(), nullptr, 16);

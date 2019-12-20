@@ -11,9 +11,14 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkBaseApplication.h>
-
-#include <QStringList>
 #include <QVariant>
+
+#if defined __GNUC__ && !defined __clang__
+#  include <QDir>
+#  include <QFileInfo>
+#  include <QString>
+#  include <QStringList>
+#endif
 
 int main(int argc, char **argv)
 {
@@ -22,17 +27,20 @@ int main(int argc, char **argv)
   app.setApplicationName("MitkCoreApp");
   app.setOrganizationName("DKFZ");
 
-  // Preload the org.mitk.gui.qt.common plug-in (and hence also Qmitk) to speed
-  // up a clean-cache start. This also works around bugs in older gcc and glibc implementations,
-  // which have difficulties with multiple dynamic opening and closing of shared libraries with
-  // many global static initializers. It also helps if dependent libraries have weird static
-  // initialization methods and/or missing de-initialization code.
-  QStringList preloadLibs;
-  preloadLibs << "liborg_mitk_gui_qt_common";
-  app.setPreloadLibraries(preloadLibs);
+  // Preload the org.blueberry.core.expressions plugin to work around a bug in
+  // GCC that leads to undefined symbols while loading certain libraries even though
+  // the symbols are actually defined.
+#if defined __GNUC__ && !defined __clang__
+  auto library = QFileInfo(argv[0]).dir().path() + "/../lib/plugins/liborg_blueberry_core_expressions.so";
+
+  if (!QFileInfo(library).exists())
+    library = "liborg_blueberry_core_expressions";
+
+  app.setPreloadLibraries(QStringList() << library);
+#endif
 
   app.setProperty(mitk::BaseApplication::PROP_APPLICATION, "org.mitk.qt.coreapplication");
 
-  // Run the workbench
+  // Run the workbench.
   return app.run();
 }

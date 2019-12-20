@@ -33,8 +33,10 @@ found in the LICENSE file.
 #include <boost/tokenizer.hpp>
 
 #include <algorithm>
+#include <cstdint>
 #include <map>
 #include <string>
+#include <vector>
 
 namespace
 {
@@ -252,10 +254,9 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
 
   std::map<std::string, std::string> privateParameters;
 
-  // convert hex to ascii
-  // the Siemens private tag contains the information like this
-  // "43\52\23\34" we jump over each \ and convert the number
-  std::string asciiString;
+  // The Siemens private tag contains information like "43\52\23\34".
+  // We jump over each "\" and convert the number;
+  std::string bytes;
 
   {
     const std::size_t SUBSTR_LENGTH = 2;
@@ -265,20 +266,15 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
       return results;
 
     const std::size_t MAX_INPUT_OFFSET = INPUT_LENGTH - SUBSTR_LENGTH;
-    const int ASCII_MIN = 0;
-    const int ASCII_MAX = 127;
+    bytes.reserve(INPUT_LENGTH / 3 + 1);
 
     try
     {
       for (std::size_t i = 0; i <= MAX_INPUT_OFFSET; i += 3)
       {
         std::string byte_string = dicomPropertyString.substr(i, SUBSTR_LENGTH);
-        int byte_value = std::stoi(byte_string.c_str(), nullptr, 16);
-
-        if (ASCII_MIN > byte_value || ASCII_MAX < byte_value)
-          return results;
-
-        asciiString.push_back(static_cast<char>(byte_value));
+        int byte = static_cast<std::string::value_type>(std::stoi(byte_string.c_str(), nullptr, 16));
+        bytes.push_back(byte);
       }
     }
     catch (const std::invalid_argument&) // std::stoi() could not perform conversion
@@ -294,21 +290,21 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
     const std::string ASCCONV_BEGIN = "### ASCCONV BEGIN ###";
     const std::string ASCCONV_END = "### ASCCONV END ###";
 
-    auto offset = asciiString.find(ASCCONV_BEGIN);
+    auto offset = bytes.find(ASCCONV_BEGIN);
 
     if (std::string::npos == offset)
       return results;
 
     offset += ASCCONV_BEGIN.length();
 
-    auto count = asciiString.find(ASCCONV_END, offset);
+    auto count = bytes.find(ASCCONV_END, offset);
 
     if (std::string::npos == count)
       return results;
 
     count -= offset;
 
-    parameterListString = asciiString.substr(offset, count);
+    parameterListString = bytes.substr(offset, count);
   }
 
   boost::replace_all(parameterListString, "\r\n", "\n");
@@ -379,24 +375,34 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
   results->GetStringProperty("CEST.Offset", offset);
   results->GetStringProperty("CEST.measurements", measurements);
 
-  if ("" == measurements)
+  if (measurements.empty())
   {
     std::string stringRepetitions = "";
-    std::string stringAverages = "";
     results->GetStringProperty("CEST.repetitions", stringRepetitions);
+
+    std::string stringAverages = "";
     results->GetStringProperty("CEST.averages", stringAverages);
-    std::stringstream  measurementStream;
-    try
+
+    const auto ERROR_STRING = "Could not find measurements, fallback assumption of repetitions + averages could not be determined either.";
+
+    if (!stringRepetitions.empty() && !stringAverages.empty())
     {
-      measurementStream << std::stoi(stringRepetitions) + std::stoi(stringAverages);
-      measurements = measurementStream.str();
-      MITK_INFO << "Could not find measurements, assuming repetitions + averages. Which is: " << measurements;
+      std::stringstream measurementStream;
+
+      try
+      {
+        measurementStream << std::stoi(stringRepetitions) + std::stoi(stringAverages);
+        measurements = measurementStream.str();
+        MITK_INFO << "Could not find measurements, assuming repetitions + averages. That is: " << measurements;
+      }
+      catch (const std::invalid_argument&)
+      {
+        MITK_ERROR << ERROR_STRING;
+      }
     }
-    catch (const std::invalid_argument &ia)
+    else
     {
-      MITK_ERROR
-        << "Could not find measurements, fallback assumption of repetitions + averages could not be determined either: "
-        << ia.what();
+      MITK_WARN << ERROR_STRING;
     }
   }
 

@@ -253,7 +253,7 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
   m_CrosshairModeButton->setMenu(m_CrosshairMenu);
   m_CrosshairModeButton->setIcon(QIcon(QPixmap(iconCrosshairMode_xpm)));
   m_CrosshairModeButton->setPopupMode(QToolButton::InstantPopup);
-  m_CrosshairModeButton->setStyleSheet("QToolButton::menu-indicator { image: none; } border: 0");
+  m_CrosshairModeButton->setStyleSheet("QToolButton::menu-indicator { image: none; }");
   m_CrosshairModeButton->setAutoRaise(true);
   layout->addWidget(m_CrosshairModeButton);
 
@@ -261,7 +261,6 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
   m_FullScreenButton->setMaximumSize(15, 15);
   m_FullScreenButton->setIconSize(size);
   m_FullScreenButton->setIcon(QIcon(QPixmap(iconFullScreen_xpm)));
-  m_FullScreenButton->setStyleSheet("border: 0");
   m_FullScreenButton->setAutoRaise(true);
   layout->addWidget(m_FullScreenButton);
 
@@ -269,7 +268,6 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
   m_LayoutDesignButton->setMaximumSize(15, 15);
   m_LayoutDesignButton->setIconSize(size);
   m_LayoutDesignButton->setIcon(QIcon(QPixmap(iconSettings_xpm)));
-  m_LayoutDesignButton->setStyleSheet("border: 0");
   m_LayoutDesignButton->setAutoRaise(true);
   layout->addWidget(m_LayoutDesignButton);
 

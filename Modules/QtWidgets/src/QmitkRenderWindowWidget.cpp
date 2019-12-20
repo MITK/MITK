@@ -103,7 +103,7 @@ void QmitkRenderWindowWidget::SetDecorationColor(const mitk::Color& color)
   m_CornerAnnotation->GetTextProperty()->SetColor(m_DecorationColor[0], m_DecorationColor[1], m_DecorationColor[2]);
 
   QColor hexColor(m_DecorationColor[0] * 255, m_DecorationColor[1] * 255, m_DecorationColor[2] * 255);
-  setStyleSheet("border: 2px solid " + hexColor.name(QColor::HexRgb));
+  setStyleSheet("QmitkRenderWindowWidget { border: 2px solid " + hexColor.name(QColor::HexRgb) + "; }");
 }
 
 void QmitkRenderWindowWidget::ShowColoredRectangle(bool show)

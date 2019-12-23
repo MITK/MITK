@@ -498,6 +498,14 @@ endif()
 #*****************************************************************************
 
 #-----------------------------------------------------------------------------
+# Organize MITK targets in folders
+#-----------------------------------------------------------------------------
+
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set(MITK_ROOT_FOLDER "MITK" CACHE STRING "")
+mark_as_advanced(MITK_ROOT_FOLDER)
+
+#-----------------------------------------------------------------------------
 # CMake function(s) and macro(s)
 #-----------------------------------------------------------------------------
 
@@ -1065,6 +1073,7 @@ set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${MITK_MODULE_LINKER
 foreach(subproject ${CTEST_PROJECT_SUBPROJECTS})
   if(NOT TARGET ${subproject} AND NOT subproject MATCHES "Unlabeled")
     add_custom_target(${subproject})
+    set_property(TARGET ${subproject} PROPERTY FOLDER "${MITK_ROOT_FOLDER}/CTestSubprojects")
   endif()
 endforeach()
 
@@ -1079,7 +1088,9 @@ add_subdirectory(Modules)
 include("${CMAKE_CURRENT_SOURCE_DIR}/Modules/ModuleList.cmake")
 mitkFunctionWhitelistModules(MITK MITK_MODULES)
 
+set(MITK_ROOT_FOLDER_BACKUP "${MITK_ROOT_FOLDER}")
 foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
+  get_filename_component(MITK_ROOT_FOLDER ${MITK_EXTENSION_DIR} NAME)
   set(MITK_MODULES_EXTENSION_DIR ${MITK_EXTENSION_DIR}/Modules)
   get_filename_component(MITK_MODULES_EXTENSION_DIR ${MITK_MODULES_EXTENSION_DIR} ABSOLUTE)
   if(EXISTS ${MITK_MODULES_EXTENSION_DIR}/ModuleList.cmake)
@@ -1091,6 +1102,7 @@ foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
   endif()
   set(MITK_MODULE_NAME_PREFIX ${MITK_DEFAULT_MODULE_NAME_PREFIX})
 endforeach()
+set(MITK_ROOT_FOLDER "${MITK_ROOT_FOLDER_BACKUP}")
 
 add_subdirectory(Wrapping)
 

@@ -41,6 +41,7 @@ macro(MITK_CREATE_MODULE_TESTS)
                            SUBPROJECTS ${MODULE_SUBPROJECTS}
                            FILES_CMAKE ${_testdriver_file_list}
                            NO_FEATURE_INFO NO_BATCH_FILE ${_no_init})
+    set_property(TARGET ${EXECUTABLE_TARGET} PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Modules/Tests")
 
     #
     # Now tell CMake which tests should be run. This is done automatically

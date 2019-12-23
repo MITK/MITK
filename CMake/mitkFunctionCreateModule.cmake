@@ -278,6 +278,7 @@ function(mitk_create_module)
     # create a meta-target if it does not already exist
     if(NOT TARGET ${_module_autoload_meta_target})
       add_custom_target(${_module_autoload_meta_target})
+      set_property(TARGET ${_module_autoload_meta_target} PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Modules/Autoload")
     endif()
 
     if(NOT MODULE_EXPORT_DEFINE)
@@ -452,16 +453,19 @@ function(mitk_create_module)
 
     if(MODULE_HEADERS_ONLY)
       add_library(${MODULE_TARGET} INTERFACE)
+      set_property(TARGET ${MODULE_TARGET} PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Modules")
     else()
       if(MODULE_EXECUTABLE)
         add_executable(${MODULE_TARGET}
                        ${MODULE_CPP_FILES} ${coverage_sources} ${CPP_FILES_GENERATED} ${Q${KITNAME}_GENERATED_CPP}
                        ${DOX_FILES} ${UI_FILES} ${QRC_FILES})
+        set_property(TARGET ${MODULE_TARGET} PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Modules/Executables")
         set(_us_module_name main)
       else()
         add_library(${MODULE_TARGET} ${_STATIC}
                     ${coverage_sources} ${CPP_FILES_GENERATED} ${Q${KITNAME}_GENERATED_CPP}
                     ${DOX_FILES} ${UI_FILES} ${QRC_FILES})
+        set_property(TARGET ${MODULE_TARGET} PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Modules")
         set(_us_module_name ${MODULE_TARGET})
       endif()
 

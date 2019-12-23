@@ -857,7 +857,10 @@ unsigned int* mitk::Image::GetDimensions() const
 
 bool mitk::Image::SetImportVolume(void *data, int t, int n, ImportMemoryManagementType importMemoryManagement)
 {
-  if (IsValidVolume(t, n) == false) return false;
+  if (!IsValidVolume(t, n)) {
+    MITK_WARN << "Can't import volume for time " << t << " and channel " << n;
+    return false;
+  }
 
   const size_t ptypeSize = this->m_ImageDescriptor->GetChannelTypeById(n).GetSize();
   ImageDataItemPointer vol;

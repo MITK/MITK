@@ -200,7 +200,7 @@ void mitk::PicFileReader::FillImage(Image::Pointer output)
   // Copy the memory to avoid mismatches of malloc() and delete[].
   // mitkIpPicGet will always allocate a new memory block with malloc(),
   // but MITK Images delete the data via delete[].
-  output->SetImportVolume(pic->data, 0, Image::CopyMemory);
+  output->SetImportVolume(pic->data, 0, 0, Image::CopyMemory);
   pic->data = nullptr;
   mitkIpPicFree(pic);
 }

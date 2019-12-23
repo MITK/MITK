@@ -167,7 +167,7 @@ void mitk::DWIHeadMotionCorrectionFilter::GenerateData()
 
   mitk::Image::Pointer splittedImage = mitk::Image::New();
   splittedImage->InitializeByItk( split_filter->GetOutput() );
-  splittedImage->SetImportVolume( split_filter->GetOutput()->GetBufferPointer(),
+  splittedImage->SetImportVolume( split_filter->GetOutput()->GetBufferPointer(), 0, 0,
                                    mitk::Image::CopyMemory );
 
 

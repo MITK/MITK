@@ -456,7 +456,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(itk::Image<TPixel, VI
     return;
   }
 
-  mitk::Image::Pointer resultImage = mitk::ImportItkImage(regionGrower->GetOutput())->Clone();
+  mitk::Image::Pointer resultImage = mitk::ImportItkImage(regionGrower->GetOutput());
 
   m_RGMINIMUM = resultImage->GetStatistics()->GetScalarValueMin() != 0 ? resultImage->GetStatistics()->GetScalarValueMin() : 1;
   m_RGMAXIMUM = resultImage->GetStatistics()->GetScalarValueMax();

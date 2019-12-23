@@ -80,7 +80,7 @@ void mitk::ITKImageImport<TInputImage>::GenerateData()
   InputImageConstPointer input  = this->GetInput();
   mitk::Image::Pointer output = this->GetOutput();
 
-  output->SetImportVolume((void*)input->GetBufferPointer(), 0, mitk::Image::ReferenceMemory);
+  output->SetImportVolume((void*)input->GetBufferPointer(), 0, 0, mitk::Image::ReferenceMemory);
 }
 
 template <class TInputImage>

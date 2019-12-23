@@ -87,6 +87,19 @@ if(MITK_SHOW_CONSOLE_WINDOW)
 else()
   add_executable(${_APP_NAME} MACOSX_BUNDLE WIN32 ${_APP_SOURCES} ${WINDOWS_ICON_RESOURCE_FILE})
 endif()
+
+if(NOT CMAKE_CURRENT_SOURCE_DIR MATCHES "^${CMAKE_SOURCE_DIR}.*")
+  foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
+    if(CMAKE_CURRENT_SOURCE_DIR MATCHES "^${MITK_EXTENSION_DIR}.*")
+      get_filename_component(MITK_EXTENSION_ROOT_FOLDER ${MITK_EXTENSION_DIR} NAME)
+      set_property(TARGET ${_APP_NAME} PROPERTY FOLDER "${MITK_EXTENSION_ROOT_FOLDER}/Applications")
+      break()
+    endif()
+  endforeach()
+else()
+  set_property(TARGET ${_APP_NAME} PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Applications")
+endif()
+
 mitk_use_modules(TARGET ${_APP_NAME} MODULES MitkAppUtil)
 
 set_target_properties(${_APP_NAME} PROPERTIES

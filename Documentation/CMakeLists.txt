@@ -172,6 +172,8 @@ add_custom_target(doc_developersguide
                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                   )
 
+set_property(TARGET doc doc_usersguide doc_developersguide PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Documentation")
+
 if(MITK_USE_BLUEBERRY)
   # convert the extension points schema files into html
   find_package(Ant)

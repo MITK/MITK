@@ -79,7 +79,7 @@ function(mitkFunctionCreateMatchPointDeployedAlgorithm)
     OUTPUT_NAME "mdra-${MatchPoint_VERSION_MAJOR}-${MatchPoint_VERSION_MINOR}_${ALG_NAME}"
     OUTPUT_NAME_DEBUG "mdra-D-${MatchPoint_VERSION_MAJOR}-${MatchPoint_VERSION_MINOR}_${ALG_NAME}"
     PREFIX ""
-    FOLDER "${MITK_ROOT_FOLDER}/MatchPointAlgorithms")
+    FOLDER "${MITK_ROOT_FOLDER}/Modules/MatchPointAlgorithms")
 
   mitk_use_modules(TARGET ${ALG_TARGET}
                    MODULES ${ALG_DEPENDS}

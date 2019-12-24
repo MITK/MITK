@@ -153,22 +153,26 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
           double val = 0.0;
 
           itk::Index<3> idx;
+          bool validIndex = true;
           m_SegmentationBinaryImage->GetGeometry()->WorldToIndex(worldCoord, idx);
-          try
-          {
-            if (m_SegmentationBinaryImage->GetImageDescriptor()->GetChannelDescriptor().GetPixelType().GetComponentType() == itk::ImageIOBase::UCHAR)
-            {
-              val = (unsigned char)mitk::UnlockedSinglePixelAccess(m_SegmentationBinaryImage, idx, 0);
-            }
-            else if (m_SegmentationBinaryImage->GetImageDescriptor()->GetChannelDescriptor().GetPixelType().GetComponentType() == itk::ImageIOBase::USHORT)
-            {
-              val = (unsigned short)mitk::UnlockedSinglePixelAccess(m_SegmentationBinaryImage, idx, 0);
+          for (int d = 0; d < 3; d++) {
+            if (idx[d] < 0 || idx[d] > m_SegmentationBinaryImage->GetDimensions()[i]) {
+              validIndex = false;;
+              break;
             }
           }
-          catch (mitk::Exception e)
-          {
-            // If value is outside the image's region ignore it
-            MITK_WARN<<e.what();
+
+          if (validIndex) {
+            try {
+              if (m_SegmentationBinaryImage->GetImageDescriptor()->GetChannelDescriptor().GetPixelType().GetComponentType() == itk::ImageIOBase::UCHAR) {
+                val = (unsigned char)mitk::UnlockedSinglePixelAccess(m_SegmentationBinaryImage, idx, 0);
+              } else if (m_SegmentationBinaryImage->GetImageDescriptor()->GetChannelDescriptor().GetPixelType().GetComponentType() == itk::ImageIOBase::USHORT) {
+                val = (unsigned short)mitk::UnlockedSinglePixelAccess(m_SegmentationBinaryImage, idx, 0);
+              }
+            }
+            catch (mitk::Exception e) {
+              MITK_WARN << e.what();
+            }
           }
 
           if (val == 0.0)

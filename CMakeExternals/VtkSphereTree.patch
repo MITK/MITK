@@ -1,0 +1,11 @@
+diff --git a/Common/ExecutionModel/vtkSphereTree.cxx b/Common/ExecutionModel/vtkSphereTree.cxx
+--- a/Common/ExecutionModel/vtkSphereTree.cxx
++++ b/Common/ExecutionModel/vtkSphereTree.cxx
+@@ -1366,6 +1366,7 @@
+   // radius (in each direction).
+   double spacing[3], r=this->AverageRadius, *bds=this->SphereBounds;
+   int dims[3], res=this->Resolution;
++  r = std::max(r, .5);
+   for (int i=0; i<3; ++i)
+   {
+     dims[i] = static_cast<int>( (bds[2*i+1]-bds[2*i])/(res*r) );

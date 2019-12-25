@@ -149,6 +149,7 @@ class MITKSEGMENTATION_EXPORT RegionGrowingTool : public FeedbackContourTool
     int m_PaintingPixelValue;
     bool m_FillFeedbackContour;
     int m_ConnectedComponentValue;
+    ContourModel::Pointer m_Contour;
 };
 
 } // namespace

@@ -64,7 +64,8 @@ mitk::RegionGrowingTool::RegionGrowingTool()
       m_VisibleWindow(0),
       m_MouseDistanceScaleFactor(0.25),
       m_FillFeedbackContour(true),
-      m_ConnectedComponentValue(1)
+      m_ConnectedComponentValue(1),
+      m_Contour(nullptr)
 {
 }
 
@@ -309,7 +310,7 @@ void mitk::RegionGrowingTool::OnMousePressed ( StateMachineAction*, InteractionE
 
         // 2. Determine if the user clicked inside or outside of the segmentation/working slice (i.e. the whole volume)
         mitk::BaseGeometry::Pointer workingSliceGeometry;
-        workingSliceGeometry = m_WorkingSlice->GetTimeGeometry()->GetGeometryForTimeStep(m_LastEventSender->GetTimeStep());
+        workingSliceGeometry = m_WorkingSlice->GetTimeGeometry()->GetGeometryForTimeStep(0);
         workingSliceGeometry->WorldToIndex(positionEvent->GetPlanePositionInWorld(), m_SeedPoint);
         itk::Index<2> indexInWorkingSlice2D;
         indexInWorkingSlice2D[0] = m_SeedPoint[0];
@@ -408,13 +409,13 @@ void mitk::RegionGrowingTool::OnMousePressedOutside(StateMachineAction*, Interac
     {
         // Get geometry and indices
         mitk::BaseGeometry::Pointer workingSliceGeometry;
-        workingSliceGeometry = m_WorkingSlice->GetTimeGeometry()->GetGeometryForTimeStep(m_LastEventSender->GetTimeStep());
+        workingSliceGeometry = m_WorkingSlice->GetTimeGeometry()->GetGeometryForTimeStep(0);
         itk::Index<2> indexInWorkingSlice2D;
         indexInWorkingSlice2D[0] = m_SeedPoint[0];
         indexInWorkingSlice2D[1] = m_SeedPoint[1];
 
         mitk::BaseGeometry::Pointer referenceSliceGeometry;
-        referenceSliceGeometry = m_ReferenceSlice->GetTimeGeometry()->GetGeometryForTimeStep(m_LastEventSender->GetTimeStep());
+        referenceSliceGeometry = m_ReferenceSlice->GetTimeGeometry()->GetGeometryForTimeStep(0);
         itk::Index<3> indexInReferenceSlice;
         itk::Index<2> indexInReferenceSlice2D;
         referenceSliceGeometry->WorldToIndex(positionEvent->GetPlanePositionInWorld(), indexInReferenceSlice);
@@ -459,7 +460,8 @@ void mitk::RegionGrowingTool::OnMousePressedOutside(StateMachineAction*, Interac
             if (resultContour.IsNotNull())
             {
                 ContourModel::Pointer resultContourWorld = FeedbackContourTool::BackProjectContourFrom2DSlice(workingSliceGeometry, FeedbackContourTool::ProjectContourTo2DSlice(m_WorkingSlice, resultContour));
-                FeedbackContourTool::SetFeedbackContour(resultContourWorld);
+                int lastTimeStep = m_LastEventSender->GetTimeStep();
+                FeedbackContourTool::SetFeedbackContour(lastTimeStep == 0 ? resultContourWorld : ContourModelUtils::MoveZerothContourTimeStep(resultContourWorld, lastTimeStep));
                 FeedbackContourTool::SetFeedbackContourVisible(true);
                 mitk::RenderingManager::GetInstance()->RequestUpdate(m_LastEventSender->GetRenderWindow());
             }
@@ -481,7 +483,7 @@ void mitk::RegionGrowingTool::OnMouseMoved(StateMachineAction*, InteractionEvent
     {
         // Get geometry and indices
         mitk::BaseGeometry::Pointer workingSliceGeometry;
-        workingSliceGeometry = m_WorkingSlice->GetTimeGeometry()->GetGeometryForTimeStep(m_LastEventSender->GetTimeStep());
+        workingSliceGeometry = m_WorkingSlice->GetTimeGeometry()->GetGeometryForTimeStep(0);
         itk::Index<2> indexInWorkingSlice2D;
         indexInWorkingSlice2D[0] = m_SeedPoint[0];
         indexInWorkingSlice2D[1] = m_SeedPoint[1];
@@ -603,8 +605,10 @@ void mitk::RegionGrowingTool::OnMouseMoved(StateMachineAction*, InteractionEvent
             // Show contour
             if (resultContour.IsNotNull())
             {
+                m_Contour = resultContour;
                 ContourModel::Pointer resultContourWorld = FeedbackContourTool::BackProjectContourFrom2DSlice(workingSliceGeometry, FeedbackContourTool::ProjectContourTo2DSlice(m_WorkingSlice, resultContour));
-                FeedbackContourTool::SetFeedbackContour(resultContourWorld);
+                int lastTimeStep = m_LastEventSender->GetTimeStep();
+                FeedbackContourTool::SetFeedbackContour(lastTimeStep == 0 ? resultContourWorld : ContourModelUtils::MoveZerothContourTimeStep(resultContourWorld, lastTimeStep));
                 FeedbackContourTool::SetFeedbackContourVisible(true);
                 mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(positionEvent->GetSender()->GetRenderWindow());
             }
@@ -622,17 +626,17 @@ void mitk::RegionGrowingTool::OnMouseReleased(StateMachineAction*, InteractionEv
 
     mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(interactionEvent);
 
-    if (m_WorkingSlice.IsNotNull() && m_FillFeedbackContour && positionEvent)
+    if (m_WorkingSlice.IsNotNull() && m_FillFeedbackContour && positionEvent && m_Contour.IsNotNull())
     {
         // Project contour into working slice
         ContourModel* feedbackContour(FeedbackContourTool::GetFeedbackContour());
-        ContourModel::Pointer projectedContour = FeedbackContourTool::ProjectContourTo2DSlice(m_WorkingSlice, feedbackContour, false, false);
+        ContourModel::Pointer projectedContour = FeedbackContourTool::ProjectContourTo2DSlice(m_WorkingSlice, m_Contour, false, false);
 
         // If there is a projected contour, fill it
         if (projectedContour.IsNotNull())
         {
             MITK_DEBUG << "Filling Segmentation";
-            FeedbackContourTool::FillContourInSlice(projectedContour, positionEvent->GetSender()->GetTimeStep(), m_WorkingSlice, m_PaintingPixelValue);
+            FeedbackContourTool::FillContourInSlice(projectedContour, 0, m_WorkingSlice, m_PaintingPixelValue);
             this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice);
             FeedbackContourTool::SetFeedbackContourVisible(false);
         }

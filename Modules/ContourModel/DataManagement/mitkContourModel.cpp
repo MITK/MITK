@@ -572,7 +572,6 @@ void mitk::ContourModel::RedistributeControlVertices(int period, int timestep)
   }
 }
 
-
 void mitk::ContourModel::ClearData()
 {
   //call the superclass, this releases the data of BaseData

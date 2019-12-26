@@ -452,6 +452,7 @@ void DicomSeriesReader::ImageBlockDescriptor::loadTags(DcmFileFormat& ff)
   if (!image) {
     return;
   }
+  ff.convertToUTF8();
   DcmDataset* fileData = ff.getDataset();
   DcmStack stack;
   while (fileData->nextObject(stack, OFTrue).good()) {

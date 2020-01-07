@@ -4,7 +4,8 @@ MITK_CREATE_MODULE_TESTS(${package_deps})
 
 if(UNIX AND NOT APPLE)
   #[[ The PythonQt library (dependency of MitkQtPython module) depends on Qt
-      libraries without absolute paths. Use LD_LIBRARY_PATH as workaround. ]]
+      libraries without absolute paths. Use LD_LIBRARY_PATH as workaround.
+      See T26955. ]]
   if(TARGET ${TESTDRIVER})
     get_target_property(ld_library_path Qt5::Core IMPORTED_LOCATION_RELEASE)
     get_filename_component(ld_library_path "${ld_library_path}" DIRECTORY)

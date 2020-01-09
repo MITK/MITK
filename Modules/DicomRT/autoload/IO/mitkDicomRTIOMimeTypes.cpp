@@ -16,7 +16,6 @@ found in the LICENSE file.
 
 #include "mitkDICOMDCMTKTagScanner.h"
 #include "mitkDICOMTagPath.h"
-#include "mitkDICOMTagsOfInterestService.h"
 #include <mitkDICOMFileReaderSelector.h>
 #include <mitkDICOMFileReader.h>
 

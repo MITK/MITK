@@ -27,10 +27,6 @@ found in the LICENSE file.
 #include <mitkTestNotRunException.h>
 #include <mitkTestingMacros.h>
 
-// include gl to read out properties
-#include <vtkOpenGL.h>
-#include <vtksys/SystemTools.hxx>
-
 #if defined _MSC_VER
 #if _MSC_VER >= 1700
 #define RESIZE_WORKAROUND
@@ -72,11 +68,6 @@ void mitk::RenderingTestHelper::Initialize(int width, int height, AntiAliasing a
   m_RenderWindow->GetRenderer()->SetDataStorage(m_DataStorage);
   this->SetMapperIDToRender2D();
   this->GetVtkRenderWindow()->SetSize(width, height);
-
-  if (!IsAdvancedOpenGL())
-  {
-    mitkThrowException(mitk::TestNotRunException) << "Insufficient OpenGL version";
-  }
 
 #ifdef RESIZE_WORKAROUND
 
@@ -122,36 +113,10 @@ void mitk::RenderingTestHelper::Initialize(int width, int height, AntiAliasing a
 #endif
 
   m_RenderWindow->GetRenderer()->Resize(width, height);
-
-  // Prints the glinfo after creation of the vtkrenderwindow, we always want to do this for debugging.
-  this->PrintGLInfo();
 }
 
 mitk::RenderingTestHelper::~RenderingTestHelper()
 {
-}
-
-bool mitk::RenderingTestHelper::IsAdvancedOpenGL()
-{
-  const GLubyte *version = glGetString(GL_VERSION);
-  if (!version)
-    return false;
-  return *version >= '2';
-}
-
-void mitk::RenderingTestHelper::PrintGLInfo()
-{
-  GLint maxTextureSize;
-
-  glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
-  ;
-
-  //MITK_INFO << "OpenGL Render Context Information: \n"
-  //          << "- GL_VENDOR: " << glGetString(GL_VENDOR) << "\n"
-  //          << "- GL_RENDERER: " << glGetString(GL_RENDERER) << "\n"
-  //          << "- GL_VERSION: " << glGetString(GL_VERSION) << "\n"
-  //          << "- GL_MAX_TEXTURE_SIZE: " << maxTextureSize << "\n"
-  //          << "- GL_EXTENSIONS: " << glGetString(GL_EXTENSIONS);
 }
 
 void mitk::RenderingTestHelper::SetMapperID(mitk::BaseRenderer::StandardMapperSlot id)

@@ -144,9 +144,6 @@ namespace mitk
      */
     bool CompareRenderWindowAgainstReference(int argc, char *argv[], double threshold = 10.0);
 
-    /** @brief Returns true if the opengl context is compatible for advanced vtk effects **/
-    bool IsAdvancedOpenGL();
-
     /**
      * @brief The ArgcHelperClass class is a convinience class to convert a vector
      * of strings to the standard c++ argv and argc arguments. This is necessary for
@@ -191,12 +188,6 @@ namespace mitk
       int width,
       int height,
       AntiAliasing antiAliasing = AntiAliasing::None);
-
-    /** @brief Prints the opengl information, e.g. version, vendor and extensions,
-       *         This function can only be called after an opengl context is active.
-       *         It only prints the context after the vtkRenderwindow is fully initialized.
-       **/
-    void PrintGLInfo();
 
     /** @brief This method tries to load the given file into a member datastorage, in order to render it.
           @param fileName The filename of the file to be loaded (including path).

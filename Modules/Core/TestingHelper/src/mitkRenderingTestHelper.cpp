@@ -63,6 +63,19 @@ void mitk::RenderingTestHelper::Initialize(int width, int height, AntiAliasing a
   mitk::UIDGenerator uidGen = mitk::UIDGenerator("UnnamedRenderer_", 8);
   m_RenderWindow = mitk::RenderWindow::New(nullptr, uidGen.GetUID().c_str());
 
+  auto renderWindow = m_RenderWindow->GetVtkRenderWindow();
+
+  if (0 == renderWindow->SupportsOpenGL())
+  {
+    auto openGLRenderWindow = dynamic_cast<vtkOpenGLRenderWindow*>(renderWindow);
+
+    auto message = nullptr != openGLRenderWindow
+      ? openGLRenderWindow->GetOpenGLSupportMessage()
+      : std::string("No details available.");
+
+    mitkThrowException(mitk::TestNotRunException) << "OpenGL not supported: " << message;
+  }
+
   m_DataStorage = mitk::StandaloneDataStorage::New();
 
   m_RenderWindow->GetRenderer()->SetDataStorage(m_DataStorage);

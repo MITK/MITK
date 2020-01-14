@@ -122,4 +122,4 @@ protected:
   QPushButton* m_FavoriteNodesButton;
   Ui_QmitkNodeSelectionDialog m_Controls;
 };
-#endif // QmitkNodeSelectionDialog_H
+#endif // QMITK_NODE_SELECTION_DIALOG_H

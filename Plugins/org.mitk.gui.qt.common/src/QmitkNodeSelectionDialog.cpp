@@ -13,7 +13,6 @@ found in the LICENSE file.
 #include "QmitkNodeSelectionDialog.h"
 
 #include <mitkDataStorageInspectorGenerator.h>
-#include <QmitkDataStorageTreeInspector.h>
 #include <QmitkNodeSelectionPreferenceHelper.h>
 
 QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString title, QString hint) : QDialog(parent),

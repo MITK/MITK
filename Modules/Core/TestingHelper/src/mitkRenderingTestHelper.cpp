@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 // VTK
 #include <vtkCamera.h>
+#include <vtkOpenGLRenderWindow.h>
 #include <vtkPNGWriter.h>
 #include <vtkRenderLargeImage.h>
 #include <vtkRenderWindow.h>

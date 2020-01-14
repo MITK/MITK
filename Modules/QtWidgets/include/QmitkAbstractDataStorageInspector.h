@@ -36,6 +36,7 @@ class MITKQTWIDGETS_EXPORT QmitkAbstractDataStorageInspector : public QWidget
   Q_OBJECT
 
 public:
+
   ~QmitkAbstractDataStorageInspector() override;
 
   /**
@@ -67,9 +68,13 @@ public:
   bool GetSelectOnlyVisibleNodes() const;
 
   using SelectionMode = QAbstractItemView::SelectionMode;
+
   /** Sets the selection mode of the inspector.*/
   virtual void SetSelectionMode(SelectionMode mode) = 0;
   virtual SelectionMode GetSelectionMode() const = 0;
+
+  /** Can be implemented to update the view of the inspector manually.*/
+  virtual void UpdateView() { };
 
 Q_SIGNALS:
   /**

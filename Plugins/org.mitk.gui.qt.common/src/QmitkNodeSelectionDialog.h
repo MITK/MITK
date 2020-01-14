@@ -24,6 +24,7 @@ found in the LICENSE file.
 #include "ui_QmitkNodeSelectionDialog.h"
 
 #include <QDialog>
+#include <QPushButton>
 
 /**
 * \class QmitkNodeSelectionDialog
@@ -99,7 +100,9 @@ Q_SIGNALS:
   void SetCurrentSelection(NodeList selectedNodes);
 
 protected Q_SLOTS:
+
   void OnSelectionChanged(NodeList selectedNodes);
+  void OnFavoriteNodesButtonClicked();
   void OnOK();
   void OnCancel();
 
@@ -116,6 +119,7 @@ protected:
   using PanelVectorType = std::vector<QmitkAbstractDataStorageInspector*>;
   PanelVectorType m_Panels;
 
+  QPushButton* m_FavoriteNodesButton;
   Ui_QmitkNodeSelectionDialog m_Controls;
 };
 #endif // QmitkNodeSelectionDialog_H

@@ -88,6 +88,14 @@ void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
 
   m_Delegate = new QmitkPropertyItemDelegate(m_Controls.treeView);
 
+  m_Controls.singleSlot->SetDataStorage(GetDataStorage());
+  m_Controls.singleSlot->SetSelectionIsOptional(true);
+  m_Controls.singleSlot->SetEmptyInfo(QString("Please select a data node"));
+  m_Controls.singleSlot->SetPopUpTitel(QString("Select data node"));
+
+  m_SelectionServiceConnector = std::make_unique<QmitkSelectionServiceConnector>();
+  SetAsSelectionListener(true);
+
   m_Controls.filterLineEdit->setClearButtonEnabled(true);
 
   m_Controls.treeView->setItemDelegateForColumn(1, m_Delegate);
@@ -109,11 +117,28 @@ void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
   icon = berry::QtStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg"));
   m_Controls.saveLabel->setPixmap(icon.pixmap(ICON_SIZE));
 
-  connect(m_Controls.filterLineEdit, SIGNAL(textChanged(const QString&)), this, SLOT(OnFilterTextChanged(const QString&)));
+  connect(m_Controls.singleSlot, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,
+    this, &QmitkPropertyTreeView::OnSelectionChanged);
+
+  connect(m_Controls.filterLineEdit, SIGNAL(textChanged(const QString&)),this, SLOT(OnFilterTextChanged(const QString&)));
   connect(m_Controls.propertyListComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnPropertyListChanged(int)));
   connect(m_Controls.newButton, SIGNAL(clicked()), this, SLOT(OnAddNewProperty()));
   connect(m_Controls.treeView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(OnCurrentRowChanged(const QModelIndex&, const QModelIndex&)));
   connect(m_Model, SIGNAL(modelReset()), this, SLOT(OnModelReset()));
+}
+
+void QmitkPropertyTreeView::SetAsSelectionListener(bool checked)
+{
+  if (checked)
+  {
+    m_SelectionServiceConnector->AddPostSelectionListener(GetSite()->GetWorkbenchWindow()->GetSelectionService());
+    connect(m_SelectionServiceConnector.get(), &QmitkSelectionServiceConnector::ServiceSelectionChanged, m_Controls.singleSlot, &QmitkSingleNodeSelectionWidget::SetCurrentSelection);
+  }
+  else
+  {
+    m_SelectionServiceConnector->RemovePostSelectionListener();
+    disconnect(m_SelectionServiceConnector.get(), &QmitkSelectionServiceConnector::ServiceSelectionChanged, m_Controls.singleSlot, &QmitkSingleNodeSelectionWidget::SetCurrentSelection);
+  }
 }
 
 QString QmitkPropertyTreeView::GetPropertyNameOrAlias(const QModelIndex& index)
@@ -318,7 +343,7 @@ void QmitkPropertyTreeView::OnPropertyNameChanged(const itk::EventObject&)
   }
 }
 
-void QmitkPropertyTreeView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes)
+void QmitkPropertyTreeView::OnSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
 {
   mitk::PropertyList* propertyList = m_Model->GetPropertyList();
 
@@ -433,9 +458,7 @@ void QmitkPropertyTreeView::OnPropertyListChanged(int index)
   if (m_SelectedNode.IsNotNull())
     nodes << m_SelectedNode;
 
-  berry::IWorkbenchPart::Pointer workbenchPart;
-
-  this->OnSelectionChanged(workbenchPart, nodes);
+  this->OnSelectionChanged(nodes);
 }
 
 void QmitkPropertyTreeView::OnAddNewProperty()

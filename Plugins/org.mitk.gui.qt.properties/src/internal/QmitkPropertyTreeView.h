@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkDataNode.h>
 #include <mitkIRenderWindowPartListener.h>
 #include <QmitkAbstractView.h>
+#include "QmitkSelectionServiceConnector.h"
 #include <ui_QmitkPropertyTreeView.h>
 
 class QmitkPropertyItemDelegate;
@@ -50,10 +51,13 @@ protected:
   void CreateQtPartControl(QWidget* parent) override;
 
 private:
+
+  void SetAsSelectionListener(bool checked);
+
   QString GetPropertyNameOrAlias(const QModelIndex& index);
   void OnPreferencesChanged(const berry::IBerryPreferences* preferences) override;
   void OnPropertyNameChanged(const itk::EventObject& event);
-  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
+  void OnSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
   void HideAllIcons();
 
 private slots:
@@ -79,6 +83,8 @@ private:
   QmitkPropertyItemDelegate* m_Delegate;
   mitk::DataNode::Pointer m_SelectedNode;
   mitk::BaseRenderer* m_Renderer;
+
+  std::unique_ptr<QmitkSelectionServiceConnector> m_SelectionServiceConnector;
 };
 
 #endif

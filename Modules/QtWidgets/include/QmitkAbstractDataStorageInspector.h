@@ -73,9 +73,6 @@ public:
   virtual void SetSelectionMode(SelectionMode mode) = 0;
   virtual SelectionMode GetSelectionMode() const = 0;
 
-  /** Can be implemented to update the view of the inspector manually.*/
-  virtual void UpdateView() { };
-
 Q_SIGNALS:
   /**
   * @brief A signal that will be emitted if the selected node has changed.

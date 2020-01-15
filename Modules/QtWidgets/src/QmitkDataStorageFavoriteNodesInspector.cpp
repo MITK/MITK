@@ -40,11 +40,6 @@ void QmitkDataStorageFavoriteNodesInspector::SetNodePredicate(mitk::NodePredicat
   QmitkDataStorageListInspector::SetNodePredicate(combinedPredicate);
 }
 
-void QmitkDataStorageFavoriteNodesInspector::UpdateView()
-{
-  dynamic_cast<QmitkDataStorageDefaultListModel*>(m_StorageModel)->NodePredicateChanged();
-}
-
 void QmitkDataStorageFavoriteNodesInspector::OnFavoriteNodesButtonClicked()
 {
   auto selectedNodes = GetSelectedNodes();
@@ -52,6 +47,4 @@ void QmitkDataStorageFavoriteNodesInspector::OnFavoriteNodesButtonClicked()
   {
     node->SetBoolProperty("org.mitk.selection.favorite", false);
   }
-
-  UpdateView();
 }

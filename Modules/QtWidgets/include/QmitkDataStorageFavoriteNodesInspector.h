@@ -40,11 +40,6 @@ public:
   */
   void SetNodePredicate(mitk::NodePredicateBase* nodePredicate) override;
 
-  /**
-  * @brief  Update the underlying storage model to inform about the new subset of favorite nodes.
-  */
-  void UpdateView() override;
-
 protected Q_SLOTS:
 
   void OnFavoriteNodesButtonClicked();

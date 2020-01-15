@@ -166,11 +166,6 @@ void QmitkNodeSelectionDialog::OnFavoriteNodesButtonClicked()
   {
     node->SetBoolProperty("org.mitk.selection.favorite", true);
   }
-
-  for (auto panel : m_Panels)
-  {
-    panel->UpdateView();
-  }
 }
 
 void QmitkNodeSelectionDialog::OnOK()

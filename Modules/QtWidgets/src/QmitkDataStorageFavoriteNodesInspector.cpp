@@ -21,7 +21,7 @@ found in the LICENSE file.
 QmitkDataStorageFavoriteNodesInspector::QmitkDataStorageFavoriteNodesInspector(QWidget* parent/* = nullptr*/)
   : QmitkDataStorageListInspector(parent)
 {
-  auto favoriteNodesButton = new QPushButton("Remove from favorites", parent);
+  auto favoriteNodesButton = new QPushButton("Remove selection from favorites", parent);
   QmitkDataStorageListInspector::m_Controls.verticalLayout->addWidget(favoriteNodesButton, 0, Qt::AlignRight);
 
   m_FavoriteNodeSelectionPredicate = mitk::NodePredicateProperty::New("org.mitk.selection.favorite", mitk::BoolProperty::New(true));

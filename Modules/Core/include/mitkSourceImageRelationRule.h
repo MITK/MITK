@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef mitkGenericIDRelationRule_h
 #define mitkGenericIDRelationRule_h
@@ -141,7 +137,7 @@ namespace mitk
     @remark Disconnect() ensures that sourece is valid and only invokes if instance exists.*/
     void Disconnect_datalayer(IPropertyOwner *source, const InstanceIDType &instanceID) const override;
 
-    virtual bool IsSupportedRuleID(const RuleIDType& ruleID) const override;
+    bool IsSupportedRuleID(const RuleIDType& ruleID) const override;
 
     itk::LightObject::Pointer InternalClone() const override;
 

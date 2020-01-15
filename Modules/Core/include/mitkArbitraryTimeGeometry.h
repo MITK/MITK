@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef ArbitraryTimeGeometry_h
 #define ArbitraryTimeGeometry_h
@@ -139,8 +135,9 @@ namespace mitk
   * The associated time step is the last step which lower time bound
   * is smaller or equal then the time point.
   * If a negative invalid time point is given always time step 0 is
-  * returned. If an positive invalid time step is given an invalid
-  * time step will be returned.
+  * returned. If a positive invalid time point is given the last time
+  * step will be returned. This is also true for time points that are
+  * exactly on the upper time bound.
   */
     TimeStepType TimePointToTimeStep(TimePointType timePoint) const override;
     /**

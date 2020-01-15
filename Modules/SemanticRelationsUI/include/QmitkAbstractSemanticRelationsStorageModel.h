@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITKABSTRACTSEMANTICRELATIONSSTORAGEMODEL_H
 #define QMITKABSTRACTSEMANTICRELATIONSSTORAGEMODEL_H
@@ -40,7 +36,7 @@ class MITKSEMANTICRELATIONSUI_EXPORT QmitkAbstractSemanticRelationsStorageModel 
 public:
 
   QmitkAbstractSemanticRelationsStorageModel(QObject* parent = nullptr);
-  virtual ~QmitkAbstractSemanticRelationsStorageModel();
+  ~QmitkAbstractSemanticRelationsStorageModel() override;
 
   /*
   * @brief Update this model with the data from the semantic relations,
@@ -52,7 +48,7 @@ public:
   *
   * @par caseID    The current case ID to identify the currently active patient / case.
   */
-  virtual void Update(const mitk::SemanticTypes::CaseID& caseID) override;
+  void Update(const mitk::SemanticTypes::CaseID& caseID) override;
 
   /**
   * @brief Set the current case ID which is needed to access the semantic relations storage.
@@ -95,7 +91,7 @@ protected:
   *   update the model data.
   *   This functions is called inside the 'SetDataStorage'-function from the parent class.
   */
-  virtual void DataStorageChanged() override;
+  void DataStorageChanged() override;
 
   /**
   * @brief This function is called if the model data is updated. It can be used by subclasses to define

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <chrono>
 #include <mitkCommon.h>
@@ -29,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 /* \brief The spectral unmixing mini app (SUMA) is designed to enable batch processing
-  for spectral unmixing. For detailed documentation look into the header files of the 
+  for spectral unmixing. For detailed documentation look into the header files of the
   included spectral unmixing filters.*/
 
 struct InputParameters
@@ -112,7 +108,7 @@ InputParameters parseInput(int argc, char *argv[])
 
 
   if (parsedArgs.count("inputFilename"))
-  { 
+  {
 
     input.inputFilename = us::any_cast<std::string>(parsedArgs["inputFilename"]);
   }
@@ -123,7 +119,7 @@ InputParameters parseInput(int argc, char *argv[])
   }
 
   if (parsedArgs.count("outputFileStruct"))
-  { 
+  {
     input.outputFileStruct = us::any_cast<std::string>(parsedArgs["outputFileStruct"]);
   }
   else
@@ -221,7 +217,7 @@ mitk::pa::SpectralUnmixingFilterBase::Pointer GetFilterInstance(std::string algo
 }
 
 int main(int argc, char *argv[])
-{ 
+{
   auto input = parseInput(argc, argv);
 
   std::string algo = input.inputAlg;
@@ -264,7 +260,7 @@ int main(int argc, char *argv[])
   m_SpectralUnmixingFilter->AddChromophore(mitk::pa::PropertyCalculator::ChromophoreType::OXYGENATED);
   m_SpectralUnmixingFilter->AddChromophore(mitk::pa::PropertyCalculator::ChromophoreType::DEOXYGENATED);
   m_SpectralUnmixingFilter->AddOutputs(2);
- 
+
   for (unsigned int wIdx = 0; wIdx < wavelengths.size(); ++wIdx)
   {
     m_SpectralUnmixingFilter->AddWavelength(wavelengths[wIdx]);
@@ -272,13 +268,13 @@ int main(int argc, char *argv[])
   }
 
   //to add a batch processing: loop for a dir start here; don't forget to set a counter to the three output savenames!!!
-  std::string inputImage = input.inputFilename; 
+  std::string inputImage = input.inputFilename;
   auto m_inputImage = mitk::IOUtil::Load<mitk::Image>(inputImage);
 
   m_SpectralUnmixingFilter->SetInput(m_inputImage);
 
   m_SpectralUnmixingFilter->Update();
- 
+
   auto output1 = m_SpectralUnmixingFilter->GetOutput(0);
   auto output2 = m_SpectralUnmixingFilter->GetOutput(1);
   output1->SetSpacing(m_inputImage->GetGeometry()->GetSpacing());
@@ -291,7 +287,7 @@ int main(int argc, char *argv[])
 
   auto m_sO2 = mitk::pa::SpectralUnmixingSO2::New();
   m_sO2->Verbose(false);
-   
+
   m_sO2->SetInput(0, output1);
   m_sO2->SetInput(1, output2);
 
@@ -310,6 +306,6 @@ int main(int argc, char *argv[])
 
   m_sO2 = nullptr;
   m_SpectralUnmixingFilter = nullptr;
-  //to add a batch processing: loop for a dir end here 
+  //to add a batch processing: loop for a dir end here
   MITK_INFO << "Spectral Unmixing DONE";
 }

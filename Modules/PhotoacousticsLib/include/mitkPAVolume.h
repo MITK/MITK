@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKPHOTOACOUSTIC3dVOLUME_H
 #define MITKPHOTOACOUSTIC3dVOLUME_H
@@ -132,7 +128,7 @@ namespace mitk
        */
       Volume(double* data, unsigned int xDim, unsigned int yDim, unsigned int zDim, double spacing);
       Volume(mitk::Image::Pointer image);
-      virtual ~Volume();
+      ~Volume() override;
 
       const int NUMBER_OF_SPATIAL_DIMENSIONS = 3;
 

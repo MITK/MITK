@@ -1,23 +1,24 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical Image Computing.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkMultiWidgetConfigurationToolBar.h"
 
-QmitkMultiWidgetConfigurationToolBar::QmitkMultiWidgetConfigurationToolBar()
-  : QToolBar()
+// mitk qt widgets module
+#include "QmitkAbstractMultiWidget.h"
+#include "QmitkMultiWidgetLayoutSelectionWidget.h"
+
+QmitkMultiWidgetConfigurationToolBar::QmitkMultiWidgetConfigurationToolBar(QmitkAbstractMultiWidget* multiWidget)
+  : QToolBar(multiWidget)
+  , m_MultiWidget(multiWidget)
 {
   QToolBar::setOrientation(Qt::Vertical);
   QToolBar::setIconSize(QSize(17, 17));
@@ -45,22 +46,29 @@ void QmitkMultiWidgetConfigurationToolBar::AddButtons()
 {
   QAction* setLayoutAction = new QAction(QIcon(":/Qmitk/mwLayout.png"), tr("Set multi widget layout"), this);
   connect(setLayoutAction, &QAction::triggered, this, &QmitkMultiWidgetConfigurationToolBar::OnSetLayout);
-
   QToolBar::addAction(setLayoutAction);
 
-  m_SynchronizeAction = new QAction(QIcon(":/Qmitk/mwSynchronized.png"), tr("Desynchronize render windows"), this);
+  m_SynchronizeAction = new QAction(QIcon(":/Qmitk/mwDesynchronized.png"), tr("Synchronize render windows"), this);
   m_SynchronizeAction->setCheckable(true);
-  m_SynchronizeAction->setChecked(true);
+  m_SynchronizeAction->setChecked(false);
   connect(m_SynchronizeAction, &QAction::triggered, this, &QmitkMultiWidgetConfigurationToolBar::OnSynchronize);
-
   QToolBar::addAction(m_SynchronizeAction);
+
+  m_InteractionSchemeChangeAction = new QAction(QIcon(":/Qmitk/mwMITK.png"), tr("Change to PACS interaction"), this);
+  m_InteractionSchemeChangeAction->setCheckable(true);
+  m_InteractionSchemeChangeAction->setChecked(false);
+  connect(m_InteractionSchemeChangeAction, &QAction::triggered, this, &QmitkMultiWidgetConfigurationToolBar::OnInteractionSchemeChanged);
+  QToolBar::addAction(m_InteractionSchemeChangeAction);
 }
 
 void QmitkMultiWidgetConfigurationToolBar::OnSetLayout()
 {
-  m_LayoutSelectionPopup->setWindowFlags(Qt::Popup);
-  m_LayoutSelectionPopup->move(this->cursor().pos().x() - m_LayoutSelectionPopup->width(), this->cursor().pos().y());
-  m_LayoutSelectionPopup->show();
+  if (nullptr != m_MultiWidget)
+  {
+    m_LayoutSelectionPopup->setWindowFlags(Qt::Popup);
+    m_LayoutSelectionPopup->move(this->cursor().pos().x() - m_LayoutSelectionPopup->width(), this->cursor().pos().y());
+    m_LayoutSelectionPopup->show();
+  }
 }
 
 void QmitkMultiWidgetConfigurationToolBar::OnSynchronize()
@@ -79,4 +87,23 @@ void QmitkMultiWidgetConfigurationToolBar::OnSynchronize()
 
   m_SynchronizeAction->setChecked(synchronized);
   emit Synchronized(synchronized);
+}
+
+void QmitkMultiWidgetConfigurationToolBar::OnInteractionSchemeChanged()
+{
+  bool PACSInteractionScheme = m_InteractionSchemeChangeAction->isChecked();
+  if (PACSInteractionScheme)
+  {
+    m_InteractionSchemeChangeAction->setIcon(QIcon(":/Qmitk/mwPACS.png"));
+    m_InteractionSchemeChangeAction->setText(tr("Change to MITK interaction"));
+    emit InteractionSchemeChanged(mitk::InteractionSchemeSwitcher::PACSStandard);
+  }
+  else
+  {
+    m_InteractionSchemeChangeAction->setIcon(QIcon(":/Qmitk/mwMITK.png"));
+    m_InteractionSchemeChangeAction->setText(tr("Change to PACS interaction"));
+    emit InteractionSchemeChanged(mitk::InteractionSchemeSwitcher::MITKStandard);
+  }
+
+  m_InteractionSchemeChangeAction->setChecked(PACSInteractionScheme);
 }

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef __QMITK_DATA_STORAGE_INSPECTOR_PROVIDER_BASE_H
 #define __QMITK_DATA_STORAGE_INSPECTOR_PROVIDER_BASE_H
@@ -35,11 +31,11 @@ template <class TInspector>
 class QmitkDataStorageInspectorProviderBase : public mitk::IDataStorageInspectorProvider
 {
 public:
-  virtual QmitkAbstractDataStorageInspector* CreateInspector() const override;
+  QmitkAbstractDataStorageInspector* CreateInspector() const override;
 
-  virtual std::string GetInspectorID() const override;
-  virtual std::string GetInspectorDisplayName() const override;
-  virtual std::string GetInspectorDescription() const override;
+  std::string GetInspectorID() const override;
+  std::string GetInspectorDisplayName() const override;
+  std::string GetInspectorDescription() const override;
 
   us::ServiceRegistration<mitk::IDataStorageInspectorProvider> RegisterService(
     us::ModuleContext *context = us::GetModuleContext());
@@ -48,7 +44,7 @@ public:
 
   QmitkDataStorageInspectorProviderBase(const std::string& id);
   QmitkDataStorageInspectorProviderBase(const std::string& id, const std::string& displayName, const std::string& desc= "" );
-  virtual ~QmitkDataStorageInspectorProviderBase();
+  ~QmitkDataStorageInspectorProviderBase() override;
 
 protected:
   QmitkDataStorageInspectorProviderBase(const QmitkDataStorageInspectorProviderBase &other);

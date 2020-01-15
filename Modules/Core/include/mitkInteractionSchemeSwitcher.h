@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical Image Computing.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKINTERACTIONSCHEMESWITCHER_H
 #define MITKINTERACTIONSCHEMESWITCHER_H
@@ -90,17 +86,31 @@ namespace mitk
 
     /**
     * @brief Set the current interaction scheme of the given interaction event handler
+    *
+    *        The interaction event handler is able to accept xml-configuration files that will define the interaction scheme.
+    *        Based on the given interaction scheme different configuration files are loaded into the interaction event handler.
+    *        The interaction scheme can be a variant of the MITK-mouse mode or the PACS-mouse mode (see 'enum InteractionScheme').
+    *        The default is 'MITKStandard'.
+    *        If the interaction scheme has been changed, an 'InteractionSchemeChangedEvent' will be invoked.
+    *
+    * @pre    The interaction event handler has to be valid (!nullptr).
+    * @throw  mitk::Exception, if the interaction event handler is invalid (==nullptr).
+    *
+    * @param interactionEventHandler  The interaction event handler that defines the interaction scheme via configuration files
+    * @param interactionScheme        The interaction scheme that should be used for the currently active interaction event handler.
     */
     void SetInteractionScheme(mitk::InteractionEventHandler* interactionEventHandler, InteractionScheme interactionScheme);
     /**
     * @brief Return the current interaction scheme
+    *
+    * @return The currently set InteractionScheme
     */
     InteractionScheme GetInteractionScheme() const { return m_InteractionScheme; };
 
   protected:
 
     InteractionSchemeSwitcher();
-    virtual ~InteractionSchemeSwitcher() override;
+    ~InteractionSchemeSwitcher() override;
 
   private:
 

@@ -1,27 +1,22 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "vtkMitkRenderProp.h"
 
-#include <vtkLODProp3D.h>
 #include <vtkObjectFactory.h>
 #include <vtkPropAssembly.h>
+#include <vtkInformation.h>
 
 #include "mitkVtkMapper.h"
-//#include "mitkGLMapper.h"
 
 vtkStandardNewMacro(vtkMitkRenderProp);
 
@@ -40,6 +35,14 @@ double *vtkMitkRenderProp::GetBounds()
 void vtkMitkRenderProp::SetPropRenderer(mitk::VtkPropRenderer::Pointer propRenderer)
 {
   this->m_VtkPropRenderer = propRenderer;
+}
+
+void vtkMitkRenderProp::SetPropertyKeys(vtkInformation *keys)
+{
+  Superclass::SetPropertyKeys(keys);
+
+  if (nullptr != m_VtkPropRenderer)
+    m_VtkPropRenderer->SetPropertyKeys(keys);
 }
 
 int vtkMitkRenderProp::RenderOpaqueGeometry(vtkViewport * /*viewport*/)
@@ -72,31 +75,27 @@ int vtkMitkRenderProp::GetNumberOfPaths()
   return m_VtkPropRenderer->GetNumberOfPaths();
 }
 
-// BUG (#1551) added method depth peeling
 int vtkMitkRenderProp::HasTranslucentPolygonalGeometry()
 {
-  typedef std::map<int, mitk::Mapper *> MappersMapType;
-  const MappersMapType mappersMap = m_VtkPropRenderer->GetMappersMap();
-  for (auto it = mappersMap.cbegin(); it != mappersMap.cend(); ++it)
+  for (const auto &mapEntry : m_VtkPropRenderer->GetMappersMap())
   {
-    mitk::Mapper *mapper = (*it).second;
+    auto vtkMapper = dynamic_cast<mitk::VtkMapper*>(mapEntry.second);
 
-    const mitk::VtkMapper::Pointer vtkMapper = dynamic_cast<mitk::VtkMapper *>(mapper);
-    if (vtkMapper)
+    if (nullptr != vtkMapper)
     {
       // Due to VTK 5.2 bug, we need to initialize the Paths object in vtkPropAssembly
       // manually (see issue #8186 committed to VTK's Mantis issue tracker)
       // --> VTK bug resolved on 2008-12-01
-      auto *propAssembly = dynamic_cast<vtkPropAssembly *>(vtkMapper->GetVtkProp(m_VtkPropRenderer));
-      if (propAssembly)
-      {
-        propAssembly->InitPathTraversal();
-      }
+      auto propAssembly = dynamic_cast<vtkPropAssembly *>(vtkMapper->GetVtkProp(m_VtkPropRenderer));
 
-      if (vtkMapper->GetVtkProp(m_VtkPropRenderer)->HasTranslucentPolygonalGeometry() == 1)
+      if (nullptr != propAssembly)
+        propAssembly->InitPathTraversal();
+
+      if (1 == vtkMapper->GetVtkProp(m_VtkPropRenderer)->HasTranslucentPolygonalGeometry())
         return 1;
     }
   }
+
   return 0;
 }
 

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkPreprocessingResamplingView.h"
 
@@ -41,6 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageTimeSelector.h"
 #include "mitkVectorImageMapper2D.h"
 #include "mitkProperties.h"
+#include "mitkLevelWindowProperty.h"
 
 // Includes for image casting between ITK and MITK
 #include "mitkImageCast.h"
@@ -81,9 +78,9 @@ typedef itk::BSplineInterpolateImageFunction<ImageType, double>                 
 
 QmitkPreprocessingResampling::QmitkPreprocessingResampling()
 : QmitkAbstractView(),
-  m_Controls(NULL),
-  m_SelectedImageNode(NULL),
-  m_TimeStepperAdapter(NULL)
+  m_Controls(nullptr),
+  m_SelectedImageNode(nullptr),
+  m_TimeStepperAdapter(nullptr)
 {
 }
 
@@ -93,7 +90,7 @@ QmitkPreprocessingResampling::~QmitkPreprocessingResampling()
 
 void QmitkPreprocessingResampling::CreateQtPartControl(QWidget *parent)
 {
-  if (m_Controls == NULL)
+  if (m_Controls == nullptr)
   {
     m_Controls = new Ui::QmitkPreprocessingResamplingViewControls;
     m_Controls->setupUi(parent);
@@ -258,7 +255,7 @@ void QmitkPreprocessingResampling::StartButtonClicked()
   {
   QString exceptionString = tr("An error occured during image loading:\n");
   exceptionString.append( e.what() );
-    QMessageBox::warning( NULL, "Preprocessing - Resampling: ", exceptionString , QMessageBox::Ok, QMessageBox::NoButton );
+    QMessageBox::warning( nullptr, "Preprocessing - Resampling: ", exceptionString , QMessageBox::Ok, QMessageBox::NoButton );
     this->BusyCursorOff();
     return;
   }
@@ -268,7 +265,7 @@ void QmitkPreprocessingResampling::StartButtonClicked()
   {
     this->BusyCursorOff();
 
-    QMessageBox::warning( NULL, "Preprocessing - Resampling", tr("Input image is broken or not initialized. Returning."), QMessageBox::Ok, QMessageBox::NoButton );
+    QMessageBox::warning( nullptr, "Preprocessing - Resampling", tr("Input image is broken or not initialized. Returning."), QMessageBox::Ok, QMessageBox::NoButton );
     return;
   }
 
@@ -394,7 +391,7 @@ void QmitkPreprocessingResampling::StartButtonClicked()
   catch (...)
   {
     this->BusyCursorOff();
-    QMessageBox::warning(NULL, "Warning", "Problem when applying filter operation. Check your input...");
+    QMessageBox::warning(nullptr, "Warning", "Problem when applying filter operation. Check your input...");
     return;
   }
 

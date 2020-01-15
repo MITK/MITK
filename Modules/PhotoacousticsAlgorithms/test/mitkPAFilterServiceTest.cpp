@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
@@ -72,10 +68,11 @@ public:
       yDim * (0.0125 / 1000000) * (1500),
       false,
       16,
-      mitk::BeamformingSettings::DelayCalc::Spherical,
       mitk::BeamformingSettings::Apodization::Box,
       128,
-      mitk::BeamformingSettings::BeamformingAlgorithm::DAS);
+      mitk::BeamformingSettings::BeamformingAlgorithm::DAS,
+      mitk::BeamformingSettings::ProbeGeometry::Linear,
+      0);
 
     return outputSettings;
   }
@@ -99,7 +96,7 @@ public:
 
     for (int i = 0; i < length; ++i)
     {
-      CPPUNIT_ASSERT_MESSAGE(std::string("Input array already not correct: " + std::to_string(inputArray[i])), abs(inputArray[i]) < 1e-5f);
+      CPPUNIT_ASSERT_MESSAGE(std::string("Input array already not correct: " + std::to_string(inputArray[i])), std::abs(inputArray[i]) < 1e-5f);
     }
 
     auto output = m_PhotoacousticFilterService->ApplyBeamforming(testImage, m_BeamformingSettings);
@@ -109,7 +106,7 @@ public:
 
     for (int i = 0; i < length; ++i)
     {
-      CPPUNIT_ASSERT_MESSAGE(std::string("Output array not correct: " + std::to_string(abs(outputArray[i]))), abs(outputArray[i]) < 1e-5f);
+      CPPUNIT_ASSERT_MESSAGE(std::string("Output array not correct: " + std::to_string(std::abs(outputArray[i]))), std::abs(outputArray[i]) < 1e-5f);
     }
   }
 

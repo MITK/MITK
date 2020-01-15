@@ -1,3 +1,15 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
 #ifndef MITKTHREESTEPLINEARMODEL_H
 #define MITKTHREESTEPLINEARMODEL_H
 
@@ -54,49 +66,49 @@ namespace mitk
 
     static const unsigned int NUMBER_OF_PARAMETERS;
 
-    virtual std::string GetModelDisplayName() const override;
+    std::string GetModelDisplayName() const override;
 
-    virtual std::string GetModelType() const override;
+    std::string GetModelType() const override;
 
-    virtual FunctionStringType GetFunctionString() const override;
+    FunctionStringType GetFunctionString() const override;
 
-    virtual std::string GetXName() const override;
+    std::string GetXName() const override;
 
-    virtual ParameterNamesType GetParameterNames() const override;
+    ParameterNamesType GetParameterNames() const override;
 
-    virtual ParametersSizeType  GetNumberOfParameters() const override;
+    ParametersSizeType  GetNumberOfParameters() const override;
 
-    virtual ParamterUnitMapType GetParameterUnits() const override;
+    ParamterUnitMapType GetParameterUnits() const override;
 
-    virtual ParameterNamesType GetStaticParameterNames() const override;
+    ParameterNamesType GetStaticParameterNames() const override;
 
-    virtual ParametersSizeType GetNumberOfStaticParameters() const override;
+    ParametersSizeType GetNumberOfStaticParameters() const override;
 
-    virtual ParameterNamesType GetDerivedParameterNames() const override;
+    ParameterNamesType GetDerivedParameterNames() const override;
 
-    virtual ParametersSizeType  GetNumberOfDerivedParameters() const override;
+    ParametersSizeType  GetNumberOfDerivedParameters() const override;
 
-    virtual ParamterUnitMapType GetDerivedParameterUnits() const override;
+    ParamterUnitMapType GetDerivedParameterUnits() const override;
 
 
   protected:
     ThreeStepLinearModel() {};
-    virtual ~ThreeStepLinearModel(){};
+    ~ThreeStepLinearModel() override{};
 
 
     /**
      * Actual implementation of the clone method. This method should be reimplemeted
      * in subclasses to clone the extra required parameters.
      */
-    virtual itk::LightObject::Pointer InternalClone() const;
+    itk::LightObject::Pointer InternalClone() const override;
 
-    virtual ModelResultType ComputeModelfunction(const ParametersType& parameters) const;
-    virtual DerivedParameterMapType ComputeDerivedParameters(const mitk::ModelBase::ParametersType&
-        parameters) const;
+    ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
+    DerivedParameterMapType ComputeDerivedParameters(const mitk::ModelBase::ParametersType&
+        parameters) const override;
 
-    virtual void SetStaticParameter(const ParameterNameType& name,
-                                    const StaticParameterValuesType& values);
-    virtual StaticParameterValuesType GetStaticParameterValue(const ParameterNameType& name) const;
+    void SetStaticParameter(const ParameterNameType& name,
+                                    const StaticParameterValuesType& values) override;
+    StaticParameterValuesType GetStaticParameterValue(const ParameterNameType& name) const override;
 
   private:
 

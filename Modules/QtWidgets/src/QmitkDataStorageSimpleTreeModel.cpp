@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical Image Computing.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <QmitkDataStorageSimpleTreeModel.h>
 #include <QmitkDataStorageTreeModelInternalItem.h>
@@ -38,7 +34,7 @@ void QmitkDataStorageSimpleTreeModel::ResetTree()
 {
   mitk::DataNode::Pointer rootDataNode = mitk::DataNode::New();
   rootDataNode->SetName("Data Storage");
-  m_Root = new TreeItem(rootDataNode, 0);
+  m_Root = new TreeItem(rootDataNode, nullptr);
 }
 
 void QmitkDataStorageSimpleTreeModel::DataStorageChanged()
@@ -161,7 +157,7 @@ QmitkDataStorageSimpleTreeModel::TreeItem *QmitkDataStorageSimpleTreeModel::Tree
       return nullptr;
     }
     return item;
-  }    
+  }
   else
     return m_Root;
 }
@@ -297,7 +293,7 @@ mitk::DataNode *QmitkDataStorageSimpleTreeModel::GetParentNode(const mitk::DataN
 
 void QmitkDataStorageSimpleTreeModel::AddNodeInternal(const mitk::DataNode *node)
 {
-  if (node == nullptr || m_DataStorage.IsExpired() || !m_DataStorage.Lock()->Exists(node) || m_Root->Find(node) != 0)
+  if (node == nullptr || m_DataStorage.IsExpired() || !m_DataStorage.Lock()->Exists(node) || m_Root->Find(node) != nullptr)
     return;
 
   // find out if we have a root node

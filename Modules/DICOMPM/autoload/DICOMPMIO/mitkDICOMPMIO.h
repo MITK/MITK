@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef __mitkDICOMPMIO_h
 #define __mitkDICOMPMIO_h
@@ -33,8 +29,8 @@ namespace mitk
   class DICOMPMIO : public mitk::AbstractFileIO
   {
   public:
-    
-	
+
+
     DICOMPMIO();
 
     // -------------- AbstractFileReader -------------
@@ -46,13 +42,13 @@ namespace mitk
      * @return a  mitk::Image
      * @throws throws an mitk::Exception if an error ocurrs
      */
-    virtual std::vector<BaseData::Pointer> Read() override;
-    virtual ConfidenceLevel GetReaderConfidenceLevel() const override;
+    std::vector<BaseData::Pointer> Read() override;
+    ConfidenceLevel GetReaderConfidenceLevel() const override;
 
     // -------------- AbstractFileWriter -------------
 
-    virtual void Write() override;
-    virtual ConfidenceLevel GetWriterConfidenceLevel() const override;
+    void Write() override;
+    ConfidenceLevel GetWriterConfidenceLevel() const override;
 
   private:
 

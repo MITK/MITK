@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QmitkIGTTrackingDataEvaluationView_h
 #define QmitkIGTTrackingDataEvaluationView_h
@@ -20,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryISelectionListener.h>
 
 #include <QmitkFunctionality.h>
+#include <QmitkStdMultiWidget.h>
 
 #include "ui_QmitkIGTTrackingDataEvaluationViewControls.h"
 #include "mitkHummelProtocolEvaluation.h"
@@ -48,12 +45,12 @@ class QmitkIGTTrackingDataEvaluationView : public QmitkFunctionality
     static const std::string VIEW_ID;
 
     QmitkIGTTrackingDataEvaluationView();
-    virtual ~QmitkIGTTrackingDataEvaluationView();
+    ~QmitkIGTTrackingDataEvaluationView() override;
 
-    virtual void CreateQtPartControl(QWidget *parent);
+    void CreateQtPartControl(QWidget *parent) override;
 
-    virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-    virtual void StdMultiWidgetNotAvailable();
+    virtual void MultiWidgetAvailable(QmitkAbstractMultiWidget &multiWidget) override;
+    virtual void MultiWidgetNotAvailable() override;
 
   protected slots:
 

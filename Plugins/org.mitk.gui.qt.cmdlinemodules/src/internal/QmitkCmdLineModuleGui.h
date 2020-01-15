@@ -1,17 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) University College London (UCL).
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QmitkCmdLineModuleGui_h
 #define QmitkCmdLineModuleGui_h
@@ -46,7 +43,7 @@ class QmitkCmdLineModuleGui : public ctkCmdLineModuleFrontendQtGui
 
 public:
   QmitkCmdLineModuleGui(const mitk::DataStorage* dataStorage, const ctkCmdLineModuleReference& moduleRef);
-  virtual ~QmitkCmdLineModuleGui();
+  ~QmitkCmdLineModuleGui() override;
 
   /**
    * \brief Returns the top level widget containing the whole GUI, and
@@ -76,7 +73,7 @@ public:
    *
    * \sa ctkCmdLineModuleFrontend::value
    */
-  virtual QVariant value(const QString &parameter, int role) const override;
+  QVariant value(const QString &parameter, int role) const override;
 
   /**
    * \brief A custom method to enable the setting of mitk::DataNode::Pointer for input images.
@@ -92,7 +89,7 @@ public:
    *
    * \sa ctkCmdLineModuleFrontend::setValue
    */
-  virtual void setValue(const QString& parameter, const QVariant& value, int role = DisplayRole) override;
+  void setValue(const QString& parameter, const QVariant& value, int role = DisplayRole) override;
 
 protected:
 
@@ -100,13 +97,13 @@ protected:
    * \brief Virtual getter.
    * \see ctkCmdLineModuleFrontendQtGui::uiLoader()
    */
-  virtual QUiLoader* uiLoader() const override;
+  QUiLoader* uiLoader() const override;
 
   /**
    * \brief Virtual getter.
    * \see ctkCmdLineModuleFrontendQtGui::xslTransform()
    */
-  virtual ctkCmdLineModuleXslTransform* xslTransform() const override;
+  ctkCmdLineModuleXslTransform* xslTransform() const override;
 
 private:
 

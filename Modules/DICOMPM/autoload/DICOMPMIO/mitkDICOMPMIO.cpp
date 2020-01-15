@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef __mitkDICOMPMIO__cpp
 #define __mitkDICOMPMIO__cpp
@@ -56,7 +52,7 @@ namespace mitk
   {
   if (AbstractFileIO::GetWriterConfidenceLevel() == Unsupported)
     return Unsupported;
-	
+
   const Image *PMinput = static_cast<const Image *>(this->GetInput());
   if (PMinput)
   {
@@ -124,17 +120,17 @@ namespace mitk
     }
 
 	mitk::Image *mitkPMImage = const_cast<mitk::Image *>(PMinput);
-	// Cast input PMinput to itk image 
+	// Cast input PMinput to itk image
 	ImageToItk<PMitkInputImageType>::Pointer PMimageToItkFilter = ImageToItk<PMitkInputImageType>::New();
 	PMimageToItkFilter->SetInput(mitkPMImage);
-		
+
 	// Cast from original itk type to dcmqi input itk image type
 	typedef itk::CastImageFilter<PMitkInputImageType, PMitkInternalImageType> castItkImageFilterType;
 	castItkImageFilterType::Pointer castFilter = castItkImageFilterType::New();
 	castFilter->SetInput(PMimageToItkFilter->GetOutput());
 	castFilter->Update();
 	PMitkInternalImageType::Pointer itkParamapImage = castFilter->GetOutput();
-	
+
 	// Create PM meta information
     const std::string tmpMetaInfoFile = this->CreateMetaDataJsonFilePM();
 	// Convert itk PM images to dicom image
@@ -144,7 +140,7 @@ namespace mitk
 	    // convert from unique to raw pointer
 	    vector<DcmDataset*> rawVecDataset;
 	    for ( const auto& dcmDataSet : dcmDatasetsSourceImage ) { rawVecDataset.push_back( dcmDataSet.get() ); }
-        
+
 	    std::unique_ptr<dcmqi::ParaMapConverter> PMconverter(new dcmqi::ParaMapConverter());
 	    std::unique_ptr<DcmDataset> PMresult (PMconverter->itkimage2paramap(itkParamapImage, rawVecDataset, tmpMetaInfoFile));
 	    // Write dicom file
@@ -159,15 +155,15 @@ namespace mitk
 		MITK_ERROR << "An error occurred during writing the DICOM Paramap: " << e.what() << endl;
 		return;
 	  }
-	
+
   }
-  
+
   const std::string mitk::DICOMPMIO::CreateMetaDataJsonFilePM() const
-  {  
+  {
 	  const mitk::Image *PMimage = dynamic_cast<const mitk::Image *>(this->GetInput());
 	  dcmqi::JSONParametricMapMetaInformationHandler PMhandler;
 
-	  
+
 	  // Get Metadata from modelFitConstants
 	  std::string parameterName;
 	  PMimage->GetPropertyList()->GetStringProperty(ModelFitConstants::PARAMETER_NAME_PROPERTY_NAME().c_str(), parameterName);
@@ -179,11 +175,11 @@ namespace mitk
 	  pmPresets->LoadPreset();
 	  auto pmType_parameterName = pmPresets->GetType(parameterName);
 	  auto pmType_modelName = pmPresets->GetType(modelName);
-	  
+
 	  // Pass codes to Paramap Converter
 	  PMhandler.setDerivedPixelContrast("TCS");
 	  PMhandler.setFrameLaterality("U");
-	  PMhandler.setQuantityValueCode(pmType_parameterName.codeValue, pmType_parameterName.codeScheme, parameterName);	  
+	  PMhandler.setQuantityValueCode(pmType_parameterName.codeValue, pmType_parameterName.codeScheme, parameterName);
 	  PMhandler.setMeasurementMethodCode(pmType_modelName.codeValue, pmType_modelName.codeScheme, modelName);
 	  PMhandler.setMeasurementUnitsCode("/min", "UCUM", "/m");
 	  PMhandler.setSeriesNumber("1");
@@ -191,7 +187,7 @@ namespace mitk
 	  PMhandler.setDerivationCode("129104", "DCM", "Perfusion image analysis");
 	  PMhandler.setRealWorldValueSlope(1);
 
-    
+
 
 	  return PMhandler.getJSONOutputAsString();
 

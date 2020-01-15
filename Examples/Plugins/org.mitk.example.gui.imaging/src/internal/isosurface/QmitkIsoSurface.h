@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITK_ISOSURFACE_H__INCLUDED
 #define QMITK_ISOSURFACE_H__INCLUDED
@@ -34,15 +30,15 @@ class QmitkIsoSurface : public QmitkAbstractView
 public:
   QmitkIsoSurface(QObject *parent = nullptr, const char *name = nullptr);
 
-  virtual ~QmitkIsoSurface();
+  ~QmitkIsoSurface() override;
 
 private:
   /**
    * \brief method for creating the widget containing the application   controls, like sliders, buttons etc.
    */
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
   /**
    * \brief method for creating the connections of main and control widget

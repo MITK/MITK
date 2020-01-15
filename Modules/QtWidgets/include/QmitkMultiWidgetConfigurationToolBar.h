@@ -1,31 +1,30 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical Image Computing.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITKMULTIWIDGETCONFIGURATIONTOOLBAR_H
 #define QMITKMULTIWIDGETCONFIGURATIONTOOLBAR_H
 
 #include "MitkQtWidgetsExports.h"
 
+#include <mitkInteractionSchemeSwitcher.h>
+
+// qt
 #include <QToolBar>
 
-// mitk qtwidgets
-#include "QmitkMultiWidgetLayoutSelectionWidget.h"
+class QmitkAbstractMultiWidget;
+class QmitkMultiWidgetLayoutSelectionWidget;
 
 /**
-* @brief 
+* @brief
 *
 *
 */
@@ -35,25 +34,30 @@ class MITKQTWIDGETS_EXPORT QmitkMultiWidgetConfigurationToolBar : public QToolBa
 
 public:
 
-  QmitkMultiWidgetConfigurationToolBar();
+  QmitkMultiWidgetConfigurationToolBar(QmitkAbstractMultiWidget* multiWidget);
   ~QmitkMultiWidgetConfigurationToolBar() override;
 
 Q_SIGNALS:
 
   void LayoutSet(int row, int column);
   void Synchronized(bool synchronized);
+  void InteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme);
 
 protected Q_SLOTS:
 
   void OnSetLayout();
   void OnSynchronize();
+  void OnInteractionSchemeChanged();
 
 private:
 
   void InitializeToolBar();;
   void AddButtons();
 
+  QmitkAbstractMultiWidget* m_MultiWidget;
+
   QAction* m_SynchronizeAction;
+  QAction* m_InteractionSchemeChangeAction;
 
   QmitkMultiWidgetLayoutSelectionWidget* m_LayoutSelectionPopup;
 

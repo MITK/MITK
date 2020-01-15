@@ -1,3 +1,15 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
 #ifndef itkLocalStatisticFilter_h
 #define itkLocalStatisticFilter_h
 
@@ -24,14 +36,14 @@ namespace itk
 
     protected:
       LocalStatisticFilter();
-      ~LocalStatisticFilter(){};
+      ~LocalStatisticFilter() override{};
 
-      virtual void ThreadedGenerateData(const OutputImageRegionType & outputRegionForThread, ThreadIdType threadId);
-      virtual void BeforeThreadedGenerateData(void);
+      void ThreadedGenerateData(const OutputImageRegionType & outputRegionForThread, ThreadIdType threadId) override;
+      void BeforeThreadedGenerateData(void) override;
 
 
       using itk::ProcessObject::MakeOutput;
-      virtual itk::ProcessObject::DataObjectPointer MakeOutput(itk::ProcessObject::DataObjectPointerArraySizeType /*idx*/) override;
+      itk::ProcessObject::DataObjectPointer MakeOutput(itk::ProcessObject::DataObjectPointerArraySizeType /*idx*/) override;
 
       void CreateOutputImage(InputImagePointer input, OutputImagePointer output);
 

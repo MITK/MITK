@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <string.h>
 #include <assert.h>
@@ -22,7 +18,7 @@ static char* tagUNDO = "SEGMENTATION_UNDO";
 static char* tagUNDO_DATA = "DATA";
 static char* tagUNDO_LEVEL = "LEVEL";
 
-// Implemented in mitkIpPicDelT.c 
+// Implemented in mitkIpPicDelT.c
 static mitkIpPicTSV_t *_mitkIpPicRemoveTag( _mitkIpPicTagsElement_t **head,
                                     _mitkIpPicTagsElement_t *which,
                                     char *tag );

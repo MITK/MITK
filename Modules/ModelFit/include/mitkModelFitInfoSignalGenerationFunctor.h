@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKModelFitInfoSignalGenerationFunctor_H
 #define MITKModelFitInfoSignalGenerationFunctor_H
@@ -57,13 +53,13 @@ namespace  mitk
     itkSetConstObjectMacro(FitInfo, mitk::modelFit::ModelFitInfo);
     itkGetConstObjectMacro(FitInfo, mitk::modelFit::ModelFitInfo);
 
-    virtual IndexedValueFunctorBase::OutputPixelVectorType Compute(const InputPixelVectorType & value, const IndexType& currentIndex) const override;
+    IndexedValueFunctorBase::OutputPixelVectorType Compute(const InputPixelVectorType & value, const IndexType& currentIndex) const override;
     /** Convinient overload because this functor does not need the value */
     virtual IndexedValueFunctorBase::OutputPixelVectorType Compute(const IndexType& currentIndex) const;
 
-    virtual unsigned int GetNumberOfOutputs() const override;
+    unsigned int GetNumberOfOutputs() const override;
 
-    virtual GridArrayType GetGrid() const override;
+    GridArrayType GetGrid() const override;
 
   protected:
     /**Method is called by Compute() to specify the parameters used to generate the model signal for the current index.
@@ -73,7 +69,7 @@ namespace  mitk
 
     ModelFitInfoSignalGenerationFunctor();
 
-    virtual ~ModelFitInfoSignalGenerationFunctor();
+    ~ModelFitInfoSignalGenerationFunctor() override;
 
   private:
     ModelParameterizerBase::ConstPointer m_ModelParameterizer;

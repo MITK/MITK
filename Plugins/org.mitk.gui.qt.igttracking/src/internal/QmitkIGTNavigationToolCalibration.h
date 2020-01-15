@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #ifndef QmitkIGTNavigationToolCalibration_h
@@ -52,11 +48,11 @@ public:
 
 	QmitkIGTNavigationToolCalibration();
 
-  virtual ~QmitkIGTNavigationToolCalibration();
+  ~QmitkIGTNavigationToolCalibration() override;
 
   static const std::string VIEW_ID;
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  void CreateQtPartControl(QWidget *parent) override;
 
   protected slots:
 
@@ -81,7 +77,7 @@ public:
 
 protected:
 
-  virtual void SetFocus();
+  void SetFocus() override;
 
   void UpdateOffsetCoordinates();
 
@@ -133,7 +129,7 @@ protected:
   mitk::PointSet::Pointer m_RegistrationLandmarks;
   mitk::DataNode::Pointer m_RegistrationLandmarksNode;
 
-  //members and helper methods for tool axis calibration 
+  //members and helper methods for tool axis calibration
   mitk::Vector3D m_CalibratedToolAxis;
   mitk::NavigationData::Pointer  m_AxisCalibration_ToolToCalibrate;
   mitk::NavigationData::Pointer  m_AxisCalibration_NavDataCalibratingTool;

@@ -1,3 +1,15 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
 #ifndef mitkGIFNeighbouringGreyLevelDependenceFeatures_h
 #define mitkGIFNeighbouringGreyLevelDependenceFeatures_h
 
@@ -113,22 +125,22 @@ namespace mitk
       /**
       * \brief Calculates the Cooccurence-Matrix based features for this class.
       */
-      virtual FeatureListType CalculateFeatures(const Image::Pointer & image, const Image::Pointer &feature) override;
+      FeatureListType CalculateFeatures(const Image::Pointer & image, const Image::Pointer &feature) override;
 
       /**
       * \brief Returns a list of the names of all features that are calculated from this class
       */
-      virtual FeatureNameListType GetFeatureNames() override;
+      FeatureNameListType GetFeatureNames() override;
 
-      virtual std::string GetCurrentFeatureEncoding() override;
+      std::string GetCurrentFeatureEncoding() override;
 
       itkGetConstMacro(Range,double);
       itkSetMacro(Range, double);
     itkGetConstMacro(Alpha, int);
     itkSetMacro(Alpha, int);
 
-    virtual void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList);
-    virtual void AddArguments(mitkCommandLineParser &parser);
+    void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList) override;
+    void AddArguments(mitkCommandLineParser &parser) override;
 
 
     struct GIFNeighbouringGreyLevelDependenceFeatureConfiguration

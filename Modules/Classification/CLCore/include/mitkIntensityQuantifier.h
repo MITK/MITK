@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #ifndef mitkIntensityQuantifier_h
@@ -65,13 +61,13 @@ public:
 
 //#ifndef DOXYGEN_SKIP
 
-  virtual void SetRequestedRegionToLargestPossibleRegion() override {};
-  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override { return true; };
-  virtual bool VerifyRequestedRegion() override { return false; };
-  virtual void SetRequestedRegion (const itk::DataObject * /*data*/) override {};
+  void SetRequestedRegionToLargestPossibleRegion() override {};
+  bool RequestedRegionIsOutsideOfTheBufferedRegion() override { return true; };
+  bool VerifyRequestedRegion() override { return false; };
+  void SetRequestedRegion (const itk::DataObject * /*data*/) override {};
 
   // Override
-  virtual bool IsEmpty() const override
+  bool IsEmpty() const override
   {
     if(IsInitialized() == false)
       return true;

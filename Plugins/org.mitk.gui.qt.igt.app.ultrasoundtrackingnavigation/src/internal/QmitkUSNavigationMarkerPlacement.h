@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QmitkUSNAVIGATIONMARKERPLACEMENT_H
 #define QmitkUSNAVIGATIONMARKERPLACEMENT_H
@@ -126,9 +122,9 @@ public:
   static const char *DATANAME_REACHED_TARGETS;
 
   explicit QmitkUSNavigationMarkerPlacement();
-  ~QmitkUSNavigationMarkerPlacement();
+  ~QmitkUSNavigationMarkerPlacement() override;
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  void CreateQtPartControl(QWidget *parent) override;
 
   static const std::string VIEW_ID;
 
@@ -138,7 +134,7 @@ protected:
   /**
   * \brief A reinit on the ultrasound image is performed every time the view gets the focus.
   */
-  virtual void SetFocus();
+  void SetFocus() override;
 
   /**
   * \brief Helper function which performs a reinit on the ultrasound image.

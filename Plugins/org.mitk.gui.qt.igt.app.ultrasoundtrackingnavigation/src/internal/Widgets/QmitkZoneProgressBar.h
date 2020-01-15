@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITKZONEPROGRESSBAR_H
 #define QMITKZONEPROGRESSBAR_H
@@ -38,7 +34,7 @@ public:
    * \param maxRange the progress bar will be empty for distances greater or equal to this distance
    * \param warnRange the progess bar will change its color for distances smaller than this distance
    */
-  explicit QmitkZoneProgressBar(QString name, int maxRange, int warnRange, QWidget *parent = 0);
+  explicit QmitkZoneProgressBar(QString name, int maxRange, int warnRange, QWidget *parent = nullptr);
 
   /**
    * @param value the current distance to the zone

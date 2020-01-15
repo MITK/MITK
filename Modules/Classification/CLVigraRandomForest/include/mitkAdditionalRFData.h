@@ -1,3 +1,15 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
 #ifndef mitkAdditionalRFData_h
 #define mitkAdditionalRFData_h
 
@@ -17,16 +29,16 @@ namespace mitk
   class NoRFData : public AdditionalRFDataAbstract
   {
   public:
-    virtual void NoFunction() { return; }
-    virtual ~NoRFData() {};
+    void NoFunction() override { return; }
+    ~NoRFData() override {};
   };
 
   class PURFData : public AdditionalRFDataAbstract
   {
   public:
     vigra::ArrayVector<double> m_Kappa;
-    virtual void NoFunction();
-    virtual ~PURFData() {};
+    void NoFunction() override;
+    ~PURFData() override {};
   };
 }
 

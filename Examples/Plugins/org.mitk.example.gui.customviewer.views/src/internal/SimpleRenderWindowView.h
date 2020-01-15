@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef SimpleRenderWindowView_H_
 #define SimpleRenderWindowView_H_
@@ -45,7 +41,7 @@ public:
    */
   SimpleRenderWindowView();
 
-  ~SimpleRenderWindowView();
+  ~SimpleRenderWindowView() override;
 
   /**
    *  String based view identifier.
@@ -61,9 +57,6 @@ public:
    */
   QmitkRenderWindow *GetActiveQmitkRenderWindow() const override;
 
-  /**
-   * \see mitk::IRenderWindowPart::GetRenderWindows()
-   */
   QHash<QString, QmitkRenderWindow *> GetRenderWindows() const;
 
   /**
@@ -71,15 +64,17 @@ public:
    */
   QHash<QString, QmitkRenderWindow *> GetQmitkRenderWindows() const override;
 
-  /**
-   * \see mitk::IRenderWindowPart::GetRenderWindow(QString)
-   */
   QmitkRenderWindow *GetRenderWindow(const QString &id) const;
 
   /**
    * \see mitk::IRenderWindowPart::GetQmitkRenderWindow(QString)
    */
   QmitkRenderWindow *GetQmitkRenderWindow(const QString &id) const override;
+
+  /**
+  * \see mitk::IRenderWindowPart::GetQmitkRenderWindow(mitk::BaseRenderer::ViewDirection)
+  */
+  QmitkRenderWindow *GetQmitkRenderWindow(const mitk::BaseRenderer::ViewDirection &viewDirection) const override;
 
   /**
    * \see mitk::IRenderWindowPart::GetSelectionPosition()

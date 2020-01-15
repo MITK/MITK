@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKMODELDATAGENERATIONFUNCTOR_H
 #define MITKMODELDATAGENERATIONFUNCTOR_H
@@ -51,15 +47,15 @@ namespace  mitk
     itkSetConstObjectMacro(ModelParameterizer, ModelParameterizerBase);
     itkGetConstObjectMacro(ModelParameterizer, ModelParameterizerBase);
 
-    virtual SimpleFunctorBase::OutputPixelVectorType Compute(const InputPixelVectorType & value) const override;
+    SimpleFunctorBase::OutputPixelVectorType Compute(const InputPixelVectorType & value) const override;
 
-    virtual unsigned int GetNumberOfOutputs() const override;
+    unsigned int GetNumberOfOutputs() const override;
 
-    virtual GridArrayType GetGrid() const override;
+    GridArrayType GetGrid() const override;
 
   protected:
     ModelDataGenerationFunctor();
-    virtual ~ModelDataGenerationFunctor();
+    ~ModelDataGenerationFunctor() override;
 
   private:
     ModelParameterizerBase::ConstPointer m_ModelParameterizer;

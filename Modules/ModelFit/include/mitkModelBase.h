@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MODELBASE_H
 #define MODELBASE_H
@@ -79,43 +75,43 @@ namespace mitk
     typedef std::map<ParameterNameType, DerivedParameterValueType> DerivedParameterMapType;
 
     /**Default implementation returns a scale of 1.0 for every defined parameter.*/
-    virtual ParamterScaleMapType GetParameterScales() const;
+    ParamterScaleMapType GetParameterScales() const override;
 
     /**Default implementation returns no unit string ("") for every defined parameter.*/
-    virtual ParamterUnitMapType GetParameterUnits() const;
+    ParamterUnitMapType GetParameterUnits() const override;
 
     /**Default implementation returns a scale of 1.0 for every defined derived parameter.*/
-    virtual DerivedParamterScaleMapType GetDerivedParameterScales() const;
+    DerivedParamterScaleMapType GetDerivedParameterScales() const override;
 
     /**Default implementation returns no unit string ("") for every defined derived parameter.*/
-    virtual DerivedParamterUnitMapType GetDerivedParameterUnits() const;
+    DerivedParamterUnitMapType GetDerivedParameterUnits() const override;
 
     /**Default implementation returns GetClassID as display name.*/
-    virtual std::string GetModelDisplayName() const;
+    std::string GetModelDisplayName() const override;
 
     /**Default implementation returns "Unkown" as model type.*/
-    virtual std::string GetModelType() const;
+    std::string GetModelType() const override;
 
     /**Default implementation returns an empty functions string.*/
-    virtual FunctionStringType GetFunctionString() const;
+    FunctionStringType GetFunctionString() const override;
 
     /**Default implementation the class name of the concrete instance as ID.*/
-    virtual ModellClassIDType GetClassID() const;
+    ModellClassIDType GetClassID() const override;
 
     /**Default implementation returns an empty string.*/
-    virtual std::string GetXName() const;
+    std::string GetXName() const override;
 
     /**Default implementation returns an empty string.*/
-    virtual std::string GetXAxisName() const;
+    std::string GetXAxisName() const override;
 
     /**Default implementation returns an empty string.*/
-    virtual std::string GetXAxisUnit() const;
+    std::string GetXAxisUnit() const override;
 
     /**Default implementation returns an empty string.*/
-    virtual std::string GetYAxisName() const;
+    std::string GetYAxisName() const override;
 
     /**Default implementation returns an empty string.*/
-    virtual std::string GetYAxisUnit() const;
+    std::string GetYAxisUnit() const override;
 
     /** Returns the names of static parameters that will be used when using
      * the model to compute the signal (but are not defined via GetSignal()).*/
@@ -131,11 +127,11 @@ namespace mitk
     /** Returns the names of derived parameters that can/will be computed by the model
      * given specific model parameters.
      * @remark Default implementation has no derived parameters*/
-    virtual DerivedParameterNamesType GetDerivedParameterNames() const;
+    DerivedParameterNamesType GetDerivedParameterNames() const override;
     /** Returns the number of derived parameters that can/will be computed by the model
     * given specific model parameters.
     * @remark Default implementation has no derived parameters*/
-    virtual DerivedParametersSizeType GetNumberOfDerivedParameters() const;
+    DerivedParametersSizeType GetNumberOfDerivedParameters() const override;
 
     /** Generic interface method that can be used to set the static parameters of the model
      * before it is used.
@@ -198,9 +194,9 @@ namespace mitk
     virtual StaticParameterValuesType GetStaticParameterValue(const ParameterNameType& name) const = 0;
 
     ModelBase();
-    virtual ~ModelBase();
+    ~ModelBase() override;
 
-    virtual void PrintSelf(std::ostream& os, ::itk::Indent indent) const;
+    void PrintSelf(std::ostream& os, ::itk::Indent indent) const override;
 
     //timeGrid in seconds
 

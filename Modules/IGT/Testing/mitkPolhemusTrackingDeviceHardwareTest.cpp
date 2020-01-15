@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkPolhemusInterface.h"
 #include "mitkTestingMacros.h"
@@ -54,7 +50,7 @@ public:
       MITK_INFO << "Frame " << i;
       for (size_t j = 0; j < lastFrame.size(); j++)
       {
-        MITK_INFO << "[" << j << "]" << " Pos:" << lastFrame.at(j).pos << " Rot:" << lastFrame.at(j).rot;
+        MITK_INFO << "[" << j << "]" << " Pos: " << lastFrame.at(j).pos << " Rot: " << lastFrame.at(j).rot << " DistortionLevel: " << lastFrame.at(j).distortionLevel;
       }
     }
 

@@ -7,10 +7,15 @@ if( NOT OPENSSL_FOUND AND NOT SSL_EAY_RELEASE AND NOT LIB_EAY_RELEASE )
 endif()
 
 if( WIN32 AND EXISTS "${SSL_EAY_RELEASE}" AND EXISTS "${LIB_EAY_RELEASE}" )
+  foreach(config_type ${CMAKE_CONFIGURATION_TYPES})
+    execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${MITK_BINARY_DIR}/bin/${config_type}")
+  endforeach()
+
   configure_file( ${SSL_EAY_RELEASE} ${MITK_BINARY_DIR}/bin/Release/ COPYONLY )
   configure_file( ${LIB_EAY_RELEASE} ${MITK_BINARY_DIR}/bin/Release/ COPYONLY )
   configure_file( ${SSL_EAY_RELEASE} ${MITK_BINARY_DIR}/bin/Debug/ COPYONLY )
   configure_file( ${LIB_EAY_RELEASE} ${MITK_BINARY_DIR}/bin/Debug/ COPYONLY )
+
   MITK_INSTALL( FILES ${SSL_EAY_RELEASE})
   MITK_INSTALL( FILES ${LIB_EAY_RELEASE})
 endif()

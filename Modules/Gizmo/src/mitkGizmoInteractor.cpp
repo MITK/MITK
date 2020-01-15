@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkGizmoInteractor.h"
 #include "mitkGizmoMapper2D.h"
@@ -199,6 +195,12 @@ void mitk::GizmoInteractor::DecideInteraction(StateMachineAction *, InteractionE
     case Gizmo::ScaleX:
     case Gizmo::ScaleY:
     case Gizmo::ScaleZ:
+      // Implementation note: Why didn't we implement per-axis scaling yet?
+      // When this was implemented, the mitk::ScaleOperation was able to only describe
+      // uniform scaling around a central point. Since we use operations for all modifications
+      // in order to have undo/redo working, any axis-specific scaling should also
+      // use operations.
+      // Consequence: enhance ScaleOperation when there is need to have scaling per axis.
       decision = InternalEvent::New(interactionEvent->GetSender(), this, "ScaleEqually");
       break;
     default:
@@ -294,8 +296,7 @@ void mitk::GizmoInteractor::ApplyTranslationToManipulatedObject(const Vector3D &
   }
 
   manipulatedGeometry->ExecuteOperation(m_FinalDoOperation.get());
-  m_ManipulatedObjectGeometry->SetIdentity();
-  m_ManipulatedObjectGeometry->Compose(manipulatedGeometry->GetIndexToWorldTransform());
+  m_ManipulatedObjectGeometry->SetIndexToWorldTransform(manipulatedGeometry->GetIndexToWorldTransform());
 }
 
 void mitk::GizmoInteractor::ApplyEqualScalingToManipulatedObject(double scalingFactor)
@@ -310,8 +311,7 @@ void mitk::GizmoInteractor::ApplyEqualScalingToManipulatedObject(double scalingF
   }
 
   manipulatedGeometry->ExecuteOperation(m_FinalDoOperation.get());
-  m_ManipulatedObjectGeometry->SetIdentity();
-  m_ManipulatedObjectGeometry->Compose(manipulatedGeometry->GetIndexToWorldTransform());
+  m_ManipulatedObjectGeometry->SetIndexToWorldTransform(manipulatedGeometry->GetIndexToWorldTransform());
 }
 
 void mitk::GizmoInteractor::ApplyRotationToManipulatedObject(double angle_deg)
@@ -327,8 +327,7 @@ void mitk::GizmoInteractor::ApplyRotationToManipulatedObject(double angle_deg)
   }
 
   manipulatedGeometry->ExecuteOperation(m_FinalDoOperation.get());
-  m_ManipulatedObjectGeometry->SetIdentity();
-  m_ManipulatedObjectGeometry->Compose(manipulatedGeometry->GetIndexToWorldTransform());
+  m_ManipulatedObjectGeometry->SetIndexToWorldTransform(manipulatedGeometry->GetIndexToWorldTransform());
 }
 
 void mitk::GizmoInteractor::FeedUndoStack(StateMachineAction *, InteractionEvent *)

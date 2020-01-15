@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
- The Medical Imaging Interaction Toolkit (MITK)
+The Medical Imaging Interaction Toolkit (MITK)
 
- Copyright (c) German Cancer Research Center,
- Division of Medical and Biological Informatics.
- All rights reserved.
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
 
- This software is distributed WITHOUT ANY WARRANTY; without
- even the implied warranty of MERCHANTABILITY or FITNESS FOR
- A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
- See LICENSE.txt or http://www.mitk.org for details.
-
- ===================================================================*/
+============================================================================*/
 
 #ifndef mitkEventRecorder_h
 #define mitkEventRecorder_h
@@ -35,15 +31,15 @@ namespace mitk
      *  <?xml version="1.0"?>
      *  <interactions>
      *   <config>
-     *    <renderer RendererName="stdmulti.widget1" ViewDirection="0"/>
-     *    <renderer RendererName="stdmulti.widget2" ViewDirection="1"/>
-     *    <renderer RendererName="stdmulti.widget3" ViewDirection="2"/>
+     *    <renderer RendererName="stdmulti.widget0" ViewDirection="0"/>
+     *    <renderer RendererName="stdmulti.widget1" ViewDirection="1"/>
+     *    <renderer RendererName="stdmulti.widget2" ViewDirection="2"/>
      *   </config>
      *   <events>
      *    <event_variant class="MOUSEMOVEEVENT" >
      *     <attribute name="PositionOnScreen" value="491,388"/>
      *     <attribute name="PositionInWorld" value="128,235.771,124.816"/>
-     *     <attribute name="RendererName" value="stdmulti.widget2"/>
+     *     <attribute name="RendererName" value="stdmulti.widget1"/>
      *    </event_variant>
      *   </events>
      *  </interactions>

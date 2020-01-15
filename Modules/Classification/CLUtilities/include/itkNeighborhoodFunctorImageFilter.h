@@ -1,3 +1,15 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
 #ifndef itkNeighborhoodFunctorImageFilter_h
 #define itkNeighborhoodFunctorImageFilter_h
 
@@ -94,12 +106,12 @@ protected:
         m_BoundsCondition = static_cast< ImageBoundaryConditionPointerType >( &m_DefaultBoundaryCondition );
         this->SetNumberOfIndexedOutputs(FunctorType::OutputCount);
     }
-    ~NeighborhoodFunctorImageFilter(){}
+    ~NeighborhoodFunctorImageFilter() override{}
 
-    void BeforeThreadedGenerateData();
+    void BeforeThreadedGenerateData() override;
 
     void ThreadedGenerateData(const OutputImageRegionType & outputRegionForThread,
-                              ThreadIdType threadId);
+                              ThreadIdType threadId) override;
 
 
     /** NeighborhoodFunctorImageFilter needs a larger input requested

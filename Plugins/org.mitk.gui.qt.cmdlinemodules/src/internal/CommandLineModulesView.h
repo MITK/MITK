@@ -1,17 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) University College London (UCL).
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef CommandLineModulesView_h
 #define CommandLineModulesView_h
@@ -52,13 +49,13 @@ class CommandLineModulesView : public QmitkAbstractView
 public:
 
   CommandLineModulesView();
-  virtual ~CommandLineModulesView();
+  ~CommandLineModulesView() override;
 
   /**
    * \brief Main method, called by framework to create the GUI at the right time.
    * \param parent The parent QWidget, as this class itself is not a QWidget subclass.
    */
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
   /**
    * \brief Called by the framework to indicate that the preferences have changed.
@@ -96,7 +93,7 @@ protected:
    * \brief Called by framework to set the focus on the right widget
    * when this view has focus, so currently, thats the ctkMenuCombo box.
    */
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
 private slots:
 

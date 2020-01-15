@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkMITKSurfaceMaterialEditorView.h"
 
@@ -100,7 +96,7 @@ void QmitkMITKSurfaceMaterialEditorView::InitPreviewWindow()
 
   m_DataTree = mitk::StandaloneDataStorage::New();
 
-  m_DataTree->Add( m_DataNode , (mitk::DataNode *)0 );
+  m_DataTree->Add( m_DataNode , (mitk::DataNode *)nullptr );
 
   m_Controls->m_PreviewRenderWindow->GetRenderer()->SetDataStorage( m_DataTree );
   m_Controls->m_PreviewRenderWindow->GetRenderer()->SetMapperID( mitk::BaseRenderer::Standard3D );
@@ -117,7 +113,7 @@ void QmitkMITKSurfaceMaterialEditorView::RefreshPropertiesList()
   mitk::PropertyList* DstPL = DstND->GetPropertyList();
 
 
-  m_Controls->m_ShaderPropertyList->SetPropertyList( 0 );
+  m_Controls->m_ShaderPropertyList->SetPropertyList( nullptr );
 
   DstPL->Clear();
 

@@ -1,11 +1,13 @@
-message(STATUS "Fixing relative dependencies")
+message(STATUS "Make Boost libraries use RPATH")
 
 file(GLOB boost_dylibs ./libboost*.dylib)
 
-foreach(in ${boost_dylibs})
+foreach(boost_dylib ${boost_dylibs})
+  get_filename_component(boost_dylib ${boost_dylib} NAME)
+  execute_process(COMMAND install_name_tool -id @rpath/${boost_dylib} ${boost_dylib})
+
   foreach(other_boost_dylib ${boost_dylibs})
-    get_filename_component(from ${other_boost_dylib} NAME)
-    set(to "@rpath/${from}")
-    execute_process(COMMAND install_name_tool -change ${from} ${to} ${in})
+    get_filename_component(other_boost_dylib ${other_boost_dylib} NAME)
+    execute_process(COMMAND install_name_tool -change ${other_boost_dylib} @rpath/${other_boost_dylib} ${boost_dylib})
   endforeach()
 endforeach()

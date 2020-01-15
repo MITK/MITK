@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #include "org_mitk_gui_qt_fit_inspector_Activator.h"
@@ -28,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 void org_mitk_gui_qt_fit_inspector_Activator::start(ctkPluginContext* context)
 	{
 		BERRY_REGISTER_EXTENSION_CLASS(ModelFitInspectorView, context)
-		
+
   QmitkNodeDescriptorManager* manager = QmitkNodeDescriptorManager::GetInstance();
 
   mitk::StringProperty::Pointer parameterProp = mitk::StringProperty::New(mitk::ModelFitConstants::PARAMETER_TYPE_VALUE_PARAMETER().c_str());
@@ -46,7 +42,7 @@ void org_mitk_gui_qt_fit_inspector_Activator::start(ctkPluginContext* context)
   mitk::StringProperty::Pointer evalProp = mitk::StringProperty::New(mitk::ModelFitConstants::PARAMETER_TYPE_VALUE_EVALUATION_PARAMETER().c_str());
   mitk::NodePredicateProperty::Pointer isModelFitEvaluation = mitk::NodePredicateProperty::New(mitk::ModelFitConstants::PARAMETER_TYPE_PROPERTY_NAME().c_str(), evalProp);
   manager->AddDescriptor(new QmitkNodeDescriptor(tr("Image"), QString(":/ModelFitVisualization/eval_image.png"), isModelFitEvaluation, manager));
-  
+
 	}
 
 	void org_mitk_gui_qt_fit_inspector_Activator::stop(ctkPluginContext* context)

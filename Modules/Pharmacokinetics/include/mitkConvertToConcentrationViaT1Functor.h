@@ -1,3 +1,15 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
 #ifndef MITKCONVERTTOCONCENTRATIONVIAT1CALCFUNCTOR_H
 #define MITKCONVERTTOCONCENTRATIONVIAT1CALCFUNCTOR_H
 
@@ -17,12 +29,12 @@ namespace mitk {
 
         void initialize(double relaxivity, double TR, double flipangle)
         {
-		
+
 			m_relaxivity = relaxivity;
 			m_TR = TR;
             m_flipangle = flipangle;
         }
-		
+
         bool operator!=( const ConvertToConcentrationViaT1CalcFunctor & other) const
         {
             return !(*this == other);
@@ -32,7 +44,7 @@ namespace mitk {
         {
            return (this->m_relaxivity == other.m_relaxivity) && (this->m_TR == other.m_TR) && (this->m_flipangle == other.m_flipangle);
         }
-		
+
 
         inline TOutputpixel operator()( const TInputPixel1 & value, const TInputPixel2 & baseline, const TInputPixel3 & nativeT1)
         {

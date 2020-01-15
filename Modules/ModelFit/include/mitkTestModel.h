@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef __MITK_TEST_MODEL_H_
 #define __MITK_TEST_MODEL_H_
@@ -44,55 +40,55 @@ namespace mitk
     /** Run-time type information (and related methods). */
     itkTypeMacro(TestModel, ModelBase);
 
-    virtual ParamterScaleMapType GetParameterScales() const override;
+    ParamterScaleMapType GetParameterScales() const override;
 
-    virtual ParamterUnitMapType GetParameterUnits() const override;
+    ParamterUnitMapType GetParameterUnits() const override;
 
-    virtual std::string GetModelDisplayName() const override;
+    std::string GetModelDisplayName() const override;
 
-    virtual std::string GetModelType() const override;
+    std::string GetModelType() const override;
 
-    virtual FunctionStringType GetFunctionString() const override;
+    FunctionStringType GetFunctionString() const override;
 
-    virtual std::string GetXName() const override;
+    std::string GetXName() const override;
 
-    virtual std::string GetXAxisName() const override;
+    std::string GetXAxisName() const override;
 
-    virtual std::string GetXAxisUnit() const override;
+    std::string GetXAxisUnit() const override;
 
-    virtual std::string GetYAxisName() const override;
+    std::string GetYAxisName() const override;
 
-    virtual std::string GetYAxisUnit() const override;
+    std::string GetYAxisUnit() const override;
 
-    virtual ParameterNamesType GetParameterNames() const override;
+    ParameterNamesType GetParameterNames() const override;
 
-    virtual ParametersSizeType  GetNumberOfParameters() const override;
+    ParametersSizeType  GetNumberOfParameters() const override;
 
-    virtual ParameterNamesType GetStaticParameterNames() const override;
+    ParameterNamesType GetStaticParameterNames() const override;
 
-    virtual ParametersSizeType GetNumberOfStaticParameters() const override;
+    ParametersSizeType GetNumberOfStaticParameters() const override;
 
-    virtual ParameterNamesType GetDerivedParameterNames() const override;
+    ParameterNamesType GetDerivedParameterNames() const override;
 
-    virtual ParametersSizeType  GetNumberOfDerivedParameters() const override;
+    ParametersSizeType  GetNumberOfDerivedParameters() const override;
 
   protected:
     TestModel() {};
-    virtual ~TestModel() {};
+    ~TestModel() override {};
 
     /**
      * Actual implementation of the clone method. This method should be reimplemeted
      * in subclasses to clone the extra required parameters.
      */
-    virtual itk::LightObject::Pointer InternalClone() const;
+    itk::LightObject::Pointer InternalClone() const override;
 
-    virtual ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
-    virtual DerivedParameterMapType ComputeDerivedParameters(const mitk::ModelBase::ParametersType&
+    ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
+    DerivedParameterMapType ComputeDerivedParameters(const mitk::ModelBase::ParametersType&
         parameters) const override;
 
-    virtual void SetStaticParameter(const ParameterNameType& name,
-                                    const StaticParameterValuesType& values);
-    virtual StaticParameterValuesType GetStaticParameterValue(const ParameterNameType& name) const
+    void SetStaticParameter(const ParameterNameType& name,
+                                    const StaticParameterValuesType& values) override;
+    StaticParameterValuesType GetStaticParameterValue(const ParameterNameType& name) const
     override;
 
   private:

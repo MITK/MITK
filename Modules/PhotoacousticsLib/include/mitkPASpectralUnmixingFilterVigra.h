@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKPHOTOACOUSTICSPECTRALUNMIXINGFILTERVIGRA_H
 #define MITKPHOTOACOUSTICSPECTRALUNMIXINGFILTERVIGRA_H
@@ -84,7 +80,7 @@ namespace mitk {
 
     protected:
       SpectralUnmixingFilterVigra();
-      virtual ~SpectralUnmixingFilterVigra();
+      ~SpectralUnmixingFilterVigra() override;
 
       /**
       * \brief overrides the baseclass method with a mehtod to calculate the spectral unmixing result vector. Herain it first converts the
@@ -96,7 +92,7 @@ namespace mitk {
       * so the pixelvalue of the first wavelength is stored in inputVector[0] and so on.
       * @throws if the algorithmName is not a member of the enum VigraAlgortihmType
       */
-      virtual Eigen::VectorXf SpectralUnmixingAlgorithm(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix,
+      Eigen::VectorXf SpectralUnmixingAlgorithm(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix,
         Eigen::VectorXf inputVector) override;
 
     private:

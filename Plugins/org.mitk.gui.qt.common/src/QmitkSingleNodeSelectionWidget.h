@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #ifndef QMITK_SINGLE_NODE_SELECTION_WIDGET_H
@@ -42,15 +38,15 @@ class MITK_QT_COMMON QmitkSingleNodeSelectionWidget : public QmitkAbstractNodeSe
 
 public:
   explicit QmitkSingleNodeSelectionWidget(QWidget* parent = nullptr);
-  ~QmitkSingleNodeSelectionWidget();
+  ~QmitkSingleNodeSelectionWidget() override;
 
   mitk::DataNode::Pointer GetSelectedNode() const;
 
   using NodeList = QmitkAbstractNodeSelectionWidget::NodeList;
 
 public Q_SLOTS:
-  virtual void SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes) override;
-  virtual void SetCurrentSelection(NodeList selectedNodes) override;
+  void SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes) override;
+  void SetCurrentSelection(NodeList selectedNodes) override;
 
 protected Q_SLOTS:
   virtual void OnClearSelection();

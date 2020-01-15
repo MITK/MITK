@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkRadiomicsStatisticView.h"
 
@@ -205,8 +201,8 @@ void QmitkRadiomicsStatistic::executeButtonPressed()
 {
   QmitkDataStorageComboBox * cb_image = dynamic_cast<QmitkDataStorageComboBox *>(m_Controls->m_InputImageGroup->layout()->itemAt(1)->widget());
   QmitkDataStorageComboBox * cb_maskimage = dynamic_cast<QmitkDataStorageComboBox *>(m_Controls->m_InputImageGroup->layout()->itemAt(3)->widget());
-  mitk::BaseData* baseDataRawImage = NULL;
-  mitk::BaseData* baseDataMaskImage = NULL;
+  mitk::BaseData* baseDataRawImage = nullptr;
+  mitk::BaseData* baseDataMaskImage = nullptr;
 
   mitk::Image::Pointer raw_image;
   mitk::Image::Pointer mask_image;
@@ -220,7 +216,7 @@ void QmitkRadiomicsStatistic::executeButtonPressed()
     baseDataRawImage = (cb_image->GetSelectedNode()->GetData());
     baseDataMaskImage = (cb_maskimage->GetSelectedNode()->GetData());
   }
-  if ((baseDataRawImage != NULL) && (baseDataMaskImage != NULL))
+  if ((baseDataRawImage != nullptr) && (baseDataMaskImage != nullptr))
   {
     raw_image = dynamic_cast<mitk::Image *>(baseDataRawImage);
     mask_image = dynamic_cast<mitk::Image *>(baseDataMaskImage);
@@ -245,7 +241,7 @@ void QmitkRadiomicsStatistic::executeButtonPressed()
     auto parameter = this->GenerateParameters();
 
     mitkUI::GIFConfigurationPanel* gifPanel = dynamic_cast<mitkUI::GIFConfigurationPanel*>(m_Controls->m_FeaturesGroup->layout()->itemAt(i)->widget());
-    if (gifPanel == NULL)
+    if (gifPanel == nullptr)
       continue;
     gifPanel->CalculateFeaturesUsingParameters(raw_image, mask_image, parameter, stats);
   }

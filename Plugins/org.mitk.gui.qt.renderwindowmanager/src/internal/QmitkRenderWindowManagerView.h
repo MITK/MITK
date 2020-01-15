@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITKRENDERWINDOWMANAGERVIEW_H
 #define QMITKRENDERWINDOWMANAGERVIEW_H
@@ -43,15 +39,15 @@ public:
 
   static const std::string VIEW_ID;
 
-  virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
-  virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
-  virtual void RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart) override;
 
 protected:
 
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
-  virtual void CreateQtPartControl(QWidget* parent) override;
+  void CreateQtPartControl(QWidget* parent) override;
 
 private Q_SLOTS:
 
@@ -66,6 +62,8 @@ private:
 
   void SetControlledRenderer();
 
+  void RenderWindowChanged();
+
   QWidget* m_Parent;
   Ui::QmitkRenderWindowManagerControls m_Controls;
 
@@ -75,7 +73,7 @@ private:
   QAbstractItemView* m_InspectorView;
   QmitkDataNodeContextMenu* m_DataNodeContextMenu;
 
-  virtual QItemSelectionModel* GetDataNodeSelectionModel() const override;
+  QItemSelectionModel* GetDataNodeSelectionModel() const override;
 };
 
 #endif // QMITKRENDERWINDOWMANAGERVIEW_H

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITKSTATISTICSTREEMODEL_H
 #define QMITKSTATISTICSTREEMODEL_H
@@ -54,31 +50,31 @@ public:
   //////////////////////////////////////////////////////////////////////////
   // overridden virtual functions from QAbstractItemModel
   //////////////////////////////////////////////////////////////////////////
-  virtual QModelIndex index(int row, int column, const QModelIndex& itemIndex = QModelIndex()) const override;
-  virtual QModelIndex parent(const QModelIndex& itemIndex) const override;
+  QModelIndex index(int row, int column, const QModelIndex& itemIndex = QModelIndex()) const override;
+  QModelIndex parent(const QModelIndex& itemIndex) const override;
 
-  virtual int rowCount(const QModelIndex& itemIndex = QModelIndex()) const override;
-  virtual int columnCount(const QModelIndex& itemIndex = QModelIndex()) const override;
+  int rowCount(const QModelIndex& itemIndex = QModelIndex()) const override;
+  int columnCount(const QModelIndex& itemIndex = QModelIndex()) const override;
 
-  virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
-  virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
   //////////////////////////////////////////////////////////////////////////
   // end override
   //////////////////////////////////////////////////////////////////////////
 
 protected:
 
-  virtual void DataStorageChanged() override;
-  virtual void NodePredicateChanged() override { }
-  virtual void NodeAdded(const mitk::DataNode*) override;
-  virtual void NodeChanged(const mitk::DataNode*) override;
-  virtual void NodeRemoved(const mitk::DataNode*) override;
+  void DataStorageChanged() override;
+  void NodePredicateChanged() override { }
+  void NodeAdded(const mitk::DataNode*) override;
+  void NodeChanged(const mitk::DataNode*) override;
+  void NodeRemoved(const mitk::DataNode*) override;
   /**
   * @brief Overridden from 'QmitkAbstractSemanticRelationsStorageModel': This function retrieves all control points
   *        of the current case and stores them to define the header of the tree.
   *        Furthermore all lesions are retrieved and the lesion data is stored and show in the tree view.
   */
-  virtual void SetData() override;
+  void SetData() override;
 
 private:
 

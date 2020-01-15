@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef __CONCRETE_MODEL_PARAMETERIZER_BASE_H
 #define __CONCRETE_MODEL_PARAMETERIZER_BASE_H
@@ -48,7 +44,7 @@ namespace mitk
     /* Returns the global static parameters for the model.
      * @remark this default implementation assumes no global static parameters exist.
      * Thus an empty map is returned.*/
-    virtual StaticParameterMapType GetGlobalStaticParameters() const
+    StaticParameterMapType GetGlobalStaticParameters() const override
     {
       StaticParameterMapType result;
       return result;
@@ -57,7 +53,7 @@ namespace mitk
     /* Returns the local static parameters for the model at the given index.
      * @remark this default implementation assumes no local static parameters exist.
      * Thus an empty map is returned.*/
-    virtual StaticParameterMapType GetLocalStaticParameters(const IndexType& /*currentPosition*/) const
+    StaticParameterMapType GetLocalStaticParameters(const IndexType& /*currentPosition*/) const override
     {
       StaticParameterMapType result;
       return result;
@@ -67,7 +63,7 @@ namespace mitk
      * It is parameterized by the static parameters (returns of GetGlobalParameter() and
      * GetLocalParameter()).
      */
-    virtual ModelBasePointer GenerateParameterizedModel(const IndexType& currentPosition) const override
+    ModelBasePointer GenerateParameterizedModel(const IndexType& currentPosition) const override
     {
       ModelPointer newModel = ModelType::New();
       StaticParameterMapType params = this->GetGlobalStaticParameters();
@@ -80,7 +76,7 @@ namespace mitk
       return newModel.GetPointer();
     };
 
-    virtual ModelBasePointer GenerateParameterizedModel() const override
+    ModelBasePointer GenerateParameterizedModel() const override
     {
       ModelPointer newModel = ModelType::New();
       StaticParameterMapType params = this->GetGlobalStaticParameters();
@@ -94,7 +90,7 @@ namespace mitk
     /* Returns a parameterization filled with zeros.
      * @remark this default implementation assumes no special initial parameterization is suggested.
      * Thus an zero filled vector is returned.*/
-    virtual ParametersType GetDefaultInitialParameterization() const
+    ParametersType GetDefaultInitialParameterization() const override
     {
       ModelPointer newModel = ModelType::New();
       ParametersType params;
@@ -104,87 +100,87 @@ namespace mitk
       return params;
     };
 
-    virtual ParameterNamesType GetParameterNames() const  override
+    ParameterNamesType GetParameterNames() const  override
     {
       return GenerateParameterizedModel()->GetParameterNames();
     };
 
-    virtual ParametersSizeType GetNumberOfParameters() const override
+    ParametersSizeType GetNumberOfParameters() const override
     {
       return GenerateParameterizedModel()->GetNumberOfParameters();
     };
 
-    virtual ParamterScaleMapType GetParameterScales() const override
+    ParamterScaleMapType GetParameterScales() const override
     {
       return GenerateParameterizedModel()->GetParameterScales();
     };
 
-    virtual ParamterUnitMapType GetParameterUnits() const override
+    ParamterUnitMapType GetParameterUnits() const override
     {
       return GenerateParameterizedModel()->GetParameterUnits();
     };
 
-    virtual ParameterNamesType GetDerivedParameterNames() const override
+    ParameterNamesType GetDerivedParameterNames() const override
     {
       return GenerateParameterizedModel()->GetDerivedParameterNames();
     };
 
-    virtual ParametersSizeType GetNumberOfDerivedParameters() const override
+    ParametersSizeType GetNumberOfDerivedParameters() const override
     {
       return GenerateParameterizedModel()->GetNumberOfDerivedParameters();
     };
 
-    virtual DerivedParamterScaleMapType GetDerivedParameterScales() const override
+    DerivedParamterScaleMapType GetDerivedParameterScales() const override
     {
       return GenerateParameterizedModel()->GetDerivedParameterScales();
     };
 
-    virtual DerivedParamterUnitMapType GetDerivedParameterUnits() const override
+    DerivedParamterUnitMapType GetDerivedParameterUnits() const override
     {
       return GenerateParameterizedModel()->GetDerivedParameterUnits();
     };
 
-    virtual std::string GetModelDisplayName() const override
+    std::string GetModelDisplayName() const override
     {
       return GenerateParameterizedModel()->GetModelDisplayName();
     };
 
-    virtual std::string GetModelType() const override
+    std::string GetModelType() const override
     {
       return GenerateParameterizedModel()->GetModelType();
     };
 
-    virtual FunctionStringType GetFunctionString() const override
+    FunctionStringType GetFunctionString() const override
     {
       return GenerateParameterizedModel()->GetFunctionString();
     };
 
-    virtual ModellClassIDType GetClassID() const override
+    ModellClassIDType GetClassID() const override
     {
       return GenerateParameterizedModel()->GetClassID();
     };
 
-    virtual std::string GetXName() const override
+    std::string GetXName() const override
     {
       return GenerateParameterizedModel()->GetXName();
     };
 
-    virtual std::string GetXAxisName() const override
+    std::string GetXAxisName() const override
     {
       return GenerateParameterizedModel()->GetXAxisName();
     };
 
-    virtual std::string GetXAxisUnit() const override
+    std::string GetXAxisUnit() const override
     {
       return GenerateParameterizedModel()->GetXAxisUnit();
     };
 
-    virtual std::string GetYAxisName() const override
+    std::string GetYAxisName() const override
     {
       return GenerateParameterizedModel()->GetYAxisName();
     };
 
-    virtual std::string GetYAxisUnit() const override
+    std::string GetYAxisUnit() const override
     {
       return GenerateParameterizedModel()->GetYAxisUnit();
     }
@@ -194,7 +190,7 @@ namespace mitk
     {
     };
 
-    virtual ~ConcreteModelParameterizerBase()
+    ~ConcreteModelParameterizerBase() override
     {
     };
 

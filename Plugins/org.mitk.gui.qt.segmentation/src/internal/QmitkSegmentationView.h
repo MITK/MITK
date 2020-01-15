@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITKSEGMENTATIONVIEW_H
 #define QMITKSEGMENTATIONVIEW_H
@@ -40,7 +36,7 @@ public:
 
   QmitkSegmentationView();
 
-  virtual ~QmitkSegmentationView();
+  ~QmitkSegmentationView() override;
 
   typedef std::map<mitk::DataNode*, unsigned long> NodeTagMapType;
 
@@ -48,28 +44,28 @@ public:
   \brief Invoked when the DataManager selection changed
   */
   virtual void OnSelectionChanged(mitk::DataNode* node);
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
   // reaction to new segmentations being created by segmentation tools
   void NewNodesGenerated();
   void NewNodeObjectsGenerated(mitk::ToolManager::DataVectorType*);
 
-  virtual void Activated() override;
-  virtual void Deactivated() override;
-  virtual void Visible() override;
-  virtual void Hidden() override;
+  void Activated() override;
+  void Deactivated() override;
+  void Visible() override;
+  void Hidden() override;
 
   ///
   /// Sets the focus to an internal widget.
   ///
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
-  virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
 
-  virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
 
   // BlueBerry's notification about preference changes (e.g. from a dialog)
-  virtual void OnPreferencesChanged(const berry::IBerryPreferences* prefs) override;
+  void OnPreferencesChanged(const berry::IBerryPreferences* prefs) override;
 
   // observer to mitk::RenderingManager's RenderingManagerViewsInitializedEvent event
   void RenderingManagerReinitialized();
@@ -103,7 +99,7 @@ protected:
   typedef std::vector<mitk::DataNode*> NodeList;
 
   // GUI setup
-  virtual void CreateQtPartControl(QWidget* parent) override;
+  void CreateQtPartControl(QWidget* parent) override;
 
   // reactions to selection events from data manager (and potential other senders)
   //void BlueBerrySelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection);

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKUSPOINTMARKINTERACTOR_H
 #define MITKUSPOINTMARKINTERACTOR_H
@@ -41,19 +37,19 @@ namespace mitk
     static void UpdateSurface(itk::SmartPointer<mitk::DataNode>);
 
     USPointMarkInteractor();
-    virtual ~USPointMarkInteractor();
+    ~USPointMarkInteractor() override;
 
     /**
      * \brief Connects the functions from the state machine to methods of this class.
      */
-    virtual void ConnectActionsAndFunctions() override;
+    void ConnectActionsAndFunctions() override;
 
     /**
      * \brief Sets empty surface as data for the new data node.
      * This is necessary as data nodes without data do not work
      * with data interactors.
      */
-    virtual void DataNodeChanged() override;
+    void DataNodeChanged() override;
 
     /**
      * \brief Set current position as origin to the data node.

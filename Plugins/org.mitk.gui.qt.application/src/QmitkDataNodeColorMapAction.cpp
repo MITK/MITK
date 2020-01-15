@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <QmitkDataNodeColorMapAction.h>
 
@@ -117,7 +113,7 @@ void QmitkDataNodeColorMapAction::OnActionTriggered(bool /*checked*/)
       continue;
     }
 
-    mitk::LookupTable::Pointer renderWindowSpecificLutTab = lookupTable->Clone();
+    mitk::LookupTable::Pointer renderWindowSpecificLuT = lookupTable->Clone();
 
     QAction* senderAction = qobject_cast<QAction*>(QObject::sender());
     if (nullptr == senderAction)
@@ -127,8 +123,8 @@ void QmitkDataNodeColorMapAction::OnActionTriggered(bool /*checked*/)
 
     // set lookup table type defined by the action string
     std::string activatedItem = senderAction->text().toStdString();
-    renderWindowSpecificLutTab->SetType(activatedItem);
-    dataNode->SetProperty("LookupTable", mitk::LookupTableProperty::New(renderWindowSpecificLutTab), baseRenderer);
+    renderWindowSpecificLuT->SetType(activatedItem);
+    dataNode->SetProperty("LookupTable", mitk::LookupTableProperty::New(renderWindowSpecificLuT), baseRenderer);
 
     if (mitk::LookupTable::LookupTableType::MULTILABEL == lookupTable->GetActiveType())
     {

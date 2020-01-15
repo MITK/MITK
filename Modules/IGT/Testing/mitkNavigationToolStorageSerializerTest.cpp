@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 //testing headers
 #include <mitkTestingMacros.h>
@@ -83,12 +79,11 @@ public:
 
   void TestWriteSimpleToolStorage()
   {
-  //create Tool Storage
+    //create Tool Storage
     mitk::NavigationToolStorage::Pointer myStorage = mitk::NavigationToolStorageTestHelper::CreateTestData_SimpleStorage();
 
-  //test serialization
-  bool success = m_Serializer->Serialize(m_FileName1,myStorage);
-  CPPUNIT_ASSERT_MESSAGE("Testing serialization of simple tool storage",success);
+    //test serialization
+    CPPUNIT_ASSERT_NO_THROW_MESSAGE("Testing serialization of simple tool storage", m_Serializer->Serialize(m_FileName1, myStorage));
   }
 
   void TestWriteComplexToolStorage()
@@ -97,8 +92,7 @@ public:
     mitk::NavigationToolStorage::Pointer myStorage = mitk::NavigationToolStorageTestHelper::CreateTestData_ComplexStorage(GetTestDataFilePath("ClaronTool"),GetTestDataFilePath("IGT-Data/ClaronTool.stl"),GetTestDataFilePath("IGT-Data/EMTool.stl"));
 
     //test serialization
-    bool success = m_Serializer->Serialize(m_FileName1,myStorage);
-    CPPUNIT_ASSERT_MESSAGE("Testing serialization of complex tool storage",success);
+    CPPUNIT_ASSERT_NO_THROW_MESSAGE("Testing serialization of complex tool storage", m_Serializer->Serialize(m_FileName1, myStorage));
   }
 
   void TestWriteStorageToInvalidFile()
@@ -123,8 +117,7 @@ public:
     mitk::NavigationToolStorage::Pointer myStorage = mitk::NavigationToolStorage::New();
 
     //test serialization
-    bool success = m_Serializer->Serialize(m_FileName1,myStorage);
-    CPPUNIT_ASSERT_MESSAGE("Testing serialization of simple tool storage",success);
+    CPPUNIT_ASSERT_NO_THROW_MESSAGE("Testing serialization of simple tool storage", m_Serializer->Serialize(m_FileName1, myStorage));
   }
 
   void TestSerializerForExceptions()

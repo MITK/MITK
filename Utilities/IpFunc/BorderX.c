@@ -1,48 +1,42 @@
-/*****************************************************************************
+/*============================================================================
 
- Copyright (c) 1993-2000,  Div. Medical and Biological Informatics, 
- Deutsches Krebsforschungszentrum, Heidelberg, Germany
+ Copyright (c) German Cancer Research Center (DKFZ)
  All rights reserved.
 
- Redistribution and use in source and binary forms, with or without 
+ Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
 
  - Redistributions of source code must retain the above copyright notice, this
    list of conditions and the following disclaimer.
 
- - Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+ - Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
- - All advertising materials mentioning features or use of this software must 
-   display the following acknowledgement: 
-          
-     "This product includes software developed by the Div. Medical and 
-      Biological Informatics, Deutsches Krebsforschungszentrum, Heidelberg, 
-      Germany."
+ - All advertising materials mentioning features or use of this software must
+   display the following acknowledgement:
 
- - Neither the name of the Deutsches Krebsforschungszentrum nor the names of 
-   its contributors may be used to endorse or promote products derived from 
-   this software without specific prior written permission. 
+     "This product includes software developed by the German Cancer Research
+      Center (DKFZ)."
 
-   THIS SOFTWARE IS PROVIDED BY THE DIVISION MEDICAL AND BIOLOGICAL
-   INFORMATICS AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED
-   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-   OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-   IN NO EVENT SHALL THE DIVISION MEDICAL AND BIOLOGICAL INFORMATICS,
-   THE DEUTSCHES KREBSFORSCHUNGSZENTRUM OR CONTRIBUTORS BE LIABLE FOR 
-   ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-   DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE 
-   GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER 
-   IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN 
-   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ - Neither the name of the German Cancer Research Center (DKFZ) nor the names
+   of its contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
 
- Send comments and/or bug reports to:
-   mbi-software@dkfz-heidelberg.de
+   THIS SOFTWARE IS PROVIDED BY THE GERMAN CANCER RESEARCH CENTER (DKFZ) AND
+   CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+   BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+   FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE GERMAN
+   CANCER RESEARCH CENTER (DKFZ) OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+   INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+   SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+   OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+   DAMAGE.
 
-*****************************************************************************/
+============================================================================*/
 
 /** @file
  *  This function sets all border pixels to a spezified value.
@@ -53,7 +47,7 @@
  *  The size of the border is calculated using the size of the single
  *  dimensions of the mask (dim/2)
  *
- * 
+ *
  *  @param pic_old input image
  *  @param mask mask which is used to calculate the border size
  *  @param value border value
@@ -78,7 +72,7 @@ mitkIpPicDescriptor *mitkIpFuncBorderX ( mitkIpPicDescriptor *pic_old,
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
-  static char *what = { "@(#)????????\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)????????\t\tGerman Cancer Research Center (DKFZ)\t"__DATE__ };
 #endif
 
 
@@ -200,16 +194,16 @@ mitkIpPicDescriptor *mitkIpFuncBorderX ( mitkIpPicDescriptor *pic_old,
 
   if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( _mitkIpFuncError ( mask ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
-  if ( ( pic_old->dim != mask->dim ) || ( mask->dim > 3 ) ) 
-    { 
+  if ( ( pic_old->dim != mask->dim ) || ( mask->dim > 3 ) )
+    {
        _mitkIpFuncSetErrno ( mitkIpFuncDIM_ERROR );
        return ( mitkIpFuncERROR );
     }
 
   for ( i = 0; i < pic_old->dim; i++ )
     {
-       if ( pic_old->n[i] <= mask->n[i]  ) 
-         { 
+       if ( pic_old->n[i] <= mask->n[i]  )
+         {
             _mitkIpFuncSetErrno ( mitkIpFuncUNFIT_ERROR );
             return ( mitkIpFuncERROR );
          }
@@ -225,13 +219,13 @@ mitkIpPicDescriptor *mitkIpFuncBorderX ( mitkIpPicDescriptor *pic_old,
        _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
        return ( mitkIpFuncERROR );
     }
-    
+
   /* create a new picture, copy the header, allocate memory             */
 
   /*  pic_new = _mitkIpFuncMalloc ( pic_old, pic_rtn, mitkIpOVERWRITE );*/
   if ( pic_rtn == NULL )
      pic_new = mitkIpPicClone ( pic_old );
-  else 
+  else
      pic_new = pic_old;
 
   if ( pic_new == NULL ) return ( mitkIpFuncERROR );
@@ -243,13 +237,13 @@ mitkIpPicDescriptor *mitkIpFuncBorderX ( mitkIpPicDescriptor *pic_old,
     size[i] = size[i-1] * pic_old->n[i-1];
   size[pic_old->dim] = 0;
 
-  mitkIpPicFORALL_2 ( BORDER, pic_old, size, value )    
+  mitkIpPicFORALL_2 ( BORDER, pic_old, size, value )
 
   /* Copy Tags */
 
   mitkIpFuncCopyTags(pic_new, pic_old);
-  
-  
+
+
 
   return ( pic_new );
 }

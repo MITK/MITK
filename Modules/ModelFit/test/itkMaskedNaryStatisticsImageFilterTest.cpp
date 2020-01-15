@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "itkImage.h"
 #include "itkImageRegionIterator.h"
@@ -22,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestingMacros.h"
 #include "mitkVector.h"
 
-#include "mitkTestArtifactGenerator.h"
+#include "mitkTestDynamicImageGenerator.h"
 
 int itkMaskedNaryStatisticsImageFilterTest(int  /*argc*/ , char*[] /*argv[]*/)
 {
@@ -55,7 +51,7 @@ int itkMaskedNaryStatisticsImageFilterTest(int  /*argc*/ , char*[] /*argv[]*/)
   MITK_TEST_CONDITION(2 == sig.size(),"Check size of sigma");
   MITK_TEST_CONDITION(2 == variance.size(),"Check size of variance");
   MITK_TEST_CONDITION(2 == sum.size(),"Check size of sum");
-  
+
   CPPUNIT_ASSERT_MESSAGE("Check computed maximum[0]",9 == max[0]);
   CPPUNIT_ASSERT_MESSAGE("Check computed minimum[0]",1 == min[0]);
   CPPUNIT_ASSERT_MESSAGE("Check computed mean[0]",5 == mean[0]);

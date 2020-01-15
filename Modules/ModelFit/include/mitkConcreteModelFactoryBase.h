@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef __CONCRETE_MODEL_FACTORY_BASE_H
 #define __CONCRETE_MODEL_FACTORY_BASE_H
@@ -57,7 +53,7 @@ namespace mitk
       return ModelType::New();
     }
 
-    virtual ModelBasePointer CreateModel() const  override
+    ModelBasePointer CreateModel() const  override
     {
       return CreateConcreteModel().GetPointer();
     };
@@ -68,87 +64,87 @@ namespace mitk
       return noConstraints;
     };
 
-    virtual ParameterNamesType GetParameterNames() const  override
+    ParameterNamesType GetParameterNames() const  override
     {
       return m_Reference->GetParameterNames();
     };
 
-    virtual ParametersSizeType GetNumberOfParameters() const override
+    ParametersSizeType GetNumberOfParameters() const override
     {
       return m_Reference->GetNumberOfParameters();
     };
 
-    virtual ParamterScaleMapType GetParameterScales() const override
+    ParamterScaleMapType GetParameterScales() const override
     {
       return m_Reference->GetParameterScales();
     };
 
-    virtual ParamterUnitMapType GetParameterUnits() const override
+    ParamterUnitMapType GetParameterUnits() const override
     {
       return m_Reference->GetParameterUnits();
     };
 
-    virtual ParameterNamesType GetDerivedParameterNames() const override
+    ParameterNamesType GetDerivedParameterNames() const override
     {
       return m_Reference->GetDerivedParameterNames();
     };
 
-    virtual ParametersSizeType GetNumberOfDerivedParameters() const override
+    ParametersSizeType GetNumberOfDerivedParameters() const override
     {
       return m_Reference->GetNumberOfDerivedParameters();
     };
 
-    virtual DerivedParamterScaleMapType GetDerivedParameterScales() const override
+    DerivedParamterScaleMapType GetDerivedParameterScales() const override
     {
       return m_Reference->GetDerivedParameterScales();
     };
 
-    virtual DerivedParamterUnitMapType GetDerivedParameterUnits() const override
+    DerivedParamterUnitMapType GetDerivedParameterUnits() const override
     {
       return m_Reference->GetDerivedParameterUnits();
     };
 
-    virtual std::string GetModelDisplayName() const override
+    std::string GetModelDisplayName() const override
     {
       return m_Reference->GetModelDisplayName();
     };
 
-    virtual std::string GetModelType() const override
+    std::string GetModelType() const override
     {
       return m_Reference->GetModelType();
     };
 
-    virtual FunctionStringType GetFunctionString() const override
+    FunctionStringType GetFunctionString() const override
     {
       return m_Reference->GetFunctionString();
     };
 
-    virtual ModellClassIDType GetClassID() const override
+    ModellClassIDType GetClassID() const override
     {
       return m_Reference->GetClassID();
     };
 
-    virtual std::string GetXName() const override
+    std::string GetXName() const override
     {
       return m_Reference->GetXName();
     };
 
-    virtual std::string GetXAxisName() const override
+    std::string GetXAxisName() const override
     {
       return m_Reference->GetXAxisName();
     };
 
-    virtual std::string GetXAxisUnit() const override
+    std::string GetXAxisUnit() const override
     {
       return m_Reference->GetXAxisUnit();
     };
 
-    virtual std::string GetYAxisName() const override
+    std::string GetYAxisName() const override
     {
       return m_Reference->GetYAxisName();
     };
 
-    virtual std::string GetYAxisUnit() const override
+    std::string GetYAxisUnit() const override
     {
       return m_Reference->GetYAxisUnit();
     }
@@ -159,7 +155,7 @@ namespace mitk
       m_Reference = ModelType::New();
     };
 
-    virtual ~ConcreteModelFactoryBase()
+    ~ConcreteModelFactoryBase() override
     {
     };
 

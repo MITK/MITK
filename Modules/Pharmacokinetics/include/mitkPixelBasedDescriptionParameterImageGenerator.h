@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
- The Medical Imaging Interaction Toolkit (MITK)
+The Medical Imaging Interaction Toolkit (MITK)
 
- Copyright (c) German Cancer Research Center,
- Division of Medical and Biological Informatics.
- All rights reserved.
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
 
- This software is distributed WITHOUT ANY WARRANTY; without
- even the implied warranty of MERCHANTABILITY or FITNESS FOR
- A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
- See LICENSE.txt or http://www.mitk.org for details.
-
- ===================================================================*/
+============================================================================*/
 
 #ifndef __MITK_PIXEL_BASED_DESCRIPTION_PARAMETER_IMAGE_GENERATOR_H_
 #define __MITK_PIXEL_BASED_DESCRIPTION_PARAMETER_IMAGE_GENERATOR_H_
@@ -60,17 +56,17 @@ namespace mitk
     itkSetObjectMacro(Functor, FunctorType);
     itkGetObjectMacro(Functor, FunctorType);
 
-    virtual double GetProgress() const override;
+    double GetProgress() const override;
 
   protected:
     PixelBasedDescriptionParameterImageGenerator() : m_Progress(0)
     {
-      m_InternalMask = NULL;
-      m_Mask = NULL;
-      m_DynamicImage = NULL;
+      m_InternalMask = nullptr;
+      m_Mask = nullptr;
+      m_DynamicImage = nullptr;
     };
 
-    ~PixelBasedDescriptionParameterImageGenerator() {};
+    ~PixelBasedDescriptionParameterImageGenerator() override {};
 
     template <typename TPixel, unsigned int VDim>
     void DoParameterCalculation(itk::Image<TPixel, VDim>* image);
@@ -80,9 +76,9 @@ namespace mitk
 
     void onFitProgressEvent(::itk::Object* caller, const ::itk::EventObject& eventObject);
 
-    virtual bool HasOutdatedResult() const override;
-    virtual void CheckValidInputs() const override;
-    virtual void DoParameterCalculationAndGetResults(ParameterImageMapType& parameterImages) override;
+    bool HasOutdatedResult() const override;
+    void CheckValidInputs() const override;
+    void DoParameterCalculationAndGetResults(ParameterImageMapType& parameterImages) override;
 
   private:
     Image::Pointer m_DynamicImage;

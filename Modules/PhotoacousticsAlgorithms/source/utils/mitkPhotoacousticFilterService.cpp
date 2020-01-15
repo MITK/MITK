@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkPhotoacousticFilterService.h"
 
@@ -266,7 +262,7 @@ mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyBandpassFilter(
   float alphaHighPass, float alphaLowPass,
   float TimeSpacing, float SpeedOfSound, bool IsBFImage)
 {
-  try 
+  try
   {
     auto floatData = ConvertToFloat(data);
     mitk::BandpassFilter::Pointer bandpassFilter = mitk::BandpassFilter::New();
@@ -281,7 +277,6 @@ mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyBandpassFilter(
     bandpassFilter->Update();
     return bandpassFilter->GetOutput();
   }
-
   catch (mitk::Exception &e)
   {
     std::string errorMessage = "Caught unexpected exception ";

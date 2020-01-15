@@ -1,20 +1,31 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical Image Computing.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkDisplayActionEventHandler.h"
+
+mitk::DisplayActionEventHandler::~DisplayActionEventHandler()
+{
+  if (!m_ObservableBroadcast.IsExpired())
+  {
+    auto observableBroadcastPtr = m_ObservableBroadcast.Lock();
+
+    // remove current observer
+    for (const auto& tag : m_ObserverTags)
+    {
+      observableBroadcastPtr->RemoveObserver(tag);
+    }
+    m_ObserverTags.clear();
+  }
+}
 
 void mitk::DisplayActionEventHandler::SetObservableBroadcast(DisplayActionEventBroadcast* observableBroadcast)
 {
@@ -72,4 +83,23 @@ void mitk::DisplayActionEventHandler::DisconnectObserver(OberserverTagType obser
     observableBroadcast->RemoveObserver(observerTag);
     m_ObserverTags.erase(observerTagPosition);
   }
+}
+
+void mitk::DisplayActionEventHandler::InitActions()
+{
+  if (m_ObservableBroadcast.IsExpired())
+  {
+    mitkThrow() << "No display action event broadcast class set to observe. Use 'SetObservableBroadcast' before initializing actions.";
+  }
+
+  auto observableBroadcast = m_ObservableBroadcast.Lock();
+  // remove all current display action events as observer
+  auto allObserverTags = GetAllObserverTags();
+  for (const auto& tag : allObserverTags)
+  {
+    observableBroadcast->RemoveObserver(tag);
+  }
+  m_ObserverTags.clear();
+
+  InitActionsImpl();
 }

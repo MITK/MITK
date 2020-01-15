@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #ifndef QMITK_FIT_PARAMETER_WIDGET_H
@@ -42,8 +38,8 @@ class MITKMODELFITUI_EXPORT QmitkFitParameterWidget : public QWidget
 public:
   using FitVectorType = std::vector<mitk::modelFit::ModelFitInfo::ConstPointer>;
 
-  QmitkFitParameterWidget(QWidget* parent = 0);
-  ~QmitkFitParameterWidget();
+  QmitkFitParameterWidget(QWidget* parent = nullptr);
+  ~QmitkFitParameterWidget() override;
 
   const FitVectorType& getFits() const;
 

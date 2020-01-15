@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QmitkOverlayManagerView_h
 #define QmitkOverlayManagerView_h
@@ -56,12 +52,12 @@ public:
   typedef std::map<std::string, mitk::Annotation::Pointer> OverlayMapType;
   static const std::string VIEW_ID;
   QmitkOverlayManagerView();
-  ~QmitkOverlayManagerView();
+  ~QmitkOverlayManagerView() override;
 
 protected:
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
   void RenderWindowPartActivated(mitk::IRenderWindowPart *renderWindowPart) override;
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart *) override;
@@ -94,16 +90,16 @@ private:
   void InitializeAddOverlayMenu();
 
   /** \see berry::IPartListener::PartActivated */
-  virtual void Activated();
+  void Activated() override;
 
   /** \see berry::IPartListener::PartDeactivated */
-  virtual void Deactivated();
+  void Deactivated() override;
 
   /** \see berry::IPartListener::PartVisible */
-  virtual void Visible();
+  void Visible() override;
 
   /** \see berry::IPartListener::PartHidden */
-  virtual void Hidden();
+  void Hidden() override;
 
   QWidget *m_Parent;
   unsigned long m_PropertyNameChangedTag;

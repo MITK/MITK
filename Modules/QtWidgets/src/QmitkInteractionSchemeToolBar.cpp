@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical Image Computing.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkInteractionSchemeToolBar.h"
 
@@ -45,9 +41,13 @@ void QmitkInteractionSchemeToolBar::SetInteractionEventHandler(mitk::Interaction
   }
 
   m_InteractionEventHandler = interactionEventHandler;
-  if (nullptr != m_InteractionEventHandler)
+  try
   {
     m_InteractionSchemeSwitcher->SetInteractionScheme(m_InteractionEventHandler, InteractionScheme::PACSStandard);
+  }
+  catch (const mitk::Exception&)
+  {
+    return;
   }
 }
 
@@ -74,9 +74,13 @@ void QmitkInteractionSchemeToolBar::OnInteractionSchemeChanged()
   {
     InteractionScheme interactionScheme = static_cast<InteractionScheme>(action->data().toInt());
 
-    if (m_InteractionEventHandler)
+    try
     {
       m_InteractionSchemeSwitcher->SetInteractionScheme(m_InteractionEventHandler, interactionScheme);
+    }
+    catch (const mitk::Exception&)
+    {
+      return;
     }
   }
 }

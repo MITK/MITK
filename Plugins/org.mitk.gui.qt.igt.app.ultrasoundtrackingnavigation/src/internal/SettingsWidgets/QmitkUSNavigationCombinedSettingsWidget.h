@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 #ifndef QMITKUSNAVIGATIONCOMBINEDSETTINGSWIDGET_H
 #define QMITKUSNAVIGATIONCOMBINEDSETTINGSWIDGET_H
 
@@ -36,13 +32,13 @@ protected slots:
   void OnApplicationChanged(int);
 
 public:
-  explicit QmitkUSNavigationCombinedSettingsWidget(QWidget *parent = 0);
-  ~QmitkUSNavigationCombinedSettingsWidget();
-  virtual void OnSetSettingsNode(itk::SmartPointer<mitk::DataNode> settingsNode, bool overwriteValues);
+  explicit QmitkUSNavigationCombinedSettingsWidget(QWidget *parent = nullptr);
+  ~QmitkUSNavigationCombinedSettingsWidget() override;
+  void OnSetSettingsNode(itk::SmartPointer<mitk::DataNode> settingsNode, bool overwriteValues) override;
 
 protected:
-  virtual void OnSaveProcessing();
-  virtual void OnLoadSettingsProcessing();
+  void OnSaveProcessing() override;
+  void OnLoadSettingsProcessing() override;
 
   QString InteractionNameToFile(const QString& name) const;
 

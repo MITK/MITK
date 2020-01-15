@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKAREAUNDERTHECURVEDESCRIPTIONPARAMETER_H
 #define MITKAREAUNDERTHECURVEDESCRIPTIONPARAMETER_H
@@ -33,15 +29,15 @@ namespace  mitk
 
         itkFactorylessNewMacro(Self);
         itkCloneMacro(Self);
-        virtual DescriptionParameterNamesType GetDescriptionParameterName() const override;
+        DescriptionParameterNamesType GetDescriptionParameterName() const override;
 
     protected:
         static const std::string PARAMETER_NAME;
 
         AreaUnderTheCurveDescriptionParameter();
-        virtual ~AreaUnderTheCurveDescriptionParameter();
+        ~AreaUnderTheCurveDescriptionParameter() override;
 
-        virtual DescriptionParameterResultsType ComputeCurveDescriptionParameter(const CurveType& curve, const CurveGridType& grid) const override;
+        DescriptionParameterResultsType ComputeCurveDescriptionParameter(const CurveType& curve, const CurveGridType& grid) const override;
 
     };
 }

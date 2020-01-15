@@ -1,3 +1,15 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
 #ifndef CHI_SQUARE_FITCOSTFUNCTION_H
 #define CHI_SQUARE_FITCOSTFUNCTION_H
 
@@ -24,14 +36,14 @@ public:
 
 protected:
 
-    virtual MeasureType CalcMeasure(const ParametersType &parameters, const SignalType& signal) const;
+    MeasureType CalcMeasure(const ParametersType &parameters, const SignalType& signal) const override;
 
     ChiSquareFitCostFunction()
     {
 
     }
 
-    ~ChiSquareFitCostFunction(){}
+    ~ChiSquareFitCostFunction() override{}
 
 };
 }

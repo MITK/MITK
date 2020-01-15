@@ -1,24 +1,20 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "org_mitk_gui_qt_matchpoint_algorithmcontrol_Activator.h"
 
 #include "QmitkMatchPoint.h"
 
-ctkPluginContext* org_mitk_gui_qt_matchpoint_algorithmcontrol_Activator::m_Context = 0;
+ctkPluginContext* org_mitk_gui_qt_matchpoint_algorithmcontrol_Activator::m_Context = nullptr;
 
 void org_mitk_gui_qt_matchpoint_algorithmcontrol_Activator::start(ctkPluginContext* context)
 {
@@ -31,7 +27,7 @@ void org_mitk_gui_qt_matchpoint_algorithmcontrol_Activator::stop(ctkPluginContex
 {
     Q_UNUSED(context)
 
-    m_Context = 0;
+    m_Context = nullptr;
 }
 
 ctkPluginContext* org_mitk_gui_qt_matchpoint_algorithmcontrol_Activator::GetContext()

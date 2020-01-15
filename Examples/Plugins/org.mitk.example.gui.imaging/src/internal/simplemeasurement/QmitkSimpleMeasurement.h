@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKSIMPELEMEASUREMENT_H
 #define MITKSIMPELEMEASUREMENT_H
@@ -41,24 +37,24 @@ class QmitkSimpleMeasurement : public QmitkAbstractView, public mitk::IZombieVie
 
 public:
   QmitkSimpleMeasurement();
-  virtual ~QmitkSimpleMeasurement();
+  ~QmitkSimpleMeasurement() override;
 
 private:
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part,
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part,
                                   const QList<mitk::DataNode::Pointer> &nodes) override;
 
-  virtual void NodeRemoved(const mitk::DataNode *node) override;
+  void NodeRemoved(const mitk::DataNode *node) override;
 
-  virtual void Activated() override;
-  virtual void Deactivated() override;
-  virtual void Visible() override;
-  virtual void Hidden() override;
+  void Activated() override;
+  void Deactivated() override;
+  void Visible() override;
+  void Hidden() override;
 
-  virtual void ActivatedZombieView(berry::SmartPointer<berry::IWorkbenchPartReference> zombieView) override;
+  void ActivatedZombieView(berry::SmartPointer<berry::IWorkbenchPartReference> zombieView) override;
 
 private slots:
 

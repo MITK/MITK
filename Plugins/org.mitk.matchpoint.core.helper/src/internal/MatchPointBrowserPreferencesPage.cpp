@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "MatchPointBrowserPreferencesPage.h"
 #include "MatchPointBrowserConstants.h"
@@ -33,14 +29,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //-----------------------------------------------------------------------------
 MatchPointBrowserPreferencesPage::MatchPointBrowserPreferencesPage()
-: m_MainControl(0)
-, m_AlgDirectories(0)
-, m_AlgFiles(0)
-, m_LoadFromHomeDir(0)
-, m_LoadFromCurrentDir(0)
-, m_LoadFromApplicationDir(0)
-, m_LoadFromAutoLoadPathDir(0)
-, m_BrowserPreferencesNode(0)
+: m_MainControl(nullptr)
+, m_AlgDirectories(nullptr)
+, m_AlgFiles(nullptr)
+, m_LoadFromHomeDir(nullptr)
+, m_LoadFromCurrentDir(nullptr)
+, m_LoadFromApplicationDir(nullptr)
+, m_LoadFromAutoLoadPathDir(nullptr)
+, m_BrowserPreferencesNode(nullptr)
 {
 
 }

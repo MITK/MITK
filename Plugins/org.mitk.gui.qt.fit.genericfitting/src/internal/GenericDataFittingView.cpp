@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "GenericDataFittingView.h"
 
@@ -118,7 +114,7 @@ void GenericDataFittingView::UpdateGUIControls()
   m_Controls.checkBox_Constraints->setEnabled(m_modelConstraints.IsNotNull());
 
   bool isGenericFactory = dynamic_cast<mitk::GenericParamModelFactory*>
-                          (m_selectedModelFactory.GetPointer()) != NULL;
+                          (m_selectedModelFactory.GetPointer()) != nullptr;
 
   m_Controls.groupGeneric->setVisible(isGenericFactory);
 
@@ -176,7 +172,7 @@ void GenericDataFittingView::OnNrOfParamsChanged()
 
 void GenericDataFittingView::OnModellSet(int index)
 {
-  m_selectedModelFactory = NULL;
+  m_selectedModelFactory = nullptr;
 
   if (index > 0)
   {
@@ -240,15 +236,15 @@ void GenericDataFittingView::OnModellingButtonClicked()
   //check if all static parameters set
   if (m_selectedModelFactory.IsNotNull() && CheckModelSettings())
   {
-    mitk::ParameterFitImageGeneratorBase::Pointer generator = NULL;
-    mitk::modelFit::ModelFitInfo::Pointer fitSession = NULL;
+    mitk::ParameterFitImageGeneratorBase::Pointer generator = nullptr;
+    mitk::modelFit::ModelFitInfo::Pointer fitSession = nullptr;
 
     bool isLinearFactory = dynamic_cast<mitk::LinearModelFactory*>
-                           (m_selectedModelFactory.GetPointer()) != NULL;
+                           (m_selectedModelFactory.GetPointer()) != nullptr;
     bool isGenericFactory = dynamic_cast<mitk::GenericParamModelFactory*>
-                            (m_selectedModelFactory.GetPointer()) != NULL;
+                            (m_selectedModelFactory.GetPointer()) != nullptr;
     bool isT2DecayFactory = dynamic_cast<mitk::T2DecayModelFactory*>
-      (m_selectedModelFactory.GetPointer()) != NULL;
+      (m_selectedModelFactory.GetPointer()) != nullptr;
 
     if (isLinearFactory)
     {
@@ -319,10 +315,10 @@ void GenericDataFittingView::OnModellingButtonClicked()
 void GenericDataFittingView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
     const QList<mitk::DataNode::Pointer>& selectedNodes)
 {
-  m_selectedNode = NULL;
-  m_selectedImage = NULL;
-  m_selectedMaskNode = NULL;
-  m_selectedMask = NULL;
+  m_selectedNode = nullptr;
+  m_selectedImage = nullptr;
+  m_selectedMaskNode = nullptr;
+  m_selectedMask = nullptr;
 
   m_Controls.masklabel->setText("No (valid) mask selected.");
   m_Controls.timeserieslabel->setText("No (valid) series selected.");
@@ -379,7 +375,7 @@ bool GenericDataFittingView::CheckModelSettings() const
   //check wether any model is set at all. Otherwise exit with false
   if (m_selectedModelFactory.IsNotNull())
   {
-    bool isGenericFactory = dynamic_cast<mitk::GenericParamModelFactory*>(m_selectedModelFactory.GetPointer()) != NULL; 
+    bool isGenericFactory = dynamic_cast<mitk::GenericParamModelFactory*>(m_selectedModelFactory.GetPointer()) != nullptr;
 
     if (isGenericFactory)
     {
@@ -546,8 +542,8 @@ void GenericDataFittingView::DoFit(const mitk::modelFit::ModelFitInfo* fitSessio
 
 GenericDataFittingView::GenericDataFittingView() : m_FittingInProgress(false)
 {
-  m_selectedImage = NULL;
-  m_selectedMask = NULL;
+  m_selectedImage = nullptr;
+  m_selectedMask = nullptr;
 
   mitk::ModelFactoryBase::Pointer factory =
     mitk::LinearModelFactory::New().GetPointer();

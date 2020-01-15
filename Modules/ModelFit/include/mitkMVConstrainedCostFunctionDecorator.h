@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MV_CONSTRAINED_COST_FUNCTION_DECORATOR_H
 #define MV_CONSTRAINED_COST_FUNCTION_DECORATOR_H
@@ -80,14 +76,14 @@ public:
     ParametersType::size_type GetFailedParameter() const;
 protected:
 
-    virtual MeasureType CalcMeasure(const ParametersType &parameters, const SignalType& signal) const;
+    MeasureType CalcMeasure(const ParametersType &parameters, const SignalType& signal) const override;
 
     MVConstrainedCostFunctionDecorator() : m_FailureThreshold(1e15), m_ActivateFailureThreshold(true),
       m_EvaluationCount(0), m_PenaltyCount(0), m_FailureCount(0), m_LastFailedParameter(-1)
     {
     }
 
-    ~MVConstrainedCostFunctionDecorator(){}
+    ~MVConstrainedCostFunctionDecorator() override{}
 
     ConstraintCheckerBase::ConstPointer m_ConstraintChecker;
     MVModelFitCostFunction::ConstPointer m_WrappedCostFunction;

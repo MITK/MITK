@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkPluginActivator.h"
 #include "QmitkMITKIGTNavigationToolManagerView.h"
@@ -26,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-  ctkPluginContext* PluginActivator::m_Context = 0;
+  ctkPluginContext* PluginActivator::m_Context = nullptr;
 
 void PluginActivator::start(ctkPluginContext* context)
 {
@@ -45,7 +41,7 @@ void PluginActivator::start(ctkPluginContext* context)
 
 void PluginActivator::stop(ctkPluginContext* context)
 {
-  m_Context = 0;
+  m_Context = nullptr;
 
   Q_UNUSED(context)
 }

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKPolhemusINTERFACE_H_HEADER_INCLUDED_
 #define MITKPolhemusINTERFACE_H_HEADER_INCLUDED_
@@ -56,6 +52,7 @@ namespace mitk
       mitk::Point3D pos;
       mitk::Quaternion rot;
       BYTE id;
+      int distortionLevel;
     };
 
     /**
@@ -74,11 +71,11 @@ namespace mitk
 
     bool Disconnect();
 
-    /** @return Returns the number of tools. Returns 0 if no information is avialable.*/
+    /** @return Returns the number of tools. Returns 0 if no information is available.*/
     unsigned int GetNumberOfTools();
 
     /** Enables/disables hemisphere tracking for all stations/tools. */
-    void SetHemisphereTrackingEnabled(bool _HeisphereTrackingEnabeled, int _tool = -1);
+    void SetHemisphereTrackingEnabled(bool _HemisphereTrackingEnabled, int _tool = -1);
 
     /** Toggles the current hemisphere. Parameter _tool describes, for which tool the hemisphere should change. Default -1 toggles all tools.
         Index starts at "1" for the first tool (i.e. station number of Polhemus). Not 0!
@@ -110,7 +107,7 @@ namespace mitk
     In contrast to SetHemisphere(1,0,0), this method restores the original HemisphereTracking settings at the end. */
     void AdjustHemisphere(int _tool);
 
-    /** @return Returns a single frame. Only works if the tracking device is not in continous tracking mode. Returns an empty vector in case of an error.*/
+    /** @return Returns a single frame. Only works if the tracking device is not in continuous tracking mode. Returns an empty vector in case of an error.*/
     std::vector<trackingData> GetSingleFrame();
 
     /** @return Returns a single frame with all tools, which could be auto detected.*/

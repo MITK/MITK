@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 // MITK
 #include "mitkUSNavigationTargetOcclusionFilter.h"
@@ -72,7 +68,7 @@ void mitk::USNavigationTargetOcclusionFilter::GenerateData()
   const mitk::NavigationData* nd = this->GetInput(m_StartPositionInput);
 
   // set every value to -1 if there is no (valid) navigation data
-  if ( nd == 0 || ! nd->IsDataValid() )
+  if ( nd == nullptr || ! nd->IsDataValid() )
   {
     float intersection = -1;
     for ( vtkIdType n = 0; n < numberOfPoints; n++ )
@@ -183,7 +179,7 @@ vtkSmartPointer<vtkPolyData> mitk::USNavigationTargetOcclusionFilter::GetVtkPoly
   }
 
   vtkSmartPointer<vtkPolyData> targetSurfaceVtk = targetSurface->GetVtkPolyData();
-  if( targetSurfaceVtk == 0 )
+  if( targetSurfaceVtk == nullptr )
   {
     MITK_WARN("USNavigationTargetOcclusionFilter") << "VtkPolyData of the mitk::Surface of the data node must not be null.";
     return nullptr;

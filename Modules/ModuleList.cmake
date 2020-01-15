@@ -5,7 +5,6 @@ set(MITK_MODULES
   Core
   CommandLine
   AppUtil
-  RDF
   LegacyIO
   DataTypesExt
   Annotation
@@ -29,7 +28,6 @@ set(MITK_MODULES
   ContourModel
   SurfaceInterpolation
   Segmentation
-  PlanarFigureSegmentation
   QtWidgets
   QtWidgetsExt
   ImageStatisticsUI
@@ -37,7 +35,6 @@ set(MITK_MODULES
   MatchPointRegistration
   MatchPointRegistrationUI
   Classification
-  GPGPU
   OpenIGTLink
   IGTBase
   IGT
@@ -81,6 +78,7 @@ set(MITK_MODULES
   DICOMPM
   REST
   RESTService
+  DICOMweb
 )
 
 if(MITK_ENABLE_PIC_READER)

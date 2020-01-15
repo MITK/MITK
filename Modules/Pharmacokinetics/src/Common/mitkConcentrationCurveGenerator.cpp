@@ -1,3 +1,15 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
 #include "mitkConcentrationCurveGenerator.h"
 #include "mitkConvertToConcentrationTurboFlashFunctor.h"
 #include "mitkConvertT2ConcentrationFunctor.h"
@@ -13,9 +25,9 @@
 #include "itkBinaryFunctorImageFilter.h"
 #include "itkTernaryFunctorImageFilter.h"
 
-mitk::ConcentrationCurveGenerator::ConcentrationCurveGenerator() : m_isT2weightedImage(false), m_isTurboFlashSequence(false), 
+mitk::ConcentrationCurveGenerator::ConcentrationCurveGenerator() : m_isT2weightedImage(false), m_isTurboFlashSequence(false),
     m_AbsoluteSignalEnhancement(false), m_RelativeSignalEnhancement(0.0), m_UsingT1Map(false), m_Factor(0.0), m_RecoveryTime(0.0), m_RelaxationTime(0.0),
-    m_Relaxivity(0.0), m_FlipAngle(0.0), m_T2Factor(0.0), m_T2EchoTime(0.0) 
+    m_Relaxivity(0.0), m_FlipAngle(0.0), m_T2Factor(0.0), m_T2EchoTime(0.0)
 {
 }
 

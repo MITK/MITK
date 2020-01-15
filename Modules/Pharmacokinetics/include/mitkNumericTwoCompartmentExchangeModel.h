@@ -1,3 +1,15 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
 #ifndef MITKNUMERICTWOCOMPARTMENTEXCHANGEMODEL_H
 #define MITKNUMERICTWOCOMPARTMENTEXCHANGEMODEL_H
 
@@ -64,39 +76,39 @@ namespace mitk
 
     static const unsigned int NUMBER_OF_PARAMETERS;
 
-    virtual std::string GetModelDisplayName() const override;
+    std::string GetModelDisplayName() const override;
 
-    virtual std::string GetModelType() const override;
+    std::string GetModelType() const override;
 
     itkGetConstReferenceMacro(ODEINTStepSize, double);
     itkSetMacro(ODEINTStepSize, double);
 
 
-    virtual ParameterNamesType GetParameterNames() const override;
-    virtual ParametersSizeType  GetNumberOfParameters() const override;
+    ParameterNamesType GetParameterNames() const override;
+    ParametersSizeType  GetNumberOfParameters() const override;
 
-    virtual ParamterUnitMapType GetParameterUnits() const override;
+    ParamterUnitMapType GetParameterUnits() const override;
 
-    virtual ParameterNamesType GetStaticParameterNames() const;
-    virtual ParametersSizeType GetNumberOfStaticParameters() const;
+    ParameterNamesType GetStaticParameterNames() const override;
+    ParametersSizeType GetNumberOfStaticParameters() const override;
 
 
   protected:
     NumericTwoCompartmentExchangeModel();
-    virtual ~NumericTwoCompartmentExchangeModel();
+    ~NumericTwoCompartmentExchangeModel() override;
 
     /**
      * Actual implementation of the clone method. This method should be reimplemeted
      * in subclasses to clone the extra required parameters.
      */
-    virtual itk::LightObject::Pointer InternalClone() const;
+    itk::LightObject::Pointer InternalClone() const override;
 
-    virtual ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
+    ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
 
-    virtual void SetStaticParameter(const ParameterNameType& name, const StaticParameterValuesType& values);
-    virtual StaticParameterValuesType GetStaticParameterValue(const ParameterNameType& name) const;
+    void SetStaticParameter(const ParameterNameType& name, const StaticParameterValuesType& values) override;
+    StaticParameterValuesType GetStaticParameterValue(const ParameterNameType& name) const override;
 
-    virtual void PrintSelf(std::ostream& os, ::itk::Indent indent) const;
+    void PrintSelf(std::ostream& os, ::itk::Indent indent) const override;
 
   private:
 

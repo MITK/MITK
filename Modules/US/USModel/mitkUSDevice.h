@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKUSDevice_H_HEADER_INCLUDED_
 #define MITKUSDevice_H_HEADER_INCLUDED_
@@ -376,11 +372,11 @@ namespace mitk {
 
     virtual void SetImageVector(std::vector<mitk::Image::Pointer> vec)
     {
-      if (this->m_ImageVector != vec)                   
-      {                                             
+      if (this->m_ImageVector != vec)
+      {
       this->m_ImageVector = vec;
-      this->Modified();                             
-      } 
+      this->Modified();
+      }
     }
 
     static ITK_THREAD_RETURN_TYPE Acquire(void* pInfoStruct);

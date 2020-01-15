@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkUSNavigationStepMarkerIntervention.h"
 #include "ui_QmitkUSNavigationStepMarkerIntervention.h"
@@ -169,7 +165,7 @@ bool QmitkUSNavigationStepMarkerIntervention::OnStartStep()
   color[2] = 0;
   m_TargetStructureWarnOverlay->SetColor(color);
 
-  mitk::ManualPlacementAnnotationRenderer::AddAnnotation(m_TargetStructureWarnOverlay.GetPointer(), "stdmulti.widget4");
+  mitk::ManualPlacementAnnotationRenderer::AddAnnotation(m_TargetStructureWarnOverlay.GetPointer(), "stdmulti.widget3");
 
   return true;
 }
@@ -219,7 +215,7 @@ bool QmitkUSNavigationStepMarkerIntervention::OnActivateStep()
   // get target node from data storage and make sure that it contains data
   m_TargetNode = this->GetNamedDerivedNode(QmitkUSNavigationMarkerPlacement::DATANAME_TARGETSURFACE,
     QmitkUSNavigationMarkerPlacement::DATANAME_TUMOUR);
-  if (m_TargetNode.IsNull() || m_TargetNode->GetData() == 0)
+  if (m_TargetNode.IsNull() || m_TargetNode->GetData() == nullptr)
   {
     mitkThrow() << "Target node (" << QmitkUSNavigationMarkerPlacement::DATANAME_TARGETSURFACE << ") must not be null.";
   }
@@ -237,7 +233,7 @@ bool QmitkUSNavigationStepMarkerIntervention::OnActivateStep()
   {
     ui->targetStructuresRangeLayout->removeWidget(m_PlannedTargetProgressBar);
     delete m_PlannedTargetProgressBar;
-    m_PlannedTargetProgressBar = 0;
+    m_PlannedTargetProgressBar = nullptr;
   }
 
   m_NodeDisplacementFilter->SelectInput(m_ReferenceSensorIndex);
@@ -513,7 +509,7 @@ void QmitkUSNavigationStepMarkerIntervention::OnFreeze(bool freezed)
   }
   else
   {
-    m_PointMarkInteractor->SetDataNode(0);
+    m_PointMarkInteractor->SetDataNode(nullptr);
     this->GetCombinedModality()->SetIsFreezed(false);
   }
 }
@@ -552,7 +548,7 @@ void QmitkUSNavigationStepMarkerIntervention::UpdateTargetCoordinates(mitk::Data
        it != m_ReachedTargetsNodes.end();
        ++it)
   {
-    if (it->IsNotNull() && (*it)->GetData() != 0)
+    if (it->IsNotNull() && (*it)->GetData() != nullptr)
     {
       m_NodeDisplacementFilter->AddNode(*it);
     }
@@ -639,7 +635,7 @@ void QmitkUSNavigationStepMarkerIntervention::UpdateTargetColors()
   m_TargetNode->SetColor(1, 1, 1);
 
   mitk::BaseData *targetNodeData = m_TargetNode->GetData();
-  if (targetNodeData == 0)
+  if (targetNodeData == nullptr)
   {
     return;
   }
@@ -859,7 +855,7 @@ void QmitkUSNavigationStepMarkerIntervention::UpdateTargetViolationStatus()
   // show warning if the needle tip is inside the target surface
   if (enclosedPoints->IsInsideSurface(needleTip[0], needleTip[1], needleTip[2]))
   {
-    if (!m_TargetStructureWarnOverlay->IsVisible(NULL))
+    if (!m_TargetStructureWarnOverlay->IsVisible(nullptr))
     {
       m_TargetStructureWarnOverlay->SetVisibility(true);
 

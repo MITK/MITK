@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITKPATIENTTABLEHEADERVIEW_H
 #define QMITKPATIENTTABLEHEADERVIEW_H
@@ -26,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QPointer>
 
 /*
-* @brief 
+* @brief
 */
 class MITKSEMANTICRELATIONSUI_EXPORT QmitkPatientTableHeaderView : public QHeaderView
 {
@@ -35,7 +31,7 @@ class MITKSEMANTICRELATIONSUI_EXPORT QmitkPatientTableHeaderView : public QHeade
 public:
 
   QmitkPatientTableHeaderView(QWidget* parent = nullptr);
-  ~QmitkPatientTableHeaderView();
+  ~QmitkPatientTableHeaderView() override;
 
   enum HeaderDataModelRoles
   {
@@ -48,7 +44,7 @@ public:
   *   The header model has been previously filled with header data.
   *   This function is overwritten from QHeaderView.
   */
-  virtual void setModel(QAbstractItemModel* model) override;
+  void setModel(QAbstractItemModel* model) override;
 
 protected:
 
@@ -56,7 +52,7 @@ protected:
   * @brief Paint each header using 'PaintHeader'.
   *   This function is overwritten from QHeaderView.
   */
-  virtual void paintSection(QPainter* painter, const QRect& rect, int logicalIndex) const override;
+  void paintSection(QPainter* painter, const QRect& rect, int logicalIndex) const override;
   /**
   * @brief Get the section size by retrieving the text content.
   *   The section size is dependent on the child and parent headers.

@@ -1,21 +1,17 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
+============================================================================*/
 
-===================================================================*/
-
-#ifndef QmitkImageStatisticsView_H__INCLUDED
-#define QmitkImageStatisticsView_H__INCLUDED
+#ifndef QMITKIMAGESTATISTICSVIEW_H
+#define QMITKIMAGESTATISTICSVIEW_H
 
 #include "ui_QmitkImageStatisticsViewControls.h"
 
@@ -25,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageStatisticsContainer.h>
 #include <QmitkNodeSelectionDialog.h>
 
-#include <mitkILifecycleAwarePart.h>
 #include <berryIPartListener.h>
 #include <mitkPropertyRelations.h>
 #include <QmitkImageStatisticsCalculationRunnable.h>
@@ -38,7 +33,7 @@ gui accessible during calculation.
 
 \ingroup Plugins/org.mitk.gui.qt.measurementtoolbox
 */
-class QmitkImageStatisticsView : public QmitkAbstractView, public mitk::ILifecycleAwarePart, public berry::IPartListener
+class QmitkImageStatisticsView : public QmitkAbstractView, public berry::IPartListener
 {
   Q_OBJECT
 
@@ -48,10 +43,10 @@ public:
   QmitkImageStatisticsView(QObject *parent = nullptr, const char *name = nullptr);
   /*!
   \brief default destructor */
-  virtual ~QmitkImageStatisticsView();
+  ~QmitkImageStatisticsView() override;
   /*!
   \brief method for creating the widget containing the application   controls, like sliders, buttons etc. */
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
   /*!
   \brief  Is called from the selection mechanism once the data manager selection has changed*/
   void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &selectedNodes) override;
@@ -59,22 +54,16 @@ public:
   static const std::string VIEW_ID;
 
 protected:
+
   using HistogramType = mitk::ImageStatisticsContainer::HistogramType;
 
-  virtual void Activated() override;
-  virtual void Deactivated() override;
-  virtual void Visible() override;
-  virtual void Hidden() override;
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
   /** \brief Is called right before the view closes (before the destructor) */
-  virtual void PartClosed(const berry::IWorkbenchPartReference::Pointer&) override;
- 
-  /** \brief Required for berry::IPartListener */
-  virtual Events::Types GetPartEventTypes() const override { return Events::CLOSED; }
+  void PartClosed(const berry::IWorkbenchPartReference::Pointer&) override;
 
-  //void OnImageSelectorChanged();
-  //void OnMaskSelectorChanged();
+  /** \brief Required for berry::IPartListener */
+  Events::Types GetPartEventTypes() const override { return Events::CLOSED; }
 
   void CalculateOrGetStatisticsNew();
   //void CalculateOrGetStatistics();
@@ -90,7 +79,6 @@ protected:
   void ResetGUI();
   void ResetGUIDefault();
 
-  //void PrepareDataStorageComboBoxes();
   /*!
   \brief method for creating the connections of main and control widget */
   virtual void CreateConnections();
@@ -98,8 +86,6 @@ protected:
   void OnStatisticsCalculationEnds();
   void OnRequestHistogramUpdate(unsigned int nBins);
   void OnCheckBoxIgnoreZeroStateChanged(int state);
-  //void OnSliderWidgetHistogramChanged(double value);
-  //void OnSliderWidgetIntensityProfileChanged();
   void OnButtonSelectionPressed();
   void OnDialogSelectionChanged();
 
@@ -107,6 +93,17 @@ protected:
   Ui::QmitkImageStatisticsViewControls m_Controls;
 
 private:
+
+  std::string GenerateStatisticsNodeName();
+
+  void HandleExistingStatistics(mitk::Image::ConstPointer image,
+                                mitk::BaseData::ConstPointer mask,
+                                mitk::ImageStatisticsContainer::Pointer);
+
+  void SetupRelationRules(mitk::ImageStatisticsContainer::Pointer, mitk::BaseData::ConstPointer mask);
+
+  mitk::DataNode::Pointer GetNodeForStatisticsContainer(mitk::ImageStatisticsContainer::ConstPointer container);
+
   typedef itk::SimpleMemberCommand< QmitkImageStatisticsView > ITKCommandType;
   QmitkImageStatisticsCalculationJob * m_CalculationJob = nullptr;
   mitk::DataNode::ConstPointer m_selectedImageNode = nullptr, m_selectedMaskNode = nullptr;
@@ -118,5 +115,7 @@ private:
   std::vector<mitk::DataNode::Pointer> m_selectedImageNodes;
   std::vector<mitk::ImageStatisticsContainer::ConstPointer> m_StatisticsForSelection;
   std::vector<QmitkImageStatisticsCalculationRunnable*> m_Runnables;
+
 };
-#endif // QmitkImageStatisticsView_H__INCLUDED
+
+#endif // QMITKIMAGESTATISTICSVIEW_H

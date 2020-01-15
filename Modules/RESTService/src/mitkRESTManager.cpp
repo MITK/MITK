@@ -1,39 +1,29 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
+============================================================================*/
 
-===================================================================*/
-
-#include <mitkRESTManager.h>
-#include <mitkRESTClient.h>
-#include <mitkRESTServer.h>
 #include <mitkIRESTObserver.h>
+#include <mitkRESTClient.h>
+#include <mitkRESTManager.h>
+#include <mitkRESTServer.h>
 
 #include <mitkExceptionMacro.h>
 #include <mitkLogMacros.h>
 
-mitk::RESTManager::RESTManager()
-{
-}
+mitk::RESTManager::RESTManager() {}
 
-mitk::RESTManager::~RESTManager()
-{
-}
+mitk::RESTManager::~RESTManager() {}
 
-pplx::task<web::json::value> mitk::RESTManager::SendRequest(const web::uri &uri,
-                                                            const RequestType &type,
-                                                            const web::json::value *content,
-                                                            const utility::string_t &filePath)
+pplx::task<web::json::value> mitk::RESTManager::SendRequest(
+  const web::uri &uri, const RequestType &type, const std::map<utility::string_t, utility::string_t> headers)
 {
   pplx::task<web::json::value> answer;
   auto client = new RESTClient;
@@ -41,16 +31,62 @@ pplx::task<web::json::value> mitk::RESTManager::SendRequest(const web::uri &uri,
   switch (type)
   {
     case RequestType::Get:
-      answer = !filePath.empty()
-        ? client->Get(uri, filePath)
-        : client->Get(uri);
+      answer = client->Get(uri, headers);
+      break;
+
+    default:
+      mitkThrow() << "Request Type not supported";
+  }
+
+  return answer;
+}
+
+pplx::task<web::json::value> mitk::RESTManager::SendBinaryRequest(
+  const web::uri &uri,
+  const RequestType &type,
+  const std::vector<unsigned char> *content,
+  const std::map<utility::string_t, utility::string_t> headers)
+{
+  pplx::task<web::json::value> answer;
+  auto client = new RESTClient;
+
+  switch (type)
+  {
+    case RequestType::Post:
+      if (nullptr == content)
+        MITK_WARN << "Content for post is empty, this will create an empty resource";
+
+      answer = client->Post(uri, content, headers);
+      break;
+
+    default:
+      mitkThrow() << "Request Type not supported for binary data";
+  }
+
+  return answer;
+}
+
+pplx::task<web::json::value> mitk::RESTManager::SendJSONRequest(
+  const web::uri &uri,
+  const RequestType &type,
+  const web::json::value *content,
+  const std::map<utility::string_t, utility::string_t> headers,
+  const utility::string_t &filePath)
+{
+  pplx::task<web::json::value> answer;
+  auto client = new RESTClient;
+
+  switch (type)
+  {
+    case RequestType::Get:
+      answer = !filePath.empty() ? client->Get(uri, filePath, headers) : client->Get(uri, headers);
       break;
 
     case RequestType::Post:
       if (nullptr == content)
-        MITK_WARN << "Content for put is empty, this will create an empty resource";
+        MITK_WARN << "Content for post is empty, this will create an empty resource";
 
-      answer = client->Post(uri, content);
+      answer = client->Post(uri, content, headers);
       break;
 
     case RequestType::Put:
@@ -91,19 +127,24 @@ void mitk::RESTManager::ReceiveRequest(const web::uri &uri, mitk::IRESTObserver 
   }
 }
 
-web::json::value mitk::RESTManager::Handle(const web::uri &uri, const web::json::value &body)
+web::http::http_response mitk::RESTManager::Handle(const web::uri &uri,
+                                                   const web::json::value &body,
+                                                   const web::http::method &method,
+                                                   const mitk::RESTUtil::ParamMap &headers)
 {
   // Checking if there is an observer for the port and path
   auto key = std::make_pair(uri.port(), uri.path());
   if (0 != m_Observers.count(key))
   {
-    return m_Observers[key]->Notify(uri, body);
+    return m_Observers[key]->Notify(uri, body, method, headers);
   }
   // No observer under this port, return null which results in status code 404 (s. RESTServer)
   else
   {
     MITK_WARN << "No Observer can handle the data";
-    return web::json::value();
+    web::http::http_response response(web::http::status_codes::BadGateway);
+    response.set_body(U("No one can handle the request under the given port."));
+    return response;
   }
 }
 

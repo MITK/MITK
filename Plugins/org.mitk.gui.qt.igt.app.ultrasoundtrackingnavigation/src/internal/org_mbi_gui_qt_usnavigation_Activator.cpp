@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "org_mbi_gui_qt_usnavigation_Activator.h"
 
@@ -25,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVirtualTrackingDevice.h"
 
 namespace mitk {
-  ctkPluginContext* org_mbi_gui_qt_usnavigation_Activator::m_Context = 0;
+  ctkPluginContext* org_mbi_gui_qt_usnavigation_Activator::m_Context = nullptr;
 
   void org_mbi_gui_qt_usnavigation_Activator::start(ctkPluginContext* context)
   {
@@ -42,8 +38,8 @@ namespace mitk {
 
   void org_mbi_gui_qt_usnavigation_Activator::stop(ctkPluginContext*)
   {
-    m_USCombinedModalityPersistence = 0;
-    m_Context = 0;
+    m_USCombinedModalityPersistence = nullptr;
+    m_Context = nullptr;
   }
 
   ctkPluginContext *org_mbi_gui_qt_usnavigation_Activator::GetContext()

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef __Q_MITK_MATCHPOINT_H
 #define __Q_MITK_MATCHPOINT_H
@@ -62,7 +58,7 @@ public:
   berryObjectMacro(QmitkMatchPoint)
 
   QmitkMatchPoint();
-  ~QmitkMatchPoint();
+  ~QmitkMatchPoint() override;
 
 protected slots:
 
@@ -92,13 +88,13 @@ protected slots:
   void OnAlgorithmInfo(QString info);
 
 protected:
-  virtual void CreateQtPartControl(QWidget* parent);
+  void CreateQtPartControl(QWidget* parent) override;
 
-  virtual void SetFocus();
+  void SetFocus() override;
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
-                                  const QList<mitk::DataNode::Pointer>& nodes);
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
+                                  const QList<mitk::DataNode::Pointer>& nodes) override;
 
 private:
 

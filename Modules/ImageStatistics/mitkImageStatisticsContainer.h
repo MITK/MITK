@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKIMAGESTATISTICSCONTAINER
 #define MITKIMAGESTATISTICSCONTAINER
@@ -49,13 +45,13 @@ namespace mitk
     using StatisticsMapType = std::map < std::string, StatisticsVariantType>;
     using StatisticsKeyType = std::string;
 
-    virtual void SetRequestedRegionToLargestPossibleRegion() override {}
+    void SetRequestedRegionToLargestPossibleRegion() override {}
 
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override { return false; }
+    bool RequestedRegionIsOutsideOfTheBufferedRegion() override { return false; }
 
-    virtual bool VerifyRequestedRegion() override { return true; }
+    bool VerifyRequestedRegion() override { return true; }
 
-    virtual void SetRequestedRegion(const itk::DataObject*) override {}
+    void SetRequestedRegion(const itk::DataObject*) override {}
 
     /**
     @brief Container class for storing the computed image statistics.
@@ -149,7 +145,7 @@ namespace mitk
 
   protected:
     ImageStatisticsContainer();
-    virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
+    void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
   private:
     itk::LightObject::Pointer InternalClone() const override;

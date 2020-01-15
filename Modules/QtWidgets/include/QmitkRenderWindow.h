@@ -1,21 +1,17 @@
-/*===================================================================
+/*============================================================================
 
- The Medical Imaging Interaction Toolkit (MITK)
+The Medical Imaging Interaction Toolkit (MITK)
 
- Copyright (c) German Cancer Research Center,
- Division of Medical and Biological Informatics.
- All rights reserved.
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
 
- This software is distributed WITHOUT ANY WARRANTY; without
- even the implied warranty of MERCHANTABILITY or FITNESS FOR
- A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
- See LICENSE.txt or http://www.mitk.org for details.
+============================================================================*/
 
- ===================================================================*/
-
-#ifndef QMITKRENDERWINDOW_H_HEADER_INCLUDED_C1C40D66
-#define QMITKRENDERWINDOW_H_HEADER_INCLUDED_C1C40D66
+#ifndef QMITKRENDERWINDOW_H
+#define QMITKRENDERWINDOW_H
 
 #include "mitkRenderWindowBase.h"
 
@@ -28,7 +24,6 @@
 #include "mitkBaseRenderer.h"
 #include "mitkInteractionEventConst.h"
 
-class QmitkStdMultiWidget;
 class QDragEnterEvent;
 class QDropEvent;
 class QInputEvent;
@@ -45,9 +40,7 @@ public:
   QmitkRenderWindow(
     QWidget *parent = nullptr,
     const QString &name = "unnamed renderwindow",
-    mitk::VtkPropRenderer *renderer = nullptr,
-    mitk::RenderingManager *renderingManager = nullptr,
-    mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard);
+    mitk::VtkPropRenderer *renderer = nullptr);
   ~QmitkRenderWindow() override;
 
   /**
@@ -59,7 +52,7 @@ public:
    * reached through to the widget's parent.
    *
    * This reaching through to the parent was implicitly required by QmitkMaterialWidget / QmitkMaterialShowCase.
-   *QmitkStdMultiWidget
+   *
    * The default behaviour of QmitkRenderWindow is now to clear the "accepted" flag
    * of Qt events after they were handled by QVTKWidget. This way parents can also
    * handle events.
@@ -69,26 +62,25 @@ public:
   virtual void SetResendQtEvents(bool resend);
 
   // Set Layout Index to define the Layout Type
-  void SetLayoutIndex(unsigned int layoutIndex);
+  void SetLayoutIndex(QmitkRenderWindowMenu::LayoutIndex layoutIndex);
 
   // Get Layout Index to define the Layout Type
-  unsigned int GetLayoutIndex();
+  QmitkRenderWindowMenu::LayoutIndex GetLayoutIndex();
 
   // MenuWidget need to update the Layout Design List when Layout had changed
-  void LayoutDesignListChanged(int layoutDesignIndex);
-
-  void HideRenderWindowMenu();
+  void LayoutDesignListChanged(QmitkRenderWindowMenu::LayoutDesign layoutDesign);
 
   // Activate or Deactivate MenuWidget.
-  void ActivateMenuWidget(bool state, QmitkStdMultiWidget *stdMultiWidget = nullptr);
+  void ActivateMenuWidget(bool state);
 
   bool GetActivateMenuWidgetFlag() { return m_MenuWidgetActivated; }
   // Get it from the QVTKWidget parent
   vtkRenderWindow *GetVtkRenderWindow() override { return GetRenderWindow(); }
+
   vtkRenderWindowInteractor *GetVtkRenderWindowInteractor() override { return nullptr; }
-  void FullScreenMode(bool state);
 
 protected:
+
   // overloaded move handler
   void moveEvent(QMoveEvent *event) override;
   // overloaded show handler
@@ -110,7 +102,7 @@ protected:
 
   // Overloaded resize handler, see decs in QVTKOpenGLWidget.
   // Basically, we have to ensure the VTK rendering is updated for each change in window size.
-  void resizeGL(int w, int h) Q_DECL_OVERRIDE;
+  void resizeGL(int w, int h) override;
 
   /// \brief Simply says we accept the event type.
   void dragEnterEvent(QDragEnterEvent *event) override;
@@ -126,24 +118,22 @@ protected:
 
   void AdjustRenderWindowMenuVisibility(const QPoint &pos);
 
-signals:
+Q_SIGNALS:
+
+  void LayoutDesignChanged(QmitkRenderWindowMenu::LayoutDesign);
 
   void ResetView();
-  // \brief int parameters are enum from QmitkStdMultiWidget
-  void ChangeCrosshairRotationMode(int);
 
-  void SignalLayoutDesignChanged(int layoutDesignIndex);
+  void CrosshairRotationModeChanged(int);
+
+  void CrosshairVisibilityChanged(bool);
 
   void moved();
 
   /// \brief Emits a signal to say that this window has had the following nodes dropped on it.
   void NodesDropped(QmitkRenderWindow *thisWindow, std::vector<mitk::DataNode *> nodes);
 
-protected slots:
-
-  void OnChangeLayoutDesign(int layoutDesignIndex);
-
-  void OnWidgetPlaneModeChanged(int);
+private Q_SLOTS:
 
   void DeferredHideMenu();
 
@@ -158,15 +148,17 @@ private:
   mitk::InteractionEvent::MouseButtons GetButtonState(QWheelEvent *we) const;
   std::string GetKeyLetter(QKeyEvent *ke) const;
   int GetDelta(QWheelEvent *we) const;
+
   bool m_ResendQtEvents;
 
   QmitkRenderWindowMenu *m_MenuWidget;
 
   bool m_MenuWidgetActivated;
 
-  unsigned int m_LayoutIndex;
+  QmitkRenderWindowMenu::LayoutIndex m_LayoutIndex;
 
   vtkSmartPointer<vtkGenericOpenGLRenderWindow> m_InternalRenderWindow;
+
 };
 
-#endif
+#endif // QMITKRENDERWINDOW_H

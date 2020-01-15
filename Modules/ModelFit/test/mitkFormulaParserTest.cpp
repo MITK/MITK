@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkTestingMacros.h"
 #include "mitkFormulaParser.h"
@@ -49,9 +45,9 @@ public:
   static void TestConstructor()
   {
     std::map<std::string, double> varMap;
-    FormulaParser *nullParser = NULL, *parser = NULL;
+    FormulaParser *nullParser = nullptr, *parser = nullptr;
 
-    TEST_NOTHROW(nullParser = new FormulaParser(NULL),
+    TEST_NOTHROW(nullParser = new FormulaParser(nullptr),
       "Testing constructor with NULL argument");
     TEST_NOTHROW(parser = new FormulaParser(&varMap),
       "Testing constructor with valid argument");
@@ -63,7 +59,7 @@ public:
   static void TestLookupVariable()
   {
     // variable map is NULL
-    FormulaParser *nullParser = new FormulaParser(NULL);
+    FormulaParser *nullParser = new FormulaParser(nullptr);
     MITK_TEST_FOR_EXCEPTION(FormulaParserException, nullParser->lookupVariable("test"));
     delete nullParser;
 

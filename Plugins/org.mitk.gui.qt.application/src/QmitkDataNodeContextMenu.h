@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITKDATANODECONTEXTMENU_H
 #define QMITKDATANODECONTEXTMENU_H
@@ -54,7 +50,7 @@ public:
 
   QmitkDataNodeContextMenu(berry::IWorkbenchPartSite::Pointer workbenchPartSite, QWidget* parent = nullptr);
 
-  virtual ~QmitkDataNodeContextMenu() override;
+  ~QmitkDataNodeContextMenu() override;
 
   void SetDataStorage(mitk::DataStorage* dataStorage);
   void SetBaseRenderer(mitk::BaseRenderer* baseRenderer);
@@ -66,7 +62,7 @@ public:
 public Q_SLOTS:
 
   void OnContextMenuRequested(const QPoint& pos);
-  void OnExtensionPointActionTriggered(bool);
+  void OnExtensionPointActionTriggered(QAction* action);
 
 private:
 

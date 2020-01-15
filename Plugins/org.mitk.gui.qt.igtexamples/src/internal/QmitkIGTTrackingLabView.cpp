@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 // Blueberry
@@ -22,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Qmitk
 #include "QmitkIGTTrackingLabView.h"
 
+#include <QmitkRenderWindow.h>
 #include <QmitkNDIConfigurationWidget.h>
 #include <QmitkFiducialRegistrationWidget.h>
 #include <QmitkUpdateTimerWidget.h>
@@ -263,7 +260,7 @@ void QmitkIGTTrackingLabView::OnInitialRegistration()
 
   //############### if activated: ct image is also transformed ##########################
   //transform ct image
-  //todo: Erklären, dass hier AffineTransform3D verwendet wird, weil NavigationData kein Spacing unterstützt!
+  //todo: Explain that AffineTransform3D is used, because NavigationData does not support spacing!
   if(m_Controls.m_ImageActive->isChecked() && m_Controls.m_ImageComboBox->GetSelectedNode().IsNotNull())
   {
     //first we have to store the original ct image transform to compose it with the new transform later
@@ -291,7 +288,7 @@ void QmitkIGTTrackingLabView::OnAddRegistrationTrackingFiducial()
 
   if( nd.IsNull() || !nd->IsDataValid())
   {
-    QMessageBox::warning( 0, "Invalid tracking data", "Navigation data is not available or invalid!", QMessageBox::Ok );
+    QMessageBox::warning( nullptr, "Invalid tracking data", "Navigation data is not available or invalid!", QMessageBox::Ok );
     return;
   }
 

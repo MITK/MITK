@@ -1,17 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) University College London (UCL).
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITKCMDLINEMODULEMENUCOMBOBOX_H
 #define QMITKCMDLINEMODULEMENUCOMBOBOX_H
@@ -37,7 +34,7 @@ class QmitkCmdLineModuleMenuComboBox : public ctkMenuComboBox {
 public:
 
   QmitkCmdLineModuleMenuComboBox(QWidget* parent = nullptr);
-  virtual ~QmitkCmdLineModuleMenuComboBox();
+  ~QmitkCmdLineModuleMenuComboBox() override;
 
   /**
    * \brief Inject the module manager, so that this widget can

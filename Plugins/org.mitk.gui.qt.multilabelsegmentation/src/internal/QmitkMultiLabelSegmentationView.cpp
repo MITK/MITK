@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkMultiLabelSegmentationView.h"
 
@@ -30,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanePositionManager.h"
 #include "mitkPluginActivator.h"
 #include "mitkSegTool2D.h"
+#include "mitkImageTimeSelector.h"
 
 // Qmitk
 #include "QmitkNewSegmentationDialog.h"
@@ -441,8 +438,30 @@ void QmitkMultiLabelSegmentationView::OnNewSegmentationSession()
 
   m_ToolManager->ActivateTool(-1);
 
-  mitk::Image* referenceImage = dynamic_cast<mitk::Image*>(referenceNode->GetData());
+  mitk::Image::ConstPointer referenceImage = dynamic_cast<mitk::Image*>(referenceNode->GetData());
   assert(referenceImage);
+
+  if (referenceImage->GetDimension() > 3)
+  {
+    auto result = QMessageBox::question(m_Parent, tr("Generate a static mask?"), tr("The selected image has multiple time steps. You can either generate a simple/static masks resembling the geometry of the first timestep of the image. Or you can generate a dynamic mask that equals the selected image in geometry and number of timesteps; thus a dynamic mask can change over time (e.g. according to the image)."), tr("Yes, generate a static mask"), tr("No, generate a dynamic mask"), QString(), 0, 0);
+    if (result == 0)
+    {
+      auto selector = mitk::ImageTimeSelector::New();
+      selector->SetInput(referenceImage);
+      selector->SetTimeNr(0);
+      selector->Update();
+
+      const auto refTimeGeometry = referenceImage->GetTimeGeometry();
+      auto newTimeGeometry = mitk::ProportionalTimeGeometry::New();
+      newTimeGeometry->SetFirstTimePoint(refTimeGeometry->GetMinimumTimePoint());
+      newTimeGeometry->SetStepDuration(refTimeGeometry->GetMaximumTimePoint() - refTimeGeometry->GetMinimumTimePoint());
+
+      mitk::Image::Pointer newImage = selector->GetOutput();
+      newTimeGeometry->SetTimeStepGeometry(referenceImage->GetGeometry(), 0);
+      newImage->SetTimeGeometry(newTimeGeometry);
+      referenceImage = newImage;
+    }
+  }
 
   QString newName = QString::fromStdString(referenceNode->GetName());
   newName.append("-labels");
@@ -1090,7 +1109,7 @@ void QmitkMultiLabelSegmentationView::RenderWindowPartActivated(mitk::IRenderWin
 void QmitkMultiLabelSegmentationView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* /*renderWindowPart*/)
 {
   m_ToolManager->ActivateTool(-1);
-  m_IRenderWindowPart = 0;
+  m_IRenderWindowPart = nullptr;
   m_Parent->setEnabled(false);
 }
 

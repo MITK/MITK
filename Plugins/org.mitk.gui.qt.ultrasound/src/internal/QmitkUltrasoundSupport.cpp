@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 // Blueberry
 #include <berryISelectionService.h>
@@ -45,8 +41,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkUltrasoundSupport::VIEW_ID = "org.mitk.views.ultrasoundsupport";
 
 QmitkUltrasoundSupport::QmitkUltrasoundSupport()
-  : m_Controls(nullptr), m_ControlCustomWidget(0), m_ControlBModeWidget(0),
-  m_ControlProbesWidget(0), m_ImageAlreadySetToNode(false),
+  : m_Controls(nullptr), m_ControlCustomWidget(nullptr), m_ControlBModeWidget(nullptr),
+  m_ControlProbesWidget(nullptr), m_ImageAlreadySetToNode(false),
   m_CurrentImageWidth(0), m_CurrentImageHeight(0)
 {
   ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
@@ -197,12 +193,12 @@ void QmitkUltrasoundSupport::UpdateImage()
       }
       // if the geometry changed: reinitialize the ultrasound image
       if ((i==0) && (m_OldGeometry.IsNotNull()) &&
-        (curOutput->GetGeometry() != NULL) &&
+        (curOutput->GetGeometry() != nullptr) &&
         (!mitk::Equal(*(m_OldGeometry.GetPointer()), *(curOutput->GetGeometry()), 0.0001, false))
         )
       {
         mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
-        if ((renderWindow != NULL) && (curOutput->GetTimeGeometry()->IsValid()) && (m_Controls->m_ShowImageStream->isChecked()))
+        if ((renderWindow != nullptr) && (curOutput->GetTimeGeometry()->IsValid()) && (m_Controls->m_ShowImageStream->isChecked()))
         {
           renderWindow->GetRenderingManager()->InitializeViews(
             curOutput->GetGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
@@ -444,19 +440,19 @@ void QmitkUltrasoundSupport::RemoveControlWidgets()
   // remove probes widget (which is not part of the tool box widget)
   m_Controls->probesWidgetContainer->removeWidget(m_ControlProbesWidget);
   delete m_ControlProbesWidget;
-  m_ControlProbesWidget = 0;
+  m_ControlProbesWidget = nullptr;
 
   delete m_ControlBModeWidget;
-  m_ControlBModeWidget = 0;
+  m_ControlBModeWidget = nullptr;
 
   delete m_ControlDopplerWidget;
-  m_ControlDopplerWidget = 0;
+  m_ControlDopplerWidget = nullptr;
 
   // delete custom widget if it is present
   if (m_ControlCustomWidget)
   {
     ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
-    delete m_ControlCustomWidget; m_ControlCustomWidget = 0;
+    delete m_ControlCustomWidget; m_ControlCustomWidget = nullptr;
     if (m_CustomWidgetServiceReference.size() > 0)
     {
       pluginContext->ungetService(m_CustomWidgetServiceReference.at(0));

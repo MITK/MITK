@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkPythonView.h"
 #include <QmitkCtkPythonShell.h>
@@ -40,8 +36,8 @@ struct QmitkPythonViewData
 QmitkPythonView::QmitkPythonView()
     : d( new QmitkPythonViewData )
 {
-    d->m_PythonVariableStackTableView = 0;
-    d->m_PythonShell = 0;
+    d->m_PythonVariableStackTableView = nullptr;
+    d->m_PythonShell = nullptr;
 }
 
 QmitkPythonView::~QmitkPythonView()

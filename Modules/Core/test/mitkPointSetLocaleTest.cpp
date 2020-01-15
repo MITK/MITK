@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 // Testing
 #include "mitkTestFixture.h"
@@ -133,7 +129,7 @@ private:
   }
 
 public:
-  void setUp()
+  void setUp() override
   {
     m_RefPointSet = mitk::PointSet::New();
 
@@ -149,7 +145,7 @@ public:
     m_RefPoint[2] = 29.6502;
   }
 
-  void tearDown()
+  void tearDown() override
   {
     m_RefPoint[0] = 0;
     m_RefPoint[1] = 0;

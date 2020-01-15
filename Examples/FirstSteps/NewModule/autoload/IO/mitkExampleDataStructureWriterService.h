@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef __mitkExampleDataStructureWriterService_h
 #define __mitkExampleDataStructureWriterService_h
@@ -32,14 +28,14 @@ namespace mitk
     typedef mitk::ExampleDataStructure InputType;
 
     ExampleDataStructureWriterService();
-    virtual ~ExampleDataStructureWriterService();
+    ~ExampleDataStructureWriterService() override;
 
     using AbstractFileWriter::Write;
-    virtual void Write() override;
+    void Write() override;
 
   protected:
     ExampleDataStructureWriterService(const ExampleDataStructureWriterService &other);
-    virtual mitk::ExampleDataStructureWriterService *Clone() const override;
+    mitk::ExampleDataStructureWriterService *Clone() const override;
   };
 
 } // end of namespace mitk

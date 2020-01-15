@@ -52,8 +52,6 @@ endif()
 
 get_property(external_projects GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS)
 
-list(REMOVE_ITEM external_projects Python)
-list(REMOVE_ITEM external_projects OpenMP)
 if(MITK_CTEST_SCRIPT_MODE)
   # Write a file containing the list of enabled external project targets.
   # This file can be read by a ctest script to separately build projects.
@@ -186,11 +184,11 @@ set(ep_common_args
   -DCMAKE_MODULE_LINKER_FLAGS:STRING=${CMAKE_MODULE_LINKER_FLAGS}
 )
 
-set(DCMTK_CMAKE_DEBUG_POSTFIX )
+if(MSVC_VERSION)
+  list(APPEND ep_common_args
+    -DCMAKE_DEBUG_POSTFIX:STRING=d
+  )
 
-# python libraries wont work with it
-if(NOT MITK_USE_Python)
-  list(APPEND ep_common_args -DCMAKE_DEBUG_POSTFIX:STRING=d)
   set(DCMTK_CMAKE_DEBUG_POSTFIX d)
 endif()
 
@@ -257,16 +255,14 @@ set(mitk_cmake_boolean_args
   BUILD_SHARED_LIBS
   WITH_COVERAGE
   BUILD_TESTING
-
   MITK_BUILD_ALL_PLUGINS
   MITK_BUILD_ALL_APPS
   MITK_BUILD_EXAMPLES
-
   MITK_USE_Qt5
   MITK_USE_SYSTEM_Boost
   MITK_USE_BLUEBERRY
   MITK_USE_OpenCL
-
+  MITK_USE_OpenMP
   MITK_ENABLE_PIC_READER
   )
 
@@ -331,15 +327,27 @@ foreach(type RUNTIME ARCHIVE LIBRARY)
 endforeach()
 
 # Optional python variables
-if(MITK_USE_Python)
+if(MITK_USE_Python3)
   list(APPEND mitk_optional_cache_args
-       -DMITK_USE_Python:BOOL=${MITK_USE_Python}
+       -DMITK_USE_Python3:BOOL=${MITK_USE_Python3}
        "-DPython3_EXECUTABLE:FILEPATH=${Python3_EXECUTABLE}"
-       "-DPython3_INCLUDE_DIR:PATH=${Python3_INCLUDE_DIR}"
+       "-DPython3_INCLUDE_DIR:PATH=${Python3_INCLUDE_DIRS}"
        "-DPython3_LIBRARY:FILEPATH=${Python3_LIBRARY}"
        "-DPython3_STDLIB:FILEPATH=${Python3_STDLIB}"
        "-DPython3_SITELIB:FILEPATH=${Python3_SITELIB}"
       )
+endif()
+
+if(OPENSSL_ROOT_DIR)
+  list(APPEND mitk_optional_cache_args
+    "-DOPENSSL_ROOT_DIR:PATH=${OPENSSL_ROOT_DIR}"
+  )
+endif()
+
+if(CMAKE_FRAMEWORK_PATH)
+  list(APPEND mitk_optional_cache_args
+    "-DCMAKE_FRAMEWORK_PATH:PATH=${CMAKE_FRAMEWORK_PATH}"
+  )
 endif()
 
 if(Eigen_INCLUDE_DIR)
@@ -399,6 +407,7 @@ ExternalProject_Add(${proj}
     ${mitk_optional_cache_args}
     -DMITK_USE_SUPERBUILD:BOOL=OFF
     -DMITK_BUILD_CONFIGURATION:STRING=${MITK_BUILD_CONFIGURATION}
+    -DMITK_FAST_TESTING:BOOL=${MITK_FAST_TESTING}
     -DCTEST_USE_LAUNCHERS:BOOL=${CTEST_USE_LAUNCHERS}
     # ----------------- Miscellaneous ---------------
     -DCMAKE_LIBRARY_PATH:PATH=${CMAKE_LIBRARY_PATH}

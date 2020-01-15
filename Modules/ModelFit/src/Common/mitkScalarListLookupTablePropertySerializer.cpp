@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkScalarListLookupTableProperty.h"
 #include "mitkScalarListLookupTablePropertySerializer.h"
@@ -23,10 +19,10 @@ TiXmlElement* mitk::ScalarListLookupTablePropertySerializer::Serialize()
 	const ScalarListLookupTableProperty* prop =
 		dynamic_cast<const ScalarListLookupTableProperty*>(m_Property.GetPointer());
 
-	if (prop == NULL)
+	if (prop == nullptr)
 	{
 		MITK_ERROR << "Serialization: Property is NULL";
-		return NULL;
+		return nullptr;
 	}
 
 	ScalarListLookupTable lut = prop->GetValue();
@@ -61,30 +57,30 @@ mitk::ScalarListLookupTablePropertySerializer::Deserialize(TiXmlElement* element
 	if (!element)
 	{
 		MITK_ERROR << "Deserialization: Element is NULL";
-		return NULL;
+		return nullptr;
 	}
 
 	ScalarListLookupTable lut;
 
 	for (TiXmlElement* listElement = element->FirstChildElement("List");
-		 listElement != NULL; listElement = listElement->NextSiblingElement("List"))
+		 listElement != nullptr; listElement = listElement->NextSiblingElement("List"))
 	{
 		std::string name;
 
-		if (listElement->Attribute("name") != NULL)
+		if (listElement->Attribute("name") != nullptr)
 		{
 			name = listElement->Attribute("name");
 		}
 		else
 		{
 			MITK_ERROR << "Deserialization: No element with attribute 'name' found";
-			return NULL;
+			return nullptr;
 		}
 
 		ScalarListLookupTable::ValueType list;
 
 		for (TiXmlElement* valueElement = listElement->FirstChildElement("Element");
-			 valueElement != NULL;
+			 valueElement != nullptr;
 			 valueElement = valueElement->NextSiblingElement("Element"))
 		{
 			double value;
@@ -92,7 +88,7 @@ mitk::ScalarListLookupTablePropertySerializer::Deserialize(TiXmlElement* element
 			if (valueElement->QueryDoubleAttribute("value", &value) == TIXML_WRONG_TYPE)
 			{
 				MITK_ERROR << "Deserialization: No element with attribute 'value' found";
-				return NULL;
+				return nullptr;
 			}
 
 			list.push_back(value);

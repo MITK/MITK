@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef org_mitk_ConcentrationCurveConverterView_Activator_h
 #define org_mitk_ConcentrationCurveConverterView_Activator_h
@@ -32,14 +28,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 		 *					first loaded.
 		 *	@param context	The corresponding CTK plug-in context in which the plug-in is loaded.
 		 */
-		void start(ctkPluginContext* context);
+		void start(ctkPluginContext* context) override;
 
 		/*!
 		 *	@brief			Deregisters the plug-in. Gets called by the framework when the plug-in
 		 *					is unloaded.
 		 *	@param context	The corresponding CTK plug-in context in which the plug-in was loaded.
 		 */
-		void stop(ctkPluginContext* context);
+		void stop(ctkPluginContext* context) override;
 	};
 
 #endif

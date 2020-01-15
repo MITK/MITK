@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkRenderWindowBase.h"
 #include "mitkRenderingManager.h"
@@ -39,19 +35,12 @@ derived object[..]"
 
 * or short: within constructors and destructors classes are not polymorph.
 */
-void mitk::RenderWindowBase::Initialize(mitk::RenderingManager *renderingManager,
-                                        const char *name,
-                                        mitk::BaseRenderer::RenderingMode::Type renderingMode)
+void mitk::RenderWindowBase::Initialize(const char *name)
 {
-  if (renderingManager == nullptr)
-  {
-    renderingManager = mitk::RenderingManager::GetInstance();
-  }
+  auto renderingManager = mitk::RenderingManager::GetInstance();
 
   if (m_Renderer.IsNull())
-  {
-    m_Renderer = mitk::VtkPropRenderer::New(name, GetVtkRenderWindow(), renderingManager, renderingMode);
-  }
+    m_Renderer = mitk::VtkPropRenderer::New(name, GetVtkRenderWindow());
 
   m_Renderer->InitRenderer(this->GetVtkRenderWindow());
 
@@ -79,7 +68,7 @@ bool mitk::RenderWindowBase::HandleEvent(InteractionEvent *interactionEvent)
 
 void mitk::RenderWindowBase::Destroy()
 {
-  m_Renderer->GetRenderingManager()->RemoveRenderWindow(GetVtkRenderWindow());
+  RenderingManager::GetInstance()->RemoveRenderWindow(GetVtkRenderWindow());
   m_Renderer->GetVtkRenderer()->RemoveViewProp(m_RenderProp);
   m_RenderProp->Delete();
   BaseRenderer::RemoveInstance(this->GetVtkRenderWindow());

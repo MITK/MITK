@@ -15,29 +15,23 @@ if(MITK_USE_CTK)
 
   if(NOT DEFINED CTK_DIR)
 
-    set(revision_tag b93e8dca)
+    set(revision_tag "kislinsk_fix-pythonlibs-handling") # Switch back to official CTK repo when PR874 was merged
 
     set(ctk_optional_cache_args )
-    if(MITK_USE_Python)
+    if(MITK_USE_Python3)
       list(APPEND ctk_optional_cache_args
            -DCTK_LIB_Scripting/Python/Widgets:BOOL=ON
            -DCTK_ENABLE_Python_Wrapping:BOOL=OFF
-           -DCTK_APP_ctkSimplePythonShell:BOOL=ON
-           "-DPYTHON_EXECUTABLE:FILEPATH=${Python3_EXECUTABLE}"
-           "-DPYTHON_INCLUDE_DIR:PATH=${Python3_INCLUDE_DIR}"
-           "-DPYTHON_LIBRARY:FILEPATH=${Python3_LIBRARY}"
+           -DCTK_APP_ctkSimplePythonShell:BOOL=OFF
+           "-DPYTHON_INCLUDE_DIR:PATH=${Python3_INCLUDE_DIRS}"
+           "-DPYTHON_LIBRARY:FILEPATH=${Python3_LIBRARY_RELEASE}"
       )
     else()
       list(APPEND ctk_optional_cache_args
            -DCTK_LIB_Scripting/Python/Widgets:BOOL=OFF
            -DCTK_ENABLE_Python_Wrapping:BOOL=OFF
            -DCTK_APP_ctkSimplePythonShell:BOOL=OFF
-      )
-    endif()
-
-    if(NOT MITK_USE_Python)
-      list(APPEND ctk_optional_cache_args
-        -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=d
+           -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=d
       )
     endif()
 
@@ -58,7 +52,7 @@ if(MITK_USE_CTK)
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
-      URL_MD5 C86289F25E79B0C5C12E424BD706388F
+      URL_MD5 49e1652cc505bdf3f77210976df97d63
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}
@@ -84,7 +78,7 @@ if(MITK_USE_CTK)
         -DCTK_PLUGIN_org.commontk.configadmin:BOOL=ON
         -DCTK_USE_GIT_PROTOCOL:BOOL=OFF
         -DDCMTK_DIR:PATH=${DCMTK_DIR}
-        -DPythonQt_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/PythonQt_fae23012.tar.gz # From https://github.com/kislinsk/PythonQt.git
+        -DPythonQt_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/PythonQt_fae23012.tar.gz
         ${${proj}_CUSTOM_CMAKE_ARGS}
       CMAKE_CACHE_ARGS
         ${ep_common_cache_args}

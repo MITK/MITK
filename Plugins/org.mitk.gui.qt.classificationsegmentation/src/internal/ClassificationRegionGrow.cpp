@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 // STD
 #include <stack>
 
@@ -342,7 +338,7 @@ void ClassificationRegionGrow::DoAutomSegmentation()
   QmitkDataStorageComboBox * cb_maskimage = dynamic_cast<QmitkDataStorageComboBox *>(m_Controls.m_MaskImageLayout->itemAt(1)->widget());
   mitk::Image::Pointer raw_image;
   mitk::Image::Pointer mask_image;
-  if ((cb_image != NULL) || (cb_maskimage != NULL))
+  if ((cb_image != nullptr) || (cb_maskimage != nullptr))
   {
     raw_image = dynamic_cast<mitk::Image *>(cb_image->GetSelectedNode()->GetData());
     mask_image = dynamic_cast<mitk::Image *>(cb_maskimage->GetSelectedNode()->GetData());

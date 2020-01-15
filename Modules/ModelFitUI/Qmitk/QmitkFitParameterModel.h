@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QmitkFitParameterModel_h
 #define QmitkFitParameterModel_h
@@ -38,8 +34,8 @@ class MITKMODELFITUI_EXPORT QmitkFitParameterModel : public QAbstractTableModel
 public:
   using FitVectorType = std::vector<mitk::modelFit::ModelFitInfo::ConstPointer>;
 
-  QmitkFitParameterModel(QObject* parent = NULL);
-  virtual ~QmitkFitParameterModel() {};
+  QmitkFitParameterModel(QObject* parent = nullptr);
+  ~QmitkFitParameterModel() override {};
 
   const FitVectorType& getFits() const;
 
@@ -47,12 +43,12 @@ public:
 
   const mitk::PointSet* getPositionBookmarks() const;
 
-  virtual Qt::ItemFlags flags(const QModelIndex& index) const;
-  virtual QVariant data(const QModelIndex& index, int role) const;
-  virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
-  virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
-  virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
-  virtual bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
+  Qt::ItemFlags flags(const QModelIndex& index) const override;
+  QVariant data(const QModelIndex& index, int role) const override;
+  QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+  int rowCount(const QModelIndex& parent = QModelIndex()) const override;
+  int columnCount(const QModelIndex& parent = QModelIndex()) const override;
+  bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
 
 public Q_SLOTS:
 

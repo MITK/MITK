@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKRENDERINGMANAGER_H_HEADER_INCLUDED_C135A197
 #define MITKRENDERINGMANAGER_H_HEADER_INCLUDED_C135A197
@@ -28,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProperties.h"
 #include "mitkPropertyList.h"
 #include "mitkTimeGeometry.h"
+#include <mitkAntiAliasing.h>
 
 class vtkRenderWindow;
 class vtkObject;
@@ -290,7 +287,11 @@ namespace mitk
 
     itkGetMacro(FocusedRenderWindow, vtkRenderWindow *)
 
-      itkSetMacro(ConstrainedPanningZooming, bool);
+    itkSetMacro(ConstrainedPanningZooming, bool);
+
+    itkGetMacro(AntiAliasing, AntiAliasing)
+
+    void SetAntiAliasing(AntiAliasing antiAliasing);
 
   protected:
     enum
@@ -365,6 +366,7 @@ namespace mitk
                                     int mapperID);
 
     vtkRenderWindow *m_FocusedRenderWindow;
+    AntiAliasing m_AntiAliasing;
   };
 
 #pragma GCC visibility push(default)

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "FitGeneratorDemoView.h"
 #include <QMessageBox>
@@ -37,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateOr.h>
 
-#include <mitkTestArtifactGenerator.h>
+#include <mitkTestDynamicImageGenerator.h>
 
 #include <iostream>
 
@@ -86,10 +82,10 @@ void FitGeneratorDemoView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*s
 
   QList<mitk::DataNode::Pointer> dataNodes = this->GetDataManagerSelection();
 
-  m_selectedNode = NULL;
-  m_selectedImage = NULL;
-  m_selectedMaskNode = NULL;
-  m_selectedMask = NULL;
+  m_selectedNode = nullptr;
+  m_selectedImage = nullptr;
+  m_selectedMaskNode = nullptr;
+  m_selectedMask = nullptr;
 
   if (!dataNodes.empty())
   {
@@ -220,8 +216,8 @@ void FitGeneratorDemoView::Generate()
 
 FitGeneratorDemoView::FitGeneratorDemoView()
 {
-  m_selectedImage = NULL;
-  m_selectedNode = NULL;
+  m_selectedImage = nullptr;
+  m_selectedNode = nullptr;
 
 }
 

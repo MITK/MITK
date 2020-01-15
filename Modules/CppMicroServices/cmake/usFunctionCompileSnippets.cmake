@@ -37,6 +37,7 @@ function(usFunctionCompileSnippets snippet_path)
     target_link_libraries(${snippet_target_name} ${PROJECT_TARGET} ${snippet_link_libraries})
     set_property(TARGET ${snippet_target_name} APPEND PROPERTY COMPILE_DEFINITIONS US_MODULE_NAME=main)
     set_property(TARGET ${snippet_target_name} PROPERTY US_MODULE_NAME main)
+    set_property(TARGET ${snippet_target_name} PROPERTY FOLDER "${MITK_ROOT_FOLDER}/CppMicroServices/Snippets")
     set_target_properties(${snippet_target_name} PROPERTIES
       LABELS Documentation
       RUNTIME_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/snippets"

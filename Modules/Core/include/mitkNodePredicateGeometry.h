@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKNODEPREDICATEGEOMETRY_H_HEADER_INCLUDED_
 #define MITKNODEPREDICATEGEOMETRY_H_HEADER_INCLUDED_
@@ -30,7 +26,7 @@ namespace mitk
    has the same geometry (in terms of spacing, origin, orientation) like
    the reference geometry. One can either check the whole time geometry of
    the date node by defining a referenc time geometry or check against one given
-   reference base geometry. If the predicate should check against a base geometry, 
+   reference base geometry. If the predicate should check against a base geometry,
    you can specify the timepoint of the data's time geometry that should be checked.
    If no timepoint is defined the predicate will evaluate the data geometry in
    the first timestep.

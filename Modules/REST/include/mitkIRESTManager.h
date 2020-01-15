@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef mitkIRESTManager_h
 #define mitkIRESTManager_h
@@ -20,9 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkServiceInterface.h>
 
 #include <MitkRESTExports.h>
+#include <mitkRESTUtil.h>
 
 #include <cpprest/json.h>
 #include <cpprest/uri.h>
+#include <cpprest/http_client.h>
 
 namespace mitk
 {
@@ -51,17 +49,48 @@ namespace mitk
     /**
      * @brief Executes a HTTP request in the mitkRESTClient class
      *
+     * @throw mitk::Exception if RequestType is not suported
      * @param uri defines the URI the request is send to
      * @param type the RequestType of the HTTP request (optional)
-     * @param body the body for the request (optional)
+     * @param headers the headers for the request (optional)
      * @return task to wait for
      */
     virtual pplx::task<web::json::value> SendRequest(
       const web::uri &uri,
       const RequestType &type = RequestType::Get,
+      const std::map<utility::string_t, utility::string_t> headers = {}) = 0;
+
+    /**
+     * @brief Executes a HTTP request in the mitkRESTClient class
+     *
+     * @param uri defines the URI the request is send to
+     * @param type the RequestType of the HTTP request (optional)
+     * @param body the body for the request (optional)
+     * @param headers the headers for the request (optional)
+     * @param filePath the file path to store the request to (optional)
+     * @return task to wait for
+     */
+    virtual pplx::task<web::json::value> SendJSONRequest(
+      const web::uri &uri,
+      const RequestType &type = RequestType::Get,
       const web::json::value *body = nullptr,
+      const std::map<utility::string_t, utility::string_t> headers = {},
       const utility::string_t &filePath = {}
     ) = 0;
+
+    /**
+     * @brief Executes a HTTP request in the mitkRESTClient class
+     *
+     * @param uri defines the URI the request is send to
+     * @param type the RequestType of the HTTP request (optional)
+     * @param body the body for the request (optional)
+     * @param headers the headers for the request (optional)
+     * @return task to wait for
+     */
+    virtual pplx::task<web::json::value> SendBinaryRequest(const web::uri &uri,
+                                                     const RequestType &type = RequestType::Get,
+                                                     const std::vector<unsigned char> *body = {},
+                                                     const std::map<utility::string_t, utility::string_t> headers = {}) = 0;
 
     /**
      * @brief starts listening for requests if there isn't another observer listening and the port is free
@@ -76,9 +105,14 @@ namespace mitk
      *
      * @param uri defines the URI of the request
      * @param body the body of the request
-     * @return the data which is modified by the notified observer
+	 * @param method the http method of the request
+	 * @param headers the http headers of the request
+     * @return the response
      */
-    virtual web::json::value Handle(const web::uri &uri, const web::json::value &body) = 0;
+    virtual web::http::http_response Handle(const web::uri &uri,
+                                            const web::json::value &body,
+                                            const web::http::method &method,
+                                            const mitk::RESTUtil::ParamMap &headers) = 0;
 
     /**
      * @brief Handles the deletion of an observer for all or a specific uri

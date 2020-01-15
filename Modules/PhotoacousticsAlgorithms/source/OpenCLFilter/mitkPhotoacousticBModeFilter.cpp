@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "./OpenCLFilter/mitkPhotoacousticBModeFilter.h"
 #include "usServiceReference.h"
@@ -75,13 +71,13 @@ void mitk::PhotoacousticBModeFilter::GenerateData()
   if (!m_UseLogFilter)
     for (unsigned int i = 0; i < size; ++i)
     {
-      OutputData[i] = abs(InputData[i]);
+      OutputData[i] = std::abs(InputData[i]);
     }
   else
   {
     for (unsigned int i = 0; i < size; ++i)
     {
-      OutputData[i] = log(abs(InputData[i]));
+      OutputData[i] = log(std::abs(InputData[i]));
     }
   }
 

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITKUSNAVIGATIONSTEPPLACEMENTPLANNING_H
 #define QMITKUSNAVIGATIONSTEPPLACEMENTPLANNING_H
@@ -82,24 +78,24 @@ protected slots:
   void OnRemoveCurrentTargetClicked();
 
 public:
-  explicit QmitkUSNavigationStepPlacementPlanning(QWidget *parent = 0);
-  ~QmitkUSNavigationStepPlacementPlanning();
+  explicit QmitkUSNavigationStepPlacementPlanning(QWidget *parent = nullptr);
+  ~QmitkUSNavigationStepPlacementPlanning() override;
 
-  virtual QString GetTitle();
-  virtual FilterVector GetFilter();
+  QString GetTitle() override;
+  FilterVector GetFilter() override;
 
 protected:
-  virtual bool OnStartStep();
-  virtual bool OnStopStep();
-  virtual bool OnRestartStep();
-  virtual bool OnFinishStep();
+  bool OnStartStep() override;
+  bool OnStopStep() override;
+  bool OnRestartStep() override;
+  bool OnFinishStep() override;
 
-  virtual bool OnActivateStep();
-  virtual bool OnDeactivateStep();
-  virtual void OnUpdate();
+  bool OnActivateStep() override;
+  bool OnDeactivateStep() override;
+  void OnUpdate() override;
 
-  virtual void OnSettingsChanged(const itk::SmartPointer<mitk::DataNode> settingsNode);
-  virtual void OnSetCombinedModality();
+  void OnSettingsChanged(const itk::SmartPointer<mitk::DataNode> settingsNode) override;
+  void OnSetCombinedModality() override;
 
   void CreateTargetNodesIfNecessary();
   void UpdateTargetCoordinates(mitk::DataNode *);

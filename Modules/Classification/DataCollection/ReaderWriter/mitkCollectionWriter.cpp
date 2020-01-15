@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
- The Medical Imaging Interaction Toolkit (MITK)
+The Medical Imaging Interaction Toolkit (MITK)
 
- Copyright (c) German Cancer Research Center,
- Division of Medical and Biological Informatics.
- All rights reserved.
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
 
- This software is distributed WITHOUT ANY WARRANTY; without
- even the implied warranty of MERCHANTABILITY or FITNESS FOR
- A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
- See LICENSE.txt or http://www.mitk.org for details.
-
- ===================================================================*/
+============================================================================*/
 #ifdef _MSC_VER
 #  pragma warning (disable : 4996)
 #endif
@@ -142,7 +138,7 @@ bool mitk::CollectionWriter::ExportCollectionToFolder(DataCollection *dataCollec
           Image::Pointer image = itemCollections->GetMitkImage(s).GetPointer();
           IOUtil::Save(image, fileName.toStdString());
         }
-        catch( const std::exception& e)
+        catch ( const std::exception& e )
         {
           MITK_ERROR << "Caught exception: " << e.what();
         }
@@ -254,7 +250,7 @@ bool mitk::CollectionWriter::SaveCollection(mitk::DataCollection *dataCollection
           Image::Pointer image = itemCollections->GetMitkImage(s).GetPointer();
           IOUtil::Save(image,fileName.toStdString());
         }
-        catch( const std::exception& e)
+        catch ( const std::exception& e )
         {
           MITK_ERROR << "Caught exception: " << e.what();
         }

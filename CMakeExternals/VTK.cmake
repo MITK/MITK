@@ -47,6 +47,9 @@ if(NOT DEFINED VTK_DIR)
       "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
       )
   endif()
+  
+  set (VTK_PATCH_OPTION
+       PATCH_COMMAND ${PATCH_COMMAND} -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VTK-8.1.0.patch)
 
   mitk_query_custom_ep_vars()
 
@@ -54,6 +57,7 @@ if(NOT DEFINED VTK_DIR)
     LIST_SEPARATOR ${sep}
     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/VTK-8.1.0.tar.gz
     URL_MD5 4fa5eadbc8723ba0b8d203f05376d932
+    ${VTK_PATCH_OPTION}
     CMAKE_GENERATOR ${gen}
     CMAKE_GENERATOR_PLATFORM ${gen_platform}
     CMAKE_ARGS

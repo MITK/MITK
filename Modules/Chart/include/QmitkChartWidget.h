@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 #ifndef QmitkC3jsWidget_h
 #define QmitkC3jsWidget_h
 
@@ -21,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidget>
 
 #include <MitkChartExports.h>
+
+class QmitkChartxyData;
 
 /*!
 \brief QmitkChartWidget is a widget to display various charts based on the javascript chart library plotly.
@@ -66,6 +64,32 @@ public:
   enum class LineStyle {
     solid,
     dashed
+  };
+  enum class ChartColor {
+    red,
+    orange,
+    yellow,
+    green,
+    blue,
+    purple,
+    brown,
+    magenta,
+    tan,
+    cyan,
+    olive,
+    maroon,
+    navy,
+    aquamarine,
+    turqouise,
+    silver,
+    lime,
+    teal,
+    indigo,
+    violet,
+    pink,
+    black,
+    white,
+    grey
   };
   enum class AxisScale {
     linear,
@@ -123,9 +147,25 @@ public:
   * \note If the label name already exists, the name is replaced with a unique one by concatenating numbers to it.
   * \warning Pie chart is significantly different than the other chart types. Here, the data given by AddData1D is summed. Each entry represents a different category.
   */
+
+  void UpdateChartExampleData(const std::map<double, double>& data2D,
+                              const std::string& label,
+                              const std::string& type,
+                              const std::string& color,
+                              const std::string& lineStyle,
+                              const std::string& pieLabelsData = 0);
+
   void AddData2D(const std::map<double, double> &data2D,
                  const std::string &label,
                  ChartType chartType = ChartType::bar);
+
+  //Add Function for the ChartExample
+  void AddChartExampleData(const std::map<double, double>& data2D,
+                           const std::string& label,
+                           const std::string& type,
+                           const std::string& color,
+                           const std::string& style,
+                           const std::string& pieLabelsData = 0);
 
   /*!
   * \brief Removes data from the widget, works for 1D and 2D Data
@@ -136,6 +176,8 @@ public:
   void RemoveData(const std::string& label);
 
   void UpdateLabel(const std::string& existingLabel, const std::string& newLabel);
+
+  QmitkChartxyData *GetDataElementByLabel(const std::string& label) const;
 
   /*!
   * \brief Sets the color of one data entry (identifier is previously assigned label)
@@ -190,7 +232,7 @@ public:
    * \note If only error plus is provided, the error bars are symmetrical
    * \param label the name of the data that is also used as identifier.
    * \param errorPlus the error in positive direction
-   * \param errorMinus the error in negative direction. Same as error plus if omitted 
+   * \param errorMinus the error in negative direction. Same as error plus if omitted
    */
   void SetXErrorBars(const std::string &label, const std::vector<double> &errorPlus, const std::vector<double>& errorMinus = std::vector<double>());
 
@@ -241,14 +283,14 @@ public:
 
   /*!
   * \brief Sets whether the subchart shall be shown.
-  * \details Changes the state of the current chart object. 
+  * \details Changes the state of the current chart object.
   * \note Needs to be reloaded with Reload() to display changes.
   */
   void SetShowSubchart(bool showSubChart);
 
   /*!
    * \brief Sets whether the error bars shall be shown.
-   * \details Changes the state of the current chart object. 
+   * \details Changes the state of the current chart object.
    * \note Needs to be reloaded with Reload() to display changes.
    * \param showErrorBars if error bars are displayed or not.
    */

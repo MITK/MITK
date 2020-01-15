@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef __Q_MITK_MATCHPOINT_H
 #define __Q_MITK_MATCHPOINT_H
@@ -61,13 +57,13 @@ public:
     berryObjectMacro(QmitkMatchPointBrowser)
 
         QmitkMatchPointBrowser();
-    virtual ~QmitkMatchPointBrowser();
+    ~QmitkMatchPointBrowser() override;
 
     /**
     * \brief Called by the framework to indicate that the preferences have changed.
     * \param prefs not used, as we call RetrievePreferenceValues().
     */
-    void OnPreferencesChanged(const berry::IBerryPreferences* prefs);
+    void OnPreferencesChanged(const berry::IBerryPreferences* prefs) override;
 
     protected slots:
 
@@ -85,8 +81,8 @@ public:
     void OnSearchChanged(const QString&);
 
 protected:
-    virtual void CreateQtPartControl(QWidget* parent);
-    virtual void SetFocus();
+    void CreateQtPartControl(QWidget* parent) override;
+    void SetFocus() override;
 
     Ui::MatchPointBrowserControls m_Controls;
 
@@ -96,7 +92,7 @@ protected:
     //! [Qt Selection Provider]
 
 private:
-    void SetSelectionProvider();
+    void SetSelectionProvider() override;
 
     void Error(QString msg);
 

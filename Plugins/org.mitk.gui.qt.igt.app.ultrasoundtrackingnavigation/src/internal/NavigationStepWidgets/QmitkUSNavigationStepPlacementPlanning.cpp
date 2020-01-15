@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkUSNavigationStepPlacementPlanning.h"
 #include "ui_QmitkUSNavigationStepPlacementPlanning.h"
@@ -380,7 +376,7 @@ void QmitkUSNavigationStepPlacementPlanning::OnFreeze(bool freeze)
   }
   else
   {
-    m_PointMarkInteractor->SetDataNode(0);
+    m_PointMarkInteractor->SetDataNode(nullptr);
   }
 
   if (!freeze)
@@ -565,7 +561,7 @@ void QmitkUSNavigationStepPlacementPlanning::UpdateTargetColors()
   m_TargetNode->SetColor(1, 1, 1);
 
   mitk::BaseData *targetNodeData = m_TargetNode->GetData();
-  if (targetNodeData == 0)
+  if (targetNodeData == nullptr)
   {
     return;
   }
@@ -639,7 +635,7 @@ void QmitkUSNavigationStepPlacementPlanning::ReinitNodeDisplacementFilter()
        it != m_PlannedTargetNodes.end();
        ++it)
   {
-    if (it->IsNotNull() && (*it)->GetData() != 0)
+    if (it->IsNotNull() && (*it)->GetData() != nullptr)
     {
       m_NodeDisplacementFilter->AddNode(*it);
     }
@@ -648,7 +644,7 @@ void QmitkUSNavigationStepPlacementPlanning::ReinitNodeDisplacementFilter()
        it != m_PlannedNeedlePaths.end();
        ++it)
   {
-    if (it->IsNotNull() && (*it)->GetData() != 0)
+    if (it->IsNotNull() && (*it)->GetData() != nullptr)
     {
       m_NodeDisplacementFilter->AddNode(*it);
     }

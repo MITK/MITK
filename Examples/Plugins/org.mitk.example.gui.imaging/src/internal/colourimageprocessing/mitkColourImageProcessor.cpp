@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkColourImageProcessor.h"
 #include <itkImage.h>
@@ -986,7 +982,7 @@ namespace mitk
 
       return CombineRGBAImage(data1, data2, dim[0], dim[1], dim[2]);
     }
-    catch (mitk::Exception &e)
+    catch ( const mitk::Exception &e )
     {
       MITK_ERROR << "mitkColourImageProcessor::combineRGBAImage - No access to image data possible." << e.what();
       return nullptr;

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #ifndef __Q_MITK_MATCHPOINT_REGISTRATION_EVALUATOR_H
@@ -48,9 +44,9 @@ public:
   berryObjectMacro(QmitkMatchPointRegistrationEvaluator)
 
   QmitkMatchPointRegistrationEvaluator();
-  ~QmitkMatchPointRegistrationEvaluator();
+  ~QmitkMatchPointRegistrationEvaluator() override;
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  void CreateQtPartControl(QWidget *parent) override;
 
 protected slots:
 
@@ -64,15 +60,15 @@ protected slots:
 
 protected:
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
+  void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
     const QList<mitk::DataNode::Pointer>& nodes) override;
 
-  virtual void NodeRemoved(const mitk::DataNode* node) override;
+  void NodeRemoved(const mitk::DataNode* node) override;
 
-  virtual void SetFocus();
+  void SetFocus() override;
 
-  virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart);
-  virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart);
+  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
 
   Ui::MatchPointRegistrationEvaluatorControls m_Controls;
 

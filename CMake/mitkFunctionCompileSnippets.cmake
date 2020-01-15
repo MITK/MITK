@@ -42,6 +42,7 @@ function(mitkFunctionCompileSnippets snippet_path)
       ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/snippets"
       LIBRARY_OUTPUT_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/snippets"
       OUTPUT_NAME ${snippet_exec_name}
+      FOLDER "${MITK_ROOT_FOLDER}/Documentation/Snippets"
     )
 
   endforeach()

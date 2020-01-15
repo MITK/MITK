@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "PETDynamicView.h"
 
@@ -173,16 +169,16 @@ void PETDynamicView::UpdateGUIControls()
   m_Controls.checkBox_Constraints->setEnabled(m_modelConstraints.IsNotNull());
 
    bool is1TCMFactory = dynamic_cast<mitk::OneTissueCompartmentModelFactory*>
-                        (m_selectedModelFactory.GetPointer()) != NULL;
+                        (m_selectedModelFactory.GetPointer()) != nullptr;
    bool isExt1TCMFactory = dynamic_cast<mitk::ExtendedOneTissueCompartmentModelFactory*>
-                        (m_selectedModelFactory.GetPointer()) != NULL;
+                        (m_selectedModelFactory.GetPointer()) != nullptr;
    bool isFDGCMFactory = dynamic_cast<mitk::TwoTissueCompartmentFDGModelFactory*>
-                        (m_selectedModelFactory.GetPointer()) != NULL;
+                        (m_selectedModelFactory.GetPointer()) != nullptr;
 
   bool is2TCMFactory = dynamic_cast<mitk::TwoTissueCompartmentModelFactory*>
-                       (m_selectedModelFactory.GetPointer()) != NULL ||
+                       (m_selectedModelFactory.GetPointer()) != nullptr ||
                        dynamic_cast<mitk::NumericTwoTissueCompartmentModelFactory*>
-                       (m_selectedModelFactory.GetPointer()) != NULL;
+                       (m_selectedModelFactory.GetPointer()) != nullptr;
 
 
   m_Controls.groupAIF->setVisible(is1TCMFactory || isExt1TCMFactory || isFDGCMFactory || is2TCMFactory);
@@ -210,7 +206,7 @@ void PETDynamicView::UpdateGUIControls()
 
 void PETDynamicView::OnModellSet(int index)
 {
-  m_selectedModelFactory = NULL;
+  m_selectedModelFactory = nullptr;
 
   if (index > 0)
   {
@@ -284,22 +280,22 @@ void PETDynamicView::OnModellingButtonClicked()
   //check if all static parameters set
   if (m_selectedModelFactory.IsNotNull() && CheckModelSettings())
   {
-    mitk::ParameterFitImageGeneratorBase::Pointer generator = NULL;
-    mitk::modelFit::ModelFitInfo::Pointer fitSession = NULL;
+    mitk::ParameterFitImageGeneratorBase::Pointer generator = nullptr;
+    mitk::modelFit::ModelFitInfo::Pointer fitSession = nullptr;
 
 
     bool isOTCFactory = dynamic_cast<mitk::OneTissueCompartmentModelFactory*>
-                        (m_selectedModelFactory.GetPointer()) != NULL;
+                        (m_selectedModelFactory.GetPointer()) != nullptr;
     bool isextOTCFactory = dynamic_cast<mitk::ExtendedOneTissueCompartmentModelFactory*>
-                        (m_selectedModelFactory.GetPointer()) != NULL;
+                        (m_selectedModelFactory.GetPointer()) != nullptr;
 
     bool isFDGFactory = dynamic_cast<mitk::TwoTissueCompartmentFDGModelFactory*>
-                        (m_selectedModelFactory.GetPointer()) != NULL;
+                        (m_selectedModelFactory.GetPointer()) != nullptr;
 
     bool isTTCFactory = dynamic_cast<mitk::TwoTissueCompartmentModelFactory*>
-                        (m_selectedModelFactory.GetPointer()) != NULL;
+                        (m_selectedModelFactory.GetPointer()) != nullptr;
     bool isNumTTCFactory = dynamic_cast<mitk::NumericTwoTissueCompartmentModelFactory*>
-                           (m_selectedModelFactory.GetPointer()) != NULL;
+                           (m_selectedModelFactory.GetPointer()) != nullptr;
 
 
     if (isOTCFactory)
@@ -399,8 +395,8 @@ void PETDynamicView::OnModellingButtonClicked()
 void PETDynamicView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
                                         const QList<mitk::DataNode::Pointer>& selectedNodes)
 {
-    m_selectedMaskNode = NULL;
-    m_selectedMask = NULL;
+    m_selectedMaskNode = nullptr;
+    m_selectedMask = nullptr;
 
     m_Controls.errorMessageLabel->setText("");
     m_Controls.masklabel->setText("No (valid) mask selected.");
@@ -430,8 +426,8 @@ void PETDynamicView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*
     }
     else
     {
-      this->m_selectedNode = NULL;
-      this->m_selectedImage = NULL;
+      this->m_selectedNode = nullptr;
+      this->m_selectedImage = nullptr;
       this->m_Controls.initialValuesManager->setReferenceImageGeometry(nullptr);
     }
 
@@ -474,15 +470,15 @@ bool PETDynamicView::CheckModelSettings() const
   {
 
     bool isOTCFactory = dynamic_cast<mitk::OneTissueCompartmentModelFactory*>
-                          (m_selectedModelFactory.GetPointer()) != NULL;
+                          (m_selectedModelFactory.GetPointer()) != nullptr;
     bool isextOTCFactory = dynamic_cast<mitk::ExtendedOneTissueCompartmentModelFactory*>
-                          (m_selectedModelFactory.GetPointer()) != NULL;
+                          (m_selectedModelFactory.GetPointer()) != nullptr;
     bool isFDGFactory = dynamic_cast<mitk::TwoTissueCompartmentFDGModelFactory*>
-                        (m_selectedModelFactory.GetPointer()) != NULL;
+                        (m_selectedModelFactory.GetPointer()) != nullptr;
     bool isTTCFactory = dynamic_cast<mitk::TwoTissueCompartmentModelFactory*>
-                        (m_selectedModelFactory.GetPointer()) != NULL;
+                        (m_selectedModelFactory.GetPointer()) != nullptr;
     bool isNumTTCFactory = dynamic_cast<mitk::NumericTwoTissueCompartmentModelFactory*>
-                           (m_selectedModelFactory.GetPointer()) != NULL;
+                           (m_selectedModelFactory.GetPointer()) != nullptr;
 
     if (isOTCFactory || isextOTCFactory || isFDGFactory || isTTCFactory || isNumTTCFactory)
     {
@@ -701,8 +697,8 @@ void PETDynamicView::DoFit(const mitk::modelFit::ModelFitInfo* fitSession,
 
 PETDynamicView::PETDynamicView() : m_FittingInProgress(false)
 {
-  m_selectedImage = NULL;
-  m_selectedMask = NULL;
+  m_selectedImage = nullptr;
+  m_selectedMask = nullptr;
 
   mitk::ModelFactoryBase::Pointer factory =
     mitk::OneTissueCompartmentModelFactory::New().GetPointer();

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef __MITK_IMAGEGENERATIONHELPER_H
 #define __MITK_IMAGEGENERATIONHELPER_H
@@ -63,7 +59,7 @@ public:
 
 private:
     ImageGenerationHelper(): m_DimX(0), m_DimY(0), m_DimZ(0) {};
-    ~ImageGenerationHelper(){};
+    ~ImageGenerationHelper() override{};
 
     mitk::Image::Pointer GenerateTestFrame(unsigned int timePointIndex);
     unsigned int m_DimX, m_DimY, m_DimZ;

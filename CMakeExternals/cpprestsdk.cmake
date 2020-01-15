@@ -23,20 +23,14 @@ if(MITK_USE_${proj})
     endif()
 
     ExternalProject_Add(${proj}
-      GIT_REPOSITORY https://github.com/Microsoft/cpprestsdk.git
-      GIT_TAG v2.10.10
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/cpprestsdk-2.10.10.tar.gz
+      URL_MD5 705c4bd79158433309b21251a4936b18
+      PATCH_COMMAND ${PATCH_COMMAND} -d "Release/libs/websocketpp" -N -p1 -i "${CMAKE_CURRENT_LIST_DIR}/${proj}.patch"
       SOURCE_SUBDIR Release
       CMAKE_ARGS ${ep_common_args}
       CMAKE_CACHE_ARGS ${cmake_cache_args}
       CMAKE_CACHE_DEFAULT_ARGS ${ep_common_cache_default_args}
       DEPENDS ${proj_DEPENDENCIES}
-    )
-
-    ExternalProject_Add_Step(${proj} git-submodule
-      COMMAND ${GIT_EXECUTABLE} submodule update --init -- Release/libs/websocketpp
-      WORKING_DIRECTORY <SOURCE_DIR>
-      DEPENDEES patch
-      DEPENDERS configure
     )
 
     set(${proj}_DIR ${ep_prefix})

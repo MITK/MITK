@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKSEMANTICRELATIONSINTEGRATION_H
 #define MITKSEMANTICRELATIONSINTEGRATION_H
@@ -57,13 +53,13 @@ namespace mitk
     *
     * @param observer   The concrete observer to register.
     */
-    virtual void AddObserver(ISemanticRelationsObserver* observer) override;
+    void AddObserver(ISemanticRelationsObserver* observer) override;
     /**
     * @brief Removes the given concrete observer from the vector that holds all currently registered observer.
     *
     * @param observer   The concrete observer to unregister.
     */
-    virtual void RemoveObserver(ISemanticRelationsObserver* observer) override;
+    void RemoveObserver(ISemanticRelationsObserver* observer) override;
 
     virtual ~SemanticRelationsIntegration() {}
 
@@ -310,7 +306,7 @@ namespace mitk
     *
     * @param  caseID    The caseID that identifies the currently active patient / case.
     */
-    virtual void NotifyObserver(const mitk::SemanticTypes::CaseID& caseID) const override;
+    void NotifyObserver(const mitk::SemanticTypes::CaseID& caseID) const override;
     /**
     * @brief Remove all control points from the storage that are not referenced by any image anymore.
     *        This might happen if an image has been removed (and unlinked from the corresponding control point)

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 // render window manager UI module
 #include "QmitkRenderWindowDataStorageTreeModel.h"
@@ -421,11 +417,11 @@ void QmitkRenderWindowDataStorageTreeModel::ResetTree()
   {
     m_Root->Delete();
   }
-  endResetModel();
 
   mitk::DataNode::Pointer rootDataNode = mitk::DataNode::New();
   rootDataNode->SetName("Data Storage");
   m_Root = new QmitkDataStorageTreeModelInternalItem(rootDataNode);
+  endResetModel();
 }
 
 void QmitkRenderWindowDataStorageTreeModel::UpdateModelData()

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkDataNode.h"
 
@@ -222,7 +218,7 @@ public:
     vtkRenderWindow *renderWindow = vtkRenderWindow::New();
 
     mitk::VtkPropRenderer::Pointer base =
-      mitk::VtkPropRenderer::New("the first renderer", renderWindow, mitk::RenderingManager::GetInstance());
+      mitk::VtkPropRenderer::New("the first renderer", renderWindow);
 
     // with BaseRenderer==Null
     MITK_TEST_CONDITION(!dataNode->IsSelected(), "Testing if this node is not set as selected")

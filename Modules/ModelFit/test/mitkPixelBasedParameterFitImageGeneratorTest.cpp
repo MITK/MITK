@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <iostream>
 
@@ -27,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkLevenbergMarquardtModelFitFunctor.h"
 
-#include "mitkTestArtifactGenerator.h"
+#include "mitkTestDynamicImageGenerator.h"
 
 int mitkPixelBasedParameterFitImageGeneratorTest(int  /*argc*/, char*[] /*argv[]*/)
 {
@@ -78,7 +74,7 @@ int mitkPixelBasedParameterFitImageGeneratorTest(int  /*argc*/, char*[] /*argv[]
     generator->SetDynamicImage(dynamicImage);
     generator->SetModelParameterizer(parameterizer);
     generator->SetFitFunctor(testFunctor);
-    
+
     generator->Generate();
 
     mitk::PixelBasedParameterFitImageGenerator::ParameterImageMapType resultImages = generator->GetParameterImages();
@@ -92,7 +88,7 @@ int mitkPixelBasedParameterFitImageGeneratorTest(int  /*argc*/, char*[] /*argv[]
 
     mitk::ImagePixelReadAccessor<mitk::ScalarType,3> slopeAccessor(resultImages["slope"]);
     mitk::ImagePixelReadAccessor<mitk::ScalarType,3> offsetAccessor(resultImages["offset"]);
-    
+
     double testValue = slopeAccessor.GetPixelByIndex(testIndex1);
     MITK_TEST_CONDITION_REQUIRED(mitk::Equal(0,testValue, 1e-5, true)==true, "Check param #1 (slope) at index #1");
     testValue = slopeAccessor.GetPixelByIndex(testIndex2);

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MODEL_FIT_FUNCTOR_BASE_H
 #define MODEL_FIT_FUNCTOR_BASE_H
@@ -91,7 +87,7 @@ namespace mitk
 
     ModelFitFunctorBase();
 
-    ~ModelFitFunctorBase();
+    ~ModelFitFunctorBase() override;
 
     /**Internal Method called by Compute to get the final criterion values thar dove the fit.
      must be implemented be concrete functor classes.*/

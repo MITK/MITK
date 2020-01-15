@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 //Poco headers
 #include <Poco/Zip/Compress.h>
@@ -108,26 +104,26 @@ mitk::DataNode::Pointer mitk::NavigationToolWriter::ConvertToDataNode(mitk::Navi
       thisTool = mitk::DataNode::New();
       thisTool->SetName("none");
     }
-    
+
   //Identifier
-    thisTool->AddProperty("identifier",mitk::StringProperty::New(Tool->GetIdentifier().c_str()), NULL, true);
+    thisTool->AddProperty("identifier",mitk::StringProperty::New(Tool->GetIdentifier().c_str()), nullptr, true);
   //Serial Number
-    thisTool->AddProperty("serial number",mitk::StringProperty::New(Tool->GetSerialNumber().c_str()), NULL, true);
+    thisTool->AddProperty("serial number",mitk::StringProperty::New(Tool->GetSerialNumber().c_str()), nullptr, true);
   //Tracking Device
-    thisTool->AddProperty("tracking device type",mitk::StringProperty::New(Tool->GetTrackingDeviceType()), NULL, true);
+    thisTool->AddProperty("tracking device type",mitk::StringProperty::New(Tool->GetTrackingDeviceType()), nullptr, true);
   //Tool Type
-    thisTool->AddProperty("tracking tool type",mitk::IntProperty::New(Tool->GetType()), NULL, true);
+    thisTool->AddProperty("tracking tool type",mitk::IntProperty::New(Tool->GetType()), nullptr, true);
   //Calibration File Name
-    thisTool->AddProperty("toolfileName",mitk::StringProperty::New(GetFileWithoutPath(Tool->GetCalibrationFile())), NULL, true);
+    thisTool->AddProperty("toolfileName",mitk::StringProperty::New(GetFileWithoutPath(Tool->GetCalibrationFile())), nullptr, true);
   //Tool Landmarks
-    thisTool->AddProperty("ToolRegistrationLandmarks",mitk::StringProperty::New(ConvertPointSetToString(Tool->GetToolLandmarks())), NULL, true);
-    thisTool->AddProperty("ToolCalibrationLandmarks",mitk::StringProperty::New(ConvertPointSetToString(Tool->GetToolControlPoints())), NULL, true);
+    thisTool->AddProperty("ToolRegistrationLandmarks",mitk::StringProperty::New(ConvertPointSetToString(Tool->GetToolLandmarks())), nullptr, true);
+    thisTool->AddProperty("ToolCalibrationLandmarks",mitk::StringProperty::New(ConvertPointSetToString(Tool->GetToolControlPoints())), nullptr, true);
 
   //Tool Tip
     if (Tool->IsToolTipSet())
     {
-      thisTool->AddProperty("ToolTipPosition",mitk::StringProperty::New(ConvertPointToString(Tool->GetToolTipPosition())), NULL, true);
-      thisTool->AddProperty("ToolAxisOrientation",mitk::StringProperty::New(ConvertQuaternionToString(Tool->GetToolAxisOrientation())), NULL, true);
+      thisTool->AddProperty("ToolTipPosition",mitk::StringProperty::New(ConvertPointToString(Tool->GetToolTipPosition())), nullptr, true);
+      thisTool->AddProperty("ToolAxisOrientation",mitk::StringProperty::New(ConvertQuaternionToString(Tool->GetToolAxisOrientation())), nullptr, true);
     }
 
   //Material is not needed, to avoid errors in scene serialization we have to do this:

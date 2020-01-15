@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef PETDynamicView_h
 #define PETDynamicView_h
@@ -75,13 +71,13 @@ protected:
   *	@param[in,out] parent	The parent QWidget, as this class itself is not a QWidget
   *							subclass.
   */
-  void CreateQtPartControl(QWidget* parent);
+  void CreateQtPartControl(QWidget* parent) override;
 
   /*!
   *	@brief	Sets the focus to the plot curve button. Gets called by the framework to set the
   *			focus on the right widget.
   */
-  void SetFocus();
+  void SetFocus() override;
 
   /*! @brief Generates a configured fit generator and the corresponding modelinfo for a descriptive brix model with pixel based strategy.
   * @remark add GenerateFunction for each model in the Combo box*/
@@ -108,8 +104,8 @@ protected:
 
   /*! \brief called by QmitkFunctionality when DataManager's selection has changed
   */
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
-                                  const QList<mitk::DataNode::Pointer>& selectedNodes);
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
+                                  const QList<mitk::DataNode::Pointer>& selectedNodes) override;
 
 
   /*! @brief The view's UI controls */

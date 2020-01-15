@@ -1,21 +1,15 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 #include "QmitkAdaptiveRegionGrowingToolGUI.h"
-
-#include "QmitkStdMultiWidget.h"
 
 #include <qmessagebox.h>
 
@@ -48,7 +42,6 @@ MITK_TOOL_GUI_MACRO(, QmitkAdaptiveRegionGrowingToolGUI, "")
 
 QmitkAdaptiveRegionGrowingToolGUI::QmitkAdaptiveRegionGrowingToolGUI(QWidget *parent)
   : QmitkToolGUI(),
-    m_MultiWidget(nullptr),
     m_DataStorage(nullptr),
     m_UseVolumeRendering(false),
     m_UpdateSuggestedThreshold(true),
@@ -153,11 +146,6 @@ void QmitkAdaptiveRegionGrowingToolGUI::SetDataStorage(mitk::DataStorage *dataSt
   m_DataStorage = dataStorage;
 }
 
-void QmitkAdaptiveRegionGrowingToolGUI::SetMultiWidget(QmitkStdMultiWidget *multiWidget)
-{
-  m_MultiWidget = multiWidget;
-}
-
 void QmitkAdaptiveRegionGrowingToolGUI::SetInputImageNode(mitk::DataNode *node)
 {
   m_InputImageNode = node;
@@ -205,7 +193,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
     mitk::Point3D seedPoint =
       pointSet
         ->GetPointSet(
-          mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))->GetTimeStep())
+          mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget0"))->GetTimeStep())
         ->GetPoints()
         ->ElementAt(0);
 
@@ -358,7 +346,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::RunSegmentation()
   }
 
   int timeStep =
-    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))->GetTimeStep();
+    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget0"))->GetTimeStep();
 
   if (!(seedPointSet->GetSize(timeStep)))
   {
@@ -618,13 +606,6 @@ void QmitkAdaptiveRegionGrowingToolGUI::InitializeLevelWindow()
   }
   lastSliderPosition = this->m_SeedpointValue + this->m_DetectedLeakagePoint - 1;
 
-  if (m_MultiWidget)
-  {
-    this->m_MultiWidget->levelWindowWidget->GetManager()->SetAutoTopMostImage(false);
-    this->m_MultiWidget->levelWindowWidget->GetManager()->SetLevelWindowProperty(
-      static_cast<mitk::LevelWindowProperty *>(newNode->GetProperty("levelwindow")));
-  }
-
   if (m_UseVolumeRendering)
     this->UpdateVolumeRenderingThreshold((int)(*level + 0.5)); // lower threshold for labeled image
 }
@@ -757,7 +738,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImag
     dynamic_cast<mitk::Image *>(this->m_RegionGrow3DTool->GetTargetSegmentationNode()->GetData());
 
   int timeStep =
-    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))->GetTimeStep();
+    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget0"))->GetTimeStep();
 
   if (originalSegmentation)
   {
@@ -860,9 +841,6 @@ void QmitkAdaptiveRegionGrowingToolGUI::EnableVolumeRendering(bool enable)
 
   if (node.IsNull())
     return;
-
-  if (m_MultiWidget)
-    m_MultiWidget->SetWidgetPlanesVisibility(!enable);
 
   if (enable)
   {

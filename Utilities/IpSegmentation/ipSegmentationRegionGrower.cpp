@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <assert.h>
 #include <queue>
@@ -39,7 +35,7 @@ tmGrowRegion4N( mitkIpPicDescriptor *src, int startOfs, bool relativeBounds, flo
   std::queue<int> ofsQueue;
 
   if (maxIterations <= 0) maxIterations = 32000;
-  if (!src) return 0;
+  if (!src) return nullptr;
   if (!segBuffer) {
     segBuffer = mitkIpPicCopyHeader( src, segBuffer );
     segBuffer->type = mitkIpPicUInt;
@@ -54,7 +50,7 @@ tmGrowRegion4N( mitkIpPicDescriptor *src, int startOfs, bool relativeBounds, flo
       segBuffer->n[1] = src->n[1];
       mitkIpUInt4_t size = _mitkIpPicSize( segBuffer );
       segBuffer->data = realloc( segBuffer->data, size );
-      if (segBuffer->data == 0) return 0;
+      if (segBuffer->data == nullptr) return nullptr;
     }
   }
   if (histBuffer) {
@@ -64,7 +60,7 @@ tmGrowRegion4N( mitkIpPicDescriptor *src, int startOfs, bool relativeBounds, flo
       histBuffer->n[1] = src->n[1];
       mitkIpUInt4_t size = _mitkIpPicSize( histBuffer );
       histBuffer->data = realloc( histBuffer->data, size );
-      if (histBuffer->data == 0) return 0;
+      if (histBuffer->data == nullptr) return nullptr;
       memset( histBuffer->data, 0, size );  // clear buffer
     }
   }
@@ -194,7 +190,7 @@ tmGrowRegion4N( mitkIpPicDescriptor *src, int startOfs, bool relativeBounds, flo
 mitkIpPicDescriptor*
 ipMITKSegmentationGrowRegion4N( mitkIpPicDescriptor *src, int startOfs, bool relativeBounds, float lowerBound, float upperBound, int maxIterations, mitkIpPicDescriptor *segBuffer, mitkIpPicDescriptor *histBuffer )
 {
-  mitkIpPicDescriptor *result = 0;
+  mitkIpPicDescriptor *result = nullptr;
   int contourOfs;
   float startCol;
 
@@ -211,7 +207,7 @@ ipMITKSegmentationGrowRegion4N( mitkIpPicDescriptor *src, int startOfs, bool rel
 mitkIpPicDescriptor*
 ipMITKSegmentationGrowRegion4N( mitkIpPicDescriptor *src, int startOfs, bool relativeBounds, float lowerBound, float upperBound, int maxIterations, mitkIpPicDescriptor *segBuffer, int &contourOfs, float &startCol, mitkIpPicDescriptor *histBuffer )
 {
-  mitkIpPicDescriptor *result = 0;
+  mitkIpPicDescriptor *result = nullptr;
 
   if (ipMITKSegmentationUndoIsEnabled (segBuffer)) {
     ipMITKSegmentationUndoSave (segBuffer);

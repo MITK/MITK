@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical Image Computing.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKSTDFUNCTIONCOMMAND_H
 #define MITKSTDFUNCTIONCOMMAND_H
@@ -53,7 +49,7 @@ namespace mitk
       m_StdActionFunction = stdFunctionAction;
     }
 
-    virtual void Execute(Object*, const itk::EventObject& event) override
+    void Execute(Object*, const itk::EventObject& event) override
     {
       if (m_StdFilterFunction && m_StdActionFunction)
       {
@@ -64,7 +60,7 @@ namespace mitk
       }
     }
 
-    virtual void Execute(const Object*, const itk::EventObject& event) override
+    void Execute(const Object*, const itk::EventObject& event) override
     {
       if (m_StdFilterFunction && m_StdActionFunction)
       {
@@ -84,7 +80,7 @@ namespace mitk
       , m_StdActionFunction(nullptr)
     {}
 
-    virtual ~StdFunctionCommand() {}
+    ~StdFunctionCommand() override {}
 
   private:
     ITK_DISALLOW_COPY_AND_ASSIGN(StdFunctionCommand);

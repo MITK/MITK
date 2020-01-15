@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkVolumeVisualizationView.h"
 
@@ -76,7 +72,7 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
     {
       m_Controls->m_TransferFunctionGeneratorWidget->AddPreset(QString::fromStdString(*it));
     }
-    
+
     // see enum in vtkSmartVolumeMapper
     m_Controls->m_RenderMode->addItem("Default");
     m_Controls->m_RenderMode->addItem("RayCast");
@@ -207,10 +203,10 @@ void QmitkVolumeVisualizationView::UpdateInterface()
     m_Controls->m_RenderMode->setCurrentIndex(0);
     m_Controls->m_RenderMode->setEnabled(false);
 
-    m_Controls->m_TransferFunctionWidget->SetDataNode(0);
+    m_Controls->m_TransferFunctionWidget->SetDataNode(nullptr);
     m_Controls->m_TransferFunctionWidget->setEnabled(false);
 
-    m_Controls->m_TransferFunctionGeneratorWidget->SetDataNode(0);
+    m_Controls->m_TransferFunctionGeneratorWidget->SetDataNode(nullptr);
     m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(false);
     return;
   }
@@ -231,10 +227,10 @@ void QmitkVolumeVisualizationView::UpdateInterface()
     m_Controls->m_RenderMode->setCurrentIndex(0);
     m_Controls->m_RenderMode->setEnabled(false);
 
-    m_Controls->m_TransferFunctionWidget->SetDataNode(0);
+    m_Controls->m_TransferFunctionWidget->SetDataNode(nullptr);
     m_Controls->m_TransferFunctionWidget->setEnabled(false);
 
-    m_Controls->m_TransferFunctionGeneratorWidget->SetDataNode(0);
+    m_Controls->m_TransferFunctionGeneratorWidget->SetDataNode(nullptr);
     m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(false);
     return;
   }
@@ -251,7 +247,7 @@ void QmitkVolumeVisualizationView::UpdateInterface()
     selectedNode->GetBoolProperty("volumerendering.usegpu",usegpu);
     selectedNode->GetBoolProperty("volumerendering.useray",useray);
     selectedNode->GetBoolProperty("volumerendering.usemip",usemip);
-          
+
     int blendMode;
     if (selectedNode->GetIntProperty("volumerendering.blendmode", blendMode))
       m_Controls->m_BlendMode->setCurrentIndex(blendMode);
@@ -265,9 +261,9 @@ void QmitkVolumeVisualizationView::UpdateInterface()
       mode = RAYCAST_RENDERMODE;
     else if(usegpu)
       mode = GPU_RENDERMODE;
-        
+
     m_Controls->m_RenderMode->setCurrentIndex(mode);
-        
+
   }
 
   m_Controls->m_TransferFunctionWidget->SetDataNode(selectedNode);
@@ -310,7 +306,7 @@ void QmitkVolumeVisualizationView::OnRenderMode(int mode)
     return;
 
   auto selectedNode = m_SelectedNode.Lock();
-  
+
   bool usegpu = false;
   if (mode == GPU_RENDERMODE)
     usegpu = true;
@@ -318,7 +314,7 @@ void QmitkVolumeVisualizationView::OnRenderMode(int mode)
   bool useray = false;
   if (mode == RAYCAST_RENDERMODE)
     useray = true;
-  
+
   if (mode == DEFAULT_RENDERMODE)
   {
     useray = true;

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef DICOMVIEW_H_
 #define DICOMVIEW_H_
@@ -49,14 +45,14 @@ public:
   /**
    * Standard destructor.
    */
-  virtual ~DicomView();
+  ~DicomView() override;
 
   /**
    * Creates the view control widgets provided by the QmitkDicomExternalDataWidget class.
    * Widgets associated with unused functionality are being removed and DICOM import and data
    * storage transfer funcionality being connected to the appropriate slots.
    */
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
 protected Q_SLOTS:
 

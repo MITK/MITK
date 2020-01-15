@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #ifndef QMITK_INSPECTION_POSITION_WIDGET_H
@@ -40,8 +36,8 @@ class MITKMODELFITUI_EXPORT QmitkInspectionPositionWidget : public QWidget
 public:
   using FitVectorType = std::vector<mitk::modelFit::ModelFitInfo::ConstPointer>;
 
-  QmitkInspectionPositionWidget(QWidget* parent = 0);
-  ~QmitkInspectionPositionWidget();
+  QmitkInspectionPositionWidget(QWidget* parent = nullptr);
+  ~QmitkInspectionPositionWidget() override;
 
   mitk::Point3D GetCurrentPosition() const;
 

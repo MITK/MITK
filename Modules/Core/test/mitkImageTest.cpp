@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 // mitk includes
 #include "mitkException.h"
@@ -188,7 +184,7 @@ int mitkImageTest(int argc, char *argv[])
     mitk::ImageReadAccessor imgMemAcc(imgMem);
     p = (int *)imgMemAcc.GetData();
   }
-  catch (mitk::Exception &e)
+  catch ( const mitk::Exception &e )
   {
     MITK_ERROR << e.what();
   }
@@ -205,7 +201,7 @@ int mitkImageTest(int argc, char *argv[])
     mitk::ImageReadAccessor imgMemAcc(imgMem);
     p2 = (int *)imgMemAcc.GetData();
   }
-  catch (mitk::Exception &e)
+  catch ( const mitk::Exception &e )
   {
     MITK_ERROR << e.what();
   }
@@ -228,7 +224,7 @@ int mitkImageTest(int argc, char *argv[])
     mitk::ImageReadAccessor imgMemAcc(imgMem, imgMem->GetSliceData(dim[2] / 2));
     p2 = (int *)imgMemAcc.GetData();
   }
-  catch (mitk::Exception &e)
+  catch ( const mitk::Exception &e )
   {
     MITK_ERROR << e.what();
   }
@@ -264,7 +260,7 @@ int mitkImageTest(int argc, char *argv[])
     mitk::ImageReadAccessor imgMemAcc(imgMem);
     imgMem->SetVolume(imgMemAcc.GetData());
   }
-  catch (mitk::Exception &e)
+  catch ( const mitk::Exception &e )
   {
     MITK_ERROR << e.what();
   }
@@ -297,7 +293,7 @@ int mitkImageTest(int argc, char *argv[])
     mitk::ImageReadAccessor imgMemAcc(imgMem);
     p = (int *)imgMemAcc.GetData();
   }
-  catch (mitk::Exception &e)
+  catch ( const mitk::Exception &e )
   {
     MITK_ERROR << e.what();
   }
@@ -311,7 +307,7 @@ int mitkImageTest(int argc, char *argv[])
     mitk::ImageReadAccessor imgMemAcc(imgMem);
     p = (int *)imgMemAcc.GetData();
   }
-  catch (mitk::Exception &e)
+  catch ( const mitk::Exception &e )
   {
     MITK_ERROR << e.what();
   }
@@ -368,7 +364,7 @@ int mitkImageTest(int argc, char *argv[])
     vecImg = nullptr;
     MITK_TEST_CONDITION_REQUIRED(vecImg.IsNull(), "testing destruction!");
   }
-  catch (mitk::Exception &e)
+  catch ( const mitk::Exception &e )
   {
     MITK_ERROR << e.what();
   }
@@ -502,7 +498,7 @@ int mitkImageTest(int argc, char *argv[])
       mitk::CastToItkImage(image, itkimage);
       MITK_TEST_CONDITION_REQUIRED(itkimage.IsNotNull(), "Test conversion to itk::Image!");
     }
-    catch (std::exception &e)
+    catch ( const std::exception &e )
     {
       MITK_INFO << e.what();
     }

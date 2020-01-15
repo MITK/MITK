@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITKUSNAVIGATIONSTEPZONEMARKING_H
 #define QMITKUSNAVIGATIONSTEPZONEMARKING_H
@@ -65,55 +61,55 @@ protected slots:
   void OnShowListClicked(int state);
 
 public:
-  explicit QmitkUSNavigationStepZoneMarking(QWidget *parent = 0);
-  ~QmitkUSNavigationStepZoneMarking();
+  explicit QmitkUSNavigationStepZoneMarking(QWidget *parent = nullptr);
+  ~QmitkUSNavigationStepZoneMarking() override;
 
   /**
    * \brief Initialization of the data storage nodes.
    * \return always true
    */
-  virtual bool OnStartStep();
+  bool OnStartStep() override;
 
   /**
    * \brief Resets widget and filter and removes nodes from the data storage.
    * \return always true
    */
-  virtual bool OnStopStep();
+  bool OnStopStep() override;
 
   /**
    * \brief There is nothing to be done.
    * \return always true
    */
-  virtual bool OnFinishStep();
+  bool OnFinishStep() override;
 
   /**
    * \brief Selects input for the node displacement filter and emits "ReadyForNextStep" signal.
    * The input selection cannot be done earlier.
    * \return
    */
-  virtual bool OnActivateStep();
+  bool OnActivateStep() override;
 
-  virtual bool OnDeactivateStep();
+  bool OnDeactivateStep() override;
 
   /**
    * \brief Updates just the tracking validity status.
    */
-  virtual void OnUpdate();
+  void OnUpdate() override;
 
   /**
    * The property "settings.interaction-concept" is used.
    */
-  virtual void OnSettingsChanged(const itk::SmartPointer<mitk::DataNode> settingsNode);
+  void OnSettingsChanged(const itk::SmartPointer<mitk::DataNode> settingsNode) override;
 
-  virtual QString GetTitle();
+  QString GetTitle() override;
 
   /**
    * @return a node displacement filter for the zone surfaces
    */
-  virtual FilterVector GetFilter();
+  FilterVector GetFilter() override;
 
 protected:
-  virtual void OnSetCombinedModality();
+  void OnSetCombinedModality() override;
 
   void UpdateReferenceSensorName();
 

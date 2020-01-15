@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITKUSNAVIGATIONSTEPTUMOURSELECTION_H
 #define QMITKUSNAVIGATIONSTEPTUMOURSELECTION_H
@@ -65,8 +61,8 @@ protected slots:
   void OnDeleteButtonClicked();
 
 public:
-  explicit QmitkUSNavigationStepTumourSelection(QWidget* parent = 0);
-  ~QmitkUSNavigationStepTumourSelection();
+  explicit QmitkUSNavigationStepTumourSelection(QWidget* parent = nullptr);
+  ~QmitkUSNavigationStepTumourSelection() override;
 
   void SetTargetSelectionOptional (bool t);
 
@@ -74,7 +70,7 @@ public:
    * \brief Initializes tumour and target surface.
    * \return always true
    */
-  virtual bool OnStartStep();
+  bool OnStartStep() override;
 
   /**
    * \brief Removes target surface and tumour node from the data storage.
@@ -82,25 +78,25 @@ public:
    * resetted.
    * \return always true
    */
-  virtual bool OnStopStep();
+  bool OnStopStep() override;
 
   /**
    * \brief Reinitializes buttons and sliders in addition of calling the default implementation.
    * \return result of the superclass implementation
    */
-  virtual bool OnRestartStep();
+  bool OnRestartStep() override;
 
   /**
    * \brief (Re)creates the target surface.
    * \return always true
    */
-  virtual bool OnFinishStep();
+  bool OnFinishStep() override;
 
   /**
    * \brief Initializes (but not activates) the interactor for tumour selection.
    * \return always true
    */
-  virtual bool OnActivateStep();
+  bool OnActivateStep() override;
 
   /**
    * \brief Deactivates the interactor for tumour selection
@@ -108,25 +104,25 @@ public:
    *
    * \return always true
    */
-  virtual bool OnDeactivateStep();
+  bool OnDeactivateStep() override;
 
   /**
    * \brief Updates tracking validity status and checks tumour node for the end of tumour creation.
    */
-  virtual void OnUpdate();
+  void OnUpdate() override;
 
   /**
    * The properties "settings.security-distance" and
    * "settings.interaction-concept" are used.
    */
-  virtual void OnSettingsChanged(const itk::SmartPointer<mitk::DataNode> settingsNode);
+  void OnSettingsChanged(const itk::SmartPointer<mitk::DataNode> settingsNode) override;
 
-  virtual QString GetTitle();
+  QString GetTitle() override;
 
   /**
    * @return a node displacement filter for tumour and target surfaces
    */
-  virtual FilterVector GetFilter();
+  FilterVector GetFilter() override;
 
   void SetTumorColor(mitk::Color c);
 
@@ -134,7 +130,7 @@ public:
   itk::SmartPointer<mitk::NodeDisplacementFilter> GetTumourNodeDisplacementFilter();
 
 protected:
-  virtual void OnSetCombinedModality();
+  void OnSetCombinedModality() override;
 
   void TumourNodeChanged(const mitk::DataNode*);
   itk::SmartPointer<mitk::Surface> CreateTargetSurface();

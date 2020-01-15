@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QmitkMultiLabelSegmentationView_h
 #define QmitkMultiLabelSegmentationView_h
@@ -41,19 +37,19 @@ public:
   static const std::string VIEW_ID;
 
   QmitkMultiLabelSegmentationView();
-  virtual ~QmitkMultiLabelSegmentationView();
+  ~QmitkMultiLabelSegmentationView() override;
 
   typedef std::map<mitk::DataNode *, unsigned long> NodeTagMapType;
 
   // GUI setup
-  void CreateQtPartControl(QWidget *parent);
+  void CreateQtPartControl(QWidget *parent) override;
 
   // ILifecycleAwarePart interface
 public:
-  void Activated();
-  void Deactivated();
-  void Visible();
-  void Hidden();
+  void Activated() override;
+  void Deactivated() override;
+  void Visible() override;
+  void Hidden() override;
 
   virtual int GetSizeFlags(bool width);
   virtual int ComputePreferredSize(bool width,
@@ -134,7 +130,7 @@ protected:
 
   void OnLooseLabelSetConnection();
 
-  void SetFocus();
+  void SetFocus() override;
 
   void UpdateControls();
 

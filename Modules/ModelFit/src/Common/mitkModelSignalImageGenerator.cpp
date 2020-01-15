@@ -1,3 +1,15 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
 #include "mitkModelSignalImageGenerator.h"
 #include "itkMultiOutputNaryFunctorImageFilter.h"
 #include "mitkArbitraryTimeGeometry.h"
@@ -67,7 +79,7 @@ void mitk::ModelSignalImageGenerator::Generate()
     }
     else
     {
-      this->m_InternalMask = NULL;
+      this->m_InternalMask = nullptr;
     }
 
     /** @todo #1 This did not work! The Access-Routine would be a much nicer solution, but for some reasons, the handling did not work.

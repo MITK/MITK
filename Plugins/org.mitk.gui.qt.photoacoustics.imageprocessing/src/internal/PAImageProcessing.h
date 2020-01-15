@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef PAImageProcessing_h
 #define PAImageProcessing_h
@@ -56,6 +52,7 @@ public:
   void LowerSliceBoundChanged();
   void SliceBoundsEnabled();
 
+  void ChangedProbe();
   void UseResampling();
   void UseLogfilter();
   void SetResampling();
@@ -94,15 +91,15 @@ public:
   void ChangedSOSBeamforming();
 
 protected:
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
   /** \brief called by QmitkFunctionality when DataManager's selection has changed.
   *  On a change some parameters are internally updated to calculate bounds for GUI elements as the slice selector for beamforming or
   *  the bandpass filter settings.
   */
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
     const QList<mitk::DataNode::Pointer>& nodes) override;
 
   /** \brief Instance of the GUI controls
@@ -193,7 +190,7 @@ signals:
   void result(mitk::Image::Pointer, std::string nameExtension);
 
 public:
-  void setConfig(unsigned int CutAbove, unsigned int CutBelow, unsigned int CutSliceFirst, unsigned int CutSliceLast);
+  void setConfig(unsigned int CutAbove, unsigned int CutBelow, unsigned int CutRight, unsigned int CutLeft, unsigned int CutSliceFirst, unsigned int CutSliceLast);
   void setInputImage(mitk::Image::Pointer image);
   void setFilterBank(mitk::PhotoacousticFilterService::Pointer filterBank)
   {
@@ -205,6 +202,8 @@ protected:
 
   unsigned int m_CutAbove;
   unsigned int m_CutBelow;
+  unsigned int m_CutRight;
+  unsigned int m_CutLeft;
   unsigned int m_CutSliceLast;
   unsigned int m_CutSliceFirst;
 

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef _QMITKDEFORMABLECLIPPINGPLANEVIEW_H_INCLUDED
 #define _QMITKDEFORMABLECLIPPINGPLANEVIEW_H_INCLUDED
@@ -40,9 +36,9 @@ public:
   static const std::string VIEW_ID;
 
   QmitkDeformableClippingPlaneView();
-  virtual ~QmitkDeformableClippingPlaneView();
+  ~QmitkDeformableClippingPlaneView() override;
 
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
   /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
@@ -50,7 +46,7 @@ public:
   ///
   /// Sets the focus to an internal widget.
   ///
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
 protected slots:
 
@@ -65,9 +61,9 @@ protected slots:
 protected:
 
   virtual void OnSelectionChanged(mitk::DataNode* node);
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
-  virtual void NodeRemoved(const mitk::DataNode* node) override;
-  virtual void NodeChanged(const mitk::DataNode* node) override;
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
+  void NodeRemoved(const mitk::DataNode* node) override;
+  void NodeChanged(const mitk::DataNode* node) override;
 
   void UpdateView();
 

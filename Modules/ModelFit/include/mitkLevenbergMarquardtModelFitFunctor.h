@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef LEVENBERGMARQUARDTMODELFITFUNCTOR_H
 #define LEVENBERGMARQUARDTMODELFITFUNCTOR_H
@@ -62,7 +58,7 @@ namespace mitk
     itkSetMacro(ActivateFailureThreshold, bool);
     itkGetConstMacro(ActivateFailureThreshold, bool);
 
-    virtual ParameterNamesType GetCriterionNames() const;
+    ParameterNamesType GetCriterionNames() const override;
 
   protected:
 
@@ -71,20 +67,20 @@ namespace mitk
 
     LevenbergMarquardtModelFitFunctor();
 
-    ~LevenbergMarquardtModelFitFunctor();
+    ~LevenbergMarquardtModelFitFunctor() override;
 
-    virtual ParametersType DoModelFit(const SignalType& value, const ModelBase* model,
+    ParametersType DoModelFit(const SignalType& value, const ModelBase* model,
                                       const ModelBase::ParametersType& initialParameters,
-                                      DebugParameterMapType& debugParameters) const;
+                                      DebugParameterMapType& debugParameters) const override;
 
-    virtual OutputPixelArrayType GetCriteria(const ModelBase* model, const ParametersType& parameters,
-        const SignalType& sample) const;
+    OutputPixelArrayType GetCriteria(const ModelBase* model, const ParametersType& parameters,
+        const SignalType& sample) const override;
 
     /** Generator function that instantiates and parameterizes the cost function that should be used by the fit functor*/
     virtual MVModelFitCostFunction::Pointer GenerateCostFunction(const SignalType& value,
         const ModelBase* model) const;
 
-    virtual ParameterNamesType DefineDebugParameterNames() const;
+    ParameterNamesType DefineDebugParameterNames() const override;
 
   private:
     double m_Epsilon;

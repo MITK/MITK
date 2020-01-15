@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical Image Computing.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITKSELECTIONSERVICECONNECTOR_H
 #define QMITKSELECTIONSERVICECONNECTOR_H
@@ -62,7 +58,7 @@ class MITK_QT_COMMON QmitkSelectionServiceConnector : public QObject
 public:
 
   QmitkSelectionServiceConnector();
-  ~QmitkSelectionServiceConnector();
+  ~QmitkSelectionServiceConnector() override;
 
   /*
   * @brief 	Create a selection listener and add it to the list of selection listener of the given selection service.

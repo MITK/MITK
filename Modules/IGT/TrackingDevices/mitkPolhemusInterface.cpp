@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <mitkPolhemusInterface.h>
 #include <PDI.h>
@@ -51,6 +47,7 @@ bool mitk::PolhemusInterface::SetupDevice()
   pdiMDat.Append(PDI_MODATA_FRAMECOUNT);
   pdiMDat.Append(PDI_MODATA_POS);
   pdiMDat.Append(PDI_MODATA_ORI);
+  pdiMDat.Append(PDI_MODATA_DISTLEV);
   m_pdiDev->SetSDataList(-1, pdiMDat);
 
   CPDIbiterr cBE;
@@ -267,6 +264,7 @@ std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::Pars
 
     PDWORD pFC = (PDWORD)(&pBuf[i]);
     PFLOAT pPno = (PFLOAT)(&pBuf[i + 4]);
+    PINT pDistLevel = (PINT)(&pBuf[i + 28]);
 
     mitk::PolhemusInterface::trackingData currentTrackingData;
 
@@ -281,6 +279,7 @@ std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::Pars
     double rollAngle = pPno[5] / 180 * itk::Math::pi;
     vnl_quaternion<double> eulerQuat(rollAngle, elevationAngle, azimuthAngle);
     currentTrackingData.rot = eulerQuat;
+    currentTrackingData.distortionLevel = *pDistLevel;
 
     returnValue.push_back(currentTrackingData);
     i += shSize;
@@ -288,7 +287,7 @@ std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::Pars
   return returnValue;
 }
 
-void mitk::PolhemusInterface::SetHemisphereTrackingEnabled(bool _HeisphereTrackingEnabeled, int _tool)
+void mitk::PolhemusInterface::SetHemisphereTrackingEnabled(bool _HemisphereTrackingEnabled, int _tool)
 {
   //only if connection is ready!
   if (!this->m_pdiDev->CnxReady())
@@ -300,8 +299,8 @@ void mitk::PolhemusInterface::SetHemisphereTrackingEnabled(bool _HeisphereTracki
   }
 
   //HemisphereTracking is switched on by SetSHemiTrack(-1). "-1" means for all sensors.
-  //To switch heisphere tracking of, you need to set a hemisphere vector e.g. by calling SetSHemisphere(-1, { (float)1,0,0 })
-  if (_HeisphereTrackingEnabeled)
+  //To switch hemisphere tracking off, you need to set a hemisphere vector e.g. by calling SetSHemisphere(-1, { (float)1,0,0 })
+  if (_HemisphereTrackingEnabled)
   {
     m_pdiDev->SetSHemiTrack(_tool);
     if (_tool != -1)

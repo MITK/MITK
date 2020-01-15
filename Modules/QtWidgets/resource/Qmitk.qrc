@@ -14,5 +14,7 @@
 		<file>mwLayout.png</file>
 		<file>mwSynchronized.png</file>
 		<file>mwDesynchronized.png</file>
+		<file>mwMITK.png</file>
+		<file>mwPACS.png</file>
     </qresource>
 </RCC>

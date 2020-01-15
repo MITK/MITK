@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical Image Computing.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITKDATASTORAGELISTINSPECTOR_H
 #define QMITKDATASTORAGELISTINSPECTOR_H
@@ -34,14 +30,14 @@ class MITKQTWIDGETS_EXPORT QmitkDataStorageListInspector : public QmitkAbstractD
 public:
   QmitkDataStorageListInspector(QWidget* parent = nullptr);
 
-  virtual QAbstractItemView* GetView() override;
-  virtual const QAbstractItemView* GetView() const override;
+  QAbstractItemView* GetView() override;
+  const QAbstractItemView* GetView() const override;
 
-  virtual void SetSelectionMode(SelectionMode mode) override;
-  virtual SelectionMode GetSelectionMode() const override;
+  void SetSelectionMode(SelectionMode mode) override;
+  SelectionMode GetSelectionMode() const override;
 
 protected:
-  virtual void Initialize() override;
+  void Initialize() override;
 
   QmitkAbstractDataStorageModel* m_StorageModel;
   Ui_QmitkDataStorageListInspector m_Controls;

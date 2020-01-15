@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITKSEMANTICRELATIONSSTATISTICSVIEW_H
 #define QMITKSEMANTICRELATIONSSTATISTICSVIEW_H
@@ -42,7 +38,7 @@ public:
 
   static const std::string VIEW_ID;
 
-  virtual ~QmitkSemanticRelationsStatisticsView() override;
+  ~QmitkSemanticRelationsStatisticsView() override;
 
   /*
   * @brief Update the view with the data from the semantic relations.
@@ -53,12 +49,12 @@ public:
   *
   * @par caseID    The current case ID to identify the currently active patient / case.
   */
-  virtual void Update(const mitk::SemanticTypes::CaseID& caseID) override;
+  void Update(const mitk::SemanticTypes::CaseID& caseID) override;
 
 protected:
 
-  virtual void SetFocus() override;
-  virtual void CreateQtPartControl(QWidget* parent) override;
+  void SetFocus() override;
+  void CreateQtPartControl(QWidget* parent) override;
 
 private Q_SLOTS:
 

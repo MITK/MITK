@@ -1,20 +1,14 @@
-/*=========================================================================
+/*============================================================================
 
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date$
-Version:   $Revision$
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, Software Development for
-Integrated Diagnostic and Therapy. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-=========================================================================*/
-
+============================================================================*/
 
 #ifndef __QMITK_PARAMETER_FIT_BACKGROUND_JOB_H
 #define __QMITK_PARAMETER_FIT_BACKGROUND_JOB_H
@@ -43,13 +37,13 @@ class MITKMODELFITUI_EXPORT ParameterFitBackgroundJob : public QObject, public Q
     Q_OBJECT
 
 public:
-  ParameterFitBackgroundJob(mitk::ParameterFitImageGeneratorBase* generator, const mitk::modelFit::ModelFitInfo* fitInfo, mitk::DataNode* parentNode = NULL);
+  ParameterFitBackgroundJob(mitk::ParameterFitImageGeneratorBase* generator, const mitk::modelFit::ModelFitInfo* fitInfo, mitk::DataNode* parentNode = nullptr);
   /** */
   ParameterFitBackgroundJob(mitk::ParameterFitImageGeneratorBase* generator, const mitk::modelFit::ModelFitInfo* fitInfo, mitk::DataNode* parentNode, mitk::modelFit::ModelFitResultNodeVectorType additionalRelevantNodes);
 
-  ~ParameterFitBackgroundJob();
+  ~ParameterFitBackgroundJob() override;
 
-		void run();
+		void run() override;
 
     /**Returns the node (if defined), that is the parent object for the results of the job.
     May be null.*/

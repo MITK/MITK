@@ -1,3 +1,15 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
 #ifndef MEANRESIDENCETIMEDESCRIPTIONPARAMETER_H
 #define MEANRESIDENCETIMEDESCRIPTIONPARAMETER_H
 
@@ -18,15 +30,15 @@ namespace  mitk
 
         itkFactorylessNewMacro(Self);
         itkCloneMacro(Self);
-        virtual DescriptionParameterNamesType GetDescriptionParameterName() const override;
+        DescriptionParameterNamesType GetDescriptionParameterName() const override;
 
     protected:
         static const std::string PARAMETER_NAME;
 
         MeanResidenceTimeDescriptionParameter();
-        virtual ~MeanResidenceTimeDescriptionParameter();
+        ~MeanResidenceTimeDescriptionParameter() override;
 
-        virtual DescriptionParameterResultsType ComputeCurveDescriptionParameter(const CurveType& curve, const CurveGridType& grid) const override;
+        DescriptionParameterResultsType ComputeCurveDescriptionParameter(const CurveType& curve, const CurveGridType& grid) const override;
 
     };
 }

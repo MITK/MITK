@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #ifndef QmitkDicomInspectorView_h
@@ -46,7 +42,7 @@ class QmitkDicomInspectorView :
 public:
 
   QmitkDicomInspectorView();
-  ~QmitkDicomInspectorView();
+  ~QmitkDicomInspectorView() override;
 
   static const std::string VIEW_ID;
 
@@ -60,21 +56,21 @@ public:
 
 protected:
 
-  virtual void CreateQtPartControl(QWidget* parent);
+  void CreateQtPartControl(QWidget* parent) override;
 
-  virtual void SetFocus();
+  void SetFocus() override;
 
   /** @brief called by QmitkFunctionality when DataManager's selection has changed */
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
-    const QList<mitk::DataNode::Pointer>& nodes);
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
+    const QList<mitk::DataNode::Pointer>& nodes) override;
 
   /**	@brief Calls OnSliceChangedDelayed so the event isn't triggered multiple times. */
   void OnSliceChanged(const itk::EventObject& e);
 
   void OnSliceNavigationControllerDeleted(const itk::Object* sender, const itk::EventObject& /*e*/);
 
-  virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart);
-  virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart);
+  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
 
   /** Initializes and sets the observers that are used to monitor changes in the selected position
    or time point in order to actualize the view.h*/

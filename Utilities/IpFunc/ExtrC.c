@@ -1,48 +1,42 @@
-/*****************************************************************************
+/*============================================================================
 
- Copyright (c) 1993-2000,  Div. Medical and Biological Informatics, 
- Deutsches Krebsforschungszentrum, Heidelberg, Germany
+ Copyright (c) German Cancer Research Center (DKFZ)
  All rights reserved.
 
- Redistribution and use in source and binary forms, with or without 
+ Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
 
  - Redistributions of source code must retain the above copyright notice, this
    list of conditions and the following disclaimer.
 
- - Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+ - Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
- - All advertising materials mentioning features or use of this software must 
-   display the following acknowledgement: 
-          
-     "This product includes software developed by the Div. Medical and 
-      Biological Informatics, Deutsches Krebsforschungszentrum, Heidelberg, 
-      Germany."
+ - All advertising materials mentioning features or use of this software must
+   display the following acknowledgement:
 
- - Neither the name of the Deutsches Krebsforschungszentrum nor the names of 
-   its contributors may be used to endorse or promote products derived from 
-   this software without specific prior written permission. 
+     "This product includes software developed by the German Cancer Research
+      Center (DKFZ)."
 
-   THIS SOFTWARE IS PROVIDED BY THE DIVISION MEDICAL AND BIOLOGICAL
-   INFORMATICS AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED
-   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-   OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-   IN NO EVENT SHALL THE DIVISION MEDICAL AND BIOLOGICAL INFORMATICS,
-   THE DEUTSCHES KREBSFORSCHUNGSZENTRUM OR CONTRIBUTORS BE LIABLE FOR 
-   ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-   DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE 
-   GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER 
-   IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN 
-   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ - Neither the name of the German Cancer Research Center (DKFZ) nor the names
+   of its contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
 
- Send comments and/or bug reports to:
-   mbi-software@dkfz-heidelberg.de
+   THIS SOFTWARE IS PROVIDED BY THE GERMAN CANCER RESEARCH CENTER (DKFZ) AND
+   CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+   BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+   FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE GERMAN
+   CANCER RESEARCH CENTER (DKFZ) OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+   INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+   SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+   OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+   DAMAGE.
 
-*****************************************************************************/
+============================================================================*/
 
 /** @file
  *  this function calculates the extreme greyvalues of all greyvalues which are
@@ -57,10 +51,10 @@
  *  @param pic_old  pointer to the original image
  *  @param min`  pointer to minimal greyvalue in circle ( return value )
  *  @param max   pointer to maximal greyvalue in circle ( return value )
- *  @param center  pointer to an array that contains the coordinates 
- *               of the center 
+ *  @param center  pointer to an array that contains the coordinates
+ *               of the center
  *               of the circle
- *  @param radius  radius of the circle                   
+ *  @param radius  radius of the circle
  *
  *  @return mitkIpFuncOK       - if no error occured
  *  @return mitkIpFuncERROR    - if an error occured
@@ -81,7 +75,7 @@ mitkIpUInt4_t  mitkIpFuncExtrC ( mitkIpPicDescriptor *pic_old,
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
-  static char *what = { "@(#)mitkIpFuncExtrC\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)mitkIpFuncExtrC\t\tGerman Cancer Research Center (DKFZ)\t"__DATE__ };
 #endif
 
 
@@ -175,7 +169,7 @@ mitkIpUInt4_t  mitkIpFuncExtrC ( mitkIpPicDescriptor *pic_old,
   /* check whether data are correct                                               */
 
   if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
-  if ( radius <= 0 ) 
+  if ( radius <= 0 )
     {
        _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
        return ( mitkIpFuncERROR );
@@ -218,8 +212,8 @@ mitkIpUInt4_t  mitkIpFuncExtrC ( mitkIpPicDescriptor *pic_old,
   /* allocate image structure                                                     */
 
   mitkIpPicFORALL_5  ( EXTR, pic_old, begin, end, size, centr, radius );
-  
-  return ( mitkIpFuncOK );    
+
+  return ( mitkIpFuncOK );
 }
 
 #endif

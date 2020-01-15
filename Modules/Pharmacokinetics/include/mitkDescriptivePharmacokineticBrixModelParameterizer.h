@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef __DESCRIPTIVEPHARMACOKINETICBRIXMODEL_PARAMETERIZER_H
 #define __DESCRIPTIVEPHARMACOKINETICBRIXMODEL_PARAMETERIZER_H
@@ -61,22 +57,22 @@ namespace mitk
     /* Returns the global static parameters for the model.
      * @remark this default implementation assumes no global static parameters exist.
      * Thus an empty map is returned.*/
-    virtual StaticParameterMapType GetGlobalStaticParameters() const;
+    StaticParameterMapType GetGlobalStaticParameters() const override;
 
     /* Returns the local static parameters for the model at the given index.
      * @remark this default implementation assumes no local static parameters exist.
      * Thus an empty map is returned.*/
-    virtual StaticParameterMapType GetLocalStaticParameters(const IndexType& currentPosition) const;
+    StaticParameterMapType GetLocalStaticParameters(const IndexType& currentPosition) const override;
 
     /** This function returns the default parameterization (e.g. initial parametrization for fitting)
      defined by the model developer for  for the given model.*/
-    virtual ParametersType GetDefaultInitialParameterization() const;
+    ParametersType GetDefaultInitialParameterization() const override;
 
   protected:
 
     DescriptivePharmacokineticBrixModelParameterizer();
 
-    virtual ~DescriptivePharmacokineticBrixModelParameterizer();
+    ~DescriptivePharmacokineticBrixModelParameterizer() override;
 
     /**injection time Tau in minutes [min]*/
     double m_Tau;

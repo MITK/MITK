@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkVtkPropRenderer.h"
 
@@ -40,6 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCamera.h>
 #include <vtkCellPicker.h>
 #include <vtkInteractorStyleTrackballCamera.h>
+#include <vtkInformation.h>
 #include <vtkLight.h>
 #include <vtkLightKit.h>
 #include <vtkLinearTransform.h>
@@ -56,11 +53,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTransform.h>
 #include <vtkWorldPointPicker.h>
 
-mitk::VtkPropRenderer::VtkPropRenderer(const char *name,
-                                       vtkRenderWindow *renWin,
-                                       mitk::RenderingManager *rm,
-                                       mitk::BaseRenderer::RenderingMode::Type renderingMode)
-  : BaseRenderer(name, renWin, rm, renderingMode), m_CameraInitializedForMapperID(0)
+mitk::VtkPropRenderer::VtkPropRenderer(const char *name, vtkRenderWindow *renWin)
+  : BaseRenderer(name, renWin),
+    m_CameraInitializedForMapperID(0)
 {
   didCount = false;
 
@@ -169,7 +164,11 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
 
   // Update mappers and prepare mapper queue
   if (type == VtkPropRenderer::Opaque)
+  {
     this->PrepareMapperQueue();
+    // Share vtkInformation, there might be new mappers
+    this->PropagateRenderInfoToMappers();
+  }
 
   // go through the generated list and let the sorted mappers paint
   for (auto it = m_MappersMap.cbegin(); it != m_MappersMap.cend(); it++)
@@ -258,6 +257,34 @@ void mitk::VtkPropRenderer::PrepareMapperQueue()
   }
 }
 
+void mitk::VtkPropRenderer::SetPropertyKeys(vtkInformation *info)
+{
+  if (info == m_VtkRenderInfo)
+    return;
+
+  m_VtkRenderInfo = info;
+  this->PropagateRenderInfoToMappers();
+}
+
+void mitk::VtkPropRenderer::PropagateRenderInfoToMappers()
+{
+  if (m_VtkRenderInfo == nullptr)
+    return;
+
+  for (const auto &mapEntry : m_MappersMap)
+  {
+    auto vtkMapper = dynamic_cast<mitk::VtkMapper*>(mapEntry.second);
+
+    if (nullptr != vtkMapper)
+    {
+      auto prop = vtkMapper->GetVtkProp(this);
+
+      if (nullptr != prop)
+        prop->SetPropertyKeys(m_VtkRenderInfo);
+    }
+  }
+}
+
 void mitk::VtkPropRenderer::Update(mitk::DataNode *datatreenode)
 {
   if (datatreenode != nullptr)
@@ -336,7 +363,7 @@ void mitk::VtkPropRenderer::RenderingCallback(vtkObject *caller, unsigned long, 
 void mitk::VtkPropRenderer::Resize(int w, int h)
 {
   BaseRenderer::Resize(w, h);
-  m_RenderingManager->RequestUpdate(this->GetRenderWindow());
+  RenderingManager::GetInstance()->RequestUpdate(this->GetRenderWindow());
 }
 
 void mitk::VtkPropRenderer::InitSize(int w, int h)

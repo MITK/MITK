@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
@@ -67,7 +63,7 @@ public:
       const float* outputData = (const float*)readAccess.GetData();
       for (unsigned int i = 0; i < DATA_DIM*DATA_DIM*DATA_DIM; ++i)
       {
-        CPPUNIT_ASSERT_MESSAGE(std::string("expected " + std::to_string(data[i]) + " but was " + std::to_string(outputData[i])), abs(outputData[i] - data[i]) < mitk::eps);
+        CPPUNIT_ASSERT_MESSAGE(std::string("expected " + std::to_string(data[i]) + " but was " + std::to_string(outputData[i])), std::abs(outputData[i] - data[i]) < mitk::eps);
       }
     }
   }

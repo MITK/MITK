@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkFunctionality.h"
 #include "internal/QmitkFunctionalityUtil.h"
@@ -41,10 +37,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QApplication>
 
 QmitkFunctionality::QmitkFunctionality()
- : m_Parent(0)
+ : m_Parent(nullptr)
  , m_Active(false)
  , m_Visible(false)
- , m_SelectionProvider(0)
+ , m_SelectionProvider(nullptr)
  , m_DataStorageServiceTracker(QmitkCommonLegacyActivator::GetContext())
  , m_HandlesMultipleDataStorages(false)
  , m_InDataStorageChanged(false)
@@ -67,7 +63,7 @@ QmitkFunctionality::GetDataStorage() const
 {
   mitk::IDataStorageService* service = m_DataStorageServiceTracker.getService();
 
-  if (service != 0)
+  if (service != nullptr)
   {
     if(m_HandlesMultipleDataStorages)
       return service->GetActiveDataStorage()->GetDataStorage();
@@ -75,31 +71,31 @@ QmitkFunctionality::GetDataStorage() const
       return service->GetDefaultDataStorage()->GetDataStorage();
   }
 
-  return 0;
+  return nullptr;
 }
 
 mitk::DataStorage::Pointer QmitkFunctionality::GetDefaultDataStorage() const
 {
   mitk::IDataStorageService* service = m_DataStorageServiceTracker.getService();
 
-  if (service != 0)
+  if (service != nullptr)
   {
     return service->GetDefaultDataStorage()->GetDataStorage();
   }
 
-  return 0;
+  return nullptr;
 }
 
 mitk::IDataStorageReference::Pointer QmitkFunctionality::GetDataStorageReference() const
 {
   mitk::IDataStorageService* dsService = m_DataStorageServiceTracker.getService();
 
-  if (dsService != 0)
+  if (dsService != nullptr)
   {
     return dsService->GetDataStorage();
   }
 
-  return mitk::IDataStorageReference::Pointer(0);
+  return mitk::IDataStorageReference::Pointer(nullptr);
 }
 
 void QmitkFunctionality::CreatePartControl(QWidget* parent)
@@ -170,8 +166,8 @@ void QmitkFunctionality::AfterCreateQtPartControl()
 
   // EMULATE INITIAL SELECTION EVENTS
 
-  // by default a a multi widget is always available
-  this->StdMultiWidgetAvailable(*this->GetActiveStdMultiWidget());
+  // by default a multi widget is always available
+  this->MultiWidgetAvailable(*this->GetActiveMultiWidget());
 
   // send datamanager selection
   this->OnSelectionChanged(this->GetDataManagerSelection());
@@ -257,10 +253,10 @@ void QmitkFunctionality::Deactivated()
 {
 }
 
-void QmitkFunctionality::StdMultiWidgetAvailable( QmitkStdMultiWidget&  /*stdMultiWidget*/ )
+void QmitkFunctionality::MultiWidgetAvailable( QmitkAbstractMultiWidget&  /*multiWidget*/ )
 {
 }
-void QmitkFunctionality::StdMultiWidgetNotAvailable()
+void QmitkFunctionality::MultiWidgetNotAvailable()
 {
 }
 
@@ -269,29 +265,27 @@ void QmitkFunctionality::DataStorageChanged()
 
 }
 
-QmitkStdMultiWidget* QmitkFunctionality::GetActiveStdMultiWidget( bool reCreateWidget )
+QmitkAbstractMultiWidget* QmitkFunctionality::GetActiveMultiWidget( bool reCreateWidget )
 {
-  QmitkStdMultiWidget* activeStdMultiWidget = 0;
+  QmitkAbstractMultiWidget* activeMultiWidget = nullptr;
 
   berry::IEditorPart::Pointer editor =
     this->GetSite()->GetPage()->GetActiveEditor();
 
-  if (reCreateWidget
-      || editor.Cast<QmitkStdMultiWidgetEditor>().IsNull()
-     )
+  if (reCreateWidget || editor.Cast<QmitkStdMultiWidgetEditor>().IsNull())
   {
     mitk::DataStorageEditorInput::Pointer editorInput(
           new mitk::DataStorageEditorInput( this->GetDataStorageReference() ));
     // open a new multi-widget editor, but do not give it the focus
     berry::IEditorPart::Pointer editor = this->GetSite()->GetPage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID, false, berry::IWorkbenchPage::MATCH_ID);
-    activeStdMultiWidget = editor.Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget();
+    activeMultiWidget = editor.Cast<QmitkStdMultiWidgetEditor>()->GetMultiWidget();
   }
   else if (editor.Cast<QmitkStdMultiWidgetEditor>().IsNotNull())
   {
-    activeStdMultiWidget = editor.Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget();
+    activeMultiWidget = editor.Cast<QmitkStdMultiWidgetEditor>()->GetMultiWidget();
   }
 
-  return activeStdMultiWidget;
+  return activeMultiWidget;
 }
 
 void QmitkFunctionality::HandleException( const char* str, QWidget* parent, bool showDialog ) const
@@ -309,7 +303,7 @@ void QmitkFunctionality::HandleException( std::exception& e, QWidget* parent, bo
   HandleException( e.what(), parent, showDialog );
 }
 
-void QmitkFunctionality::StdMultiWidgetClosed( QmitkStdMultiWidget&  /*stdMultiWidget*/ )
+void QmitkFunctionality::MultiWidgetClosed( QmitkAbstractMultiWidget&  /*multiWidget*/ )
 {
 
 }
@@ -344,7 +338,7 @@ berry::IPreferences::Pointer QmitkFunctionality::GetPreferences() const
   berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
   // const_cast workaround for bad programming: const uncorrectness this->GetViewSite() should be const
   QString id = "/" + (const_cast<QmitkFunctionality*>(this))->GetViewSite()->GetId();
-  return prefService != nullptr ? prefService->GetSystemPreferences()->Node(id): berry::IPreferences::Pointer(0);
+  return prefService != nullptr ? prefService->GetSystemPreferences()->Node(id): berry::IPreferences::Pointer(nullptr);
 }
 
 void QmitkFunctionality::Visible()

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #include "mitkModelFitParameter.h"
@@ -27,21 +23,21 @@ mitk::modelFit::Parameter::Pointer mitk::modelFit::ExtractParameterFromData(cons
 {
   if (!data)
   {
-    return NULL;
+    return nullptr;
   }
 
   mitk::modelFit::Parameter::Pointer param = mitk::modelFit::Parameter::New();
 
   if (!data->GetPropertyList()->GetStringProperty(mitk::ModelFitConstants::PARAMETER_NAME_PROPERTY_NAME().c_str(), param->name))
   {
-    return NULL;
+    return nullptr;
   };
 
   param->image = dynamic_cast<const mitk::Image*>(data);
 
   if(!(param->image))
   {
-    return NULL;
+    return nullptr;
   }
 
   std::string typeString;

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITKRENDERWINDOWDATASTORAGEINSPECTOR_H
 #define QMITKRENDERWINDOWDATASTORAGEINSPECTOR_H
@@ -47,19 +43,19 @@ public:
   /**
   * @brief See 'QmitkAbstractDataStorageInspector'
   */
-  virtual QAbstractItemView* GetView() override;
+  QAbstractItemView* GetView() override;
   /**
   * @brief See 'QmitkAbstractDataStorageInspector'
   */
-  virtual const QAbstractItemView* GetView() const override;
+  const QAbstractItemView* GetView() const override;
   /**
   * @brief See 'QmitkAbstractDataStorageInspector'
   */
-  virtual void SetSelectionMode(SelectionMode mode) override;
+  void SetSelectionMode(SelectionMode mode) override;
   /**
   * @brief See 'QmitkAbstractDataStorageInspector'
   */
-  virtual SelectionMode GetSelectionMode() const override;
+  SelectionMode GetSelectionMode() const override;
   /**
   * @brief Set the controlled base renderer.
   */
@@ -83,7 +79,7 @@ private Q_SLOTS:
 
 private:
 
-  virtual void Initialize() override;
+  void Initialize() override;
   void SetUpConnections();
 
   Ui::QmitkRenderWindowDataStorageInspector m_Controls;

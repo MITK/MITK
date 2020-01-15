@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 #ifndef __GENERIC_PARAM_MODEL_PARAMETERIZER_H
 #define __GENERIC_PARAM_MODEL_PARAMETERIZER_H
 
@@ -53,19 +49,19 @@ namespace mitk
     /**@pre The Number of paremeters must be between 1 and 10.*/
     itkSetClampMacro(NumberOfParameters, ParametersSizeType, 1, 10);
 
-    virtual mitk::ModelBase::FunctionStringType GetFunctionString() const override;
+    mitk::ModelBase::FunctionStringType GetFunctionString() const override;
 
     using Superclass::GenerateParameterizedModel;
-    virtual ModelBasePointer GenerateParameterizedModel(const IndexType& currentPosition) const;
+    ModelBasePointer GenerateParameterizedModel(const IndexType& currentPosition) const override;
 
-    virtual StaticParameterMapType GetGlobalStaticParameters() const override;
+    StaticParameterMapType GetGlobalStaticParameters() const override;
 
-    virtual ParametersType GetDefaultInitialParameterization() const override;
+    ParametersType GetDefaultInitialParameterization() const override;
 
   protected:
 
     GenericParamModelParameterizer();
-    virtual ~GenericParamModelParameterizer();
+    ~GenericParamModelParameterizer() override;
 
     mitk::ModelBase::FunctionStringType m_FunctionString;
 

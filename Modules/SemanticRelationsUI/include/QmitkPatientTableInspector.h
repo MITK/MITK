@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITKPATIENTTABLEINSPECTOR_H
 #define QMITKPATIENTTABLEINSPECTOR_H
@@ -46,14 +42,14 @@ public:
 
   QmitkPatientTableInspector(QWidget* parent = nullptr);
 
-  virtual QAbstractItemView* GetView() override;
-  virtual const QAbstractItemView* GetView() const override;
+  QAbstractItemView* GetView() override;
+  const QAbstractItemView* GetView() const override;
 
-  virtual void SetSelectionMode(SelectionMode mode) override;
-  virtual SelectionMode GetSelectionMode() const override;
+  void SetSelectionMode(SelectionMode mode) override;
+  SelectionMode GetSelectionMode() const override;
 
-  virtual void SetCaseID(const mitk::SemanticTypes::CaseID& caseID) override;
-  virtual void SetLesion(const mitk::SemanticTypes::Lesion& lesion) override;
+  void SetCaseID(const mitk::SemanticTypes::CaseID& caseID) override;
+  void SetLesion(const mitk::SemanticTypes::Lesion& lesion) override;
 
   QItemSelectionModel* GetSelectionModel();
 
@@ -72,13 +68,13 @@ private Q_SLOTS:
 
 protected:
 
-  virtual void Initialize() override;
+  void Initialize() override;
 
 private:
 
   void SetUpConnections();
 
-  virtual void keyPressEvent(QKeyEvent* e) override;
+  void keyPressEvent(QKeyEvent* e) override;
 
   Ui::QmitkPatientTableInspector m_Controls;
   QmitkPatientTableModel* m_StorageModel;

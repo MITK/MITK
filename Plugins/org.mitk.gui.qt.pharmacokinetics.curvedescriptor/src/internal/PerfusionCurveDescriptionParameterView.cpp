@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <QMessageBox>
 #include <QThreadPool>
@@ -67,8 +63,8 @@ void PerfusionCurveDescriptionParameterView::OnSelectionChanged(
 
   if (dataNodes.empty())
   {
-    m_selectedNode = NULL;
-    m_selectedImage = NULL;
+    m_selectedNode = nullptr;
+    m_selectedImage = nullptr;
   }
   else
   {
@@ -76,11 +72,14 @@ void PerfusionCurveDescriptionParameterView::OnSelectionChanged(
     m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
   }
 
+  m_Controls.lableSelectedImage->setText("No series selected.");
+
   if (m_selectedImage.IsNotNull())
   {
     if (m_selectedImage->GetTimeGeometry()->CountTimeSteps() > 1)
     {
       m_Controls.btnCalculateParameters->setEnabled(true);
+      m_Controls.lableSelectedImage->setText((this->m_selectedNode->GetName()).c_str());
     }
     else
     {
@@ -99,9 +98,9 @@ void PerfusionCurveDescriptionParameterView::OnSelectionChanged(
 
 PerfusionCurveDescriptionParameterView::PerfusionCurveDescriptionParameterView()
 {
-  m_selectedNode = NULL;
-  m_selectedImage = NULL;
-  m_selectedMask = NULL;
+  m_selectedNode = nullptr;
+  m_selectedImage = nullptr;
+  m_selectedMask = nullptr;
 }
 
 void PerfusionCurveDescriptionParameterView::InitParameterList()

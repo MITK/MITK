@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkSemanticRelationsDataStorageAccess.h"
 
@@ -258,7 +254,7 @@ mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelations
       // examination period exists, information type exists, retrieve all imageIDs from the storage
       auto allImageIDsOfExaminationPeriod = SemanticRelationsInference::GetAllImageIDsOfExaminationPeriod(caseID, examinationPeriod);
       // filter all images to remove the ones with a different information type using a lambda function
-      auto lambda = [&caseID, &informationType, this](SemanticTypes::ID imageID)
+      auto lambda = [&caseID, &informationType](SemanticTypes::ID imageID)
       {
         return (informationType != RelationStorage::GetInformationTypeOfImage(caseID, imageID));
       };

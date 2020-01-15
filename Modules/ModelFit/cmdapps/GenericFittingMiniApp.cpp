@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 // std includes
 #include <string>
@@ -240,8 +236,8 @@ void generateModelFit_ROIBased(
 
 void doFitting()
 {
-        mitk::ParameterFitImageGeneratorBase::Pointer generator = NULL;
-        mitk::modelFit::ModelFitInfo::Pointer fitSession = NULL;
+        mitk::ParameterFitImageGeneratorBase::Pointer generator = nullptr;
+        mitk::modelFit::ModelFitInfo::Pointer fitSession = nullptr;
 
         ::itk::CStyleCommand::Pointer command = ::itk::CStyleCommand::New();
         command->SetCallback(onFitEvent);
@@ -351,7 +347,7 @@ int main(int argc, char* argv[])
         MITK_ERROR << e.what();
         return EXIT_FAILURE;
     }
-    catch (std::exception e)
+    catch (const std::exception& e)
     {
         MITK_ERROR << e.what();
         return EXIT_FAILURE;

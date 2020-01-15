@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef ITKLINEHISTOGRAMBASEDMASSIMAGEFILTER_H
 #define ITKLINEHISTOGRAMBASEDMASSIMAGEFILTER_H
@@ -44,14 +40,14 @@ namespace itk
     typename TMaskImageType::Pointer m_BinaryContour;
     vnl_vector<double> m_CenterOfMask;
 
-    void ThreadedGenerateData(const typename Superclass::OutputImageRegionType &outputRegionForThread, ThreadIdType threadId);
-    void BeforeThreadedGenerateData();
+    void ThreadedGenerateData(const typename Superclass::OutputImageRegionType &outputRegionForThread, ThreadIdType threadId) override;
+    void BeforeThreadedGenerateData() override;
     //  void GenerateOutputInformation();
 
     vnl_vector<double> GetCenterOfMass(const TMaskImageType * maskImage);
 
     LineHistogramBasedMassImageFilter();
-    virtual ~LineHistogramBasedMassImageFilter();
+    ~LineHistogramBasedMassImageFilter() override;
   };
 }
 

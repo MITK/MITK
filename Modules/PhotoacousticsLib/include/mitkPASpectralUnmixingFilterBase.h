@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKPHOTOACOUSTICSPECTRALUNMIXINGFILTERBASE_H
 #define MITKPHOTOACOUSTICSPECTRALUNMIXINGFILTERBASE_H
@@ -40,7 +36,7 @@ namespace mitk {
     * The "AddWavelength" uses "push_back" to write float values into a vector. The first wavelength will correspond to the first image!!!
     * If there a more input images 'I' then added wavelengths 'w' the filter base interprets the next x images as repetition sequence of the same
     * wavelengths. If I % w !=0 the surplus image(s) will be dropped.
-    * Addtionaly one has to add chromophores from the property calculator class enum "ChromophoreType" with the "AddChromophore" method. 
+    * Addtionaly one has to add chromophores from the property calculator class enum "ChromophoreType" with the "AddChromophore" method.
     * This method as well uses "push_back" but the chosen (arbitary) order will be the order of the outputs.
     *
     * Output:
@@ -57,7 +53,7 @@ namespace mitk {
     * - "PIXELTYPE ERROR! FLOAT 32 REQUIRED": The MITK input image has to consist out of floats.
     * - "ERROR! REMOVE WAVELENGTHS!": One needs at least the same amount of images (z-dimension) then added wavelengths.
     * - "ADD MORE WAVELENGTHS!": One needs at least the same amount of wavelengths then added chromophores.
-    * - "WAVELENGTH XXX nm NOT SUPPORTED!": The wavelength is not part of the proptery calculater data base. The data base can be found @ 
+    * - "WAVELENGTH XXX nm NOT SUPPORTED!": The wavelength is not part of the proptery calculater data base. The data base can be found @
     *   [...]\mitk\Modules\PhotoacousticsLib\Resources\spectralLIB.dat
     * - "ADD OUTPUTS HAS TO BE LARGER THEN ZERO!"
     * - "NO WAVELENGHTS/CHROMOPHORES SELECZED!
@@ -117,11 +113,11 @@ namespace mitk {
       * \brief Constructor creats proptery calculater smart pointer new()
       */
       SpectralUnmixingFilterBase();
-      virtual ~SpectralUnmixingFilterBase();
+      ~SpectralUnmixingFilterBase() override;
 
       /**
       * \brief The subclasses will override the mehtod to calculate the spectral unmixing result vector.
-      * @param endmemberMatrix Matrix with number of chromophores colums and number of wavelengths rows so matrix element (i,j) contains 
+      * @param endmemberMatrix Matrix with number of chromophores colums and number of wavelengths rows so matrix element (i,j) contains
       * the absorbtion of chromophore j @ wavelength i taken from the database by PropertyElement method.
       * @param inputVector Vector containing values of one pixel of XY-plane image with number of wavelength rows (z-dimension of a sequenece)
       * so the pixelvalue of the first wavelength is stored in inputVector[0] and so on.
@@ -161,10 +157,10 @@ namespace mitk {
       * CheckPreConditions methods and enables pixelwise access to do spectral unmixing with the "SpectralUnmixingAlgorithm"
       * method. In the end the method writes the results into the new MITK output images.
       */
-      virtual void GenerateData() override;
+      void GenerateData() override;
 
       /*
-      * \brief Creats a Matrix with number of chromophores colums and number of wavelengths rows so matrix element (i,j) contains 
+      * \brief Creats a Matrix with number of chromophores colums and number of wavelengths rows so matrix element (i,j) contains
       * the absorbtion of chromophore j @ wavelength i. The absorbtion values are taken from the "PropertyElement" method.
       * @param m_Chromophore is a vector of "PropertyCalculator::ChromophoreType" containing all selected chromophores for the unmixing
       * @param m_Wavelength is a vector of integers containing all wavelengths of one sequence
@@ -173,7 +169,7 @@ namespace mitk {
         std::vector<mitk::pa::PropertyCalculator::ChromophoreType> m_Chromophore, std::vector<int> m_Wavelength);
 
       /*
-      * \brief "PropertyElement" is the tool to access the absorbtion values out of the database using mitk::pa::PropertyCalculator::GetAbsorptionForWavelengt 
+      * \brief "PropertyElement" is the tool to access the absorbtion values out of the database using mitk::pa::PropertyCalculator::GetAbsorptionForWavelengt
       * and checks if the requested wavelength is part of the database (not zero values). The "ONEENDMEMBER" is a pseudo absorber with static absorbtion 1
       * at every wavelength and is therefor not part of the database. If this one is the selected chromophore the return value is 1 for every wavelength.
       * @param wavelength has to be integer between 300 and 1000 nm

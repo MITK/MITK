@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <mitkIpPicTypeMultiplex.h>
 #include <ANN/ANN.h>
@@ -98,7 +94,7 @@ tCutResult ipMITKSegmentationGetCutPoints( mitkIpPicDescriptor *seg, mitkIpPicDe
   res.numPoints = 0;
   res.absMin = 0;
   res.cutIt = false;
-  res.deleteCurve = 0;
+  res.deleteCurve = nullptr;
 
   if (!history) return res;                  // no history!
   if (*((mitkIpUInt2_t*)history->data + ofs) == 0) return res;  // ofs not inside known history

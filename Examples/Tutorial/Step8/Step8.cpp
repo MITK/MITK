@@ -1,21 +1,18 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "Step8.h"
 
+#include "QmitkRenderWindow.h"
 #include "QmitkStdMultiWidget.h"
 
 #include "mitkRenderingManager.h"
@@ -63,9 +60,6 @@ void Step8::SetupWidgets()
 
   // Initialize bottom-right view as 3D view
   multiWidget->GetRenderWindow4()->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard3D);
-
-  // Enable standard handler for levelwindow-slider
-  multiWidget->EnableStandardLevelWindow();
 
   // Add the displayed views to the DataStorage to see their positions in 2D and 3D
   multiWidget->AddDisplayPlaneSubTree();

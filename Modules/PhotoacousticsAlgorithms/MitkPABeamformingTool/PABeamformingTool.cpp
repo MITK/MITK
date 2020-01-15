@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <mitkCommon.h>
 #include <chrono>
@@ -25,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCastToFloatImageFilter.h>
 
 #include <itksys/SystemTools.hxx>
-#include <tinyxml\tinyxml.h>
+#include <tinyxml/tinyxml.h>
 
 struct InputParameters
 {
@@ -58,7 +54,7 @@ struct CropSettings
 struct ResampleSettings
 {
   double spacing;
-  int dimX;
+  unsigned int dimX;
 };
 
 struct BModeSettings
@@ -184,17 +180,31 @@ void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSetti
       if (!processSet.DoBeamforming)
         continue;
 
-      float PitchInMeters = std::stof(elem->Attribute("pitchInMeters"));
-      float SpeedOfSound = std::stof(elem->Attribute("speedOfSound"));
-      float Angle = std::stof(elem->Attribute("angle"));
-      bool IsPhotoacousticImage = std::stoi(elem->Attribute("isPhotoacousticImage"));
-      unsigned int SamplesPerLine = std::stoi(elem->Attribute("samplesPerLine"));
-      unsigned int ReconstructionLines = std::stoi(elem->Attribute("reconstructionLines"));
-      float ReconstructionDepth = std::stof(elem->Attribute("reconstructionDepth"));
+      float SpeedOfSound = std::stof(elem->Attribute("speedOfSoundMeterPerSecond"));
+      float PitchMeter = std::stof(elem->Attribute("pitchMilliMeter"))/1000;
+      float TimeSpacingMicroSecond = (float)(input.inputImage->GetGeometry()->GetSpacing()[1] / 1000000);
+
+      if (std::stof(elem->Attribute("timeSpacingMicroSecond")) > 0) {
+        TimeSpacingMicroSecond = std::stof(elem->Attribute("timeSpacingMicroSecond"));
+        MITK_INFO << "TIME: " << TimeSpacingMicroSecond;
+      }
+
+      float Angle = std::stof(elem->Attribute("apodizationAngle"));
+      bool IsPhotoacousticImage = true;
+      if (std::string(elem->Attribute("imageType")).compare("US") == 0) {
+        IsPhotoacousticImage = false;
+        MITK_INFO << "US IMAGE";
+      }
+
+      unsigned int SamplesPerLine = std::stoi(elem->Attribute("reconstructedYDimension"));
+      unsigned int ReconstructionLines = std::stoi(elem->Attribute("reconstructedXDimension"));
+
+
+      float ReconstructionDepth = std::stof(elem->Attribute("reconstructionDepthMeter"));
       bool UseGPU = std::stoi(elem->Attribute("useGPU"));
       unsigned int GPUBatchSize = std::stoi(elem->Attribute("GPUBatchSize"));
 
-      std::string apodizationStr = elem->Attribute("apodization");
+      std::string apodizationStr = elem->Attribute("apodizationFunction");
       mitk::BeamformingSettings::Apodization Apodization = mitk::BeamformingSettings::Apodization::Box;
       if (apodizationStr == "Box")
         Apodization = mitk::BeamformingSettings::Apodization::Box;
@@ -205,7 +215,18 @@ void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSetti
       else
         mitkThrow() << "Apodization incorrectly defined in settings";
 
-      unsigned int ApodizationArraySize = std::stoi(elem->Attribute("apodizationArraySize"));
+      std::string geomStr = elem->Attribute("probeGeometry");
+      mitk::BeamformingSettings::ProbeGeometry ProbeGeometry = mitk::BeamformingSettings::ProbeGeometry::Linear;
+      if (geomStr == "linear")
+        ProbeGeometry = mitk::BeamformingSettings::ProbeGeometry::Linear;
+      else if(geomStr == "concave")
+        ProbeGeometry = mitk::BeamformingSettings::ProbeGeometry::Concave;
+      else
+        mitkThrow() << "geometry incorrectly defined in settings";
+
+      float radius = std::stof(elem->Attribute("radiusMilliMeter"))/1000;
+
+      unsigned int ApodizationArraySize = ReconstructionLines;
 
       std::string algorithmStr = elem->Attribute("algorithm");
       mitk::BeamformingSettings::BeamformingAlgorithm Algorithm = mitk::BeamformingSettings::BeamformingAlgorithm::DAS;
@@ -216,14 +237,12 @@ void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSetti
       else if (algorithmStr == "sDMAS")
         Algorithm = mitk::BeamformingSettings::BeamformingAlgorithm::sDMAS;
       else
-      {
         mitkThrow() << "Beamforming algorithm incorrectly defined in settings";
-      }
 
       *bfSet = mitk::BeamformingSettings::New(
-        (float)(input.inputImage->GetGeometry()->GetSpacing()[0] / 1000),
+        PitchMeter,
         SpeedOfSound,
-        (float)(input.inputImage->GetGeometry()->GetSpacing()[1] / 1000000),
+        TimeSpacingMicroSecond,
         Angle,
         IsPhotoacousticImage,
         SamplesPerLine,
@@ -232,10 +251,11 @@ void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSetti
         ReconstructionDepth,
         UseGPU,
         GPUBatchSize,
-        mitk::BeamformingSettings::DelayCalc::Spherical,
         Apodization,
         ApodizationArraySize,
-        Algorithm
+        Algorithm,
+        ProbeGeometry,
+        radius
       );
     }
     if (elemName == "Bandpass")
@@ -248,7 +268,6 @@ void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSetti
       bandpassSet.lowPass = std::stof(elem->Attribute("lowPass"));
       bandpassSet.alphaLow = std::stof(elem->Attribute("alphaLow"));
       bandpassSet.alphaHigh = std::stof(elem->Attribute("alphaHigh"));
-      bandpassSet.speedOfSound = std::stof(elem->Attribute("speedOfSound"));
     }
     if (elemName == "Cropping")
     {
@@ -281,7 +300,7 @@ void ParseXML(std::string xmlFile, InputParameters input, mitk::BeamformingSetti
       std::string methodStr = elem->Attribute("method");
       if (methodStr == "EnvelopeDetection")
         bmodeSet.method = mitk::PhotoacousticFilterService::BModeMethod::EnvelopeDetection;
-      else if (elem->Attribute("method") == "Abs")
+      else if (methodStr == "Abs")
         bmodeSet.method = mitk::PhotoacousticFilterService::BModeMethod::Abs;
       else
         mitkThrow() << "BMode method incorrectly set in configuration file";
@@ -298,8 +317,8 @@ int main(int argc, char * argv[])
   BandpassSettings bandpassSettings{5,10,1,1,1540};
   BModeSettings bmodeSettings{ mitk::PhotoacousticFilterService::BModeMethod::EnvelopeDetection, false };
   CropSettings cropSettings{ 0,0,0,0,0,0 };
-  ResampleSettings resSettings{ 0.15 };
-  ProcessSettings processSettings{ true, false, false };
+  ResampleSettings resSettings{ 0.15 , 256};
+  ProcessSettings processSettings{ false, false, false, false, false };
 
   MITK_INFO << "Parsing settings XML...";
   try
@@ -331,43 +350,43 @@ int main(int argc, char * argv[])
   mitk::PhotoacousticFilterService::Pointer m_FilterService = mitk::PhotoacousticFilterService::New();
 
   mitk::Image::Pointer output = inputImage;
-  if (processSettings.DoBeamforming)
-  {
-    MITK_INFO(input.verbose) << "Beamforming input image...";
-    output = m_FilterService->ApplyBeamforming(output, bfSettings);
-    MITK_INFO(input.verbose) << "Beamforming input image...[Done]";
-  }
   if (processSettings.DoBandpass)
   {
     MITK_INFO(input.verbose) << "Bandpassing input image...";
     output = m_FilterService->ApplyBandpassFilter(output, bandpassSettings.highPass*1e6, bandpassSettings.lowPass*1e6, bandpassSettings.alphaHigh, bandpassSettings.alphaLow, 1, bandpassSettings.speedOfSound, true);
     MITK_INFO(input.verbose) << "Bandpassing input image...[Done]";
   }
+  if (processSettings.DoBeamforming)
+  {
+    MITK_INFO(input.verbose) << "Beamforming input image...";
+    output = m_FilterService->ApplyBeamforming(output, bfSettings);
+    MITK_INFO(input.verbose) << "Beamforming input image...[Done]";
+  }
   if (processSettings.DoCropping)
   {
     int err;
     MITK_INFO(input.verbose) << "Applying Crop filter to image...";
-    output = m_FilterService->ApplyCropping(output, 
+    output = m_FilterService->ApplyCropping(output,
       cropSettings.above, cropSettings.below, cropSettings.right, cropSettings.left, cropSettings.zStart, cropSettings.zEnd, &err);
     MITK_INFO(input.verbose) << "Applying Crop filter to image...[Done]";
-  }
-  if (processSettings.DoResampling)
-  {
-    double spacing[3] = {output->GetGeometry()->GetSpacing()[0]*output->GetDimension(0)/resSettings.dimX, resSettings.spacing, output->GetGeometry()->GetSpacing()[2]};
-    MITK_INFO(input.verbose) << "Applying Resample filter to image...";
-    output = m_FilterService->ApplyResampling(output, spacing);
-    if (output->GetDimension(0) != resSettings.dimX)
-    {
-      double dim[3] = {(double)resSettings.dimX, (double)output->GetDimension(1), (double)output->GetDimension(2)};
-      output = m_FilterService->ApplyResamplingToDim(output, dim);
-    }
-    MITK_INFO(input.verbose) << "Applying Resample filter to image...[Done]";
   }
   if (processSettings.DoBmode)
   {
     MITK_INFO(input.verbose) << "Applying BModeFilter to image...";
     output = m_FilterService->ApplyBmodeFilter(output, bmodeSettings.method, bmodeSettings.UseLogFilter);
     MITK_INFO(input.verbose) << "Applying BModeFilter to image...[Done]";
+  }
+  if (processSettings.DoResampling)
+  {
+    double spacing[3] = { output->GetGeometry()->GetSpacing()[0] * output->GetDimension(0) / resSettings.dimX, resSettings.spacing, output->GetGeometry()->GetSpacing()[2] };
+    MITK_INFO(input.verbose) << "Applying Resample filter to image...";
+    output = m_FilterService->ApplyResampling(output, spacing);
+    if (output->GetDimension(0) != resSettings.dimX)
+    {
+      double dim[3] = { (double)resSettings.dimX, (double)output->GetDimension(1), (double)output->GetDimension(2) };
+      output = m_FilterService->ApplyResamplingToDim(output, dim);
+    }
+    MITK_INFO(input.verbose) << "Applying Resample filter to image...[Done]";
   }
 
   MITK_INFO(input.verbose) << "Saving image...";

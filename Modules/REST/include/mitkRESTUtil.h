@@ -1,30 +1,31 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef mitkRESTUtil_h
 #define mitkRESTUtil_h
 
 #include <MitkRESTExports.h>
 #include <cpprest/asyncrt_utils.h>
+#include <map>
+
 
 namespace mitk
 {
   class MITKREST_EXPORT RESTUtil
   {
   public:
+
+    typedef std::map<utility::string_t, utility::string_t> ParamMap;
+
     /**
      * @brief Converts the given std::wstring into a std::string representation
      */

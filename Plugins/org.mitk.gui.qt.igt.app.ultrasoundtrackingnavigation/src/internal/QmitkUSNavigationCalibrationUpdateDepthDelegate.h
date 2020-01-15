@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 #ifndef QMITKUSNAVIGATIONCALIBRATIONUPDATEDEPTHDELEGATE_H
 #define QMITKUSNAVIGATIONCALIBRATIONUPDATEDEPTHDELEGATE_H
 
@@ -28,8 +24,8 @@ class QmitkUSNavigationCalibrationUpdateDepthDelegate : public QStyledItemDelega
   Q_OBJECT
 
 public:
-  explicit QmitkUSNavigationCalibrationUpdateDepthDelegate(QObject* parent = 0);
-  ~QmitkUSNavigationCalibrationUpdateDepthDelegate();
+  explicit QmitkUSNavigationCalibrationUpdateDepthDelegate(QObject* parent = nullptr);
+  ~QmitkUSNavigationCalibrationUpdateDepthDelegate() override;
 
   void SetControlInterfaceBMode(mitk::USControlInterfaceBMode::Pointer controlInterfaceBMode);
 
@@ -39,7 +35,7 @@ public:
    * SetControlInterfaceBMode(). If no control interface was set (or it is
    * null) the QEvent gets ignored.
    */
-  bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index);
+  bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index) override;
 
 private:
   mitk::USControlInterfaceBMode::Pointer m_ControlInterfaceBMode;

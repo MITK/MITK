@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #ifndef QMITK_MULTI_NODE_SELECTION_WIDGET_H
@@ -60,8 +56,8 @@ public:
   void SetSelectionCheckFunction(const SelectionCheckFunctionType &checkFunction);
 
 public Q_SLOTS:
-  virtual void SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes) override;
-  virtual void SetCurrentSelection(NodeList selectedNodes) override;
+  void SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes) override;
+  void SetCurrentSelection(NodeList selectedNodes) override;
   void OnEditSelection();
 
 protected Q_SLOTS:

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <iostream>
 #include "mitkTestingMacros.h"
@@ -38,7 +34,7 @@ public:
 
 protected:
 
-    virtual MeasureType CalcMeasure(const ParametersType &parameters, const SignalType& signal) const
+    MeasureType CalcMeasure(const ParametersType &parameters, const SignalType& signal) const override
     {
       MeasureType result = signal;
       result[0] = parameters[0];
@@ -46,13 +42,13 @@ protected:
       ++m_calls;
       return result;
     };
-	
+
     TestCostFunction()
     {
       m_calls = 0;
     }
 
-    ~TestCostFunction(){}
+    ~TestCostFunction() override{}
 };
 
 int mitkMVConstrainedCostFunctionDecoratorTest(int  /*argc*/, char*[] /*argv[]*/)
@@ -70,7 +66,7 @@ int mitkMVConstrainedCostFunctionDecoratorTest(int  /*argc*/, char*[] /*argv[]*/
   signal.Fill(0.0);
   decorator->SetSample(signal);
   innerCF->SetSample(signal);
-  
+
   mitk::LinearModel::TimeGridType grid(5);
   grid[0] = 0;
   grid[1] = 1;
@@ -101,10 +97,10 @@ int mitkMVConstrainedCostFunctionDecoratorTest(int  /*argc*/, char*[] /*argv[]*/
   ///////////////////////
   //Tests
 
-  //check freshly created checker; 
-  MITK_TEST_CONDITION_REQUIRED(decorator->GetWrappedCostFunction() == NULL,
+  //check freshly created checker;
+  MITK_TEST_CONDITION_REQUIRED(decorator->GetWrappedCostFunction() == nullptr,
 								 "Testing GetWrappedCostFunction for new decorator.");
-  MITK_TEST_CONDITION_REQUIRED(decorator->GetConstraintChecker() == NULL,
+  MITK_TEST_CONDITION_REQUIRED(decorator->GetConstraintChecker() == nullptr,
 								 "Testing GetWrappedCostFunction for new decorator.");
   MITK_TEST_CONDITION_REQUIRED(decorator->GetFailureThreshold() == defaultMaxPenalty,
 								 "Testing GetWrappedCostFunction for new decorator.");
@@ -112,7 +108,7 @@ int mitkMVConstrainedCostFunctionDecoratorTest(int  /*argc*/, char*[] /*argv[]*/
   MITK_TEST_FOR_EXCEPTION(mitk::Exception, decorator->GetValue(p1));
   decorator->SetWrappedCostFunction(innerCF);
   MITK_TEST_FOR_EXCEPTION(mitk::Exception, decorator->GetValue(p1));
-  decorator->SetWrappedCostFunction(NULL);
+  decorator->SetWrappedCostFunction(nullptr);
   decorator->SetConstraintChecker(checker);
   MITK_TEST_FOR_EXCEPTION(mitk::Exception, decorator->GetValue(p1));
   decorator->SetWrappedCostFunction(innerCF);

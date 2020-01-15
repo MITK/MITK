@@ -1,22 +1,17 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
-
-#include <mitkRESTServer.h>
+============================================================================*/
 
 #include <mitkIRESTManager.h>
+#include <mitkRESTServer.h>
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
@@ -27,6 +22,7 @@ using namespace std::placeholders;
 
 using http_listener = web::http::experimental::listener::http_listener;
 using http_request = web::http::http_request;
+using http_response = web::http::http_response;
 using methods = web::http::methods;
 using status_codes = web::http::status_codes;
 
@@ -38,29 +34,25 @@ namespace mitk
     Impl(const web::uri &uri);
     ~Impl();
 
-    void HandleGet(const http_request &request);
+    void HandleRequest(const http_request &request);
 
     web::http::experimental::listener::http_listener listener;
     web::uri uri;
   };
 
-  RESTServer::Impl::Impl(const web::uri &uri)
-    : uri{uri}
-  {
-  }
+  RESTServer::Impl::Impl(const web::uri &uri) : uri{uri} {}
 
-  RESTServer::Impl::~Impl()
-  {
-  }
+  RESTServer::Impl::~Impl() {}
 
-  void RESTServer::Impl::HandleGet(const http_request &request)
+  void RESTServer::Impl::HandleRequest(const http_request &request)
   {
     web::uri_builder builder(this->listener.uri());
     builder.append(request.absolute_uri());
 
     auto uriString = builder.to_uri().to_string();
 
-    web::json::value content;
+    http_response response(status_codes::InternalError);
+    response.set_body(U("There went something wrong after receiving the request."));
 
     auto context = us::GetModuleContext();
     auto managerRef = context->GetServiceReference<IRESTManager>();
@@ -70,31 +62,39 @@ namespace mitk
       auto manager = context->GetService(managerRef);
       if (manager)
       {
-        auto data = request.extract_json().get();
-        content = manager->Handle(builder.to_uri(), data);
+        // not every request contains JSON data
+        web::json::value data = {};
+        if (request.headers().content_type() == U("application/json"))
+        {
+          data = request.extract_json().get();
+        }
+
+        mitk::RESTUtil::ParamMap headers;
+        auto begin = request.headers().begin();
+        auto end = request.headers().end();
+
+        for (; begin != end; ++begin)
+        {
+          headers.insert(mitk::RESTUtil::ParamMap::value_type(begin->first, begin->second));
+        }
+
+        response = manager->Handle(builder.to_uri(), data, request.method(), headers);
       }
     }
 
-    request.reply(content.is_null()
-      ? status_codes::NotFound
-      : status_codes::OK);
+    request.reply(response);
   }
-}
+} // namespace mitk
 
+mitk::RESTServer::RESTServer(const web::uri &uri) : m_Impl{std::make_unique<Impl>(uri)} {}
 
-mitk::RESTServer::RESTServer(const web::uri &uri)
-  : m_Impl{std::make_unique<Impl>(uri)}
-{
-}
-
-mitk::RESTServer::~RESTServer()
-{
-}
+mitk::RESTServer::~RESTServer() {}
 
 void mitk::RESTServer::OpenListener()
 {
   m_Impl->listener = http_listener(m_Impl->uri);
-  m_Impl->listener.support(methods::GET, std::bind(&Impl::HandleGet, m_Impl.get(), _1));
+  m_Impl->listener.support(std::bind(&Impl::HandleRequest, m_Impl.get(), _1));
+  m_Impl->listener.support(methods::OPTIONS, std::bind(&Impl::HandleRequest, m_Impl.get(), _1));
   m_Impl->listener.open().wait();
 }
 

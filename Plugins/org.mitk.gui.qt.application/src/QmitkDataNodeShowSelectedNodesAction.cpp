@@ -1,20 +1,17 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <QmitkDataNodeShowSelectedNodesAction.h>
+#include <mitkNodePredicateFirstLevel.h>
 
 // mitk core
 #include <mitkRenderingManager.h>
@@ -51,22 +48,15 @@ void QmitkDataNodeShowSelectedNodesAction::OnActionTriggered(bool /*checked*/)
 
   mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
 
-  auto dataNodes = GetSelectedNodes();
-  auto nodeset = dataStorage->GetAll();
-  for (auto& node : *nodeset)
+  auto selectedNodes = GetSelectedNodes();
+
+  auto allNodes = dataStorage->GetAll();
+
+  for (auto& node : *allNodes)
   {
-    if (node.IsNotNull())
+    if (node.IsNotNull() && node->GetData() != nullptr && strcmp(node->GetData()->GetNameOfClass(), "PlaneGeometryData"))
     {
-      node->SetVisibility(dataNodes.contains(node), baseRenderer);
-      if(node->GetData() == nullptr)
-      {
-        node->SetVisibility(true, baseRenderer);
-        mitk::DataStorage::SetOfObjects::ConstPointer derivations = dataStorage->GetDerivations(node);
-        for (mitk::DataStorage::SetOfObjects::const_iterator iter = derivations->begin(); iter != derivations->end(); ++iter)
-        {
-          (*iter)->SetVisibility(true, baseRenderer);
-        }
-      }
+      node->SetVisibility(selectedNodes.contains(node), baseRenderer);
     }
   }
 

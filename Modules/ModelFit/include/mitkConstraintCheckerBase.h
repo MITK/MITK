@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef CONSTRAINT_CHECKER_BASE_H
 #define CONSTRAINT_CHECKER_BASE_H
@@ -46,7 +42,7 @@ public:
     typedef Superclass::SignalType SignalType;
     typedef Superclass::ParametersType ParametersType;
 
-    virtual PenaltyValueType GetPenaltySum(const ParametersType &parameters) const;
+    PenaltyValueType GetPenaltySum(const ParametersType &parameters) const override;
 
 protected:
 
@@ -54,7 +50,7 @@ protected:
     {
     }
 
-    ~ConstraintCheckerBase(){}
+    ~ConstraintCheckerBase() override{}
 
 private:
     ConstraintCheckerBase(const ConstraintCheckerBase& source);

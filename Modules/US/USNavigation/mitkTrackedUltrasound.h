@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef __mitkTrackedUltrasound_h
 #define __mitkTrackedUltrasound_h
@@ -45,7 +41,7 @@ namespace mitk {
 
     mitkClassMacro(TrackedUltrasound, mitk::AbstractUltrasoundTrackerDevice);
     mitkNewMacro3Param(TrackedUltrasound, USDevice::Pointer, itk::SmartPointer<NavigationDataSource>, bool);
-    virtual AffineTransform3D::Pointer GetUSPlaneTransform();
+    AffineTransform3D::Pointer GetUSPlaneTransform() override;
 
 
 
@@ -54,7 +50,7 @@ namespace mitk {
     TrackedUltrasound(  USDevice::Pointer usDevice,
                         itk::SmartPointer<NavigationDataSource> trackingDevice,
                         bool trackedUltrasoundActive = true );
-    virtual ~TrackedUltrasound();
+    ~TrackedUltrasound() override;
 
     /**
     * \brief Grabs the next frame from the input.

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef __VALUE_BASED_PARAMETERIZATION_DELEGATE_H
 #define __VALUE_BASED_PARAMETERIZATION_DELEGATE_H
@@ -54,8 +50,8 @@ namespace mitk
     /** Returns the parameterization (e.g. initial parametrization for fitting) that should be used.
      If no ParameterizationDelegate is set (see SetInitialParameterizationDelegate()) it will just return
      the result of GetInitialParameterization().*/
-    virtual ParametersType GetInitialParameterization() const;
-    virtual ParametersType GetInitialParameterization(const IndexType& currentPosition) const;
+    ParametersType GetInitialParameterization() const override;
+    ParametersType GetInitialParameterization(const IndexType& currentPosition) const override;
 
   protected:
 
@@ -63,7 +59,7 @@ namespace mitk
 
     ValueBasedParameterizationDelegate();
 
-    virtual ~ValueBasedParameterizationDelegate();
+    ~ValueBasedParameterizationDelegate() override;
 
   private:
 

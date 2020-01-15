@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKUSNAVIGATIONLOGGINGBACKEND_H
 #define MITKUSNAVIGATIONLOGGINGBACKEND_H
@@ -34,7 +30,7 @@ namespace mitk {
     public:
 
       USNavigationLoggingBackend();
-      virtual ~USNavigationLoggingBackend();
+      ~USNavigationLoggingBackend() override;
 
       /** \brief Set file path und name for the output file.
        * The file will be opened and all log messages will be directed there from then on.
@@ -49,7 +45,7 @@ namespace mitk {
        *
        *  \param logMessage Logging message.
        */
-      virtual void ProcessMessage(const mbilog::LogMessage &logMessage );
+      void ProcessMessage(const mbilog::LogMessage &logMessage ) override;
 
       /** @return Returns all messages of the category "USNavigationLogging" since the last call of ClearNavigationMessages(). */
       std::vector<std::string> GetNavigationMessages();
@@ -61,7 +57,7 @@ namespace mitk {
       /** Clears the internally stored navigation messages of the category "USNavigationLogging". */
       void ClearNavigationMessages();
 
-      mbilog::OutputType GetOutputType(void) const;
+      mbilog::OutputType GetOutputType(void) const override;
 
     private:
       std::ofstream m_OutputStream;

@@ -6,7 +6,7 @@ set(MITK_USE_OpenIGTLink ON CACHE BOOL "MITK Use OpenIGTLink Library" FORCE)
 
 set(MITK_USE_OpenCL ON CACHE BOOL "MITK Use OpenCL Library" FORCE)
 
-# Enable default plugins and the navigation modules
+# Also enable plugins often used in photoacoustics
 set(MITK_CONFIG_PLUGINS
   org.mitk.gui.qt.datamanager
   org.mitk.gui.qt.stdmultiwidgeteditor
@@ -19,3 +19,4 @@ set(MITK_CONFIG_PLUGINS
   org.mitk.gui.qt.pointsetinteraction
 )
 
+set(BUILD_PhotoacousticBeamformingTool ON CACHE BOOL "Build commandline tools for Beamforming" FORCE)

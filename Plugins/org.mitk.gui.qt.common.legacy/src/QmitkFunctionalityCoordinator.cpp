@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkFunctionalityCoordinator.h"
 #include "QmitkFunctionality.h"
@@ -23,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIZombieViewPart.h>
 
 QmitkFunctionalityCoordinator::QmitkFunctionalityCoordinator()
-  : m_StandaloneFuntionality(0)
+  : m_StandaloneFuntionality(nullptr)
 {
 }
 
@@ -79,8 +75,8 @@ void QmitkFunctionalityCoordinator::PartOpened( const berry::IWorkbenchPartRefer
     for (std::set<QmitkFunctionality*>::iterator it = m_Functionalities.begin()
       ; it != m_Functionalities.end(); it++)
     {
-      (*it)->StdMultiWidgetAvailable(*(partRef
-        ->GetPart(false).Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget()));
+      (*it)->MultiWidgetAvailable(*(partRef
+        ->GetPart(false).Cast<QmitkStdMultiWidgetEditor>()->GetMultiWidget()));
     }
   }
   else
@@ -104,8 +100,8 @@ void QmitkFunctionalityCoordinator::PartClosed( const berry::IWorkbenchPartRefer
     for (std::set<QmitkFunctionality*>::iterator it = m_Functionalities.begin()
       ; it != m_Functionalities.end(); it++)
     {
-      (*it)->StdMultiWidgetClosed(*(stdMultiWidgetEditor->GetStdMultiWidget()));
-      (*it)->StdMultiWidgetNotAvailable(); // deprecated call, provided for consistence
+      (*it)->MultiWidgetClosed(*(stdMultiWidgetEditor->GetMultiWidget()));
+      (*it)->MultiWidgetNotAvailable(); // deprecated call, provided for consistence
     }
   }
   else
@@ -115,11 +111,11 @@ void QmitkFunctionalityCoordinator::PartClosed( const berry::IWorkbenchPartRefer
     if(_QmitkFunctionality.IsNotNull())
     {
       // deactivate on close ( the standalone functionality may still be activated  )
-      this->DeactivateStandaloneFunctionality(partRef.GetPointer(), 0);
+      this->DeactivateStandaloneFunctionality(partRef.GetPointer(), nullptr);
 
       // and set pointer to 0
       if(m_StandaloneFuntionality == partRef.GetPointer())
-        m_StandaloneFuntionality = 0;
+        m_StandaloneFuntionality = nullptr;
 
       m_Functionalities.erase(_QmitkFunctionality.GetPointer()); // remove as opened functionality
 
@@ -195,7 +191,7 @@ void QmitkFunctionalityCoordinator::ActivateStandaloneFunctionality( berry::IWor
 void QmitkFunctionalityCoordinator::DeactivateStandaloneFunctionality(berry::IWorkbenchPartReference* partRef,
                                                                       berry::IWorkbenchPartReference* newRef)
 {
-  if (partRef == 0) return;
+  if (partRef == nullptr) return;
 
   QmitkFunctionality* functionality = dynamic_cast<QmitkFunctionality*>(partRef->GetPart(false).GetPointer());
   if(functionality && functionality->IsActivated())

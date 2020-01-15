@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
@@ -97,47 +93,47 @@ public:
     CPPUNIT_ASSERT(m_TestVessel->IsFinished() == false);
 
     CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 4)),
-      abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 4)) <= mitk::eps);
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 4)) <= mitk::eps);
 
     m_TestVessel->ExpandVessel(m_TestInSilicoVolume, m_StraightLine, 0, nullptr);
 
     CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 4)),
-      abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 4) - 10) <= mitk::eps);
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 4) - 10) <= mitk::eps);
     CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 5, 4)),
-      abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 5, 4)) <= mitk::eps);
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 5, 4)) <= mitk::eps);
     CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 6, 4)),
-      abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 6, 4)) <= mitk::eps);
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 6, 4)) <= mitk::eps);
     CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 5)),
-      abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 5)) <= mitk::eps);
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 5)) <= mitk::eps);
     CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 6)),
-      abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 6)) <= mitk::eps);
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 6)) <= mitk::eps);
 
     CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 4)),
-      abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 4)) <= mitk::eps);
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 4)) <= mitk::eps);
     CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(2, 4, 4)),
-      abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(2, 4, 4)) <= mitk::eps);
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(2, 4, 4)) <= mitk::eps);
 
     m_TestVessel->ExpandVessel(m_TestInSilicoVolume, m_StraightLine, 0, nullptr);
 
     CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 4)),
-      abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 4) - 10) <= mitk::eps);
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 4) - 10) <= mitk::eps);
     CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 5, 4)),
-      abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 5, 4)) <= mitk::eps);
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 5, 4)) <= mitk::eps);
     CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 6, 4)),
-      abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 6, 4)) <= mitk::eps);
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 6, 4)) <= mitk::eps);
     CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 5)),
-      abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 5)) <= mitk::eps);
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 5)) <= mitk::eps);
     CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 6)),
-      abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 6)) <= mitk::eps);
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 6)) <= mitk::eps);
 
     CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 4)),
-      abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 4) - 10) <= mitk::eps);
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 4) - 10) <= mitk::eps);
     CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 4)),
-      abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 4) - 10) <= mitk::eps);
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 4) - 10) <= mitk::eps);
     CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(2, 4, 4)),
-      abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(2, 4, 4)) <= mitk::eps);
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(2, 4, 4)) <= mitk::eps);
     CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(3, 4, 4)),
-      abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(3, 4, 4)) <= mitk::eps);
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(3, 4, 4)) <= mitk::eps);
   }
 
   void testBifurcate()

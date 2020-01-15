@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITKUSNAVIGATIONSTEPMARKERINTERVENTION_H
 #define QMITKUSNAVIGATIONSTEPMARKERINTERVENTION_H
@@ -62,26 +58,26 @@ protected slots:
   void OnRiskZoneViolated(const mitk::DataNode *, mitk::Point3D);
 
 public:
-  explicit QmitkUSNavigationStepMarkerIntervention(QWidget *parent = 0);
-  ~QmitkUSNavigationStepMarkerIntervention();
+  explicit QmitkUSNavigationStepMarkerIntervention(QWidget *parent = nullptr);
+  ~QmitkUSNavigationStepMarkerIntervention() override;
 
-  virtual bool OnStartStep();
-  virtual bool OnStopStep();
-  virtual bool OnFinishStep();
+  bool OnStartStep() override;
+  bool OnStopStep() override;
+  bool OnFinishStep() override;
 
-  virtual bool OnActivateStep();
-  virtual bool OnDeactivateStep();
-  virtual void OnUpdate();
+  bool OnActivateStep() override;
+  bool OnDeactivateStep() override;
+  void OnUpdate() override;
 
-  virtual void OnSettingsChanged(const itk::SmartPointer<mitk::DataNode> settingsNode);
+  void OnSettingsChanged(const itk::SmartPointer<mitk::DataNode> settingsNode) override;
 
-  virtual QString GetTitle();
-  virtual bool GetIsRestartable();
+  QString GetTitle() override;
+  bool GetIsRestartable() override;
 
-  virtual FilterVector GetFilter();
+  FilterVector GetFilter() override;
 
 protected:
-  virtual void OnSetCombinedModality();
+  void OnSetCombinedModality() override;
 
   void ClearZones();
   void UpdateTargetCoordinates(mitk::DataNode *);

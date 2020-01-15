@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkSliceAnimationItem.h"
 #include "QmitkSliceAnimationWidget.h"
@@ -21,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 static int GetNumberOfSlices(int renderWindow)
 {
-  const QString renderWindowName = QString("stdmulti.widget%1").arg(renderWindow + 1);
+  const QString renderWindowName = QString("stdmulti.widget%1").arg(renderWindow);
   vtkRenderWindow* theRenderWindow = mitk::BaseRenderer::GetRenderWindowByName(renderWindowName.toStdString());
 
   if (theRenderWindow != nullptr)

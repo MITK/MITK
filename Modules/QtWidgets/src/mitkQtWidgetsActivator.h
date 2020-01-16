@@ -35,6 +35,7 @@ public:
 private:
   std::unique_ptr<mitk::IDataStorageInspectorProvider> m_TreeInspector;
   std::unique_ptr<mitk::IDataStorageInspectorProvider> m_ListInspector;
+  std::unique_ptr<mitk::IDataStorageInspectorProvider> m_FavoriteNodesInspector;
 };
 
 #endif // MITKCOREACTIVATOR_H_

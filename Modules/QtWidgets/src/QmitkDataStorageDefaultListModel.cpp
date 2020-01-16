@@ -39,24 +39,14 @@ void QmitkDataStorageDefaultListModel::NodeAdded(const mitk::DataNode* /*node*/)
 void QmitkDataStorageDefaultListModel::NodeChanged(const mitk::DataNode* node)
 {
   // since the "NodeChanged" event is sent quite often, we check here, if it is relevant for this model
-
-  if (m_NodePredicate.IsNull())
+  if (m_NodePredicate.IsNull() || m_NodePredicate->CheckNode(node))
   {
-    UpdateModelData();
-    return;
-  }
-
-  bool isRelevant = m_NodePredicate->CheckNode(node);
-  if (isRelevant)
-  {
-    // update definitely
     UpdateModelData();
     return;
   }
 
   // not relevant - need to check if we have to remove it
-  auto foundElement = std::find(m_DataNodes.begin(), m_DataNodes.end(), node);
-  if (foundElement != m_DataNodes.end())
+  if (std::find(m_DataNodes.begin(), m_DataNodes.end(), node) != m_DataNodes.end())
   {
     UpdateModelData();
   }

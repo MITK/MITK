@@ -10,7 +10,6 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-
 #ifndef QmitkDicomInspectorView_h
 #define QmitkDicomInspectorView_h
 
@@ -28,14 +27,12 @@ found in the LICENSE file.
 
 // mitk gui qt common plugin
 #include <QmitkAbstractView.h>
-#include "QmitkSelectionServiceConnector.h"
+#include <QmitkSelectionServiceConnector.h>
 
 /**
- *	@brief	View class defining the UI part of the ModelFitVisualization plug-in.
+ *	@brief	View class to inspect all DICOM tags available for the data of a node.
  */
-class QmitkDicomInspectorView :
-  public QmitkAbstractView,
-  public mitk::IRenderWindowPartListener
+class QmitkDicomInspectorView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
 
   Q_OBJECT
@@ -47,52 +44,62 @@ public:
 
   static const std::string VIEW_ID;
 
-  protected slots:
+  void SetFocus() override { };
 
-  /**
-   *	@brief	Triggered when the voxel or time step selection changes.
-   *			Calculates the curve and points for the current fit if the visualization is running.
-   */
-  void OnSliceChangedDelayed();
+  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
 
 protected:
 
   void CreateQtPartControl(QWidget* parent) override;
 
-  void SetFocus() override;
+  /** @brief Initializes and sets the observers that are used to monitor changes in the selected position
+      or time point in order to actualize the view*/
+  bool InitObservers();
 
-  /** @brief called by the selection widget when the selection has changed */
+  /** @brief Removes all observers of the specific deleted slice navigation controller.*/
+  void RemoveObservers(const mitk::SliceNavigationController* deletedSlicer);
+
+  /** @brief Removes all observers of the deletedPart. If null pointer is passed all observers will be removed.*/
+  void RemoveAllObservers(mitk::IRenderWindowPart* deletedPart = nullptr);
+
+  /** @brief Called by the selection widget when the selection has changed.*/
   void OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
-  /**	@brief Calls OnSliceChangedDelayed so the event isn't triggered multiple times. */
-  void OnSliceChanged(const itk::EventObject& e);
+  /**	@brief Calls OnSliceChangedDelayed so the event isn't triggered multiple times.*/
+  void OnSliceChanged();
 
   void OnSliceNavigationControllerDeleted(const itk::Object* sender, const itk::EventObject& /*e*/);
 
-  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
-  void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
-
-  /** Initializes and sets the observers that are used to monitor changes in the selected position
-   or time point in order to actualize the view.h*/
-  bool InitObservers();
-  void RemoveObservers(const mitk::SliceNavigationController* deletedSlicer);
-  /** Removes all observers of the deletedPart. If null pointer is passed all observers will be removed.*/
-  void RemoveAllObservers(mitk::IRenderWindowPart* deletedPart = nullptr);
-
-  /** Sets m_currentSelectedPosition to the current selection and validates if this position is valid
+  /** @brief Sets m_currentSelectedPosition to the current selection and validates if this position is valid
    * for the input image of the currently selected fit. If it is valid, m_validSelectedPosition is set to true.
    * If the fit, his input image or geometry is not specified, it will also handled as invalid.*/
   void ValidateAndSetCurrentPosition();
 
+private Q_SLOTS:
+
+  /**	@brief Updates the current slice and time is correctly displayed.*/
+  void OnSliceChangedDelayed();
+
+private:
+
+  void RenderTable();
+
+  /** (Re-)initializes the headers of the data table.*/
+  void UpdateData();
+  void UpdateLabels();
+
+  void SetAsSelectionListener(bool checked);
+
   Ui::QmitkDicomInspectorViewControls m_Controls;
-  mitk::IRenderWindowPart* m_renderWindowPart;
+  mitk::IRenderWindowPart* m_RenderWindowPart;
 
   std::unique_ptr<QmitkSelectionServiceConnector> m_SelectionServiceConnector;
 
-  // Needed for observing the events for when a slice or time step is changed.
+  /** Needed for observing the events for when a slice or time step is changed.*/
   bool m_PendingSliceChangedEvent;
 
-  /**Helper structure to manage the registered observer events.*/
+  /** Helper structure to manage the registered observer events.*/
   struct ObserverInfo
   {
     mitk::SliceNavigationController* controller;
@@ -107,33 +114,25 @@ protected:
   typedef std::multimap<const mitk::SliceNavigationController*, ObserverInfo> ObserverMapType;
   ObserverMapType m_ObserverMap;
 
-  /** @brief currently valid selected position in the inspector*/
-  mitk::Point3D m_currentSelectedPosition;
-  /** @brief indicates if the currently selected position is valid for the currently selected fit.
-   * This it is within the input image */
-  bool m_validSelectedPosition;
-
-  unsigned int m_currentSelectedTimeStep;
-
-  itk::IndexValueType m_currentSelectedZSlice;
-
-  /** @brief currently selected node for the DICOM information*/
+  /** @brief Currently selected node for the DICOM information.*/
   mitk::DataNode::ConstPointer m_SelectedNode;
-
+  /** @brief Base data of the currently selected node.*/
   mitk::BaseData::ConstPointer m_SelectedData;
-  /**	@brief	Is a visualization currently running? */
-  bool m_internalUpdateFlag;
 
-  /** @brief	Number of interpolation steps between two x values */
-  static const unsigned int INTERPOLATION_STEPS;
+  /** @brief Valid selected position in the inspector.*/
+  mitk::Point3D m_SelectedPosition;
+  /** @brief Indicates if the currently selected position is valid for the currently selected data.*/
+  bool m_ValidSelectedPosition;
+
+  unsigned int m_SelectedTimeStep;
+
+  itk::IndexValueType m_CurrentSelectedZSlice;
 
   /*************************************/
   /* Members for visualizing the model */
 
-  itk::TimeStamp m_selectedNodeTime;
-  itk::TimeStamp m_currentFitTime;
-  itk::TimeStamp m_currentPositionTime;
-  itk::TimeStamp m_lastRefreshTime;
+  itk::TimeStamp m_SelectedNodeTime;
+  itk::TimeStamp m_CurrentPositionTime;
 
   /**Helper structure to manage the registered observer events.*/
   struct TagInfo
@@ -141,23 +140,15 @@ protected:
     mitk::DICOMTag tag;
     mitk::DICOMProperty::ConstPointer prop;
 
-    TagInfo(const mitk::DICOMTag& aTag, mitk::DICOMProperty::ConstPointer aProp) : tag(aTag), prop(aProp)
+    TagInfo(const mitk::DICOMTag& aTag, mitk::DICOMProperty::ConstPointer aProp)
+      : tag(aTag)
+      , prop(aProp)
     {
     };
   };
 
   typedef std::map<std::string, TagInfo> TagMapType;
   TagMapType m_Tags;
-
-  void RenderTable();
-
-  /** (re)initializes the headers of the data table*/
-  void UpdateData();
-  void UpdateLabels();
-
-private:
-
-  void SetAsSelectionListener(bool checked);
 
 };
 

@@ -168,6 +168,8 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   m_Controls.radioButtonNoConversion->setChecked(true);
   m_Controls.factorSpinBox->setEnabled(false);
   m_Controls.groupBox_viaT1Map->hide();
+  m_Controls.spinBox_baselineStartTimePoint->setValue(1);
+  m_Controls.spinBox_baselineEndTimePoint->setValue(1);
 
   connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), m_Controls.groupBoxTurboFlash, SLOT(setVisible(bool)));
   connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
@@ -1177,7 +1179,10 @@ mitk::Image::Pointer MRPerfusionView::ConvertConcentrationImage(bool AIFMode)
   else
   {
     concentrationGen->SetFactor(m_Controls.factorSpinBox->value());
+    concentrationGen->SetBaselineStartTimePoint(m_Controls.spinBox_baselineStartTimePoint->value());
+    concentrationGen->SetBaselineStartTimePoint(m_Controls.spinBox_baselineEndTimePoint->value());
   }
+
 
   mitk::Image::Pointer concentrationImage = concentrationGen->GetConvertedImage();
 

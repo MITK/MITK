@@ -118,7 +118,7 @@ void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
   m_Controls.saveLabel->setPixmap(icon.pixmap(ICON_SIZE));
 
   connect(m_Controls.singleSlot, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,
-    this, &QmitkPropertyTreeView::OnSelectionChanged);
+    this, &QmitkPropertyTreeView::OnCurrentSelectionChanged);
 
   connect(m_Controls.filterLineEdit, SIGNAL(textChanged(const QString&)),this, SLOT(OnFilterTextChanged(const QString&)));
   connect(m_Controls.propertyListComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnPropertyListChanged(int)));
@@ -343,7 +343,7 @@ void QmitkPropertyTreeView::OnPropertyNameChanged(const itk::EventObject&)
   }
 }
 
-void QmitkPropertyTreeView::OnSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
+void QmitkPropertyTreeView::OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
 {
   mitk::PropertyList* propertyList = m_Model->GetPropertyList();
 
@@ -458,7 +458,7 @@ void QmitkPropertyTreeView::OnPropertyListChanged(int index)
   if (m_SelectedNode.IsNotNull())
     nodes << m_SelectedNode;
 
-  this->OnSelectionChanged(nodes);
+  this->OnCurrentSelectionChanged(nodes);
 }
 
 void QmitkPropertyTreeView::OnAddNewProperty()

@@ -883,7 +883,7 @@ function(fixup_bundle_item resolved_embedded_item exepath dirs)
       message(FATAL_ERROR "Command failed:\n ${msg}")
     endif()
   endif()
-
+  
 endfunction()
 
 
@@ -968,22 +968,6 @@ function(fixup_bundle app libs dirs)
 
     message("fixup_bundle: cleaning up...")
     clear_bundle_keys(keys)
-
-    # START OF T26976
-    # Discover and fix remaining executables (e.g. Python exec in Resources
-    # folder of Python.framework).
-    #
-    if(APPLE)
-      get_bundle_all_executables("${bundle}" file_list)
-      list(REMOVE_ITEM file_list "${app}" ${CFG_IGNORE_ITEM})
-      list(LENGTH file_list num_executables)
-      if(${num_executables} GREATER 0)
-        list(GET file_list 0 f)
-        message("fixup_bundle: fixing newly discovered executables ${f}...")
-        fixup_bundle("${f}" "" "${dirs}" IGNORE_ITEM ${CFG_IGNORE_ITEM} ${app})
-      endif()
-    endif()
-    # END OF T26976
 
     message("fixup_bundle: verifying...")
     verify_app("${app}" IGNORE_ITEM "${CFG_IGNORE_ITEM}")

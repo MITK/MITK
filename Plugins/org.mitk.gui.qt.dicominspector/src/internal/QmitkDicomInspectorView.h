@@ -14,19 +14,21 @@ found in the LICENSE file.
 #ifndef QmitkDicomInspectorView_h
 #define QmitkDicomInspectorView_h
 
+#include "ui_QmitkDicomInspectorViewControls.h"
+
 // Blueberry
-//#include <berryISelectionListener.h>
 #include <berryIPartListener.h>
 
-// mitk
-#include <QmitkAbstractView.h>
-#include <mitkIRenderWindowPartListener.h>
+// mitk DICOMReader module
 #include <mitkDICOMTag.h>
 #include <mitkDICOMProperty.h>
 
-// Qt
-#include "ui_QmitkDicomInspectorViewControls.h"
+// mitk gui common plugin
+#include <mitkIRenderWindowPartListener.h>
 
+// mitk gui qt common plugin
+#include <QmitkAbstractView.h>
+#include "QmitkSelectionServiceConnector.h"
 
 /**
  *	@brief	View class defining the UI part of the ModelFitVisualization plug-in.
@@ -35,8 +37,7 @@ class QmitkDicomInspectorView :
   public QmitkAbstractView,
   public mitk::IRenderWindowPartListener
 {
-  // this is needed for all Qt objects that should have a Qt meta-object
-  // (everything that derives from QObject and wants to have signal/slots)
+
   Q_OBJECT
 
 public:
@@ -60,9 +61,8 @@ protected:
 
   void SetFocus() override;
 
-  /** @brief called by QmitkFunctionality when DataManager's selection has changed */
-  void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
-    const QList<mitk::DataNode::Pointer>& nodes) override;
+  /** @brief called by the selection widget when the selection has changed */
+  void OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
   /**	@brief Calls OnSliceChangedDelayed so the event isn't triggered multiple times. */
   void OnSliceChanged(const itk::EventObject& e);
@@ -84,8 +84,10 @@ protected:
    * If the fit, his input image or geometry is not specified, it will also handled as invalid.*/
   void ValidateAndSetCurrentPosition();
 
-  Ui::DicomInspectorViewControls m_Controls;
+  Ui::QmitkDicomInspectorViewControls m_Controls;
   mitk::IRenderWindowPart* m_renderWindowPart;
+
+  std::unique_ptr<QmitkSelectionServiceConnector> m_SelectionServiceConnector;
 
   // Needed for observing the events for when a slice or time step is changed.
   bool m_PendingSliceChangedEvent;
@@ -115,11 +117,10 @@ protected:
 
   itk::IndexValueType m_currentSelectedZSlice;
 
-  /** @brief currently selected node for the visualization logic*/
-  mitk::DataNode::ConstPointer m_currentSelectedNode;
+  /** @brief currently selected node for the DICOM information*/
+  mitk::DataNode::ConstPointer m_SelectedNode;
 
-  mitk::BaseData::ConstPointer m_currentSelectedData;
-
+  mitk::BaseData::ConstPointer m_SelectedData;
   /**	@brief	Is a visualization currently running? */
   bool m_internalUpdateFlag;
 
@@ -153,6 +154,11 @@ protected:
   /** (re)initializes the headers of the data table*/
   void UpdateData();
   void UpdateLabels();
+
+private:
+
+  void SetAsSelectionListener(bool checked);
+
 };
 
 #endif // QmitkDicomInspectorView_h

@@ -73,7 +73,14 @@ public:
     itkSetMacro(T2EchoTime, double);
     itkGetConstReferenceMacro(T2EchoTime, double);
 
+
     /** @brief Calls Convert and returns the 4D mitk::image in Concentration units*/
+
+    itkSetMacro(BaselineStartTimePoint, int);
+    itkGetConstReferenceMacro(BaselineStartTimePoint, int);
+
+    itkSetMacro(BaselineEndTimePoint, int);
+    itkGetConstReferenceMacro(BaselineEndTimePoint, int);
 
     itkSetMacro(isTurboFlashSequence,bool);
     itkGetConstReferenceMacro(isTurboFlashSequence,bool);
@@ -110,8 +117,16 @@ protected:
     /** @brief Takes the 3D image of the first timepoint to set as baseline image*/
     void PrepareBaselineImage();
 
+
+
     /** @brief loops over all timepoints, casts the current timepoint 3D mitk::image to itk and passes it to ConvertSignalToConcentrationCurve */
     virtual void Convert();
+
+
+    //template <typename TPixel1, unsigned int ImageDimension1, typename TPixel2, unsigned int VImageDimension2>
+    //void mitk::(itk::Image<TPixel1, VImageDimension1>* imageA, itk::Image<TPixel2, VImageDimension2>* imageB)
+    //{
+    //}
 
 
 private:
@@ -140,6 +155,9 @@ private:
 
     double m_T2Factor;
     double m_T2EchoTime;
+
+    int m_BaselineStartTimePoint;
+    int m_BaselineEndTimePoint;
 };
 
 }

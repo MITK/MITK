@@ -8,8 +8,11 @@
 #include "mitkModelBase.h"
 #include "mitkExtractTimeGrid.h"
 #include "mitkArbitraryTimeGeometry.h"
-#include "itkImageIOBase.h"
+//#include "mitkArithmeticOperation.h"
+#include "itkNaryAddImageFilter.h"
+#include "mitkImageAccessByItk.h"
 
+#include "itkImageIOBase.h"
 #include "itkBinaryFunctorImageFilter.h"
 #include "itkTernaryFunctorImageFilter.h"
 
@@ -48,7 +51,6 @@ void mitk::ConcentrationCurveGenerator::Convert()
     mitk::TimeGeometry::Pointer timeGeometry = (this->m_DynamicImage->GetTimeGeometry())->Clone();
     tempImage->SetTimeGeometry(timeGeometry);
 
-
     PrepareBaselineImage();
     mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
     imageTimeSelector->SetInput(this->m_DynamicImage);
@@ -73,14 +75,51 @@ void mitk::ConcentrationCurveGenerator::Convert()
 
 void mitk::ConcentrationCurveGenerator::PrepareBaselineImage()
 {
-        mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
-        imageTimeSelector->SetInput(this->m_DynamicImage);
-        imageTimeSelector->SetTimeNr(0);
-        imageTimeSelector->UpdateLargestPossibleRegion();
+  mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
+  imageTimeSelector->SetInput(this->m_DynamicImage);
+  imageTimeSelector->SetTimeNr(0);
+  imageTimeSelector->UpdateLargestPossibleRegion();
+  mitk::Image::Pointer baselineImage0;
+  baselineImage0 = imageTimeSelector->GetOutput();
+  this->m_BaselineImage = imageTimeSelector->GetOutput();
+  
 
-        this->m_BaselineImage = imageTimeSelector->GetOutput();
 
+  /*
+  typedef itk::NaryAddImageFilter<InputBaslineImageType, OutputBaselineImageType> itkAddBaselineImagesFilterType;
+
+  typename itkAddBaselineImagesFilterType::Pointer itkNaryAddImageFilter = itkAddBaselineImagesFilterType::New();
+
+  mitk::ImageTimeSelector::Pointer imageTimeSelector1 = mitk::ImageTimeSelector::New();
+  imageTimeSelector1->SetInput(this->m_DynamicImage);
+  imageTimeSelector1->SetTimeNr(1);
+  imageTimeSelector1->UpdateLargestPossibleRegion();
+  mitk::Image::Pointer baselineImage1;
+  baselineImage1 = imageTimeSelector1->GetOutput();
+  
+
+  //add the time frames to the descriptor filter
+  std::vector<Image::Pointer> baselineCache;
+  for (unsigned int i = 0; i < this->m_DynamicImage->GetTimeSteps(); ++i)
+  {
+    mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
+    imageTimeSelector->SetInput(this->m_DynamicImage);
+    imageTimeSelector->SetTimeNr(i);
+    imageTimeSelector->UpdateLargestPossibleRegion();
+    Image::Pointer baselineImage = imageTimeSelector->GetOutput();
+    baselineCache.push_back(baselineImage);
+    mitk::CastToItkImage(baselineImage, frameImage);
+    itkAddNaryImageFilter->SetInput(i, frameImage);
+  }
+  itkAddNaryImageFilter->GetOutput();
+
+
+  //AccessFixedDimensionByItk_n(m_magnFIDImage.GetPointer(), mitkItkConversionHelper::CastMitkImageToDoubleItkImage, 4, (itkMagnFIDImage));
+  //AccessTwoImagesFixedDimensionByItk(baselineImage0, baselineImage1, CalculateAverageImage);
+  */
 }
+
+
 
 mitk::Image::Pointer mitk::ConcentrationCurveGenerator::ConvertSignalToConcentrationCurve(const mitk::Image* inputImage, const mitk::Image* baselineImage)
 {

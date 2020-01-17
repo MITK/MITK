@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include <mitkDataStorageInspectorGenerator.h>
 #include <QmitkDataStorageTreeInspector.h>
 #include <QmitkNodeSelectionPreferenceHelper.h>
+#include <QmitkDataStorageSelectionHistoryInspector.h>
 
 QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString title, QString hint) : QDialog(parent),
   m_NodePredicate(nullptr), m_SelectOnlyVisibleNodes(false), m_SelectedNodes(NodeList()), m_SelectionMode(QAbstractItemView::SingleSelection)
@@ -159,6 +160,11 @@ void QmitkNodeSelectionDialog::AddPanel(QmitkAbstractDataStorageInspector* view,
 
 void QmitkNodeSelectionDialog::OnOK()
 {
+  for (auto node : m_SelectedNodes)
+  {
+    QmitkDataStorageSelectionHistoryInspector::AddNodeToHistory(node);
+  }
+
   this->accept();
 }
 

@@ -22,7 +22,6 @@ found in the LICENSE file.
 #include <mitkProportionalTimeGeometry.h>
 #include <mitkTimeGeometry.h>
 
-// itksys
 #include "itkImage.h"
 
 // VTK includes

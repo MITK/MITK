@@ -16,7 +16,6 @@ found in the LICENSE file.
 // std includes
 #include <cmath>
 #include <iomanip>
-#include <string>
 #include <tinyxml.h>
 
 // MITK includes

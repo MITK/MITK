@@ -29,9 +29,7 @@ found in the LICENSE file.
 const std::string QmitkPropertyTreeView::VIEW_ID = "org.mitk.views.properties";
 
 QmitkPropertyTreeView::QmitkPropertyTreeView()
-  : m_Parent(nullptr),
-    m_PropertyNameChangedTag(0),
-    m_PropertyAliases(nullptr),
+  : m_PropertyAliases(nullptr),
     m_PropertyDescriptions(nullptr),
     m_PropertyPersistence(nullptr),
     m_ShowAliasesInDescription(true),
@@ -78,8 +76,6 @@ void QmitkPropertyTreeView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*
 
 void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
 {
-  m_Parent = parent;
-
   m_Controls.setupUi(parent);
 
   m_Controls.propertyListComboBox->addItem("Data node: common");
@@ -255,37 +251,8 @@ QString QmitkPropertyTreeView::GetPropertyNameOrAlias(const QModelIndex& index)
   return propertyName;
 }
 
-void QmitkPropertyTreeView::OnPropertyNameChanged()
-{
-  mitk::PropertyList* propertyList = m_Model->GetPropertyList();
-
-  if (propertyList != nullptr)
-  {
-    mitk::BaseProperty* nameProperty = propertyList->GetProperty("name");
-
-    if (nameProperty != nullptr)
-    {
-      QString partName = "Properties (";
-      partName.append(QString::fromStdString(nameProperty->GetValueAsString())).append(')');
-      this->SetPartName(partName);
-    }
-  }
-}
-
 void QmitkPropertyTreeView::OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
 {
-  mitk::PropertyList* propertyList = m_Model->GetPropertyList();
-
-  if (propertyList != nullptr)
-  {
-    mitk::BaseProperty* nameProperty = propertyList->GetProperty("name");
-
-    if (nameProperty != nullptr)
-      nameProperty->RemoveObserver(m_PropertyNameChangedTag);
-
-    m_PropertyNameChangedTag = 0;
-  }
-
   if (nodes.empty() || nodes.front().IsNull())
   {
     m_SelectedNode = nullptr;
@@ -301,13 +268,7 @@ void QmitkPropertyTreeView::OnCurrentSelectionChanged(QList<mitk::DataNode::Poin
 
   // node is selected, create tree with node properties
   m_SelectedNode = nodes.front();
-
-  QString selectionClassName = m_SelectedNode->GetData() != nullptr
-    ? m_SelectedNode->GetData()->GetNameOfClass()
-    : "";
-
-  m_SelectionClassName = selectionClassName.toStdString();
-
+  mitk::PropertyList* propertyList = m_Model->GetPropertyList();
   if (m_Renderer == nullptr && m_Controls.propertyListComboBox->currentText() == "Base data")
   {
     propertyList = m_SelectedNode->GetData() != nullptr
@@ -319,18 +280,14 @@ void QmitkPropertyTreeView::OnCurrentSelectionChanged(QList<mitk::DataNode::Poin
     propertyList = m_SelectedNode->GetPropertyList(m_Renderer);
   }
 
+  QString selectionClassName = m_SelectedNode->GetData() != nullptr
+    ? m_SelectedNode->GetData()->GetNameOfClass()
+    : "";
+
+  m_SelectionClassName = selectionClassName.toStdString();
+
   m_Model->SetPropertyList(propertyList, selectionClassName);
   m_Delegate->SetPropertyList(propertyList);
-
-  OnPropertyNameChanged();
-
-  mitk::BaseProperty* nameProperty = m_SelectedNode->GetProperty("name");
-  if (nameProperty != nullptr)
-  {
-    auto command = itk::SimpleMemberCommand<QmitkPropertyTreeView>::New();
-    command->SetCallbackFunction(this, &QmitkPropertyTreeView::OnPropertyNameChanged);
-    m_PropertyNameChangedTag = nameProperty->AddObserver(itk::ModifiedEvent(), command);
-  }
 
   m_Controls.newButton->setEnabled(true);
 
@@ -458,7 +415,7 @@ void QmitkPropertyTreeView::OnPropertyListChanged(int index)
 void QmitkPropertyTreeView::OnAddNewProperty()
 {
   std::unique_ptr<QmitkAddNewPropertyDialog> dialog(m_Controls.propertyListComboBox->currentText() != "Base data"
-    ? new QmitkAddNewPropertyDialog(m_SelectedNode, m_Renderer, m_Parent)
+    ? new QmitkAddNewPropertyDialog(m_SelectedNode, m_Renderer)
     : new QmitkAddNewPropertyDialog(m_SelectedNode->GetData()));
 
   if (dialog->exec() == QDialog::Accepted)

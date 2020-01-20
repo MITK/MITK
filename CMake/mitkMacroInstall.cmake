@@ -195,7 +195,7 @@ macro(_fixup_target)
     include(BundleUtilities)
     set(BU_CHMOD_BUNDLE_ITEMS ON)
 
-    fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/${_target_location}\" \"\${PLUGINS}\" \"\${DIRS}\" IGNORE_ITEMS Python)
+    fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/${_target_location}\" \"\${PLUGINS}\" \"\${DIRS}\" IGNORE_ITEM Python)
 
     if(APPLE)
       include(FixMacOSInstaller)

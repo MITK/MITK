@@ -106,7 +106,7 @@ void mitk::NavigationDataObjectVisualizationFilter::GenerateData()
     const std::vector<mitk::NavigationDataObjectVisualizationFilter::RepresentationPointer> data =
       this->GetAllRepresentationObjects(index);
 
-    for (int dataIdx = 0; dataIdx < data.size(); dataIdx++)
+    for (unsigned int dataIdx = 0; dataIdx < data.size(); dataIdx++)
     {
       if (data.at(dataIdx) == nullptr)
       {

@@ -86,7 +86,7 @@ void QmitkDicomInspectorView::CreateQtPartControl(QWidget* parent)
   SetAsSelectionListener(true);
 
   m_Controls.timePointValueLabel->setText(QString(""));
-  m_Controls.slieceNumberValueLabel->setText(QString(""));
+  m_Controls.sliceNumberValueLabel->setText(QString(""));
 
   connect(m_Controls.singleSlot, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,
     this, &QmitkDicomInspectorView::OnCurrentSelectionChanged);
@@ -180,19 +180,16 @@ void QmitkDicomInspectorView::OnCurrentSelectionChanged(QList<mitk::DataNode::Po
     return;
   }
 
-  if (nodes.front() == this->m_SelectedNode)
+  if (nodes.front() != this->m_SelectedNode)
   {
-    // nothing to change
-    return;
+    // node is selected, create DICOM tag table
+    m_SelectedNode = nodes.front();
+    m_SelectedData = this->m_SelectedNode->GetData();
+
+    m_SelectedNodeTime.Modified();
+    UpdateData();
+    OnSliceChangedDelayed();
   }
-
-  // node is selected, create DICOM tag table
-  m_SelectedNode = nodes.front();
-  m_SelectedData = this->m_SelectedNode->GetData();
-
-  m_SelectedNodeTime.Modified();
-  UpdateData();
-  OnSliceChangedDelayed();
 }
 
 void QmitkDicomInspectorView::OnSliceChanged()
@@ -343,19 +340,19 @@ void QmitkDicomInspectorView::UpdateLabels()
   if (m_SelectedData.IsNull())
   {
     m_Controls.timePointValueLabel->setText(QString(""));
-    m_Controls.slieceNumberValueLabel->setText(QString(""));
+    m_Controls.sliceNumberValueLabel->setText(QString(""));
   }
   else
   {
     if (m_ValidSelectedPosition)
     {
       m_Controls.timePointValueLabel->setText(QString::number(m_SelectedTimeStep));
-      m_Controls.slieceNumberValueLabel->setText(QString::number(m_CurrentSelectedZSlice));
+      m_Controls.sliceNumberValueLabel->setText(QString::number(m_CurrentSelectedZSlice));
     }
     else
     {
       m_Controls.timePointValueLabel->setText(QString("outside data geometry"));
-      m_Controls.slieceNumberValueLabel->setText(QString("outside data geometry"));
+      m_Controls.sliceNumberValueLabel->setText(QString("outside data geometry"));
     }
   }
 }

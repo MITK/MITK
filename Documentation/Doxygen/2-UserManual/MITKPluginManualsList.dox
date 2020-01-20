@@ -4,7 +4,7 @@
 The plugins and bundles provide much of the extended functionality of MITK. Each encapsulates a solution to a problem and associated features. This way one can easily assemble the necessary capabilites for a workflow without adding a lot of bloat, by combining plugins as needed.
 
 
-\paragraph PluginListPageEndUserPluginList List of Plugins 
+\paragraph PluginListPageEndUserPluginList List of General Purpose Plugins 
 
   \li \subpage org_blueberry_ui_qt_log
   \li \subpage org_mitk_views_basicimageprocessing
@@ -13,7 +13,6 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
   \li \subpage org_mitk_views_datamanager
   \li \subpage org_mitk_gui_qt_dicom
   \li \subpage org_mitk_gui_qt_dicominspector
-  \li \subpage org_mitk_gui_qt_diffusionimaging
   \li \subpage org_mitk_gui_qt_imagecropper
   \li \subpage org_mitk_views_imagenavigator
   \li \subpage org_mitk_gui_qt_measurementtoolbox
@@ -25,15 +24,27 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
   \li \subpage org_mitk_gui_qt_remeshing
   \li \subpage org_mitk_views_segmentation
   \li \subpage org_mitk_views_multilabelsegmentation
-  \li \subpage org_mitk_gui_qt_spectrocamrecorder
-  \li \subpage org_mitk_gui_qt_ultrasound
   \li \subpage org_mitk_gui_qt_viewnavigator
-  \li \subpage org_mitk_views_volumevisualization
-  \li \subpage org_mitk_gui_qt_xnat
+
+
+\paragraph PluginListPageEndUserPluginList List of Application-specific Plugins 
+
   \li \subpage org_mitk_gui_qt_aicpregistration
-  \li \subpage org_mitk_gui_qt_igtlplugin
-  \li \subpage org_mitk_gui_qt_geometrytools
+  \li \subpage org_mitk_gui_qt_cest
   \li \subpage org_mitk_gui_qt_classificationsegmentation
+  \li \subpage org_mitk_gui_qt_diffusionimaging
+  \li \subpage org_mitk_gui_qt_eventrecorder
+  \li \subpage org_mitk_gui_qt_examples
+  \li \subpage org_mitk_gui_qt_fit_demo
+  \li \subpage org_mitk_gui_qt_fit_genericfitting
+  \li \subpage org_mitk_gui_qt_fit_inspector
+  \li \subpage org_mitk_gui_qt_geometrytools
+  \li \subpage org_mitk_gui_qt_igt_app_echotrack
+  \li \subpage org_mitk_gui_qt_igtexample
+  \li \subpage org_mitk_gui_qt_igtlplugin
+  \li \subpage org_mitk_gui_qt_igttracking
+  \li \subpage org_mitk_gui_qt_igttrackingsemiautomaticmeasurement
+  \li \subpage org_mitk_gui_qt_lasercontrol
   \li \subpage org_mitk_gui_qt_matchpoint_algorithm_batch
   \li \subpage org_mitk_gui_qt_matchpoint_algorithm_browser
   \li \subpage org_mitk_gui_qt_matchpoint_algorithm_control
@@ -42,35 +53,28 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
   \li \subpage org_mitk_gui_qt_matchpoint_manipulator
   \li \subpage org_mitk_gui_qt_matchpoint_mapper
   \li \subpage org_mitk_gui_qt_matchpoint_visualizer
-  \li \subpage org_mitk_gui_qt_cest
-  \li \subpage org_mitk_gui_qt_fit_genericfitting
-  \li \subpage org_mitk_gui_qt_fit_inspector
+  \li \subpage org_mitk_gui_qt_overlaymanager
+  \li \subpage org_mitk_gui_qt_mitkphenotyping
+  \li \subpage org_mitk_gui_qt_photoacoustics_pausmotioncompensation
+  \li \subpage org_mitk_example_gui_pcaexample
   \li \subpage org_mitk_gui_qt_pharmacokinetics_mri
   \li \subpage org_mitk_gui_qt_pharmacokinetics_pet
   \li \subpage org_mitk_gui_qt_pharmacokinetics_concentration_mri
   \li \subpage org_mitk_gui_qt_pharmacokinetics_curvedescriptor
-  \li \subpage org_surfacematerialeditor
-  \li \subpage org_toftutorial
-  \li \subpage org_mitk_gui_qt_examples
-  \li \subpage org_mitkexamplesopencv
-  \li \subpage org_mitk_gui_qt_igtexample
-  \li \subpage org_mitk_gui_qt_igttracking
-  \li \subpage org_mitk_gui_qt_igt_app_echotrack
-  \li \subpage org_blueberry_ui_qt_objectinspector
-  \li \subpage org_mitk_gui_qt_eventrecorder
-  \li \subpage org_mitk_gui_qt_overlaymanager
-  \li \subpage org_mitk_example_gui_pcaexample
+  \li \subpage org_mitk_gui_qt_photoacoustics_imageprocessing
+  \li \subpage org_mitk_gui_qt_pharmacokinetics_simulation
+  \li \subpage org_mitk_gui_qt_photoacoustics_spectralunmixing
   \li \subpage org_mitk_gui_qt_radiomics
   \li \subpage org_mitk_gui_qt_renderwindowmanager
-  \li \subpage org_mitk_gui_qt_lasercontrol
-  \li \subpage org_mitk_gui_qt_photoacoustics_imageprocessing
-  \li \subpage org_mitk_gui_qt_photoacoustics_pausmotioncompensation
-  \li \subpage org_mitk_gui_qt_photoacoustics_spectralunmixing
-  \li \subpage org_mitk_gui_qt_lasercontrol
-  \li \subpage org_mitk_gui_qt_igttrackingsemiautomaticmeasurement
-  \li \subpage org_mitk_gui_qt_fit_demo
-  \li \subpage org_mitk_gui_qt_mitkphenotyping
-  \li \subpage org_mitk_gui_qt_pharmacokinetics_simulation
+  \li \subpage org_mitk_gui_qt_spectrocamrecorder
+  \li \subpage org_surfacematerialeditor
+  \li \subpage org_toftutorial
+  \li \subpage org_mitk_gui_qt_ultrasound
+  \li \subpage org_mitk_views_volumevisualization
+  \li \subpage org_mitk_gui_qt_xnat
+
+  \li \subpage org_mitkexamplesopencv
+  \li \subpage org_blueberry_ui_qt_objectinspector
 
 
 

@@ -13,10 +13,17 @@ found in the LICENSE file.
 #ifndef QmitkPropertyTreeView_h
 #define QmitkPropertyTreeView_h
 
-#include <mitkDataNode.h>
-#include <mitkIRenderWindowPartListener.h>
-#include <QmitkAbstractView.h>
 #include <ui_QmitkPropertyTreeView.h>
+
+// mitk core module
+#include <mitkDataNode.h>
+
+// mitk gui common plugin
+#include <mitkIRenderWindowPartListener.h>
+
+// mitk gui qt common plugin
+#include <QmitkAbstractView.h>
+#include "QmitkSelectionServiceConnector.h"
 
 class QmitkPropertyItemDelegate;
 class QmitkPropertyItemModel;
@@ -34,6 +41,7 @@ class QmitkPropertyTreeView : public QmitkAbstractView, public mitk::IRenderWind
   Q_OBJECT
 
 public:
+
   static const std::string VIEW_ID;
 
   berryObjectMacro(QmitkPropertyTreeView);
@@ -47,16 +55,23 @@ public:
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart*) override;
 
 protected:
+
   void CreateQtPartControl(QWidget* parent) override;
 
 private:
-  QString GetPropertyNameOrAlias(const QModelIndex& index);
+
   void OnPreferencesChanged(const berry::IBerryPreferences* preferences) override;
-  void OnPropertyNameChanged(const itk::EventObject& event);
-  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
+
+  void SetAsSelectionListener(bool checked);
+
+  QString GetPropertyNameOrAlias(const QModelIndex& index);
+
+  void OnPropertyNameChanged();
+  void OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
   void HideAllIcons();
 
-private slots:
+private Q_SLOTS:
+
   void OnCurrentRowChanged(const QModelIndex& current, const QModelIndex& previous);
   void OnPropertyListChanged(int index);
   void OnAddNewProperty();
@@ -64,6 +79,7 @@ private slots:
   void OnModelReset();
 
 private:
+
   QWidget* m_Parent;
   unsigned long m_PropertyNameChangedTag;
   std::string m_SelectionClassName;
@@ -79,6 +95,8 @@ private:
   QmitkPropertyItemDelegate* m_Delegate;
   mitk::DataNode::Pointer m_SelectedNode;
   mitk::BaseRenderer* m_Renderer;
+
+  std::unique_ptr<QmitkSelectionServiceConnector> m_SelectionServiceConnector;
 };
 
 #endif

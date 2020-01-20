@@ -69,11 +69,6 @@ namespace mitk {
     */
     typedef std::map<unsigned int, std::vector<RepresentationPointer>> RepresentationVectorPointerMap;
 
-    /**
-    * \brief Size type of an std::vector
-    */
-    typedef RepresentationPointerMap::size_type RepresentationPointerMapSizeType;
-
      /**
      * \brief Size type of an std::vector
      */

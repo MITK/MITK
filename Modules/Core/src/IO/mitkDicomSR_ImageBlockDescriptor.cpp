@@ -432,7 +432,9 @@ bool DicomSeriesReader::ImageBlockDescriptor::loadImage(DcmFileFormat& ff, Image
       MITK_ERROR << "Error: cannot store DICOM image to mitk object (" << e.what() << ")";
       return false;
     }
+    lock.lock();
     info.m_Image = image;
+    lock.unlock();
   }
   return true;
 }
@@ -561,15 +563,15 @@ DicomSeriesReader::ImageBlockDescriptor::ImageBlockDescriptor(const StringContai
 /// Returns squared distance between two slices
 /// or zero if they are from different times
 ///
-double squaredStep(const DicomSeriesReader::SliceInfo& a, const DicomSeriesReader::SliceInfo& b)
+double squaredStep(const DicomSeriesReader::SliceInfo& a, const DicomSeriesReader::SliceInfo& b, double prevStep = 1e10)
 {
   if (!a.m_HasImagePositionPatient || !b.m_HasImagePositionPatient) {
     return 1;
   }
-  if (a.m_AcquisitionNumber != b.m_AcquisitionNumber || a.m_TemporalPosition != b.m_TemporalPosition) {
-    return 0;
-  }
   auto d = (a.m_ImagePositionPatient - b.m_ImagePositionPatient).GetSquaredNorm();
+  if (a.m_AcquisitionNumber != b.m_AcquisitionNumber || a.m_TemporalPosition != b.m_TemporalPosition) {
+    return d < prevStep/4? 0 : d;
+  }
   return d < 0.000001 ? 0 : d;
 }
 
@@ -620,7 +622,7 @@ std::shared_ptr<DicomSeriesReader::ImageBlockDescriptor> DicomSeriesReader::Imag
   unsigned timeSteps2 = 1;
   while (++fileIter != m_Filenames.end()) {
     sliceInfo = &(m_SlicesInfo.at(*fileIter));
-    if (squaredStep(*sliceInfo, *referenceSlice) == 0) { // skip points from different time
+    if (squaredStep(*sliceInfo, *referenceSlice, step2) == 0) { // skip points from different time
       ++timeSteps2;
       continue;
     }
@@ -721,7 +723,7 @@ std::list<DicomSeriesReader::StringContainer> DicomSeriesReader::ImageBlockDescr
 
     MITK_DEBUG << "  " << *fileIter << " at " << sliceInfo->second.m_ImagePositionPatient;
     auto bIt = std::find_if(imageBlocks.begin(), imageBlocks.end(), [sliceInfo, this](const StringContainer& x){
-      return squaredStep(m_SlicesInfo.at(x.back()), sliceInfo->second) != 0;
+      return squaredStep(m_SlicesInfo.at(x.back()), sliceInfo->second, m_SliceDistance) != 0;
     });
     if (bIt == imageBlocks.end()) {
       bIt = imageBlocks.insert(bIt, {*fileIter});

@@ -1012,12 +1012,7 @@ if(BUILD_TESTING)
   include(CTest)
   mark_as_advanced(TCL_TCLSH DART_ROOT)
 
-  option(MITK_ENABLE_RENDERING_TESTING OFF "Enable the MITK rendering tests. Requires x-server in Linux.")
-  #Rendering testing does not work for Linux nightlies, thus it is disabled per default
-  #and activated for Mac and Windows.
-  if(WIN32 OR APPLE)
-    set(MITK_ENABLE_RENDERING_TESTING ON)
-  endif()
+  option(MITK_ENABLE_RENDERING_TESTING ON "Enable the MITK rendering tests. Requires x-server in Linux.")
   mark_as_advanced( MITK_ENABLE_RENDERING_TESTING )
 
   # Setup file for setting custom ctest vars

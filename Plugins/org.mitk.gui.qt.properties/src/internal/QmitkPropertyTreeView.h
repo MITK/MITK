@@ -66,7 +66,6 @@ private:
 
   QString GetPropertyNameOrAlias(const QModelIndex& index);
 
-  void OnPropertyNameChanged();
   void OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
   void HideAllIcons();
 
@@ -80,8 +79,6 @@ private Q_SLOTS:
 
 private:
 
-  QWidget* m_Parent;
-  unsigned long m_PropertyNameChangedTag;
   std::string m_SelectionClassName;
   mitk::IPropertyAliases* m_PropertyAliases;
   mitk::IPropertyDescriptions* m_PropertyDescriptions;

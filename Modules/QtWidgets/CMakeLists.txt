@@ -3,6 +3,7 @@ MITK_CREATE_MODULE(
   DEPENDS MitkPlanarFigure MitkAnnotation
   PACKAGE_DEPENDS
     PUBLIC ITK|ITKIOImageBase VTK|vtkGUISupportQt+vtkRenderingQt Qt5|Widgets+OpenGL+Core
+  SUBPROJECTS MITK-CoreUI
 )
 
 add_subdirectory(test)

@@ -5,4 +5,5 @@ mitk_create_plugin(
   EXPORTED_INCLUDE_SUFFIXES src
   MODULE_DEPENDS MitkQtWidgets MitkQtWidgetsExt
   PACKAGE_DEPENDS Qt5|OpenGL+Xml
+  SUBPROJECTS MITK-CoreUI
   )

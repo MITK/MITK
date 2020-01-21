@@ -473,12 +473,9 @@ set(CTEST_PROJECT_SUBPROJECTS)
 
 list(APPEND CTEST_PROJECT_SUBPROJECTS
   MITK-Core
-  MITK-CoreUI
   MITK-IGT
   MITK-ToF
-  MITK-Diffusion
   MITK-Modules # all modules not contained in a specific subproject
-  MITK-Plugins # all plugins not contained in a specific subproject
   MITK-Examples
   Unlabeled # special "subproject" catching all unlabeled targets and tests
   )

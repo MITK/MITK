@@ -22,6 +22,3 @@ mitkFunctionCreateBlueBerryApplication(
   DESCRIPTION "MITK - CoreApp Application"
   PLUGINS ${_plugins}
 )
-
-# subproject support
-add_dependencies(MITK-CoreUI MitkCoreApp)

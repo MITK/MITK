@@ -242,8 +242,6 @@ function(mitk_create_plugin)
   if(NOT MY_SUBPROJECTS)
     if(MITK_DEFAULT_SUBPROJECTS)
       set(MY_SUBPROJECTS ${MITK_DEFAULT_SUBPROJECTS})
-    elseif(TARGET MITK-Plugins)
-      set(MY_SUBPROJECTS MITK-Plugins)
     endif()
   endif()
 

@@ -36,7 +36,6 @@ set(MODULE_TESTS
   mitkGeometryDataIOTest.cpp
   mitkGeometryDataToSurfaceFilterTest.cpp
   mitkImageCastTest.cpp
-  mitkImageEqualTest.cpp
   mitkImageDataItemTest.cpp
   mitkImageGeneratorTest.cpp
   mitkIOUtilTest.cpp
@@ -54,7 +53,6 @@ set(MODULE_TESTS
   mitkPointSetOnEmptyTest.cpp
   mitkPointSetLocaleTest.cpp
   mitkPointSetWriterTest.cpp
-  mitkPointSetReaderTest.cpp
   mitkPointSetPointOperationsTest.cpp
   mitkProgressBarTest.cpp
   mitkPropertyTest.cpp
@@ -113,7 +111,6 @@ set(MODULE_TESTS
   mitkLineTest.cpp
   mitkArbitraryTimeGeometryTest.cpp
   mitkItkImageIOTest.cpp
-  mitkRotatedSlice4DTest.cpp
   mitkLevelWindowManagerCppUnitTest.cpp
   mitkVectorPropertyTest.cpp
   mitkTemporoSpatialStringPropertyTest.cpp
@@ -122,7 +119,6 @@ set(MODULE_TESTS
   mitkPreferenceListReaderOptionsFunctorTest.cpp
   mitkGenericIDRelationRuleTest.cpp
   mitkSourceImageRelationRuleTest.cpp
-  mitkPlaneGeometryDataMapper2DTest.cpp
   mitkPointSetDataInteractorTest.cpp #since mitkInteractionTestHelper is currently creating a vtkRenderWindow
   mitkSurfaceVtkMapper2DTest.cpp #new rendering test in CppUnit style
   mitkSurfaceVtkMapper2D3DTest.cpp # comparisons/consistency 2D/3D
@@ -177,6 +173,10 @@ set(MODULE_CUSTOM_TESTS
     mitkMultiComponentImageDataComparisonFilterTest.cpp
     mitkImageToItkTest.cpp
     mitkImageSliceSelectorTest.cpp
+    mitkPointSetReaderTest.cpp
+    mitkImageEqualTest.cpp
+    mitkRotatedSlice4DTest.cpp
+    mitkPlaneGeometryDataMapper2DTest.cpp
 )
 
 # Currently not working on windows because of a rendering timing issue

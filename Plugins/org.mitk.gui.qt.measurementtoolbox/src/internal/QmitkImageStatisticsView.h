@@ -45,7 +45,7 @@ public:
   \brief default destructor */
   ~QmitkImageStatisticsView() override;
   /*!
-  \brief method for creating the widget containing the application   controls, like sliders, buttons etc. */
+  \brief method for creating the widget containing the application controls, like sliders, buttons etc. */
   void CreateQtPartControl(QWidget *parent) override;
   /*!
   \brief  Is called from the selection mechanism once the data manager selection has changed*/
@@ -65,8 +65,8 @@ protected:
   /** \brief Required for berry::IPartListener */
   Events::Types GetPartEventTypes() const override { return Events::CLOSED; }
 
-  void CalculateOrGetStatisticsNew();
-  //void CalculateOrGetStatistics();
+  void CalculateOrGetMultiStatistics();
+  void CalculateOrGetStatistics();
   void CalculateStatistics(const mitk::Image* image,
                            const mitk::Image* mask = nullptr,
                            const mitk::PlanarFigure* maskPlanarFigure = nullptr);
@@ -104,15 +104,18 @@ private:
 
   mitk::DataNode::Pointer GetNodeForStatisticsContainer(mitk::ImageStatisticsContainer::ConstPointer container);
 
-  typedef itk::SimpleMemberCommand< QmitkImageStatisticsView > ITKCommandType;
-  QmitkImageStatisticsCalculationJob * m_CalculationJob = nullptr;
-  mitk::DataNode::ConstPointer m_selectedImageNode = nullptr, m_selectedMaskNode = nullptr;
+  typedef itk::SimpleMemberCommand<QmitkImageStatisticsView> ITKCommandType;
+  QmitkImageStatisticsCalculationJob* m_CalculationJob = nullptr;
+  mitk::DataNode::ConstPointer m_selectedImageNode = nullptr;
+  mitk::DataNode::ConstPointer m_selectedMaskNode = nullptr;
+  mitk::PlanarFigure::Pointer m_selectedPlanarFigure = nullptr;
+
   QmitkNodeSelectionDialog* m_SelectionDialog = nullptr;
-  mitk::PlanarFigure::Pointer m_selectedPlanarFigure=nullptr;
+
   long m_PlanarFigureObserverTag;
   bool m_ForceRecompute = false;
-  std::vector<mitk::DataNode::Pointer> m_selectedMaskNodes;
-  std::vector<mitk::DataNode::Pointer> m_selectedImageNodes;
+  std::vector<mitk::DataNode::ConstPointer> m_selectedMaskNodes;
+  std::vector<mitk::DataNode::ConstPointer> m_selectedImageNodes;
   std::vector<mitk::ImageStatisticsContainer::ConstPointer> m_StatisticsForSelection;
   std::vector<QmitkImageStatisticsCalculationRunnable*> m_Runnables;
 

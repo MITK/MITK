@@ -9,7 +9,12 @@
 function(mitkAddCustomModuleTest test_name test_function)
 
   if (BUILD_TESTING AND MODULE_IS_ENABLED)
-    add_test(${test_name} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} ${test_function} ${ARGN})
+    if(MITK_XVFB_TESTING)
+      set(xvfb_run )
+    else()
+      set(xvfb_run "xvfb-run" "--auto-servernum")
+    endif()
+    add_test(NAME ${test_name} COMMAND ${xvfb_run} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} ${test_function} ${ARGN})
     set_property(TEST ${test_name} PROPERTY LABELS ${MODULE_SUBPROJECTS} MITK)
     mitkFunctionGetLibrarySearchPaths(MITK_RUNTIME_PATH_RELEASE release RELEASE)
     mitkFunctionGetLibrarySearchPaths(MITK_RUNTIME_PATH_DEBUG debug DEBUG)

@@ -122,19 +122,11 @@ set(MODULE_TESTS
   mitkPreferenceListReaderOptionsFunctorTest.cpp
   mitkGenericIDRelationRuleTest.cpp
   mitkSourceImageRelationRuleTest.cpp
-)
-
-if(MITK_ENABLE_RENDERING_TESTING)
-set(MODULE_TESTS
-  ${MODULE_TESTS}
   mitkPlaneGeometryDataMapper2DTest.cpp
   mitkPointSetDataInteractorTest.cpp #since mitkInteractionTestHelper is currently creating a vtkRenderWindow
   mitkSurfaceVtkMapper2DTest.cpp #new rendering test in CppUnit style
   mitkSurfaceVtkMapper2D3DTest.cpp # comparisons/consistency 2D/3D
 )
-endif()
-
-
 
 # test with image filename as an extra command line parameter
 set(MODULE_IMAGE_TESTS

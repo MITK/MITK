@@ -18,9 +18,9 @@ macro(MITK_CREATE_MODULE_TESTS)
     set(MODULE_TEST_EXTRA_DRIVER_INIT "${MODULE_TEST_EXTRA_DRIVER_INIT}")
 
     if(MITK_XVFB_TESTING)
-      set(xvfb_run )
-    else()
       set(xvfb_run "xvfb-run" "--auto-servernum")
+    else()
+      set(xvfb_run )
     endif()
 
     if(MODULE_TEST_US_MODULE)

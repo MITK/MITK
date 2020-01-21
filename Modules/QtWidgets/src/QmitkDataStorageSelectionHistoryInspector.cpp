@@ -59,9 +59,9 @@ QmitkDataStorageSelectionHistoryInspector::SelectionMode QmitkDataStorageSelecti
 void QmitkDataStorageSelectionHistoryInspector::AddNodeToHistory(mitk::DataNode* node)
 {
     QmitkDataStorageHistoryModel::AddNodeToHistory(node);
-};
+}
 
 void QmitkDataStorageSelectionHistoryInspector::ResetHistory()
 {
     QmitkDataStorageHistoryModel::ResetHistory();
-};
+}

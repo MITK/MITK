@@ -36,7 +36,7 @@ public:
 
     QmitkDataStorageHistoryModel(QObject *parent);
 
-    /** Adds the passed node to the history. If the node is alread in the history, old instances will be removed.
+    /** Adds the passed node to the history. If the node is already in the history, old instances will be removed.
      If the passed node is nullptr, it will be ignored.*/
     static void AddNodeToHistory(mitk::DataNode* node);
     static void ResetHistory();
@@ -45,4 +45,4 @@ protected:
     void UpdateModelData() override;
 };
 
-#endif // QMITKDATASTORAGELISTINSPECTOR_H
+#endif // QMITKDATASTORAGEHISTORYMODEL_H

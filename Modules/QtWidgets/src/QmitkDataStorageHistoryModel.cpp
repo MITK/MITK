@@ -17,9 +17,9 @@ found in the LICENSE file.
 #include <algorithm>
 #include <mutex>
 
-/** Type of the internal history contrainer.
+/** Type of the internal history container.
  Remark: It stores raw pointer instead of mitk::WeakPointer
- because this lead to ocassional crashes when the applcation was closed (see T24770 for a simelar problem
+ because this lead to occasional crashes when the application was closed (see T24770 for a similar problem
  with the same reason*/
 using NodeHistoryType = std::deque< const mitk::DataNode* >;
 
@@ -77,10 +77,10 @@ void QmitkDataStorageHistoryModel::AddNodeToHistory(mitk::DataNode* node)
     }
 
     _nodeHistory.push_front(node);
-};
+}
 
 void QmitkDataStorageHistoryModel::ResetHistory()
 {
     const std::lock_guard<std::mutex> lock(_historyMutex);
     _nodeHistory.clear();
-};
+}

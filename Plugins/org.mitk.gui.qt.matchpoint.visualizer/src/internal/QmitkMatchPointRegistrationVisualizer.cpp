@@ -101,8 +101,14 @@ void QmitkMatchPointRegistrationVisualizer::CreateQtPartControl(QWidget* parent)
     this->m_Controls->registrationNodeSelector->SetSelectionIsOptional(false);
     this->m_Controls->fovReferenceNodeSelector->SetDataStorage(this->GetDataStorage());
     this->m_Controls->fovReferenceNodeSelector->SetSelectionIsOptional(false);
+    m_Controls->registrationNodeSelector->SetInvalidInfo("Select registration.");
+    m_Controls->registrationNodeSelector->SetPopUpTitel("Select registration.");
+    m_Controls->registrationNodeSelector->SetPopUpHint("Select the registration object whose registration visualization should be edited.");
+    m_Controls->fovReferenceNodeSelector->SetInvalidInfo("Select a FOV reference image.");
+    m_Controls->fovReferenceNodeSelector->SetPopUpTitel("Select a FOV reference image.");
+    m_Controls->fovReferenceNodeSelector->SetPopUpHint("Select the the image that should be used to define the field of view (FOV) for the registration visualization. The visualization will use the image geometry (size, orientation, spacing...).");
 
-    this->ConfigureNodeSelectors();
+    this->ConfigureNodePredicates();
 
     this->m_Controls->btnVecMagColorSmall->setDisplayColorName(false);
     this->m_Controls->btnVecMagColorMedium->setDisplayColorName(false);
@@ -121,7 +127,7 @@ void QmitkMatchPointRegistrationVisualizer::CreateQtPartControl(QWidget* parent)
     this->ConfigureVisualizationControls();
 }
 
-void QmitkMatchPointRegistrationVisualizer::ConfigureNodeSelectors()
+void QmitkMatchPointRegistrationVisualizer::ConfigureNodePredicates()
 {
   mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New(mitk::Image::GetStaticNameOfClass());
   mitk::NodePredicateDataType::Pointer isRegistration = mitk::NodePredicateDataType::New(mitk::MAPRegistrationWrapper::GetStaticNameOfClass());
@@ -131,13 +137,6 @@ void QmitkMatchPointRegistrationVisualizer::ConfigureNodeSelectors()
     return node->GetData() && node->GetData()->GetGeometry();
   };
   mitk::NodePredicateFunction::Pointer hasGeometry = mitk::NodePredicateFunction::New(geometryCheck);
-
-  m_Controls->registrationNodeSelector->SetInvalidInfo("Select registration.");
-  m_Controls->registrationNodeSelector->SetPopUpTitel("Select registration.");
-  m_Controls->registrationNodeSelector->SetPopUpHint("Select the registration object whose registration visualization should be edited.");
-  m_Controls->fovReferenceNodeSelector->SetInvalidInfo("Select a FOV reference image.");
-  m_Controls->fovReferenceNodeSelector->SetPopUpTitel("Select a FOV reference image.");
-  m_Controls->fovReferenceNodeSelector->SetPopUpHint("Select the the image that should be used to define the field of view (FOV) for the registration visualization. The visualization will use the image geometry (size, orientation, spacing...).");
 
   mitk::NodePredicateBase::Pointer nodePredicate = isRegistration;
   m_Controls->registrationNodeSelector->SetNodePredicate(nodePredicate);

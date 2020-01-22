@@ -126,9 +126,9 @@ private:
     void ConfigureVisualizationControls();
 
     /**
-    Configure the node selectors predicates and informations according to the selected algorithm.
+    Configure the node selectors predicates according to the selected algorithm.
     */
-    void ConfigureNodeSelectors();
+    void ConfigureNodePredicates();
 
     /**
      * Updates the properties of the selected node according to the states of the gui controls.*/

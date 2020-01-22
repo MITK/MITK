@@ -19,17 +19,19 @@ namespace Utilities
 {
   ThreadPool::ThreadPool()
     : m_work(boost::in_place<boost::asio::io_service::work>(boost::ref(m_service)))
+    , m_init_size(boost::thread::hardware_concurrency())
+    , m_pool(new boost::thread_group)
     , m_id(0)
     , m_count(0)
-    , m_init_size(boost::thread::hardware_concurrency())
   {
   }
 
   ThreadPool::ThreadPool(size_t count)
     : m_work(boost::in_place<boost::asio::io_service::work>(boost::ref(m_service)))
+    , m_init_size(count)
+    , m_pool(new boost::thread_group)
     , m_id(0)
     , m_count(0)
-    , m_init_size(count)
   {
   }
 
@@ -59,10 +61,10 @@ namespace Utilities
       }
       m_work = boost::none;
     }
-    m_pool.join_all();
+    m_pool->join_all();
   }
 
-  void ThreadPool::Reset()
+  void ThreadPool::Reset(size_t count)
   {
     {
       const boost::unique_lock<boost::shared_mutex> lock(m_guard);
@@ -71,9 +73,11 @@ namespace Utilities
       }
       m_service.stop();
     }
-    m_pool.join_all();
+    m_pool->join_all();
 
     const boost::unique_lock<boost::shared_mutex> lock(m_guard);
+    m_init_size = count;
+    m_pool.reset(new boost::thread_group);
     m_service.reset();
     m_work = boost::in_place<boost::asio::io_service::work>(boost::ref(m_service));
   }
@@ -81,20 +85,20 @@ namespace Utilities
   void ThreadPool::AddThreadsImpl(size_t count)
   {
     for (size_t i = 0; i < count; ++i) {
-      m_pool.create_thread(boost::bind(&boost::asio::io_service::run, &m_service, boost::ref(m_error)));
+      m_pool->create_thread(boost::bind(&boost::asio::io_service::run, &m_service, boost::ref(m_error)));
     }
+    m_init_size = 0;
   }
 
   void ThreadPool::AddThreads(size_t count)
   {
     const boost::unique_lock<boost::shared_mutex> lock(m_guard);
 
-    if (m_init_size) {
-      m_init_size += count;
-      return;
+    m_init_size += count;
+    if (m_pool->size() || m_work && !m_queue.empty()) {
+      AddThreadsImpl(m_init_size);
     }
 
-    AddThreadsImpl(count);
   }
 
   size_t ThreadPool::Enqueue(const Task& task, TaskPriority priority)
@@ -106,7 +110,6 @@ namespace Utilities
       }
       if (m_init_size) {
         AddThreadsImpl(m_init_size);
-        m_init_size = 0;
       }
     }
 
@@ -212,7 +215,7 @@ namespace Utilities
   void ThreadPool::Wait(const TCheck& check)
   {
     boost::shared_lock<boost::shared_mutex> lock(m_guard);
-    const bool isInPool = m_pool.is_this_thread_in();
+    const bool isInPool = m_pool->is_this_thread_in();
     lock.unlock();
 
     if (isInPool) {

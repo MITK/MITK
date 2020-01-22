@@ -13,7 +13,6 @@ found in the LICENSE file.
 #include "QmitkNodeSelectionDialog.h"
 
 #include <mitkDataStorageInspectorGenerator.h>
-#include <QmitkDataStorageTreeInspector.h>
 #include <QmitkNodeSelectionPreferenceHelper.h>
 #include <QmitkDataStorageSelectionHistoryInspector.h>
 
@@ -68,6 +67,10 @@ QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString titl
   m_Controls.hint->setText(hint);
   m_Controls.hint->setVisible(!hint.isEmpty());
 
+  m_FavoriteNodesButton = new QPushButton("Add to favorites");
+  m_Controls.buttonBox->addButton(m_FavoriteNodesButton, QDialogButtonBox::ActionRole);
+
+  connect(m_FavoriteNodesButton, &QPushButton::clicked, this, &QmitkNodeSelectionDialog::OnFavoriteNodesButtonClicked);
   connect(m_Controls.buttonBox, SIGNAL(accepted()), this, SLOT(OnOK()));
   connect(m_Controls.buttonBox, SIGNAL(rejected()), this, SLOT(OnCancel()));
 }
@@ -156,6 +159,14 @@ void QmitkNodeSelectionDialog::AddPanel(QmitkAbstractDataStorageInspector* view,
 
   m_Panels.push_back(view);
   connect(view, &QmitkAbstractDataStorageInspector::CurrentSelectionChanged, this, &QmitkNodeSelectionDialog::OnSelectionChanged);
+}
+
+void QmitkNodeSelectionDialog::OnFavoriteNodesButtonClicked()
+{
+  for (auto node : m_SelectedNodes)
+  {
+    node->SetBoolProperty("org.mitk.selection.favorite", true);
+  }
 }
 
 void QmitkNodeSelectionDialog::OnOK()

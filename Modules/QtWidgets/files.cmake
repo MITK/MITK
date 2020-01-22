@@ -53,6 +53,7 @@ set(CPP_FILES
   QmitkPropertyItemModel.cpp
   QmitkStyleManager.cpp
   QmitkAbstractDataStorageInspector.cpp
+  QmitkDataStorageFavoriteNodesInspector.cpp
   QmitkDataStorageListInspector.cpp
   QmitkDataStorageTreeInspector.cpp
   QmitkDataStorageSelectionHistoryInspector.cpp
@@ -104,8 +105,9 @@ set(MOC_H_FILES
   include/QmitkDataStorageComboBoxWithSelectNone.h
   include/QmitkPropertyItemDelegate.h
   include/QmitkPropertyItemModel.h
-  include/QmitkDataStorageListInspector.h
   include/QmitkAbstractDataStorageInspector.h
+  include/QmitkDataStorageFavoriteNodesInspector.h
+  include/QmitkDataStorageListInspector.h
   include/QmitkDataStorageTreeInspector.h
   include/QmitkDataStorageHistoryModel.h
   include/QmitkDataStorageSelectionHistoryInspector.h

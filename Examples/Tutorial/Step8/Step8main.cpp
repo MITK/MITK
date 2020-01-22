@@ -34,12 +34,7 @@ int main(int argc, char *argv[])
   mainWidget.Initialize();
   mainWidget.show();
 
-// for testing
-#include "QtTesting.h"
-  if (strcmp(argv[argc - 1], "-testing") != 0)
-    return qtapplication.exec();
-  else
-    return QtTesting();
+  return qtapplication.exec();
 }
 /**
 \example Step8main.cpp

@@ -78,15 +78,7 @@ int main(int argc, char *argv[])
   renderWindow.show();
   renderWindow.resize(256, 256);
 
-// for testing
-#include "QtTesting.h"
-  if (strcmp(argv[argc - 1], "-testing") != 0)
-    return qtapplication.exec();
-  else
-    return QtTesting();
-
-  // cleanup: Remove References to DataStorage. This will delete the object
-  ds = nullptr;
+  return qtapplication.exec();
 }
 /**
 \example Step1.cpp

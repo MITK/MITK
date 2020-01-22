@@ -97,7 +97,8 @@ void QmitkLevelWindowPresetDefinitionDialog::addPreset()
 
 void QmitkLevelWindowPresetDefinitionDialog::removePreset()
 {
-  QModelIndex index(presetView->selectionModel()->currentIndex());
+  QModelIndex index(m_SortModel.mapToSource(presetView->selectionModel()->currentIndex()));
+
   if (!index.isValid())
     return;
 
@@ -106,29 +107,30 @@ void QmitkLevelWindowPresetDefinitionDialog::removePreset()
 
 void QmitkLevelWindowPresetDefinitionDialog::changePreset()
 {
-  if (presetView->selectionModel()->hasSelection())
+  QModelIndex index(m_SortModel.mapToSource(presetView->selectionModel()->currentIndex()));
+
+  if (!index.isValid())
+    return;
+
+  std::string name(presetnameLineEdit->text().toStdString());
+  if (name == "")
   {
-    std::string name(presetnameLineEdit->text().toStdString());
-    if (name == "")
-    {
-      QMessageBox::critical(this,
-                            "Preset definition",
-                            "Presetname has to be set.\n"
-                            "You have to enter a Presetname.");
-    }
-    else if (m_TableModel->contains(name) &&
-             (m_TableModel->getPreset(presetView->selectionModel()->currentIndex()).name != name))
-    {
-      QMessageBox::critical(this,
-                            "Preset definition",
-                            "Presetname already exists.\n"
-                            "You have to enter another one.");
-    }
-    else
-    {
-      m_TableModel->changePreset(
-        presetView->selectionModel()->currentIndex().row(), name, levelSpinBox->value(), windowSpinBox->value());
-    }
+    QMessageBox::critical(this,
+      "Preset definition",
+      "Presetname has to be set.\n"
+      "You have to enter a Presetname.");
+  }
+  else if (m_TableModel->contains(name) &&
+    (m_TableModel->getPreset(index).name != name))
+  {
+    QMessageBox::critical(this,
+      "Preset definition",
+      "Presetname already exists.\n"
+      "You have to enter another one.");
+  }
+  else
+  {
+    m_TableModel->changePreset(index.row(), name, levelSpinBox->value(), windowSpinBox->value());
   }
 }
 

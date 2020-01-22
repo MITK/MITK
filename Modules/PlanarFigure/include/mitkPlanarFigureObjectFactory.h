@@ -21,7 +21,9 @@ namespace mitk
   class MITKPLANARFIGURE_EXPORT PlanarFigureObjectFactory : public CoreObjectFactoryBase
   {
   public:
-    mitkClassMacro(PlanarFigureObjectFactory, CoreObjectFactoryBase) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(PlanarFigureObjectFactory, CoreObjectFactoryBase);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       ~PlanarFigureObjectFactory() override;
 

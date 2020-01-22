@@ -34,10 +34,8 @@ class MITKIMAGESTATISTICS_EXPORT MaskUtilities: public itk::Object
         typedef itk::SmartPointer< const Self >     ConstPointer;
 
         /** Method for creation through the object factory. */
-        itkNewMacro(Self)
-
-        /** Runtime information support. */
-        itkTypeMacro(MaskUtilities, itk::Object)
+        itkNewMacro(Self); /** Runtime information support. */
+        itkTypeMacro(MaskUtilities, itk::Object);
 
         typedef itk::Image<TPixel, VImageDimension> ImageType;
         typedef itk::Image<unsigned short, VImageDimension> MaskType;

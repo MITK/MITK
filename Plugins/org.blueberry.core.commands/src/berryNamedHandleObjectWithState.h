@@ -33,7 +33,7 @@ class BERRY_COMMANDS NamedHandleObjectWithState : public NamedHandleObject, publ
 
 public:
 
-  berryObjectMacro(berry::NamedHandleObjectWithState)
+  berryObjectMacro(berry::NamedHandleObjectWithState);
 
   void AddState(const QString& stateId, const SmartPointer<State>& state) override;
 

@@ -42,7 +42,7 @@ class CommandStateProxy : public PersistentState
 
 public:
 
-  berryObjectMacro(berry::CommandStateProxy)
+  berryObjectMacro(berry::CommandStateProxy);
 
 private:
 

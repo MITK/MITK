@@ -59,7 +59,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(OverwriteDirectedPlaneImageFilter, ImageToImageFilter);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /**
         \brief Which plane to overwrite

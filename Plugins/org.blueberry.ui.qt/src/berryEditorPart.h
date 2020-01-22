@@ -75,7 +75,7 @@ class BERRY_UI_QT EditorPart : public WorkbenchPart , public virtual IEditorPart
   Q_INTERFACES(berry::IEditorPart)
 
 public:
-  berryObjectMacro(EditorPart, WorkbenchPart, IEditorPart)
+  berryObjectMacro(EditorPart, WorkbenchPart, IEditorPart);
 
 private:
 

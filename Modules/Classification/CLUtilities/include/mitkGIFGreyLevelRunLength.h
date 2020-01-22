@@ -93,9 +93,9 @@ namespace mitk
   class MITKCLUTILITIES_EXPORT GIFGreyLevelRunLength : public AbstractGlobalImageFeature
   {
   public:
-    mitkClassMacro(GIFGreyLevelRunLength,AbstractGlobalImageFeature)
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    mitkClassMacro(GIFGreyLevelRunLength,AbstractGlobalImageFeature);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       GIFGreyLevelRunLength();
 

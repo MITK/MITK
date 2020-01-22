@@ -51,7 +51,7 @@ namespace mitk
     ///
     /// make a clone of this intrinsics
     ///
-    itkCloneMacro(Self)
+    itkCloneMacro(Self);
 
     ///
     /// copy information from other to this

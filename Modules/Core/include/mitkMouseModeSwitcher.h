@@ -65,7 +65,8 @@ namespace mitk
 #pragma GCC visibility pop
 
     mitkClassMacroItkParent(MouseModeSwitcher, itk::Object);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       // enum of the different interaction schemes that are available
       enum InteractionScheme {

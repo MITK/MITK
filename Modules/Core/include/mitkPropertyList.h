@@ -64,12 +64,13 @@ namespace mitk
   class MITKCORE_EXPORT PropertyList : public itk::Object, public IPropertyOwner
   {
   public:
-    mitkClassMacroItkParent(PropertyList, itk::Object)
+    mitkClassMacroItkParent(PropertyList, itk::Object);
 
     /**
      * Method for creation through the object factory.
      */
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     /**
      * Map structure to hold the properties: the map key is a string,

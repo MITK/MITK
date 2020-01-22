@@ -79,9 +79,9 @@ namespace mitk
   class MITKCLUTILITIES_EXPORT GIFCurvatureStatistic : public AbstractGlobalImageFeature
   {
   public:
-    mitkClassMacro(GIFCurvatureStatistic,AbstractGlobalImageFeature)
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    mitkClassMacro(GIFCurvatureStatistic,AbstractGlobalImageFeature);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       GIFCurvatureStatistic();
 

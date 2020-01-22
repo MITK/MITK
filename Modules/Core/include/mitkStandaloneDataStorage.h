@@ -37,7 +37,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(StandaloneDataStorage, mitk::DataStorage);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       //##Documentation
       //## @brief Adds a DataNode containing a data object to its internal storage

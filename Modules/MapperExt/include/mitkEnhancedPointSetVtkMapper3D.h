@@ -65,7 +65,9 @@ namespace mitk
   public:
     mitkClassMacro(EnhancedPointSetVtkMapper3D, VtkMapper);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       virtual const mitk::PointSet *GetInput();
 

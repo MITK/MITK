@@ -34,9 +34,11 @@ namespace mitk
   class MITKDATATYPESEXT_EXPORT LookupTableSource : public itk::ProcessObject
   {
   public:
-    mitkClassMacroItkParent(LookupTableSource, itk::ProcessObject) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacroItkParent(LookupTableSource, itk::ProcessObject);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
-      typedef mitk::LookupTable OutputType;
+    typedef mitk::LookupTable OutputType;
 
     typedef OutputType::Pointer OutputTypePointer;
 

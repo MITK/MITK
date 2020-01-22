@@ -48,7 +48,8 @@ namespace itk
     typedef TElement Element;
 
     /** Method for creation through the object factory. */
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /** Standard part of every itk Object. */
       itkTypeMacro(ImportMitkImageContainer, ImportImageContainer);

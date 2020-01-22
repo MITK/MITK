@@ -36,7 +36,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(CESTImageNormalizationFilter, ImageToImageFilter);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
   protected:
     /*!

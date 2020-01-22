@@ -34,7 +34,7 @@ class BERRY_UI_QT CommandContributionItemParameter : public virtual Object
 
 public:
 
-  berryObjectMacro(CommandContributionItemParameter)
+  berryObjectMacro(CommandContributionItemParameter);
 
   /**
    * a service locator that is most appropriate for this contribution.

@@ -36,8 +36,8 @@ namespace mitk
   class MITKSEGMENTATION_EXPORT LiveWireTool2D : public SegTool2D
   {
   public:
-    mitkClassMacro(LiveWireTool2D, SegTool2D)
-    itkFactorylessNewMacro(Self)
+    mitkClassMacro(LiveWireTool2D, SegTool2D);
+    itkFactorylessNewMacro(Self);
 
     us::ModuleResource GetCursorIconResource() const override;
     us::ModuleResource GetIconResource() const override;

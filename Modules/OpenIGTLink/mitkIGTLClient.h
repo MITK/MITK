@@ -35,9 +35,9 @@ namespace mitk
   class MITKOPENIGTLINK_EXPORT IGTLClient : public IGTLDevice
   {
   public:
-    mitkClassMacro(IGTLClient, IGTLDevice)
-    mitkNewMacro1Param(Self, bool)
-    itkCloneMacro(Self)
+    mitkClassMacro(IGTLClient, IGTLDevice);
+    mitkNewMacro1Param(Self, bool);
+    itkCloneMacro(Self);
 
     /**
     * \brief Establishes the connection between this client and the IGTL server.

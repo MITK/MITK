@@ -44,7 +44,9 @@ namespace mitk
   public:
     mitkClassMacro(UnstructuredGridMapper2D, GLMapper);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       /**
        * Renders a cut through a pointset by cutting trough the n-cells,

@@ -24,7 +24,7 @@ class TestDescriptor : public ITestDescriptor
 {
 public:
 
-  berryObjectMacro(TestDescriptor)
+  berryObjectMacro(TestDescriptor);
 
   TestDescriptor(IConfigurationElement::Pointer elem);
 

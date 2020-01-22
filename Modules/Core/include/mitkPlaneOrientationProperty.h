@@ -40,7 +40,9 @@ namespace mitk
   public:
     mitkClassMacro(PlaneOrientationProperty, EnumerationProperty);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       mitkNewMacro1Param(PlaneOrientationProperty, const IdType &);
 

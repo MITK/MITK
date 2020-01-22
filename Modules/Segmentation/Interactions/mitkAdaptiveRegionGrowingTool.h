@@ -43,7 +43,8 @@ namespace mitk
      * @brief mitkClassMacro
      */
     mitkClassMacro(AdaptiveRegionGrowingTool, AutoSegmentationTool);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       bool CanHandle(BaseData *referenceData) const override;
 

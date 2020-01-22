@@ -36,7 +36,9 @@ namespace mitk
   class MITK_EXPORT ITKImageImport : public ImageSource
   {
   public:
-    mitkClassMacro(ITKImageImport, ImageSource) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(ITKImageImport, ImageSource);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       ///  \brief The type of the input image.
       typedef TInputImage InputImageType;

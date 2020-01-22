@@ -30,8 +30,8 @@ namespace mitk
 class MITKIGT_EXPORT NavigationDataSliceVisualization : public NavigationDataToNavigationDataFilter
 {
   public:
-    mitkClassMacro(NavigationDataSliceVisualization, NavigationDataToNavigationDataFilter)
-    itkNewMacro(Self)
+    mitkClassMacro(NavigationDataSliceVisualization, NavigationDataToNavigationDataFilter);
+    itkNewMacro(Self);
 
     enum ViewDirection
     {
@@ -61,8 +61,8 @@ class MITKIGT_EXPORT NavigationDataSliceVisualization : public NavigationDataToN
     /**
      * \brief Set/get the renderer that visualizes the navigation data
      */
-    itkSetObjectMacro(Renderer,BaseRenderer)
-    itkGetConstObjectMacro(Renderer,BaseRenderer)
+    itkSetObjectMacro(Renderer,BaseRenderer);
+    itkGetConstObjectMacro(Renderer,BaseRenderer);
 
     /**
      * \brief Set/get the tip offset used for plane tracking
@@ -76,8 +76,8 @@ class MITKIGT_EXPORT NavigationDataSliceVisualization : public NavigationDataToN
      *
      * Default is [0,0,0].
      */
-    itkSetMacro(TipOffset, Vector3D)
-    itkGetConstMacro(TipOffset,Vector3D)
+    itkSetMacro(TipOffset, Vector3D);
+    itkGetConstMacro(TipOffset,Vector3D);
 
     /**
      * \brief Set/get the tool trajectory used to define the cutting plane
@@ -89,7 +89,7 @@ class MITKIGT_EXPORT NavigationDataSliceVisualization : public NavigationDataToN
      * Default is [0,0,-1].
      */
     virtual void SetToolTrajectory(Vector3D direction);
-    itkGetConstMacro(ToolTrajectory, Vector3D)
+    itkGetConstMacro(ToolTrajectory, Vector3D);
 
     /**
      * \brief Set/get the world vertical vector used to define the y-axis of the
@@ -108,16 +108,16 @@ class MITKIGT_EXPORT NavigationDataSliceVisualization : public NavigationDataToN
      *
      * Default is [0,1,0].
      */
-    itkSetMacro(WorldVerticalVector, Vector3D)
-    itkGetConstMacro(WorldVerticalVector, Vector3D)
+    itkSetMacro(WorldVerticalVector, Vector3D);
+    itkGetConstMacro(WorldVerticalVector, Vector3D);
 
     /**
      * \brief Set/get the orientation of the sliced plane
      *
      * Default is Axial.
      */
-    itkSetEnumMacro(ViewDirection,ViewDirection)
-    itkGetEnumMacro(ViewDirection,ViewDirection)
+    itkSetEnumMacro(ViewDirection,ViewDirection);
+    itkGetEnumMacro(ViewDirection,ViewDirection);
 
   protected:
     NavigationDataSliceVisualization();

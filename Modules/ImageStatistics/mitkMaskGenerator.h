@@ -37,10 +37,8 @@ public:
     typedef itk::SmartPointer< const Self >     ConstPointer;
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self)
-
-    /** Runtime information support. */
-    itkTypeMacro(MaskGenerator, itk::Object)
+    itkNewMacro(Self); /** Runtime information support. */
+    itkTypeMacro(MaskGenerator, itk::Object);
 
     //~MaskGenerator();
 

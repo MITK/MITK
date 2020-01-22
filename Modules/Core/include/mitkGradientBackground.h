@@ -38,7 +38,9 @@ namespace mitk
   public:
     mitkClassMacroItkParent(GradientBackground, itk::Object);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       /**
        * Sets the renderwindow, in which the gradient background

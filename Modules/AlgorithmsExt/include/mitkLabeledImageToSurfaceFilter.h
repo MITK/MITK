@@ -36,7 +36,9 @@ namespace mitk
   public:
     mitkClassMacro(LabeledImageToSurfaceFilter, ImageToSurfaceFilter);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       typedef int LabelType;
 

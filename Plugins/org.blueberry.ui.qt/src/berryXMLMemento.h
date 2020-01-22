@@ -38,7 +38,7 @@ class BERRY_UI_QT XMLMemento : public IMemento
 {
 
   public:
-    berryObjectMacro(XMLMemento)
+    berryObjectMacro(XMLMemento);
 
     /**
      * Defines a std::ostream as XML output stream

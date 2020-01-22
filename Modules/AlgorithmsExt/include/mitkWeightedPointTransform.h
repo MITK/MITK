@@ -67,18 +67,18 @@ namespace mitk
   public:
     mitkClassMacroItkParent(WeightedPointTransform, itk::Object);
     itkFactorylessNewMacro(Self);
-    itkCloneMacro(Self)
+    itkCloneMacro(Self);
 
       /** @brief Method which registers both point sets. */
       void ComputeTransformation();
 
     /** @brief Sets the threshold of the registration. Default value is 0.0001.*/
-    itkSetMacro(Threshold, double)
+    itkSetMacro(Threshold, double);
 
       /** @brief Sets the maximum number of iterations of the registration.
         * Default value is 1000.
         */
-      itkSetMacro(MaxIterations, double)
+      itkSetMacro(MaxIterations, double);
 
       /** @return Returns the number of iterations of the last run
         * of the registration algorithm. Returns -1 if there was no

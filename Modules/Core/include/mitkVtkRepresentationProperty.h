@@ -33,7 +33,9 @@ namespace mitk
   public:
     mitkClassMacro(VtkRepresentationProperty, EnumerationProperty);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       mitkNewMacro1Param(VtkRepresentationProperty, const IdType &);
 

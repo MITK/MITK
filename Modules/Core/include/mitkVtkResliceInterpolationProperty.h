@@ -35,7 +35,9 @@ namespace mitk
   public:
     mitkClassMacro(VtkResliceInterpolationProperty, EnumerationProperty);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       mitkNewMacro1Param(VtkResliceInterpolationProperty, const IdType &);
 

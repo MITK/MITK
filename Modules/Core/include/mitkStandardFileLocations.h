@@ -91,7 +91,8 @@ namespace mitk
     static StandardFileLocations *GetInstance();
 
   protected:
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       typedef std::vector<std::string> FileSearchVectorType;
     FileSearchVectorType m_SearchDirectories;

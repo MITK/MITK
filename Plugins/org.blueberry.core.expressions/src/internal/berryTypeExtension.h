@@ -27,7 +27,7 @@ class END_POINT_;
 class TypeExtension : public Object {
 
 public:
-  berryObjectMacro(TypeExtension)
+  berryObjectMacro(TypeExtension);
 
 private:
 
@@ -52,7 +52,7 @@ protected:
 
   public:
 
-    berryObjectMacro(CONTINUE_)
+    berryObjectMacro(CONTINUE_);
 
     bool Handles(const QString&  /*namespaze*/, const QString&  /*method*/) override;
     bool IsInstantiated() override;

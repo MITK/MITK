@@ -27,9 +27,11 @@ namespace mitk
   {
   public:
 
-    mitkClassMacro(PURFClassifier, AbstractClassifier)
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    mitkClassMacro(PURFClassifier, AbstractClassifier);
+
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       PURFClassifier();
 

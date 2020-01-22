@@ -32,7 +32,7 @@ namespace berry
 struct BERRY_UI_QT IPostSelectionProvider : public ISelectionProvider
 {
 
-  berryObjectMacro(berry::IPostSelectionProvider)
+  berryObjectMacro(berry::IPostSelectionProvider);
 
   ~IPostSelectionProvider() override;
 

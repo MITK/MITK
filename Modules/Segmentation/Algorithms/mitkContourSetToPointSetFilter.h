@@ -34,9 +34,9 @@ namespace mitk
   {
   public:
     mitkClassMacro(ContourSetToPointSetFilter, PointSetSource);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
-
-      itkSetMacro(Frequency, unsigned int);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
+    itkSetMacro(Frequency, unsigned int);
 
     itkGetMacro(Frequency, unsigned int);
 

@@ -27,7 +27,7 @@ namespace berry {
  */
 struct BERRY_UI_QT ILayoutContainer : virtual public Object {
 
-  berryObjectMacro(ILayoutContainer)
+  berryObjectMacro(ILayoutContainer);
 
   ~ILayoutContainer() override;
 

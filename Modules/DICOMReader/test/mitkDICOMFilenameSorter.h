@@ -26,8 +26,9 @@ class DICOMFilenameSorter : public DICOMDatasetSorter
 {
   public:
 
-    mitkClassMacro( DICOMFilenameSorter, DICOMDatasetSorter )
-    itkNewMacro( DICOMFilenameSorter )
+    mitkClassMacro( DICOMFilenameSorter, DICOMDatasetSorter );
+
+    itkNewMacro( DICOMFilenameSorter );
 
     DICOMTagList GetTagsOfInterest() override;
 

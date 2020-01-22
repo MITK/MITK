@@ -25,7 +25,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(PixelManipulationTool, Tool);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       void SetValue(int value);
     int GetValue();

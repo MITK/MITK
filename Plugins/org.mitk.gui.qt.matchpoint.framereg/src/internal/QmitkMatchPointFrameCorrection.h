@@ -53,7 +53,7 @@ public:
   /**
   * Creates smartpointer typedefs
   */
-  berryObjectMacro(QmitkMatchPointFrameCorrection)
+  berryObjectMacro(QmitkMatchPointFrameCorrection);
 
   QmitkMatchPointFrameCorrection();
   ~QmitkMatchPointFrameCorrection() override;

@@ -22,8 +22,9 @@ namespace mitk {
     {
     public:
 
-      mitkClassMacro(SpectralUnmixingFilterSimplex, SpectralUnmixingFilterBase)
-        itkFactorylessNewMacro(Self)
+      mitkClassMacro(SpectralUnmixingFilterSimplex, SpectralUnmixingFilterBase);
+
+      itkFactorylessNewMacro(Self);
 
     protected:
       SpectralUnmixingFilterSimplex();

@@ -26,7 +26,7 @@ namespace mitk
   class DEPRECATED() MITKLEGACYIO_EXPORT ImageWriterFactory : public itk::ObjectFactoryBase
   {
   public:
-    mitkClassMacroItkParent(mitk::ImageWriterFactory, itk::ObjectFactoryBase)
+    mitkClassMacroItkParent(mitk::ImageWriterFactory, itk::ObjectFactoryBase);
 
       /** Class methods used to interface with the registered factories. */
       const char *GetITKSourceVersion(void) const override;

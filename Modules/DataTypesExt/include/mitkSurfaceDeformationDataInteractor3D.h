@@ -30,7 +30,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(SurfaceDeformationDataInteractor3D, DataInteractor);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       protected : SurfaceDeformationDataInteractor3D();
     ~SurfaceDeformationDataInteractor3D() override;

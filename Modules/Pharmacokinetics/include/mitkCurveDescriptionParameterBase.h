@@ -37,7 +37,7 @@ class MITKPHARMACOKINETICS_EXPORT CurveDescriptionParameterBase : public itk::Ob
     typedef itk::SmartPointer< Self >                            Pointer;
     typedef itk::SmartPointer< const Self >                      ConstPointer;
 
-    itkTypeMacro(CurveDescriptionParameterBase, itk::Object)
+    itkTypeMacro(CurveDescriptionParameterBase, itk::Object);
 
     typedef itk::Array<double> CurveType;
     typedef itk::Array<double> CurveGridType;

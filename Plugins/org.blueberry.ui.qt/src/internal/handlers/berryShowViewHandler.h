@@ -32,7 +32,7 @@ class ShowViewHandler : public AbstractHandler
   Q_OBJECT
 
 public:
-  berryObjectMacro(ShowViewHandler)
+  berryObjectMacro(ShowViewHandler);
 
   /**
    * Creates a new ShowViewHandler that will open the view in its default location.

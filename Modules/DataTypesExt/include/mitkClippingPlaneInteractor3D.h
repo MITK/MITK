@@ -30,7 +30,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(ClippingPlaneInteractor3D, DataInteractor);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       protected : ClippingPlaneInteractor3D();
     ~ClippingPlaneInteractor3D() override;

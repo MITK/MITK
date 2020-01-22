@@ -46,10 +46,8 @@ namespace mitk
   public:
 
     mitkClassMacro( ToFDistanceImageToSurfaceFilter , SurfaceSource );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
-
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
     itkSetMacro(CameraIntrinsics, mitk::CameraIntrinsics::Pointer);
     itkGetMacro(CameraIntrinsics, mitk::CameraIntrinsics::Pointer);
     itkSetMacro(InterPixelDistance,ToFProcessingCommon::ToFPoint2D);

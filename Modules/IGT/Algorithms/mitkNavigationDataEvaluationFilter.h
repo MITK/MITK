@@ -34,8 +34,8 @@ namespace mitk {
   public:
 
     mitkClassMacro(NavigationDataEvaluationFilter, NavigationDataToNavigationDataFilter);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     /** @brief Resets all statistics and starts again. */
     void ResetStatistic();

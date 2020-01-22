@@ -44,8 +44,8 @@ namespace mitk
       typedef std::vector<Parameter::Pointer> ParamListType;
       typedef ParamListType::const_iterator ConstIterType;
 
-      mitkClassMacroItkParent(ModelFitInfo, itk::LightObject)
-      itkSimpleNewMacro(ModelFitInfo)
+      mitkClassMacroItkParent(ModelFitInfo, itk::LightObject);
+      itkSimpleNewMacro(ModelFitInfo);
 
       ModelFitInfo() :
         x(mitk::ModelFitConstants::MODEL_X_VALUE_DEFAULT()),

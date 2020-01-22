@@ -38,7 +38,7 @@ namespace mitk
     : public itk::DataObject, public OperationActor, public Identifiable, public IPropertyOwner
   {
   public:
-    mitkClassMacroItkParent(BaseData, itk::DataObject)
+    mitkClassMacroItkParent(BaseData, itk::DataObject);
 
     // IPropertyProvider
     BaseProperty::ConstPointer GetConstProperty(const std::string &propertyKey, const std::string &contextName = "", bool fallBackOnDefaultContext = true) const override;

@@ -31,7 +31,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(ImageToContourModelFilter, ContourModelSource);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       typedef mitk::Image InputType;
 

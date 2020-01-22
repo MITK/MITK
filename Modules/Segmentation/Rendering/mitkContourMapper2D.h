@@ -33,7 +33,9 @@ namespace mitk
   public:
     mitkClassMacro(ContourMapper2D, Mapper);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       /**
        * reimplemented from Baseclass

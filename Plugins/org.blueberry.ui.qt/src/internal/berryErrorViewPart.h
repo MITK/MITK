@@ -27,7 +27,7 @@ class ErrorViewPart : public ViewPart {
 
 public:
 
-  berryObjectMacro(ErrorViewPart)
+  berryObjectMacro(ErrorViewPart);
 
   /**
    * Creates instance of the class

@@ -33,7 +33,7 @@ namespace berry
 struct BERRY_UI_QT IWorkbenchPartDescriptor : public virtual Object
 {
 
-  berryObjectMacro(berry::IWorkbenchPartDescriptor)
+  berryObjectMacro(berry::IWorkbenchPartDescriptor);
 
   /**
    * Returns the part id.

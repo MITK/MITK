@@ -32,8 +32,8 @@ namespace mitk {
   {
   public:
     mitkClassMacroItkParent(NavigationToolStorageSerializer,itk::Object);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     /**
      * @brief Saves a mitk navigation tool storage to a file.

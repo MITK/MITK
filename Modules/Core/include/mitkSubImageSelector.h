@@ -34,7 +34,9 @@ namespace mitk
     /** Run-time type information (and related methods). */
     mitkClassMacro(SubImageSelector, ImageToImageFilter);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       virtual void SetPosNr(int p);
 

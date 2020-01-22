@@ -39,7 +39,7 @@ private:
 
 public:
 
-  berryObjectMacro(EditorHistoryItem)
+  berryObjectMacro(EditorHistoryItem);
 
   /**
    * Constructs a new item.

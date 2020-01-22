@@ -39,7 +39,7 @@ private:
 
 public:
 
-  berryObjectMacro(berry::ShowInContext)
+  berryObjectMacro(berry::ShowInContext);
 
   /**
    * Constructs a new <code>ShowInContext</code> with the given input and

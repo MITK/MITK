@@ -38,9 +38,9 @@ namespace mitk
     typedef std::vector<Point3D> PointVector;
 
     mitkClassMacroItkParent(LabeledImageVolumeCalculator, itk::Object);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
-
-      itkSetConstObjectMacro(Image, mitk::Image);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
+    itkSetConstObjectMacro(Image, mitk::Image);
 
     virtual void Calculate();
 

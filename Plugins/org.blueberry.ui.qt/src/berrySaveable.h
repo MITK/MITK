@@ -46,7 +46,7 @@ class BERRY_UI_QT Saveable : /*public InternalSaveable*/ public virtual Object, 
 
 public:
 
-  berryObjectMacro(Saveable)
+  berryObjectMacro(Saveable);
 
 private:
   //Cursor waitCursor;

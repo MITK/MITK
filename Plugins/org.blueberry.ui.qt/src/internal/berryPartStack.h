@@ -45,7 +45,7 @@ class PartStack : public LayoutPart, public ILayoutContainer {
 
 public:
 
-  berryObjectMacro(PartStack)
+  berryObjectMacro(PartStack);
 
     public: static const int PROP_SELECTION; // = 0x42;
 
@@ -157,7 +157,7 @@ public:
 
         public:
 
-          berryObjectMacro(PartStackDropResult)
+          berryObjectMacro(PartStackDropResult);
 
         /**
          * Resets the target of this drop result (allows the same drop result object to be

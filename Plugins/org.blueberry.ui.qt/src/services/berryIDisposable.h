@@ -45,7 +45,7 @@ namespace berry {
 struct IDisposable : public virtual Object
 {
 
-  berryObjectMacro(berry::IDisposable)
+  berryObjectMacro(berry::IDisposable);
 
   ~IDisposable() override;
 

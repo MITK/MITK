@@ -30,7 +30,7 @@ public:
   static const int EXTENSION_POINT; // = 0;
   static const int EXTENSION; // = 1;
 
-  berryObjectMacro(berry::RegistryContribution)
+  berryObjectMacro(berry::RegistryContribution);
 
   RegistryContribution(const QString& contributorId, ExtensionRegistry* registry, bool persist);
 

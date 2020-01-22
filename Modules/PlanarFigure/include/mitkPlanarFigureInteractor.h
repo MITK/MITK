@@ -57,7 +57,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(PlanarFigureInteractor, DataInteractor);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /** \brief Sets the amount of precision */
       void SetPrecision(ScalarType precision);

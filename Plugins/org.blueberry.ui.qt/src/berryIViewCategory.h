@@ -26,7 +26,7 @@ namespace berry {
  */
 struct BERRY_UI_QT IViewCategory : public virtual Object
 {
-  berryObjectMacro(berry::IViewCategory)
+  berryObjectMacro(berry::IViewCategory);
 
   virtual QString GetId() const = 0;
   virtual QString GetLabel() const = 0;

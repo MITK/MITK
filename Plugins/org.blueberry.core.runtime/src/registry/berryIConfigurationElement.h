@@ -60,7 +60,7 @@ class Handle;
 struct org_blueberry_core_runtime_EXPORT IConfigurationElement : public virtual Object
 {
 
-  berryObjectMacro(berry::IConfigurationElement)
+  berryObjectMacro(berry::IConfigurationElement);
 
   ~IConfigurationElement() override;
 

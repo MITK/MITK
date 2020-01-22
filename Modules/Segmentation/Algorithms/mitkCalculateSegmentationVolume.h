@@ -22,7 +22,8 @@ namespace mitk
   class MITKSEGMENTATION_EXPORT CalculateSegmentationVolume : public SegmentationSink
   {
   public:
-    mitkClassMacro(CalculateSegmentationVolume, SegmentationSink) mitkAlgorithmNewMacro(CalculateSegmentationVolume);
+    mitkClassMacro(CalculateSegmentationVolume, SegmentationSink);
+    mitkAlgorithmNewMacro(CalculateSegmentationVolume);
 
   protected:
     CalculateSegmentationVolume(); // use smart pointers

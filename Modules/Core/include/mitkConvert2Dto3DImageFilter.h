@@ -34,7 +34,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(Convert2Dto3DImageFilter, ImageToImageFilter);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       protected :
       /*!

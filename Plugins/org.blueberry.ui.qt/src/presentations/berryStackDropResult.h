@@ -32,7 +32,7 @@ class BERRY_UI_QT StackDropResult : public Object {
 
 public:
 
-  berryObjectMacro(StackDropResult)
+  berryObjectMacro(StackDropResult);
 
 private:
 

@@ -42,7 +42,7 @@ private:
 
 public:
 
-  berryObjectMacro(berry::NestableHandlerService)
+  berryObjectMacro(berry::NestableHandlerService);
 
   /**
    * Constructs a new instance.

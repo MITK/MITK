@@ -29,7 +29,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(SurfaceToPointSetFilter, mitk::PointSetSource);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     using Superclass::SetInput;
     void SetInput(mitk::Surface::Pointer m_InputSurface);

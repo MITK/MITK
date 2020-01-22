@@ -30,8 +30,8 @@ namespace mitk {
   {
   public:
     mitkClassMacro(NavigationDataPlayer, NavigationDataPlayerBase);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       enum PlayerState { PlayerStopped, PlayerRunning, PlayerPaused };
     typedef mitk::NavigationData::TimeStampType TimeStampType;

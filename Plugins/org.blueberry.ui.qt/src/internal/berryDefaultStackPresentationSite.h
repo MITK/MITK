@@ -32,7 +32,7 @@ private:
 
 public:
 
-  berryObjectMacro(DefaultStackPresentationSite)
+  berryObjectMacro(DefaultStackPresentationSite);
 
   DefaultStackPresentationSite();
 

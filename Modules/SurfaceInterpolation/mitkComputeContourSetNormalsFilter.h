@@ -51,7 +51,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(ComputeContourSetNormalsFilter, SurfaceToSurfaceFilter);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /*
          \brief Returns the computed normals as a surface

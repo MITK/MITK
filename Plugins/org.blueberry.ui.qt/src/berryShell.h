@@ -119,7 +119,7 @@ class BERRY_UI_QT Shell : public virtual Object
 {
 public:
 
-  berryObjectMacro(Shell)
+  berryObjectMacro(Shell);
 
   Shell();
 

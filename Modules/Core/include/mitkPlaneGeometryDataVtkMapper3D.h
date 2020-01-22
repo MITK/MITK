@@ -96,7 +96,9 @@ namespace mitk
   public:
     mitkClassMacro(PlaneGeometryDataVtkMapper3D, VtkMapper);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       /**
       * Overloaded since the displayed color-frame of the image mustn't be

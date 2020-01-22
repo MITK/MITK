@@ -23,7 +23,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(TubeGraphObjectFactory, CoreObjectFactoryBase);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       Mapper::Pointer CreateMapper(mitk::DataNode *node, MapperSlotId slotId) override;
     void SetDefaultProperties(mitk::DataNode *node) override;

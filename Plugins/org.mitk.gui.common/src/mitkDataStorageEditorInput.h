@@ -34,7 +34,7 @@ namespace mitk
 class MITK_GUI_COMMON_PLUGIN DataStorageEditorInput : public berry::IEditorInput //, private berry::IPersistableElement
 {
 public:
-  berryObjectMacro(DataStorageEditorInput)
+  berryObjectMacro(DataStorageEditorInput);
 
   DataStorageEditorInput();
   DataStorageEditorInput(IDataStorageReference::Pointer ref);

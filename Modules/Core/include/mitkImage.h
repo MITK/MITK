@@ -83,7 +83,9 @@ namespace mitk
   public:
     mitkClassMacro(Image, SlicedData);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       /** Smart Pointer type to a ImageDataItem. */
       typedef itk::SmartPointer<ImageDataItem> ImageDataItemPointer;

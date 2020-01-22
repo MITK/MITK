@@ -67,7 +67,7 @@ namespace mitk
 
     const char *GetNameOfClass() const override { return this->GetStaticNameOfClass(); }
     itkFactorylessNewMacro(Self);
-    itkCloneMacro(Self)
+    itkCloneMacro(Self);
 
       //! Build an XML version of this property
       TiXmlElement *Serialize() override

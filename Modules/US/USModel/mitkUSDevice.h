@@ -137,7 +137,7 @@ namespace mitk {
      * \brief Event for being notified about changes of the micro service properties.
      * This event can be used if no micro service context is available.
      */
-    mitkNewMessage2Macro(PropertyChanged, const std::string&, const std::string&)
+    mitkNewMessage2Macro(PropertyChanged, const std::string&, const std::string&);
 
     /**
      * \return keys for the microservice properties of ultrasound devices
@@ -308,8 +308,9 @@ namespace mitk {
     void SetName(std::string name);
     void SetComment(std::string comment);
 
-    itkGetMacro(DeviceState, DeviceStates)
-    itkGetMacro(ServiceProperties, us::ServiceProperties)
+    itkGetMacro(DeviceState, DeviceStates);
+
+    itkGetMacro(ServiceProperties, us::ServiceProperties);
 
     void GrabImage();
 

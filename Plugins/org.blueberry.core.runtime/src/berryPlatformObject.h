@@ -49,7 +49,7 @@ class org_blueberry_core_runtime_EXPORT PlatformObject : public virtual Object, 
 
 public:
 
-  berryObjectMacro(berry::PlatformObject)
+  berryObjectMacro(berry::PlatformObject);
 
   /**
    * Constructs a new platform object.

@@ -41,7 +41,9 @@ namespace mitk
 
     mitkClassMacro(GridRepresentationProperty, EnumerationProperty);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       mitkNewMacro1Param(GridRepresentationProperty, const IdType &);
 

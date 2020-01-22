@@ -41,7 +41,7 @@ class RegistryObjectManager : public IObjectManager
 
 public:
 
-  berryObjectMacro(berry::RegistryObjectManager)
+  berryObjectMacro(berry::RegistryObjectManager);
 
   //Constants used to get the objects and their handles
   enum Type {

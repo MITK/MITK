@@ -32,7 +32,9 @@ namespace mitk
   public:
     mitkClassMacro(ImageWriter, mitk::FileWriter);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       mitkWriterMacro;
 

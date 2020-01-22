@@ -63,9 +63,9 @@ namespace mitk
   class MITKCLUTILITIES_EXPORT GIFImageDescriptionFeatures : public AbstractGlobalImageFeature
   {
   public:
-    mitkClassMacro(GIFImageDescriptionFeatures,AbstractGlobalImageFeature)
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    mitkClassMacro(GIFImageDescriptionFeatures,AbstractGlobalImageFeature);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       GIFImageDescriptionFeatures();
 

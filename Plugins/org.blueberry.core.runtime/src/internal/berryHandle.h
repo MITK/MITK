@@ -32,7 +32,7 @@ class Handle : public virtual Object
 {
 public:
 
-  berryObjectMacro(berry::Handle)
+  berryObjectMacro(berry::Handle);
 
   explicit Handle(const SmartPointer<const IObjectManager>& objectManager, int value);
   explicit Handle(const IObjectManager* objectManager, int value);

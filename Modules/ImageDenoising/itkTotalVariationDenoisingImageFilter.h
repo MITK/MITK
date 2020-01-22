@@ -51,7 +51,8 @@ namespace itk
     typedef SmartPointer<const Self> ConstPointer;
 
     /** Method for creation through the object factory. */
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /** Run-time type information (and related methods). */
       itkTypeMacro(TotalVariationDenoisingImageFilter, ImageToImageFilter);

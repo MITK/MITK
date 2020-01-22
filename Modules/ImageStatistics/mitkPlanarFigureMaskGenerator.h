@@ -40,10 +40,8 @@ namespace mitk
     typedef itk::SmartPointer<const Self> ConstPointer;
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self)
-
-      /** Runtime information support. */
-      itkTypeMacro(PlanarFigureMaskGenerator, MaskGenerator)
+    itkNewMacro(Self); /** Runtime information support. */
+      itkTypeMacro(PlanarFigureMaskGenerator, MaskGenerator);
 
       /**
        * @brief GetMask Computes and returns the mask

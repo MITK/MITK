@@ -36,7 +36,7 @@ namespace berry {
 struct BERRY_UI_QT IntroContentDetector : public Object
 {
 
-  berryObjectMacro(berry::IntroContentDetector)
+  berryObjectMacro(berry::IntroContentDetector);
 
   /**
    * Returns <code>true</code> if new intro content is available.

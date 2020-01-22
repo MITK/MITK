@@ -29,7 +29,9 @@ namespace mitk
   {
   public:
     mitkClassMacro(ResliceMethodProperty, EnumerationProperty);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self) mitkNewMacro1Param(ResliceMethodProperty, const IdType &);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
+    mitkNewMacro1Param(ResliceMethodProperty, const IdType&);
     mitkNewMacro1Param(ResliceMethodProperty, const std::string &);
 
     using BaseProperty::operator=;

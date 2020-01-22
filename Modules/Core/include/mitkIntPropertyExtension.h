@@ -27,7 +27,10 @@ namespace mitk
   public:
     mitkClassMacro(IntPropertyExtension, PropertyExtension);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self) mitkNewMacro2Param(Self, int, int);
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
+    mitkNewMacro2Param(Self, int, int);
     mitkNewMacro3Param(Self, int, int, int);
 
     int GetMaximum() const;

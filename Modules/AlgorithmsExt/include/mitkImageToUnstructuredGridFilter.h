@@ -33,8 +33,9 @@ namespace mitk
   class MITKALGORITHMSEXT_EXPORT ImageToUnstructuredGridFilter : public UnstructuredGridSource
   {
   public:
-    mitkClassMacro(ImageToUnstructuredGridFilter, UnstructuredGridSource) itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    mitkClassMacro(ImageToUnstructuredGridFilter, UnstructuredGridSource);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /** This method is called by Update(). */
       void GenerateData() override;
@@ -61,7 +62,7 @@ namespace mitk
     double GetThreshold();
 
     /** Returns the number of extracted points after edge detection */
-    itkGetMacro(NumberOfExtractedPoints, int)
+    itkGetMacro(NumberOfExtractedPoints, int);
 
       protected :
 

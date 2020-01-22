@@ -41,9 +41,9 @@ namespace mitk
 
   public:
     mitkClassMacro(MaskAndCutRoiImageFilter, ImageToImageFilter);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
-
-      itkGetMacro(MaxValue, mitk::ScalarType);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
+    itkGetMacro(MaxValue, mitk::ScalarType);
     itkGetMacro(MinValue, mitk::ScalarType);
 
     void SetRegionOfInterest(mitk::BaseData *roi);

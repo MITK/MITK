@@ -25,7 +25,7 @@ class ConfigurationElementHandle : public Handle, public IConfigurationElement
 
 public:
 
-  berryObjectMacro(berry::ConfigurationElementHandle)
+  berryObjectMacro(berry::ConfigurationElementHandle);
 
   explicit ConfigurationElementHandle(const SmartPointer<const IObjectManager> &objectManager, int id);
   explicit ConfigurationElementHandle(const IObjectManager* objectManager, int id);

@@ -33,7 +33,8 @@ class MITKSEGMENTATIONUI_EXPORT QmitkCalculateGrayValueStatisticsToolGUI : publi
 
 public:
   mitkClassMacro(QmitkCalculateGrayValueStatisticsToolGUI, QmitkToolGUI);
-  itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+  itkFactorylessNewMacro(Self);
+  itkCloneMacro(Self);
 
     /// Reacts to signals from mitk::CalculateGrayValueStatisticsTool
     void OnCalculationsDone();

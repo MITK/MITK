@@ -31,9 +31,9 @@ namespace mitk
     mitkClassMacro(RawImageFileReader, FileReader);
 
     /** Method for creation through the object factory. */
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
-
-      itkSetMacro(FileName, std::string);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
+    itkSetMacro(FileName, std::string);
     itkSetStringMacro(FileName);
     itkGetMacro(FileName, std::string);
     itkGetStringMacro(FileName);

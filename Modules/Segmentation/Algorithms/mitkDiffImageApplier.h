@@ -37,7 +37,8 @@ namespace mitk
   {
   public:
     mitkClassMacroItkParent(DiffImageApplier, itk::Object);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       void ExecuteOperation(Operation *operation) override;
 

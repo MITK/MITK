@@ -44,7 +44,7 @@ public:
 
   QSet<SmartPointer<IEvaluationReference> > restriction;
 
-  berryObjectMacro(berry::ContributionRoot)
+  berryObjectMacro(berry::ContributionRoot);
 
   ContributionRoot(InternalMenuService* menuService, const QSet<SmartPointer<IEvaluationReference> >& restriction,
                    ContributionManager* mgr, AbstractContributionFactory* factory);

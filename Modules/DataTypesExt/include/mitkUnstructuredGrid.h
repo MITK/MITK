@@ -32,7 +32,9 @@ namespace mitk
 
     mitkClassMacro(UnstructuredGrid, BaseData);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       virtual void SetVtkUnstructuredGrid(vtkUnstructuredGrid *grid, unsigned int t = 0);
 

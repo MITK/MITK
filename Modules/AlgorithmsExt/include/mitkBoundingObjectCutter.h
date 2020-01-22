@@ -35,7 +35,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(BoundingObjectCutter, ImageToImageFilter);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       void SetBoundingObject(const mitk::BoundingObject *boundingObject);
     const mitk::BoundingObject *GetBoundingObject() const;

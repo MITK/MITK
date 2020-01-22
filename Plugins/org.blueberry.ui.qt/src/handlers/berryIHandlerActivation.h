@@ -40,7 +40,7 @@ struct IHandlerService;
 struct BERRY_UI_QT IHandlerActivation : public virtual IEvaluationResultCache
 {
 
-  berryObjectMacro(berry::IHandlerActivation)
+  berryObjectMacro(berry::IHandlerActivation);
 
   ~IHandlerActivation() override;
 

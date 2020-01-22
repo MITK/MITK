@@ -38,7 +38,7 @@ class CommandParameter : public IParameter, public ITypedParameter
 
 public:
 
-  berryObjectMacro(berry::CommandParameter)
+  berryObjectMacro(berry::CommandParameter);
 
 private:
 

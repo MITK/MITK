@@ -42,7 +42,7 @@ class ExpressionAuthority : public Object, private ISourceProviderListener
 
 public:
 
-  berryObjectMacro(berry::ExpressionAuthority)
+  berryObjectMacro(berry::ExpressionAuthority);
 
 private:
 

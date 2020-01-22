@@ -50,7 +50,7 @@ struct IWorkbenchWindow;
 struct BERRY_UI_QT IWorkbenchWindowConfigurer : public Object
 {
 
-  berryObjectMacro(berry::IWorkbenchWindowConfigurer)
+  berryObjectMacro(berry::IWorkbenchWindowConfigurer);
 
   ~IWorkbenchWindowConfigurer() override;
 

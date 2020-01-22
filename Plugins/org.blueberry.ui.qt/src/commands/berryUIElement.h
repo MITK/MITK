@@ -53,7 +53,7 @@ protected:
 
 public:
 
-  berryObjectMacro(berry::UIElement)
+  berryObjectMacro(berry::UIElement);
 
   /**
    * Update the label on this UI element.

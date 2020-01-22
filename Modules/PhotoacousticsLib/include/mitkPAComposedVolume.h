@@ -34,15 +34,15 @@ namespace mitk {
     class MITKPHOTOACOUSTICSLIB_EXPORT ComposedVolume : public itk::Object
     {
     public:
-      mitkClassMacroItkParent(ComposedVolume, itk::Object)
-        mitkNewMacro1Param(Self, InSilicoTissueVolume::Pointer)
+      mitkClassMacroItkParent(ComposedVolume, itk::Object);
+      mitkNewMacro1Param(Self, InSilicoTissueVolume::Pointer);
 
-        /**
-         * @brief fluenceYOffsetPair
-         *
-         * @param nrrdFile path to the nrrd file on hard drive
-         */
-        void AddSlice(mitk::pa::FluenceYOffsetPair::Pointer fluenceYOffsetPair);
+      /**
+        * @brief fluenceYOffsetPair
+        *
+        * @param nrrdFile path to the nrrd file on hard drive
+        */
+      void AddSlice(mitk::pa::FluenceYOffsetPair::Pointer fluenceYOffsetPair);
 
       /**
        * @brief GetNumberOfFluenceComponents

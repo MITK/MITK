@@ -40,7 +40,7 @@ class BERRY_UI_QT MenuManager: public QObject, public ContributionManager, publi
 
 public:
 
-  berryObjectMacro(MenuManager)
+  berryObjectMacro(MenuManager);
 
 private:
 

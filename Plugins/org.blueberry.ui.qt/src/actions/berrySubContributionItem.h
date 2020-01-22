@@ -34,7 +34,7 @@ class BERRY_UI_QT SubContributionItem : public IContributionItem
 
 public:
 
-  berryObjectMacro(SubContributionItem)
+  berryObjectMacro(SubContributionItem);
 
 private:
 

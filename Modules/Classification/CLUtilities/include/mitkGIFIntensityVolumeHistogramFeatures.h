@@ -58,8 +58,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(GIFIntensityVolumeHistogramFeatures, AbstractGlobalImageFeature);
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+      itkFactorylessNewMacro(Self);
+      itkCloneMacro(Self);
 
       GIFIntensityVolumeHistogramFeatures();
 

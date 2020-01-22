@@ -23,8 +23,8 @@ class MITKCLVIGRARANDOMFOREST_EXPORT VigraRandomForestClassifierSerializer : pub
 {
 public:
   mitkClassMacro(VigraRandomForestClassifierSerializer, BaseDataSerializer);
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+  itkFactorylessNewMacro(Self);
+  itkCloneMacro(Self);
 
   std::string Serialize() override;
 

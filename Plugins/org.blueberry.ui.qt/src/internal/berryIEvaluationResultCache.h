@@ -39,7 +39,7 @@ class Expression;
 struct BERRY_UI_QT IEvaluationResultCache : public virtual Object
 {
 
-  berryObjectMacro(berry::IEvaluationResultCache)
+  berryObjectMacro(berry::IEvaluationResultCache);
 
   ~IEvaluationResultCache() override;
 

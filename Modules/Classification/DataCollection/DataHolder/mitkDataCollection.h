@@ -54,10 +54,11 @@ namespace mitk
   {
   public:
 
-    mitkClassMacro(DataCollection, BaseData)
+    mitkClassMacro(DataCollection, BaseData);
 
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       // Needed methods from Basedata
       void UpdateOutputInformation() override;

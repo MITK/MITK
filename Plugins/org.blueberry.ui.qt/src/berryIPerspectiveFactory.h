@@ -82,7 +82,7 @@ namespace berry {
 struct BERRY_UI_QT IPerspectiveFactory : public Object
 {
 
-  berryObjectMacro(berry::IPerspectiveFactory)
+  berryObjectMacro(berry::IPerspectiveFactory);
 
   ~IPerspectiveFactory() override;
 

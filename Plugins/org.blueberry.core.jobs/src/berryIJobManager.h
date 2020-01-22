@@ -54,7 +54,7 @@ namespace berry
 struct BERRY_JOBS IJobManager: public Object
 {
 
-  berryObjectMacro(berry::IJobManager)
+  berryObjectMacro(berry::IJobManager);
 
   /**
    * A system property key indicating whether the job manager should create

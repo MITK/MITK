@@ -50,8 +50,9 @@ namespace mitk {
     {
     public:
 
-      mitkClassMacro(LinearSpectralUnmixingFilter, SpectralUnmixingFilterBase)
-        itkFactorylessNewMacro(Self)
+      mitkClassMacro(LinearSpectralUnmixingFilter, SpectralUnmixingFilterBase);
+
+      itkFactorylessNewMacro(Self);
 
       /**
       * \brief Contains all implemented Eigen algorithms for spectral unmixing. For detailed information of the algorithms look at the

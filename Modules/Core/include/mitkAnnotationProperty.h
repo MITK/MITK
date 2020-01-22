@@ -34,7 +34,9 @@ namespace mitk
 
     typedef std::string ValueType;
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self)
       mitkNewMacro2Param(AnnotationProperty, const char *, const Point3D &);
     mitkNewMacro2Param(AnnotationProperty, const std::string &, const Point3D &);
     mitkNewMacro4Param(AnnotationProperty, const char *, ScalarType, ScalarType, ScalarType);

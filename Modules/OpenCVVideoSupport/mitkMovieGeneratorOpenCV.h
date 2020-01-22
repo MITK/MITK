@@ -32,8 +32,8 @@ class MITKOPENCVVIDEOSUPPORT_EXPORT MovieGeneratorOpenCV : public MovieGenerator
 public:
 
   mitkClassMacro(MovieGeneratorOpenCV, MovieGenerator);
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+  itkFactorylessNewMacro(Self);
+  itkCloneMacro(Self);
 
   void SetFileName( const char *fileName ) override;
 

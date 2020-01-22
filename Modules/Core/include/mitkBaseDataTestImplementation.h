@@ -28,7 +28,9 @@ namespace mitk
   public:
     mitkClassMacro(BaseDataTestImplementation, BaseData);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       void InitializeTimeGeometry(unsigned int timeSteps /* = 1 */) override
     {

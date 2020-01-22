@@ -53,7 +53,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(GizmoInteractor, DataInteractor);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       //! The node holding the gizmo for visual feedback.
       //! This is the node that the interactor is primarily working on

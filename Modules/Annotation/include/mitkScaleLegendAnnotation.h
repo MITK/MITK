@@ -42,7 +42,8 @@ namespace mitk
     };
 
     mitkClassMacro(ScaleLegendAnnotation, mitk::VtkAnnotation);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     void SetRightAxisVisibility(bool visibility);
     bool GetRightAxisVisibility() const;

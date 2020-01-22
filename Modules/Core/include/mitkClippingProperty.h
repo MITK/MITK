@@ -40,7 +40,9 @@ namespace mitk
 
     typedef std::string ValueType;
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self)
       mitkNewMacro2Param(ClippingProperty, const Point3D &, const Vector3D &);
 
     bool GetClippingEnabled() const;

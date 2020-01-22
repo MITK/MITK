@@ -150,8 +150,8 @@ namespace mitk
      */
     public:
       mitkClassMacro(GIFGreyLevelDistanceZone, AbstractGlobalImageFeature);
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+      itkFactorylessNewMacro(Self);
+      itkCloneMacro(Self);
 
       GIFGreyLevelDistanceZone();
 

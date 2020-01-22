@@ -41,7 +41,8 @@ namespace mitk
     Message<> StatisticsCompleted;
 
     mitkClassMacro(CalculateGrayValueStatisticsTool, SegmentationsProcessingTool);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       const char **GetXPM() const override;
     const char *GetName() const override;

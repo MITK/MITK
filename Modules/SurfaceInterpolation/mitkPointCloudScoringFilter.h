@@ -35,17 +35,17 @@ namespace mitk
   public:
     typedef std::pair<int, double> ScorePair;
 
-    mitkClassMacro(PointCloudScoringFilter, UnstructuredGridToUnstructuredGridFilter)
+    mitkClassMacro(PointCloudScoringFilter, UnstructuredGridToUnstructuredGridFilter);
 
-      itkFactorylessNewMacro(Self)
+    itkFactorylessNewMacro(Self);
 
       /** Number of Points of the scored UnstructuredGrid. These points are far away
        * from their neighbours */
-      itkGetMacro(NumberOfOutpPoints, int)
+      itkGetMacro(NumberOfOutpPoints, int);
 
       /** A vector in which the point IDs and their distance to their neighbours
        * is stored */
-      itkGetMacro(FilteredScores, std::vector<ScorePair>)
+      itkGetMacro(FilteredScores, std::vector<ScorePair>);
 
         protected :
 

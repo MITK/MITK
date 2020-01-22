@@ -27,8 +27,8 @@ namespace mitk
   class USPointMarkInteractor : public DataInteractor
   {
   public:
-    mitkClassMacro(USPointMarkInteractor, DataInteractor)
-      itkNewMacro(Self)
+    mitkClassMacro(USPointMarkInteractor, DataInteractor);
+    itkNewMacro(Self);
 
       typedef Message1<DataNode*> PointMarkInteractorEvent;
     PointMarkInteractorEvent CoordinatesChangedEvent;

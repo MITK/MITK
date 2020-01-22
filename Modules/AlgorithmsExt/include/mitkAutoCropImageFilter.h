@@ -57,9 +57,11 @@ namespace mitk
 
     mitkClassMacro(AutoCropImageFilter, SubImageSelector);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
 
-      itkGetConstMacro(BackgroundValue, float);
+    itkCloneMacro(Self);
+
+    itkGetConstMacro(BackgroundValue, float);
     itkSetMacro(BackgroundValue, float);
 
     itkGetConstMacro(MarginFactor, float);

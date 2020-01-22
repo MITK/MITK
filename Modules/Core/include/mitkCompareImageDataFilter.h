@@ -64,9 +64,8 @@ namespace mitk
   class MITKCORE_EXPORT CompareImageDataFilter : public ImageToImageFilter
   {
   public:
-    mitkClassMacro(CompareImageDataFilter, ImageToImageFilter)
-
-      itkSimpleNewMacro(Self)
+    mitkClassMacro(CompareImageDataFilter, ImageToImageFilter);
+    itkSimpleNewMacro(Self);
 
       /**
        * @brief Get the result of the comparison

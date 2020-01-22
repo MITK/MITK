@@ -91,8 +91,8 @@ class MITKDICOMREADER_EXPORT DICOMReaderConfigurator : public itk::LightObject
 {
   public:
 
-    mitkClassMacroItkParent( DICOMReaderConfigurator, itk::LightObject )
-    itkNewMacro( DICOMReaderConfigurator )
+    mitkClassMacroItkParent( DICOMReaderConfigurator, itk::LightObject );
+    itkNewMacro( DICOMReaderConfigurator );
 
     DICOMFileReader::Pointer CreateFromConfigFile(const std::string& filename) const;
     DICOMFileReader::Pointer CreateFromUTF8ConfigString(const std::string& xmlContents) const;

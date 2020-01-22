@@ -35,7 +35,9 @@ namespace mitk
   class MITKCORE_EXPORT SinglePointDataInteractor : public PointSetDataInteractor
   {
   public:
-    mitkClassMacro(SinglePointDataInteractor, PointSetDataInteractor) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(SinglePointDataInteractor, PointSetDataInteractor);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       protected : SinglePointDataInteractor();
     ~SinglePointDataInteractor() override;

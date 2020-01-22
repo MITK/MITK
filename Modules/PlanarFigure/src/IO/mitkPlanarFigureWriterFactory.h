@@ -21,14 +21,14 @@ namespace mitk
   class PlanarFigureWriterFactory : public itk::ObjectFactoryBase
   {
   public:
-    mitkClassMacroItkParent(mitk::PlanarFigureWriterFactory, itk::ObjectFactoryBase)
+    mitkClassMacroItkParent(mitk::PlanarFigureWriterFactory, itk::ObjectFactoryBase);
 
       /** Class methods used to interface with the registered factories. */
       const char *GetITKSourceVersion(void) const override;
     const char *GetDescription(void) const override;
 
     /** Method for class instantiation. */
-    itkFactorylessNewMacro(Self)
+    itkFactorylessNewMacro(Self);
 
       /**
        * Register one factory of this type

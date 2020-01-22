@@ -133,8 +133,8 @@ namespace mitk
   {
     public:
       mitkClassMacro(GIFCooccurenceMatrix2, AbstractGlobalImageFeature);
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+      itkFactorylessNewMacro(Self);
+      itkCloneMacro(Self);
 
       GIFCooccurenceMatrix2();
 

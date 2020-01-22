@@ -93,7 +93,9 @@ namespace mitk
   public:
     mitkClassMacro(RenderingModeProperty, EnumerationProperty);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       mitkNewMacro1Param(RenderingModeProperty, const IdType &);
 

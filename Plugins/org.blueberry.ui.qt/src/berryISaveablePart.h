@@ -33,7 +33,7 @@ namespace berry {
 struct BERRY_UI_QT ISaveablePart : public virtual Object
 {
 
-  berryObjectMacro(berry::ISaveablePart)
+  berryObjectMacro(berry::ISaveablePart);
 
     /**
      * The property id for <code>isDirty</code>.

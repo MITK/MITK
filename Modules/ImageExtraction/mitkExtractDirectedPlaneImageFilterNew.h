@@ -55,7 +55,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(ExtractDirectedPlaneImageFilterNew, ImageToImageFilter);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /**
         \brief Set macro for the current worldgeometry

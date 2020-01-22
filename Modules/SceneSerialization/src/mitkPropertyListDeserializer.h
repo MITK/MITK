@@ -25,9 +25,8 @@ namespace mitk
   public:
     mitkClassMacroItkParent(PropertyListDeserializer, itk::Object);
     itkFactorylessNewMacro(Self) // is this needed? should never be instantiated, only subclasses should
-      itkCloneMacro(Self)
-
-        itkSetStringMacro(Filename);
+      itkCloneMacro(Self);
+      itkSetStringMacro(Filename);
     itkGetStringMacro(Filename);
 
     /**

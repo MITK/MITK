@@ -21,7 +21,8 @@ namespace mitk
   class MITKALGORITHMSEXT_EXPORT SegmentationSink : public NonBlockingAlgorithm
   {
   public:
-    mitkClassMacro(SegmentationSink, NonBlockingAlgorithm) mitkAlgorithmNewMacro(SegmentationSink);
+    mitkClassMacro(SegmentationSink, NonBlockingAlgorithm);
+    mitkAlgorithmNewMacro(SegmentationSink);
 
   protected:
     SegmentationSink(); // use smart pointers

@@ -29,7 +29,7 @@ class Property : public Object {
 
 public:
 
-  berryObjectMacro(Property)
+  berryObjectMacro(Property);
 
 private:
   Reflection::TypeInfo fType;

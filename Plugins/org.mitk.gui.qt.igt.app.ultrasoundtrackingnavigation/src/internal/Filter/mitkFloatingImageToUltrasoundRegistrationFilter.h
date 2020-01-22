@@ -29,8 +29,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(FloatingImageToUltrasoundRegistrationFilter, NavigationDataPassThroughFilter);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     void InitializeTransformationMarkerCSToSensorCS( bool useNdiTracker = false );
 

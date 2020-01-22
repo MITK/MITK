@@ -28,7 +28,7 @@ namespace berry {
  */
 struct BERRY_UI_QT IViewReference : virtual public IWorkbenchPartReference {
 
-  berryObjectMacro(berry::IViewReference)
+  berryObjectMacro(berry::IViewReference);
 
   ~IViewReference() override;
 

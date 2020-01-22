@@ -32,7 +32,7 @@ class EditorSashContainer: public PartSashContainer
 {
 
 public:
-  berryObjectMacro(EditorSashContainer)
+  berryObjectMacro(EditorSashContainer);
 
 private:
 

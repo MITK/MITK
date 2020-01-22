@@ -55,7 +55,7 @@ public:
   /**
   * Creates smartpointer typedefs
   */
-  berryObjectMacro(QmitkMatchPointBatchProcessor)
+  berryObjectMacro(QmitkMatchPointBatchProcessor);
 
   QmitkMatchPointBatchProcessor();
   ~QmitkMatchPointBatchProcessor() override;

@@ -21,7 +21,7 @@ class KeyedElement : public Object
 {
 public:
 
-  berryObjectMacro(berry::KeyedElement)
+  berryObjectMacro(berry::KeyedElement);
 
   ~KeyedElement() override;
 

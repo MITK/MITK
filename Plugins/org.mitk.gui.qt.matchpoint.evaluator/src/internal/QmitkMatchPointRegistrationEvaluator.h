@@ -58,11 +58,9 @@ protected slots:
 
   void OnSliceChanged();
 
-protected:
-  /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-    const QList<mitk::DataNode::Pointer>& nodes) override;
+  void OnNodeSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
+protected:
   void NodeRemoved(const mitk::DataNode* node) override;
 
   void SetFocus() override;
@@ -90,6 +88,11 @@ private:
   /**
   * Updates the state of controls regarding to selected eval object.*/
   void ConfigureControls();
+
+  /**
+  Configure the node selectors predicates according to the selected algorithm.
+  */
+  void ConfigureNodePredicates();
 
   mitk::DataNode::Pointer m_selectedEvalNode;
 

@@ -591,11 +591,6 @@ void QmitkMatchPoint::ConfigureProgressInfos()
   m_Controls.m_progBarLevel->reset();
 }
 
-void QmitkMatchPoint::OnSelectionChanged(berry::IWorkbenchPart::Pointer,
-    const QList<mitk::DataNode::Pointer>&)
-{
-}
-
 void QmitkMatchPoint::OnNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/)
 {
   if (!m_Working)

@@ -6,6 +6,7 @@ set(CPP_FILES
   QmitkApplicationCursor.cpp
   QmitkDataStorageComboBox.cpp
   QmitkDataStorageDefaultListModel.cpp
+  QmitkDataStorageHistoryModel.cpp
   QmitkDataStorageListModel.cpp
   QmitkDataStorageTableModel.cpp
   QmitkDataStorageSimpleTreeModel.cpp
@@ -55,6 +56,7 @@ set(CPP_FILES
   QmitkDataStorageFavoriteNodesInspector.cpp
   QmitkDataStorageListInspector.cpp
   QmitkDataStorageTreeInspector.cpp
+  QmitkDataStorageSelectionHistoryInspector.cpp
   QmitkModelViewSelectionConnector.cpp
   mitkIDataStorageInspectorProvider.cpp
   mitkQtWidgetsActivator.cpp
@@ -107,6 +109,8 @@ set(MOC_H_FILES
   include/QmitkDataStorageFavoriteNodesInspector.h
   include/QmitkDataStorageListInspector.h
   include/QmitkDataStorageTreeInspector.h
+  include/QmitkDataStorageHistoryModel.h
+  include/QmitkDataStorageSelectionHistoryInspector.h
   include/QmitkModelViewSelectionConnector.h
   include/QmitkOverlayWidget.h
   include/QmitkNodeDetailsDialog.h
@@ -123,6 +127,7 @@ set(UI_FILES
   src/QmitkServiceListWidgetControls.ui
   src/QmitkDataStorageListInspector.ui
   src/QmitkDataStorageTreeInspector.ui
+  src/QmitkDataStorageSelectionHistoryInspector.ui
 )
 
 set(QRC_FILES

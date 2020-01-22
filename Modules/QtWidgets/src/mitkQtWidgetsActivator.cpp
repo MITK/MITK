@@ -20,12 +20,14 @@ found in the LICENSE file.
 #include "QmitkDataStorageInspectorProviderBase.h"
 #include "QmitkDataStorageListInspector.h"
 #include "QmitkDataStorageTreeInspector.h"
+#include "QmitkDataStorageSelectionHistoryInspector.h"
 #include "QmitkDataStorageFavoriteNodesInspector.h"
 
 void MitkQtWidgetsActivator::Load(us::ModuleContext * /*context*/)
 {
   m_TreeInspector.reset(new QmitkDataStorageInspectorProviderBase<QmitkDataStorageListInspector>("org.mitk.QmitkDataStorageListInspector", "Simple list", "Displays the filtered content of the data storage in a simple list."));
   m_ListInspector.reset(new QmitkDataStorageInspectorProviderBase<QmitkDataStorageTreeInspector>("org.mitk.QmitkDataStorageTreeInspector", "Rendering tree", "Displays the filtered content of the data storage as the current rendering tree. \n(Equals the old data manager view)"));
+  m_HistoryInspector.reset(new QmitkDataStorageInspectorProviderBase<QmitkDataStorageSelectionHistoryInspector>("org.mitk.QmitkDataStorageSelectionHistoryInspector", "Selection history", "Displays the filtered history of all node selections in this application session. \nThe nodes are sorted from new to old selections.\nOnly nodes that are still in the data storage will be displayed."));
   m_FavoriteNodesInspector.reset(new QmitkDataStorageInspectorProviderBase<QmitkDataStorageFavoriteNodesInspector>("org.mitk.QmitkDataStorageFavoriteNodesInspector", "Favorite nodes list", "Displays the favorite nodes of the data storage in a simple list."));
 }
 

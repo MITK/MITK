@@ -114,7 +114,10 @@ namespace Utilities
     }
 
     UniqueLock lockTask(m_taskGuard);
-    const auto taskId = ++m_id;
+    auto taskId = ++m_id;
+    if (priority < TaskPriority::NORMAL) {
+      taskId = -taskId;
+    }
     m_task.emplace(taskId, task);
     lockTask.unlock();
 

@@ -4,9 +4,8 @@ set(CPP_FILES
   Step6RegionGrowing2.cpp
   Step6RegionGrowing3.cpp
   Step6main.cpp
-  ../QtTesting.cpp
-  )
+)
 
 set(MOC_H_FILES
   Step6.h
-  )
+)

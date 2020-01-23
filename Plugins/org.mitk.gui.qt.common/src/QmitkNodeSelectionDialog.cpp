@@ -21,6 +21,8 @@ QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString titl
 {
   m_Controls.setupUi(this);
 
+  m_CheckFunction = [](const NodeList &) { return ""; };
+
   auto providers = mitk::DataStorageInspectorGenerator::GetProviders();
   auto visibleProviders = mitk::GetVisibleDataStorageInspectors();
   auto favoriteID = mitk::GetFavoriteDataStorageInspector();
@@ -114,6 +116,34 @@ QmitkNodeSelectionDialog::NodeList QmitkNodeSelectionDialog::GetSelectedNodes() 
   return m_SelectedNodes;
 }
 
+void QmitkNodeSelectionDialog::SetSelectionCheckFunction(const SelectionCheckFunctionType &checkFunction)
+{
+  m_CheckFunction = checkFunction;
+  auto checkResponse = m_CheckFunction(m_SelectedNodes);
+
+  m_Controls.hint->setText(QString::fromStdString(checkResponse));
+  m_Controls.hint->setVisible(!checkResponse.empty());
+}
+
+bool QmitkNodeSelectionDialog::GetSelectOnlyVisibleNodes() const
+{
+  return m_SelectOnlyVisibleNodes;
+}
+
+void QmitkNodeSelectionDialog::SetSelectionMode(SelectionMode mode)
+{
+  m_SelectionMode = mode;
+  for (auto panel : m_Panels)
+  {
+    panel->SetSelectionMode(mode);
+  }
+}
+
+QmitkNodeSelectionDialog::SelectionMode QmitkNodeSelectionDialog::GetSelectionMode() const
+{
+  return m_SelectionMode;
+}
+
 void QmitkNodeSelectionDialog::SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes)
 {
   if (m_SelectOnlyVisibleNodes != selectOnlyVisibleNodes)
@@ -130,6 +160,11 @@ void QmitkNodeSelectionDialog::SetSelectOnlyVisibleNodes(bool selectOnlyVisibleN
 void QmitkNodeSelectionDialog::SetCurrentSelection(NodeList selectedNodes)
 {
   m_SelectedNodes = selectedNodes;
+  auto checkResponse = m_CheckFunction(m_SelectedNodes);
+
+  m_Controls.hint->setText(QString::fromStdString(checkResponse));
+  m_Controls.hint->setVisible(!checkResponse.empty());
+
   for (auto panel : m_Panels)
   {
     panel->SetCurrentSelection(selectedNodes);
@@ -140,25 +175,6 @@ void QmitkNodeSelectionDialog::OnSelectionChanged(NodeList selectedNodes)
 {
   SetCurrentSelection(selectedNodes);
   emit CurrentSelectionChanged(selectedNodes);
-}
-
-void QmitkNodeSelectionDialog::AddPanel(QmitkAbstractDataStorageInspector* view, QString name, QString desc)
-{
-  view->setParent(this);
-  view->SetSelectionMode(m_SelectionMode);
-
-  auto tabPanel = new QWidget();
-  tabPanel->setObjectName(QString("tab_")+name);
-  tabPanel->setToolTip(desc);
-  m_Controls.tabWidget->insertTab(m_Controls.tabWidget->count(), tabPanel, name);
-
-  auto verticalLayout = new QVBoxLayout(tabPanel);
-  verticalLayout->setSpacing(0);
-  verticalLayout->setContentsMargins(0, 0, 0, 0);
-  verticalLayout->addWidget(view);
-
-  m_Panels.push_back(view);
-  connect(view, &QmitkAbstractDataStorageInspector::CurrentSelectionChanged, this, &QmitkNodeSelectionDialog::OnSelectionChanged);
 }
 
 void QmitkNodeSelectionDialog::OnFavoriteNodesButtonClicked()
@@ -184,16 +200,21 @@ void QmitkNodeSelectionDialog::OnCancel()
   this->reject();
 }
 
-void QmitkNodeSelectionDialog::SetSelectionMode(SelectionMode mode)
+void QmitkNodeSelectionDialog::AddPanel(QmitkAbstractDataStorageInspector* view, QString name, QString desc)
 {
-  m_SelectionMode = mode;
-  for (auto panel : m_Panels)
-  {
-    panel->SetSelectionMode(mode);
-  }
-}
+  view->setParent(this);
+  view->SetSelectionMode(m_SelectionMode);
 
-QmitkNodeSelectionDialog::SelectionMode QmitkNodeSelectionDialog::GetSelectionMode() const
-{
-  return m_SelectionMode;
+  auto tabPanel = new QWidget();
+  tabPanel->setObjectName(QString("tab_") + name);
+  tabPanel->setToolTip(desc);
+  m_Controls.tabWidget->insertTab(m_Controls.tabWidget->count(), tabPanel, name);
+
+  auto verticalLayout = new QVBoxLayout(tabPanel);
+  verticalLayout->setSpacing(0);
+  verticalLayout->setContentsMargins(0, 0, 0, 0);
+  verticalLayout->addWidget(view);
+
+  m_Panels.push_back(view);
+  connect(view, &QmitkAbstractDataStorageInspector::CurrentSelectionChanged, this, &QmitkNodeSelectionDialog::OnSelectionChanged);
 }

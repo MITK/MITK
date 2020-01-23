@@ -10,12 +10,6 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkDataCollectionImageIterator_CXX
-#define mitkDataCollectionImageIterator_CXX
-
-#include <Iterators/mitkDataCollectionImageIterator.h>
-#include <mitkImageCast.h>
-
 template <typename TDataType, int TImageDimension>
 mitk::DataCollectionImageIterator<TDataType, TImageDimension>::
   DataCollectionImageIterator(DataCollection::Pointer collection, std::string imageName) :
@@ -226,5 +220,3 @@ typename mitk::DataCollectionImageIterator<TDataType, TImageDimension>::ImageIte
 {
   return m_CurrentIterator;
 };
-
-#endif // mitkDataCollectionImageIterator_CXX

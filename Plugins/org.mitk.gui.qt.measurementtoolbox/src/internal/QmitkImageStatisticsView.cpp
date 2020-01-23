@@ -325,9 +325,19 @@ void QmitkImageStatisticsView::ResetGUIDefault()
 
 void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
 {
+  auto runnable = qobject_cast<QmitkImageStatisticsCalculationRunnable*>(sender());
+  if (nullptr == runnable)
+  {
+    return;
+  }
+
   mitk::StatusBar::GetInstance()->Clear();
-  auto runnable = m_Runnables[0];
-  m_Runnables.erase(m_Runnables.begin());
+
+  auto it = std::find(m_Runnables.begin(), m_Runnables.end(), runnable);
+  if (it != m_Runnables.end())
+  {
+    m_Runnables.erase(it);
+  }
 
   auto image = runnable->GetStatisticsImage();
 

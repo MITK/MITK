@@ -113,10 +113,13 @@ bool QmitkSingleNodeSelectionWidget::eventFilter(QObject *obj, QEvent *ev)
         return false;
       }
 
-      if (mouseEv->button() == Qt::LeftButton && this->isEnabled())
+      if (mouseEv->button() == Qt::LeftButton)
       {
-        this->EditSelection();
-        return true;
+        if (this->isEnabled())
+        {
+          this->EditSelection();
+          return true;
+        }
       }
       else
       {

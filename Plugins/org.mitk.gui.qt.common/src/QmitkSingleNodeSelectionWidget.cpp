@@ -78,7 +78,16 @@ QmitkSingleNodeSelectionWidget::NodeList QmitkSingleNodeSelectionWidget::Compile
 
 void QmitkSingleNodeSelectionWidget::OnNodePredicateChanged(const mitk::NodePredicateBase* /*newPredicate*/)
 {
-  m_SelectedNode = this->ExtractCurrentValidSelection(m_ExternalSelection);
+  if (m_NodePredicate.IsNotNull() && m_SelectedNode.IsNotNull() && !m_NodePredicate->CheckNode(m_SelectedNode))
+  {
+    m_SelectedNode = nullptr;
+  }
+
+
+  if (m_SelectedNode.IsNull())
+  {
+    m_SelectedNode = this->ExtractCurrentValidSelection(m_ExternalSelection);
+  }
 };
 
 void QmitkSingleNodeSelectionWidget::OnDataStorageChanged()

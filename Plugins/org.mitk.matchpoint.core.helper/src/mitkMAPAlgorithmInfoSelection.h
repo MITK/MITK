@@ -23,8 +23,9 @@ found in the LICENSE file.
 namespace mitk {
 
 /**
- * @class Used by plugins to communicate selections of deployed algorithms
- * E.G. used by the algorithm browser to inform about the currently selected algorithm.
+ * \brief Used by plugins to communicate selections of deployed algorithms
+ *
+ * For example used by the algorithm browser to inform about the currently selected algorithm.
  */
 class MITK_MATCHPOINT_CORE_HELPER_EXPORT MAPAlgorithmInfoSelection : public virtual berry::IStructuredSelection
 {

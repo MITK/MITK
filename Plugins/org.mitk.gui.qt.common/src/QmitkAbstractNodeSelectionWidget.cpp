@@ -76,7 +76,7 @@ void QmitkAbstractNodeSelectionWidget::SetDataStorage(mitk::DataStorage* dataSto
   this->UpdateInfo();
 };
 
-void QmitkAbstractNodeSelectionWidget::SetNodePredicate(mitk::NodePredicateBase* nodePredicate)
+void QmitkAbstractNodeSelectionWidget::SetNodePredicate(const mitk::NodePredicateBase* nodePredicate)
 {
   if (m_NodePredicate != nodePredicate)
   {
@@ -87,7 +87,7 @@ void QmitkAbstractNodeSelectionWidget::SetNodePredicate(mitk::NodePredicateBase*
   }
 };
 
-mitk::NodePredicateBase* QmitkAbstractNodeSelectionWidget::GetNodePredicate() const
+const mitk::NodePredicateBase* QmitkAbstractNodeSelectionWidget::GetNodePredicate() const
 {
   return m_NodePredicate;
 }

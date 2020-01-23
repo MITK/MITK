@@ -51,9 +51,9 @@ public:
   *
   * @param nodePredicate    A pointer to node predicate.
   */
-  virtual void SetNodePredicate(mitk::NodePredicateBase* nodePredicate);
+  virtual void SetNodePredicate(const mitk::NodePredicateBase* nodePredicate);
 
-  mitk::NodePredicateBase* GetNodePredicate() const;
+  const mitk::NodePredicateBase* GetNodePredicate() const;
 
   using NodeList = QList<mitk::DataNode::Pointer>;
 
@@ -118,7 +118,7 @@ protected:
   virtual void Initialize() = 0;
 
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
-  mitk::NodePredicateBase::Pointer m_NodePredicate;
+  mitk::NodePredicateBase::ConstPointer m_NodePredicate;
 
   std::unique_ptr<QmitkModelViewSelectionConnector> m_Connector;
 

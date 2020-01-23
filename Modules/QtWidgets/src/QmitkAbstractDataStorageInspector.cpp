@@ -38,7 +38,7 @@ void QmitkAbstractDataStorageInspector::SetDataStorage(mitk::DataStorage* dataSt
   }
 }
 
-void QmitkAbstractDataStorageInspector::SetNodePredicate(mitk::NodePredicateBase* nodePredicate)
+void QmitkAbstractDataStorageInspector::SetNodePredicate(const mitk::NodePredicateBase* nodePredicate)
 {
   if (m_NodePredicate != nodePredicate)
   {
@@ -48,7 +48,7 @@ void QmitkAbstractDataStorageInspector::SetNodePredicate(mitk::NodePredicateBase
   }
 }
 
-mitk::NodePredicateBase* QmitkAbstractDataStorageInspector::GetNodePredicate() const
+const mitk::NodePredicateBase* QmitkAbstractDataStorageInspector::GetNodePredicate() const
 {
   return m_NodePredicate;
 }

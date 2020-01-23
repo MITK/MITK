@@ -76,7 +76,7 @@ QmitkSingleNodeSelectionWidget::NodeList QmitkSingleNodeSelectionWidget::Compile
   return result;
 }
 
-void QmitkSingleNodeSelectionWidget::OnNodePredicateChanged(mitk::NodePredicateBase* /*newPredicate*/)
+void QmitkSingleNodeSelectionWidget::OnNodePredicateChanged(const mitk::NodePredicateBase* /*newPredicate*/)
 {
   m_SelectedNode = this->ExtractCurrentValidSelection(m_ExternalSelection);
 };

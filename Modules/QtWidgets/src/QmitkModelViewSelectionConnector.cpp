@@ -153,7 +153,7 @@ QList<mitk::DataNode::Pointer> QmitkModelViewSelectionConnector::FilterNodeList(
     return nodes;
   }
 
-  mitk::NodePredicateBase* nodePredicate = m_Model->GetNodePredicate();
+  auto nodePredicate = m_Model->GetNodePredicate();
   if (nullptr == nodePredicate)
   {
     // no filter set

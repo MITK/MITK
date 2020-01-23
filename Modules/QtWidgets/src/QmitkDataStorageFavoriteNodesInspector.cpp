@@ -30,7 +30,7 @@ QmitkDataStorageFavoriteNodesInspector::QmitkDataStorageFavoriteNodesInspector(Q
   connect(favoriteNodesButton, &QPushButton::clicked, this, &QmitkDataStorageFavoriteNodesInspector::OnFavoriteNodesButtonClicked);
 }
 
-void QmitkDataStorageFavoriteNodesInspector::SetNodePredicate(mitk::NodePredicateBase* nodePredicate)
+void QmitkDataStorageFavoriteNodesInspector::SetNodePredicate(const mitk::NodePredicateBase* nodePredicate)
 {
   mitk::NodePredicateAnd::Pointer combinedPredicate = mitk::NodePredicateAnd::New();
 

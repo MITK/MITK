@@ -138,6 +138,3 @@ int main(int argc, char *argv[])
   // cleanup: Remove References to DataStorage. This will delete the object
   ds = nullptr;
 }
-/**
-\example Step1.cpp
-*/

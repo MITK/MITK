@@ -15,15 +15,12 @@ found in the LICENSE file.
 
 #include "ui_QmitkImageStatisticsViewControls.h"
 
-// Qmitk includes
 #include <QmitkAbstractView.h>
-#include <QmitkImageStatisticsCalculationJob.h>
+#include <QmitkImageStatisticsCalculationRunnable.h>
 #include <mitkImageStatisticsContainer.h>
 #include <QmitkNodeSelectionDialog.h>
 
-#include <berryIPartListener.h>
 #include <mitkPropertyRelations.h>
-#include <QmitkImageStatisticsCalculationRunnable.h>
 
 /*!
 \brief QmitkImageStatisticsView is a bundle that allows statistics calculation from images. Three modes
@@ -33,42 +30,32 @@ gui accessible during calculation.
 
 \ingroup Plugins/org.mitk.gui.qt.measurementtoolbox
 */
-class QmitkImageStatisticsView : public QmitkAbstractView, public berry::IPartListener
+class QmitkImageStatisticsView : public QmitkAbstractView
 {
   Q_OBJECT
 
 public:
-  /*!
-  \brief default constructor */
-  QmitkImageStatisticsView(QObject *parent = nullptr, const char *name = nullptr);
+
+  static const std::string VIEW_ID;
+
   /*!
   \brief default destructor */
   ~QmitkImageStatisticsView() override;
   /*!
-  \brief method for creating the widget containing the application controls, like sliders, buttons etc. */
+  \brief Creates the widget containing the application controls, like sliders, buttons etc.*/
   void CreateQtPartControl(QWidget *parent) override;
-  /*!
-  \brief  Is called from the selection mechanism once the data manager selection has changed*/
-  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &selectedNodes) override;
-
-  static const std::string VIEW_ID;
 
 protected:
 
   using HistogramType = mitk::ImageStatisticsContainer::HistogramType;
 
-  void SetFocus() override;
+  void SetFocus() override { };
 
-  /** \brief Is called right before the view closes (before the destructor) */
-  void PartClosed(const berry::IWorkbenchPartReference::Pointer&) override;
-
-  /** \brief Required for berry::IPartListener */
-  Events::Types GetPartEventTypes() const override { return Events::CLOSED; }
+  virtual void CreateConnections();
 
   void CalculateOrGetMultiStatistics();
   void CalculateOrGetStatistics();
-  void CalculateStatistics(const mitk::Image* image,
-                           const mitk::Image* mask = nullptr,
+  void CalculateStatistics(const mitk::Image* image, const mitk::Image* mask = nullptr,
                            const mitk::PlanarFigure* maskPlanarFigure = nullptr);
 
   void ComputeAndDisplayIntensityProfile(mitk::Image * image, mitk::PlanarFigure* maskPlanarFigure);
@@ -78,10 +65,6 @@ protected:
 
   void ResetGUI();
   void ResetGUIDefault();
-
-  /*!
-  \brief method for creating the connections of main and control widget */
-  virtual void CreateConnections();
 
   void OnStatisticsCalculationEnds();
   void OnRequestHistogramUpdate(unsigned int nBins);
@@ -96,8 +79,7 @@ private:
 
   std::string GenerateStatisticsNodeName();
 
-  void HandleExistingStatistics(mitk::Image::ConstPointer image,
-                                mitk::BaseData::ConstPointer mask,
+  void HandleExistingStatistics(mitk::Image::ConstPointer image, mitk::BaseData::ConstPointer mask,
                                 mitk::ImageStatisticsContainer::Pointer);
 
   void SetupRelationRules(mitk::ImageStatisticsContainer::Pointer, mitk::BaseData::ConstPointer mask);
@@ -105,7 +87,6 @@ private:
   mitk::DataNode::Pointer GetNodeForStatisticsContainer(mitk::ImageStatisticsContainer::ConstPointer container);
 
   typedef itk::SimpleMemberCommand<QmitkImageStatisticsView> ITKCommandType;
-  QmitkImageStatisticsCalculationJob* m_CalculationJob = nullptr;
   mitk::DataNode::ConstPointer m_selectedImageNode = nullptr;
   mitk::DataNode::ConstPointer m_selectedMaskNode = nullptr;
   mitk::PlanarFigure::Pointer m_selectedPlanarFigure = nullptr;

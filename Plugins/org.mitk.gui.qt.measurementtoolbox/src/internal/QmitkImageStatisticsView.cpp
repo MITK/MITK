@@ -415,6 +415,7 @@ void QmitkImageStatisticsView::OnButtonSelectionPressed()
 {
   m_SelectionDialog = new QmitkNodeSelectionDialog();
   m_SelectionDialog->SetDataStorage(GetDataStorage());
+  m_SelectionDialog->SetSelectionCheckFunction(CheckForSameGeometry());
 
   // set predicates
   auto isPlanarFigurePredicate = mitk::GetImageStatisticsPlanarFigurePredicate();
@@ -524,3 +525,57 @@ mitk::DataNode::Pointer QmitkImageStatisticsView::GetNodeForStatisticsContainer(
   mitkThrow() << "No DataNode is found which holds the given statistics container!";
 }
 
+QmitkNodeSelectionDialog::SelectionCheckFunctionType QmitkImageStatisticsView::CheckForSameGeometry() const
+{
+  auto lambda = [this](const QmitkNodeSelectionDialog::NodeList& nodes)
+  {
+    if (nodes.empty())
+    {
+      return std::string();
+    }
+
+    auto leftNode = nodes[0];
+    for (int i = 1; i < nodes.size(); ++i)
+    {
+      auto rightNode = nodes[i];
+
+      bool sameGeometry = CheckForSameGeometry(leftNode, rightNode);
+      if (!sameGeometry)
+      {
+        std::stringstream ss;
+        ss << "<font class=\"warning\"><p>Invalid selection: All selected nodes must have the same geometry.</p>";
+        return ss.str();
+      }
+    }
+
+    return std::string();
+  };
+
+  return lambda;
+}
+
+bool QmitkImageStatisticsView::CheckForSameGeometry(const mitk::DataNode* node1, const mitk::DataNode* node2) const
+{
+  bool isSameGeometry(true);
+
+  mitk::Image* image1 = dynamic_cast<mitk::Image*>(node1->GetData());
+  mitk::Image* image2 = dynamic_cast<mitk::Image*>(node2->GetData());
+  if (image1 && image2)
+  {
+    mitk::BaseGeometry* geo1 = image1->GetGeometry();
+    mitk::BaseGeometry* geo2 = image2->GetGeometry();
+
+    isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetOrigin(), geo2->GetOrigin());
+    isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetExtent(0), geo2->GetExtent(0));
+    isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetExtent(1), geo2->GetExtent(1));
+    isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetExtent(2), geo2->GetExtent(2));
+    isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetSpacing(), geo2->GetSpacing());
+    isSameGeometry = isSameGeometry && mitk::MatrixEqualElementWise(geo1->GetIndexToWorldTransform()->GetMatrix(), geo2->GetIndexToWorldTransform()->GetMatrix());
+
+    return isSameGeometry;
+  }
+  else
+  {
+    return false;
+  }
+}

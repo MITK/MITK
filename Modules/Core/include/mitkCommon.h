@@ -44,7 +44,7 @@ typedef unsigned int MapperSlotId;
   typedef itk::SmartPointer<const Self> ConstPointer;                                                                  \
   static const char *GetStaticNameOfClass() { return #className; }                                                     \
   virtual std::vector<std::string> GetClassHierarchy() const override { return mitk::GetClassHierarchy<Self>(); }      \
-  itkTypeMacro(className, SuperClassName)
+  itkTypeMacro(className, SuperClassName);
 
 #define mitkClassMacroItkParent(className, SuperClassName)                                                             \
   typedef className Self;                                                                                              \
@@ -53,7 +53,7 @@ typedef unsigned int MapperSlotId;
   typedef itk::SmartPointer<const Self> ConstPointer;                                                                  \
   static const char *GetStaticNameOfClass() { return #className; }                                                     \
   virtual std::vector<std::string> GetClassHierarchy() const { return mitk::GetClassHierarchy<Self>(); }               \
-  itkTypeMacro(className, SuperClassName)
+  itkTypeMacro(className, SuperClassName);
 
 /** At version 4.7 provides two type macros, the normal one expects the Superclass to provide the
  *  GetNameOfClass explicitely, the NoParent deos not expect anything.

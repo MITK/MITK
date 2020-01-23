@@ -29,8 +29,8 @@ namespace mitk
         class MITKMODELFIT_EXPORT Parameter : public itk::LightObject
         {
         public:
-      mitkClassMacroItkParent(Parameter, itk::LightObject)
-            itkSimpleNewMacro(Parameter)
+      mitkClassMacroItkParent(Parameter, itk::LightObject);
+            itkSimpleNewMacro(Parameter);
 
       enum Type
         {

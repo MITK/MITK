@@ -34,8 +34,10 @@ namespace mitk
   {
   public:
 
-    mitkClassMacro(DisplayInteractor, EventStateMachine)
-    itkFactorylessNewMacro(Self)
+    mitkClassMacro(DisplayInteractor, EventStateMachine);
+
+    itkFactorylessNewMacro(Self);
+
     itkCloneMacro(Self)
     /**
     * By this function the Observer gets notified about new events.

@@ -47,8 +47,8 @@ namespace mitk
     static Image::Pointer ConvertCVMatToMitkImage(const cv::Mat input);
 
     mitkClassMacro(OpenCVToMitkImageFilter, ImageSource);
-    itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       ///
       /// sets an iplimage as input

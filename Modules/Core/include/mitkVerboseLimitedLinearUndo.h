@@ -36,7 +36,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(VerboseLimitedLinearUndo, LimitedLinearUndo);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       typedef std::pair<int, std::string> StackDescriptionItem;
     typedef std::vector<StackDescriptionItem>

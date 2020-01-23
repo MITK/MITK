@@ -33,7 +33,9 @@ namespace mitk
   public:
     mitkClassMacro(Contour, BaseData);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       typedef itk::PolyLineParametricPath<3> PathType;
     typedef PathType::Pointer PathPointer;

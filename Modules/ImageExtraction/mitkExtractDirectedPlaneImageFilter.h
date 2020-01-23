@@ -61,9 +61,9 @@ namespace mitk
   {
   public:
     mitkClassMacro(ExtractDirectedPlaneImageFilter, ImageToImageFilter);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
-
-      itkSetMacro(WorldGeometry, PlaneGeometry *);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
+    itkSetMacro(WorldGeometry, PlaneGeometry *);
 
     // The Reslicer is accessible to configure the desired interpolation;
     // (See vtk::ImageReslice class for documentation).

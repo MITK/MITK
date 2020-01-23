@@ -22,7 +22,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(PlanarDoubleEllipse, PlanarFigure);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       unsigned int GetNumberOfSegments() const;
     void SetNumberOfSegments(unsigned int numSegments);
@@ -40,7 +41,7 @@ namespace mitk
   protected:
     PlanarDoubleEllipse();
 
-    mitkCloneMacro(Self)
+    mitkCloneMacro(Self);
 
       mitk::Point2D ApplyControlPointConstraints(unsigned int index, const Point2D &point) override;
     void EvaluateFeaturesInternal() override;

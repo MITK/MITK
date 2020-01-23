@@ -37,7 +37,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(BoundingShapeCropper, ImageToImageFilter);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /**
       * @brief Set geometry of the bounding object

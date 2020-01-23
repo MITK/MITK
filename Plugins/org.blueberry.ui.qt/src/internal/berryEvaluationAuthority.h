@@ -33,7 +33,7 @@ class EvaluationAuthority : public ExpressionAuthority
 
 public:
 
-  berryObjectMacro(berry::EvaluationAuthority)
+  berryObjectMacro(berry::EvaluationAuthority);
 
 private:
 

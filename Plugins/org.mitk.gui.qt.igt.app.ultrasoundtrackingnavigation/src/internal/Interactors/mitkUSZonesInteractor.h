@@ -48,8 +48,9 @@ namespace mitk
     static const char* DATANODE_PROPERTY_SIZE;
     static const char* DATANODE_PROPERTY_CREATED;
 
-    mitkClassMacro(USZonesInteractor, DataInteractor)
-      itkNewMacro(Self)
+    mitkClassMacro(USZonesInteractor, DataInteractor);
+
+    itkNewMacro(Self);
 
       /**
        * \brief Creates Vtk Sphere according to current radius.

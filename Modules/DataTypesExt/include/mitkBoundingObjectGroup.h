@@ -35,7 +35,8 @@ namespace mitk
 
     mitkClassMacro(BoundingObjectGroup,
                    mitk::BoundingObject); // itk::VectorContainer<unsigned int ,mitk::BoundingObject::Pointer>);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       void UpdateOutputInformation() override;
     bool IsInside(const mitk::Point3D &p) const override;

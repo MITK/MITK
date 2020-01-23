@@ -76,11 +76,12 @@ class EXPORT_SPEC CLASS_NAME##Tool : public BASE_CLASS                          
     typedef itk::SmartPointer<Self> Pointer;                                                                           \
     typedef itk::SmartPointer<const Self> ConstPointer;                                                                \
                                                                                                                        \
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)                                                                   \
+    itkFactorylessNewMacro(Self);                                                                                      \
+    itkCloneMacro(Self);                                                                                               \
                                                                                                                        \
-      protected :                                                                                                      \
+  protected:                                                                                                           \
                                                                                                                        \
-      CLASS_NAME##Tool()                                                                                               \
+    CLASS_NAME##Tool()                                                                                                 \
     {                                                                                                                  \
       m_SegmentationGenerator = CLASS_NAME::New();                                                                     \
     }                                                                                                                  \

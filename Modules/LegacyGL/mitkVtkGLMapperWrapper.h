@@ -32,12 +32,12 @@ namespace mitk
   public:
     mitkClassMacro(VtkGLMapperWrapper, VtkMapper);
 
-    mitkNewMacro1Param(Self, GLMapper::Pointer)
+    mitkNewMacro1Param(Self, GLMapper::Pointer);
 
-      itkCloneMacro(Self)
+    itkCloneMacro(Self);
 
-      /** \brief returns the a prop assembly */
-      vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
+    /** \brief returns the a prop assembly */
+    vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
     void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 

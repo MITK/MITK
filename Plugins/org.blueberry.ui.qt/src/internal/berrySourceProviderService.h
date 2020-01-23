@@ -51,7 +51,7 @@ private:
 
 public:
 
-  berryObjectMacro(berry::SourceProviderService)
+  berryObjectMacro(berry::SourceProviderService);
 
   SourceProviderService(IServiceLocator* locator);
 

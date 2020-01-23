@@ -32,7 +32,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(PlanarFigureToPlanarFigureFilter, PlanarFigureSource);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       typedef PlanarFigure InputType;
     typedef InputType::Pointer InputTypePointer;

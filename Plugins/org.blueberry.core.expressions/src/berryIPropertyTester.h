@@ -38,7 +38,7 @@ namespace berry {
 struct BERRY_EXPRESSIONS IPropertyTester : public Object
 {
 
-  berryObjectMacro(berry::IPropertyTester)
+  berryObjectMacro(berry::IPropertyTester);
 
   ~IPropertyTester() override;
 

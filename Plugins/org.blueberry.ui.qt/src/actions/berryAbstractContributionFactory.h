@@ -75,7 +75,7 @@ private:
 
 public:
 
-  berryObjectMacro(berry::AbstractContributionFactory)
+  berryObjectMacro(berry::AbstractContributionFactory);
 
   /**
    * The contribution factories must be instantiated with their location,

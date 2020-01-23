@@ -31,7 +31,8 @@ namespace mitk
     typedef ToolCommand Self;
     typedef itk::Command Superclass;
     typedef itk::SmartPointer<Self> Pointer;
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /**
       * \brief Reacts on events from ITK filters.

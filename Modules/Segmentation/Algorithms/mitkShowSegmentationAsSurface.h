@@ -23,7 +23,8 @@ namespace mitk
   class MITKSEGMENTATION_EXPORT ShowSegmentationAsSurface : public SegmentationSink
   {
   public:
-    mitkClassMacro(ShowSegmentationAsSurface, SegmentationSink) mitkAlgorithmNewMacro(ShowSegmentationAsSurface);
+    mitkClassMacro(ShowSegmentationAsSurface, SegmentationSink);
+    mitkAlgorithmNewMacro(ShowSegmentationAsSurface);
 
   protected:
     ShowSegmentationAsSurface(); // use smart pointers

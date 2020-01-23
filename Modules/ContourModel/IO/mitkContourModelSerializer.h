@@ -22,7 +22,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(ContourModelSerializer, BaseDataSerializer);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       std::string Serialize() override;
 

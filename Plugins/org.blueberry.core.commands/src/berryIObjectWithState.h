@@ -35,7 +35,7 @@ class State;
 struct BERRY_COMMANDS IObjectWithState : public virtual Object
 {
 
-  berryObjectMacro(berry::IObjectWithState)
+  berryObjectMacro(berry::IObjectWithState);
 
   /**
    * Adds state to this object.

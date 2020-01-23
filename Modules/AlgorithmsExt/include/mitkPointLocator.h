@@ -41,7 +41,9 @@ namespace mitk
   public:
     mitkClassMacroItkParent(PointLocator, itk::Object);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       typedef int IdType;
     typedef ScalarType DistanceType;

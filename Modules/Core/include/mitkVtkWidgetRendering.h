@@ -40,7 +40,9 @@ namespace mitk
   public:
     mitkClassMacro(VtkWidgetRendering, BaseData);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       /**
        * Sets the renderwindow, in which the widget

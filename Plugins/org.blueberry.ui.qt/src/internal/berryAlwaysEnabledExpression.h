@@ -27,7 +27,7 @@ class AlwaysEnabledExpression : public Expression
 
 public:
 
-  berryObjectMacro(berry::AlwaysEnabledExpression)
+  berryObjectMacro(berry::AlwaysEnabledExpression);
 
   ~AlwaysEnabledExpression() override;
 

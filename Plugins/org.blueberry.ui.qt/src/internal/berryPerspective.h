@@ -41,7 +41,7 @@ class Perspective : public Object {
 
 public:
 
-  berryObjectMacro(Perspective)
+  berryObjectMacro(Perspective);
 
   friend class WorkbenchPage;
 

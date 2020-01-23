@@ -30,7 +30,7 @@ namespace mitk
   struct IInputDevice : public berry::Object
   {
 
-    berryObjectMacro(mitk::IInputDevice)
+    berryObjectMacro(mitk::IInputDevice);
 
     /**
     * Register the input device at one or more instances.

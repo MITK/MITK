@@ -57,7 +57,7 @@ private:
 
 public:
 
-  berryObjectMacro(berry::WorkbenchSourceProvider)
+  berryObjectMacro(berry::WorkbenchSourceProvider);
 
   WorkbenchSourceProvider();
 

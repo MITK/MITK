@@ -37,9 +37,8 @@ namespace mitk
   public:
 
     mitkClassMacro(VirtualTrackingDevice, TrackingDevice);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     /**
     * \brief Sets the refresh rate of the virtual tracking device in ms
@@ -47,13 +46,13 @@ namespace mitk
     * of the virtual tools. However, this thread may not run at all during this refresh time period.
     * \return Sets the refresh rate of the virtual tracking device in ms
     */
-    itkSetMacro(RefreshRate, unsigned int)
+    itkSetMacro(RefreshRate, unsigned int);
 
     /**
     * \brief Returns the refresh rate in ms.
     * \return Returns the refresh rate in ms.
     */
-    itkGetConstMacro(RefreshRate, unsigned int)
+    itkGetConstMacro(RefreshRate, unsigned int);
 
     /**
     * \brief Starts the tracking.

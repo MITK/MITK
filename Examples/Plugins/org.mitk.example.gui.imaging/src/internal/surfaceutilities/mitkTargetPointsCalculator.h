@@ -32,7 +32,8 @@ namespace mitk
   {
   public:
     mitkClassMacroItkParent(TargetPointsCalculator, itk::Object);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /** @brief identifier for target point calculation method */
       enum TargetPointCalculationMethod {

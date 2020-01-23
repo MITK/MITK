@@ -37,8 +37,9 @@ namespace mitk {
   public:
     mitkClassMacro(NavigationDataHandEyeCalibrationFilter, NavigationDataToNavigationDataFilter);
 
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
     /*!
     \brief transformation type for itk::QuaternionRigidTransforms

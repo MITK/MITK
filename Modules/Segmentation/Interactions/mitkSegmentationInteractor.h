@@ -30,7 +30,8 @@ namespace mitk
   class MITKSEGMENTATION_EXPORT SegmentationInteractor : public DisplayInteractor
   {
   public:
-    mitkClassMacro(SegmentationInteractor, DisplayInteractor) itkNewMacro(Self)
+    mitkClassMacro(SegmentationInteractor, DisplayInteractor);
+    itkNewMacro(Self);
 
       protected : SegmentationInteractor(){};
     ~SegmentationInteractor() override{};

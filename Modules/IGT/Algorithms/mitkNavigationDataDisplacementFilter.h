@@ -30,9 +30,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(NavigationDataDisplacementFilter, NavigationDataToNavigationDataFilter);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
     mitkSetVectorMacro(Offset, mitk::Vector3D); ///< Get Offset parameter
     mitkGetVectorMacro(Offset, mitk::Vector3D); ///< Set Offset parameter
     itkSetMacro(Transform6DOF, bool);

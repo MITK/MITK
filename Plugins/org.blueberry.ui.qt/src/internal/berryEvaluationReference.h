@@ -30,7 +30,7 @@ private:
 
 public:
 
-  berryObjectMacro(berry::EvaluationReference)
+  berryObjectMacro(berry::EvaluationReference);
 
   /**
    * @param expression

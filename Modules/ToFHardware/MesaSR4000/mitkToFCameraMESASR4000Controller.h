@@ -33,8 +33,9 @@ namespace mitk
 
     mitkClassMacro( ToFCameraMESASR4000Controller , mitk::ToFCameraMESAController );
 
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
     /*!
     \brief opens a connection to the ToF camera and initializes the hardware specific members

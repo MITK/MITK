@@ -24,9 +24,9 @@ namespace mitk
 class MITKCLCORE_EXPORT IntensityQuantifier : public BaseData
 {
 public:
-  mitkClassMacro(IntensityQuantifier, BaseData)
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+  mitkClassMacro(IntensityQuantifier, BaseData);
+  itkFactorylessNewMacro(Self);
+  itkCloneMacro(Self);
 
   IntensityQuantifier();
 

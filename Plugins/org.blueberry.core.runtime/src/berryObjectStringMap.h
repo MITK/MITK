@@ -23,7 +23,7 @@ class ObjectStringMap : public QHash<QString,QString>, public Object
 {
 public:
 
-  berryObjectMacro(berry::ObjectStringMap)
+  berryObjectMacro(berry::ObjectStringMap);
 
   ObjectStringMap();
   ObjectStringMap(const QHash<QString,QString>& other);

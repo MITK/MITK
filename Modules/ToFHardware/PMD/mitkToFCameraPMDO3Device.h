@@ -37,8 +37,9 @@ namespace mitk
 
     mitkClassMacro( ToFCameraPMDO3Device , ToFCameraPMDDevice );
 
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
   protected:
 

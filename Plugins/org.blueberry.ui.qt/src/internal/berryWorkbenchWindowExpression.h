@@ -44,7 +44,7 @@ private:
 
 public:
 
-  berryObjectMacro(berry::WorkbenchWindowExpression)
+  berryObjectMacro(berry::WorkbenchWindowExpression);
 
   /**
    * Constructs a new instance.

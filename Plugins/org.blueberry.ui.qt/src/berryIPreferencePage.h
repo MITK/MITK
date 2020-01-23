@@ -43,7 +43,7 @@ namespace berry
 struct BERRY_UI_QT IPreferencePage: virtual public Object
 {
 
-  berryObjectMacro(berry::IPreferencePage)
+  berryObjectMacro(berry::IPreferencePage);
 
   ~IPreferencePage() override;
 

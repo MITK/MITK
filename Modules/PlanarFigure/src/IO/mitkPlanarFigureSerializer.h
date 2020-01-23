@@ -23,8 +23,9 @@ namespace mitk
   class PlanarFigureSerializer : public BaseDataSerializer
   {
   public:
-    mitkClassMacro(PlanarFigureSerializer, BaseDataSerializer) itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self) std::string Serialize() override;
+    mitkClassMacro(PlanarFigureSerializer, BaseDataSerializer);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self) std::string Serialize() override;
 
   protected:
     PlanarFigureSerializer();

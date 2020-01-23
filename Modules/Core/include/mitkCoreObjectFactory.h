@@ -28,7 +28,8 @@ namespace mitk
   class MITKCORE_EXPORT CoreObjectFactory : public CoreObjectFactoryBase
   {
   public:
-    mitkClassMacro(CoreObjectFactory, CoreObjectFactoryBase) itkFactorylessNewMacro(CoreObjectFactory)
+    mitkClassMacro(CoreObjectFactory, CoreObjectFactoryBase);
+    itkFactorylessNewMacro(CoreObjectFactory);
 
       Mapper::Pointer CreateMapper(mitk::DataNode *node, MapperSlotId slotId) override;
     void SetDefaultProperties(mitk::DataNode *node) override;

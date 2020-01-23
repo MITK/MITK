@@ -45,7 +45,9 @@ namespace mitk
   public:
     mitkClassMacro(GeometryClipImageFilter, ImageToImageFilter);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       /**
       * Set the geometry to be used for clipping

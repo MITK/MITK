@@ -56,7 +56,8 @@ namespace mitk
 
   public:
     mitkClassMacro(FastMarchingTool, FeedbackContourTool);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /* typedefs for itk pipeline */
       typedef float InternalPixelType;

@@ -37,7 +37,7 @@ namespace berry {
 struct IMenuManager : public virtual IContributionManager, public IContributionItem
 {
 
-  berryObjectMacro(berry::IMenuManager)
+  berryObjectMacro(berry::IMenuManager);
 
   /**
    * Adds a menu listener to this menu.

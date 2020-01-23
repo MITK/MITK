@@ -34,7 +34,7 @@ class ExecutionEvent;
 struct BERRY_COMMANDS IHandler : public virtual Object
 {
 
-  berryObjectMacro(berry::IHandler)
+  berryObjectMacro(berry::IHandler);
 
   /**
    * Registers an instance of <code>IHandlerListener</code> to listen for

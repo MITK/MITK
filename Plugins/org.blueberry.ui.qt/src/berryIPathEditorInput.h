@@ -42,7 +42,7 @@ namespace berry {
  */
 struct BERRY_UI_QT IPathEditorInput : public IEditorInput {
 
-  berryObjectMacro(berry::IPathEditorInput)
+  berryObjectMacro(berry::IPathEditorInput);
 
   ~IPathEditorInput() override;
 

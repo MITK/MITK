@@ -40,8 +40,8 @@ namespace mitk {
  */
 class USNavigationExperimentLogging : public itk::Object {
 public:
-  mitkClassMacroItkParent(USNavigationExperimentLogging, itk::Object)
-  itkNewMacro(USNavigationExperimentLogging)
+  mitkClassMacroItkParent(USNavigationExperimentLogging, itk::Object);
+  itkNewMacro(USNavigationExperimentLogging);
 
   /**
    * \brief Clears the XML tree.
@@ -75,8 +75,8 @@ public:
   /**
    * \brief Only properties with this prefix are written into the output file.
    */
-  itkSetMacro(KeyPrefix, std::string)
-  itkGetMacro(KeyPrefix, std::string)
+  itkSetMacro(KeyPrefix, std::string);
+  itkGetMacro(KeyPrefix, std::string);
 
 protected:
   /**

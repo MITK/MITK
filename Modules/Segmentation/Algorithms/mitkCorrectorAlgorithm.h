@@ -40,7 +40,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(CorrectorAlgorithm, ImageToImageFilter);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       typedef mitk::Label::PixelType DefaultSegmentationDataType;
 

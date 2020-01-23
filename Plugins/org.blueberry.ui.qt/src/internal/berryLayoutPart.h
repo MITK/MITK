@@ -36,7 +36,7 @@ class LayoutPart : virtual public Object, public virtual ISizeProvider
 
 public:
 
-  berryObjectMacro(LayoutPart)
+  berryObjectMacro(LayoutPart);
 
 protected: ILayoutContainer* container;
 

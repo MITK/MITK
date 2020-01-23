@@ -56,7 +56,7 @@ struct IExtension;
 struct IExtensionPoint : public virtual Object
 {
 
-  berryObjectMacro(berry::IExtensionPoint)
+  berryObjectMacro(berry::IExtensionPoint);
 
   ~IExtensionPoint() override;
 

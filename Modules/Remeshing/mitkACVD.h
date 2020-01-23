@@ -68,9 +68,9 @@ namespace mitk
     {
     public:
       mitkClassMacro(RemeshFilter, SurfaceToSurfaceFilter);
-      itkFactorylessNewMacro(Self) itkCloneMacro(Self)
-
-        itkSetMacro(TimeStep, unsigned int);
+      itkFactorylessNewMacro(Self);
+      itkCloneMacro(Self);
+      itkSetMacro(TimeStep, unsigned int);
       itkSetMacro(NumVertices, int);
       itkSetMacro(Gradation, double);
       itkSetMacro(Subsampling, int);

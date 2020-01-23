@@ -25,7 +25,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(Ellipsoid, BoundingObject);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       mitk::ScalarType GetVolume() override;
     bool IsInside(const Point3D &p) const override;

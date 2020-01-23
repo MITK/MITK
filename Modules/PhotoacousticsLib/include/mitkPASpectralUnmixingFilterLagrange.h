@@ -22,8 +22,7 @@ namespace mitk {
     {
     public:
 
-      mitkClassMacro(SpectralUnmixingFilterLagrange, SpectralUnmixingFilterBase)
-        //itkFactorylessNewMacro(Self)
+      mitkClassMacro(SpectralUnmixingFilterLagrange, SpectralUnmixingFilterBase);
 
     protected:
       SpectralUnmixingFilterLagrange();

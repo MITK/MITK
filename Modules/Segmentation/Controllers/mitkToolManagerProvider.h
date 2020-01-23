@@ -57,7 +57,8 @@ namespace mitk
     friend class mitk::SegmentationModuleActivator;
 
   protected:
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       // hide everything
       ToolManagerProvider();

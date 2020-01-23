@@ -32,7 +32,9 @@ namespace mitk
   {
   public:
     mitkClassMacroItkParent(RenderWindow, itk::Object);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self) mitkNewMacro1Param(Self, vtkRenderWindow *);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
+    mitkNewMacro1Param(Self, vtkRenderWindow*);
     mitkNewMacro2Param(Self, vtkRenderWindow *, const char *);
 
     ~RenderWindow() override;

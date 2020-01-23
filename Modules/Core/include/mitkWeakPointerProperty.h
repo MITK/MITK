@@ -33,7 +33,10 @@ namespace mitk
   public:
     mitkClassMacro(WeakPointerProperty, BaseProperty);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self) mitkNewMacro1Param(WeakPointerProperty, itk::Object *);
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
+    mitkNewMacro1Param(WeakPointerProperty, itk::Object*);
 
     ~WeakPointerProperty() override;
 

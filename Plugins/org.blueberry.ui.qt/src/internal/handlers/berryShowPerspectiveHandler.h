@@ -30,7 +30,7 @@ class ShowPerspectiveHandler : public AbstractHandler
 
 public:
 
-  berryObjectMacro(ShowPerspectiveHandler)
+  berryObjectMacro(ShowPerspectiveHandler);
 
   Object::Pointer Execute(const ExecutionEvent::ConstPointer& event) override;
 

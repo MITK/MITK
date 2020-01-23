@@ -34,7 +34,7 @@ class PagePartSelectionTracker : public AbstractPartSelectionTracker
 {
 
 public:
-  berryObjectMacro(PagePartSelectionTracker)
+  berryObjectMacro(PagePartSelectionTracker);
 
 private:
 

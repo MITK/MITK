@@ -36,10 +36,8 @@ public:
     typedef double RealType;
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self)
-
-    /** Runtime information support. */
-    itkTypeMacro(IgnorePixelMaskGenerator, MaskGenerator)
+    itkNewMacro(Self); /** Runtime information support. */
+    itkTypeMacro(IgnorePixelMaskGenerator, MaskGenerator);
 
     /**
      * @brief The mask will be 0 there inputImage==pixelValue and 1 otherwise

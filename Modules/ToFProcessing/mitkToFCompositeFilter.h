@@ -42,9 +42,8 @@ namespace mitk
   public:
 
     mitkClassMacro( ToFCompositeFilter , ImageToImageFilter );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
     itkSetMacro(SegmentationMask,mitk::Image::Pointer);
     itkSetMacro(ApplyTemporalMedianFilter,bool);
     itkGetConstMacro(ApplyTemporalMedianFilter,bool);

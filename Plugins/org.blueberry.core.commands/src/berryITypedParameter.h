@@ -31,7 +31,7 @@ class ParameterType;
  */
 struct BERRY_COMMANDS ITypedParameter : public virtual Object {
 
-  berryObjectMacro(berry::ITypedParameter)
+  berryObjectMacro(berry::ITypedParameter);
 
   /**
    * Returns the {@link ParameterType} associated with a command parameter or

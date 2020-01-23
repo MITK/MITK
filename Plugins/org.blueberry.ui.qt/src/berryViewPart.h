@@ -82,7 +82,7 @@ protected:
 
 public:
 
-  berryObjectMacro(ViewPart, WorkbenchPart, IViewPart)
+  berryObjectMacro(ViewPart, WorkbenchPart, IViewPart);
 
   void Init(IViewSite::Pointer site, IMemento::Pointer memento = IMemento::Pointer(nullptr)) override;
 

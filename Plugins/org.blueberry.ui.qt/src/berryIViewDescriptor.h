@@ -42,7 +42,7 @@ namespace berry
 struct BERRY_UI_QT IViewDescriptor : public IWorkbenchPartDescriptor, public IAdaptable
 {
 
-  berryObjectMacro(berry::IViewDescriptor)
+  berryObjectMacro(berry::IViewDescriptor);
 
   ~IViewDescriptor() override;
 

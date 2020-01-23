@@ -31,9 +31,9 @@ namespace mitk
   class MITKCORE_EXPORT PointSetSource : public BaseDataSource
   {
   public:
-    mitkClassMacro(PointSetSource, BaseDataSource)
-
-      itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(PointSetSource, BaseDataSource);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
         typedef PointSet OutputType;
 

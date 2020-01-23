@@ -28,7 +28,7 @@ class RegistryObject : public KeyedElement
 
 public:
 
-  berryObjectMacro(berry::RegistryObject)
+  berryObjectMacro(berry::RegistryObject);
 
   RegistryObject();
 

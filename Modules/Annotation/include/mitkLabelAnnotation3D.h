@@ -56,7 +56,8 @@ namespace mitk
     };
 
     mitkClassMacro(LabelAnnotation3D, mitk::VtkAnnotation3D);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /** \brief Set the vector of labels that are shown to each corresponding point3D. The size has to be equal to the
          provided LabelCoordinates. */

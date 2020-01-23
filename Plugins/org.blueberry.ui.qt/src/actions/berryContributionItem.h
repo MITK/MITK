@@ -28,7 +28,7 @@ class BERRY_UI_QT ContributionItem : public IContributionItem
 
 public:
 
-  berryObjectMacro(ContributionItem)
+  berryObjectMacro(ContributionItem);
 
   enum Mode {
     DEFAULT = 0x00,

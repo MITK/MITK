@@ -40,7 +40,9 @@ namespace mitk
 
     mitkWriterMacro;
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       typedef mitk::PointSet InputType;
 

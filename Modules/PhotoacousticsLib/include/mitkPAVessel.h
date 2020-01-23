@@ -31,14 +31,14 @@ namespace mitk {
     class MITKPHOTOACOUSTICSLIB_EXPORT Vessel : public itk::LightObject
     {
     public:
-      mitkClassMacroItkParent(Vessel, itk::LightObject)
-        mitkNewMacro1Param(Self, VesselProperties::Pointer)
+      mitkClassMacroItkParent(Vessel, itk::LightObject);
+      mitkNewMacro1Param(Self, VesselProperties::Pointer);
 
-        /**
-         * Callback function definition of a VesselMeanderStrategy
-         */
-        typedef void (VesselMeanderStrategy::*CalculateNewVesselPositionCallback)
-        (Vector::Pointer, double, std::mt19937*);
+      /**
+        * Callback function definition of a VesselMeanderStrategy
+        */
+      typedef void (VesselMeanderStrategy::*CalculateNewVesselPositionCallback)
+      (Vector::Pointer, double, std::mt19937*);
 
       /**
        * @brief ExpandVessel makes this Vessel expand one step in its current direction.

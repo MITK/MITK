@@ -34,7 +34,9 @@ namespace mitk
   class MITKSEGMENTATION_EXPORT ContourModelInteractor : public DataInteractor
   {
   public:
-    mitkClassMacro(ContourModelInteractor, DataInteractor) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(ContourModelInteractor, DataInteractor);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /**
        * Here actions strings from the loaded state machine pattern are mapped to functions of

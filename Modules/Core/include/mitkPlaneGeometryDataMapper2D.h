@@ -48,7 +48,9 @@ namespace mitk
   public:
     mitkClassMacro(PlaneGeometryDataMapper2D, VtkMapper);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       virtual const mitk::PlaneGeometryData *GetInput() const;
 

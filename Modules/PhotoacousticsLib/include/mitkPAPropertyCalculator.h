@@ -25,8 +25,8 @@ namespace mitk {
     {
     public:
 
-      mitkClassMacroItkParent(PropertyCalculator, itk::LightObject)
-        itkFactorylessNewMacro(Self)
+      mitkClassMacroItkParent(PropertyCalculator, itk::LightObject);
+        itkFactorylessNewMacro(Self);
 
       struct Properties
       {

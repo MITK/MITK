@@ -32,7 +32,7 @@ namespace mitk {
     {
     public:
       mitkClassMacro(USImage, mitk::Image);
-      itkFactorylessNewMacro(Self)
+      itkFactorylessNewMacro(Self);
       itkCloneMacro(Self)
       /**
       * \brief this constructor creates an US Image identical to the recieved mitkImage. The Metadata are set to default.

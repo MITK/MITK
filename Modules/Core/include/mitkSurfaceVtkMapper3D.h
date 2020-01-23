@@ -76,9 +76,11 @@ namespace mitk
   public:
     mitkClassMacro(SurfaceVtkMapper3D, VtkMapper);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
 
-      itkSetMacro(GenerateNormals, bool);
+    itkCloneMacro(Self);
+
+    itkSetMacro(GenerateNormals, bool);
 
     itkGetMacro(GenerateNormals, bool);
 

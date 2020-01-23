@@ -47,9 +47,9 @@ class BaseGeometry;
 class USNavigationTargetUpdateFilter : public itk::Object
 {
 public:
-  mitkClassMacroItkParent(USNavigationTargetUpdateFilter, itk::Object)
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+  mitkClassMacroItkParent(USNavigationTargetUpdateFilter, itk::Object);
+  itkFactorylessNewMacro(Self);
+  itkCloneMacro(Self);
 
   /**
    * \brief Set the target surface for which the scores should be calculated.

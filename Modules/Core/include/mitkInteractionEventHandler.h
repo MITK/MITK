@@ -40,7 +40,7 @@ namespace mitk
   class MITKCORE_EXPORT InteractionEventHandler : public itk::Object
   {
   public:
-    mitkClassMacroItkParent(InteractionEventHandler, itk::Object)
+    mitkClassMacroItkParent(InteractionEventHandler, itk::Object);
 
       /**
        * @brief Loads a configuration from an XML resource.

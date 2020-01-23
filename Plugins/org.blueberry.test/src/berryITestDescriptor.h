@@ -23,7 +23,7 @@ namespace berry {
 
 struct ITestDescriptor : public Object
 {
-  berryObjectMacro(berry::ITestDescriptor)
+  berryObjectMacro(berry::ITestDescriptor);
 
   virtual CppUnit::Test* CreateTest() = 0;
   virtual QString GetId() const = 0;

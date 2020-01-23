@@ -32,7 +32,7 @@ namespace berry {
 struct BERRY_UI_QT IEditorMatchingStrategy : public Object
 {
 
-  berryObjectMacro(berry::IEditorMatchingStrategy)
+  berryObjectMacro(berry::IEditorMatchingStrategy);
 
   ~IEditorMatchingStrategy() override;
 

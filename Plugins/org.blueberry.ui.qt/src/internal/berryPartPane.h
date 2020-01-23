@@ -39,7 +39,7 @@ class PartPane : public LayoutPart,
 {
 
 public:
-  berryObjectMacro(PartPane)
+  berryObjectMacro(PartPane);
 
   friend class PartSashContainer;
   friend class EditorSashContainer;

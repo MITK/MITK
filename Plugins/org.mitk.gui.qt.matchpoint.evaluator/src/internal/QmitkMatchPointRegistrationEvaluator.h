@@ -41,7 +41,7 @@ public:
   /**
   * Creates smartpointer typedefs
   */
-  berryObjectMacro(QmitkMatchPointRegistrationEvaluator)
+  berryObjectMacro(QmitkMatchPointRegistrationEvaluator);
 
   QmitkMatchPointRegistrationEvaluator();
   ~QmitkMatchPointRegistrationEvaluator() override;

@@ -58,7 +58,7 @@ PROJECT_LOGO           =
 # entered, it will be relative to the location where doxygen was started. If
 # left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = @MITK_DOXYGEN_OUTPUT_DIR@/Guides/Users_Guide/
+OUTPUT_DIRECTORY       = "@MITK_DOXYGEN_OUTPUT_DIR@/Guides/Users_Guide/"
 
 # If the CREATE_SUBDIRS tag is set to YES, then doxygen will create 4096 sub-
 # directories (in 2 levels) under the output directory of each output format and
@@ -855,9 +855,9 @@ EXAMPLE_RECURSIVE      = YES
 # that contain images that are to be included in the documentation (see the
 # \image command).
 
-IMAGE_PATH             = @MITK_SOURCE_DIR@/Documentation/Doxygen/UserManual/ \
-                         @MITK_SOURCE_DIR@/Plugins/ \
-                         @MITK_SOURCE_DIR@/Examples/Plugins/
+IMAGE_PATH             = "@MITK_SOURCE_DIR@/Documentation/Doxygen/UserManual/" \
+                         "@MITK_SOURCE_DIR@/Plugins/" \
+                         "@MITK_SOURCE_DIR@/Examples/Plugins/"
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program
@@ -2036,12 +2036,6 @@ EXTERNAL_GROUPS        = NO
 
 EXTERNAL_PAGES         = YES
 
-# The PERL_PATH should be the absolute path and name of the perl script
-# interpreter (i.e. the result of 'which perl').
-# The default file (with absolute path) is: /usr/bin/perl.
-
-PERL_PATH              = /usr/bin/perl
-
 #---------------------------------------------------------------------------
 # Configuration options related to the dot tool
 #---------------------------------------------------------------------------
@@ -2054,15 +2048,6 @@ PERL_PATH              = /usr/bin/perl
 # The default value is: YES.
 
 CLASS_DIAGRAMS         = YES
-
-# You can define message sequence charts within doxygen comments using the \msc
-# command. Doxygen will then run the mscgen tool (see:
-# http://www.mcternan.me.uk/mscgen/)) to produce the chart and insert it in the
-# documentation. The MSCGEN_PATH tag allows you to specify the directory where
-# the mscgen tool resides. If left empty the tool is assumed to be found in the
-# default search path.
-
-MSCGEN_PATH            =
 
 # You can include diagrams made with dia in doxygen documentation. Doxygen will
 # then run dia to produce the diagram and insert it in the documentation. The
@@ -2256,7 +2241,7 @@ INTERACTIVE_SVG        = NO
 # found. If left blank, it is assumed the dot tool can be found in the path.
 # This tag requires that the tag HAVE_DOT is set to YES.
 
-DOT_PATH               = @DOXYGEN_DOT_PATH@
+DOT_PATH               = "@DOXYGEN_DOT_PATH@"
 
 # The DOTFILE_DIRS tag can be used to specify one or more directories that
 # contain dot files that are included in the documentation (see the \dotfile

@@ -67,7 +67,7 @@ struct BERRY_UI_QT IEditorPart : public virtual IWorkbenchPart,
     public ISaveablePart
 {
 
-  berryObjectMacro(berry::IEditorPart, IWorkbenchPart, ISaveablePart)
+  berryObjectMacro(berry::IEditorPart, IWorkbenchPart, ISaveablePart);
 
   ~IEditorPart() override;
 

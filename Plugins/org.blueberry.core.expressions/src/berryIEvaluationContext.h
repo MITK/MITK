@@ -36,7 +36,7 @@ namespace berry {
 struct BERRY_EXPRESSIONS IEvaluationContext : public Object
 {
 
-  berryObjectMacro(berry::IEvaluationContext)
+  berryObjectMacro(berry::IEvaluationContext);
 
   /**
    * Represents the value used by variables that exist but are not defined

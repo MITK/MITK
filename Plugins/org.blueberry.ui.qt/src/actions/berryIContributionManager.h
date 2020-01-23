@@ -51,7 +51,7 @@ struct IContributionManagerOverrides;
 struct IContributionManager : public virtual Object
 {
 
-  berryObjectMacro(berry::IContributionManager)
+  berryObjectMacro(berry::IContributionManager);
 
   /**
    * Adds an action as a contribution item to this manager.

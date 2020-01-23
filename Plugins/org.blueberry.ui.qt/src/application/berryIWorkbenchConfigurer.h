@@ -38,7 +38,7 @@ namespace berry {
 struct BERRY_UI_QT IWorkbenchConfigurer : public Object
 {
 
-  berryObjectMacro(berry::IWorkbenchConfigurer)
+  berryObjectMacro(berry::IWorkbenchConfigurer);
 
   ~IWorkbenchConfigurer() override;
 

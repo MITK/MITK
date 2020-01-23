@@ -27,9 +27,9 @@ namespace mitk
     mitkClassMacro(StlVolumeTimeSeriesReader, FileSeriesReader);
 
     /** Method for creation through the object factory. */
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
-
-      itkSetStringMacro(FileName);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
+    itkSetStringMacro(FileName);
     itkGetStringMacro(FileName);
 
     itkSetStringMacro(FilePrefix);

@@ -27,7 +27,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(BinaryImageToLabelSetImageFilter, ImageToImageFilter);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     void SetInput(const InputImageType* image) override;
     void SetInput(unsigned int index, const InputImageType* image) override;

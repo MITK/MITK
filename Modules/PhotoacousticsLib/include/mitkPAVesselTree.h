@@ -30,19 +30,19 @@ namespace mitk {
     class MITKPHOTOACOUSTICSLIB_EXPORT VesselTree : public itk::LightObject
     {
     public:
-      mitkClassMacroItkParent(VesselTree, itk::LightObject)
-        mitkNewMacro1Param(Self, VesselProperties::Pointer)
+      mitkClassMacroItkParent(VesselTree, itk::LightObject);
+      mitkNewMacro1Param(Self, VesselProperties::Pointer);
 
-        /**
-         * @brief Step Performs a simulation step, in which all subvessels of this VesselTree are expanded.
-         *
-         * @param volume
-         * @param calculateNewPosition
-         * @param bendingFactor
-         */
-        void Step(InSilicoTissueVolume::Pointer volume,
-          Vessel::CalculateNewVesselPositionCallback calculateNewPosition,
-          double bendingFactor, std::mt19937* rng);
+      /**
+        * @brief Step Performs a simulation step, in which all subvessels of this VesselTree are expanded.
+        *
+        * @param volume
+        * @param calculateNewPosition
+        * @param bendingFactor
+        */
+      void Step(InSilicoTissueVolume::Pointer volume,
+        Vessel::CalculateNewVesselPositionCallback calculateNewPosition,
+        double bendingFactor, std::mt19937* rng);
 
       /**
        * @brief IsFinished

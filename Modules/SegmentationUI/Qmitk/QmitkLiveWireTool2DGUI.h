@@ -39,7 +39,8 @@ class MITKSEGMENTATIONUI_EXPORT QmitkLiveWireTool2DGUI : public QmitkToolGUI
 
 public:
   mitkClassMacro(QmitkLiveWireTool2DGUI, QmitkToolGUI);
-  itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+  itkFactorylessNewMacro(Self);
+  itkCloneMacro(Self);
 
     protected slots :
 

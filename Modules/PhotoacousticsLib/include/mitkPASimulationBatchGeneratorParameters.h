@@ -25,26 +25,27 @@ namespace mitk {
     class MITKPHOTOACOUSTICSLIB_EXPORT SimulationBatchGeneratorParameters : public itk::Object
     {
     public:
-      mitkClassMacroItkParent(SimulationBatchGeneratorParameters, itk::Object)
-        itkFactorylessNewMacro(Self)
+      mitkClassMacroItkParent(SimulationBatchGeneratorParameters, itk::Object);
+        itkFactorylessNewMacro(Self);
+        itkSetMacro(VolumeIndex, unsigned int);
+        itkSetMacro(NrrdFilePath, std::string);
+        itkSetMacro(TissueName, std::string);
+        itkSetMacro(BinaryPath, std::string);
+        itkSetMacro(NumberOfPhotons, long);
+        itkSetMacro(YOffsetLowerThresholdInCentimeters, double);
+        itkSetMacro(YOffsetUpperThresholdInCentimeters, double);
+        itkSetMacro(YOffsetStepInCentimeters, double);
+        itkGetMacro(VolumeIndex, unsigned int);
 
-        itkSetMacro(VolumeIndex, unsigned int)
-        itkSetMacro(NrrdFilePath, std::string)
-        itkSetMacro(TissueName, std::string)
-        itkSetMacro(BinaryPath, std::string)
-        itkSetMacro(NumberOfPhotons, long)
-        itkSetMacro(YOffsetLowerThresholdInCentimeters, double)
-        itkSetMacro(YOffsetUpperThresholdInCentimeters, double)
-        itkSetMacro(YOffsetStepInCentimeters, double)
+        itkGetMacro(NrrdFilePath, std::string);
 
-        itkGetMacro(VolumeIndex, unsigned int)
-        itkGetMacro(NrrdFilePath, std::string)
-        itkGetMacro(TissueName, std::string)
-        itkGetMacro(BinaryPath, std::string)
-        itkGetMacro(NumberOfPhotons, long)
-        itkGetMacro(YOffsetLowerThresholdInCentimeters, double)
-        itkGetMacro(YOffsetUpperThresholdInCentimeters, double)
-        itkGetMacro(YOffsetStepInCentimeters, double)
+        itkGetMacro(TissueName, std::string);
+
+        itkGetMacro(BinaryPath, std::string);
+        itkGetMacro(NumberOfPhotons, long);
+        itkGetMacro(YOffsetLowerThresholdInCentimeters, double);
+        itkGetMacro(YOffsetUpperThresholdInCentimeters, double);
+        itkGetMacro(YOffsetStepInCentimeters, double);
 
     protected:
       SimulationBatchGeneratorParameters();

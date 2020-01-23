@@ -45,7 +45,7 @@ namespace mitk
   public:
 
     mitkClassMacroItkParent(ClaronInterface,itk::Object);
-    itkFactorylessNewMacro(Self)
+    itkFactorylessNewMacro(Self);
     itkCloneMacro(Self)
     /**
     * \brief Initialization of claroninterface.

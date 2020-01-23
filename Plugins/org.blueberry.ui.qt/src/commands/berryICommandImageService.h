@@ -52,7 +52,7 @@ namespace berry {
 struct BERRY_UI_QT ICommandImageService : public IDisposable
 {
 
-  berryObjectMacro(berry::ICommandImageService)
+  berryObjectMacro(berry::ICommandImageService);
 
   /**
    * The default image style. This is provided when no style is requested or

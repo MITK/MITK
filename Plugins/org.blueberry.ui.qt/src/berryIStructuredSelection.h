@@ -30,7 +30,7 @@ struct BERRY_UI_QT IStructuredSelection : public ISelection {
   typedef ObjectList<Object::Pointer> ContainerType;
   typedef ContainerType::const_iterator iterator;
 
-  berryObjectMacro(berry::IStructuredSelection)
+  berryObjectMacro(berry::IStructuredSelection);
 
   /**
    * Returns the first element in this selection, or <code>null</code>

@@ -34,8 +34,8 @@ namespace mitk {
  */
 class USNavigationStepTimer : public itk::Object {
 public:
-  mitkClassMacroItkParent(USNavigationStepTimer, itk::Object)
-  itkNewMacro(USNavigationStepTimer)
+  mitkClassMacroItkParent(USNavigationStepTimer, itk::Object);
+  itkNewMacro(USNavigationStepTimer);
 
   /**
    * \brief Stops the timer for the current index.

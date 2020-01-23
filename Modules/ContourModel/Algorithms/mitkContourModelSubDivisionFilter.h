@@ -36,7 +36,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(ContourModelSubDivisionFilter, ContourModelSource);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       typedef ContourModel OutputType;
     typedef OutputType::Pointer OutputTypePointer;

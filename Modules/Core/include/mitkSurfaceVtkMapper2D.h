@@ -58,7 +58,9 @@ namespace mitk
   public:
     mitkClassMacro(SurfaceVtkMapper2D, VtkMapper);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       virtual const mitk::Surface *GetInput() const;
 

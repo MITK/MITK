@@ -32,7 +32,7 @@ class ShowInContext;
 struct IShowInTarget : public virtual Object
 {
 
-  berryObjectMacro(berry::IShowInTarget)
+  berryObjectMacro(berry::IShowInTarget);
 
   /**
    * Shows the given context in this target.

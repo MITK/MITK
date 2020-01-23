@@ -37,7 +37,8 @@ namespace mitk
 
     // Macros
     mitkClassMacro(ExampleDataStructure, BaseData);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       ////////////////// Interface ///////////////////
 

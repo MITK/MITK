@@ -39,7 +39,7 @@ class BERRY_UI_QT Event: public Object
 
 public:
 
-  berryObjectMacro(Event)
+  berryObjectMacro(Event);
 
   Event();
 

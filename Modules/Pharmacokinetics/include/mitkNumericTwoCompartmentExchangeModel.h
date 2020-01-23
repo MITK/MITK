@@ -47,11 +47,11 @@ namespace mitk
 
 
     /** Method for creation through the object factory. */
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     /** Run-time type information (and related methods). */
-    itkTypeMacro(NumericTwoCompartmentExchangeModel, ModelBase)
+    itkTypeMacro(NumericTwoCompartmentExchangeModel, ModelBase);
 
     typedef std::vector<double> state_type;
 

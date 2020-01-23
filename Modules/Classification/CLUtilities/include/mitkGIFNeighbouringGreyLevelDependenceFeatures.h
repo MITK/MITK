@@ -116,9 +116,9 @@ namespace mitk
   class MITKCLUTILITIES_EXPORT GIFNeighbouringGreyLevelDependenceFeature : public AbstractGlobalImageFeature
   {
     public:
-      mitkClassMacro(GIFNeighbouringGreyLevelDependenceFeature, AbstractGlobalImageFeature)
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+      mitkClassMacro(GIFNeighbouringGreyLevelDependenceFeature, AbstractGlobalImageFeature);
+      itkFactorylessNewMacro(Self);
+      itkCloneMacro(Self);
 
       GIFNeighbouringGreyLevelDependenceFeature();
 

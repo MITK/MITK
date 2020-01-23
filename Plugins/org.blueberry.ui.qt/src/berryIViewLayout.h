@@ -33,7 +33,7 @@ namespace berry {
 struct BERRY_UI_QT IViewLayout : public Object
 {
 
-  berryObjectMacro(berry::IViewLayout)
+  berryObjectMacro(berry::IViewLayout);
 
    ~IViewLayout() override;
 

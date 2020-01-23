@@ -47,7 +47,9 @@ public:
    */
   mitkClassMacro(QmitkAdaptiveRegionGrowingToolGUI, QmitkToolGUI);
 
-  itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+  itkFactorylessNewMacro(Self);
+
+  itkCloneMacro(Self);
 
     QmitkAdaptiveRegionGrowingToolGUI(QWidget *parent = nullptr);
 

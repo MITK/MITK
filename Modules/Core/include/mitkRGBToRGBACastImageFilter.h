@@ -35,7 +35,9 @@ namespace mitk
   public:
     mitkClassMacro(RGBToRGBACastImageFilter, ImageToImageFilter);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       /** Static convenience method to check if the passed mitk::Image is
        * an RGB image in the sense of this converter filter.

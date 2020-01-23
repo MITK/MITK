@@ -35,11 +35,13 @@ namespace itk
 
     void SetImageMask(TMaskImageType * maskimage);
 
-    itkSetMacro(InnerScale,double)
-      itkGetMacro(InnerScale,double)
+    itkSetMacro(InnerScale,double);
 
-      itkSetMacro(OuterScale,double)
-      itkGetMacro(OuterScale,double)
+    itkGetMacro(InnerScale,double);
+
+    itkSetMacro(OuterScale,double);
+
+    itkGetMacro(OuterScale,double);
 
   private:
 

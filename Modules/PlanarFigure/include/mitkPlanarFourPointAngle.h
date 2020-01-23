@@ -30,7 +30,9 @@ namespace mitk
   public:
     mitkClassMacro(PlanarFourPointAngle, PlanarFigure);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self) public :
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self) public :
       // Feature identifiers
       const unsigned int FEATURE_ID_ANGLE;
 

@@ -65,8 +65,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(GIFNeighbourhoodGreyToneDifferenceFeatures, AbstractGlobalImageFeature);
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+      itkFactorylessNewMacro(Self);
+      itkCloneMacro(Self);
 
       GIFNeighbourhoodGreyToneDifferenceFeatures();
 

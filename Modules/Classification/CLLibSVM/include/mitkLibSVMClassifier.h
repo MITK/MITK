@@ -31,9 +31,11 @@ namespace mitk
   {
   public:
 
-    mitkClassMacro(LibSVMClassifier,AbstractClassifier)
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    mitkClassMacro(LibSVMClassifier,AbstractClassifier);
+
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
     LibSVMClassifier();
     ~LibSVMClassifier() override;

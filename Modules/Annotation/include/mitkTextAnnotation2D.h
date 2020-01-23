@@ -51,7 +51,8 @@ namespace mitk
     };
 
     mitkClassMacro(TextAnnotation2D, mitk::VtkAnnotation2D);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       Annotation::Bounds GetBoundsOnDisplay(BaseRenderer *renderer) const override;
     void SetBoundsOnDisplay(BaseRenderer *renderer, const Bounds &bounds) override;

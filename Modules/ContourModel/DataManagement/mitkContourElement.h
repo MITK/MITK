@@ -36,7 +36,9 @@ namespace mitk
   public:
     mitkClassMacroItkParent(ContourElement, itk::LightObject);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       // Data container representing vertices
 

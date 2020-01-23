@@ -32,9 +32,11 @@ namespace mitk
   class MITKCORE_EXPORT DataNodeSource : public itk::ProcessObject
   {
   public:
-    mitkClassMacroItkParent(DataNodeSource, itk::ProcessObject)
+    mitkClassMacroItkParent(DataNodeSource, itk::ProcessObject);
 
-      itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+      itkFactorylessNewMacro(Self);
+
+      itkCloneMacro(Self);
 
         typedef mitk::DataNode OutputType;
 

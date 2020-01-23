@@ -28,8 +28,8 @@ namespace mitk {
     class MITKPHOTOACOUSTICSLIB_EXPORT InSilicoTissueVolume : public itk::LightObject
     {
     public:
-      mitkClassMacroItkParent(InSilicoTissueVolume, itk::LightObject)
-      mitkNewMacro2Param(Self, TissueGeneratorParameters::Pointer, std::mt19937*)
+      mitkClassMacroItkParent(InSilicoTissueVolume, itk::LightObject);
+      mitkNewMacro2Param(Self, TissueGeneratorParameters::Pointer, std::mt19937*);
 
       enum SegmentationType
       {

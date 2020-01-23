@@ -53,7 +53,7 @@ class BERRY_UI_QT ActionBarAdvisor : public Object
 
 public:
 
-  berryObjectMacro(berry::ActionBarAdvisor)
+  berryObjectMacro(berry::ActionBarAdvisor);
 
   enum FillType {
     /**

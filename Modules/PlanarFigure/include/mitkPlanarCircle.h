@@ -29,7 +29,9 @@ namespace mitk
   public:
     mitkClassMacro(PlanarCircle, PlanarFigure);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       /** \brief Place figure in its minimal configuration (a point at least)
        * onto the given 2D geometry.

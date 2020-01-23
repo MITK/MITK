@@ -33,9 +33,11 @@ namespace mitk
   public:
     mitkClassMacro(VtkInterpolationProperty, EnumerationProperty);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
 
-      mitkNewMacro1Param(VtkInterpolationProperty, const IdType &);
+    itkCloneMacro(Self);
+
+    mitkNewMacro1Param(VtkInterpolationProperty, const IdType &);
 
     mitkNewMacro1Param(VtkInterpolationProperty, const std::string &);
 

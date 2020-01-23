@@ -75,9 +75,9 @@ namespace mitk
      * a DataInteractor is set on this DataNode.
      */
     itkEventMacro(InteractorChangedEvent, itk::AnyEvent)
-    mitkClassMacroItkParent(DataNode, itk::DataObject)
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    mitkClassMacroItkParent(DataNode, itk::DataObject);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     // IPropertyProvider
     BaseProperty::ConstPointer GetConstProperty(const std::string &propertyKey, const std::string &contextName = "", bool fallBackOnDefaultContext = true) const override;

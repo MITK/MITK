@@ -32,7 +32,7 @@ namespace berry {
 struct BERRY_UI_QT IShellProvider : public virtual Object
 {
 
-  berryObjectMacro(berry::IShellProvider, Object)
+  berryObjectMacro(berry::IShellProvider, Object);
 
   ~IShellProvider() override;
 

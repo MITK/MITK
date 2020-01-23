@@ -32,9 +32,9 @@ namespace mitk
   class MITKCORE_EXPORT DisplayActionEventBroadcast : public EventStateMachine, public InteractionEventObserver
   {
   public:
-    mitkClassMacro(DisplayActionEventBroadcast, EventStateMachine)
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    mitkClassMacro(DisplayActionEventBroadcast, EventStateMachine);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     /**
     * By this function this observer is notified about about every 'InteractionEvent'.

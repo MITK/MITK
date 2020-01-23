@@ -44,7 +44,7 @@ class HandlerActivation : public EvaluationResultCache, public IHandlerActivatio
 
 public:
 
-  berryObjectMacro(berry::HandlerActivation)
+  berryObjectMacro(berry::HandlerActivation);
 
 private:
 

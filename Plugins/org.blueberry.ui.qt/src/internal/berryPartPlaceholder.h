@@ -26,7 +26,7 @@ class PartPlaceholder : public LayoutPart {
 
 public:
 
-  berryObjectMacro(PartPlaceholder)
+  berryObjectMacro(PartPlaceholder);
 
     /**
      * Placeholder ids may contain wildcards.  This is the wildcard string.

@@ -77,7 +77,7 @@ protected:
 
 public:
 
-  berryObjectMacro(berry::Extension)
+  berryObjectMacro(berry::Extension);
 
   Extension(ExtensionRegistry* registry, bool persist);
 

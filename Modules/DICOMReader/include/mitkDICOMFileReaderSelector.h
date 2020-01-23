@@ -45,8 +45,8 @@ class MITKDICOMREADER_EXPORT DICOMFileReaderSelector : public itk::LightObject
 
     typedef std::list<DICOMFileReader::Pointer> ReaderList;
 
-    mitkClassMacroItkParent( DICOMFileReaderSelector, itk::LightObject )
-    itkNewMacro( DICOMFileReaderSelector )
+    mitkClassMacroItkParent( DICOMFileReaderSelector, itk::LightObject );
+    itkNewMacro( DICOMFileReaderSelector );
 
     /// \brief Add a configuration as expected by DICOMReaderConfigurator.
     /// Configs can only be reset by instantiating a new DICOMFileReaderSelector.

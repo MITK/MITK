@@ -37,7 +37,7 @@ private:
 
 public:
 
-  berryObjectMacro(berry::RegistryIndexElement)
+  berryObjectMacro(berry::RegistryIndexElement);
 
   RegistryIndexElement(const QString& key);
 

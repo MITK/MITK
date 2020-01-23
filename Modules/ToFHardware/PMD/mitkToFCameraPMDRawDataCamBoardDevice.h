@@ -31,7 +31,8 @@ namespace mitk
 
     mitkClassMacro( ToFCameraPMDRawDataCamBoardDevice , ToFCameraPMDRawDataDevice );
 
-    itkFactorylessNewMacro(Self)
+    itkFactorylessNewMacro(Self);
+
     itkCloneMacro(Self)
     /*!
     \brief set a BaseProperty

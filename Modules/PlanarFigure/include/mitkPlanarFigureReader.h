@@ -35,7 +35,9 @@ namespace mitk
   public:
     mitkClassMacro(PlanarFigureReader, FileReader);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       /**
        * @brief Sets the filename of the file to be read

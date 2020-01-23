@@ -70,8 +70,9 @@ class MITKDICOMREADER_EXPORT DICOMTagBasedSorter : public DICOMDatasetSorter
         unsigned int m_Precision;
     };
 
-    mitkClassMacro( DICOMTagBasedSorter, DICOMDatasetSorter )
-    itkNewMacro( DICOMTagBasedSorter )
+    mitkClassMacro( DICOMTagBasedSorter, DICOMDatasetSorter );
+
+    itkNewMacro( DICOMTagBasedSorter );
 
     /**
       \brief Datasets that differ in given tag's value will be sorted into separate outputs.

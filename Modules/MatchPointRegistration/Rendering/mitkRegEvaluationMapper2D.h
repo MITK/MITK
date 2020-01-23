@@ -59,8 +59,8 @@ public:
   mitkClassMacro( RegEvaluationMapper2D,VtkMapper );
 
   /** Method for creation through the object factory. */
-  itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+  itkFactorylessNewMacro(Self);
+  itkCloneMacro(Self);
 
   const mitk::DataNode* GetTargetNode(void);
   const mitk::DataNode* GetMovingNode(void);

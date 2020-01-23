@@ -48,9 +48,9 @@ namespace mitk
   {
   public:
     mitkClassMacroItkParent(Stepper, itk::Object);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
-
-      itkGetConstMacro(Pos, unsigned int);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
+    itkGetConstMacro(Pos, unsigned int);
 
     virtual void SetPos(unsigned int pos)
     {

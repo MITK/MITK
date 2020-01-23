@@ -36,7 +36,8 @@ namespace mitk
   {
   public:
     mitkClassMacroItkParent(CompressedImageContainer, itk::Object);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /**
        * \brief Creates a compressed version of the image.

@@ -36,7 +36,7 @@ private:
 
 public:
 
-  berryObjectMacro(DetachedPlaceHolder)
+  berryObjectMacro(DetachedPlaceHolder);
 
     /**
      * DetachedPlaceHolder constructor comment.

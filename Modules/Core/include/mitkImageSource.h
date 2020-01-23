@@ -36,10 +36,11 @@ namespace mitk
   class MITKCORE_EXPORT ImageSource : public BaseDataSource
   {
   public:
-    mitkClassMacro(ImageSource, BaseDataSource)
+    mitkClassMacro(ImageSource, BaseDataSource);
 
       /** @brief Method for creation through the object factory. */
-      itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+      itkFactorylessNewMacro(Self);
+      itkCloneMacro(Self);
 
       /** @brief Some convenient typedefs. */
       typedef mitk::Image OutputImageType;

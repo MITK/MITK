@@ -60,9 +60,9 @@ namespace mitk
     ColorProperty(const mitk::Color &color);
 
   public:
-    mitkClassMacro(ColorProperty, BaseProperty)
-
-      itkFactorylessNewMacro(Self) itkCloneMacro(Self) mitkNewMacro1Param(ColorProperty, const float *);
+    mitkClassMacro(ColorProperty, BaseProperty);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self) mitkNewMacro1Param(ColorProperty, const float *);
     mitkNewMacro1Param(ColorProperty, const mitk::Color &);
     mitkNewMacro3Param(ColorProperty, const float, const float, const float);
 

@@ -33,7 +33,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(LookupTablePropertySerializer, BasePropertySerializer);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /**
         \brief Serializes given BaseData object.

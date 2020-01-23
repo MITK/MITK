@@ -40,7 +40,7 @@ More information regarding implementing IO and MimeTypes is available at \ref Re
 
 \note{ You do not need to create your own class to manage your MimeTypes. Instead they can be defined within the Reader/Writer. }
 
-\section NewDataTypePageAddingReadersAndWriters Adding a mapper
+\section NewDataTypePageAddingMappers Adding a mapper
 
 If your data type needs a special way to render its data for the user, you need to implement a new mapper. More information can be found at \ref QVTKRendering.
 

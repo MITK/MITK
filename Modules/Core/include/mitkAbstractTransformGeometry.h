@@ -46,7 +46,9 @@ namespace mitk
   public:
     mitkClassMacro(AbstractTransformGeometry, PlaneGeometry);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       //##Documentation
       //## @brief Get the vtkAbstractTransform (stored in m_VtkAbstractTransform)

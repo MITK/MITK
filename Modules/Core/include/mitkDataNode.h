@@ -19,15 +19,8 @@ found in the LICENSE file.
 #include "mitkIdentifiable.h"
 #include "mitkIPropertyOwner.h"
 
-#ifdef MBI_NO_STD_NAMESPACE
-#define MBI_STD
-#include <fstream.h>
-#include <iostream.h>
-#else
-#define MBI_STD std
 #include <fstream>
 #include <iostream>
-#endif
 
 #include "mitkColorProperty.h"
 #include "mitkPropertyList.h"
@@ -598,17 +591,8 @@ namespace mitk
     unsigned long m_PropertyListModifiedObserverTag;
   };
 
-#if (_MSC_VER > 1200) || !defined(_MSC_VER)
-  MITKCORE_EXPORT MBI_STD::istream &operator>>(MBI_STD::istream &i, DataNode::Pointer &dtn);
-
-  MITKCORE_EXPORT MBI_STD::ostream &operator<<(MBI_STD::ostream &o, DataNode::Pointer &dtn);
-#endif
+  MITKCORE_EXPORT std::istream &operator>>(std::istream &i, DataNode::Pointer &dtn);
+  MITKCORE_EXPORT std::ostream &operator<<(std::ostream &o, DataNode::Pointer &dtn);
 } // namespace mitk
-
-#if ((defined(_MSC_VER)) && (_MSC_VER <= 1200))
-MITKCORE_EXPORT MBI_STD::istream &operator>>(MBI_STD::istream &i, mitk::DataNode::Pointer &dtn);
-
-MITKCORE_EXPORT MBI_STD::ostream &operator<<(MBI_STD::ostream &o, mitk::DataNode::Pointer &dtn);
-#endif
 
 #endif /* DATATREENODE_H_HEADER_INCLUDED_C1E14338 */

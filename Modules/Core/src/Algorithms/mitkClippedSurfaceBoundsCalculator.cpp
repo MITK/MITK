@@ -78,7 +78,7 @@ void mitk::ClippedSurfaceBoundsCalculator::SetInput(const mitk::BaseGeometry *ge
   }
 }
 
-void mitk::ClippedSurfaceBoundsCalculator::SetInput(const std::vector<mitk::Point3D> pointlist, mitk::Image *image)
+void mitk::ClippedSurfaceBoundsCalculator::SetInput(const PointListType pointlist, mitk::Image *image)
 {
   if (!pointlist.empty() && image)
   {

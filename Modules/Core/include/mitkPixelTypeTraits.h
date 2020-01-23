@@ -71,8 +71,7 @@ namespace mitk
     static const bool value = false;
   };
 
-/** \def DEFINE_TYPE_PRIMITIVE macro which provides a partial specialization for the \sa isPrimitiveType
-  object */
+/** \brief Provides a partial specialization for the \sa isPrimitiveType object */
 #define DEFINE_TYPE_PRIMITIVE(_TYPEIN)                                                                                 \
   template <>                                                                                                          \
   struct isPrimitiveType<_TYPEIN>                                                                                      \

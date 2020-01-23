@@ -112,9 +112,9 @@ void mitk::GeometryClipImageFilter::GenerateOutputInformation()
 }
 
 template <typename TPixel, unsigned int VImageDimension>
-void mitk::_InternalComputeClippedImage(itk::Image<TPixel, VImageDimension> *inputItkImage,
-                                        mitk::GeometryClipImageFilter *geometryClipper,
-                                        const mitk::PlaneGeometry *clippingPlaneGeometry)
+void mitk::GeometryClipImageFilter::_InternalComputeClippedImage(itk::Image<TPixel, VImageDimension> *inputItkImage,
+                                                                 mitk::GeometryClipImageFilter *geometryClipper,
+                                                                 const mitk::PlaneGeometry *clippingPlaneGeometry)
 {
   typedef itk::Image<TPixel, VImageDimension> ItkInputImageType;
   typedef itk::Image<TPixel, VImageDimension> ItkOutputImageType;

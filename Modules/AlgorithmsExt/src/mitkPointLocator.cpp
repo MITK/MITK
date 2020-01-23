@@ -191,7 +191,7 @@ mitk::PointLocator::DistanceType mitk::PointLocator::GetMinimalDistance(mitk::Po
   return GetMinimalDistance(m_ANNQueryPoint);
 }
 
-mitk::PointLocator::DistanceType mitk::PointLocator::GetMinimalDistance(const ANNpoint &point)
+mitk::PointLocator::DistanceType mitk::PointLocator::GetMinimalDistance(const MyANNpoint &point)
 {
   if (!m_SearchTreeInitialized)
     return -1;

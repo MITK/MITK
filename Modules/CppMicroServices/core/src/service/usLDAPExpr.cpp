@@ -86,48 +86,6 @@ bool stricomp(const std::string::value_type& v1, const std::string::value_type& 
   return ::tolower(v1) == ::tolower(v2);
 }
 
-//! Contains the current parser position and parsing utility methods.
-class LDAPExpr::ParseState
-{
-
-private:
-
-  std::size_t m_pos;
-  std::string m_str;
-
-public:
-
-  ParseState(const std::string &str);
-
-  //! Move m_pos to remove the prefix \a pre
-  bool prefix(const std::string &pre);
-
-  /** Peek a char at m_pos
-  \note If index out of bounds, throw exception
-  */
-  LDAPExpr::Byte peek();
-
-  //! Increment m_pos by n
-  void skip(int n);
-
-  //! return string from m_pos until the end
-  std::string rest() const;
-
-  //! Move m_pos until there's no spaces
-  void skipWhite();
-
-  //! Get string until special chars. Move m_pos
-  std::string getAttributeName();
-
-  //! Get string and convert * to WILDCARD
-  std::string getAttributeValue();
-
-  //! Throw InvalidSyntaxException exception
-  void error(const std::string &m) const;
-
-};
-
-
 class LDAPExprData : public SharedData
 {
 public:

@@ -58,15 +58,15 @@ namespace mitk
   {
   public:
     mitkClassMacro(GIFIntensityVolumeHistogramFeatures, AbstractGlobalImageFeature);
-      itkFactorylessNewMacro(Self);
-      itkCloneMacro(Self);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
-      GIFIntensityVolumeHistogramFeatures();
+    GIFIntensityVolumeHistogramFeatures();
 
     /**
     * \brief Calculates the Cooccurence-Matrix based features for this class.
     */
-    FeatureListType CalculateFeatures(const Image::Pointer & image, const Image::Pointer &feature) override;
+    FeatureListType CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask) override;
 
     /**
     * \brief Returns a list of the names of all features that are calculated from this class
@@ -77,8 +77,6 @@ namespace mitk
     void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList) override;
 
     std::string GetCurrentFeatureEncoding() override;
-
-  private:
   };
 }
 #endif //mitkGIFIntensityVolumeHistogramFeatures_h

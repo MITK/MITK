@@ -24,95 +24,95 @@ found in the LICENSE file.
 // STL
 #include <limits>
 
-struct GIFIntensityVolumeHistogramFeaturesParameters
+namespace
 {
-  mitk::IntensityQuantifier::Pointer quantifier;
-  std::string prefix;
-};
-
-
-template<typename TPixel, unsigned int VImageDimension>
-static void
-CalculateIntensityPeak(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, GIFIntensityVolumeHistogramFeaturesParameters params, mitk::GIFIntensityVolumeHistogramFeatures::FeatureListType & featureList)
-{
-  typedef itk::Image<TPixel, VImageDimension> ImageType;
-  typedef itk::Image<unsigned short, VImageDimension> MaskType;
-
-  typename MaskType::Pointer itkMask = MaskType::New();
-  mitk::CastToItkImage(mask, itkMask);
-
-  mitk::IntensityQuantifier::Pointer quantifier = params.quantifier;
-  std::string prefix = params.prefix;
-
-  itk::ImageRegionConstIterator<ImageType> iter(itkImage, itkImage->GetLargestPossibleRegion());
-  itk::ImageRegionConstIterator<MaskType> iterMask(itkMask, itkMask->GetLargestPossibleRegion());
-
-  MITK_INFO << "Quantification: " << quantifier->GetMinimum() << " to " << quantifier->GetMaximum() << " with " << quantifier->GetBins()<< " bins";
-
-  iter.GoToBegin();
-  iterMask.GoToBegin();
-  std::vector<double> hist;
-  hist.resize(quantifier->GetBins() , 0);
-
-  int count = 0;
-  while (!iter.IsAtEnd())
+  struct GIFIntensityVolumeHistogramFeaturesParameters
   {
-    if (iterMask.Get() > 0)
-    {
-      double value = iter.Get();
-      //std::size_t index = std::floor((value - minimum) / (maximum - minimum) * (bins-1));
-      std::size_t index = quantifier->IntensityToIndex(value);
-      ++count;
-      hist[index] += 1.0;// / count;
-    }
-    ++iterMask;
-    ++iter;
-  }
+    mitk::IntensityQuantifier::Pointer quantifier;
+    std::string prefix;
+  };
 
-  bool notFoundIntenstiy010 = true;
-  bool notFoundIntenstiy090 = true;
-
-  double intensity010 = -1;
-  double intensity090 = -1;
-  double fraction = 0;
-  double auc = 0;
-  bool firstRound = true;
-  for (int i = quantifier->GetBins()-1; i >= 0; --i)
+  template<typename TPixel, unsigned int VImageDimension>
+  void CalculateIntensityPeak(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, GIFIntensityVolumeHistogramFeaturesParameters params, mitk::GIFIntensityVolumeHistogramFeatures::FeatureListType& featureList)
   {
-    hist[i] /= count;
-    hist[i] += fraction;
-    fraction = hist[i];
-    if (!firstRound)
-    {
-      auc += 0.5 * (hist[i] + hist[i+1]) / (quantifier->GetBins()-1);
-    }
-    firstRound = false;
+    typedef itk::Image<TPixel, VImageDimension> ImageType;
+    typedef itk::Image<unsigned short, VImageDimension> MaskType;
 
-    if (notFoundIntenstiy010 && fraction > 0.1)
+    typename MaskType::Pointer itkMask = MaskType::New();
+    mitk::CastToItkImage(mask, itkMask);
+
+    mitk::IntensityQuantifier::Pointer quantifier = params.quantifier;
+    std::string prefix = params.prefix;
+
+    itk::ImageRegionConstIterator<ImageType> iter(itkImage, itkImage->GetLargestPossibleRegion());
+    itk::ImageRegionConstIterator<MaskType> iterMask(itkMask, itkMask->GetLargestPossibleRegion());
+
+    MITK_INFO << "Quantification: " << quantifier->GetMinimum() << " to " << quantifier->GetMaximum() << " with " << quantifier->GetBins() << " bins";
+
+    iter.GoToBegin();
+    iterMask.GoToBegin();
+    std::vector<double> hist;
+    hist.resize(quantifier->GetBins(), 0);
+
+    int count = 0;
+    while (!iter.IsAtEnd())
     {
-      intensity010 = quantifier->IndexToMeanIntensity(i + 1);
-      notFoundIntenstiy010 = false;
+      if (iterMask.Get() > 0)
+      {
+        double value = iter.Get();
+        //std::size_t index = std::floor((value - minimum) / (maximum - minimum) * (bins-1));
+        std::size_t index = quantifier->IntensityToIndex(value);
+        ++count;
+        hist[index] += 1.0;// / count;
+      }
+      ++iterMask;
+      ++iter;
     }
-    if (notFoundIntenstiy090 && fraction > 0.9)
+
+    bool notFoundIntenstiy010 = true;
+    bool notFoundIntenstiy090 = true;
+
+    double intensity010 = -1;
+    double intensity090 = -1;
+    double fraction = 0;
+    double auc = 0;
+    bool firstRound = true;
+    for (int i = quantifier->GetBins() - 1; i >= 0; --i)
     {
-      intensity090 = quantifier->IndexToMeanIntensity(i + 1);
-      notFoundIntenstiy090 = false;
+      hist[i] /= count;
+      hist[i] += fraction;
+      fraction = hist[i];
+      if (!firstRound)
+      {
+        auc += 0.5 * (hist[i] + hist[i + 1]) / (quantifier->GetBins() - 1);
+      }
+      firstRound = false;
+
+      if (notFoundIntenstiy010 && fraction > 0.1)
+      {
+        intensity010 = quantifier->IndexToMeanIntensity(i + 1);
+        notFoundIntenstiy010 = false;
+      }
+      if (notFoundIntenstiy090 && fraction > 0.9)
+      {
+        intensity090 = quantifier->IndexToMeanIntensity(i + 1);
+        notFoundIntenstiy090 = false;
+      }
     }
+
+    unsigned int index010 = std::ceil(quantifier->GetBins() * 0.1);
+    unsigned int index090 = std::floor(quantifier->GetBins() * 0.9);
+
+    featureList.push_back(std::make_pair(prefix + "Volume fraction at 0.10 intensity", hist[index010]));
+    featureList.push_back(std::make_pair(prefix + "Volume fraction at 0.90 intensity", hist[index090]));
+    featureList.push_back(std::make_pair(prefix + "Intensity at 0.10 volume", intensity010));
+    featureList.push_back(std::make_pair(prefix + "Intensity at 0.90 volume", intensity090));
+    featureList.push_back(std::make_pair(prefix + "Difference volume fraction at 0.10 and 0.90 intensity", std::abs<double>(hist[index010] - hist[index090])));
+    featureList.push_back(std::make_pair(prefix + "Difference intensity at 0.10 and 0.90 volume", std::abs<double>(intensity090 - intensity010)));
+    featureList.push_back(std::make_pair(prefix + "Area under IVH curve", auc));
+    //featureList.push_back(std::make_pair("Local Intensity Global Intensity Peak", globalPeakValue));
   }
-
-  unsigned int index010 = std::ceil(quantifier->GetBins() * 0.1);
-  unsigned int index090 = std::floor(quantifier->GetBins() * 0.9);
-
-  featureList.push_back(std::make_pair(prefix + "Volume fraction at 0.10 intensity", hist[index010]));
-  featureList.push_back(std::make_pair(prefix + "Volume fraction at 0.90 intensity", hist[index090]));
-  featureList.push_back(std::make_pair(prefix + "Intensity at 0.10 volume", intensity010));
-  featureList.push_back(std::make_pair(prefix + "Intensity at 0.90 volume", intensity090));
-  featureList.push_back(std::make_pair(prefix + "Difference volume fraction at 0.10 and 0.90 intensity", std::abs<double>(hist[index010] - hist[index090])));
-  featureList.push_back(std::make_pair(prefix + "Difference intensity at 0.10 and 0.90 volume", std::abs<double>(intensity090 - intensity010)));
-  featureList.push_back(std::make_pair(prefix + "Area under IVH curve", auc));
-  //featureList.push_back(std::make_pair("Local Intensity Global Intensity Peak", globalPeakValue));
 }
-
 
 mitk::GIFIntensityVolumeHistogramFeatures::GIFIntensityVolumeHistogramFeatures()
 {

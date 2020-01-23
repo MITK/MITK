@@ -149,6 +149,8 @@ public:
 
   void setDisplayPositionInfo(bool positioninfo);
 
+  void setDirectionOnly(bool directiononly);
+
   void setSelectionMode(bool selection);
 
   void setAnnotationVisibility(std::vector<bool>& visibility);
@@ -165,6 +167,7 @@ protected:
   bool m_displayPatientInfo;
   bool m_displayPatientInfoEx;
   bool m_displayPositionInfo;
+  bool m_displayDirectionOnly;
 
   void UpdateAllWidgets();
   void HideAllWidgetToolbars();

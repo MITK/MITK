@@ -94,6 +94,7 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mit
   m_displayPatientInfo(true),
   m_displayPatientInfoEx(true),
   m_displayPositionInfo(true),
+  m_displayDirectionOnly(false),
   m_Name(name),
   m_ShadowWidgets{ nullptr, nullptr, nullptr, nullptr },
   m_ShadowWidgetVisible{ false, false, false, false }
@@ -1811,6 +1812,13 @@ void QmitkStdMultiWidget::setDisplayPositionInfo(bool positioninfo)
   m_ImageMTime = -1;
 }
 
+void QmitkStdMultiWidget::setDirectionOnly(bool directiononly)
+{
+  m_displayDirectionOnly = directiononly;
+  UpdateAnnotationFonts();
+  m_ImageMTime = -1;
+}
+
 void QmitkStdMultiWidget::setSelectionMode(bool selection)
 {
   m_MouseModeSwitcher->SetSelectionMode(selection);
@@ -1869,7 +1877,7 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
     };
 
     for (int i = 0; i < 3; i++) {
-      if (m_displayPositionInfo) {
+      if (m_displayPositionInfo && !m_displayDirectionOnly) {
         _infoStringStream[axisIndices[i]] << "Im: " << (p[i] + 1) << "/" << bounds[(i * 2 + 1)];
         if (timeSteps > 1) {
           _infoStringStream[axisIndices[i]] << "\nT: " << (timestep + 1) << "/" << timeSteps;
@@ -1899,6 +1907,7 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
       }
 
       setCornerAnnotationMaxText(2, axisIndices[i], maxPosText.c_str());
+      // Left Right annotiation
       setViewDirectionAnnontation(image, p[i], axisIndices[i]);
     }
 
@@ -1974,7 +1983,7 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
       char mi[3]; mi[2] = 0;
       char ss[3]; ss[2] = 0;
 
-      if (m_displayMetaInfo) {
+      if (m_displayMetaInfo && !m_displayDirectionOnly) {
         if (m_displayPatientInfo) {
           infoStringStream[0]
             << patient.c_str()
@@ -2004,7 +2013,7 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
         infoStringStream[0].clear();
       }
 
-      if (m_displayMetaInfo) {
+      if (m_displayMetaInfo && !m_displayDirectionOnly) {
         if (m_displayMetaInfoEx) {
           if (!magneticFieldStrength.empty()) {
             infoStringStream[1]

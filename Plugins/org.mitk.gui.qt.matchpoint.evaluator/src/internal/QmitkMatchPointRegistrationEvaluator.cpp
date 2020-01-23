@@ -45,7 +45,7 @@ const std::string QmitkMatchPointRegistrationEvaluator::HelperNodeName =
     "RegistrationEvaluationHelper";
 
 QmitkMatchPointRegistrationEvaluator::QmitkMatchPointRegistrationEvaluator()
-  : m_Parent(nullptr), m_activeEvaluation(false), m_autoMoving(false), m_autoTarget(false), m_currentSelectedTimeStep(0)
+  : m_Parent(nullptr), m_activeEvaluation(false), m_currentSelectedTimeStep(0)
 {
   m_currentSelectedPosition.Fill(0.0);
 }

@@ -102,8 +102,6 @@ private:
   itk::TimeStamp m_currentPositionTime;
 
   bool m_activeEvaluation;
-  bool m_autoMoving;
-  bool m_autoTarget;
 
   /** @brief currently valid selected position in the inspector*/
   mitk::Point3D m_currentSelectedPosition;

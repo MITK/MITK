@@ -62,6 +62,7 @@ public:
   void OnSettingsChanged(mitk::DataNode*);
 
   void OnSelectionChanged();
+  void OnNodeSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
   void OnRegistrationChanged();
 
@@ -74,9 +75,6 @@ public:
   void Error(QString msg);
 
 protected:
-  /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-    const QList<mitk::DataNode::Pointer>& nodes) override;
 
   void NodeRemoved(const mitk::DataNode* node) override;
 
@@ -105,6 +103,11 @@ private:
   * Updates the state of controls regarding to the state of the view and it objects.*/
   void ConfigureControls();
 
+  /**
+  Configure the node selectors predicates according to the selected algorithm.
+  */
+  void ConfigureNodePredicates();
+
   /** Initialize the state of the view, so the manipulation can start.*/
   void InitSession();
 
@@ -121,8 +124,6 @@ private:
   itk::TimeStamp m_currentPositionTime;
 
   bool m_activeManipulation;
-  bool m_autoMoving;
-  bool m_autoTarget;
 
   /** @brief currently valid selected position in the inspector*/
   mitk::Point3D m_currentSelectedPosition;

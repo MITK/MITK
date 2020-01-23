@@ -36,7 +36,7 @@ namespace Utilities
     ~ThreadPool();
 
     void Stop();
-    void Reset();
+    void Reset(size_t threadsCount=0);
 
     void AddThreads(size_t count);
 
@@ -70,7 +70,7 @@ namespace Utilities
     boost::optional<boost::asio::io_service::work> m_work;
     mutable boost::shared_mutex m_guard;
     size_t m_init_size;
-    boost::thread_group m_pool;
+    std::unique_ptr<boost::thread_group> m_pool;
     boost::system::error_code m_error;
 
     boost::shared_mutex m_queueGuard;

@@ -592,6 +592,29 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
   m_Initialized = true;
 }
 
+void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension, const unsigned int* dimensions, unsigned int channels, const Point3D& origin, const Matrix3D& matrix,
+  const Vector3D& spacing)
+{
+  Initialize(type, dimension, dimensions, channels);
+
+  // re-initialize PlaneGeometry with origin and direction
+  PlaneGeometry* planeGeometry = static_cast<PlaneGeometry*>(GetSlicedGeometry(0)->GetPlaneGeometry(0));
+  planeGeometry->SetOrigin(origin);
+  planeGeometry->GetIndexToWorldTransform()->SetMatrix(matrix);
+
+  // re-initialize SlicedGeometry3D
+  SlicedGeometry3D* slicedGeometry = GetSlicedGeometry(0);
+  slicedGeometry->InitializeEvenlySpaced(planeGeometry, m_Dimensions[2]);
+  slicedGeometry->SetSpacing(spacing);
+
+  // re-initialize TimeGeometry
+  ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
+  timeGeometry->Initialize(slicedGeometry, m_Dimensions[3]);
+  SetTimeGeometry(timeGeometry);
+
+  this->Initialize();
+}
+
 void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::BaseGeometry& geometry, unsigned int channels, int tDim )
 {
   mitk::ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();

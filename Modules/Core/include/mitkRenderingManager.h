@@ -183,6 +183,9 @@ public:
    */
   virtual void InitializeViewsByBoundingObjects(const DataStorage * );
 
+  /** Update geometry in previosly initialized windows (in case when the image was expanded)*/
+  bool UpdateGeometry(const mitk::TimeGeometry * dataGeometry);
+
   /** Gets the (global) SliceNavigationController responsible for
    * time-slicing. */
   const SliceNavigationController *GetTimeNavigationController() const;
@@ -360,7 +363,8 @@ protected:
 
   bool m_ConstrainedPanningZooming;
 
-private:
+  /** Prepare geometry for windows initialization */
+  static bool InitializeBoundingBox(TimeGeometry::ConstPointer& timeGeometry);
 
   void InternalViewInitialization(
       mitk::BaseRenderer *baseRenderer, const mitk::TimeGeometry *geometry,

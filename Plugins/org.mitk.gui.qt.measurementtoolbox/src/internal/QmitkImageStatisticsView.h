@@ -95,6 +95,7 @@ private:
 
   long m_PlanarFigureObserverTag;
   bool m_ForceRecompute = false;
+  bool m_IgnoreZeroValueVoxel = false;
   std::vector<mitk::DataNode::ConstPointer> m_selectedMaskNodes;
   std::vector<mitk::DataNode::ConstPointer> m_selectedImageNodes;
   std::vector<mitk::ImageStatisticsContainer::ConstPointer> m_StatisticsForSelection;

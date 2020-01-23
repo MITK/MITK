@@ -304,7 +304,7 @@ void mitk::SlicedData::SetGeometry(BaseGeometry *aGeometry3D)
   }
 }
 
-void mitk::SlicedData::SetSpacing(const ScalarType aSpacing[3])
+void mitk::SlicedData::SetSpacing(const ScalarType aSpacing[])
 {
   this->SetSpacing((mitk::Vector3D)aSpacing);
 }

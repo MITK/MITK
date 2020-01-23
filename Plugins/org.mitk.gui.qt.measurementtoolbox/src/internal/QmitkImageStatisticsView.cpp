@@ -360,10 +360,7 @@ void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
   {
     auto statistic = runnable->GetStatisticsData();
 
-    auto imageRule = mitk::StatisticsToImageRelationRule::New();
-    imageRule->Connect(statistic, image);
-
-    SetupRelationRules(statistic, mask);
+    SetupRelationRules(image, mask, statistic);
 
     // checks for existing statistic, and add it to data manager
     HandleExistingStatistics(image, mask, statistic);
@@ -396,7 +393,7 @@ void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
     }
     */
 
-    SetupRelationRules(statistic, mask);
+    SetupRelationRules(image, mask, statistic);
 
     HandleExistingStatistics(image, mask, statistic);
 
@@ -471,19 +468,6 @@ void QmitkImageStatisticsView::OnDialogSelectionChanged()
   CalculateOrGetMultiStatistics();
 }
 
-
-std::string QmitkImageStatisticsView::GenerateStatisticsNodeName()
-{
-  auto statisticsNodeName = m_selectedImageNode->GetName();
-  if (m_selectedMaskNode)
-  {
-    statisticsNodeName += "_" + m_selectedMaskNode->GetName();
-  }
-  statisticsNodeName += "_statistics";
-
-  return statisticsNodeName;
-}
-
 void QmitkImageStatisticsView::HandleExistingStatistics(mitk::Image::ConstPointer image,
                                                         mitk::BaseData::ConstPointer mask,
                                                         mitk::ImageStatisticsContainer::Pointer statistic)
@@ -499,15 +483,32 @@ void QmitkImageStatisticsView::HandleExistingStatistics(mitk::Image::ConstPointe
   // statistics base data does not exist: add new node
   else
   {
-    auto statisticsNodeName = GenerateStatisticsNodeName(); // ## ADD IMAGE AND MASK?
+    auto statisticsNodeName = GenerateStatisticsNodeName(image, mask);
     auto statisticsNode = mitk::CreateImageStatisticsNode(statistic, statisticsNodeName);
     GetDataStorage()->Add(statisticsNode);
   }
 }
 
-void QmitkImageStatisticsView::SetupRelationRules(mitk::ImageStatisticsContainer::Pointer statistic,
-                                                  mitk::BaseData::ConstPointer mask)
+std::string QmitkImageStatisticsView::GenerateStatisticsNodeName(mitk::Image::ConstPointer image,
+                                                                 mitk::BaseData::ConstPointer mask)
 {
+  auto statisticsNodeName = image->GetUID();
+  if (mask)
+  {
+    statisticsNodeName += "_" + mask->GetUID();
+  }
+  statisticsNodeName += "_statistics";
+
+  return statisticsNodeName;
+}
+
+void QmitkImageStatisticsView::SetupRelationRules(mitk::Image::ConstPointer image,
+                                                  mitk::BaseData::ConstPointer mask,
+                                                  mitk::ImageStatisticsContainer::Pointer statistic)
+{
+  auto imageRule = mitk::StatisticsToImageRelationRule::New();
+  imageRule->Connect(statistic, image);
+
   if (nullptr != mask)
   {
     auto maskRule = mitk::StatisticsToMaskRelationRule::New();
@@ -515,10 +516,9 @@ void QmitkImageStatisticsView::SetupRelationRules(mitk::ImageStatisticsContainer
   }
 }
 
-mitk::DataNode::Pointer QmitkImageStatisticsView::GetNodeForStatisticsContainer(
-  mitk::ImageStatisticsContainer::ConstPointer container)
+mitk::DataNode::Pointer QmitkImageStatisticsView::GetNodeForStatisticsContainer(mitk::ImageStatisticsContainer::ConstPointer container)
 {
-  if (!container)
+  if (container.IsNull())
   {
     mitkThrow() << "Given container is null!";
   }

@@ -77,12 +77,13 @@ protected:
 
 private:
 
-  std::string GenerateStatisticsNodeName();
-
-  void HandleExistingStatistics(mitk::Image::ConstPointer image, mitk::BaseData::ConstPointer mask,
+  void HandleExistingStatistics(mitk::Image::ConstPointer, mitk::BaseData::ConstPointer,
                                 mitk::ImageStatisticsContainer::Pointer);
 
-  void SetupRelationRules(mitk::ImageStatisticsContainer::Pointer, mitk::BaseData::ConstPointer mask);
+  std::string GenerateStatisticsNodeName(mitk::Image::ConstPointer, mitk::BaseData::ConstPointer);
+
+  void SetupRelationRules(mitk::Image::ConstPointer, mitk::BaseData::ConstPointer,
+                          mitk::ImageStatisticsContainer::Pointer);
 
   mitk::DataNode::Pointer GetNodeForStatisticsContainer(mitk::ImageStatisticsContainer::ConstPointer container);
 

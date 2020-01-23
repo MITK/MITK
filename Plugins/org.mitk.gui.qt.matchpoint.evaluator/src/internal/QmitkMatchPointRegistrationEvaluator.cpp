@@ -169,7 +169,7 @@ void QmitkMatchPointRegistrationEvaluator::CheckInputs()
 
       if (uidProp)
       {
-        //search for the moving node
+        //search for the target node
         mitk::NodePredicateDataProperty::Pointer predicate = mitk::NodePredicateDataProperty::New(mitk::Prop_UID,
           uidProp);
         mitk::DataNode::Pointer targetNode = this->GetDataStorage()->GetNode(predicate);
@@ -188,7 +188,7 @@ void QmitkMatchPointRegistrationEvaluator::OnNodeSelectionChanged(QList<mitk::Da
 {
   this->CheckInputs();
 	this->ConfigureControls();
-};
+}
 
 void QmitkMatchPointRegistrationEvaluator::NodeRemoved(const mitk::DataNode* node)
 {
@@ -244,7 +244,7 @@ void QmitkMatchPointRegistrationEvaluator::OnSliceChanged()
 void QmitkMatchPointRegistrationEvaluator::OnSettingsChanged(mitk::DataNode*)
 {
 	this->GetRenderWindowPart()->RequestUpdate();
-};
+}
 
 void QmitkMatchPointRegistrationEvaluator::OnEvalBtnPushed()
 {

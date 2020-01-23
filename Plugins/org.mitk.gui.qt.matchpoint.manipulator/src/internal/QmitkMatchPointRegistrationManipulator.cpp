@@ -190,7 +190,7 @@ void QmitkMatchPointRegistrationManipulator::CheckInputs()
           this->m_SelectedMovingNode = movingNode;
           QmitkSingleNodeSelectionWidget::NodeList selection({ movingNode });
           this->m_Controls.movingNodeSelector->SetCurrentSelection(selection);
-        }        this->m_SelectedMovingNode = this->GetDataStorage()->GetNode(predicate);
+        }
       }
     }
 
@@ -200,7 +200,7 @@ void QmitkMatchPointRegistrationManipulator::CheckInputs()
 
       if (uidProp)
       {
-        //search for the moving node
+        //search for the target node
         mitk::NodePredicateDataProperty::Pointer predicate = mitk::NodePredicateDataProperty::New(mitk::Prop_UID,
           uidProp);
         mitk::DataNode::Pointer targetNode = this->GetDataStorage()->GetNode(predicate);
@@ -219,13 +219,13 @@ void QmitkMatchPointRegistrationManipulator::OnSelectionChanged()
 {
   this->CheckInputs();
   this->ConfigureControls();
-};
+}
 
 void QmitkMatchPointRegistrationManipulator::OnNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/)
 {
   this->CheckInputs();
   this->ConfigureControls();
-};
+}
 
 void QmitkMatchPointRegistrationManipulator::NodeRemoved(const mitk::DataNode* node)
 {
@@ -318,7 +318,7 @@ void QmitkMatchPointRegistrationManipulator::InitSession()
   this->m_Controls.evalSettings->SetNode(this->m_EvalNode);
 
   this->m_activeManipulation = true;
-};
+}
 
 void QmitkMatchPointRegistrationManipulator::StopSession()
 {
@@ -334,7 +334,7 @@ void QmitkMatchPointRegistrationManipulator::StopSession()
   this->m_CurrentRegistration = nullptr;
   this->m_CurrentRegistrationWrapper = nullptr;
   m_Controls.manipulationWidget->Initialize();
-};
+}
 
 
 void QmitkMatchPointRegistrationManipulator::OnRegistrationChanged()
@@ -373,7 +373,7 @@ void QmitkMatchPointRegistrationManipulator::OnSliceChanged()
 void QmitkMatchPointRegistrationManipulator::OnSettingsChanged(mitk::DataNode*)
 {
 	this->GetRenderWindowPart()->RequestUpdate();
-};
+}
 
 void QmitkMatchPointRegistrationManipulator::OnStartBtnPushed()
 {
@@ -455,7 +455,7 @@ void QmitkMatchPointRegistrationManipulator::OnMapResultIsAvailable(mitk::BaseDa
     job->m_doGeometryRefinement, job->m_InterpolatorLabel);
   this->GetDataStorage()->Add(spMappedNode);
   this->GetRenderWindowPart()->RequestUpdate();
-};
+}
 
 void QmitkMatchPointRegistrationManipulator::OnCenterTypeChanged(int index)
 {
@@ -467,7 +467,7 @@ void QmitkMatchPointRegistrationManipulator::OnCenterTypeChanged(int index)
   }
   this->m_CurrentRegistrationWrapper->Modified();
   this->GetRenderWindowPart()->RequestUpdate();
-};
+}
 
 void QmitkMatchPointRegistrationManipulator::ConfigureTransformCenter(int centerType)
 {
@@ -489,4 +489,4 @@ void QmitkMatchPointRegistrationManipulator::ConfigureTransformCenter(int center
     m_Controls.manipulationWidget->SetCenterOfRotationIsRelativeToTarget(true);
     m_Controls.manipulationWidget->SetCenterOfRotation(m_currentSelectedPosition);
   }
-};
+}

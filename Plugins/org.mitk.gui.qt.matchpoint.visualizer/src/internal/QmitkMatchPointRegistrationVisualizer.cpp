@@ -626,7 +626,7 @@ void QmitkMatchPointRegistrationVisualizer::OnDirectionChanged(int)
 {
     this->CheckAndSetDefaultFOVRef();
     this->ConfigureVisualizationControls();
-};
+}
 
 void QmitkMatchPointRegistrationVisualizer::OnUpdateBtnPushed()
 {
@@ -660,7 +660,7 @@ void QmitkMatchPointRegistrationVisualizer::OnColorInterpolationChecked(bool che
         this->m_Controls->labelVecMagMedium->setText(QString(">"));
         this->m_Controls->labelVecMagLarge->setText(QString(">"));
     }
-};
+}
 
 mitk::ScalarType QmitkMatchPointRegistrationVisualizer::GetSaveSpacing(mitk::ScalarType gridRes,
     mitk::ScalarType spacing, unsigned int maxGridRes) const

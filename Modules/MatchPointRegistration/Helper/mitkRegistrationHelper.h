@@ -24,6 +24,7 @@ found in the LICENSE file.
 //MITK
 #include <mitkImage.h>
 #include <mitkDataNode.h>
+#include <mitkNodePredicateBase.h>
 
 //MITK
 #include "MitkMatchPointRegistrationExports.h"
@@ -60,6 +61,9 @@ public:
    @return true: node contains a MAPRegistrationWrapper. false: "node" does not point to a valid instance or does not contain
     a registration wrapper.*/;
   static bool IsRegNode(const mitk::DataNode* node);
+
+  /** Returns a node predicate that identifies registration nodes.*/
+  static NodePredicateBase::ConstPointer RegNodePredicate();
 
 private:
     typedef ::map::core::Registration<3,3>::DirectMappingType RegistrationKernel3DBase;

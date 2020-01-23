@@ -12,12 +12,14 @@ found in the LICENSE file.
 
 
 #include "mitkRegistrationHelper.h"
-
+#include <mitkNodePredicateDataType.h>
 //MatchPoint
 #include "mapRegistrationKernel.h"
 
 namespace mitk
 {
+  mitk::NodePredicateDataType::ConstPointer InternalRegNodePredicate = mitk::NodePredicateDataType::New(mitk::MAPRegistrationWrapper::GetStaticNameOfClass());
+
 
   MITKRegistrationHelper::Affine3DTransformType::Pointer
   MITKRegistrationHelper::
@@ -122,13 +124,12 @@ namespace mitk
   {
     if (!node) return false;
 
-    mitk::BaseData* data = node->GetData();
-
-    if (data != nullptr)
-    {
-      return std::string("MAPRegistrationWrapper").compare(data->GetNameOfClass()) == 0;
-    }
-
-    return false;
+    return InternalRegNodePredicate->CheckNode(node);
   }
+
+  NodePredicateBase::ConstPointer MITKRegistrationHelper::RegNodePredicate()
+  {
+    return InternalRegNodePredicate.GetPointer();
+  }
+
 }

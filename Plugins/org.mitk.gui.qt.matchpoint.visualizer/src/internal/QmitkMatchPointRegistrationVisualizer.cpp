@@ -129,8 +129,9 @@ void QmitkMatchPointRegistrationVisualizer::CreateQtPartControl(QWidget* parent)
 
 void QmitkMatchPointRegistrationVisualizer::ConfigureNodePredicates()
 {
+  m_Controls->registrationNodeSelector->SetNodePredicate(mitk::MITKRegistrationHelper::RegNodePredicate());
+
   mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New(mitk::Image::GetStaticNameOfClass());
-  mitk::NodePredicateDataType::Pointer isRegistration = mitk::NodePredicateDataType::New(mitk::MAPRegistrationWrapper::GetStaticNameOfClass());
 
   auto geometryCheck = [](const mitk::DataNode * node)
   {
@@ -138,10 +139,7 @@ void QmitkMatchPointRegistrationVisualizer::ConfigureNodePredicates()
   };
   mitk::NodePredicateFunction::Pointer hasGeometry = mitk::NodePredicateFunction::New(geometryCheck);
 
-  mitk::NodePredicateBase::Pointer nodePredicate = isRegistration;
-  m_Controls->registrationNodeSelector->SetNodePredicate(nodePredicate);
-
-  nodePredicate = mitk::NodePredicateAnd::New(isImage, hasGeometry);
+  mitk::NodePredicateBase::Pointer nodePredicate = mitk::NodePredicateAnd::New(isImage, hasGeometry);
   m_Controls->fovReferenceNodeSelector->SetNodePredicate(nodePredicate);
 }
 

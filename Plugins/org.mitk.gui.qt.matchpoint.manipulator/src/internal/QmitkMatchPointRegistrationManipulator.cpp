@@ -149,13 +149,11 @@ void QmitkMatchPointRegistrationManipulator::RenderWindowPartDeactivated(
 
 void QmitkMatchPointRegistrationManipulator::ConfigureNodePredicates()
 {
+  this->m_Controls.registrationNodeSelector->SetNodePredicate(mitk::MITKRegistrationHelper::RegNodePredicate());
+
   mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New(mitk::Image::GetStaticNameOfClass());
-  mitk::NodePredicateDataType::Pointer isRegistration = mitk::NodePredicateDataType::New(mitk::MAPRegistrationWrapper::GetStaticNameOfClass());
 
-  mitk::NodePredicateBase::Pointer nodePredicate = isRegistration;
-  this->m_Controls.registrationNodeSelector->SetNodePredicate(nodePredicate);
-
-  nodePredicate = isImage;
+  mitk::NodePredicateBase::Pointer nodePredicate = isImage;
   this->m_Controls.movingNodeSelector->SetNodePredicate(nodePredicate);
   this->m_Controls.targetNodeSelector->SetNodePredicate(nodePredicate);
 }

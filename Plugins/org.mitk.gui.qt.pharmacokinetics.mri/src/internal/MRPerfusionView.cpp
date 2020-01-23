@@ -1180,7 +1180,7 @@ mitk::Image::Pointer MRPerfusionView::ConvertConcentrationImage(bool AIFMode)
   {
     concentrationGen->SetFactor(m_Controls.factorSpinBox->value());
     concentrationGen->SetBaselineStartTimePoint(m_Controls.spinBox_baselineStartTimePoint->value());
-    concentrationGen->SetBaselineStartTimePoint(m_Controls.spinBox_baselineEndTimePoint->value());
+    concentrationGen->SetBaselineEndTimePoint(m_Controls.spinBox_baselineEndTimePoint->value());
   }
 
 

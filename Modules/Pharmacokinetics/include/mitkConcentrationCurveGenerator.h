@@ -117,16 +117,11 @@ protected:
     /** @brief Takes the 3D image of the first timepoint to set as baseline image*/
     void PrepareBaselineImage();
 
-
+    template<class TPixel>
+    void CalculateAverageBaselineImage(const itk::Image<TPixel,4> *itkBaselineImage);
 
     /** @brief loops over all timepoints, casts the current timepoint 3D mitk::image to itk and passes it to ConvertSignalToConcentrationCurve */
     virtual void Convert();
-
-
-    //template <typename TPixel1, unsigned int ImageDimension1, typename TPixel2, unsigned int VImageDimension2>
-    //void mitk::(itk::Image<TPixel1, VImageDimension1>* imageA, itk::Image<TPixel2, VImageDimension2>* imageB)
-    //{
-    //}
 
 
 private:

@@ -8,13 +8,14 @@
 #include "mitkModelBase.h"
 #include "mitkExtractTimeGrid.h"
 #include "mitkArbitraryTimeGeometry.h"
-//#include "mitkArithmeticOperation.h"
 #include "itkNaryAddImageFilter.h"
 #include "mitkImageAccessByItk.h"
-
 #include "itkImageIOBase.h"
 #include "itkBinaryFunctorImageFilter.h"
 #include "itkTernaryFunctorImageFilter.h"
+#include <itkExtractImageFilter.h>
+#include <itkMultiplyImageFilter.h>
+#include <itkCastImageFilter.h>
 
 mitk::ConcentrationCurveGenerator::ConcentrationCurveGenerator() : m_isT2weightedImage(false), m_isTurboFlashSequence(false), 
     m_AbsoluteSignalEnhancement(false), m_RelativeSignalEnhancement(0.0), m_UsingT1Map(false), m_Factor(0.0), m_RecoveryTime(0.0), m_RelaxationTime(0.0),
@@ -75,50 +76,138 @@ void mitk::ConcentrationCurveGenerator::Convert()
 
 void mitk::ConcentrationCurveGenerator::PrepareBaselineImage()
 {
+
   mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
   imageTimeSelector->SetInput(this->m_DynamicImage);
   imageTimeSelector->SetTimeNr(0);
   imageTimeSelector->UpdateLargestPossibleRegion();
-  mitk::Image::Pointer baselineImage0;
-  baselineImage0 = imageTimeSelector->GetOutput();
-  this->m_BaselineImage = imageTimeSelector->GetOutput();
+  mitk::Image::Pointer baselineImage;
+  baselineImage = imageTimeSelector->GetOutput();
   
-
-
-  /*
-  typedef itk::NaryAddImageFilter<InputBaslineImageType, OutputBaselineImageType> itkAddBaselineImagesFilterType;
-
-  typename itkAddBaselineImagesFilterType::Pointer itkNaryAddImageFilter = itkAddBaselineImagesFilterType::New();
-
-  mitk::ImageTimeSelector::Pointer imageTimeSelector1 = mitk::ImageTimeSelector::New();
-  imageTimeSelector1->SetInput(this->m_DynamicImage);
-  imageTimeSelector1->SetTimeNr(1);
-  imageTimeSelector1->UpdateLargestPossibleRegion();
-  mitk::Image::Pointer baselineImage1;
-  baselineImage1 = imageTimeSelector1->GetOutput();
-  
-
-  //add the time frames to the descriptor filter
-  std::vector<Image::Pointer> baselineCache;
-  for (unsigned int i = 0; i < this->m_DynamicImage->GetTimeSteps(); ++i)
+  if (m_BaselineStartTimePoint == m_BaselineEndTimePoint)
   {
-    mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
-    imageTimeSelector->SetInput(this->m_DynamicImage);
-    imageTimeSelector->SetTimeNr(i);
-    imageTimeSelector->UpdateLargestPossibleRegion();
-    Image::Pointer baselineImage = imageTimeSelector->GetOutput();
-    baselineCache.push_back(baselineImage);
-    mitk::CastToItkImage(baselineImage, frameImage);
-    itkAddNaryImageFilter->SetInput(i, frameImage);
+    this->m_BaselineImage = imageTimeSelector->GetOutput();
   }
-  itkAddNaryImageFilter->GetOutput();
-
-
-  //AccessFixedDimensionByItk_n(m_magnFIDImage.GetPointer(), mitkItkConversionHelper::CastMitkImageToDoubleItkImage, 4, (itkMagnFIDImage));
-  //AccessTwoImagesFixedDimensionByItk(baselineImage0, baselineImage1, CalculateAverageImage);
-  */
+  else
+  {
+    try
+    {
+      AccessFixedDimensionByItk(this->m_DynamicImage, mitk::ConcentrationCurveGenerator::CalculateAverageBaselineImage, 4);
+    }
+    catch (itk::ExceptionObject & err)
+    {
+      std::cerr << "ExceptionObject in ConcentrationCurveGenerator::CalculateAverageBaselineImage caught!" << std::endl;
+      std::cerr << err << std::endl;
+    }
+  }
 }
 
+template<class TPixel>
+void mitk::ConcentrationCurveGenerator::CalculateAverageBaselineImage(const itk::Image<TPixel, 4> *itkBaselineImage)
+{
+  if (itkBaselineImage == NULL)
+  {
+    mitkThrow() << "Error in ConcentrationCurveGenerator::CalculateAverageBaselineImage. Input image is NULL.";
+  }
+  if (m_BaselineStartTimePoint > m_BaselineEndTimePoint)
+  {
+    mitkThrow() << "Error in ConcentrationCurveGenerator::CalculateAverageBaselineImage. End time point is before start time point.";
+  }
+  
+  typedef itk::Image<TPixel, 4> TPixel4DImageType;
+  typedef itk::Image<TPixel, 3> TPixel3DImageType;
+  typedef itk::Image<double, 3> Double3DImageType;
+
+  typedef itk::ExtractImageFilter<TPixel4DImageType, TPixel3DImageType> ExtractImageFilterType;
+  typedef itk::NaryAddImageFilter<TPixel3DImageType, TPixel3DImageType> NaryAddBaselineImagesFilterType;
+  typedef itk::MultiplyImageFilter<Double3DImageType, Double3DImageType, Double3DImageType > MultiplyImageFilterType;
+  typedef itk::CastImageFilter<TPixel3DImageType, Double3DImageType> DoubleCastImageFilterType;
+  typedef itk::CastImageFilter<Double3DImageType, TPixel3DImageType> TPixelCastImageFilterType;
+
+  NaryAddBaselineImagesFilterType::Pointer AddBaselineImagesFilter = NaryAddBaselineImagesFilterType::New();
+  MultiplyImageFilterType::Pointer multiplyImageFilter = MultiplyImageFilterType::New();
+  DoubleCastImageFilterType::Pointer DoubleCastImageFilter = DoubleCastImageFilterType::New();
+  TPixelCastImageFilterType::Pointer TPixelCastImageFilter = TPixelCastImageFilterType::New();
+  TPixel4DImageType::RegionType region_input = itkBaselineImage->GetLargestPossibleRegion();
+
+  if (m_BaselineEndTimePoint > region_input.GetSize()[3])
+  {
+    mitkThrow() << "Error in ConcentrationCurveGenerator::CalculateAverageBaselineImage. End time point is larger than total number of time points.";
+  }
+
+  // add the selected baseline time frames to the nary add image filter
+
+  for (int i = m_BaselineStartTimePoint-1; i < m_BaselineEndTimePoint; ++i)
+  {
+    ExtractImageFilterType::Pointer ExtractFilter = ExtractImageFilterType::New();
+    TPixel3DImageType::Pointer timePointImage = TPixel3DImageType::New();
+    TPixel4DImageType::RegionType extractionRegion;
+    TPixel4DImageType::SizeType size_input_aux = region_input.GetSize();
+    size_input_aux[3] = 0;
+    TPixel4DImageType::IndexType start_input_aux = region_input.GetIndex();
+    start_input_aux[3] = i;
+    extractionRegion.SetSize(size_input_aux);
+    extractionRegion.SetIndex(start_input_aux);
+    ExtractFilter->SetExtractionRegion(extractionRegion);
+    ExtractFilter->SetInput(itkBaselineImage);
+    ExtractFilter->SetDirectionCollapseToSubmatrix();
+    try
+    {
+      ExtractFilter->Update();
+    }
+    catch (itk::ExceptionObject & err)
+    {
+      std::cerr << "ExceptionObject caught!" << std::endl;
+      std::cerr << err << std::endl;
+    }
+    timePointImage = ExtractFilter->GetOutput();
+    AddBaselineImagesFilter->SetInput(i-(m_BaselineStartTimePoint-1), timePointImage);
+  }
+  try
+  {
+    AddBaselineImagesFilter->Update();
+  }
+  catch (itk::ExceptionObject & err)
+  {
+    std::cerr << "ExceptionObject caught!" << std::endl;
+    std::cerr << err << std::endl;
+  }
+  DoubleCastImageFilter->SetInput(AddBaselineImagesFilter->GetOutput());
+  try
+  {
+    DoubleCastImageFilter->Update();
+  }
+  catch (itk::ExceptionObject & err)
+  {
+    std::cerr << "ExceptionObject caught!" << std::endl;
+    std::cerr << err << std::endl;
+  }
+  multiplyImageFilter->SetInput(DoubleCastImageFilter->GetOutput());
+  double factor = 1.0/double(m_BaselineEndTimePoint-m_BaselineStartTimePoint+1);
+  multiplyImageFilter->SetConstant(factor);
+  try
+  {
+    multiplyImageFilter->Update();
+  }
+  catch (itk::ExceptionObject & err)
+  {
+    std::cerr << "ExceptionObject caught!" << std::endl;
+    std::cerr << err << std::endl;
+  }
+  TPixelCastImageFilter->SetInput(multiplyImageFilter->GetOutput());
+  try
+  {
+    TPixelCastImageFilter->Update();
+  }
+  catch (itk::ExceptionObject & err)
+  {
+    std::cerr << "ExceptionObject caught!" << std::endl;
+    std::cerr << err << std::endl;
+  }
+  Image::Pointer mitkBaselineImage = Image::New();
+  CastToMitkImage(TPixelCastImageFilter->GetOutput(), mitkBaselineImage);
+  this->m_BaselineImage = mitkBaselineImage;
+}
 
 
 mitk::Image::Pointer mitk::ConcentrationCurveGenerator::ConvertSignalToConcentrationCurve(const mitk::Image* inputImage, const mitk::Image* baselineImage)

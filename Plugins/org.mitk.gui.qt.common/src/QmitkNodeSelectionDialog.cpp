@@ -123,6 +123,7 @@ void QmitkNodeSelectionDialog::SetSelectionCheckFunction(const SelectionCheckFun
 
   m_Controls.hint->setText(QString::fromStdString(checkResponse));
   m_Controls.hint->setVisible(!checkResponse.empty());
+  m_Controls.buttonBox->button(QDialogButtonBox::Ok)->setEnabled(checkResponse.empty());
 }
 
 bool QmitkNodeSelectionDialog::GetSelectOnlyVisibleNodes() const
@@ -164,6 +165,7 @@ void QmitkNodeSelectionDialog::SetCurrentSelection(NodeList selectedNodes)
 
   m_Controls.hint->setText(QString::fromStdString(checkResponse));
   m_Controls.hint->setVisible(!checkResponse.empty());
+  m_Controls.buttonBox->button(QDialogButtonBox::Ok)->setEnabled(checkResponse.empty());
 
   for (auto panel : m_Panels)
   {

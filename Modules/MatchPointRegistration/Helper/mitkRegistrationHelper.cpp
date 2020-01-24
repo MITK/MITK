@@ -20,9 +20,9 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  mitk::NodePredicateDataType::ConstPointer InternalRegNodePredicate = mitk::NodePredicateDataType::New(mitk::MAPRegistrationWrapper::GetStaticNameOfClass());
-  mitk::NodePredicateDataType::ConstPointer InternalImageNodePredicate = mitk::NodePredicateDataType::New(mitk::Image::GetStaticNameOfClass());
-  mitk::NodePredicateDataType::ConstPointer InternalPointSetNodePredicate = mitk::NodePredicateDataType::New(mitk::PointSet::GetStaticNameOfClass());
+  mitk::NodePredicateDataType::ConstPointer InternalRegNodePredicate = mitk::NodePredicateDataType::New(mitk::MAPRegistrationWrapper::GetStaticNameOfClass()).GetPointer();
+  mitk::NodePredicateDataType::ConstPointer InternalImageNodePredicate = mitk::NodePredicateDataType::New(mitk::Image::GetStaticNameOfClass()).GetPointer();
+  mitk::NodePredicateDataType::ConstPointer InternalPointSetNodePredicate = mitk::NodePredicateDataType::New(mitk::PointSet::GetStaticNameOfClass()).GetPointer();
 
 
   MITKRegistrationHelper::Affine3DTransformType::Pointer

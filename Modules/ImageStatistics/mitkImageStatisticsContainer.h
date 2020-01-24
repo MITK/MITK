@@ -32,9 +32,9 @@ namespace mitk
   class MITKIMAGESTATISTICS_EXPORT ImageStatisticsContainer : public mitk::BaseData
   {
   public:
-    mitkClassMacro(ImageStatisticsContainer, mitk::BaseData)
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    mitkClassMacro(ImageStatisticsContainer, mitk::BaseData);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     using HistogramType = itk::Statistics::Histogram<double>;
     using RealType = double;

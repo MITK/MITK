@@ -36,7 +36,8 @@ namespace mitk
     itkTypeMacro(ItkLoggingAdapter, itk::OutputWindow);
 
     /** New macro for creation of through a Smart Pointer   */
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /** @brief Initializes the logging adapter. Itk logging
         *        messages are redirected to MITK logging afterwards.

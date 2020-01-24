@@ -39,7 +39,7 @@ struct BERRY_UI_QT ISafeRunnableRunner : public Object
 
 public:
 
-  berryObjectMacro(berry::ISafeRunnableRunner)
+  berryObjectMacro(berry::ISafeRunnableRunner);
 
   ~ISafeRunnableRunner() override;
 

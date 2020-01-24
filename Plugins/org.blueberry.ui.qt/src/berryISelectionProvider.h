@@ -33,7 +33,7 @@ namespace berry
 struct BERRY_UI_QT ISelectionProvider : public virtual Object
 {
 
-  berryObjectMacro(berry::ISelectionProvider)
+  berryObjectMacro(berry::ISelectionProvider);
 
   ~ISelectionProvider() override;
 

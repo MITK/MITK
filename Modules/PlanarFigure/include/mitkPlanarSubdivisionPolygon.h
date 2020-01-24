@@ -30,7 +30,9 @@ namespace mitk
   public:
     mitkClassMacro(PlanarSubdivisionPolygon, PlanarFigure);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       /** \brief Subdivision Polygon has 3 control points per definition. */
       unsigned int GetMinimumNumberOfControlPoints() const override

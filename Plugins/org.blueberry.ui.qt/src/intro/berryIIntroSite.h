@@ -30,7 +30,7 @@ namespace berry {
 struct BERRY_UI_QT IIntroSite : public IWorkbenchSite
 {
 
-  berryObjectMacro(berry::IIntroSite)
+  berryObjectMacro(berry::IIntroSite);
 
   ~IIntroSite() override;
 

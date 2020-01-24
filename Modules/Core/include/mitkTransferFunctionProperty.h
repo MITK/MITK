@@ -40,7 +40,9 @@ namespace mitk
 
     mitkClassMacro(TransferFunctionProperty, BaseProperty);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self)
       mitkNewMacro1Param(TransferFunctionProperty, mitk::TransferFunction::Pointer);
 
     itkSetMacro(Value, mitk::TransferFunction::Pointer);

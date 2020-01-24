@@ -43,15 +43,17 @@ namespace mitk
       LAPLACIAN_STD_DEV4 = 2
     };
 
-    mitkClassMacro(ImageToPointCloudFilter, ImageToUnstructuredGridFilter) itkFactorylessNewMacro(Self)
+    mitkClassMacro(ImageToPointCloudFilter, ImageToUnstructuredGridFilter);
+
+    itkFactorylessNewMacro(Self);
 
       typedef itk::Image<double, 3> FloatImageType;
 
       /** Returns the selected DetectionMethod */
-      itkGetMacro(Method, DetectionMethod)
+      itkGetMacro(Method, DetectionMethod);
 
       /** Sets the DetectionMethod for edge detection and extraction */
-      itkSetMacro(Method, DetectionMethod)
+      itkSetMacro(Method, DetectionMethod);
 
         protected :
 

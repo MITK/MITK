@@ -30,7 +30,7 @@ class Expression;
  */
 struct IContributionRoot : public Object
 {
-  berryObjectMacro(berry::IContributionRoot)
+  berryObjectMacro(berry::IContributionRoot);
 
   /**
    * Adds a given contribution item with provided visibility expression and

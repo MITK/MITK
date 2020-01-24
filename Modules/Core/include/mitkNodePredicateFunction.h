@@ -33,8 +33,8 @@ namespace mitk
   public:
     using FunctionType = std::function<bool (const mitk::DataNode *)>;
 
-    mitkClassMacro(NodePredicateFunction, NodePredicateBase)
-    mitkNewMacro1Param(NodePredicateFunction, const FunctionType &)
+    mitkClassMacro(NodePredicateFunction, NodePredicateBase);
+    mitkNewMacro1Param(NodePredicateFunction, const FunctionType&);
 
     ~NodePredicateFunction() override;
 

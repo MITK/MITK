@@ -34,7 +34,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(BoundingObjectCutAndCast, BoundingObjectCutter);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       typedef TPixel PixelType;
 

@@ -49,8 +49,8 @@ namespace mitk {
     class MITKPHOTOACOUSTICSLIB_EXPORT SpectralUnmixingFilterVigra : public SpectralUnmixingFilterBase
     {
     public:
-      mitkClassMacro(SpectralUnmixingFilterVigra, SpectralUnmixingFilterBase)
-        itkFactorylessNewMacro(Self)
+      mitkClassMacro(SpectralUnmixingFilterVigra, SpectralUnmixingFilterBase);
+      itkFactorylessNewMacro(Self);
 
       /**
       * \brief Contains all implemented Vigra algorithms for spectral unmixing. For detailed information of the algorithms look at the

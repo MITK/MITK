@@ -48,8 +48,8 @@ namespace mitk
     typedef itk::ImageRegionIterator< HSVPixelImageType > HSVConstIteratorType;
 
     mitkClassMacro( OpenCVVideoSource, VideoSource );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     ////##Documentation
     ////## @brief sets a video file as input device. One video frame is being processed by updating the renderwindow.

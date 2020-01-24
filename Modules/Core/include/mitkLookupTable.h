@@ -49,7 +49,9 @@ namespace mitk
 
     mitkClassMacroItkParent(LookupTable, itk::DataObject);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
     /**
      * @brief GetVtkLookupTable Getter for the internally wrapped vtkLookupTable.

@@ -27,9 +27,9 @@ namespace mitk
   {
   public:
     mitkClassMacroItkParent(ExtrudePlanarFigureFilter, itk::ProcessObject);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
-
-      itkGetMacro(Length, ScalarType);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
+    itkGetMacro(Length, ScalarType);
     itkSetMacro(Length, ScalarType);
 
     itkGetMacro(NumberOfSegments, unsigned int);

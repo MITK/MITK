@@ -43,9 +43,9 @@ namespace mitk
   class MITKCORE_EXPORT EnumerationProperty : public BaseProperty
   {
   public:
-    mitkClassMacro(EnumerationProperty, BaseProperty)
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    mitkClassMacro(EnumerationProperty, BaseProperty);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     /**
      * Represents the unique id which is assigned to each enumeration name.
@@ -178,7 +178,7 @@ namespace mitk
     bool IsEqual(const BaseProperty &property) const override;
     bool Assign(const BaseProperty &property) override;
 
-    mitkCloneMacro(Self)
+    mitkCloneMacro(Self);
 
   private:
     IdType m_CurrentValue;

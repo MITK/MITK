@@ -33,8 +33,8 @@ namespace mitk {
   {
   public:
     mitkClassMacroItkParent(USDevicePersistence, itk::Object);
-    itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       void StoreCurrentDevices();
 

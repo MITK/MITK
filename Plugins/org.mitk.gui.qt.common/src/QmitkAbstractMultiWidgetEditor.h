@@ -36,7 +36,7 @@ class MITK_QT_COMMON QmitkAbstractMultiWidgetEditor : public QmitkAbstractRender
 
 public:
 
-  berryObjectMacro(QmitkAbstractMultiWidgetEditor, QmitkAbstractRenderEditor, IPartListener)
+  berryObjectMacro(QmitkAbstractMultiWidgetEditor, QmitkAbstractRenderEditor, IPartListener);
 
   static const QString EDITOR_ID;
 

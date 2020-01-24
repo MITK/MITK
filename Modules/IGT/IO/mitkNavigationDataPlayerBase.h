@@ -30,24 +30,24 @@ namespace mitk{
     : public NavigationDataSource
   {
   public:
-    mitkClassMacro(NavigationDataPlayerBase, NavigationDataSource)
+    mitkClassMacro(NavigationDataPlayerBase, NavigationDataSource);
 
     /**
     * \brief Set to true if the data player should repeat the outputs.
     */
-    itkSetMacro(Repeat, bool)
+    itkSetMacro(Repeat, bool);
 
     /**
     * \return Returns if the data player should repeat the outputs.
     */
-    itkGetMacro(Repeat, bool)
+    itkGetMacro(Repeat, bool);
 
     /**
     * \brief Used for pipeline update just to tell the pipeline that we always have to update.
     */
     void UpdateOutputInformation() override;
 
-    itkGetMacro(NavigationDataSet, NavigationDataSet::Pointer)
+    itkGetMacro(NavigationDataSet, NavigationDataSet::Pointer);
 
     /**
     * \brief Set mitk::NavigationDataSet for playing.

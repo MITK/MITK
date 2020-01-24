@@ -40,25 +40,23 @@ class PointSet;
 class USTargetPlacementQualityCalculator : public itk::Object
 {
 public:
-  mitkClassMacroItkParent(USTargetPlacementQualityCalculator, itk::Object)
-  itkNewMacro(Self)
-
-  /**
+  mitkClassMacroItkParent(USTargetPlacementQualityCalculator, itk::Object);
+  itkNewMacro(Self); /**
    * \brief Setter for the surface where the targets are placed around.
    */
-  itkSetMacro(TargetSurface, itk::SmartPointer<Surface>)
+  itkSetMacro(TargetSurface, itk::SmartPointer<Surface>);
 
   /**
    * \brief Setter for the target points which are placed around the target surface.
    */
-  itkSetMacro(TargetPoints, itk::SmartPointer<PointSet>)
+  itkSetMacro(TargetPoints, itk::SmartPointer<PointSet>);
 
   /**
    * \brief Setter for the optimal angle of the target placement.
    * This angle is subtracted from the target angles when calculating the angle
    * differences.
    */
-  itkSetMacro(OptimalAngle, double)
+  itkSetMacro(OptimalAngle, double);
 
   /**
    * \brief Calculates the quality metrics.
@@ -66,9 +64,11 @@ public:
    */
   void Update();
 
-  itkGetMacro(CentersOfMassDistance, double)
-  itkGetMacro(MeanAngleDifference, double)
-  itkGetMacro(AngleDifferences, mitk::VnlVector)
+  itkGetMacro(CentersOfMassDistance, double);
+
+  itkGetMacro(MeanAngleDifference, double);
+
+  itkGetMacro(AngleDifferences, mitk::VnlVector);
 
 protected:
   USTargetPlacementQualityCalculator();

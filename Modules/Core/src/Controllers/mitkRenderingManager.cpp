@@ -31,9 +31,9 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  itkEventMacroDefinition(FocusChangedEvent, itk::AnyEvent)
+  itkEventMacroDefinition(FocusChangedEvent, itk::AnyEvent);
 
-    RenderingManager::Pointer RenderingManager::s_Instance = nullptr;
+  RenderingManager::Pointer RenderingManager::s_Instance = nullptr;
   RenderingManagerFactory *RenderingManager::s_RenderingManagerFactory = nullptr;
 
   RenderingManager::RenderingManager()

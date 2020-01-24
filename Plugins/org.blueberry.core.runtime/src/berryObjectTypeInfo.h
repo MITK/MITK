@@ -23,7 +23,7 @@ class org_blueberry_core_runtime_EXPORT ObjectTypeInfo : public Reflection::Type
 {
 public:
 
-  berryObjectMacro(ObjectTypeInfo, Reflection::TypeInfo, Object)
+  berryObjectMacro(ObjectTypeInfo, Reflection::TypeInfo, Object);
 
   ObjectTypeInfo();
   ObjectTypeInfo(const Reflection::TypeInfo& typeInfo);

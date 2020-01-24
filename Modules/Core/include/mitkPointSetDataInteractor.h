@@ -63,7 +63,9 @@ namespace mitk
   class MITKCORE_EXPORT PointSetDataInteractor : public DataInteractor
   {
   public:
-    mitkClassMacro(PointSetDataInteractor, DataInteractor) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(PointSetDataInteractor, DataInteractor);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /**
        * Sets the maximum distance that is accepted when looking for a point at a certain position using the

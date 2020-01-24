@@ -30,7 +30,8 @@ namespace mitk
   {
   public:
     mitkClassMacroItkParent(ContourUtils, itk::Object);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /**
         \brief Projects a contour onto an image point by point. Converts from world to index coordinates.

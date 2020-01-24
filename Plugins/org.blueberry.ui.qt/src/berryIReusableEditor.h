@@ -30,7 +30,7 @@ namespace berry {
 struct BERRY_UI_QT IReusableEditor : public virtual IEditorPart
 {
 
-  berryObjectMacro(berry::IReusableEditor)
+  berryObjectMacro(berry::IReusableEditor);
 
   ~IReusableEditor() override;
 

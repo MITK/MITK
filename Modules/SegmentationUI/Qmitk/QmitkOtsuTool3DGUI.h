@@ -38,7 +38,8 @@ class MITKSEGMENTATIONUI_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
 
 public:
   mitkClassMacro(QmitkOtsuTool3DGUI, QmitkToolGUI);
-  itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+  itkFactorylessNewMacro(Self);
+  itkCloneMacro(Self);
 
     signals :
 

@@ -40,7 +40,7 @@ class SaveablesList: public ISaveablesLifecycleListener
 
 public:
 
-  berryObjectMacro(SaveablesList)
+  berryObjectMacro(SaveablesList);
 
 private:
 

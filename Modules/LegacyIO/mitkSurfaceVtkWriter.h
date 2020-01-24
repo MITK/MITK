@@ -53,7 +53,9 @@ namespace mitk
   public:
     mitkClassMacro(SurfaceVtkWriter, mitk::FileWriter);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       mitkWriterMacro;
 

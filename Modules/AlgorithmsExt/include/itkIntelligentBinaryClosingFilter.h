@@ -60,7 +60,8 @@ namespace itk
     itkTypeMacro(IntelligentBinaryClosingFilter, ImageToImageFilter);
 
     /** Method for creation through the object factory. */
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /** Standard process object method.  This filter is not multithreaded. */
       void GenerateData() override;

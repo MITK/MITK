@@ -33,7 +33,7 @@ struct IParameterValues;
 struct BERRY_COMMANDS IParameter : public virtual Object
 {
 
-  berryObjectMacro(berry::IParameter)
+  berryObjectMacro(berry::IParameter);
 
   typedef QHash<QString, QString> ParameterValues;
 

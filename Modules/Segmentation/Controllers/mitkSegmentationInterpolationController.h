@@ -71,7 +71,8 @@ namespace mitk
   {
   public:
     mitkClassMacroItkParent(SegmentationInterpolationController, itk::Object);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /**
         \brief Find interpolator for a given image.

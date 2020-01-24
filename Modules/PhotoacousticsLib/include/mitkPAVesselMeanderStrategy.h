@@ -27,8 +27,8 @@ namespace mitk {
     class MITKPHOTOACOUSTICSLIB_EXPORT VesselMeanderStrategy : public itk::LightObject
     {
     public:
-      mitkClassMacroItkParent(VesselMeanderStrategy, itk::LightObject)
-        itkFactorylessNewMacro(Self)
+      mitkClassMacroItkParent(VesselMeanderStrategy, itk::LightObject);
+        itkFactorylessNewMacro(Self);
 
         /**
          * @brief CalculateNewPositionInStraightLine calculates the new position by just following the direction vector.

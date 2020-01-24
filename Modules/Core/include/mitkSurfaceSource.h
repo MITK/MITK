@@ -33,7 +33,9 @@ namespace mitk
   class MITKCORE_EXPORT SurfaceSource : public BaseDataSource
   {
   public:
-    mitkClassMacro(SurfaceSource, BaseDataSource) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(SurfaceSource, BaseDataSource);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       typedef Surface OutputType;
 

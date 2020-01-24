@@ -35,8 +35,9 @@ namespace mitk
   {
   public:
     mitkClassMacro(SmartPointerProperty, BaseProperty);
-
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self) mitkNewMacro1Param(SmartPointerProperty, itk::Object *);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
+    mitkNewMacro1Param(SmartPointerProperty, itk::Object*);
 
     typedef itk::Object::Pointer ValueType;
 

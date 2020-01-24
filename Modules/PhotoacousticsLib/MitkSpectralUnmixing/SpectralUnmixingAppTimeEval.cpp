@@ -288,8 +288,8 @@ int main(int argc, char *argv[])
         /*std::string unmixingOutputHbO2 = "E:/NHDATA/time/output/time_" + std::to_string(i) + ".nrrd";
         std::string unmixingOutputHb = "E:/NHDATA/time/output/time_" + std::to_string(i) + ".nrrd";
         mitk::IOUtil::Save(output1, unmixingOutputHbO2);
-        mitk::IOUtil::Save(output2, unmixingOutputHb);/*
-/*
+        mitk::IOUtil::Save(output2, unmixingOutputHb);
+
         //auto m_sO2 = mitk::pa::SpectralUnmixingSO2::New();
         //m_sO2->Verbose(false);
         //auto output1 = m_SpectralUnmixingFilter->GetOutput(0);

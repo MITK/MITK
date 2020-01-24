@@ -34,7 +34,7 @@ class PresentablePart: public IPresentablePart
 
 public:
 
-  berryObjectMacro(PresentablePart)
+  berryObjectMacro(PresentablePart);
 
 private:
 

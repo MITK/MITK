@@ -39,8 +39,9 @@ namespace mitk {
 class USNavigationCombinedModalityPersistence : public itk::Object
 {
 public:
-  mitkClassMacroItkParent(USNavigationCombinedModalityPersistence, itk::Object)
-  itkNewMacro(Self)
+  mitkClassMacroItkParent(USNavigationCombinedModalityPersistence, itk::Object);
+  itkNewMacro(Self);
+
 protected:
   /**
    * \brief Restores combined modality from QSettings and registers on service events.

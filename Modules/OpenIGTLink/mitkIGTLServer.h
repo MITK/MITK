@@ -33,11 +33,11 @@ namespace mitk
   class MITKOPENIGTLINK_EXPORT IGTLServer : public IGTLDevice
   {
   public:
-    mitkClassMacro(IGTLServer, IGTLDevice)
-      mitkNewMacro1Param(Self, bool)
-      itkCloneMacro(Self)
+    mitkClassMacro(IGTLServer, IGTLDevice);
+    mitkNewMacro1Param(Self, bool);
+    itkCloneMacro(Self);
 
-      typedef std::list<igtl::Socket::Pointer> SocketListType;
+    typedef std::list<igtl::Socket::Pointer> SocketListType;
     typedef SocketListType::iterator SocketListIteratorType;
 
     /**

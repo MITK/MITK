@@ -32,7 +32,7 @@ namespace berry
 
   public:
 
-    berryObjectMacro(berry::Preferences)
+    berryObjectMacro(berry::Preferences);
 
     /**
      * Maps a string key to a string value

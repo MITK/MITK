@@ -33,7 +33,9 @@ namespace mitk
   {
   public:
     mitkClassMacro(ModalityProperty, EnumerationProperty);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self) mitkNewMacro1Param(ModalityProperty, const IdType &);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
+    mitkNewMacro1Param(ModalityProperty, const IdType&);
     mitkNewMacro1Param(ModalityProperty, const std::string &);
 
     using BaseProperty::operator=;

@@ -45,7 +45,7 @@ class QmitkXnatEditor : public berry::QtEditorPart, public berry::IReusableEdito
 
 public:
 
-  berryObjectMacro(QmitkXnatEditor)
+  berryObjectMacro(QmitkXnatEditor);
 
     QmitkXnatEditor();
   ~QmitkXnatEditor();

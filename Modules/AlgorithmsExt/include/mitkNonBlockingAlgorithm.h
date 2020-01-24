@@ -86,9 +86,9 @@ namespace mitk
       itk::SmartPointer<NonBlockingAlgorithm> m_Algorithm;
     };
 
-    mitkClassMacroItkParent(NonBlockingAlgorithm, itk::Object)
+    mitkClassMacroItkParent(NonBlockingAlgorithm, itk::Object);
 
-      void SetDataStorage(DataStorage &storage);
+    void SetDataStorage(DataStorage &storage);
     DataStorage *GetDataStorage();
 
     // parameter setting

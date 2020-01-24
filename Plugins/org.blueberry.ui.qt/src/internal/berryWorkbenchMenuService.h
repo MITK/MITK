@@ -117,7 +117,7 @@ private:
 
 public:
 
-  berryObjectMacro(berry::WorkbenchMenuService)
+  berryObjectMacro(berry::WorkbenchMenuService);
 
   /**
    * Constructs a new instance of <code>MenuService</code> using a menu

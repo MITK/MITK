@@ -33,7 +33,9 @@ namespace mitk
   public:
     mitkClassMacro(MeshMapper2D, GLMapper);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       /** @brief Get the Mesh to map */
       const mitk::Mesh *GetInput(void);

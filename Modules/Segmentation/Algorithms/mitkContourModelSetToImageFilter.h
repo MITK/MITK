@@ -27,9 +27,10 @@ namespace mitk
   class MITKSEGMENTATION_EXPORT ContourModelSetToImageFilter : public ImageSource
   {
   public:
-    mitkClassMacro(ContourModelSetToImageFilter, ImageSource) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
-
-      itkSetMacro(MakeOutputBinary, bool);
+    mitkClassMacro(ContourModelSetToImageFilter, ImageSource);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
+    itkSetMacro(MakeOutputBinary, bool);
     itkGetMacro(MakeOutputBinary, bool);
     itkBooleanMacro(MakeOutputBinary);
 

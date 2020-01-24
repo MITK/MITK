@@ -46,7 +46,8 @@ namespace mitk
     };
 
     mitkClassMacro(LogoAnnotation, mitk::VtkAnnotation);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     vtkSmartPointer<vtkImageReader2Factory> m_readerFactory;
     void SetLogoImage(vtkSmartPointer<vtkImageData> logo);

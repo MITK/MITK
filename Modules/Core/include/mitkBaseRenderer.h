@@ -175,11 +175,11 @@ namespace mitk
     */
     DEPRECATED(void SetWorldGeometry3D(TimeSlicedGeometry *geometry));
 
-    itkGetConstObjectMacro(WorldTimeGeometry, TimeGeometry)
+    itkGetConstObjectMacro(WorldTimeGeometry, TimeGeometry);
 
       //##Documentation
       //## @brief Get the current 3D-worldgeometry (m_CurrentWorldGeometry) used for 3D-rendering
-      itkGetConstObjectMacro(CurrentWorldGeometry, BaseGeometry)
+      itkGetConstObjectMacro(CurrentWorldGeometry, BaseGeometry);
 
       //##Documentation
       //## @brief Get the current 2D-worldgeometry (m_CurrentWorldPlaneGeometry) used for 2D-rendering
@@ -208,7 +208,7 @@ namespace mitk
     //## \sa m_Slice
     virtual void SetSlice(unsigned int slice);
 
-    itkGetConstMacro(Slice, unsigned int)
+    itkGetConstMacro(Slice, unsigned int);
 
       //##Documentation
       //## @brief Set/Get m_TimeStep which defines together with m_Slice the 2D geometry
@@ -217,7 +217,7 @@ namespace mitk
       //## \sa m_TimeStep
       virtual void SetTimeStep(unsigned int timeStep);
 
-    itkGetConstMacro(TimeStep, unsigned int)
+    itkGetConstMacro(TimeStep, unsigned int);
 
       //##Documentation
       //## @brief Get the time-step of a BaseData object which
@@ -303,28 +303,28 @@ namespace mitk
 
     //##Documentation
     //## @brief Get the MapperSlotId to use.
-    itkGetMacro(MapperID, MapperSlotId) itkGetConstMacro(MapperID, MapperSlotId)
+    itkGetMacro(MapperID, MapperSlotId);
+    itkGetConstMacro(MapperID, MapperSlotId);
 
       //##Documentation
       //## @brief Set the MapperSlotId to use.
-      itkSetMacro(MapperID, MapperSlotId)
+      itkSetMacro(MapperID, MapperSlotId);
 
         virtual int *GetSize() const;
     virtual int *GetViewportSize() const;
 
     void SetSliceNavigationController(SliceNavigationController *SlicenavigationController);
-    itkGetObjectMacro(CameraController, CameraController)
-      itkGetObjectMacro(SliceNavigationController, SliceNavigationController)
-        itkGetObjectMacro(CameraRotationController, CameraRotationController)
-
-          itkGetMacro(EmptyWorldGeometry, bool)
+    itkGetObjectMacro(CameraController, CameraController);
+    itkGetObjectMacro(SliceNavigationController, SliceNavigationController);
+    itkGetObjectMacro(CameraRotationController, CameraRotationController);
+    itkGetMacro(EmptyWorldGeometry, bool);
 
       //##Documentation
       //## @brief Tells if the displayed region is shifted and rescaled if the render window is resized.
       itkGetMacro(KeepDisplayedRegion, bool)
       //##Documentation
       //## @brief Tells if the displayed region should be shifted and rescaled if the render window is resized.
-      itkSetMacro(KeepDisplayedRegion, bool)
+      itkSetMacro(KeepDisplayedRegion, bool);
 
       //##Documentation
       //## @brief get the name of the Renderer

@@ -1124,7 +1124,8 @@ add_subdirectory(Wrapping)
 
 if(MITK_USE_BLUEBERRY)
 
-  set(BLUEBERRY_XPDOC_OUTPUT_DIR ${MITK_DOXYGEN_OUTPUT_DIR}/html/extension-points/html/)
+  set(BLUEBERRY_XPDOC_OUTPUT_DIR "${MITK_DOXYGEN_OUTPUT_DIR}/html/extension-points/html/")
+  execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${BLUEBERRY_XPDOC_OUTPUT_DIR})
 
   # Plug-in testing (needs some work to be enabled again)
   if(BUILD_TESTING)

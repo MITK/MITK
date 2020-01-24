@@ -29,7 +29,7 @@ class LayoutTreeNode : public LayoutTree {
 
 public:
 
-  berryObjectMacro(LayoutTreeNode)
+  berryObjectMacro(LayoutTreeNode);
 
   struct ChildSizes {
     int left;

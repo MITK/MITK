@@ -26,8 +26,9 @@ namespace mitk
   class MITKALGORITHMSEXT_EXPORT UnstructuredGridToUnstructuredGridFilter : public UnstructuredGridSource
   {
   public:
-    mitkClassMacro(UnstructuredGridToUnstructuredGridFilter, UnstructuredGridSource) itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    mitkClassMacro(UnstructuredGridToUnstructuredGridFilter, UnstructuredGridSource);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /** Initializes the output information */
       void GenerateOutputInformation() override;

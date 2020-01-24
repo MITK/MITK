@@ -57,7 +57,7 @@ namespace mitk {
   class MITKOPENIGTLINK_EXPORT IGTLDevice : public itk::Object
   {
   public:
-    mitkClassMacroItkParent(IGTLDevice, itk::Object)
+    mitkClassMacroItkParent(IGTLDevice, itk::Object);
 
       IGTLDevice(bool ReadFully);
 

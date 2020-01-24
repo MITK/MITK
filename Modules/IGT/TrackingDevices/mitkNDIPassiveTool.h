@@ -58,7 +58,7 @@ namespace mitk
     itkGetStringMacro(File);          ///< get file from which this tool was loaded
 
   protected:
-    itkFactorylessNewMacro(Self)
+    itkFactorylessNewMacro(Self);
     itkCloneMacro(Self)
     NDIPassiveTool();
     ~NDIPassiveTool() override;

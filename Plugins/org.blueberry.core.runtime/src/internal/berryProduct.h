@@ -24,7 +24,7 @@ class Product : public IProduct
 
 public:
 
-  berryObjectMacro(Product, IProduct)
+  berryObjectMacro(Product, IProduct);
 
   Product(IBranding* branding);
 

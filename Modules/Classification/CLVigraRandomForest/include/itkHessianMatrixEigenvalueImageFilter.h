@@ -33,8 +33,9 @@ namespace itk
 
     void SetImageMask(TMaskImageType * maskimage);
 
-    itkSetMacro(Sigma,double)
-      itkGetMacro(Sigma,double)
+    itkSetMacro(Sigma,double);
+
+    itkGetMacro(Sigma,double);
 
   private:
 

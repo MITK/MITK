@@ -35,9 +35,8 @@ namespace mitk
   public:
 
     mitkClassMacro( RandomImageSampler , ImageToImageFilter );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
     itkSetMacro(SamplingMode, RandomImageSamplerMode);
     itkGetConstMacro(SamplingMode, RandomImageSamplerMode);
 

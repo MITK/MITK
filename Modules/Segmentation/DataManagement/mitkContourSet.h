@@ -30,7 +30,9 @@ namespace mitk
   public:
     mitkClassMacro(ContourSet, BaseData);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       typedef std::map<unsigned long, Contour::Pointer> ContourVectorType;
     typedef ContourVectorType::iterator ContourIterator;

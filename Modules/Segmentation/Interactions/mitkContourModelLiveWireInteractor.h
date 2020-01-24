@@ -37,8 +37,9 @@ namespace mitk
   class MITKSEGMENTATION_EXPORT ContourModelLiveWireInteractor : public ContourModelInteractor
   {
   public:
-    mitkClassMacro(ContourModelLiveWireInteractor, ContourModelInteractor) itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    mitkClassMacro(ContourModelLiveWireInteractor, ContourModelInteractor);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
         virtual void SetEditingContourModelNode(mitk::DataNode *_arg);
 

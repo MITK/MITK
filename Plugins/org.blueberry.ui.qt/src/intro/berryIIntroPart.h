@@ -53,7 +53,7 @@ namespace berry {
 struct BERRY_UI_QT IIntroPart : public virtual Object
 { // IAdaptable {
 
-  berryObjectMacro(berry::IIntroPart)
+  berryObjectMacro(berry::IIntroPart);
 
   ~IIntroPart() override;
 

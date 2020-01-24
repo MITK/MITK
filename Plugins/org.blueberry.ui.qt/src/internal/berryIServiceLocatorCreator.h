@@ -45,7 +45,7 @@ struct IDisposable;
 struct BERRY_UI_QT IServiceLocatorCreator : public virtual Object
 {
 
-  berryObjectMacro(berry::IServiceLocatorCreator)
+  berryObjectMacro(berry::IServiceLocatorCreator);
 
   ~IServiceLocatorCreator() override;
 

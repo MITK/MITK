@@ -29,7 +29,7 @@ namespace berry {
  */
 struct BERRY_UI_QT IEditorSite : public virtual IWorkbenchPartSite {
 
-  berryObjectMacro(berry::IEditorSite)
+  berryObjectMacro(berry::IEditorSite);
 
   ~IEditorSite() override;
 

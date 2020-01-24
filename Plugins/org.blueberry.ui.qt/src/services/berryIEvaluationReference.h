@@ -30,7 +30,7 @@ struct IPropertyChangeListener;
 struct IEvaluationReference : public virtual IEvaluationResultCache
 {
 
-  berryObjectMacro(berry::IEvaluationReference)
+  berryObjectMacro(berry::IEvaluationReference);
 
   /**
    * The property change listener associated with the evaluated expression.

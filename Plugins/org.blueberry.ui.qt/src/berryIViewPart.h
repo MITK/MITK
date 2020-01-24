@@ -70,7 +70,7 @@ namespace berry {
 struct BERRY_UI_QT IViewPart : public virtual IWorkbenchPart
 {
 
-  berryObjectMacro(berry::IViewPart, IWorkbenchPart)
+  berryObjectMacro(berry::IViewPart, IWorkbenchPart);
 
   ~IViewPart() override;
 

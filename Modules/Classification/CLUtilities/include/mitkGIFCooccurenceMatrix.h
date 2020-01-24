@@ -31,9 +31,9 @@ namespace mitk
     * GIFCooccurenceMatrix2 instead.}
     */
     public:
-      mitkClassMacro(GIFCooccurenceMatrix,AbstractGlobalImageFeature)
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+      mitkClassMacro(GIFCooccurenceMatrix,AbstractGlobalImageFeature);
+      itkFactorylessNewMacro(Self);
+      itkCloneMacro(Self);
 
       GIFCooccurenceMatrix();
 

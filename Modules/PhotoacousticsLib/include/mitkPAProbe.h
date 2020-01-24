@@ -35,11 +35,11 @@ namespace mitk {
     {
     public:
 
-      mitkClassMacroItkParent(Probe, itk::LightObject)
-        mitkNewMacro2Param(Self, std::string, bool)
-        mitkNewMacro2Param(Self, const char*, bool)
+      mitkClassMacroItkParent(Probe, itk::LightObject);
+      mitkNewMacro2Param(Self, std::string, bool);
+      mitkNewMacro2Param(Self, const char*, bool);
 
-        const std::string XML_TAG_PROBE = "Probe";
+      const std::string XML_TAG_PROBE = "Probe";
       const std::string XML_TAG_LIGHT_SOURCE = "LightSource";
 
       LightSource::PhotonInformation GetNextPhoton(double rng1, double rnd2, double rnd3, double rnd4,

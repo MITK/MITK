@@ -39,8 +39,8 @@ namespace mitk {
   {
   public:
     mitkClassMacro(TrackingDeviceSource, NavigationDataSource);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     /**
     * \brief sets the tracking device that will be used as a source for tracking data

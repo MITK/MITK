@@ -29,7 +29,7 @@ class PropChangedRunnable : public SafeRunnable
 {
 public:
 
-  berryObjectMacro(PropChangedRunnable)
+  berryObjectMacro(PropChangedRunnable);
 
   IPropertyChangeListener::Events::EventType::AbstractDelegate* delegate;
 

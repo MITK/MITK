@@ -63,7 +63,7 @@ namespace berry {
 struct BERRY_UI_QT ISaveablesSource : public virtual Object
 {
 
-  berryObjectMacro(berry::ISaveablesSource)
+  berryObjectMacro(berry::ISaveablesSource);
 
   ~ISaveablesSource() override;
 

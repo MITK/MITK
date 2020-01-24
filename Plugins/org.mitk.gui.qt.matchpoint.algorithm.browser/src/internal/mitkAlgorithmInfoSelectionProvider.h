@@ -31,7 +31,7 @@ class AlgorithmInfoSelectionProvider: public QObject,
 
 public:
 
-  berryObjectMacro(AlgorithmInfoSelectionProvider)
+  berryObjectMacro(AlgorithmInfoSelectionProvider);
 
   AlgorithmInfoSelectionProvider();
 

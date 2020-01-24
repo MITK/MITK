@@ -32,7 +32,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(Plane, BoundingObject);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       void SetExtent(const double x, const double y);
     void GetExtent(double &x, double &y) const;

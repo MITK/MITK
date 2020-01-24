@@ -88,9 +88,9 @@ namespace mitk
   class MITKCLUTILITIES_EXPORT GIFFirstOrderHistogramStatistics : public AbstractGlobalImageFeature
   {
   public:
-    mitkClassMacro(GIFFirstOrderHistogramStatistics,AbstractGlobalImageFeature)
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    mitkClassMacro(GIFFirstOrderHistogramStatistics,AbstractGlobalImageFeature);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       GIFFirstOrderHistogramStatistics();
 

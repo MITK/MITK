@@ -30,7 +30,7 @@ namespace berry {
 struct BERRY_EXPRESSIONS IIterable : public Object
 {
 
-  berryObjectMacro(berry::IIterable)
+  berryObjectMacro(berry::IIterable);
 
   typedef QList<Object::Pointer>::iterator iterator;
   typedef QList<Object::Pointer>::const_iterator const_iterator;

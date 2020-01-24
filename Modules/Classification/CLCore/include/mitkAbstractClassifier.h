@@ -33,7 +33,7 @@ class MITKCLCORE_EXPORT AbstractClassifier : public BaseData
 {
 public:
 
-  mitkClassMacro(AbstractClassifier,BaseData)
+  mitkClassMacro(AbstractClassifier,BaseData);
 
   ///
   /// @brief Build a forest of trees from the training set (X, y).

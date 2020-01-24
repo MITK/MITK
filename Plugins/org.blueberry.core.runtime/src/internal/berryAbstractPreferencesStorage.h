@@ -30,7 +30,7 @@ struct IPreferences;
 
   public:
 
-    berryObjectMacro(berry::AbstractPreferencesStorage)
+    berryObjectMacro(berry::AbstractPreferencesStorage);
 
     ///
     /// Saves the path, sets the root initially to 0.

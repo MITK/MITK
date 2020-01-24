@@ -26,7 +26,7 @@ namespace berry
 class HelpEditorInput : public PlatformObject, public IEditorInput, public IPersistableElement
 {
 public:
-  berryObjectMacro(HelpEditorInput)
+  berryObjectMacro(HelpEditorInput);
 
   HelpEditorInput(const QUrl& url = QUrl());
 

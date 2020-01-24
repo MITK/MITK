@@ -47,8 +47,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(GIFLocalIntensity, AbstractGlobalImageFeature);
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+      itkFactorylessNewMacro(Self);
+      itkCloneMacro(Self);
 
       GIFLocalIntensity();
 

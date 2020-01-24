@@ -42,7 +42,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(ImageToContourFilter, ImageToSurfaceFilter);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /**
         \brief Set macro for the geometry of the slice. If it is not set explicitly the geometry will be taken from the

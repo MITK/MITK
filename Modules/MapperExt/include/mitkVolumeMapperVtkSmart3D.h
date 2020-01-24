@@ -44,7 +44,9 @@ namespace mitk
   public:
     mitkClassMacro(VolumeMapperVtkSmart3D, VtkMapper);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
     vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 

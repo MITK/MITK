@@ -39,7 +39,7 @@ namespace mitk
   public:
     /** Standard class typedefs. */
     mitkClassMacroItkParent(BaseController, mitk::OperationActor);
-    itkFactorylessNewMacro(Self)
+    itkFactorylessNewMacro(Self);
 
       /** Method for creation through ::New */
       // mitkNewMacro(Self);

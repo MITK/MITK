@@ -32,7 +32,8 @@ public:
 
   mitkClassMacro(CameraIntrinsicsProperty, BaseProperty);
 
-  itkFactorylessNewMacro(Self)
+  itkFactorylessNewMacro(Self);
+
   itkCloneMacro(Self)
   mitkNewMacro1Param(CameraIntrinsicsProperty, mitk::CameraIntrinsics::Pointer);
 

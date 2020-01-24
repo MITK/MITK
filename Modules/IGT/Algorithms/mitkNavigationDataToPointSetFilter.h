@@ -36,8 +36,8 @@ namespace mitk {
   {
   public:
     mitkClassMacro(NavigationDataToPointSetFilter, PointSetSource);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     /**Documentation
     * \brief There are two different operation modes.
@@ -59,13 +59,12 @@ namespace mitk {
     *
     * The size determines the maximum number of timesteps in 4D mode and the number of points in 3D mode of the output PointSet
     */
-    itkSetMacro(RingBufferSize, unsigned int)
-
+    itkSetMacro(RingBufferSize, unsigned int);
 
     /**
     * \brief Sets the number of Navigation Data, which should be averaged.
     */
-    itkSetMacro(NumberForMean, unsigned int)
+    itkSetMacro(NumberForMean, unsigned int);
 
     /**
     * \brief Gets the number of Navigation Data, which should be averaged.

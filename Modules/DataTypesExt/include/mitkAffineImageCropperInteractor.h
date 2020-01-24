@@ -30,7 +30,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(AffineImageCropperInteractor, DataInteractor);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       protected : AffineImageCropperInteractor();
     ~AffineImageCropperInteractor() override;

@@ -24,7 +24,8 @@ namespace mitk
   {
   public:
     mitkClassMacroItkParent(SceneReader, itk::Object);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       virtual bool LoadScene(TiXmlDocument &document, const std::string &workingDirectory, DataStorage *storage);
   };

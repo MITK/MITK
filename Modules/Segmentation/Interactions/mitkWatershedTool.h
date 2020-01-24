@@ -43,7 +43,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(WatershedTool, AutoSegmentationTool);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       void SetThreshold(double t)
     {

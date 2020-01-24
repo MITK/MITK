@@ -36,7 +36,7 @@ namespace mitk
   class MITKOPENIGTLINK_EXPORT IGTLMessageCloneHandler: public itk::Object
   {
   public:
-    mitkClassMacroItkParent(IGTLMessageCloneHandler, itk::Object)
+    mitkClassMacroItkParent(IGTLMessageCloneHandler, itk::Object);
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 

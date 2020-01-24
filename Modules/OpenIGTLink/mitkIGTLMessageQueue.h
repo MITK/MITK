@@ -39,9 +39,9 @@ namespace mitk {
   class MITKOPENIGTLINK_EXPORT IGTLMessageQueue : public itk::Object
   {
   public:
-    mitkClassMacroItkParent(mitk::IGTLMessageQueue, itk::Object)
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    mitkClassMacroItkParent(mitk::IGTLMessageQueue, itk::Object);
+      itkFactorylessNewMacro(Self);
+      itkCloneMacro(Self);
 
       /**
        * \brief Different buffering types

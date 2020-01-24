@@ -33,7 +33,7 @@ namespace berry {
 struct BERRY_UI_QT IFolderLayout : public IPlaceholderFolderLayout
 {
 
-  berryObjectMacro(berry::IFolderLayout)
+  berryObjectMacro(berry::IFolderLayout);
 
   ~IFolderLayout() override;
 

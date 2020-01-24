@@ -62,17 +62,20 @@ namespace mitk
   class MITKALGORITHMSEXT_EXPORT UnstructuredGridClusteringFilter : public UnstructuredGridToUnstructuredGridFilter
   {
   public:
-    mitkClassMacro(UnstructuredGridClusteringFilter, UnstructuredGridToUnstructuredGridFilter)
-      itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(UnstructuredGridClusteringFilter, UnstructuredGridToUnstructuredGridFilter);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /** Sets the distance for the neighbour search */
-      itkSetMacro(eps, double) itkGetMacro(eps, double)
+      itkSetMacro(eps, double);
+      itkGetMacro(eps, double);
 
       /** Sets the number of required neighbours */
-      itkSetMacro(MinPts, int) itkGetMacro(MinPts, int)
+      itkSetMacro(MinPts, int);
+      itkGetMacro(MinPts, int);
 
       /** If activated the clusteres UnstructuredGrid is meshed */
-      itkSetMacro(Meshing, bool)
+      itkSetMacro(Meshing, bool);
 
       /** Returns all clusters as UnstructuredGrids which were found */
       virtual std::vector<mitk::UnstructuredGrid::Pointer> GetAllClusters();

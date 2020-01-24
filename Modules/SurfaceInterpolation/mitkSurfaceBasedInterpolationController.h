@@ -31,10 +31,11 @@ namespace mitk
   class MITKSURFACEINTERPOLATION_EXPORT SurfaceBasedInterpolationController : public itk::Object
   {
   public:
-    mitkClassMacroItkParent(SurfaceBasedInterpolationController, itk::Object) itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    mitkClassMacroItkParent(SurfaceBasedInterpolationController, itk::Object);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
-        static SurfaceBasedInterpolationController *GetInstance();
+    static SurfaceBasedInterpolationController *GetInstance();
 
     /**
      * Adds a new extracted contour to the list

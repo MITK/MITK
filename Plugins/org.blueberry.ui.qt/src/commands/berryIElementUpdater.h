@@ -27,7 +27,7 @@ class UIElement;
 struct IElementUpdater : public virtual Object
 {
 
-  berryObjectMacro(berry::IElementUpdater)
+  berryObjectMacro(berry::IElementUpdater);
 
   /**
    * Whenever the elements for a command are refreshed, this method is called

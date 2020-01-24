@@ -49,7 +49,9 @@ namespace mitk
   public:
     mitkClassMacro(MeshVtkMapper3D, VtkMapper);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       virtual const mitk::Mesh *GetInput();
 

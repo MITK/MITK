@@ -49,7 +49,7 @@ protected:
 
 public:
 
-  berryObjectMacro(berry::ContributionManager)
+  berryObjectMacro(berry::ContributionManager);
 
   ~ContributionManager() override;
 

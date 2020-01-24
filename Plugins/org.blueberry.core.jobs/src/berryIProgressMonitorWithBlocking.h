@@ -42,7 +42,7 @@ namespace berry
 struct BERRY_JOBS IProgressMonitorWithBlocking: public IProgressMonitor
 {
 
-  berryObjectMacro(berry::IProgressMonitorWithBlocking)
+  berryObjectMacro(berry::IProgressMonitorWithBlocking);
 
   /**
    * Indicates that this operation is blocked by some background activity. If

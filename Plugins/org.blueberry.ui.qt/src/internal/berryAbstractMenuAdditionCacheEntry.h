@@ -32,7 +32,7 @@ private:
 
 public:
 
-  berryObjectMacro(berry::AbstractMenuAdditionCacheEntry)
+  berryObjectMacro(berry::AbstractMenuAdditionCacheEntry);
 
   /**
    * Create a new instance of this class.

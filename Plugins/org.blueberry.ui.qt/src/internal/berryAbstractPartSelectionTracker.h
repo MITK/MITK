@@ -28,7 +28,7 @@ class AbstractPartSelectionTracker : public virtual Object
 {
 
 public:
-  berryObjectMacro(AbstractPartSelectionTracker)
+  berryObjectMacro(AbstractPartSelectionTracker);
 
 private:
 

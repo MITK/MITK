@@ -24,7 +24,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(PointSetSerializer, BaseDataSerializer);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self) std::string Serialize() override;
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self) std::string Serialize() override;
 
   protected:
     PointSetSerializer();

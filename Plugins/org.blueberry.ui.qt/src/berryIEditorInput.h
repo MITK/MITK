@@ -65,7 +65,7 @@ struct IPersistableElement;
  */
 struct BERRY_UI_QT IEditorInput : public virtual Object, public virtual IAdaptable
 {
-  berryObjectMacro(berry::IEditorInput)
+  berryObjectMacro(berry::IEditorInput);
 
   ~IEditorInput() override;
 

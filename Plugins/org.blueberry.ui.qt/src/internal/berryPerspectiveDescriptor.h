@@ -45,7 +45,7 @@ namespace berry {
 class PerspectiveDescriptor : public IPerspectiveDescriptor, public IPluginContribution {
 
 public:
-  berryObjectMacro(PerspectiveDescriptor, IPerspectiveDescriptor, IPluginContribution)
+  berryObjectMacro(PerspectiveDescriptor, IPerspectiveDescriptor, IPluginContribution);
 
 private:
 

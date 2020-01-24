@@ -64,7 +64,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(ExtractSliceFilter, ImageToImageFilter);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       mitkNewMacro1Param(Self, vtkImageReslice *);
 

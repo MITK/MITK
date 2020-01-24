@@ -28,7 +28,9 @@ namespace mitk
   public:
     mitkClassMacro(PlaneLandmarkProjector, LandmarkProjector);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       //##Documentation
       //## @brief Set the plane-geometry to project the target-landmarks on.

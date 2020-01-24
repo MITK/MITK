@@ -181,7 +181,11 @@ namespace mitk
     */
     const Label *GetLabel(PixelType pixelValue) const;
 
-    itkGetMacro(Layer, int) itkGetConstMacro(Layer, int) itkGetModifiableObjectMacro(LookupTable, mitk::LookupTable)
+    itkGetMacro(Layer, int);
+
+    itkGetConstMacro(Layer, int);
+
+    itkGetModifiableObjectMacro(LookupTable, mitk::LookupTable);
 
       /** \brief
       */
@@ -195,7 +199,7 @@ namespace mitk
     LabelSet();
     LabelSet(const LabelSet &);
 
-    mitkCloneMacro(Self)
+    mitkCloneMacro(Self);
 
       ~LabelSet() override;
 

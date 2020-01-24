@@ -33,7 +33,7 @@ class DetachedWindow: public Object, private IPropertyChangeListener,
 {
 
 public:
-  berryObjectMacro(DetachedWindow)
+  berryObjectMacro(DetachedWindow);
 
 private:
   PartStack::Pointer folder;

@@ -28,7 +28,7 @@ class Perspective;
 struct BERRY_UI_QT IStickyViewManager : public Object
 {
 
-  berryObjectMacro(berry::IStickyViewManager)
+  berryObjectMacro(berry::IStickyViewManager);
 
   ~IStickyViewManager() override;
 

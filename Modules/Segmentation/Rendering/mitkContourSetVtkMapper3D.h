@@ -36,7 +36,9 @@ namespace mitk
   public:
     mitkClassMacro(ContourSetVtkMapper3D, VtkMapper);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       virtual const mitk::ContourSet *GetInput();
 

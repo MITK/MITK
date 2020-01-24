@@ -58,7 +58,7 @@ class BERRY_UI_QT WorkbenchPage: public IWorkbenchPage
 {
 
 public:
-  berryObjectMacro(WorkbenchPage)
+  berryObjectMacro(WorkbenchPage);
 
 protected:
 

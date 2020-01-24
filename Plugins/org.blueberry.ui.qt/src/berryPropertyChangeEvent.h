@@ -43,7 +43,7 @@ class BERRY_UI_QT PropertyChangeEvent : public Object
 
 public:
 
-  berryObjectMacro(PropertyChangeEvent)
+  berryObjectMacro(PropertyChangeEvent);
 
 private:
 

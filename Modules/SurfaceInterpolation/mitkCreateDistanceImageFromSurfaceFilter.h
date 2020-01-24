@@ -75,9 +75,9 @@ namespace mitk
     typedef std::vector<Surface::Pointer> SurfaceList;
 
     mitkClassMacro(CreateDistanceImageFromSurfaceFilter, ImageSource);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
-
-      itkGetMacro(DistanceImageSpacing, double)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
+    itkGetMacro(DistanceImageSpacing, double);
 
         using Superclass::SetInput;
 

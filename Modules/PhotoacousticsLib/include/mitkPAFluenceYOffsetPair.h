@@ -26,10 +26,10 @@ namespace mitk
     class MITKPHOTOACOUSTICSLIB_EXPORT FluenceYOffsetPair : public itk::LightObject
     {
     public:
-      mitkClassMacroItkParent(FluenceYOffsetPair, itk::LightObject)
-        mitkNewMacro2Param(Self, mitk::pa::Volume::Pointer, double)
+      mitkClassMacroItkParent(FluenceYOffsetPair, itk::LightObject);
+      mitkNewMacro2Param(Self, mitk::pa::Volume::Pointer, double);
 
-        FluenceYOffsetPair(const FluenceYOffsetPair::Pointer other);
+      FluenceYOffsetPair(const FluenceYOffsetPair::Pointer other);
 
       const FluenceYOffsetPair &operator=(const FluenceYOffsetPair::Pointer other)
       {

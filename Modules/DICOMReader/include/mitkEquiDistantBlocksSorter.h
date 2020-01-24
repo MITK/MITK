@@ -54,8 +54,9 @@ class MITKDICOMREADER_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
 {
   public:
 
-    mitkClassMacro( EquiDistantBlocksSorter, DICOMDatasetSorter )
-    itkNewMacro( EquiDistantBlocksSorter )
+    mitkClassMacro( EquiDistantBlocksSorter, DICOMDatasetSorter );
+
+    itkNewMacro( EquiDistantBlocksSorter );
 
     DICOMTagList GetTagsOfInterest() override;
 

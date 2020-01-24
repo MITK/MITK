@@ -52,7 +52,8 @@ namespace mitk
     };
 
     mitkClassMacro(TextAnnotation3D, mitk::VtkAnnotation3D);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       protected :
 

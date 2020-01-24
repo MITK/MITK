@@ -25,7 +25,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(CameraRotationController, BaseController);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self)
       // mitkNewMacro1Param(Self, const char *);
 
       void RotateCamera();

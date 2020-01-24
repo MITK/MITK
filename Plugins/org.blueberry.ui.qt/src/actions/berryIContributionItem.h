@@ -51,7 +51,7 @@ struct IContributionManager;
 struct IContributionItem : public virtual Object
 {
 
-  berryObjectMacro(berry::IContributionItem)
+  berryObjectMacro(berry::IContributionItem);
 
 
   /**

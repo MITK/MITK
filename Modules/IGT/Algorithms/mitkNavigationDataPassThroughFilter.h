@@ -28,8 +28,8 @@ namespace mitk {
 class MITKIGT_EXPORT NavigationDataPassThroughFilter : public NavigationDataToNavigationDataFilter
 {
 public:
-  mitkClassMacro(NavigationDataPassThroughFilter, NavigationDataToNavigationDataFilter)
-  itkNewMacro(Self)
+  mitkClassMacro(NavigationDataPassThroughFilter, NavigationDataToNavigationDataFilter);
+  itkNewMacro(Self);
 
 protected:
   NavigationDataPassThroughFilter();

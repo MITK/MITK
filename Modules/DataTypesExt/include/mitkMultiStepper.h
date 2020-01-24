@@ -34,7 +34,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(MultiStepper, Stepper);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self) void AddStepper(Stepper::Pointer stepper, unsigned int repeat = 1);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self) void AddStepper(Stepper::Pointer stepper, unsigned int repeat = 1);
     void RemoveStepper(Stepper::Pointer stepper, unsigned int repeat = 1);
     /*void Next();
     void Previous();

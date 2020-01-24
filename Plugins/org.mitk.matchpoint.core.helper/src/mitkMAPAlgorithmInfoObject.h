@@ -24,7 +24,8 @@ namespace mitk
 {
 
 /**
- * @Class berry wrapper for a MatchPoint algorithm deployment info
+ * \brief berry wrapper for a MatchPoint algorithm deployment info
+ *
  * Used by mitk::MAPAlgorithmInfoSelection.
  */
 class MITK_MATCHPOINT_CORE_HELPER_EXPORT MAPAlgorithmInfoObject : public berry::Object
@@ -32,7 +33,7 @@ class MITK_MATCHPOINT_CORE_HELPER_EXPORT MAPAlgorithmInfoObject : public berry::
 
 public:
 
-  berryObjectMacro(mitk::MAPAlgorithmInfoObject)
+  berryObjectMacro(mitk::MAPAlgorithmInfoObject);
 
   MAPAlgorithmInfoObject();
   MAPAlgorithmInfoObject(::map::deployment::DLLInfo::ConstPointer info);

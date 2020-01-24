@@ -39,8 +39,9 @@ class MITKDICOMREADER_EXPORT NormalDirectionConsistencySorter : public DICOMData
 {
   public:
 
-    mitkClassMacro( NormalDirectionConsistencySorter, DICOMDatasetSorter )
-    itkNewMacro( NormalDirectionConsistencySorter )
+    mitkClassMacro( NormalDirectionConsistencySorter, DICOMDatasetSorter );
+
+    itkNewMacro( NormalDirectionConsistencySorter );
 
     DICOMTagList GetTagsOfInterest() override;
 

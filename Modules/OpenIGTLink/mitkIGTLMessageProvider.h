@@ -48,8 +48,8 @@ namespace mitk {
   {
   public:
     mitkClassMacro(IGTLMessageProvider, IGTLDeviceSource);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     typedef itk::SimpleMemberCommand<mitk::IGTLMessageProvider> ProviderCommand;
 

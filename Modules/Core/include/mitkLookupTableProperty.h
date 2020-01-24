@@ -51,7 +51,9 @@ namespace mitk
 
     mitkClassMacro(LookupTableProperty, BaseProperty);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self)
       mitkNewMacro1Param(LookupTableProperty, const mitk::LookupTable::Pointer);
 
     itkGetObjectMacro(LookupTable, LookupTable);

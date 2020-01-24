@@ -87,7 +87,7 @@ public:
    */
   static bool DEBUG; // = Policy.DEBUG_SOURCES;
 
-  berryObjectMacro(berry::AbstractSourceProvider)
+  berryObjectMacro(berry::AbstractSourceProvider);
 
   void AddSourceProviderListener(ISourceProviderListener* listener) override;
 

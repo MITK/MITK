@@ -26,9 +26,10 @@ namespace mitk
   class MITKCORE_EXPORT InteractionEvent : public itk::LightObject
   {
   public:
-    mitkClassMacroItkParent(InteractionEvent, itk::LightObject) mitkNewMacro1Param(Self, BaseRenderer *)
+    mitkClassMacroItkParent(InteractionEvent, itk::LightObject);
+    mitkNewMacro1Param(Self, BaseRenderer*);
 
-      void SetSender(BaseRenderer *sender);
+    void SetSender(BaseRenderer *sender);
     BaseRenderer *GetSender() const;
 
     /**

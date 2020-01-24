@@ -37,7 +37,7 @@ class LayoutTree : public Object, public ISizeProvider
 
 public:
 
-  berryObjectMacro(LayoutTree)
+  berryObjectMacro(LayoutTree);
 
   /* The parent of this tree or null if it is the root */
   LayoutTreeNode* parent;

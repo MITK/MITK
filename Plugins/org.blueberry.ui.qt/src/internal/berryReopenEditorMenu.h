@@ -32,7 +32,7 @@ class ReopenEditorMenu : public QObject, public ContributionItem
 
 public:
 
-  berryObjectMacro(ReopenEditorMenu)
+  berryObjectMacro(ReopenEditorMenu);
 
   /**
    * Create a new instance.

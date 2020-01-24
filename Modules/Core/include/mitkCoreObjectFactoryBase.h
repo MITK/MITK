@@ -40,7 +40,7 @@ namespace mitk
     typedef std::list<mitk::FileWriterWithInformation::Pointer> FileWriterList;
     typedef std::multimap<std::string, std::string> MultimapType;
 
-    mitkClassMacroItkParent(CoreObjectFactoryBase, itk::Object)
+    mitkClassMacroItkParent(CoreObjectFactoryBase, itk::Object);
 
       virtual Mapper::Pointer CreateMapper(mitk::DataNode *node, MapperSlotId slotId) = 0;
     virtual void SetDefaultProperties(mitk::DataNode *node) = 0;

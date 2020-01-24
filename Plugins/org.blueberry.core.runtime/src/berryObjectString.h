@@ -27,7 +27,7 @@ class org_blueberry_core_runtime_EXPORT ObjectString : public QString, public Ob
 
 public:
 
-  berryObjectMacro(berry::ObjectString)
+  berryObjectMacro(berry::ObjectString);
 
   ObjectString();
   ObjectString(const QString& s);

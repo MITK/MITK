@@ -28,15 +28,12 @@ public:
   typedef std::map<int,int> outmap;
 
   /** Method for creation through the object factory. */
-  itkNewMacro(Self)
-
-  /** Run-time type information (and related methods). */
-  itkTypeMacro(Self, ImageToImageFilter)
-
-  itkSetMacro(AcceptRate, double)
-  itkSetMacro(Label, int)
-  itkGetMacro(LabelVoxelCountMap, outmap)
-  itkGetMacro(NumberOfSampledVoxels,int)
+  itkNewMacro(Self); /** Run-time type information (and related methods). */
+  itkTypeMacro(Self, ImageToImageFilter);
+  itkSetMacro(AcceptRate, double);
+  itkSetMacro(Label, int);
+  itkGetMacro(LabelVoxelCountMap, outmap);
+  itkGetMacro(NumberOfSampledVoxels,int);
 
   int GetLabelVoxelCount(int label)
   {

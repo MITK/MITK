@@ -37,7 +37,7 @@ class BERRY_COMMANDS AbstractHandler : public QObject, public IHandler { // ,pub
   Q_INTERFACES(berry::IHandler)
 
 public:
-  berryObjectMacro(AbstractHandler)
+  berryObjectMacro(AbstractHandler);
 
 private:
 

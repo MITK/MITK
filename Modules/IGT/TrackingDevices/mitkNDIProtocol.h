@@ -87,9 +87,8 @@ namespace mitk
   {
   public:
     mitkClassMacroItkParent(NDIProtocol, itk::Object);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
     itkSetObjectMacro(TrackingDevice, NDITrackingDevice);
 
     typedef mitk::SerialCommunication::PortNumber PortNumber; ///< Port number of the serial connection

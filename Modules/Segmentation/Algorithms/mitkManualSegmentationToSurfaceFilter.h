@@ -54,7 +54,8 @@ namespace mitk
      * does not need a manual call since we use Update().
      */
     void GenerateData() override;
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /**
        * Supplies a method for setting median filter by a bool value.

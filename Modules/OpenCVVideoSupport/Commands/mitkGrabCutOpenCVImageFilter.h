@@ -60,9 +60,11 @@ public:
   /** \brief List holding image indices of the model points. */
   typedef std::vector<itk::Index<2> > ModelPointsList;
 
-  mitkClassMacro(GrabCutOpenCVImageFilter, AbstractOpenCVImageFilter)
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+  mitkClassMacro(GrabCutOpenCVImageFilter, AbstractOpenCVImageFilter);
+
+  itkFactorylessNewMacro(Self);
+
+  itkCloneMacro(Self);
 
   GrabCutOpenCVImageFilter();
   ~GrabCutOpenCVImageFilter() override;

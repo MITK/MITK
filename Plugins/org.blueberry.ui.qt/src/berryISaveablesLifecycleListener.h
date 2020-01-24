@@ -46,7 +46,7 @@ namespace berry {
  */
 struct ISaveablesLifecycleListener : public virtual Object
 {
-  berryObjectMacro(berry::ISaveablesLifecycleListener)
+  berryObjectMacro(berry::ISaveablesLifecycleListener);
 
   struct Events {
     Message1<const SaveablesLifecycleEvent::Pointer&> lifecycleChange;

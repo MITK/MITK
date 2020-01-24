@@ -27,9 +27,9 @@ namespace mitk
   class MITKPLANARFIGURE_EXPORT PlanarEllipse : public PlanarFigure
   {
   public:
-    mitkClassMacro(PlanarEllipse, PlanarFigure)
-
-      itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(PlanarEllipse, PlanarFigure);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /** \brief Place figure in its minimal configuration (a point at least)
        * onto the given 2D geometry.

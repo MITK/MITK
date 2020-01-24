@@ -41,9 +41,9 @@ namespace mitk
     typedef mitk::ITKImageImport<itkOutputImageType> ImageConverterType;
 
     mitkClassMacro(OtsuSegmentationFilter, ImageToImageFilter);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
-
-      itkGetMacro(NumberOfThresholds, unsigned int);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
+    itkGetMacro(NumberOfThresholds, unsigned int);
 
     void SetNumberOfThresholds(unsigned int number)
     {

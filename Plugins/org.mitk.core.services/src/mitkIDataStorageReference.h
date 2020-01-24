@@ -28,7 +28,7 @@ namespace mitk
  */
 struct MITK_CORE_SERVICES_PLUGIN IDataStorageReference : public berry::Object
 {
-  berryObjectMacro(mitk::IDataStorageReference)
+  berryObjectMacro(mitk::IDataStorageReference);
 
   virtual DataStorage::Pointer GetDataStorage() const = 0;
 

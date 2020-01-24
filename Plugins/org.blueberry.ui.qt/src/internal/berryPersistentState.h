@@ -35,7 +35,7 @@ class PersistentState : public State
 
 public:
 
-  berryObjectMacro(berry::PersistentState)
+  berryObjectMacro(berry::PersistentState);
 
   PersistentState();
 

@@ -59,7 +59,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(OverwriteSliceImageFilter, ImageToImageFilter);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /**
         \brief Which slice to overwrite (first one has index 0).

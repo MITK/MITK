@@ -40,7 +40,7 @@ private:
 
 public:
 
-  berryObjectMacro(berry::MultiStatus)
+  berryObjectMacro(berry::MultiStatus);
 
   /**
    * Creates and returns a new multi-status object with the given children.

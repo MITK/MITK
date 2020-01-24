@@ -33,8 +33,9 @@ namespace mitk
 
     mitkClassMacro( ToFCameraPMDRawDataDevice , ToFCameraDevice );
 
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
     itkSetMacro(ChannelSize, int);
     itkGetMacro(ChannelSize, int);

@@ -111,7 +111,7 @@ namespace mitk
   class MITKCORE_EXPORT EventStateMachine : public mitk::InteractionEventHandler
   {
   public:
-    mitkClassMacro(EventStateMachine, InteractionEventHandler)
+    mitkClassMacro(EventStateMachine, InteractionEventHandler);
 
       typedef std::map<std::string, TActionFunctor *> DEPRECATED(ActionFunctionsMapType);
 

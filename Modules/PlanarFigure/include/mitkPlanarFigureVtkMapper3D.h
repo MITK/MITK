@@ -39,7 +39,8 @@ namespace mitk
     static void SetDefaultProperties(DataNode *, BaseRenderer * = nullptr, bool = false);
 
     mitkClassMacro(PlanarFigureVtkMapper3D, VtkMapper);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       void ApplyColorAndOpacityProperties(BaseRenderer *renderer, vtkActor *actor) override;
     void ApplyPlanarFigureProperties(BaseRenderer *renderer, vtkActor *actor);

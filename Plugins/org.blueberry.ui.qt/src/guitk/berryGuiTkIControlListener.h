@@ -44,7 +44,7 @@ namespace GuiTk
 struct BERRY_UI_QT IControlListener: public virtual Object
 {
 
-  berryObjectMacro(berry::GuiTk::IControlListener)
+  berryObjectMacro(berry::GuiTk::IControlListener);
 
   struct BERRY_UI_QT Events {
 

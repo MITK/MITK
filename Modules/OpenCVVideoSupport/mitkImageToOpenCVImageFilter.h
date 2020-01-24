@@ -37,8 +37,8 @@ class MITKOPENCVVIDEOSUPPORT_EXPORT ImageToOpenCVImageFilter : public itk::Objec
         typedef itk::RGBPixel< double > DoubleRGBPixelType;
 
         mitkClassMacroItkParent(ImageToOpenCVImageFilter, itk::Object);
-        itkFactorylessNewMacro(Self)
-        itkCloneMacro(Self)
+        itkFactorylessNewMacro(Self);
+        itkCloneMacro(Self);
 
         ///
         /// \brief set the input MITK image

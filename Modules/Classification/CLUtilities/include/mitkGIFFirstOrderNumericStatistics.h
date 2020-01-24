@@ -127,9 +127,9 @@ namespace mitk
     * - <b>First Order::Number Of Voxels</b>: The volume of a single voxel. If the dimensionality is only 2D, this is the
     * surface of an voxel.
     */
-    mitkClassMacro(GIFFirstOrderNumericStatistics,AbstractGlobalImageFeature)
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    mitkClassMacro(GIFFirstOrderNumericStatistics,AbstractGlobalImageFeature);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       GIFFirstOrderNumericStatistics();
 

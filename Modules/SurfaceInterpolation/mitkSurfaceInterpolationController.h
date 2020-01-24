@@ -48,12 +48,12 @@ namespace mitk
   class MITKSURFACEINTERPOLATION_EXPORT SurfaceInterpolationController : public itk::Object
   {
   public:
-    mitkClassMacroItkParent(SurfaceInterpolationController, itk::Object) itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    mitkClassMacroItkParent(SurfaceInterpolationController, itk::Object);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
+    itkGetMacro(DistanceImageSpacing, double);
 
-        itkGetMacro(DistanceImageSpacing, double)
-
-          struct ContourPositionInformation
+    struct ContourPositionInformation
     {
       Surface::Pointer contour;
       Vector3D contourNormal;

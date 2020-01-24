@@ -41,8 +41,8 @@ namespace mitk {
   public:
 
     mitkClassMacroItkParent(NavigationTool,itk::DataObject);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     enum NavigationToolType {Instrument, Fiducial, Skinmarker, Unknown};
 

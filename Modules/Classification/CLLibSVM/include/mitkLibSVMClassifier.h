@@ -17,13 +17,10 @@ found in the LICENSE file.
 
 #include <mitkAbstractClassifier.h>
 
-namespace LibSVM
-{
-  struct svm_parameter;
-  struct svm_problem;
-  struct svm_node;
-  struct svm_model;
-}
+struct svm_parameter;
+struct svm_problem;
+struct svm_node;
+struct svm_model;
 
 namespace mitk
 {
@@ -31,9 +28,11 @@ namespace mitk
   {
   public:
 
-    mitkClassMacro(LibSVMClassifier,AbstractClassifier)
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    mitkClassMacro(LibSVMClassifier,AbstractClassifier);
+
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
     LibSVMClassifier();
     ~LibSVMClassifier() override;
@@ -63,12 +62,12 @@ namespace mitk
 
   private:
 
-    void ReadXValues(LibSVM::svm_problem * problem, LibSVM::svm_node** xSpace, const Eigen::MatrixXd &X);
-    void ReadYValues(LibSVM::svm_problem * problem, const Eigen::MatrixXi &Y);
-    void ReadWValues(LibSVM::svm_problem * problem);
+    void ReadXValues(svm_problem * problem, svm_node** xSpace, const Eigen::MatrixXd &X);
+    void ReadYValues(svm_problem * problem, const Eigen::MatrixXi &Y);
+    void ReadWValues(svm_problem * problem);
 
-    LibSVM::svm_model* m_Model;
-    LibSVM::svm_parameter * m_Parameter;
+    svm_model* m_Model;
+    svm_parameter * m_Parameter;
 
   };
 }

@@ -50,9 +50,9 @@ namespace mitk
   {
   public:
 
-    mitkClassMacroItkParent(LevelWindowManager, itk::Object)
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    mitkClassMacroItkParent(LevelWindowManager, itk::Object);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     void SetDataStorage(DataStorage *ds);
     DataStorage *GetDataStorage();

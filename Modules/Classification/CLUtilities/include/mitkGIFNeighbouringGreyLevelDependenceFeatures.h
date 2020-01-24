@@ -31,7 +31,7 @@ namespace mitk
   * around each feature is calculated and the number of voxels within the neighbourhood that
   * are greater than the center voxel plus \f$ \alpha \f$ is counted. This is called the
   * number of dependence voxels. The matrix gives the
-  * number of voxels with an intesity \f$ x \f$ and $\f d \f$ dependence neighbourhood voxels.
+  * number of voxels with an intesity \f$ x \f$ and \f$ d \f$ dependence neighbourhood voxels.
   *
   * The image is quantified prior to the calculation of the features. This reduces the number of
   * available intensity values. Instead of using the pure intensity value, the features are
@@ -116,9 +116,9 @@ namespace mitk
   class MITKCLUTILITIES_EXPORT GIFNeighbouringGreyLevelDependenceFeature : public AbstractGlobalImageFeature
   {
     public:
-      mitkClassMacro(GIFNeighbouringGreyLevelDependenceFeature, AbstractGlobalImageFeature)
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+      mitkClassMacro(GIFNeighbouringGreyLevelDependenceFeature, AbstractGlobalImageFeature);
+      itkFactorylessNewMacro(Self);
+      itkCloneMacro(Self);
 
       GIFNeighbouringGreyLevelDependenceFeature();
 

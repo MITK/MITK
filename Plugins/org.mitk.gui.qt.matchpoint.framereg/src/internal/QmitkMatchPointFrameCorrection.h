@@ -65,8 +65,6 @@ protected slots:
   */
   virtual void CreateConnections();
 
-  /// \brief Called when the user clicks the GUI button
-  void OnMaskCheckBoxToggeled(bool checked);
   void OnLoadAlgorithmButtonPushed();
   void OnSelectedAlgorithmChanged();
 
@@ -90,14 +88,12 @@ protected slots:
   void OnFrameRegistered(double progress);
   void OnFrameMapped(double progress);
 
+  void OnNodeSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
+
 protected:
   void CreateQtPartControl(QWidget* parent) override;
 
   void SetFocus() override;
-
-  /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
-                                  const QList<mitk::DataNode::Pointer>& nodes) override;
 
 private:
 
@@ -108,19 +104,20 @@ private:
 
   void Error(QString msg);
 
-  void UpdateAlgorithmList();
-
   /**
   * checks if appropriated nodes are selected in the data manager. If nodes are selected,
-  * they are stored m_MovingData and m_TargetData. It also sets the info lables accordingly.
-  * @return True: All inputs are set and valid (images). False: At least one input is not set
-  * or invalid */
-  bool CheckInputs();
+  * they are stored m_MovingData and m_TargetData.*/
+  void CheckInputs();
 
   /**
   * Updates the state of registration control buttons. Regarding to selected
   * inputs, loaded algorithm and its state.*/
   void ConfigureRegistrationControls();
+
+  /**
+  Configure the node selectors predicates according to the selected algorithm.
+  */
+  void ConfigureNodeSelectorPredicates();
 
   /**
   * Configures the progress bars according to the chosen algorithm.
@@ -139,11 +136,6 @@ private:
 
   /** Returns a proposal for a (unique) default reg job name */
   std::string GetDefaultJobName() const;
-
-  /** Returns the display name of the passed node. Normally it is just node->GetName().
-   * if the node contains a point set it is additionally checked if the point set node
-   * has a source node and its name will be added in parentheses.*/
-  std::string GetInputNodeDisplayName(const mitk::DataNode* node) const;
 
   /** Returns the Pointer to the DLL info of the algorithm currently selected by the system.
   The info is received via m_AlgorithmSelectionListener.
@@ -191,7 +183,6 @@ private:
 
   // boolean variables to control visibility of GUI elements
   bool m_CanLoadAlgorithm;
-  bool m_ValidInputs;
   bool m_Working;
 
   Ui::MatchPointFrameCorrectionControls m_Controls;

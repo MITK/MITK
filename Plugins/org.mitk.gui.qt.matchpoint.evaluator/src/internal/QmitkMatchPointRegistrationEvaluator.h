@@ -75,9 +75,6 @@ private:
 
   void Error(QString msg);
 
-  /** Methods returns a list of all eval nodes in the data manager.*/
-  QList<mitk::DataNode::Pointer> GetEvalNodes();
-
   /**
   * Checks if appropriated nodes are selected in the data manager. If nodes are selected,
   * they are stored m_spSelectedRegNode, m_spSelectedInputNode and m_spSelectedRefNode.

@@ -117,4 +117,3 @@ private:
 };
 
 #endif // MatchPoint_h
-

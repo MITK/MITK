@@ -241,7 +241,7 @@ mitk::Image::Pointer ExtractFirstFrame(const mitk::Image* dynamicImage)
   imageTimeSelector->UpdateLargestPossibleRegion();
 
   return imageTimeSelector->GetOutput();
-};
+}
 
 bool QmitkMatchPoint::CheckInputs()
 {
@@ -468,8 +468,8 @@ void QmitkMatchPoint::ConfigureRegistrationControls()
 
 void QmitkMatchPoint::ConfigureNodeSelectors()
 {
-  mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New("Image");
-  mitk::NodePredicateDataType::Pointer isPointSet = mitk::NodePredicateDataType::New("PointSet");
+  auto isImage = mitk::MITKRegistrationHelper::ImageNodePredicate();
+  auto isPointSet = mitk::MITKRegistrationHelper::PointSetNodePredicate();
   mitk::NodePredicateDataType::Pointer isLabelSet = mitk::NodePredicateDataType::New("LabelSetImage");
   mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
   mitk::NodePredicateAnd::Pointer isLegacyMask = mitk::NodePredicateAnd::New(isImage, isBinary);
@@ -484,7 +484,7 @@ void QmitkMatchPoint::ConfigureNodeSelectors()
 
   if (m_LoadedAlgorithm.IsNotNull())
   {
-    mitk::NodePredicateBase::Pointer dataPredicate;
+    mitk::NodePredicateBase::ConstPointer dataPredicate;
 
     if (m_LoadedAlgorithm->getMovingDimensions() == 2)
     {
@@ -526,7 +526,7 @@ void QmitkMatchPoint::ConfigureNodeSelectors()
         m_Controls.targetNodeSelector->SetPopUpHint("Select the target data that should be used as reference for the registration. The algorithm supports images as well as point sets.");
       }
     }
-    mitk::NodePredicateBase::Pointer nodePredicate = dataPredicate;
+    mitk::NodePredicateBase::ConstPointer nodePredicate = dataPredicate;
 
     m_Controls.movingNodeSelector->SetNodePredicate(nodePredicate);
     m_Controls.targetNodeSelector->SetNodePredicate(nodePredicate);
@@ -725,7 +725,7 @@ void QmitkMatchPoint::OnSaveLogBtnPushed()
 void QmitkMatchPoint::OnRegJobError(QString err)
 {
   Error(err);
-};
+}
 
 void QmitkMatchPoint::OnRegJobFinished()
 {
@@ -736,7 +736,7 @@ void QmitkMatchPoint::OnRegJobFinished()
   this->CheckInputs();
   this->ConfigureRegistrationControls();
   this->ConfigureProgressInfos();
-};
+}
 
 
 void QmitkMatchPoint::OnRegResultIsAvailable(mitk::MAPRegistrationWrapper::Pointer
@@ -786,12 +786,12 @@ void QmitkMatchPoint::OnRegResultIsAvailable(mitk::MAPRegistrationWrapper::Point
     QThreadPool* threadPool = QThreadPool::globalInstance();
     threadPool->start(pMapJob);
   }
-};
+}
 
 void QmitkMatchPoint::OnMapJobError(QString err)
 {
   Error(err);
-};
+}
 
 void QmitkMatchPoint::OnMapResultIsAvailable(mitk::BaseData::Pointer spMappedData,
     const QmitkMappingJob* job)
@@ -804,7 +804,7 @@ void QmitkMatchPoint::OnMapResultIsAvailable(mitk::BaseData::Pointer spMappedDat
                                          job->m_doGeometryRefinement, job->m_InterpolatorLabel);
   this->GetDataStorage()->Add(spMappedNode);
   this->GetRenderWindowPart()->RequestUpdate();
-};
+}
 
 void QmitkMatchPoint::OnAlgorithmIterated(QString info, bool hasIterationCount,
     unsigned long currentIteration)
@@ -815,7 +815,7 @@ void QmitkMatchPoint::OnAlgorithmIterated(QString info, bool hasIterationCount,
   }
 
   m_Controls.m_teLog->append(info);
-};
+}
 
 void QmitkMatchPoint::OnLevelChanged(QString info, bool hasLevelCount, unsigned long currentLevel)
 {
@@ -825,17 +825,17 @@ void QmitkMatchPoint::OnLevelChanged(QString info, bool hasLevelCount, unsigned 
   }
 
   m_Controls.m_teLog->append(QString("<b><font color='green'>") + info + QString("</font></b>"));
-};
+}
 
 void QmitkMatchPoint::OnAlgorithmStatusChanged(QString info)
 {
   m_Controls.m_teLog->append(QString("<b><font color='blue'>") + info + QString(" </font></b>"));
-};
+}
 
 void QmitkMatchPoint::OnAlgorithmInfo(QString info)
 {
   m_Controls.m_teLog->append(QString("<font color='gray'><i>") + info + QString("</i></font>"));
-};
+}
 
 void QmitkMatchPoint::OnAlgorithmSelectionChanged(const berry::IWorkbenchPart::Pointer& sourcepart,
     const berry::ISelection::ConstPointer& selection)
@@ -870,4 +870,4 @@ void QmitkMatchPoint::UpdateAlgorithmSelection(berry::ISelection::ConstPointer s
   }
 
   this->OnSelectedAlgorithmChanged();
-};
+}

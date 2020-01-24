@@ -17,9 +17,6 @@ found in the LICENSE file.
 // Mitk
 #include <mitkStatusBar.h>
 #include <mitkNodePredicateDataProperty.h>
-#include <mitkNodePredicateDataType.h>
-#include <mitkNodePredicateAnd.h>
-#include <mitkNodePredicateFunction.h>
 #include <mitkMAPRegistrationWrapper.h>
 #include "mitkRegVisPropertyTags.h"
 #include "mitkMatchPointPropertyTags.h"
@@ -151,11 +148,8 @@ void QmitkMatchPointRegistrationManipulator::ConfigureNodePredicates()
 {
   this->m_Controls.registrationNodeSelector->SetNodePredicate(mitk::MITKRegistrationHelper::RegNodePredicate());
 
-  mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New(mitk::Image::GetStaticNameOfClass());
-
-  mitk::NodePredicateBase::Pointer nodePredicate = isImage;
-  this->m_Controls.movingNodeSelector->SetNodePredicate(nodePredicate);
-  this->m_Controls.targetNodeSelector->SetNodePredicate(nodePredicate);
+  this->m_Controls.movingNodeSelector->SetNodePredicate(mitk::MITKRegistrationHelper::ImageNodePredicate());
+  this->m_Controls.targetNodeSelector->SetNodePredicate(mitk::MITKRegistrationHelper::ImageNodePredicate());
 }
 
 void QmitkMatchPointRegistrationManipulator::CheckInputs()
@@ -342,7 +336,7 @@ void QmitkMatchPointRegistrationManipulator::OnRegistrationChanged()
   this->m_EvalNode->Modified();
   this->m_CurrentRegistrationWrapper->Modified();
   this->GetRenderWindowPart()->RequestUpdate();
-};
+}
 
 void QmitkMatchPointRegistrationManipulator::OnSliceChanged()
 {

@@ -65,6 +65,12 @@ public:
   /** Returns a node predicate that identifies registration nodes.*/
   static NodePredicateBase::ConstPointer RegNodePredicate();
 
+  /** Returns a node predicate that identifies image nodes.*/
+  static NodePredicateBase::ConstPointer ImageNodePredicate();
+
+  /** Returns a node predicate that identifies point set nodes.*/
+  static NodePredicateBase::ConstPointer PointSetNodePredicate();
+
 private:
     typedef ::map::core::Registration<3,3>::DirectMappingType RegistrationKernel3DBase;
     static Affine3DTransformType::Pointer getAffineMatrix(const RegistrationKernel3DBase& kernel);

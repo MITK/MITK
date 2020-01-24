@@ -252,13 +252,13 @@ std::function<bool(const mitk::DataNode *)> GenerateDimCheckLambda(unsigned int 
 
 void QmitkMatchPointMapper::ConfigureNodePredicates(const mitk::DataNode* reg)
 {
-  mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New(mitk::Image::GetStaticNameOfClass());
-  mitk::NodePredicateDataType::Pointer isPointSet = mitk::NodePredicateDataType::New(mitk::PointSet::GetStaticNameOfClass());
+  auto isImage = mitk::MITKRegistrationHelper::ImageNodePredicate();
+  auto isPointSet = mitk::MITKRegistrationHelper::PointSetNodePredicate();
 
   auto isData = mitk::NodePredicateOr::New(isImage, isPointSet);
 
-  mitk::NodePredicateBase::Pointer inputPredicate = isData;
-  mitk::NodePredicateBase::Pointer refPredicate = isImage;
+  mitk::NodePredicateBase::ConstPointer inputPredicate = isData;
+  mitk::NodePredicateBase::ConstPointer refPredicate = isImage;
 
   if (reg != nullptr)
   {
@@ -386,7 +386,7 @@ void QmitkMatchPointMapper::OnRegNodeSelectionChanged(QList<mitk::DataNode::Poin
   this->ConfigureNodePredicates(regNode);
   this->CheckInputs();
   this->ConfigureMappingControls();
-};
+}
 
 void QmitkMatchPointMapper::OnInputNodeSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
 {
@@ -399,13 +399,13 @@ void QmitkMatchPointMapper::OnInputNodeSelectionChanged(QList<mitk::DataNode::Po
   this->ConfigureRegNodePredicate(inputNode);
   this->CheckInputs();
   this->ConfigureMappingControls();
-};
+}
 
 void QmitkMatchPointMapper::OnReferenceNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/)
 {
   this->CheckInputs();
   this->ConfigureMappingControls();
-};
+}
 
 void QmitkMatchPointMapper::OnManualRefChecked()
 {
@@ -549,7 +549,7 @@ void QmitkMatchPointMapper::SpawnMappingJob(bool doGeometryRefinement)
 void QmitkMatchPointMapper::OnMapJobError(QString err)
 {
     Error(err);
-};
+}
 
 void QmitkMatchPointMapper::OnMapResultIsAvailable(mitk::BaseData::Pointer spMappedData,
     const QmitkMappingJob* job)
@@ -565,12 +565,12 @@ void QmitkMatchPointMapper::OnMapResultIsAvailable(mitk::BaseData::Pointer spMap
 
     this->CheckInputs();
     this->ConfigureMappingControls();
-};
+}
 
 void QmitkMatchPointMapper::OnMappingInfo(QString info)
 {
     m_Controls.m_teLog->append(QString("<font color='gray'><i>") + info + QString("</i></font>"));
-};
+}
 
 void QmitkMatchPointMapper::OnXFactorChanged(double d)
 {

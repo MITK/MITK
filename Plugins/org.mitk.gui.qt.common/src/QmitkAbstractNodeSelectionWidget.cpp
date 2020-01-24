@@ -32,7 +32,7 @@ QmitkAbstractNodeSelectionWidget::~QmitkAbstractNodeSelectionWidget()
     dataStorage->RemoveNodeEvent.RemoveListener(
       mitk::MessageDelegate1<QmitkAbstractNodeSelectionWidget, const mitk::DataNode*>(this, &QmitkAbstractNodeSelectionWidget::NodeRemovedFromStorage));
   }
-};
+}
 
 
 void QmitkAbstractNodeSelectionWidget::SetDataStorage(mitk::DataStorage* dataStorage)
@@ -74,7 +74,7 @@ void QmitkAbstractNodeSelectionWidget::SetDataStorage(mitk::DataStorage* dataSto
   m_DataStorage = dataStorage;
   this->OnDataStorageChanged();
   this->UpdateInfo();
-};
+}
 
 void QmitkAbstractNodeSelectionWidget::SetNodePredicate(const mitk::NodePredicateBase* nodePredicate)
 {
@@ -85,7 +85,7 @@ void QmitkAbstractNodeSelectionWidget::SetNodePredicate(const mitk::NodePredicat
     this->OnNodePredicateChanged(nodePredicate);
     this->UpdateInfo();
   }
-};
+}
 
 const mitk::NodePredicateBase* QmitkAbstractNodeSelectionWidget::GetNodePredicate() const
 {
@@ -95,65 +95,65 @@ const mitk::NodePredicateBase* QmitkAbstractNodeSelectionWidget::GetNodePredicat
 QString QmitkAbstractNodeSelectionWidget::GetInvalidInfo() const
 {
   return m_InvalidInfo;
-};
+}
 
 QString QmitkAbstractNodeSelectionWidget::GetEmptyInfo() const
 {
   return m_EmptyInfo;
-};
+}
 
 QString QmitkAbstractNodeSelectionWidget::GetPopUpTitel() const
 {
   return m_PopUpTitel;
-};
+}
 
 QString QmitkAbstractNodeSelectionWidget::GetPopUpHint() const
 {
   return m_PopUpHint;
-};
+}
 
 bool QmitkAbstractNodeSelectionWidget::GetSelectionIsOptional() const
 {
   return m_IsOptional;
-};
+}
 
 bool QmitkAbstractNodeSelectionWidget::GetSelectOnlyVisibleNodes() const
 {
   return m_SelectOnlyVisibleNodes;
-};
+}
 
 void QmitkAbstractNodeSelectionWidget::SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes)
 {
   m_SelectOnlyVisibleNodes = selectOnlyVisibleNodes;
-};
+}
 
 void QmitkAbstractNodeSelectionWidget::SetInvalidInfo(QString info)
 {
   m_InvalidInfo = QString("<font class=\"warning\">")+info+QString("</font>");
   this->UpdateInfo();
-};
+}
 
 void QmitkAbstractNodeSelectionWidget::SetEmptyInfo(QString info)
 {
   m_EmptyInfo = QString("<font class=\"normal\">")+info+QString("</font>");
   this->UpdateInfo();
-};
+}
 
 void QmitkAbstractNodeSelectionWidget::SetPopUpTitel(QString info)
 {
   m_PopUpTitel = info;
-};
+}
 
 void QmitkAbstractNodeSelectionWidget::SetPopUpHint(QString info)
 {
   m_PopUpHint = info;
-};
+}
 
 void QmitkAbstractNodeSelectionWidget::SetSelectionIsOptional(bool isOptional)
 {
   m_IsOptional = isOptional;
   this->UpdateInfo();
-};
+}
 
 void QmitkAbstractNodeSelectionWidget::SetDataStorageDeleted()
 {

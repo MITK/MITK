@@ -56,24 +56,24 @@ const mitk::NodePredicateBase* QmitkAbstractDataStorageInspector::GetNodePredica
 QmitkAbstractDataStorageInspector::NodeList QmitkAbstractDataStorageInspector::GetSelectedNodes() const
 {
   return m_Connector->GetSelectedNodes();
-};
+}
 
 bool QmitkAbstractDataStorageInspector::GetSelectOnlyVisibleNodes() const
 {
   return m_Connector->GetSelectOnlyVisibleNodes();
-};
+}
 
 void QmitkAbstractDataStorageInspector::SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes)
 {
   m_Connector->SetSelectOnlyVisibleNodes(selectOnlyVisibleNodes);
-};
+}
 
 void QmitkAbstractDataStorageInspector::SetCurrentSelection(NodeList selectedNodes)
 {
   m_Connector->SetCurrentSelection(selectedNodes);
-};
+}
 
 void QmitkAbstractDataStorageInspector::OnSelectionChanged(NodeList selectedNodes)
 {
   emit CurrentSelectionChanged(selectedNodes);
-};
+}

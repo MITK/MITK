@@ -1,4 +1,4 @@
-/**
+﻿/**
 \page org_mitk_gui_qt_pharmacokinetics_mri The DCE MR Perfusion Datafit View
 
 \imageMacro{pharmacokinetics_mri_doc.svg,"Icon of the DCE MR Perfusion View",3.0}
@@ -61,6 +61,7 @@ Value and Width define the actual constraint value, that should not be crossed, 
 \imageMacro{dce_mri_concentration.png, "Example screen shot for concentration conversion settings.", 10}
 Most models require concentration values as input rather than raw signal intensities (i.e. all compartment models).
 The DCE MR Perfusion view offers conversion to concentration by means of relative and absolute signal enhancement as well as a special conversion for turbo flash sequences.
+For the conversion methods, a baseline image prior to contrast agent arrival is required. In many data sets, multiple baseline images are available. The "Baseline Range Selection" allows for selection of a range of images, from which the average image is calculated and set as baseline input image. Remark: The number of the first time point is 1. 
 
 \section FIT_DCE_Fitting Executing a fit
 After configuration of the entire fit routine, the respective time series to be fitted and eventually the ROI mask have to be selected.

@@ -59,7 +59,7 @@ QmitkMultiNodeSelectionWidget::NodeList QmitkMultiNodeSelectionWidget::CompileEm
   return result;
 }
 
-void QmitkMultiNodeSelectionWidget::OnNodePredicateChanged(mitk::NodePredicateBase* /*newPredicate*/)
+void QmitkMultiNodeSelectionWidget::OnNodePredicateChanged(const mitk::NodePredicateBase* /*newPredicate*/)
 {
   this->UpdateInfo();
   this->UpdateList();

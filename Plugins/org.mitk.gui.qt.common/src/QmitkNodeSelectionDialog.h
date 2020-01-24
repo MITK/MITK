@@ -49,9 +49,9 @@ public:
   *
   * @param nodePredicate    A pointer to node predicate.
   */
-  virtual void SetNodePredicate(mitk::NodePredicateBase* nodePredicate);
+  virtual void SetNodePredicate(const mitk::NodePredicateBase* nodePredicate);
 
-  mitk::NodePredicateBase* GetNodePredicate() const;
+  const mitk::NodePredicateBase* GetNodePredicate() const;
 
   using NodeList = QList<mitk::DataNode::Pointer>;
 
@@ -110,7 +110,7 @@ protected:
   void AddPanel(QmitkAbstractDataStorageInspector* view, QString name, QString desc);
 
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
-  mitk::NodePredicateBase::Pointer m_NodePredicate;
+  mitk::NodePredicateBase::ConstPointer m_NodePredicate;
   bool m_SelectOnlyVisibleNodes;
   NodeList m_SelectedNodes;
 

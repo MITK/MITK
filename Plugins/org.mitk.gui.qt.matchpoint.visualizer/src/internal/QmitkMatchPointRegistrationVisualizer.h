@@ -60,28 +60,25 @@ public:
      * the plugin*/
     mitk::MAPRegistrationWrapper* GetCurrentRegistration();
 
-    protected slots:
-
+protected slots:
     /**
      * @brief Connect all GUI elements to its corresponding slots
      */
     virtual void CreateConnections();
 
-    void OnLockRegButtonPushed();
     void OnStyleButtonPushed();
     void OnDirectionChanged(int index);
 
-    void OnUseFOVRefBtnPushed();
     void OnUpdateBtnPushed();
 
     void OnColorInterpolationChecked(bool);
 
+    void OnNodeSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
+
+    void TransferFOVRefGeometry();
+
 protected:
     void SetFocus() override;
-
-    /// \brief called by QmitkFunctionality when DataManager's selection has changed
-    void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
-        const QList<mitk::DataNode::Pointer>& nodes) override;
 
     void ActualizeRegInfo(mitk::MAPRegistrationWrapper* currentReg);
 
@@ -129,6 +126,11 @@ private:
     void ConfigureVisualizationControls();
 
     /**
+    Configure the node selectors predicates according to the selected algorithm.
+    */
+    void ConfigureNodePredicates();
+
+    /**
      * Updates the properties of the selected node according to the states of the gui controls.*/
     void StoreStateInNode();
 
@@ -155,4 +157,3 @@ private:
 };
 
 #endif // MatchPoint_h
-

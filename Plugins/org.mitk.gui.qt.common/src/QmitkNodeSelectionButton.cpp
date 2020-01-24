@@ -117,13 +117,13 @@ void QmitkNodeSelectionButton::SetSelectedNode(const mitk::DataNode* node)
   }
 
   this->update();
-};
+}
 
 void QmitkNodeSelectionButton::SetNodeInfo(QString info)
 {
   this->m_Info = info;
   this->update();
-};
+}
 
 void QmitkNodeSelectionButton::paintEvent(QPaintEvent *p)
 {

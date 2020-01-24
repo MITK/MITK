@@ -58,11 +58,9 @@ protected slots:
 
   void OnSliceChanged();
 
-protected:
-  /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-    const QList<mitk::DataNode::Pointer>& nodes) override;
+  void OnNodeSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
+protected:
   void NodeRemoved(const mitk::DataNode* node) override;
 
   void SetFocus() override;
@@ -77,9 +75,6 @@ private:
 
   void Error(QString msg);
 
-  /** Methods returns a list of all eval nodes in the data manager.*/
-  QList<mitk::DataNode::Pointer> GetEvalNodes();
-
   /**
   * Checks if appropriated nodes are selected in the data manager. If nodes are selected,
   * they are stored m_spSelectedRegNode, m_spSelectedInputNode and m_spSelectedRefNode.
@@ -91,6 +86,11 @@ private:
   * Updates the state of controls regarding to selected eval object.*/
   void ConfigureControls();
 
+  /**
+  Configure the node selectors predicates according to the selected algorithm.
+  */
+  void ConfigureNodePredicates();
+
   mitk::DataNode::Pointer m_selectedEvalNode;
 
   QmitkSliceNavigationListener m_SliceChangeListener;
@@ -99,8 +99,6 @@ private:
   itk::TimeStamp m_currentPositionTime;
 
   bool m_activeEvaluation;
-  bool m_autoMoving;
-  bool m_autoTarget;
 
   /** @brief currently valid selected position in the inspector*/
   mitk::Point3D m_currentSelectedPosition;
@@ -116,4 +114,3 @@ private:
 };
 
 #endif // MatchPoint_h
-

@@ -108,7 +108,7 @@ void QmitkAbstractDataStorageModel::SetDataStorageDeleted()
   this->SetDataStorage(nullptr);
 }
 
-void QmitkAbstractDataStorageModel::SetNodePredicate(mitk::NodePredicateBase* nodePredicate)
+void QmitkAbstractDataStorageModel::SetNodePredicate(const mitk::NodePredicateBase* nodePredicate)
 {
   if (m_NodePredicate == nodePredicate)
   {

@@ -91,7 +91,7 @@ void QmitkNodeSelectionDialog::SetDataStorage(mitk::DataStorage* dataStorage)
   }
 }
 
-void QmitkNodeSelectionDialog::SetNodePredicate(mitk::NodePredicateBase* nodePredicate)
+void QmitkNodeSelectionDialog::SetNodePredicate(const mitk::NodePredicateBase* nodePredicate)
 {
   if (m_NodePredicate != nodePredicate)
   {
@@ -104,7 +104,7 @@ void QmitkNodeSelectionDialog::SetNodePredicate(mitk::NodePredicateBase* nodePre
   }
 }
 
-mitk::NodePredicateBase* QmitkNodeSelectionDialog::GetNodePredicate() const
+const mitk::NodePredicateBase* QmitkNodeSelectionDialog::GetNodePredicate() const
 {
   return m_NodePredicate;
 }

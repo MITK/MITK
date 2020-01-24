@@ -38,7 +38,7 @@ public:
   *
   * @param nodePredicate    A pointer to a node predicate.
   */
-  void SetNodePredicate(mitk::NodePredicateBase* nodePredicate) override;
+  void SetNodePredicate(const mitk::NodePredicateBase* nodePredicate) override;
 
 protected Q_SLOTS:
 

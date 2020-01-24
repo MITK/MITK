@@ -59,7 +59,7 @@ protected:
   void EditSelection();
   void UpdateInfo() override;
 
-  void OnNodePredicateChanged(mitk::NodePredicateBase* newPredicate) override;
+  void OnNodePredicateChanged(const mitk::NodePredicateBase* newPredicate) override;
   void OnDataStorageChanged() override;
   void NodeRemovedFromStorage(const mitk::DataNode* node) override;
 

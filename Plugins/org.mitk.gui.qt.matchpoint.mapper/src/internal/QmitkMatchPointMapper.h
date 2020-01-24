@@ -24,21 +24,16 @@ found in the LICENSE file.
 
 #include "QmitkMappingJob.h"
 
-// MatchPoint
-
-
 /*!
   \brief QmitkMatchPointMapper
 
-  \warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
+  View class that implements the logic/functionality to map point sets or images based on MatchPoint registration objects.
 
   \sa QmitkFunctionality
   \ingroup ${plugin_target}_internal
   */
 class QmitkMatchPointMapper : public QmitkAbstractView
 {
-    // this is needed for all Qt objects that should have a Qt meta-object
-    // (everything that derives from QObject and wants to have signal/slots)
     Q_OBJECT
 
 public:
@@ -50,22 +45,17 @@ public:
      */
     berryObjectMacro(QmitkMatchPointMapper);
 
-        QmitkMatchPointMapper();
+    QmitkMatchPointMapper();
 
     void CreateQtPartControl(QWidget *parent) override;
 
-    protected slots:
+protected slots:
 
     /**
      * @brief Connect all GUI elements to its corresponding slots
      */
     virtual void CreateConnections();
 
-    /// \brief Called when the user clicks the GUI button
-
-    void OnLockRegButtonPushed();
-    void OnLockInputButtonPushed();
-    void OnLockReferenceButtonPushed();
     void OnManualRefChecked();
     void OnLinkSampleFactorChecked();
 
@@ -78,19 +68,17 @@ public:
     void OnMapResultIsAvailable(mitk::BaseData::Pointer spMappedData, const QmitkMappingJob* job);
     void OnMappingInfo(QString info);
 
+    void OnRegNodeSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
+    void OnInputNodeSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
+    void OnReferenceNodeSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
+
 protected:
     void SetFocus() override;
-
-    /// \brief called by QmitkFunctionality when DataManager's selection has changed
-    void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
-        const QList<mitk::DataNode::Pointer>& nodes) override;
 
     Ui::MatchPointMapperControls m_Controls;
 
 private:
     QWidget *m_Parent;
-
-    void MapNStoreImage(QmitkMappingJob* job);
 
     void Error(QString msg);
 
@@ -106,16 +94,6 @@ private:
     /** Method checks if the currently selected input is a point set.
      * If this is true, true is returned. In all other cases false is returned.*/
     bool IsPointSetInput() const;
-
-    /** Function returns the first data node containing a registration wrapper
-     * in the current selection of the data manager. If nothing is selected or
-     * no registration wrapper is selected it return nullptr.*/
-    mitk::DataNode::Pointer GetSelectedRegNode();
-
-    /** Methods returns a list of all nodes selected in the data manager that do
-     * NOT contain registration wrappers. The list may be empty if nothing is
-     * selected or no appropriate data node is selected.*/
-    QList<mitk::DataNode::Pointer> GetSelectedDataNodes();
 
     /** If a registration node is set, this function determines the auto reference node.
      * The auto reference node is the node of the target data used to determine the
@@ -150,6 +128,18 @@ private:
     void ConfigureProgressInfos();
 
     /**
+    Configure the reg node selector predicates. If a input pointer is passed,
+    the predicate will be configured according to the input.
+    */
+    void ConfigureRegNodePredicate(const mitk::DataNode* input = nullptr);
+    /**
+    Configure the input and ref node selector predicates. If a reg pointer is passed,
+    the predicate will be configured according to the input.
+    */
+    void ConfigureNodePredicates(const mitk::DataNode* reg = nullptr);
+
+
+    /**
      * Used to generate, configure and execute a mapping job regarding the
      * current settings.
      * @param doGeometryRefinement Set true if only a geometry refinement should be done.
@@ -159,13 +149,6 @@ private:
     mitk::DataNode::Pointer m_spSelectedRegNode;
     mitk::DataNode::Pointer m_spSelectedInputNode;
     mitk::DataNode::Pointer m_spSelectedRefNode;
-
-    /** boolean variable to control visibility of GUI elements*/
-    bool m_ValidReg;
-    /** boolean variable to control visibility of GUI elements*/
-    bool m_ValidInput;
-    /** boolean variable to control visibility of GUI elements*/
-    bool m_ValidRef;
 
     /** used for the internal logic to indicate of the current settings
      are set for mapping binary images (used by ConfigureMappingControls()).*/

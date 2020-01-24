@@ -69,8 +69,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImage.h>
 #include <itkImageRegionIterator.h>
 
-//#include <mitkDICOMPMPropertyHelper.h>
-//#include <mitkDICOMQIPropertyHelper.h>
+
 
 
 const std::string MRPerfusionView::VIEW_ID = "org.mitk.gui.qt.pharmacokinetics.mri";

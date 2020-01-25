@@ -78,8 +78,11 @@ void QmitkImageStatisticsView::CalculateOrGetMultiStatistics()
   m_selectedImageNode = nullptr;
   m_selectedMaskNode = nullptr;
 
-  // reset everything
-  ResetGUI();
+  if (m_selectedImageNodes.empty())
+  {
+    // no images selected; reset everything
+    ResetGUI();
+  }
 
   for (auto imageNode : m_selectedImageNodes)
   {

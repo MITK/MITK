@@ -34,7 +34,6 @@ set(INTERNAL_CPP_FILES
 )
 
 set(MOC_H_FILES
-  src/QmitkAbstractDataNodeAction.h
   src/QmitkCloseProjectAction.h
   src/QmitkDataNodeColorAction.h
   src/QmitkDataNodeColorMapAction.h

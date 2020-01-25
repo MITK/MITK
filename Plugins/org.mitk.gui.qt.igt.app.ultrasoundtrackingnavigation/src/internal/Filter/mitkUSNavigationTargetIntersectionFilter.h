@@ -39,16 +39,16 @@ class PointSet;
  */
 class USNavigationTargetIntersectionFilter : public itk::Object {
 public:
-  mitkClassMacroItkParent(USNavigationTargetIntersectionFilter, itk::Object)
-  itkNewMacro(Self)
-
-  itkSetMacro(TargetSurface, itk::SmartPointer<mitk::Surface>)
+  mitkClassMacroItkParent(USNavigationTargetIntersectionFilter, itk::Object);
+  itkNewMacro(Self);
+  
+  itkSetMacro(TargetSurface, itk::SmartPointer<mitk::Surface>);
   void SetLine(itk::SmartPointer<mitk::PointSet> line);
 
   /**
    * \return if line and surface are intersecting
    */
-  itkGetMacro(IsIntersecting, bool)
+  itkGetMacro(IsIntersecting, bool);
 
   /**
    * \return the position where the intersection occured, the result is not defined if no intersection occured

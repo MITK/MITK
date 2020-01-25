@@ -27,8 +27,8 @@ namespace mitk {
     class MITKPHOTOACOUSTICSLIB_EXPORT Vector : public itk::LightObject
     {
     public:
-      mitkClassMacroItkParent(Vector, itk::LightObject)
-        itkFactorylessNewMacro(Self)
+      mitkClassMacroItkParent(Vector, itk::LightObject);
+        itkFactorylessNewMacro(Self);
 
         /**
          * @brief GetNorm calculates the length of this vector.

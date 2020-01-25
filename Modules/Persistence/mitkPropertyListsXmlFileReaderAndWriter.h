@@ -27,7 +27,8 @@ namespace mitk
     static const char *GetPropertyListIdElementName();
 
     mitkClassMacroItkParent(PropertyListsXmlFileReaderAndWriter, itk::Object);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       bool WriteLists(const std::string &fileName,
                       const std::map<std::string, mitk::PropertyList::Pointer> &_PropertyLists) const;

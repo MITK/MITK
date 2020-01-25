@@ -29,9 +29,7 @@ found in the LICENSE file.
 const std::string QmitkPropertyTreeView::VIEW_ID = "org.mitk.views.properties";
 
 QmitkPropertyTreeView::QmitkPropertyTreeView()
-  : m_Parent(nullptr),
-    m_PropertyNameChangedTag(0),
-    m_PropertyAliases(nullptr),
+  : m_PropertyAliases(nullptr),
     m_PropertyDescriptions(nullptr),
     m_PropertyPersistence(nullptr),
     m_ShowAliasesInDescription(true),
@@ -48,21 +46,46 @@ QmitkPropertyTreeView::~QmitkPropertyTreeView()
 {
 }
 
+void QmitkPropertyTreeView::SetFocus()
+{
+  m_Controls.filterLineEdit->setFocus();
+}
+
+void QmitkPropertyTreeView::RenderWindowPartActivated(mitk::IRenderWindowPart* /*renderWindowPart*/)
+{
+  if (m_Controls.propertyListComboBox->count() == 2)
+  {
+    QHash<QString, QmitkRenderWindow*> renderWindows = this->GetRenderWindowPart()->GetQmitkRenderWindows();
+
+    Q_FOREACH(QString renderWindow, renderWindows.keys())
+    {
+      m_Controls.propertyListComboBox->insertItem(m_Controls.propertyListComboBox->count() - 1, QString("Data node: ") + renderWindow);
+    }
+  }
+}
+
+void QmitkPropertyTreeView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*)
+{
+  if (m_Controls.propertyListComboBox->count() > 2)
+  {
+    m_Controls.propertyListComboBox->clear();
+    m_Controls.propertyListComboBox->addItem("Data node: common");
+    m_Controls.propertyListComboBox->addItem("Base data");
+  }
+}
+
 void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
 {
-  m_Parent = parent;
-
   m_Controls.setupUi(parent);
 
   m_Controls.propertyListComboBox->addItem("Data node: common");
 
   mitk::IRenderWindowPart* renderWindowPart = this->GetRenderWindowPart();
-
   if (renderWindowPart != nullptr)
   {
     QHash<QString, QmitkRenderWindow*> renderWindows = renderWindowPart->GetQmitkRenderWindows();
 
-    Q_FOREACH(QString renderWindow, renderWindows.keys())
+    for(const auto& renderWindow : renderWindows.keys())
     {
       m_Controls.propertyListComboBox->addItem(QString("Data node: ") + renderWindow);
     }
@@ -88,6 +111,14 @@ void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
 
   m_Delegate = new QmitkPropertyItemDelegate(m_Controls.treeView);
 
+  m_Controls.singleSlot->SetDataStorage(GetDataStorage());
+  m_Controls.singleSlot->SetSelectionIsOptional(true);
+  m_Controls.singleSlot->SetEmptyInfo(QString("Please select a data node"));
+  m_Controls.singleSlot->SetPopUpTitel(QString("Select data node"));
+
+  m_SelectionServiceConnector = std::make_unique<QmitkSelectionServiceConnector>();
+  SetAsSelectionListener(true);
+
   m_Controls.filterLineEdit->setClearButtonEnabled(true);
 
   m_Controls.treeView->setItemDelegateForColumn(1, m_Delegate);
@@ -109,11 +140,92 @@ void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
   icon = berry::QtStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg"));
   m_Controls.saveLabel->setPixmap(icon.pixmap(ICON_SIZE));
 
-  connect(m_Controls.filterLineEdit, SIGNAL(textChanged(const QString&)), this, SLOT(OnFilterTextChanged(const QString&)));
-  connect(m_Controls.propertyListComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnPropertyListChanged(int)));
-  connect(m_Controls.newButton, SIGNAL(clicked()), this, SLOT(OnAddNewProperty()));
-  connect(m_Controls.treeView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(OnCurrentRowChanged(const QModelIndex&, const QModelIndex&)));
-  connect(m_Model, SIGNAL(modelReset()), this, SLOT(OnModelReset()));
+  connect(m_Controls.singleSlot, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,
+    this, &QmitkPropertyTreeView::OnCurrentSelectionChanged);
+  connect(m_Controls.filterLineEdit, &QLineEdit::textChanged,
+    this, &QmitkPropertyTreeView::OnFilterTextChanged);
+  connect(m_Controls.propertyListComboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+    this, &QmitkPropertyTreeView::OnPropertyListChanged);
+  connect(m_Controls.newButton, &QPushButton::clicked,
+    this, &QmitkPropertyTreeView::OnAddNewProperty);
+  connect(m_Controls.treeView->selectionModel(), &QItemSelectionModel::currentRowChanged,
+    this, &QmitkPropertyTreeView::OnCurrentRowChanged);
+  connect(m_Model, &QmitkPropertyItemModel::modelReset,
+    this, &QmitkPropertyTreeView::OnModelReset);
+}
+
+void QmitkPropertyTreeView::OnPreferencesChanged(const berry::IBerryPreferences* preferences)
+{
+  bool showAliases = preferences->GetBool(QmitkPropertiesPreferencePage::SHOW_ALIASES, true);
+  bool showDescriptions = preferences->GetBool(QmitkPropertiesPreferencePage::SHOW_DESCRIPTIONS, true);
+  bool showAliasesInDescription = preferences->GetBool(QmitkPropertiesPreferencePage::SHOW_ALIASES_IN_DESCRIPTION, true);
+  bool showPersistenceInDescription = preferences->GetBool(QmitkPropertiesPreferencePage::SHOW_PERSISTENCE_IN_DESCRIPTION, true);
+  bool developerMode = preferences->GetBool(QmitkPropertiesPreferencePage::DEVELOPER_MODE, false);
+  bool filterProperties = preferences->GetBool(QmitkPropertiesPreferencePage::FILTER_PROPERTIES, true);
+
+  m_Model->SetFilterProperties(filterProperties);
+  m_Model->SetShowAliases(showAliases);
+
+  bool updateAliases = showAliases != (m_PropertyAliases != nullptr);
+  bool updateDescriptions = showDescriptions != (m_PropertyDescriptions != nullptr);
+  bool updateAliasesInDescription = showAliasesInDescription != m_ShowAliasesInDescription;
+  bool updatePersistenceInDescription = showPersistenceInDescription != m_ShowPersistenceInDescription;
+  bool updateDeveloperMode = developerMode != m_DeveloperMode;
+
+  if (updateAliases)
+    m_PropertyAliases = showAliases
+    ? mitk::GetPropertyService<mitk::IPropertyAliases>()
+    : nullptr;
+
+  if (updateDescriptions)
+    m_PropertyDescriptions = showDescriptions
+    ? mitk::GetPropertyService<mitk::IPropertyDescriptions>()
+    : nullptr;
+
+  if (showPersistenceInDescription)
+    m_PropertyPersistence = mitk::GetPropertyService<mitk::IPropertyPersistence>();
+
+  if (updateAliasesInDescription)
+    m_ShowAliasesInDescription = showAliasesInDescription;
+
+  if (updatePersistenceInDescription)
+    m_ShowPersistenceInDescription = showPersistenceInDescription;
+
+  if (updateDescriptions || updateAliasesInDescription || updatePersistenceInDescription)
+  {
+    QModelIndexList selection = m_Controls.treeView->selectionModel()->selectedRows();
+
+    if (!selection.isEmpty())
+      this->OnCurrentRowChanged(selection[0], selection[0]);
+  }
+
+  if (updateDeveloperMode)
+  {
+    m_DeveloperMode = developerMode;
+
+    if (!developerMode)
+      m_Controls.propertyListComboBox->setCurrentIndex(0);
+
+    m_Controls.propertyListLabel->setVisible(developerMode);
+    m_Controls.propertyListComboBox->setVisible(developerMode);
+    m_Controls.newButton->setVisible(developerMode);
+  }
+
+  m_Model->OnPreferencesChanged();
+}
+
+void QmitkPropertyTreeView::SetAsSelectionListener(bool checked)
+{
+  if (checked)
+  {
+    m_SelectionServiceConnector->AddPostSelectionListener(GetSite()->GetWorkbenchWindow()->GetSelectionService());
+    connect(m_SelectionServiceConnector.get(), &QmitkSelectionServiceConnector::ServiceSelectionChanged, m_Controls.singleSlot, &QmitkSingleNodeSelectionWidget::SetCurrentSelection);
+  }
+  else
+  {
+    m_SelectionServiceConnector->RemovePostSelectionListener();
+    disconnect(m_SelectionServiceConnector.get(), &QmitkSelectionServiceConnector::ServiceSelectionChanged, m_Controls.singleSlot, &QmitkSingleNodeSelectionWidget::SetCurrentSelection);
+  }
 }
 
 QString QmitkPropertyTreeView::GetPropertyNameOrAlias(const QModelIndex& index)
@@ -137,6 +249,59 @@ QString QmitkPropertyTreeView::GetPropertyNameOrAlias(const QModelIndex& index)
   }
 
   return propertyName;
+}
+
+void QmitkPropertyTreeView::OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
+{
+  if (nodes.empty() || nodes.front().IsNull())
+  {
+    m_SelectedNode = nullptr;
+
+    this->SetPartName("Properties");
+    m_Model->SetPropertyList(nullptr);
+    m_Delegate->SetPropertyList(nullptr);
+
+    m_Controls.newButton->setEnabled(false);
+
+    return;
+  }
+
+  // node is selected, create tree with node properties
+  m_SelectedNode = nodes.front();
+  mitk::PropertyList* propertyList = m_Model->GetPropertyList();
+  if (m_Renderer == nullptr && m_Controls.propertyListComboBox->currentText() == "Base data")
+  {
+    propertyList = m_SelectedNode->GetData() != nullptr
+      ? m_SelectedNode->GetData()->GetPropertyList()
+      : nullptr;
+  }
+  else
+  {
+    propertyList = m_SelectedNode->GetPropertyList(m_Renderer);
+  }
+
+  QString selectionClassName = m_SelectedNode->GetData() != nullptr
+    ? m_SelectedNode->GetData()->GetNameOfClass()
+    : "";
+
+  m_SelectionClassName = selectionClassName.toStdString();
+
+  m_Model->SetPropertyList(propertyList, selectionClassName);
+  m_Delegate->SetPropertyList(propertyList);
+
+  m_Controls.newButton->setEnabled(true);
+
+  if (!m_ProxyModel->filterRegExp().isEmpty())
+  {
+    m_Controls.treeView->expandAll();
+  }
+}
+
+void QmitkPropertyTreeView::HideAllIcons()
+{
+  m_Controls.tagLabel->hide();
+  m_Controls.tagsLabel->hide();
+  m_Controls.saveLabel->hide();
 }
 
 void QmitkPropertyTreeView::OnCurrentRowChanged(const QModelIndex& current, const QModelIndex&)
@@ -225,195 +390,6 @@ void QmitkPropertyTreeView::OnCurrentRowChanged(const QModelIndex& current, cons
   this->HideAllIcons();
 }
 
-void QmitkPropertyTreeView::OnFilterTextChanged(const QString& filter)
-{
-  m_ProxyModel->setFilterWildcard(filter);
-
-  if (filter.isEmpty())
-    m_Controls.treeView->collapseAll();
-  else
-    m_Controls.treeView->expandAll();
-}
-
-void QmitkPropertyTreeView::OnModelReset()
-{
-  m_Controls.descriptionLabel->hide();
-  this->HideAllIcons();
-}
-
-void QmitkPropertyTreeView::OnPreferencesChanged(const berry::IBerryPreferences* preferences)
-{
-  bool showAliases = preferences->GetBool(QmitkPropertiesPreferencePage::SHOW_ALIASES, true);
-  bool showDescriptions = preferences->GetBool(QmitkPropertiesPreferencePage::SHOW_DESCRIPTIONS, true);
-  bool showAliasesInDescription = preferences->GetBool(QmitkPropertiesPreferencePage::SHOW_ALIASES_IN_DESCRIPTION, true);
-  bool showPersistenceInDescription = preferences->GetBool(QmitkPropertiesPreferencePage::SHOW_PERSISTENCE_IN_DESCRIPTION, true);
-  bool developerMode = preferences->GetBool(QmitkPropertiesPreferencePage::DEVELOPER_MODE, false);
-  bool filterProperties = preferences->GetBool(QmitkPropertiesPreferencePage::FILTER_PROPERTIES, true);
-
-  m_Model->SetFilterProperties(filterProperties);
-  m_Model->SetShowAliases(showAliases);
-
-  bool updateAliases = showAliases != (m_PropertyAliases != nullptr);
-  bool updateDescriptions = showDescriptions != (m_PropertyDescriptions != nullptr);
-  bool updateAliasesInDescription = showAliasesInDescription != m_ShowAliasesInDescription;
-  bool updatePersistenceInDescription = showPersistenceInDescription != m_ShowPersistenceInDescription;
-  bool updateDeveloperMode = developerMode != m_DeveloperMode;
-
-  if (updateAliases)
-    m_PropertyAliases = showAliases
-      ? mitk::GetPropertyService<mitk::IPropertyAliases>()
-      : nullptr;
-
-  if (updateDescriptions)
-    m_PropertyDescriptions = showDescriptions
-      ? mitk::GetPropertyService<mitk::IPropertyDescriptions>()
-      : nullptr;
-
-  if (showPersistenceInDescription)
-    m_PropertyPersistence = mitk::GetPropertyService<mitk::IPropertyPersistence>();
-
-  if (updateAliasesInDescription)
-    m_ShowAliasesInDescription = showAliasesInDescription;
-
-  if (updatePersistenceInDescription)
-    m_ShowPersistenceInDescription = showPersistenceInDescription;
-
-  if (updateDescriptions || updateAliasesInDescription || updatePersistenceInDescription)
-  {
-    QModelIndexList selection = m_Controls.treeView->selectionModel()->selectedRows();
-
-    if (!selection.isEmpty())
-      this->OnCurrentRowChanged(selection[0], selection[0]);
-  }
-
-  if (updateDeveloperMode)
-  {
-    m_DeveloperMode = developerMode;
-
-    if (!developerMode)
-      m_Controls.propertyListComboBox->setCurrentIndex(0);
-
-    m_Controls.propertyListLabel->setVisible(developerMode);
-    m_Controls.propertyListComboBox->setVisible(developerMode);
-    m_Controls.newButton->setVisible(developerMode);
-  }
-
-  m_Model->OnPreferencesChanged();
-}
-
-void QmitkPropertyTreeView::OnPropertyNameChanged(const itk::EventObject&)
-{
-  mitk::PropertyList* propertyList = m_Model->GetPropertyList();
-
-  if (propertyList != nullptr)
-  {
-    mitk::BaseProperty* nameProperty = propertyList->GetProperty("name");
-
-    if (nameProperty != nullptr)
-    {
-      QString partName = "Properties (";
-      partName.append(QString::fromStdString(nameProperty->GetValueAsString())).append(')');
-      this->SetPartName(partName);
-    }
-  }
-}
-
-void QmitkPropertyTreeView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes)
-{
-  mitk::PropertyList* propertyList = m_Model->GetPropertyList();
-
-  if (propertyList != nullptr)
-  {
-    mitk::BaseProperty* nameProperty = propertyList->GetProperty("name");
-
-    if (nameProperty != nullptr)
-      nameProperty->RemoveObserver(m_PropertyNameChangedTag);
-
-    m_PropertyNameChangedTag = 0;
-  }
-
-  if (nodes.empty() || nodes.front().IsNull())
-  {
-    m_SelectedNode = nullptr;
-
-    this->SetPartName("Properties");
-    m_Model->SetPropertyList(nullptr);
-    m_Delegate->SetPropertyList(nullptr);
-
-    m_Controls.newButton->setEnabled(false);
-  }
-  else
-  {
-    m_SelectedNode = nodes.front();
-
-    QString selectionClassName = m_SelectedNode->GetData() != nullptr
-      ? m_SelectedNode->GetData()->GetNameOfClass()
-      : "";
-
-    m_SelectionClassName = selectionClassName.toStdString();
-
-    mitk::PropertyList::Pointer propertyList;
-
-    if (m_Renderer == nullptr && m_Controls.propertyListComboBox->currentText() == "Base data")
-    {
-      propertyList = m_SelectedNode->GetData() != nullptr
-        ? m_SelectedNode->GetData()->GetPropertyList()
-        : nullptr;
-    }
-    else
-    {
-      propertyList = m_SelectedNode->GetPropertyList(m_Renderer);
-    }
-
-    m_Model->SetPropertyList(propertyList, selectionClassName);
-    m_Delegate->SetPropertyList(propertyList);
-
-    OnPropertyNameChanged(itk::ModifiedEvent());
-
-    mitk::BaseProperty* nameProperty = m_SelectedNode->GetProperty("name");
-
-    if (nameProperty != nullptr)
-    {
-      itk::ReceptorMemberCommand<QmitkPropertyTreeView>::Pointer command = itk::ReceptorMemberCommand<QmitkPropertyTreeView>::New();
-      command->SetCallbackFunction(this, &QmitkPropertyTreeView::OnPropertyNameChanged);
-      m_PropertyNameChangedTag = nameProperty->AddObserver(itk::ModifiedEvent(), command);
-    }
-
-    m_Controls.newButton->setEnabled(true);
-  }
-
-  if (!m_ProxyModel->filterRegExp().isEmpty())
-    m_Controls.treeView->expandAll();
-}
-
-void QmitkPropertyTreeView::SetFocus()
-{
-  m_Controls.filterLineEdit->setFocus();
-}
-
-void QmitkPropertyTreeView::RenderWindowPartActivated(mitk::IRenderWindowPart* /*renderWindowPart*/)
-{
-  if (m_Controls.propertyListComboBox->count() == 2)
-  {
-    QHash<QString, QmitkRenderWindow*> renderWindows = this->GetRenderWindowPart()->GetQmitkRenderWindows();
-
-    Q_FOREACH(QString renderWindow, renderWindows.keys())
-    {
-      m_Controls.propertyListComboBox->insertItem(m_Controls.propertyListComboBox->count() - 1, QString("Data node: ") + renderWindow);
-    }
-  }
-}
-
-void QmitkPropertyTreeView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*)
-{
-  if (m_Controls.propertyListComboBox->count() > 2)
-  {
-    m_Controls.propertyListComboBox->clear();
-    m_Controls.propertyListComboBox->addItem("Data node: common");
-    m_Controls.propertyListComboBox->addItem("Base data");
-  }
-}
-
 void QmitkPropertyTreeView::OnPropertyListChanged(int index)
 {
   if (index == -1)
@@ -433,24 +409,31 @@ void QmitkPropertyTreeView::OnPropertyListChanged(int index)
   if (m_SelectedNode.IsNotNull())
     nodes << m_SelectedNode;
 
-  berry::IWorkbenchPart::Pointer workbenchPart;
-
-  this->OnSelectionChanged(workbenchPart, nodes);
+  this->OnCurrentSelectionChanged(nodes);
 }
 
 void QmitkPropertyTreeView::OnAddNewProperty()
 {
   std::unique_ptr<QmitkAddNewPropertyDialog> dialog(m_Controls.propertyListComboBox->currentText() != "Base data"
-      ? new QmitkAddNewPropertyDialog(m_SelectedNode, m_Renderer, m_Parent)
-      : new QmitkAddNewPropertyDialog(m_SelectedNode->GetData()));
+    ? new QmitkAddNewPropertyDialog(m_SelectedNode, m_Renderer)
+    : new QmitkAddNewPropertyDialog(m_SelectedNode->GetData()));
 
   if (dialog->exec() == QDialog::Accepted)
     this->m_Model->Update();
 }
 
-void QmitkPropertyTreeView::HideAllIcons()
+void QmitkPropertyTreeView::OnFilterTextChanged(const QString& filter)
 {
-  m_Controls.tagLabel->hide();
-  m_Controls.tagsLabel->hide();
-  m_Controls.saveLabel->hide();
+  m_ProxyModel->setFilterWildcard(filter);
+
+  if (filter.isEmpty())
+    m_Controls.treeView->collapseAll();
+  else
+    m_Controls.treeView->expandAll();
+}
+
+void QmitkPropertyTreeView::OnModelReset()
+{
+  m_Controls.descriptionLabel->hide();
+  this->HideAllIcons();
 }

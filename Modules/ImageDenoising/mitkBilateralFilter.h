@@ -25,9 +25,9 @@ namespace mitk
   {
   public:
     mitkClassMacro(BilateralFilter, ImageToImageFilter);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
-
-      itkSetMacro(DomainSigma, float);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
+    itkSetMacro(DomainSigma, float);
     itkSetMacro(RangeSigma, float);
     itkSetMacro(AutoKernel, bool);
     itkSetMacro(KernelRadius, unsigned int);

@@ -47,8 +47,9 @@ namespace mitk
       Cubic
     };
 
-    mitkClassMacro(ExtractSliceFilter2, ImageToImageFilter)
-    itkFactorylessNewMacro(Self)
+    mitkClassMacro(ExtractSliceFilter2, ImageToImageFilter);
+
+    itkFactorylessNewMacro(Self);
 
     void SetInput(const InputImageType* image) override;
     void SetInput(unsigned int index, const InputImageType* image) override;

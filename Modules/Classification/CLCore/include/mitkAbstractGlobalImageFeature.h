@@ -124,7 +124,7 @@ namespace mitk
 class MITKCLCORE_EXPORT AbstractGlobalImageFeature : public BaseData
 {
 public:
-  mitkClassMacro(AbstractGlobalImageFeature, BaseData)
+  mitkClassMacro(AbstractGlobalImageFeature, BaseData);
 
   typedef std::vector< std::pair<std::string, double> > FeatureListType;
   typedef std::vector< std::string>                     FeatureNameListType;

@@ -41,7 +41,7 @@ class HandlerProxy : public AbstractHandlerWithState, public IElementUpdater,
 
 public:
 
-  berryObjectMacro(berry::HandlerProxy)
+  berryObjectMacro(berry::HandlerProxy);
 
 private:
 

@@ -30,7 +30,7 @@ namespace berry {
  */
 struct TestDropLocation : public Object {
 
-  berryObjectMacro(TestDropLocation)
+  berryObjectMacro(TestDropLocation);
 
     /**
      * Location where the object should be dropped, in display coordinates

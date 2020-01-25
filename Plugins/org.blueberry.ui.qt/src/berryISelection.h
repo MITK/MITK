@@ -32,7 +32,7 @@ namespace berry {
  **/
 struct BERRY_UI_QT ISelection : public Object
 {
-  berryObjectMacro(berry::ISelection)
+  berryObjectMacro(berry::ISelection);
 
   ~ISelection() override;
 

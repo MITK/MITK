@@ -43,7 +43,7 @@ namespace mitk
   public:
 
     mitkClassMacro( KinectV2Device , ToFCameraDevice );
-    itkFactorylessNewMacro(Self)
+    itkFactorylessNewMacro(Self);
     itkCloneMacro(Self)
     /** Prints the framerate to the console every 100 frames.
      *  Mainly for debugging, deactivated by default.

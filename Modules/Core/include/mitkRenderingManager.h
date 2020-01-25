@@ -285,11 +285,11 @@ namespace mitk
      */
     void SetRenderWindowFocus(vtkRenderWindow *focusWindow);
 
-    itkGetMacro(FocusedRenderWindow, vtkRenderWindow *)
+    itkGetMacro(FocusedRenderWindow, vtkRenderWindow *);
 
     itkSetMacro(ConstrainedPanningZooming, bool);
 
-    itkGetMacro(AntiAliasing, AntiAliasing)
+    itkGetMacro(AntiAliasing, AntiAliasing);
 
     void SetAntiAliasing(AntiAliasing antiAliasing);
 
@@ -376,24 +376,25 @@ namespace mitk
 
 #pragma GCC visibility pop
 
-  itkEventMacroDeclaration(FocusChangedEvent, itk::AnyEvent)
+  itkEventMacroDeclaration(FocusChangedEvent, itk::AnyEvent);
 
-    /**
-     * Generic RenderingManager implementation for "non-rendering-plattform",
-     * e.g. for tests. Its factory (TestingRenderingManagerFactory) is
-     * automatically on start-up and is used by default if not other
-     * RenderingManagerFactory is instantiated explicitly thereafter.
-     * (see mitkRenderingManager.cpp)
-     */
-    class MITKCORE_EXPORT TestingRenderingManager : public RenderingManager
+  /**
+    * Generic RenderingManager implementation for "non-rendering-plattform",
+    * e.g. for tests. Its factory (TestingRenderingManagerFactory) is
+    * automatically on start-up and is used by default if not other
+    * RenderingManagerFactory is instantiated explicitly thereafter.
+    * (see mitkRenderingManager.cpp)
+    */
+  class MITKCORE_EXPORT TestingRenderingManager : public RenderingManager
   {
   public:
     mitkClassMacro(TestingRenderingManager, RenderingManager);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
-      protected : void GenerateRenderingRequestEvent() override{
-                    // ForceImmediateUpdateAll();
-                  };
+  protected:
+    
+    void GenerateRenderingRequestEvent() override {};
   };
 
 } // namespace mitk

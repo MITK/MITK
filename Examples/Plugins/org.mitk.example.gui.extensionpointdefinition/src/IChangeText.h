@@ -19,7 +19,7 @@ found in the LICENSE file.
 
 struct org_mitk_example_gui_extensionpointdefinition_EXPORT IChangeText : public virtual berry::Object
 {
-  berryObjectMacro(IChangeText)
+  berryObjectMacro(IChangeText);
 
     ~IChangeText() override;
 

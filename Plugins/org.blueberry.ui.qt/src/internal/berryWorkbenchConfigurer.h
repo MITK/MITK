@@ -35,7 +35,7 @@ class WorkbenchConfigurer : public IWorkbenchConfigurer
 
 public:
 
-  berryObjectMacro(WorkbenchConfigurer)
+  berryObjectMacro(WorkbenchConfigurer);
 
 private:
 

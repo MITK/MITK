@@ -33,7 +33,7 @@ class BERRY_UI_QT WorkbenchPartReference : virtual public IWorkbenchPartReferenc
 
 public:
 
-  berryObjectMacro(WorkbenchPartReference)
+  berryObjectMacro(WorkbenchPartReference);
 
 
     // State constants //////////////////////////////

@@ -40,9 +40,9 @@ namespace mitk
   {
   public:
     mitkClassMacro(InteractionKeyEvent, InteractionEvent)
-      mitkNewMacro3Param(Self, BaseRenderer *, const std::string &, ModifierKeys)
+    mitkNewMacro3Param(Self, BaseRenderer*, const std::string&, ModifierKeys);
 
-        bool IsSuperClassOf(const InteractionEvent::Pointer &baseClass) const override;
+    bool IsSuperClassOf(const InteractionEvent::Pointer &baseClass) const override;
 
     ModifierKeys GetModifiers() const;
     std::string GetKey() const;

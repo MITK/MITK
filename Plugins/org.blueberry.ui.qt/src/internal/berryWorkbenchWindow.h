@@ -71,7 +71,7 @@ public:
 
 public:
 
-  berryObjectMacro(WorkbenchWindow, Window, IWorkbenchWindow)
+  berryObjectMacro(WorkbenchWindow, Window, IWorkbenchWindow);
 
   WorkbenchWindow(int number);
 

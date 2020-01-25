@@ -35,7 +35,8 @@ namespace mitk
 
     mitkClassMacroItkParent( KinectV2Controller , itk::Object );
 
-    itkFactorylessNewMacro(Self)
+    itkFactorylessNewMacro(Self);
+
     itkCloneMacro(Self)
     int GetRGBCaptureWidth() const;
     int GetRGBCaptureHeight() const;

@@ -191,12 +191,14 @@ option(BUILD_SHARED_LIBS "Build MITK with shared libraries" ON)
 option(WITH_COVERAGE "Enable/Disable coverage" OFF)
 option(BUILD_TESTING "Test the project" ON)
 option(MITK_FAST_TESTING "Disable long-running tests like packaging" OFF)
+option(MITK_XVFB_TESTING "Execute test drivers through xvfb-run" OFF)
 
 option(MITK_BUILD_ALL_APPS "Build all MITK applications" OFF)
 option(MITK_BUILD_EXAMPLES "Build the MITK Examples" OFF)
 option(MITK_ENABLE_PIC_READER "Enable support for reading the DKFZ pic file format." ON)
 
 mark_as_advanced(
+  MITK_XVFB_TESTING
   MITK_FAST_TESTING
   MITK_BUILD_ALL_APPS
   MITK_ENABLE_PIC_READER
@@ -1012,14 +1014,6 @@ if(BUILD_TESTING)
   include(CTest)
   mark_as_advanced(TCL_TCLSH DART_ROOT)
 
-  option(MITK_ENABLE_RENDERING_TESTING OFF "Enable the MITK rendering tests. Requires x-server in Linux.")
-  #Rendering testing does not work for Linux nightlies, thus it is disabled per default
-  #and activated for Mac and Windows.
-  if(WIN32 OR APPLE)
-    set(MITK_ENABLE_RENDERING_TESTING ON)
-  endif()
-  mark_as_advanced( MITK_ENABLE_RENDERING_TESTING )
-
   # Setup file for setting custom ctest vars
   configure_file(
     CMake/CTestCustom.cmake.in
@@ -1130,7 +1124,8 @@ add_subdirectory(Wrapping)
 
 if(MITK_USE_BLUEBERRY)
 
-  set(BLUEBERRY_XPDOC_OUTPUT_DIR ${MITK_DOXYGEN_OUTPUT_DIR}/html/extension-points/html/)
+  set(BLUEBERRY_XPDOC_OUTPUT_DIR "${MITK_DOXYGEN_OUTPUT_DIR}/html/extension-points/html/")
+  execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${BLUEBERRY_XPDOC_OUTPUT_DIR})
 
   # Plug-in testing (needs some work to be enabled again)
   if(BUILD_TESTING)

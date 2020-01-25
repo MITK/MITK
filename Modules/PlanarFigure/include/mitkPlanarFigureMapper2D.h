@@ -110,7 +110,9 @@ namespace mitk
   public:
     mitkClassMacro(PlanarFigureMapper2D, Mapper);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
     /**
     * reimplemented from Baseclass

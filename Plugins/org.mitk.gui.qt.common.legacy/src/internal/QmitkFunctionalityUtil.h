@@ -32,7 +32,7 @@ public:
   ///
   /// Creates smartpointer typedefs
   ///
-  berryObjectMacro(QmitkFunctionalitySelectionProvider)
+  berryObjectMacro(QmitkFunctionalitySelectionProvider);
 
   QmitkFunctionalitySelectionProvider(QmitkFunctionality* _Functionality);
 

@@ -67,7 +67,7 @@ namespace mitk
     claronToolHandle GetToolHandle();
 
   protected:
-    itkFactorylessNewMacro(Self)
+    itkFactorylessNewMacro(Self);
     itkCloneMacro(Self)
     ClaronTool();
     ~ClaronTool() override;

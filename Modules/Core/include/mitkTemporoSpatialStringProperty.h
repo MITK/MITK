@@ -41,7 +41,10 @@ namespace mitk
 
     mitkClassMacro(TemporoSpatialStringProperty, BaseProperty);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self) mitkNewMacro1Param(TemporoSpatialStringProperty, const char *);
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
+    mitkNewMacro1Param(TemporoSpatialStringProperty, const char*);
     mitkNewMacro1Param(TemporoSpatialStringProperty, const std::string &);
 
     /**Returns the value of the first time point in the first slice.

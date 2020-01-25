@@ -27,9 +27,11 @@ namespace mitk
   {
   public:
 
-    mitkClassMacro(VigraRandomForestClassifier, AbstractClassifier)
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    mitkClassMacro(VigraRandomForestClassifier, AbstractClassifier);
+
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       VigraRandomForestClassifier();
 

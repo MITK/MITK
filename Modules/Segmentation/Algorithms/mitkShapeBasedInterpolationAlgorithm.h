@@ -34,7 +34,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(ShapeBasedInterpolationAlgorithm, SegmentationInterpolationAlgorithm);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       Image::Pointer Interpolate(Image::ConstPointer lowerSlice,
                                  unsigned int lowerSliceIndex,

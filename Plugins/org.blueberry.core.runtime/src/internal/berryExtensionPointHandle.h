@@ -26,7 +26,7 @@ class ExtensionPointHandle : public Handle, public IExtensionPoint
 {
 public:
 
-  berryObjectMacro(berry::ExtensionPointHandle)
+  berryObjectMacro(berry::ExtensionPointHandle);
 
   ExtensionPointHandle(const SmartPointer<const IObjectManager>& objectManager, int id);
   ExtensionPointHandle(const IObjectManager* objectManager, int id);

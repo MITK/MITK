@@ -41,8 +41,8 @@ namespace mitk {
   {
   public:
     mitkClassMacro(MicroBirdTrackingDevice, TrackingDevice);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     /**Documentation
     * \brief Set the type of the microBird Tracking Device because it can not yet handle this itself

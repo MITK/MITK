@@ -29,7 +29,7 @@ private:
 
 public:
 
-  berryObjectMacro(berry::EvaluationService)
+  berryObjectMacro(berry::EvaluationService);
 
   EvaluationService();
 

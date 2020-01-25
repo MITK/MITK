@@ -32,7 +32,7 @@ struct IPageSite;
 struct BERRY_UI_QT IWorkbenchLocationService : public virtual Object
 {
 
-  berryObjectMacro(berry::IWorkbenchLocationService)
+  berryObjectMacro(berry::IWorkbenchLocationService);
 
   ~IWorkbenchLocationService() override;
 

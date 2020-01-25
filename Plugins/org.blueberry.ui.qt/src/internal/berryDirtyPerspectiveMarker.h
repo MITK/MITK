@@ -23,7 +23,7 @@ class DirtyPerspectiveMarker : public Object
 {
 public:
 
-  berryObjectMacro(DirtyPerspectiveMarker)
+  berryObjectMacro(DirtyPerspectiveMarker);
 
   QString perspectiveId;
 

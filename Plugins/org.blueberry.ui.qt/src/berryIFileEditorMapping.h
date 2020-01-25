@@ -41,7 +41,7 @@ namespace berry {
 struct BERRY_UI_QT IFileEditorMapping : public Object
 {
 
-  berryObjectMacro(berry::IFileEditorMapping)
+  berryObjectMacro(berry::IFileEditorMapping);
 
   ~IFileEditorMapping() override;
 

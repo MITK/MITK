@@ -27,7 +27,7 @@ namespace berry
    */
   struct org_blueberry_core_runtime_EXPORT IBerryPreferences : virtual public IPreferences
   {
-    berryObjectMacro(berry::IBerryPreferences)
+    berryObjectMacro(berry::IBerryPreferences);
 
     class org_blueberry_core_runtime_EXPORT ChangeEvent {
       IBerryPreferences* const m_Source;

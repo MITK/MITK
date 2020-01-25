@@ -22,7 +22,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(SegmentationObjectFactory, CoreObjectFactoryBase);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self) Mapper::Pointer
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self) Mapper::Pointer
       CreateMapper(mitk::DataNode *node, MapperSlotId slotId) override;
     void SetDefaultProperties(mitk::DataNode *node) override;
     const char *GetFileExtensions() override;

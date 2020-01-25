@@ -29,8 +29,8 @@ namespace mitk {
   {
   public:
     mitkClassMacroItkParent(USImageMetadata, itk::Object);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     //## getter and setter ##
     itkGetMacro(DeviceManufacturer, std::string);

@@ -172,7 +172,7 @@ private:
 
 public:
 
-  berryObjectMacro(berry::EvaluationResult)
+  berryObjectMacro(berry::EvaluationResult);
 
   bool operator==(const Object*) const override;
 

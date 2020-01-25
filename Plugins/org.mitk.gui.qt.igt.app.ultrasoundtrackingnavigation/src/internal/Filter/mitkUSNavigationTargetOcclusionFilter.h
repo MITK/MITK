@@ -35,8 +35,8 @@ class DataNode;
 class USNavigationTargetOcclusionFilter : public NavigationDataPassThroughFilter
 {
 public:
-  mitkClassMacro(USNavigationTargetOcclusionFilter, NavigationDataPassThroughFilter)
-  itkNewMacro(Self)
+  mitkClassMacro(USNavigationTargetOcclusionFilter, NavigationDataPassThroughFilter);
+  itkNewMacro(Self);
 
   /**
    * \brief Sets the target structure for which the occluded positions should be calculated.

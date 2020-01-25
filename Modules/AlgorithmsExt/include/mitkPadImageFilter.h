@@ -35,7 +35,9 @@ namespace mitk
   public:
     mitkClassMacro(PadImageFilter, ImageToImageFilter);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       /** \brief Sets the intensity of the pixel to pad */
       itkSetMacro(PadConstant, int);

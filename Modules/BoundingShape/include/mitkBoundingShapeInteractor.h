@@ -25,23 +25,24 @@ namespace mitk
 {
 // create events for interactions
 #pragma GCC visibility push(default)
-  itkEventMacro(BoundingShapeInteractionEvent, itk::AnyEvent)
+  itkEventMacro(BoundingShapeInteractionEvent, itk::AnyEvent);
 #pragma GCC visibility pop
 
-    /**
-      * @brief Basic interaction methods for mitk::GeometryData
-      *
-      * Inherit from DataInteratcor, this provides functionality of a state machine and configurable inputs.
-      *
-      * \ingroup Interaction
-      */
-    class MITKBOUNDINGSHAPE_EXPORT BoundingShapeInteractor : public DataInteractor
+  /**
+    * @brief Basic interaction methods for mitk::GeometryData
+    *
+    * Inherit from DataInteratcor, this provides functionality of a state machine and configurable inputs.
+    *
+    * \ingroup Interaction
+    */
+  class MITKBOUNDINGSHAPE_EXPORT BoundingShapeInteractor : public DataInteractor
   {
   public:
     mitkClassMacro(BoundingShapeInteractor, DataInteractor);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
-      void SetDataNode(DataNode *dataNode) override;
+    void SetDataNode(DataNode *dataNode) override;
     void SetRotationEnabled(bool rotationEnabled);
 
   protected:
@@ -97,22 +98,21 @@ namespace mitk
     virtual void ScaleObject(StateMachineAction *, InteractionEvent *);
 
     /**
-    * @brief Performs a rotation of the object relative to the mouse movement
-    */
-    // virtual void RotateObject(StateMachineAction*, InteractionEvent* interactionEvent); /* not implemented */
-
-    /**
     * @brief Initializes the movement, stores starting position
     */
+
     virtual void InitInteraction(StateMachineAction *, InteractionEvent *interactionEvent);
+
     /**
     * @brief Deselects all Handles at the end of interaction
     */
     virtual void DeselectHandles(StateMachineAction *, InteractionEvent *interactionEvent);
+
     /**
     * @brief Restore default properties of bounding box and handles
     */
     virtual void RestoreNodeProperties();
+
     /**
     * @brief Initializes member variables.
     */
@@ -123,6 +123,7 @@ namespace mitk
     * @brief Enables default crosshair properties
     */
     void EnableCrosshairNavigation();
+
     /**
     * @brief Sets limited crosshair properties (disable crosshair movement)
     */

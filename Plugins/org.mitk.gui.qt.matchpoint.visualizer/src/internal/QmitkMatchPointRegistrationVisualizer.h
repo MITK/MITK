@@ -49,7 +49,7 @@ public:
     /**
      * Creates smartpointer typedefs
      */
-    berryObjectMacro(QmitkMatchPointRegistrationVisualizer)
+    berryObjectMacro(QmitkMatchPointRegistrationVisualizer);
 
         QmitkMatchPointRegistrationVisualizer();
 

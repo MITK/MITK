@@ -67,7 +67,7 @@ class BERRY_UI_QT Workbench : public IWorkbench, private IWindowListener
 
 public:
 
-  berryObjectMacro(Workbench)
+  berryObjectMacro(Workbench);
 
   friend class RestoreStateRunnable;
 

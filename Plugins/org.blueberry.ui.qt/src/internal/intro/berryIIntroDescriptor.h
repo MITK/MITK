@@ -29,7 +29,7 @@ namespace berry {
 struct BERRY_UI_QT IIntroDescriptor : public Object
 {
 
-  berryObjectMacro(berry::IIntroDescriptor)
+  berryObjectMacro(berry::IIntroDescriptor);
 
   ~IIntroDescriptor() override;
 

@@ -34,9 +34,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(ToFImageDownsamplingFilter, ImageToImageFilter);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
     itkSetMacro(ResampledX,double);
     itkGetMacro(ResampledX,double);
 

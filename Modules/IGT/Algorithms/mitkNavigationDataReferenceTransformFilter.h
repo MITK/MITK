@@ -43,8 +43,8 @@ namespace mitk {
   {
   public:
     mitkClassMacro(NavigationDataReferenceTransformFilter, NavigationDataToNavigationDataFilter);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     typedef itk::QuaternionRigidTransform<double> QuaternionTransformType; ///< Quaternion transform for calculating
 

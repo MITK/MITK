@@ -98,7 +98,7 @@ namespace mitk
   {
   public:
     mitkClassMacroItkParent(BaseGeometry, itk::Object);
-    itkCloneMacro(Self)
+    itkCloneMacro(Self);
 
       // ********************************** TypeDef **********************************
 
@@ -529,7 +529,8 @@ namespace mitk
       //## outside the image (by half of the voxel diameter). Thus, we have
       //## to correct for this and to be able to do that, we need to know
       //## that the BaseGeometry is referring to an Image.
-      itkSetMacro(ImageGeometry, bool) itkBooleanMacro(ImageGeometry)
+      itkSetMacro(ImageGeometry, bool);
+      itkBooleanMacro(ImageGeometry);
 
         const GeometryTransformHolder *GetGeometryTransformHolder() const;
 
@@ -555,7 +556,7 @@ namespace mitk
 
     static const std::string GetTransformAsString(TransformType *transformType);
 
-    itkGetConstMacro(NDimensions, unsigned int)
+    itkGetConstMacro(NDimensions, unsigned int);
 
       bool IsBoundingBoxNull() const;
 

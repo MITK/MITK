@@ -77,7 +77,9 @@ namespace mitk
   public:
     mitkClassMacro(PointSet, BaseData);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       typedef mitk::ScalarType CoordinateType;
     typedef mitk::ScalarType InterpolationWeightType;

@@ -27,12 +27,9 @@ public:
   typedef SmartPointer< Self >        Pointer;
 
   /** Method for creation through the object factory. */
-  itkNewMacro(Self)
-
-  /** Run-time type information (and related methods). */
-  itkTypeMacro(SmoothedClassProbabilites, ImageToImageFilter)
-
-  itkSetMacro(Sigma, double)
+  itkNewMacro(Self); /** Run-time type information (and related methods). */
+  itkTypeMacro(SmoothedClassProbabilites, ImageToImageFilter);
+  itkSetMacro(Sigma, double);
 
   void SetMaskImage(TImage * mask){m_MaskImage = mask;}
 

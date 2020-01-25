@@ -72,6 +72,4 @@ mitk::DataCollectionUtility::EnsureDataImageInCollection(mitk::DataCollection::P
     }
 };
 
-
-#include <Iterators/mitkDataCollectionImageIterator.cxx>
 #endif //mitkDataCollectionUtilit_h

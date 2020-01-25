@@ -57,7 +57,7 @@ namespace berry {
 struct BERRY_UI_QT IPerspectiveDescriptor : public virtual Object
 {
 
-  berryObjectMacro(berry::IPerspectiveDescriptor)
+  berryObjectMacro(berry::IPerspectiveDescriptor);
 
   ~IPerspectiveDescriptor() override;
 

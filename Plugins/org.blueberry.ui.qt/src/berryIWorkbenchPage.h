@@ -65,7 +65,7 @@ struct IExtensionTracker;
 struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionService, public Object
 {
 
-  berryObjectMacro(berry::IWorkbenchPage)
+  berryObjectMacro(berry::IWorkbenchPage);
 
   ~IWorkbenchPage() override;
 

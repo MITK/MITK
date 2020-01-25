@@ -38,8 +38,9 @@ namespace mitk
 
     mitkClassMacro( ToFOpenCVImageGrabber , OpenCVImageSource );
 
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
     /*!
     \brief Get current ToF image. Specify image you want to grab with SetImageType()

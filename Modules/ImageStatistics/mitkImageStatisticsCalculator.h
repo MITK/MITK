@@ -30,10 +30,8 @@ namespace mitk
         typedef itk::SmartPointer< const Self >     ConstPointer;
 
         /** Method for creation through the object factory. */
-        itkNewMacro(Self)
-
-        /** Runtime information support. */
-        itkTypeMacro(ImageStatisticsCalculator_v2, itk::Object)
+        itkNewMacro(Self); /** Runtime information support. */
+        itkTypeMacro(ImageStatisticsCalculator_v2, itk::Object);
 
         typedef double statisticsValueType;
         typedef std::map<std::string, statisticsValueType> statisticsMapType;

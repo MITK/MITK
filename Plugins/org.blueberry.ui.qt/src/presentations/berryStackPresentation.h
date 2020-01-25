@@ -53,7 +53,7 @@ class BERRY_UI_QT StackPresentation : public Object, public ISizeProvider {
 
 public:
 
-  berryObjectMacro(StackPresentation)
+  berryObjectMacro(StackPresentation);
 
 private:
 

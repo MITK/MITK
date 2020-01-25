@@ -41,7 +41,8 @@ namespace mitk
     /**
      * Make this object constructable by the ::New() Method.
      */
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /**
        * The data type for a label. Currently only images with labels

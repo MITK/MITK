@@ -28,7 +28,11 @@ namespace mitk
   public:
     static void SetDefaultProperties(DataNode *node, BaseRenderer *renderer = nullptr, bool overwrite = false);
 
-    mitkClassMacro(BoundingShapeVtkMapper3D, VtkMapper) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(BoundingShapeVtkMapper3D, VtkMapper);
+
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       void ApplyColorAndOpacityProperties(BaseRenderer *, vtkActor *) override;
     void ApplyBoundingShapeProperties(BaseRenderer *renderer, vtkActor *);

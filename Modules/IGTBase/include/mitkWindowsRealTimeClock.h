@@ -34,8 +34,8 @@ namespace mitk {
   {
   public:
     mitkClassMacro(WindowsRealTimeClock, mitk::RealTimeClock);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     /**
     * \brief basic contructor

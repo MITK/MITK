@@ -32,7 +32,7 @@ namespace berry {
 struct BERRY_UI_QT IViewSite : public virtual IWorkbenchPartSite
 {
 
-  berryObjectMacro(berry::IViewSite)
+  berryObjectMacro(berry::IViewSite);
 
   ~IViewSite() override;
 

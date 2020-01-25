@@ -37,7 +37,8 @@ namespace mitk
     using MimeTypeNameType = std::string;
 
     mitkClassMacroItkParent(PropertyPersistenceInfo, itk::LightObject);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self) mitkNewMacro1Param(Self, const std::string &);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self) mitkNewMacro1Param(Self, const std::string &);
     mitkNewMacro2Param(Self, const std::string &, const std::string &);
 
     std::string GetName() const;

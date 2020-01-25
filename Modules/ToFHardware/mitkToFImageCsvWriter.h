@@ -40,7 +40,8 @@ namespace mitk
 
     mitkClassMacro( ToFImageCsvWriter , ToFImageWriter );
 
-    itkFactorylessNewMacro(Self)
+    itkFactorylessNewMacro(Self);
+
     itkCloneMacro(Self)
     /*!
     \brief Checks for file extensions and opens the output files

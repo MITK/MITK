@@ -48,8 +48,8 @@ namespace mitk
 
     ArbitraryTimeGeometry();
     typedef ArbitraryTimeGeometry self;
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /**
       * \brief Returns the number of time steps.

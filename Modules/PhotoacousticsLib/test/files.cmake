@@ -26,7 +26,7 @@ set(MODULE_TESTS
   mitkPhotoacousticNoiseGeneratorTest.cpp
   mitkSimulationBatchGeneratorTest.cpp
   mitkPropertyCalculatorTest.cpp
-  mitkSpectralUnmixingTest.cpp
+  # mitkSpectralUnmixingTest.cpp (See T27024)
   mitkPhotoacousticVesselMeanderStrategyTest.cpp
   mitkPhotoacousticVesselTest.cpp
 )

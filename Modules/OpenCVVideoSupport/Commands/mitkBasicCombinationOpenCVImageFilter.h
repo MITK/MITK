@@ -23,8 +23,8 @@ class MITKOPENCVVIDEOSUPPORT_EXPORT BasicCombinationOpenCVImageFilter : public A
 {
 public:
   mitkClassMacro(BasicCombinationOpenCVImageFilter, AbstractOpenCVImageFilter);
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+  itkFactorylessNewMacro(Self);
+  itkCloneMacro(Self);
 
   /**
     * \brief Apply list of filters to the given image.

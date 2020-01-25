@@ -31,9 +31,8 @@ namespace mitk
   class MITKSEGMENTATION_EXPORT FeatureBasedEdgeDetectionFilter : public ImageToUnstructuredGridFilter
   {
   public:
-    mitkClassMacro(FeatureBasedEdgeDetectionFilter, ImageToUnstructuredGridFilter)
-
-      itkFactorylessNewMacro(Self)
+    mitkClassMacro(FeatureBasedEdgeDetectionFilter, ImageToUnstructuredGridFilter);
+    itkFactorylessNewMacro(Self);
 
       /** Sets the segmentation for calculating the statistics within that */
       void SetSegmentationMask(mitk::Image::Pointer);

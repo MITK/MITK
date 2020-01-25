@@ -28,7 +28,9 @@ namespace mitk
   public:
     mitkClassMacroItkParent(HistogramGenerator, itk::Object);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self) typedef itk::Statistics::Histogram<double> HistogramType;
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self) typedef itk::Statistics::Histogram<double> HistogramType;
 
     itkSetMacro(Image, mitk::Image::ConstPointer);
     itkSetMacro(Size, int);

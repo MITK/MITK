@@ -57,7 +57,9 @@ namespace mitk
     LightObject::Pointer InternalClone() const override;
 
   public:
-    mitkClassMacroItkParent(TimeGeometry, itk::Object) itkCloneMacro(Self) itkCreateAnotherMacro(Self)
+    mitkClassMacroItkParent(TimeGeometry, itk::Object);
+    itkCloneMacro(Self);
+    itkCreateAnotherMacro(Self);
 
       /**
       * \brief Returns the number of time steps.

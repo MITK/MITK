@@ -32,11 +32,11 @@ namespace mitk {
     {
     public:
 
-      mitkClassMacroItkParent(MonteCarloThreadHandler, itk::LightObject)
-        mitkNewMacro2Param(MonteCarloThreadHandler, long, bool)
-        mitkNewMacro3Param(MonteCarloThreadHandler, long, bool, bool)
+      mitkClassMacroItkParent(MonteCarloThreadHandler, itk::LightObject);
+      mitkNewMacro2Param(MonteCarloThreadHandler, long, bool);
+      mitkNewMacro3Param(MonteCarloThreadHandler, long, bool, bool);
 
-        long GetNextWorkPackage();
+      long GetNextWorkPackage();
 
       void SetPackageSize(long sizeInMilliseconsOrNumberOfPhotons);
 

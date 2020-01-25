@@ -26,7 +26,7 @@ namespace mitk
   class DEPRECATED() MITKLEGACYIO_EXPORT PointSetWriterFactory : public itk::ObjectFactoryBase
   {
   public:
-    mitkClassMacroItkParent(mitk::PointSetWriterFactory, itk::ObjectFactoryBase)
+    mitkClassMacroItkParent(mitk::PointSetWriterFactory, itk::ObjectFactoryBase);
 
       /** Class methods used to interface with the registered factories. */
       const char *GetITKSourceVersion(void) const override;

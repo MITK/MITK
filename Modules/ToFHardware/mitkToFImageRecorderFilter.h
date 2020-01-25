@@ -29,8 +29,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(ToFImageRecorderFilter, ImageToImageFilter);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     /*!
     \brief Set file name for writing image files

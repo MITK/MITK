@@ -31,7 +31,8 @@ namespace mitk
   {
   public:
     mitkClassMacroItkParent(SceneIO, itk::Object);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       typedef DataStorage::SetOfObjects FailedBaseDataListType;
 

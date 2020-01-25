@@ -37,7 +37,7 @@ namespace mitk
   struct IInputDeviceDescriptor : public berry::Object
   {
 
-    berryObjectMacro(mitk::IInputDeviceDescriptor)
+    berryObjectMacro(mitk::IInputDeviceDescriptor);
 
     /**
     * Creates an instance of an input device defined in the descriptor.

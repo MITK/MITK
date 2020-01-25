@@ -47,9 +47,9 @@ namespace mitk
   {
   public:
     mitkClassMacro(SurfaceToImageFilter, ImageSource);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
-
-      itkSetMacro(MakeOutputBinary, bool);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
+    itkSetMacro(MakeOutputBinary, bool);
     itkGetMacro(MakeOutputBinary, bool);
     itkBooleanMacro(MakeOutputBinary);
 

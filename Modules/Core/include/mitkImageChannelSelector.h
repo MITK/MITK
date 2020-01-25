@@ -29,9 +29,11 @@ namespace mitk
   public:
     mitkClassMacro(ImageChannelSelector, SubImageSelector);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
 
-      itkGetConstMacro(ChannelNr, int);
+    itkCloneMacro(Self);
+
+    itkGetConstMacro(ChannelNr, int);
     itkSetMacro(ChannelNr, int);
 
   protected:

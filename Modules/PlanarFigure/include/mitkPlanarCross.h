@@ -52,7 +52,9 @@ namespace mitk
   public:
     mitkClassMacro(PlanarCross, PlanarFigure);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       /** \brief Indicates whether the PlanarFigure shall represent only a single line instead of an
        * orthogonal cross. */

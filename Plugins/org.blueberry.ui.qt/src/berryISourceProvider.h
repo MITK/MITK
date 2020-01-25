@@ -43,7 +43,7 @@ struct ISourceProviderListener;
 struct ISourceProvider : public virtual Object
 {
 
-  berryObjectMacro(berry::ISourceProvider)
+  berryObjectMacro(berry::ISourceProvider);
 
   typedef QHash<QString, Object::ConstPointer> StateMapType;
 

@@ -33,7 +33,9 @@ namespace mitk
   public:
     mitkClassMacro(SurfaceToSurfaceFilter, mitk::SurfaceSource);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       typedef itk::DataObject::Pointer DataObjectPointer;
 

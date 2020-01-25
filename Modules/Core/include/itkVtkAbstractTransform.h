@@ -42,7 +42,9 @@ namespace itk
     typedef typename Superclass::ParametersType ParametersType;
     typedef typename Superclass::JacobianType JacobianType;
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       //##Documentation
       //## @brief Get the vtkAbstractTransform (stored in m_VtkAbstractTransform)

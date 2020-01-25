@@ -18,7 +18,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(SceneReaderV1, SceneReader);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       bool LoadScene(TiXmlDocument &document,
                              const std::string &workingDirectory,

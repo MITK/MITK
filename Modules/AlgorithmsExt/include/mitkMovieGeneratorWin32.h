@@ -30,7 +30,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(MovieGeneratorWin32, MovieGenerator);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       virtual void SetFileName(const char *fileName);
 

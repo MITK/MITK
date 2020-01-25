@@ -29,7 +29,9 @@ namespace mitk
   public:
     mitkClassMacro(PlanarPolygon, PlanarFigure);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       /** \brief Set whether the polygon should be closed between first and last control point or not. */
       virtual void SetClosed(bool closed);

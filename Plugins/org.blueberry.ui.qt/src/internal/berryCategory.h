@@ -35,7 +35,7 @@ template<class T> class Category : /*IWorkbenchAdapter*/ public IPluginContribut
 
 public:
 
-  berryObjectMacro(Category<T>, IPluginContribution, IAdaptable)
+  berryObjectMacro(Category<T>, IPluginContribution, IAdaptable);
 
   typedef T ElementType;
 

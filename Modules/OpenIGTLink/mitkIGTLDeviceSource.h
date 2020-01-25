@@ -31,8 +31,8 @@ namespace mitk {
   {
   public:
     mitkClassMacro(IGTLDeviceSource, IGTLMessageSource);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     /**
     *\brief These Constants are used in conjunction with Microservices

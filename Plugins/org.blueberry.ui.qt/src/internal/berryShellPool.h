@@ -55,7 +55,7 @@ class ShellPool: public Object, public IShellListener
 
 public:
 
-  berryObjectMacro(ShellPool)
+  berryObjectMacro(ShellPool);
 
   void ShellClosed(const ShellEvent::Pointer& e) override;
 

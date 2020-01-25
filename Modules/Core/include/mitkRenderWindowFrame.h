@@ -34,7 +34,8 @@ namespace mitk
   {
   public:
     mitkClassMacroItkParent(RenderWindowFrame, itk::Object);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /**
        * Sets the renderwindow, in which colored rectangle boarders will be shown.

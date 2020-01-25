@@ -21,7 +21,7 @@ namespace mitk
   class UnstructuredGridVtkWriterFactory : public itk::ObjectFactoryBase
   {
   public:
-    mitkClassMacroItkParent(mitk::UnstructuredGridVtkWriterFactory, itk::ObjectFactoryBase)
+    mitkClassMacroItkParent(mitk::UnstructuredGridVtkWriterFactory, itk::ObjectFactoryBase);
 
       /** Class methods used to interface with the registered factories. */
       const char *GetITKSourceVersion(void) const override;

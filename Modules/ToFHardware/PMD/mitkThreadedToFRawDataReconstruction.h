@@ -43,9 +43,8 @@ namespace mitk
    public:
 
     mitkClassMacroItkParent( ThreadedToFRawDataReconstruction ,  itk::ProcessObject );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
     itkGetMacro(Init, bool);
 
     void SetChannelData(vtkShortArray* sourceData);

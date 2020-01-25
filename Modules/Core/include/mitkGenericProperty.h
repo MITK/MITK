@@ -47,7 +47,7 @@ namespace mitk
   public:
     mitkClassMacro(GenericProperty, BaseProperty);
     mitkNewMacro1Param(GenericProperty<T>, T);
-    itkCloneMacro(Self)
+    itkCloneMacro(Self);
 
       typedef T ValueType;
 
@@ -112,8 +112,12 @@ namespace mitk
                                                                                                                        \
   {                                                                                                                    \
   public:                                                                                                              \
-    mitkClassMacro(PropertyName, GenericProperty<Type>) itkFactorylessNewMacro(Self) itkCloneMacro(Self)               \
-      mitkNewMacro1Param(PropertyName, Type) using BaseProperty::operator=;                                            \
+    mitkClassMacro(PropertyName, GenericProperty<Type>);                                                               \
+    itkFactorylessNewMacro(Self);                                                                                      \
+    itkCloneMacro(Self);                                                                                               \
+    mitkNewMacro1Param(PropertyName, Type);                                                                            \
+                                                                                                                       \
+    using BaseProperty::operator=;                                                                                     \
                                                                                                                        \
   protected:                                                                                                           \
     PropertyName();                                                                                                    \

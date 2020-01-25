@@ -29,8 +29,8 @@ class MITKIMAGESTATISTICS_EXPORT PointSetStatisticsCalculator : public itk::Obje
 public:
 
   mitkClassMacroItkParent( PointSetStatisticsCalculator, itk::Object );
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+  itkFactorylessNewMacro(Self);
+  itkCloneMacro(Self);
 
   mitkNewMacro1Param(PointSetStatisticsCalculator,mitk::PointSet::Pointer);
 

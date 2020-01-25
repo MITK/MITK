@@ -120,6 +120,19 @@ if(NOT DEFINED MITK_DOXYGEN_DOT_NUM_THREADS)
   set(MITK_DOXYGEN_DOT_NUM_THREADS 0)
 endif()
 
+if(NOT DEFINED US_PLATFORM)
+  if(UNIX)
+    if(APPLE)
+      set(US_PLATFORM "US_PLATFORM_APPLE=1")
+    else()
+      set(US_PLATFORM "US_PLATFORM_LINUX=1")
+    endif()
+    set(US_PLATFORM "${US_PLATFORM} \\\nUS_PLATFORM_POSIX=1")
+  else()
+    set(US_PLATFORM "US_PLATFORM_WINDOWS=1")
+  endif()
+endif()
+
 # parse which plug-in documentation to activate
 set(USERS_GUIDE_INPUT "${MITK_SOURCE_DIR}/Documentation/Doxygen/UserManual/")
 if(MITK_USE_BLUEBERRY)
@@ -192,7 +205,7 @@ if(MITK_USE_BLUEBERRY)
 
     add_dependencies(doc mitkXPDoc)
   else()
-    message("Extension-point schema documentation generation disabled due to missing Ant and / or missing BlueBerry doc tools.")
+    message(STATUS "Extension-point schema documentation generation disabled due to missing Ant and / or missing BlueBerry doc tools.")
   endif()
 endif(MITK_USE_BLUEBERRY)
 

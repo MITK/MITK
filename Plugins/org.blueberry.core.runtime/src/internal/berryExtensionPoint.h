@@ -72,7 +72,7 @@ protected:
 
 public:
 
-  berryObjectMacro(berry::ExtensionPoint)
+  berryObjectMacro(berry::ExtensionPoint);
 
   ExtensionPoint(ExtensionRegistry* registry, bool persist);
 

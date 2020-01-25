@@ -25,7 +25,7 @@ template<typename T>
 class ObjectList : public Object, public QList<T>
 {
 public:
-  berryObjectMacro(berry::ObjectList<T>)
+  berryObjectMacro(berry::ObjectList<T>);
 
   ObjectList() : QList<T>() {}
   ObjectList(const QList<T>& l) : QList<T>(l) {}

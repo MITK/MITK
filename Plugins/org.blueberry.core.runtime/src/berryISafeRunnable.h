@@ -36,7 +36,7 @@ namespace berry
 struct org_blueberry_core_runtime_EXPORT ISafeRunnable: public Object
 {
 
-  berryObjectMacro(berry::ISafeRunnable)
+  berryObjectMacro(berry::ISafeRunnable);
 
   /**
    * Handles an exception thrown by this runnable's <code>run</code>

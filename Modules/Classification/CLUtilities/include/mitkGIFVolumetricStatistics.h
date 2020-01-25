@@ -108,9 +108,9 @@ namespace mitk
   class MITKCLUTILITIES_EXPORT GIFVolumetricStatistics : public AbstractGlobalImageFeature
   {
   public:
-    mitkClassMacro(GIFVolumetricStatistics,AbstractGlobalImageFeature)
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    mitkClassMacro(GIFVolumetricStatistics,AbstractGlobalImageFeature);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       GIFVolumetricStatistics();
 

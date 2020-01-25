@@ -32,7 +32,7 @@ class MITK_MATCHPOINT_CORE_HELPER_EXPORT MAPAlgorithmInfoObject : public berry::
 
 public:
 
-  berryObjectMacro(mitk::MAPAlgorithmInfoObject)
+  berryObjectMacro(mitk::MAPAlgorithmInfoObject);
 
   MAPAlgorithmInfoObject();
   MAPAlgorithmInfoObject(::map::deployment::DLLInfo::ConstPointer info);

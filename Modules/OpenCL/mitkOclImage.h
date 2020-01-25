@@ -46,8 +46,8 @@ class MITKOPENCL_EXPORT OclImage : public OclBaseData
 {
 public:
   mitkClassMacro(OclImage, OclBaseData);
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+  itkFactorylessNewMacro(Self);
+  itkCloneMacro(Self);
 
   /*!  \brief Copies the RAM-stored data to GMEM */
   virtual int TransferDataToGPU(cl_command_queue);

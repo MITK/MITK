@@ -66,7 +66,7 @@ struct IWorkbench;
 struct BERRY_UI_QT IWorkbenchWindow : public IPageService, public IServiceLocator, public virtual Object
 {
 
-  berryObjectMacro(berry::IWorkbenchWindow, IPageService, IServiceLocator, Object)
+  berryObjectMacro(berry::IWorkbenchWindow, IPageService, IServiceLocator, Object);
 
   /**
    * Closes this workbench window.

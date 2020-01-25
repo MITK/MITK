@@ -32,7 +32,9 @@ namespace mitk
   public:
     mitkClassMacro(PlaneGeometryData, GeometryData);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       //##Documentation
       //## @brief Set the reference to a PlaneGeometry that is stored

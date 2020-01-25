@@ -27,7 +27,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(GeometryDataSerializer, BaseDataSerializer);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self) std::string Serialize() override;
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self) std::string Serialize() override;
 
   protected:
     GeometryDataSerializer();

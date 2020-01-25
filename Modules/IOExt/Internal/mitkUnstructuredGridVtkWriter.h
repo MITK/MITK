@@ -43,7 +43,9 @@ namespace mitk
   public:
     mitkClassMacro(UnstructuredGridVtkWriter, mitk::FileWriterWithInformation);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       mitkWriterMacro;
 

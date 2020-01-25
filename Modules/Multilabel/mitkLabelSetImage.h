@@ -29,7 +29,8 @@ namespace mitk
   class MITKMULTILABEL_EXPORT LabelSetImage : public Image
   {
   public:
-    mitkClassMacro(LabelSetImage, Image) itkNewMacro(Self)
+    mitkClassMacro(LabelSetImage, Image);
+    itkNewMacro(Self);
 
       typedef mitk::Label::PixelType PixelType;
 
@@ -263,7 +264,7 @@ namespace mitk
     const mitk::Label *GetExteriorLabel() const;
 
   protected:
-    mitkCloneMacro(Self)
+    mitkCloneMacro(Self);
 
       LabelSetImage();
     LabelSetImage(const LabelSetImage &other);

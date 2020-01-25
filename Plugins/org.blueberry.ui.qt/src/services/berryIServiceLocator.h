@@ -43,7 +43,7 @@ namespace berry {
 struct BERRY_UI_QT IServiceLocator : public virtual Object
 {
 
-  berryObjectMacro(berry::IServiceLocator, Object)
+  berryObjectMacro(berry::IServiceLocator, Object);
 
   ~IServiceLocator() override;
 

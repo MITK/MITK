@@ -27,8 +27,8 @@ namespace mitk
   class MITKALGORITHMSEXT_EXPORT CropTimestepsImageFilter : public SubImageSelector
   {
   public:
-    mitkClassMacro(CropTimestepsImageFilter, SubImageSelector)
-    itkFactorylessNewMacro(Self)
+    mitkClassMacro(CropTimestepsImageFilter, SubImageSelector);
+    itkFactorylessNewMacro(Self);
 
     /*!
     * \brief Sets the input image

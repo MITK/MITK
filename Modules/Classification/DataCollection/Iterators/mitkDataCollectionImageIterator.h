@@ -14,7 +14,7 @@ found in the LICENSE file.
 #ifndef mitkDataCollectionImageIterator_H
 #define mitkDataCollectionImageIterator_H
 
-
+#include <mitkImageCast.h>
 #include <mitkDataCollection.h>
 #include <itkImageRegionIterator.h>
 

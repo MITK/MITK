@@ -46,7 +46,7 @@ private:
 
 public:
 
-  berryObjectMacro(berry::ActivePartExpression)
+  berryObjectMacro(berry::ActivePartExpression);
 
   /**
    * Constructs a new instance of <code>ActivePartExpression</code>

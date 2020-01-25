@@ -91,7 +91,7 @@ protected:
 
 public:
 
-  berryObjectMacro(berry::ConfigurationElement)
+  berryObjectMacro(berry::ConfigurationElement);
 
   ConfigurationElement(ExtensionRegistry* registry, bool persist);
 

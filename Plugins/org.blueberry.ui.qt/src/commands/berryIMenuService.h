@@ -44,7 +44,7 @@ struct IEvaluationContext;
 struct IMenuService : public IServiceWithSources
 {
 
-  berryObjectMacro(berry::IMenuService)
+  berryObjectMacro(berry::IMenuService);
 
   /**
    * Contribute and initialize the contribution factory. This should only be

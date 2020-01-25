@@ -60,7 +60,9 @@ namespace mitk
 
     mitkClassMacroItkParent(TransferFunction, itk::DataObject);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       /** \brief Get/Set min/max of transfer function range for initialization. */
       itkSetMacro(Min, int);

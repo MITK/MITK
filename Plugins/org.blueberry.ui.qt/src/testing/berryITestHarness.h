@@ -31,7 +31,7 @@ namespace berry {
 struct BERRY_UI_QT ITestHarness : public virtual Object
 {
 
-  berryObjectMacro(berry::ITestHarness)
+  berryObjectMacro(berry::ITestHarness);
 
     /**
      * Runs the tests.

@@ -48,7 +48,9 @@ namespace mitk
   public:
     mitkClassMacro(LevelWindowProperty, BaseProperty);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self) mitkNewMacro1Param(LevelWindowProperty, const mitk::LevelWindow &);
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self) mitkNewMacro1Param(LevelWindowProperty, const mitk::LevelWindow &);
 
     typedef LevelWindow ValueType;
 

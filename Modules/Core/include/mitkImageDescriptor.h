@@ -39,7 +39,9 @@ namespace mitk
   public:
     mitkClassMacroItkParent(ImageDescriptor, itk::Object);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       /** Insert new channel
 

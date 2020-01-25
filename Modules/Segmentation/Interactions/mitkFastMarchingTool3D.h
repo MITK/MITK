@@ -53,7 +53,9 @@ namespace mitk
     mitkNewMessageMacro(Ready);
 
   public:
-    mitkClassMacro(FastMarchingTool3D, AutoSegmentationTool) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(FastMarchingTool3D, AutoSegmentationTool);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /* typedefs for itk pipeline */
       typedef float InternalPixelType;

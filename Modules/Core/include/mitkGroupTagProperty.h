@@ -34,7 +34,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(GroupTagProperty, BaseProperty);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       using BaseProperty::operator=;
 

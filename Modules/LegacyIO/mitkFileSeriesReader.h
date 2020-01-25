@@ -31,7 +31,7 @@ namespace mitk
   class MITKLEGACYIO_EXPORT FileSeriesReader : public FileReader
   {
   public:
-    mitkClassMacro(FileSeriesReader, FileReader)
+    mitkClassMacro(FileSeriesReader, FileReader);
 
       typedef std::vector<std::string> MatchedFileNames;
 

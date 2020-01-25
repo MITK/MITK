@@ -46,7 +46,7 @@ class Action;
  */
 struct IActionBars : public Object
 {
-  berryObjectMacro(berry::IActionBars)
+  berryObjectMacro(berry::IActionBars);
 
   /**
    * Returns the menu manager.

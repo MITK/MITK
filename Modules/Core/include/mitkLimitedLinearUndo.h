@@ -40,7 +40,8 @@ namespace mitk
     typedef std::deque<UndoStackItem *>::reverse_iterator UndoContainerRevIter;
 
     mitkClassMacro(LimitedLinearUndo, UndoModel);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       bool SetOperationEvent(UndoStackItem *stackItem) override;
 

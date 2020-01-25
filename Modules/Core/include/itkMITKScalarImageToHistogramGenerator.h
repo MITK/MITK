@@ -35,7 +35,8 @@ namespace itk
       itkTypeMacro(MITKScalarImageToHistogramGenerator, Object);
 
       /** standard New() method support */
-      itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+      itkFactorylessNewMacro(Self);
+      itkCloneMacro(Self);
 
         typedef TImageType ImageType;
       typedef itk::Statistics::ImageToListSampleAdaptor<ImageType> AdaptorType;

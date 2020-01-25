@@ -28,7 +28,9 @@ namespace mitk
   public:
     mitkClassMacro(GeometryData, BaseData);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       void UpdateOutputInformation() override;
 

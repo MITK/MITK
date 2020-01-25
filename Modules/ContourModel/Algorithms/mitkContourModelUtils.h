@@ -29,7 +29,7 @@ namespace mitk
   class MITKCONTOURMODEL_EXPORT ContourModelUtils : public itk::Object
   {
   public:
-    mitkClassMacroItkParent(ContourModelUtils, itk::Object)
+    mitkClassMacroItkParent(ContourModelUtils, itk::Object);
 
     /**
       \brief Projects a contour onto an image point by point. Converts from world to index coordinates.

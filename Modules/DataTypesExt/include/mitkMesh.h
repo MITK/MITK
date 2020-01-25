@@ -52,7 +52,9 @@ namespace mitk
   public:
     mitkClassMacro(Mesh, PointSet);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       typedef Superclass::DataType::CellType CellType;
     typedef CellType::CellAutoPointer CellAutoPointer;

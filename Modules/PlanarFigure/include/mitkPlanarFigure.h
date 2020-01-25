@@ -50,7 +50,8 @@ namespace mitk
   class MITKPLANARFIGURE_EXPORT PlanarFigure : public BaseData
   {
   public:
-    mitkClassMacro(PlanarFigure, BaseData) itkCloneMacro(Self)
+    mitkClassMacro(PlanarFigure, BaseData);
+    itkCloneMacro(Self);
 
       typedef Point2D PolyLineElement;
 

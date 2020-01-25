@@ -80,7 +80,7 @@ namespace berry
 struct org_blueberry_core_runtime_EXPORT IAdapterManager: public Object
 {
 
-  berryObjectMacro(berry::IAdapterManager)
+  berryObjectMacro(berry::IAdapterManager);
 
   /**
    * This value can be returned to indicate that no applicable adapter factory

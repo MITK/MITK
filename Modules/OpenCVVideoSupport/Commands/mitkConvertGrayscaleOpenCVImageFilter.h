@@ -25,8 +25,8 @@ class MITKOPENCVVIDEOSUPPORT_EXPORT ConvertGrayscaleOpenCVImageFilter : public A
 
 public:
   mitkClassMacro(ConvertGrayscaleOpenCVImageFilter, AbstractOpenCVImageFilter);
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+  itkFactorylessNewMacro(Self);
+  itkCloneMacro(Self);
 
   /**
     * \brief Converts given image to grayscale.

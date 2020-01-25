@@ -69,8 +69,9 @@ namespace mitk
   class MITKSEGMENTATION_EXPORT SliceBasedInterpolationController : public itk::Object
   {
   public:
-    mitkClassMacroItkParent(SliceBasedInterpolationController, itk::Object) itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    mitkClassMacroItkParent(SliceBasedInterpolationController, itk::Object);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /**
         \brief Find interpolator for a given image.

@@ -33,7 +33,7 @@ struct ISourceProvider;
  */
 struct IServiceWithSources : public IDisposable {
 
-  berryObjectMacro(berry::IServiceWithSources)
+  berryObjectMacro(berry::IServiceWithSources);
 
   ~IServiceWithSources() override;
 

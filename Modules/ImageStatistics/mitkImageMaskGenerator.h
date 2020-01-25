@@ -31,10 +31,8 @@ public:
     typedef itk::SmartPointer< const Self >     ConstPointer;
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self)
-
-    /** Runtime information support. */
-    itkTypeMacro(BinaryImageMaskGenerator, MaskGenerator)
+    itkNewMacro(Self); /** Runtime information support. */
+    itkTypeMacro(BinaryImageMaskGenerator, MaskGenerator);
 
     mitk::Image::Pointer GetMask() override;
 

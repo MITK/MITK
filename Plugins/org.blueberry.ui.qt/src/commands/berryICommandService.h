@@ -51,7 +51,7 @@ class ParameterType;
 struct BERRY_UI_QT ICommandService : public IDisposable
 {
 
-  berryObjectMacro(berry::ICommandService)
+  berryObjectMacro(berry::ICommandService);
 
   /**
    * The identifier of the category in which all auto-generated commands will

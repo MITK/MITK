@@ -42,7 +42,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(EraseRegionTool, SetRegionTool);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       const char **GetXPM() const override;
     us::ModuleResource GetCursorIconResource() const override;

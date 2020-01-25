@@ -32,8 +32,8 @@ namespace mitk {
   {
   public:
     mitkClassMacro(NavigationDataToIGTLMessageFilter, IGTLMessageSource);
-    itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /**Documentation
       * \brief There are four different operation modes.

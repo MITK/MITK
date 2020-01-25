@@ -45,10 +45,12 @@ namespace mitk
     mitkClassMacro(StringProperty, BaseProperty);
     typedef std::string ValueType;
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self) mitkNewMacro1Param(StringProperty, const char *);
-    mitkNewMacro1Param(StringProperty, const std::string &)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
+    mitkNewMacro1Param(StringProperty, const char*);
+    mitkNewMacro1Param(StringProperty, const std::string&);
 
-      itkGetStringMacro(Value);
+    itkGetStringMacro(Value);
     itkSetStringMacro(Value);
 
     std::string GetValueAsString() const override;

@@ -33,7 +33,7 @@ namespace berry {
 struct BERRY_UI_QT IDropTarget : public Object
 {
 
-  berryObjectMacro(IDropTarget)
+  berryObjectMacro(IDropTarget);
 
   ~IDropTarget() override;
 

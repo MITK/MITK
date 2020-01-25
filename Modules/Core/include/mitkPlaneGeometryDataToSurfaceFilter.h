@@ -59,7 +59,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(PlaneGeometryDataToSurfaceFilter, SurfaceSource);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       void GenerateOutputInformation() override;
 

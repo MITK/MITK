@@ -52,7 +52,7 @@ namespace berry {
 struct BERRY_UI_QT INestable : public virtual Object
 {
 
-  berryObjectMacro(berry::INestable)
+  berryObjectMacro(berry::INestable);
 
   ~INestable() override;
 

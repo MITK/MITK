@@ -37,8 +37,9 @@ namespace mitk
 
     mitkClassMacro( NavigationDataRecorder, NavigationDataToNavigationDataFilter );
 
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
     /**
     * \brief Returns whether the NavigationDataRecorder is currently recording or not

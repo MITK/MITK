@@ -42,9 +42,9 @@ namespace mitk
   class MITKIGT_EXPORT TrackingTool : public itk::Object
   {
   public:
-    mitkClassMacroItkParent(TrackingTool, itk::Object)
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    mitkClassMacroItkParent(TrackingTool, itk::Object);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     void PrintSelf(std::ostream& os, itk::Indent indent) const override;
 

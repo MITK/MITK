@@ -32,7 +32,9 @@ namespace mitk
   class MITKDATATYPESEXT_EXPORT UnstructuredGridSource : public BaseDataSource
   {
   public:
-    mitkClassMacro(UnstructuredGridSource, BaseDataSource) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(UnstructuredGridSource, BaseDataSource);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       typedef mitk::UnstructuredGrid OutputType;
 

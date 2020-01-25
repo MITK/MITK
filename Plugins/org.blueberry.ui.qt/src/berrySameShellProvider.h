@@ -39,7 +39,7 @@ private:
 
 public:
 
-  berryObjectMacro(SameShellProvider)
+  berryObjectMacro(SameShellProvider);
 
   /**
    * Returns a shell provider that always returns the current

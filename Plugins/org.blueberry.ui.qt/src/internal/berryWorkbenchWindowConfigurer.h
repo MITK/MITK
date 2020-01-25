@@ -47,7 +47,7 @@ class WorkbenchWindowConfigurer : public IWorkbenchWindowConfigurer
 
 public:
 
-  berryObjectMacro(WorkbenchWindowConfigurer)
+  berryObjectMacro(WorkbenchWindowConfigurer);
 
   /**
    * Creates a new workbench window configurer.
@@ -260,7 +260,7 @@ private:
 
   public:
 
-    berryObjectMacro(WindowActionBarConfigurer)
+    berryObjectMacro(WindowActionBarConfigurer);
 
     WindowActionBarConfigurer(WeakPointer<WorkbenchWindow> wnd);
 

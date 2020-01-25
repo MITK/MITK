@@ -118,7 +118,7 @@ namespace berry
    */
   struct org_blueberry_core_runtime_EXPORT IPreferences : virtual public Object
   {
-    berryObjectMacro(berry::IPreferences)
+    berryObjectMacro(berry::IPreferences);
 
     ~IPreferences() override;
 

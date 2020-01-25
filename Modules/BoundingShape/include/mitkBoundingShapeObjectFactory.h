@@ -21,7 +21,9 @@ namespace mitk
   class MITKBOUNDINGSHAPE_EXPORT BoundingShapeObjectFactory : public CoreObjectFactoryBase
   {
   public:
-    mitkClassMacro(BoundingShapeObjectFactory, CoreObjectFactoryBase) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(BoundingShapeObjectFactory, CoreObjectFactoryBase);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       Mapper::Pointer CreateMapper(DataNode *node, MapperSlotId slotId) override;
     void SetDefaultProperties(DataNode *node) override;

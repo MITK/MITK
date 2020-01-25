@@ -51,7 +51,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(ExtractImageFilter, ImageToImageFilter);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /**
         \brief Which slice to extract (first one has index 0).

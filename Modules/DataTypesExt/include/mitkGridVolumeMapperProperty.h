@@ -36,7 +36,9 @@ namespace mitk
 
     mitkClassMacro(GridVolumeMapperProperty, EnumerationProperty);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       mitkNewMacro1Param(GridVolumeMapperProperty, const IdType &);
 

@@ -33,20 +33,21 @@ namespace mitk
   class MITKCORE_EXPORT Geometry3D : public BaseGeometry
   {
   public:
-    mitkClassMacro(Geometry3D, mitk::BaseGeometry)
+    mitkClassMacro(Geometry3D, mitk::BaseGeometry);
 
-      typedef itk::QuaternionRigidTransform<ScalarType> QuaternionTransformType;
+    typedef itk::QuaternionRigidTransform<ScalarType> QuaternionTransformType;
     typedef QuaternionTransformType::VnlQuaternionType VnlQuaternionType;
 
     /** Method for creation through the object factory. */
-    itkFactorylessNewMacro(Self) mitkNewMacro1Param(Self, const Self &)
+    itkFactorylessNewMacro(Self);
+    mitkNewMacro1Param(Self, const Self&);
 
-      itkCloneMacro(Self)
-      // itkGetConstReferenceMacro(TimeBounds, TimeBounds);
+    itkCloneMacro(Self);
+    // itkGetConstReferenceMacro(TimeBounds, TimeBounds);
 
-      // virtual void SetTimeBounds(const TimeBounds& timebounds);
+    // virtual void SetTimeBounds(const TimeBounds& timebounds);
 
-      protected : Geometry3D();
+  protected : Geometry3D();
     Geometry3D(const Geometry3D &);
 
     //##Documentation

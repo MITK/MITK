@@ -44,10 +44,11 @@ class MITKIGT_EXPORT TrackingVolumeGenerator : public mitk::SurfaceSource
   {
   public:
 
-    mitkClassMacro(TrackingVolumeGenerator, mitk::SurfaceSource)
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    mitkClassMacro(TrackingVolumeGenerator, mitk::SurfaceSource);
 
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
     /**
     * \brief        Deprecated! Use set DeviceData instead.

@@ -22,7 +22,7 @@ class RegistryObject;
 
 struct IObjectManager : public Object
 {
-  berryObjectMacro(berry::IObjectManager)
+  berryObjectMacro(berry::IObjectManager);
 
   ~IObjectManager() override;
 

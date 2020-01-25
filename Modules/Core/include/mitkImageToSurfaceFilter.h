@@ -64,7 +64,8 @@ namespace mitk
     };
 
     mitkClassMacro(ImageToSurfaceFilter, SurfaceSource);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /**
        * For each image time slice a surface will be created. This method is

@@ -38,7 +38,7 @@ namespace berry {
  */
 struct org_blueberry_core_runtime_EXPORT IContributor : public Object
 {
-  berryObjectMacro(berry::IContributor)
+  berryObjectMacro(berry::IContributor);
 
   ~IContributor() override;
 

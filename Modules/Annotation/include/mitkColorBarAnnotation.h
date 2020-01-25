@@ -43,7 +43,8 @@ namespace mitk
     };
 
     mitkClassMacro(ColorBarAnnotation, mitk::VtkAnnotation);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       void SetDrawAnnotations(bool annotations);
     bool GetDrawAnnotations() const;

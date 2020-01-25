@@ -81,7 +81,7 @@ struct IWorkbenchPage;
  */
 struct BERRY_UI_QT IWorkbench : public IServiceLocator {
 
-  berryObjectMacro(berry::IWorkbench)
+  berryObjectMacro(berry::IWorkbench);
 
   ~IWorkbench() override;
 

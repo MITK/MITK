@@ -47,7 +47,7 @@ struct ISourceProvider;
 struct BERRY_UI_QT ISourceProviderService : public virtual Object
 {
 
-  berryObjectMacro(berry::ISourceProviderService)
+  berryObjectMacro(berry::ISourceProviderService);
 
   ~ISourceProviderService() override;
 

@@ -37,7 +37,9 @@ namespace mitk
   public:
     mitkClassMacro(VectorImageMapper2D, GLMapper);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self) typedef double vtkScalarType;
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self) typedef double vtkScalarType;
 
     /**
      * @returns the image held by the associated with the mapper or the image

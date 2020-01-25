@@ -28,7 +28,7 @@ found in the LICENSE file.
 struct IJobStatus : public virtual IStatus
 {
 
-   berryObjectMacro(IJobStatus)
+   berryObjectMacro(IJobStatus);
 
   /**
    * Returns the job associated with this status.

@@ -75,7 +75,7 @@ class Expression;
  */
 struct BERRY_UI_QT IEvaluationService : public IServiceWithSources
 {
-  berryObjectMacro(berry::IEvaluationService)
+  berryObjectMacro(berry::IEvaluationService);
 
   /**
    * A general property that can be used.

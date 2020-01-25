@@ -69,7 +69,7 @@ namespace mitk
     DistortionLevel GetDistortionLevel() const;
 
   protected:
-    itkFactorylessNewMacro(Self)
+    itkFactorylessNewMacro(Self);
     itkCloneMacro(Self)
     PolhemusTool();
     virtual ~PolhemusTool();

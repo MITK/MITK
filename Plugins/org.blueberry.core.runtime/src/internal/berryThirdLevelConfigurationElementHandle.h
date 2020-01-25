@@ -22,7 +22,7 @@ class ThirdLevelConfigurationElementHandle : public ConfigurationElementHandle
 
 public:
 
-  berryObjectMacro(berry::ThirdLevelConfigurationElementHandle)
+  berryObjectMacro(berry::ThirdLevelConfigurationElementHandle);
 
   ThirdLevelConfigurationElementHandle(const SmartPointer<const IObjectManager>& objectManager, int id);
   ThirdLevelConfigurationElementHandle(const IObjectManager* objectManager, int id);

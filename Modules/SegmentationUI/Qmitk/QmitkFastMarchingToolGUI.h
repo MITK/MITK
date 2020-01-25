@@ -34,7 +34,8 @@ class MITKSEGMENTATIONUI_EXPORT QmitkFastMarchingToolGUI : public QmitkToolGUI
 
 public:
   mitkClassMacro(QmitkFastMarchingToolGUI, QmitkToolGUI);
-  itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+  itkFactorylessNewMacro(Self);
+  itkCloneMacro(Self);
 
     void OnThresholdChanged(int current);
 

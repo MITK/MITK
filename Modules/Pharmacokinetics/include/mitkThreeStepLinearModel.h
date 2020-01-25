@@ -37,7 +37,7 @@ namespace mitk
     itkCloneMacro(Self);
 
     /** Run-time type information (and related methods). */
-    itkTypeMacro(ThreeStepLinearModel, ModelBase)
+    itkTypeMacro(ThreeStepLinearModel, ModelBase);
 
     static const std::string MODEL_DISPLAY_NAME;
     static const std::string NAME_PARAMETER_S0;

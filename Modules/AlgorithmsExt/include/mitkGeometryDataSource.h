@@ -34,7 +34,8 @@ namespace mitk
   class MITKALGORITHMSEXT_EXPORT GeometryDataSource : public BaseDataSource
   {
   public:
-    mitkClassMacro(GeometryDataSource, BaseDataSource) itkNewMacro(Self)
+    mitkClassMacro(GeometryDataSource, BaseDataSource);
+    itkNewMacro(Self);
 
       typedef mitk::GeometryData OutputType;
 

@@ -22,8 +22,8 @@ namespace mitk
   class MITKMULTILABEL_EXPORT LabelSetImageToSurfaceThreadedFilter : public SegmentationSink
   {
   public:
-    mitkClassMacro(LabelSetImageToSurfaceThreadedFilter, SegmentationSink)
-      mitkAlgorithmNewMacro(LabelSetImageToSurfaceThreadedFilter);
+    mitkClassMacro(LabelSetImageToSurfaceThreadedFilter, SegmentationSink);
+    mitkAlgorithmNewMacro(LabelSetImageToSurfaceThreadedFilter);
 
   protected:
     LabelSetImageToSurfaceThreadedFilter(); // use smart pointers

@@ -37,7 +37,7 @@ namespace mitk
       /// frame number, starting with 0
       const unsigned int FrameNo;
 
-      mitkClassMacroItkParent( DICOMImageFrameInfo, itk::LightObject )
+      mitkClassMacroItkParent( DICOMImageFrameInfo, itk::LightObject );
 
       itkFactorylessNewMacro( DICOMImageFrameInfo );
       mitkNewMacro1Param( DICOMImageFrameInfo, const std::string&);

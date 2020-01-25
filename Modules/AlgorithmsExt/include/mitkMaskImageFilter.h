@@ -30,7 +30,9 @@ namespace mitk
   public:
     mitkClassMacro(MaskImageFilter, ImageToImageFilter);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       void SetMask(const mitk::Image *mask);
     const mitk::Image *GetMask() const;

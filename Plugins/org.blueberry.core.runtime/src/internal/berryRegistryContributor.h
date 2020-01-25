@@ -66,7 +66,7 @@ private:
 
 public:
 
-  berryObjectMacro(berry::RegistryContributor)
+  berryObjectMacro(berry::RegistryContributor);
 
   /**
    * Constructor for the registry contributor.

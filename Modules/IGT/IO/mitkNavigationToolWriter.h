@@ -38,8 +38,8 @@ namespace mitk
 
   public:
     mitkClassMacroItkParent(NavigationToolWriter,itk::Object);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     /**
      * @brief           Writes a navigation tool to a file.

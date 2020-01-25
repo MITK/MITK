@@ -85,12 +85,7 @@ int main(int argc, char *argv[])
   renderWindow.show();
   renderWindow.resize(256, 256);
 
-// for testing
-#include "QtTesting.h"
-  if (strcmp(argv[argc - 1], "-testing") != 0)
-    return qtapplication.exec();
-  else
-    return QtTesting();
+  return qtapplication.exec();
 }
 
 /**

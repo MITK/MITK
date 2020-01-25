@@ -51,7 +51,7 @@ namespace berry
  */
 struct org_blueberry_core_runtime_EXPORT IStatus: public Object
 {
-  berryObjectMacro(berry::IStatus)
+  berryObjectMacro(berry::IStatus);
 
   enum Severity
   {

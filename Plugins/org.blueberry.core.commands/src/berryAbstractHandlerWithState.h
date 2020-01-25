@@ -49,7 +49,7 @@ private:
 
 public:
 
-  berryObjectMacro(berry::AbstractHandlerWithState)
+  berryObjectMacro(berry::AbstractHandlerWithState);
 
   /**
    * <p>

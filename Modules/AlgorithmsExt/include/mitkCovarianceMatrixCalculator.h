@@ -79,12 +79,14 @@ namespace mitk
     ~CovarianceMatrixCalculator() override;
 
   public:
-    mitkClassMacroItkParent(CovarianceMatrixCalculator, itk::Object) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacroItkParent(CovarianceMatrixCalculator, itk::Object);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
-      /** Sets the scaling factor for the voronoi area.
-       *  @param factor The scaling factor.
-       */
-      void SetVoronoiScalingFator(const double factor);
+    /** Sets the scaling factor for the voronoi area.
+      *  @param factor The scaling factor.
+      */
+    void SetVoronoiScalingFator(const double factor);
 
     /** Enables/disables the covariance matrix normalization.
       * @param state Enables the covariance matrix normalization.

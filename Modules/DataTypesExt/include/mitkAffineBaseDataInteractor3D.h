@@ -21,23 +21,26 @@ namespace mitk
 {
 ////create events for interactions
 #pragma GCC visibility push(default)
-  itkEventMacro(AffineInteractionEvent, itk::AnyEvent) itkEventMacro(ScaleEvent, AffineInteractionEvent)
-    itkEventMacro(RotateEvent, AffineInteractionEvent) itkEventMacro(TranslateEvent, AffineInteractionEvent)
+  itkEventMacro(AffineInteractionEvent, itk::AnyEvent);
+  itkEventMacro(ScaleEvent, AffineInteractionEvent);
+  itkEventMacro(RotateEvent, AffineInteractionEvent);
+  itkEventMacro(TranslateEvent, AffineInteractionEvent);
 #pragma GCC visibility pop
 
-    /**
-      * \brief Affine interaction with mitk::BaseGeometry.
-      *
-      * \ingroup Interaction
-      */
-    // Inherit from DataInteractor, this provides functionality of a state machine and configurable inputs.
-    class MITKDATATYPESEXT_EXPORT AffineBaseDataInteractor3D : public DataInteractor
+  /**
+    * \brief Affine interaction with mitk::BaseGeometry.
+    *
+    * \ingroup Interaction
+    */
+  // Inherit from DataInteractor, this provides functionality of a state machine and configurable inputs.
+  class MITKDATATYPESEXT_EXPORT AffineBaseDataInteractor3D : public DataInteractor
   {
   public:
     mitkClassMacro(AffineBaseDataInteractor3D, DataInteractor);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
-      void SetDataNode(DataNode *node) override;
+    void SetDataNode(DataNode *node) override;
     void TranslateGeometry(mitk::Vector3D translate, mitk::BaseGeometry *geometry);
     void RotateGeometry(mitk::ScalarType angle, int rotationaxis, mitk::BaseGeometry *geometry);
     void ScaleGeometry(mitk::Point3D newScale, mitk::BaseGeometry *geometry);

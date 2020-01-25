@@ -26,7 +26,9 @@ namespace mitk
   class MITKCONTOURMODEL_EXPORT ContourModelSource : public BaseDataSource
   {
   public:
-    mitkClassMacro(ContourModelSource, BaseDataSource) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(ContourModelSource, BaseDataSource);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self)
 
       typedef ContourModel OutputType;
 

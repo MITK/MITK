@@ -4,23 +4,38 @@ MITK_INSTALL(FILES
   "${MITK_SOURCE_DIR}/mitk.ico"
   "${MITK_SOURCE_DIR}/mitk.bmp")
 
+# Helper vars
+
+if(WIN32)
+  set(_prefix "")
+  set(_ext ".dll")
+elseif(UNIX)
+  set(_prefix "lib")
+  if(APPLE)
+    set(_ext ".dylib")
+  else()
+    set(_ext ".so")
+  endif()
+endif()
+
+# Install PythonQt
+
+if(MITK_USE_Python3 AND PythonQt_DIR)
+  set(_python_qt_lib "${PythonQt_DIR}/")
+  if(WIN32)
+    set(_python_qt_lib "${_python_qt_lib}bin")
+  else()
+    set(_python_qt_lib "${_python_qt_lib}lib")
+  endif()
+  set(_python_qt_lib "${_python_qt_lib}/${_prefix}PythonQt${_ext}")
+  MITK_INSTALL(FILES ${_python_qt_lib})
+endif()
+
 # Install Qt plugins
 
 if(MITK_USE_Qt5)
   get_property(_qmake_location TARGET ${Qt5Core_QMAKE_EXECUTABLE} PROPERTY IMPORT_LOCATION)
   get_filename_component(_qmake_path ${_qmake_location} DIRECTORY)
-
-  if(WIN32)
-    set(_prefix "")
-    set(_ext ".dll")
-  elseif(UNIX)
-    set(_prefix "lib")
-    if(APPLE)
-      set(_ext ".dylib")
-    else()
-      set(_ext ".so")
-    endif()
-  endif()
 
   set(_install_DESTINATION "plugins/sqldrivers")
   MITK_INSTALL(FILES "${_qmake_path}/../plugins/sqldrivers/${_prefix}qsqlite${_ext}")

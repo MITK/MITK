@@ -31,7 +31,7 @@ class ShowInContext;
  */
 struct IShowInSource : public virtual Object
 {
-  berryObjectMacro(berry::IShowInSource)
+  berryObjectMacro(berry::IShowInSource);
 
   /**
    * Returns the context to show, or <code>null</code> if there is

@@ -43,7 +43,7 @@ namespace mitk {
     /** @brief Constructs a NavigationToolStorage without reference to a DataStorage. The Data Nodes of tools have to be added and removed to a data storage outside this class.
      *         Normaly the other constructor should be used.
      */
-    itkFactorylessNewMacro(Self)
+    itkFactorylessNewMacro(Self);
     itkCloneMacro(Self)
     /** @brief Constructs a NavigationToolStorage with reference to a DataStorage. The Data Nodes of tools are added and removed automatically to this data storage. */
     mitkNewMacro1Param(Self,mitk::DataStorage::Pointer);

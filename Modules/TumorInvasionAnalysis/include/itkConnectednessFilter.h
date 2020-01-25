@@ -54,10 +54,8 @@ namespace itk
     typedef typename itk::ImageRegionIterator<TFeatureImage> FeatureIteratorType;
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self)
-
-      /** Run-time type information (and related methods). */
-      itkTypeMacro(PropagateLocalFeaturesFilter, ImageToImageFilter)
+    itkNewMacro(Self); /** Run-time type information (and related methods). */
+      itkTypeMacro(PropagateLocalFeaturesFilter, ImageToImageFilter);
 
       /**
        * @brief The DistanceMode enum Available distance metrics

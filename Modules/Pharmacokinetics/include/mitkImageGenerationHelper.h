@@ -53,7 +53,7 @@ public:
     itkGetConstReferenceMacro(Grid,TimeGridType);
 
     itkSetMacro(Curve, CurveType);
-    itkGetConstReferenceMacro(Curve,CurveType)
+    itkGetConstReferenceMacro(Curve,CurveType);
 
     Image::Pointer  GenerateDynamicImageMITK();
 

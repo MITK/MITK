@@ -37,8 +37,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(IGTLMessageToNavigationDataFilter, NavigationDataSource);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     using Superclass::SetInput;
 

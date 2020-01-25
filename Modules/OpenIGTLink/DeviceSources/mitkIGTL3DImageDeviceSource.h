@@ -30,8 +30,8 @@ namespace mitk {
   {
   public:
     mitkClassMacro(IGTL3DImageDeviceSource, IGTLDeviceSource);
-    itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
   protected:
     IGTL3DImageDeviceSource();

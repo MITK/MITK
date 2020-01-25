@@ -21,7 +21,9 @@ namespace mitk
   class MITKPLANARFIGURE_EXPORT PlanarBezierCurve : public PlanarFigure
   {
   public:
-    mitkClassMacro(PlanarBezierCurve, PlanarFigure) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(PlanarBezierCurve, PlanarFigure);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       unsigned int GetNumberOfSegments() const;
     void SetNumberOfSegments(unsigned int numSegments);
@@ -43,7 +45,7 @@ namespace mitk
   protected:
     PlanarBezierCurve();
 
-    mitkCloneMacro(Self)
+    mitkCloneMacro(Self);
 
       void EvaluateFeaturesInternal() override;
     void GenerateHelperPolyLine(double, unsigned int) override;

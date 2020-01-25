@@ -27,7 +27,7 @@ class ExtensionHandle : public Handle, public IExtension
 
 public:
 
-  berryObjectMacro(berry::ExtensionHandle)
+  berryObjectMacro(berry::ExtensionHandle);
 
   ExtensionHandle(const SmartPointer<const IObjectManager>& objectManager, int id);
   ExtensionHandle(const IObjectManager* objectManager, int id);

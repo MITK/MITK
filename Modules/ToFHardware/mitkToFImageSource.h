@@ -38,8 +38,9 @@ namespace mitk
 
     mitkClassMacro( ToFImageSource, ImageSource );
 
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
   protected:
 

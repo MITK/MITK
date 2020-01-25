@@ -42,7 +42,7 @@ namespace mitk
   {
   public:
     mitkClassMacroItkParent(SlicesCoordinator, itk::Object);
-    itkFactorylessNewMacro(Self)
+    itkFactorylessNewMacro(Self);
 
       typedef std::vector<SliceNavigationController *> SNCVector;
     /** Add to list of managed slices. Check if CreatedWorldGeometry of SNC is

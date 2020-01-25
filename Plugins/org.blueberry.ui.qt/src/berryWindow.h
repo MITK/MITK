@@ -84,7 +84,7 @@ class BERRY_UI_QT Window: public IShellProvider
 
 public:
 
-  berryObjectMacro(Window, IShellProvider)
+  berryObjectMacro(Window, IShellProvider);
 
   /**
    * Standard return code constant (value 0) indicating that the window was
@@ -115,7 +115,7 @@ public:
   struct IExceptionHandler: public Object
   {
 
-    berryObjectMacro(IExceptionHandler)
+    berryObjectMacro(IExceptionHandler);
 
     /**
      * Handle the exception.

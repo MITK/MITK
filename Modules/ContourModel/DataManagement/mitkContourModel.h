@@ -49,7 +49,9 @@ namespace mitk
   public:
     mitkClassMacro(ContourModel, BaseData);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       /*+++++++++++++++ typedefs +++++++++++++++++++++++++++++++*/
       typedef mitk::ContourElement::VertexType VertexType;

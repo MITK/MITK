@@ -20,7 +20,9 @@ namespace mitk
   class IOExtObjectFactory : public CoreObjectFactoryBase
   {
   public:
-    mitkClassMacro(IOExtObjectFactory, CoreObjectFactoryBase) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(IOExtObjectFactory, CoreObjectFactoryBase);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       Mapper::Pointer CreateMapper(mitk::DataNode *node, MapperSlotId slotId) override;
     void SetDefaultProperties(mitk::DataNode *node) override;

@@ -47,7 +47,9 @@ namespace mitk
 
     mitkClassMacro(HeightFieldSurfaceClipImageFilter, ImageToImageFilter);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       /** \brief Set/Get the surface defining a height field as a triangle mesh */
       void SetClippingSurface(Surface *clippingSurface);

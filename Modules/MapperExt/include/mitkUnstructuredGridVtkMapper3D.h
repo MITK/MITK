@@ -41,7 +41,9 @@ namespace mitk
   public:
     mitkClassMacro(UnstructuredGridVtkMapper3D, VtkMapper);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       virtual const mitk::UnstructuredGrid *GetInput();
 

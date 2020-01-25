@@ -41,7 +41,9 @@ namespace mitk
   public:
     mitkClassMacro(SplineVtkMapper3D, PointSetVtkMapper3D);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
     void UpdateVtkTransform(mitk::BaseRenderer *renderer) override;

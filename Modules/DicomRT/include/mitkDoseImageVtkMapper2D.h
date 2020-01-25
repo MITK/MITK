@@ -120,8 +120,8 @@ namespace mitk {
     mitkClassMacro( DoseImageVtkMapper2D,VtkMapper );
 
     /** Method for creation through the object factory. */
-    itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /** \brief Get the Image to map */
       const mitk::Image *GetInput(void);

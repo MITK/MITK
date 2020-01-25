@@ -25,7 +25,8 @@ namespace mitk
   {
   public:
     mitkClassMacroItkParent(PropertyExtension, itk::LightObject);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       protected : PropertyExtension();
     ~PropertyExtension() override;

@@ -26,7 +26,7 @@ class CompositeExpression : public Expression
 {
 
 public:
-  berryObjectMacro(CompositeExpression)
+  berryObjectMacro(CompositeExpression);
 
 private:
 

@@ -35,8 +35,8 @@ namespace mitk
   public:
 
     mitkClassMacro(PolhemusTrackingDevice, TrackingDevice);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     /**
     * \brief Starts the tracking.

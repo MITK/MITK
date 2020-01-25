@@ -22,9 +22,10 @@ found in the LICENSE file.
 #include <QAbstractItemView>
 
 /**
-* @brief The 'QmitkModelViewSelectionConnector' is used to handle the selections of a model-view-pair.
+* @brief The 'QmitkModelViewSelectionConnector' is used to handle the selections of a model-view-pair and to synchornize them with external node selections
+*   (e.g. communicated by the application).
 *
-*   The class accepts a view and a model, which are used to react to selection changes. This class is able to propagate selection changes
+*   The class accepts a view and its model, which are used to react to selection changes. This class is able to propagate selection changes
 *   to and receive from its surrounding class.
 *
 *   The model-view-pair can be added as a selection listener to a selection service. This should be done by using 'AddPostSelectionListener'

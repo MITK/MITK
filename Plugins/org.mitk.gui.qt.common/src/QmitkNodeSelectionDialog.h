@@ -37,14 +37,14 @@ class MITK_QT_COMMON QmitkNodeSelectionDialog : public QDialog
 public:
   explicit QmitkNodeSelectionDialog(QWidget* parent = nullptr, QString caption = "", QString hint = "");
 
-  /*
+  /**
   * @brief Sets the data storage that will be used /monitored by widget.
   *
   * @param dataStorage      A pointer to the data storage to set.
   */
   void SetDataStorage(mitk::DataStorage* dataStorage);
 
-  /*
+  /**
   * @brief Sets the node predicate and updates the widget, according to the node predicate.
   *
   * @param nodePredicate    A pointer to node predicate.
@@ -54,8 +54,20 @@ public:
   const mitk::NodePredicateBase* GetNodePredicate() const;
 
   using NodeList = QList<mitk::DataNode::Pointer>;
-
   NodeList GetSelectedNodes() const;
+
+  /**
+  * @brief Helper function that is used to check the given selection for consistency.
+  *        Returning an empty string assumes that everything is alright and the selection is valid.
+  *        If the string is not empty, the content of the string will be used as error message.
+  */
+  using SelectionCheckFunctionType = std::function<std::string(const NodeList &)>;
+  /**
+  * @brief A selection check function can be set. If set the dialog uses this function to check the made/set selection.
+  *        If the selection is valid, everything is fine.
+  *        If the selection is indicated as invalid, the dialog will display the selection check function error message.
+  */
+  void SetSelectionCheckFunction(const SelectionCheckFunctionType &checkFunction);
 
   bool GetSelectOnlyVisibleNodes() const;
 
@@ -113,6 +125,8 @@ protected:
   mitk::NodePredicateBase::ConstPointer m_NodePredicate;
   bool m_SelectOnlyVisibleNodes;
   NodeList m_SelectedNodes;
+
+  SelectionCheckFunctionType m_CheckFunction;
 
   SelectionMode m_SelectionMode;
 

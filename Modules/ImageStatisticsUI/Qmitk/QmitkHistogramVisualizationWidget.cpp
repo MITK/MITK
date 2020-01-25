@@ -35,7 +35,6 @@ void QmitkHistogramVisualizationWidget::SetHistogram(itk::Statistics::Histogram<
 	m_Controls.chartWidget->SetChartType(dataLabel, QmitkChartWidget::ChartType::bar);
 	m_Controls.chartWidget->SetXAxisLabel("Gray value");
 	m_Controls.chartWidget->SetYAxisLabel("Frequency");
-  m_Controls.chartWidget->SetShowLegend(false);
   m_Controls.chartWidget->Show(m_Controls.checkBoxShowSubchart->isChecked());
 	SetGUIElementsEnabled(true);
 }

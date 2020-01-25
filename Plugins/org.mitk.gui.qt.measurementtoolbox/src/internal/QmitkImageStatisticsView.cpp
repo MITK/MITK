@@ -78,11 +78,8 @@ void QmitkImageStatisticsView::CalculateOrGetMultiStatistics()
   m_selectedImageNode = nullptr;
   m_selectedMaskNode = nullptr;
 
-  if (m_selectedImageNodes.empty())
-  {
-    // no images selected; reset everything
-    ResetGUI();
-  }
+  // reset everything
+  ResetGUI();
 
   for (auto imageNode : m_selectedImageNodes)
   {
@@ -116,7 +113,7 @@ void QmitkImageStatisticsView::CalculateOrGetStatistics()
 
   if (nullptr != m_selectedImageNode)
   {
-    auto image = dynamic_cast<mitk::Image *>(m_selectedImageNode->GetData());
+    auto image = dynamic_cast<mitk::Image*>(m_selectedImageNode->GetData());
     mitk::Image *mask = nullptr;
     mitk::PlanarFigure *maskPlanarFigure = nullptr;
 
@@ -133,7 +130,7 @@ void QmitkImageStatisticsView::CalculateOrGetStatistics()
 
     if (nullptr != m_selectedMaskNode)
     {
-      mask = dynamic_cast<mitk::Image *>(m_selectedMaskNode->GetData());
+      mask = dynamic_cast<mitk::Image*>(m_selectedMaskNode->GetData());
       if (nullptr == mask)
       {
         maskPlanarFigure = dynamic_cast<mitk::PlanarFigure *>(m_selectedMaskNode->GetData());
@@ -176,10 +173,13 @@ void QmitkImageStatisticsView::CalculateOrGetStatistics()
     if (nullptr != imageStatistics)
     {
       // triggers re-computation when switched between images and the newest one has not 100 bins (default)
-      auto calculatedBins = imageStatistics->GetStatisticsForTimeStep(0).m_Histogram.GetPointer()->Size();
-      if (calculatedBins != 100)
+      if (imageStatistics->TimeStepExists(0))
       {
-        OnRequestHistogramUpdate(m_Controls.widget_histogram->GetBins());
+        auto calculatedBins = imageStatistics->GetStatisticsForTimeStep(0).m_Histogram.GetPointer()->Size();
+        if (calculatedBins != 100)
+        {
+          OnRequestHistogramUpdate(m_Controls.widget_histogram->GetBins());
+        }
       }
     }
 
@@ -191,23 +191,17 @@ void QmitkImageStatisticsView::CalculateOrGetStatistics()
     // statistics already computed
     else
     {
-      /* HISTOGRAM CURRENTLY NOT WORKING - SEE T26269
       // Not an open planar figure: show histogram (intensity profile already shown)
       if (!(maskPlanarFigure && !maskPlanarFigure->IsClosed()))
       {
         if (imageStatistics->TimeStepExists(0))
         {
           auto histogram = imageStatistics->GetStatisticsForTimeStep(0).m_Histogram.GetPointer();
-          std::string imageNodeName = m_selectedImageNode->GetName();
-          FillHistogramWidget({ histogram }, { imageNodeName });
+          auto histogramLabelName = GenerateStatisticsNodeName(image, mask);
+          FillHistogramWidget({ histogram }, { histogramLabelName });
         }
       }
-      */
     }
-  }
-  else
-  {
-    ResetGUI();
   }
 }
 
@@ -283,7 +277,6 @@ void QmitkImageStatisticsView::FillHistogramWidget(const std::vector<const Histo
 {
   m_Controls.groupBox_histogram->setVisible(true);
   m_Controls.widget_histogram->SetTheme(GetColorTheme());
-  m_Controls.widget_histogram->Reset();
   m_Controls.widget_histogram->SetHistogram(histogram.front(), dataLabels.front());
   connect(m_Controls.widget_histogram, &QmitkHistogramVisualizationWidget::RequestHistogramUpdate,
           this, &QmitkImageStatisticsView::OnRequestHistogramUpdate);
@@ -342,7 +335,7 @@ void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
   auto image = runnable->GetStatisticsImage();
 
   // get mask
-  mitk::BaseData::ConstPointer mask = nullptr;
+  const mitk::BaseData* mask = nullptr;
   if (runnable->GetMaskImage())
   {
     mask = runnable->GetMaskImage();
@@ -365,25 +358,24 @@ void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
     // checks for existing statistic, and add it to data manager
     HandleExistingStatistics(image, mask, statistic);
 
-    /* HISTOGRAM CURRENTLY NOT WORKING - SEE T26269
-    if (!m_selectedPlanarFigure || m_selectedPlanarFigure->IsClosed())
+    auto maskPlanarFigure = dynamic_cast<const mitk::PlanarFigure*>(mask);
+    if (!maskPlanarFigure || maskPlanarFigure->IsClosed())
     {
-      FillHistogramWidget({ m_CalculationJob->GetTimeStepHistogram() }, { m_selectedImageNode->GetName() });
+      auto histogramLabelName = GenerateStatisticsNodeName(image, mask);
+      FillHistogramWidget({ runnable->GetTimeStepHistogram() }, { histogramLabelName });
     }
-    */
   }
   else // case: calculation was not successful
   {
     // handle histogram
     const HistogramType* emptyHistogram = HistogramType::New();
-    // HISTOGRAM CURRENTLY NOT WORKING - SEE T26269
-    //FillHistogramWidget({ emptyHistogram }, { m_selectedImageNode->GetName() });
+    auto histogramLabelName = GenerateStatisticsNodeName(image, mask);
+    FillHistogramWidget({ emptyHistogram }, { histogramLabelName });
 
     // handle statistics
     mitk::ImageStatisticsContainer::Pointer statistic = mitk::ImageStatisticsContainer::New();
     statistic->SetTimeGeometry(const_cast<mitk::TimeGeometry *>(image->GetTimeGeometry()));
 
-    /* HISTOGRAM CURRENTLY NOT WORKING - SEE T26269
     // add empty histogram to statistics for all time steps
     for (unsigned int i = 0; i < image->GetTimeSteps(); ++i)
     {
@@ -391,7 +383,6 @@ void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
       statisticObject.m_Histogram = emptyHistogram;
       statistic->SetStatisticsForTimeStep(i, statisticObject);
     }
-    */
 
     SetupRelationRules(image, mask, statistic);
 
@@ -406,6 +397,7 @@ void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
 
 void QmitkImageStatisticsView::OnRequestHistogramUpdate(unsigned int nBins)
 {
+  // NEEDS TO BE IMPLEMENTED - SEE T27032
 }
 
 void QmitkImageStatisticsView::OnCheckBoxIgnoreZeroStateChanged(int state)

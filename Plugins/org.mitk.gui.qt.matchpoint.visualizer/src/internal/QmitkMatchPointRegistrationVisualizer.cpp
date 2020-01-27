@@ -137,8 +137,8 @@ void QmitkMatchPointRegistrationVisualizer::ConfigureNodePredicates()
   };
   mitk::NodePredicateFunction::Pointer hasGeometry = mitk::NodePredicateFunction::New(geometryCheck);
 
-  mitk::NodePredicateBase::Pointer nodePredicate = mitk::NodePredicateAnd::New(mitk::MITKRegistrationHelper::ImageNodePredicate(), hasGeometry);
-  m_Controls->fovReferenceNodeSelector->SetNodePredicate(nodePredicate);
+  auto nodePredicate = mitk::NodePredicateAnd::New(mitk::MITKRegistrationHelper::ImageNodePredicate().GetPointer(), hasGeometry.GetPointer());
+  m_Controls->fovReferenceNodeSelector->SetNodePredicate(nodePredicate.GetPointer());
 }
 
 mitk::MAPRegistrationWrapper* QmitkMatchPointRegistrationVisualizer::GetCurrentRegistration()

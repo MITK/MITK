@@ -203,7 +203,7 @@ void QmitkMatchPointMapper::ConfigureRegNodePredicate(const mitk::DataNode* inpu
 
   if (input != nullptr)
   {
-    int dimension = 0;
+    unsigned int dimension = 0;
 
     auto inputImage = dynamic_cast<mitk::Image*>(input->GetData());
     auto pointset = dynamic_cast<const mitk::PointSet*>(input->GetData());
@@ -257,8 +257,8 @@ void QmitkMatchPointMapper::ConfigureNodePredicates(const mitk::DataNode* reg)
 
   auto isData = mitk::NodePredicateOr::New(isImage, isPointSet);
 
-  mitk::NodePredicateBase::ConstPointer inputPredicate = isData;
-  mitk::NodePredicateBase::ConstPointer refPredicate = isImage;
+  mitk::NodePredicateBase::ConstPointer inputPredicate = isData.GetPointer();
+  mitk::NodePredicateBase::ConstPointer refPredicate = isImage.GetPointer();
 
   if (reg != nullptr)
   {
@@ -275,12 +275,12 @@ void QmitkMatchPointMapper::ConfigureNodePredicates(const mitk::DataNode* reg)
       {
         //Remark: Point sets are always 3D
         auto is3DInput = mitk::NodePredicateOr::New(isPointSet, mitk::NodePredicateAnd::New(isImage, hasCorrectDim));
-        inputPredicate = is3DInput;
+        inputPredicate = is3DInput.GetPointer();
       }
       else
       {
         auto is2DInput = mitk::NodePredicateAnd::New(isImage, hasCorrectDim);
-        inputPredicate = is2DInput;
+        inputPredicate = is2DInput.GetPointer();
       }
 
       auto targetDim = wrapper->GetTargetDimensions();

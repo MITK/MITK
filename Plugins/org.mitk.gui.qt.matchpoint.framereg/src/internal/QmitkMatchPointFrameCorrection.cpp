@@ -267,8 +267,6 @@ void QmitkMatchPointFrameCorrection::CheckInputs()
   {
     typedef ::map::algorithm::facet::MaskedRegistrationAlgorithmInterface<3, 3> MaskRegInterface;
 
-    MaskRegInterface* pMaskInterface = dynamic_cast<MaskRegInterface*>(m_LoadedAlgorithm.GetPointer());
-
     m_spSelectedTargetNode = m_Controls.imageNodeSelector->GetSelectedNode();
     if (m_spSelectedTargetNode.IsNotNull())
     {

@@ -355,6 +355,7 @@ void QmitkMatchPointFrameCorrection::ConfigureRegistrationControls()
                                        (m_LoadedAlgorithm.GetPointer());
 
     m_Controls.maskNodeSelector->setVisible(pMaskReg != nullptr);
+    m_Controls.label_TargetMask->setVisible(pMaskReg != nullptr);
     if (!pMaskReg)
     {
       m_Controls.maskNodeSelector->SetCurrentSelection(QmitkSingleNodeSelectionWidget::NodeList());
@@ -371,6 +372,7 @@ void QmitkMatchPointFrameCorrection::ConfigureRegistrationControls()
     this->m_Controls.m_lbLoadedAlgorithmName->setText(
       QString("<font color='red'>no algorithm loaded!</font>"));
     m_Controls.maskNodeSelector->setVisible(false);
+    m_Controls.label_TargetMask->setVisible(false);
   }
 
   if (!m_Working)

@@ -44,10 +44,16 @@ public Q_SLOTS :
 protected:
   void paintEvent(QPaintEvent *p) override;
 
+  void AddNodeObserver();
+  void RemoveNodeObserver();
+  void OnNodeModified(const itk::Object * /*caller*/, const itk::EventObject &);
+
   mitk::DataNode::ConstPointer m_SelectedNode;
   QString m_Info;
   bool m_OutDatedThumpNail;
   QPixmap m_ThumpNail;
+
+  unsigned long m_NodeModifiedObserverTag;
 };
 
 

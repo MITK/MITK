@@ -203,6 +203,7 @@ void QmitkSingleNodeSelectionWidget::UpdateInfo()
     {
       m_Controls.btnSelect->SetNodeInfo(m_InvalidInfo);
     }
+    m_Controls.btnSelect->SetSelectionIsOptional(m_IsOptional);
     m_Controls.btnClear->setVisible(false);
   }
   else

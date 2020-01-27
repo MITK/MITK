@@ -96,6 +96,7 @@ void QmitkDataStorageViewerTestView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls.checkOnlyVisible, SIGNAL(toggled(bool)), m_Controls.singleSlot, SLOT(SetSelectOnlyVisibleNodes(bool)));
   connect(m_Controls.checkOptional, SIGNAL(toggled(bool)), m_Controls.singleSlot, SLOT(SetSelectionIsOptional(bool)));
   connect(m_Controls.checkOnlyImages, SIGNAL(toggled(bool)), this, SLOT(OnOnlyImages(bool)));
+  connect(m_Controls.checkEnabled, SIGNAL(toggled(bool)), m_Controls.singleSlot, SLOT(setEnabled(bool)));
 
   connect(m_Controls.selectionProviderCheckBox4, SIGNAL(toggled(bool)), this, SLOT(SetAsSelectionProvider4(bool)));
   connect(m_Controls.selectionListenerCheckBox4, SIGNAL(toggled(bool)), this, SLOT(SetAsSelectionListener4(bool)));
@@ -104,6 +105,7 @@ void QmitkDataStorageViewerTestView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls.checkOptional_2, SIGNAL(toggled(bool)), m_Controls.multiSlot, SLOT(SetSelectionIsOptional(bool)));
   connect(m_Controls.checkOnlyImages_2, SIGNAL(toggled(bool)), this, SLOT(OnOnlyImages2(bool)));
   connect(m_Controls.checkOnlyUneven, SIGNAL(toggled(bool)), this, SLOT(OnOnlyUneven(bool)));
+  connect(m_Controls.checkEnabled_2, SIGNAL(toggled(bool)), m_Controls.multiSlot, SLOT(setEnabled(bool)));
 }
 
 void QmitkDataStorageViewerTestView::SetAsSelectionProvider1(bool checked)

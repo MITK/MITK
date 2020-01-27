@@ -36,18 +36,27 @@ public:
   ~QmitkNodeSelectionButton() override;
 
   const mitk::DataNode* GetSelectedNode() const;
+  bool GetSelectionIsOptional() const;
 
 public Q_SLOTS :
   virtual void SetSelectedNode(const mitk::DataNode* node);
   virtual void SetNodeInfo(QString info);
 
+  /** Set the widget into an optional mode. Optional means that the selection of no valid
+  node does not mean an invalid state. Thus no node is a valid "node" selection too.
+  The state influences if the info text is handled as an information (optional) or a
+  warning (optiona==false).*/
+  void SetSelectionIsOptional(bool isOptional);
+
 protected:
   void paintEvent(QPaintEvent *p) override;
+  void changeEvent(QEvent *event) override;
 
   mitk::DataNode::ConstPointer m_SelectedNode;
   QString m_Info;
   bool m_OutDatedThumpNail;
   QPixmap m_ThumpNail;
+  bool m_IsOptional;
 };
 
 

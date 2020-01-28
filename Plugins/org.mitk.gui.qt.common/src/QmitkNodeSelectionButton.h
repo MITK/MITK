@@ -54,6 +54,7 @@ protected:
   QPixmap m_ThumpNail;
 
   unsigned long m_NodeModifiedObserverTag;
+  bool m_NodeObserved;
 };
 
 

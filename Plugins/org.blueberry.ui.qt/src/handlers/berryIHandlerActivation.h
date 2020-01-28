@@ -55,7 +55,7 @@ struct BERRY_UI_QT IHandlerActivation : public virtual IEvaluationResultCache
    * mechanism by which <code>ISourceProvider</code> events can invalidate
    * state on a <code>IHandlerActivation</code> instance.
    *
-   * @deprecated Use {@link IEvaluationResultCache#clearResult()} instead.
+   * @deprecated Use berry::IEvaluationResultCache::clearResult() instead.
    */
   virtual void ClearActive() = 0;
 

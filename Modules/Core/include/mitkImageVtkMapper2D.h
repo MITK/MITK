@@ -80,7 +80,7 @@ namespace mitk
    *   - \b "Image Rendering.Mode": This property decides which mode is used to render images. (E.g. if a lookup table
    or
    a transferfunction is applied). Detailed documentation about the modes can be found here: \link
-   mitk::RenderingerModeProperty \endlink
+   mitk::RenderingModeProperty \endlink
    *   - \b "Image Rendering.Transfer Function": (mitkTransferFunctionProperty) If this
    *          property is set, a color transferfunction will be used to color the image.
    *   - \b "binary": (BoolProperty) is the image a binary image or not
@@ -203,7 +203,7 @@ namespace mitk
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
     /** \brief This method switches between different rendering modes (e.g. use a lookup table or a transfer function).
-     * Detailed documentation about the modes can be found here: \link mitk::RenderingerModeProperty \endlink
+     * Detailed documentation about the modes can be found here: \link mitk::RenderingModeProperty \endlink
      */
     void ApplyRenderingMode(mitk::BaseRenderer *renderer);
 

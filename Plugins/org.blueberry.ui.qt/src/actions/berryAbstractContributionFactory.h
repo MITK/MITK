@@ -24,7 +24,7 @@ struct IContributionRoot;
 
 /**
  * ContributionFactories are used by the IMenuService to populate
- * ContributionManagers. In {@link #createContributionItems(IServiceLocator, IContributionRoot)}
+ * ContributionManagers. In CreateContributionItems()
  * you fill in the additions List with {@link IContributionItem} to be inserted at this
  * factory's location. For example:
  * <p>
@@ -32,7 +32,7 @@ struct IContributionRoot;
  * <pre>
  * AbstractContributionFactory contributions = new AbstractContributionFactory(
  *    &quot;menu:org.eclipse.ui.tests.api.MenuTestHarness?after=additions&quot;) {
- *  public void createContributionItems(IMenuService menuService, List additions) {
+ *  public void CreateContributionItems(IMenuService menuService, List additions) {
  *    CommandContributionItem item = new CommandContributionItem(
  *        &quot;org.eclipse.ui.tests.menus.helloWorld&quot;,
  *        &quot;org.eclipse.ui.tests.commands.enabledHelloWorld&quot;, null, null,

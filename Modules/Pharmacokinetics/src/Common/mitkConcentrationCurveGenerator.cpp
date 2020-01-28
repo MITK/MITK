@@ -137,10 +137,10 @@ void mitk::ConcentrationCurveGenerator::CalculateAverageBaselineImage(const itk:
 
   // add the selected baseline time frames to the nary add image filter
 
-  for (int i = m_BaselineStartTimeStep-1; i < m_BaselineEndTimeStep; ++i)
+  for (int i = m_BaselineStartTimeStep; i <= m_BaselineEndTimeStep; ++i)
   {
     ExtractImageFilterType::Pointer ExtractFilter = ExtractImageFilterType::New();
-    TPixel3DImageType::Pointer timePointImage = TPixel3DImageType::New();
+    TPixel3DImageType::Pointer timeFrameImage = TPixel3DImageType::New();
     TPixel4DImageType::RegionType extractionRegion;
     TPixel4DImageType::SizeType size_input_aux = region_input.GetSize();
     size_input_aux[3] = 0;
@@ -160,8 +160,8 @@ void mitk::ConcentrationCurveGenerator::CalculateAverageBaselineImage(const itk:
       std::cerr << "ExceptionObject caught!" << std::endl;
       std::cerr << err << std::endl;
     }
-    timePointImage = ExtractFilter->GetOutput();
-    AddBaselineImagesFilter->SetInput(i-(m_BaselineStartTimeStep-1), timePointImage);
+    timeFrameImage = ExtractFilter->GetOutput();
+    AddBaselineImagesFilter->SetInput(i-m_BaselineStartTimeStep, timeFrameImage);
   }
   try
   {

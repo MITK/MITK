@@ -169,8 +169,8 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   m_Controls.spinBox_baselineStartTimeStep->setEnabled(false);
   m_Controls.spinBox_baselineEndTimeStep->setEnabled(false);
   m_Controls.groupBox_viaT1Map->hide();
-  m_Controls.spinBox_baselineStartTimeStep->setValue(1);
-  m_Controls.spinBox_baselineEndTimeStep->setValue(1);
+  m_Controls.spinBox_baselineStartTimeStep->setValue(0);
+  m_Controls.spinBox_baselineEndTimeStep->setValue(0);
 
   connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), m_Controls.groupBoxTurboFlash, SLOT(setVisible(bool)));
   connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
@@ -554,18 +554,18 @@ bool MRPerfusionView::CheckModelSettings() const
           ok = ok && (m_Controls.relaxationtime->value() > 0);
           ok = ok && (m_Controls.relaxivity->value() > 0);
           ok = ok && (m_Controls.AifRecoverytime->value() > 0);
-          ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() >= 1);
+          ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() >= 0);
           ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() <= m_Controls.spinBox_baselineEndTimeStep->value());
-          ok = ok && (m_Controls.spinBox_baselineEndTimeStep->value() <= this->m_selectedImage->GetDimension(3));
+          ok = ok && (m_Controls.spinBox_baselineEndTimeStep->value() < this->m_selectedImage->GetDimension(3));
 
         }
         else if (this->m_Controls.radioButton_absoluteEnhancement->isChecked()
                  || this->m_Controls.radioButton_relativeEnchancement->isChecked())
         {
           ok = ok && (m_Controls.factorSpinBox->value() > 0);
-          ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() >= 1);
+          ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() >= 0);
           ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() <= m_Controls.spinBox_baselineEndTimeStep->value());
-          ok = ok && (m_Controls.spinBox_baselineEndTimeStep->value() <= this->m_selectedImage->GetDimension(3));
+          ok = ok && (m_Controls.spinBox_baselineEndTimeStep->value() < this->m_selectedImage->GetDimension(3));
         }
         else if (this->m_Controls.radioButtonUsingT1->isChecked())
         {
@@ -573,9 +573,9 @@ bool MRPerfusionView::CheckModelSettings() const
           ok = ok && (m_Controls.TRSpinBox->value() > 0);
           ok = ok && (m_Controls.RelaxivitySpinBox->value() > 0);
           ok = ok && (m_Controls.ComboT1Map->GetSelectedNode().IsNotNull());
-          ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() >= 1);
+          ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() >= 0);
           ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() <= m_Controls.spinBox_baselineEndTimeStep->value());
-          ok = ok && (m_Controls.spinBox_baselineEndTimeStep->value() <= this->m_selectedImage->GetDimension(3));
+          ok = ok && (m_Controls.spinBox_baselineEndTimeStep->value() < this->m_selectedImage->GetDimension(3));
         }
         else
         {
@@ -608,18 +608,18 @@ bool MRPerfusionView::CheckModelSettings() const
         ok = ok && (m_Controls.relaxationtime->value() > 0);
         ok = ok && (m_Controls.relaxivity->value() > 0);
         ok = ok && (m_Controls.AifRecoverytime->value() > 0);
-        ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() >= 1);
+        ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() >= 0);
         ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() <= m_Controls.spinBox_baselineEndTimeStep->value());
-        ok = ok && (m_Controls.spinBox_baselineEndTimeStep->value() <= this->m_selectedImage->GetDimension(3));
+        ok = ok && (m_Controls.spinBox_baselineEndTimeStep->value() < this->m_selectedImage->GetDimension(3));
 
       }
       else if (this->m_Controls.radioButton_absoluteEnhancement->isChecked()
                || this->m_Controls.radioButton_relativeEnchancement->isChecked())
       {
         ok = ok && (m_Controls.factorSpinBox->value() > 0);
-        ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() >= 1);
+        ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() >= 0);
         ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() <= m_Controls.spinBox_baselineEndTimeStep->value());
-        ok = ok && (m_Controls.spinBox_baselineEndTimeStep->value() <= this->m_selectedImage->GetDimension(3));
+        ok = ok && (m_Controls.spinBox_baselineEndTimeStep->value() < this->m_selectedImage->GetDimension(3));
       }
       else if (this->m_Controls.radioButtonUsingT1->isChecked())
       {
@@ -627,9 +627,9 @@ bool MRPerfusionView::CheckModelSettings() const
         ok = ok && (m_Controls.TRSpinBox->value() > 0);
         ok = ok && (m_Controls.RelaxivitySpinBox->value() > 0);
         ok = ok && (m_Controls.ComboT1Map->GetSelectedNode().IsNotNull());
-        ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() >= 1);
+        ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() >= 0);
         ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() <= m_Controls.spinBox_baselineEndTimeStep->value());
-        ok = ok && (m_Controls.spinBox_baselineEndTimeStep->value() <= this->m_selectedImage->GetDimension(3));
+        ok = ok && (m_Controls.spinBox_baselineEndTimeStep->value() < this->m_selectedImage->GetDimension(3));
       }
       else
       {

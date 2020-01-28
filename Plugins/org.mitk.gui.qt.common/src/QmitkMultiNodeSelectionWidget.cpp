@@ -135,22 +135,22 @@ void QmitkMultiNodeSelectionWidget::UpdateInfo()
     {
       if (this->isEnabled())
       {
-        m_Overlay->SetOverlayText(QString("<font class=\"normal\">") + m_EmptyInfo + QString("</font>"));
+        m_Overlay->SetOverlayText(QStringLiteral("<font class=\"normal\">") + m_EmptyInfo + QStringLiteral("</font>"));
       }
       else
       {
-        m_Overlay->SetOverlayText(QString("<font class=\"disabled\">") + m_EmptyInfo + QString("</font>"));
+        m_Overlay->SetOverlayText(QStringLiteral("<font class=\"disabled\">") + m_EmptyInfo + QStringLiteral("</font>"));
       }
     }
     else
     {
       if (this->isEnabled())
       {
-        m_Overlay->SetOverlayText(QString("<font class=\"warning\">") + m_InvalidInfo + QString("</font>"));
+        m_Overlay->SetOverlayText(QStringLiteral("<font class=\"warning\">") + m_InvalidInfo + QStringLiteral("</font>"));
       }
       else
       {
-        m_Overlay->SetOverlayText(QString("<font class=\"disabled\">") + m_InvalidInfo + QString("</font>"));
+        m_Overlay->SetOverlayText(QStringLiteral("<font class=\"disabled\">") + m_InvalidInfo + QStringLiteral("</font>"));
       }
     }
   }
@@ -269,4 +269,5 @@ void QmitkMultiNodeSelectionWidget::changeEvent(QEvent *event)
   {
     this->UpdateInfo();
   }
+  QmitkAbstractNodeSelectionWidget::changeEvent(event);
 }

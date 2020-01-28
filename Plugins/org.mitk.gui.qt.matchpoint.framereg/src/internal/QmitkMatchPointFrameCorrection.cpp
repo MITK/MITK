@@ -138,7 +138,7 @@ void QmitkMatchPointFrameCorrection::OnLoadAlgorithmButtonPushed()
 
   if (!dllInfo)
   {
-    Error(QString("No valid algorithm is selected. Cannot load algorithm. ABORTING."));
+    Error(QStringLiteral("No valid algorithm is selected. Cannot load algorithm. ABORTING."));
     return;
   }
 
@@ -149,7 +149,7 @@ void QmitkMatchPointFrameCorrection::OnLoadAlgorithmButtonPushed()
 
   if (tempAlgorithm.IsNull())
   {
-    Error(QString("Error. Cannot load selected algorithm."));
+    Error(QStringLiteral("Error. Cannot load selected algorithm."));
     return;
   }
 
@@ -261,7 +261,7 @@ void QmitkMatchPointFrameCorrection::CheckInputs()
   if (m_LoadedAlgorithm.IsNull())
   {
     m_Controls.m_lbLoadedAlgorithmName->setText(
-      QString("<font color='red'>No algorithm seleted!</font>"));
+      QStringLiteral("<font color='red'>No algorithm seleted!</font>"));
   }
   else
   {
@@ -368,7 +368,7 @@ void QmitkMatchPointFrameCorrection::ConfigureRegistrationControls()
     m_Controls.m_tabExclusion->setEnabled(false);
     m_Controls.m_tabExecution->setEnabled(false);
     this->m_Controls.m_lbLoadedAlgorithmName->setText(
-      QString("<font color='red'>no algorithm loaded!</font>"));
+      QStringLiteral("<font color='red'>no algorithm loaded!</font>"));
     m_Controls.maskNodeSelector->setVisible(false);
     m_Controls.label_TargetMask->setVisible(false);
   }
@@ -666,19 +666,19 @@ void QmitkMatchPointFrameCorrection::OnAlgorithmInfo(QString info)
 
 void QmitkMatchPointFrameCorrection::OnFrameProcessed(double progress)
 {
-  m_Controls.m_teLog->append(QString("<b><font color='blue'>Frame processed...</font></b>"));
+  m_Controls.m_teLog->append(QStringLiteral("<b><font color='blue'>Frame processed...</font></b>"));
   m_Controls.m_progBarFrame->setValue(100 * progress);
 };
 
 void QmitkMatchPointFrameCorrection::OnFrameRegistered(double progress)
 {
-  m_Controls.m_teLog->append(QString("<b><font color='blue'>Frame registered...</font></b>"));
+  m_Controls.m_teLog->append(QStringLiteral("<b><font color='blue'>Frame registered...</font></b>"));
   m_Controls.m_progBarFrame->setValue(100 * progress);
 };
 
 void QmitkMatchPointFrameCorrection::OnFrameMapped(double progress)
 {
-  m_Controls.m_teLog->append(QString("<b><font color='blue'>Frame mapped...</font></b>"));
+  m_Controls.m_teLog->append(QStringLiteral("<b><font color='blue'>Frame mapped...</font></b>"));
   m_Controls.m_progBarFrame->setValue(100 * progress);
 };
 

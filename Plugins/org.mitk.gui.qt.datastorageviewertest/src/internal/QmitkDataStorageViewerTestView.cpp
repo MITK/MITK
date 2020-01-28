@@ -48,16 +48,16 @@ void QmitkDataStorageViewerTestView::CreateQtPartControl(QWidget* parent)
   m_Controls.selectionListView2->setModel(m_DataStorageDefaultListModel2);
 
   m_Controls.singleSlot->SetDataStorage(GetDataStorage());
-  m_Controls.singleSlot->SetEmptyInfo(QString("EmptyInfo: Set this to display info in empty state"));
-  m_Controls.singleSlot->SetInvalidInfo(QString("InvalidInfo: is displayed for invalid states"));
-  m_Controls.singleSlot->SetPopUpTitel(QString("This is the definable caption. Choose your data now!"));
-  m_Controls.singleSlot->SetPopUpHint(QString("I am an optional hint, that can be set by the developer<p/>If not set the widget is invisible."));
+  m_Controls.singleSlot->SetEmptyInfo(QStringLiteral("EmptyInfo: Set this to display info in empty state"));
+  m_Controls.singleSlot->SetInvalidInfo(QStringLiteral("InvalidInfo: is displayed for invalid states"));
+  m_Controls.singleSlot->SetPopUpTitel(QStringLiteral("This is the definable caption. Choose your data now!"));
+  m_Controls.singleSlot->SetPopUpHint(QStringLiteral("I am an optional hint, that can be set by the developer<p/>If not set the widget is invisible."));
 
   m_Controls.multiSlot->SetDataStorage(GetDataStorage());
-  m_Controls.multiSlot->SetEmptyInfo(QString("EmptyInfo: Set this to display info in empty state"));
-  m_Controls.multiSlot->SetInvalidInfo(QString("InvalidInfo: is displayed for invalid states"));
-  m_Controls.multiSlot->SetPopUpTitel(QString("This is the definable caption. Choose your data now!"));
-  m_Controls.multiSlot->SetPopUpHint(QString("I am an optional hint, that can be set by the developer<p/>If not set the widget is invisible."));
+  m_Controls.multiSlot->SetEmptyInfo(QStringLiteral("EmptyInfo: Set this to display info in empty state"));
+  m_Controls.multiSlot->SetInvalidInfo(QStringLiteral("InvalidInfo: is displayed for invalid states"));
+  m_Controls.multiSlot->SetPopUpTitel(QStringLiteral("This is the definable caption. Choose your data now!"));
+  m_Controls.multiSlot->SetPopUpHint(QStringLiteral("I am an optional hint, that can be set by the developer<p/>If not set the widget is invisible."));
 
   m_ModelViewSelectionConnector = std::make_unique<QmitkModelViewSelectionConnector>();
   try
@@ -238,12 +238,12 @@ void QmitkDataStorageViewerTestView::OnOnlyImages2(bool checked)
   if (checked)
   {
     m_Controls.multiSlot->SetNodePredicate(mitk::NodePredicateDataType::New("Image"));
-    m_Controls.multiSlot->SetInvalidInfo(QString("InvalidInfo: is displayed for invalid states. Only images allowed!"));
+    m_Controls.multiSlot->SetInvalidInfo(QStringLiteral("InvalidInfo: is displayed for invalid states. Only images allowed!"));
   }
   else
   {
     m_Controls.multiSlot->SetNodePredicate(nullptr);
-    m_Controls.multiSlot->SetInvalidInfo(QString("InvalidInfo: is displayed for invalid states"));
+    m_Controls.multiSlot->SetInvalidInfo(QStringLiteral("InvalidInfo: is displayed for invalid states"));
   }
 };
 

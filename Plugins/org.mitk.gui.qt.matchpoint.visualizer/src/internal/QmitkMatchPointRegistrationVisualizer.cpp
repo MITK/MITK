@@ -355,8 +355,8 @@ void QmitkMatchPointRegistrationVisualizer::LoadStateFromNode()
         }
         else
         {
-            this->Error(QString("Cannot configure plugin controlls correctly. Node property ") + QString(
-                mitk::nodeProp_RegVisDirection) + QString(" has not the assumed type."));
+            this->Error(QStringLiteral("Cannot configure plugin controlls correctly. Node property ") + QString(
+                mitk::nodeProp_RegVisDirection) + QStringLiteral(" has not the assumed type."));
         }
 
         bool styleActive = false;
@@ -368,8 +368,8 @@ void QmitkMatchPointRegistrationVisualizer::LoadStateFromNode()
         }
         else
         {
-            this->Error(QString("Cannot configure plugin controlls correctly. Node property ") + QString(
-                mitk::nodeProp_RegVisGrid) + QString(" has not the assumed type."));
+            this->Error(QStringLiteral("Cannot configure plugin controlls correctly. Node property ") + QString(
+                mitk::nodeProp_RegVisGrid) + QStringLiteral(" has not the assumed type."));
         }
 
         if (this->m_spSelectedRegNode->GetBoolProperty(mitk::nodeProp_RegVisGlyph, styleActive))
@@ -378,8 +378,8 @@ void QmitkMatchPointRegistrationVisualizer::LoadStateFromNode()
         }
         else
         {
-            this->Error(QString("Cannot configure plugin controlls correctly. Node property ") + QString(
-                mitk::nodeProp_RegVisGlyph) + QString(" has not the assumed type."));
+            this->Error(QStringLiteral("Cannot configure plugin controlls correctly. Node property ") + QString(
+                mitk::nodeProp_RegVisGlyph) + QStringLiteral(" has not the assumed type."));
         }
 
         if (this->m_spSelectedRegNode->GetBoolProperty(mitk::nodeProp_RegVisPoints, styleActive))
@@ -388,8 +388,8 @@ void QmitkMatchPointRegistrationVisualizer::LoadStateFromNode()
         }
         else
         {
-            this->Error(QString("Cannot configure plugin controlls correctly. Node property ") + QString(
-                mitk::nodeProp_RegVisPoints) + QString(" has not the assumed type."));
+            this->Error(QStringLiteral("Cannot configure plugin controlls correctly. Node property ") + QString(
+                mitk::nodeProp_RegVisPoints) + QStringLiteral(" has not the assumed type."));
         }
 
         ///////////////////////////////////////////////////////
@@ -403,8 +403,8 @@ void QmitkMatchPointRegistrationVisualizer::LoadStateFromNode()
         }
         else
         {
-            this->Error(QString("Cannot configure plugin controlls correctly. Node property ") + QString(
-                mitk::nodeProp_RegVisColorStyle) + QString(" has not the assumed type."));
+            this->Error(QStringLiteral("Cannot configure plugin controlls correctly. Node property ") + QString(
+                mitk::nodeProp_RegVisColorStyle) + QStringLiteral(" has not the assumed type."));
         }
 
         QColor tmpColor;
@@ -459,8 +459,8 @@ void QmitkMatchPointRegistrationVisualizer::LoadStateFromNode()
         }
         else
         {
-            this->Error(QString("Cannot configure plugin controlls correctly. Node property ") + QString(
-                mitk::nodeProp_RegVisGridShowStart) + QString(" is not correctly defined."));
+            this->Error(QStringLiteral("Cannot configure plugin controlls correctly. Node property ") + QString(
+                mitk::nodeProp_RegVisGridShowStart) + QStringLiteral(" is not correctly defined."));
         }
 
         int gridFrequ = 5;
@@ -471,8 +471,8 @@ void QmitkMatchPointRegistrationVisualizer::LoadStateFromNode()
         }
         else
         {
-            this->Error(QString("Cannot configure plugin controlls correctly. Node property ") + QString(
-                mitk::nodeProp_RegVisGridFrequence) + QString(" is not correctly defined."));
+            this->Error(QStringLiteral("Cannot configure plugin controlls correctly. Node property ") + QString(
+                mitk::nodeProp_RegVisGridFrequence) + QStringLiteral(" is not correctly defined."));
         }
 
         float colorStart[3] = { 0.0, 0.0, 0.0 };
@@ -492,8 +492,8 @@ void QmitkMatchPointRegistrationVisualizer::LoadStateFromNode()
         }
         else
         {
-            this->Error(QString("Cannot configure plugin controlls correctly. Node property ") + QString(
-                mitk::nodeProp_RegVisFOVSize) + QString(" is not correctly defined."));
+            this->Error(QStringLiteral("Cannot configure plugin controlls correctly. Node property ") + QString(
+                mitk::nodeProp_RegVisFOVSize) + QStringLiteral(" is not correctly defined."));
         }
 
         if (this->m_spSelectedRegNode->GetProperty(valueProp, mitk::nodeProp_RegVisFOVSpacing))
@@ -504,8 +504,8 @@ void QmitkMatchPointRegistrationVisualizer::LoadStateFromNode()
         }
         else
         {
-            this->Error(QString("Cannot configure plugin controlls correctly. Node property ") + QString(
-                mitk::nodeProp_RegVisFOVSpacing) + QString(" is not correctly defined."));
+            this->Error(QStringLiteral("Cannot configure plugin controlls correctly. Node property ") + QString(
+                mitk::nodeProp_RegVisFOVSpacing) + QStringLiteral(" is not correctly defined."));
         }
 
         mitk::Point3dProperty* originProp = nullptr;
@@ -518,8 +518,8 @@ void QmitkMatchPointRegistrationVisualizer::LoadStateFromNode()
         }
         else
         {
-            this->Error(QString("Cannot configure plugin controlls correctly. Node property ") + QString(
-                mitk::nodeProp_RegVisFOVOrigin) + QString(" is not correctly defined."));
+            this->Error(QStringLiteral("Cannot configure plugin controlls correctly. Node property ") + QString(
+                mitk::nodeProp_RegVisFOVOrigin) + QStringLiteral(" is not correctly defined."));
         }
 
         mitk::Vector3DProperty* orientationProp1;
@@ -541,9 +541,9 @@ void QmitkMatchPointRegistrationVisualizer::LoadStateFromNode()
         {
             m_FOVRefOrientation.SetIdentity();
 
-            this->Error(QString("Cannot configure plugin controlls correctly. One of the node propertiesy ") +
+            this->Error(QStringLiteral("Cannot configure plugin controlls correctly. One of the node propertiesy ") +
                 QString(mitk::nodeProp_RegVisFOVOrientation1) + QString(mitk::nodeProp_RegVisFOVOrientation2) +
-                QString(mitk::nodeProp_RegVisFOVOrientation3) + QString(" is not correctly defined."));
+                QString(mitk::nodeProp_RegVisFOVOrientation3) + QStringLiteral(" is not correctly defined."));
         }
 
         this->UpdateOrientationMatrixWidget();
@@ -648,15 +648,15 @@ void QmitkMatchPointRegistrationVisualizer::OnColorInterpolationChecked(bool che
 {
     if (checked)
     {
-        this->m_Controls->labelVecMagSmall->setText(QString("="));
-        this->m_Controls->labelVecMagMedium->setText(QString("="));
-        this->m_Controls->labelVecMagLarge->setText(QString("="));
+        this->m_Controls->labelVecMagSmall->setText(QStringLiteral("="));
+        this->m_Controls->labelVecMagMedium->setText(QStringLiteral("="));
+        this->m_Controls->labelVecMagLarge->setText(QStringLiteral("="));
     }
     else
     {
-        this->m_Controls->labelVecMagSmall->setText(QString(">"));
-        this->m_Controls->labelVecMagMedium->setText(QString(">"));
-        this->m_Controls->labelVecMagLarge->setText(QString(">"));
+        this->m_Controls->labelVecMagSmall->setText(QStringLiteral(">"));
+        this->m_Controls->labelVecMagMedium->setText(QStringLiteral(">"));
+        this->m_Controls->labelVecMagLarge->setText(QStringLiteral(">"));
     }
 }
 

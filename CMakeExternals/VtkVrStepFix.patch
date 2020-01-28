@@ -1,0 +1,11 @@
+diff --git a/Rendering/VolumeOpenGL2/vtkVolumeShaderComposer.h b/Rendering/VolumeOpenGL2/vtkVolumeShaderComposer.h
+--- a/Rendering/VolumeOpenGL2/vtkVolumeShaderComposer.h
++++ b/Rendering/VolumeOpenGL2/vtkVolumeShaderComposer.h
+@@ -1634,6 +1634,7 @@
+       \n\
+       \n  g_terminatePointMax = length(terminatePoint.xyz - g_dataPos.xyz) /\
+       \n                        length(g_dirStep);\
++      \n  if (isnan(g_terminatePointMax)) g_terminatePointMax = 0.;\
+       \n  g_currentT = 0.0;");
+   }
+ 

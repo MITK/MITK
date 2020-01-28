@@ -48,7 +48,7 @@ public:
   /**
    * Return code (value 0) indicating that the workbench terminated normally.
    *
-   * @see #CreateAndRunWorkbench
+   * @see CreateAndRunWorkbench()
    * @since 3.0
    */
   static const int RETURN_OK;
@@ -57,7 +57,7 @@ public:
    * Return code (value 1) indicating that the workbench was terminated with
    * a call to <code>IWorkbench.restart</code>.
    *
-   * @see #CreateAndRunWorkbench
+   * @see CreateAndRunWorkbench()
    * @see IWorkbench#Restart
    * @since 3.0
    */
@@ -66,7 +66,7 @@ public:
   /**
    * Return code (value 2) indicating that the workbench failed to start.
    *
-   * @see #CreateAndRunWorkbench
+   * @see CreateAndRunWorkbench()
    * @see IWorkbench#Restart
    * @since 3.0
    */
@@ -76,7 +76,7 @@ public:
    * Return code (value 3) indicating that the workbench was terminated with
    * a call to IWorkbenchConfigurer#emergencyClose.
    *
-   * @see #CreateAndRunWorkbench
+   * @see CreateAndRunWorkbench()
    * @since 3.0
    */
   static const int RETURN_EMERGENCY_CLOSE;
@@ -131,7 +131,7 @@ public:
   static IWorkbench* GetWorkbench();
 
   /**
-   * Returns whether {@link #createAndRunWorkbench createAndRunWorkbench} has
+   * Returns whether CreateAndRunWorkbench() has
    * been called to create the workbench, and the workbench has yet to
    * terminate.
    * <p>

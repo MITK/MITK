@@ -31,9 +31,6 @@ class QmitkDataStorageComboBox;
 \ingroup ToolManagerEtAl
 \ingroup Widgets
 
-There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref
-QmitkInteractiveSegmentationTechnicalPage
-
 Shows the reference data of a ToolManager in a segmentation setting.
 
 The reference image can be selected from a combobox, where all images of the scene are listed.

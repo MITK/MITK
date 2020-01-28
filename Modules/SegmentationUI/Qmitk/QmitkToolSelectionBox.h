@@ -34,9 +34,6 @@ class QmitkToolGUI;
   \ingroup org_mitk_gui_qt_interactivesegmentation
   \ingroup ToolManagerEtAl
 
-  There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref
-  QmitkInteractiveSegmentationTechnicalPage
-
   This widget graphically displays the active tool of a mitk::ToolManager as a set
   of toggle buttons. Each button show the identification of a Tool (icon and name).
   When a button's toggle state is "down", the tool is activated. When a different button

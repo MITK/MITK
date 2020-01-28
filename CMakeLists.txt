@@ -551,7 +551,6 @@ include(mitkFunctionInstallCTKPlugin)
 include(mitkFunctionInstallProvisioningFiles)
 include(mitkFunctionInstallThirdPartyCTKPlugins)
 include(mitkFunctionOrganizeSources)
-include(mitkFunctionTestPlugin)
 include(mitkFunctionUseModules)
 if( ${MITK_USE_MatchPoint} )
   include(mitkFunctionCreateMatchPointDeployedAlgorithm)
@@ -641,7 +640,7 @@ find_package(Doxygen)
 option(BLUEBERRY_DEBUG_SMARTPOINTER "Enable code for debugging smart pointers" OFF)
 mark_as_advanced(BLUEBERRY_DEBUG_SMARTPOINTER)
 
-# ASK THE USER TO SHOW THE CONSOLE WINDOW FOR CoreApp and mitkWorkbench
+# Ask the user to show the console window for applications
 option(MITK_SHOW_CONSOLE_WINDOW "Use this to enable or disable the console window when starting MITK GUI Applications" ON)
 mark_as_advanced(MITK_SHOW_CONSOLE_WINDOW)
 
@@ -1126,18 +1125,6 @@ if(MITK_USE_BLUEBERRY)
 
   set(BLUEBERRY_XPDOC_OUTPUT_DIR "${MITK_DOXYGEN_OUTPUT_DIR}/html/extension-points/html/")
   execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${BLUEBERRY_XPDOC_OUTPUT_DIR})
-
-  # Plug-in testing (needs some work to be enabled again)
-  if(BUILD_TESTING)
-    set(BLUEBERRY_UI_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreApp")
-    if(TARGET CoreApp)
-      get_target_property(_is_macosx_bundle CoreApp MACOSX_BUNDLE)
-      if(APPLE AND _is_macosx_bundle)
-        set(BLUEBERRY_UI_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreApp.app/Contents/MacOS/CoreApp")
-      endif()
-    endif()
-    set(BLUEBERRY_TEST_APP_ID "org.mitk.qt.coreapplication")
-  endif()
 
   include("${CMAKE_CURRENT_SOURCE_DIR}/Plugins/PluginList.cmake")
   mitkFunctionWhitelistPlugins(MITK MITK_PLUGINS)

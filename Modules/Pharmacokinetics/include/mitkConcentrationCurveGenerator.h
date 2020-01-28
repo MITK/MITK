@@ -150,8 +150,10 @@ private:
 
     double m_T2Factor;
     double m_T2EchoTime;
-    
+    // The baseline image is averaged from the signal within time step range [m_BaselineStartTimeStep, m_BaselineEndTimeStep].
+    // m_BaselineStartTimeStep is the first time frame, that is included into the baseline averaging (starting with 0).
     int m_BaselineStartTimeStep;
+    // m_BaselinStopTimeStep is the last time frame, that is included into the baseline averaging.
     int m_BaselineEndTimeStep;
 };
 

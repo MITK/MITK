@@ -94,8 +94,6 @@ namespace mitk
     static const QString ARG_REGISTRY_MULTI_LANGUAGE;
     static const QString ARG_SPLASH_IMAGE;
     static const QString ARG_STORAGE_DIR;
-    static const QString ARG_TESTAPPLICATION;
-    static const QString ARG_TESTPLUGIN;
     static const QString ARG_XARGS;
 
     // BlueBerry specific plugin framework properties
@@ -107,8 +105,6 @@ namespace mitk
     static const QString PROP_NO_REGISTRY_CACHE;
     static const QString PROP_PRODUCT;
     static const QString PROP_REGISTRY_MULTI_LANGUAGE;
-    static const QString PROP_TESTAPPLICATION;
-    static const QString PROP_TESTPLUGIN;
 
     BaseApplication(int argc, char **argv);
     ~BaseApplication() override;

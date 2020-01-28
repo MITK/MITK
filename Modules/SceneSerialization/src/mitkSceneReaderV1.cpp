@@ -315,10 +315,6 @@ void mitk::SceneReaderV1::ClearNodePropertyListWithExceptions(DataNode &node, Pr
       As the treatment as multi-component image and the corresponding
       visualization options hinges on that property we should not delete
       it, if it was added by the mapper.
-      Old diffusion images might contain the "DisplayChannel" property
-      which stores the same information, however ignoring it is an acceptable
-      loss of precision as usually which channel is selected is not terribly
-      important.
 
       This is a fix for the issue reported in T19919.
     */

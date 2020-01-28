@@ -11,20 +11,12 @@ set(MITK_PLUGINS
   org.blueberry.ui.qt.help:ON
   org.blueberry.ui.qt.log:ON
   org.blueberry.ui.qt.objectinspector:OFF
-
-  #org.blueberry.test:ON
-  #org.blueberry.uitest:ON
-
-  #Testing/org.blueberry.core.runtime.tests:ON
-  #Testing/org.blueberry.osgi.tests:ON
-
   org.mitk.core.services:ON
   org.mitk.gui.common:ON
   org.mitk.planarfigure:ON
   org.mitk.core.ext:OFF
   org.mitk.core.jobs:OFF
   org.mitk.gui.qt.application:ON
-  org.mitk.gui.qt.coreapplication:OFF
   org.mitk.gui.qt.ext:OFF
   org.mitk.gui.qt.extapplication:OFF
   org.mitk.gui.qt.common:ON

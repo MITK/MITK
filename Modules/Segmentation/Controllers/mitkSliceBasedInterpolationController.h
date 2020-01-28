@@ -34,9 +34,6 @@ namespace mitk
 
     \ingroup ToolManagerEtAl
 
-    There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref
-    QmitkInteractiveSegmentationTechnicalPage
-
     This class keeps track of the contents of a 3D segmentation image.
     \attention mitk::SliceBasedInterpolationController assumes that the image contains pixel values of 0 and 1.
 

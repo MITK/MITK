@@ -58,10 +58,10 @@ class MITKDICOMREADER_EXPORT DICOMFileReaderSelector : public itk::LightObject
     /// \brief Add a whole pre-configured reader to the selection process.
     void AddFileReaderCanditate(DICOMFileReader::Pointer reader);
 
-    /// \brief Load 3D image creating configurations from the MITK module system (see \ref mitk::Module::FindResources).
+    /// \brief Load 3D image creating configurations from the MITK module system (see us::Module::FindResources()).
     /// For a default set of configurations, look into the directory Resources of the DICOMReader module.
     void LoadBuiltIn3DConfigs();
-    /// \brief Load 3D+t image creating configurations from the MITK module system (see \ref mitk::Module::FindResources).
+    /// \brief Load 3D+t image creating configurations from the MITK module system (see us::Module::FindResources()).
     /// For a default set of configurations, look into the directory Resources of the DICOMReader module.
     void LoadBuiltIn3DnTConfigs();
 

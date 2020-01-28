@@ -22,10 +22,9 @@ class vtkPiecewiseFunction;
 /** Documentation
 * \brief Applies the grayvalue or color/opacity level window to scalar or RGB(A) images.
 *
-* This filter is used to apply the color level window to RGB images (e.g.
-* diffusion tensor images). Therefore, the RGB channels are converted to
-* the HSI color space, where the level window can be applied. Afterwards,
-* the HSI values transformed back to the RGB space.
+* This filter is used to apply the color level window to RGB images.
+* Therefore, the RGB channels are converted to the HSI color space, where the level
+* window can be applied. Afterwards, the HSI values transformed back to the RGB space.
 *
 * The filter is also able to apply an opacity level window to RGBA images.
 *

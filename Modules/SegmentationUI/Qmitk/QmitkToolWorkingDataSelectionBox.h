@@ -28,9 +28,6 @@ found in the LICENSE file.
 
 \ingroup Widgets
 
-There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref
-QmitkInteractiveSegmentationTechnicalPage
-
 Shows the working data of a ToolManager in a segmentation setting. By default only the segmentation name is shown.
 
 The working images (segmentations) are listed in a QListView, each row telling the color and name

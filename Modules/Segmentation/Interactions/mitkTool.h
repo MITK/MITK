@@ -58,8 +58,6 @@ namespace mitk
   \ingroup Interaction
   \ingroup ToolManagerEtAl
 
-  There is a separate page describing the \ref QmitkInteractiveSegmentationTechnicalPage.
-
   Every tool is a mitk::StateMachine, which can follow any transition pattern that it likes. One important thing to know
   is, that
   every derived tool should always call SuperClass::Deactivated() at the end of its own implementation of Deactivated,

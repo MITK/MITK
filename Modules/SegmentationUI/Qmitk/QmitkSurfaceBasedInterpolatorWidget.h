@@ -45,9 +45,6 @@ namespace mitk
   \sa QmitkInteractiveSegmentation
   \sa mitk::SurfaceBasedInterpolationController
 
-  There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref
-  QmitkInteractiveSegmentationTechnicalPage
-
   QmitkSurfaceBasedInterpolatorWidgetController is responsible to watch the GUI, to notice, which slice is currently
   visible. It triggers generation of interpolation suggestions and also triggers acception of suggestions.
 */

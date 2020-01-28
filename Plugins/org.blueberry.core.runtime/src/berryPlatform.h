@@ -239,9 +239,6 @@ public:
   static const QString PROP_APPLICATION;
   static const QString PROP_IGNOREAPP;
 
-  static const QString PROP_TESTPLUGIN;
-  static const QString PROP_TESTAPPLICATION;
-
   static const QString PROP_XARGS;
 
   /**

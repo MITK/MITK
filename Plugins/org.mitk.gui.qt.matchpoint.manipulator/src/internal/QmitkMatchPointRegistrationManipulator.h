@@ -61,7 +61,7 @@ public:
   void OnStoreBtnPushed();
   void OnSettingsChanged(mitk::DataNode*);
 
-  void OnSelectionChanged();
+  void OnRegSourceChanged();
   void OnNodeSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
   void OnRegistrationChanged();

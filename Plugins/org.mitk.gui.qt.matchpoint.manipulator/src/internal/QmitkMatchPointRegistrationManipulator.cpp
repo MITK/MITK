@@ -112,7 +112,7 @@ void QmitkMatchPointRegistrationManipulator::CreateQtPartControl(QWidget* parent
   connect(m_Controls.pbCancel, SIGNAL(clicked()), this, SLOT(OnCancelBtnPushed()));
   connect(m_Controls.pbStore, SIGNAL(clicked()), this, SLOT(OnStoreBtnPushed()));
   connect(m_Controls.evalSettings, SIGNAL(SettingsChanged(mitk::DataNode*)), this, SLOT(OnSettingsChanged(mitk::DataNode*)));
-  connect(m_Controls.radioSelectedReg, SIGNAL(toggled(bool)), this, SLOT(OnSelectionChanged()));
+  connect(m_Controls.radioSelectedReg, SIGNAL(toggled(bool)), this, SLOT(OnRegSourceChanged()));
 
   connect(m_Controls.comboCenter, SIGNAL(currentIndexChanged(int)), this, SLOT(OnCenterTypeChanged(int)));
   connect(m_Controls.manipulationWidget, SIGNAL(RegistrationChanged(map::core::RegistrationBase*)), this, SLOT(OnRegistrationChanged()));
@@ -209,7 +209,7 @@ void QmitkMatchPointRegistrationManipulator::CheckInputs()
   }
 }
 
-void QmitkMatchPointRegistrationManipulator::OnSelectionChanged()
+void QmitkMatchPointRegistrationManipulator::OnRegSourceChanged()
 {
   this->CheckInputs();
   this->ConfigureControls();

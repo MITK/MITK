@@ -350,7 +350,7 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>526</width>
+           <width>158</width>
            <height>232</height>
           </rect>
          </property>
@@ -387,7 +387,7 @@
          <property name="geometry">
           <rect>
            <x>0</x>
-           <y>-120</y>
+           <y>0</y>
            <width>516</width>
            <height>452</height>
           </rect>
@@ -501,24 +501,24 @@
             <item row="4" column="1">
              <layout class="QHBoxLayout" name="horizontalLayout_14">
               <item>
-               <widget class="QLabel" name="label_baselineStartTimePoint">
+               <widget class="QLabel" name="label_baselineStartTimeStep">
                 <property name="text">
                  <string>Start Time Point</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="spinBox_baselineStartTimePoint"/>
+               <widget class="QSpinBox" name="spinBox_baselineStartTimeStep"/>
               </item>
               <item>
-               <widget class="QLabel" name="label_baselineEndTimePoint">
+               <widget class="QLabel" name="label_baselineEndTimeStep">
                 <property name="text">
                  <string>End Time Point</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="spinBox_baselineEndTimePoint"/>
+               <widget class="QSpinBox" name="spinBox_baselineEndTimeStep"/>
               </item>
              </layout>
             </item>

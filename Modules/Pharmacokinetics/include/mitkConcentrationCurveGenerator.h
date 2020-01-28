@@ -76,11 +76,11 @@ public:
 
     /** @brief Calls Convert and returns the 4D mitk::image in Concentration units*/
 
-    itkSetMacro(BaselineStartTimePoint, int);
-    itkGetConstReferenceMacro(BaselineStartTimePoint, int);
+    itkSetMacro(BaselineStartTimeStep, int);
+    itkGetConstReferenceMacro(BaselineStartTimeStep, int);
 
-    itkSetMacro(BaselineEndTimePoint, int);
-    itkGetConstReferenceMacro(BaselineEndTimePoint, int);
+    itkSetMacro(BaselineEndTimeStep, int);
+    itkGetConstReferenceMacro(BaselineEndTimeStep, int);
 
     itkSetMacro(isTurboFlashSequence,bool);
     itkGetConstReferenceMacro(isTurboFlashSequence,bool);
@@ -150,9 +150,9 @@ private:
 
     double m_T2Factor;
     double m_T2EchoTime;
-
-    int m_BaselineStartTimePoint;
-    int m_BaselineEndTimePoint;
+    
+    int m_BaselineStartTimeStep;
+    int m_BaselineEndTimeStep;
 };
 
 }

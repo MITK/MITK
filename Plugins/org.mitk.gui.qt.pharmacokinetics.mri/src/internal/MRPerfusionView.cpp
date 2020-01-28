@@ -166,11 +166,11 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   m_Controls.groupBoxTurboFlash->hide();
   m_Controls.radioButtonNoConversion->setChecked(true);
   m_Controls.factorSpinBox->setEnabled(false);
-  m_Controls.spinBox_baselineStartTimePoint->setEnabled(false);
-  m_Controls.spinBox_baselineEndTimePoint->setEnabled(false);
+  m_Controls.spinBox_baselineStartTimeStep->setEnabled(false);
+  m_Controls.spinBox_baselineEndTimeStep->setEnabled(false);
   m_Controls.groupBox_viaT1Map->hide();
-  m_Controls.spinBox_baselineStartTimePoint->setValue(1);
-  m_Controls.spinBox_baselineEndTimePoint->setValue(1);
+  m_Controls.spinBox_baselineStartTimeStep->setValue(1);
+  m_Controls.spinBox_baselineEndTimeStep->setValue(1);
 
   connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), m_Controls.groupBoxTurboFlash, SLOT(setVisible(bool)));
   connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
@@ -182,19 +182,19 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), m_Controls.factorSpinBox, SLOT(setEnabled(bool)));
   connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), m_Controls.factorSpinBox, SLOT(setEnabled(bool)));
-  connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), m_Controls.spinBox_baselineStartTimePoint, SLOT(setEnabled(bool)));
-  connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), m_Controls.spinBox_baselineStartTimePoint, SLOT(setEnabled(bool)));
-  connect(m_Controls.radioButtonUsingT1, SIGNAL(toggled(bool)), m_Controls.spinBox_baselineStartTimePoint, SLOT(setEnabled(bool)));
-  connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), m_Controls.spinBox_baselineStartTimePoint, SLOT(setEnabled(bool)));
+  connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), m_Controls.spinBox_baselineStartTimeStep, SLOT(setEnabled(bool)));
+  connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), m_Controls.spinBox_baselineStartTimeStep, SLOT(setEnabled(bool)));
+  connect(m_Controls.radioButtonUsingT1, SIGNAL(toggled(bool)), m_Controls.spinBox_baselineStartTimeStep, SLOT(setEnabled(bool)));
+  connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), m_Controls.spinBox_baselineStartTimeStep, SLOT(setEnabled(bool)));
 
-  connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), m_Controls.spinBox_baselineEndTimePoint, SLOT(setEnabled(bool)));
-  connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), m_Controls.spinBox_baselineEndTimePoint, SLOT(setEnabled(bool)));
-  connect(m_Controls.radioButtonUsingT1, SIGNAL(toggled(bool)), m_Controls.spinBox_baselineEndTimePoint, SLOT(setEnabled(bool)));
-  connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), m_Controls.spinBox_baselineEndTimePoint, SLOT(setEnabled(bool)));
+  connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), m_Controls.spinBox_baselineEndTimeStep, SLOT(setEnabled(bool)));
+  connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), m_Controls.spinBox_baselineEndTimeStep, SLOT(setEnabled(bool)));
+  connect(m_Controls.radioButtonUsingT1, SIGNAL(toggled(bool)), m_Controls.spinBox_baselineEndTimeStep, SLOT(setEnabled(bool)));
+  connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), m_Controls.spinBox_baselineEndTimeStep, SLOT(setEnabled(bool)));
 
   connect(m_Controls.factorSpinBox, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
-  connect(m_Controls.spinBox_baselineStartTimePoint, SIGNAL(valueChanged(int)), this, SLOT(UpdateGUIControls()));
-  connect(m_Controls.spinBox_baselineEndTimePoint, SIGNAL(valueChanged(int)), this, SLOT(UpdateGUIControls()));
+  connect(m_Controls.spinBox_baselineStartTimeStep, SIGNAL(valueChanged(int)), this, SLOT(UpdateGUIControls()));
+  connect(m_Controls.spinBox_baselineEndTimeStep, SIGNAL(valueChanged(int)), this, SLOT(UpdateGUIControls()));
 
   connect(m_Controls.radioButtonUsingT1, SIGNAL(toggled(bool)), m_Controls.groupBox_viaT1Map, SLOT(setVisible(bool)));
   connect(m_Controls.radioButtonUsingT1, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
@@ -554,18 +554,18 @@ bool MRPerfusionView::CheckModelSettings() const
           ok = ok && (m_Controls.relaxationtime->value() > 0);
           ok = ok && (m_Controls.relaxivity->value() > 0);
           ok = ok && (m_Controls.AifRecoverytime->value() > 0);
-          ok = ok && (m_Controls.spinBox_baselineStartTimePoint->value() >= 1);
-          ok = ok && (m_Controls.spinBox_baselineStartTimePoint->value() <= m_Controls.spinBox_baselineEndTimePoint->value());
-          ok = ok && (m_Controls.spinBox_baselineEndTimePoint->value() <= this->m_selectedImage->GetDimension(3));
+          ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() >= 1);
+          ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() <= m_Controls.spinBox_baselineEndTimeStep->value());
+          ok = ok && (m_Controls.spinBox_baselineEndTimeStep->value() <= this->m_selectedImage->GetDimension(3));
 
         }
         else if (this->m_Controls.radioButton_absoluteEnhancement->isChecked()
                  || this->m_Controls.radioButton_relativeEnchancement->isChecked())
         {
           ok = ok && (m_Controls.factorSpinBox->value() > 0);
-          ok = ok && (m_Controls.spinBox_baselineStartTimePoint->value() >= 1);
-          ok = ok && (m_Controls.spinBox_baselineStartTimePoint->value() <= m_Controls.spinBox_baselineEndTimePoint->value());
-          ok = ok && (m_Controls.spinBox_baselineEndTimePoint->value() <= this->m_selectedImage->GetDimension(3));
+          ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() >= 1);
+          ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() <= m_Controls.spinBox_baselineEndTimeStep->value());
+          ok = ok && (m_Controls.spinBox_baselineEndTimeStep->value() <= this->m_selectedImage->GetDimension(3));
         }
         else if (this->m_Controls.radioButtonUsingT1->isChecked())
         {
@@ -573,9 +573,9 @@ bool MRPerfusionView::CheckModelSettings() const
           ok = ok && (m_Controls.TRSpinBox->value() > 0);
           ok = ok && (m_Controls.RelaxivitySpinBox->value() > 0);
           ok = ok && (m_Controls.ComboT1Map->GetSelectedNode().IsNotNull());
-          ok = ok && (m_Controls.spinBox_baselineStartTimePoint->value() >= 1);
-          ok = ok && (m_Controls.spinBox_baselineStartTimePoint->value() <= m_Controls.spinBox_baselineEndTimePoint->value());
-          ok = ok && (m_Controls.spinBox_baselineEndTimePoint->value() <= this->m_selectedImage->GetDimension(3));
+          ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() >= 1);
+          ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() <= m_Controls.spinBox_baselineEndTimeStep->value());
+          ok = ok && (m_Controls.spinBox_baselineEndTimeStep->value() <= this->m_selectedImage->GetDimension(3));
         }
         else
         {
@@ -608,18 +608,18 @@ bool MRPerfusionView::CheckModelSettings() const
         ok = ok && (m_Controls.relaxationtime->value() > 0);
         ok = ok && (m_Controls.relaxivity->value() > 0);
         ok = ok && (m_Controls.AifRecoverytime->value() > 0);
-        ok = ok && (m_Controls.spinBox_baselineStartTimePoint->value() >= 1);
-        ok = ok && (m_Controls.spinBox_baselineStartTimePoint->value() <= m_Controls.spinBox_baselineEndTimePoint->value());
-        ok = ok && (m_Controls.spinBox_baselineEndTimePoint->value() <= this->m_selectedImage->GetDimension(3));
+        ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() >= 1);
+        ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() <= m_Controls.spinBox_baselineEndTimeStep->value());
+        ok = ok && (m_Controls.spinBox_baselineEndTimeStep->value() <= this->m_selectedImage->GetDimension(3));
 
       }
       else if (this->m_Controls.radioButton_absoluteEnhancement->isChecked()
                || this->m_Controls.radioButton_relativeEnchancement->isChecked())
       {
         ok = ok && (m_Controls.factorSpinBox->value() > 0);
-        ok = ok && (m_Controls.spinBox_baselineStartTimePoint->value() >= 1);
-        ok = ok && (m_Controls.spinBox_baselineStartTimePoint->value() <= m_Controls.spinBox_baselineEndTimePoint->value());
-        ok = ok && (m_Controls.spinBox_baselineEndTimePoint->value() <= this->m_selectedImage->GetDimension(3));
+        ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() >= 1);
+        ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() <= m_Controls.spinBox_baselineEndTimeStep->value());
+        ok = ok && (m_Controls.spinBox_baselineEndTimeStep->value() <= this->m_selectedImage->GetDimension(3));
       }
       else if (this->m_Controls.radioButtonUsingT1->isChecked())
       {
@@ -627,9 +627,9 @@ bool MRPerfusionView::CheckModelSettings() const
         ok = ok && (m_Controls.TRSpinBox->value() > 0);
         ok = ok && (m_Controls.RelaxivitySpinBox->value() > 0);
         ok = ok && (m_Controls.ComboT1Map->GetSelectedNode().IsNotNull());
-        ok = ok && (m_Controls.spinBox_baselineStartTimePoint->value() >= 1);
-        ok = ok && (m_Controls.spinBox_baselineStartTimePoint->value() <= m_Controls.spinBox_baselineEndTimePoint->value());
-        ok = ok && (m_Controls.spinBox_baselineEndTimePoint->value() <= this->m_selectedImage->GetDimension(3));
+        ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() >= 1);
+        ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() <= m_Controls.spinBox_baselineEndTimeStep->value());
+        ok = ok && (m_Controls.spinBox_baselineEndTimeStep->value() <= this->m_selectedImage->GetDimension(3));
       }
       else
       {
@@ -1194,8 +1194,8 @@ mitk::Image::Pointer MRPerfusionView::ConvertConcentrationImage(bool AIFMode)
 
     concentrationGen->SetRelaxationTime(m_Controls.relaxationtime->value());
     concentrationGen->SetRelaxivity(m_Controls.relaxivity->value());
-    concentrationGen->SetBaselineStartTimePoint(m_Controls.spinBox_baselineStartTimePoint->value());
-    concentrationGen->SetBaselineEndTimePoint(m_Controls.spinBox_baselineEndTimePoint->value());
+    concentrationGen->SetBaselineStartTimeStep(m_Controls.spinBox_baselineStartTimeStep->value());
+    concentrationGen->SetBaselineEndTimeStep(m_Controls.spinBox_baselineEndTimeStep->value());
 
   }
   else if (this->m_Controls.radioButtonUsingT1->isChecked())
@@ -1203,8 +1203,8 @@ mitk::Image::Pointer MRPerfusionView::ConvertConcentrationImage(bool AIFMode)
       concentrationGen->SetRecoveryTime(m_Controls.TRSpinBox->value());
       concentrationGen->SetRelaxivity(m_Controls.RelaxivitySpinBox->value());
       concentrationGen->SetT10Image(dynamic_cast<mitk::Image*>(m_Controls.ComboT1Map->GetSelectedNode()->GetData()));
-      concentrationGen->SetBaselineStartTimePoint(m_Controls.spinBox_baselineStartTimePoint->value());
-      concentrationGen->SetBaselineEndTimePoint(m_Controls.spinBox_baselineEndTimePoint->value());
+      concentrationGen->SetBaselineStartTimeStep(m_Controls.spinBox_baselineStartTimeStep->value());
+      concentrationGen->SetBaselineEndTimeStep(m_Controls.spinBox_baselineEndTimeStep->value());
       //Convert Flipangle from degree to radiant
       double alpha = m_Controls.FlipangleSpinBox->value()/360*2* boost::math::constants::pi<double>();
       concentrationGen->SetFlipAngle(alpha);
@@ -1212,8 +1212,8 @@ mitk::Image::Pointer MRPerfusionView::ConvertConcentrationImage(bool AIFMode)
   else
   {
     concentrationGen->SetFactor(m_Controls.factorSpinBox->value());
-    concentrationGen->SetBaselineStartTimePoint(m_Controls.spinBox_baselineStartTimePoint->value());
-    concentrationGen->SetBaselineEndTimePoint(m_Controls.spinBox_baselineEndTimePoint->value());
+    concentrationGen->SetBaselineStartTimeStep(m_Controls.spinBox_baselineStartTimeStep->value());
+    concentrationGen->SetBaselineEndTimeStep(m_Controls.spinBox_baselineEndTimeStep->value());
   }
 
 

@@ -84,7 +84,7 @@ void mitk::ConcentrationCurveGenerator::PrepareBaselineImage()
   mitk::Image::Pointer baselineImage;
   baselineImage = imageTimeSelector->GetOutput();
   
-  if (m_BaselineStartTimePoint == m_BaselineEndTimePoint)
+  if (m_BaselineStartTimeStep == m_BaselineEndTimeStep)
   {
     this->m_BaselineImage = imageTimeSelector->GetOutput();
   }
@@ -109,7 +109,7 @@ void mitk::ConcentrationCurveGenerator::CalculateAverageBaselineImage(const itk:
   {
     mitkThrow() << "Error in ConcentrationCurveGenerator::CalculateAverageBaselineImage. Input image is NULL.";
   }
-  if (m_BaselineStartTimePoint > m_BaselineEndTimePoint)
+  if (m_BaselineStartTimeStep > m_BaselineEndTimeStep)
   {
     mitkThrow() << "Error in ConcentrationCurveGenerator::CalculateAverageBaselineImage. End time point is before start time point.";
   }
@@ -130,14 +130,14 @@ void mitk::ConcentrationCurveGenerator::CalculateAverageBaselineImage(const itk:
   TPixelCastImageFilterType::Pointer TPixelCastImageFilter = TPixelCastImageFilterType::New();
   TPixel4DImageType::RegionType region_input = itkBaselineImage->GetLargestPossibleRegion();
 
-  if (m_BaselineEndTimePoint > region_input.GetSize()[3])
+  if (m_BaselineEndTimeStep > region_input.GetSize()[3])
   {
     mitkThrow() << "Error in ConcentrationCurveGenerator::CalculateAverageBaselineImage. End time point is larger than total number of time points.";
   }
 
   // add the selected baseline time frames to the nary add image filter
 
-  for (int i = m_BaselineStartTimePoint-1; i < m_BaselineEndTimePoint; ++i)
+  for (int i = m_BaselineStartTimeStep-1; i < m_BaselineEndTimeStep; ++i)
   {
     ExtractImageFilterType::Pointer ExtractFilter = ExtractImageFilterType::New();
     TPixel3DImageType::Pointer timePointImage = TPixel3DImageType::New();
@@ -161,7 +161,7 @@ void mitk::ConcentrationCurveGenerator::CalculateAverageBaselineImage(const itk:
       std::cerr << err << std::endl;
     }
     timePointImage = ExtractFilter->GetOutput();
-    AddBaselineImagesFilter->SetInput(i-(m_BaselineStartTimePoint-1), timePointImage);
+    AddBaselineImagesFilter->SetInput(i-(m_BaselineStartTimeStep-1), timePointImage);
   }
   try
   {
@@ -183,7 +183,7 @@ void mitk::ConcentrationCurveGenerator::CalculateAverageBaselineImage(const itk:
     std::cerr << err << std::endl;
   }
   multiplyImageFilter->SetInput(DoubleCastImageFilter->GetOutput());
-  double factor = 1.0/double(m_BaselineEndTimePoint-m_BaselineStartTimePoint+1);
+  double factor = 1.0/double(m_BaselineEndTimeStep-m_BaselineStartTimeStep+1);
   multiplyImageFilter->SetConstant(factor);
   try
   {

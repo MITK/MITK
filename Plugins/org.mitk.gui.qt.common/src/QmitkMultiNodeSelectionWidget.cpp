@@ -133,11 +133,25 @@ void QmitkMultiNodeSelectionWidget::UpdateInfo()
   {
     if (m_IsOptional)
     {
-      m_Overlay->SetOverlayText(m_EmptyInfo);
+      if (this->isEnabled())
+      {
+        m_Overlay->SetOverlayText(QStringLiteral("<font class=\"normal\">") + m_EmptyInfo + QStringLiteral("</font>"));
+      }
+      else
+      {
+        m_Overlay->SetOverlayText(QStringLiteral("<font class=\"disabled\">") + m_EmptyInfo + QStringLiteral("</font>"));
+      }
     }
     else
     {
-      m_Overlay->SetOverlayText(m_InvalidInfo);
+      if (this->isEnabled())
+      {
+        m_Overlay->SetOverlayText(QStringLiteral("<font class=\"warning\">") + m_InvalidInfo + QStringLiteral("</font>"));
+      }
+      else
+      {
+        m_Overlay->SetOverlayText(QStringLiteral("<font class=\"disabled\">") + m_InvalidInfo + QStringLiteral("</font>"));
+      }
     }
   }
   else
@@ -247,4 +261,13 @@ void QmitkMultiNodeSelectionWidget::NodeRemovedFromStorage(const mitk::DataNode*
   {
     this->OnClearSelection(node);
   }
+}
+
+void QmitkMultiNodeSelectionWidget::changeEvent(QEvent *event)
+{
+  if (event->type() == QEvent::EnabledChange)
+  {
+    this->UpdateInfo();
+  }
+  QmitkAbstractNodeSelectionWidget::changeEvent(event);
 }

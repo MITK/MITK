@@ -28,6 +28,10 @@ font.highlight {
   color: #d4821e;
 }
 
+font.disabled {
+  color: #656565;
+}
+
 QWidget {
   background-color: #2d2d30;
   border: none;

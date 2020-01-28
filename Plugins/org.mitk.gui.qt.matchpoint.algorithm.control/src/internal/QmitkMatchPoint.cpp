@@ -118,7 +118,7 @@ void QmitkMatchPoint::OnSelectedAlgorithmChanged()
 
   if (!currentItemInfo)
   {
-    Error(QString("No valid algorithm is selected. ABORTING."));
+    Error(QStringLiteral("No valid algorithm is selected. ABORTING."));
     return;
   }
 
@@ -138,7 +138,7 @@ void QmitkMatchPoint::OnLoadAlgorithmButtonPushed()
 
   if (!dllInfo)
   {
-    Error(QString("No valid algorithm is selected. Cannot load algorithm. ABORTING."));
+    Error(QStringLiteral("No valid algorithm is selected. Cannot load algorithm. ABORTING."));
     return;
   }
 
@@ -149,7 +149,7 @@ void QmitkMatchPoint::OnLoadAlgorithmButtonPushed()
 
   if (tempAlgorithm.IsNull())
   {
-    Error(QString("Error. Cannot load selected algorithm."));
+    Error(QStringLiteral("Error. Cannot load selected algorithm."));
     return;
   }
 
@@ -187,7 +187,7 @@ void QmitkMatchPoint::Error(QString msg)
   mitk::StatusBar::GetInstance()->DisplayErrorText(msg.toLatin1());
   MITK_ERROR << msg.toStdString().c_str();
 
-  m_Controls.m_teLog->append(QString("<font color='red'><b>") + msg + QString("</b></font>"));
+  m_Controls.m_teLog->append(QStringLiteral("<font color='red'><b>") + msg + QStringLiteral("</b></font>"));
 }
 
 void QmitkMatchPoint::AdaptFolderGUIElements()
@@ -275,7 +275,7 @@ bool QmitkMatchPoint::CheckInputs()
       {
         m_spSelectedMovingData = ExtractFirstFrame(movingImage).GetPointer();
         m_Controls.m_teLog->append(
-          QString("<font color='gray'><i>Selected moving image has multiple time steps. First time step is used as moving image.</i></font>"));
+          QStringLiteral("<font color='gray'><i>Selected moving image has multiple time steps. First time step is used as moving image.</i></font>"));
       }
     }
 
@@ -295,7 +295,7 @@ bool QmitkMatchPoint::CheckInputs()
       {
         m_spSelectedTargetData = ExtractFirstFrame(targetImage).GetPointer();
         m_Controls.m_teLog->append(
-          QString("<font color='gray'><i>Selected target image has multiple time steps. First time step is used as target image.</i></font>"));
+          QStringLiteral("<font color='gray'><i>Selected target image has multiple time steps. First time step is used as target image.</i></font>"));
       }
     }
 
@@ -316,7 +316,7 @@ bool QmitkMatchPoint::CheckInputs()
       {
         m_spSelectedMovingMaskData = ExtractFirstFrame(movingMaskImage).GetPointer();
         m_Controls.m_teLog->append(
-          QString("<font color='gray'><i>Selected moving mask has multiple time steps. First time step is used as moving mask.</i></font>"));
+          QStringLiteral("<font color='gray'><i>Selected moving mask has multiple time steps. First time step is used as moving mask.</i></font>"));
       }
     }
 
@@ -336,7 +336,7 @@ bool QmitkMatchPoint::CheckInputs()
       {
         m_spSelectedTargetMaskData = ExtractFirstFrame(targetMaskImage).GetPointer();
         m_Controls.m_teLog->append(
-          QString("<font color='gray'><i>Selected target mask has multiple time steps. First time step is used as target mask.</i></font>"));
+          QStringLiteral("<font color='gray'><i>Selected target mask has multiple time steps. First time step is used as target mask.</i></font>"));
       }
     }
 
@@ -456,7 +456,7 @@ void QmitkMatchPoint::ConfigureRegistrationControls()
     m_Controls.m_tabSettings->setEnabled(false);
     m_Controls.m_tabExecution->setEnabled(false);
     this->m_Controls.m_lbLoadedAlgorithmName->setText(
-      QString("<font color='red'>no algorithm loaded!</font>"));
+      QStringLiteral("<font color='red'>no algorithm loaded!</font>"));
     m_Controls.groupMasks->setVisible(false);
   }
 
@@ -749,7 +749,7 @@ void QmitkMatchPoint::OnRegResultIsAvailable(mitk::MAPRegistrationWrapper::Point
   if (pRegJob->m_StoreReg)
   {
     m_Controls.m_teLog->append(
-      QString("<b><font color='blue'> Storing registration object in data manager ... </font></b>"));
+      QStringLiteral("<b><font color='blue'> Storing registration object in data manager ... </font></b>"));
 
     this->GetDataStorage()->Add(spResultRegistrationNode);
     this->GetRenderWindowPart()->RequestUpdate();
@@ -781,7 +781,7 @@ void QmitkMatchPoint::OnRegResultIsAvailable(mitk::MAPRegistrationWrapper::Point
     connect(pMapJob, SIGNAL(AlgorithmInfo(QString)), this, SLOT(OnAlgorithmInfo(QString)));
 
     m_Controls.m_teLog->append(
-      QString("<b><font color='blue'>Started mapping input data...</font></b>"));
+      QStringLiteral("<b><font color='blue'>Started mapping input data...</font></b>"));
 
     QThreadPool* threadPool = QThreadPool::globalInstance();
     threadPool->start(pMapJob);
@@ -796,8 +796,8 @@ void QmitkMatchPoint::OnMapJobError(QString err)
 void QmitkMatchPoint::OnMapResultIsAvailable(mitk::BaseData::Pointer spMappedData,
     const QmitkMappingJob* job)
 {
-  m_Controls.m_teLog->append(QString("<b><font color='blue'>Mapped entity stored. Name: ") +
-                             QString::fromStdString(job->m_MappedName) + QString("</font></b>"));
+  m_Controls.m_teLog->append(QStringLiteral("<b><font color='blue'>Mapped entity stored. Name: ") +
+                             QString::fromStdString(job->m_MappedName) + QStringLiteral("</font></b>"));
 
   mitk::DataNode::Pointer spMappedNode = mitk::generateMappedResultNode(job->m_MappedName,
                                          spMappedData, job->GetRegistration()->getRegistrationUID(), job->m_InputDataUID,
@@ -824,17 +824,17 @@ void QmitkMatchPoint::OnLevelChanged(QString info, bool hasLevelCount, unsigned 
     m_Controls.m_progBarLevel->setValue(currentLevel);
   }
 
-  m_Controls.m_teLog->append(QString("<b><font color='green'>") + info + QString("</font></b>"));
+  m_Controls.m_teLog->append(QStringLiteral("<b><font color='green'>") + info + QStringLiteral("</font></b>"));
 }
 
 void QmitkMatchPoint::OnAlgorithmStatusChanged(QString info)
 {
-  m_Controls.m_teLog->append(QString("<b><font color='blue'>") + info + QString(" </font></b>"));
+  m_Controls.m_teLog->append(QStringLiteral("<b><font color='blue'>") + info + QStringLiteral(" </font></b>"));
 }
 
 void QmitkMatchPoint::OnAlgorithmInfo(QString info)
 {
-  m_Controls.m_teLog->append(QString("<font color='gray'><i>") + info + QString("</i></font>"));
+  m_Controls.m_teLog->append(QStringLiteral("<font color='gray'><i>") + info + QStringLiteral("</i></font>"));
 }
 
 void QmitkMatchPoint::OnAlgorithmSelectionChanged(const berry::IWorkbenchPart::Pointer& sourcepart,

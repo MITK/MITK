@@ -387,7 +387,7 @@
          <property name="geometry">
           <rect>
            <x>0</x>
-           <y>0</y>
+           <y>-108</y>
            <width>516</width>
            <height>452</height>
           </rect>
@@ -503,7 +503,7 @@
               <item>
                <widget class="QLabel" name="label_baselineStartTimeStep">
                 <property name="text">
-                 <string>Start Time Point</string>
+                 <string>Start Time Frame</string>
                 </property>
                </widget>
               </item>
@@ -513,7 +513,7 @@
               <item>
                <widget class="QLabel" name="label_baselineEndTimeStep">
                 <property name="text">
-                 <string>End Time Point</string>
+                 <string>End Time Frame</string>
                 </property>
                </widget>
               </item>

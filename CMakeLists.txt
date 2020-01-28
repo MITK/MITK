@@ -476,12 +476,22 @@ list(APPEND CTEST_PROJECT_SUBPROJECTS
   MITK-CoreUI
   MITK-IGT
   MITK-ToF
-  MITK-Diffusion
   MITK-Modules # all modules not contained in a specific subproject
   MITK-Plugins # all plugins not contained in a specific subproject
   MITK-Examples
   Unlabeled # special "subproject" catching all unlabeled targets and tests
   )
+
+foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
+  get_filename_component(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIR} ABSOLUTE)
+  if(EXISTS ${MITK_CMAKE_EXTENSION_DIR}/CMake/CTestSubprojectList.cmake)
+    set(MITK_CTEST_SUBPROJECTS "")
+    include(${MITK_CMAKE_EXTENSION_DIR}/CMake/CTestSubprojectList.cmake)
+    if(MITK_CTEST_SUBPROJECTS)
+      list(APPEND CTEST_PROJECT_SUBPROJECTS ${MITK_CTEST_SUBPROJECTS})
+    endif()
+  endif()
+endforeach()
 
 # Configure CTestConfigSubProject.cmake that could be used by CTest scripts
 configure_file(${MITK_SOURCE_DIR}/CTestConfigSubProject.cmake.in

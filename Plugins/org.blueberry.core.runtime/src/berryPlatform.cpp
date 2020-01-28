@@ -60,9 +60,6 @@ const QString Platform::PROP_APPLICATION = "BlueBerry.application";
 const QString Platform::PROP_PLUGIN_DIRS = "BlueBerry.plugin_dirs";
 const QString Platform::PROP_FORCE_PLUGIN_INSTALL = "BlueBerry.forcePlugins";
 
-const QString Platform::PROP_TESTPLUGIN = "BlueBerry.testplugin";
-const QString Platform::PROP_TESTAPPLICATION = "BlueBerry.testapplication";
-
 const QString Platform::PROP_IGNOREAPP = "BlueBerry.ignoreApp";
 
 const QString Platform::PROP_XARGS = "xargs";

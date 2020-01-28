@@ -22,18 +22,10 @@ namespace mitk {
   class MITKDATACOLLECTION_EXPORT CollectionWriter
   {
   public:
-
-    typedef float TensorScalar;
     /**
     * @brief ExportCollectionToFolder
     *
     * Creates an XML file and stores all data in the same folder as the xml file (creating sub-folders for sub-collections)
-    *
-    *
-    * Naming Conventions (Neccessary for proper saving of these images):
-    * DWI - Diffusion Weighted Images
-    * DTI - Diffusion Tensor Images
-    * FIB - Fiber Bundles
     *
     * @param dataCollection
     * @param xmlFile

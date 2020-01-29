@@ -95,6 +95,7 @@ void QmitkDataStorageViewerTestView::CreateQtPartControl(QWidget* parent)
 
   connect(m_Controls.checkOnlyVisible, SIGNAL(toggled(bool)), m_Controls.singleSlot, SLOT(SetSelectOnlyVisibleNodes(bool)));
   connect(m_Controls.checkOptional, SIGNAL(toggled(bool)), m_Controls.singleSlot, SLOT(SetSelectionIsOptional(bool)));
+  connect(m_Controls.checkAuto, SIGNAL(toggled(bool)), m_Controls.singleSlot, SLOT(SetAutoSelectNewNodes(bool)));
   connect(m_Controls.checkOnlyImages, SIGNAL(toggled(bool)), this, SLOT(OnOnlyImages(bool)));
   connect(m_Controls.checkEnabled, SIGNAL(toggled(bool)), m_Controls.singleSlot, SLOT(setEnabled(bool)));
 

@@ -134,6 +134,13 @@ protected:
   /**Member is called if the data storage has changed. Thus the selection might change to.*/
   virtual void OnDataStorageChanged() = 0;
 
+  /**Member is called when a node is added to the storage. Default implementation does nothing.
+   Derived widgets can override the method if they want to react on new nodes in the storage.*/
+  virtual void NodeAddedToStorage(const mitk::DataNode* node);
+
+  /**Member is called when a node is removed from the storage. The removed node is passed as
+   variable. Derived classes have to implement this method to react on the fact that there selection
+   might change, because the removed node is part of there selection. */
   virtual void NodeRemovedFromStorage(const mitk::DataNode* node) = 0;
 
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
@@ -144,7 +151,9 @@ protected:
   QString m_PopUpTitel;
   QString m_PopUpHint;
 
+  /** See documentation of SetSelectOnlyVisibleNodes for details*/
   bool m_IsOptional;
+  /** See documentation of SetSelectionIsOptional for details*/
   bool m_SelectOnlyVisibleNodes;
 
 private:

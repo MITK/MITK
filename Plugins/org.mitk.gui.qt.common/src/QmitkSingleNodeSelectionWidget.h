@@ -29,7 +29,7 @@ class QmitkAbstractDataStorageModel;
 
 /**
 * \class QmitkSingleNodeSelectionWidget
-* \brief Widget that represents a node selection. It acts like a button. Clicking on it
+* \brief Widget that represents a node selection of (max) one node. It acts like a button. Clicking on it
 * allows to change the selection.
 */
 class MITK_QT_COMMON QmitkSingleNodeSelectionWidget : public QmitkAbstractNodeSelectionWidget
@@ -41,12 +41,21 @@ public:
   ~QmitkSingleNodeSelectionWidget() override;
 
   mitk::DataNode::Pointer GetSelectedNode() const;
+  bool GetAutoSelectNewNodes() const;
 
   using NodeList = QmitkAbstractNodeSelectionWidget::NodeList;
 
 public Q_SLOTS:
   void SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes) override;
   void SetCurrentSelection(NodeList selectedNodes) override;
+
+  /** Sets the auto selection mode (Default is false).
+  If auto select is true and the following conditions are fullfilled, the widget will
+  select a node automatically from the data storage:
+  - a data storage is set
+  - data storage contains at least one node that matches the given predicate
+  - no selection is set.*/
+  void SetAutoSelectNewNodes(bool autoSelect);
 
 protected Q_SLOTS:
   virtual void OnClearSelection();
@@ -61,10 +70,16 @@ protected:
 
   void OnNodePredicateChanged(const mitk::NodePredicateBase* newPredicate) override;
   void OnDataStorageChanged() override;
+  void NodeAddedToStorage(const mitk::DataNode* node) override;
   void NodeRemovedFromStorage(const mitk::DataNode* node) override;
+
+  void DoAutoSelectIfNeeded();
+  void EmitAndUpdateIfNeeded(const NodeList& lastEmission);
 
   NodeList m_ExternalSelection;
   mitk::DataNode::Pointer m_SelectedNode;
+  /** See documentation of SetAutoSelectNewNodes for details*/
+  bool m_AutoSelectNewNodes;
 
   Ui_QmitkSingleNodeSelectionWidget m_Controls;
 };

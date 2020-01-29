@@ -28,7 +28,11 @@ QmitkAbstractNodeSelectionWidget::~QmitkAbstractNodeSelectionWidget()
     // remove Listener for the data storage itself
     dataStorage->RemoveObserver(m_DataStorageDeletedTag);
 
-    // remove listener from data storage
+    // remove "add node listener" from data storage
+    dataStorage->AddNodeEvent.RemoveListener(
+      mitk::MessageDelegate1<QmitkAbstractNodeSelectionWidget, const mitk::DataNode*>(this, &QmitkAbstractNodeSelectionWidget::NodeAddedToStorage));
+
+    // remove "remove node listener" from data storage
     dataStorage->RemoveNodeEvent.RemoveListener(
       mitk::MessageDelegate1<QmitkAbstractNodeSelectionWidget, const mitk::DataNode*>(this, &QmitkAbstractNodeSelectionWidget::NodeRemovedFromStorage));
   }
@@ -49,7 +53,11 @@ void QmitkAbstractNodeSelectionWidget::SetDataStorage(mitk::DataStorage* dataSto
     // remove Listener for the data storage itself
     oldStorage->RemoveObserver(m_DataStorageDeletedTag);
 
-    // remove listener from old data storage
+    // remove "add node listener" from old data storage
+    oldStorage->AddNodeEvent.RemoveListener(
+      mitk::MessageDelegate1<QmitkAbstractNodeSelectionWidget, const mitk::DataNode*>(this, &QmitkAbstractNodeSelectionWidget::NodeAddedToStorage));
+
+    // remove "remove node listener" from old data storage
     oldStorage->RemoveNodeEvent.RemoveListener(
       mitk::MessageDelegate1<QmitkAbstractNodeSelectionWidget, const mitk::DataNode*>(this, &QmitkAbstractNodeSelectionWidget::NodeRemovedFromStorage));
   }
@@ -65,7 +73,11 @@ void QmitkAbstractNodeSelectionWidget::SetDataStorage(mitk::DataStorage* dataSto
     command->SetCallbackFunction(this, &QmitkAbstractNodeSelectionWidget::SetDataStorageDeleted);
     m_DataStorageDeletedTag = newStorage->AddObserver(itk::DeleteEvent(), command);
 
-    // add listener for new data storage
+    // add "add node listener" for new data storage
+    newStorage->AddNodeEvent.AddListener(
+      mitk::MessageDelegate1<QmitkAbstractNodeSelectionWidget, const mitk::DataNode*>(this, &QmitkAbstractNodeSelectionWidget::NodeAddedToStorage));
+
+    // add remove node listener for new data storage
     newStorage->RemoveNodeEvent.AddListener(
       mitk::MessageDelegate1<QmitkAbstractNodeSelectionWidget, const mitk::DataNode*>(this, &QmitkAbstractNodeSelectionWidget::NodeRemovedFromStorage));
   }
@@ -158,4 +170,9 @@ void QmitkAbstractNodeSelectionWidget::SetSelectionIsOptional(bool isOptional)
 void QmitkAbstractNodeSelectionWidget::SetDataStorageDeleted()
 {
   this->SetDataStorage(nullptr);
+}
+
+void QmitkAbstractNodeSelectionWidget::NodeAddedToStorage(const mitk::DataNode* node)
+{
+  //default implementation does nothing;
 }

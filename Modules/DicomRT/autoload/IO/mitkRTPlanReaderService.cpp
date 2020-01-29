@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include "mitkIOMimeTypes.h"
 #include <mitkDICOMIOHelper.h>
 #include "mitkDICOMTagPath.h"
-#include "mitkDICOMTagsOfInterestService.h"
+#include "mitkIDICOMTagsOfInterest.h"
 #include "mitkDICOMDatasetAccessingImageFrameInfo.h"
 #include "mitkDicomRTIOMimeTypes.h"
 

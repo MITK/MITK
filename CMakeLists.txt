@@ -205,6 +205,11 @@ mark_as_advanced(
 )
 
 # -----------------------------------------
+# Other options
+set(MITK_CUSTOM_REVISION_DESC "" CACHE STRING "Override MITK revision description")
+mark_as_advanced(MITK_CUSTOM_REVISION_DESC)
+
+# -----------------------------------------
 # Qt version related variables
 
 option(MITK_USE_Qt5 "Use Qt 5 library" ON)

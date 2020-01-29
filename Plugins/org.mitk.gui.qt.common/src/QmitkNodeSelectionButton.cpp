@@ -96,12 +96,55 @@ QPixmap GetPixmapFromImageNode(const mitk::DataNode* dataNode, int height)
 }
 
 QmitkNodeSelectionButton::QmitkNodeSelectionButton(QWidget *parent)
-  : QPushButton(parent), m_OutDatedThumpNail(true), m_IsOptional(true)
+  : QPushButton(parent), m_OutDatedThumpNail(true), m_IsOptional(true), m_NodeModifiedObserverTag(0), m_NodeObserved(false)
 { }
 
 QmitkNodeSelectionButton::~QmitkNodeSelectionButton()
 {
+  this->RemoveNodeObserver();
   this->m_SelectedNode = nullptr;
+}
+
+void QmitkNodeSelectionButton::AddNodeObserver()
+{
+  if (this->m_SelectedNode.IsNotNull())
+  {
+    if (m_NodeObserved)
+    {
+      MITK_DEBUG << "Invalid observer state in QmitkNodeSelectionButton. There is already a registered observer. Internal logic is not correct. May be an old observer was not removed.";
+    }
+
+    auto modifiedCommand = itk::MemberCommand<QmitkNodeSelectionButton>::New();
+    modifiedCommand->SetCallbackFunction(this, &QmitkNodeSelectionButton::OnNodeModified);
+
+    // const cast because we need non const nodes and it seems to be the lesser of two evil.
+    // the changes to the node are only on the observer level. The other option would be to
+    // make the public interface require non const nodes, this we don't want to introduce.
+    auto nonconst_node = const_cast<mitk::DataNode*>(this->m_SelectedNode.GetPointer());
+    m_NodeModifiedObserverTag = nonconst_node->AddObserver(itk::ModifiedEvent(), modifiedCommand);
+    m_NodeObserved = true;
+  }
+}
+
+void QmitkNodeSelectionButton::RemoveNodeObserver()
+{
+  if (this->m_SelectedNode.IsNotNull())
+  {
+    // const cast because we need non const nodes and it seems to be the lesser of two evil.
+    // the changes to the node are only on the observer level. The other option would be to
+    // make the public interface require non const nodes, this we don't want to introduce.
+    auto nonconst_node = const_cast<mitk::DataNode*>(this->m_SelectedNode.GetPointer());
+    nonconst_node->RemoveObserver(m_NodeModifiedObserverTag);
+  }
+  m_NodeObserved = false;
+}
+
+void QmitkNodeSelectionButton::OnNodeModified(const itk::Object * /*caller*/, const itk::EventObject & event)
+{
+  if (itk::ModifiedEvent().CheckEvent(&event))
+  {
+    this->repaint();
+  }
 }
 
 const mitk::DataNode* QmitkNodeSelectionButton::GetSelectedNode() const
@@ -113,8 +156,10 @@ void QmitkNodeSelectionButton::SetSelectedNode(const mitk::DataNode* node)
 {
   if (m_SelectedNode != node)
   {
+    this->RemoveNodeObserver();
     this->m_SelectedNode = node;
     this->m_OutDatedThumpNail = true;
+    this->AddNodeObserver();
   }
 
   this->update();

@@ -52,11 +52,19 @@ protected:
   void paintEvent(QPaintEvent *p) override;
   void changeEvent(QEvent *event) override;
 
+  void AddNodeObserver();
+  void RemoveNodeObserver();
+  void OnNodeModified(const itk::Object * /*caller*/, const itk::EventObject &);
+
   mitk::DataNode::ConstPointer m_SelectedNode;
   QString m_Info;
   bool m_OutDatedThumpNail;
   QPixmap m_ThumpNail;
+
   bool m_IsOptional;
+
+  unsigned long m_NodeModifiedObserverTag;
+  bool m_NodeObserved;
 };
 
 

@@ -172,7 +172,7 @@ void QmitkAbstractNodeSelectionWidget::SetDataStorageDeleted()
   this->SetDataStorage(nullptr);
 }
 
-void QmitkAbstractNodeSelectionWidget::NodeAddedToStorage(const mitk::DataNode* node)
+void QmitkAbstractNodeSelectionWidget::NodeAddedToStorage(const mitk::DataNode* /*node*/)
 {
   //default implementation does nothing;
 }

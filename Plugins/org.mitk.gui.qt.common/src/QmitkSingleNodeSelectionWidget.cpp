@@ -297,7 +297,7 @@ void QmitkSingleNodeSelectionWidget::SetCurrentSelection(NodeList selectedNodes)
   this->EmitAndUpdateIfNeeded(lastEmission);
 };
 
-void QmitkSingleNodeSelectionWidget::NodeAddedToStorage(const mitk::DataNode* node)
+void QmitkSingleNodeSelectionWidget::NodeAddedToStorage(const mitk::DataNode* /*node*/)
 {
   if (m_SelectedNode.IsNull() && m_AutoSelectNewNodes && !m_DataStorage.IsExpired())
   {

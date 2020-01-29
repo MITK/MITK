@@ -19,6 +19,7 @@ found in the LICENSE file.
 
 #include "QPainter"
 #include "QTextDocument"
+#include "QEvent"
 
 #include <mitkDataNode.h>
 #include <QmitkNodeDescriptorManager.h>
@@ -95,7 +96,7 @@ QPixmap GetPixmapFromImageNode(const mitk::DataNode* dataNode, int height)
 }
 
 QmitkNodeSelectionButton::QmitkNodeSelectionButton(QWidget *parent)
-  : QPushButton(parent), m_OutDatedThumpNail(true), m_NodeModifiedObserverTag(0), m_NodeObserved(false)
+  : QPushButton(parent), m_OutDatedThumpNail(true), m_IsOptional(true), m_NodeModifiedObserverTag(0), m_NodeObserved(false)
 { }
 
 QmitkNodeSelectionButton::~QmitkNodeSelectionButton()
@@ -205,11 +206,32 @@ void QmitkNodeSelectionButton::paintEvent(QPaintEvent *p)
     painter.drawPixmap(origin, m_ThumpNail);
     origin.setX(origin.x() + iconLength + 5);
 
-    td.setHtml(QString::fromStdString("<font class=\"normal\">"+node->GetName()+"</font>"));
+    if (this->isEnabled())
+    {
+      td.setHtml(QString::fromStdString("<font class=\"normal\">" + node->GetName() + "</font>"));
+    }
+    else
+    {
+      td.setHtml(QString::fromStdString("<font class=\"disabled\">" + node->GetName() + "</font>"));
+    }
   }
   else
   {
-    td.setHtml(m_Info);
+    if (this->isEnabled())
+    {
+      if (this->m_IsOptional)
+      {
+        td.setHtml(QString("<font class=\"normal\">") + m_Info + QString("</font>"));
+      }
+      else
+      {
+        td.setHtml(QString("<font class=\"warning\">") + m_Info + QString("</font>"));
+      }
+    }
+    else
+    {
+      td.setHtml(QString("<font class=\"disabled\">") + m_Info + QString("</font>"));
+    }
   }
 
   auto textSize = td.size();
@@ -219,4 +241,23 @@ void QmitkNodeSelectionButton::paintEvent(QPaintEvent *p)
   painter.translate(origin);
   td.drawContents(&painter);
 
+}
+
+void QmitkNodeSelectionButton::changeEvent(QEvent *event)
+{
+  if (event->type() == QEvent::EnabledChange)
+  {
+    this->repaint();
+  }
+}
+
+bool QmitkNodeSelectionButton::GetSelectionIsOptional() const
+{
+  return m_IsOptional;
+}
+
+void QmitkNodeSelectionButton::SetSelectionIsOptional(bool isOptional)
+{
+  m_IsOptional = isOptional;
+  this->repaint();
 }

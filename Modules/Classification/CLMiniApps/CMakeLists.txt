@@ -102,12 +102,10 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
       endif()
     endforeach()
 
-  # This mini app does not depend on mitkDiffusionImaging at all
-
   mitk_create_executable(CLMatchPointReg
     DEPENDS MitkCore MitkCLUtilities MitkMatchPointRegistration MitkCommandLine MitkMatchPointRegistrationUI
     PACKAGE_DEPENDS ITK Qt5|Core Vigra MatchPoint
-    CPP_FILES CLMatchPointReg.cpp 
+    CPP_FILES CLMatchPointReg.cpp
   )
 
         # On Linux, create a shell script to start a relocatable application

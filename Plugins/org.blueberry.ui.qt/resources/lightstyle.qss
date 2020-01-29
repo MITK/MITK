@@ -16,6 +16,10 @@ font.highlight {
   color: #2067bd;
 }
 
+font.disabled {
+  color: #808080;
+}
+
 berry--QCTabBar::tab {
     background: palette(window);
     min-height: 24px;

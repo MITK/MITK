@@ -181,19 +181,24 @@ std::string GenerateNameFromDICOMProperties(const mitk::IPropertyProvider* provi
 {
   std::string nodeName = mitk::DataNode::NO_NAME_VALUE();
 
-  auto studyProp = provider->GetConstProperty(mitk::GeneratePropertyNameForDICOMTag(0x0020, 0x000D).c_str());
+  auto studyProp = provider->GetConstProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x1030).c_str());
   if (studyProp.IsNotNull())
   {
     nodeName = studyProp->GetValueAsString();
   }
 
-  auto seriesProp = provider->GetConstProperty(mitk::GeneratePropertyNameForDICOMTag(0x0020, 0x000E).c_str());
+  auto seriesProp = provider->GetConstProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x103E).c_str());
 
   if (seriesProp.IsNotNull())
   {
     if (studyProp.IsNotNull())
     {
       nodeName += " / ";
+    }
+    else
+    {
+      nodeName = "";
+
     }
     nodeName += seriesProp->GetValueAsString();
   }

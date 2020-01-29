@@ -66,6 +66,8 @@ protected Q_SLOTS:
 protected:
   NodeList CompileEmitSelection() const;
 
+  void changeEvent(QEvent *event) override;
+
   void UpdateInfo() override;
   virtual void UpdateList();
 

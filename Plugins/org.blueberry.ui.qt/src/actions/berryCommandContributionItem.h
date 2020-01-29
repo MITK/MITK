@@ -35,9 +35,8 @@ class CommandContributionItemParameter;
 class UIElement;
 
 /**
- * A contribution item which delegates to a command. It can be used in {@link
- * AbstractContributionFactory#CreateContributionItems(IServiceLocator,
- * IContributionRoot)}.
+ * A contribution item which delegates to a command. It can be used in
+ * berry::AbstractContributionFactory::CreateContributionItems().
  * <p>
  * It currently supports placement in menus and toolbars.
  * </p>

@@ -75,7 +75,7 @@ void QmitkMatchPointMapper::Error(QString msg)
     mitk::StatusBar::GetInstance()->DisplayErrorText(msg.toLatin1());
     MITK_ERROR << msg.toStdString().c_str();
 
-    m_Controls.m_teLog->append(QString("<font color='red'><b>") + msg + QString("</b></font>"));
+    m_Controls.m_teLog->append(QStringLiteral("<font color='red'><b>") + msg + QStringLiteral("</b></font>"));
 }
 
 void QmitkMatchPointMapper::CreateQtPartControl(QWidget* parent)
@@ -190,7 +190,7 @@ mitk::DataNode::Pointer QmitkMatchPointMapper::GetAutoRefNodeByReg()
         if (this->m_spSelectedRefNode != spResult)
         {
           m_Controls.m_teLog->append(
-            QString("<font color='gray'><i>Cannot determine reference automatically. Use input image as reference.</i></font>"));
+            QStringLiteral("<font color='gray'><i>Cannot determine reference automatically. Use input image as reference.</i></font>"));
         }
     }
 
@@ -323,7 +323,7 @@ void QmitkMatchPointMapper::CheckInputs()
         && this->m_spSelectedRefNode->GetData()->GetTimeSteps() > 1)
     {
         m_Controls.m_teLog->append(
-            QString("<font color='gray'><i>Selected reference image has multiple time steps. Only geometry of time step 1 is used as reference.</i></font>"));
+          QStringLiteral("<font color='gray'><i>Selected reference image has multiple time steps. Only geometry of time step 1 is used as reference.</i></font>"));
     }
 }
 
@@ -353,7 +353,7 @@ void QmitkMatchPointMapper::ConfigureMappingControls()
         if (this->IsBinaryInput())
         {
             m_Controls.m_teLog->append(
-                QString("<font color='gray'><i>Binary input (mask) detected. Preparing for mask mapping (default interpolation: nearest neigbour; padding value: 0)</i></font>"));
+              QStringLiteral("<font color='gray'><i>Binary input (mask) detected. Preparing for mask mapping (default interpolation: nearest neigbour; padding value: 0)</i></font>"));
 
             this->m_Controls.m_comboInterpolator->setCurrentIndex(0);
             this->m_Controls.m_sbErrorValue->setValue(0);
@@ -459,7 +459,7 @@ void QmitkMatchPointMapper::SpawnMappingJob(bool doGeometryRefinement)
         pJob->m_spRegNode->SetData(mitk::GenerateIdentityRegistration3D().GetPointer());
         pJob->m_spRegNode->SetName("Auto_Generated_Identity_Transform");
         m_Controls.m_teLog->append(
-            QString("<font color='gray'><i>No registration selected. Preforming mapping with identity transform</i></font>"));
+          QStringLiteral("<font color='gray'><i>No registration selected. Preforming mapping with identity transform</i></font>"));
     }
 
     if (!doGeometryRefinement)
@@ -537,8 +537,8 @@ void QmitkMatchPointMapper::SpawnMappingJob(bool doGeometryRefinement)
         Qt::BlockingQueuedConnection);
     connect(pJob, SIGNAL(AlgorithmInfo(QString)), this, SLOT(OnMappingInfo(QString)));
 
-    m_Controls.m_teLog->append(QString("<b><font color='blue'>Started mapping job. Name: ") +
-        m_Controls.m_leMappedName->text() + QString("</font></b>"));
+    m_Controls.m_teLog->append(QStringLiteral("<b><font color='blue'>Started mapping job. Name: ") +
+        m_Controls.m_leMappedName->text() + QStringLiteral("</font></b>"));
 
     QThreadPool* threadPool = QThreadPool::globalInstance();
     threadPool->start(pJob);
@@ -554,8 +554,8 @@ void QmitkMatchPointMapper::OnMapJobError(QString err)
 void QmitkMatchPointMapper::OnMapResultIsAvailable(mitk::BaseData::Pointer spMappedData,
     const QmitkMappingJob* job)
 {
-    m_Controls.m_teLog->append(QString("<b><font color='blue'>Mapped entity stored. Name: ") +
-        QString::fromStdString(job->m_MappedName) + QString("</font></b>"));
+    m_Controls.m_teLog->append(QStringLiteral("<b><font color='blue'>Mapped entity stored. Name: ") +
+        QString::fromStdString(job->m_MappedName) + QStringLiteral("</font></b>"));
 
     mitk::DataNode::Pointer spMappedNode = mitk::generateMappedResultNode(job->m_MappedName,
         spMappedData, job->GetRegistration()->getRegistrationUID(), job->m_InputDataUID,
@@ -569,7 +569,7 @@ void QmitkMatchPointMapper::OnMapResultIsAvailable(mitk::BaseData::Pointer spMap
 
 void QmitkMatchPointMapper::OnMappingInfo(QString info)
 {
-    m_Controls.m_teLog->append(QString("<font color='gray'><i>") + info + QString("</i></font>"));
+    m_Controls.m_teLog->append(QStringLiteral("<font color='gray'><i>") + info + QStringLiteral("</i></font>"));
 }
 
 void QmitkMatchPointMapper::OnXFactorChanged(double d)

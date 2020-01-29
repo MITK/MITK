@@ -39,7 +39,7 @@ Download
 
 The MITK source code and binaries for the *MitkWorkbench* application are released regularly according to the [MITK release cycle][release-cycle]. See the [Download][download] page for a list of releases.
 
-The official MITK source code is available in the [MITK Git repository][diffusion]. The Git clone command is
+The official MITK source code is available in the [MITK Git repository][phab_repo]. The Git clone command is
 
     git clone https://phabricator.mitk.org/source/mitk.git MITK
 
@@ -85,7 +85,7 @@ Useful Links
 [license]: https://github.com/MITK/MITK/blob/master/LICENSE
 [release-cycle]: http://mitk.org/MitkReleaseCycle
 [download]: http://mitk.org/Download
-[diffusion]: https://phabricator.mitk.org/source/mitk/
+[phab_repo]: https://phabricator.mitk.org/source/mitk/
 [contribute]: http://mitk.org/How_to_contribute
 [cmake]: https://www.cmake.org
 [build]: http://docs.mitk.org/nightly/BuildInstructionsPage.html

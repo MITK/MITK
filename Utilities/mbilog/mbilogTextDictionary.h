@@ -115,8 +115,6 @@ namespace mbilog
                                   "image",
                                   "img",
 
-                                  "diffusion",
-                                  "dif",
                                   "registration",
                                   "reg",
                                   "navigation",
@@ -275,7 +273,6 @@ namespace mbilog
                                   "threshold",
                                   "tsh",
 
-                                  //   "shapebased",         "shp",
                                   "based",
                                   "bsd",
                                   "shape",

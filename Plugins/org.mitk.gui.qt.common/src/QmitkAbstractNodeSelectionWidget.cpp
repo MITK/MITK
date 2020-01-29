@@ -13,8 +13,8 @@ found in the LICENSE file.
 
 #include "QmitkAbstractNodeSelectionWidget.h"
 
-QmitkAbstractNodeSelectionWidget::QmitkAbstractNodeSelectionWidget(QWidget* parent) : QWidget(parent), m_InvalidInfo("<font class=\"warning\">Error. Select data.</font>"),
-m_EmptyInfo("<font class=\"normal\">Empty. Make a selection.</font>"), m_PopUpTitel("Select a data node"), m_PopUpHint(""),
+QmitkAbstractNodeSelectionWidget::QmitkAbstractNodeSelectionWidget(QWidget* parent) : QWidget(parent), m_InvalidInfo("Error. Select data."),
+m_EmptyInfo("Empty. Make a selection."), m_PopUpTitel("Select a data node"), m_PopUpHint(""),
 m_IsOptional(false), m_SelectOnlyVisibleNodes(true)
 {
 }
@@ -129,13 +129,13 @@ void QmitkAbstractNodeSelectionWidget::SetSelectOnlyVisibleNodes(bool selectOnly
 
 void QmitkAbstractNodeSelectionWidget::SetInvalidInfo(QString info)
 {
-  m_InvalidInfo = QString("<font class=\"warning\">")+info+QString("</font>");
+  m_InvalidInfo = info;
   this->UpdateInfo();
 }
 
 void QmitkAbstractNodeSelectionWidget::SetEmptyInfo(QString info)
 {
-  m_EmptyInfo = QString("<font class=\"normal\">")+info+QString("</font>");
+  m_EmptyInfo = info;
   this->UpdateInfo();
 }
 

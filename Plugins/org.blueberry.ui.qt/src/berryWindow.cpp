@@ -359,6 +359,15 @@ QRect Window::GetConstrainedShellBounds(const QRect& preferredSize)
   int screenNum = guiTweaklet->GetClosestScreenNumber(result);
   QRect bounds(guiTweaklet->GetAvailableScreenSize(screenNum));
 
+  int titleBarHeight = shell->GetTitleBarHeight();
+  
+  bounds.setTop(bounds.y() + titleBarHeight);
+
+  result.setLeft(std::max<int>(bounds.x(), std::min<int>(result.x(), bounds.x()
+    + bounds.width() - result.width())));
+  result.setTop(std::max<int>(bounds.y(), std::min<int>(result.y(), bounds.y()
+    + bounds.height() - result.height())));
+
   if (result.height() > bounds.height()) {
     result.setHeight(bounds.height());
   }
@@ -366,11 +375,6 @@ QRect Window::GetConstrainedShellBounds(const QRect& preferredSize)
   if (result.width() > bounds.width()) {
     result.setWidth(bounds.width());
   }
-
-  result.moveLeft( std::max<int>(bounds.x(), std::min<int>(result.x(), bounds.x()
-    + bounds.width() - result.width())));
-  result.moveTop(std::max<int>(bounds.y(), std::min<int>(result.y(), bounds.y()
-    + bounds.height() - result.height())));
 
   return result;
 }

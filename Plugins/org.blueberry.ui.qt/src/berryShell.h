@@ -138,6 +138,7 @@ public:
 
   virtual void SetBounds(const QRect& bounds) = 0;
   virtual QRect GetBounds() const = 0;
+  virtual int GetTitleBarHeight() const = 0;
 
   virtual void SetLocation(int x, int y) = 0;
 

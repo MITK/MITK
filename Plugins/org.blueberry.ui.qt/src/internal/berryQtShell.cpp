@@ -68,6 +68,11 @@ QRect QtShell::GetBounds() const
   return widget->geometry();
 }
 
+int QtShell::GetTitleBarHeight() const
+{
+  return widget->geometry().y() - widget->pos().y();
+}
+
 void QtShell::SetLocation(int x, int y)
 {
   widget->move(x, y);

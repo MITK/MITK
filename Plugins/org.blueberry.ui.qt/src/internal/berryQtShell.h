@@ -38,6 +38,7 @@ public:
   // berry::Shell
   void SetBounds(const QRect& bounds) override;
   QRect GetBounds() const override;
+  int GetTitleBarHeight() const override;
 
   void SetLocation(int x, int y) override;
 

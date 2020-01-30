@@ -42,22 +42,24 @@ mitk::DataNode::Pointer QmitkSingleNodeSelectionWidget::ExtractCurrentValidSelec
 {
   mitk::DataNode::Pointer result = nullptr;
 
-  if (m_DataStorage.IsExpired())
+  if (!m_DataStorage.IsExpired())
   {
     auto storage = m_DataStorage.Lock();
-
-    for (auto node : nodes)
+    if (storage.IsNotNull())
     {
-      bool valid = storage->Exists(node);
-      if (valid && m_NodePredicate.IsNotNull())
+      for (auto node : nodes)
       {
-        valid = m_NodePredicate->CheckNode(node);
-      }
+        bool valid = storage->Exists(node);
+        if (valid && m_NodePredicate.IsNotNull())
+        {
+          valid = m_NodePredicate->CheckNode(node);
+        }
 
-      if (valid)
-      {
-        result = node;
-        break;
+        if (valid)
+        {
+          result = node;
+          break;
+        }
       }
     }
   }
@@ -113,7 +115,7 @@ void QmitkSingleNodeSelectionWidget::OnDataStorageChanged()
   {
     auto storage = m_DataStorage.Lock();
 
-    if (!storage->Exists(m_SelectedNode))
+    if (storage.IsNotNull() && !storage->Exists(m_SelectedNode))
     {
       m_SelectedNode = nullptr;
     }
@@ -332,5 +334,5 @@ bool QmitkSingleNodeSelectionWidget::GetAutoSelectNewNodes() const
 void QmitkSingleNodeSelectionWidget::SetAutoSelectNewNodes(bool autoSelect)
 {
   m_AutoSelectNewNodes = autoSelect;
-  NodeAddedToStorage(nullptr);
+  this->NodeAddedToStorage(nullptr);
 }

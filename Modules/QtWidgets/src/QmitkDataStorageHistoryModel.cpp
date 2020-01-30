@@ -37,25 +37,28 @@ void QmitkDataStorageHistoryModel::UpdateModelData()
     if (!m_DataStorage.IsExpired())
     {
         auto dataStorage = m_DataStorage.Lock();
-        mitk::DataStorage::SetOfObjects::ConstPointer nodesCandidats;
-        if (m_NodePredicate.IsNotNull())
+        if (dataStorage.IsNull())
         {
-          nodesCandidats = dataStorage->GetSubset(m_NodePredicate);
-        }
-        else
-        {
-          nodesCandidats = dataStorage->GetAll();
-        }
+          mitk::DataStorage::SetOfObjects::ConstPointer nodesCandidats;
+          if (m_NodePredicate.IsNotNull())
+          {
+            nodesCandidats = dataStorage->GetSubset(m_NodePredicate);
+          }
+          else
+          {
+            nodesCandidats = dataStorage->GetAll();
+          }
 
-        const std::lock_guard<std::mutex> lock(_historyMutex);
+          const std::lock_guard<std::mutex> lock(_historyMutex);
 
-        for (auto historyNode : _nodeHistory)
-        {
-          auto finding = std::find(nodesCandidats->begin(), nodesCandidats->end(), historyNode);
+          for (auto historyNode : _nodeHistory)
+          {
+            auto finding = std::find(nodesCandidats->begin(), nodesCandidats->end(), historyNode);
             if (finding != nodesCandidats->end())
             {
-               dataNodes.push_back(*finding);
+              dataNodes.push_back(*finding);
             }
+          }
         }
     }
 

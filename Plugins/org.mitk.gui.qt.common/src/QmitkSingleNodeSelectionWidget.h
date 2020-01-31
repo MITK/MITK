@@ -48,6 +48,7 @@ public:
 public Q_SLOTS:
   void SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes) override;
   void SetCurrentSelection(NodeList selectedNodes) override;
+  void SetCurrentSelectedNode(mitk::DataNode* selectedNode);
 
   /** Sets the auto selection mode (Default is false).
   If auto select is true and the following conditions are fullfilled, the widget will
@@ -73,7 +74,7 @@ protected:
   void NodeAddedToStorage(const mitk::DataNode* node) override;
   void NodeRemovedFromStorage(const mitk::DataNode* node) override;
 
-  void DoAutoSelectIfNeeded();
+  void DoAutoSelectIfNeeded(const mitk::DataNode* ignoreNode = nullptr);
   void EmitAndUpdateIfNeeded(const NodeList& lastEmission);
 
   NodeList m_ExternalSelection;

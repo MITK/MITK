@@ -37,7 +37,7 @@ void QmitkDataStorageHistoryModel::UpdateModelData()
     if (!m_DataStorage.IsExpired())
     {
         auto dataStorage = m_DataStorage.Lock();
-        if (dataStorage.IsNull())
+        if (dataStorage.IsNotNull())
         {
           mitk::DataStorage::SetOfObjects::ConstPointer nodesCandidats;
           if (m_NodePredicate.IsNotNull())

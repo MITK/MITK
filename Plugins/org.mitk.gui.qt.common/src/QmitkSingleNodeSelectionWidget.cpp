@@ -14,6 +14,10 @@ found in the LICENSE file.
 #include "QmitkSingleNodeSelectionWidget.h"
 
 #include <berryQtStyleManager.h>
+
+#include "mitkNodePredicateFunction.h"
+#include "mitkNodePredicateAnd.h"
+
 #include <QMouseEvent>
 
 #include "QmitkNodeSelectionDialog.h"
@@ -254,23 +258,26 @@ void QmitkSingleNodeSelectionWidget::SetSelectOnlyVisibleNodes(bool selectOnlyVi
   this->EmitAndUpdateIfNeeded(lastEmission);
 };
 
-void QmitkSingleNodeSelectionWidget::DoAutoSelectIfNeeded()
+void QmitkSingleNodeSelectionWidget::DoAutoSelectIfNeeded(const mitk::DataNode* ignoreNode)
 {
   if (m_SelectedNode.IsNull() && m_AutoSelectNewNodes && !m_DataStorage.IsExpired())
   {
     auto storage = m_DataStorage.Lock();
-    if (m_NodePredicate.IsNotNull())
+    if (storage.IsNotNull())
     {
-      m_SelectedNode = storage->GetNode(m_NodePredicate);
-    }
-    else
-    {
-      m_SelectedNode = nullptr;
-      auto nodes = storage->GetAll();
-      if (!nodes->empty())
+      auto ignoreCheck = [ignoreNode](const mitk::DataNode * node)
       {
-        m_SelectedNode = nodes->front();
+        return node != ignoreNode;
+      };
+      mitk::NodePredicateFunction::Pointer isNotIgnoredNode = mitk::NodePredicateFunction::New(ignoreCheck);
+      mitk::NodePredicateBase::Pointer predicate = isNotIgnoredNode.GetPointer();
+
+      if (m_NodePredicate.IsNotNull())
+      {
+        predicate = mitk::NodePredicateAnd::New(m_NodePredicate.GetPointer(), predicate.GetPointer()).GetPointer();
       }
+
+      m_SelectedNode = storage->GetNode(predicate);
     }
   }
 }
@@ -286,6 +293,15 @@ void QmitkSingleNodeSelectionWidget::EmitAndUpdateIfNeeded(const NodeList& lastE
   }
 };
 
+void QmitkSingleNodeSelectionWidget::SetCurrentSelectedNode(mitk::DataNode* selectedNode)
+{
+  NodeList selection;
+  if (selectedNode)
+  {
+    selection.append(selectedNode);
+  }
+  this->SetCurrentSelection(selection);
+};
 
 void QmitkSingleNodeSelectionWidget::SetCurrentSelection(NodeList selectedNodes)
 {
@@ -317,7 +333,9 @@ void QmitkSingleNodeSelectionWidget::NodeRemovedFromStorage(const mitk::DataNode
   {
     m_SelectedNode = nullptr;
 
-    this->DoAutoSelectIfNeeded();
+    //This event is triggerd before the node is realy removed from storage.
+    //Therefore we have to explictly ignore him in the autoselect search.
+    this->DoAutoSelectIfNeeded(node);
 
     auto newEmission = this->CompileEmitSelection();
 

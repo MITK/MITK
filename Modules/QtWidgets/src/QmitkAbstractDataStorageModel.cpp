@@ -34,7 +34,7 @@ QmitkAbstractDataStorageModel::~QmitkAbstractDataStorageModel()
   {
     auto dataStorage = m_DataStorage.Lock();
 
-    if (dataStorage.IsNull())
+    if (dataStorage.IsNotNull())
     {
       // remove Listener for the data storage itself
       dataStorage->RemoveObserver(m_DataStorageDeletedTag);
@@ -61,7 +61,7 @@ void QmitkAbstractDataStorageModel::SetDataStorage(mitk::DataStorage* dataStorag
   {
     auto dataStorage = m_DataStorage.Lock();
 
-    if (dataStorage.IsNull())
+    if (dataStorage.IsNotNull())
     {
       // remove Listener for the data storage itself
       dataStorage->RemoveObserver(m_DataStorageDeletedTag);
@@ -82,7 +82,7 @@ void QmitkAbstractDataStorageModel::SetDataStorage(mitk::DataStorage* dataStorag
   {
     auto dataStorage = m_DataStorage.Lock();
 
-    if (dataStorage.IsNull())
+    if (dataStorage.IsNotNull())
     {
       // add Listener for the data storage itself
       auto command = itk::SimpleMemberCommand<QmitkAbstractDataStorageModel>::New();

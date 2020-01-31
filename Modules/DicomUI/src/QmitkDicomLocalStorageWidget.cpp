@@ -64,7 +64,7 @@ void QmitkDicomLocalStorageWidget::OnStartDicomImport(const QString &dicomData)
 {
   if (m_LocalDatabase->isOpen())
   {
-    m_LocalIndexer->addDirectory(*m_LocalDatabase, dicomData, m_LocalDatabase->databaseDirectory());
+    m_LocalIndexer->addDirectory(dicomData);
   }
 }
 
@@ -72,7 +72,7 @@ void QmitkDicomLocalStorageWidget::OnStartDicomImport(const QStringList &dicomDa
 {
   if (m_LocalDatabase->isOpen())
   {
-    m_LocalIndexer->addListOfFiles(*m_LocalDatabase, dicomData, m_LocalDatabase->databaseDirectory());
+    m_LocalIndexer->addListOfFiles( dicomData);
   }
 }
 
@@ -219,6 +219,7 @@ void QmitkDicomLocalStorageWidget::SetDatabase(QString databaseFile)
   m_LocalDatabase = new ctkDICOMDatabase(databaseFile);
   m_LocalDatabase->setParent(this);
   m_Controls->ctkDicomBrowser->setDICOMDatabase(m_LocalDatabase);
+  m_LocalIndexer->setDatabase(m_LocalDatabase);
 }
 
 void QmitkDicomLocalStorageWidget::OnSeriesSelectionChanged(const QStringList &s)

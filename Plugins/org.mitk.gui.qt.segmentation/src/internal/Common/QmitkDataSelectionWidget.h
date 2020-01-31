@@ -23,7 +23,7 @@ namespace mitk
   class NodePredicateBase;
 }
 
-class QmitkDataStorageComboBox;
+class QmitkSingleNodeSelectionWidget;
 
 class QmitkDataSelectionWidget : public QWidget
 {
@@ -44,8 +44,8 @@ public:
 
   unsigned int AddDataStorageComboBox(Predicate predicate);
   unsigned int AddDataStorageComboBox(mitk::NodePredicateBase* predicate = nullptr);
-  unsigned int AddDataStorageComboBox(const QString &labelText, Predicate predicate);
-  unsigned int AddDataStorageComboBox(const QString &labelText, mitk::NodePredicateBase* predicate = nullptr);
+  unsigned int AddDataStorageComboBox(const QString &labelText, const QString &info, const QString &popupTitel, const QString &popupHint, Predicate predicate);
+  unsigned int AddDataStorageComboBox(const QString &labelText, const QString &info, const QString &popupTitel, const QString &popupHint, mitk::NodePredicateBase* predicate = nullptr);
 
   mitk::DataStorage::Pointer GetDataStorage() const;
   mitk::DataNode::Pointer GetSelection(unsigned int index);
@@ -57,11 +57,11 @@ signals:
   void SelectionChanged(unsigned int index, const mitk::DataNode* selection);
 
 private slots:
-  void OnSelectionChanged(const mitk::DataNode* selection);
+  void OnSelectionChanged(QList<mitk::DataNode::Pointer> selection);
 
 private:
   Ui::QmitkDataSelectionWidgetControls m_Controls;
-  std::vector<QmitkDataStorageComboBox*> m_DataStorageComboBoxes;
+  std::vector<QmitkSingleNodeSelectionWidget*> m_NodeSelectionWidgets;
 };
 
 #endif

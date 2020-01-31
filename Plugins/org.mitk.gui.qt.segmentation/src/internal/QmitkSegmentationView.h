@@ -40,14 +40,6 @@ public:
 
   typedef std::map<mitk::DataNode*, unsigned long> NodeTagMapType;
 
-  /*!
-  \brief Invoked when the DataManager selection changed
-  */
-  virtual void OnSelectionChanged(mitk::DataNode* node);
-  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
-
-  // reaction to new segmentations being created by segmentation tools
-  void NewNodesGenerated();
   void NewNodeObjectsGenerated(mitk::ToolManager::DataVectorType*);
 
   void Activated() override;
@@ -70,15 +62,12 @@ public:
   // observer to mitk::RenderingManager's RenderingManagerViewsInitializedEvent event
   void RenderingManagerReinitialized();
 
-  // observer to mitk::SliceController's SliceRotation event
-  void SliceRotation(const itk::EventObject&);
-
   static const std::string VIEW_ID;
 
   protected slots:
 
-  void OnPatientComboBoxSelectionChanged(const mitk::DataNode* node);
-  void OnSegmentationComboBoxSelectionChanged(const mitk::DataNode* node);
+  void OnPatientComboBoxSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
+  void OnSegmentationComboBoxSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
   // reaction to the button "New segmentation"
   void CreateNewSegmentation();
@@ -101,19 +90,11 @@ protected:
   // GUI setup
   void CreateQtPartControl(QWidget* parent) override;
 
-  // reactions to selection events from data manager (and potential other senders)
-  //void BlueBerrySelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection);
-  mitk::DataNode::Pointer FindFirstRegularImage(std::vector<mitk::DataNode*> nodes);
-  mitk::DataNode::Pointer FindFirstSegmentation(std::vector<mitk::DataNode*> nodes);
-
   // initially set the tool manager selection from the combo boxes
-  void InitToolManagerSelection(const mitk::DataNode* referenceData, const mitk::DataNode* workingData);
+  void InitToolManagerSelection(mitk::DataNode* referenceData, mitk::DataNode* workingData);
 
   // propagate BlueBerry selection to ToolManager for manual segmentation
-  void SetToolManagerSelection(const mitk::DataNode* referenceData, const mitk::DataNode* workingData);
-
-  // checks if given render window aligns with the slices of given image
-  bool IsRenderWindowAligned(QmitkRenderWindow* renderWindow, mitk::Image* image);
+  void SetToolManagerSelection(mitk::DataNode* referenceData, mitk::DataNode* workingData);
 
   // make sure all images/segmentations look as selected by the users in this view's preferences
   void ForceDisplayPreferencesUponAllImages();
@@ -134,7 +115,7 @@ protected:
 
   void NodeAdded(const mitk::DataNode *node) override;
 
-  bool CheckForSameGeometry(const mitk::DataNode*, const mitk::DataNode*) const;
+  static bool CheckForSameGeometry(const mitk::DataNode*, const mitk::DataNode*);
 
   void UpdateWarningLabel(QString text/*, bool overwriteExistingText = true*/);
 
@@ -157,8 +138,6 @@ protected:
   NodeTagMapType  m_BinaryPropertyObserverTags;
 
   unsigned int m_RenderingManagerObserverTag;
-
-  bool m_AutoSelectionEnabled;
 
   mitk::NodePredicateNot::Pointer m_IsNotAHelperObject;
   mitk::NodePredicateAnd::Pointer m_IsOfTypeImagePredicate;

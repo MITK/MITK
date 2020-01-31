@@ -1,5 +1,3 @@
-include(mitkFunctionInstallExternalCMakeProject)
-
 #-----------------------------------------------------------------------------
 # Convenient macro allowing to download a file
 #-----------------------------------------------------------------------------
@@ -104,6 +102,11 @@ endif()
 
 include(ExternalProject)
 include(mitkMacroQueryCustomEPVars)
+include(mitkFunctionInstallExternalCMakeProject)
+include(mitkFunctionCleanExternalProject)
+
+option(MITK_AUTOCLEAN_EXTERNAL_PROJECTS "Experimental: Clean external project builds if updated" OFF)
+mark_as_advanced(MITK_AUTOCLEAN_EXTERNAL_PROJECTS)
 
 set(ep_prefix "${CMAKE_BINARY_DIR}/ep")
 set_property(DIRECTORY PROPERTY EP_PREFIX ${ep_prefix})
@@ -220,18 +223,37 @@ set(mitk_depends )
 # Include external projects
 include(CMakeExternals/MITKData.cmake)
 foreach(p ${external_projects})
-  if(EXISTS ${CMAKE_SOURCE_DIR}/CMakeExternals/${p}.cmake)
-    include(CMakeExternals/${p}.cmake)
+  set(p_hash "")
+
+  set(p_file "${CMAKE_SOURCE_DIR}/CMakeExternals/${p}.cmake")
+  if(EXISTS ${p_file})
+    file(MD5 ${p_file} p_hash)
   else()
     foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
       get_filename_component(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIR} ABSOLUTE)
       set(MITK_CMAKE_EXTERNALS_EXTENSION_DIR ${MITK_EXTENSION_DIR}/CMakeExternals)
-      if(EXISTS ${MITK_CMAKE_EXTERNALS_EXTENSION_DIR}/${p}.cmake)
-        include(${MITK_CMAKE_EXTERNALS_EXTENSION_DIR}/${p}.cmake)
+      set(p_file "${MITK_CMAKE_EXTERNALS_EXTENSION_DIR}/${p}.cmake")
+      if(EXISTS ${p_file})
+        file(MD5 ${p_file} p_hash)
         break()
       endif()
     endforeach()
   endif()
+
+  if(p_hash)
+    set(p_hash_file "${ep_prefix}/tmp/${p}-hash.txt")
+    if(MITK_AUTOCLEAN_EXTERNAL_PROJECTS)
+      if(EXISTS ${p_hash_file})
+        file(READ ${p_hash_file} p_prev_hash)
+        if(NOT p_hash STREQUAL p_prev_hash)
+          mitkCleanExternalProject(${p})
+        endif()
+      endif()
+    endif()
+    file(WRITE ${p_hash_file} ${p_hash})
+  endif()
+
+  include(${p_file} OPTIONAL)
 
   list(APPEND mitk_superbuild_ep_args
        -DMITK_USE_${p}:BOOL=${MITK_USE_${p}}

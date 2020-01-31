@@ -1,6 +1,6 @@
 message(STATUS "Creating install manifest")
 
-file(GLOB installed_binaries "lib/boost_*.*" "bin/boost_*.*")
+file(GLOB installed_binaries "lib/boost_*.*" "lib/libboost_*.*" "bin/boost_*.*")
 file(GLOB_RECURSE installed_headers "include/boost/*")
 
 set(install_manifest "src/Boost-build/install_manifest.txt")

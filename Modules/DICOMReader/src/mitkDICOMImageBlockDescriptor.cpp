@@ -717,6 +717,14 @@ void mitk::DICOMImageBlockDescriptor::UpdateImageDescribingProperties() const
 
     auto tagCache = m_TagCache.Lock();
 
+    if (tagCache.IsNull())
+    {
+      MITK_ERROR << "Invalid call to DICOMImageBlockDescriptor::UpdateImageDescribingProperties(). Need to "
+        "have initialized tag-cache!";
+      return;
+    }
+
+
     const DICOMImageFrameInfo::Pointer firstFrame = m_ImageFrameList.front();
     const DICOMImageFrameInfo::Pointer lastFrame  = m_ImageFrameList.back();
 

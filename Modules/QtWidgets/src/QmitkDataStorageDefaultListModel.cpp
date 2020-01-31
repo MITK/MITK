@@ -152,7 +152,7 @@ void QmitkDataStorageDefaultListModel::UpdateModelData()
   if (!m_DataStorage.IsExpired())
   {
     auto dataStorage = m_DataStorage.Lock();
-    if (m_NodePredicate.IsNotNull())
+    if (dataStorage.IsNotNull() && m_NodePredicate.IsNotNull())
     {
       dataNodes = dataStorage->GetSubset(m_NodePredicate);
     }

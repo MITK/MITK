@@ -37,12 +37,13 @@ found in the LICENSE file.
 #include <mitkPlanarFigureInteractor.h>
 #include <mitkPlaneGeometry.h>
 #include <mitkILinkedRenderWindowPart.h>
+#include <mitkImage.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateNot.h>
+
 #include <QmitkRenderWindow.h>
-#include <mitkImage.h>
 
 #include "mitkPluginActivator.h"
 #include "usModuleRegistry.h"
@@ -429,11 +430,6 @@ void QmitkMeasurementView::PlanarFigureInitialized()
   d->m_DrawPolygon->setChecked(false);
   d->m_DrawBezierCurve->setChecked(false);
   d->m_DrawSubdivisionPolygon->setChecked(false);
-}
-
-void QmitkMeasurementView::SetFocus()
-{
-  d->m_SelectedImageLabel->setFocus();
 }
 
 void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes)

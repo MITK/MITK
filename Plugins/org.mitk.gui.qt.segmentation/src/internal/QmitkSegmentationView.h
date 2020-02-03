@@ -66,8 +66,8 @@ public:
 
   protected slots:
 
-  void OnPatientComboBoxSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
-  void OnSegmentationComboBoxSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
+  void OnPatientSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
+  void OnSegmentationSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
   // reaction to the button "New segmentation"
   void CreateNewSegmentation();

@@ -642,7 +642,7 @@ void QmitkMultiLabelSegmentationView::OnLockExteriorToggled(bool checked)
   workingImage->GetLabel(0)->SetLocked(checked);
 }
 
-void QmitkMultiLabelSegmentationView::OnReferenceSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
+void QmitkMultiLabelSegmentationView::OnReferenceSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/)
 {
   m_ToolManager->ActivateTool(-1);
 
@@ -677,7 +677,7 @@ void QmitkMultiLabelSegmentationView::OnReferenceSelectionChanged(QList<mitk::Da
   UpdateControls();
 }
 
-void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
+void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/)
 {
   m_ToolManager->ActivateTool(-1);
 

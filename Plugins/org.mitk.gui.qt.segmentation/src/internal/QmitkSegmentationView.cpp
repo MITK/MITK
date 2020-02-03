@@ -407,7 +407,7 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
 
 }
 
-void QmitkSegmentationView::OnPatientComboBoxSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
+void QmitkSegmentationView::OnPatientSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
 {
    if(! nodes.empty())
    {
@@ -452,7 +452,7 @@ void QmitkSegmentationView::OnPatientComboBoxSelectionChanged(QList<mitk::DataNo
    }
 }
 
-void QmitkSegmentationView::OnSegmentationComboBoxSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
+void QmitkSegmentationView::OnSegmentationSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
 {
    if (nodes.empty())
    {

@@ -306,8 +306,6 @@ void QmitkMeasurementView::NodeAdded(const mitk::DataNode* node)
     // adding to the map of tracked planarfigures
     d->m_DataNodeToPlanarFigureData[nonConstNode] = data;
   }
-
-  this->CheckForTopMostVisibleImage();
 }
 
 void QmitkMeasurementView::NodeChanged(const mitk::DataNode* node)
@@ -326,40 +324,6 @@ void QmitkMeasurementView::NodeChanged(const mitk::DataNode* node)
 
   if (renewText)
     this->UpdateMeasurementText();
-
-  this->CheckForTopMostVisibleImage();
-}
-
-void QmitkMeasurementView::CheckForTopMostVisibleImage(mitk::DataNode* nodeToNeglect)
-{
-  d->m_SelectedImageNode = this->DetectTopMostVisibleImage();
-
-  if (d->m_SelectedImageNode.GetPointer() == nodeToNeglect)
-    d->m_SelectedImageNode = nullptr;
-
-  auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
-  auto isHelpherObject = mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true));
-  auto isNotHelpherObject = mitk::NodePredicateNot::New(isHelpherObject);
-
-  auto nodeElements = this->GetDataStorage()->GetSubset(isNotHelpherObject);
-
-  if (d->m_SelectedImageNode.IsNotNull() && d->m_UnintializedPlanarFigure == false)
-  {
-    d->m_SelectedImageLabel->setText(QString::fromStdString(d->m_SelectedImageNode->GetName()));
-    d->m_DrawActionsToolBar->setEnabled(true);
-  }
-  else if (d->m_UnintializedPlanarFigure == false && nodeElements->size() != 0)
-  {
-    d->m_SelectedImageLabel->setText(tr("Working without an image..."));
-    d->m_DrawActionsToolBar->setEnabled(true);
-  }
-  else
-  {
-    if (d->m_UnintializedPlanarFigure == false)
-      d->m_SelectedImageLabel->setText(tr("No visible data available."));
-
-    d->m_DrawActionsToolBar->setEnabled(false);
-  }
 }
 
 void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
@@ -418,8 +382,6 @@ void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
       }
     }
   }
-
-  this->CheckForTopMostVisibleImage(nonConstNode);
 }
 
 void QmitkMeasurementView::PlanarFigureSelected(itk::Object* object, const itk::EventObject&)
@@ -476,8 +438,6 @@ void QmitkMeasurementView::SetFocus()
 
 void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes)
 {
-  this->CheckForTopMostVisibleImage();
-
   d->m_CurrentSelection = nodes;
   this->UpdateMeasurementText();
 
@@ -809,52 +769,6 @@ void QmitkMeasurementView::AddAllInteractors()
 
   for (auto it = planarFigures->Begin(); it != planarFigures->End(); ++it)
     this->NodeAdded(it.Value());
-}
-
-mitk::DataNode::Pointer QmitkMeasurementView::DetectTopMostVisibleImage()
-{
-  // get all images from the data storage which are not a segmentation
-  auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
-  auto isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
-  auto isNotBinary = mitk::NodePredicateNot::New(isBinary);
-  auto isNormalImage = mitk::NodePredicateAnd::New(isImage, isNotBinary);
-
-  auto images = this->GetDataStorage()->GetSubset(isNormalImage);
-
-  mitk::DataNode::Pointer currentNode;
-
-  int maxLayer = std::numeric_limits<int>::min();
-  int layer = 0;
-
-  // iterate over selection
-  for (auto it = images->Begin(); it != images->End(); ++it)
-  {
-    auto node = it->Value();
-
-    if (node.IsNull())
-      continue;
-
-    if (node->IsVisible(nullptr) == false)
-      continue;
-
-    // we also do not want to assign planar figures to helper objects ( even if they are of type image )
-    if (node->GetProperty("helper object") != nullptr)
-      continue;
-
-    node->GetIntProperty("layer", layer);
-
-    if (layer < maxLayer)
-    {
-      continue;
-    }
-    else
-    {
-      maxLayer = layer;
-      currentNode = node;
-    }
-  }
-
-  return currentNode;
 }
 
 void QmitkMeasurementView::EnableCrosshairNavigation()

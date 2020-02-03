@@ -71,11 +71,9 @@ class QmitkMeasurementView : public QmitkAbstractView
     mitk::DataNode::Pointer AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name);
     void UpdateMeasurementText();
     void AddAllInteractors();
-    mitk::DataNode::Pointer DetectTopMostVisibleImage();
     void EnableCrosshairNavigation();
     void DisableCrosshairNavigation();
     void PlanarFigureInitialized();
-    void CheckForTopMostVisibleImage(mitk::DataNode* nodeToNeglect = nullptr);
     mitk::DataStorage::SetOfObjects::ConstPointer GetAllPlanarFigures() const;
 
     QmitkMeasurementViewData* d;

@@ -182,7 +182,9 @@ void mitk::ReduceContourSetFilter::ReduceNumberOfPointsByDouglasPeucker(vtkIdTyp
                                                                         vtkPolygon* reducedPolygon, vtkPoints* reducedPoints)
 {
   //If the cell is too small to obtain a reduced polygon with the given stepsize return
-  if (cellSize <= static_cast<vtkIdType>(m_StepSize*3))return;
+  if (cellSize <= vtkIdType(3)) {
+    return;
+  }
 
   /*
   What we do now is (see the Douglas Peucker Algorithm):

@@ -105,9 +105,9 @@ protected:
     ConcentrationCurveGenerator();
      ~ConcentrationCurveGenerator() override;
 
-    template<class Tpixel>
-    mitk::Image::Pointer convertToConcentration(const mitk::Image* inputImage, const mitk::Image* baselineImage);
 
+     template<class TPixel_input, class TPixel_baseline>
+     mitk::Image::Pointer convertToConcentration(const itk::Image<TPixel_input, 3> *itkInputImage, const itk::Image<TPixel_baseline, 3> *itkBaselineImage);
 
     /** Calls ConvertToconcentrationFunctor for passed 3D itk::image*/
     mitk::Image::Pointer ConvertSignalToConcentrationCurve(const mitk::Image* inputImage, const mitk::Image* baselineImage);
@@ -128,7 +128,7 @@ private:
     Image::ConstPointer m_DynamicImage;
     Image::ConstPointer m_BaselineImage;
     Image::ConstPointer m_T10Image;
-
+    Image::Pointer m_ConvertSignalToConcentrationCurve_OutputImage;
     Image::Pointer m_ConvertedImage;
 
     bool m_isT2weightedImage;

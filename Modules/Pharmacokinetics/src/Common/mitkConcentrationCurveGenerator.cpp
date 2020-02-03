@@ -14,12 +14,11 @@
 #include "itkBinaryFunctorImageFilter.h"
 #include "itkTernaryFunctorImageFilter.h"
 #include <itkExtractImageFilter.h>
-#include <itkMultiplyImageFilter.h>
-#include <itkCastImageFilter.h>
+#include "itkMeanProjectionImageFilter.h"
 
 mitk::ConcentrationCurveGenerator::ConcentrationCurveGenerator() : m_isT2weightedImage(false), m_isTurboFlashSequence(false), 
     m_AbsoluteSignalEnhancement(false), m_RelativeSignalEnhancement(0.0), m_UsingT1Map(false), m_Factor(0.0), m_RecoveryTime(0.0), m_RelaxationTime(0.0),
-    m_Relaxivity(0.0), m_FlipAngle(0.0), m_T2Factor(0.0), m_T2EchoTime(0.0) 
+    m_Relaxivity(0.0), m_FlipAngle(0.0), m_T2Factor(0.0), m_T2EchoTime(0.0)
 {
 }
 
@@ -117,17 +116,13 @@ void mitk::ConcentrationCurveGenerator::CalculateAverageBaselineImage(const itk:
   typedef itk::Image<TPixel, 4> TPixel4DImageType;
   typedef itk::Image<TPixel, 3> TPixel3DImageType;
   typedef itk::Image<double, 3> Double3DImageType;
+  typedef itk::Image<double, 4> Double4DImageType;
+  typedef itk::ExtractImageFilter<TPixel4DImageType, TPixel4DImageType> ExtractImageFilterType;
+  typedef itk::ExtractImageFilter<Double4DImageType, Double3DImageType> Extract3DImageFilterType;
+  typedef itk::MeanProjectionImageFilter<TPixel4DImageType,Double4DImageType> MeanProjectionImageFilterType;
 
-  typedef itk::ExtractImageFilter<TPixel4DImageType, TPixel3DImageType> ExtractImageFilterType;
-  typedef itk::NaryAddImageFilter<TPixel3DImageType, TPixel3DImageType> NaryAddBaselineImagesFilterType;
-  typedef itk::MultiplyImageFilter<Double3DImageType, Double3DImageType, Double3DImageType > MultiplyImageFilterType;
-  typedef itk::CastImageFilter<TPixel3DImageType, Double3DImageType> DoubleCastImageFilterType;
-  typedef itk::CastImageFilter<Double3DImageType, TPixel3DImageType> TPixelCastImageFilterType;
-
-  NaryAddBaselineImagesFilterType::Pointer AddBaselineImagesFilter = NaryAddBaselineImagesFilterType::New();
-  MultiplyImageFilterType::Pointer multiplyImageFilter = MultiplyImageFilterType::New();
-  DoubleCastImageFilterType::Pointer DoubleCastImageFilter = DoubleCastImageFilterType::New();
-  TPixelCastImageFilterType::Pointer TPixelCastImageFilter = TPixelCastImageFilterType::New();
+  MeanProjectionImageFilterType::Pointer MeanProjectionImageFilter = MeanProjectionImageFilterType::New();
+  Extract3DImageFilterType::Pointer Extract3DImageFilter = Extract3DImageFilterType::New();
   TPixel4DImageType::RegionType region_input = itkBaselineImage->GetLargestPossibleRegion();
 
   if (m_BaselineEndTimeStep > region_input.GetSize()[3])
@@ -135,143 +130,97 @@ void mitk::ConcentrationCurveGenerator::CalculateAverageBaselineImage(const itk:
     mitkThrow() << "Error in ConcentrationCurveGenerator::CalculateAverageBaselineImage. End time point is larger than total number of time points.";
   }
 
-  // add the selected baseline time frames to the nary add image filter
+  ExtractImageFilterType::Pointer ExtractFilter = ExtractImageFilterType::New();
+  TPixel4DImageType::Pointer baselineTimeFrameImage = TPixel4DImageType::New();
+  TPixel4DImageType::RegionType extractionRegion;
+  TPixel4DImageType::SizeType size_input_aux = region_input.GetSize();
+  size_input_aux[3] = m_BaselineEndTimeStep - m_BaselineStartTimeStep+1;
+  TPixel4DImageType::IndexType start_input_aux = region_input.GetIndex();
+  start_input_aux[3] = m_BaselineStartTimeStep;
+  extractionRegion.SetSize(size_input_aux);
+  extractionRegion.SetIndex(start_input_aux);
+  ExtractFilter->SetExtractionRegion(extractionRegion);
+  ExtractFilter->SetInput(itkBaselineImage);
+  ExtractFilter->SetDirectionCollapseToSubmatrix();
+  try
+  {
+    ExtractFilter->Update();
+  }
+  catch (itk::ExceptionObject & err)
+  {
+    std::cerr << "ExceptionObject caught!" << std::endl;
+    std::cerr << err << std::endl;
+  }
+  baselineTimeFrameImage = ExtractFilter->GetOutput();
+  MeanProjectionImageFilter->SetProjectionDimension(3);
+  MeanProjectionImageFilter->SetInput(baselineTimeFrameImage);
+  try
+  {
+    MeanProjectionImageFilter->Update();
+  }
+  catch (itk::ExceptionObject & err)
+  {
+    std::cerr << "ExceptionObject caught!" << std::endl;
+    std::cerr << err << std::endl;
+  }
+  Extract3DImageFilter->SetInput(MeanProjectionImageFilter->GetOutput());
+  size_input_aux[3] = 0;
+  start_input_aux[3] = 0;
+  extractionRegion.SetSize(size_input_aux);
+  extractionRegion.SetIndex(start_input_aux);
+  Extract3DImageFilter->SetExtractionRegion(extractionRegion);
+  Extract3DImageFilter->SetDirectionCollapseToSubmatrix();
+  try
+  {
+    Extract3DImageFilter->Update();
+  }
+  catch (itk::ExceptionObject & err)
+  {
+    std::cerr << "ExceptionObject caught!" << std::endl;
+    std::cerr << err << std::endl;
+  }
 
-  for (int i = m_BaselineStartTimeStep; i <= m_BaselineEndTimeStep; ++i)
-  {
-    ExtractImageFilterType::Pointer ExtractFilter = ExtractImageFilterType::New();
-    TPixel3DImageType::Pointer timeFrameImage = TPixel3DImageType::New();
-    TPixel4DImageType::RegionType extractionRegion;
-    TPixel4DImageType::SizeType size_input_aux = region_input.GetSize();
-    size_input_aux[3] = 0;
-    TPixel4DImageType::IndexType start_input_aux = region_input.GetIndex();
-    start_input_aux[3] = i;
-    extractionRegion.SetSize(size_input_aux);
-    extractionRegion.SetIndex(start_input_aux);
-    ExtractFilter->SetExtractionRegion(extractionRegion);
-    ExtractFilter->SetInput(itkBaselineImage);
-    ExtractFilter->SetDirectionCollapseToSubmatrix();
-    try
-    {
-      ExtractFilter->Update();
-    }
-    catch (itk::ExceptionObject & err)
-    {
-      std::cerr << "ExceptionObject caught!" << std::endl;
-      std::cerr << err << std::endl;
-    }
-    timeFrameImage = ExtractFilter->GetOutput();
-    AddBaselineImagesFilter->SetInput(i-m_BaselineStartTimeStep, timeFrameImage);
-  }
-  try
-  {
-    AddBaselineImagesFilter->Update();
-  }
-  catch (itk::ExceptionObject & err)
-  {
-    std::cerr << "ExceptionObject caught!" << std::endl;
-    std::cerr << err << std::endl;
-  }
-  DoubleCastImageFilter->SetInput(AddBaselineImagesFilter->GetOutput());
-  try
-  {
-    DoubleCastImageFilter->Update();
-  }
-  catch (itk::ExceptionObject & err)
-  {
-    std::cerr << "ExceptionObject caught!" << std::endl;
-    std::cerr << err << std::endl;
-  }
-  multiplyImageFilter->SetInput(DoubleCastImageFilter->GetOutput());
-  double factor = 1.0/double(m_BaselineEndTimeStep-m_BaselineStartTimeStep+1);
-  multiplyImageFilter->SetConstant(factor);
-  try
-  {
-    multiplyImageFilter->Update();
-  }
-  catch (itk::ExceptionObject & err)
-  {
-    std::cerr << "ExceptionObject caught!" << std::endl;
-    std::cerr << err << std::endl;
-  }
-  TPixelCastImageFilter->SetInput(multiplyImageFilter->GetOutput());
-  try
-  {
-    TPixelCastImageFilter->Update();
-  }
-  catch (itk::ExceptionObject & err)
-  {
-    std::cerr << "ExceptionObject caught!" << std::endl;
-    std::cerr << err << std::endl;
-  }
   Image::Pointer mitkBaselineImage = Image::New();
-  CastToMitkImage(TPixelCastImageFilter->GetOutput(), mitkBaselineImage);
+  CastToMitkImage(Extract3DImageFilter->GetOutput(), mitkBaselineImage);
   this->m_BaselineImage = mitkBaselineImage;
 }
 
 
-mitk::Image::Pointer mitk::ConcentrationCurveGenerator::ConvertSignalToConcentrationCurve(const mitk::Image* inputImage, const mitk::Image* baselineImage)
+mitk::Image::Pointer mitk::ConcentrationCurveGenerator::ConvertSignalToConcentrationCurve(const mitk::Image* inputImage,const mitk::Image* baselineImage)
 {
-    mitk::PixelType m_PixelType = inputImage->GetPixelType();
-    mitk::Image::Pointer outputImage;
+  mitk::PixelType m_PixelType = inputImage->GetPixelType();
+  AccessTwoImagesFixedDimensionByItk(inputImage, baselineImage, mitk::ConcentrationCurveGenerator::convertToConcentration, 3);
+  return m_ConvertSignalToConcentrationCurve_OutputImage;
 
-    if(inputImage->GetPixelType().GetComponentType() != baselineImage->GetPixelType().GetComponentType())
-    {
-        mitkThrow() << "Input Image and Baseline Image have different Pixel Types. Data not supported";
-    }
-
-
-    if(m_PixelType.GetComponentType() == itk::ImageIOBase::USHORT)
-    {
-        outputImage = convertToConcentration<unsigned short>(inputImage, baselineImage);
-    }
-    else if(m_PixelType.GetComponentType() == itk::ImageIOBase::UINT)
-    {
-        outputImage = convertToConcentration<unsigned int>(inputImage, baselineImage);
-    }
-    else if(m_PixelType.GetComponentType() == itk::ImageIOBase::INT)
-    {
-        outputImage = convertToConcentration<int>(inputImage, baselineImage);
-    }
-    else if(m_PixelType.GetComponentType() == itk::ImageIOBase::SHORT)
-    {
-        outputImage = convertToConcentration<short>(inputImage, baselineImage);
-    }
-    else if(m_PixelType.GetComponentType() == itk::ImageIOBase::DOUBLE)
-    {
-        outputImage = convertToConcentration<double>(inputImage, baselineImage);
-    }
-    else if(m_PixelType.GetComponentType() == itk::ImageIOBase::FLOAT)
-    {
-        outputImage = convertToConcentration<double>(inputImage, baselineImage);
-    }
-    else
-    {
-        mitkThrow() << "PixelType is "<<m_PixelType.GetComponentTypeAsString()<< ". Data Pixel Type not supported";
-    }
-
-
-    return outputImage;
 }
 
-template<class Tpixel>
-mitk::Image::Pointer mitk::ConcentrationCurveGenerator::convertToConcentration(const mitk::Image* inputImage, const mitk::Image* baselineImage)
+
+template<class TPixel_input, class TPixel_baseline>
+mitk::Image::Pointer mitk::ConcentrationCurveGenerator::convertToConcentration(const itk::Image<TPixel_input, 3> *itkInputImage, const itk::Image<TPixel_baseline, 3> *itkBaselineImage)
 {
-    typedef itk::Image<Tpixel, 3> InputImageType;
+    typedef itk::Image<TPixel_input, 3> InputImageType;
+    typedef itk::Image<TPixel_baseline, 3> BaselineImageType;
+    typedef itk::Image<double, 3> DoubleImageType;
 
-    typename InputImageType::Pointer itkInputImage = InputImageType::New();
-    typename InputImageType::Pointer itkBaselineImage = InputImageType::New();
+    typename DoubleImageType::Pointer itkDoubleInputImage = DoubleImageType::New();
+    typename DoubleImageType::Pointer itkDoubleBaselineImage = DoubleImageType::New();
 
-    mitk::CastToItkImage(inputImage, itkInputImage );
-    mitk::CastToItkImage(baselineImage, itkBaselineImage );
+    typedef itk::CastImageFilter<InputImageType, DoubleImageType> CastInputImageToDoubleImageFilterType;
+    CastInputImageToDoubleImageFilterType::Pointer CastInputImageToDoubleImageFilter = CastInputImageToDoubleImageFilterType::New();
+    CastInputImageToDoubleImageFilter->SetInput(itkInputImage);
+    CastInputImageToDoubleImageFilter->Update();
+    itkDoubleInputImage = CastInputImageToDoubleImageFilter->GetOutput();
 
+    typedef itk::CastImageFilter<BaselineImageType, DoubleImageType> CastBaselineImageToDoubleImageFilterType;
+    CastBaselineImageToDoubleImageFilterType::Pointer CastBaselineImageToDoubleImageFilter = CastBaselineImageToDoubleImageFilterType::New();
+    CastBaselineImageToDoubleImageFilter->SetInput(itkBaselineImage);
+    CastBaselineImageToDoubleImageFilter->Update();
+    itkDoubleBaselineImage = CastBaselineImageToDoubleImageFilter->GetOutput();
 
-
-    mitk::Image::Pointer outputImage;
-    if(this->m_isT2weightedImage)
+    if (this->m_isT2weightedImage)
     {
-        typedef mitk::ConvertT2ConcentrationFunctor <Tpixel, Tpixel, double> ConversionFunctorT2Type;
-        typedef itk::BinaryFunctorImageFilter<InputImageType,InputImageType, ConvertedImageType, ConversionFunctorT2Type> FilterT2Type;
+        typedef mitk::ConvertT2ConcentrationFunctor <double, double, double> ConversionFunctorT2Type;
+        typedef itk::BinaryFunctorImageFilter<DoubleImageType, DoubleImageType, ConvertedImageType, ConversionFunctorT2Type> FilterT2Type;
 
         ConversionFunctorT2Type ConversionT2Functor;
         ConversionT2Functor.initialize(this->m_T2Factor, this->m_T2EchoTime);
@@ -279,20 +228,20 @@ mitk::Image::Pointer mitk::ConcentrationCurveGenerator::convertToConcentration(c
         typename FilterT2Type::Pointer ConversionT2Filter = FilterT2Type::New();
 
         ConversionT2Filter->SetFunctor(ConversionT2Functor);
-        ConversionT2Filter->SetInput1(itkInputImage);
-        ConversionT2Filter->SetInput2(itkBaselineImage);
+        ConversionT2Filter->SetInput1(itkDoubleInputImage);
+        ConversionT2Filter->SetInput2(itkDoubleBaselineImage);
 
         ConversionT2Filter->Update();
 
-        outputImage = mitk::ImportItkImage(ConversionT2Filter->GetOutput())->Clone();
-    }
+        m_ConvertSignalToConcentrationCurve_OutputImage = mitk::ImportItkImage(ConversionT2Filter->GetOutput())->Clone();
+      }
 
     else
     {
         if(this->m_isTurboFlashSequence)
         {
-            typedef mitk::ConvertToConcentrationTurboFlashFunctor <Tpixel, Tpixel, double> ConversionFunctorTurboFlashType;
-            typedef itk::BinaryFunctorImageFilter<InputImageType,InputImageType, ConvertedImageType, ConversionFunctorTurboFlashType> FilterTurboFlashType;
+            typedef mitk::ConvertToConcentrationTurboFlashFunctor <double, double, double> ConversionFunctorTurboFlashType;
+            typedef itk::BinaryFunctorImageFilter<DoubleImageType, DoubleImageType, ConvertedImageType, ConversionFunctorTurboFlashType> FilterTurboFlashType;
 
             ConversionFunctorTurboFlashType ConversionTurboFlashFunctor;
             ConversionTurboFlashFunctor.initialize(this->m_RelaxationTime, this->m_Relaxivity, this->m_RecoveryTime);
@@ -300,21 +249,21 @@ mitk::Image::Pointer mitk::ConcentrationCurveGenerator::convertToConcentration(c
             typename FilterTurboFlashType::Pointer ConversionTurboFlashFilter = FilterTurboFlashType::New();
 
             ConversionTurboFlashFilter->SetFunctor(ConversionTurboFlashFunctor);
-            ConversionTurboFlashFilter->SetInput1(itkInputImage);
-            ConversionTurboFlashFilter->SetInput2(itkBaselineImage);
+            ConversionTurboFlashFilter->SetInput1(itkDoubleInputImage);
+            ConversionTurboFlashFilter->SetInput2(itkDoubleBaselineImage);
 
             ConversionTurboFlashFilter->Update();
-            outputImage = mitk::ImportItkImage(ConversionTurboFlashFilter->GetOutput())->Clone();
+            m_ConvertSignalToConcentrationCurve_OutputImage = mitk::ImportItkImage(ConversionTurboFlashFilter->GetOutput())->Clone();
 
 
         }
         else if(this->m_UsingT1Map)
         {
-            typename InputImageType::Pointer itkT10Image = InputImageType::New();
+            typename DoubleImageType::Pointer itkT10Image = DoubleImageType::New();
             mitk::CastToItkImage(m_T10Image, itkT10Image);
 
-            typedef mitk::ConvertToConcentrationViaT1CalcFunctor <Tpixel, Tpixel, Tpixel, double> ConvertToConcentrationViaT1CalcFunctorType;
-            typedef itk::TernaryFunctorImageFilter<InputImageType, InputImageType, InputImageType,ConvertedImageType, ConvertToConcentrationViaT1CalcFunctorType> FilterT1MapType;
+            typedef mitk::ConvertToConcentrationViaT1CalcFunctor <double, double, double, double> ConvertToConcentrationViaT1CalcFunctorType;
+            typedef itk::TernaryFunctorImageFilter<DoubleImageType, DoubleImageType, DoubleImageType,ConvertedImageType, ConvertToConcentrationViaT1CalcFunctorType> FilterT1MapType;
 
             ConvertToConcentrationViaT1CalcFunctorType ConversionT1MapFunctor;
             ConversionT1MapFunctor.initialize(this->m_Relaxivity, this->m_RecoveryTime, this->m_FlipAngle);
@@ -322,20 +271,20 @@ mitk::Image::Pointer mitk::ConcentrationCurveGenerator::convertToConcentration(c
             typename FilterT1MapType::Pointer ConversionT1MapFilter = FilterT1MapType::New();
 
             ConversionT1MapFilter->SetFunctor(ConversionT1MapFunctor);
-            ConversionT1MapFilter->SetInput1(itkInputImage);
-            ConversionT1MapFilter->SetInput2(itkBaselineImage);
+            ConversionT1MapFilter->SetInput1(itkDoubleInputImage);
+            ConversionT1MapFilter->SetInput2(itkDoubleBaselineImage);
             ConversionT1MapFilter->SetInput3(itkT10Image);
 
             ConversionT1MapFilter->Update();
-            outputImage = mitk::ImportItkImage(ConversionT1MapFilter->GetOutput())->Clone();
+            m_ConvertSignalToConcentrationCurve_OutputImage = mitk::ImportItkImage(ConversionT1MapFilter->GetOutput())->Clone();
 
 
         }
 
         else if(this->m_AbsoluteSignalEnhancement)
         {
-            typedef mitk::ConvertToConcentrationAbsoluteFunctor <Tpixel, Tpixel, double> ConversionFunctorAbsoluteType;
-            typedef itk::BinaryFunctorImageFilter<InputImageType,InputImageType, ConvertedImageType, ConversionFunctorAbsoluteType> FilterAbsoluteType;
+            typedef mitk::ConvertToConcentrationAbsoluteFunctor <double, double, double> ConversionFunctorAbsoluteType;
+            typedef itk::BinaryFunctorImageFilter<DoubleImageType, DoubleImageType, ConvertedImageType, ConversionFunctorAbsoluteType> FilterAbsoluteType;
 
             ConversionFunctorAbsoluteType ConversionAbsoluteFunctor;
             ConversionAbsoluteFunctor.initialize(this->m_Factor);
@@ -343,18 +292,18 @@ mitk::Image::Pointer mitk::ConcentrationCurveGenerator::convertToConcentration(c
             typename FilterAbsoluteType::Pointer ConversionAbsoluteFilter = FilterAbsoluteType::New();
 
             ConversionAbsoluteFilter->SetFunctor(ConversionAbsoluteFunctor);
-            ConversionAbsoluteFilter->SetInput1(itkInputImage);
-            ConversionAbsoluteFilter->SetInput2(itkBaselineImage);
+            ConversionAbsoluteFilter->SetInput1(itkDoubleInputImage);
+            ConversionAbsoluteFilter->SetInput2(itkDoubleBaselineImage);
 
             ConversionAbsoluteFilter->Update();
 
-            outputImage = mitk::ImportItkImage(ConversionAbsoluteFilter->GetOutput())->Clone();
+            m_ConvertSignalToConcentrationCurve_OutputImage = mitk::ImportItkImage(ConversionAbsoluteFilter->GetOutput())->Clone();
         }
 
         else if(this->m_RelativeSignalEnhancement)
         {
-            typedef mitk::ConvertToConcentrationRelativeFunctor <Tpixel, Tpixel, double> ConversionFunctorRelativeType;
-            typedef itk::BinaryFunctorImageFilter<InputImageType,InputImageType, ConvertedImageType, ConversionFunctorRelativeType> FilterRelativeType;
+            typedef mitk::ConvertToConcentrationRelativeFunctor <double, double, double> ConversionFunctorRelativeType;
+            typedef itk::BinaryFunctorImageFilter<DoubleImageType, DoubleImageType, ConvertedImageType, ConversionFunctorRelativeType> FilterRelativeType;
 
             ConversionFunctorRelativeType ConversionRelativeFunctor;
             ConversionRelativeFunctor.initialize(this->m_Factor);
@@ -362,18 +311,16 @@ mitk::Image::Pointer mitk::ConcentrationCurveGenerator::convertToConcentration(c
             typename FilterRelativeType::Pointer ConversionRelativeFilter = FilterRelativeType::New();
 
             ConversionRelativeFilter->SetFunctor(ConversionRelativeFunctor);
-            ConversionRelativeFilter->SetInput1(itkInputImage);
-            ConversionRelativeFilter->SetInput2(itkBaselineImage);
+            ConversionRelativeFilter->SetInput1(itkDoubleInputImage);
+            ConversionRelativeFilter->SetInput2(itkDoubleBaselineImage);
 
             ConversionRelativeFilter->Update();
 
-            outputImage = mitk::ImportItkImage(ConversionRelativeFilter->GetOutput())->Clone();
+            m_ConvertSignalToConcentrationCurve_OutputImage = mitk::ImportItkImage(ConversionRelativeFilter->GetOutput())->Clone();
         }
+
     }
-
-
-
-    return outputImage;
+    return m_ConvertSignalToConcentrationCurve_OutputImage;
 
 }
 

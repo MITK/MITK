@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <QGridLayout>
 #include <QToolBar>
 #include <QTextBrowser>
+
 #include <mitkInteractionEventObserver.h>
 #include <mitkCoreServices.h>
 #include <mitkIPropertyFilters.h>
@@ -44,6 +45,8 @@ found in the LICENSE file.
 #include <mitkNodePredicateNot.h>
 
 #include <QmitkRenderWindow.h>
+#include <QmitkSelectionServiceConnector.h>
+#include <QmitkSingleNodeSelectionWidget.h>
 
 #include "mitkPluginActivator.h"
 #include "usModuleRegistry.h"
@@ -89,7 +92,7 @@ struct QmitkMeasurementViewData
       m_UnintializedPlanarFigure(false),
       m_ScrollEnabled(true),
       m_Parent(nullptr),
-      m_SelectedImageLabel(nullptr),
+      m_SingleNodeSelectionWidget(nullptr),
       m_DrawLine(nullptr),
       m_DrawPath(nullptr),
       m_DrawAngle(nullptr),
@@ -127,7 +130,8 @@ struct QmitkMeasurementViewData
   bool m_ScrollEnabled;
 
   QWidget* m_Parent;
-  QLabel* m_SelectedImageLabel;
+  QmitkSingleNodeSelectionWidget* m_SingleNodeSelectionWidget;
+  std::unique_ptr<QmitkSelectionServiceConnector> m_SelectionServiceConnector;
   QAction* m_DrawLine;
   QAction* m_DrawPath;
   QAction* m_DrawAngle;
@@ -167,10 +171,14 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
 {
   d->m_Parent = parent;
 
-  auto selectedImageLabel = new QLabel(tr("Reference Image: "));
+  d->m_SingleNodeSelectionWidget = new QmitkSingleNodeSelectionWidget();
+  d->m_SingleNodeSelectionWidget->SetDataStorage(GetDataStorage());
+  d->m_SingleNodeSelectionWidget->SetSelectionIsOptional(true);
+  d->m_SingleNodeSelectionWidget->SetEmptyInfo(QString("Please select a data node"));
+  d->m_SingleNodeSelectionWidget->SetPopUpTitel(QString("Select data node"));
 
-  d->m_SelectedImageLabel = new QLabel;
-  d->m_SelectedImageLabel->setStyleSheet("font-weight: bold;");
+  d->m_SelectionServiceConnector = std::make_unique<QmitkSelectionServiceConnector>();
+  SetAsSelectionListener(true);
 
   d->m_DrawActionsToolBar = new QToolBar;
   d->m_DrawActionsGroup = new QActionGroup(this);
@@ -227,8 +235,7 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
   d->m_CopyToClipboard = new QPushButton(tr("Copy to Clipboard"));
 
   d->m_Layout = new QGridLayout;
-  d->m_Layout->addWidget(selectedImageLabel, 0, 0, 1, 1);
-  d->m_Layout->addWidget(d->m_SelectedImageLabel, 0, 1, 1, 1);
+  d->m_Layout->addWidget(d->m_SingleNodeSelectionWidget, 0, 0, 1, 2);
   d->m_Layout->addWidget(d->m_DrawActionsToolBar, 1, 0, 1, 2);
   d->m_Layout->addWidget(d->m_SelectedPlanarFiguresText, 2, 0, 1, 2);
   d->m_Layout->addWidget(d->m_CopyToClipboard, 3, 0, 1, 2);
@@ -238,8 +245,11 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
   this->CreateConnections();
   this->AddAllInteractors();
 }
+
 void QmitkMeasurementView::CreateConnections()
 {
+  connect(d->m_SingleNodeSelectionWidget, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,
+    this, &QmitkMeasurementView::OnCurrentSelectionChanged);
   connect(d->m_DrawLine, SIGNAL(triggered(bool)), this, SLOT(OnDrawLineTriggered(bool)));
   connect(d->m_DrawPath, SIGNAL(triggered(bool)), this, SLOT(OnDrawPathTriggered(bool)));
   connect(d->m_DrawAngle, SIGNAL(triggered(bool)), this, SLOT(OnDrawAngleTriggered(bool)));
@@ -252,6 +262,32 @@ void QmitkMeasurementView::CreateConnections()
   connect(d->m_DrawBezierCurve, SIGNAL(triggered(bool)), this, SLOT(OnDrawBezierCurveTriggered(bool)));
   connect(d->m_DrawSubdivisionPolygon, SIGNAL(triggered(bool)), this, SLOT(OnDrawSubdivisionPolygonTriggered(bool)));
   connect(d->m_CopyToClipboard, SIGNAL(clicked(bool)), this, SLOT(OnCopyToClipboard(bool)));
+}
+
+void QmitkMeasurementView::SetAsSelectionListener(bool checked)
+{
+  if (checked)
+  {
+    d->m_SelectionServiceConnector->AddPostSelectionListener(GetSite()->GetWorkbenchWindow()->GetSelectionService());
+    connect(d->m_SelectionServiceConnector.get(), &QmitkSelectionServiceConnector::ServiceSelectionChanged, d->m_SingleNodeSelectionWidget, &QmitkSingleNodeSelectionWidget::SetCurrentSelection);
+  }
+  else
+  {
+    d->m_SelectionServiceConnector->RemovePostSelectionListener();
+    disconnect(d->m_SelectionServiceConnector.get(), &QmitkSelectionServiceConnector::ServiceSelectionChanged, d->m_SingleNodeSelectionWidget, &QmitkSingleNodeSelectionWidget::SetCurrentSelection);
+  }
+}
+
+void QmitkMeasurementView::OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
+{
+  if (nodes.empty() || nodes.front().IsNull())
+  {
+    d->m_SelectedImageNode = nullptr;
+  }
+  else
+  {
+    d->m_SelectedImageNode = nodes.front();
+  }
 }
 
 void QmitkMeasurementView::NodeAdded(const mitk::DataNode* node)
@@ -440,10 +476,6 @@ void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, co
   // bug 16600: deselecting all planarfigures by clicking on datamanager when no node is selected
   if (d->m_CurrentSelection.size() == 0)
   {
-    // bug 18440: resetting the selected image label here because unselecting the
-    // current node did not reset the label
-    d->m_SelectedImageLabel->setText(tr("No visible image available."));
-
     auto isPlanarFigure = mitk::TNodePredicateDataType<mitk::PlanarFigure>::New();
     auto planarFigures = this->GetDataStorage()->GetSubset(isPlanarFigure);
 

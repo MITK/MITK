@@ -72,6 +72,10 @@ private:
 
     void CreateConnections();
     mitk::DataNode::Pointer AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name);
+
+    void SetAsSelectionListener(bool checked);
+    void OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
+
     void UpdateMeasurementText();
     void AddAllInteractors();
     void EnableCrosshairNavigation();

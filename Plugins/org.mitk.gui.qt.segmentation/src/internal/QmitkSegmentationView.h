@@ -60,7 +60,7 @@ public:
   void OnPreferencesChanged(const berry::IBerryPreferences* prefs) override;
 
   // observer to mitk::RenderingManager's RenderingManagerViewsInitializedEvent event
-  void RenderingManagerReinitialized();
+  void CheckRenderingState();
 
   static const std::string VIEW_ID;
 

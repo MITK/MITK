@@ -94,7 +94,7 @@ QmitkDataSelectionWidget::~QmitkDataSelectionWidget()
 {
 }
 
-unsigned int QmitkDataSelectionWidget::AddDataStorageComboBox(QmitkDataSelectionWidget::Predicate predicate)
+unsigned int QmitkDataSelectionWidget::AddDataSelection(QmitkDataSelectionWidget::Predicate predicate)
 {
   QString hint = "Select node";
   QString popupTitel = "Select node";
@@ -127,20 +127,20 @@ unsigned int QmitkDataSelectionWidget::AddDataStorageComboBox(QmitkDataSelection
     break;
   }
 
-  return this->AddDataStorageComboBox("", hint, popupTitel, "", predicate);
+  return this->AddDataSelection("", hint, popupTitel, "", predicate);
 }
 
-unsigned int QmitkDataSelectionWidget::AddDataStorageComboBox(mitk::NodePredicateBase* predicate)
+unsigned int QmitkDataSelectionWidget::AddDataSelection(mitk::NodePredicateBase* predicate)
 {
-  return this->AddDataStorageComboBox("", "Select a node", "Select a node", "", predicate);
+  return this->AddDataSelection("", "Select a node", "Select a node", "", predicate);
 }
 
-unsigned int QmitkDataSelectionWidget::AddDataStorageComboBox(const QString &labelText, const QString &info, const QString &popupTitel, const QString &popupHint, QmitkDataSelectionWidget::Predicate predicate)
+unsigned int QmitkDataSelectionWidget::AddDataSelection(const QString &labelText, const QString &info, const QString &popupTitel, const QString &popupHint, QmitkDataSelectionWidget::Predicate predicate)
 {
-  return this->AddDataStorageComboBox(labelText, info, popupHint, popupTitel, CreatePredicate(predicate));
+  return this->AddDataSelection(labelText, info, popupHint, popupTitel, CreatePredicate(predicate));
 }
 
-unsigned int QmitkDataSelectionWidget::AddDataStorageComboBox(const QString &labelText, const QString &info, const QString &popupTitel, const QString &popupHint, mitk::NodePredicateBase* predicate)
+unsigned int QmitkDataSelectionWidget::AddDataSelection(const QString &labelText, const QString &info, const QString &popupTitel, const QString &popupHint, mitk::NodePredicateBase* predicate)
 {
   int row = m_Controls.gridLayout->rowCount();
 

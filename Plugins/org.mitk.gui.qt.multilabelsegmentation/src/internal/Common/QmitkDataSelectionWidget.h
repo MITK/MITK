@@ -41,10 +41,10 @@ public:
   explicit QmitkDataSelectionWidget(QWidget* parent = nullptr);
   ~QmitkDataSelectionWidget() override;
 
-  unsigned int AddDataStorageComboBox(PredicateType predicate);
-  unsigned int AddDataStorageComboBox(mitk::NodePredicateBase* predicate = nullptr);
-  unsigned int AddDataStorageComboBox(const QString &labelText, const QString &info, const QString &popupTitel, const QString &popupHint, PredicateType predicate);
-  unsigned int AddDataStorageComboBox(const QString &labelText, const QString &info, const QString &popupTitel, const QString &popupHint, mitk::NodePredicateBase* predicate = nullptr);
+  unsigned int AddDataSelection(PredicateType predicate);
+  unsigned int AddDataSelection(mitk::NodePredicateBase* predicate = nullptr);
+  unsigned int AddDataSelection(const QString &labelText, const QString &info, const QString &popupTitel, const QString &popupHint, PredicateType predicate);
+  unsigned int AddDataSelection(const QString &labelText, const QString &info, const QString &popupTitel, const QString &popupHint, mitk::NodePredicateBase* predicate = nullptr);
 
   mitk::DataStorage::Pointer GetDataStorage() const;
   mitk::DataNode::Pointer GetSelection(unsigned int index);

@@ -95,7 +95,7 @@ QmitkDataSelectionWidget::~QmitkDataSelectionWidget()
 {
 }
 
-unsigned int QmitkDataSelectionWidget::AddDataStorageComboBox(QmitkDataSelectionWidget::PredicateType predicate)
+unsigned int QmitkDataSelectionWidget::AddDataSelection(QmitkDataSelectionWidget::PredicateType predicate)
 {
   QString hint = "Select node";
   QString popupTitel = "Select node";
@@ -113,8 +113,8 @@ unsigned int QmitkDataSelectionWidget::AddDataStorageComboBox(QmitkDataSelection
     break;
 
   case QmitkDataSelectionWidget::SegmentationPredicate:
-    hint = "Select a ML segmentation";
-    popupTitel = "Select a ML segmentation";
+    hint = "Select an ML segmentation";
+    popupTitel = "Select an ML segmentation";
     break;
 
   case QmitkDataSelectionWidget::SurfacePredicate:
@@ -123,20 +123,20 @@ unsigned int QmitkDataSelectionWidget::AddDataStorageComboBox(QmitkDataSelection
     break;
   }
 
-  return this->AddDataStorageComboBox("", hint, popupTitel, "", predicate);
+  return this->AddDataSelection("", hint, popupTitel, "", predicate);
 }
 
-unsigned int QmitkDataSelectionWidget::AddDataStorageComboBox(mitk::NodePredicateBase* predicate)
+unsigned int QmitkDataSelectionWidget::AddDataSelection(mitk::NodePredicateBase* predicate)
 {
-  return this->AddDataStorageComboBox("", "Select a node", "Select a node", "", predicate);
+  return this->AddDataSelection("", "Select a node", "Select a node", "", predicate);
 }
 
-unsigned int QmitkDataSelectionWidget::AddDataStorageComboBox(const QString &labelText, const QString &info, const QString &popupTitel, const QString &popupHint, QmitkDataSelectionWidget::PredicateType predicate)
+unsigned int QmitkDataSelectionWidget::AddDataSelection(const QString &labelText, const QString &info, const QString &popupTitel, const QString &popupHint, QmitkDataSelectionWidget::PredicateType predicate)
 {
-  return this->AddDataStorageComboBox(labelText, info, popupHint, popupTitel, CreatePredicate(predicate));
+  return this->AddDataSelection(labelText, info, popupHint, popupTitel, CreatePredicate(predicate));
 }
 
-unsigned int QmitkDataSelectionWidget::AddDataStorageComboBox(const QString &labelText, const QString &info, const QString &popupTitel, const QString &popupHint, mitk::NodePredicateBase* predicate)
+unsigned int QmitkDataSelectionWidget::AddDataSelection(const QString &labelText, const QString &info, const QString &popupTitel, const QString &popupHint, mitk::NodePredicateBase* predicate)
 {
   int row = m_Controls.gridLayout->rowCount();
 

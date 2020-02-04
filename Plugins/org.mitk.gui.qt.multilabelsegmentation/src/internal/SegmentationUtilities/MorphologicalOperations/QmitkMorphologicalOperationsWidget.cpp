@@ -24,7 +24,7 @@ QmitkMorphologicalOperationsWidget::QmitkMorphologicalOperationsWidget(mitk::Sli
 {
   m_Controls.setupUi(this);
 
-  m_Controls.m_DataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::MaskPredicate);
+  m_Controls.m_DataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::MaskPredicate);
   m_Controls.m_DataSelectionWidget->SetHelpText(HelpText);
 
 //  mitk::IDataStorageService::Pointer service =

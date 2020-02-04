@@ -48,6 +48,10 @@ public:
     void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
     void NodeAdded(const mitk::DataNode* node) override;
+    /**
+    * @brief  Determine if we have to update the information of the currently
+    *         selected planar figures.
+    */
     void NodeChanged(const mitk::DataNode* node) override;
     void NodeRemoved(const mitk::DataNode* node) override;
 

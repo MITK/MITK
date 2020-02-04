@@ -347,20 +347,11 @@ void QmitkMeasurementView::NodeAdded(const mitk::DataNode* node)
 
 void QmitkMeasurementView::NodeChanged(const mitk::DataNode* node)
 {
-  // DETERMINE IF WE HAVE TO RENEW OUR DETAILS TEXT (ANY NODE CHANGED IN OUR SELECTION?)
-  auto renewText = false;
-
-  for (int i = 0; i < d->m_CurrentSelection.size(); ++i)
+  auto it = std::find(d->m_CurrentSelection.begin(), d->m_CurrentSelection.end(), node);
+  if (it != d->m_CurrentSelection.end())
   {
-    if (node == d->m_CurrentSelection[i])
-    {
-      renewText = true;
-      break;
-    }
-  }
-
-  if (renewText)
     this->UpdateMeasurementText();
+  }
 }
 
 void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
@@ -425,24 +416,15 @@ void QmitkMeasurementView::PlanarFigureSelected(itk::Object* object, const itk::
 {
   d->m_CurrentSelection.clear();
 
-  auto it = d->m_DataNodeToPlanarFigureData.begin();
-
-  while (it != d->m_DataNodeToPlanarFigureData.end())
+  auto lambda = [&object](const std::pair<mitk::DataNode::Pointer, QmitkPlanarFigureData>& element)
   {
-    auto node = it->first;
-    QmitkPlanarFigureData& data = it->second;
+    return element.second.m_Figure == object;
+  };
 
-    if (data.m_Figure == object )
-    {
-        node->SetSelected(true);
-        d->m_CurrentSelection.push_back( node );
-    }
-    else
-    {
-        node->SetSelected(false);
-    }
-
-    ++it;
+  auto it = std::find_if(d->m_DataNodeToPlanarFigureData.begin(), d->m_DataNodeToPlanarFigureData.end(), lambda);
+  if (it != d->m_DataNodeToPlanarFigureData.end())
+  {
+    d->m_CurrentSelection.push_back(it->first);
   }
 
   this->UpdateMeasurementText();

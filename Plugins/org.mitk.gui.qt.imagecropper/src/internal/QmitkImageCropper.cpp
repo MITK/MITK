@@ -12,31 +12,8 @@ found in the LICENSE file.
 
 #include "QmitkImageCropper.h"
 
-#include <QAction>
-#include <QCheckBox>
-#include <QColorDialog>
-#include <QInputDialog>
-#include <QMessageBox>
-#include <QSpinBox>
-#include <QSlider>
-#include <QApplication>
-
-#include <vtkCommand.h>
-#include <vtkCubeSource.h>
-#include <vtkObjectFactory.h>
-#include <vtkRenderWindow.h>
-#include <vtkPlaneWidget.h>
-#include <vtkProperty.h>
-#include <vtkSmartPointer.h>
-#include <vtkTransform.h>
-#include <vtkTransformFilter.h>
-
-#include <mitkBoundingShapeInteractor.h>
 #include <mitkBoundingShapeCropper.h>
 #include <mitkDisplayInteractor.h>
-#include <mitkIDataStorageService.h>
-#include <mitkImageCast.h> // Includes for image casting between ITK and MITK: added after using Plugin Generator
-#include <mitkImageAccessByItk.h>
 #include <mitkImageStatisticsHolder.h>
 #include <mitkInteractionConst.h>
 #include <mitkITKImageImport.h>
@@ -47,13 +24,10 @@ found in the LICENSE file.
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateFunction.h>
 #include <mitkRenderingManager.h>
-#include <mitkProperties.h>
-
-#include <itkBoundingBox.h>
-#include <itkCommand.h>
 
 #include <usModuleRegistry.h>
-#include <usGetModuleContext.h>
+
+#include <QMessageBox>
 
 const std::string QmitkImageCropper::VIEW_ID = "org.mitk.views.qmitkimagecropper";
 

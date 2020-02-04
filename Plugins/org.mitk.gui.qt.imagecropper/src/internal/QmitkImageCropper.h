@@ -19,29 +19,10 @@ found in the LICENSE file.
 #pragma warning( disable : 4250 )
 #endif
 
-#include <QProgressDialog>
-#include "QmitkRegisterClasses.h"
-#include <QList>
-
-#include "itkCommand.h"
-#include <itkImage.h>
-#include <itksys/SystemTools.hxx>
-
-#include <vtkEventQtSlotConnect.h>
-#include <vtkObjectFactory.h>
-#include <vtkRenderWindow.h>
-#include <vtkSmartPointer.h>
-
 #include <mitkBoundingShapeInteractor.h>
-#include <mitkDataStorage.h>
-#include <mitkEventConfig.h>
-#include <mitkGeometryData.h>
-#include <mitkPointSet.h>
 #include <mitkWeakPointer.h>
 
 #include "ui_ImageCropperControls.h"
-
-#include "usServiceRegistration.h"
 
 /*!
 @brief QmitkImageCropperView
@@ -52,16 +33,10 @@ found in the LICENSE file.
 */
 class QmitkImageCropper : public QmitkAbstractView
 {
-  // this is needed for all Qt objects that should have a Qt meta-object
-  // (everything that derives from QObject and wants to have signal/slots)
-private:
 
   Q_OBJECT
 
 public:
-  /*!
-  @brief Constructor. Called by SampleApp (or other apps that use functionalities)
-  */
   QmitkImageCropper(QObject *parent = nullptr);
 
   ~QmitkImageCropper() override;
@@ -77,9 +52,7 @@ public:
   */
 
   QWidget* GetControls();
-
-  /// @brief Called when the user clicks the GUI button
-  protected slots:
+protected Q_SLOTS:
   /*!
   * @brief Creates a new bounding object
   */
@@ -124,9 +97,6 @@ protected:
 
 private:
 
-  /*!
-  * The parent QWidget
-  */
   QWidget* m_ParentWidget;
   /*!
   * @brief A pointer to the node of the image to be cropped.

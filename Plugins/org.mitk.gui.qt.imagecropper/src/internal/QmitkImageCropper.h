@@ -24,19 +24,13 @@ found in the LICENSE file.
 
 #include "ui_ImageCropperControls.h"
 
-/*!
-@brief QmitkImageCropperView
-\warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
-
-\sa QmitkFunctionality
-\ingroup ${plugin_target}_internal
-*/
 class QmitkImageCropper : public QmitkAbstractView
 {
 
   Q_OBJECT
 
 public:
+
   QmitkImageCropper(QObject *parent = nullptr);
 
   ~QmitkImageCropper() override;
@@ -47,11 +41,6 @@ public:
 
   void SetFocus() override;
 
-  /*!
-  @brief Creates the Qt connections needed
-  */
-
-  QWidget* GetControls();
 protected Q_SLOTS:
   /*!
   * @brief Creates a new bounding object
@@ -81,11 +70,11 @@ protected Q_SLOTS:
 protected:
 
   /*!
- @brief called by QmitkFunctionality when DataManager's selection has changed
+  * @brief called by QmitkAbstractView when DataManager's selection has changed
   */
   void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
   /*!
-  @brief Sets the selected bounding object as current bounding object and set up interactor
+  * @brief Sets the selected bounding object as current bounding object and set up interactor
   */
   void OnComboBoxSelectionChanged(const mitk::DataNode* node);
   /*!
@@ -122,7 +111,7 @@ private:
   /*!
   * @brief Resets GUI to default
   */
-  void setDefaultGUI();
+  void SetDefaultGUI();
 
   QString AdaptBoundingObjectName(const QString& name) const;
 

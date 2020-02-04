@@ -67,7 +67,7 @@ protected:
   void ResetGUIDefault();
 
   void OnStatisticsCalculationEnds();
-  void OnRequestHistogramUpdate(unsigned int nBins);
+  void OnRequestHistogramUpdate(unsigned int);
   void OnCheckBoxIgnoreZeroStateChanged(int state);
   void OnButtonSelectionPressed();
   void OnDialogSelectionChanged();

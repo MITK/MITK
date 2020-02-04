@@ -398,7 +398,7 @@ void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
   m_Controls.label_currentlyComputingStatistics->setVisible(false);
 }
 
-void QmitkImageStatisticsView::OnRequestHistogramUpdate(unsigned int nBins)
+void QmitkImageStatisticsView::OnRequestHistogramUpdate(unsigned int)
 {
   // NEEDS TO BE IMPLEMENTED - SEE T27032
 }

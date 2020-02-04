@@ -182,15 +182,6 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), m_Controls.factorSpinBox, SLOT(setEnabled(bool)));
   connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), m_Controls.factorSpinBox, SLOT(setEnabled(bool)));
-  connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), m_Controls.spinBox_baselineStartTimeStep, SLOT(setEnabled(bool)));
-  connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), m_Controls.spinBox_baselineStartTimeStep, SLOT(setEnabled(bool)));
-  connect(m_Controls.radioButtonUsingT1, SIGNAL(toggled(bool)), m_Controls.spinBox_baselineStartTimeStep, SLOT(setEnabled(bool)));
-  connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), m_Controls.spinBox_baselineStartTimeStep, SLOT(setEnabled(bool)));
-
-  connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), m_Controls.spinBox_baselineEndTimeStep, SLOT(setEnabled(bool)));
-  connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), m_Controls.spinBox_baselineEndTimeStep, SLOT(setEnabled(bool)));
-  connect(m_Controls.radioButtonUsingT1, SIGNAL(toggled(bool)), m_Controls.spinBox_baselineEndTimeStep, SLOT(setEnabled(bool)));
-  connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), m_Controls.spinBox_baselineEndTimeStep, SLOT(setEnabled(bool)));
 
   connect(m_Controls.factorSpinBox, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.spinBox_baselineStartTimeStep, SIGNAL(valueChanged(int)), this, SLOT(UpdateGUIControls()));
@@ -256,6 +247,11 @@ void MRPerfusionView::UpdateGUIControls()
 
   m_Controls.btnModelling->setEnabled(m_selectedImage.IsNotNull()
                                       && m_selectedModelFactory.IsNotNull() && !m_FittingInProgress && CheckModelSettings());
+
+  m_Controls.spinBox_baselineStartTimeStep->setEnabled(m_Controls.radioButtonTurboFlash->isChecked() || m_Controls.radioButton_absoluteEnhancement->isChecked() || m_Controls.radioButton_relativeEnchancement->isChecked() || m_Controls.radioButtonUsingT1->isChecked());
+  m_Controls.spinBox_baselineEndTimeStep->setEnabled(m_Controls.radioButton_absoluteEnhancement->isChecked() || m_Controls.radioButton_relativeEnchancement->isChecked() || m_Controls.radioButtonUsingT1->isChecked() || m_Controls.radioButtonTurboFlash->isChecked());
+
+
 }
 
 void MRPerfusionView::OnModellSet(int index)

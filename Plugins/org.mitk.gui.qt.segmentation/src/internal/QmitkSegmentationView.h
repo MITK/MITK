@@ -76,8 +76,6 @@ public:
 
   void OnVisiblePropertyChanged();
 
-  void OnBinaryPropertyChanged();
-
   void OnShowMarkerNodes(bool);
 
   void OnTabWidgetChanged(int);
@@ -133,8 +131,6 @@ protected:
   bool m_DataSelectionChanged;
 
   NodeTagMapType  m_WorkingDataObserverTags;
-
-  NodeTagMapType  m_BinaryPropertyObserverTags;
 
   unsigned int m_RenderingManagerObserverTag;
 

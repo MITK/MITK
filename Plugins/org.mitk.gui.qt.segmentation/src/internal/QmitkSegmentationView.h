@@ -90,9 +90,6 @@ protected:
   // GUI setup
   void CreateQtPartControl(QWidget* parent) override;
 
-  // initially set the tool manager selection from the combo boxes
-  void InitToolManagerSelection(mitk::DataNode* referenceData, mitk::DataNode* workingData);
-
   // propagate BlueBerry selection to ToolManager for manual segmentation
   void SetToolManagerSelection(mitk::DataNode* referenceData, mitk::DataNode* workingData);
 
@@ -110,6 +107,8 @@ protected:
 
   // If a contourmarker is selected, the plane in the related widget will be reoriented according to the marker`s geometry
   void OnContourMarkerSelected(const mitk::DataNode* node);
+
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes) override;
 
   void NodeRemoved(const mitk::DataNode* node) override;
 

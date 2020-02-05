@@ -564,6 +564,21 @@ void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
    }
 }
 
+void QmitkSegmentationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes)
+{
+  if (nodes.size() != 0)
+  {
+    std::string markerName = "Position";
+    unsigned int numberOfNodes = nodes.size();
+    std::string nodeName = nodes.at(0)->GetName();
+    if ((numberOfNodes == 1) && (nodeName.find(markerName) == 0))
+    {
+      this->OnContourMarkerSelected(nodes.at(0));
+      return;
+    }
+  }
+}
+
 void QmitkSegmentationView::OnTabWidgetChanged(int id)
 {
    //always disable tools on tab changed
@@ -587,21 +602,6 @@ void QmitkSegmentationView::OnTabWidgetChanged(int id)
       m_Controls->m_ManualToolSelectionBox3D->show();
       //Deactivate possible active tool
    }
-}
-
-void QmitkSegmentationView::InitToolManagerSelection(mitk::DataNode* referenceData, mitk::DataNode* workingData)
-{
-  // initial tool manager selection, called from 'CreateQtPartControl'
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  toolManager->SetReferenceData(const_cast<mitk::DataNode*>(referenceData));
-  toolManager->SetWorkingData(const_cast<mitk::DataNode*>(workingData));
-
-  // check original image
-  m_Controls->btnNewSegmentation->setEnabled(referenceData != nullptr);
-  if (referenceData)
-  {
-    UpdateWarningLabel("");
-  }
 }
 
 void QmitkSegmentationView::SetToolManagerSelection(mitk::DataNode* referenceData, mitk::DataNode* workingData)
@@ -906,7 +906,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    command->SetCallbackFunction(this, &QmitkSegmentationView::CheckRenderingState);
    m_RenderingManagerObserverTag = mitk::RenderingManager::GetInstance()->AddObserver(mitk::RenderingManagerViewsInitializedEvent(), command);
 
-   InitToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), m_Controls->segImageSelector->GetSelectedNode());
+   SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), m_Controls->segImageSelector->GetSelectedNode());
 
    m_RenderWindowPart = GetRenderWindowPart();
    if (m_RenderWindowPart)

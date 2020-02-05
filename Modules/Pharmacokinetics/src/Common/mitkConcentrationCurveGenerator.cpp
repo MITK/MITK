@@ -121,9 +121,9 @@ void mitk::ConcentrationCurveGenerator::CalculateAverageBaselineImage(const itk:
   typedef itk::ExtractImageFilter<Double4DImageType, Double3DImageType> Extract3DImageFilterType;
   typedef itk::MeanProjectionImageFilter<TPixel4DImageType,Double4DImageType> MeanProjectionImageFilterType;
 
-  MeanProjectionImageFilterType::Pointer MeanProjectionImageFilter = MeanProjectionImageFilterType::New();
-  Extract3DImageFilterType::Pointer Extract3DImageFilter = Extract3DImageFilterType::New();
-  TPixel4DImageType::RegionType region_input = itkBaselineImage->GetLargestPossibleRegion();
+  typename MeanProjectionImageFilterType::Pointer MeanProjectionImageFilter = MeanProjectionImageFilterType::New();
+  typename Extract3DImageFilterType::Pointer Extract3DImageFilter = Extract3DImageFilterType::New();
+  typename TPixel4DImageType::RegionType region_input = itkBaselineImage->GetLargestPossibleRegion();
 
   if (m_BaselineEndTimeStep > region_input.GetSize()[3])
   {
@@ -131,11 +131,11 @@ void mitk::ConcentrationCurveGenerator::CalculateAverageBaselineImage(const itk:
   }
 
   ExtractImageFilterType::Pointer ExtractFilter = ExtractImageFilterType::New();
-  TPixel4DImageType::Pointer baselineTimeFrameImage = TPixel4DImageType::New();
-  TPixel4DImageType::RegionType extractionRegion;
-  TPixel4DImageType::SizeType size_input_aux = region_input.GetSize();
+  typename TPixel4DImageType::Pointer baselineTimeFrameImage = TPixel4DImageType::New();
+  typename TPixel4DImageType::RegionType extractionRegion;
+  typename TPixel4DImageType::SizeType size_input_aux = region_input.GetSize();
   size_input_aux[3] = m_BaselineEndTimeStep - m_BaselineStartTimeStep+1;
-  TPixel4DImageType::IndexType start_input_aux = region_input.GetIndex();
+  typename TPixel4DImageType::IndexType start_input_aux = region_input.GetIndex();
   start_input_aux[3] = m_BaselineStartTimeStep;
   extractionRegion.SetSize(size_input_aux);
   extractionRegion.SetIndex(start_input_aux);
@@ -206,13 +206,13 @@ mitk::Image::Pointer mitk::ConcentrationCurveGenerator::convertToConcentration(c
     typename DoubleImageType::Pointer itkDoubleBaselineImage = DoubleImageType::New();
 
     typedef itk::CastImageFilter<InputImageType, DoubleImageType> CastInputImageToDoubleImageFilterType;
-    CastInputImageToDoubleImageFilterType::Pointer CastInputImageToDoubleImageFilter = CastInputImageToDoubleImageFilterType::New();
+    typename CastInputImageToDoubleImageFilterType::Pointer CastInputImageToDoubleImageFilter = CastInputImageToDoubleImageFilterType::New();
     CastInputImageToDoubleImageFilter->SetInput(itkInputImage);
     CastInputImageToDoubleImageFilter->Update();
     itkDoubleInputImage = CastInputImageToDoubleImageFilter->GetOutput();
 
     typedef itk::CastImageFilter<BaselineImageType, DoubleImageType> CastBaselineImageToDoubleImageFilterType;
-    CastBaselineImageToDoubleImageFilterType::Pointer CastBaselineImageToDoubleImageFilter = CastBaselineImageToDoubleImageFilterType::New();
+    typename CastBaselineImageToDoubleImageFilterType::Pointer CastBaselineImageToDoubleImageFilter = CastBaselineImageToDoubleImageFilterType::New();
     CastBaselineImageToDoubleImageFilter->SetInput(itkBaselineImage);
     CastBaselineImageToDoubleImageFilter->Update();
     itkDoubleBaselineImage = CastBaselineImageToDoubleImageFilter->GetOutput();

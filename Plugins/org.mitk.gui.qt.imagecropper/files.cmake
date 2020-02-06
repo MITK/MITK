@@ -3,7 +3,7 @@ set(SRC_CPP_FILES
 )
 
 set(INTERNAL_CPP_FILES
-  org_mitk_gui_qt_imagecropper_Activator.cpp
+  mitkPluginActivator.cpp
   QmitkImageCropper.cpp
 )
 
@@ -12,7 +12,7 @@ set(UI_FILES
 )
 
 set(MOC_H_FILES
-  src/internal/org_mitk_gui_qt_imagecropper_Activator.h
+  src/internal/mitkPluginActivator.h
   src/internal/QmitkImageCropper.h
 )
 

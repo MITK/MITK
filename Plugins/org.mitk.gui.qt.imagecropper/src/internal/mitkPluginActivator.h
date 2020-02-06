@@ -17,7 +17,7 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  class org_mitk_gui_qt_imagecropper_Activator : public QObject, public ctkPluginActivator
+  class mitkPluginActivator : public QObject, public ctkPluginActivator
   {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_imagecropper")

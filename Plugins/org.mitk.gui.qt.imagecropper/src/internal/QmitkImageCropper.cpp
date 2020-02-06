@@ -324,17 +324,6 @@ void QmitkImageCropper::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part
   }
 }
 
-void QmitkImageCropper::OnComboBoxSelectionChanged(const mitk::DataNode* node)
-{
-  mitk::DataNode* selectedNode = const_cast<mitk::DataNode*>(node);
-  if (selectedNode != nullptr)
-  {
-    if (!m_ImageNode.IsExpired())
-      selectedNode->SetDataInteractor(m_ImageNode.Lock()->GetDataInteractor());
-    // m_ImageNode->GetDataInteractor()->SetDataNode(selectedNode);
-    m_ImageNode = selectedNode;
-  }
-}
 
 void QmitkImageCropper::OnSliderValueChanged(int slidervalue)
 {

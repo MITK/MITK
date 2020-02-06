@@ -74,9 +74,6 @@ protected:
   */
   void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
   /*!
-  * @brief Sets the selected bounding object as current bounding object and set up interactor
-  */
-  void OnComboBoxSelectionChanged(const mitk::DataNode* node);
   /*!
   * @brief Initializes a new bounding shape using the selected image geometry.
   */

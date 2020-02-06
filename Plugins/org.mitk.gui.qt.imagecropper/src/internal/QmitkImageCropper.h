@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <mitkBoundingShapeInteractor.h>
 #include <mitkWeakPointer.h>
 
-#include "ui_ImageCropperControls.h"
+#include "ui_QmitkImageCropperViewControls.h"
 
 class QmitkImageCropper : public QmitkAbstractView
 {
@@ -35,7 +35,7 @@ public:
 
   void CreateQtPartControl(QWidget *parent) override;
 
-  void SetFocus() override;
+  void SetFocus() override { };
 
 protected Q_SLOTS:
   /*!
@@ -51,13 +51,9 @@ protected Q_SLOTS:
   */
   void DoMasking();
   /*!
-  * @brief Dis- or enable the advanced setting section
-  */
-  void OnAdvancedSettingsButtonToggled();
-  /*!
   * @brief Updates current selection of the bounding object
   */
-  void OnDataSelectionChanged(const mitk::DataNode* node);
+  void OnBoundingBoxSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
   /*!
   * @brief Sets the scalar value for outside pixels in case of masking
   */
@@ -65,11 +61,7 @@ protected Q_SLOTS:
 
 protected:
 
-  /*!
-  * @brief called by QmitkAbstractView when DataManager's selection has changed
-  */
-  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
-  /*!
+  void OnImageSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
   /*!
   * @brief Initializes a new bounding shape using the selected image geometry.
   */
@@ -85,15 +77,13 @@ private:
   */
   mitk::WeakPointer<mitk::DataNode> m_ImageNode;
   /*!
+  * @brief A pointer to the node of the bounding box used for cropping.
+  */
+  mitk::WeakPointer<mitk::DataNode> m_BoundingBoxNode;
+  /*!
   * @brief The cuboid used for cropping.
   */
-  mitk::GeometryData::Pointer m_CroppingObject;
-
-  /*!
-  * @brief Tree node of the cuboid used for cropping.
-  */
-  mitk::DataNode::Pointer m_CroppingObjectNode;
-
+  mitk::GeometryData::Pointer m_BoundingBox;
   /*!
   * @brief Interactor for moving and scaling the cuboid
   */
@@ -114,7 +104,7 @@ private:
   bool m_Active;
   bool m_ScrollEnabled;
 
-  Ui::ImageCropperControls m_Controls;
+  Ui::QmitkImageCropperViewControls m_Controls;
 };
 
 #endif // QmitkImageCropper_h

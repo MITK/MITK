@@ -15,10 +15,6 @@ found in the LICENSE file.
 
 #include <QmitkAbstractView.h>
 
-#ifdef WIN32
-#pragma warning( disable : 4250 )
-#endif
-
 #include <mitkBoundingShapeInteractor.h>
 #include <mitkWeakPointer.h>
 

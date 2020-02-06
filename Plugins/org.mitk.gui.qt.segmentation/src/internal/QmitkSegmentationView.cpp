@@ -528,7 +528,7 @@ void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
    }
 }
 
-void QmitkSegmentationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes)
+void QmitkSegmentationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer> &nodes)
 {
   if (nodes.size() != 0)
   {

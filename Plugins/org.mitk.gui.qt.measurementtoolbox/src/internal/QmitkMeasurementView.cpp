@@ -174,8 +174,8 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
   d->m_SingleNodeSelectionWidget = new QmitkSingleNodeSelectionWidget();
   d->m_SingleNodeSelectionWidget->SetDataStorage(GetDataStorage());
   d->m_SingleNodeSelectionWidget->SetSelectionIsOptional(true);
-  d->m_SingleNodeSelectionWidget->SetEmptyInfo(QString("Please select a data node"));
-  d->m_SingleNodeSelectionWidget->SetPopUpTitel(QString("Select data node"));
+  d->m_SingleNodeSelectionWidget->SetEmptyInfo(QStringLiteral("Please select a reference image"));
+  d->m_SingleNodeSelectionWidget->SetPopUpTitel(QStringLiteral("Select a reference image"));
 
   d->m_SelectionServiceConnector = std::make_unique<QmitkSelectionServiceConnector>();
   SetAsSelectionListener(true);

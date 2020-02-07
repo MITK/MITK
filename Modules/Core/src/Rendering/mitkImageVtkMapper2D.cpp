@@ -479,15 +479,16 @@ void mitk::ImageVtkMapper2D::ApplyColor( mitk::BaseRenderer* renderer )
   }
   if(binary && selected)
   {
-    mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
-                                                                                ("binaryimage.selectedcolor", renderer));
-    if(colorprop.IsNotNull()) {
-      memcpy(rgb, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
-    }
-    else
-    {
+    // AUT-4586
+    //mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
+    //                                                                            ("binaryimage.selectedcolor", renderer));
+    //if(colorprop.IsNotNull()) {
+    //  memcpy(rgb, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
+    //}
+    //else
+    //{
       GetDataNode()->GetColor(rgb, renderer, "color");
-    }
+    //}
   }
   if(!binary || (!hover && !selected))
   {

@@ -156,8 +156,8 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
           bool validIndex = true;
           m_SegmentationBinaryImage->GetGeometry()->WorldToIndex(worldCoord, idx);
           for (int d = 0; d < 3; d++) {
-            if (idx[d] < 0 || idx[d] > m_SegmentationBinaryImage->GetDimensions()[d]) {
-              validIndex = false;;
+            if (idx[d] < 0 || idx[d] >= m_SegmentationBinaryImage->GetDimensions()[d]) {
+              validIndex = false;
               break;
             }
           }

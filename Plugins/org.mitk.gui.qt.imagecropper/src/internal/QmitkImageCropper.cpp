@@ -34,8 +34,8 @@ const std::string QmitkImageCropper::VIEW_ID = "org.mitk.views.qmitkimagecropper
 QmitkImageCropper::QmitkImageCropper(QObject *)
   : m_ParentWidget(nullptr),
   m_ImageNode(nullptr),
-  m_BoundingBox(nullptr),
   m_BoundingBoxNode(nullptr),
+  m_BoundingBox(nullptr),
   m_BoundingShapeInteractor(nullptr),
   m_CropOutsideValue(0)
 {

@@ -45,7 +45,6 @@ found in the LICENSE file.
 #include <mitkNodePredicateNot.h>
 
 #include <QmitkRenderWindow.h>
-#include <QmitkSelectionServiceConnector.h>
 #include <QmitkSingleNodeSelectionWidget.h>
 
 #include "mitkPluginActivator.h"
@@ -131,7 +130,6 @@ struct QmitkMeasurementViewData
 
   QWidget* m_Parent;
   QmitkSingleNodeSelectionWidget* m_SingleNodeSelectionWidget;
-  std::unique_ptr<QmitkSelectionServiceConnector> m_SelectionServiceConnector;
   QAction* m_DrawLine;
   QAction* m_DrawPath;
   QAction* m_DrawAngle;
@@ -179,9 +177,6 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
   d->m_SingleNodeSelectionWidget->SetSelectionIsOptional(true);
   d->m_SingleNodeSelectionWidget->SetEmptyInfo(QStringLiteral("Please select a reference image"));
   d->m_SingleNodeSelectionWidget->SetPopUpTitel(QStringLiteral("Select a reference image"));
-
-  d->m_SelectionServiceConnector = std::make_unique<QmitkSelectionServiceConnector>();
-  SetAsSelectionListener(true);
 
   d->m_DrawActionsToolBar = new QToolBar;
   d->m_DrawActionsGroup = new QActionGroup(this);
@@ -267,20 +262,6 @@ void QmitkMeasurementView::CreateConnections()
   connect(d->m_DrawBezierCurve, SIGNAL(triggered(bool)), this, SLOT(OnDrawBezierCurveTriggered(bool)));
   connect(d->m_DrawSubdivisionPolygon, SIGNAL(triggered(bool)), this, SLOT(OnDrawSubdivisionPolygonTriggered(bool)));
   connect(d->m_CopyToClipboard, SIGNAL(clicked(bool)), this, SLOT(OnCopyToClipboard(bool)));
-}
-
-void QmitkMeasurementView::SetAsSelectionListener(bool checked)
-{
-  if (checked)
-  {
-    d->m_SelectionServiceConnector->AddPostSelectionListener(GetSite()->GetWorkbenchWindow()->GetSelectionService());
-    connect(d->m_SelectionServiceConnector.get(), &QmitkSelectionServiceConnector::ServiceSelectionChanged, d->m_SingleNodeSelectionWidget, &QmitkSingleNodeSelectionWidget::SetCurrentSelection);
-  }
-  else
-  {
-    d->m_SelectionServiceConnector->RemovePostSelectionListener();
-    disconnect(d->m_SelectionServiceConnector.get(), &QmitkSelectionServiceConnector::ServiceSelectionChanged, d->m_SingleNodeSelectionWidget, &QmitkSingleNodeSelectionWidget::SetCurrentSelection);
-  }
 }
 
 void QmitkMeasurementView::OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes)

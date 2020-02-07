@@ -228,6 +228,8 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
   currentAction->setCheckable(true);
   d->m_DrawSubdivisionPolygon = currentAction;
 
+  d->m_DrawActionsToolBar->setEnabled(false);
+
   // planar figure details text
   d->m_SelectedPlanarFiguresText = new QTextBrowser;
 
@@ -283,10 +285,12 @@ void QmitkMeasurementView::OnCurrentSelectionChanged(QList<mitk::DataNode::Point
   if (nodes.empty() || nodes.front().IsNull())
   {
     d->m_SelectedImageNode = nullptr;
+    d->m_DrawActionsToolBar->setEnabled(false);
   }
   else
   {
     d->m_SelectedImageNode = nodes.front();
+    d->m_DrawActionsToolBar->setEnabled(true);
   }
 }
 
@@ -480,7 +484,6 @@ void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, co
     mitk::PlanarFigure::Pointer planarFigure = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
 
     // the last selected planar figure
-
     if (planarFigure.IsNotNull() && planarFigure->GetPlaneGeometry())
     {
       auto planarFigureInitializedWindow = false;

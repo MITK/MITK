@@ -296,19 +296,14 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>QmitkDataStorageComboBox</class>
-   <extends>QComboBox</extends>
-   <header location="global">QmitkDataStorageComboBox.h</header>
+   <class>QmitkSingleNodeSelectionWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkSingleNodeSelectionWidget.h</header>
   </customwidget>
   <customwidget>
    <class>ctkExpandButton</class>
    <extends>QToolButton</extends>
    <header>ctkExpandButton.h</header>
-  </customwidget>
-  <customwidget>
-   <class>QmitkSingleNodeSelectionWidget</class>
-   <extends>QWidget</extends>
-   <header>qmitksinglenodeselectionwidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

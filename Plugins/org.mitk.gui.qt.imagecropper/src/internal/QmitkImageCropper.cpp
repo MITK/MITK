@@ -107,6 +107,13 @@ void QmitkImageCropper::OnBoundingBoxSelectionChanged(QList<mitk::DataNode::Poin
 
     m_BoundingShapeInteractor->EnableInteraction(false);
     m_BoundingShapeInteractor->SetDataNode(nullptr);
+
+    auto imageNode = m_ImageNode.Lock();
+    if (imageNode.IsNotNull())
+    {
+      m_Controls.buttonCreateNewBoundingBox->setEnabled(true);
+    }
+
     return;
   }
 
@@ -346,7 +353,7 @@ void QmitkImageCropper::ProcessImage(bool mask)
   }
 
   mitk::BaseData* image = imageNode->GetData();
-  if (nullptr != image)
+  if (nullptr != image && m_BoundingBox.IsNotNull())
   {
     QString imageName;
     if (mask)

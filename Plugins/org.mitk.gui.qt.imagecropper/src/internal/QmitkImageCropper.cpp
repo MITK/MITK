@@ -37,9 +37,7 @@ QmitkImageCropper::QmitkImageCropper(QObject *)
   m_BoundingBox(nullptr),
   m_BoundingBoxNode(nullptr),
   m_BoundingShapeInteractor(nullptr),
-  m_CropOutsideValue(0),
-  m_Active(0),
-  m_ScrollEnabled(true)
+  m_CropOutsideValue(0)
 {
   CreateBoundingShapeInteractor(false);
 }

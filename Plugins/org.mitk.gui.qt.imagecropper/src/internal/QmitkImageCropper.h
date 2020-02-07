@@ -100,9 +100,6 @@ private:
 
   // cropping parameter
   mitk::ScalarType m_CropOutsideValue;
-  bool m_Advanced;
-  bool m_Active;
-  bool m_ScrollEnabled;
 
   Ui::QmitkImageCropperViewControls m_Controls;
 };

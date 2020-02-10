@@ -51,13 +51,13 @@ int main(int argc, char* argv[])
   mitkCommandLineParser parser;
 
   parser.setTitle("Rectify Image");
-  parser.setCategory("Preprocessing Tools");
+  parser.setCategory("Basic Image Processing");
   parser.setDescription("Resample image based on standard world to index transform");
-  parser.setContributor("MBI");
+  parser.setContributor("German Cancer Research Center (DKFZ)");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("input", "i", mitkCommandLineParser::InputImage, "Input Image", "Path to input image", us::Any(), false);
-  parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output Image", "Path to output image", us::Any(), false);
+  parser.addArgument("input", "i", mitkCommandLineParser::Image, "Input Image", "Path to input image", us::Any(), false);
+  parser.addArgument("output", "o", mitkCommandLineParser::Image, "Output Image", "Path to output image", us::Any(), false);
 
   auto parsedArgs = parser.parseArguments(argc, argv);
 

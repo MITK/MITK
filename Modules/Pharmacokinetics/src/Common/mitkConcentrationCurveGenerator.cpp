@@ -200,27 +200,13 @@ mitk::Image::Pointer mitk::ConcentrationCurveGenerator::convertToConcentration(c
 {
     typedef itk::Image<TPixel_input, 3> InputImageType;
     typedef itk::Image<TPixel_baseline, 3> BaselineImageType;
-    typedef itk::Image<double, 3> DoubleImageType;
 
-    typename DoubleImageType::Pointer itkDoubleInputImage = DoubleImageType::New();
-    typename DoubleImageType::Pointer itkDoubleBaselineImage = DoubleImageType::New();
-
-    typedef itk::CastImageFilter<InputImageType, DoubleImageType> CastInputImageToDoubleImageFilterType;
-    typename CastInputImageToDoubleImageFilterType::Pointer CastInputImageToDoubleImageFilter = CastInputImageToDoubleImageFilterType::New();
-    CastInputImageToDoubleImageFilter->SetInput(itkInputImage);
-    CastInputImageToDoubleImageFilter->Update();
-    itkDoubleInputImage = CastInputImageToDoubleImageFilter->GetOutput();
-
-    typedef itk::CastImageFilter<BaselineImageType, DoubleImageType> CastBaselineImageToDoubleImageFilterType;
-    typename CastBaselineImageToDoubleImageFilterType::Pointer CastBaselineImageToDoubleImageFilter = CastBaselineImageToDoubleImageFilterType::New();
-    CastBaselineImageToDoubleImageFilter->SetInput(itkBaselineImage);
-    CastBaselineImageToDoubleImageFilter->Update();
-    itkDoubleBaselineImage = CastBaselineImageToDoubleImageFilter->GetOutput();
 
     if (this->m_isT2weightedImage)
     {
-        typedef mitk::ConvertT2ConcentrationFunctor <double, double, double> ConversionFunctorT2Type;
-        typedef itk::BinaryFunctorImageFilter<DoubleImageType, DoubleImageType, ConvertedImageType, ConversionFunctorT2Type> FilterT2Type;
+        typedef mitk::ConvertT2ConcentrationFunctor <TPixel_input, TPixel_baseline, double> ConversionFunctorT2Type;
+        typedef itk::BinaryFunctorImageFilter<InputImageType, BaselineImageType, ConvertedImageType, ConversionFunctorT2Type> FilterT2Type;
+
 
         ConversionFunctorT2Type ConversionT2Functor;
         ConversionT2Functor.initialize(this->m_T2Factor, this->m_T2EchoTime);
@@ -228,8 +214,8 @@ mitk::Image::Pointer mitk::ConcentrationCurveGenerator::convertToConcentration(c
         typename FilterT2Type::Pointer ConversionT2Filter = FilterT2Type::New();
 
         ConversionT2Filter->SetFunctor(ConversionT2Functor);
-        ConversionT2Filter->SetInput1(itkDoubleInputImage);
-        ConversionT2Filter->SetInput2(itkDoubleBaselineImage);
+        ConversionT2Filter->SetInput1(itkInputImage);
+        ConversionT2Filter->SetInput2(itkBaselineImage);
 
         ConversionT2Filter->Update();
 
@@ -240,8 +226,8 @@ mitk::Image::Pointer mitk::ConcentrationCurveGenerator::convertToConcentration(c
     {
         if(this->m_isTurboFlashSequence)
         {
-            typedef mitk::ConvertToConcentrationTurboFlashFunctor <double, double, double> ConversionFunctorTurboFlashType;
-            typedef itk::BinaryFunctorImageFilter<DoubleImageType, DoubleImageType, ConvertedImageType, ConversionFunctorTurboFlashType> FilterTurboFlashType;
+            typedef mitk::ConvertToConcentrationTurboFlashFunctor <TPixel_input, TPixel_baseline, double> ConversionFunctorTurboFlashType;
+            typedef itk::BinaryFunctorImageFilter<InputImageType, BaselineImageType, ConvertedImageType, ConversionFunctorTurboFlashType> FilterTurboFlashType;
 
             ConversionFunctorTurboFlashType ConversionTurboFlashFunctor;
             ConversionTurboFlashFunctor.initialize(this->m_RelaxationTime, this->m_Relaxivity, this->m_RecoveryTime);
@@ -249,8 +235,8 @@ mitk::Image::Pointer mitk::ConcentrationCurveGenerator::convertToConcentration(c
             typename FilterTurboFlashType::Pointer ConversionTurboFlashFilter = FilterTurboFlashType::New();
 
             ConversionTurboFlashFilter->SetFunctor(ConversionTurboFlashFunctor);
-            ConversionTurboFlashFilter->SetInput1(itkDoubleInputImage);
-            ConversionTurboFlashFilter->SetInput2(itkDoubleBaselineImage);
+            ConversionTurboFlashFilter->SetInput1(itkInputImage);
+            ConversionTurboFlashFilter->SetInput2(itkBaselineImage);
 
             ConversionTurboFlashFilter->Update();
             m_ConvertSignalToConcentrationCurve_OutputImage = mitk::ImportItkImage(ConversionTurboFlashFilter->GetOutput())->Clone();
@@ -259,11 +245,11 @@ mitk::Image::Pointer mitk::ConcentrationCurveGenerator::convertToConcentration(c
         }
         else if(this->m_UsingT1Map)
         {
-            typename DoubleImageType::Pointer itkT10Image = DoubleImageType::New();
+            typename ConvertedImageType::Pointer itkT10Image = ConvertedImageType::New();
             mitk::CastToItkImage(m_T10Image, itkT10Image);
 
-            typedef mitk::ConvertToConcentrationViaT1CalcFunctor <double, double, double, double> ConvertToConcentrationViaT1CalcFunctorType;
-            typedef itk::TernaryFunctorImageFilter<DoubleImageType, DoubleImageType, DoubleImageType,ConvertedImageType, ConvertToConcentrationViaT1CalcFunctorType> FilterT1MapType;
+            typedef mitk::ConvertToConcentrationViaT1CalcFunctor <TPixel_input, TPixel_baseline, double, double> ConvertToConcentrationViaT1CalcFunctorType;
+            typedef itk::TernaryFunctorImageFilter<InputImageType, BaselineImageType, ConvertedImageType, ConvertedImageType, ConvertToConcentrationViaT1CalcFunctorType> FilterT1MapType;
 
             ConvertToConcentrationViaT1CalcFunctorType ConversionT1MapFunctor;
             ConversionT1MapFunctor.initialize(this->m_Relaxivity, this->m_RecoveryTime, this->m_FlipAngle);
@@ -271,8 +257,8 @@ mitk::Image::Pointer mitk::ConcentrationCurveGenerator::convertToConcentration(c
             typename FilterT1MapType::Pointer ConversionT1MapFilter = FilterT1MapType::New();
 
             ConversionT1MapFilter->SetFunctor(ConversionT1MapFunctor);
-            ConversionT1MapFilter->SetInput1(itkDoubleInputImage);
-            ConversionT1MapFilter->SetInput2(itkDoubleBaselineImage);
+            ConversionT1MapFilter->SetInput1(itkInputImage);
+            ConversionT1MapFilter->SetInput2(itkBaselineImage);
             ConversionT1MapFilter->SetInput3(itkT10Image);
 
             ConversionT1MapFilter->Update();
@@ -283,8 +269,8 @@ mitk::Image::Pointer mitk::ConcentrationCurveGenerator::convertToConcentration(c
 
         else if(this->m_AbsoluteSignalEnhancement)
         {
-            typedef mitk::ConvertToConcentrationAbsoluteFunctor <double, double, double> ConversionFunctorAbsoluteType;
-            typedef itk::BinaryFunctorImageFilter<DoubleImageType, DoubleImageType, ConvertedImageType, ConversionFunctorAbsoluteType> FilterAbsoluteType;
+            typedef mitk::ConvertToConcentrationAbsoluteFunctor <TPixel_input, TPixel_baseline, double> ConversionFunctorAbsoluteType;
+            typedef itk::BinaryFunctorImageFilter<InputImageType, BaselineImageType, ConvertedImageType, ConversionFunctorAbsoluteType> FilterAbsoluteType;
 
             ConversionFunctorAbsoluteType ConversionAbsoluteFunctor;
             ConversionAbsoluteFunctor.initialize(this->m_Factor);
@@ -292,8 +278,8 @@ mitk::Image::Pointer mitk::ConcentrationCurveGenerator::convertToConcentration(c
             typename FilterAbsoluteType::Pointer ConversionAbsoluteFilter = FilterAbsoluteType::New();
 
             ConversionAbsoluteFilter->SetFunctor(ConversionAbsoluteFunctor);
-            ConversionAbsoluteFilter->SetInput1(itkDoubleInputImage);
-            ConversionAbsoluteFilter->SetInput2(itkDoubleBaselineImage);
+            ConversionAbsoluteFilter->SetInput1(itkInputImage);
+            ConversionAbsoluteFilter->SetInput2(itkBaselineImage);
 
             ConversionAbsoluteFilter->Update();
 
@@ -302,8 +288,8 @@ mitk::Image::Pointer mitk::ConcentrationCurveGenerator::convertToConcentration(c
 
         else if(this->m_RelativeSignalEnhancement)
         {
-            typedef mitk::ConvertToConcentrationRelativeFunctor <double, double, double> ConversionFunctorRelativeType;
-            typedef itk::BinaryFunctorImageFilter<DoubleImageType, DoubleImageType, ConvertedImageType, ConversionFunctorRelativeType> FilterRelativeType;
+            typedef mitk::ConvertToConcentrationRelativeFunctor <TPixel_input, TPixel_baseline, double> ConversionFunctorRelativeType;
+            typedef itk::BinaryFunctorImageFilter<InputImageType, BaselineImageType, ConvertedImageType, ConversionFunctorRelativeType> FilterRelativeType;
 
             ConversionFunctorRelativeType ConversionRelativeFunctor;
             ConversionRelativeFunctor.initialize(this->m_Factor);
@@ -311,8 +297,8 @@ mitk::Image::Pointer mitk::ConcentrationCurveGenerator::convertToConcentration(c
             typename FilterRelativeType::Pointer ConversionRelativeFilter = FilterRelativeType::New();
 
             ConversionRelativeFilter->SetFunctor(ConversionRelativeFunctor);
-            ConversionRelativeFilter->SetInput1(itkDoubleInputImage);
-            ConversionRelativeFilter->SetInput2(itkDoubleBaselineImage);
+            ConversionRelativeFilter->SetInput1(itkInputImage);
+            ConversionRelativeFilter->SetInput2(itkBaselineImage);
 
             ConversionRelativeFilter->Update();
 

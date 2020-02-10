@@ -329,6 +329,7 @@ public:
     long m_AcquisitionNumber; ///< The maximal value means the tag is missing
     long m_TemporalPosition;
     long m_InstanceNumber;
+    unsigned long m_FileSize;
     std::string m_SOPInstanceUID;
     Point3D m_ImagePositionPatient;
     bool m_HasImagePositionPatient; ///< ImagePositionPatient exists in DICOM tags as 3 coordinates
@@ -337,12 +338,13 @@ public:
     Image::Pointer m_Image; ///< Preloaded slice or frames
 
     SliceInfo(): m_AcquisitionNumber(std::numeric_limits<long>::max()), m_TemporalPosition(std::numeric_limits<long>::max()),
+      m_FileSize(0),
       m_InstanceNumber(std::numeric_limits<long>::max()), m_HasImagePositionPatient(false) {}
     bool operator<(const DicomSeriesReader::SliceInfo& b) const; /// For ordering slices in the image
   };
 
   /// Fill SliceInfo structure from DCMTK dataset
-  static void fillSliceInfo(SliceInfo& info, DcmItem* ds);
+  static void fillSliceInfo(SliceInfo& info, DcmItem* ds, unsigned long fileSize=0);
 
   // TODO This function is for debugging purposes. It allows you to save itkImage in the DICOM file set.
   template <typename ImageType>
@@ -480,7 +482,7 @@ public:
       std::string PhotometricInterpretation() const;
 
       ImageBlockDescriptor();
-      ImageBlockDescriptor(std::string path, DcmFileFormat&);
+      ImageBlockDescriptor(std::string path, DcmFileFormat& ff, unsigned long fileSize=0);
       ImageBlockDescriptor(std::string path, DcmItem* FileRecord, DcmItem* SeriesRecord, DcmItem* PatientRecord);
       virtual ~ImageBlockDescriptor();
 
@@ -516,6 +518,7 @@ public:
       bool isMultiOriented() const { return m_MultiOriented; }
       bool good() const { return !m_SOPClassUID.empty() && !m_SeriesInstanceUID.empty() && !m_SlicesInfo.empty(); }
       bool groupable() const { return !m_Philips3D && m_NumberOfFrames<=1; }
+      unsigned long long filesSize() const;
       /**
       \brief Sort files into time step blocks of a 3D+t image.
 
@@ -573,7 +576,7 @@ public:
     std::mutex m_Mutex;
     virtual iterator addFile(std::shared_ptr<ImageBlockDescriptor> descriptor, DcmFileFormat* ff = nullptr); // Returns iterator to block where the file goes
     virtual void postProcess(); /// To call after all files in the blocks was analyzed. Split some blocks to uniform parts
-    virtual std::shared_ptr<ImageBlockDescriptor> makeBlockDescriptorPtr(std::string file, DcmFileFormat& ff); /// called internally for new members and can be overrided
+    virtual std::shared_ptr<ImageBlockDescriptor> makeBlockDescriptorPtr(std::string file, DcmFileFormat& ff, unsigned long fileSize=0); /// called internally for new members and can be overrided
     FileNamesGrouping(FileNamesGrouping&& src): std::map<std::string, std::shared_ptr<ImageBlockDescriptor>>(std::move(src)), m_Mutex() {}
     FileNamesGrouping() {}
   };

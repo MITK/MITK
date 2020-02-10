@@ -439,9 +439,9 @@ void DicomSeriesReader::FileNamesGrouping::postProcess()
   }
 }
 
-std::shared_ptr<mitk::DicomSeriesReader::ImageBlockDescriptor> DicomSeriesReader::FileNamesGrouping::makeBlockDescriptorPtr(std::string file, DcmFileFormat& ff)
+std::shared_ptr<mitk::DicomSeriesReader::ImageBlockDescriptor> DicomSeriesReader::FileNamesGrouping::makeBlockDescriptorPtr(std::string file, DcmFileFormat& ff, unsigned long fileSize)
 {
-  return std::make_shared<ImageBlockDescriptor>(file, ff);
+  return std::make_shared<ImageBlockDescriptor>(file, ff, fileSize);
 }
 
 DicomSeriesReader::FileNamesGrouping::iterator DicomSeriesReader::FileNamesGrouping::addFile(std::shared_ptr<ImageBlockDescriptor> descriptor, DcmFileFormat* ff)
@@ -794,7 +794,7 @@ void DicomSeriesReader::GetSeries(DicomSeriesReader::FileNamesGrouping& result, 
       }
 
       if(r.good()) {
-        result.addFile(result.makeBlockDescriptorPtr(file, ff), &ff);
+        result.addFile(result.makeBlockDescriptorPtr(file, ff, fd.size()), &ff);
       } else {
         //MITK_ERROR << "DICOM file \"" << file << "\" parse failed: "<< r.text();
       }

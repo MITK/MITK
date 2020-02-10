@@ -115,8 +115,9 @@ static long getIntTag(DcmTagKey tag, long defaultValue, DcmItem* d1, DcmItem* d2
   }
 }
 
-void DicomSeriesReader::fillSliceInfo(SliceInfo& info, DcmItem* ds)
+void DicomSeriesReader::fillSliceInfo(SliceInfo& info, DcmItem* ds, unsigned long fileSize)
 {
+  info.m_FileSize = fileSize;
   std::string s;
   ds->findAndGetOFStringArray(DCM_ImagePositionPatient, s);
   info.m_ImagePositionPatient = DICOMStringToPoint3D(s, &info.m_HasImagePositionPatient);
@@ -359,7 +360,7 @@ mitk::Matrix3D DicomSeriesReader::ImageBlockDescriptor::getMatrix(const Vector3D
   return matrix;
 }
 
-DicomSeriesReader::ImageBlockDescriptor::ImageBlockDescriptor(std::string path, DcmFileFormat& ff):
+DicomSeriesReader::ImageBlockDescriptor::ImageBlockDescriptor(std::string path, DcmFileFormat& ff, unsigned long fileSize):
   m_Mutex(std::make_shared<std::mutex>()),
   m_Filenames({path}),
   m_SliceThickness(0),
@@ -377,7 +378,7 @@ DicomSeriesReader::ImageBlockDescriptor::ImageBlockDescriptor(std::string path, 
 
   auto& info= m_SlicesInfo[path];
 
-  fillSliceInfo(info, ds);
+  fillSliceInfo(info, ds, fileSize);
   if (info.m_SOPInstanceUID.empty()) {
     mi->findAndGetOFStringArray(DCM_MediaStorageSOPInstanceUID, info.m_SOPInstanceUID);
   }
@@ -1094,6 +1095,15 @@ std::string DicomSeriesReader::ImageBlockDescriptor::GetPixelSpacing()
 std::string DicomSeriesReader::ImageBlockDescriptor::GetImagerPixelSpacing()
 {
   return m_ImagerPixelSpacing;
+}
+
+unsigned long long DicomSeriesReader::ImageBlockDescriptor::filesSize() const
+{
+  unsigned long long r = 0;
+  for (const auto& filename: m_Filenames) {
+    r += m_SlicesInfo.at(filename).m_FileSize;
+  }
+  return r;
 }
 
 bool DicomSeriesReader::SliceInfo::operator<(const DicomSeriesReader::SliceInfo& b) const

@@ -96,7 +96,7 @@ QPixmap GetPixmapFromImageNode(const mitk::DataNode* dataNode, int height)
 }
 
 QmitkNodeSelectionButton::QmitkNodeSelectionButton(QWidget *parent)
-  : QPushButton(parent), m_OutDatedThumpNail(true), m_IsOptional(true), m_NodeModifiedObserverTag(0), m_NodeObserved(false)
+  : QPushButton(parent), m_OutDatedThumpNail(true), m_IsOptional(true), m_NodeModifiedObserverTag(0), m_NodeObserved(false), m_DataMTime(0), m_SelectionPropMTime(0)
 { }
 
 QmitkNodeSelectionButton::~QmitkNodeSelectionButton()
@@ -139,11 +139,33 @@ void QmitkNodeSelectionButton::RemoveNodeObserver()
   m_NodeObserved = false;
 }
 
+itk::ModifiedTimeType GetSelectedPropMTime(const mitk::DataNode* node)
+{
+  itk::ModifiedTimeType propMTime = 0;
+  if (node)
+  {
+    auto prop = node->GetProperty("selected", nullptr, false);
+    if (prop)
+    {
+      propMTime = prop->GetMTime();
+    }
+  }
+  return propMTime;
+}
+
 void QmitkNodeSelectionButton::OnNodeModified(const itk::Object * /*caller*/, const itk::EventObject & event)
 {
   if (itk::ModifiedEvent().CheckEvent(&event))
   {
-    this->repaint();
+    auto propMTime = GetSelectedPropMTime(this->m_SelectedNode);
+    /*this check is introduced because of T27069. If the afformentioned issue is fixed,
+      this check can also be removed.*/
+    if (propMTime == this->m_SelectionPropMTime)
+    {
+      this->repaint();
+    }
+
+    this->m_SelectionPropMTime = propMTime;
   }
 }
 
@@ -159,6 +181,7 @@ void QmitkNodeSelectionButton::SetSelectedNode(const mitk::DataNode* node)
     this->RemoveNodeObserver();
     this->m_SelectedNode = node;
     this->m_OutDatedThumpNail = true;
+    this->m_SelectionPropMTime = GetSelectedPropMTime(node);
     this->AddNodeObserver();
   }
 
@@ -197,10 +220,16 @@ void QmitkNodeSelectionButton::paintEvent(QPaintEvent *p)
     auto iconLength = widgetSize.height() - 10;
     auto node = this->m_SelectedNode;
 
-    if (this->m_OutDatedThumpNail)
+    itk::ModifiedTimeType dataMTime = 0;
+    if (m_SelectedNode->GetData())
+    {
+      dataMTime = m_SelectedNode->GetData()->GetMTime();
+    }
+    if (dataMTime>m_DataMTime || this->m_OutDatedThumpNail)
     {
       this->m_ThumpNail = GetPixmapFromImageNode(node, iconLength);
       this->m_OutDatedThumpNail = false;
+      m_DataMTime = dataMTime;
     }
 
     painter.drawPixmap(origin, m_ThumpNail);
@@ -240,7 +269,6 @@ void QmitkNodeSelectionButton::paintEvent(QPaintEvent *p)
 
   painter.translate(origin);
   td.drawContents(&painter);
-
 }
 
 void QmitkNodeSelectionButton::changeEvent(QEvent *event)

@@ -60,6 +60,8 @@ protected:
   QString m_Info;
   bool m_OutDatedThumpNail;
   QPixmap m_ThumpNail;
+  itk::ModifiedTimeType m_DataMTime;
+  itk::ModifiedTimeType m_SelectionPropMTime;
 
   bool m_IsOptional;
 

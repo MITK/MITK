@@ -14,6 +14,7 @@ if(BUILD_BasicImageProcessingMiniApps OR MITK_BUILD_ALL_APPS)
     set( basicImageProcessingMiniApps
         FileConverter^^MitkCore
         ImageTypeConverter^^MitkCore
+        RectifyImage^^MitkCore
         SingleImageArithmetic^^MitkCore_MitkBasicImageProcessing
         TwoImageArithmetic^^MitkCore_MitkBasicImageProcessing
         ImageAndValueArithmetic^^MitkCore_MitkBasicImageProcessing

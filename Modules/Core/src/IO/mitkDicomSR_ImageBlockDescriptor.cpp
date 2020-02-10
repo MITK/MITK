@@ -14,6 +14,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include <dcmtk/dcmdata/dctk.h>
+#include <dcmtk/dcmdata/dcrledrg.h>
+#include <dcmtk/dcmdata/dcistrmb.h>
+#include <dcmtk/dcmimage/diregist.h>     /* to support color images (under WIN)*/
+#include <dcmtk/dcmimgle/dcmimage.h>
+#include <dcmtk/dcmjpeg/djdecode.h>
+#include <dcmtk/dcmjpls/djdecode.h>
+#ifdef ssize_t //for compatibility with hdf5
+#undef ssize_t
+#endif
+
 #include <mitkDicomSeriesReader.h>
 #include <mitkImage.h>
 #include <mitkPixelTypeMultiplex.h>
@@ -22,12 +33,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <gdcmUIDs.h>
 #include <gdcmImageReader.h>
 #include <gdcmTagKeywords.h>
-
-#include <dcmtk/dcmimage/diregist.h>     /* to support color images (under WIN)*/
-#include <dcmtk/dcmimgle/dcmimage.h>
-#include <dcmtk/dcmjpeg/djdecode.h>
-#include <dcmtk/dcmjpls/djdecode.h>
-#include <dcmtk/dcmdata/dcrledrg.h>
 
 #include <mitkDicomTagsList.h>
 

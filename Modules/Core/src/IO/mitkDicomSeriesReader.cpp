@@ -17,6 +17,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 // uncomment for learning more about the internal sorting mechanisms
 //#define MBILOG_ENABLE_DEBUG
 
+#ifndef _WIN32
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <unistd.h>
+#include <signal.h>
+#endif
+
+#include <mutex>
+#include <condition_variable>
+#include <chrono>
+
+#include <dcmtk/dcmdata/dctk.h>
+#include <dcmtk/dcmdata/dcrledrg.h>
+#include <dcmtk/dcmdata/dcistrmb.h>
+#ifdef ssize_t //for compatibility with hdf5
+#undef ssize_t
+#endif
+
 #include <mitkDicomSeriesReader.h>
 #include <mitkImage.h>
 #include <mitkImageCast.h>
@@ -27,6 +45,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/tokenizer.hpp>
 #include <boost/format.hpp>
 #include <boost/locale.hpp>
+#include <boost/iostreams/device/file_descriptor.hpp>
+#include <boost/filesystem.hpp>
 
 #include <itkGDCMSeriesFileNames.h>
 
@@ -446,50 +466,344 @@ DicomSeriesReader::FileNamesGrouping::iterator DicomSeriesReader::FileNamesGroup
   return it;
 }
 
+/// Input "stream" for reading DICOM file using file to memory mapping or simple system reading
+///
+class Stream {
+public:
+  /// Group of threaded tasks reading DICOM file using file to memory mapping
+  /// Also guards them from memory access errors and optimizes file access order.
+  ///
+  class TaskGroup: public Utilities::TaskGroup {
+  public:
+
+    template <typename Path>
+    void Enqueue(unsigned i, Path path, const std::function<void(Stream&)>& task, Utilities::TaskPriority priority = Utilities::TaskPriority::LOW);
+    TaskGroup(volatile bool* interrupt = nullptr);
+    static std::atomic<int> s_InCore;
+
+#ifndef _WIN32
+    ~TaskGroup();
+  protected:
+    static int s_ActiveCnt;
+    static std::mutex s_Mutex;
+    static void sigBusHandler(int);
+    static struct sigaction m_OldSigBus;
+#endif
+
+  protected:
+
+    std::mutex m_FileReadMutex;
+    std::condition_variable m_FileReadCondition;
+    std::set<unsigned> m_Running;
+    volatile bool* m_Interrupt;
+  };
+
+  // Interface to read file data
+  size_t size() const
+  {
+    return m_Size;
+  }
+  const char* data() const
+  {
+    return m_Data;
+  }
+  static bool incore() ///< true if the file is most likely in system cache (RAM)
+  {// Under Linux monitoring the file fetching time proved more effective than the use of a system call mincore()
+    return  TaskGroup::s_InCore;
+  }
+
+  Stream(): m_Data(nullptr), m_MMaped(false) {}
+
+  /// Open and load the entire file into memory
+  template<typename Path> void open(const Path& path)
+  {
+    close();
+    boost::iostreams::file_descriptor_source fd;
+    fd.open(path, std::ios_base::in|std::ios_base::binary);
+    m_Size = boost::filesystem::file_size(path);
+    // Prefetch the file and measure the reading time
+    auto startTime = std::chrono::steady_clock::now();
+
+#ifndef _WIN32
+    if (m_Size >= (1<<16)) {
+      m_Data = (char*)mmap(NULL, m_Size, PROT_READ, MAP_PRIVATE|MAP_POPULATE|MAP_LOCKED, fd.handle(), 0);
+      // prefetch is not need since MAP_LOCKED is specifed
+      // othervise the next (commented) code
+      /*
+      auto* d = fd.data();
+      for (size_t i = 0, pgSize = getpagesize()*64; i < fd.size(); i += pgSize) {
+         volatile char k = fd.data()[i];
+      }
+      */
+      if (m_Data) {
+        m_MMaped = true;
+      }
+    } else // for small files or under Windows read() is quicker
+#endif
+    {
+      m_Data = new char[m_Size];
+      size_t s = 0;
+      do {
+        auto r = fd.read(m_Data + s, m_Size);
+        if (r<0) {
+          m_Size = s;
+          break;
+        }
+        s += r;
+      } while (s < m_Size);
+    }
+    if (m_Size >= 4096) {
+      auto byteTime = (std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count())/((m_Size+4095)&~4095);
+      TaskGroup::s_InCore = byteTime < 5e-9; //< experimentally selected criterion
+    }
+
+  }
+
+  /// free memory
+  void close()
+  {
+#ifndef _WIN32
+    if (m_Data && m_MMaped) {
+      munmap(m_Data, m_Size);
+      m_MMaped = false;
+    } else
+#endif
+    {
+      delete[] m_Data;
+    }
+    m_Data = nullptr;
+  }
+  ~Stream() {
+    close();
+  }
+
+protected:
+  size_t m_Size;
+  char* m_Data;
+  bool m_MMaped;
+};
+
+#if 0
+#ifdef _WIN32
+/// This class is to transform Windows system exceptions caused by memory page access when the media is absent
+/// But file to memory mapping under Windows turned out slower than usual reding
+//
+static inline size_t getpagesize(void)
+{
+  SYSTEM_INFO system_info;
+  GetSystemInfo (&system_info);
+  return system_info.dwPageSize;
+}
+static void ThrowPageException(const std::function<void()>& protectedAction) {
+  __try {
+    protectedAction();
+  }
+  __except (GetExceptionCode() == EXCEPTION_IN_PAGE_ERROR? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH) {
+    throw 1;
+  }
+}
+#endif
+#endif
+
+template <typename Path>
+void Stream::TaskGroup::Enqueue(unsigned i, Path path, const std::function<void(Stream&)>& task, Utilities::TaskPriority priority) {
+  std::unique_lock<std::mutex> lock(m_FileReadMutex);
+  if (i==0) {
+    TaskGroup::s_InCore = 1;
+  }
+  m_Running.insert(i);
+  Utilities::TaskGroup::Enqueue(
+    [this, i, path, task]
+    {
+      try {
+#ifdef _WIN32
+//      ThrowPageException([&] {
+#endif
+          if (m_Interrupt && *m_Interrupt) {
+            throw 0;
+          }
+
+          Stream fd;
+
+          std::unique_lock<std::mutex> lock(m_FileReadMutex);
+          bool cached = false;
+          while (!(cached = incore()) && i > *m_Running.begin()) {
+            if (m_Interrupt && *m_Interrupt) {
+              throw 0;
+            }
+            m_FileReadCondition.wait(lock);
+          }
+          if (cached) {
+            auto i0 = *m_Running.begin();
+            m_Running.erase(i);
+            if (i == i0) {
+              m_FileReadCondition.notify_all();
+            }
+          }
+
+          lock.unlock();
+
+          fd.open(path); //< throws std::exception on error
+
+          lock.lock();
+
+          if (!m_Running.empty()) {
+            auto i0 = *m_Running.begin();
+            m_Running.erase(i);
+            if (i == i0) {
+              m_FileReadCondition.notify_all();
+            }
+          }
+
+          lock.unlock();
+
+          task(fd);
+
+#ifdef _WIN32
+//      });
+#endif
+      } catch (const std::exception& e) {
+        MITK_ERROR << "Readig DICOM file \"" << path << "\" failed: "<< e.what();
+      } catch (int e) {
+        if (e == 1) {
+          // Mapped file memory area becomed unaccesable
+          MITK_ERROR << "File \"" << path << "\" is unaccessible (may be truncated or media ejected)";
+        } else if (e) {
+          // Unattended int exception
+          MITK_ERROR << "File \"" << path << "\": exception " << e << " during parse";
+        }
+        // Else interrupted by user
+      }
+
+      std::unique_lock<std::mutex> lock(m_FileReadMutex);
+      if (!m_Running.empty()) {
+        auto i0 = *m_Running.begin();
+        m_Running.erase(i);
+        if (i == i0) {
+          m_FileReadCondition.notify_all();
+        }
+      }
+    },
+  priority);
+}
+
+/// Save interruption flag in the object
+/// On Linux install handler for SIGBUS can be caused due to disk ejecting or file truncating
+///
+Stream::TaskGroup::TaskGroup(volatile bool* interrupt): m_Interrupt(interrupt) {
+#ifndef _WIN32
+  std::unique_lock<std::mutex> lock(s_Mutex);
+  if (!s_ActiveCnt++) {
+    struct sigaction sigBus;
+    if (sigaction(SIGBUS, 0, &sigBus)) {
+      MITK_ERROR << "get sigaction error: " << strerror(errno);
+    }
+
+    sigBus.sa_handler = &sigBusHandler;
+    sigBus.sa_flags = SA_NODEFER;
+
+    if (sigaction(SIGBUS, &sigBus, &m_OldSigBus)) {
+      MITK_ERROR << "set sigaction error: " << strerror(errno);
+    }
+  }
+#endif
+}
+
+std::atomic<int> Stream::TaskGroup::s_InCore;
+
+#ifndef _WIN32
+/// Counter for active reading guard objects
+int  Stream::TaskGroup::s_ActiveCnt = 0;
+/// Mutex for the counter and initializators
+std::mutex Stream::TaskGroup::s_Mutex;
+struct sigaction Stream::TaskGroup::m_OldSigBus;
+
+/// Restore previous handler state for SIGBUS
+///
+Stream::TaskGroup::~TaskGroup() {
+  std::unique_lock<std::mutex> lock(s_Mutex);
+  if (!--s_ActiveCnt) {
+    if (sigaction(SIGBUS, &m_OldSigBus, 0)) {
+      MITK_ERROR << "restore sigaction error: " << strerror(errno);
+    }
+  }
+}
+
+/// Linux specific.
+/// Generate exception on memory access error
+///
+void Stream::TaskGroup::sigBusHandler(int)
+{
+  // Note: may be it is better to use sigsetjmp/siglongjmp just before accessing the mapped area
+  // and that code parts must not have dynamic memory operations, aquaring/relesing some resources etc.
+
+  throw 1;
+}
+#endif
 
 void DicomSeriesReader::GetSeries(DicomSeriesReader::FileNamesGrouping& result, const StringContainer& files, volatile bool* interrupt)
 {
   /**
     assumption about this method:
-      returns a map of uid-like-key --> list(filename)
-      each entry should contain filenames that have images of same
-        - series instance uid (automatically done by GDCMSeriesFileNames
+      returns a map of uid-like-key --> list(BlockDescriptor(filenames))
+      each entry should contain BlockDescriptor that have images of same
+        - series instance uid
         - 0020,0037 image orientation (patient)
         - 0028,0030 pixel spacing (x,y)
         - 0018,0050 slice thickness
   */
 
-  // PART I: scan files for sorting relevant DICOM tags,
-  //         separate images that differ in any of those
-  //         attributes (they cannot possibly form a 3D block)
+  // PART 1: parse and sort images by relevant DICOM tags,
+  //         separate images that differ in any of those attributes
+  //         assigning each parsed files to one of image blocks sorting slices spatially
+  //         (or at least consistently if this is NOT possible, see SliceInfo::operator<)
 
-  // PART II: assign each parsed files to one of image blocks sorting slices spatially (or at least consistently if this is NOT possible, see SliceInfo::operator<)
+  // Reading files in the disk order decreases reading time for noncached DVD
 
-  Utilities::TaskGroup getSeries;
-  int taskLimit = boost::thread::hardware_concurrency()*4;
-  for (const auto& file: files) {
+  auto taskLimit = boost::thread::hardware_concurrency()*4;
+  if (taskLimit > files.size()) {
+    taskLimit = files.size();
+  }
+  Stream::TaskGroup getSeries(interrupt);
+
+  for (unsigned i=0; i < files.size(); i++) {
     if (interrupt && *interrupt) {
       break;
     }
-    getSeries.Enqueue([&result, file, interrupt] {
-      if (interrupt && *interrupt) {
-        return;
-      }
-      // Read file and add data to new or existed image
-      DcmFileFormat ff;
-      if(!ff.loadFileUntilTag(OFFilename(file, OFFalse), EXS_Unknown, EGL_noChange, 250).good()) {
-        MITK_ERROR << "DICOM file \"" << file << "\" read failed";
-        return;
-      }
-      result.addFile(result.makeBlockDescriptorPtr(file, ff), &ff);
-    });
-    if (taskLimit > 0) {
-      --taskLimit;
-    } else {
+    if (i >= taskLimit) {
       getSeries.WaitFirst();
     }
+
+    auto file = files[i];
+
+    getSeries.Enqueue(i, file, [&result, file] (Stream& fd) {
+      // Read file and add data to new or existed image
+      DcmInputBufferStream fileStream;
+      fileStream.setBuffer(fd.data(), fd.size());
+      fileStream.setEos();
+
+      auto r = fileStream.status();
+      DcmFileFormat ff;
+
+      if (r.good()) {
+        ff.transferInit();
+        r = ff.readUntilTag(fileStream,  EXS_Unknown, EGL_noChange, 250);
+        ff.transferEnd();
+      } else {
+        //MITK_ERROR << "DICOM file \"" << file << "\" open failed: " << fileStream.status().text();
+      }
+
+      if(r.good()) {
+        result.addFile(result.makeBlockDescriptorPtr(file, ff), &ff);
+      } else {
+        //MITK_ERROR << "DICOM file \"" << file << "\" parse failed: "<< r.text();
+      }
+
+    });
   }
   getSeries.WaitAll();
+
+  // PART 2: split blocks with large spatial gaps
 
   result.postProcess();
 }

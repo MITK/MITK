@@ -353,6 +353,17 @@ if(_result LESS 0)
   message("> Adding 'locale' to MITK_USE_Boost_LIBRARIES.")
   list(APPEND MITK_USE_Boost_LIBRARIES locale)
 endif()
+# filesystem and iostreams are need for DicomSeriesReader
+list(FIND MITK_USE_Boost_LIBRARIES filesystem _result)
+if(_result LESS 0)
+  message("> Adding 'filesystem' to MITK_USE_Boost_LIBRARIES.")
+  list(APPEND MITK_USE_Boost_LIBRARIES filesystem)
+endif()
+list(FIND MITK_USE_Boost_LIBRARIES iostreams _result)
+if(_result LESS 0)
+  message("> Adding 'iostreams' to MITK_USE_Boost_LIBRARIES.")
+  list(APPEND MITK_USE_Boost_LIBRARIES iostreams)
+endif()
 
 # sanity check for supported Qt version. Only >= 5.3 is supported by CTK/PythonQt
 if(MITK_USE_QT AND MITK_USE_Python)

@@ -96,7 +96,7 @@ QPixmap GetPixmapFromImageNode(const mitk::DataNode* dataNode, int height)
 }
 
 QmitkNodeSelectionButton::QmitkNodeSelectionButton(QWidget *parent)
-  : QPushButton(parent), m_OutDatedThumpNail(true), m_IsOptional(true), m_NodeModifiedObserverTag(0), m_NodeObserved(false), m_DataMTime(0), m_SelectionPropMTime(0)
+  : QPushButton(parent), m_OutDatedThumpNail(true), m_DataMTime(0), m_SelectionPropMTime(0), m_IsOptional(true), m_NodeModifiedObserverTag(0), m_NodeObserved(false)
 { }
 
 QmitkNodeSelectionButton::~QmitkNodeSelectionButton()

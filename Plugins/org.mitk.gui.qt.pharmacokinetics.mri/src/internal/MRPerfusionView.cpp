@@ -120,6 +120,8 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   m_Controls.comboAIFImage->setEnabled(false);
   m_Controls.checkDedicatedAIFImage->setEnabled(true);
   m_Controls.HCLSpinBox->setValue(mitk::AterialInputFunctionGenerator::DEFAULT_HEMATOCRIT_LEVEL);
+  m_Controls.spinBox_baselineEndTimeStep->setMinimum(0);
+  m_Controls.spinBox_baselineStartTimeStep->setMinimum(0);
 
   connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.comboAIFMask, SLOT(setVisible(bool)));
   connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.labelAIFMask, SLOT(setVisible(bool)));
@@ -514,6 +516,12 @@ void MRPerfusionView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source
 
   m_Controls.errorMessageLabel->show();
 
+  if (this->m_selectedImage.IsNotNull())
+  {
+    m_Controls.spinBox_baselineStartTimeStep->setMaximum((this->m_selectedImage->GetDimension(3))-1);
+    m_Controls.spinBox_baselineEndTimeStep->setMaximum((this->m_selectedImage->GetDimension(3)) - 1);
+  }
+
   UpdateGUIControls();
 }
 
@@ -652,14 +660,10 @@ bool MRPerfusionView::CheckModelSettings() const
 bool MRPerfusionView::CheckBaselineSelectionSettings() const
 {
   bool ok = false;
-  if (m_Controls.spinBox_baselineStartTimeStep->value() >= 0 && m_Controls.spinBox_baselineStartTimeStep->value() <= m_Controls.spinBox_baselineEndTimeStep->value() && m_Controls.spinBox_baselineEndTimeStep->value() < this->m_selectedImage->GetDimension(3))
+  if (m_Controls.spinBox_baselineStartTimeStep->value() <= m_Controls.spinBox_baselineEndTimeStep->value())
   {
     ok = true;
   }
-    //ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() >= 0);
-  //ok = ok && (m_Controls.spinBox_baselineStartTimeStep->value() <= m_Controls.spinBox_baselineEndTimeStep->value());
-  //ok = ok && (m_Controls.spinBox_baselineEndTimeStep->value() < this->m_selectedImage->GetDimension(3));
-  MITK_INFO << "CheckBaselineSelectionSettings() ok: " << ok;
   return ok;
 }
 

@@ -371,7 +371,7 @@ void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
   else // case: calculation was not successful
   {
     // handle histogram
-    HistogramType::ConstPointer emptyHistogram = HistogramType::New();
+    auto emptyHistogram = HistogramType::New();
     auto histogramLabelName = GenerateStatisticsNodeName(image, mask);
     FillHistogramWidget({ emptyHistogram }, { histogramLabelName });
 

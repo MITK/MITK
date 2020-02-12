@@ -371,7 +371,7 @@ void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
   else // case: calculation was not successful
   {
     // handle histogram
-    const HistogramType* emptyHistogram = HistogramType::New();
+    HistogramType::ConstPointer emptyHistogram = HistogramType::New();
     auto histogramLabelName = GenerateStatisticsNodeName(image, mask);
     FillHistogramWidget({ emptyHistogram }, { histogramLabelName });
 
@@ -487,11 +487,18 @@ void QmitkImageStatisticsView::HandleExistingStatistics(mitk::Image::ConstPointe
 std::string QmitkImageStatisticsView::GenerateStatisticsNodeName(mitk::Image::ConstPointer image,
                                                                  mitk::BaseData::ConstPointer mask)
 {
-  auto statisticsNodeName = image->GetUID();
-  if (mask)
+  std::string statisticsNodeName = "no";
+
+  if (image.IsNotNull())
+  {
+    statisticsNodeName = image->GetUID();
+  }
+
+  if (mask.IsNotNull())
   {
     statisticsNodeName += "_" + mask->GetUID();
   }
+
   statisticsNodeName += "_statistics";
 
   return statisticsNodeName;

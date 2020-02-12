@@ -409,12 +409,18 @@ void QmitkImageStatisticsView::ResetGUIDefault()
 
 std::string QmitkImageStatisticsView::GenerateStatisticsNodeName()
 {
-  auto statisticsNodeName = m_selectedImageNode->GetName();
-  if (m_selectedMaskNode)
+  std::string statisticsNodeName = "";
+
+  if (m_selectedImageNode.IsNotNull())
+  {
+    statisticsNodeName = m_selectedImageNode->GetName();;
+  }
+
+  if (m_selectedMaskNode.IsNotNull())
   {
     statisticsNodeName += "_" + m_selectedMaskNode->GetName();
   }
-  statisticsNodeName += "_statistics";
+  statisticsNodeName += "statistics";
 
   return statisticsNodeName;
 }
@@ -512,7 +518,7 @@ void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
   else // case: calculation was not successfull
   {
     // handle histogram
-    const HistogramType* emptyHistogram = HistogramType::New();
+    HistogramType::ConstPointer emptyHistogram = HistogramType::New();
     this->FillHistogramWidget({emptyHistogram}, {m_selectedImageNode->GetName()});
 
     // handle statistics

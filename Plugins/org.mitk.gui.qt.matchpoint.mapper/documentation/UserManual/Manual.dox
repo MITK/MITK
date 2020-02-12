@@ -1,5 +1,5 @@
 /**
-\page org_mitk_gui_qt_matchpoint_mapper The MatchPoint Image Mapper View
+\page org_mitk_gui_qt_matchpoint_mapper MatchPoint Image Mapper View
 
 \imageMacro{map_mapper_icon_doc.svg, "Icon of the MatchPoint Image Mapper",3}
 

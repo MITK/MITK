@@ -1,5 +1,5 @@
 /**
-\page org_mitk_gui_qt_pharmacokinetics_concentration_mri The Concentration Curve Converter View
+\page org_mitk_gui_qt_pharmacokinetics_concentration_mri Concentration Curve Converter View
 
 \imageMacro{pharmacokinetics_concentration_doc.svg,"Icon of the Concentration Curve Converter View",3.0}
 

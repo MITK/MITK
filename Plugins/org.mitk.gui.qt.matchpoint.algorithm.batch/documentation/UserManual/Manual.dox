@@ -1,5 +1,5 @@
 /**
-\page org_mitk_gui_qt_matchpoint_algorithm_batch The MatchPoint Registration Batch Processor View
+\page org_mitk_gui_qt_matchpoint_algorithm_batch MatchPoint Registration Batch Processor View
 
 \imageMacro{map_icon_batch_doc.svg,"Icon of the Segmentation Utilities View",2.00}
 

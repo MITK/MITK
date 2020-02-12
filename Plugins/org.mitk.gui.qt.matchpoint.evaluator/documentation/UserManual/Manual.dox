@@ -1,5 +1,5 @@
 /**
-\page org_mitk_gui_qt_matchpoint_evaluator The MatchPoint Registration Evaluation View
+\page org_mitk_gui_qt_matchpoint_evaluator MatchPoint Registration Evaluation View
 
 \imageMacro{map_evaluator_doc.svg, "Icon of the MatchPoint Registration Evaluator", 3}
 

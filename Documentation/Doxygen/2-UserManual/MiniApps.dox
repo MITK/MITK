@@ -37,9 +37,10 @@ The configured command line tools are now available via the drop-down box of the
 
 <div align="center"><h1>Available MiniApps in MITK</h1></div>
 
-\li \subpage mitkBasicImageProcessingMiniAppsPortalPage
-\li \subpage mitkClassificationMiniAppsPortalPage
-
+<ul>
+<li>\ref mitkBasicImageProcessingMiniAppsPortalPage </li>
+<li> \ref mitkClassificationMiniAppsPortalPage </li>
+</ul>
 
 
 <div align="center"><h1>Technical Information</h1></div>

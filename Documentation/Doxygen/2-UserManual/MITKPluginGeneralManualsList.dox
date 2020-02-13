@@ -1,0 +1,31 @@
+/**
+\page PluginListGeneralPage  List of General Purpose Plugins 
+
+
+  \li \subpage org_mitk_views_basicimageprocessing
+  \li \subpage org_mitk_gui_qt_chartExample
+  \li \subpage org_mitk_views_datamanager
+  \li \subpage org_mitk_gui_qt_dicom
+  \li \subpage org_mitk_gui_qt_dicominspector
+  \li \subpage org_mitk_gui_qt_imagecropper
+  \li \subpage org_mitk_views_imagenavigator
+  \li \subpage org_blueberry_ui_qt_log
+  \li \subpage org_mitk_gui_qt_matchpoint_algorithm_batch
+  \li \subpage org_mitk_gui_qt_matchpoint_algorithm_browser
+  \li \subpage org_mitk_gui_qt_matchpoint_algorithm_control
+  \li \subpage org_mitk_gui_qt_matchpoint_evaluator
+  \li \subpage org_mitk_gui_qt_matchpoint_framereg
+  \li \subpage org_mitk_gui_qt_matchpoint_manipulator
+  \li \subpage org_mitk_gui_qt_matchpoint_mapper
+  \li \subpage org_mitk_gui_qt_matchpoint_visualizer
+  \li \subpage org_mitk_gui_qt_measurementtoolbox
+  \li \subpage org_mitk_gui_qt_moviemaker
+  \li \subpage org_mitk_views_multilabelsegmentation
+  \li \subpage org_mitk_views_pointsetinteraction
+  \li \subpage org_mitk_gui_qt_python
+  \li \subpage org_mitk_gui_qt_remeshing
+  \li \subpage org_mitk_views_screenshotmaker
+  \li \subpage org_mitk_views_segmentation
+  \li \subpage org_mitk_gui_qt_viewnavigator
+  \li \subpage org_mitk_views_volumevisualization
+*/

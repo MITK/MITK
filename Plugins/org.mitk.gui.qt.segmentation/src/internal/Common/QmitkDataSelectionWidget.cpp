@@ -147,7 +147,7 @@ unsigned int QmitkDataSelectionWidget::AddDataSelection(const QString &labelText
   if (!labelText.isEmpty())
   {
     QLabel* label = new QLabel(labelText, m_Controls.dataSelectionWidget);
-    label->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+    label->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
     m_Controls.gridLayout->addWidget(label, row, 0);
   }
 
@@ -160,7 +160,7 @@ unsigned int QmitkDataSelectionWidget::AddDataSelection(const QString &labelText
   nodeSelection->SetPopUpHint(popupHint);
   nodeSelection->SetDataStorage(this->GetDataStorage());
   nodeSelection->SetNodePredicate(predicate);
-  nodeSelection->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+  nodeSelection->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
   nodeSelection->setMinimumSize(0, 40);
 
   connect(nodeSelection, SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)), this, SLOT(OnSelectionChanged(QList<mitk::DataNode::Pointer>)));

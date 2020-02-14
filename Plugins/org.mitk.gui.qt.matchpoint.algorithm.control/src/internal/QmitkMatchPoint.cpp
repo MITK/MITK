@@ -307,14 +307,12 @@ bool QmitkMatchPoint::CheckInputs()
     else
     {
       m_spSelectedMovingMaskNode = m_Controls.movingMaskNodeSelector->GetSelectedNode();
-      m_spSelectedMovingMaskData = nullptr;
+      m_spSelectedMovingMaskData = dynamic_cast<mitk::Image*>(m_spSelectedMovingMaskNode->GetData());
 
-      auto movingMaskImage = dynamic_cast<mitk::Image*>(m_spSelectedMovingMaskNode->GetData());
-
-      if (movingMaskImage->GetDimension() - 1 == m_LoadedAlgorithm->getMovingDimensions()
-          && movingMaskImage->GetTimeSteps() > 1)
+      if (m_spSelectedMovingMaskData->GetDimension() - 1 == m_LoadedAlgorithm->getMovingDimensions()
+          && m_spSelectedMovingMaskData->GetTimeSteps() > 1)
       {
-        m_spSelectedMovingMaskData = ExtractFirstFrame(movingMaskImage).GetPointer();
+        m_spSelectedMovingMaskData = ExtractFirstFrame(m_spSelectedMovingMaskData).GetPointer();
         m_Controls.m_teLog->append(
           QStringLiteral("<font color='gray'><i>Selected moving mask has multiple time steps. First time step is used as moving mask.</i></font>"));
       }
@@ -328,13 +326,12 @@ bool QmitkMatchPoint::CheckInputs()
     else
     {
       m_spSelectedTargetMaskNode = m_Controls.targetMaskNodeSelector->GetSelectedNode();
-      m_spSelectedTargetMaskData = nullptr;
-      auto targetMaskImage = dynamic_cast<mitk::Image*>(m_spSelectedTargetMaskNode->GetData());
+      m_spSelectedTargetMaskData = dynamic_cast<mitk::Image*>(m_spSelectedTargetMaskNode->GetData());
 
-      if (targetMaskImage->GetDimension() - 1 == m_LoadedAlgorithm->getTargetDimensions()
-          && targetMaskImage->GetTimeSteps() > 1)
+      if (m_spSelectedTargetMaskData->GetDimension() - 1 == m_LoadedAlgorithm->getTargetDimensions()
+          && m_spSelectedTargetMaskData->GetTimeSteps() > 1)
       {
-        m_spSelectedTargetMaskData = ExtractFirstFrame(targetMaskImage).GetPointer();
+        m_spSelectedTargetMaskData = ExtractFirstFrame(m_spSelectedTargetMaskData).GetPointer();
         m_Controls.m_teLog->append(
           QStringLiteral("<font color='gray'><i>Selected target mask has multiple time steps. First time step is used as target mask.</i></font>"));
       }

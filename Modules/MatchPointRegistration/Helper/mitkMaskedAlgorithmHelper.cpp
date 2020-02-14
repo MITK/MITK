@@ -149,6 +149,10 @@ namespace mitk
       if (! movingSpatial) mapDefaultExceptionStaticMacro(<< "Error, cannot convert moving mask.");
       pAlg->setMovingMask(movingSpatial);
     }
+    else
+    {
+      pAlg->setMovingMask(nullptr);
+    }
 
     if (targetMask)
     {
@@ -156,6 +160,10 @@ namespace mitk
       typename TargetSpatialType::Pointer targetSpatial = dynamic_cast<TargetSpatialType*>(m_convertResult.GetPointer());
       if (! targetSpatial) mapDefaultExceptionStaticMacro(<< "Error, cannot convert moving mask.");
       pAlg->setTargetMask(targetSpatial);
+    }
+    else
+    {
+      pAlg->setTargetMask(nullptr);
     }
 
     return true;

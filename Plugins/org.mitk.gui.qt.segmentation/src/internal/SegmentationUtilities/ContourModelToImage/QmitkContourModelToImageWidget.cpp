@@ -203,8 +203,8 @@ QmitkContourModelToImageWidget::QmitkContourModelToImageWidget(mitk::SliceNaviga
 
   // Set up UI
   d->m_Controls.setupUi(this);
-  d->m_Controls.dataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::ImageAndSegmentationPredicate);
-  d->m_Controls.dataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::ContourModelPredicate);
+  d->m_Controls.dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::ImageAndSegmentationPredicate);
+  d->m_Controls.dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::ContourModelPredicate);
   d->m_Controls.dataSelectionWidget->SetHelpText(HelpText);
   d->EnableButtons(false);
 

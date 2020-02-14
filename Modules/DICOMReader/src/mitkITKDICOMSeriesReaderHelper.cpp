@@ -13,6 +13,7 @@ found in the LICENSE file.
 //#define MBILOG_ENABLE_DEBUG
 
 #include <dcmtk/dcmdata/dcvrdt.h>
+#include <dcmtk/ofstd/ofstd.h>
 
 #define BOOST_DATE_TIME_NO_LIB
 //Prevent unnecessary/unwanted auto link in this compilation when activating boost libraries in the MITK superbuild

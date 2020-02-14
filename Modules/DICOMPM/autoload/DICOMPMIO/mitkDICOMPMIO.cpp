@@ -185,12 +185,9 @@ namespace mitk
 	  PMhandler.setSeriesNumber("1");
 	  PMhandler.setInstanceNumber("1");
 	  PMhandler.setDerivationCode("129104", "DCM", "Perfusion image analysis");
-	  PMhandler.setRealWorldValueSlope(1);
-
-
+	  PMhandler.setRealWorldValueSlope("1");
 
 	  return PMhandler.getJSONOutputAsString();
-
   }
 
 

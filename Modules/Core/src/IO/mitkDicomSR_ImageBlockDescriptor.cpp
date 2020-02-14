@@ -128,7 +128,8 @@ void DicomSeriesReader::fillSliceInfo(SliceInfo& info, DcmItem* ds, unsigned lon
   if (info.m_SOPInstanceUID.empty()) {
     ds->findAndGetOFStringArray(DCM_ReferencedSOPInstanceUIDInFile, info.m_SOPInstanceUID);
   }
-  ds->findAndGetOFStringArray(DCM_ImageOrientationPatient, info.m_Orientation);
+  ds->findAndGetOFStringArray(DCM_ImageOrientationPatient, s);
+  info.m_HasOrientation = DICOMStringToOrientationVectors(s, info.m_Orientation[0], info.m_Orientation[1]);
   ds->findAndGetOFStringArray(DCM_GantryDetectorTilt, info.m_GantryTilt);
 }
 
@@ -173,7 +174,8 @@ DicomSeriesReader::ImageBlockDescriptor::ImageBlockDescriptor(std::string path, 
   auto& info= m_SlicesInfo[path];
 
   fillSliceInfo(info, FileRecord);
-  DICOMStringToOrientationVectors( info.m_Orientation, m_Orientation[0], m_Orientation[1], m_HasOrientation );
+  m_HasOrientation = info.m_HasOrientation;
+  std::copy(info.m_Orientation, info.m_Orientation+2, m_Orientation);
   fillSeriesInfo(FileRecord, SeriesRecord, PatientRecord);
 }
 static std::string getTag(const gdcm::Tag tag, const gdcm::DataSet& ds)
@@ -383,7 +385,8 @@ DicomSeriesReader::ImageBlockDescriptor::ImageBlockDescriptor(std::string path, 
     mi->findAndGetOFStringArray(DCM_MediaStorageSOPInstanceUID, info.m_SOPInstanceUID);
   }
 
-  DICOMStringToOrientationVectors( info.m_Orientation, m_Orientation[0], m_Orientation[1], m_HasOrientation );
+  m_HasOrientation = info.m_HasOrientation;
+  std::copy(info.m_Orientation, info.m_Orientation+2, m_Orientation);
   fillSeriesInfo(ds);
 
   if (m_SOPClassUID.empty()) {
@@ -626,6 +629,9 @@ std::shared_ptr<DicomSeriesReader::ImageBlockDescriptor> DicomSeriesReader::Imag
   double toleratedErrorWithWarning = step2*100;
   double toleratedError = 0.000025;
   unsigned timeSteps2 = 1;
+  unsigned zSteps = 1;
+  auto secondSlice = referenceSlice;
+  auto preLastSlice = referenceSlice;
   while (++fileIter != m_Filenames.end()) {
     sliceInfo = &(m_SlicesInfo.at(*fileIter));
     if (squaredStep(*sliceInfo, *referenceSlice, step2) == 0) { // skip points from different time
@@ -647,7 +653,9 @@ std::shared_ptr<DicomSeriesReader::ImageBlockDescriptor> DicomSeriesReader::Imag
       m_BadSlicingDistance = true;
     }
     lastDifferentOrigin = thisOrigin;
+    preLastSlice = referenceSlice;
     referenceSlice = sliceInfo;
+    ++zSteps;
   }
 /*  if (timeSteps2 != timeSteps && timeSteps < m_Filenames.size()) {
     timeSteps = 1;
@@ -657,7 +665,19 @@ std::shared_ptr<DicomSeriesReader::ImageBlockDescriptor> DicomSeriesReader::Imag
   m_MultiOriented = false;
 
   if (sliceInfo->m_Image) { // Correct spacing value to sqrt(step2)
-    m_SliceDistance = sqrt(step2);
+    if (zSteps > 1) {
+      auto last2 = squaredStep(*preLastSlice, *referenceSlice, step2);
+      if (zSteps > 2) {
+        auto mid2 = squaredStep(*secondSlice, *preLastSlice, step2) / ((zSteps-2)*(zSteps-2));
+        if (mid2 < last2) {
+          last2 = mid2;
+        }
+      }
+      if (last2 < step2) {
+        step2 = last2;
+      }
+    }
+    m_SliceDistance = sqrt( step2 );
   }
 
   if (fileIter == m_Filenames.end()) {
@@ -686,7 +706,9 @@ void DicomSeriesReader::ImageBlockDescriptor::AddFile(ImageBlockDescriptor& file
 {
   std::unique_lock<std::mutex> lock(*m_Mutex);
   auto& newSliceInfo = m_SlicesInfo[file.m_Filenames[0]] = file.m_SlicesInfo.at(file.m_Filenames[0]);
-  if ( !m_MultiOriented && (m_HasOrientation == newSliceInfo.m_Orientation.empty() || m_Filenames.size() && m_SlicesInfo.at(m_Filenames[0]).m_Orientation != newSliceInfo.m_Orientation) ) {
+  if ( !m_MultiOriented && (m_HasOrientation != newSliceInfo.m_HasOrientation
+   || m_Filenames.size() && !std::equal(newSliceInfo.m_Orientation, newSliceInfo.m_Orientation+2, m_SlicesInfo.at(m_Filenames[0]).m_Orientation,
+        [](const Vector3D& a, const Vector3D& b){ return (a-b).GetSquaredNorm() <= 0.00000001; })) ) {
     m_MultiOriented = true;
   }
   auto it= std::upper_bound(m_Filenames.begin(), m_Filenames.end(), file.m_Filenames[0], [this](const std::string& a, const std::string& b){ return m_SlicesInfo.at(a) < m_SlicesInfo.at(b); });
@@ -1122,35 +1144,17 @@ bool DicomSeriesReader::SliceInfo::operator<(const DicomSeriesReader::SliceInfo&
      - number of rows/columns
   */
 
-  auto stodNoException = [](const std::string& s)
-  {
-    try {
-      return std::stod(s);
-    } catch (std::exception&) {
-      return 0.0;
-    }
-  };
-
   // TODO: move this parsing and distance calculation to ImageBlockDescriptor constructor
   const auto& imagePosition = m_ImagePositionPatient;
   const auto& bImagePosition = b.m_ImagePositionPatient;
-  std::vector<double> imageOrientation;
-  std::vector<double> bImageOrientation;
-  parseStringToDoubleVector(m_Orientation, imageOrientation);
-  parseStringToDoubleVector(b.m_Orientation, bImageOrientation);
 
   // See if we have Image Position and Orientation which is equal
-  if ( m_HasImagePositionPatient && imageOrientation.size()>=6 && b.m_HasImagePositionPatient && bImageOrientation.size()>=6
-    && std::equal(imageOrientation.begin(), imageOrientation.begin()+6, bImageOrientation.begin(),
-         [](double a, double b){ return std::abs(a-b) <= 0.0001; }) ) {
+  if ( m_HasImagePositionPatient && m_HasOrientation && b.m_HasImagePositionPatient && b.m_HasOrientation
+    && (m_Orientation[0] - b.m_Orientation[0]).GetSquaredNorm() <= 0.00000001
+    && (m_Orientation[1] - b.m_Orientation[1]).GetSquaredNorm() <= 0.00000001 ) {
 
     // Compute the distance from world origin (0,0,0) ALONG THE NORMAL of the image planes
-
-    Vector3D normal;
-
-    normal[0] = imageOrientation[1] * imageOrientation[5] - imageOrientation[2] * imageOrientation[4];
-    normal[1] = imageOrientation[2] * imageOrientation[3] - imageOrientation[0] * imageOrientation[5];
-    normal[2] = imageOrientation[0] * imageOrientation[4] - imageOrientation[1] * imageOrientation[3];
+    auto normal = vnl_cross_3d(vnl_vector_fixed<double,3>(m_Orientation[0]), vnl_vector_fixed<double,3>(m_Orientation[1]));
 
     double
       dist1 = 0.0,

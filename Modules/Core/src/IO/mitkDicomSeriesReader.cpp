@@ -376,10 +376,10 @@ DicomSeriesReader::DICOMStringToPoint3D(const std::string& s, bool* successful)
   return p;
 }
 
-void
-DicomSeriesReader::DICOMStringToOrientationVectors(const std::string& s, Vector3D& right, Vector3D& up, bool& successful)
+bool
+DicomSeriesReader::DICOMStringToOrientationVectors(const std::string& s, Vector3D& right, Vector3D& up)
 {
-  successful = true;
+  bool successful = true;
 
   std::istringstream orientationReader(s);
   std::string coordinate;
@@ -388,31 +388,39 @@ DicomSeriesReader::DICOMStringToOrientationVectors(const std::string& s, Vector3
   {
     if (dim<3)
     {
-      right[dim++] = OFStandard::atof(coordinate.c_str());
+      right[dim++] = OFStandard::atof(coordinate.c_str(), &successful);
     }
     else
     {
-      up[dim++ - 3] = OFStandard::atof(coordinate.c_str());
+      up[dim++ - 3] = OFStandard::atof(coordinate.c_str(), &successful);
+    }
+    if (!successful)
+    {
+      break;
     }
   }
 
-  if (dim == 6) {
+  if (!successful) {
+    MITK_ERROR << "Tag ImageOrientationPatient(0020,0037) has wrong format! Default orientation will be used.";
+  } else if (dim == 6) {
     // check for noncollinearity
     if (std::abs(up[0]*right[1]-up[1]*right[0]) >= mitk::eps || std::abs(up[1]*right[2]-up[2]*right[1]) >= mitk::eps || std::abs(up[0]*right[2]-up[2]*right[0]) >= mitk::eps) {
-      return;
+      return true;
     }
     MITK_ERROR << "Tag ImageOrientationPatient(0020,0037) contains collinear vectors, so it is incorrect! Default orientation will be used.";
   } else {
     if (dim) {
       MITK_ERROR << "Tag ImageOrientationPatient(0020,0037) contains only " << dim << " instead of 6 values. Default orientation will be used.";
     }
-    successful = false;
   }
 
+  // Assign default to vectors for case when the return value will be ignored
   right.Fill(0);
   right[0] = 1.0;
   up.Fill(0);
   up[1] = 1.0;
+
+  return false;
 }
 ///
 /// Postprocessing after all files was analyzed
@@ -824,19 +832,6 @@ DicomSeriesReader::GetSeries(const std::string &dir)
   DicomSeriesReader::FileNamesGrouping result;
   GetSeries(result, directoryLister.GetFilenames());
   return result;
-}
-
-void DicomSeriesReader::parseStringToDoubleVector(std::string input, std::vector<double>& output)
-{
-  if (input.empty()) {
-    return;
-  }
-  typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
-  boost::char_separator<char> sep{"\\"};
-  tokenizer tok{ input, sep };
-  for (auto token : tok) {
-    output.push_back(std::stod(token));
-  }
 }
 
 std::string DicomSeriesReader::GetConfigurationString()

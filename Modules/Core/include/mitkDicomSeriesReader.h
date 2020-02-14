@@ -323,17 +323,16 @@ class MITKCORE_EXPORT DicomSeriesReader
 {
 public:
 
-  static void parseStringToDoubleVector(std::string input, std::vector<double>& output);
-
   struct SliceInfo {
-    long m_AcquisitionNumber; ///< The maximal value means the tag is missing
+    long m_AcquisitionNumber; ///< The maximal value std::numeric_limits<long>::max() means the tag is missing
     long m_TemporalPosition;
     long m_InstanceNumber;
     unsigned long m_FileSize;
     std::string m_SOPInstanceUID;
     Point3D m_ImagePositionPatient;
+    Vector3D m_Orientation[2];
     bool m_HasImagePositionPatient; ///< ImagePositionPatient exists in DICOM tags as 3 coordinates
-    std::string m_Orientation;
+    bool m_HasOrientation;
     std::string m_GantryTilt;       // TODO: convert to double
     Image::Pointer m_Image; ///< Preloaded slice or frames
 
@@ -422,7 +421,7 @@ public:
       /// List of files in this group
       StringContainer GetFilenames() const;
 
-      /// A unique ID describing this block (enhanced Series Instance UID).
+      /// A unique ID describing this block (enhances Series Instance UID when the series was slitted).
       int GetImageBlockUID() const;
 
       /// Calculate a key for this block to distribute files into blocks and sort the blocks
@@ -812,8 +811,8 @@ protected:
     \endverbatim
   */
   static
-  void
-  DICOMStringToOrientationVectors(const std::string& s, Vector3D& right, Vector3D& up, bool& successful);
+  bool
+  DICOMStringToOrientationVectors(const std::string& s, Vector3D& right, Vector3D& up);
 
   template <typename ImageType>
   static

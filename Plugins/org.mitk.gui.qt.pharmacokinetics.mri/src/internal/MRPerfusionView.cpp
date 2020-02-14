@@ -659,12 +659,7 @@ bool MRPerfusionView::CheckModelSettings() const
 
 bool MRPerfusionView::CheckBaselineSelectionSettings() const
 {
-  bool ok = false;
-  if (m_Controls.spinBox_baselineStartTimeStep->value() <= m_Controls.spinBox_baselineEndTimeStep->value())
-  {
-    ok = true;
-  }
-  return ok;
+  return m_Controls.spinBox_baselineStartTimeStep->value() <= m_Controls.spinBox_baselineEndTimeStep->value();
 }
 
 void MRPerfusionView::ConfigureInitialParametersOfParameterizer(mitk::ModelParameterizerBase*

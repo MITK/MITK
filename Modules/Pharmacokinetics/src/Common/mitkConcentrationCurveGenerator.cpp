@@ -134,7 +134,7 @@ void mitk::ConcentrationCurveGenerator::CalculateAverageBaselineImage(const itk:
   typename TPixel4DImageType::Pointer baselineTimeFrameImage = TPixel4DImageType::New();
   typename TPixel4DImageType::RegionType extractionRegion;
   typename TPixel4DImageType::SizeType size_input_aux = region_input.GetSize();
-  size_input_aux[3] = (m_BaselineEndTimeStep - m_BaselineStartTimeStep+1);
+  size_input_aux[3] = m_BaselineEndTimeStep - m_BaselineStartTimeStep + 1;
   typename TPixel4DImageType::IndexType start_input_aux = region_input.GetIndex();
   start_input_aux[3] = m_BaselineStartTimeStep;
   extractionRegion.SetSize(size_input_aux);

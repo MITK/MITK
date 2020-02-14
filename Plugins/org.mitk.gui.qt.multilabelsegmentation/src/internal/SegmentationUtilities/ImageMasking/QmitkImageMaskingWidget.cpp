@@ -34,8 +34,8 @@ QmitkImageMaskingWidget::QmitkImageMaskingWidget(mitk::SliceNavigationController
 {
   m_Controls.setupUi(this);
 
-  m_Controls.dataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::ImagePredicate);
-  m_Controls.dataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::MaskPredicate);
+  m_Controls.dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::ImagePredicate);
+  m_Controls.dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::MaskPredicate);
   m_Controls.dataSelectionWidget->SetHelpText(HelpText);
 
 //  mitk::IDataStorageService::Pointer service =

@@ -23,9 +23,9 @@ QmitkConvertToMlWidget::QmitkConvertToMlWidget(mitk::SliceNavigationController* 
 {
   m_Controls.setupUi(this);
 
-  m_Controls.dataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::ImagePredicate);
+  m_Controls.dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::ImagePredicate);
 
-  connect(m_Controls.dataSelectionWidget, SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)), this, SLOT(SelectionChanged()));
+  connect(m_Controls.dataSelectionWidget, SIGNAL(SelectionChanged(unsigned int, const mitk::DataNode*)), this, SLOT(SelectionChanged()));
   connect(m_Controls.pushButton, SIGNAL(clicked()), this, SLOT(Convert()));
 }
 

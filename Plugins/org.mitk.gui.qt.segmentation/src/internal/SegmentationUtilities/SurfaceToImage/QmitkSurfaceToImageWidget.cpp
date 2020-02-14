@@ -30,8 +30,8 @@ QmitkSurfaceToImageWidget::QmitkSurfaceToImageWidget(mitk::SliceNavigationContro
 {
   m_Controls.setupUi(this);
 
-  m_Controls.dataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::ImageAndSegmentationPredicate);
-  m_Controls.dataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::SurfacePredicate);
+  m_Controls.dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::ImageAndSegmentationPredicate);
+  m_Controls.dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::SurfacePredicate);
   m_Controls.dataSelectionWidget->SetHelpText(HelpText);
 
   this->EnableButtons(false);

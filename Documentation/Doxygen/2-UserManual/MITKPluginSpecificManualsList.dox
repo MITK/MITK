@@ -1,5 +1,5 @@
 /**
-\page PluginListSpecificPage List of Application-specific Plugins 
+\page PluginListSpecificPage List of Application-specific Plugins
 
   \li \subpage org_mitk_gui_qt_aicpregistration
   \li \subpage org_mitk_gui_qt_cest

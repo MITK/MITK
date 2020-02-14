@@ -527,17 +527,22 @@ public:
 #ifndef _WIN32
     if (m_Size >= (1<<16)) {
       m_Data = (char*)mmap(NULL, m_Size, PROT_READ, MAP_PRIVATE|MAP_POPULATE|MAP_LOCKED, fd.handle(), 0);
-      // prefetch is not need since MAP_LOCKED is specifed
+      if (m_Data == MAP_FAILED && errno == EAGAIN) {
+        m_Data = (char*)mmap(NULL, m_Size, PROT_READ, MAP_PRIVATE|MAP_POPULATE, fd.handle(), 0);
+      }
+      if (m_Data != MAP_FAILED) {
+        m_MMaped = true;
+      } else {
+        m_Data = nullptr;
+        throw 1;
+      }
+      // prefetch is not need since MAP_LOCKED or MAP_POPULATE is specified
       // othervise the next (commented) code
       /*
-      auto* d = fd.data();
-      for (size_t i = 0, pgSize = getpagesize()*64; i < fd.size(); i += pgSize) {
-         volatile char k = fd.data()[i];
+      for (size_t i = 0, pgSize = getpagesize(); i < m_Size; i += pgSize) {
+         volatile char k = m_Data[i];
       }
       */
-      if (m_Data) {
-        m_MMaped = true;
-      }
     } else // for small files or under Windows read() is quicker
 #endif
     {
@@ -547,6 +552,9 @@ public:
         auto r = fd.read(m_Data + s, m_Size);
         if (r<0) {
           m_Size = s;
+          if (s == 0) {
+            throw 1;
+          }
           break;
         }
         s += r;

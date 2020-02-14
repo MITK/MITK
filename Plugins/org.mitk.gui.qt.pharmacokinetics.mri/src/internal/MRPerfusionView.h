@@ -112,7 +112,12 @@ protected:
   /**Checks if the settings in the GUI are valid for the chosen model.*/
   bool CheckModelSettings() const;
 
+  bool CheckBaselineSelectionSettings() const;
+
   void InitModelComboBox() const;
+
+
+
 
   /*! Helper method that generates a node for the passed concentration image.*/
   mitk::DataNode::Pointer GenerateConcentrationNode(mitk::Image* image, const std::string& nodeName) const;

@@ -126,7 +126,6 @@ void mitk::ConcentrationCurveGenerator::CalculateAverageBaselineImage(const itk:
   }
   
   typedef itk::Image<TPixel, 4> TPixel4DImageType;
-  typedef itk::Image<TPixel, 3> TPixel3DImageType;
   typedef itk::Image<double, 3> Double3DImageType;
   typedef itk::Image<double, 4> Double4DImageType;
   typedef itk::ExtractImageFilter<TPixel4DImageType, TPixel4DImageType> ExtractImageFilterType;
@@ -142,7 +141,7 @@ void mitk::ConcentrationCurveGenerator::CalculateAverageBaselineImage(const itk:
     mitkThrow() << "Error in ConcentrationCurveGenerator::CalculateAverageBaselineImage. End time point is larger than total number of time points.";
   }
 
-  ExtractImageFilterType::Pointer ExtractFilter = ExtractImageFilterType::New();
+  typename ExtractImageFilterType::Pointer ExtractFilter = ExtractImageFilterType::New();
   typename TPixel4DImageType::Pointer baselineTimeFrameImage = TPixel4DImageType::New();
   typename TPixel4DImageType::RegionType extractionRegion;
   typename TPixel4DImageType::SizeType size_input_aux = region_input.GetSize();

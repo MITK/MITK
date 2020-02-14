@@ -96,7 +96,7 @@ QPixmap GetPixmapFromImageNode(const mitk::DataNode* dataNode, int height)
 }
 
 QmitkNodeSelectionButton::QmitkNodeSelectionButton(QWidget *parent)
-  : QPushButton(parent), m_OutDatedThumpNail(true), m_IsOptional(true), m_NodeModifiedObserverTag(0), m_NodeObserved(false)
+  : QPushButton(parent), m_OutDatedThumpNail(true), m_DataMTime(0), m_IsOptional(true), m_NodeModifiedObserverTag(0), m_NodeObserved(false)
 { }
 
 QmitkNodeSelectionButton::~QmitkNodeSelectionButton()
@@ -197,10 +197,16 @@ void QmitkNodeSelectionButton::paintEvent(QPaintEvent *p)
     auto iconLength = widgetSize.height() - 10;
     auto node = this->m_SelectedNode;
 
-    if (this->m_OutDatedThumpNail)
+    itk::ModifiedTimeType dataMTime = 0;
+    if (m_SelectedNode->GetData())
+    {
+      dataMTime = m_SelectedNode->GetData()->GetMTime();
+    }
+    if (dataMTime>m_DataMTime || this->m_OutDatedThumpNail)
     {
       this->m_ThumpNail = GetPixmapFromImageNode(node, iconLength);
       this->m_OutDatedThumpNail = false;
+      m_DataMTime = dataMTime;
     }
 
     painter.drawPixmap(origin, m_ThumpNail);
@@ -240,7 +246,6 @@ void QmitkNodeSelectionButton::paintEvent(QPaintEvent *p)
 
   painter.translate(origin);
   td.drawContents(&painter);
-
 }
 
 void QmitkNodeSelectionButton::changeEvent(QEvent *event)

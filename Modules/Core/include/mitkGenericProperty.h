@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKGENERICPROPERTY_H_HEADER_INCLUDED_C1061CEE
 #define MITKGENERICPROPERTY_H_HEADER_INCLUDED_C1061CEE
@@ -51,7 +47,7 @@ namespace mitk
   public:
     mitkClassMacro(GenericProperty, BaseProperty);
     mitkNewMacro1Param(GenericProperty<T>, T);
-    itkCloneMacro(Self)
+    itkCloneMacro(Self);
 
       typedef T ValueType;
 
@@ -116,8 +112,12 @@ namespace mitk
                                                                                                                        \
   {                                                                                                                    \
   public:                                                                                                              \
-    mitkClassMacro(PropertyName, GenericProperty<Type>) itkFactorylessNewMacro(Self) itkCloneMacro(Self)               \
-      mitkNewMacro1Param(PropertyName, Type) using BaseProperty::operator=;                                            \
+    mitkClassMacro(PropertyName, GenericProperty<Type>);                                                               \
+    itkFactorylessNewMacro(Self);                                                                                      \
+    itkCloneMacro(Self);                                                                                               \
+    mitkNewMacro1Param(PropertyName, Type);                                                                            \
+                                                                                                                       \
+    using BaseProperty::operator=;                                                                                     \
                                                                                                                        \
   protected:                                                                                                           \
     PropertyName();                                                                                                    \

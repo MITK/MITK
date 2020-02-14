@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkUSNavigationMarkerPlacement.h"
 #include "ui_QmitkUSNavigationMarkerPlacement.h"
@@ -349,7 +345,7 @@ void QmitkUSNavigationMarkerPlacement::OnCombinedModalityPropertyChanged(const s
     if (m_CombinedModality.IsNotNull() && !m_CombinedModality->GetIsCalibratedForCurrentStatus())
     {
       mitk::LayoutAnnotationRenderer::AddAnnotation(
-        m_WarnOverlay.GetPointer(), "stdmulti.widget1", mitk::LayoutAnnotationRenderer::TopLeft);
+        m_WarnOverlay.GetPointer(), "stdmulti.widget0", mitk::LayoutAnnotationRenderer::TopLeft);
       MITK_WARN << "No calibration available for the selected ultrasound image depth.";
     }
   }
@@ -469,22 +465,22 @@ void QmitkUSNavigationMarkerPlacement::SetTwoWindowView()
     switch (this->ui->m_RenderWindowSelection->value())
     {
       case 1:
-        mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetCameraController()->SetViewToCaudal();
-        i = 2;
-        j = 3; // other windows
-        k = 1;
+        mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))->GetCameraController()->SetViewToCaudal();
+        i = 1;
+        j = 2; // other windows
+        k = 0;
         break;
       case 2:
-        mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetCameraController()->SetViewToSinister();
-        i = 1;
-        j = 3;
-        k = 2;
+        mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))->GetCameraController()->SetViewToSinister();
+        i = 0;
+        j = 2;
+        k = 1;
         break;
       case 3:
-        mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetCameraController()->SetViewToAnterior();
-        i = 2;
-        j = 1;
-        k = 3;
+        mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))->GetCameraController()->SetViewToAnterior();
+        i = 1;
+        j = 0;
+        k = 2;
         break;
       default:
         return;

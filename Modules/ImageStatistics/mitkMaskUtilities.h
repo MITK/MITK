@@ -1,3 +1,15 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
 #ifndef MITKMASKUTIL
 #define MITKMASKUTIL
 
@@ -22,10 +34,8 @@ class MITKIMAGESTATISTICS_EXPORT MaskUtilities: public itk::Object
         typedef itk::SmartPointer< const Self >     ConstPointer;
 
         /** Method for creation through the object factory. */
-        itkNewMacro(Self)
-
-        /** Runtime information support. */
-        itkTypeMacro(MaskUtilities, itk::Object)
+        itkNewMacro(Self); /** Runtime information support. */
+        itkTypeMacro(MaskUtilities, itk::Object);
 
         typedef itk::Image<TPixel, VImageDimension> ImageType;
         typedef itk::Image<unsigned short, VImageDimension> MaskType;

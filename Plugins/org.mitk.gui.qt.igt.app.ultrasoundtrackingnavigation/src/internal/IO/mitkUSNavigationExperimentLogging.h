@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKUSNAVIGATIONEXPERIMENTLOGGING_H
 #define MITKUSNAVIGATIONEXPERIMENTLOGGING_H
@@ -44,8 +40,8 @@ namespace mitk {
  */
 class USNavigationExperimentLogging : public itk::Object {
 public:
-  mitkClassMacroItkParent(USNavigationExperimentLogging, itk::Object)
-  itkNewMacro(USNavigationExperimentLogging)
+  mitkClassMacroItkParent(USNavigationExperimentLogging, itk::Object);
+  itkNewMacro(USNavigationExperimentLogging);
 
   /**
    * \brief Clears the XML tree.
@@ -79,8 +75,8 @@ public:
   /**
    * \brief Only properties with this prefix are written into the output file.
    */
-  itkSetMacro(KeyPrefix, std::string)
-  itkGetMacro(KeyPrefix, std::string)
+  itkSetMacro(KeyPrefix, std::string);
+  itkGetMacro(KeyPrefix, std::string);
 
 protected:
   /**

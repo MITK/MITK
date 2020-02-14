@@ -31,6 +31,9 @@ else(_missing_deps)
   add_executable(VerifyDICOMMitkImageDump src/VerifyDICOMMitkImageDump.cpp)
   mitk_use_modules(TARGET VerifyDICOMMitkImageDump MODULES MitkDICOMTesting)
 
+  set_property(TARGET DumpDICOMMitkImage VerifyDICOMMitkImageDump PROPERTY FOLDER
+    "${MITK_ROOT_FOLDER}/Modules/Tests")
+
   add_subdirectory(test)
 endif()
 

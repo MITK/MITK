@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef OptitrackTrackingDevice_H_HEADER_INCLUDED
 #define OptitrackTrackingDevice_H_HEADER_INCLUDED
@@ -60,7 +56,7 @@ namespace mitk
   *          continuously update the tool coordinates. Remember that it will be necessary to
   *       to have a license for using the Optitrack System.
   *       See  http://www.naturalpoint.com/ for details.
-  *   \author E. Marinetto (emarinetto@hggm.es) Instituto de Investigación Sanitaria Gregorio Marañón, Madrid, Spain. & M. Noll (matthias.noll@igd.fraunhofer.de) Cognitive Computing & Medical Imaging | Fraunhofer IGD
+  *   \author E. Marinetto (emarinetto@hggm.es) Instituto de InvestigaciÃ³n Sanitaria Gregorio MaraÃ±Ã³n, Madrid, Spain. & M. Noll (matthias.noll@igd.fraunhofer.de) Cognitive Computing & Medical Imaging | Fraunhofer IGD
   *   \ingroup IGT
   */
   class MITKIGT_EXPORT OptitrackTrackingDevice : public mitk::TrackingDevice

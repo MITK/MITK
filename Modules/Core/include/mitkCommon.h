@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITK_COMMON_H_DEFINED
 #define MITK_COMMON_H_DEFINED
@@ -48,7 +44,7 @@ typedef unsigned int MapperSlotId;
   typedef itk::SmartPointer<const Self> ConstPointer;                                                                  \
   static const char *GetStaticNameOfClass() { return #className; }                                                     \
   virtual std::vector<std::string> GetClassHierarchy() const override { return mitk::GetClassHierarchy<Self>(); }      \
-  itkTypeMacro(className, SuperClassName)
+  itkTypeMacro(className, SuperClassName);
 
 #define mitkClassMacroItkParent(className, SuperClassName)                                                             \
   typedef className Self;                                                                                              \
@@ -57,7 +53,7 @@ typedef unsigned int MapperSlotId;
   typedef itk::SmartPointer<const Self> ConstPointer;                                                                  \
   static const char *GetStaticNameOfClass() { return #className; }                                                     \
   virtual std::vector<std::string> GetClassHierarchy() const { return mitk::GetClassHierarchy<Self>(); }               \
-  itkTypeMacro(className, SuperClassName)
+  itkTypeMacro(className, SuperClassName);
 
 /** At version 4.7 provides two type macros, the normal one expects the Superclass to provide the
  *  GetNameOfClass explicitely, the NoParent deos not expect anything.

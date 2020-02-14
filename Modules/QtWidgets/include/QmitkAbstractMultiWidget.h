@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical Image Computing.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITKABSTRACTMULTIWIDGET_H
 #define QMITKABSTRACTMULTIWIDGET_H
@@ -22,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk core
 #include <mitkBaseRenderer.h>
+#include <mitkDisplayActionEventHandler.h>
 #include <mitkInteractionSchemeSwitcher.h>
 #include <mitkPoint.h>
 
@@ -40,7 +37,6 @@ namespace mitk
 {
   class DataStorage;
   class InteractionEventHandler;
-  class RenderingManager;
 }
 
 /**
@@ -67,12 +63,10 @@ public:
 
   QmitkAbstractMultiWidget(QWidget* parent = 0,
                            Qt::WindowFlags f = 0,
-                           mitk::RenderingManager* renderingManager = nullptr,
-                           mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing,
                            const QString& multiWidgetName = "multiwidget");
 
   virtual ~QmitkAbstractMultiWidget();
-  
+
   virtual void InitializeMultiWidget() = 0;
   virtual void MultiWidgetOpened() { }
   virtual void MultiWidgetClosed() { }
@@ -80,16 +74,16 @@ public:
   virtual void SetDataStorage(mitk::DataStorage* dataStorage);
   mitk::DataStorage* GetDataStorage() const;
 
-  mitk::RenderingManager* GetRenderingManager() const;
-
   int GetRowCount() const;
   int GetColumnCount() const;
   virtual void SetLayout(int row, int column);
 
-  virtual void Synchronize(bool synchronized);
+  virtual void Synchronize(bool) { };
   virtual void SetInteractionScheme(mitk::InteractionSchemeSwitcher::InteractionScheme scheme);
 
   mitk::InteractionEventHandler* GetInteractionEventHandler();
+  void SetDisplayActionEventHandler(std::unique_ptr<mitk::DisplayActionEventHandler> displayActionEventHandler);
+  mitk::DisplayActionEventHandler* GetDisplayActionEventHandler();
 
   RenderWindowWidgetMap GetRenderWindowWidgets() const;
   RenderWindowWidgetMap Get2DRenderWindowWidgets() const;
@@ -106,7 +100,7 @@ public:
   RenderWindowWidgetPointer GetActiveRenderWindowWidget() const;
   RenderWindowWidgetPointer GetFirstRenderWindowWidget() const;
   RenderWindowWidgetPointer GetLastRenderWindowWidget() const;
-  
+
   virtual QString GetNameFromIndex(int row, int column) const;
   virtual QString GetNameFromIndex(size_t index) const;
 
@@ -148,11 +142,6 @@ private:
   *        can be implemented and customized in the subclasses.
   */
   virtual void SetLayoutImpl() = 0;
-  /**
-  * @brief This function will be called by the function 'Synchronize' and
-  *        can be implemented and customized in the subclasses.
-  */
-  virtual void SynchronizeImpl() = 0;
   /**
   * @brief This function will be called by the function 'SetInteractionScheme' and
   *        can be implemented and customized in the subclasses.

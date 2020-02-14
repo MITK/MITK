@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical Image Computing.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKDISPLAYACTIONEVENTHANDLER_H
 #define MITKDISPLAYACTIONEVENTHANDLER_H
@@ -40,6 +36,8 @@ namespace mitk
 
     using OberserverTagType = unsigned long;
 
+    virtual ~DisplayActionEventHandler();
+
     /**
     * @brief Sets the display action event broadcast class that should be observed.
     *     This class receives events from the given broadcast class and triggers the "corresponding functions" to perform the custom actions.
@@ -49,7 +47,7 @@ namespace mitk
     * @post If a different broadcast class was already set, the observing commands are removed as observer.
     *       Attention: All registered commands are removed from the list of observer.
     *
-    * @par  observableBroadcast   The 'DisplayActionEventBroadcast'-class that should be observed.
+    * @param  observableBroadcast   The 'DisplayActionEventBroadcast'-class that should be observed.
     */
     void SetObservableBroadcast(DisplayActionEventBroadcast* observableBroadcast);
 
@@ -62,9 +60,9 @@ namespace mitk
     * @pre    The class' observable (the display action event broadcast) has to be set to connect display events.
     * @throw  mitk::Exception, if the class' observable is null.
     *
-    * @par displayActionEvent   The 'DisplayActionEvent' on which the command should react.
-    * @par actionFunction       A custom std::Function that will be executed if the command receives the correct event.
-    * @par filterFunction       A custom std::Function that will be checked before the execution of the action function.
+    * @param displayActionEvent   The 'DisplayActionEvent' on which the command should react.
+    * @param actionFunction       A custom std::Function that will be executed if the command receives the correct event.
+    * @param filterFunction       A custom std::Function that will be checked before the execution of the action function.
     *                           If the filter function is not specified, a default filter always returning 'true' will be used.
     *
     * @return   A tag to identify, receive or remove the newly created 'StdFunctionCommand'.
@@ -81,13 +79,31 @@ namespace mitk
     * @pre    The class' observable (the display action event broadcast) has to be set to connect display events.
     * @throw  mitk::Exception, if the class' observable is null.
     *
-    * @par observerTag   The tag to identify the 'StdFunctionCommand' observer.
+    * @param observerTag   The tag to identify the 'StdFunctionCommand' observer.
     */
     void DisconnectObserver(OberserverTagType observerTag);
 
-    const std::vector<OberserverTagType>& GetAllObserverTags() { return m_ObserverTags; };
+    const std::vector<OberserverTagType>& GetAllObserverTags() { return m_ObserverTags; }
+
+    /**
+    * @brief This function can be used by sub-classes to initialize a set of pre-defined
+    *        DisplayActionEventFunctions and connect them to the observable broadcast member.
+    *        In order to customize a sub-class behavior this function calls the virtual function
+    *        InitActionsImpl.
+    *        All currently connected display action events will be removed as observer from the broadcast instance.
+    *
+    * @pre    The class' observable (the display action event broadcast) has to be set.
+    * @throw  mitk::Exception, if the class' observable is null.
+    */
+    void InitActions();
 
   protected:
+
+    /**
+    * @brief Sub-classes need to implement this function to define a customized behavior
+    *        for default action pre-definition.
+    */
+    virtual void InitActionsImpl() { }
 
     WeakPointer<DisplayActionEventBroadcast> m_ObservableBroadcast;
     std::vector<OberserverTagType> m_ObserverTags;

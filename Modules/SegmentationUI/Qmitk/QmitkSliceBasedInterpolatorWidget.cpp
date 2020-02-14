@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkSliceBasedInterpolatorWidget.h"
 
@@ -114,11 +110,11 @@ const QmitkSliceBasedInterpolatorWidget::ActionToSliceDimensionMapType
   foreach (mitk::SliceNavigationController *slicer, m_ControllerToDeleteObserverTag.keys())
   {
     std::string name = slicer->GetRenderer()->GetName();
-    if (name == "stdmulti.widget1")
+    if (name == "stdmulti.widget0")
       name = "Axial (red window)";
-    else if (name == "stdmulti.widget2")
+    else if (name == "stdmulti.widget1")
       name = "Sagittal (green window)";
-    else if (name == "stdmulti.widget3")
+    else if (name == "stdmulti.widget2")
       name = "Coronal (blue window)";
     actionToSliceDimension[new QAction(QString::fromStdString(name), nullptr)] = slicer;
   }

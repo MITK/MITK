@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical Image Computing.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITKMXNMULTIWIDGET_H
 #define QMITKMXNMULTIWIDGET_H
@@ -35,8 +31,6 @@ public:
 
   QmitkMxNMultiWidget(QWidget* parent = nullptr,
                       Qt::WindowFlags f = 0,
-                      mitk::RenderingManager* renderingManager = nullptr,
-                      mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing,
                       const QString& multiWidgetName = "mxnmulti");
 
   ~QmitkMxNMultiWidget() = default;
@@ -44,6 +38,8 @@ public:
   void InitializeMultiWidget() override;
   void MultiWidgetOpened() override;
   void MultiWidgetClosed() override;
+
+  void Synchronize(bool synchronized) override;
 
   QmitkRenderWindow* GetRenderWindow(const QString& widgetName) const override;
   QmitkRenderWindow* GetRenderWindow(const mitk::BaseRenderer::ViewDirection& viewDirection) const override;
@@ -75,7 +71,6 @@ Q_SIGNALS:
 private:
 
   void SetLayoutImpl() override;
-  void SynchronizeImpl() override { }
   void SetInteractionSchemeImpl() override { }
 
   void CreateRenderWindowWidget();

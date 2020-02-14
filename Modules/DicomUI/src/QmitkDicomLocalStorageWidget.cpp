@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 // Qmitk
 #include "QmitkDicomLocalStorageWidget.h"
@@ -68,7 +64,7 @@ void QmitkDicomLocalStorageWidget::OnStartDicomImport(const QString &dicomData)
 {
   if (m_LocalDatabase->isOpen())
   {
-    m_LocalIndexer->addDirectory(*m_LocalDatabase, dicomData, m_LocalDatabase->databaseDirectory());
+    m_LocalIndexer->addDirectory(dicomData);
   }
 }
 
@@ -76,7 +72,7 @@ void QmitkDicomLocalStorageWidget::OnStartDicomImport(const QStringList &dicomDa
 {
   if (m_LocalDatabase->isOpen())
   {
-    m_LocalIndexer->addListOfFiles(*m_LocalDatabase, dicomData, m_LocalDatabase->databaseDirectory());
+    m_LocalIndexer->addListOfFiles( dicomData);
   }
 }
 
@@ -223,6 +219,7 @@ void QmitkDicomLocalStorageWidget::SetDatabase(QString databaseFile)
   m_LocalDatabase = new ctkDICOMDatabase(databaseFile);
   m_LocalDatabase->setParent(this);
   m_Controls->ctkDicomBrowser->setDICOMDatabase(m_LocalDatabase);
+  m_LocalIndexer->setDatabase(m_LocalDatabase);
 }
 
 void QmitkDicomLocalStorageWidget::OnSeriesSelectionChanged(const QStringList &s)

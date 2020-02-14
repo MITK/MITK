@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkBaseDICOMReaderService.h"
 
@@ -185,19 +181,24 @@ std::string GenerateNameFromDICOMProperties(const mitk::IPropertyProvider* provi
 {
   std::string nodeName = mitk::DataNode::NO_NAME_VALUE();
 
-  auto studyProp = provider->GetConstProperty(mitk::GeneratePropertyNameForDICOMTag(0x0020, 0x000D).c_str());
+  auto studyProp = provider->GetConstProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x1030).c_str());
   if (studyProp.IsNotNull())
   {
     nodeName = studyProp->GetValueAsString();
   }
 
-  auto seriesProp = provider->GetConstProperty(mitk::GeneratePropertyNameForDICOMTag(0x0020, 0x000E).c_str());
+  auto seriesProp = provider->GetConstProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x103E).c_str());
 
   if (seriesProp.IsNotNull())
   {
     if (studyProp.IsNotNull())
     {
       nodeName += " / ";
+    }
+    else
+    {
+      nodeName = "";
+
     }
     nodeName += seriesProp->GetValueAsString();
   }

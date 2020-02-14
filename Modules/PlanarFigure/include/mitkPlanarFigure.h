@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef _MITK_PLANAR_FIGURE_H_
 #define _MITK_PLANAR_FIGURE_H_
@@ -54,7 +50,8 @@ namespace mitk
   class MITKPLANARFIGURE_EXPORT PlanarFigure : public BaseData
   {
   public:
-    mitkClassMacro(PlanarFigure, BaseData) itkCloneMacro(Self)
+    mitkClassMacro(PlanarFigure, BaseData);
+    itkCloneMacro(Self);
 
       typedef Point2D PolyLineElement;
 

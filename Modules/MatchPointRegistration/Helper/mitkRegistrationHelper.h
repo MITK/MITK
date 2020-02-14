@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #ifndef _mitkRegistrationHelper_h
@@ -28,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //MITK
 #include <mitkImage.h>
 #include <mitkDataNode.h>
+#include <mitkNodePredicateBase.h>
 
 //MITK
 #include "MitkMatchPointRegistrationExports.h"
@@ -64,6 +61,15 @@ public:
    @return true: node contains a MAPRegistrationWrapper. false: "node" does not point to a valid instance or does not contain
     a registration wrapper.*/;
   static bool IsRegNode(const mitk::DataNode* node);
+
+  /** Returns a node predicate that identifies registration nodes.*/
+  static NodePredicateBase::ConstPointer RegNodePredicate();
+
+  /** Returns a node predicate that identifies image nodes.*/
+  static NodePredicateBase::ConstPointer ImageNodePredicate();
+
+  /** Returns a node predicate that identifies point set nodes.*/
+  static NodePredicateBase::ConstPointer PointSetNodePredicate();
 
 private:
     typedef ::map::core::Registration<3,3>::DirectMappingType RegistrationKernel3DBase;

@@ -234,6 +234,15 @@ function(mitk_create_module)
       endif()
       set(MODULE_IS_ENABLED 0)
     else()
+      foreach(dep ${MODULE_DEPENDS})
+          if(TARGET ${dep})
+            get_target_property(AUTLOAD_DEP ${dep} MITK_AUTOLOAD_DIRECTORY)
+            if (AUTLOAD_DEP)
+              message(SEND_ERROR "Module \"${MODULE_NAME}\" has an invalid dependency on autoload module \"${dep}\". Check MITK_CREATE_MODULE usage for \"${MODULE_NAME}\".")
+            endif()
+          endif()
+      endforeach(dep)
+
       set(MODULE_IS_ENABLED 1)
       # now check for every package if it is enabled. This overlaps a bit with
       # MITK_CHECK_MODULE ...
@@ -278,6 +287,7 @@ function(mitk_create_module)
     # create a meta-target if it does not already exist
     if(NOT TARGET ${_module_autoload_meta_target})
       add_custom_target(${_module_autoload_meta_target})
+      set_property(TARGET ${_module_autoload_meta_target} PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Modules/Autoload")
     endif()
 
     if(NOT MODULE_EXPORT_DEFINE)
@@ -453,16 +463,19 @@ function(mitk_create_module)
 
     if(MODULE_HEADERS_ONLY)
       add_library(${MODULE_TARGET} INTERFACE)
+      set_property(TARGET ${MODULE_TARGET} PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Modules")
     else()
       if(MODULE_EXECUTABLE)
         add_executable(${MODULE_TARGET}
                        ${MODULE_CPP_FILES} ${coverage_sources} ${CPP_FILES_GENERATED} ${Q${KITNAME}_GENERATED_CPP}
                        ${DOX_FILES} ${UI_FILES} ${QRC_FILES})
+        set_property(TARGET ${MODULE_TARGET} PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Modules/Executables")
         set(_us_module_name main)
       else()
         add_library(${MODULE_TARGET} ${_STATIC}
                     ${coverage_sources} ${CPP_FILES_GENERATED} ${Q${KITNAME}_GENERATED_CPP}
                     ${DOX_FILES} ${UI_FILES} ${QRC_FILES})
+        set_property(TARGET ${MODULE_TARGET} PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Modules")
         set(_us_module_name ${MODULE_TARGET})
       endif()
 

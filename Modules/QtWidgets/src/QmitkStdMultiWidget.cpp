@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #define SMW_INFO MITK_INFO("widget.stdmulti")
 
@@ -34,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPointSet.h>
 #include <mitkProperties.h>
 #include <mitkStatusBar.h>
+#include <mitkDisplayActionEventHandlerStd.h>
 #include <mitkVtkLayerController.h>
 
 // qt
@@ -49,14 +46,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget *parent,
                                          Qt::WindowFlags f/* = 0*/,
-                                         mitk::RenderingManager *renderingManager/* = nullptr*/,
-                                         mitk::BaseRenderer::RenderingMode::Type renderingMode/* = mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing*/,
                                          const QString &name/* = "stdmulti"*/)
-  : QmitkAbstractMultiWidget(parent, f, renderingManager, renderingMode, name)
+  : QmitkAbstractMultiWidget(parent, f, name)
   , m_TimeNavigationController(nullptr)
   , m_PendingCrosshairPositionEvent(false)
 {
-  m_TimeNavigationController = GetRenderingManager()->GetTimeNavigationController();
+  m_TimeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
 }
 
 QmitkStdMultiWidget::~QmitkStdMultiWidget()
@@ -106,6 +101,14 @@ void QmitkStdMultiWidget::InitializeMultiWidget()
   m_ParentNodeForGeometryPlanes->SetProperty("layer", layer);
 
   AddDisplayPlaneSubTree();
+
+  SetDisplayActionEventHandler(std::make_unique<mitk::DisplayActionEventHandlerStd>());
+
+  auto displayActionEventHandler = GetDisplayActionEventHandler();
+  if (nullptr != displayActionEventHandler)
+  {
+    displayActionEventHandler->InitActions();
+  }
 }
 
 QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow(const QString& widgetName) const
@@ -222,7 +225,7 @@ void QmitkStdMultiWidget::ResetCrosshair()
     return;
   }
 
-  GetRenderingManager()->InitializeViewsByBoundingObjects(dataStorage);
+  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(dataStorage);
 
   SetWidgetPlaneMode(mitk::InteractionSchemeSwitcher::MITKStandard);
 }
@@ -705,7 +708,7 @@ void QmitkStdMultiWidget::SetWidgetPlanesVisibility(bool visible, mitk::BaseRend
   {
     m_PlaneNode3->SetVisibility(visible, renderer);
   }
-  GetRenderingManager()->RequestUpdateAll();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -718,14 +721,14 @@ void QmitkStdMultiWidget::SetLayoutImpl()
 
   // Initialize views as axial, sagittal, coronal to all data objects in DataStorage
   auto geo = GetDataStorage()->ComputeBoundingGeometry3D(GetDataStorage()->GetAll());
-  GetRenderingManager()->InitializeViews(geo);
+  mitk::RenderingManager::GetInstance()->InitializeViews(geo);
 }
 
 void QmitkStdMultiWidget::CreateRenderWindowWidgets()
 {
   // create axial render window (widget)
   QString renderWindowWidgetName = GetNameFromIndex(0, 0);
-  RenderWindowWidgetPointer renderWindowWidget1 = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage(), GetRenderingManager());
+  RenderWindowWidgetPointer renderWindowWidget1 = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage());
   auto renderWindow1 = renderWindowWidget1->GetRenderWindow();
   renderWindow1->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
   renderWindowWidget1->SetDecorationColor(GetDecorationColor(0));
@@ -735,7 +738,7 @@ void QmitkStdMultiWidget::CreateRenderWindowWidgets()
 
   // create sagittal render window (widget)
   renderWindowWidgetName = GetNameFromIndex(0, 1);
-  RenderWindowWidgetPointer renderWindowWidget2 = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage(), GetRenderingManager());
+  RenderWindowWidgetPointer renderWindowWidget2 = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage());
   auto renderWindow2 = renderWindowWidget2->GetRenderWindow();
   renderWindow2->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
   renderWindowWidget2->SetDecorationColor(GetDecorationColor(1));
@@ -746,7 +749,7 @@ void QmitkStdMultiWidget::CreateRenderWindowWidgets()
 
   // create coronal render window (widget)
   renderWindowWidgetName = GetNameFromIndex(1, 0);
-  RenderWindowWidgetPointer renderWindowWidget3 = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage(), GetRenderingManager());
+  RenderWindowWidgetPointer renderWindowWidget3 = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage());
   auto renderWindow3 = renderWindowWidget3->GetRenderWindow();
   renderWindow3->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Frontal);
   renderWindowWidget3->SetDecorationColor(GetDecorationColor(2));
@@ -756,7 +759,7 @@ void QmitkStdMultiWidget::CreateRenderWindowWidgets()
 
   // create 3D render window (widget)
   renderWindowWidgetName = GetNameFromIndex(1, 1);
-  RenderWindowWidgetPointer renderWindowWidget4 = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage(), GetRenderingManager());
+  RenderWindowWidgetPointer renderWindowWidget4 = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage());
   auto renderWindow4 = renderWindowWidget4->GetRenderWindow();
   renderWindow4->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Original);
   renderWindowWidget4->SetDecorationColor(GetDecorationColor(3));

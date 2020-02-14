@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 #ifndef _itkAdaptiveThresholdIterator_txx
 #define _itkAdaptiveThresholdIterator_txx
 
@@ -312,7 +308,7 @@ namespace itk
     // first check if the key-specific queue already exists
     if (m_QueueMap.count(key) == 0)
     {
-      // if queue doesn¥t exist, create it, push the IndexType onto it
+      // if queue doesn¬¥t exist, create it, push the IndexType onto it
       // and insert it into the map
 
       IndexQueueType newQueue;
@@ -376,7 +372,7 @@ namespace itk
           // then test it.
           if (m_ImageRegion.IsInside(tempIndex))
           {
-            // check if voxel hasn¥t already been processed
+            // check if voxel hasn¬¥t already been processed
             if (this->m_OutputImage->GetPixel(tempIndex) == 0)
             {
               // if it is inside, push it into the queue
@@ -389,7 +385,7 @@ namespace itk
               else // If the pixel is not inside the current threshold
               {
                 int distance = this->EstimateDistance(
-                  tempIndex); // [!] sollte nicht estimateDistance sondern calculateDistance() heiﬂen!
+                  tempIndex); // [!] sollte nicht estimateDistance sondern calculateDistance() hei√üen!
                 if (distance != 0)
                 {
                   // hier wird Voxel in entsprechenden Stack und ins OutputImage geschrieben

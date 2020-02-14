@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKPHOTOACOUSTICTISSUEGENERATORPARAMETERS_H
 #define MITKPHOTOACOUSTICTISSUEGENERATORPARAMETERS_H
@@ -29,8 +25,8 @@ namespace mitk {
     class MITKPHOTOACOUSTICSLIB_EXPORT TissueGeneratorParameters : public itk::Object
     {
     public:
-      mitkClassMacroItkParent(TissueGeneratorParameters, itk::Object)
-        itkFactorylessNewMacro(Self)
+      mitkClassMacroItkParent(TissueGeneratorParameters, itk::Object);
+        itkFactorylessNewMacro(Self);
 
         /**
          * Callback function definition of a VesselMeanderStrategy
@@ -38,117 +34,116 @@ namespace mitk {
         typedef void (VesselMeanderStrategy::*CalculateNewVesselPositionCallback)
         (Vector::Pointer, double, std::mt19937*);
 
-      itkGetMacro(XDim, int)
-        itkGetMacro(YDim, int)
-        itkGetMacro(ZDim, int)
-        itkGetMacro(VoxelSpacingInCentimeters, double)
-        itkGetMacro(DoPartialVolume, bool)
-        itkGetMacro(UseRngSeed, bool)
-        itkGetMacro(RngSeed, long)
-        itkGetMacro(RandomizePhysicalProperties, bool)
-        itkGetMacro(RandomizePhysicalPropertiesPercentage, double)
-        itkGetMacro(ForceVesselsMoveAlongYDirection, bool)
+      itkGetMacro(XDim, int);
 
-        itkGetMacro(MinBackgroundAbsorption, double)
-        itkGetMacro(MaxBackgroundAbsorption, double)
-        itkGetMacro(BackgroundScattering, double)
-        itkGetMacro(BackgroundAnisotropy, double)
-        itkGetMacro(AirAbsorption, double)
-        itkGetMacro(AirScattering, double)
-        itkGetMacro(AirAnisotropy, double)
-        itkGetMacro(AirThicknessInMillimeters, double)
-        itkGetMacro(SkinAbsorption, double)
-        itkGetMacro(SkinScattering, double)
-        itkGetMacro(SkinAnisotropy, double)
-        itkGetMacro(SkinThicknessInMillimeters, double)
+      itkGetMacro(YDim, int);
 
-        itkGetMacro(CalculateNewVesselPositionCallback, CalculateNewVesselPositionCallback)
-        itkGetMacro(MinNumberOfVessels, int)
-        itkGetMacro(MaxNumberOfVessels, int)
-        itkGetMacro(MinVesselBending, double)
-        itkGetMacro(MaxVesselBending, double)
-        itkGetMacro(MinVesselAbsorption, double)
-        itkGetMacro(MaxVesselAbsorption, double)
-        itkGetMacro(MinVesselRadiusInMillimeters, double)
-        itkGetMacro(MaxVesselRadiusInMillimeters, double)
-        itkGetMacro(VesselBifurcationFrequency, int)
-        itkGetMacro(MinVesselScattering, double)
-        itkGetMacro(MaxVesselScattering, double)
-        itkGetMacro(MinVesselAnisotropy, double)
-        itkGetMacro(MaxVesselAnisotropy, double)
-        itkGetMacro(MinVesselZOrigin, double)
-        itkGetMacro(MaxVesselZOrigin, double)
+      itkGetMacro(ZDim, int);
 
-        itkGetMacro(MCflag, double)
-        itkGetMacro(MCLaunchflag, double)
-        itkGetMacro(MCBoundaryflag, double)
-        itkGetMacro(MCLaunchPointX, double)
-        itkGetMacro(MCLaunchPointY, double)
-        itkGetMacro(MCLaunchPointZ, double)
-        itkGetMacro(MCFocusPointX, double)
-        itkGetMacro(MCFocusPointY, double)
-        itkGetMacro(MCFocusPointZ, double)
-        itkGetMacro(MCTrajectoryVectorX, double)
-        itkGetMacro(MCTrajectoryVectorY, double)
-        itkGetMacro(MCTrajectoryVectorZ, double)
-        itkGetMacro(MCRadius, double)
-        itkGetMacro(MCWaist, double)
+      itkGetMacro(VoxelSpacingInCentimeters, double);
+        itkGetMacro(DoPartialVolume, bool);
+        itkGetMacro(UseRngSeed, bool);
+        itkGetMacro(RngSeed, long);
+        itkGetMacro(RandomizePhysicalProperties, bool);
+        itkGetMacro(RandomizePhysicalPropertiesPercentage, double);
+        itkGetMacro(ForceVesselsMoveAlongYDirection, bool);
+        itkGetMacro(MinBackgroundAbsorption, double);
+        itkGetMacro(MaxBackgroundAbsorption, double);
+        itkGetMacro(BackgroundScattering, double);
+        itkGetMacro(BackgroundAnisotropy, double);
+        itkGetMacro(AirAbsorption, double);
+        itkGetMacro(AirScattering, double);
+        itkGetMacro(AirAnisotropy, double);
+        itkGetMacro(AirThicknessInMillimeters, double);
+        itkGetMacro(SkinAbsorption, double);
+        itkGetMacro(SkinScattering, double);
+        itkGetMacro(SkinAnisotropy, double);
+        itkGetMacro(SkinThicknessInMillimeters, double);
+        itkGetMacro(CalculateNewVesselPositionCallback, CalculateNewVesselPositionCallback);
+        itkGetMacro(MinNumberOfVessels, int);
+        itkGetMacro(MaxNumberOfVessels, int);
+        itkGetMacro(MinVesselBending, double);
+        itkGetMacro(MaxVesselBending, double);
+        itkGetMacro(MinVesselAbsorption, double);
+        itkGetMacro(MaxVesselAbsorption, double);
+        itkGetMacro(MinVesselRadiusInMillimeters, double);
+        itkGetMacro(MaxVesselRadiusInMillimeters, double);
+        itkGetMacro(VesselBifurcationFrequency, int);
+        itkGetMacro(MinVesselScattering, double);
+        itkGetMacro(MaxVesselScattering, double);
+        itkGetMacro(MinVesselAnisotropy, double);
+        itkGetMacro(MaxVesselAnisotropy, double);
+        itkGetMacro(MinVesselZOrigin, double);
+        itkGetMacro(MaxVesselZOrigin, double);
+        itkGetMacro(MCflag, double);
+        itkGetMacro(MCLaunchflag, double);
+        itkGetMacro(MCBoundaryflag, double);
+        itkGetMacro(MCLaunchPointX, double);
+        itkGetMacro(MCLaunchPointY, double);
+        itkGetMacro(MCLaunchPointZ, double);
+        itkGetMacro(MCFocusPointX, double);
+        itkGetMacro(MCFocusPointY, double);
+        itkGetMacro(MCFocusPointZ, double);
+        itkGetMacro(MCTrajectoryVectorX, double);
+        itkGetMacro(MCTrajectoryVectorY, double);
+        itkGetMacro(MCTrajectoryVectorZ, double);
+        itkGetMacro(MCRadius, double);
+        itkGetMacro(MCWaist, double);
+        itkSetMacro(XDim, int);
+        itkSetMacro(YDim, int);
+        itkSetMacro(ZDim, int);
+        itkSetMacro(VoxelSpacingInCentimeters, double);
+        itkSetMacro(DoPartialVolume, bool);
+        itkSetMacro(UseRngSeed, bool);
+        itkSetMacro(RngSeed, long);
+        itkSetMacro(RandomizePhysicalProperties, bool);
+        itkSetMacro(RandomizePhysicalPropertiesPercentage, double);
+        itkSetMacro(ForceVesselsMoveAlongYDirection, bool);
+        itkSetMacro(MinBackgroundAbsorption, double);
+        itkSetMacro(MaxBackgroundAbsorption, double);
+        itkSetMacro(BackgroundScattering, double);
+        itkSetMacro(BackgroundAnisotropy, double);
+        itkSetMacro(AirAbsorption, double);
+        itkSetMacro(AirScattering, double);
+        itkSetMacro(AirAnisotropy, double);
+        itkSetMacro(AirThicknessInMillimeters, double);
+        itkSetMacro(SkinAbsorption, double);
+        itkSetMacro(SkinScattering, double);
+        itkSetMacro(SkinAnisotropy, double);
+        itkSetMacro(SkinThicknessInMillimeters, double);
+        itkSetMacro(CalculateNewVesselPositionCallback, CalculateNewVesselPositionCallback);
+        itkSetMacro(MinNumberOfVessels, int);
+        itkSetMacro(MaxNumberOfVessels, int);
+        itkSetMacro(MinVesselBending, double);
+        itkSetMacro(MaxVesselBending, double);
+        itkSetMacro(MinVesselAbsorption, double);
+        itkSetMacro(MaxVesselAbsorption, double);
+        itkSetMacro(MinVesselRadiusInMillimeters, double);
+        itkSetMacro(MaxVesselRadiusInMillimeters, double);
+        itkSetMacro(VesselBifurcationFrequency, int);
+        itkSetMacro(MinVesselScattering, double);
+        itkSetMacro(MaxVesselScattering, double);
+        itkSetMacro(MinVesselAnisotropy, double);
+        itkSetMacro(MaxVesselAnisotropy, double);
+        itkSetMacro(MinVesselZOrigin, double);
+        itkSetMacro(MaxVesselZOrigin, double);
+        itkSetMacro(MCflag, double);
 
-        itkSetMacro(XDim, int)
-        itkSetMacro(YDim, int)
-        itkSetMacro(ZDim, int)
-        itkSetMacro(VoxelSpacingInCentimeters, double)
-        itkSetMacro(DoPartialVolume, bool)
-        itkSetMacro(UseRngSeed, bool)
-        itkSetMacro(RngSeed, long)
-        itkSetMacro(RandomizePhysicalProperties, bool)
-        itkSetMacro(RandomizePhysicalPropertiesPercentage, double)
-        itkSetMacro(ForceVesselsMoveAlongYDirection, bool)
+        itkSetMacro(MCLaunchflag, double);
 
-        itkSetMacro(MinBackgroundAbsorption, double)
-        itkSetMacro(MaxBackgroundAbsorption, double)
-        itkSetMacro(BackgroundScattering, double)
-        itkSetMacro(BackgroundAnisotropy, double)
-        itkSetMacro(AirAbsorption, double)
-        itkSetMacro(AirScattering, double)
-        itkSetMacro(AirAnisotropy, double)
-        itkSetMacro(AirThicknessInMillimeters, double)
-        itkSetMacro(SkinAbsorption, double)
-        itkSetMacro(SkinScattering, double)
-        itkSetMacro(SkinAnisotropy, double)
-        itkSetMacro(SkinThicknessInMillimeters, double)
+        itkSetMacro(MCBoundaryflag, double);
 
-        itkSetMacro(CalculateNewVesselPositionCallback, CalculateNewVesselPositionCallback)
-        itkSetMacro(MinNumberOfVessels, int)
-        itkSetMacro(MaxNumberOfVessels, int)
-        itkSetMacro(MinVesselBending, double)
-        itkSetMacro(MaxVesselBending, double)
-        itkSetMacro(MinVesselAbsorption, double)
-        itkSetMacro(MaxVesselAbsorption, double)
-        itkSetMacro(MinVesselRadiusInMillimeters, double)
-        itkSetMacro(MaxVesselRadiusInMillimeters, double)
-        itkSetMacro(VesselBifurcationFrequency, int)
-        itkSetMacro(MinVesselScattering, double)
-        itkSetMacro(MaxVesselScattering, double)
-        itkSetMacro(MinVesselAnisotropy, double)
-        itkSetMacro(MaxVesselAnisotropy, double)
-        itkSetMacro(MinVesselZOrigin, double)
-        itkSetMacro(MaxVesselZOrigin, double)
-
-        itkSetMacro(MCflag, double)
-        itkSetMacro(MCLaunchflag, double)
-        itkSetMacro(MCBoundaryflag, double)
-        itkSetMacro(MCLaunchPointX, double)
-        itkSetMacro(MCLaunchPointY, double)
-        itkSetMacro(MCLaunchPointZ, double)
-        itkSetMacro(MCFocusPointX, double)
-        itkSetMacro(MCFocusPointY, double)
-        itkSetMacro(MCFocusPointZ, double)
-        itkSetMacro(MCTrajectoryVectorX, double)
-        itkSetMacro(MCTrajectoryVectorY, double)
-        itkSetMacro(MCTrajectoryVectorZ, double)
-        itkSetMacro(MCRadius, double)
-        itkSetMacro(MCWaist, double)
+        itkSetMacro(MCLaunchPointX, double);
+        itkSetMacro(MCLaunchPointY, double);
+        itkSetMacro(MCLaunchPointZ, double);
+        itkSetMacro(MCFocusPointX, double);
+        itkSetMacro(MCFocusPointY, double);
+        itkSetMacro(MCFocusPointZ, double);
+        itkSetMacro(MCTrajectoryVectorX, double);
+        itkSetMacro(MCTrajectoryVectorY, double);
+        itkSetMacro(MCTrajectoryVectorZ, double);
+        itkSetMacro(MCRadius, double);
+        itkSetMacro(MCWaist, double);
 
     protected:
       TissueGeneratorParameters();

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical Image Computing.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkDisplayActionEventFunctions.h"
 
@@ -42,7 +38,7 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Move
       }
 
       sendingRenderer->GetCameraController()->MoveBy(displayActionEvent->GetMoveVector());
-      sendingRenderer->GetRenderingManager()->RequestUpdate(sendingRenderer->GetRenderWindow());
+      RenderingManager::GetInstance()->RequestUpdate(sendingRenderer->GetRenderWindow());
     }
   };
 
@@ -85,7 +81,7 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Zoom
       if (1.0 != displayActionEvent->GetZoomFactor())
       {
         sendingRenderer->GetCameraController()->Zoom(displayActionEvent->GetZoomFactor(), displayActionEvent->GetStartCoordinate());
-        sendingRenderer->GetRenderingManager()->RequestUpdate(sendingRenderer->GetRenderWindow());
+        RenderingManager::GetInstance()->RequestUpdate(sendingRenderer->GetRenderWindow());
       }
     }
   };
@@ -173,7 +169,7 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::SetL
       if (nullptr != levelWindowProperty)
       {
         levelWindowProperty->SetLevelWindow(levelWindow);
-        sendingRenderer->GetRenderingManager()->RequestUpdateAll();
+        RenderingManager::GetInstance()->RequestUpdateAll();
       }
     }
   };
@@ -197,14 +193,15 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Move
         return;
       }
 
-      auto allRenderWindows = sendingRenderer->GetRenderingManager()->GetAllRegisteredRenderWindows();
+      auto renderingManager = RenderingManager::GetInstance();
+      auto allRenderWindows = renderingManager->GetAllRegisteredRenderWindows();
       for (auto renderWindow : allRenderWindows)
       {
         if (BaseRenderer::GetInstance(renderWindow)->GetMapperID() == BaseRenderer::Standard2D)
         {
           BaseRenderer* currentRenderer = BaseRenderer::GetInstance(renderWindow);
           currentRenderer->GetCameraController()->MoveBy(displayActionEvent->GetMoveVector());
-          currentRenderer->GetRenderingManager()->RequestUpdate(currentRenderer->GetRenderWindow());
+          renderingManager->RequestUpdate(currentRenderer->GetRenderWindow());
         }
       }
     }
@@ -226,7 +223,7 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::SetC
         return;
       }
 
-      auto allRenderWindows = sendingRenderer->GetRenderingManager()->GetAllRegisteredRenderWindows();
+      auto allRenderWindows = RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
       for (auto renderWindow : allRenderWindows)
       {
         if (BaseRenderer::GetInstance(renderWindow)->GetMapperID() == BaseRenderer::Standard2D)
@@ -255,14 +252,15 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Zoom
 
       if (1.0 != displayActionEvent->GetZoomFactor())
       {
-        auto allRenderWindows = sendingRenderer->GetRenderingManager()->GetAllRegisteredRenderWindows();
+        auto renderingManager = RenderingManager::GetInstance();
+        auto allRenderWindows = renderingManager->GetAllRegisteredRenderWindows();
         for (auto renderWindow : allRenderWindows)
         {
           if (BaseRenderer::GetInstance(renderWindow)->GetMapperID() == BaseRenderer::Standard2D)
           {
             BaseRenderer* currentRenderer = BaseRenderer::GetInstance(renderWindow);
             currentRenderer->GetCameraController()->Zoom(displayActionEvent->GetZoomFactor(), displayActionEvent->GetStartCoordinate());
-            currentRenderer->GetRenderingManager()->RequestUpdate(currentRenderer->GetRenderWindow());
+            renderingManager->RequestUpdate(currentRenderer->GetRenderWindow());
           }
         }
       }
@@ -285,7 +283,7 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Scro
         return;
       }
 
-      auto allRenderWindows = sendingRenderer->GetRenderingManager()->GetAllRegisteredRenderWindows();
+      auto allRenderWindows = RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
       for (auto renderWindow : allRenderWindows)
       {
         if (BaseRenderer::GetInstance(renderWindow)->GetMapperID() == BaseRenderer::Standard2D)

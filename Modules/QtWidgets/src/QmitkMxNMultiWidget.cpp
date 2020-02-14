@@ -1,31 +1,30 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical Image Computing.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkMxNMultiWidget.h"
 #include "QmitkRenderWindowWidget.h"
+
+// mitk core
+#include <mitkDisplayActionEventFunctions.h>
+#include <mitkDisplayActionEventHandlerDesynchronized.h>
+#include <mitkDisplayActionEventHandlerSynchronized.h>
 
 // qt
 #include <QGridLayout>
 
 QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
                                          Qt::WindowFlags f/* = 0*/,
-                                         mitk::RenderingManager* renderingManager/* = nullptr*/,
-                                         mitk::BaseRenderer::RenderingMode::Type renderingMode/* = mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing*/,
                                          const QString& multiWidgetName/* = "mxnmulti"*/)
-  : QmitkAbstractMultiWidget(parent, f, renderingManager, renderingMode, multiWidgetName)
+  : QmitkAbstractMultiWidget(parent, f, multiWidgetName)
   , m_CrosshairVisibility(false)
 {
   // nothing here
@@ -34,8 +33,13 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
 void QmitkMxNMultiWidget::InitializeMultiWidget()
 {
   SetLayout(1, 1);
-
   ActivateMenuWidget(true);
+  SetDisplayActionEventHandler(std::make_unique<mitk::DisplayActionEventHandlerDesynchronized>());
+  auto displayActionEventHandler = GetDisplayActionEventHandler();
+  if (nullptr != displayActionEventHandler)
+  {
+    displayActionEventHandler->InitActions();
+  }
 }
 
 void QmitkMxNMultiWidget::MultiWidgetOpened()
@@ -46,6 +50,24 @@ void QmitkMxNMultiWidget::MultiWidgetOpened()
 void QmitkMxNMultiWidget::MultiWidgetClosed()
 {
   SetCrosshairVisibility(false);
+}
+
+void QmitkMxNMultiWidget::Synchronize(bool synchronized)
+{
+  if (synchronized)
+  {
+    SetDisplayActionEventHandler(std::make_unique<mitk::DisplayActionEventHandlerSynchronized>());
+  }
+  else
+  {
+    SetDisplayActionEventHandler(std::make_unique<mitk::DisplayActionEventHandlerDesynchronized>());
+  }
+
+  auto displayActionEventHandler = GetDisplayActionEventHandler();
+  if (nullptr != displayActionEventHandler)
+  {
+    displayActionEventHandler->InitActions();
+  }
 }
 
 QmitkRenderWindow* QmitkMxNMultiWidget::GetRenderWindow(const QString& widgetName) const
@@ -79,7 +101,6 @@ void QmitkMxNMultiWidget::SetActiveRenderWindowWidget(RenderWindowWidgetPointer 
     auto decorationColor = currentActiveRenderWindowWidget->GetDecorationColor();
     QColor hexColor(decorationColor[0] * 255, decorationColor[1] * 255, decorationColor[2] * 255);
     currentActiveRenderWindowWidget->setStyleSheet("border: 2px solid " + hexColor.name(QColor::HexRgb));
-
   }
 
   // set the new decoration color of the currently active render window widget
@@ -138,13 +159,7 @@ void QmitkMxNMultiWidget::ResetCrosshair()
     return;
   }
 
-  auto renderingManager = GetRenderingManager();
-  if (nullptr == renderingManager)
-  {
-    return;
-  }
-
-  renderingManager->InitializeViewsByBoundingObjects(dataStorage);
+  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(dataStorage);
 
   SetWidgetPlaneMode(mitk::InteractionSchemeSwitcher::MITKStandard);
 }
@@ -155,18 +170,18 @@ void QmitkMxNMultiWidget::SetWidgetPlaneMode(int userMode)
 
   switch (userMode)
   {
-  case 0:
-    SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKStandard);
-    break;
-  case 1:
-    SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKRotationUncoupled);
-    break;
-  case 2:
-    SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKRotationCoupled);
-    break;
-  case 3:
-    SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKSwivel);
-    break;
+    case 0:
+      SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKStandard);
+      break;
+    case 1:
+      SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKRotationUncoupled);
+      break;
+    case 2:
+      SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKRotationCoupled);
+      break;
+    case 3:
+      SetInteractionScheme(mitk::InteractionSchemeSwitcher::MITKSwivel);
+      break;
   }
 }
 
@@ -241,7 +256,7 @@ void QmitkMxNMultiWidget::CreateRenderWindowWidget()
 {
   // create the render window widget and connect signal / slot
   QString renderWindowWidgetName = GetNameFromIndex(GetNumberOfRenderWindowWidgets());
-  RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage(), GetRenderingManager());
+  RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage());
   renderWindowWidget->SetCornerAnnotationText(renderWindowWidgetName.toStdString());
 
   connect(renderWindowWidget.get(), &QmitkRenderWindowWidget::MouseEvent, this, &QmitkMxNMultiWidget::mousePressEvent);

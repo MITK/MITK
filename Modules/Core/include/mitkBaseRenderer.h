@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef BASERENDERER_H_HEADER_INCLUDED_C1CCA0F4
 #define BASERENDERER_H_HEADER_INCLUDED_C1CCA0F4
@@ -69,21 +65,6 @@ namespace mitk
   class MITKCORE_EXPORT BaseRenderer : public itk::Object
   {
   public:
-    /** \brief This rendering mode enumeration is specified at various constructors
-    *  of the Renderer and RenderWindow classes, which autoconfigures the
-    *  respective VTK objects. This has to be done at construction time because later
-    *  configuring turns out to be not working on most platforms.
-    */
-    struct RenderingMode
-    {
-      enum Type
-      {
-        NoAntiAliasing = 0,
-        FastApproximateAntiAliasing = 1 // In contrast to MSAA, FXAA works with depth peeling as it is
-                                        // applied as a post-processing pass.
-      };
-    };
-
     typedef std::map<vtkRenderWindow *, BaseRenderer *> BaseRendererMapType;
     static BaseRendererMapType baseRendererMap;
 
@@ -101,10 +82,7 @@ namespace mitk
     /** Standard class typedefs. */
     mitkClassMacroItkParent(BaseRenderer, itk::Object);
 
-    BaseRenderer(const char *name = nullptr,
-                 vtkRenderWindow *renWin = nullptr,
-                 mitk::RenderingManager *rm = nullptr,
-                 RenderingMode::Type mode = RenderingMode::FastApproximateAntiAliasing);
+    BaseRenderer(const char *name = nullptr, vtkRenderWindow *renWin = nullptr);
 
     //##Documentation
     //## @brief MapperSlotId defines which kind of mapper (e.g. 2D or 3D) should be used.
@@ -197,11 +175,11 @@ namespace mitk
     */
     DEPRECATED(void SetWorldGeometry3D(TimeSlicedGeometry *geometry));
 
-    itkGetConstObjectMacro(WorldTimeGeometry, TimeGeometry)
+    itkGetConstObjectMacro(WorldTimeGeometry, TimeGeometry);
 
       //##Documentation
       //## @brief Get the current 3D-worldgeometry (m_CurrentWorldGeometry) used for 3D-rendering
-      itkGetConstObjectMacro(CurrentWorldGeometry, BaseGeometry)
+      itkGetConstObjectMacro(CurrentWorldGeometry, BaseGeometry);
 
       //##Documentation
       //## @brief Get the current 2D-worldgeometry (m_CurrentWorldPlaneGeometry) used for 2D-rendering
@@ -230,7 +208,7 @@ namespace mitk
     //## \sa m_Slice
     virtual void SetSlice(unsigned int slice);
 
-    itkGetConstMacro(Slice, unsigned int)
+    itkGetConstMacro(Slice, unsigned int);
 
       //##Documentation
       //## @brief Set/Get m_TimeStep which defines together with m_Slice the 2D geometry
@@ -239,7 +217,7 @@ namespace mitk
       //## \sa m_TimeStep
       virtual void SetTimeStep(unsigned int timeStep);
 
-    itkGetConstMacro(TimeStep, unsigned int)
+    itkGetConstMacro(TimeStep, unsigned int);
 
       //##Documentation
       //## @brief Get the time-step of a BaseData object which
@@ -325,28 +303,28 @@ namespace mitk
 
     //##Documentation
     //## @brief Get the MapperSlotId to use.
-    itkGetMacro(MapperID, MapperSlotId) itkGetConstMacro(MapperID, MapperSlotId)
+    itkGetMacro(MapperID, MapperSlotId);
+    itkGetConstMacro(MapperID, MapperSlotId);
 
       //##Documentation
       //## @brief Set the MapperSlotId to use.
-      itkSetMacro(MapperID, MapperSlotId)
+      itkSetMacro(MapperID, MapperSlotId);
 
         virtual int *GetSize() const;
     virtual int *GetViewportSize() const;
 
     void SetSliceNavigationController(SliceNavigationController *SlicenavigationController);
-    itkGetObjectMacro(CameraController, CameraController)
-      itkGetObjectMacro(SliceNavigationController, SliceNavigationController)
-        itkGetObjectMacro(CameraRotationController, CameraRotationController)
-
-          itkGetMacro(EmptyWorldGeometry, bool)
+    itkGetObjectMacro(CameraController, CameraController);
+    itkGetObjectMacro(SliceNavigationController, SliceNavigationController);
+    itkGetObjectMacro(CameraRotationController, CameraRotationController);
+    itkGetMacro(EmptyWorldGeometry, bool);
 
       //##Documentation
       //## @brief Tells if the displayed region is shifted and rescaled if the render window is resized.
       itkGetMacro(KeepDisplayedRegion, bool)
       //##Documentation
       //## @brief Tells if the displayed region should be shifted and rescaled if the render window is resized.
-      itkSetMacro(KeepDisplayedRegion, bool)
+      itkSetMacro(KeepDisplayedRegion, bool);
 
       //##Documentation
       //## @brief get the name of the Renderer
@@ -372,16 +350,6 @@ namespace mitk
     /** Returns number of mappers which are visible and have level-of-detail
     * rendering enabled */
     unsigned int GetNumberOfVisibleLODEnabledMappers() const;
-
-    ///**
-    //* \brief Setter for the RenderingManager that handles this instance of BaseRenderer
-    //*/
-    // void SetRenderingManager( mitk::RenderingManager* );
-
-    /**
-    * \brief Getter for the RenderingManager that handles this instance of BaseRenderer
-    */
-    virtual mitk::RenderingManager *GetRenderingManager() const;
 
     //##Documentation
     //## @brief This method converts a display point to the 3D world index
@@ -447,10 +415,6 @@ namespace mitk
     //##Documentation
     //## @brief The DataStorage that is used for rendering.
     DataStorage::Pointer m_DataStorage;
-
-    //##Documentation
-    //## @brief The RenderingManager that manages this instance
-    RenderingManager::Pointer m_RenderingManager;
 
     //##Documentation
     //## @brief Timestamp of last call of Update().

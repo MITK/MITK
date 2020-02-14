@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkStdMultiWidgetEditor.h"
 
@@ -139,7 +135,7 @@ void QmitkStdMultiWidgetEditor::EnableSlicingPlanes(bool enable)
   {
     return;
   }
-  
+
   multiWidget->SetWidgetPlanesVisibility(enable);
 }
 
@@ -218,8 +214,7 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
   auto multiWidget = GetMultiWidget();
   if (nullptr == multiWidget)
   {
-    mitk::BaseRenderer::RenderingMode::Type renderingMode = static_cast<mitk::BaseRenderer::RenderingMode::Type>(preferences->GetInt("Rendering Mode", 0));
-    multiWidget = new QmitkStdMultiWidget(parent, 0, nullptr, renderingMode);
+    multiWidget = new QmitkStdMultiWidget(parent);
 
     // create left toolbar: interaction scheme toolbar to switch how the render window navigation behaves (in PACS mode)
     if (nullptr == m_Impl->m_InteractionSchemeToolBar)
@@ -307,41 +302,35 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
 
 void QmitkStdMultiWidgetEditor::InitializePreferences(berry::IBerryPreferences * preferences)
 {
-  auto multiWidget = GetMultiWidget();
+  auto multiWidget = this->GetMultiWidget();
+
   if (nullptr == multiWidget)
-  {
     return;
-  }
 
-  GetPreferenceDecorations(preferences); //overwrite if preferences are defined
+  this->GetPreferenceDecorations(preferences); // Override if preferences are defined
 
-  QmitkAbstractMultiWidget::RenderWindowWidgetMap renderWindowWidgets = multiWidget->GetRenderWindowWidgets();
-  int i = 0;
-  for (const auto& renderWindowWidget : renderWindowWidgets)
+  for (const auto& renderWindowWidget : multiWidget->GetRenderWindowWidgets())
   {
-    QString widgetName = "widget" + QString::number(i + 1);
+    auto widgetName = renderWindowWidget.second->GetWidgetName();
 
     auto gradientBackgroundColors = renderWindowWidget.second->GetGradientBackgroundColors();
-    preferences->Put(widgetName + " first background color", MitkColorToHex(gradientBackgroundColors.first));
-    preferences->Put(widgetName + " second background color", MitkColorToHex(gradientBackgroundColors.second));
+    preferences->Put(widgetName + " first background color", this->MitkColorToHex(gradientBackgroundColors.first));
+    preferences->Put(widgetName + " second background color", this->MitkColorToHex(gradientBackgroundColors.second));
 
     auto decorationColor = renderWindowWidget.second->GetDecorationColor();
-    preferences->Put(widgetName + " decoration color", MitkColorToHex(decorationColor));
+    preferences->Put(widgetName + " decoration color", this->MitkColorToHex(decorationColor));
 
     auto cornerAnnotation = renderWindowWidget.second->GetCornerAnnotationText();
     preferences->Put(widgetName + " corner annotation", QString::fromStdString(cornerAnnotation));
-
-    ++i;
   }
 }
 
 void QmitkStdMultiWidgetEditor::GetPreferenceDecorations(const berry::IBerryPreferences * preferences)
 {
   auto multiWidget = dynamic_cast<QmitkStdMultiWidget*>(GetMultiWidget());
+
   if (nullptr == multiWidget)
-  {
     return;
-  }
 
   auto hexBlack = "#000000";
   auto gradientBlack = "#191919";
@@ -351,7 +340,7 @@ void QmitkStdMultiWidgetEditor::GetPreferenceDecorations(const berry::IBerryPref
   int i = 0;
   for (const auto& renderWindowWidget : renderWindowWidgets)
   {
-    QString widgetName = renderWindowWidget.second->GetWidgetName();
+    auto widgetName = renderWindowWidget.second->GetWidgetName();
 
     if (mitk::BaseRenderer::Standard3D == mitk::BaseRenderer::GetInstance(renderWindowWidget.second->GetRenderWindow()->GetVtkRenderWindow())->GetMapperID())
     {
@@ -369,7 +358,7 @@ void QmitkStdMultiWidgetEditor::GetPreferenceDecorations(const berry::IBerryPref
     auto defaultDecorationColor = multiWidget->GetDecorationColor(i);
     auto decorationColor = preferences->Get(widgetName + " decoration color", MitkColorToHex(defaultDecorationColor));
     renderWindowWidget.second->SetDecorationColor(HexColorToMitkColor(decorationColor));
-    
+
     auto defaultCornerAnnotation = renderWindowWidget.second->GetCornerAnnotationText();
     auto cornerAnnotation = preferences->Get(widgetName + " corner annotation", QString::fromStdString(defaultCornerAnnotation));
     renderWindowWidget.second->SetCornerAnnotationText(cornerAnnotation.toStdString());

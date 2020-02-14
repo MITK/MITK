@@ -1,72 +1,66 @@
-/*****************************************************************************
+/*============================================================================
 
- Copyright (c) 1993-2000,  Div. Medical and Biological Informatics, 
- Deutsches Krebsforschungszentrum, Heidelberg, Germany
+ Copyright (c) German Cancer Research Center (DKFZ)
  All rights reserved.
 
- Redistribution and use in source and binary forms, with or without 
+ Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
 
  - Redistributions of source code must retain the above copyright notice, this
    list of conditions and the following disclaimer.
 
- - Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+ - Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
- - All advertising materials mentioning features or use of this software must 
-   display the following acknowledgement: 
-          
-     "This product includes software developed by the Div. Medical and 
-      Biological Informatics, Deutsches Krebsforschungszentrum, Heidelberg, 
-      Germany."
+ - All advertising materials mentioning features or use of this software must
+   display the following acknowledgement:
 
- - Neither the name of the Deutsches Krebsforschungszentrum nor the names of 
-   its contributors may be used to endorse or promote products derived from 
-   this software without specific prior written permission. 
+     "This product includes software developed by the German Cancer Research
+      Center (DKFZ)."
 
-   THIS SOFTWARE IS PROVIDED BY THE DIVISION MEDICAL AND BIOLOGICAL
-   INFORMATICS AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED
-   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-   OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-   IN NO EVENT SHALL THE DIVISION MEDICAL AND BIOLOGICAL INFORMATICS,
-   THE DEUTSCHES KREBSFORSCHUNGSZENTRUM OR CONTRIBUTORS BE LIABLE FOR 
-   ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-   DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE 
-   GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER 
-   IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN 
-   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ - Neither the name of the German Cancer Research Center (DKFZ) nor the names
+   of its contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
 
- Send comments and/or bug reports to:
-   mbi-software@dkfz-heidelberg.de
+   THIS SOFTWARE IS PROVIDED BY THE GERMAN CANCER RESEARCH CENTER (DKFZ) AND
+   CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+   BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+   FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE GERMAN
+   CANCER RESEARCH CENTER (DKFZ) OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+   INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+   SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+   OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+   DAMAGE.
 
-*****************************************************************************/
+============================================================================*/
 
 /**@file
-*  this function equalizes a greyvalue histogram        
+*  this function equalizes a greyvalue histogram
 */
 
 
-/**  this function equalizes a greyvalue histogram                     
+/**  this function equalizes a greyvalue histogram
  *
  *  @param pic_old    pointer to the image that should be equalized
  *  @param kind      intervall of transformation
  *  @arg @c mitkIpFuncMinMax       (extreme greyvalues)
- *  @arg @c mitkIpFuncTotal        (max. and min. possible       
- *                                           greyvalues) 
+ *  @arg @c mitkIpFuncTotal        (max. and min. possible
+ *                                           greyvalues)
  *  @param pic_return  memory used to store return image ( if pic_return == NULL
  *                new memory is allocated )
  *
- * @return pointer to the egalized image 
+ * @return pointer to the egalized image
  *
  * AUTHOR & DATE
  */
 
 /* include-Files                                                        */
 
-#include "mitkIpFuncP.h"   
+#include "mitkIpFuncP.h"
 
 mitkIpPicDescriptor *mitkIpFuncEqual ( mitkIpPicDescriptor *pic_old,
                                mitkIpFuncFlagI_t   kind,
@@ -76,7 +70,7 @@ mitkIpPicDescriptor *mitkIpFuncEqual ( mitkIpPicDescriptor *pic_old,
 
 
 #ifndef lint
-  static char *what = { "@(#)mitkIpFuncEqual\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)mitkIpFuncEqual\t\tGerman Cancer Research Center (DKFZ)\t"__DATE__ };
 #endif
 
 
@@ -145,9 +139,9 @@ mitkIpPicDescriptor *mitkIpFuncEqual ( mitkIpPicDescriptor *pic_old,
        ( ( type * ) pic_new->data )[i] = ( type ) hist_cp[index];        \
     }                                                                    \
   free ( hist_cp );                                                      \
-} 
-               
- 
+}
+
+
 
 /* -------------------------------------------------------------------  */
 /*
@@ -156,7 +150,7 @@ mitkIpPicDescriptor *mitkIpFuncEqual ( mitkIpPicDescriptor *pic_old,
 
 mitkIpPicDescriptor *mitkIpFuncEqual ( mitkIpPicDescriptor *pic_old,
                                mitkIpFuncFlagI_t   kind,
-                               mitkIpPicDescriptor *pic_return ) 
+                               mitkIpPicDescriptor *pic_return )
 {
 
   mitkIpPicDescriptor *pic_new;  /* inverted picture                        */
@@ -164,21 +158,21 @@ mitkIpPicDescriptor *mitkIpFuncEqual ( mitkIpPicDescriptor *pic_old,
   mitkIpFloat8_t      min_gv;    /* min. possible greyvalue                 */
   mitkIpUInt4_t       *hist;     /* greylevel histogram                     */
   mitkIpUInt4_t       size_hist; /* no. of elements in histogram            */
-  mitkIpFloat4_t      factor;  
+  mitkIpFloat4_t      factor;
   mitkIpFloat8_t      help;
 
   /* check data                                                         */
-  
+
   if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* create a new picture, copy the header, allocate memory             */
 
-  pic_new = _mitkIpFuncMalloc ( pic_old, pic_return, mitkIpOVERWRITE );     
+  pic_new = _mitkIpFuncMalloc ( pic_old, pic_return, mitkIpOVERWRITE );
   if ( pic_new == NULL ) return ( mitkIpFuncERROR );
 
   /* calculate max. and min. possible greyvalues                        */
 
-  if ( _mitkIpFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != mitkIpFuncOK ) 
+  if ( _mitkIpFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != mitkIpFuncOK )
     {
        mitkIpPicFree ( pic_new );
        return ( NULL );
@@ -186,8 +180,8 @@ mitkIpPicDescriptor *mitkIpFuncEqual ( mitkIpPicDescriptor *pic_old,
 
   /* calculate greylevel histogram                                      */
 
-  mitkIpFuncHist ( pic_old, min_gv, max_gv, &hist, &size_hist ); 
-  if ( hist == 0 ) 
+  mitkIpFuncHist ( pic_old, min_gv, max_gv, &hist, &size_hist );
+  if ( hist == 0 )
     {
        mitkIpPicFree ( pic_new );
        return ( NULL );
@@ -197,11 +191,11 @@ mitkIpPicDescriptor *mitkIpFuncEqual ( mitkIpPicDescriptor *pic_old,
 
   help = fabs ( min_gv );
 
-  if ( pic_old->type == mitkIpPicFloat ) 
-    factor = 1000.;                              
+  if ( pic_old->type == mitkIpPicFloat )
+    factor = 1000.;
   else if ( pic_old->type == mitkIpPicInt || pic_old->type == mitkIpPicUInt )
     factor = 1.;
-  else 
+  else
     {
        mitkIpPicFree ( pic_new );
        free ( hist );
@@ -218,8 +212,8 @@ mitkIpPicDescriptor *mitkIpFuncEqual ( mitkIpPicDescriptor *pic_old,
   /* Copy Tags */
 
   mitkIpFuncCopyTags(pic_new, pic_old);
-  
-  
+
+
 
 
   return ( pic_new );

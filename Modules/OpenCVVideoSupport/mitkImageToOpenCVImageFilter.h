@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef mitkImageToOpenCVImageFilter_h
 #define mitkImageToOpenCVImageFilter_h
@@ -41,8 +37,8 @@ class MITKOPENCVVIDEOSUPPORT_EXPORT ImageToOpenCVImageFilter : public itk::Objec
         typedef itk::RGBPixel< double > DoubleRGBPixelType;
 
         mitkClassMacroItkParent(ImageToOpenCVImageFilter, itk::Object);
-        itkFactorylessNewMacro(Self)
-        itkCloneMacro(Self)
+        itkFactorylessNewMacro(Self);
+        itkCloneMacro(Self);
 
         ///
         /// \brief set the input MITK image

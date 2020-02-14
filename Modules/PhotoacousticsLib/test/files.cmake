@@ -19,14 +19,14 @@ set(MODULE_TESTS
   mitkPhotoacousticTissueGeneratorTest.cpp
   mitkPhotoacousticVectorTest.cpp
   mitkPhotoacoustic3dVolumeTest.cpp
-  mitkPhotoacousticVolumeTest.cpp
+  # mitkPhotoacousticVolumeTest.cpp (See T27024)
   mitkPhotoacousticVesselTreeTest.cpp
   mitkMcxyzXmlTest.cpp
   mitkPhotoacousticComposedVolumeTest.cpp
   mitkPhotoacousticNoiseGeneratorTest.cpp
   mitkSimulationBatchGeneratorTest.cpp
   mitkPropertyCalculatorTest.cpp
-  mitkSpectralUnmixingTest.cpp
+  # mitkSpectralUnmixingTest.cpp (See T27024)
   mitkPhotoacousticVesselMeanderStrategyTest.cpp
   mitkPhotoacousticVesselTest.cpp
 )

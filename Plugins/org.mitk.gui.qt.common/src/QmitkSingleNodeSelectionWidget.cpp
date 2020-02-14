@@ -1,29 +1,29 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #include "QmitkSingleNodeSelectionWidget.h"
 
 #include <berryQtStyleManager.h>
+
+#include "mitkNodePredicateFunction.h"
+#include "mitkNodePredicateAnd.h"
+
 #include <QMouseEvent>
 
 #include "QmitkNodeSelectionDialog.h"
 #include "QmitkNodeDetailsDialog.h"
 
-QmitkSingleNodeSelectionWidget::QmitkSingleNodeSelectionWidget(QWidget* parent) : QmitkAbstractNodeSelectionWidget(parent)
+QmitkSingleNodeSelectionWidget::QmitkSingleNodeSelectionWidget(QWidget* parent) : QmitkAbstractNodeSelectionWidget(parent), m_AutoSelectNewNodes(false)
 {
   m_Controls.setupUi(this);
 
@@ -46,17 +46,25 @@ mitk::DataNode::Pointer QmitkSingleNodeSelectionWidget::ExtractCurrentValidSelec
 {
   mitk::DataNode::Pointer result = nullptr;
 
-  for (auto node : nodes)
+  if (!m_DataStorage.IsExpired())
   {
-    bool valid = true;
-    if (m_NodePredicate.IsNotNull())
+    auto storage = m_DataStorage.Lock();
+    if (storage.IsNotNull())
     {
-      valid = m_NodePredicate->CheckNode(node);
-    }
-    if (valid)
-    {
-      result = node;
-      break;
+      for (auto node : nodes)
+      {
+        bool valid = storage->Exists(node);
+        if (valid && m_NodePredicate.IsNotNull())
+        {
+          valid = m_NodePredicate->CheckNode(node);
+        }
+
+        if (valid)
+        {
+          result = node;
+          break;
+        }
+      }
     }
   }
 
@@ -80,13 +88,51 @@ QmitkSingleNodeSelectionWidget::NodeList QmitkSingleNodeSelectionWidget::Compile
   return result;
 }
 
-void QmitkSingleNodeSelectionWidget::OnNodePredicateChanged(mitk::NodePredicateBase* /*newPredicate*/)
+void QmitkSingleNodeSelectionWidget::OnNodePredicateChanged(const mitk::NodePredicateBase* /*newPredicate*/)
 {
-  m_SelectedNode = this->ExtractCurrentValidSelection(m_ExternalSelection);
+  auto lastEmission = this->CompileEmitSelection();
+
+  if (m_NodePredicate.IsNotNull() && m_SelectedNode.IsNotNull() && !m_NodePredicate->CheckNode(m_SelectedNode))
+  {
+    m_SelectedNode = nullptr;
+  }
+
+  if (m_SelectedNode.IsNull())
+  {
+    m_SelectedNode = this->ExtractCurrentValidSelection(m_ExternalSelection);
+  }
+
+  this->DoAutoSelectIfNeeded();
+
+  this->EmitAndUpdateIfNeeded(lastEmission);
 };
 
 void QmitkSingleNodeSelectionWidget::OnDataStorageChanged()
 {
+  auto lastEmission = this->CompileEmitSelection();
+
+  if (m_DataStorage.IsExpired())
+  {
+    m_SelectedNode = nullptr;
+  }
+  else if (m_SelectedNode.IsNotNull())
+  {
+    auto storage = m_DataStorage.Lock();
+
+    if (storage.IsNotNull() && !storage->Exists(m_SelectedNode))
+    {
+      m_SelectedNode = nullptr;
+    }
+  }
+
+  if (m_SelectedNode.IsNull())
+  {
+    m_SelectedNode = this->ExtractCurrentValidSelection(m_ExternalSelection);
+  }
+
+  this->DoAutoSelectIfNeeded();
+
+  this->EmitAndUpdateIfNeeded(lastEmission);
 };
 
 void QmitkSingleNodeSelectionWidget::OnClearSelection()
@@ -119,8 +165,11 @@ bool QmitkSingleNodeSelectionWidget::eventFilter(QObject *obj, QEvent *ev)
 
       if (mouseEv->button() == Qt::LeftButton)
       {
-        this->EditSelection();
-        return true;
+        if (this->isEnabled())
+        {
+          this->EditSelection();
+          return true;
+        }
       }
       else
       {
@@ -169,13 +218,7 @@ void QmitkSingleNodeSelectionWidget::EditSelection()
       m_SelectedNode = nodes.first();
     }
 
-    auto newEmission = this->CompileEmitSelection();
-
-    if (!EqualNodeSelections(lastEmission, newEmission))
-    {
-      emit CurrentSelectionChanged(newEmission);
-      this->UpdateInfo();
-    }
+    this->EmitAndUpdateIfNeeded(lastEmission);
   }
 
   m_Controls.btnSelect->setChecked(false);
@@ -195,6 +238,7 @@ void QmitkSingleNodeSelectionWidget::UpdateInfo()
     {
       m_Controls.btnSelect->SetNodeInfo(m_InvalidInfo);
     }
+    m_Controls.btnSelect->SetSelectionIsOptional(m_IsOptional);
     m_Controls.btnClear->setVisible(false);
   }
   else
@@ -211,13 +255,52 @@ void QmitkSingleNodeSelectionWidget::SetSelectOnlyVisibleNodes(bool selectOnlyVi
 
   m_SelectOnlyVisibleNodes = selectOnlyVisibleNodes;
 
+  this->EmitAndUpdateIfNeeded(lastEmission);
+};
+
+void QmitkSingleNodeSelectionWidget::DoAutoSelectIfNeeded(const mitk::DataNode* ignoreNode)
+{
+  if (m_SelectedNode.IsNull() && m_AutoSelectNewNodes && !m_DataStorage.IsExpired())
+  {
+    auto storage = m_DataStorage.Lock();
+    if (storage.IsNotNull())
+    {
+      auto ignoreCheck = [ignoreNode](const mitk::DataNode * node)
+      {
+        return node != ignoreNode;
+      };
+      mitk::NodePredicateFunction::Pointer isNotIgnoredNode = mitk::NodePredicateFunction::New(ignoreCheck);
+      mitk::NodePredicateBase::Pointer predicate = isNotIgnoredNode.GetPointer();
+
+      if (m_NodePredicate.IsNotNull())
+      {
+        predicate = mitk::NodePredicateAnd::New(m_NodePredicate.GetPointer(), predicate.GetPointer()).GetPointer();
+      }
+
+      m_SelectedNode = storage->GetNode(predicate);
+    }
+  }
+}
+
+void QmitkSingleNodeSelectionWidget::EmitAndUpdateIfNeeded(const NodeList& lastEmission)
+{
   auto newEmission = this->CompileEmitSelection();
 
   if (!EqualNodeSelections(lastEmission, newEmission))
   {
-    emit CurrentSelectionChanged(newEmission);
     this->UpdateInfo();
+    emit CurrentSelectionChanged(newEmission);
   }
+};
+
+void QmitkSingleNodeSelectionWidget::SetCurrentSelectedNode(mitk::DataNode* selectedNode)
+{
+  NodeList selection;
+  if (selectedNode)
+  {
+    selection.append(selectedNode);
+  }
+  this->SetCurrentSelection(selection);
 };
 
 void QmitkSingleNodeSelectionWidget::SetCurrentSelection(NodeList selectedNodes)
@@ -227,23 +310,47 @@ void QmitkSingleNodeSelectionWidget::SetCurrentSelection(NodeList selectedNodes)
   m_ExternalSelection = selectedNodes;
   m_SelectedNode = this->ExtractCurrentValidSelection(selectedNodes);
 
-  auto newEmission = this->CompileEmitSelection();
+  this->DoAutoSelectIfNeeded();
 
-  if (!EqualNodeSelections(lastEmission, newEmission))
-  {
-    this->UpdateInfo();
-    emit CurrentSelectionChanged(newEmission);
-  }
+  this->EmitAndUpdateIfNeeded(lastEmission);
 };
+
+void QmitkSingleNodeSelectionWidget::NodeAddedToStorage(const mitk::DataNode* /*node*/)
+{
+  if (m_SelectedNode.IsNull() && m_AutoSelectNewNodes && !m_DataStorage.IsExpired())
+  {
+    auto lastEmission = this->CompileEmitSelection();
+
+    this->DoAutoSelectIfNeeded();
+
+    this->EmitAndUpdateIfNeeded(lastEmission);
+  }
+}
 
 void QmitkSingleNodeSelectionWidget::NodeRemovedFromStorage(const mitk::DataNode* node)
 {
   if (m_SelectedNode == node && node != nullptr)
   {
     m_SelectedNode = nullptr;
+
+    //This event is triggerd before the node is realy removed from storage.
+    //Therefore we have to explictly ignore him in the autoselect search.
+    this->DoAutoSelectIfNeeded(node);
+
     auto newEmission = this->CompileEmitSelection();
 
     emit CurrentSelectionChanged(newEmission);
     this->UpdateInfo();
   }
+}
+
+bool QmitkSingleNodeSelectionWidget::GetAutoSelectNewNodes() const
+{
+  return m_AutoSelectNewNodes;
+}
+
+void QmitkSingleNodeSelectionWidget::SetAutoSelectNewNodes(bool autoSelect)
+{
+  m_AutoSelectNewNodes = autoSelect;
+  this->NodeAddedToStorage(nullptr);
 }

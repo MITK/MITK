@@ -1,21 +1,19 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkDICOMSegIOMimeTypes.h"
 #include "mitkIOMimeTypes.h"
+
+#include <array>
 
 #include <mitkLogMacros.h>
 
@@ -48,19 +46,6 @@ namespace mitk
 
   bool MitkDICOMSEGIOMimeTypes::MitkDICOMSEGMimeType::AppliesTo(const std::string &path) const
   {
-    std::ifstream myfile;
-    myfile.open(path, std::ios::binary);
-    //    myfile.seekg (128);
-    char *buffer = new char[128];
-    myfile.read(buffer, 128);
-    myfile.read(buffer, 4);
-    if (std::string(buffer).compare("DICM") != 0)
-    {
-      delete[] buffer;
-      return false;
-    }
-    delete[] buffer;
-
     bool canRead(CustomMimeType::AppliesTo(path));
 
     // fix for bug 18572
@@ -73,6 +58,26 @@ namespace mitk
     }
     // end fix for bug 18572
 
+    const std::size_t offset = 128;
+    const std::size_t bufferSize = 4;
+
+    std::ifstream myfile(path, std::ifstream::binary);
+
+    if (!myfile.is_open())
+      return false;
+
+    myfile.seekg(0, std::ifstream::end);
+    const auto fileSize = static_cast<std::size_t>(myfile.tellg());
+
+    if (fileSize < offset + bufferSize)
+      return false;
+
+    myfile.seekg(offset);
+    std::array<char, bufferSize> buffer;
+    myfile.read(buffer.data(), bufferSize);
+
+    if (0 != std::string(buffer.data(), bufferSize).compare("DICM"))
+      return false;
 
     DcmFileFormat dcmFileFormat;
     OFCondition status = dcmFileFormat.loadFile(path.c_str());

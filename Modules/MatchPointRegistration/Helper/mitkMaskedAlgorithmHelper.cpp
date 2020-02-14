@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkMaskedAlgorithmHelper.h"
 
@@ -153,6 +149,10 @@ namespace mitk
       if (! movingSpatial) mapDefaultExceptionStaticMacro(<< "Error, cannot convert moving mask.");
       pAlg->setMovingMask(movingSpatial);
     }
+    else
+    {
+      pAlg->setMovingMask(nullptr);
+    }
 
     if (targetMask)
     {
@@ -160,6 +160,10 @@ namespace mitk
       typename TargetSpatialType::Pointer targetSpatial = dynamic_cast<TargetSpatialType*>(m_convertResult.GetPointer());
       if (! targetSpatial) mapDefaultExceptionStaticMacro(<< "Error, cannot convert moving mask.");
       pAlg->setTargetMask(targetSpatial);
+    }
+    else
+    {
+      pAlg->setTargetMask(nullptr);
     }
 
     return true;

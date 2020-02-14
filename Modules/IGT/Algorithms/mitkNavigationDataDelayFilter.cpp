@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkNavigationDataDelayFilter.h"
 
@@ -29,8 +25,11 @@ void mitk::NavigationDataDelayFilter::GenerateData()
   // Check if number of outputs has changed since the previous call. If yes, reset buffer.
   // This actually compares the number of Navigation Datas in each step and compares it to the current number of inputs.
   // If these values differ, the number of inputrs have changed.
-  if ( (m_Buffer.size() > 0) &&  (this->GetNumberOfInputs() != m_Buffer.front().second.size()) )
-    m_Buffer.empty();
+  if ((!m_Buffer.empty()) && (this->GetNumberOfInputs() != m_Buffer.front().second.size()))
+  {
+    decltype(m_Buffer) tmp;
+    m_Buffer.swap(tmp); // Clear queue with copy-and-swap idiom
+  }
 
   // Put current navigationdatas from input into buffer
   itk::TimeStamp now;

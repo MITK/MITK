@@ -11,10 +11,6 @@ set(MITK_EXTAPP_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/MitkWorkben
 #  - installed if they are external plug-ins
 
 set(_exclude_plugins
-  org.blueberry.test
-  org.blueberry.uitest
-  org.mitk.gui.qt.coreapplication
-  org.mitk.gui.qt.diffusionimagingapp
   org.mitk.example.gui.customviewer
   org.mitk.example.gui.customviewer.views
   org.mitk.example.gui.selectionservicemitk

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITK_COLLECTION_WRITER_H
 #define MITK_COLLECTION_WRITER_H
@@ -26,18 +22,10 @@ namespace mitk {
   class MITKDATACOLLECTION_EXPORT CollectionWriter
   {
   public:
-
-    typedef float TensorScalar;
     /**
     * @brief ExportCollectionToFolder
     *
     * Creates an XML file and stores all data in the same folder as the xml file (creating sub-folders for sub-collections)
-    *
-    *
-    * Naming Conventions (Neccessary for proper saving of these images):
-    * DWI - Diffusion Weighted Images
-    * DTI - Diffusion Tensor Images
-    * FIB - Fiber Bundles
     *
     * @param dataCollection
     * @param xmlFile

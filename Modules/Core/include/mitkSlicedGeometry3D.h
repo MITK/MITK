@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKSLICEDGEOMETRY3D_H_HEADER_INCLUDED_C1EBD0AD
 #define MITKSLICEDGEOMETRY3D_H_HEADER_INCLUDED_C1EBD0AD
@@ -66,10 +62,11 @@ namespace mitk
   class MITKCORE_EXPORT SlicedGeometry3D : public mitk::BaseGeometry
   {
   public:
-    mitkClassMacro(SlicedGeometry3D, BaseGeometry)
+    mitkClassMacro(SlicedGeometry3D, BaseGeometry);
 
       /** Method for creation through the object factory. */
-      itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+      itkFactorylessNewMacro(Self);
+      itkCloneMacro(Self);
 
       /**
       * \brief Returns the PlaneGeometry of the slice (\a s).
@@ -114,7 +111,7 @@ namespace mitk
     /**
     * \brief Get the number of slices
     */
-    itkGetConstMacro(Slices, unsigned int)
+    itkGetConstMacro(Slices, unsigned int);
 
       /**
       * \brief Set PlaneGeometry of slice \a s.
@@ -154,7 +151,7 @@ namespace mitk
     *
     * \sa GetPlaneGeometry
     */
-    itkGetConstMacro(EvenlySpaced, bool)
+    itkGetConstMacro(EvenlySpaced, bool);
 
       virtual void SetEvenlySpaced(bool on = true);
 
@@ -169,7 +166,7 @@ namespace mitk
     * \sa m_DirectionVector
     */
     virtual void SetDirectionVector(const mitk::Vector3D &directionVector);
-    itkGetConstMacro(DirectionVector, const mitk::Vector3D &)
+    itkGetConstMacro(DirectionVector, const mitk::Vector3D &);
 
       itk::LightObject::Pointer InternalClone() const override;
 

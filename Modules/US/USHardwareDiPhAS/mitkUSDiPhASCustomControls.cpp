@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkUSDiPhASCustomControls.h"
 #include <cmath>
@@ -165,7 +161,7 @@ void mitk::USDiPhASCustomControls::OnSetDataType(DataType type)
       scanMode.transferImageData = true;
       m_device->UpdateScanmode();
       imageSource->ModifyDataType(DataType::Image_uChar);
-      break; 
+      break;
     }
     case DataType::Beamformed_Short : {
       scanMode.transferBeamformedData = true;
@@ -175,8 +171,8 @@ void mitk::USDiPhASCustomControls::OnSetDataType(DataType type)
       break;
     }
 
-    default: 
-      MITK_INFO << "Unknown Data Type requested";  
+    default:
+      MITK_INFO << "Unknown Data Type requested";
       break;
   }
 }

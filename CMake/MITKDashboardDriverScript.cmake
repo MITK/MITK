@@ -526,14 +526,4 @@ ${INITIAL_CMAKECACHE_OPTIONS}
 
 endfunction()
 
-if(SCRIPT_MODE STREQUAL "continuous")
-  while(1)
-    run_ctest()
-    # Loop no faster than once every 5 minutes
-    message("Wait for 5 minutes ...")
-    ctest_sleep(300)
-  endwhile()
-else()
-  run_ctest()
-endif()
-
+run_ctest()

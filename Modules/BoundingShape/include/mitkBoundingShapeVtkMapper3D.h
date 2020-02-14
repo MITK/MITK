@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef mitkBoundingShapeVtkMapper3D_h
 #define mitkBoundingShapeVtkMapper3D_h
@@ -32,7 +28,11 @@ namespace mitk
   public:
     static void SetDefaultProperties(DataNode *node, BaseRenderer *renderer = nullptr, bool overwrite = false);
 
-    mitkClassMacro(BoundingShapeVtkMapper3D, VtkMapper) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(BoundingShapeVtkMapper3D, VtkMapper);
+
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       void ApplyColorAndOpacityProperties(BaseRenderer *, vtkActor *) override;
     void ApplyBoundingShapeProperties(BaseRenderer *renderer, vtkActor *);

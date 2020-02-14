@@ -1,10 +1,50 @@
+/*============================================================================
+
+ Copyright (c) German Cancer Research Center (DKFZ)
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are met:
+
+ - Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+ - Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+ - All advertising materials mentioning features or use of this software must
+   display the following acknowledgement:
+
+     "This product includes software developed by the German Cancer Research
+      Center (DKFZ)."
+
+ - Neither the name of the German Cancer Research Center (DKFZ) nor the names
+   of its contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
+
+   THIS SOFTWARE IS PROVIDED BY THE GERMAN CANCER RESEARCH CENTER (DKFZ) AND
+   CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+   BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+   FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE GERMAN
+   CANCER RESEARCH CENTER (DKFZ) OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+   INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+   SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+   OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+   DAMAGE.
+
+============================================================================*/
+
 #include <assert.h>
 #include <math.h>
 #include "mitkIpFuncP.h"
 
 /*!
 The algorithm implements the shape-based interpolation technique.
-Further detailed information can be found in: 
+Further detailed information can be found in:
 
 G.T. Herman, J. Zheng, C.A. Bucholtz: "Shape-based interpolation"
 IEEE Computer Graphics & Applications, pp. 69-79,May 1992
@@ -73,9 +113,9 @@ static mitkIpInt2_t distance (const mitkIpInt2_t* const old_distance, const mitk
 /*!
 \brief Computes an intermediate image by linear shape-based interpolation.
 @param pic1,pic2 the images which enclose the intermediate image
-@param threshold the threshold which extracts the shape in the images 
+@param threshold the threshold which extracts the shape in the images
 @param ratio the ratio the ratio specifies the weights for interpolation, i.e. the intermediate
-image equals to pic1 or pic2 if the ratio is zero and one, respectively 
+image equals to pic1 or pic2 if the ratio is zero and one, respectively
 @returns the intermediate image
 */
 mitkIpPicDescriptor*
@@ -88,14 +128,14 @@ mitkIpFuncShapeInterpolation (mitkIpPicDescriptor* pic1, mitkIpPicDescriptor* pi
     if (result == NULL) {
 	return NULL;
     }
-    result->data = malloc (_mitkIpPicSize (result)); 
+    result->data = malloc (_mitkIpPicSize (result));
     if (result->data == NULL) {
 	_mitkIpFuncSetErrno (mitkIpFuncMALLOC_ERROR);
-	mitkIpPicFree (result);	
+	mitkIpPicFree (result);
 	return NULL;
     }
-    pic[0] = setup (pic1, threshold); 
-    pic[1] = setup (pic2, threshold); 
+    pic[0] = setup (pic1, threshold);
+    pic[1] = setup (pic2, threshold);
 
     mitkIpPicFORALL_2(INTERPOLATE, result, pic[0], pic[1]);
 
@@ -139,11 +179,11 @@ setup (mitkIpPicDescriptor* pic_old, const mitkIpFloat4_t threshold)
 	dst = (mitkIpInt2_t *) pic->data;
 	for (x = 0; x < pic->n[0]; x++) {
 		*dst++ = -MAX;
-	}	
+	}
 	dst = (mitkIpInt2_t *) pic->data + _mitkIpPicElements (pic) - pic->n[0];
 	for (x = 0; x < pic->n[0]; x++) {
 		*dst++ = -MAX;
-	}	
+	}
 	dst = (mitkIpInt2_t *) pic->data;
 	for (y = 0; y < pic->n[1]; y++) {
 		*dst = -MAX;
@@ -165,7 +205,7 @@ setup (mitkIpPicDescriptor* pic_old, const mitkIpFloat4_t threshold)
 				*dst = -5;
 			} else if ((dst[0] > dst[1]) || (dst[0] > dst[pic->n[0]])) {
 				*dst = 5;
-			}	
+			}
 			dst++;
 		}
 		dst += 2;
@@ -179,8 +219,8 @@ setup (mitkIpPicDescriptor* pic_old, const mitkIpFloat4_t threshold)
 					*dst = -5;
 				} else if ((dst[0] > dst[-1]) || (dst[0] > dst[-pic->n[0]])) {
 					*dst = 5;
-				}	
-			}	
+				}
+			}
 		}
 	}
 	return pic;

@@ -9,7 +9,9 @@
 #!  \li the 'git describe' output, which is <latest-reachable-tag>-<#Commits>-g<SHORT-HASH>
 #! \lu
 #! In case the working copy contains local changes, the ${prefix}_REVISION_DESC strings will contain
-#! a suffix [local changes]
+#! a suffix [local changes].
+#!
+#! The revision description can be overridden by a ${prefix}_CUSTOM_REVISION_DESC variable.
 #!
 #! \param source_dir The directory containing a working copy
 #! \param prefix A prefix to prepent to the variables containing
@@ -21,36 +23,37 @@ function(mitkFunctionGetVersionDescription source_dir prefix)
     message(FATAL_ERROR "prefix argument not specified")
   endif()
 
-  # initialize variable
-  set(_wc_description "NO TAG FOUND")
-  set(_dirty_repo_str " [local changes]")
+  if(${prefix}_CUSTOM_REVISION_DESC)
+    set(_wc_description ${${prefix}_CUSTOM_REVISION_DESC})
+  else()
+    # initialize variable
+    set(_wc_description "NO TAG FOUND")
+    set(_dirty_repo_str " [local changes]")
 
-  find_package(Git)
-  if(GIT_FOUND)
+    find_package(Git)
 
-    GIT_IS_REPO(${source_dir} _is_git_repo)
-    if(_is_git_repo)
-      execute_process(COMMAND ${GIT_EXECUTABLE} describe --exact-match --dirty=${_dirty_repo_str}
+    if(GIT_FOUND)
+      GIT_IS_REPO(${source_dir} _is_git_repo)
+      if(_is_git_repo)
+        execute_process(COMMAND ${GIT_EXECUTABLE} describe --exact-match --dirty=${_dirty_repo_str}
+                        WORKING_DIRECTORY ${source_dir}
+                        OUTPUT_VARIABLE _project_git_tagname
+                        RESULT_VARIABLE _proper_version
+                        ERROR_VARIABLE _description_error )
+        if(_proper_version EQUAL 0 )
+          set(_wc_description ${_project_git_tagname})
+        else(_proper_version EQUAL 0)
+          # the execution failed, i.e. the HEAD has no tag,
+          # for fallback string: execute again but without the --exact-match
+          execute_process(COMMAND ${GIT_EXECUTABLE} describe --dirty=${_dirty_repo_str}
                       WORKING_DIRECTORY ${source_dir}
-                      OUTPUT_VARIABLE _project_git_tagname
+                      OUTPUT_VARIABLE _wc_description
                       RESULT_VARIABLE _proper_version
-                      ERROR_VARIABLE _description_error )
-      if(_proper_version EQUAL 0 )
-        set(_wc_description ${_project_git_tagname})
-
-      else(_proper_version EQUAL 0)
-        # the execution failed, i.e. the HEAD has no tag,
-        # for fallback string: execute again but without the --exact-match
-        execute_process(COMMAND ${GIT_EXECUTABLE} describe --dirty=${_dirty_repo_str}
-                    WORKING_DIRECTORY ${source_dir}
-                    OUTPUT_VARIABLE _wc_description
-                    RESULT_VARIABLE _proper_version
-                    ERROR_VARIABLE _description_error)
+                      ERROR_VARIABLE _description_error)
+        endif()
+        # remove newline at and of the string
+        string(STRIP "${_wc_description}" _wc_description)
       endif()
-
-      # remove newline at and of the string
-      string(STRIP "${_wc_description}" _wc_description)
-
     endif()
   endif()
 

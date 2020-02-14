@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <mitkBaseApplication.h>
 
@@ -96,8 +92,6 @@ namespace mitk
   const QString BaseApplication::ARG_REGISTRY_MULTI_LANGUAGE = "BlueBerry.registryMultiLanguage";
   const QString BaseApplication::ARG_SPLASH_IMAGE = "BlueBerry.splashscreen";
   const QString BaseApplication::ARG_STORAGE_DIR = "BlueBerry.storageDir";
-  const QString BaseApplication::ARG_TESTAPPLICATION = "BlueBerry.testapplication";
-  const QString BaseApplication::ARG_TESTPLUGIN = "BlueBerry.testplugin";
   const QString BaseApplication::ARG_XARGS = "xargs";
 
   const QString BaseApplication::PROP_APPLICATION = "blueberry.application";
@@ -107,8 +101,6 @@ namespace mitk
   const QString BaseApplication::PROP_NO_REGISTRY_CACHE = BaseApplication::ARG_NO_REGISTRY_CACHE;
   const QString BaseApplication::PROP_PRODUCT = "blueberry.product";
   const QString BaseApplication::PROP_REGISTRY_MULTI_LANGUAGE = BaseApplication::ARG_REGISTRY_MULTI_LANGUAGE;
-  const QString BaseApplication::PROP_TESTAPPLICATION = "BlueBerry.testapplication";
-  const QString BaseApplication::PROP_TESTPLUGIN = "BlueBerry.testplugin";
 
   class SplashCloserCallback : public QRunnable
   {
@@ -754,14 +746,6 @@ namespace mitk
       .repeatable(true)
       .callback(Poco::Util::OptionCallback<Impl>(d, &Impl::handlePreloadLibraryOption));
     options.addOption(preloadLibsOption);
-
-    Poco::Util::Option testPluginOption(ARG_TESTPLUGIN.toStdString(), "", "the plug-in to be tested");
-    testPluginOption.argument("<id>").binding(PROP_TESTPLUGIN.toStdString());
-    options.addOption(testPluginOption);
-
-    Poco::Util::Option testAppOption(ARG_TESTAPPLICATION.toStdString(), "", "the application to be tested");
-    testAppOption.argument("<id>").binding(PROP_TESTAPPLICATION.toStdString());
-    options.addOption(testAppOption);
 
     Poco::Util::Option noRegistryCacheOption(ARG_NO_REGISTRY_CACHE.toStdString(), "", "do not use a cache for the registry");
     noRegistryCacheOption.callback(Poco::Util::OptionCallback<Impl>(d, &Impl::handleBooleanOption));

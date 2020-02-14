@@ -1,5 +1,5 @@
 MITK_CREATE_MODULE(
-  DEPENDS MitkCore MitkMatchPointRegistration MitkMatchPointRegistrationIO
+  DEPENDS MitkCore MitkMatchPointRegistration
   PACKAGE_DEPENDS
     PUBLIC
     PRIVATE ITK|ITKIOImageBase+ITKIOGDCM

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <QObject>
 
@@ -38,6 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPluginActivator.h"
 #include "mitkCameraController.h"
 #include "mitkLabelSetImage.h"
+#include "mitkImageTimeSelector.h"
 
 #include <QmitkRenderWindow.h>
 
@@ -209,7 +206,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
    mitk::DataNode::Pointer node = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetReferenceData(0);
    if (node.IsNotNull())
    {
-     mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+     mitk::Image::ConstPointer image = dynamic_cast<mitk::Image*>(node->GetData());
      if (image.IsNotNull())
      {
        if (image->GetDimension() > 1)
@@ -225,6 +222,28 @@ void QmitkSegmentationView::CreateNewSegmentation()
          {
            // user clicked cancel or pressed Esc or something similar
            return;
+         }
+
+         if (image->GetDimension() > 3)
+         {
+           auto result = QMessageBox::question(m_Parent, tr("Generate a static mask?"),tr("The selected image has multiple time steps. You can either generate a simple/static masks resembling the geometry of the first timestep of the image. Or you can generate a dynamic mask that equals the selected image in geometry and number of timesteps; thus a dynamic mask can change over time (e.g. according to the image)."), tr("Yes, generate a static mask"), tr("No, generate a dynamic mask"), QString(), 0,0);
+           if (result == 0)
+           {
+             auto selector = mitk::ImageTimeSelector::New();
+             selector->SetInput(image);
+             selector->SetTimeNr(0);
+             selector->Update();
+
+             const auto refTimeGeometry = image->GetTimeGeometry();
+             auto newTimeGeometry = mitk::ProportionalTimeGeometry::New();
+             newTimeGeometry->SetFirstTimePoint(refTimeGeometry->GetMinimumTimePoint());
+             newTimeGeometry->SetStepDuration(refTimeGeometry->GetMaximumTimePoint() - refTimeGeometry->GetMinimumTimePoint());
+
+             mitk::Image::Pointer newImage = selector->GetOutput();
+             newTimeGeometry->SetTimeStepGeometry(image->GetGeometry(), 0);
+             newImage->SetTimeGeometry(newTimeGeometry);
+             image = newImage;
+           }
          }
 
          // ask the user about an organ type and name, add this information to the image's (!) propertylist

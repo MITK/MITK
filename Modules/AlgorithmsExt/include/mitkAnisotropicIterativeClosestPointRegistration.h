@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef __ANISOTROPICITERATIVECLOSESTPOINTREGISTRATION_H__
 #define __ANISOTROPICITERATIVECLOSESTPOINTREGISTRATION_H__
@@ -211,14 +207,15 @@ namespace mitk
                                 const double radius);
 
   public:
-    mitkClassMacroItkParent(AnisotropicIterativeClosestPointRegistration, itk::Object) itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    mitkClassMacroItkParent(AnisotropicIterativeClosestPointRegistration, itk::Object);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /** Set the maximum amount of iterations used by the algorithm. */
-      itkSetMacro(MaxIterations, unsigned int)
+      itkSetMacro(MaxIterations, unsigned int);
 
       /** Set the threshold used to terminate the algorithm.*/
-      itkSetMacro(Threshold, double)
+      itkSetMacro(Threshold, double);
 
       /** Set the normalization factor for the fiducial registration error (FRE).
        *  The normalization factor is computed with the help of the mean variance
@@ -232,21 +229,21 @@ namespace mitk
        *  if no FRE normalization is used the normalization factor is set to 1.0
        *  as default value.
        */
-      itkSetMacro(FRENormalizationFactor, double)
+      itkSetMacro(FRENormalizationFactor, double);
 
       /** Set search radius for the correspondence search.*/
-      itkSetMacro(SearchRadius, double)
+      itkSetMacro(SearchRadius, double);
 
       /** Set the maximim number of iterations used by the point based registration
         * algorithm.
         */
-      itkSetMacro(MaxIterationsInWeightedPointTransform, double)
+      itkSetMacro(MaxIterationsInWeightedPointTransform, double);
 
       /** Get the fiducial registration error (FRE).*/
-      itkGetMacro(FRE, double)
+      itkGetMacro(FRE, double);
 
       /** Get the number of iterations used by the algorithm.*/
-      itkGetMacro(NumberOfIterations, unsigned int)
+      itkGetMacro(NumberOfIterations, unsigned int);
 
       /**
         * Factor that trimms the point set in percent for
@@ -254,27 +251,27 @@ namespace mitk
         * of the point set. To enable the trimmed version a
         * factor > 0 and < 1 must be set. The default value is 0.0.
         */
-      itkSetMacro(TrimmFactor, double)
+      itkSetMacro(TrimmFactor, double);
 
       /**
         * Set moving surface that includes the point set (X).
         */
-      itkSetMacro(MovingSurface, itk::SmartPointer<Surface>)
+      itkSetMacro(MovingSurface, itk::SmartPointer<Surface>);
 
       /**
         * Set fixed surface that includes the point set (Y).
         */
-      itkSetMacro(FixedSurface, itk::SmartPointer<Surface>)
+      itkSetMacro(FixedSurface, itk::SmartPointer<Surface>);
 
       /**
         * Returns the 3x1 translation vector computed by the algorithm.
         */
-      itkGetConstReferenceMacro(Translation, Translation)
+      itkGetConstReferenceMacro(Translation, Translation);
 
       /**
         * Returns the 3x3 rotation matrix computed by the algorithm.
         */
-      itkGetConstReferenceMacro(Rotation, Rotation)
+      itkGetConstReferenceMacro(Rotation, Rotation);
 
       /**
         * Set the covariance matrices of the moving surface. The algorithm

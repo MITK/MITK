@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 // Blueberry
@@ -104,11 +100,11 @@ for (int i=0; i<size; i++)
 }
 
 //Step 2: Remove average for each row (Mittelwertbefreiung)
-mitk::Vector3D mean; 
+mitk::Vector3D mean;
 for (int i = 0; i < size; i++) { mean += mitk::Vector3D(dataMatrix.get_column(i)); }
 mean /= size;
-for (int i = 0; i<size; i++) 
-	{ 
+for (int i = 0; i<size; i++)
+	{
 	mitk::Vector3D removedAverageI = mitk::Vector3D(dataMatrix.get_column(i)) - mean;
 	dataMatrix.set_column(i, removedAverageI);
     }

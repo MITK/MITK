@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef __mitkLabelSetImage_H_
 #define __mitkLabelSetImage_H_
@@ -33,7 +29,8 @@ namespace mitk
   class MITKMULTILABEL_EXPORT LabelSetImage : public Image
   {
   public:
-    mitkClassMacro(LabelSetImage, Image) itkNewMacro(Self)
+    mitkClassMacro(LabelSetImage, Image);
+    itkNewMacro(Self);
 
       typedef mitk::Label::PixelType PixelType;
 
@@ -267,7 +264,7 @@ namespace mitk
     const mitk::Label *GetExteriorLabel() const;
 
   protected:
-    mitkCloneMacro(Self)
+    mitkCloneMacro(Self);
 
       LabelSetImage();
     LabelSetImage(const LabelSetImage &other);

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKVtkGLMapperWrapper_H_HEADER
 #define MITKVtkGLMapperWrapper_H_HEADER
@@ -36,12 +32,12 @@ namespace mitk
   public:
     mitkClassMacro(VtkGLMapperWrapper, VtkMapper);
 
-    mitkNewMacro1Param(Self, GLMapper::Pointer)
+    mitkNewMacro1Param(Self, GLMapper::Pointer);
 
-      itkCloneMacro(Self)
+    itkCloneMacro(Self);
 
-      /** \brief returns the a prop assembly */
-      vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
+    /** \brief returns the a prop assembly */
+    vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
     void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 

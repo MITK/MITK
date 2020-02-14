@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical Image Computing.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITKRENDERWINDOWWIDGET_H
 #define QMITKRENDERWINDOWWIDGET_H
@@ -50,10 +46,7 @@ public:
   QmitkRenderWindowWidget(
     QWidget* parent = nullptr,
     const QString& widgetName = "",
-    mitk::DataStorage* dataStorage = nullptr,
-    mitk::RenderingManager* renderingManager = nullptr,
-    mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing
-  );
+    mitk::DataStorage* dataStorage = nullptr);
 
   ~QmitkRenderWindowWidget() override;
 
@@ -102,8 +95,6 @@ private:
   QHBoxLayout* m_Layout;
 
   mitk::DataStorage* m_DataStorage;
-  mitk::RenderingManager::Pointer m_RenderingManager;
-  mitk::BaseRenderer::RenderingMode::Type m_RenderingMode;
 
   QmitkRenderWindow* m_RenderWindow;
 

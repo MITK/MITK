@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkMxNMultiWidgetEditorPreferencePage.h"
 #include <QmitkMxNMultiWidgetEditor.h>
@@ -47,7 +43,6 @@ void QmitkMxNMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
   Q_ASSERT(preferenceService);
   m_Preferences = preferenceService->GetSystemPreferences()->Node(QmitkMxNMultiWidgetEditor::EDITOR_ID);
 
-  connect(m_Ui.m_RenderingModeComboBox, SIGNAL(activated(int)), SLOT(ChangeRenderingMode(int)));
   connect(m_Ui.m_ColormapComboBox, SIGNAL(activated(int)), SLOT(ChangeColormap(int)));
   connect(m_Ui.m_ResetButton, SIGNAL(clicked()), SLOT(ResetPreferencesAndGUI()));
 
@@ -64,9 +59,6 @@ bool QmitkMxNMultiWidgetEditorPreferencePage::PerformOk()
   m_Preferences->PutBool("Use constrained zooming and panning", m_Ui.m_EnableFlexibleZooming->isChecked());
   m_Preferences->PutBool("Show level/window widget", m_Ui.m_ShowLevelWindowWidget->isChecked());
   m_Preferences->PutBool("PACS like mouse interaction", m_Ui.m_PACSLikeMouseMode->isChecked());
-
-  m_Preferences->PutInt("Rendering Mode", m_Ui.m_RenderingModeComboBox->currentIndex());
-
   m_Preferences->PutInt("Render window widget colormap", m_Ui.m_ColormapComboBox->currentIndex());
   m_Preferences->PutBool("Render window individual decorations", m_Ui.m_IndividualDecorations->isChecked());
 
@@ -86,9 +78,6 @@ void QmitkMxNMultiWidgetEditorPreferencePage::Update()
   m_Ui.m_ShowLevelWindowWidget->setChecked(m_Preferences->GetBool("Show level/window widget", true));
   m_Ui.m_PACSLikeMouseMode->setChecked(m_Preferences->GetBool("PACS like mouse interaction", false));
 
-  int renderingMode = m_Preferences->GetInt("Rendering Mode", 0);
-  m_Ui.m_RenderingModeComboBox->setCurrentIndex(renderingMode);
-
   int colormap = m_Preferences->GetInt("Render window widget colormap", 0);
   m_Ui.m_ColormapComboBox->setCurrentIndex(colormap);
 
@@ -101,22 +90,6 @@ void QmitkMxNMultiWidgetEditorPreferencePage::ResetPreferencesAndGUI()
 {
   m_Preferences->Clear();
   Update();
-}
-
-void QmitkMxNMultiWidgetEditorPreferencePage::ChangeRenderingMode(int i)
-{
-  if (0 == i)
-  {
-    m_CurrentRenderingMode = "Standard";
-  }
-  else if (1 == i)
-  {
-    m_CurrentRenderingMode = "Multisampling";
-  }
-  else if (2 == i)
-  {
-    m_CurrentRenderingMode = "DepthPeeling";
-  }
 }
 
 void QmitkMxNMultiWidgetEditorPreferencePage::ChangeColormap(int i)

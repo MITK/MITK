@@ -1,59 +1,53 @@
-/*****************************************************************************
+/*============================================================================
 
- Copyright (c) 1993-2000,  Div. Medical and Biological Informatics, 
- Deutsches Krebsforschungszentrum, Heidelberg, Germany
+ Copyright (c) German Cancer Research Center (DKFZ)
  All rights reserved.
 
- Redistribution and use in source and binary forms, with or without 
+ Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
 
  - Redistributions of source code must retain the above copyright notice, this
    list of conditions and the following disclaimer.
 
- - Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+ - Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
- - All advertising materials mentioning features or use of this software must 
-   display the following acknowledgement: 
-          
-     "This product includes software developed by the Div. Medical and 
-      Biological Informatics, Deutsches Krebsforschungszentrum, Heidelberg, 
-      Germany."
+ - All advertising materials mentioning features or use of this software must
+   display the following acknowledgement:
 
- - Neither the name of the Deutsches Krebsforschungszentrum nor the names of 
-   its contributors may be used to endorse or promote products derived from 
-   this software without specific prior written permission. 
+     "This product includes software developed by the German Cancer Research
+      Center (DKFZ)."
 
-   THIS SOFTWARE IS PROVIDED BY THE DIVISION MEDICAL AND BIOLOGICAL
-   INFORMATICS AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED
-   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-   OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-   IN NO EVENT SHALL THE DIVISION MEDICAL AND BIOLOGICAL INFORMATICS,
-   THE DEUTSCHES KREBSFORSCHUNGSZENTRUM OR CONTRIBUTORS BE LIABLE FOR 
-   ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-   DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE 
-   GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER 
-   IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN 
-   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ - Neither the name of the German Cancer Research Center (DKFZ) nor the names
+   of its contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
 
- Send comments and/or bug reports to:
-   mbi-software@dkfz-heidelberg.de
+   THIS SOFTWARE IS PROVIDED BY THE GERMAN CANCER RESEARCH CENTER (DKFZ) AND
+   CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+   BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+   FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE GERMAN
+   CANCER RESEARCH CENTER (DKFZ) OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+   INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+   SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+   OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+   DAMAGE.
 
-*****************************************************************************/
+============================================================================*/
 
 /**@file
  *  This functions looks for areas in an image with the same greyvalue.
- *  Each of these areas gets it's own greyvalue.  
+ *  Each of these areas gets it's own greyvalue.
  */
 
 /** This functions looks for areas in an image with the same greyvalue.
- *  Each of these areas gets it's own greyvalue.  
+ *  Each of these areas gets it's own greyvalue.
  *
- *  CAUTION! In case of many small regions to label, the routine may 
- *  break down without exception handling, if the number of labels is 
+ *  CAUTION! In case of many small regions to label, the routine may
+ *  break down without exception handling, if the number of labels is
  *  running out.
  *
  *  @param pic_old      pointer to original image structure
@@ -66,7 +60,7 @@
  *  function _mitkIpFuncExtr   - calculates extreme greyvalues
  *  function _mitkIpFuncHist   - calculates greyvalue histogram
  *
- * AUTHOR & DATE 
+ * AUTHOR & DATE
  */
 
 /* include files                                                       */
@@ -79,7 +73,7 @@ mitkIpPicDescriptor *mitkIpFuncLabel ( mitkIpPicDescriptor *pic_old,
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
-  static char *what = { "@(#)mitkIpFuncLabel\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)mitkIpFuncLabel\t\tGerman Cancer Research Center (DKFZ)\t"__DATE__ };
 #endif
 
 
@@ -179,8 +173,8 @@ mitkIpPicDescriptor *mitkIpFuncLabel ( mitkIpPicDescriptor *pic_old,
 
 
 /* ------------------------------------------------------------------- */
-/* 
-**  mitkIpFuncLabel                     
+/*
+**  mitkIpFuncLabel
 */
 /* ------------------------------------------------------------------- */
 
@@ -196,7 +190,7 @@ mitkIpPicDescriptor *mitkIpFuncLabel ( mitkIpPicDescriptor *pic_old,
   mitkIpUInt4_t       new_label;     /*                                    */
   mitkIpUInt4_t       size[_mitkIpPicNDIM];
   mitkIpFloat8_t      min, max;      /* extreme greyvalues in image        */
-  
+
   /* check image data                                                  */
 
   if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
@@ -207,7 +201,7 @@ mitkIpPicDescriptor *mitkIpFuncLabel ( mitkIpPicDescriptor *pic_old,
   /* check whether image is binary                                     */
   /*
   mitkIpFuncHist ( pic_old, min, max, &hist, &size_hist );
-  if ( hist == NULL ) 
+  if ( hist == NULL )
     {
        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
@@ -220,8 +214,8 @@ mitkIpPicDescriptor *mitkIpFuncLabel ( mitkIpPicDescriptor *pic_old,
        if ( hist [i] != 0 ) no_gv++;
        i++;
     }
-  
-  if ( no_gv != 2 ) 
+
+  if ( no_gv != 2 )
     {
        free ( hist );
        _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
@@ -261,9 +255,9 @@ mitkIpPicDescriptor *mitkIpFuncLabel ( mitkIpPicDescriptor *pic_old,
   }
 
   /* allocation and initialisation of vectors                          */
- 
+
   a      = malloc ( ( no_label + 1 ) * sizeof ( mitkIpUInt4_t ) );
-  if ( a == NULL ) 
+  if ( a == NULL )
     {
         mitkIpPicFree ( pic_new );
         _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
@@ -287,9 +281,9 @@ mitkIpPicDescriptor *mitkIpFuncLabel ( mitkIpPicDescriptor *pic_old,
         return ( mitkIpFuncERROR );
     }
 
-  for ( i = 0; i <= no_label; i++ ) 
+  for ( i = 0; i <= no_label; i++ )
     {
-       a[i]      = i; 
+       a[i]      = i;
        a_new[i]  = i;
        a_sort[i] = 0;
     }
@@ -316,7 +310,7 @@ mitkIpPicDescriptor *mitkIpFuncLabel ( mitkIpPicDescriptor *pic_old,
    }
 
   /*
-  ** replace image with new labels                                       
+  ** replace image with new labels
   */
 
   /* hit used labels with 1                                           */
@@ -331,7 +325,7 @@ mitkIpPicDescriptor *mitkIpFuncLabel ( mitkIpPicDescriptor *pic_old,
          {
             new_label++;
             a_sort[i] = new_label;
-         } 
+         }
     }
 
   /* renumber pixels with new labels                                  */
@@ -356,10 +350,10 @@ mitkIpPicDescriptor *mitkIpFuncLabel ( mitkIpPicDescriptor *pic_old,
   /* Copy Tags */
 
   mitkIpFuncCopyTags(pic_new, pic_old);
-  
-  
-                              
-  free ( a ); 
+
+
+
+  free ( a );
   free ( a_new );
   free ( a_sort );
   return ( pic_new );

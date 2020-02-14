@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkVtkPropRenderer.h"
 
@@ -57,11 +53,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTransform.h>
 #include <vtkWorldPointPicker.h>
 
-mitk::VtkPropRenderer::VtkPropRenderer(const char *name,
-                                       vtkRenderWindow *renWin,
-                                       mitk::RenderingManager *rm,
-                                       mitk::BaseRenderer::RenderingMode::Type renderingMode)
-  : BaseRenderer(name, renWin, rm, renderingMode), m_CameraInitializedForMapperID(0)
+mitk::VtkPropRenderer::VtkPropRenderer(const char *name, vtkRenderWindow *renWin)
+  : BaseRenderer(name, renWin),
+    m_CameraInitializedForMapperID(0)
 {
   didCount = false;
 
@@ -369,7 +363,7 @@ void mitk::VtkPropRenderer::RenderingCallback(vtkObject *caller, unsigned long, 
 void mitk::VtkPropRenderer::Resize(int w, int h)
 {
   BaseRenderer::Resize(w, h);
-  m_RenderingManager->RequestUpdate(this->GetRenderWindow());
+  RenderingManager::GetInstance()->RequestUpdate(this->GetRenderWindow());
 }
 
 void mitk::VtkPropRenderer::InitSize(int w, int h)

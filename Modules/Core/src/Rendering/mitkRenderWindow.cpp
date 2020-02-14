@@ -1,31 +1,23 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkRenderWindow.h"
 
-#include "mitkRenderingManager.h"
 #include "mitkVtkEventProvider.h"
 #include "mitkVtkLayerController.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 
-mitk::RenderWindow::RenderWindow(vtkRenderWindow *renWin,
-                                 const char *name,
-                                 mitk::RenderingManager *rm,
-                                 mitk::BaseRenderer::RenderingMode::Type rmtype)
+mitk::RenderWindow::RenderWindow(vtkRenderWindow *renWin, const char *name)
   : m_vtkRenderWindow(renWin),
     m_vtkRenderWindowInteractor(nullptr),
     m_vtkMitkEventProvider(nullptr)
@@ -47,7 +39,7 @@ mitk::RenderWindow::RenderWindow(vtkRenderWindow *renWin,
   m_vtkRenderWindowInteractor->Initialize();
 
   // initialize from RenderWindowBase
-  this->Initialize(rm, name, rmtype);
+  this->Initialize(name);
 
   m_vtkMitkEventProvider = vtkEventProvider::New();
   m_vtkMitkEventProvider->SetInteractor(this->GetVtkRenderWindowInteractor());

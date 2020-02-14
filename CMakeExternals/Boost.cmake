@@ -288,6 +288,8 @@ g"
 
   endif()
 
+  set(install_manifest_dependees install)
+
   if(MITK_USE_Boost_LIBRARIES)
 
     if(WIN32)
@@ -299,6 +301,8 @@ g"
         DEPENDEES install
         WORKING_DIRECTORY <INSTALL_DIR>/lib
       )
+
+      set(install_manifest_dependees post_install)
 
     elseif(APPLE)
 
@@ -312,9 +316,17 @@ g"
         WORKING_DIRECTORY <INSTALL_DIR>/lib
       )
 
+      set(install_manifest_dependees post_install)
+
     endif()
 
   endif()
+
+  ExternalProject_Add_Step(${proj} install_manifest
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/Boost-install_manifest.cmake
+    DEPENDEES ${install_manifest_dependees}
+    WORKING_DIRECTORY ${ep_prefix}
+  )
 
 else()
 

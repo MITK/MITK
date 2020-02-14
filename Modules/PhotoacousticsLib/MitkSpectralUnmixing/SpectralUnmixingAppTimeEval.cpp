@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 //#include <boost>
 #include <chrono>
@@ -91,7 +87,7 @@ InputParameters parseInput(int argc, char *argv[])
   }
 
   if (parsedArgs.count("inputPath"))
-  { 
+  {
     input.inputPath = us::any_cast<std::string>(parsedArgs["inputPath"]);
   }
   else
@@ -101,7 +97,7 @@ InputParameters parseInput(int argc, char *argv[])
   }
 
   if (parsedArgs.count("outputPath"))
-  { 
+  {
     input.outputPath = us::any_cast<std::string>(parsedArgs["outputPath"]);
   }
   else
@@ -187,7 +183,7 @@ void add_weight(int weights, mitk::pa::SpectralUnmixingFilterBase::Pointer m_Spe
 
 
 int main(int argc, char *argv[])
-{ 
+{
   auto input = parseInput(argc, argv);
 
   std::string inputDir = input.inputPath;
@@ -198,9 +194,9 @@ int main(int argc, char *argv[])
   //maybee try with "itk system tools"
 
   //auto test = itksys::SystemTools::GetFilenameName(argv[0]).c_str();
-  
+
   //MITK_INFO << "test: " << test;
-  
+
 
   /  +++ temporary solution BEGIN +++
   std::vector<std::string> files;
@@ -232,7 +228,7 @@ int main(int argc, char *argv[])
   std::string file;
   file = "E:/NHCAMI/cami-experimental/PAI/spectralUnmixing/inSilico/paImages/selection/noiselevel1_rep1000_wavelength_selction_data.nrrd";
   files.push_back(file);*/
-  
+
   std::vector<std::string> algorithms = { "QR", "LU", "SVD", "NNLS", "WLS" };
   int repetition = 6000;
 
@@ -250,15 +246,15 @@ int main(int argc, char *argv[])
         file = "E:/NHDATA/time/input/time_0" + std::to_string(i) + ".nrrd";
       else
         file = "E:/NHDATA/time/input/time_" + std::to_string(i) + ".nrrd";
-      
+
       auto m_inputImage = mitk::IOUtil::Load<mitk::Image>(file);
-    
+
       MITK_INFO << "File: " << i;
 
       for (int j = 0; j < repetition; ++j)
         {
            std::chrono::steady_clock::time_point _start;
-           _start = std::chrono::steady_clock::now(); 
+           _start = std::chrono::steady_clock::now();
 
           mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter = GetFilterInstance(algorithms[alg]);
           m_SpectralUnmixingFilter->SetInput(m_inputImage);
@@ -267,14 +263,14 @@ int main(int argc, char *argv[])
           m_SpectralUnmixingFilter->RelativeError(false);
           m_SpectralUnmixingFilter->AddChromophore(mitk::pa::PropertyCalculator::ChromophoreType::OXYGENATED);
           m_SpectralUnmixingFilter->AddChromophore(mitk::pa::PropertyCalculator::ChromophoreType::DEOXYGENATED);
-          
+
           for (int wl = 0; wl < i; ++wl)
           {
             m_SpectralUnmixingFilter->AddWavelength(700 + wl * 10);
-          }    
-          
+          }
+
           if (alg == 4)
-          {         
+          {
             add_weight(i, m_SpectralUnmixingFilter);
           }
 
@@ -292,8 +288,8 @@ int main(int argc, char *argv[])
         /*std::string unmixingOutputHbO2 = "E:/NHDATA/time/output/time_" + std::to_string(i) + ".nrrd";
         std::string unmixingOutputHb = "E:/NHDATA/time/output/time_" + std::to_string(i) + ".nrrd";
         mitk::IOUtil::Save(output1, unmixingOutputHbO2);
-        mitk::IOUtil::Save(output2, unmixingOutputHb);/*
-/*
+        mitk::IOUtil::Save(output2, unmixingOutputHb);
+
         //auto m_sO2 = mitk::pa::SpectralUnmixingSO2::New();
         //m_sO2->Verbose(false);
         //auto output1 = m_SpectralUnmixingFilter->GetOutput(0);

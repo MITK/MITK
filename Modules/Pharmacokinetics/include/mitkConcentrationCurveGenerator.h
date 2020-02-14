@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 #ifndef CONCENTRATIONCURVEGENERATOR_H
 #define CONCENTRATIONCURVEGENERATOR_H
 
@@ -73,7 +69,14 @@ public:
     itkSetMacro(T2EchoTime, double);
     itkGetConstReferenceMacro(T2EchoTime, double);
 
+
     /** @brief Calls Convert and returns the 4D mitk::image in Concentration units*/
+
+    itkSetMacro(BaselineStartTimeStep, unsigned int);
+    itkGetConstReferenceMacro(BaselineStartTimeStep, unsigned int);
+
+    itkSetMacro(BaselineEndTimeStep, unsigned int);
+    itkGetConstReferenceMacro(BaselineEndTimeStep, unsigned int);
 
     itkSetMacro(isTurboFlashSequence,bool);
     itkGetConstReferenceMacro(isTurboFlashSequence,bool);
@@ -98,9 +101,9 @@ protected:
     ConcentrationCurveGenerator();
      ~ConcentrationCurveGenerator() override;
 
-    template<class Tpixel>
-    mitk::Image::Pointer convertToConcentration(const mitk::Image* inputImage, const mitk::Image* baselineImage);
 
+     template<class TPixel_input, class TPixel_baseline>
+     mitk::Image::Pointer convertToConcentration(const itk::Image<TPixel_input, 3> *itkInputImage, const itk::Image<TPixel_baseline, 3> *itkBaselineImage);
 
     /** Calls ConvertToconcentrationFunctor for passed 3D itk::image*/
     mitk::Image::Pointer ConvertSignalToConcentrationCurve(const mitk::Image* inputImage, const mitk::Image* baselineImage);
@@ -110,6 +113,9 @@ protected:
     /** @brief Takes the 3D image of the first timepoint to set as baseline image*/
     void PrepareBaselineImage();
 
+    template<class TPixel>
+    void CalculateAverageBaselineImage(const itk::Image<TPixel,4> *itkBaselineImage);
+
     /** @brief loops over all timepoints, casts the current timepoint 3D mitk::image to itk and passes it to ConvertSignalToConcentrationCurve */
     virtual void Convert();
 
@@ -118,7 +124,7 @@ private:
     Image::ConstPointer m_DynamicImage;
     Image::ConstPointer m_BaselineImage;
     Image::ConstPointer m_T10Image;
-
+    Image::Pointer m_ConvertSignalToConcentrationCurve_OutputImage;
     Image::Pointer m_ConvertedImage;
 
     bool m_isT2weightedImage;
@@ -140,6 +146,11 @@ private:
 
     double m_T2Factor;
     double m_T2EchoTime;
+    // The baseline image is averaged from the signal within time step range [m_BaselineStartTimeStep, m_BaselineEndTimeStep].
+    // m_BaselineStartTimeStep is the first time frame, that is included into the baseline averaging (starting with 0).
+    unsigned int m_BaselineStartTimeStep;
+    // m_BaselinStopTimeStep is the last time frame, that is included into the baseline averaging.
+    unsigned int m_BaselineEndTimeStep;
 };
 
 }

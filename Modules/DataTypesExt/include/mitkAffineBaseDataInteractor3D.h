@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef mitkAffineBaseDataInteractor3D_h
 #define mitkAffineBaseDataInteractor3D_h
@@ -25,23 +21,26 @@ namespace mitk
 {
 ////create events for interactions
 #pragma GCC visibility push(default)
-  itkEventMacro(AffineInteractionEvent, itk::AnyEvent) itkEventMacro(ScaleEvent, AffineInteractionEvent)
-    itkEventMacro(RotateEvent, AffineInteractionEvent) itkEventMacro(TranslateEvent, AffineInteractionEvent)
+  itkEventMacro(AffineInteractionEvent, itk::AnyEvent);
+  itkEventMacro(ScaleEvent, AffineInteractionEvent);
+  itkEventMacro(RotateEvent, AffineInteractionEvent);
+  itkEventMacro(TranslateEvent, AffineInteractionEvent);
 #pragma GCC visibility pop
 
-    /**
-      * \brief Affine interaction with mitk::BaseGeometry.
-      *
-      * \ingroup Interaction
-      */
-    // Inherit from DataInteractor, this provides functionality of a state machine and configurable inputs.
-    class MITKDATATYPESEXT_EXPORT AffineBaseDataInteractor3D : public DataInteractor
+  /**
+    * \brief Affine interaction with mitk::BaseGeometry.
+    *
+    * \ingroup Interaction
+    */
+  // Inherit from DataInteractor, this provides functionality of a state machine and configurable inputs.
+  class MITKDATATYPESEXT_EXPORT AffineBaseDataInteractor3D : public DataInteractor
   {
   public:
     mitkClassMacro(AffineBaseDataInteractor3D, DataInteractor);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
-      void SetDataNode(DataNode *node) override;
+    void SetDataNode(DataNode *node) override;
     void TranslateGeometry(mitk::Vector3D translate, mitk::BaseGeometry *geometry);
     void RotateGeometry(mitk::ScalarType angle, int rotationaxis, mitk::BaseGeometry *geometry);
     void ScaleGeometry(mitk::Point3D newScale, mitk::BaseGeometry *geometry);

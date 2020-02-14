@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 // Qmitk
 #include "QmitkDicomExternalDataWidget.h"
@@ -24,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Qt
 #include <QCheckBox>
 #include <QMessageBox>
+#include <QTemporaryFile>
 
 const std::string QmitkDicomExternalDataWidget::Widget_ID = "org.mitk.Widgets.QmitkDicomExternalDataWidget";
 
@@ -85,7 +82,12 @@ void QmitkDicomExternalDataWidget::Initialize()
 
   try
   {
-    m_ExternalDatabase->openDatabase(QString(":memory:"), QString("EXTERNAL-DB"));
+    // this used to be an in-memory database, but latest CTK enhancements made it difficult
+    // to maintain this mechanism
+    QTemporaryFile tmpDatabaseFile;
+    tmpDatabaseFile.open();
+    tmpDatabaseFile.setAutoRemove(false);
+    m_ExternalDatabase->openDatabase(tmpDatabaseFile.fileName(), QString("EXTERNAL-DB"));
   }
   catch (const std::exception&)
   {
@@ -179,7 +181,7 @@ void QmitkDicomExternalDataWidget::OnStartDicomImport(const QString &directory)
   // appears by receiving the progress signal from the external indexer
 
   m_LastImportDirectory = directory;
-  m_ExternalIndexer->addDirectory(*m_ExternalDatabase, m_LastImportDirectory);
+  m_ExternalIndexer->addDirectory(m_ExternalDatabase, m_LastImportDirectory);
 }
 
 void QmitkDicomExternalDataWidget::OnSeriesSelectionChanged(const QStringList &s)

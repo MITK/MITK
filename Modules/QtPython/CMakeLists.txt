@@ -12,8 +12,7 @@ if(MITK_USE_Python3)
     PUBLIC Qt5|Widgets CTK|CTKScriptingPythonCore+CTKScriptingPythonWidgets
     )
 
-  # temporarily disabled, bug-19153
-  if(UNIX)
+  if(BUILD_TESTING)
     add_subdirectory(Testing)
   endif()
 endif()

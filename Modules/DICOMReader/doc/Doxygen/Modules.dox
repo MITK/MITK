@@ -32,7 +32,6 @@ A very simple implementation is mitk::DICOMFileReaderSelector which selects the 
 
 Unstructured development tasks and ideas for future extensions
 
- - a reader for vector-valued diffusion images is currently being implemented
  - a multi-frame image reader based on DCMTK
  - perspective: slice-by-slice loading
 

@@ -1,27 +1,29 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #include "mitkRegistrationHelper.h"
+#include <mitkNodePredicateDataType.h>
+#include <mitkPointSet.h>
 
 //MatchPoint
 #include "mapRegistrationKernel.h"
 
 namespace mitk
 {
+  mitk::NodePredicateDataType::ConstPointer InternalRegNodePredicate = mitk::NodePredicateDataType::New(mitk::MAPRegistrationWrapper::GetStaticNameOfClass()).GetPointer();
+  mitk::NodePredicateDataType::ConstPointer InternalImageNodePredicate = mitk::NodePredicateDataType::New(mitk::Image::GetStaticNameOfClass()).GetPointer();
+  mitk::NodePredicateDataType::ConstPointer InternalPointSetNodePredicate = mitk::NodePredicateDataType::New(mitk::PointSet::GetStaticNameOfClass()).GetPointer();
+
 
   MITKRegistrationHelper::Affine3DTransformType::Pointer
   MITKRegistrationHelper::
@@ -126,13 +128,22 @@ namespace mitk
   {
     if (!node) return false;
 
-    mitk::BaseData* data = node->GetData();
-
-    if (data != nullptr)
-    {
-      return std::string("MAPRegistrationWrapper").compare(data->GetNameOfClass()) == 0;
-    }
-
-    return false;
+    return InternalRegNodePredicate->CheckNode(node);
   }
+
+  NodePredicateBase::ConstPointer MITKRegistrationHelper::RegNodePredicate()
+  {
+    return InternalRegNodePredicate.GetPointer();
+  }
+
+  NodePredicateBase::ConstPointer MITKRegistrationHelper::ImageNodePredicate()
+  {
+    return InternalImageNodePredicate.GetPointer();
+  }
+
+  NodePredicateBase::ConstPointer MITKRegistrationHelper::PointSetNodePredicate()
+  {
+    return InternalPointSetNodePredicate.GetPointer();
+  }
+
 }

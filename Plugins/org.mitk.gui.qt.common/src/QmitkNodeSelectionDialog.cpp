@@ -1,29 +1,27 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkNodeSelectionDialog.h"
 
 #include <mitkDataStorageInspectorGenerator.h>
-#include <QmitkDataStorageTreeInspector.h>
 #include <QmitkNodeSelectionPreferenceHelper.h>
+#include <QmitkDataStorageSelectionHistoryInspector.h>
 
 QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString title, QString hint) : QDialog(parent),
   m_NodePredicate(nullptr), m_SelectOnlyVisibleNodes(false), m_SelectedNodes(NodeList()), m_SelectionMode(QAbstractItemView::SingleSelection)
 {
   m_Controls.setupUi(this);
+
+  m_CheckFunction = [](const NodeList &) { return ""; };
 
   auto providers = mitk::DataStorageInspectorGenerator::GetProviders();
   auto visibleProviders = mitk::GetVisibleDataStorageInspectors();
@@ -71,6 +69,10 @@ QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString titl
   m_Controls.hint->setText(hint);
   m_Controls.hint->setVisible(!hint.isEmpty());
 
+  m_FavoriteNodesButton = new QPushButton("Add to favorites");
+  m_Controls.buttonBox->addButton(m_FavoriteNodesButton, QDialogButtonBox::ActionRole);
+
+  connect(m_FavoriteNodesButton, &QPushButton::clicked, this, &QmitkNodeSelectionDialog::OnFavoriteNodesButtonClicked);
   connect(m_Controls.buttonBox, SIGNAL(accepted()), this, SLOT(OnOK()));
   connect(m_Controls.buttonBox, SIGNAL(rejected()), this, SLOT(OnCancel()));
 }
@@ -91,7 +93,7 @@ void QmitkNodeSelectionDialog::SetDataStorage(mitk::DataStorage* dataStorage)
   }
 }
 
-void QmitkNodeSelectionDialog::SetNodePredicate(mitk::NodePredicateBase* nodePredicate)
+void QmitkNodeSelectionDialog::SetNodePredicate(const mitk::NodePredicateBase* nodePredicate)
 {
   if (m_NodePredicate != nodePredicate)
   {
@@ -104,7 +106,7 @@ void QmitkNodeSelectionDialog::SetNodePredicate(mitk::NodePredicateBase* nodePre
   }
 }
 
-mitk::NodePredicateBase* QmitkNodeSelectionDialog::GetNodePredicate() const
+const mitk::NodePredicateBase* QmitkNodeSelectionDialog::GetNodePredicate() const
 {
   return m_NodePredicate;
 }
@@ -112,6 +114,35 @@ mitk::NodePredicateBase* QmitkNodeSelectionDialog::GetNodePredicate() const
 QmitkNodeSelectionDialog::NodeList QmitkNodeSelectionDialog::GetSelectedNodes() const
 {
   return m_SelectedNodes;
+}
+
+void QmitkNodeSelectionDialog::SetSelectionCheckFunction(const SelectionCheckFunctionType &checkFunction)
+{
+  m_CheckFunction = checkFunction;
+  auto checkResponse = m_CheckFunction(m_SelectedNodes);
+
+  m_Controls.hint->setText(QString::fromStdString(checkResponse));
+  m_Controls.hint->setVisible(!checkResponse.empty());
+  m_Controls.buttonBox->button(QDialogButtonBox::Ok)->setEnabled(checkResponse.empty());
+}
+
+bool QmitkNodeSelectionDialog::GetSelectOnlyVisibleNodes() const
+{
+  return m_SelectOnlyVisibleNodes;
+}
+
+void QmitkNodeSelectionDialog::SetSelectionMode(SelectionMode mode)
+{
+  m_SelectionMode = mode;
+  for (auto panel : m_Panels)
+  {
+    panel->SetSelectionMode(mode);
+  }
+}
+
+QmitkNodeSelectionDialog::SelectionMode QmitkNodeSelectionDialog::GetSelectionMode() const
+{
+  return m_SelectionMode;
 }
 
 void QmitkNodeSelectionDialog::SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes)
@@ -130,6 +161,12 @@ void QmitkNodeSelectionDialog::SetSelectOnlyVisibleNodes(bool selectOnlyVisibleN
 void QmitkNodeSelectionDialog::SetCurrentSelection(NodeList selectedNodes)
 {
   m_SelectedNodes = selectedNodes;
+  auto checkResponse = m_CheckFunction(m_SelectedNodes);
+
+  m_Controls.hint->setText(QString::fromStdString(checkResponse));
+  m_Controls.hint->setVisible(!checkResponse.empty());
+  m_Controls.buttonBox->button(QDialogButtonBox::Ok)->setEnabled(checkResponse.empty());
+
   for (auto panel : m_Panels)
   {
     panel->SetCurrentSelection(selectedNodes);
@@ -142,13 +179,36 @@ void QmitkNodeSelectionDialog::OnSelectionChanged(NodeList selectedNodes)
   emit CurrentSelectionChanged(selectedNodes);
 }
 
+void QmitkNodeSelectionDialog::OnFavoriteNodesButtonClicked()
+{
+  for (auto node : m_SelectedNodes)
+  {
+    node->SetBoolProperty("org.mitk.selection.favorite", true);
+  }
+}
+
+void QmitkNodeSelectionDialog::OnOK()
+{
+  for (auto node : m_SelectedNodes)
+  {
+    QmitkDataStorageSelectionHistoryInspector::AddNodeToHistory(node);
+  }
+
+  this->accept();
+}
+
+void QmitkNodeSelectionDialog::OnCancel()
+{
+  this->reject();
+}
+
 void QmitkNodeSelectionDialog::AddPanel(QmitkAbstractDataStorageInspector* view, QString name, QString desc)
 {
   view->setParent(this);
   view->SetSelectionMode(m_SelectionMode);
 
   auto tabPanel = new QWidget();
-  tabPanel->setObjectName(QString("tab_")+name);
+  tabPanel->setObjectName(QString("tab_") + name);
   tabPanel->setToolTip(desc);
   m_Controls.tabWidget->insertTab(m_Controls.tabWidget->count(), tabPanel, name);
 
@@ -159,28 +219,4 @@ void QmitkNodeSelectionDialog::AddPanel(QmitkAbstractDataStorageInspector* view,
 
   m_Panels.push_back(view);
   connect(view, &QmitkAbstractDataStorageInspector::CurrentSelectionChanged, this, &QmitkNodeSelectionDialog::OnSelectionChanged);
-}
-
-void QmitkNodeSelectionDialog::OnOK()
-{
-  this->accept();
-}
-
-void QmitkNodeSelectionDialog::OnCancel()
-{
-  this->reject();
-}
-
-void QmitkNodeSelectionDialog::SetSelectionMode(SelectionMode mode)
-{
-  m_SelectionMode = mode;
-  for (auto panel : m_Panels)
-  {
-    panel->SetSelectionMode(mode);
-  }
-}
-
-QmitkNodeSelectionDialog::SelectionMode QmitkNodeSelectionDialog::GetSelectionMode() const
-{
-  return m_SelectionMode;
 }

@@ -3,9 +3,9 @@
 
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.chartexample"
-          name="ChartExample"
+          name="Chart Example"
 		  category="Quantification"
-          class="ChartExample"
+          class="QmitkChartExampleView"
           icon="resources/chart.svg"/>
   </extension>
 

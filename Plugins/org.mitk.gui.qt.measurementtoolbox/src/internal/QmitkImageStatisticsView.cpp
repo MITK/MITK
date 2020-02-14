@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkImageStatisticsView.h"
 
@@ -413,12 +409,18 @@ void QmitkImageStatisticsView::ResetGUIDefault()
 
 std::string QmitkImageStatisticsView::GenerateStatisticsNodeName()
 {
-  auto statisticsNodeName = m_selectedImageNode->GetName();
-  if (m_selectedMaskNode)
+  std::string statisticsNodeName = "";
+
+  if (m_selectedImageNode.IsNotNull())
+  {
+    statisticsNodeName = m_selectedImageNode->GetName();;
+  }
+
+  if (m_selectedMaskNode.IsNotNull())
   {
     statisticsNodeName += "_" + m_selectedMaskNode->GetName();
   }
-  statisticsNodeName += "_statistics";
+  statisticsNodeName += "statistics";
 
   return statisticsNodeName;
 }
@@ -516,7 +518,7 @@ void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
   else // case: calculation was not successfull
   {
     // handle histogram
-    const HistogramType* emptyHistogram = HistogramType::New();
+    auto emptyHistogram = HistogramType::New();
     this->FillHistogramWidget({emptyHistogram}, {m_selectedImageNode->GetName()});
 
     // handle statistics

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
- The Medical Imaging Interaction Toolkit (MITK)
+The Medical Imaging Interaction Toolkit (MITK)
 
- Copyright (c) German Cancer Research Center,
- Division of Medical and Biological Informatics.
- All rights reserved.
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
 
- This software is distributed WITHOUT ANY WARRANTY; without
- even the implied warranty of MERCHANTABILITY or FITNESS FOR
- A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
- See LICENSE.txt or http://www.mitk.org for details.
-
- ===================================================================*/
+============================================================================*/
 
 #ifndef QMITKRENDERWINDOW_H
 #define QMITKRENDERWINDOW_H
@@ -44,9 +40,7 @@ public:
   QmitkRenderWindow(
     QWidget *parent = nullptr,
     const QString &name = "unnamed renderwindow",
-    mitk::VtkPropRenderer *renderer = nullptr,
-    mitk::RenderingManager *renderingManager = nullptr,
-    mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing);
+    mitk::VtkPropRenderer *renderer = nullptr);
   ~QmitkRenderWindow() override;
 
   /**
@@ -108,7 +102,7 @@ protected:
 
   // Overloaded resize handler, see decs in QVTKOpenGLWidget.
   // Basically, we have to ensure the VTK rendering is updated for each change in window size.
-  void resizeGL(int w, int h) Q_DECL_OVERRIDE;
+  void resizeGL(int w, int h) override;
 
   /// \brief Simply says we accept the event type.
   void dragEnterEvent(QDragEnterEvent *event) override;

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
- The Medical Imaging Interaction Toolkit (MITK)
+The Medical Imaging Interaction Toolkit (MITK)
 
- Copyright (c) German Cancer Research Center,
- Division of Medical and Biological Informatics.
- All rights reserved.
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
 
- This software is distributed WITHOUT ANY WARRANTY; without
- even the implied warranty of MERCHANTABILITY or FITNESS FOR
- A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
- See LICENSE.txt or http://www.mitk.org for details.
-
- ===================================================================*/
+============================================================================*/
 
 #include "QmitkRenderWindow.h"
 
@@ -37,7 +33,7 @@
 #include "QmitkMimeTypes.h"
 #include "QmitkRenderWindowMenu.h"
 
-QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const QString &name, mitk::VtkPropRenderer *, mitk::RenderingManager *renderingManager, mitk::BaseRenderer::RenderingMode::Type renderingMode)
+QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const QString &name, mitk::VtkPropRenderer *)
   : QVTKOpenGLWidget(parent)
   , m_ResendQtEvents(true)
   , m_MenuWidget(nullptr)
@@ -50,7 +46,7 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const QString &name, mitk:
 
   SetRenderWindow(m_InternalRenderWindow);
 
-  Initialize(renderingManager, name.toStdString().c_str(), renderingMode);
+  Initialize(name.toStdString().c_str());
 
   setFocusPolicy(Qt::StrongFocus);
   setMouseTracking(true);
@@ -266,8 +262,8 @@ void QmitkRenderWindow::leaveEvent(QEvent *e)
 
 void QmitkRenderWindow::resizeGL(int w, int h)
 {
-  this->GetRenderer()->GetRenderingManager()->ForceImmediateUpdate(GetRenderWindow());
   QVTKOpenGLWidget::resizeGL(w, h);
+  mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(GetRenderWindow());
 }
 
 void QmitkRenderWindow::dragEnterEvent(QDragEnterEvent *event)

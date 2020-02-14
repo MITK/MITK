@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
- The Medical Imaging Interaction Toolkit (MITK)
+The Medical Imaging Interaction Toolkit (MITK)
 
- Copyright (c) German Cancer Research Center,
- Division of Medical Image Computing.
- All rights reserved.
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
 
- This software is distributed WITHOUT ANY WARRANTY; without
- even the implied warranty of MERCHANTABILITY or FITNESS FOR
- A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
- See LICENSE.txt or http://www.mitk.org for details.
-
- ===================================================================*/
+============================================================================*/
 
 #ifndef MITKDISPLAYACTIONEVENTBROADCAST_H
 #define MITKDISPLAYACTIONEVENTBROADCAST_H
@@ -36,9 +32,9 @@ namespace mitk
   class MITKCORE_EXPORT DisplayActionEventBroadcast : public EventStateMachine, public InteractionEventObserver
   {
   public:
-    mitkClassMacro(DisplayActionEventBroadcast, EventStateMachine)
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    mitkClassMacro(DisplayActionEventBroadcast, EventStateMachine);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     /**
     * By this function this observer is notified about about every 'InteractionEvent'.

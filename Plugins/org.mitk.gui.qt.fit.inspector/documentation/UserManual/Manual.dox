@@ -7,18 +7,18 @@
 
 \section FIT_INSPECTOR_Introduction Introduction
 This view (Model Fit Inspector; MFI) offers the possibility to display the time course of the signal within an individual
-voxel (with or without fit). 
+voxel (with or without fit).
 
 \section FIT_INSPECTOR_Contact Contact information
 This plug-in is being developed by the SIDT group (Software development for Integrated Diagnostics
-and Therapy) at the DKFZ (German Cancer Research Center). If you have any questions, need support,
+and Therapy) at the German Cancer Research Center (DKFZ). If you have any questions, need support,
 find a bug or have a feature request, feel free to contact us at www.mitk.org.
 
 \section FIT_INSPECTOR_Raw Viewing without a model fit
 \imageMacro{fit_inspect_raw.png, "Example screen shot showing the inspection of raw dynamic data without a fit.", 10}
 Open the view and select the dynamic image in the data manager.
 The graph plot will show the time course of image intensities (signal) in the selected voxel (cross hair) as red data points.
-The blue point indicates the frame currently displayed in the 4-window view. 
+The blue point indicates the frame currently displayed in the 4-window view.
 
 \section FIT_INSPECTOR_Fit Viewing without a model fit
 \imageMacro{fit_inspect_fit.png, "Example screen shot showing the inspection of dynamic data and an associated fit.", 10}
@@ -28,12 +28,12 @@ the utilized AIF (averaged over AIF mask) is also displayed (default in green). 
 For ROI based fits, the MFI will display both the current data curve in the selected voxel (in red)
 and the ROI-averaged fitted curve (in dark green, can be adjusted). Scrolling through the individual voxels will change
 the current data curve, but the ROI-based curve remains the same. If voxels outside the fitted area defined by the mask
-are selected, the raw data voxel values will be displayed, however no black fit line is visualized. 
+are selected, the raw data voxel values will be displayed, however no black fit line is visualized.
 
-Below the data plot, several options for data visualization can be selected: 
+Below the data plot, several options for data visualization can be selected:
 \subsection FIT_INSPECTOR_Fit_info Fit info tab
 \imageMacro{fit_inspect_info.png, "Details of the fit info tab.", 5}
-The Fit info tab displays meta-data for selected fits performed on the displayed data set. If no fit was performed and only raw data is visualized, the fields are empty. 
+The Fit info tab displays meta-data for selected fits performed on the displayed data set. If no fit was performed and only raw data is visualized, the fields are empty.
 
 \subsection FIT_INSPECTOR_Fit_Parameter Fit parameter tab
 \imageMacro{fit_inspect_results.png, "Details of the fit parameter tab.", 5}

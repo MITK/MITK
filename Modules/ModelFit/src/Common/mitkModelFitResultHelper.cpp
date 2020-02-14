@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkModelFitResultHelper.h"
 
@@ -49,7 +45,7 @@ namespace mitk
       if (dataType == modelFit::Parameter::ParameterType)
       {
         data->GetPropertyList()->SetStringProperty(ModelFitConstants::PARAMETER_TYPE_PROPERTY_NAME().c_str(), ModelFitConstants::PARAMETER_TYPE_VALUE_PARAMETER().c_str());
-      }    
+      }
       else if (dataType == modelFit::Parameter::DerivedType)
       {
         data->GetPropertyList()->SetStringProperty(ModelFitConstants::PARAMETER_TYPE_PROPERTY_NAME().c_str(), ModelFitConstants::PARAMETER_TYPE_VALUE_DERIVED_PARAMETER().c_str());
@@ -57,7 +53,7 @@ namespace mitk
       else if (dataType == modelFit::Parameter::CriterionType)
       {
         data->GetPropertyList()->SetStringProperty(ModelFitConstants::PARAMETER_TYPE_PROPERTY_NAME().c_str(), ModelFitConstants::PARAMETER_TYPE_VALUE_CRITERION().c_str());
-      } 
+      }
       else if (dataType == modelFit::Parameter::EvaluationType)
       {
         data->GetPropertyList()->SetStringProperty(ModelFitConstants::PARAMETER_TYPE_PROPERTY_NAME().c_str(), ModelFitConstants::PARAMETER_TYPE_VALUE_EVALUATION_PARAMETER().c_str());
@@ -196,7 +192,7 @@ mitk::ScalarListLookupTableProperty::Pointer mitk::modelFit::ConvertStaticParame
   {
     table.SetTableValue(pos->first,pos->second);
   }
-  
+
   result->SetValue(table);
 
   return result;
@@ -281,7 +277,7 @@ MITKMODELFIT_EXPORT void mitk::modelFit::StoreResultsInDataStorage(DataStorage* 
     mitk::DICOMQIPropertyHelper::DeriveDICOMSourceProperties(parentNode->GetData(), pos->GetPointer()->GetData());
     mitk::DICOMPMPropertyHelper::DeriveDICOMPMProperties(pos->GetPointer()->GetData());
   }
-  
+
 
 };
 

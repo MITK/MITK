@@ -143,7 +143,7 @@ void QmitkNodeSelectionButton::OnNodeModified(const itk::Object * /*caller*/, co
 {
   if (itk::ModifiedEvent().CheckEvent(&event))
   {
-    this->repaint();
+    this->update();
   }
 }
 
@@ -247,7 +247,7 @@ void QmitkNodeSelectionButton::changeEvent(QEvent *event)
 {
   if (event->type() == QEvent::EnabledChange)
   {
-    this->repaint();
+    this->update();
   }
 }
 
@@ -259,5 +259,5 @@ bool QmitkNodeSelectionButton::GetSelectionIsOptional() const
 void QmitkNodeSelectionButton::SetSelectionIsOptional(bool isOptional)
 {
   m_IsOptional = isOptional;
-  this->repaint();
+  this->update();
 }

@@ -16,7 +16,6 @@ found in the LICENSE file.
 #include <QmitkAbstractView.h>
 
 #include <mitkBoundingShapeInteractor.h>
-#include <mitkWeakPointer.h>
 
 #include "ui_QmitkImageCropperViewControls.h"
 
@@ -72,18 +71,6 @@ protected:
 private:
 
   QWidget* m_ParentWidget;
-  /*!
-  * @brief A pointer to the node of the image to be cropped.
-  */
-  mitk::WeakPointer<mitk::DataNode> m_ImageNode;
-  /*!
-  * @brief A pointer to the node of the bounding box used for cropping.
-  */
-  mitk::WeakPointer<mitk::DataNode> m_BoundingBoxNode;
-  /*!
-  * @brief The cuboid used for cropping.
-  */
-  mitk::GeometryData::Pointer m_BoundingBox;
   /*!
   * @brief Interactor for moving and scaling the cuboid
   */

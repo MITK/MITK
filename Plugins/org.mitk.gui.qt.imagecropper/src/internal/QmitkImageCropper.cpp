@@ -74,9 +74,9 @@ void QmitkImageCropper::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.boundingBoxSelectionWidget, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,
     this, &QmitkImageCropper::OnBoundingBoxSelectionChanged);
 
-  connect(m_Controls.buttonCreateNewBoundingBox, SIGNAL(clicked()), this, SLOT(DoCreateNewBoundingObject()));
-  connect(m_Controls.buttonCropping, SIGNAL(clicked()), this, SLOT(DoCropping()));
-  connect(m_Controls.buttonMasking, SIGNAL(clicked()), this, SLOT(DoMasking()));
+  connect(m_Controls.buttonCreateNewBoundingBox, SIGNAL(clicked()), this, SLOT(OnCreateNewBoundingBox()));
+  connect(m_Controls.buttonCropping, SIGNAL(clicked()), this, SLOT(OnCropping()));
+  connect(m_Controls.buttonMasking, SIGNAL(clicked()), this, SLOT(OnMasking()));
   auto lambda = [this]()
   {
     m_Controls.groupImageSettings->setVisible(!m_Controls.groupImageSettings->isVisible());
@@ -218,34 +218,7 @@ void QmitkImageCropper::OnBoundingBoxSelectionChanged(QList<mitk::DataNode::Poin
   }
 }
 
-void QmitkImageCropper::CreateBoundingShapeInteractor(bool rotationEnabled)
-{
-  if (m_BoundingShapeInteractor.IsNull())
-  {
-    m_BoundingShapeInteractor = mitk::BoundingShapeInteractor::New();
-    m_BoundingShapeInteractor->LoadStateMachine("BoundingShapeInteraction.xml", us::ModuleRegistry::GetModule("MitkBoundingShape"));
-    m_BoundingShapeInteractor->SetEventConfig("BoundingShapeMouseConfig.xml", us::ModuleRegistry::GetModule("MitkBoundingShape"));
-  }
-  m_BoundingShapeInteractor->SetRotationEnabled(rotationEnabled);
-}
-
-mitk::Geometry3D::Pointer QmitkImageCropper::InitializeWithImageGeometry(mitk::BaseGeometry::Pointer geometry)
-{
-  // convert a BaseGeometry into a Geometry3D (otherwise IO is not working properly)
-  if (geometry == nullptr)
-    mitkThrow() << "Geometry is not valid.";
-
-  auto boundingGeometry = mitk::Geometry3D::New();
-  boundingGeometry->SetBounds(geometry->GetBounds());
-  boundingGeometry->SetImageGeometry(geometry->GetImageGeometry());
-  boundingGeometry->SetOrigin(geometry->GetOrigin());
-  boundingGeometry->SetSpacing(geometry->GetSpacing());
-  boundingGeometry->SetIndexToWorldTransform(geometry->GetIndexToWorldTransform());
-  boundingGeometry->Modified();
-  return boundingGeometry;
-}
-
-void QmitkImageCropper::DoCreateNewBoundingObject()
+void QmitkImageCropper::OnCreateNewBoundingBox()
 {
   auto imageNode = m_Controls.imageSelectionWidget->GetSelectedNode();
   if (imageNode.IsNull())
@@ -290,19 +263,46 @@ void QmitkImageCropper::DoCreateNewBoundingObject()
   m_Controls.boundingBoxSelectionWidget->SetCurrentSelectedNode(boundingBoxNode);
 }
 
+void QmitkImageCropper::OnCropping()
+{
+  this->ProcessImage(false);
+}
+
+void QmitkImageCropper::OnMasking()
+{
+  this->ProcessImage(true);
+}
+
 void QmitkImageCropper::OnSliderValueChanged(int slidervalue)
 {
   m_CropOutsideValue = slidervalue;
 }
 
-void QmitkImageCropper::DoMasking()
+void QmitkImageCropper::CreateBoundingShapeInteractor(bool rotationEnabled)
 {
-  this->ProcessImage(true);
+  if (m_BoundingShapeInteractor.IsNull())
+  {
+    m_BoundingShapeInteractor = mitk::BoundingShapeInteractor::New();
+    m_BoundingShapeInteractor->LoadStateMachine("BoundingShapeInteraction.xml", us::ModuleRegistry::GetModule("MitkBoundingShape"));
+    m_BoundingShapeInteractor->SetEventConfig("BoundingShapeMouseConfig.xml", us::ModuleRegistry::GetModule("MitkBoundingShape"));
+  }
+  m_BoundingShapeInteractor->SetRotationEnabled(rotationEnabled);
 }
 
-void QmitkImageCropper::DoCropping()
+mitk::Geometry3D::Pointer QmitkImageCropper::InitializeWithImageGeometry(mitk::BaseGeometry::Pointer geometry)
 {
-  this->ProcessImage(false);
+  // convert a BaseGeometry into a Geometry3D (otherwise IO is not working properly)
+  if (geometry == nullptr)
+    mitkThrow() << "Geometry is not valid.";
+
+  auto boundingGeometry = mitk::Geometry3D::New();
+  boundingGeometry->SetBounds(geometry->GetBounds());
+  boundingGeometry->SetImageGeometry(geometry->GetImageGeometry());
+  boundingGeometry->SetOrigin(geometry->GetOrigin());
+  boundingGeometry->SetSpacing(geometry->GetSpacing());
+  boundingGeometry->SetIndexToWorldTransform(geometry->GetIndexToWorldTransform());
+  boundingGeometry->Modified();
+  return boundingGeometry;
 }
 
 void QmitkImageCropper::ProcessImage(bool mask)

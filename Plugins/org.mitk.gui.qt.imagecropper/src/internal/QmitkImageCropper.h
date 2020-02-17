@@ -26,67 +26,60 @@ class QmitkImageCropper : public QmitkAbstractView
 
 public:
 
+  static const std::string VIEW_ID;
+
   QmitkImageCropper(QObject *parent = nullptr);
 
   ~QmitkImageCropper() override;
-
-  static const std::string VIEW_ID;
 
   void CreateQtPartControl(QWidget *parent) override;
 
   void SetFocus() override { };
 
 protected Q_SLOTS:
+
   /*!
-  * @brief Creates a new bounding object
+  * @brief Updates current selection of the image to crop
   */
-  virtual void DoCreateNewBoundingObject();
-  /*!
-  * @brief Whenever Crop button is pressed, issue a cropping action
-  */
-  void DoCropping();
-  /*!
-  * @brief Whenever Mask button is pressed, issue a masking action
-  */
-  void DoMasking();
-  /*!
-* @brief Updates current selection of the image to crop
-*/
   void OnImageSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
   /*!
   * @brief Updates current selection of the bounding object
   */
   void OnBoundingBoxSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
   /*!
+  * @brief Creates a new bounding object
+  */
+  void OnCreateNewBoundingBox();
+  /*!
+  * @brief Whenever Crop button is pressed, issue a cropping action
+  */
+  void OnCropping();
+  /*!
+  * @brief Whenever Mask button is pressed, issue a masking action
+  */
+  void OnMasking();
+  /*!
   * @brief Sets the scalar value for outside pixels in case of masking
   */
   void OnSliderValueChanged(int slidervalue);
 
-protected:
-
-  /*!
-  * @brief Initializes a new bounding shape using the selected image geometry.
-  */
-  mitk::Geometry3D::Pointer InitializeWithImageGeometry(mitk::BaseGeometry::Pointer geometry);
+private:
 
   void CreateBoundingShapeInteractor(bool rotationEnabled);
 
-private:
-
-  QWidget* m_ParentWidget;
-  /*!
-  * @brief Interactor for moving and scaling the cuboid
-  */
-  mitk::BoundingShapeInteractor::Pointer m_BoundingShapeInteractor;
+  // initializes a new bounding shape using the selected image geometry.
+  mitk::Geometry3D::Pointer InitializeWithImageGeometry(mitk::BaseGeometry::Pointer geometry);
 
   void ProcessImage(bool crop);
 
-  /*!
-  * @brief Resets GUI to default
-  */
   void SetDefaultGUI();
 
   QString AdaptBoundingObjectName(const QString& name) const;
+
+  QWidget* m_ParentWidget;
+
+  // interactor for moving and scaling the cuboid
+  mitk::BoundingShapeInteractor::Pointer m_BoundingShapeInteractor;
 
   // cropping parameter
   mitk::ScalarType m_CropOutsideValue;

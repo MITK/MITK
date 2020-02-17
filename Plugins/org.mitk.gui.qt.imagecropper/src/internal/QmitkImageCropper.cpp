@@ -91,6 +91,93 @@ void QmitkImageCropper::CreateQtPartControl(QWidget *parent)
   m_ParentWidget = parent;
 }
 
+void QmitkImageCropper::OnImageSelectionChanged(QList<mitk::DataNode::Pointer>)
+{
+  bool rotationEnabled = false;
+  auto imageNode = m_Controls.imageSelectionWidget->GetSelectedNode();
+  if (imageNode.IsNull())
+  {
+    SetDefaultGUI();
+    return;
+  }
+
+  auto image = dynamic_cast<mitk::Image*>(imageNode->GetData());
+  if (nullptr != image)
+  {
+    if (image->GetDimension() < 3)
+    {
+      QMessageBox::warning(nullptr,
+        tr("Invalid image selected"),
+        tr("ImageCropper only works with 3 or more dimensions."),
+        QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
+      SetDefaultGUI();
+      return;
+    }
+
+    m_ParentWidget->setEnabled(true);
+    m_Controls.buttonCreateNewBoundingBox->setEnabled(true);
+
+    vtkSmartPointer<vtkMatrix4x4> imageMat = image->GetGeometry()->GetVtkMatrix();
+    // check whether the image geometry is rotated; if so, no pixel aligned cropping or masking can be performed
+    if ((imageMat->GetElement(1, 0) == 0.0) && (imageMat->GetElement(0, 1) == 0.0) &&
+      (imageMat->GetElement(1, 2) == 0.0) && (imageMat->GetElement(2, 1) == 0.0) &&
+      (imageMat->GetElement(2, 0) == 0.0) && (imageMat->GetElement(0, 2) == 0.0))
+    {
+      rotationEnabled = false;
+      m_Controls.labelWarningRotation->setVisible(false);
+    }
+    else
+    {
+      rotationEnabled = true;
+      m_Controls.labelWarningRotation->setStyleSheet(" QLabel { color: rgb(255, 0, 0) }");
+      m_Controls.labelWarningRotation->setVisible(true);
+    }
+
+    this->CreateBoundingShapeInteractor(rotationEnabled);
+
+    if (itk::ImageIOBase::SCALAR == image->GetPixelType().GetPixelType())
+    {
+      // Might be changed with the upcoming new image statistics plugin
+      //(recomputation might be very expensive for large images ;) )
+      auto statistics = image->GetStatistics();
+      auto minPixelValue = statistics->GetScalarValueMin();
+      auto maxPixelValue = statistics->GetScalarValueMax();
+
+      if (minPixelValue < std::numeric_limits<int>::min())
+      {
+        minPixelValue = std::numeric_limits<int>::min();
+      }
+      if (maxPixelValue > std::numeric_limits<int>::max())
+      {
+        maxPixelValue = std::numeric_limits<int>::max();
+      }
+
+      m_Controls.spinBoxOutsidePixelValue->setEnabled(true);
+      m_Controls.spinBoxOutsidePixelValue->setMaximum(static_cast<int>(maxPixelValue));
+      m_Controls.spinBoxOutsidePixelValue->setMinimum(static_cast<int>(minPixelValue));
+      m_Controls.spinBoxOutsidePixelValue->setValue(static_cast<int>(minPixelValue));
+    }
+    else
+    {
+      m_Controls.spinBoxOutsidePixelValue->setEnabled(false);
+    }
+
+    unsigned int dim = image->GetDimension();
+    if (dim < 2 || dim > 4)
+    {
+      m_ParentWidget->setEnabled(false);
+    }
+
+    if (m_Controls.boundingBoxSelectionWidget->GetSelectedNode().IsNotNull())
+    {
+      m_Controls.buttonCropping->setEnabled(true);
+      m_Controls.buttonMasking->setEnabled(true);
+      m_Controls.buttonAdvancedSettings->setEnabled(true);
+      m_Controls.groupImageSettings->setEnabled(true);
+    }
+  }
+}
+
 void QmitkImageCropper::OnBoundingBoxSelectionChanged(QList<mitk::DataNode::Pointer>)
 {
   auto boundingBoxNode = m_Controls.boundingBoxSelectionWidget->GetSelectedNode();
@@ -201,93 +288,6 @@ void QmitkImageCropper::DoCreateNewBoundingObject()
   }
 
   m_Controls.boundingBoxSelectionWidget->SetCurrentSelectedNode(boundingBoxNode);
-}
-
-void QmitkImageCropper::OnImageSelectionChanged(QList<mitk::DataNode::Pointer>)
-{
-  bool rotationEnabled = false;
-  auto imageNode = m_Controls.imageSelectionWidget->GetSelectedNode();
-  if (imageNode.IsNull())
-  {
-    SetDefaultGUI();
-    return;
-  }
-
-  auto image = dynamic_cast<mitk::Image*>(imageNode->GetData());
-  if (nullptr != image)
-  {
-    if (image->GetDimension() < 3)
-    {
-      QMessageBox::warning(nullptr,
-        tr("Invalid image selected"),
-        tr("ImageCropper only works with 3 or more dimensions."),
-        QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
-      SetDefaultGUI();
-      return;
-    }
-
-    m_ParentWidget->setEnabled(true);
-    m_Controls.buttonCreateNewBoundingBox->setEnabled(true);
-
-    vtkSmartPointer<vtkMatrix4x4> imageMat = image->GetGeometry()->GetVtkMatrix();
-    // check whether the image geometry is rotated; if so, no pixel aligned cropping or masking can be performed
-    if ((imageMat->GetElement(1, 0) == 0.0) && (imageMat->GetElement(0, 1) == 0.0) &&
-      (imageMat->GetElement(1, 2) == 0.0) && (imageMat->GetElement(2, 1) == 0.0) &&
-      (imageMat->GetElement(2, 0) == 0.0) && (imageMat->GetElement(0, 2) == 0.0))
-    {
-      rotationEnabled = false;
-      m_Controls.labelWarningRotation->setVisible(false);
-    }
-    else
-    {
-      rotationEnabled = true;
-      m_Controls.labelWarningRotation->setStyleSheet(" QLabel { color: rgb(255, 0, 0) }");
-      m_Controls.labelWarningRotation->setVisible(true);
-    }
-
-    this->CreateBoundingShapeInteractor(rotationEnabled);
-
-    if (itk::ImageIOBase::SCALAR == image->GetPixelType().GetPixelType())
-    {
-      // Might be changed with the upcoming new image statistics plugin
-      //(recomputation might be very expensive for large images ;) )
-      auto statistics = image->GetStatistics();
-      auto minPixelValue = statistics->GetScalarValueMin();
-      auto maxPixelValue = statistics->GetScalarValueMax();
-
-      if (minPixelValue < std::numeric_limits<int>::min())
-      {
-        minPixelValue = std::numeric_limits<int>::min();
-      }
-      if (maxPixelValue > std::numeric_limits<int>::max())
-      {
-        maxPixelValue = std::numeric_limits<int>::max();
-      }
-
-      m_Controls.spinBoxOutsidePixelValue->setEnabled(true);
-      m_Controls.spinBoxOutsidePixelValue->setMaximum(static_cast<int>(maxPixelValue));
-      m_Controls.spinBoxOutsidePixelValue->setMinimum(static_cast<int>(minPixelValue));
-      m_Controls.spinBoxOutsidePixelValue->setValue(static_cast<int>(minPixelValue));
-    }
-    else
-    {
-      m_Controls.spinBoxOutsidePixelValue->setEnabled(false);
-    }
-
-    unsigned int dim = image->GetDimension();
-    if (dim < 2 || dim > 4)
-    {
-      m_ParentWidget->setEnabled(false);
-    }
-
-    if (m_Controls.boundingBoxSelectionWidget->GetSelectedNode().IsNotNull())
-    {
-      m_Controls.buttonCropping->setEnabled(true);
-      m_Controls.buttonMasking->setEnabled(true);
-      m_Controls.buttonAdvancedSettings->setEnabled(true);
-      m_Controls.groupImageSettings->setEnabled(true);
-    }
-  }
 }
 
 void QmitkImageCropper::OnSliderValueChanged(int slidervalue)

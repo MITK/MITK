@@ -50,6 +50,10 @@ protected Q_SLOTS:
   */
   void DoMasking();
   /*!
+* @brief Updates current selection of the image to crop
+*/
+  void OnImageSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
+  /*!
   * @brief Updates current selection of the bounding object
   */
   void OnBoundingBoxSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
@@ -60,7 +64,6 @@ protected Q_SLOTS:
 
 protected:
 
-  void OnImageSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
   /*!
   * @brief Initializes a new bounding shape using the selected image geometry.
   */

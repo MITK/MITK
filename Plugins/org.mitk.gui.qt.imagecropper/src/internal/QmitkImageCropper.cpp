@@ -77,11 +77,12 @@ void QmitkImageCropper::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.buttonCreateNewBoundingBox, SIGNAL(clicked()), this, SLOT(DoCreateNewBoundingObject()));
   connect(m_Controls.buttonCropping, SIGNAL(clicked()), this, SLOT(DoCropping()));
   connect(m_Controls.buttonMasking, SIGNAL(clicked()), this, SLOT(DoMasking()));
-  connect(m_Controls.buttonAdvancedSettings, &ctkExpandButton::clicked,
-    this, [this]()
+  auto lambda = [this]()
   {
     m_Controls.groupImageSettings->setVisible(!m_Controls.groupImageSettings->isVisible());
-  });
+  };
+
+  connect(m_Controls.buttonAdvancedSettings, &ctkExpandButton::clicked, this, lambda);
 
   connect(m_Controls.spinBoxOutsidePixelValue, SIGNAL(valueChanged(int)), this, SLOT(OnSliderValueChanged(int)));
 

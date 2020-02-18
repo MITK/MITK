@@ -13,12 +13,12 @@ found in the LICENSE file.
 #include <mitkBoundingShapeObjectFactory.h>
 
 #include "mitkPluginActivator.h"
-#include "QmitkImageCropper.h"
+#include "QmitkImageCropperView.h"
 
 void mitk::mitkPluginActivator::start(ctkPluginContext* context)
 {
   RegisterBoundingShapeObjectFactory();
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkImageCropper, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkImageCropperView, context)
 }
 
 void mitk::mitkPluginActivator::stop(ctkPluginContext*)

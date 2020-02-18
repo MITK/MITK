@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkImageCropper_h
-#define QmitkImageCropper_h
+#ifndef QmitkImageCropperView_h
+#define QmitkImageCropperView_h
 
 #include <QmitkAbstractView.h>
 
@@ -19,7 +19,7 @@ found in the LICENSE file.
 
 #include "ui_QmitkImageCropperViewControls.h"
 
-class QmitkImageCropper : public QmitkAbstractView
+class QmitkImageCropperView : public QmitkAbstractView
 {
 
   Q_OBJECT
@@ -28,9 +28,9 @@ public:
 
   static const std::string VIEW_ID;
 
-  QmitkImageCropper(QObject *parent = nullptr);
+  QmitkImageCropperView(QObject *parent = nullptr);
 
-  ~QmitkImageCropper() override;
+  ~QmitkImageCropperView() override;
 
   void CreateQtPartControl(QWidget *parent) override;
 
@@ -87,4 +87,4 @@ private:
   Ui::QmitkImageCropperViewControls m_Controls;
 };
 
-#endif // QmitkImageCropper_h
+#endif // QmitkImageCropperView_h

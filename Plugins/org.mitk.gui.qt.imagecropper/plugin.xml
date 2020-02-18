@@ -9,7 +9,7 @@
       name="Image Cropper"
       category="General"
       icon="resources/crop.svg"
-      class="QmitkImageCropper" >
+      class="QmitkImageCropperView" >
       <description>Crop images to a given size</description>
       <keywordReference id="org.mitk.views.imagecropper.ViewKeyword"/>
     </view>

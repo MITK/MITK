@@ -1,10 +1,6 @@
-set(SRC_CPP_FILES
-
-)
-
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
-  QmitkImageCropper.cpp
+  QmitkImageCropperView.cpp
 )
 
 set(UI_FILES
@@ -13,7 +9,7 @@ set(UI_FILES
 
 set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
-  src/internal/QmitkImageCropper.h
+  src/internal/QmitkImageCropperView.h
 )
 
 set(CACHED_RESOURCE_FILES

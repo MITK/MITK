@@ -30,37 +30,26 @@ found in the LICENSE file.
 #include <mitkStatisticsToImageRelationRule.h>
 #include <mitkStatisticsToMaskRelationRule.h>
 #include <mitkStatusBar.h>
+#include <qthreadpool.h>
 
 #include "mitkImageStatisticsContainerManager.h"
 #include <mitkPlanarFigureInteractor.h>
 
 const std::string QmitkImageStatisticsView::VIEW_ID = "org.mitk.views.imagestatistics";
 
-QmitkImageStatisticsView::QmitkImageStatisticsView(QObject * /*parent*/, const char * /*name*/)
-{
-  this->m_CalculationJob = new QmitkImageStatisticsCalculationJob();
-}
-
 QmitkImageStatisticsView::~QmitkImageStatisticsView()
 {
-  if (m_selectedPlanarFigure)
+  if (nullptr != m_selectedPlanarFigure)
   {
     m_selectedPlanarFigure->RemoveObserver(m_PlanarFigureObserverTag);
   }
-
-  if (!m_CalculationJob->isFinished())
-  {
-    m_CalculationJob->terminate();
-    m_CalculationJob->wait();
-  }
-  this->m_CalculationJob->deleteLater();
 }
 
 void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  m_Controls.widget_histogram->SetTheme(this->GetColorTheme());
-  m_Controls.widget_intensityProfile->SetTheme(this->GetColorTheme());
+  m_Controls.widget_histogram->SetTheme(GetColorTheme());
+  m_Controls.widget_intensityProfile->SetTheme(GetColorTheme());
   m_Controls.groupBox_histogram->setVisible(true);
   m_Controls.groupBox_intensityProfile->setVisible(false);
   m_Controls.label_currentlyComputingStatistics->setVisible(false);
@@ -72,201 +61,62 @@ void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
   m_Controls.sliderWidget_intensityProfile->setVisible(false);
   ResetGUI();
 
-  PrepareDataStorageComboBoxes();
-  m_Controls.widget_statistics->SetDataStorage(this->GetDataStorage());
+  m_Controls.widget_statistics->SetDataStorage(GetDataStorage());
   CreateConnections();
 }
 
 void QmitkImageStatisticsView::CreateConnections()
 {
-  connect(this->m_CalculationJob,
-          &QmitkImageStatisticsCalculationJob::finished,
-          this,
-          &QmitkImageStatisticsView::OnStatisticsCalculationEnds,
-          Qt::QueuedConnection);
-  connect(this->m_Controls.checkBox_ignoreZero,
-          &QCheckBox::stateChanged,
-          this,
-          &QmitkImageStatisticsView::OnCheckBoxIgnoreZeroStateChanged);
-  connect(this->m_Controls.sliderWidget_histogram,
-          &ctkSliderWidget::valueChanged,
-          this,
-          &QmitkImageStatisticsView::OnSliderWidgetHistogramChanged);
-  connect(this->m_Controls.sliderWidget_intensityProfile,
-          &ctkSliderWidget::valueChanged,
-          this,
-          &QmitkImageStatisticsView::OnSliderWidgetIntensityProfileChanged);
-  connect(this->m_Controls.imageSelector,
-          static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-          this,
-          &QmitkImageStatisticsView::OnImageSelectorChanged);
-  connect(this->m_Controls.maskImageSelector,
-          static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-          this,
-          &QmitkImageStatisticsView::OnMaskSelectorChanged);
+  connect(m_Controls.checkBox_ignoreZero, &QCheckBox::stateChanged,
+    this, &QmitkImageStatisticsView::OnCheckBoxIgnoreZeroStateChanged);
+  connect(m_Controls.buttonSelection, &QAbstractButton::clicked,
+    this, &QmitkImageStatisticsView::OnButtonSelectionPressed);
 }
 
-void QmitkImageStatisticsView::OnCheckBoxIgnoreZeroStateChanged(int state)
+void QmitkImageStatisticsView::CalculateOrGetMultiStatistics()
 {
-  m_ForceRecompute = true;
-  if (state != Qt::Unchecked)
-  {
-    this->m_CalculationJob->SetIgnoreZeroValueVoxel(true);
-  }
-  else
-  {
-    this->m_CalculationJob->SetIgnoreZeroValueVoxel(false);
-  }
-  CalculateOrGetStatistics();
-}
+  m_selectedImageNode = nullptr;
+  m_selectedMaskNode = nullptr;
 
-void QmitkImageStatisticsView::OnSliderWidgetHistogramChanged(double value)
-{
-  unsigned int timeStep = static_cast<unsigned int>(value);
-  auto mask = m_selectedMaskNode ? m_selectedMaskNode->GetData() : nullptr;
-  auto imageStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(
-    this->GetDataStorage(), m_selectedImageNode->GetData(), mask);
-  HistogramType::ConstPointer histogram = nullptr;
-  if (imageStatistics->TimeStepExists(timeStep))
+  if (m_selectedImageNodes.empty())
   {
-    histogram = imageStatistics->GetStatisticsForTimeStep(timeStep).m_Histogram;
+    // no images selected; reset everything
+    ResetGUI();
   }
 
-  if (this->m_CalculationJob->GetStatisticsUpdateSuccessFlag())
+  for (auto imageNode : m_selectedImageNodes)
   {
-    if (histogram.IsNotNull())
+    m_selectedImageNode = imageNode;
+
+    if (m_selectedMaskNodes.empty())
     {
-      this->FillHistogramWidget({histogram}, {m_selectedImageNode->GetName()});
-    }
-    else
-    {
-      HistogramType::Pointer emptyHistogram = HistogramType::New();
-      this->FillHistogramWidget({emptyHistogram}, {m_selectedImageNode->GetName()});
-    }
-  }
-}
-
-void QmitkImageStatisticsView::OnSliderWidgetIntensityProfileChanged()
-{
-  // intensity profile is always computed on request, not stored as node in DataStorage
-  auto image = dynamic_cast<mitk::Image *>(m_selectedImageNode->GetData());
-  auto planarFigure = dynamic_cast<mitk::PlanarFigure *>(m_selectedMaskNode->GetData());
-
-  if (image && planarFigure && this->m_CalculationJob->GetStatisticsUpdateSuccessFlag())
-  {
-    this->ComputeAndDisplayIntensityProfile(image, planarFigure);
-  }
-}
-
-void QmitkImageStatisticsView::PartClosed(const berry::IWorkbenchPartReference::Pointer &) {}
-
-void QmitkImageStatisticsView::FillHistogramWidget(const std::vector<const HistogramType *> &histogram,
-                                                   const std::vector<std::string> &dataLabels)
-{
-  m_Controls.groupBox_histogram->setVisible(true);
-  m_Controls.widget_histogram->SetTheme(this->GetColorTheme());
-  m_Controls.widget_histogram->Reset();
-  m_Controls.widget_histogram->SetHistogram(histogram.front(), dataLabels.front());
-  connect(m_Controls.widget_histogram,
-          &QmitkHistogramVisualizationWidget::RequestHistogramUpdate,
-          this,
-          &QmitkImageStatisticsView::OnRequestHistogramUpdate);
-}
-
-QmitkChartWidget::ColorTheme QmitkImageStatisticsView::GetColorTheme() const
-{
-  ctkPluginContext *context = berry::WorkbenchPlugin::GetDefault()->GetPluginContext();
-  ctkServiceReference styleManagerRef = context->getServiceReference<berry::IQtStyleManager>();
-  if (styleManagerRef)
-  {
-    auto styleManager = context->getService<berry::IQtStyleManager>(styleManagerRef);
-    if (styleManager->GetStyle().name == "Dark")
-    {
-      return QmitkChartWidget::ColorTheme::darkstyle;
-    }
-    else
-    {
-      return QmitkChartWidget::ColorTheme::lightstyle;
-    }
-  }
-  return QmitkChartWidget::ColorTheme::darkstyle;
-}
-
-void QmitkImageStatisticsView::OnImageSelectorChanged()
-{
-  auto selectedImageNode = m_Controls.imageSelector->GetSelectedNode();
-  if (selectedImageNode != m_selectedImageNode)
-  {
-    m_selectedImageNode = selectedImageNode;
-    if (m_selectedImageNode.IsNotNull())
-    {
-      ResetGUIDefault();
-
-      auto isPlanarFigurePredicate = mitk::GetImageStatisticsPlanarFigurePredicate();
-      auto isMaskPredicate = mitk::GetImageStatisticsMaskPredicate();
-      auto hasSameGeometry = mitk::NodePredicateGeometry::New(m_selectedImageNode->GetData()->GetGeometry());
-      hasSameGeometry->SetCheckPrecision(1e-10);
-      auto isMaskWithGeometryPredicate = mitk::NodePredicateAnd::New(isMaskPredicate, hasSameGeometry);
-      auto isMaskOrPlanarFigureWithGeometryPredicate =
-        mitk::NodePredicateOr::New(isPlanarFigurePredicate, isMaskWithGeometryPredicate);
-      // prevent triggering of computation as the predicate triggers a signalChanged event
-      m_Controls.maskImageSelector->disconnect();
-      m_Controls.maskImageSelector->SetPredicate(isMaskOrPlanarFigureWithGeometryPredicate);
-      // reset mask to <none>
-      m_Controls.maskImageSelector->SetZeroEntryText("<none>");
-      m_Controls.checkBox_ignoreZero->setEnabled(true);
-      m_selectedMaskNode = nullptr;
-      m_Controls.widget_statistics->SetMaskNodes({});
       CalculateOrGetStatistics();
-      m_Controls.widget_statistics->SetImageNodes({m_selectedImageNode});
-      connect(this->m_Controls.maskImageSelector,
-              static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-              this,
-              &QmitkImageStatisticsView::OnMaskSelectorChanged);
     }
     else
     {
-      m_Controls.widget_statistics->SetImageNodes({});
-      m_Controls.widget_statistics->SetMaskNodes({});
-      m_Controls.widget_statistics->Reset();
-      m_Controls.widget_histogram->Reset();
-      ResetGUI();
+      for (auto maskNode : m_selectedMaskNodes)
+      {
+        m_selectedMaskNode = maskNode;
+        CalculateOrGetStatistics();
+      }
     }
-  }
-}
-
-void QmitkImageStatisticsView::OnMaskSelectorChanged()
-{
-  auto selectedMaskNode = m_Controls.maskImageSelector->GetSelectedNode();
-  if (selectedMaskNode != m_selectedMaskNode)
-  {
-    m_selectedMaskNode = selectedMaskNode;
-    if (m_selectedMaskNode.IsNotNull())
-    {
-      m_Controls.widget_statistics->SetMaskNodes({m_selectedMaskNode});
-    }
-    else
-    {
-      m_Controls.widget_statistics->SetMaskNodes({});
-    }
-    CalculateOrGetStatistics();
   }
 }
 
 void QmitkImageStatisticsView::CalculateOrGetStatistics()
 {
-  if (this->m_selectedPlanarFigure)
+  if (nullptr != m_selectedPlanarFigure)
   {
-    this->m_selectedPlanarFigure->RemoveObserver(this->m_PlanarFigureObserverTag);
-    this->m_selectedPlanarFigure = nullptr;
+    m_selectedPlanarFigure->RemoveObserver(m_PlanarFigureObserverTag);
+    m_selectedPlanarFigure = nullptr;
   }
 
   m_Controls.groupBox_intensityProfile->setVisible(false);
   m_Controls.widget_statistics->setEnabled(m_selectedImageNode.IsNotNull());
 
-  if (m_selectedImageNode != nullptr)
+  if (nullptr != m_selectedImageNode)
   {
-    auto image = dynamic_cast<mitk::Image *>(m_selectedImageNode->GetData());
+    auto image = dynamic_cast<mitk::Image*>(m_selectedImageNode->GetData());
     mitk::Image *mask = nullptr;
     mitk::PlanarFigure *maskPlanarFigure = nullptr;
 
@@ -281,54 +131,58 @@ void QmitkImageStatisticsView::CalculateOrGetStatistics()
       m_Controls.sliderWidget_histogram->setVisible(false);
     }
 
-    if (m_selectedMaskNode != nullptr)
+    if (nullptr != m_selectedMaskNode)
     {
-      mask = dynamic_cast<mitk::Image *>(m_selectedMaskNode->GetData());
-      if (mask == nullptr)
+      mask = dynamic_cast<mitk::Image*>(m_selectedMaskNode->GetData());
+      if (nullptr == mask)
       {
         maskPlanarFigure = dynamic_cast<mitk::PlanarFigure *>(m_selectedMaskNode->GetData());
       }
     }
 
     mitk::ImageStatisticsContainer::ConstPointer imageStatistics;
-    if (mask)
+    if (nullptr != mask)
     {
-      imageStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(this->GetDataStorage(), image, mask);
+      imageStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(GetDataStorage(), image, mask);
     }
-    else if (maskPlanarFigure)
+    else if (nullptr != maskPlanarFigure)
     {
       m_selectedPlanarFigure = maskPlanarFigure;
       ITKCommandType::Pointer changeListener = ITKCommandType::New();
-      changeListener->SetCallbackFunction(this, &QmitkImageStatisticsView::CalculateOrGetStatistics);
-      this->m_PlanarFigureObserverTag =
+      changeListener->SetCallbackFunction(this, &QmitkImageStatisticsView::CalculateOrGetMultiStatistics);
+      m_PlanarFigureObserverTag =
         m_selectedPlanarFigure->AddObserver(mitk::EndInteractionPlanarFigureEvent(), changeListener);
       if (!maskPlanarFigure->IsClosed())
       {
         ComputeAndDisplayIntensityProfile(image, maskPlanarFigure);
       }
       imageStatistics =
-        mitk::ImageStatisticsContainerManager::GetImageStatistics(this->GetDataStorage(), image, maskPlanarFigure);
+        mitk::ImageStatisticsContainerManager::GetImageStatistics(GetDataStorage(), image, maskPlanarFigure);
     }
     else
     {
-      imageStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(this->GetDataStorage(), image);
+      imageStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(GetDataStorage(), image);
     }
 
     bool imageStatisticsOlderThanInputs = false;
-    if (imageStatistics &&
-        (imageStatistics->GetMTime() < image->GetMTime() || (mask && imageStatistics->GetMTime() < mask->GetMTime()) ||
-         (maskPlanarFigure && imageStatistics->GetMTime() < maskPlanarFigure->GetMTime())))
+    if (nullptr != imageStatistics &&
+       ((nullptr != image && imageStatistics->GetMTime() < image->GetMTime()) ||
+        (nullptr != mask && imageStatistics->GetMTime() < mask->GetMTime()) ||
+        (nullptr != maskPlanarFigure && imageStatistics->GetMTime() < maskPlanarFigure->GetMTime())))
     {
       imageStatisticsOlderThanInputs = true;
     }
 
-    if (imageStatistics)
+    if (nullptr != imageStatistics)
     {
-      // triggers recomputation when switched between images and the newest one has not 100 bins (default)
-      auto calculatedBins = imageStatistics->GetStatisticsForTimeStep(0).m_Histogram.GetPointer()->Size();
-      if (calculatedBins != 100)
+      // triggers re-computation when switched between images and the newest one has not 100 bins (default)
+      if (imageStatistics->TimeStepExists(0))
       {
-        OnRequestHistogramUpdate(m_Controls.widget_histogram->GetBins());
+        auto calculatedBins = imageStatistics->GetStatisticsForTimeStep(0).m_Histogram.GetPointer()->Size();
+        if (calculatedBins != 100)
+        {
+          OnRequestHistogramUpdate(m_Controls.widget_histogram->GetBins());
+        }
       }
     }
 
@@ -346,17 +200,46 @@ void QmitkImageStatisticsView::CalculateOrGetStatistics()
         if (imageStatistics->TimeStepExists(0))
         {
           auto histogram = imageStatistics->GetStatisticsForTimeStep(0).m_Histogram.GetPointer();
-          std::string imageNodeName = m_selectedImageNode->GetName();
-          this->FillHistogramWidget({histogram}, {imageNodeName});
+          auto histogramLabelName = GenerateStatisticsNodeName(image, mask);
+          FillHistogramWidget({ histogram }, { histogramLabelName });
         }
       }
     }
   }
-  else
+}
+
+void QmitkImageStatisticsView::CalculateStatistics(const mitk::Image *image, const mitk::Image *mask,
+                                                   const mitk::PlanarFigure *maskPlanarFigure)
+{
+  auto runnable = new QmitkImageStatisticsCalculationRunnable();
+  runnable->Initialize(image, mask, maskPlanarFigure);
+  runnable->setAutoDelete(false);
+  runnable->SetIgnoreZeroValueVoxel(m_IgnoreZeroValueVoxel);
+  m_Runnables.push_back(runnable);
+  connect(runnable, &QmitkImageStatisticsCalculationRunnable::finished,
+    this, &QmitkImageStatisticsView::OnStatisticsCalculationEnds, Qt::QueuedConnection);
+
+  try
   {
-    ResetGUI();
+    // Compute statistics
+    QThreadPool::globalInstance()->start(runnable);
+    m_Controls.label_currentlyComputingStatistics->setVisible(true);
   }
-  m_ForceRecompute = false;
+  catch (const mitk::Exception &e)
+  {
+    mitk::StatusBar::GetInstance()->DisplayErrorText(e.GetDescription());
+    m_Controls.label_currentlyComputingStatistics->setVisible(false);
+  }
+  catch (const std::runtime_error &e)
+  {
+    mitk::StatusBar::GetInstance()->DisplayErrorText(e.what());
+    m_Controls.label_currentlyComputingStatistics->setVisible(false);
+  }
+  catch (const std::exception &e)
+  {
+    mitk::StatusBar::GetInstance()->DisplayErrorText(e.what());
+    m_Controls.label_currentlyComputingStatistics->setVisible(false);
+  }
 }
 
 void QmitkImageStatisticsView::ComputeAndDisplayIntensityProfile(mitk::Image *image,
@@ -392,48 +275,257 @@ void QmitkImageStatisticsView::ComputeAndDisplayIntensityProfile(mitk::Image *im
                                                           "Intensity Profile of " + m_selectedImageNode->GetName());
 }
 
+void QmitkImageStatisticsView::FillHistogramWidget(const std::vector<const HistogramType*> &histogram,
+                                                   const std::vector<std::string> &dataLabels)
+{
+  m_Controls.groupBox_histogram->setVisible(true);
+  m_Controls.widget_histogram->SetTheme(GetColorTheme());
+  m_Controls.widget_histogram->SetHistogram(histogram.front(), dataLabels.front());
+  connect(m_Controls.widget_histogram, &QmitkHistogramVisualizationWidget::RequestHistogramUpdate,
+          this, &QmitkImageStatisticsView::OnRequestHistogramUpdate);
+}
+
+QmitkChartWidget::ColorTheme QmitkImageStatisticsView::GetColorTheme() const
+{
+  ctkPluginContext *context = berry::WorkbenchPlugin::GetDefault()->GetPluginContext();
+  ctkServiceReference styleManagerRef = context->getServiceReference<berry::IQtStyleManager>();
+  if (styleManagerRef)
+  {
+    auto styleManager = context->getService<berry::IQtStyleManager>(styleManagerRef);
+    if (styleManager->GetStyle().name == "Dark")
+    {
+      return QmitkChartWidget::ColorTheme::darkstyle;
+    }
+    else
+    {
+      return QmitkChartWidget::ColorTheme::lightstyle;
+    }
+  }
+  return QmitkChartWidget::ColorTheme::darkstyle;
+}
+
 void QmitkImageStatisticsView::ResetGUI()
 {
   m_Controls.widget_statistics->Reset();
   m_Controls.widget_statistics->setEnabled(false);
   m_Controls.widget_histogram->Reset();
   m_Controls.widget_histogram->setEnabled(false);
-  m_Controls.checkBox_ignoreZero->setEnabled(false);
 }
 
 void QmitkImageStatisticsView::ResetGUIDefault()
 {
   m_Controls.widget_histogram->ResetDefault();
   m_Controls.checkBox_ignoreZero->setChecked(false);
+  m_IgnoreZeroValueVoxel = false;
 }
 
-std::string QmitkImageStatisticsView::GenerateStatisticsNodeName()
+void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
 {
-  std::string statisticsNodeName = "";
-
-  if (m_selectedImageNode.IsNotNull())
+  auto runnable = qobject_cast<QmitkImageStatisticsCalculationRunnable*>(sender());
+  if (nullptr == runnable)
   {
-    statisticsNodeName = m_selectedImageNode->GetName();;
+    return;
   }
 
-  if (m_selectedMaskNode.IsNotNull())
+  mitk::StatusBar::GetInstance()->Clear();
+
+  auto it = std::find(m_Runnables.begin(), m_Runnables.end(), runnable);
+  if (it != m_Runnables.end())
   {
-    statisticsNodeName += "_" + m_selectedMaskNode->GetName();
+    m_Runnables.erase(it);
   }
-  statisticsNodeName += "statistics";
+
+  auto image = runnable->GetStatisticsImage();
+
+  // get mask
+  const mitk::BaseData* mask = nullptr;
+  if (runnable->GetMaskImage())
+  {
+    mask = runnable->GetMaskImage();
+  }
+  else if (runnable->GetPlanarFigure())
+  {
+    mask = runnable->GetPlanarFigure();
+  }
+
+  // get current statistics
+  auto currentImageStatistics =
+    mitk::ImageStatisticsContainerManager::GetImageStatistics(GetDataStorage(), image, mask);
+
+  if (runnable->GetStatisticsUpdateSuccessFlag()) // case: calculation was successful
+  {
+    auto statistic = runnable->GetStatisticsData();
+
+    SetupRelationRules(image, mask, statistic);
+
+    // checks for existing statistic, and add it to data manager
+    HandleExistingStatistics(image, mask, statistic);
+
+    auto maskPlanarFigure = dynamic_cast<const mitk::PlanarFigure*>(mask);
+    if (!maskPlanarFigure || maskPlanarFigure->IsClosed())
+    {
+      auto histogramLabelName = GenerateStatisticsNodeName(image, mask);
+      FillHistogramWidget({ runnable->GetTimeStepHistogram() }, { histogramLabelName });
+    }
+  }
+  else // case: calculation was not successful
+  {
+    // handle histogram
+    auto emptyHistogram = HistogramType::New();
+    auto histogramLabelName = GenerateStatisticsNodeName(image, mask);
+    FillHistogramWidget({ emptyHistogram }, { histogramLabelName });
+
+    // handle statistics
+    mitk::ImageStatisticsContainer::Pointer statistic = mitk::ImageStatisticsContainer::New();
+    statistic->SetTimeGeometry(const_cast<mitk::TimeGeometry *>(image->GetTimeGeometry()));
+
+    // add empty histogram to statistics for all time steps
+    for (unsigned int i = 0; i < image->GetTimeSteps(); ++i)
+    {
+      auto statisticObject = mitk::ImageStatisticsContainer::ImageStatisticsObject();
+      statisticObject.m_Histogram = emptyHistogram;
+      statistic->SetStatisticsForTimeStep(i, statisticObject);
+    }
+
+    SetupRelationRules(image, mask, statistic);
+
+    HandleExistingStatistics(image, mask, statistic);
+
+    mitk::StatusBar::GetInstance()->DisplayErrorText(runnable->GetLastErrorMessage().c_str());
+    m_Controls.widget_histogram->setEnabled(false);
+  }
+
+  m_Controls.label_currentlyComputingStatistics->setVisible(false);
+}
+
+void QmitkImageStatisticsView::OnRequestHistogramUpdate(unsigned int)
+{
+  // NEEDS TO BE IMPLEMENTED - SEE T27032
+}
+
+void QmitkImageStatisticsView::OnCheckBoxIgnoreZeroStateChanged(int state)
+{
+  m_ForceRecompute = true;
+  m_IgnoreZeroValueVoxel = (state == Qt::Unchecked) ? false : true;
+
+  CalculateOrGetMultiStatistics();
+
+  m_ForceRecompute = false;
+}
+
+void QmitkImageStatisticsView::OnButtonSelectionPressed()
+{
+  m_SelectionDialog = new QmitkNodeSelectionDialog();
+  m_SelectionDialog->SetDataStorage(GetDataStorage());
+  m_SelectionDialog->SetSelectionCheckFunction(CheckForSameGeometry());
+
+  // set predicates
+  auto isPlanarFigurePredicate = mitk::GetImageStatisticsPlanarFigurePredicate();
+  auto isMaskPredicate = mitk::GetImageStatisticsMaskPredicate();
+  auto isImagePredicate = mitk::GetImageStatisticsImagePredicate();
+  auto isMaskOrPlanarFigurePredicate = mitk::NodePredicateOr::New(isPlanarFigurePredicate, isMaskPredicate);
+  auto isImageOrMaskOrPlanarFigurePredicate = mitk::NodePredicateOr::New(isMaskOrPlanarFigurePredicate, isImagePredicate);
+  m_SelectionDialog->SetNodePredicate(isImageOrMaskOrPlanarFigurePredicate);
+  m_SelectionDialog->SetSelectionMode(QAbstractItemView::MultiSelection);
+  connect(m_SelectionDialog, &QmitkNodeSelectionDialog::accepted, this, &QmitkImageStatisticsView::OnDialogSelectionChanged);
+  m_SelectionDialog->show();
+}
+
+void QmitkImageStatisticsView::OnDialogSelectionChanged()
+{
+  m_selectedImageNodes.resize(0);
+  m_selectedMaskNodes.resize(0);
+
+  QmitkNodeSelectionDialog::NodeList selectedNodeList = m_SelectionDialog->GetSelectedNodes();
+  auto isImagePredicate = mitk::GetImageStatisticsImagePredicate();
+  for (const auto& node : selectedNodeList)
+  {
+    if (isImagePredicate->CheckNode(node))
+    {
+      m_selectedImageNodes.push_back(node.GetPointer());
+    }
+    else
+    {
+      m_selectedMaskNodes.push_back(node.GetPointer());
+    }
+  }
+
+  if (!m_selectedImageNodes.empty())
+  {
+    m_Controls.widget_statistics->SetImageNodes(m_selectedImageNodes);
+  }
+
+  if (!m_selectedMaskNodes.empty())
+  {
+    m_Controls.widget_statistics->SetMaskNodes(m_selectedMaskNodes);
+  }
+
+  CalculateOrGetMultiStatistics();
+}
+
+void QmitkImageStatisticsView::HandleExistingStatistics(mitk::Image::ConstPointer image,
+                                                        mitk::BaseData::ConstPointer mask,
+                                                        mitk::ImageStatisticsContainer::Pointer statistic)
+{
+  auto imageStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(GetDataStorage(), image, mask);
+
+  // if statistics base data already exist: add to existing node
+  if (imageStatistics)
+  {
+    auto node = GetNodeForStatisticsContainer(imageStatistics);
+    node->SetData(statistic);
+  }
+  // statistics base data does not exist: add new node
+  else
+  {
+    auto statisticsNodeName = GenerateStatisticsNodeName(image, mask);
+    auto statisticsNode = mitk::CreateImageStatisticsNode(statistic, statisticsNodeName);
+    GetDataStorage()->Add(statisticsNode);
+  }
+}
+
+std::string QmitkImageStatisticsView::GenerateStatisticsNodeName(mitk::Image::ConstPointer image,
+                                                                 mitk::BaseData::ConstPointer mask)
+{
+  std::string statisticsNodeName = "no";
+
+  if (image.IsNotNull())
+  {
+    statisticsNodeName = image->GetUID();
+  }
+
+  if (mask.IsNotNull())
+  {
+    statisticsNodeName += "_" + mask->GetUID();
+  }
+
+  statisticsNodeName += "_statistics";
 
   return statisticsNodeName;
 }
 
-mitk::DataNode::Pointer QmitkImageStatisticsView::GetNodeForStatisticsContainer(
-  mitk::ImageStatisticsContainer::ConstPointer container)
+void QmitkImageStatisticsView::SetupRelationRules(mitk::Image::ConstPointer image,
+                                                  mitk::BaseData::ConstPointer mask,
+                                                  mitk::ImageStatisticsContainer::Pointer statistic)
 {
-  if (!container)
+  auto imageRule = mitk::StatisticsToImageRelationRule::New();
+  imageRule->Connect(statistic, image);
+
+  if (nullptr != mask)
+  {
+    auto maskRule = mitk::StatisticsToMaskRelationRule::New();
+    maskRule->Connect(statistic, mask);
+  }
+}
+
+mitk::DataNode::Pointer QmitkImageStatisticsView::GetNodeForStatisticsContainer(mitk::ImageStatisticsContainer::ConstPointer container)
+{
+  if (container.IsNull())
   {
     mitkThrow() << "Given container is null!";
   }
 
-  auto allDataNodes = this->GetDataStorage()->GetAll()->CastToSTLConstContainer();
+  auto allDataNodes = GetDataStorage()->GetAll()->CastToSTLConstContainer();
   for (auto node : allDataNodes)
   {
     auto nodeData = node->GetData();
@@ -445,184 +537,57 @@ mitk::DataNode::Pointer QmitkImageStatisticsView::GetNodeForStatisticsContainer(
   mitkThrow() << "No DataNode is found which holds the given statistics container!";
 }
 
-void QmitkImageStatisticsView::HandleExistingStatistics(mitk::Image::ConstPointer image,
-                                                        mitk::BaseData::ConstPointer mask,
-                                                        mitk::ImageStatisticsContainer::Pointer statistic)
+QmitkNodeSelectionDialog::SelectionCheckFunctionType QmitkImageStatisticsView::CheckForSameGeometry() const
 {
-  auto imageStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(
-    this->GetDataStorage(), image, mask);
-
-  // if statistics base data already exist: add to existing node
-  if (imageStatistics)
+  auto lambda = [this](const QmitkNodeSelectionDialog::NodeList& nodes)
   {
-    auto node = GetNodeForStatisticsContainer(imageStatistics);
-    node->SetData(statistic);
+    if (nodes.empty())
+    {
+      return std::string();
+    }
+
+    auto leftNode = nodes[0];
+    for (int i = 1; i < nodes.size(); ++i)
+    {
+      auto rightNode = nodes[i];
+
+      bool sameGeometry = CheckForSameGeometry(leftNode, rightNode);
+      if (!sameGeometry)
+      {
+        std::stringstream ss;
+        ss << "<font class=\"warning\"><p>Invalid selection: All selected nodes must have the same geometry.</p>";
+        return ss.str();
+      }
+    }
+
+    return std::string();
+  };
+
+  return lambda;
+}
+
+bool QmitkImageStatisticsView::CheckForSameGeometry(const mitk::DataNode* node1, const mitk::DataNode* node2) const
+{
+  bool isSameGeometry(true);
+
+  mitk::Image* image1 = dynamic_cast<mitk::Image*>(node1->GetData());
+  mitk::Image* image2 = dynamic_cast<mitk::Image*>(node2->GetData());
+  if (image1 && image2)
+  {
+    mitk::BaseGeometry* geo1 = image1->GetGeometry();
+    mitk::BaseGeometry* geo2 = image2->GetGeometry();
+
+    isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetOrigin(), geo2->GetOrigin());
+    isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetExtent(0), geo2->GetExtent(0));
+    isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetExtent(1), geo2->GetExtent(1));
+    isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetExtent(2), geo2->GetExtent(2));
+    isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetSpacing(), geo2->GetSpacing());
+    isSameGeometry = isSameGeometry && mitk::MatrixEqualElementWise(geo1->GetIndexToWorldTransform()->GetMatrix(), geo2->GetIndexToWorldTransform()->GetMatrix());
+
+    return isSameGeometry;
   }
-  // statistics base data does not exist: add new node
   else
   {
-    auto statisticsNodeName = GenerateStatisticsNodeName();
-    auto statisticsNode = mitk::CreateImageStatisticsNode(statistic, statisticsNodeName);
-    this->GetDataStorage()->Add(statisticsNode);
+    return false;
   }
 }
-
-void QmitkImageStatisticsView::SetupRelationRules(mitk::ImageStatisticsContainer::Pointer statistic,
-                                                  mitk::BaseData::ConstPointer mask)
-{
-  auto imageRule = mitk::StatisticsToImageRelationRule::New();
-  imageRule->Connect(statistic, m_CalculationJob->GetStatisticsImage());
-
-  if (mask)
-  {
-    auto maskRule = mitk::StatisticsToMaskRelationRule::New();
-    maskRule->Connect(statistic, mask);
-  }
-}
-
-void QmitkImageStatisticsView::OnStatisticsCalculationEnds()
-{
-  mitk::StatusBar::GetInstance()->Clear();
-
-  auto image = m_CalculationJob->GetStatisticsImage();
-
-  // get mask
-  mitk::BaseData::ConstPointer mask = nullptr;
-  if (m_CalculationJob->GetMaskImage())
-  {
-    mask = m_CalculationJob->GetMaskImage();
-  }
-  else if (m_CalculationJob->GetPlanarFigure())
-  {
-    mask = m_CalculationJob->GetPlanarFigure();
-  }
-
-  // get current statistics
-  auto currentImageStatistics =
-    mitk::ImageStatisticsContainerManager::GetImageStatistics(this->GetDataStorage(), image, mask);
-
-  if (this->m_CalculationJob->GetStatisticsUpdateSuccessFlag()) // case: calculation was successfull
-  {
-    auto statistic = m_CalculationJob->GetStatisticsData();
-
-    SetupRelationRules(statistic, mask);
-
-    // checks for existing statistic, and add it to data manager
-    HandleExistingStatistics(image, mask, statistic);
-
-    if (!m_selectedPlanarFigure || m_selectedPlanarFigure->IsClosed())
-    {
-      this->FillHistogramWidget({m_CalculationJob->GetTimeStepHistogram()}, {m_selectedImageNode->GetName()});
-    }
-  }
-  else // case: calculation was not successfull
-  {
-    // handle histogram
-    auto emptyHistogram = HistogramType::New();
-    this->FillHistogramWidget({emptyHistogram}, {m_selectedImageNode->GetName()});
-
-    // handle statistics
-    mitk::ImageStatisticsContainer::Pointer statistic = mitk::ImageStatisticsContainer::New();
-    statistic->SetTimeGeometry(const_cast<mitk::TimeGeometry *>(image->GetTimeGeometry()));
-
-	// add empty histogram to stastistics for all timesteps
-    for (unsigned int i = 0; i < image->GetTimeSteps(); ++i)
-    {
-      auto statisticObject = mitk::ImageStatisticsContainer::ImageStatisticsObject();
-      statisticObject.m_Histogram = emptyHistogram;
-      statistic->SetStatisticsForTimeStep(i, statisticObject);
-    }
-
-    SetupRelationRules(statistic, mask);
-
-    HandleExistingStatistics(image, mask, statistic);
-
-    mitk::StatusBar::GetInstance()->DisplayErrorText(m_CalculationJob->GetLastErrorMessage().c_str());
-    m_Controls.widget_histogram->setEnabled(false);
-  }
-  m_Controls.label_currentlyComputingStatistics->setVisible(false);
-}
-
-void QmitkImageStatisticsView::OnRequestHistogramUpdate(unsigned int nBins)
-{
-  m_CalculationJob->SetHistogramNBins(nBins);
-  m_CalculationJob->start();
-}
-
-void QmitkImageStatisticsView::CalculateStatistics(const mitk::Image *image,
-                                                   const mitk::Image *mask,
-                                                   const mitk::PlanarFigure *maskPlanarFigure)
-{
-  this->m_CalculationJob->Initialize(image, mask, maskPlanarFigure);
-
-  try
-  {
-    // Compute statistics
-    this->m_CalculationJob->start();
-    m_Controls.label_currentlyComputingStatistics->setVisible(true);
-  }
-  catch (const mitk::Exception &e)
-  {
-    mitk::StatusBar::GetInstance()->DisplayErrorText(e.GetDescription());
-    m_Controls.label_currentlyComputingStatistics->setVisible(false);
-  }
-  catch (const std::runtime_error &e)
-  {
-    mitk::StatusBar::GetInstance()->DisplayErrorText(e.what());
-    m_Controls.label_currentlyComputingStatistics->setVisible(false);
-  }
-  catch (const std::exception &e)
-  {
-    mitk::StatusBar::GetInstance()->DisplayErrorText(e.what());
-    m_Controls.label_currentlyComputingStatistics->setVisible(false);
-  }
-}
-
-void QmitkImageStatisticsView::OnSelectionChanged(berry::IWorkbenchPart::Pointer part,
-                                                  const QList<mitk::DataNode::Pointer> &nodes)
-{
-  Q_UNUSED(part);
-  Q_UNUSED(nodes);
-}
-
-void QmitkImageStatisticsView::PrepareDataStorageComboBoxes()
-{
-  auto isPlanarFigurePredicate = mitk::GetImageStatisticsPlanarFigurePredicate();
-  auto isMaskPredicate = mitk::GetImageStatisticsMaskPredicate();
-  auto isImagePredicate = mitk::GetImageStatisticsImagePredicate();
-  auto isMaskOrPlanarFigurePredicate = mitk::NodePredicateOr::New(isPlanarFigurePredicate, isMaskPredicate);
-
-  m_Controls.imageSelector->SetDataStorage(GetDataStorage());
-  m_Controls.imageSelector->SetPredicate(isImagePredicate);
-
-  m_Controls.maskImageSelector->SetDataStorage(GetDataStorage());
-
-  m_Controls.maskImageSelector->SetPredicate(isMaskOrPlanarFigurePredicate);
-  m_Controls.maskImageSelector->SetZeroEntryText("<none>");
-}
-
-void QmitkImageStatisticsView::Activated() {}
-
-void QmitkImageStatisticsView::Deactivated() {}
-
-void QmitkImageStatisticsView::Visible()
-{
-  connect(this->m_Controls.imageSelector,
-          static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-          this,
-          &QmitkImageStatisticsView::OnImageSelectorChanged);
-  connect(this->m_Controls.maskImageSelector,
-          static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-          this,
-          &QmitkImageStatisticsView::OnMaskSelectorChanged);
-  OnImageSelectorChanged();
-  OnMaskSelectorChanged();
-}
-
-void QmitkImageStatisticsView::Hidden()
-{
-  m_Controls.imageSelector->disconnect();
-  m_Controls.maskImageSelector->disconnect();
-}
-
-void QmitkImageStatisticsView::SetFocus() {}

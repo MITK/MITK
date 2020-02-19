@@ -712,6 +712,9 @@ void DicomSeriesReader::ImageBlockDescriptor::AddFile(ImageBlockDescriptor& file
     m_MultiOriented = true;
   }
   auto it= std::upper_bound(m_Filenames.begin(), m_Filenames.end(), file.m_Filenames[0], [this](const std::string& a, const std::string& b){ return m_SlicesInfo.at(a) < m_SlicesInfo.at(b); });
+  if (m_MultiOriented && it == m_Filenames.begin()) {
+    std::copy(file.m_Orientation, file.m_Orientation+2, m_Orientation);
+  }
   m_Filenames.insert( it, file.m_Filenames[0] );
   file.DropImages();
 }
@@ -1153,8 +1156,9 @@ bool DicomSeriesReader::SliceInfo::operator<(const DicomSeriesReader::SliceInfo&
     && (m_Orientation[0] - b.m_Orientation[0]).GetSquaredNorm() <= 0.00000001
     && (m_Orientation[1] - b.m_Orientation[1]).GetSquaredNorm() <= 0.00000001 ) {
 
-    // Compute the distance from world origin (0,0,0) ALONG THE NORMAL of the image planes
-    auto normal = vnl_cross_3d(vnl_vector_fixed<double,3>(m_Orientation[0]), vnl_vector_fixed<double,3>(m_Orientation[1]));
+    // Compute the distance from world origin (0,0,0) ALONG THE MEAN of the two NORMALS of the slices
+    auto normal = (vnl_cross_3d(vnl_vector_fixed<double,3>(m_Orientation[0]), vnl_vector_fixed<double,3>(m_Orientation[1]))
+               + vnl_cross_3d(vnl_vector_fixed<double,3>(b.m_Orientation[0]), vnl_vector_fixed<double,3>(b.m_Orientation[1])));
 
     double
       dist1 = 0.0,

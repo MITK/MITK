@@ -377,7 +377,7 @@ DicomSeriesReader::DICOMStringToPoint3D(const std::string& s, bool* successful)
 }
 
 bool
-DicomSeriesReader::DICOMStringToOrientationVectors(const std::string& s, Vector3D& right, Vector3D& up)
+DicomSeriesReader::DICOMStringToOrientationVectors(const std::string& s, vnl_vector_fixed<double,3>& right, vnl_vector_fixed<double,3>& up)
 {
   bool successful = true;
 
@@ -415,9 +415,9 @@ DicomSeriesReader::DICOMStringToOrientationVectors(const std::string& s, Vector3
   }
 
   // Assign default to vectors for case when the return value will be ignored
-  right.Fill(0);
+  right.fill(0);
   right[0] = 1.0;
-  up.Fill(0);
+  up.fill(0);
   up[1] = 1.0;
 
   return false;

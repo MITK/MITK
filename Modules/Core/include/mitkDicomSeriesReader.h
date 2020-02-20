@@ -330,7 +330,7 @@ public:
     unsigned long m_FileSize;
     std::string m_SOPInstanceUID;
     Point3D m_ImagePositionPatient;
-    Vector3D m_Orientation[2];
+    vnl_vector_fixed<double,3> m_Orientation[2];
     bool m_HasImagePositionPatient; ///< ImagePositionPatient exists in DICOM tags as 3 coordinates
     bool m_HasOrientation;
     std::string m_GantryTilt;       // TODO: convert to double
@@ -812,7 +812,7 @@ protected:
   */
   static
   bool
-  DICOMStringToOrientationVectors(const std::string& s, Vector3D& right, Vector3D& up);
+  DICOMStringToOrientationVectors(const std::string& s, vnl_vector_fixed<double,3>& right, vnl_vector_fixed<double,3>& up);
 
   template <typename ImageType>
   static

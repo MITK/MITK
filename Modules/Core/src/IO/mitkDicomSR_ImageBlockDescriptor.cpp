@@ -33,6 +33,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <gdcmUIDs.h>
 #include <gdcmImageReader.h>
 #include <gdcmTagKeywords.h>
+#include <gdcmGlobal.h>
+#include <gdcmMediaStorage.h>
+#include <gdcmStringFilter.h>
 
 #include <mitkDicomTagsList.h>
 
@@ -404,6 +407,8 @@ bool DicomSeriesReader::ImageBlockDescriptor::loadImage(DcmFileFormat& ff, Image
   auto& info= m_SlicesInfo.at(filename);
   lock.unlock();
 
+  ff.convertToUTF8();
+
   //Load image
   if (!m_Philips3D) {
     DicomImage dcmImage(&ff, EXS_Unknown, /*CIF_AcrNemaCompatibility|CIF_WrongPaletteAttributeTags|CIF_IgnoreModalityTransformation|CIF_UseAbsolutePixelRange|*/CIF_UsePartialAccessToPixelData, 0, 1);
@@ -441,6 +446,54 @@ bool DicomSeriesReader::ImageBlockDescriptor::loadImage(DcmFileFormat& ff, Image
       MITK_ERROR << "Error: cannot store DICOM image to mitk object (" << e.what() << ")";
       return false;
     }
+
+    DcmDataset* fileData = ff.getDataset();
+    DcmStack stack;
+
+    std::vector<itk::MetaDataDictionary*> dictArray = image->GetMetaDataDictionaryArray();
+    auto dict = dictArray[0];
+
+    // For compatibility with private tags processing in itk::GDCMImageIO
+    const gdcm::Dict& pubdict = gdcm::Global::GetInstance().GetDicts().GetPublicDict();
+
+    while (fileData->nextObject(stack, OFTrue).good()) {
+      auto elem = dynamic_cast<DcmElement *>(stack.top());
+      if (!elem) {
+        continue;
+      }
+      auto tag = elem->getTag();
+      std::string value;
+      if (tag.getGroup() == 0x7fe0 || !elem->valueLoaded()) {
+        continue;
+      }
+      std::ostringstream key;
+      key.fill('0');
+      key.setf(std::ios::hex, std::ios::basefield);
+      key << std::setw(4) << tag.getGroup() << '|' << std::setw(4) << tag.getElement();
+      switch(tag.getEVR()) {
+      case EVR_AT: case EVR_FL: case EVR_FD: case EVR_OF: case EVR_SL: case EVR_SS: case EVR_UL: case EVR_US:
+      case EVR_CS: case EVR_DA: case EVR_TM: case EVR_UI: case EVR_LO: case EVR_ST: case EVR_SH: case EVR_PN:
+      case EVR_DS: case EVR_IS: case EVR_AS:
+        if (elem->getOFStringArray(value).good() && !value.empty()) {
+          itk::EncapsulateMetaData(*dict, key.str(), value);
+          break;
+        }
+        // fall through
+      default:
+        // Check for it is a binary tag known by gdcm
+        gdcm::VR::VRType vrtype = pubdict.GetDictEntry(gdcm::Tag(tag.getGroup(), tag.getElement())).GetVR();
+        if (vrtype & (gdcm::VR::OB_OW | gdcm::VR::OF | gdcm::VR::UN)) {
+          std::vector<unsigned char> bin(elem->getLengthField());
+          if (elem->getPartialValue(&bin[0], 0, bin.size()).good()) {
+            OFStandard::encodeBase64(&bin[0], bin.size(), value);
+            itk::EncapsulateMetaData(*dict, key.str(), value);
+            break;
+          }
+        }
+        // Other VRs may cause assertion fault in itk::GDCMImageIO::Write during export so we ignoring them
+      }
+    }
+
     lock.lock();
     info.m_Image = image;
     lock.unlock();
@@ -463,9 +516,9 @@ void DicomSeriesReader::ImageBlockDescriptor::loadTags(DcmFileFormat& ff)
   if (!image) {
     return;
   }
-  ff.convertToUTF8();
   DcmDataset* fileData = ff.getDataset();
   DcmStack stack;
+
   while (fileData->nextObject(stack, OFTrue).good()) {
     auto elem = dynamic_cast<DcmElement *>(stack.top());
     if (!elem) {
@@ -484,7 +537,6 @@ void DicomSeriesReader::ImageBlockDescriptor::loadTags(DcmFileFormat& ff)
     if (valuePosition != tagToPropertyMap.end()) {
       std::string propertyKey = valuePosition->second;
       image->SetProperty(propertyKey.c_str(), StringProperty::New(value));
-    } else { // TODO: also save
     }
   }
   m_PropertyList = image->GetPropertyList();
@@ -819,6 +871,8 @@ Image::Pointer DicomSeriesReader::ImageBlockDescriptor::GetImage(size_t *slicesC
 
   auto image = Image::New();
   image->Initialize(firstImage->GetPixelType(), canLoadAs4D?4:3, d, 1, origin, getMatrix(spacing), spacing);
+  std::vector<itk::MetaDataDictionary*> newDictArray = image->GetMetaDataDictionaryArray();
+  auto dict = newDictArray.begin();
 
   const size_t sliceSize = d[0]*d[1]*(image->GetPixelType().GetBpe()/8);
   size_t slicesUsed = 0;
@@ -832,7 +886,8 @@ Image::Pointer DicomSeriesReader::ImageBlockDescriptor::GetImage(size_t *slicesC
     for (auto& block: imageBlocks) {
       for (auto& file: block) {
         lock.lock();
-        auto slice = m_SlicesInfo.at(file).m_Image;
+        auto& sliceInfo = m_SlicesInfo.at(file);
+        auto slice = sliceInfo.m_Image;
         lock.unlock();
         if (slice) {
           filename = file;
@@ -860,14 +915,28 @@ Image::Pointer DicomSeriesReader::ImageBlockDescriptor::GetImage(size_t *slicesC
             }
           }
           slicesUsed++;
+          **dict = *slice->GetMetaDataDictionaryArray()[0];
         } else { // 1. Slice will be loaded later, but we know they number. 2. Slice can not be loaded
           // In this cases for not first slice we temporary copy the previous
           memcpy(dstPtr, dstPtr - sliceSize, sliceSize);
+          **dict = *firstImage->GetMetaDataDictionaryArray()[0];
+          if (sliceInfo.m_HasOrientation) {
+            std::ostringstream value;
+            value << sliceInfo.m_Orientation[0][0] << '\\' << sliceInfo.m_Orientation[0][1] << '\\' << sliceInfo.m_Orientation[0][2]
+              << '\\' << sliceInfo.m_Orientation[1][0] << '\\' << sliceInfo.m_Orientation[1][1] << '\\' << sliceInfo.m_Orientation[1][2];
+            itk::EncapsulateMetaData<std::string>(**dict, "0020|0037", value.str());
+          }
+          if (sliceInfo.m_HasImagePositionPatient) {
+            std::ostringstream value;
+            value << sliceInfo.m_ImagePositionPatient[0] << '\\' << sliceInfo.m_ImagePositionPatient[1] << '\\' << sliceInfo.m_ImagePositionPatient[2];
+            itk::EncapsulateMetaData<std::string>(**dict, "0020|0032", value.str());
+          }
         }
         filesForSlices.SetTableValue(sliceNo++, filename);
         assert(slicesUsed <= sliceNo);
         dstPtr += sliceSize;
         firstSlice = false;
+        dict++;
       }
     }
     image->SetProperty("files", StringLookupTableProperty::New(filesForSlices));
@@ -1153,8 +1222,8 @@ bool DicomSeriesReader::SliceInfo::operator<(const DicomSeriesReader::SliceInfo&
 
   // See if we have Image Position and Orientation which is equal
   if ( m_HasImagePositionPatient && m_HasOrientation && b.m_HasImagePositionPatient && b.m_HasOrientation
-    && (m_Orientation[0] - b.m_Orientation[0]).GetSquaredNorm() <= 0.00000001
-    && (m_Orientation[1] - b.m_Orientation[1]).GetSquaredNorm() <= 0.00000001 ) {
+    && (m_Orientation[0] - b.m_Orientation[0]).squared_magnitude() <= 0.00000001
+    && (m_Orientation[1] - b.m_Orientation[1]).squared_magnitude() <= 0.00000001 ) {
 
     // Compute the distance from world origin (0,0,0) ALONG THE MEAN of the two NORMALS of the slices
     auto normal = (vnl_cross_3d(vnl_vector_fixed<double,3>(m_Orientation[0]), vnl_vector_fixed<double,3>(m_Orientation[1]))

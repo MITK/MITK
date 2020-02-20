@@ -38,7 +38,6 @@ class MITK_QT_COMMON QmitkSingleNodeSelectionWidget : public QmitkAbstractNodeSe
 
 public:
   explicit QmitkSingleNodeSelectionWidget(QWidget* parent = nullptr);
-  ~QmitkSingleNodeSelectionWidget() override;
 
   mitk::DataNode::Pointer GetSelectedNode() const;
   bool GetAutoSelectNewNodes() const;
@@ -46,8 +45,6 @@ public:
   using NodeList = QmitkAbstractNodeSelectionWidget::NodeList;
 
 public Q_SLOTS:
-  void SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes) override;
-  void SetCurrentSelection(NodeList selectedNodes) override;
   void SetCurrentSelectedNode(mitk::DataNode* selectedNode);
 
   /** Sets the auto selection mode (Default is false).
@@ -62,23 +59,16 @@ protected Q_SLOTS:
   virtual void OnClearSelection();
 
 protected:
-  mitk::DataNode::Pointer ExtractCurrentValidSelection(const NodeList& nodes) const;
-  NodeList CompileEmitSelection() const;
+  void ReviseSelectionChanged(const NodeList& oldInternalSelection, NodeList& newInternalSelection) override;
 
   bool eventFilter(QObject *obj, QEvent *ev) override;
   void EditSelection();
   void UpdateInfo() override;
 
-  void OnNodePredicateChanged(const mitk::NodePredicateBase* newPredicate) override;
-  void OnDataStorageChanged() override;
-  void NodeAddedToStorage(const mitk::DataNode* node) override;
-  void NodeRemovedFromStorage(const mitk::DataNode* node) override;
+  void OnNodeAddedToStorage(const mitk::DataNode* node) override;
 
-  void DoAutoSelectIfNeeded(const mitk::DataNode* ignoreNode = nullptr);
-  void EmitAndUpdateIfNeeded(const NodeList& lastEmission);
+  mitk::DataNode::Pointer DeterminAutoSelectNode(const NodeList& ignoreNodes = {});
 
-  NodeList m_ExternalSelection;
-  mitk::DataNode::Pointer m_SelectedNode;
   /** See documentation of SetAutoSelectNewNodes for details*/
   bool m_AutoSelectNewNodes;
 

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef USNAVIGATIONTARGETOCCLUSIONFILTER_H
 #define USNAVIGATIONTARGETOCCLUSIONFILTER_H
@@ -39,8 +35,8 @@ class DataNode;
 class USNavigationTargetOcclusionFilter : public NavigationDataPassThroughFilter
 {
 public:
-  mitkClassMacro(USNavigationTargetOcclusionFilter, NavigationDataPassThroughFilter)
-  itkNewMacro(Self)
+  mitkClassMacro(USNavigationTargetOcclusionFilter, NavigationDataPassThroughFilter);
+  itkNewMacro(Self);
 
   /**
    * \brief Sets the target structure for which the occluded positions should be calculated.

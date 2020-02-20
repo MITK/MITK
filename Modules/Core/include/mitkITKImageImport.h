@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKITKIMAGEIMPORT_H_HEADER_INCLUDED_C1E4861D
 #define MITKITKIMAGEIMPORT_H_HEADER_INCLUDED_C1E4861D
@@ -40,7 +36,9 @@ namespace mitk
   class MITK_EXPORT ITKImageImport : public ImageSource
   {
   public:
-    mitkClassMacro(ITKImageImport, ImageSource) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(ITKImageImport, ImageSource);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       ///  \brief The type of the input image.
       typedef TInputImage InputImageType;

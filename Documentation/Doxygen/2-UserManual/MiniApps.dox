@@ -49,7 +49,7 @@ $./GibbsTracking --xml
 <category>Fiber Tracking and Processing Methods</category>
 <title>Gibbs Tracking</title>
 <description></description>
-<contributor>MBI</contributor>
+<contributor>German Cancer Research Center (DKFZ)</contributor>
 <parameters>
 ...
 </parameters>

@@ -1,48 +1,42 @@
-/*****************************************************************************
+/*============================================================================
 
- Copyright (c) 1993-2000,  Div. Medical and Biological Informatics, 
- Deutsches Krebsforschungszentrum, Heidelberg, Germany
+ Copyright (c) German Cancer Research Center (DKFZ)
  All rights reserved.
 
- Redistribution and use in source and binary forms, with or without 
+ Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
 
  - Redistributions of source code must retain the above copyright notice, this
    list of conditions and the following disclaimer.
 
- - Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+ - Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
- - All advertising materials mentioning features or use of this software must 
-   display the following acknowledgement: 
-          
-     "This product includes software developed by the Div. Medical and 
-      Biological Informatics, Deutsches Krebsforschungszentrum, Heidelberg, 
-      Germany."
+ - All advertising materials mentioning features or use of this software must
+   display the following acknowledgement:
 
- - Neither the name of the Deutsches Krebsforschungszentrum nor the names of 
-   its contributors may be used to endorse or promote products derived from 
-   this software without specific prior written permission. 
+     "This product includes software developed by the German Cancer Research
+      Center (DKFZ)."
 
-   THIS SOFTWARE IS PROVIDED BY THE DIVISION MEDICAL AND BIOLOGICAL
-   INFORMATICS AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED
-   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-   OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-   IN NO EVENT SHALL THE DIVISION MEDICAL AND BIOLOGICAL INFORMATICS,
-   THE DEUTSCHES KREBSFORSCHUNGSZENTRUM OR CONTRIBUTORS BE LIABLE FOR 
-   ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-   DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE 
-   GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER 
-   IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN 
-   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ - Neither the name of the German Cancer Research Center (DKFZ) nor the names
+   of its contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
 
- Send comments and/or bug reports to:
-   mbi-software@dkfz-heidelberg.de
+   THIS SOFTWARE IS PROVIDED BY THE GERMAN CANCER RESEARCH CENTER (DKFZ) AND
+   CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+   BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+   FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE GERMAN
+   CANCER RESEARCH CENTER (DKFZ) OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+   INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+   SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+   OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+   DAMAGE.
 
-*****************************************************************************/
+============================================================================*/
 
 /**@file
  *  this function performs an edge detection by the Roberts gradient
@@ -50,7 +44,7 @@
 
 /** @brief performs an edge detection by the Roberts gradient
  *
- *  This gradient uses a 2x2 or 2x2x2 mask and calculates the maximum     
+ *  This gradient uses a 2x2 or 2x2x2 mask and calculates the maximum
  *  of the difference of all diagonal elements
  *
  *  @param pic_old   pointer to original image
@@ -69,13 +63,13 @@
 #include "mitkIpFuncP.h"
 
 mitkIpPicDescriptor *mitkIpFuncRoberts ( mitkIpPicDescriptor *pic_old,
-                                 mitkIpUInt4_t       dim_mask,  
+                                 mitkIpUInt4_t       dim_mask,
                                  mitkIpFuncFlagI_t   border );
 
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
-  static char *what = { "@(#)????????\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)????????\t\tGerman Cancer Research Center (DKFZ)\t"__DATE__ };
 #endif
 
 
@@ -123,13 +117,13 @@ mitkIpPicDescriptor *mitkIpFuncRoberts ( mitkIpPicDescriptor *pic_old,
 }                                                                         \
 
 /* --------------------------------------------------------------------- */
-/* 
-** function mitkIpFuncRoberts                                               
+/*
+** function mitkIpFuncRoberts
 */
 /* --------------------------------------------------------------------- */
- 
+
 mitkIpPicDescriptor *mitkIpFuncRoberts ( mitkIpPicDescriptor *pic_old,
-                                 mitkIpUInt4_t       dim_mask,  
+                                 mitkIpUInt4_t       dim_mask,
                                  mitkIpFuncFlagI_t   border )
 {
   mitkIpPicDescriptor *pic_new;          /* pointer to new image structure   */
@@ -156,7 +150,7 @@ mitkIpPicDescriptor *mitkIpFuncRoberts ( mitkIpPicDescriptor *pic_old,
 
   for ( i = 0; i < dim_mask; i++ )
     n[i] = 2;
- 
+
   for ( i = dim_mask; i < _mitkIpPicNDIM; i++ )
     n[i] = 1;
 
@@ -173,7 +167,7 @@ mitkIpPicDescriptor *mitkIpFuncRoberts ( mitkIpPicDescriptor *pic_old,
   mask_size = ( mitkIpUInt4_t ) pow ( 2., ( mitkIpFloat8_t ) dim_mask );
   off_vekt  = calloc ( mask_size, sizeof( mitkIpInt4_t ) );
   off_mask  = 0;
-  if ( off_vekt == NULL ) 
+  if ( off_vekt == NULL )
     {
        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
@@ -207,7 +201,7 @@ mitkIpPicDescriptor *mitkIpFuncRoberts ( mitkIpPicDescriptor *pic_old,
    }
 
   /* allocate new image                                                  */
-     
+
   if ( border == mitkIpFuncBorderOld )
     pic_new = mitkIpPicClone ( pic_old );
   else if ( border == mitkIpFuncBorderZero )
@@ -215,7 +209,7 @@ mitkIpPicDescriptor *mitkIpFuncRoberts ( mitkIpPicDescriptor *pic_old,
        pic_new = mitkIpPicCopyHeader ( pic_old, 0 );
        pic_new->data = malloc ( _mitkIpPicSize ( pic_new ) );
     }
-  else 
+  else
     {
        free ( off_vekt );
        _mitkIpFuncSetErrno ( mitkIpFuncFLAG_ERROR );
@@ -232,7 +226,7 @@ mitkIpPicDescriptor *mitkIpFuncRoberts ( mitkIpPicDescriptor *pic_old,
   if ( pic_new->data == NULL )
     {
        free ( off_vekt );
-       mitkIpPicFree ( pic_new ); 
+       mitkIpPicFree ( pic_new );
        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
@@ -241,10 +235,10 @@ mitkIpPicDescriptor *mitkIpFuncRoberts ( mitkIpPicDescriptor *pic_old,
 
   for ( i = 0; i < pic_old->dim; i++ )
     n[i] = pic_old->n[i] - 1;
- 
+
   for ( i = pic_old->dim; i < _mitkIpPicNDIM; i++ )
     n[i] = 1;
- 
+
   mitkIpPicFORALL_4 ( ROBERTS, pic_old, mask_size, n, off_vekt, size );
 
   free ( off_vekt );
@@ -252,8 +246,8 @@ mitkIpPicDescriptor *mitkIpFuncRoberts ( mitkIpPicDescriptor *pic_old,
   /* Copy Tags */
 
   mitkIpFuncCopyTags(pic_new, pic_old);
-  
-  
+
+
 
   return ( pic_new );
 }

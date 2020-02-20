@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef mitkBaseApplication_h
 #define mitkBaseApplication_h
@@ -98,8 +94,6 @@ namespace mitk
     static const QString ARG_REGISTRY_MULTI_LANGUAGE;
     static const QString ARG_SPLASH_IMAGE;
     static const QString ARG_STORAGE_DIR;
-    static const QString ARG_TESTAPPLICATION;
-    static const QString ARG_TESTPLUGIN;
     static const QString ARG_XARGS;
 
     // BlueBerry specific plugin framework properties
@@ -111,8 +105,6 @@ namespace mitk
     static const QString PROP_NO_REGISTRY_CACHE;
     static const QString PROP_PRODUCT;
     static const QString PROP_REGISTRY_MULTI_LANGUAGE;
-    static const QString PROP_TESTAPPLICATION;
-    static const QString PROP_TESTPLUGIN;
 
     BaseApplication(int argc, char **argv);
     ~BaseApplication() override;

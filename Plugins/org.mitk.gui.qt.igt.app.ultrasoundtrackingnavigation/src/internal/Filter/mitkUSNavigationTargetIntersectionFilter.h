@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKUSNAVIGATIONTARGETINTERSECTIONFILTER_H
 #define MITKUSNAVIGATIONTARGETINTERSECTIONFILTER_H
@@ -43,16 +39,16 @@ class PointSet;
  */
 class USNavigationTargetIntersectionFilter : public itk::Object {
 public:
-  mitkClassMacroItkParent(USNavigationTargetIntersectionFilter, itk::Object)
-  itkNewMacro(Self)
-
-  itkSetMacro(TargetSurface, itk::SmartPointer<mitk::Surface>)
+  mitkClassMacroItkParent(USNavigationTargetIntersectionFilter, itk::Object);
+  itkNewMacro(Self);
+  
+  itkSetMacro(TargetSurface, itk::SmartPointer<mitk::Surface>);
   void SetLine(itk::SmartPointer<mitk::PointSet> line);
 
   /**
    * \return if line and surface are intersecting
    */
-  itkGetMacro(IsIntersecting, bool)
+  itkGetMacro(IsIntersecting, bool);
 
   /**
    * \return the position where the intersection occured, the result is not defined if no intersection occured

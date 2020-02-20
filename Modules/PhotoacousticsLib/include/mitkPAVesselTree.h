@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKVESSELSTRUCTURE_H
 #define MITKVESSELSTRUCTURE_H
@@ -34,19 +30,19 @@ namespace mitk {
     class MITKPHOTOACOUSTICSLIB_EXPORT VesselTree : public itk::LightObject
     {
     public:
-      mitkClassMacroItkParent(VesselTree, itk::LightObject)
-        mitkNewMacro1Param(Self, VesselProperties::Pointer)
+      mitkClassMacroItkParent(VesselTree, itk::LightObject);
+      mitkNewMacro1Param(Self, VesselProperties::Pointer);
 
-        /**
-         * @brief Step Performs a simulation step, in which all subvessels of this VesselTree are expanded.
-         *
-         * @param volume
-         * @param calculateNewPosition
-         * @param bendingFactor
-         */
-        void Step(InSilicoTissueVolume::Pointer volume,
-          Vessel::CalculateNewVesselPositionCallback calculateNewPosition,
-          double bendingFactor, std::mt19937* rng);
+      /**
+        * @brief Step Performs a simulation step, in which all subvessels of this VesselTree are expanded.
+        *
+        * @param volume
+        * @param calculateNewPosition
+        * @param bendingFactor
+        */
+      void Step(InSilicoTissueVolume::Pointer volume,
+        Vessel::CalculateNewVesselPositionCallback calculateNewPosition,
+        double bendingFactor, std::mt19937* rng);
 
       /**
        * @brief IsFinished

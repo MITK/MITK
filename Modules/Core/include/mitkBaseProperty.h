@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef BASEPROPERTY_H_HEADER_INCLUDED_C1F4DF54
 #define BASEPROPERTY_H_HEADER_INCLUDED_C1F4DF54
@@ -39,7 +35,8 @@ namespace mitk
   class MITKCORE_EXPORT BaseProperty : public itk::Object
   {
   public:
-    mitkClassMacroItkParent(BaseProperty, itk::Object) itkCloneMacro(Self)
+    mitkClassMacroItkParent(BaseProperty, itk::Object);
+    itkCloneMacro(Self);
 
       /*! @brief Subclasses must implement IsEqual(const BaseProperty&) to support comparison.
 

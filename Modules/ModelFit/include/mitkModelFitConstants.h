@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef _MITK_MODEL_FIT_CONSTANTS_H_
 #define _MITK_MODEL_FIT_CONSTANTS_H_
@@ -37,10 +33,10 @@ namespace mitk
 
         /**
         * modelfit.input.variables ist eine Map der Variablennamen, die einem Eingabebild zu eigen sind und
-        * unabhängig von einem Fit sind.
-        * Deren Wert ist ein Array, welches die Variablenwerte für die einzelnen Zeitschritte enthält.
-        * Die Länge eines solchen Arrays muss entweder der Anzahl der Zeitschritte dieses Bildes entsprechen
-        * oder genau 1 sein, wenn der Wert für alle Zeitschritte dieses Bildes gleich ist.
+        * unabhÃ¤ngig von einem Fit sind.
+        * Deren Wert ist ein Array, welches die Variablenwerte fÃ¼r die einzelnen Zeitschritte enthÃ¤lt.
+        * Die LÃ¤nge eines solchen Arrays muss entweder der Anzahl der Zeitschritte dieses Bildes entsprechen
+        * oder genau 1 sein, wenn der Wert fÃ¼r alle Zeitschritte dieses Bildes gleich ist.
         * Beispiele:
         * ["x1":[580], "x2":[3060], "x3":[41]]      (1 Zeitschritt, 3 Variablen)
         * ["TE":[2.47, 5.85, 9.23, 12.61], "TI":[10.3]] (4 Zeitschritte, 2 Variablen)
@@ -68,22 +64,22 @@ namespace mitk
         static const std::string PARAMETER_TYPE_PROPERTY_NAME();
 
         /**
-        * modelfit.parameter.type Wert für normale Parameters.
+        * modelfit.parameter.type Wert fÃ¼r normale Parameters.
         */
         static const std::string PARAMETER_TYPE_VALUE_PARAMETER();
 
         /**
-        * modelfit.parameter.type Wert für derived Parameters.
+        * modelfit.parameter.type Wert fÃ¼r derived Parameters.
         */
         static const std::string PARAMETER_TYPE_VALUE_DERIVED_PARAMETER();
 
         /**
-        * modelfit.parameter.type Wert für Crtierion-Parameters.
+        * modelfit.parameter.type Wert fÃ¼r Crtierion-Parameters.
         */
         static const std::string PARAMETER_TYPE_VALUE_CRITERION();
 
         /**
-        * modelfit.parameter.type Wert für Evaluation-Parameters.
+        * modelfit.parameter.type Wert fÃ¼r Evaluation-Parameters.
         */
         static const std::string PARAMETER_TYPE_VALUE_EVALUATION_PARAMETER();
 
@@ -148,8 +144,8 @@ namespace mitk
         static const std::string YAXIS_UNIT_PROPERTY_NAME();
 
         /**
-        * modelfit.fit.uid ist eine einzigartige ID (unabhängig von Ausführungsrechner, Session oder Applikationsinstanz),
-        * die einem Fit vergeben wird um alle zugehörigen Bilder eindeutig zu kennzeichnen.
+        * modelfit.fit.uid ist eine einzigartige ID (unabhÃ¤ngig von AusfÃ¼hrungsrechner, Session oder Applikationsinstanz),
+        * die einem Fit vergeben wird um alle zugehÃ¶rigen Bilder eindeutig zu kennzeichnen.
         */
         static const std::string FIT_UID_PROPERTY_NAME();
 
@@ -185,10 +181,10 @@ namespace mitk
 
         /**
         * modelfit.fit.staticParameters ist eine Map der Variablennamen, die im Funktions-String vorkommen und
-        * nicht mit modelfit.input.variables abgedeckt sind. Dies können z.B. Konstanten sein oder Variablen,
-        * die sich (abhängig vom Fit) über den Zeitverlauf ändern, wie z.B. der Mittelwert einer Maske über einen Arterienquerschnitt.
+        * nicht mit modelfit.input.variables abgedeckt sind. Dies kÃ¶nnen z.B. Konstanten sein oder Variablen,
+        * die sich (abhÃ¤ngig vom Fit) Ã¼ber den Zeitverlauf Ã¤ndern, wie z.B. der Mittelwert einer Maske Ã¼ber einen Arterienquerschnitt.
         * (Entspricht den StaticParameters in mitk::ModelBase)
-        * Der Wert der Variablen ist ein Array, welches die Variablenwerte enthält.
+        * Der Wert der Variablen ist ein Array, welches die Variablenwerte enthÃ¤lt.
         * Beispiel:
         * ["AIF":[2, 8, 8, 4, 5], "tau":[0.42]] (insgesamt 5 Zeitschritte, 2 Variablen)
         */

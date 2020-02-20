@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #ifndef QMITK_ABSTRACT_NODE_SELECTION_WIDGET_H
@@ -54,9 +50,9 @@ public:
   *
   * @par nodePredicate    A pointer to node predicate.
   */
-  void SetNodePredicate(mitk::NodePredicateBase* nodePredicate);
+  void SetNodePredicate(const mitk::NodePredicateBase* nodePredicate);
 
-  mitk::NodePredicateBase* GetNodePredicate() const;
+  const mitk::NodePredicateBase* GetNodePredicate() const;
 
   QString GetInvalidInfo() const;
   QString GetEmptyInfo() const;
@@ -133,22 +129,31 @@ protected:
 
   /**Member is called if the predicate has changed. Thus the selection might change to. The new (changed) predicate
   is passed with the function call. It is the same like this->GetNodePredicate() called in the function call.*/
-  virtual void OnNodePredicateChanged(mitk::NodePredicateBase* newPredicate) = 0;
+  virtual void OnNodePredicateChanged(const mitk::NodePredicateBase* newPredicate) = 0;
 
   /**Member is called if the data storage has changed. Thus the selection might change to.*/
   virtual void OnDataStorageChanged() = 0;
 
+  /**Member is called when a node is added to the storage. Default implementation does nothing.
+   Derived widgets can override the method if they want to react on new nodes in the storage.*/
+  virtual void NodeAddedToStorage(const mitk::DataNode* node);
+
+  /**Member is called when a node is removed from the storage. The removed node is passed as
+   variable. Derived classes have to implement this method to react on the fact that there selection
+   might change, because the removed node is part of there selection. */
   virtual void NodeRemovedFromStorage(const mitk::DataNode* node) = 0;
 
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
-  mitk::NodePredicateBase::Pointer m_NodePredicate;
+  mitk::NodePredicateBase::ConstPointer m_NodePredicate;
 
   QString m_InvalidInfo;
   QString m_EmptyInfo;
   QString m_PopUpTitel;
   QString m_PopUpHint;
 
+  /** See documentation of SetSelectOnlyVisibleNodes for details*/
   bool m_IsOptional;
+  /** See documentation of SetSelectionIsOptional for details*/
   bool m_SelectOnlyVisibleNodes;
 
 private:

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkRenderingManager.h"
 #include "mitkBaseRenderer.h"
@@ -23,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderingManagerFactory.h"
 
 #include <vtkRenderWindow.h>
+#include <vtkRendererCollection.h>
 
 #include "mitkNumericTypes.h"
 #include <itkAffineGeometryFrame.h>
@@ -34,9 +31,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  itkEventMacroDefinition(FocusChangedEvent, itk::AnyEvent)
+  itkEventMacroDefinition(FocusChangedEvent, itk::AnyEvent);
 
-    RenderingManager::Pointer RenderingManager::s_Instance = nullptr;
+  RenderingManager::Pointer RenderingManager::s_Instance = nullptr;
   RenderingManagerFactory *RenderingManager::s_RenderingManagerFactory = nullptr;
 
   RenderingManager::RenderingManager()
@@ -48,7 +45,8 @@ namespace mitk
       m_TimeNavigationController(SliceNavigationController::New()),
       m_DataStorage(nullptr),
       m_ConstrainedPanningZooming(true),
-      m_FocusedRenderWindow(nullptr)
+      m_FocusedRenderWindow(nullptr),
+      m_AntiAliasing(AntiAliasing::FastApproximate)
   {
     m_ShadingEnabled.assign(3, false);
     m_ShadingValues.assign(4, 0.0);
@@ -536,61 +534,56 @@ namespace mitk
 
   void RenderingManager::RenderingStartCallback(vtkObject *caller, unsigned long, void *, void *)
   {
-    auto *renderWindow = dynamic_cast<vtkRenderWindow *>(caller);
-    mitk::RenderingManager *renman = mitk::BaseRenderer::GetInstance(renderWindow)->GetRenderingManager();
-    RenderWindowList &renderWindowList = renman->m_RenderWindowList;
+    auto renderingManager = RenderingManager::GetInstance();
+    auto renderWindow = dynamic_cast<vtkRenderWindow*>(caller);
 
-    if (renderWindow)
-    {
-      renderWindowList[renderWindow] = RENDERING_INPROGRESS;
-    }
+    if (nullptr != renderWindow)
+      renderingManager->m_RenderWindowList[renderWindow] = RENDERING_INPROGRESS;
 
-    renman->m_UpdatePending = false;
+    renderingManager->m_UpdatePending = false;
   }
 
   void RenderingManager::RenderingProgressCallback(vtkObject *caller, unsigned long, void *, void *)
   {
-    auto *renderWindow = dynamic_cast<vtkRenderWindow *>(caller);
-    mitk::RenderingManager *renman = mitk::BaseRenderer::GetInstance(renderWindow)->GetRenderingManager();
+    auto renderingManager = RenderingManager::GetInstance();
 
-    if (renman->m_LODAbortMechanismEnabled)
+    if (renderingManager->m_LODAbortMechanismEnabled)
     {
-      auto *renderWindow = dynamic_cast<vtkRenderWindow *>(caller);
-      if (renderWindow)
+      auto renderWindow = dynamic_cast<vtkRenderWindow *>(caller);
+
+      if (nullptr != renderWindow)
       {
-        BaseRenderer *renderer = BaseRenderer::GetInstance(renderWindow);
-        if (renderer && (renderer->GetNumberOfVisibleLODEnabledMappers() > 0))
-        {
-          renman->DoMonitorRendering();
-        }
+        auto renderer = BaseRenderer::GetInstance(renderWindow);
+
+        if (nullptr != renderer && 0 < renderer->GetNumberOfVisibleLODEnabledMappers())
+          renderingManager->DoMonitorRendering();
       }
     }
   }
 
   void RenderingManager::RenderingEndCallback(vtkObject *caller, unsigned long, void *, void *)
   {
-    auto *renderWindow = dynamic_cast<vtkRenderWindow *>(caller);
+    auto renderWindow = dynamic_cast<vtkRenderWindow*>(caller);
 
-    mitk::RenderingManager *renman = mitk::BaseRenderer::GetInstance(renderWindow)->GetRenderingManager();
-
-    RenderWindowList &renderWindowList = renman->m_RenderWindowList;
-
-    RendererIntMap &nextLODMap = renman->m_NextLODMap;
-
-    if (renderWindow)
+    if (nullptr != renderWindow)
     {
-      BaseRenderer *renderer = BaseRenderer::GetInstance(renderWindow);
-      if (renderer)
-      {
-        renderWindowList[renderer->GetRenderWindow()] = RENDERING_INACTIVE;
+      auto renderer = BaseRenderer::GetInstance(renderWindow);
 
-        // Level-of-Detail handling
-        if (renderer->GetNumberOfVisibleLODEnabledMappers() > 0)
+      if (nullptr != renderer)
+      {
+        auto renderingManager = RenderingManager::GetInstance();
+        renderingManager->m_RenderWindowList[renderer->GetRenderWindow()] = RENDERING_INACTIVE;
+
+        if (0 < renderer->GetNumberOfVisibleLODEnabledMappers())
         {
-          if (nextLODMap[renderer] == 0)
-            renman->StartOrResetTimer();
+          if (0 == renderingManager->m_NextLODMap[renderer])
+          {
+            renderingManager->StartOrResetTimer();
+          }
           else
-            nextLODMap[renderer] = 0;
+          {
+            renderingManager->m_NextLODMap[renderer] = 0;
+          }
         }
       }
     }
@@ -736,6 +729,36 @@ namespace mitk
       }
 
       MITK_ERROR << "Tried to set a RenderWindow that does not exist.";
+    }
+  }
+
+  void RenderingManager::SetAntiAliasing(AntiAliasing antiAliasing)
+  {
+    if (m_AntiAliasing != antiAliasing)
+    {
+      auto renderingManager = mitk::RenderingManager::GetInstance();
+      auto renderWindows = renderingManager->GetAllRegisteredRenderWindows();
+
+      for (auto renderWindow : renderWindows)
+      {
+        auto renderers = renderWindow->GetRenderers();
+
+        if (nullptr != renderers)
+        {
+          renderers->InitTraversal();
+          auto renderer = renderers->GetNextItem();
+
+          while (nullptr != renderer)
+          {
+            renderer->SetUseFXAA(AntiAliasing::FastApproximate == antiAliasing);
+            renderer = renderers->GetNextItem();
+          }
+
+          renderingManager->RequestUpdate(renderWindow);
+        }
+      }
+
+      m_AntiAliasing = antiAliasing;
     }
   }
 

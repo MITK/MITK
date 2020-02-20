@@ -1,4 +1,4 @@
-/**
+﻿/**
 \page org_mitk_gui_qt_pharmacokinetics_mri The DCE MR Perfusion Datafit View
 
 \imageMacro{pharmacokinetics_mri_doc.svg,"Icon of the DCE MR Perfusion View",3.0}
@@ -6,11 +6,11 @@
 \tableofcontents
 
 \section FIT_DCE_Introduction Introduction
-For pharmacokinetic analysis of DCE MRI/CT data using compartment models in non-linear least square fitting the DCE MR Perfusion Datafit plugin can be used. 
+For pharmacokinetic analysis of DCE MRI/CT data using compartment models in non-linear least square fitting the DCE MR Perfusion Datafit plugin can be used.
 
 \section FIT_DCE_Contact Contact information
 This plug-in is being developed by Charlotte Debus and the SIDT group (Software development for Integrated Diagnostics
-and Therapy) at the DKFZ (German Cancer Research Center).
+and Therapy) at the German Cancer Research Center (DKFZ).
 If you have any questions, need support, find a bug or have a feature request, feel free to contact us at www.mitk.org.
 \subsection FIT_DCE_Cite Citation information
 If you use the view for your research please cite our work as reference:\n\n
@@ -18,7 +18,7 @@ Debus C and Floca R, Ingrisch M, Kompan I, Maier-Hein K, Abdollahi A, Nolden M, 
 
 \section FIT_DCE_General General information
 \imageMacro{dce_mri_init.png, "Example screen shot showing the view at first start.", 10}
-For pharmacokinetic analysis of DCE MRI/CT data using compartment models in non-linear least square fitting the DCE MR Perfusion Datafit view can be used. 
+For pharmacokinetic analysis of DCE MRI/CT data using compartment models in non-linear least square fitting the DCE MR Perfusion Datafit view can be used.
 In principle, every model can be fitted on the entire image. However, for model configuration reasons (e.g. AIF required) and computational time cost, this is often not advisable.
 Therefore, apart from the image to be fitted (Selected Time Series), a ROI segmentation can be defined (Selected Mask), within which model fitting is performed.
 The view currently offers voxel wise and/or ROI averaged fits of intensity-time curves with different quantitative and semi-quantitative models.
@@ -61,6 +61,7 @@ Value and Width define the actual constraint value, that should not be crossed, 
 \imageMacro{dce_mri_concentration.png, "Example screen shot for concentration conversion settings.", 10}
 Most models require concentration values as input rather than raw signal intensities (i.e. all compartment models).
 The DCE MR Perfusion view offers conversion to concentration by means of relative and absolute signal enhancement as well as a special conversion for turbo flash sequences.
+For the conversion methods, a baseline image prior to contrast agent arrival is required. In many data sets, multiple baseline images are available. The "Baseline Range Selection" allows for selection of a range of time frames, from which the average image (along the time dimension) is calculated and set as baseline input image. Remark: The number of the first time frame is 0. 
 
 \section FIT_DCE_Fitting Executing a fit
 After configuration of the entire fit routine, the respective time series to be fitted and eventually the ROI mask have to be selected.
@@ -73,7 +74,7 @@ As default, the name of the model and the fitting strategy (pixel/ROI) are given
 For development purposes and evaluation of the fits, the option "Generate debug parameter images" is available.
 Enabling this option will result in additional parameter maps displaying the status of the optimizer at fit termination, like needed optimization time, number of iterations, constraint violations and reasons for fit termination (criterion reached, maximum number of iterations, etc.).\n\n
 
-After all necessary configurations are set, the button "Start Modelling" is enabled, which starts the fitting routine. Progress can be seen in the message box on the bottom. Resulting parameter maps will afterwards be added to the data manager as sub-nodes to the analyzed 4D image. 
+After all necessary configurations are set, the button "Start Modelling" is enabled, which starts the fitting routine. Progress can be seen in the message box on the bottom. Resulting parameter maps will afterwards be added to the data manager as sub-nodes to the analyzed 4D image.
 
 \section FIT_DCE_lit References/Literature
 - \anchor FIT_DCE_lit_ref1 [1] Brix G, Semmler W, Port R, Schad LR, Layer G, Lorenz WJ. Pharmacokinetic parameters in CNS Gd-DTPA enhanced MR imaging. J Comput Assist Tomogr. 1991;15:621–8.

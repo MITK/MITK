@@ -31,13 +31,6 @@ set(MITK_EXTENSIONS # "<repo>|<branch/tag/commit>|<src dir>"
 # "https://phabricator.mitk.org/source/mitk-diffusion.git|master|MITK-Diffusion"
 )
 
-# The directory containing the Qt binaries
-set(QT5_INSTALL_PREFIX "/home/user/Qt/5.11.4/gcc_64")
-# For Windows, e.g.
-#set(QT5_INSTALL_PREFIX "C:/Qt/5.11.4/msvc2017_64")
-
-set(QT_BINARY_DIR "${QT5_INSTALL_PREFIX}/bin")
-
 #
 # Dashboard options
 #
@@ -90,9 +83,9 @@ set(CTEST_BINARY_DIRECTORY "${CTEST_DASHBOARD_ROOT}/MITK-sb-${short_of_ctest_bui
 # to configure the MITK-Superbuild. The
 set(MITK_INITIAL_CACHE "
 # Example how to set a boolean variable in the MITK-Build via this script:
-#SET(MITK_ENABLE_TOF_HARDWARE \"TRUE\" CACHE INTERNAL \"Enable ToF Hardware\")
+#set(MITK_ENABLE_TOF_HARDWARE \"TRUE\" CACHE INTERNAL \"Enable ToF Hardware\")
 # Example how to set a path variable in the MITK-Build via this script:
-#SET(MITK_PMD_LIB \"/home/kilgus/thomas/PMDSDK2/Linux_x86_64/bin/libpmdaccess2.so\" CACHE INTERNAL \"PMD lib\")
+#set(MITK_PMD_LIB \"/home/kilgus/thomas/PMDSDK2/Linux_x86_64/bin/libpmdaccess2.so\" CACHE INTERNAL \"PMD lib\")
 ")
 
 set(ADDITIONAL_CMAKECACHE_OPTION "
@@ -107,7 +100,7 @@ CMAKE_PREFIX_PATH:PATH=${CMAKE_PREFIX_PATH}
 set(TEST_TO_EXCLUDE_REGEX "")
 
 # set any extra environment variables here
-set(ENV{DISPLAY} ":0")
+set(ENV{PATH} "$ENV{PATH}")
 
 find_program(CTEST_COVERAGE_COMMAND NAMES gcov)
 find_program(CTEST_MEMORYCHECK_COMMAND NAMES valgrind)

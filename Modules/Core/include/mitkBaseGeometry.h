@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef BaseGeometry_H_HEADER_INCLUDED
 #define BaseGeometry_H_HEADER_INCLUDED
@@ -102,7 +98,7 @@ namespace mitk
   {
   public:
     mitkClassMacroItkParent(BaseGeometry, itk::Object);
-    itkCloneMacro(Self)
+    itkCloneMacro(Self);
 
       // ********************************** TypeDef **********************************
 
@@ -533,7 +529,8 @@ namespace mitk
       //## outside the image (by half of the voxel diameter). Thus, we have
       //## to correct for this and to be able to do that, we need to know
       //## that the BaseGeometry is referring to an Image.
-      itkSetMacro(ImageGeometry, bool) itkBooleanMacro(ImageGeometry)
+      itkSetMacro(ImageGeometry, bool);
+      itkBooleanMacro(ImageGeometry);
 
         const GeometryTransformHolder *GetGeometryTransformHolder() const;
 
@@ -559,7 +556,7 @@ namespace mitk
 
     static const std::string GetTransformAsString(TransformType *transformType);
 
-    itkGetConstMacro(NDimensions, unsigned int)
+    itkGetConstMacro(NDimensions, unsigned int);
 
       bool IsBoundingBoxNull() const;
 

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical Image Computing.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 // mitk qt widgets module
 #include "QmitkAbstractMultiWidget.h"
@@ -22,10 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk core
 #include <mitkDataStorage.h>
-#include <mitkDisplayActionEvents.h>
 #include <mitkDisplayActionEventBroadcast.h>
-#include <mitkDisplayActionEventFunctions.h>
-#include <mitkDisplayActionEventHandler.h>
 
 // qt
 #include <QMouseEvent>
@@ -36,8 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 struct QmitkAbstractMultiWidget::Impl final
 {
   Impl(QmitkAbstractMultiWidget* multiWidget,
-       mitk::RenderingManager* renderingManager,
-       mitk::BaseRenderer::RenderingMode::Type renderingMode,
        const QString& multiWidgetName);
 
   void SetDataStorage(mitk::DataStorage* dataStorage)
@@ -55,64 +46,15 @@ struct QmitkAbstractMultiWidget::Impl final
     }
   }
 
-  void Synchronize(bool synchronized)
-  {
-    auto allObserverTags = m_DisplayActionEventHandler->GetAllObserverTags();
-    for (auto observerTag : allObserverTags)
-    {
-      m_DisplayActionEventHandler->DisconnectObserver(observerTag);
-    }
-
-    if (synchronized)
-    {
-      mitk::StdFunctionCommand::ActionFunction actionFunction = mitk::DisplayActionEventFunctions::MoveCameraSynchronizedAction();
-      m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplayMoveEvent(nullptr, mitk::Vector2D()), actionFunction);
-
-      actionFunction = mitk::DisplayActionEventFunctions::SetCrosshairSynchronizedAction();
-      m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplaySetCrosshairEvent(nullptr, mitk::Point3D()), actionFunction);
-
-      actionFunction = mitk::DisplayActionEventFunctions::ZoomCameraSynchronizedAction();
-      m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplayZoomEvent(nullptr, 0.0, mitk::Point2D()), actionFunction);
-
-      actionFunction = mitk::DisplayActionEventFunctions::ScrollSliceStepperSynchronizedAction();
-      m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplayScrollEvent(nullptr, 0), actionFunction);
-    }
-    else
-    {
-      mitk::StdFunctionCommand::ActionFunction actionFunction = mitk::DisplayActionEventFunctions::MoveSenderCameraAction();
-      m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplayMoveEvent(nullptr, mitk::Vector2D()), actionFunction);
-
-      actionFunction = mitk::DisplayActionEventFunctions::SetCrosshairAction();
-      m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplaySetCrosshairEvent(nullptr, mitk::Point3D()), actionFunction);
-
-      actionFunction = mitk::DisplayActionEventFunctions::ZoomSenderCameraAction();
-      m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplayZoomEvent(nullptr, 0.0, mitk::Point2D()), actionFunction);
-
-      actionFunction = mitk::DisplayActionEventFunctions::ScrollSliceStepperAction();
-      m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplayScrollEvent(nullptr, 0), actionFunction);
-    }
-
-    // use the standard 'set level window' action for both modes
-    mitk::StdFunctionCommand::ActionFunction actionFunction = mitk::DisplayActionEventFunctions::SetLevelWindowAction();
-    m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplaySetLevelWindowEvent(nullptr, mitk::ScalarType(), mitk::ScalarType()), actionFunction);
-  }
-
   void InitializeDisplayActionEventHandling()
   {
     m_DisplayActionEventBroadcast = mitk::DisplayActionEventBroadcast::New();
     m_DisplayActionEventBroadcast->LoadStateMachine("DisplayInteraction.xml");
     m_DisplayActionEventBroadcast->SetEventConfig("DisplayConfigPACS.xml");
-
-    m_DisplayActionEventHandler = std::make_unique<mitk::DisplayActionEventHandler>();
-    m_DisplayActionEventHandler->SetObservableBroadcast(m_DisplayActionEventBroadcast);
-
-    Synchronize(true);
   }
-  
+
   mitk::DataStorage::Pointer m_DataStorage;
 
-  mitk::RenderingManager* m_RenderingManager;
-  mitk::BaseRenderer::RenderingMode::Type m_RenderingMode;
   QString m_MultiWidgetName;
 
   RenderWindowWidgetMap m_RenderWindowWidgets;
@@ -128,12 +70,8 @@ struct QmitkAbstractMultiWidget::Impl final
 };
 
 QmitkAbstractMultiWidget::Impl::Impl(QmitkAbstractMultiWidget* multiWidget,
-                                     mitk::RenderingManager* renderingManager,
-                                     mitk::BaseRenderer::RenderingMode::Type renderingMode,
                                      const QString& multiWidgetName)
   : m_DataStorage(nullptr)
-  , m_RenderingManager(renderingManager)
-  , m_RenderingMode(renderingMode)
   , m_MultiWidgetName(multiWidgetName)
   , m_MultiWidgetRows(0)
   , m_MultiWidgetColumns(0)
@@ -146,11 +84,9 @@ QmitkAbstractMultiWidget::Impl::Impl(QmitkAbstractMultiWidget* multiWidget,
 
 QmitkAbstractMultiWidget::QmitkAbstractMultiWidget(QWidget* parent,
                                                    Qt::WindowFlags f/* = 0*/,
-                                                   mitk::RenderingManager* renderingManager/* = nullptr*/,
-                                                   mitk::BaseRenderer::RenderingMode::Type renderingMode/* = mitk::BaseRenderer::RenderingMode::FastApproximateAntiAliasing*/,
                                                    const QString& multiWidgetName/* = "multiwidget"*/)
   : QWidget(parent, f)
-  , m_Impl(std::make_unique<Impl>(this, renderingManager, renderingMode, multiWidgetName))
+  , m_Impl(std::make_unique<Impl>(this, multiWidgetName))
 {
   // nothing here
 }
@@ -165,17 +101,6 @@ void QmitkAbstractMultiWidget::SetDataStorage(mitk::DataStorage* dataStorage)
 mitk::DataStorage* QmitkAbstractMultiWidget::GetDataStorage() const
 {
   return m_Impl->m_DataStorage;
-}
-
-mitk::RenderingManager* QmitkAbstractMultiWidget::GetRenderingManager() const
-{
-  // use the global rendering manager if none was specified
-  if (m_Impl->m_RenderingManager == nullptr)
-  {
-    return mitk::RenderingManager::GetInstance();
-  }
-
-  return m_Impl->m_RenderingManager;
 }
 
 int QmitkAbstractMultiWidget::GetRowCount() const
@@ -193,12 +118,6 @@ void QmitkAbstractMultiWidget::SetLayout(int row, int column)
   m_Impl->m_MultiWidgetRows = row;
   m_Impl->m_MultiWidgetColumns = column;
   SetLayoutImpl();
-}
-
-void QmitkAbstractMultiWidget::Synchronize(bool synchronized)
-{
-  m_Impl->Synchronize(synchronized);
-  SynchronizeImpl();
 }
 
 void QmitkAbstractMultiWidget::SetInteractionScheme(mitk::InteractionSchemeSwitcher::InteractionScheme scheme)
@@ -220,6 +139,17 @@ void QmitkAbstractMultiWidget::SetInteractionScheme(mitk::InteractionSchemeSwitc
 mitk::InteractionEventHandler* QmitkAbstractMultiWidget::GetInteractionEventHandler()
 {
   return m_Impl->m_DisplayActionEventBroadcast.GetPointer();
+}
+
+void QmitkAbstractMultiWidget::SetDisplayActionEventHandler(std::unique_ptr<mitk::DisplayActionEventHandler> displayActionEventHandler)
+{
+  m_Impl->m_DisplayActionEventHandler = std::move(displayActionEventHandler);
+  m_Impl->m_DisplayActionEventHandler->SetObservableBroadcast(m_Impl->m_DisplayActionEventBroadcast);
+}
+
+mitk::DisplayActionEventHandler* QmitkAbstractMultiWidget::GetDisplayActionEventHandler()
+{
+  return m_Impl->m_DisplayActionEventHandler.get();
 }
 
 QmitkAbstractMultiWidget::RenderWindowWidgetMap QmitkAbstractMultiWidget::GetRenderWindowWidgets() const

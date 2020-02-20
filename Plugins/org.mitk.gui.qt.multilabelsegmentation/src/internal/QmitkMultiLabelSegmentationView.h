@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QmitkMultiLabelSegmentationView_h
 #define QmitkMultiLabelSegmentationView_h
@@ -108,10 +104,10 @@ protected slots:
   void OnLockExteriorToggled(bool);
 
   // reaction to the selection of a new patient (reference) image in the DataStorage combobox
-  void OnReferenceSelectionChanged(const mitk::DataNode* node);
+  void OnReferenceSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
   // reaction to the selection of a new Segmentation (working) image in the DataStorage combobox
-  void OnSegmentationSelectionChanged(const mitk::DataNode* node);
+  void OnSegmentationSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
   // reaction to ...
   void OnInterpolationSelectionChanged(int);
@@ -119,13 +115,7 @@ protected slots:
 protected:
 
   // reimplemented from QmitkAbstractView
-  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes) override;
-
-  // reimplemented from QmitkAbstractView
   void OnPreferencesChanged(const berry::IBerryPreferences* prefs) override;
-
-  // reimplemented from QmitkAbstractView
-  void NodeAdded(const mitk::DataNode* node) override;
 
   // reimplemented from QmitkAbstractView
   void NodeRemoved(const mitk::DataNode* node) override;
@@ -149,11 +139,7 @@ protected:
   void InitializeListeners();
 
   /// \brief Checks if two images have the same size and geometry
-  bool CheckForSameGeometry(const mitk::Image *image1, const mitk::Image *image2) const;
-
-  QString GetLastFileOpenPath();
-
-  void SetLastFileOpenPath(const QString &path);
+  static bool CheckForSameGeometry(const mitk::DataNode *node1, const mitk::DataNode *node2);
 
   /// \brief the Qt parent of our GUI (NOT of this object)
   QWidget *m_Parent;

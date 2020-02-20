@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKUSNAVIGATIONSTEPTIMER_H
 #define MITKUSNAVIGATIONSTEPTIMER_H
@@ -38,8 +34,8 @@ namespace mitk {
  */
 class USNavigationStepTimer : public itk::Object {
 public:
-  mitkClassMacroItkParent(USNavigationStepTimer, itk::Object)
-  itkNewMacro(USNavigationStepTimer)
+  mitkClassMacroItkParent(USNavigationStepTimer, itk::Object);
+  itkNewMacro(USNavigationStepTimer);
 
   /**
    * \brief Stops the timer for the current index.

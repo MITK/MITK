@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef mitkPointCloudScoringFilter_h_Included
 #define mitkPointCloudScoringFilter_h_Included
@@ -39,17 +35,17 @@ namespace mitk
   public:
     typedef std::pair<int, double> ScorePair;
 
-    mitkClassMacro(PointCloudScoringFilter, UnstructuredGridToUnstructuredGridFilter)
+    mitkClassMacro(PointCloudScoringFilter, UnstructuredGridToUnstructuredGridFilter);
 
-      itkFactorylessNewMacro(Self)
+    itkFactorylessNewMacro(Self);
 
       /** Number of Points of the scored UnstructuredGrid. These points are far away
        * from their neighbours */
-      itkGetMacro(NumberOfOutpPoints, int)
+      itkGetMacro(NumberOfOutpPoints, int);
 
       /** A vector in which the point IDs and their distance to their neighbours
        * is stored */
-      itkGetMacro(FilteredScores, std::vector<ScorePair>)
+      itkGetMacro(FilteredScores, std::vector<ScorePair>);
 
         protected :
 

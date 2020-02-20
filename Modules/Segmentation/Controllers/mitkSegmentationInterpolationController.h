@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef mitkSegmentationInterpolationController_h_Included
 #define mitkSegmentationInterpolationController_h_Included
@@ -38,9 +34,6 @@ namespace mitk
     \sa QmitkInteractiveSegmentation
 
     \ingroup ToolManagerEtAl
-
-    There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref
-    QmitkInteractiveSegmentationTechnicalPage
 
     This class keeps track of the contents of a 3D segmentation image.
     \attention mitk::SegmentationInterpolationController assumes that the image contains pixel values of 0 and 1.
@@ -75,7 +68,8 @@ namespace mitk
   {
   public:
     mitkClassMacroItkParent(SegmentationInterpolationController, itk::Object);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /**
         \brief Find interpolator for a given image.

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #ifndef MITKNAVIGATIONDATATOMESSAGEFILTER_H_HEADER_INCLUDED_
@@ -42,8 +38,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(NavigationDataToMessageFilter, NavigationDataToNavigationDataFilter);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
     mitkNewMessage2Macro(PositionChanged, mitk::NavigationData::PositionType, unsigned int);       ///< Sends the message PositionChangedMessage whenever the position of the input changes. First parameter is the new position, second parameter is the index of the input that changed
     mitkNewMessage2Macro(OrientationChanged, mitk::NavigationData::OrientationType, unsigned int); ///< Sends the message OrientationChangedMessage whenever the orientation of the input changes. First parameter is the new orientation, second parameter is the index of the input that changed
     mitkNewMessage2Macro(ErrorChanged, mitk::NavigationData::CovarianceMatrixType, unsigned int);  ///< Sends the message ErrorChangedMessage whenever the error covariance matrix of the input changes. First parameter is the new error covariance matrix, second parameter is the index of the input that changed

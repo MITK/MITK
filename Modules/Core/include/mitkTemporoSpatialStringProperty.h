@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKTEMPOROSPATIALSTRINGPROPERTY_H_HEADER
 #define MITKTEMPOROSPATIALSTRINGPROPERTY_H_HEADER
@@ -45,7 +41,10 @@ namespace mitk
 
     mitkClassMacro(TemporoSpatialStringProperty, BaseProperty);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self) mitkNewMacro1Param(TemporoSpatialStringProperty, const char *);
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
+    mitkNewMacro1Param(TemporoSpatialStringProperty, const char*);
     mitkNewMacro1Param(TemporoSpatialStringProperty, const std::string &);
 
     /**Returns the value of the first time point in the first slice.

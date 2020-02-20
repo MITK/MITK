@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITK_NODE_SELECTION_DIALOG_H
 #define QMITK_NODE_SELECTION_DIALOG_H
@@ -28,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkNodeSelectionDialog.h"
 
 #include <QDialog>
+#include <QPushButton>
 
 /**
 * \class QmitkNodeSelectionDialog
@@ -40,25 +37,37 @@ class MITK_QT_COMMON QmitkNodeSelectionDialog : public QDialog
 public:
   explicit QmitkNodeSelectionDialog(QWidget* parent = nullptr, QString caption = "", QString hint = "");
 
-  /*
+  /**
   * @brief Sets the data storage that will be used /monitored by widget.
   *
   * @param dataStorage      A pointer to the data storage to set.
   */
   void SetDataStorage(mitk::DataStorage* dataStorage);
 
-  /*
+  /**
   * @brief Sets the node predicate and updates the widget, according to the node predicate.
   *
   * @param nodePredicate    A pointer to node predicate.
   */
-  virtual void SetNodePredicate(mitk::NodePredicateBase* nodePredicate);
+  virtual void SetNodePredicate(const mitk::NodePredicateBase* nodePredicate);
 
-  mitk::NodePredicateBase* GetNodePredicate() const;
+  const mitk::NodePredicateBase* GetNodePredicate() const;
 
   using NodeList = QList<mitk::DataNode::Pointer>;
-
   NodeList GetSelectedNodes() const;
+
+  /**
+  * @brief Helper function that is used to check the given selection for consistency.
+  *        Returning an empty string assumes that everything is alright and the selection is valid.
+  *        If the string is not empty, the content of the string will be used as error message.
+  */
+  using SelectionCheckFunctionType = std::function<std::string(const NodeList &)>;
+  /**
+  * @brief A selection check function can be set. If set the dialog uses this function to check the made/set selection.
+  *        If the selection is valid, everything is fine.
+  *        If the selection is indicated as invalid, the dialog will display the selection check function error message.
+  */
+  void SetSelectionCheckFunction(const SelectionCheckFunctionType &checkFunction);
 
   bool GetSelectOnlyVisibleNodes() const;
 
@@ -103,7 +112,9 @@ Q_SIGNALS:
   void SetCurrentSelection(NodeList selectedNodes);
 
 protected Q_SLOTS:
+
   void OnSelectionChanged(NodeList selectedNodes);
+  void OnFavoriteNodesButtonClicked();
   void OnOK();
   void OnCancel();
 
@@ -111,15 +122,18 @@ protected:
   void AddPanel(QmitkAbstractDataStorageInspector* view, QString name, QString desc);
 
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
-  mitk::NodePredicateBase::Pointer m_NodePredicate;
+  mitk::NodePredicateBase::ConstPointer m_NodePredicate;
   bool m_SelectOnlyVisibleNodes;
   NodeList m_SelectedNodes;
+
+  SelectionCheckFunctionType m_CheckFunction;
 
   SelectionMode m_SelectionMode;
 
   using PanelVectorType = std::vector<QmitkAbstractDataStorageInspector*>;
   PanelVectorType m_Panels;
 
+  QPushButton* m_FavoriteNodesButton;
   Ui_QmitkNodeSelectionDialog m_Controls;
 };
-#endif // QmitkNodeSelectionDialog_H
+#endif // QMITK_NODE_SELECTION_DIALOG_H

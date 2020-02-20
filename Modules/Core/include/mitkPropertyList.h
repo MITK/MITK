@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef PROPERTYLIST_H_HEADER_INCLUDED_C1C77D8D
 #define PROPERTYLIST_H_HEADER_INCLUDED_C1C77D8D
@@ -68,12 +64,13 @@ namespace mitk
   class MITKCORE_EXPORT PropertyList : public itk::Object, public IPropertyOwner
   {
   public:
-    mitkClassMacroItkParent(PropertyList, itk::Object)
+    mitkClassMacroItkParent(PropertyList, itk::Object);
 
     /**
      * Method for creation through the object factory.
      */
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     /**
      * Map structure to hold the properties: the map key is a string,

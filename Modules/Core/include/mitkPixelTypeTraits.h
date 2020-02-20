@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef PIXELTYPETRAITS_H
 #define PIXELTYPETRAITS_H
@@ -75,8 +71,7 @@ namespace mitk
     static const bool value = false;
   };
 
-/** \def DEFINE_TYPE_PRIMITIVE macro which provides a partial specialization for the \sa isPrimitiveType
-  object */
+/** \brief Provides a partial specialization for the \sa isPrimitiveType object */
 #define DEFINE_TYPE_PRIMITIVE(_TYPEIN)                                                                                 \
   template <>                                                                                                          \
   struct isPrimitiveType<_TYPEIN>                                                                                      \

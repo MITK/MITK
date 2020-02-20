@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "../DataManagement/mitkBoundingShapeUtil.h"
 #include <mitkBoundingShapeInteractor.h>
@@ -288,7 +284,7 @@ bool mitk::BoundingShapeInteractor::CheckOverHandles(const InteractionEvent *int
       this->GetDataNode()->GetPropertyList()->SetProperty(activeHandleIdPropertyName,
                                                           mitk::IntProperty::New(handleNum++));
       this->GetDataNode()->GetData()->Modified();
-      interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+      RenderingManager::GetInstance()->RequestUpdateAll();
       return true;
     }
     else
@@ -302,7 +298,7 @@ bool mitk::BoundingShapeInteractor::CheckOverHandles(const InteractionEvent *int
   return false;
 }
 
-void mitk::BoundingShapeInteractor::SelectHandle(StateMachineAction *, InteractionEvent *interactionEvent)
+void mitk::BoundingShapeInteractor::SelectHandle(StateMachineAction *, InteractionEvent *)
 {
   this->DisableCrosshairNavigation();
   DataNode::Pointer node = this->GetDataNode();
@@ -318,11 +314,11 @@ void mitk::BoundingShapeInteractor::SelectHandle(StateMachineAction *, Interacti
   }
   this->GetDataNode()->GetData()->UpdateOutputInformation(); // Geometry is up-to-date
   this->GetDataNode()->GetData()->Modified();
-  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
   return;
 }
 
-void mitk::BoundingShapeInteractor::DeselectHandles(StateMachineAction *, InteractionEvent *interactionEvent)
+void mitk::BoundingShapeInteractor::DeselectHandles(StateMachineAction *, InteractionEvent *)
 {
   this->DisableCrosshairNavigation();
   DataNode::Pointer node = this->GetDataNode();
@@ -333,7 +329,7 @@ void mitk::BoundingShapeInteractor::DeselectHandles(StateMachineAction *, Intera
   this->GetDataNode()->GetPropertyList()->SetProperty(activeHandleIdPropertyName, mitk::IntProperty::New(-1));
   this->GetDataNode()->GetData()->UpdateOutputInformation(); // Geometry is up-to-date
   this->GetDataNode()->GetData()->Modified();
-  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
 
   return;
 }
@@ -358,7 +354,7 @@ void mitk::BoundingShapeInteractor::SelectObject(StateMachineAction *, Interacti
   return;
 }
 
-void mitk::BoundingShapeInteractor::DeselectObject(StateMachineAction *, InteractionEvent *interactionEvent)
+void mitk::BoundingShapeInteractor::DeselectObject(StateMachineAction *, InteractionEvent *)
 {
   this->EnableCrosshairNavigation(); // enable crosshair interaction and scolling if user is hovering over the object
 
@@ -376,7 +372,7 @@ void mitk::BoundingShapeInteractor::DeselectObject(StateMachineAction *, Interac
 
   this->GetDataNode()->GetData()->UpdateOutputInformation(); // Geometry is up-to-date
   this->GetDataNode()->GetData()->Modified();
-  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
   return;
 }
 

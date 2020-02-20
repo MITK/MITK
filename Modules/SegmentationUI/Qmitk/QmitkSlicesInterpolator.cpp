@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkSlicesInterpolator.h"
 
@@ -173,13 +169,13 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget *parent, const char * /
   m_3DContourNode->SetProperty("3DContourContainer", mitk::BoolProperty::New(true));
   m_3DContourNode->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
   m_3DContourNode->SetVisibility(
+    false, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget0")));
+  m_3DContourNode->SetVisibility(
     false, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
   m_3DContourNode->SetVisibility(
     false, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2")));
   m_3DContourNode->SetVisibility(
     false, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")));
-  m_3DContourNode->SetVisibility(
-    false, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
 
   QWidget::setContentsMargins(0, 0, 0, 0);
   if (QWidget::layout() != nullptr)
@@ -598,7 +594,7 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
 
   if (interpolatedSurface.IsNotNull() && workingNode &&
       workingNode->IsVisible(
-        mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))))
+        mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2"))))
   {
     m_BtnApply3D->setEnabled(true);
     m_BtnSuggestPlane->setEnabled(true);
@@ -940,7 +936,7 @@ void ::QmitkSlicesInterpolator::RunPlaneSuggestion()
 
   // Create plane suggestion
   mitk::BaseRenderer::Pointer br =
-    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"));
+    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget0"));
   mitk::PlaneProposer planeProposer;
   std::vector<mitk::UnstructuredGrid::Pointer> grids = clusterFilter->GetAllClusters();
 
@@ -1082,7 +1078,7 @@ void QmitkSlicesInterpolator::StopUpdateInterpolationTimer()
   m_Timer->stop();
   m_InterpolatedSurfaceNode->SetProperty("color", mitk::ColorProperty::New(SURFACE_COLOR_RGB));
   mitk::RenderingManager::GetInstance()->RequestUpdate(
-    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetRenderWindow());
+    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))->GetRenderWindow());
 }
 
 void QmitkSlicesInterpolator::ChangeSurfaceColor()
@@ -1100,7 +1096,7 @@ void QmitkSlicesInterpolator::ChangeSurfaceColor()
   }
   m_InterpolatedSurfaceNode->Update();
   mitk::RenderingManager::GetInstance()->RequestUpdate(
-    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetRenderWindow());
+    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))->GetRenderWindow());
 }
 
 void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
@@ -1132,7 +1128,7 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
         }
 
         if ((workingNode->IsVisible(
-              mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")))) &&
+              mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2")))) &&
             !isInterpolationResult && m_3DInterpolationEnabled)
         {
           int ret = QMessageBox::Yes;
@@ -1296,7 +1292,7 @@ void QmitkSlicesInterpolator::Show3DInterpolationResult(bool status)
 
   if (m_3DContourNode.IsNotNull())
     m_3DContourNode->SetVisibility(
-      status, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
+      status, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")));
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

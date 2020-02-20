@@ -2,17 +2,13 @@
 
 """
 
-The MultiSpectral Imaging Toolkit (MSITK)
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Computer Assisted Interventions.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
-
-See LICENSE for details
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
 """
 '''

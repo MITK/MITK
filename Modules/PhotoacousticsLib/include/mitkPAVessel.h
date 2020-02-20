@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKVESSEL_H
 #define MITKVESSEL_H
@@ -35,14 +31,14 @@ namespace mitk {
     class MITKPHOTOACOUSTICSLIB_EXPORT Vessel : public itk::LightObject
     {
     public:
-      mitkClassMacroItkParent(Vessel, itk::LightObject)
-        mitkNewMacro1Param(Self, VesselProperties::Pointer)
+      mitkClassMacroItkParent(Vessel, itk::LightObject);
+      mitkNewMacro1Param(Self, VesselProperties::Pointer);
 
-        /**
-         * Callback function definition of a VesselMeanderStrategy
-         */
-        typedef void (VesselMeanderStrategy::*CalculateNewVesselPositionCallback)
-        (Vector::Pointer, double, std::mt19937*);
+      /**
+        * Callback function definition of a VesselMeanderStrategy
+        */
+      typedef void (VesselMeanderStrategy::*CalculateNewVesselPositionCallback)
+      (Vector::Pointer, double, std::mt19937*);
 
       /**
        * @brief ExpandVessel makes this Vessel expand one step in its current direction.

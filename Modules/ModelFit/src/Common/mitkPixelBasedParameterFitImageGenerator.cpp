@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "itkCommand.h"
 #include "itkMultiOutputNaryFunctorImageFilter.h"
@@ -39,7 +35,7 @@ void
 };
 
 template <typename TPixel, unsigned int VDim>
-void 
+void
   mitk::PixelBasedParameterFitImageGenerator::DoPrepareMask(itk::Image<TPixel, VDim>* image)
 {
   m_InternalMask = dynamic_cast<InternalMaskType*>(image);
@@ -59,7 +55,7 @@ void
 }
 
 template<typename TImage>
-mitk::PixelBasedParameterFitImageGenerator::ParameterImageMapType StoreResultImages( mitk::ModelFitFunctorBase::ParameterNamesType &paramNames, itk::ImageSource<TImage>* source, mitk::ModelFitFunctorBase::ParameterNamesType::size_type startPos, mitk::ModelFitFunctorBase::ParameterNamesType::size_type& endPos ) 
+mitk::PixelBasedParameterFitImageGenerator::ParameterImageMapType StoreResultImages( mitk::ModelFitFunctorBase::ParameterNamesType &paramNames, itk::ImageSource<TImage>* source, mitk::ModelFitFunctorBase::ParameterNamesType::size_type startPos, mitk::ModelFitFunctorBase::ParameterNamesType::size_type& endPos )
 {
   mitk::PixelBasedParameterFitImageGenerator::ParameterImageMapType result;
   for (mitk::ModelFitFunctorBase::ParameterNamesType::size_type j = 0; j < paramNames.size(); ++j)
@@ -82,7 +78,7 @@ mitk::PixelBasedParameterFitImageGenerator::ParameterImageMapType StoreResultIma
 }
 
 template <typename TPixel, unsigned int VDim>
-void 
+void
   mitk::PixelBasedParameterFitImageGenerator::DoParameterFit(itk::Image<TPixel, VDim>* /*image*/)
 {
   using InputFrameImageType = itk::Image<TPixel, VDim-1>;
@@ -128,7 +124,7 @@ void
 
   ModelFitFunctorPolicy functor;
 
-  functor.SetModelFitFunctor(this->m_FitFunctor); 
+  functor.SetModelFitFunctor(this->m_FitFunctor);
   functor.SetModelParameterizer(this->m_ModelParameterizer);
   fitFilter->SetFunctor(functor);
   if (this->m_InternalMask.IsNotNull())

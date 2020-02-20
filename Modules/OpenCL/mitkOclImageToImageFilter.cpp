@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkOclImageToImageFilter.h"
 #include "mitkOclImage.h"
@@ -179,7 +175,7 @@ bool mitk::OclImageToImageFilter::InitExec(cl_kernel ckKernel)
   //TODO bpp, or SetImageWidth/Height/...
   MITK_INFO << "Create GPU Image call " << uiImageWidth<< "x"<<uiImageHeight<< "x"<<uiImageDepth;
   clBuffOut = m_Output->CreateGPUImage(uiImageWidth, uiImageHeight, uiImageDepth, this->m_CurrentType + 1);
-  
+
 
   clErr = 0;
   clErr  = clSetKernelArg(ckKernel, 0, sizeof(cl_mem), &clBuffIn);

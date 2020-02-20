@@ -1,3 +1,15 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
 #ifndef MITKTHREESTEPLINEARMODEL_H
 #define MITKTHREESTEPLINEARMODEL_H
 
@@ -25,7 +37,7 @@ namespace mitk
     itkCloneMacro(Self);
 
     /** Run-time type information (and related methods). */
-    itkTypeMacro(ThreeStepLinearModel, ModelBase)
+    itkTypeMacro(ThreeStepLinearModel, ModelBase);
 
     static const std::string MODEL_DISPLAY_NAME;
     static const std::string NAME_PARAMETER_S0;

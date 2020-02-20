@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKGEOMETRYCLIPIMAGEFILTER_H_HEADER_INCLUDED_C1F48A22
 #define MITKGEOMETRYCLIPIMAGEFILTER_H_HEADER_INCLUDED_C1F48A22
@@ -49,7 +45,9 @@ namespace mitk
   public:
     mitkClassMacro(GeometryClipImageFilter, ImageToImageFilter);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       /**
       * Set the geometry to be used for clipping
@@ -129,9 +127,9 @@ namespace mitk
     void GenerateData() override;
 
     template <typename TPixel, unsigned int VImageDimension>
-    friend void _InternalComputeClippedImage(itk::Image<TPixel, VImageDimension> *itkImage,
-                                             mitk::GeometryClipImageFilter *geometryClipper,
-                                             const mitk::PlaneGeometry *clippingPlaneGeometry);
+    void _InternalComputeClippedImage(itk::Image<TPixel, VImageDimension> *itkImage,
+                                      mitk::GeometryClipImageFilter *geometryClipper,
+                                      const mitk::PlaneGeometry *clippingPlaneGeometry);
 
     mitk::BaseGeometry::ConstPointer m_ClippingGeometry;
     mitk::GeometryData::Pointer m_ClippingGeometryData;

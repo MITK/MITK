@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef mitkDICOMFileReaderSelector_h
 #define mitkDICOMFileReaderSelector_h
@@ -49,8 +45,8 @@ class MITKDICOMREADER_EXPORT DICOMFileReaderSelector : public itk::LightObject
 
     typedef std::list<DICOMFileReader::Pointer> ReaderList;
 
-    mitkClassMacroItkParent( DICOMFileReaderSelector, itk::LightObject )
-    itkNewMacro( DICOMFileReaderSelector )
+    mitkClassMacroItkParent( DICOMFileReaderSelector, itk::LightObject );
+    itkNewMacro( DICOMFileReaderSelector );
 
     /// \brief Add a configuration as expected by DICOMReaderConfigurator.
     /// Configs can only be reset by instantiating a new DICOMFileReaderSelector.
@@ -62,10 +58,10 @@ class MITKDICOMREADER_EXPORT DICOMFileReaderSelector : public itk::LightObject
     /// \brief Add a whole pre-configured reader to the selection process.
     void AddFileReaderCanditate(DICOMFileReader::Pointer reader);
 
-    /// \brief Load 3D image creating configurations from the MITK module system (see \ref mitk::Module::FindResources).
+    /// \brief Load 3D image creating configurations from the MITK module system (see us::Module::FindResources()).
     /// For a default set of configurations, look into the directory Resources of the DICOMReader module.
     void LoadBuiltIn3DConfigs();
-    /// \brief Load 3D+t image creating configurations from the MITK module system (see \ref mitk::Module::FindResources).
+    /// \brief Load 3D+t image creating configurations from the MITK module system (see us::Module::FindResources()).
     /// For a default set of configurations, look into the directory Resources of the DICOMReader module.
     void LoadBuiltIn3DnTConfigs();
 

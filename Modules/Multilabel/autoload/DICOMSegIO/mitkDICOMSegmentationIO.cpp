@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef __mitkDICOMSegmentationIO__cpp
 #define __mitkDICOMSegmentationIO__cpp
@@ -104,7 +100,7 @@ namespace mitk
         return Unsupported;
       }
 
-      // Check if input file has dicom information for the referenced image (original DICOM image, e.g. CT) Still necessary, see write() 
+      // Check if input file has dicom information for the referenced image (original DICOM image, e.g. CT) Still necessary, see write()
       mitk::StringLookupTableProperty::Pointer dicomFilesProp =
       dynamic_cast<mitk::StringLookupTableProperty *>(input->GetProperty("referenceFiles").GetPointer());
 
@@ -459,7 +455,7 @@ namespace mitk
     const std::string output;
     dcmqi::JSONSegmentationMetaInformationHandler handler;
 
- 
+
     // 1. Metadata attributes that will be listed in the resulting DICOM SEG object
     std::string contentCreatorName;
     if (!image->GetPropertyList()->GetStringProperty(GeneratePropertyNameForDICOMTag(0x0070, 0x0084).c_str(),

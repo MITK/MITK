@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkDataNode.h"
 #include "mitkCoreObjectFactory.h"
@@ -118,11 +114,11 @@ mitk::DataNode &mitk::DataNode::operator=(mitk::BaseData *right)
 }
 
 #if (_MSC_VER > 1200) || !defined(_MSC_VER)
-MBI_STD::istream &mitk::operator>>(MBI_STD::istream &i, mitk::DataNode::Pointer &dtn)
+std::istream &mitk::operator>>(std::istream &i, mitk::DataNode::Pointer &dtn)
 #endif
 #if ((defined(_MSC_VER)) && (_MSC_VER <= 1200))
-  MBI_STD::istream &
-  operator>>(MBI_STD::istream &i, mitk::DataNode::Pointer &dtn)
+  std::istream &
+  operator>>(std::istream &i, mitk::DataNode::Pointer &dtn)
 #endif
 {
   dtn = mitk::DataNode::New();
@@ -131,11 +127,11 @@ MBI_STD::istream &mitk::operator>>(MBI_STD::istream &i, mitk::DataNode::Pointer 
 }
 
 #if (_MSC_VER > 1200) || !defined(_MSC_VER)
-MBI_STD::ostream &mitk::operator<<(MBI_STD::ostream &o, mitk::DataNode::Pointer &dtn)
+std::ostream &mitk::operator<<(std::ostream &o, mitk::DataNode::Pointer &dtn)
 #endif
 #if ((defined(_MSC_VER)) && (_MSC_VER <= 1200))
-  MBI_STD::ostream &
-  operator<<(MBI_STD::ostream &o, mitk::DataNode::Pointer &dtn)
+  std::ostream &
+  operator<<(std::ostream &o, mitk::DataNode::Pointer &dtn)
 #endif
 {
   if (dtn->GetData() != nullptr)

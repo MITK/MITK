@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <iostream>
 #include "mitkTestingMacros.h"
@@ -38,7 +34,7 @@ int mitkSimpleBarrierConstraintCheckerTest(int  /*argc*/, char*[] /*argv[]*/)
 
   double defaultMaxPenalty = 1e15;
 
-  //check freshly created checker; 
+  //check freshly created checker;
   MITK_TEST_CONDITION_REQUIRED(checker->GetNumberOfConstraints() == 0, "Testing GetNumberOfConstraints for new checker.");
   MITK_TEST_CONDITION_REQUIRED(checker->GetFailedConstraintValue() == defaultMaxPenalty, "Testing GetNumberOfConstraints for new checker.");
   MITK_TEST_CONDITION_REQUIRED(checker->GetMaxConstraintPenalty() == defaultMaxPenalty, "Testing GetNumberOfConstraints for new checker.");
@@ -124,7 +120,7 @@ int mitkSimpleBarrierConstraintCheckerTest(int  /*argc*/, char*[] /*argv[]*/)
   MITK_TEST_CONDITION_REQUIRED(penalties[2] == 0.0, "Testing penalty 3 of test parameters p9.");
   MITK_TEST_CONDITION_REQUIRED(penalties[3] == 0.0, "Testing penalty 4 of test parameters p9.");
   MITK_TEST_CONDITION_REQUIRED(checker->GetPenaltySum(p9) == penalties[0] + penalties[1] + penalties[2] + penalties[3], "Testing penalty sum of test parameters p9.");
-  
+
   checker->SetMaxConstraintPenalty(2222);
   penalties = checker->GetPenalties(p8);
   MITK_TEST_CONDITION_REQUIRED(penalties[3] == 2222, "Testing penalty 3 of test parameters p8 with changed max penalty.");

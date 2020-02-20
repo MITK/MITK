@@ -1,25 +1,21 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 /****************************************************************************
  *              fresnel.h -
  *  Calculation of Fresnel integrals by expansion to Chebyshev series
  *  Expansions are taken from the book
  *  Y.L. Luke. Mathematical functions and their approximations.
- *  Ìoscow, "Mir", 1980. PP. 145-149 (Russian edition)
+ *  ÃŒoscow, "Mir", 1980. PP. 145-149 (Russian edition)
  ****************************************************************************
  */
 

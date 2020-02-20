@@ -15,7 +15,7 @@ if(MITK_USE_CTK)
 
   if(NOT DEFINED CTK_DIR)
 
-    set(revision_tag "kislinsk_fix-pythonlibs-handling") # Switch back to official CTK repo when PR874 was merged
+    set(revision_tag "78341aba")
 
     set(ctk_optional_cache_args )
     if(MITK_USE_Python3)
@@ -23,7 +23,7 @@ if(MITK_USE_CTK)
            -DCTK_LIB_Scripting/Python/Widgets:BOOL=ON
            -DCTK_ENABLE_Python_Wrapping:BOOL=OFF
            -DCTK_APP_ctkSimplePythonShell:BOOL=OFF
-           "-DPYTHON_INCLUDE_DIR:PATH=${Python3_INCLUDE_DIR}"
+           "-DPYTHON_INCLUDE_DIR:PATH=${Python3_INCLUDE_DIRS}"
            "-DPYTHON_LIBRARY:FILEPATH=${Python3_LIBRARY_RELEASE}"
       )
     else()
@@ -51,8 +51,8 @@ if(MITK_USE_CTK)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
-      URL_MD5 49e1652cc505bdf3f77210976df97d63
+      GIT_REPOSITORY https://github.com/commontk/CTK
+      GIT_TAG ${revision_tag}
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}
@@ -68,7 +68,7 @@ if(MITK_USE_CTK)
         -DQt5_DIR=${Qt5_DIR}
         -DGit_EXECUTABLE:FILEPATH=${GIT_EXECUTABLE}
         -DGIT_EXECUTABLE:FILEPATH=${GIT_EXECUTABLE}
-        -DCTK_BUILD_QTDESIGNER_PLUGINS:BOOL=OFF
+        -DCTK_BUILD_QTDESIGNER_PLUGINS:BOOL=ON
         -DCTK_LIB_CommandLineModules/Backend/LocalProcess:BOOL=ON
         -DCTK_LIB_CommandLineModules/Frontend/QtGui:BOOL=ON
         -DCTK_LIB_PluginFramework:BOOL=ON

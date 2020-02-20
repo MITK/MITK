@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #include "QmitkNodeSelectionButton.h"
@@ -23,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QPainter"
 #include "QTextDocument"
+#include "QEvent"
 
 #include <mitkDataNode.h>
 #include <QmitkNodeDescriptorManager.h>
@@ -99,12 +96,55 @@ QPixmap GetPixmapFromImageNode(const mitk::DataNode* dataNode, int height)
 }
 
 QmitkNodeSelectionButton::QmitkNodeSelectionButton(QWidget *parent)
-  : QPushButton(parent), m_OutDatedThumpNail(true)
+  : QPushButton(parent), m_OutDatedThumpNail(true), m_DataMTime(0), m_IsOptional(true), m_NodeModifiedObserverTag(0), m_NodeObserved(false)
 { }
 
 QmitkNodeSelectionButton::~QmitkNodeSelectionButton()
 {
+  this->RemoveNodeObserver();
   this->m_SelectedNode = nullptr;
+}
+
+void QmitkNodeSelectionButton::AddNodeObserver()
+{
+  if (this->m_SelectedNode.IsNotNull())
+  {
+    if (m_NodeObserved)
+    {
+      MITK_DEBUG << "Invalid observer state in QmitkNodeSelectionButton. There is already a registered observer. Internal logic is not correct. May be an old observer was not removed.";
+    }
+
+    auto modifiedCommand = itk::MemberCommand<QmitkNodeSelectionButton>::New();
+    modifiedCommand->SetCallbackFunction(this, &QmitkNodeSelectionButton::OnNodeModified);
+
+    // const cast because we need non const nodes and it seems to be the lesser of two evil.
+    // the changes to the node are only on the observer level. The other option would be to
+    // make the public interface require non const nodes, this we don't want to introduce.
+    auto nonconst_node = const_cast<mitk::DataNode*>(this->m_SelectedNode.GetPointer());
+    m_NodeModifiedObserverTag = nonconst_node->AddObserver(itk::ModifiedEvent(), modifiedCommand);
+    m_NodeObserved = true;
+  }
+}
+
+void QmitkNodeSelectionButton::RemoveNodeObserver()
+{
+  if (this->m_SelectedNode.IsNotNull())
+  {
+    // const cast because we need non const nodes and it seems to be the lesser of two evil.
+    // the changes to the node are only on the observer level. The other option would be to
+    // make the public interface require non const nodes, this we don't want to introduce.
+    auto nonconst_node = const_cast<mitk::DataNode*>(this->m_SelectedNode.GetPointer());
+    nonconst_node->RemoveObserver(m_NodeModifiedObserverTag);
+  }
+  m_NodeObserved = false;
+}
+
+void QmitkNodeSelectionButton::OnNodeModified(const itk::Object * /*caller*/, const itk::EventObject & event)
+{
+  if (itk::ModifiedEvent().CheckEvent(&event))
+  {
+    this->update();
+  }
 }
 
 const mitk::DataNode* QmitkNodeSelectionButton::GetSelectedNode() const
@@ -116,18 +156,20 @@ void QmitkNodeSelectionButton::SetSelectedNode(const mitk::DataNode* node)
 {
   if (m_SelectedNode != node)
   {
+    this->RemoveNodeObserver();
     this->m_SelectedNode = node;
     this->m_OutDatedThumpNail = true;
+    this->AddNodeObserver();
   }
 
   this->update();
-};
+}
 
 void QmitkNodeSelectionButton::SetNodeInfo(QString info)
 {
   this->m_Info = info;
   this->update();
-};
+}
 
 void QmitkNodeSelectionButton::paintEvent(QPaintEvent *p)
 {
@@ -140,7 +182,7 @@ void QmitkNodeSelectionButton::paintEvent(QPaintEvent *p)
     auto styleManager = context->getService<berry::IQtStyleManager>(styleManagerRef);
     stylesheet = styleManager->GetStylesheet();
   }
-  
+
   QPushButton::paintEvent(p);
 
   QPainter painter(this);
@@ -155,20 +197,47 @@ void QmitkNodeSelectionButton::paintEvent(QPaintEvent *p)
     auto iconLength = widgetSize.height() - 10;
     auto node = this->m_SelectedNode;
 
-    if (this->m_OutDatedThumpNail)
+    itk::ModifiedTimeType dataMTime = 0;
+    if (m_SelectedNode->GetData())
+    {
+      dataMTime = m_SelectedNode->GetData()->GetMTime();
+    }
+    if (dataMTime>m_DataMTime || this->m_OutDatedThumpNail)
     {
       this->m_ThumpNail = GetPixmapFromImageNode(node, iconLength);
       this->m_OutDatedThumpNail = false;
+      m_DataMTime = dataMTime;
     }
 
     painter.drawPixmap(origin, m_ThumpNail);
     origin.setX(origin.x() + iconLength + 5);
 
-    td.setHtml(QString::fromStdString("<font class=\"normal\">"+node->GetName()+"</font>"));
+    if (this->isEnabled())
+    {
+      td.setHtml(QString::fromStdString("<font class=\"normal\">" + node->GetName() + "</font>"));
+    }
+    else
+    {
+      td.setHtml(QString::fromStdString("<font class=\"disabled\">" + node->GetName() + "</font>"));
+    }
   }
   else
   {
-    td.setHtml(m_Info);
+    if (this->isEnabled())
+    {
+      if (this->m_IsOptional)
+      {
+        td.setHtml(QString("<font class=\"normal\">") + m_Info + QString("</font>"));
+      }
+      else
+      {
+        td.setHtml(QString("<font class=\"warning\">") + m_Info + QString("</font>"));
+      }
+    }
+    else
+    {
+      td.setHtml(QString("<font class=\"disabled\">") + m_Info + QString("</font>"));
+    }
   }
 
   auto textSize = td.size();
@@ -177,5 +246,23 @@ void QmitkNodeSelectionButton::paintEvent(QPaintEvent *p)
 
   painter.translate(origin);
   td.drawContents(&painter);
+}
 
+void QmitkNodeSelectionButton::changeEvent(QEvent *event)
+{
+  if (event->type() == QEvent::EnabledChange)
+  {
+    this->update();
+  }
+}
+
+bool QmitkNodeSelectionButton::GetSelectionIsOptional() const
+{
+  return m_IsOptional;
+}
+
+void QmitkNodeSelectionButton::SetSelectionIsOptional(bool isOptional)
+{
+  m_IsOptional = isOptional;
+  this->update();
 }

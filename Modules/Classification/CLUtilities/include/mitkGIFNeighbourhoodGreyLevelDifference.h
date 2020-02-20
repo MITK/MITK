@@ -1,3 +1,15 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
 #ifndef mitkGIFNeighbourhoodGreyLevelDifference_h
 #define mitkGIFNeighbourhoodGreyLevelDifference_h
 
@@ -10,9 +22,9 @@ namespace mitk
   class MITKCLUTILITIES_EXPORT GIFNeighbourhoodGreyLevelDifference : public AbstractGlobalImageFeature
   {
   public:
-    mitkClassMacro(GIFNeighbourhoodGreyLevelDifference,AbstractGlobalImageFeature)
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    mitkClassMacro(GIFNeighbourhoodGreyLevelDifference,AbstractGlobalImageFeature);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       GIFNeighbourhoodGreyLevelDifference();
 

@@ -45,7 +45,7 @@
          </attribute>
       </complexType>
    </element>
-   
+
    <element name="inputdevice">
       <annotation>
          <appinfo>
@@ -76,7 +76,7 @@
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  a fully qualified name of the class that implements 
+                  a fully qualified name of the class that implements
 &lt;samp&gt;mitk::IInputDevice&lt;/samp&gt;.
                </documentation>
                <appinfo>
@@ -103,17 +103,17 @@
          <meta.section type="examples"/>
       </appinfo>
       <documentation>
-         The following is an example of the extension point: 
+         The following is an example of the extension point:
 &lt;p&gt;
 &lt;pre&gt;
-   &lt;extension point=&quot;org.mitk.core.ext.inputdevices&quot;&gt; 
+   &lt;extension point=&quot;org.mitk.core.ext.inputdevices&quot;&gt;
       &lt;inputdevice
-         id=&quot;com.xyz.inputdevice.XYZDevice&quot; 
-         name=&quot;XYZ Device&quot; 
+         id=&quot;com.xyz.inputdevice.XYZDevice&quot;
+         name=&quot;XYZ Device&quot;
          class=&quot;ns::XYZDevice&quot; &gt;
          &lt;description&gt;My new 20-dimensional input device&lt;/description&gt;
       &lt;/inputdevice&gt;
-   &lt;/extension&gt; 
+   &lt;/extension&gt;
 &lt;/pre&gt;
 &lt;/p&gt;
      </documentation>
@@ -124,8 +124,8 @@
          <meta.section type="apiInfo"/>
       </appinfo>
       <documentation>
-         The value of the &lt;samp&gt;class&lt;/samp&gt; attribute must be a 
-fully qualified name of the class that implements 
+         The value of the &lt;samp&gt;class&lt;/samp&gt; attribute must be a
+fully qualified name of the class that implements
 &lt;samp&gt;mitk::IInputDevice&lt;/samp&gt;.
       </documentation>
    </annotation>
@@ -145,7 +145,7 @@ fully qualified name of the class that implements
          <meta.section type="copyright"/>
       </appinfo>
       <documentation>
-         Copyright (c) 2010 Medical and Biological Informatics, DKFZ&lt;br&gt;
+         Copyright (c) German Cancer Research Center (DKFZ)&lt;br&gt;
 All rights reserved.
       </documentation>
    </annotation>

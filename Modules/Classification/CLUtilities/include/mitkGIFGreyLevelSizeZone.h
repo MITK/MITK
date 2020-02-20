@@ -1,3 +1,15 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
 #ifndef mitkGIFGreyLevelSizeZone_h
 #define mitkGIFGreyLevelSizeZone_h
 
@@ -81,8 +93,8 @@ namespace mitk
     */
     public:
       mitkClassMacro(GIFGreyLevelSizeZone, AbstractGlobalImageFeature);
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+      itkFactorylessNewMacro(Self);
+      itkCloneMacro(Self);
 
       GIFGreyLevelSizeZone();
 

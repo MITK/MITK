@@ -1,3 +1,15 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
 #ifndef MITKHOTSPOTCALCULATOR_H
 #define MITKHOTSPOTCALCULATOR_H
 
@@ -32,10 +44,8 @@ namespace mitk
         typedef itk::SmartPointer< const Self >     ConstPointer;
 
         /** Method for creation through the object factory. */
-        itkNewMacro(Self)
-
-        /** Runtime information support. */
-        itkTypeMacro(HotspotMaskGenerator, MaskGenerator)
+        itkNewMacro(Self); /** Runtime information support. */
+        itkTypeMacro(HotspotMaskGenerator, MaskGenerator);
 
         /**
         @brief Set the input image. Required for this class

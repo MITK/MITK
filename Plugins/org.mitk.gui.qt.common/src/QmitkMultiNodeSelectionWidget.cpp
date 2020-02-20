@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #include "QmitkMultiNodeSelectionWidget.h"
@@ -63,7 +59,7 @@ QmitkMultiNodeSelectionWidget::NodeList QmitkMultiNodeSelectionWidget::CompileEm
   return result;
 }
 
-void QmitkMultiNodeSelectionWidget::OnNodePredicateChanged(mitk::NodePredicateBase* /*newPredicate*/)
+void QmitkMultiNodeSelectionWidget::OnNodePredicateChanged(const mitk::NodePredicateBase* /*newPredicate*/)
 {
   this->UpdateInfo();
   this->UpdateList();
@@ -137,11 +133,25 @@ void QmitkMultiNodeSelectionWidget::UpdateInfo()
   {
     if (m_IsOptional)
     {
-      m_Overlay->SetOverlayText(m_EmptyInfo);
+      if (this->isEnabled())
+      {
+        m_Overlay->SetOverlayText(QStringLiteral("<font class=\"normal\">") + m_EmptyInfo + QStringLiteral("</font>"));
+      }
+      else
+      {
+        m_Overlay->SetOverlayText(QStringLiteral("<font class=\"disabled\">") + m_EmptyInfo + QStringLiteral("</font>"));
+      }
     }
     else
     {
-      m_Overlay->SetOverlayText(m_InvalidInfo);
+      if (this->isEnabled())
+      {
+        m_Overlay->SetOverlayText(QStringLiteral("<font class=\"warning\">") + m_InvalidInfo + QStringLiteral("</font>"));
+      }
+      else
+      {
+        m_Overlay->SetOverlayText(QStringLiteral("<font class=\"disabled\">") + m_InvalidInfo + QStringLiteral("</font>"));
+      }
     }
   }
   else
@@ -251,4 +261,13 @@ void QmitkMultiNodeSelectionWidget::NodeRemovedFromStorage(const mitk::DataNode*
   {
     this->OnClearSelection(node);
   }
+}
+
+void QmitkMultiNodeSelectionWidget::changeEvent(QEvent *event)
+{
+  if (event->type() == QEvent::EnabledChange)
+  {
+    this->UpdateInfo();
+  }
+  QmitkAbstractNodeSelectionWidget::changeEvent(event);
 }

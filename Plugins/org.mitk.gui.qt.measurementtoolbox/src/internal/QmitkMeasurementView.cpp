@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkMeasurementView.h"
 
@@ -22,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QGridLayout>
 #include <QToolBar>
 #include <QTextBrowser>
+
 #include <mitkInteractionEventObserver.h>
 #include <mitkCoreServices.h>
 #include <mitkIPropertyFilters.h>
@@ -41,12 +38,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPlanarFigureInteractor.h>
 #include <mitkPlaneGeometry.h>
 #include <mitkILinkedRenderWindowPart.h>
+#include <mitkImage.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateNot.h>
+
 #include <QmitkRenderWindow.h>
-#include <mitkImage.h>
+#include <QmitkSingleNodeSelectionWidget.h>
 
 #include "mitkPluginActivator.h"
 #include "usModuleRegistry.h"
@@ -92,7 +91,7 @@ struct QmitkMeasurementViewData
       m_UnintializedPlanarFigure(false),
       m_ScrollEnabled(true),
       m_Parent(nullptr),
-      m_SelectedImageLabel(nullptr),
+      m_SingleNodeSelectionWidget(nullptr),
       m_DrawLine(nullptr),
       m_DrawPath(nullptr),
       m_DrawAngle(nullptr),
@@ -130,7 +129,7 @@ struct QmitkMeasurementViewData
   bool m_ScrollEnabled;
 
   QWidget* m_Parent;
-  QLabel* m_SelectedImageLabel;
+  QmitkSingleNodeSelectionWidget* m_SingleNodeSelectionWidget;
   QAction* m_DrawLine;
   QAction* m_DrawPath;
   QAction* m_DrawAngle;
@@ -170,10 +169,14 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
 {
   d->m_Parent = parent;
 
-  auto selectedImageLabel = new QLabel(tr("Reference Image: "));
-
-  d->m_SelectedImageLabel = new QLabel;
-  d->m_SelectedImageLabel->setStyleSheet("font-weight: bold;");
+  d->m_SingleNodeSelectionWidget = new QmitkSingleNodeSelectionWidget();
+  d->m_SingleNodeSelectionWidget->SetDataStorage(GetDataStorage());
+  d->m_SingleNodeSelectionWidget->SetNodePredicate(mitk::NodePredicateAnd::New(
+    mitk::TNodePredicateDataType<mitk::Image>::New(),
+    mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))));
+  d->m_SingleNodeSelectionWidget->SetSelectionIsOptional(true);
+  d->m_SingleNodeSelectionWidget->SetEmptyInfo(QStringLiteral("Please select a reference image"));
+  d->m_SingleNodeSelectionWidget->SetPopUpTitel(QStringLiteral("Select a reference image"));
 
   d->m_DrawActionsToolBar = new QToolBar;
   d->m_DrawActionsGroup = new QActionGroup(this);
@@ -223,6 +226,8 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
   currentAction->setCheckable(true);
   d->m_DrawSubdivisionPolygon = currentAction;
 
+  d->m_DrawActionsToolBar->setEnabled(false);
+
   // planar figure details text
   d->m_SelectedPlanarFiguresText = new QTextBrowser;
 
@@ -230,8 +235,7 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
   d->m_CopyToClipboard = new QPushButton(tr("Copy to Clipboard"));
 
   d->m_Layout = new QGridLayout;
-  d->m_Layout->addWidget(selectedImageLabel, 0, 0, 1, 1);
-  d->m_Layout->addWidget(d->m_SelectedImageLabel, 0, 1, 1, 1);
+  d->m_Layout->addWidget(d->m_SingleNodeSelectionWidget, 0, 0, 1, 2);
   d->m_Layout->addWidget(d->m_DrawActionsToolBar, 1, 0, 1, 2);
   d->m_Layout->addWidget(d->m_SelectedPlanarFiguresText, 2, 0, 1, 2);
   d->m_Layout->addWidget(d->m_CopyToClipboard, 3, 0, 1, 2);
@@ -241,8 +245,11 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
   this->CreateConnections();
   this->AddAllInteractors();
 }
+
 void QmitkMeasurementView::CreateConnections()
 {
+  connect(d->m_SingleNodeSelectionWidget, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,
+    this, &QmitkMeasurementView::OnCurrentSelectionChanged);
   connect(d->m_DrawLine, SIGNAL(triggered(bool)), this, SLOT(OnDrawLineTriggered(bool)));
   connect(d->m_DrawPath, SIGNAL(triggered(bool)), this, SLOT(OnDrawPathTriggered(bool)));
   connect(d->m_DrawAngle, SIGNAL(triggered(bool)), this, SLOT(OnDrawAngleTriggered(bool)));
@@ -255,6 +262,20 @@ void QmitkMeasurementView::CreateConnections()
   connect(d->m_DrawBezierCurve, SIGNAL(triggered(bool)), this, SLOT(OnDrawBezierCurveTriggered(bool)));
   connect(d->m_DrawSubdivisionPolygon, SIGNAL(triggered(bool)), this, SLOT(OnDrawSubdivisionPolygonTriggered(bool)));
   connect(d->m_CopyToClipboard, SIGNAL(clicked(bool)), this, SLOT(OnCopyToClipboard(bool)));
+}
+
+void QmitkMeasurementView::OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
+{
+  if (nodes.empty() || nodes.front().IsNull())
+  {
+    d->m_SelectedImageNode = nullptr;
+    d->m_DrawActionsToolBar->setEnabled(false);
+  }
+  else
+  {
+    d->m_SelectedImageNode = nodes.front();
+    d->m_DrawActionsToolBar->setEnabled(true);
+  }
 }
 
 void QmitkMeasurementView::NodeAdded(const mitk::DataNode* node)
@@ -310,59 +331,14 @@ void QmitkMeasurementView::NodeAdded(const mitk::DataNode* node)
     // adding to the map of tracked planarfigures
     d->m_DataNodeToPlanarFigureData[nonConstNode] = data;
   }
-
-  this->CheckForTopMostVisibleImage();
 }
 
 void QmitkMeasurementView::NodeChanged(const mitk::DataNode* node)
 {
-  // DETERMINE IF WE HAVE TO RENEW OUR DETAILS TEXT (ANY NODE CHANGED IN OUR SELECTION?)
-  auto renewText = false;
-
-  for (int i = 0; i < d->m_CurrentSelection.size(); ++i)
+  auto it = std::find(d->m_CurrentSelection.begin(), d->m_CurrentSelection.end(), node);
+  if (it != d->m_CurrentSelection.end())
   {
-    if (node == d->m_CurrentSelection[i])
-    {
-      renewText = true;
-      break;
-    }
-  }
-
-  if (renewText)
     this->UpdateMeasurementText();
-
-  this->CheckForTopMostVisibleImage();
-}
-
-void QmitkMeasurementView::CheckForTopMostVisibleImage(mitk::DataNode* nodeToNeglect)
-{
-  d->m_SelectedImageNode = this->DetectTopMostVisibleImage();
-
-  if (d->m_SelectedImageNode.GetPointer() == nodeToNeglect)
-    d->m_SelectedImageNode = nullptr;
-
-  auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
-  auto isHelpherObject = mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true));
-  auto isNotHelpherObject = mitk::NodePredicateNot::New(isHelpherObject);
-
-  auto nodeElements = this->GetDataStorage()->GetSubset(isNotHelpherObject);
-
-  if (d->m_SelectedImageNode.IsNotNull() && d->m_UnintializedPlanarFigure == false)
-  {
-    d->m_SelectedImageLabel->setText(QString::fromStdString(d->m_SelectedImageNode->GetName()));
-    d->m_DrawActionsToolBar->setEnabled(true);
-  }
-  else if (d->m_UnintializedPlanarFigure == false && nodeElements->size() != 0)
-  {
-    d->m_SelectedImageLabel->setText(tr("Working without an image..."));
-    d->m_DrawActionsToolBar->setEnabled(true);
-  }
-  else
-  {
-    if (d->m_UnintializedPlanarFigure == false)
-      d->m_SelectedImageLabel->setText(tr("No visible data available."));
-
-    d->m_DrawActionsToolBar->setEnabled(false);
   }
 }
 
@@ -422,32 +398,21 @@ void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
       }
     }
   }
-
-  this->CheckForTopMostVisibleImage(nonConstNode);
 }
 
 void QmitkMeasurementView::PlanarFigureSelected(itk::Object* object, const itk::EventObject&)
 {
   d->m_CurrentSelection.clear();
 
-  auto it = d->m_DataNodeToPlanarFigureData.begin();
-
-  while (it != d->m_DataNodeToPlanarFigureData.end())
+  auto lambda = [&object](const std::pair<mitk::DataNode::Pointer, QmitkPlanarFigureData>& element)
   {
-    auto node = it->first;
-    QmitkPlanarFigureData& data = it->second;
+    return element.second.m_Figure == object;
+  };
 
-    if (data.m_Figure == object )
-    {
-        node->SetSelected(true);
-        d->m_CurrentSelection.push_back( node );
-    }
-    else
-    {
-        node->SetSelected(false);
-    }
-
-    ++it;
+  auto it = std::find_if(d->m_DataNodeToPlanarFigureData.begin(), d->m_DataNodeToPlanarFigureData.end(), lambda);
+  if (it != d->m_DataNodeToPlanarFigureData.end())
+  {
+    d->m_CurrentSelection.push_back(it->first);
   }
 
   this->UpdateMeasurementText();
@@ -473,25 +438,14 @@ void QmitkMeasurementView::PlanarFigureInitialized()
   d->m_DrawSubdivisionPolygon->setChecked(false);
 }
 
-void QmitkMeasurementView::SetFocus()
-{
-  d->m_SelectedImageLabel->setFocus();
-}
-
 void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes)
 {
-  this->CheckForTopMostVisibleImage();
-
   d->m_CurrentSelection = nodes;
   this->UpdateMeasurementText();
 
   // bug 16600: deselecting all planarfigures by clicking on datamanager when no node is selected
   if (d->m_CurrentSelection.size() == 0)
   {
-    // bug 18440: resetting the selected image label here because unselecting the
-    // current node did not reset the label
-    d->m_SelectedImageLabel->setText(tr("No visible image available."));
-
     auto isPlanarFigure = mitk::TNodePredicateDataType<mitk::PlanarFigure>::New();
     auto planarFigures = this->GetDataStorage()->GetSubset(isPlanarFigure);
 
@@ -514,7 +468,6 @@ void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, co
     mitk::PlanarFigure::Pointer planarFigure = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
 
     // the last selected planar figure
-
     if (planarFigure.IsNotNull() && planarFigure->GetPlaneGeometry())
     {
       auto planarFigureInitializedWindow = false;
@@ -813,52 +766,6 @@ void QmitkMeasurementView::AddAllInteractors()
 
   for (auto it = planarFigures->Begin(); it != planarFigures->End(); ++it)
     this->NodeAdded(it.Value());
-}
-
-mitk::DataNode::Pointer QmitkMeasurementView::DetectTopMostVisibleImage()
-{
-  // get all images from the data storage which are not a segmentation
-  auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
-  auto isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
-  auto isNotBinary = mitk::NodePredicateNot::New(isBinary);
-  auto isNormalImage = mitk::NodePredicateAnd::New(isImage, isNotBinary);
-
-  auto images = this->GetDataStorage()->GetSubset(isNormalImage);
-
-  mitk::DataNode::Pointer currentNode;
-
-  int maxLayer = std::numeric_limits<int>::min();
-  int layer = 0;
-
-  // iterate over selection
-  for (auto it = images->Begin(); it != images->End(); ++it)
-  {
-    auto node = it->Value();
-
-    if (node.IsNull())
-      continue;
-
-    if (node->IsVisible(nullptr) == false)
-      continue;
-
-    // we also do not want to assign planar figures to helper objects ( even if they are of type image )
-    if (node->GetProperty("helper object") != nullptr)
-      continue;
-
-    node->GetIntProperty("layer", layer);
-
-    if (layer < maxLayer)
-    {
-      continue;
-    }
-    else
-    {
-      maxLayer = layer;
-      currentNode = node;
-    }
-  }
-
-  return currentNode;
 }
 
 void QmitkMeasurementView::EnableCrosshairNavigation()

@@ -1,48 +1,42 @@
-/*****************************************************************************
+/*============================================================================
 
- Copyright (c) 1993-2000,  Div. Medical and Biological Informatics, 
- Deutsches Krebsforschungszentrum, Heidelberg, Germany
+ Copyright (c) German Cancer Research Center (DKFZ)
  All rights reserved.
 
- Redistribution and use in source and binary forms, with or without 
+ Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
 
  - Redistributions of source code must retain the above copyright notice, this
    list of conditions and the following disclaimer.
 
- - Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+ - Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
- - All advertising materials mentioning features or use of this software must 
-   display the following acknowledgement: 
-          
-     "This product includes software developed by the Div. Medical and 
-      Biological Informatics, Deutsches Krebsforschungszentrum, Heidelberg, 
-      Germany."
+ - All advertising materials mentioning features or use of this software must
+   display the following acknowledgement:
 
- - Neither the name of the Deutsches Krebsforschungszentrum nor the names of 
-   its contributors may be used to endorse or promote products derived from 
-   this software without specific prior written permission. 
+     "This product includes software developed by the German Cancer Research
+      Center (DKFZ)."
 
-   THIS SOFTWARE IS PROVIDED BY THE DIVISION MEDICAL AND BIOLOGICAL
-   INFORMATICS AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED
-   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-   OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-   IN NO EVENT SHALL THE DIVISION MEDICAL AND BIOLOGICAL INFORMATICS,
-   THE DEUTSCHES KREBSFORSCHUNGSZENTRUM OR CONTRIBUTORS BE LIABLE FOR 
-   ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-   DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE 
-   GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER 
-   IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN 
-   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ - Neither the name of the German Cancer Research Center (DKFZ) nor the names
+   of its contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
 
- Send comments and/or bug reports to:
-   mbi-software@dkfz-heidelberg.de
+   THIS SOFTWARE IS PROVIDED BY THE GERMAN CANCER RESEARCH CENTER (DKFZ) AND
+   CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+   BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+   FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE GERMAN
+   CANCER RESEARCH CENTER (DKFZ) OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+   INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+   SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+   OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+   DAMAGE.
 
-*****************************************************************************/
+============================================================================*/
 
 /**@file
  *  this function calculates the variance of all pixels inside of a polygon
@@ -79,14 +73,14 @@ mitkIpFloat8_t mitkIpFuncVarROI  ( mitkIpPicDescriptor *pic_old,
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
-  static char *what = { "@(#)mitkIpFuncVarROI\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)mitkIpFuncVarROI\t\tGerman Cancer Research Center (DKFZ)\t"__DATE__ };
 #endif
 
 
 /*definition of macros                                                 */
 
-#define MAX( x, y ) ( x > y ) ? x : y  
-#define MIN( x, y ) ( x < y ) ? x : y  
+#define MAX( x, y ) ( x > y ) ? x : y
+#define MIN( x, y ) ( x < y ) ? x : y
 #define ROI( type, pic, pic_help, sum, sum2, count )                    \
 {                                                                       \
    mitkIpBool_t     in;                                                     \
@@ -127,7 +121,7 @@ mitkIpFloat8_t mitkIpFuncVarROI  ( mitkIpPicDescriptor *pic_old,
 mitkIpFloat8_t mitkIpFuncVarROI  ( mitkIpPicDescriptor *pic_old,
                            mitkIpUInt4_t       *pol_x,
                            mitkIpUInt4_t       *pol_y,
-                           mitkIpUInt4_t       no_pts ) 
+                           mitkIpUInt4_t       no_pts )
 {
    mitkIpFloat8_t      var;             /* variance  of greyvalues in ROI   */
    mitkIpFloat8_t      sum=0;           /* sum  of greyvalues in ROI        */
@@ -165,29 +159,29 @@ mitkIpFloat8_t mitkIpFuncVarROI  ( mitkIpPicDescriptor *pic_old,
 
    /* check whether ROI is in image                                     */
 
-   /* Expression is always false. 
-   if ( min_x < 0 ) 
+   /* Expression is always false.
+   if ( min_x < 0 )
      {
         _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
         return ( mitkIpFuncERROR );
      }
    */
 
-   if ( max_x > pic_old->n[0] ) 
+   if ( max_x > pic_old->n[0] )
      {
         _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
         return ( mitkIpFuncERROR );
      }
 
    /* Expression is always false.
-   if ( min_y < 0 ) 
+   if ( min_y < 0 )
      {
         _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
         return ( mitkIpFuncERROR );
      }
    */
 
-   if ( max_y > pic_old->n[1] ) 
+   if ( max_y > pic_old->n[1] )
      {
         _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
         return ( mitkIpFuncERROR );
@@ -197,19 +191,19 @@ mitkIpFloat8_t mitkIpFuncVarROI  ( mitkIpPicDescriptor *pic_old,
 
    a = ( mitkIpFloat8_t * ) malloc ( no_pts * sizeof ( mitkIpFloat8_t ) );
    if ( !a )
-     { 
+     {
         _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
         return ( mitkIpFuncERROR );
      }
    b = ( mitkIpFloat8_t * ) malloc ( no_pts * sizeof ( mitkIpFloat8_t ) );
    if ( !b )
-     { 
+     {
         _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
         return ( mitkIpFuncERROR );
      }
-  
+
    /* Geraden zwischen zwei benachbarten Punkten berechnen              */
-  
+
    for ( i = 0; i < no_pts-1;  i++ )
      {
         diff = ( mitkIpFloat8_t ) pol_x[i+1] - ( mitkIpFloat8_t ) pol_x[i];
@@ -224,7 +218,7 @@ mitkIpFloat8_t mitkIpFuncVarROI  ( mitkIpPicDescriptor *pic_old,
             a[i] = 0.;
            }
      }
-   diff = ( mitkIpFloat8_t ) pol_x[no_pts-1] - ( mitkIpFloat8_t )  pol_x[0]; 
+   diff = ( mitkIpFloat8_t ) pol_x[no_pts-1] - ( mitkIpFloat8_t )  pol_x[0];
    if ( diff )
      {
         a[no_pts-1] = ( ( mitkIpFloat8_t ) pol_y[no_pts-1] - ( mitkIpFloat8_t ) pol_y[0] ) / diff;
@@ -235,7 +229,7 @@ mitkIpFloat8_t mitkIpFuncVarROI  ( mitkIpPicDescriptor *pic_old,
         b[no_pts-1] = 0.;
         a[no_pts-1] = 0.;
      }
-   
+
   /* Function to calculate mean                                          */
 
   sum = mitkIpFuncMeanROI ( pic_old, pol_x, pol_y, no_pts );
@@ -243,8 +237,8 @@ mitkIpFloat8_t mitkIpFuncVarROI  ( mitkIpPicDescriptor *pic_old,
   /* draw polygon to image                                               */
 
   pic_help = _mitkIpFuncDrawPoly ( pic_old, pol_x, pol_y, no_pts, a, b );
-  if ( !pic_help ) 
-    { 
+  if ( !pic_help )
+    {
        free ( a );
        free ( b );
        return ( mitkIpFuncERROR );
@@ -254,7 +248,7 @@ mitkIpFloat8_t mitkIpFuncVarROI  ( mitkIpPicDescriptor *pic_old,
 
   if ( count == 1 )
     var = 0;
-  else 
+  else
     var =  sum2 / ( count - 1 );
 
   free ( a );
@@ -263,7 +257,7 @@ mitkIpFloat8_t mitkIpFuncVarROI  ( mitkIpPicDescriptor *pic_old,
 
   return ( var );
 
-} 
+}
 
 #endif
 

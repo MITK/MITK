@@ -1,9 +1,9 @@
-/*=============================================================================
+/*============================================================================
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) German Cancer Research Center (DKFZ)
+  All rights reserved.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 
-=============================================================================*/
+============================================================================*/
 
 #ifndef USMODULECONTEXT_H_
 #define USMODULECONTEXT_H_
@@ -63,9 +63,9 @@ template<class S> class ServiceObjects;
  * <p>
  * A <code>ModuleContext</code> object will be created and provided to the
  * module associated with this context when it is loaded using the
- * {@link ModuleActivator::Load} method. The same <code>ModuleContext</code>
+ * us::ModuleActivator::Load method. The same <code>ModuleContext</code>
  * object will be passed to the module associated with this context when it is
- * unloaded using the {@link ModuleActivator::Unload} method. A
+ * unloaded using the us::ModuleActivator::Unload method. A
  * <code>ModuleContext</code> object is generally for the private use of its
  * associated module and is not meant to be shared with other modules in the
  * module environment.
@@ -143,7 +143,7 @@ public:
    * module registering the service and should not be shared with other
    * modules. The registering module is defined to be the context module.
    * Other modules can locate the service by using either the
-   * {@link #GetServiceReferences} or {@link #GetServiceReference} method.
+   * GetServiceReferences() or GetServiceReference() method.
    *
    * <p>
    * A module can register a service object that implements the
@@ -156,11 +156,11 @@ public:
    * <li>The framework adds the following service properties to the service
    * properties from the specified <code>ServiceProperties</code> (which may be
    * omitted): <br/>
-   * A property named ServiceConstants#SERVICE_ID() identifying the
+   * A property named us::ServiceConstants::SERVICE_ID() identifying the
    * registration number of the service <br/>
-   * A property named ServiceConstants#OBJECTCLASS() containing all the
+   * A property named us::ServiceConstants::OBJECTCLASS() containing all the
    * specified classes. <br/>
-   * A property named ServiceConstants#SERVICE_SCOPE() identifying the scope
+   * A property named us::ServiceConstants::SERVICE_SCOPE() identifying the scope
    * of the service. <br/>
    * Properties with these names in the specified <code>ServiceProperties</code> will
    * be ignored.
@@ -178,10 +178,10 @@ public:
    *        to raw service pointers.
    * @param properties The properties for this service. The keys in the
    *        properties object must all be <code>std::string</code> objects. See
-   *        {@link ServiceConstants} for a list of standard service property keys.
+   *        us::ServiceConstants for a list of standard service property keys.
    *        Changes should not be made to this object after calling this
    *        method. To update the service's properties the
-   *        {@link ServiceRegistration::SetProperties} method must be called.
+   *        us::ServiceRegistration::SetProperties method must be called.
    *        The set of properties may be omitted if the service has
    *        no properties.
    * @return A <code>ServiceRegistration</code> object for use by the module
@@ -421,7 +421,7 @@ public:
    * empty, the service must have been registered with the
    * specified class name. The complete list of class names with which a
    * service was registered is available from the service's
-   * {@link ServiceConstants#OBJECTCLASS() objectClass} property.
+   * us::ServiceConstants::OBJECTCLASS() property.
    * <li>If the specified <code>filter</code> is not empty, the
    * filter expression must match the service.
    * </ul>
@@ -494,10 +494,10 @@ public:
    * specified class.
    * <p>
    * If multiple such services exist, the service with the highest ranking (as
-   * specified in its ServiceConstants::SERVICE_RANKING() property) is returned.
+   * specified in its us::ServiceConstants::SERVICE_RANKING() property) is returned.
    * <p>
    * If there is a tie in ranking, the service with the lowest service ID (as
-   * specified in its ServiceConstants::SERVICE_ID() property); that is, the
+   * specified in its us::ServiceConstants::SERVICE_ID() property); that is, the
    * service that was registered first is returned.
    *
    * @param clazz The class name with which the service was registered.
@@ -561,7 +561,7 @@ public:
    * <li>If the context module's use count for the service is currently one
    * and the service was registered with an object implementing the
    * <code>ServiceFactory</code> interface, the
-   * {@link ServiceFactory::GetService} method is
+   * us::ServiceFactory::GetService() method is
    * called to create a service object for the context module. This service
    * object is cached by the framework. While the context module's use count
    * for the service is greater than zero, subsequent calls to get the
@@ -707,7 +707,7 @@ public:
    * <p>
    * The callback is called if the filter criteria is met. To filter based
    * upon the class of the service, the filter should reference the
-   * ServiceConstants#OBJECTCLASS() property. If <code>filter</code> is
+   * us::ServiceConstants::OBJECTCLASS() property. If <code>filter</code> is
    * empty, all services are considered to match the filter.
    *
    * <p>

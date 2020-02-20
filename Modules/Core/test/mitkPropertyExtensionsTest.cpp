@@ -1,23 +1,27 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
+============================================================================*/
 
-===================================================================*/
-
+// Testing
+#include "mitkTestFixture.h"
+#include "mitkTestingMacros.h"
+// std includes
+#include <string>
+#include <algorithm>
+// MITK includes
 #include <mitkCoreServices.h>
 #include <mitkIPropertyExtensions.h>
 #include <mitkPropertyExtension.h>
-#include <mitkTestingMacros.h>
+// VTK includes
+#include <vtkDebugLeaks.h>
 
 class TestPropertyExtension : public mitk::PropertyExtension
 {
@@ -32,36 +36,65 @@ private:
   std::string m_Name;
 };
 
-int mitkPropertyExtensionsTest(int, char *[])
+class mitkPropertyExtensionsTestSuite : public mitk::TestFixture
 {
-  MITK_TEST_BEGIN("mitkPropertyExtensionsTest");
+  CPPUNIT_TEST_SUITE(mitkPropertyExtensionsTestSuite);
+  MITK_TEST(GetPropertyExtensionService_Success);
+  MITK_TEST(GetPropertyExtension_Success);
+  MITK_TEST(GetOverwrittenExtension_Success);
+  MITK_TEST(GetPropertyExtensionRestricted_Success);
+  CPPUNIT_TEST_SUITE_END();
 
-  mitk::IPropertyExtensions *propertyExtensions = mitk::CoreServices::GetPropertyExtensions();
-  MITK_TEST_CONDITION_REQUIRED(propertyExtensions != nullptr, "Get property extensions service");
+private:
+  mitk::IPropertyExtensions *m_PropertyExtensions;
+  TestPropertyExtension::Pointer m_Extension1;
 
-  propertyExtensions->AddExtension("propertyName1", TestPropertyExtension::New("extension1a").GetPointer());
-  propertyExtensions->AddExtension("propertyName1", TestPropertyExtension::New("extension1b").GetPointer());
-  TestPropertyExtension::Pointer extension1 =
-    dynamic_cast<TestPropertyExtension *>(propertyExtensions->GetExtension("propertyName1").GetPointer());
+public:
+  void setUp()
+  {
+    m_PropertyExtensions = mitk::CoreServices::GetPropertyExtensions();
+    m_PropertyExtensions->AddExtension("propertyName1", TestPropertyExtension::New("extension1a").GetPointer());
+    m_PropertyExtensions->AddExtension("propertyName1", TestPropertyExtension::New("extension1b").GetPointer());
+  }
 
-  MITK_TEST_CONDITION(extension1.IsNotNull() && extension1->GetName() == "extension1a",
-                      "Get extension of \"propertyName1\"");
+  void tearDown()
+  {
+    m_PropertyExtensions = nullptr;
+  }
 
-  propertyExtensions->AddExtension("propertyName1", TestPropertyExtension::New("extension1b").GetPointer(), "", true);
-  extension1 = dynamic_cast<TestPropertyExtension *>(propertyExtensions->GetExtension("propertyName1").GetPointer());
+  void GetPropertyExtensionService_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Get property extensions service", m_PropertyExtensions != nullptr);
+  }
 
-  MITK_TEST_CONDITION(extension1.IsNotNull() && extension1->GetName() == "extension1b",
-                      "Get overwritten extension of \"propertyName1\"");
+  void GetPropertyExtension_Success()
+  {
+    TestPropertyExtension::Pointer extension1 =
+      dynamic_cast<TestPropertyExtension *>(m_PropertyExtensions->GetExtension("propertyName1").GetPointer());
+    
+    CPPUNIT_ASSERT_MESSAGE("Get extension of \"propertyName1\"", 
+      extension1.IsNotNull() && extension1->GetName() == "extension1a");
+  }
 
-  propertyExtensions->AddExtension(
-    "propertyName1", TestPropertyExtension::New("extension1c").GetPointer(), "className");
-  TestPropertyExtension::Pointer extension2 =
-    dynamic_cast<TestPropertyExtension *>(propertyExtensions->GetExtension("propertyName1", "className").GetPointer());
-  extension1 = dynamic_cast<TestPropertyExtension *>(propertyExtensions->GetExtension("propertyName1").GetPointer());
+  void GetOverwrittenExtension_Success()
+  {
+    m_PropertyExtensions->AddExtension("propertyName1", TestPropertyExtension::New("extension1b").GetPointer(), "", true);
+    m_Extension1 = dynamic_cast<TestPropertyExtension *>(m_PropertyExtensions->GetExtension("propertyName1").GetPointer());
+    CPPUNIT_ASSERT_MESSAGE("Get overwritten extension of \"propertyName1\"",
+             m_Extension1.IsNotNull() && m_Extension1->GetName() == "extension1b");
+  }
 
-  MITK_TEST_CONDITION(extension1.IsNotNull() && extension1->GetName() == "extension1b" && extension2.IsNotNull() &&
-                        extension2->GetName() == "extension1c",
-                      "Get extension of \"propertyName1\" restricted to \"className\"");
+  void GetPropertyExtensionRestricted_Success()
+  {
+    m_PropertyExtensions->AddExtension("propertyName1", TestPropertyExtension::New("extension1c").GetPointer(), "className");
+    TestPropertyExtension::Pointer extension2 =
+      dynamic_cast<TestPropertyExtension *>(m_PropertyExtensions->GetExtension("propertyName1", "className").GetPointer());
+    m_Extension1 = dynamic_cast<TestPropertyExtension *>(m_PropertyExtensions->GetExtension("propertyName1").GetPointer());
+    
+    CPPUNIT_ASSERT_MESSAGE("Get extension of \"propertyName1\" restricted to \"className\"",
+      m_Extension1.IsNotNull() && m_Extension1->GetName() == "extension1b" && extension2.IsNotNull() &&
+      extension2->GetName() == "extension1c");
+  }
+  };
+  MITK_TEST_SUITE_REGISTRATION(mitkPropertyExtensions)
 
-  MITK_TEST_END();
-}

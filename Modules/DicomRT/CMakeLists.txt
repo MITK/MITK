@@ -1,6 +1,6 @@
 if(NOT DEFINED DCMTK_dcmrt_LIBRARY OR DCMTK_dcmrt_LIBRARY)
   mitk_create_module(
-    DEPENDS MitkSceneSerializationBase MitkDICOMReader MitkDICOMReaderServices
+    DEPENDS MitkSceneSerializationBase MitkDICOMReader
     PACKAGE_DEPENDS PUBLIC DCMTK
   )
   add_subdirectory(autoload/IO)

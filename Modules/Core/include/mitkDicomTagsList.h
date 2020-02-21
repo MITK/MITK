@@ -712,7 +712,7 @@ namespace mitk {
     "0018|9087",
     "0018|9089"
   };
-  
+
   static const std::map<std::string, std::string> tagToPropertyMap = {
     // Patient module
     std::make_pair("0010|0010", "dicom.patient.PatientsName"),
@@ -726,11 +726,12 @@ namespace mitk {
     std::make_pair("0010|4000", "dicom.patient.PatientComments"),
     std::make_pair("0012|0062", "dicom.patient.PatientIdentityRemoved"),
     std::make_pair("0012|0063", "dicom.patient.DeIdentificationMethod"),
-    
+
     // General Study module
     std::make_pair("0020|000d", "dicom.study.StudyInstanceUID"),
     std::make_pair("0008|0020", "dicom.study.StudyDate"),
     std::make_pair("0008|0030", "dicom.study.StudyTime"),
+    std::make_pair("0008|0070", "dicom.study.Manufacturer"),
     std::make_pair("0008|0080", "dicom.study.InstitutionName"),
     std::make_pair("0008|0090", "dicom.study.ReferringPhysiciansName"),
     std::make_pair("0020|0010", "dicom.study.StudyID"),
@@ -743,7 +744,8 @@ namespace mitk {
     std::make_pair("0008|0022", "dicom.acquisition.Date"),
     std::make_pair("0008|0032", "dicom.acquisition.Time"),
     std::make_pair("0020|0012", "dicom.acquisition.Number"),
-    
+    std::make_pair("0020|0013", "dicom.image.Number"),
+
     // General Series module
     std::make_pair("0008|0060", "dicom.series.Modality"),
     std::make_pair("0020|000e", "dicom.series.SeriesInstanceUID"),
@@ -762,22 +764,22 @@ namespace mitk {
     std::make_pair("0028|0109", "dicom.series.LargestPixelValueInSeries"),
     std::make_pair("0008|0016", "dicom.series.SopClassUid"),
     std::make_pair("0020|9128", "dicom.series.TemporalPositionIndex"),
-    
+
     // VOI LUT module
     std::make_pair("0028|1050", "dicom.voilut.WindowCenter"),
     std::make_pair("0028|1051", "dicom.voilut.WindowWidth"),
     std::make_pair("0028|1055", "dicom.voilut.WindowCenterAndWidthExplanation"),
-    
+
     // Image Pixel module
     std::make_pair("0028|0004", "dicom.pixel.PhotometricInterpretation"),
     std::make_pair("0028|0010", "dicom.pixel.Rows"),
     std::make_pair("0028|0011", "dicom.pixel.Columns"),
-    
+
     // Image Plane module
     std::make_pair("0028|0030", "dicom.PixelSpacing"),
     std::make_pair("0018|1164", "dicom.ImagerPixelSpacing"),
-    
-    // Misc 
+
+    // Misc
     std::make_pair("0008|0005", "dicom.SpecificCharacterSet"),
     std::make_pair("0018|0080", "dicom.TR"),
     std::make_pair("0018|0081", "dicom.TE"),

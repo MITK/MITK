@@ -235,22 +235,6 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
   std::locale l( "C" );
   std::cin.imbue(l);
 
-  if (  DicomSeriesReader::IsPhilips3DDicom(this->GetFileName()) )
-  {
-    MITK_INFO << "it is a Philips3D US Dicom file" << std::endl;
-    this->ResizeOutputs(1);
-    DataNode::Pointer node = this->GetOutput();
-    mitk::DicomSeriesReader::StringContainer stringvec;
-    stringvec.push_back(this->GetFileName());
-    if (DicomSeriesReader::LoadDicomSeries(stringvec, *node))
-    {
-      node->SetName(this->GetBaseFileName());
-    }
-    std::cin.imbue(previousCppLocale);
-    return;
-
-  }
-
   DicomSeriesReader::FileNamesGrouping imageBlocks = DicomSeriesReader::GetSeries(this->GetDirectory());
   const unsigned int size = imageBlocks.size();
 
@@ -266,11 +250,11 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
     const std::string &uid = n_it->first;
     DataNode::Pointer node = this->GetOutput(outputIndex);
 
-    const DicomSeriesReader::ImageBlockDescriptor& imageBlockDescriptor( n_it->second );
+    const DicomSeriesReader::ImageBlockDescriptor& imageBlockDescriptor( *n_it->second );
 
     MITK_INFO << "--------------------------------------------------------------------------------";
     MITK_INFO << "DataNodeFactory: Loading DICOM series " << outputIndex << ": Series UID " << imageBlockDescriptor.GetSeriesInstanceUID() << std::endl;
-    MITK_INFO << "  " << imageBlockDescriptor.GetFilenames().size() << " '" << imageBlockDescriptor.GetModality() << "' files (" << imageBlockDescriptor.GetSOPClassUIDAsString() << ") loaded into 1 mitk::Image";
+    MITK_INFO << "  " << imageBlockDescriptor.size() << " '" << imageBlockDescriptor.GetModality() << "' files (" << imageBlockDescriptor.GetSOPClassUIDAsString() << ") loaded into 1 mitk::Image";
     MITK_INFO << "  multi-frame: " << (imageBlockDescriptor.IsMultiFrameImage()?"Yes":"No");
     MITK_INFO << "  reader support: " << DicomSeriesReader::ReaderImplementationLevelToString(imageBlockDescriptor.GetReaderImplementationLevel());
     MITK_INFO << "  pixel spacing type: " << DicomSeriesReader::PixelSpacingInterpretationToString( imageBlockDescriptor.GetPixelSpacingType() );
@@ -278,7 +262,7 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
     MITK_INFO << "  3D+t: " << (imageBlockDescriptor.HasMultipleTimePoints()?"Yes":"No");
     MITK_INFO << "--------------------------------------------------------------------------------";
 
-    if (DicomSeriesReader::LoadDicomSeries(n_it->second.GetFilenames(), *node, true, true, true))
+    if (DicomSeriesReader::LoadDicomSeries(n_it->second->GetFilenames(), *node, true, true, true))
     {
       std::string nodeName(uid);
       std::string studyDescription;

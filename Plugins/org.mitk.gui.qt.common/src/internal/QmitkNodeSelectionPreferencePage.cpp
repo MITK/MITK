@@ -15,6 +15,9 @@ found in the LICENSE file.
 
 #include "QmitkNodeSelectionPreferenceHelper.h"
 
+#include <QmitkDataStorageSelectionHistoryInspector.h>
+#include <QmitkDataStorageFavoriteNodesInspector.h>
+
 //-----------------------------------------------------------------------------
 QmitkNodeSelectionPreferencePage::QmitkNodeSelectionPreferencePage()
   : m_MainControl(nullptr), m_Controls(nullptr)
@@ -125,22 +128,25 @@ void QmitkNodeSelectionPreferencePage::Update()
   m_Controls->listInspectors->clear();
   for (const auto iter : allProviders)
   {
-    auto currentID = iter.first;
-    QListWidgetItem* item = new QListWidgetItem;
-    item->setText(QString::fromStdString(iter.second->GetInspectorDisplayName()));
-    item->setData(Qt::UserRole, QVariant::fromValue(QString::fromStdString(currentID)));
-    item->setToolTip(QString::fromStdString(iter.second->GetInspectorDescription()));
+    if (iter.first != QmitkDataStorageFavoriteNodesInspector::INSPECTOR_ID() && iter.first != QmitkDataStorageSelectionHistoryInspector::INSPECTOR_ID())
+    {
+      auto currentID = iter.first;
+      QListWidgetItem* item = new QListWidgetItem;
+      item->setText(QString::fromStdString(iter.second->GetInspectorDisplayName()));
+      item->setData(Qt::UserRole, QVariant::fromValue(QString::fromStdString(currentID)));
+      item->setToolTip(QString::fromStdString(iter.second->GetInspectorDescription()));
 
-    auto finding = std::find_if(visibleProviders.cbegin(), visibleProviders.cend(), [&currentID](auto v) {return v.second == currentID; });
-    if (finding == visibleProviders.cend())
-    {
-      item->setCheckState(Qt::Unchecked);
-      m_Controls->listInspectors->addItem(item);
-    }
-    else
-    {
-      item->setCheckState(Qt::Checked);
-      m_Controls->listInspectors->insertItem(finding->first, item);
+      auto finding = std::find_if(visibleProviders.cbegin(), visibleProviders.cend(), [&currentID](auto v) {return v.second == currentID; });
+      if (finding == visibleProviders.cend())
+      {
+        item->setCheckState(Qt::Unchecked);
+        m_Controls->listInspectors->addItem(item);
+      }
+      else
+      {
+        item->setCheckState(Qt::Checked);
+        m_Controls->listInspectors->insertItem(finding->first, item);
+      }
     }
   }
 

@@ -21,6 +21,8 @@ namespace mitk
 {
   using DataStorageInspectorIDType = std::string;
 
+  /** map containing the IDs of all inspectors that should be visible. The map key is the order of appareance
+  of the respective inspector.*/
   using VisibleDataStorageInspectorMapType = std::map<unsigned int, DataStorageInspectorIDType>;
 
     /** Stores the given ID as favorite inspector.*/

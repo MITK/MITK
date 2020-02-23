@@ -20,5 +20,7 @@
 		<file>history-solid.svg</file>
 		<file>tree_inspector.svg</file>
 		<file>list-solid.svg</file>
-    </qresource>
+		<file>favorite_add.svg</file>
+		<file>favorite_remove.svg</file>
+	</qresource>
 </RCC>

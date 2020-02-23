@@ -17,7 +17,7 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
-#include <QByteArray>
+#include <QIcon>
 
 class QmitkAbstractDataStorageInspector;
 
@@ -54,7 +54,7 @@ namespace mitk
     virtual std::string GetInspectorDescription() const = 0;
     /** Returns the svg data of the icon of the inspector. Empty array indicates that no icon is defined.
      @remark It is passed as svg file content and not as icon directly to allow later styling*/
-    virtual QByteArray GetInspectorIconSVG() const = 0;
+    virtual QIcon GetInspectorIcon() const = 0;
 
     /**
     * @brief Service property name for the inspector ID.

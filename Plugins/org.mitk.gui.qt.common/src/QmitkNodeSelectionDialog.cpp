@@ -28,7 +28,7 @@ QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString titl
 
   auto providers = mitk::DataStorageInspectorGenerator::GetProviders();
   auto visibleProviders = mitk::GetVisibleDataStorageInspectors();
-  auto favoriteID = mitk::GetFavoriteDataStorageInspector();
+  auto favoriteID = mitk::GetPreferredDataStorageInspector();
 
   if (visibleProviders.empty())
   {
@@ -60,16 +60,22 @@ QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString titl
     }
   }
 
-  auto favoritesPorvider = mitk::DataStorageInspectorGenerator::GetProvider(QmitkDataStorageFavoriteNodesInspector::INSPECTOR_ID());
-  if (favoritesPorvider != nullptr)
+  if (mitk::GetShowFavoritesInspector())
   {
-    this->AddPanel(favoritesPorvider, favoriteID, favoriteFound, favIndex);
+    auto favoritesPorvider = mitk::DataStorageInspectorGenerator::GetProvider(QmitkDataStorageFavoriteNodesInspector::INSPECTOR_ID());
+    if (favoritesPorvider != nullptr)
+    {
+      this->AddPanel(favoritesPorvider, favoriteID, favoriteFound, favIndex);
+    }
   }
 
-  auto historyPorvider = mitk::DataStorageInspectorGenerator::GetProvider(QmitkDataStorageSelectionHistoryInspector::INSPECTOR_ID());
-  if (historyPorvider != nullptr)
+  if (mitk::GetShowHistoryInspector())
   {
-    this->AddPanel(historyPorvider, favoriteID, favoriteFound, favIndex);
+    auto historyPorvider = mitk::DataStorageInspectorGenerator::GetProvider(QmitkDataStorageSelectionHistoryInspector::INSPECTOR_ID());
+    if (historyPorvider != nullptr)
+    {
+      this->AddPanel(historyPorvider, favoriteID, favoriteFound, favIndex);
+    }
   }
 
   m_Controls.tabWidget->setCurrentIndex(favIndex);
@@ -79,7 +85,7 @@ QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString titl
   m_Controls.hint->setText(hint);
   m_Controls.hint->setVisible(!hint.isEmpty());
 
-  m_Controls.btnAddToFav->setIcon(berry::QtStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/star-solid.svg")));
+  m_Controls.btnAddToFav->setIcon(berry::QtStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/favorite_add.svg")));
 
   connect(m_Controls.btnAddToFav, &QPushButton::clicked, this, &QmitkNodeSelectionDialog::OnFavoriteNodesButtonClicked);
   connect(m_Controls.buttonBox, SIGNAL(accepted()), this, SLOT(OnOK()));
@@ -231,10 +237,10 @@ void QmitkNodeSelectionDialog::AddPanel(const mitk::IDataStorageInspectorProvide
 
   auto panelPos = m_Controls.tabWidget->insertTab(m_Controls.tabWidget->count(), tabPanel, name);
 
-  auto iconSVG = provider->GetInspectorIconSVG();
-  if (!iconSVG.isEmpty())
+  auto icon = provider->GetInspectorIcon();
+  if (!icon.isNull())
   {
-    m_Controls.tabWidget->setTabIcon(panelPos, berry::QtStyleManager::ThemeIcon(iconSVG));
+    m_Controls.tabWidget->setTabIcon(panelPos, icon);
   }
 
   m_Panels.push_back(inspector);

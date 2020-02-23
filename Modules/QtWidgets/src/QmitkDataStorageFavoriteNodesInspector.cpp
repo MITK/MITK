@@ -17,12 +17,18 @@ found in the LICENSE file.
 #include "mitkNodePredicateAnd.h"
 
 #include "QPushButton"
+#include "QmitkStyleManager.h"
+
 
 QmitkDataStorageFavoriteNodesInspector::QmitkDataStorageFavoriteNodesInspector(QWidget* parent/* = nullptr*/)
   : QmitkDataStorageListInspector(parent)
 {
-  auto favoriteNodesButton = new QPushButton("Remove selection from favorites", parent);
+  auto favoriteNodesButton = new QPushButton(parent);
   QmitkDataStorageListInspector::m_Controls.verticalLayout->addWidget(favoriteNodesButton, 0, Qt::AlignRight);
+
+  favoriteNodesButton->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/favorite_remove.svg")));
+  favoriteNodesButton->setIconSize(QSize(24, 24));
+  favoriteNodesButton->setToolTip("Remove selected nodes as favorite");
 
   m_FavoriteNodeSelectionPredicate = mitk::NodePredicateProperty::New("org.mitk.selection.favorite", mitk::BoolProperty::New(true));
   m_NodePredicate = m_FavoriteNodeSelectionPredicate;

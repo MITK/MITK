@@ -41,7 +41,7 @@ public:
   InspectorIDType GetInspectorID() const override;
   std::string GetInspectorDisplayName() const override;
   std::string GetInspectorDescription() const override;
-  QByteArray GetInspectorIconSVG() const override;
+  QIcon GetInspectorIcon() const override;
 
   us::ServiceRegistration<mitk::IDataStorageInspectorProvider> RegisterService(
     us::ModuleContext *context = us::GetModuleContext());

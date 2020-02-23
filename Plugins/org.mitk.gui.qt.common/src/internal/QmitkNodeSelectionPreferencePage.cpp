@@ -47,7 +47,7 @@ void QmitkNodeSelectionPreferencePage::CreateQtControl(QWidget* parent)
   m_Controls = new Ui::QmitkNodeSelectionPreferencePage;
   m_Controls->setupUi( m_MainControl );
 
-  connect(m_Controls->comboFavorite, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateWidgets()));
+  connect(m_Controls->comboPreferred, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateWidgets()));
   connect(m_Controls->btnUp, SIGNAL(clicked(bool)), this, SLOT(MoveUp()));
   connect(m_Controls->btnDown, SIGNAL(clicked(bool)), this, SLOT(MoveDown()));
   connect(m_Controls->listInspectors, SIGNAL(itemSelectionChanged()), this, SLOT(UpdateWidgets()));
@@ -66,8 +66,8 @@ QWidget* QmitkNodeSelectionPreferencePage::GetQtControl() const
 bool QmitkNodeSelectionPreferencePage::PerformOk()
 {
   //store favorite
-  auto id = m_Controls->comboFavorite->currentData().toString();
-  mitk::PutFavoriteDataStorageInspector(id.toStdString());
+  auto id = m_Controls->comboPreferred->currentData().toString();
+  mitk::PutPreferredDataStorageInspector(id.toStdString());
 
   //store visible
   mitk::VisibleDataStorageInspectorMapType visibles;
@@ -83,6 +83,8 @@ bool QmitkNodeSelectionPreferencePage::PerformOk()
     }
   }
   mitk::PutVisibleDataStorageInspectors(visibles);
+  mitk::PutShowFavoritesInspector(m_Controls->checkShowFav->isChecked());
+  mitk::PutShowHistoryInspector(m_Controls->checkShowHistory->isChecked());
 
   return true;
 }
@@ -101,7 +103,7 @@ void QmitkNodeSelectionPreferencePage::Update()
 
   auto visibleProviders = mitk::GetVisibleDataStorageInspectors();
   auto allProviders = mitk::DataStorageInspectorGenerator::GetProviders();
-  auto favorite = mitk::GetFavoriteDataStorageInspector();
+  auto favorite = mitk::GetPreferredDataStorageInspector();
 
   auto finding = m_Providers.find(favorite);
   if (finding == m_Providers.cend())
@@ -112,17 +114,17 @@ void QmitkNodeSelectionPreferencePage::Update()
   //fill favorite combo
   int index = 0;
   int currentIndex = 0;
-  m_Controls->comboFavorite->clear();
+  m_Controls->comboPreferred->clear();
   for (auto iter : m_Providers)
   {
-    m_Controls->comboFavorite->addItem(QString::fromStdString(iter.second->GetInspectorDisplayName()),QVariant::fromValue(QString::fromStdString(iter.first)));
+    m_Controls->comboPreferred->addItem(QString::fromStdString(iter.second->GetInspectorDisplayName()),QVariant::fromValue(QString::fromStdString(iter.first)));
     if (iter.first == favorite)
     {
       currentIndex = index;
     };
     ++index;
   }
-  m_Controls->comboFavorite->setCurrentIndex(currentIndex);
+  m_Controls->comboPreferred->setCurrentIndex(currentIndex);
 
   //fill inspector list
   m_Controls->listInspectors->clear();
@@ -150,6 +152,9 @@ void QmitkNodeSelectionPreferencePage::Update()
     }
   }
 
+  m_Controls->checkShowFav->setChecked(mitk::GetShowFavoritesInspector());
+  m_Controls->checkShowHistory->setChecked(mitk::GetShowHistoryInspector());
+
   this->UpdateWidgets();
 }
 
@@ -162,9 +167,9 @@ void QmitkNodeSelectionPreferencePage::UpdateWidgets()
   for (int i = 0; i < m_Controls->listInspectors->count(); ++i)
   {
     auto item = m_Controls->listInspectors->item(i);
-    if (item->data(Qt::UserRole).toString() == m_Controls->comboFavorite->currentData().toString())
+    if (item->data(Qt::UserRole).toString() == m_Controls->comboPreferred->currentData().toString())
     {
-      //favorites are always visible.
+      //preferred inspector is always visible.
       item->setCheckState(Qt::Checked);
       item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
     }
@@ -173,6 +178,16 @@ void QmitkNodeSelectionPreferencePage::UpdateWidgets()
       item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
     }
   }
+
+  if (QmitkDataStorageFavoriteNodesInspector::INSPECTOR_ID() == m_Controls->comboPreferred->currentData().toString())
+  {
+    m_Controls->checkShowFav->setChecked(true);
+  }
+  if (QmitkDataStorageSelectionHistoryInspector::INSPECTOR_ID() == m_Controls->comboPreferred->currentData().toString())
+  {
+    m_Controls->checkShowHistory->setChecked(true);
+  }
+
 };
 
 void QmitkNodeSelectionPreferencePage::MoveDown()

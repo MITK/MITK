@@ -23,7 +23,7 @@ namespace mitk
   class MITKQTWIDGETS_EXPORT DataStorageInspectorGenerator
   {
   public:
-    using IDType = std::string;
+    using IDType = mitk::IDataStorageInspectorProvider::InspectorIDType;
 
     using ProviderMapType = std::map<IDType, mitk::IDataStorageInspectorProvider*>;
     static ProviderMapType GetProviders();

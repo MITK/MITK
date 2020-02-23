@@ -17,11 +17,13 @@ found in the LICENSE file.
 #include <usModuleContext.h>
 #include <usPrototypeServiceFactory.h>
 
+#include <QFile>
+
   template<class TInspector>
   class QmitkDataStorageInspectorProviderBase<TInspector>::Impl
   {
   public:
-    Impl(const std::string& id, const std::string& displayName, const std::string& desc) : m_Ranking(0), m_ID(id), m_DisplayName(displayName), m_Desc(desc)
+    Impl(const std::string& id, const std::string& displayName, const std::string& desc, const QByteArray& svg) : m_Ranking(0), m_ID(id), m_DisplayName(displayName), m_Desc(desc), m_SVG(svg)
     {
     };
 
@@ -42,6 +44,7 @@ found in the LICENSE file.
     std::string m_ID;
     std::string m_DisplayName;
     std::string m_Desc;
+    QByteArray m_SVG;
   };
 
   template<class TInspector>
@@ -50,9 +53,18 @@ found in the LICENSE file.
   }
 
   template<class TInspector>
-  QmitkDataStorageInspectorProviderBase<TInspector>::QmitkDataStorageInspectorProviderBase(const std::string& id, const std::string& displayName, const std::string& desc)
+  QmitkDataStorageInspectorProviderBase<TInspector>::QmitkDataStorageInspectorProviderBase(const std::string& id, const std::string& displayName, const std::string& desc, const std::string& pathToIconSVG)
   {
-    d.reset(new Impl(id, displayName, desc));
+    QByteArray svg;
+
+    if (!pathToIconSVG.empty())
+    {
+      QFile iconFile(QString::fromStdString(pathToIconSVG));
+      if (iconFile.open(QIODevice::ReadOnly))
+         svg = iconFile.readAll();
+    }
+
+    d.reset(new Impl(id, displayName, desc, svg));
     RegisterService();
   }
 
@@ -75,7 +87,7 @@ found in the LICENSE file.
   };
 
   template<class TInspector>
-  std::string
+  typename QmitkDataStorageInspectorProviderBase<TInspector>::InspectorIDType
     QmitkDataStorageInspectorProviderBase<TInspector>::GetInspectorID() const
   {
     return d->m_ID;
@@ -93,6 +105,13 @@ found in the LICENSE file.
     QmitkDataStorageInspectorProviderBase<TInspector>::GetInspectorDescription() const
   {
     return d->m_Desc;
+  };
+
+  template<class TInspector>
+  QByteArray
+    QmitkDataStorageInspectorProviderBase<TInspector>::GetInspectorIconSVG() const
+  {
+    return d->m_SVG;
   };
 
   template<class TInspector>

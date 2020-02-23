@@ -40,6 +40,11 @@ public:
   */
   void SetNodePredicate(const mitk::NodePredicateBase* nodePredicate) override;
 
+  constexpr static const char* INSPECTOR_ID()
+  {
+    return "org.mitk.QmitkDataStorageFavoriteNodesInspector";
+  };
+
 protected Q_SLOTS:
 
   void OnFavoriteNodesButtonClicked();

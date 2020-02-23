@@ -16,5 +16,9 @@
 		<file>mwDesynchronized.png</file>
 		<file>mwMITK.png</file>
 		<file>mwPACS.png</file>
+		<file>star-solid.svg</file>
+		<file>history-solid.svg</file>
+		<file>tree_inspector.svg</file>
+		<file>list-solid.svg</file>
     </qresource>
 </RCC>

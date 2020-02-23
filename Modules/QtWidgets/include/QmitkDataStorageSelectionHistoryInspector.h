@@ -39,6 +39,11 @@ public:
   static void AddNodeToHistory(mitk::DataNode* node);
   static void ResetHistory();
 
+  constexpr static const char* INSPECTOR_ID()
+  {
+    return "org.mitk.QmitkDataStorageSelectionHistoryInspector";
+  };
+
 protected:
   void Initialize() override;
 

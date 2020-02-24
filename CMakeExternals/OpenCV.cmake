@@ -61,6 +61,7 @@ if(MITK_USE_OpenCV)
         -DENABLE_CXX11:BOOL=ON
         -DWITH_IPP:BOOL=OFF
         -DBUILD_IPP_IW:BOOL=OFF
+        -DENABLE_PRECOMPILED_HEADERS:BOOL=OFF
         ${additional_cmake_args}
         ${${proj}_CUSTOM_CMAKE_ARGS}
       CMAKE_CACHE_ARGS

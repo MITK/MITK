@@ -74,7 +74,7 @@ Q_SIGNALS:
   *
   * @par	nodes		A list of data nodes that are newly selected.
   */
-  void CurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
+  void CurrentSelectionChanged(NodeList nodes);
 
 public Q_SLOTS:
   /*
@@ -84,7 +84,7 @@ public Q_SLOTS:
   *   An outgoing selection can then at most contain the filtered nodes.
   *   If false, the incoming non-visible selection will be stored and later added to the outgoing selection,
   *   to include the original selection that could not be modified.
-  *   The part of the original selection, that is non-visible are the nodes that are not
+  *   The part of the original selection, that is non-visible are the nodes, that do not fullfill the predicate.
   *
   * @par selectOnlyVisibleNodes   The bool value to define the selection modus.
   */
@@ -127,7 +127,7 @@ public Q_SLOTS:
   void SetSelectionIsOptional(bool isOptional);
 
 protected Q_SLOTS:
-  /** Call to remove a node from the current selection. If the node is part of the current selection.
+  /** Call to remove a node from the current selection. If the node is part of the current selection,
    this will trigger ReviseSelectionChanged(), AllowEmissionOfSelection() and if there is really a change,
    will also emit CurrentSelectionChanged.*/
   void RemoveNodeFromSelection(const mitk::DataNode* node);
@@ -145,7 +145,7 @@ protected:
    The default implementation does nothing.*/
   virtual void OnDataStorageChanged();
 
-  /** This member function will called when ever the a new internal selection has been determined. This can be
+  /** This member function will called when ever a new internal selection has been determined. This can be
   used to update the state of internal widgets. The default implementation does nothing.*/
   virtual void OnInternalSelectionChanged();
 
@@ -154,7 +154,7 @@ protected:
   virtual void OnNodeAddedToStorage(const mitk::DataNode* node);
 
   /**Method is called when a node is removed from the storage. The removed node is passed as
-  variable. This member is called directly bevore the node will be removed from the current selection if
+  variable. This member is called directly before the node will be removed from the current selection if
   he was a part. Default implementation does nothing. */
   virtual void OnNodeRemovedFromStorage(const mitk::DataNode* node);
 
@@ -163,7 +163,7 @@ protected:
   void HandleChangeOfInternalSelection(NodeList newInternalSelection);
 
   /**Compiles the list of node that would be emitted. It always contains the internal selection.
-  Depending on SelectOnlyVisivleNodes it also adds all external select nodes that weren't visible
+  Depending on SelectOnlyVisibleNodes it also adds all external select nodes that weren't visible
   (failed the predicate).*/
   NodeList CompileEmitSelection() const;
 
@@ -174,7 +174,7 @@ protected:
   passed internal selection as compiled by the base implementation.*/
   virtual void ReviseSelectionChanged(const NodeList& oldInternalSelection, NodeList& newInternalSelection);
 
-  /** This function will be called befor the CurrentSelectionChanged signal is emitted. The return value indicates
+  /** This function will be called before the CurrentSelectionChanged signal is emitted. The return value indicates
   if the signal should be emitted (true = emission; false = no emission). The default implementation always
   returns true.
   @param emissionCandidates The nodes that will be emitted if the function returns true.*/
@@ -205,13 +205,14 @@ private:
   /** Helper triggered on the storage delete event */
   void SetDataStorageDeleted();
 
-  /**Member is called when a node is added to the storage. Default implementation does nothing.
-  Derived widgets can override the method if they want to react on new nodes in the storage.*/
+  /**Member is called when a node is added to the storage.
+  Derived widgets can override the method OnNodeAddedToStorage if they want to react on new nodes in the storage.*/
   void NodeAddedToStorage(const mitk::DataNode* node);
 
-  /**Member is called when a node is removed from the storage. The removed node is passed as
-  variable. Derived classes have to implement this method to react on the fact that there selection
-  might change, because the removed node is part of there selection. */
+  /**Member is called when a node is removed from the storage. It calls OnNodeRemovedFromStorage() and afterwards
+  it removes the removed node form the selection (if it is part of the current selection).
+  Derived classes can override OnNodeRemovedFromStorage() to react on the fact that a node might be removed and
+  their selection might change, because the removed node is part of there selection.*/
   void NodeRemovedFromStorage(const mitk::DataNode* node);
 
   void OnNodeModified(const itk::Object * /*caller*/, const itk::EventObject &);

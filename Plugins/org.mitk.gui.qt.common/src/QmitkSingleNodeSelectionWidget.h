@@ -67,6 +67,8 @@ protected:
 
   void OnNodeAddedToStorage(const mitk::DataNode* node) override;
 
+  /** Helper function that gets a suitable auto selected node from the datastorage that fits to the predicate settings.
+   @param ignoreNodes You may pass a list of nodes that must not be choosen as auto selected node. */
   mitk::DataNode::Pointer DeterminAutoSelectNode(const NodeList& ignoreNodes = {});
 
   /** See documentation of SetAutoSelectNewNodes for details*/

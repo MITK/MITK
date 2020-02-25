@@ -113,6 +113,17 @@ void QmitkAbstractNodeSelectionWidget::SetNodePredicate(const mitk::NodePredicat
       }
     }
 
+    if (!m_SelectOnlyVisibleNodes)
+    {
+      for (auto& node : m_CurrentExternalSelection)
+      {
+        if (!newInternalNodes.contains(node) && (m_NodePredicate.IsNull() || m_NodePredicate->CheckNode(node)))
+        {
+          newInternalNodes.append(node);
+        }
+      }
+    }
+
     this->HandleChangeOfInternalSelection(newInternalNodes);
   }
 }
@@ -147,7 +158,7 @@ void QmitkAbstractNodeSelectionWidget::SetCurrentSelection(NodeList selectedNode
   }
 
   this->HandleChangeOfInternalSelection(newInternalSelection);
-};
+}
 
 const mitk::NodePredicateBase* QmitkAbstractNodeSelectionWidget::GetNodePredicate() const
 {
@@ -234,7 +245,7 @@ void QmitkAbstractNodeSelectionWidget::ReviseSelectionChanged(const NodeList& /*
 {
 }
 
-bool QmitkAbstractNodeSelectionWidget::AllowEmissionOfSelection(const NodeList& emissionCandidates) const
+bool QmitkAbstractNodeSelectionWidget::AllowEmissionOfSelection(const NodeList& /*emissionCandidates*/) const
 {
   return true;
 }

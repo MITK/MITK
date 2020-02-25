@@ -53,19 +53,19 @@ public:
   };
 
   int m_OnNodeAddedToStorage;
-  void OnNodeAddedToStorage(const mitk::DataNode* node) override
+  void OnNodeAddedToStorage(const mitk::DataNode* /*node*/) override
   {
     m_OnNodeAddedToStorage++;
   };
 
   int m_OnNodeRemovedFromStorage;
-  void OnNodeRemovedFromStorage(const mitk::DataNode* node) override
+  void OnNodeRemovedFromStorage(const mitk::DataNode* /*node*/) override
   {
     m_OnNodeRemovedFromStorage++;
   };
 
   int m_ReviseSelectionChanged;
-  void ReviseSelectionChanged(const NodeList& oldInternalSelection, NodeList& newInternalSelection) override
+  void ReviseSelectionChanged(const NodeList& /*oldInternalSelection*/, NodeList& /*newInternalSelection*/) override
   {
     m_ReviseSelectionChanged++;
   };

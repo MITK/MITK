@@ -99,6 +99,7 @@ class QmitkAbstractNodeSelectionWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(SelectOnlyVisibleNodesTest);
   MITK_TEST(OtherSetterAnsGetterTest);
   MITK_TEST(AllowEmissionOfSelectionTest);
+  MITK_TEST(OnNodeModifiedTest);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -494,6 +495,90 @@ public:
     CPPUNIT_ASSERT_EQUAL(1, widget.m_NewSelectionEmited);
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node3 }, widget.m_LastNewEmision));
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1 }, widget.GetSelectedNodes()));
+  }
+
+  void OnNodeModifiedTest()
+  {
+    TestWidget widget;
+
+    widget.SetDataStorage(m_DataStorage);
+    widget.SetCurrentSelection({ m_Node3 });
+
+    //Check OnNodeModified behavour without predicate
+    m_Node3->SetName("NewName");
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodePredicateChanged);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_OnInternalSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeAddedToStorage);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_ReviseSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(3, widget.m_AllowEmissionOfSelection);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_NewSelectionEmited);
+    CPPUNIT_ASSERT(EqualNodeSelections({ m_Node3 }, widget.m_LastNewEmision));
+    CPPUNIT_ASSERT(EqualNodeSelections({ m_Node3 }, widget.GetSelectedNodes()));
+
+    //simulate behaviour if allowance is changed to true
+    widget.m_Allow = false;
+    m_Node3->SetName("NewName_temp");
+    widget.m_Allow = true;
+    m_Node3->SetName("NewName");
+    CPPUNIT_ASSERT_EQUAL(4, widget.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodePredicateChanged);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_OnInternalSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeAddedToStorage);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_ReviseSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(7, widget.m_AllowEmissionOfSelection);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_NewSelectionEmited);
+    CPPUNIT_ASSERT(EqualNodeSelections({ m_Node3 }, widget.m_LastNewEmision));
+    CPPUNIT_ASSERT(EqualNodeSelections({ m_Node3 }, widget.GetSelectedNodes()));
+
+    //change irrelevant node
+    m_Node2->SetName("IrrelevantNode");
+    CPPUNIT_ASSERT_EQUAL(4, widget.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodePredicateChanged);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_OnInternalSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeAddedToStorage);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_ReviseSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(7, widget.m_AllowEmissionOfSelection);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_NewSelectionEmited);
+    CPPUNIT_ASSERT(EqualNodeSelections({ m_Node3 }, widget.m_LastNewEmision));
+    CPPUNIT_ASSERT(EqualNodeSelections({ m_Node3 }, widget.GetSelectedNodes()));
+
+    //test with predicate set
+    widget.SetNodePredicate(GeneratTestPredicate("node1"));
+    m_Node3->SetName("NowAlsoIrrelevantNode");
+    CPPUNIT_ASSERT_EQUAL(5, widget.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_OnNodePredicateChanged);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
+    CPPUNIT_ASSERT_EQUAL(3, widget.m_OnInternalSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeAddedToStorage);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
+    CPPUNIT_ASSERT_EQUAL(3, widget.m_ReviseSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(8, widget.m_AllowEmissionOfSelection);
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_NewSelectionEmited);
+    CPPUNIT_ASSERT(EqualNodeSelections({ }, widget.m_LastNewEmision));
+    CPPUNIT_ASSERT(EqualNodeSelections({ }, widget.GetSelectedNodes()));
+
+    widget.SetCurrentSelection({ m_Node1, m_Node1_2 });
+    CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1, m_Node1_2 }, widget.m_LastNewEmision));
+
+    m_Node1->SetName("NodeSortedOutByPredicate");
+    CPPUNIT_ASSERT_EQUAL(7, widget.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_OnNodePredicateChanged);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
+    CPPUNIT_ASSERT_EQUAL(5, widget.m_OnInternalSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeAddedToStorage);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
+    CPPUNIT_ASSERT_EQUAL(5, widget.m_ReviseSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(10, widget.m_AllowEmissionOfSelection);
+    CPPUNIT_ASSERT_EQUAL(4, widget.m_NewSelectionEmited);
+    CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1_2 }, widget.m_LastNewEmision));
+    CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1_2 }, widget.GetSelectedNodes()));
   }
 
 };

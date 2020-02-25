@@ -14,6 +14,7 @@ found in the LICENSE file.
 #ifndef mitkMaskedAlgorithmHelper_h
 #define mitkMaskedAlgorithmHelper_h
 
+#include "itkSpatialObject.h"
 
 //MatchPoint
 #include "mapRegistrationAlgorithmBase.h"
@@ -31,7 +32,6 @@ namespace mitk
     Helper class as an easy bridge to set mitk images as masks for registration algorithms. It is assumed that the
     Image indicates the mask by pixel values != 0.
     \remark Currently only 2D-2D and 3D-3D algorithms are supported.
-    \remark Currently only masks with pixel type unsigned char (default mitk segmentation images) are supported.
     \remark Current implementation is not thread-save. Just use one Helper class per registration task.
   */
   class MITKMATCHPOINTREGISTRATION_EXPORT MaskedAlgorithmHelper
@@ -54,7 +54,7 @@ namespace mitk
     ~MaskedAlgorithmHelper() {}
 
   private:
-    typedef unsigned char MaskPixelType;
+    using MaskPixelType = unsigned char;
 
     MaskedAlgorithmHelper& operator = (const MaskedAlgorithmHelper&);
     MaskedAlgorithmHelper(const MaskedAlgorithmHelper&);
@@ -63,9 +63,17 @@ namespace mitk
     template<unsigned int VImageDimension1, unsigned int VImageDimension2>
     bool DoSetMasks(const mitk::Image* movingMask, const mitk::Image* targetMask);
 
-    /**Internal helper that is used by SetData if the data are images to set them properly.*/
+    /**Internal helper that is used by SetData if the data are images to cast and set them properly.*/
     template<typename TPixelType, unsigned int VImageDimension>
     void DoConvertMask(const itk::Image<TPixelType, VImageDimension>* mask);
+    /**Internal helper that is used by SetData if the data are images to set them properly.*/
+    template<unsigned int VImageDimension>
+    void DoConvertMask(const itk::Image<MaskPixelType, VImageDimension>* mask);
+
+    /**Internal helper that is used to pack the mask image into a spatial object.*/
+    template<unsigned int VImageDimension>
+    typename itk::SpatialObject<VImageDimension>::Pointer ConvertMaskSO(const itk::Image<MaskPixelType, VImageDimension>* mask) const;
+
     /**Helper member that containes the result of the last call of DoConvertMask().*/
     itk::DataObject::Pointer m_convertResult;
 

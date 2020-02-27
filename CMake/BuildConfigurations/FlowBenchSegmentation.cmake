@@ -12,5 +12,3 @@ set(MITK_CONFIG_PLUGINS
   org.mitk.gui.qt.multilabelsegmentation
   org.mitk.gui.qt.flow.segmentation
 )
-
-set(MITK_VTK_DEBUG_LEAKS OFF CACHE BOOL "Enable VTK Debug Leaks" FORCE)

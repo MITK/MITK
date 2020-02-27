@@ -122,6 +122,7 @@ public:
   typedef std::vector<ImageDataItemPointer> ImageDataItemPointerArray;
 
   ReaderType::DictionaryArrayType GetMetaDataDictionaryArray() const;
+  ReaderType::DictionaryArrayType& AllocateMetaDataDictionaryArray() const;
   void SetMetaDataDictionary(ReaderType::DictionaryArrayType metaData);
   void SetMetaDataDictionary(DicomTagToValueList& array);
 

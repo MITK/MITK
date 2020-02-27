@@ -450,7 +450,7 @@ bool DicomSeriesReader::ImageBlockDescriptor::loadImage(DcmFileFormat& ff, Image
     DcmDataset* fileData = ff.getDataset();
     DcmStack stack;
 
-    std::vector<itk::MetaDataDictionary*> dictArray = image->GetMetaDataDictionaryArray();
+    auto& dictArray = image->AllocateMetaDataDictionaryArray();
     auto dict = dictArray[0];
 
     // For compatibility with private tags processing in itk::GDCMImageIO
@@ -871,7 +871,7 @@ Image::Pointer DicomSeriesReader::ImageBlockDescriptor::GetImage(size_t *slicesC
 
   auto image = Image::New();
   image->Initialize(firstImage->GetPixelType(), canLoadAs4D?4:3, d, 1, origin, getMatrix(spacing), spacing);
-  std::vector<itk::MetaDataDictionary*> newDictArray = image->GetMetaDataDictionaryArray();
+  auto& newDictArray = image->AllocateMetaDataDictionaryArray();
   auto dict = newDictArray.begin();
 
   const size_t sliceSize = d[0]*d[1]*(image->GetPixelType().GetBpe()/8);
@@ -915,11 +915,11 @@ Image::Pointer DicomSeriesReader::ImageBlockDescriptor::GetImage(size_t *slicesC
             }
           }
           slicesUsed++;
-          **dict = *slice->GetMetaDataDictionaryArray()[0];
+          **dict = *slice->AllocateMetaDataDictionaryArray()[0];
         } else { // 1. Slice will be loaded later, but we know they number. 2. Slice can not be loaded
           // In this cases for not first slice we temporary copy the previous
           memcpy(dstPtr, dstPtr - sliceSize, sliceSize);
-          **dict = *firstImage->GetMetaDataDictionaryArray()[0];
+          **dict = *firstImage->AllocateMetaDataDictionaryArray()[0];
           if (sliceInfo.m_HasOrientation) {
             std::ostringstream value;
             value << sliceInfo.m_Orientation[0][0] << '\\' << sliceInfo.m_Orientation[0][1] << '\\' << sliceInfo.m_Orientation[0][2]

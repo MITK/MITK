@@ -12,13 +12,12 @@ found in the LICENSE file.
 
 #include <QmitkDataStorageFavoriteNodesInspector.h>
 
-#include <QmitkDataStorageDefaultListModel.h>
+#include "QmitkDataStorageDefaultListModel.h"
 
 #include "mitkNodePredicateAnd.h"
 
 #include "QPushButton"
 #include "QmitkStyleManager.h"
-
 
 QmitkDataStorageFavoriteNodesInspector::QmitkDataStorageFavoriteNodesInspector(QWidget* parent/* = nullptr*/)
   : QmitkDataStorageListInspector(parent)

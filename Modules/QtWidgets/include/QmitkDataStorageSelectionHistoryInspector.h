@@ -17,6 +17,7 @@ found in the LICENSE file.
 
 #include <QmitkAbstractDataStorageInspector.h>
 #include <QSortFilterProxyModel>
+#include "QmitkSimpleTextOverlayWidget.h"
 
 #include "ui_QmitkDataStorageSelectionHistoryInspector.h"
 
@@ -49,6 +50,7 @@ protected:
 
   QmitkAbstractDataStorageModel* m_StorageModel;
   Ui_QmitkDataStorageSelectionHistoryInspector m_Controls;
+  QmitkSimpleTextOverlayWidget* m_Overlay;
 };
 
 #endif // QMITKDATASTORAGESELECTIONHISTORYINSPECTOR_H

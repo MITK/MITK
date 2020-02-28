@@ -49,6 +49,7 @@ if(NOT DEFINED GDCM_DIR)
        ${ep_common_args}
        ${additional_args}
        -DGDCM_BUILD_SHARED_LIBS:BOOL=ON
+       -DGDCM_BUILD_DOCBOOK_MANPAGES:BOOL=OFF
        ${${proj}_CUSTOM_CMAKE_ARGS}
      CMAKE_CACHE_ARGS
        ${ep_common_cache_args}

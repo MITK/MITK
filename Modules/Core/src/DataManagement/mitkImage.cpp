@@ -45,23 +45,39 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define FILL_C_ARRAY( _arr, _size, _value) for(unsigned int i=0u; i<_size; i++) \
 { _arr[i] = _value; }
 
-mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray() const
+mitk::ReaderType::DictionaryArrayType& mitk::Image::AllocateMetaDataDictionaryArray() const
 {
-  if (m_MetaDataDictionaryArray.size()) {
+  int numberSlices = GetLargestPossibleRegion().GetSize()[2];
+  numberSlices *= GetTimeSteps();
+  numberSlices *= GetPixelType().GetNumberOfComponents();
+
+  if (m_MetaDataDictionaryArray.size() == numberSlices) {
     return m_MetaDataDictionaryArray;
   }
 
-  int numberSlices = GetLargestPossibleRegion().GetSize()[2];
-  int timeSteps = GetTimeSteps();
-  int numberOfComponents = GetPixelType().GetNumberOfComponents();
+  for (unsigned int i = numberSlices; i < m_MetaDataDictionaryArray.size(); ++i)
+  {
+    delete m_MetaDataDictionaryArray[i];
+  }
 
-  //mitk::ReaderType::DictionaryArrayType outputArray;
-  m_MetaDataDictionaryArray.resize(numberSlices * timeSteps * numberOfComponents);
+  unsigned int i = m_MetaDataDictionaryArray.size();
+  m_MetaDataDictionaryArray.resize(numberSlices);
 
-  for (unsigned int i = 0; i < m_MetaDataDictionaryArray.size(); ++i)
+  for (; i < m_MetaDataDictionaryArray.size(); ++i)
   {
     m_MetaDataDictionaryArray[i] = new mitk::ReaderType::DictionaryType;
   }
+
+  return m_MetaDataDictionaryArray;
+}
+
+mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray() const
+{
+  if (m_MetaDataDictionaryArray.size() == GetLargestPossibleRegion().GetSize()[2] * GetTimeSteps() * GetPixelType().GetNumberOfComponents()) {
+    return m_MetaDataDictionaryArray;
+  }
+
+  mitk::Image::AllocateMetaDataDictionaryArray();
 
   mitk::SlicedGeometry3D* slicedGeometry = GetSlicedGeometry(0);
   for (unsigned int i = 0; i < dicomTagsList.size(); ++i)
@@ -108,31 +124,28 @@ mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray() 
           imageMatrix[0][0] = imageMatrix[0][0] / spacingVector[0];
           imageMatrix[1][1] = imageMatrix[1][1] / spacingVector[1];
 
-          std::string imageOrientation = boost::str(boost::format("%d\\%d\\%d\\%d\\%d\\%d")
-          %imageMatrix[0][0] %imageMatrix[0][1] %imageMatrix[0][2]
-          %imageMatrix[1][0] %imageMatrix[1][1] %imageMatrix[1][2]
-          );
-
-          std::string imagePosition = boost::str(boost::format("%d\\%d\\%d")
-          %originVector[0] %originVector[1] %originVector[2]
-          );
-
-          std::string spacing = boost::str(boost::format("%d\\%d\\%d")
-          %spacingVector[0] %spacingVector[1] %spacingVector[2]
-          );
-
           if (tagkey == TAG_IMAGE_ORIENTATION)
           {
+            std::string imageOrientation = boost::str(boost::format("%d\\%d\\%d\\%d\\%d\\%d")
+              %imageMatrix[0][0] %imageMatrix[0][1] %imageMatrix[0][2]
+              %imageMatrix[1][0] %imageMatrix[1][1] %imageMatrix[1][2]
+            );
             itk::EncapsulateMetaData<std::string>(*(m_MetaDataDictionaryArray[j]), tagkey, imageOrientation);
             continue;
           }
           else if (tagkey == TAG_IMAGE_POSITION)
           {
+            std::string imagePosition = boost::str(boost::format("%d\\%d\\%d")
+              %originVector[0] %originVector[1] %originVector[2]
+            );
             itk::EncapsulateMetaData<std::string>(*(m_MetaDataDictionaryArray[j]), tagkey, imagePosition);
             continue;
           }
           else if (tagkey == TAG_PIXEL_SPACING)
           {
+            std::string spacing = boost::str(boost::format("%d\\%d\\%d")
+              %spacingVector[0] %spacingVector[1] %spacingVector[2]
+            );
             itk::EncapsulateMetaData<std::string>(*(m_MetaDataDictionaryArray[j]), tagkey, spacing);
             continue;
           }

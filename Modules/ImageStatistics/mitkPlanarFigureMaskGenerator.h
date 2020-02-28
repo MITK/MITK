@@ -62,6 +62,10 @@ namespace mitk
     itkGetConstMacro(PlanarFigureAxis, unsigned int);
     itkGetConstMacro(PlanarFigureSlice, unsigned int);
 
+    /** Helper function that indicates if a passed planar geometry is tilted regarding a given geometry and its main axis.
+     *@result If either planarGeometry or geometry is nullptr it will return false.*/
+    static bool CheckPlanarFigureIsNotTilted(const PlaneGeometry* planarGeometry, const BaseGeometry *geometry);
+
   protected:
     PlanarFigureMaskGenerator()
       : Superclass(),
@@ -84,7 +88,8 @@ namespace mitk
 
     mitk::Image::ConstPointer extract2DImageSlice(unsigned int axis, unsigned int slice);
 
-    bool GetPrincipalAxis(const BaseGeometry *geometry, Vector3D vector, unsigned int &axis);
+    /** Helper function that deduces if the passed vector is equal to one of the primary axis of the geometry.*/
+    static bool GetPrincipalAxis(const BaseGeometry *geometry, Vector3D vector, unsigned int &axis);
 
     /** Connection from ITK to VTK */
     template <typename ITK_Exporter, typename VTK_Importer>
@@ -138,6 +143,7 @@ namespace mitk
     unsigned long m_InternalMaskUpdateTime;
     unsigned int m_PlanarFigureSlice;
   };
+
 } // namespace mitk
 
 #endif // MITKPLANARFIGUREMASKGENERATOR

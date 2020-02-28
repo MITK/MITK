@@ -70,7 +70,6 @@ protected:
   void OnRequestHistogramUpdate(unsigned int);
   void OnCheckBoxIgnoreZeroStateChanged(int state);
   void OnButtonSelectionPressed();
-  void OnDialogSelectionChanged();
 
   // member variable
   Ui::QmitkImageStatisticsViewControls m_Controls;
@@ -88,20 +87,19 @@ private:
   mitk::DataNode::Pointer GetNodeForStatisticsContainer(mitk::ImageStatisticsContainer::ConstPointer container);
 
   QmitkNodeSelectionDialog::SelectionCheckFunctionType CheckForSameGeometry() const;
-  bool CheckForSameGeometry(const mitk::DataNode* node1, const mitk::DataNode* node2) const;
+  bool CheckForSameGeometry(const mitk::Image* image, const mitk::BaseData* data) const;
 
   typedef itk::SimpleMemberCommand<QmitkImageStatisticsView> ITKCommandType;
   mitk::DataNode::ConstPointer m_selectedImageNode = nullptr;
   mitk::DataNode::ConstPointer m_selectedMaskNode = nullptr;
   mitk::PlanarFigure::Pointer m_selectedPlanarFigure = nullptr;
 
-  QmitkNodeSelectionDialog* m_SelectionDialog = nullptr;
-
   long m_PlanarFigureObserverTag;
   bool m_ForceRecompute = false;
   bool m_IgnoreZeroValueVoxel = false;
   std::vector<mitk::DataNode::ConstPointer> m_selectedMaskNodes;
   std::vector<mitk::DataNode::ConstPointer> m_selectedImageNodes;
+  QmitkNodeSelectionDialog::NodeList m_SelectedNodeList;
   std::vector<mitk::ImageStatisticsContainer::ConstPointer> m_StatisticsForSelection;
   std::vector<QmitkImageStatisticsCalculationRunnable*> m_Runnables;
 

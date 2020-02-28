@@ -158,8 +158,12 @@ protected:
   he was a part. Default implementation does nothing. */
   virtual void OnNodeRemovedFromStorage(const mitk::DataNode* node);
 
-  /**Method is called if the internal selection has changed. It will call the methods ReviseSelectionChanged(),
-   OnInternalSelectionChanged(), UpdateInfo() and EmitSelection() with the new emission candidates.*/
+  /**Method is called if the internal selection has changed. It will call following methods, that can be overriden to change
+   behavior in derived classes:
+   - pre internal selection change: ReviseSelectionChanged()
+   - post internal selection change: OnInternalSelectionChanged(), UpdateInfo() and AllowEmissionOfSelection() (via EmitSelection())
+   .
+   If the emission is needed and allowed it will also trigger the emission via EmitSelection().*/
   void HandleChangeOfInternalSelection(NodeList newInternalSelection);
 
   /**Compiles the list of node that would be emitted. It always contains the internal selection.
@@ -230,5 +234,8 @@ private:
 
   using NodeObserverTagMapType = std::map<const mitk::DataNode*, unsigned long>;
   NodeObserverTagMapType m_NodeObserverTags;
+
+  /** Help to prevent recursions due to signal loops when emitting selections.*/
+  bool m_RecursionGuard;
 };
 #endif // QmitkAbstractNodeSelectionWidget_H

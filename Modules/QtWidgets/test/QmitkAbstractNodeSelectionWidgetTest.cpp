@@ -97,9 +97,10 @@ class QmitkAbstractNodeSelectionWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(DataStorageEventTest);
   MITK_TEST(NodePredicateTest);
   MITK_TEST(SelectOnlyVisibleNodesTest);
-  MITK_TEST(OtherSetterAnsGetterTest);
+  MITK_TEST(OtherSetterAndGetterTest);
   MITK_TEST(AllowEmissionOfSelectionTest);
   MITK_TEST(OnNodeModifiedTest);
+  MITK_TEST(SignalRecursionTest);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -440,7 +441,7 @@ public:
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1, m_Node1_2 }, widget.GetSelectedNodes()));
   }
 
-  void OtherSetterAnsGetterTest()
+  void OtherSetterAndGetterTest()
   {
     TestWidget widget;
 
@@ -579,6 +580,43 @@ public:
     CPPUNIT_ASSERT_EQUAL(4, widget.m_NewSelectionEmited);
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1_2 }, widget.m_LastNewEmision));
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1_2 }, widget.GetSelectedNodes()));
+  }
+
+  void SignalRecursionTest()
+  {
+    TestWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+
+    TestWidget widget2;
+    widget2.SetDataStorage(m_DataStorage);
+
+    QmitkAbstractNodeSelectionWidget::connect(&widget, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, &widget2, &QmitkAbstractNodeSelectionWidget::SetCurrentSelection);
+    QmitkAbstractNodeSelectionWidget::connect(&widget2, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, &widget, &QmitkAbstractNodeSelectionWidget::SetCurrentSelection);
+
+    widget.SetCurrentSelection({ m_Node1 });
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodePredicateChanged);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_OnInternalSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeAddedToStorage);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_ReviseSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_AllowEmissionOfSelection);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_NewSelectionEmited);
+    CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1 }, widget.m_LastNewEmision));
+    CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1 }, widget.GetSelectedNodes()));
+
+    CPPUNIT_ASSERT_EQUAL(2, widget2.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(0, widget2.m_OnNodePredicateChanged);
+    CPPUNIT_ASSERT_EQUAL(1, widget2.m_OnDataStorageChanged);
+    CPPUNIT_ASSERT_EQUAL(2, widget2.m_OnInternalSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(0, widget2.m_OnNodeAddedToStorage);
+    CPPUNIT_ASSERT_EQUAL(0, widget2.m_OnNodeRemovedFromStorage);
+    CPPUNIT_ASSERT_EQUAL(2, widget2.m_ReviseSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(2, widget2.m_AllowEmissionOfSelection);
+    CPPUNIT_ASSERT_EQUAL(1, widget2.m_NewSelectionEmited);
+    CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1 }, widget2.m_LastNewEmision));
+    CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1 }, widget2.GetSelectedNodes()));
   }
 
 };

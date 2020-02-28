@@ -16,7 +16,7 @@ found in the LICENSE file.
 
 QmitkAbstractNodeSelectionWidget::QmitkAbstractNodeSelectionWidget(QWidget* parent) : QWidget(parent), m_InvalidInfo("Error. Select data."),
 m_EmptyInfo("Empty. Make a selection."), m_PopUpTitel("Select a data node"), m_PopUpHint(""),
-m_IsOptional(false), m_SelectOnlyVisibleNodes(true), m_DataStorageDeletedTag(0), m_LastEmissionAllowance(true)
+m_IsOptional(false), m_SelectOnlyVisibleNodes(true), m_DataStorageDeletedTag(0), m_LastEmissionAllowance(true), m_RecursionGuard(false)
 {
 }
 
@@ -145,19 +145,22 @@ void QmitkAbstractNodeSelectionWidget::HandleChangeOfInternalSelection(NodeList 
 
 void QmitkAbstractNodeSelectionWidget::SetCurrentSelection(NodeList selectedNodes)
 {
-  m_CurrentExternalSelection = selectedNodes;
-  
-  auto dataStorage = m_DataStorage.Lock();
-  NodeList newInternalSelection;
-  for (auto node : selectedNodes)
+  if (!m_RecursionGuard)
   {
-    if (dataStorage.IsNotNull() && dataStorage->Exists(node) && (m_NodePredicate.IsNull() || m_NodePredicate->CheckNode(node)))
-    {
-      newInternalSelection.append(node);
-    }
-  }
+    m_CurrentExternalSelection = selectedNodes;
 
-  this->HandleChangeOfInternalSelection(newInternalSelection);
+    auto dataStorage = m_DataStorage.Lock();
+    NodeList newInternalSelection;
+    for (auto node : selectedNodes)
+    {
+      if (dataStorage.IsNotNull() && dataStorage->Exists(node) && (m_NodePredicate.IsNull() || m_NodePredicate->CheckNode(node)))
+      {
+        newInternalSelection.append(node);
+      }
+    }
+
+    this->HandleChangeOfInternalSelection(newInternalSelection);
+  }
 }
 
 const mitk::NodePredicateBase* QmitkAbstractNodeSelectionWidget::GetNodePredicate() const
@@ -255,7 +258,9 @@ void QmitkAbstractNodeSelectionWidget::EmitSelection(const NodeList& emissionCan
   m_LastEmissionAllowance = this->AllowEmissionOfSelection(emissionCandidates);
   if (m_LastEmissionAllowance && !EqualNodeSelections(m_LastEmission, emissionCandidates))
   {
+    m_RecursionGuard = true;
     emit CurrentSelectionChanged(emissionCandidates);
+    m_RecursionGuard = false;
     m_LastEmission = emissionCandidates;
   }
 }

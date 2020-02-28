@@ -44,7 +44,7 @@ void QmitkSingleNodeSelectionWidget::ReviseSelectionChanged(const NodeList& oldI
   {
     if (m_AutoSelectNewNodes)
     {
-      auto autoSelectedNode = this->DeterminAutoSelectNode(oldInternalSelection);
+      auto autoSelectedNode = this->DetermineAutoSelectNode(oldInternalSelection);
 
       if (autoSelectedNode.IsNotNull())
       {
@@ -162,7 +162,7 @@ void QmitkSingleNodeSelectionWidget::UpdateInfo()
   m_Controls.btnSelect->SetSelectedNode(this->GetSelectedNode());
 }
 
-mitk::DataNode::Pointer QmitkSingleNodeSelectionWidget::DeterminAutoSelectNode(const NodeList& ignoreNodes)
+mitk::DataNode::Pointer QmitkSingleNodeSelectionWidget::DetermineAutoSelectNode(const NodeList& ignoreNodes)
 {
   mitk::DataNode::Pointer result;
   auto storage = m_DataStorage.Lock();
@@ -209,7 +209,7 @@ void QmitkSingleNodeSelectionWidget::OnNodeAddedToStorage(const mitk::DataNode* 
 {
   if (this->GetSelectedNode().IsNull() && m_AutoSelectNewNodes)
   {
-    auto autoNode = this->DeterminAutoSelectNode();
+    auto autoNode = this->DetermineAutoSelectNode();
 
     if (autoNode.IsNotNull())
     {

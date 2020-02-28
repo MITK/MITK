@@ -171,12 +171,12 @@ void QmitkDataStorageViewerTestView::SetAsSelectionProvider3(bool checked)
   if (checked)
   {
     m_SelectionServiceConnector3->SetAsSelectionProvider(GetSite()->GetSelectionProvider().Cast<QmitkDataNodeSelectionProvider>().GetPointer());
-    connect(m_Controls.singleSlot, SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)), m_SelectionServiceConnector3.get(), SLOT(ChangeServiceSelection(QList<mitk::DataNode::Pointer>)));
+    connect(m_Controls.singleSlot, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, m_SelectionServiceConnector3.get(), &QmitkSelectionServiceConnector::ChangeServiceSelection);
   }
   else
   {
     m_SelectionServiceConnector3->RemoveAsSelectionProvider();
-    disconnect(m_Controls.singleSlot, SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)), m_SelectionServiceConnector3.get(), SLOT(ChangeServiceSelection(QList<mitk::DataNode::Pointer>)));
+    disconnect(m_Controls.singleSlot, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, m_SelectionServiceConnector3.get(), &QmitkSelectionServiceConnector::ChangeServiceSelection);
   }
 }
 
@@ -199,12 +199,12 @@ void QmitkDataStorageViewerTestView::SetAsSelectionProvider4(bool checked)
   if (checked)
   {
     m_SelectionServiceConnector4->SetAsSelectionProvider(GetSite()->GetSelectionProvider().Cast<QmitkDataNodeSelectionProvider>().GetPointer());
-    connect(m_Controls.multiSlot, SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)), m_SelectionServiceConnector4.get(), SLOT(ChangeServiceSelection(QList<mitk::DataNode::Pointer>)));
+    connect(m_Controls.multiSlot, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, m_SelectionServiceConnector4.get(), &QmitkSelectionServiceConnector::ChangeServiceSelection);
   }
   else
   {
     m_SelectionServiceConnector4->RemoveAsSelectionProvider();
-    disconnect(m_Controls.multiSlot, SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)), m_SelectionServiceConnector4.get(), SLOT(ChangeServiceSelection(QList<mitk::DataNode::Pointer>)));
+    disconnect(m_Controls.multiSlot, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, m_SelectionServiceConnector4.get(), &QmitkSelectionServiceConnector::ChangeServiceSelection);
   }
 }
 

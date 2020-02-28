@@ -156,7 +156,12 @@ public:
   void InstantiationTest()
   {
     TestWidget* widget;
+    
     CPPUNIT_ASSERT_NO_THROW_MESSAGE("Normal constructor fails", widget = new TestWidget());
+    delete widget;
+
+    //seperated both test to avoid warning as error "widget may be used uninitialized in this function"
+    widget = new TestWidget();
     CPPUNIT_ASSERT_NO_THROW_MESSAGE("Normal destructor fails", delete widget);
   }
 

@@ -92,7 +92,6 @@ public:
 class QmitkAbstractNodeSelectionWidgetTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(QmitkAbstractNodeSelectionWidgetTestSuite);
-  MITK_TEST(InstantiationTest);
   MITK_TEST(SetDataStorageTest);
   MITK_TEST(DataStorageEventTest);
   MITK_TEST(NodePredicateTest);
@@ -150,19 +149,6 @@ public:
   void tearDown() override
   {
     delete m_TestApp;
-  }
-
-
-  void InstantiationTest()
-  {
-    TestWidget* widget;
-    
-    CPPUNIT_ASSERT_NO_THROW_MESSAGE("Normal constructor fails", widget = new TestWidget());
-    delete widget;
-
-    //seperated both test to avoid warning as error "widget may be used uninitialized in this function"
-    widget = new TestWidget();
-    CPPUNIT_ASSERT_NO_THROW_MESSAGE("Normal destructor fails", delete widget);
   }
 
   void SetDataStorageTest()

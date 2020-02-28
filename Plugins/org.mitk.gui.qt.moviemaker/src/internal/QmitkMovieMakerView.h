@@ -15,6 +15,9 @@ found in the LICENSE file.
 
 #include <QmitkAbstractView.h>
 
+#include <utility>
+#include <vector>
+
 class QmitkAnimationItem;
 class QmitkAnimationWidget;
 class QmitkFFmpegWriter;
@@ -77,14 +80,12 @@ private:
   void RedrawTimeline();
   void CalculateTotalDuration();
   QmitkAnimationItem* GetSelectedAnimationItem() const;
-  QVector<QPair<QmitkAnimationItem*, double> > GetActiveAnimations(double t) const;
-
-  QString GetFFmpegPath() const;
+  std::vector<std::pair<QmitkAnimationItem*, double>> GetActiveAnimations(double t) const;
 
   QmitkFFmpegWriter* m_FFmpegWriter;
   Ui::QmitkMovieMakerView* m_Ui;
   QStandardItemModel* m_AnimationModel;
-  QMap<QString, QmitkAnimationWidget*> m_AnimationWidgets;
+  std::map<QString, QmitkAnimationWidget*> m_AnimationWidgets;
   QMenu* m_AddAnimationMenu;
   QMenu* m_RecordMenu;
   QTimer* m_Timer;

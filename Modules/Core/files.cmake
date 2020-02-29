@@ -274,6 +274,7 @@ set(CPP_FILES
   Rendering/mitkSurfaceVtkMapper2D.cpp
   Rendering/mitkSurfaceVtkMapper3D.cpp
   Rendering/mitkVtkEventProvider.cpp
+  Rendering/mitkVtkFont.cpp
   Rendering/mitkVtkMapper.cpp
   Rendering/mitkVtkOverlay2D.cpp
   Rendering/mitkVtkOverlay3D.cpp

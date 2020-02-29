@@ -1,7 +1,6 @@
 MITK_CREATE_MODULE(
   PACKAGE_DEPENDS
-    PUBLIC Boost
-    PRIVATE Qt5|Core
+    PUBLIC Boost Qt5|Core
 )
 
 if (UNIX)

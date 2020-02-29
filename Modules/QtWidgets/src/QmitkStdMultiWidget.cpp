@@ -30,6 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QStringList>
 #include <QDir>
 
+#include <dcmtk/dcmdata/dcvrpn.h>
+
 #include <mitkProperties.h>
 #include <mitkPlaneGeometryDataMapper2D.h>
 #include <mitkPointSet.h>
@@ -48,14 +50,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataNodePickingEventObserver.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkResliceMethodProperty.h>
+#include <mitkVtkFont.h>
 
 #include <vtkRendererCollection.h>
-#include <vtkTextProperty.h>
 #include <vtkCornerAnnotation.h>
 #include <vtkMitkRectangleProp.h>
 #include "mitkPixelTypeMultiplex.h"
-
-#include <PathUtilities.h>
 
 void QmitkStdMultiWidget::UpdateAnnotationFonts()
 {
@@ -355,6 +355,7 @@ void QmitkStdMultiWidget::InitializeWidget(bool showPlanesIn3d)
   for(int i = 0; i < 4; i++) {
     cornerText[i] = vtkCornerAnnotation::New();
     textProp[i] = vtkTextProperty::New();
+    mitk::setUnicodeFont(textProp[i]);
     ren[i] = vtkRenderer::New();
     ren[i]->AddActor(cornerText[i]);
     ren[i]->InteractiveOff();
@@ -659,13 +660,10 @@ void QmitkStdMultiWidget::SetDecorationProperties( std::string text, mitk::Color
     return;
   }
 
-  std::string fontPath = Utilities::preferredPath(Utilities::absPath(std::string("Fonts\\DejaVuSans.ttf")));
-
   vtkSmartPointer<vtkCornerAnnotation> annotation = m_CornerAnnotations[widgetNumber];
   annotation->SetText(0, text.c_str());
   annotation->SetMaximumFontSize(12);
-  annotation->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
-  annotation->GetTextProperty()->SetFontFile(fontPath.c_str());
+  mitk::setUnicodeFont(annotation->GetTextProperty());
   annotation->GetTextProperty()->SetColor( color[0],color[1],color[2] );
 
   if(!renderer->HasViewProp(annotation))
@@ -1756,8 +1754,6 @@ mitk::DataNode::Pointer QmitkStdMultiWidget::GetTopLayerNode(mitk::DataStorage::
 
 void QmitkStdMultiWidget::setCornerAnnotation(int corner, int i, const char* text)
 {
-  std::string fontPath = Utilities::preferredPath(Utilities::absPath(std::string("Fonts\\DejaVuSans.ttf")));
-
   // empty or NULL string breaks renderer
   // and white square appears
   if ((text == NULL) || (text[0] == 0)) {
@@ -1766,8 +1762,6 @@ void QmitkStdMultiWidget::setCornerAnnotation(int corner, int i, const char* tex
 
   cornerText[i]->SetText(corner, text);
   cornerText[i]->SetMaximumFontSize(15);
-  textProp[i]->SetFontFamily(VTK_FONT_FILE);
-  textProp[i]->SetFontFile(fontPath.c_str());
   textProp[i]->SetColor(1.0, 1.0, 7.0);
   cornerText[i]->SetTextProperty(textProp[i]);
 }
@@ -1943,6 +1937,7 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
         sliceThickness, xrayTubeCurrent, kvp, imagePosition, windowCenter, windowWidth;
 
       imageProperties->GetStringProperty("dicom.patient.PatientsName", patient);
+      DcmPersonName::getFormattedNameFromString(patient, patient); // process '^' and '='
       imageProperties->GetStringProperty("dicom.patient.PatientID", patientId);
       imageProperties->GetStringProperty("dicom.patient.PatientsBirthDate", birthday);
       imageProperties->GetStringProperty("dicom.patient.PatientsSex", sex);
@@ -1955,6 +1950,7 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
       }
       imageProperties->GetStringProperty("dicom.study.StudyID", studiId);
       imageProperties->GetStringProperty("dicom.study.StudyDescription", studyDescription);
+      DcmPersonName::getFormattedNameFromString(studyDescription, studyDescription); // '^' appears in some studies
       //imageProperties->GetStringProperty("dicom.series.SeriesDescription", seriesDescription);
       imageProperties->GetStringProperty("dicom.ExInfo", exInfo);
       imageProperties->GetStringProperty("dicom.MagneticFieldStrength", magneticFieldStrength);

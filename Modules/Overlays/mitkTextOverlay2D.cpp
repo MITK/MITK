@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkTextOverlay2D.h"
-#include <vtkTextProperty.h>
+#include <mitkVtkFont.h>
 #include "vtkUnicodeString.h"
 #include <vtkTextActor.h>
 #include <vtkPropAssembly.h>
@@ -79,36 +79,7 @@ mitk::TextOverlay2D::LocalStorage::LocalStorage()
   m_STextActor = vtkSmartPointer<vtkTextActor>::New();
   m_STextProp = vtkSmartPointer<vtkTextProperty>::New();
 
-  std::string m_programPath;
-
-#ifndef _WIN32
-#include <unistd.h>
-#include <limits.h>
-
-  char buff[PATH_MAX];
-  ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff) - 1);
-  if (len != -1) {
-    buff[len] = '\0';
-    m_programPath = std::string(buff);
-  }
-#else
-
-  m_programPath.resize(1024);
-  DWORD pathSize = GetModuleFileNameA(nullptr, &m_programPath[0], m_programPath.size());
-  m_programPath.resize(pathSize);
-
-  std::string::size_type pos = m_programPath.rfind("\\");
-  if (pos != std::string::npos) {
-    m_programPath.erase(pos + 1, m_programPath.size());
-  }
-
-#endif
-
-  std::string fontPath = m_programPath + std::string("Fonts\\DejaVuSans.ttf");
-
-  m_TextProp->SetFontFamily(VTK_FONT_FILE);
-  m_TextProp->SetFontFile(fontPath.c_str());
-  
+  setUnicodeFont(m_TextProp);
   m_TextProp->SetFontSize(FONT_SIZE);
   m_STextProp->SetFontSize(FONT_SIZE);
 
@@ -142,8 +113,9 @@ void mitk::TextOverlay2D::UpdateVtkOverlay2D(mitk::BaseRenderer *renderer)
     if ( GetStringProperty( "font.family", fontFamilyAsString ) == false || fontFamilyAsString.empty())
     {
       fontFamilyAsString = "Arial";
+    } else {
+      ls->m_TextProp->SetFontFamilyAsString( fontFamilyAsString.c_str() );
     }
-    ls->m_TextProp->SetFontFamilyAsString( fontFamilyAsString.c_str() );
     ls->m_STextProp->SetFontFamilyAsString( fontFamilyAsString.c_str() );
 
     bool boldFont(false);

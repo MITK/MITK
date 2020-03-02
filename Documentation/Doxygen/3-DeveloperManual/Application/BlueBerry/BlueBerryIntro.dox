@@ -28,7 +28,7 @@ BlueBerry makes use of the Eclipse UI guidlines which state some concepts on how
 
 \section WorkbenchWindow WorkbenchWindow
 \li has one \ref Workbench-Page "page"
-\imageMacro{workbench-window.jpg,"Worbench Windows",8.47}
+\imageMacro{workbench-window.jpg,"Workbench Windows",8.47}
 
 \section WorkbenchPage Workbench Page
 \li denotes to the inner part of the \ref WorkbenchWindow "window", that is: everything except the title bar

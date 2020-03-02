@@ -40,6 +40,7 @@ class QmitkChartxyData : public QObject
   Q_PROPERTY(QVariant m_Color READ GetColor WRITE SetColor NOTIFY SignalColorChanged);
   Q_PROPERTY(QVariant m_Label READ GetLabel WRITE SetLabel NOTIFY SignalLabelChanged);
   Q_PROPERTY(QVariant m_LineStyleName READ GetLineStyle WRITE SetLineStyle NOTIFY SignalLineStyleChanged);
+  Q_PROPERTY(QVariant m_MarkerSymbolName READ GetMarkerSymbol WRITE SetMarkerSymbol NOTIFY SignalMarkerSymbolChanged);
 
 public:
   explicit QmitkChartxyData(const QMap<QVariant, QVariant> &data,
@@ -117,6 +118,13 @@ public:
     emit SignalColorChanged(color);
   };
 
+  Q_INVOKABLE QVariant GetMarkerSymbol() const { return m_MarkerSymbolName; };
+  Q_INVOKABLE void SetMarkerSymbol(const QVariant &markerSymbol)
+  {
+    m_MarkerSymbolName = markerSymbol;
+    emit SignalMarkerSymbolChanged(markerSymbol);
+  };
+
   Q_INVOKABLE QVariant GetLineStyle() const { return m_LineStyleName; };
   Q_INVOKABLE void SetLineStyle(const QVariant &lineStyle)
   {
@@ -141,6 +149,7 @@ signals:
   void SignalLabelChanged(const QVariant label);
   void SignalPieLabelsChanged(const QList<QVariant> pieLabels);
   void SignalLineStyleChanged(const QVariant lineStyle);
+  void SignalMarkerSymbolChanged(const QVariant lineStyle);
 
 private:
   /** js needs to know which label position in the list QmitkChartWidget::Impl::m_C3xyData it has for updating the values*/
@@ -156,6 +165,7 @@ private:
   QVariant m_ChartType;
   QVariant m_Color;
   QVariant m_LineStyleName;
+  QVariant m_MarkerSymbolName;
 };
 
 #endif // QmitkC3xyData_h

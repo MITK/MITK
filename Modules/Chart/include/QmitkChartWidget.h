@@ -65,6 +65,22 @@ public:
     solid,
     dashed
   };
+  enum class MarkerSymbol {
+    circle,
+    diamond,
+    cross,
+    square,
+    pentagon,
+    star,
+    x,
+    diamond_tall,
+    star_diamond,
+    star_triangle_up,
+    star_triangle_down,
+    asterisk,
+    cross_thin,
+    x_thin
+  };
   enum class ChartColor {
     red,
     orange,
@@ -200,6 +216,12 @@ public:
   void SetLineStyle(const std::string& label, LineStyle style);
 
   /*!
+  * \brief Sets the marker style of one data entry (identifier is previously assigned label)
+  * \note If an unknown label is given, nothing happens.
+  */
+  void SetMarkerSymbol(const std::string &label, MarkerSymbol symbol);
+
+  /*!
   * \brief Sets the axis scale to either linear (default) or logarithmic.
   * \sa https://plot.ly/javascript/log-plot/
   */
@@ -314,6 +336,8 @@ public:
   void Reload();
 
   QSize sizeHint() const override;
+
+  void SavePlotAsImage();
 
 public slots:
   void OnLoadFinished(bool isLoadSuccessful);

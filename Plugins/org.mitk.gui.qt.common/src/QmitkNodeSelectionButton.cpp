@@ -91,12 +91,20 @@ QPixmap GetPixmapFromImageNode(const mitk::DataNode* dataNode, int height)
 
   QImage thumbnailImage(reinterpret_cast<const unsigned char*>(imageData->GetScalarPointer()), dims[0], dims[1], QImage::Format_ARGB32);
 
-  thumbnailImage = thumbnailImage.scaledToHeight(height,Qt::SmoothTransformation).rgbSwapped();
+  if (dims[0] > dims[1])
+  {
+    thumbnailImage = thumbnailImage.scaledToWidth(height, Qt::SmoothTransformation).rgbSwapped();
+  }
+  else
+  {
+    thumbnailImage = thumbnailImage.scaledToHeight(height, Qt::SmoothTransformation).rgbSwapped();
+  }
+
   return QPixmap::fromImage(thumbnailImage);
 }
 
 QmitkNodeSelectionButton::QmitkNodeSelectionButton(QWidget *parent)
-  : QPushButton(parent), m_OutDatedThumpNail(true), m_DataMTime(0), m_IsOptional(true), m_NodeModifiedObserverTag(0), m_NodeObserved(false)
+  : QPushButton(parent), m_OutDatedThumbNail(true), m_DataMTime(0), m_IsOptional(true), m_NodeModifiedObserverTag(0), m_NodeObserved(false)
 { }
 
 QmitkNodeSelectionButton::~QmitkNodeSelectionButton()
@@ -158,7 +166,7 @@ void QmitkNodeSelectionButton::SetSelectedNode(const mitk::DataNode* node)
   {
     this->RemoveNodeObserver();
     this->m_SelectedNode = node;
-    this->m_OutDatedThumpNail = true;
+    this->m_OutDatedThumbNail = true;
     this->AddNodeObserver();
   }
 
@@ -202,14 +210,16 @@ void QmitkNodeSelectionButton::paintEvent(QPaintEvent *p)
     {
       dataMTime = m_SelectedNode->GetData()->GetMTime();
     }
-    if (dataMTime>m_DataMTime || this->m_OutDatedThumpNail)
+    if (dataMTime>m_DataMTime || this->m_OutDatedThumbNail)
     {
-      this->m_ThumpNail = GetPixmapFromImageNode(node, iconLength);
-      this->m_OutDatedThumpNail = false;
+      this->m_ThumbNail = GetPixmapFromImageNode(node, iconLength);
+      this->m_OutDatedThumbNail = false;
       m_DataMTime = dataMTime;
     }
 
-    painter.drawPixmap(origin, m_ThumpNail);
+    auto thumbNailOrigin = origin;
+    thumbNailOrigin.setY(thumbNailOrigin.y() + ((iconLength - m_ThumbNail.height()) / 2));
+    painter.drawPixmap(thumbNailOrigin, m_ThumbNail);
     origin.setX(origin.x() + iconLength + 5);
 
     if (this->isEnabled())

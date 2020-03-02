@@ -17,14 +17,17 @@ found in the LICENSE file.
 #include <mitkStepper.h>
 #include <ui_QmitkTimeSliceAnimationWidget.h>
 
-static int GetNumberOfSlices()
+namespace
 {
-  mitk::Stepper* stepper = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime();
+  int GetNumberOfSlices()
+  {
+    mitk::Stepper* stepper = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime();
 
-  if (stepper != nullptr)
-    return std::max(1, static_cast<int>(stepper->GetSteps()));
+    if (stepper != nullptr)
+      return std::max(1, static_cast<int>(stepper->GetSteps()));
 
-  return 1;
+    return 1;
+  }
 }
 
 QmitkTimeSliceAnimationWidget::QmitkTimeSliceAnimationWidget(QWidget* parent)
@@ -33,14 +36,9 @@ QmitkTimeSliceAnimationWidget::QmitkTimeSliceAnimationWidget(QWidget* parent)
 {
   m_Ui->setupUi(this);
 
-  this->connect(m_Ui->sliceRangeWidget, SIGNAL(minimumValueChanged(double)),
-    this, SLOT(OnFromChanged(double)));
-
-  this->connect(m_Ui->sliceRangeWidget, SIGNAL(maximumValueChanged(double)),
-    this, SLOT(OnToChanged(double)));
-
-  this->connect(m_Ui->reverseCheckBox, SIGNAL(clicked(bool)),
-    this, SLOT(OnReverseChanged(bool)));
+  connect(m_Ui->sliceRangeWidget, SIGNAL(minimumValueChanged(double)), this, SLOT(OnFromChanged(double)));
+  connect(m_Ui->sliceRangeWidget, SIGNAL(maximumValueChanged(double)), this, SLOT(OnToChanged(double)));
+  connect(m_Ui->reverseCheckBox, SIGNAL(clicked(bool)), this, SLOT(OnReverseChanged(bool)));
 }
 
 QmitkTimeSliceAnimationWidget::~QmitkTimeSliceAnimationWidget()
@@ -51,12 +49,15 @@ void QmitkTimeSliceAnimationWidget::SetAnimationItem(QmitkAnimationItem* sliceAn
 {
   m_AnimationItem = dynamic_cast<QmitkTimeSliceAnimationItem*>(sliceAnimationItem);
 
-  if (m_AnimationItem == nullptr)
+  if (nullptr == m_AnimationItem)
     return;
 
   const int maximum = GetNumberOfSlices() - 1;
   const int from = std::min(m_AnimationItem->GetFrom(), maximum);
-  const int to = std::min(m_AnimationItem->GetTo(), maximum);
+  int to = std::max(from, std::min(m_AnimationItem->GetTo(), maximum));
+
+  if (0 == to)
+    to = maximum;
 
   m_AnimationItem->SetFrom(from);
   m_AnimationItem->SetTo(to);
@@ -68,7 +69,7 @@ void QmitkTimeSliceAnimationWidget::SetAnimationItem(QmitkAnimationItem* sliceAn
 
 void QmitkTimeSliceAnimationWidget::OnFromChanged(double from)
 {
-  if (m_AnimationItem == nullptr)
+  if (nullptr == m_AnimationItem)
     return;
 
   int intFrom = static_cast<int>(from);
@@ -79,7 +80,7 @@ void QmitkTimeSliceAnimationWidget::OnFromChanged(double from)
 
 void QmitkTimeSliceAnimationWidget::OnToChanged(double to)
 {
-  if (m_AnimationItem == nullptr)
+  if (nullptr == m_AnimationItem)
     return;
 
   int intTo = static_cast<int>(to);
@@ -90,7 +91,7 @@ void QmitkTimeSliceAnimationWidget::OnToChanged(double to)
 
 void QmitkTimeSliceAnimationWidget::OnReverseChanged(bool reverse)
 {
-  if (m_AnimationItem == nullptr)
+  if (nullptr == m_AnimationItem)
     return;
 
   if (m_AnimationItem->GetReverse() != reverse)

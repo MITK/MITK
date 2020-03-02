@@ -42,8 +42,6 @@ public:
 
   using NodeList = QmitkAbstractNodeSelectionWidget::NodeList;
 
-  NodeList GetSelectedNodes() const;
-
   /**Helper function that is used to check the given selection for consistency.
    Returning an empty string assumes that everything is alright and the selection
    is valid. If the string is not empty, the content of the string will be used
@@ -56,31 +54,23 @@ public:
   void SetSelectionCheckFunction(const SelectionCheckFunctionType &checkFunction);
 
 public Q_SLOTS:
-  void SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes) override;
-  void SetCurrentSelection(NodeList selectedNodes) override;
   void OnEditSelection();
 
 protected Q_SLOTS:
   void OnClearSelection(const mitk::DataNode* node);
 
 protected:
-  NodeList CompileEmitSelection() const;
-
   void changeEvent(QEvent *event) override;
 
   void UpdateInfo() override;
-  virtual void UpdateList();
+  void OnInternalSelectionChanged() override;
 
-  void OnNodePredicateChanged(const mitk::NodePredicateBase* newPredicate) override;
-  void OnDataStorageChanged() override;
-  void NodeRemovedFromStorage(const mitk::DataNode* node) override;
-
-  NodeList m_CurrentSelection;
+  bool AllowEmissionOfSelection(const NodeList& emissionCandidates) const override;
 
   QmitkSimpleTextOverlayWidget* m_Overlay;
 
   SelectionCheckFunctionType m_CheckFunction;
-  std::string m_CheckResponse;
+  mutable std::string m_CheckResponse;
 
   Ui_QmitkMultiNodeSelectionWidget m_Controls;
 };

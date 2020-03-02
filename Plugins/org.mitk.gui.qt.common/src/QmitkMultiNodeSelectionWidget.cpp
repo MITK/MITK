@@ -26,55 +26,11 @@ QmitkMultiNodeSelectionWidget::QmitkMultiNodeSelectionWidget(QWidget* parent) : 
   m_Overlay->setVisible(false);
   m_CheckFunction = [](const NodeList &) { return ""; };
 
-  this->UpdateList();
+  this->OnInternalSelectionChanged();
   this->UpdateInfo();
 
   connect(m_Controls.btnChange, SIGNAL(clicked(bool)), this, SLOT(OnEditSelection()));
 }
-
-QmitkMultiNodeSelectionWidget::NodeList QmitkMultiNodeSelectionWidget::CompileEmitSelection() const
-{
-  NodeList result;
-
-  for (int i = 0; i < m_Controls.list->count(); ++i)
-  {
-    QListWidgetItem* item = m_Controls.list->item(i);
-
-    auto node = item->data(Qt::UserRole).value<mitk::DataNode::Pointer>();
-    result.append(node);
-  }
-
-
-  if (!m_SelectOnlyVisibleNodes)
-  {
-    for (auto node : m_CurrentSelection)
-    {
-      if (!result.contains(node))
-      {
-        result.append(node);
-      }
-    }
-  }
-
-  return result;
-}
-
-void QmitkMultiNodeSelectionWidget::OnNodePredicateChanged(const mitk::NodePredicateBase* /*newPredicate*/)
-{
-  this->UpdateInfo();
-  this->UpdateList();
-};
-
-void QmitkMultiNodeSelectionWidget::OnDataStorageChanged()
-{
-  this->UpdateInfo();
-  this->UpdateList();
-};
-
-QmitkMultiNodeSelectionWidget::NodeList QmitkMultiNodeSelectionWidget::GetSelectedNodes() const
-{
-  return m_CurrentSelection;
-};
 
 void QmitkMultiNodeSelectionWidget::SetSelectionCheckFunction(const SelectionCheckFunctionType &checkFunction)
 {
@@ -85,11 +41,11 @@ void QmitkMultiNodeSelectionWidget::SetSelectionCheckFunction(const SelectionChe
 
   if (newCheckResponse.empty() && !m_CheckResponse.empty())
   {
-    emit CurrentSelectionChanged(newEmission);
+    this->EmitSelection(newEmission);
   }
   m_CheckResponse = newCheckResponse;
   this->UpdateInfo();
-};
+}
 
 void QmitkMultiNodeSelectionWidget::OnEditSelection()
 {
@@ -104,28 +60,12 @@ void QmitkMultiNodeSelectionWidget::OnEditSelection()
   m_Controls.btnChange->setChecked(true);
   if (dialog->exec())
   {
-    auto lastEmission = this->CompileEmitSelection();
-
-    m_CurrentSelection = dialog->GetSelectedNodes();
-    this->UpdateList();
-
-    auto newEmission = this->CompileEmitSelection();
-
-    m_CheckResponse = m_CheckFunction(newEmission);
-    this->UpdateInfo();
-
-    if (!EqualNodeSelections(lastEmission, newEmission))
-    {
-      if (m_CheckResponse.empty())
-      {
-        emit CurrentSelectionChanged(newEmission);
-      }
-    }
+    this->HandleChangeOfInternalSelection(dialog->GetSelectedNodes());
   }
   m_Controls.btnChange->setChecked(false);
 
   delete dialog;
-};
+}
 
 void QmitkMultiNodeSelectionWidget::UpdateInfo()
 {
@@ -168,15 +108,15 @@ void QmitkMultiNodeSelectionWidget::UpdateInfo()
   {
     auto item = m_Controls.list->item(i);
     auto widget = qobject_cast<QmitkNodeSelectionListItemWidget*>(m_Controls.list->itemWidget(item));
-    widget->SetClearAllowed(m_IsOptional || m_CurrentSelection.size() > 1);
+    widget->SetClearAllowed(m_IsOptional || m_Controls.list->count() > 1);
   }
-};
+}
 
-void QmitkMultiNodeSelectionWidget::UpdateList()
+void QmitkMultiNodeSelectionWidget::OnInternalSelectionChanged()
 {
   m_Controls.list->clear();
-
-  for (auto node : m_CurrentSelection)
+  auto currentSelection = this->GetCurrentInternalSelection();
+  for (auto& node : currentSelection)
   {
     if (m_NodePredicate.IsNull() || m_NodePredicate->CheckNode(node))
     {
@@ -186,7 +126,7 @@ void QmitkMultiNodeSelectionWidget::UpdateList()
       QmitkNodeSelectionListItemWidget* widget = new QmitkNodeSelectionListItemWidget;
 
       widget->SetSelectedNode(node);
-      widget->SetClearAllowed(m_IsOptional || m_CurrentSelection.size() > 1);
+      widget->SetClearAllowed(m_IsOptional || currentSelection.size() > 1);
 
       connect(widget, &QmitkNodeSelectionListItemWidget::ClearSelection, this, &QmitkMultiNodeSelectionWidget::OnClearSelection);
       newItem->setData(Qt::UserRole, QVariant::fromValue<mitk::DataNode::Pointer>(node));
@@ -195,72 +135,11 @@ void QmitkMultiNodeSelectionWidget::UpdateList()
       m_Controls.list->setItemWidget(newItem, widget);
     }
   }
-};
-
-void QmitkMultiNodeSelectionWidget::SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes)
-{
-  auto lastEmission = this->CompileEmitSelection();
-
-  m_SelectOnlyVisibleNodes = selectOnlyVisibleNodes;
-
-  auto newEmission = this->CompileEmitSelection();
-
-  if (!EqualNodeSelections(lastEmission, newEmission))
-  {
-    m_CheckResponse = m_CheckFunction(newEmission);
-    if (m_CheckResponse.empty())
-    {
-      emit CurrentSelectionChanged(newEmission);
-    }
-    this->UpdateList();
-    this->UpdateInfo();
-  }
-};
-
-void QmitkMultiNodeSelectionWidget::SetCurrentSelection(NodeList selectedNodes)
-{
-  auto lastEmission = this->CompileEmitSelection();
-
-  m_CurrentSelection = selectedNodes;
-  this->UpdateList();
-
-  auto newEmission = this->CompileEmitSelection();
-
-  if (!EqualNodeSelections(lastEmission, newEmission))
-  {
-    m_CheckResponse = m_CheckFunction(newEmission);
-    if (m_CheckResponse.empty())
-    {
-      emit CurrentSelectionChanged(newEmission);
-    }
-    this->UpdateInfo();
-  }
-};
+}
 
 void QmitkMultiNodeSelectionWidget::OnClearSelection(const mitk::DataNode* node)
 {
-  auto finding = std::find(std::begin(m_CurrentSelection), std::end(m_CurrentSelection), node);
-  m_CurrentSelection.erase(finding);
-
-  this->UpdateList();
-  auto newEmission = this->CompileEmitSelection();
-  m_CheckResponse = m_CheckFunction(newEmission);
-
-  if (m_CheckResponse.empty())
-  {
-    emit CurrentSelectionChanged(newEmission);
-  }
-  this->UpdateInfo();
-};
-
-void QmitkMultiNodeSelectionWidget::NodeRemovedFromStorage(const mitk::DataNode* node)
-{
-  auto finding = std::find(std::begin(m_CurrentSelection), std::end(m_CurrentSelection), node);
-
-  if (finding != std::end(m_CurrentSelection))
-  {
-    this->OnClearSelection(node);
-  }
+  this->RemoveNodeFromSelection(node);
 }
 
 void QmitkMultiNodeSelectionWidget::changeEvent(QEvent *event)
@@ -270,4 +149,10 @@ void QmitkMultiNodeSelectionWidget::changeEvent(QEvent *event)
     this->UpdateInfo();
   }
   QmitkAbstractNodeSelectionWidget::changeEvent(event);
+}
+
+bool QmitkMultiNodeSelectionWidget::AllowEmissionOfSelection(const NodeList& emissionCandidates) const
+{
+  m_CheckResponse = m_CheckFunction(emissionCandidates);
+  return m_CheckResponse.empty();
 }

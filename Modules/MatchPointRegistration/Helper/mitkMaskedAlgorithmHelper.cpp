@@ -50,41 +50,11 @@ namespace mitk
     if ( movingMask)
     {
       result = result && (movingMask->GetDimension() == movingDim);
-
-      if (movingDim == 2)
-      {
-        typedef itk::Image<MaskPixelType,2> MaskImageType;
-        mitk::PixelType maskPixelType = mitk::MakePixelType<MaskImageType>();
-
-        result = result && (maskPixelType == movingMask->GetPixelType());
-      }
-      else if (movingDim == 3)
-      {
-        typedef itk::Image<MaskPixelType,3> MaskImageType;
-        mitk::PixelType maskPixelType = mitk::MakePixelType<MaskImageType>();
-
-        result = result && (maskPixelType == movingMask->GetPixelType());
-      }
     }
 
     if ( targetMask)
     {
       result = result && (targetMask->GetDimension() == targetDim);
-
-      if (movingDim == 2)
-      {
-        typedef itk::Image<MaskPixelType,2> MaskImageType;
-        mitk::PixelType maskPixelType = mitk::MakePixelType<MaskImageType>();
-
-        result = result && (maskPixelType == targetMask->GetPixelType());
-      }
-      else if (movingDim == 3)
-      {
-        typedef itk::Image<MaskPixelType,3> MaskImageType;
-        mitk::PixelType maskPixelType = mitk::MakePixelType<MaskImageType>();
-
-        result = result && (maskPixelType == targetMask->GetPixelType());
-      }
     }
 
     if (movingDim == 2)
@@ -131,22 +101,22 @@ namespace mitk
     return false;
   };
 
-  template<unsigned int VImageDimension1, unsigned int VImageDimension2>
+  template<unsigned int VMovingDimension, unsigned int VTargetDimension>
   bool MaskedAlgorithmHelper::DoSetMasks(const mitk::Image* movingMask, const mitk::Image* targetMask)
   {
-    typedef itk::SpatialObject<VImageDimension1> MovingSpatialType;
-    typedef itk::SpatialObject<VImageDimension2> TargetSpatialType;
+    typedef itk::SpatialObject<VMovingDimension> MovingSpatialType;
+    typedef itk::SpatialObject<VTargetDimension> TargetSpatialType;
 
-    typedef ::map::algorithm::facet::MaskedRegistrationAlgorithmInterface<VImageDimension1, VImageDimension2> MaskedRegInterface;
+    typedef ::map::algorithm::facet::MaskedRegistrationAlgorithmInterface<VMovingDimension, VTargetDimension> MaskedRegInterface;
     MaskedRegInterface* pAlg = dynamic_cast<MaskedRegInterface*>(m_AlgorithmBase.GetPointer());
 
     if (!pAlg) return false;
 
     if (movingMask)
     {
-      AccessFixedTypeByItk(movingMask, DoConvertMask, (MaskPixelType), (VImageDimension1));
+      AccessFixedDimensionByItk(movingMask, DoConvertMask, VMovingDimension);
       typename MovingSpatialType::Pointer movingSpatial = dynamic_cast<MovingSpatialType*>(m_convertResult.GetPointer());
-      if (! movingSpatial) mapDefaultExceptionStaticMacro(<< "Error, cannot convert moving mask.");
+      if (!movingSpatial) mapDefaultExceptionStaticMacro(<< "Error, cannot convert moving mask.");
       pAlg->setMovingMask(movingSpatial);
     }
     else
@@ -156,7 +126,7 @@ namespace mitk
 
     if (targetMask)
     {
-      AccessFixedTypeByItk(targetMask, DoConvertMask, (MaskPixelType), (VImageDimension2));
+      AccessFixedDimensionByItk(targetMask, DoConvertMask, VTargetDimension);
       typename TargetSpatialType::Pointer targetSpatial = dynamic_cast<TargetSpatialType*>(m_convertResult.GetPointer());
       if (! targetSpatial) mapDefaultExceptionStaticMacro(<< "Error, cannot convert moving mask.");
       pAlg->setTargetMask(targetSpatial);
@@ -169,15 +139,37 @@ namespace mitk
     return true;
   }
 
-  template<typename TPixelType, unsigned int VImageDimension>
-  void MaskedAlgorithmHelper::DoConvertMask(const itk::Image<TPixelType,VImageDimension>* mask)
+  template<unsigned int VImageDimension>
+  typename itk::SpatialObject<VImageDimension>::Pointer
+    MaskedAlgorithmHelper::ConvertMaskSO(const itk::Image<MaskPixelType, VImageDimension>* mask) const
   {
     typedef itk::ImageMaskSpatialObject<VImageDimension> SpatialType;
 
     typename SpatialType::Pointer spatial = SpatialType::New();
     spatial->SetImage(mask);
 
-    m_convertResult = spatial.GetPointer();
+    return spatial.GetPointer();
   }
 
+  template<typename TPixelType, unsigned int VImageDimension>
+  void MaskedAlgorithmHelper::DoConvertMask(const itk::Image<TPixelType,VImageDimension>* mask)
+  {
+    using InImageType = itk::Image<TPixelType, VImageDimension>;
+    using MaskImageType = itk::Image<MaskPixelType, VImageDimension>;
+
+    typedef itk::CastImageFilter< InImageType, MaskImageType > CastFilterType;
+    typename CastFilterType::Pointer  imageCaster = CastFilterType::New();
+
+    imageCaster->SetInput(mask);
+
+    auto castedMask = imageCaster->GetOutput();
+    imageCaster->Update();
+    m_convertResult = ConvertMaskSO<VImageDimension>(castedMask);
+  }
+
+  template<unsigned int VImageDimension>
+  void MaskedAlgorithmHelper::DoConvertMask(const itk::Image<MaskPixelType, VImageDimension>* mask)
+  {
+    m_convertResult = ConvertMaskSO<VImageDimension>(mask);
+  }
 }

@@ -60,6 +60,7 @@ if(MSVC_IDE OR MSVC_VERSION)
   target_link_libraries(${MODULE_TARGET} PRIVATE psapi.lib)
 endif()
 
-add_subdirectory(TestingHelper)
-
-add_subdirectory(test)
+if(BUILD_TESTING)
+  add_subdirectory(TestingHelper)
+  add_subdirectory(test)
+endif()

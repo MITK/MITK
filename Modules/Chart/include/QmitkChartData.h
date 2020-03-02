@@ -15,6 +15,12 @@ found in the LICENSE file.
 
 #include <QmitkChartWidget.h>
 #include <QVariant>
+#include <QApplication>
+#include <QClipboard>
+#include <QUrl>
+#include <QFileDialog>
+#include <boost/algorithm/string.hpp>
+#include <fstream>
 
 /** \brief This class holds the relevant properties for the chart generation with C3 such as labels and diagram type.
 * It is derived from QObject, because we need Q_PROPERTIES to send Data via QWebChannel to JavaScript.
@@ -118,6 +124,11 @@ public:
     emit SignalMaxValueYViewChanged(m_MaxValueYView);
   };
 
+  void EmitSignalImageUrl()
+  {
+    emit SignalImageUrl();
+  };
+
 signals:
   void SignalYAxisLabelChanged(const QVariant label);
   void SignalXAxisLabelChanged(const QVariant label);
@@ -135,6 +146,27 @@ signals:
   void SignalMaxValueXViewChanged(const QVariant maxValueXView);
   void SignalMinValueYViewChanged(const QVariant minValueYView);
   void SignalMaxValueYViewChanged(const QVariant maxValueYView);
+  void SignalImageUrl();
+
+public slots:
+  void slotImageUrl(const QString &datafromjs)
+  {
+    QString ds = QUrl::fromPercentEncoding(datafromjs.toLatin1());
+
+    QString filename = QFileDialog::getSaveFileName(
+          0,
+          tr("Save Plot"),
+          "my_plot.svg",
+          tr("Scalable Vector Graphics (*.svg)") );
+    if (filename.isEmpty())
+      return;
+
+    std::string out_image = ds.toStdString();
+    boost::algorithm::replace_first(out_image, "data:image/svg+xml,", "");
+    std::ofstream outfile(filename.toStdString());
+    outfile.write(out_image.c_str(), out_image.size());
+    outfile.close();
+  }
 
 private:
   QVariant m_xAxisLabel;

@@ -74,7 +74,10 @@ public:
   void ClearData();
 
   void SetColor(const std::string &label, const std::string &colorName);
+
   void SetLineStyle(const std::string &label, LineStyle style);
+
+  void SetMarkerSymbol(const std::string &label, MarkerSymbol symbol);
 
   void SetYAxisScale(AxisScale scale);
 
@@ -124,6 +127,8 @@ public:
 
   QSize sizeHint() const;
 
+  void GetImageUrl();
+
 private:
   using ChartxyDataVector = std::vector<std::unique_ptr<QmitkChartxyData>>;
   std::string GetUniqueLabelName(const QList<QVariant> &labelList, const std::string &label) const;
@@ -139,6 +144,7 @@ private:
   std::map<QmitkChartWidget::ColorTheme, std::string> m_ColorThemeToName;
   std::map<QmitkChartWidget::LegendPosition, std::string> m_LegendPositionToName;
   std::map<QmitkChartWidget::LineStyle, std::string> m_LineStyleToName;
+  std::map<QmitkChartWidget::MarkerSymbol, std::string> m_MarkerSymbolToName;
   std::map<QmitkChartWidget::AxisScale, std::string> m_AxisScaleToName;
 };
 
@@ -203,6 +209,22 @@ QmitkChartWidget::Impl::Impl(QWidget *parent)
   m_LineStyleToName.emplace(LineStyle::solid, "solid");
   m_LineStyleToName.emplace(LineStyle::dashed, "dashed");
 
+  m_MarkerSymbolToName.emplace(MarkerSymbol::circle, "circle");
+  m_MarkerSymbolToName.emplace(MarkerSymbol::cross, "cross");
+  m_MarkerSymbolToName.emplace(MarkerSymbol::diamond, "diamond");
+  m_MarkerSymbolToName.emplace(MarkerSymbol::pentagon, "pentagon");
+  m_MarkerSymbolToName.emplace(MarkerSymbol::square, "square");
+  m_MarkerSymbolToName.emplace(MarkerSymbol::star, "star");
+  m_MarkerSymbolToName.emplace(MarkerSymbol::x, "x");
+
+  m_MarkerSymbolToName.emplace(MarkerSymbol::diamond_tall, "diamond-tall");
+  m_MarkerSymbolToName.emplace(MarkerSymbol::star_diamond, "star-diamond");
+  m_MarkerSymbolToName.emplace(MarkerSymbol::star_triangle_up, "star-triangle-up");
+  m_MarkerSymbolToName.emplace(MarkerSymbol::star_triangle_down, "star-triangle-down");
+  m_MarkerSymbolToName.emplace(MarkerSymbol::asterisk, "asterisk");
+  m_MarkerSymbolToName.emplace(MarkerSymbol::cross_thin, "cross-thin");
+  m_MarkerSymbolToName.emplace(MarkerSymbol::x_thin, "x-thin");
+
   m_AxisScaleToName.emplace(AxisScale::linear, "");
   m_AxisScaleToName.emplace(AxisScale::log, "log");
 
@@ -230,6 +252,11 @@ std::string CheckForCorrectHex(const std::string &colorName)
   {
     return colorName;
   }
+}
+
+void QmitkChartWidget::Impl::GetImageUrl()
+{
+  m_C3Data.EmitSignalImageUrl();
 }
 
 void QmitkChartWidget::Impl::AddData1D(const std::vector<double> &data1D,
@@ -449,6 +476,13 @@ void QmitkChartWidget::Impl::SetLineStyle(const std::string &label, LineStyle st
   auto element = GetDataElementByLabel(label);
   const std::string lineStyleName(m_LineStyleToName.at(style));
   element->SetLineStyle(QVariant(QString::fromStdString(lineStyleName)));
+}
+
+void QmitkChartWidget::Impl::SetMarkerSymbol(const std::string &label, MarkerSymbol symbol)
+{
+  auto element = GetDataElementByLabel(label);
+  const std::string markerSymbolName(m_MarkerSymbolToName.at(symbol));
+  element->SetMarkerSymbol(QVariant(QString::fromStdString(markerSymbolName)));
 }
 
 void QmitkChartWidget::Impl::SetYAxisScale(AxisScale scale)
@@ -725,6 +759,11 @@ void QmitkChartWidget::SetLineStyle(const std::string &label, LineStyle style)
   m_Impl->SetLineStyle(label, style);
 }
 
+void QmitkChartWidget::SetMarkerSymbol(const std::string &label, MarkerSymbol symbol)
+{
+  m_Impl->SetMarkerSymbol(label, symbol);
+}
+
 void QmitkChartWidget::SetYAxisScale(AxisScale scale)
 {
   m_Impl->SetYAxisScale(scale);
@@ -912,4 +951,9 @@ void QmitkChartWidget::Reload()
 QSize QmitkChartWidget::sizeHint() const
 {
   return m_Impl->sizeHint();
+}
+
+void QmitkChartWidget::SavePlotAsImage()
+{
+  m_Impl->GetImageUrl();
 }

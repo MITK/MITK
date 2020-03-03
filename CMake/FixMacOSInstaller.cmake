@@ -39,14 +39,3 @@ get_filename_component(app ${bundle_path} NAME_WE)
 set(app_path "${bundle_path}/Contents/MacOS/${app}")
 execute_process(COMMAND install_name_tool -add_rpath "@executable_path/../Frameworks" ${app_path} ERROR_QUIET)
 execute_process(COMMAND install_name_tool -add_rpath "@executable_path/../../../../.." ${qtwebengineprocess_path} ERROR_QUIET)
-
-##################################################
-# (2) Fix hard dependencies to auto-load modules #
-##################################################
-
-# Create symlinks to auto-load modules in MitkCore directory
-file(GLOB autoload_module_paths "${bundle_path}/Contents/MacOS/MitkCore/*.dylib")
-foreach(autoload_module_path ${autoload_module_paths})
-  get_filename_component(autoload_module ${autoload_module_path} NAME)
-  execute_process(COMMAND ln -s MitkCore/${autoload_module} WORKING_DIRECTORY "${bundle_path}/Contents/MacOS")
-endforeach()

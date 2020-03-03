@@ -288,11 +288,7 @@ void QmitkChartWidget::Impl::AddData2D(const std::map<double, double> &data2D,
 
   auto definedLabels = GetDataLabels(m_C3xyData);
   auto uniqueLabel = GetUniqueLabelName(definedLabels, label);
-  if (type == ChartType::scatter)
-  {
-    SetShowDataPoints(true);
-    MITK_INFO << "Enabling data points for all because of scatter plot";
-  }
+
   unsigned int sizeOfC3xyData = static_cast<unsigned int>(m_C3xyData.size());
   m_C3xyData.push_back(std::make_unique<QmitkChartxyData>(data2DConverted,
                                                           QVariant(QString::fromStdString(uniqueLabel)),
@@ -500,7 +496,6 @@ QmitkChartxyData *QmitkChartWidget::Impl::GetDataElementByLabel(const std::strin
       return qmitkChartxyData.get();
     }
   }
-  MITK_WARN << "label " << label << " not found in QmitkChartWidget";
   return nullptr;
 }
 

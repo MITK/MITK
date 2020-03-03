@@ -80,17 +80,14 @@ int mitkDicomSeriesReaderTest(int argc, char* argv[])
        seriesIter != seriesInFiles.end();
        ++seriesIter)
   {
-    mitk::DicomSeriesReader::StringContainer files = seriesIter->second.GetFilenames();
+    mitk::Image::Pointer image = seriesIter->second->GetImage();
 
-    mitk::DataNode::Pointer node = mitk::DicomSeriesReader::LoadDicomSeries( files );
-    MITK_TEST_CONDITION_REQUIRED(node.IsNotNull(),"Testing node")
+    MITK_TEST_CONDITION_REQUIRED(image.IsNotNull(),"Testing image")
 
-    if (node.IsNotNull())
+    if (image.IsNotNull())
     {
-      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
-
       images.push_back( image );
-      fileMap.insert( std::pair<mitk::Image::Pointer, mitk::DicomSeriesReader::StringContainer>(image,files));
+      fileMap.insert( std::pair<mitk::Image::Pointer, mitk::DicomSeriesReader::StringContainer>(image, seriesIter->second->GetFilenames()) );
     }
   }
 

@@ -76,18 +76,10 @@ mitk::TestDCMLoading::ImageList mitk::TestDCMLoading::LoadFiles( const StringCon
        seriesIter != seriesInFiles.end();
        ++seriesIter)
   {
-    StringContainer files = seriesIter->second.GetFilenames();
-
-    DataNode::Pointer node = DicomSeriesReader::LoadDicomSeries( files, true, true, true, nullptr, nullptr, preLoadedVolume ); // true, true, true ist just a copy of the default values
-
-    if (node.IsNotNull())
+    Image::Pointer image = seriesIter->second->GetImage();
+    if (image.IsNotNull())
     {
-      Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
-
       result.push_back( image );
-    }
-    else
-    {
     }
   }
 

@@ -608,7 +608,8 @@ public:
    Parse a list of files for images of DICOM series.
    For each series, an enumeration of the files contained in it is created.
 
-   \return The resulting maps UID-like keys (based on Series Instance UID and slice properties) to sorted lists of file names.
+   \param result The resulting maps UID-like keys (based on Series Instance UID and slice properties)
+   to smart pointer to ImageBlockDescriptor ready to load tags and the image.
 
    SeriesInstanceUID will be enhanced to be unique for each set of file names
    that is later loadable as a single mitk::Image. This implies that
@@ -619,12 +620,20 @@ public:
    it will follow the same logic as itk::GDCMSeriesFileNames to enhance the UID with
    more digits and dots.
 
-   Optionally, more tags can be used to separate files into different logical series by setting
-   the restrictions parameter.
-
-   \warning Adding restrictions is not yet implemented!
    */
   static void GetSeries(FileNamesGrouping& result, const StringContainer& files, volatile bool* interrupt = nullptr);
+
+  /**
+   \brief Same as the preferred version but returns the result instead of add to the first argument (see other GetSeries())
+
+   \return The resulting maps UID-like keys (based on Series Instance UID and slice properties) to sorted lists of file names.
+   */
+  static FileNamesGrouping GetSeries(const StringContainer& files, volatile bool* interrupt = nullptr)
+  {
+    FileNamesGrouping result;
+    GetSeries(result, files, interrupt);
+    return result;
+  }
 
   /**
    Loads a DICOM series composed by the file names enumerated in the file names container.

@@ -513,9 +513,17 @@ void mitk::DisplayInteractor::SetCrosshair(mitk::StateMachineAction *, mitk::Int
   const BaseRenderer::Pointer sender = interactionEvent->GetSender();
   auto renWindows = sender->GetRenderingManager()->GetAllRegisteredRenderWindows();
   InteractionPositionEvent* positionEvent = static_cast<InteractionPositionEvent*>(interactionEvent);
-  Point3D pos = /*mitk::BaseRenderer::GetInstance(sender->GetRenderWindow())->GetMapperID() == mitk::BaseRenderer::Standard2D ?
+
+#ifdef _WIN32
+  Point3D pos = mitk::BaseRenderer::GetInstance(sender->GetRenderWindow())->GetMapperID() == mitk::BaseRenderer::Standard2D ?
     pos = positionEvent->GetPlanePositionInWorld() :
-    pos =*/ positionEvent->GetPositionInWorld();
+    pos = positionEvent->GetPositionInWorld();
+#else
+  // code above doesn't work on Linux release builds
+  // (it does work on DEBUG but it makes no sense until it will work on Release)
+  // (there is bug for it somewhere in Jira)
+  Point3D pos = positionEvent->GetPositionInWorld();
+#endif
 
   for(auto renWin : renWindows)
   {

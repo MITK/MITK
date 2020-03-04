@@ -536,7 +536,7 @@ mitk::DataNode::Pointer QmitkImageStatisticsView::GetNodeForStatisticsContainer(
 
 QmitkNodeSelectionDialog::SelectionCheckFunctionType QmitkImageStatisticsView::CheckForSameGeometry() const
 {
-  auto lambda = [this](const QmitkNodeSelectionDialog::NodeList& nodes)
+  auto lambda = [](const QmitkNodeSelectionDialog::NodeList& nodes)
   {
     if (nodes.empty())
     {

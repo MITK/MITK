@@ -845,8 +845,8 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    toolManager->NewNodeObjectsGenerated += mitk::MessageDelegate1<QmitkSegmentationView, mitk::ToolManager::DataVectorType*>(this, &QmitkSegmentationView::NewNodeObjectsGenerated);
 
    // create signal/slot connections
-   connect(m_Controls->patImageSelector, SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)), this, SLOT(OnPatientSelectionChanged(QList<mitk::DataNode::Pointer>)));
-   connect(m_Controls->segImageSelector, SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)), this, SLOT(OnSegmentationSelectionChanged(QList<mitk::DataNode::Pointer>)));
+   connect(m_Controls->patImageSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkSegmentationView::OnPatientSelectionChanged);
+   connect(m_Controls->segImageSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkSegmentationView::OnSegmentationSelectionChanged);
 
    connect(m_Controls->btnNewSegmentation, SIGNAL(clicked()), this, SLOT(CreateNewSegmentation()));
    connect(m_Controls->tabWidgetSegmentationTools, SIGNAL(currentChanged(int)), this, SLOT(OnTabWidgetChanged(int)));

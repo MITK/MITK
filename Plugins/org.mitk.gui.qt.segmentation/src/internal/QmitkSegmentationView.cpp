@@ -363,7 +363,7 @@ void QmitkSegmentationView::OnPatientSelectionChanged(QList<mitk::DataNode::Poin
       this->SetToolManagerSelection(node, segNode);
       if (segNode)
       {
-        //Doing this we can assure that the segmenation is always visible if the segmentation and the patient image are
+        //Doing this we can assure that the segmentation is always visible if the segmentation and the patient image are
         //loaded separately
         int layer(10);
         node->GetIntProperty("layer", layer);

@@ -24,9 +24,9 @@ found in the LICENSE file.
 class QmitkRenderWindow;
 
 /**
-* \ingroup ToolManagerEtAl
-* \ingroup org_mitk_gui_qt_segmentation_internal
-* \warning Implementation of this class is split up into two .cpp files to make things more compact. Check both this file and QmitkSegmentationOrganNamesHandling.cpp
+* @brief
+*
+*
 */
 class QmitkSegmentationView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
@@ -42,9 +42,6 @@ public:
 
   void NewNodeObjectsGenerated(mitk::ToolManager::DataVectorType*);
 
-  ///
-  /// Sets the focus to an internal widget.
-  ///
   void SetFocus() override;
 
   void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;

@@ -18,8 +18,6 @@ found in the LICENSE file.
 #include "QmitkAbstractDataStorageInspector.h"
 #include "QmitkSimpleTextOverlayWidget.h"
 
-#include <QSortFilterProxyModel>
-
 #include "ui_QmitkDataStorageListInspector.h"
 
 /*

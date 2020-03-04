@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
-#include <QmitkAbstractDataStorageInspector.h>
+#include "QmitkAbstractDataStorageInspector.h"
 #include <QSortFilterProxyModel>
 #include "QmitkSimpleTextOverlayWidget.h"
 

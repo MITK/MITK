@@ -86,35 +86,35 @@ QmitkAbstractDataStorageInspector*
   QmitkDataStorageInspectorProviderBase<TInspector>::CreateInspector() const
 {
   return new TInspector;
-};
+}
 
 template<class TInspector>
 typename QmitkDataStorageInspectorProviderBase<TInspector>::InspectorIDType
   QmitkDataStorageInspectorProviderBase<TInspector>::GetInspectorID() const
 {
   return d->m_ID;
-};
+}
 
 template<class TInspector>
 std::string
   QmitkDataStorageInspectorProviderBase<TInspector>::GetInspectorDisplayName() const
 {
   return d->m_DisplayName;
-};
+}
 
 template<class TInspector>
 std::string
   QmitkDataStorageInspectorProviderBase<TInspector>::GetInspectorDescription() const
 {
   return d->m_Desc;
-};
+}
 
 template<class TInspector>
 QIcon
   QmitkDataStorageInspectorProviderBase<TInspector>::GetInspectorIcon() const
 {
   return QmitkStyleManager::ThemeIcon(d->m_SVG);
-};
+}
 
 template<class TInspector>
 us::ServiceRegistration<mitk::IDataStorageInspectorProvider>

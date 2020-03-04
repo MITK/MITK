@@ -68,5 +68,5 @@ QmitkDataStorageTreeInspector::SelectionMode QmitkDataStorageTreeInspector::GetS
 
 void QmitkDataStorageTreeInspector::OnModelReset()
 {
-  m_Overlay->setVisible(m_StorageModel->rowCount(m_StorageModel->sibling(0, 0, QModelIndex())) == 0);
+  m_Overlay->setVisible(!m_StorageModel->hasChildren());
 }

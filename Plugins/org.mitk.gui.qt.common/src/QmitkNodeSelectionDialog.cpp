@@ -28,7 +28,7 @@ QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString titl
 
   auto providers = mitk::DataStorageInspectorGenerator::GetProviders();
   auto visibleProviders = mitk::GetVisibleDataStorageInspectors();
-  auto favoriteID = mitk::GetPreferredDataStorageInspector();
+  auto preferredID = mitk::GetPreferredDataStorageInspector();
 
   if (visibleProviders.empty())
   {
@@ -41,8 +41,8 @@ QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString titl
     }
   }
 
-  int favIndex = 0;
-  bool favoriteFound = false;
+  int preferredIndex = 0;
+  bool preferredFound = false;
   for (auto proIter : visibleProviders)
   {
     auto finding = providers.find(proIter.second);
@@ -51,7 +51,7 @@ QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString titl
       if (finding->second->GetInspectorID() != QmitkDataStorageFavoriteNodesInspector::INSPECTOR_ID() && finding->second->GetInspectorID() != QmitkDataStorageSelectionHistoryInspector::INSPECTOR_ID())
       {
         auto provider = finding->second;
-        this->AddPanel(provider, favoriteID, favoriteFound, favIndex);
+        this->AddPanel(provider, preferredID, preferredFound, preferredIndex);
       }
     }
     else
@@ -65,7 +65,7 @@ QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString titl
     auto favoritesPorvider = mitk::DataStorageInspectorGenerator::GetProvider(QmitkDataStorageFavoriteNodesInspector::INSPECTOR_ID());
     if (favoritesPorvider != nullptr)
     {
-      this->AddPanel(favoritesPorvider, favoriteID, favoriteFound, favIndex);
+      this->AddPanel(favoritesPorvider, preferredID, preferredFound, preferredIndex);
     }
   }
 
@@ -74,11 +74,11 @@ QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString titl
     auto historyPorvider = mitk::DataStorageInspectorGenerator::GetProvider(QmitkDataStorageSelectionHistoryInspector::INSPECTOR_ID());
     if (historyPorvider != nullptr)
     {
-      this->AddPanel(historyPorvider, favoriteID, favoriteFound, favIndex);
+      this->AddPanel(historyPorvider, preferredID, preferredFound, preferredIndex);
     }
   }
 
-  m_Controls.tabWidget->setCurrentIndex(favIndex);
+  m_Controls.tabWidget->setCurrentIndex(preferredIndex);
   this->setWindowTitle(title);
   this->setToolTip(hint);
 
@@ -88,8 +88,8 @@ QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString titl
   m_Controls.btnAddToFav->setIcon(berry::QtStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/favorite_add.svg")));
 
   connect(m_Controls.btnAddToFav, &QPushButton::clicked, this, &QmitkNodeSelectionDialog::OnFavoriteNodesButtonClicked);
-  connect(m_Controls.buttonBox, SIGNAL(accepted()), this, SLOT(OnOK()));
-  connect(m_Controls.buttonBox, SIGNAL(rejected()), this, SLOT(OnCancel()));
+  connect(m_Controls.buttonBox, &QDialogButtonBox::accepted, this, &QmitkNodeSelectionDialog::OnOK);
+  connect(m_Controls.buttonBox, &QDialogButtonBox::rejected, this, &QmitkNodeSelectionDialog::OnCancel);
 }
 
 void QmitkNodeSelectionDialog::SetDataStorage(mitk::DataStorage* dataStorage)
@@ -217,7 +217,7 @@ void QmitkNodeSelectionDialog::OnCancel()
   this->reject();
 }
 
-void QmitkNodeSelectionDialog::AddPanel(const mitk::IDataStorageInspectorProvider * provider, const mitk::IDataStorageInspectorProvider::InspectorIDType&favoriteID, bool &favoriteFound, int &favIndex)
+void QmitkNodeSelectionDialog::AddPanel(const mitk::IDataStorageInspectorProvider * provider, const mitk::IDataStorageInspectorProvider::InspectorIDType& preferredID, bool &preferredFound, int &preferredIndex)
 {
   auto inspector = provider->CreateInspector();
   QString name = QString::fromStdString(provider->GetInspectorDisplayName());
@@ -246,9 +246,9 @@ void QmitkNodeSelectionDialog::AddPanel(const mitk::IDataStorageInspectorProvide
   m_Panels.push_back(inspector);
   connect(inspector, &QmitkAbstractDataStorageInspector::CurrentSelectionChanged, this, &QmitkNodeSelectionDialog::OnSelectionChanged);
 
-  favoriteFound = favoriteFound || provider->GetInspectorID() == favoriteID;
-  if (!favoriteFound)
+  preferredFound = preferredFound || provider->GetInspectorID() == preferredID;
+  if (!preferredFound)
   {
-    ++favIndex;
+    ++preferredIndex;
   }
 }

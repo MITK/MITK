@@ -121,7 +121,7 @@ protected Q_SLOTS:
 
 protected:
 
-  void AddPanel(const mitk::IDataStorageInspectorProvider * provider, const mitk::IDataStorageInspectorProvider::InspectorIDType &favoriteID, bool &favoriteFound, int &favIndex);
+  void AddPanel(const mitk::IDataStorageInspectorProvider* provider, const mitk::IDataStorageInspectorProvider::InspectorIDType &preferredID, bool &preferredFound, int &preferredIndex);
 
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
   mitk::NodePredicateBase::ConstPointer m_NodePredicate;

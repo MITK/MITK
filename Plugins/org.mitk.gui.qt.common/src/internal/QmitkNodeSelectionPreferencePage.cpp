@@ -50,7 +50,7 @@ void QmitkNodeSelectionPreferencePage::CreateQtControl(QWidget* parent)
   connect(m_Controls->comboPreferred, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateWidgets()));
   connect(m_Controls->btnUp, SIGNAL(clicked(bool)), this, SLOT(MoveUp()));
   connect(m_Controls->btnDown, SIGNAL(clicked(bool)), this, SLOT(MoveDown()));
-  connect(m_Controls->listInspectors, SIGNAL(itemSelectionChanged()), this, SLOT(UpdateWidgets()));
+  connect(m_Controls->listInspectors, &QListWidget::itemSelectionChanged, this, &QmitkNodeSelectionPreferencePage::UpdateWidgets);
 
   this->Update();
 }
@@ -179,15 +179,21 @@ void QmitkNodeSelectionPreferencePage::UpdateWidgets()
     }
   }
 
-  if (QmitkDataStorageFavoriteNodesInspector::INSPECTOR_ID() == m_Controls->comboPreferred->currentData().toString())
+  auto isFavSelected =
+    QmitkDataStorageFavoriteNodesInspector::INSPECTOR_ID() == m_Controls->comboPreferred->currentData().toString();
+  if (isFavSelected)
   {
     m_Controls->checkShowFav->setChecked(true);
   }
-  if (QmitkDataStorageSelectionHistoryInspector::INSPECTOR_ID() == m_Controls->comboPreferred->currentData().toString())
+  m_Controls->checkShowFav->setEnabled(!isFavSelected);
+
+  auto isHistorySelected =
+    QmitkDataStorageSelectionHistoryInspector::INSPECTOR_ID() == m_Controls->comboPreferred->currentData().toString();
+  if (isHistorySelected)
   {
     m_Controls->checkShowHistory->setChecked(true);
   }
-
+  m_Controls->checkShowHistory->setEnabled(!isHistorySelected);
 };
 
 void QmitkNodeSelectionPreferencePage::MoveDown()

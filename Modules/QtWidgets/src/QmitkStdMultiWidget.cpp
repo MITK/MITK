@@ -30,8 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QStringList>
 #include <QDir>
 
-#include <dcmtk/dcmdata/dcvrpn.h>
-
+#include <StringUtilities.h>
 #include <mitkProperties.h>
 #include <mitkPlaneGeometryDataMapper2D.h>
 #include <mitkPointSet.h>
@@ -1937,7 +1936,7 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
         sliceThickness, xrayTubeCurrent, kvp, imagePosition, windowCenter, windowWidth;
 
       imageProperties->GetStringProperty("dicom.patient.PatientsName", patient);
-      DcmPersonName::getFormattedNameFromString(patient, patient); // process '^' and '='
+      patient = Utilities::formatPersonName(patient); // process '^' and '='
       imageProperties->GetStringProperty("dicom.patient.PatientID", patientId);
       imageProperties->GetStringProperty("dicom.patient.PatientsBirthDate", birthday);
       imageProperties->GetStringProperty("dicom.patient.PatientsSex", sex);
@@ -1950,7 +1949,7 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
       }
       imageProperties->GetStringProperty("dicom.study.StudyID", studiId);
       imageProperties->GetStringProperty("dicom.study.StudyDescription", studyDescription);
-      DcmPersonName::getFormattedNameFromString(studyDescription, studyDescription); // '^' appears in some studies
+      studyDescription = Utilities::formatPersonName(studyDescription); // '^' appears in some studies
       //imageProperties->GetStringProperty("dicom.series.SeriesDescription", seriesDescription);
       imageProperties->GetStringProperty("dicom.ExInfo", exInfo);
       imageProperties->GetStringProperty("dicom.MagneticFieldStrength", magneticFieldStrength);

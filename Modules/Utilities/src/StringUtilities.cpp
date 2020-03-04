@@ -1,5 +1,7 @@
 #include "StringUtilities.h"
 
+#include <dcmtk/dcmdata/dcvrpn.h>
+
 #ifdef _WIN32
 #include <Windows.h>
 #endif
@@ -122,4 +124,20 @@ namespace Utilities
 
     return true;
   }
+
+  std::string formatPersonName(const std::string& pn, int group)
+  {
+    std::string r;
+    for (int i = 0; i < 3; i++) {
+      if (DcmPersonName::getFormattedNameFromString(pn, r, group).good() && !r.empty()) {
+        return r;
+      }
+      // search for any informative group
+      if (--group < 0) {
+        group = 2;
+      }
+    }
+    return pn;
+  }
+
 }

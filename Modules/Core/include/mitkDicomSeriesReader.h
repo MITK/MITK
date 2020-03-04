@@ -337,8 +337,7 @@ public:
     Image::Pointer m_Image; ///< Preloaded slice or frames
 
     SliceInfo(): m_AcquisitionNumber(std::numeric_limits<long>::max()), m_TemporalPosition(std::numeric_limits<long>::max()),
-      m_FileSize(0),
-      m_InstanceNumber(std::numeric_limits<long>::max()), m_HasImagePositionPatient(false) {}
+      m_InstanceNumber(std::numeric_limits<long>::max()), m_FileSize(0), m_HasImagePositionPatient(false) {}
     bool operator<(const DicomSeriesReader::SliceInfo& b) const; /// For ordering slices in the image
   };
 
@@ -573,7 +572,9 @@ public:
 
   struct MITKCORE_EXPORT FileNamesGrouping: std::map<std::string, std::shared_ptr<ImageBlockDescriptor>> {
     std::mutex m_Mutex;
-    virtual iterator addFile(std::shared_ptr<ImageBlockDescriptor> descriptor, DcmFileFormat* ff = nullptr); // Returns iterator to block where the file goes
+    /// Add new file to series list, loading tags necessary for sorting and image data if requested
+    /// \return iterator to block where the file goes
+    virtual iterator addFile(std::shared_ptr<ImageBlockDescriptor> descriptor, DcmFileFormat* ff = nullptr, bool loadImageData = false);
     virtual void postProcess(); /// To call after all files in the blocks was analyzed. Split some blocks to uniform parts
     virtual std::shared_ptr<ImageBlockDescriptor> makeBlockDescriptorPtr(std::string file, DcmFileFormat& ff, unsigned long fileSize=0); /// called internally for new members and can be overrided
     FileNamesGrouping(FileNamesGrouping&& src): std::map<std::string, std::shared_ptr<ImageBlockDescriptor>>(std::move(src)), m_Mutex() {}
@@ -621,7 +622,7 @@ public:
    more digits and dots.
 
    */
-  static void GetSeries(FileNamesGrouping& result, const StringContainer& files, volatile bool* interrupt = nullptr);
+  static void GetSeries(FileNamesGrouping& result, const StringContainer& files, volatile bool* interrupt = nullptr, bool loadImageData = false);
 
   /**
    \brief Same as the preferred version but returns the result instead of add to the first argument (see other GetSeries())
@@ -631,7 +632,7 @@ public:
   static FileNamesGrouping GetSeries(const StringContainer& files, volatile bool* interrupt = nullptr)
   {
     FileNamesGrouping result;
-    GetSeries(result, files, interrupt);
+    GetSeries(result, files, interrupt, true);
     return result;
   }
 

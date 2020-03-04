@@ -38,9 +38,6 @@ std::vector<itk::SmartPointer<BaseData> > DicomSeriesReaderService::Read()
   std::vector<BaseData::Pointer> result;
 
   mitk::LocaleSwitch localeSwitch("C");
-  std::locale previousCppLocale(std::cin.getloc());
-  std::locale l( "C" );
-  std::cin.imbue(l);
 
   std::string fileName = this->GetLocalFileName();
 
@@ -56,7 +53,6 @@ std::vector<itk::SmartPointer<BaseData> > DicomSeriesReaderService::Read()
   for (DicomSeriesReader::FileNamesGrouping::const_iterator n_it = imageBlocks.begin(); n_it != n_end; ++n_it)
   {
     const std::string &uid = n_it->first;
-    DataNode::Pointer node = DataNode::New();
 
     const DicomSeriesReader::ImageBlockDescriptor& imageBlockDescriptor( *n_it->second );
 
@@ -70,9 +66,8 @@ std::vector<itk::SmartPointer<BaseData> > DicomSeriesReaderService::Read()
     MITK_INFO << "  3D+t: " << (imageBlockDescriptor.HasMultipleTimePoints()?"Yes":"No");
     MITK_INFO << "--------------------------------------------------------------------------------";
 
-    if (DicomSeriesReader::LoadDicomSeries(n_it->second->GetFilenames(), *node, true, true, true))
+    if (auto data = n_it->second->GetImage())
     {
-      BaseData::Pointer data = node->GetData();
       PropertyList::Pointer dataProps = data->GetPropertyList();
 
       std::string nodeName(uid);
@@ -90,7 +85,7 @@ std::vector<itk::SmartPointer<BaseData> > DicomSeriesReaderService::Read()
       StringProperty::Pointer nameProp = StringProperty::New(nodeName);
       data->SetProperty("name", nameProp);
 
-      result.push_back(data);
+      result.push_back(data.GetPointer());
       ++outputIndex;
     }
     else
@@ -100,8 +95,6 @@ std::vector<itk::SmartPointer<BaseData> > DicomSeriesReaderService::Read()
 
     ProgressBar::GetInstance()->Progress();
   }
-
-  std::cin.imbue(previousCppLocale);
 
   return result;
 }

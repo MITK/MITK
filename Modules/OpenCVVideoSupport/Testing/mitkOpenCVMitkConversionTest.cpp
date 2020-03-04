@@ -223,7 +223,7 @@ void ConvertCVMatForthAndBack(mitk::Image::Pointer inputForCVMat, std::string im
 
   // initialize the image with the input image, since we want to test equality and OpenCV does not feature geometries and spacing
   mitk::Image::Pointer result = inputForCVMat->Clone();
-  result->SetImportSlice(const_cast<void*>(toMitkConverter->GetOutput()->GetSliceData()->GetData()));
+  result->SetSlice(const_cast<void*>(toMitkConverter->GetOutput()->GetSliceData()->GetData()));
 
   if( result->GetPixelType().GetNumberOfComponents() == 1 )
   {
@@ -277,7 +277,7 @@ void ConvertIplImageForthAndBack(mitk::Image::Pointer inputForIpl, std::string i
 
   // initialize the image with the input image, since we want to test equality and OpenCV does not feature geometries and spacing
   mitk::Image::Pointer result = inputForIpl->Clone();
-  result->SetImportSlice(const_cast<void*>(toMitkConverter->GetOutput()->GetSliceData()->GetData()));
+  result->SetSlice(const_cast<void*>(toMitkConverter->GetOutput()->GetSliceData()->GetData()));
 
   if( result->GetPixelType().GetNumberOfComponents() == 1 )
   {

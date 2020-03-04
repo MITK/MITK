@@ -53,25 +53,18 @@ int main(int argc, char* argv[])
   std::string outFileName = us::any_cast<std::string>(parsedArgs["output"]);
 
   //check if DICOMTags have been set as property for mitk::Image
-  mitk::DicomSeriesReader::FileNamesGrouping seriesInFiles = mitk::DicomSeriesReader::GetSeries( inputFolder, true );
+  mitk::DicomSeriesReader::FileNamesGrouping seriesInFiles = mitk::DicomSeriesReader::GetSeries( inputFolder );
   std::list<mitk::Image::Pointer> images;
-  std::map<mitk::Image::Pointer, mitk::DicomSeriesReader::StringContainer> fileMap;
 
   // TODO sort series UIDs, implementation of map iterator might differ on different platforms (or verify this is a standard topic??)
   for (mitk::DicomSeriesReader::FileNamesGrouping::const_iterator seriesIter = seriesInFiles.begin();
        seriesIter != seriesInFiles.end();
        ++seriesIter)
   {
-    mitk::DicomSeriesReader::StringContainer files = seriesIter->second.GetFilenames();
-
-    mitk::DataNode::Pointer node = mitk::DicomSeriesReader::LoadDicomSeries( files );
-
-    if (node.IsNotNull())
+    mitk::Image::Pointer image = seriesIter->second->GetImage();
+    if (image.IsNotNull())
     {
-      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
-
       images.push_back( image );
-      fileMap.insert( std::pair<mitk::Image::Pointer, mitk::DicomSeriesReader::StringContainer>(image,files));
     }
   }
 

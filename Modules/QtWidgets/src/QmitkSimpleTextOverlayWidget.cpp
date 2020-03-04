@@ -12,11 +12,9 @@ found in the LICENSE file.
 
 #include "QmitkSimpleTextOverlayWidget.h"
 
-#include <berryWorkbenchPlugin.h>
-#include <berryQtStyleManager.h>
-
 #include "QTextDocument"
 #include "QPainter"
+#include "QApplication" 
 
 QmitkSimpleTextOverlayWidget::QmitkSimpleTextOverlayWidget(QWidget* parent)
   : QmitkOverlayWidget(parent)
@@ -42,19 +40,11 @@ void QmitkSimpleTextOverlayWidget::paintEvent(QPaintEvent* p)
 {
   QmitkOverlayWidget::paintEvent(p);
 
-  QString stylesheet;
-
-  ctkPluginContext* context = berry::WorkbenchPlugin::GetDefault()->GetPluginContext();
-  ctkServiceReference styleManagerRef = context->getServiceReference<berry::IQtStyleManager>();
-  if (styleManagerRef)
-  {
-    auto styleManager = context->getService<berry::IQtStyleManager>(styleManagerRef);
-    stylesheet = styleManager->GetStylesheet();
-  }
+  auto styleSheet = qApp->styleSheet();
 
   QPainter painter(this);
   QTextDocument td(this);
-  td.setDefaultStyleSheet(stylesheet);
+  td.setDefaultStyleSheet(styleSheet);
 
   auto widgetSize = this->size();
   td.setTextWidth(widgetSize.width()-20.);

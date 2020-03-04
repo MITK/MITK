@@ -63,6 +63,7 @@ set(CPP_FILES
   mitkQtWidgetsActivator.cpp
   mitkDataStorageInspectorGenerator.cpp
   QmitkOverlayWidget.cpp
+  QmitkSimpleTextOverlayWidget.cpp
   QmitkNodeDetailsDialog.cpp
 )
 
@@ -115,6 +116,7 @@ set(MOC_H_FILES
   include/QmitkDataStorageSelectionHistoryInspector.h
   include/QmitkModelViewSelectionConnector.h
   include/QmitkOverlayWidget.h
+  include/QmitkSimpleTextOverlayWidget.h
   include/QmitkNodeDetailsDialog.h
 )
 

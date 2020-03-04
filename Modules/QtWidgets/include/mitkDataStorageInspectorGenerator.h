@@ -19,11 +19,11 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /** Convinvience class to get all or specific DataStorageInspectorProvider. */
+  /** Convenience class to get all or specific DataStorageInspectorProvider. */
   class MITKQTWIDGETS_EXPORT DataStorageInspectorGenerator
   {
   public:
-    using IDType = std::string;
+    using IDType = mitk::IDataStorageInspectorProvider::InspectorIDType;
 
     using ProviderMapType = std::map<IDType, mitk::IDataStorageInspectorProvider*>;
     static ProviderMapType GetProviders();

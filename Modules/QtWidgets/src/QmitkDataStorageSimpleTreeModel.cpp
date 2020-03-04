@@ -44,14 +44,18 @@ void QmitkDataStorageSimpleTreeModel::DataStorageChanged()
     m_Root->Delete();
   }
 
+  beginResetModel();
   ResetTree();
   UpdateModelData();
+  endResetModel();
 }
 
 void QmitkDataStorageSimpleTreeModel::NodePredicateChanged()
 {
+  beginResetModel();
   ResetTree();
   UpdateModelData();
+  endResetModel();
 }
 
 void QmitkDataStorageSimpleTreeModel::NodeAdded(const mitk::DataNode *node)

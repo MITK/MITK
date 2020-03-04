@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg827"
+   version="1.1"
+   viewBox="0 0 576 512"
+   role="img"
+   class="svg-inline--fa fa-star fa-w-18"
+   data-icon="star"
+   data-prefix="fas"
+   focusable="false"
+   aria-hidden="true">
+  <metadata
+     id="metadata833">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs831" />
+  <path
+     style="fill:#00ff00"
+     id="path825"
+     d="M 288.03711 -0.01171875 C 276.62461 -0.04921875 265.20078 5.8507813 259.30078 17.800781 L 194 150.19922 L 47.900391 171.5 C 21.700391 175.3 11.199219 207.59961 30.199219 226.09961 L 135.90039 329.09961 L 110.90039 474.59961 C 106.40039 500.89961 134.10078 520.60078 157.30078 508.30078 L 288 439.59961 L 359 476.91992 L 359 426.34961 L 274 426.34961 L 274 294.26367 C 302.32787 294.44437 330.65625 294.30173 358.98438 294.30273 C 359.08718 266.65177 358.9136 239.00061 359 211.34961 L 359 210.34961 L 359 209.34961 L 491 209.34961 L 491 279.5 L 545.80078 226.09961 C 564.80078 207.59961 554.29961 175.3 528.09961 171.5 L 382 150.19922 L 316.69922 17.800781 C 310.84922 6.0007812 299.44961 0.02578125 288.03711 -0.01171875 z M 427.17969 511.34961 C 431.46516 512.23949 435.74991 512.18675 439.82617 511.34961 L 427.17969 511.34961 z " />
+  <path
+     id="rect835-4"
+     d="m 385.00002,235.34957 v 85 h -85 v 80 h 85 v 85 h 80 v -85 h 85 v -80 h -85 v -85 z"
+     style="opacity:1;fill:#ff00ff;fill-opacity:1;stroke:#000000;stroke-width:12;stroke-linecap:butt;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0" />
+</svg>

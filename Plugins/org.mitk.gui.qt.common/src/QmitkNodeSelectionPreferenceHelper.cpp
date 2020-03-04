@@ -94,26 +94,68 @@ mitk::VisibleDataStorageInspectorMapType mitk::GetVisibleDataStorageInspectors()
   return visMap;
 }
 
-mitk::DataStorageInspectorIDType mitk::GetFavoriteDataStorageInspector()
+mitk::DataStorageInspectorIDType mitk::GetPreferredDataStorageInspector()
 {
   berry::IPreferencesService *prefService = berry::Platform::GetPreferencesService();
 
   berry::IPreferences::Pointer prefNode =
     prefService->GetSystemPreferences()->Node(mitk::NodeSelectionConstants::ROOT_PREFERENCE_NODE_ID.c_str());
 
-  auto id = prefNode->Get(mitk::NodeSelectionConstants::FAVORITE_INSPECTOR_ID.c_str(), "");
+  auto id = prefNode->Get(mitk::NodeSelectionConstants::PREFERRED_INSPECTOR_ID.c_str(), "");
 
   mitk::DataStorageInspectorIDType result = id.toStdString();
   return result;
 }
 
-void mitk::PutFavoriteDataStorageInspector(const DataStorageInspectorIDType &id)
+void mitk::PutPreferredDataStorageInspector(const DataStorageInspectorIDType &id)
 {
   berry::IPreferencesService *prefService = berry::Platform::GetPreferencesService();
 
   berry::IPreferences::Pointer prefNode =
     prefService->GetSystemPreferences()->Node(mitk::NodeSelectionConstants::ROOT_PREFERENCE_NODE_ID.c_str());
 
-  prefNode->Put(mitk::NodeSelectionConstants::FAVORITE_INSPECTOR_ID.c_str(), id.c_str());
+  prefNode->Put(mitk::NodeSelectionConstants::PREFERRED_INSPECTOR_ID.c_str(), id.c_str());
   prefNode->Flush();
+}
+
+void mitk::PutShowFavoritesInspector(bool show)
+{
+  berry::IPreferencesService *prefService = berry::Platform::GetPreferencesService();
+
+  berry::IPreferences::Pointer prefNode =
+    prefService->GetSystemPreferences()->Node(mitk::NodeSelectionConstants::ROOT_PREFERENCE_NODE_ID.c_str());
+
+  prefNode->PutBool(mitk::NodeSelectionConstants::SHOW_FAVORITE_INSPECTOR.c_str(), show);
+  prefNode->Flush();
+}
+
+bool mitk::GetShowFavoritesInspector()
+{
+  berry::IPreferencesService *prefService = berry::Platform::GetPreferencesService();
+
+  berry::IPreferences::Pointer prefNode =
+    prefService->GetSystemPreferences()->Node(mitk::NodeSelectionConstants::ROOT_PREFERENCE_NODE_ID.c_str());
+
+  return prefNode->GetBool(mitk::NodeSelectionConstants::SHOW_FAVORITE_INSPECTOR.c_str(), true);
+}
+
+void mitk::PutShowHistoryInspector(bool show)
+{
+  berry::IPreferencesService *prefService = berry::Platform::GetPreferencesService();
+
+  berry::IPreferences::Pointer prefNode =
+    prefService->GetSystemPreferences()->Node(mitk::NodeSelectionConstants::ROOT_PREFERENCE_NODE_ID.c_str());
+
+  prefNode->PutBool(mitk::NodeSelectionConstants::SHOW_HISTORY_INSPECTOR.c_str(), show);
+  prefNode->Flush();
+}
+
+bool mitk::GetShowHistoryInspector()
+{
+  berry::IPreferencesService *prefService = berry::Platform::GetPreferencesService();
+
+  berry::IPreferences::Pointer prefNode =
+    prefService->GetSystemPreferences()->Node(mitk::NodeSelectionConstants::ROOT_PREFERENCE_NODE_ID.c_str());
+
+  return prefNode->GetBool(mitk::NodeSelectionConstants::SHOW_HISTORY_INSPECTOR.c_str(), true);
 }

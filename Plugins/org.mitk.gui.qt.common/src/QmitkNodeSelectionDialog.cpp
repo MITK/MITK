@@ -12,9 +12,12 @@ found in the LICENSE file.
 
 #include "QmitkNodeSelectionDialog.h"
 
+#include <berryQtStyleManager.h>
+
 #include <mitkDataStorageInspectorGenerator.h>
 #include <QmitkNodeSelectionPreferenceHelper.h>
 #include <QmitkDataStorageSelectionHistoryInspector.h>
+#include <QmitkDataStorageFavoriteNodesInspector.h>
 
 QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString title, QString hint) : QDialog(parent),
   m_NodePredicate(nullptr), m_SelectOnlyVisibleNodes(false), m_SelectedNodes(NodeList()), m_SelectionMode(QAbstractItemView::SingleSelection)
@@ -25,7 +28,7 @@ QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString titl
 
   auto providers = mitk::DataStorageInspectorGenerator::GetProviders();
   auto visibleProviders = mitk::GetVisibleDataStorageInspectors();
-  auto favoriteID = mitk::GetFavoriteDataStorageInspector();
+  auto preferredID = mitk::GetPreferredDataStorageInspector();
 
   if (visibleProviders.empty())
   {
@@ -38,22 +41,17 @@ QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString titl
     }
   }
 
-  int favIndex = 0;
-  bool favoriteFound = false;
+  int preferredIndex = 0;
+  bool preferredFound = false;
   for (auto proIter : visibleProviders)
   {
     auto finding = providers.find(proIter.second);
     if (finding != providers.end())
     {
-      auto inspector = finding->second->CreateInspector();
-      QString name = QString::fromStdString(finding->second->GetInspectorDisplayName());
-      QString desc = QString::fromStdString(finding->second->GetInspectorDescription());
-      AddPanel(inspector, name, desc);
-
-      favoriteFound = favoriteFound || proIter.second == favoriteID;
-      if (!favoriteFound)
+      if (finding->second->GetInspectorID() != QmitkDataStorageFavoriteNodesInspector::INSPECTOR_ID() && finding->second->GetInspectorID() != QmitkDataStorageSelectionHistoryInspector::INSPECTOR_ID())
       {
-        ++favIndex;
+        auto provider = finding->second;
+        this->AddPanel(provider, preferredID, preferredFound, preferredIndex);
       }
     }
     else
@@ -62,19 +60,36 @@ QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString titl
     }
   }
 
-  m_Controls.tabWidget->setCurrentIndex(favIndex);
+  if (mitk::GetShowFavoritesInspector())
+  {
+    auto favoritesPorvider = mitk::DataStorageInspectorGenerator::GetProvider(QmitkDataStorageFavoriteNodesInspector::INSPECTOR_ID());
+    if (favoritesPorvider != nullptr)
+    {
+      this->AddPanel(favoritesPorvider, preferredID, preferredFound, preferredIndex);
+    }
+  }
+
+  if (mitk::GetShowHistoryInspector())
+  {
+    auto historyPorvider = mitk::DataStorageInspectorGenerator::GetProvider(QmitkDataStorageSelectionHistoryInspector::INSPECTOR_ID());
+    if (historyPorvider != nullptr)
+    {
+      this->AddPanel(historyPorvider, preferredID, preferredFound, preferredIndex);
+    }
+  }
+
+  m_Controls.tabWidget->setCurrentIndex(preferredIndex);
   this->setWindowTitle(title);
   this->setToolTip(hint);
 
   m_Controls.hint->setText(hint);
   m_Controls.hint->setVisible(!hint.isEmpty());
 
-  m_FavoriteNodesButton = new QPushButton("Add to favorites");
-  m_Controls.buttonBox->addButton(m_FavoriteNodesButton, QDialogButtonBox::ActionRole);
+  m_Controls.btnAddToFav->setIcon(berry::QtStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/favorite_add.svg")));
 
-  connect(m_FavoriteNodesButton, &QPushButton::clicked, this, &QmitkNodeSelectionDialog::OnFavoriteNodesButtonClicked);
-  connect(m_Controls.buttonBox, SIGNAL(accepted()), this, SLOT(OnOK()));
-  connect(m_Controls.buttonBox, SIGNAL(rejected()), this, SLOT(OnCancel()));
+  connect(m_Controls.btnAddToFav, &QPushButton::clicked, this, &QmitkNodeSelectionDialog::OnFavoriteNodesButtonClicked);
+  connect(m_Controls.buttonBox, &QDialogButtonBox::accepted, this, &QmitkNodeSelectionDialog::OnOK);
+  connect(m_Controls.buttonBox, &QDialogButtonBox::rejected, this, &QmitkNodeSelectionDialog::OnCancel);
 }
 
 void QmitkNodeSelectionDialog::SetDataStorage(mitk::DataStorage* dataStorage)
@@ -202,21 +217,38 @@ void QmitkNodeSelectionDialog::OnCancel()
   this->reject();
 }
 
-void QmitkNodeSelectionDialog::AddPanel(QmitkAbstractDataStorageInspector* view, QString name, QString desc)
+void QmitkNodeSelectionDialog::AddPanel(const mitk::IDataStorageInspectorProvider * provider, const mitk::IDataStorageInspectorProvider::InspectorIDType& preferredID, bool &preferredFound, int &preferredIndex)
 {
-  view->setParent(this);
-  view->SetSelectionMode(m_SelectionMode);
+  auto inspector = provider->CreateInspector();
+  QString name = QString::fromStdString(provider->GetInspectorDisplayName());
+  QString desc = QString::fromStdString(provider->GetInspectorDescription());
+
+  inspector->setParent(this);
+  inspector->SetSelectionMode(m_SelectionMode);
 
   auto tabPanel = new QWidget();
   tabPanel->setObjectName(QString("tab_") + name);
   tabPanel->setToolTip(desc);
-  m_Controls.tabWidget->insertTab(m_Controls.tabWidget->count(), tabPanel, name);
 
   auto verticalLayout = new QVBoxLayout(tabPanel);
   verticalLayout->setSpacing(0);
   verticalLayout->setContentsMargins(0, 0, 0, 0);
-  verticalLayout->addWidget(view);
+  verticalLayout->addWidget(inspector);
 
-  m_Panels.push_back(view);
-  connect(view, &QmitkAbstractDataStorageInspector::CurrentSelectionChanged, this, &QmitkNodeSelectionDialog::OnSelectionChanged);
+  auto panelPos = m_Controls.tabWidget->insertTab(m_Controls.tabWidget->count(), tabPanel, name);
+
+  auto icon = provider->GetInspectorIcon();
+  if (!icon.isNull())
+  {
+    m_Controls.tabWidget->setTabIcon(panelPos, icon);
+  }
+
+  m_Panels.push_back(inspector);
+  connect(inspector, &QmitkAbstractDataStorageInspector::CurrentSelectionChanged, this, &QmitkNodeSelectionDialog::OnSelectionChanged);
+
+  preferredFound = preferredFound || provider->GetInspectorID() == preferredID;
+  if (!preferredFound)
+  {
+    ++preferredIndex;
+  }
 }

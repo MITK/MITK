@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <QmitkDataStorageListInspector.h>
 
 #include "mitkNodePredicateProperty.h"
+#include "QmitkSimpleTextOverlayWidget.h"
 
 /*
 * @brief This is an inspector that offers a simple list view on favorite nodes of a data storage.
@@ -40,6 +41,11 @@ public:
   */
   void SetNodePredicate(const mitk::NodePredicateBase* nodePredicate) override;
 
+  constexpr static const char* INSPECTOR_ID()
+  {
+    return "org.mitk.QmitkDataStorageFavoriteNodesInspector";
+  };
+
 protected Q_SLOTS:
 
   void OnFavoriteNodesButtonClicked();
@@ -47,7 +53,6 @@ protected Q_SLOTS:
 private:
 
   mitk::NodePredicateProperty::Pointer m_FavoriteNodeSelectionPredicate;
-
 };
 
 #endif // QMITKDATASTORAGEFAVORITENODESINSPECTOR_H

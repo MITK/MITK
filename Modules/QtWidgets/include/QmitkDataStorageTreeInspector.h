@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <MitkQtWidgetsExports.h>
 
 #include <QmitkAbstractDataStorageInspector.h>
+#include "QmitkSimpleTextOverlayWidget.h"
 #include <QSortFilterProxyModel>
 
 #include "ui_QmitkDataStorageTreeInspector.h"
@@ -40,9 +41,11 @@ public:
 
 protected:
   void Initialize() override;
+  void OnModelReset();
 
   QmitkAbstractDataStorageModel* m_StorageModel;
   Ui_QmitkDataStorageTreeInspector m_Controls;
+  QmitkSimpleTextOverlayWidget* m_Overlay;
 };
 
 #endif // QMITKDATASTORAGETREEINSPECTOR_H

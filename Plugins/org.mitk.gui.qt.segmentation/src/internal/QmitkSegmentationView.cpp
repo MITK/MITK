@@ -124,22 +124,6 @@ void QmitkSegmentationView::NewNodeObjectsGenerated(mitk::ToolManager::DataVecto
    }
 }
 
-void QmitkSegmentationView::Visible()
-{
-}
-
-void QmitkSegmentationView::Hidden()
-{
-}
-
-void QmitkSegmentationView::Activated()
-{
-}
-
-void QmitkSegmentationView::Deactivated()
-{
-}
-
 void QmitkSegmentationView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
 {
   if (m_RenderWindowPart != renderWindowPart)

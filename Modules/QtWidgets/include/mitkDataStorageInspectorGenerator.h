@@ -19,7 +19,7 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /** Convenvience class to get all or specific DataStorageInspectorProvider. */
+  /** Convenience class to get all or specific DataStorageInspectorProvider. */
   class MITKQTWIDGETS_EXPORT DataStorageInspectorGenerator
   {
   public:

@@ -194,7 +194,7 @@ void QmitkNodeSelectionPreferencePage::UpdateWidgets()
     m_Controls->checkShowHistory->setChecked(true);
   }
   m_Controls->checkShowHistory->setEnabled(!isHistorySelected);
-};
+}
 
 void QmitkNodeSelectionPreferencePage::MoveDown()
 {
@@ -206,7 +206,7 @@ void QmitkNodeSelectionPreferencePage::MoveDown()
     m_Controls->listInspectors->setCurrentRow(currentIndex + 1);
   }
   this->UpdateWidgets();
-};
+}
 
 void QmitkNodeSelectionPreferencePage::MoveUp()
 {
@@ -218,4 +218,4 @@ void QmitkNodeSelectionPreferencePage::MoveUp()
     m_Controls->listInspectors->setCurrentRow(currentIndex - 1);
   }
   this->UpdateWidgets();
-};
+}

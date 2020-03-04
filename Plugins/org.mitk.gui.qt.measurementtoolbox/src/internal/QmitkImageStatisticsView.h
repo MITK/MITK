@@ -87,7 +87,6 @@ private:
   mitk::DataNode::Pointer GetNodeForStatisticsContainer(mitk::ImageStatisticsContainer::ConstPointer container);
 
   QmitkNodeSelectionDialog::SelectionCheckFunctionType CheckForSameGeometry() const;
-  bool CheckForSameGeometry(const mitk::Image* image, const mitk::BaseData* data) const;
 
   typedef itk::SimpleMemberCommand<QmitkImageStatisticsView> ITKCommandType;
   mitk::DataNode::ConstPointer m_selectedImageNode = nullptr;

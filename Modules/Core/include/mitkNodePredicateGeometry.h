@@ -49,7 +49,7 @@ namespace mitk
 
   protected:
 
-    /**Constructor that is used configures the predicate to check against the the refernce geometry against the first data timepoint.*/
+    /**Constructor that is used configures the predicate to check the refernce geometry against the first data timepoint.*/
     NodePredicateGeometry(const BaseGeometry* refGeometry);
     /**Constructor allows to define the timepoint that should be evaluated against the reference.*/
     NodePredicateGeometry(const BaseGeometry* refGeometry, TimePointType relevantTimePoint);

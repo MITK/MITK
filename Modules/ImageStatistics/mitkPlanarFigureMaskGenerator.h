@@ -63,7 +63,7 @@ namespace mitk
     itkGetConstMacro(PlanarFigureSlice, unsigned int);
 
     /** Helper function that indicates if a passed planar geometry is tilted regarding a given geometry and its main axis.
-     *@result If either planarGeometry or geometry is nullptr it will return false.*/
+     *@pre If either planarGeometry or geometry is nullptr it will return false.*/
     static bool CheckPlanarFigureIsNotTilted(const PlaneGeometry* planarGeometry, const BaseGeometry *geometry);
 
   protected:

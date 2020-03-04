@@ -554,15 +554,39 @@ QmitkNodeSelectionDialog::SelectionCheckFunctionType QmitkImageStatisticsView::C
       }
     }
 
+    if (imageNodeData == nullptr)
+    {
+      std::stringstream ss;
+      ss << "<font class=\"warning\"><p>Select at least one image.</p>";
+      return ss.str();
+    }
+
+    auto imageGeoPredicate = mitk::NodePredicateGeometry::New(imageNodeData->GetGeometry());
+
     for (auto& rightNode : nodes)
     {
-      if (imageNodeData == rightNode->GetData())
+      if (imageNodeData != rightNode->GetData())
       {
-        bool sameGeometry = CheckForSameGeometry(imageNodeData, rightNode->GetData());
+        bool sameGeometry = true;
+
+        if (dynamic_cast<const mitk::Image*>(rightNode->GetData()))
+        {
+          sameGeometry = imageGeoPredicate->CheckNode(rightNode);
+        }
+        else
+        {
+          const mitk::PlanarFigure* planar2 = dynamic_cast<const mitk::PlanarFigure*>(rightNode->GetData());
+          if (planar2)
+          {
+            sameGeometry = mitk::PlanarFigureMaskGenerator::CheckPlanarFigureIsNotTilted(planar2->GetPlaneGeometry(), imageNodeData->GetGeometry());
+          }
+        }
+
         if (!sameGeometry)
         {
           std::stringstream ss;
-          ss << "<font class=\"warning\"><p>Invalid selection: All selected nodes must have the same geometry.</p>";
+          ss << "<font class=\"warning\"><p>Invalid selection: All selected nodes must have the same geometry.</p><p>Differing node i.a.: \"";
+          ss << rightNode->GetName() <<"\"</p>";
           return ss.str();
         }
       }
@@ -572,32 +596,4 @@ QmitkNodeSelectionDialog::SelectionCheckFunctionType QmitkImageStatisticsView::C
   };
 
   return lambda;
-}
-
-bool QmitkImageStatisticsView::CheckForSameGeometry(const mitk::Image* image, const mitk::BaseData* data) const
-{
-  bool isSameGeometry(true);
-
-  const mitk::Image* image2 = dynamic_cast<const mitk::Image*>(data);
-  const mitk::PlanarFigure* planar2 = dynamic_cast<const mitk::PlanarFigure*>(data);
-  if (image2)
-  {
-    const mitk::BaseGeometry* geo1 = image->GetGeometry();
-    const mitk::BaseGeometry* geo2 = image2->GetGeometry();
-
-    isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetOrigin(), geo2->GetOrigin());
-    isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetExtent(0), geo2->GetExtent(0));
-    isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetExtent(1), geo2->GetExtent(1));
-    isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetExtent(2), geo2->GetExtent(2));
-    isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetSpacing(), geo2->GetSpacing());
-    isSameGeometry = isSameGeometry && mitk::MatrixEqualElementWise(geo1->GetIndexToWorldTransform()->GetMatrix(), geo2->GetIndexToWorldTransform()->GetMatrix());
-
-    return isSameGeometry;
-  }
-  else if (planar2)
-  {
-    return mitk::PlanarFigureMaskGenerator::CheckPlanarFigureIsNotTilted(planar2->GetPlaneGeometry(), image->GetGeometry());
-  }
-
-  return false;
 }

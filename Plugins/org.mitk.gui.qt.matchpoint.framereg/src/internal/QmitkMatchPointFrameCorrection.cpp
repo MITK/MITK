@@ -82,8 +82,8 @@ void QmitkMatchPointFrameCorrection::SetFocus()
 
 void QmitkMatchPointFrameCorrection::CreateConnections()
 {
-  connect(m_Controls.imageNodeSelector, SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)), this, SLOT(OnNodeSelectionChanged(QList<mitk::DataNode::Pointer>)));
-  connect(m_Controls.maskNodeSelector, SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)), this, SLOT(OnNodeSelectionChanged(QList<mitk::DataNode::Pointer>)));
+  connect(m_Controls.imageNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointFrameCorrection::OnNodeSelectionChanged);
+  connect(m_Controls.maskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointFrameCorrection::OnNodeSelectionChanged);
 
   // ------
   // Tab 1 - Shared library loading interface

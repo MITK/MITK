@@ -130,14 +130,11 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget *parent)
   m_Controls.m_WorkingNodeSelector->SetPopUpHint("Select a segmentation that should be modified. Only segmentation with the same geometry and within the bounds of the reference image are selected.");
 
   connect(m_Controls.m_ReferenceNodeSelector,
-          SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)),
-          this,
-          SLOT(OnReferenceSelectionChanged(QList<mitk::DataNode::Pointer>)));
-
+          &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
+          this,&QmitkMultiLabelSegmentationView::OnReferenceSelectionChanged);
   connect(m_Controls.m_WorkingNodeSelector,
-          SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)),
-          this,
-          SLOT(OnSegmentationSelectionChanged(QList<mitk::DataNode::Pointer>)));
+          &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
+          this,&QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged);
 
   // *------------------------
   // * ToolManager

@@ -57,9 +57,9 @@ void QmitkMatchPointMapper::SetFocus()
 
 void QmitkMatchPointMapper::CreateConnections()
 {
-    connect(m_Controls.registrationNodeSelector, SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)), this, SLOT(OnRegNodeSelectionChanged(QList<mitk::DataNode::Pointer>)));
-    connect(m_Controls.inputNodeSelector, SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)), this, SLOT(OnInputNodeSelectionChanged(QList<mitk::DataNode::Pointer>)));
-    connect(m_Controls.referenceNodeSelector, SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)), this, SLOT(OnReferenceNodeSelectionChanged(QList<mitk::DataNode::Pointer>)));
+    connect(m_Controls.registrationNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointMapper::OnRegNodeSelectionChanged);
+    connect(m_Controls.inputNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointMapper::OnInputNodeSelectionChanged);
+    connect(m_Controls.referenceNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointMapper::OnReferenceNodeSelectionChanged);
 
     connect(m_Controls.m_cbManualRef, SIGNAL(clicked()), this, SLOT(OnManualRefChecked()));
     connect(m_Controls.m_cbLinkFactors, SIGNAL(clicked()), this, SLOT(OnLinkSampleFactorChecked()));

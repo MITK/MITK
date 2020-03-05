@@ -163,7 +163,8 @@ unsigned int QmitkDataSelectionWidget::AddDataSelection(const QString &labelText
   nodeSelection->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
   nodeSelection->setMinimumSize(0, 40);
 
-  connect(nodeSelection, SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)), this, SLOT(OnSelectionChanged(QList<mitk::DataNode::Pointer>)));
+  connect(nodeSelection, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkDataSelectionWidget::OnSelectionChanged);
+
   m_Controls.gridLayout->addWidget(nodeSelection, row, 1);
 
   m_NodeSelectionWidgets.push_back(nodeSelection);

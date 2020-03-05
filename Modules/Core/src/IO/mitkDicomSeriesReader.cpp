@@ -165,13 +165,12 @@ DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames,
   return false;
 }
 
-// TODO: REMOVE
 bool
 DicomSeriesReader::IsDicom(const std::string &filename)
 {
-  DcmIoType::Pointer io = DcmIoType::New();
-
-  return io->CanReadFile(filename.c_str());
+  DcmFileFormat ff;
+  ff.loadFile(OFFilename(filename,OFFalse));
+  return ImageBlockDescriptor(filename, ff).good();
 }
 
 bool
@@ -454,7 +453,7 @@ std::shared_ptr<mitk::DicomSeriesReader::ImageBlockDescriptor> DicomSeriesReader
 
 DicomSeriesReader::FileNamesGrouping::iterator DicomSeriesReader::FileNamesGrouping::addFile(std::shared_ptr<ImageBlockDescriptor> descriptor, DcmFileFormat* ff, bool loadImageData)
 {
-  if (!descriptor->good() || loadImageData && descriptor->loadImage(*ff)) {
+  if (!descriptor->good() || loadImageData && !descriptor->loadImage(*ff)) {
     return end();
   }
   auto key = descriptor->sortingKey();
@@ -1109,18 +1108,6 @@ std::string DicomSeriesReader::GetStandardCharSet(std::string dicomCharset)
 void DicomSeriesReader::LoadDicom(DataNode &node, bool load4D, bool correctTilt, UpdateCallBackMethod callback, void *source, Image::Pointer preLoadedImageBlock, DicomSeriesReader::ImageBlockDescriptor& descriptor)
 {
   mitk::LocaleSwitch localeSwitch("C");
-  struct LocaleSwitcher {
-    std::locale previousCppLocale;
-    LocaleSwitcher() : previousCppLocale(std::cin.getloc())
-    {
-      std::locale l( "C" );
-      std::cin.imbue(l);
-    }
-    ~LocaleSwitcher()
-    {
-      std::cin.imbue(previousCppLocale);
-    }
-  } localeSwitcher;
 
   try
   {

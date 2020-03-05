@@ -265,18 +265,18 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
     // get the connected image data node/mask data node
     auto imageRule = mitk::StatisticsToImageRelationRule::New();
     auto imageOfStatisticsPredicate = imageRule->GetDestinationsDetector(statistic);
-    auto imageFinding = std::find_if(m_ImageNodes.begin(), m_ImageNodes.end(), [imageOfStatisticsPredicate](const mitk::DataNode::ConstPointer& testNode) { return imageOfStatisticsPredicate->CheckNode(testNode); });
+    auto imageFinding = std::find_if(m_ImageNodes.begin(), m_ImageNodes.end(), [&imageOfStatisticsPredicate](const mitk::DataNode::ConstPointer& testNode) { return imageOfStatisticsPredicate->CheckNode(testNode); });
 
     auto maskRule = mitk::StatisticsToMaskRelationRule::New();
     auto maskOfStatisticsPredicate = maskRule->GetDestinationsDetector(statistic);
-    auto maskFinding = std::find_if(m_MaskNodes.begin(), m_MaskNodes.end(), [maskOfStatisticsPredicate](const mitk::DataNode::ConstPointer& testNode) { return maskOfStatisticsPredicate->CheckNode(testNode); });
+    auto maskFinding = std::find_if(m_MaskNodes.begin(), m_MaskNodes.end(), [&maskOfStatisticsPredicate](const mitk::DataNode::ConstPointer& testNode) { return maskOfStatisticsPredicate->CheckNode(testNode); });
 
     if (imageFinding == m_ImageNodes.end())
     {
       mitkThrow() << "no image found connected to statistic" << statistic << " Aborting.";
     }
 
-    auto image = *imageFinding;
+    auto& image = *imageFinding;
 
     // image: 1. hierarchy level
     QmitkImageStatisticsTreeItem *imageItem = nullptr;
@@ -307,7 +307,7 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
     QmitkImageStatisticsTreeItem *lastParent = nullptr;
     if (maskFinding != m_MaskNodes.end())
     {
-      auto mask = *maskFinding;
+      auto& mask = *maskFinding;
       QString maskLabel = QString::fromStdString(mask->GetName());
       QmitkImageStatisticsTreeItem *maskItem;
       // add statistical values directly in this hierarchy level

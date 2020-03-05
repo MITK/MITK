@@ -69,6 +69,8 @@ QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString titl
   m_Controls.hint->setText(hint);
   m_Controls.hint->setVisible(!hint.isEmpty());
 
+  m_Controls.error->setVisible(false);
+
   m_FavoriteNodesButton = new QPushButton("Add to favorites");
   m_Controls.buttonBox->addButton(m_FavoriteNodesButton, QDialogButtonBox::ActionRole);
 
@@ -121,8 +123,8 @@ void QmitkNodeSelectionDialog::SetSelectionCheckFunction(const SelectionCheckFun
   m_CheckFunction = checkFunction;
   auto checkResponse = m_CheckFunction(m_SelectedNodes);
 
-  m_Controls.hint->setText(QString::fromStdString(checkResponse));
-  m_Controls.hint->setVisible(!checkResponse.empty());
+  m_Controls.error->setText(QString::fromStdString(checkResponse));
+  m_Controls.error->setVisible(!checkResponse.empty());
   m_Controls.buttonBox->button(QDialogButtonBox::Ok)->setEnabled(checkResponse.empty());
 }
 
@@ -163,8 +165,8 @@ void QmitkNodeSelectionDialog::SetCurrentSelection(NodeList selectedNodes)
   m_SelectedNodes = selectedNodes;
   auto checkResponse = m_CheckFunction(m_SelectedNodes);
 
-  m_Controls.hint->setText(QString::fromStdString(checkResponse));
-  m_Controls.hint->setVisible(!checkResponse.empty());
+  m_Controls.error->setText(QString::fromStdString(checkResponse));
+  m_Controls.error->setVisible(!checkResponse.empty());
   m_Controls.buttonBox->button(QDialogButtonBox::Ok)->setEnabled(checkResponse.empty());
 
   for (auto panel : m_Panels)

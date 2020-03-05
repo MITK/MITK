@@ -557,7 +557,7 @@ QmitkNodeSelectionDialog::SelectionCheckFunctionType QmitkImageStatisticsView::C
     if (imageNodeData == nullptr)
     {
       std::stringstream ss;
-      ss << "<font class=\"warning\"><p>Select at least one image.</p>";
+      ss << "<font class=\"warning\"><p>Select at least one image.</p></font>";
       return ss.str();
     }
 
@@ -586,7 +586,7 @@ QmitkNodeSelectionDialog::SelectionCheckFunctionType QmitkImageStatisticsView::C
         {
           std::stringstream ss;
           ss << "<font class=\"warning\"><p>Invalid selection: All selected nodes must have the same geometry.</p><p>Differing node i.a.: \"";
-          ss << rightNode->GetName() <<"\"</p>";
+          ss << rightNode->GetName() <<"\"</p></font>";
           return ss.str();
         }
       }

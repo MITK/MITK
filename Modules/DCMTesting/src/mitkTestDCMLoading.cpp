@@ -69,9 +69,8 @@ mitk::TestDCMLoading::ImageList mitk::TestDCMLoading::LoadFiles( const StringCon
 
   ImageList result;
 
-  DicomSeriesReader::FileNamesGrouping seriesInFiles = DicomSeriesReader::GetSeries( files);
+  DicomSeriesReader::FileNamesGrouping seriesInFiles = DicomSeriesReader::GetSeries(files);
 
-  // TODO sort series UIDs, implementation of map iterator might differ on different platforms (or verify this is a standard topic??)
   for (DicomSeriesReader::FileNamesGrouping::const_iterator seriesIter = seriesInFiles.begin();
        seriesIter != seriesInFiles.end();
        ++seriesIter)

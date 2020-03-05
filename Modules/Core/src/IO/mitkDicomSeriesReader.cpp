@@ -452,9 +452,9 @@ std::shared_ptr<mitk::DicomSeriesReader::ImageBlockDescriptor> DicomSeriesReader
   return std::make_shared<ImageBlockDescriptor>(file, ff, fileSize);
 }
 
-DicomSeriesReader::FileNamesGrouping::iterator DicomSeriesReader::FileNamesGrouping::addFile(std::shared_ptr<ImageBlockDescriptor> descriptor, DcmFileFormat* ff)
+DicomSeriesReader::FileNamesGrouping::iterator DicomSeriesReader::FileNamesGrouping::addFile(std::shared_ptr<ImageBlockDescriptor> descriptor, DcmFileFormat* ff, bool loadImageData)
 {
-  if (!descriptor->good()) {
+  if (!descriptor->good() || loadImageData && descriptor->loadImage(*ff)) {
     return end();
   }
   auto key = descriptor->sortingKey();
@@ -757,7 +757,7 @@ void Stream::TaskGroup::sigBusHandler(int)
 }
 #endif
 
-void DicomSeriesReader::GetSeries(DicomSeriesReader::FileNamesGrouping& result, const StringContainer& files, volatile bool* interrupt)
+void DicomSeriesReader::GetSeries(DicomSeriesReader::FileNamesGrouping& result, const StringContainer& files, volatile bool* interrupt, bool loadImageData)
 {
   /**
     assumption about this method:
@@ -792,7 +792,7 @@ void DicomSeriesReader::GetSeries(DicomSeriesReader::FileNamesGrouping& result, 
 
     auto file = files[i];
 
-    getSeries.Enqueue(i, file, [&result, file] (Stream& fd) {
+    getSeries.Enqueue(i, file, [&result, file, loadImageData] (Stream& fd) {
       // Read file and add data to new or existed image
       DcmInputBufferStream fileStream;
       fileStream.setBuffer(fd.data(), fd.size());
@@ -810,7 +810,7 @@ void DicomSeriesReader::GetSeries(DicomSeriesReader::FileNamesGrouping& result, 
       }
 
       if(r.good()) {
-        result.addFile(result.makeBlockDescriptorPtr(file, ff, fd.size()), &ff);
+        result.addFile(result.makeBlockDescriptorPtr(file, ff, fd.size()), &ff, loadImageData);
       } else {
         //MITK_ERROR << "DICOM file \"" << file << "\" parse failed: "<< r.text();
       }
@@ -830,7 +830,7 @@ DicomSeriesReader::GetSeries(const std::string &dir)
   gdcm::Directory directoryLister;
   directoryLister.Load( dir.c_str(), false ); // non-recursive
   DicomSeriesReader::FileNamesGrouping result;
-  GetSeries(result, directoryLister.GetFilenames());
+  GetSeries(result, directoryLister.GetFilenames(), nullptr, true);
   return result;
 }
 

@@ -152,7 +152,7 @@ public:
    * \sa UpdateData1D
    * \sa AddData2D
    */
-  void UpdateData2D(const std::map<double, double> &data2D, const std::string &label);
+  void UpdateData2D(const std::vector< std::pair<double, double> > &data2D, const std::string &label);
 
   /*!
   * \brief Adds 2D data to the widget. Call repeatedly for displaying multiple charts.
@@ -164,19 +164,19 @@ public:
   * \warning Pie chart is significantly different than the other chart types. Here, the data given by AddData1D is summed. Each entry represents a different category.
   */
 
-  void UpdateChartExampleData(const std::map<double, double>& data2D,
+  void UpdateChartExampleData(const std::vector< std::pair<double, double> >& data2D,
                               const std::string& label,
                               const std::string& type,
                               const std::string& color,
                               const std::string& lineStyle,
                               const std::string& pieLabelsData = 0);
 
-  void AddData2D(const std::map<double, double> &data2D,
+  void AddData2D(const std::vector< std::pair<double, double> > &data2D,
                  const std::string &label,
                  ChartType chartType = ChartType::bar);
 
   //Add Function for the ChartExample
-  void AddChartExampleData(const std::map<double, double>& data2D,
+  void AddChartExampleData(const std::vector< std::pair<double, double> >& data2D,
                            const std::string& label,
                            const std::string& type,
                            const std::string& color,

@@ -56,7 +56,7 @@ namespace mitk
         QmitkChartWidget::LineStyle ReturnChartStyleByString(std::string chartStyleString);
 
         void Add(int dataSet);
-        std::map<double, double> ToStdMap(QVariantList xData, QVariantList yData);
+        std::vector<std::pair<double, double> > ToStdPairList(QVariantList xData, QVariantList yData);
         void ClearMemory();
 
     }; // end ChartExampleTestHelper

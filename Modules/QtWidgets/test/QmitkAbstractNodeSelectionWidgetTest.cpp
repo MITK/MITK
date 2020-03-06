@@ -18,6 +18,9 @@ found in the LICENSE file.
 
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
+#include <mitkRenderingTestHelper.h>
+
+extern std::vector<std::string> globalCmdLineArgs;
 
 class TestWidget : public QmitkAbstractNodeSelectionWidget
 {
@@ -131,8 +134,9 @@ public:
     m_DataStorage->Add(m_Node3);
     m_DataStorage->Add(m_Node1_2);
 
-    int argc = 0;
-    char** argv = nullptr;
+    mitk::RenderingTestHelper::ArgcHelperClass cmdLineArgs(globalCmdLineArgs);
+    auto argc = cmdLineArgs.GetArgc();
+    auto argv = cmdLineArgs.GetArgv();
     m_TestApp = new QApplication(argc, argv);
   }
 

@@ -31,7 +31,7 @@ void QmitkHistogramVisualizationWidget::SetHistogram(itk::Statistics::Histogram<
 		return;
 
 	m_Histogram = histogram;
-	m_Controls.chartWidget->AddData2D(ConvertHistogramToMap(m_Histogram), dataLabel);
+  m_Controls.chartWidget->AddData2D(ConvertHistogramToPairList(m_Histogram), dataLabel);
 	m_Controls.chartWidget->SetChartType(dataLabel, QmitkChartWidget::ChartType::bar);
 	m_Controls.chartWidget->SetXAxisLabel("Gray value");
 	m_Controls.chartWidget->SetYAxisLabel("Frequency");
@@ -86,9 +86,9 @@ void QmitkHistogramVisualizationWidget::SetGUIElementsEnabled(bool enabled)
 	m_Controls.doubleSpinBoxMinValue->setEnabled(m_Controls.checkBoxViewMinMax->isChecked());
 }
 
-std::map<double, double> QmitkHistogramVisualizationWidget::ConvertHistogramToMap(itk::Statistics::Histogram<double>::ConstPointer histogram) const
+std::vector< std::pair<double, double> > QmitkHistogramVisualizationWidget::ConvertHistogramToPairList(itk::Statistics::Histogram<double>::ConstPointer histogram) const
 {
-	std::map<double, double> histogramMap;
+  std::map<double, double> histogramMap;
 	if (histogram)
 	{
 		auto endIt = histogram->End();
@@ -103,7 +103,11 @@ std::map<double, double> QmitkHistogramVisualizationWidget::ConvertHistogramToMa
 		}
 
 	}
-	return histogramMap;
+  std::vector< std::pair<double, double> > histogram_list;
+  for(auto iter = histogramMap.begin(); iter != histogramMap.end(); ++iter)
+    histogram_list.push_back( std::pair<double, double>(iter->first, iter->second) );
+
+  return histogram_list;
 }
 
 void QmitkHistogramVisualizationWidget::OnClipboardButtonClicked()

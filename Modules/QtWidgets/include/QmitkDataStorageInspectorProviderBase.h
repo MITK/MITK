@@ -36,9 +36,12 @@ class QmitkDataStorageInspectorProviderBase : public mitk::IDataStorageInspector
 public:
   QmitkAbstractDataStorageInspector* CreateInspector() const override;
 
-  std::string GetInspectorID() const override;
+  using InspectorIDType = mitk::IDataStorageInspectorProvider::InspectorIDType;
+
+  InspectorIDType GetInspectorID() const override;
   std::string GetInspectorDisplayName() const override;
   std::string GetInspectorDescription() const override;
+  QIcon GetInspectorIcon() const override;
 
   us::ServiceRegistration<mitk::IDataStorageInspectorProvider> RegisterService(
     us::ModuleContext *context = us::GetModuleContext());
@@ -46,7 +49,7 @@ public:
   void UnregisterService();
 
   QmitkDataStorageInspectorProviderBase(const std::string& id);
-  QmitkDataStorageInspectorProviderBase(const std::string& id, const std::string& displayName, const std::string& desc= "" );
+  QmitkDataStorageInspectorProviderBase(const std::string& id, const std::string& displayName, const std::string& desc = "", const std::string& pathToIconSVG = "");
   ~QmitkDataStorageInspectorProviderBase() override;
 
 protected:

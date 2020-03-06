@@ -124,22 +124,6 @@ void QmitkSegmentationView::NewNodeObjectsGenerated(mitk::ToolManager::DataVecto
    }
 }
 
-void QmitkSegmentationView::Visible()
-{
-}
-
-void QmitkSegmentationView::Hidden()
-{
-}
-
-void QmitkSegmentationView::Activated()
-{
-}
-
-void QmitkSegmentationView::Deactivated()
-{
-}
-
 void QmitkSegmentationView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
 {
   if (m_RenderWindowPart != renderWindowPart)
@@ -379,7 +363,7 @@ void QmitkSegmentationView::OnPatientSelectionChanged(QList<mitk::DataNode::Poin
       this->SetToolManagerSelection(node, segNode);
       if (segNode)
       {
-        //Doing this we can assure that the segmenation is always visible if the segmentation and the patient image are
+        //Doing this we can assure that the segmentation is always visible if the segmentation and the patient image are
         //loaded separately
         int layer(10);
         node->GetIntProperty("layer", layer);
@@ -821,21 +805,21 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    // all part of open source MITK
    m_Controls->m_ManualToolSelectionBox2D->setEnabled(true);
    m_Controls->m_ManualToolSelectionBox2D->SetGenerateAccelerators(true);
-   m_Controls->m_ManualToolSelectionBox2D->SetToolGUIArea( m_Controls->m_ManualToolGUIContainer2D );
+   m_Controls->m_ManualToolSelectionBox2D->SetToolGUIArea(m_Controls->m_ManualToolGUIContainer2D);
 
    m_Controls->m_ManualToolSelectionBox2D->SetDisplayedToolGroups(segTools2D.toStdString());
    m_Controls->m_ManualToolSelectionBox2D->SetLayoutColumns(3);
-   m_Controls->m_ManualToolSelectionBox2D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
-   connect( m_Controls->m_ManualToolSelectionBox2D, SIGNAL(ToolSelected(int)), this, SLOT(OnManualTool2DSelected(int)) );
+   m_Controls->m_ManualToolSelectionBox2D->SetEnabledMode(QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible);
+   connect(m_Controls->m_ManualToolSelectionBox2D, &QmitkToolSelectionBox::ToolSelected, this, &QmitkSegmentationView::OnManualTool2DSelected);
 
    //setup 3D Tools
    m_Controls->m_ManualToolSelectionBox3D->setEnabled(true);
    m_Controls->m_ManualToolSelectionBox3D->SetGenerateAccelerators(true);
-   m_Controls->m_ManualToolSelectionBox3D->SetToolGUIArea( m_Controls->m_ManualToolGUIContainer3D );
+   m_Controls->m_ManualToolSelectionBox3D->SetToolGUIArea(m_Controls->m_ManualToolGUIContainer3D);
    //specify tools to be added to 3D Tool area
    m_Controls->m_ManualToolSelectionBox3D->SetDisplayedToolGroups(segTools3D.toStdString());
    m_Controls->m_ManualToolSelectionBox3D->SetLayoutColumns(3);
-   m_Controls->m_ManualToolSelectionBox3D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
+   m_Controls->m_ManualToolSelectionBox3D->SetEnabledMode(QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible);
 
    //Hide 3D selection box, show 2D selection box
    m_Controls->m_ManualToolSelectionBox3D->hide();
@@ -845,12 +829,12 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    toolManager->NewNodeObjectsGenerated += mitk::MessageDelegate1<QmitkSegmentationView, mitk::ToolManager::DataVectorType*>(this, &QmitkSegmentationView::NewNodeObjectsGenerated);
 
    // create signal/slot connections
-   connect(m_Controls->patImageSelector, SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)), this, SLOT(OnPatientSelectionChanged(QList<mitk::DataNode::Pointer>)));
-   connect(m_Controls->segImageSelector, SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)), this, SLOT(OnSegmentationSelectionChanged(QList<mitk::DataNode::Pointer>)));
+   connect(m_Controls->patImageSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkSegmentationView::OnPatientSelectionChanged);
+   connect(m_Controls->segImageSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkSegmentationView::OnSegmentationSelectionChanged);
 
-   connect(m_Controls->btnNewSegmentation, SIGNAL(clicked()), this, SLOT(CreateNewSegmentation()));
-   connect(m_Controls->tabWidgetSegmentationTools, SIGNAL(currentChanged(int)), this, SLOT(OnTabWidgetChanged(int)));
-   connect(m_Controls->m_SlicesInterpolator, SIGNAL(SignalShowMarkerNodes(bool)), this, SLOT(OnShowMarkerNodes(bool)));
+   connect(m_Controls->btnNewSegmentation, &QToolButton::clicked, this, &QmitkSegmentationView::CreateNewSegmentation);
+   connect(m_Controls->tabWidgetSegmentationTools, &QTabWidget::currentChanged, this, &QmitkSegmentationView::OnTabWidgetChanged);
+   connect(m_Controls->m_SlicesInterpolator, &QmitkSlicesInterpolator::SignalShowMarkerNodes, this, &QmitkSegmentationView::OnShowMarkerNodes);
 
    // set callback function for already existing nodes (images & segmentations)
    mitk::DataStorage::SetOfObjects::ConstPointer allImages = GetDataStorage()->GetSubset(m_IsOfTypeImagePredicate);

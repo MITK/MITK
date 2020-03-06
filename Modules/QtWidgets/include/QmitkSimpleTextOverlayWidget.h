@@ -14,12 +14,12 @@ found in the LICENSE file.
 #define QMITK_SIMPLE_TEXT_OVERLAY_WIDGET_H
 
 #include "QmitkOverlayWidget.h"
-#include "org_mitk_gui_qt_common_Export.h"
+#include <MitkQtWidgetsExports.h>
 
 /** Simple overlay that renders a passed string.
  You may pass an html string that will be rendered accordingly
  respecting the current application style sheet.*/
-class MITK_QT_COMMON QmitkSimpleTextOverlayWidget : public QmitkOverlayWidget
+class MITKQTWIDGETS_EXPORT QmitkSimpleTextOverlayWidget : public QmitkOverlayWidget
 {
   Q_OBJECT
   Q_PROPERTY(QString overlayText READ GetOverlayText WRITE SetOverlayText)

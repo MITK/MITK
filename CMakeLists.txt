@@ -209,6 +209,38 @@ mark_as_advanced(
 set(MITK_CUSTOM_REVISION_DESC "" CACHE STRING "Override MITK revision description")
 mark_as_advanced(MITK_CUSTOM_REVISION_DESC)
 
+#-----------------------------------------------------------------------------
+# Build configurations
+#-----------------------------------------------------------------------------
+
+set(_buildConfigs "Custom")
+
+file(GLOB _buildConfigFiles CMake/BuildConfigurations/*.cmake)
+
+foreach(_buildConfigFile ${_buildConfigFiles})
+  get_filename_component(_buildConfigFile ${_buildConfigFile} NAME_WE)
+  list(APPEND _buildConfigs ${_buildConfigFile})
+endforeach()
+
+foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
+  file(GLOB _extBuildConfigFiles ${MITK_EXTENSION_DIR}/CMake/BuildConfigurations/*.cmake)
+
+  foreach(_extBuildConfigFile ${_extBuildConfigFiles})
+    get_filename_component(_extBuildConfigFile ${_extBuildConfigFile} NAME_WE)
+    list(APPEND _buildConfigs ${_extBuildConfigFile})
+  endforeach()
+
+  list(REMOVE_DUPLICATES _buildConfigs)
+endforeach()
+
+set(MITK_BUILD_CONFIGURATION "Custom" CACHE STRING "Use pre-defined MITK configurations")
+set_property(CACHE MITK_BUILD_CONFIGURATION PROPERTY STRINGS ${_buildConfigs})
+
+mitkFunctionEnableBuildConfiguration()
+
+mitkFunctionCreateWhitelistPaths(MITK)
+mitkFunctionFindWhitelists(MITK)
+
 # -----------------------------------------
 # Qt version related variables
 
@@ -300,38 +332,6 @@ option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
 option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
 option(MITK_USE_OpenMP "Use OpenMP" OFF)
 option(MITK_USE_Python3 "Use Python 3" OFF)
-
-#-----------------------------------------------------------------------------
-# Build configurations
-#-----------------------------------------------------------------------------
-
-set(_buildConfigs "Custom")
-
-file(GLOB _buildConfigFiles CMake/BuildConfigurations/*.cmake)
-
-foreach(_buildConfigFile ${_buildConfigFiles})
-  get_filename_component(_buildConfigFile ${_buildConfigFile} NAME_WE)
-  list(APPEND _buildConfigs ${_buildConfigFile})
-endforeach()
-
-foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
-  file(GLOB _extBuildConfigFiles ${MITK_EXTENSION_DIR}/CMake/BuildConfigurations/*.cmake)
-
-  foreach(_extBuildConfigFile ${_extBuildConfigFiles})
-    get_filename_component(_extBuildConfigFile ${_extBuildConfigFile} NAME_WE)
-    list(APPEND _buildConfigs ${_extBuildConfigFile})
-  endforeach()
-
-  list(REMOVE_DUPLICATES _buildConfigs)
-endforeach()
-
-set(MITK_BUILD_CONFIGURATION "Custom" CACHE STRING "Use pre-defined MITK configurations")
-set_property(CACHE MITK_BUILD_CONFIGURATION PROPERTY STRINGS ${_buildConfigs})
-
-mitkFunctionEnableBuildConfiguration()
-
-mitkFunctionCreateWhitelistPaths(MITK)
-mitkFunctionFindWhitelists(MITK)
 
 # -----------------------------------------
 # Custom dependency logic

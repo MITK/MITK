@@ -258,26 +258,28 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
   bool hasMask = false;
   bool hasMultipleTimesteps = false;
 
-  std::map<mitk::DataNode::Pointer, QmitkImageStatisticsTreeItem *> dataNodeToTreeItem;
+  std::map<mitk::DataNode::ConstPointer, QmitkImageStatisticsTreeItem *> dataNodeToTreeItem;
 
   for (auto statistic : m_Statistics)
   {
     // get the connected image data node/mask data node
     auto imageRule = mitk::StatisticsToImageRelationRule::New();
     auto imageOfStatisticsPredicate = imageRule->GetDestinationsDetector(statistic);
-    auto imageCandidates = this->GetDataStorage()->GetSubset(imageOfStatisticsPredicate);
+    auto imageFinding = std::find_if(m_ImageNodes.begin(), m_ImageNodes.end(), [&imageOfStatisticsPredicate](const mitk::DataNode::ConstPointer& testNode) { return imageOfStatisticsPredicate->CheckNode(testNode); });
 
     auto maskRule = mitk::StatisticsToMaskRelationRule::New();
     auto maskOfStatisticsPredicate = maskRule->GetDestinationsDetector(statistic);
-    auto maskCandidates = this->GetDataStorage()->GetSubset(maskOfStatisticsPredicate);
+    auto maskFinding = std::find_if(m_MaskNodes.begin(), m_MaskNodes.end(), [&maskOfStatisticsPredicate](const mitk::DataNode::ConstPointer& testNode) { return maskOfStatisticsPredicate->CheckNode(testNode); });
 
-    if (imageCandidates->empty())
+    if (imageFinding == m_ImageNodes.end())
     {
       mitkThrow() << "no image found connected to statistic" << statistic << " Aborting.";
     }
-    auto image = imageCandidates->front();
+
+    auto& image = *imageFinding;
+
     // image: 1. hierarchy level
-    QmitkImageStatisticsTreeItem *imageItem;
+    QmitkImageStatisticsTreeItem *imageItem = nullptr;
     auto search = dataNodeToTreeItem.find(image);
     // the tree item was created previously
     if (search != dataNodeToTreeItem.end())
@@ -288,7 +290,7 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
     else
     {
       QString imageLabel = QString::fromStdString(image->GetName());
-      if (statistic->GetTimeSteps() == 1 && maskCandidates->empty())
+      if (statistic->GetTimeSteps() == 1 && maskFinding == m_MaskNodes.end())
       {
         auto statisticsObject = statistic->GetStatisticsForTimeStep(0);
         imageItem = new QmitkImageStatisticsTreeItem(statisticsObject, m_StatisticNames, imageLabel, m_RootItem);
@@ -302,10 +304,10 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
     }
 
     // mask: 2. hierarchy level (optional, only if mask exists)
-    QmitkImageStatisticsTreeItem *lastParent;
-    if (!maskCandidates->empty())
+    QmitkImageStatisticsTreeItem *lastParent = nullptr;
+    if (maskFinding != m_MaskNodes.end())
     {
-      auto mask = maskCandidates->front();
+      auto& mask = *maskFinding;
       QString maskLabel = QString::fromStdString(mask->GetName());
       QmitkImageStatisticsTreeItem *maskItem;
       // add statistical values directly in this hierarchy level

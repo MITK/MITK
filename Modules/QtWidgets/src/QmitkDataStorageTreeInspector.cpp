@@ -25,9 +25,15 @@ QmitkDataStorageTreeInspector::QmitkDataStorageTreeInspector(QWidget* parent/* =
   m_Controls.view->setHeaderHidden(true);
   m_Controls.view->setTextElideMode(Qt::ElideMiddle);
 
+  m_Overlay = new QmitkSimpleTextOverlayWidget(this);
+  m_Overlay->setVisible(false);
+  m_Overlay->SetOverlayText(QStringLiteral("<font class=\"normal\"><p style=\"text-align:center\">No suitable data available in data storage.</p></center></font>"));
+
   m_StorageModel = new QmitkDataStorageSimpleTreeModel(this);
 
   m_Controls.view->setModel(m_StorageModel);
+
+  connect(m_StorageModel, &QAbstractItemModel::modelReset, this, &QmitkDataStorageTreeInspector::OnModelReset);
 }
 
 QAbstractItemView* QmitkDataStorageTreeInspector::GetView()
@@ -58,4 +64,9 @@ void QmitkDataStorageTreeInspector::SetSelectionMode(SelectionMode mode)
 QmitkDataStorageTreeInspector::SelectionMode QmitkDataStorageTreeInspector::GetSelectionMode() const
 {
   return m_Controls.view->selectionMode();
+}
+
+void QmitkDataStorageTreeInspector::OnModelReset()
+{
+  m_Overlay->setVisible(!m_StorageModel->hasChildren());
 }

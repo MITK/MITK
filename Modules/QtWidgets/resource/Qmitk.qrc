@@ -16,5 +16,11 @@
 		<file>mwDesynchronized.png</file>
 		<file>mwMITK.png</file>
 		<file>mwPACS.png</file>
-    </qresource>
+		<file>star-solid.svg</file>
+		<file>history-solid.svg</file>
+		<file>tree_inspector.svg</file>
+		<file>list-solid.svg</file>
+		<file>favorite_add.svg</file>
+		<file>favorite_remove.svg</file>
+	</qresource>
 </RCC>

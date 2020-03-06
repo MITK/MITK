@@ -15,8 +15,9 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
-#include <QmitkAbstractDataStorageInspector.h>
+#include "QmitkAbstractDataStorageInspector.h"
 #include <QSortFilterProxyModel>
+#include "QmitkSimpleTextOverlayWidget.h"
 
 #include "ui_QmitkDataStorageSelectionHistoryInspector.h"
 
@@ -39,11 +40,17 @@ public:
   static void AddNodeToHistory(mitk::DataNode* node);
   static void ResetHistory();
 
+  constexpr static const char* INSPECTOR_ID()
+  {
+    return "org.mitk.QmitkDataStorageSelectionHistoryInspector";
+  };
+
 protected:
   void Initialize() override;
 
   QmitkAbstractDataStorageModel* m_StorageModel;
   Ui_QmitkDataStorageSelectionHistoryInspector m_Controls;
+  QmitkSimpleTextOverlayWidget* m_Overlay;
 };
 
 #endif // QMITKDATASTORAGESELECTIONHISTORYINSPECTOR_H

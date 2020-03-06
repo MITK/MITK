@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkDataStorage.h>
 #include <mitkWeakPointer.h>
 #include <mitkNodePredicateBase.h>
+#include "mitkIDataStorageInspectorProvider.h"
 
 #include <QmitkAbstractDataStorageInspector.h>
 
@@ -119,7 +120,8 @@ protected Q_SLOTS:
   void OnCancel();
 
 protected:
-  void AddPanel(QmitkAbstractDataStorageInspector* view, QString name, QString desc);
+
+  void AddPanel(const mitk::IDataStorageInspectorProvider* provider, const mitk::IDataStorageInspectorProvider::InspectorIDType &preferredID, bool &preferredFound, int &preferredIndex);
 
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
   mitk::NodePredicateBase::ConstPointer m_NodePredicate;

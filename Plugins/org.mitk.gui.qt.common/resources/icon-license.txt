@@ -1,0 +1,2 @@
+See [Font Awsome 4] in Licenses/ICONS.md for:
+- times.svg

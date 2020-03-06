@@ -1,0 +1,10 @@
+/**
+  \defgroup org_mitk_gui_qt_flow_segmentation org.mitk.gui.qt.flow.segmentation
+  \ingroup MITKPlugins
+
+  Plugin introduces the perspective QmitkFlowSegmentationPerspective that is used as org.mitk.qt.flowapplication.defaultperspective for the flow application.
+  (This ensures the correct views opened for direct segmentation).
+  Further the plugin introduces the the view "Segmentation Flow Control" that can be used to easily save the segmentations.
+
+*/
+

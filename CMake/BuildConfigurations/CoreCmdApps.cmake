@@ -1,0 +1,7 @@
+include(${CMAKE_CURRENT_LIST_DIR}/Minimal.cmake)
+
+set(MITK_WHITELIST "CoreCmdApps" CACHE STRING "" FORCE)
+
+if(NOT MITK_USE_SUPERBUILD)
+  set(BUILD_CoreCmdApps ON CACHE BOOL "" FORCE)
+endif()

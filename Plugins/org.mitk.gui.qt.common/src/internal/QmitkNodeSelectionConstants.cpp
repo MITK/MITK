@@ -14,5 +14,7 @@ found in the LICENSE file.
 
 const std::string mitk::NodeSelectionConstants::ROOT_PREFERENCE_NODE_ID = "/NODESELECTION/UI";
 const std::string mitk::NodeSelectionConstants::VISIBLE_INSPECTORS_NODE_ID = "visibleInspectors";
-const std::string mitk::NodeSelectionConstants::FAVORITE_INSPECTOR_ID = "inspectorID";
+const std::string mitk::NodeSelectionConstants::PREFERRED_INSPECTOR_ID = "inspectorID";
 const std::string mitk::NodeSelectionConstants::VISIBLE_INSPECTOR_ID = "inspectorID";
+const std::string mitk::NodeSelectionConstants::SHOW_FAVORITE_INSPECTOR = "showFavoriteInspector";
+const std::string mitk::NodeSelectionConstants::SHOW_HISTORY_INSPECTOR = "showHistoryInspector";

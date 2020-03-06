@@ -12,7 +12,6 @@ set(SRC_CPP_FILES
   QmitkMultiWidgetDecorationManager.cpp
   QmitkNodeSelectionPreferenceHelper.cpp
   QmitkNodeSelectionButton.cpp
-  QmitkSimpleTextOverlayWidget.cpp
 )
 
 set(INTERNAL_CPP_FILES
@@ -43,7 +42,6 @@ set(MOC_H_FILES
   src/QmitkNodeSelectionDialog.h
   src/QmitkMultiNodeSelectionWidget.h
   src/QmitkNodeSelectionButton.h
-  src/QmitkSimpleTextOverlayWidget.h
   src/internal/QmitkCommonActivator.h
   src/internal/QmitkNodeSelectionPreferencePage.h
   src/internal/QmitkNodeSelectionListItemWidget.h

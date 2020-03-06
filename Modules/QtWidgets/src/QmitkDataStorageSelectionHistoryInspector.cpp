@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include <QmitkDataStorageSelectionHistoryInspector.h>
 
-#include <QmitkDataStorageHistoryModel.h>
+#include "QmitkDataStorageHistoryModel.h"
 
 QmitkDataStorageSelectionHistoryInspector::QmitkDataStorageSelectionHistoryInspector(QWidget* parent/* = nullptr*/)
   : QmitkAbstractDataStorageInspector(parent)
@@ -22,6 +22,10 @@ QmitkDataStorageSelectionHistoryInspector::QmitkDataStorageSelectionHistoryInspe
   m_Controls.view->setSelectionMode(QAbstractItemView::ExtendedSelection);
   m_Controls.view->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_Controls.view->setAlternatingRowColors(true);
+
+  m_Overlay = new QmitkSimpleTextOverlayWidget(this);
+  m_Overlay->setVisible(false);
+  m_Overlay->SetOverlayText(QStringLiteral("<font class=\"normal\"><p style=\"text-align:center\">No history available yet.</p></center></font>"));
 
   m_StorageModel = new QmitkDataStorageHistoryModel(this);
 
@@ -44,6 +48,8 @@ void QmitkDataStorageSelectionHistoryInspector::Initialize()
   m_StorageModel->SetNodePredicate(m_NodePredicate);
 
   m_Connector->SetView(m_Controls.view);
+
+  m_Overlay->setVisible(m_StorageModel->rowCount() == 0);
 }
 
 void QmitkDataStorageSelectionHistoryInspector::SetSelectionMode(SelectionMode mode)

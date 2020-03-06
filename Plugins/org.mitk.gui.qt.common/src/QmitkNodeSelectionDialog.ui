@@ -21,7 +21,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
-    <number>5</number>
+    <number>0</number>
    </property>
    <property name="leftMargin">
     <number>0</number>
@@ -36,7 +36,7 @@
     <number>0</number>
    </property>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_2">
+    <layout class="QVBoxLayout" name="layoutHint">
      <property name="leftMargin">
       <number>6</number>
      </property>
@@ -44,6 +44,9 @@
       <number>6</number>
      </property>
      <property name="rightMargin">
+      <number>6</number>
+     </property>
+     <property name="bottomMargin">
       <number>6</number>
      </property>
      <item>
@@ -78,24 +81,12 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QPushButton" name="btnAddToFav">
-       <property name="toolTip">
-        <string>Add the current selection to the favorites.</string>
-       </property>
-       <property name="text">
-        <string>Add to favorites</string>
-       </property>
-      </widget>
-   </item>
-   <item>
-    <layout class="QVBoxLayout" name="verticalLayout_3">
+    <layout class="QVBoxLayout" name="layoutError">
      <property name="leftMargin">
       <number>6</number>
      </property>
      <property name="topMargin">
-      <number>0</number>
+      <number>6</number>
      </property>
      <property name="rightMargin">
       <number>6</number>
@@ -111,6 +102,18 @@
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="btnAddToFav">
+       <property name="toolTip">
+        <string>Add the current selection to the favorites.</string>
+       </property>
+       <property name="text">
+        <string>Add to favorites</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QDialogButtonBox" name="buttonBox">

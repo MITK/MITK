@@ -120,6 +120,7 @@ protected Q_SLOTS:
   void OnCancel();
 
 protected:
+  void SetErrorText(const std::string& checkResponse);
 
   void AddPanel(const mitk::IDataStorageInspectorProvider* provider, const mitk::IDataStorageInspectorProvider::InspectorIDType &preferredID, bool &preferredFound, int &preferredIndex);
 

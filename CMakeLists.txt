@@ -209,6 +209,28 @@ mark_as_advanced(
 set(MITK_CUSTOM_REVISION_DESC "" CACHE STRING "Override MITK revision description")
 mark_as_advanced(MITK_CUSTOM_REVISION_DESC)
 
+set_property(GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS "")
+
+include(CMakeExternals/ExternalProjectList.cmake)
+
+foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
+  set(MITK_CMAKE_EXTERNALS_EXTENSION_DIR ${MITK_EXTENSION_DIR}/CMakeExternals)
+  get_filename_component(MITK_CMAKE_EXTERNALS_EXTENSION_DIR ${MITK_CMAKE_EXTERNALS_EXTENSION_DIR} ABSOLUTE)
+  if(EXISTS ${MITK_CMAKE_EXTERNALS_EXTENSION_DIR}/ExternalProjectList.cmake)
+    include(${MITK_CMAKE_EXTERNALS_EXTENSION_DIR}/ExternalProjectList.cmake)
+  endif()
+endforeach()
+
+# -----------------------------------------
+# Other MITK_USE_* options not related to
+# external projects build via the
+# MITK superbuild
+
+option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
+option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
+option(MITK_USE_OpenMP "Use OpenMP" OFF)
+option(MITK_USE_Python3 "Use Python 3" OFF)
+
 #-----------------------------------------------------------------------------
 # Build configurations
 #-----------------------------------------------------------------------------
@@ -310,28 +332,6 @@ if(MITK_USE_Qt5)
     message(FATAL_ERROR "Qt version ${Qt5_VERSION_MAJOR}.${Qt5_VERSION_MINOR} is not yet supported. We recommend using the latest long-term support version 5.12.x.")
   endif()
 endif()
-
-set_property(GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS "")
-
-include(CMakeExternals/ExternalProjectList.cmake)
-
-foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
-  set(MITK_CMAKE_EXTERNALS_EXTENSION_DIR ${MITK_EXTENSION_DIR}/CMakeExternals)
-  get_filename_component(MITK_CMAKE_EXTERNALS_EXTENSION_DIR ${MITK_CMAKE_EXTERNALS_EXTENSION_DIR} ABSOLUTE)
-  if(EXISTS ${MITK_CMAKE_EXTERNALS_EXTENSION_DIR}/ExternalProjectList.cmake)
-    include(${MITK_CMAKE_EXTERNALS_EXTENSION_DIR}/ExternalProjectList.cmake)
-  endif()
-endforeach()
-
-# -----------------------------------------
-# Other MITK_USE_* options not related to
-# external projects build via the
-# MITK superbuild
-
-option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
-option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
-option(MITK_USE_OpenMP "Use OpenMP" OFF)
-option(MITK_USE_Python3 "Use Python 3" OFF)
 
 # -----------------------------------------
 # Custom dependency logic

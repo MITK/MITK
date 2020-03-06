@@ -1,9 +1,9 @@
 MITK_CREATE_MODULE_TESTS()
 
 if(UNIX AND NOT APPLE)
-  set(minimum_platform "-platform minimal")
+  set(qt_platform "-platform minimal")
 else()
-  unset(minimum_platform)
+  unset(qt_platform)
 endif()
 
-mitkAddCustomModuleTest(QmitkAbstractNodeSelectionWidgetTest QmitkAbstractNodeSelectionWidgetTest ${minimum_platform})
+mitkAddCustomModuleTest(QmitkAbstractNodeSelectionWidgetTest QmitkAbstractNodeSelectionWidgetTest ${qt_platform})

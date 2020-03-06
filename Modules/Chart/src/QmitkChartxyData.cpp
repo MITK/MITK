@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include <QmitkChartxyData.h>
 
-QmitkChartxyData::QmitkChartxyData(const QList< QPair<QVariant, QVariant> > &data,
+QmitkChartxyData::QmitkChartxyData(const std::vector< std::pair<double, double> > &data,
                                    const QVariant &label,
                                    const QVariant &chartType,
                                    const QVariant &position)
@@ -21,10 +21,10 @@ QmitkChartxyData::QmitkChartxyData(const QList< QPair<QVariant, QVariant> > &dat
   SetData(data);
 }
 
-void QmitkChartxyData::SetData(const QList< QPair<QVariant, QVariant> > &data)
+void QmitkChartxyData::SetData(const std::vector< std::pair<double, double> > &data)
 {
   ClearData();
-  for (const auto &entry : data.toStdList())
+  for (const auto &entry : data)
   {
     m_XData.push_back(entry.first);
     m_YData.push_back(entry.second);

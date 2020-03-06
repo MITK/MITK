@@ -70,9 +70,9 @@ private:
   void OnShowDataPointsChanged(int newState);
   void OnShowSubchartChanged(int newState);
 
-  std::map<double, double> CreateMap(std::vector<double> keys, std::vector<double> values) const;
+  std::vector< std::pair<double, double> > CreatePairList(std::vector<double> keys, std::vector<double> values) const;
   std::string ConvertToText(std::vector<QVariant> numbers, std::string delimiter = ";") const;
-  std::string ConvertToText(std::map<double, double> numbers, std::string delimiter = ";") const;
+  std::string ConvertToText(std::vector< std::pair<double, double> > numbers, std::string delimiter = ";") const;
   std::string ConvertToText(QVariantList list, std::string delimiter = ";") const;
   std::vector<double> ConvertToDoubleVector(const QString& data, QChar delimiter = ';') const;
   std::vector<std::string> ConvertToStringVector(const QString& data, QChar delimiter = ';') const;

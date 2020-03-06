@@ -279,18 +279,13 @@ void QmitkChartWidget::Impl::AddData2D(const std::vector< std::pair<double, doub
                                        const std::string &label,
                                        QmitkChartWidget::ChartType type)
 {
-  QList< QPair<QVariant, QVariant> > data2DConverted;
-  for (const auto &aValue : data2D)
-  {
-    data2DConverted.append(QPair<QVariant, QVariant>(aValue.first, aValue.second));
-  }
   const std::string chartTypeName(m_ChartTypeToName.at(type));
 
   auto definedLabels = GetDataLabels(m_C3xyData);
   auto uniqueLabel = GetUniqueLabelName(definedLabels, label);
 
   unsigned int sizeOfC3xyData = static_cast<unsigned int>(m_C3xyData.size());
-  m_C3xyData.push_back(std::make_unique<QmitkChartxyData>(data2DConverted,
+  m_C3xyData.push_back(std::make_unique<QmitkChartxyData>(data2D,
                                                           QVariant(QString::fromStdString(uniqueLabel)),
                                                           QVariant(QString::fromStdString(chartTypeName)),
                                                           QVariant(sizeOfC3xyData)));
@@ -303,12 +298,6 @@ void QmitkChartWidget::Impl::AddChartExampleData(const std::vector< std::pair<do
                                                  const std::string& lineStyle,
                                                  const std::string& pieLabelsData)
 {
-  QList< QPair<QVariant, QVariant> > data2DConverted;
-  for (const auto& aValue : data2D)
-  {
-    data2DConverted.append(QPair<QVariant, QVariant>(aValue.first, aValue.second));
-  }
-
   auto definedLabels = GetDataLabels(m_C3xyData);
   auto uniqueLabel = GetUniqueLabelName(definedLabels, label);
   if (type == "scatter")
@@ -320,7 +309,7 @@ void QmitkChartWidget::Impl::AddChartExampleData(const std::vector< std::pair<do
 
   std::unique_ptr<QmitkChartxyData> chartData =
       std::make_unique<QmitkChartxyData>(
-        data2DConverted,
+        data2D,
         QVariant(QString::fromStdString(uniqueLabel)),
         QVariant(QString::fromStdString(type)),
         QVariant(sizeOfC3xyData));
@@ -372,14 +361,7 @@ void QmitkChartWidget::Impl::UpdateData2D(const std::vector< std::pair<double, d
 {
   auto element = GetDataElementByLabel(label);
   if (element)
-  {
-    QList< QPair<QVariant, QVariant> > data2DConverted;
-    for (const auto &aValue : data2D)
-    {
-      data2DConverted.append( QPair<QVariant, QVariant>(aValue.first, aValue.second) );
-    }
-    element->SetData(data2DConverted);
-  }
+    element->SetData(data2D);
 }
 
 void QmitkChartWidget::Impl::UpdateChartExampleData(const std::vector< std::pair<double, double> >& data2D,

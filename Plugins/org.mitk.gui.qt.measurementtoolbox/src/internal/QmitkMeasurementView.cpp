@@ -18,6 +18,8 @@ found in the LICENSE file.
 #include <QGridLayout>
 #include <QToolBar>
 #include <QTextBrowser>
+#include <QCheckBox>
+#include <QGroupBox>
 
 #include <mitkInteractionEventObserver.h>
 #include <mitkCoreServices.h>
@@ -46,6 +48,8 @@ found in the LICENSE file.
 
 #include <QmitkRenderWindow.h>
 #include <QmitkSingleNodeSelectionWidget.h>
+
+#include "ctkDoubleSpinBox.h"
 
 #include "mitkPluginActivator.h"
 #include "usModuleRegistry.h"
@@ -107,7 +111,10 @@ struct QmitkMeasurementViewData
       m_DrawActionsGroup(nullptr),
       m_SelectedPlanarFiguresText(nullptr),
       m_CopyToClipboard(nullptr),
-      m_Layout(nullptr)
+      m_Layout(nullptr),
+      m_Radius(nullptr),
+      m_Thickness(nullptr),
+      m_FixedParameterBox(nullptr)
   {
   }
 
@@ -146,6 +153,9 @@ struct QmitkMeasurementViewData
   QTextBrowser* m_SelectedPlanarFiguresText;
   QPushButton* m_CopyToClipboard;
   QGridLayout* m_Layout;
+  ctkDoubleSpinBox* m_Radius;
+  ctkDoubleSpinBox* m_Thickness;
+  QGroupBox* m_FixedParameterBox;
 };
 
 const std::string QmitkMeasurementView::VIEW_ID = "org.mitk.views.measurement";
@@ -228,6 +238,40 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
 
   d->m_DrawActionsToolBar->setEnabled(false);
 
+  // fixed parameter section
+  auto fixedLayout = new QGridLayout();
+
+  d->m_FixedParameterBox = new QGroupBox();
+  d->m_FixedParameterBox->setCheckable(true);
+  d->m_FixedParameterBox->setChecked(false);
+  d->m_FixedParameterBox->setTitle("Fixed sized circle/double ellipse");
+  d->m_FixedParameterBox->setToolTip("If activated, circles and double ellipses (as rings) figures will always be created with the set parameters as fixed size.");
+  d->m_FixedParameterBox->setAlignment(Qt::AlignLeft);
+
+  auto labelRadius1 = new QLabel(QString("Radius"));
+  d->m_Radius = new ctkDoubleSpinBox();
+  d->m_Radius->setMinimum(0);
+  d->m_Radius->setValue(10);
+  d->m_Radius->setSuffix(" mm");
+  d->m_Radius->setAlignment(Qt::AlignLeft);
+  d->m_Radius->setToolTip("Sets the radius for following planar figures: circle, double ellipse (as ring).");
+
+  auto labelThickness = new QLabel(QString("Thickness"));
+  d->m_Thickness = new ctkDoubleSpinBox();
+  d->m_Thickness->setMinimum(0);
+  d->m_Thickness->setMaximum(10);
+  d->m_Thickness->setValue(5);
+  d->m_Thickness->setSuffix(" mm");
+  d->m_Thickness->setAlignment(Qt::AlignLeft);
+  d->m_Thickness->setToolTip("Sets the thickness for following planar figures: double ellipse (as ring).");
+
+  fixedLayout->addWidget(labelRadius1,0,0);
+  fixedLayout->addWidget(d->m_Radius,0,1);
+  fixedLayout->addWidget(labelThickness,1,0);
+  fixedLayout->addWidget(d->m_Thickness,1,1);
+
+  d->m_FixedParameterBox->setLayout(fixedLayout);
+
   // planar figure details text
   d->m_SelectedPlanarFiguresText = new QTextBrowser;
 
@@ -237,8 +281,9 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
   d->m_Layout = new QGridLayout;
   d->m_Layout->addWidget(d->m_SingleNodeSelectionWidget, 0, 0, 1, 2);
   d->m_Layout->addWidget(d->m_DrawActionsToolBar, 1, 0, 1, 2);
-  d->m_Layout->addWidget(d->m_SelectedPlanarFiguresText, 2, 0, 1, 2);
-  d->m_Layout->addWidget(d->m_CopyToClipboard, 3, 0, 1, 2);
+  d->m_Layout->addWidget(d->m_FixedParameterBox, 2, 0, 1, 2);
+  d->m_Layout->addWidget(d->m_SelectedPlanarFiguresText, 3, 0, 1, 2);
+  d->m_Layout->addWidget(d->m_CopyToClipboard, 4, 0, 1, 2);
 
   d->m_Parent->setLayout(d->m_Layout);
 
@@ -262,6 +307,7 @@ void QmitkMeasurementView::CreateConnections()
   connect(d->m_DrawBezierCurve, SIGNAL(triggered(bool)), this, SLOT(OnDrawBezierCurveTriggered(bool)));
   connect(d->m_DrawSubdivisionPolygon, SIGNAL(triggered(bool)), this, SLOT(OnDrawSubdivisionPolygonTriggered(bool)));
   connect(d->m_CopyToClipboard, SIGNAL(clicked(bool)), this, SLOT(OnCopyToClipboard(bool)));
+  connect(d->m_Radius, QOverload<double>::of(&ctkDoubleSpinBox::valueChanged), d->m_Thickness, &ctkDoubleSpinBox::setMaximum);
 }
 
 void QmitkMeasurementView::OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
@@ -606,9 +652,9 @@ void QmitkMeasurementView::OnDrawFourPointAngleTriggered(bool)
 
 void QmitkMeasurementView::OnDrawCircleTriggered(bool)
 {
-  this->AddFigureToDataStorage(
-    mitk::PlanarCircle::New(),
-    QString("Circle%1").arg(++d->m_CircleCounter));
+  auto circle = (d->m_FixedParameterBox->isChecked()) ? mitk::PlanarCircle::New(d->m_Radius->value()) : mitk::PlanarCircle::New();
+
+  this->AddFigureToDataStorage(circle, QString("Circle%1").arg(++d->m_CircleCounter));
 }
 
 void QmitkMeasurementView::OnDrawEllipseTriggered(bool)
@@ -620,9 +666,9 @@ void QmitkMeasurementView::OnDrawEllipseTriggered(bool)
 
 void QmitkMeasurementView::OnDrawDoubleEllipseTriggered(bool)
 {
-  this->AddFigureToDataStorage(
-    mitk::PlanarDoubleEllipse::New(),
-    QString("DoubleEllipse%1").arg(++d->m_DoubleEllipseCounter));
+  auto ellipse = (d->m_FixedParameterBox->isChecked()) ? mitk::PlanarDoubleEllipse::New(d->m_Radius->value(),d->m_Thickness->value()) : mitk::PlanarDoubleEllipse::New();
+
+  this->AddFigureToDataStorage(ellipse, QString("DoubleEllipse%1").arg(++d->m_DoubleEllipseCounter));
 }
 
 void QmitkMeasurementView::OnDrawBezierCurveTriggered(bool)

@@ -30,6 +30,8 @@ found in the LICENSE file.
 #include <mitkStatisticsToImageRelationRule.h>
 #include <mitkStatisticsToMaskRelationRule.h>
 #include <mitkStatusBar.h>
+#include <mitkPlanarFigure.h>
+#include <mitkPlanarFigureMaskGenerator.h>
 #include <qthreadpool.h>
 
 #include "mitkImageStatisticsContainerManager.h"
@@ -415,9 +417,9 @@ void QmitkImageStatisticsView::OnCheckBoxIgnoreZeroStateChanged(int state)
 
 void QmitkImageStatisticsView::OnButtonSelectionPressed()
 {
-  m_SelectionDialog = new QmitkNodeSelectionDialog();
-  m_SelectionDialog->SetDataStorage(GetDataStorage());
-  m_SelectionDialog->SetSelectionCheckFunction(CheckForSameGeometry());
+  QmitkNodeSelectionDialog* dialog = new QmitkNodeSelectionDialog(nullptr, "Select input for the statistic","You may select images and ROIs to compute their statistic. ROIs may be segmentations or planar figures.");
+  dialog->SetDataStorage(GetDataStorage());
+  dialog->SetSelectionCheckFunction(CheckForSameGeometry());
 
   // set predicates
   auto isPlanarFigurePredicate = mitk::GetImageStatisticsPlanarFigurePredicate();
@@ -425,42 +427,37 @@ void QmitkImageStatisticsView::OnButtonSelectionPressed()
   auto isImagePredicate = mitk::GetImageStatisticsImagePredicate();
   auto isMaskOrPlanarFigurePredicate = mitk::NodePredicateOr::New(isPlanarFigurePredicate, isMaskPredicate);
   auto isImageOrMaskOrPlanarFigurePredicate = mitk::NodePredicateOr::New(isMaskOrPlanarFigurePredicate, isImagePredicate);
-  m_SelectionDialog->SetNodePredicate(isImageOrMaskOrPlanarFigurePredicate);
-  m_SelectionDialog->SetSelectionMode(QAbstractItemView::MultiSelection);
-  connect(m_SelectionDialog, &QmitkNodeSelectionDialog::accepted, this, &QmitkImageStatisticsView::OnDialogSelectionChanged);
-  m_SelectionDialog->show();
-}
+  dialog->SetNodePredicate(isImageOrMaskOrPlanarFigurePredicate);
+  dialog->SetSelectionMode(QAbstractItemView::MultiSelection);
+  dialog->SetCurrentSelection(m_SelectedNodeList);
 
-void QmitkImageStatisticsView::OnDialogSelectionChanged()
-{
-  m_selectedImageNodes.resize(0);
-  m_selectedMaskNodes.resize(0);
-
-  QmitkNodeSelectionDialog::NodeList selectedNodeList = m_SelectionDialog->GetSelectedNodes();
-  auto isImagePredicate = mitk::GetImageStatisticsImagePredicate();
-  for (const auto& node : selectedNodeList)
+  if (dialog->exec())
   {
-    if (isImagePredicate->CheckNode(node))
-    {
-      m_selectedImageNodes.push_back(node.GetPointer());
-    }
-    else
-    {
-      m_selectedMaskNodes.push_back(node.GetPointer());
-    }
-  }
+    m_selectedImageNodes.resize(0);
+    m_selectedMaskNodes.resize(0);
 
-  if (!m_selectedImageNodes.empty())
-  {
+    m_SelectedNodeList = dialog->GetSelectedNodes();
+    auto isImagePredicate = mitk::GetImageStatisticsImagePredicate();
+    for (const auto& node : m_SelectedNodeList)
+    {
+      if (isImagePredicate->CheckNode(node))
+      {
+        m_selectedImageNodes.push_back(node.GetPointer());
+      }
+      else
+      {
+        m_selectedMaskNodes.push_back(node.GetPointer());
+      }
+    }
+
     m_Controls.widget_statistics->SetImageNodes(m_selectedImageNodes);
-  }
 
-  if (!m_selectedMaskNodes.empty())
-  {
     m_Controls.widget_statistics->SetMaskNodes(m_selectedMaskNodes);
+
+    CalculateOrGetMultiStatistics();
   }
 
-  CalculateOrGetMultiStatistics();
+  delete dialog;
 }
 
 void QmitkImageStatisticsView::HandleExistingStatistics(mitk::Image::ConstPointer image,
@@ -539,24 +536,59 @@ mitk::DataNode::Pointer QmitkImageStatisticsView::GetNodeForStatisticsContainer(
 
 QmitkNodeSelectionDialog::SelectionCheckFunctionType QmitkImageStatisticsView::CheckForSameGeometry() const
 {
-  auto lambda = [this](const QmitkNodeSelectionDialog::NodeList& nodes)
+  auto lambda = [](const QmitkNodeSelectionDialog::NodeList& nodes)
   {
     if (nodes.empty())
     {
       return std::string();
     }
 
-    auto leftNode = nodes[0];
-    for (int i = 1; i < nodes.size(); ++i)
-    {
-      auto rightNode = nodes[i];
+    const mitk::Image* imageNodeData = nullptr;
 
-      bool sameGeometry = CheckForSameGeometry(leftNode, rightNode);
-      if (!sameGeometry)
+    for (auto& node : nodes)
+    {
+      imageNodeData = dynamic_cast<const mitk::Image*>(node->GetData());
+      if (imageNodeData)
       {
-        std::stringstream ss;
-        ss << "<font class=\"warning\"><p>Invalid selection: All selected nodes must have the same geometry.</p>";
-        return ss.str();
+        break;
+      }
+    }
+
+    if (imageNodeData == nullptr)
+    {
+      std::stringstream ss;
+      ss << "<font class=\"warning\"><p>Select at least one image.</p></font>";
+      return ss.str();
+    }
+
+    auto imageGeoPredicate = mitk::NodePredicateGeometry::New(imageNodeData->GetGeometry());
+
+    for (auto& rightNode : nodes)
+    {
+      if (imageNodeData != rightNode->GetData())
+      {
+        bool sameGeometry = true;
+
+        if (dynamic_cast<const mitk::Image*>(rightNode->GetData()))
+        {
+          sameGeometry = imageGeoPredicate->CheckNode(rightNode);
+        }
+        else
+        {
+          const mitk::PlanarFigure* planar2 = dynamic_cast<const mitk::PlanarFigure*>(rightNode->GetData());
+          if (planar2)
+          {
+            sameGeometry = mitk::PlanarFigureMaskGenerator::CheckPlanarFigureIsNotTilted(planar2->GetPlaneGeometry(), imageNodeData->GetGeometry());
+          }
+        }
+
+        if (!sameGeometry)
+        {
+          std::stringstream ss;
+          ss << "<font class=\"warning\"><p>Invalid selection: All selected nodes must have the same geometry.</p><p>Differing node i.a.: \"";
+          ss << rightNode->GetName() <<"\"</p></font>";
+          return ss.str();
+        }
       }
     }
 
@@ -564,30 +596,4 @@ QmitkNodeSelectionDialog::SelectionCheckFunctionType QmitkImageStatisticsView::C
   };
 
   return lambda;
-}
-
-bool QmitkImageStatisticsView::CheckForSameGeometry(const mitk::DataNode* node1, const mitk::DataNode* node2) const
-{
-  bool isSameGeometry(true);
-
-  mitk::Image* image1 = dynamic_cast<mitk::Image*>(node1->GetData());
-  mitk::Image* image2 = dynamic_cast<mitk::Image*>(node2->GetData());
-  if (image1 && image2)
-  {
-    mitk::BaseGeometry* geo1 = image1->GetGeometry();
-    mitk::BaseGeometry* geo2 = image2->GetGeometry();
-
-    isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetOrigin(), geo2->GetOrigin());
-    isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetExtent(0), geo2->GetExtent(0));
-    isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetExtent(1), geo2->GetExtent(1));
-    isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetExtent(2), geo2->GetExtent(2));
-    isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetSpacing(), geo2->GetSpacing());
-    isSameGeometry = isSameGeometry && mitk::MatrixEqualElementWise(geo1->GetIndexToWorldTransform()->GetMatrix(), geo2->GetIndexToWorldTransform()->GetMatrix());
-
-    return isSameGeometry;
-  }
-  else
-  {
-    return false;
-  }
 }

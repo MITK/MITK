@@ -356,6 +356,15 @@ void PlanarFigureMaskGenerator::InternalCalculateMaskFromOpenPlanarFigure(
   m_InternalITKImageMask2D = maskImage;
 }
 
+bool PlanarFigureMaskGenerator::CheckPlanarFigureIsNotTilted(const PlaneGeometry* planarGeometry, const BaseGeometry *geometry)
+{
+  if (!planarGeometry) return false;
+  if (!geometry) return false;
+
+  unsigned int axis;
+  return GetPrincipalAxis(geometry,planarGeometry->GetNormal(), axis);
+}
+
 bool PlanarFigureMaskGenerator::GetPrincipalAxis(
   const BaseGeometry *geometry, Vector3D vector,
   unsigned int &axis )
@@ -366,7 +375,12 @@ bool PlanarFigureMaskGenerator::GetPrincipalAxis(
     Vector3D axisVector = geometry->GetAxisVector( i );
     axisVector.Normalize();
 
-    if ( fabs( fabs( axisVector * vector ) - 1.0) < mitk::eps )
+    //normal mitk::eps is to pedantic for this check. See e.g. T27122
+    //therefore choose a larger epsilon. The value was set a) as small as
+    //possible but b) still allowing to datasets like in (T27122) to pass
+    //when floating rounding errors sum up.
+    const double epsilon = 5e-5;
+    if ( fabs( fabs( axisVector * vector ) - 1.0) < epsilon)
     {
       axis = i;
       return true;

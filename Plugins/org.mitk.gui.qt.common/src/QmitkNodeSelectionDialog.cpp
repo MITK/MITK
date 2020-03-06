@@ -84,6 +84,16 @@ QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString titl
 
   m_Controls.hint->setText(hint);
   m_Controls.hint->setVisible(!hint.isEmpty());
+  if(hint.isEmpty())
+  {
+    m_Controls.layoutHint->setContentsMargins(0, 0, 0, 0);
+  }
+  else
+  {
+    m_Controls.layoutHint->setContentsMargins(6, 6, 6, 6);
+  }
+
+  this->SetErrorText("");
 
   m_Controls.btnAddToFav->setIcon(berry::QtStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/favorite_add.svg")));
 
@@ -136,9 +146,23 @@ void QmitkNodeSelectionDialog::SetSelectionCheckFunction(const SelectionCheckFun
   m_CheckFunction = checkFunction;
   auto checkResponse = m_CheckFunction(m_SelectedNodes);
 
-  m_Controls.hint->setText(QString::fromStdString(checkResponse));
-  m_Controls.hint->setVisible(!checkResponse.empty());
+  SetErrorText(checkResponse);
+
   m_Controls.buttonBox->button(QDialogButtonBox::Ok)->setEnabled(checkResponse.empty());
+}
+
+void QmitkNodeSelectionDialog::SetErrorText(const std::string& checkResponse)
+{
+  m_Controls.error->setText(QString::fromStdString(checkResponse));
+  m_Controls.error->setVisible(!checkResponse.empty());
+  if (checkResponse.empty())
+  {
+    m_Controls.layoutError->setContentsMargins(0, 0, 0, 0);
+  }
+  else
+  {
+    m_Controls.layoutError->setContentsMargins(6, 6, 6, 6);
+  }
 }
 
 bool QmitkNodeSelectionDialog::GetSelectOnlyVisibleNodes() const
@@ -178,8 +202,8 @@ void QmitkNodeSelectionDialog::SetCurrentSelection(NodeList selectedNodes)
   m_SelectedNodes = selectedNodes;
   auto checkResponse = m_CheckFunction(m_SelectedNodes);
 
-  m_Controls.hint->setText(QString::fromStdString(checkResponse));
-  m_Controls.hint->setVisible(!checkResponse.empty());
+  SetErrorText(checkResponse);
+
   m_Controls.buttonBox->button(QDialogButtonBox::Ok)->setEnabled(checkResponse.empty());
 
   for (auto panel : m_Panels)

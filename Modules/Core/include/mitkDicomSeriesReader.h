@@ -590,7 +590,7 @@ public:
   static std::string GetConfigurationString();
 
   /**
-   \brief Checks if a specific file contains DICOM data. Don't use this function, just try to read.
+   \brief For tests only! Checks if a specific file contains DICOM data. Don't use this function, just try to read.
   */
   static
   bool

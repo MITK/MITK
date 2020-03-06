@@ -262,8 +262,11 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
     MITK_INFO << "  3D+t: " << (imageBlockDescriptor.HasMultipleTimePoints()?"Yes":"No");
     MITK_INFO << "--------------------------------------------------------------------------------";
 
-    if (DicomSeriesReader::LoadDicomSeries(n_it->second->GetFilenames(), *node, true, true, true))
+    if (auto image = n_it->second->GetImage())
     {
+      node->GetPropertyList()->ConcatenatePropertyList( image->GetPropertyList(), true );
+      node->SetData(image);
+
       std::string nodeName(uid);
       std::string studyDescription;
       if ( node->GetStringProperty( "dicom.study.StudyDescription", studyDescription ) )

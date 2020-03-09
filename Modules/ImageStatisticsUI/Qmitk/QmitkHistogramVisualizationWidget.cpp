@@ -105,7 +105,7 @@ std::vector< std::pair<double, double> > QmitkHistogramVisualizationWidget::Conv
 	}
   std::vector< std::pair<double, double> > histogram_list;
   for(auto iter = histogramMap.begin(); iter != histogramMap.end(); ++iter)
-    histogram_list.push_back( std::pair<double, double>(iter->first, iter->second) );
+    histogram_list.emplace_back( std::make_pair(iter->first, iter->second) );
 
   return histogram_list;
 }

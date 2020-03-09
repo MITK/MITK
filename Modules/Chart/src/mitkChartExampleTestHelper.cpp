@@ -340,7 +340,7 @@ std::vector< std::pair<double, double> > mitk::ChartExampleTestHelper::ToStdPair
   std::vector< std::pair<double, double> > data;
   for (size_t i = 0; i < xDataConverted.size(); i++)
   {
-    data.push_back(std::make_pair(xDataConverted[i].toDouble(), yDataConverted[i].toDouble()));
+    data.emplace_back(std::make_pair(xDataConverted[i].toDouble(), yDataConverted[i].toDouble()));
   }
 
   return data;

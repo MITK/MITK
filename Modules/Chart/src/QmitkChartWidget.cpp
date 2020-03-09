@@ -268,7 +268,7 @@ void QmitkChartWidget::Impl::AddData1D(const std::vector<double> &data1D,
   // transform the 1D data to 2D data
   for (const auto &ele : data1D)
   {
-    transformedData2D.push_back(std::pair<double, double>(count, ele));
+    transformedData2D.emplace_back(std::make_pair(count, ele));
     count++;
   }
 
@@ -350,7 +350,7 @@ void QmitkChartWidget::Impl::UpdateData1D(const std::vector<double> &data1D, con
   // transform the 1D data to 2D data
   for (const auto &ele : data1D)
   {
-    transformedData2D.push_back( std::pair<double, double>(count, ele) );
+    transformedData2D.emplace_back( std::make_pair(count, ele) );
     count++;
   }
 

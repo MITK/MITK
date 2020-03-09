@@ -43,12 +43,12 @@ class QmitkChartxyData : public QObject
   Q_PROPERTY(QVariant m_MarkerSymbolName READ GetMarkerSymbol WRITE SetMarkerSymbol NOTIFY SignalMarkerSymbolChanged);
 
 public:
-  explicit QmitkChartxyData(const QList< QPair<QVariant, QVariant> > &data,
+  explicit QmitkChartxyData(const std::vector< std::pair<double, double> > &data,
                             const QVariant &label,
                             const QVariant &diagramType,
                             const QVariant &position); // Constructor for Data2D (x:y=1:2, 2:6, 3:7)
 
-  void SetData(const QList< QPair<QVariant, QVariant> > &data);
+  void SetData(const std::vector< std::pair<double, double> > &data);
 
   Q_INVOKABLE QVariant GetLabelCount() const { return m_LabelCount; }
 

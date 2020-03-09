@@ -59,6 +59,8 @@ if(MITK_USE_DCMTK)
          -DDCMTK_WITH_PNG:BOOL=OFF # see bug #9894
          -DDCMTK_WITH_TIFF:BOOL=OFF  # see bug #9894
          -DDCMTK_WITH_XML:BOOL=OFF  # see bug #9894
+         -DDCMTK_ENABLE_EXTERNAL_DICTIONARY=OFF
+         -DDCMTK_ENABLE_BUILTIN_DICTIONARY=ON 
       CMAKE_CACHE_ARGS
         ${ep_common_cache_args}
       CMAKE_CACHE_DEFAULT_ARGS

@@ -23,7 +23,7 @@ std::unique_ptr<QmitkChartxyData> mitk::ChartExampleTestHelper::GetDataOne()
 
   for (int i = 0; i < 10; i++)
   {
-    data.push_back(std::pair<double, double>(i, i));
+    data.emplace_back(i, i);
   }
 
   myDataOne->SetData(data);
@@ -43,7 +43,7 @@ std::unique_ptr<QmitkChartxyData> mitk::ChartExampleTestHelper::GetDataTwo()
 
   for (int i = 10; i < 20; i++)
   {
-    data.push_back(std::pair<double, double>(i, i));
+    data.emplace_back(i, i);
   }
 
   myDataTwo->SetData(data);
@@ -63,7 +63,7 @@ std::unique_ptr<QmitkChartxyData> mitk::ChartExampleTestHelper::GetDataThree()
 
   for (int i = 20; i < 30; i++)
   {
-    data.push_back(std::pair<double, double>(i, i));
+    data.emplace_back(i, i);
   }
 
   myDataThree->SetData(data);
@@ -83,7 +83,7 @@ std::unique_ptr<QmitkChartxyData> mitk::ChartExampleTestHelper::GetDataFour()
 
   for (int i = 30; i < 40; i++)
   {
-    data.push_back(std::pair<double, double>(i, i));
+    data.emplace_back(i, i);
   }
 
   myDataFour->SetData(data);
@@ -103,7 +103,7 @@ std::unique_ptr<QmitkChartxyData> mitk::ChartExampleTestHelper::GetDataFive()
 
   for (int i = 40; i < 50; i++)
   {
-    data.push_back(std::pair<double, double>(i, i));
+    data.emplace_back(i, i);
   }
 
   myDataFive->SetData(data);
@@ -340,7 +340,7 @@ std::vector< std::pair<double, double> > mitk::ChartExampleTestHelper::ToStdPair
   std::vector< std::pair<double, double> > data;
   for (size_t i = 0; i < xDataConverted.size(); i++)
   {
-    data.emplace_back(std::make_pair(xDataConverted[i].toDouble(), yDataConverted[i].toDouble()));
+    data.emplace_back(xDataConverted[i].toDouble(), yDataConverted[i].toDouble());
   }
 
   return data;

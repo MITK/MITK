@@ -41,25 +41,25 @@ QString QmitkStatisticsModelToStringConverter::GetString() const
     {
       if (i > 0)
       {
-        textData += m_columnDelimiterWithSpace;
+        textData += m_columnDelimiter;
       }
       textData += m_statisticsModel->headerData(i, Qt::Horizontal).toString();
     }
-    textData += m_lineDelimiter;
+    textData += m_rowDelimiter;
   }
   textData += Iterate(m_rootIndex, m_statisticsModel);
 
   return textData;
 }
 
-void QmitkStatisticsModelToStringConverter::SetRowDelimiter(QChar lineDelimiter)
+void QmitkStatisticsModelToStringConverter::SetRowDelimiter(QChar rowDelimiter)
 {
-  m_lineDelimiter = lineDelimiter;
+  m_rowDelimiter = rowDelimiter;
 }
 
 void QmitkStatisticsModelToStringConverter::SetColumnDelimiter(QChar columnDelimiter)
 {
-  m_columnDelimiterWithSpace = columnDelimiter + QString(" ");
+  m_columnDelimiter = columnDelimiter;
 }
 
 void QmitkStatisticsModelToStringConverter::SetIncludeHeaderData(bool includeHeaderData)
@@ -82,7 +82,7 @@ QString QmitkStatisticsModelToStringConverter::Iterate(const QModelIndex &index,
   }
   else
   {
-    content += m_lineDelimiter;
+    content += m_rowDelimiter;
   }
 
   auto rows = model->rowCount(index);
@@ -91,13 +91,13 @@ QString QmitkStatisticsModelToStringConverter::Iterate(const QModelIndex &index,
   {
     if (i > 0)
     {
-      content += m_lineDelimiter;
+      content += m_rowDelimiter;
     }
     for (int j = 0; j < cols; ++j)
     {
       if (j > 0)
       {
-        content += m_columnDelimiterWithSpace;
+        content += m_columnDelimiter;
       }
       content += Iterate(model->index(i, j, index), model, depth + 1);
     }

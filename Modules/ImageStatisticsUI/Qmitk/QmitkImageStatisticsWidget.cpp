@@ -70,10 +70,12 @@ void QmitkImageStatisticsWidget::OnDataAvailable()
 void QmitkImageStatisticsWidget::OnClipboardButtonClicked()
 {
   QmitkStatisticsModelToStringConverter converter;
+  converter.SetColumnDelimiter('\t');
   converter.SetTableModel(m_imageStatisticsModel);
   converter.SetRootIndex(m_Controls.treeViewStatistics->rootIndex());
   converter.SetIncludeHeaderData(true);
 
   QString clipboardAsString = converter.GetString();
+  QApplication::clipboard()->clear();
   QApplication::clipboard()->setText(clipboardAsString, QClipboard::Clipboard);
 }

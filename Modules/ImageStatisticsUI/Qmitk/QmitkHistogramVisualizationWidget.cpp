@@ -112,21 +112,21 @@ std::vector< std::pair<double, double> > QmitkHistogramVisualizationWidget::Conv
 
 void QmitkHistogramVisualizationWidget::OnClipboardButtonClicked()
 {
-	if (m_Histogram)
-	{
-		QApplication::clipboard()->clear();
-		QString clipboard("Measurement \t Frequency\n");
-		auto iter = m_Histogram->Begin();
-		auto iterEnd = m_Histogram->End();
-		for (; iter != iterEnd; ++iter)
-		{
-			clipboard = clipboard.append("%L1 \t %L2\n")
-				.arg(iter.GetMeasurementVector()[0], 0, 'f', 2)
-				.arg(iter.GetFrequency());
-		}
+  if (m_Histogram)
+  {
+    QString clipboard("Measurement \t Frequency\n");
+    auto iter = m_Histogram->Begin();
+    auto iterEnd = m_Histogram->End();
+    for (; iter != iterEnd; ++iter)
+    {
+      clipboard = clipboard.append("%L1 \t %L2\n")
+        .arg(iter.GetMeasurementVector()[0], 0, 'f', 2)
+        .arg(iter.GetFrequency());
+    }
 
-		QApplication::clipboard()->setText(clipboard, QClipboard::Clipboard);
-	}
+    QApplication::clipboard()->clear();
+    QApplication::clipboard()->setText(clipboard, QClipboard::Clipboard);
+  }
 }
 
 void QmitkHistogramVisualizationWidget::OnDefaultNBinsCheckBoxChanged()

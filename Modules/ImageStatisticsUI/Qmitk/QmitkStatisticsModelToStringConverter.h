@@ -20,11 +20,9 @@ found in the LICENSE file.
 
 \details
 The content of a table model is converted to a string. Each cell is converted to a string. Default
-oder: iteration over rows. The line separation delimiter (default: '\n') and the column separation
+order: iteration over rows. The row separation delimiter (default: '\n') and the column separation
 delimiter (default: ',') can be chosen. It also can be chosen if the headers should
 be exported to the string.
-
-By default, the produced string is csv conform
 */
 
 class MITKIMAGESTATISTICSUI_EXPORT QmitkStatisticsModelToStringConverter
@@ -39,7 +37,7 @@ public:
   \exception throws exception if model is nullptr
   */
   QString GetString() const;
-  void SetRowDelimiter(QChar lineDelimiter);
+  void SetRowDelimiter(QChar rowDelimiter);
   void SetColumnDelimiter(QChar columnDelimiter);
   /**
   \brief If header data (column/row captions) are exported
@@ -57,8 +55,12 @@ private:
 
   QAbstractItemModel *m_statisticsModel = nullptr;
   QModelIndex m_rootIndex;
-  QChar m_lineDelimiter = '\n';
+
+  QChar m_rowDelimiter = '\n';
+  QChar m_columnDelimiter = ',';
+
   bool m_includeHeaderData = false;
-  QString m_columnDelimiterWithSpace = ", ";
+
 };
+
 #endif // QmitkTableModelToQString_H__INCLUDED

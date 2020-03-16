@@ -13,7 +13,7 @@ found in the LICENSE file.
 #define QmitkTableModelToQString_H__INCLUDED
 
 #include <MitkImageStatisticsUIExports.h>
-#include <QAbstractItemModel>
+#include <QmitkImageStatisticsTreeModel.h>
 
 /**
 \brief Converts the content of the statistics model to a string
@@ -30,7 +30,7 @@ class MITKIMAGESTATISTICSUI_EXPORT QmitkStatisticsModelToStringConverter
 public:
   QmitkStatisticsModelToStringConverter();
 
-  void SetTableModel(QAbstractItemModel *model);
+  void SetTableModel(QmitkImageStatisticsTreeModel *model);
   void SetRootIndex(QModelIndex rootIndex);
   /**
   \brief Returns the string
@@ -45,15 +45,12 @@ public:
   void SetIncludeHeaderData(bool includeHeaderData);
 
 private:
-  /**
-\brief Iterates recursively over all cells and returns their content
-\details based on https://stackoverflow.com/questions/39153835/how-to-loop-over-qabstractitemview-indexes
-*/
+
   QString Iterate(const QModelIndex &index,
-                  const QAbstractItemModel *model,
+                  const QmitkImageStatisticsTreeModel *model,
                   int depth = 0) const;
 
-  QAbstractItemModel *m_statisticsModel = nullptr;
+  QmitkImageStatisticsTreeModel *m_statisticsModel = nullptr;
   QModelIndex m_rootIndex;
 
   QChar m_rowDelimiter = '\n';

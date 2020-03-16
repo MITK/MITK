@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 QmitkStatisticsModelToStringConverter::QmitkStatisticsModelToStringConverter() {}
 
-void QmitkStatisticsModelToStringConverter::SetTableModel(QAbstractItemModel *model)
+void QmitkStatisticsModelToStringConverter::SetTableModel(QmitkImageStatisticsTreeModel *model)
 {
   m_statisticsModel = model;
 }
@@ -43,7 +43,7 @@ QString QmitkStatisticsModelToStringConverter::GetString() const
       {
         textData += m_columnDelimiter;
       }
-      textData += m_statisticsModel->headerData(i, Qt::Horizontal).toString();
+      textData += m_statisticsModel->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString();
     }
     textData += m_rowDelimiter;
   }
@@ -68,39 +68,57 @@ void QmitkStatisticsModelToStringConverter::SetIncludeHeaderData(bool includeHea
 }
 
 QString QmitkStatisticsModelToStringConverter::Iterate(const QModelIndex &index,
-                                                       const QAbstractItemModel *model,
+                                                       const QmitkImageStatisticsTreeModel *model,
                                                        int depth) const
 {
   QString content;
+
   if (index.isValid())
   {
-    content = index.data().toString();
-  }
-  if (!model->hasChildren(index) || (index.flags() & Qt::ItemNeverHasChildren))
-  {
-    return content;
-  }
-  else
-  {
-    content += m_rowDelimiter;
+    auto data = index.data();
+
+    if(data.type() == QMetaType::Float || data.type() == QMetaType::Double )
+    {
+      content = QString("%L1").arg(data.toDouble(), 0, 'f');
+    }
+    else
+    {
+      content = data.toString();
+    }
   }
 
   auto rows = model->rowCount(index);
-  auto cols = model->columnCount(index);
-  for (int i = 0; i < rows; ++i)
+  for (int r = 0; r < rows; ++r)
   {
-    if (i > 0)
+    auto childIndex = model->index(r, 0, index);
+    if (model->hasChildren(childIndex))
     {
+      if (depth>1)
+      {
+        content += QString(" >> ");
+      }
+      content += Iterate(childIndex, model, ++depth);
+    }
+    else
+    {
+      auto cols = model->columnCount(index);
+      for (int c = 0; c < cols; ++c)
+      {
+        if (c > 0)
+        {
+          content += m_columnDelimiter;
+        }
+        else
+        {
+          content += QString(" >> ");
+        }
+
+        auto childIndex = model->index(r, c, index);
+        content += Iterate(childIndex, model, ++depth);
+      }
       content += m_rowDelimiter;
     }
-    for (int j = 0; j < cols; ++j)
-    {
-      if (j > 0)
-      {
-        content += m_columnDelimiter;
-      }
-      content += Iterate(model->index(i, j, index), model, depth + 1);
-    }
   }
+
   return content;
 }

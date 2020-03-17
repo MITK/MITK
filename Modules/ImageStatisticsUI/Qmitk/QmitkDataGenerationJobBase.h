@@ -61,7 +61,7 @@ signals:
     @param results a vector of DataNode objects produces by the job and ready tu use, put into storage.
     @param the job that produced the data
     */
-    void ResultsAvailable(const mitk::DataStorage::SetOfObjects* results, const QmitkDataGenerationJobBase* job);
+    void ResultsAvailable(mitk::DataStorage::SetOfObjects::ConstPointer results, const QmitkDataGenerationJobBase* job);
     
 protected:
   /*! @brief constructor with inputData and outputNodes

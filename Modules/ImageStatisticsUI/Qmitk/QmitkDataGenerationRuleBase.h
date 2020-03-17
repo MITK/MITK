@@ -15,20 +15,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef __QMITK_WORKFLOW_BASE_H
-#define __QMITK_WORKFLOW_BASE_H
+#ifndef __QMITK_DATA_GENERATION_RULE_BASE_H
+#define __QMITK_DATA_GENERATION_RULE_BASE_H
 
 //MITK
 #include <mitkDataStorage.h>
 #include <mitkDataNode.h>
 
-//MITK-RTTB
-#include <QmitkRTJobBase.h>
+#include "QmitkDataGenerationJobBase.h"
 
-#include <MitkRTToolboxUIExports.h>
+#include <MitkImageStatisticsUIExports.h>
+
+
+namespace mitk
+{
+  static const std::string STATS_GENERATION_STATUS_PROPERTY_NAME = "MITK.statistic.generation.status";
+  static const std::string STATS_GENERATION_STATUS_VALUE_WORK_IN_PROGRESS = "workInProgress";
+  static const std::string STATS_GENERATION_STATUS_VALUE_BASE_DATA_FAILED = "failed";
+}
 
 /*!
-\brief QmitkTaskGenerationRuleBase
+\brief QmitkDataGenerationRuleBase
 Base class for a Task generation rule
 \details With task generation rule, we denote the process of defining a sequence of jobs (that encapsulate computation classes) to produce a desired output.
 We require the following information:
@@ -37,7 +44,7 @@ We require the following information:
 \example to compute a DVH, dose and voxelization are required. If the voxelization is not available, a job has to be triggered to compute it.
 */
 
-class MITKRTTOOLBOXUI_EXPORT QmitkTaskGenerationRuleBase
+class MITKIMAGESTATISTICSUI_EXPORT QmitkDataGenerationRuleBase
 {
 public:
 	/*! @brief Returns if the (final or interim) result node is already available in the storage and up-to-date
@@ -47,18 +54,12 @@ public:
   virtual mitk::DataNode::Pointer GetLatestResult(mitk::DataStorage::Pointer storage, mitk::DataNode::ConstPointer doseNode, mitk::DataNode::ConstPointer structNode) const = 0;
 	/*! @brief Returns the next job that needs to be done in order to complete the workflow
     */
-	virtual QmitkRTJobBase* GetNextMissingJob(mitk::DataStorage::Pointer storage, mitk::DataNode::ConstPointer doseNode, mitk::DataNode::ConstPointer structNode) const =0;
+  virtual QmitkDataGenerationJobBase* GetNextMissingJob(mitk::DataStorage::Pointer storage, mitk::DataNode::ConstPointer doseNode, mitk::DataNode::ConstPointer structNode) const =0;
 protected:
   /*! @brief Creates a data node for interim results
   @details It's the jobs responsibility to write the final results to the data of the DataNode.
   */
   mitk::DataNode::Pointer CreateDataNodeInterimResults(mitk::BaseData::Pointer data) const;
-	/*! @brief Returns the voxelization job
-      @details is required by two workflows (QmitkDoseStatisticsWorkflow and QmitkDVHWorkflow) and therefore provided in the base class
-    */
-	QmitkRTJobBase* GetVoxelizationJob(mitk::DataStorage::Pointer storage, mitk::DataNode::ConstPointer doseNode, mitk::DataNode::ConstPointer structNode) const;
-  const mitk::DataNode* GetLatestVoxelization(mitk::DataStorage::Pointer storage, mitk::DataNode::ConstPointer doseNode, mitk::DataNode::ConstPointer structNode) const;
-  mitk::BaseData::Pointer GetVoxelizedResultTypeBaseData() const;
 };
 
 #endif

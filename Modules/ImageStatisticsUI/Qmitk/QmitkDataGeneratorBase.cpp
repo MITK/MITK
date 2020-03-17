@@ -16,6 +16,8 @@ found in the LICENSE file.
 #include "QmitkDataGenerationJobBase.h"
 #include "mitkDataNode.h"
 
+#include <QThreadPool>
+
 QmitkDataGeneratorBase::QmitkDataGeneratorBase(mitk::DataStorage::Pointer storage) :
   m_Storage(storage)
 {}
@@ -30,22 +32,27 @@ QmitkDataGeneratorBase::~QmitkDataGeneratorBase()
   {
     // remove "add node listener" from data storage
     dataStorage->AddNodeEvent.RemoveListener(
-      mitk::MessageDelegate1<QmitkDataGeneratorBase, const mitk::DataNode*>(this, &QmitkDataGeneratorBase::NodeAddedToStorage));
+      mitk::MessageDelegate1<QmitkDataGeneratorBase, const mitk::DataNode*>(this, &QmitkDataGeneratorBase::NodeAddedOrModified));
 
     // remove "remove node listener" from data storage
     dataStorage->ChangedNodeEvent.RemoveListener(
-      mitk::MessageDelegate1<QmitkDataGeneratorBase, const mitk::DataNode*>(this, &QmitkDataGeneratorBase::NodeModified));
+      mitk::MessageDelegate1<QmitkDataGeneratorBase, const mitk::DataNode*>(this, &QmitkDataGeneratorBase::NodeAddedOrModified));
   }
 }
 
-mitk::DataStorage* QmitkDataGeneratorBase::GetDataStorage() const
+mitk::DataStorage::Pointer QmitkDataGeneratorBase::GetDataStorage() const
 {
-  return m_Storage;
+  return m_Storage.Lock();
 }
 
 bool QmitkDataGeneratorBase::GetAutoUpdate() const
 {
   return m_AutoUpdate;
+}
+
+bool QmitkDataGeneratorBase::IsGenerating() const
+{
+  return m_RunningGeneration;
 }
 
 void QmitkDataGeneratorBase::SetDataStorage(mitk::DataStorage* storage)
@@ -59,11 +66,11 @@ void QmitkDataGeneratorBase::SetDataStorage(mitk::DataStorage* storage)
   {
     // remove "add node listener" from old data storage
     oldStorage->AddNodeEvent.RemoveListener(
-      mitk::MessageDelegate1<QmitkDataGeneratorBase, const mitk::DataNode*>(this, &QmitkDataGeneratorBase::NodeAddedToStorage));
+      mitk::MessageDelegate1<QmitkDataGeneratorBase, const mitk::DataNode*>(this, &QmitkDataGeneratorBase::NodeAddedOrModified));
 
     // remove "remove node listener" from old data storage
     oldStorage->ChangedNodeEvent.RemoveListener(
-      mitk::MessageDelegate1<QmitkDataGeneratorBase, const mitk::DataNode*>(this, &QmitkDataGeneratorBase::NodeModified));
+      mitk::MessageDelegate1<QmitkDataGeneratorBase, const mitk::DataNode*>(this, &QmitkDataGeneratorBase::NodeAddedOrModified));
   }
 
   m_Storage = storage;
@@ -74,11 +81,11 @@ void QmitkDataGeneratorBase::SetDataStorage(mitk::DataStorage* storage)
   {
     // add "add node listener" for new data storage
     newStorage->AddNodeEvent.AddListener(
-      mitk::MessageDelegate1<QmitkDataGeneratorBase, const mitk::DataNode*>(this, &QmitkDataGeneratorBase::NodeAddedToStorage));
+      mitk::MessageDelegate1<QmitkDataGeneratorBase, const mitk::DataNode*>(this, &QmitkDataGeneratorBase::NodeAddedOrModified));
 
     // add remove node listener for new data storage
     newStorage->ChangedNodeEvent.AddListener(
-      mitk::MessageDelegate1<QmitkDataGeneratorBase, const mitk::DataNode*>(this, &QmitkDataGeneratorBase::NodeModified));
+      mitk::MessageDelegate1<QmitkDataGeneratorBase, const mitk::DataNode*>(this, &QmitkDataGeneratorBase::NodeAddedOrModified));
   }
 }
 
@@ -87,32 +94,101 @@ void QmitkDataGeneratorBase::SetAutoUpdate(bool autoUpdate)
   m_AutoUpdate = autoUpdate;
 }
 
-void QmitkDataGeneratorBase::OnJobError(QString error, const QmitkRTJobBase* failedJob)
+void QmitkDataGeneratorBase::OnJobError(QString error, const QmitkDataGenerationJobBase* failedJob) const
 {
   emit JobError(error, failedJob);
 }
 
-void QmitkDataGeneratorBase::OnFinalResultsAvailable(const mitk::DataStorage::SetOfObjects* results, const QmitkRTJobBase *job)
+void QmitkDataGeneratorBase::OnFinalResultsAvailable(mitk::DataStorage::SetOfObjects::ConstPointer results, const QmitkDataGenerationJobBase *job) const
 {
-  if (results)
+  if (results.IsNotNull())
   {
-    TODO go through the results and ensure that the cache status property is removed
-    //no need to remove the WIP property (mitk::RT_CACHE_STATUS_NAME) again, as directly set the BaseData in the job (where this property is not set)
+    {
+      std::shared_lock<std::shared_mutex> mutexguard(m_DataMutex);
+      auto storage = m_Storage.Lock();
+      if (storage.IsNull())
+      {
+        for (auto pos = results->Begin(); pos != results->End(); ++pos)
+        {
+          storage->Add(pos->Value());
+        }
+      }
+    }
+
     emit NewDataAvailable(results);
   }
 }
 
-TODO if storage is set the generator should register observers for node changes of datastorage. See e.g. node selection widget how to do it.
-If some node has changed that is relevant it flags new generation if a doGeneration is ongoing or triggers a new one.
+void QmitkDataGeneratorBase::NodeAddedOrModified(const mitk::DataNode* node)
+{
+  if (this->NodeChangeIsRelevant(node))
+  {
+    m_RestartGeneration = true;
+    if (!IsGenerating())
+    {
+      this->Generate();
+    }
+  }
+}
 
-void QmitkDataGeneratorBase::Generate()
+void QmitkDataGeneratorBase::Generate() const
 {
   m_RunningGeneration = true;
+  m_RestartGeneration = true;
   while (m_RestartGeneration)
   {
     m_RestartGeneration = false;
-    DoGeneration();
+    DoGenerate();
   }
 
   m_RunningGeneration = false;
+}
+
+void QmitkDataGeneratorBase::DoGenerate() const
+{
+  auto imageSegCombinations = this->GetAllImageStructCombinations();
+
+  QThreadPool* threadPool = QThreadPool::globalInstance();
+
+  bool everythingValid = true;
+
+  for (const auto& imageAndSeg : imageSegCombinations)
+  {
+    MITK_INFO << "processing node " << imageAndSeg.first->GetName() << " and struct " << imageAndSeg.second->GetName();
+
+    if (!this->IsValidResultAvailable(imageAndSeg.first.GetPointer(), imageAndSeg.second.GetPointer()))
+    {
+      this->IndicateFutureResults(imageAndSeg.first.GetPointer(), imageAndSeg.second.GetPointer());
+
+      if (everythingValid)
+      {
+        emit GenerationStarted();
+        everythingValid = false;
+      }
+
+      MITK_INFO << "no valid result available. Triggering computation of necessary jobs.";
+      auto job = this->GetNextMissingGenerationJob(imageAndSeg.first.GetPointer(), imageAndSeg.second.GetPointer());
+
+      //other jobs are pending, nothing has to be done
+      if (!job) {
+        MITK_INFO << "waiting for other jobs to finish";
+      }
+      else
+      {
+        job->setAutoDelete(true);
+        connect(job, &QmitkDataGenerationJobBase::Error, this, &QmitkDataGeneratorBase::OnJobError);
+        connect(job, &QmitkDataGenerationJobBase::ResultsAvailable, this, &QmitkDataGeneratorBase::OnFinalResultsAvailable);
+        threadPool->start(job);
+      }
+    }
+    else
+    {
+      this->RemoveObsoleteDataNodes(imageAndSeg.first.GetPointer(), imageAndSeg.second.GetPointer());
+    }
+  }
+
+  if (everythingValid)
+  {
+    emit GenerationFinished();
+  }
 }

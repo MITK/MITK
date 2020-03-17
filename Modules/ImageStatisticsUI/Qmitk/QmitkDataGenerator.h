@@ -18,19 +18,19 @@ found in the LICENSE file.
 /*!
 \brief QmitkRTDataGenerator
 Class that implements the generation of the required data
-\tparam taskgenerationRule a specific taskgenerationRule class, where details about (job) requirements and dependencies
+\tparam DataGenerationRule a specific DataGenerationRule class, where details about (job) requirements and dependencies
 are defined (e.g. which jobs needs to compute the DVH)
 \details Required inputs are:
 - storage,
 - doseNodes (>=1)
 - structNodes (>=1).
 The given dataStorage is used to save all generated data.
-The taskgenerationRule is executed on all combinations of doseNodes and structNodes.
+The DataGenerationRule is executed on all combinations of doseNodes and structNodes.
 If new data is generated, the signal NewDataAvailable is emitted.
 \note has a base class, because templated classes can't have QObject as parent class.
 @sa QmitkRTDataGeneratorBase
 */
-template <class taskGenerationRule>
+template <class DataGenerationRule>
 class QmitkRTDataGenerator : public QmitkRTDataGeneratorBase
 {
   public:
@@ -53,7 +53,7 @@ public slots:
     void SetStructureNodes(mitk::DataStorage::SetOfObjects::ConstPointer structureNodes);
 
 protected:
-  /*! @brief Generate the data (by default all combinations of doseNodes and structNodes with the specified taskgenerationRule)
+  /*! @brief Generate the data (by default all combinations of doseNodes and structNodes with the specified DataGenerationRule)
   */
   void DoGenerate() override;
   bool NodeChangeIsRelevant(const mitk::DataNode* changedNode) const override;

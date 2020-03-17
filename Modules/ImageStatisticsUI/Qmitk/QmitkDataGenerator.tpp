@@ -54,19 +54,19 @@ QmitkDataGeneratorBase::GetAllDoseStructCombinations() const {
 }
 
 
-template <class taskGenerationRule>
+template <class DataGenerationRule>
 void
-QmitkRTDataGenerator<taskGenerationRule>::DoGenerate() {
+QmitkRTDataGenerator<DataGenerationRule>::DoGenerate() {
   auto doseAndStructCombinations = GetAllDoseStructCombinations();
 
   QThreadPool* threadPool = QThreadPool::globalInstance();
   bool jobSpawned = false;
   for (const auto& doseAndStruct : doseAndStructCombinations) {
     MITK_INFO << "processing node " << doseAndStruct.first->GetName() << " and struct " << doseAndStruct.second->GetName();
-    taskGenerationRule aTaskGenerationRule = taskGenerationRule();
-    if (!aTaskGenerationRule.IsResultAvailable(m_Storage.GetPointer(), doseAndStruct.first.GetPointer(), doseAndStruct.second.GetPointer())) {
+    DataGenerationRule aDataGenerationRule = DataGenerationRule();
+    if (!aDataGenerationRule.IsResultAvailable(m_Storage.GetPointer(), doseAndStruct.first.GetPointer(), doseAndStruct.second.GetPointer())) {
       MITK_INFO << "no result available. Triggering computation of necessary jobs.";
-      auto job = aTaskGenerationRule.GetNextMissingJob(m_Storage, doseAndStruct.first.GetPointer(), doseAndStruct.second.GetPointer());
+      auto job = aDataGenerationRule.GetNextMissingJob(m_Storage, doseAndStruct.first.GetPointer(), doseAndStruct.second.GetPointer());
       //other jobs are pending, nothing has to be done
       if (!job) {
         MITK_INFO << "waiting for other jobs to finish";
@@ -79,8 +79,8 @@ QmitkRTDataGenerator<taskGenerationRule>::DoGenerate() {
           m_Storage->Add(dataNode);
         }
       }
-      connect(job, SIGNAL(Error(QString, const QmitkRTJobBase*)), this, SLOT(OnJobError(QString, const QmitkRTJobBase*)));
-      connect(job, SIGNAL(ResultsAvailable(const mitk::DataStorage::SetOfObjects*, const QmitkRTJobBase*)), this, SLOT(OnFinalResultsAvailable(const mitk::DataStorage::SetOfObjects*, const QmitkRTJobBase*)));
+      connect(job, SIGNAL(Error(QString, const QmitkDataGenerationJobBase*)), this, SLOT(OnJobError(QString, const QmitkDataGenerationJobBase*)));
+      connect(job, SIGNAL(ResultsAvailable(const mitk::DataStorage::SetOfObjects*, const QmitkDataGenerationJobBase*)), this, SLOT(OnFinalResultsAvailable(const mitk::DataStorage::SetOfObjects*, const QmitkDataGenerationJobBase*)));
       threadPool->start(job);
       jobSpawned = true;
     }

@@ -470,28 +470,19 @@ bool DicomSeriesReader::ImageBlockDescriptor::loadImage(DcmFileFormat& ff, Image
       key.fill('0');
       key.setf(std::ios::hex, std::ios::basefield);
       key << std::setw(4) << tag.getGroup() << '|' << std::setw(4) << tag.getElement();
-      switch(tag.getEVR()) {
-      case EVR_AT: case EVR_FL: case EVR_FD: case EVR_OF: case EVR_SL: case EVR_SS: case EVR_UL: case EVR_US:
-      case EVR_CS: case EVR_DA: case EVR_TM: case EVR_UI: case EVR_LO: case EVR_ST: case EVR_SH: case EVR_PN:
-      case EVR_DS: case EVR_IS: case EVR_AS:
-        if (elem->getOFStringArray(value).good() && !value.empty()) {
+
+      // Check for it is a binary tag known by gdcm
+      gdcm::VR::VRType vrtype = pubdict.GetDictEntry(gdcm::Tag(tag.getGroup(), tag.getElement())).GetVR();
+      if (vrtype & (gdcm::VR::OB_OW | gdcm::VR::OF | gdcm::VR::UN)) {
+        std::vector<unsigned char> bin(elem->getLengthField());
+        if (elem->getPartialValue(&bin[0], 0, bin.size()).good()) {
+          OFStandard::encodeBase64(&bin[0], bin.size(), value);
           itk::EncapsulateMetaData(*dict, key.str(), value);
-          break;
         }
-        // fall through
-      default:
-        // Check for it is a binary tag known by gdcm
-        gdcm::VR::VRType vrtype = pubdict.GetDictEntry(gdcm::Tag(tag.getGroup(), tag.getElement())).GetVR();
-        if (vrtype & (gdcm::VR::OB_OW | gdcm::VR::OF | gdcm::VR::UN)) {
-          std::vector<unsigned char> bin(elem->getLengthField());
-          if (elem->getPartialValue(&bin[0], 0, bin.size()).good()) {
-            OFStandard::encodeBase64(&bin[0], bin.size(), value);
-            itk::EncapsulateMetaData(*dict, key.str(), value);
-            break;
-          }
-        }
-        // Other VRs may cause assertion fault in itk::GDCMImageIO::Write during export so we ignoring them
+      } else if (vrtype && elem->getOFStringArray(value).good() && !value.empty()) {
+        itk::EncapsulateMetaData(*dict, key.str(), value);
       }
+      // Other VRs may cause assertion fault in itk::GDCMImageIO::Write during export so we ignoring them
     }
 
     lock.lock();

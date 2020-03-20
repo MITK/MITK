@@ -1,11 +1,3 @@
-#
-# Variables:
-#  MITK_DOXYGEN_OUTPUT_DIR: doxygen output directory (optional)
-
-# Needed early on for redirecting the BlueBerry documentation output dir
-set(MITK_DOXYGEN_OUTPUT_DIR ${PROJECT_BINARY_DIR}/Documentation/Doxygen CACHE PATH
-    "Output directory for doxygen generated documentation." )
-
 # Compile source code snippets
 add_subdirectory(Snippets)
 

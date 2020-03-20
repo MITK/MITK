@@ -1137,6 +1137,9 @@ set(MITK_ROOT_FOLDER "${MITK_ROOT_FOLDER_BACKUP}")
 
 add_subdirectory(Wrapping)
 
+set(MITK_DOXYGEN_OUTPUT_DIR "${PROJECT_BINARY_DIR}/Documentation/Doxygen" CACHE PATH
+  "Output directory for doxygen generated documentation.")
+
 if(MITK_USE_BLUEBERRY)
 
   set(BLUEBERRY_XPDOC_OUTPUT_DIR "${MITK_DOXYGEN_OUTPUT_DIR}/html/extension-points/html/")

@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include "mitkStatisticsToMaskRelationRule.h"
 #include "mitkNodePredicateFunction.h"
 #include "mitkNodePredicateAnd.h"
+#include "mitkNodePredicateNot.h"
 #include "mitkNodePredicateDataProperty.h"
 #include "mitkProperties.h"
 #include "mitkImageStatisticsContainerManager.h"
@@ -58,7 +59,7 @@ bool QmitkImageStatisticsDataGenerator::NodeChangeIsRelevant(const mitk::DataNod
   if (!result)
   {
     std::string status;
-    if (!changedNode->GetStringProperty(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str(), status) || status != mitk::STATS_GENERATION_STATUS_VALUE_WORK_IN_PROGRESS)
+    if (!changedNode->GetStringProperty(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str(), status))
     {
       auto stats = dynamic_cast<const mitk::ImageStatisticsContainer*>(changedNode->GetData());
       return stats != nullptr;
@@ -103,7 +104,8 @@ mitk::DataNode::Pointer QmitkImageStatisticsDataGenerator::GetLatestResult(const
 
       if (noWIP)
       {
-        predicate = mitk::NodePredicateAnd::New(predicate, mitk::NodePredicateDataProperty::New(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str()));
+        auto noWIPPredicate = mitk::NodePredicateNot::New(mitk::NodePredicateDataProperty::New(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str()));
+        predicate = mitk::NodePredicateAnd::New(predicate, noWIPPredicate);
       }
 
       std::shared_lock<std::shared_mutex> mutexguard(m_DataMutex);
@@ -113,8 +115,8 @@ mitk::DataNode::Pointer QmitkImageStatisticsDataGenerator::GetLatestResult(const
 
       for (const auto& node : *statisticContainerCandidateNodes)
       {
-        auto isUpToDate = image->GetMTime() > node->GetData()->GetMTime()
-                          && (mask == nullptr || mask->GetMTime() > node->GetData()->GetMTime());
+        auto isUpToDate = image->GetMTime() < node->GetData()->GetMTime()
+                          && (mask == nullptr || mask->GetMTime() < node->GetData()->GetMTime());
 
         if (!onlyIfUpToDate || isUpToDate)
         {
@@ -196,7 +198,8 @@ QmitkDataGenerationJobBase* QmitkImageStatisticsDataGenerator::GetNextMissingGen
 {
   auto resultDataNode = this->GetLatestResult(imageNode, roiNode, true, false);
 
-  if (resultDataNode.IsNull())
+  std::string status;
+  if (resultDataNode.IsNull() || (resultDataNode->GetStringProperty(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str(), status) && status == mitk::STATS_GENERATION_STATUS_VALUE_PENDING))
   {
     if (!imageNode || !imageNode->GetData())
     {
@@ -224,7 +227,6 @@ QmitkDataGenerationJobBase* QmitkImageStatisticsDataGenerator::GetNextMissingGen
 
     return newJob;
   }
-
   return nullptr;
 }
 
@@ -249,7 +251,7 @@ void QmitkImageStatisticsDataGenerator::RemoveObsoleteDataNodes(const mitk::Data
   auto binPredicate = mitk::NodePredicateDataProperty::New(mitk::STATS_HISTOGRAM_BIN_PROPERTY_NAME.c_str(), mitk::UIntProperty::New(m_HistogramNBins));
   auto zeroPredicate = mitk::NodePredicateDataProperty::New(mitk::STATS_IGNORE_ZERO_VOXEL_PROPERTY_NAME.c_str(), mitk::BoolProperty::New(m_IgnoreZeroValueVoxel));
 
-  mitk::NodePredicateBase::ConstPointer predicate = mitk::NodePredicateAnd::New(predicate, notLatestPredicate);
+  mitk::NodePredicateBase::ConstPointer predicate = mitk::NodePredicateAnd::New(rulePredicate, notLatestPredicate);
   predicate = mitk::NodePredicateAnd::New(predicate, binPredicate, zeroPredicate);
 
   auto storage = m_Storage.Lock();

@@ -44,6 +44,9 @@ public:
   mitk::DataStorage::Pointer GetDataStorage() const;
   bool GetAutoUpdate() const;
 
+  /** Indicates if currently there is work in progress, so data generation jobs are running or pending.
+   It is set to true when GenerationStarted is triggered and becomes false as soon as GenerationFinished is triggered.
+  */
   bool IsGenerating() const;
 
   void Generate() const;
@@ -113,13 +116,14 @@ protected:
   bool m_AutoUpdate = false;
 
   mutable std::shared_mutex m_DataMutex;
-  mutable bool m_RunningGeneration = false;
+  mutable bool m_InGenerate = false;
   mutable bool m_RestartGeneration = false;
+  mutable bool m_WIP = false;
 
   /**Member is called when a node is added to the storage.*/
   void NodeAddedOrModified(const mitk::DataNode* node);
 
-  void EnsureRecheckingAndGeneration();
+  void EnsureRecheckingAndGeneration() const;
 
   unsigned long m_DataStorageDeletedTag;
 };

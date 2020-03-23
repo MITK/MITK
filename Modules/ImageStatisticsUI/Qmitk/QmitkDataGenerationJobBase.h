@@ -29,6 +29,7 @@ namespace mitk
 {
   static const std::string STATS_GENERATION_STATUS_PROPERTY_NAME = "MITK.statistic.generation.status";
   static const std::string STATS_GENERATION_STATUS_VALUE_WORK_IN_PROGRESS = "workInProgress";
+  static const std::string STATS_GENERATION_STATUS_VALUE_PENDING = "pending";
   static const std::string STATS_GENERATION_STATUS_VALUE_BASE_DATA_FAILED = "failed";
 }
 

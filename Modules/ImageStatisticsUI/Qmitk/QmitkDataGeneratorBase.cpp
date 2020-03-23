@@ -52,7 +52,7 @@ bool QmitkDataGeneratorBase::GetAutoUpdate() const
 
 bool QmitkDataGeneratorBase::IsGenerating() const
 {
-  return m_RunningGeneration;
+  return m_WIP;
 }
 
 void QmitkDataGeneratorBase::SetDataStorage(mitk::DataStorage* storage)
@@ -121,6 +121,11 @@ void QmitkDataGeneratorBase::OnFinalResultsAvailable(JobResultMapType results, c
   }
 
   emit NewDataAvailable(resultnodes.GetPointer());
+
+  if (!resultnodes->empty())
+  {
+    this->EnsureRecheckingAndGeneration();
+  }
 }
 
 void QmitkDataGeneratorBase::NodeAddedOrModified(const mitk::DataNode* node)
@@ -131,10 +136,10 @@ void QmitkDataGeneratorBase::NodeAddedOrModified(const mitk::DataNode* node)
   }
 }
 
-void QmitkDataGeneratorBase::EnsureRecheckingAndGeneration()
+void QmitkDataGeneratorBase::EnsureRecheckingAndGeneration() const
 {
   m_RestartGeneration = true;
-  if (!IsGenerating())
+  if (!m_InGenerate)
   {
     this->Generate();
   }
@@ -142,15 +147,22 @@ void QmitkDataGeneratorBase::EnsureRecheckingAndGeneration()
 
 void QmitkDataGeneratorBase::Generate() const
 {
-  m_RunningGeneration = true;
-  m_RestartGeneration = true;
-  while (m_RestartGeneration)
+  if (m_InGenerate)
   {
-    m_RestartGeneration = false;
-    DoGenerate();
+    m_RestartGeneration = true;
   }
+  else
+  {
+    m_InGenerate = true;
+    m_RestartGeneration = true;
+    while (m_RestartGeneration)
+    {
+      m_RestartGeneration = false;
+      DoGenerate();
+    }
 
-  m_RunningGeneration = false;
+    m_InGenerate = false;
+  }
 }
 
 mitk::DataNode::Pointer QmitkDataGeneratorBase::CreateWIPDataNode(mitk::BaseData* dataDummy, const std::string& nodeName)
@@ -161,7 +173,7 @@ mitk::DataNode::Pointer QmitkDataGeneratorBase::CreateWIPDataNode(mitk::BaseData
 
   auto interimResultNode = mitk::DataNode::New();
   interimResultNode->SetProperty("helper object", mitk::BoolProperty::New(true));
-  dataDummy->SetProperty(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str(), mitk::StringProperty::New(mitk::STATS_GENERATION_STATUS_VALUE_WORK_IN_PROGRESS));
+  dataDummy->SetProperty(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str(), mitk::StringProperty::New(mitk::STATS_GENERATION_STATUS_VALUE_PENDING));
   interimResultNode->SetVisibility(false);
   interimResultNode->SetData(dataDummy);
   if (!nodeName.empty())
@@ -190,6 +202,7 @@ void QmitkDataGeneratorBase::DoGenerate() const
 
       if (everythingValid)
       {
+        m_WIP = true;
         emit GenerationStarted();
         everythingValid = false;
       }
@@ -215,8 +228,9 @@ void QmitkDataGeneratorBase::DoGenerate() const
     }
   }
 
-  if (everythingValid)
+  if (everythingValid && m_WIP)
   {
+    m_WIP = false;
     emit GenerationFinished();
   }
 }

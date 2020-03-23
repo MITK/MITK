@@ -91,6 +91,9 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
             return "RTDose" == mimeType.GetComment();
           });
 
+          if (dicomRTMimeTypes.end() == rtDoseReaderIter)
+            mitkThrow() << "Cannot find DICOMRT RTDOSE file reader.";
+
           auto doseReader = fileReaderRegistry.GetReaders(*rtDoseReaderIter).at(0);
 
           doseReader->SetInput(ImporterUtil::getUTF8String(listOfFilesForSeries.front()));
@@ -142,6 +145,9 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
             return "RTStruct" == mimeType.GetComment();
           });
 
+          if (dicomRTMimeTypes.end() == rtStructReaderIter)
+            mitkThrow() << "Cannot find DICOMRT RTSTRUCT file reader.";
+
           auto structReader = fileReaderRegistry.GetReaders(*rtStructReaderIter).at(0);
 
           structReader->SetInput(ImporterUtil::getUTF8String(listOfFilesForSeries.front()));
@@ -185,6 +191,9 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
           auto rtPlanReaderIter = std::find_if(dicomRTMimeTypes.begin(), dicomRTMimeTypes.end(), [](const auto& mimeType) {
             return "RTPLAN" == mimeType.GetComment();
           });
+
+          if (dicomRTMimeTypes.end() == rtPlanReaderIter)
+            mitkThrow() << "Cannot find DICOMRT RTPLAN file reader.";
 
           auto planReader = fileReaderRegistry.GetReaders(*rtPlanReaderIter).at(0);
 

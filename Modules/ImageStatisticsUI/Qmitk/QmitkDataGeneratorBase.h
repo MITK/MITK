@@ -21,9 +21,9 @@ found in the LICENSE file.
 //MITK
 #include <mitkDataStorage.h>
 
-#include <MitkImageStatisticsUIExports.h>
+#include "QmitkDataGenerationJobBase.h"
 
-class QmitkDataGenerationJobBase;
+#include <MitkImageStatisticsUIExports.h>
 
 /*!
 \brief QmitkDataGeneratorBase
@@ -39,12 +39,17 @@ public:
 
   ~QmitkDataGeneratorBase();
 
+  using JobResultMapType = QmitkDataGenerationJobBase::ResultMapType;
+
   mitk::DataStorage::Pointer GetDataStorage() const;
   bool GetAutoUpdate() const;
 
   bool IsGenerating() const;
 
   void Generate() const;
+
+  /** Indicates if for a given image and ROI a valid final result is available.*/
+  virtual bool IsValidResultAvailable(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const = 0;
 
 public slots:
   void SetDataStorage(mitk::DataStorage* storage);
@@ -54,7 +59,7 @@ protected slots:
   void OnJobError(QString error, const QmitkDataGenerationJobBase* failedJob) const;
   /*! @brief Wraps the resulting BaseData* into DataNode objects
   */
-  void OnFinalResultsAvailable(mitk::DataStorage::SetOfObjects::ConstPointer results, const QmitkDataGenerationJobBase *job) const;
+  void OnFinalResultsAvailable(JobResultMapType results, const QmitkDataGenerationJobBase *job) const;
 
 signals:
   /*! @brief Signal that is emitted if new final data is produced.
@@ -77,24 +82,29 @@ protected:
   /*! @brief Constructor
   @param storage the data storage where all produced data should be stored
   */
-  QmitkDataGeneratorBase(mitk::DataStorage::Pointer storage);
-  QmitkDataGeneratorBase();
+  QmitkDataGeneratorBase(mitk::DataStorage::Pointer storage, QObject* parent = nullptr);
+  QmitkDataGeneratorBase(QObject* parent = nullptr);
+
+  using InputPairVectorType = std::vector<std::pair<mitk::DataNode::ConstPointer, mitk::DataNode::ConstPointer>>;
 
   virtual bool NodeChangeIsRelevant(const mitk::DataNode* changedNode) const = 0;
-  virtual std::vector<std::pair<mitk::DataNode::Pointer, mitk::DataNode::Pointer>> GetAllImageStructCombinations() const = 0;
+  virtual InputPairVectorType GetAllImageROICombinations() const = 0;
   /** Indicates if there is already an valid and up-to-date result for the given node pair.*/
-  virtual bool IsValidResultAvailable(const mitk::DataNode* imageNode, const mitk::DataNode* segNode) const = 0;
-  /** Generate placeholder nodes for all (interim) results that will be produced to have a valid final result.
-   and add them to the data storage. It is important that the data generation property is set correctly for the
-   generated placeholder nodes.*/
-  virtual void IndicateFutureResults(const mitk::DataNode* imageNode, const mitk::DataNode* segNode) const = 0;
+  virtual void IndicateFutureResults(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const = 0;
   /*! @brief Returns the next job that needs to be done in order to complete the workflow.
    If no job instance is passed back, it either indicated that there is nothing to do (IsValidResultAvailable == true)
    or that currently a interim result is still missing and therefore the next job cannot be triggered.*/
-  virtual QmitkDataGenerationJobBase* GetNextMissingGenerationJob(const mitk::DataNode* imageNode, const mitk::DataNode* segNode) const =0;
+  virtual QmitkDataGenerationJobBase* GetNextMissingGenerationJob(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const =0;
   /** Remove all obsolete data nodes for the given image and seg node from the data storage.
   Obsolete nodes are (interim) result nodes that are not the most recent any more.*/
-  virtual void RemoveObsoleteDataNodes(const mitk::DataNode* imageNode, const mitk::DataNode* segNode) const = 0;
+  virtual void RemoveObsoleteDataNodes(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const = 0;
+  /** Prepares result to be added to the storage in an appropriate way and returns the data node for that.*/
+  virtual mitk::DataNode::Pointer PrepareResultForStorage(const std::string& label, mitk::BaseData* result, const QmitkDataGenerationJobBase* job) const = 0;
+
+  /*! @brief Creates a data node for interim results
+  @details It's the jobs responsibility to write the final results to the data of the DataNode.
+  */
+  static mitk::DataNode::Pointer CreateWIPDataNode(mitk::BaseData* dataDummy, const std::string& nodeName);
 
   void DoGenerate() const;
 
@@ -109,8 +119,9 @@ protected:
   /**Member is called when a node is added to the storage.*/
   void NodeAddedOrModified(const mitk::DataNode* node);
 
-  unsigned long m_DataStorageDeletedTag;
+  void EnsureRecheckingAndGeneration();
 
+  unsigned long m_DataStorageDeletedTag;
 };
 
 #endif

@@ -13,59 +13,39 @@ found in the LICENSE file.
 #include "QmitkDataGenerationJobBase.h"
 
 
-mitk::DataStorage::SetOfObjects::ConstPointer QmitkDataGenerationJobBase::GetOutputDataNodes() const
+std::string QmitkDataGenerationJobBase::GetLastErrorMessage() const
 {
-  return m_OutputDataNodes;
+  return m_LastErrorMessage;
 }
 
-QmitkDataGenerationJobBase::QmitkDataGenerationJobBase(const mitk::DataStorage::SetOfObjects* outputDataNodes, const std::vector<mitk::BaseData::ConstPointer>& inputBaseData) :m_OutputDataNodes(outputDataNodes), m_InputBaseData(inputBaseData)
+bool QmitkDataGenerationJobBase::GetComputationSuccessFlag() const
 {
-}
-
-QmitkDataGenerationJobBase::QmitkDataGenerationJobBase(mitk::DataNode* outputDataNode, const std::vector<mitk::BaseData::ConstPointer>& inputBaseData): m_InputBaseData(inputBaseData)
-{
-  if (!outputDataNode) {
-    mitkThrow() << "No output data node defined.";
-  }
-
-  auto nodes = mitk::DataStorage::SetOfObjects::New();
-  nodes->InsertElement(0, outputDataNode);
-  m_OutputDataNodes = nodes;
-}
-
-QmitkDataGenerationJobBase::QmitkDataGenerationJobBase(const mitk::DataStorage::SetOfObjects* outputDataNodes) : m_OutputDataNodes(outputDataNodes)
-{
-}
-
-QmitkDataGenerationJobBase::QmitkDataGenerationJobBase(mitk::DataNode* outputDataNode) : QmitkDataGenerationJobBase(outputDataNode, std::vector<mitk::BaseData::ConstPointer>())
-{
-}
-
-QmitkDataGenerationJobBase::~QmitkDataGenerationJobBase()
-{
-}
-
-void QmitkDataGenerationJobBase::SetInputBaseData(const std::vector<mitk::BaseData::ConstPointer>& baseData)
-{
-  m_InputBaseData = baseData;
+  return m_ComputationSuccessful;
 }
 
 void QmitkDataGenerationJobBase::run()
 {
   try
   {
-    if (this->RunComputation())
+    m_ComputationSuccessful = this->RunComputation();
+    if (m_ComputationSuccessful)
     {
-      emit ResultsAvailable(m_OutputDataNodes, this);
+      emit ResultsAvailable(this->GetResults(), this);
+    }
+    else
+    {
+      emit Error(QString("Error while running computation. Error description: ") + QString::fromStdString(m_LastErrorMessage), this);
     }
   }
   catch (std::exception& e)
   {
-    emit Error(QString("Error while running computation. Error description: ") + QString::fromLatin1(
-      e.what()), this);
+    m_LastErrorMessage = e.what();
+    emit Error(QString("Error while running computation. Error description: ") + QString::fromStdString(m_LastErrorMessage), this);
+
   }
   catch (...)
   {
-    emit Error(QString("Unknown error while running computation."), this);
+    m_LastErrorMessage = "Unknown exception";
+    emit Error(QString("Error while running computation. Error description: ") + QString::fromStdString(m_LastErrorMessage), this);
   }
 }

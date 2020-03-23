@@ -22,6 +22,7 @@ found in the LICENSE file.
 
 namespace mitk
 {
+
   /**
    @brief Container class for storing a StatisticsObject for each timestep.
 
@@ -143,6 +144,11 @@ namespace mitk
     */
     bool TimeStepExists(TimeStepType timeStep) const;
 
+    /*!
+    /brief Returns the histogram of the currently selected time step.
+    @pre timeStep must be valid*/
+    const HistogramType* GetTimeStepHistogram(TimeStepType timeStep) const;
+
   protected:
     ImageStatisticsContainer();
     void PrintSelf(std::ostream &os, itk::Indent indent) const override;
@@ -157,6 +163,5 @@ namespace mitk
 
   MITKIMAGESTATISTICS_EXPORT ImageStatisticsContainer::ImageStatisticsObject::StatisticNameVector GetAllStatisticNames(const ImageStatisticsContainer* container);
   MITKIMAGESTATISTICS_EXPORT ImageStatisticsContainer::ImageStatisticsObject::StatisticNameVector GetAllStatisticNames(std::vector<ImageStatisticsContainer::ConstPointer> containers);
-
 }
 #endif // MITKIMAGESTATISTICSCONTAINER

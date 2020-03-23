@@ -28,12 +28,10 @@ mitk::ImageStatisticsContainer::ConstPointer mitk::ImageStatisticsContainerManag
     mitkThrow() << "Image is nullptr";
   }
 
-  mitk::NodePredicateBase::ConstPointer predicate = GetPredicateForSources(image, mask);;
+  mitk::NodePredicateBase::ConstPointer predicate = GetStatisticsPredicateForSources(image, mask);;
 
-  if (predicate) {
-    auto nodePredicateImageStatisticsContainer = mitk::NodePredicateDataType::New(ImageStatisticsContainer::GetStaticNameOfClass());
-    predicate = mitk::NodePredicateAnd::New(predicate, nodePredicateImageStatisticsContainer);
-
+  if (predicate)
+  {
     auto statisticContainerCandidateNodes = dataStorage->GetSubset(predicate);
     mitk::DataStorage::SetOfObjects::Pointer statisticContainerCandidateNodesFiltered;
 
@@ -65,14 +63,18 @@ mitk::ImageStatisticsContainer::ConstPointer mitk::ImageStatisticsContainerManag
   }
 }
 
-mitk::NodePredicateBase::ConstPointer mitk::ImageStatisticsContainerManager::GetPredicateForSources(const mitk::BaseData* image, const mitk::BaseData* mask)
+mitk::NodePredicateBase::ConstPointer mitk::ImageStatisticsContainerManager::GetStatisticsPredicateForSources(const mitk::BaseData* image, const mitk::BaseData* mask)
 {
   if (!image) {
     mitkThrow() << "Image is nullptr";
   }
 
+  auto nodePredicateImageStatisticsContainer = mitk::NodePredicateDataType::New(ImageStatisticsContainer::GetStaticNameOfClass());
+
   auto imageRule = mitk::StatisticsToImageRelationRule::New();
-  mitk::NodePredicateBase::ConstPointer predicate = imageRule->GetSourcesDetector(image);
+  auto imagePredicate = imageRule->GetSourcesDetector(image);
+
+  mitk::NodePredicateBase::ConstPointer predicate = mitk::NodePredicateAnd::New(nodePredicateImageStatisticsContainer, imagePredicate);
 
   auto maskRule = mitk::StatisticsToMaskRelationRule::New();
   if (mask)

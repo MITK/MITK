@@ -15,14 +15,14 @@ found in the LICENSE file.
 
 #include "QmitkDataGenerationJobBase.h"
 #include "mitkDataNode.h"
+#include "mitkProperties.h"
 
 #include <QThreadPool>
 
-QmitkDataGeneratorBase::QmitkDataGeneratorBase(mitk::DataStorage::Pointer storage) :
-  m_Storage(storage)
+QmitkDataGeneratorBase::QmitkDataGeneratorBase(mitk::DataStorage::Pointer storage, QObject* parent) : QObject(parent), m_Storage(storage)
 {}
 
-QmitkDataGeneratorBase::QmitkDataGeneratorBase()
+QmitkDataGeneratorBase::QmitkDataGeneratorBase(QObject* parent): QObject(parent)
 {}
 
 QmitkDataGeneratorBase::~QmitkDataGeneratorBase()
@@ -99,35 +99,44 @@ void QmitkDataGeneratorBase::OnJobError(QString error, const QmitkDataGeneration
   emit JobError(error, failedJob);
 }
 
-void QmitkDataGeneratorBase::OnFinalResultsAvailable(mitk::DataStorage::SetOfObjects::ConstPointer results, const QmitkDataGenerationJobBase *job) const
+void QmitkDataGeneratorBase::OnFinalResultsAvailable(JobResultMapType results, const QmitkDataGenerationJobBase *job) const
 {
-  if (results.IsNotNull())
+  auto resultnodes = mitk::DataStorage::SetOfObjects::New();
+
+  for (auto pos : results)
   {
+    resultnodes->push_back(this->PrepareResultForStorage(pos.first, pos.second, job));
+  }
+
+  {
+    std::shared_lock<std::shared_mutex> mutexguard(m_DataMutex);
+    auto storage = m_Storage.Lock();
+    if (storage.IsNotNull())
     {
-      std::shared_lock<std::shared_mutex> mutexguard(m_DataMutex);
-      auto storage = m_Storage.Lock();
-      if (storage.IsNull())
+      for (auto pos = resultnodes->Begin(); pos != resultnodes->End(); ++pos)
       {
-        for (auto pos = results->Begin(); pos != results->End(); ++pos)
-        {
-          storage->Add(pos->Value());
-        }
+        storage->Add(pos->Value());
       }
     }
-
-    emit NewDataAvailable(results);
   }
+
+  emit NewDataAvailable(resultnodes.GetPointer());
 }
 
 void QmitkDataGeneratorBase::NodeAddedOrModified(const mitk::DataNode* node)
 {
   if (this->NodeChangeIsRelevant(node))
   {
-    m_RestartGeneration = true;
-    if (!IsGenerating())
-    {
-      this->Generate();
-    }
+    this->EnsureRecheckingAndGeneration();
+  }
+}
+
+void QmitkDataGeneratorBase::EnsureRecheckingAndGeneration()
+{
+  m_RestartGeneration = true;
+  if (!IsGenerating())
+  {
+    this->Generate();
   }
 }
 
@@ -144,9 +153,28 @@ void QmitkDataGeneratorBase::Generate() const
   m_RunningGeneration = false;
 }
 
+mitk::DataNode::Pointer QmitkDataGeneratorBase::CreateWIPDataNode(mitk::BaseData* dataDummy, const std::string& nodeName)
+{
+  if (!dataDummy) {
+    mitkThrow() << "data is nullptr";
+  }
+
+  auto interimResultNode = mitk::DataNode::New();
+  interimResultNode->SetProperty("helper object", mitk::BoolProperty::New(true));
+  dataDummy->SetProperty(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str(), mitk::StringProperty::New(mitk::STATS_GENERATION_STATUS_VALUE_WORK_IN_PROGRESS));
+  interimResultNode->SetVisibility(false);
+  interimResultNode->SetData(dataDummy);
+  if (!nodeName.empty())
+  {
+    interimResultNode->SetName(nodeName);
+  }
+  return interimResultNode;
+}
+
+
 void QmitkDataGeneratorBase::DoGenerate() const
 {
-  auto imageSegCombinations = this->GetAllImageStructCombinations();
+  auto imageSegCombinations = this->GetAllImageROICombinations();
 
   QThreadPool* threadPool = QThreadPool::globalInstance();
 
@@ -154,7 +182,7 @@ void QmitkDataGeneratorBase::DoGenerate() const
 
   for (const auto& imageAndSeg : imageSegCombinations)
   {
-    MITK_INFO << "processing node " << imageAndSeg.first->GetName() << " and struct " << imageAndSeg.second->GetName();
+    MITK_INFO << "processing node " << imageAndSeg.first << " and struct " << imageAndSeg.second;
 
     if (!this->IsValidResultAvailable(imageAndSeg.first.GetPointer(), imageAndSeg.second.GetPointer()))
     {
@@ -176,8 +204,8 @@ void QmitkDataGeneratorBase::DoGenerate() const
       else
       {
         job->setAutoDelete(true);
-        connect(job, &QmitkDataGenerationJobBase::Error, this, &QmitkDataGeneratorBase::OnJobError);
-        connect(job, &QmitkDataGenerationJobBase::ResultsAvailable, this, &QmitkDataGeneratorBase::OnFinalResultsAvailable);
+        connect(job, &QmitkDataGenerationJobBase::Error, this, &QmitkDataGeneratorBase::OnJobError, Qt::BlockingQueuedConnection);
+        connect(job, &QmitkDataGenerationJobBase::ResultsAvailable, this, &QmitkDataGeneratorBase::OnFinalResultsAvailable, Qt::BlockingQueuedConnection);
         threadPool->start(job);
       }
     }

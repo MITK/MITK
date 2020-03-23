@@ -31,15 +31,16 @@ namespace mitk
   public:
     /**Documentation
     @brief Returns the StatisticContainer for the given image and mask
-    @return a valid StatisticsContainer or nullptr if no StatisticContainer is found or no rules have been defined
+    @return a valid StatisticsContainer or nullptr if no StatisticContainer is found.
     @details if more than one StatisticsContainer is found, only the newest (ModifiedTime) is returned
     @pre Datastorage must point to a valid instance.
     @pre image must Point to a valid instance.
     */
     static mitk::ImageStatisticsContainer::ConstPointer GetImageStatistics(const mitk::DataStorage* dataStorage, const mitk::BaseData* image, const mitk::BaseData* mask=nullptr);
 
-  protected:
-    static mitk::NodePredicateBase::ConstPointer GetPredicateForSources(const mitk::BaseData* image, const mitk::BaseData* mask = nullptr);
+    /** Returns the predicate that can be used to search for statistic containers of
+    the given image (and mask) in the passed data storage.*/
+    static mitk::NodePredicateBase::ConstPointer GetStatisticsPredicateForSources(const mitk::BaseData* image, const mitk::BaseData* mask = nullptr);
   };
 }
 #endif

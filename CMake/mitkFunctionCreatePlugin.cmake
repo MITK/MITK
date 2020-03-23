@@ -82,6 +82,15 @@ function(mitk_create_plugin)
     return()
   endif()
 
+  foreach(_module_dep ${_PLUGIN_MODULE_DEPENDS})
+    if(TARGET ${_module_dep})
+      get_target_property(AUTLOAD_DEP ${_module_dep} MITK_AUTOLOAD_DIRECTORY)
+      if (AUTLOAD_DEP)
+        message(SEND_ERROR "Plugin \"${PROJECT_NAME}\" has an invalid dependency on autoload module \"${_module_dep}\". Check MITK_CREATE_PLUGIN usage for \"${PROJECT_NAME}\".")
+      endif()
+    endif()
+  endforeach()
+
   # -------------- All dependencies are resolved ------------------
 
   message(STATUS "Creating CTK plugin ${PROJECT_NAME}")

@@ -11,22 +11,22 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#include "mitkRTPlanReaderService.h"
+#include <mitkRTPlanReaderService.h>
 
-#include "mitkImage.h"
-#include "mitkDICOMDCMTKTagScanner.h"
-#include "mitkIOMimeTypes.h"
+#include <mitkImage.h>
+#include <mitkDICOMDCMTKTagScanner.h>
+#include <mitkIOMimeTypes.h>
 #include <mitkDICOMIOHelper.h>
-#include "mitkDICOMTagPath.h"
-#include "mitkIDICOMTagsOfInterest.h"
-#include "mitkDICOMDatasetAccessingImageFrameInfo.h"
-#include "mitkDicomRTIOMimeTypes.h"
+#include <mitkDICOMTagPath.h>
+#include <mitkIDICOMTagsOfInterest.h>
+#include <mitkDICOMDatasetAccessingImageFrameInfo.h>
+#include <mitkDicomRTMimeTypes.h>
 
 
 namespace mitk
 {
 
-  RTPlanReaderService::RTPlanReaderService() : AbstractFileReader(CustomMimeType(mitk::DicomRTIOMimeTypes::DICOMRT_PLAN_MIMETYPE_NAME()), mitk::DicomRTIOMimeTypes::DICOMRT_PLAN_MIMETYPE_DESCRIPTION()) {
+  RTPlanReaderService::RTPlanReaderService() : AbstractFileReader(CustomMimeType(mitk::DicomRTMimeTypes::DICOMRT_PLAN_MIMETYPE_NAME()), mitk::DicomRTMimeTypes::DICOMRT_PLAN_MIMETYPE_DESCRIPTION()) {
     m_FileReaderServiceReg = RegisterService();
 
   }

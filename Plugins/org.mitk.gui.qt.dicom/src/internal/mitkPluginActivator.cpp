@@ -13,6 +13,9 @@ found in the LICENSE file.
 #include "mitkPluginActivator.h"
 #include "QmitkDicomBrowser.h"
 #include "QmitkDicomPreferencePage.h"
+#include <usModuleInitialization.h>
+
+US_INITIALIZE_MODULE
 
 namespace mitk {
 ctkPluginContext* PluginActivator::pluginContext = nullptr;

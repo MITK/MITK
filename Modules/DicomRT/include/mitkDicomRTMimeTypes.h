@@ -10,21 +10,22 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKDicomRTIOMimeTypes_H
-#define MITKDicomRTIOMimeTypes_H
+#ifndef MITKDicomRTMimeTypes_H
+#define MITKDicomRTMimeTypes_H
 
-#include "mitkCustomMimeType.h"
+#include <mitkCustomMimeType.h>
 #include <mitkIDICOMTagsOfInterest.h>
+#include <MitkDicomRTExports.h>
 
 #include <string>
 
 namespace mitk {
 
-class DicomRTIOMimeTypes
+class MITKDICOMRT_EXPORT DicomRTMimeTypes
 {
 public:
 
-  class  RTDoseMimeType : public CustomMimeType
+  class MITKDICOMRT_EXPORT RTDoseMimeType : public CustomMimeType
   {
   public:
     RTDoseMimeType();
@@ -33,7 +34,7 @@ public:
     RTDoseMimeType* Clone() const override;
   };
 
-  class  RTStructMimeType : public CustomMimeType
+  class MITKDICOMRT_EXPORT RTStructMimeType : public CustomMimeType
   {
   public:
     RTStructMimeType();
@@ -41,7 +42,7 @@ public:
     RTStructMimeType* Clone() const override;
   };
 
-  class  RTPlanMimeType : public CustomMimeType
+  class MITKDICOMRT_EXPORT RTPlanMimeType : public CustomMimeType
   {
   public:
     RTPlanMimeType();
@@ -63,8 +64,8 @@ public:
   static std::string DICOMRT_STRUCT_MIMETYPE_DESCRIPTION();
   static std::string DICOMRT_PLAN_MIMETYPE_DESCRIPTION();
 
-  DicomRTIOMimeTypes() = delete;
-  DicomRTIOMimeTypes(const DicomRTIOMimeTypes&) = delete;
+  DicomRTMimeTypes() = delete;
+  DicomRTMimeTypes(const DicomRTMimeTypes&) = delete;
 
   static mitk::IDICOMTagsOfInterest* GetDicomTagsOfInterestService();
   static bool canReadByDicomFileReader(const std::string & path);
@@ -73,4 +74,4 @@ public:
 
 }
 
-#endif // MITKDicomRTIOMimeTypes_H
+#endif // MITKDicomRTMimeTypes_H

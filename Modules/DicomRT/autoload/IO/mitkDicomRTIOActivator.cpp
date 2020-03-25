@@ -20,7 +20,7 @@ found in the LICENSE file.
 #include <mitkIPropertyDescriptions.h>
 #include <mitkIPropertyPersistence.h>
 
-#include "mitkDicomRTIOMimeTypes.h"
+#include <mitkDicomRTMimeTypes.h>
 
 namespace mitk
 {
@@ -36,7 +36,7 @@ namespace mitk
       us::ServiceProperties props;
       props[ us::ServiceConstants::SERVICE_RANKING() ] = 100;
 
-      m_MimeTypes = mitk::DicomRTIOMimeTypes::Get();
+      m_MimeTypes = mitk::DicomRTMimeTypes::Get();
       for (std::vector<mitk::CustomMimeType*>::const_iterator mimeTypeIter = m_MimeTypes.begin(),
         iterEnd = m_MimeTypes.end(); mimeTypeIter != iterEnd; ++mimeTypeIter)
       {

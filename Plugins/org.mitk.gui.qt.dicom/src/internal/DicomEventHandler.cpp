@@ -24,8 +24,7 @@ found in the LICENSE file.
 #include "mitkImage.h"
 #include <mitkContourModelSet.h>
 #include <mitkFileReaderRegistry.h>
-#include <mitkCoreServices.h>
-#include <mitkIMimeTypeProvider.h>
+#include <mitkDicomRTMimeTypes.h>
 
 #include <mitkDICOMFileReaderSelector.h>
 #include <mitkDICOMDCMTKTagScanner.h>
@@ -58,6 +57,21 @@ found in the LICENSE file.
 
 #include <ImporterUtil.h>
 
+namespace
+{
+  mitk::IFileReader* GetReader(mitk::FileReaderRegistry& readerRegistry, const mitk::CustomMimeType& mimeType)
+  {
+    try
+    {
+      return readerRegistry.GetReaders(mitk::MimeType(mimeType, -1, -1)).at(0);
+    }
+    catch (const std::out_of_range&)
+    {
+      mitkThrow() << "Cannot find " << mimeType.GetCategory() << " " << mimeType.GetComment() << " file reader.";
+    }
+  }
+}
+
 DicomEventHandler::DicomEventHandler()
 {
 }
@@ -80,22 +94,11 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
         ctkEvent.getProperty("Modality").toString().compare("RTPLAN", Qt::CaseInsensitive) == 0))
     {
       QString modality = ctkEvent.getProperty("Modality").toString();
-
-      auto mimeTypeProvider = mitk::CoreServices::GetMimeTypeProvider();
-      auto dicomRTMimeTypes = mimeTypeProvider->GetMimeTypesForCategory("DICOMRT");
-      mitk::FileReaderRegistry fileReaderRegistry;
+      mitk::FileReaderRegistry readerRegistry;
 
       if(modality.compare("RTDOSE",Qt::CaseInsensitive) == 0)
       {
-          auto rtDoseReaderIter = std::find_if(dicomRTMimeTypes.begin(), dicomRTMimeTypes.end(), [](const auto &mimeType) {
-            return "RTDose" == mimeType.GetComment();
-          });
-
-          if (dicomRTMimeTypes.end() == rtDoseReaderIter)
-            mitkThrow() << "Cannot find DICOMRT RTDOSE file reader.";
-
-          auto doseReader = fileReaderRegistry.GetReaders(*rtDoseReaderIter).at(0);
-
+          auto doseReader = GetReader(readerRegistry, mitk::DicomRTMimeTypes::DICOMRT_DOSE_MIMETYPE());
           doseReader->SetInput(ImporterUtil::getUTF8String(listOfFilesForSeries.front()));
           std::vector<itk::SmartPointer<mitk::BaseData> > readerOutput = doseReader->Read();
           if (!readerOutput.empty()){
@@ -141,15 +144,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
       }
       else if(modality.compare("RTSTRUCT",Qt::CaseInsensitive) == 0)
       {
-          auto rtStructReaderIter = std::find_if(dicomRTMimeTypes.begin(), dicomRTMimeTypes.end(), [](const auto& mimeType) {
-            return "RTStruct" == mimeType.GetComment();
-          });
-
-          if (dicomRTMimeTypes.end() == rtStructReaderIter)
-            mitkThrow() << "Cannot find DICOMRT RTSTRUCT file reader.";
-
-          auto structReader = fileReaderRegistry.GetReaders(*rtStructReaderIter).at(0);
-
+          auto structReader = GetReader(readerRegistry, mitk::DicomRTMimeTypes::DICOMRT_STRUCT_MIMETYPE());
           structReader->SetInput(ImporterUtil::getUTF8String(listOfFilesForSeries.front()));
           std::vector<itk::SmartPointer<mitk::BaseData> > readerOutput = structReader->Read();
 
@@ -188,15 +183,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
       }
       else if (modality.compare("RTPLAN", Qt::CaseInsensitive) == 0)
       {
-          auto rtPlanReaderIter = std::find_if(dicomRTMimeTypes.begin(), dicomRTMimeTypes.end(), [](const auto& mimeType) {
-            return "RTPLAN" == mimeType.GetComment();
-          });
-
-          if (dicomRTMimeTypes.end() == rtPlanReaderIter)
-            mitkThrow() << "Cannot find DICOMRT RTPLAN file reader.";
-
-          auto planReader = fileReaderRegistry.GetReaders(*rtPlanReaderIter).at(0);
-
+          auto planReader = GetReader(readerRegistry, mitk::DicomRTMimeTypes::DICOMRT_PLAN_MIMETYPE());
           planReader->SetInput(ImporterUtil::getUTF8String(listOfFilesForSeries.front()));
           std::vector<itk::SmartPointer<mitk::BaseData> > readerOutput = planReader->Read();
           if (!readerOutput.empty()){

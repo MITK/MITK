@@ -79,7 +79,7 @@ void QmitkImageStatisticsView::CreateConnections()
   connect(m_Controls.widget_histogram, &QmitkHistogramVisualizationWidget::RequestHistogramUpdate,
     this, &QmitkImageStatisticsView::OnRequestHistogramUpdate);
 
-  connect(m_DataGenerator, &QmitkImageStatisticsDataGenerator::GenerationStarted,
+  connect(m_DataGenerator, &QmitkImageStatisticsDataGenerator::DataGenerationStarted,
     this, &QmitkImageStatisticsView::OnGenerationStarted);
   connect(m_DataGenerator, &QmitkImageStatisticsDataGenerator::GenerationFinished,
     this, &QmitkImageStatisticsView::OnGenerationFinished);
@@ -205,7 +205,7 @@ void QmitkImageStatisticsView::ResetGUIDefault()
   m_IgnoreZeroValueVoxel = false;
 }
 
-void QmitkImageStatisticsView::OnGenerationStarted()
+void QmitkImageStatisticsView::OnGenerationStarted(const mitk::DataNode* /*imageNode*/, const mitk::DataNode* /*roiNode*/, const QmitkDataGenerationJobBase* /*job*/)
 {
   m_Controls.label_currentlyComputingStatistics->setVisible(true);
 }

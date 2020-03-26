@@ -49,7 +49,7 @@ public:
 protected:
   bool NodeChangeIsRelevant(const mitk::DataNode* changedNode) const final;
   void IndicateFutureResults(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const final;
-  QmitkDataGenerationJobBase* GetNextMissingGenerationJob(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const final;
+  std::pair<QmitkDataGenerationJobBase*, mitk::DataNode::Pointer> GetNextMissingGenerationJob(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const final;
   void RemoveObsoleteDataNodes(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const final;
   mitk::DataNode::Pointer PrepareResultForStorage(const std::string& label, mitk::BaseData* result, const QmitkDataGenerationJobBase* job) const final;
 

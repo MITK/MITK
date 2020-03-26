@@ -29,7 +29,11 @@ void QmitkImageStatisticsDataGenerator::SetIgnoreZeroValueVoxel(bool _arg)
   if (m_IgnoreZeroValueVoxel != _arg)
   {
     m_IgnoreZeroValueVoxel = _arg;
-    this->EnsureRecheckingAndGeneration();
+
+    if (m_AutoUpdate)
+    {
+      this->EnsureRecheckingAndGeneration();
+    }
   }
 }
 
@@ -43,7 +47,11 @@ void QmitkImageStatisticsDataGenerator::SetHistogramNBins(unsigned int nbins)
   if (m_HistogramNBins != nbins)
   {
     m_HistogramNBins = nbins;
-    this->EnsureRecheckingAndGeneration();
+
+    if (m_AutoUpdate)
+    {
+      this->EnsureRecheckingAndGeneration();
+    }
   }
 }
 
@@ -62,10 +70,10 @@ bool QmitkImageStatisticsDataGenerator::NodeChangeIsRelevant(const mitk::DataNod
     if (!changedNode->GetStringProperty(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str(), status))
     {
       auto stats = dynamic_cast<const mitk::ImageStatisticsContainer*>(changedNode->GetData());
-      return stats != nullptr;
+      result = stats != nullptr;
     }
   }
-  return false;
+  return result;
 }
 
 bool QmitkImageStatisticsDataGenerator::IsValidResultAvailable(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const
@@ -134,7 +142,7 @@ mitk::DataNode::Pointer QmitkImageStatisticsDataGenerator::GetLatestResult(const
             return a->GetData()->GetMTime() < b->GetData()->GetMTime();
             });
           newestElement = *newestIter;
-          MITK_WARN << "multiple statistics (" << statisticContainerCandidateNodesFiltered->size() << ") for image/mask found. Returning only newest one.";
+          MITK_DEBUG << "multiple statistics (" << statisticContainerCandidateNodesFiltered->size() << ") for image/mask found. Returning only newest one.";
           for (const auto& node : *statisticContainerCandidateNodesFiltered)
           {
             MITK_DEBUG << node->GetName() << ", timestamp: " << node->GetData()->GetMTime();
@@ -167,7 +175,8 @@ void QmitkImageStatisticsDataGenerator::IndicateFutureResults(const mitk::DataNo
     mask = roiNode->GetData();
   }
 
-  if (!this->IsValidResultAvailable(imageNode, roiNode))
+  auto resultDataNode = this->GetLatestResult(imageNode, roiNode, true, false);
+  if (resultDataNode.IsNull())
   {
     auto dummyStats = mitk::ImageStatisticsContainer::New();
 
@@ -194,7 +203,7 @@ void QmitkImageStatisticsDataGenerator::IndicateFutureResults(const mitk::DataNo
   }
 }
 
-QmitkDataGenerationJobBase* QmitkImageStatisticsDataGenerator::GetNextMissingGenerationJob(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const
+std::pair<QmitkDataGenerationJobBase*, mitk::DataNode::Pointer> QmitkImageStatisticsDataGenerator::GetNextMissingGenerationJob(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const
 {
   auto resultDataNode = this->GetLatestResult(imageNode, roiNode, true, false);
 
@@ -224,10 +233,15 @@ QmitkDataGenerationJobBase* QmitkImageStatisticsDataGenerator::GetNextMissingGen
 
     newJob->Initialize(image, mask, planar);
     newJob->SetIgnoreZeroValueVoxel(m_IgnoreZeroValueVoxel);
+    newJob->SetHistogramNBins(m_HistogramNBins);
 
-    return newJob;
+    return std::pair<QmitkDataGenerationJobBase*, mitk::DataNode::Pointer>(newJob, resultDataNode.GetPointer());
   }
-  return nullptr;
+  else if (resultDataNode->GetStringProperty(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str(), status) && status == mitk::STATS_GENERATION_STATUS_VALUE_WORK_IN_PROGRESS)
+  {
+    return std::pair<QmitkDataGenerationJobBase*, mitk::DataNode::Pointer>(nullptr, resultDataNode.GetPointer());
+  }
+  return std::pair<QmitkDataGenerationJobBase*, mitk::DataNode::Pointer>(nullptr, nullptr);
 }
 
 void QmitkImageStatisticsDataGenerator::RemoveObsoleteDataNodes(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const

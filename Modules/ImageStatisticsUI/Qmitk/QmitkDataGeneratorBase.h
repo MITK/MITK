@@ -49,7 +49,11 @@ public:
   */
   bool IsGenerating() const;
 
-  void Generate() const;
+  /** Checks data validity and triggers generation of data, if needed.
+  The generation itselfs will be done in threads an orchastrated by this class. To learn if the threads are finished and
+  everything is uptodate, listen to the signal GenerationFinished.
+  @return indicates if everything is already valid (true) or if the generation of new data was triggerd (false).*/
+  bool Generate() const;
 
   /** Indicates if for a given image and ROI a valid final result is available.*/
   virtual bool IsValidResultAvailable(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const = 0;
@@ -65,13 +69,14 @@ protected slots:
   void OnFinalResultsAvailable(JobResultMapType results, const QmitkDataGenerationJobBase *job) const;
 
 signals:
+
+  /*! @brief Signal that is emitted if a data generation job is started to generat outdated/inexistant data.
+  */
+  void DataGenerationStarted(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode, const QmitkDataGenerationJobBase* job) const;
+
   /*! @brief Signal that is emitted if new final data is produced.
   */
   void NewDataAvailable(mitk::DataStorage::SetOfObjects::ConstPointer data) const;
-
-  /*! @brief Signal that is emitted if the generator emits new jobs.
-  */
-  void GenerationStarted() const;
 
   /*! @brief Signal that is emitted if all jobs are finished.
   */
@@ -94,10 +99,14 @@ protected:
   virtual InputPairVectorType GetAllImageROICombinations() const = 0;
   /** Indicates if there is already an valid and up-to-date result for the given node pair.*/
   virtual void IndicateFutureResults(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const = 0;
-  /*! @brief Returns the next job that needs to be done in order to complete the workflow.
-   If no job instance is passed back, it either indicated that there is nothing to do (IsValidResultAvailable == true)
-   or that currently a interim result is still missing and therefore the next job cannot be triggered.*/
-  virtual QmitkDataGenerationJobBase* GetNextMissingGenerationJob(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const =0;
+  /*! @brief Is called to generate the next job instance that needs to be done and its associated dummy node
+      in order to progress the data generation workflow.
+   @remark The method assumes that the caller takes care of the job instance deletion.
+   @return std::pair of job pointer and placeholder node associated with the job. Current combinations are possible:
+   - 1) Both are null: nothing to do;
+   - 2) Both are set: there is something to do for a pending dumme node;
+   - 3) job null and node set: a job for this node is already work in progress.*/
+  virtual std::pair<QmitkDataGenerationJobBase*,mitk::DataNode::Pointer> GetNextMissingGenerationJob(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const =0;
   /** Remove all obsolete data nodes for the given image and seg node from the data storage.
   Obsolete nodes are (interim) result nodes that are not the most recent any more.*/
   virtual void RemoveObsoleteDataNodes(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const = 0;
@@ -109,7 +118,7 @@ protected:
   */
   static mitk::DataNode::Pointer CreateWIPDataNode(mitk::BaseData* dataDummy, const std::string& nodeName);
 
-  void DoGenerate() const;
+  bool DoGenerate() const;
 
   mitk::WeakPointer<mitk::DataStorage> m_Storage;
 

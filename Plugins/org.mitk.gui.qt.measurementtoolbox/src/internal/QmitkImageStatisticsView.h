@@ -63,7 +63,7 @@ protected:
   void ResetGUI();
   void ResetGUIDefault();
 
-  void OnGenerationStarted();
+  void OnGenerationStarted(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode, const QmitkDataGenerationJobBase* job);
   void OnGenerationFinished();
   void OnJobError(QString error, const QmitkDataGenerationJobBase* failedJob);
   void OnRequestHistogramUpdate(unsigned int);

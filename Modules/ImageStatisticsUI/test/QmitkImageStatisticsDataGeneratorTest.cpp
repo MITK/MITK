@@ -17,6 +17,12 @@ found in the LICENSE file.
 #include "mitkPlanarFigure.h"
 #include "mitkIOUtil.h"
 
+#include "mitkStatisticsToImageRelationRule.h"
+#include "mitkStatisticsToMaskRelationRule.h"
+#include "mitkProperties.h"
+
+#include "QmitkImageStatisticsCalculationRunnable.h"
+
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
@@ -26,7 +32,7 @@ public:
   TestQmitkImageStatisticsDataGenerator(mitk::DataStorage::Pointer storage, QObject* parent = nullptr) : QmitkImageStatisticsDataGenerator(storage, parent)
   {
     connect(this, &QmitkDataGeneratorBase::NewDataAvailable, this, &TestQmitkImageStatisticsDataGenerator::NewDataAvailableEmited);
-    connect(this, &QmitkDataGeneratorBase::GenerationStarted, this, &TestQmitkImageStatisticsDataGenerator::GenerationStartedEmited);
+    connect(this, &QmitkDataGeneratorBase::DataGenerationStarted, this, &TestQmitkImageStatisticsDataGenerator::DataGenerationStartedEmited);
     connect(this, &QmitkDataGeneratorBase::GenerationFinished, this, &TestQmitkImageStatisticsDataGenerator::GenerationFinishedEmited);
     connect(this, &QmitkDataGeneratorBase::JobError, this, &TestQmitkImageStatisticsDataGenerator::JobErrorEmited);
   };
@@ -37,10 +43,10 @@ public:
     m_NewDataAvailable.emplace_back(data);
   };
 
-  mutable int m_GenerationStartedEmited = 0;
-  void GenerationStartedEmited() const
+  mutable int m_DataGenerationStartedEmited = 0;
+  void DataGenerationStartedEmited(const mitk::DataNode* /*imageNode*/, const mitk::DataNode* /*roiNode*/, const QmitkDataGenerationJobBase* /*job*/) const
   {
-    m_GenerationStartedEmited++;
+    m_DataGenerationStartedEmited++;
   }
 
   mutable int m_GenerationFinishedEmited = 0;
@@ -96,12 +102,14 @@ public:
     m_Image1 = mitk::IOUtil::Load<mitk::Image>(pic3DCroppedFile);
     CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D_cropped", m_Image1.IsNotNull());
     m_ImageNode1->SetData(m_Image1);
+    m_DataStorage->Add(m_ImageNode1);
 
     m_ImageNode2 = mitk::DataNode::New();
     m_ImageNode2->SetName("Image_2");
     m_Image2 = mitk::IOUtil::Load<mitk::Image>(pic3DCroppedFile);
     CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D_cropped", m_Image2.IsNotNull());
     m_ImageNode2->SetData(m_Image2);
+    m_DataStorage->Add(m_ImageNode2);
 
     m_MaskImageNode = mitk::DataNode::New();
     m_MaskImageNode->SetName("Mask");
@@ -109,6 +117,7 @@ public:
     m_Mask = mitk::IOUtil::Load<mitk::Image>(pic3DCroppedBinMaskFile);
     CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D binary mask", m_Mask.IsNotNull());
     m_MaskImageNode->SetData(m_Mask);
+    m_DataStorage->Add(m_MaskImageNode);
 
     m_PFNode = mitk::DataNode::New();
     m_PFNode->SetName("PF");
@@ -116,6 +125,7 @@ public:
     m_PF = mitk::IOUtil::Load<mitk::PlanarFigure>(pic3DCroppedPlanarFigureFile);
     CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D planar figure", m_PF.IsNotNull());
     m_PFNode->SetData(m_PF);
+    m_DataStorage->Add(m_PFNode);
 
     int argc = 0;
     char** argv = nullptr;
@@ -128,20 +138,56 @@ public:
   }
 
 
+  bool CheckResultNode(const std::vector<mitk::DataNode::Pointer> resultNodes, const mitk::DataNode* imageNode, const mitk::DataNode* roiNode, unsigned int histBin = 100, bool noZero = false)
+  {
+    for (auto& resultNode : resultNodes)
+    {
+      bool result = false;
+
+      if (resultNode && resultNode->GetData() && imageNode && imageNode->GetData())
+      {
+        auto imageRule = mitk::StatisticsToImageRelationRule::New();
+        result = !imageRule->GetRelationUIDs(resultNode, imageNode).empty();
+
+        if (roiNode)
+        {
+          auto maskRule = mitk::StatisticsToMaskRelationRule::New();
+          result = result && !maskRule->GetRelationUIDs(resultNode, roiNode).empty();
+        }
+
+        auto prop = resultNode->GetData()->GetProperty(mitk::STATS_HISTOGRAM_BIN_PROPERTY_NAME.c_str());
+        auto binProp = dynamic_cast<const mitk::UIntProperty*>(prop.GetPointer());
+        result = result && binProp->GetValue() == histBin;
+
+        prop = resultNode->GetData()->GetProperty(mitk::STATS_IGNORE_ZERO_VOXEL_PROPERTY_NAME.c_str());
+        auto zeroProp = dynamic_cast<const mitk::BoolProperty*>(prop.GetPointer());
+        result = result && zeroProp->GetValue() == noZero;
+      }
+
+      if (result)
+      { //node was in the result set
+        return true;
+      }
+
+    }
+
+    return false;
+  }
+
   void NullTest()
   {
     TestQmitkImageStatisticsDataGenerator generator(nullptr);
 
     generator.Generate();
+    CPPUNIT_ASSERT_EQUAL(0, generator.m_DataGenerationStartedEmited);
     CPPUNIT_ASSERT_EQUAL(0, generator.m_GenerationFinishedEmited);
-    CPPUNIT_ASSERT_EQUAL(0, generator.m_GenerationStartedEmited);
     CPPUNIT_ASSERT(generator.m_JobErrorEmited_error.empty());
     CPPUNIT_ASSERT(generator.m_NewDataAvailable.empty());
 
     generator.SetDataStorage(m_DataStorage);
     generator.Generate();
+    CPPUNIT_ASSERT_EQUAL(0, generator.m_DataGenerationStartedEmited);
     CPPUNIT_ASSERT_EQUAL(0, generator.m_GenerationFinishedEmited);
-    CPPUNIT_ASSERT_EQUAL(0, generator.m_GenerationStartedEmited);
     CPPUNIT_ASSERT(generator.m_JobErrorEmited_error.empty());
     CPPUNIT_ASSERT(generator.m_NewDataAvailable.empty());
   }
@@ -184,38 +230,287 @@ public:
     generator.Generate();
     m_TestApp->exec();
 
+    CPPUNIT_ASSERT_EQUAL(1, generator.m_DataGenerationStartedEmited);
     CPPUNIT_ASSERT_EQUAL(1, generator.m_GenerationFinishedEmited);
-    CPPUNIT_ASSERT_EQUAL(1, generator.m_GenerationStartedEmited);
     CPPUNIT_ASSERT(generator.m_JobErrorEmited_error.empty());
-    CPPUNIT_ASSERT(generator.m_NewDataAvailable.empty());
+    CPPUNIT_ASSERT(1 == generator.m_NewDataAvailable.size());
+    CPPUNIT_ASSERT(CheckResultNode({ generator.m_NewDataAvailable.front()->front() }, m_ImageNode1, nullptr));
+
+    CPPUNIT_ASSERT_MESSAGE("Error: Rerun has generated new data.", generator.Generate());
   }
 
   void MultiImageTest()
   {
+    TestQmitkImageStatisticsDataGenerator generator(m_DataStorage);
+
+    generator.SetImageNodes({ m_ImageNode1.GetPointer(), m_ImageNode2.GetPointer() });
+    generator.Generate();
+    m_TestApp->exec();
+
+    CPPUNIT_ASSERT_EQUAL(2, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL(1, generator.m_GenerationFinishedEmited);
+    CPPUNIT_ASSERT(generator.m_JobErrorEmited_error.empty());
+    CPPUNIT_ASSERT(2u == generator.m_NewDataAvailable.size());
+    CPPUNIT_ASSERT(CheckResultNode({ generator.m_NewDataAvailable[0]->front(), generator.m_NewDataAvailable[1]->front() }, m_ImageNode1, nullptr));
+    CPPUNIT_ASSERT(CheckResultNode({ generator.m_NewDataAvailable[0]->front(), generator.m_NewDataAvailable[1]->front() }, m_ImageNode2, nullptr));
+
+    CPPUNIT_ASSERT_MESSAGE("Error: Rerun has generated new data.", generator.Generate());
   }
 
   void ImageAndROITest()
   {
+    TestQmitkImageStatisticsDataGenerator generator(m_DataStorage);
+
+    generator.SetImageNodes({ m_ImageNode1.GetPointer() });
+    generator.SetROINodes({ m_MaskImageNode.GetPointer() });
+    generator.Generate();
+    m_TestApp->exec();
+
+    CPPUNIT_ASSERT_EQUAL(1, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL(1, generator.m_GenerationFinishedEmited);
+    CPPUNIT_ASSERT(generator.m_JobErrorEmited_error.empty());
+    CPPUNIT_ASSERT(1 == generator.m_NewDataAvailable.size());
+    CPPUNIT_ASSERT(CheckResultNode({ generator.m_NewDataAvailable[0]->front() }, m_ImageNode1, m_MaskImageNode));
+
+    CPPUNIT_ASSERT_MESSAGE("Error: Rerun has generated new data.", generator.Generate());
+
+    generator.SetROINodes({ m_PFNode.GetPointer() });
+    generator.Generate();
+    m_TestApp->exec();
+
+    CPPUNIT_ASSERT_EQUAL(2, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL(2, generator.m_GenerationFinishedEmited);
+    CPPUNIT_ASSERT(generator.m_JobErrorEmited_error.empty());
+    CPPUNIT_ASSERT(2 == generator.m_NewDataAvailable.size());
+    CPPUNIT_ASSERT(CheckResultNode({ generator.m_NewDataAvailable[1]->front() }, m_ImageNode1, m_PFNode));
+
+    CPPUNIT_ASSERT_MESSAGE("Error: Rerun has generated new data.", generator.Generate());
   }
 
   void ImageAndMultiROITest()
   {
+    TestQmitkImageStatisticsDataGenerator generator(m_DataStorage);
+
+    generator.SetImageNodes({ m_ImageNode1.GetPointer() });
+    generator.SetROINodes({ m_PFNode.GetPointer(), m_MaskImageNode.GetPointer(), nullptr });
+    generator.Generate();
+    m_TestApp->exec();
+
+    CPPUNIT_ASSERT_EQUAL(3, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL(1, generator.m_GenerationFinishedEmited);
+    CPPUNIT_ASSERT(generator.m_JobErrorEmited_error.empty());
+    CPPUNIT_ASSERT(3 == generator.m_NewDataAvailable.size());
+    CPPUNIT_ASSERT(CheckResultNode({ generator.m_NewDataAvailable[0]->front(), generator.m_NewDataAvailable[1]->front(), generator.m_NewDataAvailable[2]->front()}, m_ImageNode1, m_PFNode));
+    CPPUNIT_ASSERT(CheckResultNode({ generator.m_NewDataAvailable[0]->front(), generator.m_NewDataAvailable[1]->front(), generator.m_NewDataAvailable[2]->front() }, m_ImageNode1, m_MaskImageNode));
+    CPPUNIT_ASSERT(CheckResultNode({ generator.m_NewDataAvailable[0]->front(), generator.m_NewDataAvailable[1]->front(), generator.m_NewDataAvailable[2]->front() }, m_ImageNode1, nullptr));
+
+    CPPUNIT_ASSERT_MESSAGE("Error: Rerun has generated new data.", generator.Generate());
   }
 
   void MultiMultiTest()
   {
+    TestQmitkImageStatisticsDataGenerator generator(m_DataStorage);
+
+    generator.SetImageNodes({ m_ImageNode1.GetPointer(), m_ImageNode2.GetPointer() });
+    generator.SetROINodes({ m_PFNode.GetPointer(), m_MaskImageNode.GetPointer(), nullptr });
+    generator.Generate();
+    m_TestApp->exec();
+
+    CPPUNIT_ASSERT_EQUAL(6, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL(1, generator.m_GenerationFinishedEmited);
+    CPPUNIT_ASSERT(generator.m_JobErrorEmited_error.empty());
+    CPPUNIT_ASSERT(6 == generator.m_NewDataAvailable.size());
+    CPPUNIT_ASSERT(CheckResultNode({ generator.m_NewDataAvailable[0]->front(), generator.m_NewDataAvailable[1]->front(),
+                                     generator.m_NewDataAvailable[2]->front(), generator.m_NewDataAvailable[3]->front(),
+                                     generator.m_NewDataAvailable[4]->front(), generator.m_NewDataAvailable[5]->front() }, m_ImageNode1, m_PFNode));
+    CPPUNIT_ASSERT(CheckResultNode({ generator.m_NewDataAvailable[0]->front(), generator.m_NewDataAvailable[1]->front(),
+                                     generator.m_NewDataAvailable[2]->front(), generator.m_NewDataAvailable[3]->front(),
+                                     generator.m_NewDataAvailable[4]->front(), generator.m_NewDataAvailable[5]->front() }, m_ImageNode1, m_MaskImageNode));
+    CPPUNIT_ASSERT(CheckResultNode({ generator.m_NewDataAvailable[0]->front(), generator.m_NewDataAvailable[1]->front(),
+                                     generator.m_NewDataAvailable[2]->front(), generator.m_NewDataAvailable[3]->front(),
+                                     generator.m_NewDataAvailable[4]->front(), generator.m_NewDataAvailable[5]->front() }, m_ImageNode1, nullptr));
+    CPPUNIT_ASSERT(CheckResultNode({ generator.m_NewDataAvailable[0]->front(), generator.m_NewDataAvailable[1]->front(),
+                                     generator.m_NewDataAvailable[2]->front(), generator.m_NewDataAvailable[3]->front(),
+                                     generator.m_NewDataAvailable[4]->front(), generator.m_NewDataAvailable[5]->front() }, m_ImageNode2, m_PFNode));
+    CPPUNIT_ASSERT(CheckResultNode({ generator.m_NewDataAvailable[0]->front(), generator.m_NewDataAvailable[1]->front(),
+                                     generator.m_NewDataAvailable[2]->front(), generator.m_NewDataAvailable[3]->front(),
+                                     generator.m_NewDataAvailable[4]->front(), generator.m_NewDataAvailable[5]->front() }, m_ImageNode2, m_MaskImageNode));
+    CPPUNIT_ASSERT(CheckResultNode({ generator.m_NewDataAvailable[0]->front(), generator.m_NewDataAvailable[1]->front(),
+                                     generator.m_NewDataAvailable[2]->front(), generator.m_NewDataAvailable[3]->front(),
+                                     generator.m_NewDataAvailable[4]->front(), generator.m_NewDataAvailable[5]->front() }, m_ImageNode2, nullptr));
+
+    CPPUNIT_ASSERT_MESSAGE("Error: Rerun has generated new data.", generator.Generate());
   }
 
   void InputChangedTest()
   {
+    TestQmitkImageStatisticsDataGenerator generator(m_DataStorage);
+
+    generator.SetImageNodes({ m_ImageNode2.GetPointer() });
+    m_TestApp->processEvents();
+
+    CPPUNIT_ASSERT_EQUAL(0, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL(0, generator.m_GenerationFinishedEmited);
+    CPPUNIT_ASSERT(generator.m_JobErrorEmited_error.empty());
+    CPPUNIT_ASSERT(0 == generator.m_NewDataAvailable.size());
+
+    generator.SetAutoUpdate(true);
+    generator.SetImageNodes({ m_ImageNode1.GetPointer() });
+    m_TestApp->exec();
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update seemed not to work.", 1, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update seemed not to work.", 1, generator.m_GenerationFinishedEmited);
+    CPPUNIT_ASSERT_MESSAGE("Error: Auto update seemed not to work.", generator.m_JobErrorEmited_error.empty());
+    CPPUNIT_ASSERT_MESSAGE("Error: Auto update seemed not to work.", 1 == generator.m_NewDataAvailable.size());
+
+    generator.SetImageNodes({ m_ImageNode1.GetPointer() });
+    m_TestApp->processEvents();
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggerd, but input does not realy changed.", 1, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggerd, but input does not realy changed.", 1, generator.m_GenerationFinishedEmited);
+    CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggerd, but input does not realy changed.", generator.m_JobErrorEmited_error.empty());
+    CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggerd, but input does not realy changed.", 1 == generator.m_NewDataAvailable.size());
+
+    generator.SetAutoUpdate(true);
+    generator.SetROINodes({ m_MaskImageNode.GetPointer() });
+    m_TestApp->exec();
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update seemed not to work.", 2, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update seemed not to work.", 2, generator.m_GenerationFinishedEmited);
+    CPPUNIT_ASSERT_MESSAGE("Error: Auto update seemed not to work.", generator.m_JobErrorEmited_error.empty());
+    CPPUNIT_ASSERT_MESSAGE("Error: Auto update seemed not to work.", 2 == generator.m_NewDataAvailable.size());
   }
 
   void SettingsChangedTest()
   {
+    TestQmitkImageStatisticsDataGenerator generator(m_DataStorage);
+
+    generator.SetImageNodes({ m_ImageNode1.GetPointer() });
+    generator.Generate();
+    m_TestApp->exec();
+
+    CPPUNIT_ASSERT_EQUAL(1, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL(1, generator.m_GenerationFinishedEmited);
+    CPPUNIT_ASSERT(generator.m_JobErrorEmited_error.empty());
+    CPPUNIT_ASSERT(1 == generator.m_NewDataAvailable.size());
+    CPPUNIT_ASSERT(CheckResultNode({ generator.m_NewDataAvailable[0]->front() }, m_ImageNode1, nullptr));
+
+    generator.SetHistogramNBins(50);
+    generator.Generate();
+    m_TestApp->exec();
+
+    CPPUNIT_ASSERT_EQUAL(2, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL(2, generator.m_GenerationFinishedEmited);
+    CPPUNIT_ASSERT(generator.m_JobErrorEmited_error.empty());
+    CPPUNIT_ASSERT(2 == generator.m_NewDataAvailable.size());
+    CPPUNIT_ASSERT(CheckResultNode({ generator.m_NewDataAvailable[1]->front() }, m_ImageNode1, nullptr, 50));
+
+    generator.SetIgnoreZeroValueVoxel(true);
+    generator.Generate();
+    m_TestApp->exec();
+
+    CPPUNIT_ASSERT_EQUAL(3, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL(3, generator.m_GenerationFinishedEmited);
+    CPPUNIT_ASSERT(generator.m_JobErrorEmited_error.empty());
+    CPPUNIT_ASSERT(3 == generator.m_NewDataAvailable.size());
+    CPPUNIT_ASSERT(CheckResultNode({ generator.m_NewDataAvailable[2]->front() }, m_ImageNode1, nullptr, 50, true));
+
+    //now check auto update feature
+    generator.SetAutoUpdate(true);
+    generator.SetHistogramNBins(5);
+    m_TestApp->exec();
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update seemed not to work.", 4, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update seemed not to work.", 4, generator.m_GenerationFinishedEmited);
+    CPPUNIT_ASSERT_MESSAGE("Error: Auto update seemed not to work.", generator.m_JobErrorEmited_error.empty());
+    CPPUNIT_ASSERT_MESSAGE("Error: Auto update seemed not to work.", 4 == generator.m_NewDataAvailable.size());
+    CPPUNIT_ASSERT(CheckResultNode({ generator.m_NewDataAvailable[3]->front() }, m_ImageNode1, nullptr, 5, true));
+
+    generator.SetHistogramNBins(5);
+    m_TestApp->processEvents();
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggerd, but input does not realy changed.", 4, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggerd, but input does not realy changed.", 4, generator.m_GenerationFinishedEmited);
+    CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggerd, but input does not realy changed.", generator.m_JobErrorEmited_error.empty());
+    CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggerd, but input does not realy changed.", 4 == generator.m_NewDataAvailable.size());
+
+    generator.SetIgnoreZeroValueVoxel(false);
+    m_TestApp->exec();
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update seemed not to work.", 5, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update seemed not to work.", 5, generator.m_GenerationFinishedEmited);
+    CPPUNIT_ASSERT_MESSAGE("Error: Auto update seemed not to work.", generator.m_JobErrorEmited_error.empty());
+    CPPUNIT_ASSERT_MESSAGE("Error: Auto update seemed not to work.", 5 == generator.m_NewDataAvailable.size());
+    CPPUNIT_ASSERT(CheckResultNode({ generator.m_NewDataAvailable[4]->front() }, m_ImageNode1, nullptr, 5, false));
+
+    generator.SetIgnoreZeroValueVoxel(false);
+    m_TestApp->processEvents();
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggerd, but input does not realy changed.", 5, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggerd, but input does not realy changed.", 5, generator.m_GenerationFinishedEmited);
+    CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggerd, but input does not realy changed.", generator.m_JobErrorEmited_error.empty());
+    CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggerd, but input does not realy changed.", 5 == generator.m_NewDataAvailable.size());
   }
 
   void DataStorageModificationTest()
   {
+    TestQmitkImageStatisticsDataGenerator generator(m_DataStorage);
+
+    generator.SetImageNodes({ m_ImageNode1.GetPointer() });
+    generator.SetROINodes({ m_PFNode.GetPointer() });
+    generator.Generate();
+    m_TestApp->exec();
+
+    CPPUNIT_ASSERT_EQUAL(1, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL(1, generator.m_GenerationFinishedEmited);
+    CPPUNIT_ASSERT(generator.m_JobErrorEmited_error.empty());
+    CPPUNIT_ASSERT(1 == generator.m_NewDataAvailable.size());
+
+    m_PF->Modified();
+    m_PFNode->Modified();
+    m_TestApp->processEvents();
+
+    CPPUNIT_ASSERT_EQUAL(1, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL(1, generator.m_GenerationFinishedEmited);
+    CPPUNIT_ASSERT(generator.m_JobErrorEmited_error.empty());
+    CPPUNIT_ASSERT(1 == generator.m_NewDataAvailable.size());
+
+    generator.Generate();
+    m_TestApp->exec();
+
+    CPPUNIT_ASSERT_EQUAL(2, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL(2, generator.m_GenerationFinishedEmited);
+    CPPUNIT_ASSERT(generator.m_JobErrorEmited_error.empty());
+    CPPUNIT_ASSERT(2 == generator.m_NewDataAvailable.size());
+
+    //now check auto update feature
+    generator.SetAutoUpdate(true);
+    m_PF->Modified();
+    m_PFNode->Modified();
+    m_TestApp->exec();
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update seemed not to work.", 3, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update seemed not to work.", 3, generator.m_GenerationFinishedEmited);
+    CPPUNIT_ASSERT_MESSAGE("Error: Auto update seemed not to work.", generator.m_JobErrorEmited_error.empty());
+    CPPUNIT_ASSERT_MESSAGE("Error: Auto update seemed not to work.", 3 == generator.m_NewDataAvailable.size());
+
+
+    m_DataStorage->Add(mitk::DataNode::New());
+    m_TestApp->processEvents();
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggerd, but only irrelevant node was added.", 3, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggerd, but only irrelevant node was added.", 3, generator.m_GenerationFinishedEmited);
+    CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggerd, but only irrelevant node was added.", generator.m_JobErrorEmited_error.empty());
+    CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggerd, but only irrelevant node was added.", 3 == generator.m_NewDataAvailable.size());
+
+    m_Image2->Modified();
+    m_ImageNode2->Modified();
+    m_TestApp->processEvents();
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggerd, but only irrelevant node was added.", 3, generator.m_DataGenerationStartedEmited);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggerd, but only irrelevant node was added.", 3, generator.m_GenerationFinishedEmited);
+    CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggerd, but only irrelevant node was added.", generator.m_JobErrorEmited_error.empty());
+    CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggerd, but only irrelevant node was added.", 3 == generator.m_NewDataAvailable.size());
   }
 
 };

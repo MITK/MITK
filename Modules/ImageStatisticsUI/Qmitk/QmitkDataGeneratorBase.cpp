@@ -19,8 +19,10 @@ found in the LICENSE file.
 
 #include <QThreadPool>
 
-QmitkDataGeneratorBase::QmitkDataGeneratorBase(mitk::DataStorage::Pointer storage, QObject* parent) : QObject(parent), m_Storage(storage)
-{}
+QmitkDataGeneratorBase::QmitkDataGeneratorBase(mitk::DataStorage::Pointer storage, QObject* parent) : QObject(parent)
+{
+  this->SetDataStorage(storage);
+}
 
 QmitkDataGeneratorBase::QmitkDataGeneratorBase(QObject* parent): QObject(parent)
 {}
@@ -121,11 +123,6 @@ void QmitkDataGeneratorBase::OnFinalResultsAvailable(JobResultMapType results, c
   }
 
   emit NewDataAvailable(resultnodes.GetPointer());
-
-  if (!resultnodes->empty())
-  {
-    this->EnsureRecheckingAndGeneration();
-  }
 }
 
 void QmitkDataGeneratorBase::NodeAddedOrModified(const mitk::DataNode* node)
@@ -145,8 +142,9 @@ void QmitkDataGeneratorBase::EnsureRecheckingAndGeneration() const
   }
 }
 
-void QmitkDataGeneratorBase::Generate() const
+bool QmitkDataGeneratorBase::Generate() const
 {
+  bool everythingValid = false;
   if (m_InGenerate)
   {
     m_RestartGeneration = true;
@@ -158,11 +156,12 @@ void QmitkDataGeneratorBase::Generate() const
     while (m_RestartGeneration)
     {
       m_RestartGeneration = false;
-      DoGenerate();
+      everythingValid = DoGenerate();
     }
 
     m_InGenerate = false;
   }
+  return everythingValid;
 }
 
 mitk::DataNode::Pointer QmitkDataGeneratorBase::CreateWIPDataNode(mitk::BaseData* dataDummy, const std::string& nodeName)
@@ -184,7 +183,7 @@ mitk::DataNode::Pointer QmitkDataGeneratorBase::CreateWIPDataNode(mitk::BaseData
 }
 
 
-void QmitkDataGeneratorBase::DoGenerate() const
+bool QmitkDataGeneratorBase::DoGenerate() const
 {
   auto imageSegCombinations = this->GetAllImageROICombinations();
 
@@ -194,7 +193,14 @@ void QmitkDataGeneratorBase::DoGenerate() const
 
   for (const auto& imageAndSeg : imageSegCombinations)
   {
-    MITK_INFO << "processing node " << imageAndSeg.first << " and struct " << imageAndSeg.second;
+    if (imageAndSeg.second.IsNotNull())
+    {
+      MITK_INFO << "checking node " << imageAndSeg.first->GetName() << " and ROI " << imageAndSeg.second->GetName();
+    }
+    else
+    {
+      MITK_INFO << "checking node " << imageAndSeg.first->GetName();
+    }
 
     if (!this->IsValidResultAvailable(imageAndSeg.first.GetPointer(), imageAndSeg.second.GetPointer()))
     {
@@ -203,23 +209,26 @@ void QmitkDataGeneratorBase::DoGenerate() const
       if (everythingValid)
       {
         m_WIP = true;
-        emit GenerationStarted();
         everythingValid = false;
       }
 
-      MITK_INFO << "no valid result available. Triggering computation of necessary jobs.";
-      auto job = this->GetNextMissingGenerationJob(imageAndSeg.first.GetPointer(), imageAndSeg.second.GetPointer());
+      MITK_INFO << "No valid result available. Requesting next necessary job." << imageAndSeg.first->GetName();
+      auto nextJob = this->GetNextMissingGenerationJob(imageAndSeg.first.GetPointer(), imageAndSeg.second.GetPointer());
 
       //other jobs are pending, nothing has to be done
-      if (!job) {
-        MITK_INFO << "waiting for other jobs to finish";
-      }
-      else
+      if (nextJob.first==nullptr && nextJob.second.IsNotNull())
       {
-        job->setAutoDelete(true);
-        connect(job, &QmitkDataGenerationJobBase::Error, this, &QmitkDataGeneratorBase::OnJobError, Qt::BlockingQueuedConnection);
-        connect(job, &QmitkDataGenerationJobBase::ResultsAvailable, this, &QmitkDataGeneratorBase::OnFinalResultsAvailable, Qt::BlockingQueuedConnection);
-        threadPool->start(job);
+        MITK_INFO << "Last generation job still running, pass on till job is finished...";
+      }
+      else if(nextJob.first != nullptr && nextJob.second.IsNotNull())
+      {
+        MITK_INFO << "Next generation job started...";
+        nextJob.first->setAutoDelete(true);
+        nextJob.second->GetData()->SetProperty(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str(), mitk::StringProperty::New(mitk::STATS_GENERATION_STATUS_VALUE_WORK_IN_PROGRESS));
+        connect(nextJob.first, &QmitkDataGenerationJobBase::Error, this, &QmitkDataGeneratorBase::OnJobError, Qt::BlockingQueuedConnection);
+        connect(nextJob.first, &QmitkDataGenerationJobBase::ResultsAvailable, this, &QmitkDataGeneratorBase::OnFinalResultsAvailable, Qt::BlockingQueuedConnection);
+        emit DataGenerationStarted(imageAndSeg.first.GetPointer(), imageAndSeg.second.GetPointer(), nextJob.first);
+        threadPool->start(nextJob.first);
       }
     }
     else
@@ -233,4 +242,6 @@ void QmitkDataGeneratorBase::DoGenerate() const
     m_WIP = false;
     emit GenerationFinished();
   }
+
+  return everythingValid;
 }

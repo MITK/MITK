@@ -29,16 +29,13 @@ found in the LICENSE file.
 namespace mitk
 {
 
-std::vector<CustomMimeType*> DicomRTMimeTypes::Get()
+std::array<std::unique_ptr<CustomMimeType>, 3> DicomRTMimeTypes::Get()
 {
-  std::vector<CustomMimeType*> mimeTypes;
-
-  // order matters here (descending rank for mime types)
-  mimeTypes.push_back(DICOMRT_DOSE_MIMETYPE().Clone());
-  mimeTypes.push_back(DICOMRT_PLAN_MIMETYPE().Clone());
-  mimeTypes.push_back(DICOMRT_STRUCT_MIMETYPE().Clone());
-
-  return mimeTypes;
+  return {
+    std::make_unique<RTDoseMimeType>(),
+    std::make_unique<RTPlanMimeType>(),
+    std::make_unique<RTStructMimeType>()
+  };
 }
 
 // Mime Types
@@ -205,40 +202,34 @@ DicomRTMimeTypes::RTPlanMimeType DicomRTMimeTypes::DICOMRT_PLAN_MIMETYPE()
 // Names
 std::string DicomRTMimeTypes::DICOMRT_DOSE_MIMETYPE_NAME()
 {
-  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".dicomrt.dose";
-  return name;
+  return IOMimeTypes::DEFAULT_BASE_NAME() + ".dicomrt.dose";
 }
 
 std::string DicomRTMimeTypes::DICOMRT_STRUCT_MIMETYPE_NAME()
 {
-  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".dicomrt.struct";
-  return name;
+  return IOMimeTypes::DEFAULT_BASE_NAME() + ".dicomrt.struct";
 }
 
 std::string DicomRTMimeTypes::DICOMRT_PLAN_MIMETYPE_NAME()
 {
-  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".dicomrt.plan";
-  return name;
+  return IOMimeTypes::DEFAULT_BASE_NAME() + ".dicomrt.plan";
 }
 
 // Descriptions
 
 std::string DicomRTMimeTypes::DICOMRT_DOSE_MIMETYPE_DESCRIPTION()
 {
-  static std::string description = "RTDOSE reader";
-  return description;
+  return "RTDOSE reader";
 }
 
 std::string DicomRTMimeTypes::DICOMRT_STRUCT_MIMETYPE_DESCRIPTION()
 {
-  static std::string description = "RTSTRUCT reader";
-  return description;
+  return "RTSTRUCT reader";
 }
 
 std::string DicomRTMimeTypes::DICOMRT_PLAN_MIMETYPE_DESCRIPTION()
 {
-  static std::string description = "RTPLAN reader";
-  return description;
+  return "RTPLAN reader";
 }
 
 mitk::IDICOMTagsOfInterest* DicomRTMimeTypes::GetDicomTagsOfInterestService()

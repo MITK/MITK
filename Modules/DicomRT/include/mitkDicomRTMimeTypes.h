@@ -17,6 +17,8 @@ found in the LICENSE file.
 #include <mitkIDICOMTagsOfInterest.h>
 #include <MitkDicomRTExports.h>
 
+#include <array>
+#include <memory>
 #include <string>
 
 namespace mitk {
@@ -50,7 +52,7 @@ public:
     RTPlanMimeType* Clone() const override;
   };
   // Get all DicomRT Mime Types
-  static std::vector<CustomMimeType*> Get();
+  static std::array<std::unique_ptr<CustomMimeType>, 3> Get();
 
   static RTDoseMimeType DICOMRT_DOSE_MIMETYPE();
   static RTStructMimeType DICOMRT_STRUCT_MIMETYPE();

@@ -133,9 +133,9 @@ void QmitkImageStatisticsView::UpdateIntensityProfile()
 
 void QmitkImageStatisticsView::UpdateHistogramWidget()
 {
-  m_Controls.groupBox_histogram->setVisible(false);
+  m_Controls.groupBox_histogram->setVisible(true);
 
-  if (m_selectedImageNodes.size() == 1 || m_selectedMaskNodes.size()<=1)
+  if (m_selectedImageNodes.size() == 1 && m_selectedMaskNodes.size()<=1)
   { //currently only supported for one image and roi due to histogram widget limitations.
     auto imageNode = m_selectedImageNodes.front();
     const mitk::DataNode* roiNode = nullptr;
@@ -143,7 +143,7 @@ void QmitkImageStatisticsView::UpdateHistogramWidget()
     {
       roiNode = m_selectedMaskNodes.front();
     }
-    auto statisticsNode = m_DataGenerator->GetLatestResult(imageNode, roiNode);
+    auto statisticsNode = m_DataGenerator->GetLatestResult(imageNode, roiNode, true);
 
     if (statisticsNode.IsNotNull())
     {
@@ -163,10 +163,10 @@ void QmitkImageStatisticsView::UpdateHistogramWidget()
           label << " with " << roiNode->GetName();
         }
 
-        m_Controls.groupBox_histogram->setVisible(true);
         m_Controls.widget_histogram->SetTheme(GetColorTheme());
         m_Controls.widget_histogram->SetHistogram(statistics->GetTimeStepHistogram(0), label.str());
       }
+      m_Controls.groupBox_histogram->setVisible(statisticsNode.IsNotNull());
     }
   }
 }
@@ -198,13 +198,6 @@ void QmitkImageStatisticsView::ResetGUI()
   m_Controls.widget_histogram->setEnabled(false);
 }
 
-void QmitkImageStatisticsView::ResetGUIDefault()
-{
-  m_Controls.widget_histogram->ResetDefault();
-  m_Controls.checkBox_ignoreZero->setChecked(false);
-  m_IgnoreZeroValueVoxel = false;
-}
-
 void QmitkImageStatisticsView::OnGenerationStarted(const mitk::DataNode* /*imageNode*/, const mitk::DataNode* /*roiNode*/, const QmitkDataGenerationJobBase* /*job*/)
 {
   m_Controls.label_currentlyComputingStatistics->setVisible(true);
@@ -228,13 +221,19 @@ void QmitkImageStatisticsView::OnJobError(QString error, const QmitkDataGenerati
 
 void QmitkImageStatisticsView::OnRequestHistogramUpdate(unsigned int nbins)
 {
+  m_Controls.widget_statistics->SetHistogramNBins(nbins);
   m_DataGenerator->SetHistogramNBins(nbins);
+  this->UpdateIntensityProfile();
+  this->UpdateHistogramWidget();
 }
 
 void QmitkImageStatisticsView::OnCheckBoxIgnoreZeroStateChanged(int state)
 {
-  m_IgnoreZeroValueVoxel = (state == Qt::Unchecked) ? false : true;
-  m_DataGenerator->SetIgnoreZeroValueVoxel(m_IgnoreZeroValueVoxel);
+  auto ignoreZeroValueVoxel = (state == Qt::Unchecked) ? false : true;
+  m_Controls.widget_statistics->SetIgnoreZeroValueVoxel(ignoreZeroValueVoxel);
+  m_DataGenerator->SetIgnoreZeroValueVoxel(ignoreZeroValueVoxel);
+  this->UpdateIntensityProfile();
+  this->UpdateHistogramWidget();
 }
 
 void QmitkImageStatisticsView::OnButtonSelectionPressed()
@@ -302,8 +301,13 @@ void QmitkImageStatisticsView::OnButtonSelectionPressed()
     m_Controls.widget_statistics->SetImageNodes(m_selectedImageNodes);
     m_Controls.widget_statistics->SetMaskNodes(m_selectedMaskNodes);
 
+    m_DataGenerator->SetAutoUpdate(false);
     m_DataGenerator->SetImageNodes(m_selectedImageNodes);
     m_DataGenerator->SetROINodes(m_selectedMaskNodes);
+    m_DataGenerator->Generate();
+    m_DataGenerator->SetAutoUpdate(true);
+
+    m_Controls.widget_statistics->setEnabled(!m_selectedImageNodes.empty());
   }
 
   delete dialog;

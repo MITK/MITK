@@ -61,7 +61,6 @@ protected:
   QmitkChartWidget::ColorTheme GetColorTheme() const;
 
   void ResetGUI();
-  void ResetGUIDefault();
 
   void OnGenerationStarted(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode, const QmitkDataGenerationJobBase* job);
   void OnGenerationFinished();
@@ -80,7 +79,6 @@ private:
   mitk::PlanarFigure::Pointer m_selectedPlanarFigure = nullptr;
 
   long m_PlanarFigureObserverTag;
-  bool m_IgnoreZeroValueVoxel = false;
   std::vector<mitk::DataNode::ConstPointer> m_selectedMaskNodes;
   std::vector<mitk::DataNode::ConstPointer> m_selectedImageNodes;
   QmitkNodeSelectionDialog::NodeList m_SelectedNodeList;

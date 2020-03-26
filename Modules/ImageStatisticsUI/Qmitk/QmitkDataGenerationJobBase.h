@@ -25,14 +25,6 @@ found in the LICENSE file.
 
 #include <MitkImageStatisticsUIExports.h>
 
-namespace mitk
-{
-  static const std::string STATS_GENERATION_STATUS_PROPERTY_NAME = "MITK.statistic.generation.status";
-  static const std::string STATS_GENERATION_STATUS_VALUE_WORK_IN_PROGRESS = "workInProgress";
-  static const std::string STATS_GENERATION_STATUS_VALUE_PENDING = "pending";
-  static const std::string STATS_GENERATION_STATUS_VALUE_BASE_DATA_FAILED = "failed";
-}
-
 /*!
 \brief QmitkDataGenerationJobBase
 Base class for all jobs. Each job wraps an implementation of DataGenerationComputationInterface to compute a computation in a multi threaded environment with Qt

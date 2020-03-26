@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIgnorePixelMaskGenerator.h>
 #include "mitkStatisticsToImageRelationRule.h"
 #include "mitkStatisticsToMaskRelationRule.h"
+#include "mitkImageStatisticsContainerManager.h"
 #include "mitkProperties.h"
 
 QmitkImageStatisticsCalculationRunnable::QmitkImageStatisticsCalculationRunnable()

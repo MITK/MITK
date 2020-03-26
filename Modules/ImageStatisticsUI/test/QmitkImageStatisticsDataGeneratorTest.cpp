@@ -19,6 +19,7 @@ found in the LICENSE file.
 
 #include "mitkStatisticsToImageRelationRule.h"
 #include "mitkStatisticsToMaskRelationRule.h"
+#include "mitkImageStatisticsContainerManager.h"
 #include "mitkProperties.h"
 
 #include "QmitkImageStatisticsCalculationRunnable.h"

@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include "QmitkDataGenerationJobBase.h"
 #include "mitkDataNode.h"
 #include "mitkProperties.h"
+#include "mitkImageStatisticsContainerManager.h"
 
 #include <QThreadPool>
 

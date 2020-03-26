@@ -26,12 +26,6 @@ found in the LICENSE file.
 
 #include <MitkImageStatisticsUIExports.h>
 
-namespace mitk
-{
-  static const std::string STATS_HISTOGRAM_BIN_PROPERTY_NAME = "MITK.statistic.histogram_bins";
-  static const std::string STATS_IGNORE_ZERO_VOXEL_PROPERTY_NAME = "MITK.statistic.ignore_zero_voxel";
-}
-
 /**
 * /brief This class is executed as background thread for image statistics calculation.
 *

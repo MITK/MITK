@@ -15,20 +15,21 @@ found in the LICENSE file.
 QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem(
   ImageStatisticsObject statisticsData,
   StatisticNameVector statisticNames,
-  QVariant label,
+  QVariant label, bool isWIP,
   QmitkImageStatisticsTreeItem *parent)
-  : m_statistics(statisticsData) , m_statisticNames(statisticNames), m_label(label), m_parentItem(parent)
+  : m_statistics(statisticsData) , m_statisticNames(statisticNames), m_label(label), m_parentItem(parent), m_IsWIP(isWIP)
 {
 }
 
  QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem(StatisticNameVector statisticNames,
                                                            QVariant label,
+                                                           bool isWIP,
                                                            QmitkImageStatisticsTreeItem *parentItem)
-  : QmitkImageStatisticsTreeItem(ImageStatisticsObject(), statisticNames, label, parentItem )
+  : QmitkImageStatisticsTreeItem(ImageStatisticsObject(), statisticNames, label, isWIP, parentItem )
 {
 }
 
- QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem() : QmitkImageStatisticsTreeItem(StatisticNameVector(), QVariant(), nullptr ) {}
+ QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem() : QmitkImageStatisticsTreeItem(StatisticNameVector(), QVariant(), false, nullptr ) {}
 
 QmitkImageStatisticsTreeItem::~QmitkImageStatisticsTreeItem()
 {
@@ -60,23 +61,30 @@ QVariant QmitkImageStatisticsTreeItem::data(int column) const
   QVariant result;
   if (column > 0 && !m_statisticNames.empty())
   {
-    if (column - 1 < static_cast<int>(m_statisticNames.size()))
+    if (m_IsWIP)
     {
-      auto statisticKey = m_statisticNames.at(column - 1);
-      std::stringstream ss;
-      if (m_statistics.HasStatistic(statisticKey))
+      result = QVariant(QString("..."));
+    }
+    else
+    {
+      if (column - 1 < static_cast<int>(m_statisticNames.size()))
       {
-        ss << m_statistics.GetValueNonConverted(statisticKey);
+        auto statisticKey = m_statisticNames.at(column - 1);
+        std::stringstream ss;
+        if (m_statistics.HasStatistic(statisticKey))
+        {
+          ss << m_statistics.GetValueNonConverted(statisticKey);
+        }
+        else
+        {
+          return QVariant();
+        }
+        result = QVariant(QString::fromStdString(ss.str()));
       }
       else
       {
         return QVariant();
       }
-      result = QVariant(QString::fromStdString(ss.str()));
-    }
-    else
-    {
-      return QVariant();
     }
   }
   else if (column == 0)
@@ -98,3 +106,8 @@ int QmitkImageStatisticsTreeItem::row() const
 
   return 0;
 }
+
+bool QmitkImageStatisticsTreeItem::isWIP() const
+{
+  return m_IsWIP;
+};

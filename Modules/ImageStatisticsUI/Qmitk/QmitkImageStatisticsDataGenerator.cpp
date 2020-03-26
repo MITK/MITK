@@ -84,76 +84,22 @@ bool QmitkImageStatisticsDataGenerator::IsValidResultAvailable(const mitk::DataN
 
 mitk::DataNode::Pointer QmitkImageStatisticsDataGenerator::GetLatestResult(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode, bool onlyIfUpToDate, bool noWIP) const
 {
-  mitk::DataNode::Pointer result;
-
   auto storage = m_Storage.Lock();
-  if (storage)
+
+  if (!imageNode || !imageNode->GetData())
   {
-    if (!imageNode || !imageNode->GetData())
-    {
-      mitkThrow() << "Image is nullptr";
-    }
-
-    const auto image = imageNode->GetData();
-    const mitk::BaseData* mask = nullptr;
-    if (roiNode)
-    {
-      mask = roiNode->GetData();
-    }
-
-    mitk::NodePredicateBase::ConstPointer predicate = mitk::ImageStatisticsContainerManager::GetStatisticsPredicateForSources(image, mask);
-
-    if (predicate)
-    {
-      auto binPredicate = mitk::NodePredicateDataProperty::New(mitk::STATS_HISTOGRAM_BIN_PROPERTY_NAME.c_str(), mitk::UIntProperty::New(m_HistogramNBins));
-      auto zeroPredicate = mitk::NodePredicateDataProperty::New(mitk::STATS_IGNORE_ZERO_VOXEL_PROPERTY_NAME.c_str(), mitk::BoolProperty::New(m_IgnoreZeroValueVoxel));
-
-      predicate = mitk::NodePredicateAnd::New(predicate, binPredicate, zeroPredicate);
-
-      if (noWIP)
-      {
-        auto noWIPPredicate = mitk::NodePredicateNot::New(mitk::NodePredicateDataProperty::New(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str()));
-        predicate = mitk::NodePredicateAnd::New(predicate, noWIPPredicate);
-      }
-
-      std::shared_lock<std::shared_mutex> mutexguard(m_DataMutex);
-      auto statisticContainerCandidateNodes = storage->GetSubset(predicate);
-
-      auto statisticContainerCandidateNodesFiltered = mitk::DataStorage::SetOfObjects::New();
-
-      for (const auto& node : *statisticContainerCandidateNodes)
-      {
-        auto isUpToDate = image->GetMTime() < node->GetData()->GetMTime()
-                          && (mask == nullptr || mask->GetMTime() < node->GetData()->GetMTime());
-
-        if (!onlyIfUpToDate || isUpToDate)
-        {
-          statisticContainerCandidateNodesFiltered->push_back(node);
-        }
-      }
-
-      if (!statisticContainerCandidateNodesFiltered->empty())
-      {
-        auto newestElement = statisticContainerCandidateNodesFiltered->front();
-        if (statisticContainerCandidateNodesFiltered->size() > 1)
-        {
-          //in case of multiple found statistics, return only newest one
-          auto newestIter = std::max_element(std::begin(*statisticContainerCandidateNodesFiltered), std::end(*statisticContainerCandidateNodesFiltered), [](mitk::DataNode::Pointer a, mitk::DataNode::Pointer b) {
-            return a->GetData()->GetMTime() < b->GetData()->GetMTime();
-            });
-          newestElement = *newestIter;
-          MITK_DEBUG << "multiple statistics (" << statisticContainerCandidateNodesFiltered->size() << ") for image/mask found. Returning only newest one.";
-          for (const auto& node : *statisticContainerCandidateNodesFiltered)
-          {
-            MITK_DEBUG << node->GetName() << ", timestamp: " << node->GetData()->GetMTime();
-          }
-        }
-        result = newestElement;
-      }
-    }
+    mitkThrow() << "Image is nullptr";
   }
 
-  return result;
+  const auto image = imageNode->GetData();
+  const mitk::BaseData* mask = nullptr;
+  if (roiNode)
+  {
+    mask = roiNode->GetData();
+  }
+    
+  std::shared_lock<std::shared_mutex> mutexguard(m_DataMutex);
+  return mitk::ImageStatisticsContainerManager::GetImageStatisticsNode(storage, image, mask, m_IgnoreZeroValueVoxel, m_HistogramNBins, onlyIfUpToDate, noWIP);
 }
 
 void QmitkImageStatisticsDataGenerator::IndicateFutureResults(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const

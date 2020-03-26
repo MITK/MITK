@@ -56,6 +56,27 @@ void QmitkImageStatisticsWidget::Reset()
   m_Controls.buttonCopyImageStatisticsToClipboard->setEnabled(false);
 }
 
+
+void QmitkImageStatisticsWidget::SetIgnoreZeroValueVoxel(bool _arg)
+{
+  m_imageStatisticsModel->SetIgnoreZeroValueVoxel(_arg);
+}
+
+bool QmitkImageStatisticsWidget::GetIgnoreZeroValueVoxel() const
+{
+  return this->m_imageStatisticsModel->GetIgnoreZeroValueVoxel();
+}
+
+void QmitkImageStatisticsWidget::SetHistogramNBins(unsigned int nbins)
+{
+  m_imageStatisticsModel->SetHistogramNBins(nbins);
+}
+
+unsigned int QmitkImageStatisticsWidget::GetHistogramNBins() const
+{
+  return this->m_imageStatisticsModel->GetHistogramNBins();
+}
+
 void QmitkImageStatisticsWidget::CreateConnections()
 {
 	connect(m_Controls.buttonCopyImageStatisticsToClipboard, &QPushButton::clicked, this, &QmitkImageStatisticsWidget::OnClipboardButtonClicked);

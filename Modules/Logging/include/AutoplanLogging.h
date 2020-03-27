@@ -146,8 +146,19 @@ namespace Logger
       namespace xp = boost::xpressive;
       int level = 1;
       std::string formatedTypeName;
+      std::string lambdaStr = "::<lambda_";
+      const char* lambdaIt = std::search(
+        typeName,
+        typeName + strlen(typeName),
+        lambdaStr.begin(),
+        lambdaStr.end()
+      );
+      bool lambdaFound = (lambdaIt != typeName + strlen(typeName));
+      if (lambdaFound) {
+        level--; // Because lambda part is going to be cut off, we will have '(' deficit
+      }
       //copy only function, classes and namespaces names
-      std::copy_if(std::reverse_iterator<const char *>(typeName + strlen(typeName)), std::reverse_iterator<const char *>(typeName),
+      std::copy_if(std::reverse_iterator<const char *>(typeName + strlen(typeName) - strlen(lambdaIt)), std::reverse_iterator<const char *>(typeName),
         std::back_inserter(formatedTypeName), [&level](const char& character) -> bool
       {
         if ('>' == character) {

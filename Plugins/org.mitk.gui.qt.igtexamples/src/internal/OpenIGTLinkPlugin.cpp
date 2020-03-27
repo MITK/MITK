@@ -154,7 +154,7 @@ void OpenIGTLinkPlugin::ReceivingButtonClicked()
 
       this->GetDataStorage()->Add(newNode);
 
-      m_NavigationDataObjectVisualizationFilter->SetRepresentationObject(i, mySphere);
+      m_NavigationDataObjectVisualizationFilter->SetRepresentationObject(i, mySphere.GetPointer());
     }
 
     m_IGTLClient->StartCommunication();

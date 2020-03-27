@@ -113,7 +113,7 @@ void OpenIGTLinkExample::CreatePipeline()
      mySphere->SetVtkPolyData(vtkSphere->GetOutput());
      newNode->SetData(mySphere);
 
-     m_VisFilter->SetRepresentationObject(i, mySphere);
+     m_VisFilter->SetRepresentationObject(i, mySphere.GetPointer());
 
      m_DemoNodes.append(newNode);
   }

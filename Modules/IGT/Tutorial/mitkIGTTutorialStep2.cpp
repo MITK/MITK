@@ -87,7 +87,7 @@ int main(int, char**)
   //Filter for rendering the cone at correct postion and orientation
   mitk::NavigationDataObjectVisualizationFilter::Pointer visualizer = mitk::NavigationDataObjectVisualizationFilter::New();
   visualizer->SetInput(0, source->GetOutput());
-  visualizer->SetRepresentationObject(0, cone);
+  visualizer->SetRepresentationObject(0, cone.GetPointer());
   //! [Moving Object]
 
   //! [Fixed Object]

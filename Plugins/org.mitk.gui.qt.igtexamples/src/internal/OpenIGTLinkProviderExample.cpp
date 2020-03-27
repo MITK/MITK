@@ -145,7 +145,7 @@ void OpenIGTLinkProviderExample::CreatePipeline()
 
     this->GetDataStorage()->Add(newNode);
 
-    m_NavDataVisualizer->SetRepresentationObject(i, mySphere);
+    m_NavDataVisualizer->SetRepresentationObject(i, mySphere.GetPointer());
 
     m_DemoNodes.append(newNode);
   }

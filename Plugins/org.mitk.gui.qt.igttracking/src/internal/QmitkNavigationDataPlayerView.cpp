@@ -210,7 +210,7 @@ void QmitkNavigationDataPlayerView::CreatePipeline(){
     vtkData->Update();
     mySphere->SetVtkPolyData(vtkData->GetOutput());
     node->SetData(mySphere);
-    m_VisFilter->SetRepresentationObject(i, mySphere);
+    m_VisFilter->SetRepresentationObject(i, mySphere.GetPointer());
 
     // Add Node to DataStorageand to local list of Nodes
     GetDataStorage()->Add(node);

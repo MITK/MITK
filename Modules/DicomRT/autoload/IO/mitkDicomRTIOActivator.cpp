@@ -37,9 +37,9 @@ namespace mitk
       for (const auto& mimeType : DicomRTMimeTypes::Get())
         context->RegisterService(mimeType.get(), props);
 
-      m_RTDoseReader.reset(new RTDoseReaderService);
-      m_RTPlanReader.reset(new RTPlanReaderService);
-      m_RTStructureSetReader.reset(new RTStructureSetReaderService);
+      m_RTDoseReader = std::make_unique<RTDoseReaderService>();
+      m_RTPlanReader = std::make_unique<RTPlanReaderService>();
+      m_RTStructureSetReader = std::make_unique<RTStructureSetReaderService>();
     }
 
     void Unload(us::ModuleContext*) override

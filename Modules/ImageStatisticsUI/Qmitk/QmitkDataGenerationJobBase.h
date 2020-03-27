@@ -27,19 +27,10 @@ found in the LICENSE file.
 
 /*!
 \brief QmitkDataGenerationJobBase
-Base class for all jobs. Each job wraps an implementation of DataGenerationComputationInterface to compute a computation in a multi threaded environment with Qt
-\details the signal ResultsAvailable is emitted when the job is finished
-the signal Error is emitted in case of an error
-\example
-QThreadPool* threadPool = QThreadPool::globalInstance();
-auto voxelizationJob = new QmitkVoxelizationJob(doseImage, structContourModelSet, voxelizationNode);
-connect(job, SIGNAL(ResultsAvailable(const mitk::DataStorage::SetOfObjects*, const QmitkDataGenerationJobBase*)), this, SLOT(OnFinalResultsAvailable(const mitk::DataStorage::SetOfObjects*, const QmitkDataGenerationJobBase*)));
-threadPool->start(job);
+Base class for generation jobs used by QmitkDataGenerationBase and derived classes.
 */
 class MITKIMAGESTATISTICSUI_EXPORT QmitkDataGenerationJobBase : public QObject, public QRunnable
 {
-    // this is needed for all Qt objects that should have a Qt meta-object
-    // (everything that derives from QObject and wants to have signal/slots)
     Q_OBJECT
 
 public:

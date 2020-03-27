@@ -125,7 +125,7 @@ void QmitkDataGeneratorBase::NodeAddedOrModified(const mitk::DataNode* node)
 {
   if (!m_AddingToStorage)
   {
-    if (this->NodeChangeIsRelevant(node))
+    if (this->ChangedNodeIsRelevant(node))
     {
       this->EnsureRecheckingAndGeneration();
     }

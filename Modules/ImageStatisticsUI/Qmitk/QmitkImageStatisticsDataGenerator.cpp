@@ -60,9 +60,9 @@ unsigned int QmitkImageStatisticsDataGenerator::GetHistogramNBins() const
   return this->m_HistogramNBins;
 }
 
-bool QmitkImageStatisticsDataGenerator::NodeChangeIsRelevant(const mitk::DataNode* changedNode) const
+bool QmitkImageStatisticsDataGenerator::ChangedNodeIsRelevant(const mitk::DataNode* changedNode) const
 {
-  auto result = QmitkImageAndRoiDataGeneratorBase::NodeChangeIsRelevant(changedNode);
+  auto result = QmitkImageAndRoiDataGeneratorBase::ChangedNodeIsRelevant(changedNode);
 
   if (!result)
   {

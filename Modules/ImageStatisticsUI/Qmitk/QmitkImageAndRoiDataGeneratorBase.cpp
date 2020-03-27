@@ -59,7 +59,7 @@ QmitkImageAndRoiDataGeneratorBase::SetROINodes(const NodeVectorType& roiNodes)
 }
 
 bool
-QmitkImageAndRoiDataGeneratorBase::NodeChangeIsRelevant(const mitk::DataNode* changedNode) const
+QmitkImageAndRoiDataGeneratorBase::ChangedNodeIsRelevant(const mitk::DataNode* changedNode) const
 {
   if (m_AutoUpdate)
   {

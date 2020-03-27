@@ -66,8 +66,7 @@ bool QmitkImageStatisticsDataGenerator::NodeChangeIsRelevant(const mitk::DataNod
 
   if (!result)
   {
-    std::string status;
-    if (!changedNode->GetStringProperty(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str(), status))
+    if (changedNode->GetProperty(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str()) == nullptr)
     {
       auto stats = dynamic_cast<const mitk::ImageStatisticsContainer*>(changedNode->GetData());
       result = stats != nullptr;

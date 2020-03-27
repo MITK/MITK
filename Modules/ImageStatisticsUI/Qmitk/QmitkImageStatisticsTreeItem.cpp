@@ -61,13 +61,13 @@ QVariant QmitkImageStatisticsTreeItem::data(int column) const
   QVariant result;
   if (column > 0 && !m_statisticNames.empty())
   {
-    if (m_IsWIP)
+    if (column - 1 < static_cast<int>(m_statisticNames.size()))
     {
-      result = QVariant(QString("..."));
-    }
-    else
-    {
-      if (column - 1 < static_cast<int>(m_statisticNames.size()))
+      if (m_IsWIP)
+      {
+        result = QVariant(QString("..."));
+      }
+      else
       {
         auto statisticKey = m_statisticNames.at(column - 1);
         std::stringstream ss;
@@ -81,10 +81,10 @@ QVariant QmitkImageStatisticsTreeItem::data(int column) const
         }
         result = QVariant(QString::fromStdString(ss.str()));
       }
-      else
-      {
-        return QVariant();
-      }
+    }
+    else
+    {
+      return QVariant();
     }
   }
   else if (column == 0)

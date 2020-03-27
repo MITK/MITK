@@ -80,7 +80,7 @@ QVariant QmitkImageStatisticsTreeModel::data(const QModelIndex &index, int role)
   {
     return item->data(index.column());
   }
-  else if (role == Qt::DecorationRole && index.column() == 0 && item->isWIP())
+  else if (role == Qt::DecorationRole && index.column() == 0 && item->isWIP() && item->childCount()==0)
   {
     return QVariant(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/hourglass-half-solid.svg")));
   }
@@ -381,7 +381,7 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
         if (statistic->TimeStepExists(i))
         {
           auto statisticsItem = new QmitkImageStatisticsTreeItem(
-                statistic->GetStatisticsForTimeStep(i), m_StatisticNames, timeStepLabel, lastParent);
+                statistic->GetStatisticsForTimeStep(i), m_StatisticNames, timeStepLabel, isWIP, lastParent);
           lastParent->appendChild(statisticsItem);
         }
       }

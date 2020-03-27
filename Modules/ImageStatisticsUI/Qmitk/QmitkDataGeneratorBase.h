@@ -118,6 +118,10 @@ protected:
   */
   static mitk::DataNode::Pointer CreateWIPDataNode(mitk::BaseData* dataDummy, const std::string& nodeName);
 
+  InputPairVectorType FilterImageROICombinations(InputPairVectorType&& imageROICombinations) const;
+
+  std::string GetPairDescription(const InputPairVectorType::value_type& imageAndSeg) const;
+
   bool DoGenerate() const;
 
   mitk::WeakPointer<mitk::DataStorage> m_Storage;
@@ -128,6 +132,7 @@ protected:
   mutable bool m_InGenerate = false;
   mutable bool m_RestartGeneration = false;
   mutable bool m_WIP = false;
+  mutable bool m_AddingToStorage = false;
 
   /**Member is called when a node is added to the storage.*/
   void NodeAddedOrModified(const mitk::DataNode* node);

@@ -33,11 +33,7 @@ QmitkDataGeneratorBase::~QmitkDataGeneratorBase()
   auto dataStorage = m_Storage.Lock();
   if (dataStorage.IsNotNull())
   {
-    // remove "add node listener" from data storage
-    dataStorage->AddNodeEvent.RemoveListener(
-      mitk::MessageDelegate1<QmitkDataGeneratorBase, const mitk::DataNode*>(this, &QmitkDataGeneratorBase::NodeAddedOrModified));
-
-    // remove "remove node listener" from data storage
+    // remove "change node listener" from data storage
     dataStorage->ChangedNodeEvent.RemoveListener(
       mitk::MessageDelegate1<QmitkDataGeneratorBase, const mitk::DataNode*>(this, &QmitkDataGeneratorBase::NodeAddedOrModified));
   }
@@ -67,11 +63,7 @@ void QmitkDataGeneratorBase::SetDataStorage(mitk::DataStorage* storage)
   auto oldStorage = m_Storage.Lock();
   if (oldStorage.IsNotNull())
   {
-    // remove "add node listener" from old data storage
-    oldStorage->AddNodeEvent.RemoveListener(
-      mitk::MessageDelegate1<QmitkDataGeneratorBase, const mitk::DataNode*>(this, &QmitkDataGeneratorBase::NodeAddedOrModified));
-
-    // remove "remove node listener" from old data storage
+    // remove "change node listener" from old data storage
     oldStorage->ChangedNodeEvent.RemoveListener(
       mitk::MessageDelegate1<QmitkDataGeneratorBase, const mitk::DataNode*>(this, &QmitkDataGeneratorBase::NodeAddedOrModified));
   }
@@ -82,11 +74,7 @@ void QmitkDataGeneratorBase::SetDataStorage(mitk::DataStorage* storage)
 
   if (newStorage.IsNotNull())
   {
-    // add "add node listener" for new data storage
-    newStorage->AddNodeEvent.AddListener(
-      mitk::MessageDelegate1<QmitkDataGeneratorBase, const mitk::DataNode*>(this, &QmitkDataGeneratorBase::NodeAddedOrModified));
-
-    // add remove node listener for new data storage
+    // add change node listener for new data storage
     newStorage->ChangedNodeEvent.AddListener(
       mitk::MessageDelegate1<QmitkDataGeneratorBase, const mitk::DataNode*>(this, &QmitkDataGeneratorBase::NodeAddedOrModified));
   }
@@ -116,21 +104,31 @@ void QmitkDataGeneratorBase::OnFinalResultsAvailable(JobResultMapType results, c
     auto storage = m_Storage.Lock();
     if (storage.IsNotNull())
     {
+      m_AddingToStorage = true;
       for (auto pos = resultnodes->Begin(); pos != resultnodes->End(); ++pos)
       {
         storage->Add(pos->Value());
       }
+      m_AddingToStorage = false;
     }
   }
 
   emit NewDataAvailable(resultnodes.GetPointer());
+
+  if (!resultnodes->empty())
+  {
+    this->EnsureRecheckingAndGeneration();
+  }
 }
 
 void QmitkDataGeneratorBase::NodeAddedOrModified(const mitk::DataNode* node)
 {
-  if (this->NodeChangeIsRelevant(node))
+  if (!m_AddingToStorage)
   {
-    this->EnsureRecheckingAndGeneration();
+    if (this->NodeChangeIsRelevant(node))
+    {
+      this->EnsureRecheckingAndGeneration();
+    }
   }
 }
 
@@ -184,24 +182,53 @@ mitk::DataNode::Pointer QmitkDataGeneratorBase::CreateWIPDataNode(mitk::BaseData
 }
 
 
+QmitkDataGeneratorBase::InputPairVectorType QmitkDataGeneratorBase::FilterImageROICombinations(InputPairVectorType&& imageROICombinations) const
+{
+  std::shared_lock<std::shared_mutex> mutexguard(m_DataMutex);
+
+  InputPairVectorType filteredImageROICombinations;
+
+  auto storage = m_Storage.Lock();
+  if (storage.IsNotNull())
+  {
+    for (auto inputPair : imageROICombinations)
+    {
+      if (storage->Exists(inputPair.first) && (inputPair.second.IsNull() || storage->Exists(inputPair.second)))
+      {
+        filteredImageROICombinations.emplace_back(inputPair);
+      }
+      else
+      {
+        MITK_DEBUG << "Ignor pair because at least one of the nodes is not in storage. Pair: " << GetPairDescription(inputPair);
+      }
+    }
+  }
+  return filteredImageROICombinations;
+}
+
+std::string QmitkDataGeneratorBase::GetPairDescription(const InputPairVectorType::value_type& imageAndSeg) const
+{
+  if (imageAndSeg.second.IsNotNull())
+  {
+    return imageAndSeg.first->GetName() + " and ROI " + imageAndSeg.second->GetName();
+  }
+  else
+  {
+    return imageAndSeg.first->GetName();
+  }
+}
+
 bool QmitkDataGeneratorBase::DoGenerate() const
 {
-  auto imageSegCombinations = this->GetAllImageROICombinations();
+  auto filteredImageROICombinations = FilterImageROICombinations(this->GetAllImageROICombinations());
 
   QThreadPool* threadPool = QThreadPool::globalInstance();
 
   bool everythingValid = true;
 
-  for (const auto& imageAndSeg : imageSegCombinations)
+  for (const auto& imageAndSeg : filteredImageROICombinations)
   {
-    if (imageAndSeg.second.IsNotNull())
-    {
-      MITK_INFO << "checking node " << imageAndSeg.first->GetName() << " and ROI " << imageAndSeg.second->GetName();
-    }
-    else
-    {
-      MITK_INFO << "checking node " << imageAndSeg.first->GetName();
-    }
+    MITK_DEBUG << "checking node " << GetPairDescription(imageAndSeg);
 
     if (!this->IsValidResultAvailable(imageAndSeg.first.GetPointer(), imageAndSeg.second.GetPointer()))
     {
@@ -213,17 +240,17 @@ bool QmitkDataGeneratorBase::DoGenerate() const
         everythingValid = false;
       }
 
-      MITK_INFO << "No valid result available. Requesting next necessary job." << imageAndSeg.first->GetName();
+      MITK_DEBUG << "No valid result available. Requesting next necessary job." << imageAndSeg.first->GetName();
       auto nextJob = this->GetNextMissingGenerationJob(imageAndSeg.first.GetPointer(), imageAndSeg.second.GetPointer());
 
       //other jobs are pending, nothing has to be done
       if (nextJob.first==nullptr && nextJob.second.IsNotNull())
       {
-        MITK_INFO << "Last generation job still running, pass on till job is finished...";
+        MITK_DEBUG << "Last generation job still running, pass on till job is finished...";
       }
       else if(nextJob.first != nullptr && nextJob.second.IsNotNull())
       {
-        MITK_INFO << "Next generation job started...";
+        MITK_DEBUG << "Next generation job started...";
         nextJob.first->setAutoDelete(true);
         nextJob.second->GetData()->SetProperty(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str(), mitk::StringProperty::New(mitk::STATS_GENERATION_STATUS_VALUE_WORK_IN_PROGRESS));
         connect(nextJob.first, &QmitkDataGenerationJobBase::Error, this, &QmitkDataGeneratorBase::OnJobError, Qt::BlockingQueuedConnection);

@@ -144,9 +144,7 @@ void PlanarFigureMaskGenerator::InternalCalculateMaskFromPlanarFigure(
   if (!planarFigureHolePolyline.empty())
   {
     holePoints = vtkSmartPointer<vtkPoints>::New();
-
     Point3D point3D;
-    PlanarFigure::PolyLineType::const_iterator end = planarFigureHolePolyline.end();
 
     for (const auto& point : planarFigureHolePolyline)
     {

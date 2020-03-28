@@ -58,7 +58,7 @@ void QmitkDataGeneratorBase::SetDataStorage(mitk::DataStorage* storage)
 {
   if (storage == m_Storage) return;
 
-  std::shared_lock<std::shared_mutex> mutexguard(m_DataMutex);
+  std::lock_guard<std::mutex> mutexguard(m_DataMutex);
 
   auto oldStorage = m_Storage.Lock();
   if (oldStorage.IsNotNull())
@@ -100,7 +100,7 @@ void QmitkDataGeneratorBase::OnFinalResultsAvailable(JobResultMapType results, c
   }
 
   {
-    std::shared_lock<std::shared_mutex> mutexguard(m_DataMutex);
+    std::lock_guard<std::mutex> mutexguard(m_DataMutex);
     auto storage = m_Storage.Lock();
     if (storage.IsNotNull())
     {
@@ -184,7 +184,7 @@ mitk::DataNode::Pointer QmitkDataGeneratorBase::CreateWIPDataNode(mitk::BaseData
 
 QmitkDataGeneratorBase::InputPairVectorType QmitkDataGeneratorBase::FilterImageROICombinations(InputPairVectorType&& imageROICombinations) const
 {
-  std::shared_lock<std::shared_mutex> mutexguard(m_DataMutex);
+  std::lock_guard<std::mutex> mutexguard(m_DataMutex);
 
   InputPairVectorType filteredImageROICombinations;
 

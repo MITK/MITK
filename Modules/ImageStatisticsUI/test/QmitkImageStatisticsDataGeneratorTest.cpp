@@ -58,7 +58,7 @@ public:
   }
 
   mutable std::vector<QString> m_JobErrorEmited_error;
-  void JobErrorEmited(QString error, const QmitkDataGenerationJobBase* failedJob) const
+  void JobErrorEmited(QString error, const QmitkDataGenerationJobBase* /*failedJob*/) const
   {
     m_JobErrorEmited_error.emplace_back(error);
   }

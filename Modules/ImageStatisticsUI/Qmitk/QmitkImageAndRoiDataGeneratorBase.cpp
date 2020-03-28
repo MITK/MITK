@@ -30,7 +30,7 @@ QmitkImageAndRoiDataGeneratorBase::SetImageNodes(const NodeVectorType& imageNode
   if (m_ImageNodes != imageNodes)
   {
     {
-      std::shared_lock<std::shared_mutex> mutexguard(m_DataMutex);
+      std::lock_guard<std::mutex> mutexguard(m_DataMutex);
       m_ImageNodes = imageNodes;
     }
 
@@ -47,7 +47,7 @@ QmitkImageAndRoiDataGeneratorBase::SetROINodes(const NodeVectorType& roiNodes)
   if (m_ROINodes != roiNodes)
   {
     {
-      std::shared_lock<std::shared_mutex> mutexguard(m_DataMutex);
+      std::lock_guard<std::mutex> mutexguard(m_DataMutex);
       m_ROINodes = roiNodes;
     }
 
@@ -82,7 +82,7 @@ QmitkImageAndRoiDataGeneratorBase::ChangedNodeIsRelevant(const mitk::DataNode* c
 QmitkImageAndRoiDataGeneratorBase::InputPairVectorType
 QmitkImageAndRoiDataGeneratorBase::GetAllImageROICombinations() const
 {
-  std::shared_lock<std::shared_mutex> mutexguard(m_DataMutex);
+  std::lock_guard<std::mutex> mutexguard(m_DataMutex);
 
   InputPairVectorType allCombinations;
   for (auto& imageNode : m_ImageNodes)

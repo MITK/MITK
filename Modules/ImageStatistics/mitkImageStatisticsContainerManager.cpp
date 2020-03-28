@@ -112,7 +112,7 @@ mitk::NodePredicateBase::ConstPointer mitk::ImageStatisticsContainerManager::Get
   auto imageRule = mitk::StatisticsToImageRelationRule::New();
   auto imagePredicate = imageRule->GetSourcesDetector(image);
 
-  mitk::NodePredicateBase::ConstPointer predicate = mitk::NodePredicateAnd::New(nodePredicateImageStatisticsContainer, imagePredicate);
+  mitk::NodePredicateBase::ConstPointer predicate = mitk::NodePredicateAnd::New(nodePredicateImageStatisticsContainer, imagePredicate).GetPointer();
 
   auto maskRule = mitk::StatisticsToMaskRelationRule::New();
   if (mask)

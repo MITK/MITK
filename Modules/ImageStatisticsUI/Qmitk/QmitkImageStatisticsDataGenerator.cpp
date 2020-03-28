@@ -97,7 +97,7 @@ mitk::DataNode::Pointer QmitkImageStatisticsDataGenerator::GetLatestResult(const
     mask = roiNode->GetData();
   }
     
-  std::shared_lock<std::shared_mutex> mutexguard(m_DataMutex);
+  std::lock_guard<std::mutex> mutexguard(m_DataMutex);
   return mitk::ImageStatisticsContainerManager::GetImageStatisticsNode(storage, image, mask, m_IgnoreZeroValueVoxel, m_HistogramNBins, onlyIfUpToDate, noWIP);
 }
 
@@ -142,7 +142,7 @@ void QmitkImageStatisticsDataGenerator::IndicateFutureResults(const mitk::DataNo
     auto storage = m_Storage.Lock();
     if (storage)
     {
-      std::shared_lock<std::shared_mutex> mutexguard(m_DataMutex);
+      std::lock_guard<std::mutex> mutexguard(m_DataMutex);
       storage->Add(dummyNode);
     }
   }
@@ -216,14 +216,14 @@ void QmitkImageStatisticsDataGenerator::RemoveObsoleteDataNodes(const mitk::Data
   auto storage = m_Storage.Lock();
   if (storage)
   {
-    std::shared_lock<std::shared_mutex> mutexguard(m_DataMutex);
+    std::lock_guard<std::mutex> mutexguard(m_DataMutex);
 
     auto oldStatisticContainerNodes = storage->GetSubset(predicate);
     storage->Remove(oldStatisticContainerNodes);
   }
 }
 
-mitk::DataNode::Pointer QmitkImageStatisticsDataGenerator::PrepareResultForStorage(const std::string& label, mitk::BaseData* result, const QmitkDataGenerationJobBase* job) const
+mitk::DataNode::Pointer QmitkImageStatisticsDataGenerator::PrepareResultForStorage(const std::string& /*label*/, mitk::BaseData* result, const QmitkDataGenerationJobBase* job) const
 {
   auto statsJob = dynamic_cast<const QmitkImageStatisticsCalculationRunnable*>(job);
 

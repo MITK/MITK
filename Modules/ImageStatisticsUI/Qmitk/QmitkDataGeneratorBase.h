@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef __QMITK_DATA_GENERATOR_BASE_H
 #define __QMITK_DATA_GENERATOR_BASE_H
 
-#include <shared_mutex>
+#include <mutex>
 
 //QT
 #include <QObject>
@@ -152,7 +152,7 @@ protected:
 
   bool m_AutoUpdate = false;
 
-  mutable std::shared_mutex m_DataMutex;
+  mutable std::mutex m_DataMutex;
 
 private: 
   /** Indicates if we are currently in the Generation() verification and generation of pending jobs triggering loop.

@@ -213,7 +213,7 @@ void QmitkImageStatisticsView::OnGenerationFinished()
   this->UpdateHistogramWidget();
 }
 
-void QmitkImageStatisticsView::OnJobError(QString error, const QmitkDataGenerationJobBase* failedJob)
+void QmitkImageStatisticsView::OnJobError(QString error, const QmitkDataGenerationJobBase* /*failedJob*/)
 {
   mitk::StatusBar::GetInstance()->DisplayErrorText(error.toStdString().c_str());
   MITK_WARN << "Error when calculating statistics: " << error;

@@ -210,8 +210,8 @@ void QmitkImageStatisticsDataGenerator::RemoveObsoleteDataNodes(const mitk::Data
   auto binPredicate = mitk::NodePredicateDataProperty::New(mitk::STATS_HISTOGRAM_BIN_PROPERTY_NAME.c_str(), mitk::UIntProperty::New(m_HistogramNBins));
   auto zeroPredicate = mitk::NodePredicateDataProperty::New(mitk::STATS_IGNORE_ZERO_VOXEL_PROPERTY_NAME.c_str(), mitk::BoolProperty::New(m_IgnoreZeroValueVoxel));
 
-  mitk::NodePredicateBase::ConstPointer predicate = mitk::NodePredicateAnd::New(rulePredicate, notLatestPredicate);
-  predicate = mitk::NodePredicateAnd::New(predicate, binPredicate, zeroPredicate);
+  mitk::NodePredicateBase::ConstPointer predicate = mitk::NodePredicateAnd::New(rulePredicate, notLatestPredicate).GetPointer();
+  predicate = mitk::NodePredicateAnd::New(predicate, binPredicate, zeroPredicate).GetPointer();
 
   auto storage = m_Storage.Lock();
   if (storage)

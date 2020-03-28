@@ -55,12 +55,12 @@ mitk::DataNode::Pointer mitk::ImageStatisticsContainerManager::GetImageStatistic
     auto binPredicate = mitk::NodePredicateDataProperty::New(mitk::STATS_HISTOGRAM_BIN_PROPERTY_NAME.c_str(), mitk::UIntProperty::New(histogramNBins));
     auto zeroPredicate = mitk::NodePredicateDataProperty::New(mitk::STATS_IGNORE_ZERO_VOXEL_PROPERTY_NAME.c_str(), mitk::BoolProperty::New(ignoreZeroVoxel));
 
-    predicate = mitk::NodePredicateAnd::New(predicate, binPredicate, zeroPredicate);
+    predicate = mitk::NodePredicateAnd::New(predicate, binPredicate, zeroPredicate).GetPointer();
 
     if (noWIP)
     {
       auto noWIPPredicate = mitk::NodePredicateNot::New(mitk::NodePredicateDataProperty::New(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str()));
-      predicate = mitk::NodePredicateAnd::New(predicate, noWIPPredicate);
+      predicate = mitk::NodePredicateAnd::New(predicate, noWIPPredicate).GetPointer();
     }
 
     auto statisticContainerCandidateNodes = dataStorage->GetSubset(predicate);
@@ -118,12 +118,12 @@ mitk::NodePredicateBase::ConstPointer mitk::ImageStatisticsContainerManager::Get
   if (mask)
   {
     auto maskPredicate = maskRule->GetSourcesDetector(mask);
-    predicate = mitk::NodePredicateAnd::New(predicate, maskPredicate);
+    predicate = mitk::NodePredicateAnd::New(predicate, maskPredicate).GetPointer();
   }
   else
   {
     auto maskPredicate = mitk::NodePredicateNot::New(maskRule->GetConnectedSourcesDetector());
-    predicate = mitk::NodePredicateAnd::New(predicate, maskPredicate);
+    predicate = mitk::NodePredicateAnd::New(predicate, maskPredicate).GetPointer();
   }
 
   return predicate;

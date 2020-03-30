@@ -19,7 +19,7 @@ found in the LICENSE file.
 \brief Converts the content of the statistics model to a string
 
 \details
-The content of a table model is converted to a string. Each cell is converted to a string. Default
+The content of a QmitkImageStatisticsTreeModel instance is converted to a string. Each cell is converted to a string. Default
 order: iteration over rows. The row separation delimiter (default: '\n') and the column separation
 delimiter (default: ',') can be chosen. It also can be chosen if the headers should
 be exported to the string.
@@ -30,7 +30,7 @@ class MITKIMAGESTATISTICSUI_EXPORT QmitkStatisticsModelToStringConverter
 public:
   QmitkStatisticsModelToStringConverter();
 
-  void SetTableModel(QmitkImageStatisticsTreeModel *model);
+  void SetModel(QmitkImageStatisticsTreeModel *model);
   void SetRootIndex(QModelIndex rootIndex);
   /**
   \brief Returns the string
@@ -48,7 +48,7 @@ private:
 
   QString Iterate(const QModelIndex &index,
                   const QmitkImageStatisticsTreeModel *model,
-                  int depth = 0) const;
+                  QString label = "") const;
 
   QmitkImageStatisticsTreeModel *m_statisticsModel = nullptr;
   QModelIndex m_rootIndex;

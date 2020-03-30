@@ -71,7 +71,7 @@ void QmitkImageStatisticsWidget::OnClipboardButtonClicked()
 {
   QmitkStatisticsModelToStringConverter converter;
   converter.SetColumnDelimiter('\t');
-  converter.SetTableModel(m_imageStatisticsModel);
+  converter.SetModel(m_imageStatisticsModel);
   converter.SetRootIndex(m_Controls.treeViewStatistics->rootIndex());
   converter.SetIncludeHeaderData(true);
 

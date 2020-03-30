@@ -199,7 +199,7 @@ QmitkDataGeneratorBase::InputPairVectorType QmitkDataGeneratorBase::FilterImageR
       }
       else
       {
-        MITK_DEBUG << "Ignor pair because at least one of the nodes is not in storage. Pair: " << GetPairDescription(inputPair);
+        MITK_DEBUG << "Ignore pair because at least one of the nodes is not in storage. Pair: " << GetPairDescription(inputPair);
       }
     }
   }

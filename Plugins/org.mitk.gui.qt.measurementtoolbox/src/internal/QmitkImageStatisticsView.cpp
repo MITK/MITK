@@ -164,7 +164,7 @@ void QmitkImageStatisticsView::UpdateHistogramWidget()
         }
 
         m_Controls.widget_histogram->SetTheme(GetColorTheme());
-        m_Controls.widget_histogram->SetHistogram(statistics->GetTimeStepHistogram(0), label.str());
+        m_Controls.widget_histogram->SetHistogram(statistics->GetHistogramForTimeStep(0), label.str());
       }
       m_Controls.groupBox_histogram->setVisible(statisticsNode.IsNotNull());
     }

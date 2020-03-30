@@ -38,8 +38,8 @@ namespace mitk
   {
   public:
     /**Documentation
-    @brief Returns the StatisticContainer for the given image and mask from the storage-
-    @return a valid StatisticsContainer or nullptr if no StatisticContainer is found.
+    @brief Returns the StatisticsContainer for the given image and mask from the storage-
+    @return a valid StatisticsContainer or nullptr if no StatisticsContainer is found.
     @details if more than one StatisticsContainer is found, only the newest (ModifiedTime) is returned
     @pre Datastorage must point to a valid instance.
     @pre image must Point to a valid instance.

@@ -32,11 +32,11 @@ The key idea is that this class ensures that for vector of given image ROI pairs
 a result instance (e.g ImageStatisticsContainer) will be calculated, if needed (e.g. because it is missing or
 not uptodate anymore), and stored in the data storage passed to a generator instance. While derived classes i.a.
 specify how to generate the image ROI pairs, how to detect latest results, what the next generation step is and
-how to remove obsolete data from the storage, the base class takes core of the observation of the data storage
-and orchestrat the whole checking and generation workflow.
-In all the generation/orchestration process the data storage passed to the generator serves 1) as place where the final
-results are stored and searched and it resembles the state of the genertion process with these final results and WIP
-place holder nodes that indicate planned or currently processed generation steps.
+how to remove obsolete data from the storage, the base class takes care of the observation of the data storage
+and orchestrates the whole checking and generation workflow.
+In all the generation/orchestration process the data storage, passed to the generator, 1) serves as place where the final
+results are stored and searched and 2) it resembles the state of the genertion process with these final results and WIP
+place holder nodes that indicate planed or currently processed generation steps.
 */
 class MITKIMAGESTATISTICSUI_EXPORT QmitkDataGeneratorBase : public QObject
 {
@@ -51,7 +51,7 @@ public:
 
   mitk::DataStorage::Pointer GetDataStorage() const;
 
-  /** Indicates the generator may triggers the update automatically (true). Reasons for an update are:
+  /** Indicates if the generator may trigger the update automatically (true). Reasons for an update are:
    - Input data has been changed or modified
    - Generation relevant settings in derived classes have been changed (must be implemented in derived classes)
    */
@@ -63,7 +63,7 @@ public:
   bool IsGenerating() const;
 
   /** Checks data validity and triggers generation of data, if needed.
-  The generation itselfs will be done with a thread pool and is orchastrated by this class. To learn if the threads are finished and
+  The generation itselfs will be done with a thread pool and is orchestrated by this class. To learn if the threads are finished and
   everything is uptodate, listen to the signal GenerationFinished.
   @return indicates if everything is already valid (true) or if the generation of new data was triggerd (false).*/
   bool Generate() const;

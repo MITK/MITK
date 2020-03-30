@@ -115,7 +115,7 @@ namespace mitk
   }
 
   const ImageStatisticsContainer::HistogramType*
-    ImageStatisticsContainer::GetTimeStepHistogram(TimeStepType timeStep) const
+    ImageStatisticsContainer::GetHistogramForTimeStep(TimeStepType timeStep) const
   {
     return this->GetStatisticsForTimeStep(timeStep).m_Histogram;
   }

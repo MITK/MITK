@@ -110,4 +110,4 @@ int QmitkImageStatisticsTreeItem::row() const
 bool QmitkImageStatisticsTreeItem::isWIP() const
 {
   return m_IsWIP;
-};
+}

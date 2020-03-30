@@ -39,8 +39,6 @@ mitk::ImageStatisticsContainer::Pointer mitk::ImageStatisticsContainerManager::G
 
 mitk::DataNode::Pointer mitk::ImageStatisticsContainerManager::GetImageStatisticsNode(const mitk::DataStorage* dataStorage, const mitk::BaseData* image, const mitk::BaseData* mask, bool ignoreZeroVoxel, unsigned int histogramNBins, bool onlyIfUpToDate, bool noWIP)
 {
-  mitk::DataNode::Pointer result;
-
   if (!dataStorage) {
     mitkThrow() << "data storage is nullptr!";
   }
@@ -49,6 +47,8 @@ mitk::DataNode::Pointer mitk::ImageStatisticsContainerManager::GetImageStatistic
   }
 
   mitk::NodePredicateBase::ConstPointer predicate = GetStatisticsPredicateForSources(image, mask);
+
+  mitk::DataNode::Pointer result;
 
   if (predicate)
   {

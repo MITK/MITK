@@ -144,10 +144,10 @@ namespace mitk
     */
     bool TimeStepExists(TimeStepType timeStep) const;
 
-    /*!
-    /brief Returns the histogram of the currently selected time step.
+    /**
+    /brief Returns the histogram of the passed time step.
     @pre timeStep must be valid*/
-    const HistogramType* GetTimeStepHistogram(TimeStepType timeStep) const;
+    const HistogramType* GetHistogramForTimeStep(TimeStepType timeStep) const;
 
   protected:
     ImageStatisticsContainer();

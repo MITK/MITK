@@ -43,10 +43,11 @@ public:
 
   virtual ResultMapType GetResults() const = 0;
 
+  /** Calls RunComputation() and takes care of the error handling and result signalling.*/
   void run() final;
 
   /*!
-  /brief Returns a flag the indicates if the jop computation was successfull.*/
+  /brief Returns a flag the indicates if the job computation was successfull.*/
   bool GetComputationSuccessFlag() const;
 
   std::string GetLastErrorMessage() const;
@@ -54,7 +55,7 @@ public:
 signals:
     void Error(QString err, const QmitkDataGenerationJobBase* job);
     /*! @brief Signal is emitted when results are available. 
-    @param results a of base date objects produces by the job and ready tu use, put into storage.
+    @param results produced by the job and ready to be used.
     @param the job that produced the data
     */
     void ResultsAvailable(ResultMapType results, const QmitkDataGenerationJobBase* job);

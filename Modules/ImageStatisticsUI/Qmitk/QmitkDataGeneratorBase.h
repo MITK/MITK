@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __QMITK_DATA_GENERATOR_BASE_H
-#define __QMITK_DATA_GENERATOR_BASE_H
+#ifndef QmitkDataGeneratorBase_h
+#define QmitkDataGeneratorBase_h
 
 #include <mutex>
 
@@ -45,7 +45,7 @@ public:
   QmitkDataGeneratorBase(const QmitkDataGeneratorBase& other) = delete;
   QmitkDataGeneratorBase& operator=(const QmitkDataGeneratorBase& other) = delete;
 
-  ~QmitkDataGeneratorBase();
+  virtual ~QmitkDataGeneratorBase();
 
   using JobResultMapType = QmitkDataGenerationJobBase::ResultMapType;
 

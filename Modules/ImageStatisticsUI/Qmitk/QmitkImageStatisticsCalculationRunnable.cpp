@@ -128,27 +128,9 @@ bool QmitkImageStatisticsCalculationRunnable::RunComputation()
       calculator->SetMask(pfMaskGen.GetPointer());
     }
   }
-  catch (const mitk::Exception& e)
-  {
-    MITK_ERROR << "MITK Exception: " << e.what();
-    m_LastErrorMessage = e.what();
-    statisticCalculationSuccessful = false;
-  }
-  catch (const itk::ExceptionObject& e)
-  {
-    MITK_ERROR << "ITK Exception:" << e.what();
-    m_LastErrorMessage = e.what();
-    statisticCalculationSuccessful = false;
-  }
-  catch (const std::runtime_error &e)
-  {
-    MITK_ERROR << "Runtime Exception: " << e.what();
-    m_LastErrorMessage = e.what();
-    statisticCalculationSuccessful = false;
-  }
   catch (const std::exception &e)
   {
-    MITK_ERROR << "Standard Exception: " << e.what();
+    MITK_ERROR << "Error while configuring the statistics calculator: " << e.what();
     m_LastErrorMessage = e.what();
     statisticCalculationSuccessful = false;
   }
@@ -171,22 +153,10 @@ bool QmitkImageStatisticsCalculationRunnable::RunComputation()
   {
     calculator->GetStatistics();
   }
-  catch (mitk::Exception& e)
-  {
-    m_LastErrorMessage = e.GetDescription();
-    MITK_ERROR << "MITK Exception: " << e.what();
-    statisticCalculationSuccessful = false;
-  }
-  catch (const std::runtime_error &e)
-  {
-    m_LastErrorMessage = "Failure: " + std::string(e.what());
-    MITK_ERROR << "Runtime Exception: " << e.what();
-    statisticCalculationSuccessful = false;
-  }
   catch (const std::exception &e)
   {
-    m_LastErrorMessage = "Failure: " + std::string(e.what());
-    MITK_ERROR << "Standard Exception: " << e.what();
+    m_LastErrorMessage = "Failure while calculating the statistics: " + std::string(e.what());
+    MITK_ERROR << m_LastErrorMessage;
     statisticCalculationSuccessful = false;
   }
 

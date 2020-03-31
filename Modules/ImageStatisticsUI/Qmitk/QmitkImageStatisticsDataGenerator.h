@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __QMITK_IMAGE_STATISTICS_DATA_GENERATOR_H
-#define __QMITK_IMAGE_STATISTICS_DATA_GENERATOR_H
+#ifndef QmitkImageStatisticsDataGenerator_h
+#define QmitkImageStatisticsDataGenerator_h
 
 #include "QmitkImageAndRoiDataGeneratorBase.h"
 
@@ -30,7 +30,7 @@ public:
   QmitkImageStatisticsDataGenerator(mitk::DataStorage::Pointer storage, QObject* parent = nullptr) : QmitkImageAndRoiDataGeneratorBase(storage, parent) {};
   QmitkImageStatisticsDataGenerator(QObject* parent = nullptr) : QmitkImageAndRoiDataGeneratorBase(parent) {};
 
-  bool IsValidResultAvailable(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const final;
+  bool IsValidResultAvailable(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const;
 
   /** Returns the latest result for a given image and ROI and the current settings of the generator.
    @param onlyIfUpToDate Indicates if results should only be returned if the are up to date, thus not older then image and ROI.
@@ -51,11 +51,11 @@ public:
   unsigned int GetHistogramNBins() const;
 
 protected:
-  bool ChangedNodeIsRelevant(const mitk::DataNode* changedNode) const final;
-  void IndicateFutureResults(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const final;
-  std::pair<QmitkDataGenerationJobBase*, mitk::DataNode::Pointer> GetNextMissingGenerationJob(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const final;
-  void RemoveObsoleteDataNodes(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const final;
-  mitk::DataNode::Pointer PrepareResultForStorage(const std::string& label, mitk::BaseData* result, const QmitkDataGenerationJobBase* job) const final;
+  bool ChangedNodeIsRelevant(const mitk::DataNode* changedNode) const;
+  void IndicateFutureResults(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const;
+  std::pair<QmitkDataGenerationJobBase*, mitk::DataNode::Pointer> GetNextMissingGenerationJob(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const;
+  void RemoveObsoleteDataNodes(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const;
+  mitk::DataNode::Pointer PrepareResultForStorage(const std::string& label, mitk::BaseData* result, const QmitkDataGenerationJobBase* job) const;
 
   QmitkImageStatisticsDataGenerator(const QmitkImageStatisticsDataGenerator&) = delete;
   QmitkImageStatisticsDataGenerator& operator = (const QmitkImageStatisticsDataGenerator&) = delete;

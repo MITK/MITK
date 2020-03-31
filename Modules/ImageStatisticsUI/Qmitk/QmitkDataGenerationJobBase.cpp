@@ -34,18 +34,18 @@ void QmitkDataGenerationJobBase::run()
     }
     else
     {
-      emit Error(QString("Error while running computation. Error description: ") + QString::fromStdString(m_LastErrorMessage), this);
+      emit Error(QStringLiteral("Error while running computation. Error description: ") + QString::fromStdString(m_LastErrorMessage), this);
     }
   }
-  catch (std::exception& e)
+  catch (const std::exception& e)
   {
     m_LastErrorMessage = e.what();
-    emit Error(QString("Error while running computation. Error description: ") + QString::fromStdString(m_LastErrorMessage), this);
+    emit Error(QStringLiteral("Error while running computation. Error description: ") + QString::fromStdString(m_LastErrorMessage), this);
 
   }
   catch (...)
   {
     m_LastErrorMessage = "Unknown exception";
-    emit Error(QString("Error while running computation. Error description: ") + QString::fromStdString(m_LastErrorMessage), this);
+    emit Error(QStringLiteral("Error while running computation. Error description: ") + QString::fromStdString(m_LastErrorMessage), this);
   }
 }

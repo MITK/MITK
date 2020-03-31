@@ -85,7 +85,7 @@ mitk::DataNode::Pointer QmitkImageStatisticsDataGenerator::GetLatestResult(const
 {
   auto storage = m_Storage.Lock();
 
-  if (!imageNode || !imageNode->GetData())
+  if (imageNode == nullptr || !imageNode->GetData())
   {
     mitkThrow() << "Image is nullptr";
   }
@@ -103,7 +103,7 @@ mitk::DataNode::Pointer QmitkImageStatisticsDataGenerator::GetLatestResult(const
 
 void QmitkImageStatisticsDataGenerator::IndicateFutureResults(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const
 {
-  if (!imageNode || !imageNode->GetData())
+  if (imageNode == nullptr || !imageNode->GetData())
   {
     mitkThrow() << "Image node is nullptr";
   }
@@ -115,7 +115,7 @@ void QmitkImageStatisticsDataGenerator::IndicateFutureResults(const mitk::DataNo
   }
 
   const mitk::BaseData* mask = nullptr;
-  if (roiNode)
+  if (roiNode != nullptr)
   {
     mask = roiNode->GetData();
   }
@@ -140,7 +140,7 @@ void QmitkImageStatisticsDataGenerator::IndicateFutureResults(const mitk::DataNo
     auto dummyNode = CreateWIPDataNode(dummyStats, "WIP_"+GenerateStatisticsNodeName(image, mask));
 
     auto storage = m_Storage.Lock();
-    if (storage)
+    if (storage != nullptr)
     {
       std::lock_guard<std::mutex> mutexguard(m_DataMutex);
       storage->Add(dummyNode);
@@ -155,20 +155,20 @@ std::pair<QmitkDataGenerationJobBase*, mitk::DataNode::Pointer> QmitkImageStatis
   std::string status;
   if (resultDataNode.IsNull() || (resultDataNode->GetStringProperty(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str(), status) && status == mitk::STATS_GENERATION_STATUS_VALUE_PENDING))
   {
-    if (!imageNode || !imageNode->GetData())
+    if (imageNode == nullptr || !imageNode->GetData())
     {
       mitkThrow() << "Image node is nullptr";
     }
 
     auto image = dynamic_cast<const mitk::Image*>(imageNode->GetData());
-    if (!image)
+    if (image == nullptr)
     {
       mitkThrow() << "Image node date is nullptr or no image.";
     }
 
     const mitk::Image* mask = nullptr;
     const mitk::PlanarFigure* planar = nullptr;
-    if (roiNode)
+    if (roiNode != nullptr)
     {
       mask = dynamic_cast<const mitk::Image*>(roiNode->GetData());
       planar = dynamic_cast<const mitk::PlanarFigure*>(roiNode->GetData());
@@ -191,14 +191,14 @@ std::pair<QmitkDataGenerationJobBase*, mitk::DataNode::Pointer> QmitkImageStatis
 
 void QmitkImageStatisticsDataGenerator::RemoveObsoleteDataNodes(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const
 {
-  if (!imageNode || !imageNode->GetData())
+  if (imageNode == nullptr || !imageNode->GetData())
   {
     mitkThrow() << "Image is nullptr";
   }
 
   const auto image = imageNode->GetData();
   const mitk::BaseData* mask = nullptr;
-  if (roiNode)
+  if (roiNode != nullptr)
   {
     mask = roiNode->GetData();
   }
@@ -214,7 +214,7 @@ void QmitkImageStatisticsDataGenerator::RemoveObsoleteDataNodes(const mitk::Data
   predicate = mitk::NodePredicateAnd::New(predicate, binPredicate, zeroPredicate).GetPointer();
 
   auto storage = m_Storage.Lock();
-  if (storage)
+  if (storage != nullptr)
   {
     std::lock_guard<std::mutex> mutexguard(m_DataMutex);
 
@@ -227,7 +227,7 @@ mitk::DataNode::Pointer QmitkImageStatisticsDataGenerator::PrepareResultForStora
 {
   auto statsJob = dynamic_cast<const QmitkImageStatisticsCalculationRunnable*>(job);
 
-  if (statsJob)
+  if (statsJob != nullptr)
   {
     auto resultNode = mitk::DataNode::New();
     resultNode->SetProperty("helper object", mitk::BoolProperty::New(true));
@@ -235,7 +235,7 @@ mitk::DataNode::Pointer QmitkImageStatisticsDataGenerator::PrepareResultForStora
     resultNode->SetData(result);
     
     const mitk::BaseData* roi = statsJob->GetMaskImage();
-    if (!roi)
+    if (roi == nullptr)
     {
       roi = statsJob->GetPlanarFigure();
     }
@@ -257,14 +257,14 @@ std::string QmitkImageStatisticsDataGenerator::GenerateStatisticsNodeName(const 
     statisticsNodeName << "noZeros_";
   }
 
-  if (!image)
+  if (image == nullptr)
   {
     mitkThrow() << "Image is nullptr";
   }
 
   statisticsNodeName << image->GetUID();
 
-  if (roi)
+  if (roi != nullptr)
   {
     statisticsNodeName << "_" + roi->GetUID();
   }

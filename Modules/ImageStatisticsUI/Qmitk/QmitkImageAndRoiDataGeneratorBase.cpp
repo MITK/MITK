@@ -85,7 +85,7 @@ QmitkImageAndRoiDataGeneratorBase::GetAllImageROICombinations() const
   std::lock_guard<std::mutex> mutexguard(m_DataMutex);
 
   InputPairVectorType allCombinations;
-  for (auto& imageNode : m_ImageNodes)
+  for (const auto& imageNode : m_ImageNodes)
   {
     if (m_ROINodes.empty())
     {
@@ -93,7 +93,7 @@ QmitkImageAndRoiDataGeneratorBase::GetAllImageROICombinations() const
     }
     else
     {
-      for (auto& roiNode : m_ROINodes)
+      for (const auto& roiNode : m_ROINodes)
       {
         allCombinations.emplace_back(imageNode, roiNode);
       }

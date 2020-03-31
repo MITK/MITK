@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __QMITK_IMAGE_AND_ROI_DATA_GENERATOR_BASE_H
-#define __QMITK_IMAGE_AND_ROI_DATA_GENERATOR_BASE_H
+#ifndef QmitkImageAndRoiDataGeneratorBase_h
+#define QmitkImageAndRoiDataGeneratorBase_h
 
 #include "QmitkDataGeneratorBase.h"
 #include <MitkImageStatisticsUIExports.h>

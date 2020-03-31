@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef QMITKIMAGESTATISTICSCALCULATIONRUNNABLE_H_INCLUDED
-#define QMITKIMAGESTATISTICSCALCULATIONRUNNABLE_H_INCLUDED
+#ifndef QmitkImageStatisticsCalculationRunnable_h
+#define QmitkImageStatisticsCalculationRunnable_h
 
 //mitk headers
 #include "mitkImage.h"

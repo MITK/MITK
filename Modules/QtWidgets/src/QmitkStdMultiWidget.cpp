@@ -2523,7 +2523,7 @@ void QmitkStdMultiWidget::setViewDirectionAnnontation(mitk::Image* image, int sl
     }
   }
 
-  std::vector<char*> annotations;
+  std::vector<const char*> annotations;
   annotations.resize(4);
 
   switch (mainAxis) {

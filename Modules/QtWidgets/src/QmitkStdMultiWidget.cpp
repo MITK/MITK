@@ -237,6 +237,21 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mit
   connect( mitkWidget3, SIGNAL( ChangeCrosshairRotationMode(int) ), this, SLOT( SetWidgetPlaneMode(int) ) );
   connect( this, SIGNAL(WidgetNotifyNewCrossHairMode(int)), mitkWidget3, SLOT(OnWidgetPlaneModeChanged(int)) );
 
+  for (auto i = 0; i < 3; i++) {
+    connect(GetRenderWindow(i), &QmitkRenderWindow::annotationPositionChanged, this, [this]() { HandleCrosshairPositionEvent(); });
+    connect(GetRenderWindow(i), &QmitkRenderWindow::mouseEvent, this, [this](QMouseEvent* e) {
+      if (e->buttons() && e->type() == QEvent::MouseMove) {
+        auto modes = GetMouseModeSwitcher()->GetActiveMouseModes();
+        for (auto& mode : modes) {
+          if (mode.first == mitk::MouseModeSwitcher::MouseRotation) {
+            HandleCrosshairPositionEvent();
+            break;
+          }
+        }
+      }
+    });
+  }
+
   connect( mitkWidget4, SIGNAL( SignalLayoutDesignChanged(int) ), this, SLOT( OnLayoutDesignChanged(int) ) );
   connect( mitkWidget4, SIGNAL( ChangeCrosshairRotationMode(int) ), this, SLOT( SetWidgetPlaneMode(int) ) );
   connect( this, SIGNAL(WidgetNotifyNewCrossHairMode(int)), mitkWidget4, SLOT(OnWidgetPlaneModeChanged(int)) );
@@ -2493,8 +2508,7 @@ void QmitkStdMultiWidget::setViewDirectionAnnontation(mitk::Image* image, int sl
 
   if (!m_displayMetaInfo) {
     mainAxis = secondAxis = -1;
-  }
-  else {
+  } else {
     switch (i) {
     case 0:
       std::swap(mainAxis, tertiaryAxis);
@@ -2509,43 +2523,68 @@ void QmitkStdMultiWidget::setViewDirectionAnnontation(mitk::Image* image, int sl
     }
   }
 
+  std::vector<char*> annotations;
+  annotations.resize(4);
+
   switch (mainAxis) {
   case 0:
-    setCornerAnnotation(vtkCornerAnnotation::UpperEdge, i, mainSign ? "I" : "S");
-    setCornerAnnotation(vtkCornerAnnotation::LowerEdge, i, mainSign ? "S" : "I");
+    annotations[0] = mainSign ? "I" : "S";
+    annotations[2] = mainSign ? "S" : "I";
     break;
   case 1:
-    setCornerAnnotation(vtkCornerAnnotation::UpperEdge, i, mainSign ? "S" : "I");
-    setCornerAnnotation(vtkCornerAnnotation::LowerEdge, i, mainSign ? "I" : "S");
+    annotations[0] = mainSign ? "S" : "I";
+    annotations[2] = mainSign ? "I" : "S";
     break;
   case 2:
-    setCornerAnnotation(vtkCornerAnnotation::UpperEdge, i, mainSign ? "A" : "P");
-    setCornerAnnotation(vtkCornerAnnotation::LowerEdge, i, mainSign ? "P" : "A");
+    annotations[0] = mainSign ? "A" : "P";
+    annotations[2] = mainSign ? "P" : "A";
     break;
   default:
-    setCornerAnnotation(vtkCornerAnnotation::UpperEdge, i, " ");
-    setCornerAnnotation(vtkCornerAnnotation::LowerEdge, i, " ");
+    annotations[0] = " ";
+    annotations[2] = " ";
     break;
   }
 
   switch (secondAxis) {
   case 0:
-    setCornerAnnotation(vtkCornerAnnotation::RightEdge, i, secondSign ? "L" : "R");
-    setCornerAnnotation(vtkCornerAnnotation::LeftEdge, i, secondSign ? "R" : "L");
+    annotations[1] = secondSign ? "L" : "R";
+    annotations[3] = secondSign ? "R" : "L";
     break;
   case 1:
-    setCornerAnnotation(vtkCornerAnnotation::RightEdge, i, secondSign ? "P" : "A");
-    setCornerAnnotation(vtkCornerAnnotation::LeftEdge, i, secondSign ? "A" : "P");
+    annotations[1] = secondSign ? "P" : "A";
+    annotations[3] = secondSign ? "A" : "P";
     break;
   case 2:
-    setCornerAnnotation(vtkCornerAnnotation::RightEdge, i, secondSign ? "L" : "R");
-    setCornerAnnotation(vtkCornerAnnotation::LeftEdge, i, secondSign ? "R" : "L");
+    annotations[1] = secondSign ? "L" : "R";
+    annotations[3] = secondSign ? "R" : "L";
     break;
   default:
-    setCornerAnnotation(vtkCornerAnnotation::RightEdge, i, " ");
-    setCornerAnnotation(vtkCornerAnnotation::LeftEdge, i, " ");
+    annotations[1] = " ";
+    annotations[3] = " ";
     break;
   }
+
+  //Current window caclulation
+  //mitk::VtkLayerController::GetInstance(this->GetRenderWindow2()->GetRenderWindow())->InsertForegroundRenderer(ren[0], true);
+  //mitk::VtkLayerController::GetInstance(this->GetRenderWindow3()->GetRenderWindow())->InsertForegroundRenderer(ren[1], true);
+  //mitk::VtkLayerController::GetInstance(this->GetRenderWindow1()->GetRenderWindow())->InsertForegroundRenderer(ren[2], true);
+  //mitk::VtkLayerController::GetInstance(this->GetRenderWindow4()->GetRenderWindow())->InsertForegroundRenderer(ren[3], true);
+  auto index = i < 3 ? (i + 1) % 3 : i;
+  auto rw = GetRenderWindow(index);
+
+  auto size = annotations.size();
+  int steps = rw->GetRenderer()->GetCameraRotationController()->getRoll() / 90.0;
+  int startIndex = size + steps;
+
+  auto azimuth = rw->GetRenderer()->GetCameraRotationController()->getAzimuth();
+  if (fmod(azimuth, 360) >= 180) {
+    std::swap(annotations[1], annotations[3]);
+  }
+
+  setCornerAnnotation(vtkCornerAnnotation::UpperEdge, i, annotations[startIndex % size]);
+  setCornerAnnotation(vtkCornerAnnotation::RightEdge, i, annotations[(startIndex + 1) % size]);
+  setCornerAnnotation(vtkCornerAnnotation::LowerEdge, i, annotations[(startIndex + 2) % size]);
+  setCornerAnnotation(vtkCornerAnnotation::LeftEdge, i, annotations[(startIndex + 3) % size]);
 }
 
 std::vector<QmitkStdMultiWidget::FunctionSet> QmitkStdMultiWidget::getFuncSetDisplayAnnotation()

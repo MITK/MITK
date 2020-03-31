@@ -235,7 +235,7 @@ mitk::MouseModeSwitcher::MouseMode mitk::MouseModeSwitcher::GetCurrentMouseMode(
   return m_ActiveMouseMode;
 }
 
-mitk::MouseModeSwitcher::MouseModeMap mitk::MouseModeSwitcher::GetActiveMouseModes()
+mitk::MouseModeSwitcher::MouseModeMap& mitk::MouseModeSwitcher::GetActiveMouseModes()
 {
   return m_ActiveMouseModes;
 }

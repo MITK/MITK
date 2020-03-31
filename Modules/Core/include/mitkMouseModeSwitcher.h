@@ -116,7 +116,7 @@ namespace mitk {
     */
     MouseMode GetCurrentMouseMode() const;
 
-    MouseModeMap GetActiveMouseModes();
+    MouseModeMap& GetActiveMouseModes();
 
     /**
     * \brief Enable 3D view selection events

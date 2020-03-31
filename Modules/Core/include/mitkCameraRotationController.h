@@ -55,6 +55,9 @@ public:
   void Mirror(bool horizontal);
   void ResetTransformationAngles();
 
+  double getRoll() { return m_Roll; }
+  double getAzimuth() { return m_Azimuth; }
+
 protected:
   CameraRotationController();
   virtual ~CameraRotationController();

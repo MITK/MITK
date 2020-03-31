@@ -114,6 +114,12 @@ namespace mitk
     return m_TimeStepMap.find(timeStep) != m_TimeStepMap.end();
   }
 
+  const ImageStatisticsContainer::HistogramType*
+    ImageStatisticsContainer::GetHistogramForTimeStep(TimeStepType timeStep) const
+  {
+    return this->GetStatisticsForTimeStep(timeStep).m_Histogram;
+  }
+
   const ImageStatisticsContainer::ImageStatisticsObject &ImageStatisticsContainer::GetStatisticsForTimeStep(
     TimeStepType timeStep) const
   {

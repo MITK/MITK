@@ -9,25 +9,22 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef QMITKIMAGESTATISTICSCALCULATIONRUNNABLE_H_INCLUDED
-#define QMITKIMAGESTATISTICSCALCULATIONRUNNABLE_H_INCLUDED
-
-//QT headers
-#include <QThread>
-#include <qrunnable.h>
-#include <qobject.h>
+#ifndef QmitkImageStatisticsCalculationRunnable_h
+#define QmitkImageStatisticsCalculationRunnable_h
 
 //mitk headers
 #include "mitkImage.h"
 #include "mitkPlanarFigure.h"
 #include "mitkImageStatisticsContainer.h"
-#include <MitkImageStatisticsUIExports.h>
+
+#include "QmitkDataGenerationJobBase.h"
 
 // itk headers
 #ifndef __itkHistogram_h
 #include <itkHistogram.h>
 #endif
 
+#include <MitkImageStatisticsUIExports.h>
 
 /**
 * /brief This class is executed as background thread for image statistics calculation.
@@ -35,7 +32,7 @@ found in the LICENSE file.
 *   This class is derived from QRunnable and is intended to be used by QmitkImageStatisticsView
 *   to run the image statistics calculation in a background thread keeping the GUI usable.
 */
-class MITKIMAGESTATISTICSUI_EXPORT QmitkImageStatisticsCalculationRunnable : public QObject, public QRunnable
+class MITKIMAGESTATISTICSUI_EXPORT QmitkImageStatisticsCalculationRunnable : public QmitkDataGenerationJobBase
 {
   Q_OBJECT
 public:
@@ -72,20 +69,11 @@ public:
   /*!
   /brief Get bin size for histogram resolution.*/
   unsigned int GetHistogramNBins() const;
-  /*!
-  /brief Returns the histogram of the currently selected time step. */
-  const HistogramType* GetTimeStepHistogram(unsigned int t = 0) const;
 
-  /*!
-  /brief Returns a flag the indicates if the statistics are updated successfully */
-  bool GetStatisticsUpdateSuccessFlag() const;
-  /*!
-  /brief Method called once the thread is executed. */
-  void run() override;
+  ResultMapType GetResults() const override;
 
-  std::string GetLastErrorMessage() const;
-signals:
-  void finished();
+protected:
+  bool RunComputation() override;
 
 private:
   mitk::Image::ConstPointer m_StatisticsImage;                         ///< member variable holds the input image for which the statistics need to be calculated.
@@ -94,8 +82,5 @@ private:
   mitk::ImageStatisticsContainer::Pointer m_StatisticsContainer;
   bool m_IgnoreZeros;                                             ///< member variable holds flag to indicate if zero valued voxel should be suppressed
   unsigned int m_HistogramNBins;                                      ///< member variable holds the bin size for histogram resolution.
-  bool m_CalculationSuccessful;                                   ///< flag set if statistics calculation was successful
-  std::vector<HistogramType::ConstPointer> m_HistogramVector;          ///< member holds the histograms of all time steps.
-  std::string m_message;
 };
 #endif // QMITKIMAGESTATISTICSCALCULATIONRUNNABLE_H_INCLUDED

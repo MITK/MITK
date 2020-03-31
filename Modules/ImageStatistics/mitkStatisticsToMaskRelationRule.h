@@ -21,7 +21,7 @@ namespace mitk
   class MITKIMAGESTATISTICS_EXPORT StatisticsToMaskRelationRule : public mitk::GenericIDRelationRule
   {
   public:
-    mitkClassMacroItkParent(StatisticsToMaskRelationRule, mitk::GenericIDRelationRule);
+    mitkClassMacro(StatisticsToMaskRelationRule, mitk::GenericIDRelationRule);
     itkNewMacro(Self);
 
   protected:

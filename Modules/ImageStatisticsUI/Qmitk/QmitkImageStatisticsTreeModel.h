@@ -26,7 +26,10 @@ class QmitkImageStatisticsTreeItem;
 
 /*!
 \class QmitkImageStatisticsTreeModel
-Model that takes a mitk::ImageStatisticsContainer and represents it as model in context of the QT view-model-concept.
+The class is used to represent the information of mitk::ImageStatisticsContainer in the set datastorage in the context of the QT view-model-concept.
+The represented ImageStatisticContainer are specified by setting the image and mask nodes that should be regarded.
+In addition you may specified the statistic computation property HistorgramNBins and IgnoreZeroValueVoxel to select the correct
+statistics.
 */
 class MITKIMAGESTATISTICSUI_EXPORT QmitkImageStatisticsTreeModel : public QmitkAbstractDataStorageModel
 {
@@ -40,6 +43,16 @@ public:
   void SetImageNodes(const std::vector<mitk::DataNode::ConstPointer>& nodes);
   void SetMaskNodes(const std::vector<mitk::DataNode::ConstPointer>& nodes);
   void Clear();
+
+  /*! /brief Set flag to ignore zero valued voxels */
+  void SetIgnoreZeroValueVoxel(bool _arg);
+  /*! /brief Get status of zero value voxel ignoring. */
+  bool GetIgnoreZeroValueVoxel() const;
+
+  /*! /brief Set bin size for histogram resolution.*/
+  void SetHistogramNBins(unsigned int nbins);
+  /*! /brief Get bin size for histogram resolution.*/
+  unsigned int GetHistogramNBins() const;
 
   Qt::ItemFlags flags(const QModelIndex &index) const override;
   QVariant data(const QModelIndex &index, int role) const override;
@@ -106,6 +119,9 @@ private:
     itk::SimpleFastMutexLock m_Mutex;
     QmitkImageStatisticsTreeItem *m_RootItem;
     QVariant m_HeaderFirstColumn;
+
+    bool m_IgnoreZeroValueVoxel = false;
+    unsigned int m_HistogramNBins = 100;
 };
 
 #endif // mitkQmitkImageStatisticsTreeModel_h

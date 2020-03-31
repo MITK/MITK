@@ -20,15 +20,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageMaskGenerator.h>
 #include <mitkPlanarFigureMaskGenerator.h>
 #include <mitkIgnorePixelMaskGenerator.h>
+#include "mitkStatisticsToImageRelationRule.h"
+#include "mitkStatisticsToMaskRelationRule.h"
+#include "mitkImageStatisticsContainerManager.h"
+#include "mitkProperties.h"
 
 QmitkImageStatisticsCalculationRunnable::QmitkImageStatisticsCalculationRunnable()
-  : QObject(), QRunnable()
+  : QmitkDataGenerationJobBase()
   , m_StatisticsImage(nullptr)
   , m_BinaryMask(nullptr)
   , m_PlanarFigureMask(nullptr)
   , m_IgnoreZeros(false)
   , m_HistogramNBins(100)
-  , m_CalculationSuccessful(false)
 {
 }
 
@@ -85,26 +88,14 @@ unsigned int QmitkImageStatisticsCalculationRunnable::GetHistogramNBins() const
   return this->m_HistogramNBins;
 }
 
-std::string QmitkImageStatisticsCalculationRunnable::GetLastErrorMessage() const
+QmitkDataGenerationJobBase::ResultMapType QmitkImageStatisticsCalculationRunnable::GetResults() const
 {
-  return m_message;
+  ResultMapType result;
+  result.emplace("statistics", this->GetStatisticsData());
+  return result;
 }
 
-const QmitkImageStatisticsCalculationRunnable::HistogramType*
-QmitkImageStatisticsCalculationRunnable::GetTimeStepHistogram(unsigned int t) const
-{
-  if (t >= this->m_HistogramVector.size())
-    return nullptr;
-
-  return this->m_HistogramVector.at(t).GetPointer();
-}
-
-bool QmitkImageStatisticsCalculationRunnable::GetStatisticsUpdateSuccessFlag() const
-{
-  return m_CalculationSuccessful;
-}
-
-void QmitkImageStatisticsCalculationRunnable::run()
+bool QmitkImageStatisticsCalculationRunnable::RunComputation()
 {
   bool statisticCalculationSuccessful = true;
   mitk::ImageStatisticsCalculator::Pointer calculator = mitk::ImageStatisticsCalculator::New();
@@ -137,28 +128,10 @@ void QmitkImageStatisticsCalculationRunnable::run()
       calculator->SetMask(pfMaskGen.GetPointer());
     }
   }
-  catch (const mitk::Exception& e)
-  {
-    MITK_ERROR << "MITK Exception: " << e.what();
-    m_message = e.what();
-    statisticCalculationSuccessful = false;
-  }
-  catch (const itk::ExceptionObject& e)
-  {
-    MITK_ERROR << "ITK Exception:" << e.what();
-    m_message = e.what();
-    statisticCalculationSuccessful = false;
-  }
-  catch (const std::runtime_error &e)
-  {
-    MITK_ERROR << "Runtime Exception: " << e.what();
-    m_message = e.what();
-    statisticCalculationSuccessful = false;
-  }
   catch (const std::exception &e)
   {
-    MITK_ERROR << "Standard Exception: " << e.what();
-    m_message = e.what();
+    MITK_ERROR << "Error while configuring the statistics calculator: " << e.what();
+    m_LastErrorMessage = e.what();
     statisticCalculationSuccessful = false;
   }
 
@@ -180,47 +153,34 @@ void QmitkImageStatisticsCalculationRunnable::run()
   {
     calculator->GetStatistics();
   }
-  catch (mitk::Exception& e)
-  {
-    m_message = e.GetDescription();
-    MITK_ERROR << "MITK Exception: " << e.what();
-    statisticCalculationSuccessful = false;
-  }
-  catch (const std::runtime_error &e)
-  {
-    m_message = "Failure: " + std::string(e.what());
-    MITK_ERROR << "Runtime Exception: " << e.what();
-    statisticCalculationSuccessful = false;
-  }
   catch (const std::exception &e)
   {
-    m_message = "Failure: " + std::string(e.what());
-    MITK_ERROR << "Standard Exception: " << e.what();
+    m_LastErrorMessage = "Failure while calculating the statistics: " + std::string(e.what());
+    MITK_ERROR << m_LastErrorMessage;
     statisticCalculationSuccessful = false;
   }
-
-  this->m_CalculationSuccessful = statisticCalculationSuccessful;
 
   if (statisticCalculationSuccessful)
   {
     m_StatisticsContainer = calculator->GetStatistics();
-    this->m_HistogramVector.clear();
 
-    for (unsigned int i = 0; i < m_StatisticsImage->GetTimeSteps(); i++)
+    auto imageRule = mitk::StatisticsToImageRelationRule::New();
+    imageRule->Connect(m_StatisticsContainer, m_StatisticsImage);
+
+    if (nullptr != m_PlanarFigureMask)
     {
-      HistogramType::ConstPointer tempHistogram;
-      try {
-        if (calculator->GetStatistics()->TimeStepExists(i))
-        {
-          tempHistogram = calculator->GetStatistics()->GetStatisticsForTimeStep(i).m_Histogram;
-          this->m_HistogramVector.push_back(tempHistogram);
-        }
-      }
-      catch (mitk::Exception&) {
-        MITK_WARN << ":-(";
-      }
-
+      auto maskRule = mitk::StatisticsToMaskRelationRule::New();
+      maskRule->Connect(m_StatisticsContainer, m_PlanarFigureMask);
     }
+
+    if (nullptr != m_BinaryMask)
+    {
+      auto maskRule = mitk::StatisticsToMaskRelationRule::New();
+      maskRule->Connect(m_StatisticsContainer, m_BinaryMask);
+    }
+
+    m_StatisticsContainer->SetProperty(mitk::STATS_HISTOGRAM_BIN_PROPERTY_NAME.c_str(), mitk::UIntProperty::New(m_HistogramNBins));
+    m_StatisticsContainer->SetProperty(mitk::STATS_IGNORE_ZERO_VOXEL_PROPERTY_NAME.c_str(), mitk::BoolProperty::New(m_IgnoreZeros));
   }
-  emit finished();
+  return statisticCalculationSuccessful;
 }

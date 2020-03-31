@@ -7,14 +7,17 @@ set(CPP_FILES
   Qmitk/QmitkStatisticsModelToStringConverter.cpp
   Qmitk/QmitkImageStatisticsWidget.cpp
   Qmitk/QmitkImageStatisticsTreeItem.cpp
+  Qmitk/QmitkDataGenerationJobBase.cpp
+  Qmitk/QmitkDataGeneratorBase.cpp
+  Qmitk/QmitkImageAndRoiDataGeneratorBase.cpp
+  Qmitk/QmitkImageStatisticsDataGenerator.cpp
 )
 
 set(H_FILES
   Qmitk/QmitkStatisticsModelToStringConverter.h
   Qmitk/QmitkImageStatisticsTreeItem.h
-)
-
-set(TPP_FILES
+  Qmitk/QmitkImageAndRoiDataGeneratorBase.h
+  Qmitk/QmitkImageStatisticsDataGenerator.h
 )
 
 set(UI_FILES
@@ -30,4 +33,6 @@ set(MOC_H_FILES
   Qmitk/QmitkImageStatisticsTreeModel.h
   Qmitk/QmitkImageStatisticsCalculationJob.h
   Qmitk/QmitkImageStatisticsWidget.h
+  Qmitk/QmitkDataGenerationJobBase.h
+  Qmitk/QmitkDataGeneratorBase.h
 )

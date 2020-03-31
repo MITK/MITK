@@ -16,11 +16,13 @@ found in the LICENSE file.
 #include "ui_QmitkImageStatisticsViewControls.h"
 
 #include <QmitkAbstractView.h>
-#include <QmitkImageStatisticsCalculationRunnable.h>
 #include <mitkImageStatisticsContainer.h>
 #include <QmitkNodeSelectionDialog.h>
 
 #include <mitkPropertyRelations.h>
+
+class QmitkImageStatisticsDataGenerator;
+class QmitkDataGenerationJobBase;
 
 /*!
 \brief QmitkImageStatisticsView is a bundle that allows statistics calculation from images. Three modes
@@ -53,20 +55,16 @@ protected:
 
   virtual void CreateConnections();
 
-  void CalculateOrGetMultiStatistics();
-  void CalculateOrGetStatistics();
-  void CalculateStatistics(const mitk::Image* image, const mitk::Image* mask = nullptr,
-                           const mitk::PlanarFigure* maskPlanarFigure = nullptr);
+  void UpdateIntensityProfile();
+  void UpdateHistogramWidget();
 
-  void ComputeAndDisplayIntensityProfile(mitk::Image * image, mitk::PlanarFigure* maskPlanarFigure);
-  void FillHistogramWidget(const std::vector<const HistogramType*> &histogram,
-                           const std::vector<std::string> &dataLabels);
   QmitkChartWidget::ColorTheme GetColorTheme() const;
 
   void ResetGUI();
-  void ResetGUIDefault();
 
-  void OnStatisticsCalculationEnds();
+  void OnGenerationStarted(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode, const QmitkDataGenerationJobBase* job);
+  void OnGenerationFinished();
+  void OnJobError(QString error, const QmitkDataGenerationJobBase* failedJob);
   void OnRequestHistogramUpdate(unsigned int);
   void OnCheckBoxIgnoreZeroStateChanged(int state);
   void OnButtonSelectionPressed();
@@ -75,33 +73,17 @@ protected:
   Ui::QmitkImageStatisticsViewControls m_Controls;
 
 private:
-
-  void HandleExistingStatistics(mitk::Image::ConstPointer, mitk::BaseData::ConstPointer,
-                                mitk::ImageStatisticsContainer::Pointer);
-
-  std::string GenerateStatisticsNodeName(mitk::Image::ConstPointer, mitk::BaseData::ConstPointer);
-
-  void SetupRelationRules(mitk::Image::ConstPointer, mitk::BaseData::ConstPointer,
-                          mitk::ImageStatisticsContainer::Pointer);
-
-  mitk::DataNode::Pointer GetNodeForStatisticsContainer(mitk::ImageStatisticsContainer::ConstPointer container);
-
   QmitkNodeSelectionDialog::SelectionCheckFunctionType CheckForSameGeometry() const;
 
   typedef itk::SimpleMemberCommand<QmitkImageStatisticsView> ITKCommandType;
-  mitk::DataNode::ConstPointer m_selectedImageNode = nullptr;
-  mitk::DataNode::ConstPointer m_selectedMaskNode = nullptr;
   mitk::PlanarFigure::Pointer m_selectedPlanarFigure = nullptr;
 
   long m_PlanarFigureObserverTag;
-  bool m_ForceRecompute = false;
-  bool m_IgnoreZeroValueVoxel = false;
   std::vector<mitk::DataNode::ConstPointer> m_selectedMaskNodes;
   std::vector<mitk::DataNode::ConstPointer> m_selectedImageNodes;
   QmitkNodeSelectionDialog::NodeList m_SelectedNodeList;
   std::vector<mitk::ImageStatisticsContainer::ConstPointer> m_StatisticsForSelection;
-  std::vector<QmitkImageStatisticsCalculationRunnable*> m_Runnables;
-
+  QmitkImageStatisticsDataGenerator* m_DataGenerator = nullptr;
 };
 
 #endif // QMITKIMAGESTATISTICSVIEW_H

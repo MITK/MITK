@@ -129,7 +129,7 @@ double QmitkStatisticsCalculator::GetSegmentationMaskVolume(mitk::DataNode::Poin
   }
 
   // all nodes and images are valid, retrieve statistics
-  mitk::ImageStatisticsContainer::ConstPointer imageStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(dataStorage, image, segmentation);
+  mitk::ImageStatisticsContainer::ConstPointer imageStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(dataStorage, image, segmentation).GetPointer();
 
   bool imageStatisticsOlderThanInputs = false;
   if (imageStatistics && (imageStatistics->GetMTime() < image->GetMTime() || (imageStatistics->GetMTime() < segmentation->GetMTime())))

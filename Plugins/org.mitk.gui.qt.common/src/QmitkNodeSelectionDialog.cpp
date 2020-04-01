@@ -278,7 +278,7 @@ void QmitkNodeSelectionDialog::AddPanel(const mitk::IDataStorageInspectorProvide
   }
 }
 
-void QmitkNodeSelectionDialog::OnDoubleClicked(const QModelIndex& index)
+void QmitkNodeSelectionDialog::OnDoubleClicked(const QModelIndex& /*index*/)
 {
   if (!m_SelectedNodes.empty())
   {

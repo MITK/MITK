@@ -269,10 +269,19 @@ void QmitkNodeSelectionDialog::AddPanel(const mitk::IDataStorageInspectorProvide
 
   m_Panels.push_back(inspector);
   connect(inspector, &QmitkAbstractDataStorageInspector::CurrentSelectionChanged, this, &QmitkNodeSelectionDialog::OnSelectionChanged);
+  connect(inspector->GetView(), &QAbstractItemView::doubleClicked, this, &QmitkNodeSelectionDialog::OnDoubleClicked);
 
   preferredFound = preferredFound || provider->GetInspectorID() == preferredID;
   if (!preferredFound)
   {
     ++preferredIndex;
+  }
+}
+
+void QmitkNodeSelectionDialog::OnDoubleClicked(const QModelIndex& index)
+{
+  if (!m_SelectedNodes.empty())
+  {
+    this->OnOK();
   }
 }

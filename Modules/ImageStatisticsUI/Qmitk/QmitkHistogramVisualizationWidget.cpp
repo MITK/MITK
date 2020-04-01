@@ -33,21 +33,25 @@ void QmitkHistogramVisualizationWidget::SetHistogram(itk::Statistics::Histogram<
   if (histogram == nullptr)
     return;
 
+  bool histogramWasEmpty = m_Histograms.empty();
+
   if (m_Histograms.find(dataLabel) == m_Histograms.end())
   {
     m_Histograms.insert(std::make_pair(dataLabel, histogram));
     m_Controls.chartWidget->AddData2D(ConvertHistogramToPairList(histogram), dataLabel);
+    m_Controls.chartWidget->SetChartType(dataLabel, QmitkChartWidget::ChartType::bar);
   }
   else
   {
     m_Histograms[dataLabel] = histogram;
     m_Controls.chartWidget->UpdateData2D(ConvertHistogramToPairList(histogram), dataLabel);
   }
-  m_Controls.chartWidget->SetChartType(dataLabel, QmitkChartWidget::ChartType::bar);
 
-  m_Controls.chartWidget->Show(m_Controls.checkBoxShowSubchart->isChecked());
-
-  SetGUIElementsEnabled(!m_Histograms.empty());
+  if (m_Histograms.empty() != histogramWasEmpty)
+  {
+    m_Controls.chartWidget->Show(m_Controls.checkBoxShowSubchart->isChecked());
+    SetGUIElementsEnabled(!m_Histograms.empty());
+  }
 }
 
 void QmitkHistogramVisualizationWidget::Reset()
@@ -183,9 +187,13 @@ void QmitkHistogramVisualizationWidget::OnViewMinMaxCheckBoxChanged()
 
     auto maxVector = histogram.second->GetDimensionMaxs(0);
     if (m_Controls.checkBoxUseDefaultNBins->isChecked())
+    {
       if (max < maxVector[m_DefaultNBins - 1]) max = maxVector[m_DefaultNBins - 1];
+    }
     else
+    {
       if (max < maxVector[m_Controls.spinBoxNBins->value() - 1]) max = maxVector[m_Controls.spinBoxNBins->value() - 1];
+    }
   }
 
   if (!m_Controls.checkBoxViewMinMax->isChecked())

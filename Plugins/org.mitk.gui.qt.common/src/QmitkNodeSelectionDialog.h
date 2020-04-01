@@ -118,6 +118,7 @@ protected Q_SLOTS:
   void OnFavoriteNodesButtonClicked();
   void OnOK();
   void OnCancel();
+  void OnDoubleClicked(const QModelIndex& index);
 
 protected:
   void SetErrorText(const std::string& checkResponse);

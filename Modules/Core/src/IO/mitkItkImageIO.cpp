@@ -215,12 +215,10 @@ namespace mitk
     this->RegisterService();
   }
 
-  /**Helper function that converts the content of a meta data into a time point vector.
-   * If MetaData is not valid or cannot be converted an empty vector is returned.*/
-  std::vector<TimePointType> ConvertMetaDataObjectToTimePointList(const itk::MetaDataObjectBase *data)
+  std::vector<TimePointType> ConvertMetaDataObjectToTimePointList(const itk::MetaDataObjectBase* data)
   {
-    const auto *timeGeometryTimeData =
-      dynamic_cast<const itk::MetaDataObject<std::string> *>(data);
+    const auto* timeGeometryTimeData =
+      dynamic_cast<const itk::MetaDataObject<std::string>*>(data);
     std::vector<TimePointType> result;
 
     if (timeGeometryTimeData)
@@ -235,6 +233,19 @@ namespace mitk
     }
 
     return result;
+  };
+
+  itk::MetaDataObjectBase::Pointer ConvertTimePointListToMetaDataObject(const mitk::TimeGeometry* timeGeometry)
+  {
+    std::stringstream stream;
+    stream << timeGeometry->GetTimeBounds(0)[0];
+    for (TimeStepType pos = 0; pos < timeGeometry->CountTimeSteps(); ++pos)
+    {
+      stream << " " << timeGeometry->GetTimeBounds(pos)[1];
+    }
+    auto result = itk::MetaDataObject<std::string>::New();
+    result->SetMetaDataObjectValue(stream.str());
+    return result.GetPointer();
   };
 
   std::vector<BaseData::Pointer> ItkImageIO::Read()
@@ -613,16 +624,8 @@ namespace mitk
                                               PROPERTY_KEY_TIMEGEOMETRY_TYPE,
                                               ArbitraryTimeGeometry::GetStaticNameOfClass());
 
-        std::stringstream stream;
-        stream << arbitraryTG->GetTimeBounds(0)[0];
-        for (TimeStepType pos = 0; pos < arbitraryTG->CountTimeSteps(); ++pos)
-        {
-          stream << " " << arbitraryTG->GetTimeBounds(pos)[1];
-        }
-        std::string data = stream.str();
-
-        itk::EncapsulateMetaData<std::string>(
-          m_ImageIO->GetMetaDataDictionary(), PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS, data);
+        auto metaTimePoints = ConvertTimePointListToMetaDataObject(arbitraryTG);
+        m_ImageIO->GetMetaDataDictionary().Set(PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS, metaTimePoints);
       }
 
       // Handle properties
@@ -649,6 +652,7 @@ namespace mitk
 
         itk::EncapsulateMetaData<std::string>(m_ImageIO->GetMetaDataDictionary(), key, value);
       }
+
       ImageReadAccessor imageAccess(image);
       LocaleSwitch localeSwitch2("C");
       m_ImageIO->Write(imageAccess.GetData());

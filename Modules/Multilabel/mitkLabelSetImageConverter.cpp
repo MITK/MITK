@@ -77,6 +77,8 @@ mitk::Image::Pointer mitk::ConvertLabelSetImageToImage(LabelSetImage::ConstPoint
     {
       AccessByItk_2(labelSetImage->GetLayerImage(0), ::ConvertLabelSetImageToImage, labelSetImage, image);
     }
+
+    image->SetTimeGeometry(labelSetImage->GetTimeGeometry()->Clone());
   }
 
   return image;
@@ -136,6 +138,7 @@ mitk::LabelSetImage::Pointer mitk::ConvertImageToLabelSetImage(Image::Pointer im
       labelSetImage = mitk::LabelSetImage::New();
       labelSetImage->InitializeByLabeledImage(image);
     }
+    labelSetImage->SetTimeGeometry(image->GetTimeGeometry()->Clone());
   }
 
   return labelSetImage;

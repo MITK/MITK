@@ -23,6 +23,7 @@ found in the LICENSE file.
 #include <mitkImageStatisticsContainerNodeHelper.h>
 #include <mitkStatisticsToImageRelationRule.h>
 #include <mitkStatisticsToMaskRelationRule.h>
+#include <mitkProperties.h>
 
 class mitkImageStatisticsContainerManagerTestSuite : public mitk::TestFixture
 {
@@ -33,6 +34,8 @@ class mitkImageStatisticsContainerManagerTestSuite : public mitk::TestFixture
   MITK_TEST(GetImageStatisticsWithImageAndMaskConnected);
   MITK_TEST(GetImageStatisticsWithImageAndMaskNotConnected);
   MITK_TEST(GetImageStatisticsInvalid);
+  MITK_TEST(GetImageStatisticsProperties);
+  MITK_TEST(GetImageStatisticsUpToDate);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -44,15 +47,24 @@ private:
 public:
   void setUp() override
   {
-    m_statisticsContainer = mitk::ImageStatisticsContainer::New();
-    m_statisticsContainer2 = mitk::ImageStatisticsContainer::New();
-    m_statisticsContainer3 = mitk::ImageStatisticsContainer::New();
     m_image = mitk::Image::New();
     m_image2 = mitk::Image::New();
     m_mask = mitk::Image::New();
     m_mask2 = mitk::Image::New();
     m_planarFigure = mitk::PlanarCircle::New().GetPointer();
     m_planarFigure2 = mitk::PlanarCircle::New().GetPointer();
+
+    m_statisticsContainer = mitk::ImageStatisticsContainer::New();
+    m_statisticsContainer->SetProperty(mitk::STATS_HISTOGRAM_BIN_PROPERTY_NAME.c_str(), mitk::UIntProperty::New(100));
+    m_statisticsContainer->SetProperty(mitk::STATS_IGNORE_ZERO_VOXEL_PROPERTY_NAME.c_str(), mitk::BoolProperty::New(false));
+
+    m_statisticsContainer2 = mitk::ImageStatisticsContainer::New();
+    m_statisticsContainer2->SetProperty(mitk::STATS_HISTOGRAM_BIN_PROPERTY_NAME.c_str(), mitk::UIntProperty::New(100));
+    m_statisticsContainer2->SetProperty(mitk::STATS_IGNORE_ZERO_VOXEL_PROPERTY_NAME.c_str(), mitk::BoolProperty::New(false));
+
+    m_statisticsContainer3 = mitk::ImageStatisticsContainer::New();
+    m_statisticsContainer3->SetProperty(mitk::STATS_HISTOGRAM_BIN_PROPERTY_NAME.c_str(), mitk::UIntProperty::New(100));
+    m_statisticsContainer3->SetProperty(mitk::STATS_IGNORE_ZERO_VOXEL_PROPERTY_NAME.c_str(), mitk::BoolProperty::New(false));
   }
 
   void tearDown() override
@@ -90,6 +102,69 @@ public:
     CPPUNIT_ASSERT_EQUAL(emptyStatistic.IsNull(), true);
   }
 
+  void GetImageStatisticsProperties()
+  {
+    auto statisticsNode = mitk::CreateImageStatisticsNode(m_statisticsContainer, "testStatistics");
+    CreateNodeRelationImage(m_statisticsContainer.GetPointer(), m_image.GetPointer());
+    auto standaloneDataStorage = mitk::StandaloneDataStorage::New();
+    standaloneDataStorage->Add(statisticsNode);
+
+    statisticsNode = mitk::CreateImageStatisticsNode(m_statisticsContainer2, "testStatistics");
+    m_statisticsContainer2->SetProperty(mitk::STATS_HISTOGRAM_BIN_PROPERTY_NAME.c_str(), mitk::UIntProperty::New(50));
+    CreateNodeRelationImage(m_statisticsContainer2.GetPointer(), m_image.GetPointer());
+    standaloneDataStorage->Add(statisticsNode);
+
+    statisticsNode = mitk::CreateImageStatisticsNode(m_statisticsContainer3, "testStatistics");
+    m_statisticsContainer3->SetProperty(mitk::STATS_IGNORE_ZERO_VOXEL_PROPERTY_NAME.c_str(), mitk::BoolProperty::New(true));
+    CreateNodeRelationImage(m_statisticsContainer3.GetPointer(), m_image.GetPointer());
+    standaloneDataStorage->Add(statisticsNode);
+
+    mitk::ImageStatisticsContainer::ConstPointer foundStatistics;
+    CPPUNIT_ASSERT_NO_THROW(foundStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(standaloneDataStorage.GetPointer(), m_image.GetPointer()));
+    CPPUNIT_ASSERT_EQUAL(foundStatistics->GetUID(), m_statisticsContainer->GetUID());
+    CPPUNIT_ASSERT_NO_THROW(foundStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(standaloneDataStorage.GetPointer(), m_image.GetPointer(), nullptr, false, 50));
+    CPPUNIT_ASSERT_EQUAL(foundStatistics->GetUID(), m_statisticsContainer2->GetUID());
+    CPPUNIT_ASSERT_NO_THROW(foundStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(standaloneDataStorage.GetPointer(), m_image.GetPointer(), nullptr, true,100));
+    CPPUNIT_ASSERT_EQUAL(foundStatistics->GetUID(), m_statisticsContainer3->GetUID());
+  }
+
+  void GetImageStatisticsUpToDate()
+  {
+    auto statisticsNode = mitk::CreateImageStatisticsNode(m_statisticsContainer, "testStatistics");
+    CreateNodeRelationImage(m_statisticsContainer.GetPointer(), m_image.GetPointer());
+    CreateNodeRelationMask(m_statisticsContainer.GetPointer(), m_mask.GetPointer());
+    auto standaloneDataStorage = mitk::StandaloneDataStorage::New();
+    standaloneDataStorage->Add(statisticsNode);
+
+    mitk::ImageStatisticsContainer::ConstPointer foundStatistics;
+    CPPUNIT_ASSERT_NO_THROW(foundStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(standaloneDataStorage.GetPointer(), m_image.GetPointer(), m_mask.GetPointer(),false, 100));
+    CPPUNIT_ASSERT_EQUAL(foundStatistics->GetUID(), m_statisticsContainer->GetUID());
+
+    m_image->Modified();
+
+    CPPUNIT_ASSERT_NO_THROW(foundStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(standaloneDataStorage.GetPointer(), m_image.GetPointer(), m_mask.GetPointer(), false, 100, true));
+    CPPUNIT_ASSERT_MESSAGE("Error. Statistics was found even though it is outdated.",foundStatistics.IsNull());
+    CPPUNIT_ASSERT_NO_THROW(foundStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(standaloneDataStorage.GetPointer(), m_image.GetPointer(), m_mask.GetPointer(), false, 100, false));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error. Statistics was not found, even if outdated results are allowed.", foundStatistics->GetUID(), m_statisticsContainer->GetUID());
+
+    m_statisticsContainer->Modified();
+
+    CPPUNIT_ASSERT_NO_THROW(foundStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(standaloneDataStorage.GetPointer(), m_image.GetPointer(), m_mask.GetPointer(), false, 100));
+    CPPUNIT_ASSERT_EQUAL(foundStatistics->GetUID(), m_statisticsContainer->GetUID());
+
+    m_mask->Modified();
+
+    CPPUNIT_ASSERT_NO_THROW(foundStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(standaloneDataStorage.GetPointer(), m_image.GetPointer(), m_mask.GetPointer(), false, 100, true));
+    CPPUNIT_ASSERT_MESSAGE("Error. Statistics was found even though it is outdated.", foundStatistics.IsNull());
+    CPPUNIT_ASSERT_NO_THROW(foundStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(standaloneDataStorage.GetPointer(), m_image.GetPointer(), m_mask.GetPointer(), false, 100, false));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error. Statistics was not found, even if outdated results are allowed.", foundStatistics->GetUID(), m_statisticsContainer->GetUID());
+
+    m_statisticsContainer->Modified();
+
+    CPPUNIT_ASSERT_NO_THROW(foundStatistics = mitk::ImageStatisticsContainerManager::GetImageStatistics(standaloneDataStorage.GetPointer(), m_image.GetPointer(), m_mask.GetPointer(), false, 100));
+    CPPUNIT_ASSERT_EQUAL(foundStatistics->GetUID(), m_statisticsContainer->GetUID());
+  }
+
   void GetImageStatisticsWithImageConnected()
   {
     //create rules connection
@@ -123,6 +198,8 @@ public:
 
     //add another newer statistic: should return this newer one
     auto statisticsContainerNew = mitk::ImageStatisticsContainer::New();
+    statisticsContainerNew->SetProperty(mitk::STATS_HISTOGRAM_BIN_PROPERTY_NAME.c_str(), mitk::UIntProperty::New(100));
+    statisticsContainerNew->SetProperty(mitk::STATS_IGNORE_ZERO_VOXEL_PROPERTY_NAME.c_str(), mitk::BoolProperty::New(false));
     CreateNodeRelationImage(statisticsContainerNew.GetPointer(), m_image.GetPointer());
 
     auto statisticsNodeNew = mitk::CreateImageStatisticsNode(statisticsContainerNew, "testStatisticsNew");
@@ -187,7 +264,8 @@ public:
 
     //add another newer statistic: should return this newer one
     auto statisticsContainerNew = mitk::ImageStatisticsContainer::New();
-
+    statisticsContainerNew->SetProperty(mitk::STATS_HISTOGRAM_BIN_PROPERTY_NAME.c_str(), mitk::UIntProperty::New(100));
+    statisticsContainerNew->SetProperty(mitk::STATS_IGNORE_ZERO_VOXEL_PROPERTY_NAME.c_str(), mitk::BoolProperty::New(false));
     mitk::PropertyRelations::RuleResultVectorType rules4;
     CreateNodeRelationImage(statisticsContainerNew.GetPointer(), m_image.GetPointer());
     CreateNodeRelationMask(statisticsContainerNew.GetPointer(), m_mask.GetPointer());

@@ -111,6 +111,8 @@ public:
 
   void updateAllWindows();
 
+  void emit_annotationPositionChanged() { emit annotationPositionChanged(this); };
+
 protected:
   // overloaded move handler
   virtual void moveEvent(QMoveEvent* event) override;
@@ -161,6 +163,8 @@ signals:
   void NodesDropped(QmitkRenderWindow *thisWindow, std::vector<mitk::DataNode*> nodes);
 
   void windowPlaneSelectionChanged();
+
+  void annotationPositionChanged(QmitkRenderWindow* renderWindow);
 
 protected slots:
 

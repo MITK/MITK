@@ -614,16 +614,12 @@ void QmitkMeasurementView::OnDrawLineTriggered(bool)
 
 void QmitkMeasurementView::OnDrawPathTriggered(bool)
 {
+  mitk::CoreServicePointer<mitk::IPropertyFilters> propertyFilters(mitk::CoreServices::GetPropertyFilters());
 
-  auto propertyFilters = mitk::CoreServices::GetPropertyFilters();
+  mitk::PropertyFilter filter;
+  filter.AddEntry("ClosedPlanarPolygon", mitk::PropertyFilter::Blacklist);
 
-  if (propertyFilters != nullptr)
-  {
-    mitk::PropertyFilter filter;
-    filter.AddEntry("ClosedPlanarPolygon", mitk::PropertyFilter::Blacklist);
-
-    propertyFilters->AddFilter(filter, "PlanarPolygon");
-  }
+  propertyFilters->AddFilter(filter, "PlanarPolygon");
 
   mitk::PlanarPolygon::Pointer planarFigure = mitk::PlanarPolygon::New();
   planarFigure->ClosedOff();

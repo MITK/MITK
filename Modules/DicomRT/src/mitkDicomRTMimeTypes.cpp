@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDicomRTIOMimeTypes.h"
+#include <mitkDicomRTMimeTypes.h>
 
-#include "mitkIOMimeTypes.h"
+#include <mitkIOMimeTypes.h>
 
-#include "mitkDICOMDCMTKTagScanner.h"
-#include "mitkDICOMTagPath.h"
+#include <mitkDICOMDCMTKTagScanner.h>
+#include <mitkDICOMTagPath.h>
 #include <mitkDICOMFileReaderSelector.h>
 #include <mitkDICOMFileReader.h>
 
@@ -29,21 +29,18 @@ found in the LICENSE file.
 namespace mitk
 {
 
-std::vector<CustomMimeType*> DicomRTIOMimeTypes::Get()
+std::array<std::unique_ptr<CustomMimeType>, 3> DicomRTMimeTypes::Get()
 {
-  std::vector<CustomMimeType*> mimeTypes;
-
-  // order matters here (descending rank for mime types)
-  mimeTypes.push_back(DICOMRT_DOSE_MIMETYPE().Clone());
-  mimeTypes.push_back(DICOMRT_PLAN_MIMETYPE().Clone());
-  mimeTypes.push_back(DICOMRT_STRUCT_MIMETYPE().Clone());
-
-  return mimeTypes;
+  return {
+    std::make_unique<RTDoseMimeType>(),
+    std::make_unique<RTPlanMimeType>(),
+    std::make_unique<RTStructMimeType>()
+  };
 }
 
 // Mime Types
 
-DicomRTIOMimeTypes::RTDoseMimeType::RTDoseMimeType()
+DicomRTMimeTypes::RTDoseMimeType::RTDoseMimeType()
   : CustomMimeType(DICOMRT_DOSE_MIMETYPE_NAME())
 {
   std::string category = "DICOMRT";
@@ -53,7 +50,7 @@ DicomRTIOMimeTypes::RTDoseMimeType::RTDoseMimeType()
   this->AddExtension("dcm");
 }
 
-bool DicomRTIOMimeTypes::RTDoseMimeType::AppliesTo(const std::string &path) const
+bool DicomRTMimeTypes::RTDoseMimeType::AppliesTo(const std::string &path) const
 {
   bool canRead( CustomMimeType::AppliesTo(path) );
 
@@ -75,7 +72,7 @@ bool DicomRTIOMimeTypes::RTDoseMimeType::AppliesTo(const std::string &path) cons
     }
 }
 
-std::string DicomRTIOMimeTypes::GetModality(const std::string & path)
+std::string DicomRTMimeTypes::GetModality(const std::string & path)
 {
   mitk::IDICOMTagsOfInterest* toiSrv = GetDicomTagsOfInterestService();
 
@@ -101,7 +98,7 @@ std::string DicomRTIOMimeTypes::GetModality(const std::string & path)
   return modality;
 }
 
-bool DicomRTIOMimeTypes::canReadByDicomFileReader(const std::string & filename)
+bool DicomRTMimeTypes::canReadByDicomFileReader(const std::string & filename)
 {
   mitk::DICOMFileReaderSelector::Pointer selector = mitk::DICOMFileReaderSelector::New();
   selector->LoadBuiltIn3DConfigs();
@@ -117,12 +114,12 @@ bool DicomRTIOMimeTypes::canReadByDicomFileReader(const std::string & filename)
   }
 }
 
-DicomRTIOMimeTypes::RTDoseMimeType* DicomRTIOMimeTypes::RTDoseMimeType::Clone() const
+DicomRTMimeTypes::RTDoseMimeType* DicomRTMimeTypes::RTDoseMimeType::Clone() const
 {
   return new RTDoseMimeType(*this);
 }
 
-DicomRTIOMimeTypes::RTStructMimeType::RTStructMimeType()
+DicomRTMimeTypes::RTStructMimeType::RTStructMimeType()
   : CustomMimeType(DICOMRT_STRUCT_MIMETYPE_NAME())
 {
   std::string category = "DICOMRT";
@@ -132,7 +129,7 @@ DicomRTIOMimeTypes::RTStructMimeType::RTStructMimeType()
   this->AddExtension("dcm");
 }
 
-bool DicomRTIOMimeTypes::RTStructMimeType::AppliesTo(const std::string &path) const
+bool DicomRTMimeTypes::RTStructMimeType::AppliesTo(const std::string &path) const
 {
   bool canRead(CustomMimeType::AppliesTo(path));
 
@@ -149,12 +146,12 @@ bool DicomRTIOMimeTypes::RTStructMimeType::AppliesTo(const std::string &path) co
   }
 }
 
-DicomRTIOMimeTypes::RTStructMimeType* DicomRTIOMimeTypes::RTStructMimeType::Clone() const
+DicomRTMimeTypes::RTStructMimeType* DicomRTMimeTypes::RTStructMimeType::Clone() const
 {
   return new RTStructMimeType(*this);
 }
 
-DicomRTIOMimeTypes::RTPlanMimeType::RTPlanMimeType()
+DicomRTMimeTypes::RTPlanMimeType::RTPlanMimeType()
   : CustomMimeType(DICOMRT_PLAN_MIMETYPE_NAME())
 {
   std::string category = "DICOMRT";
@@ -164,7 +161,7 @@ DicomRTIOMimeTypes::RTPlanMimeType::RTPlanMimeType()
   this->AddExtension("dcm");
 }
 
-bool DicomRTIOMimeTypes::RTPlanMimeType::AppliesTo(const std::string &path) const
+bool DicomRTMimeTypes::RTPlanMimeType::AppliesTo(const std::string &path) const
 {
   bool canRead(CustomMimeType::AppliesTo(path));
 
@@ -181,67 +178,61 @@ bool DicomRTIOMimeTypes::RTPlanMimeType::AppliesTo(const std::string &path) cons
     }
 }
 
-DicomRTIOMimeTypes::RTPlanMimeType* DicomRTIOMimeTypes::RTPlanMimeType::Clone() const
+DicomRTMimeTypes::RTPlanMimeType* DicomRTMimeTypes::RTPlanMimeType::Clone() const
 {
   return new RTPlanMimeType(*this);
 }
 
 
-DicomRTIOMimeTypes::RTDoseMimeType DicomRTIOMimeTypes::DICOMRT_DOSE_MIMETYPE()
+DicomRTMimeTypes::RTDoseMimeType DicomRTMimeTypes::DICOMRT_DOSE_MIMETYPE()
 {
   return RTDoseMimeType();
 }
 
-DicomRTIOMimeTypes::RTStructMimeType DicomRTIOMimeTypes::DICOMRT_STRUCT_MIMETYPE()
+DicomRTMimeTypes::RTStructMimeType DicomRTMimeTypes::DICOMRT_STRUCT_MIMETYPE()
 {
   return RTStructMimeType();
 }
 
-DicomRTIOMimeTypes::RTPlanMimeType DicomRTIOMimeTypes::DICOMRT_PLAN_MIMETYPE()
+DicomRTMimeTypes::RTPlanMimeType DicomRTMimeTypes::DICOMRT_PLAN_MIMETYPE()
 {
   return RTPlanMimeType();
 }
 
 // Names
-std::string DicomRTIOMimeTypes::DICOMRT_DOSE_MIMETYPE_NAME()
+std::string DicomRTMimeTypes::DICOMRT_DOSE_MIMETYPE_NAME()
 {
-  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".dicomrt.dose";
-  return name;
+  return IOMimeTypes::DEFAULT_BASE_NAME() + ".dicomrt.dose";
 }
 
-std::string DicomRTIOMimeTypes::DICOMRT_STRUCT_MIMETYPE_NAME()
+std::string DicomRTMimeTypes::DICOMRT_STRUCT_MIMETYPE_NAME()
 {
-  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".dicomrt.struct";
-  return name;
+  return IOMimeTypes::DEFAULT_BASE_NAME() + ".dicomrt.struct";
 }
 
-std::string DicomRTIOMimeTypes::DICOMRT_PLAN_MIMETYPE_NAME()
+std::string DicomRTMimeTypes::DICOMRT_PLAN_MIMETYPE_NAME()
 {
-  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".dicomrt.plan";
-  return name;
+  return IOMimeTypes::DEFAULT_BASE_NAME() + ".dicomrt.plan";
 }
 
 // Descriptions
 
-std::string DicomRTIOMimeTypes::DICOMRT_DOSE_MIMETYPE_DESCRIPTION()
+std::string DicomRTMimeTypes::DICOMRT_DOSE_MIMETYPE_DESCRIPTION()
 {
-  static std::string description = "RTDOSE reader";
-  return description;
+  return "RTDOSE reader";
 }
 
-std::string DicomRTIOMimeTypes::DICOMRT_STRUCT_MIMETYPE_DESCRIPTION()
+std::string DicomRTMimeTypes::DICOMRT_STRUCT_MIMETYPE_DESCRIPTION()
 {
-  static std::string description = "RTSTRUCT reader";
-  return description;
+  return "RTSTRUCT reader";
 }
 
-std::string DicomRTIOMimeTypes::DICOMRT_PLAN_MIMETYPE_DESCRIPTION()
+std::string DicomRTMimeTypes::DICOMRT_PLAN_MIMETYPE_DESCRIPTION()
 {
-  static std::string description = "RTPLAN reader";
-  return description;
+  return "RTPLAN reader";
 }
 
-mitk::IDICOMTagsOfInterest* DicomRTIOMimeTypes::GetDicomTagsOfInterestService()
+mitk::IDICOMTagsOfInterest* DicomRTMimeTypes::GetDicomTagsOfInterestService()
 {
   mitk::IDICOMTagsOfInterest* result = nullptr;
 

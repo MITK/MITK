@@ -15,20 +15,21 @@ found in the LICENSE file.
 QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem(
   ImageStatisticsObject statisticsData,
   StatisticNameVector statisticNames,
-  QVariant label,
+  QVariant label, bool isWIP,
   QmitkImageStatisticsTreeItem *parent)
-  : m_statistics(statisticsData) , m_statisticNames(statisticNames), m_label(label), m_parentItem(parent)
+  : m_statistics(statisticsData) , m_statisticNames(statisticNames), m_label(label), m_parentItem(parent), m_IsWIP(isWIP)
 {
 }
 
  QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem(StatisticNameVector statisticNames,
                                                            QVariant label,
+                                                           bool isWIP,
                                                            QmitkImageStatisticsTreeItem *parentItem)
-  : QmitkImageStatisticsTreeItem(ImageStatisticsObject(), statisticNames, label, parentItem )
+  : QmitkImageStatisticsTreeItem(ImageStatisticsObject(), statisticNames, label, isWIP, parentItem )
 {
 }
 
- QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem() : QmitkImageStatisticsTreeItem(StatisticNameVector(), QVariant(), nullptr ) {}
+ QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem() : QmitkImageStatisticsTreeItem(StatisticNameVector(), QVariant(), false, nullptr ) {}
 
 QmitkImageStatisticsTreeItem::~QmitkImageStatisticsTreeItem()
 {
@@ -83,14 +84,21 @@ QVariant QmitkImageStatisticsTreeItem::data(int column) const
   {
     if (column - 1 < static_cast<int>(m_statisticNames.size()))
     {
-      auto statisticKey = m_statisticNames.at(column - 1);
-      if (m_statistics.HasStatistic(statisticKey))
+      if (m_IsWIP)
       {
-        return boost::apply_visitor(StatValueVisitor(), m_statistics.GetValueNonConverted(statisticKey));
+        result = QVariant(QString("..."));
       }
       else
       {
-        return QVariant();
+        auto statisticKey = m_statisticNames.at(column - 1);
+        if (m_statistics.HasStatistic(statisticKey))
+        {
+          return boost::apply_visitor(StatValueVisitor(), m_statistics.GetValueNonConverted(statisticKey));
+        }
+        else
+        {
+          return QVariant();
+        }
       }
     }
     else
@@ -116,4 +124,9 @@ int QmitkImageStatisticsTreeItem::row() const
     return m_parentItem->m_childItems.indexOf(const_cast<QmitkImageStatisticsTreeItem *>(this));
 
   return 0;
+}
+
+bool QmitkImageStatisticsTreeItem::isWIP() const
+{
+  return m_IsWIP;
 }

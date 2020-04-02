@@ -31,24 +31,28 @@ class ModelFitIOActivator : public us::ModuleActivator
 public:
   void registerProperty(const std::string& name, const std::string& key, const std::string& description)
   {
-    mitk::CoreServices::GetPropertyDescriptions()->AddDescription(name, description);
+    mitk::CoreServicePointer<mitk::IPropertyDescriptions> propDescService(mitk::CoreServices::GetPropertyDescriptions());
+    propDescService->AddDescription(name, description);
 
     mitk::PropertyPersistenceInfo::Pointer ppi = mitk::PropertyPersistenceInfo::New();
     ppi->SetNameAndKey(name, key);
 
-    mitk::CoreServices::GetPropertyPersistence()->AddInfo(ppi, true);
+    mitk::CoreServicePointer<mitk::IPropertyPersistence> propPersistenceService(mitk::CoreServices::GetPropertyPersistence());
+    propPersistenceService->AddInfo(ppi, true);
   }
 
   void registerProperty(const std::string& name, const std::string& key, const std::string& description, const PropertyPersistenceInfo::DeserializationFunctionType &deFnc, const PropertyPersistenceInfo::SerializationFunctionType &serFnc)
   {
-    mitk::CoreServices::GetPropertyDescriptions()->AddDescription(name, description);
+    mitk::CoreServicePointer<mitk::IPropertyDescriptions> propDescService(mitk::CoreServices::GetPropertyDescriptions());
+    propDescService->AddDescription(name, description);
 
     mitk::PropertyPersistenceInfo::Pointer ppi = mitk::PropertyPersistenceInfo::New();
     ppi->SetNameAndKey(name, key);
     ppi->SetDeserializationFunction(deFnc);
     ppi->SetSerializationFunction(serFnc);
 
-    mitk::CoreServices::GetPropertyPersistence()->AddInfo(ppi, true);
+    mitk::CoreServicePointer<mitk::IPropertyPersistence> propPersistenceService(mitk::CoreServices::GetPropertyPersistence());
+    propPersistenceService->AddInfo(ppi, true);
   }
 
   void Load(us::ModuleContext* /*context*/) override

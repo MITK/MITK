@@ -38,6 +38,16 @@ public:
   void SetMaskNodes(const std::vector<mitk::DataNode::ConstPointer> &nodes);
   void Reset();
 
+  /*! /brief Set flag to ignore zero valued voxels */
+  void SetIgnoreZeroValueVoxel(bool _arg);
+  /*! /brief Get status of zero value voxel ignoring. */
+  bool GetIgnoreZeroValueVoxel() const;
+
+  /*! /brief Set bin size for histogram resolution.*/
+  void SetHistogramNBins(unsigned int nbins);
+  /*! /brief Get bin size for histogram resolution.*/
+  unsigned int GetHistogramNBins() const;
+
 private:
   void CreateConnections();
   void OnDataAvailable();

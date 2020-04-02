@@ -73,7 +73,7 @@ private:
   const unsigned int m_MinNBins = 10;
   const unsigned int m_MaxNBins = 10000;
 
-  itk::Statistics::Histogram<double>::ConstPointer m_Histogram;
+  std::map < std::string, itk::Statistics::Histogram<double>::ConstPointer> m_Histograms;
 };
 
 #endif // QmitkHistogramVisualizationWidget_H__INCLUDED

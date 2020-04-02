@@ -66,6 +66,7 @@ void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
   m_DataGenerator->SetDataStorage(this->GetDataStorage());
   m_DataGenerator->SetAutoUpdate(true);
   m_Controls.widget_statistics->SetDataStorage(this->GetDataStorage());
+  m_Controls.widget_histogram->SetTheme(GetColorTheme());
   CreateConnections();
 }
 
@@ -163,7 +164,6 @@ void QmitkImageStatisticsView::UpdateHistogramWidget()
           label << " with " << roiNode->GetName();
         }
 
-        m_Controls.widget_histogram->SetTheme(GetColorTheme());
         m_Controls.widget_histogram->SetHistogram(statistics->GetHistogramForTimeStep(0), label.str());
       }
       m_Controls.groupBox_histogram->setVisible(statisticsNode.IsNotNull());
@@ -196,6 +196,7 @@ void QmitkImageStatisticsView::ResetGUI()
   m_Controls.widget_statistics->setEnabled(false);
   m_Controls.widget_histogram->Reset();
   m_Controls.widget_histogram->setEnabled(false);
+  m_Controls.widget_histogram->SetTheme(GetColorTheme());
 }
 
 void QmitkImageStatisticsView::OnGenerationStarted(const mitk::DataNode* /*imageNode*/, const mitk::DataNode* /*roiNode*/, const QmitkDataGenerationJobBase* /*job*/)

@@ -178,8 +178,8 @@ void QmitkHistogramVisualizationWidget::OnShowSubchartCheckBoxChanged()
 
 void QmitkHistogramVisualizationWidget::OnViewMinMaxCheckBoxChanged()
 {
-  double min = itk::NumericTraits<double>::max();
-  double max = itk::NumericTraits<double>::NonpositiveMin();
+  double min = std::numeric_limits<double>::max();
+  double max = std::numeric_limits<double>::lowest();
   for (const auto& histogram : m_Histograms)
   {
     auto aMin = histogram.second->GetBinMin(0, 0);
@@ -188,11 +188,11 @@ void QmitkHistogramVisualizationWidget::OnViewMinMaxCheckBoxChanged()
     auto maxVector = histogram.second->GetDimensionMaxs(0);
     if (m_Controls.checkBoxUseDefaultNBins->isChecked())
     {
-      if (max < maxVector[m_DefaultNBins - 1]) max = maxVector[m_DefaultNBins - 1];
+      max = std::max(max, maxVector[m_DefaultNBins - 1]);
     }
     else
     {
-      if (max < maxVector[m_Controls.spinBoxNBins->value() - 1]) max = maxVector[m_Controls.spinBoxNBins->value() - 1];
+      max = std::max(max, maxVector[m_Controls.spinBoxNBins->value() - 1]);
     }
   }
 

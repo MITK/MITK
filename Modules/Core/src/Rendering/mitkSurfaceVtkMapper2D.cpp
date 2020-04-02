@@ -381,7 +381,7 @@ void mitk::SurfaceVtkMapper2D::ApplyAllProperties(mitk::BaseRenderer *renderer)
 
 void mitk::SurfaceVtkMapper2D::SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer, bool overwrite)
 {
-  mitk::IPropertyAliases *aliases = mitk::CoreServices::GetPropertyAliases();
+  mitk::CoreServicePointer<mitk::IPropertyAliases> aliases(mitk::CoreServices::GetPropertyAliases());
   node->AddProperty("line width", FloatProperty::New(2.0f), renderer, overwrite);
   aliases->AddAlias("line width", "Surface.2D.Line Width", "Surface");
   node->AddProperty("scalar mode", VtkScalarModeProperty::New(), renderer, overwrite);

@@ -52,8 +52,14 @@ namespace mitk
     int GetIntByKey(const itk::MetaDataDictionary &dic, const std::string &str);
     std::string GetStringByKey(const itk::MetaDataDictionary &dic, const std::string &str);
 
+  protected:
+    // Fills the m_DefaultMetaDataKeys vector with default values
+    virtual void InitializeDefaultMetaDataKeys();
+
   private:
     LabelSetImageIO *IOClone() const override;
+
+    std::vector<std::string> m_DefaultMetaDataKeys;
   };
 } // end of namespace mitk
 

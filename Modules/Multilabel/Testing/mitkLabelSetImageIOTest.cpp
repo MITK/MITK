@@ -80,7 +80,7 @@ public:
 
     mitk::IOUtil::Save(multilabelImage, pathToImage);
 
-    mitk::LabelSetImage::Pointer loadedImage =
+    auto loadedImage =
       mitk::IOUtil::Load<mitk::LabelSetImage >(pathToImage);
 
     // This information is currently not serialized but also checked within the Equals function
@@ -125,7 +125,7 @@ public:
 
     mitk::IOUtil::Save(multilabelImage, pathToImage);
 
-    mitk::LabelSetImage::Pointer loadedImage =
+    auto loadedImage =
       mitk::IOUtil::Load<mitk::LabelSetImage >(pathToImage);
 
     // This information is currently not serialized but also checked within the Equals function
@@ -180,7 +180,7 @@ public:
 
     mitk::IOUtil::Save(multilabelImage, pathToImage);
 
-    mitk::LabelSetImage::Pointer loadedImage =
+    auto loadedImage =
       mitk::IOUtil::Load<mitk::LabelSetImage >(pathToImage);
 
     // This information is currently not serialized but also checked within the Equals function
@@ -209,7 +209,8 @@ public:
 
     auto propPersistenceInfo = mitk::PropertyPersistenceInfo::New();
     propPersistenceInfo->SetNameAndKey("my.cool.test.property", "my_cool_test_property");
-    mitk::CoreServices::GetPropertyPersistence()->AddInfo(propPersistenceInfo);
+    mitk::CoreServicePointer<mitk::IPropertyPersistence> propPersService(mitk::CoreServices::GetPropertyPersistence());
+    propPersService->AddInfo(propPersistenceInfo);
 
     multilabelImage->SetProperty("my.cool.test.property", mitk::StringProperty::New("test_content"));
 
@@ -218,7 +219,7 @@ public:
 
     mitk::IOUtil::Save(multilabelImage, pathToImage);
 
-    mitk::LabelSetImage::Pointer loadedImage =
+    auto loadedImage =
       mitk::IOUtil::Load<mitk::LabelSetImage >(pathToImage);
 
     auto loadedProp = loadedImage->GetProperty("my.cool.test.property");

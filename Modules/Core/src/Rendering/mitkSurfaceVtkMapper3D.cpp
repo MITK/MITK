@@ -509,7 +509,8 @@ void mitk::SurfaceVtkMapper3D::SetDefaultProperties(mitk::DataNode *node, mitk::
   node->AddProperty("Backface Culling", mitk::BoolProperty::New(false), renderer, overwrite);
 
   node->AddProperty("Depth Sorting", mitk::BoolProperty::New(false), renderer, overwrite);
-  mitk::CoreServices::GetPropertyDescriptions()->AddDescription(
+  mitk::CoreServicePointer<mitk::IPropertyDescriptions> propDescService(mitk::CoreServices::GetPropertyDescriptions());
+  propDescService->AddDescription(
     "Depth Sorting",
     "Enables correct rendering for transparent objects by ordering polygons according to the distance "
     "to the camera. It is not recommended to enable this property for large surfaces (rendering might "

@@ -241,8 +241,8 @@ namespace mitk
       mitk::PropertyList::Pointer imagePropertyList = input->GetPropertyList();
       for (const auto& property : *imagePropertyList->GetMap())
       {
-        IPropertyPersistence::InfoResultType infoList =
-          mitk::CoreServices::GetPropertyPersistence()->GetInfo(property.first, GetMimeType()->GetName(), true);
+        mitk::CoreServicePointer<IPropertyPersistence> propPersistenceService(mitk::CoreServices::GetPropertyPersistence());
+        IPropertyPersistence::InfoResultType infoList = propPersistenceService->GetInfo(property.first, GetMimeType()->GetName(), true);
 
         if (infoList.empty())
         {
@@ -401,7 +401,7 @@ namespace mitk
     if (dictionary.HasKey(PROPERTY_NAME_TIMEGEOMETRY_TYPE) || dictionary.HasKey(PROPERTY_KEY_TIMEGEOMETRY_TYPE))
     { // also check for the name because of backwards compatibility. Past code version stored with the name and not with
       // the key
-      itk::MetaDataObject<std::string>::ConstPointer timeGeometryTypeData = nullptr;
+      itk::MetaDataObject<std::string>::ConstPointer timeGeometryTypeData;
       if (dictionary.HasKey(PROPERTY_NAME_TIMEGEOMETRY_TYPE))
       {
         timeGeometryTypeData =
@@ -415,7 +415,7 @@ namespace mitk
 
       if (timeGeometryTypeData->GetMetaDataObjectValue() == ArbitraryTimeGeometry::GetStaticNameOfClass())
       {
-        MITK_INFO << "used time geometry: " << ArbitraryTimeGeometry::GetStaticNameOfClass() << std::endl;
+        MITK_INFO << "used time geometry: " << ArbitraryTimeGeometry::GetStaticNameOfClass();
         typedef std::vector<TimePointType> TimePointVector;
         TimePointVector timePoints;
 
@@ -428,11 +428,14 @@ namespace mitk
           timePoints = ConvertMetaDataObjectToTimePointList(dictionary.Get(PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS));
         }
 
-        if (timePoints.size() - 1 != image->GetDimension(3))
+        if (timePoints.empty())
+        {
+          MITK_ERROR << "Stored timepoints are empty. Meta information seems to bee invalid. Switch to ProportionalTimeGeometry fallback";
+        }
+        else if (timePoints.size() - 1 != image->GetDimension(3))
         {
           MITK_ERROR << "Stored timepoints (" << timePoints.size() - 1 << ") and size of image time dimension ("
-            << image->GetDimension(3) << ") do not match. Switch to ProportionalTimeGeometry fallback"
-            << std::endl;
+            << image->GetDimension(3) << ") do not match. Switch to ProportionalTimeGeometry fallback";
         }
         else
         {
@@ -452,7 +455,7 @@ namespace mitk
 
     if (timeGeometry.IsNull())
     { // Fallback. If no other valid time geometry has been created, create a ProportionalTimeGeometry
-      MITK_INFO << "used time geometry: " << ProportionalTimeGeometry::GetStaticNameOfClass() << std::endl;
+      MITK_INFO << "used time geometry: " << ProportionalTimeGeometry::GetStaticNameOfClass();
       ProportionalTimeGeometry::Pointer propTimeGeometry = ProportionalTimeGeometry::New();
       propTimeGeometry->Initialize(slicedGeometry, image->GetDimension(3));
       timeGeometry = propTimeGeometry;
@@ -461,7 +464,7 @@ namespace mitk
     image->SetTimeGeometry(timeGeometry);
 
     buffer = nullptr;
-    MITK_INFO << "number of image components: " << image->GetPixelType().GetNumberOfComponents() << std::endl;
+    MITK_INFO << "number of image components: " << image->GetPixelType().GetNumberOfComponents();
 
     // end regular image loading
 
@@ -514,9 +517,10 @@ namespace mitk
         std::string mimeTypeName = GetMimeType()->GetName();
 
         // Check if there is already a info for the key and our mime type.
-        IPropertyPersistence::InfoResultType infoList = mitk::CoreServices::GetPropertyPersistence()->GetInfoByKey(key);
+        mitk::CoreServicePointer<IPropertyPersistence> propPersistenceService(mitk::CoreServices::GetPropertyPersistence());
+        IPropertyPersistence::InfoResultType infoList = propPersistenceService->GetInfoByKey(key);
 
-        auto predicate = [mimeTypeName](const PropertyPersistenceInfo::ConstPointer& x) {
+        auto predicate = [&mimeTypeName](const PropertyPersistenceInfo::ConstPointer& x) {
           return x.IsNotNull() && x->GetMimeTypeName() == mimeTypeName;
         };
         auto finding = std::find_if(infoList.begin(), infoList.end(), predicate);
@@ -538,7 +542,7 @@ namespace mitk
         }
         else
         { // we have not found anything suitable so we generate our own info
-          PropertyPersistenceInfo::Pointer newInfo = PropertyPersistenceInfo::New();
+          auto newInfo = PropertyPersistenceInfo::New();
           newInfo->SetNameAndKey(assumedPropertyName, key);
           newInfo->SetMimeTypeName(PropertyPersistenceInfo::ANY_MIMETYPE_NAME());
           info = newInfo;
@@ -553,7 +557,7 @@ namespace mitk
 
         // Read properties should be persisted unless they are default properties
         // which are written anyway
-        bool isDefaultKey(false);
+        bool isDefaultKey = false;
 
         for (const auto& defaultKey : m_DefaultMetaDataKeys)
         {
@@ -570,12 +574,12 @@ namespace mitk
 
         if (!isDefaultKey)
         {
-          mitk::CoreServices::GetPropertyPersistence()->AddInfo(info);
+          propPersistenceService->AddInfo(info);
         }
       }
     }
 
-    MITK_INFO << "...finished!" << std::endl;
+    MITK_INFO << "...finished!";
 
     std::vector<BaseData::Pointer> result;
     result.push_back(output.GetPointer());

@@ -23,21 +23,10 @@ found in the LICENSE file.
 #include <QToolButton>
 #include <algorithm>
 #include <mitkBaseProperty.h>
+#include <mitkCoreServices.h>
 #include <mitkFloatPropertyExtension.h>
 #include <mitkIPropertyExtensions.h>
 #include <mitkIntPropertyExtension.h>
-#include <usGetModuleContext.h>
-#include <usModuleContext.h>
-#include <usServiceReference.h>
-
-mitk::IPropertyExtensions *GetPropertyService()
-{
-  us::ModuleContext *context = us::GetModuleContext();
-  us::ServiceReference<mitk::IPropertyExtensions> serviceRef =
-    context->GetServiceReference<mitk::IPropertyExtensions>();
-
-  return serviceRef ? context->GetService<mitk::IPropertyExtensions>(serviceRef) : nullptr;
-}
 
 QmitkColorWidget::QmitkColorWidget(QWidget *parent)
   : QWidget(parent), m_LineEdit(new QLineEdit), m_Button(new QToolButton)
@@ -183,10 +172,10 @@ QWidget *QmitkPropertyItemDelegate::createEditor(QWidget *parent,
     {
       QSpinBox *spinBox = new QSpinBox(parent);
 
-      mitk::IPropertyExtensions *extensions = GetPropertyService();
+      mitk::CoreServicePointer<mitk::IPropertyExtensions> extensions(mitk::CoreServices::GetPropertyExtensions());
       std::string name = this->GetPropertyName(index);
 
-      if (extensions != nullptr && !name.empty() && extensions->HasExtension(name))
+      if (!name.empty() && extensions->HasExtension(name))
       {
         mitk::IntPropertyExtension::Pointer extension =
           dynamic_cast<mitk::IntPropertyExtension *>(extensions->GetExtension(name).GetPointer());
@@ -208,10 +197,10 @@ QWidget *QmitkPropertyItemDelegate::createEditor(QWidget *parent,
     {
       QDoubleSpinBox *spinBox = new QDoubleSpinBox(parent);
 
-      mitk::IPropertyExtensions *extensions = GetPropertyService();
+      mitk::CoreServicePointer<mitk::IPropertyExtensions> extensions(mitk::CoreServices::GetPropertyExtensions());
       std::string name = this->GetPropertyName(index);
 
-      if (extensions != nullptr && !name.empty() && extensions->HasExtension(name))
+      if (!name.empty() && extensions->HasExtension(name))
       {
         mitk::FloatPropertyExtension::Pointer extension =
           dynamic_cast<mitk::FloatPropertyExtension *>(extensions->GetExtension(name).GetPointer());

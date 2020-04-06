@@ -10,9 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkGetPropertyService.h"
 #include "QmitkAddNewPropertyDialog.h"
-#include "QmitkPropertiesPreferencePage.h"
 #include "QmitkPropertyItemDelegate.h"
 #include "QmitkPropertyItemModel.h"
 #include "QmitkPropertyItemSortFilterProxyModel.h"
@@ -29,12 +27,9 @@ found in the LICENSE file.
 const std::string QmitkPropertyTreeView::VIEW_ID = "org.mitk.views.properties";
 
 QmitkPropertyTreeView::QmitkPropertyTreeView()
-  : m_PropertyAliases(nullptr),
-    m_PropertyDescriptions(nullptr),
-    m_PropertyPersistence(nullptr),
-    m_ShowAliasesInDescription(true),
-    m_ShowPersistenceInDescription(true),
-    m_DeveloperMode(false),
+  : m_PropertyAliases(mitk::CoreServices::GetPropertyAliases(nullptr), nullptr),
+    m_PropertyDescriptions(mitk::CoreServices::GetPropertyDescriptions(nullptr), nullptr),
+    m_PropertyPersistence(mitk::CoreServices::GetPropertyPersistence(nullptr), nullptr),
     m_ProxyModel(nullptr),
     m_Model(nullptr),
     m_Delegate(nullptr),
@@ -96,10 +91,6 @@ void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
   m_Controls.newButton->setEnabled(false);
 
   this->HideAllIcons();
-  m_Controls.descriptionLabel->hide();
-  m_Controls.propertyListLabel->hide();
-  m_Controls.propertyListComboBox->hide();
-  m_Controls.newButton->hide();
 
   m_ProxyModel = new QmitkPropertyItemSortFilterProxyModel(m_Controls.treeView);
   m_Model = new QmitkPropertyItemModel(m_ProxyModel);
@@ -152,66 +143,6 @@ void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
     this, &QmitkPropertyTreeView::OnCurrentRowChanged);
   connect(m_Model, &QmitkPropertyItemModel::modelReset,
     this, &QmitkPropertyTreeView::OnModelReset);
-}
-
-void QmitkPropertyTreeView::OnPreferencesChanged(const berry::IBerryPreferences* preferences)
-{
-  bool showAliases = preferences->GetBool(QmitkPropertiesPreferencePage::SHOW_ALIASES, true);
-  bool showDescriptions = preferences->GetBool(QmitkPropertiesPreferencePage::SHOW_DESCRIPTIONS, true);
-  bool showAliasesInDescription = preferences->GetBool(QmitkPropertiesPreferencePage::SHOW_ALIASES_IN_DESCRIPTION, true);
-  bool showPersistenceInDescription = preferences->GetBool(QmitkPropertiesPreferencePage::SHOW_PERSISTENCE_IN_DESCRIPTION, true);
-  bool developerMode = preferences->GetBool(QmitkPropertiesPreferencePage::DEVELOPER_MODE, false);
-  bool filterProperties = preferences->GetBool(QmitkPropertiesPreferencePage::FILTER_PROPERTIES, true);
-
-  m_Model->SetFilterProperties(filterProperties);
-  m_Model->SetShowAliases(showAliases);
-
-  bool updateAliases = showAliases != (m_PropertyAliases != nullptr);
-  bool updateDescriptions = showDescriptions != (m_PropertyDescriptions != nullptr);
-  bool updateAliasesInDescription = showAliasesInDescription != m_ShowAliasesInDescription;
-  bool updatePersistenceInDescription = showPersistenceInDescription != m_ShowPersistenceInDescription;
-  bool updateDeveloperMode = developerMode != m_DeveloperMode;
-
-  if (updateAliases)
-    m_PropertyAliases = showAliases
-    ? mitk::GetPropertyService<mitk::IPropertyAliases>()
-    : nullptr;
-
-  if (updateDescriptions)
-    m_PropertyDescriptions = showDescriptions
-    ? mitk::GetPropertyService<mitk::IPropertyDescriptions>()
-    : nullptr;
-
-  if (showPersistenceInDescription)
-    m_PropertyPersistence = mitk::GetPropertyService<mitk::IPropertyPersistence>();
-
-  if (updateAliasesInDescription)
-    m_ShowAliasesInDescription = showAliasesInDescription;
-
-  if (updatePersistenceInDescription)
-    m_ShowPersistenceInDescription = showPersistenceInDescription;
-
-  if (updateDescriptions || updateAliasesInDescription || updatePersistenceInDescription)
-  {
-    QModelIndexList selection = m_Controls.treeView->selectionModel()->selectedRows();
-
-    if (!selection.isEmpty())
-      this->OnCurrentRowChanged(selection[0], selection[0]);
-  }
-
-  if (updateDeveloperMode)
-  {
-    m_DeveloperMode = developerMode;
-
-    if (!developerMode)
-      m_Controls.propertyListComboBox->setCurrentIndex(0);
-
-    m_Controls.propertyListLabel->setVisible(developerMode);
-    m_Controls.propertyListComboBox->setVisible(developerMode);
-    m_Controls.newButton->setVisible(developerMode);
-  }
-
-  m_Model->OnPreferencesChanged();
 }
 
 void QmitkPropertyTreeView::SetAsSelectionListener(bool checked)
@@ -306,7 +237,7 @@ void QmitkPropertyTreeView::HideAllIcons()
 
 void QmitkPropertyTreeView::OnCurrentRowChanged(const QModelIndex& current, const QModelIndex&)
 {
-  if (m_PropertyDescriptions != nullptr && current.isValid())
+  if (current.isValid())
   {
     QString name = this->GetPropertyNameOrAlias(current);
 
@@ -315,25 +246,22 @@ void QmitkPropertyTreeView::OnCurrentRowChanged(const QModelIndex& current, cons
       QString alias;
       bool isTrueName = true;
 
-      if (m_PropertyAliases != nullptr)
+      std::string trueName = m_PropertyAliases->GetPropertyName(name.toStdString());
+
+      if (trueName.empty() && !m_SelectionClassName.empty())
+        trueName = m_PropertyAliases->GetPropertyName(name.toStdString(), m_SelectionClassName);
+
+      if (!trueName.empty())
       {
-        std::string trueName = m_PropertyAliases->GetPropertyName(name.toStdString());
-
-        if (trueName.empty() && !m_SelectionClassName.empty())
-          trueName = m_PropertyAliases->GetPropertyName(name.toStdString(), m_SelectionClassName);
-
-        if (!trueName.empty())
-        {
-          alias = name;
-          name = QString::fromStdString(trueName);
-          isTrueName = false;
-        }
+        alias = name;
+        name = QString::fromStdString(trueName);
+        isTrueName = false;
       }
 
       QString description = QString::fromStdString(m_PropertyDescriptions->GetDescription(name.toStdString()));
       std::vector<std::string> aliases;
 
-      if (!isTrueName && m_PropertyAliases != nullptr)
+      if (!isTrueName)
       {
         aliases = m_PropertyAliases->GetAliases(name.toStdString(), m_SelectionClassName);
 
@@ -341,16 +269,13 @@ void QmitkPropertyTreeView::OnCurrentRowChanged(const QModelIndex& current, cons
           aliases = m_PropertyAliases->GetAliases(name.toStdString());
       }
 
-      bool isPersistent = false;
-
-      if (m_PropertyPersistence != nullptr)
-        isPersistent = m_PropertyPersistence->HasInfo(name.toStdString());
+      bool isPersistent = m_PropertyPersistence->HasInfo(name.toStdString());
 
       if (!description.isEmpty() || !aliases.empty() || isPersistent)
       {
         QString customizedDescription;
 
-        if (m_ShowAliasesInDescription && !aliases.empty())
+        if (!aliases.empty())
         {
           customizedDescription = "<h3 style=\"margin-bottom:0\">" + name + "</h3>";
 

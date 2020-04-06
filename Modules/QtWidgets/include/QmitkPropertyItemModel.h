@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <QAbstractItemModel>
 #include <mitkPropertyList.h>
 #include <mitkWeakPointer.h>
+#include <mitkCoreServices.h>
 
 class QmitkPropertyItem;
 
@@ -27,9 +28,6 @@ namespace berry
 
 namespace mitk
 {
-  class IPropertyAliases;
-  class IPropertyFilters;
-
   enum
   {
     PropertyRole = Qt::UserRole + 1
@@ -50,17 +48,12 @@ public:
   mitk::PropertyList *GetPropertyList() const;
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
   QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
-  void OnPreferencesChanged();
   QModelIndex parent(const QModelIndex &child) const override;
   int rowCount(const QModelIndex &parent = QModelIndex()) const override;
   bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
   void SetPropertyList(mitk::PropertyList *propertyList, const QString &className = "");
   void Update();
 
-  void SetShowAliases(const bool showAliases) { this->m_ShowAliases = showAliases; }
-  bool GetShowAliases() const { return this->m_ShowAliases; }
-  void SetFilterProperties(const bool filterProperties) { this->m_FilterProperties = filterProperties; }
-  bool GetFilterProperties() const { return this->m_FilterProperties; }
 private:
   void CreateRootItem();
   QModelIndex FindProperty(const mitk::BaseProperty *property);
@@ -69,10 +62,8 @@ private:
   void OnPropertyModified(const itk::Object *property, const itk::EventObject &event);
   void SetNewPropertyList(mitk::PropertyList *newPropertyList);
 
-  bool m_ShowAliases;
-  bool m_FilterProperties;
-  mitk::IPropertyAliases *m_PropertyAliases;
-  mitk::IPropertyFilters *m_PropertyFilters;
+  mitk::CoreServicePointer<mitk::IPropertyAliases> m_PropertyAliases;
+  mitk::CoreServicePointer<mitk::IPropertyFilters> m_PropertyFilters;
   mitk::WeakPointer<mitk::PropertyList> m_PropertyList;
   QString m_ClassName;
   std::unique_ptr<QmitkPropertyItem> m_RootItem;

@@ -21,38 +21,28 @@ found in the LICENSE file.
 #include <mitkRenderingManager.h>
 #include <mitkStringProperty.h>
 
-#include <usGetModuleContext.h>
-#include <usModuleContext.h>
-#include <usServiceReference.h>
-
-template <class T>
-T *GetPropertyService()
+namespace
 {
-  us::ModuleContext *context = us::GetModuleContext();
-  us::ServiceReference<T> serviceRef = context->GetServiceReference<T>();
+  QColor MitkToQt(const mitk::Color& color)
+  {
+    return QColor(color.GetRed() * 255, color.GetGreen() * 255, color.GetBlue() * 255);
+  }
 
-  return serviceRef ? context->GetService<T>(serviceRef) : nullptr;
-}
+  mitk::BaseProperty* GetBaseProperty(const QVariant& data)
+  {
+    return data.isValid() ? reinterpret_cast<mitk::BaseProperty*>(data.value<void*>()) : nullptr;
+  }
 
-static QColor MitkToQt(const mitk::Color &color)
-{
-  return QColor(color.GetRed() * 255, color.GetGreen() * 255, color.GetBlue() * 255);
-}
+  mitk::Color QtToMitk(const QColor& color)
+  {
+    mitk::Color mitkColor;
 
-static mitk::BaseProperty *GetBaseProperty(const QVariant &data)
-{
-  return data.isValid() ? reinterpret_cast<mitk::BaseProperty *>(data.value<void *>()) : nullptr;
-}
+    mitkColor.SetRed(color.red() / 255.0f);
+    mitkColor.SetGreen(color.green() / 255.0f);
+    mitkColor.SetBlue(color.blue() / 255.0f);
 
-static mitk::Color QtToMitk(const QColor &color)
-{
-  mitk::Color mitkColor;
-
-  mitkColor.SetRed(color.red() / 255.0f);
-  mitkColor.SetGreen(color.green() / 255.0f);
-  mitkColor.SetBlue(color.blue() / 255.0f);
-
-  return mitkColor;
+    return mitkColor;
+  }
 }
 
 class PropertyEqualTo
@@ -70,10 +60,8 @@ private:
 
 QmitkPropertyItemModel::QmitkPropertyItemModel(QObject *parent)
   : QAbstractItemModel(parent),
-    m_ShowAliases(false),
-    m_FilterProperties(false),
-    m_PropertyAliases(nullptr),
-    m_PropertyFilters(nullptr)
+    m_PropertyAliases(mitk::CoreServices::GetPropertyAliases()),
+    m_PropertyFilters(mitk::CoreServices::GetPropertyFilters())
 {
   this->CreateRootItem();
 }
@@ -271,32 +259,6 @@ QModelIndex QmitkPropertyItemModel::index(int row, int column, const QModelIndex
   return childItem != nullptr ? this->createIndex(row, column, childItem) : QModelIndex();
 }
 
-void QmitkPropertyItemModel::OnPreferencesChanged()
-{
-  bool updateAliases = m_ShowAliases != (m_PropertyAliases != nullptr);
-  bool updateFilters = m_FilterProperties != (m_PropertyFilters != nullptr);
-
-  bool resetPropertyList = false;
-
-  if (updateAliases)
-  {
-    m_PropertyAliases = m_ShowAliases ? GetPropertyService<mitk::IPropertyAliases>() : nullptr;
-
-    resetPropertyList = !m_PropertyList.IsExpired();
-  }
-
-  if (updateFilters)
-  {
-    m_PropertyFilters = m_FilterProperties ? GetPropertyService<mitk::IPropertyFilters>() : nullptr;
-
-    if (!resetPropertyList)
-      resetPropertyList = !m_PropertyList.IsExpired();
-  }
-
-  if (resetPropertyList)
-    this->SetNewPropertyList(m_PropertyList.Lock());
-}
-
 void QmitkPropertyItemModel::OnPropertyListModified()
 {
   this->SetNewPropertyList(m_PropertyList.Lock());
@@ -451,8 +413,7 @@ void QmitkPropertyItemModel::SetNewPropertyList(mitk::PropertyList *newPropertyL
     mitk::PropertyList::PropertyMap filteredProperties;
     bool filterProperties = false;
 
-    if (m_PropertyFilters != nullptr &&
-        (m_PropertyFilters->HasFilter() || m_PropertyFilters->HasFilter(m_ClassName.toStdString())))
+    if (m_PropertyFilters->HasFilter() || m_PropertyFilters->HasFilter(m_ClassName.toStdString()))
     {
       filteredProperties = m_PropertyFilters->ApplyFilter(*m_PropertyList.Lock()->GetMap(), m_ClassName.toStdString());
       filterProperties = true;
@@ -467,13 +428,10 @@ void QmitkPropertyItemModel::SetNewPropertyList(mitk::PropertyList *newPropertyL
     {
       std::vector<std::string> aliases;
 
-      if (m_PropertyAliases != nullptr)
-      {
-        aliases = m_PropertyAliases->GetAliases(iter->first, m_ClassName.toStdString());
+      aliases = m_PropertyAliases->GetAliases(iter->first, m_ClassName.toStdString());
 
-        if (aliases.empty() && !m_ClassName.isEmpty())
-          aliases = m_PropertyAliases->GetAliases(iter->first);
-      }
+      if (aliases.empty() && !m_ClassName.isEmpty())
+        aliases = m_PropertyAliases->GetAliases(iter->first);
 
       if (aliases.empty())
       {

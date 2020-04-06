@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <ui_QmitkPropertyTreeView.h>
 
 // mitk core module
+#include <mitkCoreServices.h>
 #include <mitkDataNode.h>
 
 // mitk gui common plugin
@@ -60,8 +61,6 @@ protected:
 
 private:
 
-  void OnPreferencesChanged(const berry::IBerryPreferences* preferences) override;
-
   void SetAsSelectionListener(bool checked);
 
   QString GetPropertyNameOrAlias(const QModelIndex& index);
@@ -80,12 +79,9 @@ private Q_SLOTS:
 private:
 
   std::string m_SelectionClassName;
-  mitk::IPropertyAliases* m_PropertyAliases;
-  mitk::IPropertyDescriptions* m_PropertyDescriptions;
-  mitk::IPropertyPersistence* m_PropertyPersistence;
-  bool m_ShowAliasesInDescription;
-  bool m_ShowPersistenceInDescription;
-  bool m_DeveloperMode;
+  mitk::CoreServicePointer<mitk::IPropertyAliases> m_PropertyAliases;
+  mitk::CoreServicePointer<mitk::IPropertyDescriptions> m_PropertyDescriptions;
+  mitk::CoreServicePointer<mitk::IPropertyPersistence> m_PropertyPersistence;
   Ui::QmitkPropertyTreeView m_Controls;
   QmitkPropertyItemSortFilterProxyModel* m_ProxyModel;
   QmitkPropertyItemModel* m_Model;

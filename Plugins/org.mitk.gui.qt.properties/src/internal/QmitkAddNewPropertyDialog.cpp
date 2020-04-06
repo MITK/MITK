@@ -10,10 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include "org_mitk_gui_qt_properties_Activator.h"
 #include "QmitkAddNewPropertyDialog.h"
-#include "mitkGetPropertyService.h"
-#include <mitkIPropertyPersistence.h>
 #include <mitkProperties.h>
+#include <mitkIPropertyPersistence.h>
+#include <mitkCoreServices.h>
 #include <QMessageBox>
 #include <cassert>
 
@@ -76,13 +77,9 @@ void QmitkAddNewPropertyDialog::AddNewProperty()
 
     if (m_Controls.persistentCheckBox->isChecked())
     {
-      mitk::IPropertyPersistence* propertyPersistence = mitk::GetPropertyService<mitk::IPropertyPersistence>();
-
-      if (propertyPersistence != nullptr)
-      {
-        mitk::PropertyPersistenceInfo::Pointer info = mitk::PropertyPersistenceInfo::New(m_Controls.nameLineEdit->text().toStdString());
-        propertyPersistence->AddInfo(info);
-      }
+      mitk::CoreServicePointer<mitk::IPropertyPersistence> propertyPersistence(mitk::CoreServices::GetPropertyPersistence());
+      auto info = mitk::PropertyPersistenceInfo::New(m_Controls.nameLineEdit->text().toStdString());
+      propertyPersistence->AddInfo(info);
     }
   }
   else

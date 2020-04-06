@@ -11,7 +11,6 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "org_mitk_gui_qt_properties_Activator.h"
-#include "QmitkPropertiesPreferencePage.h"
 #include "QmitkPropertyTreeView.h"
 
 ctkPluginContext* mitk::org_mitk_gui_qt_properties_Activator::m_Context = nullptr;
@@ -23,7 +22,6 @@ ctkPluginContext* mitk::org_mitk_gui_qt_properties_Activator::GetContext()
 
 void mitk::org_mitk_gui_qt_properties_Activator::start(ctkPluginContext* context)
 {
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkPropertiesPreferencePage, context);
   BERRY_REGISTER_EXTENSION_CLASS(QmitkPropertyTreeView, context);
   m_Context = context;
 }

@@ -3,20 +3,17 @@ set(SRC_CPP_FILES
 
 set(INTERNAL_CPP_FILES
   org_mitk_gui_qt_properties_Activator.cpp
-  QmitkPropertiesPreferencePage.cpp
   QmitkPropertyItemSortFilterProxyModel.cpp
   QmitkPropertyTreeView.cpp
   QmitkAddNewPropertyDialog.cpp
 )
 
 set(UI_FILES
-  src/internal/QmitkPropertiesPreferencePage.ui
   src/internal/QmitkPropertyTreeView.ui
   src/internal/QmitkAddNewPropertyDialog.ui
 )
 
 set(MOC_H_FILES
-  src/internal/QmitkPropertiesPreferencePage.h
   src/internal/org_mitk_gui_qt_properties_Activator.h
   src/internal/QmitkPropertyItemSortFilterProxyModel.h
   src/internal/QmitkPropertyTreeView.h

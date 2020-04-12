@@ -68,20 +68,16 @@ protected:
   void OnRequestHistogramUpdate(unsigned int);
   void OnCheckBoxIgnoreZeroStateChanged(int state);
   void OnButtonSelectionPressed();
+  void OnImageSelectionChanged(QmitkAbstractNodeSelectionWidget::NodeList nodes);
+  void OnROISelectionChanged(QmitkAbstractNodeSelectionWidget::NodeList nodes);
 
   // member variable
   Ui::QmitkImageStatisticsViewControls m_Controls;
 
 private:
   QmitkNodeSelectionDialog::SelectionCheckFunctionType CheckForSameGeometry() const;
+  mitk::NodePredicateBase::Pointer QmitkImageStatisticsView::GenerateROIPredicate() const;
 
-  typedef itk::SimpleMemberCommand<QmitkImageStatisticsView> ITKCommandType;
-  mitk::PlanarFigure::Pointer m_selectedPlanarFigure = nullptr;
-
-  long m_PlanarFigureObserverTag;
-  std::vector<mitk::DataNode::ConstPointer> m_selectedMaskNodes;
-  std::vector<mitk::DataNode::ConstPointer> m_selectedImageNodes;
-  QmitkNodeSelectionDialog::NodeList m_SelectedNodeList;
   std::vector<mitk::ImageStatisticsContainer::ConstPointer> m_StatisticsForSelection;
   QmitkImageStatisticsDataGenerator* m_DataGenerator = nullptr;
 };

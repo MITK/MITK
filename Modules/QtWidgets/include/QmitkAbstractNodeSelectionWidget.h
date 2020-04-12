@@ -64,9 +64,14 @@ public:
   bool GetSelectOnlyVisibleNodes() const;
 
   using NodeList = QList<mitk::DataNode::Pointer>;
+  /** Other node container type often used in the code base.*/
+  using ConstNodeStdVector = std::vector<mitk::DataNode::ConstPointer>;
 
   /** Returns the selected nodes, as emitted with CurrentSelectionChanged*/
   NodeList GetSelectedNodes() const;
+  /** Convinience method that returns the selected nodes as ConstNodeStdVector.
+   This is a type also often used in the  mitk code base.*/
+  ConstNodeStdVector GetSelectedNodesStdVector() const;
 
 Q_SIGNALS:
   /*

@@ -227,7 +227,7 @@ public:
   {
     TestQmitkImageStatisticsDataGenerator generator(m_DataStorage);
 
-    generator.SetImageNodes({ m_ImageNode1.GetPointer() });
+    generator.SetImageNodes({ m_ImageNode1 });
     generator.Generate();
     m_TestApp->exec();
 
@@ -244,7 +244,7 @@ public:
   {
     TestQmitkImageStatisticsDataGenerator generator(m_DataStorage);
 
-    generator.SetImageNodes({ m_ImageNode1.GetPointer(), m_ImageNode2.GetPointer() });
+    generator.SetImageNodes({ m_ImageNode1, m_ImageNode2 });
     generator.Generate();
     m_TestApp->exec();
 
@@ -262,8 +262,8 @@ public:
   {
     TestQmitkImageStatisticsDataGenerator generator(m_DataStorage);
 
-    generator.SetImageNodes({ m_ImageNode1.GetPointer() });
-    generator.SetROINodes({ m_MaskImageNode.GetPointer() });
+    generator.SetImageNodes({ m_ImageNode1 });
+    generator.SetROINodes({ m_MaskImageNode });
     generator.Generate();
     m_TestApp->exec();
 
@@ -275,7 +275,7 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("Error: Rerun has generated new data.", generator.Generate());
 
-    generator.SetROINodes({ m_PFNode.GetPointer() });
+    generator.SetROINodes({ m_PFNode });
     generator.Generate();
     m_TestApp->exec();
 
@@ -292,8 +292,8 @@ public:
   {
     TestQmitkImageStatisticsDataGenerator generator(m_DataStorage);
 
-    generator.SetImageNodes({ m_ImageNode1.GetPointer() });
-    generator.SetROINodes({ m_PFNode.GetPointer(), m_MaskImageNode.GetPointer(), nullptr });
+    generator.SetImageNodes({ m_ImageNode1 });
+    generator.SetROINodes({ m_PFNode, m_MaskImageNode, nullptr });
     generator.Generate();
     m_TestApp->exec();
 
@@ -312,8 +312,8 @@ public:
   {
     TestQmitkImageStatisticsDataGenerator generator(m_DataStorage);
 
-    generator.SetImageNodes({ m_ImageNode1.GetPointer(), m_ImageNode2.GetPointer() });
-    generator.SetROINodes({ m_PFNode.GetPointer(), m_MaskImageNode.GetPointer(), nullptr });
+    generator.SetImageNodes({ m_ImageNode1, m_ImageNode2 });
+    generator.SetROINodes({ m_PFNode, m_MaskImageNode, nullptr });
     generator.Generate();
     m_TestApp->exec();
 
@@ -347,7 +347,7 @@ public:
   {
     TestQmitkImageStatisticsDataGenerator generator(m_DataStorage);
 
-    generator.SetImageNodes({ m_ImageNode2.GetPointer() });
+    generator.SetImageNodes({ m_ImageNode2 });
     m_TestApp->processEvents();
 
     CPPUNIT_ASSERT_EQUAL(0, generator.m_DataGenerationStartedEmited);
@@ -356,7 +356,7 @@ public:
     CPPUNIT_ASSERT(0 == generator.m_NewDataAvailable.size());
 
     generator.SetAutoUpdate(true);
-    generator.SetImageNodes({ m_ImageNode1.GetPointer() });
+    generator.SetImageNodes({ m_ImageNode1 });
     m_TestApp->exec();
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update seemed not to work.", 1, generator.m_DataGenerationStartedEmited);
@@ -364,7 +364,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Error: Auto update seemed not to work.", generator.m_JobErrorEmited_error.empty());
     CPPUNIT_ASSERT_MESSAGE("Error: Auto update seemed not to work.", 1 == generator.m_NewDataAvailable.size());
 
-    generator.SetImageNodes({ m_ImageNode1.GetPointer() });
+    generator.SetImageNodes({ m_ImageNode1 });
     m_TestApp->processEvents();
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggerd, but input does not realy changed.", 1, generator.m_DataGenerationStartedEmited);
@@ -373,7 +373,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggerd, but input does not realy changed.", 1 == generator.m_NewDataAvailable.size());
 
     generator.SetAutoUpdate(true);
-    generator.SetROINodes({ m_MaskImageNode.GetPointer() });
+    generator.SetROINodes({ m_MaskImageNode });
     m_TestApp->exec();
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update seemed not to work.", 2, generator.m_DataGenerationStartedEmited);
@@ -386,7 +386,7 @@ public:
   {
     TestQmitkImageStatisticsDataGenerator generator(m_DataStorage);
 
-    generator.SetImageNodes({ m_ImageNode1.GetPointer() });
+    generator.SetImageNodes({ m_ImageNode1 });
     generator.Generate();
     m_TestApp->exec();
 
@@ -457,8 +457,8 @@ public:
   {
     TestQmitkImageStatisticsDataGenerator generator(m_DataStorage);
 
-    generator.SetImageNodes({ m_ImageNode1.GetPointer() });
-    generator.SetROINodes({ m_PFNode.GetPointer() });
+    generator.SetImageNodes({ m_ImageNode1 });
+    generator.SetROINodes({ m_PFNode });
     generator.Generate();
     m_TestApp->exec();
 

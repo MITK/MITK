@@ -48,6 +48,12 @@ QmitkAbstractNodeSelectionWidget::NodeList QmitkAbstractNodeSelectionWidget::Get
   return this->CompileEmitSelection();
 }
 
+QmitkAbstractNodeSelectionWidget::ConstNodeStdVector QmitkAbstractNodeSelectionWidget::GetSelectedNodesStdVector() const
+{
+  auto result = this->GetSelectedNodes();
+  return ConstNodeStdVector(result.begin(), result.end());
+}
+
 void QmitkAbstractNodeSelectionWidget::SetDataStorage(mitk::DataStorage* dataStorage)
 {
   if (m_DataStorage == dataStorage)

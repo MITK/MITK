@@ -26,17 +26,24 @@ class MITKIMAGESTATISTICSUI_EXPORT QmitkImageAndRoiDataGeneratorBase : public Qm
 public:
   using Superclass = QmitkDataGeneratorBase;
 
-  using NodeVectorType = std::vector<mitk::DataNode::ConstPointer>;
+  using ConstNodeVectorType = std::vector<mitk::DataNode::ConstPointer>;
+  using NodeVectorType = std::vector<mitk::DataNode::Pointer>;
 
-  NodeVectorType GetImageNodes() const;
-  NodeVectorType GetROINodes() const;
+  ConstNodeVectorType GetImageNodes() const;
+  ConstNodeVectorType GetROINodes() const;
+
 
 public slots:
     /*! @brief Setter for image nodes
     */
+    void SetImageNodes(const ConstNodeVectorType& imageNodes);
+    /*! Convinience overload*/
     void SetImageNodes(const NodeVectorType& imageNodes);
+
     /*! @brief Setter for roi nodes
     */
+    void SetROINodes(const ConstNodeVectorType& roiNodes);
+    /*! Convinience overload*/
     void SetROINodes(const NodeVectorType& roiNodes);
 
 protected:
@@ -48,8 +55,8 @@ protected:
   bool ChangedNodeIsRelevant(const mitk::DataNode *changedNode) const override;
   InputPairVectorType GetAllImageROICombinations() const override;
 
-  NodeVectorType m_ImageNodes;
-  NodeVectorType m_ROINodes;
+  ConstNodeVectorType m_ImageNodes;
+  ConstNodeVectorType m_ROINodes;
 
   QmitkImageAndRoiDataGeneratorBase(const QmitkImageAndRoiDataGeneratorBase&) = delete;
   QmitkImageAndRoiDataGeneratorBase& operator = (const QmitkImageAndRoiDataGeneratorBase&) = delete;

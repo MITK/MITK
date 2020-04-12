@@ -400,7 +400,7 @@ mitk::NodePredicateBase::Pointer QmitkImageStatisticsView::GenerateROIPredicate(
   auto isMaskPredicate = mitk::GetImageStatisticsMaskPredicate();
   auto isMaskOrPlanarFigurePredicate = mitk::NodePredicateOr::New(isPlanarFigurePredicate, isMaskPredicate);
 
-  mitk::NodePredicateBase::Pointer result = isMaskOrPlanarFigurePredicate;
+  mitk::NodePredicateBase::Pointer result = isMaskOrPlanarFigurePredicate.GetPointer();
 
   if(!m_Controls.imageNodesSelector->GetSelectedNodes().empty())
   {

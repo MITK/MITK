@@ -386,6 +386,25 @@ void QmitkStdMultiWidget::InitializeWidget(bool showPlanesIn3d)
   mitkWidget4->GetSliceNavigationController()
     ->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
 
+  //connect to the "time navigation controller": send component via sliceNavigationControllers
+  m_TimeNavigationController->ConnectGeometryComponentEvent(
+    mitkWidget1->GetSliceNavigationController(), false);
+  m_TimeNavigationController->ConnectGeometryComponentEvent(
+    mitkWidget2->GetSliceNavigationController(), false);
+  m_TimeNavigationController->ConnectGeometryComponentEvent(
+    mitkWidget3->GetSliceNavigationController(), false);
+  m_TimeNavigationController->ConnectGeometryComponentEvent(
+    mitkWidget4->GetSliceNavigationController(), false);
+
+  mitkWidget1->GetSliceNavigationController()
+    ->ConnectGeometryComponentEvent(m_TimeNavigationController, false);
+  mitkWidget2->GetSliceNavigationController()
+    ->ConnectGeometryComponentEvent(m_TimeNavigationController, false);
+  mitkWidget3->GetSliceNavigationController()
+    ->ConnectGeometryComponentEvent(m_TimeNavigationController, false);
+  mitkWidget4->GetSliceNavigationController()
+    ->ConnectGeometryComponentEvent(m_TimeNavigationController, false);
+
   m_MouseModeSwitcher = mitk::MouseModeSwitcher::New(mitkWidget1->GetRenderer());
   m_MouseModeSwitcher->AddRenderer(mitkWidget2->GetRenderer());
   m_MouseModeSwitcher->AddRenderer(mitkWidget3->GetRenderer());
@@ -1908,13 +1927,23 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
     node->GetBoolProperty("volumerendering", value);
     if (value) {
       std::string text = "";
-      if (m_displayPositionInfo && timeSteps > 1) {
-        text += "T: " + std::to_string(timestep + 1) + "/" + std::to_string(timeSteps);
+      if (m_displayPositionInfo) {
+        if (timeSteps > 1) {
+          text += "T: " + std::to_string(timestep + 1) + "/" + std::to_string(timeSteps) + "\n";
+        }
+        if (componentMax > 1) {
+          text += "V: " + std::to_string(component + 1) + "/" + std::to_string(componentMax);
+        }
       }
       setCornerAnnotation(2, 3, text.c_str());
 
       std::string maxPosText = "";
-      maxPosText += "T: " + std::to_string(timeSteps) + "/" + std::to_string(timeSteps);
+      if (timeSteps > 1) {
+        maxPosText += "T: " + std::to_string(timeSteps) + "/" + std::to_string(timeSteps) + "\n";
+      }
+      if (componentMax > 1) {
+        maxPosText += "V: " + std::to_string(componentMax) + "/" + std::to_string(componentMax);
+      }
       setCornerAnnotationMaxText(2, 3, maxPosText.c_str());
     }
 

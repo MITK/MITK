@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkVolumeProperty.h>
 #include <vtkSmartVolumeMapper.h>
 #include <vtkImageData.h>
+#include <vtkImageExtractComponents.h>
 
 namespace mitk
 {
@@ -68,9 +69,11 @@ namespace mitk
     vtkSmartPointer<vtkVolume> m_Volume;
     vtkSmartPointer<vtkSmartVolumeMapper> m_SmartVolumeMapper;
     vtkSmartPointer<vtkVolumeProperty> m_VolumeProperty;
+    vtkSmartPointer<vtkImageExtractComponents> m_VectorComponentExtractor;
 
-    int m_TimeStep;
-    
+    int m_LastTimeStep;
+    int m_LastComponent;
+
     void UpdateTransferFunctions(mitk::BaseRenderer *renderer);
     void UpdateRenderMode(mitk::BaseRenderer *renderer);
 

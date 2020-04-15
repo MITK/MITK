@@ -56,6 +56,7 @@ void QmitkMultiNodeSelectionWidget::OnEditSelection()
   dialog->SetCurrentSelection(this->CompileEmitSelection());
   dialog->SetSelectOnlyVisibleNodes(m_SelectOnlyVisibleNodes);
   dialog->SetSelectionMode(QAbstractItemView::MultiSelection);
+  dialog->SetSelectionCheckFunction(m_CheckFunction);
 
   m_Controls.btnChange->setChecked(true);
   if (dialog->exec())

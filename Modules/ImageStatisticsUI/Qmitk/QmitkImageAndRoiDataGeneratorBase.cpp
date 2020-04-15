@@ -12,20 +12,20 @@ found in the LICENSE file.
 
 #include "QmitkImageAndRoiDataGeneratorBase.h"
 
-QmitkImageAndRoiDataGeneratorBase::NodeVectorType
+QmitkImageAndRoiDataGeneratorBase::ConstNodeVectorType
 QmitkImageAndRoiDataGeneratorBase::GetROINodes() const
 {
   return m_ROINodes;
 }
 
-QmitkImageAndRoiDataGeneratorBase::NodeVectorType
+QmitkImageAndRoiDataGeneratorBase::ConstNodeVectorType
 QmitkImageAndRoiDataGeneratorBase::GetImageNodes() const
 {
   return m_ImageNodes;
 }
 
 void
-QmitkImageAndRoiDataGeneratorBase::SetImageNodes(const NodeVectorType& imageNodes)
+QmitkImageAndRoiDataGeneratorBase::SetImageNodes(const ConstNodeVectorType& imageNodes)
 {
   if (m_ImageNodes != imageNodes)
   {
@@ -42,7 +42,16 @@ QmitkImageAndRoiDataGeneratorBase::SetImageNodes(const NodeVectorType& imageNode
 }
 
 void
-QmitkImageAndRoiDataGeneratorBase::SetROINodes(const NodeVectorType& roiNodes)
+QmitkImageAndRoiDataGeneratorBase::SetImageNodes(const NodeVectorType& imageNodes)
+{
+  ConstNodeVectorType constInput;
+  constInput.reserve(imageNodes.size());
+  std::copy(imageNodes.begin(), imageNodes.end(), constInput.begin());
+  this->SetImageNodes(constInput);
+}
+
+void
+QmitkImageAndRoiDataGeneratorBase::SetROINodes(const ConstNodeVectorType& roiNodes)
 {
   if (m_ROINodes != roiNodes)
   {
@@ -56,6 +65,15 @@ QmitkImageAndRoiDataGeneratorBase::SetROINodes(const NodeVectorType& roiNodes)
       this->EnsureRecheckingAndGeneration();
     }
   }
+}
+
+void
+QmitkImageAndRoiDataGeneratorBase::SetROINodes(const NodeVectorType& roiNodes)
+{
+  ConstNodeVectorType constInput;
+  constInput.reserve(roiNodes.size());
+  std::copy(roiNodes.begin(), roiNodes.end(), constInput.begin());
+  this->SetROINodes(constInput);
 }
 
 bool

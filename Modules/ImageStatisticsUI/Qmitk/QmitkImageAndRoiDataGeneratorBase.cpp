@@ -11,7 +11,6 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkImageAndRoiDataGeneratorBase.h"
-#include <QVector>
 
 QmitkImageAndRoiDataGeneratorBase::ConstNodeVectorType
 QmitkImageAndRoiDataGeneratorBase::GetROINodes() const

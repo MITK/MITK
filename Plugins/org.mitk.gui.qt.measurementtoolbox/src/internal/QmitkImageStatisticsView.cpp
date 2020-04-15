@@ -118,7 +118,7 @@ void QmitkImageStatisticsView::UpdateIntensityProfile()
   { //only supported for one image and roi currently
     auto image = dynamic_cast<mitk::Image*>(selectedImageNodes.front()->GetData());
 
-    mitk::PlanarFigure* maskPlanarFigure = dynamic_cast<mitk::PlanarFigure*>(selectedROINodes.front()->GetData());
+    auto maskPlanarFigure = dynamic_cast<mitk::PlanarFigure*>(selectedROINodes.front()->GetData());
 
     if (maskPlanarFigure != nullptr)
     {
@@ -412,13 +412,13 @@ mitk::NodePredicateBase::Pointer QmitkImageStatisticsView::GenerateROIPredicate(
 
       bool sameGeometry = true;
 
-      if (dynamic_cast<const mitk::Image*>(node->GetData()))
+      if (dynamic_cast<const mitk::Image*>(node->GetData()) != nullptr)
       {
         sameGeometry = imageGeoPredicate->CheckNode(node);
       }
       else
       {
-        const mitk::PlanarFigure* planar2 = dynamic_cast<const mitk::PlanarFigure*>(node->GetData());
+        const auto planar2 = dynamic_cast<const mitk::PlanarFigure*>(node->GetData());
         if (planar2)
         {
           sameGeometry = mitk::PlanarFigureMaskGenerator::CheckPlanarFigureIsNotTilted(planar2->GetPlaneGeometry(), image->GetGeometry());

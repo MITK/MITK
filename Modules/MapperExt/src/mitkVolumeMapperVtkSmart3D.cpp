@@ -27,7 +27,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 void mitk::VolumeMapperVtkSmart3D::initialize()
 {
-  if (!m_Volume->GetMapper() || this->GetTimestep() != m_TimeStep) {
+  mitk::Image *input = const_cast<mitk::Image *>(static_cast<const mitk::Image *>(this->GetDataNode()->GetData()));
+
+  int displayedComponent = 0;
+  this->GetDataNode()->GetIntProperty("Image.Displayed Component", displayedComponent);
+  int numberOfComponents = input->GetPixelType().GetNumberOfComponents();
+
+  int timeStep = 0;
+  this->GetDataNode()->GetIntProperty("Image.Displayed Timestep", timeStep);
+  int numberOfTimeSteps = input->GetTimeSteps();
+
+  if (!m_Volume->GetMapper() ||
+    (numberOfTimeSteps > 1 && timeStep != m_LastTimeStep) ||
+    (numberOfComponents > 1 && displayedComponent != m_LastComponent)) {
     createMapper(GetInputImage());
     createVolume();
     createVolumeProperty();
@@ -121,10 +133,24 @@ void mitk::VolumeMapperVtkSmart3D::setClippingPlanes(vtkPlanes* planes)
 vtkImageData* mitk::VolumeMapperVtkSmart3D::GetInputImage()
 {
   mitk::Image *input = const_cast<mitk::Image *>(static_cast<const mitk::Image *>(this->GetDataNode()->GetData()));
-  m_TimeStep = this->GetTimestep();
-  int maxTime = input->GetTimeSteps() - 1;
   mitk::ImageVtkAccessor accessor(input);
-  vtkImageData* img = accessor.getVtkImageData(m_TimeStep < maxTime ? m_TimeStep : maxTime);
+  vtkImageData* img = accessor.getVtkImageData(this->GetTimestep());
+
+  m_LastTimeStep = this->GetTimestep();
+
+  if (input->GetPixelType().GetNumberOfComponents() > 1) {
+    int displayedComponent = 0;
+    this->GetDataNode()->GetIntProperty("Image.Displayed Component", displayedComponent);
+
+    m_VectorComponentExtractor->SetComponents(displayedComponent);
+    m_VectorComponentExtractor->SetInputData(img);
+    m_VectorComponentExtractor->Modified();
+    m_VectorComponentExtractor->Update();
+
+    img = m_VectorComponentExtractor->GetOutput();
+
+    m_LastComponent = displayedComponent;
+  }
 
   if (img) {
     img->SetSpacing(1,1,1);
@@ -251,7 +277,9 @@ void mitk::VolumeMapperVtkSmart3D::UpdateRenderMode(mitk::BaseRenderer *renderer
 }
 
 mitk::VolumeMapperVtkSmart3D::VolumeMapperVtkSmart3D() :
-  m_TimeStep(0)
+  m_VectorComponentExtractor(vtkSmartPointer<vtkImageExtractComponents>::New()),
+  m_LastTimeStep(-1),
+  m_LastComponent(-1)
 {
   vtkObjectFactory::RegisterFactory(vtkRenderingOpenGL2ObjectFactory::New());
   vtkObjectFactory::RegisterFactory(vtkRenderingVolumeOpenGL2ObjectFactory::New());

@@ -92,6 +92,7 @@ mitk::ThreeDnTDICOMSeriesReader
   // we should describe our need for this tag as needed via a function
   // (however, we currently know that the superclass will always need this tag)
   const DICOMTag tagImagePositionPatient(0x0020, 0x0032);
+  const DICOMTag tagSeriesInstaceUID(0x0020, 0x000e);
 
   while (!remainingBlocks.empty())
   {
@@ -104,6 +105,7 @@ mitk::ThreeDnTDICOMSeriesReader
     const unsigned int currentBlockNumberOfSlices = firstBlock.size();
     const std::string currentBlockFirstOrigin = firstBlock.front()->GetTagValueAsString( tagImagePositionPatient ).value;
     const std::string currentBlockLastOrigin  =  firstBlock.back()->GetTagValueAsString( tagImagePositionPatient ).value;
+    const auto currentBlockSeriesInstanceUID = firstBlock.back()->GetTagValueAsString(tagSeriesInstaceUID).value;
 
     remainingBlocks.erase( remainingBlocks.begin() );
 
@@ -118,10 +120,12 @@ mitk::ThreeDnTDICOMSeriesReader
       const unsigned int otherBlockNumberOfSlices = otherBlock.size();
       const std::string otherBlockFirstOrigin = otherBlock.front()->GetTagValueAsString( tagImagePositionPatient ).value;
       const std::string otherBlockLastOrigin  =  otherBlock.back()->GetTagValueAsString( tagImagePositionPatient ).value;
+      const auto otherBlockSeriesInstanceUID = otherBlock.back()->GetTagValueAsString(tagSeriesInstaceUID).value;
 
       // add matching blocks to current3DnTBlock
       // keep other blocks for later
       if (   otherBlockNumberOfSlices == currentBlockNumberOfSlices
+          && otherBlockSeriesInstanceUID == currentBlockSeriesInstanceUID
           && otherBlockFirstOrigin == currentBlockFirstOrigin
           && otherBlockLastOrigin == currentBlockLastOrigin
           )

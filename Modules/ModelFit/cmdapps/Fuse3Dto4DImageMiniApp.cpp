@@ -23,7 +23,7 @@ found in the LICENSE file.
 // MITK includes
 #include <mitkIOUtil.h>
 #include <mitkPreferenceListReaderOptionsFunctor.h>
-#include <mitkDynamicImageGenerator.h>
+#include <mitkDynamicImageGenerationFilter.h>
 
 mitkCommandLineParser::StringContainerType inFilenames;
 std::string outFileName;
@@ -115,7 +115,7 @@ int main(int argc, char* argv[])
       timebounds.resize(inFilenames.size()+1);
       std::iota(timebounds.begin(), timebounds.end(), 0.0);
     }
-    else if (inFilenames.size() != timebounds.size() + 1)
+    else if (inFilenames.size() + 1 != timebounds.size())
     {
       std::cerr << "Cannot fuse images. Explicitly specified time bounds do not match. Use --help for more information on how to specify time bounds correctly.";
       return EXIT_FAILURE;
@@ -138,7 +138,8 @@ int main(int argc, char* argv[])
         ++step;
       }
 
-      filter->SetTimeBounds(timebounds);
+      filter->SetFirstMinTimeBound(timebounds[0]);
+      filter->SetMaxTimeBounds({ timebounds.begin() + 1, timebounds.end() });
 
       std::cout << "Fuse the images ..." << std::endl;
 

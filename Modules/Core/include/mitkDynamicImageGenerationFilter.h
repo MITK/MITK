@@ -16,12 +16,15 @@ found in the LICENSE file.
 
 #include "mitkImageToImageFilter.h"
 
-#include "MitkModelFitExports.h"
+#include "MitkCoreExports.h"
 
 namespace mitk
 {
-  /** Filter that takes n inputs and fuse it to a dynamic image (with n time points).*/
-  class MITKMODELFIT_EXPORT DynamicImageGenerationFilter : public ImageToImageFilter
+  /** Filter that takes n mitk images as inputs and fuse them to a dynamic image (with n time points).
+  Preconditions of this filter are, that all input images have the same pixel type and geometry.
+  It no time bounds are defined the dynamic image will start at 0 ms and each time step has a duration
+  of 1 ms.*/
+  class MITKCORE_EXPORT DynamicImageGenerationFilter : public ImageToImageFilter
   {
   public:
     mitkClassMacro(DynamicImageGenerationFilter, ImageToImageFilter);
@@ -30,8 +33,13 @@ namespace mitk
 
     typedef std::vector<mitk::TimePointType> TimeBoundsVectorType;
 
-    itkGetConstMacro(TimeBounds, TimeBoundsVectorType);
-    void SetTimeBounds(const TimeBoundsVectorType &bounds);
+    itkGetConstMacro(FirstMinTimeBound, mitk::TimePointType);
+    /**Set custom min time bound for the first time step.*/
+    itkSetMacro(FirstMinTimeBound, mitk::TimePointType);
+
+    itkGetConstMacro(MaxTimeBounds, TimeBoundsVectorType);
+    /**Set custom max time bounds for all time steps.*/
+    void SetMaxTimeBounds(const TimeBoundsVectorType &bounds);
 
   protected:
     DynamicImageGenerationFilter(){};
@@ -44,7 +52,8 @@ namespace mitk
     void GenerateData() override;
 
   private:
-    TimeBoundsVectorType m_TimeBounds;
+    TimeBoundsVectorType m_MaxTimeBounds;
+    mitk::TimePointType m_FirstMinTimeBound = 0.0;
   };
 }
 

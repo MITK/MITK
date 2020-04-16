@@ -10,16 +10,17 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDynamicImageGenerator.h"
+#include "mitkDynamicImageGenerationFilter.h"
 
 #include <numeric>
 
 #include "mitkArbitraryTimeGeometry.h"
 #include "mitkImageReadAccessor.h"
+#include "mitkTemporoSpatialStringProperty.h"
 
-void mitk::DynamicImageGenerationFilter::SetTimeBounds(const TimeBoundsVectorType& timeBounds)
+void mitk::DynamicImageGenerationFilter::SetMaxTimeBounds(const TimeBoundsVectorType& timeBounds)
 {
-  m_TimeBounds = timeBounds;
+  m_MaxTimeBounds = timeBounds;
   this->Modified();
 }
 
@@ -27,9 +28,10 @@ void mitk::DynamicImageGenerationFilter::GenerateInputRequestedRegion()
 {
   Superclass::GenerateInputRequestedRegion();
 
-  mitk::Image* input = this->GetInput();
-
-  input->SetRequestedRegionToLargestPossibleRegion();
+  for (DataObjectPointerArraySizeType pos = 0; pos < this->GetNumberOfInputs(); pos++)
+  {
+    this->GetInput(pos)->SetRequestedRegionToLargestPossibleRegion();
+  }
 }
 
 void mitk::DynamicImageGenerationFilter::GenerateOutputInformation()
@@ -37,17 +39,19 @@ void mitk::DynamicImageGenerationFilter::GenerateOutputInformation()
   mitk::Image::ConstPointer input = this->GetInput();
   mitk::Image::Pointer output = this->GetOutput();
 
-  auto timeBounds = m_TimeBounds;
+  auto timeBounds = m_MaxTimeBounds;
 
   if (timeBounds.empty())
   {
-    timeBounds.resize(this->GetNumberOfInputs() + 1);
-    std::iota(timeBounds.begin(), timeBounds.end(), 0.0);
+    timeBounds.resize(this->GetNumberOfInputs());
+    std::iota(timeBounds.begin(), timeBounds.end(), 1.0);
   }
-  else if(timeBounds.size() != this->GetNumberOfInputs() + 1)
+  else if(timeBounds.size() != this->GetNumberOfInputs())
   {
-    mitkThrow() << "User defined time bounds does not match the number if inputs (" << this->GetNumberOfInputs() << "). Size of timebounds is " << timeBounds.size() << ", but it should be " << this->GetNumberOfInputs() + 1 << ".";
+    mitkThrow() << "User defined max time bounds do not match the number if inputs (" << this->GetNumberOfInputs() << "). Size of max timebounds is " << timeBounds.size() << ", but it should be " << this->GetNumberOfInputs() << ".";
   }
+
+  timeBounds.insert(timeBounds.begin(), m_FirstMinTimeBound);
 
   auto timeGeo = mitk::ArbitraryTimeGeometry::New();
   timeGeo->ReserveSpaceForGeometries(this->GetNumberOfInputs());
@@ -56,9 +60,38 @@ void mitk::DynamicImageGenerationFilter::GenerateOutputInformation()
   {
     timeGeo->AppendNewTimeStepClone(this->GetInput(pos)->GetGeometry(), timeBounds[pos], timeBounds[pos + 1]);
   }
-  
   output->Initialize(input->GetPixelType(), *timeGeo);
-  output->SetPropertyList(input->GetPropertyList()->Clone());
+
+  auto newPropList = input->GetPropertyList()->Clone();
+  for (DataObjectPointerArraySizeType pos = 1; pos < this->GetNumberOfInputs(); pos++)
+  {
+    const auto otherList = this->GetInput(pos)->GetPropertyList();
+    for (const auto& key : otherList->GetPropertyKeys())
+    {
+      auto prop = newPropList->GetProperty(key);
+      if (prop == nullptr)
+      {
+        newPropList->SetProperty(key, otherList->GetProperty(key)->Clone());
+      }
+      else
+      {
+        auto tempoSpatialProp = dynamic_cast<mitk::TemporoSpatialStringProperty*>(prop);
+        auto oTempoSpatialProp = dynamic_cast<mitk::TemporoSpatialStringProperty*>(otherList->GetProperty(key));
+        if (prop != nullptr && oTempoSpatialProp != nullptr)
+        {
+          auto availabelSlices = oTempoSpatialProp->GetAvailableSlices(0);
+
+          for (const auto& sliceID : availabelSlices)
+          {
+            tempoSpatialProp->SetValue(pos, sliceID, oTempoSpatialProp->GetValueBySlice(sliceID));
+          }
+        }
+        //other prop types can be ignored, we only use the values of the first frame.
+      }
+    }
+  }
+
+  output->SetPropertyList(newPropList);
 }
 
 

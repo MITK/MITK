@@ -134,65 +134,7 @@ namespace mitk
     void ProcessNode(DataNode *node, BaseRenderer *renderer, Surface *surface, LayerSortedActorList &layerSortedActors);
 
     void ImageMapperDeletedCallback(itk::Object *caller, const itk::EventObject &event);
-
-    /** \brief general PropAssembly to hold the entire scene */
-    vtkAssembly *m_Prop3DAssembly;
-
-    /** \brief PropAssembly to hold the planes */
-    vtkAssembly *m_ImageAssembly;
-
-    PlaneGeometryDataToSurfaceFilter::Pointer m_SurfaceCreator;
-
-    BoundingBox::Pointer m_SurfaceCreatorBoundingBox;
-
-    BoundingBox::PointsContainer::Pointer m_SurfaceCreatorPointsContainer;
-
-    /** \brief Edge extractor for tube-shaped frame */
-    vtkFeatureEdges *m_Edges;
-
-    /** \brief Filter to apply object transform to the extracted edges */
-    vtkTransformPolyDataFilter *m_EdgeTransformer;
-
-    /** \brief Source to create the tube-shaped frame  */
-    vtkTubeFilter *m_EdgeTuber;
-
-    /** \brief Mapper for the tube-shaped frame  */
-    vtkPolyDataMapper *m_EdgeMapper;
-
-    /** \brief Actor for the tube-shaped frame */
-    vtkActor *m_EdgeActor;
-
-    /** \brief Mapper for black plane background */
-    vtkPolyDataMapper *m_BackgroundMapper;
-
-    /** \brief Actor for black plane background */
-    vtkActor *m_BackgroundActor;
-
-    /** \brief Transforms the suface before applying the glyph filter */
-    vtkTransformPolyDataFilter *m_NormalsTransformer;
-
-    /** \brief Mapper for normals representation (thin lines) */
-    vtkPolyDataMapper *m_FrontNormalsMapper;
-    vtkPolyDataMapper *m_BackNormalsMapper;
-
-    /** \brief  Generates lines for surface normals */
-    vtkHedgeHog *m_FrontHedgeHog;
-    vtkHedgeHog *m_BackHedgeHog;
-
-    /** \brief Actor to hold the normals arrows */
-    vtkActor *m_FrontNormalsActor;
-    vtkActor *m_BackNormalsActor;
-
-    /** Cleans the polyline in order to avoid phantom boundaries */
-    vtkCleanPolyData *m_Cleaner;
-
-    /** Internal flag, if actors for normals are already added to m_Prop3DAssembly*/
-    bool m_NormalsActorAdded;
-
-    /** \brief The DataStorage defines which part of the data tree is traversed for renderering. */
-    mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
-
-    class MITKCORE_EXPORT ActorInfo
+      class MITKCORE_EXPORT ActorInfo
     {
     public:
       vtkActor *m_Actor;
@@ -211,7 +153,81 @@ namespace mitk
     * ImageMapper
     */
     typedef std::map<ImageVtkMapper2D *, ActorInfo> ActorList;
-    ActorList m_ImageActors;
+
+    /** \brief Internal class holding the mapper, actor, etc. for each of the 3D render windows */
+    class MITKCORE_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
+    {
+    public:
+      /** \brief general PropAssembly to hold the entire scene */
+      vtkAssembly *m_Prop3DAssembly;
+
+      /** \brief PropAssembly to hold the planes */
+      vtkAssembly *m_ImageAssembly;
+
+      mitk::PlaneGeometryDataToSurfaceFilter::Pointer m_SurfaceCreator;
+
+      mitk::BoundingBox::Pointer m_SurfaceCreatorBoundingBox;
+
+      mitk::BoundingBox::PointsContainer::Pointer m_SurfaceCreatorPointsContainer;
+
+      /** \brief Edge extractor for tube-shaped frame */
+      vtkFeatureEdges *m_Edges;
+
+      /** \brief Filter to apply object transform to the extracted edges */
+      vtkTransformPolyDataFilter *m_EdgeTransformer;
+
+      /** \brief Source to create the tube-shaped frame  */
+      vtkTubeFilter *m_EdgeTuber;
+
+      /** \brief Mapper for the tube-shaped frame  */
+      vtkPolyDataMapper *m_EdgeMapper;
+
+      /** \brief Actor for the tube-shaped frame */
+      vtkActor *m_EdgeActor;
+
+      /** \brief Mapper for black plane background */
+      vtkPolyDataMapper *m_BackgroundMapper;
+
+      /** \brief Actor for black plane background */
+      vtkActor *m_BackgroundActor;
+
+      /** \brief Transforms the suface before applying the glyph filter */
+      vtkTransformPolyDataFilter *m_NormalsTransformer;
+
+      /** \brief Mapper for normals representation (thin lines) */
+      vtkPolyDataMapper *m_FrontNormalsMapper;
+      vtkPolyDataMapper *m_BackNormalsMapper;
+
+      /** \brief  Generates lines for surface normals */
+      vtkHedgeHog *m_FrontHedgeHog;
+      vtkHedgeHog *m_BackHedgeHog;
+
+      /** \brief Actor to hold the normals arrows */
+      vtkActor *m_FrontNormalsActor;
+      vtkActor *m_BackNormalsActor;
+
+      /** Cleans the polyline in order to avoid phantom boundaries */
+      vtkCleanPolyData *m_Cleaner;
+
+      /** Internal flag, if actors for normals are already added to m_Prop3DAssembly*/
+      bool m_NormalsActorAdded;
+
+      /** Holds the actors for each of the 3D render windows */
+      ActorList m_ImageActors;
+
+      /** \brief Timestamp of last update of stored data. */
+      itk::TimeStamp m_LastUpdateTime;
+      /** \brief Default constructor of the local storage. */
+      LocalStorage();
+      /** \brief Default deconstructor of the local storage. */
+      ~LocalStorage() override;
+    };    
+
+     /** \brief The LocalStorageHandler holds all LocalStorages for the 3D render windows. */
+    mitk::LocalStorageHandler<LocalStorage> m_LSH;
+    
+    /** \brief The DataStorage defines which part of the data tree is traversed for renderering. */
+    mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
 
     // responsiblity to remove the observer upon its destruction
     typedef itk::MemberCommand<PlaneGeometryDataVtkMapper3D> MemberCommandType;

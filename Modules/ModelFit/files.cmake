@@ -25,6 +25,7 @@ set(CPP_FILES
   Common/mitkFresnel.cpp
   Common/mitkModelFitPlotDataHelper.cpp
   Common/mitkModelSignalImageGenerator.cpp
+  Common/mitkDynamicImageGenerator.cpp
   Functors/mitkSimpleFunctorBase.cpp
   Functors/mitkSimpleFunctorPolicy.cpp
   Functors/mitkChiSquareFitCostFunction.cpp

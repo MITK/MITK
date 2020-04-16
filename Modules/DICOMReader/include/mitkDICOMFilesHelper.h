@@ -32,6 +32,10 @@ DICOMFilePathList GetDICOMFilesInSameDirectory(const std::string& filePath);
 All DICOM files will be added to the result and returned.
 @remark The helper does no sorting of any kind.*/
 DICOMFilePathList FilterForDICOMFiles(const DICOMFilePathList& fileList);
+
+/** Returns all DICOM files passed with fileList that have the same series instance UID then the passed refFilePath.
+@pre refFilePath must point to a valid DICOM file.*/
+DICOMFilePathList FilterDICOMFilesForSameSeries(const std::string& refFilePath, const DICOMFilePathList& fileList);
 }
 
 #endif // MITKDICOMFILESHELPER_H

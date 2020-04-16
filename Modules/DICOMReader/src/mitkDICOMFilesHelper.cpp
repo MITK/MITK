@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include <itkGDCMImageIO.h>
 #include <itksys/SystemTools.hxx>
 #include <gdcmDirectory.h>
+#include <gdcmScanner.h>
 
 mitk::DICOMFilePathList mitk::GetDICOMFilesInSameDirectory(const std::string& filePath)
 {
@@ -22,7 +23,12 @@ mitk::DICOMFilePathList mitk::GetDICOMFilesInSameDirectory(const std::string& fi
 
   if (!filePath.empty())
   {
-    std::string dir = itksys::SystemTools::GetFilenamePath(filePath);
+
+    std::string dir = filePath;
+    if (!itksys::SystemTools::FileIsDirectory(filePath))
+    {
+      dir = itksys::SystemTools::GetFilenamePath(filePath);
+    }
 
     gdcm::Directory directoryLister;
     directoryLister.Load(dir.c_str(), false); // non-recursive
@@ -47,3 +53,28 @@ mitk::DICOMFilePathList mitk::FilterForDICOMFiles(const DICOMFilePathList& fileL
 
   return result;
 };
+
+mitk::DICOMFilePathList mitk::FilterDICOMFilesForSameSeries(const std::string& refFilePath, const DICOMFilePathList& fileList)
+{
+  auto dicomFiles = FilterForDICOMFiles(fileList);
+
+  //use the gdcm scanner directly instead of our wrapping classes, as it is a very simple task
+  //and I want to spare the indirection/overhead.
+  auto scanner = std::make_shared<gdcm::Scanner>();
+
+  const gdcm::Tag seriesInstanceUIDTag(0x0020, 0x000e);
+
+  scanner->AddTag(seriesInstanceUIDTag); //Series Instance UID;
+
+  scanner->Scan({ refFilePath });
+  auto uid = scanner->GetValue(refFilePath.c_str(), seriesInstanceUIDTag);
+  
+  if (uid != nullptr)
+  {
+    const std::string refUID = uid;
+    scanner->Scan(dicomFiles);
+    return scanner->GetAllFilenamesFromTagToValue(seriesInstanceUIDTag, refUID.c_str());
+  }
+
+  return mitk::DICOMFilePathList();
+}

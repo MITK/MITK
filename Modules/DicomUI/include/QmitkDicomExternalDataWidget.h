@@ -91,6 +91,11 @@ public slots:
 
   void OnSeriesSelectionChanged(const QStringList &s);
 
+protected slots:
+  void OnProgressStep(const QString&);
+
+  void OnProgressDetail(const QString&);
+
 protected:
   /// \brief Get the list of filepath from current selected index in TreeView. All file paths referring to the index
   /// will be returned.
@@ -107,6 +112,7 @@ protected:
 
   QProgressDialog *m_ProgressDialog;
   QString m_LastImportDirectory;
+  QString m_ProgressStep;
 
   Ui::QmitkDicomExternalDataWidgetControls *m_Controls;
 };

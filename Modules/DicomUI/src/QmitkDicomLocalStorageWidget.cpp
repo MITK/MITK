@@ -54,7 +54,7 @@ void QmitkDicomLocalStorageWidget::CreateQtPartControl(QWidget *parent)
     connect(
       m_Controls->ctkDicomBrowser, SIGNAL(seriesDoubleClicked(const QModelIndex &)), this, SLOT(OnViewButtonClicked()));
 
-    connect(m_LocalIndexer, SIGNAL(indexingComplete()), this, SIGNAL(SignalFinishedImport()));
+    connect(m_LocalIndexer, SIGNAL(indexingComplete(int, int, int, int)), this, SIGNAL(SignalFinishedImport()));
 
     m_Controls->ctkDicomBrowser->setTableOrientation(Qt::Vertical);
   }

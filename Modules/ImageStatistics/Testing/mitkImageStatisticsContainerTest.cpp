@@ -28,6 +28,7 @@ class mitkImageStatisticsContainerTestSuite : public mitk::TestFixture
     MITK_TEST(PrintSelf);
     MITK_TEST(InternalClone);
     MITK_TEST(StatisticNames);
+    MITK_TEST(OverwriteStatistic);
     MITK_TEST(Reset);
     CPPUNIT_TEST_SUITE_END();
 
@@ -243,6 +244,25 @@ public:
 
         CPPUNIT_ASSERT_EQUAL_MESSAGE("Estimated statistics names are not correct.", mitk::GetAllStatisticNames(m_StatisticsContainer).size(), estimatedDefaultStatisticNames.size() + 1);
         
+    void OverwriteStatistic()
+    {
+        m_StatisticsContainer->SetTimeGeometry(m_TimeGeometry);
+
+        m_StatisticsObject.AddStatistic("Test", 4.2);
+
+        m_StatisticsContainer->SetStatisticsForTimeStep(0, m_StatisticsObject);
+        m_StatisticsContainer->SetStatisticsForTimeStep(1, m_StatisticsObject);
+        m_StatisticsContainer->SetStatisticsForTimeStep(2, m_StatisticsObject);
+        m_StatisticsContainer->SetStatisticsForTimeStep(3, m_StatisticsObject);
+        m_StatisticsContainer->SetStatisticsForTimeStep(4, m_StatisticsObject);
+
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Statistic was not correctly added to StatisticsObject.", boost::get<double> (m_StatisticsContainer->GetStatisticsForTimeStep(0).GetValueNonConverted("Test")), 4.2);
+
+        // An existing statistic won't be updated by adding another statistic with same name to that object.
+        m_StatisticsObject.AddStatistic("Test", 42.0);
+
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Statistic was overwritten.", boost::get<double>(m_StatisticsContainer->GetStatisticsForTimeStep(0).GetValueNonConverted("Test")), 4.2);
+    }
         std::vector<mitk::ImageStatisticsContainer::ConstPointer> containers;
 
         containers.push_back(m_StatisticsContainer.GetPointer());

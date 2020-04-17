@@ -45,7 +45,7 @@ void
 QmitkImageAndRoiDataGeneratorBase::SetImageNodes(const NodeVectorType& imageNodes)
 {
   ConstNodeVectorType constInput;
-  constInput.reserve(imageNodes.size());
+  constInput.resize(imageNodes.size());
   std::copy(imageNodes.begin(), imageNodes.end(), constInput.begin());
   this->SetImageNodes(constInput);
 }
@@ -71,7 +71,7 @@ void
 QmitkImageAndRoiDataGeneratorBase::SetROINodes(const NodeVectorType& roiNodes)
 {
   ConstNodeVectorType constInput;
-  constInput.reserve(roiNodes.size());
+  constInput.resize(roiNodes.size());
   std::copy(roiNodes.begin(), roiNodes.end(), constInput.begin());
   this->SetROINodes(constInput);
 }

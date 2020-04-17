@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "mitkTestDynamicImageGenerator.h"
 #include "mitkArbitraryTimeGeometry.h"
 #include "mitkImageCast.h"
-#include "mitkDynamicImageGenerationFilter.h"
+#include "mitkTemporalJoinImagesFilter.h"
 
 namespace mitk
 {
@@ -191,9 +191,9 @@ namespace mitk
 
   Image::Pointer GenerateDynamicTestImageMITK()
   {
-    auto filter = mitk::DynamicImageGenerationFilter::New();
+    auto filter = mitk::TemporalJoinImagesFilter::New();
 
-    mitk::DynamicImageGenerationFilter::TimeBoundsVectorType bounds;
+    mitk::TemporalJoinImagesFilter::TimeBoundsVectorType bounds;
     for (int i = 0; i < 10; ++i)
     {
       filter->SetInput(i, GenerateTestFrame(1 + (5.0 * i)));

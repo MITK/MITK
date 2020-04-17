@@ -10,26 +10,27 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef DYNAMICIMAGEGENERATOR_H
-#define DYNAMICIMAGEGENERATOR_H
+#ifndef TEMPORALJOINIMAGESFILTER_H
+#define TEMPORALJOINIMAGESFILTER_H
 
 
 #include "mitkImageToImageFilter.h"
+#include "mitkCommon.h"
 
 #include "MitkCoreExports.h"
 
 namespace mitk
 {
-  /** Filter that takes n mitk images as inputs and fuse them to a dynamic image (with n time points).
+  /** Filter that takes n mitk images as inputs and fuse them to a new image (with n time points).
   Preconditions of this filter are, that all input images have the same pixel type and geometry.
+  The sequence of frames in the output image is the same then the sequence of inputs.
   It no time bounds are defined the dynamic image will start at 0 ms and each time step has a duration
   of 1 ms.*/
-  class MITKCORE_EXPORT DynamicImageGenerationFilter : public ImageToImageFilter
+  class MITKCORE_EXPORT TemporalJoinImagesFilter : public ImageToImageFilter
   {
   public:
-    mitkClassMacro(DynamicImageGenerationFilter, ImageToImageFilter);
-    itkFactorylessNewMacro(DynamicImageGenerationFilter);
-    itkCloneMacro(Self);
+    mitkClassMacro(TemporalJoinImagesFilter, ImageToImageFilter);
+    itkFactorylessNewMacro(TemporalJoinImagesFilter);
 
     typedef std::vector<mitk::TimePointType> TimeBoundsVectorType;
 
@@ -42,8 +43,8 @@ namespace mitk
     void SetMaxTimeBounds(const TimeBoundsVectorType &bounds);
 
   protected:
-    DynamicImageGenerationFilter(){};
-    ~DynamicImageGenerationFilter() override{};
+    TemporalJoinImagesFilter(){};
+    ~TemporalJoinImagesFilter() override{};
 
     void GenerateInputRequestedRegion() override;
 

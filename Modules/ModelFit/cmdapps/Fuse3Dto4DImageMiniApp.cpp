@@ -23,7 +23,7 @@ found in the LICENSE file.
 // MITK includes
 #include <mitkIOUtil.h>
 #include <mitkPreferenceListReaderOptionsFunctor.h>
-#include <mitkDynamicImageGenerationFilter.h>
+#include <mitkTemporalJoinImagesFilter.h>
 
 mitkCommandLineParser::StringContainerType inFilenames;
 std::string outFileName;
@@ -126,7 +126,7 @@ int main(int argc, char* argv[])
     {
       std::cout << "Load images:" << std::endl;
 
-      auto filter = mitk::DynamicImageGenerationFilter::New();
+      auto filter = mitk::TemporalJoinImagesFilter::New();
 
       unsigned int step = 0;
       for (auto path : inFilenames)
@@ -153,11 +153,6 @@ int main(int argc, char* argv[])
       std::cout << "Processing finished." << std::endl;
 
       return EXIT_SUCCESS;
-    }
-    catch (const itk::ExceptionObject& e)
-    {
-        MITK_ERROR << e.what();
-        return EXIT_FAILURE;
     }
     catch (const std::exception& e)
     {

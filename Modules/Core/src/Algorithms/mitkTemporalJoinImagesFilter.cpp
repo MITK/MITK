@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDynamicImageGenerationFilter.h"
+#include "mitkTemporalJoinImagesFilter.h"
 
 #include <numeric>
 
@@ -18,52 +18,53 @@ found in the LICENSE file.
 #include "mitkImageReadAccessor.h"
 #include "mitkTemporoSpatialStringProperty.h"
 
-void mitk::DynamicImageGenerationFilter::SetMaxTimeBounds(const TimeBoundsVectorType& timeBounds)
+void mitk::TemporalJoinImagesFilter::SetMaxTimeBounds(const TimeBoundsVectorType& timeBounds)
 {
   m_MaxTimeBounds = timeBounds;
   this->Modified();
 }
 
-void mitk::DynamicImageGenerationFilter::GenerateInputRequestedRegion()
+void mitk::TemporalJoinImagesFilter::GenerateInputRequestedRegion()
 {
   Superclass::GenerateInputRequestedRegion();
-
-  for (DataObjectPointerArraySizeType pos = 0; pos < this->GetNumberOfInputs(); pos++)
+  const auto nrOfInputs = this->GetNumberOfInputs();
+  for (DataObjectPointerArraySizeType pos = 0; pos < nrOfInputs; ++pos)
   {
     this->GetInput(pos)->SetRequestedRegionToLargestPossibleRegion();
   }
 }
 
-void mitk::DynamicImageGenerationFilter::GenerateOutputInformation()
+void mitk::TemporalJoinImagesFilter::GenerateOutputInformation()
 {
   mitk::Image::ConstPointer input = this->GetInput();
   mitk::Image::Pointer output = this->GetOutput();
 
+  const auto nrOfInputs = this->GetNumberOfInputs();
   auto timeBounds = m_MaxTimeBounds;
 
   if (timeBounds.empty())
   {
-    timeBounds.resize(this->GetNumberOfInputs());
+    timeBounds.resize(nrOfInputs);
     std::iota(timeBounds.begin(), timeBounds.end(), 1.0);
   }
-  else if(timeBounds.size() != this->GetNumberOfInputs())
+  else if(timeBounds.size() != nrOfInputs)
   {
-    mitkThrow() << "User defined max time bounds do not match the number if inputs (" << this->GetNumberOfInputs() << "). Size of max timebounds is " << timeBounds.size() << ", but it should be " << this->GetNumberOfInputs() << ".";
+    mitkThrow() << "User defined max time bounds do not match the number if inputs (" << nrOfInputs << "). Size of max timebounds is " << timeBounds.size() << ", but it should be " << nrOfInputs << ".";
   }
 
   timeBounds.insert(timeBounds.begin(), m_FirstMinTimeBound);
 
   auto timeGeo = mitk::ArbitraryTimeGeometry::New();
-  timeGeo->ReserveSpaceForGeometries(this->GetNumberOfInputs());
+  timeGeo->ReserveSpaceForGeometries(nrOfInputs);
 
-  for (DataObjectPointerArraySizeType pos = 0; pos < this->GetNumberOfInputs(); pos++)
+  for (DataObjectPointerArraySizeType pos = 0; pos < nrOfInputs; ++pos)
   {
     timeGeo->AppendNewTimeStepClone(this->GetInput(pos)->GetGeometry(), timeBounds[pos], timeBounds[pos + 1]);
   }
   output->Initialize(input->GetPixelType(), *timeGeo);
 
   auto newPropList = input->GetPropertyList()->Clone();
-  for (DataObjectPointerArraySizeType pos = 1; pos < this->GetNumberOfInputs(); pos++)
+  for (DataObjectPointerArraySizeType pos = 1; pos < nrOfInputs; ++pos)
   {
     const auto otherList = this->GetInput(pos)->GetPropertyList();
     for (const auto& key : otherList->GetPropertyKeys())
@@ -95,12 +96,13 @@ void mitk::DynamicImageGenerationFilter::GenerateOutputInformation()
 }
 
 
-void mitk::DynamicImageGenerationFilter::GenerateData()
+void mitk::TemporalJoinImagesFilter::GenerateData()
 {
   mitk::Image::Pointer output = this->GetOutput();
   mitk::Image::ConstPointer refInput = this->GetInput();
+  const auto nrOfInputs = this->GetNumberOfInputs();
 
-  for (DataObjectPointerArraySizeType pos = 0; pos < this->GetNumberOfInputs(); pos++)
+  for (DataObjectPointerArraySizeType pos = 0; pos < nrOfInputs; ++pos)
   {
     if (!Equal(*(refInput->GetGeometry()), *(this->GetInput(pos)->GetGeometry()), mitk::eps, false))
     {
@@ -112,7 +114,7 @@ void mitk::DynamicImageGenerationFilter::GenerateData()
     }
   }
 
-  for (DataObjectPointerArraySizeType pos = 0; pos < this->GetNumberOfInputs(); pos++)
+  for (DataObjectPointerArraySizeType pos = 0; pos < nrOfInputs; ++pos)
   {
     mitk::ImageReadAccessor accessor(this->GetInput(pos));
     output->SetVolume(accessor.GetData(), pos);

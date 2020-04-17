@@ -136,10 +136,6 @@ public:
         m_timeGeometry->ClearAllGeometries();
     }
 
-    void CreateNodeRelationImage(mitk::BaseData::Pointer statistics, mitk::BaseData::ConstPointer image)
-    {
-        auto rule = mitk::StatisticsToImageRelationRule::New();
-        rule->Connect(statistics, image);
     }
 
     void StatisticNamesIO()

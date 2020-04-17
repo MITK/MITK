@@ -122,6 +122,7 @@ set(MODULE_TESTS
   mitkPointSetDataInteractorTest.cpp #since mitkInteractionTestHelper is currently creating a vtkRenderWindow
   mitkSurfaceVtkMapper2DTest.cpp #new rendering test in CppUnit style
   mitkSurfaceVtkMapper2D3DTest.cpp # comparisons/consistency 2D/3D
+  mitkTemporalJoinImagesFilterTest.cpp
 )
 
 # test with image filename as an extra command line parameter

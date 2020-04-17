@@ -33,6 +33,7 @@ set(CPP_FILES
   Algorithms/mitkSurfaceToSurfaceFilter.cpp
   Algorithms/mitkUIDGenerator.cpp
   Algorithms/mitkVolumeCalculator.cpp
+  Algorithms/mitkTemporalJoinImagesFilter.cpp
 
   Controllers/mitkBaseController.cpp
   Controllers/mitkCallbackFromGUIThread.cpp

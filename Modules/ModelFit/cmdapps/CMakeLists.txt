@@ -13,6 +13,7 @@ if(BUILD_ModelFitMiniApps OR MITK_BUILD_ALL_APPS)
     set( miniapps
     GenericFittingMiniApp^^
     PixelDumpMiniApp^^
+    Fuse3Dto4DImageMiniApp^^
     )
 
     foreach(miniapp ${miniapps})

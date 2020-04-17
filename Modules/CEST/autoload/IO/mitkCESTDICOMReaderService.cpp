@@ -20,6 +20,10 @@ found in the LICENSE file.
 
 #include <itkGDCMImageIO.h>
 
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
+#include <usModuleResource.h>
+
 namespace mitk
 {
   CESTDICOMReaderService::CESTDICOMReaderService()
@@ -45,6 +49,7 @@ namespace mitk
 
 
     this->SetDefaultOptions(defaultOptions);
+    this->SetOnlyRegardOwnSeries(false);
 
     this->RegisterService();
   }
@@ -53,8 +58,8 @@ namespace mitk
   {
     mitk::DICOMFileReaderSelector::Pointer selector = mitk::DICOMFileReaderSelector::New();
 
-    selector->LoadBuiltIn3DConfigs();
-    selector->LoadBuiltIn3DnTConfigs();
+    auto r = ::us::GetModuleContext()->GetModule()->GetResource("cest_DKFZ.xml");
+    selector->AddConfigFromResource(r);
     selector->SetInputFiles(relevantFiles);
 
     mitk::DICOMFileReader::Pointer reader = selector->GetFirstReaderWithMinimumNumberOfOutputImages();

@@ -48,11 +48,12 @@ mitk::ClassicDICOMSeriesReader
   this->SetFixTiltByShearing(true); // that was configurable, default was true
   this->SetToleratedOriginOffset(0.005); // was hard-coded
   this->SetGroup3DandT(true); // that was configurable, default was true
+  this->OnlyCondenseSameSeriesOff();
 
   m_EquiDistantBlocksSorter->SetAcceptTwoSlicesGroups(false); // old reader did not accept that
 
   this->SetConfigurationLabel("2013 sorting logic");
-  this->SetConfigurationDescription("Sort by Image Position, then Acquisition Number, Time, Trigger time, group by 3D+t, group tilted images");
+  this->SetConfigurationDescription("Sort by Image Position, then Acquisition Number, Time, Trigger time, group by 3D+t, group tilted images, condense blocks even if series does not match");
 }
 
 mitk::ClassicDICOMSeriesReader

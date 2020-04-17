@@ -65,13 +65,17 @@ void QmitkDicomExternalDataWidget::CreateQtPartControl(QWidget *parent)
     connect(m_ImportDialog, SIGNAL(fileSelected(QString)), this, SLOT(OnStartDicomImport(QString)));
 
     connect(m_ExternalIndexer,
-            SIGNAL(indexingFilePath(const QString &)),
-            m_ProgressDialog,
-            SLOT(setLabelText(const QString &)));
+      SIGNAL(progressStep(QString)),
+      this,
+      SLOT(OnProgressStep(const QString&)));
+    connect(m_ExternalIndexer,
+            SIGNAL(progressDetail(QString)),
+            this,
+            SLOT(OnProgressDetail(const QString &)));
     connect(m_ExternalIndexer, SIGNAL(progress(int)), m_ProgressDialog, SLOT(setValue(int)));
     // actually the progress dialog closes if the maximum value is reached, BUT
     // the following line is needed since the external indexer wont reach maximum value (100 % progress)
-    connect(m_ExternalIndexer, SIGNAL(indexingComplete()), m_ProgressDialog, SLOT(close()));
+    connect(m_ExternalIndexer, SIGNAL(indexingComplete(int, int, int, int)), m_ProgressDialog, SLOT(close()));
     connect(m_ProgressDialog, SIGNAL(canceled()), m_ExternalIndexer, SLOT(cancel()));
   }
 }
@@ -128,6 +132,17 @@ void QmitkDicomExternalDataWidget::OnViewButtonClicked()
     }
     emit SignalDicomToDataManager(eventProperty);
   }
+}
+
+void QmitkDicomExternalDataWidget::OnProgressStep(const QString& step)
+{
+  m_ProgressStep = step;
+  m_ProgressDialog->setLabelText(step);
+}
+
+void QmitkDicomExternalDataWidget::OnProgressDetail(const QString& detail)
+{
+  m_ProgressDialog->setLabelText(m_ProgressStep+"\n"+detail);
 }
 
 QStringList QmitkDicomExternalDataWidget::GetFileNamesFromIndex()

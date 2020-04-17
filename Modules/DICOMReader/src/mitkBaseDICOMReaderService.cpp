@@ -31,24 +31,36 @@ found in the LICENSE file.
 #include <itksys/SystemTools.hxx>
 #include <itksys/Directory.hxx>
 
-namespace mitk {
+namespace mitk
+{
 
   BaseDICOMReaderService::BaseDICOMReaderService(const std::string& description)
     : AbstractFileReader(CustomMimeType(IOMimeTypes::DICOM_MIMETYPE()), description)
 {
 }
 
-  BaseDICOMReaderService::BaseDICOMReaderService(const mitk::CustomMimeType& customType, const std::string& description)
-    : AbstractFileReader(customType, description)
-  {
-  }
+BaseDICOMReaderService::BaseDICOMReaderService(const mitk::CustomMimeType& customType, const std::string& description)
+  : AbstractFileReader(customType, description)
+{
+}
+
+void BaseDICOMReaderService::SetOnlyRegardOwnSeries(bool regard)
+{
+  m_OnlyRegardOwnSeries = regard;
+}
+
+bool BaseDICOMReaderService::GetOnlyRegardOwnSeries() const
+{
+  return m_OnlyRegardOwnSeries;
+}
+
 
 std::vector<itk::SmartPointer<BaseData> > BaseDICOMReaderService::Read()
 {
   std::vector<BaseData::Pointer> result;
 
 
-  std::string fileName = this->GetLocalFileName();
+  const std::string fileName = this->GetLocalFileName();
   //special handling of Philips 3D US DICOM.
   //Copied from DICOMSeriesReaderService
   if (DicomSeriesReader::IsPhilips3DDicom(fileName))
@@ -74,31 +86,7 @@ std::vector<itk::SmartPointer<BaseData> > BaseDICOMReaderService::Read()
   }
 
   //Normal DICOM handling (It wasn't a Philips 3D US)
-  mitk::StringList relevantFiles = this->GetRelevantFiles();
-
-  // check whether directory or file
-  // if directory try to find first file within it instead
-  // We only support this for a single directory at once
-  if (relevantFiles.empty())
-  {
-    bool pathIsDirectory = itksys::SystemTools::FileIsDirectory(this->GetLocalFileName());
-    if (pathIsDirectory)
-    {
-      itksys::Directory input;
-      input.Load(this->GetLocalFileName().c_str());
-
-      std::vector<std::string> files;
-      for (unsigned long idx = 0; idx<input.GetNumberOfFiles(); idx++)
-      {
-        if (!itksys::SystemTools::FileIsDirectory(input.GetFile(idx)))
-        {
-          std::string fullpath = this->GetLocalFileName() + "/" + std::string(input.GetFile(idx));
-          files.push_back(fullpath.c_str());
-        }
-      }
-      relevantFiles = files;
-    }
-  }
+  mitk::StringList relevantFiles = this->GetDICOMFilesInSameDirectory();
 
   if (relevantFiles.empty())
   {
@@ -106,7 +94,14 @@ std::vector<itk::SmartPointer<BaseData> > BaseDICOMReaderService::Read()
   }
   else
   {
-      mitk::DICOMFileReader::Pointer reader = this->GetReader(relevantFiles);
+    bool pathIsDirectory = itksys::SystemTools::FileIsDirectory(fileName);
+
+    if (!pathIsDirectory && m_OnlyRegardOwnSeries)
+    {
+      relevantFiles = mitk::FilterDICOMFilesForSameSeries(fileName, relevantFiles);
+    }
+
+    mitk::DICOMFileReader::Pointer reader = this->GetReader(relevantFiles);
 
       if(reader.IsNull())
       {
@@ -114,6 +109,23 @@ std::vector<itk::SmartPointer<BaseData> > BaseDICOMReaderService::Read()
       }
       else
       {
+        if (!pathIsDirectory)
+        { //we ensure that we only load the relevant image block files
+          const auto nrOfOutputs = reader->GetNumberOfOutputs();
+          for (unsigned int outputIndex = 0; outputIndex < nrOfOutputs; ++outputIndex)
+          {
+            const auto frameList = reader->GetOutput(outputIndex).GetImageFrameList();
+
+            auto finding = std::find_if(frameList.begin(), frameList.end(), [&](const DICOMImageFrameInfo::Pointer& frame) { return frame->Filename == fileName; });
+
+            if (finding != frameList.end())
+            { //we have the block containing the fileName -> these are the realy relevant files.
+              relevantFiles.resize(frameList.size());
+              std::transform(frameList.begin(), frameList.end(), relevantFiles.begin(), [](const DICOMImageFrameInfo::Pointer& frame) { return frame->Filename; });
+              break;
+            }
+          }
+        }
           const unsigned int ntotalfiles = relevantFiles.size();
 
           for( unsigned int i=0; i< ntotalfiles; i++)
@@ -152,7 +164,7 @@ std::vector<itk::SmartPointer<BaseData> > BaseDICOMReaderService::Read()
   return result;
 }
 
-StringList BaseDICOMReaderService::GetRelevantFiles() const
+StringList BaseDICOMReaderService::GetDICOMFilesInSameDirectory() const
 {
   std::string fileName = this->GetLocalFileName();
 

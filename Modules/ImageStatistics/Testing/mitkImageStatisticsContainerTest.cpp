@@ -29,6 +29,7 @@ class mitkImageStatisticsContainerTestSuite : public mitk::TestFixture
     MITK_TEST(InternalClone);
     MITK_TEST(StatisticNames);
     MITK_TEST(OverwriteStatistic);
+    MITK_TEST(AllStatisticNamesForContainer);
     MITK_TEST(Reset);
     CPPUNIT_TEST_SUITE_END();
 
@@ -275,13 +276,33 @@ public:
 
         CPPUNIT_ASSERT_EQUAL_MESSAGE("Statistic was overwritten.", boost::get<double>(m_StatisticsContainer->GetStatisticsForTimeStep(0).GetValueNonConverted("Test")), 4.2);
     }
+
+    void AllStatisticNamesForContainer()
+    {
+        m_StatisticsContainer->SetTimeGeometry(m_TimeGeometry);
+
+        m_StatisticsObject.AddStatistic("Test", 4.2);
+        m_StatisticsObject2.AddStatistic("Test2", 4.2);
+
+        // Setting the same statistics for different time steps will only add the statistics name once.
+        m_StatisticsContainer->SetStatisticsForTimeStep(0, m_StatisticsObject);
+        m_StatisticsContainer->SetStatisticsForTimeStep(1, m_StatisticsObject2);
+        m_StatisticsContainer->SetStatisticsForTimeStep(2, m_StatisticsObject);
+        m_StatisticsContainer->SetStatisticsForTimeStep(3, m_StatisticsObject2);
+        m_StatisticsContainer->SetStatisticsForTimeStep(4, m_StatisticsObject);
+
         std::vector<mitk::ImageStatisticsContainer::ConstPointer> containers;
 
         containers.push_back(m_StatisticsContainer.GetPointer());
+        // Trying to get AllStatisticNames for empty container does not triggers an exception.
         containers.push_back(m_StatisticsContainer2.GetPointer());
         containers.push_back(m_StatisticsContainer3.GetPointer());
 
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Estimated statistics names are not correct.", mitk::GetAllStatisticNames(containers).size(), estimatedDefaultStatisticNames.size() + 1);
+        CPPUNIT_ASSERT_NO_THROW_MESSAGE("Empty container triggered an exception.", mitk::GetAllStatisticNames(containers));
+
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Estimated statistics names are not correct.", mitk::GetAllStatisticNames(containers).size(), estimatedDefaultStatisticNames.size() + 2);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Custom statistic name was not saved correctly.", m_StatisticsContainer->GetStatisticsForTimeStep(0).HasStatistic("Test"), true);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Custom statistic name was not saved correctly.", m_StatisticsContainer->GetStatisticsForTimeStep(1).HasStatistic("Test2"), true);
     }
 
     void Reset()

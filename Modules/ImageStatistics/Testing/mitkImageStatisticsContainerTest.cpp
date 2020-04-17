@@ -209,10 +209,31 @@ public:
 
     void InternalClone()
     {
+        m_StatisticsContainer->SetTimeGeometry(m_TimeGeometry);
+
+        m_StatisticsObject.AddStatistic("Test", 4.2);
+
+        m_StatisticsContainer->SetStatisticsForTimeStep(0, m_StatisticsObject);
+        m_StatisticsContainer->SetStatisticsForTimeStep(1, m_StatisticsObject);
+        m_StatisticsContainer->SetStatisticsForTimeStep(2, m_StatisticsObject);
+        m_StatisticsContainer->SetStatisticsForTimeStep(3, m_StatisticsObject);
+        m_StatisticsContainer->SetStatisticsForTimeStep(4, m_StatisticsObject);
+
         auto clone = m_StatisticsContainer->Clone();
 
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", m_StatisticsContainer->GetGeometry(), clone->GetGeometry());
         CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", m_StatisticsContainer->GetNumberOfTimeSteps(), clone->GetNumberOfTimeSteps());
+
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", clone->TimeStepExists(0), true);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", clone->TimeStepExists(1), true);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", clone->TimeStepExists(2), true);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", clone->TimeStepExists(3), true);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", clone->TimeStepExists(4), true);
+
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", clone->GetStatisticsForTimeStep(0).HasStatistic("Test"), true);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", clone->GetStatisticsForTimeStep(1).HasStatistic("Test"), true);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", clone->GetStatisticsForTimeStep(2).HasStatistic("Test"), true);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", clone->GetStatisticsForTimeStep(3).HasStatistic("Test"), true);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Internal clone was not cloned correctly.", clone->GetStatisticsForTimeStep(4).HasStatistic("Test"), true);
     }
 
     void StatisticNames()

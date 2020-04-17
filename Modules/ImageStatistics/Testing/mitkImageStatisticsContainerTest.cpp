@@ -14,9 +14,6 @@ found in the LICENSE file.
 #include "mitkTestFixture.h"
 
 //MITK includes
-#include "mitkIOUtil.h"
-#include "mitkStandaloneDataStorage.h"
-#include "mitkStatisticsToImageRelationRule.h"
 #include "mitkArbitraryTimeGeometry.h"
 #include "mitkImageStatisticsContainerNodeHelper.h"
 #include "mitkImageStatisticsContainerManager.h"

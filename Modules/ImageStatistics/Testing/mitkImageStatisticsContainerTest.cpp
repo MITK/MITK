@@ -189,6 +189,8 @@ public:
         CPPUNIT_ASSERT_THROW_MESSAGE("Out of timeStep geometry bounds timeStep was added but no exception was thrown.", m_StatisticsContainer->SetStatisticsForTimeStep(42, m_StatisticsObject), mitk::Exception);
 
         CPPUNIT_ASSERT_EQUAL_MESSAGE("Statistics container does not contain the right amount of timeSteps.", static_cast<int> (m_StatisticsContainer->GetNumberOfTimeSteps()), 5);
+
+        CPPUNIT_ASSERT_THROW_MESSAGE("A statistic for a non existing time steps was found.", m_StatisticsContainer->GetStatisticsForTimeStep(42), mitk::Exception);
     }
 
     void PrintSelf()
@@ -278,6 +280,8 @@ public:
         CPPUNIT_ASSERT_EQUAL_MESSAGE("Estimated statistics names are not correct.", mitk::GetAllStatisticNames(containers).size(), estimatedDefaultStatisticNames.size() + 2);
         CPPUNIT_ASSERT_EQUAL_MESSAGE("Custom statistic name was not saved correctly.", m_StatisticsContainer2->GetStatisticsForTimeStep(0).HasStatistic("Test2"), true);
         CPPUNIT_ASSERT_EQUAL_MESSAGE("Custom statistic name was not saved correctly.", m_StatisticsContainer3->GetStatisticsForTimeStep(0).HasStatistic("Test3"), true);
+    }
+
     void OverwriteStatistic()
     {
         m_StatisticsContainer->SetTimeGeometry(m_TimeGeometry);

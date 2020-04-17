@@ -60,7 +60,7 @@ mitk::DICOMFilePathList mitk::FilterDICOMFilesForSameSeries(const std::string& r
 
   //use the gdcm scanner directly instead of our wrapping classes, as it is a very simple task
   //and I want to spare the indirection/overhead.
-  auto scanner = gdcm::Scanner();
+  gdcm::Scanner scanner;
 
   const gdcm::Tag seriesInstanceUIDTag(0x0020, 0x000e);
 

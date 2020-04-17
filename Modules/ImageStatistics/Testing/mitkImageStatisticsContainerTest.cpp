@@ -217,31 +217,45 @@ public:
     void StatisticNames()
     {
         m_StatisticsContainer->SetTimeGeometry(m_TimeGeometry);
+        m_StatisticsContainer2->SetTimeGeometry(m_TimeGeometry);
+        m_StatisticsContainer3->SetTimeGeometry(m_TimeGeometry);
 
         m_StatisticsObject.AddStatistic("Test", 4.2);
         m_StatisticsObject2.AddStatistic("Test2", 4.2);
         m_StatisticsObject3.AddStatistic("Test3", 4.2);
 
+        // Setting the same statistics for different time steps will only add the statistics name once.
         m_StatisticsContainer->SetStatisticsForTimeStep(0, m_StatisticsObject);
         m_StatisticsContainer->SetStatisticsForTimeStep(1, m_StatisticsObject);
         m_StatisticsContainer->SetStatisticsForTimeStep(2, m_StatisticsObject);
         m_StatisticsContainer->SetStatisticsForTimeStep(3, m_StatisticsObject);
         m_StatisticsContainer->SetStatisticsForTimeStep(4, m_StatisticsObject);
 
-        m_StatisticsContainer->SetStatisticsForTimeStep(0, m_StatisticsObject2);
-        m_StatisticsContainer->SetStatisticsForTimeStep(1, m_StatisticsObject2);
-        m_StatisticsContainer->SetStatisticsForTimeStep(2, m_StatisticsObject2);
-        m_StatisticsContainer->SetStatisticsForTimeStep(3, m_StatisticsObject2);
-        m_StatisticsContainer->SetStatisticsForTimeStep(4, m_StatisticsObject2);
+        // Setting the same statistics for different time steps will only add the statistics name once.
+        m_StatisticsContainer2->SetStatisticsForTimeStep(0, m_StatisticsObject2);
+        m_StatisticsContainer2->SetStatisticsForTimeStep(1, m_StatisticsObject2);
+        m_StatisticsContainer2->SetStatisticsForTimeStep(2, m_StatisticsObject2);
+        m_StatisticsContainer2->SetStatisticsForTimeStep(3, m_StatisticsObject2);
+        m_StatisticsContainer2->SetStatisticsForTimeStep(4, m_StatisticsObject2);
 
-        m_StatisticsContainer->SetStatisticsForTimeStep(0, m_StatisticsObject3);
-        m_StatisticsContainer->SetStatisticsForTimeStep(1, m_StatisticsObject3);
-        m_StatisticsContainer->SetStatisticsForTimeStep(2, m_StatisticsObject3);
-        m_StatisticsContainer->SetStatisticsForTimeStep(3, m_StatisticsObject3);
-        m_StatisticsContainer->SetStatisticsForTimeStep(4, m_StatisticsObject3);
+        // Setting the same statistics for different time steps will only add the statistics name once.
+        m_StatisticsContainer3->SetStatisticsForTimeStep(0, m_StatisticsObject3);
+        m_StatisticsContainer3->SetStatisticsForTimeStep(1, m_StatisticsObject3);
+        m_StatisticsContainer3->SetStatisticsForTimeStep(2, m_StatisticsObject3);
+        m_StatisticsContainer3->SetStatisticsForTimeStep(3, m_StatisticsObject3);
+        m_StatisticsContainer3->SetStatisticsForTimeStep(4, m_StatisticsObject3);
 
         CPPUNIT_ASSERT_EQUAL_MESSAGE("Estimated statistics names are not correct.", mitk::GetAllStatisticNames(m_StatisticsContainer).size(), estimatedDefaultStatisticNames.size() + 1);
-        
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Custom statistic name was not saved correctly.", m_StatisticsContainer->GetStatisticsForTimeStep(0).HasStatistic("Test"), true);
+
+        std::vector<mitk::ImageStatisticsContainer::ConstPointer> containers;
+
+        containers.push_back(m_StatisticsContainer2.GetPointer());
+        containers.push_back(m_StatisticsContainer3.GetPointer());
+
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Estimated statistics names are not correct.", mitk::GetAllStatisticNames(containers).size(), estimatedDefaultStatisticNames.size() + 2);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Custom statistic name was not saved correctly.", m_StatisticsContainer2->GetStatisticsForTimeStep(0).HasStatistic("Test2"), true);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Custom statistic name was not saved correctly.", m_StatisticsContainer3->GetStatisticsForTimeStep(0).HasStatistic("Test3"), true);
     void OverwriteStatistic()
     {
         m_StatisticsContainer->SetTimeGeometry(m_TimeGeometry);

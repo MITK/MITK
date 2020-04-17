@@ -202,10 +202,8 @@ public:
         m_StatisticsContainer->SetStatisticsForTimeStep(3, m_StatisticsObject);
         m_StatisticsContainer->SetStatisticsForTimeStep(4, m_StatisticsObject);
 
-        std::stringstream print;
-        m_StatisticsContainer->Print(print);
-        
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Data was changed.", static_cast<int> (print.str().length()), 1237);
+        std::stringstream print;       
+        CPPUNIT_ASSERT_NO_THROW_MESSAGE("Print function throws an exception.", m_StatisticsContainer->Print(print));
     }
 
     void InternalClone()

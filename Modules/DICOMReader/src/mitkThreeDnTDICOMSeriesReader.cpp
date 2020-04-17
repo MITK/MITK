@@ -16,14 +16,14 @@ found in the LICENSE file.
 mitk::ThreeDnTDICOMSeriesReader
 ::ThreeDnTDICOMSeriesReader(unsigned int decimalPlacesForOrientation)
 :DICOMITKSeriesGDCMReader(decimalPlacesForOrientation)
-,m_Group3DandT(m_DefaultGroup3DandT)
+,m_Group3DandT(m_DefaultGroup3DandT), m_OnlyCondenseSameSeries(m_DefaultOnlyCondenseSameSeries)
 {
 }
 
 mitk::ThreeDnTDICOMSeriesReader
 ::ThreeDnTDICOMSeriesReader(const ThreeDnTDICOMSeriesReader& other )
 :DICOMITKSeriesGDCMReader(other)
-,m_Group3DandT(m_DefaultGroup3DandT)
+,m_Group3DandT(m_DefaultGroup3DandT), m_OnlyCondenseSameSeries(m_DefaultOnlyCondenseSameSeries)
 {
 }
 
@@ -125,7 +125,7 @@ mitk::ThreeDnTDICOMSeriesReader
       // add matching blocks to current3DnTBlock
       // keep other blocks for later
       if (   otherBlockNumberOfSlices == currentBlockNumberOfSlices
-          && otherBlockSeriesInstanceUID == currentBlockSeriesInstanceUID
+          && (!m_OnlyCondenseSameSeries || otherBlockSeriesInstanceUID == currentBlockSeriesInstanceUID)
           && otherBlockFirstOrigin == currentBlockFirstOrigin
           && otherBlockLastOrigin == currentBlockLastOrigin
           )

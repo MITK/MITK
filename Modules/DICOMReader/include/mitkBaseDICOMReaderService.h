@@ -46,6 +46,16 @@ protected:
   /** Returns the reader instance that should be used. The descission may be based
    * one the passed relevant file list.*/
   virtual mitk::DICOMFileReader::Pointer GetReader(const mitk::StringList& relevantFiles) const = 0;
+
+  void SetOnlyRegardOwnSeries(bool);
+  bool GetOnlyRegardOwnSeries() const;
+
+private:
+  /** Flags that constrols if the read() operation should only regard DICOM files of the same series
+  if the specified GetLocalFileName() is a file. If it is a director, this flag has no impact (it is
+  assumed false then).
+  */
+  bool m_OnlyRegardOwnSeries = true;
 };
 
 

@@ -51,6 +51,10 @@ class MITKDICOMREADER_EXPORT ThreeDnTDICOMSeriesReader : public DICOMITKSeriesGD
     void SetGroup3DandT(bool on);
     bool GetGroup3DandT() const;
 
+    itkBooleanMacro(OnlyCondenseSameSeries);
+    itkSetMacro(OnlyCondenseSameSeries, bool);
+    itkGetConstMacro(OnlyCondenseSameSeries, bool);
+
     // void AllocateOutputImages();
     /// \brief Load via multiple calls to itk::ImageSeriesReader.
     bool LoadImages() override;
@@ -60,6 +64,10 @@ class MITKDICOMREADER_EXPORT ThreeDnTDICOMSeriesReader : public DICOMITKSeriesGD
     static bool GetDefaultGroup3DandT()
     {
       return m_DefaultGroup3DandT;
+    }
+    static bool GetDefaultOnlyCondenseSameSeries()
+    {
+      return m_DefaultOnlyCondenseSameSeries;
     }
 
   protected:
@@ -80,8 +88,10 @@ class MITKDICOMREADER_EXPORT ThreeDnTDICOMSeriesReader : public DICOMITKSeriesGD
     bool LoadMitkImageForImageBlockDescriptor(DICOMImageBlockDescriptor& block) const override;
 
     bool m_Group3DandT;
+    bool m_OnlyCondenseSameSeries;
 
     const static bool m_DefaultGroup3DandT = true;
+    const static bool m_DefaultOnlyCondenseSameSeries = true;
 };
 
 }

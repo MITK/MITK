@@ -60,20 +60,20 @@ mitk::DICOMFilePathList mitk::FilterDICOMFilesForSameSeries(const std::string& r
 
   //use the gdcm scanner directly instead of our wrapping classes, as it is a very simple task
   //and I want to spare the indirection/overhead.
-  auto scanner = std::make_shared<gdcm::Scanner>();
+  auto scanner = gdcm::Scanner();
 
   const gdcm::Tag seriesInstanceUIDTag(0x0020, 0x000e);
 
-  scanner->AddTag(seriesInstanceUIDTag); //Series Instance UID;
+  scanner.AddTag(seriesInstanceUIDTag); //Series Instance UID;
 
-  scanner->Scan({ refFilePath });
-  auto uid = scanner->GetValue(refFilePath.c_str(), seriesInstanceUIDTag);
+  scanner.Scan({ refFilePath });
+  auto uid = scanner.GetValue(refFilePath.c_str(), seriesInstanceUIDTag);
   
   if (uid != nullptr)
   {
     const std::string refUID = uid;
-    scanner->Scan(dicomFiles);
-    return scanner->GetAllFilenamesFromTagToValue(seriesInstanceUIDTag, refUID.c_str());
+    scanner.Scan(dicomFiles);
+    return scanner.GetAllFilenamesFromTagToValue(seriesInstanceUIDTag, refUID.c_str());
   }
 
   return mitk::DICOMFilePathList();

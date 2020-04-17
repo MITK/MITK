@@ -54,6 +54,9 @@ class MITKDICOMREADER_EXPORT DICOMFileReaderSelector : public itk::LightObject
     /// \brief Add a configuration as expected by DICOMReaderConfigurator.
     /// Configs can only be reset by instantiating a new DICOMFileReaderSelector.
     void AddConfigFile(const std::string& filename);
+    /// \brief Add a configuration that is stored in the passed us::ModuleResourse.
+    /// Configs can only be reset by instantiating a new DICOMFileReaderSelector.
+    void AddConfigFromResource(us::ModuleResource& resource);
 
     /// \brief Add a whole pre-configured reader to the selection process.
     void AddFileReaderCanditate(DICOMFileReader::Pointer reader);
@@ -85,7 +88,6 @@ class MITKDICOMREADER_EXPORT DICOMFileReaderSelector : public itk::LightObject
 
     void AddConfigsFromResources(const std::string& path);
     void AddConfigFromResource(const std::string& resourcename);
-    void AddConfigFromResource(us::ModuleResource& resource);
 
   private:
 

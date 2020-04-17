@@ -176,6 +176,11 @@ mitk::DICOMReaderConfigurator
   bool group3DnT = QueryBooleanAttribute(element, "group3DnT", ThreeDnTDICOMSeriesReader::GetDefaultGroup3DandT());
 
   reader->SetGroup3DandT( group3DnT );
+
+  // add the "onlyCondenseSameSeries" flag
+  bool onlyCondenseSameSeries = QueryBooleanAttribute(element, "onlyCondenseSameSeries", ThreeDnTDICOMSeriesReader::GetDefaultOnlyCondenseSameSeries());
+
+  reader->SetOnlyCondenseSameSeries(onlyCondenseSameSeries);
 }
 
 mitk::ThreeDnTDICOMSeriesReader::Pointer

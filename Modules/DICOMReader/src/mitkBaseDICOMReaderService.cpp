@@ -31,17 +31,29 @@ found in the LICENSE file.
 #include <itksys/SystemTools.hxx>
 #include <itksys/Directory.hxx>
 
-namespace mitk {
+namespace mitk
+{
 
   BaseDICOMReaderService::BaseDICOMReaderService(const std::string& description)
     : AbstractFileReader(CustomMimeType(IOMimeTypes::DICOM_MIMETYPE()), description)
 {
 }
 
-  BaseDICOMReaderService::BaseDICOMReaderService(const mitk::CustomMimeType& customType, const std::string& description)
-    : AbstractFileReader(customType, description)
-  {
-  }
+BaseDICOMReaderService::BaseDICOMReaderService(const mitk::CustomMimeType& customType, const std::string& description)
+  : AbstractFileReader(customType, description)
+{
+}
+
+void BaseDICOMReaderService::SetOnlyRegardOwnSeries(bool regard)
+{
+  m_OnlyRegardOwnSeries = regard;
+}
+
+bool BaseDICOMReaderService::GetOnlyRegardOwnSeries() const
+{
+  return m_OnlyRegardOwnSeries;
+}
+
 
 std::vector<itk::SmartPointer<BaseData> > BaseDICOMReaderService::Read()
 {
@@ -84,7 +96,7 @@ std::vector<itk::SmartPointer<BaseData> > BaseDICOMReaderService::Read()
   {
     bool pathIsDirectory = itksys::SystemTools::FileIsDirectory(fileName);
 
-    if (!pathIsDirectory)
+    if (!pathIsDirectory && m_OnlyRegardOwnSeries)
     {
       relevantFiles = mitk::FilterDICOMFilesForSameSeries(fileName, relevantFiles);
     }
@@ -99,7 +111,8 @@ std::vector<itk::SmartPointer<BaseData> > BaseDICOMReaderService::Read()
       {
         if (!pathIsDirectory)
         { //we ensure that we only load the relevant image block files
-          for (unsigned int outputIndex = 0; outputIndex < reader->GetNumberOfOutputs(); ++outputIndex)
+          const auto nrOfOutputs = reader->GetNumberOfOutputs();
+          for (unsigned int outputIndex = 0; outputIndex < nrOfOutputs; ++outputIndex)
           {
             const auto frameList = reader->GetOutput(outputIndex).GetImageFrameList();
 

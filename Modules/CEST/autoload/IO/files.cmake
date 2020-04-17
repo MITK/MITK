@@ -4,3 +4,6 @@ set(CPP_FILES
   mitkCESTIOActivator.cpp
 )
 
+set(RESOURCE_FILES
+  cest_DKFZ.xml
+)

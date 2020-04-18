@@ -25,6 +25,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIPropertyAliases.h>
 #include <mitkIPropertyDescriptions.h>
 #include <mitkIPropertyPersistence.h>
+#include <mitkImage.h>
+#include <mitkCoreServices.h>
+#include <mitkPropertyFilter.h>
+#include <mitkPropertyFilters.h>
 #include <QmitkRenderWindow.h>
 #include <QPainter>
 #include <memory>
@@ -380,6 +384,27 @@ void QmitkPropertyTreeView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, c
     else
     {
       propertyList = m_SelectedNode->GetPropertyList(m_Renderer);
+    }
+
+    auto propertyFilters = mitk::CoreServices::GetPropertyFilters();
+    if (propertyFilters) {
+      propertyFilters->RemoveFilter();
+
+      auto image = dynamic_cast<mitk::Image*>(m_SelectedNode->GetData());
+      if (image && image->GetLargestPossibleRegion().GetSize()[2] < 10) {
+        mitk::PropertyFilter filter;
+        std::vector<std::string> blackList = {
+          "volumerendering", "volumerendering.usegpu", "volumerendering.uselod", "volumerendering.usemip", "volumerendering.useray",
+          "volumerendering.cpu.diffuse", "volumerendering.cpu.specular", "volumerendering.cpu.specular.power", "volumerendering.cpu.ambient",
+          "volumerendering.gpu.ambient", "volumerendering.gpu.diffuse", "volumerendering.gpu.reducesliceartifacts", "volumerendering.gpu.specular",
+          "volumerendering.gpu.specular.power", "volumerendering.gpu.usetexturecompression",
+          "volumerendering.ray.ambient", "volumerendering.ray.diffuse", "volumerendering.ray.specular", "volumerendering.ray.specular.power"
+        };
+        for (auto &property : blackList) {
+          filter.AddEntry(property, mitk::PropertyFilter::Blacklist);
+        }
+        propertyFilters->AddFilter(filter);
+      }
     }
 
     m_Model->SetPropertyList(propertyList, selectionClassName);

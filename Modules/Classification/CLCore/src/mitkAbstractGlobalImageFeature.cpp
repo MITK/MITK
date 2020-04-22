@@ -16,6 +16,33 @@ found in the LICENSE file.
 #include <mitkITKImageImport.h>
 #include <iterator>
 
+
+bool mitk::FeatureID::operator < (const FeatureID& rh) const
+{
+  if (this->featureClass < rh.featureClass) return true;
+  if (this->featureClass == rh.featureClass)
+  {
+    if (this->name < rh.name) return true;
+    if (this->name == rh.name && this->settingID < rh.settingID) return true;
+  }
+  return false;
+}
+
+bool mitk::FeatureID::operator ==(const FeatureID& rh) const
+{
+  if (this->name != rh.name) return false;
+  if (this->settingID != rh.settingID) return false;
+  if (this->featureClass != rh.featureClass) return false;
+  return true;
+}
+
+mitk::FeatureID mitk::CreateFeatureID(FeatureID templateID, std::string name)
+{
+  auto newID = templateID;
+  newID.name = name;
+  return newID;
+}
+
 static void
 ExtractSlicesFromImages(mitk::Image::Pointer image, mitk::Image::Pointer mask,
   int direction,
@@ -112,9 +139,6 @@ ExtractSlicesFromImages(mitk::Image::Pointer image, mitk::Image::Pointer mask,
   }
 }
 
-
-
-
 std::vector<double> mitk::AbstractGlobalImageFeature::SplitDouble(std::string str, char delimiter) {
   std::vector<double> internal;
   std::stringstream ss(str); // Turn the string into a stream.
@@ -129,7 +153,19 @@ std::vector<double> mitk::AbstractGlobalImageFeature::SplitDouble(std::string st
   return internal;
 }
 
-void  mitk::AbstractGlobalImageFeature::AddQuantifierArguments(mitkCommandLineParser &parser)
+void  mitk::AbstractGlobalImageFeature::AddArguments(mitkCommandLineParser& parser) const
+{
+  this->AddQuantifierArguments(parser);
+  this->DoAddArguments(parser);
+}
+
+void  mitk::AbstractGlobalImageFeature::DoAddArguments(mitkCommandLineParser& parser) const
+{
+  //Default implementation does nothing.
+  //Override to change behavior.
+}
+
+void  mitk::AbstractGlobalImageFeature::AddQuantifierArguments(mitkCommandLineParser &parser) const
 {
   std::string name = GetOptionPrefix();
 
@@ -139,17 +175,16 @@ void  mitk::AbstractGlobalImageFeature::AddQuantifierArguments(mitkCommandLinePa
   parser.addArgument(name + "::binsize", name + "::binsize", mitkCommandLineParser::Float, "Binsize", "Define the size of the used bins", us::Any());
   parser.addArgument(name + "::ignore-global-histogram", name + "::ignore-global-histogram", mitkCommandLineParser::Bool, "Ignore the global histogram Parameters", "Ignores the global histogram parameters", us::Any());
   parser.addArgument(name + "::ignore-mask-for-histogram", name + "::ignore-mask", mitkCommandLineParser::Bool, "Ignore the global histogram Parameters", "Ignores the global histogram parameters", us::Any());
-
 }
 
-void  mitk::AbstractGlobalImageFeature::InitializeQuantifierFromParameters(const Image::Pointer & feature, const Image::Pointer &mask, unsigned int defaultBins)
+void  mitk::AbstractGlobalImageFeature::ConfigureQuantifierSettingsByParameters()
 {
   unsigned int bins = 0;
   double binsize = 0;
   double minimum = 0;
   double maximum = 0;
 
-  auto parsedArgs = GetParameter();
+  auto parsedArgs = GetParameters();
   std::string name = GetOptionPrefix();
 
   bool useGlobal = true;
@@ -222,10 +257,15 @@ void  mitk::AbstractGlobalImageFeature::InitializeQuantifierFromParameters(const
     SetBinsize(binsize);
     SetUseBinsize(true);
   }
-  InitializeQuantifier(feature, mask, defaultBins);
 }
 
-void  mitk::AbstractGlobalImageFeature::InitializeQuantifier(const Image::Pointer & feature, const Image::Pointer &mask, unsigned int defaultBins)
+void mitk::AbstractGlobalImageFeature::ConfigureSettingsByParameters(const ParametersType& parameters)
+{
+  //Default implementation does nothing.
+  //Override to change behavior.
+}
+
+void  mitk::AbstractGlobalImageFeature::InitializeQuantifier(const Image* feature, const Image* mask, unsigned int defaultBins)
 {
   m_Quantifier = IntensityQuantifier::New();
   if (GetUseMinimumIntensity() && GetUseMaximumIntensity() && GetUseBinsize())
@@ -269,25 +309,32 @@ void  mitk::AbstractGlobalImageFeature::InitializeQuantifier(const Image::Pointe
     m_Quantifier->InitializeByImageRegion(feature, mask, defaultBins);
 }
 
-std::string mitk::AbstractGlobalImageFeature::GetCurrentFeatureEncoding()
-{
-  return "";
-}
-
-std::string mitk::AbstractGlobalImageFeature::FeatureDescriptionPrefix()
+std::string mitk::AbstractGlobalImageFeature::GenerateLegacyFeatureName(const FeatureID& id) const
 {
   std::string output;
   output = m_FeatureClassName + "::";
-  if (m_EncodeParameters)
+  if (m_EncodeParametersInFeaturePrefix)
   {
-    output += GetCurrentFeatureEncoding() + "::";
+    output += this->GenerateLegacyFeatureEncoding(id) + "::";
   }
-  return output;
+
+  return output + this->GenerateLegacyFeatureNamePart(id);
+};
+
+std::string mitk::AbstractGlobalImageFeature::GenerateLegacyFeatureNamePart(const FeatureID& id) const
+{
+  return id.name;
 }
 
-std::string mitk::AbstractGlobalImageFeature::QuantifierParameterString()
+std::string mitk::AbstractGlobalImageFeature::GenerateLegacyFeatureEncoding(const FeatureID& id) const
+{
+  return this->QuantifierParameterString();
+}
+
+std::string mitk::AbstractGlobalImageFeature::QuantifierParameterString() const
 {
   std::stringstream ss;
+  ss.imbue(std::locale("c"));
   if (GetUseMinimumIntensity() && GetUseMaximumIntensity() && GetUseBinsize())
     ss << "Min-" << GetMinimumIntensity() << "_Max-" << GetMaximumIntensity() << "_BS-" << GetBinsize();
   else if (GetUseMinimumIntensity() && GetUseBins() && GetUseBinsize())
@@ -330,12 +377,41 @@ std::string mitk::AbstractGlobalImageFeature::QuantifierParameterString()
   return ss.str();
 }
 
-
-void mitk::AbstractGlobalImageFeature::CalculateFeaturesSliceWiseUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, int sliceID, FeatureListType &featureList)
+mitk::FeatureID mitk::AbstractGlobalImageFeature::CreateTemplateFeatureID(std::string settingsSuffix, FeatureID::ParametersType additionalParams)
 {
-  m_CalculateWithParameter = true;
-  auto result = CalculateFeaturesSlicewise(feature, mask, sliceID);
-  featureList.insert(featureList.end(), result.begin(), result.end());
+  FeatureID newID;
+  newID.featureClass = this->GetFeatureClassName();
+  newID.settingID = this->GetShortName();
+  if (!settingsSuffix.empty())
+  {
+    newID.settingID += "_" + settingsSuffix;
+  }
+
+  std::string name = this->GetOptionPrefix();
+  for (const auto& paramIter : m_Parameters)
+  {
+    if (paramIter.first.find(name) == 0)
+    {
+      newID.parameters.insert(std::make_pair(paramIter.first, paramIter.second));
+    }
+  }
+
+  for (const auto& paramIter : additionalParams)
+  {
+    newID.parameters.insert(std::make_pair(paramIter.first, paramIter.second));
+  }
+  return newID;
+}
+
+void mitk::AbstractGlobalImageFeature::CalculateAndAppendFeaturesSliceWise(const Image::Pointer & feature, const Image::Pointer &mask, int sliceID, FeatureListType &featureList, bool checkParameterActivation)
+{
+  auto parsedArgs = GetParameters();
+
+  if (!checkParameterActivation || parsedArgs.count(GetLongName()))
+  {
+    auto result = CalculateFeaturesSlicewise(feature, mask, sliceID);
+    featureList.insert(featureList.end(), result.begin(), result.end());
+  }
 }
 
 mitk::AbstractGlobalImageFeature::FeatureListType mitk::AbstractGlobalImageFeature::CalculateFeaturesSlicewise(const Image::Pointer & feature, const Image::Pointer &mask, int sliceID)
@@ -348,17 +424,8 @@ mitk::AbstractGlobalImageFeature::FeatureListType mitk::AbstractGlobalImageFeatu
 
   for (std::size_t index = 0; index < imageVector.size(); ++index)
   {
-    if (m_CalculateWithParameter)
-    {
-      FeatureListType stat;
-      this->CalculateFeaturesUsingParameters(imageVector[index], maskVector[index], maskVector[index], stat);
-      statVector.push_back(stat);
-    }
-    else
-    {
-      auto stat = this->CalculateFeatures(imageVector[index], maskVector[index]);
-      statVector.push_back(stat);
-    }
+    auto stat = this->CalculateFeatures(imageVector[index], maskVector[index]);
+    statVector.push_back(stat);
   }
 
   if (statVector.size() < 1)
@@ -368,10 +435,12 @@ mitk::AbstractGlobalImageFeature::FeatureListType mitk::AbstractGlobalImageFeatu
   for (std::size_t i = 0; i < statVector[0].size(); ++i)
   {
     auto cElement1 = statVector[0][i];
-    cElement1.first = "SliceWise Mean " + cElement1.first;
+    cElement1.first.name = "SliceWise Mean " + cElement1.first.name;
+    cElement1.first.legacyName = this->GenerateLegacyFeatureName(cElement1.first);
     cElement1.second = 0.0;
     auto cElement2 = statVector[0][i];
-    cElement2.first = "SliceWise Var. " + cElement2.first;
+    cElement2.first.name = "SliceWise Var. " + cElement2.first.name;
+    cElement2.first.legacyName = this->GenerateLegacyFeatureName(cElement2.first);
     cElement2.second = 0.0;
     statMean.push_back(cElement1);
     statStd.push_back(cElement2);
@@ -398,5 +467,29 @@ mitk::AbstractGlobalImageFeature::FeatureListType mitk::AbstractGlobalImageFeatu
   }
   std::copy(statMean.begin(), statMean.end(), std::back_inserter(result));
   std::copy(statStd.begin(), statStd.end(), std::back_inserter(result));
+  return result;
+}
+
+void mitk::AbstractGlobalImageFeature::CalculateAndAppendFeatures(const Image* feature, const Image* mask, const Image* maskNoNAN, FeatureListType& featureList, bool checkParameterActivation)
+{
+  auto parsedArgs = GetParameters();
+
+  if (!checkParameterActivation || parsedArgs.count(GetLongName()))
+  {
+    auto result = CalculateFeatures(feature, mask, maskNoNAN);
+    featureList.insert(featureList.end(), result.begin(), result.end());
+  }
+}
+
+mitk::AbstractGlobalImageFeature::FeatureListType mitk::AbstractGlobalImageFeature::CalculateFeatures(const Image* feature, const Image* mask)
+{
+  auto result = this->DoCalculateFeatures(feature, mask);
+
+  //ensure legacy names
+  for (auto& feature : result)
+  {
+    feature.first.legacyName = this->GenerateLegacyFeatureName(feature.first);
+  }
+
   return result;
 }

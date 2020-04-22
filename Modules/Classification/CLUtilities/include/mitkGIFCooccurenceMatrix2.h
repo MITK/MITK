@@ -138,36 +138,23 @@ namespace mitk
 
       GIFCooccurenceMatrix2();
 
-      /**
-      * \brief Calculates the Cooccurence-Matrix based features for this class.
-      */
-      FeatureListType CalculateFeatures(const Image::Pointer & image, const Image::Pointer &feature) override;
+      FeatureListType CalculateFeatures(const Image* image, const Image* mask, const Image* maskNoNAN) override;
 
-      /**
-      * \brief Returns a list of the names of all features that are calculated from this class
-      */
-      FeatureNameListType GetFeatureNames() override;
+      itkGetConstMacro(Ranges, std::vector<double>);
+      void SetRanges(std::vector<double> ranges);
+      void SetRange(double range);
 
-      void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList) override;
-      void AddArguments(mitkCommandLineParser &parser) override;
-      std::string GetCurrentFeatureEncoding() override;
+  protected:
+    void DoAddArguments(mitkCommandLineParser& parser) const override;
 
-      itkGetConstMacro(Range,double);
-      itkSetMacro(Range, double);
+    std::string GenerateLegacyFeatureEncoding(const FeatureID& id) const override;
 
-    struct GIFCooccurenceMatrix2Configuration
-    {
-      double range;
-      unsigned int direction;
+    FeatureListType DoCalculateFeatures(const Image* image, const Image* mask) override;
 
-      double MinimumIntensity;
-      double MaximumIntensity;
-      int Bins;
-      std::string prefix;
-    };
+    void ConfigureSettingsByParameters(const ParametersType& parameters) override;
 
     private:
-      double m_Range;
+      std::vector<double> m_Ranges;
   };
 
 }

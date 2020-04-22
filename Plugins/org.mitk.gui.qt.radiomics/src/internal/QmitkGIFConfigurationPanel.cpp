@@ -191,7 +191,7 @@ mitkUI::GIFConfigurationPanel::CalculateFeaturesUsingParameters(const mitk::Imag
     {
       MITK_INFO << item.first << " : " << item.second.ToString();
     }
-    tmpCalc->SetParameter(parameter);
+    tmpCalc->SetParameters(parameter);
     bool calculateSliceWise = false;
     int slice = 0;
     if (parameter.count("slice-wise"))

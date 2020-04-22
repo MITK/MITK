@@ -137,7 +137,7 @@ void mitk::cl::FeatureResultWritter::AddResult(std::string desc, int slice, mitk
       {
         AddColumn(slice);
       }
-      AddColumn(m_SubjectInformation + stats[i].first);
+      AddColumn(m_SubjectInformation + stats[i].first.legacyName);
       AddColumn(stats[i].second);
       NewRow("");
       ++m_CurrentElement;
@@ -177,7 +177,7 @@ void mitk::cl::FeatureResultWritter::AddHeader(std::string, int slice, mitk::Abs
     }
     for (std::size_t i = 0; i < stats.size(); ++i)
     {
-      AddColumn(stats[i].first);
+      AddColumn(stats[i].first.legacyName);
     }
     NewRow("EndOfMeasurement");
   }

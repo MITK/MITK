@@ -398,7 +398,7 @@ mitk::FeatureID mitk::AbstractGlobalImageFeature::CreateTemplateFeatureID(std::s
 
   for (const auto& paramIter : additionalParams)
   {
-    newID.parameters.insert(std::make_pair(paramIter.first, paramIter.second));
+    newID.parameters[paramIter.first] = paramIter.second;
   }
   return newID;
 }

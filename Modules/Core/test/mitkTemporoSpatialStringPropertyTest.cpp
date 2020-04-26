@@ -69,6 +69,20 @@ public:
     CPPUNIT_ASSERT(refProp->GetAvailableTimeSteps()[1] == 3);
     CPPUNIT_ASSERT(refProp->GetAvailableTimeSteps()[2] == 6);
 
+    CPPUNIT_ASSERT(refProp->GetAvailableTimeSteps(0).size() == 2);
+    CPPUNIT_ASSERT(refProp->GetAvailableTimeSteps(0)[0] == 0);
+    CPPUNIT_ASSERT(refProp->GetAvailableTimeSteps(0)[1] == 3);
+
+    CPPUNIT_ASSERT(refProp->GetAvailableTimeSteps(1).size() == 1);
+    CPPUNIT_ASSERT(refProp->GetAvailableTimeSteps(1)[0] == 6);
+
+    CPPUNIT_ASSERT(refProp->GetAvailableTimeSteps(5).size() == 0);
+
+    CPPUNIT_ASSERT(refProp->GetAvailableSlices().size() == 3);
+    CPPUNIT_ASSERT(refProp->GetAvailableSlices()[0] == 0);
+    CPPUNIT_ASSERT(refProp->GetAvailableSlices()[1] == 1);
+    CPPUNIT_ASSERT(refProp->GetAvailableSlices()[2] == 2);
+
     CPPUNIT_ASSERT(refProp->GetAvailableSlices(0).size() == 1);
     CPPUNIT_ASSERT(refProp->GetAvailableSlices(0)[0] == 0);
     CPPUNIT_ASSERT(refProp->GetAvailableSlices(3).size() == 2);

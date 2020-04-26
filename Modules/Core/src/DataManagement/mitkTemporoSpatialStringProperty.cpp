@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <iterator>
+#include <set>
 
 #include "mitkTemporoSpatialStringProperty.h"
 
@@ -162,6 +163,21 @@ bool mitk::TemporoSpatialStringProperty::HasValueByTimeStep(const TimeStepType &
   return HasValue(timeStep, 0, allowClose, true);
 };
 
+std::vector<mitk::TemporoSpatialStringProperty::IndexValueType> mitk::TemporoSpatialStringProperty::GetAvailableSlices() const
+{
+  std::set<IndexValueType> uniqueSlices;
+
+  for (const auto& timeStep : m_Values)
+  {
+    for (const auto& slice : timeStep.second)
+    {
+      uniqueSlices.insert(slice.first);
+    }
+  }
+
+  return std::vector<IndexValueType>(std::begin(uniqueSlices), std::end(uniqueSlices));
+}
+
 std::vector<mitk::TemporoSpatialStringProperty::IndexValueType> mitk::TemporoSpatialStringProperty::GetAvailableSlices(
   const TimeStepType &timeStep) const
 {
@@ -192,6 +208,21 @@ std::vector<mitk::TimeStepType> mitk::TemporoSpatialStringProperty::GetAvailable
 
   return result;
 };
+
+std::vector<mitk::TimeStepType> mitk::TemporoSpatialStringProperty::GetAvailableTimeSteps(const IndexValueType& slice) const
+{
+  std::vector<mitk::TimeStepType> result;
+
+  for (const auto& timeStep : m_Values)
+  {
+    if (timeStep.second.find(slice) != std::end(timeStep.second))
+    {
+      result.push_back(timeStep.first);
+    }
+  }
+  return result;
+}
+
 
 void mitk::TemporoSpatialStringProperty::SetValue(const TimeStepType &timeStep,
                                                   const IndexValueType &zSlice,

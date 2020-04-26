@@ -195,6 +195,11 @@ public:
 
     void PrintSelf()
     {
+        std::stringstream print;
+
+        // Check print function for empty container
+        CPPUNIT_ASSERT_NO_THROW_MESSAGE("Print function throws an exception.", m_StatisticsContainer->Print(print));
+
         m_StatisticsContainer->SetTimeGeometry(m_TimeGeometry);
 
         m_StatisticsObject.AddStatistic("Test", 4.2);
@@ -205,7 +210,7 @@ public:
         m_StatisticsContainer->SetStatisticsForTimeStep(3, m_StatisticsObject);
         m_StatisticsContainer->SetStatisticsForTimeStep(4, m_StatisticsObject);
 
-        std::stringstream print;       
+        // Check print function for filled container
         CPPUNIT_ASSERT_NO_THROW_MESSAGE("Print function throws an exception.", m_StatisticsContainer->Print(print));
     }
 

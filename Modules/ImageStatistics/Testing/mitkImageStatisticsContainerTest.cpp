@@ -323,12 +323,15 @@ public:
 
         std::vector<mitk::ImageStatisticsContainer::ConstPointer> containers;
 
-        containers.push_back(m_StatisticsContainer.GetPointer());
         // Trying to get AllStatisticNames for empty container does not triggers an exception.
         containers.push_back(m_StatisticsContainer2.GetPointer());
         containers.push_back(m_StatisticsContainer3.GetPointer());
 
+        // First checking if empty containers would trigger an exception.
         CPPUNIT_ASSERT_NO_THROW_MESSAGE("Empty container triggered an exception.", mitk::GetAllStatisticNames(containers));
+
+        // Adding filled container to check if data was saved correctly.
+        containers.push_back(m_StatisticsContainer.GetPointer());
 
         CPPUNIT_ASSERT_EQUAL_MESSAGE("Estimated statistics names are not correct.", mitk::GetAllStatisticNames(containers).size(), estimatedDefaultStatisticNames.size() + 2);
         CPPUNIT_ASSERT_EQUAL_MESSAGE("Custom statistic name was not saved correctly.", m_StatisticsContainer->GetStatisticsForTimeStep(0).HasStatistic("Test"), true);

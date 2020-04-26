@@ -14,13 +14,6 @@ found in the LICENSE file.
 
 #include "mitkTemporoSpatialStringProperty.h"
 
-#ifdef _MSC_VER
-// has to be deactivated because of a bug in boost v1.59. see Boost bug ticket #11599
-// as soon as MITK uses a boost version with a bug fix we can remove the disableling.
-#pragma warning(push)
-#pragma warning(disable : 4715)
-#endif
-
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/type_traits/make_unsigned.hpp>
@@ -358,7 +351,3 @@ mitk::BaseProperty::Pointer mitk::PropertyPersistenceDeserialization::deserializ
 
   return prop.GetPointer();
 }
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif

@@ -327,17 +327,74 @@ std::basic_string<Ch> CreateJSONEscapes(const std::basic_string<Ch> &s)
   }
 
   std::ostringstream stream;
+  stream.imbue(std::locale("C"));
   stream << "{\"values\":[";
 
-  std::vector<mitk::TimeStepType> ts = tsProp->GetAvailableTimeSteps();
-  bool first = true;
-  for (auto t : ts)
-  {
-    std::vector<mitk::TemporoSpatialStringProperty::IndexValueType> zs = tsProp->GetAvailableSlices(t);
-    for (auto z : zs)
-    {
-      std::string value = CreateJSONEscapes(tsProp->GetValue(t, z));
+  //we condense the content of the property to have a compact serialization.
+  //we start with condensing time points and then slices (in difference to the
+  //internal layout). Reason: There is more entropy in slices (looking at DICOM)
+  //than across time points for one slice, so we can "compress" to a higher rate.
+  //We don't wanted to change the internal structure of the property as it would
+  //introduce API inconvinience and subtle changes in behavior.
+  using CondensedTimeKeyType = std::pair<mitk::TimeStepType, mitk::TimeStepType>;
+  using CondensedTimePointsType = std::map<CondensedTimeKeyType, std::string>;
 
+  using CondensedSliceKeyType = std::pair<mitk::TemporoSpatialStringProperty::IndexValueType, mitk::TemporoSpatialStringProperty::IndexValueType>;
+  using CondensedSlicesType = std::map<CondensedSliceKeyType, CondensedTimePointsType>;
+
+  CondensedSlicesType uncondensedSlices;
+  auto zs = tsProp->GetAvailableSlices();
+  for (const auto z : zs)
+  {
+    CondensedTimePointsType condensedTimePoints;
+    auto ts = tsProp->GetAvailableTimeSteps(z);
+    CondensedTimeKeyType condensedKey = { ts.front(),ts.front() };
+    auto refValue = tsProp->GetValue(ts.front(), z);
+
+    for (const auto t: ts)
+    {
+      const auto& newVal = tsProp->GetValue(t, z);
+      if (newVal != refValue
+          || t<condensedKey.second || t > condensedKey.second + 1) //condense only if there is no gap
+      {
+        condensedTimePoints[condensedKey] = refValue;
+        refValue = newVal;
+        condensedKey.first = t;
+      }
+      condensedKey.second = t;
+    }
+    condensedTimePoints[condensedKey] = refValue;
+    uncondensedSlices[{ z,z }] = condensedTimePoints;
+  }
+
+  //now condense the slices
+  CondensedSlicesType condensedSlices;
+  if(!uncondensedSlices.empty())
+  {
+    CondensedTimePointsType& refSlice = uncondensedSlices.begin()->second;
+    CondensedSliceKeyType refSliceKey = uncondensedSlices.begin()->first;
+
+    for (const auto& uz : uncondensedSlices)
+    {
+      const auto& newSlice = uz.second;
+      if (newSlice != refSlice
+          || uz.first.first < refSliceKey.second || uz.first.first > refSliceKey.second + 1) //condense only if there is no gap
+      {
+        condensedSlices[refSliceKey] = refSlice;
+        refSlice = newSlice;
+        refSliceKey.first = uz.first.first;
+      }
+      refSliceKey.second = uz.first.first;
+    }
+    condensedSlices[refSliceKey] = refSlice;
+  }
+
+
+  bool first = true;
+  for (const auto& z : condensedSlices)
+  {
+    for (const auto& t : z.second)
+    {
       if (first)
       {
         first = false;
@@ -347,7 +404,18 @@ std::basic_string<Ch> CreateJSONEscapes(const std::basic_string<Ch> &s)
         stream << ", ";
       }
 
-      stream << "{\"t\":" << t << ", \"z\":" << z << ", \"value\":\"" << value << "\"}";
+      stream << "{\"z\":" << z.first.first << ", ";
+      if (z.first.first != z.first.second)
+      {
+        stream << "\"zmax\":" << z.first.second << ", ";
+      }
+      stream << "\"t\":" << t.first.first << ", ";
+      if (t.first.first != t.first.second)
+      {
+        stream << "\"tmax\":" << t.first.second << ", ";
+      }
+
+      stream << "\"value\":\"" << CreateJSONEscapes(t.second) << "\"}";
     }
   }
 
@@ -367,6 +435,7 @@ mitk::BaseProperty::Pointer mitk::PropertyPersistenceDeserialization::deserializ
   boost::property_tree::ptree root;
 
   std::istringstream stream(value);
+  stream.imbue(std::locale("C"));
 
   boost::property_tree::read_json(stream, root);
 
@@ -375,9 +444,18 @@ mitk::BaseProperty::Pointer mitk::PropertyPersistenceDeserialization::deserializ
     std::string value = element.second.get("value", "");
     mitk::TemporoSpatialStringProperty::IndexValueType z =
       element.second.get<mitk::TemporoSpatialStringProperty::IndexValueType>("z", 0);
+    mitk::TemporoSpatialStringProperty::IndexValueType zmax =
+      element.second.get<mitk::TemporoSpatialStringProperty::IndexValueType>("zmax", z);
     TimeStepType t = element.second.get<TimeStepType>("t", 0);
+    TimeStepType tmax = element.second.get<TimeStepType>("tmax", t);
 
-    prop->SetValue(t, z, value);
+    for (auto currentT = t; currentT <= tmax; ++currentT)
+    {
+      for (auto currentZ = z; currentZ <= zmax; ++currentZ)
+      {
+        prop->SetValue(currentT, currentZ, value);
+      }
+    }
   }
 
   return prop.GetPointer();

@@ -8,7 +8,7 @@
 <config>
   <!-- Zoom sensitivity -->
   <param name="zoomFactor" value="5"/>
-  <param name="coupled" value="false"/>
+  <param name="coupled" value="true"/>
   <!-- Zoom either by moving mouse leftright or updown -->
   <param name="zoomDirection" value="updown"/>
   <!-- react to an event, even tough is was already processed by a DataInteractor-->

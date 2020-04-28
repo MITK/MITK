@@ -2234,17 +2234,9 @@ void QmitkStdMultiWidget::SetWidgetPlaneMode( int userMode )
       case 0:
         m_MouseModeSwitcher->SetInteractionScheme(mitk::MouseModeSwitcher::InteractionScheme::MITK);
         break;
-      case 1:
-        crosshairManager->setCrosshairMode(CrosshairMode::PLANE);
-        m_MouseModeSwitcher->SetInteractionScheme( mitk::MouseModeSwitcher::InteractionScheme::ROTATION);
-        break;
-
-      case 2:
-        crosshairManager->setCrosshairMode(CrosshairMode::PLANE);
-        m_MouseModeSwitcher->SetInteractionScheme( mitk::MouseModeSwitcher::InteractionScheme::ROTATIONLINKED);
-        break;
 
       case 3:
+        crosshairManager->setCrosshairMode(CrosshairMode::PLANE);
         m_MouseModeSwitcher->SetInteractionScheme( mitk::MouseModeSwitcher::InteractionScheme::SWIVEL);
         break;
     }

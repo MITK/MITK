@@ -857,20 +857,12 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
     QActionGroup* rotationModeActionGroup = new QActionGroup(crosshairModesMenu);
     rotationModeActionGroup->setExclusive(true);
 
-    QAction* noCrosshairRotation = new QAction(crosshairModesMenu);
-    noCrosshairRotation->setActionGroup(rotationModeActionGroup);
-    noCrosshairRotation->setText(tr("Crosshair rotation"));
-    noCrosshairRotation->setCheckable(true);
-    noCrosshairRotation->setChecked(currentCrosshairRotationMode==0);
-    noCrosshairRotation->setData( 0 );
-    crosshairModesMenu->addAction( noCrosshairRotation );
-
     QAction* coupledCrosshairRotation = new QAction(crosshairModesMenu);
     coupledCrosshairRotation->setActionGroup(rotationModeActionGroup);
     coupledCrosshairRotation->setText(tr("Coupled crosshair rotation"));
     coupledCrosshairRotation->setCheckable(true);
-    coupledCrosshairRotation->setChecked(currentCrosshairRotationMode==2);
-    coupledCrosshairRotation->setData( 2 );
+    coupledCrosshairRotation->setChecked(currentCrosshairRotationMode==0);
+    coupledCrosshairRotation->setData( 0 );
     crosshairModesMenu->addAction( coupledCrosshairRotation );
 
     QAction* swivelMode = new QAction(crosshairModesMenu);

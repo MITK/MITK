@@ -127,18 +127,6 @@ void mitk::MouseModeSwitcher::SetInteractionScheme(InteractionScheme scheme)
   }
     break;
 
-  case ROTATION:
-  {
-    eventConfig = "DisplayConfigMITKRotationUnCoupled.xml";
-  }
-    break;
-
-  case ROTATIONLINKED:
-  {
-    eventConfig = "DisplayConfigMITKRotation.xml";
-  }
-    break;
-
   case SWIVEL:
   {
     eventConfig = "DisplayConfigMITKSwivel.xml";

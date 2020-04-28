@@ -374,4 +374,5 @@ public:
         CPPUNIT_ASSERT_EQUAL_MESSAGE("Time geometry was not cleared correctly.", m_TimeGeometry->IsValid(), false);
     }
 };
+
 MITK_TEST_SUITE_REGISTRATION(mitkImageStatisticsContainer)

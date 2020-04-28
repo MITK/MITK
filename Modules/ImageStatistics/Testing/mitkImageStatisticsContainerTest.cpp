@@ -323,11 +323,13 @@ public:
 
         std::vector<mitk::ImageStatisticsContainer::ConstPointer> containers;
 
-        // Trying to get AllStatisticNames for empty container does not triggers an exception.
+        // Check if empty vector triggers exception.
+        CPPUNIT_ASSERT_NO_THROW_MESSAGE("Empty vector triggered an exception.", mitk::GetAllStatisticNames(containers));
+
         containers.push_back(m_StatisticsContainer2.GetPointer());
         containers.push_back(m_StatisticsContainer3.GetPointer());
 
-        // First checking if empty containers would trigger an exception.
+        // Check if vector with empty container triggers exception.
         CPPUNIT_ASSERT_NO_THROW_MESSAGE("Empty container triggered an exception.", mitk::GetAllStatisticNames(containers));
 
         // Adding filled container to check if data was saved correctly.

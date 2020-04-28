@@ -163,7 +163,15 @@ void QmitkAdaptiveRegionGrowingToolGUI::SetInputImageNode(mitk::DataNode *node)
 }
 
 template <typename TPixel>
-static void AccessPixel(mitk::PixelType /*ptype*/, const mitk::Image::Pointer im, mitk::Point3D p, int &val)
+static void AccessPixel(mitk::PixelType /*ptype*/, mitk::Image* im, mitk::Point3D p, int& val)
+{
+  mitk::ImagePixelReadAccessor<TPixel, 3> access(im);
+  val = access.GetPixelByWorldCoordinates(p);
+}
+
+/**Overloaded const verison*/
+template <typename TPixel>
+static void AccessPixel(mitk::PixelType /*ptype*/, const mitk::Image* im, mitk::Point3D p, int &val)
 {
   mitk::ImagePixelReadAccessor<TPixel, 3> access(im);
   val = access.GetPixelByWorldCoordinates(p);
@@ -188,7 +196,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
 
     m_Controls.m_lblSetSeedpoint->setText("");
 
-    mitk::Image *image = dynamic_cast<mitk::Image *>(m_InputImageNode->GetData());
+    const mitk::Image *image = dynamic_cast<mitk::Image *>(m_InputImageNode->GetData());
 
     mitk::Point3D seedPoint =
       pointSet

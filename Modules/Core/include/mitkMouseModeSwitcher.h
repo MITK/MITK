@@ -78,11 +78,8 @@ namespace mitk {
     // enum of the different interaction schemes that are available
     enum InteractionScheme
     {
-      // deleted mouse mode "PACS"
-      //PACS = 0,
       MITK = 0,
-      ROTATION = 1,
-      ROTATIONLINKED = 2,
+      // deleted mouse modes: PACS, ROTATION, ROTATIONLINKED
       SWIVEL = 3
     };
 

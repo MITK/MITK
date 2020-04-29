@@ -316,8 +316,6 @@ Interactions/DisplayConfigCrossHairRight.xml
 Interactions/DisplayConfigCrossHairMiddle.xml
 Interactions/DisplayConfigMITK.xml
 Interactions/DisplayConfigMITKNoCrosshair.xml
-Interactions/DisplayConfigMITKRotation.xml
-Interactions/DisplayConfigMITKRotationUnCoupled.xml
 Interactions/DisplayConfigMITKSwivel.xml
 Interactions/DisplayConfigMITKLimited.xml
 Interactions/PointSet.xml

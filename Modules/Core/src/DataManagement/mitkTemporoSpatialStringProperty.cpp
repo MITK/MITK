@@ -311,6 +311,57 @@ std::basic_string<Ch> CreateJSONEscapes(const std::basic_string<Ch> &s)
   return result;
 }
 
+using CondensedTimeKeyType = std::pair<mitk::TimeStepType, mitk::TimeStepType>;
+using CondensedTimePointsType = std::map<CondensedTimeKeyType, std::string>;
+
+using CondensedSliceKeyType = std::pair<mitk::TemporoSpatialStringProperty::IndexValueType, mitk::TemporoSpatialStringProperty::IndexValueType>;
+using CondensedSlicesType = std::map<CondensedSliceKeyType, CondensedTimePointsType>;
+
+/** Helper function that checks if between an ID and a successing ID is no gap.*/
+template<typename TValue>
+bool isGap(const TValue& value, const TValue& successor)
+{
+  return value<successor || value > successor + 1;
+}
+
+
+template<typename TNewKey, typename TNewValue, typename TMasterKey, typename TMasterValue, typename TCondensedContainer>
+void CheckAndCondenseElement(const TNewKey& newKeyMinID, const TNewValue& newValue, TMasterKey& masterKey, TMasterValue& masterValue, TCondensedContainer& condensedContainer)
+{
+  if (newValue != masterValue
+    || isGap(newKeyMinID, masterKey.second))
+  {
+    condensedContainer[masterKey] = masterValue;
+    masterValue = newValue;
+    masterKey.first = newKeyMinID;
+  }
+  masterKey.second = newKeyMinID;
+}
+
+/** Helper function that tries to condense the values of time points for a slice as much as possible and returns all slices with condensed timepoint values.*/
+CondensedSlicesType CondenseTimePointValuesOfProperty(const mitk::TemporoSpatialStringProperty* tsProp)
+{
+  CondensedSlicesType uncondensedSlices;
+
+  auto zs = tsProp->GetAvailableSlices();
+  for (const auto z : zs)
+  {
+    CondensedTimePointsType condensedTimePoints;
+    auto timePointIDs = tsProp->GetAvailableTimeSteps(z);
+    CondensedTimeKeyType condensedKey = { timePointIDs.front(),timePointIDs.front() };
+    auto refValue = tsProp->GetValue(timePointIDs.front(), z);
+
+    for (const auto timePointID : timePointIDs)
+    {
+      const auto& newVal = tsProp->GetValue(timePointID, z);
+      CheckAndCondenseElement(timePointID, newVal, condensedKey, refValue, condensedTimePoints);
+    }
+    condensedTimePoints[condensedKey] = refValue;
+    uncondensedSlices[{ z, z }] = condensedTimePoints;
+  }
+  return uncondensedSlices;
+}
+
 ::std::string mitk::PropertyPersistenceSerialization::serializeTemporoSpatialStringPropertyToJSON(
   const mitk::BaseProperty *prop)
 {
@@ -336,57 +387,21 @@ std::basic_string<Ch> CreateJSONEscapes(const std::basic_string<Ch> &s)
   //than across time points for one slice, so we can "compress" to a higher rate.
   //We don't wanted to change the internal structure of the property as it would
   //introduce API inconvinience and subtle changes in behavior.
-  using CondensedTimeKeyType = std::pair<mitk::TimeStepType, mitk::TimeStepType>;
-  using CondensedTimePointsType = std::map<CondensedTimeKeyType, std::string>;
-
-  using CondensedSliceKeyType = std::pair<mitk::TemporoSpatialStringProperty::IndexValueType, mitk::TemporoSpatialStringProperty::IndexValueType>;
-  using CondensedSlicesType = std::map<CondensedSliceKeyType, CondensedTimePointsType>;
-
-  CondensedSlicesType uncondensedSlices;
-  auto zs = tsProp->GetAvailableSlices();
-  for (const auto z : zs)
-  {
-    CondensedTimePointsType condensedTimePoints;
-    auto ts = tsProp->GetAvailableTimeSteps(z);
-    CondensedTimeKeyType condensedKey = { ts.front(),ts.front() };
-    auto refValue = tsProp->GetValue(ts.front(), z);
-
-    for (const auto t: ts)
-    {
-      const auto& newVal = tsProp->GetValue(t, z);
-      if (newVal != refValue
-          || t<condensedKey.second || t > condensedKey.second + 1) //condense only if there is no gap
-      {
-        condensedTimePoints[condensedKey] = refValue;
-        refValue = newVal;
-        condensedKey.first = t;
-      }
-      condensedKey.second = t;
-    }
-    condensedTimePoints[condensedKey] = refValue;
-    uncondensedSlices[{ z,z }] = condensedTimePoints;
-  }
+  CondensedSlicesType uncondensedSlices = CondenseTimePointValuesOfProperty(tsProp);
 
   //now condense the slices
   CondensedSlicesType condensedSlices;
   if(!uncondensedSlices.empty())
   {
-    CondensedTimePointsType& refSlice = uncondensedSlices.begin()->second;
-    CondensedSliceKeyType refSliceKey = uncondensedSlices.begin()->first;
+    CondensedTimePointsType& masterSlice = uncondensedSlices.begin()->second;
+    CondensedSliceKeyType masterSliceKey = uncondensedSlices.begin()->first;
 
-    for (const auto& uz : uncondensedSlices)
+    for (const auto& uncondensedSlice : uncondensedSlices)
     {
-      const auto& newSlice = uz.second;
-      if (newSlice != refSlice
-          || uz.first.first < refSliceKey.second || uz.first.first > refSliceKey.second + 1) //condense only if there is no gap
-      {
-        condensedSlices[refSliceKey] = refSlice;
-        refSlice = newSlice;
-        refSliceKey.first = uz.first.first;
-      }
-      refSliceKey.second = uz.first.first;
+      const auto& uncondensedSliceID = uncondensedSlice.first.first;
+      CheckAndCondenseElement(uncondensedSliceID, uncondensedSlice.second, masterSliceKey, masterSlice, condensedSlices);
     }
-    condensedSlices[refSliceKey] = refSlice;
+    condensedSlices[masterSliceKey] = masterSlice;
   }
 
 
@@ -404,18 +419,24 @@ std::basic_string<Ch> CreateJSONEscapes(const std::basic_string<Ch> &s)
         stream << ", ";
       }
 
-      stream << "{\"z\":" << z.first.first << ", ";
-      if (z.first.first != z.first.second)
+      const auto& minSliceID = z.first.first;
+      const auto& maxSliceID = z.first.second;
+      const auto& minTimePointID = t.first.first;
+      const auto& maxTimePointID = t.first.second;
+
+      stream << "{\"z\":" << minSliceID << ", ";
+      if (minSliceID != maxSliceID)
       {
-        stream << "\"zmax\":" << z.first.second << ", ";
+        stream << "\"zmax\":" << maxSliceID << ", ";
       }
-      stream << "\"t\":" << t.first.first << ", ";
-      if (t.first.first != t.first.second)
+      stream << "\"t\":" << minTimePointID << ", ";
+      if (minTimePointID != maxTimePointID)
       {
-        stream << "\"tmax\":" << t.first.second << ", ";
+        stream << "\"tmax\":" << maxTimePointID << ", ";
       }
 
-      stream << "\"value\":\"" << CreateJSONEscapes(t.second) << "\"}";
+      const auto& value = t.second;
+      stream << "\"value\":\"" << CreateJSONEscapes(value) << "\"}";
     }
   }
 

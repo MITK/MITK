@@ -31,7 +31,7 @@ mitk::GeometryDataReaderService::~GeometryDataReaderService()
 {
 }
 
-std::vector<itk::SmartPointer<mitk::BaseData>> mitk::GeometryDataReaderService::Read()
+std::vector<itk::SmartPointer<mitk::BaseData>> mitk::GeometryDataReaderService::DoRead()
 {
   // Switch the current locale to "C"
   LocaleSwitch localeSwitch("C");

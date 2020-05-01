@@ -14,9 +14,10 @@ found in the LICENSE file.
 
 #include <mitkCustomMimeType.h>
 #include <mitkIOUtil.h>
-#include <mitkStandaloneDataStorage.h>
 
 #include <mitkFileReaderWriterBase.h>
+#include <mitkVersion.h>
+#include <mitkIOMetaInformationPropertyConstants.h>
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
@@ -84,17 +85,28 @@ namespace mitk
 
   std::vector<BaseData::Pointer> AbstractFileReader::Read()
   {
-    std::vector<BaseData::Pointer> result;
+    std::vector<BaseData::Pointer> result = this->DoRead();
 
-    DataStorage::Pointer ds = StandaloneDataStorage::New().GetPointer();
-    this->Read(*ds);
-    DataStorage::SetOfObjects::ConstPointer dataNodes = ds->GetAll();
-    for (DataStorage::SetOfObjects::ConstIterator iter = dataNodes->Begin(), iterEnd = dataNodes->End();
-         iter != iterEnd;
-         ++iter)
+    const auto options = this->GetOptions();
+
+    for (auto& data : result)
     {
-      result.push_back(iter.Value()->GetData());
+      data->SetProperty(PropertyKeyPathToPropertyName(IOMetaInformationPropertyConsants::READER_DESCRIPTION()), StringProperty::New(d->GetDescription()));
+      data->SetProperty(PropertyKeyPathToPropertyName(IOMetaInformationPropertyConsants::READER_VERSION()), StringProperty::New(MITK_VERSION_STRING));
+      data->SetProperty(PropertyKeyPathToPropertyName(IOMetaInformationPropertyConsants::READER_MIME_NAME()), StringProperty::New(d->GetMimeType()->GetName()));
+      data->SetProperty(PropertyKeyPathToPropertyName(IOMetaInformationPropertyConsants::READER_MIME_CATEGORY()), StringProperty::New(d->GetMimeType()->GetCategory()));
+      if (this->GetInputStream() == nullptr)
+      {
+        data->SetProperty(PropertyKeyPathToPropertyName(IOMetaInformationPropertyConsants::READER_INPUTLOCATION()), StringProperty::New(this->GetInputLocation()));
+      }
+
+      for (const auto& option : options)
+      {
+        auto optionpath = IOMetaInformationPropertyConsants::READER_OPTION_ROOT().AddElement(option.first);
+        data->SetProperty(PropertyKeyPathToPropertyName(optionpath), StringProperty::New(option.second.ToString()));
+      }
     }
+
     return result;
   }
 

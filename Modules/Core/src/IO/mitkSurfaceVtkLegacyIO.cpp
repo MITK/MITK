@@ -33,7 +33,7 @@ namespace mitk
     this->RegisterService();
   }
 
-  std::vector<itk::SmartPointer<BaseData>> SurfaceVtkLegacyIO::Read()
+  std::vector<itk::SmartPointer<BaseData>> SurfaceVtkLegacyIO::DoRead()
   {
     mitk::Surface::Pointer output = mitk::Surface::New();
 

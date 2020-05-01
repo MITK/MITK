@@ -134,7 +134,7 @@ mitk::PicFileReader::PicFileReader() : AbstractFileReader()
   this->RegisterService();
 }
 
-std::vector<mitk::BaseData::Pointer> mitk::PicFileReader::Read()
+std::vector<mitk::BaseData::Pointer> mitk::PicFileReader::DoRead()
 {
   mitk::Image::Pointer image = this->CreateImage();
   this->FillImage(image);

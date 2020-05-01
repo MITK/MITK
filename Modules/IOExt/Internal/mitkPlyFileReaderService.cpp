@@ -30,7 +30,7 @@ mitk::PlyFileReaderService::~PlyFileReaderService()
 {
 }
 
-std::vector<itk::SmartPointer<mitk::BaseData>> mitk::PlyFileReaderService::Read()
+std::vector<itk::SmartPointer<mitk::BaseData>> mitk::PlyFileReaderService::DoRead()
 {
   std::vector<itk::SmartPointer<BaseData>> result;
 

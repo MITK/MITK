@@ -43,12 +43,13 @@ namespace mitk
     ~GeometryDataReaderService() override;
 
     using AbstractFileReader::Read;
-    std::vector<itk::SmartPointer<BaseData>> Read() override;
 
     /**
      * @brief Provides the MIME type for reader and writer.
      */
     static CustomMimeType GEOMETRY_DATA_MIMETYPE();
+  protected:
+    std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
   private:
     GeometryDataReaderService(const GeometryDataReaderService &other);

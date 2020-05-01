@@ -25,7 +25,6 @@ namespace mitk
     // -------------- AbstractFileReader -------------
 
     using AbstractFileReader::Read;
-    std::vector<BaseData::Pointer> Read() override;
 
     ConfidenceLevel GetReaderConfidenceLevel() const override;
 
@@ -34,6 +33,8 @@ namespace mitk
     void Write() override;
 
     ConfidenceLevel GetWriterConfidenceLevel() const override;
+  protected:
+    std::vector<BaseData::Pointer> DoRead() override;
 
   private:
     ImageVtkXmlIO *IOClone() const override;

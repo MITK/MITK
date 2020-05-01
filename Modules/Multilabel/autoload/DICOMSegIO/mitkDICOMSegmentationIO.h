@@ -36,18 +36,20 @@ namespace mitk
     // -------------- AbstractFileReader -------------
 
     using AbstractFileReader::Read;
-    /**
-     * @brief Reads a number of DICOM segmentation from the file system
-     * @return a vector of mitk::LabelSetImages
-     * @throws throws an mitk::Exception if an error ocurrs
-     */
-    std::vector<BaseData::Pointer> Read() override;
+
     ConfidenceLevel GetReaderConfidenceLevel() const override;
 
     // -------------- AbstractFileWriter -------------
 
     void Write() override;
     ConfidenceLevel GetWriterConfidenceLevel() const override;
+  protected:
+    /**
+     * @brief Reads a number of DICOM segmentation from the file system
+     * @return a vector of mitk::LabelSetImages
+     * @throws throws an mitk::Exception if an error ocurrs
+     */
+    std::vector<BaseData::Pointer> DoRead() override;
 
   private:
     DICOMSegmentationIO *IOClone() const override;

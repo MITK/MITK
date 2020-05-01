@@ -58,7 +58,9 @@ namespace mitk
     * single structures.
     */
     using AbstractFileReader::Read;
-    std::vector<itk::SmartPointer<BaseData> > Read() override;
+
+  protected:
+    std::vector<BaseData::Pointer> DoRead() override;
 
   private:
     RTStructureSetReaderService* Clone() const override;

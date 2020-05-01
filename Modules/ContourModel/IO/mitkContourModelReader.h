@@ -39,12 +39,12 @@ namespace mitk
     ~ContourModelReader() override;
 
     using AbstractFileReader::Read;
-    std::vector<itk::SmartPointer<BaseData>> Read() override;
 
   protected:
     virtual void ReadPoints(mitk::ContourModel::Pointer newContourModel,
                             TiXmlElement *currentTimeSeries,
                             unsigned int currentTimeStep);
+    std::vector<BaseData::Pointer> DoRead() override;
 
   private:
     ContourModelReader *Clone() const override;

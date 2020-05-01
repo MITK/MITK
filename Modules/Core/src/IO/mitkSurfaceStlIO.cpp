@@ -58,7 +58,7 @@ namespace mitk
     this->RegisterService();
   }
 
-  std::vector<itk::SmartPointer<BaseData>> SurfaceStlIO::Read()
+  std::vector<itk::SmartPointer<BaseData>> SurfaceStlIO::DoRead()
   {
     LocaleSwitch localeSwitch("C");
 

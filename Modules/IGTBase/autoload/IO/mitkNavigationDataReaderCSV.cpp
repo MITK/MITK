@@ -39,7 +39,7 @@ mitk::NavigationDataReaderCSV* mitk::NavigationDataReaderCSV::Clone() const
   return new NavigationDataReaderCSV(*this);
 }
 
-std::vector<itk::SmartPointer<mitk::BaseData>> mitk::NavigationDataReaderCSV::Read()
+std::vector<itk::SmartPointer<mitk::BaseData>> mitk::NavigationDataReaderCSV::DoRead()
 {
   std::vector<std::string> fileContent = GetFileContentLineByLine(GetInputLocation());
   int NumOfTools = getNumberOfToolsInLine(fileContent[0]);

@@ -36,9 +36,9 @@ namespace mitk {
      *          Returns an empty NavigationDataSet if the file could not be read.
      */
     using AbstractFileReader::Read;
-    std::vector<itk::SmartPointer<BaseData>> Read() override;
 
   protected:
+    std::vector<BaseData::Pointer> DoRead() override;
 
     /**
      * /brief Creates a NavigationData Pointer based on the given Input.

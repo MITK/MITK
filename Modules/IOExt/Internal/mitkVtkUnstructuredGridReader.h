@@ -25,9 +25,10 @@ namespace mitk
     ~VtkUnstructuredGridReader() override;
 
     using AbstractFileReader::Read;
-    std::vector<itk::SmartPointer<BaseData>> Read() override;
 
   protected:
+    std::vector<BaseData::Pointer> DoRead() override;
+
     VtkUnstructuredGridReader *Clone() const override;
   };
 

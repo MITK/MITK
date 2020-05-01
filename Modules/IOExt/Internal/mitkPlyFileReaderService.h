@@ -34,9 +34,11 @@ namespace mitk
     ~PlyFileReaderService() override;
 
     using AbstractFileReader::Read;
-    std::vector<itk::SmartPointer<BaseData>> Read() override;
 
     static mitk::CustomMimeType mimeType;
+
+  protected:
+    std::vector<BaseData::Pointer> DoRead() override;
 
   private:
     PlyFileReaderService *Clone() const override;

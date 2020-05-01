@@ -30,6 +30,7 @@ class mitkPropertyKeyPathTestSuite : public mitk::TestFixture
   MITK_TEST(PropertyKeyPathToPropertyName);
   MITK_TEST(ExecutePropertyRegEx);
   MITK_TEST(Comparison);
+  MITK_TEST(InitializerList);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -308,6 +309,12 @@ public:
         CPPUNIT_ASSERT(std::regex_match(result, regEx));
       }
     }
+  }
+
+  void InitializerList()
+  {
+    mitk::PropertyKeyPath newPath = {"a","b2","c3"};
+    CPPUNIT_ASSERT(newPath == deepPath);
   }
 };
 

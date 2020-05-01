@@ -595,9 +595,9 @@ int main(int argc, char* argv[])
       cFeature->SetBins(param.globalNumberOfBins);
       MITK_INFO << param.globalNumberOfBins;
     }
-    cFeature->SetParameter(parsedArgs);
+    cFeature->SetParameters(parsedArgs);
     cFeature->SetDirection(direction);
-    cFeature->SetEncodeParameters(param.encodeParameter);
+    cFeature->SetEncodeParametersInFeaturePrefix(param.encodeParameter);
   }
 
   bool addDescription = parsedArgs.count("description");
@@ -670,12 +670,12 @@ int main(int argc, char* argv[])
     {
       log << " Calculating " << cFeature->GetFeatureClassName() << " -";
       cFeature->SetMorphMask(cMorphMask);
-      cFeature->CalculateFeaturesUsingParameters(cImage, cMask, cMaskNoNaN, stats);
+      cFeature->CalculateAndAppendFeatures(cImage, cMask, cMaskNoNaN, stats);
     }
 
     for (std::size_t i = 0; i < stats.size(); ++i)
     {
-      std::cout << stats[i].first << " - " << stats[i].second << std::endl;
+      std::cout << stats[i].first.legacyName << " - " << stats[i].second << std::endl;
     }
 
     writer.AddHeader(description, currentSlice, stats, param.useHeader, addDescription);
@@ -699,10 +699,10 @@ int main(int argc, char* argv[])
     for (std::size_t i = 0; i < allStats[0].size(); ++i)
     {
       auto cElement1 = allStats[0][i];
-      cElement1.first = "SliceWise Mean " + cElement1.first;
+      cElement1.first.legacyName = "SliceWise Mean " + cElement1.first.legacyName;
       cElement1.second = 0.0;
       auto cElement2 = allStats[0][i];
-      cElement2.first = "SliceWise Var. " + cElement2.first;
+      cElement2.first.legacyName = "SliceWise Var. " + cElement2.first.legacyName;
       cElement2.second = 0.0;
       statMean.push_back(cElement1);
       statStd.push_back(cElement2);
@@ -726,8 +726,8 @@ int main(int argc, char* argv[])
 
     for (std::size_t i = 0; i < statMean.size(); ++i)
     {
-      std::cout << statMean[i].first << " - " << statMean[i].second << std::endl;
-      std::cout << statStd[i].first << " - " << statStd[i].second << std::endl;
+      std::cout << statMean[i].first.legacyName << " - " << statMean[i].second << std::endl;
+      std::cout << statStd[i].first.legacyName << " - " << statStd[i].second << std::endl;
     }
     if (true)
     {

@@ -12,7 +12,11 @@ found in the LICENSE file.
 
 #include "mitkCoreActivator.h"
 
+#include <mitkCoreServices.h>
+#include <mitkPropertyPersistenceInfo.h>
+
 // File IO
+#include <mitkIOMetaInformationPropertyConstants.h>
 #include <mitkGeometryDataReaderService.h>
 #include <mitkGeometryDataWriterService.h>
 #include <mitkIOMimeTypes.h>
@@ -101,6 +105,30 @@ void AddMitkAutoLoadPaths(const std::string &programPath)
 #endif
 }
 
+void AddPropertyPersistence(const mitk::PropertyKeyPath& propPath)
+{
+  mitk::CoreServicePointer<mitk::IPropertyPersistence> persistenceService(mitk::CoreServices::GetPropertyPersistence());
+
+  mitk::PropertyPersistenceInfo::Pointer info = mitk::PropertyPersistenceInfo::New();
+  if (propPath.IsExplicit())
+  {
+    std::string name = mitk::PropertyKeyPathToPropertyName(propPath);
+    std::string key = name;
+    std::replace(key.begin(), key.end(), '.', '_');
+    info->SetNameAndKey(name, key);
+  }
+  else
+  {
+    std::string key = mitk::PropertyKeyPathToPersistenceKeyRegEx(propPath);
+    std::string keyTemplate = mitk::PropertyKeyPathToPersistenceKeyTemplate(propPath);
+    std::string propRegEx = mitk::PropertyKeyPathToPropertyRegEx(propPath);
+    std::string propTemplate = mitk::PropertyKeyPathToPersistenceNameTemplate(propPath);
+    info->UseRegEx(propRegEx, propTemplate, key, keyTemplate);
+  }
+
+  persistenceService->AddInfo(info);
+}
+
 class FixedNiftiImageIO : public itk::NiftiImageIO
 {
 public:
@@ -177,6 +205,14 @@ void MitkCoreActivator::Load(us::ModuleContext *context)
   m_FileReaders.push_back(new mitk::GeometryDataReaderService());
   m_FileWriters.push_back(new mitk::GeometryDataWriterService());
   m_FileReaders.push_back(new mitk::RawImageFileReaderService());
+
+  //add properties that should be persistent (if possible/supported by the writer)
+  AddPropertyPersistence(mitk::IOMetaInformationPropertyConsants::READER_DESCRIPTION());
+  AddPropertyPersistence(mitk::IOMetaInformationPropertyConsants::READER_INPUTLOCATION());
+  AddPropertyPersistence(mitk::IOMetaInformationPropertyConsants::READER_MIME_CATEGORY());
+  AddPropertyPersistence(mitk::IOMetaInformationPropertyConsants::READER_MIME_NAME());
+  AddPropertyPersistence(mitk::IOMetaInformationPropertyConsants::READER_VERSION());
+  AddPropertyPersistence(mitk::IOMetaInformationPropertyConsants::READER_OPTIONS_ANY());
 
   /*
     There IS an option to exchange ALL vtkTexture instances against vtkNeverTranslucentTextureFactory.

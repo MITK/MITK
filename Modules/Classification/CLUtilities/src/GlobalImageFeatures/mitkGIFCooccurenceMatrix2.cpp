@@ -683,17 +683,19 @@ mitk::AbstractGlobalImageFeature::FeatureListType mitk::GIFCooccurenceMatrix2::C
   return Superclass::CalculateFeatures(image, maskNoNAN);
 }
 
-void mitk::GIFCooccurenceMatrix2::DoAddArguments(mitkCommandLineParser &parser) const
+void mitk::GIFCooccurenceMatrix2::AddArguments(mitkCommandLineParser &parser) const
 {
-  std::string name = GetOptionPrefix();
+  this->AddQuantifierArguments(parser);
 
-  parser.addArgument(GetLongName(), name, mitkCommandLineParser::Bool, "Use Co-occurence matrix", "calculates Co-occurence based features (new implementation)", us::Any());
+  std::string name = this->GetOptionPrefix();
+
+  parser.addArgument(this->GetLongName(), name, mitkCommandLineParser::Bool, "Use Co-occurence matrix", "calculates Co-occurence based features (new implementation)", us::Any());
   parser.addArgument(name+"::range", name+"::range", mitkCommandLineParser::String, "Cooc 2 Range", "Define the range that is used (Semicolon-separated)", us::Any());
 }
 
 std::string mitk::GIFCooccurenceMatrix2::GenerateLegacyFeatureEncoding(const FeatureID& id) const
 {
-  return QuantifierParameterString() + "_Range-" + id.parameters.at("::range").ToString();
+  return QuantifierParameterString() + "_Range-" + id.parameters.at(this->GetOptionPrefix()+"::range").ToString();
 }
 
 void mitk::GIFCooccurenceMatrix2::ConfigureSettingsByParameters(const ParametersType& parameters)

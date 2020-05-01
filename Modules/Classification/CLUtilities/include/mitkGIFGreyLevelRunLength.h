@@ -97,15 +97,16 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      GIFGreyLevelRunLength();
+    GIFGreyLevelRunLength();
 
     FeatureListType CalculateFeatures(const Image* image, const Image* mask, const Image* maskNoNAN) override;
+    using Superclass::CalculateFeatures;
+
+    void AddArguments(mitkCommandLineParser &parser) const override;
 
   protected:
 
     FeatureListType DoCalculateFeatures(const Image* image, const Image* mask) override;
-    void DoAddArguments(mitkCommandLineParser &parser) const override;
-
   };
 }
 #endif //mitkGIFGreyLevelRunLength_h

@@ -199,18 +199,13 @@ mitkUI::GIFConfigurationPanel::CalculateFeaturesUsingParameters(const mitk::Imag
       slice = us::any_cast<int>(parameter["slice-wise"]);
       calculateSliceWise = true;
     }
-    if (parameter.count("encode-parameter-in-name"))
-    {
-      bool encodeParameter = us::any_cast<bool>(parameter["encode-parameter-in-name"]);
-      tmpCalc->SetEncodeParameters(encodeParameter);
-    }
     if (calculateSliceWise)
     {
-      tmpCalc->CalculateFeaturesSliceWiseUsingParameters(feature, mask, slice, featureList);
+      tmpCalc->CalculateAndAppendFeaturesSliceWise(feature, mask, slice, featureList);
     }
     else
     {
-      tmpCalc->CalculateFeaturesUsingParameters(feature, mask, mask, featureList);
+      tmpCalc->CalculateAndAppendFeatures(feature, mask, mask, featureList);
     }
   }
 }

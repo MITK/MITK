@@ -139,14 +139,15 @@ namespace mitk
       GIFCooccurenceMatrix2();
 
       FeatureListType CalculateFeatures(const Image* image, const Image* mask, const Image* maskNoNAN) override;
+      using Superclass::CalculateFeatures;
 
       itkGetConstMacro(Ranges, std::vector<double>);
       void SetRanges(std::vector<double> ranges);
       void SetRange(double range);
 
-  protected:
-    void DoAddArguments(mitkCommandLineParser& parser) const override;
+    void AddArguments(mitkCommandLineParser& parser) const override;
 
+  protected:
     std::string GenerateLegacyFeatureEncoding(const FeatureID& id) const override;
 
     FeatureListType DoCalculateFeatures(const Image* image, const Image* mask) override;

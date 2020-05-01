@@ -34,7 +34,7 @@ found in the LICENSE file.
 namespace mitk
 {
 
-  /**Used as ID for features calculated by deature classes*/
+  /**Used as ID for features calculated by feature classes*/
   struct MITKCLCORE_EXPORT FeatureID
   {
     /**Name of the feature*/
@@ -157,25 +157,25 @@ public:
   /**
   * \brief Calculates the feature of this abstact interface. Does not necessarily considers the parameter settings.
   */
-  FeatureListType CalculateFeatures(const Image* feature, const Image* mask);
-  virtual FeatureListType CalculateFeatures(const Image* feature, const Image* mask, const Image* maskNoNAN) = 0;
+  FeatureListType CalculateFeatures(const Image* image, const Image* mask);
+  virtual FeatureListType CalculateFeatures(const Image* image, const Image* mask, const Image* maskNoNAN) = 0;
 
   /**
   * \brief Calculates the given feature Slice-wise. Might not be availble for an individual filter!
   */
-  FeatureListType CalculateFeaturesSlicewise(const Image::Pointer & feature, const Image::Pointer &mask, int sliceID);
+  FeatureListType CalculateFeaturesSlicewise(const Image::Pointer & image, const Image::Pointer &mask, int sliceID);
 
   /**
   * \brief Calculates the feature of this abstact interface. Does not necessarily considers the parameter settings.
   */
-  virtual void CalculateAndAppendFeaturesSliceWise(const Image::Pointer & feature, const Image::Pointer &mask, int sliceID, FeatureListType &featureList, bool checkParameterActivation = true);
+  virtual void CalculateAndAppendFeaturesSliceWise(const Image::Pointer & image, const Image::Pointer &mask, int sliceID, FeatureListType &featureList, bool checkParameterActivation = true);
 
   /**
   * \brief Calculates the feature of this abstact interface. Does not necessarily considers the parameter settings.
   * @param checkParameterActivation Indicates if the features should only be calculated and added if the FeatureClass is activated in the parameters.
   * True: only append if activated in the parametes. False: always and append it.
   */
-  void CalculateAndAppendFeatures(const Image* feature, const Image* mask, const Image* maskNoNAN, FeatureListType &featureList, bool checkParameterActivation = true);
+  void CalculateAndAppendFeatures(const Image* image, const Image* mask, const Image* maskNoNAN, FeatureListType &featureList, bool checkParameterActivation = true);
 
   itkSetMacro(Prefix, std::string);
   itkSetMacro(ShortName, std::string);
@@ -238,17 +238,20 @@ public:
     return m_ShortName;
   }
 
-  /** Can be called to add all relevant argument for configuring the instance to the passed parser instance.
-  It always calls AddQuantifierArguments(...) and afterwards DoAddArguments(...). Implement DoAddArguments() to
-  handle class specific arguments.*/
-  void AddArguments(mitkCommandLineParser &parser) const;
+  /** Can be called to add all relevant argument for configuring the feature instance to the passed parser instance.
+  Must be implemented be derived classes. For adding the quantifier arguments use AddQuantifierArguments(...) as
+  helper function.*/
+  virtual void AddArguments(mitkCommandLineParser &parser) const = 0;
+
+  /** Helper function that generates the legacy feature name without encoding of parameters; as it is used e.g.
+   in the unit tests.*/
+  static std::string GenerateLegacyFeatureNameWOEncoding(const FeatureID& id);
 
 protected:
   std::vector<double> SplitDouble(std::string str, char delimiter);
 
-  virtual FeatureListType DoCalculateFeatures(const Image* feature, const Image* mask) = 0;
+  virtual FeatureListType DoCalculateFeatures(const Image* image, const Image* mask) = 0;
 
-  virtual void DoAddArguments(mitkCommandLineParser& parser) const;
   void AddQuantifierArguments(mitkCommandLineParser& parser) const;
 
   /** Ensures that all quantifier relevant variables of the instance are set correctly given the information in m_Parameters.*/
@@ -259,7 +262,7 @@ protected:
   virtual void ConfigureSettingsByParameters(const ParametersType& parameters);
 
   /**Initializes the quantifier gigen the quantifier relevant variables and the passed arguments.*/
-  void InitializeQuantifier(const Image* feature, const Image*, unsigned int defaultBins = 256);
+  void InitializeQuantifier(const Image* image, const Image* mask, unsigned int defaultBins = 256);
 
   /** Helper that encodes the quantifier parameters in a string (e.g. used for the legacy feature name)*/
   std::string QuantifierParameterString() const;
@@ -274,7 +277,7 @@ protected:
   * Overwrite GenerateLegacyFeatureNamePart and GenerateLegacyFeatureEncoding to change behavior in
   * derived classes.
   */
-  std::string GenerateLegacyFeatureName(const FeatureID& id) const;
+  virtual std::string GenerateLegacyFeatureName(const FeatureID& id) const;
   virtual std::string GenerateLegacyFeatureNamePart(const FeatureID& id) const;
   virtual std::string GenerateLegacyFeatureEncoding(const FeatureID& id) const;
 

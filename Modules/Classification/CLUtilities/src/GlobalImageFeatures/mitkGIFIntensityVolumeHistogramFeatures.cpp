@@ -29,11 +29,11 @@ namespace
   struct GIFIntensityVolumeHistogramFeaturesParameters
   {
     mitk::IntensityQuantifier::Pointer quantifier;
-    std::string prefix;
+    mitk::FeatureID id;
   };
 
   template<typename TPixel, unsigned int VImageDimension>
-  void CalculateIntensityPeak(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, GIFIntensityVolumeHistogramFeaturesParameters params, mitk::GIFIntensityVolumeHistogramFeatures::FeatureListType& featureList)
+  void CalculateIntensityPeak(const itk::Image<TPixel, VImageDimension>* itkImage, const mitk::Image* mask, GIFIntensityVolumeHistogramFeaturesParameters params, mitk::GIFIntensityVolumeHistogramFeatures::FeatureListType& featureList)
   {
     typedef itk::Image<TPixel, VImageDimension> ImageType;
     typedef itk::Image<unsigned short, VImageDimension> MaskType;
@@ -42,7 +42,6 @@ namespace
     mitk::CastToItkImage(mask, itkMask);
 
     mitk::IntensityQuantifier::Pointer quantifier = params.quantifier;
-    std::string prefix = params.prefix;
 
     itk::ImageRegionConstIterator<ImageType> iter(itkImage, itkImage->GetLargestPossibleRegion());
     itk::ImageRegionConstIterator<MaskType> iterMask(itkMask, itkMask->GetLargestPossibleRegion());
@@ -103,13 +102,13 @@ namespace
     unsigned int index010 = std::ceil(quantifier->GetBins() * 0.1);
     unsigned int index090 = std::floor(quantifier->GetBins() * 0.9);
 
-    featureList.push_back(std::make_pair(prefix + "Volume fraction at 0.10 intensity", hist[index010]));
-    featureList.push_back(std::make_pair(prefix + "Volume fraction at 0.90 intensity", hist[index090]));
-    featureList.push_back(std::make_pair(prefix + "Intensity at 0.10 volume", intensity010));
-    featureList.push_back(std::make_pair(prefix + "Intensity at 0.90 volume", intensity090));
-    featureList.push_back(std::make_pair(prefix + "Difference volume fraction at 0.10 and 0.90 intensity", std::abs<double>(hist[index010] - hist[index090])));
-    featureList.push_back(std::make_pair(prefix + "Difference intensity at 0.10 and 0.90 volume", std::abs<double>(intensity090 - intensity010)));
-    featureList.push_back(std::make_pair(prefix + "Area under IVH curve", auc));
+    featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Volume fraction at 0.10 intensity"), hist[index010]));
+    featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Volume fraction at 0.90 intensity"), hist[index090]));
+    featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Intensity at 0.10 volume"), intensity010));
+    featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Intensity at 0.90 volume"), intensity090));
+    featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Difference volume fraction at 0.10 and 0.90 intensity"), std::abs<double>(hist[index010] - hist[index090])));
+    featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Difference intensity at 0.10 and 0.90 volume"), std::abs<double>(intensity090 - intensity010)));
+    featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Area under IVH curve"), auc));
     //featureList.push_back(std::make_pair("Local Intensity Global Intensity Peak", globalPeakValue));
   }
 }
@@ -121,49 +120,31 @@ mitk::GIFIntensityVolumeHistogramFeatures::GIFIntensityVolumeHistogramFeatures()
   SetFeatureClassName("Intensity Volume Histogram");
 }
 
-mitk::GIFIntensityVolumeHistogramFeatures::FeatureListType mitk::GIFIntensityVolumeHistogramFeatures::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
+void mitk::GIFIntensityVolumeHistogramFeatures::AddArguments(mitkCommandLineParser& parser) const
 {
-  InitializeQuantifier(image, mask, 1000);
-  FeatureListType featureList;
-  GIFIntensityVolumeHistogramFeaturesParameters params;
-  params.quantifier = GetQuantifier();
-  params.prefix = FeatureDescriptionPrefix();
-  AccessByItk_3(image, CalculateIntensityPeak, mask, params, featureList);
-  return featureList;
-}
-
-mitk::GIFIntensityVolumeHistogramFeatures::FeatureNameListType mitk::GIFIntensityVolumeHistogramFeatures::GetFeatureNames()
-{
-  FeatureNameListType featureList;
-  return featureList;
-}
-
-
-void mitk::GIFIntensityVolumeHistogramFeatures::AddArguments(mitkCommandLineParser &parser)
-{
+  AddQuantifierArguments(parser);
   std::string name = GetOptionPrefix();
 
   parser.addArgument(GetLongName(), name, mitkCommandLineParser::Bool, "Use Local Intensity", "calculates local intensity based features", us::Any());
-  AddQuantifierArguments(parser);
 }
 
-void
-mitk::GIFIntensityVolumeHistogramFeatures::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &, FeatureListType &featureList)
+mitk::AbstractGlobalImageFeature::FeatureListType mitk::GIFIntensityVolumeHistogramFeatures::DoCalculateFeatures(const Image* image, const Image* mask)
 {
-  InitializeQuantifierFromParameters(feature, mask, 1000);
+  FeatureListType featureList;
 
-  auto parsedArgs = GetParameter();
-  if (parsedArgs.count(GetLongName()))
-  {
-    MITK_INFO << "Start calculating local intensity features ....";
-    auto localResults = this->CalculateFeatures(feature, mask);
-    featureList.insert(featureList.end(), localResults.begin(), localResults.end());
-    MITK_INFO << "Finished calculating local intensity features....";
-  }
+  InitializeQuantifier(image, mask, 1000);
+
+  MITK_INFO << "Start calculating local intensity features ....";
+  GIFIntensityVolumeHistogramFeaturesParameters params;
+  params.quantifier = GetQuantifier();
+  params.id = this->CreateTemplateFeatureID();
+  AccessByItk_3(image, CalculateIntensityPeak, mask, params, featureList);
+  MITK_INFO << "Finished calculating local intensity features....";
+
+  return featureList;
 }
 
-std::string mitk::GIFIntensityVolumeHistogramFeatures::GetCurrentFeatureEncoding()
+mitk::AbstractGlobalImageFeature::FeatureListType mitk::GIFIntensityVolumeHistogramFeatures::CalculateFeatures(const Image* image, const Image* mask, const Image*)
 {
-  return QuantifierParameterString();
+  return Superclass::CalculateFeatures(image, mask);
 }
-

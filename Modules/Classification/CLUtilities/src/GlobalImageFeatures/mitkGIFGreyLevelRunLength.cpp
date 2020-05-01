@@ -236,8 +236,10 @@ mitk::GIFGreyLevelRunLength::GIFGreyLevelRunLength()
   SetFeatureClassName("Run Length");
 }
 
-void mitk::GIFGreyLevelRunLength::DoAddArguments(mitkCommandLineParser &parser) const
+void mitk::GIFGreyLevelRunLength::AddArguments(mitkCommandLineParser &parser) const
 {
+  this->AddQuantifierArguments(parser);
+
   std::string name = GetOptionPrefix();
 
   parser.addArgument(GetLongName(), name, mitkCommandLineParser::Bool, "Use Run-Length", "Calculates Run-Length based features", us::Any());

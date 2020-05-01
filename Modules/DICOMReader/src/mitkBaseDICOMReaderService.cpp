@@ -24,6 +24,8 @@ found in the LICENSE file.
 #include <mitkLocaleSwitch.h>
 #include "mitkIPropertyProvider.h"
 #include "mitkPropertyNameHelper.h"
+#include "mitkPropertyKeyPath.h"
+#include "mitkDICOMIOMetaInformationPropertyConstants.h"
 
 #include <iostream>
 
@@ -55,7 +57,7 @@ bool BaseDICOMReaderService::GetOnlyRegardOwnSeries() const
 }
 
 
-std::vector<itk::SmartPointer<BaseData> > BaseDICOMReaderService::Read()
+std::vector<itk::SmartPointer<BaseData> > BaseDICOMReaderService::DoRead()
 {
   std::vector<BaseData::Pointer> result;
 
@@ -155,6 +157,8 @@ std::vector<itk::SmartPointer<BaseData> > BaseDICOMReaderService::Read()
 
             StringProperty::Pointer nameProp = StringProperty::New(nodeName);
             data->SetProperty("name", nameProp);
+
+            data->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::READER_CONFIGURATION()), StringProperty::New(reader->GetConfigurationLabel()));
 
             result.push_back(data);
           }

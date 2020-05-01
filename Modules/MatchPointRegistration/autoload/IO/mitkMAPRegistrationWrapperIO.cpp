@@ -22,48 +22,13 @@ found in the LICENSE file.
 
 #include <mitkCustomMimeType.h>
 #include <mitkIOMimeTypes.h>
+#include <mitkLocaleSwitch.h>
 
 #include "mitkMAPRegistrationWrapperIO.h"
 #include "mitkMAPRegistrationWrapper.h"
 
 namespace mitk
 {
-
-  /** Helper structure to change (and reset) the
-  * local settings in a function scope*/
-  struct LocaleSwitch
-  {
-    LocaleSwitch(const std::string& newLocale)
-      : m_OldLocale(std::setlocale(LC_ALL, nullptr))
-      , m_NewLocale(newLocale)
-    {
-      if (m_OldLocale == nullptr)
-      {
-        m_OldLocale = "";
-      }
-      else if (m_NewLocale != m_OldLocale)
-      {
-        // set the locale
-        if (std::setlocale(LC_ALL, m_NewLocale.c_str()) == nullptr)
-        {
-          MITK_INFO << "Could not set locale " << m_NewLocale;
-          m_OldLocale = nullptr;
-        }
-      }
-    }
-
-    ~LocaleSwitch()
-    {
-      if (m_OldLocale != nullptr && std::setlocale(LC_ALL, m_OldLocale) == nullptr)
-      {
-        MITK_INFO << "Could not reset locale " << m_OldLocale;
-      }
-    }
-
-  private:
-    const char* m_OldLocale;
-    const std::string m_NewLocale;
-  };
 
   /** Helper class that allows to use an functor in multiple combinations of
   * moving and target dimensions on a passed MAPRegistrationWrapper instance.\n
@@ -265,7 +230,7 @@ namespace mitk
     return IFileWriter::Supported;
   }
 
-  std::vector<BaseData::Pointer >  MAPRegistrationWrapperIO::Read()
+  std::vector<BaseData::Pointer >  MAPRegistrationWrapperIO::DoRead()
   {
     std::vector<BaseData::Pointer > result;
 

@@ -35,13 +35,14 @@ public:
     void Write() override;
 
     using AbstractFileIO::Read;
-    std::vector<itk::SmartPointer<BaseData> > Read() override;
 
     ConfidenceLevel GetReaderConfidenceLevel() const override;
     ConfidenceLevel GetWriterConfidenceLevel() const override;
 
 
-  protected:
+protected:
+    std::vector<itk::SmartPointer<BaseData>> DoRead() override;
+
 
     mutable vigra::RandomForest<int> m_rf;
 //    DecisionForestFileIO(const DecisionForestFileIO& other);

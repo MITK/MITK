@@ -35,7 +35,7 @@ namespace mitk
 
     Image::Pointer CreateImage();
 
-    std::vector<BaseData::Pointer> DoRead() override;
+    std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
   private:
     static void ConvertHandedness(mitkIpPicDescriptor *pic);

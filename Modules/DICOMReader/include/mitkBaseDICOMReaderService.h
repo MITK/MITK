@@ -37,7 +37,7 @@ public:
 protected:
   /** Uses this->GetRelevantFile() and this->GetReader to load the image.
    * data and puts it into base data instances-*/
-  std::vector<BaseData::Pointer> DoRead() override;
+  std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
  /** Returns the list of all DCM files that are in the same directory
    * like this->GetLocalFileName().*/

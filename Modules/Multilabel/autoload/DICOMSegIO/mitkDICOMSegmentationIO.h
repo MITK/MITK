@@ -49,7 +49,7 @@ namespace mitk
      * @return a vector of mitk::LabelSetImages
      * @throws throws an mitk::Exception if an error ocurrs
      */
-    std::vector<BaseData::Pointer> DoRead() override;
+    std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
   private:
     DICOMSegmentationIO *IOClone() const override;

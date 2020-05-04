@@ -36,7 +36,7 @@ namespace mitk {
     using AbstractFileReader::Read;
 
   protected:
-    std::vector<BaseData::Pointer> DoRead() override;
+    std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
     NavigationDataReaderXML(const NavigationDataReaderXML& other);
     mitk::NavigationDataReaderXML* Clone() const override;

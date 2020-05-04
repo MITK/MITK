@@ -38,7 +38,7 @@ namespace mitk {
     using AbstractFileReader::Read;
 
   protected:
-    std::vector<BaseData::Pointer> DoRead() override;
+    std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
     /**
      * /brief Creates a NavigationData Pointer based on the given Input.

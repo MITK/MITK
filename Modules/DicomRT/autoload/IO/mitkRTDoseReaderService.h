@@ -45,7 +45,7 @@ namespace mitk
       * relative to a PrescriptionDose defined in the RT-Plan. If there is no
       * RT-Plan file PrescriptionDose is set to 80% of the maximum dose.
       */
-      std::vector<BaseData::Pointer> DoRead() override;
+      std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
     private:
       RTDoseReaderService* Clone() const override;

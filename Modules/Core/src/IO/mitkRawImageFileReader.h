@@ -35,7 +35,7 @@ namespace mitk
   protected:
     RawImageFileReaderService(const RawImageFileReaderService &other);
 
-    std::vector<BaseData::Pointer> DoRead() override;
+    std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
     using mitk::AbstractFileReader::Read;
 

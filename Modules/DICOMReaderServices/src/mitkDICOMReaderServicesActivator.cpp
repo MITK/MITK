@@ -24,7 +24,7 @@ found in the LICENSE file.
 
 #include <usModuleContext.h>
 
-void AddPropertyPersistence(const mitk::PropertyKeyPath& propPath, bool temperoSpatial = false)
+void AddPropertyPersistence(const mitk::PropertyKeyPath& propPath, bool temporoSpatial = false)
 {
   mitk::CoreServicePointer<mitk::IPropertyPersistence> persistenceService(mitk::CoreServices::GetPropertyPersistence());
 
@@ -45,7 +45,7 @@ void AddPropertyPersistence(const mitk::PropertyKeyPath& propPath, bool temperoS
     info->UseRegEx(propRegEx, propTemplate, key, keyTemplate);
   }
 
-  if (temperoSpatial)
+  if (temporoSpatial)
   {
     info->SetDeserializationFunction(mitk::PropertyPersistenceDeserialization::deserializeJSONToTemporoSpatialStringProperty);
     info->SetSerializationFunction(mitk::PropertyPersistenceSerialization::serializeTemporoSpatialStringPropertyToJSON);

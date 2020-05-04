@@ -53,7 +53,7 @@ namespace mitk
     * @return a vector of mitk::LabelSetImages
     * @throws throws an mitk::Exception if an error ocurrs during parsing the nrrd header
     */
-    std::vector<BaseData::Pointer> DoRead() override;
+    std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
     // Fills the m_DefaultMetaDataKeys vector with default values
     virtual void InitializeDefaultMetaDataKeys();

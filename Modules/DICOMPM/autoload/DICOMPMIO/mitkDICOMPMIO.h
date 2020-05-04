@@ -45,11 +45,11 @@ namespace mitk
     ConfidenceLevel GetWriterConfidenceLevel() const override;
   protected:
     /**
-     * @brief Reads a DICOM parametric maps from the file system
-     * @return a  mitk::Image
-     * @throws throws an mitk::Exception if an error ocurrs
+     * @brief Reads a DICOM parametric map from the file system
+     * @return an mitk::Image
+     * @throws an mitk::Exception if an error ocurrs
      */
-    std::vector<BaseData::Pointer> DoRead() override;
+    std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
   private:
 

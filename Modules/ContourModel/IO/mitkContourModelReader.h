@@ -44,7 +44,7 @@ namespace mitk
     virtual void ReadPoints(mitk::ContourModel::Pointer newContourModel,
                             TiXmlElement *currentTimeSeries,
                             unsigned int currentTimeStep);
-    std::vector<BaseData::Pointer> DoRead() override;
+    std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
   private:
     ContourModelReader *Clone() const override;

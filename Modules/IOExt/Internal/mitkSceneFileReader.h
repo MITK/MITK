@@ -27,7 +27,7 @@ namespace mitk
     DataStorage::SetOfObjects::Pointer Read(DataStorage &ds) override;
 
   protected:
-    std::vector<BaseData::Pointer> DoRead() override;
+    std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
   private:
     SceneFileReader *Clone() const override;

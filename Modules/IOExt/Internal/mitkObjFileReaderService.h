@@ -36,7 +36,7 @@ namespace mitk
     static mitk::CustomMimeType mimeType;
 
   protected:
-    std::vector<BaseData::Pointer> DoRead() override;
+    std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
   private:
     ObjFileReaderService *Clone() const override;

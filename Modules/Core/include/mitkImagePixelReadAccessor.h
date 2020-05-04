@@ -168,7 +168,7 @@ namespace mitk
                                          mitk::ScalarType &val,
                                          int component = 0)
   {
-    mitk::ImagePixelReadAccessor<TPixel, 3> imAccess(im, item, mitk::ImageAccessorBase::IgnoreLock);
+    ImagePixelReadAccessor<TPixel, 3> imAccess(im, item, mitk::ImageAccessorBase::IgnoreLock);
     val = imAccess.GetConsecutivePixelsAsVector(idx, component + 1).GetElement(component);
     return val;
   }
@@ -182,7 +182,7 @@ namespace mitk
     mitk::ScalarType& val,
     int component = 0)
   {
-    mitk::ImagePixelReadAccessor<TPixel, 3> imAccess(im, item, mitk::ImageAccessorBase::IgnoreLock);
+    ImagePixelReadAccessor<TPixel, 3> imAccess(im, item, mitk::ImageAccessorBase::IgnoreLock);
     val = imAccess.GetConsecutivePixelsAsVector(idx, component + 1).GetElement(component);
     return val;
   }

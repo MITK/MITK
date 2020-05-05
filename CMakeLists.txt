@@ -747,6 +747,14 @@ if(WITH_COVERAGE)
 endif()
 
 #-----------------------------------------------------------------------------
+# Set UI testing flags
+#-----------------------------------------------------------------------------
+if(MITK_XVFB_TESTING)
+  set(MITK_XVFB_TESTING_COMMAND "xvfb-run" "--auto-servernum" CACHE STRING "Command and options to test through Xvfb")
+  mark_as_advanced(MITK_XVFB_TESTING_COMMAND)
+endif(MITK_XVFB_TESTING)
+
+#-----------------------------------------------------------------------------
 # MITK C/CXX Flags
 #-----------------------------------------------------------------------------
 

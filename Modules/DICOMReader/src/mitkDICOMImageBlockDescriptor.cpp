@@ -50,8 +50,6 @@ mitk::DICOMImageBlockDescriptor::DICOMImageBlockDescriptor( const DICOMImageBloc
   {
     m_MitkImage = m_MitkImage->Clone();
   }
-
-  m_PropertyFunctor = &mitk::DICOMImageBlockDescriptor::GetPropertyForDICOMValues;
 }
 
 mitk::DICOMImageBlockDescriptor& mitk::DICOMImageBlockDescriptor::

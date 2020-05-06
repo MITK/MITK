@@ -204,6 +204,14 @@ mark_as_advanced(
   MITK_ENABLE_PIC_READER
 )
 
+#-----------------------------------------------------------------------------
+# Set UI testing flags
+#-----------------------------------------------------------------------------
+if(MITK_XVFB_TESTING)
+  set(MITK_XVFB_TESTING_COMMAND "xvfb-run" "--auto-servernum" CACHE STRING "Command and options to test through Xvfb")
+  mark_as_advanced(MITK_XVFB_TESTING_COMMAND)
+endif(MITK_XVFB_TESTING)
+
 # -----------------------------------------
 # Other options
 set(MITK_CUSTOM_REVISION_DESC "" CACHE STRING "Override MITK revision description")
@@ -745,14 +753,6 @@ if(WITH_COVERAGE)
     set(COVERAGE_C_FLAGS ${coverage_flags})
   endif()
 endif()
-
-#-----------------------------------------------------------------------------
-# Set UI testing flags
-#-----------------------------------------------------------------------------
-if(MITK_XVFB_TESTING)
-  set(MITK_XVFB_TESTING_COMMAND "xvfb-run" "--auto-servernum" CACHE STRING "Command and options to test through Xvfb")
-  mark_as_advanced(MITK_XVFB_TESTING_COMMAND)
-endif(MITK_XVFB_TESTING)
 
 #-----------------------------------------------------------------------------
 # MITK C/CXX Flags

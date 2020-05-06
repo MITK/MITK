@@ -35,7 +35,9 @@ bool CheckAllPropertiesAreInOtherList(const mitk::PropertyList* list, const mitk
     MITK_TEST_CONDITION( otherEntry != otherListM->end(), "  Property '" << key << "' is contained in other list" )
 
     mitk::BaseProperty* otherProperty = otherEntry->second;
-    MITK_TEST_CONDITION( equal &= (*property == *otherProperty), "  Property '" << key << "' is equal in both list" )
+    auto propEqual = (*property == *otherProperty);
+    MITK_TEST_CONDITION(propEqual, "  Property '" << key << "' is equal in both list");
+    equal &= propEqual;
   }
 
   return equal;

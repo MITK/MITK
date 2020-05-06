@@ -10,7 +10,7 @@ function(mitkAddCustomModuleTest test_name test_function)
 
   if (BUILD_TESTING AND MODULE_IS_ENABLED)
     if(MITK_XVFB_TESTING)
-      set(xvfb_run "xvfb-run" "--auto-servernum")
+      set(xvfb_run ${MITK_XVFB_TESTING_COMMAND})
     else()
       set(xvfb_run )
     endif()

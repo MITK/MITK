@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkCLResultWritter_h
-#define mitkCLResultWritter_h
+#ifndef mitkCLResultWriter_h
+#define mitkCLResultWriter_h
 
 #include "MitkCLUtilitiesExports.h"
 
@@ -25,11 +25,11 @@ namespace mitk
 {
   namespace cl
   {
-    class MITKCLUTILITIES_EXPORT FeatureResultWritter
+    class MITKCLUTILITIES_EXPORT FeatureResultWriter
     {
     public:
-      FeatureResultWritter(std::string, int mode);
-      ~FeatureResultWritter();
+      FeatureResultWriter(std::string, int mode);
+      ~FeatureResultWriter();
 
       void SetDecimalPoint(char decimal);
 

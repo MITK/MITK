@@ -43,7 +43,7 @@ found in the LICENSE file.
 #include <mitkITKImageImport.h>
 #include <mitkConvert2Dto3DImageFilter.h>
 
-#include <mitkCLResultWritter.h>
+#include <mitkCLResultWriter.h>
 #include <mitkVersion.h>
 
 #include <iostream>
@@ -413,7 +413,8 @@ int main(int argc, char* argv[])
   parser.addArgument("description","d",mitkCommandLineParser::String,"Text","Description that is added to the output",us::Any());
   parser.addArgument("direction", "dir", mitkCommandLineParser::String, "Int", "Allows to specify the direction for Cooc and RL. 0: All directions, 1: Only single direction (Test purpose), 2,3,4... Without dimension 0,1,2... ", us::Any());
   parser.addArgument("slice-wise", "slice", mitkCommandLineParser::String, "Int", "Allows to specify if the image is processed slice-wise (number giving direction) ", us::Any());
-  parser.addArgument("output-mode", "omode", mitkCommandLineParser::Int, "Int", "Defines if the results of an image / slice are written in a single row (0 , default) or column (1).");
+  parser.addArgument("output-mode", "omode", mitkCommandLineParser::Int, "Int", "Defines the format of the output. 0: (Default) results of an image / slice are written in a single row;"
+    " 1: results of an image / slice are written in a single column; 2: store the result of on image as structured radiomocs report (XML).");
 
   // Miniapp Infos
   parser.setCategory("Classification Tools");
@@ -601,7 +602,7 @@ int main(int argc, char* argv[])
   }
 
   bool addDescription = parsedArgs.count("description");
-  mitk::cl::FeatureResultWritter writer(param.outputPath, writeDirection);
+  mitk::cl::FeatureResultWriter writer(param.outputPath, writeDirection);
 
   if (param.useDecimalPoint)
   {

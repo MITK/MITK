@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <mitkCLResultWritter.h>
+#include <mitkCLResultWriter.h>
 
 #include <iostream>
 #include <locale>
@@ -29,7 +29,7 @@ private:
   charT m_Sep;
 };
 
-mitk::cl::FeatureResultWritter::FeatureResultWritter(std::string file, int mode) :
+mitk::cl::FeatureResultWriter::FeatureResultWriter(std::string file, int mode) :
 m_Mode(mode),
 m_CurrentRow(0),
 m_CurrentElement(0),
@@ -45,7 +45,7 @@ m_DecimalPoint('.')
   m_Output.open(file, std::ios::app);
 }
 
-mitk::cl::FeatureResultWritter::~FeatureResultWritter()
+mitk::cl::FeatureResultWriter::~FeatureResultWriter()
 {
   for (std::size_t i = 0; i < m_List.size() - 1; ++i)
   {
@@ -55,14 +55,14 @@ mitk::cl::FeatureResultWritter::~FeatureResultWritter()
   m_Output.close();
 }
 
-void mitk::cl::FeatureResultWritter::SetDecimalPoint(char decimal)
+void mitk::cl::FeatureResultWriter::SetDecimalPoint(char decimal)
 {
   m_Output.imbue(std::locale(std::cout.getloc(), new punct_facet<char>(decimal)));
   m_UseSpecialDecimalPoint = true;
   m_DecimalPoint = decimal;
 }
 
-void mitk::cl::FeatureResultWritter::AddColumn(double value) {
+void mitk::cl::FeatureResultWriter::AddColumn(double value) {
   std::ostringstream  ss;
   if (m_UseSpecialDecimalPoint)
   {
@@ -72,7 +72,7 @@ void mitk::cl::FeatureResultWritter::AddColumn(double value) {
   AddColumn(ss.str());
 }
 
-void mitk::cl::FeatureResultWritter::AddSubjectInformation(std::string value) {
+void mitk::cl::FeatureResultWriter::AddSubjectInformation(std::string value) {
   if ((m_Mode == 0) || (m_Mode == 1))
   {
     AddColumn(value);
@@ -88,7 +88,7 @@ void mitk::cl::FeatureResultWritter::AddSubjectInformation(std::string value) {
   }
 }
 
-void mitk::cl::FeatureResultWritter::AddColumn(std::string value) {
+void mitk::cl::FeatureResultWriter::AddColumn(std::string value) {
   if ((m_Mode == 0) || (m_Mode == 2))
   {
     m_List[m_CurrentRow] = m_List[m_CurrentRow] + value + m_Separator;
@@ -106,7 +106,7 @@ void mitk::cl::FeatureResultWritter::AddColumn(std::string value) {
 }
 
 
-void mitk::cl::FeatureResultWritter::NewRow(std::string endName) {
+void mitk::cl::FeatureResultWriter::NewRow(std::string endName) {
   AddColumn(endName);
   if ((m_Mode == 0) || (m_Mode == 2))
   {
@@ -123,7 +123,7 @@ void mitk::cl::FeatureResultWritter::NewRow(std::string endName) {
   }
 }
 
-void mitk::cl::FeatureResultWritter::AddResult(std::string desc, int slice, mitk::AbstractGlobalImageFeature::FeatureListType stats, bool, bool withDescription)
+void mitk::cl::FeatureResultWriter::AddResult(std::string desc, int slice, mitk::AbstractGlobalImageFeature::FeatureListType stats, bool, bool withDescription)
 {
   if (m_Mode == 2)
   {
@@ -163,7 +163,7 @@ void mitk::cl::FeatureResultWritter::AddResult(std::string desc, int slice, mitk
   }
 }
 
-void mitk::cl::FeatureResultWritter::AddHeader(std::string, int slice, mitk::AbstractGlobalImageFeature::FeatureListType stats, bool withHeader, bool withDescription)
+void mitk::cl::FeatureResultWriter::AddHeader(std::string, int slice, mitk::AbstractGlobalImageFeature::FeatureListType stats, bool withHeader, bool withDescription)
 {
   if ((withHeader) && (m_CurrentElement == 0))
   {

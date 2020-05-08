@@ -25,27 +25,27 @@ found in the LICENSE file.
 bool mitk::PropertyRelationRuleBase::IsAbstract() const
 {
   return true;
-};
+}
 
 bool mitk::PropertyRelationRuleBase::IsSourceCandidate(const IPropertyProvider *owner) const
 {
   return owner != nullptr;
-};
+}
 
 bool mitk::PropertyRelationRuleBase::IsDestinationCandidate(const IPropertyProvider *owner) const
 {
   return owner != nullptr;
-};
+}
 
 mitk::PropertyKeyPath mitk::PropertyRelationRuleBase::GetRootKeyPath()
 {
   return PropertyKeyPath().AddElement("MITK").AddElement("Relations");
-};
+}
 
 bool mitk::PropertyRelationRuleBase::IsSupportedRuleID(const RuleIDType& ruleID) const
 {
   return ruleID == this->GetRuleID();
-};
+}
 
 
 std::string mitk::PropertyRelationRuleBase::GetRIIPropertyRegEx(const std::string propName, const InstanceIDType &instanceID) const
@@ -66,7 +66,7 @@ std::string mitk::PropertyRelationRuleBase::GetRIIPropertyRegEx(const std::strin
   }
 
   return PropertyKeyPathToPropertyRegEx(path);
-};
+}
 
 //workaround until T24729 is done. Please remove if T24728 is done
 //then could directly use owner->GetPropertyKeys() again.
@@ -87,13 +87,13 @@ std::vector<std::string> mitk::PropertyRelationRuleBase::GetPropertyKeys(const m
     keys = owner->GetPropertyKeys();
   }
   return keys;
-};
+}
 //end workaround for T24729
 
 bool mitk::PropertyRelationRuleBase::IsSource(const IPropertyProvider *owner) const
 {
   return !this->GetExistingRelations(owner).empty();
-};
+}
 
 bool mitk::PropertyRelationRuleBase::HasRelation(
   const IPropertyProvider* source, const IPropertyProvider* destination, RelationType requiredRelation) const
@@ -187,7 +187,7 @@ mitk::PropertyRelationRuleBase::RelationVectorType mitk::PropertyRelationRuleBas
   }
 
   return result;
-};
+}
 
 mitk::PropertyRelationRuleBase::RelationUIDVectorType mitk::PropertyRelationRuleBase::GetExistingRelations(
   const IPropertyProvider *source, RelationType layer) const
@@ -260,7 +260,7 @@ mitk::PropertyRelationRuleBase::RelationUIDVectorType mitk::PropertyRelationRule
   }
 
   return result;
-};
+}
 
 mitk::PropertyRelationRuleBase::RelationUIDVectorType mitk::PropertyRelationRuleBase::GetRelationUIDs(
   const IPropertyProvider *source, const IPropertyProvider *destination) const
@@ -294,7 +294,7 @@ mitk::PropertyRelationRuleBase::RelationUIDVectorType mitk::PropertyRelationRule
   std::set_union(relUIDs_id.begin(), relUIDs_id.end(), relUIDs_Data.begin(), relUIDs_Data.end(), std::back_inserter(result));
 
   return result;
-};
+}
 
 mitk::PropertyRelationRuleBase::RelationUIDType
 mitk::PropertyRelationRuleBase::GetRelationUID(const IPropertyProvider *source, const IPropertyProvider *destination) const
@@ -311,7 +311,7 @@ mitk::PropertyRelationRuleBase::GetRelationUID(const IPropertyProvider *source, 
   }
 
   return result[0];
-};
+}
 
 mitk::PropertyRelationRuleBase::InstanceIDType mitk::PropertyRelationRuleBase::NULL_INSTANCE_ID()
 {
@@ -340,7 +340,7 @@ mitk::PropertyRelationRuleBase::RelationUIDType mitk::PropertyRelationRuleBase::
   }
 
   return result;
-};
+}
 
 mitk::PropertyRelationRuleBase::InstanceIDType mitk::PropertyRelationRuleBase::GetInstanceIDByRelationUID(
   const IPropertyProvider *source, const RelationUIDType &relationUID) const
@@ -378,7 +378,7 @@ mitk::PropertyRelationRuleBase::InstanceIDType mitk::PropertyRelationRuleBase::G
   }
 
   return result;
-};
+}
 
 mitk::PropertyRelationRuleBase::InstanceIDVectorType mitk::PropertyRelationRuleBase::GetInstanceID_IDLayer(
   const IPropertyProvider *source, const IPropertyProvider *destination) const
@@ -440,7 +440,7 @@ mitk::PropertyRelationRuleBase::InstanceIDVectorType mitk::PropertyRelationRuleB
   }
 
   return result;
-};
+}
 
 mitk::PropertyRelationRuleBase::RelationUIDType mitk::PropertyRelationRuleBase::Connect(IPropertyOwner *source, const IPropertyProvider *destination) const
 {
@@ -526,7 +526,7 @@ mitk::PropertyRelationRuleBase::RelationUIDType mitk::PropertyRelationRuleBase::
   this->Connect_datalayer(source, destination, instanceID);
 
   return relationUID;
-};
+}
 
 void mitk::PropertyRelationRuleBase::Disconnect(IPropertyOwner *source, const IPropertyProvider *destination, RelationType layer) const
 {
@@ -552,7 +552,7 @@ void mitk::PropertyRelationRuleBase::Disconnect(IPropertyOwner *source, const IP
   {
     // nothing to do and no real error in context of disconnect.
   }
-};
+}
 
 void mitk::PropertyRelationRuleBase::Disconnect(IPropertyOwner *source, RelationUIDType relationUID, RelationType layer) const
 {
@@ -584,13 +584,13 @@ void mitk::PropertyRelationRuleBase::Disconnect(IPropertyOwner *source, Relation
       }
     }
   }
-};
+}
 
 mitk::PropertyRelationRuleBase::RelationUIDType mitk::PropertyRelationRuleBase::CreateRelationUID()
 {
   UIDGenerator generator;
   return generator.GetUID();
-};
+}
 
 /**This mutex is used to guard mitk::PropertyRelationRuleBase::CreateNewRelationInstance by a class wide mutex to avoid
   racing conditions in a scenario where rules are used concurrently. It is not in the class interface itself, because it
@@ -646,12 +646,12 @@ mitk::PropertyRelationRuleBase::InstanceIDType mitk::PropertyRelationRuleBase::C
   source->SetProperty(relUIDKey, mitk::StringProperty::New(relationUID));
 
   return newID;
-};
+}
 
 itk::LightObject::Pointer mitk::PropertyRelationRuleBase::InternalClone() const
 {
   return Superclass::InternalClone();
-};
+}
 
 
 mitk::PropertyRelationRuleBase::InstanceIDType mitk::PropertyRelationRuleBase::GetInstanceIDByPropertyName(const std::string propName)
@@ -665,7 +665,7 @@ mitk::PropertyRelationRuleBase::InstanceIDType mitk::PropertyRelationRuleBase::G
   }
 
   return proppath.GetNode(2).name;
-};
+}
 
 mitk::PropertyRelationRuleBase::RuleIDType mitk::PropertyRelationRuleBase::GetRuleIDByInstanceID(const IPropertyProvider *source,
   const InstanceIDType &instanceID) const
@@ -693,7 +693,7 @@ mitk::PropertyRelationRuleBase::RuleIDType mitk::PropertyRelationRuleBase::GetRu
   }
 
   return result;
-};
+}
 
 std::string mitk::PropertyRelationRuleBase::GetDestinationUIDByInstanceID(const IPropertyProvider* source,
   const InstanceIDType& instanceID) const
@@ -716,7 +716,7 @@ std::string mitk::PropertyRelationRuleBase::GetDestinationUIDByInstanceID(const 
   }
 
   return result;
-};
+}
 
 
 namespace mitk
@@ -764,7 +764,7 @@ mitk::NodePredicateBase::ConstPointer mitk::PropertyRelationRuleBase::GetSourceC
   };
 
   return NodePredicateRuleFunction::New(check, this).GetPointer();
-};
+}
 
 mitk::NodePredicateBase::ConstPointer mitk::PropertyRelationRuleBase::GetDestinationCandidateIndicator() const
 {
@@ -773,7 +773,7 @@ mitk::NodePredicateBase::ConstPointer mitk::PropertyRelationRuleBase::GetDestina
   };
 
   return NodePredicateRuleFunction::New(check, this).GetPointer();
-};
+}
 
 mitk::NodePredicateBase::ConstPointer mitk::PropertyRelationRuleBase::GetConnectedSourcesDetector() const
 {
@@ -783,7 +783,7 @@ mitk::NodePredicateBase::ConstPointer mitk::PropertyRelationRuleBase::GetConnect
   };
 
   return NodePredicateRuleFunction::New(check, this).GetPointer();
-};
+}
 
 mitk::NodePredicateBase::ConstPointer mitk::PropertyRelationRuleBase::GetSourcesDetector(
   const IPropertyProvider *destination, RelationType exclusiveRelation) const
@@ -799,7 +799,7 @@ mitk::NodePredicateBase::ConstPointer mitk::PropertyRelationRuleBase::GetSources
   };
 
   return NodePredicateRuleFunction::New(check, this).GetPointer();
-};
+}
 
 mitk::NodePredicateBase::ConstPointer mitk::PropertyRelationRuleBase::GetDestinationsDetector(
   const IPropertyProvider *source, RelationType exclusiveRelation) const
@@ -815,7 +815,7 @@ mitk::NodePredicateBase::ConstPointer mitk::PropertyRelationRuleBase::GetDestina
   };
 
   return NodePredicateRuleFunction::New(check, this).GetPointer();
-};
+}
 
 mitk::NodePredicateBase::ConstPointer mitk::PropertyRelationRuleBase::GetDestinationDetector(
   const IPropertyProvider *source, RelationUIDType relationUID) const
@@ -852,4 +852,4 @@ mitk::NodePredicateBase::ConstPointer mitk::PropertyRelationRuleBase::GetDestina
   };
 
   return NodePredicateRuleFunction::New(check, this).GetPointer();
-};
+}

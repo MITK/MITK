@@ -166,7 +166,7 @@ namespace mitk
 
     /** Returns the relation UID for the passed source and destination of this rule instance.
     If the passed instances have no relation, no ID can be deduced and an exception will be thrown.
-    If more then one relation is found, also an exception will be thrown. Thus only use this convinience method,
+    If more than one relation is found, also an exception will be thrown. Thus only use this convenience method,
     if you are sure that one(!) relation UID can exist.
     @pre source must be a pointer to a valid IPropertyOwner instance.
     @pre destination must be a pointer to a valid IPropertyOwner instance.
@@ -335,7 +335,7 @@ namespace mitk
      @pre source must have a relation instance with this ID*/
     RuleIDType GetRuleIDByInstanceID(const IPropertyProvider *source,
       const InstanceIDType &instanceID) const;
-    /**Helper function that retrives the destinatuon UID of a relation instance of a passed
+    /**Helper function that retrives the destination UID of a relation instance of a passed
        source. If the relation has no destination UID, an empty string will be returned.
        @pre source must be valid.*/
     std::string GetDestinationUIDByInstanceID(const IPropertyProvider * source,

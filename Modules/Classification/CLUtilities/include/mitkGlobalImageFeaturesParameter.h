@@ -35,6 +35,7 @@ namespace mitk
       std::string maskName;
       std::string maskFolder;
       std::string outputPath;
+      std::string outputXMLPath;
 
       std::string morphPath;
       std::string morphName;
@@ -67,6 +68,8 @@ namespace mitk
       bool useDecimalPoint;
       char decimalPoint;
       bool encodeParameter;
+      std::string pipelineUID;
+      bool calculateAllFeatures;
 
     private:
       void ParseFileLocations(std::map<std::string, us::Any> &parsedArgs);

@@ -44,6 +44,7 @@ found in the LICENSE file.
 #include <mitkConvert2Dto3DImageFilter.h>
 
 #include <mitkCLResultWriter.h>
+#include <mitkCLResultXMLWriter.h>
 #include <mitkVersion.h>
 
 #include <iostream>
@@ -437,7 +438,7 @@ int main(int argc, char* argv[])
   //bool savePNGofSlices = true;
   //std::string folderForPNGOfSlices = "E:\\tmp\\bonekamp\\fig\\";
 
-  std::string version = "Version: 1.22";
+  std::string version = "Version: 1.23";
   MITK_INFO << version;
 
   std::ofstream log;
@@ -671,7 +672,7 @@ int main(int argc, char* argv[])
     {
       log << " Calculating " << cFeature->GetFeatureClassName() << " -";
       cFeature->SetMorphMask(cMorphMask);
-      cFeature->CalculateAndAppendFeatures(cImage, cMask, cMaskNoNaN, stats);
+      cFeature->CalculateAndAppendFeatures(cImage, cMask, cMaskNoNaN, stats, !param.calculateAllFeatures);
     }
 
     for (std::size_t i = 0; i < stats.size(); ++i)
@@ -748,12 +749,36 @@ int main(int argc, char* argv[])
     writer.AddResult(description, currentSlice, statStd, param.useHeader, addDescription);
   }
 
+  int returnCode = EXIT_SUCCESS;
+
+  if (!param.outputXMLPath.empty())
+  {
+    if (sliceWise)
+    {
+      MITK_ERROR << "Xml output is not supported in slicewise mode";
+      returnCode = EXIT_FAILURE;
+    }
+    else
+    {
+      mitk::cl::CLResultXMLWriter xmlWriter;
+      xmlWriter.SetCLIArgs(parsedArgs);
+      xmlWriter.SetFeatures(allStats.front());
+      xmlWriter.SetImage(image);
+      xmlWriter.SetMask(mask);
+      xmlWriter.SetMethodName("CLGlobalImageFeatures");
+      xmlWriter.SetMethodVersion(version + "(mitk: " MITK_VERSION_STRING+")");
+      xmlWriter.SetOrganisation("German Cancer Research Center (DKFZ)");
+      xmlWriter.SetPipelineUID(param.pipelineUID);
+      xmlWriter.write(param.outputXMLPath);
+    }
+  }
+
   if (param.useLogfile)
   {
     log << "Finished calculation" << std::endl;
     log.close();
   }
-  return 0;
+  return returnCode;
 }
 
 #endif

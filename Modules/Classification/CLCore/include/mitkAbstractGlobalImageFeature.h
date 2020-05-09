@@ -45,6 +45,8 @@ namespace mitk
     std::string settingID;
     /**Alternative name that containes the legacy naming of the feature that encodes the parametersetting directly in the string.*/
     std::string legacyName;
+    /**Version of the feature definition*/
+    std::string version = "1";
 
     using ParametersType = std::map<std::string, us::Any>;
     ParametersType parameters;

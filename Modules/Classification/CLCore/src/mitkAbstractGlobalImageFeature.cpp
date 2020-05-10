@@ -247,7 +247,7 @@ void  mitk::AbstractGlobalImageFeature::ConfigureQuantifierSettingsByParameters(
   }
 }
 
-void mitk::AbstractGlobalImageFeature::ConfigureSettingsByParameters(const ParametersType& parameters)
+void mitk::AbstractGlobalImageFeature::ConfigureSettingsByParameters(const ParametersType& /*parameters*/)
 {
   //Default implementation does nothing.
   //Override to change behavior.
@@ -314,7 +314,7 @@ std::string mitk::AbstractGlobalImageFeature::GenerateLegacyFeatureNamePart(cons
   return id.name;
 }
 
-std::string mitk::AbstractGlobalImageFeature::GenerateLegacyFeatureEncoding(const FeatureID& id) const
+std::string mitk::AbstractGlobalImageFeature::GenerateLegacyFeatureEncoding(const FeatureID& /*id*/) const
 {
   return this->QuantifierParameterString();
 }

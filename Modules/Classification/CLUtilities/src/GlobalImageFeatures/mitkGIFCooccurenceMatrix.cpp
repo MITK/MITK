@@ -332,7 +332,7 @@ std::string mitk::GIFCooccurenceMatrix::GenerateLegacyFeatureNamePart(const Feat
   return result;
 }
 
-std::string mitk::GIFCooccurenceMatrix::GenerateLegacyFeatureEncoding(const FeatureID& id) const
+std::string mitk::GIFCooccurenceMatrix::GenerateLegacyFeatureEncoding(const FeatureID& /*id*/) const
 {
   //deprecated GIFCooccurenceMatrix does not support feature encoding
   return "";

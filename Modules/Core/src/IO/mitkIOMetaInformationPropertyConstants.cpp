@@ -15,37 +15,37 @@ found in the LICENSE file.
 namespace mitk
 {
 
-  PropertyKeyPath IOMetaInformationPropertyConsants::READER_DESCRIPTION()
+  PropertyKeyPath IOMetaInformationPropertyConstants::READER_DESCRIPTION()
   {
     return PropertyKeyPath({ "MITK", "IO", "reader", "description" });
   }
 
-  PropertyKeyPath IOMetaInformationPropertyConsants::READER_VERSION()
+  PropertyKeyPath IOMetaInformationPropertyConstants::READER_VERSION()
   {
     return PropertyKeyPath({ "MITK", "IO", "reader", "version" });
   }
 
-  PropertyKeyPath IOMetaInformationPropertyConsants::READER_MIME_NAME()
+  PropertyKeyPath IOMetaInformationPropertyConstants::READER_MIME_NAME()
   {
     return PropertyKeyPath({ "MITK", "IO", "reader", "mime", "name" });
   }
 
-  PropertyKeyPath IOMetaInformationPropertyConsants::READER_MIME_CATEGORY()
+  PropertyKeyPath IOMetaInformationPropertyConstants::READER_MIME_CATEGORY()
   {
     return PropertyKeyPath({ "MITK", "IO", "reader", "mime", "category" });
   }
 
-  PropertyKeyPath IOMetaInformationPropertyConsants::READER_INPUTLOCATION()
+  PropertyKeyPath IOMetaInformationPropertyConstants::READER_INPUTLOCATION()
   {
     return PropertyKeyPath({ "MITK", "IO", "reader", "inputlocation" });
   }
 
-  PropertyKeyPath IOMetaInformationPropertyConsants::READER_OPTION_ROOT()
+  PropertyKeyPath IOMetaInformationPropertyConstants::READER_OPTION_ROOT()
   {
     return PropertyKeyPath({ "MITK", "IO", "reader", "option" });
   }
 
-  PropertyKeyPath IOMetaInformationPropertyConsants::READER_OPTIONS_ANY()
+  PropertyKeyPath IOMetaInformationPropertyConstants::READER_OPTIONS_ANY()
   {
     return READER_OPTION_ROOT().AddAnyElement();
   }

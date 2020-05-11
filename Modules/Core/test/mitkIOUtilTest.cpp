@@ -251,15 +251,15 @@ public:
     mitk::Image::Pointer img = mitk::IOUtil::Load<mitk::Image>(m_ImagePath);
     CPPUNIT_ASSERT(img.IsNotNull());
     
-    auto value = img->GetProperty(mitk::PropertyKeyPathToPropertyName(mitk::IOMetaInformationPropertyConsants::READER_DESCRIPTION()).c_str())->GetValueAsString();
+    auto value = img->GetProperty(mitk::PropertyKeyPathToPropertyName(mitk::IOMetaInformationPropertyConstants::READER_DESCRIPTION()).c_str())->GetValueAsString();
     CPPUNIT_ASSERT_EQUAL(std::string("ITK NrrdImageIO"), value);
-    value = img->GetProperty(mitk::PropertyKeyPathToPropertyName(mitk::IOMetaInformationPropertyConsants::READER_INPUTLOCATION()).c_str())->GetValueAsString();
+    value = img->GetProperty(mitk::PropertyKeyPathToPropertyName(mitk::IOMetaInformationPropertyConstants::READER_INPUTLOCATION()).c_str())->GetValueAsString();
     CPPUNIT_ASSERT_EQUAL(m_ImagePath, value);
-    value = img->GetProperty(mitk::PropertyKeyPathToPropertyName(mitk::IOMetaInformationPropertyConsants::READER_MIME_CATEGORY()).c_str())->GetValueAsString();
+    value = img->GetProperty(mitk::PropertyKeyPathToPropertyName(mitk::IOMetaInformationPropertyConstants::READER_MIME_CATEGORY()).c_str())->GetValueAsString();
     CPPUNIT_ASSERT_EQUAL(std::string("Images"), value);
-    value = img->GetProperty(mitk::PropertyKeyPathToPropertyName(mitk::IOMetaInformationPropertyConsants::READER_MIME_NAME()).c_str())->GetValueAsString();
+    value = img->GetProperty(mitk::PropertyKeyPathToPropertyName(mitk::IOMetaInformationPropertyConstants::READER_MIME_NAME()).c_str())->GetValueAsString();
     CPPUNIT_ASSERT_EQUAL(std::string("application/vnd.mitk.image.nrrd"), value);
-    value = img->GetProperty(mitk::PropertyKeyPathToPropertyName(mitk::IOMetaInformationPropertyConsants::READER_VERSION()).c_str())->GetValueAsString();
+    value = img->GetProperty(mitk::PropertyKeyPathToPropertyName(mitk::IOMetaInformationPropertyConstants::READER_VERSION()).c_str())->GetValueAsString();
     CPPUNIT_ASSERT_EQUAL(std::string(MITK_VERSION_STRING), value);
 
     //check if the information is persistet correctly on save.
@@ -273,15 +273,15 @@ public:
     io->ReadImageInformation();
     auto metaDict = io->GetMetaDataDictionary();
 
-    auto metaValue = GetValueFromMetaDict(metaDict, mitk::IOMetaInformationPropertyConsants::READER_DESCRIPTION());
+    auto metaValue = GetValueFromMetaDict(metaDict, mitk::IOMetaInformationPropertyConstants::READER_DESCRIPTION());
     CPPUNIT_ASSERT_EQUAL(std::string("ITK NrrdImageIO"), metaValue);
-    metaValue = GetValueFromMetaDict(metaDict, mitk::IOMetaInformationPropertyConsants::READER_INPUTLOCATION());
+    metaValue = GetValueFromMetaDict(metaDict, mitk::IOMetaInformationPropertyConstants::READER_INPUTLOCATION());
     CPPUNIT_ASSERT_EQUAL(m_ImagePath, metaValue);
-    metaValue = GetValueFromMetaDict(metaDict, mitk::IOMetaInformationPropertyConsants::READER_MIME_CATEGORY());
+    metaValue = GetValueFromMetaDict(metaDict, mitk::IOMetaInformationPropertyConstants::READER_MIME_CATEGORY());
     CPPUNIT_ASSERT_EQUAL(std::string("Images"), metaValue);
-    metaValue = GetValueFromMetaDict(metaDict, mitk::IOMetaInformationPropertyConsants::READER_MIME_NAME());
+    metaValue = GetValueFromMetaDict(metaDict, mitk::IOMetaInformationPropertyConstants::READER_MIME_NAME());
     CPPUNIT_ASSERT_EQUAL(std::string("application/vnd.mitk.image.nrrd"), metaValue);
-    metaValue = GetValueFromMetaDict(metaDict, mitk::IOMetaInformationPropertyConsants::READER_VERSION());
+    metaValue = GetValueFromMetaDict(metaDict, mitk::IOMetaInformationPropertyConstants::READER_VERSION());
     CPPUNIT_ASSERT_EQUAL(std::string(MITK_VERSION_STRING), metaValue);
 
     // delete the files after the test is done

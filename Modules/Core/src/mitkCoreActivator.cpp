@@ -109,7 +109,7 @@ void AddPropertyPersistence(const mitk::PropertyKeyPath& propPath)
 {
   mitk::CoreServicePointer<mitk::IPropertyPersistence> persistenceService(mitk::CoreServices::GetPropertyPersistence());
 
-  mitk::PropertyPersistenceInfo::Pointer info = mitk::PropertyPersistenceInfo::New();
+  auto info = mitk::PropertyPersistenceInfo::New();
   if (propPath.IsExplicit())
   {
     std::string name = mitk::PropertyKeyPathToPropertyName(propPath);
@@ -207,12 +207,12 @@ void MitkCoreActivator::Load(us::ModuleContext *context)
   m_FileReaders.push_back(new mitk::RawImageFileReaderService());
 
   //add properties that should be persistent (if possible/supported by the writer)
-  AddPropertyPersistence(mitk::IOMetaInformationPropertyConsants::READER_DESCRIPTION());
-  AddPropertyPersistence(mitk::IOMetaInformationPropertyConsants::READER_INPUTLOCATION());
-  AddPropertyPersistence(mitk::IOMetaInformationPropertyConsants::READER_MIME_CATEGORY());
-  AddPropertyPersistence(mitk::IOMetaInformationPropertyConsants::READER_MIME_NAME());
-  AddPropertyPersistence(mitk::IOMetaInformationPropertyConsants::READER_VERSION());
-  AddPropertyPersistence(mitk::IOMetaInformationPropertyConsants::READER_OPTIONS_ANY());
+  AddPropertyPersistence(mitk::IOMetaInformationPropertyConstants::READER_DESCRIPTION());
+  AddPropertyPersistence(mitk::IOMetaInformationPropertyConstants::READER_INPUTLOCATION());
+  AddPropertyPersistence(mitk::IOMetaInformationPropertyConstants::READER_MIME_CATEGORY());
+  AddPropertyPersistence(mitk::IOMetaInformationPropertyConstants::READER_MIME_NAME());
+  AddPropertyPersistence(mitk::IOMetaInformationPropertyConstants::READER_VERSION());
+  AddPropertyPersistence(mitk::IOMetaInformationPropertyConstants::READER_OPTIONS_ANY());
 
   /*
     There IS an option to exchange ALL vtkTexture instances against vtkNeverTranslucentTextureFactory.

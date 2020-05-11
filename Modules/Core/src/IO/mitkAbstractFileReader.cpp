@@ -91,18 +91,18 @@ namespace mitk
 
     for (auto& data : result)
     {
-      data->SetProperty(PropertyKeyPathToPropertyName(IOMetaInformationPropertyConsants::READER_DESCRIPTION()), StringProperty::New(d->GetDescription()));
-      data->SetProperty(PropertyKeyPathToPropertyName(IOMetaInformationPropertyConsants::READER_VERSION()), StringProperty::New(MITK_VERSION_STRING));
-      data->SetProperty(PropertyKeyPathToPropertyName(IOMetaInformationPropertyConsants::READER_MIME_NAME()), StringProperty::New(d->GetMimeType()->GetName()));
-      data->SetProperty(PropertyKeyPathToPropertyName(IOMetaInformationPropertyConsants::READER_MIME_CATEGORY()), StringProperty::New(d->GetMimeType()->GetCategory()));
+      data->SetProperty(PropertyKeyPathToPropertyName(IOMetaInformationPropertyConstants::READER_DESCRIPTION()), StringProperty::New(d->GetDescription()));
+      data->SetProperty(PropertyKeyPathToPropertyName(IOMetaInformationPropertyConstants::READER_VERSION()), StringProperty::New(MITK_VERSION_STRING));
+      data->SetProperty(PropertyKeyPathToPropertyName(IOMetaInformationPropertyConstants::READER_MIME_NAME()), StringProperty::New(d->GetMimeType()->GetName()));
+      data->SetProperty(PropertyKeyPathToPropertyName(IOMetaInformationPropertyConstants::READER_MIME_CATEGORY()), StringProperty::New(d->GetMimeType()->GetCategory()));
       if (this->GetInputStream() == nullptr)
       {
-        data->SetProperty(PropertyKeyPathToPropertyName(IOMetaInformationPropertyConsants::READER_INPUTLOCATION()), StringProperty::New(this->GetInputLocation()));
+        data->SetProperty(PropertyKeyPathToPropertyName(IOMetaInformationPropertyConstants::READER_INPUTLOCATION()), StringProperty::New(this->GetInputLocation()));
       }
 
       for (const auto& option : options)
       {
-        auto optionpath = IOMetaInformationPropertyConsants::READER_OPTION_ROOT().AddElement(option.first);
+        auto optionpath = IOMetaInformationPropertyConstants::READER_OPTION_ROOT().AddElement(option.first);
         data->SetProperty(PropertyKeyPathToPropertyName(optionpath), StringProperty::New(option.second.ToString()));
       }
     }

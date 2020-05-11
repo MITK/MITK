@@ -42,7 +42,7 @@ public:
 
   using mitk::AbstractFileReader::Read;
 
-  std::vector<itk::SmartPointer<mitk::BaseData>> Read() override
+  std::vector<itk::SmartPointer<mitk::BaseData>> DoRead() override
   {
     std::vector<mitk::BaseData::Pointer> result;
     return result;
@@ -76,7 +76,7 @@ public:
 
   using mitk::AbstractFileReader::Read;
 
-  std::vector<itk::SmartPointer<mitk::BaseData>> Read() override
+  std::vector<itk::SmartPointer<mitk::BaseData>> DoRead() override
   {
     std::vector<mitk::BaseData::Pointer> result;
     return result;

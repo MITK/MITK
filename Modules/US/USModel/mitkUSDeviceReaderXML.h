@@ -31,7 +31,7 @@ namespace mitk {
     ~USDeviceReaderXML() override;
 
     using AbstractFileReader::Read;
-    std::vector<itk::SmartPointer<BaseData>> Read() override;
+
     bool ReadUltrasoundDeviceConfiguration();
 
     void SetFilename(std::string filename);
@@ -73,6 +73,8 @@ namespace mitk {
     USDeviceConfigData &GetUSDeviceConfigData();
 
   protected:
+    std::vector<itk::SmartPointer<BaseData>> DoRead() override;
+
     USDeviceReaderXML(const USDeviceReaderXML& other);
     mitk::USDeviceReaderXML* Clone() const override;
 

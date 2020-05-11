@@ -51,7 +51,7 @@ mitk::USDeviceReaderXML* mitk::USDeviceReaderXML::Clone() const
 
 
 
-std::vector<itk::SmartPointer<mitk::BaseData>> mitk::USDeviceReaderXML::Read()
+std::vector<itk::SmartPointer<mitk::BaseData>> mitk::USDeviceReaderXML::DoRead()
 {
   MITK_WARN << "This method is not implemented. \
   Please use the method ReadUltrasoundDeviceConfiguration() instead.";

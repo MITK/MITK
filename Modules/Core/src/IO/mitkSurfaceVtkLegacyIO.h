@@ -27,13 +27,15 @@ namespace mitk
     // -------------- AbstractFileReader -------------
 
     using AbstractFileReader::Read;
-    std::vector<BaseData::Pointer> Read() override;
 
     ConfidenceLevel GetReaderConfidenceLevel() const override;
 
     // -------------- AbstractFileWriter -------------
 
     void Write() override;
+
+  protected:
+    std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
   private:
     SurfaceVtkLegacyIO *IOClone() const override;

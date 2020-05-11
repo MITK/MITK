@@ -79,7 +79,7 @@ mitk::RandomForestFileIO::~RandomForestFileIO()
 
 std::vector<itk::SmartPointer<mitk::BaseData> >
 mitk::RandomForestFileIO::
-Read()
+DoRead()
 {
   mitk::VigraRandomForestClassifier::Pointer output = mitk::VigraRandomForestClassifier::New();
   std::vector<itk::SmartPointer<mitk::BaseData> > result;

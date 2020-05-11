@@ -278,6 +278,15 @@ namespace mitk
 
   PropertyKeyPath::PropertyKeyPath(const PropertyKeyPath &path) { *this = path; };
 
+  PropertyKeyPath::PropertyKeyPath(const std::initializer_list< ElementNameType >& list)
+  {
+    this->Reset();
+    for (const auto& name : list)
+    {
+      this->AddElement(name);
+    }
+  }
+
   PropertyKeyPath::~PropertyKeyPath(){};
 
   void PropertyKeyPath::Reset() { m_NodeInfos.clear(); };

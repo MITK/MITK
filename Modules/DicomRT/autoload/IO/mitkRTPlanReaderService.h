@@ -41,15 +41,17 @@ namespace mitk
     RTPlanReaderService(const RTPlanReaderService& other);
 
     using AbstractFileReader::Read;
+
+    ~RTPlanReaderService() override;
+
+  protected:
     /**
     * \brief Reads the file (only tags).
       @details DICOMDCMTKTagScanner is used to read the tags
       \note No image information is in RTPLAN.
       \sa mitk::GetDefaultDICOMTagsOfInterest() for tags that are read
     */
-    std::vector<itk::SmartPointer<BaseData> > Read() override;
-
-    ~RTPlanReaderService() override;
+    std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
   private:
     RTPlanReaderService* Clone() const override;

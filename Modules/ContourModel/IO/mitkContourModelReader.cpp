@@ -37,7 +37,7 @@ mitk::ContourModelReader::~ContourModelReader()
 {
 }
 
-std::vector<itk::SmartPointer<mitk::BaseData>> mitk::ContourModelReader::Read()
+std::vector<itk::SmartPointer<mitk::BaseData>> mitk::ContourModelReader::DoRead()
 {
   std::vector<itk::SmartPointer<mitk::BaseData>> result;
   std::string location = GetInputLocation();

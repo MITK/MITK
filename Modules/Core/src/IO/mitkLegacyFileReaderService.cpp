@@ -51,7 +51,7 @@ mitk::LegacyFileReaderService::~LegacyFileReaderService()
 
 ////////////////////// Reading /////////////////////////
 
-std::vector<itk::SmartPointer<mitk::BaseData>> mitk::LegacyFileReaderService::Read()
+std::vector<itk::SmartPointer<mitk::BaseData>> mitk::LegacyFileReaderService::DoRead()
 {
   std::vector<BaseData::Pointer> result;
 

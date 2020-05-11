@@ -168,6 +168,8 @@ namespace mitk
 
     PropertyKeyPath();
     PropertyKeyPath(const PropertyKeyPath &path);
+    /** overload constructor that supports simple key pathes consisting only of elements.*/
+    PropertyKeyPath(const std::initializer_list< ElementNameType >& list);
 
     ~PropertyKeyPath();
 

@@ -30,13 +30,15 @@ namespace mitk
 
     // -------------- AbstractFileReader -------------
     using AbstractFileReader::Read;
-    std::vector<itk::SmartPointer<BaseData> > Read() override;
 
     ConfidenceLevel GetReaderConfidenceLevel() const override;
 
     // -------------- AbstractFileWriter -------------
     void Write() override;
     ConfidenceLevel GetWriterConfidenceLevel() const override;
+
+  protected:
+    std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
   private:
     MAPRegistrationWrapperIO(const MAPRegistrationWrapperIO& other);

@@ -42,7 +42,9 @@ namespace mitk
     ~PointSetReaderService() override;
 
     using AbstractFileReader::Read;
-    std::vector<itk::SmartPointer<BaseData>> Read() override;
+
+  protected:
+    std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
   private:
     PointSetReaderService(const PointSetReaderService &other);

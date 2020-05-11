@@ -36,6 +36,7 @@ set(CPP_FILES
   mitkDICOMTagPath.cpp
   mitkDICOMProperty.cpp
   mitkDICOMFilesHelper.cpp
+  mitkDICOMIOMetaInformationPropertyConstants.cpp
   legacy/mitkDicomSeriesReader.cpp
   legacy/mitkDicomSR_GantryTiltInformation.cpp
   legacy/mitkDicomSR_ImageBlockDescriptor.cpp

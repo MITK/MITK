@@ -23,6 +23,7 @@ class mitkTemporoSpatialStringPropertyTestSuite : public mitk::TestFixture
   MITK_TEST(GetValue);
   MITK_TEST(HasValue);
   MITK_TEST(SetValue);
+  MITK_TEST(IsUniform);
 
   MITK_TEST(serializeTemporoSpatialStringPropertyToJSON);
   MITK_TEST(deserializeJSONToTemporoSpatialStringProperty);
@@ -72,6 +73,7 @@ public:
   }
 
   void tearDown() override {}
+
   void GetValue()
   {
     CPPUNIT_ASSERT(refProp->GetValue() == "v_0_0");
@@ -151,6 +153,13 @@ public:
     CPPUNIT_ASSERT(refProp->GetValue(0, 0) == "newValue");
     CPPUNIT_ASSERT(refProp->GetAvailableTimeSteps().size() == 1);
     CPPUNIT_ASSERT(refProp->GetAvailableSlices(0).size() == 1);
+  }
+
+  void IsUniform()
+  {
+    CPPUNIT_ASSERT(!refProp->IsUniform());
+    CPPUNIT_ASSERT(!refPartlyCondensibleProp->IsUniform());
+    CPPUNIT_ASSERT(refCondensibleProp->IsUniform());
   }
 
   void serializeTemporoSpatialStringPropertyToJSON()

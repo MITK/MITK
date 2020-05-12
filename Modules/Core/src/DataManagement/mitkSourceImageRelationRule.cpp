@@ -18,7 +18,12 @@ found in the LICENSE file.
 #include "mitkStringProperty.h"
 #include "mitkTemporoSpatialStringProperty.h"
 #include "mitkDataNode.h"
+#include "mitkIdentifiable.h"
 
+std::string mitk::SourceImageRelationRule::GenerateRuleID(const std::string& purpose) const
+{
+  return "SourceImageRelation " + purpose;
+}
 
 bool mitk::SourceImageRelationRule::IsAbstract() const
 {
@@ -32,7 +37,7 @@ bool mitk::SourceImageRelationRule::IsSupportedRuleID(const RuleIDType& ruleID) 
 
 mitk::SourceImageRelationRule::RuleIDType mitk::SourceImageRelationRule::GetRuleID() const
 {
-  return "SourceImageRelation " + m_PurposeTag;
+  return this->GenerateRuleID(m_PurposeTag);
 };
 
 std::string mitk::SourceImageRelationRule::GetDisplayName() const
@@ -83,50 +88,70 @@ mitk::SourceImageRelationRule::SourceImageRelationRule(const RuleIDType &purpose
                                                    const std::string &destinationRole)
   : m_PurposeTag(purposeTag), m_DisplayName(displayName), m_SourceRole(sourceRole), m_DestinationRole(destinationRole){};
 
-mitk::SourceImageRelationRule::InstanceIDVectorType mitk::SourceImageRelationRule::GetInstanceID_datalayer(
-  const IPropertyProvider * source, const IPropertyProvider * destination) const
+mitk::SourceImageRelationRule::DataRelationUIDVectorType
+mitk::SourceImageRelationRule::GetRelationUIDs_DataLayer(const IPropertyProvider* source,
+  const IPropertyProvider* destination, const InstanceIDVectorType& instances_IDLayer) const
 {
-  InstanceIDVectorType result;
+  DataRelationUIDVectorType result;
 
-  auto relevantReferenceIndices = GetReferenceSequenceIndices(source, destination);
+  auto relevantIndicesAndRuleIDs = GetReferenceSequenceIndices(source, destination, instances_IDLayer);
 
-  auto itemRegExStr = this->GetRIIPropertyRegEx("SourceImageSequenceItem");
-  auto regEx = std::regex(itemRegExStr);
+  auto itemRIIRegExStr = this->GetRIIPropertyRegEx("SourceImageSequenceItem");
+  auto regEx = std::regex(itemRIIRegExStr);
 
   //workaround until T24729 is done. Please remove if T24728 is done
   auto keys = PropertyRelationRuleBase::GetPropertyKeys(source);
   //end workaround for T24729
 
-  for (const auto &key : keys)
+  for (const auto &indexNRule : relevantIndicesAndRuleIDs)
   {
-    if (std::regex_match(key, regEx))
+    bool relationCoveredByRII = false;
+    for (const auto& key : keys)
     {
-      auto sequItemProp = source->GetConstProperty(key);
-      if (sequItemProp.IsNotNull())
+      if (std::regex_match(key, regEx))
       {
-        auto finding = std::find(std::cbegin(relevantReferenceIndices), std::cend(relevantReferenceIndices), sequItemProp->GetValueAsString());
-        if (finding != std::cend(relevantReferenceIndices))
+        auto sequItemProp = source->GetConstProperty(key);
+        if (sequItemProp.IsNotNull() && sequItemProp->GetValueAsString() == std::to_string(indexNRule.first))
         {
+          relationCoveredByRII = true;
           auto instanceID = GetInstanceIDByPropertyName(key);
           auto ruleID = GetRuleIDByInstanceID(source, instanceID);
           if (this->IsSupportedRuleID(ruleID))
           {
-            result.push_back(instanceID);
+            result.emplace_back(this->GetRelationUIDByInstanceID(source, instanceID), ruleID);
           }
         }
       }
+    }
+
+    if (!relationCoveredByRII)
+    {
+      //the relation is not covered on the RII level, so we generate the property path to the DICOM source reference (this is done via
+      //the SOP Instance UIDs which uniquely identify an DICOM IOD). We use this property path as relation UID because it is identifying
+      //on the data level (even so not long term stable if relations with a lower index are removed).
+      PropertyKeyPath referencedInstanceUIDs;
+      referencedInstanceUIDs.AddElement("DICOM").AddElement("0008").AddSelection("2112", indexNRule.first).AddElement("0008").AddElement("1155");
+
+      std::string ruleID = "";
+      if (!indexNRule.second.empty())
+      {
+        ruleID = this->GenerateRuleID(indexNRule.second);
+      }
+
+      result.emplace_back(PropertyKeyPathToPropertyName(referencedInstanceUIDs), ruleID);
     }
   }
 
   return result;
 };
 
-std::vector<std::string> mitk::SourceImageRelationRule::GetReferenceSequenceIndices(const IPropertyProvider * source,
-  const IPropertyProvider * destination) const
+std::vector<std::pair<size_t,std::string> > mitk::SourceImageRelationRule::GetReferenceSequenceIndices(const IPropertyProvider * source,
+  const IPropertyProvider * destination, InstanceIDVectorType ignoreInstances) const
 {
-  std::vector<std::string> result;
+  std::vector<std::pair<size_t, std::string> > result;
 
   BaseProperty::ConstPointer destInstanceUIDProp;
+  std::string destinationUID = "";
 
   if (destination)
   {
@@ -136,12 +161,31 @@ std::vector<std::string> mitk::SourceImageRelationRule::GetReferenceSequenceIndi
     {
       return result;
     }
+
+    auto identifiable = this->CastProviderAsIdentifiable(destination);
+
+    if (identifiable)
+    {
+      destinationUID= identifiable->GetUID();
+    }
+  }
+
+  std::vector<std::string> ignoreItemIndices;
+  for (const auto& iID : ignoreInstances)
+  {
+    auto sourceImageRefPath = GetRootKeyPath().AddElement(iID).AddElement("SourceImageSequenceItem");
+    auto imageRefProp = source->GetConstProperty(PropertyKeyPathToPropertyName(sourceImageRefPath));
+
+    if (imageRefProp.IsNotNull())
+    {
+      ignoreItemIndices.emplace_back(imageRefProp->GetValueAsString());
+    }
   }
 
   PropertyKeyPath referencedInstanceUIDs;
   referencedInstanceUIDs.AddElement("DICOM").AddElement("0008").AddAnySelection("2112").AddElement("0008").AddElement("1155");
 
-  auto sourceRegExStr = PropertyKeyPathToPropertyRegEx(referencedInstanceUIDs);;
+  auto sourceRegExStr = PropertyKeyPathToPropertyRegEx(referencedInstanceUIDs);
   auto regEx = std::regex(sourceRegExStr);
 
   std::vector<std::string> keys;
@@ -158,13 +202,22 @@ std::vector<std::string> mitk::SourceImageRelationRule::GetReferenceSequenceIndi
       {
         auto currentKeyPath = PropertyNameToPropertyKeyPath(key);
         auto currentKeyPathSelection = currentKeyPath.GetNode(2).selection;
-        PropertyKeyPath purposePath;
-        purposePath.AddElement("DICOM").AddElement("0008").AddSelection("2112", currentKeyPathSelection).AddElement("0040").AddSelection("a170", 0).AddElement("0008").AddElement("0104");
 
-        auto purposeProp = source->GetConstProperty(PropertyKeyPathToPropertyName(purposePath));
-        if (this->IsAbstract() || (purposeProp.IsNotNull() && purposeProp->GetValueAsString() == this->m_PurposeTag))
+        auto finding = std::find(ignoreItemIndices.begin(), ignoreItemIndices.end(), std::to_string(currentKeyPathSelection));
+        if (finding == ignoreItemIndices.end())
         {
-          result.push_back(std::to_string(currentKeyPathSelection));
+          PropertyKeyPath purposePath;
+          purposePath.AddElement("DICOM").AddElement("0008").AddSelection("2112", currentKeyPathSelection).AddElement("0040").AddSelection("a170", 0).AddElement("0008").AddElement("0104");
+          auto purposeProp = source->GetConstProperty(PropertyKeyPathToPropertyName(purposePath));
+          std::string currentPurpose = "";
+          if (purposeProp.IsNotNull())
+          {
+            currentPurpose = purposeProp->GetValueAsString();
+          }
+          if (this->IsAbstract() || (purposeProp.IsNotNull() && currentPurpose == this->m_PurposeTag))
+          {
+            result.emplace_back(currentKeyPathSelection, currentPurpose);
+          }
         }
       }
     }
@@ -172,34 +225,6 @@ std::vector<std::string> mitk::SourceImageRelationRule::GetReferenceSequenceIndi
 
   return result;
 };
-
-bool mitk::SourceImageRelationRule::HasImplicitDataRelation(const IPropertyProvider * source,
-                                                          const IPropertyProvider * destination) const
-{
-  auto relevantReferences = GetReferenceSequenceIndices(source, destination);
-
-  if (this->IsAbstract())
-  {
-    return !relevantReferences.empty();
-  }
-  else
-  {
-    for (auto referenceIndex : relevantReferences)
-    {
-      PropertyKeyPath purposePath;
-      purposePath.AddElement("DICOM").AddElement("0008").AddSelection("2112", std::stoi(referenceIndex)).AddElement("0040").AddSelection("a170", 0).AddElement("0008").AddElement("0104");
-      auto purposeProp = source->GetConstProperty(PropertyKeyPathToPropertyName(purposePath));
-
-      if (purposeProp.IsNotNull() && purposeProp->GetValueAsString() == this->m_PurposeTag)
-      {
-        return true;
-      }
-    }
-  }
-
-  return false;
-};
-
 
 /**This mutex is used to guard mitk::SourceImageRelationRule::CreateNewSourceImageSequenceItem by a class wide mutex to avoid
 racing conditions in a scenario where rules are used concurrently. It is not in the class interface itself, because it
@@ -278,7 +303,7 @@ void mitk::SourceImageRelationRule::Connect_datalayer(IPropertyOwner * source,
     std::string  newSelectionIndexStr;
     if (!existingRefs.empty())
     {
-      newSelectionIndexStr = existingRefs[0];
+      newSelectionIndexStr = std::to_string(existingRefs[0].first);
     }
     else
     {
@@ -308,30 +333,41 @@ void mitk::SourceImageRelationRule::Connect_datalayer(IPropertyOwner * source,
   }
 };
 
-void mitk::SourceImageRelationRule::Disconnect_datalayer(IPropertyOwner * source, const InstanceIDType & instanceID) const
+void mitk::SourceImageRelationRule::Disconnect_datalayer(IPropertyOwner * source, const RelationUIDType & relationUID) const
 {
-  auto sourceImageRefPath = GetRootKeyPath().AddElement(instanceID).AddElement("SourceImageSequenceItem");
-  auto imageRefProp = source->GetConstProperty(PropertyKeyPathToPropertyName(sourceImageRefPath));
+  std::string deletedImageRefSequenceIndexStr = "";
 
-  if (imageRefProp.IsNotNull())
+  if (relationUID.find("DICOM") == 0)
+  { //relation that is purly data based.
+    auto currentKeyPath = PropertyNameToPropertyKeyPath(relationUID);
+    deletedImageRefSequenceIndexStr = std::to_string(currentKeyPath.GetNode(2).selection);
+  }
+  else
   {
-    auto deletedImageRefSequenceIndex = imageRefProp->GetValueAsString();
+    auto sourceImageRefPath = GetRootKeyPath().AddElement(this->GetInstanceIDByRelationUID(source,relationUID)).AddElement("SourceImageSequenceItem");
+    auto imageRefProp = source->GetConstProperty(PropertyKeyPathToPropertyName(sourceImageRefPath));
+    if (imageRefProp.IsNotNull())
+    {
+      deletedImageRefSequenceIndexStr = imageRefProp->GetValueAsString();
+    }
+  }
 
+  if(!deletedImageRefSequenceIndexStr.empty())
+  {
+    auto deletedImageRefSequenceIndex = std::stoull(deletedImageRefSequenceIndexStr);
     auto refs = GetReferenceSequenceIndices(source);
     std::sort(refs.begin(), refs.end());
 
-    for (auto refIndexStr : refs)
+    for (auto refIndex : refs)
     {
-      auto refIndex = std::stoi(refIndexStr);
-
-      if (refIndex >= std::stoi(deletedImageRefSequenceIndex))
+      if (refIndex.first >= deletedImageRefSequenceIndex)
       {
         PropertyKeyPath refDICOMDataPath;
-        refDICOMDataPath.AddElement("DICOM").AddElement("0008").AddSelection("2112", refIndex);
+        refDICOMDataPath.AddElement("DICOM").AddElement("0008").AddSelection("2112", refIndex.first);
         auto prefix = PropertyKeyPathToPropertyName(refDICOMDataPath);
 
         PropertyKeyPath refRelDataPath = GetRootKeyPath().AddAnyElement().AddElement("SourceImageSequenceItem");;
-        auto regEx = std::regex(PropertyKeyPathToPropertyRegEx(refRelDataPath));
+        auto riiRegEx = std::regex(PropertyKeyPathToPropertyRegEx(refRelDataPath));
 
         //workaround until T24729 is done. You can use directly source->GetPropertyKeys again, when fixed.
         const auto keys = GetPropertyKeys(source);
@@ -341,25 +377,27 @@ void mitk::SourceImageRelationRule::Disconnect_datalayer(IPropertyOwner * source
         {
           if (key.find(prefix) == 0)
           { //its a relevant DICOM property delete or update
-            if (refIndexStr != deletedImageRefSequenceIndex)
+            if (refIndex.first != deletedImageRefSequenceIndex)
             {
               //reindex to close the gap in the dicom sequence.
               auto newPath = PropertyNameToPropertyKeyPath(key);
-              newPath.GetNode(2).selection = refIndex - 1;
+              newPath.GetNode(2).selection = refIndex.first - 1;
               source->SetProperty(PropertyKeyPathToPropertyName(newPath), source->GetNonConstProperty(key));
             }
             //remove old/outdated data layer information
             source->RemoveProperty(key);
-
-            auto sourceImageRefPath = GetRootKeyPath().AddElement(instanceID).AddElement("SourceImageSequenceItem");
           }
-          if (std::regex_match(key, regEx))
-          {
+          if (std::regex_match(key, riiRegEx))
+          { //it is a relevant RII property, remove it or update it.
             auto imageSequenceItemProp = source->GetConstProperty(key);
-            if (imageSequenceItemProp->GetValueAsString() == std::to_string(refIndex))
+            if (imageSequenceItemProp->GetValueAsString() == deletedImageRefSequenceIndexStr)
             {
-              //its a relevant data property of the relation rule.
-              source->SetProperty(key, StringProperty::New(std::to_string(refIndex - 1)));
+              source->RemoveProperty(key);
+            }
+            else if (imageSequenceItemProp->GetValueAsString() == std::to_string(refIndex.first))
+            {
+              //its a relevant data property of the relation rule reindex it.
+              source->SetProperty(key, StringProperty::New(std::to_string(refIndex.first - 1)));
             }
           }
         }

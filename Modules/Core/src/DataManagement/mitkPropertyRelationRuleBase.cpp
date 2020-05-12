@@ -20,31 +20,32 @@ found in the LICENSE file.
 
 #include <mutex>
 #include <regex>
+#include <algorithm>
 
 bool mitk::PropertyRelationRuleBase::IsAbstract() const
 {
   return true;
-};
+}
 
 bool mitk::PropertyRelationRuleBase::IsSourceCandidate(const IPropertyProvider *owner) const
 {
   return owner != nullptr;
-};
+}
 
 bool mitk::PropertyRelationRuleBase::IsDestinationCandidate(const IPropertyProvider *owner) const
 {
   return owner != nullptr;
-};
+}
 
 mitk::PropertyKeyPath mitk::PropertyRelationRuleBase::GetRootKeyPath()
 {
   return PropertyKeyPath().AddElement("MITK").AddElement("Relations");
-};
+}
 
 bool mitk::PropertyRelationRuleBase::IsSupportedRuleID(const RuleIDType& ruleID) const
 {
   return ruleID == this->GetRuleID();
-};
+}
 
 
 std::string mitk::PropertyRelationRuleBase::GetRIIPropertyRegEx(const std::string propName, const InstanceIDType &instanceID) const
@@ -65,7 +66,7 @@ std::string mitk::PropertyRelationRuleBase::GetRIIPropertyRegEx(const std::strin
   }
 
   return PropertyKeyPathToPropertyRegEx(path);
-};
+}
 
 //workaround until T24729 is done. Please remove if T24728 is done
 //then could directly use owner->GetPropertyKeys() again.
@@ -86,43 +87,40 @@ std::vector<std::string> mitk::PropertyRelationRuleBase::GetPropertyKeys(const m
     keys = owner->GetPropertyKeys();
   }
   return keys;
-};
+}
 //end workaround for T24729
-
 
 bool mitk::PropertyRelationRuleBase::IsSource(const IPropertyProvider *owner) const
 {
-  if (!owner)
+  return !this->GetExistingRelations(owner).empty();
+}
+
+bool mitk::PropertyRelationRuleBase::HasRelation(
+  const IPropertyProvider* source, const IPropertyProvider* destination, RelationType requiredRelation) const
+{
+  auto relTypes = this->GetRelationTypes(source, destination);
+
+
+  if (requiredRelation == RelationType::None)
   {
-    mitkThrow() << "Error. Passed owner pointer is NULL";
+    return !relTypes.empty();
   }
 
-  std::vector<std::string> keys;
-  //workaround until T24729 is done. Please remove if T24728 is done
-  keys = GetPropertyKeys(owner);
-  //end workaround for T24729
-
-  auto sourceRegExStr = this->GetRIIPropertyRegEx("ruleID");
-  auto regEx = std::regex(sourceRegExStr);
-
-  for (const auto &key : keys)
+  RelationVectorType allowedTypes = { RelationType::Complete };
+  if (requiredRelation == RelationType::Data)
   {
-    if (std::regex_match(key, regEx))
-    {
-      auto idProp = owner->GetConstProperty(key);
-      auto ruleID = idProp->GetValueAsString();
-      if (this->IsSupportedRuleID(ruleID))
-      {
-        return true;
-      }
-    }
+    allowedTypes.emplace_back(RelationType::Data);
+  }
+  else if (requiredRelation == RelationType::ID)
+  {
+    allowedTypes.emplace_back(RelationType::ID);
   }
 
-  return false;
-};
+  return relTypes.end() != std::find_first_of(relTypes.begin(), relTypes.end(), allowedTypes.begin(), allowedTypes.end());
+}
 
-mitk::PropertyRelationRuleBase::RelationType mitk::PropertyRelationRuleBase::HasRelation(
-  const IPropertyProvider *source, const IPropertyProvider *destination) const
+mitk::PropertyRelationRuleBase::RelationVectorType mitk::PropertyRelationRuleBase::GetRelationTypes(
+  const IPropertyProvider* source, const IPropertyProvider* destination) const
 {
   if (!source)
   {
@@ -133,73 +131,136 @@ mitk::PropertyRelationRuleBase::RelationType mitk::PropertyRelationRuleBase::Has
     mitkThrow() << "Error. Passed owner pointer is NULL";
   }
 
-  RelationType result = RelationType::None;
-
-  if (!this->GetInstanceID_IDLayer(source, destination).empty())
-  { // has relations of type Connected_ID;
-    result = RelationType::Connected_ID;
+  auto instanceIDs_IDLayer = this->GetInstanceID_IDLayer(source, destination);
+  auto relIDs_dataLayer = this->GetRelationUIDs_DataLayer(source, destination, {});
+  if (relIDs_dataLayer.size() > 1)
+  {
+    MITK_WARN << "Property relation on data level is ambiguous. First relation is used. Relation UID: "
+              << relIDs_dataLayer.front().first;
   }
 
-  if (result == RelationType::None)
+  bool hasComplete = instanceIDs_IDLayer.end() != std::find_if(instanceIDs_IDLayer.begin(), instanceIDs_IDLayer.end(), [&](const InstanceIDVectorType::value_type& instanceID)
   {
-    auto instanceIDs_data = this->GetInstanceID_datalayer(source, destination);
+    auto relID_IDlayer = this->GetRelationUIDByInstanceID(source, instanceID);
+    auto ruleID_IDlayer = this->GetRuleIDByInstanceID(source, instanceID);
 
-    if (instanceIDs_data.size() > 1)
+    return relIDs_dataLayer.end() != std::find_if(relIDs_dataLayer.begin(), relIDs_dataLayer.end(), [&](const DataRelationUIDVectorType::value_type& relID)
     {
-      MITK_WARN << "Property relation on data level is ambiguous. First relation is used. Instance ID: "
-                << instanceIDs_data.front();
-    }
+      return relID.first == relID_IDlayer && relID.second == ruleID_IDlayer;
+    });
+  });
 
-    if (!instanceIDs_data.empty() && instanceIDs_data.front() != NULL_INSTANCE_ID())
-    { // has relations of type Connected_Data;
-      result = RelationType::Connected_Data;
-    }
-  }
-
-  if (result == RelationType::None)
+  bool hasID = instanceIDs_IDLayer.end() != std::find_if(instanceIDs_IDLayer.begin(), instanceIDs_IDLayer.end(), [&](const InstanceIDVectorType::value_type& instanceID)
   {
-    if (this->HasImplicitDataRelation(source, destination))
-    { // has relations of type Connected_Data;
-      result = RelationType::Implicit_Data;
-    }
+    auto relID_IDlayer = this->GetRelationUIDByInstanceID(source, instanceID);
+    auto ruleID_IDlayer = this->GetRuleIDByInstanceID(source, instanceID);
+
+    return relIDs_dataLayer.end() == std::find_if(relIDs_dataLayer.begin(), relIDs_dataLayer.end(), [&](const DataRelationUIDVectorType::value_type& relID)
+    {
+      return relID.first == relID_IDlayer && relID.second == ruleID_IDlayer;
+    });
+  });
+
+  bool hasData = relIDs_dataLayer.end() != std::find_if(relIDs_dataLayer.begin(), relIDs_dataLayer.end(), [&](const DataRelationUIDVectorType::value_type& relID)
+  {
+    return instanceIDs_IDLayer.end() == std::find_if(instanceIDs_IDLayer.begin(), instanceIDs_IDLayer.end(), [&](const InstanceIDVectorType::value_type& instanceID)
+    {
+      auto relID_IDlayer = this->GetRelationUIDByInstanceID(source, instanceID);
+      auto ruleID_IDlayer = this->GetRuleIDByInstanceID(source, instanceID);
+      return relID.first == relID_IDlayer && relID.second == ruleID_IDlayer;
+    });
+  });
+
+  RelationVectorType result;
+
+  if (hasData)
+  {
+    result.emplace_back(RelationType::Data);
+  }
+  if (hasID)
+  {
+    result.emplace_back(RelationType::ID);
+  }
+  if (hasComplete)
+  {
+    result.emplace_back(RelationType::Complete);
   }
 
   return result;
-};
+}
 
 mitk::PropertyRelationRuleBase::RelationUIDVectorType mitk::PropertyRelationRuleBase::GetExistingRelations(
-  const IPropertyProvider *source) const
+  const IPropertyProvider *source, RelationType layer) const
 {
   if (!source)
   {
     mitkThrow() << "Error. Passed source pointer is NULL";
   }
 
-  auto ruleIDRegExStr = this->GetRIIPropertyRegEx("ruleID");
-  auto regEx = std::regex(ruleIDRegExStr);
-
-  //workaround until T24729 is done. You can use directly source->GetPropertyKeys again, when fixed.
-  const auto keys = GetPropertyKeys(source);
-  //end workaround for T24729
-
   RelationUIDVectorType relationUIDs;
+  InstanceIDVectorType instanceIDs;
 
-  for (const auto &key : keys)
+  if (layer != RelationType::Data)
   {
-    if (std::regex_match(key, regEx))
+    auto ruleIDRegExStr = this->GetRIIPropertyRegEx("ruleID");
+    auto regEx = std::regex(ruleIDRegExStr);
+
+    //workaround until T24729 is done. You can use directly source->GetPropertyKeys again, when fixed.
+    const auto keys = GetPropertyKeys(source);
+    //end workaround for T24729
+
+    for (const auto& key : keys)
     {
-      auto idProp = source->GetConstProperty(key);
-      auto ruleID = idProp->GetValueAsString();
-      if (this->IsSupportedRuleID(ruleID))
+      if (std::regex_match(key, regEx))
       {
-        auto instanceID = this->GetInstanceIDByPropertyName(key);
-        relationUIDs.push_back(this->GetRelationUIDByInstanceID(source, instanceID));
+        auto idProp = source->GetConstProperty(key);
+        auto ruleID = idProp->GetValueAsString();
+        if (this->IsSupportedRuleID(ruleID))
+        {
+          auto instanceID = this->GetInstanceIDByPropertyName(key);
+          instanceIDs.emplace_back(instanceID);
+          relationUIDs.push_back(this->GetRelationUIDByInstanceID(source, instanceID));
+        }
       }
     }
   }
 
-  return relationUIDs;
-};
+  if (layer == RelationType::ID)
+  {
+    return relationUIDs;
+  }
+
+  DataRelationUIDVectorType relationUIDandRuleID_Data;
+  if (layer != RelationType::ID)
+  {
+    relationUIDandRuleID_Data = this->GetRelationUIDs_DataLayer(source, nullptr, instanceIDs);
+  }
+
+  RelationUIDVectorType relationUIDs_Data;
+  std::transform(relationUIDandRuleID_Data.begin(), relationUIDandRuleID_Data.end(), std::back_inserter(relationUIDs_Data),
+    [](const DataRelationUIDVectorType::value_type& v) { return v.first; });
+
+  if (layer == RelationType::Data)
+  {
+    return relationUIDs_Data;
+  }
+
+  std::sort(relationUIDs.begin(), relationUIDs.end());
+  std::sort(relationUIDs_Data.begin(), relationUIDs_Data.end());
+
+  RelationUIDVectorType result;
+
+  if (layer == RelationType::Complete)
+  {
+    std::set_intersection(relationUIDs.begin(), relationUIDs.end(), relationUIDs_Data.begin(), relationUIDs_Data.end(), std::back_inserter(result));
+  }
+  else
+  {
+    std::set_union(relationUIDs.begin(), relationUIDs.end(), relationUIDs_Data.begin(), relationUIDs_Data.end(), std::back_inserter(result));
+  }
+
+  return result;
+}
 
 mitk::PropertyRelationRuleBase::RelationUIDVectorType mitk::PropertyRelationRuleBase::GetRelationUIDs(
   const IPropertyProvider *source, const IPropertyProvider *destination) const
@@ -213,29 +274,27 @@ mitk::PropertyRelationRuleBase::RelationUIDVectorType mitk::PropertyRelationRule
     mitkThrow() << "Error. Passed destination pointer is NULL";
   }
 
-  RelationUIDVectorType result;
+  RelationUIDVectorType relUIDs_id;
 
   auto instanceIDs = this->GetInstanceID_IDLayer(source, destination);
   for (const auto instanceID : instanceIDs)
   {
-    result.push_back(this->GetRelationUIDByInstanceID(source, instanceID));
+    relUIDs_id.push_back(this->GetRelationUIDByInstanceID(source, instanceID));
   }
 
-  if (result.empty() || this->IsAbstract())
-  {
-    auto instanceIDs_data = this->GetInstanceID_datalayer(source, destination);
+  DataRelationUIDVectorType relationUIDandRuleID_Data = this->GetRelationUIDs_DataLayer(source,destination,instanceIDs);
+  RelationUIDVectorType relUIDs_Data;
+  std::transform(relationUIDandRuleID_Data.begin(), relationUIDandRuleID_Data.end(), std::back_inserter(relUIDs_Data),
+    [](const DataRelationUIDVectorType::value_type& v) { return v.first; });
 
-    for (const auto instanceID : instanceIDs_data)
-    {
-      if (std::find(std::begin(instanceIDs), std::end(instanceIDs), instanceID) == std::end(instanceIDs))
-      {
-        result.push_back(this->GetRelationUIDByInstanceID(source, instanceID));
-      }
-    }
-  }
+  std::sort(relUIDs_id.begin(), relUIDs_id.end());
+  std::sort(relUIDs_Data.begin(), relUIDs_Data.end());
+
+  RelationUIDVectorType result;
+  std::set_union(relUIDs_id.begin(), relUIDs_id.end(), relUIDs_Data.begin(), relUIDs_Data.end(), std::back_inserter(result));
 
   return result;
-};
+}
 
 mitk::PropertyRelationRuleBase::RelationUIDType
 mitk::PropertyRelationRuleBase::GetRelationUID(const IPropertyProvider *source, const IPropertyProvider *destination) const
@@ -252,7 +311,7 @@ mitk::PropertyRelationRuleBase::GetRelationUID(const IPropertyProvider *source, 
   }
 
   return result[0];
-};
+}
 
 mitk::PropertyRelationRuleBase::InstanceIDType mitk::PropertyRelationRuleBase::NULL_INSTANCE_ID()
 {
@@ -281,7 +340,7 @@ mitk::PropertyRelationRuleBase::RelationUIDType mitk::PropertyRelationRuleBase::
   }
 
   return result;
-};
+}
 
 mitk::PropertyRelationRuleBase::InstanceIDType mitk::PropertyRelationRuleBase::GetInstanceIDByRelationUID(
   const IPropertyProvider *source, const RelationUIDType &relationUID) const
@@ -319,7 +378,7 @@ mitk::PropertyRelationRuleBase::InstanceIDType mitk::PropertyRelationRuleBase::G
   }
 
   return result;
-};
+}
 
 mitk::PropertyRelationRuleBase::InstanceIDVectorType mitk::PropertyRelationRuleBase::GetInstanceID_IDLayer(
   const IPropertyProvider *source, const IPropertyProvider *destination) const
@@ -333,17 +392,7 @@ mitk::PropertyRelationRuleBase::InstanceIDVectorType mitk::PropertyRelationRuleB
     mitkThrow() << "Error. Passed destination pointer is NULL";
   }
 
-  auto identifiable = dynamic_cast<const Identifiable *>(destination);
-
-  if (!identifiable)
-  { //This check and pass through to data is needed due to solve T25711. See Task for more information.
-    //This could be removed at the point we can get rid of DataNodes or they get realy transparent.
-    auto node = dynamic_cast<const DataNode*>(destination);
-    if (node && node->GetData())
-    {
-      identifiable = dynamic_cast<const Identifiable *>(node->GetData());
-    }
-  }
+  auto identifiable = CastProviderAsIdentifiable(destination);
 
   InstanceIDVectorType result;
 
@@ -381,7 +430,24 @@ mitk::PropertyRelationRuleBase::InstanceIDVectorType mitk::PropertyRelationRuleB
   }
 
   return result;
-};
+}
+
+const mitk::Identifiable* mitk::PropertyRelationRuleBase::CastProviderAsIdentifiable(const mitk::IPropertyProvider* destination) const
+{
+  auto identifiable = dynamic_cast<const Identifiable*>(destination);
+
+  if (!identifiable)
+  { //This check and pass through to data is needed due to solve T25711. See Task for more information.
+    //This could be removed at the point we can get rid of DataNodes or they get realy transparent.
+    auto node = dynamic_cast<const DataNode*>(destination);
+    if (node && node->GetData())
+    {
+      identifiable = dynamic_cast<const Identifiable*>(node->GetData());
+    }
+  }
+
+  return identifiable;
+}
 
 mitk::PropertyRelationRuleBase::RelationUIDType mitk::PropertyRelationRuleBase::Connect(IPropertyOwner *source, const IPropertyProvider *destination) const
 {
@@ -401,25 +467,19 @@ mitk::PropertyRelationRuleBase::RelationUIDType mitk::PropertyRelationRuleBase::
   auto instanceIDs = this->GetInstanceID_IDLayer(source, destination);
   bool hasIDlayer = !instanceIDs.empty();
 
-  auto instanceIDs_data = this->GetInstanceID_datalayer(source, destination);
-  if (instanceIDs_data.size() > 1)
-  {
-    MITK_WARN << "Property relation on data level is ambiguous. First relation is used. Instance ID: "
-              << instanceIDs_data.front();
-  }
-  bool hasDatalayer = !instanceIDs_data.empty();
+  auto relUIDs_data = this->GetRelationUIDs_DataLayer(source, destination, {});
 
-  if (hasIDlayer && hasDatalayer && instanceIDs.front() != instanceIDs_data.front())
+  if (relUIDs_data.size() > 1)
   {
-    mitkThrow() << "Property relation information is in an invalid state. ID and data layer point to different "
-                   "relation instances. Rule: "
-                << this->GetRuleID() << "; ID based instance: " << instanceIDs.front()
-                << "; Data base instance: " << instanceIDs_data.front();
+    MITK_WARN << "Property relation on data level is ambiguous. First relation is used. RelationUID ID: "
+              << relUIDs_data.front().first;
   }
+
+  bool hasDatalayer = !relUIDs_data.empty();
 
   RelationUIDType relationUID = this->CreateRelationUID();
 
-  InstanceIDType instanceID = "";
+  InstanceIDType instanceID = NULL_INSTANCE_ID();
 
   if (hasIDlayer)
   {
@@ -427,9 +487,15 @@ mitk::PropertyRelationRuleBase::RelationUIDType mitk::PropertyRelationRuleBase::
   }
   else if (hasDatalayer)
   {
-    instanceID = instanceIDs_data.front();
+    try
+    {
+      instanceID = this->GetInstanceIDByRelationUID(source, relUIDs_data.front().first);
+    }
+    catch(...)
+    { }
   }
-  else
+
+  if(instanceID == NULL_INSTANCE_ID())
   {
     instanceID = this->CreateNewRelationInstance(source, relationUID);
   }
@@ -444,17 +510,7 @@ mitk::PropertyRelationRuleBase::RelationUIDType mitk::PropertyRelationRuleBase::
 
   if (!hasIDlayer)
   {
-    auto identifiable = dynamic_cast<const Identifiable *>(destination);
-
-    if (!identifiable)
-    { //This check and pass through to data is needed due to solve T25711. See Task for more information.
-      //This could be removed at the point we can get rid of DataNodes or they get realy transparent.
-      auto node = dynamic_cast<const DataNode*>(destination);
-      if (node && node->GetData())
-      {
-        identifiable = dynamic_cast<const Identifiable *>(node->GetData());
-      }
-    }
+    auto identifiable = this->CastProviderAsIdentifiable(destination);
 
     if (identifiable)
     {
@@ -464,38 +520,52 @@ mitk::PropertyRelationRuleBase::RelationUIDType mitk::PropertyRelationRuleBase::
     }
   }
 
-  if (!hasDatalayer)
-  {
-    this->Connect_datalayer(source, destination, instanceID);
-  }
+  this->Connect_datalayer(source, destination, instanceID);
 
   return relationUID;
-};
+}
 
-void mitk::PropertyRelationRuleBase::Disconnect(IPropertyOwner *source, const IPropertyProvider *destination) const
+void mitk::PropertyRelationRuleBase::Disconnect(IPropertyOwner *source, const IPropertyProvider *destination, RelationType layer) const
 {
+  if (source == nullptr)
+  {
+    mitkThrow() << "Error. Source is invalid. Cannot disconnect.";
+  }
+
+  if (destination == nullptr)
+  {
+    mitkThrow() << "Error. Destination is invalid. Cannot disconnect.";
+  }
+
   try
   {
     const auto relationUIDs = this->GetRelationUIDs(source, destination);
     for (const auto relUID: relationUIDs)
     {
-      this->Disconnect(source, relUID);
+      this->Disconnect(source, relUID, layer);
     }
   }
   catch (const NoPropertyRelationException &)
   {
     // nothing to do and no real error in context of disconnect.
   }
-};
+}
 
-void mitk::PropertyRelationRuleBase::Disconnect(IPropertyOwner *source, RelationUIDType relationUID) const
+void mitk::PropertyRelationRuleBase::Disconnect(IPropertyOwner *source, RelationUIDType relationUID, RelationType layer) const
 {
-  auto instanceID = this->GetInstanceIDByRelationUID(source, relationUID);
-
-  if (instanceID != NULL_INSTANCE_ID())
+  if (source == nullptr)
   {
-    this->Disconnect_datalayer(source, instanceID);
+    mitkThrow() << "Error. Source is invalid. Cannot disconnect.";
+  }
 
+  if (layer == RelationType::Data || layer == RelationType::Complete)
+  {
+    this->Disconnect_datalayer(source, relationUID);
+  }
+
+  auto instanceID = this->GetInstanceIDByRelationUID(source, relationUID);
+  if ((layer == RelationType::ID || layer == RelationType::Complete) && instanceID != NULL_INSTANCE_ID())
+  {
     auto instancePrefix = PropertyKeyPathToPropertyName(GetRootKeyPath().AddElement(instanceID));
 
     //workaround until T24729 is done. You can use directly source->GetPropertyKeys again, when fixed.
@@ -511,13 +581,13 @@ void mitk::PropertyRelationRuleBase::Disconnect(IPropertyOwner *source, Relation
       }
     }
   }
-};
+}
 
 mitk::PropertyRelationRuleBase::RelationUIDType mitk::PropertyRelationRuleBase::CreateRelationUID()
 {
   UIDGenerator generator;
   return generator.GetUID();
-};
+}
 
 /**This mutex is used to guard mitk::PropertyRelationRuleBase::CreateNewRelationInstance by a class wide mutex to avoid
   racing conditions in a scenario where rules are used concurrently. It is not in the class interface itself, because it
@@ -573,12 +643,12 @@ mitk::PropertyRelationRuleBase::InstanceIDType mitk::PropertyRelationRuleBase::C
   source->SetProperty(relUIDKey, mitk::StringProperty::New(relationUID));
 
   return newID;
-};
+}
 
 itk::LightObject::Pointer mitk::PropertyRelationRuleBase::InternalClone() const
 {
   return Superclass::InternalClone();
-};
+}
 
 
 mitk::PropertyRelationRuleBase::InstanceIDType mitk::PropertyRelationRuleBase::GetInstanceIDByPropertyName(const std::string propName)
@@ -592,7 +662,7 @@ mitk::PropertyRelationRuleBase::InstanceIDType mitk::PropertyRelationRuleBase::G
   }
 
   return proppath.GetNode(2).name;
-};
+}
 
 mitk::PropertyRelationRuleBase::RuleIDType mitk::PropertyRelationRuleBase::GetRuleIDByInstanceID(const IPropertyProvider *source,
   const InstanceIDType &instanceID) const
@@ -620,7 +690,31 @@ mitk::PropertyRelationRuleBase::RuleIDType mitk::PropertyRelationRuleBase::GetRu
   }
 
   return result;
-};
+}
+
+std::string mitk::PropertyRelationRuleBase::GetDestinationUIDByInstanceID(const IPropertyProvider* source,
+  const InstanceIDType& instanceID) const
+{
+  if (!source)
+  {
+    mitkThrow() << "Error. Source is invalid. Cannot deduce rule ID";
+  }
+
+  auto path = GetRootKeyPath().AddElement(instanceID).AddElement("destinationUID");
+  auto name = PropertyKeyPathToPropertyName(path);
+
+  const auto prop = source->GetConstProperty(name);
+
+  std::string result;
+
+  if (prop.IsNotNull())
+  {
+    result = prop->GetValueAsString();
+  }
+
+  return result;
+}
+
 
 namespace mitk
 {
@@ -667,7 +761,7 @@ mitk::NodePredicateBase::ConstPointer mitk::PropertyRelationRuleBase::GetSourceC
   };
 
   return NodePredicateRuleFunction::New(check, this).GetPointer();
-};
+}
 
 mitk::NodePredicateBase::ConstPointer mitk::PropertyRelationRuleBase::GetDestinationCandidateIndicator() const
 {
@@ -676,7 +770,7 @@ mitk::NodePredicateBase::ConstPointer mitk::PropertyRelationRuleBase::GetDestina
   };
 
   return NodePredicateRuleFunction::New(check, this).GetPointer();
-};
+}
 
 mitk::NodePredicateBase::ConstPointer mitk::PropertyRelationRuleBase::GetConnectedSourcesDetector() const
 {
@@ -686,39 +780,39 @@ mitk::NodePredicateBase::ConstPointer mitk::PropertyRelationRuleBase::GetConnect
   };
 
   return NodePredicateRuleFunction::New(check, this).GetPointer();
-};
+}
 
 mitk::NodePredicateBase::ConstPointer mitk::PropertyRelationRuleBase::GetSourcesDetector(
-  const IPropertyProvider *destination, RelationType minimalRelation) const
+  const IPropertyProvider *destination, RelationType exclusiveRelation) const
 {
   if (!destination)
   {
     mitkThrow() << "Error. Passed destination pointer is NULL";
   }
 
-  auto check = [destination, minimalRelation](const mitk::IPropertyProvider *node,
+  auto check = [destination, exclusiveRelation](const mitk::IPropertyProvider *node,
                                               const mitk::PropertyRelationRuleBase *rule) {
-    return rule->HasRelation(node, destination) >= minimalRelation;
+    return rule->HasRelation(node, destination, exclusiveRelation);
   };
 
   return NodePredicateRuleFunction::New(check, this).GetPointer();
-};
+}
 
 mitk::NodePredicateBase::ConstPointer mitk::PropertyRelationRuleBase::GetDestinationsDetector(
-  const IPropertyProvider *source, RelationType minimalRelation) const
+  const IPropertyProvider *source, RelationType exclusiveRelation) const
 {
   if (!source)
   {
     mitkThrow() << "Error. Passed source pointer is NULL";
   }
 
-  auto check = [source, minimalRelation](const mitk::IPropertyProvider *node,
+  auto check = [source, exclusiveRelation](const mitk::IPropertyProvider *node,
                                          const mitk::PropertyRelationRuleBase *rule) {
-    return rule->HasRelation(source, node) >= minimalRelation;
+    return rule->HasRelation(source, node, exclusiveRelation);
   };
 
   return NodePredicateRuleFunction::New(check, this).GetPointer();
-};
+}
 
 mitk::NodePredicateBase::ConstPointer mitk::PropertyRelationRuleBase::GetDestinationDetector(
   const IPropertyProvider *source, RelationUIDType relationUID) const
@@ -755,4 +849,4 @@ mitk::NodePredicateBase::ConstPointer mitk::PropertyRelationRuleBase::GetDestina
   };
 
   return NodePredicateRuleFunction::New(check, this).GetPointer();
-};
+}

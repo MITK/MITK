@@ -67,14 +67,25 @@ namespace mitk
     bool HasValueBySlice(const IndexValueType &zSlice, bool allowClose = false) const;
     bool HasValueByTimeStep(const TimeStepType &timeStep, bool allowClose = false) const;
 
-    std::vector<IndexValueType> GetAvailableSlices(const TimeStepType &timeStep) const;
+    /** return all slices stored for the specified timestep.*/
+    std::vector<IndexValueType> GetAvailableSlices(const TimeStepType& timeStep) const;
+    /** return all time steps stored for the specified slice.*/
+    std::vector<TimeStepType> GetAvailableTimeSteps(const IndexValueType& slice) const;
+    /** return all time steps stored in the property.*/
     std::vector<TimeStepType> GetAvailableTimeSteps() const;
+    /** return all slices stored in the property. @Remark not all time steps may contain all slices.*/
+    std::vector<IndexValueType> GetAvailableSlices() const;
 
     void SetValue(const TimeStepType &timeStep, const IndexValueType &zSlice, const ValueType &value);
 
     void SetValue(const ValueType &value);
 
     std::string GetValueAsString() const override;
+
+    /** Inidicates of all values (all time steps, all slices) are the same, or if at least one value stored
+    in the property is different. If IsUniform==true one can i.a. use GetValueAsString() without the loss of
+    information to retrieve the stored value.*/
+    bool IsUniform() const;
 
     using BaseProperty::operator=;
 

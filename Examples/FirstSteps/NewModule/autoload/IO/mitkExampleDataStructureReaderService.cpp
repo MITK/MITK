@@ -35,7 +35,7 @@ namespace mitk
   }
 
   ExampleDataStructureReaderService::~ExampleDataStructureReaderService() {}
-  std::vector<itk::SmartPointer<BaseData>> ExampleDataStructureReaderService::Read()
+  std::vector<itk::SmartPointer<BaseData>> ExampleDataStructureReaderService::DoRead()
   {
     std::vector<itk::SmartPointer<mitk::BaseData>> result;
     std::string location = GetInputLocation();

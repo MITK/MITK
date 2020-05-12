@@ -18,7 +18,7 @@ found in the LICENSE file.
 
 typedef itk::Image<unsigned char, 3> ImageType;
 
-std::vector<itk::SmartPointer<mitk::BaseData> > mitk::DummyLsetFileReader::Read()
+std::vector<itk::SmartPointer<mitk::BaseData> > mitk::DummyLsetFileReader::DoRead()
 {
 
   std::vector<itk::SmartPointer<mitk::BaseData> > result;

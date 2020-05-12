@@ -42,7 +42,7 @@ mitk::NavigationDataReaderXML* mitk::NavigationDataReaderXML::Clone() const
 }
 
 
-std::vector<itk::SmartPointer<mitk::BaseData>> mitk::NavigationDataReaderXML::Read()
+std::vector<itk::SmartPointer<mitk::BaseData>> mitk::NavigationDataReaderXML::DoRead()
 {
   mitk::NavigationDataSet::Pointer dataset;
   std::istream* in = GetInputStream();

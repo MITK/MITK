@@ -249,7 +249,7 @@ namespace mitk
     return result.GetPointer();
   };
 
-  std::vector<BaseData::Pointer> ItkImageIO::Read()
+  std::vector<BaseData::Pointer> ItkImageIO::DoRead()
   {
     std::vector<BaseData::Pointer> result;
     mitk::LocaleSwitch localeSwitch("C");

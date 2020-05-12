@@ -29,15 +29,26 @@ namespace mitk
     printing numbers, in order to consistently get "." and not "," as
     a decimal separator.
 
+    WARNING: Please be aware that using setlocale and there for is not thread
+    safe. So use this class with care (see tast T24295 for more information.
+    This switch is especially use full if you have to deal with third party code
+    where you have to controll the locale via set locale
     \code
-
-    std::string toString(int number)
     {
       mitk::LocaleSwitch localeSwitch("C");// installs C locale until the end of the function
 
-      std::stringstream parser;
-      parser << number;
+      ExternalLibraryCall(); //that might throw or what ever.
+    }
+    \endcode
 
+    If you just want to control you own stringstream operations use imbue instead, as it is
+    threadsafe. E.G.:
+    \code
+    std::string toString(int number)
+    {
+      std::ostringstream parser;
+      parser.imbue(std::locale("C"));
+      parser << number;
       return parser.str();
     }
     \endcode

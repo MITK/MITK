@@ -24,8 +24,10 @@ namespace mitk
     SceneFileReader();
 
     using AbstractFileReader::Read;
-    std::vector<itk::SmartPointer<BaseData>> Read() override;
     DataStorage::SetOfObjects::Pointer Read(DataStorage &ds) override;
+
+  protected:
+    std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
   private:
     SceneFileReader *Clone() const override;

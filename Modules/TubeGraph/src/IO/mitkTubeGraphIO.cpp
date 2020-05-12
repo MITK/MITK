@@ -34,7 +34,7 @@ namespace mitk
     this->RegisterService();
   }
 
-  std::vector<BaseData::Pointer> TubeGraphIO::Read()
+  std::vector<BaseData::Pointer> TubeGraphIO::DoRead()
   {
     std::locale::global(std::locale("C"));
 

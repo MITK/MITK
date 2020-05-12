@@ -463,7 +463,8 @@ function(mitk_create_module)
 
     if(MODULE_HEADERS_ONLY)
       add_library(${MODULE_TARGET} INTERFACE)
-      set_property(TARGET ${MODULE_TARGET} PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Modules")
+      # INTERFACE_LIBRARY targets may only have whitelisted properties. The property "FOLDER" is not allowed.
+      # set_property(TARGET ${MODULE_TARGET} PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Modules")
     else()
       if(MODULE_EXECUTABLE)
         add_executable(${MODULE_TARGET}

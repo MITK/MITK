@@ -171,7 +171,7 @@ static void AccessPixel(mitk::PixelType /*ptype*/, mitk::Image* im, mitk::Point3
 
 /**Overloaded const verison*/
 template <typename TPixel>
-static void AccessPixel(mitk::PixelType /*ptype*/, const mitk::Image* im, mitk::Point3D p, int &val)
+static void AccessPixel(mitk::PixelType /*ptype*/, const mitk::Image* im, mitk::Point3D p, int& val)
 {
   mitk::ImagePixelReadAccessor<TPixel, 3> access(im);
   val = access.GetPixelByWorldCoordinates(p);

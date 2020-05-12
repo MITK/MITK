@@ -191,7 +191,7 @@ namespace mitk
   }
 
 
-  std::vector<BaseData::Pointer> DICOMPMIO::Read()
+  std::vector<BaseData::Pointer> DICOMPMIO::DoRead()
   {
 	  mitk::LocaleSwitch localeSwitch("C");
 	  std::vector<BaseData::Pointer> result;

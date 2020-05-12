@@ -291,7 +291,7 @@ namespace mitk
       return Unsupported;
   }
 
-  std::vector<BaseData::Pointer> LabelSetImageIO::Read()
+  std::vector<BaseData::Pointer> LabelSetImageIO::DoRead()
   {
     mitk::LocaleSwitch localeSwitch("C");
 

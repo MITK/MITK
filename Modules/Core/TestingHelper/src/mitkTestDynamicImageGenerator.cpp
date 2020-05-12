@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "mitkTestDynamicImageGenerator.h"
 #include "mitkArbitraryTimeGeometry.h"
 #include "mitkImageCast.h"
+#include "mitkTemporalJoinImagesFilter.h"
 
 namespace mitk
 {
@@ -190,63 +191,21 @@ namespace mitk
 
   Image::Pointer GenerateDynamicTestImageMITK()
   {
+    auto filter = mitk::TemporalJoinImagesFilter::New();
 
-    mitk::Image::Pointer tempImage = GenerateTestFrame(1);
-    mitk::Image::Pointer dynamicImage = mitk::Image::New();
-
-    DynamicITKImageType::Pointer dynamicITKImage = DynamicITKImageType::New();
-    DynamicITKImageType::RegionType dynamicITKRegion;
-    DynamicITKImageType::PointType dynamicITKOrigin;
-    DynamicITKImageType::IndexType dynamicITKIndex;
-    DynamicITKImageType::SpacingType dynamicITKSpacing;
-
-    dynamicITKSpacing[0] = tempImage->GetGeometry()->GetSpacing()[0];
-    dynamicITKSpacing[1] = tempImage->GetGeometry()->GetSpacing()[1];
-    dynamicITKSpacing[2] = tempImage->GetGeometry()->GetSpacing()[2];
-    dynamicITKSpacing[3] = 5.0;
-
-    dynamicITKIndex[0] = 0;  // The first pixel of the REGION
-    dynamicITKIndex[1] = 0;
-    dynamicITKIndex[2] = 0;
-    dynamicITKIndex[3] = 0;
-
-    dynamicITKRegion.SetSize(0, tempImage->GetDimension(0));
-    dynamicITKRegion.SetSize(1, tempImage->GetDimension(1));
-    dynamicITKRegion.SetSize(2, tempImage->GetDimension(2));
-    dynamicITKRegion.SetSize(3, 10);
-
-    dynamicITKRegion.SetIndex(dynamicITKIndex);
-
-    dynamicITKOrigin[0] = tempImage->GetGeometry()->GetOrigin()[0];
-    dynamicITKOrigin[1] = tempImage->GetGeometry()->GetOrigin()[1];
-    dynamicITKOrigin[2] = tempImage->GetGeometry()->GetOrigin()[2];
-
-    dynamicITKImage->SetOrigin(dynamicITKOrigin);
-    dynamicITKImage->SetSpacing(dynamicITKSpacing);
-    dynamicITKImage->SetRegions(dynamicITKRegion);
-    dynamicITKImage->Allocate();
-    dynamicITKImage->FillBuffer(0); //not sure if this is necessary
-
-    // Convert
-    mitk::CastToMitkImage(dynamicITKImage, dynamicImage);
-
-    ArbitraryTimeGeometry::Pointer timeGeometry = ArbitraryTimeGeometry::New();
-    timeGeometry->ClearAllGeometries();
-
-
+    mitk::TemporalJoinImagesFilter::TimeBoundsVectorType bounds;
     for (int i = 0; i < 10; ++i)
     {
-      mitk::Image::Pointer frameImage = GenerateTestFrame(1 + (dynamicITKSpacing[3] * i));
-      mitk::ImageReadAccessor accessor(frameImage);
-      dynamicImage->SetVolume(accessor.GetData(), i);
-
-      timeGeometry->AppendNewTimeStepClone(frameImage->GetGeometry(), 1 + (dynamicITKSpacing[3] * i),
-                                        1 + (dynamicITKSpacing[3]*(i+1)));
+      filter->SetInput(i, GenerateTestFrame(1 + (5.0 * i)));
+      bounds.push_back(1 + (5.0 * (i + 1)));
     }
 
-    dynamicImage->SetTimeGeometry(timeGeometry);
+    filter->SetFirstMinTimeBound(1.);
+    filter->SetMaxTimeBounds(bounds);
 
-    return dynamicImage;
+    filter->Update();
+
+    return filter->GetOutput();
   }
 
 }

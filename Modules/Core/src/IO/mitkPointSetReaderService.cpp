@@ -33,7 +33,7 @@ mitk::PointSetReaderService::~PointSetReaderService()
 {
 }
 
-std::vector<itk::SmartPointer<mitk::BaseData>> mitk::PointSetReaderService::Read()
+std::vector<itk::SmartPointer<mitk::BaseData>> mitk::PointSetReaderService::DoRead()
 {
   // Switch the current locale to "C"
   LocaleSwitch localeSwitch("C");

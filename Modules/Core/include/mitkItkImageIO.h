@@ -36,7 +36,6 @@ namespace mitk
     // -------------- AbstractFileReader -------------
 
     using AbstractFileReader::Read;
-    std::vector<itk::SmartPointer<BaseData>> Read() override;
 
     ConfidenceLevel GetReaderConfidenceLevel() const override;
 
@@ -51,6 +50,9 @@ namespace mitk
 
     // Fills the m_DefaultMetaDataKeys vector with default values
     virtual void InitializeDefaultMetaDataKeys();
+
+    // -------------- AbstractFileReader -------------
+    std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
   private:
     ItkImageIO(const ItkImageIO &other);

@@ -37,7 +37,7 @@ namespace mitk
 
     using AbstractFileReader::Read;
 
-    std::vector<itk::SmartPointer<BaseData>> Read() override
+    std::vector<itk::SmartPointer<BaseData>> DoRead() override
     {
       std::vector<itk::SmartPointer<BaseData>> result;
       return result;

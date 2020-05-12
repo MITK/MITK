@@ -56,7 +56,7 @@ namespace mitk
     this->RegisterService();
   }
 
-  std::vector<BaseData::Pointer> ImageVtkXmlIO::Read()
+  std::vector<BaseData::Pointer> ImageVtkXmlIO::DoRead()
   {
     vtkSmartPointer<VtkXMLImageDataReader> reader = vtkSmartPointer<VtkXMLImageDataReader>::New();
     if (this->GetInputStream())

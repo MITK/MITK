@@ -66,7 +66,7 @@ namespace mitk
     mitk::CastToMitkImage(scaledOutput, this->scaledDoseImage);
   }
 
-  std::vector<itk::SmartPointer<BaseData> > RTDoseReaderService::Read()
+  std::vector<itk::SmartPointer<BaseData> > RTDoseReaderService::DoRead()
   {
     std::vector<itk::SmartPointer<mitk::BaseData> > result;
 

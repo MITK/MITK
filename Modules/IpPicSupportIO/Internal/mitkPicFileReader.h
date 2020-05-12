@@ -29,12 +29,13 @@ namespace mitk
     PicFileReader();
 
     using AbstractFileReader::Read;
-    std::vector<mitk::BaseData::Pointer> Read() override;
 
   protected:
     void FillImage(Image::Pointer image);
 
     Image::Pointer CreateImage();
+
+    std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
   private:
     static void ConvertHandedness(mitkIpPicDescriptor *pic);

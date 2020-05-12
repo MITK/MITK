@@ -268,7 +268,7 @@ namespace mitk
     return Unsupported;
   }
 
-  std::vector<BaseData::Pointer> DICOMSegmentationIO::Read()
+  std::vector<BaseData::Pointer> DICOMSegmentationIO::DoRead()
   {
     mitk::LocaleSwitch localeSwitch("C");
 

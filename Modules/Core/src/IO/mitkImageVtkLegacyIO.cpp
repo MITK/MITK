@@ -33,7 +33,7 @@ namespace mitk
     this->RegisterService();
   }
 
-  std::vector<BaseData::Pointer> ImageVtkLegacyIO::Read()
+  std::vector<BaseData::Pointer> ImageVtkLegacyIO::DoRead()
   {
     // The legay vtk reader cannot work with input streams
     const std::string fileName = this->GetLocalFileName();

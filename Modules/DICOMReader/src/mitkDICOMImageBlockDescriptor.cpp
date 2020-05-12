@@ -13,8 +13,12 @@ found in the LICENSE file.
 #include "mitkDICOMImageBlockDescriptor.h"
 #include "mitkStringProperty.h"
 #include "mitkLevelWindowProperty.h"
+#include "mitkPropertyKeyPath.h"
+#include "mitkDICOMIOMetaInformationPropertyConstants.h"
 #include <gdcmUIDs.h>
 #include <vector>
+#include <gdcmVersion.h>
+#include <dcmtk/config/osconfig.h>
 
 mitk::DICOMImageBlockDescriptor::DICOMImageBlockDescriptor()
 : m_ReaderImplementationLevel( SOPClassUnknown )
@@ -46,8 +50,6 @@ mitk::DICOMImageBlockDescriptor::DICOMImageBlockDescriptor( const DICOMImageBloc
   {
     m_MitkImage = m_MitkImage->Clone();
   }
-
-  m_PropertyFunctor = &mitk::DICOMImageBlockDescriptor::GetPropertyForDICOMValues;
 }
 
 mitk::DICOMImageBlockDescriptor& mitk::DICOMImageBlockDescriptor::
@@ -444,6 +446,38 @@ mitk::Image::Pointer mitk::DICOMImageBlockDescriptor::DescribeImageWithPropertie
   if ( !mitkImage )
     return mitkImage;
 
+  mitkImage->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::READER_FILES()), this->GetProperty("filenamesForSlices"));
+  mitkImage->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::READER_PIXEL_SPACING_INTERPRETATION_STRING()),
+    StringProperty::New(PixelSpacingInterpretationToString(this->GetPixelSpacingInterpretation())));
+  mitkImage->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::READER_PIXEL_SPACING_INTERPRETATION()),
+    GenericProperty<PixelSpacingInterpretation>::New(this->GetPixelSpacingInterpretation()));
+  mitkImage->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::READER_IMPLEMENTATION_LEVEL_STRING()),
+    StringProperty::New(ReaderImplementationLevelToString(m_ReaderImplementationLevel)));
+  mitkImage->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::READER_IMPLEMENTATION_LEVEL()),
+    GenericProperty<ReaderImplementationLevel>::New(m_ReaderImplementationLevel));
+  mitkImage->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::READER_GANTRY_TILT_CORRECTED()),
+    BoolProperty::New(this->GetTiltInformation().IsRegularGantryTilt()));
+  mitkImage->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::READER_3D_plus_t()), BoolProperty::New(this->GetFlag("3D+t", false)));
+  mitkImage->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::READER_GDCM()), StringProperty::New(gdcm::Version::GetVersion()));
+  mitkImage->SetProperty(PropertyKeyPathToPropertyName(DICOMIOMetaInformationPropertyConstants::READER_DCMTK()), StringProperty::New(PACKAGE_VERSION));
+
+  // get all found additional tags of interest
+
+  for (auto tag : m_FoundAdditionalTags)
+  {
+    BaseProperty* prop = this->GetProperty(tag);
+    if (prop)
+    {
+      mitkImage->SetProperty(tag.c_str(), prop);
+    }
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////
+  //// Deprecated properties should be removed sooner then later (see above)
+  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////
+
   // first part: add some tags that describe individual slices
   // these propeties are defined at analysis time (see UpdateImageDescribingProperties())
 
@@ -454,7 +488,7 @@ mitk::Image::Pointer mitk::DICOMImageBlockDescriptor::DescribeImageWithPropertie
   mitkImage->SetProperty( propertyKeySliceLocation, this->GetProperty( "sliceLocationForSlices" ) );
   mitkImage->SetProperty( propertyKeyInstanceNumber, this->GetProperty( "instanceNumberForSlices" ) );
   mitkImage->SetProperty( propertyKeySOPInstanceUID, this->GetProperty( "SOPInstanceUIDForSlices" ) );
-  mitkImage->SetProperty( "files", this->GetProperty( "filenamesForSlices" ) );
+  mitkImage->SetProperty( "files", this->GetProperty( "filenamesForSlices_deprecated" ) );
 
   // second part: add properties that describe the whole image block
   mitkImage->SetProperty( "dicomseriesreader.SOPClassUID", StringProperty::New( this->GetSOPClassUID() ) );
@@ -506,17 +540,6 @@ mitk::Image::Pointer mitk::DICOMImageBlockDescriptor::DescribeImageWithPropertie
 
   mitkImage->SetProperty( "dicom.pixel.Rows", this->GetProperty( "rows" ) );
   mitkImage->SetProperty( "dicom.pixel.Columns", this->GetProperty( "columns" ) );
-
-  // third part: get all found additional tags of interest
-
-  for (auto tag : m_FoundAdditionalTags)
-  {
-    BaseProperty* prop = this->GetProperty(tag);
-    if (prop)
-    {
-      mitkImage->SetProperty(tag.c_str(), prop);
-    }
-  }
 
   // fourth part: get something from ImageIO. BUT this needs to be created elsewhere. or not at all!
 
@@ -758,7 +781,8 @@ void mitk::DICOMImageBlockDescriptor::UpdateImageDescribingProperties() const
     StringLookupTable sliceLocationForSlices;
     StringLookupTable instanceNumberForSlices;
     StringLookupTable SOPInstanceUIDForSlices;
-    StringLookupTable filenamesForSlices;
+    StringLookupTable filenamesForSlices_deprecated;
+    DICOMCachedValueLookupTable filenamesForSlices;
 
     const DICOMTag tagSliceLocation( 0x0020, 0x1041 );
     const DICOMTag tagInstanceNumber( 0x0020, 0x0013 );
@@ -788,7 +812,8 @@ void mitk::DICOMImageBlockDescriptor::UpdateImageDescribingProperties() const
       SOPInstanceUIDForSlices.SetTableValue( slice, sopInstanceUID );
 
       const std::string filename = ( *frameIter )->Filename;
-      filenamesForSlices.SetTableValue( slice, filename );
+      filenamesForSlices_deprecated.SetTableValue( slice, filename );
+      filenamesForSlices.SetTableValue(slice, { static_cast<unsigned int>(timePoint), zSlice, filename });
 
       MITK_DEBUG << "Tag info for slice " << slice << ": SL '" << sliceLocation << "' IN '" << instanceNumber
                  << "' SOP instance UID '" << sopInstanceUID << "'";
@@ -819,8 +844,8 @@ void mitk::DICOMImageBlockDescriptor::UpdateImageDescribingProperties() const
     thisInstance->SetProperty( "SOPInstanceUIDForSlices",
                                StringLookupTableProperty::New( SOPInstanceUIDForSlices ) );
 
-    thisInstance->SetProperty( "filenamesForSlices", StringLookupTableProperty::New( filenamesForSlices ) );
-
+    thisInstance->SetProperty( "filenamesForSlices_deprecated", StringLookupTableProperty::New( filenamesForSlices_deprecated ) );
+    thisInstance->SetProperty("filenamesForSlices", m_PropertyFunctor(filenamesForSlices));
 
     //add properties for additional tags of interest
 

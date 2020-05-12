@@ -81,12 +81,17 @@ namespace mitk
       }
     };
 
-    InstanceIDVectorType GetInstanceID_datalayer(const IPropertyProvider *source,
-                                                         const IPropertyProvider *destination) const override
+    DataRelationUIDVectorType GetRelationUIDs_DataLayer(const IPropertyProvider* source,
+      const IPropertyProvider* destination, const InstanceIDVectorType& instances_IDLayer) const override
     {
-      InstanceIDVectorType result;
+      DataRelationUIDVectorType result;
 
-      auto destProp = destination->GetConstProperty("name");
+      mitk::BaseProperty::ConstPointer destProp;
+
+      if (destination != nullptr)
+      {
+        destProp = destination->GetConstProperty("name");
+      }
 
       if (destProp.IsNotNull())
       {
@@ -106,23 +111,27 @@ namespace mitk
             {
               if (instance_matches.size()>1)
               {
-                result.push_back(instance_matches[1]);
+                auto finding = std::find(instances_IDLayer.begin(), instances_IDLayer.end(), instance_matches[1]);
+                if (finding == instances_IDLayer.end())
+                {
+                  result.emplace_back(this->GetRelationUIDByInstanceID(source, instance_matches[1]), this->GetRuleIDByInstanceID(source, instance_matches[1]));
+                }
               }
             }
           }
         }
       }
+
+      if (result.empty() && instances_IDLayer.empty())
+      {
+        auto refNameProp = source->GetConstProperty("referencedName");
+        if (refNameProp.IsNotNull() && (destProp.IsNull() || destProp->GetValueAsString() == refNameProp->GetValueAsString()))
+        {
+          result.emplace_back(refNameProp->GetValueAsString(),"");
+        }
+      }
+
       return result;
-    };
-
-    bool HasImplicitDataRelation(const IPropertyProvider *source,
-                                         const IPropertyProvider *destination) const override
-    {
-      auto destProp = destination->GetConstProperty("name");
-      auto sourceProp = source->GetConstProperty("referencedName");
-
-      return destProp.IsNotNull() && sourceProp.IsNotNull() &&
-             destProp->GetValueAsString() == sourceProp->GetValueAsString();
     };
 
     void Connect_datalayer(IPropertyOwner *source,
@@ -137,9 +146,17 @@ namespace mitk
         StringProperty::New(destProp->GetValueAsString()));
     };
 
-    void Disconnect_datalayer(IPropertyOwner *source, const InstanceIDType & /*instanceID*/) const override
+    void Disconnect_datalayer(IPropertyOwner *source, const RelationUIDType & relationUID) const override
     {
       source->RemoveProperty("referencedName");
+      try
+      {
+        auto instanceID = this->GetInstanceIDByRelationUID(source, relationUID);
+        source->RemoveProperty(
+            PropertyKeyPathToPropertyName(Superclass::GetRootKeyPath().AddElement(instanceID).AddElement("dataHandle")));
+      }
+      catch(...)
+      { }
     };
   };
 } // namespace mitk
@@ -163,6 +180,8 @@ class mitkPropertyRelationRuleBaseTestSuite : public mitk::TestFixture
   MITK_TEST(GetDestinationDetector);
   MITK_TEST(Connect);
   MITK_TEST(Disconnect);
+  MITK_TEST(Disconnect_partial_ID);
+  MITK_TEST(Disconnect_partial_Data);
   MITK_TEST(Connect_abstract);
   MITK_TEST(Disconnect_abstract);
 
@@ -247,7 +266,8 @@ public:
     name = "MITK.Relations.1.ruleID";
     source_idOnly_1->AddProperty(name.c_str(), mitk::StringProperty::New(rule->GetRuleID()));
 
-    source_data_1 = source_implicit_1->Clone();
+    source_data_1 = mitk::DataNode::New();
+    source_data_1->AddProperty("referencedName", mitk::StringProperty::New(dest_1->GetName()));
     name = "MITK.Relations.1.relationUID";
     source_data_1->AddProperty(name.c_str(), mitk::StringProperty::New("uid2"));
     name = "MITK.Relations.1.dataHandle";
@@ -261,11 +281,14 @@ public:
     name = "MITK.Relations.2.ruleID";
     source_data_1->AddProperty(name.c_str(), mitk::StringProperty::New("TestRule_othertype"));
 
-    source_1 = source_data_1->Clone();
+    source_1 = mitk::DataNode::New();
+    source_1->AddProperty("referencedName", mitk::StringProperty::New(dest_1->GetName()));
     name = "MITK.Relations.1.relationUID";
     source_1->AddProperty(name.c_str(), mitk::StringProperty::New("uid3"), nullptr, true);
     name = "MITK.Relations.1.destinationUID";
     source_1->AddProperty(name.c_str(), mitk::StringProperty::New(dest_1_data->GetUID()));
+    name = "MITK.Relations.1.dataHandle";
+    source_1->AddProperty(name.c_str(), mitk::StringProperty::New(dest_1->GetName()));
     name = "MITK.Relations.1.ruleID";
     source_1->AddProperty(name.c_str(), mitk::StringProperty::New(rule->GetRuleID()));
     name = "MITK.Relations.2.relationUID";
@@ -275,13 +298,16 @@ public:
     name = "MITK.Relations.2.ruleID";
     source_1->AddProperty(name.c_str(), mitk::StringProperty::New("TestRule_othertype"));
 
-    source_multi = source_1->Clone();
+    source_multi = mitk::DataNode::New();
+    source_multi->AddProperty("referencedName", mitk::StringProperty::New(dest_1->GetName()));
     name = "MITK.Relations.1.relationUID";
     source_multi->AddProperty(name.c_str(), mitk::StringProperty::New("uid4"), nullptr, true);
     name = "MITK.Relations.1.destinationUID";
     source_multi->AddProperty(name.c_str(), mitk::StringProperty::New(dest_1_data->GetUID()));
     name = "MITK.Relations.1.ruleID";
     source_multi->AddProperty(name.c_str(), mitk::StringProperty::New(rule->GetRuleID()));
+    name = "MITK.Relations.1.dataHandle";
+    source_multi->AddProperty(name.c_str(), mitk::StringProperty::New(dest_1->GetName()));
     name = "MITK.Relations.4.relationUID";
     source_multi->AddProperty(name.c_str(), mitk::StringProperty::New("uid5"));
     name = "MITK.Relations.4.destinationUID";
@@ -339,7 +365,7 @@ public:
       "Violated precondition (nullptr) does not throw.", rule->IsSource(nullptr), itk::ExceptionObject);
 
     CPPUNIT_ASSERT(!rule->IsSource(unRelated));
-    CPPUNIT_ASSERT(!rule->IsSource(source_implicit_1));
+    CPPUNIT_ASSERT(rule->IsSource(source_implicit_1));
     CPPUNIT_ASSERT(rule->IsSource(source_data_1));
     CPPUNIT_ASSERT(rule->IsSource(source_idOnly_1));
     CPPUNIT_ASSERT(rule->IsSource(source_1));
@@ -349,7 +375,7 @@ public:
     CPPUNIT_ASSERT(!rule->IsSource(source_otherTypeRule));
 
     CPPUNIT_ASSERT(!abstractRule->IsSource(unRelated));
-    CPPUNIT_ASSERT(!abstractRule->IsSource(source_implicit_1));
+    CPPUNIT_ASSERT(abstractRule->IsSource(source_implicit_1));
     CPPUNIT_ASSERT(abstractRule->IsSource(source_data_1));
     CPPUNIT_ASSERT(abstractRule->IsSource(source_idOnly_1));
     CPPUNIT_ASSERT(abstractRule->IsSource(source_1));
@@ -369,45 +395,89 @@ public:
                                  rule->HasRelation(source_1, nullptr),
                                  itk::ExceptionObject);
 
-    CPPUNIT_ASSERT(rule->HasRelation(source_1, unRelated) == mitk::PropertyRelationRuleBase::RelationType::None);
-    CPPUNIT_ASSERT(rule->HasRelation(unRelated, dest_1) == mitk::PropertyRelationRuleBase::RelationType::None);
-    CPPUNIT_ASSERT(rule->HasRelation(source_otherRule, dest_1) == mitk::PropertyRelationRuleBase::RelationType::None);
-    CPPUNIT_ASSERT(rule->HasRelation(source_otherTypeRule, dest_1) == mitk::PropertyRelationRuleBase::RelationType::None);
+    CPPUNIT_ASSERT(!rule->HasRelation(source_1, unRelated));
+    CPPUNIT_ASSERT(!rule->HasRelation(unRelated, dest_1));
+    CPPUNIT_ASSERT(!rule->HasRelation(source_otherRule, dest_1));
+    CPPUNIT_ASSERT(!rule->HasRelation(source_otherTypeRule, dest_1));
 
-    CPPUNIT_ASSERT(rule->HasRelation(source_implicit_1, dest_1) ==
-                   mitk::PropertyRelationRuleBase::RelationType::Implicit_Data);
-    CPPUNIT_ASSERT(rule->HasRelation(source_data_1, dest_1) ==
-                   mitk::PropertyRelationRuleBase::RelationType::Connected_Data);
-    CPPUNIT_ASSERT(rule->HasRelation(source_idOnly_1, dest_1) ==
-                   mitk::PropertyRelationRuleBase::RelationType::Connected_ID);
-    CPPUNIT_ASSERT(rule->HasRelation(source_1, dest_1) == mitk::PropertyRelationRuleBase::RelationType::Connected_ID);
-    CPPUNIT_ASSERT(rule->HasRelation(source_multi, dest_1) ==
-                   mitk::PropertyRelationRuleBase::RelationType::Connected_ID);
+    CPPUNIT_ASSERT(rule->HasRelation(source_implicit_1, dest_1));
+    CPPUNIT_ASSERT(rule->HasRelation(source_implicit_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Data));
+    CPPUNIT_ASSERT(!rule->HasRelation(source_implicit_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::ID));
+    CPPUNIT_ASSERT(!rule->HasRelation(source_implicit_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete));
 
-    CPPUNIT_ASSERT(rule->HasRelation(source_1, dest_2) == mitk::PropertyRelationRuleBase::RelationType::None);
-    CPPUNIT_ASSERT(rule->HasRelation(source_multi, dest_2) ==
-                   mitk::PropertyRelationRuleBase::RelationType::Connected_ID);
+    CPPUNIT_ASSERT(rule->HasRelation(source_data_1, dest_1));
+    CPPUNIT_ASSERT(rule->HasRelation(source_data_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Data));
+    CPPUNIT_ASSERT(!rule->HasRelation(source_data_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::ID));
+    CPPUNIT_ASSERT(!rule->HasRelation(source_data_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete));
+
+    CPPUNIT_ASSERT(rule->HasRelation(source_idOnly_1, dest_1));
+    CPPUNIT_ASSERT(!rule->HasRelation(source_idOnly_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Data));
+    CPPUNIT_ASSERT(rule->HasRelation(source_idOnly_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::ID));
+    CPPUNIT_ASSERT(!rule->HasRelation(source_idOnly_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete));
+
+    CPPUNIT_ASSERT(rule->HasRelation(source_1, dest_1));
+    CPPUNIT_ASSERT(rule->HasRelation(source_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Data));
+    CPPUNIT_ASSERT(rule->HasRelation(source_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::ID));
+    CPPUNIT_ASSERT(rule->HasRelation(source_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete));
+
+    CPPUNIT_ASSERT(!rule->HasRelation(source_1, dest_2));
+    CPPUNIT_ASSERT(!rule->HasRelation(source_1, dest_2, mitk::PropertyRelationRuleBase::RelationType::Data));
+    CPPUNIT_ASSERT(!rule->HasRelation(source_1, dest_2, mitk::PropertyRelationRuleBase::RelationType::ID));
+    CPPUNIT_ASSERT(!rule->HasRelation(source_1, dest_2, mitk::PropertyRelationRuleBase::RelationType::Complete));
+
+    CPPUNIT_ASSERT(rule->HasRelation(source_multi, dest_1));
+    CPPUNIT_ASSERT(rule->HasRelation(source_multi, dest_1, mitk::PropertyRelationRuleBase::RelationType::Data));
+    CPPUNIT_ASSERT(rule->HasRelation(source_multi, dest_1, mitk::PropertyRelationRuleBase::RelationType::ID));
+    CPPUNIT_ASSERT(rule->HasRelation(source_multi, dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete));
+
+    CPPUNIT_ASSERT(rule->HasRelation(source_multi, dest_2));
+    CPPUNIT_ASSERT(!rule->HasRelation(source_multi, dest_2, mitk::PropertyRelationRuleBase::RelationType::Data));
+    CPPUNIT_ASSERT(rule->HasRelation(source_multi, dest_2, mitk::PropertyRelationRuleBase::RelationType::ID));
+    CPPUNIT_ASSERT(!rule->HasRelation(source_multi, dest_2, mitk::PropertyRelationRuleBase::RelationType::Complete));
 
 
-    CPPUNIT_ASSERT(abstractRule->HasRelation(source_1, unRelated) == mitk::PropertyRelationRuleBase::RelationType::None);
-    CPPUNIT_ASSERT(abstractRule->HasRelation(unRelated, dest_1) == mitk::PropertyRelationRuleBase::RelationType::None);
-    CPPUNIT_ASSERT(abstractRule->HasRelation(source_otherRule, dest_1) == mitk::PropertyRelationRuleBase::RelationType::None);
-    CPPUNIT_ASSERT(abstractRule->HasRelation(source_otherTypeRule, dest_1) ==
-      mitk::PropertyRelationRuleBase::RelationType::Connected_ID);
+    CPPUNIT_ASSERT(!abstractRule->HasRelation(source_1, unRelated));
+    CPPUNIT_ASSERT(!abstractRule->HasRelation(unRelated, dest_1));
+    CPPUNIT_ASSERT(!abstractRule->HasRelation(source_otherRule, dest_1));
+    CPPUNIT_ASSERT(abstractRule->HasRelation(source_otherTypeRule, dest_1));
+    CPPUNIT_ASSERT(!abstractRule->HasRelation(source_otherTypeRule, dest_1, mitk::PropertyRelationRuleBase::RelationType::Data));
+    CPPUNIT_ASSERT(abstractRule->HasRelation(source_otherTypeRule, dest_1, mitk::PropertyRelationRuleBase::RelationType::ID));
+    CPPUNIT_ASSERT(!abstractRule->HasRelation(source_otherTypeRule, dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete));
 
-    CPPUNIT_ASSERT(abstractRule->HasRelation(source_implicit_1, dest_1) ==
-      mitk::PropertyRelationRuleBase::RelationType::Implicit_Data);
-    CPPUNIT_ASSERT(abstractRule->HasRelation(source_data_1, dest_1) ==
-      mitk::PropertyRelationRuleBase::RelationType::Connected_ID);
-    CPPUNIT_ASSERT(abstractRule->HasRelation(source_idOnly_1, dest_1) ==
-      mitk::PropertyRelationRuleBase::RelationType::Connected_ID);
-    CPPUNIT_ASSERT(abstractRule->HasRelation(source_1, dest_1) == mitk::PropertyRelationRuleBase::RelationType::Connected_ID);
-    CPPUNIT_ASSERT(abstractRule->HasRelation(source_multi, dest_1) ==
-      mitk::PropertyRelationRuleBase::RelationType::Connected_ID);
+    CPPUNIT_ASSERT(abstractRule->HasRelation(source_implicit_1, dest_1));
+    CPPUNIT_ASSERT(abstractRule->HasRelation(source_implicit_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Data));
+    CPPUNIT_ASSERT(!abstractRule->HasRelation(source_implicit_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::ID));
+    CPPUNIT_ASSERT(!abstractRule->HasRelation(source_implicit_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete));
 
-    CPPUNIT_ASSERT(abstractRule->HasRelation(source_1, dest_2) == mitk::PropertyRelationRuleBase::RelationType::Connected_ID);
-    CPPUNIT_ASSERT(abstractRule->HasRelation(source_multi, dest_2) ==
-      mitk::PropertyRelationRuleBase::RelationType::Connected_ID);
+    CPPUNIT_ASSERT(abstractRule->HasRelation(source_data_1, dest_1));
+    CPPUNIT_ASSERT(abstractRule->HasRelation(source_data_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Data));
+    CPPUNIT_ASSERT(abstractRule->HasRelation(source_data_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::ID));
+    CPPUNIT_ASSERT(!abstractRule->HasRelation(source_data_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete));
+
+    CPPUNIT_ASSERT(abstractRule->HasRelation(source_idOnly_1, dest_1));
+    CPPUNIT_ASSERT(!abstractRule->HasRelation(source_idOnly_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Data));
+    CPPUNIT_ASSERT(abstractRule->HasRelation(source_idOnly_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::ID));
+    CPPUNIT_ASSERT(!abstractRule->HasRelation(source_idOnly_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete));
+
+    CPPUNIT_ASSERT(abstractRule->HasRelation(source_1, dest_1));
+    CPPUNIT_ASSERT(abstractRule->HasRelation(source_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Data));
+    CPPUNIT_ASSERT(abstractRule->HasRelation(source_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::ID));
+    CPPUNIT_ASSERT(abstractRule->HasRelation(source_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete));
+
+    CPPUNIT_ASSERT(abstractRule->HasRelation(source_1, dest_2));
+    CPPUNIT_ASSERT(!abstractRule->HasRelation(source_1, dest_2, mitk::PropertyRelationRuleBase::RelationType::Data));
+    CPPUNIT_ASSERT(abstractRule->HasRelation(source_1, dest_2, mitk::PropertyRelationRuleBase::RelationType::ID));
+    CPPUNIT_ASSERT(!abstractRule->HasRelation(source_1, dest_2, mitk::PropertyRelationRuleBase::RelationType::Complete));
+
+    CPPUNIT_ASSERT(abstractRule->HasRelation(source_multi, dest_1));
+    CPPUNIT_ASSERT(abstractRule->HasRelation(source_multi, dest_1, mitk::PropertyRelationRuleBase::RelationType::Data));
+    CPPUNIT_ASSERT(abstractRule->HasRelation(source_multi, dest_1, mitk::PropertyRelationRuleBase::RelationType::ID));
+    CPPUNIT_ASSERT(abstractRule->HasRelation(source_multi, dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete));
+
+    CPPUNIT_ASSERT(abstractRule->HasRelation(source_multi, dest_2));
+    CPPUNIT_ASSERT(!abstractRule->HasRelation(source_multi, dest_2, mitk::PropertyRelationRuleBase::RelationType::Data));
+    CPPUNIT_ASSERT(abstractRule->HasRelation(source_multi, dest_2, mitk::PropertyRelationRuleBase::RelationType::ID));
+    CPPUNIT_ASSERT(!abstractRule->HasRelation(source_multi, dest_2, mitk::PropertyRelationRuleBase::RelationType::Complete));
   }
 
   void GetExistingRelations()
@@ -419,9 +489,12 @@ public:
     CPPUNIT_ASSERT(rule->GetExistingRelations(unRelated).empty());
     CPPUNIT_ASSERT(rule->GetExistingRelations(source_otherRule).empty());
     CPPUNIT_ASSERT(rule->GetExistingRelations(source_otherTypeRule).empty());
-    CPPUNIT_ASSERT(rule->GetExistingRelations(source_implicit_1).empty());
 
-    auto uids = rule->GetExistingRelations(source_idOnly_1);
+    auto uids = rule->GetExistingRelations(source_implicit_1);
+    CPPUNIT_ASSERT(uids.size() == 1);
+    CPPUNIT_ASSERT(uids.front() == dest_1->GetName());
+
+    uids = rule->GetExistingRelations(source_idOnly_1);
     CPPUNIT_ASSERT(uids.size() == 1);
     CPPUNIT_ASSERT(uids.front() == "uid1");
 
@@ -442,7 +515,10 @@ public:
 
     CPPUNIT_ASSERT(abstractRule->GetExistingRelations(unRelated).empty());
     CPPUNIT_ASSERT(abstractRule->GetExistingRelations(source_otherRule).empty());
-    CPPUNIT_ASSERT(abstractRule->GetExistingRelations(source_implicit_1).empty());
+
+    uids = abstractRule->GetExistingRelations(source_implicit_1);
+    CPPUNIT_ASSERT(uids.size() == 1);
+    CPPUNIT_ASSERT(uids.front() == dest_1->GetName());
 
     uids = abstractRule->GetExistingRelations(source_idOnly_1);
     CPPUNIT_ASSERT(uids.size() == 1);
@@ -538,7 +614,7 @@ public:
 
     CPPUNIT_ASSERT(!predicate->CheckNode(nullptr));
     CPPUNIT_ASSERT(!predicate->CheckNode(unRelated));
-    CPPUNIT_ASSERT(!predicate->CheckNode(source_implicit_1));
+    CPPUNIT_ASSERT(predicate->CheckNode(source_implicit_1));
     CPPUNIT_ASSERT(predicate->CheckNode(source_data_1));
     CPPUNIT_ASSERT(predicate->CheckNode(source_idOnly_1));
     CPPUNIT_ASSERT(predicate->CheckNode(source_1));
@@ -552,7 +628,7 @@ public:
 
     CPPUNIT_ASSERT(!predicate2->CheckNode(nullptr));
     CPPUNIT_ASSERT(!predicate2->CheckNode(unRelated));
-    CPPUNIT_ASSERT(!predicate2->CheckNode(source_implicit_1));
+    CPPUNIT_ASSERT(predicate2->CheckNode(source_implicit_1));
     CPPUNIT_ASSERT(predicate2->CheckNode(source_data_1));
     CPPUNIT_ASSERT(predicate2->CheckNode(source_idOnly_1));
     CPPUNIT_ASSERT(predicate2->CheckNode(source_1));
@@ -580,19 +656,19 @@ public:
     CPPUNIT_ASSERT(predicate->CheckNode(source_1));
     CPPUNIT_ASSERT(predicate->CheckNode(source_multi));
 
-    predicate = rule->GetSourcesDetector(dest_1, mitk::PropertyRelationRuleBase::RelationType::Connected_Data);
+    predicate = rule->GetSourcesDetector(dest_1, mitk::PropertyRelationRuleBase::RelationType::Data);
 
     CPPUNIT_ASSERT(!predicate->CheckNode(unRelated));
     CPPUNIT_ASSERT(!predicate->CheckNode(source_otherRule));
     CPPUNIT_ASSERT(!predicate->CheckNode(source_otherTypeRule));
 
-    CPPUNIT_ASSERT(!predicate->CheckNode(source_implicit_1));
+    CPPUNIT_ASSERT(predicate->CheckNode(source_implicit_1));
     CPPUNIT_ASSERT(predicate->CheckNode(source_data_1));
-    CPPUNIT_ASSERT(predicate->CheckNode(source_idOnly_1));
+    CPPUNIT_ASSERT(!predicate->CheckNode(source_idOnly_1));
     CPPUNIT_ASSERT(predicate->CheckNode(source_1));
     CPPUNIT_ASSERT(predicate->CheckNode(source_multi));
 
-    predicate = rule->GetSourcesDetector(dest_1, mitk::PropertyRelationRuleBase::RelationType::Connected_ID);
+    predicate = rule->GetSourcesDetector(dest_1, mitk::PropertyRelationRuleBase::RelationType::ID);
 
     CPPUNIT_ASSERT(!predicate->CheckNode(unRelated));
     CPPUNIT_ASSERT(!predicate->CheckNode(source_otherRule));
@@ -604,7 +680,19 @@ public:
     CPPUNIT_ASSERT(predicate->CheckNode(source_1));
     CPPUNIT_ASSERT(predicate->CheckNode(source_multi));
 
-    predicate = rule->GetSourcesDetector(dest_2, mitk::PropertyRelationRuleBase::RelationType::Implicit_Data);
+    predicate = rule->GetSourcesDetector(dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete);
+
+    CPPUNIT_ASSERT(!predicate->CheckNode(unRelated));
+    CPPUNIT_ASSERT(!predicate->CheckNode(source_otherRule));
+    CPPUNIT_ASSERT(!predicate->CheckNode(source_otherTypeRule));
+
+    CPPUNIT_ASSERT(!predicate->CheckNode(source_implicit_1));
+    CPPUNIT_ASSERT(!predicate->CheckNode(source_data_1));
+    CPPUNIT_ASSERT(!predicate->CheckNode(source_idOnly_1));
+    CPPUNIT_ASSERT(predicate->CheckNode(source_1));
+    CPPUNIT_ASSERT(predicate->CheckNode(source_multi));
+
+    predicate = rule->GetSourcesDetector(dest_2);
 
     CPPUNIT_ASSERT(!predicate->CheckNode(unRelated));
     CPPUNIT_ASSERT(!predicate->CheckNode(source_otherRule));
@@ -616,7 +704,7 @@ public:
     CPPUNIT_ASSERT(!predicate->CheckNode(source_1));
     CPPUNIT_ASSERT(predicate->CheckNode(source_multi));
 
-    predicate = abstractRule->GetSourcesDetector(dest_1, mitk::PropertyRelationRuleBase::RelationType::Connected_ID);
+    predicate = abstractRule->GetSourcesDetector(dest_1, mitk::PropertyRelationRuleBase::RelationType::ID);
 
     CPPUNIT_ASSERT(!predicate->CheckNode(unRelated));
     CPPUNIT_ASSERT(!predicate->CheckNode(source_otherRule));
@@ -625,6 +713,30 @@ public:
     CPPUNIT_ASSERT(!predicate->CheckNode(source_implicit_1));
     CPPUNIT_ASSERT(predicate->CheckNode(source_data_1));
     CPPUNIT_ASSERT(predicate->CheckNode(source_idOnly_1));
+    CPPUNIT_ASSERT(predicate->CheckNode(source_1));
+    CPPUNIT_ASSERT(predicate->CheckNode(source_multi));
+
+    predicate = abstractRule->GetSourcesDetector(dest_1, mitk::PropertyRelationRuleBase::RelationType::Data);
+
+    CPPUNIT_ASSERT(!predicate->CheckNode(unRelated));
+    CPPUNIT_ASSERT(!predicate->CheckNode(source_otherRule));
+    CPPUNIT_ASSERT(!predicate->CheckNode(source_otherTypeRule));
+
+    CPPUNIT_ASSERT(predicate->CheckNode(source_implicit_1));
+    CPPUNIT_ASSERT(predicate->CheckNode(source_data_1));
+    CPPUNIT_ASSERT(!predicate->CheckNode(source_idOnly_1));
+    CPPUNIT_ASSERT(predicate->CheckNode(source_1));
+    CPPUNIT_ASSERT(predicate->CheckNode(source_multi));
+
+    predicate = abstractRule->GetSourcesDetector(dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete);
+
+    CPPUNIT_ASSERT(!predicate->CheckNode(unRelated));
+    CPPUNIT_ASSERT(!predicate->CheckNode(source_otherRule));
+    CPPUNIT_ASSERT(!predicate->CheckNode(source_otherTypeRule));
+
+    CPPUNIT_ASSERT(!predicate->CheckNode(source_implicit_1));
+    CPPUNIT_ASSERT(!predicate->CheckNode(source_data_1));
+    CPPUNIT_ASSERT(!predicate->CheckNode(source_idOnly_1));
     CPPUNIT_ASSERT(predicate->CheckNode(source_1));
     CPPUNIT_ASSERT(predicate->CheckNode(source_multi));
 
@@ -656,38 +768,55 @@ public:
     predicate = rule->GetDestinationsDetector(source_implicit_1);
     CPPUNIT_ASSERT(predicate->CheckNode(dest_1));
     predicate =
-      rule->GetDestinationsDetector(source_implicit_1, mitk::PropertyRelationRuleBase::RelationType::Connected_Data);
+      rule->GetDestinationsDetector(source_implicit_1, mitk::PropertyRelationRuleBase::RelationType::Data);
+    CPPUNIT_ASSERT(predicate->CheckNode(dest_1));
+    predicate =
+      rule->GetDestinationsDetector(source_implicit_1, mitk::PropertyRelationRuleBase::RelationType::ID);
+    CPPUNIT_ASSERT(!predicate->CheckNode(dest_1));
+    predicate =
+      rule->GetDestinationsDetector(source_implicit_1, mitk::PropertyRelationRuleBase::RelationType::Complete);
     CPPUNIT_ASSERT(!predicate->CheckNode(dest_1));
 
     predicate = rule->GetDestinationsDetector(source_data_1);
     CPPUNIT_ASSERT(predicate->CheckNode(dest_1));
     predicate =
-      rule->GetDestinationsDetector(source_data_1, mitk::PropertyRelationRuleBase::RelationType::Connected_Data);
+      rule->GetDestinationsDetector(source_data_1, mitk::PropertyRelationRuleBase::RelationType::Data);
     CPPUNIT_ASSERT(predicate->CheckNode(dest_1));
     predicate =
-      rule->GetDestinationsDetector(source_data_1, mitk::PropertyRelationRuleBase::RelationType::Connected_ID);
+      rule->GetDestinationsDetector(source_data_1, mitk::PropertyRelationRuleBase::RelationType::ID);
+    CPPUNIT_ASSERT(!predicate->CheckNode(dest_1));
+    predicate =
+      rule->GetDestinationsDetector(source_data_1, mitk::PropertyRelationRuleBase::RelationType::Complete);
     CPPUNIT_ASSERT(!predicate->CheckNode(dest_1));
 
     predicate = rule->GetDestinationsDetector(source_idOnly_1);
     CPPUNIT_ASSERT(predicate->CheckNode(dest_1));
     predicate =
-      rule->GetDestinationsDetector(source_idOnly_1, mitk::PropertyRelationRuleBase::RelationType::Connected_Data);
+      rule->GetDestinationsDetector(source_idOnly_1, mitk::PropertyRelationRuleBase::RelationType::Data);
+    CPPUNIT_ASSERT(!predicate->CheckNode(dest_1));
+    predicate =
+      rule->GetDestinationsDetector(source_idOnly_1, mitk::PropertyRelationRuleBase::RelationType::ID);
     CPPUNIT_ASSERT(predicate->CheckNode(dest_1));
     predicate =
-      rule->GetDestinationsDetector(source_idOnly_1, mitk::PropertyRelationRuleBase::RelationType::Connected_ID);
-    CPPUNIT_ASSERT(predicate->CheckNode(dest_1));
+      rule->GetDestinationsDetector(source_idOnly_1, mitk::PropertyRelationRuleBase::RelationType::Complete);
+    CPPUNIT_ASSERT(!predicate->CheckNode(dest_1));
 
     predicate = rule->GetDestinationsDetector(source_1);
     CPPUNIT_ASSERT(predicate->CheckNode(dest_1));
     CPPUNIT_ASSERT(!predicate->CheckNode(unRelated));
     CPPUNIT_ASSERT(!predicate->CheckNode(dest_2));
     predicate =
-      rule->GetDestinationsDetector(source_1, mitk::PropertyRelationRuleBase::RelationType::Connected_Data);
+      rule->GetDestinationsDetector(source_1, mitk::PropertyRelationRuleBase::RelationType::Data);
     CPPUNIT_ASSERT(predicate->CheckNode(dest_1));
     CPPUNIT_ASSERT(!predicate->CheckNode(unRelated));
     CPPUNIT_ASSERT(!predicate->CheckNode(dest_2));
     predicate =
-      rule->GetDestinationsDetector(source_1, mitk::PropertyRelationRuleBase::RelationType::Connected_ID);
+      rule->GetDestinationsDetector(source_1, mitk::PropertyRelationRuleBase::RelationType::ID);
+    CPPUNIT_ASSERT(predicate->CheckNode(dest_1));
+    CPPUNIT_ASSERT(!predicate->CheckNode(unRelated));
+    CPPUNIT_ASSERT(!predicate->CheckNode(dest_2));
+    predicate =
+      rule->GetDestinationsDetector(source_1, mitk::PropertyRelationRuleBase::RelationType::Complete);
     CPPUNIT_ASSERT(predicate->CheckNode(dest_1));
     CPPUNIT_ASSERT(!predicate->CheckNode(unRelated));
     CPPUNIT_ASSERT(!predicate->CheckNode(dest_2));
@@ -696,13 +825,17 @@ public:
     CPPUNIT_ASSERT(predicate->CheckNode(dest_1));
     CPPUNIT_ASSERT(predicate->CheckNode(dest_2));
     predicate =
-      rule->GetDestinationsDetector(source_multi, mitk::PropertyRelationRuleBase::RelationType::Connected_Data);
+      rule->GetDestinationsDetector(source_multi, mitk::PropertyRelationRuleBase::RelationType::Data);
+    CPPUNIT_ASSERT(predicate->CheckNode(dest_1));
+    CPPUNIT_ASSERT(!predicate->CheckNode(dest_2));
+    predicate =
+      rule->GetDestinationsDetector(source_multi, mitk::PropertyRelationRuleBase::RelationType::ID);
     CPPUNIT_ASSERT(predicate->CheckNode(dest_1));
     CPPUNIT_ASSERT(predicate->CheckNode(dest_2));
     predicate =
-      rule->GetDestinationsDetector(source_multi, mitk::PropertyRelationRuleBase::RelationType::Connected_ID);
+      rule->GetDestinationsDetector(source_multi, mitk::PropertyRelationRuleBase::RelationType::Complete);
     CPPUNIT_ASSERT(predicate->CheckNode(dest_1));
-    CPPUNIT_ASSERT(predicate->CheckNode(dest_2));
+    CPPUNIT_ASSERT(!predicate->CheckNode(dest_2));
 
     predicate = abstractRule->GetDestinationsDetector(source_otherTypeRule);
     CPPUNIT_ASSERT(predicate->CheckNode(dest_1));
@@ -743,18 +876,14 @@ public:
                                  itk::ExceptionObject);
 
     // check upgrade of an implicit connection
-    CPPUNIT_ASSERT(rule->HasRelation(source_implicit_1, dest_1) ==
-                   mitk::PropertyRelationRuleBase::RelationType::Implicit_Data);
+    CPPUNIT_ASSERT(!rule->HasRelation(source_implicit_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete));
     rule->Connect(source_implicit_1, dest_1);
-    CPPUNIT_ASSERT(rule->HasRelation(source_implicit_1, dest_1) ==
-                   mitk::PropertyRelationRuleBase::RelationType::Connected_ID);
+    CPPUNIT_ASSERT(rule->HasRelation(source_implicit_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete));
 
     // check upgrade of an data connection
-    CPPUNIT_ASSERT(rule->HasRelation(source_data_1, dest_1) ==
-                   mitk::PropertyRelationRuleBase::RelationType::Connected_Data);
+    CPPUNIT_ASSERT(!rule->HasRelation(source_data_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete));
     rule->Connect(source_data_1, dest_1);
-    CPPUNIT_ASSERT(rule->HasRelation(source_data_1, dest_1) ==
-                   mitk::PropertyRelationRuleBase::RelationType::Connected_ID);
+    CPPUNIT_ASSERT(rule->HasRelation(source_data_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete));
     std::string name = "MITK.Relations.1.destinationUID";
     auto prop = source_data_1->GetProperty(name.c_str());
     CPPUNIT_ASSERT_MESSAGE(
@@ -762,9 +891,9 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Incorrect destination uid was  stored.", prop->GetValueAsString() == dest_1_data->GetUID());
 
     // check actualization of an id only connection
+    CPPUNIT_ASSERT(!rule->HasRelation(source_idOnly_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete));
     rule->Connect(source_idOnly_1, dest_1);
-    CPPUNIT_ASSERT(rule->HasRelation(source_idOnly_1, dest_1) ==
-                   mitk::PropertyRelationRuleBase::RelationType::Connected_ID);
+    CPPUNIT_ASSERT(rule->HasRelation(source_idOnly_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete));
     CPPUNIT_ASSERT_MESSAGE("Additional relation was defined instead of updating exting one.",
                            rule->GetExistingRelations(source_1).size() == 1);
     name = "MITK.Relations.1.dataHandle";
@@ -781,14 +910,13 @@ public:
 
     // check actualization of an existing connection
     rule->Connect(source_1, dest_1);
-    CPPUNIT_ASSERT(rule->HasRelation(source_1, dest_1) == mitk::PropertyRelationRuleBase::RelationType::Connected_ID);
+    CPPUNIT_ASSERT(rule->HasRelation(source_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete));
     CPPUNIT_ASSERT_MESSAGE("Additional relation was defined instead of updating exting one.",
                            rule->GetExistingRelations(source_1).size() == 1);
 
     // check new connection
     auto newConnectUID = rule->Connect(source_multi, unRelated);
-    CPPUNIT_ASSERT(rule->HasRelation(source_multi, unRelated) ==
-                   mitk::PropertyRelationRuleBase::RelationType::Connected_ID);
+    CPPUNIT_ASSERT(rule->HasRelation(source_multi, unRelated, mitk::PropertyRelationRuleBase::RelationType::Complete));
     name = "MITK.Relations.5.dataHandle";
     prop = source_multi->GetProperty(name.c_str());
     CPPUNIT_ASSERT_MESSAGE(
@@ -826,25 +954,24 @@ public:
                                  rule->Disconnect(nullptr, "uid"),
                                  itk::ExceptionObject);
 
-    CPPUNIT_ASSERT(rule->HasRelation(source_1, unRelated) == mitk::PropertyRelationRuleBase::RelationType::None);
+    CPPUNIT_ASSERT(!rule->HasRelation(source_1, unRelated, mitk::PropertyRelationRuleBase::RelationType::None));
     rule->Disconnect(source_1, unRelated);
-    CPPUNIT_ASSERT(rule->HasRelation(source_1, unRelated) == mitk::PropertyRelationRuleBase::RelationType::None);
-    CPPUNIT_ASSERT_MESSAGE("Data property was not removed.", !source_1->GetProperty("referencedName"));
+    CPPUNIT_ASSERT(!rule->HasRelation(source_1, unRelated, mitk::PropertyRelationRuleBase::RelationType::None));
+    CPPUNIT_ASSERT_MESSAGE("Data property was illegaly removed.", source_1->GetProperty("referencedName"));
 
     rule->Disconnect(source_1, dest_2);
-    CPPUNIT_ASSERT(rule->HasRelation(source_1, dest_2) == mitk::PropertyRelationRuleBase::RelationType::None);
+    CPPUNIT_ASSERT(!rule->HasRelation(source_1, dest_2, mitk::PropertyRelationRuleBase::RelationType::None));
     CPPUNIT_ASSERT(this->hasRelationProperties(source_1));
 
-    CPPUNIT_ASSERT(rule->HasRelation(source_1, dest_1) == mitk::PropertyRelationRuleBase::RelationType::Connected_ID);
+    CPPUNIT_ASSERT(rule->HasRelation(source_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete));
     rule->Disconnect(source_1, dest_1);
-    CPPUNIT_ASSERT(rule->HasRelation(source_1, dest_1) == mitk::PropertyRelationRuleBase::RelationType::None);
+    CPPUNIT_ASSERT(!rule->HasRelation(source_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::None));
     CPPUNIT_ASSERT(!this->hasRelationProperties(source_1, "1"));
     CPPUNIT_ASSERT_MESSAGE("Data of other rule type was removed.",this->hasRelationProperties(source_1, "2"));
 
-    CPPUNIT_ASSERT(rule->HasRelation(source_multi, dest_1) ==
-                   mitk::PropertyRelationRuleBase::RelationType::Connected_ID);
+    CPPUNIT_ASSERT(rule->HasRelation(source_multi, dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete));
     rule->Disconnect(source_multi, dest_1);
-    CPPUNIT_ASSERT(rule->HasRelation(source_multi, dest_1) == mitk::PropertyRelationRuleBase::RelationType::None);
+    CPPUNIT_ASSERT(!rule->HasRelation(source_multi, dest_1, mitk::PropertyRelationRuleBase::RelationType::None));
     CPPUNIT_ASSERT(!this->hasRelationProperties(source_multi, "1"));
     CPPUNIT_ASSERT(this->hasRelationProperties(source_multi, "2"));
     CPPUNIT_ASSERT(this->hasRelationProperties(source_multi, "4"));
@@ -863,6 +990,68 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Data of other rule type was removed.", this->hasRelationProperties(source_otherTypeRule, "1"));
   }
 
+  void Disconnect_partial_ID()
+  {
+    CPPUNIT_ASSERT_THROW_MESSAGE("Violated precondition (source is nullptr) does not throw.",
+      rule->Disconnect(nullptr, dest_1, mitk::PropertyRelationRuleBase::RelationType::ID),
+      itk::ExceptionObject);
+
+    CPPUNIT_ASSERT_THROW_MESSAGE("Violated precondition (destination is nullptr) does not throw.",
+      rule->Disconnect(source_1, nullptr, mitk::PropertyRelationRuleBase::RelationType::ID),
+      itk::ExceptionObject);
+
+    CPPUNIT_ASSERT_THROW_MESSAGE("Violated precondition (destination is nullptr) does not throw.",
+      rule->Disconnect(nullptr, "uid", mitk::PropertyRelationRuleBase::RelationType::ID),
+      itk::ExceptionObject);
+
+    CPPUNIT_ASSERT(!rule->HasRelation(source_1, unRelated, mitk::PropertyRelationRuleBase::RelationType::None));
+    rule->Disconnect(source_1, unRelated, mitk::PropertyRelationRuleBase::RelationType::ID);
+    CPPUNIT_ASSERT(!rule->HasRelation(source_1, unRelated, mitk::PropertyRelationRuleBase::RelationType::None));
+    CPPUNIT_ASSERT_MESSAGE("Data property was illegaly removed.", source_1->GetProperty("referencedName"));
+
+    rule->Disconnect(source_idOnly_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::ID);
+    CPPUNIT_ASSERT(!rule->HasRelation(source_idOnly_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::None));
+
+    rule->Disconnect(source_data_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::ID);
+    CPPUNIT_ASSERT(rule->HasRelation(source_data_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Data));
+
+    CPPUNIT_ASSERT(rule->HasRelation(source_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete));
+    rule->Disconnect(source_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::ID);
+    CPPUNIT_ASSERT(rule->HasRelation(source_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Data));
+    CPPUNIT_ASSERT(!this->hasRelationProperties(source_1, "1"));
+    CPPUNIT_ASSERT_MESSAGE("Data of other rule type was removed.", this->hasRelationProperties(source_1, "2"));
+  }
+
+  void Disconnect_partial_Data()
+  {
+    CPPUNIT_ASSERT_THROW_MESSAGE("Violated precondition (source is nullptr) does not throw.",
+      rule->Disconnect(nullptr, dest_1, mitk::PropertyRelationRuleBase::RelationType::Data),
+      itk::ExceptionObject);
+
+    CPPUNIT_ASSERT_THROW_MESSAGE("Violated precondition (destination is nullptr) does not throw.",
+      rule->Disconnect(source_1, nullptr, mitk::PropertyRelationRuleBase::RelationType::Data),
+      itk::ExceptionObject);
+
+    CPPUNIT_ASSERT_THROW_MESSAGE("Violated precondition (destination is nullptr) does not throw.",
+      rule->Disconnect(nullptr, "uid", mitk::PropertyRelationRuleBase::RelationType::Data),
+      itk::ExceptionObject);
+
+    CPPUNIT_ASSERT(!rule->HasRelation(source_1, unRelated, mitk::PropertyRelationRuleBase::RelationType::None));
+    rule->Disconnect(source_1, unRelated, mitk::PropertyRelationRuleBase::RelationType::Data);
+    CPPUNIT_ASSERT(!rule->HasRelation(source_1, unRelated, mitk::PropertyRelationRuleBase::RelationType::None));
+    CPPUNIT_ASSERT_MESSAGE("Data property was illegaly removed.", source_1->GetProperty("referencedName"));
+
+    rule->Disconnect(source_idOnly_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Data);
+    CPPUNIT_ASSERT(rule->HasRelation(source_idOnly_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::ID));
+
+    rule->Disconnect(source_data_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Data);
+    CPPUNIT_ASSERT(!rule->HasRelation(source_data_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::None));
+
+    CPPUNIT_ASSERT(rule->HasRelation(source_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete));
+    rule->Disconnect(source_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Data);
+    CPPUNIT_ASSERT(rule->HasRelation(source_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::ID));
+  }
+
   void Connect_abstract()
   {
     CPPUNIT_ASSERT_THROW_MESSAGE("Violated precondition (abstract does not connect) does not throw.",
@@ -876,21 +1065,19 @@ public:
 
   void Disconnect_abstract()
   {
-
-    CPPUNIT_ASSERT(abstractRule->HasRelation(source_1, dest_2) == mitk::PropertyRelationRuleBase::RelationType::Connected_ID);
+    CPPUNIT_ASSERT(abstractRule->HasRelation(source_1, dest_2, mitk::PropertyRelationRuleBase::RelationType::ID));
     abstractRule->Disconnect(source_1, dest_2);
-    CPPUNIT_ASSERT(abstractRule->HasRelation(source_1, dest_2) == mitk::PropertyRelationRuleBase::RelationType::None);
+    CPPUNIT_ASSERT(!abstractRule->HasRelation(source_1, dest_2, mitk::PropertyRelationRuleBase::RelationType::None));
     CPPUNIT_ASSERT(!this->hasRelationProperties(source_1, "2"));
 
-    CPPUNIT_ASSERT(abstractRule->HasRelation(source_1, dest_1) == mitk::PropertyRelationRuleBase::RelationType::Connected_ID);
+    CPPUNIT_ASSERT(abstractRule->HasRelation(source_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete));
     abstractRule->Disconnect(source_1, dest_1);
-    CPPUNIT_ASSERT(abstractRule->HasRelation(source_1, dest_1) == mitk::PropertyRelationRuleBase::RelationType::None);
+    CPPUNIT_ASSERT(!abstractRule->HasRelation(source_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::None));
     CPPUNIT_ASSERT(!this->hasRelationProperties(source_1, "1"));
 
-    CPPUNIT_ASSERT(abstractRule->HasRelation(source_multi, dest_1) ==
-      mitk::PropertyRelationRuleBase::RelationType::Connected_ID);
+    CPPUNIT_ASSERT(abstractRule->HasRelation(source_multi, dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete));
     abstractRule->Disconnect(source_multi, dest_1);
-    CPPUNIT_ASSERT(abstractRule->HasRelation(source_multi, dest_1) == mitk::PropertyRelationRuleBase::RelationType::None);
+    CPPUNIT_ASSERT(!abstractRule->HasRelation(source_multi, dest_1, mitk::PropertyRelationRuleBase::RelationType::None));
     CPPUNIT_ASSERT(!this->hasRelationProperties(source_multi, "1"));
     CPPUNIT_ASSERT(this->hasRelationProperties(source_multi, "2"));
     CPPUNIT_ASSERT(this->hasRelationProperties(source_multi, "4"));
@@ -907,7 +1094,6 @@ public:
 
     abstractRule->Disconnect(source_otherTypeRule, dest_1);
     CPPUNIT_ASSERT_MESSAGE("Data of other rule type was removed.", !this->hasRelationProperties(source_otherTypeRule, "1"));
-
   }
 
 };

@@ -347,6 +347,9 @@ namespace mitk
        Please remove if T24728 is done then could directly use owner->GetPropertyKeys() again.*/
     static std::vector<std::string> GetPropertyKeys(const IPropertyProvider *owner);
 
+    /** Helper method that tries to cast the provider to the Identifiable interface.*/
+    const Identifiable* CastProviderAsIdentifiable(const mitk::IPropertyProvider* provider) const;
+
   private:
     /** Creats a relation UID*/
     static RelationUIDType CreateRelationUID();

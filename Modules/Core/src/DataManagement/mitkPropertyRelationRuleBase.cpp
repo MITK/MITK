@@ -392,17 +392,7 @@ mitk::PropertyRelationRuleBase::InstanceIDVectorType mitk::PropertyRelationRuleB
     mitkThrow() << "Error. Passed destination pointer is NULL";
   }
 
-  auto identifiable = dynamic_cast<const Identifiable *>(destination);
-
-  if (!identifiable)
-  { //This check and pass through to data is needed due to solve T25711. See Task for more information.
-    //This could be removed at the point we can get rid of DataNodes or they get realy transparent.
-    auto node = dynamic_cast<const DataNode*>(destination);
-    if (node && node->GetData())
-    {
-      identifiable = dynamic_cast<const Identifiable *>(node->GetData());
-    }
-  }
+  auto identifiable = CastProviderAsIdentifiable(destination);
 
   InstanceIDVectorType result;
 
@@ -440,6 +430,23 @@ mitk::PropertyRelationRuleBase::InstanceIDVectorType mitk::PropertyRelationRuleB
   }
 
   return result;
+}
+
+const mitk::Identifiable* mitk::PropertyRelationRuleBase::CastProviderAsIdentifiable(const mitk::IPropertyProvider* destination) const
+{
+  auto identifiable = dynamic_cast<const Identifiable*>(destination);
+
+  if (!identifiable)
+  { //This check and pass through to data is needed due to solve T25711. See Task for more information.
+    //This could be removed at the point we can get rid of DataNodes or they get realy transparent.
+    auto node = dynamic_cast<const DataNode*>(destination);
+    if (node && node->GetData())
+    {
+      identifiable = dynamic_cast<const Identifiable*>(node->GetData());
+    }
+  }
+
+  return identifiable;
 }
 
 mitk::PropertyRelationRuleBase::RelationUIDType mitk::PropertyRelationRuleBase::Connect(IPropertyOwner *source, const IPropertyProvider *destination) const
@@ -503,17 +510,7 @@ mitk::PropertyRelationRuleBase::RelationUIDType mitk::PropertyRelationRuleBase::
 
   if (!hasIDlayer)
   {
-    auto identifiable = dynamic_cast<const Identifiable *>(destination);
-
-    if (!identifiable)
-    { //This check and pass through to data is needed due to solve T25711. See Task for more information.
-      //This could be removed at the point we can get rid of DataNodes or they get realy transparent.
-      auto node = dynamic_cast<const DataNode*>(destination);
-      if (node && node->GetData())
-      {
-        identifiable = dynamic_cast<const Identifiable *>(node->GetData());
-      }
-    }
+    auto identifiable = this->CastProviderAsIdentifiable(destination);
 
     if (identifiable)
     {

@@ -126,6 +126,9 @@ mitk::SourceImageRelationRule::GetRelationUIDs_DataLayer(const IPropertyProvider
 
     if (!relationCoveredByRII)
     {
+      //the relation is not covered on the RII level, so we generate the property path to the DICOM source reference (this is done via
+      //the SOP Instance UIDs which uniquely identify an DICOM IOD). We use this property path as relation UID because it is identifying
+      //on the data level (even so not long term stable if relations with a lower index are removed).
       PropertyKeyPath referencedInstanceUIDs;
       referencedInstanceUIDs.AddElement("DICOM").AddElement("0008").AddSelection("2112", indexNRule.first).AddElement("0008").AddElement("1155");
 
@@ -159,17 +162,8 @@ std::vector<std::pair<size_t,std::string> > mitk::SourceImageRelationRule::GetRe
       return result;
     }
 
-    auto identifiable = dynamic_cast<const Identifiable*>(destination);
+    auto identifiable = this->CastProviderAsIdentifiable(destination);
 
-    if (!identifiable)
-    { //This check and pass through to data is needed due to solve T25711. See Task for more information.
-      //This could be removed at the point we can get rid of DataNodes or they get realy transparent.
-      auto node = dynamic_cast<const DataNode*>(destination);
-      if (node && node->GetData())
-      {
-        identifiable = dynamic_cast<const Identifiable*>(node->GetData());
-      }
-    }
     if (identifiable)
     {
       destinationUID= identifiable->GetUID();

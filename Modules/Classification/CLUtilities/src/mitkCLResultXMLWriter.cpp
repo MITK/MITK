@@ -21,6 +21,8 @@ found in the LICENSE file.
 #include <mitkDICOMTagPath.h>
 #include <mitkDICOMProperty.h>
 #include <mitkLocaleSwitch.h>
+#include <mitkIOMetaInformationPropertyConstants.h>
+#include <mitkDICOMIOMetaInformationPropertyConstants.h>
 
 #include <tinyxml.h>
 
@@ -38,29 +40,27 @@ private:
   charT m_Sep;
 };
 
-void AddSeriesInstanceUID(const mitk::Image* image, TiXmlElement* xmlNode)
+void AddPropertyAsNode(const mitk::Image* image, const std::string& key, const std::string& tag, TiXmlElement* rootNode)
 {
-  auto prop = image->GetProperty(mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0020, 0x000e)).c_str());
+  auto prop = image->GetProperty(key.c_str());
   if (prop.IsNotNull())
   {
-    auto seriesUIDNode = new TiXmlElement("mp:seriesInstanceUID");
+    auto propNode = new TiXmlElement(tag);
     TiXmlText* valueText = new TiXmlText(prop->GetValueAsString());
-    seriesUIDNode->LinkEndChild(valueText);
-    xmlNode->LinkEndChild(seriesUIDNode);
+    propNode->LinkEndChild(valueText);
+
+    rootNode->LinkEndChild(propNode);
   }
+}
+
+void AddSeriesInstanceUID(const mitk::Image* image, TiXmlElement* xmlNode)
+{
+  AddPropertyAsNode(image, mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0020, 0x000e)), "mp:seriesInstanceUID", xmlNode);
 }
 
 void AddFilePath(const mitk::Image* image, TiXmlElement* xmlNode)
 {
-  auto prop = image->GetProperty("TODO_fileName");
-  if (prop.IsNotNull())
-  {
-    auto filePathNode = new TiXmlElement("mp:filePath");
-    TiXmlText* valueText = new TiXmlText(prop->GetValueAsString());
-    filePathNode->LinkEndChild(valueText);
-
-    xmlNode->LinkEndChild(filePathNode);
-  }
+  AddPropertyAsNode(image, mitk::PropertyKeyPathToPropertyName(mitk::IOMetaInformationPropertyConstants::READER_INPUTLOCATION()), "mp:filePath", xmlNode);
 }
 
 void AddSOPInstanceUIDs(const mitk::Image* image, TiXmlElement* xmlNode)
@@ -72,7 +72,7 @@ void AddSOPInstanceUIDs(const mitk::Image* image, TiXmlElement* xmlNode)
     auto instanceUIDsNode = new TiXmlElement("mp:sopInstanceUIDs");
     xmlNode->LinkEndChild(instanceUIDsNode);
 
-    if (true /*TODO support compact writting*/)
+    if (dicomProp->IsUniform())
     {
       auto instanceUIDNode = new TiXmlElement("mp:sopInstanceUID");
       TiXmlText* valueText = new TiXmlText(dicomProp->GetValueAsString());
@@ -167,6 +167,17 @@ void AddFeatureSettings(const mitk::AbstractGlobalImageFeature::FeatureListType&
   }
 }
 
+void AddReaderInfo(const mitk::Image* image, TiXmlElement* imageNode)
+{
+  auto ioNode = new TiXmlElement("mp:IOReader");
+  imageNode->LinkEndChild(ioNode);
+  AddPropertyAsNode(image, mitk::PropertyKeyPathToPropertyName(mitk::IOMetaInformationPropertyConstants::READER_DESCRIPTION()), "mp:description", ioNode);
+  AddPropertyAsNode(image, mitk::PropertyKeyPathToPropertyName(mitk::IOMetaInformationPropertyConstants::READER_VERSION()), "mp:version", ioNode);
+  AddPropertyAsNode(image, mitk::PropertyKeyPathToPropertyName(mitk::DICOMIOMetaInformationPropertyConstants::READER_CONFIGURATION()), "mp:configuration", ioNode);
+  AddPropertyAsNode(image, mitk::PropertyKeyPathToPropertyName(mitk::DICOMIOMetaInformationPropertyConstants::READER_GDCM()), "mp:gdcmVersion", ioNode);
+  AddPropertyAsNode(image, mitk::PropertyKeyPathToPropertyName(mitk::DICOMIOMetaInformationPropertyConstants::READER_DCMTK()), "mp:dcmtkVersion", ioNode);
+}
+
 void WriteDocument(std::ostream& stream, const mitk::Image* image, const mitk::Image* mask,
   const mitk::AbstractGlobalImageFeature::FeatureListType& features, const std::string& methodName,
   const std::string& organisation, const std::string& version, const std::string& pipelineUID,
@@ -206,8 +217,8 @@ void WriteDocument(std::ostream& stream, const mitk::Image* image, const mitk::I
   AddSeriesInstanceUID(image, imageNode);
   AddFilePath(image, imageNode);
   AddSOPInstanceUIDs(image, imageNode);
+  AddReaderInfo(image,imageNode);
 
-  //todo image reader meta info
 
   auto maskNode = new TiXmlElement("mp:mask");
   rootNode->LinkEndChild(maskNode);
@@ -215,6 +226,7 @@ void WriteDocument(std::ostream& stream, const mitk::Image* image, const mitk::I
   AddSeriesInstanceUID(mask, maskNode);
   AddFilePath(mask, maskNode);
   AddSOPInstanceUIDs(mask, maskNode);
+  AddReaderInfo(mask, maskNode);
 
   //todo mask reader meta info
 
@@ -286,8 +298,15 @@ void mitk::cl::CLResultXMLWriter::write(const std::string& filePath) const
 {
   std::ofstream resultFile;
   resultFile.open(filePath.c_str());
-  this->write(resultFile);
-  resultFile.close();
+  if (resultFile.is_open())
+  {
+    this->write(resultFile);
+    resultFile.close();
+  }
+  else
+  {
+    MITK_ERROR << "Cannot write xml results. Unable to open file: \""<<filePath<<"\"";
+  }
 }
 
 void mitk::cl::CLResultXMLWriter::write(std::ostream& stream) const

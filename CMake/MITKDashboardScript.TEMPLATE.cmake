@@ -130,6 +130,10 @@ macro(downloadFile url dest)
   endif()
 endmacro()
 
+if(NOT GIT_BRANCH)
+  set(GIT_BRANCH "master")
+endif()
+
 #
 # Download and include setup script
 #

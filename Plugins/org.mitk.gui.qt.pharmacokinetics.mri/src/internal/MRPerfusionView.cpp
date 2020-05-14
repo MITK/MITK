@@ -93,7 +93,6 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   m_Controls.setupUi(parent);
 
   m_Controls.btnModelling->setEnabled(false);
-  m_Controls.errorMessageLabel->hide();
 
   this->InitModelComboBox();
 
@@ -452,7 +451,6 @@ void MRPerfusionView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source
   m_selectedMaskNode = nullptr;
   m_selectedMask = nullptr;
 
-  m_Controls.errorMessageLabel->setText("");
   m_Controls.masklabel->setText("No (valid) mask selected.");
   m_Controls.timeserieslabel->setText("No (valid) series selected.");
 
@@ -509,8 +507,6 @@ void MRPerfusionView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source
   {
     this->m_Controls.radioPixelBased->setChecked(true);
   }
-
-  m_Controls.errorMessageLabel->show();
 
   if (this->m_selectedImage.IsNotNull())
   {
@@ -1012,10 +1008,8 @@ void MRPerfusionView::GenerateAIFbasedModelFit_ROIBased(
 void MRPerfusionView::DoFit(const mitk::modelFit::ModelFitInfo* fitSession,
                             mitk::ParameterFitImageGeneratorBase* generator)
 {
-  std::stringstream message;
-  message << "<font color='green'>" << "Fitting Data Set . . ." << "</font>";
-  m_Controls.errorMessageLabel->setText(message.str().c_str());
-  m_Controls.errorMessageLabel->show();
+  this->m_Controls.infoBox->append(QString("<font color='green'>" + QString("Fitting Data Set . . .") + QString ("</font>")));
+
 
   /////////////////////////
   //create job and put it into the thread pool
@@ -1323,7 +1317,7 @@ void MRPerfusionView::LoadAIFfromFile()
 
   if (!in1.is_open())
   {
-    m_Controls.errorMessageLabel->setText("Could not open AIF File!");
+    this->m_Controls.infoBox->append(QString("Could not open AIF File!"));
   }
 
 

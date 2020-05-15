@@ -457,13 +457,17 @@ int main(int argc, char* argv[])
     std::cout.imbue(std::locale(std::cout.getloc(), new punct_facet<char>(param.decimalPoint)));
   }
 
-  mitk::Image::Pointer image;
-  mitk::Image::Pointer mask;
 
-  mitk::Image::Pointer tmpImage = mitk::IOUtil::Load<mitk::Image>(param.imagePath);
-  mitk::Image::Pointer tmpMask = mitk::IOUtil::Load<mitk::Image>(param.maskPath);
-  image = tmpImage;
-  mask = tmpMask;
+  //representing the original loaded image data without any prepropcessing that might come.
+  mitk::Image::Pointer loadedImage = mitk::IOUtil::Load<mitk::Image>(param.imagePath);
+  //representing the original loaded mask data without any prepropcessing that might come.
+  mitk::Image::Pointer loadedMask = mitk::IOUtil::Load<mitk::Image>(param.maskPath);
+
+  mitk::Image::Pointer image = loadedImage;
+  mitk::Image::Pointer mask = loadedMask;
+
+  mitk::Image::Pointer tmpImage = loadedImage;
+  mitk::Image::Pointer tmpMask = loadedMask;
 
   mitk::Image::Pointer morphMask = mask;
   if (param.useMorphMask)
@@ -763,8 +767,8 @@ int main(int argc, char* argv[])
       mitk::cl::CLResultXMLWriter xmlWriter;
       xmlWriter.SetCLIArgs(parsedArgs);
       xmlWriter.SetFeatures(allStats.front());
-      xmlWriter.SetImage(image);
-      xmlWriter.SetMask(mask);
+      xmlWriter.SetImage(loadedImage);
+      xmlWriter.SetMask(loadedMask);
       xmlWriter.SetMethodName("CLGlobalImageFeatures");
       xmlWriter.SetMethodVersion(version + "(mitk: " MITK_VERSION_STRING+")");
       xmlWriter.SetOrganisation("German Cancer Research Center (DKFZ)");

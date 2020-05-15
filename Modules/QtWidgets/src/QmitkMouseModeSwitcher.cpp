@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkMouseModeSwitcher::QmitkMouseModeSwitcher( QWidget* parent )
 :QToolBar(parent)
 ,m_ActionGroup(new QActionGroup(this))
-,m_MouseModeSwitcher(NULL)
 ,m_ObserverTag(0)
 ,m_InObservationReaction(false)
 {
@@ -49,29 +48,18 @@ void QmitkMouseModeSwitcher::addButton( MouseMode id, const QString& toolName, c
 
 QmitkMouseModeSwitcher::~QmitkMouseModeSwitcher()
 {
-  if (m_MouseModeSwitcher)
-  {
-    m_MouseModeSwitcher->RemoveObserver( m_ObserverTag );
-  }
+  mitk::MouseModeSwitcher::GetInstance().RemoveObserver( m_ObserverTag );
 }
 
-void QmitkMouseModeSwitcher::setMouseModeSwitcher( mitk::MouseModeSwitcher* mms )
+void QmitkMouseModeSwitcher::setMouseModeSwitcher( /*mitk::MouseModeSwitcher* mms*/)
 {
   // goodbye / welcome ceremonies
-  if (m_MouseModeSwitcher)
-  {
-    m_MouseModeSwitcher->RemoveObserver( m_ObserverTag );
-  }
+  mitk::MouseModeSwitcher::GetInstance().RemoveObserver(m_ObserverTag);
 
-  m_MouseModeSwitcher = mms;
-
-  if ( m_MouseModeSwitcher )
-  {
-    itk::ReceptorMemberCommand<QmitkMouseModeSwitcher>::Pointer command =
-      itk::ReceptorMemberCommand<QmitkMouseModeSwitcher>::New();
-    command->SetCallbackFunction(this, &QmitkMouseModeSwitcher::OnMouseModeChanged);
-    m_ObserverTag = m_MouseModeSwitcher->AddObserver( mitk::MouseModeSwitcher::MouseModeChangedEvent(), command );
-  }
+  itk::ReceptorMemberCommand<QmitkMouseModeSwitcher>::Pointer command =
+    itk::ReceptorMemberCommand<QmitkMouseModeSwitcher>::New();
+  command->SetCallbackFunction(this, &QmitkMouseModeSwitcher::OnMouseModeChanged);
+  m_ObserverTag = mitk::MouseModeSwitcher::GetInstance().AddObserver(mitk::MouseModeSwitcher::MouseModeChangedEvent(), command);
 }
 
 void QmitkMouseModeSwitcher::modeSelectedByUser()
@@ -86,13 +74,10 @@ void QmitkMouseModeSwitcher::modeSelectedByUser()
     //qDebug() << "Mouse mode '" << qPrintable(action->text()) << "' selected, trigger mode id " << id;
 
 
-    if (m_MouseModeSwitcher)
-    {
       //Deleted mouse mode "PACS"
-      m_MouseModeSwitcher->SetInteractionScheme(mitk::MouseModeSwitcher::InteractionScheme::MITK/*PACS*/);
-      m_MouseModeSwitcher->SelectMouseMode( id );
-    }
-    emit MouseModeSelected( id );
+    mitk::MouseModeSwitcher::GetInstance().SetInteractionScheme(mitk::MouseModeSwitcher::InteractionScheme::MITK/*PACS*/);
+    mitk::MouseModeSwitcher::GetInstance().SelectMouseMode(id);
+    emit MouseModeSelected(id);
 
   }
 }
@@ -102,9 +87,9 @@ void QmitkMouseModeSwitcher::OnMouseModeChanged(const itk::EventObject&)
   m_InObservationReaction = true;
 
   // push button graphically
-  assert( m_MouseModeSwitcher );
+  //assert( m_MouseModeSwitcher );
 
-  MouseMode activeMode = m_MouseModeSwitcher->GetCurrentMouseMode();
+  MouseMode activeMode = mitk::MouseModeSwitcher::GetInstance().GetCurrentMouseMode();
 
   foreach(QAction* action, m_ActionGroup->actions())
   {

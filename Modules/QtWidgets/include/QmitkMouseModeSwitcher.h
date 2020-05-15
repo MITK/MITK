@@ -53,7 +53,7 @@ class MITKQTWIDGETS_EXPORT QmitkMouseModeSwitcher : public QToolBar
 
       \todo QmitkMouseModeSwitcher could be enhanced to actively observe mitk::MouseModeSwitcher and change available actions or visibility appropriately.
     */
-    void setMouseModeSwitcher( mitk::MouseModeSwitcher* );
+    void setMouseModeSwitcher( /*mitk::MouseModeSwitcher**/ );
 
   signals:
 
@@ -77,7 +77,7 @@ class MITKQTWIDGETS_EXPORT QmitkMouseModeSwitcher : public QToolBar
     void OnMouseModeChanged(const itk::EventObject&);
 
     QActionGroup* m_ActionGroup;
-    mitk::MouseModeSwitcher* m_MouseModeSwitcher;
+    //mitk::MouseModeSwitcher* m_MouseModeSwitcher;
 
     unsigned long m_ObserverTag;
 

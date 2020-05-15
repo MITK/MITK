@@ -509,6 +509,15 @@ int main(int argc, char* argv[])
     AccessByItk_2(image, ResampleImage, param.resampleResolution, newImage);
     image = newImage;
   }
+
+  log << " Resample if required -";
+  if (param.resampleMask)
+  {
+    mitk::Image::Pointer newMaskImage = mitk::Image::New();
+    AccessByItk_2(mask, ResampleMask, image, newMaskImage);
+    mask = newMaskImage;
+  }
+
   if ( ! mitk::Equal(mask->GetGeometry(0)->GetOrigin(), image->GetGeometry(0)->GetOrigin()))
   {
     MITK_INFO << "Not equal Origins";
@@ -522,14 +531,6 @@ int main(int argc, char* argv[])
     {
       return -1;
     }
-  }
-
-  log << " Resample if required -";
-  if (param.resampleMask)
-  {
-    mitk::Image::Pointer newMaskImage = mitk::Image::New();
-    AccessByItk_2(mask, ResampleMask, image, newMaskImage);
-    mask = newMaskImage;
   }
 
   log << " Check for Equality -";

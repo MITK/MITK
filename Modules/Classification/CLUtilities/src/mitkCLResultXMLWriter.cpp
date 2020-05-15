@@ -184,6 +184,7 @@ void WriteDocument(std::ostream& stream, const mitk::Image* image, const mitk::I
   const std::map<std::string, us::Any>& cliArgs)
 {
   TiXmlDocument doc;
+  doc.SetCondenseWhiteSpace(false);
 
   auto decl = new TiXmlDeclaration(
     "1.0", "UTF-8", "");
@@ -250,8 +251,10 @@ void WriteDocument(std::ostream& stream, const mitk::Image* image, const mitk::I
   rootNode->LinkEndChild(featSettingsNode);
   AddFeatureSettings(features, featSettingsNode);
 
-  doc.SetCondenseWhiteSpace(false);
-  stream << doc;
+  TiXmlPrinter printer;
+
+  doc.Accept(&printer);
+  stream << printer.Str();
 }
 
 void mitk::cl::CLResultXMLWriter::SetImage(const Image* image)

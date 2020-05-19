@@ -65,7 +65,6 @@ namespace mitk {
   public:
 
     static MouseModeSwitcher& GetInstance();
-    static void DestroyInstance();
 
 #pragma GCC visibility push(default)
     /**
@@ -133,6 +132,8 @@ namespace mitk {
   protected:
     MouseModeSwitcher(BaseRenderer::Pointer renderer);
     MouseModeSwitcher();
+    MouseModeSwitcher(const MouseModeSwitcher&) = delete;
+    MouseModeSwitcher& operator=(const MouseModeSwitcher&) = delete;
   private:
 
     InteractionScheme m_ActiveInteractionScheme;

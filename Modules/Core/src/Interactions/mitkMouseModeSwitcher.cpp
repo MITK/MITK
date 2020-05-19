@@ -13,9 +13,6 @@
  See LICENSE.txt or http://www.mitk.org for details.
 
  ===================================================================*/
-
-#include <boost/scoped_ptr.hpp>
-
 #include "mitkMouseModeSwitcher.h"
 // us
 #include "usGetModuleContext.h"
@@ -24,8 +21,6 @@
 #include "mitkInteractionEventObserver.h"
 
 namespace {
-  boost::scoped_ptr<mitk::MouseModeSwitcher> s_impl;
-
   std::string getNameButton(const unsigned int& button)
   {
     std::string buttonName;
@@ -62,15 +57,8 @@ namespace {
 
 mitk::MouseModeSwitcher& mitk::MouseModeSwitcher::GetInstance()
 {
-  if (!s_impl) {
-    s_impl.reset(new mitk::MouseModeSwitcher());
-  }
-  return *s_impl;
-}
-
-void mitk::MouseModeSwitcher::DestroyInstance()
-{
-  s_impl.reset();
+  static MouseModeSwitcher s_impl;
+  return s_impl;
 }
 
 mitk::MouseModeSwitcher::MouseModeSwitcher() :

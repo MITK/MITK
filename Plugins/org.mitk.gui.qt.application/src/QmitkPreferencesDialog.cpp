@@ -66,7 +66,11 @@ namespace {
     , "org.mitk.gui.qt.application.LanguagePreferencePage"
     , "org.mitk.gui.qt.application.UserDataPreferencePagePage"
     , "org.mitk.gui.qt.application.SeriesTagsPreferencePage"
-    , "org.mitk.gui.qt.application.PacsPreferencePage" });
+    , "org.mitk.gui.qt.application.PacsPreferencePage"
+#ifdef DELIVERY_BUILD
+    , "org.mitk.gui.qt.application.TrackingPreferencePage"
+#endif
+    });
 }
 
 class QmitkPreferencesDialogPrivate : public Ui::QmitkPreferencesDialog

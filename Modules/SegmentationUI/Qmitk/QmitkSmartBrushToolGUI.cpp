@@ -78,8 +78,8 @@ void QmitkSmartBrushToolGUI::OnNewToolAssociated(mitk::Tool* tool)
   m_SmartBrushTool = dynamic_cast<mitk::SmartBrushTool*>(tool);
 
   if (m_SmartBrushTool.IsNotNull()) {
-    m_SmartBrushTool->radiusChanged -= mitk::MessageDelegate1<QmitkSmartBrushToolGUI, int>(this, &QmitkSmartBrushToolGUI::OnRadiusChanged);
-    m_SmartBrushTool->sensitivityChanged -= mitk::MessageDelegate1<QmitkSmartBrushToolGUI, int>(this, &QmitkSmartBrushToolGUI::OnSensitivityChanged);
+    m_SmartBrushTool->radiusChanged += mitk::MessageDelegate1<QmitkSmartBrushToolGUI, int>(this, &QmitkSmartBrushToolGUI::OnRadiusChanged);
+    m_SmartBrushTool->sensitivityChanged += mitk::MessageDelegate1<QmitkSmartBrushToolGUI, int>(this, &QmitkSmartBrushToolGUI::OnSensitivityChanged);
   }
 }
 

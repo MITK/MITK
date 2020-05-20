@@ -404,6 +404,10 @@ void mitk::SegTool2D::WriteSliceToVolume(const mitk::SegTool2D::SliceInformation
   image->Modified();
   image->GetVtkImageData()->Modified();
 
+  // also mark its node as modified (T27308). Can be removed if T27307
+  // is properly solved
+  if (workingNode != nullptr) workingNode->Modified();
+
   /*============= BEGIN undo/redo feature block ========================*/
   // specify the undo operation with the edited slice
   auto *doOperation =

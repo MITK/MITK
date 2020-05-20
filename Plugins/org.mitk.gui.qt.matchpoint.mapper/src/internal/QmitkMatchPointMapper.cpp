@@ -27,12 +27,10 @@ found in the LICENSE file.
 #include <mitkUIDHelper.h>
 #include <mitkAlgorithmHelper.h>
 #include <mitkResultNodeGenerationHelper.h>
-#include <mitkNodePredicateDataProperty.h>
 #include <mitkNodePredicateFunction.h>
-#include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateOr.h>
 #include <mitkNodePredicateAnd.h>
-#include <mitkNodePredicateProperty.h>
+#include <mitkNodePredicateDataProperty.h>
 
 // Qmitk
 #include "QmitkMatchPointMapper.h"
@@ -137,12 +135,7 @@ bool  QmitkMatchPointMapper::IsAbleToRefineGeometry() const
 
 bool  QmitkMatchPointMapper::IsBinaryInput() const
 {
-    mitk::NodePredicateDataType::Pointer isLabelSet = mitk::NodePredicateDataType::New("LabelSetImage");
-    mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New("Image");
-    mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
-    mitk::NodePredicateAnd::Pointer isLegacyMask = mitk::NodePredicateAnd::New(isImage, isBinary);
-
-    mitk::NodePredicateOr::Pointer maskPredicate = mitk::NodePredicateOr::New(isLegacyMask, isLabelSet);
+    auto maskPredicate = mitk::MITKRegistrationHelper::MaskNodePredicate();
 
     bool result = false;
 
@@ -330,18 +323,23 @@ void QmitkMatchPointMapper::CheckInputs()
 void QmitkMatchPointMapper::ConfigureMappingControls()
 {
     bool validInput = m_spSelectedInputNode.IsNotNull();
-    bool validReg = m_spSelectedRegNode.IsNotNull();
     bool validRef = m_spSelectedRefNode.IsNotNull();
 
     this->m_Controls.referenceNodeSelector->setEnabled(this->m_Controls.m_cbManualRef->isChecked());
-    this->m_Controls.m_pbMap->setEnabled(validInput  && validRef && validReg);
-    this->m_Controls.m_pbRefine->setEnabled(validInput && validReg
-        && this->IsAbleToRefineGeometry() && !this->IsPointSetInput());
+    this->m_Controls.m_pbMap->setEnabled(validInput  && validRef);
+    this->m_Controls.m_pbRefine->setEnabled(validInput && this->IsAbleToRefineGeometry() && !this->IsPointSetInput());
 
-    if (validInput && validReg)
+    if (validInput)
     {
-        this->m_Controls.m_leMappedName->setText(tr("mapped_by_") + QString::fromStdString(
-            m_spSelectedRegNode->GetName()));
+      if (m_spSelectedRegNode.IsNotNull())
+      {
+        this->m_Controls.m_leMappedName->setText(tr("mapped_") + QString::fromStdString(m_spSelectedInputNode->GetName())
+          + tr("_by_") + QString::fromStdString(m_spSelectedRegNode->GetName()));
+      }
+      else
+      {
+        this->m_Controls.m_leMappedName->setText(tr("resampled_") + QString::fromStdString(m_spSelectedInputNode->GetName()));
+      }
     }
     else
     {

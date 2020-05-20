@@ -226,9 +226,6 @@ void QmitkMatchPointFrameCorrection::CreateQtPartControl(QWidget* parent)
 void QmitkMatchPointFrameCorrection::ConfigureNodeSelectorPredicates()
 {
   auto isImage = mitk::MITKRegistrationHelper::ImageNodePredicate();
-  mitk::NodePredicateDataType::Pointer isLabelSet = mitk::NodePredicateDataType::New("LabelSetImage");
-  mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
-  mitk::NodePredicateAnd::Pointer isLegacyMask = mitk::NodePredicateAnd::New(isImage, isBinary);
   mitk::NodePredicateBase::Pointer maskDimensionPredicate = mitk::NodePredicateOr::New(mitk::NodePredicateDimension::New(3), mitk::NodePredicateDimension::New(4)).GetPointer();
   mitk::NodePredicateDimension::Pointer imageDimensionPredicate = mitk::NodePredicateDimension::New(4);
 
@@ -237,7 +234,7 @@ void QmitkMatchPointFrameCorrection::ConfigureNodeSelectorPredicates()
 
   m_Controls.imageNodeSelector->SetNodePredicate(mitk::NodePredicateAnd::New(isImage, imageDimensionPredicate));
 
-  mitk::NodePredicateAnd::Pointer maskPredicate = mitk::NodePredicateAnd::New(mitk::NodePredicateOr::New(isLegacyMask, isLabelSet), maskDimensionPredicate);
+  mitk::NodePredicateAnd::Pointer maskPredicate = mitk::NodePredicateAnd::New(mitk::MITKRegistrationHelper::MaskNodePredicate(), maskDimensionPredicate);
   if (m_spSelectedTargetData != nullptr)
   {
     auto hasSameGeometry = mitk::NodePredicateGeometry::New(m_spSelectedTargetData->GetGeometry());

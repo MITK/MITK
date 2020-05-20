@@ -467,12 +467,9 @@ void QmitkMatchPoint::ConfigureNodeSelectors()
 {
   auto isImage = mitk::MITKRegistrationHelper::ImageNodePredicate();
   auto isPointSet = mitk::MITKRegistrationHelper::PointSetNodePredicate();
-  mitk::NodePredicateDataType::Pointer isLabelSet = mitk::NodePredicateDataType::New("LabelSetImage");
-  mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
-  mitk::NodePredicateAnd::Pointer isLegacyMask = mitk::NodePredicateAnd::New(isImage, isBinary);
+  auto isMask = mitk::MITKRegistrationHelper::MaskNodePredicate();
   mitk::NodePredicateBase::Pointer dimensionPredicate = mitk::NodePredicateOr::New(mitk::NodePredicateDimension::New(3), mitk::NodePredicateDimension::New(4)).GetPointer();
 
-  mitk::NodePredicateAnd::Pointer maskPredicate = mitk::NodePredicateAnd::New(mitk::NodePredicateOr::New(isLegacyMask, isLabelSet), dimensionPredicate);
 
   m_Controls.movingNodeSelector->setEnabled(m_LoadedAlgorithm.IsNotNull());
   m_Controls.targetNodeSelector->setEnabled(m_LoadedAlgorithm.IsNotNull());
@@ -528,7 +525,7 @@ void QmitkMatchPoint::ConfigureNodeSelectors()
     m_Controls.movingNodeSelector->SetNodePredicate(nodePredicate);
     m_Controls.targetNodeSelector->SetNodePredicate(nodePredicate);
 
-    nodePredicate = mitk::NodePredicateAnd::New(maskPredicate, dimensionPredicate);
+    nodePredicate = mitk::NodePredicateAnd::New(isMask, dimensionPredicate);
 
     m_Controls.movingMaskNodeSelector->SetEmptyInfo("Select moving mask. (optional)");
     m_Controls.movingMaskNodeSelector->SetPopUpTitel("Select moving mask");

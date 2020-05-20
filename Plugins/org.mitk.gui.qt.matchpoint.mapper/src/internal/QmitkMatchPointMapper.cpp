@@ -336,10 +336,17 @@ void QmitkMatchPointMapper::ConfigureMappingControls()
     this->m_Controls.m_pbMap->setEnabled(validInput  && validRef);
     this->m_Controls.m_pbRefine->setEnabled(validInput && this->IsAbleToRefineGeometry() && !this->IsPointSetInput());
 
-    if (validInput && m_spSelectedRegNode.IsNotNull())
+    if (validInput)
     {
-        this->m_Controls.m_leMappedName->setText(tr("mapped_by_") + QString::fromStdString(
-            m_spSelectedRegNode->GetName()));
+      if (m_spSelectedRegNode.IsNotNull())
+      {
+        this->m_Controls.m_leMappedName->setText(tr("mapped_") + QString::fromStdString(m_spSelectedInputNode->GetName())
+          + tr("_by_") + QString::fromStdString(m_spSelectedRegNode->GetName()));
+      }
+      else
+      {
+        this->m_Controls.m_leMappedName->setText(tr("resampled_") + QString::fromStdString(m_spSelectedInputNode->GetName()));
+      }
     }
     else
     {

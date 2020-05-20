@@ -13,6 +13,9 @@ found in the LICENSE file.
 
 #include "mitkRegistrationHelper.h"
 #include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateOr.h>
 #include <mitkPointSet.h>
 
 //MatchPoint
@@ -20,9 +23,9 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  mitk::NodePredicateDataType::ConstPointer InternalRegNodePredicate = mitk::NodePredicateDataType::New(mitk::MAPRegistrationWrapper::GetStaticNameOfClass()).GetPointer();
-  mitk::NodePredicateDataType::ConstPointer InternalImageNodePredicate = mitk::NodePredicateDataType::New(mitk::Image::GetStaticNameOfClass()).GetPointer();
-  mitk::NodePredicateDataType::ConstPointer InternalPointSetNodePredicate = mitk::NodePredicateDataType::New(mitk::PointSet::GetStaticNameOfClass()).GetPointer();
+  mitk::TNodePredicateDataType<mitk::MAPRegistrationWrapper>::ConstPointer InternalRegNodePredicate = mitk::TNodePredicateDataType<mitk::MAPRegistrationWrapper>::New().GetPointer();
+  mitk::TNodePredicateDataType<mitk::Image>::ConstPointer InternalImageNodePredicate = mitk::TNodePredicateDataType<mitk::Image>::New().GetPointer();
+  mitk::TNodePredicateDataType<mitk::PointSet>::ConstPointer InternalPointSetNodePredicate = mitk::TNodePredicateDataType<mitk::PointSet>::New().GetPointer();
 
 
   MITKRegistrationHelper::Affine3DTransformType::Pointer
@@ -144,6 +147,19 @@ namespace mitk
   NodePredicateBase::ConstPointer MITKRegistrationHelper::PointSetNodePredicate()
   {
     return InternalPointSetNodePredicate.GetPointer();
+  }
+
+  NodePredicateBase::ConstPointer MITKRegistrationHelper::MaskNodePredicate()
+  {
+    auto isLabelSetImage = mitk::NodePredicateDataType::New("LabelSetImage");
+    auto hasBinaryProperty = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
+    auto isLegacyMask = mitk::NodePredicateAnd::New(ImageNodePredicate(), hasBinaryProperty);
+
+    return isLegacyMask.GetPointer();
+    //Deactivated due to T27435. Should be reactivated as soon T27435 is fixed
+    //auto isLabelSetOrLegacyMask = mitk::NodePredicateOr::New(isLabelSetImage, isLegacyMask);
+    //
+    //return isLabelSetOrLegacyMask.GetPointer();
   }
 
 }

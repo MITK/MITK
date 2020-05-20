@@ -27,12 +27,10 @@ found in the LICENSE file.
 #include <mitkUIDHelper.h>
 #include <mitkAlgorithmHelper.h>
 #include <mitkResultNodeGenerationHelper.h>
-#include <mitkNodePredicateDataProperty.h>
 #include <mitkNodePredicateFunction.h>
-#include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateOr.h>
 #include <mitkNodePredicateAnd.h>
-#include <mitkNodePredicateProperty.h>
+#include <mitkNodePredicateDataProperty.h>
 
 // Qmitk
 #include "QmitkMatchPointMapper.h"
@@ -137,12 +135,7 @@ bool  QmitkMatchPointMapper::IsAbleToRefineGeometry() const
 
 bool  QmitkMatchPointMapper::IsBinaryInput() const
 {
-    mitk::NodePredicateDataType::Pointer isLabelSet = mitk::NodePredicateDataType::New("LabelSetImage");
-    mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New("Image");
-    mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
-    mitk::NodePredicateAnd::Pointer isLegacyMask = mitk::NodePredicateAnd::New(isImage, isBinary);
-
-    mitk::NodePredicateOr::Pointer maskPredicate = mitk::NodePredicateOr::New(isLegacyMask, isLabelSet);
+    auto maskPredicate = mitk::MITKRegistrationHelper::MaskNodePredicate();
 
     bool result = false;
 

@@ -132,9 +132,9 @@ namespace mitk {
   protected:
     MouseModeSwitcher(BaseRenderer::Pointer renderer);
     MouseModeSwitcher();
-    MouseModeSwitcher(const MouseModeSwitcher&) = delete;
-    MouseModeSwitcher& operator=(const MouseModeSwitcher&) = delete;
   private:
+    MouseModeSwitcher& operator=(const MouseModeSwitcher&) = delete;
+    MouseModeSwitcher(const MouseModeSwitcher&) = delete;
 
     InteractionScheme m_ActiveInteractionScheme;
     MouseMode         m_ActiveMouseMode;

@@ -232,3 +232,13 @@ mitk::MouseModeSwitcher::MouseModeMap& mitk::MouseModeSwitcher::GetActiveMouseMo
 {
   return m_ActiveMouseModes;
 }
+
+mitk::MouseModeSwitcher& mitk::MouseModeSwitcher::operator=(const MouseModeSwitcher&)
+{
+  throw std::logic_error("mitk::MouseModeSwitcher must be singleton.");
+}
+
+mitk::MouseModeSwitcher::MouseModeSwitcher(const MouseModeSwitcher&)
+{
+  throw std::logic_error("mitk::MouseModeSwitcher must be singleton.");
+}

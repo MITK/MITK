@@ -133,8 +133,8 @@ namespace mitk {
     MouseModeSwitcher(BaseRenderer::Pointer renderer);
     MouseModeSwitcher();
   private:
-    MouseModeSwitcher& operator=(const MouseModeSwitcher&) = delete;
-    MouseModeSwitcher(const MouseModeSwitcher&) = delete;
+    MouseModeSwitcher& operator=(const MouseModeSwitcher&);
+    MouseModeSwitcher(const MouseModeSwitcher&);
 
     InteractionScheme m_ActiveInteractionScheme;
     MouseMode         m_ActiveMouseMode;
@@ -149,6 +149,8 @@ namespace mitk {
     std::unordered_set<std::string> m_RegisteredRendererNames;
 
     MouseModeMap m_ActiveMouseModes;
+
+    friend itk::SmartPointer<mitk::MouseModeSwitcher>;
   };
 } // namespace mitk
 

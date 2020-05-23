@@ -11,31 +11,21 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkPlanarFigureObjectFactory.h"
-#include "mitkPlanarFigureWriter.h"
 
 #include "mitkCoreObjectFactory.h"
 
 #include "mitkPlanarFigure.h"
-#include "mitkPlanarFigureIOFactory.h"
 #include "mitkPlanarFigureMapper2D.h"
 #include "mitkPlanarFigureVtkMapper3D.h"
-#include "mitkPlanarFigureWriterFactory.h"
 #include "mitkVtkGLMapperWrapper.h"
 
 typedef std::multimap<std::string, std::string> MultimapType;
 
 mitk::PlanarFigureObjectFactory::PlanarFigureObjectFactory()
-  : m_PlanarFigureIOFactory(PlanarFigureIOFactory::New().GetPointer()),
-    m_PlanarFigureWriterFactory(PlanarFigureWriterFactory::New().GetPointer())
 {
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
-    itk::ObjectFactoryBase::RegisterFactory(m_PlanarFigureIOFactory);
-    itk::ObjectFactoryBase::RegisterFactory(m_PlanarFigureWriterFactory);
-
-    m_FileWriters.push_back(PlanarFigureWriter::New().GetPointer());
-
     CreateFileExtensionsMap();
 
     alreadyDone = true;
@@ -44,8 +34,6 @@ mitk::PlanarFigureObjectFactory::PlanarFigureObjectFactory()
 
 mitk::PlanarFigureObjectFactory::~PlanarFigureObjectFactory()
 {
-  itk::ObjectFactoryBase::UnRegisterFactory(m_PlanarFigureWriterFactory);
-  itk::ObjectFactoryBase::UnRegisterFactory(m_PlanarFigureIOFactory);
 }
 
 mitk::Mapper::Pointer mitk::PlanarFigureObjectFactory::CreateMapper(mitk::DataNode *node, MapperSlotId id)
@@ -96,29 +84,22 @@ const char *mitk::PlanarFigureObjectFactory::GetFileExtensions()
 
 mitk::CoreObjectFactoryBase::MultimapType mitk::PlanarFigureObjectFactory::GetFileExtensionsMap()
 {
-  return m_FileExtensionsMap;
+  return {};
 }
 
 const char *mitk::PlanarFigureObjectFactory::GetSaveFileExtensions()
 {
-  // return ";;Planar Figures (*.pf)";  // for mitk::PlanarFigure and derived classes
   std::string fileExtension;
-  this->CreateFileExtensions(m_SaveFileExtensionsMap, fileExtension);
+  this->CreateFileExtensions({}, fileExtension);
   return fileExtension.c_str();
 };
 
 mitk::CoreObjectFactoryBase::MultimapType mitk::PlanarFigureObjectFactory::GetSaveFileExtensionsMap()
 {
-  return m_SaveFileExtensionsMap;
+  return {};
 }
 
 void mitk::PlanarFigureObjectFactory::CreateFileExtensionsMap()
-{
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pf", "Planar Figure Files"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.pf", "Planar Figure Files"));
-}
-
-void mitk::PlanarFigureObjectFactory::RegisterIOFactories()
 {
 }
 

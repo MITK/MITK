@@ -1098,8 +1098,8 @@ void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatist
   mitk::ImageStatisticsContainer::RealType minObject = 0;
   mitk::ImageStatisticsContainer::RealType maxObject = 0;
   mitk::ImageStatisticsContainer::RealType rmsObject = 0;
-  mitk::ImageStatisticsContainer::IndexType minIndexObject = {0, 0, 0};
-  mitk::ImageStatisticsContainer::IndexType maxIndexObject = {0, 0, 0};
+  mitk::ImageStatisticsContainer::IndexType minIndexObject(3,0);
+  mitk::ImageStatisticsContainer::IndexType maxIndexObject(3,0);
 	CPPUNIT_ASSERT_NO_THROW(numberOfVoxelsObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::VoxelCountType>(mitk::ImageStatisticsConstants::NUMBEROFVOXELS()));
 	CPPUNIT_ASSERT_NO_THROW(meanObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MEAN()));
 	CPPUNIT_ASSERT_NO_THROW(mppObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MPP()));

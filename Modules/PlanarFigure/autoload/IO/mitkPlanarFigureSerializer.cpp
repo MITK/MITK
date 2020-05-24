@@ -12,7 +12,8 @@ found in the LICENSE file.
 
 #include "mitkPlanarFigureSerializer.h"
 #include "mitkPlanarFigure.h"
-#include "mitkPlanarFigureWriter.h"
+
+#include <mitkIOUtil.h>
 
 #include <itksys/SystemTools.hxx>
 
@@ -47,10 +48,7 @@ std::string mitk::PlanarFigureSerializer::Serialize()
 
   try
   {
-    PlanarFigureWriter::Pointer writer = PlanarFigureWriter::New();
-    writer->SetFileName(fullname);
-    writer->SetInput(const_cast<PlanarFigure *>(pf));
-    writer->Write();
+    mitk::IOUtil::Save(pf, fullname);
   }
   catch (std::exception &e)
   {

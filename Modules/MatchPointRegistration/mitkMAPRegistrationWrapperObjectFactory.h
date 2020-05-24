@@ -51,15 +51,6 @@ class MAPRegistrationWrapperObjectFactory : public mitk::CoreObjectFactoryBase
 
   protected:
     MAPRegistrationWrapperObjectFactory();
-  private:
-    void CreateFileExtensionsMap();
-    std::string m_ExternalFileExtensions;
-    std::string m_InternalFileExtensions;
-    std::string m_SaveFileExtensions;
-    MultimapType m_FileExtensionsMap;
-    MultimapType m_SaveFileExtensionsMap;
-
-    itk::ObjectFactoryBase::Pointer m_RegistrationWrapperIOFactory;
 };
 
 }

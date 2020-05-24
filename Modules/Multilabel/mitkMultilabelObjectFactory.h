@@ -36,14 +36,6 @@ namespace mitk
     MultilabelObjectFactory();
     ~MultilabelObjectFactory() override;
     void CreateFileExtensionsMap();
-    MultimapType m_FileExtensionsMap;
-    MultimapType m_SaveFileExtensionsMap;
-
-  private:
-    itk::ObjectFactoryBase::Pointer m_LabelSetImageIOFactory;
-    itk::ObjectFactoryBase::Pointer m_LabelSetImageWriterFactory;
-
-    std::vector<mitk::AbstractFileIO *> m_FileIOs;
   };
 }
 

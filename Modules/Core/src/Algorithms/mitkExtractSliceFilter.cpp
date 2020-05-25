@@ -197,8 +197,8 @@ void mitk::ExtractSliceFilter::GenerateOutputInformation()
   mitk::BoundingBox::BoundsArrayType boundsCopy;
   boundsCopy[0] = boundsCopy[2] = boundsCopy[4] = 0;
   boundsCopy[5] = 1;
-  boundsCopy[1] = xMax - xMin;
-  boundsCopy[3] = yMax - yMin;
+  boundsCopy[1] = std::max(xMax - xMin, 1);
+  boundsCopy[3] = std::max(yMax - yMin, 1);
   sliceGeometry->SetBounds(boundsCopy);
 
   sliceGeometry->Modified();

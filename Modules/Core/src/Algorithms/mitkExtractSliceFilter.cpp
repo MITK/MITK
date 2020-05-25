@@ -85,8 +85,6 @@ void mitk::ExtractSliceFilter::GenerateOutputInformation()
   auto abstractGeometry =
     dynamic_cast<const AbstractTransformGeometry *>(m_WorldGeometry);
 
-  auto planeGeometry = dynamic_cast<const PlaneGeometry *>(m_WorldGeometry);
-
   if (abstractGeometry != nullptr)
   {
     extent[0] = abstractGeometry->GetParametricExtent(0);
@@ -100,50 +98,42 @@ void mitk::ExtractSliceFilter::GenerateOutputInformation()
   }
   else
   {
-    if (planeGeometry != nullptr)
+    // if the worldGeomatry is a PlaneGeometry everything is straight forward
+    right = sliceGeometry->GetAxisVector(0);
+    bottom = sliceGeometry->GetAxisVector(1);
+
+    if (m_InPlaneResampleExtentByGeometry)
     {
-      // if the worldGeomatry is a PlaneGeometry everything is straight forward
-      right = planeGeometry->GetAxisVector(0);
-      bottom = planeGeometry->GetAxisVector(1);
-
-      if (m_InPlaneResampleExtentByGeometry)
-      {
-        // Resampling grid corresponds to the current world geometry. This
-        // means that the spacing of the output 2D image depends on the
-        // currently selected world geometry, and *not* on the image itself.
-        extent[0] = m_WorldGeometry->GetExtent(0);
-        extent[1] = m_WorldGeometry->GetExtent(1);
-      }
-      else
-      {
-        const TimeGeometry *inputTimeGeometry = input->GetTimeGeometry();
-        if ((inputTimeGeometry == nullptr) || (inputTimeGeometry->CountTimeSteps() <= 0))
-        {
-          itkWarningMacro(<< "Error reading input image TimeGeometry.");
-          return;
-        }
-
-        // Resampling grid corresponds to the input geometry. This means that
-        // the spacing of the output 2D image is directly derived from the
-        // associated input image, regardless of the currently selected world
-        // geometry.
-        Vector3D rightInIndex, bottomInIndex;
-        inputTimeGeometry->GetGeometryForTimeStep(m_TimeStep)->WorldToIndex(right, rightInIndex);
-        inputTimeGeometry->GetGeometryForTimeStep(m_TimeStep)->WorldToIndex(bottom, bottomInIndex);
-        extent[0] = rightInIndex.GetNorm();
-        extent[1] = bottomInIndex.GetNorm();
-      }
-
-      // Get the extent of the current world geometry and calculate resampling
-      // spacing therefrom.
-      widthInMM = m_WorldGeometry->GetExtentInMM(0);
-      heightInMM = m_WorldGeometry->GetExtentInMM(1);
+      // Resampling grid corresponds to the current world geometry. This
+      // means that the spacing of the output 2D image depends on the
+      // currently selected world geometry, and *not* on the image itself.
+      extent[0] = m_WorldGeometry->GetExtent(0);
+      extent[1] = m_WorldGeometry->GetExtent(1);
     }
     else
     {
-      mitkThrow()<<"mitk::ExtractSliceFilter: No fitting geometry for reslice axis!";
-      return;
+      const TimeGeometry *inputTimeGeometry = input->GetTimeGeometry();
+      if ((inputTimeGeometry == nullptr) || (inputTimeGeometry->CountTimeSteps() <= 0))
+      {
+        itkWarningMacro(<< "Error reading input image TimeGeometry.");
+        return;
+      }
+
+      // Resampling grid corresponds to the input geometry. This means that
+      // the spacing of the output 2D image is directly derived from the
+      // associated input image, regardless of the currently selected world
+      // geometry.
+      Vector3D rightInIndex, bottomInIndex;
+      inputTimeGeometry->GetGeometryForTimeStep(m_TimeStep)->WorldToIndex(right, rightInIndex);
+      inputTimeGeometry->GetGeometryForTimeStep(m_TimeStep)->WorldToIndex(bottom, bottomInIndex);
+      extent[0] = rightInIndex.GetNorm();
+      extent[1] = bottomInIndex.GetNorm();
     }
+
+    // Get the extent of the current world geometry and calculate resampling
+    // spacing therefrom.
+    widthInMM = m_WorldGeometry->GetExtentInMM(0);
+    heightInMM = m_WorldGeometry->GetExtentInMM(1);
   }
 
   right.Normalize();
@@ -167,7 +157,7 @@ void mitk::ExtractSliceFilter::GenerateOutputInformation()
       sliceBound = 0.0;
     }
 
-    if (this->GetClippedPlaneBounds(m_WorldGeometry->GetReferenceGeometry(), planeGeometry, sliceBounds))
+    if (this->GetClippedPlaneBounds(m_WorldGeometry->GetReferenceGeometry(), sliceGeometry, sliceBounds))
     {
       // Calculate output extent (integer values)
       xMin = static_cast<int>(sliceBounds[0] / m_OutPutSpacing[0] + 0.5);

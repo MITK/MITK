@@ -29,7 +29,7 @@ mitk::TwoStepLinearModelFactory::GetDefaultInitialParameterization() const
 };
 
 mitk::ModelParameterizerBase::Pointer mitk::TwoStepLinearModelFactory::DoCreateParameterizer(
-  const modelFit::ModelFitInfo* fit) const
+  const modelFit::ModelFitInfo* /*fit*/) const
 {
   return ConcreteModelParameterizerBase<TwoStepLinearModel>::New().GetPointer();
 };

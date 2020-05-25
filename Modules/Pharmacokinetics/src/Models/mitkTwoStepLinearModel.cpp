@@ -128,14 +128,14 @@ mitk::TwoStepLinearModel::ParametersSizeType  mitk::TwoStepLinearModel::GetNumbe
   return 0;
 }
 
-void mitk::TwoStepLinearModel::SetStaticParameter(const ParameterNameType& name,
-    const StaticParameterValuesType& values)
+void mitk::TwoStepLinearModel::SetStaticParameter(const ParameterNameType& /*name*/,
+    const StaticParameterValuesType& /*values*/)
 {
   //do nothing
 };
 
 mitk::TwoStepLinearModel::StaticParameterValuesType mitk::TwoStepLinearModel::GetStaticParameterValue(
-  const ParameterNameType& name) const
+  const ParameterNameType& /*name*/) const
 {
   StaticParameterValuesType result;
 

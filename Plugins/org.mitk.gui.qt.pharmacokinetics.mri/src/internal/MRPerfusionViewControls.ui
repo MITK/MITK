@@ -99,9 +99,6 @@
        </layout>
       </widget>
      </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_4"/>
-     </item>
     </layout>
    </item>
    <item>
@@ -304,7 +301,7 @@
            <x>0</x>
            <y>0</y>
            <width>526</width>
-           <height>137</height>
+           <height>140</height>
           </rect>
          </property>
          <attribute name="label">

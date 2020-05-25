@@ -1,5 +1,8 @@
 #include "mitkShowSegmentationAsAgtkSurface.h"
 
+#include <itkMinimumMaximumImageCalculator.h>
+#include <itkBinaryThresholdImageFilter.h>
+
 #include <vtkCallbackCommand.h>
 #include <vtkDecimatePro.h>
 #include <vtkFlyingEdges3D.h>
@@ -40,7 +43,7 @@ bool ShowSegmentationAsAgtkSurface::PreProcessing()
   size_t labeledPixels = 0;
 
   for (it.GoToBegin(); !it.IsAtEnd(); ++it) {
-    if (it.Get() == FOREGROUND_VALUE) {
+    if (it.Get() > BACKGROUND_VALUE) {
       labeledPixels++;
       InputImageType::IndexType index = it.GetIndex();
 
@@ -78,13 +81,31 @@ bool ShowSegmentationAsAgtkSurface::PreProcessing()
   typedef itk::ResampleImageFilter<InputImageType, FloatImage> ResampleImageFilterType;
   typename ResampleImageFilterType::Pointer resampler = ResampleImageFilterType::New();
   m_ProgressAccumulator->RegisterInternalFilter(resampler, m_ProgressWeight);
-  resampler->SetInput(m_Input);
   resampler->SetInterpolator(interpolator);
   resampler->SetSize(region.GetSize());
   resampler->SetOutputOrigin(origin);
   resampler->SetOutputSpacing(m_Input->GetSpacing());
   resampler->SetOutputDirection(m_Input->GetDirection());
   resampler->SetDefaultPixelValue(BACKGROUND_VALUE);
+
+  auto maxCalculator = itk::MinimumMaximumImageCalculator<InputImageType>::New();
+  maxCalculator->SetImage(m_Input);
+  maxCalculator->ComputeMaximum();
+  if (maxCalculator->GetMaximum() > FOREGROUND_VALUE) {
+    using ThresholderType = itk::BinaryThresholdImageFilter<InputImageType, InputImageType>;
+    ThresholderType::Pointer thresholder = ThresholderType::New();
+    thresholder->SetInput(m_Input);
+    thresholder->SetLowerThreshold(FOREGROUND_VALUE);
+    thresholder->SetUpperThreshold(std::numeric_limits<unsigned char>::max());
+    thresholder->SetOutsideValue(BACKGROUND_VALUE);
+    thresholder->SetInsideValue(FOREGROUND_VALUE);
+    thresholder->Update();
+
+    resampler->SetInput(thresholder->GetOutput());
+  } else {
+    resampler->SetInput(m_Input);
+  }
+
   resampler->Update();
   m_FloatTmpImage = resampler->GetOutput();
 

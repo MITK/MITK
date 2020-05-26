@@ -126,6 +126,7 @@ void QmitkRegistrationManipulationWidget::InitControls()
   this->ConfigureTransformCenter();
 
   //set bounds of the translation slider widget to have sensible ranges
+  this->m_internalUpdate = true;
   auto currenttrans = m_DirectCurrentTransform->GetTranslation();
   this->slideTransX->setMinimum(currenttrans[0] - 250);
   this->slideTransY->setMinimum(currenttrans[1] - 250);
@@ -133,6 +134,9 @@ void QmitkRegistrationManipulationWidget::InitControls()
   this->slideTransX->setMaximum(currenttrans[0] + 250);
   this->slideTransY->setMaximum(currenttrans[1] + 250);
   this->slideTransZ->setMaximum(currenttrans[2] + 250);
+  this->m_internalUpdate = false;
+
+  this->UpdateTransformWidgets();
 };
 
 void QmitkRegistrationManipulationWidget::UpdateTransformWidgets()

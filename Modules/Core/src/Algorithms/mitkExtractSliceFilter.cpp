@@ -83,7 +83,7 @@ void mitk::ExtractSliceFilter::GenerateOutputInformation()
   Point3D sliceOrigin = sliceGeometry->GetOrigin();
 
   auto abstractGeometry =
-    dynamic_cast<const AbstractTransformGeometry *>(m_WorldGeometry);
+    dynamic_cast<const AbstractTransformGeometry *>(m_WorldGeometry.GetPointer());
 
   if (abstractGeometry != nullptr)
   {
@@ -273,12 +273,12 @@ void mitk::ExtractSliceFilter::GenerateData()
   Point3D origin;
   Vector3D normal;
 
-  const auto *planeGeometry = dynamic_cast<const PlaneGeometry *>(m_WorldGeometry);
+  const auto *planeGeometry = dynamic_cast<const PlaneGeometry *>(m_WorldGeometry.GetPointer());
   // Code for curved planes, mostly taken 1:1 from imageVtkMapper2D and not tested yet.
   // Do we have an AbstractTransformGeometry?
   // This is the case for AbstractTransformGeometry's (e.g. a ThinPlateSplineCurvedGeometry )
   const auto *abstractGeometry =
-    dynamic_cast<const AbstractTransformGeometry *>(m_WorldGeometry);
+    dynamic_cast<const AbstractTransformGeometry *>(m_WorldGeometry.GetPointer());
 
   if (abstractGeometry != nullptr)
   {
@@ -491,7 +491,7 @@ bool mitk::ExtractSliceFilter::GetClippedPlaneBounds(double bounds[6])
     return false;
 
   return this->GetClippedPlaneBounds(
-    m_WorldGeometry->GetReferenceGeometry(), dynamic_cast<const PlaneGeometry *>(m_WorldGeometry), bounds);
+    m_WorldGeometry->GetReferenceGeometry(), m_WorldGeometry, bounds);
 }
 
 bool mitk::ExtractSliceFilter::GetClippedPlaneBounds(const BaseGeometry *boundingGeometry,

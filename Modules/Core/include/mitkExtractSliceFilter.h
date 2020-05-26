@@ -67,13 +67,16 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      mitkNewMacro1Param(Self, vtkImageReslice *);
+    mitkNewMacro1Param(Self, vtkImageReslice *);
 
     /** \brief Set the axis where to reslice at.*/
     void SetWorldGeometry(const PlaneGeometry *geometry)
     {
-      this->m_WorldGeometry = geometry;
-      this->Modified();
+      if (geometry != m_WorldGeometry)
+      {
+        this->m_WorldGeometry = geometry;
+        this->Modified();
+      }
     }
 
     /** \brief Set the time step in the 4D volume */
@@ -167,7 +170,7 @@ namespace mitk
     void GenerateOutputInformation() override;
     void GenerateInputRequestedRegion() override;
 
-    const PlaneGeometry *m_WorldGeometry;
+    PlaneGeometry::ConstPointer m_WorldGeometry;
     vtkSmartPointer<vtkImageReslice> m_Reslicer;
 
     unsigned int m_TimeStep;

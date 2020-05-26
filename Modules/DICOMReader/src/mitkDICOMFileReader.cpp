@@ -45,6 +45,8 @@ mitk::DICOMFileReader
     m_Outputs = other.m_Outputs;
     m_ConfigLabel = other.m_ConfigLabel;
     m_ConfigDescription = other.m_ConfigDescription;
+    m_AdditionalTagsOfInterest = other.m_AdditionalTagsOfInterest;
+    m_TagLookupTableToPropertyFunctor = other.m_TagLookupTableToPropertyFunctor;
   }
   return *this;
 }

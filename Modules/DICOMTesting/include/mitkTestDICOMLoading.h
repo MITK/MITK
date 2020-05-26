@@ -13,6 +13,7 @@ found in the LICENSE file.
 #define mitkTestDICOMLoading_h
 
 #include "mitkClassicDICOMSeriesReader.h"
+#include "mitkPropertyKeyPath.h"
 
 #include "MitkDICOMTestingExports.h"
 
@@ -96,6 +97,8 @@ class MITKDICOMTESTING_EXPORT TestDICOMLoading
       stream >> value;
       return (!stream.fail()) && (std::abs(value) <= std::numeric_limits<T>::max());
     }
+
+    static void AddPropertyToDump(const mitk::PropertyKeyPath& key, const mitk::Image* image, std::stringstream& result);
 
     const char* m_PreviousCLocale;
     std::locale m_PreviousCppLocale;

@@ -34,12 +34,7 @@ namespace mitk
     // -------------- AbstractFileReader -------------
 
     using AbstractFileReader::Read;
-    /**
-    * @brief Reads a number of mitk::LabelSetImages from the file system
-    * @return a vector of mitk::LabelSetImages
-    * @throws throws an mitk::Exception if an error ocurrs during parsing the nrrd header
-    */
-    std::vector<BaseData::Pointer> Read() override;
+
     ConfidenceLevel GetReaderConfidenceLevel() const override;
 
     // -------------- AbstractFileWriter -------------
@@ -53,6 +48,13 @@ namespace mitk
     std::string GetStringByKey(const itk::MetaDataDictionary &dic, const std::string &str);
 
   protected:
+    /**
+    * @brief Reads a number of mitk::LabelSetImages from the file system
+    * @return a vector of mitk::LabelSetImages
+    * @throws throws an mitk::Exception if an error ocurrs during parsing the nrrd header
+    */
+    std::vector<itk::SmartPointer<BaseData>> DoRead() override;
+
     // Fills the m_DefaultMetaDataKeys vector with default values
     virtual void InitializeDefaultMetaDataKeys();
 

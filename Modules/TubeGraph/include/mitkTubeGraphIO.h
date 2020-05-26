@@ -36,7 +36,6 @@ namespace mitk
     // -------------- AbstractFileReader -------------
 
     using AbstractFileReader::Read;
-    std::vector<BaseData::Pointer> Read() override;
 
     ConfidenceLevel GetReaderConfidenceLevel() const override;
 
@@ -58,6 +57,9 @@ namespace mitk
       static std::string name = mitk::IOMimeTypes::DEFAULT_BASE_NAME() + ".graphs.tubular-sructure";
       return name;
     }
+
+  protected:
+    std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
   private:
     TubeGraphIO *IOClone() const override;

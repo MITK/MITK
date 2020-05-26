@@ -97,7 +97,7 @@ namespace mitk
     return nullptr;
   }
 
-  std::vector<itk::SmartPointer<BaseData> > RTStructureSetReaderService::Read()
+  std::vector<itk::SmartPointer<BaseData> > RTStructureSetReaderService::DoRead()
   {
     std::vector<itk::SmartPointer<mitk::BaseData> > result;
 

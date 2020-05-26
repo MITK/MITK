@@ -269,6 +269,7 @@ set(CPP_FILES
   IO/mitkSurfaceVtkXmlIO.cpp
   IO/mitkVtkLoggingAdapter.cpp
   IO/mitkPreferenceListReaderOptionsFunctor.cpp
+  IO/mitkIOMetaInformationPropertyConstants.cpp
 
   Rendering/mitkAbstractAnnotationRenderer.cpp
   Rendering/mitkAnnotationUtils.cpp

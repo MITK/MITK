@@ -37,7 +37,7 @@ namespace mitk
 
   RTPlanReaderService::~RTPlanReaderService() {}
 
-  std::vector<itk::SmartPointer<BaseData> > RTPlanReaderService::Read()
+  std::vector<itk::SmartPointer<BaseData> > RTPlanReaderService::DoRead()
   {
     std::vector<itk::SmartPointer<mitk::BaseData> > result;
     auto DICOMTagsOfInterestService = GetDicomTagsOfInterestService();

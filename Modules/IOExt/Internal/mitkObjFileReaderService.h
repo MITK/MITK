@@ -32,9 +32,11 @@ namespace mitk
     ~ObjFileReaderService() override;
 
     using AbstractFileReader::Read;
-    std::vector<itk::SmartPointer<BaseData>> Read() override;
 
     static mitk::CustomMimeType mimeType;
+
+  protected:
+    std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
   private:
     ObjFileReaderService *Clone() const override;

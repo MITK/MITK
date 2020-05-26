@@ -18,8 +18,6 @@ found in the LICENSE file.
 #include <mitkInteractionTestHelper.h>
 #include <mitkRenderingTestHelper.h>
 #include <mitkPlanarFigureInteractor.h>
-#include <mitkPlanarFigureReader.h>
-#include <mitkPlanarFigureWriter.h>
 
 #include <mitkPlanarAngle.h>
 #include <mitkPlanarArrow.h>
@@ -99,10 +97,7 @@ public:
     interactionTestHelper.PlaybackInteraction();
 
     // Load reference PlanarFigure
-    mitk::PlanarFigureReader::Pointer reader = mitk::PlanarFigureReader::New();
-    reader->SetFileName(GetTestDataFilePath(referenceFigurePath));
-    reader->Update();
-    mitk::PlanarFigure::Pointer reference = reader->GetOutput(0);
+    auto reference = mitk::IOUtil::Load<mitk::PlanarFigure>(GetTestDataFilePath(referenceFigurePath));
 
     // Compare figures
     MITK_ASSERT_EQUAL(figure, reference, "Compare figure with reference");

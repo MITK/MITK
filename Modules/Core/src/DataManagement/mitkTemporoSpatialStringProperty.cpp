@@ -57,6 +57,22 @@ std::string mitk::TemporoSpatialStringProperty::GetValueAsString() const
   return GetValue();
 }
 
+bool mitk::TemporoSpatialStringProperty::IsUniform() const
+{
+  auto refValue = this->GetValue();
+
+  for (const auto& timeStep : m_Values)
+  {
+    auto finding = std::find_if_not(timeStep.second.begin(), timeStep.second.end(), [&refValue](const mitk::TemporoSpatialStringProperty::SliceMapType::value_type& val) { return val.second == refValue; });
+    if (finding != timeStep.second.end())
+    {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 itk::LightObject::Pointer mitk::TemporoSpatialStringProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));

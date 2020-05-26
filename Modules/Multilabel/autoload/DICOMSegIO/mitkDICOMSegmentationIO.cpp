@@ -222,7 +222,7 @@ namespace mitk
 
         // Convert itk segmentation images to dicom image
         std::unique_ptr<dcmqi::ImageSEGConverter> converter = std::make_unique<dcmqi::ImageSEGConverter>();
-        std::unique_ptr<DcmDataset> result(converter->itkimage2dcmSegmentation(rawVecDataset, segmentations, tmpMetaInfoFile));
+        std::unique_ptr<DcmDataset> result(converter->itkimage2dcmSegmentation(rawVecDataset, segmentations, tmpMetaInfoFile, false));
 
         // Write dicom file
         DcmFileFormat dcmFileFormat(result.get());
@@ -268,7 +268,7 @@ namespace mitk
     return Unsupported;
   }
 
-  std::vector<BaseData::Pointer> DICOMSegmentationIO::Read()
+  std::vector<BaseData::Pointer> DICOMSegmentationIO::DoRead()
   {
     mitk::LocaleSwitch localeSwitch("C");
 

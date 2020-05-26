@@ -30,7 +30,7 @@ mitk::ObjFileReaderService::~ObjFileReaderService()
 {
 }
 
-std::vector<itk::SmartPointer<mitk::BaseData>> mitk::ObjFileReaderService::Read()
+std::vector<itk::SmartPointer<mitk::BaseData>> mitk::ObjFileReaderService::DoRead()
 {
   std::vector<itk::SmartPointer<BaseData>> result;
 

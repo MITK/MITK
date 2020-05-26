@@ -65,7 +65,7 @@ mitk::RawImageFileReaderService::RawImageFileReaderService(const mitk::RawImageF
 {
 }
 
-std::vector<itk::SmartPointer<mitk::BaseData>> mitk::RawImageFileReaderService::Read()
+std::vector<itk::SmartPointer<mitk::BaseData>> mitk::RawImageFileReaderService::DoRead()
 {
   std::vector<mitk::BaseData::Pointer> result;
 

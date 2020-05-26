@@ -38,7 +38,7 @@ mitk::VtkUnstructuredGridReader::~VtkUnstructuredGridReader()
 {
 }
 
-std::vector<itk::SmartPointer<mitk::BaseData>> mitk::VtkUnstructuredGridReader::Read()
+std::vector<itk::SmartPointer<mitk::BaseData>> mitk::VtkUnstructuredGridReader::DoRead()
 {
   MITK_INFO << "Loading "
             << " as vtk unstructured grid";

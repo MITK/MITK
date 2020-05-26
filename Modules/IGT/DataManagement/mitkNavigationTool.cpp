@@ -56,7 +56,7 @@ mitk::NavigationTool::NavigationTool(const NavigationTool &other)
   this->m_Type = other.m_Type;
   if (other.m_DataNode.IsNotNull())
   {
-    this->m_DataNode = other.m_DataNode->Clone();
+    this->m_DataNode = mitk::DataNode::New();
     this->m_DataNode->SetName(other.m_DataNode->GetName());
     if (other.m_DataNode->GetData())
     {

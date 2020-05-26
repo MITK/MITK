@@ -39,17 +39,9 @@ namespace mitk
 
     mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override;
 
-    DEPRECATED(void RegisterIOFactories());
-
   protected:
     PlanarFigureObjectFactory();
     void CreateFileExtensionsMap();
-    MultimapType m_FileExtensionsMap;
-    MultimapType m_SaveFileExtensionsMap;
-
-  private:
-    itk::ObjectFactoryBase::Pointer m_PlanarFigureIOFactory;
-    itk::ObjectFactoryBase::Pointer m_PlanarFigureWriterFactory;
   };
 }
 

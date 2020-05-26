@@ -16,7 +16,11 @@ found in the LICENSE file.
 
 #include <mitkIOUtil.h>
 #include <mitkImageGenerator.h>
+#include <mitkIOMetaInformationPropertyConstants.h>
+#include <mitkVersion.h>
 
+#include <itkMetaDataObject.h>
+#include <itkNrrdImageIO.h>
 #include <itksys/SystemTools.hxx>
 
 class mitkIOUtilTestSuite : public mitk::TestFixture
@@ -31,6 +35,7 @@ class mitkIOUtilTestSuite : public mitk::TestFixture
   MITK_TEST(TestLoadAndSaveSurface);
   MITK_TEST(TestTempMethodsForUniqueFilenames);
   MITK_TEST(TestTempMethodsForUniqueFilenames);
+  MITK_TEST(TestIOMetaInformation);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -226,6 +231,63 @@ public:
     // delete the files after the test is done
     std::remove(surfacePath.c_str());
   }
+
+  std::string GenerateMetaDictKey(const mitk::PropertyKeyPath& propKey)
+  {
+    auto result = mitk::PropertyKeyPathToPropertyName(propKey);
+    std::replace(result.begin(), result.end(), '.', '_');
+    return result;
+  }
+
+  std::string GetValueFromMetaDict(const itk::MetaDataDictionary& dict, const mitk::PropertyKeyPath& propKey)
+  {
+    auto metaValueBase = dict.Get(GenerateMetaDictKey(propKey));
+    auto metaValue = dynamic_cast<const itk::MetaDataObject<std::string>*>(metaValueBase);
+    return metaValue->GetMetaDataObjectValue();
+  }
+
+  void TestIOMetaInformation()
+  {
+    mitk::Image::Pointer img = mitk::IOUtil::Load<mitk::Image>(m_ImagePath);
+    CPPUNIT_ASSERT(img.IsNotNull());
+    
+    auto value = img->GetProperty(mitk::PropertyKeyPathToPropertyName(mitk::IOMetaInformationPropertyConstants::READER_DESCRIPTION()).c_str())->GetValueAsString();
+    CPPUNIT_ASSERT_EQUAL(std::string("ITK NrrdImageIO"), value);
+    value = img->GetProperty(mitk::PropertyKeyPathToPropertyName(mitk::IOMetaInformationPropertyConstants::READER_INPUTLOCATION()).c_str())->GetValueAsString();
+    CPPUNIT_ASSERT_EQUAL(m_ImagePath, value);
+    value = img->GetProperty(mitk::PropertyKeyPathToPropertyName(mitk::IOMetaInformationPropertyConstants::READER_MIME_CATEGORY()).c_str())->GetValueAsString();
+    CPPUNIT_ASSERT_EQUAL(std::string("Images"), value);
+    value = img->GetProperty(mitk::PropertyKeyPathToPropertyName(mitk::IOMetaInformationPropertyConstants::READER_MIME_NAME()).c_str())->GetValueAsString();
+    CPPUNIT_ASSERT_EQUAL(std::string("application/vnd.mitk.image.nrrd"), value);
+    value = img->GetProperty(mitk::PropertyKeyPathToPropertyName(mitk::IOMetaInformationPropertyConstants::READER_VERSION()).c_str())->GetValueAsString();
+    CPPUNIT_ASSERT_EQUAL(std::string(MITK_VERSION_STRING), value);
+
+    //check if the information is persistet correctly on save.
+    std::ofstream tmpStream;
+    std::string imagePath = mitk::IOUtil::CreateTemporaryFile(tmpStream, "ioMeta_XXXXXX.nrrd");
+    tmpStream.close();
+    mitk::IOUtil::Save(img, imagePath);
+
+    auto io = itk::NrrdImageIO::New();
+    io->SetFileName(imagePath);
+    io->ReadImageInformation();
+    auto metaDict = io->GetMetaDataDictionary();
+
+    auto metaValue = GetValueFromMetaDict(metaDict, mitk::IOMetaInformationPropertyConstants::READER_DESCRIPTION());
+    CPPUNIT_ASSERT_EQUAL(std::string("ITK NrrdImageIO"), metaValue);
+    metaValue = GetValueFromMetaDict(metaDict, mitk::IOMetaInformationPropertyConstants::READER_INPUTLOCATION());
+    CPPUNIT_ASSERT_EQUAL(m_ImagePath, metaValue);
+    metaValue = GetValueFromMetaDict(metaDict, mitk::IOMetaInformationPropertyConstants::READER_MIME_CATEGORY());
+    CPPUNIT_ASSERT_EQUAL(std::string("Images"), metaValue);
+    metaValue = GetValueFromMetaDict(metaDict, mitk::IOMetaInformationPropertyConstants::READER_MIME_NAME());
+    CPPUNIT_ASSERT_EQUAL(std::string("application/vnd.mitk.image.nrrd"), metaValue);
+    metaValue = GetValueFromMetaDict(metaDict, mitk::IOMetaInformationPropertyConstants::READER_VERSION());
+    CPPUNIT_ASSERT_EQUAL(std::string(MITK_VERSION_STRING), metaValue);
+
+    // delete the files after the test is done
+    std::remove(imagePath.c_str());
+  }
+
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkIOUtil)

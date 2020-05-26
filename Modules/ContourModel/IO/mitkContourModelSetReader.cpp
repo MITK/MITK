@@ -39,7 +39,7 @@ mitk::ContourModelSetReader::~ContourModelSetReader()
 {
 }
 
-std::vector<itk::SmartPointer<mitk::BaseData>> mitk::ContourModelSetReader::Read()
+std::vector<itk::SmartPointer<mitk::BaseData>> mitk::ContourModelSetReader::DoRead()
 {
   std::vector<itk::SmartPointer<mitk::BaseData>> result;
   std::vector<itk::SmartPointer<mitk::BaseData>> internalResult;

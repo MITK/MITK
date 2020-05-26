@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include <mitkCustomMimeType.h>
 #include <mitkIOMimeTypes.h>
 #include <mitkSceneIO.h>
+#include <mitkStandaloneDataStorage.h>
 
 namespace mitk
 {
@@ -60,6 +61,21 @@ namespace mitk
     return result;
   }
 
-  std::vector<BaseData::Pointer> SceneFileReader::Read() { return AbstractFileReader::Read(); }
+  std::vector<BaseData::Pointer> SceneFileReader::DoRead()
+  {
+    std::vector<BaseData::Pointer> result;
+
+    DataStorage::Pointer ds = StandaloneDataStorage::New().GetPointer();
+    this->Read(*ds);
+    DataStorage::SetOfObjects::ConstPointer dataNodes = ds->GetAll();
+    for (DataStorage::SetOfObjects::ConstIterator iter = dataNodes->Begin(), iterEnd = dataNodes->End();
+      iter != iterEnd;
+      ++iter)
+    {
+      result.push_back(iter.Value()->GetData());
+    }
+    return result;
+  }
+
   SceneFileReader *SceneFileReader::Clone() const { return new SceneFileReader(*this); }
 }

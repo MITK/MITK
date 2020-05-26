@@ -72,7 +72,7 @@ void mitk::ExtractSliceFilter::GenerateOutputInformation()
   double widthInMM, heightInMM;
   Vector2D extent;
 
-  // set the geometry from current worldgeometry for the reusultimage
+  // set the geometry from current worldgeometry for the resultimage
   // this is needed that the image has the correct mitk geometry
   // the sliceGeometry is the Geometry of the result slice
   PlaneGeometry::Pointer sliceGeometry = m_WorldGeometry->Clone();
@@ -157,7 +157,7 @@ void mitk::ExtractSliceFilter::GenerateOutputInformation()
       sliceBound = 0.0;
     }
 
-    if (this->GetClippedPlaneBounds(m_WorldGeometry->GetReferenceGeometry(), sliceGeometry, sliceBounds))
+    if (this->GetClippedPlaneBounds(m_WorldGeometry->GetReferenceGeometry(), m_WorldGeometry, sliceBounds))
     {
       // Calculate output extent (integer values)
       xMin = static_cast<int>(sliceBounds[0] / m_OutPutSpacing[0] + 0.5);

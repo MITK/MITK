@@ -333,8 +333,14 @@ void QmitkMatchPointRegistrationManipulator::StopSession()
 
 void QmitkMatchPointRegistrationManipulator::OnRegistrationChanged()
 {
-  this->m_EvalNode->Modified();
-  this->m_CurrentRegistrationWrapper->Modified();
+  if (this->m_EvalNode.IsNotNull())
+  {
+    this->m_EvalNode->Modified();
+  }
+  if (this->m_CurrentRegistrationWrapper.IsNotNull())
+  {
+    this->m_CurrentRegistrationWrapper->Modified();
+  }
   this->GetRenderWindowPart()->RequestUpdate();
 }
 
@@ -459,7 +465,10 @@ void QmitkMatchPointRegistrationManipulator::OnCenterTypeChanged(int index)
   {
     this->m_EvalNode->Modified();
   }
-  this->m_CurrentRegistrationWrapper->Modified();
+  if (this->m_CurrentRegistrationWrapper.IsNotNull())
+  {
+    this->m_CurrentRegistrationWrapper->Modified();
+  }
   this->GetRenderWindowPart()->RequestUpdate();
 }
 

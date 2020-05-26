@@ -99,8 +99,8 @@ void mitk::ExtractSliceFilter::GenerateOutputInformation()
   else
   {
     // if the worldGeomatry is a PlaneGeometry everything is straight forward
-    right = sliceGeometry->GetAxisVector(0);
-    bottom = sliceGeometry->GetAxisVector(1);
+    right = m_WorldGeometry->GetAxisVector(0);
+    bottom = m_WorldGeometry->GetAxisVector(1);
 
     if (m_InPlaneResampleExtentByGeometry)
     {

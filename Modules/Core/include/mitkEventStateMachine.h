@@ -134,7 +134,7 @@ namespace mitk
      * and the event is treated as HANDLED even though some actions might not have been executed! So be sure that all actions that occur within
      * one transitions have the same conditions.
      */
-    bool HandleEvent(InteractionEvent* event, DataNode* dataNode);
+    virtual bool HandleEvent(InteractionEvent* event, DataNode* dataNode);
 
     /**
     * @brief Enables or disabled Undo.

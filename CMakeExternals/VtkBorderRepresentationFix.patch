@@ -1,0 +1,22 @@
+diff --git a/Interaction/Widgets/vtkBorderRepresentation.cxx b/Interaction/Widgets/vtkBorderRepresentation.cxx
+--- a/Interaction/Widgets/vtkBorderRepresentation.cxx
++++ b/Interaction/Widgets/vtkBorderRepresentation.cxx
+@@ -13,6 +13,7 @@
+ 
+ =========================================================================*/
+ #include "vtkBorderRepresentation.h"
++#include "vtkCamera.h"
+ #include "vtkRenderer.h"
+ #include "vtkPoints.h"
+ #include "vtkCellArray.h"
+@@ -485,7 +486,9 @@ void vtkBorderRepresentation::BuildRepresentation()
+   if (this->Renderer &&
+       (this->GetMTime() > this->BuildTime ||
+        (this->Renderer->GetVTKWindow() &&
+-        this->Renderer->GetVTKWindow()->GetMTime() > this->BuildTime)))
++        this->Renderer->GetVTKWindow()->GetMTime() > this->BuildTime) ||
++       (this->Renderer->GetActiveCamera() &&
++       this->Renderer->GetActiveCamera()->GetMTime() > this->BuildTime)))
+   {
+     // Negotiate with subclasses
+     if ( ! this->Negotiated )

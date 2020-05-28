@@ -228,10 +228,15 @@ void MRPerfusionView::UpdateGUIControls()
   bool isNum2CXMFactory = dynamic_cast<mitk::NumericTwoCompartmentExchangeModelFactory*>
                           (m_selectedModelFactory.GetPointer()) != nullptr;
 
+  bool isSLFactory = dynamic_cast<mitk::ThreeStepLinearModelFactory*>
+    (m_selectedModelFactory.GetPointer()) != nullptr ||
+    dynamic_cast<mitk::TwoStepLinearModelFactory*>
+    (m_selectedModelFactory.GetPointer()) != nullptr;
+
   m_Controls.groupAIF->setVisible(isToftsFactory || is2CXMFactory);
   m_Controls.groupDescBrix->setVisible(isDescBrixFactory);
   m_Controls.groupNum2CXM->setVisible(isNum2CXMFactory);
-  m_Controls.groupConcentration->setVisible(isToftsFactory || is2CXMFactory);
+  m_Controls.groupConcentration->setVisible(isToftsFactory || is2CXMFactory || isSLFactory);
 
   m_Controls.groupBox_FitConfiguration->setVisible(m_selectedModelFactory);
 
@@ -588,6 +593,10 @@ bool MRPerfusionView::CheckModelSettings() const
           ok = ok && (m_Controls.ComboT1Map->GetSelectedNode().IsNotNull());
           ok = ok && CheckBaselineSelectionSettings();
         }
+        else if (this->m_Controls.radioButtonNoConversion->isChecked())
+        {
+          ok = true;
+        }
         else
         {
           ok = false;
@@ -635,6 +644,10 @@ bool MRPerfusionView::CheckModelSettings() const
         ok = ok && (m_Controls.RelaxivitySpinBox->value() > 0);
         ok = ok && (m_Controls.ComboT1Map->GetSelectedNode().IsNotNull());
         ok = ok && CheckBaselineSelectionSettings();
+      }
+      else if (this->m_Controls.radioButtonNoConversion->isChecked())
+      {
+        ok = ok && true;
       }
       else
       {

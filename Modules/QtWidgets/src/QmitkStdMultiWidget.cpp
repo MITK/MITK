@@ -51,10 +51,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkResliceMethodProperty.h>
 #include <mitkVtkFont.h>
 
+#include <vtkActor.h>
 #include <vtkRendererCollection.h>
 #include <vtkCornerAnnotation.h>
 #include <vtkMitkRectangleProp.h>
 #include "mitkPixelTypeMultiplex.h"
+
+#include "HumanViewActor.h"
 
 void QmitkStdMultiWidget::UpdateAnnotationFonts()
 {
@@ -106,6 +109,7 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mit
     m_RenderingManager = mitk::RenderingManager::GetInstance();
   }
   m_TimeNavigationController = m_RenderingManager->GetTimeNavigationController();
+  m_HumanActor = HumanViewActor::New();
 
   /*******************************/
   //Create Widget manually
@@ -465,17 +469,17 @@ mitk::Color QmitkStdMultiWidget::GetDecorationColor(unsigned int widgetNumber)
   switch (widgetNumber) {
   case 0:
   {
-    float red[3] = { .753, 0., 0.};//This is #00B000 in hex
+    float red[3] = { .753f, 0.f, 0.f};//This is #00B000 in hex
     return mitk::Color(red);
   }
   case 1:
   {
-    float green[3] = { 0., .69, 0.};//This is #00B000 in hex
+    float green[3] = { 0.f, .69f, 0.f};//This is #00B000 in hex
     return mitk::Color(green);
   }
   case 2:
   {
-    float blue[3] = { 0., .502, 1.};//This is #0080FF in hex
+    float blue[3] = { 0.f, .502f, 1.f};//This is #0080FF in hex
     return mitk::Color(blue);
   }
   case 3:
@@ -525,6 +529,8 @@ QmitkStdMultiWidget::~QmitkStdMultiWidget()
     textProp[i]->Delete();
     ren[i]->Delete();
   }
+
+  m_HumanActor->Delete();
 }
 
 void QmitkStdMultiWidget::RemovePlanesFromDataStorage()
@@ -726,6 +732,11 @@ void QmitkStdMultiWidget::SetDecorationProperties( std::string text, mitk::Color
 
   if (!frameRenderer->HasViewProp(frame)) {
     frameRenderer->AddViewProp(frame);
+  }
+
+  if (widgetNumber == 3) {
+    m_HumanActor->mainCamera = renderer->GetActiveCamera();
+    frameRenderer->AddActor2D(m_HumanActor);
   }
 }
 

@@ -26,6 +26,8 @@ found in the LICENSE file.
 #include <mitkDescriptivePharmacokineticBrixModelValueBasedParameterizer.h>
 #include "mitkThreeStepLinearModelFactory.h"
 #include "mitkThreeStepLinearModelParameterizer.h"
+#include "mitkTwoStepLinearModelFactory.h"
+#include "mitkTwoStepLinearModelParameterizer.h"
 #include <mitkExtendedToftsModelFactory.h>
 #include <mitkExtendedToftsModelParameterizer.h>
 #include <mitkStandardToftsModelFactory.h>
@@ -161,12 +163,11 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
 
   //Concentration
   m_Controls.groupConcentration->hide();
+  m_Controls.groupBoxEnhancement->hide();
   m_Controls.groupBoxTurboFlash->hide();
   m_Controls.radioButtonNoConversion->setChecked(true);
-  m_Controls.factorSpinBox->setEnabled(false);
-  m_Controls.spinBox_baselineStartTimeStep->setEnabled(false);
-  m_Controls.spinBox_baselineEndTimeStep->setEnabled(false);
   m_Controls.groupBox_viaT1Map->hide();
+
   m_Controls.spinBox_baselineStartTimeStep->setValue(0);
   m_Controls.spinBox_baselineEndTimeStep->setValue(0);
 
@@ -178,8 +179,8 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
 
   connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
-  connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), m_Controls.factorSpinBox, SLOT(setEnabled(bool)));
-  connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), m_Controls.factorSpinBox, SLOT(setEnabled(bool)));
+  connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), m_Controls.groupBoxEnhancement, SLOT(setVisible(bool)));
+  connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), m_Controls.groupBoxEnhancement, SLOT(setVisible(bool)));
 
   connect(m_Controls.factorSpinBox, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.spinBox_baselineStartTimeStep, SIGNAL(valueChanged(int)), this, SLOT(UpdateGUIControls()));
@@ -226,10 +227,15 @@ void MRPerfusionView::UpdateGUIControls()
   bool isNum2CXMFactory = dynamic_cast<mitk::NumericTwoCompartmentExchangeModelFactory*>
                           (m_selectedModelFactory.GetPointer()) != nullptr;
 
+  bool isSLFactory = dynamic_cast<mitk::ThreeStepLinearModelFactory*>
+    (m_selectedModelFactory.GetPointer()) != nullptr ||
+    dynamic_cast<mitk::TwoStepLinearModelFactory*>
+    (m_selectedModelFactory.GetPointer()) != nullptr;
+
   m_Controls.groupAIF->setVisible(isToftsFactory || is2CXMFactory);
   m_Controls.groupDescBrix->setVisible(isDescBrixFactory);
   m_Controls.groupNum2CXM->setVisible(isNum2CXMFactory);
-  m_Controls.groupConcentration->setVisible(isToftsFactory || is2CXMFactory);
+  m_Controls.groupConcentration->setVisible(isToftsFactory || is2CXMFactory || isSLFactory);
 
   m_Controls.groupBox_FitConfiguration->setVisible(m_selectedModelFactory);
 
@@ -335,6 +341,8 @@ void MRPerfusionView::OnModellingButtonClicked()
                              (m_selectedModelFactory.GetPointer()) != nullptr;
     bool is3LinearFactory = dynamic_cast<mitk::ThreeStepLinearModelFactory*>
                              (m_selectedModelFactory.GetPointer()) != nullptr;
+    bool is2LinearFactory = dynamic_cast<mitk::TwoStepLinearModelFactory*>
+                             (m_selectedModelFactory.GetPointer()) != nullptr;
     bool isExtToftsFactory = dynamic_cast<mitk::ExtendedToftsModelFactory*>
                           (m_selectedModelFactory.GetPointer()) != nullptr;
     bool isStanToftsFactory = dynamic_cast<mitk::StandardToftsModelFactory*>
@@ -355,16 +363,27 @@ void MRPerfusionView::OnModellingButtonClicked()
         GenerateDescriptiveBrixModel_ROIBased(fitSession, generator);
       }
     }
+    else if (is2LinearFactory)
+    {
+      if (this->m_Controls.radioPixelBased->isChecked())
+      {
+        GenerateLinearModelFit_PixelBased<mitk::TwoStepLinearModelParameterizer>(fitSession, generator);
+      }
+      else
+      {
+        GenerateLinearModelFit_ROIBased<mitk::TwoStepLinearModelParameterizer>(fitSession, generator);
+      }
+    }
     else if (is3LinearFactory)
     {
-        if (this->m_Controls.radioPixelBased->isChecked())
-        {
-          Generate3StepLinearModelFit_PixelBased(fitSession, generator);
-        }
-        else
-        {
-          Generate3StepLinearModelFit_ROIBased(fitSession, generator);
-        }
+      if (this->m_Controls.radioPixelBased->isChecked())
+      {
+        GenerateLinearModelFit_PixelBased<mitk::ThreeStepLinearModelParameterizer>(fitSession, generator);
+      }
+      else
+      {
+        GenerateLinearModelFit_ROIBased<mitk::ThreeStepLinearModelParameterizer>(fitSession, generator);
+      }
     }
     else if (isStanToftsFactory)
     {
@@ -532,6 +551,8 @@ bool MRPerfusionView::CheckModelSettings() const
                              (m_selectedModelFactory.GetPointer()) != nullptr;
     bool is3LinearFactory = dynamic_cast<mitk::ThreeStepLinearModelFactory*>
                              (m_selectedModelFactory.GetPointer()) != nullptr;
+    bool is2LinearFactory = dynamic_cast<mitk::TwoStepLinearModelFactory*>
+                             (m_selectedModelFactory.GetPointer()) != nullptr;
     bool isToftsFactory = dynamic_cast<mitk::StandardToftsModelFactory*>
                           (m_selectedModelFactory.GetPointer()) != nullptr||
                           dynamic_cast<mitk::ExtendedToftsModelFactory*>
@@ -546,7 +567,7 @@ bool MRPerfusionView::CheckModelSettings() const
       //if all static parameters for this model are set, exit with true, Otherwise exit with false
       ok = m_Controls.injectiontime->value() > 0;
     }
-    else if (is3LinearFactory)
+    else if (is3LinearFactory || is2LinearFactory)
     {
         if (this->m_Controls.radioButtonTurboFlash->isChecked() )
         {
@@ -570,6 +591,10 @@ bool MRPerfusionView::CheckModelSettings() const
           ok = ok && (m_Controls.RelaxivitySpinBox->value() > 0);
           ok = ok && (m_Controls.ComboT1Map->GetSelectedNode().IsNotNull());
           ok = ok && CheckBaselineSelectionSettings();
+        }
+        else if (this->m_Controls.radioButtonNoConversion->isChecked())
+        {
+          ok = true;
         }
         else
         {
@@ -618,6 +643,10 @@ bool MRPerfusionView::CheckModelSettings() const
         ok = ok && (m_Controls.RelaxivitySpinBox->value() > 0);
         ok = ok && (m_Controls.ComboT1Map->GetSelectedNode().IsNotNull());
         ok = ok && CheckBaselineSelectionSettings();
+      }
+      else if (this->m_Controls.radioButtonNoConversion->isChecked())
+      {
+        ok = ok && true;
       }
       else
       {
@@ -771,14 +800,14 @@ void MRPerfusionView::GenerateDescriptiveBrixModel_ROIBased(mitk::modelFit::Mode
   modelFitInfo->inputData.SetTableValue("ROI", infoSignal);
 }
 
-void MRPerfusionView::Generate3StepLinearModelFit_PixelBased(mitk::modelFit::ModelFitInfo::Pointer&
+template <typename TParameterizer>
+void MRPerfusionView::GenerateLinearModelFit_PixelBased(mitk::modelFit::ModelFitInfo::Pointer&
     modelFitInfo, mitk::ParameterFitImageGeneratorBase::Pointer& generator)
 {
   mitk::PixelBasedParameterFitImageGenerator::Pointer fitGenerator =
     mitk::PixelBasedParameterFitImageGenerator::New();
 
-  mitk::ThreeStepLinearModelParameterizer::Pointer modelParameterizer =
-    mitk::ThreeStepLinearModelParameterizer::New();
+  typename TParameterizer::Pointer modelParameterizer = TParameterizer::New();
 
   this->ConfigureInitialParametersOfParameterizer(modelParameterizer);
 
@@ -805,7 +834,8 @@ void MRPerfusionView::Generate3StepLinearModelFit_PixelBased(mitk::modelFit::Mod
     m_selectedNode->GetData(), mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED(), this->GetFitName(), roiUID);
 }
 
-void MRPerfusionView::Generate3StepLinearModelFit_ROIBased(mitk::modelFit::ModelFitInfo::Pointer&
+template <typename TParameterizer>
+void MRPerfusionView::GenerateLinearModelFit_ROIBased(mitk::modelFit::ModelFitInfo::Pointer&
     modelFitInfo, mitk::ParameterFitImageGeneratorBase::Pointer& generator)
 {
   if (m_selectedMask.IsNull())
@@ -816,8 +846,7 @@ void MRPerfusionView::Generate3StepLinearModelFit_ROIBased(mitk::modelFit::Model
   mitk::ROIBasedParameterFitImageGenerator::Pointer fitGenerator =
     mitk::ROIBasedParameterFitImageGenerator::New();
 
-  mitk::ThreeStepLinearModelParameterizer::Pointer modelParameterizer =
-    mitk::ThreeStepLinearModelParameterizer::New();
+  typename TParameterizer::Pointer modelParameterizer = TParameterizer::New();
 
   //Compute ROI signal
   mitk::MaskedDynamicImageStatisticsGenerator::Pointer signalGenerator =
@@ -1054,6 +1083,8 @@ MRPerfusionView::MRPerfusionView() : m_FittingInProgress(false), m_HasGeneratedN
 
   mitk::ModelFactoryBase::Pointer factory =
     mitk::DescriptivePharmacokineticBrixModelFactory::New().GetPointer();
+  m_FactoryStack.push_back(factory);
+  factory = mitk::TwoStepLinearModelFactory::New().GetPointer();
   m_FactoryStack.push_back(factory);
   factory = mitk::ThreeStepLinearModelFactory::New().GetPointer();
   m_FactoryStack.push_back(factory);

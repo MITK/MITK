@@ -64,6 +64,8 @@ namespace mitk {
   {
   public:
 
+    static MouseModeSwitcher& GetInstance();
+
 #pragma GCC visibility push(default)
     /**
       \brief Can be observed by GUI class to update button states when mode is changed programatically.
@@ -72,8 +74,8 @@ namespace mitk {
 #pragma GCC visibility pop
 
     mitkClassMacroItkParent( MouseModeSwitcher, itk::Object );
-    mitkNewMacro1Param(Self, BaseRenderer::Pointer);
-    itkNewMacro(Self);
+    //mitkNewMacro1Param(Self, BaseRenderer::Pointer);
+    //itkNewMacro(Self);
 
     // enum of the different interaction schemes that are available
     enum InteractionScheme
@@ -125,11 +127,14 @@ namespace mitk {
     */
     void AddRenderer(BaseRenderer::Pointer renderer);
 
+    virtual ~MouseModeSwitcher();
+
   protected:
     MouseModeSwitcher(BaseRenderer::Pointer renderer);
     MouseModeSwitcher();
-    virtual ~MouseModeSwitcher();
   private:
+    MouseModeSwitcher& operator=(const MouseModeSwitcher&);
+    MouseModeSwitcher(const MouseModeSwitcher&);
 
     InteractionScheme m_ActiveInteractionScheme;
     MouseMode         m_ActiveMouseMode;
@@ -144,6 +149,8 @@ namespace mitk {
     std::unordered_set<std::string> m_RegisteredRendererNames;
 
     MouseModeMap m_ActiveMouseModes;
+
+    friend itk::SmartPointer<mitk::MouseModeSwitcher>;
   };
 } // namespace mitk
 

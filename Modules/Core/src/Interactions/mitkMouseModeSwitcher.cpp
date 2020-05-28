@@ -13,7 +13,6 @@
  See LICENSE.txt or http://www.mitk.org for details.
 
  ===================================================================*/
-
 #include "mitkMouseModeSwitcher.h"
 // us
 #include "usGetModuleContext.h"
@@ -54,6 +53,12 @@ namespace {
       }
     }
   }
+}
+
+mitk::MouseModeSwitcher& mitk::MouseModeSwitcher::GetInstance()
+{
+  static MouseModeSwitcher s_impl;
+  return s_impl;
 }
 
 mitk::MouseModeSwitcher::MouseModeSwitcher() :
@@ -226,4 +231,14 @@ mitk::MouseModeSwitcher::MouseMode mitk::MouseModeSwitcher::GetCurrentMouseMode(
 mitk::MouseModeSwitcher::MouseModeMap& mitk::MouseModeSwitcher::GetActiveMouseModes()
 {
   return m_ActiveMouseModes;
+}
+
+mitk::MouseModeSwitcher& mitk::MouseModeSwitcher::operator=(const MouseModeSwitcher&)
+{
+  throw std::logic_error("mitk::MouseModeSwitcher must be singleton.");
+}
+
+mitk::MouseModeSwitcher::MouseModeSwitcher(const MouseModeSwitcher&)
+{
+  throw std::logic_error("mitk::MouseModeSwitcher must be singleton.");
 }

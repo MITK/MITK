@@ -275,7 +275,7 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     d->m_RenderWindows.insert("coronal", d->m_StdMultiWidget->GetRenderWindow3());
     d->m_RenderWindows.insert("3d", d->m_StdMultiWidget->GetRenderWindow4());
 
-    d->m_MouseModeToolbar->setMouseModeSwitcher( d->m_StdMultiWidget->GetMouseModeSwitcher() );
+    d->m_MouseModeToolbar->setMouseModeSwitcher( /*d->m_StdMultiWidget->GetMouseModeSwitcher()*/ );
 
     layout->addWidget(d->m_StdMultiWidget);
 
@@ -393,7 +393,7 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
   // deleted mouse mode "PACS"
   //bool newMode = prefs->GetBool("PACS like mouse interaction", false);
   d->m_MouseModeToolbar->setVisible(false);
-  d->m_StdMultiWidget->GetMouseModeSwitcher()->SetInteractionScheme( /*newMode ? mitk::MouseModeSwitcher::PACS :*/ mitk::MouseModeSwitcher::MITK);
+  mitk::MouseModeSwitcher::GetInstance().SetInteractionScheme( /*newMode ? mitk::MouseModeSwitcher::PACS :*/ mitk::MouseModeSwitcher::MITK);
 
   mitk::DisplayInteractor::SetClockRotationSpeed(prefs->GetInt("Rotation Step", 90));
   d->m_StdMultiWidget->crosshairManager->updateAllWindows();

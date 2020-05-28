@@ -70,7 +70,7 @@ public:
 
   void ForceImmediateUpdate();
 
-  mitk::MouseModeSwitcher* GetMouseModeSwitcher();
+  //mitk::MouseModeSwitcher* GetMouseModeSwitcher();
   void setMouseMode(mitk::MouseModeSwitcher::MouseMode mode, const Qt::MouseButton& button);
 
   QmitkRenderWindow* GetRenderWindow1() const;
@@ -407,7 +407,6 @@ protected:
 
   bool m_GradientBackgroundFlag;
 
-  mitk::MouseModeSwitcher::Pointer m_MouseModeSwitcher;
   mitk::SliceNavigationController* m_TimeNavigationController;
 
   mitk::DataStorage::Pointer m_DataStorage;

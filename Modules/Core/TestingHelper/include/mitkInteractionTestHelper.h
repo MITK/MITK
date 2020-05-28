@@ -141,7 +141,6 @@ protected:
 
   RenderWindowListType m_RenderWindowList;
   mitk::DataStorage::Pointer m_DataStorage;
-  mitk::MouseModeSwitcher::Pointer m_MouseModeSwitcher;
 
 };
 }//namespace mitk

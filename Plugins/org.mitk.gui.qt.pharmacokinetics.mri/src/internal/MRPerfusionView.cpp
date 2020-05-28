@@ -163,12 +163,11 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
 
   //Concentration
   m_Controls.groupConcentration->hide();
+  m_Controls.groupBoxEnhancement->hide();
   m_Controls.groupBoxTurboFlash->hide();
   m_Controls.radioButtonNoConversion->setChecked(true);
-  m_Controls.factorSpinBox->setEnabled(false);
-  m_Controls.spinBox_baselineStartTimeStep->setEnabled(false);
-  m_Controls.spinBox_baselineEndTimeStep->setEnabled(false);
   m_Controls.groupBox_viaT1Map->hide();
+
   m_Controls.spinBox_baselineStartTimeStep->setValue(0);
   m_Controls.spinBox_baselineEndTimeStep->setValue(0);
 
@@ -180,8 +179,8 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
 
   connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
-  connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), m_Controls.factorSpinBox, SLOT(setEnabled(bool)));
-  connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), m_Controls.factorSpinBox, SLOT(setEnabled(bool)));
+  connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), m_Controls.groupBoxEnhancement, SLOT(setVisible(bool)));
+  connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), m_Controls.groupBoxEnhancement, SLOT(setVisible(bool)));
 
   connect(m_Controls.factorSpinBox, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.spinBox_baselineStartTimeStep, SIGNAL(valueChanged(int)), this, SLOT(UpdateGUIControls()));

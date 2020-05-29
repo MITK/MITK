@@ -128,17 +128,18 @@ namespace mitk
     */
     TimePointType TimeStepToTimePoint(TimeStepType timeStep) const override;
     /**
-  * \brief Converts a time point to the corresponding time step
-  *
-  * Converts a time point to a time step in a way that
-  * the new time step indicates the same geometry as the time point.
-  * The associated time step is the last step which lower time bound
-  * is smaller or equal then the time point.
-  * If a negative invalid time point is given always time step 0 is
-  * returned. If a positive invalid time point is given the last time
-  * step will be returned. This is also true for time points that are
-  * exactly on the upper time bound.
-  */
+    * \brief Converts a time point to the corresponding time step
+    *
+    * Converts a time point to a time step in a way that
+    * the new time step indicates the same geometry as the time point.
+    * The associated time step is the last step which lower time bound
+    * is smaller or equal then the time point.
+    * If a negative invalid time point is given always time step 0 is
+    * returned. If a positive invalid time point is given the last time
+    * step will be returned. This is also true for time points that are
+    * exactly on the upper time bound (the only exception is the final
+    * time step in case that HasCollapsedFinalTimeStep() is true).
+    */
     TimeStepType TimePointToTimeStep(TimePointType timePoint) const override;
     /**
     * \brief Returns the geometry which corresponds to the given time step
@@ -230,6 +231,13 @@ namespace mitk
     void ReserveSpaceForGeometries( TimeStepType numberOfGeometries );
 
     void PrintSelf(std::ostream &os, itk::Indent indent) const override;
+
+    /** This is a helper that indicates problematic corner cases that often occure e.g. when loading
+    dynamic DICOM data. There the final time step is collapsed as min time bound and max time bound
+    have the same value. For a more detailed explination why it happens please see:
+    https://phabricator.mitk.org/T24766#131411
+    */
+    const bool HasCollapsedFinalTimeStep() const;
 
   protected:
     ~ArbitraryTimeGeometry() override;

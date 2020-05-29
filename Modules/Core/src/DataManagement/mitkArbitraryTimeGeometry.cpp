@@ -294,7 +294,7 @@ void mitk::ArbitraryTimeGeometry::PrintSelf(std::ostream &os, itk::Indent indent
   }
 }
 
-const bool mitk::ArbitraryTimeGeometry::HasCollapsedFinalTimeStep() const
+bool mitk::ArbitraryTimeGeometry::HasCollapsedFinalTimeStep() const
 {
   bool result = false;
 

@@ -171,6 +171,17 @@ public:
     CPPUNIT_ASSERT_EQUAL(0, widget.m_NewSelectionEmited);
 
     widget.SetDataStorage(m_DataStorage);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodePredicateChanged);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnInternalSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeAddedToStorage);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_ReviseSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_AllowEmissionOfSelection);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_NewSelectionEmited);
+
+    widget.SetCurrentSelection({ m_Node1 });
     CPPUNIT_ASSERT_EQUAL(1, widget.m_UpdateInfo);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodePredicateChanged);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
@@ -179,42 +190,31 @@ public:
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_ReviseSelectionChanged);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_AllowEmissionOfSelection);
-    CPPUNIT_ASSERT_EQUAL(0, widget.m_NewSelectionEmited);
-
-    widget.SetCurrentSelection({ m_Node1 });
-    CPPUNIT_ASSERT_EQUAL(2, widget.m_UpdateInfo);
-    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodePredicateChanged);
-    CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
-    CPPUNIT_ASSERT_EQUAL(2, widget.m_OnInternalSelectionChanged);
-    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeAddedToStorage);
-    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
-    CPPUNIT_ASSERT_EQUAL(2, widget.m_ReviseSelectionChanged);
-    CPPUNIT_ASSERT_EQUAL(2, widget.m_AllowEmissionOfSelection);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_NewSelectionEmited);
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1 }, widget.m_LastNewEmision));
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1 }, widget.GetSelectedNodes()));
 
     widget.SetDataStorage(m_DataStorage);
-    CPPUNIT_ASSERT_EQUAL(2, widget.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_UpdateInfo);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodePredicateChanged);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Set same data storage but triggered change", 1, widget.m_OnDataStorageChanged);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_OnInternalSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeAddedToStorage);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_ReviseSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_AllowEmissionOfSelection);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_NewSelectionEmited);
+    CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1 }, widget.GetSelectedNodes()));
+
+    widget.SetDataStorage(nullptr);
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodePredicateChanged);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Set same data storage but triggered change", 2, widget.m_OnDataStorageChanged);
     CPPUNIT_ASSERT_EQUAL(2, widget.m_OnInternalSelectionChanged);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeAddedToStorage);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
     CPPUNIT_ASSERT_EQUAL(2, widget.m_ReviseSelectionChanged);
     CPPUNIT_ASSERT_EQUAL(2, widget.m_AllowEmissionOfSelection);
-    CPPUNIT_ASSERT_EQUAL(1, widget.m_NewSelectionEmited);
-    CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1 }, widget.GetSelectedNodes()));
-
-    widget.SetDataStorage(nullptr);
-    CPPUNIT_ASSERT_EQUAL(3, widget.m_UpdateInfo);
-    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodePredicateChanged);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Set same data storage but triggered change", 2, widget.m_OnDataStorageChanged);
-    CPPUNIT_ASSERT_EQUAL(3, widget.m_OnInternalSelectionChanged);
-    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeAddedToStorage);
-    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
-    CPPUNIT_ASSERT_EQUAL(3, widget.m_ReviseSelectionChanged);
-    CPPUNIT_ASSERT_EQUAL(3, widget.m_AllowEmissionOfSelection);
     CPPUNIT_ASSERT_EQUAL(2, widget.m_NewSelectionEmited);
     CPPUNIT_ASSERT(EqualNodeSelections({}, widget.m_LastNewEmision));
     CPPUNIT_ASSERT(EqualNodeSelections({}, widget.GetSelectedNodes()));
@@ -228,53 +228,53 @@ public:
     widget.SetDataStorage(m_DataStorage);
     m_DataStorage->Add(newNode);
 
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodePredicateChanged);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnInternalSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_OnNodeAddedToStorage);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_ReviseSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_AllowEmissionOfSelection);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_NewSelectionEmited);
+
+    widget.SetCurrentSelection({ newNode });
+    m_DataStorage->Remove(m_Node1);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_UpdateInfo);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodePredicateChanged);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnInternalSelectionChanged);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnNodeAddedToStorage);
-    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_OnNodeRemovedFromStorage);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_ReviseSelectionChanged);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_AllowEmissionOfSelection);
-    CPPUNIT_ASSERT_EQUAL(0, widget.m_NewSelectionEmited);
-
-    widget.SetCurrentSelection({ newNode });
-    m_DataStorage->Remove(m_Node1);
-    CPPUNIT_ASSERT_EQUAL(2, widget.m_UpdateInfo);
-    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodePredicateChanged);
-    CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
-    CPPUNIT_ASSERT_EQUAL(2, widget.m_OnInternalSelectionChanged);
-    CPPUNIT_ASSERT_EQUAL(1, widget.m_OnNodeAddedToStorage);
-    CPPUNIT_ASSERT_EQUAL(1, widget.m_OnNodeRemovedFromStorage);
-    CPPUNIT_ASSERT_EQUAL(2, widget.m_ReviseSelectionChanged);
-    CPPUNIT_ASSERT_EQUAL(2, widget.m_AllowEmissionOfSelection);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_NewSelectionEmited);
     CPPUNIT_ASSERT(EqualNodeSelections({ newNode }, widget.m_LastNewEmision));
     CPPUNIT_ASSERT(EqualNodeSelections({ newNode }, widget.GetSelectedNodes()));
 
     m_DataStorage->Remove(newNode);
-    CPPUNIT_ASSERT_EQUAL(3, widget.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_UpdateInfo);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodePredicateChanged);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
-    CPPUNIT_ASSERT_EQUAL(3, widget.m_OnInternalSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_OnInternalSelectionChanged);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnNodeAddedToStorage);
     CPPUNIT_ASSERT_EQUAL(2, widget.m_OnNodeRemovedFromStorage);
-    CPPUNIT_ASSERT_EQUAL(3, widget.m_ReviseSelectionChanged);
-    CPPUNIT_ASSERT_EQUAL(3, widget.m_AllowEmissionOfSelection);
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_ReviseSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_AllowEmissionOfSelection);
     CPPUNIT_ASSERT_EQUAL(2, widget.m_NewSelectionEmited);
     CPPUNIT_ASSERT(EqualNodeSelections({}, widget.m_LastNewEmision));
     CPPUNIT_ASSERT(EqualNodeSelections({}, widget.GetSelectedNodes()));
 
     widget.SetCurrentSelection({ m_Node2 });
     m_DataStorage = nullptr;
-    CPPUNIT_ASSERT_EQUAL(5, widget.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(4, widget.m_UpdateInfo);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodePredicateChanged);
     CPPUNIT_ASSERT_EQUAL(2, widget.m_OnDataStorageChanged);
-    CPPUNIT_ASSERT_EQUAL(5, widget.m_OnInternalSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(4, widget.m_OnInternalSelectionChanged);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnNodeAddedToStorage);
     CPPUNIT_ASSERT_EQUAL(2, widget.m_OnNodeRemovedFromStorage);
-    CPPUNIT_ASSERT_EQUAL(5, widget.m_ReviseSelectionChanged);
-    CPPUNIT_ASSERT_EQUAL(5, widget.m_AllowEmissionOfSelection);
+    CPPUNIT_ASSERT_EQUAL(4, widget.m_ReviseSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(4, widget.m_AllowEmissionOfSelection);
     CPPUNIT_ASSERT_EQUAL(4, widget.m_NewSelectionEmited);
     CPPUNIT_ASSERT(EqualNodeSelections({}, widget.m_LastNewEmision));
     CPPUNIT_ASSERT(EqualNodeSelections({}, widget.GetSelectedNodes()));
@@ -289,68 +289,68 @@ public:
     widget.SetNodePredicate(testPred);
     CPPUNIT_ASSERT(testPred == widget.GetNodePredicate());
 
-    CPPUNIT_ASSERT_EQUAL(1, widget.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_UpdateInfo);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnNodePredicateChanged);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnDataStorageChanged);
-    CPPUNIT_ASSERT_EQUAL(1, widget.m_OnInternalSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnInternalSelectionChanged);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeAddedToStorage);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
-    CPPUNIT_ASSERT_EQUAL(1, widget.m_ReviseSelectionChanged);
-    CPPUNIT_ASSERT_EQUAL(1, widget.m_AllowEmissionOfSelection);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_ReviseSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_AllowEmissionOfSelection);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_NewSelectionEmited);
 
     widget.SetDataStorage(m_DataStorage);
 
     widget.SetCurrentSelection({ m_Node3 });
-    CPPUNIT_ASSERT_EQUAL(3, widget.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_UpdateInfo);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnNodePredicateChanged);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
-    CPPUNIT_ASSERT_EQUAL(3, widget.m_OnInternalSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnInternalSelectionChanged);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeAddedToStorage);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
-    CPPUNIT_ASSERT_EQUAL(3, widget.m_ReviseSelectionChanged);
-    CPPUNIT_ASSERT_EQUAL(3, widget.m_AllowEmissionOfSelection);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_ReviseSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_AllowEmissionOfSelection);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_NewSelectionEmited);
     CPPUNIT_ASSERT(EqualNodeSelections({}, widget.m_LastNewEmision));
     CPPUNIT_ASSERT(EqualNodeSelections({}, widget.GetSelectedNodes()));
 
     widget.SetCurrentSelection({ m_Node2 });
-    CPPUNIT_ASSERT_EQUAL(4, widget.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_UpdateInfo);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnNodePredicateChanged);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
-    CPPUNIT_ASSERT_EQUAL(4, widget.m_OnInternalSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_OnInternalSelectionChanged);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeAddedToStorage);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
-    CPPUNIT_ASSERT_EQUAL(4, widget.m_ReviseSelectionChanged);
-    CPPUNIT_ASSERT_EQUAL(4, widget.m_AllowEmissionOfSelection);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_ReviseSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_AllowEmissionOfSelection);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_NewSelectionEmited);
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node2 }, widget.m_LastNewEmision));
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node2 }, widget.GetSelectedNodes()));
 
     //change predicate while nodes are selected
     widget.SetNodePredicate(GeneratTestPredicate("node1"));
-    CPPUNIT_ASSERT_EQUAL(5, widget.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_UpdateInfo);
     CPPUNIT_ASSERT_EQUAL(2, widget.m_OnNodePredicateChanged);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
-    CPPUNIT_ASSERT_EQUAL(5, widget.m_OnInternalSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_OnInternalSelectionChanged);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeAddedToStorage);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
-    CPPUNIT_ASSERT_EQUAL(5, widget.m_ReviseSelectionChanged);
-    CPPUNIT_ASSERT_EQUAL(5, widget.m_AllowEmissionOfSelection);
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_ReviseSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_AllowEmissionOfSelection);
     CPPUNIT_ASSERT_EQUAL(2, widget.m_NewSelectionEmited);
     CPPUNIT_ASSERT(EqualNodeSelections({}, widget.m_LastNewEmision));
     CPPUNIT_ASSERT(EqualNodeSelections({}, widget.GetSelectedNodes()));
 
     //change selection to mixed one (valid nodes and invalid ones)
     widget.SetCurrentSelection({ m_Node1, m_Node2, m_Node1_2 });
-    CPPUNIT_ASSERT_EQUAL(6, widget.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(3, widget.m_UpdateInfo);
     CPPUNIT_ASSERT_EQUAL(2, widget.m_OnNodePredicateChanged);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
-    CPPUNIT_ASSERT_EQUAL(6, widget.m_OnInternalSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(3, widget.m_OnInternalSelectionChanged);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeAddedToStorage);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
-    CPPUNIT_ASSERT_EQUAL(6, widget.m_ReviseSelectionChanged);
-    CPPUNIT_ASSERT_EQUAL(6, widget.m_AllowEmissionOfSelection);
+    CPPUNIT_ASSERT_EQUAL(3, widget.m_ReviseSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(3, widget.m_AllowEmissionOfSelection);
     CPPUNIT_ASSERT_EQUAL(3, widget.m_NewSelectionEmited);
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1, m_Node1_2 }, widget.m_LastNewEmision));
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1, m_Node1_2 }, widget.GetSelectedNodes()));
@@ -367,70 +367,70 @@ public:
     widget.SetNodePredicate(testPred);
     widget.SetDataStorage(m_DataStorage);
     widget.SetCurrentSelection({ m_Node3 });
-    CPPUNIT_ASSERT_EQUAL(3, widget.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_UpdateInfo);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnNodePredicateChanged);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
-    CPPUNIT_ASSERT_EQUAL(3, widget.m_OnInternalSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnInternalSelectionChanged);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeAddedToStorage);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
-    CPPUNIT_ASSERT_EQUAL(3, widget.m_ReviseSelectionChanged);
-    CPPUNIT_ASSERT_EQUAL(3, widget.m_AllowEmissionOfSelection);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_ReviseSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_AllowEmissionOfSelection);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_NewSelectionEmited);
     CPPUNIT_ASSERT(EqualNodeSelections({}, widget.m_LastNewEmision));
     CPPUNIT_ASSERT(EqualNodeSelections({}, widget.GetSelectedNodes()));
 
     widget.SetSelectOnlyVisibleNodes(false);
     CPPUNIT_ASSERT_EQUAL(false, widget.GetSelectOnlyVisibleNodes());
-    CPPUNIT_ASSERT_EQUAL(3, widget.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_UpdateInfo);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnNodePredicateChanged);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
-    CPPUNIT_ASSERT_EQUAL(3, widget.m_OnInternalSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnInternalSelectionChanged);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeAddedToStorage);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
-    CPPUNIT_ASSERT_EQUAL(3, widget.m_ReviseSelectionChanged);
-    CPPUNIT_ASSERT_EQUAL(4, widget.m_AllowEmissionOfSelection);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_ReviseSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_AllowEmissionOfSelection);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_NewSelectionEmited);
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node3 }, widget.m_LastNewEmision));
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node3 }, widget.GetSelectedNodes()));
 
     //change selection to mixed one (valid nodes and invalid ones)
     widget.SetCurrentSelection({ m_Node1, m_Node2, m_Node1_2 });
-    CPPUNIT_ASSERT_EQUAL(4, widget.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_UpdateInfo);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnNodePredicateChanged);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
-    CPPUNIT_ASSERT_EQUAL(4, widget.m_OnInternalSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_OnInternalSelectionChanged);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeAddedToStorage);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
-    CPPUNIT_ASSERT_EQUAL(4, widget.m_ReviseSelectionChanged);
-    CPPUNIT_ASSERT_EQUAL(5, widget.m_AllowEmissionOfSelection);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_ReviseSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_AllowEmissionOfSelection);
     CPPUNIT_ASSERT_EQUAL(2, widget.m_NewSelectionEmited);
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1, m_Node2, m_Node1_2 }, widget.m_LastNewEmision));
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1, m_Node2, m_Node1_2 }, widget.GetSelectedNodes()));
 
     //change predicate while nodes are selected
     widget.SetNodePredicate(GeneratTestPredicate("node1"));
-    CPPUNIT_ASSERT_EQUAL(5, widget.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_UpdateInfo);
     CPPUNIT_ASSERT_EQUAL(2, widget.m_OnNodePredicateChanged);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
-    CPPUNIT_ASSERT_EQUAL(5, widget.m_OnInternalSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_OnInternalSelectionChanged);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeAddedToStorage);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
-    CPPUNIT_ASSERT_EQUAL(5, widget.m_ReviseSelectionChanged);
-    CPPUNIT_ASSERT_EQUAL(6, widget.m_AllowEmissionOfSelection);
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_ReviseSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(3, widget.m_AllowEmissionOfSelection);
     CPPUNIT_ASSERT_EQUAL(2, widget.m_NewSelectionEmited);
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1, m_Node2, m_Node1_2 }, widget.m_LastNewEmision));
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1, m_Node2, m_Node1_2 }, widget.GetSelectedNodes()));
 
     widget.SetSelectOnlyVisibleNodes(true);
     CPPUNIT_ASSERT_EQUAL(true, widget.GetSelectOnlyVisibleNodes());
-    CPPUNIT_ASSERT_EQUAL(5, widget.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_UpdateInfo);
     CPPUNIT_ASSERT_EQUAL(2, widget.m_OnNodePredicateChanged);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
-    CPPUNIT_ASSERT_EQUAL(5, widget.m_OnInternalSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_OnInternalSelectionChanged);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeAddedToStorage);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
-    CPPUNIT_ASSERT_EQUAL(5, widget.m_ReviseSelectionChanged);
-    CPPUNIT_ASSERT_EQUAL(7, widget.m_AllowEmissionOfSelection);
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_ReviseSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(4, widget.m_AllowEmissionOfSelection);
     CPPUNIT_ASSERT_EQUAL(3, widget.m_NewSelectionEmited);
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1, m_Node1_2 }, widget.m_LastNewEmision));
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1, m_Node1_2 }, widget.GetSelectedNodes()));
@@ -465,6 +465,21 @@ public:
 
     widget.SetDataStorage(m_DataStorage);
     widget.SetCurrentSelection({ m_Node3 });
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodePredicateChanged);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_OnInternalSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeAddedToStorage);
+    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_ReviseSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_AllowEmissionOfSelection);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_NewSelectionEmited);
+    CPPUNIT_ASSERT(EqualNodeSelections({ m_Node3 }, widget.m_LastNewEmision));
+    CPPUNIT_ASSERT(EqualNodeSelections({ m_Node3 }, widget.GetSelectedNodes()));
+
+    widget.m_Allow = false;
+
+    widget.SetCurrentSelection({ m_Node1 });
     CPPUNIT_ASSERT_EQUAL(2, widget.m_UpdateInfo);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodePredicateChanged);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
@@ -473,21 +488,6 @@ public:
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
     CPPUNIT_ASSERT_EQUAL(2, widget.m_ReviseSelectionChanged);
     CPPUNIT_ASSERT_EQUAL(2, widget.m_AllowEmissionOfSelection);
-    CPPUNIT_ASSERT_EQUAL(1, widget.m_NewSelectionEmited);
-    CPPUNIT_ASSERT(EqualNodeSelections({ m_Node3 }, widget.m_LastNewEmision));
-    CPPUNIT_ASSERT(EqualNodeSelections({ m_Node3 }, widget.GetSelectedNodes()));
-
-    widget.m_Allow = false;
-
-    widget.SetCurrentSelection({ m_Node1 });
-    CPPUNIT_ASSERT_EQUAL(3, widget.m_UpdateInfo);
-    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodePredicateChanged);
-    CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
-    CPPUNIT_ASSERT_EQUAL(3, widget.m_OnInternalSelectionChanged);
-    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeAddedToStorage);
-    CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
-    CPPUNIT_ASSERT_EQUAL(3, widget.m_ReviseSelectionChanged);
-    CPPUNIT_ASSERT_EQUAL(3, widget.m_AllowEmissionOfSelection);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_NewSelectionEmited);
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node3 }, widget.m_LastNewEmision));
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1 }, widget.GetSelectedNodes()));
@@ -502,14 +502,14 @@ public:
 
     //Check OnNodeModified behavour without predicate
     m_Node3->SetName("NewName");
-    CPPUNIT_ASSERT_EQUAL(2, widget.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_UpdateInfo);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodePredicateChanged);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
-    CPPUNIT_ASSERT_EQUAL(2, widget.m_OnInternalSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_OnInternalSelectionChanged);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeAddedToStorage);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
-    CPPUNIT_ASSERT_EQUAL(2, widget.m_ReviseSelectionChanged);
-    CPPUNIT_ASSERT_EQUAL(3, widget.m_AllowEmissionOfSelection);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_ReviseSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_AllowEmissionOfSelection);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_NewSelectionEmited);
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node3 }, widget.m_LastNewEmision));
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node3 }, widget.GetSelectedNodes()));
@@ -519,28 +519,28 @@ public:
     m_Node3->SetName("NewName_temp");
     widget.m_Allow = true;
     m_Node3->SetName("NewName");
-    CPPUNIT_ASSERT_EQUAL(4, widget.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(3, widget.m_UpdateInfo);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodePredicateChanged);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
-    CPPUNIT_ASSERT_EQUAL(2, widget.m_OnInternalSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_OnInternalSelectionChanged);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeAddedToStorage);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
-    CPPUNIT_ASSERT_EQUAL(2, widget.m_ReviseSelectionChanged);
-    CPPUNIT_ASSERT_EQUAL(7, widget.m_AllowEmissionOfSelection);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_ReviseSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(6, widget.m_AllowEmissionOfSelection);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_NewSelectionEmited);
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node3 }, widget.m_LastNewEmision));
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node3 }, widget.GetSelectedNodes()));
 
     //change irrelevant node
     m_Node2->SetName("IrrelevantNode");
-    CPPUNIT_ASSERT_EQUAL(4, widget.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(3, widget.m_UpdateInfo);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodePredicateChanged);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
-    CPPUNIT_ASSERT_EQUAL(2, widget.m_OnInternalSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_OnInternalSelectionChanged);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeAddedToStorage);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
-    CPPUNIT_ASSERT_EQUAL(2, widget.m_ReviseSelectionChanged);
-    CPPUNIT_ASSERT_EQUAL(7, widget.m_AllowEmissionOfSelection);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_ReviseSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(6, widget.m_AllowEmissionOfSelection);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_NewSelectionEmited);
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node3 }, widget.m_LastNewEmision));
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node3 }, widget.GetSelectedNodes()));
@@ -548,14 +548,14 @@ public:
     //test with predicate set
     widget.SetNodePredicate(GeneratTestPredicate("node1"));
     m_Node3->SetName("NowAlsoIrrelevantNode");
-    CPPUNIT_ASSERT_EQUAL(5, widget.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(4, widget.m_UpdateInfo);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnNodePredicateChanged);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
-    CPPUNIT_ASSERT_EQUAL(3, widget.m_OnInternalSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_OnInternalSelectionChanged);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeAddedToStorage);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
-    CPPUNIT_ASSERT_EQUAL(3, widget.m_ReviseSelectionChanged);
-    CPPUNIT_ASSERT_EQUAL(8, widget.m_AllowEmissionOfSelection);
+    CPPUNIT_ASSERT_EQUAL(2, widget.m_ReviseSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(7, widget.m_AllowEmissionOfSelection);
     CPPUNIT_ASSERT_EQUAL(2, widget.m_NewSelectionEmited);
     CPPUNIT_ASSERT(EqualNodeSelections({ }, widget.m_LastNewEmision));
     CPPUNIT_ASSERT(EqualNodeSelections({ }, widget.GetSelectedNodes()));
@@ -564,14 +564,14 @@ public:
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1, m_Node1_2 }, widget.m_LastNewEmision));
 
     m_Node1->SetName("NodeSortedOutByPredicate");
-    CPPUNIT_ASSERT_EQUAL(7, widget.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(6, widget.m_UpdateInfo);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnNodePredicateChanged);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
-    CPPUNIT_ASSERT_EQUAL(5, widget.m_OnInternalSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(4, widget.m_OnInternalSelectionChanged);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeAddedToStorage);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
-    CPPUNIT_ASSERT_EQUAL(5, widget.m_ReviseSelectionChanged);
-    CPPUNIT_ASSERT_EQUAL(10, widget.m_AllowEmissionOfSelection);
+    CPPUNIT_ASSERT_EQUAL(4, widget.m_ReviseSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(9, widget.m_AllowEmissionOfSelection);
     CPPUNIT_ASSERT_EQUAL(4, widget.m_NewSelectionEmited);
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1_2 }, widget.m_LastNewEmision));
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1_2 }, widget.GetSelectedNodes()));
@@ -589,26 +589,26 @@ public:
     QmitkAbstractNodeSelectionWidget::connect(&widget2, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, &widget, &QmitkAbstractNodeSelectionWidget::SetCurrentSelection);
 
     widget.SetCurrentSelection({ m_Node1 });
-    CPPUNIT_ASSERT_EQUAL(2, widget.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_UpdateInfo);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodePredicateChanged);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_OnDataStorageChanged);
-    CPPUNIT_ASSERT_EQUAL(2, widget.m_OnInternalSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_OnInternalSelectionChanged);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeAddedToStorage);
     CPPUNIT_ASSERT_EQUAL(0, widget.m_OnNodeRemovedFromStorage);
-    CPPUNIT_ASSERT_EQUAL(2, widget.m_ReviseSelectionChanged);
-    CPPUNIT_ASSERT_EQUAL(2, widget.m_AllowEmissionOfSelection);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_ReviseSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(1, widget.m_AllowEmissionOfSelection);
     CPPUNIT_ASSERT_EQUAL(1, widget.m_NewSelectionEmited);
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1 }, widget.m_LastNewEmision));
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1 }, widget.GetSelectedNodes()));
 
-    CPPUNIT_ASSERT_EQUAL(2, widget2.m_UpdateInfo);
+    CPPUNIT_ASSERT_EQUAL(1, widget2.m_UpdateInfo);
     CPPUNIT_ASSERT_EQUAL(0, widget2.m_OnNodePredicateChanged);
     CPPUNIT_ASSERT_EQUAL(1, widget2.m_OnDataStorageChanged);
-    CPPUNIT_ASSERT_EQUAL(2, widget2.m_OnInternalSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(1, widget2.m_OnInternalSelectionChanged);
     CPPUNIT_ASSERT_EQUAL(0, widget2.m_OnNodeAddedToStorage);
     CPPUNIT_ASSERT_EQUAL(0, widget2.m_OnNodeRemovedFromStorage);
-    CPPUNIT_ASSERT_EQUAL(2, widget2.m_ReviseSelectionChanged);
-    CPPUNIT_ASSERT_EQUAL(2, widget2.m_AllowEmissionOfSelection);
+    CPPUNIT_ASSERT_EQUAL(1, widget2.m_ReviseSelectionChanged);
+    CPPUNIT_ASSERT_EQUAL(1, widget2.m_AllowEmissionOfSelection);
     CPPUNIT_ASSERT_EQUAL(1, widget2.m_NewSelectionEmited);
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1 }, widget2.m_LastNewEmision));
     CPPUNIT_ASSERT(EqualNodeSelections({ m_Node1 }, widget2.GetSelectedNodes()));

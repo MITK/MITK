@@ -14,8 +14,6 @@ found in the LICENSE file.
 #define MITK_UID_GENERATOR_INDCLUDED_FASAWE
 
 #include <MitkCoreExports.h>
-#include <iostream>
-#include <random>
 #include <string>
 
 namespace mitk
@@ -23,26 +21,23 @@ namespace mitk
   /*!
     \brief Generated unique IDs
 
-    Creates unique IDs from a given prefix, the current date/time and a random part. Be aware that, a length of one or
-    two might not be sufficient.
+    Creates unique IDs.
 
-    The prefix is given to the constructor, together with the desired
-    length of the random part.
-
-    The current implementation uses the time in seconds in combination with an a random part.
+    The current implementation uses the UUID specification (https://www.ietf.org/rfc/rfc4122.txt) and
+    random generator.
+    One may define a prefix for the UID string. But it is not needed do guarantee uniquness. It is
+    just a human readable addition to see for which e.g. purpose the UID was generated.
   */
   class MITKCORE_EXPORT UIDGenerator
   {
   public:
-    UIDGenerator(const char *prefix = "UID_", unsigned int lengthOfRandomPart = 8);
+    UIDGenerator(const char * prefix = "");
 
     /** @return Returns a unique ID as string. You will get another unique ID each time you call GetUID. */
     std::string GetUID();
 
   private:
     std::string m_Prefix;
-    unsigned int m_LengthOfRandomPart;
-    std::uniform_int_distribution<unsigned long int> m_Distribution;
   };
 } // namespace mitk
 

@@ -329,7 +329,7 @@ void mitk::Annotation::RegisterAsMicroservice(us::ServiceProperties props)
     m_ServiceRegistration.Unregister();
   us::ModuleContext *context = us::GetModuleContext();
   // Define ServiceProps
-  mitk::UIDGenerator uidGen = mitk::UIDGenerator("org.mitk.services.Annotation.id_", 16);
+  mitk::UIDGenerator uidGen = mitk::UIDGenerator("org.mitk.services.Annotation.id_");
   props[US_PROPKEY_ID] = uidGen.GetUID();
   m_ServiceRegistration = context->RegisterService(this, props);
 }

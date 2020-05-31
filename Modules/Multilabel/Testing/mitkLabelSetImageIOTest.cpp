@@ -88,6 +88,7 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("Error reading label set image", loadedImage.IsNotNull());
     CPPUNIT_ASSERT_MESSAGE("Error reading label set image", mitk::Equal(*multilabelImage, *loadedImage, 0.0001, true));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Error, read image has different UID", multilabelImage->GetUID(), loadedImage->GetUID());
 
     itksys::SystemTools::RemoveFile(pathToImage);
   }

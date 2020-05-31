@@ -32,6 +32,10 @@ bool mitk::BaseDataCompare::AreEqual(const BaseData *left, const BaseData *right
 
   if (AreSameClasses(left, right, verbose))
   {
+    if (left->GetUID() != right->GetUID())
+    {
+      return false;
+    }
     return InternalAreEqual(*left, *right, eps, verbose);
   }
 

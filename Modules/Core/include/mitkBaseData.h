@@ -37,6 +37,7 @@ namespace mitk
   //** but it is no guaranteed feature and also depends on the format the data is stored in
   //** as not all formats support storing of meta information. Please check the documentation
   //** of the IFileReader and IFileWriter classes to see if the ID-persistance is supported.
+  //** MITK SceneIO supports the UID persistance for all BaseData derived classes.
   //## @ingroup Data
   class MITKCORE_EXPORT BaseData
     : public itk::DataObject, public OperationActor, public Identifiable, public IPropertyOwner

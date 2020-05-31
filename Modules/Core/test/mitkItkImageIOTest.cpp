@@ -218,6 +218,8 @@ public:
         "TimeGeometries are equal.",
         mitk::Equal(*(image->GetTimeGeometry()), *(compareImage->GetTimeGeometry()), mitk::eps, true));
 
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Error, read image has different UID", image->GetUID(), compareImage->GetUID());
+
       remove(tmpFilePath.c_str());
     }
     catch (...)
@@ -261,6 +263,8 @@ public:
       // CPPUNIT_ASSERT_MESSAGE("Images are equal.", mitk::Equal(*image, *compareImage, mitk::eps, true));
       CPPUNIT_ASSERT_MESSAGE("TimeGeometries are equal.",
                              mitk::Equal(*(image->GetTimeGeometry()), *(compareImage->GetTimeGeometry()), 5e-4, true));
+
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Error, read image has different UID", image->GetUID(), compareImage->GetUID());
 
       // delete
       remove(tmpFilePath.c_str());

@@ -92,6 +92,9 @@ DataNode::Pointer SurfaceCreator::createModel()
   vtkSmartPointer<vtkPolyData> result;
 
   Image::Pointer image(dynamic_cast<Image*>(m_Input->GetData()));
+  if (!image) {
+    return nullptr;
+  }
   int minTimeStep = 0;
   int maxTimeStep = 1;
   if (image->GetDimension() > 3) {

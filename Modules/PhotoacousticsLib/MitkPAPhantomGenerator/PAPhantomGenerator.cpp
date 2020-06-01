@@ -162,7 +162,7 @@ InputParameters parseInput(int argc, char* argv[])
   }
   else
   {
-    auto uid = mitk::UIDGenerator("", 8);
+    auto uid = mitk::UIDGenerator("");
     input.identifyer = uid.GetUID();
   }
   MITK_INFO << "Parsing arguments...[Done]";

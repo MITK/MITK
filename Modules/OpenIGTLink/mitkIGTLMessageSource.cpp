@@ -106,7 +106,7 @@ void mitk::IGTLMessageSource::RegisterAsMicroservice()
   // Define ServiceProps
   us::ServiceProperties props;
   mitk::UIDGenerator uidGen =
-      mitk::UIDGenerator ("org.mitk.services.IGTLMessageSource.id_", 16);
+      mitk::UIDGenerator ("org.mitk.services.IGTLMessageSource.id_");
   props[ US_PROPKEY_ID ] = uidGen.GetUID();
   props[ US_PROPKEY_DEVICENAME ] = m_Name;
   props[ US_PROPKEY_DEVICETYPE ] = m_Type;

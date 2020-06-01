@@ -101,7 +101,7 @@ void mitk::USImageLoggingFilter::SaveImages(std::string path, std::vector<std::s
     }
 
   //generate a unique ID which is used as part of the filenames, so we avoid to overwrite old files by mistake.
-  mitk::UIDGenerator myGen = mitk::UIDGenerator("",5);
+  mitk::UIDGenerator myGen = mitk::UIDGenerator();
   std::string uniqueID = myGen.GetUID();
 
   //first: write the images

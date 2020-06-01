@@ -108,8 +108,7 @@ namespace mitk
   GetMITKRegistrationWrapper() const
   {
     map::core::RegistrationBase::Pointer spInternalResult = GetRegistration();
-    mitk::MAPRegistrationWrapper::Pointer spResult = mitk::MAPRegistrationWrapper::New();
-    spResult->SetRegistration(spInternalResult);
+    mitk::MAPRegistrationWrapper::Pointer spResult = mitk::MAPRegistrationWrapper::New(spInternalResult);
     return spResult;
   };
 
@@ -401,8 +400,7 @@ namespace mitk
       regAlg->setTargetImage(dummyImg);
       regAlg->setMovingImage(dummyImg);
 
-      mitk::MAPRegistrationWrapper::Pointer dummyReg = mitk::MAPRegistrationWrapper::New();
-      dummyReg->SetRegistration(regAlg->getRegistration());
+      mitk::MAPRegistrationWrapper::Pointer dummyReg = mitk::MAPRegistrationWrapper::New(regAlg->getRegistration());
 
       return dummyReg;
   }

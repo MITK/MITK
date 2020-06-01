@@ -61,12 +61,13 @@ namespace mitk
      *
      * \return Empty string if an object has no unique ID.
      */
-    UIDType GetUID() const;
+    virtual UIDType GetUID() const;
+
+  protected:
+    virtual void SetUID(const UIDType& uid);
 
   private:
     friend class UIDManipulator;
-
-    void SetUID(const UIDType &uid);
 
     struct Impl;
     Impl *m_Impl;

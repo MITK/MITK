@@ -13,9 +13,16 @@ found in the LICENSE file.
 #include "mitkMAPRegistrationWrapper.h"
 
 #include <mapExceptionObjectMacros.h>
+#include <mapRegistrationManipulator.h>
 
-mitk::MAPRegistrationWrapper::MAPRegistrationWrapper()
+mitk::MAPRegistrationWrapper::MAPRegistrationWrapper(map::core::RegistrationBase* registration) : m_spRegistration(registration)
 {
+  if (registration == nullptr)
+  {
+    mitkThrow() << "Error. Cannot create MAPRegistrationWrapper with invalid registration instance (nullptr).";
+  }
+
+  Identifiable::SetUID(registration->getRegistrationUID());
 }
 
 mitk::MAPRegistrationWrapper::~MAPRegistrationWrapper()
@@ -107,11 +114,6 @@ const map::core::RegistrationBase* mitk::MAPRegistrationWrapper::GetRegistration
     return m_spRegistration;
 }
 
-void mitk::MAPRegistrationWrapper::SetRegistration(map::core::RegistrationBase* pReg)
-{
-  m_spRegistration = pReg;
-}
-
 void mitk::MAPRegistrationWrapper::PrintSelf (std::ostream &os, itk::Indent indent) const
 {
     Superclass::PrintSelf(os,indent);
@@ -135,3 +137,23 @@ void mitk::MAPRegistrationWrapper::PrintSelf (std::ostream &os, itk::Indent inde
 
     }
 }
+
+void  mitk::MAPRegistrationWrapper::SetUID(const UIDType& uid)
+{
+  if (m_spRegistration.IsNull())
+  {
+    mitkThrow() << "Error. Cannot set UID. Wrapper points to invalid registration (nullptr).";
+  }
+  Identifiable::SetUID(uid);
+  ::map::core::RegistrationBaseManipulator manip(m_spRegistration);
+  manip.getTagValues()[::map::tags::RegistrationUID] = uid;
+};
+
+mitk::Identifiable::UIDType mitk::MAPRegistrationWrapper::GetUID() const
+{
+  if (m_spRegistration.IsNull())
+  {
+    mitkThrow() << "Error. Cannot return UID. Wrapper points to invalid registration (nullptr).";
+  }
+  return m_spRegistration->getRegistrationUID();
+};

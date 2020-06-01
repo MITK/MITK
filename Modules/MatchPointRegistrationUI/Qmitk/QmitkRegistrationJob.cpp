@@ -182,8 +182,7 @@ void QmitkRegistrationJob::run()
     }
     else
     {
-      mitk::MAPRegistrationWrapper::Pointer spRegWrapper = mitk::MAPRegistrationWrapper::New();
-      spRegWrapper->SetRegistration(m_spResultRegistration);
+      mitk::MAPRegistrationWrapper::Pointer spRegWrapper = mitk::MAPRegistrationWrapper::New(m_spResultRegistration);
 
       emit RegResultIsAvailable(spRegWrapper, this);
     }

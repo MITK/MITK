@@ -235,7 +235,15 @@ void mitk::BinaryThresholdULTool::CreateNewSegmentationFromThreshold(DataNode* n
 
       if (emptySegmentation)
       {
+        std::string segName = emptySegmentation->GetName();
+        std::string captionName;
+        emptySegmentation->GetStringProperty("caption", captionName);
+
         emptySegmentation->SetData(feedBackImage);
+
+        // Needed in case seg data type changed
+        emptySegmentation->SetName(segName);
+        emptySegmentation->SetStringProperty("caption", captionName.c_str());
 
         //since we are maybe working on a smaller image, pad it to the size of the original image
         if (m_OriginalImageNode.GetPointer() != m_NodeForThresholding.GetPointer())

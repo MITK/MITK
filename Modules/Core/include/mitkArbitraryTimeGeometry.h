@@ -234,7 +234,7 @@ namespace mitk
 
     /** This is a helper that indicates problematic corner cases that often occure e.g. when loading
     dynamic DICOM data. There the final time step is collapsed as min time bound and max time bound
-    have the same value. For a more detailed explination why it happens please see:
+    have the same value. For a more detailed explanation why it happens please see:
     https://phabricator.mitk.org/T24766#131411 and https://phabricator.mitk.org/T27259#203524
     */
     bool HasCollapsedFinalTimeStep() const;

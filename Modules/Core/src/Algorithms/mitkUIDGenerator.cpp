@@ -14,10 +14,14 @@ found in the LICENSE file.
 
 #include <sstream>
 
+#include <mutex>
+
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 
+boost::uuids::random_generator uuidGen;
+std::mutex uuidGen_mutex;
 
 mitk::UIDGenerator::UIDGenerator(const char *prefix)
   : m_Prefix(prefix)
@@ -27,10 +31,12 @@ mitk::UIDGenerator::UIDGenerator(const char *prefix)
 std::string mitk::UIDGenerator::GetUID()
 {
   std::ostringstream s;
-  auto gen = boost::uuids::random_generator();
-  auto uuid = gen();
 
-  s << m_Prefix << uuid;
+  {
+    std::lock_guard<std::mutex> guard(uuidGen_mutex);
+    auto uuid = uuidGen();
+    s << m_Prefix << uuid;
+  }
 
   return s.str();
 }

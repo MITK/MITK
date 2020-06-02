@@ -25,13 +25,13 @@ namespace mitk
 
     The current implementation uses the UUID specification (https://www.ietf.org/rfc/rfc4122.txt) and
     random generator.
-    One may define a prefix for the UID string. But it is not needed do guarantee uniquness. It is
-    just a human readable addition to see for which e.g. purpose the UID was generated.
+    One may define a prefix for the UID string. But it is not needed to guarantee uniquness. It is
+    just a human readable addition, e.g. to see for which purpose the UID was generated.
   */
   class MITKCORE_EXPORT UIDGenerator
   {
   public:
-    UIDGenerator(const char * prefix = "");
+    explicit UIDGenerator(const char * prefix = "");
 
     /** @return Returns a unique ID as string. You will get another unique ID each time you call GetUID. */
     std::string GetUID();

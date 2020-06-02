@@ -76,7 +76,7 @@ void mitk::NavigationDataSource::RegisterAsMicroservice(){
 
   // Define ServiceProps
   us::ServiceProperties props;
-  mitk::UIDGenerator uidGen = mitk::UIDGenerator ("org.mitk.services.NavigationDataSource.id_", 16);
+  mitk::UIDGenerator uidGen = mitk::UIDGenerator ("org.mitk.services.NavigationDataSource.id_");
   props[ US_PROPKEY_ID ] = uidGen.GetUID();
   props[ US_PROPKEY_DEVICENAME ] = m_Name;
   m_ServiceRegistration = context->RegisterService(this, props);

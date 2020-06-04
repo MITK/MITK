@@ -404,7 +404,7 @@ namespace mitk
 
   std::string IOUtil::CreateTemporaryFile(const std::string &templateName, std::string path)
   {
-    ofstream tmpOutputStream;
+    std::ofstream tmpOutputStream;
     std::string returnValue = CreateTemporaryFile(tmpOutputStream, templateName, path);
     tmpOutputStream.close();
     return returnValue;

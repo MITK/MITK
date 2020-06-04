@@ -36,6 +36,7 @@ found in the LICENSE file.
 #include <vtkPolyDataNormals.h>
 #include <vtkProperty.h>
 #include <vtkSmartPointer.h>
+#include <vtkTexture.h>
 
 const mitk::Surface *mitk::SurfaceVtkMapper3D::GetInput()
 {

@@ -104,13 +104,13 @@ namespace mitk
 
   private:
     void ReduceNumberOfPointsByNthPoint(
-      vtkIdType cellSize, vtkIdType *cell, vtkPoints *points, vtkPolygon *reducedPolygon, vtkPoints *reducedPoints);
+      vtkIdType cellSize, const vtkIdType *cell, vtkPoints *points, vtkPolygon *reducedPolygon, vtkPoints *reducedPoints);
 
     void ReduceNumberOfPointsByDouglasPeucker(
-      vtkIdType cellSize, vtkIdType *cell, vtkPoints *points, vtkPolygon *reducedPolygon, vtkPoints *reducedPoints);
+      vtkIdType cellSize, const vtkIdType *cell, vtkPoints *points, vtkPolygon *reducedPolygon, vtkPoints *reducedPoints);
 
     bool CheckForIntersection(
-      vtkIdType *currentCell,
+      const vtkIdType *currentCell,
       vtkIdType currentCellSize,
       vtkPoints *currentPoints,
       /*vtkIdType numberOfIntersections, vtkIdType* intersectionPoints,*/ unsigned int currentInputIndex);

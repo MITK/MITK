@@ -229,7 +229,7 @@ void mitk::UnstructuredGridMapper2D::Paint(mitk::BaseRenderer *renderer)
 
   for (int i = 0; i < numberOfLines; ++i)
   {
-    vtkIdType *cell(nullptr);
+    const vtkIdType *cell(nullptr);
     vtkIdType cellSize(0);
 
     vlines->GetNextCell(cellSize, cell);
@@ -303,7 +303,7 @@ void mitk::UnstructuredGridMapper2D::Paint(mitk::BaseRenderer *renderer)
 
     for (int i = 0; i < numberOfPolys; ++i)
     {
-      vtkIdType *cell(nullptr);
+      const vtkIdType *cell(nullptr);
       vtkIdType cellSize(0);
 
       vpolys->GetNextCell(cellSize, cell);
@@ -366,7 +366,7 @@ void mitk::UnstructuredGridMapper2D::Paint(mitk::BaseRenderer *renderer)
       glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
       for (int i = 0; i < numberOfPolys; ++i)
       {
-        vtkIdType *cell(nullptr);
+        const vtkIdType *cell(nullptr);
         vtkIdType cellSize(0);
 
         vpolys->GetNextCell(cellSize, cell);

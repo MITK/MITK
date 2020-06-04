@@ -349,7 +349,7 @@ void vtkApplyLookupTableOnScalars(vtkMitkLevelWindowFilter *self,
   while (!outputIt.IsAtEnd())
   {
     unsigned char *outputSI = outputIt.BeginSpan();
-    unsigned char *outputSIEnd = outputIt.EndSpan();
+    const unsigned char * const outputSIEnd = outputIt.EndSpan();
 
     // do we iterate over the inner vertical clipping bounds
     if (y >= clippingBounds[2] && y < clippingBounds[3])
@@ -365,13 +365,13 @@ void vtkApplyLookupTableOnScalars(vtkMitkLevelWindowFilter *self,
         {
           // fetching original value
           auto grayValue = static_cast<double>(*inputSI);
-          // applying lookuptable - copy the 4 (RGBA) chars as a single int
-          *reinterpret_cast<int *>(outputSI) = *reinterpret_cast<int *>(lookupTable->MapValue(grayValue));
+          // applying lookuptable
+          memcpy(outputSI, lookupTable->MapValue(grayValue), 4);
         }
         else
         {
           // outer horizontal clipping bounds - write a transparent RGBA pixel as a single int
-          *reinterpret_cast<int *>(outputSI) = 0;
+          memset(outputSI, 0, 4);
         }
 
         inputSI++;

@@ -34,8 +34,6 @@ namespace mitk
     \brief Manages and coordinates instances of mitk::Tool.
 
     \sa QmitkToolSelectionBox
-    \sa QmitkToolReferenceDataSelectionBox
-    \sa QmitkToolWorkingDataSelectionBox
     \sa Tool
     \sa QmitkSegmentationView
 

@@ -19,10 +19,7 @@ Qmitk/QmitkPixelManipulationToolGUI.cpp
 Qmitk/QmitkSlicesInterpolator.cpp
 Qmitk/QmitkToolGUI.cpp
 Qmitk/QmitkToolGUIArea.cpp
-Qmitk/QmitkToolReferenceDataSelectionBox.cpp
-Qmitk/QmitkToolRoiDataSelectionBox.cpp
 Qmitk/QmitkToolSelectionBox.cpp
-Qmitk/QmitkToolWorkingDataSelectionBox.cpp
 Qmitk/QmitkWatershedToolGUI.cpp
 #Added from ML
 Qmitk/QmitkLabelSetWidget.cpp
@@ -53,10 +50,7 @@ Qmitk/QmitkPixelManipulationToolGUI.h
 Qmitk/QmitkSlicesInterpolator.h
 Qmitk/QmitkToolGUI.h
 Qmitk/QmitkToolGUIArea.h
-Qmitk/QmitkToolReferenceDataSelectionBox.h
-Qmitk/QmitkToolRoiDataSelectionBox.h
 Qmitk/QmitkToolSelectionBox.h
-Qmitk/QmitkToolWorkingDataSelectionBox.h
 Qmitk/QmitkWatershedToolGUI.h
 #Added from ML
 Qmitk/QmitkLabelSetWidget.h

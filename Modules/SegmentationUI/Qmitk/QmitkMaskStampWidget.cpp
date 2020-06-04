@@ -24,8 +24,7 @@ QmitkMaskStampWidget::QmitkMaskStampWidget(QWidget *parent, const char * /*name*
   m_Controls.setupUi(this);
   m_Controls.m_InformationWidget->hide();
 
-  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  assert(m_ToolManager);
+  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager(mitk::ToolManagerProvider::MULTILABEL_SEGMENTATION);
   m_ToolManager->ActivateTool(-1);
 
   mitk::TNodePredicateDataType<mitk::Image>::Pointer isImage = mitk::TNodePredicateDataType<mitk::Image>::New();

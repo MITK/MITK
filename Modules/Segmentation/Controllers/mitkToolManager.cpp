@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkToolManager.h"
+#include "mitkToolManagerProvider.h"
 #include "mitkCoreObjectFactory.h"
 
 #include <itkCommand.h>
@@ -153,10 +154,22 @@ bool mitk::ToolManager::ActivateTool(int id)
 
   while (nextTool != m_ActiveToolID)
   {
-    if (m_ActiveTool)
+    // Deactivate all other active tools to ensure a globally single active tool
+    for (const auto& toolManager : ToolManagerProvider::GetInstance()->GetToolManagers())
     {
-      m_ActiveTool->Deactivated();
-      m_ActiveToolRegistration.Unregister();
+      if (nullptr != toolManager.second->m_ActiveTool)
+      {
+        toolManager.second->m_ActiveTool->Deactivated();
+        toolManager.second->m_ActiveToolRegistration.Unregister();
+
+        // The active tool of *this* ToolManager is handled below this loop
+        if (this != toolManager.second)
+        {
+          toolManager.second->m_ActiveTool = nullptr;
+          toolManager.second->m_ActiveToolID = -1;
+          toolManager.second->ActiveToolChanged.Send();
+        }
+      }
     }
 
     m_ActiveTool = GetToolById(nextTool);

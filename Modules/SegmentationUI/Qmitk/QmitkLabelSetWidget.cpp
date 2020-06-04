@@ -56,8 +56,7 @@ QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget *parent)
 
   m_ColorSequenceRainbow.GoToBegin();
 
-  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  assert(m_ToolManager);
+  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager(mitk::ToolManagerProvider::MULTILABEL_SEGMENTATION);
 
   m_Controls.m_LabelSearchBox->setAlwaysShowClearIcon(true);
   m_Controls.m_LabelSearchBox->setShowSearchIcon(true);

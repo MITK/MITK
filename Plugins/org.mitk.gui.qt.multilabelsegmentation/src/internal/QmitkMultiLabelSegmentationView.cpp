@@ -140,11 +140,10 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget *parent)
   // * ToolManager
   // *------------------------
 
-  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  assert(m_ToolManager);
+  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager(mitk::ToolManagerProvider::MULTILABEL_SEGMENTATION);
   m_ToolManager->SetDataStorage(*(this->GetDataStorage()));
   m_ToolManager->InitializeTools();
-  // use the same ToolManager instance for our 3D Tools
+  m_Controls.m_ManualToolSelectionBox2D->SetToolManager(*m_ToolManager);
   m_Controls.m_ManualToolSelectionBox3D->SetToolManager(*m_ToolManager);
 
   // *------------------------

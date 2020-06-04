@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <berryPlatform.h>
 #include <mitkIDataStorageService.h>
 #include <mitkSliceNavigationController.h>
+#include <mitkToolManagerProvider.h>
 
 static const char* const HelpText = "Select a mask above";
 
@@ -27,21 +28,15 @@ QmitkMorphologicalOperationsWidget::QmitkMorphologicalOperationsWidget(mitk::Sli
   m_Controls.m_DataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::MaskPredicate);
   m_Controls.m_DataSelectionWidget->SetHelpText(HelpText);
 
-//  mitk::IDataStorageService::Pointer service =
-//    berry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
-
-//  assert(service.IsNotNull());
-
   mitk::DataStorage::Pointer ds = m_Controls.m_DataSelectionWidget->GetDataStorage();
   m_Controls.m_LabelSetWidget->SetDataStorage(ds);
   m_Controls.m_LabelSetWidget->setEnabled(true);
 
-
+  m_Controls.m_ToolSelectionBox->SetToolManager(*mitk::ToolManagerProvider::GetInstance()->GetToolManager(mitk::ToolManagerProvider::MULTILABEL_SEGMENTATION));
   m_Controls.m_ToolSelectionBox->SetGenerateAccelerators(true);
   m_Controls.m_ToolSelectionBox->SetToolGUIArea( m_Controls.m_ToolGUIContainer );
   m_Controls.m_ToolSelectionBox->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
   m_Controls.m_ToolSelectionBox->SetDisplayedToolGroups("Median Dilate Erode Open Close 'Fill Holes' 'Keep N Largest' 'Split' 'Region Selector'");
-//  m_Controls.m_LabelSetWidget->SetDataStorage( *(this->GetDataStorage()) );
 
   connect(m_Controls.btnClosing, SIGNAL(clicked()), this, SLOT(OnClosingButtonClicked()));
   connect(m_Controls.btnOpening, SIGNAL(clicked()), this, SLOT(OnOpeningButtonClicked()));

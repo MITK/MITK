@@ -64,6 +64,7 @@ if(NOT DEFINED VTK_DIR)
       -DVTK_LEGACY_REMOVE:BOOL=ON
       -DVTK_MODULE_ENABLE_VTK_TestingRendering:STRING=YES
       -DVTK_MODULE_ENABLE_VTK_RenderingContextOpenGL2:STRING=YES
+      -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2:STRING=YES
       ${additional_cmake_args}
       ${${proj}_CUSTOM_CMAKE_ARGS}
     CMAKE_CACHE_ARGS

@@ -17,6 +17,9 @@ found in the LICENSE file.
 #include <vtkObjectFactory.h>
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
+#include <vtkAutoInit.h>
+
+VTK_MODULE_INIT(vtkRenderingVolumeOpenGL2);
 
 void mitk::VolumeMapperVtkSmart3D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
 {

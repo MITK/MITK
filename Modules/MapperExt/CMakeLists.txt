@@ -1,6 +1,6 @@
 mitk_create_module(
   DEPENDS MitkDataTypesExt MitkLegacyGL
-  PACKAGE_DEPENDS PRIVATE VTK|CommonComputationalGeometry+CommonSystem
+  PACKAGE_DEPENDS PRIVATE VTK|CommonComputationalGeometry+CommonSystem+RenderingVolumeOpenGL2
 )
 
 if(TARGET ${MODULE_TARGET})

@@ -3,6 +3,7 @@ MITK_CREATE_MODULE(
   DEPENDS MitkAlgorithmsExt MitkIpSegmentation MitkIpFunc MitkSurfaceInterpolation MitkGraphAlgorithms MitkContourModel MitkMultilabel
   PACKAGE_DEPENDS
     PUBLIC ITK|ITKBinaryMathematicalMorphology+ITKLabelVoting+ITKRegionGrowing+ITKFastMarching+ITKAnisotropicSmoothing+ITKWatersheds
+    PRIVATE VTK|ImagingGeneral
 )
 
 add_subdirectory(Testing)

@@ -7,7 +7,7 @@ endif()
 mitk_create_module(
   PACKAGE_DEPENDS
     PUBLIC CTK|CTKPluginFramework ${qt5_depends} Poco|Util
-    PRIVATE VTK
+    PRIVATE VTK|GUISupportQt
   DEPENDS
     PUBLIC qtsingleapplication
     PRIVATE MitkCore

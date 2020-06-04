@@ -1,6 +1,6 @@
 MITK_CREATE_MODULE_TESTS()
 if(TARGET ${TESTDRIVER})
-  mitk_use_modules(TARGET ${TESTDRIVER} PACKAGES VTK|vtkTestingRendering)
+  mitk_use_modules(TARGET ${TESTDRIVER} PACKAGES VTK|TestingRendering)
 
   mitkAddCustomModuleTest(mitkPlayerLoadAndRenderDepthDataTest_KinectDepthImage #testname
     mitkPlayerLoadAndRenderDepthDataTest #testclassname

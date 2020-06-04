@@ -1,5 +1,6 @@
 mitk_create_module(
   DEPENDS MitkDataTypesExt MitkLegacyGL
+  PACKAGE_DEPENDS PRIVATE VTK|CommonComputationalGeometry+CommonSystem
 )
 
 if(TARGET ${MODULE_TARGET})

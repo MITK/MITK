@@ -3,6 +3,7 @@ MITK_CREATE_MODULE(
   DEPENDS MitkCore MitkSceneSerializationBase
   PACKAGE_DEPENDS
    PUBLIC MatchPoint
+   PRIVATE VTK|ImagingGeneral+ImagingHybrid
 )
 
 if(TARGET ${MODULE_TARGET})

@@ -34,7 +34,7 @@ found in the LICENSE file.
 #include "QmitkRenderWindowMenu.h"
 
 QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const QString &name, mitk::VtkPropRenderer *)
-  : QVTKOpenGLWidget(parent)
+  : QVTKOpenGLNativeWidget(parent)
   , m_ResendQtEvents(true)
   , m_MenuWidget(nullptr)
   , m_MenuWidgetActivated(false)
@@ -44,7 +44,7 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const QString &name, mitk:
   m_InternalRenderWindow->SetMultiSamples(0);
   m_InternalRenderWindow->SetAlphaBitPlanes(0);
 
-  SetRenderWindow(m_InternalRenderWindow);
+  setRenderWindow(m_InternalRenderWindow);
 
   Initialize(name.toStdString().c_str());
 
@@ -121,9 +121,26 @@ void QmitkRenderWindow::ActivateMenuWidget(bool state)
   }
 }
 
+bool QmitkRenderWindow::event(QEvent* e)
+{
+  if (e->type() == QEvent::MouseMove ||
+    e->type() == QEvent::MouseButtonRelease ||
+    e->type() == QEvent::MouseButtonPress ||
+    e->type() == QEvent::MouseButtonDblClick)
+  {
+    auto me = static_cast<QMouseEvent*>(e);
+    if (nullptr != me)
+    {
+      emit mouseEvent(me);
+    }
+  }
+
+  return QVTKOpenGLNativeWidget::event(e);
+}
+
 void QmitkRenderWindow::moveEvent(QMoveEvent *event)
 {
-  QVTKOpenGLWidget::moveEvent(event);
+  QVTKOpenGLNativeWidget::moveEvent(event);
 
   // after a move the overlays need to be positioned
   emit moved();
@@ -131,7 +148,7 @@ void QmitkRenderWindow::moveEvent(QMoveEvent *event)
 
 void QmitkRenderWindow::showEvent(QShowEvent *event)
 {
-  QVTKOpenGLWidget::showEvent(event);
+  QVTKOpenGLNativeWidget::showEvent(event);
 
   // this singleshot is necessary to have the overlays positioned correctly after initial show
   // simple call of moved() is no use here!!
@@ -148,7 +165,7 @@ void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
 
   if (!this->HandleEvent(mPressEvent.GetPointer()))
   {
-    QVTKOpenGLWidget::mousePressEvent(me);
+    QVTKOpenGLNativeWidget::mousePressEvent(me);
   }
 
   if (m_ResendQtEvents)
@@ -165,7 +182,7 @@ void QmitkRenderWindow::mouseDoubleClickEvent(QMouseEvent *me)
 
   if (!this->HandleEvent(mPressEvent.GetPointer()))
   {
-    QVTKOpenGLWidget::mousePressEvent(me);
+    QVTKOpenGLNativeWidget::mousePressEvent(me);
   }
 
   if (m_ResendQtEvents)
@@ -182,7 +199,7 @@ void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)
 
   if (!this->HandleEvent(mReleaseEvent.GetPointer()))
   {
-    QVTKOpenGLWidget::mouseReleaseEvent(me);
+    QVTKOpenGLNativeWidget::mouseReleaseEvent(me);
   }
 
   if (m_ResendQtEvents)
@@ -202,7 +219,7 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
 
   if (!this->HandleEvent(mMoveEvent.GetPointer()))
   {
-    QVTKOpenGLWidget::mouseMoveEvent(me);
+    QVTKOpenGLNativeWidget::mouseMoveEvent(me);
   }
 }
 
@@ -214,7 +231,7 @@ void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
 
   if (!this->HandleEvent(mWheelEvent.GetPointer()))
   {
-    QVTKOpenGLWidget::wheelEvent(we);
+    QVTKOpenGLNativeWidget::wheelEvent(we);
   }
 
   if (m_ResendQtEvents)
@@ -231,7 +248,7 @@ void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
   mitk::InteractionKeyEvent::Pointer keyEvent = mitk::InteractionKeyEvent::New(m_Renderer, key, modifiers);
   if (!this->HandleEvent(keyEvent.GetPointer()))
   {
-    QVTKOpenGLWidget::keyPressEvent(ke);
+    QVTKOpenGLNativeWidget::keyPressEvent(ke);
   }
 
   if (m_ResendQtEvents)
@@ -243,7 +260,7 @@ void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
 void QmitkRenderWindow::enterEvent(QEvent *e)
 {
   // TODO implement new event
-  QVTKOpenGLWidget::enterEvent(e);
+  QVTKOpenGLNativeWidget::enterEvent(e);
 }
 
 void QmitkRenderWindow::leaveEvent(QEvent *e)
@@ -257,13 +274,13 @@ void QmitkRenderWindow::leaveEvent(QEvent *e)
     m_MenuWidget->smoothHide();
   }
 
-  QVTKOpenGLWidget::leaveEvent(e);
+  QVTKOpenGLNativeWidget::leaveEvent(e);
 }
 
 void QmitkRenderWindow::resizeGL(int w, int h)
 {
-  QVTKOpenGLWidget::resizeGL(w, h);
-  mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(GetRenderWindow());
+  QVTKOpenGLNativeWidget::resizeGL(w, h);
+  mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(renderWindow());
 }
 
 void QmitkRenderWindow::dragEnterEvent(QDragEnterEvent *event)

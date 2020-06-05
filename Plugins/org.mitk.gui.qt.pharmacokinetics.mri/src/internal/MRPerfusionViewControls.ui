@@ -99,24 +99,6 @@
        </layout>
       </widget>
      </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_4">
-       <item>
-        <widget class="QLabel" name="label_4">
-         <property name="text">
-          <string>Message</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="errorMessageLabel">
-         <property name="text">
-          <string>-</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
     </layout>
    </item>
    <item>

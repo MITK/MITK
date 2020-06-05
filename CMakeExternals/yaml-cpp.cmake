@@ -6,13 +6,15 @@ set(proj yaml-cpp)
 set(proj_DEPENDENCIES )
 set(${proj}_DEPENDS ${proj})
 
-if(NOT DEFINED yaml-cpp_DIR OR NOT EXISTS ${yaml-cpp_DIR})
-  find_package(yaml-cpp)
+find_package(${proj} 0.6.2)
+
+if(NOT EXISTS "${YAML_CPP_INCLUDE_DIR}" AND "${YAML_CPP_INCLUDE_DIR}" MATCHES .*/\.\./include)
+  string(REPLACE /../i /i YAML_CPP_INCLUDE_DIR "${YAML_CPP_INCLUDE_DIR}")
 endif()
 
-if(NOT DEFINED yaml-cpp_DIR OR NOT EXISTS ${yaml-cpp_DIR})
+if(NOT DEFINED ${proj}_DIR OR NOT EXISTS "${${proj}_DIR}")
 
-  set(additional_cmake_args )
+  set(additional_cmake_args -DYAML_BUILD_SHARED_LIBS=ON)
 
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}
@@ -32,7 +34,7 @@ if(NOT DEFINED yaml-cpp_DIR OR NOT EXISTS ${yaml-cpp_DIR})
   set(${proj}_DIR ${ep_prefix})
   mitkFunctionInstallExternalCMakeProject(${proj})
 
-else()
+elseif(NOT TARGET ${proj})
 
   mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
 

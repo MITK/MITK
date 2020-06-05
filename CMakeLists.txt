@@ -263,6 +263,7 @@ ELSE(MITK_USE_TOF_KINECTV2)
 ENDIF(MITK_USE_TOF_KINECTV2)
 
 mitkFunctionAddExternalProject(NAME tinyxml     ON  ADVANCED)
+mitkFunctionAddExternalProject(NAME yaml-cpp    ON  ADVANCED DOC "EXPERIMENTAL, superbuild only: Use yaml-cpp")
 mitkFunctionAddExternalProject(NAME GDCM        ON  ADVANCED)
 mitkFunctionAddExternalProject(NAME GLUT        OFF ADVANCED)
 mitkFunctionAddExternalProject(NAME Raptor2     OFF ADVANCED)

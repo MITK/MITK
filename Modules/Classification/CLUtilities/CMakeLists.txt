@@ -1,6 +1,6 @@
 mitk_create_module(
   DEPENDS MitkCore MitkCLCore MitkCommandLine
-  PACKAGE_DEPENDS PUBLIC Eigen
+  PACKAGE_DEPENDS PUBLIC Eigen PRIVATE VTK|FiltersStatistics
 )
 
 if(TARGET ${MODULE_TARGET})

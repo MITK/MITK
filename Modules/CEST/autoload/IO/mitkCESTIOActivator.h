@@ -33,6 +33,7 @@ namespace mitk
 
   private:
     std::unique_ptr<IFileReader> m_CESTDICOMReader;
+    std::unique_ptr<IFileReader> m_CESTDICOMManualReader;
     std::vector<mitk::CustomMimeType *> m_MimeTypes;
   };
 }

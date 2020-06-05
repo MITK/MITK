@@ -52,7 +52,7 @@ void mitk::CESTImageNormalizationFilter::GenerateData()
   resultMitkImage->SetTimeGeometry(resultTimeGeometry);
 
   resultMitkImage->SetPropertyList(this->GetInput()->GetPropertyList()->Clone());
-  resultMitkImage->GetPropertyList()->SetStringProperty(mitk::CustomTagParser::m_OffsetsPropertyName.c_str(), m_RealOffsets.c_str());
+  resultMitkImage->GetPropertyList()->SetStringProperty(mitk::CEST_PROPERTY_NAME_OFFSETS().c_str(), m_RealOffsets.c_str());
   // remove uids
   resultMitkImage->GetPropertyList()->DeleteProperty("DICOM.0008.0018");
   resultMitkImage->GetPropertyList()->DeleteProperty("DICOM.0020.000D");
@@ -68,7 +68,7 @@ std::vector<double> ExtractOffsets(const mitk::Image* image)
   {
     std::string offsets = "";
     std::vector<std::string> parts;
-    if (image->GetPropertyList()->GetStringProperty(mitk::CustomTagParser::m_OffsetsPropertyName.c_str(), offsets) && !offsets.empty())
+    if (image->GetPropertyList()->GetStringProperty(mitk::CEST_PROPERTY_NAME_OFFSETS().c_str(), offsets) && !offsets.empty())
     {
       boost::algorithm::trim(offsets);
       boost::split(parts, offsets, boost::is_any_of(" "));

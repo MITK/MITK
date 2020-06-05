@@ -14,7 +14,6 @@ found in the LICENSE file.
 
 #include <mitkProperties.h>
 #include <mitkStringProperty.h>
-#include <mitkLocaleSwitch.h>
 
 #include "mitkIPropertyPersistence.h"
 #include "usGetModuleContext.h"
@@ -60,7 +59,6 @@ namespace
 }
 
 const std::string mitk::CustomTagParser::m_CESTPropertyPrefix = "CEST.";
-const std::string mitk::CustomTagParser::m_OffsetsPropertyName = m_CESTPropertyPrefix + "Offsets";
 const std::string mitk::CustomTagParser::m_RevisionPropertyName = m_CESTPropertyPrefix + "Revision";
 const std::string mitk::CustomTagParser::m_JSONRevisionPropertyName = m_CESTPropertyPrefix + "revision_json";
 
@@ -417,27 +415,17 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
   {
     MITK_INFO << "Parsed as T1 image";
 
-    mitk::LocaleSwitch localeSwitch("C");
-
     std::stringstream trecStream;
 
     std::string trecPath = m_DicomDataPath + "/TREC.txt";
-    std::ifstream list(trecPath.c_str());
+    auto trec = ReadListFromFile(trecPath);
 
-    if (list.good())
-    {
-      std::string currentTime;
-      while (std::getline(list, currentTime))
-      {
-        trecStream << currentTime << " ";
-      }
-    }
-    else
+    if(trec.empty())
     {
       MITK_WARN << "Assumed T1, but could not load TREC at " << trecPath;
     }
 
-    results->SetStringProperty(CEST_PROPERTY_NAME_TREC().c_str(), trecStream.str().c_str());
+    results->SetStringProperty(CEST_PROPERTY_NAME_TREC().c_str(), trec.c_str());
   }
   else
   {
@@ -447,7 +435,7 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
     if (hasSamplingInformation)
     {
       std::string offsets = GetOffsetString(sampling, offset, measurements);
-      results->SetStringProperty(m_OffsetsPropertyName.c_str(), offsets.c_str());
+      results->SetStringProperty(CEST_PROPERTY_NAME_OFFSETS().c_str(), offsets.c_str());
     }
     else
     {
@@ -473,6 +461,23 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
   }
 
   return results;
+}
+
+std::string mitk::CustomTagParser::ReadListFromFile(const std::string& filePath)
+{
+  std::stringstream listStream;
+  std::ifstream list(filePath.c_str());
+  list.imbue(std::locale("C"));
+
+  if (list.good())
+  {
+    std::string currentValue;
+    while (std::getline(list, currentValue))
+    {
+      listStream << currentValue << " ";
+    }
+  }
+  return listStream.str();
 }
 
 mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomProperty(mitk::TemporoSpatialStringProperty *dicomProperty)
@@ -692,8 +697,8 @@ std::string mitk::CustomTagParser::GetRevisionAppropriateJSONString(std::string 
 
 std::string mitk::CustomTagParser::GetOffsetString(std::string samplingType, std::string offset, std::string measurements)
 {
-  mitk::LocaleSwitch localeSwitch("C");
   std::stringstream results;
+  results.imbue(std::locale("C"));
 
   std::string normalizationIndicatingOffset = "-300";
 
@@ -766,15 +771,12 @@ std::string mitk::CustomTagParser::GetOffsetString(std::string samplingType, std
   else if (samplingType == "3" || samplingType == "List")
   {
     std::string listPath = m_DicomDataPath + "/LIST.txt";
-    std::ifstream list(listPath.c_str());
 
-    if (list.good())
+    auto values = ReadListFromFile(listPath);
+
+    if (!values.empty())
     {
-      std::string currentOffset;
-      while (std::getline(list, currentOffset))
-      {
-        results << currentOffset << " ";
-      }
+      results << values;
     }
     else
     {
@@ -869,4 +871,24 @@ const std::string mitk::CEST_PROPERTY_NAME_OFFSETS()
 const std::string mitk::CEST_PROPERTY_NAME_TREC()
 {
   return std::string("CEST.TREC");
+}
+
+const std::string mitk::CEST_PROPERTY_NAME_FREQ()
+{
+  return std::string("CEST.FREQ");
+}
+
+const std::string mitk::CEST_PROPERTY_NAME_PULSEDURATION()
+{
+  return std::string("CEST.PulseDuration");
+}
+
+const std::string mitk::CEST_PROPERTY_NAME_B1Amplitude()
+{
+  return std::string("CEST.B1Amplitude");
+}
+
+const std::string mitk::CEST_PROPERTY_NAME_DutyCycle()
+{
+  return std::string("CEST.DutyCycle");
 }

@@ -78,6 +78,8 @@ namespace mitk
     /// parse the provided string and return a property list based on the closest revision parameter mapping
     mitk::PropertyList::Pointer ParseDicomPropertyString(std::string dicomPropertyString);
 
+    static std::string ReadListFromFile(const std::string& filePath);
+
     /** Extract the revision out of the passed sequenceFileName. If the file name is not a valid CEST file name
       (see rules in the class documentation) exceptions will be thrown. If the file name is valid but contains no
       revision number an empty string will be returned.
@@ -86,9 +88,6 @@ namespace mitk
 
     void SetParseStrategy(std::string parseStrategy);
     void SetRevisionMappingStrategy(std::string revisionMappingStrategy);
-
-    /// name of the property for the offsets, including normalization offsets
-    static const std::string m_OffsetsPropertyName;
 
     /// name of the property for the data acquisition revision
     static const std::string m_RevisionPropertyName;
@@ -142,6 +141,10 @@ namespace mitk
   const std::string MITKCEST_EXPORT CEST_PROPERTY_NAME_OFFSETS();
   const std::string MITKCEST_EXPORT CEST_PROPERTY_NAME_TREC();
 
+  const std::string MITKCEST_EXPORT CEST_PROPERTY_NAME_FREQ();
+  const std::string MITKCEST_EXPORT CEST_PROPERTY_NAME_PULSEDURATION();
+  const std::string MITKCEST_EXPORT CEST_PROPERTY_NAME_B1Amplitude();
+  const std::string MITKCEST_EXPORT CEST_PROPERTY_NAME_DutyCycle();
 }
 
 #endif // MITKCUSTOMTAGPARSER_H

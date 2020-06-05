@@ -13,10 +13,12 @@ found in the LICENSE file.
 #include "mitkCESTIOActivator.h"
 
 #include "mitkCESTDICOMReaderService.h"
+#include "mitkCESTGenericDICOMReaderService.h"
 
 #include <usModuleContext.h>
 
 #include "mitkCESTIOMimeTypes.h"
+#include "mitkIOMimeTypes.h"
 
 namespace mitk
 {
@@ -35,6 +37,7 @@ namespace mitk
     }
 
     m_CESTDICOMReader.reset(new CESTDICOMReaderService());
+    m_CESTDICOMManualReader.reset(new CESTDICOMManualReaderService(CustomMimeType(IOMimeTypes::DICOM_MIMETYPE()), "CEST DICOM Manual Reader"));
   }
 
   void CESTIOActivator::Unload(us::ModuleContext *) {}

@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include <iomanip>
 #include <sstream>
+#include <bitset>
 
 #include <vtkMatrix4x4.h>
 #include <vtkMatrixToLinearTransform.h>
@@ -27,6 +28,7 @@ found in the LICENSE file.
 #include "mitkRotationOperation.h"
 #include "mitkScaleOperation.h"
 #include "mitkVector.h"
+#include "mitkMatrix.h"
 
 mitk::BaseGeometry::BaseGeometry()
   : Superclass(),
@@ -1000,4 +1002,104 @@ bool mitk::Equal(const mitk::BaseGeometry::TransformType &leftHandSide,
     return false;
   }
   return true;
+}
+
+bool mitk::IsSubGeometry(const mitk::BaseGeometry& testGeo,
+  const mitk::BaseGeometry& referenceGeo,
+  ScalarType eps,
+  bool verbose)
+{
+  bool result = true;
+
+  // Compare spacings (must be equal)
+  const auto testedSpacing = testGeo.GetSpacing();
+  if (!mitk::Equal(testedSpacing, referenceGeo.GetSpacing(), eps))
+  {
+    if (verbose)
+    {
+      MITK_INFO << "[( Geometry3D )] Spacing differs.";
+      MITK_INFO << "testedGeometry is " << setprecision(12) << testedSpacing << " : referenceGeometry is "
+        << referenceGeo.GetSpacing() << " and tolerance is " << eps;
+    }
+    result = false;
+  }
+
+  // Compare ImageGeometry Flag (must be equal)
+  if (referenceGeo.GetImageGeometry() != testGeo.GetImageGeometry())
+  {
+    if (verbose)
+    {
+      MITK_INFO << "[( Geometry3D )] GetImageGeometry is different.";
+      MITK_INFO << "referenceGeo is " << referenceGeo.GetImageGeometry() << " : testGeo is "
+        << testGeo.GetImageGeometry();
+    }
+    result = false;
+  }
+
+  // Compare IndexToWorldTransform Matrix (must be equal -> same axis directions)
+  if (!Equal(*(testGeo.GetIndexToWorldTransform()), *(referenceGeo.GetIndexToWorldTransform()), eps, verbose))
+  {
+    result = false;
+  }
+
+  // Compare BoundingBoxes (must be <=, thus corners of the tests geom must be inside the reference)
+  for (int i = 0; i<8; ++i)
+  {
+    auto testCorner = testGeo.GetCornerPoint(i);
+    if (testGeo.GetImageGeometry())
+    {
+      //if it is an image geometry the upper bounds indicate the first index that is not inside
+      //the geometry. Thus we will get the lower corener of the "first" voxel outside,
+      //but we need the corner of the "last" voxel inside the test geometry.
+      //To achive that we supstract one spacing from each index elment that is constructed
+      //by an upper bound value (see implementation of BaseGeometry::GetCorner().
+      std::bitset<sizeof(int)> bs(i);
+      if (bs.test(0))
+      {
+        testCorner[2] -= testedSpacing[2];
+      }
+      if (bs.test(1))
+      {
+        testCorner[1] -= testedSpacing[1];
+      }
+      if (bs.test(2))
+      {
+        testCorner[0] -= testedSpacing[0];
+      }
+    }
+
+    if (!referenceGeo.IsInside(testCorner))
+    {
+      if (verbose)
+      {
+        MITK_INFO << "[( Geometry3D )] corner point is not inside. ";
+        MITK_INFO << "referenceGeo is " << setprecision(12) << referenceGeo << " : tested corner is "
+          << testGeo.GetCornerPoint(i);
+      }
+      result = false;
+    }
+  }
+
+  // check grid of test geometry is on the grid of the reference geometry. This important as boundingbox is
+  // only checked for containing the tested geometry, but if a corner (one is enough as we know that axis
+  // and spacing are equal) of the tested geometry is on the grid it is realy a sub geometry
+  // (as they have the same spacing and axis).
+  auto cornerOffset = testGeo.GetCornerPoint(0) - referenceGeo.GetCornerPoint(0);
+  for (unsigned int i = 0; i < 3; ++i)
+  {
+    auto pixelCountContious = cornerOffset[i] / testedSpacing[i];
+    auto pixelCount = std::round(pixelCountContious);
+    if (std::abs(pixelCount - pixelCountContious) > eps)
+    {
+      if (verbose)
+      {
+        MITK_INFO << "[( Geometry3D )] Tested geometry is not on the grid of the reference geometry. ";
+        MITK_INFO << "referenceGeo is " << setprecision(15) << referenceGeo << " : tested corner offset in pixels is "
+          << pixelCountContious << " for axis "<<i;
+      }
+      result = false;
+    }
+  }
+
+  return result;
 }

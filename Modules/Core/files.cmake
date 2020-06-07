@@ -127,6 +127,7 @@ set(CPP_FILES
   DataManagement/mitkNodePredicateProperty.cpp
   DataManagement/mitkNodePredicateDataProperty.cpp
   DataManagement/mitkNodePredicateSource.cpp
+  DataManagement/mitkNodePredicateSubGeometry.cpp
   DataManagement/mitkNumericConstants.cpp
   DataManagement/mitkPlaneGeometry.cpp
   DataManagement/mitkPlaneGeometryData.cpp

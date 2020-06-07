@@ -25,6 +25,7 @@ found in the LICENSE file.
 #include <mitkIntensityProfile.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateGeometry.h>
+#include <mitkNodePredicateSubGeometry.h>
 #include <mitkNodePredicateOr.h>
 #include <mitkNodePredicateFunction.h>
 #include <mitkSliceNavigationController.h>
@@ -332,7 +333,9 @@ void QmitkImageStatisticsView::OnButtonSelectionPressed()
 
 QmitkNodeSelectionDialog::SelectionCheckFunctionType QmitkImageStatisticsView::CheckForSameGeometry() const
 {
-  auto lambda = [](const QmitkNodeSelectionDialog::NodeList& nodes)
+  auto isMaskPredicate = mitk::GetImageStatisticsMaskPredicate();
+
+  auto lambda = [isMaskPredicate](const QmitkNodeSelectionDialog::NodeList& nodes)
   {
     if (nodes.empty())
     {
@@ -340,12 +343,12 @@ QmitkNodeSelectionDialog::SelectionCheckFunctionType QmitkImageStatisticsView::C
     }
 
     const mitk::Image* imageNodeData = nullptr;
-
     for (auto& node : nodes)
     {
-      imageNodeData = dynamic_cast<const mitk::Image*>(node->GetData());
-      if (imageNodeData)
+      auto castedData = dynamic_cast<const mitk::Image*>(node->GetData());
+      if (castedData != nullptr && !isMaskPredicate->CheckNode(node))
       {
+        imageNodeData = castedData;
         break;
       }
     }
@@ -358,27 +361,32 @@ QmitkNodeSelectionDialog::SelectionCheckFunctionType QmitkImageStatisticsView::C
     }
 
     auto imageGeoPredicate = mitk::NodePredicateGeometry::New(imageNodeData->GetGeometry());
+    auto maskGeoPredicate = mitk::NodePredicateSubGeometry::New(imageNodeData->GetGeometry());
 
     for (auto& rightNode : nodes)
     {
       if (imageNodeData != rightNode->GetData())
       {
-        bool sameGeometry = true;
+        bool validGeometry = true;
 
-        if (dynamic_cast<const mitk::Image*>(rightNode->GetData()))
+        if (isMaskPredicate->CheckNode(rightNode))
         {
-          sameGeometry = imageGeoPredicate->CheckNode(rightNode);
+          validGeometry = maskGeoPredicate->CheckNode(rightNode);
+        }
+        else if (dynamic_cast<const mitk::Image*>(rightNode->GetData()))
+        {
+          validGeometry = imageGeoPredicate->CheckNode(rightNode);
         }
         else
         {
           const mitk::PlanarFigure* planar2 = dynamic_cast<const mitk::PlanarFigure*>(rightNode->GetData());
           if (planar2)
           {
-            sameGeometry = mitk::PlanarFigureMaskGenerator::CheckPlanarFigureIsNotTilted(planar2->GetPlaneGeometry(), imageNodeData->GetGeometry());
+            validGeometry = mitk::PlanarFigureMaskGenerator::CheckPlanarFigureIsNotTilted(planar2->GetPlaneGeometry(), imageNodeData->GetGeometry());
           }
         }
 
-        if (!sameGeometry)
+        if (!validGeometry)
         {
           std::stringstream ss;
           ss << "<font class=\"warning\"><p>Invalid selection: All selected nodes must have the same geometry.</p><p>Differing node i.a.: \"";
@@ -405,11 +413,10 @@ mitk::NodePredicateBase::Pointer QmitkImageStatisticsView::GenerateROIPredicate(
   if(!m_Controls.imageNodesSelector->GetSelectedNodes().empty())
   {
     auto image = m_Controls.imageNodesSelector->GetSelectedNodes().front()->GetData();
+    auto imageGeoPredicate = mitk::NodePredicateSubGeometry::New(image->GetGeometry());
 
-    auto lambda = [image](const mitk::DataNode* node)
+    auto lambda = [image, imageGeoPredicate](const mitk::DataNode* node)
     {
-      auto imageGeoPredicate = mitk::NodePredicateGeometry::New(image->GetGeometry());
-
       bool sameGeometry = true;
 
       if (dynamic_cast<const mitk::Image*>(node->GetData()) != nullptr)

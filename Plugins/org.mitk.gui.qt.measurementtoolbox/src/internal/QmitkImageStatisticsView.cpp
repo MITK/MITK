@@ -275,14 +275,14 @@ void QmitkImageStatisticsView::OnImageSelectionChanged(QmitkAbstractNodeSelectio
   auto images = m_Controls.imageNodesSelector->GetSelectedNodesStdVector();
   m_Controls.widget_statistics->SetImageNodes(images);
 
+  m_Controls.widget_statistics->setEnabled(!images.empty());
+
+  m_Controls.roiNodesSelector->SetNodePredicate(this->GenerateROIPredicate());
+
   m_DataGenerator->SetAutoUpdate(false);
   m_DataGenerator->SetImageNodes(images);
   m_DataGenerator->Generate();
   m_DataGenerator->SetAutoUpdate(true);
-
-  m_Controls.widget_statistics->setEnabled(!images.empty());
-
-  m_Controls.roiNodesSelector->SetNodePredicate(this->GenerateROIPredicate());
 
   this->UpdateHistogramWidget();
   this->UpdateIntensityProfile();

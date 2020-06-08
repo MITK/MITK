@@ -300,8 +300,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>484</width>
-           <height>68</height>
+           <width>459</width>
+           <height>140</height>
           </rect>
          </property>
          <attribute name="label">
@@ -332,8 +332,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>484</width>
-           <height>244</height>
+           <width>158</width>
+           <height>232</height>
           </rect>
          </property>
          <attribute name="label">
@@ -369,9 +369,9 @@
          <property name="geometry">
           <rect>
            <x>0</x>
-           <y>-17</y>
-           <width>433</width>
-           <height>473</height>
+           <y>-40</y>
+           <width>449</width>
+           <height>397</height>
           </rect>
          </property>
          <attribute name="label">
@@ -408,9 +408,9 @@
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="radioButtonUsingT1">
+             <widget class="QRadioButton" name="radioButtonUsingT1viaVFA">
               <property name="text">
-               <string>Using T1 Map</string>
+               <string>Using T1 Map via Variable Flip Angle</string>
               </property>
              </widget>
             </item>
@@ -492,9 +492,9 @@
              </widget>
             </item>
             <item>
-             <widget class="QGroupBox" name="groupBox_viaT1Map">
+             <widget class="QGroupBox" name="groupBox_T1MapviaVFA">
               <property name="title">
-               <string>T1 Map Parameters:</string>
+               <string>T1 Map via Variable Flip Angle Parameters:</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_5">
                <item row="1" column="0">
@@ -527,7 +527,7 @@
                <item row="3" column="0">
                 <widget class="QLabel" name="label_8">
                  <property name="text">
-                  <string>T1 Map [ms] :</string>
+                  <string>Proton Density Weighted Image :</string>
                  </property>
                 </widget>
                </item>
@@ -539,7 +539,7 @@
                 </widget>
                </item>
                <item row="3" column="1">
-                <widget class="QmitkDataStorageComboBox" name="ComboT1Map" native="true"/>
+                <widget class="QmitkDataStorageComboBox" name="ComboPDWImage" native="true"/>
                </item>
               </layout>
              </widget>

@@ -38,4 +38,8 @@ elseif(NOT TARGET ${proj})
 
   mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
 
+else()
+
+  message("yaml-cpp found. Version:${${proj}_VERSION} ${YAML_CPP_INCLUDE_VERSION} cmake:'${${proj}_DIR}' includes:'${YAML_CPP_INCLUDE_DIR}' libs:'${YAML_CPP_LIBRARIES}'")
+
 endif()

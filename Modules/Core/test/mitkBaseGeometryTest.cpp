@@ -1333,7 +1333,6 @@ public:
   {
     CPPUNIT_ASSERT(mitk::IsSubGeometry(*aDummyGeometry, *aDummyGeometry, mitk::eps, true));
 
-    mitk::Vector3D spacing = aDummyGeometry->GetSpacing();
     for (unsigned int i = 0; i < 3; ++i)
     {
       mitk::Vector3D wrongSpacing = aDummyGeometry->GetSpacing();

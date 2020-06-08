@@ -79,7 +79,6 @@ public:
   {
     mitk::NodePredicateSubGeometry::Pointer predicate = mitk::NodePredicateSubGeometry::New(m_RefGeometry);
 
-    mitk::Vector3D spacing = m_RefGeometry->GetSpacing();
     for (unsigned int i = 0; i < 3; ++i)
     {
       mitk::Vector3D wrongSpacing = m_RefGeometry->GetSpacing();

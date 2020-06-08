@@ -165,7 +165,7 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   m_Controls.groupBoxEnhancement->hide();
   m_Controls.groupBoxTurboFlash->hide();
   m_Controls.radioButtonNoConversion->setChecked(true);
-  m_Controls.groupBox_viaT1Map->hide();
+  m_Controls.groupBox_T1MapviaVFA->hide();
 
   m_Controls.spinBox_baselineStartTimeStep->setValue(0);
   m_Controls.spinBox_baselineEndTimeStep->setValue(0);
@@ -185,15 +185,15 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls.spinBox_baselineStartTimeStep, SIGNAL(valueChanged(int)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.spinBox_baselineEndTimeStep, SIGNAL(valueChanged(int)), this, SLOT(UpdateGUIControls()));
 
-  connect(m_Controls.radioButtonUsingT1, SIGNAL(toggled(bool)), m_Controls.groupBox_viaT1Map, SLOT(setVisible(bool)));
-  connect(m_Controls.radioButtonUsingT1, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
+  connect(m_Controls.radioButtonUsingT1viaVFA, SIGNAL(toggled(bool)), m_Controls.groupBox_T1MapviaVFA, SLOT(setVisible(bool)));
+  connect(m_Controls.radioButtonUsingT1viaVFA, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.FlipangleSpinBox, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.RelaxivitySpinBox, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.TRSpinBox, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
-  m_Controls.ComboT1Map->SetDataStorage(this->GetDataStorage());
-  m_Controls.ComboT1Map->SetPredicate(m_IsNoMaskImagePredicate);
-  m_Controls.ComboT1Map->setEnabled(false);
-  connect(m_Controls.radioButtonUsingT1, SIGNAL(toggled(bool)), m_Controls.ComboT1Map, SLOT(setEnabled(bool)));
+  m_Controls.ComboPDWImage->SetDataStorage(this->GetDataStorage());
+  m_Controls.ComboPDWImage->SetPredicate(m_IsNoMaskImagePredicate);
+  m_Controls.ComboPDWImage->setEnabled(false);
+  connect(m_Controls.radioButtonUsingT1viaVFA, SIGNAL(toggled(bool)), m_Controls.ComboPDWImage, SLOT(setEnabled(bool)));
 
   UpdateGUIControls();
 }
@@ -251,8 +251,8 @@ void MRPerfusionView::UpdateGUIControls()
   m_Controls.btnModelling->setEnabled(m_selectedImage.IsNotNull()
                                       && m_selectedModelFactory.IsNotNull() && !m_FittingInProgress && CheckModelSettings());
 
-  m_Controls.spinBox_baselineStartTimeStep->setEnabled(m_Controls.radioButtonTurboFlash->isChecked() || m_Controls.radioButton_absoluteEnhancement->isChecked() || m_Controls.radioButton_relativeEnchancement->isChecked() || m_Controls.radioButtonUsingT1->isChecked());
-  m_Controls.spinBox_baselineEndTimeStep->setEnabled(m_Controls.radioButton_absoluteEnhancement->isChecked() || m_Controls.radioButton_relativeEnchancement->isChecked() || m_Controls.radioButtonUsingT1->isChecked() || m_Controls.radioButtonTurboFlash->isChecked());
+  m_Controls.spinBox_baselineStartTimeStep->setEnabled(m_Controls.radioButtonTurboFlash->isChecked() || m_Controls.radioButton_absoluteEnhancement->isChecked() || m_Controls.radioButton_relativeEnchancement->isChecked() || m_Controls.radioButtonUsingT1viaVFA->isChecked());
+  m_Controls.spinBox_baselineEndTimeStep->setEnabled(m_Controls.radioButton_absoluteEnhancement->isChecked() || m_Controls.radioButton_relativeEnchancement->isChecked() || m_Controls.radioButtonUsingT1viaVFA->isChecked() || m_Controls.radioButtonTurboFlash->isChecked());
 
 
 }
@@ -580,12 +580,12 @@ bool MRPerfusionView::CheckModelSettings() const
           ok = ok && (m_Controls.factorSpinBox->value() > 0);
           ok = ok && CheckBaselineSelectionSettings();
         }
-        else if (this->m_Controls.radioButtonUsingT1->isChecked() )
+        else if (this->m_Controls.radioButtonUsingT1viaVFA->isChecked() )
         {
           ok = ok && (m_Controls.FlipangleSpinBox->value() > 0);
           ok = ok && (m_Controls.TRSpinBox->value() > 0);
           ok = ok && (m_Controls.RelaxivitySpinBox->value() > 0);
-          ok = ok && (m_Controls.ComboT1Map->GetSelectedNode().IsNotNull());
+          ok = ok && (m_Controls.ComboPDWImage->GetSelectedNode().IsNotNull());
           ok = ok && CheckBaselineSelectionSettings();
         }
         else if (this->m_Controls.radioButtonNoConversion->isChecked())
@@ -632,12 +632,12 @@ bool MRPerfusionView::CheckModelSettings() const
         ok = ok && (m_Controls.factorSpinBox->value() > 0);
         ok = ok && CheckBaselineSelectionSettings();
       }
-      else if (this->m_Controls.radioButtonUsingT1->isChecked() )
+      else if (this->m_Controls.radioButtonUsingT1viaVFA->isChecked() )
       {
         ok = ok && (m_Controls.FlipangleSpinBox->value() > 0);
         ok = ok && (m_Controls.TRSpinBox->value() > 0);
         ok = ok && (m_Controls.RelaxivitySpinBox->value() > 0);
-        ok = ok && (m_Controls.ComboT1Map->GetSelectedNode().IsNotNull());
+        ok = ok && (m_Controls.ComboPDWImage->GetSelectedNode().IsNotNull());
         ok = ok && CheckBaselineSelectionSettings();
       }
       else if (this->m_Controls.radioButtonNoConversion->isChecked())
@@ -1197,7 +1197,7 @@ mitk::Image::Pointer MRPerfusionView::ConvertConcentrationImage(bool AIFMode)
   concentrationGen->SetisTurboFlashSequence(IsTurboFlashSequenceFlag());
   concentrationGen->SetAbsoluteSignalEnhancement(m_Controls.radioButton_absoluteEnhancement->isChecked());
   concentrationGen->SetRelativeSignalEnhancement(m_Controls.radioButton_relativeEnchancement->isChecked());
-  concentrationGen->SetUsingT1Map(m_Controls.radioButtonUsingT1->isChecked());
+  concentrationGen->SetUsingT1Map(m_Controls.radioButtonUsingT1viaVFA->isChecked());
 
   if (IsTurboFlashSequenceFlag())
   {
@@ -1216,11 +1216,11 @@ mitk::Image::Pointer MRPerfusionView::ConvertConcentrationImage(bool AIFMode)
     concentrationGen->SetBaselineEndTimeStep(m_Controls.spinBox_baselineEndTimeStep->value());
 
   }
-  else if (this->m_Controls.radioButtonUsingT1->isChecked())
+  else if (this->m_Controls.radioButtonUsingT1viaVFA->isChecked())
   {
       concentrationGen->SetRecoveryTime(m_Controls.TRSpinBox->value());
       concentrationGen->SetRelaxivity(m_Controls.RelaxivitySpinBox->value());
-      concentrationGen->SetT10Image(dynamic_cast<mitk::Image*>(m_Controls.ComboT1Map->GetSelectedNode()->GetData()));
+      concentrationGen->SetT10Image(dynamic_cast<mitk::Image*>(m_Controls.ComboPDWImage->GetSelectedNode()->GetData()));
       concentrationGen->SetBaselineStartTimeStep(m_Controls.spinBox_baselineStartTimeStep->value());
       concentrationGen->SetBaselineEndTimeStep(m_Controls.spinBox_baselineEndTimeStep->value());
       //Convert Flipangle from degree to radiant

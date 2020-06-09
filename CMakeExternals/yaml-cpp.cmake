@@ -6,7 +6,9 @@ set(proj yaml-cpp)
 set(proj_DEPENDENCIES )
 set(${proj}_DEPENDS ${proj})
 
-find_package(${proj} 0.6.2)
+if(NOT WIN32) # It is not clear what to do with installed packages for Widows, but the default method using the system registry is not suitable for Jenkins
+  find_package(${proj} 0.6.2)
+endif()
 
 if(NOT EXISTS "${YAML_CPP_INCLUDE_DIR}" AND "${YAML_CPP_INCLUDE_DIR}" MATCHES .*/\.\./include)
   string(REPLACE /../i /i YAML_CPP_INCLUDE_DIR "${YAML_CPP_INCLUDE_DIR}")

@@ -123,6 +123,7 @@ namespace Logger
       static Log& get(const std::string& src);
 
       void reinitLogger();
+      void flush();
 
       void setSource(const std::string& src);
       void setUserData(const std::string& fullName, const std::string& organization);

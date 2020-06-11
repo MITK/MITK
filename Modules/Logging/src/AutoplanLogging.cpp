@@ -263,6 +263,7 @@ namespace Logger
         % boost::log::expressions::attr<boost::uuids::uuid>("SessionTag")
         % boost::log::expressions::attr<std::string>("AdditionalField")
       );
+      sink->locked_backend()->auto_flush(true);
 
       /// Add the sink to the core
       boost::log::core::get()->add_sink(sink);
@@ -454,6 +455,12 @@ namespace Logger
   {
     dataBackend->flush();
     return dataStream->str();
+  }
+
+  void Log::flush()
+  {
+    dataBackend->flush();
+    boost::log::core::get()->flush();
   }
 
   std::string Log::getDataFromDate(std::string dateTime) const

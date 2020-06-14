@@ -228,7 +228,7 @@ void QmitkSlicesInterpolator::SetDataStorage( mitk::DataStorage::Pointer storage
       mitk::MessageDelegate1<QmitkSlicesInterpolator, const mitk::DataNode*>(this, &QmitkSlicesInterpolator::nodeRemoved)
     );
   }
-   
+
   m_DataStorage = storage;
   m_SurfaceInterpolator->SetDataStorage(storage);
 
@@ -295,6 +295,9 @@ void QmitkSlicesInterpolator::Initialize(mitk::ToolManager* toolManager, const Q
       m_ControllerToSliceObserverTag.insert(slicer, slicer->AddObserver(mitk::SliceNavigationController::GeometrySliceEvent(NULL,0), sliceChangedCommand));
     }
     ACTION_TO_SLICEDIMENSION = createActionToSliceDimension();
+
+    // Initialization call
+    OnToolManagerWorkingDataModified();
   }
 
   m_Initialized = true;
@@ -334,7 +337,7 @@ QmitkSlicesInterpolator::~QmitkSlicesInterpolator()
 
   WaitForFutures();
 
-  if (m_DataStorage.IsNotNull()) 
+  if (m_DataStorage.IsNotNull())
   {
     m_DataStorage->RemoveNodeEvent.RemoveListener(
       mitk::MessageDelegate1<QmitkSlicesInterpolator, const mitk::DataNode*>(this, &QmitkSlicesInterpolator::nodeRemoved)

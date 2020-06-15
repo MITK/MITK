@@ -33,6 +33,11 @@ namespace mitk
   //## Base of all data objects, e.g., images, contours, surfaces etc. Inherits
   //## from itk::DataObject and thus can be included in a pipeline.
   //## Inherits also from OperationActor and can be used as a destination for Undo
+  //## @remark Some derived classes may support the persistence of the Identifiable UID.
+  //** but it is no guaranteed feature and also depends on the format the data is stored in
+  //** as not all formats support storing of meta information. Please check the documentation
+  //** of the IFileReader and IFileWriter classes to see if the ID-persistance is supported.
+  //** MITK SceneIO supports the UID persistance for all BaseData derived classes.
   //## @ingroup Data
   class MITKCORE_EXPORT BaseData
     : public itk::DataObject, public OperationActor, public Identifiable, public IPropertyOwner

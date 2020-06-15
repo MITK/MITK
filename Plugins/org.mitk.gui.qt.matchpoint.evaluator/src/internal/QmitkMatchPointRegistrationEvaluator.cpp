@@ -23,7 +23,7 @@ found in the LICENSE file.
 #include "mitkRegEvaluationObject.h"
 #include "mitkRegistrationHelper.h"
 #include "mitkRegEvaluationMapper2D.h"
-#include <mitkAlgorithmHelper.h>
+#include <mitkMAPAlgorithmHelper.h>
 
 // Qmitk
 #include "QmitkRenderWindow.h"

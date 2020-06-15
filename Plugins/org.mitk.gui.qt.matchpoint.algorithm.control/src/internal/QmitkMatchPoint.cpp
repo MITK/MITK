@@ -24,7 +24,7 @@ found in the LICENSE file.
 #include <mitkImageTimeSelector.h>
 #include <mitkMAPAlgorithmInfoSelection.h>
 #include <mitkRegistrationHelper.h>
-#include <mitkAlgorithmHelper.h>
+#include <mitkMAPAlgorithmHelper.h>
 #include <mitkResultNodeGenerationHelper.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateOr.h>
@@ -485,7 +485,7 @@ void QmitkMatchPoint::ConfigureNodeSelectors()
       dimensionPredicate = mitk::NodePredicateDimension::New(2);
     }
 
-    if (mitk::MITKAlgorithmHelper::HasImageAlgorithmInterface(m_LoadedAlgorithm))
+    if (mitk::MAPAlgorithmHelper::HasImageAlgorithmInterface(m_LoadedAlgorithm))
     {
       dataPredicate = mitk::NodePredicateAnd::New(isImage, dimensionPredicate);
 
@@ -497,7 +497,7 @@ void QmitkMatchPoint::ConfigureNodeSelectors()
       m_Controls.targetNodeSelector->SetPopUpHint("Select the target image that should be used as reference for the registration.");
     }
 
-    if (mitk::MITKAlgorithmHelper::HasPointSetAlgorithmInterface(m_LoadedAlgorithm))
+    if (mitk::MAPAlgorithmHelper::HasPointSetAlgorithmInterface(m_LoadedAlgorithm))
     {
       if (dataPredicate.IsNull())
       {

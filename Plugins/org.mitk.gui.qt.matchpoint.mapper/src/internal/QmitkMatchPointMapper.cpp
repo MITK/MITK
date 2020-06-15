@@ -25,7 +25,7 @@ found in the LICENSE file.
 #include "mitkRegistrationHelper.h"
 #include <mitkResultNodeGenerationHelper.h>
 #include <mitkUIDHelper.h>
-#include <mitkAlgorithmHelper.h>
+#include <mitkMAPAlgorithmHelper.h>
 #include <mitkResultNodeGenerationHelper.h>
 #include <mitkNodePredicateFunction.h>
 #include <mitkNodePredicateOr.h>

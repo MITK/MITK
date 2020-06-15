@@ -26,6 +26,9 @@ namespace mitk
    * Instantiating this class with a given itk::ImageIOBase instance
    * will register corresponding MITK reader/writer services for that
    * ITK ImageIO object.
+   * For all ITK ImageIOs that support the serialization of MetaData
+   * (e.g. nrrd or mhd) the ItkImageIO ensures the serialization
+   * of Identification UID.
    */
   class MITKCORE_EXPORT ItkImageIO : public AbstractFileIO
   {

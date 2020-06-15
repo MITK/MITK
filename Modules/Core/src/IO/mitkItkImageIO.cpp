@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <mitkImage.h>
 #include <mitkImageReadAccessor.h>
 #include <mitkLocaleSwitch.h>
+#include <mitkUIDManipulator.h>
 
 #include <itkImage.h>
 #include <itkImageFileReader.h>
@@ -35,6 +36,7 @@ namespace mitk
   const char *const PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS = "org.mitk.timegeometry.timepoints";
   const char *const PROPERTY_KEY_TIMEGEOMETRY_TYPE = "org_mitk_timegeometry_type";
   const char *const PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS = "org_mitk_timegeometry_timepoints";
+  const char* const PROPERTY_KEY_UID = "org_mitk_uid";
 
   ItkImageIO::ItkImageIO(const ItkImageIO &other)
     : AbstractFileIO(other), m_ImageIO(dynamic_cast<itk::ImageIOBase *>(other.m_ImageIO->Clone().GetPointer()))
@@ -498,6 +500,17 @@ namespace mitk
       }
     }
 
+    // Handle UID
+    if (dictionary.HasKey(PROPERTY_KEY_UID))
+    {
+      itk::MetaDataObject<std::string>::ConstPointer uidData = dynamic_cast<const itk::MetaDataObject<std::string>*>(dictionary.Get(PROPERTY_KEY_UID));
+      if (uidData.IsNotNull())
+      {
+        mitk::UIDManipulator uidManipulator(image);
+        uidManipulator.SetUID(uidData->GetMetaDataObjectValue());
+      }
+    }
+
     MITK_INFO << "...finished!";
 
     result.push_back(image.GetPointer());
@@ -657,6 +670,9 @@ namespace mitk
 
         itk::EncapsulateMetaData<std::string>(m_ImageIO->GetMetaDataDictionary(), key, value);
       }
+
+      // Handle UID
+      itk::EncapsulateMetaData<std::string>(m_ImageIO->GetMetaDataDictionary(), PROPERTY_KEY_UID, image->GetUID());
 
       ImageReadAccessor imageAccess(image);
       LocaleSwitch localeSwitch2("C");

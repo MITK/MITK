@@ -516,6 +516,7 @@ TiXmlElement *mitk::SceneIO::SaveBaseData(BaseData *data, const std::string &fil
       break;
     }
   }
+  element->SetAttribute("UID", data->GetUID());
 
   return element;
 }

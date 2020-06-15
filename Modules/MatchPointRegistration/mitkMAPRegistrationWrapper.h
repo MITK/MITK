@@ -39,7 +39,9 @@ public:
 
   mitkClassMacro( MAPRegistrationWrapper, BaseData );
 
-  itkNewMacro( Self );
+  mitkNewMacro1Param( Self, ::map::core::RegistrationBase*);
+
+  Identifiable::UIDType GetUID() const override;
 
   /**
    * Empty implementation, since the MAPRegistrationWrapper doesn't
@@ -245,13 +247,13 @@ public:
   ::map::core::RegistrationBase* GetRegistration();
   const ::map::core::RegistrationBase* GetRegistration() const;
 
-  void SetRegistration(::map::core::RegistrationBase* pReg);
-
 protected:
     void PrintSelf (std::ostream &os, itk::Indent indent) const override;
 
-    MAPRegistrationWrapper();
+    MAPRegistrationWrapper(::map::core::RegistrationBase* registration);
     ~MAPRegistrationWrapper() override;
+
+    void SetUID(const UIDType& uid) override;
 
     ::map::core::RegistrationBase::Pointer m_spRegistration;
 

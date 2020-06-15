@@ -23,7 +23,7 @@ found in the LICENSE file.
 #include "mitkRegEvaluationObject.h"
 #include "mitkRegistrationHelper.h"
 #include "mitkRegEvaluationMapper2D.h"
-#include <mitkAlgorithmHelper.h>
+#include <mitkMAPAlgorithmHelper.h>
 #include <mitkResultNodeGenerationHelper.h>
 #include <mitkUIDHelper.h>
 
@@ -284,9 +284,8 @@ void QmitkMatchPointRegistrationManipulator::InitSession()
     m_Controls.manipulationWidget->Initialize(m_SelectedPreReg);
   }
 
-  this->m_CurrentRegistrationWrapper = mitk::MAPRegistrationWrapper::New();
   this->m_CurrentRegistration = m_Controls.manipulationWidget->GetInterimRegistration();
-  this->m_CurrentRegistrationWrapper->SetRegistration(m_CurrentRegistration);
+  this->m_CurrentRegistrationWrapper = mitk::MAPRegistrationWrapper::New(m_CurrentRegistration);
 
   this->m_Controls.comboCenter->setCurrentIndex(0);
   this->OnCenterTypeChanged(0);
@@ -401,10 +400,8 @@ void QmitkMatchPointRegistrationManipulator::OnCancelBtnPushed()
 
 void QmitkMatchPointRegistrationManipulator::OnStoreBtnPushed()
 {
-  mitk::MAPRegistrationWrapper::Pointer newRegWrapper = mitk::MAPRegistrationWrapper::New();
   map::core::RegistrationBase::Pointer newReg = this->m_Controls.manipulationWidget->GenerateRegistration();
-
-  newRegWrapper->SetRegistration(newReg);
+  auto newRegWrapper = mitk::MAPRegistrationWrapper::New(newReg);
 
   mitk::DataNode::Pointer spResultRegistrationNode = mitk::generateRegistrationResultNode(
     this->m_Controls.lbNewRegName->text().toStdString(), newRegWrapper, "org.mitk::manual_registration",

@@ -23,7 +23,7 @@ found in the LICENSE file.
 #include "mitkRegEvaluationObject.h"
 #include "mitkRegistrationHelper.h"
 #include "mitkRegEvaluationMapper2D.h"
-#include <mitkAlgorithmHelper.h>
+#include <mitkMAPAlgorithmHelper.h>
 #include <mitkResultNodeGenerationHelper.h>
 #include <mitkUIDHelper.h>
 
@@ -401,7 +401,7 @@ void QmitkMatchPointRegistrationManipulator::OnCancelBtnPushed()
 void QmitkMatchPointRegistrationManipulator::OnStoreBtnPushed()
 {
   map::core::RegistrationBase::Pointer newReg = this->m_Controls.manipulationWidget->GenerateRegistration();
-  mitk::MAPRegistrationWrapper::Pointer newRegWrapper = mitk::MAPRegistrationWrapper::New(newReg);
+  auto newRegWrapper = mitk::MAPRegistrationWrapper::New(newReg);
 
   mitk::DataNode::Pointer spResultRegistrationNode = mitk::generateRegistrationResultNode(
     this->m_Controls.lbNewRegName->text().toStdString(), newRegWrapper, "org.mitk::manual_registration",

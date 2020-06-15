@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include "mitkProgressBar.h"
 #include "mitkPropertyListDeserializer.h"
 #include "mitkSerializerMacros.h"
-#include "mitkUIDManipulator.h"
+#include <mitkUIDManipulator.h>
 #include <mitkRenderingModeProperty.h>
 
 MITK_REGISTER_SERIALIZER(SceneReaderV1)
@@ -273,7 +273,7 @@ mitk::DataNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag(TiXmlElemen
     }
 
     const char* dataUID = dataElement->Attribute("UID");
-    if (!error && dataUID && strlen(dataUID) != 0)
+    if (!error && nullptr != dataUID && 0 != strlen(dataUID))
     {
       UIDManipulator manip(node->GetData());
       manip.SetUID(dataUID);

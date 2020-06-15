@@ -38,7 +38,7 @@ found in the LICENSE file.
 
 #include "itkUnaryFunctorImageFilter.h"
 #include <mitkImageMappingHelper.h>
-#include <mitkAlgorithmHelper.h>
+#include <mitkMAPAlgorithmHelper.h>
 #include <itkImageDuplicator.h>
 
 namespace mitk

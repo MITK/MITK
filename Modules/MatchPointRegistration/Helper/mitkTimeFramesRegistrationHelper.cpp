@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <mitkImageReadAccessor.h>
 
 #include <mitkMaskedAlgorithmHelper.h>
-#include <mitkAlgorithmHelper.h>
+#include <mitkMAPAlgorithmHelper.h>
 
 mitk::Image::Pointer
 mitk::TimeFramesRegistrationHelper::GetFrameImage(const mitk::Image* image,
@@ -134,7 +134,7 @@ mitk::TimeFramesRegistrationHelper::RegistrationPointer
 mitk::TimeFramesRegistrationHelper::DoFrameRegistration(const mitk::Image* movingFrame,
     const mitk::Image* targetFrame, const mitk::Image* targetMask) const
 {
-  mitk::MITKAlgorithmHelper algHelper(m_Algorithm);
+  mitk::MAPAlgorithmHelper algHelper(m_Algorithm);
   algHelper.SetAllowImageCasting(true);
   algHelper.SetData(movingFrame, targetFrame);
 

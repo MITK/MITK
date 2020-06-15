@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef mitkAlgorithmHelper_h
-#define mitkAlgorithmHelper_h
+#ifndef mitkMAPAlgorithmHelper_h
+#define mitkMAPAlgorithmHelper_h
 
 
 //MatchPoint
@@ -30,15 +30,15 @@ found in the LICENSE file.
 namespace mitk
 {
   /*!
-    \brief MITKAlgorithmHelper
+    \brief MAPAlgorithmHelper
     \remark Current implementation is not thread-save. Just use one Helper class per registration task.
     \warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
   */
-  class MITKMATCHPOINTREGISTRATION_EXPORT MITKAlgorithmHelper
+  class MITKMATCHPOINTREGISTRATION_EXPORT MAPAlgorithmHelper
   {
   public:
 
-    MITKAlgorithmHelper(map::algorithm::RegistrationAlgorithmBase* algorithm);
+    MAPAlgorithmHelper(map::algorithm::RegistrationAlgorithmBase* algorithm);
 
     void SetData(const mitk::BaseData* moving, const mitk::BaseData* target);
 
@@ -67,12 +67,12 @@ namespace mitk
 
     mitk::MAPRegistrationWrapper::Pointer GetMITKRegistrationWrapper() const;
 
-    ~MITKAlgorithmHelper() {}
+    ~MAPAlgorithmHelper() {}
 
   private:
 
-    MITKAlgorithmHelper& operator = (const MITKAlgorithmHelper&);
-    MITKAlgorithmHelper(const MITKAlgorithmHelper&);
+    MAPAlgorithmHelper& operator = (const MAPAlgorithmHelper&);
+    MAPAlgorithmHelper(const MAPAlgorithmHelper&);
 
     /**Internal helper that casts itk images from one pixel type into an other
       (used by DoSetImages if the images have the right dimension but wrong type and AllowImageCasting is activated)*/

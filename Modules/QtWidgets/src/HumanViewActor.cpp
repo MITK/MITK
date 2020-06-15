@@ -6,6 +6,8 @@
 #include <vtkObjectFactory.h>
 #include <vtkRenderer.h>
 
+#include "HumanModel.h"
+
 vtkStandardNewMacro(HumanViewActor);
 
 const GLchar* VERTEX_SHADER =
@@ -20,7 +22,7 @@ const GLchar* VERTEX_SHADER =
 "out vec3 vec_color;"
 "void main()"
 "{"
-  "gl_Position = in_rot * vec4(in_vertex, 1.);"
+  "gl_Position = in_rot * vec4(in_vertex, .5);"
   "vec3 rot_normal = (in_rot * vec4(in_normal, 1.)).xyz;"
   "vec3 light = normalize(LIGHT_POS - in_vertex);"
   "vec_color = COLOR * max(.2,dot(rot_normal, light));"
@@ -34,57 +36,6 @@ const GLchar* FRAGMENT_SHADER =
 "{"
   "frag_color = vec4(vec_color, 1.);"
 "}";
-
-#define HUMAN_HEIGHT 1.65f/2.f
-#define HUMAN_WIDTH 0.5/2.f
-const GLfloat HUMAN_VERTS[] = {
-  // front
-  -HUMAN_WIDTH, -HUMAN_WIDTH, HUMAN_HEIGHT,
-   HUMAN_WIDTH, -HUMAN_WIDTH, HUMAN_HEIGHT,
-   HUMAN_WIDTH,  HUMAN_WIDTH, HUMAN_HEIGHT,
-  -HUMAN_WIDTH,  HUMAN_WIDTH, HUMAN_HEIGHT,
-  // back
-  -HUMAN_WIDTH, -HUMAN_WIDTH, -HUMAN_HEIGHT,
-   HUMAN_WIDTH, -HUMAN_WIDTH, -HUMAN_HEIGHT,
-   HUMAN_WIDTH,  HUMAN_WIDTH, -HUMAN_HEIGHT,
-  -HUMAN_WIDTH,  HUMAN_WIDTH, -HUMAN_HEIGHT,
-};
-#undef HUMAN_HEIGHT
-#undef HUMAN_WIDTH
-
-const GLushort HUMAN_INDICES[] = {
-  // front
-  0, 2, 1,
-  2, 0, 3,
-  // right
-  1, 6, 5,
-  6, 1, 2,
-  // back
-  7, 5, 6,
-  5, 7, 4,
-  // left
-  4, 3, 0,
-  3, 4, 7,
-  // bottom
-  4, 1, 5,
-  1, 4, 0,
-  // top
-  3, 6, 2,
-  6, 3, 7
-};
-
-const GLfloat HUMAN_NORMALS[] = {
-  // front
-  -.57735f, -.57735f, .57735f,
-  .57735f, -.57735f, .57735f,
-  .57735f,  .57735f,  .57735f,
-  -.57735f,  .57735f,  .57735f,
-  // back
-  -.57735f, -.57735f, -.57735f,
-  .57735f, -.57735f, -.57735f,
-  .57735f,  .57735f, -.57735f,
-  -.57735f,  .57735f, -.57735f
-};
 
 void compileShader(GLuint shaderId, const GLchar* source)
 {
@@ -136,19 +87,19 @@ void HumanViewActor::AllocateBuffers()
   glGenBuffers(2, m_Vbo);
 
   glBindBuffer(GL_ARRAY_BUFFER, m_Vbo[0]);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(HUMAN_VERTS), HUMAN_VERTS, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(lowHumanVertices), lowHumanVertices, GL_STATIC_DRAW);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
   glEnableVertexAttribArray(0);
 
   glBindBuffer(GL_ARRAY_BUFFER, m_Vbo[1]);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(HUMAN_NORMALS), HUMAN_NORMALS, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(lowHumanNormals), lowHumanNormals, GL_STATIC_DRAW);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
   glEnableVertexAttribArray(1);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   glGenBuffers(1, &m_Ibo);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Ibo);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(HUMAN_INDICES), HUMAN_INDICES, GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(lowHumanIndices), lowHumanIndices, GL_STATIC_DRAW);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
@@ -236,8 +187,9 @@ int HumanViewActor::RenderOverlay(vtkViewport* viewport)
   int* size = viewport->GetSize();
   glViewport(0,size[1]-100,100,100);
 
-  glDisable(GL_DEPTH_TEST);
-  glCullFace(GL_BACK);
+  glClear(GL_DEPTH_BUFFER_BIT);
+  // Blender uses cw, vtk uses ccw, can't care enough to edit normals
+  glCullFace(GL_FRONT);
   glEnable(GL_CULL_FACE);
   glUseProgram(m_Program);
 
@@ -246,7 +198,7 @@ int HumanViewActor::RenderOverlay(vtkViewport* viewport)
 
   glUniformMatrix4fv(m_ProgramRot, 1, GL_FALSE, rot);
 
-  glDrawElements(GL_TRIANGLES, sizeof(HUMAN_INDICES) / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
+  glDrawElements(GL_TRIANGLES, NUM_LOWHUMAN_OBJECT_INDEX, GL_UNSIGNED_SHORT, 0);
 
   glDisable(GL_CULL_FACE);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

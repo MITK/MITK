@@ -74,6 +74,7 @@ set(MOC_H_FILES
   include/QmitkPropertyItemModel.h
   include/mitkCrosshairManager.h
   include/HumanViewActor.h
+  include/HumanModel.h
 )
 
 set(UI_FILES

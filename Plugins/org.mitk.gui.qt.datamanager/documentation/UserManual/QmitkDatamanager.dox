@@ -52,14 +52,6 @@ There are several ways of saving data from the Datamanager:
 	<li> use <em>File -> Save...</em> from the top menu on multiple data nodes
 </ul>
 
-There are two ways of saving a whole whole project with all data nodes:
-<ul>
-	<li> use the <em>Save Project</em> Button in the left upper corner
-	<li> use <em>File -> Save Project...</em> from the top menu
-</ul>
-
-When saving the whole project, the order / hierarchy of data nodes is saved as well. By contrast the order / hierarchy is lost, when saving a single data node.
-
 \section DataManagerWorking Working with the Datamanager
 
 After loading data into the Datamanager the data appears as data nodes in a sorted list inside the Datamanager.
@@ -184,14 +176,14 @@ The user can customize the hotkeys by accessing the <em>preference page</em>:
   <li> <em>Global reinit</em> Re-initializes the render windows to the common bounding box of all data nodes of the data storage that
     <ul>
       <li> have not set <tt>"includeInBoundingBox"</tt> to false
-      <li> are <tt>"visible"</tt>.
+      <li> are <tt>"visible"</tt>
     </ul>
     In this case it does not matter on which node this action is performed.
   <li> <em>Make all nodes invisible</em> Hides all data nodes of the data storage.
   <li> <em>Reinit selected nodes</em> Re-initializes the render windows to the common bounding box of all selected data nodes of the data storage that
     <ul>
       <li> have not set <tt>"includeInBoundingBox"</tt> to false
-      <li> are <tt>"visible"</tt>.
+      <li> are <tt>"visible"</tt>
     </ul>
   <li> <em>Show node information</em> Opens a pop-up window with detailed information about each node, like data type, geometry, DICOM information, file path etc.
   <li> <em>Toggle visibility of selected nodes</em>: Shows / hides each selected data node according to each node's current visibility state.

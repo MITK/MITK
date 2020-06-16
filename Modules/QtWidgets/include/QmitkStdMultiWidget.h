@@ -42,6 +42,7 @@ class QmitkLevelWindowWidget;
 class QmitkRenderWindow;
 class vtkCornerAnnotation;
 class vtkMitkRectangleProp;
+class HumanViewActor;
 
 namespace mitk {
   class RenderingManager;
@@ -168,6 +169,8 @@ protected:
   bool m_displayPatientInfoEx;
   bool m_displayPositionInfo;
   bool m_displayDirectionOnly;
+
+  HumanViewActor* m_HumanActor;
 
   void UpdateAllWidgets();
   void HideAllWidgetToolbars();

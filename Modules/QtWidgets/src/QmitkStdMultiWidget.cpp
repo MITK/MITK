@@ -2421,6 +2421,13 @@ void QmitkStdMultiWidget::ActivateMenuWidget( bool state )
   mitkWidget2->ActivateMenuWidget( state, this );
   mitkWidget3->ActivateMenuWidget( state, this );
   mitkWidget4->ActivateMenuWidget( state, this );
+
+  if (state) {
+    mitkWidget1->LayoutDesignListChanged(m_Layout);
+    mitkWidget2->LayoutDesignListChanged(m_Layout);
+    mitkWidget3->LayoutDesignListChanged(m_Layout);
+    mitkWidget4->LayoutDesignListChanged(m_Layout);
+  }
 }
 
 bool QmitkStdMultiWidget::IsMenuWidgetEnabled() const

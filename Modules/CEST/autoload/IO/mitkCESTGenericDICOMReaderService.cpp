@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "mitkCESTGenericDICOMReaderService.h"
 
 #include "mitkIOMimeTypes.h"
+#include <mitkExtractCESTOffset.h>
 #include <mitkCustomTagParser.h>
 #include <mitkDICOMDCMTKTagScanner.h>
 #include <mitkDICOMFileReaderSelector.h>
@@ -232,6 +233,30 @@ namespace mitk
       }
 
       auto image = dynamic_cast<mitk::Image*>(item.GetPointer());
+
+      if (isCEST)
+      {
+        try
+        {
+          auto offsets = ExtractCESTOffset(image);
+        }
+        catch (...)
+        {
+          mitkThrow() << "Cannot load CEST file. Number of CEST offsets do not equal the number of image time steps. Image time steps: " << image->GetTimeSteps() << "; offset values: " << offsetValues;
+        }
+      }
+      else if (isT1)
+      {
+        try
+        {
+          auto t1s = ExtractCESTT1Time(image);
+        }
+        catch (...)
+        {
+          mitkThrow() << "Cannot load T1 file. Number of T1 times do not equal the number of image time steps. Image time steps: " << image->GetTimeSteps() << "; T1 values: " << trecValues;
+        }
+      }
+
       if (normalizationStrategy == "Automatic" && mitk::IsNotNormalizedCESTImage(image))
       {
         MITK_INFO << "Unnormalized CEST image was loaded and will be normalized automatically.";

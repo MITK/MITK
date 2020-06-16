@@ -18,7 +18,6 @@ found in the LICENSE file.
 #include <usModuleContext.h>
 
 #include "mitkCESTIOMimeTypes.h"
-#include "mitkIOMimeTypes.h"
 
 namespace mitk
 {
@@ -28,19 +27,30 @@ namespace mitk
     props[us::ServiceConstants::SERVICE_RANKING()] = 10;
 
     m_MimeTypes = mitk::MitkCESTIOMimeTypes::Get();
-    for (std::vector<mitk::CustomMimeType *>::const_iterator mimeTypeIter = m_MimeTypes.begin(),
-                                                             iterEnd = m_MimeTypes.end();
-         mimeTypeIter != iterEnd;
-         ++mimeTypeIter)
+    for (auto& mimeType : m_MimeTypes)
     {
-      context->RegisterService(*mimeTypeIter, props);
+      if (mimeType->GetName() == mitk::MitkCESTIOMimeTypes::CEST_DICOM_WITHOUT_META_FILE_NAME())
+      { // "w/o meta" mimetype should only registered with low priority.
+        context->RegisterService(mimeType);
+      }
+      else
+      {
+        context->RegisterService(mimeType, props);
+      }
     }
 
     m_CESTDICOMReader.reset(new CESTDICOMReaderService());
-    m_CESTDICOMManualReader.reset(new CESTDICOMManualReaderService(CustomMimeType(IOMimeTypes::DICOM_MIMETYPE()), "CEST DICOM Manual Reader"));
+    m_CESTDICOMManualWithMetaFileReader.reset(new CESTDICOMManualReaderService(MitkCESTIOMimeTypes::CEST_DICOM_WITH_META_FILE_MIMETYPE(), "CEST DICOM Manual Reader"));
+    m_CESTDICOMManualWithOutMetaFileReader.reset(new CESTDICOMManualReaderService(MitkCESTIOMimeTypes::CEST_DICOM_WITHOUT_META_FILE_MIMETYPE(), "CEST DICOM Manual Reader"));
   }
 
-  void CESTIOActivator::Unload(us::ModuleContext *) {}
+  void CESTIOActivator::Unload(us::ModuleContext *)
+  {
+    for (auto& elem : m_MimeTypes)
+    {
+      delete elem;
+    }
+  }
 }
 
 US_EXPORT_MODULE_ACTIVATOR(mitk::CESTIOActivator)

@@ -23,7 +23,7 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  IOMimeTypes::DicomMimeType::DicomMimeType() : CustomMimeType(DICOM_MIMETYPE_NAME())
+  IOMimeTypes::BaseDicomMimeType::BaseDicomMimeType(const std::string& name) : CustomMimeType(name)
   {
     this->AddExtension("gdcm");
     this->AddExtension("dcm");
@@ -37,7 +37,11 @@ namespace mitk
     this->SetComment("DICOM");
   }
 
-  bool IOMimeTypes::DicomMimeType::AppliesTo(const std::string &path) const
+  IOMimeTypes::BaseDicomMimeType::BaseDicomMimeType(const BaseDicomMimeType& other) : CustomMimeType(other.GetName())
+  {
+  }
+
+  bool IOMimeTypes::BaseDicomMimeType::AppliesTo(const std::string &path) const
   {
     // check whether directory or file
     // if directory try to find first file within it instead
@@ -85,7 +89,14 @@ namespace mitk
     }
   }
 
-  IOMimeTypes::DicomMimeType *IOMimeTypes::DicomMimeType::Clone() const { return new DicomMimeType(*this); }
+  IOMimeTypes::BaseDicomMimeType*IOMimeTypes::BaseDicomMimeType::Clone() const { return new BaseDicomMimeType(*this); }
+
+  IOMimeTypes::DicomMimeType::DicomMimeType() : BaseDicomMimeType(DICOM_MIMETYPE_NAME())
+  {
+  }
+
+  IOMimeTypes::DicomMimeType* IOMimeTypes::DicomMimeType::Clone() const { return new DicomMimeType(*this); }
+
   std::vector<CustomMimeType *> IOMimeTypes::Get()
   {
     std::vector<CustomMimeType *> mimeTypes;

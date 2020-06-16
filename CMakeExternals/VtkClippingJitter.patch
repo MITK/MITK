@@ -1,0 +1,36 @@
+diff --git a/Rendering/VolumeOpenGL2/vtkVolumeShaderComposer.h b/Rendering/VolumeOpenGL2/vtkVolumeShaderComposer.h
+index bef04fb..ddb9fb9 100644
+--- a/Rendering/VolumeOpenGL2/vtkVolumeShaderComposer.h
++++ b/Rendering/VolumeOpenGL2/vtkVolumeShaderComposer.h
+@@ -1918,6 +1918,15 @@ namespace vtkvolume
+       \n        {\
+       \n        newObjDataPos /= newObjDataPos.w;\
+       \n        }\
++      \n\
++      \n      bool stop = any(greaterThan(newObjDataPos, in_texMax)) ||\
++      \n        any(lessThan(newObjDataPos, in_texMin));\
++      \n      if (stop)\
++      \n        {\
++      \n        // The ray exits the bounding box before ever intersecting the plane (only\
++      \n        // the clipped space is hit).\
++      \n        discard;\
++      \n        }\
+       \n      if (in_useJittering)\
+       \n        {\
+       \n        g_dataPos = newObjDataPos.xyz + g_rayJitter;\
+@@ -1927,15 +1936,6 @@ namespace vtkvolume
+       \n        g_dataPos = newObjDataPos.xyz + g_dirStep;\
+       \n        }\
+       \n\
+-      \n      bool stop = any(greaterThan(g_dataPos, in_texMax)) ||\
+-      \n        any(lessThan(g_dataPos, in_texMin));\
+-      \n      if (stop)\
+-      \n        {\
+-      \n        // The ray exits the bounding box before ever intersecting the plane (only\
+-      \n        // the clipped space is hit).\
+-      \n        discard;\
+-      \n        }\
+-      \n\
+       \n      bool behindGeometry = dot(terminatePointObj.xyz - planeOrigin.xyz, normalizedPlaneNormal) < 0.0;\
+       \n      if (behindGeometry)\
+       \n        {\

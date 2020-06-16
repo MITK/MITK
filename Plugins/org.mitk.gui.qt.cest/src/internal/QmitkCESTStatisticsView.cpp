@@ -198,7 +198,7 @@ void QmitkCESTStatisticsView::OnSelectionChanged(berry::IWorkbenchPart::Pointer 
       m_Controls.labelWarning->setVisible(false);
 
       bool zSpectrumSet = SetZSpectrum(dynamic_cast<mitk::StringProperty *>(
-        node->GetData()->GetProperty(mitk::CustomTagParser::m_OffsetsPropertyName.c_str()).GetPointer()));
+        node->GetData()->GetProperty(mitk::CEST_PROPERTY_NAME_OFFSETS().c_str()).GetPointer()));
 
       atLeastOneWasCESTImage = atLeastOneWasCESTImage || zSpectrumSet;
 
@@ -793,7 +793,7 @@ void QmitkCESTStatisticsView::OnSliceChanged()
     {
       m_Controls.labelWarning->setVisible(false);
       bool zSpectrumSet = SetZSpectrum(dynamic_cast<mitk::StringProperty *>(
-        node->GetData()->GetProperty(mitk::CustomTagParser::m_OffsetsPropertyName.c_str()).GetPointer()));
+        node->GetData()->GetProperty(mitk::CEST_PROPERTY_NAME_OFFSETS().c_str()).GetPointer()));
 
       if (zSpectrumSet)
       {

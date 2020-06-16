@@ -71,7 +71,7 @@ void QmitkCESTNormalizeView::OnNormalizeButtonClicked()
     }
 
     std::string offsetsStr = "";
-    bool hasOffsets = selectedImage->GetPropertyList()->GetStringProperty(mitk::CustomTagParser::m_OffsetsPropertyName.c_str(), offsetsStr);
+    bool hasOffsets = selectedImage->GetPropertyList()->GetStringProperty(mitk::CEST_PROPERTY_NAME_OFFSETS().c_str(), offsetsStr);
     if (!hasOffsets)
     {
       QMessageBox::information(nullptr, "CEST normalization", "Selected image was missing CEST offset information.");

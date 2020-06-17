@@ -127,7 +127,7 @@ protected:
   /** Returns the current input image. If a current fit is set it will be its input image.
    * Otherwise it will be the image stored in the currently selected node. If the node is not set, contains no image
    * or the image is not 4D, NULL will be returned.*/
-  mitk::Image::Pointer GetCurrentInputImage() const;
+  mitk::Image::ConstPointer GetCurrentInputImage() const;
 
   /** Returns the variable/time grid of the GetCurrentInputImage(). If a model fit is selected its provider will be used
    to get the correct grid, otherwise just a simple time grid will be extracted.*/

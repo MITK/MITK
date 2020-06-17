@@ -245,7 +245,7 @@ void ModelFitInspectorView::OnFullPlotClicked(bool checked)
 
 int ModelFitInspectorView::ActualizeFitSelectionWidget()
 {
-  mitk::NodeUIDType selectedFitUD = "";
+  mitk::modelFit::ModelFitInfo::UIDType selectedFitUD = "";
   bool isModelFitNode = this->m_currentSelectedNode->GetData()->GetPropertyList()->GetStringProperty(
     mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str(), selectedFitUD);
 
@@ -323,7 +323,7 @@ void ModelFitInspectorView::OnInputChanged(const QList<mitk::DataNode::Pointer>&
 
       this->m_currentSelectedNode = nodes.front();
 
-      mitk::NodeUIDType selectedFitUD = "";
+      mitk::modelFit::ModelFitInfo::UIDType selectedFitUD = "";
       bool isModelFitNode = this->m_currentSelectedNode->GetData()->GetPropertyList()->GetStringProperty(
                               mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str(), selectedFitUD);
 
@@ -409,14 +409,14 @@ void ModelFitInspectorView::ValidateAndSetCurrentPosition()
     m_currentPositionTime.Modified();
     m_validSelectedPosition = false;
 
-    mitk::Image::Pointer inputImage = this->GetCurrentInputImage();
+    auto inputImage = this->GetCurrentInputImage();
 
     if (inputImage.IsNull())
     {
       return;
     }
 
-    mitk::BaseGeometry::Pointer geometry = inputImage->GetTimeGeometry()->GetGeometryForTimeStep(
+    mitk::BaseGeometry::ConstPointer geometry = inputImage->GetTimeGeometry()->GetGeometryForTimeStep(
       m_currentSelectedTimeStep);
 
     // check for invalid time step
@@ -435,9 +435,9 @@ void ModelFitInspectorView::ValidateAndSetCurrentPosition()
   }
 }
 
-mitk::Image::Pointer  ModelFitInspectorView::GetCurrentInputImage() const
+mitk::Image::ConstPointer  ModelFitInspectorView::GetCurrentInputImage() const
 {
-  mitk::Image::Pointer result = nullptr;
+  mitk::Image::ConstPointer result = nullptr;
 
   if (this->m_currentFit.IsNotNull())
   {

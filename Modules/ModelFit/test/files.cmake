@@ -7,7 +7,6 @@ SET(MODULE_TESTS
   mitkROIBasedParameterFitImageGeneratorTest.cpp
   mitkMaskedDynamicImageStatisticsGeneratorTest.cpp
   mitkModelFitInfoTest.cpp
-  mitkModelFitUIDHelperTest.cpp
   mitkModelFitStaticParameterMapTest.cpp
   mitkSimpleBarrierConstraintCheckerTest.cpp
   mitkMVConstrainedCostFunctionDecoratorTest.cpp

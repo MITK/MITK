@@ -250,8 +250,7 @@ CalcSignalFromFunction(const mitk::Point3D& position, const mitk::modelFit::Mode
     mitkThrow() << "Cannot calc model curve from function for given fit. Passed ModelFitInfo instance is nullptr.";
   }
 
-  mitk::Image::Pointer inputImage = fitInfo->inputImage;
-  assert(inputImage.IsNotNull());
+  assert(fitInfo->inputImage.IsNotNull());
 
   mitk::PlotDataCurve::Pointer result = mitk::PlotDataCurve::New();
   mitk::PlotDataCurve::ValuesType values;
@@ -259,7 +258,7 @@ CalcSignalFromFunction(const mitk::Point3D& position, const mitk::modelFit::Mode
 
   // Calculate index
   ::itk::Index<3> index;
-  mitk::BaseGeometry::Pointer geometry = inputImage->GetTimeGeometry()->GetGeometryForTimeStep(0);
+  mitk::BaseGeometry::Pointer geometry = fitInfo->inputImage->GetTimeGeometry()->GetGeometryForTimeStep(0);
 
   geometry->WorldToIndex(position, index);
 
@@ -307,12 +306,11 @@ CalcSignalFromModel(const mitk::Point3D& position, const mitk::modelFit::ModelFi
     parameterizer = mitk::ModelGenerator::GenerateModelParameterizer(*fitInfo);
   }
 
-  mitk::Image::Pointer inputImage = fitInfo->inputImage;
-  assert(inputImage.IsNotNull());
+  assert(fitInfo->inputImage.IsNotNull());
 
   // Calculate index
   ::itk::Index<3> index;
-  mitk::BaseGeometry::Pointer geometry = inputImage->GetTimeGeometry()->GetGeometryForTimeStep(0);
+  mitk::BaseGeometry::Pointer geometry = fitInfo->inputImage->GetTimeGeometry()->GetGeometryForTimeStep(0);
 
   geometry->WorldToIndex(position, index);
 

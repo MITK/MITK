@@ -24,7 +24,6 @@ found in the LICENSE file.
 #include <mitkImageTimeSelector.h>
 #include <mitkImageCast.h>
 #include <mitkPreferenceListReaderOptionsFunctor.h>
-#include <mitkModelFitUIDHelper.h>
 
 #include <mitkConcentrationCurveGenerator.h>
 
@@ -234,7 +233,6 @@ void doConversion()
 
     mitk::Image::Pointer concentrationImage = concentrationGen->GetConvertedImage();
 
-    mitk::EnsureModelFitUID(concentrationImage);
     mitk::IOUtil::Save(concentrationImage, outFileName);
 
     std::cout << "Store result: " << outFileName << std::endl;

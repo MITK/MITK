@@ -727,7 +727,7 @@ void MRPerfusionView::GenerateDescriptiveBrixModel_PixelBased(mitk::modelFit::Mo
   if (m_selectedMask.IsNotNull())
   {
     fitGenerator->SetMask(m_selectedMask);
-    roiUID = mitk::EnsureModelFitUID(this->m_selectedMaskNode);
+    roiUID = m_selectedMask->GetUID();
   }
 
   fitGenerator->SetDynamicImage(m_selectedImage);
@@ -780,7 +780,7 @@ void MRPerfusionView::GenerateDescriptiveBrixModel_ROIBased(mitk::modelFit::Mode
 
   generator = fitGenerator.GetPointer();
 
-  std::string roiUID = mitk::EnsureModelFitUID(this->m_selectedMaskNode);
+  std::string roiUID = this->m_selectedMask->GetUID();
 
   //Create model info
   modelFitInfo = mitk::modelFit::CreateFitInfoFromModelParameterizer(modelParameterizer,
@@ -817,7 +817,7 @@ void MRPerfusionView::GenerateLinearModelFit_PixelBased(mitk::modelFit::ModelFit
   if (m_selectedMask.IsNotNull())
   {
     fitGenerator->SetMask(m_selectedMask);
-    roiUID = mitk::EnsureModelFitUID(this->m_selectedMaskNode);
+    roiUID = this->m_selectedMask->GetUID();
   }
 
   fitGenerator->SetDynamicImage(m_selectedImage);
@@ -868,7 +868,7 @@ void MRPerfusionView::GenerateLinearModelFit_ROIBased(mitk::modelFit::ModelFitIn
 
   generator = fitGenerator.GetPointer();
 
-  std::string roiUID = mitk::EnsureModelFitUID(this->m_selectedMaskNode);
+  std::string roiUID = this->m_selectedMask->GetUID();
 
   //Create model info
   modelFitInfo = mitk::modelFit::CreateFitInfoFromModelParameterizer(modelParameterizer,
@@ -924,7 +924,7 @@ void MRPerfusionView::GenerateAIFbasedModelFit_PixelBased(mitk::modelFit::ModelF
   if (m_selectedMask.IsNotNull())
   {
     fitGenerator->SetMask(m_selectedMask);
-    roiUID = mitk::EnsureModelFitUID(this->m_selectedMaskNode);
+    roiUID = this->m_selectedMask->GetUID();
   }
 
   fitGenerator->SetDynamicImage(this->m_inputImage);
@@ -1005,7 +1005,7 @@ void MRPerfusionView::GenerateAIFbasedModelFit_ROIBased(
 
   generator = fitGenerator.GetPointer();
 
-  std::string roiUID = mitk::EnsureModelFitUID(this->m_selectedMaskNode);
+  std::string roiUID = this->m_selectedMask->GetUID();
 
   //Create model info
   modelFitInfo = mitk::modelFit::CreateFitInfoFromModelParameterizer(modelParameterizer,
@@ -1172,8 +1172,6 @@ mitk::DataNode::Pointer MRPerfusionView::GenerateConcentrationNode(mitk::Image* 
   result->SetData(image);
   result->SetName(nodeName);
   result->SetVisibility(true);
-
-  mitk::EnsureModelFitUID(result);
 
   return result;
 };
@@ -1380,8 +1378,6 @@ void MRPerfusionView::PrepareConcentrationImage()
 
   m_inputImage = concentrationImage;
   m_inputNode = concentrationNode;
-
-  mitk::EnsureModelFitUID(concentrationNode);
 }
 
 void MRPerfusionView::PrepareAIFConcentrationImage()
@@ -1420,8 +1416,6 @@ void MRPerfusionView::PrepareAIFConcentrationImage()
 
   m_inputAIFImage = concentrationImage;
   m_inputAIFNode = concentrationNode;
-
-  mitk::EnsureModelFitUID(concentrationNode);
 }
 
 

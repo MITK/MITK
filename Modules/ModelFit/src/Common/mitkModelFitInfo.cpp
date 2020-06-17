@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include "mitkModelFitInfo.h"
 #include "mitkScalarListLookupTableProperty.h"
 #include "mitkModelFitException.h"
+#include "mitkModelFitResultRelationRule.h"
 
 void mitk::modelFit::ModelFitInfo::AddParameter(Parameter::Pointer p)
 {
@@ -214,28 +215,24 @@ mitk::modelFit::CreateFitInfoFromNode(const ModelFitInfo::UIDType& uid,
   }
 
   //fit input and ROI
-  try
-  {
-    fit->inputUID = GetMandatoryProperty(node,
-                                         mitk::ModelFitConstants::FIT_INPUT_IMAGEUID_PROPERTY_NAME());
-  }
-  catch (const ModelFitException& e)
-  {
-    MITK_ERROR << e.what();
-    return nullptr;
-  }
-
   if (storage)
   {
-    mitk::DataNode::Pointer inputNode = GetNodeByModelFitUID(storage, fit->inputUID);
-
-    if (inputNode.IsNull())
+    auto inputRule = ModelFitResultRelationRule::New();
+    auto inputPredicate = inputRule->GetDestinationsDetector(node);
+    auto inputNodes = storage->GetSubset(inputPredicate);
+    if (inputNodes->empty())
     {
-      MITK_ERROR << "Cannot create valid model fit info. input node cannot be found.";
+      MITK_ERROR << "Cannot create valid model fit info. Input node cannot be found.";
       return nullptr;
     }
+    if (inputNodes->size()>1)
+    {
+      MITK_WARN << "More then one node found as input node. This could indicate an invalid state as only one input node should be present. Used first found input node.";
+    }
 
-    mitk::Image::Pointer inputImage = dynamic_cast<mitk::Image*>(inputNode->GetData());
+    auto inputNode = inputNodes->front();
+
+    mitk::Image::ConstPointer inputImage = dynamic_cast<const mitk::Image*>(inputNode->GetData());
 
     if (inputImage.IsNull())
     {
@@ -261,7 +258,7 @@ mitk::modelFit::CreateFitInfoFromNode(const ModelFitInfo::UIDType& uid,
 mitk::modelFit::ModelFitInfo::Pointer
 mitk::modelFit::CreateFitInfoFromModelParameterizer(const ModelParameterizerBase* usedParameterizer,
 mitk::BaseData* inputImage, const std::string& fitType, const std::string& fitName,
-    const NodeUIDType roiUID)
+    const ModelFitInfo::UIDType& roiUID)
 {
   if (!usedParameterizer)
   {
@@ -276,7 +273,6 @@ mitk::BaseData* inputImage, const std::string& fitType, const std::string& fitNa
   fit->fitType = fitType;
   fit->fitName = fitName;
   fit->inputImage = dynamic_cast<Image*>(inputImage);
-  fit->inputUID = EnsureModelFitUID(inputImage);
 
   if (fit->inputImage.IsNull())
   {
@@ -379,7 +375,7 @@ mitk::BaseData* inputImage, const std::string& fitType, const std::string& fitNa
 mitk::modelFit::ModelFitInfo::Pointer
 mitk::modelFit::CreateFitInfoFromModelParameterizer(const ModelParameterizerBase* usedParameterizer,
 mitk::BaseData* inputImage, const std::string& fitType, const ScalarListLookupTable& inputData,
-const std::string& fitName, const NodeUIDType roiUID)
+const std::string& fitName, const ModelFitInfo::UIDType& roiUID)
 {
   mitk::modelFit::ModelFitInfo::Pointer info = CreateFitInfoFromModelParameterizer(usedParameterizer,
     inputImage, fitType, fitName, roiUID);

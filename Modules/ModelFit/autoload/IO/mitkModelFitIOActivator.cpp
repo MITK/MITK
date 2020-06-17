@@ -58,8 +58,6 @@ public:
   void Load(us::ModuleContext* /*context*/) override
   {
     //register relevant properties
-    registerProperty(mitk::ModelFitConstants::UID_PROPERTY_NAME(), "data_uid", "UID used to identify data in an MITK session.");
-
     registerProperty(mitk::ModelFitConstants::INPUT_VARIABLES_PROPERTY_NAME(), "modelfit_input_variables", "Array of input variables used in/for a model fit.", PropertyPersistenceDeserialization::deserializeXMLToScalarListLookupTableProperty, PropertyPersistenceSerialization::serializeScalarListLookupTablePropertyToXML);
 
     registerProperty(mitk::ModelFitConstants::PARAMETER_NAME_PROPERTY_NAME(), "modelfit_parameter_name", "Name of the parameter, that is represented by the data and how it is used in the function string (modelfit.model.function).");
@@ -82,10 +80,13 @@ public:
     registerProperty(mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME(), "modelfit_fit_uid", "UID of the fit.");
     registerProperty(mitk::ModelFitConstants::FIT_NAME_PROPERTY_NAME(), "modelfit_fit_name", "Human readable name for the fit.");
     registerProperty(mitk::ModelFitConstants::FIT_TYPE_PROPERTY_NAME(), "modelfit_fit_type", "Type of the fit (e.g. ROI based or pixel based).");
-    registerProperty(mitk::ModelFitConstants::FIT_INPUT_IMAGEUID_PROPERTY_NAME(), "modelfit_fit_input_imageUID", "UID of the input image that used to fit the model.");
     registerProperty(mitk::ModelFitConstants::FIT_INPUT_ROIUID_PROPERTY_NAME(), "modelfit_fit_input_roiUID", "UID of the ROI used for the fit.");
     registerProperty(mitk::ModelFitConstants::FIT_INPUT_DATA_PROPERTY_NAME(), "modelfit_fit_input_data", "Property containing input data directly stored in the fit information.");
     registerProperty(mitk::ModelFitConstants::FIT_STATIC_PARAMETERS_PROPERTY_NAME(), "modelfit_fit_staticParameters", "Property containing static parameters used for the fit.", PropertyPersistenceDeserialization::deserializeXMLToScalarListLookupTableProperty, PropertyPersistenceSerialization::serializeScalarListLookupTablePropertyToXML);
+
+    //legacy properties for backwards compatibility
+    registerProperty(mitk::ModelFitConstants::LEGACY_UID_PROPERTY_NAME(), "data_uid", "UID used to identify data in an MITK session.");
+    registerProperty(mitk::ModelFitConstants::LEGACY_FIT_INPUT_IMAGEUID_PROPERTY_NAME(), "modelfit_fit_input_imageUID", "UID of the input image that used to fit the model.");
   }
 
   void Unload(us::ModuleContext* ) override

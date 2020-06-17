@@ -27,11 +27,6 @@ namespace mitk
         static const std::string MODEL_FIT_PROPERTY_NAME();
 
         /**
-        * Name of the "uid" property for all data objects concerning model fitting.
-        */
-        static const std::string UID_PROPERTY_NAME();
-
-        /**
         * modelfit.input.variables ist eine Map der Variablennamen, die einem Eingabebild zu eigen sind und
         * unabhängig von einem Fit sind.
         * Deren Wert ist ein Array, welches die Variablenwerte für die einzelnen Zeitschritte enthält.
@@ -162,12 +157,7 @@ namespace mitk
 
         static const std::string FIT_TYPE_VALUE_PIXELBASED();
 
-    static const std::string FIT_TYPE_VALUE_ROIBASED();
-
-        /**
-        * modelfit.fit.input.imageUID defines the UID of the image that is used directly or indirectly (then it is source for input.data) to make the fit.
-        */
-        static const std::string FIT_INPUT_IMAGEUID_PROPERTY_NAME();
+        static const std::string FIT_TYPE_VALUE_ROIBASED();
 
         /**
         * modelfit.fit.input.roiUID defines the UID of the ROI that is used to make the fit. If not set no Mask was used or specified.
@@ -190,6 +180,21 @@ namespace mitk
         */
         static const std::string FIT_STATIC_PARAMETERS_PROPERTY_NAME();
 
+        /**
+        * Name of the "uid" property for all data objects concerning model fitting.
+        * @remark This was also known as UID_PROPRTY_NAME(). It was renamed to indicate
+        * that is only kept for backwards compatibility. Model fit now uses the Identifiable
+        * interface of BaseData and the PropertyRelationRules to identify/find data.
+        */
+        static const std::string LEGACY_UID_PROPERTY_NAME();
+
+        /**
+        * modelfit.fit.input.imageUID defines the UID of the image that is used directly or indirectly (then it is source for input.data) to make the fit.
+        * @remark This was also known as FIT_INPUT_IMAGEUID_PROPERTY_NAME(). It was renamed to indicate
+        * that is only kept for backwards compatibility. Model fit now uses the Identifiable
+        * interface of BaseData and the ModelFitResultRelationRule to identify/find the input data.
+        */
+        static const std::string LEGACY_FIT_INPUT_IMAGEUID_PROPERTY_NAME();
 
     };
 }

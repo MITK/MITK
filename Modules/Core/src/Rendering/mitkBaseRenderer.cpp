@@ -177,6 +177,7 @@ mitk::BaseRenderer::BaseRenderer(const char *name,
   m_CameraController->SetRenderer(this);
 
   m_VtkRenderer = vtkRenderer::New();
+  m_VtkRenderer->SetMaximumNumberOfPeels(16);
 
   if (AntiAliasing::FastApproximate == RenderingManager::GetInstance()->GetAntiAliasing())
     m_VtkRenderer->UseFXAAOn();
@@ -220,13 +221,9 @@ void mitk::BaseRenderer::SetMapperID(MapperSlotId id)
 {
   if (m_MapperID != id)
   {
-    if (Standard3D == id)
-    {
-      m_VtkRenderer->UseDepthPeelingOn();
-      m_VtkRenderer->UseDepthPeelingForVolumesOn();
-      m_VtkRenderer->SetMaximumNumberOfPeels(16);
-      m_VtkRenderer->SetOcclusionRatio(0.0);
-    }
+    bool useDepthPeeling = Standard3D == id;
+    m_VtkRenderer->SetUseDepthPeeling(useDepthPeeling);
+    m_VtkRenderer->SetUseDepthPeelingForVolumes(useDepthPeeling);
 
     m_MapperID = id;
     this->Modified();

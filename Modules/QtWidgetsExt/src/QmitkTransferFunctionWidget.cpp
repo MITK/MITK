@@ -35,6 +35,7 @@ QmitkTransferFunctionWidget::QmitkTransferFunctionWidget(QWidget* parent,
 
   connect(m_XEditColor, SIGNAL( textEdited ( const QString & ) ), this, SLOT(SetXValueColor( const QString & )));
 
+  m_RangeSlider->setOrientation(Qt::Horizontal);
   m_RangeSlider->setMinimum(-2048);
   m_RangeSlider->setMaximum(2048);
   connect(m_RangeSlider, SIGNAL(valuesChanged(int,int)),this, SLOT(OnSpanChanged(int,int)));

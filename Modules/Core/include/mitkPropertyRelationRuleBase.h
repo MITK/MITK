@@ -195,7 +195,7 @@ namespace mitk
     @param source Pointer to the Source instance that should be used for detection.
     @param exclusiveRelation Defines if only special types of relations should detected. None: All relations (default);
     Data: must be a data relation (so Data or Complete); ID: must be an ID relation (so ID or Complete); Complete: only complete relations.
-    @pre Destination must be a valid instance.*/
+    @pre Source must be a valid instance.*/
     NodePredicateBase::ConstPointer GetDestinationsDetector(
       const IPropertyProvider *source, RelationType exclusiveRelation = RelationType::None) const;
     /**Returns a predicate that can be used to find the Destination of the passed Source for a given relationUID.

@@ -160,6 +160,9 @@ namespace mitk
       return m_IsActive;
     }
 
+    bool allow2D = true;
+    bool allow3D = true;
+
   protected:
     EventStateMachine();
     virtual ~EventStateMachine();

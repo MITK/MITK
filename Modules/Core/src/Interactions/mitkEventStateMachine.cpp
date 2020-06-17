@@ -129,6 +129,18 @@ bool mitk::EventStateMachine::HandleEvent(InteractionEvent* event, DataNode* dat
   if (!m_IsActive)
     return false;
 
+  mitk::BaseRenderer::Pointer sender = event->GetSender();
+  if (!sender) {
+    return false;
+  }
+
+  if (sender->GetMapperID() == mitk::BaseRenderer::Standard2D && !allow2D) {
+    return false;
+  }
+  if (sender->GetMapperID() == mitk::BaseRenderer::Standard3D && !allow3D) {
+    return false;
+  }
+
   if (!FilterEvents(event, dataNode))
   {
     return false;
@@ -214,16 +226,17 @@ mitk::StateMachineState* mitk::EventStateMachine::GetCurrentState() const
 
 bool mitk::EventStateMachine::FilterEvents(InteractionEvent* interactionEvent, DataNode* dataNode)
 {
-  if (dataNode == NULL)
-  {
+  if (dataNode == NULL) {
     MITK_WARN<< "EventStateMachine: Empty DataNode received along with this Event " << interactionEvent;
     return false;
   }
+
   bool visible = false;
-  if (dataNode->GetBoolProperty("visible", visible, interactionEvent->GetSender()) == false)
-  { //property doesn't exist
+  if (dataNode->GetBoolProperty("visible", visible, interactionEvent->GetSender()) == false) {
+    // Property doesn't exist
     return false;
   }
+
   return visible;
 }
 

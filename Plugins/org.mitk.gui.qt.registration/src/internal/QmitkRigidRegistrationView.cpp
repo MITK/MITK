@@ -127,7 +127,7 @@ struct SelListenerRigidRegistration : ISelectionListener
               if (dynamic_cast<mitk::Image*>(node->GetData())->GetDimension() == 4)
               {
                 m_View->m_Controls.m_StatusLabel->show();
-                QMessageBox::information( NULL, "RigidRegistration", "Only 2D or 3D images can be processed.", QMessageBox::Ok );
+                QMessageBox::information( NULL, QObject::tr("RigidRegistration"), QObject::tr("Only 2D or 3D images can be processed."), QMessageBox::Ok );
                 return;
               }
               if (foundFixedImage == false)

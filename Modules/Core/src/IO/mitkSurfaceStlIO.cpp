@@ -28,23 +28,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkErrorCode.h>
 #include <vtkSmartPointer.h>
 
+#include <QString>
+
 namespace mitk {
 
 std::string SurfaceStlIO::OPTION_MERGE_POINTS()
 {
-  static std::string s = "Merge points";
+  static std::string s = QT_TRANSLATE_NOOP("ReaderOption", "Merge points");
   return s;
 }
 
 std::string SurfaceStlIO::OPTION_TAG_SOLIDS()
 {
-  static std::string s = "Tag solids";
+  static std::string s = QT_TRANSLATE_NOOP("ReaderOption", "Tag solids");
   return s;
 }
 
 std::string SurfaceStlIO::OPTION_CLEAN()
 {
-  static std::string s = "Clean poly data";
+  static std::string s = QT_TRANSLATE_NOOP("ReaderOption", "Clean poly data");
   return s;
 }
 

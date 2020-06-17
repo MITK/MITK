@@ -61,14 +61,14 @@ QmitkFileReaderOptionsDialog::QmitkFileReaderOptionsDialog(mitk::IOUtil::LoadInf
   {
     ui->m_ReaderLabel->setVisible(false);
     ui->m_ReaderComboBox->setVisible(false);
-    ui->m_FilePathLabel->setText(QString("File: %1").arg(QString::fromStdString(loadInfo.m_Path)));
+    ui->m_FilePathLabel->setText(tr("File: %1").arg(QString::fromStdString(loadInfo.m_Path)));
   }
   else
   {
-    ui->m_FilePathLabel->setText(QString("for %1").arg(QString::fromStdString(loadInfo.m_Path)));
+    ui->m_FilePathLabel->setText(tr("for %1").arg(QString::fromStdString(loadInfo.m_Path)));
   }
 
-  this->setWindowTitle("File reading options");
+  this->setWindowTitle(tr("File reading options"));
 }
 
 QmitkFileReaderOptionsDialog::~QmitkFileReaderOptionsDialog()

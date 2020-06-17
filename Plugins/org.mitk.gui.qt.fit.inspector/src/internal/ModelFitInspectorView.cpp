@@ -34,6 +34,7 @@ found in the LICENSE file.
 #include "mitkModelFitException.h"
 #include "mitkModelFitParameterValueExtraction.h"
 #include "mitkTimeGridHelper.h"
+#include "mitkModelFitResultRelationRule.h"
 
 #include "mitkModelFitPlotDataHelper.h"
 
@@ -246,8 +247,12 @@ void ModelFitInspectorView::OnFullPlotClicked(bool checked)
 int ModelFitInspectorView::ActualizeFitSelectionWidget()
 {
   mitk::modelFit::ModelFitInfo::UIDType selectedFitUD = "";
-  bool isModelFitNode = this->m_currentSelectedNode->GetData()->GetPropertyList()->GetStringProperty(
-    mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str(), selectedFitUD);
+  bool isModelFitNode = false;
+  if (this->m_Controls.inputNodeSelector->GetSelectedNode().IsNotNull())
+  {
+    isModelFitNode = this->m_Controls.inputNodeSelector->GetSelectedNode()->GetData()->GetPropertyList()->GetStringProperty(
+      mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str(), selectedFitUD);
+  }
 
   mitk::DataStorage::Pointer storage = this->GetDataStorage();
 
@@ -329,7 +334,13 @@ void ModelFitInspectorView::OnInputChanged(const QList<mitk::DataNode::Pointer>&
 
       if (isModelFitNode)
       {
-        this->m_currentSelectedNode = this->GetParentNode(this->m_currentSelectedNode);
+        this->m_currentSelectedNode = this->GetInputNode(this->m_currentSelectedNode);
+        if (this->m_currentSelectedNode.IsNull())
+        {
+          MITK_WARN <<
+            "Model fit Inspector in invalid state. Input image for selected fit cannot be found in data storage. Failed fit UID:"
+            << selectedFitUD;
+        }
       }
 
       auto cmbIndex = ActualizeFitSelectionWidget();
@@ -376,12 +387,18 @@ void ModelFitInspectorView::OnInputChanged(const QList<mitk::DataNode::Pointer>&
 }
 
 mitk::DataNode::ConstPointer
-ModelFitInspectorView::GetParentNode(mitk::DataNode::ConstPointer node)
+ModelFitInspectorView::GetInputNode(mitk::DataNode::ConstPointer node)
 {
   if (node.IsNotNull())
   {
+    std::string selectedFitUD = "";
+    bool isModelFitNode = node->GetData()->GetPropertyList()->GetStringProperty(
+        mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str(), selectedFitUD);
+
+    auto rule = mitk::ModelFitResultRelationRule::New();
+    auto predicate = rule->GetDestinationsDetector(node);
     mitk::DataStorage::SetOfObjects::ConstPointer parentNodeList =
-      GetDataStorage()->GetSources(node);
+      GetDataStorage()->GetSubset(predicate);
 
     if (parentNodeList->size() > 0)
     {

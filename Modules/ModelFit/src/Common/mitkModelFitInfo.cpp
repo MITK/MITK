@@ -10,11 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include "mitkModelFitInfo.h"
+
 #include <mitkNodePredicateDataProperty.h>
+#include <mitkNodePredicateAnd.h>
 #include <mitkUIDGenerator.h>
 #include "mitkDataNode.h"
 #include "mitkDataStorage.h"
-#include "mitkModelFitInfo.h"
+
 #include "mitkScalarListLookupTableProperty.h"
 #include "mitkModelFitException.h"
 #include "mitkModelFitResultRelationRule.h"
@@ -402,20 +405,23 @@ mitk::modelFit::GetNodesOfFit(const ModelFitInfo::UIDType& fitUID, const mitk::D
 mitk::modelFit::NodeUIDSetType
 mitk::modelFit::GetFitUIDsOfNode(const mitk::DataNode* node,	const mitk::DataStorage* storage)
 {
+  auto rule = ModelFitResultRelationRule::New();
   mitk::modelFit::NodeUIDSetType result;
 
   if (node && storage)
   {
-    mitk::NodePredicateDataProperty::Pointer predicate = mitk::NodePredicateDataProperty::New(
+    auto fitUIDPredicate = mitk::NodePredicateDataProperty::New(
           mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str());
-    mitk::DataStorage::SetOfObjects::ConstPointer nodes = storage->GetDerivations(node, predicate,
-        false);
+    auto rulePredicate = rule->GetSourcesDetector(node);
+    auto predicate = NodePredicateAnd::New(fitUIDPredicate, rulePredicate);
+    mitk::DataStorage::SetOfObjects::ConstPointer nodes = storage->GetSubset(predicate);
 
     for (mitk::DataStorage::SetOfObjects::ConstIterator pos = nodes->Begin(); pos != nodes->End();
          ++pos)
     {
       mitk::modelFit::ModelFitInfo::UIDType uid;
       pos->Value()->GetData()->GetPropertyList()->GetStringProperty(mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str(), uid);
+
       result.insert(uid);
     }
 

@@ -113,11 +113,12 @@ protected:
       timeGrid);
 
   /**
-   *	@brief		Returns the parent node of the given node if it exists.
-   *	@param node	The node whose parent node should be returned.
-   *	@return		The parent node of the given node or NULL if it doesn't exist.
+   * @brief Returns the input node that was used to generate the passed model fit node if it exists.
+   * @param node Node that is a model fit result.
+   * @return The input node that was used to generate the passed node. If the input node cannot
+   * be found in the storage or the passed node is not a model fit result node, a nullptr will be returned.
    */
-  mitk::DataNode::ConstPointer GetParentNode(mitk::DataNode::ConstPointer node);
+  mitk::DataNode::ConstPointer GetInputNode(mitk::DataNode::ConstPointer node);
 
   /** Sets m_currentSelectedPosition to the current selection and validates if this position is valid
    * for the input image of the currently selected fit. If it is valid, m_validSelectedPosition is set to true.

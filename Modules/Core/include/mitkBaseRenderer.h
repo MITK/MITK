@@ -308,7 +308,7 @@ namespace mitk
 
       //##Documentation
       //## @brief Set the MapperSlotId to use.
-      itkSetMacro(MapperID, MapperSlotId);
+      virtual void SetMapperID(MapperSlotId id);
 
         virtual int *GetSize() const;
     virtual int *GetViewportSize() const;

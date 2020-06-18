@@ -122,6 +122,11 @@ class mitkBaseGeometryTestSuite : public mitk::TestFixture
   MITK_TEST(TestGetExtent);
   MITK_TEST(TestIsInside);
   MITK_TEST(TestGetMatrixColumn);
+  // test IsSubGeometry
+  MITK_TEST(IsSubGeometry_Spacing);
+  MITK_TEST(IsSubGeometry_TransformMatrix);
+  MITK_TEST(IsSubGeometry_Bounds);
+  MITK_TEST(IsSubGeometry_Grid);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -1323,6 +1328,176 @@ public:
     newDummy->SetIndexToWorldTransform(anotherTransform);
     MITK_ASSERT_EQUAL(dummy, newDummy, "GetMatrixColumn");
   }
+
+  void IsSubGeometry_Spacing()
+  {
+    CPPUNIT_ASSERT(mitk::IsSubGeometry(*aDummyGeometry, *aDummyGeometry, mitk::eps, true));
+
+    for (unsigned int i = 0; i < 3; ++i)
+    {
+      mitk::Vector3D wrongSpacing = aDummyGeometry->GetSpacing();
+      wrongSpacing[i] += mitk::eps * 2;
+      auto wrongGeometry = aDummyGeometry->Clone();
+      wrongGeometry->SetSpacing(wrongSpacing);
+
+      CPPUNIT_ASSERT(!mitk::IsSubGeometry(*wrongGeometry, *aDummyGeometry, mitk::eps, true));
+    }
+    for (unsigned int i = 0; i < 3; ++i)
+    {
+      mitk::Vector3D wrongSpacing = aDummyGeometry->GetSpacing();
+      wrongSpacing[i] -= mitk::eps * 2;
+      auto wrongGeometry = aDummyGeometry->Clone();
+      wrongGeometry->SetSpacing(wrongSpacing);
+
+      CPPUNIT_ASSERT(!mitk::IsSubGeometry(*wrongGeometry, *aDummyGeometry, mitk::eps, true));
+    }
+  }
+
+  void IsSubGeometry_TransformMatrix()
+  {
+    CPPUNIT_ASSERT(mitk::IsSubGeometry(*aDummyGeometry, *aDummyGeometry, mitk::eps, true));
+
+    for (unsigned int i = 0; i < 3; ++i)
+    {
+      for (unsigned int j = 0; j < 3; ++j)
+      {
+        itk::Matrix<mitk::ScalarType, 3, 3> wrongMatrix = aDummyGeometry->GetIndexToWorldTransform()->GetMatrix();
+        wrongMatrix[i][j] += mitk::eps * 2;
+        auto wrongGeometry = aDummyGeometry->Clone();
+        wrongGeometry->GetIndexToWorldTransform()->SetMatrix(wrongMatrix);
+
+        CPPUNIT_ASSERT(!mitk::IsSubGeometry(*wrongGeometry, *aDummyGeometry, mitk::eps, true));
+      }
+    }
+  }
+
+  void IsSubGeometry_Bounds()
+  {
+    IsSubGeometry_Bounds_internal(false);
+    IsSubGeometry_Bounds_internal(true);
+  }
+
+  void IsSubGeometry_Bounds_internal(bool isImage)
+  {
+    auto newBounds = aDummyGeometry->GetBounds();
+    newBounds[0] = 10;
+    newBounds[1] = 20;
+    newBounds[2] = 10;
+    newBounds[3] = 20;
+    newBounds[4] = 10;
+    newBounds[5] = 20;
+    aDummyGeometry->SetBounds(newBounds);
+    aDummyGeometry->SetImageGeometry(isImage);
+
+    CPPUNIT_ASSERT(mitk::IsSubGeometry(*aDummyGeometry, *aDummyGeometry, mitk::eps, true));
+
+    for (unsigned int i = 0; i < 6; ++i)
+    {
+      auto legalBounds = newBounds;
+      if (i % 2 == 0)
+      {
+        legalBounds[i] += 1;
+      }
+      else
+      {
+        legalBounds[i] -= 1;
+      }
+      auto legalGeometry = aDummyGeometry->Clone();
+      legalGeometry->SetBounds(legalBounds);
+
+      CPPUNIT_ASSERT(mitk::IsSubGeometry(*legalGeometry, *aDummyGeometry, mitk::eps, true));
+    }
+
+    for (unsigned int i = 0; i < 6; ++i)
+    {
+      auto wrongBounds = aDummyGeometry->GetBounds();
+      if (i % 2 == 0)
+      {
+        wrongBounds[i] -= 1;
+      }
+      else
+      {
+        wrongBounds[i] += 1;
+      }
+      auto wrongGeometry = aDummyGeometry->Clone();
+      wrongGeometry->SetBounds(wrongBounds);
+
+      CPPUNIT_ASSERT(!mitk::IsSubGeometry(*wrongGeometry, *aDummyGeometry, mitk::eps, true));
+    }
+  }
+
+  void IsSubGeometry_Grid()
+  {
+    IsSubGeometry_Grid_internal(true);
+    IsSubGeometry_Grid_internal(false);
+  }
+
+  void IsSubGeometry_Grid_internal(bool isImage)
+  {
+    auto newBounds = aDummyGeometry->GetBounds();
+    newBounds[0] = 0;
+    newBounds[1] = 20;
+    newBounds[2] = 0;
+    newBounds[3] = 20;
+    newBounds[4] = 0;
+    newBounds[5] = 20;
+    aDummyGeometry->SetBounds(newBounds);
+    aDummyGeometry->SetImageGeometry(isImage);
+
+    auto smallerGeometry = aDummyGeometry->Clone();
+    newBounds[0] = 5;
+    newBounds[1] = 10;
+    newBounds[2] = 5;
+    newBounds[3] = 10;
+    newBounds[4] = 5;
+    newBounds[5] = 10;
+    smallerGeometry->SetBounds(newBounds);
+
+    //legal negative shift
+    for (unsigned int i = 0; i < 3; ++i)
+    {
+      auto legalOrigin = smallerGeometry->GetOrigin();
+      legalOrigin[i] -= smallerGeometry->GetSpacing()[i];
+      auto legalGeometry = smallerGeometry->Clone();
+      legalGeometry->SetOrigin(legalOrigin);
+
+      CPPUNIT_ASSERT(mitk::IsSubGeometry(*legalGeometry, *aDummyGeometry, mitk::eps, true));
+    }
+
+    //legal positive shift
+    for (unsigned int i = 0; i < 3; ++i)
+    {
+      auto legalOrigin = smallerGeometry->GetOrigin();
+      legalOrigin[i] += smallerGeometry->GetSpacing()[i];
+      auto legalGeometry = smallerGeometry->Clone();
+      legalGeometry->SetOrigin(legalOrigin);
+
+      CPPUNIT_ASSERT(mitk::IsSubGeometry(*legalGeometry, *aDummyGeometry, mitk::eps, true));
+    }
+
+    //wrong negative shift
+    for (unsigned int i = 0; i < 3; ++i)
+    {
+      auto wrongOrigin = smallerGeometry->GetOrigin();
+      wrongOrigin[i] -= 2 * mitk::eps;
+      auto wrongGeometry = smallerGeometry->Clone();
+      wrongGeometry->SetOrigin(wrongOrigin);
+
+      CPPUNIT_ASSERT(!mitk::IsSubGeometry(*wrongGeometry, *aDummyGeometry, mitk::eps, true));
+    }
+
+    //wrong positive shift
+    for (unsigned int i = 0; i < 3; ++i)
+    {
+      auto wrongOrigin = smallerGeometry->GetOrigin();
+      wrongOrigin[i] += 2 * mitk::eps;
+      auto wrongGeometry = smallerGeometry->Clone();
+      wrongGeometry->SetOrigin(wrongOrigin);
+
+      CPPUNIT_ASSERT(!mitk::IsSubGeometry(*wrongGeometry, *aDummyGeometry, mitk::eps, true));
+    }
+  }
+
 
   /*
 

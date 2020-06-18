@@ -10,7 +10,6 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-
 #include "QmitkSingleNodeSelectionWidget.h"
 
 #include <berryQtStyleManager.h>
@@ -23,7 +22,9 @@ found in the LICENSE file.
 #include "QmitkNodeSelectionDialog.h"
 #include "QmitkNodeDetailsDialog.h"
 
-QmitkSingleNodeSelectionWidget::QmitkSingleNodeSelectionWidget(QWidget* parent) : QmitkAbstractNodeSelectionWidget(parent), m_AutoSelectNewNodes(false)
+QmitkSingleNodeSelectionWidget::QmitkSingleNodeSelectionWidget(QWidget* parent)
+  : QmitkAbstractNodeSelectionWidget(parent)
+  , m_AutoSelectNewNodes(false)
 {
   m_Controls.setupUi(this);
 
@@ -203,7 +204,7 @@ void QmitkSingleNodeSelectionWidget::SetCurrentSelectedNode(mitk::DataNode* sele
     selection.append(selectedNode);
   }
   this->SetCurrentSelection(selection);
-};
+}
 
 void QmitkSingleNodeSelectionWidget::OnNodeAddedToStorage(const mitk::DataNode* /*node*/)
 {

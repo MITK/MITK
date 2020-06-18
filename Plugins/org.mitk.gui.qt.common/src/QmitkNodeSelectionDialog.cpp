@@ -19,8 +19,12 @@ found in the LICENSE file.
 #include <QmitkDataStorageSelectionHistoryInspector.h>
 #include <QmitkDataStorageFavoriteNodesInspector.h>
 
-QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString title, QString hint) : QDialog(parent),
-  m_NodePredicate(nullptr), m_SelectOnlyVisibleNodes(false), m_SelectedNodes(NodeList()), m_SelectionMode(QAbstractItemView::SingleSelection)
+QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString title, QString hint)
+  : QDialog(parent)
+  , m_NodePredicate(nullptr)
+  , m_SelectOnlyVisibleNodes(false)
+  , m_SelectedNodes(NodeList())
+  , m_SelectionMode(QAbstractItemView::SingleSelection)
 {
   m_Controls.setupUi(this);
 

@@ -337,7 +337,7 @@ if(MITK_USE_Qt5)
   find_package(Qt5 ${MITK_QT5_MINIMUM_VERSION} COMPONENTS ${MITK_QT5_COMPONENTS} REQUIRED HINTS ${MITK_QT5_HINTS})
 
   if(${Qt5_VERSION} VERSION_GREATER_EQUAL 5.13)
-    message(FATAL_ERROR "Qt version ${Qt5_VERSION_MAJOR}.${Qt5_VERSION_MINOR} is not yet supported. We recommend using the latest long-term support version 5.12.x.")
+    message(WARNING "Qt version ${Qt5_VERSION_MAJOR}.${Qt5_VERSION_MINOR} is not yet supported. We recommend using the latest long-term support version 5.12.x.")
   endif()
 endif()
 

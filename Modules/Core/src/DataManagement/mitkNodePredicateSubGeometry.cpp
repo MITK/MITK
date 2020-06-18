@@ -35,10 +35,10 @@ bool mitk::NodePredicateSubGeometry::CheckNode(const mitk::DataNode *node) const
   if (node == nullptr)
     mitkThrow() << "NodePredicateSubGeometry: invalid node";
 
-  mitk::BaseData *data = node->GetData();
+  const auto *data = node->GetData();
   if (data)
   {
-    if (m_RefGeometry.IsNotNull())
+    if (nullptr != data && m_RefGeometry.IsNotNull())
     { //check only one time point.
       mitk::BaseGeometry::Pointer testGeometry = data->GetGeometry();
       if (this->m_UseTimePoint)
@@ -46,7 +46,7 @@ bool mitk::NodePredicateSubGeometry::CheckNode(const mitk::DataNode *node) const
         testGeometry = data->GetTimeGeometry()->GetGeometryForTimePoint(m_TimePoint);
       }
 
-      if (testGeometry)
+      if (testGeometry.IsNotNull())
       {
         return IsSubGeometry(*testGeometry, *m_RefGeometry, this->m_CheckPrecision, false);
       }

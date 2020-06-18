@@ -762,19 +762,19 @@ namespace mitk
   * a given reference geometry.
   *
   * Sub geometry means that both geometries have the same voxel grid (same spacing, same axes,
-  * orgin is on voxel grid), but the boundingbox of the checked geometry is contained or equal
+  * orgin is on voxel grid), but the bounding box of the checked geometry is contained or equal
   * to the bounding box of the reference geometry.\n
   * By this definition equal geometries are always sub geometries of each other.
   *
-  * The function checks the spacing, origin, axisvectors, extents, the matrix of the
+  * The function checks the spacing, origin, axis vectors, extents, the matrix of the
   * IndexToWorldTransform (elementwise), the bounding (elementwise) and the ImageGeometry flag.
   *
-  * The parameter eps is a tolarence value for all methods which are internally used for comparion.
+  * The parameter eps is a tolarence value for all methods which are internally used for comparison.
   * @param testGeo Geometry that should be checked if it is a sub geometry of referenceGeo.
   * @param referenceGeo Geometry that should contain testedGeometry as sub geometry.
   * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
   * @param verbose Flag indicating if the user wants detailed console output or not.
-  * @return True, if all comparison are true. False in any other case.
+  * @return True, if all comparison are true. False otherwise.
   */
   MITKCORE_EXPORT bool IsSubGeometry(const mitk::BaseGeometry& testGeo,
     const mitk::BaseGeometry& referenceGeo,

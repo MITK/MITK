@@ -1080,22 +1080,22 @@ bool mitk::IsSubGeometry(const mitk::BaseGeometry& testGeo,
     }
   }
 
-  // check grid of test geometry is on the grid of the reference geometry. This important as boundingbox is
-  // only checked for containing the tested geometry, but if a corner (one is enough as we know that axis
-  // and spacing are equal) of the tested geometry is on the grid it is realy a sub geometry
-  // (as they have the same spacing and axis).
+  // check grid of test geometry is on the grid of the reference geometry. This is important as the
+  // boundingbox is only checked for containing the tested geometry, but if a corner (one is enough
+  // as we know that axis and spacing are equal) of the tested geometry is on the grid it is really
+  // a sub geometry (as they have the same spacing and axis).
   auto cornerOffset = testGeo.GetCornerPoint(0) - referenceGeo.GetCornerPoint(0);
   for (unsigned int i = 0; i < 3; ++i)
   {
-    auto pixelCountContious = cornerOffset[i] / testedSpacing[i];
-    auto pixelCount = std::round(pixelCountContious);
-    if (std::abs(pixelCount - pixelCountContious) > eps)
+    auto pixelCountContinous = cornerOffset[i] / testedSpacing[i];
+    auto pixelCount = std::round(pixelCountContinous);
+    if (std::abs(pixelCount - pixelCountContinous) > eps)
     {
       if (verbose)
       {
         MITK_INFO << "[( Geometry3D )] Tested geometry is not on the grid of the reference geometry. ";
         MITK_INFO << "referenceGeo is " << setprecision(15) << referenceGeo << " : tested corner offset in pixels is "
-          << pixelCountContious << " for axis "<<i;
+          << pixelCountContinous << " for axis "<<i;
       }
       result = false;
     }

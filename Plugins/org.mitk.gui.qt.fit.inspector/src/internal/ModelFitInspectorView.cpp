@@ -392,8 +392,6 @@ ModelFitInspectorView::GetInputNode(mitk::DataNode::ConstPointer node)
   if (node.IsNotNull())
   {
     std::string selectedFitUD = "";
-    bool isModelFitNode = node->GetData()->GetPropertyList()->GetStringProperty(
-        mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str(), selectedFitUD);
 
     auto rule = mitk::ModelFitResultRelationRule::New();
     auto predicate = rule->GetDestinationsDetector(node);
@@ -434,7 +432,7 @@ void ModelFitInspectorView::ValidateAndSetCurrentPosition()
     }
 
     mitk::BaseGeometry::ConstPointer geometry = inputImage->GetTimeGeometry()->GetGeometryForTimeStep(
-      m_currentSelectedTimeStep);
+      m_currentSelectedTimeStep).GetPointer();
 
     // check for invalid time step
     if (geometry.IsNull())

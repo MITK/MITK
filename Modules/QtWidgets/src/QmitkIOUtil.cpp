@@ -38,6 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ConfigManager.h"
 
 // QT
+#include <QApplication>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QSet>
@@ -367,6 +368,22 @@ QString QmitkIOUtil::GetFileOpenFilterString()
   return filters;
 }
 
+static QString translateErrorMsg(std::string errMsg)
+{
+  QString res = QString::fromStdString(errMsg);
+  if (res.indexOf('\n') >= 0) {
+    QStringList l = res.split('\n');
+    QString translatable;
+    for (QString str : l) {
+      translatable += QApplication::translate("mitkIOUtil Error", str.toStdString().c_str()) + '\n';
+    }
+    res = translatable;
+  } else {
+    res = QApplication::translate("mitkIOUtil Error", errMsg.c_str());
+  }
+  return res;
+}
+
 QList<mitk::BaseData::Pointer> QmitkIOUtil::Load(const QStringList& paths, QWidget* parent)
 {
   std::vector<LoadInfo> loadInfos;
@@ -379,7 +396,7 @@ QList<mitk::BaseData::Pointer> QmitkIOUtil::Load(const QStringList& paths, QWidg
   std::string errMsg = Load(loadInfos, NULL, NULL, &optionsCallback);
   if (!errMsg.empty())
   {
-    QMessageBox::warning(parent, "Error reading files", QString::fromStdString(errMsg));
+    QMessageBox::warning(parent, QObject::tr("Error reading files"), translateErrorMsg(errMsg));
     mitkThrow() << errMsg;
   }
 
@@ -408,7 +425,7 @@ mitk::DataStorage::SetOfObjects::Pointer QmitkIOUtil::Load(const QStringList& pa
   std::string errMsg = Load(loadInfos, nodeResult, &storage, &optionsCallback, interrupt);
   if (!errMsg.empty())
   {
-    QMessageBox::warning(parent, "Error reading files", QString::fromStdString(errMsg));
+    QMessageBox::warning(parent, QObject::tr("Error reading files"), translateErrorMsg(errMsg));
     mitkThrow() << errMsg;
   }
   return nodeResult;

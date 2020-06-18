@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkFileReaderWriterOptionsWidget.h"
 
+#include <QApplication>
 #include <QFormLayout>
 
 #include <limits>
@@ -25,13 +26,10 @@ static QString GetAnyWidgetLabel(const std::string& name)
   QString label;
   // get the last segment from the option name and use it as the label
   std::string::size_type pos = name.find_last_of('.');
-  if (pos == std::string::npos)
-  {
-    label = QString::fromStdString(name);
-  }
-  else if (pos < name.length() - 1)
-  {
-    label = QString::fromStdString(name.substr(pos + 1));
+  if (pos == std::string::npos) {
+    label = QApplication::translate("ReaderOption", name.c_str());
+  } else if (pos < name.length() - 1) {
+    label = QApplication::translate("ReaderOption", (name.substr(pos + 1)).c_str());
   }
   return label;
 }

@@ -90,6 +90,8 @@ static std::string GetLastErrorStr()
 #include <fcntl.h>
 #include <sys/stat.h>
 
+#include <QString>
+
 static const char validLetters[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
 // A cross-platform version of the mkstemps function
@@ -656,7 +658,7 @@ std::string IOUtil::Load(std::vector<LoadInfo>& loadInfos,
 {
   if (loadInfos.empty())
   {
-    return "No input files given";
+    return QT_TRANSLATE_NOOP("mitkIOUtil Error", "No input files given");
   }
 
   int filesToRead = loadInfos.size();
@@ -672,7 +674,7 @@ std::string IOUtil::Load(std::vector<LoadInfo>& loadInfos,
     {
       if (!itksys::SystemTools::FileExists(loadInfo.m_Path.c_str()))
       {
-        errMsg += "File '" + loadInfo.m_Path + "' does not exist\n";
+        errMsg += std::string(QT_TRANSLATE_NOOP("mitkIOUtil Error", "File does not exist")) + '\n' + loadInfo.m_Path + '\n';
       }
       else
       {
@@ -733,14 +735,14 @@ std::string IOUtil::Load(std::vector<LoadInfo>& loadInfos,
 
     if (loadInfo.m_Cancel)
     {
-      errMsg += "Reading operation(s) cancelled.";
+      errMsg += QT_TRANSLATE_NOOP("mitkIOUtil Error", "Reading operation(s) cancelled.");
       break;
     }
 
     IFileReader* reader = loadInfo.m_ReaderSelector.GetSelected().GetReader();
     if (reader == NULL)
     {
-      errMsg += "Unexpected NULL reader.";
+      errMsg += std::string(QT_TRANSLATE_NOOP("mitkIOUtil Error", "Unexpected NULL reader.")) + '\n' + loadInfo.m_Path + '\n';
       break;
     }
 
@@ -790,12 +792,12 @@ std::string IOUtil::Load(std::vector<LoadInfo>& loadInfos,
 
       if ((loadInfo.m_Output.empty() || (nodeResult && nodeResult->Size() == 0)) && interrupt && !*interrupt)
       {
-        errMsg += "Unknown read error occurred reading " + loadInfo.m_Path;
+        errMsg += QT_TRANSLATE_NOOP("mitkIOUtil Error", "Unknown read error occurred") + '\n' + loadInfo.m_Path + '\n';
       }
     }
     catch (const std::exception& e)
     {
-      errMsg += "Exception occured when reading file " + loadInfo.m_Path + ":\n" + e.what() + "\n\n";
+      errMsg += std::string(QT_TRANSLATE_NOOP("mitkIOUtil Error", "Exception occured:")) + '\n' + e.what() + '\n';
     }
     mitk::ProgressBar::GetInstance()->Progress(2);
     --filesToRead;

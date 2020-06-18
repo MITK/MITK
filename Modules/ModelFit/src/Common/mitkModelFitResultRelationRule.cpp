@@ -44,16 +44,20 @@ mitk::ModelFitResultRelationRule::GetRelationUIDs_DataLayer(const IPropertyProvi
     if (imageUIDprop.IsNotNull())
     {
       const auto inputImageUID = imageUIDprop->GetValueAsString();
-      auto modelFitUIDprop = destination->GetConstProperty(ModelFitConstants::LEGACY_UID_PROPERTY_NAME());
-
-      if (modelFitUIDprop.IsNotNull())
+      bool isValid = nullptr == destination;
+      if (nullptr != destination)
       {
-        const auto destinationUID = modelFitUIDprop->GetValueAsString();
+        auto modelFitUIDprop = destination->GetConstProperty(ModelFitConstants::LEGACY_UID_PROPERTY_NAME());
 
-        if (destinationUID == inputImageUID)
+        if (modelFitUIDprop.IsNotNull())
         {
-          result.emplace_back("model.fit.input.image.legacy.relation", this->GetRuleID());
+          const auto destinationUID = modelFitUIDprop->GetValueAsString();
+          isValid = destinationUID == inputImageUID;
         }
+      }
+      if (isValid)
+      {
+        result.emplace_back("model.fit.input.image.legacy.relation", this->GetRuleID());
       }
     }
   }

@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include "mitkIOMimeTypes.h"
 #include <mitkExtractCESTOffset.h>
 #include <mitkCustomTagParser.h>
+#include <mitkCESTPropertyHelper.h>
 #include <mitkDICOMDCMTKTagScanner.h>
 #include <mitkDICOMFileReaderSelector.h>
 #include "mitkCESTImageNormalizationFilter.h"

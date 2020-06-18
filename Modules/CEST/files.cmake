@@ -5,6 +5,7 @@ set(CPP_FILES
   mitkCustomTagParser.cpp
   mitkCESTImageDetectionHelper.cpp
   mitkExtractCESTOffset.cpp
+  mitkCESTPropertyHelper.cpp
 )
 
 set(RESOURCE_FILES

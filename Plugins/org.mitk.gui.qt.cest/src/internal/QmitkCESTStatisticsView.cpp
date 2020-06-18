@@ -31,7 +31,7 @@ found in the LICENSE file.
 
 // mitk
 #include <mitkCESTImageNormalizationFilter.h>
-#include <mitkCustomTagParser.h>
+#include <mitkCESTPropertyHelper.h>
 #include <mitkITKImageImport.h>
 #include <mitkImage.h>
 #include <mitkImageAccessByItk.h>

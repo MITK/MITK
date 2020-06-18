@@ -24,7 +24,7 @@ found in the LICENSE file.
 
 #include <mitkImage.h>
 #include "mitkCESTImageNormalizationFilter.h"
-#include "mitkCustomTagParser.h"
+#include "mitkCESTPropertyHelper.h"
 #include "mitkCESTImageDetectionHelper.h"
 
 const std::string QmitkCESTNormalizeView::VIEW_ID = "org.mitk.gui.qt.cest.normalize";

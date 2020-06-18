@@ -12,25 +12,23 @@ found in the LICENSE file.
 
 #include "mitkCESTImageDetectionHelper.h"
 
-#include "mitkCustomTagParser.h"
+#include "mitkCESTPropertyHelper.h"
 #include "mitkImage.h"
 #include "mitkDataNode.h"
 #include "mitkNodePredicateFunction.h"
 
 bool mitk::IsAnyCESTImage(const Image* cestImage)
 {
-  if (!cestImage) return false;
-
-  auto prop = cestImage->GetProperty(mitk::CEST_PROPERTY_NAME_TOTALSCANTIME().c_str());
-
-  return prop.IsNotNull();
+  return IsCESTorWasabiImage(cestImage) || IsCESTT1Image(cestImage);
 };
 
 bool mitk::IsCESTorWasabiImage(const Image* cestImage)
 {
   if (!cestImage) return false;
 
-  return IsAnyCESTImage(cestImage) && !IsCESTT1Image(cestImage);
+  auto prop = cestImage->GetProperty(mitk::CEST_PROPERTY_NAME_OFFSETS().c_str());
+
+  return prop.IsNotNull();
 };
 
 bool mitk::IsCESTT1Image(const Image* cestImage)

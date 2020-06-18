@@ -15,7 +15,9 @@ found in the LICENSE file.
 #include <mitkProperties.h>
 #include <mitkStringProperty.h>
 
+#include "mitkCESTPropertyHelper.h"
 #include "mitkIPropertyPersistence.h"
+
 #include "usGetModuleContext.h"
 #include "usModule.h"
 #include "usModuleContext.h"
@@ -841,54 +843,4 @@ std::string mitk::CustomTagParser::GetExternalJSONDirectory()
   jsonDirectory << stringToModule << "/CESTRevisionMapping";
 
   return jsonDirectory.str();
-}
-
-const std::string mitk::CEST_PROPERTY_NAME_TOTALSCANTIME()
-{
-  return "CEST.TotalScanTime";
-};
-
-const std::string mitk::CEST_PROPERTY_NAME_PREPERATIONTYPE()
-{
-  return "CEST.PreparationType";
-};
-
-const std::string mitk::CEST_PROPERTY_NAME_RECOVERYMODE()
-{
-  return "CEST.RecoveryMode";
-};
-
-const std::string mitk::CEST_PROPERTY_NAME_SPOILINGTYPE()
-{
-  return "CEST.SpoilingType";
-};
-
-const std::string mitk::CEST_PROPERTY_NAME_OFFSETS()
-{
-  return "CEST.Offsets";
-};
-
-const std::string mitk::CEST_PROPERTY_NAME_TREC()
-{
-  return std::string("CEST.TREC");
-}
-
-const std::string mitk::CEST_PROPERTY_NAME_FREQ()
-{
-  return std::string("CEST.FREQ");
-}
-
-const std::string mitk::CEST_PROPERTY_NAME_PULSEDURATION()
-{
-  return std::string("CEST.PulseDuration");
-}
-
-const std::string mitk::CEST_PROPERTY_NAME_B1Amplitude()
-{
-  return std::string("CEST.B1Amplitude");
-}
-
-const std::string mitk::CEST_PROPERTY_NAME_DutyCycle()
-{
-  return std::string("CEST.DutyCycle");
 }

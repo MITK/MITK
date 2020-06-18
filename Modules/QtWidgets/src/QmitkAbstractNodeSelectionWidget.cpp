@@ -10,13 +10,20 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-
 #include "QmitkAbstractNodeSelectionWidget.h"
 #include "QmitkModelViewSelectionConnector.h"
 
-QmitkAbstractNodeSelectionWidget::QmitkAbstractNodeSelectionWidget(QWidget* parent) : QWidget(parent), m_InvalidInfo("Error. Select data."),
-m_EmptyInfo("Empty. Make a selection."), m_PopUpTitel("Select a data node"), m_PopUpHint(""),
-m_IsOptional(false), m_SelectOnlyVisibleNodes(true), m_DataStorageDeletedTag(0), m_LastEmissionAllowance(true), m_RecursionGuard(false)
+QmitkAbstractNodeSelectionWidget::QmitkAbstractNodeSelectionWidget(QWidget* parent)
+  : QWidget(parent)
+  , m_InvalidInfo("Error. Select data.")
+  , m_EmptyInfo("Empty. Make a selection.")
+  , m_PopUpTitel("Select a data node")
+  , m_PopUpHint("")
+  , m_IsOptional(false)
+  , m_SelectOnlyVisibleNodes(true)
+  , m_DataStorageDeletedTag(0)
+  , m_LastEmissionAllowance(true)
+  , m_RecursionGuard(false)
 {
 }
 

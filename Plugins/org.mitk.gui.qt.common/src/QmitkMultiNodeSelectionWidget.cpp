@@ -10,7 +10,6 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-
 #include "QmitkMultiNodeSelectionWidget.h"
 
 #include <algorithm>
@@ -19,7 +18,8 @@ found in the LICENSE file.
 #include "QmitkCustomVariants.h"
 #include "internal/QmitkNodeSelectionListItemWidget.h"
 
-QmitkMultiNodeSelectionWidget::QmitkMultiNodeSelectionWidget(QWidget* parent) : QmitkAbstractNodeSelectionWidget(parent)
+QmitkMultiNodeSelectionWidget::QmitkMultiNodeSelectionWidget(QWidget* parent)
+  : QmitkAbstractNodeSelectionWidget(parent)
 {
   m_Controls.setupUi(this);
   m_Overlay = new QmitkSimpleTextOverlayWidget(m_Controls.list);

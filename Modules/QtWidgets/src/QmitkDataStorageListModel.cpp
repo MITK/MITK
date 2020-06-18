@@ -23,7 +23,10 @@ found in the LICENSE file.
 QmitkDataStorageListModel::QmitkDataStorageListModel(mitk::DataStorage *dataStorage,
                                                      mitk::NodePredicateBase::Pointer pred,
                                                      QObject *parent)
-  : QAbstractListModel(parent), m_NodePredicate(nullptr), m_DataStorage(nullptr), m_BlockEvents(false)
+  : QAbstractListModel(parent)
+  , m_NodePredicate(nullptr)
+  , m_DataStorage(nullptr)
+  , m_BlockEvents(false)
 {
   this->SetPredicate(pred);
   this->SetDataStorage(dataStorage);

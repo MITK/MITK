@@ -13,6 +13,10 @@ found in the LICENSE file.
 #ifndef QMITK_NODE_SELECTION_DIALOG_H
 #define QMITK_NODE_SELECTION_DIALOG_H
 
+#include "org_mitk_gui_qt_common_Export.h"
+
+#include "ui_QmitkNodeSelectionDialog.h"
+
 #include <mitkDataStorage.h>
 #include <mitkWeakPointer.h>
 #include <mitkNodePredicateBase.h>
@@ -20,16 +24,13 @@ found in the LICENSE file.
 
 #include <QmitkAbstractDataStorageInspector.h>
 
-#include "org_mitk_gui_qt_common_Export.h"
-
-#include "ui_QmitkNodeSelectionDialog.h"
-
 #include <QDialog>
 #include <QPushButton>
 
 /**
-* \class QmitkNodeSelectionDialog
-* \brief Widget that allows to show and edit the content of an mitk::IsoDoseLevel instance.
+* @class QmitkNodeSelectionDialog
+* @brief A customized QDialog that displays different data storage inspectors and allows to
+*        set and get a current selection by selecting data nodes in the data storage inspectors.
 */
 class MITK_QT_COMMON QmitkNodeSelectionDialog : public QDialog
 {
@@ -39,14 +40,18 @@ public:
   explicit QmitkNodeSelectionDialog(QWidget* parent = nullptr, QString caption = "", QString hint = "");
 
   /**
-  * @brief Sets the data storage that will be used /monitored by widget.
+  * @brief Set the data storage that will be used.
+  *        The function iterates over the dialog's panels and sets the data storage of each panel accordingly.
+  *        Each panel is a specific data storage inspector.
   *
   * @param dataStorage      A pointer to the data storage to set.
   */
   void SetDataStorage(mitk::DataStorage* dataStorage);
 
   /**
-  * @brief Sets the node predicate and updates the widget, according to the node predicate.
+  * @brief Set the node predicate that will be used.
+  *        The function iterates over the dialog's panels and sets the node predicate of each panel accordingly.
+  *        Each panel is a specific data storage inspector.
   *
   * @param nodePredicate    A pointer to node predicate.
   */
@@ -73,11 +78,18 @@ public:
   bool GetSelectOnlyVisibleNodes() const;
 
   using SelectionMode = QAbstractItemView::SelectionMode;
+  /**
+  * @brief Set the Qt selection mode (e.g. Single selection, multi selection).
+  *        The function iterates over the dialog's panels and sets the Qt selection mode of each panel accordingly.
+  *        Each panel is a concrete data storage inspector.
+  *
+  * @param mode   The QAbstractItemView::SelectionMode to define the selection mode.
+  */
   void SetSelectionMode(SelectionMode mode);
   SelectionMode GetSelectionMode() const;
 
 Q_SIGNALS:
-  /*
+  /**
   * @brief A signal that will be emitted if the selected node has changed.
   *
   * @param nodes		A list of data nodes that are newly selected.
@@ -85,28 +97,18 @@ Q_SIGNALS:
   void CurrentSelectionChanged(NodeList nodes);
 
   public Q_SLOTS:
-  /*
-  * @brief Change the selection modus of the item view's selection model.
-  *
-  *   If true, an incoming selection will be filtered (reduced) to only those nodes that are visible by the current view.
-  *   An outgoing selection can then at most contain the filtered nodes.
-  *   If false, the incoming non-visible selection will be stored and later added to the outgoing selection,
-  *   to include the original selection that could not be modified.
-  *   The part of the original selection, that is non-visible are the nodes that are not
+  /**
+  * @brief Set the selection modus to (not) include invisible nodes in the selection.
+  *        The function iterates over the dialog's panels and sets the selection modus of each panel accordingly.
+  *        Each panel is a concrete data storage inspector.
   *
   * @param selectOnlyVisibleNodes   The bool value to define the selection modus.
   */
   void SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes);
-
-  /*
-  * @brief Transform a list of data nodes into a model selection and set this as a new selection of the
-  *        selection model of the private member item view.
-  *
-  *   The function filters the given list of nodes according to the 'm_SelectOnlyVisibleNodes' member variable. If
-  *   necessary, the non-visible nodes are stored. This is done if 'm_SelectOnlyVisibleNodes' is false: In this case
-  *   the selection may be filtered and only a subset of the selected nodes may be visible and therefore (de-)selectable
-  *   in the data storage viewer. By storing the non-visible nodes it is possible to send the new, modified selection
-  *   but also include the selected nodes from the original selection that could not be modified (see 'SetSelectOnlyVisibleNodes').
+  /**
+  * @brief Set the currently selected nodes given a list of data nodes.
+  *        The function iterates over the dialog's panels and sets the current selection of each panel accordingly.
+  *        Each panel is a concrete data storage inspector.
   *
   * @param nodes		A list of data nodes that should be newly selected.
   */
@@ -140,4 +142,5 @@ protected:
   QPushButton* m_FavoriteNodesButton;
   Ui_QmitkNodeSelectionDialog m_Controls;
 };
+
 #endif // QMITK_NODE_SELECTION_DIALOG_H

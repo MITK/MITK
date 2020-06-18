@@ -10,30 +10,27 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-
 #include "QmitkNodeSelectionButton.h"
-
-// berry includes
-#include <berryWorkbenchPlugin.h>
-#include <berryQtStyleManager.h>
-
-#include "QPainter"
-#include "QTextDocument"
-#include "QEvent"
-
-#include <mitkDataNode.h>
-#include <QmitkNodeDescriptorManager.h>
 
 // mitk core
 #include <mitkBaseRenderer.h>
-#include <mitkDataNode.h>
 #include <mitkExtractSliceFilter.h>
 #include <vtkMitkLevelWindowFilter.h>
 #include <mitkPlanarFigure.h>
 #include <mitkPropertyNameHelper.h>
 
-// vtk
+// mitk qt widgets module
+#include <QmitkNodeDescriptorManager.h>
+
+// berry includes
+#include <berryWorkbenchPlugin.h>
+#include <berryQtStyleManager.h>
+
 #include <vtkLookupTable.h>
+
+#include <QEvent>
+#include <QPainter>
+#include <QTextDocument>
 
 QPixmap GetPixmapFromImageNode(const mitk::DataNode* dataNode, int height)
 {
@@ -104,8 +101,14 @@ QPixmap GetPixmapFromImageNode(const mitk::DataNode* dataNode, int height)
 }
 
 QmitkNodeSelectionButton::QmitkNodeSelectionButton(QWidget *parent)
-  : QPushButton(parent), m_OutDatedThumbNail(true), m_DataMTime(0), m_IsOptional(true), m_NodeModifiedObserverTag(0), m_NodeObserved(false)
-{ }
+  : QPushButton(parent)
+  , m_OutDatedThumbNail(true)
+  , m_DataMTime(0)
+  , m_IsOptional(true)
+  , m_NodeModifiedObserverTag(0)
+  , m_NodeObserved(false)
+{
+}
 
 QmitkNodeSelectionButton::~QmitkNodeSelectionButton()
 {

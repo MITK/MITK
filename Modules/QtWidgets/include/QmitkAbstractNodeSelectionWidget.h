@@ -10,15 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-
 #ifndef QMITK_ABSTRACT_NODE_SELECTION_WIDGET_H
 #define QMITK_ABSTRACT_NODE_SELECTION_WIDGET_H
+
+#include <MitkQtWidgetsExports.h>
 
 #include <mitkDataStorage.h>
 #include <mitkWeakPointer.h>
 #include <mitkNodePredicateBase.h>
-
-#include <MitkQtWidgetsExports.h>
 
 #include <QWidget>
 
@@ -38,7 +37,7 @@ public:
   virtual ~QmitkAbstractNodeSelectionWidget() override;
 
   /**
-  * @brief Sets the data storage that will be used /monitored by widget.
+  * @brief Sets the data storage that will be used / monitored by widget.
   *
   * @par dataStorage      A pointer to the data storage to set.
   */
@@ -74,7 +73,7 @@ public:
   ConstNodeStdVector GetSelectedNodesStdVector() const;
 
 Q_SIGNALS:
-  /*
+  /**
   * @brief A signal that will be emitted if the selected node has changed.
   *
   * @par	nodes		A list of data nodes that are newly selected.
@@ -82,7 +81,7 @@ Q_SIGNALS:
   void CurrentSelectionChanged(NodeList nodes);
 
 public Q_SLOTS:
-  /*
+  /**
   * @brief Change the selection modus of the item view's selection model.
   *
   *   If true, an incoming selection will be filtered (reduced) to only those nodes that are visible by the current view.
@@ -95,8 +94,8 @@ public Q_SLOTS:
   */
   void SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes);
 
-  /*
-  * @brief Transform a list of data nodes into a model selection and set this as a new selection of the
+  /**
+  * @brief Transform a list of data nodes (a selection) into a model selection and set this as a new selection of the
   *        selection model of the private member item view.
   *
   *   The function filters the given list of nodes according to the 'm_SelectOnlyVisibleNodes' member variable. If
@@ -110,87 +109,100 @@ public Q_SLOTS:
   void SetCurrentSelection(NodeList selectedNodes);
 
   /** Set the info text that should be displayed if no (valid) node is selected,
-   * but a selection is mandatory.
-   * The string can contain HTML code. if wanted*/
+  *   but a selection is mandatory.
+  *   The string can contain HTML code, if desired.
+  */
   void SetInvalidInfo(QString info);
 
   /** Set the info text that should be displayed if no (valid) node is selected,
-  * but a selection is optional.
-  * The string can contain HTML code. if wanted*/
+  *   but a selection is optional.
+  *   The string can contain HTML code, if desired.
+  */
   void SetEmptyInfo(QString info);
 
   /** Set the caption of the popup that is displayed to alter the selection.
-  * The string can contain HTML code. if wanted*/
+  *   The string can contain HTML code, if desired.
+  */
   void SetPopUpTitel(QString info);
 
   /** Set the hint text of the popup that is displayed to alter the selection.
-  * The string can contain HTML code. if wanted*/
+  *   The string can contain HTML code, if desired.
+  */
   void SetPopUpHint(QString info);
 
   /** Set the widget into an optional mode. Optional means that the selection of no valid
-   node does not mean an invalid state. Thus no node is a valid "node" selection too.*/
+  *   node does not mean an invalid state. Thus no node is a valid "node" selection too.
+  */
   void SetSelectionIsOptional(bool isOptional);
 
 protected Q_SLOTS:
   /** Call to remove a node from the current selection. If the node is part of the current selection,
-   this will trigger ReviseSelectionChanged(), AllowEmissionOfSelection() and if there is really a change,
-   will also emit CurrentSelectionChanged.*/
+  *   this will trigger ReviseSelectionChanged(), AllowEmissionOfSelection() and if there is really a change,
+  *   will also emit CurrentSelectionChanged.
+  */
   void RemoveNodeFromSelection(const mitk::DataNode* node);
 
 protected:
-  /**Method is called if the display of the selected nodes should be updated (e.g. because the selection changed)*/
+  /** Method is called if the display of the selected nodes should be updated (e.g. because the selection changed). */
   virtual void UpdateInfo() = 0;
 
-  /**Method is called if the predicate has changed, before the selection will be updated according to the new predicate.
-   The default implementation does nothing.
-   @remark If you are only interested to know when the selection has changed, overwrite OnInternalSelectionChange().*/
+  /** Method is called if the predicate has changed, before the selection will be updated according to the new predicate.
+  *   The default implementation does nothing.
+  *   @remark If you are only interested to know when the selection has changed, overwrite OnInternalSelectionChange().
+  */
   virtual void OnNodePredicateChanged();
 
-  /**Method is called if the data storage has changed. The selection will be automatically be reseted afterwards.
-   The default implementation does nothing.*/
+  /** Method is called if the data storage has changed. The selection will be automatically be reseted afterwards.
+  *   The default implementation does nothing.
+  */
   virtual void OnDataStorageChanged();
 
   /** This member function will called when ever a new internal selection has been determined. This can be
-  used to update the state of internal widgets. The default implementation does nothing.*/
+  *   used to update the state of internal widgets. The default implementation does nothing.
+  */
   virtual void OnInternalSelectionChanged();
 
-  /**Method is called when a node is added to the storage. Default implementation does nothing.
-  Derived widgets can override the method if they want to react on new nodes in the storage.*/
+  /** Method is called when a node is added to the storage. Default implementation does nothing.
+  *   Derived widgets can override the method if they want to react on new nodes in the storage.
+  */
   virtual void OnNodeAddedToStorage(const mitk::DataNode* node);
 
-  /**Method is called when a node is removed from the storage. The removed node is passed as
-  variable. This member is called directly before the node will be removed from the current selection if
-  he was a part. Default implementation does nothing. */
+  /** Method is called when a node is removed from the storage. The removed node is passed as
+  *   variable. This member is called directly before the node will be removed from the current selection if
+  *   he was a part. Default implementation does nothing.
+  */
   virtual void OnNodeRemovedFromStorage(const mitk::DataNode* node);
 
-  /**Method is called if the internal selection has changed. It will call following methods, that can be overriden to change
-   behavior in derived classes:
-   - pre internal selection change: ReviseSelectionChanged()
-   - post internal selection change: OnInternalSelectionChanged(), UpdateInfo() and AllowEmissionOfSelection() (via EmitSelection())
-   .
-   If the emission is needed and allowed it will also trigger the emission via EmitSelection().*/
+  /** Method is called if the internal selection has changed. It will call following methods, that can be overriden to change
+  *   behavior in derived classes:
+  *   - pre internal selection change: ReviseSelectionChanged()
+  *   - post internal selection change: OnInternalSelectionChanged(), UpdateInfo() and AllowEmissionOfSelection() (via EmitSelection()).
+  *   If the emission is needed and allowed it will also trigger the emission via EmitSelection().
+  */
   void HandleChangeOfInternalSelection(NodeList newInternalSelection);
 
-  /**Compiles the list of node that would be emitted. It always contains the internal selection.
-  Depending on SelectOnlyVisibleNodes it also adds all external select nodes that weren't visible
-  (failed the predicate).*/
+  /** Compiles the list of node that would be emitted. It always contains the internal selection.
+  *   Depending on SelectOnlyVisibleNodes it also adds all external select nodes that weren't visible (failed the predicate).
+  */
   NodeList CompileEmitSelection() const;
 
-  /** This member function is called if the internal selection is about to be changed by the
-  base implementation.
-  This is the slot where derived classes can revise and change the internal selection before widget updates,
-  signal emissions and other things are triggered. Default implementation does nothing, thus it keeps the
-  passed internal selection as compiled by the base implementation.*/
+  /** This member function is called if the internal selection is about to be changed by the base implementation.
+  *   This is the slot where derived classes can revise and change the internal selection before widget updates,
+  *   signal emissions and other things are triggered. Default implementation does nothing, thus it keeps the
+  *   passed internal selection as compiled by the base implementation.
+  */
   virtual void ReviseSelectionChanged(const NodeList& oldInternalSelection, NodeList& newInternalSelection);
 
   /** This function will be called before the CurrentSelectionChanged signal is emitted. The return value indicates
-  if the signal should be emitted (true = emission; false = no emission). The default implementation always
-  returns true.
-  @param emissionCandidates The nodes that will be emitted if the function returns true.*/
+  *   if the signal should be emitted (true = emission; false = no emission). The default implementation always
+  *   returns true.
+  *   @param emissionCandidates The nodes that will be emitted if the function returns true.
+  */
   virtual bool AllowEmissionOfSelection(const NodeList& emissionCandidates) const;
 
   /** Checks if the new emission differs from the last emission. If this is the case and AllowEmissionOfSelection()
-  returns true the new selection will be emited. */
+  *   returns true the new selection will be emited.
+  */
   void EmitSelection(const NodeList& emissionCandidates);
 
   void SetCurrentInternalSelection(NodeList selectedNodes);
@@ -243,4 +255,5 @@ private:
   /** Help to prevent recursions due to signal loops when emitting selections.*/
   bool m_RecursionGuard;
 };
-#endif // QmitkAbstractNodeSelectionWidget_H
+
+#endif // QMITK_ABSTRACT_NODE_SELECTION_WIDGET_H

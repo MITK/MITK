@@ -19,7 +19,10 @@ found in the LICENSE file.
 
 #include <mitkDataNodeObject.h>
 #include <mitkDataNodeSelection.h>
-#include <mitkProperties.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
 
 #include <QmitkPointListWidget.h>
 #include <QmitkRenderWindow.h>
@@ -40,6 +43,24 @@ void QmitkPointSetInteractionView::CreateQtPartControl(QWidget *parent)
   m_Controls = new Ui::QmitkPointSetInteractionViewControls;
   m_Controls->setupUi(parent);
 
+  m_Controls->selectedPointSetWidget->SetDataStorage(GetDataStorage());
+  m_Controls->selectedPointSetWidget->SetNodePredicate(mitk::NodePredicateAnd::New(
+    mitk::TNodePredicateDataType<mitk::PointSet>::New(),
+    mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))));
+
+  m_Controls->selectedPointSetWidget->SetSelectionIsOptional(true);
+  m_Controls->selectedPointSetWidget->SetEmptyInfo(QString("Please select a point set"));
+  m_Controls->selectedPointSetWidget->SetPopUpTitel(QString("Select point set"));
+
+  m_SelectionServiceConnector = std::make_unique<QmitkSelectionServiceConnector>();
+
+  m_SelectionServiceConnector->AddPostSelectionListener(GetSite()->GetWorkbenchWindow()->GetSelectionService());
+  connect(m_SelectionServiceConnector.get(), &QmitkSelectionServiceConnector::ServiceSelectionChanged,
+    m_Controls->selectedPointSetWidget, &QmitkSingleNodeSelectionWidget::SetCurrentSelection);
+
+  connect(m_Controls->selectedPointSetWidget, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,
+    this, &QmitkPointSetInteractionView::OnCurrentSelectionChanged);
+
   connect(m_Controls->addPointSetPushButton, &QPushButton::clicked,
     this, &QmitkPointSetInteractionView::OnAddPointSetClicked);
 
@@ -54,41 +75,22 @@ void QmitkPointSetInteractionView::SetFocus()
   m_Controls->addPointSetPushButton->setFocus();
 }
 
-void QmitkPointSetInteractionView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes)
+void QmitkPointSetInteractionView::OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
 {
-  mitk::DataNode::Pointer selectedNode;
-
-  if (!nodes.empty())
+  if (nodes.empty() || nodes.front().IsNull())
   {
-    selectedNode = nodes.front();
-  }
-
-  mitk::PointSet::Pointer pointSet;
-
-  if (selectedNode.IsNotNull())
-  {
-    pointSet = dynamic_cast<mitk::PointSet*>(selectedNode->GetData());
-  }
-
-  if (pointSet.IsNotNull())
-  {
-    m_SelectedPointSetNode = selectedNode;
-    m_Controls->currentPointSetLabel->setText(QString::fromStdString(selectedNode->GetName()));
-    m_Controls->poinSetListWidget->SetPointSetNode(selectedNode);
-  }
-  else
-  {
-    m_Controls->currentPointSetLabel->setText(tr("None"));
     m_Controls->poinSetListWidget->SetPointSetNode(nullptr);
+    return;
   }
-}
 
-void QmitkPointSetInteractionView::NodeChanged(const mitk::DataNode* node)
-{
-  if (node == m_SelectedPointSetNode && m_Controls->currentPointSetLabel->text().toStdString() != node->GetName())
+  auto selectedPointSet = dynamic_cast<mitk::PointSet*>(nodes.front()->GetData());
+  if (nullptr == selectedPointSet)
   {
-    m_Controls->currentPointSetLabel->setText(QString::fromStdString(node->GetName()));
+    m_Controls->poinSetListWidget->SetPointSetNode(nullptr);
+    return;
   }
+
+  m_Controls->poinSetListWidget->SetPointSetNode(nodes.front());
 }
 
 void QmitkPointSetInteractionView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
@@ -130,9 +132,5 @@ void QmitkPointSetInteractionView::OnAddPointSetClicked()
   pointSetNode->SetColor(1.0, 1.0, 0.0);
   this->GetDataStorage()->Add(pointSetNode);
 
-  // create a new selection and emulate selection for this
-  berry::IWorkbenchPart::Pointer nullPart;
-  QList<mitk::DataNode::Pointer> selection;
-  selection.push_back(pointSetNode);
-  this->OnSelectionChanged(nullPart, selection);
+  m_Controls->selectedPointSetWidget->SetCurrentSelectedNode(pointSetNode);
 }

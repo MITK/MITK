@@ -23,16 +23,25 @@
    <item>
     <layout class="QGridLayout" name="gridLayout">
      <item row="0" column="0">
-      <widget class="QLabel" name="pointSetLabel">
+      <widget class="QLabel" name="selectedPointSetLabel">
        <property name="text">
-        <string>Selected point set:</string>
+        <string>Selected point set</string>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLabel" name="currentPointSetLabel">
-       <property name="text">
-        <string>none</string>
+      <widget class="QmitkSingleNodeSelectionWidget" name="selectedPointSetWidget" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>40</height>
+        </size>
        </property>
       </widget>
      </item>
@@ -66,6 +75,11 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>QmitkSingleNodeSelectionWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkSingleNodeSelectionWidget.h</header>
+  </customwidget>
   <customwidget>
    <class>QmitkPointListWidget</class>
    <extends>QWidget</extends>

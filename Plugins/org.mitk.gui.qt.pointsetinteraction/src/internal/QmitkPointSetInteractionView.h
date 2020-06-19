@@ -17,16 +17,13 @@ found in the LICENSE file.
 
 // mitk core
 #include <mitkDataNode.h>
-#include <mitkWeakPointer.h>
 
 // org mitk gui common plugin
-#include <mitkILifecycleAwarePart.h>
 #include <mitkIRenderWindowPartListener.h>
 
 // org mitk gui qt common plugin
 #include <QmitkAbstractView.h>
-
-#include <berryISelectionListener.h>
+#include <QmitkSelectionServiceConnector.h>
 
 /**
 * @brief
@@ -46,14 +43,12 @@ public:
 
   void SetFocus() override;
 
-  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
-  void NodeChanged(const mitk::DataNode* node) override;
-
   void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
 
-protected Q_SLOT:
+private Q_SLOT:
 
+  void OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
   void OnAddPointSetClicked();
 
 private:
@@ -62,7 +57,7 @@ private:
 
   Ui::QmitkPointSetInteractionViewControls* m_Controls;
 
-  mitk::WeakPointer<mitk::DataNode> m_SelectedPointSetNode;
+  std::unique_ptr<QmitkSelectionServiceConnector> m_SelectionServiceConnector;
 
 };
 

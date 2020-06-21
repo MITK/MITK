@@ -47,10 +47,12 @@ namespace mitk
       //##Documentation
       //## @brief Get the Stepper through the slices
       mitk::Stepper *GetSlice();
+      const mitk::Stepper* GetSlice() const;
 
     //##Documentation
     //## @brief Get the Stepper through the time
     mitk::Stepper *GetTime();
+    const mitk::Stepper* GetTime() const;
 
   protected:
     /**

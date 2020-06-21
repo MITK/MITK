@@ -127,7 +127,7 @@ struct MITK_GUI_COMMON_PLUGIN IRenderWindowPart {
 
   /**
    * Get the selected position in the render window with id <code>id</code>
-   * or in the active render window if <code>id</code> is nullptr.
+   * or in the active render window if <code>id</code> is an empty string.
    *
    * \param id The render window id.
    * \return The currently selected position in world coordinates.
@@ -142,6 +142,14 @@ struct MITK_GUI_COMMON_PLUGIN IRenderWindowPart {
    * \param id The render window id in which the selection should take place.
    */
   virtual void SetSelectedPosition(const mitk::Point3D& pos, const QString& id = QString()) = 0;
+
+  /**
+   * Get the time point selected in the render window with id <code>id</code>
+   * or in the active render window if <code>id</code> is an empty string.
+   *
+   * \param id The render window id.
+   * \return The currently selected position in world coordinates.*/
+  virtual TimePointType GetSelectedTimePoint(const QString& id = QString()) const = 0;
 
   /**
    * Enable \e decorations like colored borders, menu widgets, logos, text annotations, etc.

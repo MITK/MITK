@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <ctkServiceTracker.h>
 #include <mitkIRenderingManager.h>
 #include <mitkInteractionConst.h>
+#include <mitkSliceNavigationController.h>
 
 #include <QVBoxLayout>
 #include <mitkPlaneGeometry.h>
@@ -188,4 +189,14 @@ mitk::SliceNavigationController *SimpleRenderWindowView::GetTimeNavigationContro
   if (GetRenderingManager())
     return GetRenderingManager()->GetTimeNavigationController();
   return nullptr;
+}
+
+mitk::TimePointType SimpleRenderWindowView::GetSelectedTimePoint(const QString& /*id*/) const
+{
+  auto timeNavigator = this->GetTimeNavigationController();
+  if (nullptr != timeNavigator)
+  {
+    return timeNavigator->GetSelectedTimePoint();
+  }
+  return 0;
 }

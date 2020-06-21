@@ -122,6 +122,10 @@ public:
    */
   mitk::SliceNavigationController *GetTimeNavigationController() const override;
 
+  /**
+  * \see mitk::IRenderWindowPart::GetSelectedTimePoint()
+  */
+  mitk::TimePointType GetSelectedTimePoint(const QString& id = QString()) const override;
 protected:
   void SetFocus() override;
 

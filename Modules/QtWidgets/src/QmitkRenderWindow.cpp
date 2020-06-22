@@ -227,8 +227,11 @@ void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
     QVTKWidget::keyPressEvent(ke);
   }
 
-  if (m_ResendQtEvents)
+  if (keyEvent->accepted) {
+    ke->accept();
+  } else if (m_ResendQtEvents) {
     ke->ignore();
+  }
 }
 
 void QmitkRenderWindow::enterEvent(QEvent *e)

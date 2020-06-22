@@ -257,6 +257,8 @@ void mitk::PlanarFigureInteractor::DeleteFigure( StateMachineAction*, Interactio
 
   interactionEvent->GetSender()->GetDataStorage()->Remove( GetDataNode() );
   interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+
+  interactionEvent->accepted = true;
 }
 
 

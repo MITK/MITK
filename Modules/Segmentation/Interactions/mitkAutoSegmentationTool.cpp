@@ -28,8 +28,11 @@ const char *mitk::AutoSegmentationTool::GetGroup() const
   return "autoSegmentation";
 }
 
-mitk::Image::Pointer mitk::AutoSegmentationTool::Get3DImage(mitk::Image::Pointer image, unsigned int timestep)
+mitk::Image::ConstPointer mitk::AutoSegmentationTool::Get3DImage(const mitk::Image* image, unsigned int timestep) const
 {
+  if (nullptr == image)
+    return image;
+
   if (image->GetDimension() != 4)
     return image;
 
@@ -41,6 +44,17 @@ mitk::Image::Pointer mitk::AutoSegmentationTool::Get3DImage(mitk::Image::Pointer
   imageTimeSelector->UpdateLargestPossibleRegion();
 
   return imageTimeSelector->GetOutput();
+}
+
+mitk::Image::ConstPointer mitk::AutoSegmentationTool::Get3DImageByTimePoint(const mitk::Image* image, TimePointType timePoint) const
+{
+  if (nullptr == image)
+    return image;
+
+  if (!image->GetTimeGeometry()->IsValidTimePoint(timePoint))
+    return nullptr;
+
+  return this->Get3DImage(image, image->GetTimeGeometry()->TimePointToTimeStep(timePoint));
 }
 
 void mitk::AutoSegmentationTool::SetOverwriteExistingSegmentation(bool overwrite)

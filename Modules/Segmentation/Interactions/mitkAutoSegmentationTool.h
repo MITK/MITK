@@ -54,7 +54,8 @@ namespace mitk
 
     const char *GetGroup() const override;
 
-    virtual itk::SmartPointer<Image> Get3DImage(itk::SmartPointer<Image> image, unsigned int timestep);
+    virtual Image::ConstPointer Get3DImage(const Image* image, unsigned int timestep) const;
+    virtual Image::ConstPointer Get3DImageByTimePoint(const Image* image, TimePointType timePoint) const;
 
     bool m_OverwriteExistingSegmentation;
   };

@@ -199,6 +199,8 @@ void QmitkSliceBasedInterpolatorWidget::OnTimeChanged(itk::Object *sender, const
   mitk::SliceNavigationController *slicer = dynamic_cast<mitk::SliceNavigationController *>(sender);
   Q_ASSERT(slicer);
 
+  m_TimePoints[slicer] = slicer->GetSelectedTimePoint();
+
   // TODO Macht das hier wirklich Sinn????
   if (m_LastSNC == slicer)
   {

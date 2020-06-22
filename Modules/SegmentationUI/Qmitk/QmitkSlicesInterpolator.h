@@ -214,7 +214,7 @@ protected:
     ToolManager)
     should be interpolated. The actual work is then done by our SegmentationInterpolation object.
    */
-  void Interpolate(mitk::PlaneGeometry *plane, unsigned int timeStep, mitk::SliceNavigationController *slicer);
+  void Interpolate(mitk::PlaneGeometry *plane, mitk::TimePointType timePoint, mitk::SliceNavigationController *slicer);
 
   // void InterpolateSurface();
 
@@ -270,7 +270,7 @@ private:
   mitk::SliceNavigationController *m_LastSNC;
   unsigned int m_LastSliceIndex;
 
-  QHash<mitk::SliceNavigationController *, unsigned int> m_TimeStep;
+  QHash<mitk::SliceNavigationController *, mitk::TimePointType> m_TimePoints;
 
   bool m_2DInterpolationEnabled;
   bool m_3DInterpolationEnabled;

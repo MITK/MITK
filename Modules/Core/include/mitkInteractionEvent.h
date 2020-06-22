@@ -97,6 +97,8 @@ namespace mitk
     static const std::string KeySpace; // = "Space";
     // End special keys
 
+  bool accepted = false;
+
   protected:
     InteractionEvent(BaseRenderer*);
     virtual ~InteractionEvent();

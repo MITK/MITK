@@ -66,7 +66,7 @@
       <action name="add_initial_point" ID="11" />
       <action name="finalize_figure" />
     </transition>
-  
+
     <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="FigurePlaced" >
       <condition name="figure_is_editable" />
       <action name="add_initial_point" ID="11" /> <!-- AcADD -->
@@ -91,12 +91,6 @@
       <condition name="figure_is_on_current_slice" />
       <condition name="hovering_above_annotation" />
       <action name="start_hovering" />
-    </transition>
-
-    <transition event_class="InteractionKeyEvent" event_variant="StdDelete" target="Start" > <!-- delete figure -->
-      <condition name="figure_is_selected" />
-      <condition name="figure_can_be_deleted" />
-      <action name="delete_figure" />
     </transition>
   </state>
 
@@ -129,6 +123,12 @@
       <condition name="figure_is_on_current_slice" />
       <condition name="figure_is_editable" />
       <action name="move_annotations" />
+    </transition>
+
+    <transition event_class="InteractionKeyEvent" event_variant="StdDelete" target="Start" > <!-- delete figure -->
+      <condition name="figure_is_selected" />
+      <condition name="figure_can_be_deleted" />
+      <action name="delete_figure" />
     </transition>
   </state>
 
@@ -189,7 +189,12 @@
       <condition name="figure_is_on_current_slice" />
       <action name="request_context_menu" ID="48000" />
     </transition>
-    
+
+    <transition event_class="InteractionKeyEvent" event_variant="StdDelete" target="Start" > <!-- delete figure -->
+      <condition name="figure_is_selected" />
+      <condition name="figure_can_be_deleted" />
+      <action name="delete_figure" />
+    </transition>
   </state>
 
   <state name="ContextMenuHelperState">
@@ -271,6 +276,11 @@
       <condition name="points_can_be_added_or_removed" inverted="true" />
     </transition>
 
+    <transition event_class="InteractionKeyEvent" event_variant="StdDelete" target="Start" > <!-- delete figure -->
+      <condition name="figure_is_selected" />
+      <condition name="figure_can_be_deleted" />
+      <action name="delete_figure" />
+    </transition>
   </state>
 
   <state name="HoveringAfterPointRemovedGuardState">

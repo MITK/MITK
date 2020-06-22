@@ -110,7 +110,7 @@ QmitkCESTStatisticsView::QmitkCESTStatisticsView(QObject * /*parent*/, const cha
   this->m_CalculatorJob = new QmitkImageStatisticsCalculationJob();
 
   m_currentSelectedPosition.Fill(0.0);
-  m_currentSelectedTimeStep = 0;
+  m_currentSelectedTimePoint = 0.;
   m_CrosshairPointSet = mitk::PointSet::New();
 }
 
@@ -762,16 +762,15 @@ void QmitkCESTStatisticsView::Clear()
 void QmitkCESTStatisticsView::OnSliceChanged()
 {
   mitk::Point3D currentSelectedPosition = this->GetRenderWindowPart()->GetSelectedPosition(nullptr);
-  unsigned int currentSelectedTimeStep =
-    this->GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->GetPos();
+  mitk::TimePointType currentSelectedTimePoint = this->GetRenderWindowPart()->GetSelectedTimePoint();
 
-  if (m_currentSelectedPosition != currentSelectedPosition || m_currentSelectedTimeStep != currentSelectedTimeStep)
+  if (m_currentSelectedPosition != currentSelectedPosition || currentSelectedTimePoint != currentSelectedTimePoint)
   //|| m_selectedNodeTime > m_currentPositionTime)
   {
     // the current position has been changed or the selected node has been changed since the last position validation ->
     // check position
     m_currentSelectedPosition = currentSelectedPosition;
-    m_currentSelectedTimeStep = currentSelectedTimeStep;
+    m_currentSelectedTimePoint = currentSelectedTimePoint;
     m_currentPositionTime.Modified();
 
     m_CrosshairPointSet->Clear();

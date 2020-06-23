@@ -49,6 +49,7 @@ void QmitkPointSetInteractionView::CreateQtPartControl(QWidget *parent)
     mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))));
 
   m_Controls->selectedPointSetWidget->SetSelectionIsOptional(true);
+  m_Controls->selectedPointSetWidget->SetAutoSelectNewNodes(true);
   m_Controls->selectedPointSetWidget->SetEmptyInfo(QString("Please select a point set"));
   m_Controls->selectedPointSetWidget->SetPopUpTitel(QString("Select point set"));
 

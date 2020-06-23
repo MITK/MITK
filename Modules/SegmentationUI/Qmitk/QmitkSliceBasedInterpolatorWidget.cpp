@@ -287,7 +287,7 @@ mitk::Image::Pointer QmitkSliceBasedInterpolatorWidget::GetWorkingSlice(const mi
 
   if (!m_WorkingImage->GetTimeGeometry()->IsValidTimePoint(timePoint))
   {
-    MITK_WARN << "Cannot get slice of WorkingImage. Time point selected by SliceNavigationControl is not within the time bounds of WorkingImage. Time point: " << timePoint;
+    MITK_WARN << "Cannot get slice of WorkingImage. Time point selected by SliceNavigationController is not within the time bounds of WorkingImage. Time point: " << timePoint;
     return nullptr;
   }
 
@@ -479,7 +479,7 @@ void QmitkSliceBasedInterpolatorWidget::OnAcceptInterpolationClicked()
     const auto timePoint = m_LastSNC->GetSelectedTimePoint();
     if (!m_WorkingImage->GetTimeGeometry()->IsValidTimePoint(timePoint))
     {
-      MITK_WARN << "Cannot accept interpolation. Time point selected by SliceNavigationControl is not within the time bounds of WorkingImage. Time point: " << timePoint;
+      MITK_WARN << "Cannot accept interpolation. Time point selected by SliceNavigationController is not within the time bounds of WorkingImage. Time point: " << timePoint;
       return;
     }
 
@@ -550,7 +550,7 @@ void QmitkSliceBasedInterpolatorWidget::AcceptAllInterpolations(mitk::SliceNavig
   const auto timePoint = slicer->GetSelectedTimePoint();
   if (!m_WorkingImage->GetTimeGeometry()->IsValidTimePoint(timePoint))
   {
-    MITK_WARN << "Cannot accept all interpolations. Time point selected by SliceNavigationControl is not within the time bounds of WorkingImage. Time point: " << timePoint;
+    MITK_WARN << "Cannot accept all interpolations. Time point selected by SliceNavigationController is not within the time bounds of WorkingImage. Time point: " << timePoint;
 
     return;
   }

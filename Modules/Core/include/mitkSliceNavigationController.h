@@ -422,11 +422,11 @@ namespace mitk
      */
     void AdjustSliceStepperRange();
 
-    /** \brief Convinience method that returns the time step currently selected by the controller.*/
+    /** \brief Convenience method that returns the time step currently selected by the controller.*/
     TimeStepType GetSelectedTimeStep() const;
 
-    /** \brief Convinience method that returns the time point that corresponds to the selected
-     *time step. The conversion is done using the time geometry of the SliceNavigationControler.*/
+    /** \brief Convenience method that returns the time point that corresponds to the selected
+     *time step. The conversion is done using the time geometry of the SliceNavigationController.*/
     TimePointType GetSelectedTimePoint() const;
 
   protected:

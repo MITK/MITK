@@ -264,7 +264,7 @@ void mitk::SurfaceInterpolationController::Interpolate()
 {
   if (!m_SelectedSegmentation->GetTimeGeometry()->IsValidTimePoint(m_CurrentTimePoint))
   {
-    MITK_WARN << "No interpolation possible, currently selected timepoint is not in the time bounds of currently selecte segmentation. Time point: " << m_CurrentTimePoint;
+    MITK_WARN << "No interpolation possible, currently selected timepoint is not in the time bounds of currently selected segmentation. Time point: " << m_CurrentTimePoint;
     m_InterpolationResult = nullptr;
     return;
   }

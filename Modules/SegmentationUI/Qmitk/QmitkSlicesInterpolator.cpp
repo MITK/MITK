@@ -657,7 +657,7 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
     const auto timePoint = m_LastSNC->GetSelectedTimePoint();
     if (!m_Segmentation->GetTimeGeometry()->IsValidTimePoint(timePoint))
     {
-      MITK_WARN << "Cannot accept interpolation. Time point selected by SliceNavigationControl is not within the time bounds of segmentation. Time point: " << timePoint;
+      MITK_WARN << "Cannot accept interpolation. Time point selected by SliceNavigationController is not within the time bounds of segmentation. Time point: " << timePoint;
       return;
     }
 
@@ -698,7 +698,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
     {
       if (!m_Segmentation->GetTimeGeometry()->IsValidTimePoint(timePoint))
       {
-        MITK_WARN << "Cannot accept all interpolations. Time point selected by passed SliceNavigationControl is not within the time bounds of segmentation. Time point: " << timePoint;
+        MITK_WARN << "Cannot accept all interpolations. Time point selected by passed SliceNavigationController is not within the time bounds of segmentation. Time point: " << timePoint;
         return;
       }
 
@@ -863,7 +863,7 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
     if (!m_ToolManager->GetReferenceData(0)->GetData()->GetTimeGeometry()->IsValidTimePoint(timePoint) ||
         !m_ToolManager->GetWorkingData(0)->GetData()->GetTimeGeometry()->IsValidTimePoint(timePoint))
     {
-      MITK_WARN << "Cannot accept interpolation. Time point selected by SliceNavigationControl is not within the time bounds of reference or working image. Time point: " << timePoint;
+      MITK_WARN << "Cannot accept interpolation. Time point selected by SliceNavigationController is not within the time bounds of reference or working image. Time point: " << timePoint;
       return;
     }
 
@@ -1273,7 +1273,7 @@ void QmitkSlicesInterpolator::SetCurrentContourListID()
         unsigned int time_position = 0;
         if (!workingNode->GetData()->GetTimeGeometry()->IsValidTimePoint(timePoint))
         {
-          MITK_WARN << "Cannot accept interpolation. Time point selected by SliceNavigationControl is not within the time bounds of WorkingImage. Time point: " << timePoint;
+          MITK_WARN << "Cannot accept interpolation. Time point selected by SliceNavigationController is not within the time bounds of WorkingImage. Time point: " << timePoint;
         }
         time_position = workingNode->GetData()->GetTimeGeometry()->TimePointToTimeStep(timePoint);
 

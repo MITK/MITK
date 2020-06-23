@@ -629,20 +629,17 @@ namespace mitk
     }
   }
 
-  /** \brief Convinience method that returns the time step currently selected by the controller.*/
   TimeStepType SliceNavigationController::GetSelectedTimeStep() const
   {
     return this->GetTime()->GetPos();
   }
 
-  /** \brief Convinience method that returns the time point that corresponds to the selected
-   *time step. The conversion is done using the time geometry of the SliceNavigationControler.*/
   TimePointType SliceNavigationController::GetSelectedTimePoint() const
   {
     auto timeStep = this->GetSelectedTimeStep();
     if (m_CreatedWorldGeometry.IsNull())
     {
-      mitkThrow() << "SliceNavigationController is in an invalid state as m_CreatedWorldGeometry is invalid.";
+      mitkThrow() << "SliceNavigationController is in an invalid state as internal world geometry is invalid.";
     }
 
     if (!m_CreatedWorldGeometry->IsValidTimeStep(timeStep))

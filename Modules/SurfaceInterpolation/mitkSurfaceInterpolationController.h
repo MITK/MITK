@@ -79,7 +79,8 @@ namespace mitk
       }
     };
 
-    unsigned int GetCurrentTimePoint() { return m_CurrentTimePoint; };
+    TimePointType GetCurrentTimePoint() const { return m_CurrentTimePoint; };
+
     /**
      * @brief Adds a new extracted contour to the list
      * @param newContour the contour to be added. If a contour at that position

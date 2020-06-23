@@ -53,12 +53,6 @@ void QmitkPointSetInteractionView::CreateQtPartControl(QWidget *parent)
   m_Controls->selectedPointSetWidget->SetEmptyInfo(QString("Please select a point set"));
   m_Controls->selectedPointSetWidget->SetPopUpTitel(QString("Select point set"));
 
-  m_SelectionServiceConnector = std::make_unique<QmitkSelectionServiceConnector>();
-
-  m_SelectionServiceConnector->AddPostSelectionListener(GetSite()->GetWorkbenchWindow()->GetSelectionService());
-  connect(m_SelectionServiceConnector.get(), &QmitkSelectionServiceConnector::ServiceSelectionChanged,
-    m_Controls->selectedPointSetWidget, &QmitkSingleNodeSelectionWidget::SetCurrentSelection);
-
   connect(m_Controls->selectedPointSetWidget, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,
     this, &QmitkPointSetInteractionView::OnCurrentSelectionChanged);
 

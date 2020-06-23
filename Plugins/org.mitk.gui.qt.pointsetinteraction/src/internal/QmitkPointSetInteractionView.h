@@ -23,7 +23,6 @@ found in the LICENSE file.
 
 // org mitk gui qt common plugin
 #include <QmitkAbstractView.h>
-#include <QmitkSelectionServiceConnector.h>
 
 /**
 * @brief
@@ -56,8 +55,6 @@ private:
   void CreateQtPartControl(QWidget *parent) override;
 
   Ui::QmitkPointSetInteractionViewControls* m_Controls;
-
-  std::unique_ptr<QmitkSelectionServiceConnector> m_SelectionServiceConnector;
 
 };
 

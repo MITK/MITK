@@ -23,9 +23,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryShell.h>
 #include <internal/berryQtWidgetController.h>
 
+#include <org_blueberry_ui_qt_Export.h>
+
 namespace berry {
 
-class QtMainWindowControl : public QMainWindow
+class BERRY_UI_QT QtMainWindowControl : public QMainWindow
 {
 
   Q_OBJECT

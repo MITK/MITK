@@ -12,13 +12,9 @@ found in the LICENSE file.
 
 #include "QmitkPointSetInteractionView.h"
 
-#include <berryIWorkbenchWindow.h>
-#include <berryISelectionService.h>
 #include <QInputDialog>
 #include <QLineEdit>
 
-#include <mitkDataNodeObject.h>
-#include <mitkDataNodeSelection.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateNot.h>

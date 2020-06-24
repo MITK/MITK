@@ -378,7 +378,7 @@ const mitk::PointSet::Pointer QmitkIGTPlayerWidget::GetNavigationDatasPointSet()
 
       if(isRealTimeMode)
         position = m_RealTimePlayer->GetOutput(i)->GetPosition();
-      else if(isSequentialMode)
+      else
         position = m_SequentialPlayer->GetOutput(i)->GetPosition();
 
       pointType[0] = position[0];

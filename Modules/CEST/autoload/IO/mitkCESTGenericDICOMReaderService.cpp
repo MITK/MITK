@@ -67,13 +67,20 @@ namespace mitk
   {
     boost::property_tree::ptree root;
 
-    try
+    if (itksys::SystemTools::FileExists(file))
     {
-      boost::property_tree::read_json(file, root, std::locale("C"));
+      try
+      {
+        boost::property_tree::read_json(file, root, std::locale("C"));
+      }
+      catch (const boost::property_tree::json_parser_error & e)
+      {
+        MITK_WARN << "Could not parse CEST meta file. Fall back to default values. Error was:\n" << e.what();
+      }
     }
-    catch (const boost::property_tree::json_parser_error & e)
+    else
     {
-      MITK_WARN << "Could not parse CEST meta file. Fall back to default values. Error was:\n" << e.what();
+      MITK_DEBUG << "CEST meta file does not exist. Fall back to default values. CEST meta file path: " << file;
     }
 
     IFileIO::Options options;

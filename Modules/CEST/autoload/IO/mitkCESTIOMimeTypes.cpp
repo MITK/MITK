@@ -77,18 +77,24 @@ namespace mitk
     mitk::DICOMTagCache::Pointer tagCache = scanner->GetScanCache();
 
     mitk::DICOMImageFrameList imageFrameList = mitk::ConvertToDICOMImageFrameList(tagCache->GetFrameInfoList());
-    mitk::DICOMImageFrameInfo *firstFrame = imageFrameList.begin()->GetPointer();
 
-    std::string byteString = tagCache->GetTagValue(firstFrame, siemensCESTprivateTag).value;
+    bool mapNotEmpty = false;
 
-    if (byteString.empty()) {
-      return false;
+    if (!imageFrameList.empty())
+    {
+      mitk::DICOMImageFrameInfo* firstFrame = imageFrameList.begin()->GetPointer();
+
+      std::string byteString = tagCache->GetTagValue(firstFrame, siemensCESTprivateTag).value;
+
+      if (byteString.empty()) {
+        return false;
+      }
+      mitk::CustomTagParser tagParser(relevantFiles[0]);
+
+      auto parsedPropertyList = tagParser.ParseDicomPropertyString(byteString);
+
+      mapNotEmpty = parsedPropertyList->GetMap()->size() > 0;
     }
-    mitk::CustomTagParser tagParser(relevantFiles[0]);
-
-    auto parsedPropertyList = tagParser.ParseDicomPropertyString(byteString);
-
-    bool mapNotEmpty = parsedPropertyList->GetMap()->size() > 0;
 
     return mapNotEmpty;
   }

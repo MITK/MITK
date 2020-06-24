@@ -101,7 +101,7 @@ mitk::VisibleDataStorageInspectorMapType mitk::GetVisibleDataStorageInspectors()
 
     //fill inspector list
     unsigned int pos = 0;
-    for (const auto iter : allProviders)
+    for (const auto& iter : allProviders)
     {
       if (iter.first != QmitkDataStorageFavoriteNodesInspector::INSPECTOR_ID() && iter.first != QmitkDataStorageSelectionHistoryInspector::INSPECTOR_ID())
       {
@@ -126,7 +126,7 @@ mitk::DataStorageInspectorIDType mitk::GetPreferredDataStorageInspector()
   mitk::DataStorageInspectorIDType result = id.toStdString();
 
   if (result.empty())
-  { //nothing set, deduce default
+  { //nothing set, deduce default preferred inspector
     auto visibleInspectors = GetVisibleDataStorageInspectors();
     if (!visibleInspectors.empty())
     {

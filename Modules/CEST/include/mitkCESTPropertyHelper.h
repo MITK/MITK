@@ -14,6 +14,7 @@ found in the LICENSE file.
 #define __CEST_PROERTY_HELPER_H
 
 #include "mitkIPropertyProvider.h"
+#include "mitkIPropertyOwner.h"
 
 #include "MitkCESTExports.h"
 
@@ -38,6 +39,11 @@ namespace mitk
   If it is not possible to generate/get the value an mitk::Exception will be thrown.
   The value is returned in [MHz]. Normally in the property it is stored in [Hz].*/
   double MITKCEST_EXPORT GetCESTFrequency(const IPropertyProvider* provider);
+
+  /**Helper function that sets the CEST frequency property ("CEST.FREQ") in the passed owner.
+  If it owner is nullptr nothing will be done.
+  The value is passed in [MHz] and set in the property in [Hz].*/
+  void MITKCEST_EXPORT SetCESTFrequencyMHz(IPropertyOwner* owner, double freqInMHz);
 
   /**Helper function that gets the CEST pulse duration property ("CEST.PulseDuration") from the input image.
   If it is not possible to generate/get the value an mitk::Exception will be thrown.

@@ -46,6 +46,7 @@ namespace mitk {
     CESTDICOMManualReaderService* Clone() const override;
   };
 
+  DICOMTagPath DICOM_IMAGING_FREQUENCY_PATH();
 }
 
 #endif // MITKCESTGenericDICOMReaderService_H

@@ -18,6 +18,8 @@ found in the LICENSE file.
 #include <mitkCESTPropertyHelper.h>
 #include <mitkDICOMDCMTKTagScanner.h>
 #include <mitkDICOMFileReaderSelector.h>
+#include <mitkDICOMProperty.h>
+
 #include "mitkCESTImageNormalizationFilter.h"
 
 #include "itksys/SystemTools.hxx"
@@ -31,19 +33,71 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  DICOMTagPath DICOM_IMAGING_FREQUENCY_PATH()
+  {
+    return mitk::DICOMTagPath(0x0018, 0x0084);
+  }
+
+  std::string OPTION_NAME_B1()
+  {
+    return "B1 amplitude";
+  };
+  
+  std::string OPTION_NAME_PULSE()
+  {
+    return "Pulse duration [us]";
+  };
+  
+  std::string OPTION_NAME_DC()
+  {
+    return "Duty cycle [%]";
+  };
+  
+  std::string OPTION_NAME_NORMALIZE()
+  {
+    return "Normalize data";
+  };
+
+  std::string OPTION_NAME_NORMALIZE_AUTOMATIC()
+  {
+    return "Automatic";
+  };
+
+  std::string OPTION_NAME_NORMALIZE_NO()
+  {
+    return "No";
+  };
+
+  std::string OPTION_NAME_MERGE()
+  {
+    return "Merge all series";
+  };
+
+  std::string OPTION_NAME_MERGE_YES()
+  {
+    return "Yes";
+  };
+
+  std::string OPTION_NAME_MERGE_NO()
+  {
+    return "No";
+  };
+
   CESTDICOMManualReaderService::CESTDICOMManualReaderService(const CustomMimeType& mimeType, const std::string& description)
     : BaseDICOMReaderService(mimeType, description)
   {
     IFileIO::Options options;
-    options["B1 amplitude"] = 0.0;
-    options["CEST frequency [Hz]"] = 0.0;
-    options["Pulse duration [us]"] = 0.0;
-    options["Duty cycle [%]"] = 0.0;
+    options[OPTION_NAME_B1().c_str()] = 0.0;
+    options[OPTION_NAME_PULSE().c_str()] = 0.0;
+    options[OPTION_NAME_DC().c_str()] = 0.0;
     std::vector<std::string> normalizationStrategy;
-    normalizationStrategy.push_back("Automatic");
-    normalizationStrategy.push_back("No");
-    options["Normalize data"] = normalizationStrategy;
-
+    normalizationStrategy.push_back(OPTION_NAME_NORMALIZE_AUTOMATIC().c_str());
+    normalizationStrategy.push_back(OPTION_NAME_NORMALIZE_NO().c_str());
+    options[OPTION_NAME_NORMALIZE().c_str()] = normalizationStrategy;
+    std::vector<std::string> mergeStrategy;
+    mergeStrategy.push_back(OPTION_NAME_MERGE_NO().c_str());
+    mergeStrategy.push_back(OPTION_NAME_MERGE_YES().c_str());
+    options[OPTION_NAME_MERGE().c_str()] = mergeStrategy;
     this->SetDefaultOptions(options);
 
     this->RegisterService();
@@ -59,7 +113,14 @@ namespace mitk
     auto finding = root.find(key);
     if (finding != root.not_found())
     {
-      options[key] = finding->second.get_value<double>();
+      try
+      {
+        options[key] = finding->second.get_value<double>();
+      }
+      catch (const boost::property_tree::ptree_bad_data & /*e*/)
+      {
+        options[key] = finding->second.get_value<std::string>();
+      }
     }
   }
 
@@ -84,12 +145,12 @@ namespace mitk
     }
 
     IFileIO::Options options;
-    ExtractOptionFromPropertyTree(CEST_PROPERTY_NAME_FREQ(),root, options);
     ExtractOptionFromPropertyTree(CEST_PROPERTY_NAME_B1Amplitude(), root, options);
     ExtractOptionFromPropertyTree(CEST_PROPERTY_NAME_PULSEDURATION(), root, options);
     ExtractOptionFromPropertyTree(CEST_PROPERTY_NAME_DutyCycle(), root, options);
     ExtractOptionFromPropertyTree(CEST_PROPERTY_NAME_OFFSETS(), root, options);
     ExtractOptionFromPropertyTree(CEST_PROPERTY_NAME_TREC(), root, options);
+    ExtractOptionFromPropertyTree("CEST.MergeAllSeries", root, options);
 
     return options;
   }
@@ -111,6 +172,31 @@ namespace mitk
     }
   }
   
+  void TransferMergeOption(const mitk::IFileIO::Options& sourceOptions, const std::string& sourceName, mitk::IFileIO::Options& options, const std::string& newName)
+  {
+    auto sourceFinding = sourceOptions.find(sourceName);
+    auto finding = options.find(newName);
+
+    bool replaceValue = finding == options.end();
+    if (!replaceValue)
+    {
+      try
+      {
+        us::any_cast<std::string>(finding->second);
+      }
+      catch (const us::BadAnyCastException& /*e*/)
+      {
+        replaceValue = true;
+        //if we cannot cast in string the user has not make a selection yet
+      }
+    }
+
+    if (sourceFinding != sourceOptions.end() && us::any_cast<std::string>(sourceFinding->second) != OPTION_NAME_MERGE_NO() && replaceValue)
+    {
+      options[newName] = sourceFinding->second;
+    }
+  }
+
   std::string CESTDICOMManualReaderService::GetCESTMetaFilePath() const
   {
     auto dir = itksys::SystemTools::GetFilenamePath(this->GetInputLocation());
@@ -140,10 +226,10 @@ namespace mitk
     {
       auto fileOptions = ExtractOptionsFromFile(this->GetCESTMetaFilePath());
 
-      TransferOption(fileOptions, CEST_PROPERTY_NAME_FREQ(), options, "CEST frequency [Hz]");
-      TransferOption(fileOptions, CEST_PROPERTY_NAME_B1Amplitude(), options, "B1 amplitude");
-      TransferOption(fileOptions, CEST_PROPERTY_NAME_PULSEDURATION(), options, "Pulse duration [us]");
-      TransferOption(fileOptions, CEST_PROPERTY_NAME_DutyCycle(), options, "Duty cycle [%]");
+      TransferOption(fileOptions, CEST_PROPERTY_NAME_B1Amplitude(), options, OPTION_NAME_B1());
+      TransferOption(fileOptions, CEST_PROPERTY_NAME_PULSEDURATION(), options, OPTION_NAME_PULSE());
+      TransferOption(fileOptions, CEST_PROPERTY_NAME_DutyCycle(), options, OPTION_NAME_DC());
+      TransferMergeOption(fileOptions, "CEST.MergeAllSeries", options, OPTION_NAME_MERGE());
     }
     return options;
   }
@@ -157,6 +243,14 @@ namespace mitk
   DICOMFileReader::Pointer CESTDICOMManualReaderService::GetReader(const mitk::StringList& relevantFiles) const
   {
     mitk::DICOMFileReaderSelector::Pointer selector = mitk::DICOMFileReaderSelector::New();
+
+    const std::string mergeStrategy = this->GetOption(OPTION_NAME_MERGE()).ToString();
+
+    if (mergeStrategy == OPTION_NAME_MERGE_YES())
+    {
+      auto r = ::us::GetModuleContext()->GetModule()->GetResource("cest_DKFZ.xml");
+      selector->AddConfigFromResource(r);
+    }
 
     selector->LoadBuiltIn3DnTConfigs();
     selector->SetInputFiles(relevantFiles);
@@ -174,22 +268,23 @@ namespace mitk
 
   std::vector<itk::SmartPointer<BaseData>> CESTDICOMManualReaderService::Read()
   {
+    const Options userOptions = this->GetOptions();
+
+    const std::string mergeStrategy = userOptions.find(OPTION_NAME_MERGE())->second.ToString();
+    this->SetOnlyRegardOwnSeries(mergeStrategy != OPTION_NAME_MERGE_YES());
+
     std::vector<BaseData::Pointer> result;
     std::vector<BaseData::Pointer> dicomResult = BaseDICOMReaderService::Read();
 
-    const Options userOptions = this->GetOptions();
-
-    const std::string normalizationStrategy = userOptions.find("Normalize data")->second.ToString();
+    const std::string normalizationStrategy = userOptions.find(OPTION_NAME_NORMALIZE())->second.ToString();
 
     for (auto &item : dicomResult)
     {
       auto fileOptions = ExtractOptionsFromFile(this->GetCESTMetaFilePath());
       IFileIO::Options options;
-      TransferOption(userOptions, "CEST frequency [Hz]", options, CEST_PROPERTY_NAME_FREQ());
-      TransferOption(userOptions, "B1 amplitude", options, CEST_PROPERTY_NAME_B1Amplitude());
-      TransferOption(userOptions, "Pulse duration [us]", options, CEST_PROPERTY_NAME_PULSEDURATION());
-      TransferOption(userOptions, "Duty cycle [%]", options, CEST_PROPERTY_NAME_DutyCycle());
-      TransferOption(fileOptions, CEST_PROPERTY_NAME_FREQ(), options, CEST_PROPERTY_NAME_FREQ());
+      TransferOption(userOptions, OPTION_NAME_B1(), options, CEST_PROPERTY_NAME_B1Amplitude());
+      TransferOption(userOptions, OPTION_NAME_PULSE(), options, CEST_PROPERTY_NAME_PULSEDURATION());
+      TransferOption(userOptions, OPTION_NAME_DC(), options, CEST_PROPERTY_NAME_DutyCycle());
       TransferOption(fileOptions, CEST_PROPERTY_NAME_B1Amplitude(), options, CEST_PROPERTY_NAME_B1Amplitude());
       TransferOption(fileOptions, CEST_PROPERTY_NAME_PULSEDURATION(), options, CEST_PROPERTY_NAME_PULSEDURATION());
       TransferOption(fileOptions, CEST_PROPERTY_NAME_DutyCycle(), options, CEST_PROPERTY_NAME_DutyCycle());
@@ -240,6 +335,14 @@ namespace mitk
         item->GetPropertyList()->SetStringProperty(option.first.c_str(), option.second.ToString().c_str());
       }
 
+      auto freqProp = item->GetProperty(mitk::DICOMTagPathToPropertyName(DICOM_IMAGING_FREQUENCY_PATH()).c_str());
+
+      if (freqProp.IsNull())
+      {
+        mitkThrow() << "Loaded image in invalid state. Does not contain the DICOM Imaging Frequency tag.";
+      }
+      SetCESTFrequencyMHz(item, mitk::ConvertDICOMStrToValue<double>(freqProp->GetValueAsString()));
+
       auto image = dynamic_cast<mitk::Image*>(item.GetPointer());
 
       if (isCEST)
@@ -265,7 +368,7 @@ namespace mitk
         }
       }
 
-      if (normalizationStrategy == "Automatic" && mitk::IsNotNormalizedCESTImage(image))
+      if (normalizationStrategy == OPTION_NAME_NORMALIZE_AUTOMATIC() && mitk::IsNotNormalizedCESTImage(image))
       {
         MITK_INFO << "Unnormalized CEST image was loaded and will be normalized automatically.";
         auto normalizationFilter = mitk::CESTImageNormalizationFilter::New();

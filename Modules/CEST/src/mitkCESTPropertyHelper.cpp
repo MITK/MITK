@@ -13,26 +13,27 @@ found in the LICENSE file.
 #include "mitkCESTPropertyHelper.h"
 
 #include "mitkDICOMProperty.h"
+#include "mitkStringProperty.h"
 
 const std::string mitk::CEST_PROPERTY_NAME_PREPERATIONTYPE()
 {
   return "CEST.PreparationType";
-};
+}
 
 const std::string mitk::CEST_PROPERTY_NAME_RECOVERYMODE()
 {
   return "CEST.RecoveryMode";
-};
+}
 
 const std::string mitk::CEST_PROPERTY_NAME_SPOILINGTYPE()
 {
   return "CEST.SpoilingType";
-};
+}
 
 const std::string mitk::CEST_PROPERTY_NAME_OFFSETS()
 {
   return "CEST.Offsets";
-};
+}
 
 const std::string mitk::CEST_PROPERTY_NAME_TREC()
 {
@@ -96,7 +97,15 @@ double mitk::GetCESTFrequency(const IPropertyProvider* provider)
   else mitkThrow() << "Cannot determine frequency. Selected input has no property \"" << CEST_PROPERTY_NAME_FREQ << "\"";
 
   return result;
-};
+}
+
+void mitk::SetCESTFrequencyMHz(IPropertyOwner* owner, double freqInMHz)
+{
+  if (nullptr != owner)
+  {
+    owner->SetProperty(CEST_PROPERTY_NAME_FREQ().c_str(), mitk::StringProperty::New(ConvertValueToDICOMStr(freqInMHz * 1000000)));
+  }
+}
 
 double mitk::GetCESTPulseDuration(const IPropertyProvider* provider)
 {
@@ -115,7 +124,7 @@ double mitk::GetCESTPulseDuration(const IPropertyProvider* provider)
   else mitkThrow() << "Cannot determine pulse duration. Selected input has no property \"" << CEST_PROPERTY_NAME_PULSEDURATION << "\"";
 
   return result;
-};
+}
 
 double mitk::GetCESTDutyCycle(const IPropertyProvider* provider)
 {
@@ -134,4 +143,4 @@ double mitk::GetCESTDutyCycle(const IPropertyProvider* provider)
   else mitkThrow() << "Cannot determine duty cycle. Selected input has no property \"" << CEST_PROPERTY_NAME_DutyCycle << "\"";
 
   return result;
-};
+}

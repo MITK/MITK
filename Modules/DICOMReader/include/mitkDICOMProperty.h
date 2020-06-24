@@ -59,6 +59,23 @@ namespace mitk
     return d;
   };
 
+  /**Helper function that can be used to convert a numeric value into content of a DICOM property.
+     @pre value must be convertibel into a string.
+     If this is not the case an exception will be thrown.
+     */
+  template<typename TNumericType>
+  std::string ConvertValueToDICOMStr(const TNumericType value)
+  {
+    std::ostringstream oss(value);
+    oss.imbue(std::locale("C"));
+    if (!(oss << value))
+    {
+      mitkThrow() << "Cannot convert value type to dicom string. Type: " << typeid(TNumericType).name() << "; value: " << value;
+    }
+
+    return oss.str();
+  };
+
 
 }
 

@@ -80,7 +80,7 @@ namespace mitk
     std::string modality;
     itk::MetaDataDictionary& dict = gdcmIO->GetMetaDataDictionary();
     itk::ExposeMetaData<std::string>(dict, "0008|0060", modality);
-    MITK_INFO << "DICOM Modality is " << modality;
+    MITK_DEBUG << "DICOM Modality detected by MimeType "<< this->GetName() << " is " << modality;
     if (modality == "RTSTRUCT" || modality == "RTDOSE" || modality == "RTPLAN") {
       return false;
     }

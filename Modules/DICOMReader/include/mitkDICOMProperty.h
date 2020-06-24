@@ -66,7 +66,7 @@ namespace mitk
   template<typename TNumericType>
   std::string ConvertValueToDICOMStr(const TNumericType value)
   {
-    std::ostringstream oss(value);
+    std::ostringstream oss;
     oss.imbue(std::locale("C"));
     if (!(oss << value))
     {

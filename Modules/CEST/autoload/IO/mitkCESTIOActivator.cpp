@@ -65,8 +65,6 @@ namespace mitk
         }
       }
     }
-
-    IDICOMTagsOfInterest* toiService = mitk::GetDicomTagsOfInterestService();
   }
 
   void CESTIOActivator::Unload(us::ModuleContext *)

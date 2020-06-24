@@ -75,7 +75,7 @@ double mitk::GetCESTB1Amplitude(const IPropertyProvider* provider)
   {
     result = mitk::ConvertDICOMStrToValue<double>(prop->GetValueAsString());
   }
-  else mitkThrow() << "Cannot determine B! amplitude. Selected input has no property \"" << CEST_PROPERTY_NAME_B1Amplitude << "\"";
+  else mitkThrow() << "Cannot determine B! amplitude. Selected input has no property \"" << CEST_PROPERTY_NAME_B1Amplitude() << "\"";
 
   return result;
 }
@@ -94,7 +94,7 @@ double mitk::GetCESTFrequency(const IPropertyProvider* provider)
   {
     result = mitk::ConvertDICOMStrToValue<double>(prop->GetValueAsString()) * 0.000001;
   }
-  else mitkThrow() << "Cannot determine frequency. Selected input has no property \"" << CEST_PROPERTY_NAME_FREQ << "\"";
+  else mitkThrow() << "Cannot determine frequency. Selected input has no property \"" << CEST_PROPERTY_NAME_FREQ() << "\"";
 
   return result;
 }
@@ -121,7 +121,7 @@ double mitk::GetCESTPulseDuration(const IPropertyProvider* provider)
   {
     result = mitk::ConvertDICOMStrToValue<double>(prop->GetValueAsString()) * 0.000001;
   }
-  else mitkThrow() << "Cannot determine pulse duration. Selected input has no property \"" << CEST_PROPERTY_NAME_PULSEDURATION << "\"";
+  else mitkThrow() << "Cannot determine pulse duration. Selected input has no property \"" << CEST_PROPERTY_NAME_PULSEDURATION() << "\"";
 
   return result;
 }
@@ -140,7 +140,7 @@ double mitk::GetCESTDutyCycle(const IPropertyProvider* provider)
   {
     result = mitk::ConvertDICOMStrToValue<double>(prop->GetValueAsString()) * 0.01;
   }
-  else mitkThrow() << "Cannot determine duty cycle. Selected input has no property \"" << CEST_PROPERTY_NAME_DutyCycle << "\"";
+  else mitkThrow() << "Cannot determine duty cycle. Selected input has no property \"" << CEST_PROPERTY_NAME_DutyCycle() << "\"";
 
   return result;
 }

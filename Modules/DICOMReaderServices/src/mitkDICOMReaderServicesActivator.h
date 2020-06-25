@@ -35,7 +35,7 @@ public:
 private:
 
   std::unique_ptr<IFileReader> m_AutoSelectingDICOMReader;
-  std::unique_ptr<IFileReader> m_ClassicDICOMSeriesReader;
+  std::unique_ptr<IFileReader> m_ManualSelectingDICOMSeriesReader;
   std::unique_ptr<IFileReader> m_SimpleVolumeDICOMSeriesReader;
   std::unique_ptr<IDICOMTagsOfInterest> m_DICOMTagsOfInterestService;
 

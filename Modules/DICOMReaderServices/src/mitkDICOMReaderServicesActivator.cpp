@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "mitkDICOMReaderServicesActivator.h"
 
 #include "mitkAutoSelectingDICOMReaderService.h"
-#include "mitkClassicDICOMSeriesReaderService.h"
+#include "mitkManualSelectingDICOMReaderService.h"
 #include "mitkDICOMTagsOfInterestService.h"
 #include "mitkSimpleVolumeDICOMSeriesReaderService.h"
 #include "mitkCoreServices.h"
@@ -60,6 +60,7 @@ namespace mitk {
   {
     m_AutoSelectingDICOMReader.reset(new AutoSelectingDICOMReaderService());
     m_SimpleVolumeDICOMSeriesReader.reset(new SimpleVolumeDICOMSeriesReaderService());
+    m_ManualSelectingDICOMSeriesReader.reset(new ManualSelectingDICOMReaderService());
 
     m_DICOMTagsOfInterestService.reset(new DICOMTagsOfInterestService());
     context->RegisterService<mitk::IDICOMTagsOfInterest>(m_DICOMTagsOfInterestService.get());

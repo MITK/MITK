@@ -1012,7 +1012,9 @@ void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::
     }
     else
     {
-      mitk::ScalarType pixelValue = mitk::UnlockedSinglePixelAccess(image3D, p, posEvent->GetSender()->GetTimeStep(), component);
+      unsigned int renderTS = posEvent->GetSender()->GetTimeStep();
+      unsigned int timeStep = renderTS < image3D->GetTimeSteps() ? renderTS : 0;
+      mitk::ScalarType pixelValue = mitk::UnlockedSinglePixelAccess(image3D, p, timeStep, component);
       statusBar->DisplayImageInfo(worldposition, p, posEvent->GetSender()->GetTime(), pixelValue);
     }
   }

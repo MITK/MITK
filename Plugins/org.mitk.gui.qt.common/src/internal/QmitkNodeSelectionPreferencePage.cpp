@@ -132,24 +132,16 @@ void QmitkNodeSelectionPreferencePage::Update()
       item->setData(Qt::UserRole, QVariant::fromValue(QString::fromStdString(currentID)));
       item->setToolTip(QString::fromStdString(iter.second->GetInspectorDescription()));
 
-      if (visibleProviders.empty())
-      { //no preferences for visibility set, as default we assume, everything is visible.
-        item->setCheckState(Qt::Checked);
+      auto finding = std::find_if(visibleProviders.cbegin(), visibleProviders.cend(), [&currentID](auto v) {return v.second == currentID; });
+      if (finding == visibleProviders.cend())
+      {
+        item->setCheckState(Qt::Unchecked);
         m_Controls->listInspectors->addItem(item);
       }
       else
       {
-        auto finding = std::find_if(visibleProviders.cbegin(), visibleProviders.cend(), [&currentID](auto v) {return v.second == currentID; });
-        if (finding == visibleProviders.cend())
-        {
-          item->setCheckState(Qt::Unchecked);
-          m_Controls->listInspectors->addItem(item);
-        }
-        else
-        {
-          item->setCheckState(Qt::Checked);
-          m_Controls->listInspectors->insertItem(finding->first, item);
-        }
+        item->setCheckState(Qt::Checked);
+        m_Controls->listInspectors->insertItem(finding->first, item);
       }
     }
   }

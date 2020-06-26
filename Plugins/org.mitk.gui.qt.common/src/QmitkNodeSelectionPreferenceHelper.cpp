@@ -20,8 +20,11 @@ found in the LICENSE file.
 #include <berryIPreferencesService.h>
 #include <berryPlatform.h>
 
+#include <QmitkDataStorageSelectionHistoryInspector.h>
+#include <QmitkDataStorageFavoriteNodesInspector.h>
 
 #include "mitkExceptionMacro.h"
+#include "mitkDataStorageInspectorGenerator.h"
 
 void mitk::PutVisibleDataStorageInspectors(const VisibleDataStorageInspectorMapType &inspectors)
 {
@@ -91,6 +94,23 @@ mitk::VisibleDataStorageInspectorMapType mitk::GetVisibleDataStorageInspectors()
       visMap.insert(std::make_pair(order, id.toStdString()));
     }
   }
+
+  if (visMap.empty())
+  { //no visibility preferences set. Generate default
+    auto allProviders = mitk::DataStorageInspectorGenerator::GetProviders();
+
+    //fill inspector list
+    unsigned int pos = 0;
+    for (const auto& iter : allProviders)
+    {
+      if (iter.first != QmitkDataStorageFavoriteNodesInspector::INSPECTOR_ID() && iter.first != QmitkDataStorageSelectionHistoryInspector::INSPECTOR_ID())
+      {
+        visMap.insert(std::make_pair(pos, iter.first));
+        ++pos;
+      }
+    }
+  }
+
   return visMap;
 }
 
@@ -104,6 +124,16 @@ mitk::DataStorageInspectorIDType mitk::GetPreferredDataStorageInspector()
   auto id = prefNode->Get(mitk::NodeSelectionConstants::PREFERRED_INSPECTOR_ID.c_str(), "");
 
   mitk::DataStorageInspectorIDType result = id.toStdString();
+
+  if (result.empty())
+  { //nothing set, deduce default preferred inspector
+    auto visibleInspectors = GetVisibleDataStorageInspectors();
+    if (!visibleInspectors.empty())
+    {
+      result = visibleInspectors.begin()->second;
+    }
+  }
+
   return result;
 }
 

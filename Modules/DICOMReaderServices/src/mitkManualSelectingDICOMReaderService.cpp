@@ -38,7 +38,7 @@ ManualSelectingDICOMReaderService::ManualSelectingDICOMReaderService()
   this->RegisterService();
 }
 
-DICOMFileReader::Pointer ManualSelectingDICOMReaderService::GetReader(const mitk::StringList& relevantFiles) const
+DICOMFileReader::Pointer ManualSelectingDICOMReaderService::GetReader(const mitk::StringList& /*relevantFiles*/) const
 {
   const auto label = this->GetOption("Configuration").ToString();
 

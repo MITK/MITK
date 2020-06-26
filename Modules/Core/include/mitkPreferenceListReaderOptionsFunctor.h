@@ -36,6 +36,8 @@ namespace mitk
    * If no preference listed controller is available, the functor will use the pre selected reader.
    * If no pre selected controller is available, the functor will use the first not black
    * listed reader.
+   * If user options (non empty) are specified for the functor, the selected reader will be set
+   * with these user options.
    *
    * \see IOUtil
    */
@@ -47,10 +49,13 @@ namespace mitk
 
     PreferenceListReaderOptionsFunctor();
     PreferenceListReaderOptionsFunctor(const ListType& preference, const ListType& black);
+    PreferenceListReaderOptionsFunctor(const ListType& preference, const IFileReader::Options& options);
+    PreferenceListReaderOptionsFunctor(const ListType& preference, const ListType& black, const IFileReader::Options& options);
 
   protected:
-    ListType m_PreferenceList;
-    ListType m_BlackList;
+    const ListType m_PreferenceList;
+    const ListType m_BlackList;
+    const IFileReader::Options m_Options;
   };
 }
 

@@ -222,8 +222,8 @@ void QmitkDicomInspectorView::ValidateAndSetCurrentPosition()
     || m_SelectedTimePoint != currentSelectedTimePoint
     || m_SelectedNodeTime > m_CurrentPositionTime)
   {
-    // the current position has been changed or the selected node has been changed since
-    // the last position validation -> check position
+    // the current position has been changed, the selected node has been changed since
+    // the last position validation or the current time position has been changed -> check position
     m_SelectedPosition = currentSelectedPosition;
     m_SelectedTimePoint = currentSelectedTimePoint;
     m_CurrentPositionTime.Modified();
@@ -234,12 +234,7 @@ void QmitkDicomInspectorView::ValidateAndSetCurrentPosition()
       return;
     }
 
-    mitk::BaseGeometry::Pointer geometry = nullptr;
-
-    if (m_SelectedData->GetTimeGeometry()->IsValidTimePoint(m_SelectedTimePoint))
-    {
-      m_SelectedData->GetTimeGeometry()->GetGeometryForTimePoint(m_SelectedTimePoint);
-    }
+    mitk::BaseGeometry::Pointer geometry = m_SelectedData->GetTimeGeometry()->GetGeometryForTimePoint(m_SelectedTimePoint);
 
     // check for invalid time step
     if (geometry.IsNull())

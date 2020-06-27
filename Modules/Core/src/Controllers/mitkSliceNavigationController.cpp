@@ -637,9 +637,10 @@ namespace mitk
   TimePointType SliceNavigationController::GetSelectedTimePoint() const
   {
     auto timeStep = this->GetSelectedTimeStep();
+
     if (m_CreatedWorldGeometry.IsNull())
     {
-      mitkThrow() << "SliceNavigationController is in an invalid state as internal world geometry is invalid.";
+      return 0.0;
     }
 
     if (!m_CreatedWorldGeometry->IsValidTimeStep(timeStep))

@@ -225,7 +225,10 @@ void QmitkImageCropperView::OnCreateNewBoundingBox()
   {
     return;
   }
-
+  if (nullptr == imageNode->GetData())
+  {
+    return;
+  }
 
   QString name = QString::fromStdString(imageNode->GetName() + " Bounding Shape");
 
@@ -242,7 +245,7 @@ void QmitkImageCropperView::OnCreateNewBoundingBox()
   // get current timestep to support 3d+t images
   auto renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::IRenderWindowPartStrategy::OPEN);
   const auto timePoint = renderWindowPart->GetSelectedTimePoint();
-  const auto imageGeometry = static_cast<mitk::BaseGeometry*>(imageNode->GetData()->GetTimeGeometry()->GetGeometryForTimePoint(timePoint));
+  const auto imageGeometry = imageNode->GetData()->GetTimeGeometry()->GetGeometryForTimePoint(timePoint);
 
   auto boundingBox = mitk::GeometryData::New();
   boundingBox->SetGeometry(static_cast<mitk::Geometry3D*>(this->InitializeWithImageGeometry(imageGeometry)));

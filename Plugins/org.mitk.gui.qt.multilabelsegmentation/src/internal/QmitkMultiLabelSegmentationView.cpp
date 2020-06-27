@@ -365,6 +365,20 @@ void QmitkMultiLabelSegmentationView::OnNewLabel()
 {
   m_ToolManager->ActivateTool(-1);
 
+  if (m_ReferenceNode.IsNull())
+  {
+    QMessageBox::information(
+      m_Parent, "New Segmentation Session", "Please load and select a patient image before starting some action.");
+    return;
+  }
+
+  if (nullptr == m_ReferenceNode->GetData())
+  {
+    QMessageBox::information(
+      m_Parent, "New Segmentation Session", "Please load and select a patient image before starting some action.");
+    return;
+  }
+
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
   if (!workingNode)
   {
@@ -401,7 +415,7 @@ void QmitkMultiLabelSegmentationView::OnNewLabel()
   UpdateControls();
   m_Controls.m_LabelSetWidget->ResetAllTableWidgetItems();
 
-  mitk::RenderingManager::GetInstance()->InitializeViews(workingNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+  this->ReinitializeViews();
 }
 
 void QmitkMultiLabelSegmentationView::OnShowLabelTable(bool value)
@@ -428,6 +442,14 @@ void QmitkMultiLabelSegmentationView::OnNewSegmentationSession()
   mitk::Image::ConstPointer referenceImage = dynamic_cast<mitk::Image*>(referenceNode->GetData());
   assert(referenceImage);
 
+  const auto currentTimePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+  unsigned int imageTimeStep = 0;
+  if (referenceImage->GetTimeGeometry()->IsValidTimePoint(currentTimePoint))
+  {
+    imageTimeStep = referenceImage->GetTimeGeometry()->TimePointToTimeStep(currentTimePoint);
+  }
+
+  auto segTemplateImage = referenceImage;
   if (referenceImage->GetDimension() > 3)
   {
     auto result = QMessageBox::question(m_Parent, tr("Generate a static mask?"), tr("The selected image has multiple time steps. You can either generate a simple/static masks resembling the geometry of the first timestep of the image. Or you can generate a dynamic mask that equals the selected image in geometry and number of timesteps; thus a dynamic mask can change over time (e.g. according to the image)."), tr("Yes, generate a static mask"), tr("No, generate a dynamic mask"), QString(), 0, 0);
@@ -444,9 +466,9 @@ void QmitkMultiLabelSegmentationView::OnNewSegmentationSession()
       newTimeGeometry->SetStepDuration(refTimeGeometry->GetMaximumTimePoint() - refTimeGeometry->GetMinimumTimePoint());
 
       mitk::Image::Pointer newImage = selector->GetOutput();
-      newTimeGeometry->SetTimeStepGeometry(referenceImage->GetGeometry(), 0);
+      newTimeGeometry->SetTimeStepGeometry(referenceImage->GetGeometry(imageTimeStep), 0);
       newImage->SetTimeGeometry(newTimeGeometry);
-      referenceImage = newImage;
+      segTemplateImage = newImage;
     }
   }
 
@@ -465,7 +487,7 @@ void QmitkMultiLabelSegmentationView::OnNewSegmentationSession()
   mitk::LabelSetImage::Pointer workingImage = mitk::LabelSetImage::New();
   try
   {
-    workingImage->Initialize(referenceImage);
+    workingImage->Initialize(segTemplateImage);
   }
   catch (mitk::Exception& e)
   {
@@ -698,7 +720,7 @@ void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(QList<mitk:
   if (m_WorkingNode.IsNotNull())
   {
     m_Controls.m_LabelSetWidget->ResetAllTableWidgetItems();
-    mitk::RenderingManager::GetInstance()->InitializeViews(m_WorkingNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+    this->ReinitializeViews();
   }
 }
 
@@ -1019,5 +1041,21 @@ void QmitkMultiLabelSegmentationView::InitializeListeners()
     props["name"] = std::string("SegmentationInteraction");
     m_ServiceRegistration =
       us::GetModuleContext()->RegisterService<mitk::InteractionEventObserver>(m_Interactor.GetPointer(), props);
+  }
+}
+
+void QmitkMultiLabelSegmentationView::ReinitializeViews() const
+{
+  if (m_ReferenceNode.IsNotNull() && nullptr != m_ReferenceNode->GetData())
+  {
+    const auto currentTimePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+    unsigned int imageTimeStep = 0;
+    if (m_ReferenceNode->GetData()->GetTimeGeometry()->IsValidTimePoint(currentTimePoint))
+    {
+      imageTimeStep = m_ReferenceNode->GetData()->GetTimeGeometry()->TimePointToTimeStep(currentTimePoint);
+    }
+
+    mitk::RenderingManager::GetInstance()->InitializeViews(m_ReferenceNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+    mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->SetPos(imageTimeStep);
   }
 }

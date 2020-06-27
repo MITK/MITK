@@ -138,6 +138,8 @@ protected:
 
   void InitializeListeners();
 
+  void ReinitializeViews() const;
+
   /// \brief the Qt parent of our GUI (NOT of this object)
   QWidget *m_Parent;
 

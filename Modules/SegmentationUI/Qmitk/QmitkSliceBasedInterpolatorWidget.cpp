@@ -137,7 +137,7 @@ void QmitkSliceBasedInterpolatorWidget::SetSliceNavigationControllers(
     // Has to be initialized
     m_LastSNC = slicer;
 
-    m_TimeStep.insert(slicer, slicer->GetTime()->GetPos());
+    m_TimePoints.insert(slicer, slicer->GetSelectedTimePoint());
 
     itk::MemberCommand<QmitkSliceBasedInterpolatorWidget>::Pointer deleteCommand =
       itk::MemberCommand<QmitkSliceBasedInterpolatorWidget>::New();
@@ -199,7 +199,7 @@ void QmitkSliceBasedInterpolatorWidget::OnTimeChanged(itk::Object *sender, const
   mitk::SliceNavigationController *slicer = dynamic_cast<mitk::SliceNavigationController *>(sender);
   Q_ASSERT(slicer);
 
-  m_TimeStep[slicer] /* = event.GetPos()*/;
+  m_TimePoints[slicer] = slicer->GetSelectedTimePoint();
 
   // TODO Macht das hier wirklich Sinn????
   if (m_LastSNC == slicer)
@@ -234,17 +234,17 @@ void QmitkSliceBasedInterpolatorWidget::TranslateAndInterpolateChangedSlice(cons
     const mitk::SliceNavigationController::GeometrySliceEvent &geometrySliceEvent =
       dynamic_cast<const mitk::SliceNavigationController::GeometrySliceEvent &>(e);
     mitk::TimeGeometry *timeGeometry = geometrySliceEvent.GetTimeGeometry();
-    if (timeGeometry && m_TimeStep.contains(slicer))
+    if (timeGeometry && m_TimePoints.contains(slicer) && timeGeometry->IsValidTimePoint(m_TimePoints[slicer]))
     {
       mitk::SlicedGeometry3D *slicedGeometry =
-        dynamic_cast<mitk::SlicedGeometry3D *>(timeGeometry->GetGeometryForTimeStep(m_TimeStep[slicer]).GetPointer());
+        dynamic_cast<mitk::SlicedGeometry3D *>(timeGeometry->GetGeometryForTimePoint(m_TimePoints[slicer]).GetPointer());
       if (slicedGeometry)
       {
         mitk::PlaneGeometry *plane = slicedGeometry->GetPlaneGeometry(geometrySliceEvent.GetPos());
         if (plane)
         {
           m_LastSNC = slicer;
-          this->Interpolate(plane, m_TimeStep[slicer], slicer);
+          this->Interpolate(plane, m_TimePoints[slicer], slicer);
         }
       }
     }
@@ -252,11 +252,18 @@ void QmitkSliceBasedInterpolatorWidget::TranslateAndInterpolateChangedSlice(cons
 }
 
 void QmitkSliceBasedInterpolatorWidget::Interpolate(mitk::PlaneGeometry *plane,
-                                                    unsigned int timeStep,
+                                                    mitk::TimePointType timePoint,
                                                     mitk::SliceNavigationController *slicer)
 {
   int clickedSliceDimension(-1);
   int clickedSliceIndex(-1);
+
+  if (!m_WorkingImage->GetTimeGeometry()->IsValidTimePoint(timePoint))
+  {
+    MITK_WARN << "Cannot interpolate WorkingImage. Passed time point is not within the time bounds of WorkingImage. Time point: " << timePoint;
+    return;
+  }
+  const auto timeStep = m_WorkingImage->GetTimeGeometry()->TimePointToTimeStep(timePoint);
 
   // calculate real slice position, i.e. slice of the image and not slice of the TimeSlicedGeometry
   // see if timestep is needed here
@@ -276,7 +283,13 @@ void QmitkSliceBasedInterpolatorWidget::Interpolate(mitk::PlaneGeometry *plane,
 
 mitk::Image::Pointer QmitkSliceBasedInterpolatorWidget::GetWorkingSlice(const mitk::PlaneGeometry *planeGeometry)
 {
-  unsigned int timeStep = m_LastSNC->GetTime()->GetPos();
+  const auto timePoint = m_LastSNC->GetSelectedTimePoint();
+
+  if (!m_WorkingImage->GetTimeGeometry()->IsValidTimePoint(timePoint))
+  {
+    MITK_WARN << "Cannot get slice of WorkingImage. Time point selected by SliceNavigationController is not within the time bounds of WorkingImage. Time point: " << timePoint;
+    return nullptr;
+  }
 
   // Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk
   // reslicer
@@ -288,6 +301,7 @@ mitk::Image::Pointer QmitkSliceBasedInterpolatorWidget::GetWorkingSlice(const mi
   // use ExtractSliceFilter with our specific vtkImageReslice for overwriting and extracting
   mitk::ExtractSliceFilter::Pointer extractor = mitk::ExtractSliceFilter::New(reslice);
   extractor->SetInput(m_WorkingImage);
+  const auto timeStep = m_WorkingImage->GetTimeGeometry()->TimePointToTimeStep(timePoint);
   extractor->SetTimeStep(timeStep);
   extractor->SetWorldGeometry(planeGeometry);
   extractor->SetVtkOutputRequest(false);
@@ -462,10 +476,16 @@ void QmitkSliceBasedInterpolatorWidget::OnAcceptInterpolationClicked()
     overwrite->SetOverwriteMode(true);
     overwrite->Modified();
 
-    unsigned int timeStep = m_LastSNC->GetTime()->GetPos();
+    const auto timePoint = m_LastSNC->GetSelectedTimePoint();
+    if (!m_WorkingImage->GetTimeGeometry()->IsValidTimePoint(timePoint))
+    {
+      MITK_WARN << "Cannot accept interpolation. Time point selected by SliceNavigationController is not within the time bounds of WorkingImage. Time point: " << timePoint;
+      return;
+    }
 
     mitk::ExtractSliceFilter::Pointer extractor = mitk::ExtractSliceFilter::New(overwrite);
     extractor->SetInput(m_WorkingImage);
+    const auto timeStep = m_WorkingImage->GetTimeGeometry()->TimePointToTimeStep(timePoint);
     extractor->SetTimeStep(timeStep);
     extractor->SetWorldGeometry(planeGeometry);
     extractor->SetVtkOutputRequest(false);
@@ -527,7 +547,14 @@ void QmitkSliceBasedInterpolatorWidget::AcceptAllInterpolations(mitk::SliceNavig
 {
   // Since we need to shift the plane it must be clone so that the original plane isn't altered
   mitk::PlaneGeometry::Pointer reslicePlane = slicer->GetCurrentPlaneGeometry()->Clone();
-  unsigned int timeStep = slicer->GetTime()->GetPos();
+  const auto timePoint = slicer->GetSelectedTimePoint();
+  if (!m_WorkingImage->GetTimeGeometry()->IsValidTimePoint(timePoint))
+  {
+    MITK_WARN << "Cannot accept all interpolations. Time point selected by SliceNavigationController is not within the time bounds of WorkingImage. Time point: " << timePoint;
+
+    return;
+  }
+  const auto timeStep = m_WorkingImage->GetTimeGeometry()->TimePointToTimeStep(timePoint);
 
   int sliceDimension(-1);
   int sliceIndex(-1);

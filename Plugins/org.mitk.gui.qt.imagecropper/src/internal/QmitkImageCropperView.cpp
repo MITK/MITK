@@ -225,7 +225,10 @@ void QmitkImageCropperView::OnCreateNewBoundingBox()
   {
     return;
   }
-
+  if (nullptr == imageNode->GetData())
+  {
+    return;
+  }
 
   QString name = QString::fromStdString(imageNode->GetName() + " Bounding Shape");
 
@@ -241,8 +244,8 @@ void QmitkImageCropperView::OnCreateNewBoundingBox()
 
   // get current timestep to support 3d+t images
   auto renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::IRenderWindowPartStrategy::OPEN);
-  int timeStep = renderWindowPart->GetTimeNavigationController()->GetTime()->GetPos();
-  auto imageGeometry = static_cast<mitk::BaseGeometry*>(imageNode->GetData()->GetGeometry(timeStep));
+  const auto timePoint = renderWindowPart->GetSelectedTimePoint();
+  const auto imageGeometry = imageNode->GetData()->GetTimeGeometry()->GetGeometryForTimePoint(timePoint);
 
   auto boundingBox = mitk::GeometryData::New();
   boundingBox->SetGeometry(static_cast<mitk::Geometry3D*>(this->InitializeWithImageGeometry(imageGeometry)));
@@ -289,7 +292,7 @@ void QmitkImageCropperView::CreateBoundingShapeInteractor(bool rotationEnabled)
   m_BoundingShapeInteractor->SetRotationEnabled(rotationEnabled);
 }
 
-mitk::Geometry3D::Pointer QmitkImageCropperView::InitializeWithImageGeometry(mitk::BaseGeometry::Pointer geometry)
+mitk::Geometry3D::Pointer QmitkImageCropperView::InitializeWithImageGeometry(const mitk::BaseGeometry* geometry) const
 {
   // convert a BaseGeometry into a Geometry3D (otherwise IO is not working properly)
   if (geometry == nullptr)
@@ -300,7 +303,7 @@ mitk::Geometry3D::Pointer QmitkImageCropperView::InitializeWithImageGeometry(mit
   boundingGeometry->SetImageGeometry(geometry->GetImageGeometry());
   boundingGeometry->SetOrigin(geometry->GetOrigin());
   boundingGeometry->SetSpacing(geometry->GetSpacing());
-  boundingGeometry->SetIndexToWorldTransform(geometry->GetIndexToWorldTransform());
+  boundingGeometry->SetIndexToWorldTransform(geometry->GetIndexToWorldTransform()->Clone());
   boundingGeometry->Modified();
   return boundingGeometry;
 }
@@ -308,7 +311,7 @@ mitk::Geometry3D::Pointer QmitkImageCropperView::InitializeWithImageGeometry(mit
 void QmitkImageCropperView::ProcessImage(bool mask)
 {
   auto renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::IRenderWindowPartStrategy::OPEN);
-  int timeStep = renderWindowPart->GetTimeNavigationController()->GetTime()->GetPos();
+  const auto timePoint = renderWindowPart->GetSelectedTimePoint();
 
   auto imageNode = m_Controls.imageSelectionWidget->GetSelectedNode();
   if (imageNode.IsNull())
@@ -323,6 +326,13 @@ void QmitkImageCropperView::ProcessImage(bool mask)
     QMessageBox::information(nullptr, "Warning", "Please load and select a cropping object before starting image processing.");
     return;
   }
+
+  if (!imageNode->GetData()->GetTimeGeometry()->IsValidTimePoint(timePoint))
+  {
+    QMessageBox::information(nullptr, "Warning", "Please select a time point that is within the time bounds of the selected image.");
+    return;
+  }
+  const auto timeStep = imageNode->GetData()->GetTimeGeometry()->TimePointToTimeStep(timePoint);
 
   auto image = dynamic_cast<mitk::Image*>(imageNode->GetData());
   auto boundingBox = dynamic_cast<mitk::GeometryData*>(boundingBoxNode->GetData());

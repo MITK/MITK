@@ -68,7 +68,7 @@ private:
   void CreateBoundingShapeInteractor(bool rotationEnabled);
 
   // initializes a new bounding shape using the selected image geometry.
-  mitk::Geometry3D::Pointer InitializeWithImageGeometry(mitk::BaseGeometry::Pointer geometry);
+  mitk::Geometry3D::Pointer InitializeWithImageGeometry(const mitk::BaseGeometry* geometry) const;
 
   void ProcessImage(bool crop);
 

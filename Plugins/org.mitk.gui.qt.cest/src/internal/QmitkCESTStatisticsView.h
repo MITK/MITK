@@ -126,9 +126,7 @@ class QmitkCESTStatisticsView : public QmitkAbstractView, public mitk::IRenderWi
     itk::TimeStamp m_currentPositionTime;
     /** @brief currently valid selected position in the inspector*/
     mitk::Point3D m_currentSelectedPosition;
-    /** @brief indicates if the currently selected position is valid for the currently selected fit.
-    * This it is within the input image */
-    unsigned int m_currentSelectedTimeStep;
+    mitk::TimePointType m_currentSelectedTimePoint;
 
 };
 

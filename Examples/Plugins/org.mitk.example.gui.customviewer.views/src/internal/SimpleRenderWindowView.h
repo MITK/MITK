@@ -77,31 +77,6 @@ public:
   QmitkRenderWindow *GetQmitkRenderWindow(const mitk::BaseRenderer::ViewDirection &viewDirection) const override;
 
   /**
-   * \see mitk::IRenderWindowPart::GetSelectionPosition()
-   */
-  mitk::Point3D GetSelectedPosition(const QString &id = QString()) const override;
-
-  /**
-   * \see mitk::IRenderWindowPart::SetSelectedPosition()
-   */
-  void SetSelectedPosition(const mitk::Point3D &pos, const QString &id = QString()) override;
-
-  /**
-   * \see mitk::IRenderWindowPart::EnableDecorations()
-   */
-  void EnableDecorations(bool enable, const QStringList &decorations = QStringList()) override;
-
-  /**
-   * \see mitk::IRenderWindowPart::IsDecorationEnabled()
-   */
-  bool IsDecorationEnabled(const QString &decoration) const override;
-
-  /**
-   * \see mitk::IRenderWindowPart::GetDecorations()
-   */
-  QStringList GetDecorations() const override;
-
-  /**
    * \see mitk::QmitkAbstractRenderEditor::GetRenderingManager()
    */
   mitk::IRenderingManager *GetRenderingManager() const override;
@@ -121,6 +96,36 @@ public:
    * \see mitk::QmitkAbstractRenderEditor::GetTimeNavigationController()
    */
   mitk::SliceNavigationController *GetTimeNavigationController() const override;
+
+  /**
+   * \see mitk::IRenderWindowPart::GetSelectionPosition()
+   */
+  mitk::Point3D GetSelectedPosition(const QString& id = QString()) const override;
+
+  /**
+   * \see mitk::IRenderWindowPart::SetSelectedPosition()
+   */
+  void SetSelectedPosition(const mitk::Point3D& pos, const QString& id = QString()) override;
+
+  /**
+  * \see mitk::IRenderWindowPart::GetSelectedTimePoint()
+  */
+  mitk::TimePointType GetSelectedTimePoint(const QString& id = QString()) const override;
+
+  /**
+   * \see mitk::IRenderWindowPart::EnableDecorations()
+   */
+  void EnableDecorations(bool enable, const QStringList& decorations = QStringList()) override;
+
+  /**
+   * \see mitk::IRenderWindowPart::IsDecorationEnabled()
+   */
+  bool IsDecorationEnabled(const QString& decoration) const override;
+
+  /**
+   * \see mitk::IRenderWindowPart::GetDecorations()
+   */
+  QStringList GetDecorations() const override; 
 
 protected:
   void SetFocus() override;

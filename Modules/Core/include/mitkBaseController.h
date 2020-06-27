@@ -34,23 +34,22 @@ namespace mitk
   //## there is 3D+t data.
   //## @note not yet implemented
   //## @ingroup NavigationControl
-  class MITKCORE_EXPORT BaseController : public mitk::OperationActor, public itk::Object
+  class MITKCORE_EXPORT BaseController : public OperationActor, public itk::Object
   {
   public:
     /** Standard class typedefs. */
-    mitkClassMacroItkParent(BaseController, mitk::OperationActor);
+    mitkClassMacroItkParent(BaseController, OperationActor);
     itkFactorylessNewMacro(Self);
 
-      /** Method for creation through ::New */
-      // mitkNewMacro(Self);
-
-      //##Documentation
-      //## @brief Get the Stepper through the slices
-      mitk::Stepper *GetSlice();
+    //##Documentation
+    //## @brief Get the Stepper through the slices
+    Stepper *GetSlice();
+    const Stepper* GetSlice() const;
 
     //##Documentation
     //## @brief Get the Stepper through the time
-    mitk::Stepper *GetTime();
+    Stepper *GetTime();
+    const Stepper* GetTime() const;
 
   protected:
     /**

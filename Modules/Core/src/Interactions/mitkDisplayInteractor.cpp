@@ -278,9 +278,6 @@ bool mitk::DisplayInteractor::CheckSwivelPossible(const mitk::InteractionEvent *
     if (BaseRenderer::GetInstance(renWin)->GetMapperID() == BaseRenderer::Standard3D)
       continue;
 
-    // unsigned int slice = (*iter)->GetSlice()->GetPos();
-    // unsigned int time  = (*iter)->GetTime()->GetPos();
-
     const PlaneGeometry *planeGeometry = snc->GetCurrentPlaneGeometry();
     if (!planeGeometry)
       continue;

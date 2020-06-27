@@ -14,7 +14,6 @@ set(INTERNAL_CPP_FILES
 
 set(UI_FILES
   src/internal/QmitkDicomBrowserControls.ui
-  src/internal/QmitkDicomPreferencePage.ui
 )
 
 set(MOC_H_FILES

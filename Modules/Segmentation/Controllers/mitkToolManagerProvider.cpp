@@ -16,18 +16,29 @@ found in the LICENSE file.
 #include <usGetModuleContext.h>
 #include <usServiceReference.h>
 
-mitk::ToolManagerProvider::ToolManagerProvider() : m_ToolManager(mitk::ToolManager::New(nullptr))
+const char* const mitk::ToolManagerProvider::SEGMENTATION = "";
+const char* const mitk::ToolManagerProvider::MULTILABEL_SEGMENTATION = "org.mitk.views.multilabelsegmentation";
+
+mitk::ToolManagerProvider::ToolManagerProvider()
 {
+  m_ToolManagers[SEGMENTATION] = ToolManager::New(nullptr);
 }
 
 mitk::ToolManagerProvider::~ToolManagerProvider()
 {
-  this->m_ToolManager = nullptr;
 }
 
-mitk::ToolManager *mitk::ToolManagerProvider::GetToolManager()
+mitk::ToolManager *mitk::ToolManagerProvider::GetToolManager(const std::string& context)
 {
-  return this->m_ToolManager.GetPointer();
+  if (m_ToolManagers.end() == m_ToolManagers.find(context))
+    m_ToolManagers[context] = ToolManager::New(nullptr);
+
+  return m_ToolManagers[context].GetPointer();
+}
+
+mitk::ToolManagerProvider::ProviderMapType mitk::ToolManagerProvider::GetToolManagers() const
+{
+  return m_ToolManagers;
 }
 
 mitk::ToolManagerProvider *mitk::ToolManagerProvider::GetInstance()

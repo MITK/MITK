@@ -144,7 +144,7 @@ MITKSWIG_ADD_HEADERFILE(mapDeploymentDLLAccess.h)
 %}
 DLLHandle const * ConvertDLLHandleSmartPointerToPointer(DLLHandle::Pointer p);
 
-MITKSWIG_ADD_CLASS(MITKAlgorithmHelper, mitkAlgorithmHelper.h, mitk)
+MITKSWIG_ADD_CLASS(MAPAlgorithmHelper, mitkMAPAlgorithmHelper.h, mitk)
 MITKSWIG_ADD_CLASS(RegistrationType, mitkImageMappingHelper.h, mitk::ImageMappingHelper)
 MITKSWIG_ADD_CLASS(MITKRegistrationType, mitkImageMappingHelper.h, mitk::ImageMappingHelper)
 

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkAlgorithmHelper.h"
+#include "mitkMAPAlgorithmHelper.h"
 
 //itk
 #include <itkImageDuplicator.h>
@@ -29,13 +29,13 @@ found in the LICENSE file.
 namespace mitk
 {
 
-  MITKAlgorithmHelper::MITKAlgorithmHelper(map::algorithm::RegistrationAlgorithmBase *algorithm)
+  MAPAlgorithmHelper::MAPAlgorithmHelper(map::algorithm::RegistrationAlgorithmBase *algorithm)
     : m_AlgorithmBase(algorithm), m_Error(CheckError::none)
   {
     m_AllowImageCasting = true;
   }
 
-  bool MITKAlgorithmHelper::HasImageAlgorithmInterface(const map::algorithm::RegistrationAlgorithmBase* algorithm)
+  bool MAPAlgorithmHelper::HasImageAlgorithmInterface(const map::algorithm::RegistrationAlgorithmBase* algorithm)
   {
     using InternalDefault2DImageType = itk::Image<map::core::discrete::InternalPixelType, 2>;
     using InternalDefault3DImageType = itk::Image<map::core::discrete::InternalPixelType, 3>;
@@ -50,19 +50,19 @@ namespace mitk
     if (dynamic_cast<Alg3D2DType*>(algorithm) != nullptr) return true;
 
     return false;
-  };
+  }
 
-  bool MITKAlgorithmHelper::HasPointSetAlgorithmInterface(const map::algorithm::RegistrationAlgorithmBase* algorithm)
+  bool MAPAlgorithmHelper::HasPointSetAlgorithmInterface(const map::algorithm::RegistrationAlgorithmBase* algorithm)
   {
     typedef ::map::core::continuous::Elements<3>::InternalPointSetType InternalDefaultPointSetType;
     typedef const ::map::algorithm::facet::PointSetRegistrationAlgorithmInterface<InternalDefaultPointSetType, InternalDefaultPointSetType>
       PointSetRegInterface;
 
     return dynamic_cast<PointSetRegInterface*>(algorithm) != nullptr;
-  };
+  }
 
   map::core::RegistrationBase::Pointer
-  MITKAlgorithmHelper::
+  MAPAlgorithmHelper::
   GetRegistration() const
   {
     map::core::RegistrationBase::Pointer spResult;
@@ -73,13 +73,13 @@ namespace mitk
     if (movingDim != targetDim)
     {
       mapDefaultExceptionStaticMacro( <<
-                                      "Error, algorithm instance has unequal dimensionality and is therefore not supported in the current version of MITKAlgorithmHelper.");
+                                      "Error, algorithm instance has unequal dimensionality and is therefore not supported in the current version of MAPAlgorithmHelper.");
     }
 
     if (movingDim > 3)
     {
       mapDefaultExceptionStaticMacro( <<
-                                      "Error, algorithm instance has a dimensionality larger than 3 and is therefore not supported in the current version of MITKAlgorithmHelper.");
+                                      "Error, algorithm instance has a dimensionality larger than 3 and is therefore not supported in the current version of MAPAlgorithmHelper.");
     }
 
     typedef ::map::algorithm::facet::RegistrationAlgorithmInterface<2, 2> RegistrationAlg2D2DInterface;
@@ -104,28 +104,27 @@ namespace mitk
   }
 
   mitk::MAPRegistrationWrapper::Pointer
-  MITKAlgorithmHelper::
+  MAPAlgorithmHelper::
   GetMITKRegistrationWrapper() const
   {
     map::core::RegistrationBase::Pointer spInternalResult = GetRegistration();
-    mitk::MAPRegistrationWrapper::Pointer spResult = mitk::MAPRegistrationWrapper::New();
-    spResult->SetRegistration(spInternalResult);
+    mitk::MAPRegistrationWrapper::Pointer spResult = mitk::MAPRegistrationWrapper::New(spInternalResult);
     return spResult;
-  };
+  }
 
 
   static const mitk::Image* GetDataAsImage(const mitk::BaseData* data)
   {
     return dynamic_cast<const mitk::Image*>(data);
-  };
+  }
 
   static const mitk::PointSet* GetDataAsPointSet(const mitk::BaseData* data)
   {
     return dynamic_cast<const mitk::PointSet*>(data);
-  };
+  }
 
   bool
-  MITKAlgorithmHelper::
+  MAPAlgorithmHelper::
   CheckData(const mitk::BaseData* moving, const mitk::BaseData* target, CheckError::Type& error) const
   {
     if (! m_AlgorithmBase)
@@ -198,20 +197,19 @@ namespace mitk
 
     error = m_Error;
     return result;
+  }
 
-  };
-
-  void MITKAlgorithmHelper::SetAllowImageCasting(bool allowCasting)
+  void MAPAlgorithmHelper::SetAllowImageCasting(bool allowCasting)
   {
     this->m_AllowImageCasting = allowCasting;
-  };
+  }
 
-  bool MITKAlgorithmHelper::GetAllowImageCasting() const
+  bool MAPAlgorithmHelper::GetAllowImageCasting() const
   {
     return this->m_AllowImageCasting;
-  };
+  }
 
-  void MITKAlgorithmHelper::SetData(const mitk::BaseData* moving, const mitk::BaseData* target)
+  void MAPAlgorithmHelper::SetData(const mitk::BaseData* moving, const mitk::BaseData* target)
   {
     if (! m_AlgorithmBase)
     {
@@ -234,7 +232,7 @@ namespace mitk
     if (movingDim != targetDim)
     {
       mapDefaultExceptionStaticMacro( <<
-                                      "Error, cannot set data. Current version of MITKAlgorithmHelper only supports images/point sets with same dimensionality.");
+                                      "Error, cannot set data. Current version of MAPAlgorithmHelper only supports images/point sets with same dimensionality.");
     }
 
     if (GetDataAsPointSet(target) && GetDataAsPointSet(moving))
@@ -262,10 +260,10 @@ namespace mitk
         AccessTwoImagesFixedDimensionByItk(GetDataAsImage(moving), GetDataAsImage(target), DoSetImages, 3);
       }
     }
-  };
+  }
 
   template<typename TInImageType, typename TOutImageType>
-  typename TOutImageType::Pointer MITKAlgorithmHelper::CastImage(const TInImageType* input) const
+  typename TOutImageType::Pointer MAPAlgorithmHelper::CastImage(const TInImageType* input) const
   {
     typedef itk::CastImageFilter< TInImageType, TOutImageType > CastFilterType;
     typename CastFilterType::Pointer  spImageCaster =  CastFilterType::New();
@@ -280,7 +278,7 @@ namespace mitk
 
   template<typename TPixelType1, unsigned int VImageDimension1,
            typename TPixelType2, unsigned int VImageDimension2>
-  void MITKAlgorithmHelper::DoSetImages(const itk::Image<TPixelType1, VImageDimension1>* moving,
+  void MAPAlgorithmHelper::DoSetImages(const itk::Image<TPixelType1, VImageDimension1>* moving,
                                         const itk::Image<TPixelType2, VImageDimension2>* target)
   {
     typedef itk::Image<TPixelType1, VImageDimension1> MovingImageType;
@@ -332,7 +330,7 @@ namespace mitk
       if (! m_AllowImageCasting)
       {
         mapDefaultExceptionStaticMacro( <<
-                                        "Error, cannot set images. MITKAlgorithmHelper has to convert them into MatchPoint default images, but is not allowed. Please reconfigure helper.");
+                                        "Error, cannot set images. MAPAlgorithmHelper has to convert them into MatchPoint default images, but is not allowed. Please reconfigure helper.");
       }
 
       typename InternalDefaultTargetImageType::Pointer spCastedTarget =
@@ -350,7 +348,7 @@ namespace mitk
 
   template<typename TPixelType1, unsigned int VImageDimension1,
            typename TPixelType2, unsigned int VImageDimension2>
-  void MITKAlgorithmHelper::DoCheckImages(const itk::Image<TPixelType1, VImageDimension1>* /*moving*/,
+  void MAPAlgorithmHelper::DoCheckImages(const itk::Image<TPixelType1, VImageDimension1>* /*moving*/,
                                           const itk::Image<TPixelType2, VImageDimension2>* /*target*/) const
   {
     typedef itk::Image<TPixelType1, VImageDimension1> MovingImageType;
@@ -393,7 +391,7 @@ namespace mitk
       typedef map::algorithm::DummyImageRegistrationAlgorithm<map::core::discrete::Elements<3>::InternalImageType, map::core::discrete::Elements<3>::InternalImageType, DummyRegIDPolicy>
           DummyRegType;
       DummyRegType::Pointer regAlg = DummyRegType::New();
-      mitk::MITKAlgorithmHelper helper(regAlg);
+      mitk::MAPAlgorithmHelper helper(regAlg);
 
       map::core::discrete::Elements<3>::InternalImageType::Pointer dummyImg =
           map::core::discrete::Elements<3>::InternalImageType::New();
@@ -401,8 +399,7 @@ namespace mitk
       regAlg->setTargetImage(dummyImg);
       regAlg->setMovingImage(dummyImg);
 
-      mitk::MAPRegistrationWrapper::Pointer dummyReg = mitk::MAPRegistrationWrapper::New();
-      dummyReg->SetRegistration(regAlg->getRegistration());
+      auto dummyReg = mitk::MAPRegistrationWrapper::New(regAlg->getRegistration());
 
       return dummyReg;
   }

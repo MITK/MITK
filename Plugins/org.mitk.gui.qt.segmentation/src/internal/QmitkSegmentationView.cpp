@@ -35,7 +35,7 @@ found in the LICENSE file.
 #include "mitkCameraController.h"
 #include "mitkLabelSetImage.h"
 #include "mitkImageTimeSelector.h"
-#include "mitkNodePredicateFunction.h"
+#include "mitkNodePredicateSubGeometry.h"
 
 #include <QmitkRenderWindow.h>
 
@@ -350,12 +350,7 @@ void QmitkSegmentationView::OnPatientSelectionChanged(QList<mitk::DataNode::Poin
       this->UpdateWarningLabel("");
       auto node = nodes.first();
 
-      auto geometryCheck = [node](const mitk::DataNode * segNode)
-      {
-        return QmitkSegmentationView::CheckForSameGeometry(segNode, node);
-      };
-      mitk::NodePredicateFunction::Pointer hasCorrectGeo = mitk::NodePredicateFunction::New(geometryCheck);
-      auto segPredicate = mitk::NodePredicateAnd::New(m_IsASegmentationImagePredicate.GetPointer(), hasCorrectGeo.GetPointer());
+      auto segPredicate = mitk::NodePredicateAnd::New(m_IsASegmentationImagePredicate.GetPointer(), mitk::NodePredicateSubGeometry::New(node->GetData()->GetGeometry()));
 
       m_Controls->segImageSelector->SetNodePredicate(segPredicate);
 
@@ -705,32 +700,6 @@ void QmitkSegmentationView::CheckRenderingState()
    this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), nullptr);
    this->SetToolSelectionBoxesEnabled(false);
    this->UpdateWarningLabel(tr("Please perform a reinit on the segmentation image!"));
-}
-
-bool QmitkSegmentationView::CheckForSameGeometry(const mitk::DataNode *node1, const mitk::DataNode *node2)
-{
-   bool isSameGeometry(true);
-
-   mitk::Image* image1 = dynamic_cast<mitk::Image*>(node1->GetData());
-   mitk::Image* image2 = dynamic_cast<mitk::Image*>(node2->GetData());
-   if (image1 && image2)
-   {
-      mitk::BaseGeometry* geo1 = image1->GetGeometry();
-      mitk::BaseGeometry* geo2 = image2->GetGeometry();
-
-      isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetOrigin(), geo2->GetOrigin());
-      isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetExtent(0), geo2->GetExtent(0));
-      isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetExtent(1), geo2->GetExtent(1));
-      isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetExtent(2), geo2->GetExtent(2));
-      isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetSpacing(), geo2->GetSpacing());
-      isSameGeometry = isSameGeometry && mitk::MatrixEqualElementWise(geo1->GetIndexToWorldTransform()->GetMatrix(), geo2->GetIndexToWorldTransform()->GetMatrix());
-
-      return isSameGeometry;
-   }
-   else
-   {
-      return false;
-   }
 }
 
 void QmitkSegmentationView::UpdateWarningLabel(QString text)

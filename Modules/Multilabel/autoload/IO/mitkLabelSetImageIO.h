@@ -19,7 +19,8 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-  * Writes a LabelSetImage to a file
+  * Writes a LabelSetImage to a file.
+  * mitk::Identifiable UID is supported and will be serialized.
   * @ingroup Process
   */
   // The export macro should be removed. Currently, the unit

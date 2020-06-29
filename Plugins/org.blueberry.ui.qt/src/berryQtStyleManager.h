@@ -19,6 +19,8 @@ found in the LICENSE file.
 
 #include <QHash>
 
+#include <typeinfo>
+
 namespace berry {
 
 class BERRY_UI_QT QtStyleManager : public QObject, public IQtStyleManager

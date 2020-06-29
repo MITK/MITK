@@ -29,36 +29,26 @@ class mitkUIDGeneratorTestSuite : public mitk::TestFixture
 
   CPPUNIT_TEST_SUITE_END();
 
-  unsigned short m_UidLengthStart = 5;
-  unsigned short m_UidLengthEnd = 20;
-
-
   void UIDGeneratorInstanceRenewalSucceed()
   {
-    for (auto k = m_UidLengthStart; k < m_UidLengthEnd; ++k)
-    {
-      mitk::UIDGenerator uidGen1("UID_", k);
-      auto uid1_1 = uidGen1.GetUID();
+    mitk::UIDGenerator uidGen1("UID_");
+    auto uid1_1 = uidGen1.GetUID();
 
-      uidGen1 = mitk::UIDGenerator("UID_", k);
-      auto uid2_1 = uidGen1.GetUID();
+    uidGen1 = mitk::UIDGenerator("UID_");
+    auto uid2_1 = uidGen1.GetUID();
 
-      CPPUNIT_ASSERT_MESSAGE("Different UIDs are not allowed to be equal", uid1_1 != uid2_1);
-    }
+    CPPUNIT_ASSERT_MESSAGE("Different UIDs are not allowed to be equal", uid1_1 != uid2_1);
   }
 
   void UIDGeneratorMultipleInstancesSucceed()
   {
-    for (auto k = m_UidLengthStart; k < m_UidLengthEnd; ++k)
-    {
-      mitk::UIDGenerator uidGen1("UID_", k);
-      mitk::UIDGenerator uidGen2("UID_", k);
+    mitk::UIDGenerator uidGen1("UID_");
+    mitk::UIDGenerator uidGen2("UID_");
 
-      auto uid1_1 = uidGen1.GetUID();
-      auto uid2_1 = uidGen2.GetUID();
+    auto uid1_1 = uidGen1.GetUID();
+    auto uid2_1 = uidGen2.GetUID();
 
-      CPPUNIT_ASSERT_MESSAGE("Different UIDs are not allowed to be equal", uid1_1 != uid2_1);
-    }
+    CPPUNIT_ASSERT_MESSAGE("Different UIDs are not allowed to be equal", uid1_1 != uid2_1);
   }
 };
 

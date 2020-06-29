@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include "mitkProgressBar.h"
 #include "mitkPropertyListDeserializer.h"
 #include "mitkSerializerMacros.h"
+#include <mitkUIDManipulator.h>
 #include <mitkRenderingModeProperty.h>
 
 MITK_REGISTER_SERIALIZER(SceneReaderV1)
@@ -269,6 +270,13 @@ mitk::DataNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag(TiXmlElemen
         MITK_ERROR << "Error during attempt to read '" << filename << "'. Factory returned nullptr object.";
         error = true;
       }
+    }
+
+    const char* dataUID = dataElement->Attribute("UID");
+    if (!error && nullptr != dataUID && 0 != strlen(dataUID))
+    {
+      UIDManipulator manip(node->GetData());
+      manip.SetUID(dataUID);
     }
   }
 

@@ -4,7 +4,7 @@ set(CPP_FILES
   mitkRegEvaluationObjectFactory.cpp
   mitkRegEvaluationObject.cpp
   Helper/mitkUIDHelper.cpp
-  Helper/mitkAlgorithmHelper.cpp
+  Helper/mitkMAPAlgorithmHelper.cpp
   Helper/mitkMaskedAlgorithmHelper.cpp
   Helper/mitkRegistrationHelper.cpp
   Helper/mitkImageMappingHelper.cpp
@@ -38,7 +38,7 @@ set(H_FILES
   algorithms/mitkRigidClosedFormPointsDefaultRegistrationAlgorithm.h
   algorithms/mitkRigidICPDefaultRegistrationAlgorithm.h
   Helper/mitkUIDHelper.h
-  Helper/mitkAlgorithmHelper.h
+  Helper/mitkMAPAlgorithmHelper.h
   Helper/mitkMaskedAlgorithmHelper.h
   Helper/mitkRegistrationHelper.h
   Helper/mitkImageMappingHelper.h

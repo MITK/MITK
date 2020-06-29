@@ -48,7 +48,6 @@ mitk::PlanarFigure::PlanarFigure(const Self &other)
     m_PreviewControlPoint(other.m_PreviewControlPoint),
     m_PreviewControlPointVisible(other.m_PreviewControlPointVisible),
     m_FigurePlaced(other.m_FigurePlaced),
-    m_PlaneGeometry(other.m_PlaneGeometry), // do not clone since SetPlaneGeometry() doesn't clone either
     m_PolyLineUpToDate(other.m_PolyLineUpToDate),
     m_HelperLinesUpToDate(other.m_HelperLinesUpToDate),
     m_FeaturesUpToDate(other.m_FeaturesUpToDate),
@@ -61,6 +60,7 @@ mitk::PlanarFigure::PlanarFigure(const Self &other)
   {
     m_HelperPolyLinesToBePainted->InsertElement(i, other.m_HelperPolyLinesToBePainted->GetElement(i));
   }
+  m_PlaneGeometry = dynamic_cast<PlaneGeometry*>(GetGeometry(0));
 }
 
 void mitk::PlanarFigure::SetPlaneGeometry(mitk::PlaneGeometry *geometry)

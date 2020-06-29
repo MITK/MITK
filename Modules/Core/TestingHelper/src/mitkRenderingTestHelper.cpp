@@ -61,7 +61,7 @@ void mitk::RenderingTestHelper::Initialize(int width, int height, AntiAliasing a
 {
   RenderingManager::GetInstance()->SetAntiAliasing(antiAliasing);
 
-  mitk::UIDGenerator uidGen = mitk::UIDGenerator("UnnamedRenderer_", 8);
+  mitk::UIDGenerator uidGen = mitk::UIDGenerator("UnnamedRenderer_");
   m_RenderWindow = mitk::RenderWindow::New(nullptr, uidGen.GetUID().c_str());
 
   auto renderWindow = m_RenderWindow->GetVtkRenderWindow();

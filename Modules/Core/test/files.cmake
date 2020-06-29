@@ -116,6 +116,7 @@ set(MODULE_TESTS
   mitkTemporoSpatialStringPropertyTest.cpp
   mitkPropertyNameHelperTest.cpp
   mitkNodePredicateGeometryTest.cpp
+  mitkNodePredicateSubGeometryTest.cpp
   mitkPreferenceListReaderOptionsFunctorTest.cpp
   mitkGenericIDRelationRuleTest.cpp
   mitkSourceImageRelationRuleTest.cpp

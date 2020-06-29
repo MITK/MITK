@@ -112,7 +112,7 @@ find_program(CTEST_GIT_COMMAND NAMES git)
 # The git repository containing MITK code
 #set(GIT_REPOSITORY "/home/username/MITK")
 # The branch of the MITK git repository to check out
-#set(GIT_BRANCH "bug-xxx-label")
+#set(GIT_BRANCH "develop")
 
 ##########################################
 # WARNING: DO NOT EDIT BEYOND THIS POINT #
@@ -130,17 +130,14 @@ macro(downloadFile url dest)
   endif()
 endmacro()
 
+if(NOT GIT_BRANCH)
+  set(GIT_BRANCH "master")
+endif()
+
 #
 # Download and include setup script
 #
-if(NOT DEFINED GIT_BRANCH OR GIT_BRANCH STREQUAL "")
-  set(IS_PHABRICATOR_URL FALSE)
-  set(url "https://raw.githubusercontent.com/MITK/MITK/master/CMake/MITKDashboardSetup.cmake")
-else()
-  set(IS_PHABRICATOR_URL TRUE)
-  string(REPLACE "/" "%252F" GIT_BRANCH_URL ${GIT_BRANCH})
-  set(url "https://phabricator.mitk.org/source/mitk/browse/${GIT_BRANCH_URL}/CMake/MITKDashboardSetup.cmake?view=raw")
-endif()
+set(url "https://raw.githubusercontent.com/MITK/MITK/${GIT_BRANCH}/CMake/MITKDashboardSetup.cmake")
 set(dest ${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}.setup)
 downloadFile("${url}" "${dest}")
 include(${dest})

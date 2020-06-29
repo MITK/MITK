@@ -250,8 +250,7 @@ namespace mitk
     map::io::RegistrationFileReader::Pointer spReader = map::io::RegistrationFileReader::New();
     spReader->setPreferLazyLoading(true);
     map::core::RegistrationBase::Pointer spReg = spReader->read(fileName);
-    mitk::MAPRegistrationWrapper::Pointer spRegWrapper = mitk::MAPRegistrationWrapper::New();
-    spRegWrapper->SetRegistration(spReg);
+    auto spRegWrapper = mitk::MAPRegistrationWrapper::New(spReg);
 
     result.push_back(spRegWrapper.GetPointer());
     return result;

@@ -46,6 +46,8 @@ found in the LICENSE file.
 #include <mitkTwoCompartmentExchangeModelFactory.h>
 #include <mitkThreeStepLinearModelParameterizer.h>
 #include <mitkThreeStepLinearModelFactory.h>
+#include <mitkTwoStepLinearModelParameterizer.h>
+#include <mitkTwoStepLinearModelFactory.h>
 #include <mitkModelFactoryBase.h>
 
 std::string inFilename;
@@ -69,6 +71,7 @@ std::string modelName;
 float aifHematocritLevel(0);
 float brixInjectionTime(0);
 
+const std::string MODEL_NAME_2SL = "2SL";
 const std::string MODEL_NAME_3SL = "3SL";
 const std::string MODEL_NAME_descriptive = "descriptive";
 const std::string MODEL_NAME_tofts = "tofts";
@@ -421,20 +424,19 @@ void generateDescriptiveBrixModel_ROIBased(mitk::modelFit::ModelFitInfo::Pointer
   modelFitInfo->inputData.SetTableValue("ROI", infoSignal);
 }
 
-
-void Generate3StepLinearModelFit_PixelBased(mitk::modelFit::ModelFitInfo::Pointer&
+template <typename TParameterizer, typename TFactory>
+void GenerateLinearModelFit_PixelBased(mitk::modelFit::ModelFitInfo::Pointer&
   modelFitInfo, mitk::ParameterFitImageGeneratorBase::Pointer& generator)
 {
   mitk::PixelBasedParameterFitImageGenerator::Pointer fitGenerator =
     mitk::PixelBasedParameterFitImageGenerator::New();
 
-  mitk::ThreeStepLinearModelParameterizer::Pointer modelParameterizer =
-    mitk::ThreeStepLinearModelParameterizer::New();
+  typename TParameterizer::Pointer modelParameterizer = TParameterizer::New();
 
   mitk::Image::Pointer mask3D = getMask3D();
 
   //Specify fitting strategy and criterion parameters
-  mitk::ModelFactoryBase::Pointer factory = mitk::ThreeStepLinearModelFactory::New().GetPointer();
+  mitk::ModelFactoryBase::Pointer factory = TFactory::New().GetPointer();
   mitk::ModelFitFunctorBase::Pointer fitFunctor = createDefaultFitFunctor(modelParameterizer, factory);
 
   //Parametrize fit generator
@@ -457,7 +459,8 @@ void Generate3StepLinearModelFit_PixelBased(mitk::modelFit::ModelFitInfo::Pointe
     image, mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED(), roiUID);
 }
 
-void Generate3StepLinearModelFit_ROIBased(mitk::modelFit::ModelFitInfo::Pointer&
+template <typename TParameterizer, typename TFactory>
+void GenerateLinearModelFit_ROIBased(mitk::modelFit::ModelFitInfo::Pointer&
   modelFitInfo, mitk::ParameterFitImageGeneratorBase::Pointer& generator)
 {
   mitk::Image::Pointer mask3D = getMask3D();
@@ -470,8 +473,7 @@ void Generate3StepLinearModelFit_ROIBased(mitk::modelFit::ModelFitInfo::Pointer&
   mitk::ROIBasedParameterFitImageGenerator::Pointer fitGenerator =
     mitk::ROIBasedParameterFitImageGenerator::New();
 
-  mitk::ThreeStepLinearModelParameterizer::Pointer modelParameterizer =
-    mitk::ThreeStepLinearModelParameterizer::New();
+  typename TParameterizer::Pointer modelParameterizer = TParameterizer::New();
 
   //Compute ROI signal
   mitk::MaskedDynamicImageStatisticsGenerator::Pointer signalGenerator =
@@ -483,8 +485,9 @@ void Generate3StepLinearModelFit_ROIBased(mitk::modelFit::ModelFitInfo::Pointer&
   mitk::MaskedDynamicImageStatisticsGenerator::ResultType roiSignal = signalGenerator->GetMean();
 
   //Specify fitting strategy and criterion parameters
-  mitk::ModelFactoryBase::Pointer factory = mitk::ThreeStepLinearModelFactory::New().GetPointer();
+  mitk::ModelFactoryBase::Pointer factory = TFactory::New().GetPointer();
   mitk::ModelFitFunctorBase::Pointer fitFunctor = createDefaultFitFunctor(modelParameterizer, factory);
+
 
   //Parametrize fit generator
   fitGenerator->SetModelParameterizer(modelParameterizer);
@@ -672,6 +675,7 @@ void createFitGenerator(mitk::modelFit::ModelFitInfo::Pointer& fitSession, mitk:
   bool isToftsFactory = modelName == MODEL_NAME_tofts;
   bool is2CXMFactory = modelName == MODEL_NAME_2CX;
   bool is3SLFactory = modelName == MODEL_NAME_3SL;
+  bool is2SLFactory = modelName == MODEL_NAME_2SL;
 
   if (isDescBrixFactory)
   {
@@ -690,11 +694,23 @@ void createFitGenerator(mitk::modelFit::ModelFitInfo::Pointer& fitSession, mitk:
     std::cout << "Model:  three step linear model" << std::endl;
     if (!roibased)
     {
-      Generate3StepLinearModelFit_PixelBased(fitSession, generator);
+      GenerateLinearModelFit_PixelBased<mitk::ThreeStepLinearModelParameterizer, mitk::ThreeStepLinearModelFactory>(fitSession, generator);
     }
     else
     {
-      Generate3StepLinearModelFit_ROIBased(fitSession, generator);
+      GenerateLinearModelFit_ROIBased<mitk::ThreeStepLinearModelParameterizer, mitk::ThreeStepLinearModelFactory>(fitSession, generator);
+    }
+  }
+  else if (is2SLFactory)
+  {
+    std::cout << "Model:  two step linear model" << std::endl;
+    if (!roibased)
+    {
+      GenerateLinearModelFit_PixelBased<mitk::TwoStepLinearModelParameterizer, mitk::TwoStepLinearModelFactory>(fitSession, generator);
+    }
+    else
+    {
+      GenerateLinearModelFit_ROIBased<mitk::TwoStepLinearModelParameterizer, mitk::TwoStepLinearModelFactory>(fitSession, generator);
     }
   }
   else if (isToftsFactory)

@@ -28,8 +28,7 @@ QmitkConvertMaskToLabelAction::~QmitkConvertMaskToLabelAction()
 
 void QmitkConvertMaskToLabelAction::Run( const QList<mitk::DataNode::Pointer> &selectedNodes )
 {
-  mitk::ToolManager::Pointer toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  assert(toolManager);
+  mitk::ToolManager::Pointer toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager(mitk::ToolManagerProvider::MULTILABEL_SEGMENTATION);
 
   mitk::DataNode* workingNode = toolManager->GetWorkingData(0);
   if (!workingNode)

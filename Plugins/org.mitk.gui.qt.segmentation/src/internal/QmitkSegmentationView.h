@@ -104,8 +104,6 @@ protected:
 
   void NodeAdded(const mitk::DataNode *node) override;
 
-  static bool CheckForSameGeometry(const mitk::DataNode*, const mitk::DataNode*);
-
   void UpdateWarningLabel(QString text/*, bool overwriteExistingText = true*/);
 
   // the Qt parent of our GUI (NOT of this object)

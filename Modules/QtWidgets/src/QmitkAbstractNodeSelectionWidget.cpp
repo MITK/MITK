@@ -136,17 +136,20 @@ void QmitkAbstractNodeSelectionWidget::SetNodePredicate(const mitk::NodePredicat
 
 void QmitkAbstractNodeSelectionWidget::HandleChangeOfInternalSelection(NodeList newInternalSelection)
 {
-  this->ReviseSelectionChanged(m_CurrentInternalSelection, newInternalSelection);
+  if (!EqualNodeSelections(m_CurrentInternalSelection, newInternalSelection))
+  {
+    this->ReviseSelectionChanged(m_CurrentInternalSelection, newInternalSelection);
 
-  this->SetCurrentInternalSelection(newInternalSelection);
+    this->SetCurrentInternalSelection(newInternalSelection);
 
-  this->OnInternalSelectionChanged();
+    this->OnInternalSelectionChanged();
 
-  auto newEmission = this->CompileEmitSelection();
+    auto newEmission = this->CompileEmitSelection();
 
-  this->EmitSelection(newEmission);
+    this->EmitSelection(newEmission);
 
-  this->UpdateInfo();
+    this->UpdateInfo();
+  }
 }
 
 void QmitkAbstractNodeSelectionWidget::SetCurrentSelection(NodeList selectedNodes)

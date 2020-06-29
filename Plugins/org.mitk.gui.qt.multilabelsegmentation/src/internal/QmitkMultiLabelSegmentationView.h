@@ -138,9 +138,6 @@ protected:
 
   void InitializeListeners();
 
-  /// \brief Checks if two images have the same size and geometry
-  static bool CheckForSameGeometry(const mitk::DataNode *node1, const mitk::DataNode *node2);
-
   /// \brief the Qt parent of our GUI (NOT of this object)
   QWidget *m_Parent;
 

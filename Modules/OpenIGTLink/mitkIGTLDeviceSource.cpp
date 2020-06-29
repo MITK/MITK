@@ -245,7 +245,7 @@ void mitk::IGTLDeviceSource::RegisterAsMicroservice()
   // Define ServiceProps
   us::ServiceProperties props;
   mitk::UIDGenerator uidGen =
-    mitk::UIDGenerator("org.mitk.services.IGTLDeviceSource.id_", 16);
+    mitk::UIDGenerator("org.mitk.services.IGTLDeviceSource.id_");
   props[US_PROPKEY_ID] = uidGen.GetUID();
   props[US_PROPKEY_DEVICENAME] = this->GetName();
   props[US_PROPKEY_IGTLDEVICENAME] = m_Name;

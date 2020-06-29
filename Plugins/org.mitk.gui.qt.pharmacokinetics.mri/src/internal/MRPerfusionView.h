@@ -87,16 +87,17 @@ protected:
   void GenerateDescriptiveBrixModel_ROIBased(mitk::modelFit::ModelFitInfo::Pointer& modelFitInfo,
       mitk::ParameterFitImageGeneratorBase::Pointer& generator);
 
-  void Generate3StepLinearModelFit_PixelBased(mitk::modelFit::ModelFitInfo::Pointer& modelFitInfo,
+  template <typename TParameterizer>
+  void GenerateLinearModelFit_PixelBased(mitk::modelFit::ModelFitInfo::Pointer& modelFitInfo,
       mitk::ParameterFitImageGeneratorBase::Pointer& generator);
-  void Generate3StepLinearModelFit_ROIBased(mitk::modelFit::ModelFitInfo::Pointer& modelFitInfo,
+  template <typename TParameterizer>
+  void GenerateLinearModelFit_ROIBased(mitk::modelFit::ModelFitInfo::Pointer& modelFitInfo,
       mitk::ParameterFitImageGeneratorBase::Pointer& generator);
 
 
   template <typename TParameterizer>
   void GenerateAIFbasedModelFit_ROIBased(mitk::modelFit::ModelFitInfo::Pointer& modelFitInfo,
                                  mitk::ParameterFitImageGeneratorBase::Pointer& generator);
-
   template <typename TParameterizer>
   void GenerateAIFbasedModelFit_PixelBased(mitk::modelFit::ModelFitInfo::Pointer& modelFitInfo,
                                    mitk::ParameterFitImageGeneratorBase::Pointer& generator);

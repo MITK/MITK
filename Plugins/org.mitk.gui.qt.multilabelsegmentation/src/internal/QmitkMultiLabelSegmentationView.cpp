@@ -26,7 +26,7 @@ found in the LICENSE file.
 #include "mitkPluginActivator.h"
 #include "mitkSegTool2D.h"
 #include "mitkImageTimeSelector.h"
-#include "mitkNodePredicateFunction.h"
+#include "mitkNodePredicateSubGeometry.h"
 
 // Qmitk
 #include "QmitkNewSegmentationDialog.h"
@@ -140,11 +140,10 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget *parent)
   // * ToolManager
   // *------------------------
 
-  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  assert(m_ToolManager);
+  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager(mitk::ToolManagerProvider::MULTILABEL_SEGMENTATION);
   m_ToolManager->SetDataStorage(*(this->GetDataStorage()));
   m_ToolManager->InitializeTools();
-  // use the same ToolManager instance for our 3D Tools
+  m_Controls.m_ManualToolSelectionBox2D->SetToolManager(*m_ToolManager);
   m_Controls.m_ManualToolSelectionBox3D->SetToolManager(*m_ToolManager);
 
   // *------------------------
@@ -165,6 +164,8 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget *parent)
 
   m_Controls.m_cbInterpolation->setCurrentIndex(0);
   m_Controls.m_swInterpolation->hide();
+
+  m_Controls.m_gbInterpolation->hide(); // See T27436
 
   QString segTools2D = tr("Add Subtract Fill Erase Paint Wipe 'Region Growing' FastMarching2D Correction 'Live Wire'");
   QString segTools3D = tr("Threshold 'Two Thresholds' 'Auto Threshold' 'Multiple Otsu'");
@@ -649,13 +650,7 @@ void QmitkMultiLabelSegmentationView::OnReferenceSelectionChanged(QList<mitk::Da
 
   if (m_ReferenceNode.IsNotNull())
   {
-    auto geometryCheck = [refNode](const mitk::DataNode * segNode)
-    {
-      return QmitkMultiLabelSegmentationView::CheckForSameGeometry(refNode,segNode);
-    };
-
-    mitk::NodePredicateFunction::Pointer hasCorrectGeo = mitk::NodePredicateFunction::New(geometryCheck);
-    auto segPredicate = mitk::NodePredicateAnd::New(m_SegmentationPredicate.GetPointer(), hasCorrectGeo.GetPointer());
+    auto segPredicate = mitk::NodePredicateAnd::New(m_SegmentationPredicate.GetPointer(), mitk::NodePredicateSubGeometry::New(refNode->GetData()->GetGeometry()));
 
     m_Controls.m_WorkingNodeSelector->SetNodePredicate(segPredicate);
 
@@ -1024,36 +1019,5 @@ void QmitkMultiLabelSegmentationView::InitializeListeners()
     props["name"] = std::string("SegmentationInteraction");
     m_ServiceRegistration =
       us::GetModuleContext()->RegisterService<mitk::InteractionEventObserver>(m_Interactor.GetPointer(), props);
-  }
-}
-
-bool QmitkMultiLabelSegmentationView::CheckForSameGeometry(const mitk::DataNode *node1, const mitk::DataNode *node2)
-{
-  bool isSameGeometry(true);
-
-  auto image1 = dynamic_cast<const mitk::Image*>(node1->GetData());
-  assert(image1);
-
-  auto image2 = dynamic_cast<const mitk::Image*>(node2->GetData());
-  assert(image2);
-
-  if (image1 && image2)
-  {
-    mitk::BaseGeometry::Pointer geo1 = image1->GetGeometry();
-    mitk::BaseGeometry::Pointer geo2 = image2->GetGeometry();
-
-    isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetOrigin(), geo2->GetOrigin());
-    isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetExtent(0), geo2->GetExtent(0));
-    isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetExtent(1), geo2->GetExtent(1));
-    isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetExtent(2), geo2->GetExtent(2));
-    isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetSpacing(), geo2->GetSpacing());
-    isSameGeometry = isSameGeometry && mitk::MatrixEqualElementWise(geo1->GetIndexToWorldTransform()->GetMatrix(),
-                                                                    geo2->GetIndexToWorldTransform()->GetMatrix());
-
-    return isSameGeometry;
-  }
-  else
-  {
-    return false;
   }
 }

@@ -31,7 +31,7 @@ found in the LICENSE file.
 #include <mapDeploymentDLLAccess.h>
 #include <mapRegistrationBase.h>
 
-#include <mitkAlgorithmHelper.h>
+#include <mitkMAPAlgorithmHelper.h>
 // Qt
 #include <QDir>
 #include <QFileInfo>
@@ -142,7 +142,7 @@ int main(int argc, char* argv[])
     return -2;
   }
 
-  mitk::MITKAlgorithmHelper helper(tempAlgorithm);
+  mitk::MAPAlgorithmHelper helper(tempAlgorithm);
   helper.SetData(movingImage, fixedImage);
   auto registration = helper.GetRegistration();
   MITK_INFO << "Well....";

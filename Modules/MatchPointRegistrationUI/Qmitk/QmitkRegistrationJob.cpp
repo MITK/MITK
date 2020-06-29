@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "QmitkRegistrationJob.h"
 
 // Mitk
-#include <mitkAlgorithmHelper.h>
+#include <mitkMAPAlgorithmHelper.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkImageMappingHelper.h>
 #include <mitkMAPRegistrationWrapper.h>
@@ -34,17 +34,17 @@ found in the LICENSE file.
 const mitk::Image *QmitkRegistrationJob::GetTargetDataAsImage() const
 {
   return dynamic_cast<const mitk::Image *>(m_spTargetData.GetPointer());
-};
+}
 
 const mitk::Image *QmitkRegistrationJob::GetMovingDataAsImage() const
 {
   return dynamic_cast<const mitk::Image *>(m_spMovingData.GetPointer());
-};
+}
 
 const map::algorithm::RegistrationAlgorithmBase *QmitkRegistrationJob::GetLoadedAlgorithm() const
 {
   return m_spLoadedAlgorithm;
-};
+}
 
 void QmitkRegistrationJob::OnMapAlgorithmEvent(::itk::Object *, const itk::EventObject &event)
 {
@@ -154,18 +154,18 @@ QmitkRegistrationJob::QmitkRegistrationJob(map::algorithm::RegistrationAlgorithm
   m_spCommand = ::itk::MemberCommand<QmitkRegistrationJob>::New();
   m_spCommand->SetCallbackFunction(this, &QmitkRegistrationJob::OnMapAlgorithmEvent);
   m_ObserverID = m_spLoadedAlgorithm->AddObserver(::map::events::AlgorithmEvent(), m_spCommand);
-};
+}
 
 QmitkRegistrationJob::~QmitkRegistrationJob()
 {
   m_spLoadedAlgorithm->RemoveObserver(m_ObserverID);
-};
+}
 
 void QmitkRegistrationJob::run()
 {
   try
   {
-    mitk::MITKAlgorithmHelper helper(m_spLoadedAlgorithm);
+    mitk::MAPAlgorithmHelper helper(m_spLoadedAlgorithm);
     mitk::MaskedAlgorithmHelper maskedHelper(m_spLoadedAlgorithm);
 
     //*@TODO Data Check and failure handle
@@ -182,8 +182,7 @@ void QmitkRegistrationJob::run()
     }
     else
     {
-      mitk::MAPRegistrationWrapper::Pointer spRegWrapper = mitk::MAPRegistrationWrapper::New();
-      spRegWrapper->SetRegistration(m_spResultRegistration);
+      auto spRegWrapper = mitk::MAPRegistrationWrapper::New(m_spResultRegistration);
 
       emit RegResultIsAvailable(spRegWrapper, this);
     }
@@ -198,4 +197,4 @@ void QmitkRegistrationJob::run()
   }
 
   emit Finished();
-};
+}

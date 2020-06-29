@@ -15,7 +15,18 @@ found in the LICENSE file.
 #include <mitkIOUtil.h>
 #include <QFile>
 #include <QDir>
+
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable: 5208)
+#endif
+
 #include <PythonQt.h>
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
+
 #include "PythonPath.h"
 #include <vtkPolyData.h>
 #include <mitkRenderingManager.h>

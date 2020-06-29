@@ -41,8 +41,7 @@ QmitkSurfaceBasedInterpolatorWidget::QmitkSurfaceBasedInterpolatorWidget(QWidget
 {
   m_Controls.setupUi(this);
 
-  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  Q_ASSERT(m_ToolManager);
+  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager(mitk::ToolManagerProvider::MULTILABEL_SEGMENTATION);
 
   m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkSurfaceBasedInterpolatorWidget>(
     this, &QmitkSurfaceBasedInterpolatorWidget::OnToolManagerWorkingDataModified);

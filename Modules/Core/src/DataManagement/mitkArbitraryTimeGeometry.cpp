@@ -89,7 +89,8 @@ mitk::TimeBounds mitk::ArbitraryTimeGeometry::GetTimeBounds(TimeStepType step) c
 
 bool mitk::ArbitraryTimeGeometry::IsValidTimePoint(TimePointType timePoint) const
 {
-  return this->GetMinimumTimePoint() <= timePoint && timePoint < this->GetMaximumTimePoint();
+  return this->GetMinimumTimePoint() <= timePoint &&
+    (timePoint < this->GetMaximumTimePoint() || (this->HasCollapsedFinalTimeStep() && timePoint <= this->GetMaximumTimePoint()));
 }
 
 bool mitk::ArbitraryTimeGeometry::IsValidTimeStep(TimeStepType timeStep) const
@@ -117,7 +118,7 @@ mitk::TimeStepType mitk::ArbitraryTimeGeometry::TimePointToTimeStep(TimePointTyp
   {
     for (auto pos = m_MaximumTimePoints.cbegin(); pos != m_MaximumTimePoints.cend(); ++pos)
     {
-      if (timePoint < *pos)
+      if (timePoint < *pos || (pos==std::prev(m_MaximumTimePoints.cend()) && timePoint <= *pos && this->HasCollapsedFinalTimeStep()))
       {
         break;
       }
@@ -291,4 +292,16 @@ void mitk::ArbitraryTimeGeometry::PrintSelf(std::ostream &os, itk::Indent indent
   {
     os << indent.GetNextIndent() << "Step " << i << ": " << m_MaximumTimePoints[i] << " ms" << std::endl;
   }
+}
+
+bool mitk::ArbitraryTimeGeometry::HasCollapsedFinalTimeStep() const
+{
+  bool result = false;
+
+  if (!m_MaximumTimePoints.empty() && !m_MinimumTimePoints.empty())
+  {
+    result = m_MinimumTimePoints.back() == m_MaximumTimePoints.back();
+  }
+
+  return result;
 }

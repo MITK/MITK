@@ -438,7 +438,7 @@ void mitk::AbstractUltrasoundTrackerDevice::RegisterAsMicroservice()
 
   // Define ServiceProps
   // us::ServiceProperties props;
-  mitk::UIDGenerator uidGen = mitk::UIDGenerator("org.mitk.services.AbstractUltrasoundTrackerDevice", 16);
+  mitk::UIDGenerator uidGen = mitk::UIDGenerator("org.mitk.services.AbstractUltrasoundTrackerDevice");
   m_ServiceProperties[US_PROPKEY_ID] = uidGen.GetUID();
   m_ServiceProperties[US_PROPKEY_DEVICENAME] = m_UltrasoundDevice->GetName();
   m_ServiceProperties[US_PROPKEY_CLASS] = mitk::AbstractUltrasoundTrackerDevice::DeviceClassIdentifier;

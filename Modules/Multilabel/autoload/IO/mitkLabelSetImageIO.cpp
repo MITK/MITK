@@ -24,6 +24,7 @@ found in the LICENSE file.
 #include <mitkIPropertyPersistence.h>
 #include <mitkCoreServices.h>
 #include <mitkItkImageIO.h>
+#include <mitkUIDManipulator.h>
 
 // itk
 #include "itkImageFileReader.h"
@@ -39,6 +40,7 @@ namespace mitk
   const char* const PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS = "org.mitk.timegeometry.timepoints";
   const char* const PROPERTY_KEY_TIMEGEOMETRY_TYPE = "org_mitk_timegeometry_type";
   const char* const PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS = "org_mitk_timegeometry_timepoints";
+  const char* const PROPERTY_KEY_UID = "org_mitk_uid";
 
   LabelSetImageIO::LabelSetImageIO()
     : AbstractFileIO(LabelSetImage::GetStaticNameOfClass(), IOMimeTypes::NRRD_MIMETYPE(), "MITK Multilabel Image")
@@ -260,6 +262,9 @@ namespace mitk
 
         itk::EncapsulateMetaData<std::string>(nrrdImageIo->GetMetaDataDictionary(), key, value);
       }
+
+      // Handle UID
+      itk::EncapsulateMetaData<std::string>(nrrdImageIo->GetMetaDataDictionary(), PROPERTY_KEY_UID, input->GetUID());
 
       ImageReadAccessor imageAccess(inputVector);
       nrrdImageIo->Write(imageAccess.GetData());
@@ -576,6 +581,17 @@ namespace mitk
         {
           propPersistenceService->AddInfo(info);
         }
+      }
+    }
+
+    // Handle UID
+    if (dictionary.HasKey(PROPERTY_KEY_UID))
+    {
+      itk::MetaDataObject<std::string>::ConstPointer uidData = dynamic_cast<const itk::MetaDataObject<std::string>*>(dictionary.Get(PROPERTY_KEY_UID));
+      if (uidData.IsNotNull())
+      {
+        mitk::UIDManipulator uidManipulator(output);
+        uidManipulator.SetUID(uidData->GetMetaDataObjectValue());
       }
     }
 

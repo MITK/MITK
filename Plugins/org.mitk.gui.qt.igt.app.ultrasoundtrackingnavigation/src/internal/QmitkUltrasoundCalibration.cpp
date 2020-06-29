@@ -375,7 +375,7 @@ void QmitkUltrasoundCalibration::OnAddCurrentTipPositionForVerification()
 void QmitkUltrasoundCalibration::OnStartCalibrationProcess()
 {
   // US Image Stream
-  m_Node = this->GetDataStorage()->GetNamedNode("US Viewing Stream - Image 0")->Clone();
+  m_Node = dynamic_cast<mitk::DataNode*>(this->GetDataStorage()->GetNamedNode("US Viewing Stream - Image 0")->CreateAnother().GetPointer());
   m_Node->SetName("US Calibration Viewing Stream");
   this->GetDataStorage()->Add(m_Node);
 

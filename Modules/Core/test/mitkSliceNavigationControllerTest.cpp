@@ -149,7 +149,7 @@ public:
   {
     auto sliceNavigationController = mitk::SliceNavigationController::New();
 
-    CPPUNIT_ASSERT_THROW(sliceNavigationController->GetSelectedTimePoint(), mitk::Exception);
+    CPPUNIT_ASSERT(sliceNavigationController->GetSelectedTimePoint() == 0.);
 
     sliceNavigationController->SetInputWorldTimeGeometry(m_TimeGeometry);
     sliceNavigationController->SetViewDirection(mitk::SliceNavigationController::Sagittal);

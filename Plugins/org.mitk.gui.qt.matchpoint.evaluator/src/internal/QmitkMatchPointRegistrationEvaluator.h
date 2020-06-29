@@ -102,9 +102,8 @@ private:
 
   /** @brief currently valid selected position in the inspector*/
   mitk::Point3D m_currentSelectedPosition;
-  /** @brief indicates if the currently selected position is valid for the currently selected fit.
-  * This it is within the input image */
-  unsigned int m_currentSelectedTimeStep;
+  /** @brief currently selected timepoint*/
+  mitk::TimePointType m_currentSelectedTimePoint;
 
   mitk::DataNode::Pointer m_spSelectedRegNode;
   mitk::DataNode::Pointer m_spSelectedMovingNode;

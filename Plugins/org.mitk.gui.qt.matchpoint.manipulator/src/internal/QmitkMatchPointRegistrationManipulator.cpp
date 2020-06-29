@@ -57,7 +57,7 @@ const std::string QmitkMatchPointRegistrationManipulator::HelperNodeName =
 
 QmitkMatchPointRegistrationManipulator::QmitkMatchPointRegistrationManipulator()
   : m_Parent(nullptr), m_activeManipulation(false),
-    m_currentSelectedTimeStep(0), m_internalUpdate(false)
+    m_currentSelectedTimePoint(0.), m_internalUpdate(false)
 {
   m_currentSelectedPosition.Fill(0.0);
 }
@@ -346,15 +346,15 @@ void QmitkMatchPointRegistrationManipulator::OnRegistrationChanged()
 void QmitkMatchPointRegistrationManipulator::OnSliceChanged()
 {
   mitk::Point3D currentSelectedPosition = GetRenderWindowPart()->GetSelectedPosition(nullptr);
-  unsigned int currentSelectedTimeStep = GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->GetPos();
+  auto currentTimePoint = GetRenderWindowPart()->GetSelectedTimePoint();
 
   if (m_currentSelectedPosition != currentSelectedPosition
-    || m_currentSelectedTimeStep != currentSelectedTimeStep
+    || m_currentSelectedTimePoint != currentTimePoint
     || m_selectedNodeTime > m_currentPositionTime)
   {
     //the current position has been changed or the selected node has been changed since the last position validation -> check position
     m_currentSelectedPosition = currentSelectedPosition;
-    m_currentSelectedTimeStep = currentSelectedTimeStep;
+    m_currentSelectedTimePoint = currentTimePoint;
     m_currentPositionTime.Modified();
 
     if (this->m_EvalNode.IsNotNull())

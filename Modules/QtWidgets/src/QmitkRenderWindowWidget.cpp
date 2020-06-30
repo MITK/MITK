@@ -201,12 +201,6 @@ void QmitkRenderWindowWidget::InitializeGUI()
 	//Carlo's change.
 	mitk::BaseRenderer::GetInstance(m_RenderWindow->GetRenderWindow())->SetDataStorage(m_DataStorage);
 
-//  mitk::TimeGeometry::ConstPointer timeGeometry = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
-//	mitk::RenderingManager::GetInstance()->InitializeViews(timeGeometry);
-	// Carlo's change:
-//	mitk::RenderingManager::GetInstance()->InitializeView(m_RenderWindow->GetRenderWindow(),timeGeometry);
-//	mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(m_DataStorage);
-
   m_Layout->addWidget(m_RenderWindow);
 
   // add point set as a crosshair

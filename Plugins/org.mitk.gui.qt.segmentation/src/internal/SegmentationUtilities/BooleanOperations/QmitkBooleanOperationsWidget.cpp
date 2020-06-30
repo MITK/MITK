@@ -120,7 +120,7 @@ void QmitkBooleanOperationsWidget::DoBooleanOperation(mitk::BooleanOperation::Ty
 
   try
   {
-    mitk::BooleanOperation booleanOperation(type, segmentationA, segmentationB, timeNavigationController->GetTime()->GetPos());
+    mitk::BooleanOperation booleanOperation(type, segmentationA, segmentationB, timeNavigationController->GetSelectedTimePoint());
     result = booleanOperation.GetResult();
 
     assert(result.IsNotNull());

@@ -198,7 +198,6 @@ void QmitkRenderWindowWidget::InitializeGUI()
 
   connect(m_RenderWindow, &QVTKOpenGLWidget::mouseEvent, this, &QmitkRenderWindowWidget::MouseEvent);
 
-	//Carlo's change.
 	mitk::BaseRenderer::GetInstance(m_RenderWindow->GetRenderWindow())->SetDataStorage(m_DataStorage);
 
   m_Layout->addWidget(m_RenderWindow);

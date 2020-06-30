@@ -225,8 +225,6 @@ void QmitkStdMultiWidget::ResetCrosshair()
     return;
   }
 
-//	mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(dataStorage);
-	// Carlo's change: reset all windows
 	auto geo = dataStorage->ComputeBoundingGeometry3D(dataStorage->GetAll());
 	mitk::RenderingManager::GetInstance()->InitializeView(GetRenderWindow1()->GetRenderWindow(), geo);
 	mitk::RenderingManager::GetInstance()->InitializeView(GetRenderWindow2()->GetRenderWindow(), geo);

@@ -91,6 +91,7 @@ void QmitkMatchPointRegistrationEvaluator::CreateQtPartControl(QWidget* parent)
   this->m_Controls.targetNodeSelector->SetInvalidInfo("Select target image.");
   this->m_Controls.targetNodeSelector->SetPopUpTitel("Select target image.");
   this->m_Controls.targetNodeSelector->SetPopUpHint("Select the target image for the evaluation.");
+  this->m_Controls.checkAutoSelect->setChecked(true);
 
   this->ConfigureNodePredicates();
 
@@ -134,11 +135,12 @@ void QmitkMatchPointRegistrationEvaluator::CheckInputs()
 {
   if (!m_activeEvaluation)
   {
+    bool autoSelectInput = m_Controls.checkAutoSelect->isChecked() && this->m_spSelectedRegNode != this->m_Controls.registrationNodeSelector->GetSelectedNode();
     this->m_spSelectedRegNode = this->m_Controls.registrationNodeSelector->GetSelectedNode();
     this->m_spSelectedMovingNode = this->m_Controls.movingNodeSelector->GetSelectedNode();
     this->m_spSelectedTargetNode = this->m_Controls.targetNodeSelector->GetSelectedNode();
 
-    if (this->m_spSelectedMovingNode.IsNull() && this->m_spSelectedRegNode.IsNotNull())
+    if (this->m_spSelectedRegNode.IsNotNull() && (this->m_spSelectedMovingNode.IsNull() || autoSelectInput))
     {
       mitk::BaseProperty* uidProp = m_spSelectedRegNode->GetData()->GetProperty(mitk::Prop_RegAlgMovingData);
 
@@ -157,7 +159,7 @@ void QmitkMatchPointRegistrationEvaluator::CheckInputs()
       }
     }
 
-    if (this->m_spSelectedTargetNode.IsNull() && this->m_spSelectedRegNode.IsNotNull())
+    if (this->m_spSelectedRegNode.IsNotNull() && (this->m_spSelectedTargetNode.IsNull() || autoSelectInput))
     {
       mitk::BaseProperty* uidProp = m_spSelectedRegNode->GetData()->GetProperty(mitk::Prop_RegAlgTargetData);
 

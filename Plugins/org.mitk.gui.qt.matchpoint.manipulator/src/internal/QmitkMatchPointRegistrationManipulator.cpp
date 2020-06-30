@@ -105,6 +105,7 @@ void QmitkMatchPointRegistrationManipulator::CreateQtPartControl(QWidget* parent
   this->m_Controls.targetNodeSelector->SetInvalidInfo("Select target image.");
   this->m_Controls.targetNodeSelector->SetPopUpTitel("Select target image.");
   this->m_Controls.targetNodeSelector->SetPopUpHint("Select the target image for the evaluation.");
+  this->m_Controls.checkAutoSelect->setChecked(true);
 
   this->ConfigureNodePredicates();
 
@@ -156,6 +157,7 @@ void QmitkMatchPointRegistrationManipulator::CheckInputs()
 {
   if (!m_activeManipulation)
   {
+    bool autoSelectInput = m_Controls.checkAutoSelect->isChecked() && this->m_SelectedPreRegNode != this->m_Controls.registrationNodeSelector->GetSelectedNode();
     this->m_SelectedPreRegNode = this->m_Controls.registrationNodeSelector->GetSelectedNode();
     this->m_SelectedMovingNode = this->m_Controls.movingNodeSelector->GetSelectedNode();
     this->m_SelectedTargetNode = this->m_Controls.targetNodeSelector->GetSelectedNode();
@@ -169,7 +171,7 @@ void QmitkMatchPointRegistrationManipulator::CheckInputs()
       }
     }
 
-    if (this->m_SelectedMovingNode.IsNull() && this->m_SelectedPreRegNode.IsNotNull())
+    if (this->m_SelectedPreRegNode.IsNotNull() && (this->m_SelectedMovingNode.IsNull() || autoSelectInput))
     {
       mitk::BaseProperty* uidProp = m_SelectedPreRegNode->GetData()->GetProperty(mitk::Prop_RegAlgMovingData);
 
@@ -188,7 +190,7 @@ void QmitkMatchPointRegistrationManipulator::CheckInputs()
       }
     }
 
-    if (this->m_SelectedTargetNode.IsNull() && this->m_SelectedPreRegNode.IsNotNull())
+    if (this->m_SelectedPreRegNode.IsNotNull() && (this->m_SelectedTargetNode.IsNull() || autoSelectInput))
     {
       mitk::BaseProperty* uidProp = m_SelectedPreRegNode->GetData()->GetProperty(mitk::Prop_RegAlgTargetData);
 
@@ -267,6 +269,7 @@ void QmitkMatchPointRegistrationManipulator::ConfigureControls()
   this->m_Controls.pbCancel->setEnabled(m_activeManipulation);
   this->m_Controls.pbStore->setEnabled(m_activeManipulation);
   this->m_Controls.registrationNodeSelector->setEnabled(!m_activeManipulation && this->m_Controls.radioSelectedReg->isChecked());
+  this->m_Controls.checkAutoSelect->setEnabled(!m_activeManipulation && this->m_Controls.radioSelectedReg->isChecked());
   this->m_Controls.movingNodeSelector->setEnabled(!m_activeManipulation);
   this->m_Controls.targetNodeSelector->setEnabled(!m_activeManipulation);
 }

@@ -62,6 +62,19 @@
           </property>
         </widget>
       </item>
+      <item>
+        <widget class="QCheckBox" name="checkAutoSelect">
+          <property name="toolTip">
+            <string>If checked, the target and the moving image will be selected (if available) together with a selected pre registration.</string>
+          </property>
+          <property name="text">
+            <string>Autoselect images by registration</string>
+          </property>
+          <property name="checked">
+            <bool>true</bool>
+          </property>
+        </widget>
+      </item>
      </layout>
     </widget>
    </item>

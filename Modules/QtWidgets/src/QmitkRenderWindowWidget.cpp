@@ -52,8 +52,8 @@ void QmitkRenderWindowWidget::SetDataStorage(mitk::DataStorage* dataStorage)
   m_DataStorage = dataStorage;
   if (nullptr != m_RenderWindow)
   {
-    mitk::BaseRenderer::GetInstance(m_RenderWindow->GetRenderWindow())->SetDataStorage(dataStorage);
-  }
+		mitk::BaseRenderer::GetInstance(m_RenderWindow->GetRenderWindow())->SetDataStorage(dataStorage);
+	}
 }
 
 mitk::SliceNavigationController* QmitkRenderWindowWidget::GetSliceNavigationController() const
@@ -63,11 +63,15 @@ mitk::SliceNavigationController* QmitkRenderWindowWidget::GetSliceNavigationCont
 
 void QmitkRenderWindowWidget::RequestUpdate()
 {
+	auto geo = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
+	mitk::RenderingManager::GetInstance()->InitializeView(m_RenderWindow->GetRenderWindow(), geo);
   mitk::RenderingManager::GetInstance()->RequestUpdate(m_RenderWindow->GetRenderWindow());
 }
 
 void QmitkRenderWindowWidget::ForceImmediateUpdate()
 {
+	auto geo = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
+	mitk::RenderingManager::GetInstance()->InitializeView(m_RenderWindow->GetRenderWindow(), geo);
   mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(m_RenderWindow->GetRenderWindow());
 }
 
@@ -186,8 +190,6 @@ void QmitkRenderWindowWidget::InitializeGUI()
     return;
   }
 
-  mitk::RenderingManager::GetInstance()->SetDataStorage(m_DataStorage);
-
   // create render window for this render window widget
   m_RenderWindow = new QmitkRenderWindow(this, m_WidgetName, nullptr);
   m_RenderWindow->SetLayoutIndex(mitk::BaseRenderer::ViewDirection::SAGITTAL);
@@ -196,8 +198,15 @@ void QmitkRenderWindowWidget::InitializeGUI()
 
   connect(m_RenderWindow, &QVTKOpenGLWidget::mouseEvent, this, &QmitkRenderWindowWidget::MouseEvent);
 
-  mitk::TimeGeometry::ConstPointer timeGeometry = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
-  mitk::RenderingManager::GetInstance()->InitializeViews(timeGeometry);
+	//Carlo's change.
+	mitk::BaseRenderer::GetInstance(m_RenderWindow->GetRenderWindow())->SetDataStorage(m_DataStorage);
+
+//  mitk::TimeGeometry::ConstPointer timeGeometry = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
+//	mitk::RenderingManager::GetInstance()->InitializeViews(timeGeometry);
+	// Carlo's change:
+//	mitk::RenderingManager::GetInstance()->InitializeView(m_RenderWindow->GetRenderWindow(),timeGeometry);
+//	mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(m_DataStorage);
+
   m_Layout->addWidget(m_RenderWindow);
 
   // add point set as a crosshair

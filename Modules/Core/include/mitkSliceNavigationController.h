@@ -160,10 +160,6 @@ class MITKCORE_EXPORT SliceNavigationController : public BaseController
     
     void setPositionTop(bool top);
 
-    void setGlobalSync(bool sync);
-
-    bool isInSync();
-
     mitkClassMacro(SliceNavigationController,BaseController);
     //itkFactorylessNewMacro(Self)
     //mitkNewMacro1Param(Self, const char *);
@@ -582,8 +578,6 @@ class MITKCORE_EXPORT SliceNavigationController : public BaseController
 
     bool m_SliceLocked;
     bool m_SliceRotationLocked;
-
-    bool m_InGlobalSync;
 
     unsigned int m_OldPos;
 

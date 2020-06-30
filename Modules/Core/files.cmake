@@ -200,6 +200,7 @@ set(CPP_FILES
   Interactions/mitkXML2EventParser.cpp
   Interactions/mitkPickingEventObserver.cpp
   Interactions/mitkDataNodePickingEventObserver.cpp
+  Interactions/WindowSyncManager.cpp
 
   IO/mitkAbstractFileIO.cpp
   IO/mitkAbstractFileReader.cpp

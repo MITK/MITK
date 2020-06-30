@@ -197,6 +197,17 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
     m_Controls.m_lblSetSeedpoint->setText("");
 
     const mitk::Image *image = dynamic_cast<mitk::Image *>(m_InputImageNode->GetData());
+    const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+
+    auto image3D = Get3DImageByTimePoint(image, timePoint);
+
+    if (nullptr == image3D)
+    {
+      MITK_WARN << "Cannot run segementation. Currently selected timepoint is not in the time bounds of the selected "
+                   "reference image. Time point: "
+                << timePoint;
+      return;
+    }
 
     mitk::Point3D seedPoint =
       pointSet
@@ -205,9 +216,9 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
         ->GetPoints()
         ->ElementAt(0);
 
-    if (image->GetGeometry()->IsInside(seedPoint))
+    if (image3D->GetGeometry()->IsInside(seedPoint))
       mitkPixelTypeMultiplex3(
-        AccessPixel, image->GetChannelDescriptor().GetPixelType(), image, seedPoint, m_SeedpointValue) else return;
+        AccessPixel, image3D->GetChannelDescriptor().GetPixelType(), image3D, seedPoint, m_SeedpointValue) else return;
 
     /* In this case the seedpoint is placed e.g. in the lung or bronchialtree
      * The lowerFactor sets the windowsize depending on the regiongrowing direction
@@ -225,7 +236,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
     mitk::ScalarType pixelValues[125];
     unsigned int pos(0);
 
-    image->GetGeometry(0)->WorldToIndex(seedPoint, currentIndex);
+    image3D->GetGeometry(0)->WorldToIndex(seedPoint, currentIndex);
     runningIndex = currentIndex;
 
     for (int i = runningIndex[0] - 2; i <= runningIndex[0] + 2; i++)
@@ -238,13 +249,13 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
           currentIndex[1] = j;
           currentIndex[2] = k;
 
-          if (image->GetGeometry()->IsIndexInside(currentIndex))
+          if (image3D->GetGeometry()->IsIndexInside(currentIndex))
           {
             int component = 0;
             m_InputImageNode->GetIntProperty("Image.Displayed Component", component);
             mitkPixelTypeMultiplex4(mitk::FastSinglePixelAccess,
-                                    image->GetChannelDescriptor().GetPixelType(),
-                                    image,
+                                    image3D->GetChannelDescriptor().GetPixelType(),
+                                    image3D,
                                     nullptr,
                                     currentIndex,
                                     pixelValues[pos]);
@@ -294,9 +305,9 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
      * meanSeedValue+0.85*windowsSize
      * if the RG direction is downwards the lower TH is meanSeedValue-0.85*windowSize and upper TH is
      * meanSeedValue+0.15*windowsSize
-    */
-    mitk::ScalarType min = image->GetStatistics()->GetScalarValueMin();
-    mitk::ScalarType max = image->GetStatistics()->GetScalarValueMax();
+     */
+    mitk::ScalarType min = image3D->GetStatistics()->GetScalarValueMin();
+    mitk::ScalarType max = image3D->GetStatistics()->GetScalarValueMax();
     mitk::ScalarType windowSize = max - min;
 
     windowSize = 0.15 * windowSize;
@@ -322,6 +333,28 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
       m_Controls.m_ThresholdSlider->setMaximumValue(m_UPPERTHRESHOLD);
     }
   }
+}
+
+mitk::Image::ConstPointer QmitkAdaptiveRegionGrowingToolGUI::Get3DImageByTimePoint(const mitk::Image *image,
+                                                                                   mitk::TimePointType timePoint) const
+{
+  if (nullptr == image)
+    return image;
+
+  if (image->GetDimension() != 4)
+    return image;
+
+  if (!image->GetTimeGeometry()->IsValidTimePoint(timePoint))
+    return nullptr;
+
+  auto imageTimeSelector = mitk::ImageTimeSelector::New();
+
+  imageTimeSelector->SetInput(image);
+  imageTimeSelector->SetTimeNr(static_cast<int>(image->GetTimeGeometry()->TimePointToTimeStep(timePoint)));
+
+  imageTimeSelector->UpdateLargestPossibleRegion();
+
+  return imageTimeSelector->GetOutput();
 }
 
 void QmitkAdaptiveRegionGrowingToolGUI::RunSegmentation()

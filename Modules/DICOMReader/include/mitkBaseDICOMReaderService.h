@@ -27,14 +27,14 @@ namespace mitk {
 class MITKDICOMREADER_EXPORT BaseDICOMReaderService : public AbstractFileReader
 {
 public:
-  BaseDICOMReaderService(const std::string& description);
-  BaseDICOMReaderService(const mitk::CustomMimeType& customType, const std::string& description);
-
   using AbstractFileReader::Read;
 
   IFileReader::ConfidenceLevel GetConfidenceLevel() const override;
 
 protected:
+  BaseDICOMReaderService(const std::string& description);
+  BaseDICOMReaderService(const mitk::CustomMimeType& customType, const std::string& description);
+
   /** Uses this->GetRelevantFile() and this->GetReader to load the image.
    * data and puts it into base data instances-*/
   std::vector<itk::SmartPointer<BaseData>> DoRead() override;

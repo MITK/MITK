@@ -35,6 +35,9 @@ namespace mitk {
     us::Any GetOption(const std::string& name) const override;
 
   protected:
+    CESTDICOMManualReaderService(const CESTDICOMManualReaderService&) = default;
+    CESTDICOMManualReaderService& operator=(const CESTDICOMManualReaderService&) = default;
+
     std::string GetCESTMetaFilePath() const;
     std::string GetTRECFilePath() const;
     std::string GetLISTFilePath() const;

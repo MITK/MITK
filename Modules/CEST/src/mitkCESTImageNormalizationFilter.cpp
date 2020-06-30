@@ -12,7 +12,8 @@ found in the LICENSE file.
 
 #include "mitkCESTImageNormalizationFilter.h"
 
-#include <mitkCustomTagParser.h>
+#include <mitkCESTPropertyHelper.h>
+#include <mitkExtractCESTOffset.h>
 #include <mitkImage.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
@@ -52,7 +53,7 @@ void mitk::CESTImageNormalizationFilter::GenerateData()
   resultMitkImage->SetTimeGeometry(resultTimeGeometry);
 
   resultMitkImage->SetPropertyList(this->GetInput()->GetPropertyList()->Clone());
-  resultMitkImage->GetPropertyList()->SetStringProperty(mitk::CustomTagParser::m_OffsetsPropertyName.c_str(), m_RealOffsets.c_str());
+  resultMitkImage->GetPropertyList()->SetStringProperty(CEST_PROPERTY_NAME_OFFSETS().c_str(), m_RealOffsets.c_str());
   // remove uids
   resultMitkImage->GetPropertyList()->DeleteProperty("DICOM.0008.0018");
   resultMitkImage->GetPropertyList()->DeleteProperty("DICOM.0020.000D");
@@ -60,41 +61,13 @@ void mitk::CESTImageNormalizationFilter::GenerateData()
 
 }
 
-std::vector<double> ExtractOffsets(const mitk::Image* image)
-{
-  std::vector<double> result;
-
-  if (image)
-  {
-    std::string offsets = "";
-    std::vector<std::string> parts;
-    if (image->GetPropertyList()->GetStringProperty(mitk::CustomTagParser::m_OffsetsPropertyName.c_str(), offsets) && !offsets.empty())
-    {
-      boost::algorithm::trim(offsets);
-      boost::split(parts, offsets, boost::is_any_of(" "));
-
-      for (auto part : parts)
-      {
-        std::istringstream iss(part);
-        iss.imbue(std::locale("C"));
-        double d;
-        iss >> d;
-        result.push_back(d);
-      }
-    }
-  }
-
-  return result;
-}
-
-
 template <typename TPixel, unsigned int VImageDimension>
 void mitk::CESTImageNormalizationFilter::NormalizeTimeSteps(const itk::Image<TPixel, VImageDimension>* image)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<double, VImageDimension> OutputImageType;
 
-  auto offsets = ExtractOffsets(this->GetInput());
+  auto offsets = ExtractCESTOffset(this->GetInput());
 
   // determine normalization images
   std::vector<unsigned int> mZeroIndices;
@@ -216,9 +189,9 @@ void mitk::CESTImageNormalizationFilter::GenerateOutputInformation()
 
 bool mitk::IsNotNormalizedCESTImage(const Image* cestImage)
 {
-  auto offsets = ExtractOffsets(cestImage);
+  auto offsets = ExtractCESTOffset(cestImage);
 
-  for (auto offset : offsets)
+  for (const auto& offset : offsets)
   {
     if (offset < -299 || offset > 299)
     {

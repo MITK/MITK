@@ -36,6 +36,9 @@ public:
 
   void accept() override;
 
+protected slots:
+  void SetCurrentReader(int index);
+
 private:
   Ui::QmitkFileReaderOptionsDialog *ui;
   mitk::IOUtil::LoadInfo &m_LoadInfo;

@@ -26,11 +26,22 @@ namespace mitk
   class MITKCORE_EXPORT IOMimeTypes
   {
   public:
-    class MITKCORE_EXPORT DicomMimeType : public CustomMimeType
+
+    /** Base mime types for all kind of DICOM images, that can be reused
+    by more specific mime types based on DICOM images.*/
+    class MITKCORE_EXPORT BaseDicomMimeType : public CustomMimeType
+    {
+    public:
+      BaseDicomMimeType(const std::string &name);
+      BaseDicomMimeType(const BaseDicomMimeType& other) = default;
+      bool AppliesTo(const std::string& path) const override;
+      BaseDicomMimeType* Clone() const override;
+    };
+
+    class MITKCORE_EXPORT DicomMimeType : public BaseDicomMimeType
     {
     public:
       DicomMimeType();
-      bool AppliesTo(const std::string &path) const override;
       DicomMimeType *Clone() const override;
     };
 

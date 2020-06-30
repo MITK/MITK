@@ -1,5 +1,6 @@
 set(CPP_FILES
   mitkCESTDICOMReaderService.cpp
+  mitkCESTGenericDICOMReaderService.cpp
   mitkCESTIOMimeTypes.cpp
   mitkCESTIOActivator.cpp
 )

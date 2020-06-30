@@ -23,6 +23,7 @@ found in the LICENSE file.
 #include <mitkTemporoSpatialStringProperty.h>
 #include "mitkCESTImageDetectionHelper.h"
 #include "mitkCustomTagParser.h"
+#include "mitkCESTPropertyHelper.h"
 
 class mitkCESTDICOMReaderServiceTestSuite : public mitk::TestFixture
 {

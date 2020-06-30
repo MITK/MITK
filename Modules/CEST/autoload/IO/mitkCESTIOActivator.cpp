@@ -30,7 +30,7 @@ namespace mitk
     props[us::ServiceConstants::SERVICE_RANKING()] = 10;
 
     m_MimeTypes = mitk::MitkCESTIOMimeTypes::Get();
-    for (auto& mimeType : m_MimeTypes)
+    for (const auto& mimeType : m_MimeTypes)
     {
       if (mimeType->GetName() == mitk::MitkCESTIOMimeTypes::CEST_DICOM_WITHOUT_META_FILE_NAME())
       { // "w/o meta" mimetype should only registered with low priority.
@@ -42,9 +42,9 @@ namespace mitk
       }
     }
 
-    m_CESTDICOMReader.reset(new CESTDICOMReaderService());
-    m_CESTDICOMManualWithMetaFileReader.reset(new CESTDICOMManualReaderService(MitkCESTIOMimeTypes::CEST_DICOM_WITH_META_FILE_MIMETYPE(), "CEST DICOM Manual Reader"));
-    m_CESTDICOMManualWithOutMetaFileReader.reset(new CESTDICOMManualReaderService(MitkCESTIOMimeTypes::CEST_DICOM_WITHOUT_META_FILE_MIMETYPE(), "CEST DICOM Manual Reader"));
+    m_CESTDICOMReader = std::make_unique<CESTDICOMReaderService>();
+    m_CESTDICOMManualWithMetaFileReader = std::make_unique<CESTDICOMManualReaderService>(MitkCESTIOMimeTypes::CEST_DICOM_WITH_META_FILE_MIMETYPE(), "CEST DICOM Manual Reader");
+    m_CESTDICOMManualWithOutMetaFileReader = std::make_unique<CESTDICOMManualReaderService>(MitkCESTIOMimeTypes::CEST_DICOM_WITHOUT_META_FILE_MIMETYPE(), "CEST DICOM Manual Reader");
 
     m_Context = context;
     {
@@ -58,7 +58,7 @@ namespace mitk
         context->GetServiceReferences<IDICOMTagsOfInterest>();
       if (!refs.empty())
       {
-        for (auto ref : refs)
+        for (const auto& ref : refs)
         {
           this->RegisterTagsOfInterest(m_Context->GetService(ref));
           m_Context->UngetService(ref);
@@ -72,6 +72,7 @@ namespace mitk
     for (auto& elem : m_MimeTypes)
     {
       delete elem;
+      elem = nullptr;
     }
   }
 

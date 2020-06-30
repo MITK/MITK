@@ -37,10 +37,6 @@ namespace mitk
     this->SetComment("DICOM");
   }
 
-  IOMimeTypes::BaseDicomMimeType::BaseDicomMimeType(const BaseDicomMimeType& other) : CustomMimeType(other.GetName())
-  {
-  }
-
   bool IOMimeTypes::BaseDicomMimeType::AppliesTo(const std::string &path) const
   {
     // check whether directory or file

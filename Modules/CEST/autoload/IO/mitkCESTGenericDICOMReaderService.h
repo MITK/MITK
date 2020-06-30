@@ -26,7 +26,6 @@ namespace mitk {
   {
   public:
     CESTDICOMManualReaderService(const CustomMimeType& mimeType, const std::string& description);
-    CESTDICOMManualReaderService(const mitk::CESTDICOMManualReaderService& other);
 
     /** Uses the AbstractFileReader Read function and add extra steps for CEST meta data */
     using AbstractFileReader::Read;
@@ -41,8 +40,8 @@ namespace mitk {
     std::string GetLISTFilePath() const;
 
     mitk::DICOMFileReader::Pointer GetReader(const mitk::StringList& relevantFiles) const override;
-  private:
 
+  private:
     CESTDICOMManualReaderService* Clone() const override;
   };
 

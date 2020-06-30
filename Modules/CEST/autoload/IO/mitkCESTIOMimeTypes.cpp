@@ -93,7 +93,7 @@ namespace mitk
 
       auto parsedPropertyList = tagParser.ParseDicomPropertyString(byteString);
 
-      mapNotEmpty = parsedPropertyList->GetMap()->size() > 0;
+      mapNotEmpty = !parsedPropertyList->GetMap()->empty();
     }
 
     return mapNotEmpty;

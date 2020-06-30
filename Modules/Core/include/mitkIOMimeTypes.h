@@ -33,7 +33,7 @@ namespace mitk
     {
     public:
       BaseDicomMimeType(const std::string &name);
-      BaseDicomMimeType(const BaseDicomMimeType& other);
+      BaseDicomMimeType(const BaseDicomMimeType& other) = default;
       bool AppliesTo(const std::string& path) const override;
       BaseDicomMimeType* Clone() const override;
     };

@@ -211,8 +211,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
 
     mitk::Point3D seedPoint =
       pointSet
-        ->GetPointSet(
-          mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget0"))->GetTimeStep())
+        ->GetPointSet(static_cast<int>(image->GetTimeGeometry()->TimePointToTimeStep(timePoint)))
         ->GetPoints()
         ->ElementAt(0);
 
@@ -386,25 +385,32 @@ void QmitkAdaptiveRegionGrowingToolGUI::RunSegmentation()
     return;
   }
 
-  int timeStep =
-    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget0"))->GetTimeStep();
-
-  if (!(seedPointSet->GetSize(timeStep)))
-  {
-    m_Controls.m_pbRunSegmentation->setEnabled(true);
-    QMessageBox::information(
-      nullptr, "Adaptive Region Growing functionality", "The seed point is empty! Please choose a new seed point.");
-    return;
-  }
-
-  QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-
-  mitk::PointSet::PointType seedPoint = seedPointSet->GetPointSet(timeStep)->GetPoints()->Begin().Value();
-
   mitk::Image::Pointer orgImage = dynamic_cast<mitk::Image *>(m_InputImageNode->GetData());
 
   if (orgImage.IsNotNull())
   {
+    const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+
+    if (!orgImage->GetTimeGeometry()->IsValidTimePoint(timePoint))
+      mitkThrow() << "Image is not defined for specified time point. Time point: " << timePoint;
+
+    int timeStep = static_cast<int>(orgImage->GetTimeGeometry()->TimePointToTimeStep(timePoint));
+
+    if (!(seedPointSet->GetSize(timeStep)))
+    {
+      m_Controls.m_pbRunSegmentation->setEnabled(true);
+      QMessageBox::information(
+        nullptr, "Adaptive Region Growing functionality", "The seed point is empty! Please choose a new seed point.");
+      return;
+    }
+
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+    mitk::PointSet::PointType seedPoint = seedPointSet->GetPointSet(timeStep)->GetPoints()->Begin().Value();
+
+
+
+
     if (orgImage->GetDimension() == 4)
     {
       mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
@@ -778,8 +784,13 @@ void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImag
   mitk::Image::Pointer originalSegmentation =
     dynamic_cast<mitk::Image *>(this->m_RegionGrow3DTool->GetTargetSegmentationNode()->GetData());
 
-  int timeStep =
-    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget0"))->GetTimeStep();
+  const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+
+  if (!originalSegmentation->GetTimeGeometry()->IsValidTimePoint(timePoint))
+    mitkThrow() << "Segmentation is not defined for specified time point. Time point: " << timePoint;
+
+  int timeStep = static_cast<int>(originalSegmentation->GetTimeGeometry()->TimePointToTimeStep(timePoint));
+
 
   if (originalSegmentation)
   {

@@ -43,7 +43,7 @@ namespace mitk
      * \param[in] segmentationB The second operand of the boolean operation.
      * \param[in] The time point at which the operation will be executed.
      */
-    BooleanOperation(Type type, Image::Pointer segmentationA, Image::Pointer segmentationB, mitk::TimePointType time = 0.);
+    BooleanOperation(Type type, Image::Pointer segmentationA, Image::Pointer segmentationB, TimePointType time = 0.);
     ~BooleanOperation();
 
     /* \brief Execute boolean operation and return resulting segmentation.

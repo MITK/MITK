@@ -75,9 +75,22 @@ mitk::Image::Pointer QmitkContourModelToImageWidgetPrivate::FillContourModelSetI
   contourFiller->SetImage(image);
   contourFiller->SetInput(contourSet);
   contourFiller->MakeOutputBinaryOn();
-  contourFiller->Update();
+  mitk::Image::Pointer result = nullptr;
 
-  mitk::Image::Pointer result = contourFiller->GetOutput();
+  try
+  {
+    contourFiller->Update();
+    result = contourFiller->GetOutput();
+  }
+  catch (const std::exception & e)
+  {
+    MITK_ERROR << "Error while converting contour model. "<< e.what();
+  }
+  catch (...)
+  {
+    MITK_ERROR << "Unknown error while converting contour model.";
+  }
+
   if (result.IsNull())
   {
     MITK_ERROR<<"Could not write the selected contours into the image!";

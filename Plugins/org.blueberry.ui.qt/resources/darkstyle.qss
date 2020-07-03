@@ -661,3 +661,13 @@ QWidget#widgetForModalities QToolButton:checked {
   border: 1px solid #007acc;
   margin: 1px;
 }
+
+#ViewerProgressBar {
+  border: 2px solid grey;
+  margin: 4px 0 4px 0;
+}
+
+#ViewerToolButton {
+  border: 1px solid #3f3f46;
+  margin: 4px 0 4px 0;
+}

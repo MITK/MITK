@@ -36,7 +36,6 @@ mitk::ContourModelGLMapper2DBase::ContourModelGLMapper2DBase() : m_Initialized(f
 {
   m_PointNumbersOverlay = mitk::TextOverlay2D::New();
   m_ControlPointNumbersOverlay = mitk::TextOverlay2D::New();
-
 }
 
 mitk::ContourModelGLMapper2DBase::~ContourModelGLMapper2DBase()
@@ -178,7 +177,9 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel* r
 
     bool checkDistance = true;
     dataNode->GetBoolProperty("contour.check-distance", checkDistance);
-
+    
+    bool showScale = false;
+    dataNode->GetBoolProperty("contour.show-scale", showScale);
 
     mitk::ContourModel::VertexIterator pointsIt = renderingContour->IteratorBegin(timestep);
 
@@ -339,6 +340,47 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel* r
 
       pointsIt++;
     }//end while iterate over controlpoints
+
+    if (showScale && (renderingContour->IteratorEnd() - renderingContour->IteratorBegin() > 1)) {
+      auto itBegin = renderingContour->Begin();
+      mitk::Point3D startPoint = (*itBegin)->Coordinates;
+      mitk::Point3D endPoint = (*++itBegin)->Coordinates;
+
+      mitk::Point2D startPoint2d;
+      mitk::Point2D endPoint2d;
+      renderer->WorldToDisplay(startPoint, startPoint2d);
+      renderer->WorldToDisplay(endPoint, endPoint2d);
+      renderer->DisplayToPlane(startPoint2d, startPoint2d);
+      renderer->DisplayToPlane(endPoint2d, endPoint2d);
+
+      mitk::Vector2D directionVector2d = endPoint2d - startPoint2d;
+      double vectorLength = directionVector2d.GetNorm();
+      directionVector2d.Normalize();
+
+      mitk::Vector2D ortoVector2d;
+      ortoVector2d[0] = directionVector2d[1];
+      ortoVector2d[1] = -directionVector2d[0];
+
+      for (int i = 1; i < vectorLength / 10.0; ++i) {
+        mitk::Point2D sectionBegin = startPoint2d;
+        sectionBegin += directionVector2d * 10.0 * i;
+
+        mitk::Point2D sectionBegin2d = sectionBegin;
+        mitk::Point2D sectionEnd2d = sectionBegin;
+
+        double sectionLength = (i % 2) ? 5.0 : 10.0;
+        sectionBegin2d -= ortoVector2d * sectionLength;
+        sectionEnd2d += ortoVector2d * sectionLength;
+
+        renderer->PlaneToDisplay(sectionBegin2d, sectionBegin2d);
+        renderer->PlaneToDisplay(sectionEnd2d, sectionEnd2d);
+
+        linePoints.push_back(sectionBegin2d[0]);
+        linePoints.push_back(sectionBegin2d[1]);
+        linePoints.push_back(sectionEnd2d[0]);
+        linePoints.push_back(sectionEnd2d[1]);
+      }
+    }
 
     //close contour if necessary
     if(renderingContour->IsClosed(timestep) && drawit && showSegments)

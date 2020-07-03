@@ -209,9 +209,12 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
       return;
     }
 
+    if (!pointSet->GetTimeGeometry()->IsValidTimePoint(timePoint))
+      return;
+
     mitk::Point3D seedPoint =
       pointSet
-        ->GetPointSet(static_cast<int>(image->GetTimeGeometry()->TimePointToTimeStep(timePoint)))
+        ->GetPointSet(static_cast<int>(pointSet->GetTimeGeometry()->TimePointToTimeStep(timePoint)))
         ->GetPoints()
         ->ElementAt(0);
 
@@ -305,8 +308,8 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
      * if the RG direction is downwards the lower TH is meanSeedValue-0.85*windowSize and upper TH is
      * meanSeedValue+0.15*windowsSize
      */
-    mitk::ScalarType min = image3D->GetStatistics()->GetScalarValueMin();
-    mitk::ScalarType max = image3D->GetStatistics()->GetScalarValueMax();
+    mitk::ScalarType min = image->GetStatistics()->GetScalarValueMin();
+    mitk::ScalarType max = image->GetStatistics()->GetScalarValueMax();
     mitk::ScalarType windowSize = max - min;
 
     windowSize = 0.15 * windowSize;
@@ -340,11 +343,11 @@ mitk::Image::ConstPointer QmitkAdaptiveRegionGrowingToolGUI::Get3DImageByTimePoi
   if (nullptr == image)
     return image;
 
-  if (image->GetDimension() != 4)
-    return image;
-
   if (!image->GetTimeGeometry()->IsValidTimePoint(timePoint))
     return nullptr;
+
+  if (image->GetDimension() != 4)
+    return image;
 
   auto imageTimeSelector = mitk::ImageTimeSelector::New();
 
@@ -391,10 +394,10 @@ void QmitkAdaptiveRegionGrowingToolGUI::RunSegmentation()
   {
     const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
 
-    if (!orgImage->GetTimeGeometry()->IsValidTimePoint(timePoint))
-      mitkThrow() << "Image is not defined for specified time point. Time point: " << timePoint;
+    if (!seedPointSet->GetTimeGeometry()->IsValidTimePoint(timePoint))
+      mitkThrow() << "Point set is not defined for specified time point. Time point: " << timePoint;
 
-    int timeStep = static_cast<int>(orgImage->GetTimeGeometry()->TimePointToTimeStep(timePoint));
+    int timeStep = static_cast<int>(seedPointSet->GetTimeGeometry()->TimePointToTimeStep(timePoint));
 
     if (!(seedPointSet->GetSize(timeStep)))
     {
@@ -408,22 +411,12 @@ void QmitkAdaptiveRegionGrowingToolGUI::RunSegmentation()
 
     mitk::PointSet::PointType seedPoint = seedPointSet->GetPointSet(timeStep)->GetPoints()->Begin().Value();
 
+    auto image3D = Get3DImageByTimePoint(orgImage, timePoint);
 
-
-
-    if (orgImage->GetDimension() == 4)
-    {
-      mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-      timeSelector->SetInput(orgImage);
-      timeSelector->SetTimeNr(timeStep);
-      timeSelector->UpdateLargestPossibleRegion();
-      mitk::Image *timedImage = timeSelector->GetOutput();
-      AccessByItk_2(timedImage, StartRegionGrowing, timedImage->GetGeometry(), seedPoint);
-    }
-    else if (orgImage->GetDimension() == 3)
+    if (image3D.IsNotNull())
     {
       // QApplication::setOverrideCursor(QCursor(Qt::WaitCursor)); //set the cursor to waiting
-      AccessByItk_2(orgImage, StartRegionGrowing, orgImage->GetGeometry(), seedPoint);
+      AccessByItk_2(image3D, StartRegionGrowing, image3D->GetGeometry(), seedPoint);
       // QApplication::restoreOverrideCursor();//reset cursor
     }
     else
@@ -440,9 +433,9 @@ void QmitkAdaptiveRegionGrowingToolGUI::RunSegmentation()
 }
 
 template <typename TPixel, unsigned int VImageDimension>
-void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(itk::Image<TPixel, VImageDimension> *itkImage,
-                                                           mitk::BaseGeometry *imageGeometry,
-                                                           mitk::PointSet::PointType seedPoint)
+void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(const itk::Image<TPixel, VImageDimension> *itkImage,
+                                                           const mitk::BaseGeometry *imageGeometry,
+                                                           const mitk::PointSet::PointType seedPoint)
 {
   typedef itk::Image<TPixel, VImageDimension> InputImageType;
   typedef typename InputImageType::IndexType IndexType;

@@ -176,7 +176,7 @@ protected:
   void OnPointAdded();
 
    /**
-   * @brief Method to extract an 3D image based on a given time point that can be taken from the SliceNavigationController
+   * @brief Method to extract a 3D image based on a given time point that can be taken from the SliceNavigationController
    *
    * This ensures that the seed point is taken from the current selected 3D image
    */
@@ -211,9 +211,9 @@ private:
   long m_PointSetMoveObserverTag;
 
   template <typename TPixel, unsigned int VImageDimension>
-  void StartRegionGrowing(itk::Image<TPixel, VImageDimension> *itkImage,
-                          mitk::BaseGeometry *imageGeometry,
-                          mitk::PointSet::PointType seedPoint);
+  void StartRegionGrowing(const itk::Image<TPixel, VImageDimension> *itkImage,
+                          const mitk::BaseGeometry *imageGeometry,
+                          const mitk::PointSet::PointType seedPoint);
 
   template <typename TPixel, unsigned int VImageDimension>
   void ITKThresholding(itk::Image<TPixel, VImageDimension> *inputImage);

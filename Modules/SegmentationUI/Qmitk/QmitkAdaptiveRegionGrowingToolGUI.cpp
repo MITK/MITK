@@ -308,8 +308,10 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
      * if the RG direction is downwards the lower TH is meanSeedValue-0.85*windowSize and upper TH is
      * meanSeedValue+0.15*windowsSize
      */
-    mitk::ScalarType min = image->GetStatistics()->GetScalarValueMin();
-    mitk::ScalarType max = image->GetStatistics()->GetScalarValueMax();
+    const auto timeStepOfImage = image->GetTimeGeometry()->TimePointToTimeStep(timePoint);
+    mitk::ScalarType min = image->GetStatistics()->GetScalarValueMin(timeStepOfImage);
+    mitk::ScalarType max = image->GetStatistics()->GetScalarValueMax(timeStepOfImage);
+
     mitk::ScalarType windowSize = max - min;
 
     windowSize = 0.15 * windowSize;

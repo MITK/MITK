@@ -56,7 +56,7 @@ void mitk::ContourModelSetToImageFilter::GenerateOutputInformation()
 
   if (m_MakeOutputBinary)
   {
-    output->Initialize(mitk::MakeScalarPixelType<unsigned char>(), *m_ReferenceImage->GetTimeGeometry(), 1, 1);
+    output->Initialize(mitk::MakeScalarPixelType<unsigned char>(), *m_ReferenceImage->GetTimeGeometry(), 1);
   }
   else
   {
@@ -122,14 +122,12 @@ void mitk::ContourModelSetToImageFilter::GenerateData()
 
   if (outputImage.IsNull() || outputImage->IsInitialized() == false || !outputImage->IsVolumeSet(m_TimeStep))
   {
-    MITK_ERROR << "Error creating output for specified image!";
-    return;
+    mitkThrow() << "Error creating output for specified image!";
   }
 
   if (!contourSet || contourSet->GetContourModelList()->size() == 0)
   {
-    MITK_ERROR << "No contours specified!";
-    return;
+    mitkThrow() << "No contours specified!";
   }
 
   mitk::BaseGeometry *outputImageGeo = outputImage->GetGeometry(m_TimeStep);

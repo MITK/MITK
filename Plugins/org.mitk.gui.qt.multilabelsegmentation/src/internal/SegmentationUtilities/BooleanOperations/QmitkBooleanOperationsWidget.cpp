@@ -120,7 +120,7 @@ void QmitkBooleanOperationsWidget::DoBooleanOperation(mitk::BooleanOperation::Ty
 
   try
   {
-    mitk::BooleanOperation booleanOperation(type, segmentation0, segmentation1, timeNavigationController->GetTime()->GetPos());
+    mitk::BooleanOperation booleanOperation(type, segmentation0, segmentation1, timeNavigationController->GetSelectedTimePoint());
     result = booleanOperation.GetResult();
   }
   catch (const mitk::Exception &exception)

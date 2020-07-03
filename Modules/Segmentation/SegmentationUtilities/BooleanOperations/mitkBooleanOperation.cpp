@@ -20,21 +20,21 @@ found in the LICENSE file.
 
 typedef itk::Image<mitk::Label::PixelType, 3> ImageType;
 
-static mitk::Image::Pointer Get3DSegmentation(mitk::Image::Pointer segmentation, unsigned int time)
+static mitk::Image::Pointer Get3DSegmentation(mitk::Image::Pointer segmentation, mitk::TimePointType time)
 {
   if (segmentation->GetDimension() != 4)
     return segmentation;
 
   auto imageTimeSelector = mitk::ImageTimeSelector::New();
   imageTimeSelector->SetInput(segmentation);
-  imageTimeSelector->SetTimeNr(static_cast<int>(time));
+  imageTimeSelector->SetTimeNr(segmentation->GetTimeGeometry()->TimePointToTimeStep(time));
 
   imageTimeSelector->UpdateLargestPossibleRegion();
 
   return imageTimeSelector->GetOutput();
 }
 
-static ImageType::Pointer CastTo3DItkImage(mitk::Image::Pointer segmentation, unsigned int time)
+static ImageType::Pointer CastTo3DItkImage(mitk::Image::Pointer segmentation, mitk::TimePointType time)
 {
   ImageType::Pointer result;
   mitk::CastToItkImage(Get3DSegmentation(segmentation, time), result);
@@ -44,8 +44,8 @@ static ImageType::Pointer CastTo3DItkImage(mitk::Image::Pointer segmentation, un
 mitk::BooleanOperation::BooleanOperation(Type type,
                                          mitk::Image::Pointer segmentationA,
                                          mitk::Image::Pointer segmentationB,
-                                         unsigned int time)
-  : m_Type(type), m_SegmentationA(segmentationA), m_SegmentationB(segmentationB), m_Time(time)
+                                         TimePointType time)
+  : m_Type(type), m_SegmentationA(segmentationA), m_SegmentationB(segmentationB), m_TimePoint(time)
 {
   this->ValidateSegmentations();
 }
@@ -74,8 +74,8 @@ mitk::LabelSetImage::Pointer mitk::BooleanOperation::GetResult() const
 
 mitk::LabelSetImage::Pointer mitk::BooleanOperation::GetDifference() const
 {
-  auto input1 = CastTo3DItkImage(m_SegmentationA, m_Time);
-  auto input2 = CastTo3DItkImage(m_SegmentationB, m_Time);
+  auto input1 = CastTo3DItkImage(m_SegmentationA, m_TimePoint);
+  auto input2 = CastTo3DItkImage(m_SegmentationB, m_TimePoint);
 
   auto notFilter = itk::NotImageFilter<ImageType, ImageType>::New();
   notFilter->SetInput(input2);
@@ -99,8 +99,8 @@ mitk::LabelSetImage::Pointer mitk::BooleanOperation::GetDifference() const
 
 mitk::LabelSetImage::Pointer mitk::BooleanOperation::GetIntersection() const
 {
-  auto input1 = CastTo3DItkImage(m_SegmentationA, m_Time);
-  auto input2 = CastTo3DItkImage(m_SegmentationB, m_Time);
+  auto input1 = CastTo3DItkImage(m_SegmentationA, m_TimePoint);
+  auto input2 = CastTo3DItkImage(m_SegmentationB, m_TimePoint);
 
   auto andFilter = itk::AndImageFilter<ImageType, ImageType>::New();
   andFilter->SetInput1(input1);
@@ -121,8 +121,8 @@ mitk::LabelSetImage::Pointer mitk::BooleanOperation::GetIntersection() const
 
 mitk::LabelSetImage::Pointer mitk::BooleanOperation::GetUnion() const
 {
-  auto input1 = CastTo3DItkImage(m_SegmentationA, m_Time);
-  auto input2 = CastTo3DItkImage(m_SegmentationB, m_Time);
+  auto input1 = CastTo3DItkImage(m_SegmentationA, m_TimePoint);
+  auto input2 = CastTo3DItkImage(m_SegmentationB, m_TimePoint);
 
   auto orFilter = itk::OrImageFilter<ImageType, ImageType>::New();
   orFilter->SetInput1(input1);
@@ -161,18 +161,11 @@ void mitk::BooleanOperation::ValidateSegmentation(mitk::Image::Pointer segmentat
   if (dimension > 4)
     mitkThrow() << "Segmentation has more than four dimensions!";
 
-  if (m_Time != 0)
-  {
-    if (dimension < 4)
-      mitkThrow() << "Expected four-dimensional segmentation!";
-
-    if (segmentation->GetDimension(3) < m_Time)
-      mitkThrow() << "Extent of fourth dimension of segmentation is less than specified time!";
-  }
-  else if (dimension < 3)
-  {
+  if (dimension < 3)
     mitkThrow() << "Segmentation has less than three dimensions!";
-  }
+
+  if (!segmentation->GetTimeGeometry()->IsValidTimePoint(m_TimePoint))
+    mitkThrow() << "Segmentation is not defined for specified time point. Time point: " << m_TimePoint;
 }
 
 void mitk::BooleanOperation::ValidateSegmentations() const
@@ -182,4 +175,11 @@ void mitk::BooleanOperation::ValidateSegmentations() const
 
   if (m_SegmentationA->GetDimension() != m_SegmentationB->GetDimension())
     mitkThrow() << "Segmentations have different dimensions!";
+
+  const auto geometryA = m_SegmentationA->GetTimeGeometry()->GetGeometryForTimePoint(m_TimePoint);
+  const auto geometryB = m_SegmentationB->GetTimeGeometry()->GetGeometryForTimePoint(m_TimePoint);
+  if (!mitk::Equal(*(geometryA.GetPointer()), *(geometryB.GetPointer()),eps,false))
+  {
+    mitkThrow() << "Segmentations have different geometries and cannot be used for boolean operations!";
+  }
 }

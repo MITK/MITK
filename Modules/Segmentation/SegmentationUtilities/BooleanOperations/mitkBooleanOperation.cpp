@@ -175,4 +175,11 @@ void mitk::BooleanOperation::ValidateSegmentations() const
 
   if (m_SegmentationA->GetDimension() != m_SegmentationB->GetDimension())
     mitkThrow() << "Segmentations have different dimensions!";
+
+  const auto geometryA = m_SegmentationA->GetTimeGeometry()->GetGeometryForTimePoint(m_TimePoint);
+  const auto geometryB = m_SegmentationB->GetTimeGeometry()->GetGeometryForTimePoint(m_TimePoint);
+  if (!mitk::Equal(*(geometryA.GetPointer()), *(geometryB.GetPointer()),eps,false))
+  {
+    mitkThrow() << "Segmentations have different geometries and cannot be used for boolean operations!";
+  }
 }

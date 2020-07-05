@@ -1890,7 +1890,7 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
   unsigned int timestep = baseRenderer->GetTimeStep();
   auto timeSteps = image.IsNotNull() ? image->GetTimeSteps() : 0;
   unsigned int component = baseRenderer->GetComponent();
-  unsigned int componentMax = image.IsNotNull() ? image->GetPixelType().GetNumberOfComponents() : 0;
+  unsigned int componentMax = image.IsNotNull() ? baseRenderer->GetSliceNavigationController()->GetComponent()->GetSteps() : 0;
 
   if(image.IsNotNull() && (timeSteps > timestep ))
   {

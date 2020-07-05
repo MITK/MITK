@@ -608,7 +608,8 @@ void mitk::DisplayInteractor::Scroll(StateMachineAction*, InteractionEvent* inte
     if (sm.syncSlice && sm.rendererInSlicersSync(ren)) {
       sliceNaviController->GetSlice()->SetPos(newPos);
 
-      sm.updateSlicers(getRendererCenter(ren));
+      mitk::Point3D cen = getRendererCenter(ren);
+      sm.updateSlicers(cen);
     } else {
       sliceNaviController->GetSlice()->SetPos(newPos);
       ren->RequestUpdate();
@@ -636,9 +637,9 @@ void mitk::DisplayInteractor::ScrollOneDown(StateMachineAction* action, Interact
       sm.updateSlicersDeltaNext();
     } else {
       stepper->Next();
-      
       if (sm.syncSlice && syncRenderer) {
-        sm.updateSlicers(getRendererCenter(sender));
+        mitk::Point3D cen = getRendererCenter(sender);
+        sm.updateSlicers(cen);
       } else {
         sender->RequestUpdate();
       }
@@ -664,7 +665,8 @@ void mitk::DisplayInteractor::ScrollOneUp(StateMachineAction* action, Interactio
     } else {
       stepper->Previous();
       if (sm.syncSlice && syncRenderer) {
-        sm.updateSlicers(getRendererCenter(sender));
+        mitk::Point3D cen = getRendererCenter(sender);
+        sm.updateSlicers(cen);
       } else {
         sender->RequestUpdate();
       }

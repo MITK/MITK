@@ -58,11 +58,11 @@ namespace mitk {
 
   void DICOMReaderServicesActivator::Load(us::ModuleContext* context)
   {
-    m_AutoSelectingDICOMReader.reset(new AutoSelectingDICOMReaderService());
-    m_SimpleVolumeDICOMSeriesReader.reset(new SimpleVolumeDICOMSeriesReaderService());
-    m_ManualSelectingDICOMSeriesReader.reset(new ManualSelectingDICOMReaderService());
+    m_AutoSelectingDICOMReader = std::make_unique<AutoSelectingDICOMReaderService>();
+    m_SimpleVolumeDICOMSeriesReader = std::make_unique<SimpleVolumeDICOMSeriesReaderService>();
+    m_ManualSelectingDICOMSeriesReader = std::make_unique<ManualSelectingDICOMReaderService>();
 
-    m_DICOMTagsOfInterestService.reset(new DICOMTagsOfInterestService());
+    m_DICOMTagsOfInterestService = std::make_unique<DICOMTagsOfInterestService>();
     context->RegisterService<mitk::IDICOMTagsOfInterest>(m_DICOMTagsOfInterestService.get());
 
     DICOMTagPathMapType tagmap = GetDefaultDICOMTagsOfInterest();

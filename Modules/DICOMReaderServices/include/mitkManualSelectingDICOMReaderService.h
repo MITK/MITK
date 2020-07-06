@@ -27,8 +27,8 @@ public:
   ManualSelectingDICOMReaderService();
 
 protected:
-  /** Returns the reader instance that should be used. The descission may be based
-  * one the passed relevant file list.*/
+  /** Returns the reader instance that should be used. The decision may be based
+  * one the passed list of relevant files.*/
   mitk::DICOMFileReader::Pointer GetReader(const mitk::StringList& relevantFiles) const override;
 
 private:

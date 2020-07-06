@@ -66,7 +66,7 @@ public:
   void setUp() override
   {
     m_Controller = mitk::SurfaceInterpolationController::GetInstance();
-    m_Controller->SetCurrentTimeStep(0);
+    m_Controller->SetCurrentTimePoint(0.);
 
     vtkSmartPointer<vtkRegularPolygonSource> polygonSource = vtkSmartPointer<vtkRegularPolygonSource>::New();
     polygonSource->SetRadius(100);
@@ -651,7 +651,7 @@ public:
     m_Controller->AddNewContour(surf_2);
 
     // Add contours for another timestep
-    m_Controller->SetCurrentTimeStep(2);
+    m_Controller->SetCurrentTimePoint(2);
 
     double center_3[3] = {1.3f, 3.5f, 4.6f};
     double normal_3[3] = {0.20f, 1.6f, 0.8f};
@@ -680,7 +680,7 @@ public:
     m_Controller->AddNewContour(surf_3);
     m_Controller->AddNewContour(surf_4);
 
-    m_Controller->SetCurrentTimeStep(0);
+    m_Controller->SetCurrentTimePoint(0);
 
     // Check if all contours are there
     mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo1;
@@ -717,7 +717,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Contours not equal!",
                            mitk::Equal(*(surf_2->GetVtkPolyData()), *(contour_2->GetVtkPolyData()), 0.000001, true));
 
-    m_Controller->SetCurrentTimeStep(2);
+    m_Controller->SetCurrentTimePoint(2);
 
     // CPPUNIT_ASSERT_MESSAGE("Contour accessed from outside of timestep!", m_Controller->GetNumberOfContours() == 0);
     contour_1 = m_Controller->GetContour(contourInfo1);
@@ -742,16 +742,16 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Segmentation images are not equal",
                            m_Controller->GetCurrentSegmentation().GetPointer() == segmentation_2.GetPointer());
 
-    m_Controller->SetCurrentTimeStep(1);
+    m_Controller->SetCurrentTimePoint(1);
     CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetNumberOfContours() == 0);
 
-    m_Controller->SetCurrentTimeStep(0);
+    m_Controller->SetCurrentTimePoint(0);
     CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetNumberOfContours() == 2);
 
-    m_Controller->SetCurrentTimeStep(4);
+    m_Controller->SetCurrentTimePoint(4);
     CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetNumberOfContours() == 0);
 
-    m_Controller->SetCurrentTimeStep(2);
+    m_Controller->SetCurrentTimePoint(2);
     CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetNumberOfContours() == 2);
   }
 
@@ -815,7 +815,7 @@ public:
       unsigned int dimensions1[] = {10, 10, 10, 7};
       mitk::Image::Pointer segmentation_1 = createImage4D(dimensions1);
       m_Controller->SetCurrentInterpolationSession(segmentation_1);
-      m_Controller->SetCurrentTimeStep(3);
+      m_Controller->SetCurrentTimePoint(3);
     }
     CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 0",
                            m_Controller->GetNumberOfInterpolationSessions() == 0);

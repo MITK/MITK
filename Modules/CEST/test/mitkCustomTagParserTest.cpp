@@ -19,6 +19,7 @@ found in the LICENSE file.
 
 // MITK includes
 #include "mitkCustomTagParser.h"
+#include "mitkCESTPropertyHelper.h"
 #include <mitkTemporoSpatialStringProperty.h>
 
 //itksys

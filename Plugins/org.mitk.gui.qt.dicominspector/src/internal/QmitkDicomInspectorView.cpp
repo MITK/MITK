@@ -40,7 +40,7 @@ QmitkDicomInspectorView::QmitkDicomInspectorView()
   : m_RenderWindowPart(nullptr)
   , m_PendingSliceChangedEvent(false)
   , m_SelectedNode(nullptr)
-  , m_SelectedTimeStep(0)
+  , m_SelectedTimePoint(0.)
   , m_CurrentSelectedZSlice(0)
 {
   m_SelectedPosition.Fill(0.0);
@@ -216,16 +216,16 @@ void QmitkDicomInspectorView::OnSliceNavigationControllerDeleted(const itk::Obje
 void QmitkDicomInspectorView::ValidateAndSetCurrentPosition()
 {
   mitk::Point3D currentSelectedPosition = GetRenderWindowPart()->GetSelectedPosition(nullptr);
-  unsigned int currentSelectedTimeStep = GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->GetPos();
+  const auto currentSelectedTimePoint = GetRenderWindowPart()->GetSelectedTimePoint();
 
   if (m_SelectedPosition != currentSelectedPosition
-    || m_SelectedTimeStep != currentSelectedTimeStep
+    || m_SelectedTimePoint != currentSelectedTimePoint
     || m_SelectedNodeTime > m_CurrentPositionTime)
   {
-    // the current position has been changed or the selected node has been changed since
-    // the last position validation -> check position
+    // the current position has been changed, the selected node has been changed since
+    // the last position validation or the current time position has been changed -> check position
     m_SelectedPosition = currentSelectedPosition;
-    m_SelectedTimeStep = currentSelectedTimeStep;
+    m_SelectedTimePoint = currentSelectedTimePoint;
     m_CurrentPositionTime.Modified();
     m_ValidSelectedPosition = false;
 
@@ -234,8 +234,7 @@ void QmitkDicomInspectorView::ValidateAndSetCurrentPosition()
       return;
     }
 
-    mitk::BaseGeometry::Pointer geometry = m_SelectedData->GetTimeGeometry()->GetGeometryForTimeStep(
-      m_SelectedTimeStep);
+    mitk::BaseGeometry::Pointer geometry = m_SelectedData->GetTimeGeometry()->GetGeometryForTimePoint(m_SelectedTimePoint);
 
     // check for invalid time step
     if (geometry.IsNull())
@@ -274,12 +273,13 @@ void QmitkDicomInspectorView::RenderTable()
 {
   assert(nullptr != m_RenderWindowPart);
 
-  // configure fit information
+  const auto timeStep = (m_SelectedData.IsNull()) ? 0 : m_SelectedData->GetTimeGeometry()->TimePointToTimeStep(m_SelectedTimePoint);
+
   unsigned int rowIndex = 0;
   for (const auto& element : m_Tags)
   {
     QTableWidgetItem* newItem = new QTableWidgetItem(QString::fromStdString(
-      element.second.prop->GetValue(m_SelectedTimeStep, m_CurrentSelectedZSlice, true, true)));
+      element.second.prop->GetValue(timeStep, m_CurrentSelectedZSlice, true, true)));
     m_Controls.tableTags->setItem(rowIndex, 3, newItem);
     ++rowIndex;
   }
@@ -344,9 +344,11 @@ void QmitkDicomInspectorView::UpdateLabels()
   }
   else
   {
+    const auto timeStep = m_SelectedData->GetTimeGeometry()->TimePointToTimeStep(m_SelectedTimePoint);
+
     if (m_ValidSelectedPosition)
     {
-      m_Controls.timePointValueLabel->setText(QString::number(m_SelectedTimeStep));
+      m_Controls.timePointValueLabel->setText(QString::number(timeStep) + QStringLiteral("(")+ QString::number(m_SelectedTimePoint/1000.) + QStringLiteral(" [s])"));
       m_Controls.sliceNumberValueLabel->setText(QString::number(m_CurrentSelectedZSlice));
     }
     else

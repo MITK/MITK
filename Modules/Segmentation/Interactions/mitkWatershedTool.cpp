@@ -84,12 +84,18 @@ void mitk::WatershedTool::DoIt()
 {
   // get image from tool manager
   mitk::DataNode::Pointer referenceData = m_ToolManager->GetReferenceData(0);
-  mitk::Image::Pointer input = dynamic_cast<mitk::Image *>(referenceData->GetData());
+  mitk::Image::ConstPointer input = dynamic_cast<const mitk::Image *>(referenceData->GetData());
   if (input.IsNull())
     return;
 
-  unsigned int timestep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
-  input = Get3DImage(input, timestep);
+  const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+  input = Get3DImageByTimePoint(input, timePoint);
+
+  if (nullptr == input)
+  {
+    MITK_WARN << "Cannot run segementation. Currently selected timepoint is not in the time bounds of the selected reference image. Time point: " << timePoint;
+    return;
+  }
 
   mitk::Image::Pointer output;
 
@@ -138,7 +144,7 @@ void mitk::WatershedTool::DoIt()
 }
 
 template <typename TPixel, unsigned int VImageDimension>
-void mitk::WatershedTool::ITKWatershed(itk::Image<TPixel, VImageDimension> *originalImage,
+void mitk::WatershedTool::ITKWatershed(const itk::Image<TPixel, VImageDimension> *originalImage,
                                        mitk::Image::Pointer &segmentation)
 {
   typedef itk::WatershedImageFilter<itk::Image<float, VImageDimension>> WatershedFilter;

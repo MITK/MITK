@@ -64,7 +64,7 @@ namespace mitk
       * \param segmentation A pointer to the output image, which will point to the pipeline output after execution.
       */
     template <typename TPixel, unsigned int VImageDimension>
-    void ITKWatershed(itk::Image<TPixel, VImageDimension> *originalImage, itk::SmartPointer<mitk::Image> &segmentation);
+    void ITKWatershed(const itk::Image<TPixel, VImageDimension> *originalImage, itk::SmartPointer<mitk::Image> &segmentation);
 
     const char **GetXPM() const override;
     const char *GetName() const override;

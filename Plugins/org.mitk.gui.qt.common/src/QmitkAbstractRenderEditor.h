@@ -64,6 +64,13 @@ public:
 
   berryObjectMacro(QmitkAbstractRenderEditor, QtEditorPart, mitk::IRenderWindowPart);
 
+  /**
+  * \see mitk::IRenderWindowPart::GetSelectedTimePoint()
+  This default implementation assumes that all renderer use the same TimeNavigationControl
+  provided by this class (GetTimeNavigationControl()).
+  */
+  mitk::TimePointType GetSelectedTimePoint(const QString& id = QString()) const override;
+
   QmitkAbstractRenderEditor();
   ~QmitkAbstractRenderEditor() override;
 

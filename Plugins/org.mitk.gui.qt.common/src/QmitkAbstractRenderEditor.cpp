@@ -140,3 +140,13 @@ bool QmitkAbstractRenderEditor::IsDirty() const
 
 bool QmitkAbstractRenderEditor::IsSaveAsAllowed() const
 { return false; }
+
+mitk::TimePointType QmitkAbstractRenderEditor::GetSelectedTimePoint(const QString& /*id*/) const
+{
+  auto timeNavigator = this->GetTimeNavigationController();
+  if (nullptr != timeNavigator)
+  {
+    return timeNavigator->GetSelectedTimePoint();
+  }
+  return 0;
+}

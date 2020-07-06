@@ -65,7 +65,7 @@ QWidget* QmitkNodeSelectionPreferencePage::GetQtControl() const
 //-----------------------------------------------------------------------------
 bool QmitkNodeSelectionPreferencePage::PerformOk()
 {
-  //store favorite
+  //store preferred
   auto id = m_Controls->comboPreferred->currentData().toString();
   mitk::PutPreferredDataStorageInspector(id.toStdString());
 
@@ -103,22 +103,16 @@ void QmitkNodeSelectionPreferencePage::Update()
 
   auto visibleProviders = mitk::GetVisibleDataStorageInspectors();
   auto allProviders = mitk::DataStorageInspectorGenerator::GetProviders();
-  auto favorite = mitk::GetPreferredDataStorageInspector();
+  auto preferredInspectorID = mitk::GetPreferredDataStorageInspector();
 
-  auto finding = m_Providers.find(favorite);
-  if (finding == m_Providers.cend())
-  {
-    favorite = m_Providers.begin()->first;
-  }
-
-  //fill favorite combo
+  //fill preferred combo
   int index = 0;
   int currentIndex = 0;
   m_Controls->comboPreferred->clear();
   for (auto iter : m_Providers)
   {
-    m_Controls->comboPreferred->addItem(QString::fromStdString(iter.second->GetInspectorDisplayName()),QVariant::fromValue(QString::fromStdString(iter.first)));
-    if (iter.first == favorite)
+    m_Controls->comboPreferred->addItem(QString::fromStdString(iter.second->GetInspectorDisplayName()), QVariant::fromValue(QString::fromStdString(iter.first)));
+    if (iter.first == preferredInspectorID)
     {
       currentIndex = index;
     };

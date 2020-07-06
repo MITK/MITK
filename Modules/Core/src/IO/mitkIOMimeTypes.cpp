@@ -23,7 +23,7 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  IOMimeTypes::DicomMimeType::DicomMimeType() : CustomMimeType(DICOM_MIMETYPE_NAME())
+  IOMimeTypes::BaseDicomMimeType::BaseDicomMimeType(const std::string& name) : CustomMimeType(name)
   {
     this->AddExtension("gdcm");
     this->AddExtension("dcm");
@@ -37,7 +37,7 @@ namespace mitk
     this->SetComment("DICOM");
   }
 
-  bool IOMimeTypes::DicomMimeType::AppliesTo(const std::string &path) const
+  bool IOMimeTypes::BaseDicomMimeType::AppliesTo(const std::string &path) const
   {
     // check whether directory or file
     // if directory try to find first file within it instead
@@ -76,7 +76,7 @@ namespace mitk
     std::string modality;
     itk::MetaDataDictionary& dict = gdcmIO->GetMetaDataDictionary();
     itk::ExposeMetaData<std::string>(dict, "0008|0060", modality);
-    MITK_INFO << "DICOM Modality is " << modality;
+    MITK_DEBUG << "DICOM Modality detected by MimeType "<< this->GetName() << " is " << modality;
     if (modality == "RTSTRUCT" || modality == "RTDOSE" || modality == "RTPLAN") {
       return false;
     }
@@ -85,7 +85,14 @@ namespace mitk
     }
   }
 
-  IOMimeTypes::DicomMimeType *IOMimeTypes::DicomMimeType::Clone() const { return new DicomMimeType(*this); }
+  IOMimeTypes::BaseDicomMimeType*IOMimeTypes::BaseDicomMimeType::Clone() const { return new BaseDicomMimeType(*this); }
+
+  IOMimeTypes::DicomMimeType::DicomMimeType() : BaseDicomMimeType(DICOM_MIMETYPE_NAME())
+  {
+  }
+
+  IOMimeTypes::DicomMimeType* IOMimeTypes::DicomMimeType::Clone() const { return new DicomMimeType(*this); }
+
   std::vector<CustomMimeType *> IOMimeTypes::Get()
   {
     std::vector<CustomMimeType *> mimeTypes;

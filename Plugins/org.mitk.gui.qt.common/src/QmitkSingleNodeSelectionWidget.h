@@ -10,7 +10,6 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-
 #ifndef QMITK_SINGLE_NODE_SELECTION_WIDGET_H
 #define QMITK_SINGLE_NODE_SELECTION_WIDGET_H
 
@@ -28,9 +27,9 @@ found in the LICENSE file.
 class QmitkAbstractDataStorageModel;
 
 /**
-* \class QmitkSingleNodeSelectionWidget
-* \brief Widget that represents a node selection of (max) one node. It acts like a button. Clicking on it
-* allows to change the selection.
+* @class QmitkSingleNodeSelectionWidget
+* @brief Widget that represents a node selection of (max) one node. It acts like a button. Clicking on it
+*        allows to change the selection.
 */
 class MITK_QT_COMMON QmitkSingleNodeSelectionWidget : public QmitkAbstractNodeSelectionWidget
 {
@@ -77,4 +76,4 @@ protected:
   Ui_QmitkSingleNodeSelectionWidget m_Controls;
 };
 
-#endif // QmitkSingleNodeSelectionWidget_H
+#endif // QMITK_SINGLE_NODE_SELECTION_WIDGET_H

@@ -78,6 +78,8 @@ namespace mitk
     /// parse the provided string and return a property list based on the closest revision parameter mapping
     mitk::PropertyList::Pointer ParseDicomPropertyString(std::string dicomPropertyString);
 
+    static std::string ReadListFromFile(const std::string& filePath);
+
     /** Extract the revision out of the passed sequenceFileName. If the file name is not a valid CEST file name
       (see rules in the class documentation) exceptions will be thrown. If the file name is valid but contains no
       revision number an empty string will be returned.
@@ -86,9 +88,6 @@ namespace mitk
 
     void SetParseStrategy(std::string parseStrategy);
     void SetRevisionMappingStrategy(std::string revisionMappingStrategy);
-
-    /// name of the property for the offsets, including normalization offsets
-    static const std::string m_OffsetsPropertyName;
 
     /// name of the property for the data acquisition revision
     static const std::string m_RevisionPropertyName;
@@ -134,13 +133,6 @@ namespace mitk
     /// How to handle parameter mapping based on absent revision jsons
     std::string m_RevisionMappingStrategy;
   };
-
-  const std::string MITKCEST_EXPORT CEST_PROPERTY_NAME_TOTALSCANTIME();
-  const std::string MITKCEST_EXPORT CEST_PROPERTY_NAME_PREPERATIONTYPE();
-  const std::string MITKCEST_EXPORT CEST_PROPERTY_NAME_RECOVERYMODE();
-  const std::string MITKCEST_EXPORT CEST_PROPERTY_NAME_SPOILINGTYPE();
-  const std::string MITKCEST_EXPORT CEST_PROPERTY_NAME_OFFSETS();
-  const std::string MITKCEST_EXPORT CEST_PROPERTY_NAME_TREC();
 
 }
 

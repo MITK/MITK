@@ -106,6 +106,8 @@ void QmitkImageStatisticsView::CreateConnections()
     this, &QmitkImageStatisticsView::OnImageSelectionChanged);
   connect(m_Controls.roiNodesSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
     this, &QmitkImageStatisticsView::OnROISelectionChanged);
+
+  connect(m_Controls.sliderWidget_intensityProfile, &ctkSliderWidget::valueChanged, this, &QmitkImageStatisticsView::UpdateIntensityProfile);
 }
 
 void QmitkImageStatisticsView::UpdateIntensityProfile()

@@ -1,7 +1,3 @@
-set(SRC_CPP_FILES
-
-)
-
 set(INTERNAL_CPP_FILES
   QmitkPointSetInteractionView.cpp
   mitkPluginActivator.cpp

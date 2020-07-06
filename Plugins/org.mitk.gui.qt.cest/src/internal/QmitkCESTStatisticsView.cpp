@@ -31,7 +31,7 @@ found in the LICENSE file.
 
 // mitk
 #include <mitkCESTImageNormalizationFilter.h>
-#include <mitkCustomTagParser.h>
+#include <mitkCESTPropertyHelper.h>
 #include <mitkITKImageImport.h>
 #include <mitkImage.h>
 #include <mitkImageAccessByItk.h>
@@ -110,7 +110,7 @@ QmitkCESTStatisticsView::QmitkCESTStatisticsView(QObject * /*parent*/, const cha
   this->m_CalculatorJob = new QmitkImageStatisticsCalculationJob();
 
   m_currentSelectedPosition.Fill(0.0);
-  m_currentSelectedTimeStep = 0;
+  m_currentSelectedTimePoint = 0.;
   m_CrosshairPointSet = mitk::PointSet::New();
 }
 
@@ -198,7 +198,7 @@ void QmitkCESTStatisticsView::OnSelectionChanged(berry::IWorkbenchPart::Pointer 
       m_Controls.labelWarning->setVisible(false);
 
       bool zSpectrumSet = SetZSpectrum(dynamic_cast<mitk::StringProperty *>(
-        node->GetData()->GetProperty(mitk::CustomTagParser::m_OffsetsPropertyName.c_str()).GetPointer()));
+        node->GetData()->GetProperty(mitk::CEST_PROPERTY_NAME_OFFSETS().c_str()).GetPointer()));
 
       atLeastOneWasCESTImage = atLeastOneWasCESTImage || zSpectrumSet;
 
@@ -762,16 +762,15 @@ void QmitkCESTStatisticsView::Clear()
 void QmitkCESTStatisticsView::OnSliceChanged()
 {
   mitk::Point3D currentSelectedPosition = this->GetRenderWindowPart()->GetSelectedPosition(nullptr);
-  unsigned int currentSelectedTimeStep =
-    this->GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->GetPos();
+  mitk::TimePointType currentSelectedTimePoint = this->GetRenderWindowPart()->GetSelectedTimePoint();
 
-  if (m_currentSelectedPosition != currentSelectedPosition || m_currentSelectedTimeStep != currentSelectedTimeStep)
+  if (m_currentSelectedPosition != currentSelectedPosition || currentSelectedTimePoint != currentSelectedTimePoint)
   //|| m_selectedNodeTime > m_currentPositionTime)
   {
     // the current position has been changed or the selected node has been changed since the last position validation ->
     // check position
     m_currentSelectedPosition = currentSelectedPosition;
-    m_currentSelectedTimeStep = currentSelectedTimeStep;
+    m_currentSelectedTimePoint = currentSelectedTimePoint;
     m_currentPositionTime.Modified();
 
     m_CrosshairPointSet->Clear();
@@ -793,7 +792,7 @@ void QmitkCESTStatisticsView::OnSliceChanged()
     {
       m_Controls.labelWarning->setVisible(false);
       bool zSpectrumSet = SetZSpectrum(dynamic_cast<mitk::StringProperty *>(
-        node->GetData()->GetProperty(mitk::CustomTagParser::m_OffsetsPropertyName.c_str()).GetPointer()));
+        node->GetData()->GetProperty(mitk::CEST_PROPERTY_NAME_OFFSETS().c_str()).GetPointer()));
 
       if (zSpectrumSet)
       {

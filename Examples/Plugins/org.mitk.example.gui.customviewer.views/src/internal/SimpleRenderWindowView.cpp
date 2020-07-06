@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <ctkServiceTracker.h>
 #include <mitkIRenderingManager.h>
 #include <mitkInteractionConst.h>
+#include <mitkSliceNavigationController.h>
 
 #include <QVBoxLayout>
 #include <mitkPlaneGeometry.h>
@@ -102,47 +103,6 @@ QmitkRenderWindow *SimpleRenderWindowView::GetQmitkRenderWindow(const mitk::Base
   return 0;
 }
 
-mitk::Point3D SimpleRenderWindowView::GetSelectedPosition(const QString & /*id*/) const
-{
-  const mitk::PlaneGeometry *pg = m_RenderWindow->GetSliceNavigationController()->GetCurrentPlaneGeometry();
-  if (pg)
-  {
-    return pg->GetCenter();
-  }
-  else
-  {
-    return mitk::Point3D();
-  }
-}
-
-void SimpleRenderWindowView::SetSelectedPosition(const mitk::Point3D &, const QString &)
-{
-}
-
-void SimpleRenderWindowView::EnableDecorations(bool enable, const QStringList &decorations)
-{
-  if (decorations.isEmpty() || decorations.contains(DECORATION_MENU))
-  {
-    m_RenderWindow->ActivateMenuWidget(enable);
-  }
-}
-
-bool SimpleRenderWindowView::IsDecorationEnabled(const QString &decoration) const
-{
-  if (decoration == DECORATION_MENU)
-  {
-    return m_RenderWindow->GetActivateMenuWidgetFlag();
-  }
-  return false;
-}
-
-QStringList SimpleRenderWindowView::GetDecorations() const
-{
-  QStringList decorations;
-  decorations << DECORATION_MENU;
-  return decorations;
-}
-
 void SimpleRenderWindowView::SetFocus()
 {
   m_RenderWindow->setFocus();
@@ -188,4 +148,55 @@ mitk::SliceNavigationController *SimpleRenderWindowView::GetTimeNavigationContro
   if (GetRenderingManager())
     return GetRenderingManager()->GetTimeNavigationController();
   return nullptr;
+}
+
+mitk::Point3D SimpleRenderWindowView::GetSelectedPosition(const QString& /*id*/) const
+{
+  const mitk::PlaneGeometry* pg = m_RenderWindow->GetSliceNavigationController()->GetCurrentPlaneGeometry();
+  if (pg)
+  {
+    return pg->GetCenter();
+  }
+  else
+  {
+    return mitk::Point3D();
+  }
+}
+
+void SimpleRenderWindowView::SetSelectedPosition(const mitk::Point3D&, const QString&)
+{
+}
+
+mitk::TimePointType SimpleRenderWindowView::GetSelectedTimePoint(const QString& /*id*/) const
+{
+  auto timeNavigator = this->GetTimeNavigationController();
+  if (nullptr != timeNavigator)
+  {
+    return timeNavigator->GetSelectedTimePoint();
+  }
+  return 0;
+}
+
+void SimpleRenderWindowView::EnableDecorations(bool enable, const QStringList& decorations)
+{
+  if (decorations.isEmpty() || decorations.contains(DECORATION_MENU))
+  {
+    m_RenderWindow->ActivateMenuWidget(enable);
+  }
+}
+
+bool SimpleRenderWindowView::IsDecorationEnabled(const QString& decoration) const
+{
+  if (decoration == DECORATION_MENU)
+  {
+    return m_RenderWindow->GetActivateMenuWidgetFlag();
+  }
+  return false;
+}
+
+QStringList SimpleRenderWindowView::GetDecorations() const
+{
+  QStringList decorations;
+  decorations << DECORATION_MENU;
+  return decorations;
 }

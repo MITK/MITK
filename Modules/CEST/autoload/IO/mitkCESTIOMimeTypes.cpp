@@ -30,30 +30,24 @@ namespace mitk
 
     // order matters here (descending rank for mime types)
 
+    mimeTypes.push_back(CEST_DICOM_WITH_META_FILE_MIMETYPE().Clone());
     mimeTypes.push_back(CEST_DICOM_MIMETYPE().Clone());
+    mimeTypes.push_back(CEST_DICOM_WITHOUT_META_FILE_MIMETYPE().Clone());
 
     return mimeTypes;
   }
 
   // Mime Types
 
-  MitkCESTIOMimeTypes::MitkCESTDicomMimeType::MitkCESTDicomMimeType() : CustomMimeType(CEST_DICOM_MIMETYPE_NAME())
+  MitkCESTIOMimeTypes::MitkCESTDicomMimeType::MitkCESTDicomMimeType() : IOMimeTypes::BaseDicomMimeType(CEST_DICOM_MIMETYPE_NAME())
   {
-    this->AddExtension("gdcm");
-    this->AddExtension("dcm");
-    this->AddExtension("DCM");
-    this->AddExtension("dc3");
-    this->AddExtension("DC3");
-    this->AddExtension("ima");
-    this->AddExtension("img");
-
     this->SetCategory(IOMimeTypes::CATEGORY_IMAGES());
     this->SetComment("CEST DICOM");
   }
 
   bool MitkCESTIOMimeTypes::MitkCESTDicomMimeType::AppliesTo(const std::string &path) const
   {
-    bool canRead(CustomMimeType::AppliesTo(path));
+    bool canRead(IOMimeTypes::BaseDicomMimeType::AppliesTo(path));
 
     // fix for bug 18572
     // Currently this function is called for writing as well as reading, in that case
@@ -64,10 +58,6 @@ namespace mitk
       return canRead;
     }
     // end fix for bug 18572
-
-    // Ask the GDCM ImageIO class directly
-    itk::GDCMImageIO::Pointer gdcmIO = itk::GDCMImageIO::New();
-    canRead = gdcmIO->CanReadFile(path.c_str());
 
     if (!canRead)
     {
@@ -87,18 +77,24 @@ namespace mitk
     mitk::DICOMTagCache::Pointer tagCache = scanner->GetScanCache();
 
     mitk::DICOMImageFrameList imageFrameList = mitk::ConvertToDICOMImageFrameList(tagCache->GetFrameInfoList());
-    mitk::DICOMImageFrameInfo *firstFrame = imageFrameList.begin()->GetPointer();
 
-    std::string byteString = tagCache->GetTagValue(firstFrame, siemensCESTprivateTag).value;
+    bool mapNotEmpty = false;
 
-    if (byteString.empty()) {
-      return false;
+    if (!imageFrameList.empty())
+    {
+      mitk::DICOMImageFrameInfo* firstFrame = imageFrameList.begin()->GetPointer();
+
+      std::string byteString = tagCache->GetTagValue(firstFrame, siemensCESTprivateTag).value;
+
+      if (byteString.empty()) {
+        return false;
+      }
+      mitk::CustomTagParser tagParser(relevantFiles[0]);
+
+      auto parsedPropertyList = tagParser.ParseDicomPropertyString(byteString);
+
+      mapNotEmpty = !parsedPropertyList->GetMap()->empty();
     }
-    mitk::CustomTagParser tagParser(relevantFiles[0]);
-
-    auto parsedPropertyList = tagParser.ParseDicomPropertyString(byteString);
-
-    bool mapNotEmpty = parsedPropertyList->GetMap()->size() > 0;
 
     return mapNotEmpty;
   }
@@ -113,11 +109,121 @@ namespace mitk
     return MitkCESTDicomMimeType();
   }
 
-  // Names
   std::string MitkCESTIOMimeTypes::CEST_DICOM_MIMETYPE_NAME()
   {
     // create a unique and sensible name for this mime type
     static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".image.dicom.cest";
     return name;
   }
+
+  MitkCESTIOMimeTypes::MitkCESTDicomWithMetaFileMimeType::MitkCESTDicomWithMetaFileMimeType() : IOMimeTypes::BaseDicomMimeType(CEST_DICOM_WITH_META_FILE_NAME())
+  {
+    this->SetCategory(IOMimeTypes::CATEGORY_IMAGES());
+    this->SetComment("CEST DICOM");
+  }
+
+  bool MitkCESTIOMimeTypes::MitkCESTDicomWithMetaFileMimeType::AppliesTo(const std::string& path) const
+  {
+    bool canRead(IOMimeTypes::BaseDicomMimeType::AppliesTo(path));
+
+    // fix for bug 18572
+    // Currently this function is called for writing as well as reading, in that case
+    // the image information can of course not be read
+    // This is a bug, this function should only be called for reading.
+    if (!itksys::SystemTools::FileExists(path.c_str()))
+    {
+      return canRead;
+    }
+    // end fix for bug 18572
+
+    if (!canRead)
+    {
+      return canRead;
+    }
+
+    std::string dir = path;
+    if (!itksys::SystemTools::FileIsDirectory(path))
+    {
+      dir = itksys::SystemTools::GetProgramPath(path);
+    }
+
+    std::string metafilePath = dir +"/" + "CEST_META.json";
+
+    canRead = itksys::SystemTools::FileExists(metafilePath.c_str());
+
+    return canRead;
+  }
+
+  MitkCESTIOMimeTypes::MitkCESTDicomWithMetaFileMimeType* MitkCESTIOMimeTypes::MitkCESTDicomWithMetaFileMimeType::Clone() const
+  {
+    return new MitkCESTDicomWithMetaFileMimeType(*this);
+  }
+
+  MitkCESTIOMimeTypes::MitkCESTDicomWithMetaFileMimeType MitkCESTIOMimeTypes::CEST_DICOM_WITH_META_FILE_MIMETYPE()
+  {
+    return MitkCESTDicomWithMetaFileMimeType();
+  }
+
+  std::string MitkCESTIOMimeTypes::CEST_DICOM_WITH_META_FILE_NAME()
+  {
+    // create a unique and sensible name for this mime type
+    static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".image.dicom.cest.generic.meta";
+    return name;
+  }
+
+  MitkCESTIOMimeTypes::MitkCESTDicomWOMetaFileMimeType::MitkCESTDicomWOMetaFileMimeType() : IOMimeTypes::BaseDicomMimeType(CEST_DICOM_WITHOUT_META_FILE_NAME())
+  {
+    this->SetCategory(IOMimeTypes::CATEGORY_IMAGES());
+    this->SetComment("CEST DICOM");
+  }
+
+  bool MitkCESTIOMimeTypes::MitkCESTDicomWOMetaFileMimeType::AppliesTo(const std::string& path) const
+  {
+    bool canRead(IOMimeTypes::BaseDicomMimeType::AppliesTo(path));
+
+    // fix for bug 18572
+    // Currently this function is called for writing as well as reading, in that case
+    // the image information can of course not be read
+    // This is a bug, this function should only be called for reading.
+    if (!itksys::SystemTools::FileExists(path.c_str()))
+    {
+      return canRead;
+    }
+    // end fix for bug 18572
+
+    if (!canRead)
+    {
+      return canRead;
+    }
+
+    std::string dir = path;
+    if (!itksys::SystemTools::FileIsDirectory(path))
+    {
+      dir = itksys::SystemTools::GetProgramPath(path);
+    }
+
+    std::string metafilePath = dir + "/" + "CEST_META.json";
+
+    canRead = !itksys::SystemTools::FileExists(metafilePath.c_str());
+
+    return canRead;
+  }
+
+  MitkCESTIOMimeTypes::MitkCESTDicomWOMetaFileMimeType* MitkCESTIOMimeTypes::MitkCESTDicomWOMetaFileMimeType::Clone() const
+  {
+    return new MitkCESTDicomWOMetaFileMimeType(*this);
+  }
+
+  MitkCESTIOMimeTypes::MitkCESTDicomWOMetaFileMimeType MitkCESTIOMimeTypes::CEST_DICOM_WITHOUT_META_FILE_MIMETYPE()
+  {
+    return MitkCESTDicomWOMetaFileMimeType();
+  }
+
+  std::string MitkCESTIOMimeTypes::CEST_DICOM_WITHOUT_META_FILE_NAME()
+  {
+    // create a unique and sensible name for this mime type
+    static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".image.dicom.cest.generic.nometa";
+    return name;
+  }
+
 }

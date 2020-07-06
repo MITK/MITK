@@ -124,7 +124,7 @@ private:
   /** @brief Indicates if the currently selected position is valid for the currently selected data.*/
   bool m_ValidSelectedPosition;
 
-  unsigned int m_SelectedTimeStep;
+  mitk::TimePointType m_SelectedTimePoint;
 
   itk::IndexValueType m_CurrentSelectedZSlice;
 

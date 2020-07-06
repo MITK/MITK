@@ -181,10 +181,10 @@ void QmitkSegmentationView::CreateNewSegmentation()
    mitk::DataNode::Pointer node = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetReferenceData(0);
    if (node.IsNotNull())
    {
-     mitk::Image::ConstPointer image = dynamic_cast<mitk::Image*>(node->GetData());
-     if (image.IsNotNull())
+     mitk::Image::ConstPointer referenceImage = dynamic_cast<mitk::Image*>(node->GetData());
+     if (referenceImage.IsNotNull())
      {
-       if (image->GetDimension() > 1)
+       if (referenceImage->GetDimension() > 1)
        {
          // ask about the name and organ type of the new segmentation
          QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog(m_Parent); // needs a QWidget as parent, "this" is not QWidget
@@ -199,25 +199,33 @@ void QmitkSegmentationView::CreateNewSegmentation()
            return;
          }
 
-         if (image->GetDimension() > 3)
+         const auto currentTimePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+         unsigned int imageTimeStep = 0;
+         if (referenceImage->GetTimeGeometry()->IsValidTimePoint(currentTimePoint))
+         {
+           imageTimeStep = referenceImage->GetTimeGeometry()->TimePointToTimeStep(currentTimePoint);
+         }
+
+         auto segTemplateImage = referenceImage;
+         if (referenceImage->GetDimension() > 3)
          {
            auto result = QMessageBox::question(m_Parent, tr("Generate a static mask?"),tr("The selected image has multiple time steps. You can either generate a simple/static masks resembling the geometry of the first timestep of the image. Or you can generate a dynamic mask that equals the selected image in geometry and number of timesteps; thus a dynamic mask can change over time (e.g. according to the image)."), tr("Yes, generate a static mask"), tr("No, generate a dynamic mask"), QString(), 0,0);
            if (result == 0)
            {
              auto selector = mitk::ImageTimeSelector::New();
-             selector->SetInput(image);
+             selector->SetInput(referenceImage);
              selector->SetTimeNr(0);
              selector->Update();
 
-             const auto refTimeGeometry = image->GetTimeGeometry();
+             const auto refTimeGeometry = referenceImage->GetTimeGeometry();
              auto newTimeGeometry = mitk::ProportionalTimeGeometry::New();
              newTimeGeometry->SetFirstTimePoint(refTimeGeometry->GetMinimumTimePoint());
              newTimeGeometry->SetStepDuration(refTimeGeometry->GetMaximumTimePoint() - refTimeGeometry->GetMinimumTimePoint());
 
              mitk::Image::Pointer newImage = selector->GetOutput();
-             newTimeGeometry->SetTimeStepGeometry(image->GetGeometry(), 0);
+             newTimeGeometry->SetTimeStepGeometry(referenceImage->GetGeometry(imageTimeStep), 0);
              newImage->SetTimeGeometry(newTimeGeometry);
-             image = newImage;
+             segTemplateImage = newImage;
            }
          }
 
@@ -235,7 +243,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
                newNodeName = "no_name";
              }
 
-             mitk::DataNode::Pointer emptySegmentation = firstTool->CreateEmptySegmentationNode(image, newNodeName, dialog->GetColor());
+             mitk::DataNode::Pointer emptySegmentation = firstTool->CreateEmptySegmentationNode(segTemplateImage, newNodeName, dialog->GetColor());
              // initialize showVolume to false to prevent recalculating the volume while working on the segmentation
              emptySegmentation->SetProperty("showVolume", mitk::BoolProperty::New(false));
              if (!emptySegmentation)
@@ -259,7 +267,8 @@ void QmitkSegmentationView::CreateNewSegmentation()
              this->GetDataStorage()->Add(emptySegmentation, node); // add as a child, because the segmentation "derives" from the original
 
              m_Controls->segImageSelector->SetCurrentSelectedNode(emptySegmentation);
-             mitk::RenderingManager::GetInstance()->InitializeViews(emptySegmentation->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+             mitk::RenderingManager::GetInstance()->InitializeViews(referenceImage->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+             mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->SetPos(imageTimeStep);
            }
            catch (const std::bad_alloc&)
            {

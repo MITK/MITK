@@ -32,7 +32,17 @@ mitk::Stepper *mitk::BaseController::GetSlice()
   return m_Slice.GetPointer();
 }
 
+const mitk::Stepper* mitk::BaseController::GetSlice() const
+{
+  return m_Slice.GetPointer();
+}
+
 mitk::Stepper *mitk::BaseController::GetTime()
+{
+  return m_Time.GetPointer();
+}
+
+const mitk::Stepper* mitk::BaseController::GetTime() const
 {
   return m_Time.GetPointer();
 }

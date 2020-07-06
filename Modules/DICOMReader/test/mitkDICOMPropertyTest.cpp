@@ -23,6 +23,7 @@ class mitkDICOMPropertyTestSuite : public mitk::TestFixture
   MITK_TEST(GetPropertyByDICOMTagPath);
   MITK_TEST(GetPropertyByDICOMTagPath_2);
   MITK_TEST(ConvertDICOMStrToValue);
+  MITK_TEST(ConvertValueToDICOMStr);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -152,6 +153,12 @@ public:
     CPPUNIT_ASSERT_EQUAL(mitk::ConvertDICOMStrToValue<int>("1"), 1);
     CPPUNIT_ASSERT_THROW(mitk::ConvertDICOMStrToValue<double>("1,35"), mitk::Exception);
     CPPUNIT_ASSERT_THROW(mitk::ConvertDICOMStrToValue<double>("nonumber"), mitk::Exception);
+  }
+
+  void ConvertValueToDICOMStr()
+  {
+    CPPUNIT_ASSERT_EQUAL(mitk::ConvertValueToDICOMStr(1.35), std::string("1.35"));
+    CPPUNIT_ASSERT_EQUAL(mitk::ConvertValueToDICOMStr(1), std::string("1"));
   }
 
 };

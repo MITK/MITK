@@ -17,7 +17,8 @@ found in the LICENSE file.
 #include "QmitkEnums.h"
 #include "QmitkNodeDescriptorManager.h"
 
-QmitkDataStorageDefaultListModel::QmitkDataStorageDefaultListModel(QObject *parent) : QmitkAbstractDataStorageModel(parent)
+QmitkDataStorageDefaultListModel::QmitkDataStorageDefaultListModel(QObject *parent)
+  : QmitkAbstractDataStorageModel(parent)
 {
 }
 

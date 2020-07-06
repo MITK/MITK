@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include <mitkPlaneGeometry.h>
 #include <mitkSlicedGeometry3D.h>
 #include <mitkSliceNavigationController.h>
+#include <mitkArbitraryTimeGeometry.h>
 
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
@@ -26,7 +27,11 @@ class mitkSliceNavigationControllerTestSuite : public mitk::TestFixture
   CPPUNIT_TEST(validateAxialViewDirection);
   CPPUNIT_TEST(validateCoronalViewDirection);
   CPPUNIT_TEST(validateSagittalViewDirection);
+  CPPUNIT_TEST(GetSelectedTimePoint);
   CPPUNIT_TEST_SUITE_END();
+
+  mitk::Geometry3D::Pointer m_Geometry3D;
+  mitk::ArbitraryTimeGeometry::Pointer m_TimeGeometry;
 
 public:
   void setUp() override
@@ -55,6 +60,13 @@ public:
     m_Geometry3D = mitk::Geometry3D::New();
     m_Geometry3D->SetBounds(slicedGeometry3D->GetBounds());
     m_Geometry3D->SetIndexToWorldTransform(slicedGeometry3D->GetIndexToWorldTransform());
+
+    m_TimeGeometry = mitk::ArbitraryTimeGeometry::New();
+    m_TimeGeometry->AppendNewTimeStepClone(m_Geometry3D, 0.5, 10.);
+    m_TimeGeometry->AppendNewTimeStepClone(m_Geometry3D, 10., 30.);
+    m_TimeGeometry->AppendNewTimeStepClone(m_Geometry3D, 30., 50.);
+    m_TimeGeometry->AppendNewTimeStepClone(m_Geometry3D, 50., 60.);
+    m_TimeGeometry->Update();
   }
 
   void tearDown() override
@@ -133,6 +145,33 @@ public:
     CPPUNIT_ASSERT(this->validateGeometry(sliceNavigationController->GetCurrentGeometry3D(), origin, firstAxisVector, secondAxisVector, thirdAxisVector));
   }
 
+  void GetSelectedTimePoint()
+  {
+    auto sliceNavigationController = mitk::SliceNavigationController::New();
+
+    CPPUNIT_ASSERT(sliceNavigationController->GetSelectedTimePoint() == 0.);
+
+    sliceNavigationController->SetInputWorldTimeGeometry(m_TimeGeometry);
+    sliceNavigationController->SetViewDirection(mitk::SliceNavigationController::Sagittal);
+    sliceNavigationController->Update();
+
+    CPPUNIT_ASSERT(sliceNavigationController->GetSelectedTimeStep() == 0);
+    CPPUNIT_ASSERT(sliceNavigationController->GetSelectedTimePoint() == 0.5);
+
+    sliceNavigationController->GetTime()->SetPos(2);
+    CPPUNIT_ASSERT(sliceNavigationController->GetSelectedTimeStep() == 2);
+    CPPUNIT_ASSERT(sliceNavigationController->GetSelectedTimePoint() == 30.0);
+
+    auto sliceNavigationController2 = mitk::SliceNavigationController::New();
+
+    sliceNavigationController2->SetInputWorldGeometry3D(m_Geometry3D);
+    sliceNavigationController2->SetViewDirection(mitk::SliceNavigationController::Sagittal);
+    sliceNavigationController2->Update();
+
+    CPPUNIT_ASSERT(sliceNavigationController2->GetSelectedTimeStep() == 0);
+    CPPUNIT_ASSERT(sliceNavigationController2->GetSelectedTimePoint() == 0.0);
+  }
+
 private:
   bool validateGeometry(mitk::BaseGeometry::ConstPointer geometry, const mitk::Point3D &origin, const mitk::Vector3D &firstAxisVector, const mitk::Vector3D &secondAxisVector, const mitk::Vector3D &thirdAxisVector)
   {
@@ -161,7 +200,6 @@ private:
     return result;
   }
 
-  mitk::Geometry3D::Pointer m_Geometry3D;
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkSliceNavigationController)

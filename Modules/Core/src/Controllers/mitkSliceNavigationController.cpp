@@ -629,4 +629,28 @@ namespace mitk
     }
   }
 
+  TimeStepType SliceNavigationController::GetSelectedTimeStep() const
+  {
+    return this->GetTime()->GetPos();
+  }
+
+  TimePointType SliceNavigationController::GetSelectedTimePoint() const
+  {
+    auto timeStep = this->GetSelectedTimeStep();
+
+    if (m_CreatedWorldGeometry.IsNull())
+    {
+      return 0.0;
+    }
+
+    if (!m_CreatedWorldGeometry->IsValidTimeStep(timeStep))
+    {
+      mitkThrow() << "SliceNavigationController is in an invalid state. It has a time step"
+        << "selected that is not covered by its time geometry. Selected time step: "
+        << timeStep << "; TimeGeometry steps count: " << m_CreatedWorldGeometry->CountTimeSteps();
+    }
+
+    return m_CreatedWorldGeometry->TimeStepToTimePoint(timeStep);
+  }
+
 } // namespace

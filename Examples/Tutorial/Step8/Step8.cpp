@@ -59,7 +59,6 @@ void Step8::SetupWidgets()
 
   // Add the displayed views to the DataStorage to see their positions in 2D and 3D
   multiWidget->AddPlanesToDataStorage();
-  multiWidget->SetWidgetPlanesVisibility(true);
 
   //*************************************************************************
   // Part Ib: create and initialize LevelWindowWidget

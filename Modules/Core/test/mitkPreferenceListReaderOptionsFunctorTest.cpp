@@ -28,6 +28,9 @@ namespace mitk
     TestFileReaderService(const std::string &description)
     : AbstractFileReader(CustomMimeType("TestMimeType"), description)
     {
+      Options options;
+      options["o1"] = 0;
+      this->SetDefaultOptions(options);
       m_ServiceRegistration = RegisterService();
     };
 
@@ -71,7 +74,7 @@ class mitkPreferenceListReaderOptionsFunctorTestSuite : public mitk::TestFixture
   MITK_TEST(UseOverlappingBlackAndPreferenceList);
   MITK_TEST(UsePreferenceListWithInexistantReaders);
   MITK_TEST(UseAllBlackedList);
-
+  MITK_TEST(SetOptions);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -102,7 +105,7 @@ public:
 
     us::ModuleContext *context = us::GetModuleContext();
     us::ServiceProperties props;
-    props[us::ServiceConstants::SERVICE_RANKING()] = 10;
+    props[us::ServiceConstants::SERVICE_RANKING()] = 100;
     context->RegisterService(m_TestMimeType, props);
 
     m_NormalService = new mitk::TestFileReaderService("Normal Test Service");
@@ -126,6 +129,7 @@ public:
     CPPUNIT_ASSERT(true == functor(info));
     auto description = info.m_ReaderSelector.GetSelected().GetDescription();
     CPPUNIT_ASSERT_EQUAL(std::string("Prefered Test Service"), description);
+    CPPUNIT_ASSERT("0" == info.m_ReaderSelector.GetSelected().GetReader()->GetOptions()["o1"].ToString());
   }
 
   void UseNoList()
@@ -194,6 +198,22 @@ public:
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor(emptyList, black);
     CPPUNIT_ASSERT_THROW(functor(info), mitk::Exception);
   }
+
+  void SetOptions()
+  {
+    mitk::IOUtil::LoadInfo info(m_ImagePath);
+
+    mitk::IFileReader::Options options;
+    options.insert(std::make_pair("o1", 42));
+  
+    mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor(preference, options);
+
+    CPPUNIT_ASSERT(true == functor(info));
+    auto description = info.m_ReaderSelector.GetSelected().GetDescription();
+    CPPUNIT_ASSERT_EQUAL(std::string("Prefered Test Service"), description);
+    CPPUNIT_ASSERT("42" == info.m_ReaderSelector.GetSelected().GetReader()->GetOption("o1").ToString());
+  }
+
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkPreferenceListReaderOptionsFunctor)

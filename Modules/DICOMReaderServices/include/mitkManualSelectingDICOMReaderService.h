@@ -10,20 +10,21 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKSIMPLEVOLUMEDICOMSERIESREADERSERVICE_H
-#define MITKSIMPLEVOLUMEDICOMSERIESREADERSERVICE_H
+#ifndef MITKMANUALSELECTINGDICOMREADERSERVICE_H
+#define MITKMANUALSELECTINGDICOMREADERSERVICE_H
 
 #include <mitkBaseDICOMReaderService.h>
+#include <mitkDICOMFileReaderSelector.h>
 
 namespace mitk {
 
   /**
-  Service wrapper that selects a DICOMITKSeriesGDCMReader configured for a simple and non-restrictive 3D volume import.
+  Service wrapper that offers a manual selection of the DICOMFileReader configuration that should be used.
   */
-class SimpleVolumeDICOMSeriesReaderService : public BaseDICOMReaderService
+class ManualSelectingDICOMReaderService : public BaseDICOMReaderService
 {
 public:
-  SimpleVolumeDICOMSeriesReaderService();
+  ManualSelectingDICOMReaderService();
 
 protected:
   /** Returns the reader instance that should be used. The decision may be based
@@ -31,10 +32,12 @@ protected:
   mitk::DICOMFileReader::Pointer GetReader(const mitk::StringList& relevantFiles) const override;
 
 private:
-  SimpleVolumeDICOMSeriesReaderService* Clone() const override;
 
+  ManualSelectingDICOMReaderService* Clone() const override;
+
+  DICOMFileReaderSelector::Pointer m_Selector;
 };
 
 }
 
-#endif // MITKSIMPLEVOLUMEDICOMSERIESREADERSERVICE_H
+#endif // MITKMANUALSELECTINGDICOMREADERSERVICE_H

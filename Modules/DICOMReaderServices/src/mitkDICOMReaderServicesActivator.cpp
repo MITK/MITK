@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "mitkDICOMReaderServicesActivator.h"
 
 #include "mitkAutoSelectingDICOMReaderService.h"
-#include "mitkClassicDICOMSeriesReaderService.h"
+#include "mitkManualSelectingDICOMReaderService.h"
 #include "mitkDICOMTagsOfInterestService.h"
 #include "mitkSimpleVolumeDICOMSeriesReaderService.h"
 #include "mitkCoreServices.h"
@@ -58,10 +58,11 @@ namespace mitk {
 
   void DICOMReaderServicesActivator::Load(us::ModuleContext* context)
   {
-    m_AutoSelectingDICOMReader.reset(new AutoSelectingDICOMReaderService());
-    m_SimpleVolumeDICOMSeriesReader.reset(new SimpleVolumeDICOMSeriesReaderService());
+    m_AutoSelectingDICOMReader = std::make_unique<AutoSelectingDICOMReaderService>();
+    m_SimpleVolumeDICOMSeriesReader = std::make_unique<SimpleVolumeDICOMSeriesReaderService>();
+    m_ManualSelectingDICOMSeriesReader = std::make_unique<ManualSelectingDICOMReaderService>();
 
-    m_DICOMTagsOfInterestService.reset(new DICOMTagsOfInterestService());
+    m_DICOMTagsOfInterestService = std::make_unique<DICOMTagsOfInterestService>();
     context->RegisterService<mitk::IDICOMTagsOfInterest>(m_DICOMTagsOfInterestService.get());
 
     DICOMTagPathMapType tagmap = GetDefaultDICOMTagsOfInterest();

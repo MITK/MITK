@@ -76,6 +76,8 @@ protected:
   QPushButton* m_btConfirm;
   QPushButton* m_btClearSeeds;
 
+  QWidget* m_Controls;
+
   mitk::FastMarchingTool3D::Pointer m_FastMarchingTool;
 
   bool m_TimeIsConnected;

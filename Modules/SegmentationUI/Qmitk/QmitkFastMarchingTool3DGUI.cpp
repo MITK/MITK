@@ -40,7 +40,6 @@ m_TimeIsConnected(false)
 
   // create the visible widgets
   QVBoxLayout *widgetLayout = new QVBoxLayout(this);
-  widgetLayout->setContentsMargins(0, 0, 0, 0);
 
   QFont fntHelp;
   fntHelp.setBold(true);
@@ -50,6 +49,11 @@ m_TimeIsConnected(false)
   lblHelp->setFont(fntHelp);
 
   widgetLayout->addWidget(lblHelp);
+
+  m_Controls = new QWidget(this);
+  widgetLayout->addWidget(m_Controls);
+  QVBoxLayout* controlsLayout = new QVBoxLayout(m_Controls);
+  controlsLayout->setContentsMargins(0, 0, 0, 0);
 
   // Sigma controls
   {
@@ -63,7 +67,7 @@ m_TimeIsConnected(false)
    QSpacerItem* sp2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
    hlayout->addItem(sp2);
 
-   widgetLayout->addItem(hlayout);
+   controlsLayout->addLayout(hlayout);
   }
 
   m_slSigma = new ctkSliderWidget(this);
@@ -75,7 +79,7 @@ m_TimeIsConnected(false)
   m_slSigma->setTracking(false);
   m_slSigma->setToolTip(tr("The \"sigma\" parameter in the Gradient Magnitude filter."));
   connect( m_slSigma, SIGNAL(valueChanged(double)), this, SLOT(OnSigmaChanged(double)));
-  widgetLayout->addWidget( m_slSigma );
+  controlsLayout->addWidget( m_slSigma );
 
   // Alpha controls
   {
@@ -89,7 +93,7 @@ m_TimeIsConnected(false)
    QSpacerItem* sp2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
    hlayout->addItem(sp2);
 
-   widgetLayout->addItem(hlayout);
+   controlsLayout->addLayout(hlayout);
   }
 
   m_slAlpha = new ctkSliderWidget(this);
@@ -101,7 +105,7 @@ m_TimeIsConnected(false)
   m_slAlpha->setTracking(false);
   m_slAlpha->setToolTip("The \"alpha\" parameter in the Sigmoid mapping filter.");
   connect( m_slAlpha, SIGNAL(valueChanged(double)), this, SLOT(OnAlphaChanged(double)));
-  widgetLayout->addWidget( m_slAlpha );
+  controlsLayout->addWidget( m_slAlpha );
 
   // Beta controls
   {
@@ -115,7 +119,7 @@ m_TimeIsConnected(false)
    QSpacerItem* sp2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
    hlayout->addItem(sp2);
 
-   widgetLayout->addLayout(hlayout);
+   controlsLayout->addLayout(hlayout);
   }
 
   m_slBeta = new ctkSliderWidget(this);
@@ -127,7 +131,7 @@ m_TimeIsConnected(false)
   m_slBeta->setTracking(false);
   m_slBeta->setToolTip(tr("The \"beta\" parameter in the Sigmoid mapping filter."));
   connect( m_slBeta, SIGNAL(valueChanged(double)), this, SLOT(OnBetaChanged(double)));
-  widgetLayout->addWidget( m_slBeta );
+  controlsLayout->addWidget( m_slBeta );
 
   // stopping value controls
   {
@@ -141,7 +145,7 @@ m_TimeIsConnected(false)
    QSpacerItem* sp2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
    hlayout->addItem(sp2);
 
-   widgetLayout->addLayout(hlayout);
+   controlsLayout->addLayout(hlayout);
   }
 
   m_slStoppingValue = new ctkSliderWidget(this);
@@ -154,7 +158,7 @@ m_TimeIsConnected(false)
   m_slStoppingValue->setTracking(false);
   m_slStoppingValue->setToolTip(tr("The \"stopping value\" parameter in the fast marching 3D algorithm"));
   connect( m_slStoppingValue, SIGNAL(valueChanged(double)), this, SLOT(OnStoppingValueChanged(double)));
-  widgetLayout->addWidget( m_slStoppingValue );
+  controlsLayout->addWidget( m_slStoppingValue );
 
   // threshold controls
   {
@@ -168,7 +172,7 @@ m_TimeIsConnected(false)
    QSpacerItem* sp2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
    hlayout->addItem(sp2);
 
-   widgetLayout->addLayout(hlayout);
+   controlsLayout->addLayout(hlayout);
   }
 
   m_slwThreshold = new ctkRangeWidget(this);
@@ -180,22 +184,22 @@ m_TimeIsConnected(false)
   m_slwThreshold->setTracking(false);
   m_slwThreshold->setToolTip(tr("The lower and upper thresholds for the final thresholding"));
   connect( m_slwThreshold, SIGNAL(valuesChanged(double, double)), this, SLOT(OnThresholdChanged(double, double)));
-  widgetLayout->addWidget( m_slwThreshold );
+  controlsLayout->addWidget( m_slwThreshold );
 
   m_btClearSeeds = new QPushButton(tr("Clear"));
   m_btClearSeeds->setToolTip(tr("Clear current result and start over again"));
-  widgetLayout->addWidget(m_btClearSeeds);
+  controlsLayout->addWidget(m_btClearSeeds);
   connect( m_btClearSeeds, SIGNAL(clicked()), this, SLOT(OnClearSeeds()) );
 
   m_btConfirm = new QPushButton(tr("Confirm Segmentation"));
   m_btConfirm->setToolTip(tr("Incorporate current result in your working session."));
   m_btConfirm->setEnabled(false);
-  widgetLayout->addWidget(m_btConfirm);
+  controlsLayout->addWidget(m_btConfirm);
   connect( m_btConfirm, SIGNAL(clicked()), this, SLOT(OnConfirmSegmentation()) );
 
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
 
-  this->setEnabled(false);
+  m_Controls->setEnabled(false);
 
   m_slSigma->setDecimals(2);
   m_slBeta->setDecimals(2);
@@ -353,6 +357,6 @@ void QmitkFastMarchingTool3DGUI::BusyStateChanged(bool value)
 
 void QmitkFastMarchingTool3DGUI::OnFastMarchingToolReady()
 {
-  this->setEnabled(true);
+  m_Controls->setEnabled(true);
   this->m_btConfirm->setEnabled(true);
 }

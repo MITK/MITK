@@ -75,7 +75,7 @@
        <string>Presets</string>
       </attribute>
       <attribute name="toolTip">
-       <string notr="true">Apply internal MITK transfer function presets.
+       <string>Apply internal MITK transfer function presets.
 Or save and load your own created transfer functions in a folder in XML format.</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">

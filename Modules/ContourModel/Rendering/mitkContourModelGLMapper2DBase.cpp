@@ -341,6 +341,8 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel* r
       pointsIt++;
     }//end while iterate over controlpoints
 
+    std::vector<float> scalePoints;
+    std::vector<float> scalePointsEven;
     if (showScale && (renderingContour->IteratorEnd() - renderingContour->IteratorBegin() > 1)) {
       auto itBegin = renderingContour->Begin();
       mitk::Point3D startPoint = (*itBegin)->Coordinates;
@@ -375,10 +377,17 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel* r
         renderer->PlaneToDisplay(sectionBegin2d, sectionBegin2d);
         renderer->PlaneToDisplay(sectionEnd2d, sectionEnd2d);
 
-        linePoints.push_back(sectionBegin2d[0]);
-        linePoints.push_back(sectionBegin2d[1]);
-        linePoints.push_back(sectionEnd2d[0]);
-        linePoints.push_back(sectionEnd2d[1]);
+        if (i % 2) {
+          scalePointsEven.push_back(sectionBegin2d[0]);
+          scalePointsEven.push_back(sectionBegin2d[1]);
+          scalePointsEven.push_back(sectionEnd2d[0]);
+          scalePointsEven.push_back(sectionEnd2d[1]);
+        } else {
+          scalePoints.push_back(sectionBegin2d[0]);
+          scalePoints.push_back(sectionBegin2d[1]);
+          scalePoints.push_back(sectionEnd2d[0]);
+          scalePoints.push_back(sectionEnd2d[1]);
+        }
       }
     }
 
@@ -402,6 +411,24 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel* r
     // Draw lines
     this->m_Context->GetPen()->SetWidth(lineWidth);
     this->m_Context->DrawLines(linePoints.data(), linePoints.size() / 2);
+
+    if (showScale) {
+      double opacity = this->m_Context->GetPen()->GetOpacity();
+      double penColor[3];
+      this->m_Context->GetPen()->SetWidth(1.0);
+      this->m_Context->GetPen()->SetOpacity(200);
+      this->m_Context->GetPen()->GetColorF(penColor);
+      if (scalePoints.size() > 1) {
+        this->m_Context->GetPen()->SetColorF(1.0, 0.9, 0.0);
+        this->m_Context->DrawLines(scalePoints.data(), scalePoints.size() / 2);
+      }
+      if (scalePointsEven.size() > 1) {
+        this->m_Context->GetPen()->SetColorF(0.0, 1.0, 0.0);
+        this->m_Context->DrawLines(scalePointsEven.data(), scalePointsEven.size() / 2);
+      }
+      this->m_Context->GetPen()->SetColorF(penColor);
+      this->m_Context->GetPen()->SetOpacity(opacity);
+    }
     this->m_Context->GetPen()->SetWidth(1);
 
     //draw selected vertex if exists

@@ -7,8 +7,8 @@ index bef04fb..ddb9fb9 100644
        \n        newObjDataPos /= newObjDataPos.w;\
        \n        }\
 +      \n\
-+      \n      bool stop = any(greaterThan(newObjDataPos, in_texMax)) ||\
-+      \n        any(lessThan(newObjDataPos, in_texMin));\
++      \n      bool stop = any(greaterThan(newObjDataPos.xyz, in_texMax)) ||\
++      \n        any(lessThan(newObjDataPos.xyz, in_texMin));\
 +      \n      if (stop)\
 +      \n        {\
 +      \n        // The ray exits the bounding box before ever intersecting the plane (only\

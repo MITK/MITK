@@ -793,11 +793,13 @@ void BaseApplication::defineOptions(Poco::Util::OptionSet& options)
   splashScreenOption.argument("<filename>").binding(ARG_SPLASH_IMAGE.toStdString());
   options.addOption(splashScreenOption);
 
-  options.addOption(Poco::Util::Option("exit", "exiting after some time"));
+  options.addOption(Poco::Util::Option("exit", "", "exiting after some time"));
 
-  options.addOption(Poco::Util::Option("upgrade", "running Autoplan upgrade"));
+  options.addOption(Poco::Util::Option("upgrade", "", "running Autoplan upgrade"));
 
-  options.addOption(Poco::Util::Option("new-instance", "creating new Autoplan instance"));
+  options.addOption(Poco::Util::Option("new-instance", "", "creating new Autoplan instance"));
+
+  options.addOption(Poco::Util::Option("configure", "", "use with --exit to configure and exit"));
 
   Poco::Util::Option xargsOption(ARG_XARGS.toStdString(), "", "Extended argument list");
   xargsOption.argument("<args>").binding(ARG_XARGS.toStdString());

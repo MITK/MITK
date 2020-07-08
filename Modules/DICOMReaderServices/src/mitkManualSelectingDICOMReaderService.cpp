@@ -15,11 +15,9 @@ found in the LICENSE file.
 namespace mitk {
 
 ManualSelectingDICOMReaderService::ManualSelectingDICOMReaderService()
-  : BaseDICOMReaderService("MITK DICOM Reader v2 (manual)")
+  : BaseDICOMReaderService("MITK DICOM Reader v2 (manual)"), m_Selector(mitk::DICOMFileReaderSelector::New())
 {
   Options defaultOptions;
-
-  m_Selector = mitk::DICOMFileReaderSelector::New();
 
   m_Selector->LoadBuiltIn3DConfigs();
   m_Selector->LoadBuiltIn3DnTConfigs();
@@ -42,7 +40,7 @@ DICOMFileReader::Pointer ManualSelectingDICOMReaderService::GetReader(const mitk
 {
   const auto label = this->GetOption("Configuration").ToString();
 
-  mitk::DICOMFileReader::Pointer selectedReader = nullptr;
+  mitk::DICOMFileReader::Pointer selectedReader;
   
   auto readers = m_Selector->GetAllConfiguredReaders();
   for (const auto& reader : readers)

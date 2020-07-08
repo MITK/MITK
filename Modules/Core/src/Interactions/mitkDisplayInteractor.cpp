@@ -46,6 +46,7 @@
 #include "mitkImage.h"
 #include "mitkPixelTypeMultiplex.h"
 #include <mitkCompositePixelValueToString.h>
+#include "WindowSyncManager.h"
 
 void mitk::DisplayInteractor::Notify(InteractionEvent* interactionEvent, bool isHandled)
 {
@@ -462,49 +463,21 @@ void mitk::DisplayInteractor::Move(StateMachineAction*, InteractionEvent* intera
   InteractionPositionEvent* positionEvent = static_cast<InteractionPositionEvent*>(interactionEvent);
 
   float invertModifier = -1.0;
-  if ( m_InvertMoveDirection )
-  {
+  if (m_InvertMoveDirection) {
     invertModifier = 1.0;
   }
-  // perform translation
+
   Vector2D moveVector = (positionEvent->GetPointerPositionOnScreen() - m_LastDisplayCoordinate) * invertModifier;
 
   auto senderSliceNavigationController = sender->GetSliceNavigationController();
-  if (s_PanZoomSynchronization && senderSliceNavigationController->isInSync())
-  {
-    auto allRenderWindows = mitk::RenderingManager::GetGenerallyAllRegisteredRenderWindows();
-    std::string sourceStudy(sender->GetStudyUID());
-    for(vtkRenderWindow* renderWindow : allRenderWindows)
-    {
-      const BaseRenderer::Pointer ren = BaseRenderer::GetInstance(renderWindow);
-      if (ren->GetMapperID() == BaseRenderer::Standard3D)
-      {
-        continue;
-      }
-      auto sliceNavigationController = ren->GetSliceNavigationController();
-      if (sliceNavigationController->isInSync())
-      {
-        bool sameDirection = (sliceNavigationController->GetDefaultViewDirection() == senderSliceNavigationController->GetDefaultViewDirection());
-        if (sameDirection)
-        {
-          if (mitk::DisplayInteractor::s_PanZoomSynchronizationStudy)
-          {
-            if (sourceStudy != ren->GetStudyUID())
-            {
-              continue;
-            }
-          }
-          ren->GetCameraController()->MoveBy(moveVector);
-          ren->GetRenderingManager()->RequestUpdate(renderWindow);
-        }
-      }
-    }
-  }
-  else
-  {
+  WindowSyncManager& sm = WindowSyncManager::getInstance();
+  if (sm.syncCamera && sm.rendererInCameraSync(sender)) {
+    sm.updateCameraMove(moveVector);
+  } else {
     sender->GetCameraController()->MoveBy(moveVector);
-    sender->GetRenderingManager()->RequestUpdate(sender->GetRenderWindow());
+    sender->RequestUpdate();
   }
+
   m_LastDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
 }
 
@@ -542,71 +515,44 @@ void mitk::DisplayInteractor::Zoom(StateMachineAction*, InteractionEvent* intera
   float factor = 1.0;
   float distance = 0;
 
-  if (m_ZoomDirection == "updown")
-  {
+  if (m_ZoomDirection == "updown") {
     distance = m_CurrentDisplayCoordinate[1] - m_LastDisplayCoordinate[1];
-  }
-  else
-  {
+  } else {
     distance = m_CurrentDisplayCoordinate[0] - m_LastDisplayCoordinate[0];
   }
 
-  if ( m_InvertZoomDirection )
-  {
+  if (m_InvertZoomDirection) {
     distance *= -1.0;
   }
 
   // set zooming speed
-  if (distance < 0.0)
-  {
+  if (distance < 0.0) {
     factor = 1.0 / m_ZoomFactor;
-  }
-  else if (distance > 0.0)
-  {
+  } else if (distance > 0.0) {
     factor = 1.0 * m_ZoomFactor;
   }
 
-  if (factor != 1.0)
-  {
-    auto senderSliceNavigationController = sender->GetSliceNavigationController();
-    if (s_PanZoomSynchronization && senderSliceNavigationController->isInSync())
-    {
-      std::string sourceStudy(sender->GetStudyUID());
-      auto allRenderWindows = mitk::RenderingManager::GetGenerallyAllRegisteredRenderWindows();
-      for(vtkRenderWindow* renderWindow : allRenderWindows)
-      {
-        const BaseRenderer::Pointer ren = BaseRenderer::GetInstance(renderWindow);
-        if (ren->GetMapperID() == BaseRenderer::Standard3D)
-        {
-          continue;
-        }
-        auto sliceNavigationController = ren->GetSliceNavigationController();
-        if (sliceNavigationController->isInSync()) {
-          bool sameDirection = (sliceNavigationController->GetDefaultViewDirection() == senderSliceNavigationController->GetDefaultViewDirection());
-          if (sameDirection)
-          {
-            if (mitk::DisplayInteractor::s_PanZoomSynchronizationStudy)
-            {
-              if (sourceStudy != ren->GetStudyUID())
-              {
-                continue;
-              }
-            }
-            ren->GetCameraController()->Zoom(factor, m_StartCoordinateInMM);
-            ren->GetRenderingManager()->RequestUpdate(renderWindow);
-          }
-        }
-      }
-    }
-    else
-    {
-      sender->GetCameraController()->Zoom(factor, m_StartCoordinateInMM);
-      sender->GetRenderingManager()->RequestUpdate(sender->GetRenderWindow());
-    }
+  WindowSyncManager& sm = WindowSyncManager::getInstance();
+  if (sm.syncCamera && sm.rendererInCameraSync(sender)) {
+    sm.updateCameraZoom(factor, m_StartCoordinateInMM);
+  } else {
+    sender->GetCameraController()->Zoom(factor, m_StartCoordinateInMM);
+    sender->RequestUpdate();
   }
 
   m_LastDisplayCoordinate = m_CurrentDisplayCoordinate;
   m_CurrentDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
+}
+
+mitk::Point3D mitk::DisplayInteractor::getRendererCenter(mitk::BaseRenderer* ren)
+{
+  mitk::Point3D point3d;
+  mitk::Point3D corner0 = ren->GetCurrentWorldPlaneGeometry()->GetCornerPoint(true, true, true);
+  mitk::Point3D corner1 = ren->GetCurrentWorldPlaneGeometry()->GetCornerPoint(false, false, true);
+  point3d[0] = (corner0[0] + corner1[0]) / 2;
+  point3d[1] = (corner0[1] + corner1[1]) / 2;
+  point3d[2] = (corner0[2] + corner1[2]) / 2;
+  return point3d;
 }
 
 void mitk::DisplayInteractor::Scroll(StateMachineAction*, InteractionEvent* interactionEvent)
@@ -614,32 +560,24 @@ void mitk::DisplayInteractor::Scroll(StateMachineAction*, InteractionEvent* inte
   InteractionPositionEvent* positionEvent = static_cast<InteractionPositionEvent*>(interactionEvent);
 
   mitk::SliceNavigationController::Pointer sliceNaviController = interactionEvent->GetSender()->GetSliceNavigationController();
-  if (sliceNaviController)
-  {
+  if (sliceNaviController) {
     int delta = 0;
     // Scrolling direction
-    if (m_ScrollDirection == "updown")
-    {
+    if (m_ScrollDirection == "updown") {
       delta = static_cast<int>(m_LastDisplayCoordinate[1] - positionEvent->GetPointerPositionOnScreen()[1]);
-    }
-    else
-    {
+    } else {
       delta = static_cast<int>(m_LastDisplayCoordinate[0] - positionEvent->GetPointerPositionOnScreen()[0]);
     }
 
-    if ( m_InvertScrollDirection )
-    {
+    if (m_InvertScrollDirection) {
       delta *= -1;
     }
 
     // Set how many pixels the mouse has to be moved to scroll one slice
     // if we moved less than 'm_IndexToSliceModifier' pixels slice ONE slice only
-    if (delta > 0 && delta < m_IndexToSliceModifier)
-    {
+    if (delta > 0 && delta < m_IndexToSliceModifier) {
       delta = m_IndexToSliceModifier;
-    }
-    else if (delta < 0 && delta > -m_IndexToSliceModifier)
-    {
+    } else if (delta < 0 && delta > -m_IndexToSliceModifier) {
       delta = -m_IndexToSliceModifier;
     }
     delta /= m_IndexToSliceModifier;
@@ -648,29 +586,35 @@ void mitk::DisplayInteractor::Scroll(StateMachineAction*, InteractionEvent* inte
 
     // if auto repeat is on, start at first slice if you reach the last slice and vice versa
     int maxSlices = sliceNaviController->GetSlice()->GetSteps();
-    if (m_AutoRepeat)
-    {
-      while (newPos < 0)
-      {
+    if (m_AutoRepeat) {
+      while (newPos < 0) {
         newPos += maxSlices;
       }
 
-      while (newPos >= maxSlices)
-      {
+      while (newPos >= maxSlices) {
         newPos -= maxSlices;
       }
-    }
-    else
-    {
+    } else {
       // if the new slice is below 0 we still show slice 0
       // due to the stepper using unsigned int we have to do this ourselves
-      if (newPos < 1)
-      {
+      if (newPos < 1) {
         newPos = 0;
       }
     }
-    // set the new position
-    sliceNaviController->GetSlice()->SetPos(newPos);
+
+    // Set the new position
+    WindowSyncManager& sm = WindowSyncManager::getInstance();
+    mitk::BaseRenderer* ren = interactionEvent->GetSender();
+    if (sm.syncSlice && sm.rendererInSlicersSync(ren)) {
+      sliceNaviController->GetSlice()->SetPos(newPos);
+
+      mitk::Point3D cen = getRendererCenter(ren);
+      sm.updateSlicers(cen);
+    } else {
+      sliceNaviController->GetSlice()->SetPos(newPos);
+      ren->RequestUpdate();
+    }
+
     m_LastDisplayCoordinate = m_CurrentDisplayCoordinate;
     m_CurrentDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
   }
@@ -678,64 +622,97 @@ void mitk::DisplayInteractor::Scroll(StateMachineAction*, InteractionEvent* inte
 
 void mitk::DisplayInteractor::ScrollOneDown(StateMachineAction* action, InteractionEvent* interactionEvent)
 {
-  mitk::SliceNavigationController::Pointer sliceNaviController = interactionEvent->GetSender()->GetSliceNavigationController();
-  if (!sliceNaviController->GetSliceLocked())
-  {
+  mitk::BaseRenderer* sender = interactionEvent->GetSender();
+  mitk::SliceNavigationController::Pointer sliceNaviController = sender->GetSliceNavigationController();
+  if (!sliceNaviController->GetSliceLocked()) {
     mitk::Stepper* stepper = sliceNaviController->GetSlice();
     if (stepper->GetSteps() <= 1) {
       ScrollTimeOneDown(action, interactionEvent);
       return;
     }
-    stepper->Next();
-    interactionEvent->GetSender()->RequestUpdate();
+
+    WindowSyncManager& sm = WindowSyncManager::getInstance();
+    bool syncRenderer = sm.rendererInSlicersSync(sender);
+    if (sm.syncSliceDelta && syncRenderer) {
+      sm.updateSlicersDeltaNext();
+    } else {
+      stepper->Next();
+      if (sm.syncSlice && syncRenderer) {
+        mitk::Point3D cen = getRendererCenter(sender);
+        sm.updateSlicers(cen);
+      } else {
+        sender->RequestUpdate();
+      }
+    }
   }
 }
 
 void mitk::DisplayInteractor::ScrollOneUp(StateMachineAction* action, InteractionEvent* interactionEvent)
 {
-  mitk::SliceNavigationController::Pointer sliceNaviController = interactionEvent->GetSender()->GetSliceNavigationController();
-  if (!sliceNaviController->GetSliceLocked())
-  {
+  mitk::BaseRenderer* sender = interactionEvent->GetSender();
+  mitk::SliceNavigationController::Pointer sliceNaviController = sender->GetSliceNavigationController();
+  if (!sliceNaviController->GetSliceLocked()) {
     mitk::Stepper* stepper = sliceNaviController->GetSlice();
     if (stepper->GetSteps() <= 1) {
       ScrollTimeOneUp(action, interactionEvent);
       return;
     }
-    stepper->Previous();
-    interactionEvent->GetSender()->RequestUpdate();
+
+    WindowSyncManager& sm = WindowSyncManager::getInstance();
+    bool syncRenderer = sm.rendererInSlicersSync(sender);
+    if (sm.syncSliceDelta && syncRenderer) {
+      sm.updateSlicersDeltaPrevious();
+    } else {
+      stepper->Previous();
+      if (sm.syncSlice && syncRenderer) {
+        mitk::Point3D cen = getRendererCenter(sender);
+        sm.updateSlicers(cen);
+      } else {
+        sender->RequestUpdate();
+      }
+    }
   }
 }
 
 void mitk::DisplayInteractor::ScrollTimeOneDown(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  mitk::SliceNavigationController::Pointer sliceNaviController = interactionEvent->GetSender()->GetSliceNavigationController();
-  if (!sliceNaviController->GetSliceLocked())
-  {
+  mitk::BaseRenderer* sender = interactionEvent->GetSender();
+  mitk::SliceNavigationController::Pointer sliceNaviController = sender->GetSliceNavigationController();
+  if (!sliceNaviController->GetSliceLocked()) {
     mitk::Stepper* stepper = sliceNaviController->GetTime();
 
     if (stepper->GetSteps() < 2 && sliceNaviController->GetComponent()->GetSteps() > 1) {
       stepper = sliceNaviController->GetComponent();
     }
 
-    stepper->Next();
-    interactionEvent->GetSender()->RequestUpdate();
+    WindowSyncManager& sm = WindowSyncManager::getInstance();
+    if (sm.syncSliceDelta && sm.rendererInSlicersSync(sender)) {
+      sm.updateSlicersDeltaComponentNext();
+    } else {
+      stepper->Next();
+      interactionEvent->GetSender()->RequestUpdate();
+    }
   }
-
 }
 
 void mitk::DisplayInteractor::ScrollTimeOneUp(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  mitk::SliceNavigationController::Pointer sliceNaviController = interactionEvent->GetSender()->GetSliceNavigationController();
-  if (!sliceNaviController->GetSliceLocked())
-  {
+  mitk::BaseRenderer* sender = interactionEvent->GetSender();
+  mitk::SliceNavigationController::Pointer sliceNaviController = sender->GetSliceNavigationController();
+  if (!sliceNaviController->GetSliceLocked()) {
     mitk::Stepper* stepper = sliceNaviController->GetTime();
 
     if (stepper->GetSteps() < 2 && sliceNaviController->GetComponent()->GetSteps() > 1) {
       stepper = sliceNaviController->GetComponent();
     }
 
-    stepper->Previous();
-    interactionEvent->GetSender()->RequestUpdate();
+    WindowSyncManager& sm = WindowSyncManager::getInstance();
+    if (sm.syncSliceDelta && sm.rendererInSlicersSync(sender)) {
+      sm.updateSlicersDeltaComponentPrevious();
+    } else {
+      stepper->Previous();
+      interactionEvent->GetSender()->RequestUpdate();
+    }
   }
 }
 

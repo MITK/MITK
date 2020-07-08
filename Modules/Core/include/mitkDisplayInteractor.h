@@ -194,6 +194,8 @@ namespace mitk
 
   private:
 
+    mitk::Point3D getRendererCenter(mitk::BaseRenderer* ren);
+
     mitk::DataNode::Pointer GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes,mitk::Point3D worldposition, BaseRenderer* ren);
 
     /**

@@ -19,6 +19,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.application:ON
   org.mitk.gui.qt.ext:OFF
   org.mitk.gui.qt.extapplication:OFF
+  org.mitk.gui.qt.mitkworkbench.intro:OFF
   org.mitk.gui.qt.common:ON
   org.mitk.gui.qt.stdmultiwidgeteditor:ON
   org.mitk.gui.qt.mxnmultiwidgeteditor:OFF

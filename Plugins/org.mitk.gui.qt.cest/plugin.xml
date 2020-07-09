@@ -12,7 +12,7 @@
     <view id="org.mitk.views.cest.normalization"
           name="CEST normalization"
           class="QmitkCESTNormalizeView"
-          icon="resources/icon_norm.png"
+          icon="resources/cest_normalize.svg"
 		  category="CEST"/>
   </extension>
 </plugin>

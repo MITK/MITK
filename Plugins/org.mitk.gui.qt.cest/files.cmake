@@ -24,7 +24,7 @@ set(MOC_H_FILES
 # plug-in views in the workbench
 set(CACHED_RESOURCE_FILES
   resources/icon.svg
-  resources/icon_norm.png
+  resources/cest_normalize.svg
   plugin.xml
 )
 

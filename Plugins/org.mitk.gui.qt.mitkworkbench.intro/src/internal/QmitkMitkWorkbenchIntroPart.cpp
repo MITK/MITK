@@ -42,7 +42,7 @@ found in the LICENSE file.
 #include <QByteArray>
 #include <QDesktopServices>
 
-#include "QmitkExtApplicationPlugin.h"
+#include "QmitkMitkWorkbenchIntroPlugin.h"
 #include "mitkDataStorageEditorInput.h"
 #include <string>
 
@@ -112,7 +112,7 @@ namespace
 
         workbench->ShowPerspective(id, workbenchWindow);
 
-        auto context = QmitkExtApplicationPlugin::GetDefault()->GetPluginContext();
+        auto context = QmitkMitkWorkbenchIntroPlugin::GetDefault()->GetPluginContext();
         auto serviceReference = context->getServiceReference<mitk::IDataStorageService>();
 
         mitk::IDataStorageService* service = serviceReference
@@ -148,7 +148,7 @@ QmitkMitkWorkbenchIntroPart::QmitkMitkWorkbenchIntroPart()
   : m_Controls(nullptr),
     m_Impl(new Impl)
 {
-  berry::IPreferences::Pointer workbenchPrefs = QmitkExtApplicationPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences();
+  berry::IPreferences::Pointer workbenchPrefs = QmitkMitkWorkbenchIntroPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences();
   workbenchPrefs->PutBool(berry::WorkbenchPreferenceConstants::SHOW_INTRO, true);
   workbenchPrefs->Flush();
 }
@@ -158,13 +158,13 @@ QmitkMitkWorkbenchIntroPart::~QmitkMitkWorkbenchIntroPart()
   // if the workbench is not closing (that means, welcome screen was closed explicitly), set "Show_intro" false
   if (!this->GetIntroSite()->GetPage()->GetWorkbenchWindow()->GetWorkbench()->IsClosing())
   {
-    berry::IPreferences::Pointer workbenchPrefs = QmitkExtApplicationPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences();
+    berry::IPreferences::Pointer workbenchPrefs = QmitkMitkWorkbenchIntroPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences();
     workbenchPrefs->PutBool(berry::WorkbenchPreferenceConstants::SHOW_INTRO, false);
     workbenchPrefs->Flush();
   }
   else
   {
-    berry::IPreferences::Pointer workbenchPrefs = QmitkExtApplicationPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences();
+    berry::IPreferences::Pointer workbenchPrefs = QmitkMitkWorkbenchIntroPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences();
     workbenchPrefs->PutBool(berry::WorkbenchPreferenceConstants::SHOW_INTRO, true);
     workbenchPrefs->Flush();
   }

@@ -5,6 +5,7 @@ set(MITK_CONFIG_PACKAGES
 )
 
 set(MITK_CONFIG_PLUGINS
+  org.mitk.gui.qt.mitkworkbench.intro
   org.mitk.gui.qt.datamanager
   org.mitk.gui.qt.stdmultiwidgeteditor
   org.mitk.gui.qt.dicom

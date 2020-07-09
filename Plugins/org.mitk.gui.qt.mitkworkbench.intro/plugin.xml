@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+  <extension point="org.blueberry.ui.intro">
+    <intro id="org.mitk.qt.extapplicationintro"
+      class="QmitkMitkWorkbenchIntroPart"
+      role="editor"/>
+    <introProductBinding
+      productId="org.mitk.gui.qt.extapplication.workbench"
+      introId="org.mitk.qt.extapplicationintro"/>
+  </extension>
+</plugin>

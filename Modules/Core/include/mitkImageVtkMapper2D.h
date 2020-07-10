@@ -144,8 +144,10 @@ namespace mitk
     class MITKCORE_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
     {
     public:
-      /** \brief Actor of a 2D render window. */
-      vtkSmartPointer<vtkActor> m_Actor;
+      /** \brief Actor of the image in a 2D render window. */
+      vtkSmartPointer<vtkActor> m_ImageActor;
+      /** \brief Actor of the shadowimage in a 2D render window. */
+      vtkSmartPointer<vtkActor> m_ShadowOutlineActor;
 
       /** Prop assembly containting everything for a regular display of the image.*/
       vtkSmartPointer<vtkPropAssembly> m_Actors;

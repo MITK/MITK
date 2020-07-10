@@ -7,7 +7,7 @@ set(proj_DEPENDENCIES )
 set(${proj}_DEPENDS ${proj})
 
 if(NOT WIN32) # It is not clear what to do with installed packages for Widows, but the default method using the system registry is not suitable for Jenkins
-  find_package(${proj} 0.5.2)
+  find_package(${proj} 0.6.0)
 endif()
 
 if(NOT EXISTS "${YAML_CPP_INCLUDE_DIR}" AND "${YAML_CPP_INCLUDE_DIR}" MATCHES .*/\.\./include)

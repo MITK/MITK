@@ -147,7 +147,15 @@ namespace mitk
       /** \brief Actor of a 2D render window. */
       vtkSmartPointer<vtkActor> m_Actor;
 
+      /** Prop assembly containting everything for a regular display of the image.*/
       vtkSmartPointer<vtkPropAssembly> m_Actors;
+      /** Prop assembly used if workspace is in an invalid state (e.g. invalid time point or
+       * invalid world coordinate position is selected) and mapper has to "early out"
+       * in Update() or GenerateDataForRenderer()*/
+      vtkSmartPointer<vtkPropAssembly> m_EmptyActors;
+      /** Prop assembly exposed publicly via ImagVtkMapper2D::GetVTKProp()*/
+      vtkSmartPointer<vtkPropAssembly> m_PublicActors;
+
       /** \brief Mapper of a 2D render window. */
       vtkSmartPointer<vtkPolyDataMapper> m_Mapper;
       vtkSmartPointer<vtkImageExtractComponents> m_VectorComponentExtractor;

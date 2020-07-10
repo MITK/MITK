@@ -109,7 +109,7 @@ const mitk::Image *mitk::ImageVtkMapper2D::GetInput(void)
 vtkProp *mitk::ImageVtkMapper2D::GetVtkProp(mitk::BaseRenderer *renderer)
 {
   // return the actor corresponding to the renderer
-  return m_LSH.GetLocalStorage(renderer)->m_Actors;
+  return m_LSH.GetLocalStorage(renderer)->m_PublicActors;
 }
 
 void mitk::ImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
@@ -120,6 +120,11 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rendere
   mitk::DataNode *datanode = this->GetDataNode();
   if (nullptr == image || !image->IsInitialized())
   {
+    // set image to nullptr, to clear the texture in 3D, because
+    // the latest image is used there if the plane is out of the geometry
+    // see bug-13275
+    localStorage->m_ReslicedImage = nullptr;
+    localStorage->m_PublicActors = localStorage->m_EmptyActors;
     return;
   }
 
@@ -127,10 +132,17 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rendere
   const PlaneGeometry *worldGeometry = renderer->GetCurrentWorldPlaneGeometry();
   if (nullptr == worldGeometry || !worldGeometry->IsValid() || !worldGeometry->HasReferenceGeometry())
   {
+    // set image to nullptr, to clear the texture in 3D, because
+    // the latest image is used there if the plane is out of the geometry
+    // see bug-13275
+    localStorage->m_ReslicedImage = nullptr;
+    localStorage->m_PublicActors = localStorage->m_EmptyActors;
     return;
   }
 
   image->Update();
+
+  localStorage->m_PublicActors = localStorage->m_Actors;
 
   // early out if there is no intersection of the current rendering geometry
   // and the geometry of the image that is to be rendered.
@@ -652,17 +664,24 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer *renderer)
   // Calculate time step of the input data for the specified renderer (integer value)
   this->CalculateTimeStep(renderer);
 
+  LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
+
   // Check if time step is valid
   const TimeGeometry *dataTimeGeometry = data->GetTimeGeometry();
   if ((dataTimeGeometry == nullptr) || (dataTimeGeometry->CountTimeSteps() == 0) ||
       (!dataTimeGeometry->IsValidTimeStep(this->GetTimestep())))
   {
+    localStorage->m_PublicActors = localStorage->m_EmptyActors;
+    // set image to nullptr, to clear the texture in 3D, because
+    // the latest image is used there if the plane is out of the geometry
+    // see bug-13275
+    localStorage->m_ReslicedImage = nullptr;
+
     return;
   }
 
   const DataNode *node = this->GetDataNode();
   data->UpdateOutputInformation();
-  LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
   // check if something important has changed and we need to rerender
   if ((localStorage->m_LastUpdateTime < node->GetMTime()) ||
@@ -1090,6 +1109,7 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_Mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   m_Actor = vtkSmartPointer<vtkActor>::New();
   m_Actors = vtkSmartPointer<vtkPropAssembly>::New();
+  m_EmptyActors = vtkSmartPointer<vtkPropAssembly>::New();
   m_Reslicer = mitk::ExtractSliceFilter::New();
   m_TSFilter = vtkSmartPointer<vtkMitkThickSlicesFilter>::New();
   m_OutlinePolyData = vtkSmartPointer<vtkPolyData>::New();
@@ -1122,4 +1142,6 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
 
   m_Actors->AddPart(outlineShadowActor);
   m_Actors->AddPart(m_Actor);
+
+  m_PublicActors = m_EmptyActors;
 }

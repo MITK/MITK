@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QDialog>
 #include <QScopedPointer>
-
+#include <QKeyEvent>
 
 class QmitkPreferencesDialogPrivate;
 
@@ -55,6 +55,7 @@ protected slots:
 
 protected:
 
+  virtual void keyPressEvent(QKeyEvent* e) override;
   //bool eventFilter(QObject *obj, QEvent *event);
   void UpdateTree();
   void UpdateExistingTree(bool advancedMode);

@@ -134,7 +134,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rendere
 
   image->Update();
 
-  localStorage->m_PublicActors = localStorage->m_Actors;
+  localStorage->m_PublicActors = localStorage->m_Actors.Get();
 
   // early out if there is no intersection of the current rendering geometry
   // and the geometry of the image that is to be rendered.
@@ -619,7 +619,7 @@ void mitk::ImageVtkMapper2D::ApplyColorTransferFunction(mitk::BaseRenderer *rend
 
 void mitk::ImageVtkMapper2D::SetToInvalidState(mitk::ImageVtkMapper2D::LocalStorage* localStorage)
 {
-  localStorage->m_PublicActors = localStorage->m_EmptyActors;
+  localStorage->m_PublicActors = localStorage->m_EmptyActors.Get();
   // set image to nullptr, to clear the texture in 3D, because
   // the latest image is used there if the plane is out of the geometry
   // see bug-13275
@@ -1120,5 +1120,5 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_Actors->AddPart(m_ShadowOutlineActor);
   m_Actors->AddPart(m_ImageActor);
 
-  m_PublicActors = m_EmptyActors;
+  m_PublicActors = m_EmptyActors.Get();
 }

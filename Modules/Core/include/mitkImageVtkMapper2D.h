@@ -156,7 +156,7 @@ namespace mitk
        * in Update() or GenerateDataForRenderer()*/
       vtkSmartPointer<vtkPropAssembly> m_EmptyActors;
       /** Prop assembly exposed publicly via ImagVtkMapper2D::GetVTKProp()*/
-      vtkSmartPointer<vtkPropAssembly> m_PublicActors;
+      vtkProp* m_PublicActors = nullptr;
 
       /** \brief Mapper of a 2D render window. */
       vtkSmartPointer<vtkPolyDataMapper> m_Mapper;

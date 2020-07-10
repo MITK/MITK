@@ -1,5 +1,5 @@
-/**
-\page org_mitk_gui_qt_pharmacokinetics_pet The Dynamic PET DataFit View
+﻿/**
+\page org_mitk_gui_qt_pharmacokinetics_pet Dynamic PET DataFit View
 
 \imageMacro{pharmacokinetics_pet_doc.svg,"Icon of the DCE MR Perfusion View",3.0}
 

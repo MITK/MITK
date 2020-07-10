@@ -1,5 +1,5 @@
 /**
-\page org_mitk_gui_qt_imagecropper Image Cropper Plugin
+\page org_mitk_gui_qt_imagecropper Image Cropper
 
 \imageMacro{crop.svg,"Icon of the Image Cropper Plugin.",20}
 

@@ -1,5 +1,5 @@
 /**
-\page org_mitk_gui_qt_pharmacokinetics_curvedescriptor The Perfusion Curve Description Parameters View
+\page org_mitk_gui_qt_pharmacokinetics_curvedescriptor Perfusion Curve Description Parameters View
 
 \imageMacro{pharmacokinetics_curve_desc_doc.svg,"Icon of the Perfusion Curve Description Parameters View",3.0}
 

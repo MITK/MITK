@@ -1,0 +1,42 @@
+/**
+\page PluginListSpecificPage List of Application-specific Plugins
+
+  \li \subpage org_mitk_gui_qt_aicpregistration
+  \li \subpage org_mitk_gui_qt_cest
+  \li \subpage org_mitk_gui_qt_classificationsegmentation
+  \li \subpage org_mitk_views_cmdlinemodules
+  \li \subpage org_mitk_gui_qt_pharmacokinetics_concentration_mri
+  \li \subpage org_mitk_gui_qt_pharmacokinetics_mri
+  \li \subpage org_mitk_gui_qt_pharmacokinetics_pet
+  \li \subpage org_mitk_gui_qt_eventrecorder
+  \li \subpage org_mitk_gui_qt_examples
+  \li \subpage org_mitk_gui_qt_geometrytools
+  \li \subpage org_mitk_gui_qt_igtexample
+  \li \subpage org_mitk_gui_qt_igtlplugin
+  \li \subpage org_mitk_gui_qt_igttracking
+  \li \subpage org_mitk_gui_qt_igttrackingsemiautomaticmeasurement
+  \li \subpage org_mitk_gui_qt_lasercontrol
+  \li \subpage org_mitk_gui_qt_fit_demo
+  \li \subpage org_mitk_gui_qt_fit_genericfitting
+  \li \subpage org_mitk_gui_qt_fit_inspector
+  \li \subpage org_mitkexamplesopencv
+  \li \subpage org_mitk_gui_qt_overlaymanager
+  \li \subpage org_mitk_gui_qt_mitkphenotyping
+  \li \subpage org_mitk_gui_qt_photoacoustics_pausmotioncompensation
+  \li \subpage org_mitk_example_gui_pcaexample
+  \li \subpage org_mitk_gui_qt_pharmacokinetics_curvedescriptor
+  \li \subpage org_mitk_gui_qt_photoacoustics_imageprocessing
+  \li \subpage org_mitk_gui_qt_pharmacokinetics_simulation
+  \li \subpage org_mitk_gui_qt_pointsetinteractionmultispectrum
+  \li \subpage org_mitk_gui_qt_renderwindowmanager
+  \li \subpage org_mitk_gui_qt_photoacoustics_spectralunmixing
+  \li \subpage org_mitk_gui_qt_spectrocamrecorder
+  \li \subpage org_surfacematerialeditor
+  \li \subpage org_blueberry_ui_qt_objectinspector
+  \li \subpage org_toftutorial
+  \li \subpage org_mitk_gui_qt_ultrasound
+  \li \subpage org_mitk_gui_qt_igt_app_echotrack
+  \li \subpage org_mitk_gui_qt_xnat
+
+
+*/

@@ -1,5 +1,5 @@
 /**
-\page org_mitk_gui_qt_photoacoustics_spectralunmixing The spectral unmixing (SU) plugin
+\page org_mitk_gui_qt_photoacoustics_spectralunmixing Spectral Unmixing (SU) Plugin
 
 \imageMacro{icon.png,"Icon of Spectralunmixing",2.00}
 

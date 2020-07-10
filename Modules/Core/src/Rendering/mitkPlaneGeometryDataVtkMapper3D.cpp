@@ -465,7 +465,7 @@ namespace mitk
           BaseRenderer::Pointer planeRenderer =
             dynamic_cast<BaseRenderer *>(rendererProp->GetWeakPointer().GetPointer());
           // Retrieve and update image to be mapped
-          const ImageVtkMapper2D::LocalStorage *localStorage = imageMapper->GetLocalStorage(planeRenderer);
+          const ImageVtkMapper2D::LocalStorage *localStorage = imageMapper->GetConstLocalStorage(planeRenderer);
 
           if (planeRenderer.IsNotNull())
           {

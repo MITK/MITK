@@ -20,7 +20,7 @@ if(NOT DEFINED ${proj}_DIR OR NOT EXISTS "${${proj}_DIR}")
 
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}
-    GIT_REPOSITORY "git@github.com:samsmu/yaml-cpp.git"
+    GIT_REPOSITORY "https://github.com/samsmu/yaml-cpp.git"
     GIT_TAG "yaml-cpp-0.6.3"
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS

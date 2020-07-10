@@ -976,6 +976,12 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowOpen()
       mitk::WorkbenchUtil::OpenEditor(configurer->GetWindow()->GetActivePage(),dsInput);
     }
   }
+
+  auto introPart = configurer->GetWindow()->GetWorkbench()->GetIntroManager()->GetIntro();
+  if (introPart.IsNotNull())
+  {
+    configurer->GetWindow()->GetWorkbench()->GetIntroManager()->ShowIntro(GetWindowConfigurer()->GetWindow(), false);
+  }
 }
 
 void QmitkExtWorkbenchWindowAdvisor::onIntro()

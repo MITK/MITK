@@ -389,6 +389,15 @@ void QmitkPreferencesDialog::OnKeywordEditingFinished()
 {
 }
 
+void QmitkPreferencesDialog::keyPressEvent(QKeyEvent* e)
+{
+  if ((e->key() == Qt::Key_Return || e->key() == Qt::Key_Enter) &&
+    !d->buttonBox->button(QDialogButtonBox::Ok)->hasFocus()) {
+    return;
+  }
+  QDialog::keyPressEvent(e);
+}
+
 //bool QmitkPreferencesDialog::eventFilter( QObject *obj, QEvent *event )
 //{
 //  if(obj == d->m_Keyword)

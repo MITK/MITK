@@ -14,9 +14,10 @@ found in the LICENSE file.
 #define MITKDICOMREADERSERVICESACTIVATOR_H
 
 #include <usModuleActivator.h>
-#include <usServiceEvent.h>
+#include <usModuleEvent.h>
 
 #include <memory>
+#include <mutex>
 
 namespace mitk {
 
@@ -30,17 +31,18 @@ public:
   void Load(us::ModuleContext* context) override;
   void Unload(us::ModuleContext* context) override;
 
-  void AliasServiceChanged(const us::ServiceEvent event);
-
 private:
+  void OnModuleEvent(const us::ModuleEvent event);
 
   std::unique_ptr<IFileReader> m_AutoSelectingDICOMReader;
   std::unique_ptr<IFileReader> m_ManualSelectingDICOMSeriesReader;
   std::unique_ptr<IFileReader> m_SimpleVolumeDICOMSeriesReader;
   std::unique_ptr<IDICOMTagsOfInterest> m_DICOMTagsOfInterestService;
 
-  us::ModuleContext* mitkContext;
+  us::ModuleContext* m_Context;
 
+  /**mutex to guard the module listening */
+  std::mutex m_Mutex;
 };
 
 }

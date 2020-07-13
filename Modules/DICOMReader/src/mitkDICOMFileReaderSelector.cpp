@@ -41,6 +41,8 @@ void
 mitk::DICOMFileReaderSelector
 ::AddConfigsFromResources(const std::string& path)
 {
+  if (nullptr == us::GetModuleContext()) return;
+
   const std::vector<us::ModuleResource> configs =
     us::GetModuleContext()->GetModule()->FindResources( path, "*.xml", false );
 
@@ -92,6 +94,8 @@ void
 mitk::DICOMFileReaderSelector
 ::AddConfigFromResource(const std::string& resourcename)
 {
+  if (nullptr == us::GetModuleContext()) return;
+
   us::ModuleResource r = us::GetModuleContext()->GetModule()->GetResource(resourcename);
   this->AddConfigFromResource(r);
 }

@@ -23,6 +23,7 @@ found in the LICENSE file.
 #include "mitkTemporoSpatialStringProperty.h"
 
 #include <usModuleContext.h>
+#include <usModuleRegistry.h>
 
 void AddPropertyPersistence(const mitk::PropertyKeyPath& propPath, bool temporoSpatial = false)
 {
@@ -58,9 +59,10 @@ namespace mitk {
 
   void DICOMReaderServicesActivator::Load(us::ModuleContext* context)
   {
+    m_Context = context;
+
     m_AutoSelectingDICOMReader = std::make_unique<AutoSelectingDICOMReaderService>();
     m_SimpleVolumeDICOMSeriesReader = std::make_unique<SimpleVolumeDICOMSeriesReaderService>();
-    m_ManualSelectingDICOMSeriesReader = std::make_unique<ManualSelectingDICOMReaderService>();
 
     m_DICOMTagsOfInterestService = std::make_unique<DICOMTagsOfInterestService>();
     context->RegisterService<mitk::IDICOMTagsOfInterest>(m_DICOMTagsOfInterestService.get());
@@ -83,12 +85,39 @@ namespace mitk {
     AddPropertyPersistence(mitk::DICOMIOMetaInformationPropertyConstants::READER_PIXEL_SPACING_INTERPRETATION());
     AddPropertyPersistence(mitk::DICOMIOMetaInformationPropertyConstants::READER_PIXEL_SPACING_INTERPRETATION_STRING());
 
+    //We have to handle ManualSelectingDICOMSeriesReader different then the other
+    //readers. Reason: The reader uses in its constructor DICOMFileReaderSelector.
+    //this class needs to access resources of MitkDICOMReader module, which might
+    //not be initialized yet (that would lead to a crash, see i.a. T27553). Thus check if the module
+    //is alreade loaded. If not, register a listener and create the reader as soon
+    //as the module is available.
+    auto dicomModule = us::ModuleRegistry::GetModule("MitkDICOMReader");
+    if (nullptr == dicomModule)
+    {
+      std::lock_guard<std::mutex> lock(m_Mutex);
+      // Listen for events of module life cycle.
+      m_Context->AddModuleListener(this, &DICOMReaderServicesActivator::OnModuleEvent);
+    }
+    else
+    {
+      m_ManualSelectingDICOMSeriesReader = std::make_unique<ManualSelectingDICOMReaderService>();
+    }
   }
 
   void DICOMReaderServicesActivator::Unload(us::ModuleContext*)
   {
   }
 
+  void DICOMReaderServicesActivator::OnModuleEvent(const us::ModuleEvent event)
+  {
+    //We have to handle ManualSelectingDICOMSeriesReader different then the other
+    //readers. For more details the the explinations in the constructor.
+    std::lock_guard<std::mutex> lock(m_Mutex);
+    if (nullptr == m_ManualSelectingDICOMSeriesReader && event.GetModule()->GetName()=="MitkDICOMReader" && event.GetType() == us::ModuleEvent::LOADED)
+    {
+      m_ManualSelectingDICOMSeriesReader = std::make_unique<ManualSelectingDICOMReaderService>();
+    }
+  }
 }
 
 US_EXPORT_MODULE_ACTIVATOR(mitk::DICOMReaderServicesActivator)

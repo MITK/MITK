@@ -33,6 +33,7 @@ set(CPP_FILES
   mitkDICOMReaderConfigurator.cpp
   mitkDICOMFileReaderSelector.cpp
   mitkIDICOMTagsOfInterest.cpp
+  mitkDICOMTagsOfInterestAddHelper.cpp
   mitkDICOMTagPath.cpp
   mitkDICOMProperty.cpp
   mitkDICOMFilesHelper.cpp

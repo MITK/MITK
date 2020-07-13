@@ -196,6 +196,8 @@ private:
 
   mitk::NodePredicateBase::Pointer m_IsNoMaskImagePredicate;
   mitk::NodePredicateBase::Pointer m_IsMaskPredicate;
+  mitk::NodePredicateBase::Pointer m_isValidPDWImagePredicate;
+  mitk::NodePredicateBase::Pointer m_isValidTimeSeriesImagePredicate;
 
   /* Node used for the fit (my be the selected image
   or converted ones (depending on the ui settings */

@@ -23,6 +23,7 @@ void mitk::DICOMTagsOfInterestAddHelper::Activate(us::ModuleContext* context, Ta
     std::lock_guard<std::mutex> lock(m_Mutex);
     m_Active = true;
     m_Context = context;
+    m_TagsOfInterest = tags;
 
     // Listen for events pertaining to dictionary services.
     m_Context->AddServiceListener(this, &DICOMTagsOfInterestAddHelper::DICOMTagsOfInterestServiceChanged,

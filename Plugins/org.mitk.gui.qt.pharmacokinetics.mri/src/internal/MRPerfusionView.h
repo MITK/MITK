@@ -125,10 +125,8 @@ protected:
 
     /*! \brief called by QmitkFunctionality when DataManager's selection has changed
   */
-  void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
-                                  const QList<mitk::DataNode::Pointer>& selectedNodes) override;
 
-  // Variables
+  void OnSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/);
 
   /*! @brief The view's UI controls */
   Ui::MRPerfusionViewControls m_Controls;

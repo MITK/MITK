@@ -59,7 +59,7 @@ found in the LICENSE file.
 #include <QMessageBox>
 #include <QThreadPool>
 #include <QFileDialog>
-#include <QmitkDataStorageComboBox.h>
+#include <QmitkSingleNodeSelectionWidget.h>
 
 
 // Includes for image casting between ITK and MITK
@@ -100,10 +100,29 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
 
   this->InitModelComboBox();
 
+  m_Controls.timeSeriesNodeSelector->SetNodePredicate(this->m_isValidTimeSeriesImagePredicate);
+  m_Controls.timeSeriesNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls.timeSeriesNodeSelector->SetSelectionIsOptional(false);
+  m_Controls.timeSeriesNodeSelector->SetInvalidInfo("Please select time series.");
+
+  m_Controls.maskNodeSelector->SetNodePredicate(this->m_IsMaskPredicate);
+  m_Controls.maskNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls.maskNodeSelector->SetSelectionIsOptional(false);
+  m_Controls.maskNodeSelector->SetInvalidInfo("Please select mask.");
   connect(m_Controls.btnModelling, SIGNAL(clicked()), this, SLOT(OnModellingButtonClicked()));
 
   connect(m_Controls.comboModel, SIGNAL(currentIndexChanged(int)), this, SLOT(OnModellSet(int)));
   connect(m_Controls.radioPixelBased, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
+
+  connect(m_Controls.timeSeriesNodeSelector,
+          &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
+          this,
+          &MRPerfusionView::OnSelectionChanged);
+
+  connect(m_Controls.maskNodeSelector,
+    &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
+    this,
+    &MRPerfusionView::OnSelectionChanged);
 
   //AIF setting
   m_Controls.groupAIF->hide();
@@ -192,10 +211,13 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls.FlipangleSpinBox, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.RelaxivitySpinBox, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.TRSpinBox, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
-  m_Controls.ComboPDWImage->SetDataStorage(this->GetDataStorage());
-  m_Controls.ComboPDWImage->SetPredicate(m_IsNoMaskImagePredicate);
-  m_Controls.ComboPDWImage->setEnabled(false);
-  connect(m_Controls.radioButtonUsingT1viaVFA, SIGNAL(toggled(bool)), m_Controls.ComboPDWImage, SLOT(setEnabled(bool)));
+
+  m_Controls.PDWImageNodeSelector->SetNodePredicate(m_isValidPDWImagePredicate);
+  m_Controls.PDWImageNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls.PDWImageNodeSelector->SetInvalidInfo("Please select PDW Image.");
+  m_Controls.PDWImageNodeSelector->setEnabled(false);
+
+  connect(m_Controls.radioButtonUsingT1viaVFA, SIGNAL(toggled(bool)), m_Controls.PDWImageNodeSelector, SLOT(setEnabled(bool)));
 
   UpdateGUIControls();
 }
@@ -466,36 +488,25 @@ void MRPerfusionView::OnModellingButtonClicked()
 }
 
 
-void MRPerfusionView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
-    const QList<mitk::DataNode::Pointer>& selectedNodes)
+
+void MRPerfusionView::OnSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/)
 {
   m_selectedMaskNode = nullptr;
   m_selectedMask = nullptr;
 
-  m_Controls.masklabel->setText("No (valid) mask selected.");
-  m_Controls.timeserieslabel->setText("No (valid) series selected.");
-
-  QList<mitk::DataNode::Pointer> nodes = selectedNodes;
-
-  if (nodes.size() > 0 && this->m_IsNoMaskImagePredicate->CheckNode(nodes.front()))
+  if (m_Controls.timeSeriesNodeSelector->GetSelectedNode().IsNotNull())
   {
-    this->m_selectedNode = nodes.front();
-    auto selectedImage = dynamic_cast<mitk::Image*>(this->m_selectedNode->GetData());
-    m_Controls.timeserieslabel->setText((this->m_selectedNode->GetName()).c_str());
+    this->m_selectedNode = m_Controls.timeSeriesNodeSelector->GetSelectedNode();
+    m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
 
-    if (selectedImage != this->m_selectedImage)
+    if (m_selectedImage)
     {
-      if (selectedImage)
-      {
-        this->m_Controls.initialValuesManager->setReferenceImageGeometry(selectedImage->GetGeometry());
-      }
-      else
-      {
-        this->m_Controls.initialValuesManager->setReferenceImageGeometry(nullptr);
-      }
+      this->m_Controls.initialValuesManager->setReferenceImageGeometry(m_selectedImage->GetGeometry());
     }
-    this->m_selectedImage = selectedImage;
-    nodes.pop_front();
+    else
+    {
+      this->m_Controls.initialValuesManager->setReferenceImageGeometry(nullptr);
+    }
   }
   else
   {
@@ -504,24 +515,23 @@ void MRPerfusionView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source
     this->m_Controls.initialValuesManager->setReferenceImageGeometry(nullptr);
   }
 
-  if (nodes.size() > 0 && this->m_IsMaskPredicate->CheckNode(nodes.front()))
-  {
-      this->m_selectedMaskNode = nodes.front();
-      this->m_selectedMask = dynamic_cast<mitk::Image*>(this->m_selectedMaskNode->GetData());
 
-      if (this->m_selectedMask->GetTimeSteps() > 1)
+  if (m_Controls.maskNodeSelector->GetSelectedNode().IsNotNull())
+  {
+    this->m_selectedMaskNode = m_Controls.maskNodeSelector->GetSelectedNode();
+      this->m_selectedMask = dynamic_cast<mitk::Image*>(m_selectedMaskNode->GetData());
+
+      if (this->m_selectedMask.IsNotNull() && this->m_selectedMask->GetTimeSteps() > 1)
       {
         MITK_INFO <<
                   "Selected mask has multiple timesteps. Only use first timestep to mask model fit. Mask name: " <<
-                  m_selectedMaskNode->GetName();
+                  m_Controls.maskNodeSelector->GetSelectedNode()->GetName();
         mitk::ImageTimeSelector::Pointer maskedImageTimeSelector = mitk::ImageTimeSelector::New();
         maskedImageTimeSelector->SetInput(this->m_selectedMask);
         maskedImageTimeSelector->SetTimeNr(0);
         maskedImageTimeSelector->UpdateLargestPossibleRegion();
         this->m_selectedMask = maskedImageTimeSelector->GetOutput();
       }
-
-      m_Controls.masklabel->setText((this->m_selectedMaskNode->GetName()).c_str());
   }
 
   if (m_selectedMask.IsNull())
@@ -587,7 +597,7 @@ bool MRPerfusionView::CheckModelSettings() const
           ok = ok && (m_Controls.FlipangleSpinBox->value() > 0);
           ok = ok && (m_Controls.TRSpinBox->value() > 0);
           ok = ok && (m_Controls.RelaxivitySpinBox->value() > 0);
-          ok = ok && (m_Controls.ComboPDWImage->GetSelectedNode().IsNotNull());
+          ok = ok && (m_Controls.PDWImageNodeSelector->GetSelectedNode().IsNotNull());
           ok = ok && CheckBaselineSelectionSettings();
         }
         else if (this->m_Controls.radioButtonNoConversion->isChecked())
@@ -639,7 +649,7 @@ bool MRPerfusionView::CheckModelSettings() const
         ok = ok && (m_Controls.FlipangleSpinBox->value() > 0);
         ok = ok && (m_Controls.TRSpinBox->value() > 0);
         ok = ok && (m_Controls.RelaxivitySpinBox->value() > 0);
-        ok = ok && (m_Controls.ComboPDWImage->GetSelectedNode().IsNotNull());
+        ok = ok && (m_Controls.PDWImageNodeSelector->GetSelectedNode().IsNotNull());
         ok = ok && CheckBaselineSelectionSettings();
       }
       else if (this->m_Controls.radioButtonNoConversion->isChecked())
@@ -1106,7 +1116,7 @@ MRPerfusionView::MRPerfusionView() : m_FittingInProgress(false), m_HasGeneratedN
 
   this->m_IsNoMaskImagePredicate = mitk::NodePredicateAnd::New(isNoMask, mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
 
-  this->m_isValidTimeSeriesImagePredicate = mitk::NodePredicateFunction::New([](const mitk::DataNode* node)
+  auto isDynamicData = mitk::NodePredicateFunction::New([](const mitk::DataNode* node)
   {
     return  (node && node->GetData() && node->GetData()->GetTimeSteps() > 1);
   });
@@ -1117,6 +1127,7 @@ MRPerfusionView::MRPerfusionView() : m_FittingInProgress(false), m_HasGeneratedN
   });
 
   this->m_isValidPDWImagePredicate = mitk::NodePredicateAnd::New(is3DImage, isNoModelFitNodePredicate);
+  this->m_isValidTimeSeriesImagePredicate = mitk::NodePredicateAnd::New(isDynamicData, isImage, isNoMask);
 }
 
 void MRPerfusionView::OnJobFinished()
@@ -1235,7 +1246,7 @@ mitk::Image::Pointer MRPerfusionView::ConvertConcentrationImage(bool AIFMode)
   {
       concentrationGen->SetRecoveryTime(m_Controls.TRSpinBox->value());
       concentrationGen->SetRelaxivity(m_Controls.RelaxivitySpinBox->value());
-      concentrationGen->SetT10Image(dynamic_cast<mitk::Image*>(m_Controls.ComboPDWImage->GetSelectedNode()->GetData()));
+      concentrationGen->SetT10Image(dynamic_cast<mitk::Image*>(m_Controls.PDWImageNodeSelector->GetSelectedNode()->GetData()));
       concentrationGen->SetBaselineStartTimeStep(m_Controls.spinBox_baselineStartTimeStep->value());
       concentrationGen->SetBaselineEndTimeStep(m_Controls.spinBox_baselineEndTimeStep->value());
       //Convert Flipangle from degree to radiant

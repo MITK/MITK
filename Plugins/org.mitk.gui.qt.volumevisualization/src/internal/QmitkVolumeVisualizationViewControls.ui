@@ -107,6 +107,11 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>QmitkSingleNodeSelectionWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkSingleNodeSelectionWidget.h</header>
+  </customwidget>
+  <customwidget>
    <class>QmitkTransferFunctionWidget</class>
    <extends>QWidget</extends>
    <header location="global">QmitkTransferFunctionWidget.h</header>

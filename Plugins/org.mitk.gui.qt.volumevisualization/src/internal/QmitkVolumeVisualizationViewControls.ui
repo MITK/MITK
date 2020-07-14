@@ -21,48 +21,36 @@
   </property>
   <layout class="QVBoxLayout">
    <item>
-    <widget class="QLabel" name="m_ErrorImageLabel">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="m_NoSelectedImageLabel">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text">
-      <string>Please select a volume image</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="m_SelectedImageLabel">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
+   <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="volumeSelectionLabel">
+       <property name="text">
+        <string>Selected image:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QmitkSingleNodeSelectionWidget" name="volumeSelectionWidget" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>40</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+	</layout>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QCheckBox" name="m_EnableRenderingCB">
+      <widget class="QCheckBox" name="enableRenderingCB">
        <property name="toolTip">
         <string>Click this checkbox to enable volumerendering in the 3D view of the selected image</string>
        </property>
@@ -72,7 +60,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="m_RenderMode">
+      <widget class="QComboBox" name="renderMode">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -85,12 +73,12 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="m_BlendMode"/>
+      <widget class="QComboBox" name="blendMode"/>
      </item>
     </layout>
    </item>
    <item>
-    <widget class="QmitkTransferFunctionGeneratorWidget" name="m_TransferFunctionGeneratorWidget" native="true">
+    <widget class="QmitkTransferFunctionGeneratorWidget" name="transferFunctionGeneratorWidget" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
        <horstretch>0</horstretch>
@@ -106,7 +94,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QmitkTransferFunctionWidget" name="m_TransferFunctionWidget" native="true">
+    <widget class="QmitkTransferFunctionWidget" name="transferFunctionWidget" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -130,9 +118,6 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <includes>
-  <include location="local">QmitkDataStorageComboBox.h</include>
- </includes>
  <resources/>
  <connections/>
 </ui>

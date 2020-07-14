@@ -34,6 +34,12 @@ found in the LICENSE file.
 #include <mitkTransferFunctionInitializer.h>
 #include <mitkTransferFunctionProperty.h>
 
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateDimension.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateOr.h>
+#include <mitkNodePredicateProperty.h>
 #include "mitkBaseRenderer.h"
 
 #include "mitkVtkVolumeRenderingProperty.h"
@@ -66,43 +72,51 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
   m_Controls = new Ui::QmitkVolumeVisualizationViewControls;
   m_Controls->setupUi(parent);
 
+  m_Controls->volumeSelectionWidget->SetDataStorage(GetDataStorage());
+  m_Controls->volumeSelectionWidget->SetNodePredicate(mitk::NodePredicateAnd::New(
+    mitk::TNodePredicateDataType<mitk::Image>::New(),
+    mitk::NodePredicateOr::New(mitk::NodePredicateDimension::New(3), mitk::NodePredicateDimension::New(4)),
+    mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))));
+
+  m_Controls->volumeSelectionWidget->SetSelectionIsOptional(true);
+  m_Controls->volumeSelectionWidget->SetEmptyInfo(QString("Please select a 3D / 4D image volume"));
+  m_Controls->volumeSelectionWidget->SetPopUpTitel(QString("Select image volume"));
   // Fill the transfer function presets in the generator widget
   std::vector<std::string> names;
   mitk::TransferFunctionInitializer::GetPresetNames(names);
   for (const auto& name : names)
   {
-    m_Controls->m_TransferFunctionGeneratorWidget->AddPreset(QString::fromStdString(name));
+    m_Controls->transferFunctionGeneratorWidget->AddPreset(QString::fromStdString(name));
   }
 
   // see enum in vtkSmartVolumeMapper
-  m_Controls->m_RenderMode->addItem("Default");
-  m_Controls->m_RenderMode->addItem("RayCast");
-  m_Controls->m_RenderMode->addItem("GPU");
+  m_Controls->renderMode->addItem("Default");
+  m_Controls->renderMode->addItem("RayCast");
+  m_Controls->renderMode->addItem("GPU");
 
   // see vtkVolumeMapper::BlendModes
-  m_Controls->m_BlendMode->addItem("Comp");
-  m_Controls->m_BlendMode->addItem("Max");
-  m_Controls->m_BlendMode->addItem("Min");
-  m_Controls->m_BlendMode->addItem("Avg");
-  m_Controls->m_BlendMode->addItem("Add");
+  m_Controls->blendMode->addItem("Comp");
+  m_Controls->blendMode->addItem("Max");
+  m_Controls->blendMode->addItem("Min");
+  m_Controls->blendMode->addItem("Avg");
+  m_Controls->blendMode->addItem("Add");
 
-  connect(m_Controls->m_EnableRenderingCB, SIGNAL(toggled(bool)), this, SLOT(OnEnableRendering(bool)));
-  connect(m_Controls->m_RenderMode, SIGNAL(activated(int)), this, SLOT(OnRenderMode(int)));
-  connect(m_Controls->m_BlendMode, SIGNAL(activated(int)), this, SLOT(OnBlendMode(int)));
+  connect(m_Controls->volumeSelectionWidget, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,
+    this, &QmitkVolumeVisualizationView::OnCurrentSelectionChanged);
+  connect(m_Controls->enableRenderingCB, SIGNAL(toggled(bool)), this, SLOT(OnEnableRendering(bool)));
+  connect(m_Controls->renderMode, SIGNAL(activated(int)), this, SLOT(OnRenderMode(int)));
+  connect(m_Controls->blendMode, SIGNAL(activated(int)), this, SLOT(OnBlendMode(int)));
 
-  connect(m_Controls->m_TransferFunctionGeneratorWidget, SIGNAL(SignalUpdateCanvas()),
-          m_Controls->m_TransferFunctionWidget, SLOT(OnUpdateCanvas()));
-  connect(m_Controls->m_TransferFunctionGeneratorWidget, SIGNAL(SignalTransferFunctionModeChanged(int)),
+  connect(m_Controls->transferFunctionGeneratorWidget, SIGNAL(SignalUpdateCanvas()),
+          m_Controls->transferFunctionWidget, SLOT(OnUpdateCanvas()));
+  connect(m_Controls->transferFunctionGeneratorWidget, SIGNAL(SignalTransferFunctionModeChanged(int)),
           SLOT(OnMitkInternalPreset(int)));
 
-  m_Controls->m_EnableRenderingCB->setEnabled(false);
-  m_Controls->m_BlendMode->setEnabled(false);
-  m_Controls->m_RenderMode->setEnabled(false);
-  m_Controls->m_TransferFunctionWidget->setEnabled(false);
-  m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(false);
-
-  m_Controls->m_SelectedImageLabel->hide();
-  m_Controls->m_ErrorImageLabel->hide();
+  m_Controls->enableRenderingCB->setEnabled(false);
+  m_Controls->blendMode->setEnabled(false);
+  m_Controls->renderMode->setEnabled(false);
+  m_Controls->transferFunctionWidget->setEnabled(false);
+  m_Controls->transferFunctionGeneratorWidget->setEnabled(false);
 }
 
 void QmitkVolumeVisualizationView::OnMitkInternalPreset(int mode)
@@ -124,71 +138,25 @@ void QmitkVolumeVisualizationView::OnMitkInternalPreset(int mode)
     mitk::TransferFunctionInitializer::Pointer tfInit = mitk::TransferFunctionInitializer::New(transferFuncProp->GetValue());
     tfInit->SetTransferFunctionMode(mode);
     RequestRenderWindowUpdate();
-    m_Controls->m_TransferFunctionWidget->OnUpdateCanvas();
+    m_Controls->transferFunctionWidget->OnUpdateCanvas();
   }
 }
 
-void QmitkVolumeVisualizationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer> &nodes)
+void QmitkVolumeVisualizationView::OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
 {
-  bool weHadAnImageButItsNotThreeDeeOrFourDee = false;
+  m_SelectedNode = nullptr;
 
-  mitk::DataNode::Pointer node;
-  for (mitk::DataNode::Pointer currentNode : nodes)
+  if (nodes.empty() || nodes.front().IsNull())
   {
-    if (currentNode.IsNotNull() && dynamic_cast<mitk::Image*>(currentNode->GetData()))
-    {
-      if (dynamic_cast<mitk::Image*>(currentNode->GetData())->GetDimension() >= 3)
-      {
-        if (node.IsNull())
-        {
-          node = currentNode;
-        }
-      }
-      else
-      {
-        weHadAnImageButItsNotThreeDeeOrFourDee = true;
-      }
-    }
+    UpdateInterface();
+    return;
   }
 
-  if (node.IsNotNull())
+  auto selectedNode = nodes.front();
+  auto image = dynamic_cast<mitk::Image*>(selectedNode->GetData());
+  if (nullptr != image)
   {
-    m_Controls->m_NoSelectedImageLabel->hide();
-    m_Controls->m_ErrorImageLabel->hide();
-    m_Controls->m_SelectedImageLabel->show();
-
-    std::string infoText;
-
-    if (node->GetName().empty())
-    {
-      infoText = std::string("Selected Image: [currently selected image has no name]");
-    }
-    else
-    {
-      infoText = std::string("Selected Image: ") + node->GetName();
-    }
-
-    m_Controls->m_SelectedImageLabel->setText(QString(infoText.c_str()));
-    m_SelectedNode = node;
-  }
-  else
-  {
-    if (weHadAnImageButItsNotThreeDeeOrFourDee)
-    {
-      m_Controls->m_NoSelectedImageLabel->hide();
-      m_Controls->m_ErrorImageLabel->show();
-      std::string infoText;
-      infoText = std::string("only 3D or 4D images are supported");
-      m_Controls->m_ErrorImageLabel->setText(QString(infoText.c_str()));
-    }
-    else
-    {
-      m_Controls->m_SelectedImageLabel->hide();
-      m_Controls->m_ErrorImageLabel->hide();
-      m_Controls->m_NoSelectedImageLabel->show();
-    }
-
-    m_SelectedNode = nullptr;
+    m_SelectedNode = selectedNode;
   }
 
   UpdateInterface();
@@ -263,20 +231,20 @@ void QmitkVolumeVisualizationView::UpdateInterface()
   if (m_SelectedNode.IsExpired())
   {
     // turnoff all
-    m_Controls->m_EnableRenderingCB->setChecked(false);
-    m_Controls->m_EnableRenderingCB->setEnabled(false);
+    m_Controls->enableRenderingCB->setChecked(false);
+    m_Controls->enableRenderingCB->setEnabled(false);
 
-    m_Controls->m_BlendMode->setCurrentIndex(0);
-    m_Controls->m_BlendMode->setEnabled(false);
+    m_Controls->blendMode->setCurrentIndex(0);
+    m_Controls->blendMode->setEnabled(false);
 
-    m_Controls->m_RenderMode->setCurrentIndex(0);
-    m_Controls->m_RenderMode->setEnabled(false);
+    m_Controls->renderMode->setCurrentIndex(0);
+    m_Controls->renderMode->setEnabled(false);
 
-    m_Controls->m_TransferFunctionWidget->SetDataNode(nullptr);
-    m_Controls->m_TransferFunctionWidget->setEnabled(false);
+    m_Controls->transferFunctionWidget->SetDataNode(nullptr);
+    m_Controls->transferFunctionWidget->setEnabled(false);
 
-    m_Controls->m_TransferFunctionGeneratorWidget->SetDataNode(nullptr);
-    m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(false);
+    m_Controls->transferFunctionGeneratorWidget->SetDataNode(nullptr);
+    m_Controls->transferFunctionGeneratorWidget->setEnabled(false);
     return;
   }
 
@@ -284,29 +252,29 @@ void QmitkVolumeVisualizationView::UpdateInterface()
   auto selectedNode = m_SelectedNode.Lock();
 
   selectedNode->GetBoolProperty("volumerendering", enabled);
-  m_Controls->m_EnableRenderingCB->setEnabled(true);
-  m_Controls->m_EnableRenderingCB->setChecked(enabled);
+  m_Controls->enableRenderingCB->setEnabled(true);
+  m_Controls->enableRenderingCB->setChecked(enabled);
 
   if (!enabled)
   {
     // turnoff all except volumerendering checkbox
-    m_Controls->m_BlendMode->setCurrentIndex(0);
-    m_Controls->m_BlendMode->setEnabled(false);
+    m_Controls->blendMode->setCurrentIndex(0);
+    m_Controls->blendMode->setEnabled(false);
 
-    m_Controls->m_RenderMode->setCurrentIndex(0);
-    m_Controls->m_RenderMode->setEnabled(false);
+    m_Controls->renderMode->setCurrentIndex(0);
+    m_Controls->renderMode->setEnabled(false);
 
-    m_Controls->m_TransferFunctionWidget->SetDataNode(nullptr);
-    m_Controls->m_TransferFunctionWidget->setEnabled(false);
+    m_Controls->transferFunctionWidget->SetDataNode(nullptr);
+    m_Controls->transferFunctionWidget->setEnabled(false);
 
-    m_Controls->m_TransferFunctionGeneratorWidget->SetDataNode(nullptr);
-    m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(false);
+    m_Controls->transferFunctionGeneratorWidget->SetDataNode(nullptr);
+    m_Controls->transferFunctionGeneratorWidget->setEnabled(false);
     return;
   }
 
   // otherwise we can activate em all
-  m_Controls->m_BlendMode->setEnabled(true);
-  m_Controls->m_RenderMode->setEnabled(true);
+  m_Controls->blendMode->setEnabled(true);
+  m_Controls->renderMode->setEnabled(true);
 
   // Determine Combo Box mode
   {
@@ -319,10 +287,10 @@ void QmitkVolumeVisualizationView::UpdateInterface()
 
     int blendMode;
     if (selectedNode->GetIntProperty("volumerendering.blendmode", blendMode))
-      m_Controls->m_BlendMode->setCurrentIndex(blendMode);
+      m_Controls->blendMode->setCurrentIndex(blendMode);
 
     if (usemip)
-      m_Controls->m_BlendMode->setCurrentIndex(vtkVolumeMapper::MAXIMUM_INTENSITY_BLEND);
+      m_Controls->blendMode->setCurrentIndex(vtkVolumeMapper::MAXIMUM_INTENSITY_BLEND);
 
     int mode = DEFAULT_RENDERMODE;
 
@@ -331,23 +299,11 @@ void QmitkVolumeVisualizationView::UpdateInterface()
     else if (usegpu)
       mode = GPU_RENDERMODE;
 
-    m_Controls->m_RenderMode->setCurrentIndex(mode);
+    m_Controls->renderMode->setCurrentIndex(mode);
   }
 
-  m_Controls->m_TransferFunctionWidget->SetDataNode(selectedNode);
-  m_Controls->m_TransferFunctionWidget->setEnabled(true);
-  m_Controls->m_TransferFunctionGeneratorWidget->SetDataNode(selectedNode);
-  m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(true);
-}
-
-void QmitkVolumeVisualizationView::NodeRemoved(const mitk::DataNode* node)
-{
-  if (m_SelectedNode == node)
-  {
-    m_SelectedNode = nullptr;
-    m_Controls->m_SelectedImageLabel->hide();
-    m_Controls->m_ErrorImageLabel->hide();
-    m_Controls->m_NoSelectedImageLabel->show();
-    UpdateInterface();
-  }
+  m_Controls->transferFunctionWidget->SetDataNode(selectedNode);
+  m_Controls->transferFunctionWidget->setEnabled(true);
+  m_Controls->transferFunctionGeneratorWidget->SetDataNode(selectedNode);
+  m_Controls->transferFunctionGeneratorWidget->setEnabled(true);
 }

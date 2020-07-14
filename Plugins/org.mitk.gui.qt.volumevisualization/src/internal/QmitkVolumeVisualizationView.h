@@ -38,9 +38,9 @@ public:
 
   void SetFocus() override;
 
-  void OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes) override;
+private Q_SLOTS:
 
-protected Q_SLOTS:
+  void OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
   void OnMitkInternalPreset(int mode);
   void OnEnableRendering(bool state);
@@ -52,10 +52,8 @@ private:
   void CreateQtPartControl(QWidget* parent) override;
 
   void UpdateInterface();
-  void NodeRemoved(const mitk::DataNode *node) override;
 
   Ui::QmitkVolumeVisualizationViewControls* m_Controls;
-
   mitk::WeakPointer<mitk::DataNode> m_SelectedNode;
 
 };

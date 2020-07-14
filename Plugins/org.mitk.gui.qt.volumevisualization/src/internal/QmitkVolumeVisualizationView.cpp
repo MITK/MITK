@@ -12,24 +12,10 @@ found in the LICENSE file.
 
 #include "QmitkVolumeVisualizationView.h"
 
-#include <QComboBox>
-
 #include <vtkSmartVolumeMapper.h>
-#include <vtkVersionMacros.h>
 
-#include <berryISelectionProvider.h>
-#include <berryISelectionService.h>
-#include <berryIWorkbenchWindow.h>
-//#include <berryISelectionService.h>
-#include <mitkDataNodeObject.h>
 #include <mitkImage.h>
 
-#include <mitkNodePredicateDataType.h>
-#include <mitkProperties.h>
-
-#include "QmitkColorTransferFunctionCanvas.h"
-#include "QmitkPiecewiseFunctionCanvas.h"
-#include "mitkHistogramGenerator.h"
 #include <mitkTransferFunction.h>
 #include <mitkTransferFunctionInitializer.h>
 #include <mitkTransferFunctionProperty.h>
@@ -40,13 +26,8 @@ found in the LICENSE file.
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateOr.h>
 #include <mitkNodePredicateProperty.h>
-#include "mitkBaseRenderer.h"
 
-#include "mitkVtkVolumeRenderingProperty.h"
-
-#include <mitkIRenderingManager.h>
-
-#include <QToolTip>
+#include <mitkProperties.h>
 
 const std::string QmitkVolumeVisualizationView::VIEW_ID = "org.mitk.views.volumevisualization";
 
@@ -81,6 +62,7 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
   m_Controls->volumeSelectionWidget->SetSelectionIsOptional(true);
   m_Controls->volumeSelectionWidget->SetEmptyInfo(QString("Please select a 3D / 4D image volume"));
   m_Controls->volumeSelectionWidget->SetPopUpTitel(QString("Select image volume"));
+
   // Fill the transfer function presets in the generator widget
   std::vector<std::string> names;
   mitk::TransferFunctionInitializer::GetPresetNames(names);

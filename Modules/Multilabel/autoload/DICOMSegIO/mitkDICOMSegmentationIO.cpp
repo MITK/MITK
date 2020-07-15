@@ -47,41 +47,38 @@ namespace mitk
     AbstractFileWriter::SetRanking(10);
     AbstractFileReader::SetRanking(10);
     this->RegisterService();
-
-    this->AddDICOMTagsToService();
   }
 
-  void DICOMSegmentationIO::AddDICOMTagsToService()
+  std::vector<mitk::DICOMTagPath> DICOMSegmentationIO::GetDICOMTagsOfInterest()
   {
-    IDICOMTagsOfInterest *toiService = GetDicomTagsOfInterestService();
-    if (toiService != nullptr)
-    {
-      toiService->AddTagOfInterest(DICOMSegmentationConstants::SEGMENT_SEQUENCE_PATH());
+    std::vector<mitk::DICOMTagPath> result;
+    result.emplace_back(DICOMSegmentationConstants::SEGMENT_SEQUENCE_PATH());
 
-      toiService->AddTagOfInterest(DICOMSegmentationConstants::SEGMENT_NUMBER_PATH());
-      toiService->AddTagOfInterest(DICOMSegmentationConstants::SEGMENT_LABEL_PATH());
-      toiService->AddTagOfInterest(DICOMSegmentationConstants::SEGMENT_ALGORITHM_TYPE_PATH());
+    result.emplace_back(DICOMSegmentationConstants::SEGMENT_NUMBER_PATH());
+    result.emplace_back(DICOMSegmentationConstants::SEGMENT_LABEL_PATH());
+    result.emplace_back(DICOMSegmentationConstants::SEGMENT_ALGORITHM_TYPE_PATH());
 
-      toiService->AddTagOfInterest(DICOMSegmentationConstants::ANATOMIC_REGION_SEQUENCE_PATH());
-      toiService->AddTagOfInterest(DICOMSegmentationConstants::ANATOMIC_REGION_CODE_VALUE_PATH());
-      toiService->AddTagOfInterest(DICOMSegmentationConstants::ANATOMIC_REGION_CODE_SCHEME_PATH());
-      toiService->AddTagOfInterest(DICOMSegmentationConstants::ANATOMIC_REGION_CODE_MEANING_PATH());
+    result.emplace_back(DICOMSegmentationConstants::ANATOMIC_REGION_SEQUENCE_PATH());
+    result.emplace_back(DICOMSegmentationConstants::ANATOMIC_REGION_CODE_VALUE_PATH());
+    result.emplace_back(DICOMSegmentationConstants::ANATOMIC_REGION_CODE_SCHEME_PATH());
+    result.emplace_back(DICOMSegmentationConstants::ANATOMIC_REGION_CODE_MEANING_PATH());
 
-      toiService->AddTagOfInterest(DICOMSegmentationConstants::SEGMENTED_PROPERTY_CATEGORY_SEQUENCE_PATH());
-      toiService->AddTagOfInterest(DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_VALUE_PATH());
-      toiService->AddTagOfInterest(DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_SCHEME_PATH());
-      toiService->AddTagOfInterest(DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_MEANING_PATH());
+    result.emplace_back(DICOMSegmentationConstants::SEGMENTED_PROPERTY_CATEGORY_SEQUENCE_PATH());
+    result.emplace_back(DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_VALUE_PATH());
+    result.emplace_back(DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_SCHEME_PATH());
+    result.emplace_back(DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_MEANING_PATH());
 
-      toiService->AddTagOfInterest(DICOMSegmentationConstants::SEGMENTED_PROPERTY_TYPE_SEQUENCE_PATH());
-      toiService->AddTagOfInterest(DICOMSegmentationConstants::SEGMENT_TYPE_CODE_VALUE_PATH());
-      toiService->AddTagOfInterest(DICOMSegmentationConstants::SEGMENT_TYPE_CODE_SCHEME_PATH());
-      toiService->AddTagOfInterest(DICOMSegmentationConstants::SEGMENT_TYPE_CODE_MEANING_PATH());
+    result.emplace_back(DICOMSegmentationConstants::SEGMENTED_PROPERTY_TYPE_SEQUENCE_PATH());
+    result.emplace_back(DICOMSegmentationConstants::SEGMENT_TYPE_CODE_VALUE_PATH());
+    result.emplace_back(DICOMSegmentationConstants::SEGMENT_TYPE_CODE_SCHEME_PATH());
+    result.emplace_back(DICOMSegmentationConstants::SEGMENT_TYPE_CODE_MEANING_PATH());
 
-      toiService->AddTagOfInterest(DICOMSegmentationConstants::SEGMENTED_PROPERTY_MODIFIER_SEQUENCE_PATH());
-      toiService->AddTagOfInterest(DICOMSegmentationConstants::SEGMENT_MODIFIER_CODE_VALUE_PATH());
-      toiService->AddTagOfInterest(DICOMSegmentationConstants::SEGMENT_MODIFIER_CODE_SCHEME_PATH());
-      toiService->AddTagOfInterest(DICOMSegmentationConstants::SEGMENT_MODIFIER_CODE_MEANING_PATH());
-    }
+    result.emplace_back(DICOMSegmentationConstants::SEGMENTED_PROPERTY_MODIFIER_SEQUENCE_PATH());
+    result.emplace_back(DICOMSegmentationConstants::SEGMENT_MODIFIER_CODE_VALUE_PATH());
+    result.emplace_back(DICOMSegmentationConstants::SEGMENT_MODIFIER_CODE_SCHEME_PATH());
+    result.emplace_back(DICOMSegmentationConstants::SEGMENT_MODIFIER_CODE_MEANING_PATH());
+
+    return result;
   }
 
   IFileIO::ConfidenceLevel DICOMSegmentationIO::GetWriterConfidenceLevel() const

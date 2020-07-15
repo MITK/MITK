@@ -16,7 +16,11 @@ found in the LICENSE file.
 #include <mitkAbstractFileIO.h>
 #include <mitkLabelSetImage.h>
 
+#include <mitkDICOMTagsOfInterestAddHelper.h>
+
 #include <dcmqi/JSONSegmentationMetaInformationHandler.h>
+
+#include <memory>
 
 namespace mitk
 {
@@ -43,6 +47,9 @@ namespace mitk
 
     void Write() override;
     ConfidenceLevel GetWriterConfidenceLevel() const override;
+
+    static std::vector<mitk::DICOMTagPath> GetDICOMTagsOfInterest();
+
   protected:
     /**
      * @brief Reads a number of DICOM segmentation from the file system
@@ -57,7 +64,6 @@ namespace mitk
     // -------------- DICOMSegmentationIO specific functions -------------
     const std::string CreateMetaDataJsonFile(int layer);
     void SetLabelProperties(Label *label, dcmqi::SegmentAttributes *segmentAttribute);
-    void AddDICOMTagsToService();
   };
 } // end of namespace mitk
 

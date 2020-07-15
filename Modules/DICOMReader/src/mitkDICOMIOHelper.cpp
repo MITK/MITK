@@ -27,7 +27,7 @@ namespace mitk
     us::ModuleContext *context = us::GetModuleContext();
     if (context == nullptr)
     {
-      MITK_WARN << "No dicom context found.";
+      MITK_WARN << "No MitkDICOMReader module context found.";
       return result;
     }
     std::vector<us::ServiceReference<mitk::IDICOMTagsOfInterest>> toiRegisters =

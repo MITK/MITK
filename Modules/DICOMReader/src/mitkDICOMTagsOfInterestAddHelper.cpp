@@ -76,7 +76,7 @@ mitk::DICOMTagsOfInterestAddHelper::~DICOMTagsOfInterestAddHelper()
     {
       try
       {
-        m_Context->RemoveServiceListener(this, &DICOMTagsOfInterestAddHelper::DICOMTagsOfInterestServiceChanged);
+        context->RemoveServiceListener(this, &DICOMTagsOfInterestAddHelper::DICOMTagsOfInterestServiceChanged);
       }
       catch (...)
       {

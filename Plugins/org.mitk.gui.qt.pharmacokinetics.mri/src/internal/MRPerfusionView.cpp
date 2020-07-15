@@ -104,6 +104,7 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   m_Controls.timeSeriesNodeSelector->SetDataStorage(this->GetDataStorage());
   m_Controls.timeSeriesNodeSelector->SetSelectionIsOptional(false);
   m_Controls.timeSeriesNodeSelector->SetInvalidInfo("Please select time series.");
+  m_Controls.timeSeriesNodeSelector->SetAutoSelectNewNodes(true);
 
   m_Controls.maskNodeSelector->SetNodePredicate(this->m_IsMaskPredicate);
   m_Controls.maskNodeSelector->SetDataStorage(this->GetDataStorage());

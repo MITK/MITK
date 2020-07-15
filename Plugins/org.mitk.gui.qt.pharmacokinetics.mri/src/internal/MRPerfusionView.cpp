@@ -130,26 +130,27 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   m_Controls.btnAIFFile->setEnabled(false);
   m_Controls.btnAIFFile->setEnabled(false);
   m_Controls.radioAIFImage->setChecked(true);
-  m_Controls.comboAIFMask->SetDataStorage(this->GetDataStorage());
-  m_Controls.comboAIFMask->SetPredicate(m_IsMaskPredicate);
-  m_Controls.comboAIFMask->setVisible(true);
-  m_Controls.comboAIFMask->setEnabled(true);
-  m_Controls.comboAIFImage->SetDataStorage(this->GetDataStorage());
-  m_Controls.comboAIFImage->SetPredicate(m_IsNoMaskImagePredicate);
-  m_Controls.comboAIFImage->setEnabled(false);
+  m_Controls.AIFMaskNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls.AIFMaskNodeSelector->SetNodePredicate(m_IsMaskPredicate);
+  m_Controls.AIFMaskNodeSelector->setVisible(true);
+  m_Controls.AIFMaskNodeSelector->setEnabled(true);
+  m_Controls.AIFImageNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls.AIFImageNodeSelector->SetNodePredicate(this->m_isValidTimeSeriesImagePredicate);
+  m_Controls.AIFImageNodeSelector->setEnabled(false);
+
   m_Controls.checkDedicatedAIFImage->setEnabled(true);
   m_Controls.HCLSpinBox->setValue(mitk::AterialInputFunctionGenerator::DEFAULT_HEMATOCRIT_LEVEL);
   m_Controls.spinBox_baselineEndTimeStep->setMinimum(0);
   m_Controls.spinBox_baselineStartTimeStep->setMinimum(0);
 
-  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.comboAIFMask, SLOT(setVisible(bool)));
+  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFMaskNodeSelector, SLOT(setVisible(bool)));
   connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.labelAIFMask, SLOT(setVisible(bool)));
   connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.checkDedicatedAIFImage, SLOT(setVisible(bool)));
-  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.comboAIFMask, SLOT(setEnabled(bool)));
+  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFMaskNodeSelector, SLOT(setEnabled(bool)));
   connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.checkDedicatedAIFImage, SLOT(setEnabled(bool)));
   connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.checkDedicatedAIFImage, SLOT(setVisible(bool)));
-  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.comboAIFImage, SLOT(setVisible(bool)));
-  connect(m_Controls.checkDedicatedAIFImage, SIGNAL(toggled(bool)), m_Controls.comboAIFImage, SLOT(setEnabled(bool)));
+  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFImageNodeSelector, SLOT(setVisible(bool)));
+  connect(m_Controls.checkDedicatedAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFImageNodeSelector, SLOT(setEnabled(bool)));
   connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
   connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), m_Controls.btnAIFFile, SLOT(setEnabled(bool)));
   connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), m_Controls.aifFilePath, SLOT(setEnabled(bool)));
@@ -614,11 +615,11 @@ bool MRPerfusionView::CheckModelSettings() const
     {
       if (this->m_Controls.radioAIFImage->isChecked())
       {
-        ok = ok && m_Controls.comboAIFMask->GetSelectedNode().IsNotNull();
+        ok = ok && m_Controls.AIFMaskNodeSelector->GetSelectedNode().IsNotNull();
 
         if (this->m_Controls.checkDedicatedAIFImage->isChecked())
         {
-          ok = ok && m_Controls.comboAIFImage->GetSelectedNode().IsNotNull();
+          ok = ok && m_Controls.AIFImageNodeSelector->GetSelectedNode().IsNotNull();
         }
       }
       else if (this->m_Controls.radioAIFFile->isChecked())
@@ -1127,6 +1128,7 @@ MRPerfusionView::MRPerfusionView() : m_FittingInProgress(false), m_HasGeneratedN
     return isNoModelFitNode;
   });
 
+
   this->m_isValidPDWImagePredicate = mitk::NodePredicateAnd::New(is3DImage, isNoModelFitNodePredicate);
   this->m_isValidTimeSeriesImagePredicate = mitk::NodePredicateAnd::New(isDynamicData, isImage, isNoMask);
 }
@@ -1309,7 +1311,7 @@ void MRPerfusionView::GetAIF(mitk::AIFBasedModelBase::AterialInputFunctionType& 
     aifGenerator->SetHCL(this->m_Controls.HCLSpinBox->value());
 
     //mask settings
-    this->m_selectedAIFMaskNode = m_Controls.comboAIFMask->GetSelectedNode();
+    this->m_selectedAIFMaskNode = m_Controls.AIFMaskNodeSelector->GetSelectedNode();
     this->m_selectedAIFMask = dynamic_cast<mitk::Image*>(this->m_selectedAIFMaskNode->GetData());
 
     if (this->m_selectedAIFMask->GetTimeSteps() > 1)
@@ -1333,7 +1335,7 @@ void MRPerfusionView::GetAIF(mitk::AIFBasedModelBase::AterialInputFunctionType& 
     //image settings
     if (this->m_Controls.checkDedicatedAIFImage->isChecked())
     {
-      this->m_selectedAIFImageNode = m_Controls.comboAIFImage->GetSelectedNode();
+      this->m_selectedAIFImageNode = m_Controls.AIFImageNodeSelector->GetSelectedNode();
       this->m_selectedAIFImage = dynamic_cast<mitk::Image*>(this->m_selectedAIFImageNode->GetData());
     }
     else

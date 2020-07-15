@@ -108,8 +108,8 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
 
   m_Controls.maskNodeSelector->SetNodePredicate(this->m_IsMaskPredicate);
   m_Controls.maskNodeSelector->SetDataStorage(this->GetDataStorage());
-  m_Controls.maskNodeSelector->SetSelectionIsOptional(false);
-  m_Controls.maskNodeSelector->SetInvalidInfo("Please select mask.");
+  m_Controls.maskNodeSelector->SetSelectionIsOptional(true);
+  m_Controls.maskNodeSelector->SetEmptyInfo("Please select (optional) mask.");
   connect(m_Controls.btnModelling, SIGNAL(clicked()), this, SLOT(OnModellingButtonClicked()));
 
   connect(m_Controls.comboModel, SIGNAL(currentIndexChanged(int)), this, SLOT(OnModellSet(int)));

@@ -142,6 +142,7 @@ namespace mitk
 
     itkDebugMacro(<<"GenerateOutputInformation()");
 
+    /*
     unsigned int i;
     auto tmpDimensions = new unsigned int[inputImage->GetDimension()];
 
@@ -159,7 +160,9 @@ namespace mitk
 
     outputImage->SetGeometry(
       static_cast< Geometry3D * >( inputImage->GetGeometry()->Clone().GetPointer() ) );
+    */
 
+    outputImage->Initialize(inputImage);
     outputImage->SetPropertyList( inputImage->GetPropertyList()->Clone() );
 
     m_TimeOfHeaderInitialization.Modified();
@@ -421,6 +424,10 @@ namespace mitk
         // Compose IndexToWorld transform of image with WorldToIndexTransform of
         // clipping data for conversion from image index space to plane index space
         AffineTransform3D::Pointer planeWorldToIndexTransform = AffineTransform3D::New();
+        if (inputSurface->IsEmptyTimeStep(t)) {
+          continue;
+        }
+
         inputSurface->GetGeometry( t )->GetIndexToWorldTransform()
           ->GetInverse( planeWorldToIndexTransform );
 

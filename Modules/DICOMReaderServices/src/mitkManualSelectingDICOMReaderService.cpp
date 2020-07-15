@@ -12,14 +12,10 @@ found in the LICENSE file.
 
 #include "mitkManualSelectingDICOMReaderService.h"
 
-namespace mitk {
-
-ManualSelectingDICOMReaderService::ManualSelectingDICOMReaderService()
-  : BaseDICOMReaderService("MITK DICOM Reader v2 (manual)")
+mitk::ManualSelectingDICOMReaderService::ManualSelectingDICOMReaderService()
+  : BaseDICOMReaderService("MITK DICOM Reader v2 (manual)"), m_Selector(DICOMFileReaderSelector::New())
 {
   Options defaultOptions;
-
-  m_Selector = mitk::DICOMFileReaderSelector::New();
 
   m_Selector->LoadBuiltIn3DConfigs();
   m_Selector->LoadBuiltIn3DnTConfigs();
@@ -38,11 +34,11 @@ ManualSelectingDICOMReaderService::ManualSelectingDICOMReaderService()
   this->RegisterService();
 }
 
-DICOMFileReader::Pointer ManualSelectingDICOMReaderService::GetReader(const mitk::StringList& /*relevantFiles*/) const
+mitk::DICOMFileReader::Pointer mitk::ManualSelectingDICOMReaderService::GetReader(const mitk::StringList& /*relevantFiles*/) const
 {
   const auto label = this->GetOption("Configuration").ToString();
 
-  mitk::DICOMFileReader::Pointer selectedReader = nullptr;
+  DICOMFileReader::Pointer selectedReader;
   
   auto readers = m_Selector->GetAllConfiguredReaders();
   for (const auto& reader : readers)
@@ -54,11 +50,9 @@ DICOMFileReader::Pointer ManualSelectingDICOMReaderService::GetReader(const mitk
   }
 
   return selectedReader;
-};
-
-ManualSelectingDICOMReaderService* ManualSelectingDICOMReaderService::Clone() const
-{
-  return new ManualSelectingDICOMReaderService(*this);
 }
 
+mitk::ManualSelectingDICOMReaderService* mitk::ManualSelectingDICOMReaderService::Clone() const
+{
+  return new ManualSelectingDICOMReaderService(*this);
 }

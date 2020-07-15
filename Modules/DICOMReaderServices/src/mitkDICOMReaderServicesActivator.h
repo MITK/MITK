@@ -32,7 +32,7 @@ public:
   void Unload(us::ModuleContext* context) override;
 
 private:
-  void OnModuleEvent(const us::ModuleEvent event);
+  void EnsureManualSelectingDICOMSeriesReader(const us::ModuleEvent event);
 
   std::unique_ptr<IFileReader> m_AutoSelectingDICOMReader;
   std::unique_ptr<IFileReader> m_ManualSelectingDICOMSeriesReader;

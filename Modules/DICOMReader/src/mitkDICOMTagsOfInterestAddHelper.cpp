@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include <mitkIDICOMTagsOfInterest.h>
 
 #include "usModuleContext.h"
+#include "usGetModuleContext.h"
 
 void mitk::DICOMTagsOfInterestAddHelper::Activate(us::ModuleContext* context, TagsOfInterestVector tags)
 {
@@ -49,16 +50,16 @@ void mitk::DICOMTagsOfInterestAddHelper::Deactivate()
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
     m_Active = false;
-    try
+    if (nullptr != m_Context)
     {
-      if (nullptr != m_Context)
+      try
       {
-        m_Context->RemoveServiceListener(this, &DICOMTagsOfInterestAddHelper::DICOMTagsOfInterestServiceChanged);
+          m_Context->RemoveServiceListener(this, &DICOMTagsOfInterestAddHelper::DICOMTagsOfInterestServiceChanged);
       }
-    }
-    catch (...)
-    {
-      MITK_WARN << "Was not able to remove service listener from module context.";
+      catch (...)
+      {
+        MITK_WARN << "Was not able to remove service listener from module context.";
+      }
     }
   }
 }
@@ -67,7 +68,21 @@ mitk::DICOMTagsOfInterestAddHelper::~DICOMTagsOfInterestAddHelper()
 {
   if (m_Active)
   {
-    MITK_WARN << "DICOMTagsOfInterestAddHelper was not deactivated correctly befor its destructor was called.";
+    MITK_ERROR << "DICOMTagsOfInterestAddHelper was not deactivated correctly befor its destructor was called.";
+    auto context = us::GetModuleContext();
+    //we cannot trust m_Context at this point anymore and have no means to validate it. So try to get the own module context
+    //and to remove the listener via this context.
+    if (nullptr != context)
+    {
+      try
+      {
+        m_Context->RemoveServiceListener(this, &DICOMTagsOfInterestAddHelper::DICOMTagsOfInterestServiceChanged);
+      }
+      catch (...)
+      {
+        MITK_WARN << "Was not able to remove service listener from module context.";
+      }
+    }
   }
 }
 

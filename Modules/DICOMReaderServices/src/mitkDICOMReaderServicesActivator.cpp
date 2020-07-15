@@ -86,7 +86,7 @@ namespace mitk {
     AddPropertyPersistence(mitk::DICOMIOMetaInformationPropertyConstants::READER_PIXEL_SPACING_INTERPRETATION_STRING());
 
     //We have to handle ManualSelectingDICOMSeriesReader different then the other
-    //readers. Reason: The reader uses in its constructor DICOMFileReaderSelector.
+    //readers. Reason: The reader uses DICOMFileReaderSelector in its constructor.
     //this class needs to access resources of MitkDICOMReader module, which might
     //not be initialized yet (that would lead to a crash, see i.a. T27553). Thus check if the module
     //is alreade loaded. If not, register a listener and create the reader as soon
@@ -96,7 +96,7 @@ namespace mitk {
     {
       std::lock_guard<std::mutex> lock(m_Mutex);
       // Listen for events of module life cycle.
-      m_Context->AddModuleListener(this, &DICOMReaderServicesActivator::OnModuleEvent);
+      m_Context->AddModuleListener(this, &DICOMReaderServicesActivator::EnsureManualSelectingDICOMSeriesReader);
     }
     else
     {
@@ -108,10 +108,10 @@ namespace mitk {
   {
   }
 
-  void DICOMReaderServicesActivator::OnModuleEvent(const us::ModuleEvent event)
+  void DICOMReaderServicesActivator::EnsureManualSelectingDICOMSeriesReader(const us::ModuleEvent event)
   {
     //We have to handle ManualSelectingDICOMSeriesReader different then the other
-    //readers. For more details the the explinations in the constructor.
+    //readers. For more details see the explanations in the constructor.
     std::lock_guard<std::mutex> lock(m_Mutex);
     if (nullptr == m_ManualSelectingDICOMSeriesReader && event.GetModule()->GetName()=="MitkDICOMReader" && event.GetType() == us::ModuleEvent::LOADED)
     {

@@ -257,7 +257,7 @@ mitk::Point3D mitk::PlanarFigure::GetWorldControlPoint(unsigned int index) const
     return point3D;
   }
 
-  itkExceptionMacro(<< "GetWorldControlPoint(): Invalid index!");
+  itkExceptionMacro(<< "GetWorldControlPoint(): Invalid plane geometry or index!");
 }
 
 const mitk::PlanarFigure::PolyLineType mitk::PlanarFigure::GetPolyLine(unsigned int index)

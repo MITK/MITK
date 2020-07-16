@@ -59,7 +59,6 @@ found in the LICENSE file.
 #include <QMessageBox>
 #include <QThreadPool>
 #include <QFileDialog>
-#include <QmitkSingleNodeSelectionWidget.h>
 
 
 // Includes for image casting between ITK and MITK

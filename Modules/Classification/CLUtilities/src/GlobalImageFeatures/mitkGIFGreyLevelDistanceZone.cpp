@@ -58,11 +58,30 @@ namespace mitk{
 }
 
 static
-void MatrixFeaturesTo(mitk::GreyLevelDistanceZoneFeatures features,
-                      std::string prefix,
-                      mitk::GIFGreyLevelDistanceZone::FeatureListType &featureList);
-
-
+void MatrixFeaturesTo(const mitk::GreyLevelDistanceZoneFeatures& features,
+  const mitk::GreyLevelDistanceZoneConfiguration& config,
+  mitk::GIFGreyLevelDistanceZone::FeatureListType& featureList)
+{
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Small Distance Emphasis"), features.SmallDistanceEmphasis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Large Distance Emphasis"), features.LargeDistanceEmphasis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Low Grey Level Emphasis"), features.LowGreyLevelEmphasis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "High Grey Level Emphasis"), features.HighGreyLevelEmphasis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Small Distance Low Grey Level Emphasis"), features.SmallDistanceLowGreyLevelEmphasis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Small Distance High Grey Level Emphasis"), features.SmallDistanceHighGreyLevelEmphasis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Large Distance Low Grey Level Emphasis"), features.LargeDistanceLowGreyLevelEmphasis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Large Distance High Grey Level Emphasis"), features.LargeDistanceHighGreyLevelEmphasis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Grey Level Non-Uniformity"), features.GreyLevelNonUniformity));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Grey Level Non-Uniformity Normalized"), features.GreyLevelNonUniformityNormalized));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Distance Size Non-Uniformity"), features.ZoneDistanceNonUniformity));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Distance Size Non-Uniformity Normalized"), features.ZoneDistanceNoneUniformityNormalized));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Zone Percentage"), features.ZonePercentage));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Grey Level Mean"), features.GreyLevelMean));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Grey Level Variance"), features.GreyLevelVariance));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Zone Distance Mean"), features.ZoneDistanceMean));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Zone Distance Variance"), features.ZoneDistanceVariance));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Zone Distance Entropy"), features.ZoneDistanceEntropy));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Grey Level Entropy"), features.ZoneDistanceEntropy));
+}
 
 mitk::GreyLevelDistanceZoneMatrixHolder::GreyLevelDistanceZoneMatrixHolder(mitk::IntensityQuantifier::Pointer quantifier, int number, int maxSize) :
                     m_NumberOfBins(number),
@@ -390,33 +409,6 @@ CalculateGreyLevelDistanceZoneFeatures(const itk::Image<TPixel, VImageDimension>
   CalculateFeatures(holderOverall, overallFeature);
 
   MatrixFeaturesTo(overallFeature, config, featureList);
-}
-
-
-static
-void MatrixFeaturesTo(const mitk::GreyLevelDistanceZoneFeatures& features,
-                      const mitk::GreyLevelDistanceZoneConfiguration& config,
-                      mitk::GIFGreyLevelDistanceZone::FeatureListType &featureList)
-{
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Small Distance Emphasis"), features.SmallDistanceEmphasis));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Large Distance Emphasis"), features.LargeDistanceEmphasis));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Low Grey Level Emphasis"), features.LowGreyLevelEmphasis));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "High Grey Level Emphasis"), features.HighGreyLevelEmphasis));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Small Distance Low Grey Level Emphasis"), features.SmallDistanceLowGreyLevelEmphasis));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Small Distance High Grey Level Emphasis"), features.SmallDistanceHighGreyLevelEmphasis));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Large Distance Low Grey Level Emphasis"), features.LargeDistanceLowGreyLevelEmphasis));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Large Distance High Grey Level Emphasis"), features.LargeDistanceHighGreyLevelEmphasis));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Grey Level Non-Uniformity"), features.GreyLevelNonUniformity));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Grey Level Non-Uniformity Normalized"), features.GreyLevelNonUniformityNormalized));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Distance Size Non-Uniformity"), features.ZoneDistanceNonUniformity));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Distance Size Non-Uniformity Normalized"), features.ZoneDistanceNoneUniformityNormalized));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Zone Percentage"), features.ZonePercentage));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Grey Level Mean"), features.GreyLevelMean));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Grey Level Variance"), features.GreyLevelVariance));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Zone Distance Mean"), features.ZoneDistanceMean));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Zone Distance Variance"), features.ZoneDistanceVariance));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Zone Distance Entropy"), features.ZoneDistanceEntropy));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Grey Level Entropy"), features.ZoneDistanceEntropy));
 }
 
   mitk::GIFGreyLevelDistanceZone::GIFGreyLevelDistanceZone()

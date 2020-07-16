@@ -127,10 +127,38 @@ namespace mitk
 }
 
 static
-void MatrixFeaturesTo(mitk::NGLDMMatrixFeatures features,
-                      std::string prefix,
-                      mitk::GIFNeighbouringGreyLevelDependenceFeature::FeatureListType &featureList);
+void MatrixFeaturesTo(const mitk::NGLDMMatrixFeatures& features,
+  const GIFNeighbouringGreyLevelDependenceFeatureConfiguration& config,
+  mitk::GIFNeighbouringGreyLevelDependenceFeature::FeatureListType& featureList)
+{
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Low Dependence Emphasis"), features.LowDependenceEmphasis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "High Dependence Emphasis"), features.HighDependenceEmphasis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Low Grey Level Count Emphasis"), features.LowGreyLevelCountEmphasis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "High Grey Level Count Emphasis"), features.HighGreyLevelCountEmphasis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Low Dependence Low Grey Level Emphasis"), features.LowDependenceLowGreyLevelEmphasis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Low Dependence High Grey Level Emphasis"), features.LowDependenceHighGreyLevelEmphasis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "High Dependence Low Grey Level Emphasis"), features.HighDependenceLowGreyLevelEmphasis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "High Dependence High Grey Level Emphasis"), features.HighDependenceHighGreyLevelEmphasis));
 
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Grey Level Non-Uniformity"), features.GreyLevelNonUniformity));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Grey Level Non-Uniformity Normalised"), features.GreyLevelNonUniformityNormalised));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Dependence Count Non-Uniformity"), features.DependenceCountNonUniformity));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Dependence Count Non-Uniformity Normalised"), features.DependenceCountNonUniformityNormalised));
+
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Dependence Count Percentage"), features.DependenceCountPercentage));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Grey Level Mean"), features.MeanGreyLevelCount));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Grey Level Variance"), features.GreyLevelVariance));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Dependence Count Mean"), features.MeanDependenceCount));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Dependence Count Variance"), features.DependenceCountVariance));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Dependence Count Entropy"), features.DependenceCountEntropy));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Dependence Count Energy"), features.DependenceCountEnergy));
+
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Expected Neighbourhood Size"), features.ExpectedNeighbourhoodSize));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Average Neighbourhood Size"), features.AverageNeighbourhoodSize));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Average Incomplete Neighbourhood Size"), features.AverageIncompleteNeighbourhoodSize));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Percentage of complete Neighbourhoods"), features.PercentageOfCompleteNeighbourhoods));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Percentage of Dependence Neighbour Voxels"), features.PercentageOfDependenceNeighbours));
+}
 
 mitk::NGLDMMatrixHolder::NGLDMMatrixHolder(double min, double max, int number, int depenence) :
                                             m_MinimumRange(min),
@@ -385,42 +413,6 @@ CalculateCoocurenceFeatures(const itk::Image<TPixel, VImageDimension>* itkImage,
   LocalCalculateFeatures(holderOverall, overallFeature);
 
   MatrixFeaturesTo(overallFeature, config, featureList);
-}
-
-
-static
-void MatrixFeaturesTo(const mitk::NGLDMMatrixFeatures& features,
-                      const GIFNeighbouringGreyLevelDependenceFeatureConfiguration& config,
-                      mitk::GIFNeighbouringGreyLevelDependenceFeature::FeatureListType &featureList)
-{
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Low Dependence Emphasis"), features.LowDependenceEmphasis));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "High Dependence Emphasis"), features.HighDependenceEmphasis));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Low Grey Level Count Emphasis"), features.LowGreyLevelCountEmphasis));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "High Grey Level Count Emphasis"), features.HighGreyLevelCountEmphasis));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Low Dependence Low Grey Level Emphasis"), features.LowDependenceLowGreyLevelEmphasis));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Low Dependence High Grey Level Emphasis"), features.LowDependenceHighGreyLevelEmphasis));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "High Dependence Low Grey Level Emphasis"), features.HighDependenceLowGreyLevelEmphasis));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "High Dependence High Grey Level Emphasis"), features.HighDependenceHighGreyLevelEmphasis));
-
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Grey Level Non-Uniformity"), features.GreyLevelNonUniformity));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Grey Level Non-Uniformity Normalised"), features.GreyLevelNonUniformityNormalised));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Dependence Count Non-Uniformity"), features.DependenceCountNonUniformity));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Dependence Count Non-Uniformity Normalised"), features.DependenceCountNonUniformityNormalised));
-
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Dependence Count Percentage"), features.DependenceCountPercentage));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Grey Level Mean"), features.MeanGreyLevelCount));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Grey Level Variance"), features.GreyLevelVariance));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Dependence Count Mean"), features.MeanDependenceCount));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Dependence Count Variance"), features.DependenceCountVariance));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Dependence Count Entropy"), features.DependenceCountEntropy));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Dependence Count Energy"), features.DependenceCountEnergy));
-
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Expected Neighbourhood Size"), features.ExpectedNeighbourhoodSize));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Average Neighbourhood Size"), features.AverageNeighbourhoodSize));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Average Incomplete Neighbourhood Size"), features.AverageIncompleteNeighbourhoodSize));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Percentage of complete Neighbourhoods"), features.PercentageOfCompleteNeighbourhoods));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Percentage of Dependence Neighbour Voxels"), features.PercentageOfDependenceNeighbours));
-
 }
 
 mitk::GIFNeighbouringGreyLevelDependenceFeature::GIFNeighbouringGreyLevelDependenceFeature() :

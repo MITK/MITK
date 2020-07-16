@@ -130,11 +130,47 @@ namespace mitk
 
 }
 
+
 static
 void MatrixFeaturesTo(const mitk::CoocurenceMatrixFeatures& features,
-                      const std::string& prefix,
-                      const mitk::GIFCooccurenceMatrix2Configuration& config,
-                      mitk::GIFCooccurenceMatrix2::FeatureListType &featureList);
+  const std::string& prefix,
+  const mitk::GIFCooccurenceMatrix2Configuration& config,
+  mitk::GIFCooccurenceMatrix2::FeatureListType& featureList)
+{
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Joint Maximum"), features.JointMaximum));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Joint Average"), features.JointAverage));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Joint Variance"), features.JointVariance));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Joint Entropy"), features.JointEntropy));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Difference Average"), features.DifferenceAverage));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Difference Variance"), features.DifferenceVariance));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Difference Entropy"), features.DifferenceEntropy));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Sum Average"), features.SumAverage));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Sum Variance"), features.SumVariance));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Sum Entropy"), features.SumEntropy));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Angular Second Moment"), features.AngularSecondMoment));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Contrast"), features.Contrast));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Dissimilarity"), features.Dissimilarity));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Inverse Difference"), features.InverseDifference));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Inverse Difference Normalized"), features.InverseDifferenceNormalised));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Inverse Difference Moment"), features.InverseDifferenceMoment));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Inverse Difference Moment Normalized"), features.InverseDifferenceMomentNormalised));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Inverse Variance"), features.InverseVariance));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Correlation"), features.Correlation));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Autocorrelation"), features.Autocorrelation));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Cluster Tendency"), features.ClusterTendency));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Cluster Shade"), features.ClusterShade));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Cluster Prominence"), features.ClusterProminence));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "First Measure of Information Correlation"), features.FirstMeasureOfInformationCorrelation));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Second Measure of Information Correlation"), features.SecondMeasureOfInformationCorrelation));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Row Maximum"), features.RowMaximum));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Row Average"), features.RowAverage));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Row Variance"), features.RowVariance));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Row Entropy"), features.RowEntropy));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "First Row-Column Entropy"), features.FirstRowColumnEntropy));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Second Row-Column Entropy"), features.SecondRowColumnEntropy));
+}
+
+
 static
 void CalculateMeanAndStdDevFeatures(std::vector<mitk::CoocurenceMatrixFeatures> featureList,
                                     mitk::CoocurenceMatrixFeatures &meanFeature,
@@ -142,8 +178,6 @@ void CalculateMeanAndStdDevFeatures(std::vector<mitk::CoocurenceMatrixFeatures> 
 static
 void NormalizeMatrixFeature(mitk::CoocurenceMatrixFeatures &features,
                             std::size_t number);
-
-
 
 
 mitk::CoocurenceMatrixHolder::CoocurenceMatrixHolder(double min, double max, int number) :
@@ -469,46 +503,6 @@ CalculateCoocurenceFeatures(const itk::Image<TPixel, VImageDimension>* itkImage,
   MatrixFeaturesTo(overallFeature, "Overall ", config, featureList);
   MatrixFeaturesTo(featureMean, "Mean ", config, featureList);
   MatrixFeaturesTo(featureStd, "Std.Dev. ", config, featureList);
-}
-
-
-static
-void MatrixFeaturesTo(const mitk::CoocurenceMatrixFeatures& features,
-                      const std::string& prefix,
-                      const mitk::GIFCooccurenceMatrix2Configuration& config,
-                      mitk::GIFCooccurenceMatrix2::FeatureListType &featureList)
-{
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Joint Maximum"), features.JointMaximum));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Joint Average"), features.JointAverage));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Joint Variance"), features.JointVariance));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Joint Entropy"), features.JointEntropy));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Difference Average"), features.DifferenceAverage));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Difference Variance"), features.DifferenceVariance));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Difference Entropy"), features.DifferenceEntropy));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Sum Average"), features.SumAverage));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Sum Variance"), features.SumVariance));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Sum Entropy"), features.SumEntropy));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Angular Second Moment"), features.AngularSecondMoment));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Contrast"), features.Contrast));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Dissimilarity"), features.Dissimilarity));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Inverse Difference"), features.InverseDifference));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Inverse Difference Normalized"), features.InverseDifferenceNormalised));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Inverse Difference Moment"), features.InverseDifferenceMoment));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Inverse Difference Moment Normalized"), features.InverseDifferenceMomentNormalised));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Inverse Variance"), features.InverseVariance));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Correlation"), features.Correlation));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Autocorrelation"), features.Autocorrelation));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Cluster Tendency"), features.ClusterTendency));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Cluster Shade"), features.ClusterShade));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Cluster Prominence"), features.ClusterProminence));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "First Measure of Information Correlation"), features.FirstMeasureOfInformationCorrelation));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Second Measure of Information Correlation"), features.SecondMeasureOfInformationCorrelation));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Row Maximum"), features.RowMaximum));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Row Average"), features.RowAverage));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Row Variance"), features.RowVariance));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Row Entropy"), features.RowEntropy));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "First Row-Column Entropy"), features.FirstRowColumnEntropy));
-  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Second Row-Column Entropy"), features.SecondRowColumnEntropy));
 }
 
 static

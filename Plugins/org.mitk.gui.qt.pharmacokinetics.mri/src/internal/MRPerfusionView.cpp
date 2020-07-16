@@ -134,6 +134,7 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   m_Controls.AIFMaskNodeSelector->SetNodePredicate(m_IsMaskPredicate);
   m_Controls.AIFMaskNodeSelector->setVisible(true);
   m_Controls.AIFMaskNodeSelector->setEnabled(true);
+  m_Controls.AIFMaskNodeSelector->SetAutoSelectNewNodes(true);
   m_Controls.AIFImageNodeSelector->SetDataStorage(this->GetDataStorage());
   m_Controls.AIFImageNodeSelector->SetNodePredicate(this->m_isValidTimeSeriesImagePredicate);
   m_Controls.AIFImageNodeSelector->setEnabled(false);

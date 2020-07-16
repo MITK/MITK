@@ -126,7 +126,7 @@ protected:
     /*! \brief called by QmitkFunctionality when DataManager's selection has changed
   */
 
-  void OnSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/);
+  void OnNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/);
 
   /*! @brief The view's UI controls */
   Ui::MRPerfusionViewControls m_Controls;

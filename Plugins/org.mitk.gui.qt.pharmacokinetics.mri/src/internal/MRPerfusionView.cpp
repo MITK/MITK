@@ -118,12 +118,12 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls.timeSeriesNodeSelector,
           &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
           this,
-          &MRPerfusionView::OnSelectionChanged);
+          &MRPerfusionView::OnNodeSelectionChanged);
 
   connect(m_Controls.maskNodeSelector,
     &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
     this,
-    &MRPerfusionView::OnSelectionChanged);
+    &MRPerfusionView::OnNodeSelectionChanged);
 
   //AIF setting
   m_Controls.groupAIF->hide();
@@ -491,7 +491,7 @@ void MRPerfusionView::OnModellingButtonClicked()
 
 
 
-void MRPerfusionView::OnSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/)
+void MRPerfusionView::OnNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/)
 {
   m_selectedMaskNode = nullptr;
   m_selectedMask = nullptr;

@@ -125,6 +125,16 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
     this,
     &MRPerfusionView::OnNodeSelectionChanged);
 
+  connect(m_Controls.AIFMaskNodeSelector,
+    &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
+    this,
+    &MRPerfusionView::UpdateGUIControls);
+
+  connect(m_Controls.AIFImageNodeSelector,
+    &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
+    this,
+    &MRPerfusionView::UpdateGUIControls);
+
   //AIF setting
   m_Controls.groupAIF->hide();
   m_Controls.btnAIFFile->setEnabled(false);

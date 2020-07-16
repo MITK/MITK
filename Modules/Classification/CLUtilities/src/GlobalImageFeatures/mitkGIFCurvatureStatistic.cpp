@@ -33,7 +33,7 @@ found in the LICENSE file.
 #include <sstream>
 #include <limits>
 
-static void calculateLocalStatistic(vtkDataArray* scalars, std::string name, std::string featureDescriptionPrefix, mitk::GIFCurvatureStatistic::FeatureListType & featureList)
+static void calculateLocalStatistic(vtkDataArray* scalars, const std::string& name, const mitk::FeatureID& featureID, mitk::GIFCurvatureStatistic::FeatureListType & featureList)
 {
   int size = scalars->GetNumberOfTuples();
   double minimum = std::numeric_limits<double>::max();
@@ -91,17 +91,17 @@ static void calculateLocalStatistic(vtkDataArray* scalars, std::string name, std
   double stddevN = std::sqrt(mean2n / countNegative - meanN*meanN);
   double skewnessN = ((mean3n / countNegative) - 3 * meanN*stddevN*stddevN - meanN*meanN*meanN) / (stddevN*stddevN*stddevN);
 
-  featureList.push_back(std::make_pair(featureDescriptionPrefix + "Minimum " + name + " Curvature", minimum));
-  featureList.push_back(std::make_pair(featureDescriptionPrefix + "Maximum " + name + " Curvature", maximum));
-  featureList.push_back(std::make_pair(featureDescriptionPrefix + "Mean " + name + " Curvature", mean));
-  featureList.push_back(std::make_pair(featureDescriptionPrefix + "Standard Deviation " + name + " Curvature", stddev));
-  featureList.push_back(std::make_pair(featureDescriptionPrefix + "Skewness " + name + " Curvature", skewness));
-  featureList.push_back(std::make_pair(featureDescriptionPrefix + "Mean Positive " + name + " Curvature", meanP));
-  featureList.push_back(std::make_pair(featureDescriptionPrefix + "Standard Deviation Positive " + name + " Curvature", stddevP));
-  featureList.push_back(std::make_pair(featureDescriptionPrefix + "Skewness Positive " + name + " Curvature", skewnessP));
-  featureList.push_back(std::make_pair(featureDescriptionPrefix + "Mean Negative " + name + " Curvature", meanN));
-  featureList.push_back(std::make_pair(featureDescriptionPrefix + "Standard Deviation Negative " + name + " Curvature", stddevN));
-  featureList.push_back(std::make_pair(featureDescriptionPrefix + "Skewness Negative " + name + " Curvature", skewnessN));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Minimum " + name + " Curvature"), minimum));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Maximum " + name + " Curvature"), maximum));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Mean " + name + " Curvature"), mean));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Standard Deviation " + name + " Curvature"), stddev));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Skewness " + name + " Curvature"), skewness));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Mean Positive " + name + " Curvature"), meanP));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Standard Deviation Positive " + name + " Curvature"), stddevP));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Skewness Positive " + name + " Curvature"), skewnessP));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Mean Negative " + name + " Curvature"), meanN));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Standard Deviation Negative " + name + " Curvature"), stddevN));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Skewness Negative " + name + " Curvature"), skewnessN));
 
 }
 
@@ -112,66 +112,59 @@ mitk::GIFCurvatureStatistic::GIFCurvatureStatistic()
   SetFeatureClassName("Curvature Feature");
 }
 
-mitk::GIFCurvatureStatistic::FeatureListType mitk::GIFCurvatureStatistic::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
-{
-  FeatureListType featureList;
-  if (image->GetDimension() < 3)
-  {
-    return featureList;
-  }
-
-  vtkSmartPointer<vtkImageMarchingCubes> mesher = vtkSmartPointer<vtkImageMarchingCubes>::New();
-  vtkSmartPointer<vtkCurvatures> curvator = vtkSmartPointer<vtkCurvatures>::New();
-  mesher->SetInputData(mask->GetVtkImageData());
-  mesher->SetValue(0, 0.5);
-  curvator->SetInputConnection(mesher->GetOutputPort());
-  curvator->SetCurvatureTypeToMean();
-  curvator->Update();
-  vtkDataArray* scalars = curvator->GetOutput()->GetPointData()->GetScalars();
-  calculateLocalStatistic(scalars, "Mean", FeatureDescriptionPrefix(), featureList);
-
-  curvator->SetCurvatureTypeToGaussian();
-  curvator->Update();
-  scalars = curvator->GetOutput()->GetPointData()->GetScalars();
-  calculateLocalStatistic(scalars, "Gaussian", FeatureDescriptionPrefix(), featureList);
-
-  curvator->SetCurvatureTypeToMinimum();
-  curvator->Update();
-  scalars = curvator->GetOutput()->GetPointData()->GetScalars();
-  calculateLocalStatistic(scalars, "Minimum", FeatureDescriptionPrefix(), featureList);
-
-  curvator->SetCurvatureTypeToMaximum();
-  curvator->Update();
-  scalars = curvator->GetOutput()->GetPointData()->GetScalars();
-  calculateLocalStatistic(scalars, "Maximum", FeatureDescriptionPrefix(), featureList);
-
-  return featureList;
-}
-
-mitk::GIFCurvatureStatistic::FeatureNameListType mitk::GIFCurvatureStatistic::GetFeatureNames()
-{
-  FeatureNameListType featureList;
-  return featureList;
-}
-
-
-void mitk::GIFCurvatureStatistic::AddArguments(mitkCommandLineParser &parser)
+void mitk::GIFCurvatureStatistic::AddArguments(mitkCommandLineParser &parser) const
 {
   std::string name = GetOptionPrefix();
 
   parser.addArgument(GetLongName(), name, mitkCommandLineParser::Bool, "Use Curvature of Surface as feature", "calculates shape curvature based features", us::Any());
 }
 
-void
-mitk::GIFCurvatureStatistic::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &, FeatureListType &featureList)
+mitk::AbstractGlobalImageFeature::FeatureListType mitk::GIFCurvatureStatistic::DoCalculateFeatures(const Image* image, const Image* mask)
 {
-  auto parsedArgs = GetParameter();
-  if (parsedArgs.count(GetLongName()))
+  FeatureListType featureList;
+
+  if (image->GetDimension() < 3)
+  {
+    MITK_INFO << "Passed calculating volumetric features due to wrong dimensionality ....";
+  }
+  else
   {
     MITK_INFO << "Start calculating volumetric features ....";
-    auto localResults = this->CalculateFeatures(feature, mask);
-    featureList.insert(featureList.end(), localResults.begin(), localResults.end());
+
+    auto id = this->CreateTemplateFeatureID();
+    vtkSmartPointer<vtkImageMarchingCubes> mesher = vtkSmartPointer<vtkImageMarchingCubes>::New();
+    vtkSmartPointer<vtkCurvatures> curvator = vtkSmartPointer<vtkCurvatures>::New();
+    auto nonconstVtkData = const_cast<vtkImageData*>(mask->GetVtkImageData());
+    mesher->SetInputData(nonconstVtkData);
+    mesher->SetValue(0, 0.5);
+    curvator->SetInputConnection(mesher->GetOutputPort());
+    curvator->SetCurvatureTypeToMean();
+    curvator->Update();
+    vtkDataArray* scalars = curvator->GetOutput()->GetPointData()->GetScalars();
+    calculateLocalStatistic(scalars, "Mean", id, featureList);
+
+    curvator->SetCurvatureTypeToGaussian();
+    curvator->Update();
+    scalars = curvator->GetOutput()->GetPointData()->GetScalars();
+    calculateLocalStatistic(scalars, "Gaussian", id, featureList);
+
+    curvator->SetCurvatureTypeToMinimum();
+    curvator->Update();
+    scalars = curvator->GetOutput()->GetPointData()->GetScalars();
+    calculateLocalStatistic(scalars, "Minimum", id, featureList);
+
+    curvator->SetCurvatureTypeToMaximum();
+    curvator->Update();
+    scalars = curvator->GetOutput()->GetPointData()->GetScalars();
+    calculateLocalStatistic(scalars, "Maximum", id, featureList);
+
     MITK_INFO << "Finished calculating volumetric features....";
   }
+
+  return featureList;
 }
 
+mitk::AbstractGlobalImageFeature::FeatureListType mitk::GIFCurvatureStatistic::CalculateFeatures(const Image* image, const Image* mask, const Image*)
+{
+  return Superclass::CalculateFeatures(image, mask);
+}

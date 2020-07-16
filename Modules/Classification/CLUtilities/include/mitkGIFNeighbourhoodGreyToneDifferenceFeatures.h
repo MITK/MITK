@@ -65,28 +65,23 @@ namespace mitk
   {
   public:
     mitkClassMacro(GIFNeighbourhoodGreyToneDifferenceFeatures, AbstractGlobalImageFeature);
-      itkFactorylessNewMacro(Self);
-      itkCloneMacro(Self);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
-      GIFNeighbourhoodGreyToneDifferenceFeatures();
-
-    /**
-    * \brief Calculates the Cooccurence-Matrix based features for this class.
-    */
-    FeatureListType CalculateFeatures(const Image::Pointer & image, const Image::Pointer &feature) override;
-
-    /**
-    * \brief Returns a list of the names of all features that are calculated from this class
-    */
-    FeatureNameListType GetFeatureNames() override;
-
-    std::string GetCurrentFeatureEncoding() override;
-
-    void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList) override;
-    void AddArguments(mitkCommandLineParser &parser) override;
+    GIFNeighbourhoodGreyToneDifferenceFeatures();
 
     itkSetMacro(Range, int);
     itkGetConstMacro(Range, int);
+
+    FeatureListType CalculateFeatures(const Image* image, const Image* mask, const Image* maskNoNAN) override;
+    using Superclass::CalculateFeatures;
+
+    void AddArguments(mitkCommandLineParser& parser) const override;
+
+  protected:
+    std::string GenerateLegacyFeatureEncoding(const FeatureID& id) const override;
+    FeatureListType DoCalculateFeatures(const Image* image, const Image* mask) override;
+    void ConfigureSettingsByParameters(const ParametersType& parameters) override;
 
   private:
     int m_Range;

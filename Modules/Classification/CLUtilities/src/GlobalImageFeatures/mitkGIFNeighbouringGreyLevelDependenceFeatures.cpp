@@ -26,6 +26,18 @@ found in the LICENSE file.
 // STL
 #include <sstream>
 
+struct GIFNeighbouringGreyLevelDependenceFeatureConfiguration
+{
+  double range;
+  unsigned int direction;
+  int alpha;
+
+  double MinimumIntensity;
+  double MaximumIntensity;
+  int Bins;
+  mitk::FeatureID id;
+};
+
 namespace mitk
 {
   struct NGLDMMatrixHolder
@@ -115,10 +127,38 @@ namespace mitk
 }
 
 static
-void MatrixFeaturesTo(mitk::NGLDMMatrixFeatures features,
-                      std::string prefix,
-                      mitk::GIFNeighbouringGreyLevelDependenceFeature::FeatureListType &featureList);
+void MatrixFeaturesTo(const mitk::NGLDMMatrixFeatures& features,
+  const GIFNeighbouringGreyLevelDependenceFeatureConfiguration& config,
+  mitk::GIFNeighbouringGreyLevelDependenceFeature::FeatureListType& featureList)
+{
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Low Dependence Emphasis"), features.LowDependenceEmphasis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "High Dependence Emphasis"), features.HighDependenceEmphasis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Low Grey Level Count Emphasis"), features.LowGreyLevelCountEmphasis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "High Grey Level Count Emphasis"), features.HighGreyLevelCountEmphasis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Low Dependence Low Grey Level Emphasis"), features.LowDependenceLowGreyLevelEmphasis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Low Dependence High Grey Level Emphasis"), features.LowDependenceHighGreyLevelEmphasis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "High Dependence Low Grey Level Emphasis"), features.HighDependenceLowGreyLevelEmphasis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "High Dependence High Grey Level Emphasis"), features.HighDependenceHighGreyLevelEmphasis));
 
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Grey Level Non-Uniformity"), features.GreyLevelNonUniformity));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Grey Level Non-Uniformity Normalised"), features.GreyLevelNonUniformityNormalised));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Dependence Count Non-Uniformity"), features.DependenceCountNonUniformity));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Dependence Count Non-Uniformity Normalised"), features.DependenceCountNonUniformityNormalised));
+
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Dependence Count Percentage"), features.DependenceCountPercentage));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Grey Level Mean"), features.MeanGreyLevelCount));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Grey Level Variance"), features.GreyLevelVariance));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Dependence Count Mean"), features.MeanDependenceCount));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Dependence Count Variance"), features.DependenceCountVariance));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Dependence Count Entropy"), features.DependenceCountEntropy));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Dependence Count Energy"), features.DependenceCountEnergy));
+
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Expected Neighbourhood Size"), features.ExpectedNeighbourhoodSize));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Average Neighbourhood Size"), features.AverageNeighbourhoodSize));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Average Incomplete Neighbourhood Size"), features.AverageIncompleteNeighbourhoodSize));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Percentage of complete Neighbourhoods"), features.PercentageOfCompleteNeighbourhoods));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Percentage of Dependence Neighbour Voxels"), features.PercentageOfDependenceNeighbours));
+}
 
 mitk::NGLDMMatrixHolder::NGLDMMatrixHolder(double min, double max, int number, int depenence) :
                                             m_MinimumRange(min),
@@ -157,8 +197,8 @@ double mitk::NGLDMMatrixHolder::IndexToMaxIntensity(int index)
 
 template<typename TPixel, unsigned int VImageDimension>
 void
-CalculateNGLDMMatrix(itk::Image<TPixel, VImageDimension>* itkImage,
-                    itk::Image<unsigned short, VImageDimension>* mask,
+CalculateNGLDMMatrix(const itk::Image<TPixel, VImageDimension>* itkImage,
+                    const itk::Image<unsigned short, VImageDimension>* mask,
                     int alpha,
                     int range,
                     unsigned int direction,
@@ -166,8 +206,8 @@ CalculateNGLDMMatrix(itk::Image<TPixel, VImageDimension>* itkImage,
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<unsigned short, VImageDimension> MaskImageType;
-  typedef itk::NeighborhoodIterator<ImageType> ShapeIterType;
-  typedef itk::NeighborhoodIterator<MaskImageType> ShapeMaskIterType;
+  typedef itk::ConstNeighborhoodIterator<ImageType> ShapeIterType;
+  typedef itk::ConstNeighborhoodIterator<MaskImageType> ShapeMaskIterType;
 
   holder.m_NumberOfCompleteNeighbourhoods = 0;
   holder.m_NumberOfNeighbourhoods = 0;
@@ -351,7 +391,7 @@ void LocalCalculateFeatures(
 
 template<typename TPixel, unsigned int VImageDimension>
 void
-CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFNeighbouringGreyLevelDependenceFeature::FeatureListType & featureList, mitk::GIFNeighbouringGreyLevelDependenceFeature::GIFNeighbouringGreyLevelDependenceFeatureConfiguration config)
+CalculateCoocurenceFeatures(const itk::Image<TPixel, VImageDimension>* itkImage, const mitk::Image* mask, mitk::GIFNeighbouringGreyLevelDependenceFeature::FeatureListType & featureList, GIFNeighbouringGreyLevelDependenceFeatureConfiguration config)
 {
   typedef itk::Image<unsigned short, VImageDimension> MaskType;
 
@@ -372,127 +412,91 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
   CalculateNGLDMMatrix<TPixel, VImageDimension>(itkImage, maskImage, config.alpha, config.range, config.direction, holderOverall);
   LocalCalculateFeatures(holderOverall, overallFeature);
 
-  MatrixFeaturesTo(overallFeature, config.FeatureEncoding, featureList);
-}
-
-
-static
-void MatrixFeaturesTo(mitk::NGLDMMatrixFeatures features,
-                      std::string prefix,
-                      mitk::GIFNeighbouringGreyLevelDependenceFeature::FeatureListType &featureList)
-{
-  featureList.push_back(std::make_pair(prefix + "Low Dependence Emphasis", features.LowDependenceEmphasis));
-  featureList.push_back(std::make_pair(prefix + "High Dependence Emphasis", features.HighDependenceEmphasis));
-  featureList.push_back(std::make_pair(prefix + "Low Grey Level Count Emphasis", features.LowGreyLevelCountEmphasis));
-  featureList.push_back(std::make_pair(prefix + "High Grey Level Count Emphasis", features.HighGreyLevelCountEmphasis));
-  featureList.push_back(std::make_pair(prefix + "Low Dependence Low Grey Level Emphasis", features.LowDependenceLowGreyLevelEmphasis));
-  featureList.push_back(std::make_pair(prefix + "Low Dependence High Grey Level Emphasis", features.LowDependenceHighGreyLevelEmphasis));
-  featureList.push_back(std::make_pair(prefix + "High Dependence Low Grey Level Emphasis", features.HighDependenceLowGreyLevelEmphasis));
-  featureList.push_back(std::make_pair(prefix + "High Dependence High Grey Level Emphasis", features.HighDependenceHighGreyLevelEmphasis));
-
-  featureList.push_back(std::make_pair(prefix + "Grey Level Non-Uniformity", features.GreyLevelNonUniformity));
-  featureList.push_back(std::make_pair(prefix + "Grey Level Non-Uniformity Normalised", features.GreyLevelNonUniformityNormalised));
-  featureList.push_back(std::make_pair(prefix + "Dependence Count Non-Uniformity", features.DependenceCountNonUniformity));
-  featureList.push_back(std::make_pair(prefix + "Dependence Count Non-Uniformity Normalised", features.DependenceCountNonUniformityNormalised));
-
-  featureList.push_back(std::make_pair(prefix + "Dependence Count Percentage", features.DependenceCountPercentage));
-  featureList.push_back(std::make_pair(prefix + "Grey Level Mean", features.MeanGreyLevelCount));
-  featureList.push_back(std::make_pair(prefix + "Grey Level Variance", features.GreyLevelVariance));
-  featureList.push_back(std::make_pair(prefix + "Dependence Count Mean", features.MeanDependenceCount));
-  featureList.push_back(std::make_pair(prefix + "Dependence Count Variance", features.DependenceCountVariance));
-  featureList.push_back(std::make_pair(prefix + "Dependence Count Entropy", features.DependenceCountEntropy));
-  featureList.push_back(std::make_pair(prefix + "Dependence Count Energy", features.DependenceCountEnergy));
-
-  featureList.push_back(std::make_pair(prefix + "Expected Neighbourhood Size", features.ExpectedNeighbourhoodSize));
-  featureList.push_back(std::make_pair(prefix + "Average Neighbourhood Size", features.AverageNeighbourhoodSize));
-  featureList.push_back(std::make_pair(prefix + "Average Incomplete Neighbourhood Size", features.AverageIncompleteNeighbourhoodSize));
-  featureList.push_back(std::make_pair(prefix + "Percentage of complete Neighbourhoods", features.PercentageOfCompleteNeighbourhoods));
-  featureList.push_back(std::make_pair(prefix + "Percentage of Dependence Neighbour Voxels", features.PercentageOfDependenceNeighbours));
-
+  MatrixFeaturesTo(overallFeature, config, featureList);
 }
 
 mitk::GIFNeighbouringGreyLevelDependenceFeature::GIFNeighbouringGreyLevelDependenceFeature() :
-m_Range(1.0)
+  m_Ranges({ 1.0 }), m_Alpha(0.)
 {
   SetShortName("ngld");
   SetLongName("neighbouring-grey-level-dependence");
   SetFeatureClassName("Neighbouring Grey Level Dependence");
 }
 
-mitk::GIFNeighbouringGreyLevelDependenceFeature::FeatureListType mitk::GIFNeighbouringGreyLevelDependenceFeature::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
+void mitk::GIFNeighbouringGreyLevelDependenceFeature::SetRanges(std::vector<double> ranges)
 {
-  FeatureListType featureList;
-  InitializeQuantifier(image, mask);
-
-  GIFNeighbouringGreyLevelDependenceFeatureConfiguration config;
-  config.direction = GetDirection();
-  config.range = m_Range;
-  config.alpha = 0;
-
-  config.MinimumIntensity = GetQuantifier()->GetMinimum();
-  config.MaximumIntensity = GetQuantifier()->GetMaximum();
-  config.Bins = GetQuantifier()->GetBins();
-
-  config.FeatureEncoding = FeatureDescriptionPrefix();
-
-  AccessByItk_3(image, CalculateCoocurenceFeatures, mask, featureList,config);
-
-  return featureList;
+  m_Ranges = ranges;
+  this->Modified();
 }
 
-mitk::GIFNeighbouringGreyLevelDependenceFeature::FeatureNameListType mitk::GIFNeighbouringGreyLevelDependenceFeature::GetFeatureNames()
+void mitk::GIFNeighbouringGreyLevelDependenceFeature::SetRange(double range)
 {
-  FeatureNameListType featureList;
-
-  return featureList;
+  m_Ranges.resize(1);
+  m_Ranges[0] = range;
+  this->Modified();
 }
 
-
-
-void mitk::GIFNeighbouringGreyLevelDependenceFeature::AddArguments(mitkCommandLineParser &parser)
+void mitk::GIFNeighbouringGreyLevelDependenceFeature::AddArguments(mitkCommandLineParser& parser) const
 {
+  AddQuantifierArguments(parser);
+
   std::string name = GetOptionPrefix();
 
   parser.addArgument(GetLongName(), name, mitkCommandLineParser::Bool, "Calculate Neighbouring Grey Level Dependence Features", "Calculate Neighbouring grey level dependence based features", us::Any());
   parser.addArgument(name + "::range", name + "::range", mitkCommandLineParser::String, "NGLD Range", "Define the range that is used (Semicolon-separated)", us::Any());
-
-  AddQuantifierArguments(parser);
+  parser.addArgument(name + "::alpha", name + "::alpha", mitkCommandLineParser::Int, "Int", "", us::Any());
 }
 
-void
-mitk::GIFNeighbouringGreyLevelDependenceFeature::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &, const Image::Pointer &maskNoNAN, FeatureListType &featureList)
+mitk::AbstractGlobalImageFeature::FeatureListType mitk::GIFNeighbouringGreyLevelDependenceFeature::DoCalculateFeatures(const Image* image, const Image* mask)
 {
-  auto parsedArgs = GetParameter();
-  std::string name = GetOptionPrefix();
+  FeatureListType featureList;
 
-  if (parsedArgs.count(GetLongName()))
+  this->InitializeQuantifier(image, mask);
+  for (const auto& range : m_Ranges)
   {
-    std::vector<double> ranges;
-    if (parsedArgs.count(name + "::range"))
-    {
-      ranges = SplitDouble(parsedArgs[name + "::range"].ToString(), ';');
-    }
-    else
-    {
-      ranges.push_back(1);
-    }
-    for (double range : ranges)
-    {
-      InitializeQuantifierFromParameters(feature, maskNoNAN);
-      this->SetRange(range);
-      MITK_INFO << "Start calculating NGLD";
-      auto localResults = this->CalculateFeatures(feature, maskNoNAN);
-      featureList.insert(featureList.end(), localResults.begin(), localResults.end());
-      MITK_INFO << "Finished calculating NGLD";
-    }
+    MITK_INFO << "Start calculating NGLD with range " << range << "....";
+    GIFNeighbouringGreyLevelDependenceFeatureConfiguration config;
+    config.direction = GetDirection();
+    config.range = range;
+    config.alpha = m_Alpha;
+
+    config.MinimumIntensity = GetQuantifier()->GetMinimum();
+    config.MaximumIntensity = GetQuantifier()->GetMaximum();
+    config.Bins = GetQuantifier()->GetBins();
+
+    config.id = this->CreateTemplateFeatureID(std::to_string(range), { {GetOptionPrefix() + "::range", range} });
+
+    AccessByItk_3(image, CalculateCoocurenceFeatures, mask, featureList, config);
+    MITK_INFO << "Finished calculating NGLD with range " << range << "....";
+  }
+
+  return featureList;
+}
+
+mitk::AbstractGlobalImageFeature::FeatureListType mitk::GIFNeighbouringGreyLevelDependenceFeature::CalculateFeatures(const Image* image, const Image*, const Image* maskNoNAN)
+{
+  return Superclass::CalculateFeatures(image, maskNoNAN);
+}
+
+std::string mitk::GIFNeighbouringGreyLevelDependenceFeature::GenerateLegacyFeatureEncoding(const FeatureID& id) const
+{
+  return QuantifierParameterString() + "_Range-" + id.parameters.at(this->GetOptionPrefix() + "::range").ToString();
+}
+
+void mitk::GIFNeighbouringGreyLevelDependenceFeature::ConfigureSettingsByParameters(const ParametersType& parameters)
+{
+  auto prefixname = GetOptionPrefix();
+
+  auto name = prefixname + "::range";
+  if (parameters.count(name))
+  {
+    m_Ranges = SplitDouble(parameters.at(name).ToString(), ';');
+  }
+
+  name = prefixname + "::alpha";
+  if (parameters.count(name))
+  {
+    int alpha = us::any_cast<int>(parameters.at(name));
+    this->SetAlpha(alpha);
   }
 }
-
-std::string mitk::GIFNeighbouringGreyLevelDependenceFeature::GetCurrentFeatureEncoding()
-{
-  std::ostringstream  ss;
-  ss << m_Range;
-  std::string strRange = ss.str();
-  return QuantifierParameterString() + "_Range-"+ss.str();
-}
-

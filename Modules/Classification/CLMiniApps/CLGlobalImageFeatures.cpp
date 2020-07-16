@@ -43,7 +43,8 @@ found in the LICENSE file.
 #include <mitkITKImageImport.h>
 #include <mitkConvert2Dto3DImageFilter.h>
 
-#include <mitkCLResultWritter.h>
+#include <mitkCLResultWriter.h>
+#include <mitkCLResultXMLWriter.h>
 #include <mitkVersion.h>
 
 #include <iostream>
@@ -413,7 +414,8 @@ int main(int argc, char* argv[])
   parser.addArgument("description","d",mitkCommandLineParser::String,"Text","Description that is added to the output",us::Any());
   parser.addArgument("direction", "dir", mitkCommandLineParser::String, "Int", "Allows to specify the direction for Cooc and RL. 0: All directions, 1: Only single direction (Test purpose), 2,3,4... Without dimension 0,1,2... ", us::Any());
   parser.addArgument("slice-wise", "slice", mitkCommandLineParser::String, "Int", "Allows to specify if the image is processed slice-wise (number giving direction) ", us::Any());
-  parser.addArgument("output-mode", "omode", mitkCommandLineParser::Int, "Int", "Defines if the results of an image / slice are written in a single row (0 , default) or column (1).");
+  parser.addArgument("output-mode", "omode", mitkCommandLineParser::Int, "Int", "Defines the format of the output. 0: (Default) results of an image / slice are written in a single row;"
+    " 1: results of an image / slice are written in a single column; 2: store the result of on image as structured radiomocs report (XML).");
 
   // Miniapp Infos
   parser.setCategory("Classification Tools");
@@ -436,7 +438,7 @@ int main(int argc, char* argv[])
   //bool savePNGofSlices = true;
   //std::string folderForPNGOfSlices = "E:\\tmp\\bonekamp\\fig\\";
 
-  std::string version = "Version: 1.22";
+  std::string version = "Version: 1.23";
   MITK_INFO << version;
 
   std::ofstream log;
@@ -455,13 +457,17 @@ int main(int argc, char* argv[])
     std::cout.imbue(std::locale(std::cout.getloc(), new punct_facet<char>(param.decimalPoint)));
   }
 
-  mitk::Image::Pointer image;
-  mitk::Image::Pointer mask;
 
-  mitk::Image::Pointer tmpImage = mitk::IOUtil::Load<mitk::Image>(param.imagePath);
-  mitk::Image::Pointer tmpMask = mitk::IOUtil::Load<mitk::Image>(param.maskPath);
-  image = tmpImage;
-  mask = tmpMask;
+  //representing the original loaded image data without any prepropcessing that might come.
+  mitk::Image::Pointer loadedImage = mitk::IOUtil::Load<mitk::Image>(param.imagePath);
+  //representing the original loaded mask data without any prepropcessing that might come.
+  mitk::Image::Pointer loadedMask = mitk::IOUtil::Load<mitk::Image>(param.maskPath);
+
+  mitk::Image::Pointer image = loadedImage;
+  mitk::Image::Pointer mask = loadedMask;
+
+  mitk::Image::Pointer tmpImage = loadedImage;
+  mitk::Image::Pointer tmpMask = loadedMask;
 
   mitk::Image::Pointer morphMask = mask;
   if (param.useMorphMask)
@@ -503,6 +509,15 @@ int main(int argc, char* argv[])
     AccessByItk_2(image, ResampleImage, param.resampleResolution, newImage);
     image = newImage;
   }
+
+  log << " Resample if required -";
+  if (param.resampleMask)
+  {
+    mitk::Image::Pointer newMaskImage = mitk::Image::New();
+    AccessByItk_2(mask, ResampleMask, image, newMaskImage);
+    mask = newMaskImage;
+  }
+
   if ( ! mitk::Equal(mask->GetGeometry(0)->GetOrigin(), image->GetGeometry(0)->GetOrigin()))
   {
     MITK_INFO << "Not equal Origins";
@@ -516,14 +531,6 @@ int main(int argc, char* argv[])
     {
       return -1;
     }
-  }
-
-  log << " Resample if required -";
-  if (param.resampleMask)
-  {
-    mitk::Image::Pointer newMaskImage = mitk::Image::New();
-    AccessByItk_2(mask, ResampleMask, image, newMaskImage);
-    mask = newMaskImage;
   }
 
   log << " Check for Equality -";
@@ -595,13 +602,13 @@ int main(int argc, char* argv[])
       cFeature->SetBins(param.globalNumberOfBins);
       MITK_INFO << param.globalNumberOfBins;
     }
-    cFeature->SetParameter(parsedArgs);
+    cFeature->SetParameters(parsedArgs);
     cFeature->SetDirection(direction);
-    cFeature->SetEncodeParameters(param.encodeParameter);
+    cFeature->SetEncodeParametersInFeaturePrefix(param.encodeParameter);
   }
 
   bool addDescription = parsedArgs.count("description");
-  mitk::cl::FeatureResultWritter writer(param.outputPath, writeDirection);
+  mitk::cl::FeatureResultWriter writer(param.outputPath, writeDirection);
 
   if (param.useDecimalPoint)
   {
@@ -670,12 +677,12 @@ int main(int argc, char* argv[])
     {
       log << " Calculating " << cFeature->GetFeatureClassName() << " -";
       cFeature->SetMorphMask(cMorphMask);
-      cFeature->CalculateFeaturesUsingParameters(cImage, cMask, cMaskNoNaN, stats);
+      cFeature->CalculateAndAppendFeatures(cImage, cMask, cMaskNoNaN, stats, !param.calculateAllFeatures);
     }
 
     for (std::size_t i = 0; i < stats.size(); ++i)
     {
-      std::cout << stats[i].first << " - " << stats[i].second << std::endl;
+      std::cout << stats[i].first.legacyName << " - " << stats[i].second << std::endl;
     }
 
     writer.AddHeader(description, currentSlice, stats, param.useHeader, addDescription);
@@ -699,10 +706,10 @@ int main(int argc, char* argv[])
     for (std::size_t i = 0; i < allStats[0].size(); ++i)
     {
       auto cElement1 = allStats[0][i];
-      cElement1.first = "SliceWise Mean " + cElement1.first;
+      cElement1.first.legacyName = "SliceWise Mean " + cElement1.first.legacyName;
       cElement1.second = 0.0;
       auto cElement2 = allStats[0][i];
-      cElement2.first = "SliceWise Var. " + cElement2.first;
+      cElement2.first.legacyName = "SliceWise Var. " + cElement2.first.legacyName;
       cElement2.second = 0.0;
       statMean.push_back(cElement1);
       statStd.push_back(cElement2);
@@ -726,8 +733,8 @@ int main(int argc, char* argv[])
 
     for (std::size_t i = 0; i < statMean.size(); ++i)
     {
-      std::cout << statMean[i].first << " - " << statMean[i].second << std::endl;
-      std::cout << statStd[i].first << " - " << statStd[i].second << std::endl;
+      std::cout << statMean[i].first.legacyName << " - " << statMean[i].second << std::endl;
+      std::cout << statStd[i].first.legacyName << " - " << statStd[i].second << std::endl;
     }
     if (true)
     {
@@ -747,12 +754,36 @@ int main(int argc, char* argv[])
     writer.AddResult(description, currentSlice, statStd, param.useHeader, addDescription);
   }
 
+  int returnCode = EXIT_SUCCESS;
+
+  if (!param.outputXMLPath.empty())
+  {
+    if (sliceWise)
+    {
+      MITK_ERROR << "Xml output is not supported in slicewise mode";
+      returnCode = EXIT_FAILURE;
+    }
+    else
+    {
+      mitk::cl::CLResultXMLWriter xmlWriter;
+      xmlWriter.SetCLIArgs(parsedArgs);
+      xmlWriter.SetFeatures(allStats.front());
+      xmlWriter.SetImage(loadedImage);
+      xmlWriter.SetMask(loadedMask);
+      xmlWriter.SetMethodName("CLGlobalImageFeatures");
+      xmlWriter.SetMethodVersion(version + "(mitk: " MITK_VERSION_STRING+")");
+      xmlWriter.SetOrganisation("German Cancer Research Center (DKFZ)");
+      xmlWriter.SetPipelineUID(param.pipelineUID);
+      xmlWriter.write(param.outputXMLPath);
+    }
+  }
+
   if (param.useLogfile)
   {
     log << "Finished calculation" << std::endl;
     log.close();
   }
-  return 0;
+  return returnCode;
 }
 
 #endif

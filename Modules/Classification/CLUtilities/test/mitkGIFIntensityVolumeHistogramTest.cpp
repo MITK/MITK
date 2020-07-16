@@ -59,8 +59,8 @@ public:
     std::map<std::string, double> results;
     for (auto valuePair : featureList)
     {
-      MITK_INFO << valuePair.first << " : " << valuePair.second;
-      results[valuePair.first] = valuePair.second;
+      MITK_INFO << mitk::AbstractGlobalImageFeature::GenerateLegacyFeatureNameWOEncoding(valuePair.first) << " : " << valuePair.second;
+      results[mitk::AbstractGlobalImageFeature::GenerateLegacyFeatureNameWOEncoding(valuePair.first)] = valuePair.second;
     }
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Image Diagnostics should calculate 7 features.", std::size_t(7), featureList.size());
 
@@ -92,8 +92,8 @@ public:
     std::map<std::string, double> results;
     for (auto valuePair : featureList)
     {
-      MITK_INFO << valuePair.first << " : " << valuePair.second;
-      results[valuePair.first] = valuePair.second;
+      MITK_INFO << mitk::AbstractGlobalImageFeature::GenerateLegacyFeatureNameWOEncoding(valuePair.first) << " : " << valuePair.second;
+      results[mitk::AbstractGlobalImageFeature::GenerateLegacyFeatureNameWOEncoding(valuePair.first)] = valuePair.second;
     }
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Image Diagnostics should calculate 7 features.", std::size_t(7), featureList.size());
 
@@ -125,8 +125,8 @@ public:
     std::map<std::string, double> results;
     for (auto valuePair : featureList)
     {
-      MITK_INFO << valuePair.first << " : " << valuePair.second;
-      results[valuePair.first] = valuePair.second;
+      MITK_INFO << mitk::AbstractGlobalImageFeature::GenerateLegacyFeatureNameWOEncoding(valuePair.first) << " : " << valuePair.second;
+      results[mitk::AbstractGlobalImageFeature::GenerateLegacyFeatureNameWOEncoding(valuePair.first)] = valuePair.second;
     }
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Image Diagnostics should calculate 42 features.", std::size_t(42), featureList.size());
 

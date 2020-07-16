@@ -222,6 +222,6 @@ void mitk::GIFNeighbourhoodGreyLevelDifference::ConfigureSettingsByParameters(co
   if (parameters.count(name))
   {
     bool tmp = us::any_cast<bool>(parameters.at(name));
-    m_UseCTRange;
+    m_UseCTRange = tmp;
   }
 }

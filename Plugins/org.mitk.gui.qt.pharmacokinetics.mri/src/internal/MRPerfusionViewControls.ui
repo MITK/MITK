@@ -736,7 +736,7 @@
   <customwidget>
    <class>QmitkSingleNodeSelectionWidget</class>
    <extends>QWidget</extends>
-   <header>qmitksinglenodeselectionwidget.h</header>
+   <header>QmitkSingleNodeSelectionWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -518,6 +518,11 @@ void mitk::PointSetDataInteractor::SetMaxPoints(unsigned int maxNumber)
   m_MaxNumberOfPoints = maxNumber;
 }
 
+int mitk::PointSetDataInteractor::GetMaxPoints()
+{
+  return m_MaxNumberOfPoints;
+}
+
 int mitk::PointSetDataInteractor::GetPointIndexByPosition(Point3D position, unsigned int time, float accuracy)
 {
   // iterate over point set and check if it contains a point close enough to the pointer to be selected

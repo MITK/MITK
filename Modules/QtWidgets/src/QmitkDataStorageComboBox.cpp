@@ -191,7 +191,7 @@ void QmitkDataStorageComboBox::RemoveNode( int index )
     //# remove itk::Event observer
     mitk::DataNode* _DataNode = m_Nodes.at(index);
     // get name property first
-    mitk::BaseProperty* nameProperty = _DataNode->GetProperty("name");
+    mitk::BaseProperty* nameProperty = getNameProprety(_DataNode);
     // if prop exists remove modified listener
     if(nameProperty)
     {
@@ -355,7 +355,7 @@ void QmitkDataStorageComboBox::InsertNode(int index, const mitk::DataNode* _Data
 
   // const cast because we need non const nodes
   mitk::DataNode* _NonConstDataNode = const_cast<mitk::DataNode*>(_DataNode);
-  mitk::BaseProperty* nameProperty = _NonConstDataNode->GetProperty("name");
+  mitk::BaseProperty* nameProperty = getNameProprety(_NonConstDataNode);
 
   if(!changedNode)
   {
@@ -443,7 +443,7 @@ void QmitkDataStorageComboBox::Reset()
 
 QString QmitkDataStorageComboBox::GetDisplayedNodeName(const mitk::DataNode* node)
 {
-  mitk::BaseProperty* nameProperty = node->GetProperty("name");
+  mitk::BaseProperty* nameProperty = getNameProprety(node);
   std::string _NonConstDataNodeName = "unnamed node";
   if (nameProperty) {
     _NonConstDataNodeName = nameProperty->GetValueAsString();
@@ -451,3 +451,13 @@ QString QmitkDataStorageComboBox::GetDisplayedNodeName(const mitk::DataNode* nod
 
   return QString::fromStdString(_NonConstDataNodeName);
 }
+
+mitk::BaseProperty::Pointer QmitkDataStorageComboBox::getNameProprety(const mitk::DataNode* node)
+{
+  mitk::BaseProperty::Pointer prop = node->GetProperty("caption");
+  if (prop == nullptr) {
+    prop = node->GetProperty("name");
+  }
+  return prop;
+}
+

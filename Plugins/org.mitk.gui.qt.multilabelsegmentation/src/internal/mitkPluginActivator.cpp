@@ -14,7 +14,6 @@ found in the LICENSE file.
 
 #include "QmitkMultiLabelSegmentationView.h"
 #include "QmitkThresholdAction.h"
-#include "QmitkAutocropAction.h"
 #include "QmitkConvertSurfaceToLabelAction.h"
 #include "QmitkConvertMaskToLabelAction.h"
 #include "QmitkConvertToMultiLabelSegmentationAction.h"
@@ -35,7 +34,6 @@ void mitk::PluginActivator::start(ctkPluginContext *context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(QmitkMultiLabelSegmentationView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkThresholdAction, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkAutocropAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkConvertSurfaceToLabelAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkConvertMaskToLabelAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkConvertToMultiLabelSegmentationAction, context)

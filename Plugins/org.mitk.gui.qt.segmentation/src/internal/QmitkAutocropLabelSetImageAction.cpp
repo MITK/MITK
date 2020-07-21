@@ -205,8 +205,6 @@ void QmitkAutocropLabelSetImageAction::Run(const QList<mitk::DataNode::Pointer>&
 
       for (std::remove_const_t<decltype(numTimeSteps)> timeStep = 0; timeStep < numTimeSteps; ++timeStep)
       {
-        auto* croppedVolume = new PixelType[numPixels];
-
         const mitk::Image* image = nullptr;
 
         if (numTimeSteps > 1)
@@ -232,6 +230,7 @@ void QmitkAutocropLabelSetImageAction::Run(const QList<mitk::DataNode::Pointer>&
           return;
         }
 
+        auto* croppedVolume = new PixelType[numPixels];
         itk::Index<3> croppedIndex;
 
         for (croppedIndex[2] = 0; croppedIndex[2] < croppedDim[2]; ++croppedIndex[2])

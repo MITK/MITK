@@ -96,6 +96,7 @@ void QmitkAutocropLabelSetImageAction::Run(const QList<mitk::DataNode::Pointer>&
         catch (const mitk::Exception&)
         {
           MITK_ERROR << "Autocrop was aborted: Image read access to \"" << dataNode->GetName() << "\" was denied.";
+          labelSetImage->SetActiveLayer(activeLayer);
           return;
         }
 
@@ -157,6 +158,7 @@ void QmitkAutocropLabelSetImageAction::Run(const QList<mitk::DataNode::Pointer>&
     if (labelSetImageIsEmpty)
     {
       MITK_WARN << "Autocrop was skipped: Image \"" << dataNode->GetName() << "\" is empty.";
+      labelSetImage->SetActiveLayer(activeLayer);
       return;
     }
 
@@ -227,6 +229,7 @@ void QmitkAutocropLabelSetImageAction::Run(const QList<mitk::DataNode::Pointer>&
         catch (const mitk::Exception&)
         {
           MITK_ERROR << "Autocrop was aborted: Image read access to \"" << dataNode->GetName() << "\" was denied.";
+          labelSetImage->SetActiveLayer(activeLayer);
           return;
         }
 

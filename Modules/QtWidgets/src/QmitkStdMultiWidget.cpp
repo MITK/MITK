@@ -225,11 +225,11 @@ void QmitkStdMultiWidget::ResetCrosshair()
     return;
   }
 
-	auto geo = dataStorage->ComputeBoundingGeometry3D(dataStorage->GetAll());
-	mitk::RenderingManager::GetInstance()->InitializeView(GetRenderWindow1()->GetRenderWindow(), geo);
-	mitk::RenderingManager::GetInstance()->InitializeView(GetRenderWindow2()->GetRenderWindow(), geo);
-	mitk::RenderingManager::GetInstance()->InitializeView(GetRenderWindow3()->GetRenderWindow(), geo);
-	mitk::RenderingManager::GetInstance()->InitializeView(GetRenderWindow4()->GetRenderWindow(), geo);
+  auto geo = dataStorage->ComputeBoundingGeometry3D(dataStorage->GetAll());
+  mitk::RenderingManager::GetInstance()->InitializeView(GetRenderWindow1()->GetRenderWindow(), geo);
+  mitk::RenderingManager::GetInstance()->InitializeView(GetRenderWindow2()->GetRenderWindow(), geo);
+  mitk::RenderingManager::GetInstance()->InitializeView(GetRenderWindow3()->GetRenderWindow(), geo);
+  mitk::RenderingManager::GetInstance()->InitializeView(GetRenderWindow4()->GetRenderWindow(), geo);
 
   SetWidgetPlaneMode(mitk::InteractionSchemeSwitcher::MITKStandard);
 }
@@ -637,7 +637,7 @@ void QmitkStdMultiWidget::AddDisplayPlaneSubTree()
   // ... of widget 1
   mitk::BaseRenderer* renderer1 = mitk::BaseRenderer::GetInstance(GetRenderWindow1()->GetRenderWindow());
   m_PlaneNode1 = renderer1->GetCurrentWorldPlaneGeometryNode();
-	m_PlaneNode1->SetProperty("visible", mitk::BoolProperty::New(true));
+  m_PlaneNode1->SetProperty("visible", mitk::BoolProperty::New(true));
   m_PlaneNode1->SetProperty("name", mitk::StringProperty::New(std::string(renderer1->GetName()) + ".plane"));
   m_PlaneNode1->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
   m_PlaneNode1->SetProperty("helper object", mitk::BoolProperty::New(true));
@@ -723,7 +723,7 @@ void QmitkStdMultiWidget::SetLayoutImpl()
   CreateRenderWindowWidgets();
   GetMultiWidgetLayoutManager()->SetLayoutDesign(QmitkMultiWidgetLayoutManager::LayoutDesign::DEFAULT);
 
-	ResetCrosshair();
+  ResetCrosshair();
 }
 
 void QmitkStdMultiWidget::CreateRenderWindowWidgets()
@@ -744,7 +744,6 @@ void QmitkStdMultiWidget::CreateRenderWindowWidgets()
   auto renderWindow2 = renderWindowWidget2->GetRenderWindow();
   renderWindow2->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
   renderWindowWidget2->SetDecorationColor(GetDecorationColor(1));
-//  renderWindowWidget2->setStyleSheet("border: 0px");
   renderWindowWidget2->SetCornerAnnotationText("Sagittal");
   renderWindowWidget2->GetRenderWindow()->SetLayoutIndex(ViewDirection::SAGITTAL);
   AddRenderWindowWidget(renderWindowWidgetName, renderWindowWidget2);

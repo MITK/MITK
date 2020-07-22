@@ -52,8 +52,8 @@ void QmitkRenderWindowWidget::SetDataStorage(mitk::DataStorage* dataStorage)
   m_DataStorage = dataStorage;
   if (nullptr != m_RenderWindow)
   {
-		mitk::BaseRenderer::GetInstance(m_RenderWindow->GetRenderWindow())->SetDataStorage(dataStorage);
-	}
+    mitk::BaseRenderer::GetInstance(m_RenderWindow->GetRenderWindow())->SetDataStorage(dataStorage);
+  }
 }
 
 mitk::SliceNavigationController* QmitkRenderWindowWidget::GetSliceNavigationController() const
@@ -63,15 +63,15 @@ mitk::SliceNavigationController* QmitkRenderWindowWidget::GetSliceNavigationCont
 
 void QmitkRenderWindowWidget::RequestUpdate()
 {
-	auto geo = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
-	mitk::RenderingManager::GetInstance()->InitializeView(m_RenderWindow->GetRenderWindow(), geo);
+  auto geo = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
+  mitk::RenderingManager::GetInstance()->InitializeView(m_RenderWindow->GetRenderWindow(), geo);
   mitk::RenderingManager::GetInstance()->RequestUpdate(m_RenderWindow->GetRenderWindow());
 }
 
 void QmitkRenderWindowWidget::ForceImmediateUpdate()
 {
-	auto geo = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
-	mitk::RenderingManager::GetInstance()->InitializeView(m_RenderWindow->GetRenderWindow(), geo);
+  auto geo = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
+  mitk::RenderingManager::GetInstance()->InitializeView(m_RenderWindow->GetRenderWindow(), geo);
   mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(m_RenderWindow->GetRenderWindow());
 }
 
@@ -198,7 +198,11 @@ void QmitkRenderWindowWidget::InitializeGUI()
 
   connect(m_RenderWindow, &QVTKOpenGLWidget::mouseEvent, this, &QmitkRenderWindowWidget::MouseEvent);
 
-	mitk::BaseRenderer::GetInstance(m_RenderWindow->GetRenderWindow())->SetDataStorage(m_DataStorage);
+  mitk::BaseRenderer::GetInstance(m_RenderWindow->GetRenderWindow())->SetDataStorage(m_DataStorage);
+
+  // Init datastorage geometry
+  auto geo = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
+  mitk::RenderingManager::GetInstance()->InitializeView(m_RenderWindow->GetRenderWindow(), geo);
 
   m_Layout->addWidget(m_RenderWindow);
 

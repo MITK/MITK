@@ -299,7 +299,7 @@ bool QmitkDataStorageTreeModel::dropMimeData(
           auto dataStorage = m_DataStorage.Lock();
 
           m_BlockDataStorageEvents = true;
-          mitk::DataNode *droppedNode = (*diIter)->GetDataNode();
+          mitk::DataNode::Pointer droppedNode = (*diIter)->GetDataNode();
           mitk::DataNode *dropOntoNode = dropItem->GetDataNode();
           dataStorage->Remove(droppedNode);
           dataStorage->Add(droppedNode, dropOntoNode);

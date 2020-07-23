@@ -10,23 +10,19 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QMITKDEFORMABLECLIPPINGPLANEVIEW_H_INCLUDED
-#define _QMITKDEFORMABLECLIPPINGPLANEVIEW_H_INCLUDED
-
+#ifndef QMITKDEFORMABLECLIPPINGPLANEVIEW_H
+#define QMITKDEFORMABLECLIPPINGPLANEVIEW_H
 
 #include <ui_QmitkDeformableClippingPlaneViewControls.h>
+
 #include <mitkImage.h>
 #include <QmitkAbstractView.h>
 
 typedef itk::RGBPixel< float > Color;
 
-/*!
-* \ingroup org_mitk_gui_qt_deformableSurface
-*
-* \brief QmitkDeformableClippingPlaneView
-*
-* Document your class here.
-*/
+/**
+ * @brief
+ */
 class QmitkDeformableClippingPlaneView : public QmitkAbstractView
 {
   Q_OBJECT
@@ -38,17 +34,9 @@ public:
   QmitkDeformableClippingPlaneView();
   ~QmitkDeformableClippingPlaneView() override;
 
-  void CreateQtPartControl(QWidget *parent) override;
-
-  /// \brief Creation of the connections of main and control widget
-  virtual void CreateConnections();
-
-  ///
-  /// Sets the focus to an internal widget.
-  ///
   void SetFocus() override;
 
-protected slots:
+private Q_SLOTS:
 
     void OnComboBoxSelectionChanged(const mitk::DataNode* node);
     void OnCreateNewClippingPlane();
@@ -58,7 +46,10 @@ protected slots:
     void OnRotationMode(bool check);
     void OnDeformationMode(bool check);
 
-protected:
+private:
+
+  void CreateQtPartControl(QWidget *parent) override;
+  virtual void CreateConnections();
 
   virtual void OnSelectionChanged(mitk::DataNode* node);
   void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
@@ -67,15 +58,15 @@ protected:
 
   void UpdateView();
 
-  Ui::QmitkDeformableClippingPlaneViewControls m_Controls;
-
-private:
   mitk::DataStorage::SetOfObjects::ConstPointer GetAllClippingPlanes();
   mitk::Color GetLabelColor(int label);
   void DeactivateInteractionButtons();
 
+  Ui::QmitkDeformableClippingPlaneViewControls* m_Controls;
+
   mitk::DataNode::Pointer m_ReferenceNode;
   mitk::DataNode::Pointer m_WorkingNode;
+
 };
 
 #endif

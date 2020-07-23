@@ -820,21 +820,6 @@ const mitk::GeometryTransformHolder *mitk::BaseGeometry::GetGeometryTransformHol
   return m_GeometryTransform;
 }
 
-bool mitk::Equal(const mitk::BaseGeometry::BoundingBoxType *leftHandSide,
-                 const mitk::BaseGeometry::BoundingBoxType *rightHandSide,
-                 ScalarType eps,
-                 bool verbose)
-{
-  if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
-  {
-    MITK_ERROR << "mitk::Equal( const mitk::Geometry3D::BoundingBoxType *leftHandSide, const "
-                  "mitk::Geometry3D::BoundingBoxType *rightHandSide, ScalarType eps, bool verbose ) does not with nullptr "
-                  "pointer input.";
-    return false;
-  }
-  return Equal(*leftHandSide, *rightHandSide, eps, verbose);
-}
-
 bool mitk::Equal(const mitk::BaseGeometry::BoundingBoxType &leftHandSide,
                  const mitk::BaseGeometry::BoundingBoxType &rightHandSide,
                  ScalarType eps,
@@ -860,20 +845,6 @@ bool mitk::Equal(const mitk::BaseGeometry::BoundingBoxType &leftHandSide,
     itLeft++;
   }
   return result;
-}
-
-bool mitk::Equal(const mitk::BaseGeometry *leftHandSide,
-                 const mitk::BaseGeometry *rightHandSide,
-                 ScalarType eps,
-                 bool verbose)
-{
-  if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
-  {
-    MITK_ERROR << "mitk::Equal(const mitk::Geometry3D *leftHandSide, const mitk::Geometry3D *rightHandSide, ScalarType "
-                  "eps, bool verbose) does not with nullptr pointer input.";
-    return false;
-  }
-  return Equal(*leftHandSide, *rightHandSide, eps, verbose);
 }
 
 bool mitk::Equal(const mitk::BaseGeometry &leftHandSide,
@@ -978,20 +949,6 @@ bool mitk::Equal(const mitk::BaseGeometry& leftHandSide,
   bool verbose)
 {
   return Equal(leftHandSide, rightHandSide, eps, eps, verbose);
-}
-
-bool mitk::Equal(const mitk::BaseGeometry::TransformType *leftHandSide,
-                 const mitk::BaseGeometry::TransformType *rightHandSide,
-                 ScalarType eps,
-                 bool verbose)
-{
-  if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
-  {
-    MITK_ERROR << "mitk::Equal(const Geometry3D::TransformType *leftHandSide, const Geometry3D::TransformType "
-                  "*rightHandSide, ScalarType eps, bool verbose ) does not with nullptr pointer input.";
-    return false;
-  }
-  return Equal(*leftHandSide, *rightHandSide, eps, verbose);
 }
 
 bool mitk::Equal(const mitk::BaseGeometry::TransformType &leftHandSide,

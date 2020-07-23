@@ -10,7 +10,6 @@ set(CPP_FILES
   mitkMultiLabelMaskGenerator.cpp
   mitkImageMaskGenerator.cpp
   mitkHistogramStatisticsCalculator.cpp
-  mitkMaskUtilities.cpp
   mitkIgnorePixelMaskGenerator.cpp
   mitkImageStatisticsPredicateHelper.cpp
   mitkImageStatisticsContainerNodeHelper.cpp
@@ -44,4 +43,8 @@ set(H_FILES
   mitkStatisticsToImageRelationRule.h
   mitkStatisticsToMaskRelationRule.h
   mitkImageStatisticsConstants.h
+)
+
+set(TPP_FILES
+  mitkMaskUtilities.tpp
 )

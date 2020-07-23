@@ -408,13 +408,18 @@ void QmitkDeformableClippingPlaneView::OnDeformationMode(bool check)
 
 void QmitkDeformableClippingPlaneView::CreateConnections()
 {
-  connect(m_Controls->translationPushButton, SIGNAL(toggled(bool)), this, SLOT(OnTranslationMode(bool)));
-  connect(m_Controls->rotationPushButton, SIGNAL(toggled(bool)), this, SLOT(OnRotationMode(bool)));
-  connect(m_Controls->deformationPushButton, SIGNAL(toggled(bool)), this, SLOT(OnDeformationMode(bool)));
-  connect(m_Controls->createNewPlanePushButton, SIGNAL(clicked()), this, SLOT(OnCreateNewClippingPlane()));
-  connect(m_Controls->updateVolumePushButton, SIGNAL(clicked()), this, SLOT(OnCalculateClippingVolume()));
-  connect(m_Controls->clippingPlaneSelector, SIGNAL(OnSelectionChanged(const mitk::DataNode*)),
-    this, SLOT(OnComboBoxSelectionChanged(const mitk::DataNode*)));
+  connect(m_Controls->translationPushButton, &QPushButton::toggled,
+          this, &QmitkDeformableClippingPlaneView::OnTranslationMode);
+  connect(m_Controls->rotationPushButton, &QPushButton::toggled,
+    this, &QmitkDeformableClippingPlaneView::OnRotationMode);
+  connect(m_Controls->deformationPushButton, &QPushButton::toggled,
+          this, &QmitkDeformableClippingPlaneView::OnDeformationMode);
+  connect(m_Controls->createNewPlanePushButton, &QPushButton::clicked,
+          this, &QmitkDeformableClippingPlaneView::OnCreateNewClippingPlane);
+  connect(m_Controls->updateVolumePushButton, &QPushButton::clicked,
+          this, &QmitkDeformableClippingPlaneView::OnCalculateClippingVolume);
+  connect(m_Controls->clippingPlaneSelector, &QmitkDataStorageComboBox::OnSelectionChanged,
+          this, &QmitkDeformableClippingPlaneView::OnComboBoxSelectionChanged);
 }
 
 void QmitkDeformableClippingPlaneView::OnSelectionChanged(mitk::DataNode* node)

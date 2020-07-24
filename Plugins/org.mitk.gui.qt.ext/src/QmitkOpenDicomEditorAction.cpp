@@ -52,7 +52,7 @@ void QmitkOpenDicomEditorAction::init(berry::IWorkbenchWindow::Pointer window)
   m_Window = window;
   this->setParent(static_cast<QWidget*>(m_Window->GetShell()->GetControl()));
   this->setText("&DICOM");
-  this->setToolTip("Open dicom tool");
+  this->setToolTip("Open dicom browser");
 
   berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
 
@@ -72,6 +72,6 @@ void QmitkOpenDicomEditorAction::Run()
   }
 
   berry::IEditorInput::Pointer editorInput2(new berry::FileEditorInput(QString()));
-  m_Window->GetActivePage()->OpenEditor(editorInput2, "org.mitk.editors.dicomeditor");
+  m_Window->GetActivePage()->OpenEditor(editorInput2, "org.mitk.editors.dicombrowser");
 }
 

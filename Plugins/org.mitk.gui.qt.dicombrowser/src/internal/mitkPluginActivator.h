@@ -21,7 +21,7 @@ class PluginActivator :
   public QObject, public ctkPluginActivator
 {
   Q_OBJECT
-  Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_dicom")
+  Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_dicombrowser")
   Q_INTERFACES(ctkPluginActivator)
 
 public:

@@ -88,7 +88,7 @@
           </property>
           <attribute name="icon">
            <iconset resource="../../resources/dicom.qrc">
-            <normaloff>:/org.mitk.gui.qt.dicom/drive-harddisk_32.png</normaloff>:/org.mitk.gui.qt.dicom/drive-harddisk_32.png</iconset>
+            <normaloff>:/org.mitk.gui.qt.dicombrowser/drive-harddisk_32.png</normaloff>:/org.mitk.gui.qt.dicombrowser/drive-harddisk_32.png</iconset>
           </attribute>
           <attribute name="title">
            <string>Local Storage</string>
@@ -118,8 +118,8 @@
           </property>
           <attribute name="icon">
            <iconset resource="../../resources/dicom.qrc">
-            <normaloff>:/org.mitk.gui.qt.dicom/import_32.png</normaloff>
-            <selectedon>:/org.mitk.gui.qt.dicom/import_32.png</selectedon>:/org.mitk.gui.qt.dicom/import_32.png</iconset>
+            <normaloff>:/org.mitk.gui.qt.dicombrowser/import_32.png</normaloff>
+            <selectedon>:/org.mitk.gui.qt.dicombrowser/import_32.png</selectedon>:/org.mitk.gui.qt.dicombrowser/import_32.png</iconset>
           </attribute>
           <attribute name="title">
            <string>Import</string>
@@ -149,7 +149,7 @@
           </property>
           <attribute name="icon">
            <iconset resource="../../resources/dicom.qrc">
-            <normaloff>:/org.mitk.gui.qt.dicom/network-workgroup_32.png</normaloff>:/org.mitk.gui.qt.dicom/network-workgroup_32.png</iconset>
+            <normaloff>:/org.mitk.gui.qt.dicombrowser/network-workgroup_32.png</normaloff>:/org.mitk.gui.qt.dicombrowser/network-workgroup_32.png</iconset>
           </attribute>
           <attribute name="title">
            <string>Query Retrieve</string>

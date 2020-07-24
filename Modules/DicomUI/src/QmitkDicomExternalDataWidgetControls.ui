@@ -44,8 +44,8 @@
             <string>Scan directory</string>
            </property>
            <property name="icon">
-            <iconset resource="../../../Plugins/org.mitk.gui.qt.dicom/resources/dicom.qrc">
-             <normaloff>:/org.mitk.gui.qt.dicom/folder_32.png</normaloff>:/org.mitk.gui.qt.dicom/folder_32.png</iconset>
+            <iconset resource="../../../Plugins/org.mitk.gui.qt.dicombrowser/resources/dicom.qrc">
+             <normaloff>:/org.mitk.gui.qt.dicombrowser/folder_32.png</normaloff>:/org.mitk.gui.qt.dicombrowser/folder_32.png</iconset>
            </property>
           </widget>
          </item>
@@ -58,8 +58,8 @@
             <string>Add to local storage</string>
            </property>
            <property name="icon">
-            <iconset resource="../../../Plugins/org.mitk.gui.qt.dicom/resources/dicom.qrc">
-             <normaloff>:/org.mitk.gui.qt.dicom/import_32.png</normaloff>:/org.mitk.gui.qt.dicom/import_32.png</iconset>
+            <iconset resource="../../../Plugins/org.mitk.gui.qt.dicombrowser/resources/dicom.qrc">
+             <normaloff>:/org.mitk.gui.qt.dicombrowser/import_32.png</normaloff>:/org.mitk.gui.qt.dicombrowser/import_32.png</iconset>
            </property>
           </widget>
          </item>
@@ -72,8 +72,8 @@
             <string>View</string>
            </property>
            <property name="icon">
-            <iconset resource="../../../Plugins/org.mitk.gui.qt.dicom/resources/dicom.qrc">
-             <normaloff>:/org.mitk.gui.qt.dicom/viewIcon.png</normaloff>:/org.mitk.gui.qt.dicom/viewIcon.png</iconset>
+            <iconset resource="../../../Plugins/org.mitk.gui.qt.dicombrowser/resources/dicom.qrc">
+             <normaloff>:/org.mitk.gui.qt.dicombrowser/viewIcon.png</normaloff>:/org.mitk.gui.qt.dicombrowser/viewIcon.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -132,7 +132,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../Plugins/org.mitk.gui.qt.dicom/resources/dicom.qrc"/>
+  <include location="../../../Plugins/org.mitk.gui.qt.dicombrowser/resources/dicom.qrc"/>
  </resources>
  <connections/>
 </ui>

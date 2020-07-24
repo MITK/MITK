@@ -22,7 +22,7 @@ found in the LICENSE file.
 #include <QDir>
 #include <QDirIterator>
 #include <QCoreApplication>
-#include "org_mitk_gui_qt_dicom_config.h"
+#include "org_mitk_gui_qt_dicombrowser_config.h"
 
 QmitkStoreSCPLauncher::QmitkStoreSCPLauncher(QmitkStoreSCPLauncherBuilder* builder)
 : m_StoreSCP(new QProcess())

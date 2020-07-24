@@ -1,4 +1,4 @@
-project(org_mitk_gui_qt_dicom)
+project(org_mitk_gui_qt_dicombrowser)
 
 # Note:
 # If we use an installed version of DCMTK then DCMTK_DIR points to the subdirectory
@@ -16,7 +16,7 @@ mark_as_advanced(DCMTK_STORESCP)
 if(NOT EXISTS ${DCMTK_STORESCP})
   message(WARNING "Couldn't find program storescp: Query/retrieve of the DICOM plugin won't work!")
 else()
-  configure_file( org_mitk_gui_qt_dicom_config.h.in org_mitk_gui_qt_dicom_config.h @ONLY)
+  configure_file( org_mitk_gui_qt_dicombrowser_config.h.in org_mitk_gui_qt_dicombrowser_config.h @ONLY)
 
   MITK_INSTALL_HELPER_APP(EXECUTABLES ${DCMTK_STORESCP})
 

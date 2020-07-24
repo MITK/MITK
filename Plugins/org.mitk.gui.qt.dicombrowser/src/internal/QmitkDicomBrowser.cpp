@@ -43,7 +43,7 @@ void QmitkDicomBrowser::CreateQtPartControl(QWidget *parent )
 {
     m_Controls.setupUi( parent );
     m_Controls.StoreSCPStatusLabel->setTextFormat(Qt::RichText);
-    m_Controls.StoreSCPStatusLabel->setText("<img src=':/org.mitk.gui.qt.dicom/network-offline_16.png'>");
+    m_Controls.StoreSCPStatusLabel->setText("<img src=':/org.mitk.gui.qt.dicombrowser/network-offline_16.png'>");
 
 
     TestHandler();
@@ -151,12 +151,12 @@ void QmitkDicomBrowser::StartStoreSCP()
 
 void QmitkDicomBrowser::OnStoreSCPStatusChanged(const QString& status)
 {
-    m_Controls.StoreSCPStatusLabel->setText("<img src=':/org.mitk.gui.qt.dicom/network-idle_16.png'> "+status);
+    m_Controls.StoreSCPStatusLabel->setText("<img src=':/org.mitk.gui.qt.dicombrowser/network-idle_16.png'> "+status);
 }
 
 void QmitkDicomBrowser::OnDicomNetworkError(const QString& status)
 {
-    m_Controls.StoreSCPStatusLabel->setText("<img src=':/org.mitk.gui.qt.dicom/network-error_16.png'> "+status);
+    m_Controls.StoreSCPStatusLabel->setText("<img src=':/org.mitk.gui.qt.dicombrowser/network-error_16.png'> "+status);
 }
 
 void QmitkDicomBrowser::StopStoreSCP()

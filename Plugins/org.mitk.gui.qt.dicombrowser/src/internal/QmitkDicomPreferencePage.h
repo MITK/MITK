@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <QStringList>
 
 #include "berryIQtPreferencePage.h"
-#include <org_mitk_gui_qt_dicom_Export.h>
+#include <org_mitk_gui_qt_dicombrowser_Export.h>
 #include <berryIPreferences.h>
 
 class QWidget;

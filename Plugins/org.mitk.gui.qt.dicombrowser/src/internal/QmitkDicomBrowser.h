@@ -26,7 +26,7 @@ found in the LICENSE file.
 #include "QmitkStoreSCPLauncher.h"
 #include "QmitkStoreSCPLauncherBuilder.h"
 #include "ui_QmitkDicomBrowserControls.h"
-#include <org_mitk_gui_qt_dicom_Export.h>
+#include <org_mitk_gui_qt_dicombrowser_Export.h>
 
 // Qt
 #include <QObject>

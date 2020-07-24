@@ -93,8 +93,6 @@ public:
   {
   }
 
-private:
-
 };
 }
 

@@ -99,7 +99,7 @@ namespace mitk
 
     using InstanceIDType = std::string;
     /** Returns the property key path for a RII property.
-     * @param propName If not empty a PropertyPath element will added (with the passed value) after the <InstenceID> element.
+     * @param propName If not empty a PropertyPath element will added (with the passed value) after the <InstanceID> element.
      * @param instanceID If not empty, the PropertyKeyPath is only for a specific instance. If empty,
      * it is wildcarded and will match RIIs property of any instance.*/
     static PropertyKeyPath GetRIIPropertyKeyPath(const std::string propName, const InstanceIDType& instanceID);
@@ -340,7 +340,7 @@ namespace mitk
     virtual bool IsSupportedRuleID(const RuleIDType& ruleID) const;
 
     /** Helper function that generates a reg ex that can be used to find a specific RII property for the rule instance.
-     * @param propName If not empty a PropertyPath element will added (with the passed value) after the <InstanceID> element.
+     * @param propName If not empty a PropertyPath element will be added (with the passed value) after the <InstanceID> element.
      * @param instanceID If not empty only for the reg ex will only valid for the passed instanceID. Otherwise for all.*/
     std::string GetRIIPropertyRegEx(const std::string propName = "", const InstanceIDType &instanceID = "") const;
 

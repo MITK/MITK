@@ -296,7 +296,7 @@ public:
     CPPUNIT_ASSERT(abstractRule->IsAbstract());
     CPPUNIT_ASSERT(!rule->IsAbstract());
 
-    CPPUNIT_ASSERT_EQUAL(abstractRule->GetRuleID(), std::string("SourceImageRelation "));
+    CPPUNIT_ASSERT_EQUAL(abstractRule->GetRuleID(), std::string("SourceImageRelation"));
     CPPUNIT_ASSERT_EQUAL(abstractRule->GetDisplayName(), std::string("Abstract image to image relation"));
     CPPUNIT_ASSERT_EQUAL(abstractRule->GetSourceRoleName(), std::string("derived data"));
     CPPUNIT_ASSERT_EQUAL(abstractRule->GetDestinationRoleName(), std::string("source image"));

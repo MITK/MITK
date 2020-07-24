@@ -77,4 +77,4 @@ itk::LightObject::Pointer mitk::ModelFitResultRelationRule::InternalClone() cons
   itk::LightObject::Pointer result = Self::New().GetPointer();
 
   return result;
-};
+}

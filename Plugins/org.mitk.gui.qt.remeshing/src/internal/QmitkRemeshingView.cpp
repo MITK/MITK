@@ -40,26 +40,29 @@ void QmitkRemeshingView::CreateQtPartControl(QWidget* parent)
 
   m_Controls.remeshPushButton->setIcon(berry::QtStyleManager::ThemeIcon(QStringLiteral(":/Remeshing/RemeshingIcon.svg")));
 
-  m_Controls.surfaceComboBox->SetDataStorage(this->GetDataStorage());
-  m_Controls.surfaceComboBox->SetPredicate(mitk::NodePredicateAnd::New(
+  m_Controls.selectionWidget->SetDataStorage(this->GetDataStorage());
+  m_Controls.selectionWidget->SetSelectionIsOptional(true);
+  m_Controls.selectionWidget->SetEmptyInfo(QStringLiteral("Select a surface"));
+  m_Controls.selectionWidget->SetAutoSelectNewNodes(true);
+  m_Controls.selectionWidget->SetNodePredicate(mitk::NodePredicateAnd::New(
     mitk::TNodePredicateDataType<mitk::Surface>::New(),
     mitk::NodePredicateNot::New(mitk::NodePredicateOr::New(
       mitk::NodePredicateProperty::New("helper object"),
       mitk::NodePredicateProperty::New("hidden object")))));
 
-  connect(m_Controls.surfaceComboBox, SIGNAL(OnSelectionChanged(const mitk::DataNode *)), this, SLOT(OnSelectedSurfaceChanged(const mitk::DataNode *)));
+  connect(m_Controls.selectionWidget, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkRemeshingView::OnSelectedSurfaceChanged);
   connect(m_Controls.densitySlider, SIGNAL(valueChanged(int)), this, SLOT(OnDensityChanged(int)));
   connect(m_Controls.densitySpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnDensityChanged(int)));
   connect(m_Controls.remeshPushButton, SIGNAL(clicked()), this, SLOT(OnRemeshButtonClicked()));
 
-  this->OnSelectedSurfaceChanged(m_Controls.surfaceComboBox->GetSelectedNode());
+  this->OnSelectedSurfaceChanged(m_Controls.selectionWidget->GetSelectedNodes());
 }
 
-void QmitkRemeshingView::OnSelectedSurfaceChanged(const mitk::DataNode *node)
+void QmitkRemeshingView::OnSelectedSurfaceChanged(const QmitkSingleNodeSelectionWidget::NodeList& nodes)
 {
-  if (node != nullptr)
+  if (!nodes.empty() && nodes.front().IsNotNull())
   {
-    m_MaxNumberOfVertices = static_cast<int>(static_cast<mitk::Surface*>(node->GetData())->GetVtkPolyData()->GetNumberOfPoints());
+    m_MaxNumberOfVertices = static_cast<int>(static_cast<mitk::Surface*>(nodes.front()->GetData())->GetVtkPolyData()->GetNumberOfPoints());
     this->EnableWidgets(true);
   }
   else
@@ -80,7 +83,7 @@ void QmitkRemeshingView::OnDensityChanged(int density)
 
 void QmitkRemeshingView::OnRemeshButtonClicked()
 {
-  mitk::DataNode::Pointer selectedNode = m_Controls.surfaceComboBox->GetSelectedNode();
+  mitk::DataNode::Pointer selectedNode = m_Controls.selectionWidget->GetSelectedNode();
   mitk::Surface::ConstPointer surface = static_cast<mitk::Surface*>(selectedNode->GetData());
 
   int density = m_Controls.densitySpinBox->value();
@@ -141,7 +144,6 @@ void QmitkRemeshingView::OnRemeshButtonClicked()
 
 void QmitkRemeshingView::EnableWidgets(bool enable)
 {
-  m_Controls.surfaceComboBox->setEnabled(enable);
   m_Controls.densitySlider->setEnabled(enable);
   m_Controls.densitySpinBox->setEnabled(enable);
   m_Controls.remeshingComboBox->setEnabled(enable);
@@ -154,6 +156,6 @@ void QmitkRemeshingView::EnableWidgets(bool enable)
 
 void QmitkRemeshingView::SetFocus()
 {
-  m_Controls.surfaceComboBox->setFocus();
+  m_Controls.selectionWidget->setFocus();
 }
 

@@ -14,6 +14,7 @@ found in the LICENSE file.
 #define QmitkRemeshingView_h
 
 #include <QmitkAbstractView.h>
+#include <QmitkSingleNodeSelectionWidget.h>
 #include <ui_QmitkRemeshingViewControls.h>
 
 class QmitkRemeshingView : public QmitkAbstractView
@@ -28,7 +29,7 @@ public:
   void SetFocus() override;
 
 private slots:
-  void OnSelectedSurfaceChanged(const mitk::DataNode *node);
+  void OnSelectedSurfaceChanged(const QmitkSingleNodeSelectionWidget::NodeList& nodes);
   void OnDensityChanged(int numVertices);
   void OnRemeshButtonClicked();
 

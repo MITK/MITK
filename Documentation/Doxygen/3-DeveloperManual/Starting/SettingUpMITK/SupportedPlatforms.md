@@ -27,8 +27,8 @@ Errors or bugs discovered in these platforms are prioritized and corrected as so
 | Platform                            | Compilers
 | ----------------------------------- | --------------------------------------------------
 | Microsoft Windows 10 (x64)          | Visual Studio 2019 (latest update)
+| Linux Ubuntu 20.04 (x64)            | Default GCC version
 | Linux Ubuntu 18.04 (x64)            | Default GCC version
-| Linux Ubuntu 16.04 (x64)            | Default GCC version
 
 Tier 2 Platforms
 ----------------

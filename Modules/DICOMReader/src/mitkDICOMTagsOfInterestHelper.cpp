@@ -167,7 +167,7 @@ mitk::GetDefaultDICOMTagsOfInterest()
 
     result.insert(MakeEntry(DICOMTagPath(radioNuclideRootTag).AddElement(0x0008, 0x0100))); //dicom.pet.Radionuclide.CodeValue
     result.insert(MakeEntry(DICOMTagPath(radioNuclideRootTag).AddElement(0x0008, 0x0102))); //dicom.pet.Radionuclide.CodingSchemeDesignator
-    result.insert(MakeEntry(DICOMTagPath(radioNuclideRootTag).AddElement(0x0008, 0x0104))); //dicom.pet.Radionuclide.CodemManing
+    result.insert(MakeEntry(DICOMTagPath(radioNuclideRootTag).AddElement(0x0008, 0x0104))); //dicom.pet.Radionuclide.CodeMeaning
 
     result.insert(MakeEntry(DICOMTag(0x0054, 0x1001))); //dicom.pet.RadioactivityUnits
     result.insert(MakeEntry(DICOMTag(0x0054, 0x1102))); //dicom.pet.DecayCorrection
@@ -194,6 +194,17 @@ mitk::GetDefaultDICOMTagsOfInterest()
     result.insert(MakeEntry(DICOMTag(0x0008, 0x0018))); //SOP Instance UID
     result.insert(MakeEntry(DICOMTag(0x0020, 0x0013))); //Instance number
     result.insert(MakeEntry(DICOMTag(0x0020, 0x1041))); //Slice location
+
+    //Tags that document relations to other elements
+    DICOMTagPath sourceImageRefRootTag;
+    sourceImageRefRootTag.AddAnySelection(0x0008, 0x2112);
+    result.insert(MakeEntry(DICOMTagPath(sourceImageRefRootTag).AddElement(0x0008, 0x1155))); //dicom.SourceImage.ReferenceSOPInstanceUID
+    result.insert(MakeEntry(DICOMTagPath(sourceImageRefRootTag).AddElement(0x0008, 0x1150))); //dicom.SourceImage.ReferenceSOPClassUID
+    DICOMTagPath sourceImageRefPurposeRootTag(sourceImageRefRootTag);
+    sourceImageRefPurposeRootTag.AddAnySelection(0x0040, 0xa170);
+    result.insert(MakeEntry(DICOMTagPath(sourceImageRefPurposeRootTag).AddElement(0x0008, 0x0104))); //dicom.SourceImage.Purpose.CodeMeaning
+    result.insert(MakeEntry(DICOMTagPath(sourceImageRefPurposeRootTag).AddElement(0x0008, 0x0100))); //dicom.SourceImage.Purpose.CodeValue
+    result.insert(MakeEntry(DICOMTagPath(sourceImageRefPurposeRootTag).AddElement(0x0008, 0x0102))); //dicom.SourceImage.Purpose.CodeSchemeDesignator
 
     return result;
 };

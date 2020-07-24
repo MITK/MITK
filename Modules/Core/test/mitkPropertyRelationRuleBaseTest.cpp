@@ -184,6 +184,7 @@ class mitkPropertyRelationRuleBaseTestSuite : public mitk::TestFixture
   MITK_TEST(Disconnect_partial_Data);
   MITK_TEST(Connect_abstract);
   MITK_TEST(Disconnect_abstract);
+  MITK_TEST(GetRIIPropertyKeyPath);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -1095,6 +1096,50 @@ public:
     abstractRule->Disconnect(source_otherTypeRule, dest_1);
     CPPUNIT_ASSERT_MESSAGE("Data of other rule type was removed.", !this->hasRelationProperties(source_otherTypeRule, "1"));
   }
+
+  void GetRIIPropertyKeyPath()
+  {
+    auto path = mitk::PropertyRelationRuleBase::GetRootKeyPath();
+    mitk::PropertyKeyPath referencePath({ "MITK", "Relations" });
+    CPPUNIT_ASSERT(referencePath == path);
+
+    path = mitk::PropertyRelationRuleBase::GetRIIPropertyKeyPath("a","1");
+    referencePath = { "MITK", "Relations", "1", "a" };
+    CPPUNIT_ASSERT(referencePath == path);
+
+    path = mitk::PropertyRelationRuleBase::GetRIIPropertyKeyPath("", "1");
+    referencePath = { "MITK", "Relations", "1"};
+    CPPUNIT_ASSERT(referencePath == path);
+
+    path = mitk::PropertyRelationRuleBase::GetRIIPropertyKeyPath("a", "");
+    referencePath = mitk::PropertyRelationRuleBase::GetRootKeyPath().AddAnyElement().AddElement("a");
+    CPPUNIT_ASSERT(referencePath == path);
+
+    path = mitk::PropertyRelationRuleBase::GetRIIRelationUIDPropertyKeyPath();
+    referencePath = mitk::PropertyRelationRuleBase::GetRootKeyPath().AddAnyElement().AddElement("relationUID");
+    CPPUNIT_ASSERT(referencePath == path);
+
+    path = mitk::PropertyRelationRuleBase::GetRIIRelationUIDPropertyKeyPath("1");
+    referencePath = { "MITK", "Relations", "1", "relationUID" };
+    CPPUNIT_ASSERT(referencePath == path);
+
+    path = mitk::PropertyRelationRuleBase::GetRIIRuleIDPropertyKeyPath();
+    referencePath = mitk::PropertyRelationRuleBase::GetRootKeyPath().AddAnyElement().AddElement("ruleID");
+    CPPUNIT_ASSERT(referencePath == path);
+
+    path = mitk::PropertyRelationRuleBase::GetRIIRuleIDPropertyKeyPath("1");
+    referencePath = { "MITK", "Relations", "1", "ruleID" };
+    CPPUNIT_ASSERT(referencePath == path);
+
+    path = mitk::PropertyRelationRuleBase::GetRIIDestinationUIDPropertyKeyPath();
+    referencePath = mitk::PropertyRelationRuleBase::GetRootKeyPath().AddAnyElement().AddElement("destinationUID");
+    CPPUNIT_ASSERT(referencePath == path);
+
+    path = mitk::PropertyRelationRuleBase::GetRIIDestinationUIDPropertyKeyPath("1");
+    referencePath = { "MITK", "Relations", "1", "destinationUID" };
+    CPPUNIT_ASSERT(referencePath == path);
+  }
+
 
 };
 

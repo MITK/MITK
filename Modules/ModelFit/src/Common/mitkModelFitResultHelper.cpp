@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include "mitkModelTraitsInterface.h"
 #include "mitkModelFitConstants.h"
 #include "mitkModelFitInfo.h"
+#include <mitkModelFitResultRelationRule.h>
 
 #include <mitkDICOMPMPropertyHelper.h>
 #include <mitkDICOMQIPropertyHelper.h>
@@ -80,7 +81,7 @@ namespace mitk
         }
       }
 
-    };
+    }
 
     void AdaptDataPropertyToModelFit(mitk::BaseData* data, const modelFit::ModelFitInfo* fitInfo)
     {
@@ -132,7 +133,9 @@ namespace mitk
       data->GetPropertyList()->SetStringProperty(ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str(), fitInfo->uid.c_str());
       data->GetPropertyList()->SetStringProperty(ModelFitConstants::FIT_NAME_PROPERTY_NAME().c_str(), fitInfo->fitName.c_str());
       data->GetPropertyList()->SetStringProperty(ModelFitConstants::FIT_TYPE_PROPERTY_NAME().c_str(), fitInfo->fitType.c_str());
-      data->GetPropertyList()->SetStringProperty(ModelFitConstants::FIT_INPUT_IMAGEUID_PROPERTY_NAME().c_str(), fitInfo->inputUID.c_str());
+
+      const auto rule = ModelFitResultRelationRule::New();
+      rule->Connect(dynamic_cast<Image*>(data), fitInfo->inputImage);
 
       if (fitInfo->inputData.GetLookupTable().size() > 0)
       {
@@ -148,7 +151,7 @@ namespace mitk
       }
 
       data->SetProperty(ModelFitConstants::FIT_STATIC_PARAMETERS_PROPERTY_NAME().c_str(), ConvertStaticParametersToProperty(fitInfo->staticParamMap));
-    };
+    }
 
     mitk::DataNode::Pointer CreateNode(const ModelBase::ParameterNameType& name, Image* parameterImage, const ModelFitInfo* fitInfo)
     {
@@ -178,7 +181,7 @@ namespace mitk
       result->SetVisibility(false);
 
       return result;
-    };
+    }
   }
 }
 
@@ -196,13 +199,13 @@ mitk::ScalarListLookupTableProperty::Pointer mitk::modelFit::ConvertStaticParame
   result->SetValue(table);
 
   return result;
-};
+}
 
 MITKMODELFIT_EXPORT void mitk::modelFit::SetModelFitDataProperties(mitk::BaseData* data, const ModelBase::ParameterNameType& name, modelFit::Parameter::Type dataType, const modelFit::ModelFitInfo* fitInfo)
 {
   AdaptDataPropertyToModelFit(data, fitInfo);
   AdaptDataPropertyToParameter(data, name, dataType, fitInfo);
-};
+}
 
 MITKMODELFIT_EXPORT mitk::DataNode::Pointer mitk::modelFit::CreateResultNode( const ModelBase::ParameterNameType& name, modelFit::Parameter::Type nodeType, Image* parameterImage, const ModelFitInfo* modelFitInfo)
 {
@@ -219,8 +222,12 @@ MITKMODELFIT_EXPORT mitk::DataNode::Pointer mitk::modelFit::CreateResultNode( co
   DataNode::Pointer result = CreateNode(name, parameterImage, modelFitInfo);
   SetModelFitDataProperties(parameterImage, name, nodeType, modelFitInfo);
 
+  // Set DICOM properties, paramap-secific (DICOMPM) and general properties from source data (DICOMQI)
+  mitk::DICOMQIPropertyHelper::DeriveDICOMSourceProperties(modelFitInfo->inputImage, parameterImage);
+  mitk::DICOMPMPropertyHelper::DeriveDICOMPMProperties(parameterImage);
+
   return result;
-};
+}
 
 MITKMODELFIT_EXPORT mitk::modelFit::ModelFitResultNodeVectorType mitk::modelFit::CreateResultNodeMap( const ModelFitResultImageMapType& results, const ModelFitResultImageMapType& derivedResults, const ModelFitResultImageMapType& criterionResults, const ModelFitResultImageMapType& evaluationResults, const ModelFitInfo* fitInfo)
 {
@@ -256,7 +263,7 @@ MITKMODELFIT_EXPORT mitk::modelFit::ModelFitResultNodeVectorType mitk::modelFit:
   }
 
   return nodes;
-};
+}
 
 MITKMODELFIT_EXPORT void mitk::modelFit::StoreResultsInDataStorage(DataStorage* storage, const ModelFitResultNodeVectorType& resultNodes, DataNode* parentNode)
 {
@@ -269,15 +276,5 @@ MITKMODELFIT_EXPORT void mitk::modelFit::StoreResultsInDataStorage(DataStorage* 
   {
     storage->Add(*pos,parentNode);
   }
-
-  // Set DICOM properties, paramap-secific (DICOMPM) and general properties from source data (DICOMQI)
-
-  for (ModelFitResultNodeVectorType::const_iterator pos = resultNodes.begin(); pos != resultNodes.end(); pos++)
-  {
-    mitk::DICOMQIPropertyHelper::DeriveDICOMSourceProperties(parentNode->GetData(), pos->GetPointer()->GetData());
-    mitk::DICOMPMPropertyHelper::DeriveDICOMPMProperties(pos->GetPointer()->GetData());
-  }
-
-
-};
+}
 

@@ -1,3 +1,3 @@
 project(Dump)
 
-mitk_create_executable(DEPENDS MitkDICOMReader)
+mitk_create_executable(DEPENDS MitkDICOM)

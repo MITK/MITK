@@ -23,6 +23,6 @@ else()
   mitk_create_plugin(
     EXPORT_DIRECTIVE DICOM_EXPORT
     EXPORTED_INCLUDE_SUFFIXES src
-    MODULE_DEPENDS MitkContourModel MitkQtWidgetsExt MitkDicomUI MitkDicomRT MitkRTUI MitkDICOMReader
+    MODULE_DEPENDS MitkContourModel MitkQtWidgetsExt MitkDICOMUI MitkRT MitkRTUI MitkDICOM
   )
 endif()

@@ -18,7 +18,7 @@ found in the LICENSE file.
 // Blueberry
 #include <berryIPartListener.h>
 
-// mitk DICOMReader module
+// mitk DICOM module
 #include <mitkDICOMTag.h>
 #include <mitkDICOMProperty.h>
 

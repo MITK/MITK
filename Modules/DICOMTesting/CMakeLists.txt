@@ -14,7 +14,7 @@ set(CPP_FILES)
 
 # now create a new module only for testing purposes
 MITK_CREATE_MODULE(
-  DEPENDS MitkDICOMReader
+  DEPENDS MitkDICOM
   PACKAGE_DEPENDS
     PRIVATE GDCM DCMTK ITK|ITKIOGDCM
 )

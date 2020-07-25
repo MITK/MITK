@@ -38,7 +38,7 @@ option ( MITK_PYTHON_WHEEL "Add building of python wheels to the dist target." O
 mark_as_advanced( MITK_PYTHON_WHEEL )
 
 # Prepare the SWIG-File, i.e. especially add necessary include folders
-mitkSwigPrepareFiles(pyMITK MITK.i "MitkCore;MitkCLCore;MitkCLUtilities;ITKCommon;MitkMatchPointRegistration;MitkSegmentation;MitkMultilabel;MitkDICOMReader;MitkDICOMReaderServices;MitkDicomRT")
+mitkSwigPrepareFiles(pyMITK MITK.i "MitkCore;MitkCLCore;MitkCLUtilities;ITKCommon;MitkMatchPointRegistration;MitkSegmentation;MitkMultilabel;MitkDICOM;MitkDICOMImageIO;MitkRT")
 
 # Add additional SWIG Parameters
 # These parameters depend on the target language
@@ -51,7 +51,7 @@ set(CMAKE_SWIG_OUTDIR ${CMAKE_CURRENT_BINARY_DIR})
 # Create the actual SWIG project
 swig_add_module(pyMITK python MITK.i )
 
-mitkSwigAddLibraryDependencies(pyMITK "MitkCore;MitkCLCore;MitkCLUtilities;ITKCommon;MitkMatchPointRegistration;MitkSegmentation;MitkMultilabel;MitkDICOMReader;MitkDICOMReaderServices;MitkDicomRT")
+mitkSwigAddLibraryDependencies(pyMITK "MitkCore;MitkCLCore;MitkCLUtilities;ITKCommon;MitkMatchPointRegistration;MitkSegmentation;MitkMultilabel;MitkDICOM;MitkDICOMImageIO;MitkRT")
 mitk_target_link_libraries_with_dynamic_lookup(${SWIG_MODULE_pyMITK_REAL_NAME} ${PYTHON_LIBRARIES})
 
 

@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define QmitkDicomExternalDataWidget_h
 
 #include "ui_QmitkDicomExternalDataWidgetControls.h"
-#include <MitkDicomUIExports.h>
+#include <MitkDICOMUIExports.h>
 
 // include ctk
 #include <ctkDICOMDatabase.h>

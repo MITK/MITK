@@ -14,7 +14,7 @@ found in the LICENSE file.
 
 // #include <QmitkFunctionality.h>
 #include "ui_QmitkDicomLocalStorageWidgetControls.h"
-#include <MitkDicomUIExports.h>
+#include <MitkDICOMUIExports.h>
 
 // include ctk
 #include <ctkDICOMDatabase.h>

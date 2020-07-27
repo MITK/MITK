@@ -642,13 +642,13 @@ namespace mitk
   * IndexToWorldTransform (elementwise), the bounding (elementwise) and the ImageGeometry flag.
   *
   * The parameter eps is a tolarence value for all methods which are internally used for comparion.
-  * If you want to use different tolarance values for different parts of the geometry, feel free to use
+  * If you want to use different tolerance values for different parts of the geometry, feel free to use
   * the other comparison methods and write your own implementation of Equal.
   * @param rightHandSide Compare this against leftHandSide.
   * @param leftHandSide Compare this against rightHandSide.
-  * @param coordinateEps Tolarence for comparison of all spatial aspects (spacing, origin and grid alignment).
+  * @param coordinateEps Tolerance for comparison of all spatial aspects (spacing, origin and grid alignment).
   * You can use mitk::eps in most cases.
-  * @param directionEps Tolarence for comparison of all directional aspects (axis). You can use mitk::eps in most cases.
+  * @param directionEps Tolerance for comparison of all directional aspects (axis). You can use mitk::eps in most cases.
   * @param verbose Flag indicating if the user wants detailed console output or not.
   * @return True, if all comparison are true. False in any other case.
   */
@@ -656,15 +656,15 @@ namespace mitk
     const mitk::BaseGeometry& rightHandSide,
     ScalarType coordinateEps,
     ScalarType directionEps,
-    bool verbose);
+    bool verbose = false);
 
   /**
   * @brief Equal A function comparing two geometries for beeing identical.
   *
   * @ingroup MITKTestingAPI
   *
-  * @overload This is a overloaded version that uses one tolerance for spatial and directional aspects. For more details,
-  * see other function version.
+  * @overload This is an overloaded version that uses a single tolerance for spatial and directional aspects. For more details,
+  * see the other overloaded version.
   * @param rightHandSide Compare this against leftHandSide.
   * @param leftHandSide Compare this against rightHandSide.
   * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
@@ -673,8 +673,8 @@ namespace mitk
   */
   MITKCORE_EXPORT bool Equal(const mitk::BaseGeometry &leftHandSide,
                              const mitk::BaseGeometry &rightHandSide,
-                             ScalarType eps,
-                             bool verbose);
+                             ScalarType eps = mitk::eps,
+                             bool verbose = false);
 
   /**
   * @brief Equal A function comparing two transforms (TransformType) for beeing identical.
@@ -726,27 +726,27 @@ namespace mitk
   * The function checks the spacing, origin, axis vectors, extents, the matrix of the
   * IndexToWorldTransform (elementwise), the bounding (elementwise) and the ImageGeometry flag.
   *
-  * The parameter eps is a tolarence value for all methods which are internally used for comparison.
+  * The parameter eps is a tolerance value for all methods which are internally used for comparison.
   * @param testGeo Geometry that should be checked if it is a sub geometry of referenceGeo.
   * @param referenceGeo Geometry that should contain testedGeometry as sub geometry.
-  * @param coordinateEps Tolarence for comparison of all spatial aspects (spacing, origin and grid alignment).
+  * @param coordinateEps Tolerance for comparison of all spatial aspects (spacing, origin and grid alignment).
   * You can use mitk::eps in most cases.
-  * @param directionEps Tolarence for comparison of all directional aspects (axis). You can use mitk::eps in most cases.
+  * @param directionEps Tolerance for comparison of all directional aspects (axis). You can use mitk::eps in most cases.
   * @param verbose Flag indicating if the user wants detailed console output or not.
-  * @return True, if all comparison are true. False otherwise.
+  * @return True, if all comparisons are true. False otherwise.
   */
   MITKCORE_EXPORT bool IsSubGeometry(const mitk::BaseGeometry& testGeo,
     const mitk::BaseGeometry& referenceGeo,
     ScalarType coordinateEps,
     ScalarType directionEps,
-    bool verbose);
+    bool verbose = false);
 
   /**
   * @brief A function checks if a test geometry is a sub geometry of
   * a given reference geometry.
   *
-  * @overload This is a overloaded version that uses one tolerance for spatial and directional aspects. For more details,
-  * see other function version.
+  * @overload This is a overloaded version that uses a single tolerance for spatial and directional aspects. For more details,
+  * see the other overloaded version.
   * @param testGeo Geometry that should be checked if it is a sub geometry of referenceGeo.
   * @param referenceGeo Geometry that should contain testedGeometry as sub geometry.
   * @param eps Tolarence for comparison (both spatial and directional). You can use mitk::eps in most cases.
@@ -755,8 +755,8 @@ namespace mitk
   */
   MITKCORE_EXPORT bool IsSubGeometry(const mitk::BaseGeometry& testGeo,
     const mitk::BaseGeometry& referenceGeo,
-    ScalarType eps,
-    bool verbose);
+    ScalarType eps = mitk::eps,
+    bool verbose = false);
 
 } // namespace mitk
 

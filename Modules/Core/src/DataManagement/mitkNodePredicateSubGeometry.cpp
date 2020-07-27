@@ -16,13 +16,13 @@ found in the LICENSE file.
 #include "mitkNodePredicateGeometry.h"
 
 mitk::NodePredicateSubGeometry::NodePredicateSubGeometry(const BaseGeometry* refGeometry, TimePointType relevantTimePoint)
-  : m_RefGeometry(refGeometry), m_TimePoint(relevantTimePoint), m_UseTimePoint(true), m_CheckPrecision(mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION)
+  : m_RefGeometry(refGeometry), m_TimePoint(relevantTimePoint), m_UseTimePoint(true), m_CheckPrecision(NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION)
 {
   if (m_RefGeometry.IsNull()) mitkThrow() << "Invalid constructor initialization. Reference base geometry instance is nullptr pointer.";
 }
 
 mitk::NodePredicateSubGeometry::NodePredicateSubGeometry(const BaseGeometry* refGeometry)
-  : m_RefGeometry(refGeometry), m_TimePoint(0), m_UseTimePoint(false), m_CheckPrecision(mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION)
+  : m_RefGeometry(refGeometry), m_TimePoint(0), m_UseTimePoint(false), m_CheckPrecision(NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION)
 {
   if (m_RefGeometry.IsNull()) mitkThrow() << "Invalid constructor initialization. Reference base geometry instance is nullptr pointer.";
 }

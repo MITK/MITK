@@ -35,11 +35,11 @@ namespace mitk
    the first timestep.
    Evaluates to "false" for unsupported or undefined data objects/geometries.
 
-   On can specify the tolerance/precesion of the check via SetCheckPrecision().
-   @remark The default tolerance is the same like for NodePredicateGeometry and therefore not as strict as mitk::eps. The reason is,
-   that, for the typicale usage of the node predicate, mitk::eps would be to pedantic. We
+   On can specify the tolerance/precision of the check via SetCheckPrecision().
+   @remark The default tolerance is the same as for NodePredicateGeometry and therefore not as strict as mitk::eps. The reason is,
+   that, for the typical use of the node predicate, mitk::eps would be to pedantic. We
    often encounter floating point differences and practically it makes no difference e.g.
-   if two images differ something like 0.000001 mm in size or spacing
+   if two images differ something like 0.000001 mm in size or spacing.
    @ingroup DataStorage */
   class MITKCORE_EXPORT NodePredicateSubGeometry : public NodePredicateBase
   {

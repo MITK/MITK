@@ -11,7 +11,7 @@ This is a list of available examples:
 
 /**
 
-\page MitkOpenCL_Overview The MITK OpenCL Module
+\page MitkOpenCL_Overview OpenCL Module
 
 The MITK OpenCL Module provides a basic class structure to allow usage of OpenCL-accelerated parallel computing.
 

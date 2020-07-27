@@ -28,7 +28,7 @@ This view provides an easy interface to quickly compute some features of a whole
 
 \section QmitkImageStatisticsUserManualUsage Usage
 
-After loading of an image or a binary mask of an image in the datamanager, the Image Statistics view shows some statistical information on the selected image. If a mask is selected, the name of the mask and the name of the image, to which the mask is applied, are shown in the respective combo boxes. For time data the current time step is used for the selected mask and the selected image. If the total number of time steps on the selected mask is less than the current time step, the last time step of the mask is used. If a mask is selected, its used time step will be displayed next to its name like this: (t=0).
+After selection of an image or a binary mask of an image in the datamanager, the Image Statistics view shows some statistical information. If a mask is selected, the name of the mask and the name of the image, to which the mask is applied, are shown at the top. For time data the current time step is used for the selected mask and the selected image. If the total number of time steps on the selected mask is less than the current time step, the last time step of the mask is used. If a mask is selected, its used time step will be displayed next to its name like this: (t=0).
 
 Check "Ignore zero-valued voxels" to hide voxels with grayvalue zero.
 
@@ -36,11 +36,12 @@ Below it is the statistics window which displays the calculated statistical feat
 
 Beneath the statistics window is the histogram window, which shows the histogram of the current selection.
 
-At top of the histogram window are two checkboxes, one "Show Subchart" and other is "Use default bins". Below that is #bins spinbox. One can uncheck the "Use default bins" checkbox to change the number of bins.
+Draw a rectangular window with pressed left button to zoom the histogram view in. With a double click in the view area you can zoom out to the default viewport.
+You can also just pan the view in horizontal or vertical direction by dragging with the left mousebutton in the respective direction.
 
-Use mousewheel to zoom in and out the histogram. With the left mouse button the histogram is pannable in zoomed state.
+If the mask is not a closed planar figure or a segmentation an intensity profile is created instead of the histogram.
 
-If the histogram is displayed as a barchart a tooltip is available by hovering over one of the bins. A tooltip is also available, if an intesity profile is created for a path element as mask.
+A tooltip is available by hovering over one of the bins.
 
 At the bottom of each view is one button. They copy their respective data in csv format to the clipboard.
 

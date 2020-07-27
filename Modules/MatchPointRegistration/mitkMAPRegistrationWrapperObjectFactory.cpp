@@ -81,7 +81,7 @@ void mitk::MAPRegistrationWrapperObjectFactory::SetDefaultProperties(mitk::DataN
   }
 }
 
-const char* mitk::MAPRegistrationWrapperObjectFactory::GetFileExtensions()
+std::string mitk::MAPRegistrationWrapperObjectFactory::GetFileExtensions()
 {
   std::string fileExtension;
   this->CreateFileExtensions({}, fileExtension);
@@ -93,7 +93,7 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::MAPRegistrationWrapperObjectFact
   return {};
 }
 
-const char* mitk::MAPRegistrationWrapperObjectFactory::GetSaveFileExtensions()
+std::string mitk::MAPRegistrationWrapperObjectFactory::GetSaveFileExtensions()
 {
   std::string fileExtension;
   this->CreateFileExtensions({}, fileExtension);

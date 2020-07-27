@@ -59,7 +59,7 @@ void mitk::RegEvaluationObjectFactory::SetDefaultProperties(mitk::DataNode*)
 
 }
 
-const char* mitk::RegEvaluationObjectFactory::GetFileExtensions()
+std::string mitk::RegEvaluationObjectFactory::GetFileExtensions()
 {
   //return empty (dummy) extension string
   return m_FileExtensions.c_str();
@@ -70,7 +70,7 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::RegEvaluationObjectFactory::GetF
   return mitk::CoreObjectFactoryBase::MultimapType();
 }
 
-const char* mitk::RegEvaluationObjectFactory::GetSaveFileExtensions()
+std::string mitk::RegEvaluationObjectFactory::GetSaveFileExtensions()
 {
   //return empty (dummy) extension string
   return m_FileExtensions.c_str();

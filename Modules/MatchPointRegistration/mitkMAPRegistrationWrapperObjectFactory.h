@@ -33,7 +33,7 @@ class MAPRegistrationWrapperObjectFactory : public mitk::CoreObjectFactoryBase
     /**
      * @deprecatedSince{2014_10} See mitk::FileWriterRegistry and QmitkIOUtil
      */
-    DEPRECATED(virtual const char* GetFileExtensions());
+    DEPRECATED(virtual std::string GetFileExtensions());
     /**
      * @deprecatedSince{2014_10} See mitk::FileWriterRegistry and QmitkIOUtil
      */
@@ -41,7 +41,7 @@ class MAPRegistrationWrapperObjectFactory : public mitk::CoreObjectFactoryBase
     /**
      * @deprecatedSince{2014_10} See mitk::FileWriterRegistry and QmitkIOUtil
      */
-    DEPRECATED(virtual const char* GetSaveFileExtensions());
+    DEPRECATED(virtual std::string GetSaveFileExtensions());
     /**
      * @deprecatedSince{2014_10} See mitk::FileWriterRegistry and QmitkIOUtil
      */

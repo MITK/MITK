@@ -44,7 +44,7 @@ namespace mitk
     void SetDefaultProperties(mitk::DataNode *node) override;
 
     // Deprecated but required!
-    const char *GetFileExtensions() override { return ""; }
+    std::string GetFileExtensions() override { return ""; }
     // Deprecated but required!
     mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override
     {
@@ -52,7 +52,7 @@ namespace mitk
     }
 
     // Deprecated but required!
-    const char *GetSaveFileExtensions() override { return ""; }
+    std::string GetSaveFileExtensions() override { return ""; }
     // Deprecated but required!
     mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override
     {

@@ -56,7 +56,7 @@ void mitk::TubeGraphObjectFactory::SetDefaultProperties(mitk::DataNode *node)
   }
 }
 
-const char *mitk::TubeGraphObjectFactory::GetFileExtensions()
+std::string mitk::TubeGraphObjectFactory::GetFileExtensions()
 {
   std::string fileExtension;
   this->CreateFileExtensions(m_FileExtensionsMap, fileExtension);
@@ -68,7 +68,7 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::TubeGraphObjectFactory::GetFileE
   return m_FileExtensionsMap;
 }
 
-const char *mitk::TubeGraphObjectFactory::GetSaveFileExtensions()
+std::string mitk::TubeGraphObjectFactory::GetSaveFileExtensions()
 {
   std::string fileExtension;
   this->CreateFileExtensions(m_SaveFileExtensionsMap, fileExtension);

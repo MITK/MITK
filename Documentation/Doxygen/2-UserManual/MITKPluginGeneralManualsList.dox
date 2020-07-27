@@ -1,9 +1,9 @@
 /**
-\page PluginListGeneralPage  List of General Purpose Plugins 
+\page PluginListGeneralPage  List of General Purpose Plugins
 
 
   \li \subpage org_mitk_views_basicimageprocessing
-  \li \subpage org_mitk_gui_qt_chartExample
+  \li \subpage org_mitk_views_chartexample
   \li \subpage org_mitk_views_datamanager
   \li \subpage org_mitk_gui_qt_dicom
   \li \subpage org_mitk_gui_qt_dicominspector

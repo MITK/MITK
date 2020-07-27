@@ -3,8 +3,6 @@
 
 \tableofcontents
 
-\imageMacro{icon.png,"Icon of ChartExample",2.00}
-
 \section org_mitk_gui_qt_chartExampleOverview Overview
 Describe the features of your awesome plugin here
 <ul>

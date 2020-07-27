@@ -765,10 +765,12 @@ WARN_LOGFILE           =
 # spaces.
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = "@MITK_SOURCE_DIR@" \
-                         "@MITK_SOURCE_DIR@/README.md" \
-                         "@MITK_BINARY_DIR@" \
-                         "@MITK_DOXYGEN_ADDITIONAL_INPUT_DIRS@"
+
+INPUT                  = @MITK_SOURCE_DIR@ \
+                         @MITK_SOURCE_DIR@/README.md \
+                         @MITK_BINARY_DIR@ \
+                         @MITK_DOXYGEN_ADDITIONAL_INPUT_DIRS@
+
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -826,7 +828,6 @@ EXCLUDE                = "@MITK_SOURCE_DIR@/Utilities/IpFunc/" \
                          "@MITK_BINARY_DIR@/bin/" \
                          "@MITK_BINARY_DIR@/PT/" \
                          "@MITK_BINARY_DIR@/GP/" \
-                         "@MITK_BINARY_DIR@/Modules/CppMicroServices/" \
                          "@MITK_BINARY_DIR@/_CPack_Packages/" \
                          @MITK_DOXYGEN_ADDITIONAL_EXCLUDE_DIRS@
 

@@ -1,5 +1,5 @@
 /**
-\page org_mitk_gui_qt_matchpoint_algorithm_browser The MatchPoint Algorithm Browser View
+\page org_mitk_gui_qt_matchpoint_algorithm_browser MatchPoint Algorithm Browser View
 
 \imageMacro{map_icon_browser_doc.svg, "Icon of the MatchPoint Algorithm Browser", 3}
 

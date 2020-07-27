@@ -1,5 +1,5 @@
 /**
-\page org_mitk_views_basicimageprocessing The Basic Image Processing Plugin
+\page org_mitk_views_basicimageprocessing Basic Image Processing
 
 \imageMacro{QmitkBasicImageProcessing_ImageProcessing_48.png,"Icon of the Basic Image Processing Plugin",2.00}
 
@@ -8,7 +8,7 @@
 \section QmitkBasicImageProcessingUserManualSummary Summary
 
 This view provides an easy interface to fundamental image preprocessing and enhancement filters.
-It offers filter operations on 3D and 4D images in the areas of noise suppression, morphological operations, edge detection and image arithmetics, 
+It offers filter operations on 3D and 4D images in the areas of noise suppression, morphological operations, edge detection and image arithmetics,
 as well as image inversion and downsampling.
 
 Please see \ref QmitkBasicImageProcessingUserManualOverview for more detailed information on usage and supported filters.
@@ -20,7 +20,7 @@ This view provides an easy interface to fundamental image preprocessing and imag
 It offers a variety of filter operations in the areas of noise suppression, morphological operations, edge detection and image arithmetics.
 Currently the view can be used with all 3D and 4D image types loadable by MITK.
 2D image support will be added in the future.
-All filters are encapsulated from the Insight Segmentation and Registration Toolkit (ITK, www.itk.org). 
+All filters are encapsulated from the Insight Segmentation and Registration Toolkit (ITK, www.itk.org).
 
 \imageMacro{QmitkBasicImageProcessing_BIP_Overview.png,"MITK with the Basic Image Processing view",16.00}
 
@@ -29,7 +29,7 @@ This document will tell you how to use this view, but it is assumed that you alr
 \section QmitkBasicImageProcessingUserManualFilters Filters
 
 This section will not describe the fundamental functioning of the single filters in detail, though.
-If you want to know more about a single filter, please have a look at http://www.itk.org/Doxygen316/html/classes.html 
+If you want to know more about a single filter, please have a look at http://www.itk.org/Doxygen316/html/classes.html
 or in any good digital image processing book. For total denoising filter, please see Tony F. Chan et al., "The digital TV filter and nonlinear denoising".
 
 Available filters are:
@@ -43,7 +43,7 @@ Available filters are:
   <li> Median Filtering</li>
   <li> Total Variation Denoising</li>
   </ul>
-  
+
 <li><b>Morphological Operations</b></li>
   <ul>
   <li> Dilation</li>
@@ -51,25 +51,25 @@ Available filters are:
   <li> Opening</li>
   <li> Closing</li>
   </ul>
-  
+
 <li><b>%Edge Detection</b></li>
   <ul>
   <li> Gradient Image</li>
   <li> Laplacian Operator (Second Derivative)</li>
   <li> Sobel Operator</li>
   </ul>
-  
+
 <li><b>Misc</b></li>
   <ul>
   <li> Threshold </li>
   <li> Image Inversion</li>
-  <li> Downsampling (isotropic)</li>  
+  <li> Downsampling (isotropic)</li>
   </ul>
 </ul>
-  
+
 <H2>\a Dual image operations</H2>
 
-<ul>  
+<ul>
 <li><b>Image Arithmetics</b></li>
   <ul>
   <li> Add two images</li>
@@ -77,14 +77,14 @@ Available filters are:
   <li> Multiply two images</li>
   <li> Divide two images</li>
   </ul>
-  
+
   <li><b>Binary Operations</b></li>
   <ul>
   <li> Logical AND</li>
   <li> Logical OR</li>
   <li> Logical XOR</li>
   </ul>
-</ul> 
+</ul>
 
 \section QmitkBasicImageProcessingUserManualUsage Usage
 
@@ -96,7 +96,7 @@ All you have to do to use a filter is to:
 <li> Press the execute button</li>
 </ul>
 A busy cursor appeares; when it vanishes, the operation is completed. Your filtered image is displayed and selected for further processing.
-(If the  checkbox "Hide original image" is not selected, you will maybe not see the filter result imideately, 
+(If the  checkbox "Hide original image" is not selected, you will maybe not see the filter result imideately,
 because your filtered image is possibly hidden by the original.)
 
 For two image operations, please make sure that the correct second image is selected in the drop down menu, and the image order is correct.
@@ -118,7 +118,7 @@ This means, a true 4D filtering is not supported by now.
 
 <B>A filter crashes during execution.</B><BR>
 Maybe your image is too large. Some filter operations, like derivatives, take a lot of memory.
-Try downsampling your image first. 
+Try downsampling your image first.
 
 <B>All other problems.</B><BR>
 Please report to the MITK mailing list.

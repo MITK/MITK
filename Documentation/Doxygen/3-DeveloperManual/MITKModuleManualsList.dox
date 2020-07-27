@@ -1,0 +1,18 @@
+/**
+\page MITKModuleManualsList List of Module Manuals
+
+  \li \subpage AnnotationModulePage
+  \li \subpage ChartModule
+  \li \subpage IGTConcepts
+  \li \subpage NavigationGeneralModulePage
+  \li \subpage IGTTutorialOverview
+  \li \subpage MitkOpenCL_Overview
+  \li \subpage LegacyGLModule
+  \li \subpage PAModulePage
+  \li \subpage mitkPython_Overview
+  \li \subpage RESTModule
+  \li \subpage GeneratingDeviceModulesPage
+  \li \subpage USModulePage
+
+*/
+

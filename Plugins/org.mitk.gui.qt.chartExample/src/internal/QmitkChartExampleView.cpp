@@ -375,7 +375,7 @@ std::string QmitkChartExampleView::ConvertToText(std::vector<std::pair<double, d
 
     if (!numbers.empty())
     {
-        for (const auto keyValue : numbers)
+        for (const auto& keyValue : numbers)
         {
             oss << keyValue.first << ":" << keyValue.second << delimiter;
         }
@@ -429,7 +429,7 @@ std::vector<double> QmitkChartExampleView::ConvertToDoubleVector(const QString& 
         return output;
     }
 
-    for (const QString entry : data.split(delimiter))
+    for (const QString& entry : data.split(delimiter))
     {
         output.push_back(entry.toDouble());
     }
@@ -444,7 +444,7 @@ std::vector<std::string> QmitkChartExampleView::ConvertToStringVector(const QStr
         return output;
     }
 
-    for (const QString entry : data.split(delimiter))
+    for (const QString& entry : data.split(delimiter))
     {
         output.push_back(entry.toStdString());
     }

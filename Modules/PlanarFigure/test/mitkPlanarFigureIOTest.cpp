@@ -341,7 +341,7 @@ public:
     //(e.g. reader meta information), but they are not relevant
     //for the test. Only check of all properties of the reference
     //are present and correct.
-    for (const auto prop : *refProperties)
+    for (const auto& prop : *refProperties)
     {
       auto finding = testProperties->find(prop.first);
       if (finding == testProperties->end())

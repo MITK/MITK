@@ -277,7 +277,7 @@ mitk::PropertyRelationRuleBase::RelationUIDVectorType mitk::PropertyRelationRule
   RelationUIDVectorType relUIDs_id;
 
   auto instanceIDs = this->GetInstanceID_IDLayer(source, destination);
-  for (const auto instanceID : instanceIDs)
+  for (const auto& instanceID : instanceIDs)
   {
     relUIDs_id.push_back(this->GetRelationUIDByInstanceID(source, instanceID));
   }
@@ -540,7 +540,7 @@ void mitk::PropertyRelationRuleBase::Disconnect(IPropertyOwner *source, const IP
   try
   {
     const auto relationUIDs = this->GetRelationUIDs(source, destination);
-    for (const auto relUID: relationUIDs)
+    for (const auto& relUID: relationUIDs)
     {
       this->Disconnect(source, relUID, layer);
     }

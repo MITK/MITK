@@ -26,9 +26,9 @@ namespace mitk
 
       Mapper::Pointer CreateMapper(mitk::DataNode *node, MapperSlotId slotId) override;
     void SetDefaultProperties(mitk::DataNode *node) override;
-    const char *GetFileExtensions() override;
+    std::string GetFileExtensions() override;
     mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override;
-    const char *GetSaveFileExtensions() override;
+    std::string GetSaveFileExtensions() override;
     mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override;
 
   private:

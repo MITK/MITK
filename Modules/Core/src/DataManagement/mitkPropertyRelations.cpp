@@ -59,7 +59,7 @@ mitk::PropertyRelations::RuleResultVectorType mitk::PropertyRelations::GetRulesF
 
   if (source)
   {
-    for (const auto rule : m_RuleMap)
+    for (const auto& rule : m_RuleMap)
     {
       if (rule.second->IsSource(source))
       {
@@ -75,7 +75,7 @@ mitk::PropertyRelations::RuleResultVectorType mitk::PropertyRelations::GetRulesF
 {
   RuleResultVectorType result;
 
-  for (const auto rule : m_RuleMap)
+  for (const auto& rule : m_RuleMap)
   {
     if (rule.second->IsSourceCandidate(sourceCandidate))
     {
@@ -90,7 +90,7 @@ mitk::PropertyRelations::RuleResultVectorType mitk::PropertyRelations::GetRulesF
 {
   RuleResultVectorType result;
 
-  for (const auto rule : m_RuleMap)
+  for (const auto& rule : m_RuleMap)
   {
     if (rule.second->IsDestinationCandidate(destCandidate))
     {

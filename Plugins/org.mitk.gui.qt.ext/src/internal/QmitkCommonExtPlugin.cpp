@@ -104,7 +104,7 @@ void QmitkCommonExtPlugin::loadDataFromDisk(const QStringList &arguments, bool g
              const std::string path(arguments[i].toStdString());
              auto addedNodes = mitk::IOUtil::Load(path, *dataStorage);
 
-             for (auto const node : *addedNodes )
+             for (const auto& node : *addedNodes )
              {
                node->SetIntProperty("layer", argumentsAdded);
              }

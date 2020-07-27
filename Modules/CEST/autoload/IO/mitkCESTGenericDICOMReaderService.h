@@ -36,7 +36,7 @@ namespace mitk {
 
   protected:
     CESTDICOMManualReaderService(const CESTDICOMManualReaderService&) = default;
-    CESTDICOMManualReaderService& operator=(const CESTDICOMManualReaderService&) = default;
+    CESTDICOMManualReaderService& operator=(const CESTDICOMManualReaderService&) = delete;
 
     std::string GetCESTMetaFilePath() const;
     std::string GetTRECFilePath() const;

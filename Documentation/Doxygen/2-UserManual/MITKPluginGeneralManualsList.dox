@@ -3,7 +3,6 @@
 
 
   \li \subpage org_mitk_views_basicimageprocessing
-  \li \subpage org_mitk_views_chartexample
   \li \subpage org_mitk_views_datamanager
   \li \subpage org_mitk_gui_qt_dicom
   \li \subpage org_mitk_gui_qt_dicominspector

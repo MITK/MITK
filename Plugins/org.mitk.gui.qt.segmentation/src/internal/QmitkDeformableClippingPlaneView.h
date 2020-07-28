@@ -16,6 +16,8 @@ found in the LICENSE file.
 #include <ui_QmitkDeformableClippingPlaneViewControls.h>
 
 #include <mitkImage.h>
+#include <mitkNodePredicateAnd.h>
+#include "mitkNodePredicateProperty.h"
 #include <QmitkAbstractView.h>
 
 typedef itk::RGBPixel< float > Color;
@@ -63,6 +65,9 @@ private:
   void DeactivateInteractionButtons();
 
   Ui::QmitkDeformableClippingPlaneViewControls* m_Controls;
+
+  mitk::NodePredicateAnd::Pointer m_IsImagePredicate;
+  mitk::NodePredicateProperty::Pointer m_IsClippingPlanePredicate;
 
   mitk::DataNode::Pointer m_ReferenceNode;
   mitk::DataNode::Pointer m_WorkingNode;

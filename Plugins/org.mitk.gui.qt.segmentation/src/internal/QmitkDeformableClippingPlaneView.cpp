@@ -20,7 +20,7 @@ found in the LICENSE file.
 #include "mitkLevelWindowProperty.h"
 #include "mitkLookupTableProperty.h"
 #include "mitkNodePredicateDataType.h"
-#include "mitkNodePredicateProperty.h"
+#include "mitkNodePredicateNot.h"
 #include "mitkRenderingModeProperty.h"
 #include "mitkRotationOperation.h"
 #include "mitkSurfaceVtkMapper3D.h"
@@ -47,6 +47,12 @@ QmitkDeformableClippingPlaneView::QmitkDeformableClippingPlaneView()
   , m_ReferenceNode(nullptr)
   , m_WorkingNode(nullptr)
 {
+  auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
+  auto isNotHelperObject = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)));
+
+  m_IsImagePredicate = mitk::NodePredicateAnd::New(isImage, isNotHelperObject);
+
+  m_IsClippingPlanePredicate = mitk::NodePredicateProperty::New("clippingPlane", mitk::BoolProperty::New(true));
 }
 
 QmitkDeformableClippingPlaneView::~QmitkDeformableClippingPlaneView()
@@ -65,10 +71,9 @@ void QmitkDeformableClippingPlaneView::CreateQtPartControl(QWidget *parent)
   m_Controls = new Ui::QmitkDeformableClippingPlaneViewControls;
   m_Controls->setupUi(parent);
 
-  auto isClippingPlane = mitk::NodePredicateProperty::New("clippingPlane", mitk::BoolProperty::New(true));
 
   m_Controls->clippingPlaneSelector->SetDataStorage(this->GetDataStorage());
-  m_Controls->clippingPlaneSelector->SetPredicate(isClippingPlane);
+  m_Controls->clippingPlaneSelector->SetPredicate(m_IsClippingPlanePredicate);
 
   m_Controls->volumeGroupBox->setEnabled(false);
   m_Controls->interactionSelectionBox->setEnabled(false);
@@ -83,8 +88,7 @@ void QmitkDeformableClippingPlaneView::OnComboBoxSelectionChanged(const mitk::Da
   this->DeactivateInteractionButtons();
 
   auto selectedNode = const_cast<mitk::DataNode*>(node);
-
-  if(selectedNode != nullptr)
+  if(nullptr != selectedNode)
   {
     if(m_WorkingNode.IsNotNull())
       selectedNode->SetDataInteractor(m_WorkingNode->GetDataInteractor());
@@ -123,10 +127,9 @@ void QmitkDeformableClippingPlaneView::OnCreateNewClippingPlane()
       if (m_Controls->surfaceModelCheckBox->isChecked())
       {
         //Check if there is a surface node from the image. If not, create one
-        bool createSurfaceFromImage(true);
-        mitk::NodePredicateDataType::Pointer isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
-        mitk::NodePredicateDataType::Pointer isSurface = mitk::NodePredicateDataType::New("Surface");
-        mitk::DataStorage::SetOfObjects::ConstPointer childNodes = GetDataStorage()->GetDerivations(m_ReferenceNode, isSurface, true);
+        bool createSurfaceFromImage = true;
+        auto isSurface = mitk::NodePredicateDataType::New("Surface");
+        auto childNodes = GetDataStorage()->GetDerivations(selectedNode, isSurface, true);
 
         for (mitk::DataStorage::SetOfObjects::ConstIterator itChildNodes = childNodes->Begin();
           itChildNodes != childNodes->End(); itChildNodes++)
@@ -141,14 +144,14 @@ void QmitkDeformableClippingPlaneView::OnCreateNewClippingPlane()
         if (createSurfaceFromImage)
         {
           //Lsg 2: Surface for the 3D-perspective
-          mitk::ImageToSurfaceFilter::Pointer surfaceFilter = mitk::ImageToSurfaceFilter::New();
-          surfaceFilter->SetInput(referenceImage);
+          auto surfaceFilter = mitk::ImageToSurfaceFilter::New();
+          surfaceFilter->SetInput(selectedImage);
           surfaceFilter->SetThreshold(1);
           surfaceFilter->SetSmooth(true);
           //Downsampling
           surfaceFilter->SetDecimate(mitk::ImageToSurfaceFilter::DecimatePro);
 
-          mitk::DataNode::Pointer surfaceNode = mitk::DataNode::New();
+          auto surfaceNode = mitk::DataNode::New();
           surfaceNode->SetData(surfaceFilter->GetOutput());
           surfaceNode->SetProperty("color", m_ReferenceNode->GetProperty("color"));
           surfaceNode->SetOpacity(0.5);
@@ -191,7 +194,7 @@ void QmitkDeformableClippingPlaneView::OnCreateNewClippingPlane()
   plane->GetVtkPolyData(0)->GetPointData()->SetScalars(scalars);
   plane->GetVtkPolyData(0)->GetPointData()->Update();
 
-  mitk::DataNode::Pointer planeNode = mitk::DataNode::New();
+  auto planeNode = mitk::DataNode::New();
   planeNode->SetData(plane);
 
   std::stringstream planeName;
@@ -209,17 +212,17 @@ void QmitkDeformableClippingPlaneView::OnCreateNewClippingPlane()
   planeNode->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
 
   // Set lookup table for plane surface visualization
-  vtkSmartPointer<vtkLookupTable> lookupTable = vtkSmartPointer<vtkLookupTable>::New();
-  lookupTable->SetHueRange(0.6, 0.0);
-  lookupTable->SetSaturationRange(1.0, 1.0);
-  lookupTable->SetValueRange(1.0, 1.0);
-  lookupTable->SetTableRange(-1.0, 1.0);
-  lookupTable->Build();
+  auto lookupTablevtk = vtkSmartPointer<vtkLookupTable>::New();
+  lookupTablevtk->SetHueRange(0.6, 0.0);
+  lookupTablevtk->SetSaturationRange(1.0, 1.0);
+  lookupTablevtk->SetValueRange(1.0, 1.0);
+  lookupTablevtk->SetTableRange(-1.0, 1.0);
+  lookupTablevtk->Build();
 
-  mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
-  lut->SetVtkLookupTable(lookupTable);
+  auto lookupTable = mitk::LookupTable::New();
+  lookupTable->SetVtkLookupTable(lookupTablevtk);
 
-  mitk::LookupTableProperty::Pointer prop = mitk::LookupTableProperty::New(lut);
+  auto prop = mitk::LookupTableProperty::New(lookupTable);
 
   planeNode->SetProperty("LookupTable", prop);
   planeNode->SetBoolProperty("scalar visibility", true);
@@ -234,9 +237,6 @@ void QmitkDeformableClippingPlaneView::OnCreateNewClippingPlane()
 
   //Set view of plane to wireframe
   planeNode->SetProperty("material.representation", mitk::VtkRepresentationProperty::New(VTK_WIREFRAME));
-
-  //Set the plane as working data for the tools and selected it
-  this->OnSelectionChanged(planeNode);
 
   //Add the plane to data storage
   this->GetDataStorage()->Add(planeNode);
@@ -269,7 +269,7 @@ void QmitkDeformableClippingPlaneView::OnCalculateClippingVolume()
   mitk::DataStorage::SetOfObjects::ConstPointer allClippingPlanes = this->GetAllClippingPlanes();
   for (mitk::DataStorage::SetOfObjects::ConstIterator itPlanes = allClippingPlanes->Begin(); itPlanes != allClippingPlanes->End(); itPlanes++)
   {
-    bool isVisible(false);
+    bool isVisible = false;
     itPlanes.Value()->GetBoolProperty("visible", isVisible);
     mitk::Surface* plane = dynamic_cast<mitk::Surface*>(itPlanes.Value()->GetData());
 
@@ -304,7 +304,7 @@ void QmitkDeformableClippingPlaneView::OnCalculateClippingVolume()
     this->GetDataStorage()->Remove(oldClippedNode);
 
   //add the new clipped image node
-  mitk::DataNode::Pointer clippedNode = mitk::DataNode::New();
+  auto clippedNode = mitk::DataNode::New();
   mitk::Image::Pointer clippedImage = surfaceClipFilter->GetOutput();
   clippedImage->DisconnectPipeline();
   clippedNode->SetData(clippedImage);
@@ -315,15 +315,14 @@ void QmitkDeformableClippingPlaneView::OnCalculateClippingVolume()
   clippedNode->SetOpacity(0.4);
   this->GetDataStorage()->Add(clippedNode);
 
-  mitk::LabeledImageVolumeCalculator::Pointer volumeCalculator = mitk::LabeledImageVolumeCalculator::New();
+  auto volumeCalculator = mitk::LabeledImageVolumeCalculator::New();
   volumeCalculator->SetImage(clippedImage);
   volumeCalculator->Calculate();
 
   std::vector<double> volumes = volumeCalculator->GetVolumes();
 
-  mitk::LabeledImageLookupTable::Pointer lut = mitk::LabeledImageLookupTable::New();
+  auto lookupTable = mitk::LabeledImageLookupTable::New();
   int lablesWithVolume = 0;
-
   for (unsigned int i = 1; i < volumes.size(); ++i)
   {
     if (volumes.at(i) != 0)
@@ -331,7 +330,7 @@ void QmitkDeformableClippingPlaneView::OnCalculateClippingVolume()
       lablesWithVolume++;
 
       mitk::Color color(GetLabelColor(lablesWithVolume));
-      lut->SetColorForLabel(i, color.GetRed(), color.GetGreen(), color.GetBlue(), 1.0);
+      lookupTable->SetColorForLabel(i, color.GetRed(), color.GetGreen(), color.GetBlue(), 1.0);
 
       QColor qcolor;
       qcolor.setRgbF(color.GetRed(), color.GetGreen(), color.GetBlue(), 0.7);
@@ -350,12 +349,12 @@ void QmitkDeformableClippingPlaneView::OnCalculateClippingVolume()
 
   //set the rendering mode to use the lookup table and level window
   clippedNode->SetProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR));
-  mitk::LookupTableProperty::Pointer lutProp = mitk::LookupTableProperty::New(lut.GetPointer());
+  mitk::LookupTableProperty::Pointer lutProp = mitk::LookupTableProperty::New(lookupTable.GetPointer());
   clippedNode->SetProperty("LookupTable", lutProp);
   // it is absolutely important, to use the LevelWindow settings provided by
   // the LUT generator, otherwise, it is not guaranteed, that colors show
   // up correctly.
-  clippedNode->SetProperty("levelwindow", mitk::LevelWindowProperty::New(lut->GetLevelWindow()));
+  clippedNode->SetProperty("levelwindow", mitk::LevelWindowProperty::New(lookupTable->GetLevelWindow()));
 }
 
 void QmitkDeformableClippingPlaneView::OnTranslationMode(bool check)
@@ -409,17 +408,16 @@ void QmitkDeformableClippingPlaneView::OnDeformationMode(bool check)
 void QmitkDeformableClippingPlaneView::CreateConnections()
 {
   connect(m_Controls->translationPushButton, &QPushButton::toggled,
-          this, &QmitkDeformableClippingPlaneView::OnTranslationMode);
+    this, &QmitkDeformableClippingPlaneView::OnTranslationMode);
   connect(m_Controls->rotationPushButton, &QPushButton::toggled,
     this, &QmitkDeformableClippingPlaneView::OnRotationMode);
   connect(m_Controls->deformationPushButton, &QPushButton::toggled,
-          this, &QmitkDeformableClippingPlaneView::OnDeformationMode);
+    this, &QmitkDeformableClippingPlaneView::OnDeformationMode);
   connect(m_Controls->createNewPlanePushButton, &QPushButton::clicked,
-          this, &QmitkDeformableClippingPlaneView::OnCreateNewClippingPlane);
+    this, &QmitkDeformableClippingPlaneView::OnCreateNewClippingPlane);
   connect(m_Controls->updateVolumePushButton, &QPushButton::clicked,
-          this, &QmitkDeformableClippingPlaneView::OnCalculateClippingVolume);
+    this, &QmitkDeformableClippingPlaneView::OnCalculateClippingVolume);
   connect(m_Controls->clippingPlaneSelector, &QmitkDataStorageComboBox::OnSelectionChanged,
-          this, &QmitkDeformableClippingPlaneView::OnComboBoxSelectionChanged);
 }
 
 void QmitkDeformableClippingPlaneView::OnSelectionChanged(mitk::DataNode* node)
@@ -567,8 +565,7 @@ void QmitkDeformableClippingPlaneView::UpdateView()
 
 mitk::DataStorage::SetOfObjects::ConstPointer QmitkDeformableClippingPlaneView::GetAllClippingPlanes()
 {
-  mitk::NodePredicateProperty::Pointer clipPredicate = mitk::NodePredicateProperty::New("clippingPlane", mitk::BoolProperty::New(true));
-  mitk::DataStorage::SetOfObjects::ConstPointer allPlanes = GetDataStorage()->GetSubset(clipPredicate);
+  auto allPlanes = GetDataStorage()->GetSubset(m_IsClippingPlanePredicate);
   return allPlanes;
 }
 

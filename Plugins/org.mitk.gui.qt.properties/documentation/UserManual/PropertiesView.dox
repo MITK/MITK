@@ -1,0 +1,57 @@
+/**
+\page org_mitk_views_properties The Properties
+
+\imageMacro{icon.svg,"Icon of the Properties View.",2.00}
+
+\tableofcontents
+
+\section org_mitk_views_propertiesOverview Overview
+
+The Properties View allows you to inspect and change properties of a selected data node and its attached data.
+This View is only for advanced users and developers, as it is easy to alter the program state in unexpected ways.
+It can be considered as a complete exposure of parts of the backend that are usually supposed to be accessed only through dedicated frontend components like the color or opacity widgets in the context menu of a data node in the Data Manager View.
+
+\section org_mitk_views_propertiesUsage Usage
+
+\imageMacro{view.png,"The Properties View.",12.00}
+
+\subsection org_mitk_views_propertiesUsagePropertyListTypes Property list types
+
+After you selected a data node, the Property View allows you to switch between several property lists that are attached to the selected data node and its actual data.
+By default, you see the common data node property list.
+
+There are two types of property lists: data node property lists and data property lists.
+
+Data node property lists consist of properties that the application attaches mainly for rendering settings.
+They are not intrinsically part of the actual data and are only persisted when saving the MITK scene as a whole.
+A typical example of such a property is "visible", which decides if the data should be rendered or hidden.
+
+The common data node property list is applied to all render windows but there are also render window specific data node property lists.
+Any property that is found in both the common list and a render window specific list is overriden by the latter one.
+For example, if you want to hide an image only in the 3d render window but show it in all other render windows, you check "visible" in the common list, add the same property to the 3d render window specific list, and uncheck it there.
+
+There is only a single data property list.
+It represents the true metadata of the selected data like DICOM tags of a DICOM image.
+When saving specific data, most data properties are written to the data file, as long as the selected file format supports metadata.
+A popular example is the NRRD image format that allows to save custom key value pairs in text format in the file header.
+Not all data properties are meant for persistence, though.
+To check if a certain data property will be written to a metadata-enabled file format, click on in the properties tree view and check if there is a save icon at the bottom in the additional property info box.
+
+\subsection org_mitk_views_propertiesUsageFilter Filter
+
+Property lists can be quite large and complex, shown as a tree structure in the Properties View.
+To quickly find properties of interest you can use the filter text box, which will filter the properties while you type.
+
+\subsection org_mitk_views_propertiesUsageEditProperties Edit properties
+
+Most property value types like numbers, strings, boolean values, or colors can be edited by either clicking or double-clicking in the Value column.
+For example, to edit color properties, double-click on the colored Value cell.
+You can either enter a color by name like "yellow", in hex notation like "#ffff00" (or abbreviated "#ff0"), or click on the "..." button to open a color picker dialog.
+
+\subsection org_mitk_views_propertiesUsagePropertyInfos Additional property information
+
+Some properties have additional information attached like a description, aliases, or a persistence flag.
+This information is shown at the bottom of the Properties View.
+When no additional information is available, the additional property info box is hidden.
+
+*/

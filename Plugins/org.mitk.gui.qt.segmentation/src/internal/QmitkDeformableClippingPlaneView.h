@@ -40,6 +40,7 @@ public:
 
 private Q_SLOTS:
 
+    void OnSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
     void OnComboBoxSelectionChanged(const mitk::DataNode* node);
     void OnCreateNewClippingPlane();
     void OnCalculateClippingVolume();
@@ -53,8 +54,6 @@ private:
   void CreateQtPartControl(QWidget *parent) override;
   virtual void CreateConnections();
 
-  virtual void OnSelectionChanged(mitk::DataNode* node);
-  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
   void NodeRemoved(const mitk::DataNode* node) override;
   void NodeChanged(const mitk::DataNode* node) override;
 
@@ -69,7 +68,6 @@ private:
   mitk::NodePredicateAnd::Pointer m_IsImagePredicate;
   mitk::NodePredicateProperty::Pointer m_IsClippingPlanePredicate;
 
-  mitk::DataNode::Pointer m_ReferenceNode;
   mitk::DataNode::Pointer m_WorkingNode;
 
 };

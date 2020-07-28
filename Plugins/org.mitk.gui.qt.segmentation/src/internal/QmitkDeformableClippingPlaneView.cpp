@@ -44,7 +44,6 @@ const std::string QmitkDeformableClippingPlaneView::VIEW_ID = "org.mitk.views.de
 
 QmitkDeformableClippingPlaneView::QmitkDeformableClippingPlaneView()
   : QmitkAbstractView()
-  , m_ReferenceNode(nullptr)
   , m_WorkingNode(nullptr)
 {
   auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
@@ -71,16 +70,27 @@ void QmitkDeformableClippingPlaneView::CreateQtPartControl(QWidget *parent)
   m_Controls = new Ui::QmitkDeformableClippingPlaneViewControls;
   m_Controls->setupUi(parent);
 
+  m_Controls->imageSelectionWidget->SetDataStorage(GetDataStorage());
+  m_Controls->imageSelectionWidget->SetNodePredicate(m_IsImagePredicate);
+  m_Controls->imageSelectionWidget->SetSelectionIsOptional(false);
+  m_Controls->imageSelectionWidget->SetInvalidInfo("Select an image or segmentation.");
+  m_Controls->imageSelectionWidget->SetPopUpTitel("Select an image or segmentation.");
 
   m_Controls->clippingPlaneSelector->SetDataStorage(this->GetDataStorage());
   m_Controls->clippingPlaneSelector->SetPredicate(m_IsClippingPlanePredicate);
 
   m_Controls->volumeGroupBox->setEnabled(false);
   m_Controls->interactionSelectionBox->setEnabled(false);
-  m_Controls->noSelectedImageLabel->show();
   m_Controls->planesWarningLabel->hide();
 
   this->CreateConnections();
+
+  m_Controls->imageSelectionWidget->SetAutoSelectNewNodes(true);
+}
+
+void QmitkDeformableClippingPlaneView::OnSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
+{
+  this->UpdateView();
 }
 
 void QmitkDeformableClippingPlaneView::OnComboBoxSelectionChanged(const mitk::DataNode* node)
@@ -104,7 +114,6 @@ void QmitkDeformableClippingPlaneView::OnCreateNewClippingPlane()
   this->DeactivateInteractionButtons();
 
   auto plane = mitk::Surface::New();
-  auto referenceImage = mitk::Image::New();
   auto planeSource = vtkSmartPointer<vtkPlaneSource>::New();
 
   planeSource->SetOrigin(-32.0, -32.0, 0.0);
@@ -117,11 +126,11 @@ void QmitkDeformableClippingPlaneView::OnCreateNewClippingPlane()
 
   double imageDiagonal = 200;
 
-  if (m_ReferenceNode.IsNotNull())
+  auto selectedNode = m_Controls->imageSelectionWidget->GetSelectedNode();
+  if (selectedNode.IsNotNull())
   {
-    referenceImage = dynamic_cast<mitk::Image*>(m_ReferenceNode->GetData());
-
-    if (referenceImage.IsNotNull())
+    auto selectedImage = dynamic_cast<mitk::Image*>(selectedNode->GetData());
+    if (nullptr != selectedImage)
     {
       // check if user wants a surface model
       if (m_Controls->surfaceModelCheckBox->isChecked())
@@ -131,13 +140,13 @@ void QmitkDeformableClippingPlaneView::OnCreateNewClippingPlane()
         auto isSurface = mitk::NodePredicateDataType::New("Surface");
         auto childNodes = GetDataStorage()->GetDerivations(selectedNode, isSurface, true);
 
-        for (mitk::DataStorage::SetOfObjects::ConstIterator itChildNodes = childNodes->Begin();
-          itChildNodes != childNodes->End(); itChildNodes++)
+        for (mitk::DataStorage::SetOfObjects::ConstIterator it = childNodes->Begin();
+          it != childNodes->End(); it++)
         {
-          if (itChildNodes.Value().IsNotNull() && itChildNodes->Value()->GetName().compare(m_ReferenceNode->GetName()) == 0)
+          if (it.Value().IsNotNull() && it->Value()->GetName().compare(selectedNode->GetName()) == 0)
           {
             createSurfaceFromImage = false;
-            itChildNodes.Value()->SetVisibility(true);
+            it.Value()->SetVisibility(true);
           }
         }
 
@@ -153,21 +162,21 @@ void QmitkDeformableClippingPlaneView::OnCreateNewClippingPlane()
 
           auto surfaceNode = mitk::DataNode::New();
           surfaceNode->SetData(surfaceFilter->GetOutput());
-          surfaceNode->SetProperty("color", m_ReferenceNode->GetProperty("color"));
+          surfaceNode->SetProperty("color", selectedNode->GetProperty("color"));
           surfaceNode->SetOpacity(0.5);
-          surfaceNode->SetName(m_ReferenceNode->GetName());
-          GetDataStorage()->Add(surfaceNode, m_ReferenceNode);
+          surfaceNode->SetName(selectedNode->GetName());
+          GetDataStorage()->Add(surfaceNode, selectedNode);
         }
       }
 
       //If an image is selected trim the plane to this.
-      imageDiagonal = referenceImage->GetGeometry()->GetDiagonalLength();
-      plane->SetOrigin(referenceImage->GetGeometry()->GetCenter());
+      imageDiagonal = selectedImage->GetGeometry()->GetDiagonalLength();
+      plane->SetOrigin(selectedImage->GetGeometry()->GetCenter());
 
       // Rotate plane
       mitk::Vector3D rotationAxis;
       mitk::FillVector3D(rotationAxis, 0.0, 1.0, 0.0);
-      mitk::RotationOperation op(mitk::OpROTATE, referenceImage->GetGeometry()->GetCenter(), rotationAxis, 90.0);
+      mitk::RotationOperation op(mitk::OpROTATE, selectedImage->GetGeometry()->GetCenter(), rotationAxis, 90.0);
       plane->GetGeometry()->ExecuteOperation(&op);
     }
   }
@@ -256,10 +265,16 @@ void QmitkDeformableClippingPlaneView::OnCreateNewClippingPlane()
 
 void QmitkDeformableClippingPlaneView::OnCalculateClippingVolume()
 {
-  bool isSegmentation(false);
-  m_ReferenceNode->GetBoolProperty("binary", isSegmentation);
+  auto selectedNode = m_Controls->imageSelectionWidget->GetSelectedNode();
+  if (selectedNode.IsNull())
+  {
+    MITK_ERROR << "No segmentation selected! Can't calculate volume";
+    return;
+  }
 
-  if (m_ReferenceNode.IsNull() || !isSegmentation)
+  bool isSegmentation = false;
+  selectedNode->GetBoolProperty("binary", isSegmentation);
+  if (!isSegmentation)
   {
     MITK_ERROR << "No segmentation selected! Can't calculate volume";
     return;
@@ -288,12 +303,12 @@ void QmitkDeformableClippingPlaneView::OnCalculateClippingVolume()
   //Clear the list of volumes, before calculating the new values
   m_Controls->volumeList->clear();
 
-  m_ReferenceNode->SetBoolProperty("visible", false);
+  selectedNode->SetBoolProperty("visible", false);
 
   //set some properties for clipping the image-->Output: labled Image
   mitk::HeightFieldSurfaceClipImageFilter::Pointer surfaceClipFilter = mitk::HeightFieldSurfaceClipImageFilter::New();
 
-  surfaceClipFilter->SetInput(dynamic_cast<mitk::Image*> (m_ReferenceNode->GetData()));
+  surfaceClipFilter->SetInput(dynamic_cast<mitk::Image*>(selectedNode->GetData()));
   surfaceClipFilter->SetClippingModeToMultiPlaneValue();
   surfaceClipFilter->SetClippingSurfaces(clippingPlanes);
   surfaceClipFilter->Update();
@@ -407,6 +422,8 @@ void QmitkDeformableClippingPlaneView::OnDeformationMode(bool check)
 
 void QmitkDeformableClippingPlaneView::CreateConnections()
 {
+  connect(m_Controls->imageSelectionWidget, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
+    this, &QmitkDeformableClippingPlaneView::OnSelectionChanged);
   connect(m_Controls->translationPushButton, &QPushButton::toggled,
     this, &QmitkDeformableClippingPlaneView::OnTranslationMode);
   connect(m_Controls->rotationPushButton, &QPushButton::toggled,
@@ -418,73 +435,16 @@ void QmitkDeformableClippingPlaneView::CreateConnections()
   connect(m_Controls->updateVolumePushButton, &QPushButton::clicked,
     this, &QmitkDeformableClippingPlaneView::OnCalculateClippingVolume);
   connect(m_Controls->clippingPlaneSelector, &QmitkDataStorageComboBox::OnSelectionChanged,
-}
-
-void QmitkDeformableClippingPlaneView::OnSelectionChanged(mitk::DataNode* node)
-{
-  berry::IWorkbenchPart::Pointer nullPart;
-  QList<mitk::DataNode::Pointer> nodes;
-  nodes.push_back(node);
-
-  this->OnSelectionChanged(nullPart, nodes);
-}
-
-void QmitkDeformableClippingPlaneView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
-{
-  bool isClippingPlane = false;
-
-  for (auto node : nodes)
-  {
-    node->GetBoolProperty("clippingPlane", isClippingPlane);
-
-    if (isClippingPlane)
-    {
-      m_Controls->clippingPlaneSelector->setCurrentIndex(m_Controls->clippingPlaneSelector->Find(node));
-    }
-    else
-    {
-      if(node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) != nullptr)
-      {
-        if(m_ReferenceNode.IsNotNull() && node->GetData() == m_ReferenceNode->GetData())
-          return;
-
-        m_ReferenceNode = node;
-      }
-    }
-  }
-
-  this->UpdateView();
+    this, &QmitkDeformableClippingPlaneView::OnComboBoxSelectionChanged);
 }
 
 void QmitkDeformableClippingPlaneView::NodeRemoved(const mitk::DataNode* node)
 {
-  bool isClippingPlane(false);
-  node->GetBoolProperty("clippingPlane", isClippingPlane);
-
-  if (isClippingPlane)
+  if (m_IsClippingPlanePredicate->CheckNode(node))
   {
     if (this->GetAllClippingPlanes()->Size() <= 1)
     {
       m_WorkingNode = nullptr;
-      this->UpdateView();
-    }
-    else
-    {
-      this->OnSelectionChanged(this->GetAllClippingPlanes()->front() == node
-        ? this->GetAllClippingPlanes()->ElementAt(1)
-        : this->GetAllClippingPlanes()->front());
-    }
-  }
-  else
-  {
-    if (m_ReferenceNode.IsNotNull())
-    {
-      if (node->GetData() == m_ReferenceNode->GetData())
-      {
-        m_ReferenceNode = nullptr;
-        m_Controls->volumeList->clear();
-      }
-
       this->UpdateView();
     }
   }
@@ -497,27 +457,25 @@ void::QmitkDeformableClippingPlaneView::NodeChanged(const mitk::DataNode*)
 
 void QmitkDeformableClippingPlaneView::UpdateView()
 {
-  if (m_ReferenceNode.IsNotNull())
+  auto selectedNode = m_Controls->imageSelectionWidget->GetSelectedNode();
+  if (selectedNode.IsNotNull())
   {
-    m_Controls->noSelectedImageLabel->hide();
-
-    m_Controls->selectedImageLabel->setText(QString::fromUtf8(m_ReferenceNode->GetName().c_str()));
-
+    m_Controls->selectedReferenceImageLabel->setText(QString::fromUtf8(selectedNode->GetName().c_str()));
     if (m_WorkingNode.IsNotNull())
     {
       bool isSegmentation = false;
-      m_ReferenceNode->GetBoolProperty("binary", isSegmentation);
+      selectedNode->GetBoolProperty("binary", isSegmentation);
       m_Controls->interactionSelectionBox->setEnabled(true);
 
       m_Controls->volumeGroupBox->setEnabled(isSegmentation);
 
       //clear list --> than search for all shown clipping plans (max 7 planes)
-      m_Controls->selectedVolumePlanesLabel->setText("");
+      m_Controls->selectedClippingPlanesLabel->setText("");
       m_Controls->planesWarningLabel->hide();
-      int volumePlanes=0;
+      int volumePlanes = 0;
 
-      mitk::DataStorage::SetOfObjects::ConstPointer allClippingPlanes = this->GetAllClippingPlanes();
-      for (mitk::DataStorage::SetOfObjects::ConstIterator itPlanes = allClippingPlanes->Begin(); itPlanes != allClippingPlanes->End(); itPlanes++)
+      auto allClippingPlanes = this->GetAllClippingPlanes();
+      for (auto& itPlanes = allClippingPlanes->Begin(); itPlanes != allClippingPlanes->End(); itPlanes++)
       {
         bool isVisible = false;
         itPlanes.Value()->GetBoolProperty("visible", isVisible);
@@ -526,7 +484,7 @@ void QmitkDeformableClippingPlaneView::UpdateView()
           if (volumePlanes < 7)
           {
             ++volumePlanes;
-            m_Controls->selectedVolumePlanesLabel->setText(m_Controls->selectedVolumePlanesLabel->text().append(QString::fromStdString(itPlanes.Value()->GetName()+"\n")));
+            m_Controls->selectedClippingPlanesLabel->setText(m_Controls->selectedClippingPlanesLabel->text().append(QString::fromStdString(itPlanes.Value()->GetName()+"\n")));
           }
           else
           {
@@ -540,16 +498,15 @@ void QmitkDeformableClippingPlaneView::UpdateView()
     {
       m_Controls->volumeGroupBox->setEnabled(false);
       m_Controls->interactionSelectionBox->setEnabled(false);
-      m_Controls->selectedVolumePlanesLabel->setText("");
+      m_Controls->selectedClippingPlanesLabel->setText("");
       m_Controls->volumeList->clear();
     }
   }
   else
   {
     m_Controls->volumeGroupBox->setEnabled(false);
-    m_Controls->noSelectedImageLabel->show();
-    m_Controls->selectedImageLabel->setText("");
-    m_Controls->selectedVolumePlanesLabel->setText("");
+    m_Controls->selectedReferenceImageLabel->setText("");
+    m_Controls->selectedClippingPlanesLabel->setText("");
     m_Controls->planesWarningLabel->hide();
 
     if (m_WorkingNode.IsNull())

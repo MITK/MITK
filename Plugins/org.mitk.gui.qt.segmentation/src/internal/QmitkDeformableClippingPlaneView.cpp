@@ -88,7 +88,7 @@ void QmitkDeformableClippingPlaneView::CreateQtPartControl(QWidget *parent)
   m_Controls->imageSelectionWidget->SetAutoSelectNewNodes(true);
 }
 
-void QmitkDeformableClippingPlaneView::OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
+void QmitkDeformableClippingPlaneView::OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/)
 {
   this->UpdateView();
 }

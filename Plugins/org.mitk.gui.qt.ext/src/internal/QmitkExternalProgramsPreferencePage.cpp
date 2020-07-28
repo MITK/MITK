@@ -68,15 +68,15 @@ void QmitkExternalProgramsPreferencePage::CreateQtControl(QWidget* parent)
 
 void QmitkExternalProgramsPreferencePage::OnFFmpegButtonClicked()
 {
-  QString filter = "ffmpeg/avconv executable ";
+  QString filter = "ffmpeg executable ";
 
 #if defined(WIN32)
-  filter += "(ffmpeg.exe avconv.exe)";
+  filter += "(ffmpeg.exe)";
 #else
-  filter += "(ffmpeg avconv)";
+  filter += "(ffmpeg)";
 #endif
 
-  QString ffmpegPath = QFileDialog::getOpenFileName(m_Control, "FFmpeg/Libav", "", filter);
+  QString ffmpegPath = QFileDialog::getOpenFileName(m_Control, "FFmpeg", "", filter);
 
   if (!ffmpegPath.isEmpty())
   {
@@ -97,7 +97,7 @@ void QmitkExternalProgramsPreferencePage::OnFFmpegProcessFinished(int exitCode, 
   {
     QString output = QTextCodec::codecForName("UTF-8")->toUnicode(m_FFmpegProcess->readAllStandardOutput());
 
-    if (output.startsWith("ffmpeg") || output.startsWith("avconv"))
+    if (output.startsWith("ffmpeg"))
     {
       m_Ui->ffmpegLineEdit->setText(m_FFmpegPath);
       return;

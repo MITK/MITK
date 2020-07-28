@@ -37,6 +37,7 @@ found in the LICENSE file.
 #include <QSplashScreen>
 #include <QStandardPaths>
 #include <QTime>
+#include <QWebEngineUrlScheme>
 
 namespace
 {
@@ -508,6 +509,10 @@ namespace mitk
     this->setOrganizationDomain(orgDomain);
 
     qInstallMessageHandler(outputQtMessage);
+
+    QWebEngineUrlScheme qtHelpScheme("qthelp");
+    qtHelpScheme.setFlags(QWebEngineUrlScheme::LocalScheme | QWebEngineUrlScheme::LocalAccessAllowed);
+    QWebEngineUrlScheme::registerScheme(qtHelpScheme);
   }
 
   void BaseApplication::initialize(Poco::Util::Application &self)

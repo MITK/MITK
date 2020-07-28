@@ -40,7 +40,7 @@ public:
 
 private Q_SLOTS:
 
-    void OnSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
+    void OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
     void OnComboBoxSelectionChanged(const mitk::DataNode* node);
     void OnCreateNewClippingPlane();
     void OnCalculateClippingVolume();

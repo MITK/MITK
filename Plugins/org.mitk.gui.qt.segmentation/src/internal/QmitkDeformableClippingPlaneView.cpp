@@ -475,7 +475,7 @@ void QmitkDeformableClippingPlaneView::UpdateView()
       int volumePlanes = 0;
 
       auto allClippingPlanes = this->GetAllClippingPlanes();
-      for (auto& itPlanes = allClippingPlanes->Begin(); itPlanes != allClippingPlanes->End(); itPlanes++)
+      for (const auto& itPlanes = allClippingPlanes->Begin(); itPlanes != allClippingPlanes->End(); itPlanes++)
       {
         bool isVisible = false;
         itPlanes.Value()->GetBoolProperty("visible", isVisible);

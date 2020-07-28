@@ -23,7 +23,7 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
   <li> \ref  org_mitk_gui_qt_matchpoint_mapper</li>
   <li> \ref  org_mitk_gui_qt_matchpoint_visualizer</li>
   <li> \ref  org_mitk_gui_qt_measurementtoolbox </li>
-  <li> \ref  org_mitk_gui_qt_moviemaker </li>
+  <li> \ref  org_mitk_views_moviemaker </li>
   <li> \ref  org_mitk_views_multilabelsegmentation </li>
   <li> \ref  org_mitk_views_pointsetinteraction </li>
   <li> \ref  org_mitk_gui_qt_python </li>

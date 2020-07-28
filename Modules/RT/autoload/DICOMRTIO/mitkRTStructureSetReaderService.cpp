@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "mitkRTStructureSetReaderService.h"
 
-#include <mitkDicomRTMimeTypes.h>
+#include <mitkDICOMRTMimeTypes.h>
 #include <mitkDICOMIOHelper.h>
 #include <mitkDICOMTagPath.h>
 #include <mitkDICOMDCMTKTagScanner.h>
@@ -21,7 +21,7 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  RTStructureSetReaderService::RTStructureSetReaderService() : AbstractFileReader(CustomMimeType(mitk::DicomRTMimeTypes::DICOMRT_STRUCT_MIMETYPE_NAME()), mitk::DicomRTMimeTypes::DICOMRT_STRUCT_MIMETYPE_DESCRIPTION()) {
+  RTStructureSetReaderService::RTStructureSetReaderService() : AbstractFileReader(CustomMimeType(mitk::DICOMRTMimeTypes::DICOMRT_STRUCT_MIMETYPE_NAME()), mitk::DICOMRTMimeTypes::DICOMRT_STRUCT_MIMETYPE_DESCRIPTION()) {
     m_FileReaderServiceReg = RegisterService();
   }
 

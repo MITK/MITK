@@ -1,5 +1,5 @@
 /**
-\page org_mitk_gui_qt_dicombrowser The Dicom Plugin
+\page org_mitk_editors_dicombrowser The Dicom Browser Plugin
 
 \imageMacro{dicom.svg,"Icon of the DICOM Plugin",2.00}
 

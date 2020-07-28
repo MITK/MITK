@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
 
-#include <mitkDicomRTMimeTypes.h>
+#include <mitkDICOMRTMimeTypes.h>
 #include <mitkRTDoseReaderService.h>
 #include <mitkRTPlanReaderService.h>
 #include <mitkRTStructureSetReaderService.h>
@@ -34,7 +34,7 @@ namespace mitk
       us::ServiceProperties props;
       props[us::ServiceConstants::SERVICE_RANKING()] = 100;
 
-      for (const auto& mimeType : DicomRTMimeTypes::Get())
+      for (const auto& mimeType : DICOMRTMimeTypes::Get())
         context->RegisterService(mimeType.get(), props);
 
       m_RTDoseReader = std::make_unique<RTDoseReaderService>();

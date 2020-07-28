@@ -24,7 +24,7 @@ found in the LICENSE file.
 #include "mitkImage.h"
 #include <mitkContourModelSet.h>
 #include <mitkFileReaderRegistry.h>
-#include <mitkDicomRTMimeTypes.h>
+#include <mitkDICOMRTMimeTypes.h>
 
 #include <mitkDICOMFileReaderSelector.h>
 #include <mitkDICOMDCMTKTagScanner.h>
@@ -98,7 +98,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
 
       if(modality.compare("RTDOSE",Qt::CaseInsensitive) == 0)
       {
-          auto doseReader = GetReader(readerRegistry, mitk::DicomRTMimeTypes::DICOMRT_DOSE_MIMETYPE());
+          auto doseReader = GetReader(readerRegistry, mitk::DICOMRTMimeTypes::DICOMRT_DOSE_MIMETYPE());
           doseReader->SetInput(ImporterUtil::getUTF8String(listOfFilesForSeries.front()));
           std::vector<itk::SmartPointer<mitk::BaseData> > readerOutput = doseReader->Read();
           if (!readerOutput.empty()){
@@ -144,7 +144,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
       }
       else if(modality.compare("RTSTRUCT",Qt::CaseInsensitive) == 0)
       {
-          auto structReader = GetReader(readerRegistry, mitk::DicomRTMimeTypes::DICOMRT_STRUCT_MIMETYPE());
+          auto structReader = GetReader(readerRegistry, mitk::DICOMRTMimeTypes::DICOMRT_STRUCT_MIMETYPE());
           structReader->SetInput(ImporterUtil::getUTF8String(listOfFilesForSeries.front()));
           std::vector<itk::SmartPointer<mitk::BaseData> > readerOutput = structReader->Read();
 
@@ -183,7 +183,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
       }
       else if (modality.compare("RTPLAN", Qt::CaseInsensitive) == 0)
       {
-          auto planReader = GetReader(readerRegistry, mitk::DicomRTMimeTypes::DICOMRT_PLAN_MIMETYPE());
+          auto planReader = GetReader(readerRegistry, mitk::DICOMRTMimeTypes::DICOMRT_PLAN_MIMETYPE());
           planReader->SetInput(ImporterUtil::getUTF8String(listOfFilesForSeries.front()));
           std::vector<itk::SmartPointer<mitk::BaseData> > readerOutput = planReader->Read();
           if (!readerOutput.empty()){

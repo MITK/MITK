@@ -9,7 +9,7 @@ SET(CPP_FILES
   mitkDoseImageVtkMapper2D.cpp
   mitkIsoLevelsGenerator.cpp
   mitkDoseNodeHelper.cpp
-  mitkDicomRTMimeTypes.cpp
+  mitkDICOMRTMimeTypes.cpp
 )
 
 set(TPP_FILES

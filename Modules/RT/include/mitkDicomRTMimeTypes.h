@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKDicomRTMimeTypes_H
-#define MITKDicomRTMimeTypes_H
+#ifndef MITKDICOMRTMimeTypes_H
+#define MITKDICOMRTMimeTypes_H
 
 #include <mitkCustomMimeType.h>
 #include <mitkIDICOMTagsOfInterest.h>
@@ -23,7 +23,7 @@ found in the LICENSE file.
 
 namespace mitk {
 
-class MITKRT_EXPORT DicomRTMimeTypes
+class MITKRT_EXPORT DICOMRTMimeTypes
 {
 public:
 
@@ -66,8 +66,8 @@ public:
   static std::string DICOMRT_STRUCT_MIMETYPE_DESCRIPTION();
   static std::string DICOMRT_PLAN_MIMETYPE_DESCRIPTION();
 
-  DicomRTMimeTypes() = delete;
-  DicomRTMimeTypes(const DicomRTMimeTypes&) = delete;
+  DICOMRTMimeTypes() = delete;
+  DICOMRTMimeTypes(const DICOMRTMimeTypes&) = delete;
 
   static mitk::IDICOMTagsOfInterest* GetDicomTagsOfInterestService();
   static bool canReadByDicomFileReader(const std::string & path);
@@ -76,4 +76,4 @@ public:
 
 }
 
-#endif // MITKDicomRTMimeTypes_H
+#endif // MITKDICOMRTMimeTypes_H

@@ -20,13 +20,13 @@ found in the LICENSE file.
 #include <mitkDICOMTagPath.h>
 #include <mitkIDICOMTagsOfInterest.h>
 #include <mitkDICOMDatasetAccessingImageFrameInfo.h>
-#include <mitkDicomRTMimeTypes.h>
+#include <mitkDICOMRTMimeTypes.h>
 
 
 namespace mitk
 {
 
-  RTPlanReaderService::RTPlanReaderService() : AbstractFileReader(CustomMimeType(mitk::DicomRTMimeTypes::DICOMRT_PLAN_MIMETYPE_NAME()), mitk::DicomRTMimeTypes::DICOMRT_PLAN_MIMETYPE_DESCRIPTION()) {
+  RTPlanReaderService::RTPlanReaderService() : AbstractFileReader(CustomMimeType(mitk::DICOMRTMimeTypes::DICOMRT_PLAN_MIMETYPE_NAME()), mitk::DICOMRTMimeTypes::DICOMRT_PLAN_MIMETYPE_DESCRIPTION()) {
     m_FileReaderServiceReg = RegisterService();
 
   }

@@ -23,7 +23,7 @@ found in the LICENSE file.
 #include <mitkImageStatisticsHolder.h>
 #include <mitkDICOMTagPath.h>
 #include <mitkDICOMDCMTKTagScanner.h>
-#include <mitkDicomRTMimeTypes.h>
+#include <mitkDICOMRTMimeTypes.h>
 #include <mitkDICOMIOHelper.h>
 
 #include <dcmtk/dcmrt/drtdose.h>
@@ -34,7 +34,7 @@ found in the LICENSE file.
 namespace mitk
 {
 
-  RTDoseReaderService::RTDoseReaderService() : AbstractFileReader(CustomMimeType(mitk::DicomRTMimeTypes::DICOMRT_DOSE_MIMETYPE_NAME()), mitk::DicomRTMimeTypes::DICOMRT_DOSE_MIMETYPE_DESCRIPTION()) {
+  RTDoseReaderService::RTDoseReaderService() : AbstractFileReader(CustomMimeType(mitk::DICOMRTMimeTypes::DICOMRT_DOSE_MIMETYPE_NAME()), mitk::DICOMRTMimeTypes::DICOMRT_DOSE_MIMETYPE_DESCRIPTION()) {
     m_FileReaderServiceReg = RegisterService();
   }
 

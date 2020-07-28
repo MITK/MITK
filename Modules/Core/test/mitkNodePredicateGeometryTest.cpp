@@ -138,7 +138,7 @@ public:
     mitk::Vector3D differentSpacing;
     differentSpacing[0] = 1.0;
     differentSpacing[1] = 2.0;
-    differentSpacing[2] = 3.0+3*mitk::eps;
+    differentSpacing[2] = 3.0+3* mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION;
 
     m_AnotherGeometry3D->SetSpacing(differentSpacing);
     m_Data->SetClonedGeometry(m_AnotherGeometry3D);
@@ -153,7 +153,7 @@ public:
     //check less strict precission checkings
     differentSpacing[0] = 1.0;
     differentSpacing[1] = 1.0;
-    differentSpacing[2] = 1.0 + 3 * mitk::eps;
+    differentSpacing[2] = 1.0 + 3 * mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION;
 
     m_AnotherGeometry3D->SetSpacing(differentSpacing);
     m_Data->SetClonedGeometry(m_AnotherGeometry3D);

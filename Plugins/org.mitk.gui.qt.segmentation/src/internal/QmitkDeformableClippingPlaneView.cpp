@@ -165,7 +165,7 @@ void QmitkDeformableClippingPlaneView::OnCreateNewClippingPlane()
           surfaceNode->SetProperty("color", selectedNode->GetProperty("color"));
           surfaceNode->SetOpacity(0.5);
           surfaceNode->SetName(selectedNode->GetName());
-          GetDataStorage()->Add(surfaceNode, selectedNode);
+          this->GetDataStorage()->Add(surfaceNode, selectedNode);
         }
       }
 

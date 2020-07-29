@@ -143,7 +143,7 @@ void QmitkDeformableClippingPlaneView::OnCreateNewClippingPlane()
         for (mitk::DataStorage::SetOfObjects::ConstIterator it = childNodes->Begin();
           it != childNodes->End(); it++)
         {
-          if (it.Value().IsNotNull() && it->Value()->GetName().compare(selectedNode->GetName()) == 0)
+          if (it.Value().IsNotNull() && it->Value()->GetName() == selectedNode->GetName())
           {
             createSurfaceFromImage = false;
             it.Value()->SetVisibility(true);

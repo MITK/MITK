@@ -12,31 +12,31 @@ found in the LICENSE file.
 
 #include "QmitkDeformableClippingPlaneView.h"
 
-#include "usModuleRegistry.h"
+#include <usModuleRegistry.h>
 
 // mitk core
-#include "mitkImageToSurfaceFilter.h"
-#include "mitkInteractionConst.h"
-#include "mitkLevelWindowProperty.h"
-#include "mitkLookupTableProperty.h"
-#include "mitkNodePredicateDataType.h"
-#include "mitkNodePredicateNot.h"
-#include "mitkRenderingModeProperty.h"
-#include "mitkRotationOperation.h"
-#include "mitkSurfaceVtkMapper3D.h"
-#include "mitkVtkRepresentationProperty.h"
-#include "mitkVtkResliceInterpolationProperty.h"
+#include <mitkImageToSurfaceFilter.h>
+#include <mitkInteractionConst.h>
+#include <mitkLevelWindowProperty.h>
+#include <mitkLookupTableProperty.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkRenderingModeProperty.h>
+#include <mitkRotationOperation.h>
+#include <mitkSurfaceVtkMapper3D.h>
+#include <mitkVtkRepresentationProperty.h>
+#include <mitkVtkResliceInterpolationProperty.h>
 
-#include "mitkHeightFieldSurfaceClipImageFilter.h"
-#include "mitkClippingPlaneInteractor3D.h"
-#include "mitkLabeledImageLookupTable.h"
-#include "mitkLabeledImageVolumeCalculator.h"
-#include "mitkSurfaceDeformationDataInteractor3D.h"
+#include <mitkHeightFieldSurfaceClipImageFilter.h>
+#include <mitkClippingPlaneInteractor3D.h>
+#include <mitkLabeledImageLookupTable.h>
+#include <mitkLabeledImageVolumeCalculator.h>
+#include <mitkSurfaceDeformationDataInteractor3D.h>
 
-#include "vtkFloatArray.h"
-#include "vtkPointData.h"
-#include "vtkPlaneSource.h"
-#include "vtkProperty.h"
+#include <vtkFloatArray.h>
+#include <vtkPointData.h>
+#include <vtkPlaneSource.h>
+#include <vtkProperty.h>
 
 #include <mitkILinkedRenderWindowPart.h>
 

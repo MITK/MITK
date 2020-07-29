@@ -17,7 +17,7 @@ found in the LICENSE file.
 
 #include <mitkImage.h>
 #include <mitkNodePredicateAnd.h>
-#include "mitkNodePredicateProperty.h"
+#include <mitkNodePredicateProperty.h>
 #include <QmitkAbstractView.h>
 
 typedef itk::RGBPixel< float > Color;

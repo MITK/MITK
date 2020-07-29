@@ -52,7 +52,7 @@ const char *mitk::BoundingShapeObjectFactory::GetDescription() const
 
 std::string mitk::BoundingShapeObjectFactory::GetFileExtensions()
 {
-  return nullptr;
+  return "";
 }
 
 mitk::CoreObjectFactoryBase::MultimapType mitk::BoundingShapeObjectFactory::GetFileExtensionsMap()
@@ -62,7 +62,7 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::BoundingShapeObjectFactory::GetF
 
 std::string mitk::BoundingShapeObjectFactory::GetSaveFileExtensions()
 {
-  return nullptr;
+  return "";
 }
 
 mitk::CoreObjectFactoryBase::MultimapType mitk::BoundingShapeObjectFactory::GetSaveFileExtensionsMap()

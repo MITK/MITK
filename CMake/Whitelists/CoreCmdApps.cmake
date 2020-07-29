@@ -10,10 +10,10 @@ list(APPEND enabled_modules
   DICOMPM
   DICOMPMIO
   DICOMQI
-  DICOMReader
-  DICOMReaderServices
-  DicomRT
-  DicomRTIO
+  DICOM
+  DICOMImageIO
+  RT
+  DICOMRTIO
   DICOMSegIO
   ModelFit
   Multilabel

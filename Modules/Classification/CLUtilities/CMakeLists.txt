@@ -1,5 +1,5 @@
 mitk_create_module(
-  DEPENDS MitkCore MitkCLCore MitkCommandLine MitkDICOMReader
+  DEPENDS MitkCore MitkCLCore MitkCommandLine MitkDICOM
   PACKAGE_DEPENDS PUBLIC Eigen PRIVATE tinyxml
 )
 

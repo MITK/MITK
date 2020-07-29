@@ -19,7 +19,7 @@ namespace mitk {
 
   /**
   Service wrapper that auto selects (using the mitk::DICOMFileReaderSelector) the best DICOMFileReader from
-  the DICOMReader module and loads the CEST relevant meta data from a provided cest_meta.json file or
+  the DICOM module and loads the CEST relevant meta data from a provided cest_meta.json file or
   provided from the user as reader options.
   */
   class CESTDICOMManualReaderService : public BaseDICOMReaderService

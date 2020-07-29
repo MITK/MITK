@@ -22,7 +22,7 @@ In order to calculate the radiomics features using the graphical interface you f
 
 \li Drag n' Drop: Select the image you want to load with your standard data managing tool, for example with the explorer on windows or finder on Mac. Drag and drop the file into the open MITK Workbench window, the image will then be loaded if possible. If you 
 
-\li DICOM Browser: MITK offers the basic possibiliy to manage and handle DICOM images using the DICOM Browser. You can enable this view by clicking on "DICOM", right of the "Redo"-Button. Within the DICOM Browser, it is possible to read complete folders, and load specific series into the workbench. For more information see \ref org_mitk_gui_qt_dicom .
+\li DICOM Browser: MITK offers the basic possibiliy to manage and handle DICOM images using the DICOM Browser. You can enable this view by clicking on "DICOM", right of the "Redo"-Button. Within the DICOM Browser, it is possible to read complete folders, and load specific series into the workbench. For more information see \ref org_mitk_gui_qt_dicombrowser .
 
 
 

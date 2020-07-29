@@ -1,7 +1,7 @@
 set(enabled_modules
   Core
   CppMicroServices
-  DICOMReader
+  DICOM
   DICOMPM
   DataTypesExt
   AlgorithmsExt
@@ -9,7 +9,7 @@ set(enabled_modules
   Multilabel
   SceneSerializationBase
   DICOMPMIO
-  DICOMReaderServices
+  DICOMImageIO
   ContourModel
   DICOMSegIO
   LegacyGL

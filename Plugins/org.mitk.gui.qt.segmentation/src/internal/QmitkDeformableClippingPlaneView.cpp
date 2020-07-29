@@ -124,7 +124,7 @@ void QmitkDeformableClippingPlaneView::OnCreateNewClippingPlane()
 
   plane->SetVtkPolyData(planeSource->GetOutput());
 
-  double imageDiagonal = 200;
+  mitk::ScalarType imageDiagonal = 200.0;
 
   auto selectedNode = m_Controls->imageSelectionWidget->GetSelectedNode();
   if (selectedNode.IsNotNull())

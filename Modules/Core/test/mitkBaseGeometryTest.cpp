@@ -378,7 +378,7 @@ public:
     matrix = vnlmatrix;
     anotherTransform->SetMatrix(matrix);
 
-    CPPUNIT_ASSERT(mitk::Equal(anotherTransform, dummy->GetIndexToWorldTransform(), mitk::eps, true));
+    CPPUNIT_ASSERT(mitk::Equal(*anotherTransform, *(dummy->GetIndexToWorldTransform()), mitk::eps, true));
   }
 
   void TestSetIndexToWorldTransform_WithPointerToSameTransform()
@@ -550,18 +550,18 @@ public:
     anotherTransform->SetMatrix(anotherMatrix);
     anotherTransform->SetMatrix(aMatrix);
     CPPUNIT_ASSERT_MESSAGE("Exact same transforms are mitk::Equal() for eps=mitk::eps",
-                           mitk::Equal(aTransform, anotherTransform, mitk::eps, true));
+                           mitk::Equal(*aTransform, *anotherTransform, mitk::eps, true));
     CPPUNIT_ASSERT_MESSAGE("Exact same transforms are mitk::Equal() for eps=vnl_math::eps",
-                           mitk::Equal(aTransform, anotherTransform, vnl_math::eps, true));
+                           mitk::Equal(*aTransform, *anotherTransform, vnl_math::eps, true));
 
     anotherMatrix(0, 1) = 0.0002 + mitk::eps;
     anotherTransform->SetMatrix(anotherMatrix);
     CPPUNIT_ASSERT_MESSAGE("Transforms of diff mitk::eps are !mitk::Equal() for eps=vnl_math::eps",
-                           !mitk::Equal(aTransform, anotherTransform, vnl_math::eps, true));
+                           !mitk::Equal(*aTransform, *anotherTransform, vnl_math::eps, true));
     CPPUNIT_ASSERT_MESSAGE("Transforms of diff mitk::eps are !mitk::Equal() for eps=mitk::eps-1%",
-                           !mitk::Equal(aTransform, anotherTransform, mitk::eps * 0.99, true));
+                           !mitk::Equal(*aTransform, *anotherTransform, mitk::eps * 0.99, true));
     CPPUNIT_ASSERT_MESSAGE("Transforms of diff mitk::eps _are_ mitk::Equal() for eps=mitk::eps+1%",
-                           mitk::Equal(aTransform, anotherTransform, mitk::eps * 1.01, true));
+                           mitk::Equal(*aTransform, *anotherTransform, mitk::eps * 1.01, true));
   }
 
   void TestComposeTransform()

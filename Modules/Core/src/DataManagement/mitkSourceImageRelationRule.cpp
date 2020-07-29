@@ -22,7 +22,12 @@ found in the LICENSE file.
 
 std::string mitk::SourceImageRelationRule::GenerateRuleID(const std::string& purpose) const
 {
-  return "SourceImageRelation " + purpose;
+  std::string result = "SourceImageRelation";
+  if (!purpose.empty())
+  {
+    result += " " + purpose;
+  }
+  return result;
 }
 
 bool mitk::SourceImageRelationRule::IsAbstract() const

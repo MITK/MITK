@@ -506,7 +506,7 @@ std::vector<int> mitk::CustomTagParser::GetInternalRevisions()
 
   std::vector<int> availableRevisionsVector;
 
-  for (auto const resource : configs)
+  for (const auto& resource : configs)
   {
     availableRevisionsVector.push_back(std::stoi(resource.GetBaseName()));
   }
@@ -525,7 +525,7 @@ std::vector<int> mitk::CustomTagParser::GetExternalRevisions()
 
   std::vector<int> availableRevisionsVector;
 
-  for (auto const jsonpath : JsonFiles)
+  for (const auto& jsonpath : JsonFiles)
   {
     std::string jsonDir;
     std::string jsonName;

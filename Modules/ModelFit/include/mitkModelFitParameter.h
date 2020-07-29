@@ -14,7 +14,6 @@ found in the LICENSE file.
 #define mitkModelFitParameter_h
 
 #include <mitkImage.h>
-#include "mitkModelFitUIDHelper.h"
 
 #include "MitkModelFitExports.h"
 

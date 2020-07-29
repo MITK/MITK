@@ -635,8 +635,6 @@ namespace mitk
   //
   /**
   * @brief Equal A function comparing two geometries for beeing identical.
-  * @warning This method is deprecated and will not be available in the future. Use the \a bool mitk::Equal(const
-  * mitk::mitk::BaseGeometry& g1, const mitk::BaseGeometry& g2) instead.
   *
   * @ingroup MITKTestingAPI
   *
@@ -644,28 +642,29 @@ namespace mitk
   * IndexToWorldTransform (elementwise), the bounding (elementwise) and the ImageGeometry flag.
   *
   * The parameter eps is a tolarence value for all methods which are internally used for comparion.
-  * If you want to use different tolarance values for different parts of the geometry, feel free to use
+  * If you want to use different tolerance values for different parts of the geometry, feel free to use
   * the other comparison methods and write your own implementation of Equal.
   * @param rightHandSide Compare this against leftHandSide.
   * @param leftHandSide Compare this against rightHandSide.
-  * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
+  * @param coordinateEps Tolerance for comparison of all spatial aspects (spacing, origin and grid alignment).
+  * You can use mitk::eps in most cases.
+  * @param directionEps Tolerance for comparison of all directional aspects (axis). You can use mitk::eps in most cases.
   * @param verbose Flag indicating if the user wants detailed console output or not.
   * @return True, if all comparison are true. False in any other case.
   */
-  DEPRECATED(MITKCORE_EXPORT bool Equal(
-    const mitk::BaseGeometry *leftHandSide, const mitk::BaseGeometry *rightHandSide, ScalarType eps, bool verbose));
+  MITKCORE_EXPORT bool Equal(const mitk::BaseGeometry& leftHandSide,
+    const mitk::BaseGeometry& rightHandSide,
+    ScalarType coordinateEps,
+    ScalarType directionEps,
+    bool verbose = false);
 
   /**
   * @brief Equal A function comparing two geometries for beeing identical.
   *
   * @ingroup MITKTestingAPI
   *
-  * The function compares the spacing, origin, axisvectors, extents, the matrix of the
-  * IndexToWorldTransform (elementwise), the bounding (elementwise) and the ImageGeometry flag.
-  *
-  * The parameter eps is a tolarence value for all methods which are internally used for comparion.
-  * If you want to use different tolarance values for different parts of the geometry, feel free to use
-  * the other comparison methods and write your own implementation of Equal.
+  * @overload This is an overloaded version that uses a single tolerance for spatial and directional aspects. For more details,
+  * see the other overloaded version.
   * @param rightHandSide Compare this against leftHandSide.
   * @param leftHandSide Compare this against rightHandSide.
   * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
@@ -674,29 +673,8 @@ namespace mitk
   */
   MITKCORE_EXPORT bool Equal(const mitk::BaseGeometry &leftHandSide,
                              const mitk::BaseGeometry &rightHandSide,
-                             ScalarType eps,
-                             bool verbose);
-
-  /**
-  * @brief Equal A function comparing two transforms (TransformType) for beeing identical.
-  * @warning This method is deprecated and will not be available in the future. Use the \a bool mitk::Equal(const
-  * mitk::mitk::BaseGeometry::TransformType& t1, const mitk::BaseGeometry::TransformType& t2) instead.
-  *
-  * @ingroup MITKTestingAPI
-  *
-  * The function compares the IndexToWorldTransform (elementwise).
-  *
-  * The parameter eps is a tolarence value for all methods which are internally used for comparion.
-  * @param rightHandSide Compare this against leftHandSide.
-  * @param leftHandSide Compare this against rightHandSide.
-  * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
-  * @param verbose Flag indicating if the user wants detailed console output or not.
-  * @return True, if all comparison are true. False in any other case.
-  */
-  DEPRECATED(MITKCORE_EXPORT bool Equal(const mitk::BaseGeometry::TransformType *leftHandSide,
-                                        const mitk::BaseGeometry::TransformType *rightHandSide,
-                                        ScalarType eps,
-                                        bool verbose));
+                             ScalarType eps = mitk::eps,
+                             bool verbose = false);
 
   /**
   * @brief Equal A function comparing two transforms (TransformType) for beeing identical.
@@ -716,27 +694,6 @@ namespace mitk
                              const mitk::BaseGeometry::TransformType &rightHandSide,
                              ScalarType eps,
                              bool verbose);
-
-  /**
-  * @brief Equal A function comparing two bounding boxes (BoundingBoxType) for beeing identical.
-  * @warning This method is deprecated and will not be available in the future. Use the \a bool mitk::Equal(const
-  * mitk::mitk::BaseGeometry::BoundingBoxType& b1, const mitk::BaseGeometry::BoundingBoxType& b2) instead.
-  *
-  * @ingroup MITKTestingAPI
-  *
-  * The function compares the bounds (elementwise).
-  *
-  * The parameter eps is a tolarence value for all methods which are internally used for comparion.
-  * @param rightHandSide Compare this against leftHandSide.
-  * @param leftHandSide Compare this against rightHandSide.
-  * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
-  * @param verbose Flag indicating if the user wants detailed console output or not.
-  * @return True, if all comparison are true. False in any other case.
-  */
-  DEPRECATED(MITKCORE_EXPORT bool Equal(const mitk::BaseGeometry::BoundingBoxType *leftHandSide,
-                                        const mitk::BaseGeometry::BoundingBoxType *rightHandSide,
-                                        ScalarType eps,
-                                        bool verbose));
 
   /**
   * @brief Equal A function comparing two bounding boxes (BoundingBoxType) for beeing identical.
@@ -769,17 +726,37 @@ namespace mitk
   * The function checks the spacing, origin, axis vectors, extents, the matrix of the
   * IndexToWorldTransform (elementwise), the bounding (elementwise) and the ImageGeometry flag.
   *
-  * The parameter eps is a tolarence value for all methods which are internally used for comparison.
+  * The parameter eps is a tolerance value for all methods which are internally used for comparison.
   * @param testGeo Geometry that should be checked if it is a sub geometry of referenceGeo.
   * @param referenceGeo Geometry that should contain testedGeometry as sub geometry.
-  * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
+  * @param coordinateEps Tolerance for comparison of all spatial aspects (spacing, origin and grid alignment).
+  * You can use mitk::eps in most cases.
+  * @param directionEps Tolerance for comparison of all directional aspects (axis). You can use mitk::eps in most cases.
+  * @param verbose Flag indicating if the user wants detailed console output or not.
+  * @return True, if all comparisons are true. False otherwise.
+  */
+  MITKCORE_EXPORT bool IsSubGeometry(const mitk::BaseGeometry& testGeo,
+    const mitk::BaseGeometry& referenceGeo,
+    ScalarType coordinateEps,
+    ScalarType directionEps,
+    bool verbose = false);
+
+  /**
+  * @brief A function checks if a test geometry is a sub geometry of
+  * a given reference geometry.
+  *
+  * @overload This is a overloaded version that uses a single tolerance for spatial and directional aspects. For more details,
+  * see the other overloaded version.
+  * @param testGeo Geometry that should be checked if it is a sub geometry of referenceGeo.
+  * @param referenceGeo Geometry that should contain testedGeometry as sub geometry.
+  * @param eps Tolarence for comparison (both spatial and directional). You can use mitk::eps in most cases.
   * @param verbose Flag indicating if the user wants detailed console output or not.
   * @return True, if all comparison are true. False otherwise.
   */
   MITKCORE_EXPORT bool IsSubGeometry(const mitk::BaseGeometry& testGeo,
     const mitk::BaseGeometry& referenceGeo,
-    ScalarType eps,
-    bool verbose);
+    ScalarType eps = mitk::eps,
+    bool verbose = false);
 
 } // namespace mitk
 

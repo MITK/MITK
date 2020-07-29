@@ -10,11 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKMASKUTIL_CPP
-#define MITKMASKUTIL_CPP
+#ifndef MITKMASKUTIL_TPP
+#define MITKMASKUTIL_TPP
 
 #include <mitkMaskUtilities.h>
-//#include <mitkImageCast.h>
 #include <mitkImageAccessByItk.h>
 #include <itkExtractImageFilter.h>
 #include <itkChangeInformationImageFilter.h>
@@ -68,14 +67,10 @@ namespace mitk
               for(unsigned int j = 0; j < imageDirection.ColumnDimensions; ++j )
               {
                 double differenceDirection = imageDirection[i][j] - maskDirection[i][j];
-                if ( fabs( differenceDirection ) > mitk::eps )
+                if (fabs(differenceDirection) > MASK_SUITABILITY_TOLERANCE_DIRECTION)
                 {
-                  double differenceDirection = imageDirection[i][j] - maskDirection[i][j];
-                  if ( fabs( differenceDirection ) > 0.001 /*mitk::eps*/ ) // TODO: temp fix (bug 17121)
-                  {
-                    maskSanity = false;
-                    MITK_INFO << "Mask needs to have same direction as image! (Image direction: " << imageDirection << "; Mask direction: " << maskDirection << ")";
-                  }
+                  maskSanity = false;
+                  MITK_INFO << "Mask needs to have same direction as image! (Image direction: " << imageDirection << "; Mask direction: " << maskDirection << ")";
                 }
               }
             }
@@ -85,7 +80,7 @@ namespace mitk
             PointType maskSpacing = m_Mask->GetSpacing();
             for (unsigned int i = 0; i < VImageDimension; i++)
             {
-                if ( fabs( maskSpacing[i] - imageSpacing[i] ) > mitk::eps )
+                if ( fabs( maskSpacing[i] - imageSpacing[i] ) > MASK_SUITABILITY_TOLERANCE_COORDINATE )
                 {
                     maskSanity = false;
                     MITK_INFO << "Spacing of mask and image is not equal. Mask: " << maskSpacing << " image: " << imageSpacing;
@@ -107,7 +102,7 @@ namespace mitk
             {
               double misalignment = maskOriginContinousIndex[i] - floor( maskOriginContinousIndex[i] + 0.5 );
               // misalignment must be a multiple (int) of spacing in that direction
-              if (  fmod(misalignment,imageSpacing[i])  > mitk::eps )
+              if (  fmod(misalignment,imageSpacing[i])  > MASK_SUITABILITY_TOLERANCE_COORDINATE)
               {
                   maskSanity = false;
                   MITK_INFO << "Pixels/voxels of mask and image are not sufficiently aligned! (Misalignment: " << fmod(misalignment,imageSpacing[i]) << ")";
@@ -179,8 +174,8 @@ namespace mitk
 
           extractImageFilter->SetInput( m_Image );
           extractImageFilter->SetExtractionRegion( extractionRegion );
-          extractImageFilter->SetCoordinateTolerance( 0.001 );
-          extractImageFilter->SetDirectionTolerance( 0.001 );
+          extractImageFilter->SetCoordinateTolerance(MASK_SUITABILITY_TOLERANCE_COORDINATE);
+          extractImageFilter->SetDirectionTolerance(MASK_SUITABILITY_TOLERANCE_DIRECTION);
           extractImageFilter->Update();
           extractedImg = extractImageFilter->GetOutput();
           extractedImg->SetOrigin(m_Mask->GetOrigin());

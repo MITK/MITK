@@ -6,7 +6,6 @@ set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
   QmitkMultiLabelSegmentationView.cpp
   QmitkThresholdAction.cpp
-  QmitkAutocropAction.cpp
   QmitkConvertSurfaceToLabelAction.cpp
   QmitkConvertMaskToLabelAction.cpp
   QmitkConvertToMultiLabelSegmentationAction.cpp
@@ -39,7 +38,6 @@ set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
   src/internal/QmitkMultiLabelSegmentationView.h
   src/internal/QmitkThresholdAction.h
-  src/internal/QmitkAutocropAction.h
   src/internal/QmitkConvertSurfaceToLabelAction.h
   src/internal/QmitkLoadMultiLabelPresetAction.h
   src/internal/QmitkCreateMultiLabelPresetAction.h

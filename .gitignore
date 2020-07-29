@@ -1,6 +1,8 @@
 CMakeLists.txt.user*
 .clang_complete
+.clangd
 .autosave
+*.stackdump
 
 ########## Git related
 

@@ -42,7 +42,7 @@ We now move the tracked blue cone object for 75 steps, update the rendering and 
 
 \snippet mitkIGTTutorialStep2.cpp Tracking
 
-\section igtTut2sec2 Final Transform
+\section igtTut2sec4 Final Transform
 
 Finally, we apply the new position of the tracked object (source->GetOutput) to the stored fixedNavigationData transform and update the rendering one last time.
 

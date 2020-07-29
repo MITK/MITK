@@ -122,7 +122,7 @@ void QmitkNodeSelectionPreferencePage::Update()
 
   //fill inspector list
   m_Controls->listInspectors->clear();
-  for (const auto iter : allProviders)
+  for (const auto& iter : allProviders)
   {
     if (iter.first != QmitkDataStorageFavoriteNodesInspector::INSPECTOR_ID() && iter.first != QmitkDataStorageSelectionHistoryInspector::INSPECTOR_ID())
     {

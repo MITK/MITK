@@ -47,10 +47,9 @@ bool mitk::PropertyRelationRuleBase::IsSupportedRuleID(const RuleIDType& ruleID)
   return ruleID == this->GetRuleID();
 }
 
-
-std::string mitk::PropertyRelationRuleBase::GetRIIPropertyRegEx(const std::string propName, const InstanceIDType &instanceID) const
+mitk::PropertyKeyPath mitk::PropertyRelationRuleBase::GetRIIPropertyKeyPath(const std::string propName, const InstanceIDType& instanceID)
 {
-  auto path = this->GetRootKeyPath();
+  auto path = GetRootKeyPath();
   if (instanceID.empty())
   {
     path.AddAnyElement();
@@ -65,7 +64,27 @@ std::string mitk::PropertyRelationRuleBase::GetRIIPropertyRegEx(const std::strin
     path.AddElement(propName);
   }
 
-  return PropertyKeyPathToPropertyRegEx(path);
+  return path;
+}
+
+std::string mitk::PropertyRelationRuleBase::GetRIIPropertyRegEx(const std::string propName, const InstanceIDType &instanceID) const
+{
+  return PropertyKeyPathToPropertyRegEx(GetRIIPropertyKeyPath(propName, instanceID));
+}
+
+mitk::PropertyKeyPath mitk::PropertyRelationRuleBase::GetRIIRelationUIDPropertyKeyPath(const InstanceIDType& instanceID)
+{
+  return GetRIIPropertyKeyPath("relationUID", instanceID);
+}
+
+mitk::PropertyKeyPath mitk::PropertyRelationRuleBase::GetRIIRuleIDPropertyKeyPath(const InstanceIDType& instanceID)
+{
+  return GetRIIPropertyKeyPath("ruleID", instanceID);
+}
+
+mitk::PropertyKeyPath mitk::PropertyRelationRuleBase::GetRIIDestinationUIDPropertyKeyPath(const InstanceIDType& instanceID)
+{
+  return GetRIIPropertyKeyPath("destinationUID", instanceID);
 }
 
 //workaround until T24729 is done. Please remove if T24728 is done
@@ -277,7 +296,7 @@ mitk::PropertyRelationRuleBase::RelationUIDVectorType mitk::PropertyRelationRule
   RelationUIDVectorType relUIDs_id;
 
   auto instanceIDs = this->GetInstanceID_IDLayer(source, destination);
-  for (const auto instanceID : instanceIDs)
+  for (const auto& instanceID : instanceIDs)
   {
     relUIDs_id.push_back(this->GetRelationUIDByInstanceID(source, instanceID));
   }
@@ -326,7 +345,7 @@ mitk::PropertyRelationRuleBase::RelationUIDType mitk::PropertyRelationRuleBase::
   if (instanceID != NULL_INSTANCE_ID())
   {
     auto idProp = source->GetConstProperty(
-      PropertyKeyPathToPropertyName(this->GetRootKeyPath().AddElement(instanceID).AddElement("relationUID")));
+      PropertyKeyPathToPropertyName(GetRIIRelationUIDPropertyKeyPath(instanceID)));
 
     if (idProp.IsNotNull())
     {
@@ -353,7 +372,7 @@ mitk::PropertyRelationRuleBase::InstanceIDType mitk::PropertyRelationRuleBase::G
   InstanceIDType result = NULL_INSTANCE_ID();
 
   auto destRegExStr =
-    PropertyKeyPathToPropertyRegEx(GetRootKeyPath().AddAnyElement().AddElement("relationUID"));
+    PropertyKeyPathToPropertyRegEx(GetRIIRelationUIDPropertyKeyPath());
   auto regEx = std::regex(destRegExStr);
   std::smatch instance_matches;
 
@@ -501,11 +520,11 @@ mitk::PropertyRelationRuleBase::RelationUIDType mitk::PropertyRelationRuleBase::
   }
 
   auto relUIDKey =
-    PropertyKeyPathToPropertyName(GetRootKeyPath().AddElement(instanceID).AddElement("relationUID"));
+    PropertyKeyPathToPropertyName(GetRIIRelationUIDPropertyKeyPath(instanceID));
   source->SetProperty(relUIDKey, mitk::StringProperty::New(relationUID));
 
   auto ruleIDKey =
-    PropertyKeyPathToPropertyName(GetRootKeyPath().AddElement(instanceID).AddElement("ruleID"));
+    PropertyKeyPathToPropertyName(GetRIIRuleIDPropertyKeyPath(instanceID));
   source->SetProperty(ruleIDKey, mitk::StringProperty::New(this->GetRuleID()));
 
   if (!hasIDlayer)
@@ -515,7 +534,7 @@ mitk::PropertyRelationRuleBase::RelationUIDType mitk::PropertyRelationRuleBase::
     if (identifiable)
     {
       auto destUIDKey =
-        PropertyKeyPathToPropertyName(GetRootKeyPath().AddElement(instanceID).AddElement("destinationUID"));
+        PropertyKeyPathToPropertyName(GetRIIDestinationUIDPropertyKeyPath(instanceID));
       source->SetProperty(destUIDKey, mitk::StringProperty::New(identifiable->GetUID()));
     }
   }
@@ -540,7 +559,7 @@ void mitk::PropertyRelationRuleBase::Disconnect(IPropertyOwner *source, const IP
   try
   {
     const auto relationUIDs = this->GetRelationUIDs(source, destination);
-    for (const auto relUID: relationUIDs)
+    for (const auto& relUID: relationUIDs)
     {
       this->Disconnect(source, relUID, layer);
     }
@@ -607,7 +626,7 @@ mitk::PropertyRelationRuleBase::InstanceIDType mitk::PropertyRelationRuleBase::C
   InstanceIDType newID = "1";
 
   auto destRegExStr =
-    PropertyKeyPathToPropertyRegEx(this->GetRootKeyPath().AddAnyElement().AddElement("relationUID"));
+    PropertyKeyPathToPropertyRegEx(GetRIIRelationUIDPropertyKeyPath());
   auto regEx = std::regex(destRegExStr);
   std::smatch instance_matches;
 
@@ -639,7 +658,7 @@ mitk::PropertyRelationRuleBase::InstanceIDType mitk::PropertyRelationRuleBase::C
   //////////////////////////////////////
   // reserve new ID
   auto relUIDKey =
-    PropertyKeyPathToPropertyName(this->GetRootKeyPath().AddElement(newID).AddElement("relationUID"));
+    PropertyKeyPathToPropertyName(GetRIIRelationUIDPropertyKeyPath(newID));
   source->SetProperty(relUIDKey, mitk::StringProperty::New(relationUID));
 
   return newID;
@@ -672,7 +691,7 @@ mitk::PropertyRelationRuleBase::RuleIDType mitk::PropertyRelationRuleBase::GetRu
     mitkThrow() << "Error. Source is invalid. Cannot deduce rule ID";
   }
 
-  auto path = GetRootKeyPath().AddElement(instanceID).AddElement("ruleID");
+  auto path = GetRIIRuleIDPropertyKeyPath(instanceID);
   auto name = PropertyKeyPathToPropertyName(path);
 
   const auto prop = source->GetConstProperty(name);
@@ -700,7 +719,7 @@ std::string mitk::PropertyRelationRuleBase::GetDestinationUIDByInstanceID(const 
     mitkThrow() << "Error. Source is invalid. Cannot deduce rule ID";
   }
 
-  auto path = GetRootKeyPath().AddElement(instanceID).AddElement("destinationUID");
+  auto path = GetRIIDestinationUIDPropertyKeyPath(instanceID);
   auto name = PropertyKeyPathToPropertyName(path);
 
   const auto prop = source->GetConstProperty(name);

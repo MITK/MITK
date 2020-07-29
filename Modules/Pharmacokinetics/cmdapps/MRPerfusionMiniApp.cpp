@@ -352,7 +352,7 @@ void generateDescriptiveBrixModel_PixelBased(mitk::modelFit::ModelFitInfo::Point
   if (mask3D.IsNotNull())
   {
     fitGenerator->SetMask(mask3D);
-    roiUID = mitk::EnsureModelFitUID(mask);
+    roiUID = mask->GetUID();
   }
 
   fitGenerator->SetDynamicImage(image);
@@ -408,7 +408,7 @@ void generateDescriptiveBrixModel_ROIBased(mitk::modelFit::ModelFitInfo::Pointer
 
   generator = fitGenerator.GetPointer();
 
-  std::string roiUID = mitk::EnsureModelFitUID(mask);
+  std::string roiUID = mask->GetUID();
 
   //Create model info
   modelFitInfo = mitk::modelFit::CreateFitInfoFromModelParameterizer(modelParameterizer,
@@ -446,7 +446,7 @@ void GenerateLinearModelFit_PixelBased(mitk::modelFit::ModelFitInfo::Pointer&
   if (mask3D.IsNotNull())
   {
     fitGenerator->SetMask(mask3D);
-    roiUID = mitk::EnsureModelFitUID(mask);
+    roiUID = mask->GetUID();
   }
 
   fitGenerator->SetDynamicImage(image);
@@ -498,7 +498,7 @@ void GenerateLinearModelFit_ROIBased(mitk::modelFit::ModelFitInfo::Pointer&
 
   generator = fitGenerator.GetPointer();
 
-  std::string roiUID = mitk::EnsureModelFitUID(mask);
+  std::string roiUID = mask->GetUID();
 
   //Create model info
   modelFitInfo = mitk::modelFit::CreateFitInfoFromModelParameterizer(modelParameterizer,
@@ -544,7 +544,7 @@ void generateAIFbasedModelFit_PixelBased(mitk::modelFit::ModelFitInfo::Pointer&
   if (mask3D.IsNotNull())
   {
     fitGenerator->SetMask(mask3D);
-    roiUID = mitk::EnsureModelFitUID(mask);
+    roiUID = mask->GetUID();
   }
 
   fitGenerator->SetDynamicImage(image);
@@ -615,7 +615,7 @@ void generateAIFbasedModelFit_ROIBased(
 
   generator = fitGenerator.GetPointer();
 
-  std::string roiUID = mitk::EnsureModelFitUID(mask);
+  std::string roiUID = mask->GetUID();
 
   //Create model info
   modelFitInfo = mitk::modelFit::CreateFitInfoFromModelParameterizer(modelParameterizer,

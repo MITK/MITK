@@ -226,7 +226,7 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode *node
   return newMapper;
 }
 
-const char *mitk::CoreObjectFactory::GetFileExtensions()
+std::string mitk::CoreObjectFactory::GetFileExtensions()
 {
   MultimapType aMap;
   for (auto it = m_ExtraFactories.begin(); it != m_ExtraFactories.end(); ++it)
@@ -283,7 +283,7 @@ void mitk::CoreObjectFactory::CreateFileExtensionsMap()
   */
 }
 
-const char *mitk::CoreObjectFactory::GetSaveFileExtensions()
+std::string mitk::CoreObjectFactory::GetSaveFileExtensions()
 {
   MultimapType aMap;
   for (auto it = m_ExtraFactories.begin(); it != m_ExtraFactories.end(); ++it)

@@ -288,7 +288,7 @@ void QmitkDeformableClippingPlaneView::OnCalculateClippingVolume()
     itPlanes.Value()->GetBoolProperty("visible", isVisible);
     auto plane = dynamic_cast<mitk::Surface*>(itPlanes.Value()->GetData());
 
-    if (isVisible && plane)
+    if (isVisible && nullptr != plane)
       clippingPlanes.push_back(plane);
   }
 

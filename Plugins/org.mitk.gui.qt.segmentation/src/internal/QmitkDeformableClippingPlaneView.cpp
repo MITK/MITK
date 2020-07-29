@@ -338,9 +338,10 @@ void QmitkDeformableClippingPlaneView::OnCalculateClippingVolume()
 
   auto lookupTable = mitk::LabeledImageLookupTable::New();
   int lablesWithVolume = 0;
-  for (unsigned int i = 1; i < volumes.size(); ++i)
+  auto numberOfVolumes = volumes.size();
+  for (decltype(numberOfVolumes) i = 1; i < numberOfVolumes; ++i)
   {
-    if (volumes.at(i) != 0)
+    if (0 != volumes[0])
     {
       lablesWithVolume++;
 
@@ -352,7 +353,7 @@ void QmitkDeformableClippingPlaneView::OnCalculateClippingVolume()
 
       //output volume as string "x.xx ml"
       std::stringstream stream;
-      stream << std::fixed << std::setprecision(2) << volumes.at(i) / 1000;
+      stream << std::fixed << std::setprecision(2) << 0.001 * volumes[i] << " ml";
       stream << " ml";
 
       auto item = new QListWidgetItem();

@@ -510,14 +510,7 @@ void QmitkDeformableClippingPlaneView::UpdateView()
     m_Controls->selectedClippingPlanesLabel->setText("");
     m_Controls->planesWarningLabel->hide();
 
-    if (m_WorkingNode.IsNull())
-    {
-      m_Controls->interactionSelectionBox->setEnabled(false);
-    }
-    else
-    {
-      m_Controls->interactionSelectionBox->setEnabled(true);
-    }
+    m_Controls->interactionSelectionBox->setEnabled(m_WorkingNode.IsNotNull());
   }
 }
 

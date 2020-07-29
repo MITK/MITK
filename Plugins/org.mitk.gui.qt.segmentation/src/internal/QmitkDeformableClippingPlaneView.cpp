@@ -40,6 +40,8 @@ found in the LICENSE file.
 
 #include <mitkILinkedRenderWindowPart.h>
 
+#include <array>
+
 const std::string QmitkDeformableClippingPlaneView::VIEW_ID = "org.mitk.views.deformableclippingplane";
 
 QmitkDeformableClippingPlaneView::QmitkDeformableClippingPlaneView()
@@ -522,79 +524,56 @@ mitk::DataStorage::SetOfObjects::ConstPointer QmitkDeformableClippingPlaneView::
 
 mitk::Color QmitkDeformableClippingPlaneView::GetLabelColor(int label)
 {
-  float red, green, blue;
+  std::array<float, 3> color = { 0.0f, 0.0f, 0.0f };
+
   switch (label % 6)
   {
-    case 0:
-    {
-      red = 1.0;
-      green = 0.0;
-      blue = 0.0;
-      break;
-    }
-    case 1:
-    {
-      red = 0.0;
-      green = 1.0;
-      blue = 0.0;
-      break;
-    }
-    case 2:
-    {
-      red = 0.0;
-      green = 0.0;
-      blue = 1.0;
-      break;
-    }
-    case 3:
-    {
-      red = 1.0;
-      green = 1.0;
-      blue = 0.0;
-      break;
-    }
-    case 4:
-    {
-      red = 1.0;
-      green = 0.0;
-      blue = 1.0;
-      break;
-    }
-    case 5:
-    {
-      red = 0.0;
-      green = 1.0;
-      blue = 1.0;
-      break;
-    }
-    default:
-    {
-      red = 0.0;
-      green = 0.0;
-      blue = 0.0;
-    }
+  case 0: // red
+    color[0] = 1.0f;
+    break;
+  case 1: // green
+    color[1] = 1.0f;
+    break;
+  case 2: // blue
+    color[2] = 1.0f;
+    break;
+  case 3: // yellow
+    color[0] = 1.0f;
+    color[1] = 1.0f;
+    break;
+  case 4: // magenta
+    color[0] = 1.0f;
+    color[2] = 1.0f;
+    break;
+  case 5: // cyan
+    color[1] = 1.0f;
+    color[2] = 1.0f;
+  default: // black
+    break;
   }
 
-  float tmp[3] = { red, green, blue };
-
-  double factor;
-
   int outerCycleNr = label / 6;
-  int cycleSize = pow(2.0, static_cast<int>(log(static_cast<double>(outerCycleNr)) / log(2.0)));
-  if (cycleSize == 0)
-    cycleSize = 1;
+  int cycleSize = std::min(1, static_cast<int>(std::pow(2.0, std::log(outerCycleNr) / std::log(2.0))));
   int insideCycleCounter = outerCycleNr % cycleSize;
 
-  if (outerCycleNr == 0)
-    factor = 255;
+  float factor;
+  if (0 == outerCycleNr)
+  {
+    factor = 255.0f;
+  }
   else
-    factor = (256 / (2 * cycleSize)) + (insideCycleCounter * (256 / cycleSize));
+  {
+    factor = 256.0f / (2.0f * cycleSize) + insideCycleCounter * (256.0f / cycleSize);
+  }
 
-  tmp[0] = tmp[0] / 256 * factor;
-  tmp[1] = tmp[1] / 256 * factor;
-  tmp[2] = tmp[2] / 256 * factor;
+  color =
+  {
+    color[0] / 256.0f * factor,
+    color[1] / 256.0f * factor,
+    color[2] / 256.0f * factor
+  };
 
-  return mitk::Color(tmp);
+  return mitk::Color(color.data());
 }
 
 void QmitkDeformableClippingPlaneView::DeactivateInteractionButtons()

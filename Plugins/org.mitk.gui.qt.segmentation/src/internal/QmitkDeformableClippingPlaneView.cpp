@@ -286,7 +286,7 @@ void QmitkDeformableClippingPlaneView::OnCalculateClippingVolume()
   {
     bool isVisible = false;
     itPlanes.Value()->GetBoolProperty("visible", isVisible);
-    mitk::Surface* plane = dynamic_cast<mitk::Surface*>(itPlanes.Value()->GetData());
+    auto plane = dynamic_cast<mitk::Surface*>(itPlanes.Value()->GetData());
 
     if (isVisible && plane)
       clippingPlanes.push_back(plane);
@@ -355,7 +355,7 @@ void QmitkDeformableClippingPlaneView::OnCalculateClippingVolume()
       stream << std::fixed << std::setprecision(2) << volumes.at(i) / 1000;
       stream << " ml";
 
-      QListWidgetItem* item = new QListWidgetItem();
+      auto item = new QListWidgetItem();
       item->setText(QString::fromStdString(stream.str()));
       item->setBackgroundColor(qcolor);
       m_Controls->volumeList->addItem(item);

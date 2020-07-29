@@ -1009,33 +1009,47 @@ bool mitk::IsSubGeometry(const mitk::BaseGeometry& testGeo,
     result = false;
   }
 
-  // Compare BoundingBoxes (must be <=, thus corners of the tests geom must be inside the reference)
   for (int i = 0; i<8; ++i)
   {
     auto testCorner = testGeo.GetCornerPoint(i);
-    if (testGeo.GetImageGeometry())
+    bool isInside = false;
+    mitk::Point3D testCornerIndex;
+    referenceGeo.WorldToIndex(testCorner, testCornerIndex);
+
+    std::bitset<sizeof(int)> bs(i);
+    //To regard the directionEps, we substract or add it to the index elments
+    //depending on wether it was constructed by a lower or an upper bound value
+    //(see implementation of BaseGeometry::GetCorner()).
+    if (bs.test(0))
     {
-      //if it is an image geometry the upper bounds indicate the first index that is not inside
-      //the geometry. Thus we will get the lower corener of the "first" voxel outside,
-      //but we need the corner of the "last" voxel inside the test geometry.
-      //To achive that we supstract one spacing from each index elment that is constructed
-      //by an upper bound value (see implementation of BaseGeometry::GetCorner().
-      std::bitset<sizeof(int)> bs(i);
-      if (bs.test(0))
-      {
-        testCorner[2] -= testedSpacing[2];
-      }
-      if (bs.test(1))
-      {
-        testCorner[1] -= testedSpacing[1];
-      }
-      if (bs.test(2))
-      {
-        testCorner[0] -= testedSpacing[0];
-      }
+      testCornerIndex[2] -= directionEps;
+    }
+    else
+    {
+      testCornerIndex[2] += directionEps;
     }
 
-    if (!referenceGeo.IsInside(testCorner))
+    if (bs.test(1))
+    {
+      testCornerIndex[1] -= directionEps;
+    }
+    else
+    {
+      testCornerIndex[1] += directionEps;
+    }
+
+    if (bs.test(2))
+    {
+      testCornerIndex[0] -= directionEps;
+    }
+    else
+    {
+      testCornerIndex[0] += directionEps;
+    }
+
+    isInside = referenceGeo.IsIndexInside(testCornerIndex);
+
+    if (!isInside)
     {
       if (verbose)
       {
@@ -1049,12 +1063,14 @@ bool mitk::IsSubGeometry(const mitk::BaseGeometry& testGeo,
 
   // check grid of test geometry is on the grid of the reference geometry. This is important as the
   // boundingbox is only checked for containing the tested geometry, but if a corner (one is enough
-  // as we know that axis and spacing are equal) of the tested geometry is on the grid it is really
-  // a sub geometry (as they have the same spacing and axis).
+  // as we know that axis and spacing are equal, due to equal transfor (see above)) of the tested geometry
+  // is on the grid it is really a sub geometry (as they have the same spacing and axis).
   auto cornerOffset = testGeo.GetCornerPoint(0) - referenceGeo.GetCornerPoint(0);
+  mitk::Vector3D cornerIndexOffset;
+  referenceGeo.WorldToIndex(cornerOffset, cornerIndexOffset);
   for (unsigned int i = 0; i < 3; ++i)
   {
-    auto pixelCountContinous = cornerOffset[i] / testedSpacing[i];
+    auto pixelCountContinous = cornerIndexOffset[i];
     auto pixelCount = std::round(pixelCountContinous);
     if (std::abs(pixelCount - pixelCountContinous) > coordinateEps)
     {

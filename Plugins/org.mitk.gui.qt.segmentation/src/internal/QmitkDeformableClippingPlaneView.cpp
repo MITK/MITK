@@ -44,6 +44,7 @@ const std::string QmitkDeformableClippingPlaneView::VIEW_ID = "org.mitk.views.de
 
 QmitkDeformableClippingPlaneView::QmitkDeformableClippingPlaneView()
   : QmitkAbstractView()
+  , m_Controls(new Ui::QmitkDeformableClippingPlaneViewControls)
   , m_WorkingNode(nullptr)
 {
   auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
@@ -67,7 +68,6 @@ void QmitkDeformableClippingPlaneView::SetFocus()
 
 void QmitkDeformableClippingPlaneView::CreateQtPartControl(QWidget *parent)
 {
-  m_Controls = new Ui::QmitkDeformableClippingPlaneViewControls;
   m_Controls->setupUi(parent);
 
   m_Controls->imageSelectionWidget->SetDataStorage(GetDataStorage());

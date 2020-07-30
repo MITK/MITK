@@ -302,5 +302,8 @@ void QmitkMatchPointRegistrationEvaluator::OnStopBtnPushed()
 
   this->CheckInputs();
   this->ConfigureControls();
-  this->GetRenderWindowPart()->RequestUpdate();
+  if (nullptr != this->GetRenderWindowPart())
+  {
+    this->GetRenderWindowPart()->RequestUpdate();
+  }
 }

@@ -797,7 +797,11 @@ void QmitkMatchPoint::OnMapResultIsAvailable(mitk::BaseData::Pointer spMappedDat
                                          spMappedData, job->GetRegistration()->getRegistrationUID(), job->m_InputDataUID,
                                          job->m_doGeometryRefinement, job->m_InterpolatorLabel);
   this->GetDataStorage()->Add(spMappedNode);
-  this->GetRenderWindowPart()->RequestUpdate();
+
+  if (nullptr != this->GetRenderWindowPart())
+  {
+    this->GetRenderWindowPart()->RequestUpdate();
+  }
 }
 
 void QmitkMatchPoint::OnAlgorithmIterated(QString info, bool hasIterationCount,

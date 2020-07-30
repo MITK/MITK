@@ -21,6 +21,7 @@ found in the LICENSE file.
 
 #include "mitkInteractionEventObserver.h"
 #include "mitkSegTool2D.h"
+#include "mitkRenderingManager.h"
 
 #include "usGetModuleContext.h"
 #include "usModuleContext.h"
@@ -31,6 +32,40 @@ mitk::ToolManager::ToolManager(DataStorage *storage)
   CoreObjectFactory::GetInstance(); // to make sure a CoreObjectFactory was instantiated (and in turn, possible tools
                                     // are registered) - bug 1029
   this->InitializeTools();
+  this->EnsureTimeObservation();
+}
+
+void mitk::ToolManager::EnsureTimeObservation()
+{
+  if (nullptr != mitk::RenderingManager::GetInstance() && nullptr != mitk::RenderingManager::GetInstance()->GetTimeNavigationController())
+  {
+    auto timestepper = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime();
+
+    m_LastTimePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+
+    if (timestepper != m_CurrentTimeStepper)
+    {
+      itk::MemberCommand<ToolManager>::Pointer command = itk::MemberCommand<ToolManager>::New();
+      command->SetCallbackFunction(this, &ToolManager::OnTimeChanged);
+      m_TimePointObserverTag = timestepper->AddObserver(itk::ModifiedEvent(), command);
+      m_CurrentTimeStepper = timestepper;
+    }
+  }
+}
+
+void mitk::ToolManager::StopTimeObservation()
+{
+  if (nullptr!= m_CurrentTimeStepper && nullptr != mitk::RenderingManager::GetInstance() && nullptr != mitk::RenderingManager::GetInstance()->GetTimeNavigationController())
+  {
+    auto timestepper = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime();
+
+    if (timestepper == m_CurrentTimeStepper)
+    {
+      timestepper->RemoveObserver(m_TimePointObserverTag);
+      m_CurrentTimeStepper = nullptr;
+      m_TimePointObserverTag = 0;
+    }
+  }
 }
 
 mitk::ToolManager::~ToolManager()
@@ -58,6 +93,7 @@ mitk::ToolManager::~ToolManager()
   {
     observerTagMapIter->first->RemoveObserver(observerTagMapIter->second);
   }
+  this->StopTimeObservation();
 }
 
 void mitk::ToolManager::InitializeTools()
@@ -171,6 +207,8 @@ bool mitk::ToolManager::ActivateTool(int id)
         }
       }
     }
+
+    this->EnsureTimeObservation();
 
     m_ActiveTool = GetToolById(nextTool);
     m_ActiveToolID = m_ActiveTool ? nextTool : -1; // current ID if tool is valid, otherwise -1
@@ -520,4 +558,22 @@ void mitk::ToolManager::OnNodeRemoved(const mitk::DataNode *node)
   OnOneOfTheReferenceDataDeleted(const_cast<mitk::DataNode *>(node), itk::DeleteEvent());
   OnOneOfTheRoiDataDeleted(const_cast<mitk::DataNode *>(node), itk::DeleteEvent());
   OnOneOfTheWorkingDataDeleted(const_cast<mitk::DataNode *>(node), itk::DeleteEvent());
+}
+
+void mitk::ToolManager::OnTimeChanged(const itk::Object* caller, const itk::EventObject& e)
+{
+  if (caller == m_CurrentTimeStepper)
+  {
+    const auto currentTimePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+    if (currentTimePoint != m_LastTimePoint)
+    {
+      m_LastTimePoint = currentTimePoint;
+      SelectedTimePointChanged.Send();
+    }
+  }
+}
+
+mitk::TimePointType mitk::ToolManager::GetCurrentTimePoint() const
+{
+  return m_LastTimePoint;
 }

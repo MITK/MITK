@@ -93,6 +93,7 @@ namespace mitk
     Message<> ReferenceDataChanged;
     Message<> WorkingDataChanged;
     Message<> RoiDataChanged;
+    Message<> SelectedTimePointChanged;
 
     Message1<std::string> ToolErrorMessage;
     Message1<std::string> GeneralToolMessage;
@@ -145,22 +146,22 @@ namespace mitk
     */
     Tool *GetActiveTool();
 
-    /*
+    /**
       \brief Set a list of data/images as reference objects.
     */
     void SetReferenceData(DataVectorType);
 
-    /*
+    /**
       \brief Set single data item/image as reference object.
     */
     void SetReferenceData(DataNode *);
 
-    /*
+    /**
       \brief Set a list of data/images as working objects.
     */
     void SetWorkingData(DataVectorType);
 
-    /*
+    /**
       \brief Set single data item/image as working object.
     */
     void SetWorkingData(DataNode *);
@@ -175,12 +176,12 @@ namespace mitk
     */
     void SetRoiData(DataNode *);
 
-    /*
+    /**
       \brief Get the list of reference data.
     */
     DataVectorType GetReferenceData();
 
-    /*
+    /**
       \brief Get the current reference data.
       \warning If there is a list of items, this method will only return the first list item.
     */
@@ -191,24 +192,28 @@ namespace mitk
     */
     DataVectorType GetWorkingData();
 
-    /*
+    /**
       \brief Get the current working data.
       \warning If there is a list of items, this method will only return the first list item.
     */
     DataNode *GetWorkingData(unsigned int);
 
-    /*
+    /**
      \brief Get the current roi data
      */
     DataVectorType GetRoiData();
 
-    /*
+    /**
      \brief Get the roi data at position idx
      */
     DataNode *GetRoiData(int idx);
 
     DataStorage *GetDataStorage();
     void SetDataStorage(DataStorage &storage);
+
+    /** Get the current selected time point of the RenderManager
+    */
+    TimePointType GetCurrentTimePoint() const;
 
     /*
       \brief Tell that someone is using tools.
@@ -275,6 +280,20 @@ namespace mitk
 
     /// \brief Callback for NodeRemove events
     void OnNodeRemoved(const mitk::DataNode *node);
+
+    /** Callback for time changed events*/
+    void OnTimeChanged(const itk::Object* caller, const itk::EventObject& e);
+
+    void EnsureTimeObservation();
+    void StopTimeObservation();
+
+private:
+  //Time point of last detected change
+  TimePointType m_LastTimePoint = 0;
+  //Tag of the observer that listens to time changes
+  unsigned long m_TimePointObserverTag = 0;
+  //Pointer to the observed time stepper
+  const Stepper* m_CurrentTimeStepper = nullptr;
   };
 
 } // namespace

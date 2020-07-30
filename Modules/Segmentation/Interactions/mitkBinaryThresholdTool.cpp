@@ -85,6 +85,9 @@ void mitk::BinaryThresholdTool::Activated()
   m_ToolManager->RoiDataChanged +=
     mitk::MessageDelegate<mitk::BinaryThresholdTool>(this, &mitk::BinaryThresholdTool::OnRoiDataChanged);
 
+  m_ToolManager->SelectedTimePointChanged +=
+    mitk::MessageDelegate<mitk::BinaryThresholdTool>(this, &mitk::BinaryThresholdTool::OnTimePointChanged);
+
   m_OriginalImageNode = m_ToolManager->GetReferenceData(0);
   m_NodeForThresholding = m_OriginalImageNode;
 
@@ -102,6 +105,10 @@ void mitk::BinaryThresholdTool::Deactivated()
 {
   m_ToolManager->RoiDataChanged -=
     mitk::MessageDelegate<mitk::BinaryThresholdTool>(this, &mitk::BinaryThresholdTool::OnRoiDataChanged);
+
+  m_ToolManager->SelectedTimePointChanged -=
+    mitk::MessageDelegate<mitk::BinaryThresholdTool>(this, &mitk::BinaryThresholdTool::OnTimePointChanged);
+
   m_NodeForThresholding = nullptr;
   m_OriginalImageNode = nullptr;
   try
@@ -153,7 +160,7 @@ void mitk::BinaryThresholdTool::SetThresholdValue(double value)
 
 void mitk::BinaryThresholdTool::AcceptCurrentThresholdValue()
 {
-  CreateNewSegmentationFromThreshold(m_NodeForThresholding);
+  CreateNewSegmentationFromThreshold();
 
   RenderingManager::GetInstance()->RequestUpdateAll();
   m_ToolManager->ActivateTool(-1);
@@ -226,9 +233,14 @@ void mitk::BinaryThresholdTool::SetupPreviewNode()
 
       if (image.GetPointer() == originalImage.GetPointer())
       {
+        m_SensibleMinimumThresholdValue = std::numeric_limits<ScalarType>::max();
+        m_SensibleMaximumThresholdValue = std::numeric_limits<ScalarType>::lowest();
         Image::StatisticsHolderPointer statistics = originalImage->GetStatistics();
-        m_SensibleMinimumThresholdValue = static_cast<double>(statistics->GetScalarValueMin());
-        m_SensibleMaximumThresholdValue = static_cast<double>(statistics->GetScalarValueMax());
+        for (unsigned int ts = 0; ts < originalImage->GetTimeSteps(); ++ts)
+        {
+          m_SensibleMinimumThresholdValue = std::min(m_SensibleMinimumThresholdValue, static_cast<double>(statistics->GetScalarValueMin()));
+          m_SensibleMaximumThresholdValue = std::max(m_SensibleMaximumThresholdValue, static_cast<double>(statistics->GetScalarValueMax()));
+        }
       }
 
       if ((originalImage->GetPixelType().GetPixelType() == itk::ImageIOBase::SCALAR) &&
@@ -247,67 +259,91 @@ void mitk::BinaryThresholdTool::SetupPreviewNode()
 }
 
 template <typename TPixel, unsigned int VImageDimension>
-static void ITKSetVolume(itk::Image<TPixel, VImageDimension> *originalImage,
+static void ITKSetVolume(const itk::Image<TPixel, VImageDimension> *originalImage,
                          mitk::Image *segmentation,
                          unsigned int timeStep)
 {
-  segmentation->SetVolume((void *)originalImage->GetPixelContainer()->GetBufferPointer(), timeStep);
+  auto constPixelContainer = originalImage->GetPixelContainer();
+  //have to make a const cast because itk::PixelContainer does not provide a const correct access :(
+  auto pixelContainer = const_cast<typename itk::Image<TPixel, VImageDimension>::PixelContainer*>(constPixelContainer);
+  segmentation->SetVolume((void *)pixelContainer->GetBufferPointer(), timeStep);
 }
 
-void mitk::BinaryThresholdTool::CreateNewSegmentationFromThreshold(DataNode *node)
+void mitk::BinaryThresholdTool::TransferImageAtTimeStep(const Image* sourceImage, Image* destinationImage, const TimeStepType timeStep)
 {
-  if (node)
+  try
+  {
+    Image::ConstPointer image3D = this->Get3DImage(sourceImage, timeStep);
+
+    if (image3D->GetDimension() == 2)
+    {
+      AccessFixedDimensionByItk_2(
+        image3D, ITKSetVolume, 2, destinationImage, timeStep);
+    }
+    else
+    {
+      AccessFixedDimensionByItk_2(
+        image3D, ITKSetVolume, 3, destinationImage, timeStep);
+    }
+  }
+  catch (...)
+  {
+    Tool::ErrorMessage("Error accessing single time steps of the original image. Cannot create segmentation.");
+  }
+}
+
+void mitk::BinaryThresholdTool::CreateNewSegmentationFromThreshold()
+{
+  if (m_NodeForThresholding.IsNotNull() && m_ThresholdFeedbackNode.IsNotNull())
   {
     Image::Pointer feedBackImage = dynamic_cast<Image *>(m_ThresholdFeedbackNode->GetData());
     if (feedBackImage.IsNotNull())
     {
-      DataNode::Pointer emptySegmentation = GetTargetSegmentationNode();
+      DataNode::Pointer emptySegmentationNode = GetTargetSegmentationNode();
 
-      if (emptySegmentation)
+      if (emptySegmentationNode)
       {
-        // actually perform a thresholding and ask for an organ type
-        for (unsigned int timeStep = 0; timeStep < feedBackImage->GetTimeSteps(); ++timeStep)
-        {
-          try
-          {
-            ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
-            timeSelector->SetInput(feedBackImage);
-            timeSelector->SetTimeNr(timeStep);
-            timeSelector->UpdateLargestPossibleRegion();
-            Image::Pointer image3D = timeSelector->GetOutput();
+        const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+        auto emptySegmentation = dynamic_cast<Image*>(emptySegmentationNode->GetData());
 
-            if (image3D->GetDimension() == 2)
-            {
-              AccessFixedDimensionByItk_2(
-                image3D, ITKSetVolume, 2, dynamic_cast<Image *>(emptySegmentation->GetData()), timeStep);
-            }
-            else
-            {
-              AccessFixedDimensionByItk_2(
-                image3D, ITKSetVolume, 3, dynamic_cast<Image *>(emptySegmentation->GetData()), timeStep);
-            }
-          }
-          catch (...)
+        // actually perform a thresholding
+        // REMARK: the following code in this scope assumes that feedBackImage and emptySegmentationImage
+        // are clones of the working image (segmentation provided to the tool). Therefor the have the same
+        // time geometry.
+        if (feedBackImage->GetTimeSteps() != emptySegmentation->GetTimeSteps())
+        {
+          mitkThrow() << "Cannot performe threshold. Internal tool state is invalid."
+            << " Preview segmentation and segmentation result image have different time geometries.";
+        }
+
+        if (m_CreateAllTimeSteps)
+        {
+          for (unsigned int timeStep = 0; timeStep < feedBackImage->GetTimeSteps(); ++timeStep)
           {
-            Tool::ErrorMessage("Error accessing single time steps of the original image. Cannot create segmentation.");
+            TransferImageAtTimeStep(feedBackImage, emptySegmentation, timeStep);
           }
+        }
+        else
+        {
+          const auto timeStep = emptySegmentation->GetTimeGeometry()->TimePointToTimeStep(timePoint);
+          TransferImageAtTimeStep(feedBackImage, emptySegmentation, timeStep);
         }
 
         if (m_OriginalImageNode.GetPointer() != m_NodeForThresholding.GetPointer())
         {
           mitk::PadImageFilter::Pointer padFilter = mitk::PadImageFilter::New();
 
-          padFilter->SetInput(0, dynamic_cast<mitk::Image *>(emptySegmentation->GetData()));
+          padFilter->SetInput(0, emptySegmentation);
           padFilter->SetInput(1, dynamic_cast<mitk::Image *>(m_OriginalImageNode->GetData()));
           padFilter->SetBinaryFilter(true);
           padFilter->SetUpperThreshold(1);
           padFilter->SetLowerThreshold(1);
           padFilter->Update();
 
-          emptySegmentation->SetData(padFilter->GetOutput());
+          emptySegmentationNode->SetData(padFilter->GetOutput());
         }
 
-        m_ToolManager->SetWorkingData(emptySegmentation);
+        m_ToolManager->SetWorkingData(emptySegmentationNode);
         m_ToolManager->GetWorkingData(0)->Modified();
       }
     }
@@ -347,11 +383,22 @@ void mitk::BinaryThresholdTool::OnRoiDataChanged()
   this->UpdatePreview();
 }
 
+void mitk::BinaryThresholdTool::OnTimePointChanged()
+{
+  if (m_ThresholdFeedbackNode.IsNotNull() && m_NodeForThresholding.IsNotNull())
+  {
+    if (m_ThresholdFeedbackNode->GetData()->GetTimeSteps() == 1)
+    {
+      this->UpdatePreview();
+    }
+  }
+}
+
 template <typename TPixel, unsigned int VImageDimension>
-void mitk::BinaryThresholdTool::ITKThresholding(itk::Image<TPixel, VImageDimension> *originalImage,
+void mitk::BinaryThresholdTool::ITKThresholding(const itk::Image<TPixel, VImageDimension> *originalImage,
                                                 Image *segmentation,
                                                 double thresholdValue,
-                                                unsigned int timeStep)
+                                                unsigned int timeStep) const
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<mitk::Tool::DefaultSegmentationDataType, VImageDimension> SegmentationType;
@@ -369,10 +416,10 @@ void mitk::BinaryThresholdTool::ITKThresholding(itk::Image<TPixel, VImageDimensi
 }
 
 template <typename TPixel, unsigned int VImageDimension>
-void mitk::BinaryThresholdTool::ITKThresholdingOldBinary(itk::Image<TPixel, VImageDimension> *originalImage,
+void mitk::BinaryThresholdTool::ITKThresholdingOldBinary(const itk::Image<TPixel, VImageDimension> *originalImage,
                                                          Image *segmentation,
                                                          double thresholdValue,
-                                                         unsigned int timeStep)
+                                                         unsigned int timeStep) const
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<unsigned char, VImageDimension> SegmentationType;
@@ -395,23 +442,38 @@ void mitk::BinaryThresholdTool::UpdatePreview()
   mitk::Image::Pointer previewImage = dynamic_cast<mitk::Image *>(m_ThresholdFeedbackNode->GetData());
   if (thresholdImage && previewImage)
   {
-    for (unsigned int timeStep = 0; timeStep < thresholdImage->GetTimeSteps(); ++timeStep)
+    if (previewImage->GetTimeSteps() > 1)
     {
-      ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
-      timeSelector->SetInput(thresholdImage);
-      timeSelector->SetTimeNr(timeStep);
-      timeSelector->UpdateLargestPossibleRegion();
-      Image::Pointer feedBackImage3D = timeSelector->GetOutput();
+      for (unsigned int timeStep = 0; timeStep < thresholdImage->GetTimeSteps(); ++timeStep)
+      {
+        auto feedBackImage3D = this->Get3DImage(thresholdImage, timeStep);
+
+        if (m_IsOldBinary)
+        {
+          AccessByItk_n(feedBackImage3D, ITKThresholdingOldBinary, (previewImage, m_CurrentThresholdValue, timeStep));
+        }
+        else
+        {
+          AccessByItk_n(feedBackImage3D, ITKThresholding, (previewImage, m_CurrentThresholdValue, timeStep));
+        }
+      }
+    }
+    else
+    {
+      const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+      auto feedBackImage3D = this->Get3DImageByTimePoint(thresholdImage, timePoint);
+      auto segTimeStep = previewImage->GetTimeGeometry()->TimePointToTimeStep(timePoint);
 
       if (m_IsOldBinary)
       {
-        AccessByItk_n(feedBackImage3D, ITKThresholdingOldBinary, (previewImage, m_CurrentThresholdValue, timeStep));
+        AccessByItk_n(feedBackImage3D, ITKThresholdingOldBinary, (previewImage, m_CurrentThresholdValue, segTimeStep));
       }
       else
       {
-        AccessByItk_n(feedBackImage3D, ITKThresholding, (previewImage, m_CurrentThresholdValue, timeStep));
+        AccessByItk_n(feedBackImage3D, ITKThresholding, (previewImage, m_CurrentThresholdValue, segTimeStep));
       }
     }
+
 
     RenderingManager::GetInstance()->RequestUpdateAll();
   }

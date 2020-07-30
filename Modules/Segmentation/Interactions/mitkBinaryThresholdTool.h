@@ -63,21 +63,25 @@ namespace mitk
 
     void SetupPreviewNode();
 
-    void CreateNewSegmentationFromThreshold(DataNode *node);
+    void TransferImageAtTimeStep(const Image* sourceImage, Image* destinationImage, const TimeStepType timeStep);
+
+    void CreateNewSegmentationFromThreshold();
 
     void OnRoiDataChanged();
+    void OnTimePointChanged();
+
     void UpdatePreview();
 
     template <typename TPixel, unsigned int VImageDimension>
-    void ITKThresholding(itk::Image<TPixel, VImageDimension> *originalImage,
+    void ITKThresholding(const itk::Image<TPixel, VImageDimension> *originalImage,
                          mitk::Image *segmentation,
                          double thresholdValue,
-                         unsigned int timeStep);
+                         unsigned int timeStep) const;
     template <typename TPixel, unsigned int VImageDimension>
-    void ITKThresholdingOldBinary(itk::Image<TPixel, VImageDimension> *originalImage,
+    void ITKThresholdingOldBinary(const itk::Image<TPixel, VImageDimension> *originalImage,
                                   mitk::Image *segmentation,
                                   double thresholdValue,
-                                  unsigned int timeStep);
+                                  unsigned int timeStep) const;
 
     DataNode::Pointer m_ThresholdFeedbackNode;
     DataNode::Pointer m_OriginalImageNode;
@@ -89,6 +93,7 @@ namespace mitk
     bool m_IsFloatImage;
 
     bool m_IsOldBinary = false;
+    bool m_CreateAllTimeSteps = false;
   };
 
 } // namespace

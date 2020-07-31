@@ -8,7 +8,9 @@
 \tableofcontents
 
 \section FIT_DCE_Introduction Introduction
-For pharmacokinetic analysis of DCE MRI/CT data using compartment models in non-linear least square fitting the DCE MR Perfusion Datafit plugin can be used.
+In dynamic contrast-enhanced (DCE) MRI, pharmacokinetic (PK) modeling is used to quantify tissue physiology. 
+Parameters describing the microvasculature can be derived by fitting a pharmacokinetic model to the dynamic data. 
+
 
 \section FIT_DCE_Contact Contact information
 This plug-in is being developed by the SIDT group (Software development for Integrated Diagnostics and Therapy) at the German Cancer Research Center (DKFZ).

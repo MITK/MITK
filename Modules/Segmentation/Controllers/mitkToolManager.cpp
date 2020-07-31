@@ -558,7 +558,7 @@ void mitk::ToolManager::OnNodeRemoved(const mitk::DataNode *node)
   OnOneOfTheWorkingDataDeleted(const_cast<mitk::DataNode *>(node), itk::DeleteEvent());
 }
 
-void mitk::ToolManager::OnTimeChanged(const itk::Object* caller, const itk::EventObject& e)
+void mitk::ToolManager::OnTimeChanged(const itk::Object* caller, const itk::EventObject& /*e*/)
 {
   if (caller == m_CurrentTimeStepper)
   {

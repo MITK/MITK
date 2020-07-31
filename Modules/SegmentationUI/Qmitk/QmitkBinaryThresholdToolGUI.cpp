@@ -130,7 +130,7 @@ void QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged(double lo
   m_InternalUpdate = false;
 }
 
-void QmitkBinaryThresholdToolGUI::OnThresholdingValuesChanged(mitk::ScalarType lower, mitk::ScalarType upper)
+void QmitkBinaryThresholdToolGUI::OnThresholdingValuesChanged(mitk::ScalarType lower, mitk::ScalarType /*upper*/)
 {
   m_ThresholdSlider->setValue(lower);
 }

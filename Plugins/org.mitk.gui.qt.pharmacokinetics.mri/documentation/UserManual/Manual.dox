@@ -26,16 +26,16 @@ In principle, every model can be fitted on the entire image. However, for model 
 Therefore, apart from the image to be fitted (<i>Selected Time Series</i>), a ROI segmentation can be defined (<i>Selected Mask</i>), within which model fitting is performed.
 The view currently offers <i>Pixel based</i> and/or <i>ROI based</i> averaged fits of time-varying curves. If a mask is selected, <i>ROI based</i> fitting is enabled.
 
-\subsection FIT_DCE_General_models Supported models
+\section FIT_DCE_General_models Supported models
 Currently the following pharmacokinetic models for gadolinium-based contrast agent are available:
 -	The Descriptive Brix model \ref FIT_DCE_lit_ref1 "[1]"
--	A semi-quantitative three segment linear model (3SL)
+-	A semi-quantitative two/three segment linear model (2SL/3SL)
 -	The standard tofts model \ref FIT_DCE_lit_ref2 "[2]"
 -	The extended Tofts model \ref FIT_DCE_lit_ref3 "[3]"
 -	The two compartment exchange model (2CXM) \ref FIT_DCE_lit_ref4 "[4, 5]"
 
 \section FIT_DCE_Settings Model Settings
-\imageMacro{dce_mri_config.png, "Example screenshot showing the config settings of the view.", 10}
+\imageMacro{dce_mri_config.png, "General settings of the view.", 10}
 
 \subsection FIT_DCE_Settings_model Model specific settings
 Selecting one of the \ref FIT_DCE_General_models "supported models" will open below tabs for further configuration of the model.

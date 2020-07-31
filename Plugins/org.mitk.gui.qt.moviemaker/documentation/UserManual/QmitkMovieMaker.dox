@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_moviemaker The Movie Maker
 
-\imageMacro{video-camera.svg,"Icon of the Movie Maker Plugin.",2.00}
+\imageMacro{moviemakericon_black.svg,"Icon of the Movie Maker Plugin.",2.00}
 
 \tableofcontents
 

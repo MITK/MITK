@@ -13,7 +13,6 @@ set(CPP_FILES
   Common/mitkModelFitInfo.cpp
   Common/mitkModelFitStaticParameterMap.cpp
   Common/mitkModelGenerator.cpp
-  Common/mitkModelFitUIDHelper.cpp
   Common/mitkModelFitResultHelper.cpp
   Common/mitkScalarListLookupTable.cpp
   Common/mitkScalarListLookupTableProperty.cpp
@@ -25,6 +24,7 @@ set(CPP_FILES
   Common/mitkFresnel.cpp
   Common/mitkModelFitPlotDataHelper.cpp
   Common/mitkModelSignalImageGenerator.cpp
+  Common/mitkModelFitResultRelationRule.cpp
   Functors/mitkSimpleFunctorBase.cpp
   Functors/mitkSimpleFunctorPolicy.cpp
   Functors/mitkChiSquareFitCostFunction.cpp

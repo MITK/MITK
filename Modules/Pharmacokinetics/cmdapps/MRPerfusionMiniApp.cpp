@@ -105,7 +105,7 @@ void setupParser(mitkCommandLineParser& parser)
     // see mitkCommandLineParser::addArgument for more information
     parser.beginGroup("Model parameters");
     parser.addArgument(
-        "model", "l", mitkCommandLineParser::String, "Model function", "Model that should be used to fit the concentration signal. Options are: \""+MODEL_NAME_descriptive+"\" (descriptive pharmacokinetic Brix model),\""+MODEL_NAME_3SL+"\" (three step linear model), \""+MODEL_NAME_tofts+"\" (extended tofts model) or \""+MODEL_NAME_2CX+"\" (two compartment exchange model).", us::Any(std::string(MODEL_NAME_tofts)));
+        "model", "l", mitkCommandLineParser::String, "Model function", "Model that should be used to fit the concentration signal. Options are: \""+MODEL_NAME_descriptive+"\" (descriptive pharmacokinetic Brix model),\"" + MODEL_NAME_2SL + "\" (two step linear model),\""+MODEL_NAME_3SL+"\" (three step linear model), \""+MODEL_NAME_tofts+"\" (extended tofts model) or \""+MODEL_NAME_2CX+"\" (two compartment exchange model).", us::Any(std::string(MODEL_NAME_tofts)));
     parser.addArgument(
         "injectiontime", "j", mitkCommandLineParser::Float, "Injection time [min]", "Injection time of the bolus. This information is needed for the descriptive pharmacokinetic Brix model.", us::Any());
     parser.endGroup();
@@ -352,7 +352,7 @@ void generateDescriptiveBrixModel_PixelBased(mitk::modelFit::ModelFitInfo::Point
   if (mask3D.IsNotNull())
   {
     fitGenerator->SetMask(mask3D);
-    roiUID = mitk::EnsureModelFitUID(mask);
+    roiUID = mask->GetUID();
   }
 
   fitGenerator->SetDynamicImage(image);
@@ -408,7 +408,7 @@ void generateDescriptiveBrixModel_ROIBased(mitk::modelFit::ModelFitInfo::Pointer
 
   generator = fitGenerator.GetPointer();
 
-  std::string roiUID = mitk::EnsureModelFitUID(mask);
+  std::string roiUID = mask->GetUID();
 
   //Create model info
   modelFitInfo = mitk::modelFit::CreateFitInfoFromModelParameterizer(modelParameterizer,
@@ -446,7 +446,7 @@ void GenerateLinearModelFit_PixelBased(mitk::modelFit::ModelFitInfo::Pointer&
   if (mask3D.IsNotNull())
   {
     fitGenerator->SetMask(mask3D);
-    roiUID = mitk::EnsureModelFitUID(mask);
+    roiUID = mask->GetUID();
   }
 
   fitGenerator->SetDynamicImage(image);
@@ -498,7 +498,7 @@ void GenerateLinearModelFit_ROIBased(mitk::modelFit::ModelFitInfo::Pointer&
 
   generator = fitGenerator.GetPointer();
 
-  std::string roiUID = mitk::EnsureModelFitUID(mask);
+  std::string roiUID = mask->GetUID();
 
   //Create model info
   modelFitInfo = mitk::modelFit::CreateFitInfoFromModelParameterizer(modelParameterizer,
@@ -544,7 +544,7 @@ void generateAIFbasedModelFit_PixelBased(mitk::modelFit::ModelFitInfo::Pointer&
   if (mask3D.IsNotNull())
   {
     fitGenerator->SetMask(mask3D);
-    roiUID = mitk::EnsureModelFitUID(mask);
+    roiUID = mask->GetUID();
   }
 
   fitGenerator->SetDynamicImage(image);
@@ -615,7 +615,7 @@ void generateAIFbasedModelFit_ROIBased(
 
   generator = fitGenerator.GetPointer();
 
-  std::string roiUID = mitk::EnsureModelFitUID(mask);
+  std::string roiUID = mask->GetUID();
 
   //Create model info
   modelFitInfo = mitk::modelFit::CreateFitInfoFromModelParameterizer(modelParameterizer,
@@ -821,7 +821,7 @@ int main(int argc, char* argv[])
             std::cout << "Mask:  none" << std::endl;
         }
 
-        if (modelName != MODEL_NAME_descriptive && modelName != MODEL_NAME_3SL)
+        if (modelName != MODEL_NAME_descriptive && modelName != MODEL_NAME_3SL && MODEL_NAME_2SL != modelName)
         {
           if (!aifMaskFileName.empty())
           {

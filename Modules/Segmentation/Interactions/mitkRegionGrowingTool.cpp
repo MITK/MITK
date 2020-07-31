@@ -40,6 +40,8 @@ found in the LICENSE file.
 
 #include <itkImageDuplicator.h>
 
+#include <limits>
+
 namespace mitk
 {
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, RegionGrowingTool, "Region growing tool");
@@ -106,8 +108,8 @@ void mitk::RegionGrowingTool::Deactivated()
 
 // Get the average pixel value of square/cube with radius=neighborhood around index
 template <typename TPixel, unsigned int imageDimension>
-void mitk::RegionGrowingTool::GetNeighborhoodAverage(itk::Image<TPixel, imageDimension> *itkImage,
-                                                     itk::Index<imageDimension> index,
+void mitk::RegionGrowingTool::GetNeighborhoodAverage(const itk::Image<TPixel, imageDimension> *itkImage,
+                                                     const itk::Index<imageDimension>& index,
                                                      ScalarType *result,
                                                      unsigned int neighborhood)
 {
@@ -168,8 +170,8 @@ void mitk::RegionGrowingTool::GetNeighborhoodAverage(itk::Image<TPixel, imageDim
 
 // Check whether index lies inside a segmentation
 template <typename TPixel, unsigned int imageDimension>
-void mitk::RegionGrowingTool::IsInsideSegmentation(itk::Image<TPixel, imageDimension> *itkImage,
-                                                   itk::Index<imageDimension> index,
+void mitk::RegionGrowingTool::IsInsideSegmentation(const itk::Image<TPixel, imageDimension> *itkImage,
+                                                   const itk::Index<imageDimension>& index,
                                                    bool *result)
 {
   if (itkImage->GetPixel(index) > 0)
@@ -184,9 +186,9 @@ void mitk::RegionGrowingTool::IsInsideSegmentation(itk::Image<TPixel, imageDimen
 
 // Do the region growing (i.e. call an ITK filter that does it)
 template <typename TPixel, unsigned int imageDimension>
-void mitk::RegionGrowingTool::StartRegionGrowing(itk::Image<TPixel, imageDimension> *inputImage,
-                                                 itk::Index<imageDimension> seedIndex,
-                                                 std::array<ScalarType, 2> thresholds,
+void mitk::RegionGrowingTool::StartRegionGrowing(const itk::Image<TPixel, imageDimension> *inputImage,
+                                                 const itk::Index<imageDimension>& seedIndex,
+                                                 const std::array<ScalarType, 2>& thresholds,
                                                  mitk::Image::Pointer &outputImage)
 {
   MITK_DEBUG << "Starting region growing at index " << seedIndex << " with lower threshold " << thresholds[0]
@@ -200,7 +202,7 @@ void mitk::RegionGrowingTool::StartRegionGrowing(itk::Image<TPixel, imageDimensi
 
   // perform region growing in desired segmented region
   regionGrower->SetInput(inputImage);
-  regionGrower->AddSeed(seedIndex);
+  regionGrower->SetSeed(seedIndex);
 
   regionGrower->SetLower(thresholds[0]);
   regionGrower->SetUpper(thresholds[1]);
@@ -276,6 +278,34 @@ void mitk::RegionGrowingTool::StartRegionGrowing(itk::Image<TPixel, imageDimensi
   m_ConnectedComponentValue = resultImageCC->GetPixel(seedIndex);
 
   outputImage = mitk::GrabItkImageMemory(resultImageCC);
+}
+
+template <typename TPixel, unsigned int imageDimension>
+void mitk::RegionGrowingTool::CalculateInitialThresholds(const itk::Image<TPixel, imageDimension>*)
+{
+  LevelWindow levelWindow;
+  m_ToolManager->GetReferenceData(0)->GetLevelWindow(levelWindow);
+
+  m_ThresholdExtrema = { std::numeric_limits<TPixel>::lowest(), std::numeric_limits<TPixel>::max() };
+
+  const ScalarType lowerWindowBound = std::max(m_ThresholdExtrema[0], levelWindow.GetLowerWindowBound());
+  const ScalarType upperWindowBound = std::min(m_ThresholdExtrema[1], levelWindow.GetUpperWindowBound());
+
+  if (m_SeedValue < lowerWindowBound)
+  {
+    m_InitialThresholds = { m_ThresholdExtrema[0], lowerWindowBound };
+  }
+  else if (m_SeedValue > upperWindowBound)
+  {
+    m_InitialThresholds = { upperWindowBound, m_ThresholdExtrema[1] };
+  }
+  else
+  {
+    const ScalarType range = 0.1 * (upperWindowBound - lowerWindowBound); // 10% of the visible window
+
+    m_InitialThresholds[0] = std::min(std::max(lowerWindowBound, m_SeedValue - 0.5 * range), upperWindowBound - range);
+    m_InitialThresholds[1] = m_InitialThresholds[0] + range;
+  }
 }
 
 void mitk::RegionGrowingTool::OnMousePressed(StateMachineAction *, InteractionEvent *interactionEvent)
@@ -429,16 +459,8 @@ void mitk::RegionGrowingTool::OnMousePressedOutside(StateMachineAction *, Intera
     m_SeedValue = averageValue;
     MITK_DEBUG << "Seed value is " << m_SeedValue;
 
-    // Get level window settings
-    LevelWindow lw(0, 500); // default window 0 to 500, can we do something smarter here?
-    m_ToolManager->GetReferenceData(0)->GetLevelWindow(
-      lw); // will fill lw if levelwindow property is present, otherwise won't touch it.
-    ScalarType currentVisibleWindow = lw.GetWindow();
-    MITK_DEBUG << "Level window width is " << currentVisibleWindow;
-    m_InitialThresholds[0] = m_SeedValue - currentVisibleWindow / 20.0; // 20 is arbitrary (though works reasonably
-                                                                        // well), is there a better alternative (maybe
-                                                                        // option in preferences)?
-    m_InitialThresholds[1] = m_SeedValue + currentVisibleWindow / 20.0;
+    // Calculate initial thresholds
+    AccessFixedDimensionByItk(m_ReferenceSlice, CalculateInitialThresholds, 2);
     m_Thresholds[0] = m_InitialThresholds[0];
     m_Thresholds[1] = m_InitialThresholds[1];
 
@@ -504,13 +526,14 @@ void mitk::RegionGrowingTool::OnMouseMoved(StateMachineAction *, InteractionEven
     m_ScreenXDifference += positionEvent->GetPointerPositionOnScreen()[0] - m_LastScreenPosition[0];
     m_LastScreenPosition = positionEvent->GetPointerPositionOnScreen();
 
-    // Moving the mouse up and down adjusts the width of the threshold window, moving it left and right shifts the
-    // threshold window
-    m_Thresholds[0] = std::min<ScalarType>(
-      m_SeedValue, m_InitialThresholds[0] - (m_ScreenYDifference - m_ScreenXDifference) * m_MouseDistanceScaleFactor);
-    m_Thresholds[1] = std::max<ScalarType>(
-      m_SeedValue, m_InitialThresholds[1] + (m_ScreenYDifference + m_ScreenXDifference) * m_MouseDistanceScaleFactor);
-    MITK_DEBUG << "Screen difference X: " << m_ScreenXDifference;
+    // Moving the mouse up and down adjusts the width of the threshold window,
+    // moving it left and right shifts the threshold window
+    m_Thresholds[0] = std::min(m_SeedValue, m_InitialThresholds[0] - (m_ScreenYDifference - m_ScreenXDifference) * m_MouseDistanceScaleFactor);
+    m_Thresholds[1] = std::max(m_SeedValue, m_InitialThresholds[1] + (m_ScreenYDifference + m_ScreenXDifference) * m_MouseDistanceScaleFactor);
+
+    // Do not exceed the pixel type extrema of the reference slice, though
+    m_Thresholds[0] = std::max(m_ThresholdExtrema[0], m_Thresholds[0]);
+    m_Thresholds[1] = std::min(m_ThresholdExtrema[1], m_Thresholds[1]);
 
     // Perform region growing again and show the result
     mitk::Image::Pointer resultImage = mitk::Image::New();

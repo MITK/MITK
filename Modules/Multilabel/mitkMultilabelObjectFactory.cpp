@@ -82,7 +82,7 @@ void mitk::MultilabelObjectFactory::SetDefaultProperties(mitk::DataNode *node)
   }
 }
 
-const char *mitk::MultilabelObjectFactory::GetFileExtensions()
+std::string mitk::MultilabelObjectFactory::GetFileExtensions()
 {
   std::string fileExtension;
   this->CreateFileExtensions({}, fileExtension);
@@ -103,7 +103,7 @@ void mitk::MultilabelObjectFactory::CreateFileExtensionsMap()
 {
 }
 
-const char *mitk::MultilabelObjectFactory::GetSaveFileExtensions()
+std::string mitk::MultilabelObjectFactory::GetSaveFileExtensions()
 {
   std::string fileExtension;
   this->CreateFileExtensions({}, fileExtension);

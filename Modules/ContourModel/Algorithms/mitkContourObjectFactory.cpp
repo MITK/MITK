@@ -98,7 +98,7 @@ void mitk::ContourObjectFactory::SetDefaultProperties(mitk::DataNode *node)
   }
 }
 
-const char *mitk::ContourObjectFactory::GetFileExtensions()
+std::string mitk::ContourObjectFactory::GetFileExtensions()
 {
   std::string fileExtension;
   this->CreateFileExtensions(m_FileExtensionsMap, fileExtension);
@@ -119,7 +119,7 @@ void mitk::ContourObjectFactory::CreateFileExtensionsMap()
 {
 }
 
-const char *mitk::ContourObjectFactory::GetSaveFileExtensions()
+std::string mitk::ContourObjectFactory::GetSaveFileExtensions()
 {
   std::string fileExtension;
   this->CreateFileExtensions(m_SaveFileExtensionsMap, fileExtension);

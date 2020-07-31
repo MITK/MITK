@@ -10,27 +10,19 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKVOLUMEVISUALIZATIONVIEW_H_
-#define QMITKVOLUMEVISUALIZATIONVIEW_H_
-
-#include <QmitkAbstractView.h>
-
-#include <mitkDataNodeSelection.h>
-
-#include <mitkWeakPointer.h>
-
-#include <mitkImage.h>
-
-#include "mitkDataStorage.h"
-
-#include <QmitkDataStorageListModel.h>
-#include <QmitkDataStorageComboBox.h>
-#include <QmitkTransferFunctionWidget.h>
+#ifndef QMITKVOLUMEVISUALIZATIONVIEW_H
+#define QMITKVOLUMEVISUALIZATIONVIEW_H
 
 #include "ui_QmitkVolumeVisualizationViewControls.h"
 
+// mitk core
+#include <mitkDataStorage.h>
+#include <mitkWeakPointer.h>
+
+#include <QmitkAbstractView.h>
+
 /**
- * \ingroup org_mitk_gui_qt_volumevisualization_internal
+ * @brief
  */
 class QmitkVolumeVisualizationView : public QmitkAbstractView
 {
@@ -38,41 +30,32 @@ class QmitkVolumeVisualizationView : public QmitkAbstractView
 
 public:
 
-  void SetFocus() override;
+  static const std::string VIEW_ID;
 
   QmitkVolumeVisualizationView();
 
-  ~QmitkVolumeVisualizationView() override;
+  ~QmitkVolumeVisualizationView() override = default;
 
-  void CreateQtPartControl(QWidget *parent) override;
+  void SetFocus() override;
 
-  ///
-  /// Invoked when the DataManager selection changed
-  ///
-  void OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes) override;
+private Q_SLOTS:
 
-  static const std::string VIEW_ID;
+  void OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
-
-protected slots:
-
-  void OnMitkInternalPreset( int mode );
-
-  void OnEnableRendering( bool state );
-  void OnRenderMode( int mode );
+  void OnMitkInternalPreset(int mode);
+  void OnEnableRendering(bool state);
+  void OnRenderMode(int mode);
   void OnBlendMode(int mode);
-
-protected:
-
-  Ui::QmitkVolumeVisualizationViewControls* m_Controls;
 
 private:
 
-  mitk::WeakPointer<mitk::DataNode> m_SelectedNode;
+  void CreateQtPartControl(QWidget* parent) override;
 
   void UpdateInterface();
-  void NodeRemoved(const mitk::DataNode* node) override;
+
+  Ui::QmitkVolumeVisualizationViewControls* m_Controls;
+  mitk::WeakPointer<mitk::DataNode> m_SelectedNode;
 
 };
 
-#endif /*QMITKVOLUMEVISUALIZATIONVIEW_H_*/
+#endif // QMITKVOLUMEVISUALIZATIONVIEW_H

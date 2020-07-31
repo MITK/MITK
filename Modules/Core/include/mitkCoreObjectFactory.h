@@ -51,7 +51,7 @@ namespace mitk
      * @return The c-string that contains the file extensions
      * @deprecatedSince{2014_10} See mitk::FileReaderRegistry and QmitkIOUtil
      */
-    DEPRECATED(virtual const char *GetFileExtensions() override);
+    DEPRECATED(virtual std::string GetFileExtensions() override);
 
     /**
      * @brief get the defined (open) file extension map
@@ -69,7 +69,7 @@ namespace mitk
      * @return The c-string that contains the (save) file extensions
      * @deprecatedSince{2014_10} See mitk::FileWriterRegistry and QmitkIOUtil
      */
-    DEPRECATED(virtual const char *GetSaveFileExtensions() override);
+    DEPRECATED(virtual std::string GetSaveFileExtensions() override);
 
     /**
      * @brief get the defined (save) file extension map

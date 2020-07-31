@@ -14,7 +14,7 @@ found in the LICENSE file.
 
 
 const std::string mitk::ModelFitConstants::MODEL_FIT_PROPERTY_NAME() { return "modelfit";}
-const std::string mitk::ModelFitConstants::UID_PROPERTY_NAME() { return "data.uid";}
+const std::string mitk::ModelFitConstants::LEGACY_UID_PROPERTY_NAME() { return "data.uid";}
 const std::string mitk::ModelFitConstants::INPUT_VARIABLES_PROPERTY_NAME() { return "modelfit.input.variables";}
 const std::string mitk::ModelFitConstants::PARAMETER_NAME_PROPERTY_NAME() { return "modelfit.parameter.name";}
 const std::string mitk::ModelFitConstants::PARAMETER_TYPE_PROPERTY_NAME() { return "modelfit.parameter.type";}
@@ -41,7 +41,7 @@ const std::string mitk::ModelFitConstants::FIT_NAME_PROPERTY_NAME() { return "mo
 const std::string mitk::ModelFitConstants::FIT_TYPE_PROPERTY_NAME() { return "modelfit.fit.type";}
 const std::string mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED() { return "pixelbased";}
 const std::string mitk::ModelFitConstants::FIT_TYPE_VALUE_ROIBASED() { return "ROIbased";}
-const std::string mitk::ModelFitConstants::FIT_INPUT_IMAGEUID_PROPERTY_NAME() { return "modelfit.fit.input.imageUID";}
+const std::string mitk::ModelFitConstants::LEGACY_FIT_INPUT_IMAGEUID_PROPERTY_NAME() { return "modelfit.fit.input.imageUID";}
 const std::string mitk::ModelFitConstants::FIT_INPUT_ROIUID_PROPERTY_NAME() { return "modelfit.fit.input.roiUID";}
 const std::string mitk::ModelFitConstants::FIT_INPUT_DATA_PROPERTY_NAME() { return "modelfit.fit.input.data";}
 const std::string mitk::ModelFitConstants::FIT_STATIC_PARAMETERS_PROPERTY_NAME() { return "modelfit.fit.staticParameters";}

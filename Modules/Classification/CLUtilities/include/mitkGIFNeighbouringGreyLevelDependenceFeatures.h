@@ -115,48 +115,33 @@ namespace mitk
  */
   class MITKCLUTILITIES_EXPORT GIFNeighbouringGreyLevelDependenceFeature : public AbstractGlobalImageFeature
   {
-    public:
-      mitkClassMacro(GIFNeighbouringGreyLevelDependenceFeature, AbstractGlobalImageFeature);
-      itkFactorylessNewMacro(Self);
-      itkCloneMacro(Self);
+  public:
+    mitkClassMacro(GIFNeighbouringGreyLevelDependenceFeature, AbstractGlobalImageFeature);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
-      GIFNeighbouringGreyLevelDependenceFeature();
+    GIFNeighbouringGreyLevelDependenceFeature();
 
-      /**
-      * \brief Calculates the Cooccurence-Matrix based features for this class.
-      */
-      FeatureListType CalculateFeatures(const Image::Pointer & image, const Image::Pointer &feature) override;
+    FeatureListType CalculateFeatures(const Image* image, const Image* mask, const Image* maskNoNAN) override;
+    using Superclass::CalculateFeatures;
 
-      /**
-      * \brief Returns a list of the names of all features that are calculated from this class
-      */
-      FeatureNameListType GetFeatureNames() override;
-
-      std::string GetCurrentFeatureEncoding() override;
-
-      itkGetConstMacro(Range,double);
-      itkSetMacro(Range, double);
+    itkGetConstMacro(Ranges, std::vector<double>);
+    void SetRanges(std::vector<double> ranges);
+    void SetRange(double range);
     itkGetConstMacro(Alpha, int);
     itkSetMacro(Alpha, int);
 
-    void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList) override;
-    void AddArguments(mitkCommandLineParser &parser) override;
+    void AddArguments(mitkCommandLineParser& parser) const override;
 
+  protected:
+    std::string GenerateLegacyFeatureEncoding(const FeatureID& id) const override;
 
-    struct GIFNeighbouringGreyLevelDependenceFeatureConfiguration
-    {
-      double range;
-      unsigned int direction;
-      int alpha;
+    FeatureListType DoCalculateFeatures(const Image* image, const Image* mask) override;
 
-      double MinimumIntensity;
-      double MaximumIntensity;
-      int Bins;
-      std::string FeatureEncoding;
-    };
+    void ConfigureSettingsByParameters(const ParametersType& parameters) override;
 
-    private:
-    double m_Range;
+  private:
+    std::vector<double> m_Ranges;
     int m_Alpha;
   };
 

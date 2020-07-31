@@ -1,47 +1,59 @@
 /**
-\page org_mitk_views_pointsetinteraction The Point Set Interaction View
+\page org_mitk_views_pointsetinteraction The Point Set Interaction
 
 \imageMacro{pointset_interaction.svg,"Icon of the Point Set Interaction View",2.00}
 
-Available sections:
-  - \ref QmitkPointSetInteractionUserManualOverview
-  - \ref QmitkPointSetInteractionUserManualDetails
-
-\section QmitkPointSetInteractionUserManualOverview Overview
+<h1>Overview</h1>
 
 This view allows you to define multiple sets of points, to fill them with points and to save them in so called PointSets.
 
-\imageMacro{QmitkPointSetInteraction_Screenshot.png,"MITK with the QmitkPointSetInteraction view",16.00}
+\imageMacro{QmitkPointSetInteraction_Screenshot.png,"PointSet Annotations in MITK",16.00}
 
 This document will tell you how to use this view, but it is assumed that you already know how to navigate through the slices of an image using the
 four window view. Please read the application manual for more information.
 
-\section QmitkPointSetInteractionUserManualDetails Details
+<h1>Usage</h1>
 
-First of all you have to select a PointSet to use this view. Therefore, you have to select the point set in the data manager.
-If there are currently no point sets in the data tree, you have to first add a new point set to the data tree. This is done by clicking the "Add pointset..."
-button.
+
+<h2>Create new PointSet</h2>
+
+First of all you have to select a PointSet to use this view. You can either select an existing PointSet in the data manager or you can create a new one. This is done by clicking the 'Add pointset...' button.
 
 \imageMacro{QmitkPointSetInteraction_AddPointSet.png,"The Add pointset... dialog",8.64}
 
-In the pop-up dialog, you have to specify a name for the new point set. This is also the node for the new data tree item.
+In the pop-up dialog, you have to specify a name for the new PointSet. Afterwards, it appears as a new node in the data manager.
 
-\imageMacro{QmitkPointSetInteraction_CurrentPointSetArea.png,"The Current pointset area",6.52}
 
-The "Current pointset" area contains a list of points. Within this area, all points for the current point set node are listed.
-To set points you have to toggle the "Set Points"  button, the leftmost of the four buttons on the bottom of the view.
-Points can be defined by performing a left mouse button click while holding the "Shift"-key pressed in the four window view.
+<h2>Add new points </h2>
 
-To erase all points from the list press the next button. The user is prompted to confirm the decision. If you want to delete only a single point, left click on it in the list and then press delete on your keyboard.
+To set points you have to toggle the 'Set Points'  button (<b>+</b>), the leftmost of the seven buttons on the bottom of the view.
+Points can be defined by performing a left mouse button click while holding the 'Shift'-key pressed in the four window view.
+Alternatively, you can set a new point by pressing the button next to the left most button (<b>+ xyz</b>) and adding a new point location directly.
 
-With the third button, a previously saved point set can be loaded and all of its points are shown in the list and the four window view.
-The user is prompted to select the file to be loaded.
-The file extension is ".mps". On the right of this button is the save button.
-With this function the entire point set can be saved to the harddrive. The user is prompted to select a filename.
-Pointsets are saved in XML fileformat but have to have a ".mps" file extension.
+The 'Current pointset' area contains a list of all points in the current PointSet node with index and position.
 
-You can select points in the render window, if the "Set Points" button is toggled, with a left mouse button click on them.
-If you keep the mouse button pressed, you can move the points by moving the mouse and then releasing the mouse button.
-With the delete key you can remove the selected points.
+\imageMacro{QmitkPointSetInteraction_CurrentPointSetArea.png,"PointSet Interaction View",6.52}
+
+
+<h2>Remove points </h2>
+
+To erase a point from the list press either the third button or the delete key on your keyboard.
+
+<h2>Modify point position</h2>
+
+By using the 'up' and 'down' arrow buttons, the index location of a point in the PointSet can be altered.
+
+
+<h2>Save and load a PointSet</h2>
+
+With the two last buttons PointSets can be saved and loaded.
+With the 'save' button, the entire PointSet can be saved to the harddrive. The user is prompted to select a filename.
+PointSets are saved in XML fileformat but have to have a '.mps' file extension. A previously saved PointSet can be loaded and all of its points appear in the list and the four window view as well as a node in the data manager.
+
+
+<h2>Modify points</h2>
+
+You can select a single point in the render window, if the 'Set Points' button is toggled. If you keep the mouse button pressed, you can move the points by moving the mouse and then releasing the mouse button. With the delete key you can remove the selected points.
+
 
 */

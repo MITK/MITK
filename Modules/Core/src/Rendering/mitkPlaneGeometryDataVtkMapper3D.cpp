@@ -465,7 +465,7 @@ namespace mitk
           BaseRenderer::Pointer planeRenderer =
             dynamic_cast<BaseRenderer *>(rendererProp->GetWeakPointer().GetPointer());
           // Retrieve and update image to be mapped
-          const ImageVtkMapper2D::LocalStorage *localStorage = imageMapper->GetLocalStorage(planeRenderer);
+          const ImageVtkMapper2D::LocalStorage *localStorage = imageMapper->GetConstLocalStorage(planeRenderer);
 
           if (planeRenderer.IsNotNull())
           {
@@ -536,7 +536,7 @@ namespace mitk
               texture->SetColorModeToDirectScalars();
 
               // re-use properties from the 2D image mapper
-              imageActor->SetProperty(localStorage->m_Actor->GetProperty());
+              imageActor->SetProperty(localStorage->m_ImageActor->GetProperty());
               imageActor->GetProperty()->SetAmbient(0.5);
 
               // Set texture interpolation on/off

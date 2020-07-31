@@ -1,5 +1,5 @@
 MITK_CREATE_MODULE(
-  DEPENDS MitkSceneSerializationBase MitkDICOMReader MitkMultilabel MitkPersistence MitkImageStatisticsUI
+  DEPENDS MitkSceneSerializationBase MitkDICOM MitkMultilabel MitkPersistence MitkImageStatisticsUI
 )
 
 if(BUILD_TESTING)

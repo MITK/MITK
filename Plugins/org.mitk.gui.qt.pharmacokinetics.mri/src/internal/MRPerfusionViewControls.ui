@@ -10,6 +10,12 @@
     <height>1124</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="minimumSize">
    <size>
     <width>0</width>
@@ -20,39 +26,50 @@
    <string>QmitkTemplate</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="sizeConstraint">
+    <enum>QLayout::SetDefaultConstraint</enum>
+   </property>
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_2">
+     <property name="spacing">
+      <number>4</number>
+     </property>
+     <property name="sizeConstraint">
+      <enum>QLayout::SetDefaultConstraint</enum>
+     </property>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QLabel" name="label_2">
+      <layout class="QGridLayout" name="gridLayout_6">
+       <item row="0" column="0">
+        <widget class="QLabel" name="timeSeriesLabel">
          <property name="text">
           <string>Selected Time Series:</string>
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QLabel" name="timeserieslabel">
-         <property name="text">
-          <string>No series selected.</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <item>
-        <widget class="QLabel" name="label_3">
+       <item row="1" column="0">
+        <widget class="QLabel" name="maskLabel">
          <property name="text">
           <string>Selected Mask:</string>
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QLabel" name="masklabel">
-         <property name="text">
-          <string>No mask selected.</string>
+       <item row="0" column="1">
+        <widget class="QmitkSingleNodeSelectionWidget" name="timeSeriesNodeSelector" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>40</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QmitkSingleNodeSelectionWidget" name="maskNodeSelector" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>40</height>
+          </size>
          </property>
         </widget>
        </item>
@@ -60,12 +77,27 @@
      </item>
      <item>
       <widget class="QGroupBox" name="groupBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>40</height>
+        </size>
+       </property>
        <property name="title">
         <string>Fitting strategy</string>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <property name="spacing">
          <number>5</number>
+        </property>
+        <property name="sizeConstraint">
+         <enum>QLayout::SetMinAndMaxSize</enum>
         </property>
         <property name="leftMargin">
          <number>5</number>
@@ -81,6 +113,12 @@
         </property>
         <item>
          <widget class="QRadioButton" name="radioPixelBased">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="text">
            <string>Pixel based</string>
           </property>
@@ -91,6 +129,12 @@
         </item>
         <item>
          <widget class="QRadioButton" name="radioROIbased">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="text">
            <string>ROI based</string>
           </property>
@@ -128,16 +172,6 @@
         <property name="leftMargin">
          <number>20</number>
         </property>
-        <item row="0" column="2">
-         <widget class="QmitkDataStorageComboBox" name="comboAIFMask" native="true">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="0">
          <widget class="QLabel" name="labelAIFMask">
           <property name="text">
@@ -155,15 +189,25 @@
           </property>
          </widget>
         </item>
+        <item row="0" column="2">
+         <widget class="QmitkSingleNodeSelectionWidget" name="AIFMaskNodeSelector" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
+         </widget>
+        </item>
         <item row="2" column="2">
-         <widget class="QmitkDataStorageComboBox" name="comboAIFImage" native="true">
+         <widget class="QmitkSingleNodeSelectionWidget" name="AIFImageNodeSelector" native="true">
           <property name="enabled">
            <bool>false</bool>
           </property>
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>0</height>
+            <height>40</height>
            </size>
           </property>
          </widget>
@@ -301,7 +345,7 @@
            <x>0</x>
            <y>0</y>
            <width>459</width>
-           <height>140</height>
+           <height>84</height>
           </rect>
          </property>
          <attribute name="label">
@@ -332,7 +376,7 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>158</width>
+           <width>459</width>
            <height>232</height>
           </rect>
          </property>
@@ -369,7 +413,7 @@
          <property name="geometry">
           <rect>
            <x>0</x>
-           <y>-40</y>
+           <y>0</y>
            <width>449</width>
            <height>397</height>
           </rect>
@@ -539,7 +583,7 @@
                 </widget>
                </item>
                <item row="3" column="1">
-                <widget class="QmitkDataStorageComboBox" name="ComboPDWImage" native="true"/>
+                <widget class="QmitkSingleNodeSelectionWidget" name="PDWImageNodeSelector" native="true"/>
                </item>
               </layout>
              </widget>
@@ -664,6 +708,9 @@
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Expanding</enum>
+     </property>
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
@@ -687,9 +734,10 @@
    <header>QmitkInitialValuesManagerWidget.h</header>
   </customwidget>
   <customwidget>
-   <class>QmitkDataStorageComboBox</class>
+   <class>QmitkSingleNodeSelectionWidget</class>
    <extends>QWidget</extends>
-   <header location="global">QmitkDataStorageComboBox.h</header>
+   <header>QmitkSingleNodeSelectionWidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

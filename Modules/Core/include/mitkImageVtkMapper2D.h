@@ -126,7 +126,7 @@ namespace mitk
       /** \brief Get the Image to map */
       const mitk::Image *GetInput(void);
 
-    /** \brief Checks whether this mapper needs to update itself and generate
+      /** \brief Checks whether this mapper needs to update itself and generate
      * data. */
     void Update(mitk::BaseRenderer *renderer) override;
 
@@ -144,10 +144,20 @@ namespace mitk
     class MITKCORE_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
     {
     public:
-      /** \brief Actor of a 2D render window. */
-      vtkSmartPointer<vtkActor> m_Actor;
+      /** \brief Actor of the image in a 2D render window. */
+      vtkSmartPointer<vtkActor> m_ImageActor;
+      /** \brief Actor of the shadowimage in a 2D render window. */
+      vtkSmartPointer<vtkActor> m_ShadowOutlineActor;
 
+      /** Prop assembly containting everything for a regular display of the image.*/
       vtkSmartPointer<vtkPropAssembly> m_Actors;
+      /** Prop assembly used if workspace is in an invalid state (e.g. invalid time point or
+       * invalid world coordinate position is selected) and mapper has to "early out"
+       * in Update() or GenerateDataForRenderer()*/
+      vtkSmartPointer<vtkPropAssembly> m_EmptyActors;
+      /** Prop assembly exposed publicly via ImagVtkMapper2D::GetVTKProp()*/
+      vtkProp* m_PublicActors = nullptr;
+
       /** \brief Mapper of a 2D render window. */
       vtkSmartPointer<vtkPolyDataMapper> m_Mapper;
       vtkSmartPointer<vtkImageExtractComponents> m_VectorComponentExtractor;
@@ -193,11 +203,8 @@ namespace mitk
       ~LocalStorage() override;
     };
 
-    /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
-    mitk::LocalStorageHandler<LocalStorage> m_LSH;
-
     /** \brief Get the LocalStorage corresponding to the current renderer. */
-    LocalStorage *GetLocalStorage(mitk::BaseRenderer *renderer);
+    const LocalStorage *GetConstLocalStorage(mitk::BaseRenderer *renderer);
 
     /** \brief Set the default properties for general image rendering. */
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
@@ -208,6 +215,12 @@ namespace mitk
     void ApplyRenderingMode(mitk::BaseRenderer *renderer);
 
   protected:
+    /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
+    mitk::LocalStorageHandler<LocalStorage> m_LSH;
+
+    /** \brief Get the LocalStorage corresponding to the current renderer. */
+    LocalStorage* GetLocalStorage(mitk::BaseRenderer* renderer);
+
     /** \brief Transforms the actor to the actual position in 3D.
       *   \param renderer The current renderer corresponding to the render window.
       */
@@ -300,6 +313,9 @@ namespace mitk
       * If the distances have different sign, there is an intersection.
       **/
     bool RenderingGeometryIntersectsImage(const PlaneGeometry *renderingGeometry, SlicedGeometry3D *imageGeometry);
+
+    /** Helper function to reset the local storage in order to indicate an invalid state.*/
+    void SetToInvalidState(mitk::ImageVtkMapper2D::LocalStorage* localStorage);
   };
 
 } // namespace mitk

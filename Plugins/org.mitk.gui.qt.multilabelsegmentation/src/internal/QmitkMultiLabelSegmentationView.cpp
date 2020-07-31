@@ -866,11 +866,12 @@ void QmitkMultiLabelSegmentationView::OnEstablishLabelSetConnection()
 void QmitkMultiLabelSegmentationView::OnLooseLabelSetConnection()
 {
   if (m_WorkingNode.IsNull())
-  {
     return;
-  }
-  mitk::LabelSetImage *workingImage = dynamic_cast<mitk::LabelSetImage *>(m_WorkingNode->GetData());
-  assert(workingImage);
+
+  auto* workingImage = dynamic_cast<mitk::LabelSetImage *>(m_WorkingNode->GetData());
+
+  if (nullptr == workingImage)
+    return; // data (type) was changed in-place, e.g. LabelSetImage -> Image
 
   // Reset LabelSetWidget Events
   workingImage->GetActiveLabelSet()->AddLabelEvent -= mitk::MessageDelegate<QmitkLabelSetWidget>(

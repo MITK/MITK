@@ -125,10 +125,8 @@ protected:
 
     /*! \brief called by QmitkFunctionality when DataManager's selection has changed
   */
-  void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
-                                  const QList<mitk::DataNode::Pointer>& selectedNodes) override;
 
-  // Variables
+  void OnNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/);
 
   /*! @brief The view's UI controls */
   Ui::MRPerfusionViewControls m_Controls;
@@ -196,6 +194,8 @@ private:
 
   mitk::NodePredicateBase::Pointer m_IsNoMaskImagePredicate;
   mitk::NodePredicateBase::Pointer m_IsMaskPredicate;
+  mitk::NodePredicateBase::Pointer m_isValidPDWImagePredicate;
+  mitk::NodePredicateBase::Pointer m_isValidTimeSeriesImagePredicate;
 
   /* Node used for the fit (my be the selected image
   or converted ones (depending on the ui settings */

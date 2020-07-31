@@ -350,8 +350,6 @@ namespace mitk
 
     itk::LightObject::Pointer InternalClone() const override = 0;
 
-    PlaneGeometry *m_PlaneGeometry;
-
     bool m_PolyLineUpToDate;
     bool m_HelperLinesUpToDate;
     bool m_FeaturesUpToDate;

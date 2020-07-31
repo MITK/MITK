@@ -1,6 +1,6 @@
 mitk_create_module(
-  DEPENDS MitkCore MitkCLCore MitkCommandLine
-  PACKAGE_DEPENDS PUBLIC Eigen
+  DEPENDS MitkCore MitkCLCore MitkCommandLine MitkDICOM
+  PACKAGE_DEPENDS PUBLIC Eigen PRIVATE tinyxml
 )
 
 if(TARGET ${MODULE_TARGET})

@@ -24,9 +24,17 @@ found in the LICENSE file.
 // STL
 #include <sstream>
 
+struct GIFNeighbourhoodGreyLevelDifferenceParameterStruct
+{
+  bool  m_UseCTRange;
+  double m_Range;
+  unsigned int m_Direction;
+  mitk::FeatureID id;
+};
+
 template<typename TPixel, unsigned int VImageDimension>
 void
-  CalculateGrayLevelNeighbourhoodGreyLevelDifferenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFNeighbourhoodGreyLevelDifference::FeatureListType & featureList, mitk::GIFNeighbourhoodGreyLevelDifference::ParameterStruct params)
+  CalculateGrayLevelNeighbourhoodGreyLevelDifferenceFeatures(const itk::Image<TPixel, VImageDimension>* itkImage, const mitk::Image* mask, mitk::GIFNeighbourhoodGreyLevelDifference::FeatureListType & featureList, GIFNeighbourhoodGreyLevelDifferenceParameterStruct params)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<TPixel, VImageDimension> MaskType;
@@ -89,7 +97,7 @@ void
   if (rangeOfPixels < 2)
     rangeOfPixels = 256;
 
-  if (params.m_UseCtRange)
+  if (params.m_UseCTRange)
   {
     filter->SetPixelValueMinMax((TPixel)(-1024.5),(TPixel)(3096.5));
     filter->SetNumberOfBinsPerAxis(3096.5+1024.5);
@@ -114,19 +122,19 @@ void
     switch (i)
     {
     case TextureFilterType::Coarseness :
-      featureList.push_back(std::make_pair("NeighbourhoodGreyLevelDifference ("+ strRange+") Coarseness Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Coarseness Means"),featureMeans->ElementAt(i)));
       break;
     case TextureFilterType::Contrast :
-      featureList.push_back(std::make_pair("NeighbourhoodGreyLevelDifference ("+ strRange+") Contrast Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Contrast Means"),featureMeans->ElementAt(i)));
       break;
     case TextureFilterType::Busyness :
-      featureList.push_back(std::make_pair("NeighbourhoodGreyLevelDifference ("+ strRange+") Busyness Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Busyness Means"),featureMeans->ElementAt(i)));
       break;
     case TextureFilterType::Complexity :
-      featureList.push_back(std::make_pair("NeighbourhoodGreyLevelDifference ("+ strRange+") Complexity Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Complexity Means"),featureMeans->ElementAt(i)));
       break;
     case TextureFilterType::Strength :
-      featureList.push_back(std::make_pair("NeighbourhoodGreyLevelDifference ("+ strRange+") Strength Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Strength Means"),featureMeans->ElementAt(i)));
       break;
     default:
       break;
@@ -135,86 +143,85 @@ void
 }
 
 mitk::GIFNeighbourhoodGreyLevelDifference::GIFNeighbourhoodGreyLevelDifference():
-m_Range(1.0), m_UseCtRange(false)
+  m_Ranges({ 1.0 }), m_UseCTRange(false)
 {
   SetShortName("ngld");
   SetLongName("NeighbourhoodGreyLevelDifference");
 }
 
-mitk::GIFNeighbourhoodGreyLevelDifference::FeatureListType mitk::GIFNeighbourhoodGreyLevelDifference::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
+void mitk::GIFNeighbourhoodGreyLevelDifference::SetRanges(std::vector<double> ranges)
 {
-  FeatureListType featureList;
-
-  ParameterStruct params;
-  params.m_UseCtRange=m_UseCtRange;
-  params.m_Range = m_Range;
-  params.m_Direction = GetDirection();
-
-  AccessByItk_3(image, CalculateGrayLevelNeighbourhoodGreyLevelDifferenceFeatures, mask, featureList,params);
-
-  return featureList;
+  m_Ranges = ranges;
+  this->Modified();
 }
 
-mitk::GIFNeighbourhoodGreyLevelDifference::FeatureNameListType mitk::GIFNeighbourhoodGreyLevelDifference::GetFeatureNames()
+void mitk::GIFNeighbourhoodGreyLevelDifference::SetRange(double range)
 {
-  FeatureNameListType featureList;
-  featureList.push_back("NeighbourhoodGreyLevelDifference. Coarseness Means");
-  featureList.push_back("NeighbourhoodGreyLevelDifference. Coarseness Std.");
-  featureList.push_back("NeighbourhoodGreyLevelDifference. Contrast Means");
-  featureList.push_back("NeighbourhoodGreyLevelDifference. Contrast Std.");
-  featureList.push_back("NeighbourhoodGreyLevelDifference. Busyness Means");
-  featureList.push_back("NeighbourhoodGreyLevelDifference. Busyness Std.");
-  featureList.push_back("NeighbourhoodGreyLevelDifference. Complexity Means");
-  featureList.push_back("NeighbourhoodGreyLevelDifference. Complexity Std.");
-  featureList.push_back("NeighbourhoodGreyLevelDifference. Strength Means");
-  featureList.push_back("NeighbourhoodGreyLevelDifference. Strength Std.");
-  return featureList;
+  m_Ranges.resize(1);
+  m_Ranges[0] = range;
+  this->Modified();
 }
 
-
-
-void mitk::GIFNeighbourhoodGreyLevelDifference::AddArguments(mitkCommandLineParser &parser)
+void mitk::GIFNeighbourhoodGreyLevelDifference::AddArguments(mitkCommandLineParser &parser) const
 {
   std::string name = GetOptionPrefix();
 
   parser.addArgument(GetLongName(), name, mitkCommandLineParser::String, "Use Co-occurence matrix", "calculates Co-occurence based features (new implementation)", us::Any());
   parser.addArgument(name + "::range", name + "::range", mitkCommandLineParser::String, "Cooc 2 Range", "Define the range that is used (Semicolon-separated)", us::Any());
-  parser.addArgument(name + "::direction", name + "::dir", mitkCommandLineParser::String, "Int", "Allows to specify the direction for Cooc and RL. 0: All directions, 1: Only single direction (Test purpose), 2,3,4... without dimension 0,1,2... ", us::Any());
+  parser.addArgument(name + "::direction", name + "::dir", mitkCommandLineParser::Int, "Int", "Allows to specify the direction for Cooc and RL. 0: All directions, 1: Only single direction (Test purpose), 2,3,4... without dimension 0,1,2... ", us::Any());
+  parser.addArgument(name + "::useCTRange", name + "::ct", mitkCommandLineParser::Bool, "Use CT range", "If flag is set only value in the CT range will be used for feature computation.", us::Any());
 }
 
-void
-mitk::GIFNeighbourhoodGreyLevelDifference::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &, const Image::Pointer &maskNoNAN, FeatureListType &featureList)
+mitk::AbstractGlobalImageFeature::FeatureListType mitk::GIFNeighbourhoodGreyLevelDifference::DoCalculateFeatures(const Image* image, const Image* mask)
 {
-  auto parsedArgs = GetParameter();
-  std::string name = GetOptionPrefix();
+  FeatureListType featureList;
 
-  if (parsedArgs.count(GetLongName()))
+  for (const auto& range : m_Ranges)
   {
-    int direction = 0;
-    if (parsedArgs.count(name + "::direction"))
-    {
-      direction = SplitDouble(parsedArgs[name + "::direction"].ToString(), ';')[0];
-    }
-    std::vector<double> ranges;
-    if (parsedArgs.count(name + "::range"))
-    {
-      ranges = SplitDouble(parsedArgs[name + "::range"].ToString(), ';');
-    }
-    else
-    {
-      ranges.push_back(1);
-    }
-
-    for (std::size_t i = 0; i < ranges.size(); ++i)
-    {
-      MITK_INFO << "Start calculating Neighbourhood Grey Level Difference with range " << ranges[i] << "....";
-      this->SetRange(ranges[i]);
-      this->SetDirection(direction);
-      auto localResults = this->CalculateFeatures(feature, maskNoNAN);
-      featureList.insert(featureList.end(), localResults.begin(), localResults.end());
-      MITK_INFO << "Finished calculating coocurence with range " << ranges[i] << "....";
-    }
+    MITK_INFO << "Start calculating Neighbourhood Grey Level Difference with range " << range << "....";
+    GIFNeighbourhoodGreyLevelDifferenceParameterStruct params;
+    params.m_UseCTRange = m_UseCTRange;
+    params.m_Range = range;
+    params.m_Direction = GetDirection();
+    params.id = this->CreateTemplateFeatureID(std::to_string(range), { {GetOptionPrefix() + "::range", range} });
+    AccessByItk_3(image, CalculateGrayLevelNeighbourhoodGreyLevelDifferenceFeatures, mask, featureList, params);
+    MITK_INFO << "Finished calculating coocurence with range " << range << "....";
   }
 
+  return featureList;
 }
 
+mitk::AbstractGlobalImageFeature::FeatureListType mitk::GIFNeighbourhoodGreyLevelDifference::CalculateFeatures(const Image* image, const Image*, const Image* maskNoNAN)
+{
+  return Superclass::CalculateFeatures(image, maskNoNAN);
+}
+
+std::string mitk::GIFNeighbourhoodGreyLevelDifference::GenerateLegacyFeatureName(const FeatureID& id) const
+{
+  return "NeighbourhoodGreyLevelDifference (" + id.parameters.at(this->GetOptionPrefix() + "::range").ToString() + ") " + id.name;
+}
+
+void mitk::GIFNeighbourhoodGreyLevelDifference::ConfigureSettingsByParameters(const ParametersType& parameters)
+{
+  auto prefixname = GetOptionPrefix();
+
+  auto name = prefixname + "::range";
+  if (parameters.count(name))
+  {
+    m_Ranges = SplitDouble(parameters.at(name).ToString(), ';');
+  }
+
+  name = prefixname + "::direction";
+  if (parameters.count(name))
+  {
+    int direction = us::any_cast<int>(parameters.at(name));
+    this->SetDirection(direction);
+  }
+
+  name = prefixname + "::useCTRange";
+  if (parameters.count(name))
+  {
+    bool tmp = us::any_cast<bool>(parameters.at(name));
+    m_UseCTRange = tmp;
+  }
+}

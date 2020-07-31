@@ -47,24 +47,9 @@ namespace mitk
     m_CESTDICOMManualWithOutMetaFileReader = std::make_unique<CESTDICOMManualReaderService>(MitkCESTIOMimeTypes::CEST_DICOM_WITHOUT_META_FILE_MIMETYPE(), "CEST DICOM Manual Reader");
 
     m_Context = context;
-    {
-      std::lock_guard<std::mutex> lock(m_Mutex);
-      // Listen for events pertaining to dictionary services.
-      m_Context->AddServiceListener(this, &CESTIOActivator::DICOMTagsOfInterestServiceChanged,
-        std::string("(&(") + us::ServiceConstants::OBJECTCLASS() + "=" +
-        us_service_interface_iid<IDICOMTagsOfInterest>() + "))");
-      // Query for any service references matching any language.
-      std::vector<us::ServiceReference<IDICOMTagsOfInterest> > refs =
-        context->GetServiceReferences<IDICOMTagsOfInterest>();
-      if (!refs.empty())
-      {
-        for (const auto& ref : refs)
-        {
-          this->RegisterTagsOfInterest(m_Context->GetService(ref));
-          m_Context->UngetService(ref);
-        }
-      }
-    }
+
+    DICOMTagsOfInterestAddHelper::TagsOfInterestVector tags = { mitk::DICOM_IMAGING_FREQUENCY_PATH() };
+    m_TagHelper.Activate(m_Context, tags);
   }
 
   void CESTIOActivator::Unload(us::ModuleContext *)
@@ -74,28 +59,7 @@ namespace mitk
       delete elem;
       elem = nullptr;
     }
-  }
-
-  void CESTIOActivator::RegisterTagsOfInterest(IDICOMTagsOfInterest* toiService) const
-  {
-    if (toiService != nullptr)
-    {
-      toiService->AddTagOfInterest(mitk::DICOM_IMAGING_FREQUENCY_PATH());
-    }
-  }
-
-  void CESTIOActivator::DICOMTagsOfInterestServiceChanged(const us::ServiceEvent event)
-  {
-    std::lock_guard<std::mutex> lock(m_Mutex);
-    // If a dictionary service was registered, see if we
-    // need one. If so, get a reference to it.
-    if (event.GetType() == us::ServiceEvent::REGISTERED)
-    {
-        // Get a reference to the service object.
-        us::ServiceReference<IDICOMTagsOfInterest> ref = event.GetServiceReference();
-        this->RegisterTagsOfInterest(m_Context->GetService(ref));
-        m_Context->UngetService(ref);
-    }
+    m_TagHelper.Deactivate();
   }
 }
 

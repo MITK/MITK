@@ -133,20 +133,14 @@ namespace mitk
 
       GIFFirstOrderNumericStatistics();
 
-    /**
-    * \brief Calculates the First Order Features based on a binned version of the image.
-    */
-    FeatureListType CalculateFeatures(const Image::Pointer & image, const Image::Pointer &feature) override;
+      FeatureListType CalculateFeatures(const Image* image, const Image* mask, const Image* maskNoNAN) override;
+      using Superclass::CalculateFeatures;
 
-    /**
-    * \brief Returns a list of the names of all features that are calculated from this class
-    */
-    FeatureNameListType GetFeatureNames() override;
-    std::string GetCurrentFeatureEncoding() override;
+      void AddArguments(mitkCommandLineParser& parser) const override;
 
-    void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList) override;
-    void AddArguments(mitkCommandLineParser &parser) override;
+  protected:
 
+    FeatureListType DoCalculateFeatures(const Image* image, const Image* mask) override;
   };
 }
 #endif //mitkGIFFirstNumericOrderStatistics_h

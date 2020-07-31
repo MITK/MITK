@@ -77,7 +77,7 @@ void mitk::PlanarFigureObjectFactory::SetDefaultProperties(mitk::DataNode *node)
   }
 }
 
-const char *mitk::PlanarFigureObjectFactory::GetFileExtensions()
+std::string mitk::PlanarFigureObjectFactory::GetFileExtensions()
 {
   return "";
 }
@@ -87,7 +87,7 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::PlanarFigureObjectFactory::GetFi
   return {};
 }
 
-const char *mitk::PlanarFigureObjectFactory::GetSaveFileExtensions()
+std::string mitk::PlanarFigureObjectFactory::GetSaveFileExtensions()
 {
   std::string fileExtension;
   this->CreateFileExtensions({}, fileExtension);

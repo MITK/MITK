@@ -37,6 +37,7 @@ found in the LICENSE file.
 #include <QSplashScreen>
 #include <QStandardPaths>
 #include <QTime>
+#include <QWebEngineUrlScheme>
 
 namespace
 {
@@ -245,7 +246,7 @@ namespace mitk
           std::string finalKey;
           keyStack.pop_back();
 
-          for (const auto key : keyChain)
+          for (const auto& key : keyChain)
             finalKey += key + '.';
 
           finalKey += currSubKey;
@@ -255,12 +256,12 @@ namespace mitk
         {
           keyChain.push_back(currSubKey);
 
-          for (const auto key : subKeys)
+          for (const auto& key : subKeys)
             keyStack.push_back(key);
         }
       }
 
-      for (const auto key : keys)
+      for (const auto& key : keys)
       {
         if (configuration.hasProperty(key))
         {
@@ -297,12 +298,12 @@ namespace mitk
         }
         else
         {
-          for(const auto pluginPath : provInfo.getPluginDirs())
+          for(const auto& pluginPath : provInfo.getPluginDirs())
             ctkPluginFrameworkLauncher::addSearchPath(pluginPath);
 
           auto pluginUrlsToStart = provInfo.getPluginsToStart();
 
-          for (const auto url : pluginUrlsToStart)
+          for (const auto& url : pluginUrlsToStart)
             pluginsToStart.push_back(url.toString());
         }
       }
@@ -508,6 +509,10 @@ namespace mitk
     this->setOrganizationDomain(orgDomain);
 
     qInstallMessageHandler(outputQtMessage);
+
+    QWebEngineUrlScheme qtHelpScheme("qthelp");
+    qtHelpScheme.setFlags(QWebEngineUrlScheme::LocalScheme | QWebEngineUrlScheme::LocalAccessAllowed);
+    QWebEngineUrlScheme::registerScheme(qtHelpScheme);
   }
 
   void BaseApplication::initialize(Poco::Util::Application &self)
@@ -678,7 +683,7 @@ namespace mitk
     // Walk one directory up and add bin and lib sub-dirs; this might be redundant
     appDir.cdUp();
 
-    for (const auto suffix : suffixes)
+    for (const auto& suffix : suffixes)
       ctkPluginFrameworkLauncher::addSearchPath(appDir.absoluteFilePath(suffix));
   }
 

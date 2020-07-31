@@ -1,5 +1,5 @@
 /**
-\page org_mitk_gui_qt_dicominspector DICOM Inspector
+\page org_mitk_gui_qt_dicominspector The DICOM Inspector
 
 \imageMacro{ "inspector.png", "Icon of DICOM Inspector", 2}
 

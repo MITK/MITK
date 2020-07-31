@@ -24,6 +24,16 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  struct GIFGreyLevelSizeZoneConfiguration
+  {
+    unsigned int direction;
+
+    double MinimumIntensity;
+    double MaximumIntensity;
+    int Bins;
+    FeatureID id;
+  };
+
   struct GreyLevelSizeZoneMatrixHolder
   {
   public:
@@ -90,11 +100,29 @@ namespace mitk
 }
 
 static
-void MatrixFeaturesTo(mitk::GreyLevelSizeZoneFeatures features,
-                      std::string prefix,
-                      mitk::GIFGreyLevelSizeZone::FeatureListType &featureList);
-
-
+void MatrixFeaturesTo(const mitk::GreyLevelSizeZoneFeatures& features,
+  const mitk::GIFGreyLevelSizeZoneConfiguration& config,
+  mitk::GIFGreyLevelSizeZone::FeatureListType& featureList)
+{
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Small Zone Emphasis"), features.SmallZoneEmphasis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Large Zone Emphasis"), features.LargeZoneEmphasis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Low Grey Level Emphasis"), features.LowGreyLevelEmphasis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "High Grey Level Emphasis"), features.HighGreyLevelEmphasis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Small Zone Low Grey Level Emphasis"), features.SmallZoneLowGreyLevelEmphasis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Small Zone High Grey Level Emphasis"), features.SmallZoneHighGreyLevelEmphasis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Large Zone Low Grey Level Emphasis"), features.LargeZoneLowGreyLevelEmphasis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Large Zone High Grey Level Emphasis"), features.LargeZoneHighGreyLevelEmphasis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Grey Level Non-Uniformity"), features.GreyLevelNonUniformity));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Grey Level Non-Uniformity Normalized"), features.GreyLevelNonUniformityNormalized));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Zone Size Non-Uniformity"), features.ZoneSizeNonUniformity));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Zone Size Non-Uniformity Normalized"), features.ZoneSizeNoneUniformityNormalized));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Zone Percentage"), features.ZonePercentage));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Grey Level Mean"), features.GreyLevelMean));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Grey Level Variance"), features.GreyLevelVariance));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Zone Size Mean"), features.ZoneSizeMean));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Zone Size Variance"), features.ZoneSizeVariance));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, "Zone Size Entropy"), features.ZoneSizeEntropy));
+}
 
 mitk::GreyLevelSizeZoneMatrixHolder::GreyLevelSizeZoneMatrixHolder(double min, double max, int number, int maxSize) :
                     m_MinimumRange(min),
@@ -127,8 +155,8 @@ double mitk::GreyLevelSizeZoneMatrixHolder::IndexToMaxIntensity(int index)
 
 template<typename TPixel, unsigned int VImageDimension>
 static int
-CalculateGlSZMatrix(itk::Image<TPixel, VImageDimension>* itkImage,
-                    itk::Image<unsigned short, VImageDimension>* mask,
+CalculateGlSZMatrix(const itk::Image<TPixel, VImageDimension>* itkImage,
+                    const itk::Image<unsigned short, VImageDimension>* mask,
                     std::vector<itk::Offset<VImageDimension> > offsets,
                     bool estimateLargestRegion,
                     mitk::GreyLevelSizeZoneMatrixHolder &holder)
@@ -137,8 +165,8 @@ CalculateGlSZMatrix(itk::Image<TPixel, VImageDimension>* itkImage,
   typedef itk::Image<unsigned short, VImageDimension> MaskImageType;
   typedef typename ImageType::IndexType IndexType;
 
-  typedef itk::ImageRegionIteratorWithIndex<ImageType> ConstIterType;
-  typedef itk::ImageRegionIteratorWithIndex<MaskImageType> ConstMaskIterType;
+  typedef itk::ImageRegionConstIteratorWithIndex<ImageType> ConstIterType;
+  typedef itk::ImageRegionConstIteratorWithIndex<MaskImageType> ConstMaskIterType;
 
   auto region = mask->GetLargestPossibleRegion();
   typename MaskImageType::RegionType newRegion;
@@ -225,8 +253,8 @@ static void CalculateFeatures(
   pgMatrix.rowwise().normalize();
   pzMatrix.colwise().normalize();
 
-  for (int i = 0; i < holder.m_NumberOfBins; ++i)
-    for (int j = 0; j < holder.m_NumberOfBins; ++j)
+  for (int i = 0; i < pgzMatrix.rows(); ++i)
+    for (int j = 0; j < pgzMatrix.cols(); ++j)
     {
       if (pgzMatrix(i, j) != pgzMatrix(i, j))
         pgzMatrix(i, j) = 0;
@@ -299,7 +327,7 @@ static void CalculateFeatures(
 
 template<typename TPixel, unsigned int VImageDimension>
 static void
-CalculateGreyLevelSizeZoneFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFGreyLevelSizeZone::FeatureListType & featureList, mitk::GIFGreyLevelSizeZone::GIFGreyLevelSizeZoneConfiguration config)
+CalculateGreyLevelSizeZoneFeatures(const itk::Image<TPixel, VImageDimension>* itkImage, const mitk::Image* mask, mitk::GIFGreyLevelSizeZone::FeatureListType & featureList, mitk::GIFGreyLevelSizeZoneConfiguration config)
 {
   typedef itk::Image<unsigned short, VImageDimension> MaskType;
   typedef itk::Neighborhood<TPixel, VImageDimension > NeighborhoodType;
@@ -353,33 +381,7 @@ CalculateGreyLevelSizeZoneFeatures(itk::Image<TPixel, VImageDimension>* itkImage
   CalculateGlSZMatrix<TPixel, VImageDimension>(itkImage, maskImage, offsetVector, false, holderOverall);
   CalculateFeatures(holderOverall, overallFeature);
 
-  MatrixFeaturesTo(overallFeature, config.prefix, featureList);
-}
-
-
-static
-void MatrixFeaturesTo(mitk::GreyLevelSizeZoneFeatures features,
-                      std::string prefix,
-                      mitk::GIFGreyLevelSizeZone::FeatureListType &featureList)
-{
-  featureList.push_back(std::make_pair(prefix + "Small Zone Emphasis", features.SmallZoneEmphasis));
-  featureList.push_back(std::make_pair(prefix + "Large Zone Emphasis", features.LargeZoneEmphasis));
-  featureList.push_back(std::make_pair(prefix + "Low Grey Level Emphasis", features.LowGreyLevelEmphasis));
-  featureList.push_back(std::make_pair(prefix + "High Grey Level Emphasis", features.HighGreyLevelEmphasis));
-  featureList.push_back(std::make_pair(prefix + "Small Zone Low Grey Level Emphasis", features.SmallZoneLowGreyLevelEmphasis));
-  featureList.push_back(std::make_pair(prefix + "Small Zone High Grey Level Emphasis", features.SmallZoneHighGreyLevelEmphasis));
-  featureList.push_back(std::make_pair(prefix + "Large Zone Low Grey Level Emphasis", features.LargeZoneLowGreyLevelEmphasis));
-  featureList.push_back(std::make_pair(prefix + "Large Zone High Grey Level Emphasis", features.LargeZoneHighGreyLevelEmphasis));
-  featureList.push_back(std::make_pair(prefix + "Grey Level Non-Uniformity", features.GreyLevelNonUniformity));
-  featureList.push_back(std::make_pair(prefix + "Grey Level Non-Uniformity Normalized", features.GreyLevelNonUniformityNormalized));
-  featureList.push_back(std::make_pair(prefix + "Zone Size Non-Uniformity", features.ZoneSizeNonUniformity));
-  featureList.push_back(std::make_pair(prefix + "Zone Size Non-Uniformity Normalized", features.ZoneSizeNoneUniformityNormalized));
-  featureList.push_back(std::make_pair(prefix + "Zone Percentage", features.ZonePercentage));
-  featureList.push_back(std::make_pair(prefix + "Grey Level Mean", features.GreyLevelMean));
-  featureList.push_back(std::make_pair(prefix + "Grey Level Variance", features.GreyLevelVariance));
-  featureList.push_back(std::make_pair(prefix + "Zone Size Mean", features.ZoneSizeMean));
-  featureList.push_back(std::make_pair(prefix + "Zone Size Variance", features.ZoneSizeVariance));
-  featureList.push_back(std::make_pair(prefix + "Zone Size Entropy", features.ZoneSizeEntropy));
+  MatrixFeaturesTo(overallFeature, config, featureList);
 }
 
   mitk::GIFGreyLevelSizeZone::GIFGreyLevelSizeZone()
@@ -389,11 +391,22 @@ void MatrixFeaturesTo(mitk::GreyLevelSizeZoneFeatures features,
   SetFeatureClassName("Grey Level Size Zone");
 }
 
-mitk::GIFGreyLevelSizeZone::FeatureListType mitk::GIFGreyLevelSizeZone::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
+void mitk::GIFGreyLevelSizeZone::AddArguments(mitkCommandLineParser& parser) const
 {
+  this->AddQuantifierArguments(parser);
+
+  std::string name = GetOptionPrefix();
+
+  parser.addArgument(GetLongName(), name, mitkCommandLineParser::Bool, "Use Grey Level Size Zone", "Calculates the size zone based features.", us::Any());
+}
+
+mitk::AbstractGlobalImageFeature::FeatureListType mitk::GIFGreyLevelSizeZone::DoCalculateFeatures(const Image* image, const Image* mask)
+{
+  FeatureListType featureList;
+
   InitializeQuantifier(image, mask);
 
-  FeatureListType featureList;
+  MITK_INFO << "Start calculating  Grey leve size zone ...";
 
   GIFGreyLevelSizeZoneConfiguration config;
   config.direction = GetDirection();
@@ -401,50 +414,16 @@ mitk::GIFGreyLevelSizeZone::FeatureListType mitk::GIFGreyLevelSizeZone::Calculat
   config.MinimumIntensity = GetQuantifier()->GetMinimum();
   config.MaximumIntensity = GetQuantifier()->GetMaximum();
   config.Bins = GetQuantifier()->GetBins();
-  config.prefix = FeatureDescriptionPrefix();
+  config.id = this->CreateTemplateFeatureID();
 
   AccessByItk_3(image, CalculateGreyLevelSizeZoneFeatures, mask, featureList, config);
 
+  MITK_INFO << "Finished calculating Grey level size zone ...";
+
   return featureList;
 }
 
-mitk::GIFGreyLevelSizeZone::FeatureNameListType mitk::GIFGreyLevelSizeZone::GetFeatureNames()
+mitk::AbstractGlobalImageFeature::FeatureListType mitk::GIFGreyLevelSizeZone::CalculateFeatures(const Image* image, const Image*, const Image* maskNoNAN)
 {
-  FeatureNameListType featureList;
-  return featureList;
+  return Superclass::CalculateFeatures(image, maskNoNAN);
 }
-
-
-
-
-void mitk::GIFGreyLevelSizeZone::AddArguments(mitkCommandLineParser &parser)
-{
-  std::string name = GetOptionPrefix();
-
-  parser.addArgument(GetLongName(), name, mitkCommandLineParser::Bool, "Use Grey Level Size Zone", "Calculates the size zone based features.", us::Any());
-  AddQuantifierArguments(parser);
-}
-
-void
-mitk::GIFGreyLevelSizeZone::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &, const Image::Pointer &maskNoNAN, FeatureListType &featureList)
-{
-  auto parsedArgs = GetParameter();
-  std::string name = GetOptionPrefix();
-
-  if (parsedArgs.count(GetLongName()))
-  {
-    InitializeQuantifierFromParameters(feature, maskNoNAN);
-
-    MITK_INFO << "Start calculating  Grey leve size zone ...";
-    auto localResults = this->CalculateFeatures(feature, maskNoNAN);
-    featureList.insert(featureList.end(), localResults.begin(), localResults.end());
-    MITK_INFO << "Finished calculating Grey level size zone ...";
-  }
-
-}
-
-std::string mitk::GIFGreyLevelSizeZone::GetCurrentFeatureEncoding()
-{
-  return QuantifierParameterString();
-}
-

@@ -131,7 +131,7 @@ void mitk::IOExtObjectFactory::SetDefaultProperties(mitk::DataNode *node)
   }
 }
 
-const char *mitk::IOExtObjectFactory::GetFileExtensions()
+std::string mitk::IOExtObjectFactory::GetFileExtensions()
 {
   std::string fileExtension;
   this->CreateFileExtensions(m_FileExtensionsMap, fileExtension);
@@ -159,7 +159,7 @@ void mitk::IOExtObjectFactory::CreateFileExtensionsMap()
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "VTK Legacy Unstructured Grid"));
 }
 
-const char *mitk::IOExtObjectFactory::GetSaveFileExtensions()
+std::string mitk::IOExtObjectFactory::GetSaveFileExtensions()
 {
   std::string fileExtension;
   this->CreateFileExtensions(m_SaveFileExtensionsMap, fileExtension);

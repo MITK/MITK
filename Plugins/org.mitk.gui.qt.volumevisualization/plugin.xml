@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?BlueBerry version="0.1"?>
 <plugin>
   <extension point="org.blueberry.ui.views">
-    <view
-      id="org.mitk.views.volumevisualization"
-      name="Volume Visualization"
-      class="QmitkVolumeVisualizationView"
-      icon="resources/volume_visualization.svg"
-      category="General" >
+    <view id="org.mitk.views.volumevisualization"
+          name="Volume Visualization"
+          class="QmitkVolumeVisualizationView"
+          icon="resources/volume_visualization.svg"
+          category="General">
       <description>Configure the 3D-Visualization of images.</description>
       <keywordReference id="org.mitk.views.volumevisualization.ViewKeyword"/>
     </view>
@@ -25,14 +23,13 @@
   <!--This extension points adds the volume visualization view to the
   "Window->Show Views" menu if the visualization perspective is opened-->
   <extension point="org.blueberry.ui.perspectiveExtensions">
-            <perspectiveExtension
-                 targetID="org.mitk.mitkworkbench.perspectives.visualization">
-                 <viewShortcut id="org.mitk.views.volumevisualization"/>
-                 <view id="org.mitk.views.volumevisualization"
-                             relative="org.mitk.views.datamanager"
-                             relationship="bottom"
-                             ratio="0.80"
-                             visible="false"/>
-            </perspectiveExtension>
+    <perspectiveExtension targetID="org.mitk.mitkworkbench.perspectives.visualization">
+        <viewShortcut id="org.mitk.views.volumevisualization"/>
+        <view id="org.mitk.views.volumevisualization"
+              relative="org.mitk.views.datamanager"
+              relationship="bottom"
+              ratio="0.80"
+              visible="false"/>
+	</perspectiveExtension>
   </extension>
 </plugin>

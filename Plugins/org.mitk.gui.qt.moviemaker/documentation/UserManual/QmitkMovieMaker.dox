@@ -1,22 +1,22 @@
 /**
-\page org_mitk_gui_qt_moviemaker The Movie Maker Plugin
+\page org_mitk_views_moviemaker The Movie Maker
 
 \imageMacro{video-camera.svg,"Icon of the Movie Maker Plugin.",2.00}
 
 \tableofcontents
 
-\section org_mitk_gui_qt_moviemakerOverview Overview
+\section org_mitk_views_moviemakerOverview Overview
 
 The Movie Maker View allows you to create basic animations of your scene and to record them to video files.
 Individual animations are arranged in a timeline and can be played back sequential or in parallel.
 
-The Movie Maker View uses external FFmpeg/Libav command line utilities to write compressed video files.
+The Movie Maker View uses the external FFmpeg command line utility to write compressed video files.
 
-<b>You have to manually install either FFmpeg or Libav and set the corresponding path in "External Programs" in the MITK Workbench Preferences (Ctrl+P) in order to record your movies to video files.</b>
+<b>You have to manually install FFmpeg and set the corresponding path in "External Programs" in the MITK Workbench Preferences (Ctrl+P) in order to record your movies to video files.</b>
 
 \imageMacro{QmitkMovieMaker_Preferences.png,"The External Programs preferences page.",12.00}
 
-\section org_mitk_gui_qt_moviemakerUsage Usage
+\section org_mitk_views_moviemakerUsage Usage
 
 \imageMacro{QmitkMovieMaker_MovieMakerView.png,"The Movie Maker View.",16.00}
 
@@ -34,7 +34,7 @@ You can play back, pause and stop your movie with the according controls at the 
 Click the "Record" button to finally record your movie to a video file with the specified number of frames per second.
 You have to choose the render window which you want to record.
 
-\subsection org_mitk_gui_qt_moviemakerOrbitUsage Orbit Animation
+\subsection org_mitk_views_moviemakerOrbitUsage Orbit Animation
 
 The Orbit animation rotates the camera in the 3D window around the scene.
 Align the camera directly in the 3D window and enter the number of degrees for the orbitting.
@@ -43,7 +43,7 @@ Adjust the camera in the 3D window and restart the animation.
 
 \imageMacro{QmitkMovieMaker_Orbit.png,"The Orbit animation.",12.00}
 
-\subsection org_mitk_gui_qt_moviemakerSliceUsage Slice Animation
+\subsection org_mitk_views_moviemakerSliceUsage Slice Animation
 
 The Slice animation slices through an image.
 You can choose the image plane (axial, sagittal, or coronal), as well as the start and end points of the slicing.
@@ -52,7 +52,7 @@ Check "Reverse" in order to slice from the higher slice number to the lower slic
 
 \imageMacro{QmitkMovieMaker_Slice.png,"The Slice animation.",12.00}
 
-\subsection org_mitk_gui_qt_moviemakerTimeUsage Time Animation
+\subsection org_mitk_views_moviemakerTimeUsage Time Animation
 
 The Time animation steps through the individual time steps of the current scene.
 You can specify the range of the animated time steps.

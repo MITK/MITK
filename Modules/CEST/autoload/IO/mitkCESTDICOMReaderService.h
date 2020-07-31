@@ -19,7 +19,7 @@ namespace mitk {
 
   /**
   Service wrapper that auto selects (using the mitk::DICOMFileReaderSelector) the best DICOMFileReader from
-  the DICOMReader module and loads additional meta data for CEST data.
+  the DICOM module and loads additional meta data for CEST data.
   */
   class CESTDICOMReaderService : public BaseDICOMReaderService
   {
@@ -33,7 +33,7 @@ namespace mitk {
 
   protected:
     /** Returns the reader instance that should be used. The decision may be based
-    * one the passed relevant file list.*/
+    * one the passed list of relevant files.*/
     mitk::DICOMFileReader::Pointer GetReader(const mitk::StringList& relevantFiles) const override;
 
   private:

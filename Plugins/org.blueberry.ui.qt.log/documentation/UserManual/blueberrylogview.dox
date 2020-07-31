@@ -7,9 +7,9 @@ This plug-in records all logging output of events and progress as specified in t
 
 \imageMacro{LogView.png,"Screenshot of the Logging Module",16.00}
 
-There are different features available in the view. The filter text field allows for searching all log events containing a certain substring. Using the button "Copy to clipboard" on the bottom right you can copy the current content of the logging view to your clipboard. This enables you to insert the logging information to any text processing application.
+There are different features available in the view. The "Filter" text field allows for searching all log events containing a certain substring. Using the button "Copy to clipboard" on the bottom right you can copy the current content of the logging view to your clipboard. This enables you to insert the logging information to any text processing application.
 
-You can also show more information on every logging message by activating the two checkboxes. In the simple view, leaving both checkboxes unchecked, you'll see logging messages and logging levels. A brief description of the logging levels can be found in the \ref LoggingPage "logging concept documentation". The checkbox "Category" adds a column for the category. The checkbox "Show Advanced Field" shows method, filename and linenumber where the logging message was emitted as well as the running time of the application. The next figure shows all information which can be shown in the Logging Module.
+You can also show more information on every logging message by activating the two checkboxes. In the simple view, leaving both checkboxes unchecked, you'll see logging messages and logging levels. A brief description of the logging levels can be found in the \ref LoggingPage "logging concept documentation". The checkbox "Categories" adds a column for the category. The checkbox "Advanced Fields" shows method, filename and linenumber where the logging message was emitted as well as the running time of the application. The next figure shows all information which can be shown in the Logging Module.
 
 \imageMacro{LogViewExplain.png,"Details on the Vizualized Logging Information",16.00}
 

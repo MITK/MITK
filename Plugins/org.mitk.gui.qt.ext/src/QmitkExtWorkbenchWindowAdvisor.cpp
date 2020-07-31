@@ -301,7 +301,7 @@ public:
       }
 
       //GetViewRegistry()->Find("org.mitk.views.imagenavigator");
-      if(windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
+      if(windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicombrowser"))
       {
         windowAdvisor->openDicomEditorAction->setEnabled(true);
       }
@@ -351,7 +351,7 @@ public:
         i.next()->setEnabled(false);
       }
 
-      if(windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
+      if(windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicombrowser"))
       {
         windowAdvisor->openDicomEditorAction->setEnabled(false);
       }
@@ -748,7 +748,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   imageNavigatorAction = new QAction(berry::QtStyleManager::ThemeIcon(basePath + "image_navigator.svg"), "&Image Navigator", nullptr);
   bool imageNavigatorViewFound = window->GetWorkbench()->GetViewRegistry()->Find("org.mitk.views.imagenavigator");
 
-  if (this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
+  if (this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicombrowser"))
   {
     openDicomEditorAction = new QmitkOpenDicomEditorAction(berry::QtStyleManager::ThemeIcon(basePath + "dicom.svg"), window);
   }
@@ -806,7 +806,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   mainActionsToolBar->addAction(closeProjectAction);
   mainActionsToolBar->addAction(undoAction);
   mainActionsToolBar->addAction(redoAction);
-  if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
+  if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicombrowser"))
   {
     mainActionsToolBar->addAction(openDicomEditorAction);
   }
@@ -975,6 +975,12 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowOpen()
       mitk::DataStorageEditorInput::Pointer dsInput(new mitk::DataStorageEditorInput(dsRef));
       mitk::WorkbenchUtil::OpenEditor(configurer->GetWindow()->GetActivePage(),dsInput);
     }
+  }
+
+  auto introPart = configurer->GetWindow()->GetWorkbench()->GetIntroManager()->GetIntro();
+  if (introPart.IsNotNull())
+  {
+    configurer->GetWindow()->GetWorkbench()->GetIntroManager()->ShowIntro(GetWindowConfigurer()->GetWindow(), false);
   }
 }
 

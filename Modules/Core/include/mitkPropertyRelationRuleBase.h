@@ -97,6 +97,25 @@ namespace mitk
     /** Returns the generic root path for relation rules ("MITK.Relations").*/
     static PropertyKeyPath GetRootKeyPath();
 
+    using InstanceIDType = std::string;
+    /** Returns the property key path for a RII property.
+     * @param propName If not empty a PropertyPath element will added (with the passed value) after the <InstanceID> element.
+     * @param instanceID If not empty, the PropertyKeyPath is only for a specific instance. If empty,
+     * it is wildcarded and will match RIIs property of any instance.*/
+    static PropertyKeyPath GetRIIPropertyKeyPath(const std::string propName, const InstanceIDType& instanceID);
+    /** Returns the property key path for RII RelationUID properties.
+     * @param instanceID If not empty, the PropertyKeyPath is only for a specific instance. If empty,
+     * it is wildcarded and will match RII RelationUIDs property of any instance.*/
+    static PropertyKeyPath GetRIIRelationUIDPropertyKeyPath(const InstanceIDType& instanceID = "");
+    /** Returns the property key path for RII RuleID properties.
+     * @param instanceID If not empty, the PropertyKeyPath is only for a specific instance. If empty,
+     * it is wildcarded and will match RII RuleIDs property of any instance.*/
+    static PropertyKeyPath GetRIIRuleIDPropertyKeyPath(const InstanceIDType& instanceID = "");
+    /** Returns the property key path for RII DestinationUID properties.
+     * @param instanceID If not empty, the PropertyKeyPath is only for a specific instance. If empty,
+     * it is wildcarded and will match RII DestinationUIDs property of any instance.*/
+    static PropertyKeyPath GetRIIDestinationUIDPropertyKeyPath(const InstanceIDType& instanceID = "");
+
     /** Returns an ID string that identifies the rule class.
     @post The returned rule ID must met the preconditions of a PropertyKeyPath element name
     (see mitk::PropertyKeyPath*/
@@ -195,7 +214,7 @@ namespace mitk
     @param source Pointer to the Source instance that should be used for detection.
     @param exclusiveRelation Defines if only special types of relations should detected. None: All relations (default);
     Data: must be a data relation (so Data or Complete); ID: must be an ID relation (so ID or Complete); Complete: only complete relations.
-    @pre Destination must be a valid instance.*/
+    @pre Source must be a valid instance.*/
     NodePredicateBase::ConstPointer GetDestinationsDetector(
       const IPropertyProvider *source, RelationType exclusiveRelation = RelationType::None) const;
     /**Returns a predicate that can be used to find the Destination of the passed Source for a given relationUID.
@@ -240,7 +259,6 @@ namespace mitk
     PropertyRelationRuleBase() = default;
     ~PropertyRelationRuleBase() override = default;
 
-    using InstanceIDType = std::string;
     using InstanceIDVectorType = std::vector<InstanceIDType>;
     static InstanceIDType NULL_INSTANCE_ID();
 
@@ -322,7 +340,7 @@ namespace mitk
     virtual bool IsSupportedRuleID(const RuleIDType& ruleID) const;
 
     /** Helper function that generates a reg ex that can be used to find a specific RII property for the rule instance.
-     * @param propName If not empty a PropertyPath element will added (with the passed value) after the <RuleID> element.
+     * @param propName If not empty a PropertyPath element will be added (with the passed value) after the <InstanceID> element.
      * @param instanceID If not empty only for the reg ex will only valid for the passed instanceID. Otherwise for all.*/
     std::string GetRIIPropertyRegEx(const std::string propName = "", const InstanceIDType &instanceID = "") const;
 

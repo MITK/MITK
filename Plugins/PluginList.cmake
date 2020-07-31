@@ -19,6 +19,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.application:ON
   org.mitk.gui.qt.ext:OFF
   org.mitk.gui.qt.extapplication:OFF
+  org.mitk.gui.qt.mitkworkbench.intro:OFF
   org.mitk.gui.qt.common:ON
   org.mitk.gui.qt.stdmultiwidgeteditor:ON
   org.mitk.gui.qt.mxnmultiwidgeteditor:OFF
@@ -30,7 +31,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.datastorageviewertest:OFF
   org.mitk.gui.qt.properties:ON
   org.mitk.gui.qt.basicimageprocessing:OFF
-  org.mitk.gui.qt.dicom:OFF
+  org.mitk.gui.qt.dicombrowser:OFF
   org.mitk.gui.qt.dicominspector:OFF
   org.mitk.gui.qt.dosevisualization:OFF
   org.mitk.gui.qt.geometrytools:OFF

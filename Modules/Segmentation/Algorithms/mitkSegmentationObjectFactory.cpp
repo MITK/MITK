@@ -92,7 +92,7 @@ void mitk::SegmentationObjectFactory::SetDefaultProperties(mitk::DataNode *node)
   //  }
 }
 
-const char *mitk::SegmentationObjectFactory::GetFileExtensions()
+std::string mitk::SegmentationObjectFactory::GetFileExtensions()
 {
   std::string fileExtension;
   this->CreateFileExtensions(m_FileExtensionsMap, fileExtension);
@@ -113,7 +113,7 @@ void mitk::SegmentationObjectFactory::CreateFileExtensionsMap()
 {
 }
 
-const char *mitk::SegmentationObjectFactory::GetSaveFileExtensions()
+std::string mitk::SegmentationObjectFactory::GetSaveFileExtensions()
 {
   std::string fileExtension;
   this->CreateFileExtensions(m_SaveFileExtensionsMap, fileExtension);

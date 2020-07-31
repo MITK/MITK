@@ -30,13 +30,13 @@ found in the LICENSE file.
 struct GIFLocalIntensityParameter
 {
   double range;
-  std::string prefix;
+  mitk::FeatureID id;
 };
 
 
 template<typename TPixel, unsigned int VImageDimension>
 static void
-CalculateIntensityPeak(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFLocalIntensity::FeatureListType & featureList, GIFLocalIntensityParameter params)
+CalculateIntensityPeak(const itk::Image<TPixel, VImageDimension>* itkImage, const mitk::Image* mask, mitk::GIFLocalIntensity::FeatureListType & featureList, GIFLocalIntensityParameter params)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<unsigned short, VImageDimension> MaskType;
@@ -52,8 +52,8 @@ CalculateIntensityPeak(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Imag
   filter->SetRange(range);
   filter->Update();
 
-  featureList.push_back(std::make_pair(params.prefix + "2. Local Intensity Peak", filter->GetLocalPeak()));
-  featureList.push_back(std::make_pair(params.prefix + "2. Global Intensity Peak", filter->GetGlobalPeak()));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "2. Local Intensity Peak"), filter->GetLocalPeak()));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "2. Global Intensity Peak"), filter->GetGlobalPeak()));
 }
 
 
@@ -65,61 +65,53 @@ m_Range(6.2)
   SetFeatureClassName("Local Intensity");
 }
 
-mitk::GIFLocalIntensity::FeatureListType mitk::GIFLocalIntensity::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
+std::string mitk::GIFLocalIntensity::GenerateLegacyFeatureEncoding(const FeatureID& id) const
 {
-  FeatureListType featureList;
-  if (image->GetDimension() < 3)
-  {
-    return featureList;
-  }
-  GIFLocalIntensityParameter params;
-  params.range = GetRange();
-  params.prefix = FeatureDescriptionPrefix();
-  AccessByItk_3(image, CalculateIntensityPeak, mask, featureList, params);
-  return featureList;
+  return "_Range-" + id.parameters.at(this->GetOptionPrefix() + "::range").ToString();
 }
 
-mitk::GIFLocalIntensity::FeatureNameListType mitk::GIFLocalIntensity::GetFeatureNames()
-{
-  FeatureNameListType featureList;
-  return featureList;
-}
-
-
-void mitk::GIFLocalIntensity::AddArguments(mitkCommandLineParser &parser)
+void mitk::GIFLocalIntensity::AddArguments(mitkCommandLineParser& parser) const
 {
   std::string name = GetOptionPrefix();
 
   parser.addArgument(GetLongName(), name, mitkCommandLineParser::Bool, "Use Local Intensity", "calculates local intensity based features", us::Any());
-  parser.addArgument(name + "::range", name+"::range", mitkCommandLineParser::Float, "Range for the local intensity", "Give the range that should be used for the local intensity in mm", us::Any());
+  parser.addArgument(name + "::range", name + "::range", mitkCommandLineParser::Float, "Range for the local intensity", "Give the range that should be used for the local intensity in mm", us::Any());
 }
 
-void
-mitk::GIFLocalIntensity::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &, FeatureListType &featureList)
+mitk::AbstractGlobalImageFeature::FeatureListType mitk::GIFLocalIntensity::DoCalculateFeatures(const Image* image, const Image* mask)
 {
-  std::string name = GetOptionPrefix();
-  auto parsedArgs = GetParameter();
-  if (parsedArgs.count(GetLongName()))
+  FeatureListType featureList;
+
+  if (image->GetDimension() < 3)
   {
-    if (parsedArgs.count(name + "::range"))
-    {
-      double range = us::any_cast<float>(parsedArgs[name + "::range"]);
-      this->SetRange(range);
-    }
+    MITK_INFO << "Skipped GIFLocalIntensity. Only supports 3D images ....";
+  }
+  else
+  {
     MITK_INFO << "Start calculating local intensity features ....";
-    auto localResults = this->CalculateFeatures(feature, mask);
-    featureList.insert(featureList.end(), localResults.begin(), localResults.end());
+
+    GIFLocalIntensityParameter params;
+    params.range = GetRange();
+    params.id = this->CreateTemplateFeatureID();
+    AccessByItk_3(image, CalculateIntensityPeak, mask, featureList, params);
+
     MITK_INFO << "Finished calculating local intensity features....";
   }
+
+  return featureList;
 }
 
-std::string mitk::GIFLocalIntensity::GetCurrentFeatureEncoding()
+mitk::AbstractGlobalImageFeature::FeatureListType mitk::GIFLocalIntensity::CalculateFeatures(const Image* image, const Image* mask, const Image*)
 {
-  std::ostringstream  ss;
-  ss << m_Range;
-  std::string strRange = ss.str();
-  return "Range-" + ss.str();
+  return Superclass::CalculateFeatures(image, mask);
 }
 
-
-
+void mitk::GIFLocalIntensity::ConfigureSettingsByParameters(const ParametersType& parameters)
+{
+  auto name = GetOptionPrefix() + "::range";
+  if (parameters.count(name))
+  {
+    double range = us::any_cast<float>(parameters.at(name));
+    this->SetRange(range);
+  }
+}

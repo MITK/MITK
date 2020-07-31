@@ -28,6 +28,17 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  struct GIFCooccurenceMatrix2Configuration
+  {
+    double range;
+    unsigned int direction;
+
+    double MinimumIntensity;
+    double MaximumIntensity;
+    int Bins;
+    FeatureID id;
+  };
+
   struct CoocurenceMatrixHolder
   {
   public:
@@ -119,10 +130,47 @@ namespace mitk
 
 }
 
+
 static
-void MatrixFeaturesTo(mitk::CoocurenceMatrixFeatures features,
-                      std::string prefix,
-                      mitk::GIFCooccurenceMatrix2::FeatureListType &featureList);
+void MatrixFeaturesTo(const mitk::CoocurenceMatrixFeatures& features,
+  const std::string& prefix,
+  const mitk::GIFCooccurenceMatrix2Configuration& config,
+  mitk::GIFCooccurenceMatrix2::FeatureListType& featureList)
+{
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Joint Maximum"), features.JointMaximum));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Joint Average"), features.JointAverage));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Joint Variance"), features.JointVariance));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Joint Entropy"), features.JointEntropy));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Difference Average"), features.DifferenceAverage));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Difference Variance"), features.DifferenceVariance));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Difference Entropy"), features.DifferenceEntropy));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Sum Average"), features.SumAverage));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Sum Variance"), features.SumVariance));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Sum Entropy"), features.SumEntropy));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Angular Second Moment"), features.AngularSecondMoment));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Contrast"), features.Contrast));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Dissimilarity"), features.Dissimilarity));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Inverse Difference"), features.InverseDifference));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Inverse Difference Normalized"), features.InverseDifferenceNormalised));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Inverse Difference Moment"), features.InverseDifferenceMoment));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Inverse Difference Moment Normalized"), features.InverseDifferenceMomentNormalised));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Inverse Variance"), features.InverseVariance));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Correlation"), features.Correlation));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Autocorrelation"), features.Autocorrelation));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Cluster Tendency"), features.ClusterTendency));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Cluster Shade"), features.ClusterShade));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Cluster Prominence"), features.ClusterProminence));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "First Measure of Information Correlation"), features.FirstMeasureOfInformationCorrelation));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Second Measure of Information Correlation"), features.SecondMeasureOfInformationCorrelation));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Row Maximum"), features.RowMaximum));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Row Average"), features.RowAverage));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Row Variance"), features.RowVariance));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Row Entropy"), features.RowEntropy));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "First Row-Column Entropy"), features.FirstRowColumnEntropy));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(config.id, prefix + "Second Row-Column Entropy"), features.SecondRowColumnEntropy));
+}
+
+
 static
 void CalculateMeanAndStdDevFeatures(std::vector<mitk::CoocurenceMatrixFeatures> featureList,
                                     mitk::CoocurenceMatrixFeatures &meanFeature,
@@ -130,8 +178,6 @@ void CalculateMeanAndStdDevFeatures(std::vector<mitk::CoocurenceMatrixFeatures> 
 static
 void NormalizeMatrixFeature(mitk::CoocurenceMatrixFeatures &features,
                             std::size_t number);
-
-
 
 
 mitk::CoocurenceMatrixHolder::CoocurenceMatrixHolder(double min, double max, int number) :
@@ -165,8 +211,8 @@ double mitk::CoocurenceMatrixHolder::IndexToMaxIntensity(int index)
 
 template<typename TPixel, unsigned int VImageDimension>
 void
-CalculateCoOcMatrix(itk::Image<TPixel, VImageDimension>* itkImage,
-                    itk::Image<unsigned short, VImageDimension>* mask,
+CalculateCoOcMatrix(const itk::Image<TPixel, VImageDimension>* itkImage,
+                    const itk::Image<unsigned short, VImageDimension>* mask,
                     itk::Offset<VImageDimension> offset,
                     int range,
                     mitk::CoocurenceMatrixHolder &holder)
@@ -375,7 +421,7 @@ void CalculateFeatures(
 
 template<typename TPixel, unsigned int VImageDimension>
 void
-CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFCooccurenceMatrix2::FeatureListType & featureList, mitk::GIFCooccurenceMatrix2::GIFCooccurenceMatrix2Configuration config)
+CalculateCoocurenceFeatures(const itk::Image<TPixel, VImageDimension>* itkImage, const mitk::Image* mask, mitk::GIFCooccurenceMatrix2::FeatureListType & featureList, mitk::GIFCooccurenceMatrix2Configuration config)
 {
   typedef itk::Image<unsigned short, VImageDimension> MaskType;
   typedef itk::Neighborhood<TPixel, VImageDimension > NeighborhoodType;
@@ -454,48 +500,9 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
   ss << config.range;
   std::string strRange = ss.str();
 
-  MatrixFeaturesTo(overallFeature, config.prefix + "Overall ", featureList);
-  MatrixFeaturesTo(featureMean, config.prefix + "Mean ", featureList);
-  MatrixFeaturesTo(featureStd, config.prefix + "Std.Dev. ", featureList);
-}
-
-
-static
-void MatrixFeaturesTo(mitk::CoocurenceMatrixFeatures features,
-                      std::string prefix,
-                      mitk::GIFCooccurenceMatrix2::FeatureListType &featureList)
-{
-  featureList.push_back(std::make_pair(prefix + "Joint Maximum", features.JointMaximum));
-  featureList.push_back(std::make_pair(prefix + "Joint Average", features.JointAverage));
-  featureList.push_back(std::make_pair(prefix + "Joint Variance", features.JointVariance));
-  featureList.push_back(std::make_pair(prefix + "Joint Entropy", features.JointEntropy));
-  featureList.push_back(std::make_pair(prefix + "Difference Average", features.DifferenceAverage));
-  featureList.push_back(std::make_pair(prefix + "Difference Variance", features.DifferenceVariance));
-  featureList.push_back(std::make_pair(prefix + "Difference Entropy", features.DifferenceEntropy));
-  featureList.push_back(std::make_pair(prefix + "Sum Average", features.SumAverage));
-  featureList.push_back(std::make_pair(prefix + "Sum Variance", features.SumVariance));
-  featureList.push_back(std::make_pair(prefix + "Sum Entropy", features.SumEntropy));
-  featureList.push_back(std::make_pair(prefix + "Angular Second Moment", features.AngularSecondMoment));
-  featureList.push_back(std::make_pair(prefix + "Contrast", features.Contrast));
-  featureList.push_back(std::make_pair(prefix + "Dissimilarity", features.Dissimilarity));
-  featureList.push_back(std::make_pair(prefix + "Inverse Difference", features.InverseDifference));
-  featureList.push_back(std::make_pair(prefix + "Inverse Difference Normalized", features.InverseDifferenceNormalised));
-  featureList.push_back(std::make_pair(prefix + "Inverse Difference Moment", features.InverseDifferenceMoment));
-  featureList.push_back(std::make_pair(prefix + "Inverse Difference Moment Normalized", features.InverseDifferenceMomentNormalised));
-  featureList.push_back(std::make_pair(prefix + "Inverse Variance", features.InverseVariance));
-  featureList.push_back(std::make_pair(prefix + "Correlation", features.Correlation));
-  featureList.push_back(std::make_pair(prefix + "Autocorrelation", features.Autocorrelation));
-  featureList.push_back(std::make_pair(prefix + "Cluster Tendency", features.ClusterTendency));
-  featureList.push_back(std::make_pair(prefix + "Cluster Shade", features.ClusterShade));
-  featureList.push_back(std::make_pair(prefix + "Cluster Prominence", features.ClusterProminence));
-  featureList.push_back(std::make_pair(prefix + "First Measure of Information Correlation", features.FirstMeasureOfInformationCorrelation));
-  featureList.push_back(std::make_pair(prefix + "Second Measure of Information Correlation", features.SecondMeasureOfInformationCorrelation));
-  featureList.push_back(std::make_pair(prefix + "Row Maximum", features.RowMaximum));
-  featureList.push_back(std::make_pair(prefix + "Row Average", features.RowAverage));
-  featureList.push_back(std::make_pair(prefix + "Row Variance", features.RowVariance));
-  featureList.push_back(std::make_pair(prefix + "Row Entropy", features.RowEntropy));
-  featureList.push_back(std::make_pair(prefix + "First Row-Column Entropy", features.FirstRowColumnEntropy));
-  featureList.push_back(std::make_pair(prefix + "Second Row-Column Entropy", features.SecondRowColumnEntropy));
+  MatrixFeaturesTo(overallFeature, "Overall ", config, featureList);
+  MatrixFeaturesTo(featureMean, "Mean ", config, featureList);
+  MatrixFeaturesTo(featureStd, "Std.Dev. ", config, featureList);
 }
 
 static
@@ -619,87 +626,77 @@ void NormalizeMatrixFeature(mitk::CoocurenceMatrixFeatures &features,
 }
 
 mitk::GIFCooccurenceMatrix2::GIFCooccurenceMatrix2():
-m_Range(1.0)
+  m_Ranges({ 1.0 })
 {
   SetShortName("cooc2");
   SetLongName("cooccurence2");
   SetFeatureClassName("Co-occurenced Based Features");
 }
 
-mitk::GIFCooccurenceMatrix2::FeatureListType mitk::GIFCooccurenceMatrix2::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
+void mitk::GIFCooccurenceMatrix2::SetRanges(std::vector<double> ranges)
 {
-  InitializeQuantifier(image, mask);
+  m_Ranges = ranges;
+  this->Modified();
+}
 
+void mitk::GIFCooccurenceMatrix2::SetRange(double range)
+{
+  m_Ranges.resize(1);
+  m_Ranges[0] = range;
+  this->Modified();
+}
+
+mitk::AbstractGlobalImageFeature::FeatureListType mitk::GIFCooccurenceMatrix2::DoCalculateFeatures(const Image* image, const Image* mask)
+{
   FeatureListType featureList;
 
-  GIFCooccurenceMatrix2Configuration config;
-  config.direction = GetDirection();
-  config.range = m_Range;
+  InitializeQuantifier(image, mask);
 
-  config.MinimumIntensity = GetQuantifier()->GetMinimum();
-  config.MaximumIntensity = GetQuantifier()->GetMaximum();
-  config.Bins = GetQuantifier()->GetBins();
-  config.prefix = FeatureDescriptionPrefix();
-
-  AccessByItk_3(image, CalculateCoocurenceFeatures, mask, featureList,config);
-
-  return featureList;
-}
-
-mitk::GIFCooccurenceMatrix2::FeatureNameListType mitk::GIFCooccurenceMatrix2::GetFeatureNames()
-{
-  FeatureNameListType featureList;
-  return featureList;
-}
-
-
-
-
-void mitk::GIFCooccurenceMatrix2::AddArguments(mitkCommandLineParser &parser)
-{
-  std::string name = GetOptionPrefix();
-
-  parser.addArgument(GetLongName(), name, mitkCommandLineParser::Bool, "Use Co-occurence matrix", "calculates Co-occurence based features (new implementation)", us::Any());
-  parser.addArgument(name+"::range", name+"::range", mitkCommandLineParser::String, "Cooc 2 Range", "Define the range that is used (Semicolon-separated)", us::Any());
-  AddQuantifierArguments(parser);
-}
-
-void
-mitk::GIFCooccurenceMatrix2::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &, const Image::Pointer &maskNoNAN, FeatureListType &featureList)
-{
-  auto parsedArgs = GetParameter();
-  std::string name = GetOptionPrefix();
-
-  if (parsedArgs.count(GetLongName()))
+  for (const auto& range: m_Ranges)
   {
-    InitializeQuantifierFromParameters(feature, maskNoNAN);
-    std::vector<double> ranges;
+    MITK_INFO << "Start calculating coocurence with range " << range << "....";
 
-    if (parsedArgs.count(name + "::range"))
-    {
-      ranges = SplitDouble(parsedArgs[name + "::range"].ToString(), ';');
-    }
-    else
-    {
-      ranges.push_back(1);
-    }
+    GIFCooccurenceMatrix2Configuration config;
+    config.direction = GetDirection();
+    config.range = range;
+    config.MinimumIntensity = GetQuantifier()->GetMinimum();
+    config.MaximumIntensity = GetQuantifier()->GetMaximum();
+    config.Bins = GetQuantifier()->GetBins();
+    config.id = this->CreateTemplateFeatureID(std::to_string(range), { {GetOptionPrefix() + "::range", range} });
 
-    for (std::size_t i = 0; i < ranges.size(); ++i)
-    {
-      MITK_INFO << "Start calculating coocurence with range " << ranges[i] << "....";
-      this->SetRange(ranges[i]);
-      auto localResults = this->CalculateFeatures(feature, maskNoNAN);
-      featureList.insert(featureList.end(), localResults.begin(), localResults.end());
-      MITK_INFO << "Finished calculating coocurence with range " << ranges[i] << "....";
-    }
+    AccessByItk_3(image, CalculateCoocurenceFeatures, mask, featureList, config);
+
+    MITK_INFO << "Finished calculating coocurence with range " << range << "....";
   }
+
+  return featureList;
 }
 
-
-std::string mitk::GIFCooccurenceMatrix2::GetCurrentFeatureEncoding()
+mitk::AbstractGlobalImageFeature::FeatureListType mitk::GIFCooccurenceMatrix2::CalculateFeatures(const Image* image, const Image*, const Image* maskNoNAN)
 {
-  std::ostringstream  ss;
-  ss << m_Range;
-  std::string strRange = ss.str();
-  return QuantifierParameterString() + "_Range-" + ss.str();
+  return Superclass::CalculateFeatures(image, maskNoNAN);
+}
+
+void mitk::GIFCooccurenceMatrix2::AddArguments(mitkCommandLineParser &parser) const
+{
+  this->AddQuantifierArguments(parser);
+
+  std::string name = this->GetOptionPrefix();
+
+  parser.addArgument(this->GetLongName(), name, mitkCommandLineParser::Bool, "Use Co-occurence matrix", "calculates Co-occurence based features (new implementation)", us::Any());
+  parser.addArgument(name+"::range", name+"::range", mitkCommandLineParser::String, "Cooc 2 Range", "Define the range that is used (Semicolon-separated)", us::Any());
+}
+
+std::string mitk::GIFCooccurenceMatrix2::GenerateLegacyFeatureEncoding(const FeatureID& id) const
+{
+  return QuantifierParameterString() + "_Range-" + id.parameters.at(this->GetOptionPrefix()+"::range").ToString();
+}
+
+void mitk::GIFCooccurenceMatrix2::ConfigureSettingsByParameters(const ParametersType& parameters)
+{
+  auto name = GetOptionPrefix()+"::range";
+  if (parameters.count(name))
+  {
+    m_Ranges = SplitDouble(parameters.at(name).ToString(), ';');
+  }
 }

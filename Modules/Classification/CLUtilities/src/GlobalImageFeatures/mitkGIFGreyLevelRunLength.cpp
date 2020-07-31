@@ -23,9 +23,23 @@ found in the LICENSE file.
 // STL
 #include <sstream>
 
+namespace mitk
+{
+  struct GIFGreyLevelRunLengthParameters
+  {
+    unsigned int m_Direction;
+
+    double MinimumIntensity;
+    double MaximumIntensity;
+    int Bins;
+    FeatureID id;
+  };
+}
+
+
 template<typename TPixel, unsigned int VImageDimension>
 void
-  CalculateGrayLevelRunLengthFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFGreyLevelRunLength::FeatureListType & featureList, mitk::GIFGreyLevelRunLength::ParameterStruct params)
+  CalculateGrayLevelRunLengthFeatures(const itk::Image<TPixel, VImageDimension>* itkImage, const mitk::Image* mask, mitk::GIFGreyLevelRunLength::FeatureListType & featureList, mitk::GIFGreyLevelRunLengthParameters params)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<TPixel, VImageDimension> MaskType;
@@ -125,89 +139,89 @@ void
     switch (i)
     {
     case TextureFilterType::ShortRunEmphasis :
-      featureList.push_back(std::make_pair(params.featurePrefix + "Short run emphasis Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Short run emphasis Std.", featureStd->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Short run emphasis Comb.", featureCombined->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Short run emphasis Means"), featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Short run emphasis Std."), featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Short run emphasis Comb."), featureCombined->ElementAt(i)));
       break;
     case TextureFilterType::LongRunEmphasis :
-      featureList.push_back(std::make_pair(params.featurePrefix + "Long run emphasis Means", featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Long run emphasis Std.", featureStd->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Long run emphasis Comb.", featureCombined->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Long run emphasis Means"), featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Long run emphasis Std."), featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Long run emphasis Comb."), featureCombined->ElementAt(i)));
       break;
     case TextureFilterType::GreyLevelNonuniformity :
-      featureList.push_back(std::make_pair(params.featurePrefix + "Grey level nonuniformity Means", featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Grey level nonuniformity Std.", featureStd->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Grey level nonuniformity Comb.", featureCombined->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Grey level nonuniformity Means"), featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Grey level nonuniformity Std."), featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Grey level nonuniformity Comb."), featureCombined->ElementAt(i)));
       break;
     case TextureFilterType::GreyLevelNonuniformityNormalized :
-      featureList.push_back(std::make_pair(params.featurePrefix + "Grey level nonuniformity normalized Means", featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Grey level nonuniformity normalized Std.", featureStd->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Grey level nonuniformity normalized Comb.", featureCombined->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Grey level nonuniformity normalized Means"), featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Grey level nonuniformity normalized Std."), featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Grey level nonuniformity normalized Comb."), featureCombined->ElementAt(i)));
       break;
     case TextureFilterType::RunLengthNonuniformity :
-      featureList.push_back(std::make_pair(params.featurePrefix + "Run length nonuniformity Means", featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Run length nonuniformity Std.", featureStd->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Run length nonuniformity Comb.", featureCombined->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Run length nonuniformity Means"), featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Run length nonuniformity Std."), featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Run length nonuniformity Comb."), featureCombined->ElementAt(i)));
       break;
     case TextureFilterType::RunLengthNonuniformityNormalized :
-      featureList.push_back(std::make_pair(params.featurePrefix + "Run length nonuniformity normalized Means", featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Run length nonuniformity normalized Std.", featureStd->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Run length nonuniformity normalized Comb.", featureCombined->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Run length nonuniformity normalized Means"), featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Run length nonuniformity normalized Std."), featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Run length nonuniformity normalized Comb."), featureCombined->ElementAt(i)));
       break;
     case TextureFilterType::LowGreyLevelRunEmphasis :
-      featureList.push_back(std::make_pair(params.featurePrefix + "Low grey level run emphasis Means", featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Low grey level run emphasis Std.", featureStd->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Low grey level run emphasis Comb.", featureCombined->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Low grey level run emphasis Means"), featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Low grey level run emphasis Std."), featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Low grey level run emphasis Comb."), featureCombined->ElementAt(i)));
       break;
     case TextureFilterType::HighGreyLevelRunEmphasis :
-      featureList.push_back(std::make_pair(params.featurePrefix + "High grey level run emphasis Means", featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "High grey level run emphasis Std.", featureStd->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "High grey level run emphasis Comb.", featureCombined->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "High grey level run emphasis Means"), featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "High grey level run emphasis Std."), featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "High grey level run emphasis Comb."), featureCombined->ElementAt(i)));
       break;
     case TextureFilterType::ShortRunLowGreyLevelEmphasis :
-      featureList.push_back(std::make_pair(params.featurePrefix + "Short run low grey level emphasis Means", featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Short run low grey level emphasis  Std.", featureStd->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Short run low grey level emphasis  Comb.", featureCombined->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Short run low grey level emphasis Means"), featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Short run low grey level emphasis  Std."), featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Short run low grey level emphasis  Comb."), featureCombined->ElementAt(i)));
       break;
     case TextureFilterType::ShortRunHighGreyLevelEmphasis :
-      featureList.push_back(std::make_pair(params.featurePrefix + "Short run high grey level emphasis Means", featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Short run high grey level emphasis Std.", featureStd->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Short run high grey level emphasis Comb.", featureCombined->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Short run high grey level emphasis Means"), featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Short run high grey level emphasis Std."), featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Short run high grey level emphasis Comb."), featureCombined->ElementAt(i)));
       break;
     case TextureFilterType::LongRunLowGreyLevelEmphasis :
-      featureList.push_back(std::make_pair(params.featurePrefix + "Long run low grey level emphasis Means", featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Long run low grey level emphasis Std.", featureStd->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Long run low grey level emphasis Comb.", featureCombined->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Long run low grey level emphasis Means"), featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Long run low grey level emphasis Std."), featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Long run low grey level emphasis Comb."), featureCombined->ElementAt(i)));
       break;
     case TextureFilterType::LongRunHighGreyLevelEmphasis :
-      featureList.push_back(std::make_pair(params.featurePrefix + "Long run high grey level emphasis Means", featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Long run high grey level emphasis Std.", featureStd->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Long run high grey level emphasis Comb.", featureCombined->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Long run high grey level emphasis Means"), featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Long run high grey level emphasis Std."), featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Long run high grey level emphasis Comb."), featureCombined->ElementAt(i)));
       break;
     case TextureFilterType::RunPercentage :
-      featureList.push_back(std::make_pair(params.featurePrefix + "Run percentage Means", featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Run percentage Std.", featureStd->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Run percentage Comb.", featureCombined->ElementAt(i) / newOffset->size()));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Run percentage Means"), featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Run percentage Std."), featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Run percentage Comb."), featureCombined->ElementAt(i) / newOffset->size()));
       break;
     case TextureFilterType::NumberOfRuns :
-      featureList.push_back(std::make_pair(params.featurePrefix + "Number of runs Means", featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Number of runs Std.", featureStd->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Number of runs Comb.", featureCombined->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Number of runs Means"), featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Number of runs Std."), featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Number of runs Comb."), featureCombined->ElementAt(i)));
       break;
     case TextureFilterType::GreyLevelVariance :
-      featureList.push_back(std::make_pair(params.featurePrefix + "Grey level variance Means", featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Grey level variance Std.", featureStd->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Grey level variance Comb.", featureCombined->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Grey level variance Means"), featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Grey level variance Std."), featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Grey level variance Comb."), featureCombined->ElementAt(i)));
       break;
     case TextureFilterType::RunLengthVariance :
-      featureList.push_back(std::make_pair(params.featurePrefix + "Run length variance Means", featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Run length variance Std.", featureStd->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Run length variance Comb.", featureCombined->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Run length variance Means"), featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Run length variance Std."), featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Run length variance Comb."), featureCombined->ElementAt(i)));
       break;
     case TextureFilterType::RunEntropy :
-      featureList.push_back(std::make_pair(params.featurePrefix + "Run length entropy Means", featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Run length entropy Std.", featureStd->ElementAt(i)));
-      featureList.push_back(std::make_pair(params.featurePrefix + "Run length entropy Comb.", featureCombined->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Run length entropy Means"), featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Run length entropy Std."), featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id, "Run length entropy Comb."), featureCombined->ElementAt(i)));
       break;
     default:
       break;
@@ -222,64 +236,46 @@ mitk::GIFGreyLevelRunLength::GIFGreyLevelRunLength()
   SetFeatureClassName("Run Length");
 }
 
-mitk::GIFGreyLevelRunLength::FeatureListType mitk::GIFGreyLevelRunLength::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
+void mitk::GIFGreyLevelRunLength::AddArguments(mitkCommandLineParser &parser) const
 {
-  InitializeQuantifier(image, mask);
+  this->AddQuantifierArguments(parser);
+
+  std::string name = GetOptionPrefix();
+
+  parser.addArgument(GetLongName(), name, mitkCommandLineParser::Bool, "Use Run-Length", "Calculates Run-Length based features", us::Any());
+}
+
+mitk::AbstractGlobalImageFeature::FeatureListType mitk::GIFGreyLevelRunLength::DoCalculateFeatures(const Image* image, const Image* mask)
+{
   FeatureListType featureList;
 
-  ParameterStruct params;
+  InitializeQuantifier(image, mask);
+
+  MITK_INFO << "Start calculating Run-length";
+
+  GIFGreyLevelRunLengthParameters params;
 
   params.m_Direction = GetDirection();
 
   params.MinimumIntensity = GetQuantifier()->GetMinimum();
   params.MaximumIntensity = GetQuantifier()->GetMaximum();
   params.Bins = GetQuantifier()->GetBins();
-  params.featurePrefix = FeatureDescriptionPrefix();
+  params.id = this->CreateTemplateFeatureID();
+
 
   MITK_INFO << params.MinimumIntensity;
   MITK_INFO << params.MaximumIntensity;
   MITK_INFO << params.m_Direction;
   MITK_INFO << params.Bins;
 
-  AccessByItk_3(image, CalculateGrayLevelRunLengthFeatures, mask, featureList,params);
+  AccessByItk_3(image, CalculateGrayLevelRunLengthFeatures, mask, featureList, params);
 
+  MITK_INFO << "Finished calculating Run-length";
+  
   return featureList;
 }
 
-mitk::GIFGreyLevelRunLength::FeatureNameListType mitk::GIFGreyLevelRunLength::GetFeatureNames()
+mitk::AbstractGlobalImageFeature::FeatureListType mitk::GIFGreyLevelRunLength::CalculateFeatures(const Image* image, const Image*, const Image* maskNoNAN)
 {
-  FeatureNameListType featureList;
-  return featureList;
-}
-
-
-void mitk::GIFGreyLevelRunLength::AddArguments(mitkCommandLineParser &parser)
-{
-  std::string name = GetOptionPrefix();
-
-  parser.addArgument(GetLongName(), name, mitkCommandLineParser::Bool, "Use Run-Length", "Calculates Run-Length based features", us::Any());
-  AddQuantifierArguments(parser);
-}
-
-void
-mitk::GIFGreyLevelRunLength::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &, const Image::Pointer &maskNoNAN, FeatureListType &featureList)
-{
-  auto parsedArgs = GetParameter();
-  std::string name = GetOptionPrefix();
-
-  if (parsedArgs.count(GetLongName()))
-  {
-    InitializeQuantifierFromParameters(feature, maskNoNAN);
-
-    MITK_INFO << "Start calculating Run-length";
-    auto localResults = this->CalculateFeatures(feature, maskNoNAN);
-    featureList.insert(featureList.end(), localResults.begin(), localResults.end());
-    MITK_INFO << "Finished calculating Run-length";
-  }
-
-}
-
-std::string mitk::GIFGreyLevelRunLength::GetCurrentFeatureEncoding()
-{
-  return QuantifierParameterString();
+  return Superclass::CalculateFeatures(image, maskNoNAN);
 }

@@ -33,6 +33,33 @@ found in the LICENSE file.
 
 namespace mitk
 {
+
+  /**Used as ID for features calculated by feature classes*/
+  struct MITKCLCORE_EXPORT FeatureID
+  {
+    /**Name of the feature*/
+    std::string name;
+    /**Name of the feature class*/
+    std::string featureClass;
+    /**ID for the setting that is represented by parameters and is specified by the feature class while calculating the features. It must be as unique as the parameters themself.*/
+    std::string settingID;
+    /**Alternative name that containes the legacy naming of the feature that encodes the parametersetting directly in the string.*/
+    std::string legacyName;
+    /**Version of the feature definition*/
+    std::string version = "1";
+
+    using ParametersType = std::map<std::string, us::Any>;
+    ParametersType parameters;
+
+    bool operator < (const FeatureID& rh) const;
+    bool operator ==(const FeatureID& rh) const;
+  };
+
+  /**Helper that takes a pass templateID clones it and populates it with the also passed informations befor returning it.
+   * @param templateID reference ID that should be cloned.
+   * @param name Name of the feature.*/
+  MITKCLCORE_EXPORT FeatureID CreateFeatureID(FeatureID templateID, std::string name);
+
   /**
   *
   *
@@ -126,66 +153,52 @@ class MITKCLCORE_EXPORT AbstractGlobalImageFeature : public BaseData
 public:
   mitkClassMacro(AbstractGlobalImageFeature, BaseData);
 
-  typedef std::vector< std::pair<std::string, double> > FeatureListType;
-  typedef std::vector< std::string>                     FeatureNameListType;
-  typedef std::map<std::string, us::Any>                ParameterTypes;
+  typedef std::vector< std::pair<FeatureID, double> > FeatureListType;
+  using ParametersType = FeatureID::ParametersType;
 
   /**
   * \brief Calculates the feature of this abstact interface. Does not necessarily considers the parameter settings.
   */
-  virtual FeatureListType CalculateFeatures(const Image::Pointer & feature, const Image::Pointer &mask) = 0;
+  FeatureListType CalculateFeatures(const Image* image, const Image* mask);
+  virtual FeatureListType CalculateFeatures(const Image* image, const Image* mask, const Image* maskNoNAN) = 0;
 
   /**
   * \brief Calculates the given feature Slice-wise. Might not be availble for an individual filter!
   */
-  FeatureListType CalculateFeaturesSlicewise(const Image::Pointer & feature, const Image::Pointer &mask, int sliceID);
+  FeatureListType CalculateFeaturesSlicewise(const Image::Pointer & image, const Image::Pointer &mask, int sliceID);
 
   /**
   * \brief Calculates the feature of this abstact interface. Does not necessarily considers the parameter settings.
   */
-  virtual void CalculateFeaturesSliceWiseUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, int sliceID, FeatureListType &featureList);
+  virtual void CalculateAndAppendFeaturesSliceWise(const Image::Pointer & image, const Image::Pointer &mask, int sliceID, FeatureListType &featureList, bool checkParameterActivation = true);
 
   /**
   * \brief Calculates the feature of this abstact interface. Does not necessarily considers the parameter settings.
+  * @param checkParameterActivation Indicates if the features should only be calculated and added if the FeatureClass is activated in the parameters.
+  * True: only append if activated in the parametes. False: always and append it.
   */
-  virtual void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList) = 0;
-
-  /**
-  * \brief Returns a list of the names of all features that are calculated from this class
-  */
-  virtual FeatureNameListType GetFeatureNames() = 0;
-
-  /**
-  * \brief Adds an additional Separator to the name of the feature, which encodes the used parameters
-  */
-  virtual std::string GetCurrentFeatureEncoding();
-
-  /**
-  * \brief Returns a string that encodes the feature class name.
-  *
-  * This Feature returns a string that should be put before every other feature
-  * value. It has the format [<Prefix>::]<Feature Class Name>::[<Parameter Encoding>::].
-  * The options <Prefix> and <Parameter Encoding> are only added, if the corresponding
-  * options are set.
-  */
-  std::string FeatureDescriptionPrefix();
+  void CalculateAndAppendFeatures(const Image* image, const Image* mask, const Image* maskNoNAN, FeatureListType &featureList, bool checkParameterActivation = true);
 
   itkSetMacro(Prefix, std::string);
   itkSetMacro(ShortName, std::string);
   itkSetMacro(LongName, std::string);
   itkSetMacro(FeatureClassName, std::string);
   itkSetMacro(Direction, int);
-  void SetParameter(ParameterTypes param) { m_Parameter=param; };
+
+  void SetParameters(ParametersType param)
+  {
+    m_Parameters = param;
+    this->ConfigureQuantifierSettingsByParameters();
+    this->ConfigureSettingsByParameters(param);
+    this->Modified();
+  };
 
   itkGetConstMacro(Prefix, std::string);
   itkGetConstMacro(ShortName, std::string);
   itkGetConstMacro(LongName, std::string);
   itkGetConstMacro(FeatureClassName, std::string);
-  itkGetConstMacro(Parameter, ParameterTypes);
+  itkGetConstMacro(Parameters, ParametersType);
 
-  itkSetMacro(UseQuantifier, bool);
-  itkGetConstMacro(UseQuantifier, bool);
-  itkSetMacro(Quantifier, IntensityQuantifier::Pointer);
   itkGetMacro(Quantifier, IntensityQuantifier::Pointer);
 
   itkGetConstMacro(Direction, int);
@@ -216,24 +229,59 @@ public:
   itkSetMacro(IgnoreMask, bool);
   itkGetConstMacro(IgnoreMask, bool);
 
-  itkSetMacro(EncodeParameters, bool);
-  itkGetConstMacro(EncodeParameters, bool);
+  itkSetMacro(EncodeParametersInFeaturePrefix, bool);
+  itkGetConstMacro(EncodeParametersInFeaturePrefix, bool);
+  itkBooleanMacro(EncodeParametersInFeaturePrefix);
 
   std::string GetOptionPrefix() const
   {
-    if (m_Prefix.length() > 0)
+    if (!m_Prefix.empty())
       return m_Prefix + "::" + m_ShortName;
     return m_ShortName;
-
   }
 
-  virtual void AddArguments(mitkCommandLineParser &parser) = 0;
+  /** Can be called to add all relevant argument for configuring the feature instance to the passed parser instance.
+  Must be implemented be derived classes. For adding the quantifier arguments use AddQuantifierArguments(...) as
+  helper function.*/
+  virtual void AddArguments(mitkCommandLineParser &parser) const = 0;
+
+  /** Helper function that generates the legacy feature name without encoding of parameters; as it is used e.g.
+   in the unit tests.*/
+  static std::string GenerateLegacyFeatureNameWOEncoding(const FeatureID& id);
+
+protected:
   std::vector<double> SplitDouble(std::string str, char delimiter);
 
-  void AddQuantifierArguments(mitkCommandLineParser &parser);
-  void InitializeQuantifierFromParameters(const Image::Pointer & feature, const Image::Pointer &mask,unsigned int defaultBins = 256);
-  void InitializeQuantifier(const Image::Pointer & feature, const Image::Pointer &mask, unsigned int defaultBins = 256);
-  std::string QuantifierParameterString();
+  virtual FeatureListType DoCalculateFeatures(const Image* image, const Image* mask) = 0;
+
+  void AddQuantifierArguments(mitkCommandLineParser& parser) const;
+
+  /** Ensures that all quantifier relevant variables of the instance are set correctly given the information in m_Parameters.*/
+  void ConfigureQuantifierSettingsByParameters();
+
+  /** Ensures that the instance is configured according to the information given in the passed parameters.
+  * This method will be called by SetParameters(...) after ConfigureQuantifierSettingsByParameters() was called.*/
+  virtual void ConfigureSettingsByParameters(const ParametersType& parameters);
+
+  /**Initializes the quantifier gigen the quantifier relevant variables and the passed arguments.*/
+  void InitializeQuantifier(const Image* image, const Image* mask, unsigned int defaultBins = 256);
+
+  /** Helper that encodes the quantifier parameters in a string (e.g. used for the legacy feature name)*/
+  std::string QuantifierParameterString() const;
+
+  /* Creates a template feature id.
+   * it will set the featureClass, the settingID (assuming that it is the featureClass with the passed suffix
+   * and all parameters that are global or have the option prefix of the instance.*/
+  FeatureID CreateTemplateFeatureID(std::string settingsSuffix = "", FeatureID::ParametersType additionalParams = {});
+
+  /** Helper that generates the legacy feature names for a passed FeatureID.
+  * Format of the legacy feature name is: <ClassName>::[<LegacyFeatureEncoding>::]<LegacyFeatureNamePart>
+  * Overwrite GenerateLegacyFeatureNamePart and GenerateLegacyFeatureEncoding to change behavior in
+  * derived classes.
+  */
+  virtual std::string GenerateLegacyFeatureName(const FeatureID& id) const;
+  virtual std::string GenerateLegacyFeatureNamePart(const FeatureID& id) const;
+  virtual std::string GenerateLegacyFeatureEncoding(const FeatureID& id) const;
 
 public:
 
@@ -261,16 +309,18 @@ private:
   std::string m_ShortName; // Name of all variables
   std::string m_LongName; // Long version of the name (For turning on)
   std::string m_FeatureClassName;
-  ParameterTypes m_Parameter; // Parameter setting
+  ParametersType m_Parameters; // Parameter setting
 
-  bool m_UseQuantifier = false;
+  mitk::Image::Pointer m_MorphMask = nullptr;
+
+
   IntensityQuantifier::Pointer m_Quantifier;
-
+  //Quantifier relevant variables
   double m_MinimumIntensity = 0;
   bool m_UseMinimumIntensity = false;
   double m_MaximumIntensity = 100;
   bool m_UseMaximumIntensity = false;
-  bool m_EncodeParameters = false;
+  bool m_EncodeParametersInFeaturePrefix = false;
 
   double m_Binsize = 1;
   bool m_UseBinsize = false;
@@ -280,9 +330,6 @@ private:
   int m_Direction = 0;
 
   bool m_IgnoreMask = false;
-  bool m_CalculateWithParameter = false;
-
-  mitk::Image::Pointer m_MorphMask = nullptr;
 //#endif // Skip Doxygen
 
 };

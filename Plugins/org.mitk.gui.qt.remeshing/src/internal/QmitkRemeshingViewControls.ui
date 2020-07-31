@@ -19,63 +19,6 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="3" column="1" colspan="2">
-      <widget class="QComboBox" name="qualityComboBox">
-       <property name="currentIndex">
-        <number>0</number>
-       </property>
-       <item>
-        <property name="text">
-         <string>Medium (fast)</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>High (slow)</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Maximum (very slow)</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item row="1" column="2">
-      <widget class="QSpinBox" name="densitySpinBox">
-       <property name="suffix">
-        <string>%</string>
-       </property>
-       <property name="minimum">
-        <number>1</number>
-       </property>
-       <property name="maximum">
-        <number>100</number>
-       </property>
-       <property name="singleStep">
-        <number>1</number>
-       </property>
-       <property name="value">
-        <number>100</number>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1" colspan="2">
-      <widget class="QCheckBox" name="preserveEdgesCheckBox">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Preserve Edges</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="0">
       <widget class="QLabel" name="surfaceLabel">
        <property name="sizePolicy">
@@ -90,15 +33,12 @@
       </widget>
      </item>
      <item row="0" column="1" colspan="2">
-      <widget class="QmitkDataStorageComboBox" name="surfaceComboBox">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
+      <widget class="QmitkSingleNodeSelectionWidget" name="selectionWidget" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>40</height>
+        </size>
        </property>
       </widget>
      </item>
@@ -140,6 +80,25 @@
        </property>
       </widget>
      </item>
+     <item row="1" column="2">
+      <widget class="QSpinBox" name="densitySpinBox">
+       <property name="suffix">
+        <string>%</string>
+       </property>
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>100</number>
+       </property>
+       <property name="singleStep">
+        <number>1</number>
+       </property>
+       <property name="value">
+        <number>100</number>
+       </property>
+      </widget>
+     </item>
      <item row="2" column="0">
       <widget class="QLabel" name="remeshingLabel">
        <property name="sizePolicy">
@@ -177,6 +136,44 @@
        </property>
        <property name="text">
         <string>Quality</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1" colspan="2">
+      <widget class="QComboBox" name="qualityComboBox">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <item>
+        <property name="text">
+         <string>Medium (fast)</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>High (slow)</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Maximum (very slow)</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="4" column="1" colspan="2">
+      <widget class="QCheckBox" name="preserveEdgesCheckBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Preserve Edges</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -229,13 +226,13 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QmitkDataStorageComboBox</class>
-   <extends>QComboBox</extends>
-   <header location="global">QmitkDataStorageComboBox.h</header>
+   <class>QmitkSingleNodeSelectionWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkSingleNodeSelectionWidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>surfaceComboBox</tabstop>
   <tabstop>densitySpinBox</tabstop>
   <tabstop>preserveEdgesCheckBox</tabstop>
   <tabstop>remeshPushButton</tabstop>

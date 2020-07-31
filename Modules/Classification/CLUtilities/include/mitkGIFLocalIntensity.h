@@ -47,31 +47,25 @@ namespace mitk
   {
   public:
     mitkClassMacro(GIFLocalIntensity, AbstractGlobalImageFeature);
-      itkFactorylessNewMacro(Self);
-      itkCloneMacro(Self);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
-      GIFLocalIntensity();
-
-    /**
-    * \brief Calculates the Cooccurence-Matrix based features for this class.
-    */
-    FeatureListType CalculateFeatures(const Image::Pointer & image, const Image::Pointer &feature) override;
-
-    /**
-    * \brief Returns a list of the names of all features that are calculated from this class
-    */
-    FeatureNameListType GetFeatureNames() override;
-
-    void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList) override;
-    void AddArguments(mitkCommandLineParser &parser) override;
-
-    std::string GetCurrentFeatureEncoding() override;
+    GIFLocalIntensity();
 
     itkGetConstMacro(Range, double);
     itkSetMacro(Range, double);
 
-  private:
+    FeatureListType CalculateFeatures(const Image* image, const Image* mask, const Image* maskNoNAN) override;
+    using Superclass::CalculateFeatures;
 
+    void AddArguments(mitkCommandLineParser& parser) const override;
+
+  protected:
+    std::string GenerateLegacyFeatureEncoding(const FeatureID& id) const override;
+    FeatureListType DoCalculateFeatures(const Image* image, const Image* mask) override;
+    void ConfigureSettingsByParameters(const ParametersType& parameters) override;
+
+  private:
     double m_Range;
   };
 }

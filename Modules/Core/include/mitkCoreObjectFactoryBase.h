@@ -48,7 +48,7 @@ namespace mitk
     /**
      * @deprecatedSince{2014_10} See mitk::FileReaderRegistry and QmitkIOUtil
      */
-    virtual const char *GetFileExtensions() = 0;
+    virtual std::string GetFileExtensions() = 0;
 
     /**
      * @deprecatedSince{2014_10} See mitk::FileReaderRegistry and QmitkIOUtil
@@ -58,7 +58,7 @@ namespace mitk
     /**
      * @deprecatedSince{2014_10} See mitk::FileWriterRegistry and QmitkIOUtil
      */
-    virtual const char *GetSaveFileExtensions() = 0;
+    virtual std::string GetSaveFileExtensions() = 0;
 
     /**
      * @deprecatedSince{2014_10} See mitk::FileWriterRegistry and QmitkIOUtil

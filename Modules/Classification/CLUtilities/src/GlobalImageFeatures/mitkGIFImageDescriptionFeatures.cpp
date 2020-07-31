@@ -27,7 +27,7 @@ found in the LICENSE file.
 
 template<typename TPixel, unsigned int VImageDimension>
 static void
-CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFImageDescriptionFeatures::FeatureListType & featureList, std::string prefix)
+CalculateFirstOrderStatistics(const itk::Image<TPixel, VImageDimension>* itkImage, const mitk::Image* mask, mitk::GIFImageDescriptionFeatures::FeatureListType & featureList, const mitk::FeatureID& featureID)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<unsigned short, VImageDimension> MaskType;
@@ -103,29 +103,29 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   imageMean /= voxelCount;
   maskMean /= maskVoxelCount;
 
-  featureList.push_back(std::make_pair(prefix + "Image Dimension X", imageDimensionX));
-  featureList.push_back(std::make_pair(prefix + "Image Dimension Y", imageDimensionY));
-  featureList.push_back(std::make_pair(prefix + "Image Dimension Z", imageDimensionZ));
-  featureList.push_back(std::make_pair(prefix + "Image Spacing X", imageVoxelSpacingX));
-  featureList.push_back(std::make_pair(prefix + "Image Spacing Y", imageVoxelSpacingY));
-  featureList.push_back(std::make_pair(prefix + "Image Spacing Z", imageVoxelSpacingZ));
-  featureList.push_back(std::make_pair(prefix + "Image Mean intensity", imageMean));
-  featureList.push_back(std::make_pair(prefix + "Image Minimum intensity", imageMinimum));
-  featureList.push_back(std::make_pair(prefix + "Image Maximum intensity", imageMaximum));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Image Dimension X"), imageDimensionX));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Image Dimension Y"), imageDimensionY));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Image Dimension Z"), imageDimensionZ));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Image Spacing X"), imageVoxelSpacingX));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Image Spacing Y"), imageVoxelSpacingY));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Image Spacing Z"), imageVoxelSpacingZ));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Image Mean intensity"), imageMean));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Image Minimum intensity"), imageMinimum));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Image Maximum intensity"), imageMaximum));
 
-  featureList.push_back(std::make_pair(prefix + "Mask Dimension X", maskDimensionX));
-  featureList.push_back(std::make_pair(prefix + "Mask Dimension Y", maskDimensionY));
-  featureList.push_back(std::make_pair(prefix + "Mask Dimension Z", maskDimensionZ));
-  featureList.push_back(std::make_pair(prefix + "Mask bounding box X", maskMaximumX - maskMinimumX + 1));
-  featureList.push_back(std::make_pair(prefix + "Mask bounding box Y", maskMaximumY - maskMinimumY + 1));
-  featureList.push_back(std::make_pair(prefix + "Mask bounding box Z", maskMaximumZ - maskMinimumZ + 1));
-  featureList.push_back(std::make_pair(prefix + "Mask Spacing X", maskVoxelSpacingX));
-  featureList.push_back(std::make_pair(prefix + "Mask Spacing Y", maskVoxelSpacingY));
-  featureList.push_back(std::make_pair(prefix + "Mask Spacing Z", maskVoxelSpacingZ));
-  featureList.push_back(std::make_pair(prefix + "Mask Voxel Count", maskVoxelCount));
-  featureList.push_back(std::make_pair(prefix + "Mask Mean intensity", maskMean));
-  featureList.push_back(std::make_pair(prefix + "Mask Minimum intensity", maskMinimum));
-  featureList.push_back(std::make_pair(prefix + "Mask Maximum intensity", maskMaximum));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Mask Dimension X"), maskDimensionX));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Mask Dimension Y"), maskDimensionY));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Mask Dimension Z"), maskDimensionZ));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Mask bounding box X"), maskMaximumX - maskMinimumX + 1));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Mask bounding box Y"), maskMaximumY - maskMinimumY + 1));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Mask bounding box Z"), maskMaximumZ - maskMinimumZ + 1));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Mask Spacing X"), maskVoxelSpacingX));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Mask Spacing Y"), maskVoxelSpacingY));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Mask Spacing Z"), maskVoxelSpacingZ));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Mask Voxel Count"), maskVoxelCount));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Mask Mean intensity"), maskMean));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Mask Minimum intensity"), maskMinimum));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(featureID, "Mask Maximum intensity"), maskMaximum));
 
 }
 
@@ -137,37 +137,25 @@ mitk::GIFImageDescriptionFeatures::GIFImageDescriptionFeatures()
   SetFeatureClassName("Diagnostic");
 }
 
-mitk::GIFImageDescriptionFeatures::FeatureListType mitk::GIFImageDescriptionFeatures::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
-{
-  FeatureListType featureList;
-  AccessByItk_3(image, CalculateFirstOrderStatistics, mask, featureList, FeatureDescriptionPrefix());
-
-  return featureList;
-}
-
-mitk::GIFImageDescriptionFeatures::FeatureNameListType mitk::GIFImageDescriptionFeatures::GetFeatureNames()
-{
-  FeatureNameListType featureList;
-  return featureList;
-}
-
-
-void mitk::GIFImageDescriptionFeatures::AddArguments(mitkCommandLineParser &parser)
+void mitk::GIFImageDescriptionFeatures::AddArguments(mitkCommandLineParser &parser) const
 {
   std::string name = GetOptionPrefix();
   parser.addArgument(GetLongName(), name, mitkCommandLineParser::Bool, "Use Image Description", "calculates image description features", us::Any());
 }
 
-void
-mitk::GIFImageDescriptionFeatures::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &, const Image::Pointer &maskNoNAN, FeatureListType &featureList)
+mitk::AbstractGlobalImageFeature::FeatureListType mitk::GIFImageDescriptionFeatures::DoCalculateFeatures(const Image* image, const Image* mask)
 {
-  auto parsedArgs = GetParameter();
-  if (parsedArgs.count(GetLongName()))
-  {
-    MITK_INFO << "Start calculating image description features....";
-    auto localResults = this->CalculateFeatures(feature, maskNoNAN);
-    featureList.insert(featureList.end(), localResults.begin(), localResults.end());
-    MITK_INFO << "Finished calculating image description features....";
-  }
+  FeatureListType featureList;
+
+  MITK_INFO << "Start calculating image description features....";
+  auto id = this->CreateTemplateFeatureID();
+  AccessByItk_3(image, CalculateFirstOrderStatistics, mask, featureList, id);
+  MITK_INFO << "Finished calculating image description features....";
+
+  return featureList;
 }
 
+mitk::AbstractGlobalImageFeature::FeatureListType mitk::GIFImageDescriptionFeatures::CalculateFeatures(const Image* image, const Image*, const Image* maskNoNAN)
+{
+  return Superclass::CalculateFeatures(image, maskNoNAN);
+}

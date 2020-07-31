@@ -11,19 +11,6 @@
     <product name="MITK Workbench" application="org.mitk.qt.extapplication" />
   </extension>
 
-  <extension id="fiberfox" point="org.blueberry.core.runtime.products">
-    <product name="MITK Fiberfox" application="org.mitk.qt.extapplication" />
-  </extension>
-
-  <extension point="org.blueberry.ui.intro">
-    <intro id="org.mitk.qt.extapplicationintro"
-      class="QmitkMitkWorkbenchIntroPart"
-      role="editor"/>
-    <introProductBinding
-      productId="org.mitk.gui.qt.extapplication.workbench"
-      introId="org.mitk.qt.extapplicationintro"/>
-  </extension>
-
   <extension point="org.blueberry.ui.perspectives">
     <perspective
       id="org.mitk.extapp.defaultperspective"

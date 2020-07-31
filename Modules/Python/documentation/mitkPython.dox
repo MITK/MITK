@@ -1,6 +1,6 @@
 /**
 
-\page mitkPython_Overview The MITK Python Module
+\page mitkPython_Overview Python Module
 
 \section python_sec1 Brief description
 The MITK Python Module provides a service class to interactively run python code (passed as C++ strings) and

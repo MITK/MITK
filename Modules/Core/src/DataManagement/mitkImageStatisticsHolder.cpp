@@ -13,6 +13,8 @@ found in the LICENSE file.
 
 #include "mitkHistogramGenerator.h"
 #include <mitkProperties.h>
+#include "mitkImageAccessByItk.h"
+//#define BOUNDINGOBJECT_IGNORE
 
 mitk::ImageStatisticsHolder::ImageStatisticsHolder(mitk::Image *image)
   : m_Image(image)
@@ -94,10 +96,7 @@ void mitk::ImageStatisticsHolder::ResetImageStatistics()
   m_CountOfMaxValuedVoxels.assign(1, 0);
 }
 
-#include "mitkImageAccessByItk.h"
-
-//#define BOUNDINGOBJECT_IGNORE
-
+/// \cond SKIP_DOXYGEN
 template <typename ItkImageType>
 void mitk::_ComputeExtremaInItkImage(const ItkImageType *itkImage, mitk::ImageStatisticsHolder *statisticsHolder, int t)
 {
@@ -174,7 +173,9 @@ void mitk::_ComputeExtremaInItkImage(const ItkImageType *itkImage, mitk::ImageSt
   }
   statisticsHolder->m_LastRecomputeTimeStamp.Modified();
 }
+/// \endcond SKIP_DOXYGEN
 
+/// \cond SKIP_DOXYGEN
 template <typename ItkImageType>
 void mitk::_ComputeExtremaInItkVectorImage(const ItkImageType *itkImage,
                                            mitk::ImageStatisticsHolder *statisticsHolder,
@@ -252,7 +253,7 @@ void mitk::_ComputeExtremaInItkVectorImage(const ItkImageType *itkImage,
   }
   statisticsHolder->m_LastRecomputeTimeStamp.Modified();
 }
-
+/// \endcond SKIP_DOXYGEN
 void mitk::ImageStatisticsHolder::ComputeImageStatistics(int t, unsigned int component)
 {
   // timestep valid?

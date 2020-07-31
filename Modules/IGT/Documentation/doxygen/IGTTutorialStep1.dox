@@ -8,7 +8,7 @@ At the very end of this page, you can find build instructions on how to run this
 
 \snippet mitkIGTTutorialStep1.cpp What we will do
 
-\section sec1 Tracking Layer
+\section IGT_Tracking_Layer Tracking Layer
 
 Firstly a new object "tracker" of the type mitk::VirtualTrackingDevice is created, then two tools, named "tool1" and "tool2",
 are added to this tracker. Since the tracking device "tracker" is treated as a virtual tracking
@@ -16,7 +16,7 @@ device, tool1 and tool2 are just added to the object by method AddTool(name) and
 
 \snippet mitkIGTTutorialStep1.cpp Part I Basic 1
 
-\section sec2 Navigation Layer
+\section IGT_Navigation_Layer Navigation Layer
 
 \imageMacro{IGTTutorialStep1.png,"",15.90}
 
@@ -31,7 +31,7 @@ with an offset for each direction (X,Y,Z). The given filter has inputs and outpu
 
 \snippet mitkIGTTutorialStep1.cpp Part II
 
-\section sec3 Record Navigation Data
+\section IGT_Record_Navigation_Data Record Navigation Data
 
 In part III, all the NavigationData is recorded with the NavigationDataRecorder. In order to record, we simply create
 an object "recorder" of the type mitk::NavigationDataRecorder and set the appropriate file to it. Now the displacer object is connected to the
@@ -41,7 +41,7 @@ a for-loop statement. This can also be seen as a simulation of a timer by using 
 
 \snippet mitkIGTTutorialStep1.cpp Part III: Record the data with the NavigationDataRecorder
 
-\section sec4 Play Navigation Data
+\section IGT_Play_Navigation_Data Play Navigation Data
 
 Part IV explains how the recoded file can be played for further use. After the object "player" of a type mitk::NavigationDataSequentialPlayer
 is created, the required file has to be set to the player and playing has to be started.  Here, there exists a new pipeline which functions by reading

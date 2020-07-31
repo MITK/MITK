@@ -38,6 +38,9 @@ found in the LICENSE file.
 #include <itkGDCMImageIO.h>
 #include <itkNiftiImageIO.h>
 
+// PropertyRelationRules
+#include <mitkPropertyRelationRuleBase.h>
+
 // Micro Services
 #include <usGetModuleContext.h>
 #include <usModule.h>
@@ -213,6 +216,11 @@ void MitkCoreActivator::Load(us::ModuleContext *context)
   AddPropertyPersistence(mitk::IOMetaInformationPropertyConstants::READER_MIME_NAME());
   AddPropertyPersistence(mitk::IOMetaInformationPropertyConstants::READER_VERSION());
   AddPropertyPersistence(mitk::IOMetaInformationPropertyConstants::READER_OPTIONS_ANY());
+
+  AddPropertyPersistence(mitk::PropertyRelationRuleBase::GetRIIDestinationUIDPropertyKeyPath());
+  AddPropertyPersistence(mitk::PropertyRelationRuleBase::GetRIIRelationUIDPropertyKeyPath());
+  AddPropertyPersistence(mitk::PropertyRelationRuleBase::GetRIIRuleIDPropertyKeyPath());
+  AddPropertyPersistence(mitk::PropertyRelationRuleBase::GetRIIPropertyKeyPath("","").AddAnyElement());
 
   /*
     There IS an option to exchange ALL vtkTexture instances against vtkNeverTranslucentTextureFactory.

@@ -33,6 +33,7 @@ found in the LICENSE file.
 #include <mitkMatrixConvert.h>
 #include <mitkRotationOperation.h>
 #include <mitkScaleOperation.h>
+#include <mitkNodePredicateGeometry.h>
 
 class vtkMatrix4x4;
 class vtkMatrixToLinearTransform;
@@ -125,8 +126,14 @@ class mitkBaseGeometryTestSuite : public mitk::TestFixture
   // test IsSubGeometry
   MITK_TEST(IsSubGeometry_Spacing);
   MITK_TEST(IsSubGeometry_TransformMatrix);
-  MITK_TEST(IsSubGeometry_Bounds);
-  MITK_TEST(IsSubGeometry_Grid);
+  MITK_TEST(IsSubGeometry_Bounds_Image);
+  MITK_TEST(IsSubGeometry_Bounds_NoneImage);
+  MITK_TEST(IsSubGeometry_Grid_Image);
+  MITK_TEST(IsSubGeometry_Grid_NoneImage);
+  MITK_TEST(IsSubGeometry_Bounds_Oblique_Image);
+  MITK_TEST(IsSubGeometry_Bounds_Oblique_NoneImage);
+  MITK_TEST(IsSubGeometry_Grid_Oblique_Image);
+  MITK_TEST(IsSubGeometry_Grid_Oblique_NoneImage);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -150,6 +157,7 @@ private:
 
   DummyTestClass::Pointer aDummyGeometry;
   DummyTestClass::Pointer anotherDummyGeometry;
+  DummyTestClass::Pointer aDummyGeometryOblique;
 
 public:
   // Set up for variables
@@ -178,12 +186,12 @@ public:
     aThirdTransform->SetMatrix(aThirdMatrix);
 
     // Bounding Box
-    float bounds[6] = {0, 1, 0, 1, 0, 1};
+    float bounds[6] = { 0, 1, 0, 1, 0, 1 };
     mitk::BoundingBox::BoundsArrayType b;
-    const float *input = bounds;
+    const float* input = bounds;
     int j = 0;
     for (mitk::BoundingBox::BoundsArrayType::Iterator it = b.Begin(); j < 6; ++j)
-      *it++ = (mitk::ScalarType)*input++;
+      *it++ = (mitk::ScalarType) * input++;
 
     aBoundingBox = BoundingBoxType::New();
 
@@ -225,6 +233,28 @@ public:
     aDummyGeometry = DummyTestClass::New();
     aDummyGeometry->Initialize();
     anotherDummyGeometry = aDummyGeometry->Clone();
+
+    aDummyGeometryOblique = DummyTestClass::New();
+    aDummyGeometryOblique->Initialize();
+    auto newBounds = aDummyGeometryOblique->GetBounds();
+    newBounds[0] = 0;
+    newBounds[1] = 5;
+    newBounds[2] = 10;
+    newBounds[3] = 20;
+    newBounds[4] = 30;
+    newBounds[5] = 40;
+    aDummyGeometryOblique->SetBounds(newBounds);
+    aDummyGeometryOblique->GetMatrixColumn(0);
+    auto obliqueTransform = mitk::AffineTransform3D::New();
+    mitk::AffineTransform3D::OutputVectorType rotationAxis(0.);
+    rotationAxis[1] = 1.;
+    obliqueTransform->Rotate3D(rotationAxis, 0.6);
+    mitk::AffineTransform3D::OutputVectorType translation;
+    translation[0] = 100.;
+    translation[1] = -50.;
+    translation[2] = -150.;
+    obliqueTransform->SetTranslation(translation);
+    aDummyGeometryOblique->SetIndexToWorldTransform(obliqueTransform);
   }
 
   void tearDown() override
@@ -378,7 +408,7 @@ public:
     matrix = vnlmatrix;
     anotherTransform->SetMatrix(matrix);
 
-    CPPUNIT_ASSERT(mitk::Equal(anotherTransform, dummy->GetIndexToWorldTransform(), mitk::eps, true));
+    CPPUNIT_ASSERT(mitk::Equal(*anotherTransform, *(dummy->GetIndexToWorldTransform()), mitk::eps, true));
   }
 
   void TestSetIndexToWorldTransform_WithPointerToSameTransform()
@@ -550,18 +580,18 @@ public:
     anotherTransform->SetMatrix(anotherMatrix);
     anotherTransform->SetMatrix(aMatrix);
     CPPUNIT_ASSERT_MESSAGE("Exact same transforms are mitk::Equal() for eps=mitk::eps",
-                           mitk::Equal(aTransform, anotherTransform, mitk::eps, true));
+                           mitk::Equal(*aTransform, *anotherTransform, mitk::eps, true));
     CPPUNIT_ASSERT_MESSAGE("Exact same transforms are mitk::Equal() for eps=vnl_math::eps",
-                           mitk::Equal(aTransform, anotherTransform, vnl_math::eps, true));
+                           mitk::Equal(*aTransform, *anotherTransform, vnl_math::eps, true));
 
     anotherMatrix(0, 1) = 0.0002 + mitk::eps;
     anotherTransform->SetMatrix(anotherMatrix);
     CPPUNIT_ASSERT_MESSAGE("Transforms of diff mitk::eps are !mitk::Equal() for eps=vnl_math::eps",
-                           !mitk::Equal(aTransform, anotherTransform, vnl_math::eps, true));
+                           !mitk::Equal(*aTransform, *anotherTransform, vnl_math::eps, true));
     CPPUNIT_ASSERT_MESSAGE("Transforms of diff mitk::eps are !mitk::Equal() for eps=mitk::eps-1%",
-                           !mitk::Equal(aTransform, anotherTransform, mitk::eps * 0.99, true));
+                           !mitk::Equal(*aTransform, *anotherTransform, mitk::eps * 0.99, true));
     CPPUNIT_ASSERT_MESSAGE("Transforms of diff mitk::eps _are_ mitk::Equal() for eps=mitk::eps+1%",
-                           mitk::Equal(aTransform, anotherTransform, mitk::eps * 1.01, true));
+                           mitk::Equal(*aTransform, *anotherTransform, mitk::eps * 1.01, true));
   }
 
   void TestComposeTransform()
@@ -1371,9 +1401,13 @@ public:
     }
   }
 
-  void IsSubGeometry_Bounds()
+  void IsSubGeometry_Bounds_NoneImage()
   {
     IsSubGeometry_Bounds_internal(false);
+  }
+
+  void IsSubGeometry_Bounds_Image()
+  {
     IsSubGeometry_Bounds_internal(true);
   }
 
@@ -1426,9 +1460,13 @@ public:
     }
   }
 
-  void IsSubGeometry_Grid()
+  void IsSubGeometry_Grid_Image()
   {
     IsSubGeometry_Grid_internal(true);
+  }
+
+  void IsSubGeometry_Grid_NoneImage()
+  {
     IsSubGeometry_Grid_internal(false);
   }
 
@@ -1498,21 +1536,146 @@ public:
     }
   }
 
-
-  /*
-
-  void (){
-  DummyTestClass::Pointer dummy = DummyTestClass::New();
-
-  CPPUNIT_ASSERT();
-
-  //undo changes, new and changed object need to be the same!
-
-  DummyTestClass::Pointer newDummy = DummyTestClass::New();
-  CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+  void IsSubGeometry_Bounds_Oblique_NoneImage()
+  {
+    IsSubGeometry_Bounds_Oblique_internal(false);
   }
 
-  */
+  void IsSubGeometry_Bounds_Oblique_Image()
+  {
+    IsSubGeometry_Bounds_Oblique_internal(true);
+  }
+
+  void IsSubGeometry_Bounds_Oblique_internal(bool isImage)
+  {
+    auto newBounds = aDummyGeometryOblique->GetBounds();
+    aDummyGeometryOblique->SetImageGeometry(isImage);
+
+    //REMARK: used NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION to compensate rounding errors that
+    //are interoduced when transforming points/indeces due to the oblique geometry.
+    CPPUNIT_ASSERT(mitk::IsSubGeometry(*aDummyGeometryOblique, *aDummyGeometryOblique, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION, true));
+
+    for (unsigned int i = 0; i < 6; ++i)
+    {
+      auto legalBounds = newBounds;
+      if (i % 2 == 0)
+      {
+        legalBounds[i] += 1;
+      }
+      else
+      {
+        legalBounds[i] -= 1;
+      }
+      auto legalGeometry = aDummyGeometryOblique->Clone();
+      legalGeometry->SetBounds(legalBounds);
+
+      CPPUNIT_ASSERT(mitk::IsSubGeometry(*legalGeometry, *aDummyGeometryOblique, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION, true));
+    }
+
+    for (unsigned int i = 0; i < 6; ++i)
+    {
+      auto wrongBounds = newBounds;
+      if (i % 2 == 0)
+      {
+        wrongBounds[i] -= 1;
+      }
+      else
+      {
+        wrongBounds[i] += 1;
+      }
+      auto wrongGeometry = aDummyGeometryOblique->Clone();
+      wrongGeometry->SetBounds(wrongBounds);
+
+      CPPUNIT_ASSERT(!mitk::IsSubGeometry(*wrongGeometry, *aDummyGeometryOblique, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION, true));
+    }
+  }
+
+  void IsSubGeometry_Grid_Oblique_NoneImage()
+  {
+    IsSubGeometry_Grid_Oblique_internal(false);
+  }
+
+  void IsSubGeometry_Grid_Oblique_Image()
+  {
+    IsSubGeometry_Grid_Oblique_internal(true);
+  }
+
+  void IsSubGeometry_Grid_Oblique_internal(bool isImage)
+  {
+    auto newBounds = aDummyGeometryOblique->GetBounds();
+    newBounds[0] = 0;
+    newBounds[1] = 20;
+    newBounds[2] = 0;
+    newBounds[3] = 20;
+    newBounds[4] = 0;
+    newBounds[5] = 20;
+    aDummyGeometryOblique->SetBounds(newBounds);
+    aDummyGeometryOblique->SetImageGeometry(isImage);
+
+    auto smallerGeometry = aDummyGeometryOblique->Clone();
+    newBounds[0] = 5;
+    newBounds[1] = 10;
+    newBounds[2] = 5;
+    newBounds[3] = 10;
+    newBounds[4] = 5;
+    newBounds[5] = 10;
+    smallerGeometry->SetBounds(newBounds);
+
+    //REMARK: used NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION in the following checks
+    //to compensate rounding errors that are interoduced when transforming points/indeces
+    //due to the oblique geometry.
+
+    //legal negative shift
+    for (unsigned int i = 0; i < 3; ++i)
+    {
+      auto legalOrigin = smallerGeometry->GetOrigin();
+      mitk::Point3D index;
+      smallerGeometry->WorldToIndex(legalOrigin, index);
+      index[i] -= 1;
+      smallerGeometry->IndexToWorld(index, legalOrigin);
+      auto legalGeometry = smallerGeometry->Clone();
+      legalGeometry->SetOrigin(legalOrigin);
+
+      CPPUNIT_ASSERT(mitk::IsSubGeometry(*legalGeometry, *aDummyGeometryOblique, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION, true));
+    }
+
+    //legal positive shift
+    for (unsigned int i = 0; i < 3; ++i)
+    {
+      auto legalOrigin = smallerGeometry->GetOrigin();
+      mitk::Point3D index;
+      smallerGeometry->WorldToIndex(legalOrigin, index);
+      index[i] += 1;
+      smallerGeometry->IndexToWorld(index, legalOrigin);
+      auto legalGeometry = smallerGeometry->Clone();
+      legalGeometry->SetOrigin(legalOrigin);
+
+      CPPUNIT_ASSERT(mitk::IsSubGeometry(*legalGeometry, *aDummyGeometryOblique, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION, true));
+    }
+
+    //wrong negative shift
+    for (unsigned int i = 0; i < 3; ++i)
+    {
+      auto wrongOrigin = smallerGeometry->GetOrigin();
+      wrongOrigin[i] -= 2 * mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION;
+      auto wrongGeometry = smallerGeometry->Clone();
+      wrongGeometry->SetOrigin(wrongOrigin);
+
+      CPPUNIT_ASSERT(!mitk::IsSubGeometry(*wrongGeometry, *aDummyGeometryOblique, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION, true));
+    }
+
+    //wrong positive shift
+    for (unsigned int i = 0; i < 3; ++i)
+    {
+      auto wrongOrigin = smallerGeometry->GetOrigin();
+      wrongOrigin[i] += 2 * mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION;
+      auto wrongGeometry = smallerGeometry->Clone();
+      wrongGeometry->SetOrigin(wrongOrigin);
+
+      CPPUNIT_ASSERT(!mitk::IsSubGeometry(*wrongGeometry, *aDummyGeometryOblique, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION, true));
+    }
+  }
+
 }; // end class mitkBaseGeometryTestSuite
 
 MITK_TEST_SUITE_REGISTRATION(mitkBaseGeometry)

@@ -24,9 +24,20 @@ found in the LICENSE file.
 // STL
 #include <sstream>
 
+namespace mitk
+{
+  struct GIFFirstOrderStatisticsParameterStruct
+  {
+    double MinimumIntensity;
+    double MaximumIntensity;
+    int Bins;
+    FeatureID id;
+  };
+}
+
 template<typename TPixel, unsigned int VImageDimension>
 void
-CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFFirstOrderStatistics::FeatureListType & featureList, mitk::GIFFirstOrderStatistics::ParameterStruct params)
+CalculateFirstOrderStatistics(const itk::Image<TPixel, VImageDimension>* itkImage, const mitk::Image* mask, mitk::GIFFirstOrderStatistics::FeatureListType & featureList, mitk::GIFFirstOrderStatisticsParameterStruct params)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<unsigned short, VImageDimension> MaskType;
@@ -199,62 +210,62 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
     robustMeanAbsoluteDeviation = robustMeanAbsoluteDeviation / histogram->GetTotalFrequency();
   }
 
-  featureList.push_back(std::make_pair(params.prefix + "Mean", labelStatisticsImageFilter->GetMean(1)));
-  featureList.push_back(std::make_pair(params.prefix + "Unbiased Variance", labelStatisticsImageFilter->GetVariance(1))); //Siehe Definition von Unbiased Variance estimation. (Wird nicht durch n sondern durch n-1 normalisiert)
-  featureList.push_back(std::make_pair(params.prefix + "Biased Variance", variance));
-  featureList.push_back(std::make_pair(params.prefix + "Skewness", skewness));
-  featureList.push_back(std::make_pair(params.prefix + "Kurtosis", kurtosis));
-  featureList.push_back(std::make_pair(params.prefix + "Median", labelStatisticsImageFilter->GetMedian(1)));
-  featureList.push_back(std::make_pair(params.prefix + "Minimum", labelStatisticsImageFilter->GetMinimum(1)));
-  featureList.push_back(std::make_pair(params.prefix + "Maximum", labelStatisticsImageFilter->GetMaximum(1)));
-  featureList.push_back(std::make_pair(params.prefix + "Range", range));
-  featureList.push_back(std::make_pair(params.prefix + "Mean Absolute Deviation", mean_absolut_deviation));
-  featureList.push_back(std::make_pair(params.prefix + "Robust Mean Absolute Deviation", robustMeanAbsoluteDeviation));
-  featureList.push_back(std::make_pair(params.prefix + "Median Absolute Deviation", median_absolut_deviation));
-  featureList.push_back(std::make_pair(params.prefix + "Coefficient Of Variation", coefficient_of_variation));
-  featureList.push_back(std::make_pair(params.prefix + "Quantile Coefficient Of Dispersion", quantile_coefficient_of_dispersion));
-  featureList.push_back(std::make_pair(params.prefix + "Energy", squared_sum));
-  featureList.push_back(std::make_pair(params.prefix + "Root Mean Square", rms));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Mean"), labelStatisticsImageFilter->GetMean(1)));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Unbiased Variance"), labelStatisticsImageFilter->GetVariance(1))); //Siehe Definition von Unbiased Variance estimation. (Wird nicht durch n sondern durch n-1 normalisiert)
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Biased Variance"), variance));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Skewness"), skewness));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Kurtosis"), kurtosis));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Median"), labelStatisticsImageFilter->GetMedian(1)));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Minimum"), labelStatisticsImageFilter->GetMinimum(1)));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Maximum"), labelStatisticsImageFilter->GetMaximum(1)));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Range"), range));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Mean Absolute Deviation"), mean_absolut_deviation));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Robust Mean Absolute Deviation"), robustMeanAbsoluteDeviation));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Median Absolute Deviation"), median_absolut_deviation));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Coefficient Of Variation"), coefficient_of_variation));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Quantile Coefficient Of Dispersion"), quantile_coefficient_of_dispersion));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Energy"), squared_sum));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Root Mean Square"), rms));
 
   typename HistogramType::MeasurementVectorType mv(1);
   mv[0] = 0;
   typename HistogramType::IndexType resultingIndex;
   histogram->GetIndex(mv, resultingIndex);
-  featureList.push_back(std::make_pair(params.prefix + "Robust Mean", meanRobust));
-  featureList.push_back(std::make_pair(params.prefix + "Uniformity", uniformity));
-  featureList.push_back(std::make_pair(params.prefix + "Entropy", entropy));
-  featureList.push_back(std::make_pair(params.prefix + "Excess Kurtosis", kurtosis - 3));
-  featureList.push_back(std::make_pair(params.prefix + "Covered Image Intensity Range", coveredGrayValueRange));
-  featureList.push_back(std::make_pair(params.prefix + "Sum", labelStatisticsImageFilter->GetSum(1)));
-  featureList.push_back(std::make_pair(params.prefix + "Mode", mode_bin));
-  featureList.push_back(std::make_pair(params.prefix + "Mode Probability", mode_value));
-  featureList.push_back(std::make_pair(params.prefix + "Unbiased Standard deviation", labelStatisticsImageFilter->GetSigma(1)));
-  featureList.push_back(std::make_pair(params.prefix + "Biased Standard deviation", sqrt(variance)));
-  featureList.push_back(std::make_pair(params.prefix + "Number Of Voxels", labelStatisticsImageFilter->GetCount(1)));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Robust Mean"), meanRobust));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Uniformity"), uniformity));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Entropy"), entropy));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Excess Kurtosis"), kurtosis - 3));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Covered Image Intensity Range"), coveredGrayValueRange));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Sum"), labelStatisticsImageFilter->GetSum(1)));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Mode"), mode_bin));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Mode Probability"), mode_value));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Unbiased Standard deviation"), labelStatisticsImageFilter->GetSigma(1)));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Biased Standard deviation"), sqrt(variance)));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Number Of Voxels"), labelStatisticsImageFilter->GetCount(1)));
 
-  featureList.push_back(std::make_pair(params.prefix + "05th Percentile", p05th));
-  featureList.push_back(std::make_pair(params.prefix + "10th Percentile", p10th));
-  featureList.push_back(std::make_pair(params.prefix + "15th Percentile", p15th));
-  featureList.push_back(std::make_pair(params.prefix + "20th Percentile", p20th));
-  featureList.push_back(std::make_pair(params.prefix + "25th Percentile", p25th));
-  featureList.push_back(std::make_pair(params.prefix + "30th Percentile", p30th));
-  featureList.push_back(std::make_pair(params.prefix + "35th Percentile", p35th));
-  featureList.push_back(std::make_pair(params.prefix + "40th Percentile", p40th));
-  featureList.push_back(std::make_pair(params.prefix + "45th Percentile", p45th));
-  featureList.push_back(std::make_pair(params.prefix + "50th Percentile", p50th));
-  featureList.push_back(std::make_pair(params.prefix + "55th Percentile", p55th));
-  featureList.push_back(std::make_pair(params.prefix + "60th Percentile", p60th));
-  featureList.push_back(std::make_pair(params.prefix + "65th Percentile", p65th));
-  featureList.push_back(std::make_pair(params.prefix + "70th Percentile", p70th));
-  featureList.push_back(std::make_pair(params.prefix + "75th Percentile", p75th));
-  featureList.push_back(std::make_pair(params.prefix + "80th Percentile", p80th));
-  featureList.push_back(std::make_pair(params.prefix + "85th Percentile", p85th));
-  featureList.push_back(std::make_pair(params.prefix + "90th Percentile", p90th));
-  featureList.push_back(std::make_pair(params.prefix + "95th Percentile", p95th));
-  featureList.push_back(std::make_pair(params.prefix + "Interquartile Range", (p75th - p25th)));
-  featureList.push_back(std::make_pair(params.prefix + "Image Dimension", VImageDimension));
-  featureList.push_back(std::make_pair(params.prefix + "Voxel Space", voxelSpace));
-  featureList.push_back(std::make_pair(params.prefix + "Voxel Volume", voxelVolume));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"05th Percentile"), p05th));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"10th Percentile"), p10th));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"15th Percentile"), p15th));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"20th Percentile"), p20th));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"25th Percentile"), p25th));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"30th Percentile"), p30th));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"35th Percentile"), p35th));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"40th Percentile"), p40th));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"45th Percentile"), p45th));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"50th Percentile"), p50th));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"55th Percentile"), p55th));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"60th Percentile"), p60th));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"65th Percentile"), p65th));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"70th Percentile"), p70th));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"75th Percentile"), p75th));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"80th Percentile"), p80th));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"85th Percentile"), p85th));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"90th Percentile"), p90th));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"95th Percentile"), p95th));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Interquartile Range"), (p75th - p25th)));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Image Dimension"), VImageDimension));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Voxel Space"), voxelSpace));
+  featureList.push_back(std::make_pair(mitk::CreateFeatureID(params.id,"Voxel Volume"), voxelVolume));
 }
 
 mitk::GIFFirstOrderStatistics::GIFFirstOrderStatistics()
@@ -264,60 +275,35 @@ mitk::GIFFirstOrderStatistics::GIFFirstOrderStatistics()
   SetFeatureClassName("First Order");
 }
 
-mitk::GIFFirstOrderStatistics::FeatureListType mitk::GIFFirstOrderStatistics::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
+void mitk::GIFFirstOrderStatistics::AddArguments(mitkCommandLineParser& parser) const
 {
-  InitializeQuantifier(image, mask);
+  this->AddQuantifierArguments(parser);
+
+  std::string name = this->GetOptionPrefix();
+  parser.addArgument(this->GetLongName(), name, mitkCommandLineParser::Bool, "Use first order statistics as feature", "calculates first order statistics features", us::Any());
+}
+
+mitk::AbstractGlobalImageFeature::FeatureListType mitk::GIFFirstOrderStatistics::DoCalculateFeatures(const Image* image, const Image* mask)
+{
   FeatureListType featureList;
 
-  ParameterStruct params;
+  this->InitializeQuantifier(image, mask);
 
+  MITK_INFO << "Start calculating first order features ....";
+
+  GIFFirstOrderStatisticsParameterStruct params;
   params.MinimumIntensity = GetQuantifier()->GetMinimum();
   params.MaximumIntensity = GetQuantifier()->GetMaximum();
   params.Bins = GetQuantifier()->GetBins();
-  params.prefix = FeatureDescriptionPrefix();
+  params.id = this->CreateTemplateFeatureID();
   AccessByItk_3(image, CalculateFirstOrderStatistics, mask, featureList, params);
 
+  MITK_INFO << "Finished calculating first order features....";
+
   return featureList;
 }
 
-mitk::GIFFirstOrderStatistics::FeatureNameListType mitk::GIFFirstOrderStatistics::GetFeatureNames()
+mitk::AbstractGlobalImageFeature::FeatureListType mitk::GIFFirstOrderStatistics::CalculateFeatures(const Image* image, const Image*, const Image* maskNoNAN)
 {
-  FeatureNameListType featureList;
-  featureList.push_back("First Order::Minimum");
-  featureList.push_back("First Order::Maximum");
-  featureList.push_back("First Order::Mean");
-  featureList.push_back("First Order::Variance");
-  featureList.push_back("First Order::Sum");
-  featureList.push_back("First Order::Median");
-  featureList.push_back("First Order::Standard deviation");
-  featureList.push_back("First Order::No. of Voxel");
-  return featureList;
-}
-
-
-void mitk::GIFFirstOrderStatistics::AddArguments(mitkCommandLineParser &parser)
-{
-  std::string name = GetOptionPrefix();
-
-  parser.addArgument(GetLongName(), name, mitkCommandLineParser::Bool, "Use Volume-Statistic", "calculates volume based features", us::Any());
-  AddQuantifierArguments(parser);
-}
-
-void
-mitk::GIFFirstOrderStatistics::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &, const Image::Pointer &maskNoNAN, FeatureListType &featureList)
-{
-  auto parsedArgs = GetParameter();
-  if (parsedArgs.count(GetLongName()))
-  {
-    InitializeQuantifierFromParameters(feature, maskNoNAN);
-    MITK_INFO << "Start calculating first order features ....";
-    auto localResults = this->CalculateFeatures(feature, maskNoNAN);
-    featureList.insert(featureList.end(), localResults.begin(), localResults.end());
-    MITK_INFO << "Finished calculating first order features....";
-  }
-}
-
-std::string mitk::GIFFirstOrderStatistics::GetCurrentFeatureEncoding()
-{
-  return QuantifierParameterString();
+  return Superclass::CalculateFeatures(image, maskNoNAN);
 }

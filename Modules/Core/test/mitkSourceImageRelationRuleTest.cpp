@@ -28,6 +28,7 @@ class mitkSourceImageRelationRuleTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkSourceImageRelationRuleTestSuite);
 
+  MITK_TEST(ConstructionAndGetter);
   MITK_TEST(IsSourceCandidate);
   MITK_TEST(IsDestinationCandidate);
   MITK_TEST(IsSource);
@@ -289,6 +290,34 @@ public:
   }
 
   void tearDown() override {}
+
+  void ConstructionAndGetter()
+  {
+    CPPUNIT_ASSERT(abstractRule->IsAbstract());
+    CPPUNIT_ASSERT(!rule->IsAbstract());
+
+    CPPUNIT_ASSERT_EQUAL(abstractRule->GetRuleID(), std::string("SourceImageRelation"));
+    CPPUNIT_ASSERT_EQUAL(abstractRule->GetDisplayName(), std::string("Abstract image to image relation"));
+    CPPUNIT_ASSERT_EQUAL(abstractRule->GetSourceRoleName(), std::string("derived data"));
+    CPPUNIT_ASSERT_EQUAL(abstractRule->GetDestinationRoleName(), std::string("source image"));
+
+    CPPUNIT_ASSERT_EQUAL(rule->GetRuleID(), std::string("SourceImageRelation Test"));
+    CPPUNIT_ASSERT_EQUAL(rule->GetDisplayName(), std::string("Test relation"));
+    CPPUNIT_ASSERT_EQUAL(rule->GetSourceRoleName(), std::string("derived data"));
+    CPPUNIT_ASSERT_EQUAL(rule->GetDestinationRoleName(), std::string("source image"));
+
+    rule = mitk::SourceImageRelationRule::New("Test2", "DisplayName2");
+    CPPUNIT_ASSERT_EQUAL(rule->GetRuleID(), std::string("SourceImageRelation Test2"));
+    CPPUNIT_ASSERT_EQUAL(rule->GetDisplayName(), std::string("DisplayName2"));
+    CPPUNIT_ASSERT_EQUAL(rule->GetSourceRoleName(), std::string("derived data"));
+    CPPUNIT_ASSERT_EQUAL(rule->GetDestinationRoleName(), std::string("source image"));
+
+    rule = mitk::SourceImageRelationRule::New("Test3", "DisplayName3", "s", "d");
+    CPPUNIT_ASSERT_EQUAL(rule->GetRuleID(), std::string("SourceImageRelation Test3"));
+    CPPUNIT_ASSERT_EQUAL(rule->GetDisplayName(), std::string("DisplayName3"));
+    CPPUNIT_ASSERT_EQUAL(rule->GetSourceRoleName(), std::string("s"));
+    CPPUNIT_ASSERT_EQUAL(rule->GetDestinationRoleName(), std::string("d"));
+  }
 
   void IsSourceCandidate()
   {

@@ -186,6 +186,7 @@ namespace mitk
     val = imAccess.GetConsecutivePixelsAsVector(idx, component + 1).GetElement(component);
     return val;
   }
+
 }
 
 #endif // MITKIMAGEPIXELREADACCESSOR_H

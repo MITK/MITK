@@ -9,6 +9,7 @@ set(INTERNAL_CPP_FILES
   QmitkCreatePolygonModelAction.cpp
   #QmitkStatisticsAction.cpp
   QmitkAutocropAction.cpp
+  QmitkAutocropLabelSetImageAction.cpp
   QmitkDeformableClippingPlaneView.cpp
   Common/QmitkDataSelectionWidget.cpp
   SegmentationUtilities/QmitkSegmentationUtilitiesView.cpp
@@ -40,6 +41,7 @@ set(MOC_H_FILES
   src/internal/QmitkCreatePolygonModelAction.h
   #src/internal/QmitkStatisticsAction.h
   src/internal/QmitkAutocropAction.h
+  src/internal/QmitkAutocropLabelSetImageAction.h
   src/internal/QmitkDeformableClippingPlaneView.h
   src/internal/Common/QmitkDataSelectionWidget.h
   src/internal/SegmentationUtilities/QmitkSegmentationUtilitiesView.h

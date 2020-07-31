@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+  <extension point="org.blueberry.ui.editors">
+    <editor
+      id="org.mitk.editors.dicombrowser"
+      name="MITK DICOM Browser"
+      class="QmitkDicomBrowser"
+      icon="resources/dicom.svg">
+    </editor>
+  </extension>
+
+  <extension point="org.blueberry.ui.preferencePages">
+    <page id="org.mitk.gui.qt.application.QmitkDicomPreferencePage" name="Dicom Editor" class="QmitkDicomPreferencePage">
+      <keywordreference id="org.mitk.gui.qt.application.DataManagerPreferencePageKeywords"></keywordreference>
+    </page>
+  </extension>
+  <extension point="org.blueberry.ui.keywords">
+    <keyword id="org.mitk.gui.qt.application.DataManagerPreferencePageKeywords" label="DICOM Browser Preferences"/>
+  </extension>
+</plugin>

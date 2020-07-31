@@ -204,7 +204,7 @@ void mitk::ExtractSliceFilter::GenerateOutputInformation()
   sliceGeometry->Modified();
 
   Image::Pointer output = this->GetOutput();
-  output->Initialize(input->GetPixelType(), 2, *sliceGeometry);
+  output->Initialize(input->GetPixelType(), 1, *sliceGeometry);
 
   m_XMin = xMin;
   m_XMax = xMax;

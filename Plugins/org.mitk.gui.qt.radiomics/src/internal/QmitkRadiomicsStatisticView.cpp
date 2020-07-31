@@ -252,7 +252,7 @@ void QmitkRadiomicsStatistic::executeButtonPressed()
   {
     m_Controls->m_ResultTable->setItem(i, 0, new QTableWidgetItem(imageName));
     m_Controls->m_ResultTable->setItem(i, 1, new QTableWidgetItem(maskName));
-    m_Controls->m_ResultTable->setItem(i, 2, new QTableWidgetItem(stats[i].first.c_str()));
+    m_Controls->m_ResultTable->setItem(i, 2, new QTableWidgetItem(stats[i].first.legacyName.c_str()));
     m_Controls->m_ResultTable->setItem(i, 3, new QTableWidgetItem(QString::number(stats[i].second)));
   }
   }

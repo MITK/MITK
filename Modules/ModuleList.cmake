@@ -12,8 +12,7 @@ set(MITK_MODULES
   LegacyGL
   AlgorithmsExt
   MapperExt
-  DICOMReader
-  DICOMReaderServices
+  DICOM
   DICOMQI
   DICOMTesting
   SceneSerializationBase
@@ -51,14 +50,14 @@ set(MITK_MODULES
   PhotoacousticsLib
   US
   USUI
-  DicomUI
+  DICOMUI
   Remeshing
   Python
   QtPython
   Persistence
   OpenIGTLinkUI
   IGTUI
-  DicomRT
+  RT
   RTUI
   IOExt
   XNAT

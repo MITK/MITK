@@ -36,6 +36,7 @@ void mitk::cl::GlobalImageFeaturesParameter::AddParameter(mitkCommandLineParser 
   parser.addArgument("output",  "o", mitkCommandLineParser::File, "Output text file", "Path to output file. The output statistic is appended to this file.", us::Any(), false, false, false, mitkCommandLineParser::Output);
 
   // Optional Parameter
+  parser.addArgument("xml-output", "x", mitkCommandLineParser::File, "XML result file", "Path where the results should be stored as XML result file. ", us::Any(), true, false, false, mitkCommandLineParser::Input);
   parser.addArgument("logfile",    "log",         mitkCommandLineParser::File, "Text Logfile", "Path to the location of the target log file. ", us::Any(), true, false, false, mitkCommandLineParser::Input);
   parser.addArgument("save-image", "save-image",  mitkCommandLineParser::File, "Output Image", "If spezified, the image that is used for the analysis is saved to this location.", us::Any(), true, false, false, mitkCommandLineParser::Output);
   parser.addArgument("save-mask", "save-mask",    mitkCommandLineParser::File, "Output Image", "If spezified, the mask that is used for the analysis is saved to this location. ", us::Any(), true, false, false, mitkCommandLineParser::Output);
@@ -54,7 +55,9 @@ void mitk::cl::GlobalImageFeaturesParameter::AddParameter(mitkCommandLineParser 
   parser.addArgument("bins", "bins", mitkCommandLineParser::Int, "Int", "Number of bins if bins are used. If set, it is overwritten by more specific bin count", us::Any());
   parser.addArgument("binsize", "binsize", mitkCommandLineParser::Float, "Int", "Size of bins that is used. If set, it is overwritten by more specific bin count", us::Any());
   parser.addArgument("ignore-mask-for-histogram", "ignore-mask", mitkCommandLineParser::Bool, "Bool", "If the whole image is used to calculate the histogram. ", us::Any());
-  parser.addArgument("encode-parameter-in-name", "encode-parameter", mitkCommandLineParser::Bool, "Bool", "If true, the parameters used for each feature is encoded in its name. ", us::Any());
+  parser.addArgument("encode-parameter-in-name", "encode-parameter", mitkCommandLineParser::Bool, "Bool", "If true, the parameters used for each feature is encoded in its name.", us::Any());
+  parser.addArgument("pipeline-uid", "p", mitkCommandLineParser::String, "Pipeline UID", "UID that is stored in the XML output and identifies the processing pipeline the app is used in.", us::Any());
+  parser.addArgument("all-features", "a", mitkCommandLineParser::Bool, "Calculate all features", "If true, all features will be calculated and the feature specific activation will be ignored.", us::Any());
 }
 
 void mitk::cl::GlobalImageFeaturesParameter::ParseParameter(std::map<std::string, us::Any> parsedArgs)
@@ -89,6 +92,11 @@ void mitk::cl::GlobalImageFeaturesParameter::ParseFileLocations(std::map<std::st
     morphName = itksys::SystemTools::GetFilenameName(morphPath);
   }
 
+  outputXMLPath = "";
+  if (parsedArgs.count("xml-output"))
+  {
+    outputXMLPath = parsedArgs["xml-output"].ToString();
+  }
 }
 
 void mitk::cl::GlobalImageFeaturesParameter::ParseAdditionalOutputs(std::map<std::string, us::Any> &parsedArgs)
@@ -138,6 +146,13 @@ void mitk::cl::GlobalImageFeaturesParameter::ParseAdditionalOutputs(std::map<std
     }
   }
 
+  pipelineUID = "";
+  if (parsedArgs.count("pipeline-uid"))
+  {
+    pipelineUID = us::any_cast<std::string>(parsedArgs["pipeline-uid"]);
+  }
+
+  calculateAllFeatures = parsedArgs.count("all-features");
 }
 
 void mitk::cl::GlobalImageFeaturesParameter::ParseHeaderInformation(std::map<std::string, us::Any> &parsedArgs)

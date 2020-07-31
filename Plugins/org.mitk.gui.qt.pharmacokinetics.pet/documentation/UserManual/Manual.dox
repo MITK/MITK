@@ -1,5 +1,5 @@
-/**
-\page org_mitk_gui_qt_pharmacokinetics_pet The Dynamic PET DataFit View
+﻿/**
+\page org_mitk_gui_qt_pharmacokinetics_pet Dynamic PET DataFit View
 
 \imageMacro{pharmacokinetics_pet_doc.svg,"Icon of the DCE MR Perfusion View",3.0}
 
@@ -13,7 +13,7 @@ This plug-in is being developed by Charlotte Debus and the SIDT group (Software 
 and Therapy) at the German Cancer Research Center (DKFZ).
 If you have any questions, need support, find a bug or have a feature request, feel free to contact us at www.mitk.org.
 
-\subsection FIT_DCE_Cite Citation information
+\subsection FIT_PET_Cite Citation information
 If you use the view for your research please cite our work as reference:\n\n
 Debus C and Floca R, Ingrisch M, Kompan I, Maier-Hein K, Abdollahi A, Nolden M, MITK-ModelFit: generic open-source framework for model fits and their exploration in medical imaging – design, implementation and application on the example of DCE-MRI (arXiv:1807.07353)
 

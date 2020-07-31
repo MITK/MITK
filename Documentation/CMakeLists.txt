@@ -60,17 +60,6 @@ if(MITK_DOXYGEN_GENERATE_QCH_FILES)
 
 endif()
 
-
-if(MITK_USE_BLUEBERRY)
-  file(RELATIVE_PATH _blueberry_doxygen_path ${MITK_DOXYGEN_OUTPUT_DIR}/html ${BLUEBERRY_DOXYGEN_OUTPUT_DIR}/html)
-  set(BLUEBERRY_DOXYGEN_TAGFILE "${BLUEBERRY_DOXYGEN_TAGFILE_NAME}=${_blueberry_doxygen_path}")
-  set(BLUEBERRY_DOXYGEN_LINK "<a class=\"el\" href=\"${_blueberry_doxygen_path}/index.html\">BlueBerry Documentation</a>")
-  set(MITK_XP_LINK "\\ref mitkExtPointsIndex")
-  configure_file(schema.css ${MITK_DOXYGEN_OUTPUT_DIR}/html/schema.css)
-
-  set(MITK_DOXYGEN_ENABLED_SECTIONS "${MITK_DOXYGEN_ENABLED_SECTIONS} BLUEBERRY")
-endif(MITK_USE_BLUEBERRY)
-
 # Compile a doxygen input filter for processing CMake scripts
 include(mitkFunctionCMakeDoxygenFilterCompile)
 mitkFunctionCMakeDoxygenFilterCompile(NAMESPACE "CMake")

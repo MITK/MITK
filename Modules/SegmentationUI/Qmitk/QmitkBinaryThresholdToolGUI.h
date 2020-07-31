@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <MitkSegmentationUIExports.h>
 
 #include "ctkSliderWidget.h"
+#include <qcheckbox.h>
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
@@ -65,7 +66,10 @@ protected:
   QmitkBinaryThresholdToolGUI();
   ~QmitkBinaryThresholdToolGUI() override;
 
-  ctkSliderWidget* m_ThresholdSlider;
+  ctkSliderWidget* m_ThresholdSlider = nullptr;
+  QCheckBox* m_CheckProcessAll = nullptr;
+  QCheckBox* m_CheckCreateNew = nullptr;
+
   bool m_InternalUpdate = false;
 
   mitk::BinaryThresholdTool::Pointer m_BinaryThresholdTool;

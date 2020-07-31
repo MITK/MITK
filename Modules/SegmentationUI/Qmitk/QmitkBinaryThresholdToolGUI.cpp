@@ -11,8 +11,6 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkBinaryThresholdToolGUI.h"
-#include "QmitkConfirmSegmentationDialog.h"
-#include "QmitkNewSegmentationDialog.h"
 
 #include <qlabel.h>
 #include <qlayout.h>
@@ -47,12 +45,19 @@ QmitkBinaryThresholdToolGUI::QmitkBinaryThresholdToolGUI()
   okButton->setFont(f);
   mainLayout->addWidget(okButton);
 
+  m_CheckProcessAll = new QCheckBox("Process all time steps", this);
+  m_CheckProcessAll->setChecked(false);
+  mainLayout->addWidget(m_CheckProcessAll);
+
+  m_CheckCreateNew = new QCheckBox("Create as new segmentation", this);
+  m_CheckCreateNew->setChecked(false);
+  mainLayout->addWidget(m_CheckCreateNew);
+
   connect(this, SIGNAL(NewToolAssociated(mitk::Tool *)), this, SLOT(OnNewToolAssociated(mitk::Tool *)));
 }
 
 QmitkBinaryThresholdToolGUI::~QmitkBinaryThresholdToolGUI()
 {
-  // !!!
   if (m_BinaryThresholdTool.IsNotNull())
   {
     m_BinaryThresholdTool->IntervalBordersChanged -=
@@ -83,31 +88,27 @@ void QmitkBinaryThresholdToolGUI::OnNewToolAssociated(mitk::Tool *tool)
         this, &QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged);
     m_BinaryThresholdTool->ThresholdingValuesChanged += mitk::MessageDelegate2<QmitkBinaryThresholdToolGUI, mitk::ScalarType, mitk::ScalarType>(
       this, &QmitkBinaryThresholdToolGUI::OnThresholdingValuesChanged);
+
+    m_BinaryThresholdTool->SetOverwriteExistingSegmentation(true);
+    m_CheckProcessAll->setVisible(m_BinaryThresholdTool->GetTargetSegmentationNode()->GetData()->GetTimeSteps()>1);
   }
 }
 
 void QmitkBinaryThresholdToolGUI::OnAcceptThresholdPreview()
 {
-  QmitkConfirmSegmentationDialog dialog;
-  QString segName = QString::fromStdString(m_BinaryThresholdTool->GetCurrentSegmentationName());
-
-  dialog.SetSegmentationName(segName);
-  int result = dialog.exec();
-
-  switch (result)
-  {
-    case QmitkConfirmSegmentationDialog::CREATE_NEW_SEGMENTATION:
-      m_BinaryThresholdTool->SetOverwriteExistingSegmentation(false);
-      break;
-    case QmitkConfirmSegmentationDialog::OVERWRITE_SEGMENTATION:
-      m_BinaryThresholdTool->SetOverwriteExistingSegmentation(true);
-      break;
-    case QmitkConfirmSegmentationDialog::CANCEL_SEGMENTATION:
-      return;
-  }
-
   if (m_BinaryThresholdTool.IsNotNull())
   {
+    if (m_CheckCreateNew->isChecked())
+    {
+      m_BinaryThresholdTool->SetOverwriteExistingSegmentation(false);
+    }
+    else
+    {
+      m_BinaryThresholdTool->SetOverwriteExistingSegmentation(true);
+    }
+
+    m_BinaryThresholdTool->SetCreateAllTimeSteps(m_CheckProcessAll->isChecked());
+
     this->thresholdAccepted();
     m_BinaryThresholdTool->AcceptCurrentThresholdValue();
   }

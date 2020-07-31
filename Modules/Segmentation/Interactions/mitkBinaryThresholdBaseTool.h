@@ -46,6 +46,10 @@ namespace mitk
     virtual void AcceptCurrentThresholdValue();
     virtual void CancelThresholding();
 
+    itkSetMacro(CreateAllTimeSteps, bool);
+    itkGetMacro(CreateAllTimeSteps, bool);
+    itkBooleanMacro(CreateAllTimeSteps);
+
   protected:
     BinaryThresholdBaseTool(); // purposely hidden
     ~BinaryThresholdBaseTool() override;
@@ -79,7 +83,13 @@ namespace mitk
     ScalarType m_CurrentUpperThresholdValue;
 
     bool m_IsOldBinary = false;
+
+    /** Indicates if Accepting the threshold should transfer/create the segmentations
+     of all time steps (true) or only of the currently selected timepoint (false).*/
     bool m_CreateAllTimeSteps = false;
+
+    /** Indicates if the tool should behave like a single threshold tool (true)
+      or like a upper/lower threshold tool (false)*/
     bool m_LockedUpperThreshold = false;
   };
 

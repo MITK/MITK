@@ -8,24 +8,23 @@
 \tableofcontents
 
 \section FIT_DCE_Introduction Introduction
-In dynamic contrast-enhanced (DCE) MRI, pharmacokinetic (PK) modeling is used to quantify tissue physiology. 
-Parameters describing the microvasculature can be derived by fitting a pharmacokinetic model to the dynamic data. 
+In dynamic contrast-enhanced (DCE) MRI, pharmacokinetic (PK) modeling can be used to quantify tissue physiology. 
+Parameters describing the tissue microvasculature can be derived by fitting a pharmacokinetic model, e.g. a compartment model, to the dynamic data. 
+This view offers a comprehensive set of tools to perform pharmacokinetic analysis.
 
-
-\section FIT_DCE_Contact Contact information
+\section FIT_DCE_Contact Contact Information
 This plug-in is being developed by the SIDT group (Software development for Integrated Diagnostics and Therapy) at the German Cancer Research Center (DKFZ).
 If you have any questions, need support, find a bug or have a feature request, feel free to contact us at www.mitk.org.
 
-\subsection FIT_DCE_Cite Citation information
+\subsection FIT_DCE_Cite Citation Information
 If you use the view for your research please cite our work as reference:\n\n
 Debus C and Floca R, Ingrisch M, Kompan I, Maier-Hein K, Abdollahi A, Nolden M, MITK-ModelFit: generic open-source framework for model fits and their exploration in medical imaging – design, implementation and application on the example of DCE-MRI https://doi.org/10.1186/s12859-018-2588-1 (BMC Bioinformatics 2019 20:31)
 
-\section FIT_DCE_General General information
-\imageMacro{dce_mri_init.png, "Example screen shot showing the view at first start.", 10}
-For pharmacokinetic analysis of DCE MRI/CT data using compartment models in non-linear least square fitting the DCE MR Perfusion Datafit view can be used.
+\section FIT_DCE_Data_and_ROI_Selection Data and ROI Selection
+\imageMacro{dce_mri_maskAndFittingStrategy.png, "Data and ROI Selection.", 10}
 In principle, every model can be fitted on the entire image. However, for model configuration reasons (e.g. AIF required) and computational time cost, this is often not advisable.
 Therefore, apart from the image to be fitted (Selected Time Series), a ROI segmentation can be defined (Selected Mask), within which model fitting is performed.
-The view currently offers voxel wise and/or ROI averaged fits of intensity-time curves with different quantitative and semi-quantitative models.
+The view currently offers voxel-wise and/or ROI averaged fits of time-varying curves with different quantitative and semi-quantitative models.
 If a mask is selected, ROI-based fitting (fit average curve within ROI) is enabled (radio button Fitting Strategy – Pixel based / ROI based).
 
 \subsection FIT_DCE_General_models Supported models

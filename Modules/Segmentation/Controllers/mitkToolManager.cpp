@@ -32,7 +32,6 @@ mitk::ToolManager::ToolManager(DataStorage *storage)
   CoreObjectFactory::GetInstance(); // to make sure a CoreObjectFactory was instantiated (and in turn, possible tools
                                     // are registered) - bug 1029
   this->InitializeTools();
-  this->EnsureTimeObservation();
 }
 
 void mitk::ToolManager::EnsureTimeObservation()
@@ -208,8 +207,6 @@ bool mitk::ToolManager::ActivateTool(int id)
       }
     }
 
-    this->EnsureTimeObservation();
-
     m_ActiveTool = GetToolById(nextTool);
     m_ActiveToolID = m_ActiveTool ? nextTool : -1; // current ID if tool is valid, otherwise -1
 
@@ -217,6 +214,7 @@ bool mitk::ToolManager::ActivateTool(int id)
 
     if (m_ActiveTool)
     {
+      this->EnsureTimeObservation();
       if (m_RegisteredClients > 0)
       {
         m_ActiveTool->Activated();

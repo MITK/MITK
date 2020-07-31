@@ -16,7 +16,7 @@ If you have any questions, need support, find a bug or have a feature request, f
 
 \subsection FIT_DCE_Cite Citation information
 If you use the view for your research please cite our work as reference:\n\n
-Debus C and Floca R, Ingrisch M, Kompan I, Maier-Hein K, Abdollahi A, Nolden M, MITK-ModelFit: generic open-source framework for model fits and their exploration in medical imaging – design, implementation and application on the example of DCE-MRI (arXiv:1807.07353)
+Debus C and Floca R, Ingrisch M, Kompan I, Maier-Hein K, Abdollahi A, Nolden M, MITK-ModelFit: generic open-source framework for model fits and their exploration in medical imaging – design, implementation and application on the example of DCE-MRI https://doi.org/10.1186/s12859-018-2588-1 (BMC Bioinformatics 2019 20:31)
 
 \section FIT_DCE_General General information
 \imageMacro{dce_mri_init.png, "Example screen shot showing the view at first start.", 10}

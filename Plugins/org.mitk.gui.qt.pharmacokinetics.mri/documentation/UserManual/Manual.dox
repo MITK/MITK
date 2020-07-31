@@ -18,14 +18,13 @@ If you have any questions, need support, find a bug or have a feature request, f
 
 \subsection FIT_DCE_Cite Citation Information
 If you use the view for your research please cite our work as reference:\n\n
-Debus C and Floca R, Ingrisch M, Kompan I, Maier-Hein K, Abdollahi A, Nolden M, MITK-ModelFit: generic open-source framework for model fits and their exploration in medical imaging – design, implementation and application on the example of DCE-MRI https://doi.org/10.1186/s12859-018-2588-1 (BMC Bioinformatics 2019 20:31)
+Debus C and Floca R, Ingrisch M, Kompan I, Maier-Hein K, Abdollahi A, Nolden M, <i>MITK-ModelFit: generic open-source framework for model fits and their exploration in medical imaging – design, implementation and application on the example of DCE-MRI</i>. https://doi.org/10.1186/s12859-018-2588-1 (BMC Bioinformatics 2019 20:31)
 
 \section FIT_DCE_Data_and_ROI_Selection Data and ROI Selection
 \imageMacro{dce_mri_maskAndFittingStrategy.png, "Data and ROI Selection.", 10}
 In principle, every model can be fitted on the entire image. However, for model configuration reasons (e.g. AIF required) and computational time cost, this is often not advisable.
-Therefore, apart from the image to be fitted (Selected Time Series), a ROI segmentation can be defined (Selected Mask), within which model fitting is performed.
-The view currently offers voxel-wise and/or ROI averaged fits of time-varying curves with different quantitative and semi-quantitative models.
-If a mask is selected, ROI-based fitting (fit average curve within ROI) is enabled (radio button Fitting Strategy – Pixel based / ROI based).
+Therefore, apart from the image to be fitted (<i>Selected Time Series</i>), a ROI segmentation can be defined (<i>Selected Mask</i>), within which model fitting is performed.
+The view currently offers <i>Pixel based</i> and/or <i>ROI based</i> averaged fits of time-varying curves. If a mask is selected, <i>ROI based</i> fitting is enabled.
 
 \subsection FIT_DCE_General_models Supported models
 Currently the following pharmacokinetic models for gadolinium-based contrast agent are available:

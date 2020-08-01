@@ -56,7 +56,7 @@ endforeach()
 
 # Standard CMake macros
 include(FeatureSummary)
-include(CTestUseLaunchers)
+include(CTest)
 include(CMakeParseArguments)
 include(FindPackageHandleStandardArgs)
 
@@ -1033,10 +1033,6 @@ endif()
 #-----------------------------------------------------------------------------
 
 if(BUILD_TESTING)
-  enable_testing()
-  include(CTest)
-  mark_as_advanced(TCL_TCLSH DART_ROOT)
-
   # Setup file for setting custom ctest vars
   configure_file(
     CMake/CTestCustom.cmake.in
@@ -1056,18 +1052,18 @@ if(BUILD_TESTING)
   set(CMAKE_TESTDRIVER_BEFORE_TESTMAIN "
     try
       {")
-  set(CMAKE_TESTDRIVER_AFTER_TESTMAIN "    }
-      catch ( const std::exception & excp  )
-        {
-        fprintf(stderr,\"%s\\n\",excp.what());
+  set(CMAKE_TESTDRIVER_AFTER_TESTMAIN "
+      }
+      catch (const std::exception& e)
+      {
+        fprintf(stderr, \"%s\\n\", e.what());
         return EXIT_FAILURE;
-        }
-      catch( ... )
-        {
+      }
+      catch (...)
+      {
         printf(\"Exception caught in the test driver\\n\");
         return EXIT_FAILURE;
-        }
-      ")
+      }")
 
   set(MITK_TEST_OUTPUT_DIR "${MITK_BINARY_DIR}/test_output")
   if(NOT EXISTS ${MITK_TEST_OUTPUT_DIR})

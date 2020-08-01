@@ -8,7 +8,7 @@ function(mitkFunctionGenerateProjectXml dir name targets is_superbuild)
   set(xml_subprojects )
 
   if(${is_superbuild})
-    set(xml_subprojects ${xml_subprojects} "  <SubProject name=\"SuperBuild\">\n")
+    set(xml_subprojects ${xml_subprojects} "  <SubProject name=\"SuperBuild\"/>\n")
   endif()
 
   foreach(target ${targets})

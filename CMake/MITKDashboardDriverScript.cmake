@@ -183,7 +183,7 @@ endfunction()
 macro(finalize_submission)
 
   # Note should be at the end
-  ctest_submit(PARTS Notes RETRY_DELAY 3 RETRY_COUNT 3)
+  ctest_submit(PARTS Notes Done RETRY_DELAY 3 RETRY_COUNT 3)
 
   # Send status to the "CDash Web Admin"
   if(CDASH_ADMIN_URL_PREFIX)

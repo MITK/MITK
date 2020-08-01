@@ -27,8 +27,8 @@ function(mitkFunctionGetVersionDescription source_dir prefix)
     set(_wc_description ${${prefix}_CUSTOM_REVISION_DESC})
   else()
     # initialize variable
-    set(_wc_description "NO TAG FOUND")
-    set(_dirty_repo_str " [local changes]")
+    set(_wc_description "unknown_version")
+    set(_dirty_repo_str "-local_changes")
 
     find_package(Git)
 
@@ -38,18 +38,24 @@ function(mitkFunctionGetVersionDescription source_dir prefix)
         execute_process(COMMAND ${GIT_EXECUTABLE} describe --exact-match --dirty=${_dirty_repo_str}
                         WORKING_DIRECTORY ${source_dir}
                         OUTPUT_VARIABLE _project_git_tagname
-                        RESULT_VARIABLE _proper_version
-                        ERROR_VARIABLE _description_error )
-        if(_proper_version EQUAL 0 )
+                        RESULT_VARIABLE _proper_version)
+        if(_proper_version EQUAL 0)
           set(_wc_description ${_project_git_tagname})
-        else(_proper_version EQUAL 0)
+        else()
           # the execution failed, i.e. the HEAD has no tag,
           # for fallback string: execute again but without the --exact-match
           execute_process(COMMAND ${GIT_EXECUTABLE} describe --dirty=${_dirty_repo_str}
-                      WORKING_DIRECTORY ${source_dir}
-                      OUTPUT_VARIABLE _wc_description
-                      RESULT_VARIABLE _proper_version
-                      ERROR_VARIABLE _description_error)
+                          WORKING_DIRECTORY ${source_dir}
+                          OUTPUT_VARIABLE _wc_description
+                          RESULT_VARIABLE _proper_version)
+
+          if(NOT _proper_version EQUAL 0)
+            # last fallback, i.e. working copy is a shallow clone, at least use
+            # commit hash
+            execute_process(COMMAND ${GIT_EXECUTABLE} describe --always --dirty=${_dirty_repo_str}
+                            WORKING_DIRECTORY ${source_dir}
+                            OUTPUT_VARIABLE _wc_description)
+          endif()
         endif()
         # remove newline at and of the string
         string(STRIP "${_wc_description}" _wc_description)
@@ -57,6 +63,6 @@ function(mitkFunctionGetVersionDescription source_dir prefix)
     endif()
   endif()
 
-  set(${prefix}_REVISION_DESC ${_wc_description} PARENT_SCOPE )
+  set(${prefix}_REVISION_DESC ${_wc_description} PARENT_SCOPE)
 
 endfunction()

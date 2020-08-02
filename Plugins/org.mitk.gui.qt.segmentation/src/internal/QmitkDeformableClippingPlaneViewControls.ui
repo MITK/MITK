@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>422</width>
-    <height>642</height>
+    <width>300</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -17,118 +17,38 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>QmitkDeformableSurface</string>
+   <string>Deformable surface</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3">
+  <layout class="QVBoxLayout">
    <item>
-    <widget class="QLabel" name="noSelectedImageLabel">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="palette">
-      <palette>
-       <active>
-        <colorrole role="WindowText">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>197</red>
-           <green>0</green>
-           <blue>0</blue>
-          </color>
-         </brush>
-        </colorrole>
-        <colorrole role="Text">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>191</red>
-           <green>0</green>
-           <blue>0</blue>
-          </color>
-         </brush>
-        </colorrole>
-        <colorrole role="ButtonText">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>189</red>
-           <green>0</green>
-           <blue>0</blue>
-          </color>
-         </brush>
-        </colorrole>
-       </active>
-       <inactive>
-        <colorrole role="WindowText">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>197</red>
-           <green>0</green>
-           <blue>0</blue>
-          </color>
-         </brush>
-        </colorrole>
-        <colorrole role="Text">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>191</red>
-           <green>0</green>
-           <blue>0</blue>
-          </color>
-         </brush>
-        </colorrole>
-        <colorrole role="ButtonText">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>189</red>
-           <green>0</green>
-           <blue>0</blue>
-          </color>
-         </brush>
-        </colorrole>
-       </inactive>
-       <disabled>
-        <colorrole role="WindowText">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>120</red>
-           <green>120</green>
-           <blue>120</blue>
-          </color>
-         </brush>
-        </colorrole>
-        <colorrole role="Text">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>120</red>
-           <green>120</green>
-           <blue>120</blue>
-          </color>
-         </brush>
-        </colorrole>
-        <colorrole role="ButtonText">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>120</red>
-           <green>120</green>
-           <blue>120</blue>
-          </color>
-         </brush>
-        </colorrole>
-       </disabled>
-      </palette>
-     </property>
-     <property name="text">
-      <string>Please select an image!</string>
-     </property>
-    </widget>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="imageSelectionLabel">
+       <property name="text">
+        <string>Selected image</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QmitkSingleNodeSelectionWidget" name="imageSelectionWidget" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>40</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QGroupBox" name="planeGroupBox">
-     <property name="title">
-      <string/>
-     </property>
      <property name="checkable">
       <bool>false</bool>
      </property>
@@ -137,7 +57,7 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <layout class="QHBoxLayout" name="horizontalLayout_1">
         <item>
          <widget class="QPushButton" name="createNewPlanePushButton">
           <property name="sizePolicy">
@@ -167,7 +87,7 @@
        </layout>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_1">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
          <widget class="QLabel" name="clippingPlaneSelectorLabel">
           <property name="sizePolicy">
@@ -241,7 +161,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../../../../../../bin/mitk_debug/MITK-build/Plugins/org.mitk.gui.qt.segmentation/org_mitk_gui_qt_segmentation_cached.qrc">
+            <iconset>
              <normaloff>:/org.mitk.gui.qt.segmentation/resources/clipping_plane_translate_48x48.png</normaloff>:/org.mitk.gui.qt.segmentation/resources/clipping_plane_translate_48x48.png</iconset>
            </property>
            <property name="iconSize">
@@ -282,7 +202,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../../../../../../bin/mitk_debug/MITK-build/Plugins/org.mitk.gui.qt.segmentation/org_mitk_gui_qt_segmentation_cached.qrc">
+            <iconset>
              <normaloff>:/org.mitk.gui.qt.segmentation/resources/clipping_plane_rotate48x48.png</normaloff>:/org.mitk.gui.qt.segmentation/resources/clipping_plane_rotate48x48.png</iconset>
            </property>
            <property name="iconSize">
@@ -320,7 +240,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../../../../../../bin/mitk_debug/MITK-build/Plugins/org.mitk.gui.qt.segmentation/org_mitk_gui_qt_segmentation_cached.qrc">
+            <iconset>
              <normaloff>:/org.mitk.gui.qt.segmentation/resources/clipping_plane_deform48x48.png</normaloff>:/org.mitk.gui.qt.segmentation/resources/clipping_plane_deform48x48.png</iconset>
            </property>
            <property name="iconSize">
@@ -367,97 +287,6 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="palette">
-      <palette>
-       <active>
-        <colorrole role="WindowText">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>197</red>
-           <green>0</green>
-           <blue>0</blue>
-          </color>
-         </brush>
-        </colorrole>
-        <colorrole role="Text">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>191</red>
-           <green>0</green>
-           <blue>0</blue>
-          </color>
-         </brush>
-        </colorrole>
-        <colorrole role="ButtonText">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>189</red>
-           <green>0</green>
-           <blue>0</blue>
-          </color>
-         </brush>
-        </colorrole>
-       </active>
-       <inactive>
-        <colorrole role="WindowText">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>197</red>
-           <green>0</green>
-           <blue>0</blue>
-          </color>
-         </brush>
-        </colorrole>
-        <colorrole role="Text">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>191</red>
-           <green>0</green>
-           <blue>0</blue>
-          </color>
-         </brush>
-        </colorrole>
-        <colorrole role="ButtonText">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>189</red>
-           <green>0</green>
-           <blue>0</blue>
-          </color>
-         </brush>
-        </colorrole>
-       </inactive>
-       <disabled>
-        <colorrole role="WindowText">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>120</red>
-           <green>120</green>
-           <blue>120</blue>
-          </color>
-         </brush>
-        </colorrole>
-        <colorrole role="Text">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>120</red>
-           <green>120</green>
-           <blue>120</blue>
-          </color>
-         </brush>
-        </colorrole>
-        <colorrole role="ButtonText">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>120</red>
-           <green>120</green>
-           <blue>120</blue>
-          </color>
-         </brush>
-        </colorrole>
-       </disabled>
-      </palette>
-     </property>
      <property name="text">
       <string>Please select less or equal 6 clipping planes!</string>
      </property>
@@ -480,7 +309,7 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
-           <widget class="QLabel" name="segmentationLabel">
+           <widget class="QLabel" name="referenceImageLabel">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -493,7 +322,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="clippingPlansLabel">
+           <widget class="QLabel" name="clippingPlanesLabel">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
               <horstretch>0</horstretch>
@@ -501,7 +330,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>Clipping planes  </string>
+             <string>Clipping planes</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -513,7 +342,7 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
-           <widget class="QLabel" name="selectedImageLabel">
+           <widget class="QLabel" name="selectedReferenceImageLabel">
             <property name="enabled">
              <bool>true</bool>
             </property>
@@ -523,28 +352,14 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="font">
-             <font>
-              <family>MS Shell Dlg 2</family>
-              <pointsize>8</pointsize>
-              <weight>50</weight>
-              <bold>false</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="selectedVolumePlanesLabel">
+           <widget class="QLabel" name="selectedClippingPlanesLabel">
             <property name="font">
              <font>
               <pointsize>8</pointsize>
              </font>
-            </property>
-            <property name="text">
-             <string/>
             </property>
             <property name="alignment">
              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -598,6 +413,11 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
+  <customwidget>
+   <class>QmitkSingleNodeSelectionWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkSingleNodeSelectionWidget.h</header>
+  </customwidget>
   <customwidget>
    <class>QmitkDataStorageComboBox</class>
    <extends>QComboBox</extends>

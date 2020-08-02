@@ -184,7 +184,7 @@ void QmitkDeformableClippingPlaneView::OnCreateNewClippingPlane()
   }
 
   // equivalent to the extent and resolution function of the clipping plane
-  const double x = imageDiagonal * 0.9;
+  const auto x = imageDiagonal * 0.9;
   planeSource->SetOrigin(-x / 2.0, -x / 2.0, 0.0);
   planeSource->SetPoint1(x / 2.0, -x / 2.0, 0.0);
   planeSource->SetPoint2(-x / 2.0, x / 2.0, 0.0);
@@ -198,7 +198,8 @@ void QmitkDeformableClippingPlaneView::OnCreateNewClippingPlane()
   scalars->SetName("Distance");
   scalars->SetNumberOfComponents(1);
 
-  for (unsigned int i = 0; i < plane->GetVtkPolyData(0)->GetNumberOfPoints(); ++i)
+  const auto numerOfPoints = plane->GetVtkPolyData(0)->GetNumberOfPoints();
+  for (std::remove_const_t<decltype(numerOfPoints)> i = 0; i < plane->GetVtkPolyData(0)->GetNumberOfPoints(); ++i)
   {
     scalars->InsertNextValue(-1.0);
   }
@@ -336,12 +337,12 @@ void QmitkDeformableClippingPlaneView::OnCalculateClippingVolume()
   volumeCalculator->SetImage(clippedImage);
   volumeCalculator->Calculate();
 
-  std::vector<double> volumes = volumeCalculator->GetVolumes();
+  auto volumes = volumeCalculator->GetVolumes();
 
   auto lookupTable = mitk::LabeledImageLookupTable::New();
   int lablesWithVolume = 0;
-  auto numberOfVolumes = volumes.size();
-  for (decltype(numberOfVolumes) i = 1; i < numberOfVolumes; ++i)
+  const auto numberOfVolumes = volumes.size();
+  for (std::remove_const_t<decltype(numberOfVolumes)> i = 1; i < numberOfVolumes; ++i)
   {
     if (0 != volumes[0])
     {

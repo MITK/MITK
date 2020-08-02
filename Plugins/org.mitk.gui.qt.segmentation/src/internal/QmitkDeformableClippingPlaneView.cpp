@@ -567,11 +567,10 @@ mitk::Color QmitkDeformableClippingPlaneView::GetLabelColor(int label)
     factor = 256.0f / (2.0f * cycleSize) + insideCycleCounter * (256.0f / cycleSize);
   }
 
-  color =
-  {
-    color[0] / 256.0f * factor,
-    color[1] / 256.0f * factor,
-    color[2] / 256.0f * factor
+  color = {
+    std::min(1.0f, color[0] / 256.0f * factor),
+    std::min(1.0f, color[1] / 256.0f * factor),
+    std::min(1.0f, color[2] / 256.0f * factor)
   };
 
   return mitk::Color(color.data());

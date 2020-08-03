@@ -49,19 +49,19 @@ Caution: the file may not contain a header line, but the first line must start w
 Furthermore, the <i>Hematocrit Level</i> has to be set (from 0 to 1) for conversion from whole blood to plasma concentration. It is set to the literature default value of 0.45.
 
 \subsection FIT_DCE_Settings_start Start parameter
-\imageMacro{dce_mri_start.png, "Example screen shot for start parameter settings.", 10}
+\imageMacro{dce_mri_start.png, "Example screenshot for start parameter settings.", 10}
 In cases of noisy data it can be useful to define the initial starting values of the parameter estimates, at which optimization starts, in order to prevent optimization results in local optima.
 Each model has default scalar values (applied to every voxel) for initial values of each parameter, however these can be adjusted.
 Moreover, initial values can also be defined locally for each individual voxel via starting value images. To load a starting value image, change the <i>Type</i> from <i>scalar</i> to <i>image</i>. 
 In the <i>Value</i> column, selection of a starting value image will be available. 
 
-\subsection FIT_DCE_Settings_constraint Constraint settings
-\imageMacro{dce_mri_constraint.png, "Example screen shot for constraint settings.", 10}
+\subsection FIT_DCE_Settings_constraint Constraints settings
+\imageMacro{dce_mri_constraints.png, "Example screenshot for constraints settings.", 10}
 To limit the fitting search space and to exclude unphysical/illogical results for model parameter estimates, constraints to individual parameters as well as combinations can be imposed.
 Each model has default constraints, however, new ones can be defined or removed by the + and – buttons in the table.
-The first column specifies the parameter(s) involved in the constraint (if multiple selected, their sum will be used) by selection in the drop down menu.
-The second column defines whether the constraints defines an upper or lower boundary.
-Value and Width define the actual constraint value, that should not be crossed, and a certain tolerance width.
+The first column specifies the parameter(s) involved in the constraint (if multiple parameters are selected, their sum will be used) by selection in the drop down menu.
+The second column <i>Type</i> defines whether the constraint defines an upper or lower boundary.
+<i>Value</i> defines the actual constraint value, that should not be crossed, and <i>Width</i> allows for a certain tolerance width.
 
 \subsection FIT_DCE_Settings_concentration Signal to concentration conversion settings
 \imageMacro{dce_mri_concentration.png, "Example screen shot for concentration conversion settings.", 10}

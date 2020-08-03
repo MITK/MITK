@@ -12,11 +12,11 @@ In dynamic contrast-enhanced (DCE) MRI, pharmacokinetic (PK) modeling can be use
 Parameters describing the tissue microvasculature can be derived by fitting a pharmacokinetic model, e.g. a compartment model, to the dynamic data. 
 This view offers a comprehensive set of tools to perform pharmacokinetic analysis.
 
-\section FIT_DCE_Contact Contact Information
+\section FIT_DCE_Contact Contact information
 This plug-in is being developed by the SIDT group (Software development for Integrated Diagnostics and Therapy) at the German Cancer Research Center (DKFZ).
 If you have any questions, need support, find a bug or have a feature request, feel free to contact us at www.mitk.org.
 
-\subsection FIT_DCE_Cite Citation Information
+\subsection FIT_DCE_Cite Citation information
 If you use the view for your research please cite our work as reference:\n\n
 Debus C and Floca R, Ingrisch M, Kompan I, Maier-Hein K, Abdollahi A, Nolden M, <i>MITK-ModelFit: generic open-source framework for model fits and their exploration in medical imaging – design, implementation and application on the example of DCE-MRI</i>. https://doi.org/10.1186/s12859-018-2588-1 (BMC Bioinformatics 2019 20:31)
 
@@ -34,7 +34,7 @@ Currently the following pharmacokinetic models for gadolinium-based contrast age
 -	The extended Tofts model \ref FIT_DCE_lit_ref3 "[3]"
 -	The two compartment exchange model (2CXM) \ref FIT_DCE_lit_ref4 "[4, 5]"
 
-\section FIT_DCE_Settings Model Settings
+\section FIT_DCE_Settings Model settings
 \imageMacro{dce_mri_modelSettings.png, "Model settings of the view for the standard Tofts model.", 10}
 
 \subsection FIT_DCE_Settings_model Model specific settings
@@ -64,10 +64,13 @@ The second column <i>Type</i> defines whether the constraint defines an upper or
 <i>Value</i> defines the actual constraint value, that should not be crossed, and <i>Width</i> allows for a certain tolerance width.
 
 \subsection FIT_DCE_Settings_concentration Signal to concentration conversion settings
-\imageMacro{dce_mri_concentration.png, "Example screen shot for concentration conversion settings.", 10}
-Most models require concentration values as input rather than raw signal intensities (i.e. all compartment models).
-The DCE MR Perfusion view offers conversion to concentration by means of relative and absolute signal enhancement as well as a special conversion for turbo flash sequences.
-For the conversion methods, a baseline image prior to contrast agent arrival is required. In many data sets, multiple baseline images are available. The "Baseline Range Selection" allows for selection of a range of time frames, from which the average image (along the time dimension) is calculated and set as baseline input image. Remark: The number of the first time frame is 0. 
+\imageMacro{dce_mri_concentration.png, "Example screenshot for concentration conversion settings.", 10}
+Most models require contrast agent concentration values as input rather than raw signal intensities (i.e. all compartment models).
+The DCE MR Perfusion DataFit View offers a variety of tools for the conversion from signal to concentration:
+by means of relative and absolute signal enhancement, via a T1-map calculated by the variable flip angle method, as well as a special conversion for turbo flash sequences.
+For the conversion methods, a baseline image prior to contrast agent arrival is required.
+In many data sets, multiple baseline images are available. The <i>Baseline Range Selection</i> allows for selection of a range of time frames, from which the average image (along the time dimension) is calculated and set as baseline input image. 
+Remark: The number of the first time frame is 0.
 
 \section FIT_DCE_Fitting Executing a fit
 After configuration of the entire fit routine, the respective time series to be fitted and eventually the ROI mask have to be selected.

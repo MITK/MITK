@@ -201,6 +201,11 @@ StitchImageFilter< TInputImage, TOutputImage, TInterpolatorPrecisionType, TTrans
   this->EnsureInterpolators();
   this->EnsureTransforms();
 
+  for (const auto& interpolator : m_Interpolators)
+  {
+    interpolator.second->SetInputImage(interpolator.first);
+  }
+
   unsigned int nComponents
     = DefaultConvertPixelTraits<PixelType>::GetNumberOfComponents(
         m_DefaultPixelValue );
@@ -243,70 +248,14 @@ StitchImageFilter< TInputImage, TOutputImage, TInterpolatorPrecisionType, TTrans
 ::ThreadedGenerateData(const OutputImageRegionType & outputRegionForThread,
                        ThreadIdType threadId)
 {
-  // Check whether the input or the output is a
-  // SpecialCoordinatesImage. If either are, then we cannot use the
-  // fast path since index mapping will definitely not be linear.
-  typedef SpecialCoordinatesImage< PixelType, ImageDimension >           OutputSpecialCoordinatesImageType;
-  typedef SpecialCoordinatesImage< InputPixelType, InputImageDimension > InputSpecialCoordinatesImageType;
 
   if( outputRegionForThread.GetNumberOfPixels() == 0 )
     {
     return;
     }
 
-  this->NonlinearThreadedGenerateData(outputRegionForThread, threadId);
-}
-
-template< typename TInputImage,
-          typename TOutputImage,
-          typename TInterpolatorPrecisionType,
-          typename TTransformPrecisionType >
-typename StitchImageFilter< TInputImage, TOutputImage, TInterpolatorPrecisionType, TTransformPrecisionType >
-::PixelType
-StitchImageFilter< TInputImage, TOutputImage, TInterpolatorPrecisionType, TTransformPrecisionType >
-::CastPixelWithBoundsChecking(const InterpolatorOutputType value,
-                              const ComponentType minComponent,
-                              const ComponentType maxComponent ) const
-{
-  const unsigned int nComponents = InterpolatorConvertType::GetNumberOfComponents(value);
-  PixelType          outputValue;
-
-  NumericTraits<PixelType>::SetLength( outputValue, nComponents );
-
-  for (unsigned int n = 0; n < nComponents; n++)
-    {
-    ComponentType component = InterpolatorConvertType::GetNthComponent( n, value );
-
-    if ( component < minComponent )
-      {
-      PixelConvertType::SetNthComponent( n, outputValue, static_cast<PixelComponentType>( minComponent ) );
-      }
-    else if ( component > maxComponent )
-      {
-      PixelConvertType::SetNthComponent( n, outputValue, static_cast<PixelComponentType>( maxComponent ) );
-      }
-    else
-      {
-      PixelConvertType::SetNthComponent(n, outputValue,
-                                        static_cast<PixelComponentType>( component ) );
-      }
-    }
-
-  return outputValue;
-}
-
-template< typename TInputImage,
-          typename TOutputImage,
-          typename TInterpolatorPrecisionType,
-          typename TTransformPrecisionType >
-void
-StitchImageFilter< TInputImage, TOutputImage, TInterpolatorPrecisionType, TTransformPrecisionType >
-::NonlinearThreadedGenerateData(const OutputImageRegionType &
-                                outputRegionForThread,
-                                ThreadIdType threadId)
-{
   // Get the output pointers
-  OutputImageType *outputPtr = this->GetOutput();
+  OutputImageType* outputPtr = this->GetOutput();
 
   // Get this input pointers
   InputImageVectorType inputs = this->GetInputs();
@@ -324,23 +273,23 @@ StitchImageFilter< TInputImage, TOutputImage, TInterpolatorPrecisionType, TTrans
   ContinuousInputIndexType inputIndex;
 
   // Support for progress methods/callbacks
-  ProgressReporter progress( this,
-                             threadId,
-                             outputRegionForThread.GetNumberOfPixels() );
+  ProgressReporter progress(this,
+    threadId,
+    outputRegionForThread.GetNumberOfPixels());
 
   // Min/max values of the output pixel type AND these values
   // represented as the output type of the interpolator
-  const PixelComponentType minValue =  NumericTraits< PixelComponentType >::NonpositiveMin();
-  const PixelComponentType maxValue =  NumericTraits< PixelComponentType >::max();
+  const PixelComponentType minValue = NumericTraits< PixelComponentType >::NonpositiveMin();
+  const PixelComponentType maxValue = NumericTraits< PixelComponentType >::max();
 
   typedef typename InterpolatorType::OutputType OutputType;
-  const ComponentType minOutputValue = static_cast< ComponentType >( minValue );
-  const ComponentType maxOutputValue = static_cast< ComponentType >( maxValue );
+  const ComponentType minOutputValue = static_cast<ComponentType>(minValue);
+  const ComponentType maxOutputValue = static_cast<ComponentType>(maxValue);
 
   // Walk the output region
   outIt.GoToBegin();
 
-  while ( !outIt.IsAtEnd() )
+  while (!outIt.IsAtEnd())
   {
     // Determine the index of the current output pixel
     outputPtr->TransformIndexToPhysicalPoint(outIt.GetIndex(), outputPoint);
@@ -380,148 +329,38 @@ template< typename TInputImage,
           typename TOutputImage,
           typename TInterpolatorPrecisionType,
           typename TTransformPrecisionType >
-void
+typename StitchImageFilter< TInputImage, TOutputImage, TInterpolatorPrecisionType, TTransformPrecisionType >
+::PixelType
 StitchImageFilter< TInputImage, TOutputImage, TInterpolatorPrecisionType, TTransformPrecisionType >
-::LinearThreadedGenerateData(const OutputImageRegionType &
-                             outputRegionForThread,
-                             ThreadIdType threadId)
+::CastPixelWithBoundsChecking(const InterpolatorOutputType value,
+                              const ComponentType minComponent,
+                              const ComponentType maxComponent ) const
 {
-  // Get the output pointers
-  OutputImageType *outputPtr = this->GetOutput();
+  const unsigned int nComponents = InterpolatorConvertType::GetNumberOfComponents(value);
+  PixelType          outputValue;
 
-  // Get this input pointers
-  InputImageVectorType inputs = this->GetInputs();
-  TransformMapType transforms = this->GetTransforms();
+  NumericTraits<PixelType>::SetLength( outputValue, nComponents );
 
-  // Create an iterator that will walk the output region for this thread.
-  typedef ImageScanlineIterator< TOutputImage > OutputIterator;
-
-  OutputIterator outIt(outputPtr, outputRegionForThread);
-
-  // Define a few indices that will be used to translate from an input pixel
-  // to an output pixel
-  PointType outputPoint;         // Coordinates of current output pixel
-  PointType tmpOutputPoint;
-
-  std::map<const InputImageType*, ContinuousInputIndexType> inputIndices;
-
-  typedef typename PointType::VectorType VectorType;
-  std::map<const InputImageType*, VectorType> deltas; // delta in input continuous index coordinate frame
-
-  IndexType index;
-
-  const typename OutputImageRegionType::SizeType &regionSize = outputRegionForThread.GetSize();
-  const SizeValueType numberOfLinesToProcess = outputRegionForThread.GetNumberOfPixels() / regionSize[0];
-
-  // Support for progress methods/callbacks
-  ProgressReporter progress( this,
-                             threadId,
-                             numberOfLinesToProcess );
-
-  typedef typename InterpolatorType::OutputType OutputType;
-
-  // Cache information from the superclass
-  PixelType defaultValue = this->GetDefaultPixelValue();
-
-  // Min/max values of the output pixel type AND these values
-  // represented as the output type of the interpolator
-  const PixelComponentType minValue =  NumericTraits< PixelComponentType >::NonpositiveMin();
-  const PixelComponentType maxValue =  NumericTraits< PixelComponentType >::max();
-
-  typedef typename InterpolatorType::OutputType OutputType;
-  const ComponentType minOutputValue = static_cast< ComponentType >( minValue );
-  const ComponentType maxOutputValue = static_cast< ComponentType >( maxValue );
-
-  // Determine the position of the first pixel in the scanline
-  index = outIt.GetIndex();
-  outputPtr->TransformIndexToPhysicalPoint(index, outputPoint);
-
-  // Compute corresponding input pixel position
-  for (const auto& input : inputs)
-  {
-    auto inputPoint = transforms[input]->TransformPoint(outputPoint);
-
-    ContinuousInputIndexType inputIndex;
-    input->TransformPhysicalPointToContinuousIndex(inputPoint, inputIndex);
-    inputIndices[input] = inputIndex;
-  }
-
-  // As we walk across a scan line in the output image, we trace
-  // an oriented/scaled/translated line in the input image.  Cache
-  // the delta along this line in continuous index space of the input
-  // image. This allows us to use vector addition to model the
-  // transformation.
-  //
-  // To find delta, we take two pixels adjacent in a scanline
-  // and determine the continuous indices of these pixels when
-  // mapped to the input coordinate frame. We use the difference
-  // between these two continuous indices as the delta to apply
-  // to an index to trace line in the input image as we move
-  // across the scanline of the output image.
-  //
-  // We determine delta in this manner so that Images
-  // are both handled properly (taking into account the direction cosines).
-  //
-  ++index[0];
-  outputPtr->TransformIndexToPhysicalPoint(index, tmpOutputPoint);
-  for (const auto& input : inputs)
-  {
-    auto tmpInputPoint = transforms[input]->TransformPoint(tmpOutputPoint);
-
-    ContinuousInputIndexType tmpInputIndex;
-    input->TransformPhysicalPointToContinuousIndex(tmpInputPoint,
-      tmpInputIndex);
-    deltas[input] = tmpInputIndex - inputIndices[input];
-  }
-
-  while ( !outIt.IsAtEnd() )
+  for (unsigned int n = 0; n < nComponents; n++)
     {
-    // Determine the continuous index of the first pixel of output
-    // scanline when mapped to the input coordinate frame.
-    //
+    ComponentType component = InterpolatorConvertType::GetNthComponent( n, value );
 
-    // First get the position of the pixel in the output coordinate frame
-    index = outIt.GetIndex();
-    outputPtr->TransformIndexToPhysicalPoint(index, outputPoint);
-
-    // Compute corresponding input pixel continuous index, this index
-    // will incremented in the scanline loop
-    for (const auto& input : inputs)
-    {
-      auto inputPoint = transforms[input]->TransformPoint(outputPoint);
-      input->TransformPhysicalPointToContinuousIndex(inputPoint, inputIndices[input]);
+    if ( component < minComponent )
+      {
+      PixelConvertType::SetNthComponent( n, outputValue, static_cast<PixelComponentType>( minComponent ) );
+      }
+    else if ( component > maxComponent )
+      {
+      PixelConvertType::SetNthComponent( n, outputValue, static_cast<PixelComponentType>( maxComponent ) );
+      }
+    else
+      {
+      PixelConvertType::SetNthComponent(n, outputValue,
+                                        static_cast<PixelComponentType>( component ) );
+      }
     }
 
-    while ( !outIt.IsAtEndOfLine() )
-      {
-      std::vector<PixelType> pixvals;
-
-      for (const auto& input : inputs)
-      {
-        if (m_Interpolators[input]->IsInsideBuffer(inputIndices[input]))
-        {
-          auto value = m_Interpolators[input]->EvaluateAtContinuousIndex(inputIndices[input]);
-          pixvals.emplace_back(this->CastPixelWithBoundsChecking(value, minOutputValue, maxOutputValue));
-        }
-        inputIndices[input] += deltas[input];
-      }
-
-      // Evaluate input at right position and copy to the output
-      if ( !pixvals.empty())
-        {
-        double sum = std::accumulate(pixvals.begin(), pixvals.end(), 0.0);
-        outIt.Set(sum / pixvals.size());
-        }
-      else
-        {
-        outIt.Set(defaultValue); // default background value
-        }
-
-      ++outIt;
-      }
-    progress.CompletedPixel();
-    outIt.NextLine();
-    }
+  return outputValue;
 }
 
 template<typename TInputImage, typename TOutputImage, typename TInterpolatorPrecisionType, typename TTransformPrecisionType>
@@ -722,6 +561,8 @@ StitchImageFilter< TInputImage, TOutputImage, TInterpolatorPrecisionType, TTrans
 ::EnsureInterpolators()
 {
   const auto inputCount = this->GetNumberOfIndexedInputs();
+  InterpolatorMapType newInterpolatorMap;
+
   for (unsigned int i = 0; i < inputCount; ++i)
   {
     auto input = this->GetInput(i);
@@ -733,9 +574,14 @@ StitchImageFilter< TInputImage, TOutputImage, TInterpolatorPrecisionType, TTrans
 
     if (m_Interpolators[input].IsNull())
     {
-      m_Interpolators[input] = LinearInterpolatorType::New().GetPointer();
+      newInterpolatorMap[input] = LinearInterpolatorType::New().GetPointer();
+    }
+    else
+    {
+      newInterpolatorMap[input] = m_Interpolators[input];
     }
   }
+  m_Interpolators = newInterpolatorMap;
 }
 
 template< typename TInputImage,

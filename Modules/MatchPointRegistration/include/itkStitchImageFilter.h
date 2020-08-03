@@ -257,19 +257,6 @@ protected:
   virtual void ThreadedGenerateData(const OutputImageRegionType & outputRegionForThread,
                                     ThreadIdType threadId) ITK_OVERRIDE;
 
-  /** Default implementation for resampling that works for any
-   * transformation type. */
-  virtual void NonlinearThreadedGenerateData(const OutputImageRegionType &
-                                             outputRegionForThread,
-                                             ThreadIdType threadId);
-
-  /** Implementation for resampling that works for with linear
-   *  transformation types.
-   */
-  virtual void LinearThreadedGenerateData(const OutputImageRegionType &
-                                          outputRegionForThread,
-                                          ThreadIdType threadId);
-
   /** Cast pixel from interpolator output to PixelType. */
   virtual PixelType CastPixelWithBoundsChecking( const InterpolatorOutputType value,
                                                  const ComponentType minComponent,

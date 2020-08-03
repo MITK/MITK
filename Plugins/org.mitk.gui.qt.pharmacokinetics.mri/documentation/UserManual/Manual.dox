@@ -73,17 +73,23 @@ In many data sets, multiple baseline images are available. The <i>Baseline Range
 Remark: The number of the first time frame is 0.
 
 \section FIT_DCE_Fitting Executing a fit
-After configuration of the entire fit routine, the respective time series to be fitted and eventually the ROI mask have to be selected.
-If only an image is needed, selection of the respective time series in the data manager is sufficient.
-If a mask is to be selected as well, image and mask have to be selected by holding the shift key and selecting them in this order from the Data manager.\n\n
 
-In order to distinguish results from different model fits to the data, a Fitting name can be defined in the bottom field.
+In order to distinguish results from different model fits to the data, a <i>Fitting name</i> can be defined.
 As default, the name of the model and the fitting strategy (pixel/ROI) are given. This name will then be appended by the respective parameter name.\n\n
 
-For development purposes and evaluation of the fits, the option "Generate debug parameter images" is available.
-Enabling this option will result in additional parameter maps displaying the status of the optimizer at fit termination, like needed optimization time, number of iterations, constraint violations and reasons for fit termination (criterion reached, maximum number of iterations, etc.).\n\n
+For development purposes and evaluation of the fits, the option <i>Generate debug parameter images</i> is available.
+Enabling this option will result in additional parameter maps displaying the status of the optimizer at fit termination.
+In the following definitions, an <i>evaluation</i> describes the process of cost function calculation and evaluation by the optimizer for a given parameter set.
 
-After all necessary configurations are set, the button "Start Modelling" is enabled, which starts the fitting routine. Progress can be seen in the message box on the bottom. Resulting parameter maps will afterwards be added to the data manager as sub-nodes to the analyzed 4D image.
+- <i>Stop condition</i>: Reasons for the fit termination, i.e. criterion reached, maximum number of iterations,...
+- <i>Optimization time</i>
+- <i>Number of iterations</i>
+- <i>Constraint penalty ratio</i>: Ratio between evaluations that were penalized and all evaluations. 0.0 means no evaluation was penalized; 1.0 all evaluations were. Evaluations that hit the failure threshold count as penalized too.
+- <i>Constraint last failed parameter</i>: Ratio between evaluations that where beyond the failure threshold. 0.0 means no evaluation was a failure (but some may be penalized).
+- <i>Constraint failure ratio</i>: Index of the first (in terms of index position) parameter, which failed the constraints in the last evaluation.
+
+After all necessary configurations are set, the button <i>Start Modelling</i> is enabled, which starts the fitting routine.
+Progress can be seen in the message box on the bottom. Resulting parameter maps will afterwards be added to the Data Manager as sub-nodes of the analyzed 4D image.
 
 \section FIT_DCE_lit References/Literature
 - \anchor FIT_DCE_lit_ref1 [1] Brix G, Semmler W, Port R, Schad LR, Layer G, Lorenz WJ. Pharmacokinetic parameters in CNS Gd-DTPA enhanced MR imaging. J Comput Assist Tomogr. 1991;15:621–8.

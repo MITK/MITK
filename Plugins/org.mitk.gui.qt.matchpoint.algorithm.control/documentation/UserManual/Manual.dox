@@ -1,34 +1,35 @@
 /**
-\page org_mitk_gui_qt_matchpoint_algorithm_control The MatchPoint Algorithm Control View
+\page org_mitk_views_matchpoint_algorithm_control The MatchPoint Algorithm Control View
 
 \imageMacro{map_icon_run_doc.svg,"Icon of the MatchPoint Algorithm Control",3.0}
 
 \tableofcontents
 
 \section MAP_RUN_Introduction Introduction
-This plugin offers the user a way to use a selected registration algorithm in order to determine a registration for two selected images. For the selection of an algorithm please see MatchPoint Algorithm Browser (\ref org_mitk_gui_qt_matchpoint_algorithm_browser).
-
-\section MAP_RUN_Contact Contact information
-This plug-in is being developed by the SIDT group (Software development for Integrated Diagnostics
-and Therapy) at the German Cancer Research Center (DKFZ). If you have any questions, need support,
-find a bug or have a feature request, feel free to contact us at www.mitk.org.
+This plugin offers the user a way to register data (images or point sets) in order to establish a spatial correlation/mapping (stored as registration object in the data storage). To determine a registration the user has to select
+a registration algorithm. For the selection of an algorithm please see MatchPoint Algorithm Browser (\ref org_mitk_views_matchpoint_algorithm_browser).
 
 \section MAP_RUN_Usage Usage
 \imageMacro{map_control_example.png, "Example screenshot showing the control plugin in use.", 10}
-To use the plugin a registration algorithm must be loaded and a moving as well as a target image must be selected.\n
-The moving image is registered onto the target image. Thus the result is a mapped input image in the geometry (field of view, orientation, spacing) defined by the target image.\n
-All images are selected in the data manager using multi select (press the CTRL-key while selecting the nodes in the data manager). The first selection is the moving image, the second is the target image.\n
-If an algorithm is loaded and input images are selected, the plugin will automatically switch to the "Execution" tab.
+To use the plugin a registration algorithm must be loaded and moving data as well as target data must be selected.
+
+The type of data supported depends on the chosen algorithm. Basically the plugin supports the registration of images and point sets.
+The moving data is registered onto the target data. Thus in case of images, the result is a mapped input image in the geometry (field of view, orientation, spacing) defined by the target image.\n
+All inputs that should be used for the registration are selected via the respective selection widgets shown in the image below. The box with the mask input selectors are only shown if the chosen algorithm supports masks. It is also optional to set only one ore both masks. (Remark: implications of which mask to set may depend on the specific algorithms; e.g. sometimes it is computationally more efficient to set at least the moving mask if possible.)
+
+\imageMacro{map_control_inputs.png, "Input selections for the registration. Moving and target inputs are mandatory. Moving and target masks are only available if the algorithm supports them and are optional.", 5}
+
+If an algorithm is loaded and inputs are selected, the plugin will automatically switch to the "Execution" tab.
 
 \subsection MAP_RUN_Usage_selection Selection tab
 \imageMacro{map_control_step1_selection.png, "Details of the selection tab.", 5}
 In this tab registration algorithms that are selected in the MatchPoint Algorithm Browser can be chosen. In the tab you see the ID of the algorithm selected by the browser and its profile information.\n
-If you press "Load selected algorithm", the algorithm will be used by the control plugin. The name of the algorithm occurs in the text field "Loaded algorithm" (at the top of the plugin view).\n
+If you press the button "Load selected algorithm", the algorithm will be used by the control plugin. The name of the algorithm occurs in the text field "Loaded algorithm" (at the top of the plugin view).\n
 At this point, it has no effect if you change the selection in the browser. The control plugin will keep the loaded algorithm until you choose to load another one.
 
 \subsection MAP_RUN_Usage_exec Execution tab
 \imageMacro{map_control_step2_execution.png, "Details of the execution tab.", 5}
-In this tab you can specify a name for the registration job (this will determine the names of the result nodes in the data manager).\n
+In this tab you can specify a name for the registration job (this will determine the names of the result nodes in the Data Manager View and the data selection widgets).\n
 You can also choose to "store registration" (which is normally the goal of the whole process, because this is the very result of the algorithm ;).\n
 Additionally you can choose "Generate + store mapped result". This is a convenience feature which often saves you the time to use the mapper plugin afterwards. It will do the same like using the mapper plugin with the moving and target image, setting padding value "0" and using "linear interpolation". If you need other settings, skip the convenience generation and use the MatchPoint mapper plugin directly.\n
 "Start" will trigger the registration process. Some algorithms can be stopped while processing takes place. In those cases, there is a "Stop" button enabled, as soon as the registration process starts.

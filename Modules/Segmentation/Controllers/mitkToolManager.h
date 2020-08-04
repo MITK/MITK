@@ -109,7 +109,7 @@ namespace mitk
 
     int GetToolID(const Tool *tool);
 
-    /*
+    /**
       \param id The tool of interest.
       Counting starts with 0.
     */
@@ -166,12 +166,12 @@ namespace mitk
     */
     void SetWorkingData(DataNode *);
 
-    /*
+    /**
       \brief Set a list of data/images as roi objects.
     */
     void SetRoiData(DataVectorType);
 
-    /*
+    /**
       \brief Set a single data item/image as roi object.
     */
     void SetRoiData(DataNode *);
@@ -187,7 +187,7 @@ namespace mitk
     */
     DataNode *GetReferenceData(int);
 
-    /*
+    /**
       \brief Get the list of working data.
     */
     DataVectorType GetWorkingData();
@@ -215,13 +215,13 @@ namespace mitk
     */
     TimePointType GetCurrentTimePoint() const;
 
-    /*
+    /**
       \brief Tell that someone is using tools.
       GUI elements should call this when they become active. This method increases an internal "client count".
      */
     void RegisterClient();
 
-    /*
+    /**
       \brief Tell that someone is NOT using tools.
       GUI elements should call this when they become active. This method increases an internal "client count".
      */
@@ -239,7 +239,7 @@ namespace mitk
     void OnOneOfTheRoiDataDeletedConst(const itk::Object *caller, const itk::EventObject &e);
     void OnOneOfTheRoiDataDeleted(itk::Object *caller, const itk::EventObject &e);
 
-    /*
+    /**
      \brief Connected to tool's messages
 
      This method just resends error messages coming from any of the tools. This way clients (GUIs) only have to observe
@@ -282,18 +282,19 @@ namespace mitk
     void OnNodeRemoved(const mitk::DataNode *node);
 
     /** Callback for time changed events*/
-    void OnTimeChanged(const itk::Object* caller, const itk::EventObject& e);
+    void OnTimeChangedConst(const itk::Object* caller, const itk::EventObject& e);
+    void OnTimeChanged(itk::Object* caller, const itk::EventObject& e);
 
     void EnsureTimeObservation();
     void StopTimeObservation();
 
-private:
-  //Time point of last detected change
-  TimePointType m_LastTimePoint = 0;
-  //Tag of the observer that listens to time changes
-  unsigned long m_TimePointObserverTag = 0;
-  //Pointer to the observed time stepper
-  const Stepper* m_CurrentTimeStepper = nullptr;
+  private:
+    /** Time point of last detected change*/
+    TimePointType m_LastTimePoint = 0;
+    /** Tag of the observer that listens to time changes*/
+    unsigned long m_TimePointObserverTag = 0;
+    /** Pointer to the observed time stepper*/
+    WeakPointer<SliceNavigationController> m_CurrentTimeNavigationController;
   };
 
 } // namespace

@@ -83,7 +83,7 @@ mitk::DataNode *mitk::AutoSegmentationTool::GetTargetSegmentationNode()
       return nullptr;
     }
 
-    std::string nodename = m_ToolManager->GetReferenceData(0)->GetName() + "_" + this->GetName();
+    std::string nodename = refNode->GetName() + "_" + this->GetName();
     mitk::Color color;
     color.SetRed(1);
     color.SetBlue(0);

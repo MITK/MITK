@@ -22,6 +22,7 @@ found in the LICENSE file.
 #include "mitkInteractionEventObserver.h"
 #include "mitkSegTool2D.h"
 #include "mitkRenderingManager.h"
+#include "mitkSliceNavigationController.h"
 
 #include "usGetModuleContext.h"
 #include "usModuleContext.h"
@@ -38,32 +39,37 @@ void mitk::ToolManager::EnsureTimeObservation()
 {
   if (nullptr != mitk::RenderingManager::GetInstance() && nullptr != mitk::RenderingManager::GetInstance()->GetTimeNavigationController())
   {
-    auto timestepper = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime();
+    auto timeController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
 
     m_LastTimePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
 
-    if (timestepper != m_CurrentTimeStepper)
+    auto currentTimeController = m_CurrentTimeNavigationController.Lock();
+
+    if (timeController != currentTimeController)
     {
+      if (currentTimeController.IsNotNull())
+      {
+        currentTimeController->RemoveObserver(m_TimePointObserverTag);
+      }
+
       itk::MemberCommand<ToolManager>::Pointer command = itk::MemberCommand<ToolManager>::New();
       command->SetCallbackFunction(this, &ToolManager::OnTimeChanged);
-      m_TimePointObserverTag = timestepper->AddObserver(itk::ModifiedEvent(), command);
-      m_CurrentTimeStepper = timestepper;
+      command->SetCallbackFunction(this, &ToolManager::OnTimeChangedConst);
+      m_CurrentTimeNavigationController = timeController;
+      m_TimePointObserverTag = timeController->AddObserver(SliceNavigationController::GeometryTimeEvent(nullptr,0), command);
     }
   }
 }
 
 void mitk::ToolManager::StopTimeObservation()
 {
-  if (nullptr!= m_CurrentTimeStepper && nullptr != mitk::RenderingManager::GetInstance() && nullptr != mitk::RenderingManager::GetInstance()->GetTimeNavigationController())
-  {
-    auto timestepper = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime();
+  auto currentTimeController = m_CurrentTimeNavigationController.Lock();
 
-    if (timestepper == m_CurrentTimeStepper)
-    {
-      timestepper->RemoveObserver(m_TimePointObserverTag);
-      m_CurrentTimeStepper = nullptr;
-      m_TimePointObserverTag = 0;
-    }
+  if (currentTimeController.IsNotNull())
+  {
+    currentTimeController->RemoveObserver(m_TimePointObserverTag);
+    m_CurrentTimeNavigationController = nullptr;
+    m_TimePointObserverTag = 0;
   }
 }
 
@@ -558,11 +564,17 @@ void mitk::ToolManager::OnNodeRemoved(const mitk::DataNode *node)
   OnOneOfTheWorkingDataDeleted(const_cast<mitk::DataNode *>(node), itk::DeleteEvent());
 }
 
-void mitk::ToolManager::OnTimeChanged(const itk::Object* caller, const itk::EventObject& /*e*/)
+void mitk::ToolManager::OnTimeChanged(itk::Object* caller, const itk::EventObject& e)
 {
-  if (caller == m_CurrentTimeStepper)
+  this->OnTimeChangedConst(caller, e);
+}
+
+void mitk::ToolManager::OnTimeChangedConst(const itk::Object* caller, const itk::EventObject& /*e*/)
+{
+  auto currentController = m_CurrentTimeNavigationController.Lock();
+  if (caller == currentController)
   {
-    const auto currentTimePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+    const auto currentTimePoint = currentController->GetSelectedTimePoint();
     if (currentTimePoint != m_LastTimePoint)
     {
       m_LastTimePoint = currentTimePoint;

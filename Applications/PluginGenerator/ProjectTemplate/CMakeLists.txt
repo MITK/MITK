@@ -80,6 +80,7 @@ set(CMAKE_MODULE_PATH
 # CMake Function(s) and Macro(s)
 #-----------------------------------------------------------------------------
 
+include(CTest)
 include(MacroEmptyExternalProject)
 
 #-----------------------------------------------------------------------------
@@ -241,34 +242,23 @@ set(CMAKE_MODULE_LINKER_FLAGS ${${PROJECT_NAME}_MODULE_LINKER_FLAGS})
 #-----------------------------------------------------------------------------
 
 if(BUILD_TESTING)
-  enable_testing()
-  include(CTest)
-  mark_as_advanced(TCL_TCLSH DART_ROOT)
-
-  # Setup file for setting custom ctest vars
-  configure_file(
-    CMake/CTestCustom.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/CTestCustom.cmake
-    @ONLY
-    )
-
   # Configuration for the CMake-generated test driver
   set(CMAKE_TESTDRIVER_EXTRA_INCLUDES "#include <stdexcept>")
   set(CMAKE_TESTDRIVER_BEFORE_TESTMAIN "
     try
       {")
-  set(CMAKE_TESTDRIVER_AFTER_TESTMAIN " }
-      catch ( const std::exception & excp  )
-        {
-        fprintf(stderr,\"%s\\n\",excp.what());
+  set(CMAKE_TESTDRIVER_AFTER_TESTMAIN "
+      }
+      catch (const std::exception& e)
+      {
+        fprintf(stderr, \"%s\\n\", e.what());
         return EXIT_FAILURE;
-        }
-      catch( ... )
-        {
+      }
+      catch (...)
+      {
         printf(\"Exception caught in the test driver\\n\");
         return EXIT_FAILURE;
-        }
-      ")
+      }")
 endif()
 
 #-----------------------------------------------------------------------------

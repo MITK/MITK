@@ -987,13 +987,6 @@ endif()
 #-----------------------------------------------------------------------------
 
 if(BUILD_TESTING)
-  # Setup file for setting custom ctest vars
-  configure_file(
-    CMake/CTestCustom.cmake.in
-    ${MITK_BINARY_DIR}/CTestCustom.cmake
-    @ONLY
-    )
-
   # Initial cache for ProjectTemplate and PluginGenerator tests
   configure_file(
      CMake/mitkTestInitialCache.txt.in

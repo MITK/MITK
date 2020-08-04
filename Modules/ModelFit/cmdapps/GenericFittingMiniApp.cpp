@@ -289,7 +289,7 @@ int main(int argc, char* argv[])
     mitkCommandLineParser parser;
     setupParser(parser);
 
-    mitk::PreferenceListReaderOptionsFunctor readerFilterFunctor = mitk::PreferenceListReaderOptionsFunctor({ "MITK DICOM Reader v2 (classic config)" }, { "MITK DICOM Reader" });
+    mitk::PreferenceListReaderOptionsFunctor readerFilterFunctor = mitk::PreferenceListReaderOptionsFunctor({ "MITK DICOM Reader v2 (autoselect)" }, { "" });
 
     const std::map<std::string, us::Any>& parsedArgs = parser.parseArguments(argc, argv);
     if (!configureApplicationSettings(parsedArgs))

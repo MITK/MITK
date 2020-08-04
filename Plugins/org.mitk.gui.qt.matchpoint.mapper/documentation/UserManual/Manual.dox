@@ -21,7 +21,7 @@ It is one of several MatchPoint registration plugins.
 To use the mapper at least the input (image or point set) must be selected. Additionally you may select a registration object and, in case the input is an image, an optional reference image.
 
 The reference image defines the geometry (field of view, orientation, spacing) that should be used for the result image.
-The view will try to automatically determine the reference image. By default it is the target image that was used to determin the selected registration.
+The view will try to automatically determine the reference image. By default it is the target image that was used to determine the selected registration.
 If auto selection cannot determine the reference (e.g. because it was not specified or it is currently not loaded), the input image will be selected as reference.
 The reference image can be also defined by the user explicitly by activating manual selection.
 
@@ -34,11 +34,11 @@ just want to resample an image into the geometry of an other image (when no regi
 advantage of the different interpolation and sub/super sampling strategies.
 
 \imageMacro{map_mapper_instructions.png, "Main elements of the mapper view.", 7}
-(1) The currently selected registration, that will be used for mapping. Click to change.\n
-(2) Reset button that will remove the current selected registration and switches back to an identity transform.\n
+(1) The currently selected registration that will be used for mapping. Click to change.\n
+(2) Reset button that will remove the current selected registration and switch back to an identity transform.\n
 (3) The currently selected input data, that will be mapped. Click to change.\n
 (4) The currently (automatically or by user) selected reference image, that defines the geometry of the result. Click to change.\n
-(5) The name of the result data in the data manger.\n
+(5) The name of the result data in the data manager.\n
 (6) The start button(s) to commence the mapping process. For details regarding the two options see \ref MAP_MAPPER_Refine.\n
 (7) Log windows with messages regarding the mapping process.\n
 
@@ -51,14 +51,14 @@ For images "Map" fills the pixels of the output image by interpolating input ima
 But may take longer and introduces interpolation errors, because a new image is resampled.\n
 The second option "Refine geometry" is only offered, if the registration (more precise its inverse kernel) is matrix based and the selected data is an image.
 In this case it just clones the image and refines its image geometry (origin and orientation) to project it to the position indicated by the registration; thus no interpolation artefacts are introduced.
-\remark If you want to use a mapped image in conjunction with the statistic plugin and an mask of the reference image (or you want to proceed any other computation that expects the voxel to be in the same grid for direct numeric comparison), you must use "Map" to ensure the same geometry
-(including the same image grid; including same spacing and resolution). Otherwise operations like the statistic plugin will fail.
+\remark If you want to use a mapped image in conjunction with the image statistics plugin and a mask of the reference image (or you want to proceed any other computation that expects the voxel to be in the same grid for direct numeric comparison), you must use "Map" to ensure the same geometry
+(including the same image grid; including same spacing and resolution). Otherwise operations like the images statistics plugin will fail.
 
 \section MAP_MAPPER_Settings Settings
 \imageMacro{map_mapper-settings.png, "Available settings for mapping images.", 7}
 If you map the image (and not just refine the geometry), you have several settings available:\n
-\li "Allow undefined pixels": Activate to handle pixels of the result image that are not in the field of view of the input image. This pixel will get the "padding value".
-\li "Allow error pixels": Activate to handle pixels of the result image that can not be mapped because the registration does not support this part of the output image. This pixel will get the "error value".
+\li "Allow undefined pixels": Activate to handle pixels of the result image that are not in the field of view of the input image. These pixels will get the "padding value".
+\li "Allow error pixels": Activate to handle pixels of the result image that can not be mapped because the registration does not support this part of the output image. These pixels will get the "error value".
 \li "Interpolator": Set to choose the interpolation strategy that should be used for mapping.
 \li "Activate super/sub sampling": Activate if you want to use origin and orientation of the reference image but want to alter the spacing.
 

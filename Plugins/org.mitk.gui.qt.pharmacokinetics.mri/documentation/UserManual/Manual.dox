@@ -13,7 +13,7 @@ Parameters describing the tissue microvasculature can be derived by fitting a ph
 This view offers a comprehensive set of tools to perform pharmacokinetic analysis.
 
 \section FIT_DCE_Contact Contact information
-This plug-in is being developed by the SIDT group (Software development for Integrated Diagnostics and Therapy) at the German Cancer Research Center (DKFZ).
+This plug-in is being developed by the SIDT group (Software Development for Integrated Diagnostics and Therapy) at the German Cancer Research Center (DKFZ).
 If you have any questions, need support, find a bug or have a feature request, feel free to contact us at www.mitk.org.
 
 \subsection FIT_DCE_Cite Citation information
@@ -21,7 +21,7 @@ If you use the view for your research please cite our work as reference:\n\n
 Debus C and Floca R, Ingrisch M, Kompan I, Maier-Hein K, Abdollahi A, Nolden M, <i>MITK-ModelFit: generic open-source framework for model fits and their exploration in medical imaging – design, implementation and application on the example of DCE-MRI</i>. https://doi.org/10.1186/s12859-018-2588-1 (BMC Bioinformatics 2019 20:31)
 
 \section FIT_DCE_Data_and_ROI_Selection Time series and mask selection
-\imageMacro{dce_mri_maskAndFittingStrategy.png, "Data and ROI Selection.", 10}
+\imageMacro{dce_mri_maskAndFittingStrategy.png, "Time series and mask selection.", 10}
 In principle, every model can be fitted on the entire image. However, for model configuration reasons (e.g. AIF required) and computational time cost, this is often not advisable.
 Therefore, apart from the image to be fitted (<i>Selected Time Series</i>), a ROI segmentation can be defined (<i>Selected Mask</i>), within which model fitting is performed.
 The view currently offers <i>Pixel based</i> and/or <i>ROI based</i> averaged fits of time-varying curves. If a mask is selected, <i>ROI based</i> fitting is enabled.
@@ -43,10 +43,10 @@ Selecting one of the \ref FIT_DCE_General_models "supported models" will open be
 - The 3SL is a semi-quantitative descriptive model that distinguishes three different segments of the signal: A constant baseline, the initial fast rise (wash-in) and the final slow rise / signal decrease (washout). Each of these segments is approximated by a linear curve, with change points in-between. It requires no further configuration.
 - The standard Tofts model, the extended Tofts model and the 2CXM are all three compartment models that require the input of the concentration time curve in the tissue feeding artery, the arterial input function (AIF). 
 In the DCE MR Perfusion Datafit View, the arterial input function can be defined in several ways. For patient individual image derived AIFs, select the radio button <i>Select AIF from Image</i>. 
-In that case, a segmentation ROI for the artery has to be selected from the Data Manager. In cases, where the respective artery does not lie in the same image as the investigated tissue (e.g. in animal experiments, where a slice through the heart is used for AIF extraction), a <i>Dedicated AIF image</i> can be selected from the Data Manager.
-An alternative option is to define the AIF via an external file  <i>Select AIF from File</i> (e.g. for population derived AIFs or AIFs from blood sampling). By clicking the Browse button, one can select a csv file that holds the AIF values and corresponding timepoints (in tuple format (Time, Value)). 
-Caution: the file may not contain a header line, but the first line must start with Time and Intensity values.
-Furthermore, the <i>Hematocrit Level</i> has to be set (from 0 to 1) for conversion from whole blood to plasma concentration. It is set to the literature default value of 0.45.
+In that case, a segmentation ROI for the artery has to be selected from the Data Manager. In cases where the respective artery does not lie in the same image as the investigated tissue (e.g. in animal experiments, where a slice through the heart is used for AIF extraction), a <i>Dedicated AIF image</i> can be selected from the Data Manager.
+An alternative option is to define the AIF via an external file by selecting <i>Select AIF from File</i> (e.g. for population derived AIFs or AIFs from blood sampling). By clicking the <i>Browse</i> button, one can select a csv file that holds the AIF values and corresponding timepoints (in tuple format (Time, Value)). 
+Caution: the file must not contain a header line, but the first line must start with Time and Intensity values.
+Furthermore, the <i>Hematocrit Level</i> has to be set (from 0 to 1) for conversion from whole blood to plasma concentration. It is set as default to the literature value of 0.45.
 
 \subsection FIT_DCE_Settings_start Start parameter
 \imageMacro{dce_mri_start.png, "Example screenshot for start parameter settings.", 10}
@@ -82,10 +82,10 @@ Enabling this option will result in additional parameter maps displaying the sta
 In the following definitions, an <i>evaluation</i> describes the process of cost function calculation and evaluation by the optimizer for a given parameter set.
 
 - <i>Stop condition</i>: Reasons for the fit termination, i.e. criterion reached, maximum number of iterations,...
-- <i>Optimization time</i>
-- <i>Number of iterations</i>
-- <i>Constraint penalty ratio</i>: Ratio between evaluations that were penalized and all evaluations. 0.0 means no evaluation was penalized; 1.0 all evaluations were. Evaluations that hit the failure threshold count as penalized too.
-- <i>Constraint last failed parameter</i>: Ratio between evaluations that where beyond the failure threshold. 0.0 means no evaluation was a failure (but some may be penalized).
+- <i>Optimization time</i>: The overall time from fitting start to termination.
+- <i>Number of iterations</i>: The number of iterations from fitting start to termination.
+- <i>Constraint penalty ratio</i>: Ratio between evaluations that were penalized and all evaluations. 0.0 means no evaluation was penalized; 1.0 all evaluations were. Evaluations that hit the failure threshold count as penalized, too.
+- <i>Constraint last failed parameter</i>: Ratio between evaluations that were beyond the failure threshold. 0.0 means no evaluation was a failure (but some may be penalized).
 - <i>Constraint failure ratio</i>: Index of the first (in terms of index position) parameter, which failed the constraints in the last evaluation.
 
 After all necessary configurations are set, the button <i>Start Modelling</i> is enabled, which starts the fitting routine.

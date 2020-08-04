@@ -93,6 +93,7 @@ namespace mitk
     Message<> ReferenceDataChanged;
     Message<> WorkingDataChanged;
     Message<> RoiDataChanged;
+    Message<> SelectedTimePointChanged;
 
     Message1<std::string> ToolErrorMessage;
     Message1<std::string> GeneralToolMessage;
@@ -108,7 +109,7 @@ namespace mitk
 
     int GetToolID(const Tool *tool);
 
-    /*
+    /**
       \param id The tool of interest.
       Counting starts with 0.
     */
@@ -145,64 +146,64 @@ namespace mitk
     */
     Tool *GetActiveTool();
 
-    /*
+    /**
       \brief Set a list of data/images as reference objects.
     */
     void SetReferenceData(DataVectorType);
 
-    /*
+    /**
       \brief Set single data item/image as reference object.
     */
     void SetReferenceData(DataNode *);
 
-    /*
+    /**
       \brief Set a list of data/images as working objects.
     */
     void SetWorkingData(DataVectorType);
 
-    /*
+    /**
       \brief Set single data item/image as working object.
     */
     void SetWorkingData(DataNode *);
 
-    /*
+    /**
       \brief Set a list of data/images as roi objects.
     */
     void SetRoiData(DataVectorType);
 
-    /*
+    /**
       \brief Set a single data item/image as roi object.
     */
     void SetRoiData(DataNode *);
 
-    /*
+    /**
       \brief Get the list of reference data.
     */
     DataVectorType GetReferenceData();
 
-    /*
+    /**
       \brief Get the current reference data.
       \warning If there is a list of items, this method will only return the first list item.
     */
     DataNode *GetReferenceData(int);
 
-    /*
+    /**
       \brief Get the list of working data.
     */
     DataVectorType GetWorkingData();
 
-    /*
+    /**
       \brief Get the current working data.
       \warning If there is a list of items, this method will only return the first list item.
     */
     DataNode *GetWorkingData(unsigned int);
 
-    /*
+    /**
      \brief Get the current roi data
      */
     DataVectorType GetRoiData();
 
-    /*
+    /**
      \brief Get the roi data at position idx
      */
     DataNode *GetRoiData(int idx);
@@ -210,13 +211,17 @@ namespace mitk
     DataStorage *GetDataStorage();
     void SetDataStorage(DataStorage &storage);
 
-    /*
+    /** Get the current selected time point of the RenderManager
+    */
+    TimePointType GetCurrentTimePoint() const;
+
+    /**
       \brief Tell that someone is using tools.
       GUI elements should call this when they become active. This method increases an internal "client count".
      */
     void RegisterClient();
 
-    /*
+    /**
       \brief Tell that someone is NOT using tools.
       GUI elements should call this when they become active. This method increases an internal "client count".
      */
@@ -234,7 +239,7 @@ namespace mitk
     void OnOneOfTheRoiDataDeletedConst(const itk::Object *caller, const itk::EventObject &e);
     void OnOneOfTheRoiDataDeleted(itk::Object *caller, const itk::EventObject &e);
 
-    /*
+    /**
      \brief Connected to tool's messages
 
      This method just resends error messages coming from any of the tools. This way clients (GUIs) only have to observe
@@ -275,6 +280,21 @@ namespace mitk
 
     /// \brief Callback for NodeRemove events
     void OnNodeRemoved(const mitk::DataNode *node);
+
+    /** Callback for time changed events*/
+    void OnTimeChangedConst(const itk::Object* caller, const itk::EventObject& e);
+    void OnTimeChanged(itk::Object* caller, const itk::EventObject& e);
+
+    void EnsureTimeObservation();
+    void StopTimeObservation();
+
+  private:
+    /** Time point of last detected change*/
+    TimePointType m_LastTimePoint = 0;
+    /** Tag of the observer that listens to time changes*/
+    unsigned long m_TimePointObserverTag = 0;
+    /** Pointer to the observed time stepper*/
+    WeakPointer<SliceNavigationController> m_CurrentTimeNavigationController;
   };
 
 } // namespace

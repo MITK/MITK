@@ -17,9 +17,9 @@ found in the LICENSE file.
 #include "mitkBinaryThresholdTool.h"
 #include <MitkSegmentationUIExports.h>
 
-#include <QDoubleSpinBox>
+#include "ctkSliderWidget.h"
+#include <qcheckbox.h>
 
-class QSlider;
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
   \brief GUI for mitk::BinaryThresholdTool.
@@ -42,8 +42,8 @@ public:
   itkFactorylessNewMacro(Self);
   itkCloneMacro(Self);
 
-    void OnThresholdingIntervalBordersChanged(double lower, double upper, bool isFloat);
-  void OnThresholdingValueChanged(double current);
+  void OnThresholdingIntervalBordersChanged(double lower, double upper, bool isFloat);
+  void OnThresholdingValuesChanged(mitk::ScalarType lower, mitk::ScalarType upper);
 
 signals:
 
@@ -60,34 +60,17 @@ protected slots:
   void OnNewToolAssociated(mitk::Tool *);
   void OnAcceptThresholdPreview();
 
-  /// \brief Called when Spinner value has changed. Consider: Spinner contains DOUBLE values
-  void OnSpinnerValueChanged();
-
-  /// \brief Called when Slider value has changed. Consider: Slider contains INT values
-  void OnSliderValueChanged(int value);
+  void OnSliderValueChanged(double value);
 
 protected:
   QmitkBinaryThresholdToolGUI();
   ~QmitkBinaryThresholdToolGUI() override;
 
-  /// \brief When Slider (int value) has changed, we need to convert it to a respective double value for the spinner
-  double SliderIntToDouble(int val);
+  ctkSliderWidget* m_ThresholdSlider = nullptr;
+  QCheckBox* m_CheckProcessAll = nullptr;
+  QCheckBox* m_CheckCreateNew = nullptr;
 
-  /// \brief When Spinner (double value) has changed, we need to convert it to a respective int value for the slider
-  int DoubleToSliderInt(double val);
-
-  QSlider *m_Slider;
-  QDoubleSpinBox *m_Spinner;
-
-  /// \brief is image float or int?
-  bool m_isFloat;
-
-  double m_RangeMin;
-  double m_RangeMax;
-  double m_Range;
-
-  /// \brief helper bool values to find out, which of the GUI elements has been touched by the user.
-  bool m_ChangingSlider, m_ChangingSpinner;
+  bool m_InternalUpdate = false;
 
   mitk::BinaryThresholdTool::Pointer m_BinaryThresholdTool;
 };

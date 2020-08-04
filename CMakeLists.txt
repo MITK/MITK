@@ -65,7 +65,6 @@ include(mitkFunctionGetGccVersion)
 include(mitkFunctionCheckCompilerFlags)
 include(mitkFunctionSuppressWarnings) # includes several functions
 include(mitkMacroEmptyExternalProject)
-include(mitkFunctionGenerateProjectXml)
 include(mitkFunctionEnableBuildConfiguration)
 include(mitkFunctionWhitelists)
 include(mitkFunctionAddExternalProject)
@@ -476,51 +475,6 @@ if(NOT MITK_ACCESSBYITK_DIMENSIONS)
       "2,3"
       CACHE STRING "List of dimensions used in AccessByItk and InstantiateAccessFunction macros")
 endif()
-
-#-----------------------------------------------------------------------------
-# Project.xml
-#-----------------------------------------------------------------------------
-
-# A list of topologically ordered targets
-set(CTEST_PROJECT_SUBPROJECTS)
-
-list(APPEND CTEST_PROJECT_SUBPROJECTS
-  MITK-Core
-  MITK-CoreUI
-  MITK-IGT
-  MITK-ToF
-  MITK-Modules # all modules not contained in a specific subproject
-  MITK-Plugins # all plugins not contained in a specific subproject
-  MITK-Examples
-  Unlabeled # special "subproject" catching all unlabeled targets and tests
-  )
-
-foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
-  set(MITK_CMAKE_EXTENSION_DIR ${MITK_EXTENSION_DIR}/CMake)
-  get_filename_component(MITK_CMAKE_EXTENSION_DIR ${MITK_CMAKE_EXTENSION_DIR} ABSOLUTE)
-  if(EXISTS ${MITK_CMAKE_EXTENSION_DIR}/CTestSubprojectList.cmake)
-    set(MITK_CTEST_SUBPROJECTS "")
-    include(${MITK_CMAKE_EXTENSION_DIR}/CTestSubprojectList.cmake)
-    if(MITK_CTEST_SUBPROJECTS)
-      list(APPEND CTEST_PROJECT_SUBPROJECTS ${MITK_CTEST_SUBPROJECTS})
-    endif()
-  endif()
-endforeach()
-
-# Configure CTestConfigSubProject.cmake that could be used by CTest scripts
-configure_file(${MITK_SOURCE_DIR}/CTestConfigSubProject.cmake.in
-               ${MITK_BINARY_DIR}/CTestConfigSubProject.cmake)
-
-if(CTEST_PROJECT_ADDITIONAL_TARGETS)
-  # those targets will be executed at the end of the ctest driver script
-  # and they also get their own subproject label
-  set(subproject_list "${CTEST_PROJECT_SUBPROJECTS};${CTEST_PROJECT_ADDITIONAL_TARGETS}")
-else()
-  set(subproject_list "${CTEST_PROJECT_SUBPROJECTS}")
-endif()
-
-# Generate Project.xml file expected by the CTest driver script
-mitkFunctionGenerateProjectXml(${MITK_BINARY_DIR} MITK "${subproject_list}" ${MITK_USE_SUPERBUILD})
 
 #-----------------------------------------------------------------------------
 # Superbuild script
@@ -1100,17 +1054,6 @@ set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${MITK_C_FLAGS_RELEASE}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${MITK_EXE_LINKER_FLAGS}")
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${MITK_SHARED_LINKER_FLAGS}")
 set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${MITK_MODULE_LINKER_FLAGS}")
-
-#-----------------------------------------------------------------------------
-# Add custom targets representing CDash subprojects
-#-----------------------------------------------------------------------------
-
-foreach(subproject ${CTEST_PROJECT_SUBPROJECTS})
-  if(NOT TARGET ${subproject} AND NOT subproject MATCHES "Unlabeled")
-    add_custom_target(${subproject})
-    set_property(TARGET ${subproject} PROPERTY FOLDER "${MITK_ROOT_FOLDER}/CTestSubprojects")
-  endif()
-endforeach()
 
 #-----------------------------------------------------------------------------
 # Add subdirectories

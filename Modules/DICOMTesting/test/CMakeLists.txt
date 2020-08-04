@@ -1,7 +1,4 @@
-
-MITK_CREATE_MODULE_TESTS(LABELS)
-
-include(mitkFunctionAddTestLabel)
+MITK_CREATE_MODULE_TESTS()
 
 # verify minimum expectations:
 #   files are recognized as DICOM
@@ -66,7 +63,6 @@ function(AddDicomTestsFromDataRepository CURRENT_DATASET_DIR TESTS_DIR INPUT_LIS
     #message(STATUS "  Load ${dicomFiles}")
     add_test(${testname}
              ${VERIFY_DUMP_CMD} ${expecteddump} ${dicomFiles})
-    mitkFunctionAddTestLabel(${testname})
 
   endforeach(input allInputs)
 

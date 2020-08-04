@@ -45,7 +45,6 @@ set_property(TARGET ${exec_target} PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Plugins/
 target_link_libraries(${exec_target} Qt5::Core)
 
 if(NOT standalone_build)
-  # subproject support
   add_dependencies(MITK-CoreUI ${exec_target})
 endif()
 

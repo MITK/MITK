@@ -31,6 +31,10 @@ namespace mitk
   public:
     mitkClassMacro(AutoSegmentationTool, Tool);
 
+    /** Sets m_OverwriteExistingSegmentation and therefore controls if
+    * a confirmed segmentation should replace the old segmentation/working node
+    * or if it should be stored as new and additional node.
+    */
     void SetOverwriteExistingSegmentation(bool overwrite);
 
     /**
@@ -54,8 +58,10 @@ namespace mitk
 
     const char *GetGroup() const override;
 
-    virtual Image::ConstPointer Get3DImage(const Image* image, unsigned int timestep) const;
-    virtual Image::ConstPointer Get3DImageByTimePoint(const Image* image, TimePointType timePoint) const;
+    /** Helper that extracts the image for the passed timestep, if the image has multiple time steps.*/
+    static Image::ConstPointer Get3DImage(const Image* image, unsigned int timestep);
+    /** Helper that extracts the image for the passed time point, if the image has multiple time steps.*/
+    static Image::ConstPointer Get3DImageByTimePoint(const Image* image, TimePointType timePoint);
 
     bool m_OverwriteExistingSegmentation;
   };

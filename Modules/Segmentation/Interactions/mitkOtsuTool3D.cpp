@@ -42,7 +42,7 @@ namespace mitk
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, OtsuTool3D, "Otsu Segmentation");
 }
 
-mitk::OtsuTool3D::OtsuTool3D()
+mitk::OtsuTool3D::OtsuTool3D() : AutoSegmentationWithPreviewTool(true)
 {
 }
 
@@ -50,44 +50,43 @@ mitk::OtsuTool3D::~OtsuTool3D()
 {
 }
 
+void mitk::OtsuTool3D::SetSelectedRegions(const SelectedRegionVectorType& regions)
+{
+  if (this->m_SelectedRegions != regions)
+  {
+    this->m_SelectedRegions = regions;
+    //Note: we do not call this->Modified() on puprose. Reason: changing the
+    //selected regions should not force to run otsu filter in DoUpdatePreview due to changed MTime.
+  }
+}
+
+mitk::OtsuTool3D::SelectedRegionVectorType mitk::OtsuTool3D::GetSelectedRegions() const
+{
+  return this->m_SelectedRegions;
+}
+
 void mitk::OtsuTool3D::Activated()
 {
   Superclass::Activated();
 
-  if (m_ToolManager)
-  {
-    m_OriginalImage = dynamic_cast<mitk::Image *>(m_ToolManager->GetReferenceData(0)->GetData());
+  m_SelectedRegions = {};
+  m_NumberOfBins = 128;
+  m_NumberOfRegions = 2;
+  m_UseValley = false;
 
-    m_BinaryPreviewNode = mitk::DataNode::New();
-    m_BinaryPreviewNode->SetName("Binary_Preview");
-    m_BinaryPreviewNode->SetProperty("color", ColorProperty::New(0.0, 1.0, 0.0));
-    m_BinaryPreviewNode->SetProperty("opacity", FloatProperty::New(0.3));
-    // m_BinaryPreviewNode->SetBoolProperty("helper object", true);
-    // m_BinaryPreviewNode->SetProperty("binary", mitk::BoolProperty::New(true));
-    m_ToolManager->GetDataStorage()->Add(this->m_BinaryPreviewNode);
+  m_OtsuResultNode = mitk::DataNode::New();
+  m_OtsuResultNode->SetName("Otsu_Preview");
+  // m_MultiLabelResultNode->SetBoolProperty("helper object", true);
+  m_OtsuResultNode->SetVisibility(true);
+  m_OtsuResultNode->SetOpacity(1.0);
 
-    m_MultiLabelResultNode = mitk::DataNode::New();
-    m_MultiLabelResultNode->SetName("Otsu_Preview");
-    // m_MultiLabelResultNode->SetBoolProperty("helper object", true);
-    m_MultiLabelResultNode->SetVisibility(true);
-
-    m_MaskedImagePreviewNode = mitk::DataNode::New();
-    m_MaskedImagePreviewNode->SetName("Volume_Preview");
-    // m_MultiLabelResultNode->SetBoolProperty("helper object", true);
-    m_MaskedImagePreviewNode->SetVisibility(false);
-
-    m_ToolManager->GetDataStorage()->Add(this->m_MultiLabelResultNode);
-  }
+  m_ToolManager->GetDataStorage()->Add(this->m_OtsuResultNode);
 }
 
 void mitk::OtsuTool3D::Deactivated()
 {
-  m_ToolManager->GetDataStorage()->Remove(this->m_MultiLabelResultNode);
-  m_MultiLabelResultNode = nullptr;
-  m_ToolManager->GetDataStorage()->Remove(this->m_BinaryPreviewNode);
-  m_BinaryPreviewNode = nullptr;
-  m_ToolManager->GetDataStorage()->Remove(this->m_MaskedImagePreviewNode);
-  m_MaskedImagePreviewNode = nullptr;
+  m_ToolManager->GetDataStorage()->Remove(this->m_OtsuResultNode);
+  m_OtsuResultNode = nullptr;
 
   Superclass::Deactivated();
 }
@@ -104,91 +103,99 @@ us::ModuleResource mitk::OtsuTool3D::GetIconResource() const
   return resource;
 }
 
-void mitk::OtsuTool3D::RunSegmentation(int regions, bool useValley, int numberOfBins)
+const char* mitk::OtsuTool3D::GetName() const
 {
-  int numberOfThresholds = regions - 1;
+  return "Otsu";
+}
 
+void mitk::OtsuTool3D::UpdateCleanUp()
+{
+  if (m_OtsuResultNode.IsNotNull())
+    m_OtsuResultNode->SetVisibility(m_SelectedRegions.empty());
+
+  if (nullptr != this->GetPreviewSegmentationNode())
+    this->GetPreviewSegmentationNode()->SetVisibility(!m_SelectedRegions.empty());
+
+  if (m_SelectedRegions.empty())
+  {
+    this->ResetPreviewNode();
+  }
+}
+
+void mitk::OtsuTool3D::DoUpdatePreview(const Image* inputAtTimeStep, Image* previewImage, TimeStepType timeStep)
+{
+  int numberOfThresholds = m_NumberOfRegions - 1;
 
   const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
-  auto image3D = Get3DImageByTimePoint(m_OriginalImage, timePoint);
+  mitk::LabelSetImage::Pointer otsuResultImage = dynamic_cast<LabelSetImage*>(this->m_OtsuResultNode->GetData());
 
-  if (nullptr == image3D)
+  if (nullptr == m_OtsuResultNode->GetData()
+      || this->GetMTime() > m_OtsuResultNode->GetData()->GetMTime()
+      || this->m_LastOtsuTimeStep != timeStep //this covers the case where dynamic
+                                              //segmentations have to compute a preview
+                                              //for all time steps on confirmation
+      || this->GetLastTimePointOfUpdate() != timePoint //this ensures that static seg
+                                                       //previews work with dynamic images
+                                                       //with avoiding unnecessary other otsu computations
+     )
   {
-    MITK_WARN << "Cannot run segementation. Currently selected timepoint is not in the time bounds of the selected reference image. Time point: " << timePoint;
-    return;
+    if (nullptr == inputAtTimeStep)
+    {
+      MITK_WARN << "Cannot run segementation. Currently selected input image is not set.";
+      return;
+    }
+
+    this->m_LastOtsuTimeStep = timeStep;
+
+    mitk::OtsuSegmentationFilter::Pointer otsuFilter = mitk::OtsuSegmentationFilter::New();
+    otsuFilter->SetNumberOfThresholds(numberOfThresholds);
+    otsuFilter->SetValleyEmphasis(m_UseValley);
+    otsuFilter->SetNumberOfBins(m_NumberOfBins);
+    otsuFilter->SetInput(inputAtTimeStep);
+    otsuFilter->AddObserver(itk::ProgressEvent(), m_ProgressCommand);
+
+    try
+    {
+      otsuFilter->Update();
+    }
+    catch (...)
+    {
+      mitkThrow() << "itkOtsuFilter error (image dimension must be in {2, 3} and image must not be RGB)";
+    }
+
+    otsuResultImage = mitk::LabelSetImage::New();
+    otsuResultImage->InitializeByLabeledImage(otsuFilter->GetOutput());
+    this->m_OtsuResultNode->SetData(otsuResultImage);
+    this->m_OtsuResultNode->SetProperty("binary", mitk::BoolProperty::New(false));
+    mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
+    renderingMode->SetValue(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR);
+    this->m_OtsuResultNode->SetProperty("Image Rendering.Mode", renderingMode);
+    mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
+    mitk::LookupTableProperty::Pointer prop = mitk::LookupTableProperty::New(lut);
+    vtkSmartPointer<vtkLookupTable> lookupTable = vtkSmartPointer<vtkLookupTable>::New();
+    lookupTable->SetHueRange(1.0, 0.0);
+    lookupTable->SetSaturationRange(1.0, 1.0);
+    lookupTable->SetValueRange(1.0, 1.0);
+    lookupTable->SetTableRange(-1.0, 1.0);
+    lookupTable->Build();
+    lut->SetVtkLookupTable(lookupTable);
+    prop->SetLookupTable(lut);
+    this->m_OtsuResultNode->SetProperty("LookupTable", prop);
+    mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
+    mitk::LevelWindow levelwindow;
+    levelwindow.SetRangeMinMax(0, numberOfThresholds + 1);
+    levWinProp->SetLevelWindow(levelwindow);
+    this->m_OtsuResultNode->SetProperty("levelwindow", levWinProp);
   }
 
-  mitk::OtsuSegmentationFilter::Pointer otsuFilter = mitk::OtsuSegmentationFilter::New();
-  otsuFilter->SetNumberOfThresholds(numberOfThresholds);
-  otsuFilter->SetValleyEmphasis(useValley);
-  otsuFilter->SetNumberOfBins(numberOfBins);
-  otsuFilter->SetInput(image3D);
-
-  try
+  if (!m_SelectedRegions.empty())
   {
-    otsuFilter->Update();
+    AccessByItk_n(otsuResultImage, CalculatePreview, (previewImage, timeStep));
   }
-  catch (...)
-  {
-    mitkThrow() << "itkOtsuFilter error (image dimension must be in {2, 3} and image must not be RGB)";
-  }
-
-  m_ToolManager->GetDataStorage()->Remove(this->m_MultiLabelResultNode);
-  m_MultiLabelResultNode = nullptr;
-  m_MultiLabelResultNode = mitk::DataNode::New();
-  m_MultiLabelResultNode->SetName("Otsu_Preview");
-  m_MultiLabelResultNode->SetVisibility(true);
-  m_ToolManager->GetDataStorage()->Add(this->m_MultiLabelResultNode);
-  m_MultiLabelResultNode->SetOpacity(1.0);
-
-  mitk::LabelSetImage::Pointer resultImage = mitk::LabelSetImage::New();
-  resultImage->InitializeByLabeledImage(otsuFilter->GetOutput());
-  this->m_MultiLabelResultNode->SetData(resultImage);
-  m_MultiLabelResultNode->SetProperty("binary", mitk::BoolProperty::New(false));
-  mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
-  renderingMode->SetValue(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR);
-  m_MultiLabelResultNode->SetProperty("Image Rendering.Mode", renderingMode);
-  mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
-  mitk::LookupTableProperty::Pointer prop = mitk::LookupTableProperty::New(lut);
-  vtkSmartPointer<vtkLookupTable> lookupTable = vtkSmartPointer<vtkLookupTable>::New();
-  lookupTable->SetHueRange(1.0, 0.0);
-  lookupTable->SetSaturationRange(1.0, 1.0);
-  lookupTable->SetValueRange(1.0, 1.0);
-  lookupTable->SetTableRange(-1.0, 1.0);
-  lookupTable->Build();
-  lut->SetVtkLookupTable(lookupTable);
-  prop->SetLookupTable(lut);
-  m_MultiLabelResultNode->SetProperty("LookupTable", prop);
-  mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
-  mitk::LevelWindow levelwindow;
-  levelwindow.SetRangeMinMax(0, numberOfThresholds + 1);
-  levWinProp->SetLevelWindow(levelwindow);
-  m_MultiLabelResultNode->SetProperty("levelwindow", levWinProp);
-
-  // m_BinaryPreviewNode->SetVisibility(false);
-  //  m_MultiLabelResultNode->SetVisibility(true);
-  // this->m_OtsuSegmentationDialog->setCursor(Qt::ArrowCursor);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-void mitk::OtsuTool3D::ConfirmSegmentation()
-{
-  mitk::LabelSetImage::Pointer resultImage = mitk::LabelSetImage::New();
-  resultImage->InitializeByLabeledImage(dynamic_cast<mitk::Image *>(m_BinaryPreviewNode->GetData()));
-  GetTargetSegmentationNode()->SetData(resultImage);
-
-  m_ToolManager->ActivateTool(-1);
-}
-
-void mitk::OtsuTool3D::UpdateBinaryPreview(std::vector<int> regionIDs)
-{
-  m_MultiLabelResultNode->SetVisibility(false);
-  mitk::Image::Pointer multiLabelSegmentation = dynamic_cast<mitk::Image *>(m_MultiLabelResultNode->GetData());
-  AccessByItk_1(multiLabelSegmentation, CalculatePreview, regionIDs);
 }
 
 template <typename TPixel, unsigned int VImageDimension>
-void mitk::OtsuTool3D::CalculatePreview(itk::Image<TPixel, VImageDimension> *itkImage, std::vector<int> regionIDs)
+void mitk::OtsuTool3D::CalculatePreview(itk::Image<TPixel, VImageDimension> *itkImage, mitk::Image* segmentation, unsigned int timeStep)
 {
   typedef itk::Image<TPixel, VImageDimension> InputImageType;
   typedef itk::Image<mitk::Tool::DefaultSegmentationDataType, VImageDimension> OutputImageType;
@@ -198,80 +205,49 @@ void mitk::OtsuTool3D::CalculatePreview(itk::Image<TPixel, VImageDimension> *itk
   typename FilterType::Pointer filter = FilterType::New();
 
   // InputImageType::Pointer itkImage;
-  typename OutputImageType::Pointer itkBinaryTempImage1;
-  typename OutputImageType::Pointer itkBinaryTempImage2;
   typename OutputImageType::Pointer itkBinaryResultImage;
 
-  // mitk::Image::Pointer multiLabelSegmentation = dynamic_cast<mitk::Image*>(m_MultiLabelResultNode->GetData());
-  // mitk::CastToItkImage(multiLabelSegmentation, itkImage);
-
   filter->SetInput(itkImage);
-  filter->SetLowerThreshold(regionIDs[0]);
-  filter->SetUpperThreshold(regionIDs[0]);
+  filter->SetLowerThreshold(m_SelectedRegions[0]);
+  filter->SetUpperThreshold(m_SelectedRegions[0]);
   filter->SetInsideValue(1);
   filter->SetOutsideValue(0);
+  filter->AddObserver(itk::ProgressEvent(), m_ProgressCommand);
   filter->Update();
-  itkBinaryTempImage2 = filter->GetOutput();
-
-  typename itk::OrImageFilter<OutputImageType, OutputImageType>::Pointer orFilter =
-    itk::OrImageFilter<OutputImageType, OutputImageType>::New();
+  itkBinaryResultImage = filter->GetOutput();
+  itkBinaryResultImage->DisconnectPipeline();
 
   // if more than one region id is used compute the union of all given binary regions
-  for (auto it = regionIDs.begin(); it != regionIDs.end(); ++it)
+  for (const auto regionID : m_SelectedRegions)
   {
-    filter->SetLowerThreshold(*it);
-    filter->SetUpperThreshold(*it);
-    filter->SetInsideValue(1);
-    filter->SetOutsideValue(0);
-    filter->Update();
-    itkBinaryTempImage1 = filter->GetOutput();
+    if (regionID != m_SelectedRegions[0])
+    {
+      filter->SetLowerThreshold(regionID);
+      filter->SetUpperThreshold(regionID);
+      filter->SetInsideValue(1);
+      filter->SetOutsideValue(0);
+      filter->Update();
 
-    orFilter->SetInput1(itkBinaryTempImage1);
-    orFilter->SetInput2(itkBinaryTempImage2);
+      typename OutputImageType::Pointer tempImage = filter->GetOutput();
 
-    orFilter->UpdateLargestPossibleRegion();
-    itkBinaryResultImage = orFilter->GetOutput();
-    itkBinaryTempImage2 = itkBinaryResultImage;
+      typename itk::OrImageFilter<OutputImageType, OutputImageType>::Pointer orFilter =
+        itk::OrImageFilter<OutputImageType, OutputImageType>::New();
+      orFilter->SetInput1(tempImage);
+      orFilter->SetInput2(itkBinaryResultImage);
+      orFilter->AddObserver(itk::ProgressEvent(), m_ProgressCommand);
+
+      orFilter->UpdateLargestPossibleRegion();
+      itkBinaryResultImage = orFilter->GetOutput();
+    }
   }
   //----------------------------------------------------------------------------------------------------
-  mitk::Image::Pointer binarySegmentation;
-  mitk::CastToMitkImage(itkBinaryResultImage, binarySegmentation);
-  m_BinaryPreviewNode->SetData(binarySegmentation);
-  m_BinaryPreviewNode->SetVisibility(true);
-  m_BinaryPreviewNode->SetProperty("outline binary", mitk::BoolProperty::New(false));
 
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  segmentation->SetVolume((void*)(itkBinaryResultImage->GetPixelContainer()->GetBufferPointer()), timeStep);
 }
 
-const char *mitk::OtsuTool3D::GetName() const
+unsigned int mitk::OtsuTool3D::GetMaxNumberOfBins() const
 {
-  return "Otsu";
-}
-
-void mitk::OtsuTool3D::UpdateVolumePreview(bool volumeRendering)
-{
-  if (volumeRendering)
-  {
-    m_MaskedImagePreviewNode->SetBoolProperty("volumerendering", true);
-    m_MaskedImagePreviewNode->SetBoolProperty("volumerendering.uselod", true);
-  }
-  else
-  {
-    m_MaskedImagePreviewNode->SetBoolProperty("volumerendering", false);
-  }
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-void mitk::OtsuTool3D::ShowMultiLabelResultNode(bool show)
-{
-  m_MultiLabelResultNode->SetVisibility(show);
-  m_BinaryPreviewNode->SetVisibility(!show);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-int mitk::OtsuTool3D::GetNumberOfBins()
-{
-  ScalarType min = m_OriginalImage.GetPointer()->GetStatistics()->GetScalarValueMin();
-  ScalarType max = m_OriginalImage.GetPointer()->GetStatistics()->GetScalarValueMaxNoRecompute();
-  return static_cast<int>(max - min) + 1;
+  const auto min = this->GetReferenceData()->GetStatistics()->GetScalarValueMin();
+  const auto max = this->GetReferenceData()->GetStatistics()->GetScalarValueMaxNoRecompute();
+  return static_cast<unsigned int>(max - min) + 1;
 }

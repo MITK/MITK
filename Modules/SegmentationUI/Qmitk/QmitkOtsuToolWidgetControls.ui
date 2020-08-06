@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>192</width>
-    <height>293</height>
+    <height>300</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -196,6 +196,26 @@
      </property>
      <property name="text">
       <string>Confirm Segmentation</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="m_CheckProcessAll">
+     <property name="toolTip">
+      <string>&quot;Add the confirmed segmentation as a new segmentation instead of overwriting the currently selected.&quot;</string>
+     </property>
+     <property name="text">
+      <string>Process all time steps</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="m_CheckCreateNew">
+     <property name="toolTip">
+      <string>Add the confirmed segmentation as a new segmentation instead of overwriting the currently selected.</string>
+     </property>
+     <property name="text">
+      <string>Create as new segmentation</string>
      </property>
     </widget>
    </item>

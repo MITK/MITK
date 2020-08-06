@@ -327,8 +327,6 @@ void mitk::FastMarchingTool3D::UpdateCleanUp()
 
 void mitk::FastMarchingTool3D::DoUpdatePreview(const Image* inputAtTimeStep, Image* previewImage, TimeStepType timeStep)
 {
-  bool isOldBinary = nullptr == dynamic_cast<mitk::LabelSetImage*>(previewImage);
-
   if (nullptr != inputAtTimeStep && nullptr != previewImage && m_SeedContainer.IsNotNull() && !m_SeedContainer->empty())
   {
     AccessFixedDimensionByItk_n(inputAtTimeStep, DoITKFastMarching, 3, (previewImage, timeStep));

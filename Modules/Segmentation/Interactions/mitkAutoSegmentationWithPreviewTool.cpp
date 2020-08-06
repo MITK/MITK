@@ -40,7 +40,7 @@ mitk::AutoSegmentationWithPreviewTool::~AutoSegmentationWithPreviewTool()
 {
 }
 
-bool mitk::AutoSegmentationWithPreviewTool::CanHandle(const BaseData* referenceData, const BaseData* workingData) const
+bool mitk::AutoSegmentationWithPreviewTool::CanHandle(const BaseData* /*referenceData*/, const BaseData* workingData) const
 {
   if (workingData == nullptr)
     return true;

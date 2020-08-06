@@ -59,7 +59,7 @@ mitk::Tool::~Tool()
 {
 }
 
-bool mitk::Tool::CanHandle(BaseData *) const
+bool mitk::Tool::CanHandle(const BaseData* /*referenceData*/, const BaseData* /*workingData*/) const
 {
   return true;
 }

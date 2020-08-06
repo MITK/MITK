@@ -6,11 +6,15 @@
 \tableofcontents
 
 \section org_mitk_gui_qt_pharmacokinetics_concentration_mri_overview Overview
-Stand-alone conversion of image signal intensities to contrast agent concentration units can be performed with a dedicated plugin. 
-The plugin distinguishes between T1 weighted and T2 weighted sequences. T1 conversion can be performed in terms of absolute and relative signal enhancement as well as turbo flash sequences for both 3D images (baseline images S0 without contrast enhancement (pre-contrast) input required) and 4D sequences (baseline selected as first frame of time series).
+This view offers a dedicated stand-alone conversion of MR image signal intensities to contrast agent concentration.
+It contains a selection of the conversion tools for T1-weighted signal intensities, which are a part of the DCE MR Perfusion Datafit View (see \ref FIT_DCE_Settings_concentration).
+Additionally, it allows for conversion between T2-weighted signal intensities and contrast agent concentration.
 
 \section org_mitk_gui_qt_pharmacokinetics_concentration_mri_Contact Contact information
 This plug-in is being developed by the SIDT group (Software Development for Integrated Diagnostics and Therapy) at the German Cancer Research Center (DKFZ).
 If you have any questions, need support, find a bug or have a feature request, feel free to contact us at www.mitk.org.
+
+
+
 
 */

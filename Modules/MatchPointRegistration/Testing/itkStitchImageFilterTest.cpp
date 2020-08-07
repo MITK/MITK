@@ -42,20 +42,28 @@ public:
   {
     InputImageType::PointType origin;
     origin.Fill(0.);
+    InputImageType::SpacingType spacing;
+    spacing.Fill(1.);
+    spacing[1] = 5.;
+
     m_Filter = FilterType::New();
     m_Input1 = mitk::GenerateTestImage(1);
+    m_Input1->SetSpacing(spacing);
 
     m_Input2 = mitk::GenerateTestImage(10);
-    origin[1] = 2.;
+    origin[1] = 10.;
     m_Input2->SetOrigin(origin);
+    m_Input2->SetSpacing(spacing);
 
     m_Input3 = mitk::GenerateTestImage(100);
-    origin[1] = 4.;
+    origin[1] = 20.;
     m_Input3->SetOrigin(origin);
+    m_Input3->SetSpacing(spacing);
 
     FilterType::SizeType size = { 3, 9 };
     m_Filter->SetDefaultPixelValue(1000);
     m_Filter->SetSize(size);
+    m_Filter->SetOutputSpacing(spacing);
   }
 
   void tearDown() override
@@ -107,13 +115,13 @@ public:
 
     using TranslationType = itk::TranslationTransform<double, 2>;
     TranslationType::OutputVectorType offset;
-    offset[0] = 0;
-    offset[1] = -1;
+    offset[0] = 0.;
+    offset[1] = -5.;
     auto translation1 = TranslationType::New();
     translation1->SetOffset(offset);
     m_Filter->SetInput(1, m_Input2, translation1);
     
-    offset[1] = -2;
+    offset[1] = -10.;
     auto translation2 = TranslationType::New();
     translation2->SetOffset(offset);
     m_Filter->SetInput(2, m_Input3, translation2);
@@ -129,11 +137,11 @@ public:
     using TranslationType = itk::TranslationTransform<double, 2>;
     TranslationType::OutputVectorType offset;
     offset[0] = 0;
-    offset[1] = -1.5;
+    offset[1] = -7.5;
     auto translation1 = TranslationType::New();
     translation1->SetOffset(offset);
 
-    offset[1] = -2.5;
+    offset[1] = -12.5;
     auto translation2 = TranslationType::New();
     translation2->SetOffset(offset);
 

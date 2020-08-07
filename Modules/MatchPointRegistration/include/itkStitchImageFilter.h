@@ -25,7 +25,25 @@ found in the LICENSE file.
 
 namespace itk
 {
-/** \class StitchImageFilter
+  enum class StitchStrategy
+  {
+    Mean = 0, //use the mean value of all inputs that can provide a pixel vaule
+    BorderDistance = 1 //use the value that is largest minimal distance to its image borders (use e.g. if vaules tend to be not relyable at borders)
+  };
+
+  std::ostream& operator<< (std::ostream& os, const itk::StitchStrategy& strategy)
+  {
+    if (itk::StitchStrategy::Mean == strategy)
+      os << "Mean";
+    else if (itk::StitchStrategy::BorderDistance == strategy)
+      os << "BorderDistance";
+    else
+      os << "unkown";
+
+    return os;
+  };
+
+  /** \class StitchImageFilter
  * \brief ITK filter that resamples/stitches multiple images into a given reference geometry.
  *
  * StitchImageFilter is simelar to itk's ResampleImageFilter, but in difference to the last
@@ -201,6 +219,9 @@ public:
   itkBooleanMacro(UseReferenceImage);
   itkGetConstMacro(UseReferenceImage, bool);
 
+  itkSetMacro(StitchStrategy, StitchStrategy);
+  itkGetConstMacro(StitchStrategy, StitchStrategy);
+
   /** StitchImageFilter produces an image which is a different size
    * than its input.  As such, it needs to provide an implementation
    * for GenerateOutputInformation() in order to inform the pipeline
@@ -297,7 +318,7 @@ private:
   DirectionType   m_OutputDirection;      // output image direction cosines
   IndexType       m_OutputStartIndex;     // output image start index
   bool            m_UseReferenceImage;
-
+  StitchStrategy  m_StitchStrategy;
 };
 } // end namespace itk
 

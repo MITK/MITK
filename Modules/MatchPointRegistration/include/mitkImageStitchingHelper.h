@@ -21,6 +21,8 @@ found in the LICENSE file.
 #include "mitkMAPRegistrationWrapper.h"
 #include "mitkImageMappingHelper.h"
 
+#include <itkStitchImageFilter.h>
+
 #include "MitkMatchPointRegistrationExports.h"
 
 namespace mitk
@@ -40,18 +42,18 @@ namespace mitk
     MITKMATCHPOINTREGISTRATION_EXPORT Image::Pointer StitchImages(std::vector<Image::ConstPointer> inputs,
       std::vector<::map::core::RegistrationBase::ConstPointer> registrations,
       const BaseGeometry* resultGeometry,
-      const double& paddingValue = 0,
+      const double& paddingValue = 0, itk::StitchStrategy stitchStrategy = itk::StitchStrategy::Mean,
       mitk::ImageMappingInterpolator::Type interpolatorType = mitk::ImageMappingInterpolator::Linear);
 
     MITKMATCHPOINTREGISTRATION_EXPORT Image::Pointer StitchImages(std::vector<Image::ConstPointer> inputs,
       std::vector<MAPRegistrationWrapper::ConstPointer> registrations,
       const BaseGeometry* resultGeometry,
-      const double& paddingValue = 0,
+      const double& paddingValue = 0, itk::StitchStrategy stitchStrategy = itk::StitchStrategy::Mean,
       mitk::ImageMappingInterpolator::Type interpolatorType = mitk::ImageMappingInterpolator::Linear);
 
     MITKMATCHPOINTREGISTRATION_EXPORT Image::Pointer StitchImages(std::vector<Image::ConstPointer> inputs,
       const BaseGeometry* resultGeometry,
-      const double& paddingValue = 0,
+      const double& paddingValue = 0, itk::StitchStrategy stitchStrategy = itk::StitchStrategy::Mean,
       mitk::ImageMappingInterpolator::Type interpolatorType = mitk::ImageMappingInterpolator::Linear);
 
 }

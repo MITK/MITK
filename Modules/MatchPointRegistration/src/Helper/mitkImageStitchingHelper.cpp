@@ -17,7 +17,6 @@ found in the LICENSE file.
 #include <itkLinearInterpolateImageFunction.h>
 #include <itkBSplineInterpolateImageFunction.h>
 #include <itkWindowedSincInterpolateImageFunction.h>
-#include <itkStitchImageFilter.h>
 
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
@@ -76,7 +75,7 @@ void doMITKStitching(const ::itk::Image<TPixelType,VImageDimension>* input1,
   std::vector<mitk::Image::ConstPointer> inputs,
   std::vector<::map::core::RegistrationBase::ConstPointer> registrations,
   const mitk::BaseGeometry* resultGeometry,
-  const double& paddingValue, mitk::ImageMappingInterpolator::Type interpolatorType)
+  const double& paddingValue, itk::StitchStrategy stitchStrategy, mitk::ImageMappingInterpolator::Type interpolatorType)
 {
   using ConcreteRegistrationType = ::map::core::Registration<VImageDimension, VImageDimension>;
   using ItkImageType = itk::Image<TPixelType, VImageDimension>;
@@ -86,14 +85,29 @@ void doMITKStitching(const ::itk::Image<TPixelType,VImageDimension>* input1,
   
   stitcher->SetDefaultPixelValue(paddingValue);
 
-  stitcher->SetOutputSpacing(resultGeometry->GetSpacing());
   stitcher->SetOutputOrigin(resultGeometry->GetOrigin());
-  stitcher->SetOutputDirection(resultGeometry->GetIndexToWorldTransform()->GetMatrix());
+
+  const auto spacing = resultGeometry->GetSpacing();
+  stitcher->SetOutputSpacing(spacing);
+
+  StitchingFilterType::DirectionType itkDirection;
+  const auto mitkDirection = resultGeometry->GetIndexToWorldTransform()->GetMatrix();
+  for (unsigned int i = 0; i < VImageDimension; ++i)
+  {
+    for (unsigned int j = 0; j < VImageDimension; ++j)
+    {
+      itkDirection[i][j] = mitkDirection[i][j] / spacing[j];
+    }
+  }
+  stitcher->SetOutputDirection(itkDirection);
+
   ItkImageType::SizeType size;
   size[0] = resultGeometry->GetExtent(0);
   size[1] = resultGeometry->GetExtent(1);
   size[2] = resultGeometry->GetExtent(2);
   stitcher->SetSize(size);
+  stitcher->SetNumberOfThreads(1);
+  stitcher->SetStitchStrategy(stitchStrategy);
 
   auto inputIter = inputs.begin();
   auto regIter = registrations.begin();
@@ -112,6 +126,9 @@ void doMITKStitching(const ::itk::Image<TPixelType,VImageDimension>* input1,
     }
 
     stitcher->SetInput(index, itkInput, kernel->getTransformModel(), generateInterpolator< ::itk::Image<TPixelType, VImageDimension> >(interpolatorType));
+    ++inputIter;
+    ++regIter;
+    ++index;
   }
 
   stitcher->Update();
@@ -122,7 +139,7 @@ mitk::Image::Pointer
 mitk::StitchImages(std::vector<Image::ConstPointer> inputs,
   std::vector<::map::core::RegistrationBase::ConstPointer> registrations,
   const BaseGeometry* resultGeometry,
-  const double& paddingValue,
+  const double& paddingValue, itk::StitchStrategy stitchStrategy,
   mitk::ImageMappingInterpolator::Type interpolatorType)
 {
   if (inputs.size() != registrations.size())
@@ -168,7 +185,7 @@ mitk::StitchImages(std::vector<Image::ConstPointer> inputs,
 
   Image::Pointer result;
 
-  AccessFixedDimensionByItk_n(inputs.front(), doMITKStitching, 3, (result, inputs, registrations, resultGeometry, paddingValue, interpolatorType));
+  AccessFixedDimensionByItk_n(inputs.front(), doMITKStitching, 3, (result, inputs, registrations, resultGeometry, paddingValue, stitchStrategy, interpolatorType));
 
   return result;
 }
@@ -177,7 +194,7 @@ mitk::Image::Pointer
 mitk::StitchImages(std::vector<Image::ConstPointer> inputs,
   std::vector<MAPRegistrationWrapper::ConstPointer> registrations,
   const BaseGeometry* resultGeometry,
-  const double& paddingValue,
+  const double& paddingValue, itk::StitchStrategy stitchStrategy,
   mitk::ImageMappingInterpolator::Type interpolatorType)
 {
 
@@ -191,14 +208,14 @@ mitk::StitchImages(std::vector<Image::ConstPointer> inputs,
     unwrappedRegs.push_back(reg->GetRegistration());
   }
 
-  Image::Pointer result = StitchImages(inputs, unwrappedRegs, resultGeometry, paddingValue, interpolatorType);
+  Image::Pointer result = StitchImages(inputs, unwrappedRegs, resultGeometry, paddingValue, stitchStrategy, interpolatorType);
   return result;
 }
 
 mitk::Image::Pointer
 mitk::StitchImages(std::vector<Image::ConstPointer> inputs,
   const BaseGeometry* resultGeometry,
-  const double& paddingValue,
+  const double& paddingValue, itk::StitchStrategy stitchStrategy,
   mitk::ImageMappingInterpolator::Type interpolatorType)
 {
   auto defaultReg = GenerateIdentityRegistration3D();
@@ -206,7 +223,7 @@ mitk::StitchImages(std::vector<Image::ConstPointer> inputs,
   defaultRegs.resize(inputs.size());
   std::fill(defaultRegs.begin(), defaultRegs.end(), defaultReg->GetRegistration());
   
-  Image::Pointer result = StitchImages(inputs, defaultRegs, resultGeometry, paddingValue, interpolatorType);
+  Image::Pointer result = StitchImages(inputs, defaultRegs, resultGeometry, paddingValue, stitchStrategy, interpolatorType);
   return result;
 }
 

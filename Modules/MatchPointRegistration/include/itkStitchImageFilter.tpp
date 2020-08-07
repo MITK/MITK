@@ -36,7 +36,8 @@ StitchImageFilter< TInputImage, TOutputImage, TInterpolatorPrecisionType, TTrans
 ::StitchImageFilter() :
   m_OutputSpacing( 1.0 ),
   m_OutputOrigin( 0.0 ),
-  m_UseReferenceImage( false )
+  m_UseReferenceImage( false ),
+  m_StitchStrategy(StitchStrategy::Mean)
 {
 
   m_Size.Fill( 0 );
@@ -256,13 +257,21 @@ StitchImageFilter< TInputImage, TOutputImage, TInterpolatorPrecisionType, TTrans
 
   // Get the output pointers
   OutputImageType* outputPtr = this->GetOutput();
-
   // Get this input pointers
   InputImageVectorType inputs = this->GetInputs();
   TransformMapType transforms = this->GetTransforms();
 
+  std::map<const InputImageType*, typedef InputImageType::IndexType> lowerIndices;
+  std::map<const InputImageType*, typedef InputImageType::IndexType> upperIndices;
+  for (const auto& input : inputs)
+  {
+    const auto largestRegion = input->GetLargestPossibleRegion();
+    lowerIndices[input] = largestRegion.GetIndex();
+    upperIndices[input] = largestRegion.GetUpperIndex();
+  }
+
   // Create an iterator that will walk the output region for this thread.
-  typedef ImageRegionIteratorWithIndex< TOutputImage > OutputIterator;
+  typedef ImageRegionIteratorWithIndex< OutputImageType > OutputIterator;
   OutputIterator outIt(outputPtr, outputRegionForThread);
 
   // Define a few indices that will be used to translate from an input pixel
@@ -295,6 +304,7 @@ StitchImageFilter< TInputImage, TOutputImage, TInterpolatorPrecisionType, TTrans
     outputPtr->TransformIndexToPhysicalPoint(outIt.GetIndex(), outputPoint);
 
     std::vector<PixelType> pixvals;
+    std::vector<double> pixDistance;
 
     for (const auto& input : inputs)
     {
@@ -307,13 +317,31 @@ StitchImageFilter< TInputImage, TOutputImage, TInterpolatorPrecisionType, TTrans
       {
         OutputType value = m_Interpolators[input]->EvaluateAtContinuousIndex(inputIndex);
         pixvals.emplace_back(this->CastPixelWithBoundsChecking(value, minOutputValue, maxOutputValue));
+
+        ContinuousInputIndexType indexDistance;
+        const auto spacing = input->GetSpacing();
+
+        double minBorderDistance = std::numeric_limits<double>::max();
+        for (unsigned int i = 0; i < ImageDimension; ++i)
+        {
+          minBorderDistance = std::min(minBorderDistance, std::min(std::abs(lowerIndices[input][i] - inputIndex[i]) * spacing[i], std::abs(upperIndices[input][i] - inputIndex[i]) * spacing[i]));
+        }
+        pixDistance.emplace_back(minBorderDistance);
       }
     }
 
     if (!pixvals.empty())
-    { //at least one input provided a value -> compute weighted sum
-      double sum = std::accumulate(pixvals.begin(), pixvals.end(), 0.0);
-      outIt.Set(sum / pixvals.size());
+    { //at least one input provided a value
+      if (StitchStrategy::Mean == m_StitchStrategy)
+      {
+        double sum = std::accumulate(pixvals.begin(), pixvals.end(), 0.0);
+        outIt.Set(sum / pixvals.size());
+      }
+      else
+      {
+        auto finding = std::max_element(pixDistance.begin(), pixDistance.end());
+        outIt.Set(pixvals[std::distance(pixDistance.begin(), finding)]);
+      }
     }
     else
     {

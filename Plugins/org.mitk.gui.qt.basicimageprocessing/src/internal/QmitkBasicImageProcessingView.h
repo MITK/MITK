@@ -13,13 +13,13 @@ found in the LICENSE file.
 #ifndef QMITKBASICIMAGEPROCESSINGVIEW_H
 #define QMITKBASICIMAGEPROCESSINGVIEW_H
 
-#include <QmitkAbstractView.h>
+#include <ui_QmitkBasicImageProcessingViewControls.h>
+
 #include <org_mitk_gui_qt_basicimageprocessing_Export.h>
-#include "ui_QmitkBasicImageProcessingViewControls.h"
 
-#include "QmitkStepperAdapter.h"
-
-#include <mitkDataStorageSelection.h>
+#include <mitkNodePredicateAnd.h>
+#include <QmitkStepperAdapter.h>
+#include <QmitkAbstractView.h>
 
 /*!
 \brief This module allows to use some basic image processing filters for preprocessing, image enhancement and testing purposes
@@ -55,12 +55,7 @@ public:
 
 private Q_SLOTS:
 
-  /*!
-  \brief Invoked when the DataManager selection changed
-  */
-  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
-
-
+  void OnCurrentSelectionChanged(const QList<mitk::DataNode::Pointer>& nodes);
 
     /*
    * When an action is selected in the "one image ops" list box
@@ -104,8 +99,9 @@ private:
 
   Ui::QmitkBasicImageProcessingViewControls* m_Controls;
 
-  mitk::DataStorageSelection::Pointer m_SelectedImageNode;
   QmitkStepperAdapter* m_TimeStepperAdapter;
+
+  mitk::NodePredicateAnd::Pointer m_IsImagePredicate;
 
   enum ActionType
   {

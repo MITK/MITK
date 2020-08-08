@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#if !defined(QmitkBasicImageProcessingView_H__INCLUDED)
-#define QmitkBasicImageProcessingView_H__INCLUDED
+#ifndef QMITKBASICIMAGEPROCESSINGVIEW_H
+#define QMITKBASICIMAGEPROCESSINGVIEW_H
 
 #include <QmitkAbstractView.h>
 #include <org_mitk_gui_qt_basicimageprocessing_Export.h>
@@ -46,28 +46,14 @@ class BASICIMAGEPROCESSING_EXPORT QmitkBasicImageProcessing : public QmitkAbstra
   Q_OBJECT
 
 public:
+  static const std::string VIEW_ID;
 
-  /*!
-  \brief default constructor
-  */
   QmitkBasicImageProcessing();
-
-  /*!
-  \brief default destructor
-  */
   ~QmitkBasicImageProcessing() override;
-
-  /*!
-  \brief method for creating the widget containing the application controls, like sliders, buttons etc.
-  */
-  void CreateQtPartControl(QWidget *parent) override;
 
   void SetFocus() override;
 
-  /*!
-  \brief method for creating the connections of main and control widget
-  */
-  virtual void CreateConnections();
+private Q_SLOTS:
 
   /*!
   \brief Invoked when the DataManager selection changed
@@ -75,40 +61,38 @@ public:
   void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
 
-  protected slots:
 
     /*
-    * When an action is selected in the "one image ops" list box
-    */
-    void SelectAction(int action);
+   * When an action is selected in the "one image ops" list box
+   */
+  void SelectAction(int action);
 
-    /*
-    * When an action is selected in the "two image ops" list box
-    */
-    void SelectAction2(int operation);
+  /*
+   * When an action is selected in the "two image ops" list box
+   */
+  void SelectAction2(int operation);
 
-    /*
-    * The "Execute" button in the "one image ops" box was triggered
-    */
-    void StartButtonClicked();
+  /*
+   * The "Execute" button in the "one image ops" box was triggered
+   */
+  void StartButtonClicked();
 
-    /*
-    * The "Execute" button in the "two image ops" box was triggered
-    */
-    void StartButton2Clicked();
+  /*
+   * The "Execute" button in the "two image ops" box was triggered
+   */
+  void StartButton2Clicked();
 
-    /*
-    *  Switch between the one and the two image operations GUI
-    */
-    void ChangeGUI();
+  /*
+   *  Switch between the one and the two image operations GUI
+   */
+  void ChangeGUI();
 
-    void SelectInterpolator(int interpolator);
+  void SelectInterpolator(int interpolator);
 
 private:
 
-  /*
-  * After a one image operation, reset the "one image ops" panel
-  */
+  void CreateQtPartControl(QWidget *parent) override;
+  virtual void CreateConnections();
   void ResetOneImageOpPanel();
 
   /*
@@ -124,16 +108,13 @@ private:
   /** retrieve the tnc from renderwindow part */
   void InternalGetTimeNavigationController();
 
-  /*!
-  * controls containing sliders for scrolling through the slices
-  */
-  Ui::QmitkBasicImageProcessingViewControls *m_Controls;
+  Ui::QmitkBasicImageProcessingViewControls* m_Controls;
 
-  //mitk::DataNode*       m_SelectedImageNode;
   mitk::DataStorageSelection::Pointer m_SelectedImageNode;
-  QmitkStepperAdapter*      m_TimeStepperAdapter;
+  QmitkStepperAdapter* m_TimeStepperAdapter;
 
-  enum ActionType {
+  enum ActionType
+  {
     NOACTIONSELECTED,
     CATEGORY_DENOISING,
     GAUSSIAN,
@@ -158,7 +139,8 @@ private:
     RESCALE2
   } m_SelectedAction;
 
-  enum OperationType{
+  enum OperationType
+  {
     TWOIMAGESNOACTIONSELECTED,
     CATEGORY_ARITHMETIC,
     ADD,
@@ -172,12 +154,11 @@ private:
     XOR
   } m_SelectedOperation;
 
-  enum InterpolationType{
+  enum InterpolationType
+  {
     LINEAR,
     NEAREST
   } m_SelectedInterpolation;
 };
 
-#endif // !defined(QmitkBasicImageProcessing_H__INCLUDED)
-
-
+#endif // !defined(QmitkBasicImageProcessing_H__INCLUDED)QMITKBASICIMAGEPROCESSINGVIEW_H

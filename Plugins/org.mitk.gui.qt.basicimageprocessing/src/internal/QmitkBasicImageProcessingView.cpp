@@ -325,21 +325,6 @@ void QmitkBasicImageProcessing::ChangeGUI()
   }
 }
 
-void QmitkBasicImageProcessing::ResetOneImageOpPanel()
-{
-  m_Controls->tlParam1->setText(tr("Param1"));
-  m_Controls->tlParam2->setText(tr("Param2"));
-
-  m_Controls->cbWhat1->setCurrentIndex(0);
-
-  m_Controls->tlTime->setEnabled(false);
-
-  this->ResetParameterPanel();
-
-  m_Controls->btnDoIt->setEnabled(false);
-  m_Controls->cbHideOrig->setEnabled(false);
-}
-
 void QmitkBasicImageProcessing::ResetParameterPanel()
 {
   m_Controls->tlParam->setEnabled(false);
@@ -368,16 +353,6 @@ void QmitkBasicImageProcessing::ResetParameterPanel()
   m_Controls->cbParam4->hide();
   m_Controls->tlParam3->hide();
   m_Controls->tlParam4->hide();
-}
-
-void QmitkBasicImageProcessing::ResetTwoImageOpPanel()
-{
-  m_Controls->cbWhat2->setCurrentIndex(0);
-
-  m_Controls->tlImage2->setEnabled(false);
-  m_Controls->m_ImageSelector2->setEnabled(false);
-
-  m_Controls->btnDoIt2->setEnabled(false);
 }
 
 void QmitkBasicImageProcessing::SelectAction(int action)

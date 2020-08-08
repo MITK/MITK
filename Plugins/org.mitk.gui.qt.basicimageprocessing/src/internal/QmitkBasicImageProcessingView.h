@@ -93,17 +93,11 @@ private:
 
   void CreateQtPartControl(QWidget *parent) override;
   virtual void CreateConnections();
-  void ResetOneImageOpPanel();
 
   /*
   * Helper method to reset the parameter set panel
   */
   void ResetParameterPanel();
-
-  /*
-  * After a two image operation, reset the "two image ops" panel
-  */
-  void ResetTwoImageOpPanel();
 
   /** retrieve the tnc from renderwindow part */
   void InternalGetTimeNavigationController();

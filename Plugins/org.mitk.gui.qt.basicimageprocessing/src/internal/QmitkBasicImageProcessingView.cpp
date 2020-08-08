@@ -225,13 +225,13 @@ void QmitkBasicImageProcessing::CreateQtPartControl(QWidget *parent)
 
 void QmitkBasicImageProcessing::CreateConnections()
 {
-  connect((QObject *)(m_Controls->cbWhat1), SIGNAL(activated(int)), this, SLOT(SelectAction(int)));
-  connect((QObject *)(m_Controls->btnDoIt), SIGNAL(clicked()), (QObject *)this, SLOT(StartButtonClicked()));
-  connect((QObject *)(m_Controls->cbWhat2), SIGNAL(activated(int)), this, SLOT(SelectAction2(int)));
-  connect((QObject *)(m_Controls->btnDoIt2), SIGNAL(clicked()), (QObject *)this, SLOT(StartButton2Clicked()));
-  connect((QObject *)(m_Controls->rBOneImOp), SIGNAL(clicked()), this, SLOT(ChangeGUI()));
-  connect((QObject *)(m_Controls->rBTwoImOp), SIGNAL(clicked()), this, SLOT(ChangeGUI()));
-  connect((QObject *)(m_Controls->cbParam4), SIGNAL(activated(int)), this, SLOT(SelectInterpolator(int)));
+  connect(m_Controls->cbWhat1, qOverload<int>(&QComboBox::activated), this, &QmitkBasicImageProcessing::SelectAction);
+  connect(m_Controls->btnDoIt, &QPushButton::clicked, this, &QmitkBasicImageProcessing::StartButtonClicked);
+  connect(m_Controls->cbWhat2, qOverload<int>(&QComboBox::activated), this, &QmitkBasicImageProcessing::SelectAction2);
+  connect(m_Controls->btnDoIt2, &QPushButton::clicked, this, &QmitkBasicImageProcessing::StartButton2Clicked);
+  connect(m_Controls->rBOneImOp, &QRadioButton::clicked, this, &QmitkBasicImageProcessing::ChangeGUI);
+  connect(m_Controls->rBTwoImOp, &QRadioButton::clicked, this, &QmitkBasicImageProcessing::ChangeGUI);
+  connect(m_Controls->cbParam4, qOverload<int>(&QComboBox::activated), this, &QmitkBasicImageProcessing::SelectInterpolator);
   connect(m_Controls->selectedImageWidget, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
     this, &QmitkBasicImageProcessing::OnCurrentSelectionChanged);
   connect(m_Controls->selectedImageWidget_2, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,

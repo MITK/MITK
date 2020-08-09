@@ -48,11 +48,10 @@ namespace itk
  *
  * StitchImageFilter is simelar to itk's ResampleImageFilter, but in difference to the last
  * mentioned StitchImageFilter is able to resample multiple input images at once (with a transform
- * for each input image). If mutliple input images cover the output region a wighted sum of all
- * mapped input pixel values will be calculated.
- * It resamples images image through some coordinate
- * transform, interpolating via some image function.  The class is templated
- * over the types of the input and output images.
+ * for each input image). If mutliple input images cover the output region the behavior depends on
+ * the StitchStragy:
+ * - Mean: a wighted sum of all voxels mapped input pixel values will be calculated.
+ * - BorderDisntance: the voxel will be choosen that have the largest minimal distance to its own image borders.
  *
  * All other behaviors are simelar to itk::ResampleImageFilter. See the filter's description for
  * more details.

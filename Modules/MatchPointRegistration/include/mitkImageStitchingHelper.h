@@ -27,17 +27,20 @@ found in the LICENSE file.
 
 namespace mitk
 {
-    /**Helper that maps a given input image
-     * @param input Image that should be mapped.
-     * @param registration Pointer to the registration instance that should be used for mapping
-     * @param resultGeometry Pointer to the Geometry object that specifies the grid of the result image. If not defined the geometry of the input image will be used.
+    /**Helper that stitch a given vector of input images
+     * @param inputs vector of input images that should be stitched.
+     * @param registrations vector of registrations that should be used for mapping of the inputs befor stitching.
+     * the method assumes that order of registrations is the same than the order of inputs, thus for the n-th input
+     * the n-th registration will be used.
+     * @param resultGeometry Pointer to the Geometry object that specifies the grid of the result image.
      * @param paddingValue Indicates the value that should be used if an out of input error occurs (and throwOnOutOfInputAreaError is false).
      * @param interpolatorType Indicates the type of interpolation strategy that should be used.
-     * @pre input must be valid
-     * @pre registration must be valid
-     * @pre Dimensionality of the registration must match with the input imageinput must be valid
-     * @remark Depending in the settings of throwOnOutOfInputAreaError and throwOnMappingError it may also throw
-     * due to inconsistencies in the mapping process. See parameter description.
+     * @param stitchStrategy Strategy used if more then one input can contribute. for more details see the documentation of itk::StitchStrategy.
+     * @pre inputs must not be empty and contain valid instances
+     * @pre registration must have same size then inputs and contain valid instances.
+     * @pre Dimensionality of the registrations must match with the inputs
+     * @pre resultGeometry must be valid.
+     * @remark The helper currently only supports 3D images.
      * @result Pointer to the resulting mapped image.h*/
     MITKMATCHPOINTREGISTRATION_EXPORT Image::Pointer StitchImages(std::vector<Image::ConstPointer> inputs,
       std::vector<::map::core::RegistrationBase::ConstPointer> registrations,
@@ -51,6 +54,9 @@ namespace mitk
       const double& paddingValue = 0, itk::StitchStrategy stitchStrategy = itk::StitchStrategy::Mean,
       mitk::ImageMappingInterpolator::Type interpolatorType = mitk::ImageMappingInterpolator::Linear);
 
+    /**@overload
+     * Convinience version that uses identity transforms form the registrations.
+     */
     MITKMATCHPOINTREGISTRATION_EXPORT Image::Pointer StitchImages(std::vector<Image::ConstPointer> inputs,
       const BaseGeometry* resultGeometry,
       const double& paddingValue = 0, itk::StitchStrategy stitchStrategy = itk::StitchStrategy::Mean,

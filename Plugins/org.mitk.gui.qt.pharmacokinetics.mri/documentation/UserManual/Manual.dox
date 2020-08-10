@@ -23,7 +23,8 @@ Debus C and Floca R, Ingrisch M, Kompan I, Maier-Hein K, Abdollahi A, Nolden M, 
 \imageMacro{dce_mri_maskAndFittingStrategy.png, "Time series and mask selection.", 10}
 In principle, every model can be fitted on the entire image. However, for model configuration reasons (e.g. AIF required) and computational time cost, this is often not advisable.
 Therefore, apart from the image to be fitted (<i>Selected Time Series</i>), a ROI segmentation can be defined (<i>Selected Mask</i>), within which model fitting is performed.
-The view currently offers <i>Pixel based</i> and/or <i>ROI based</i> averaged fits of time-varying curves. If a mask is selected, <i>ROI based</i> fitting is enabled.
+The view currently offers <i>Pixel based</i> and/or <i>ROI based</i> averaged fits of time-varying curves. The <i>ROI based</i> fitting option becomes enabled, if a mask is selected.
+
 
 \section FIT_DCE_General_models Supported models
 Currently the following pharmacokinetic models for gadolinium-based contrast agent are available:

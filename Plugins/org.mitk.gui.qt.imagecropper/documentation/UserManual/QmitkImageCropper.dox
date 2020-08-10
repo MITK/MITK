@@ -1,37 +1,52 @@
 /**
-\page org_mitk_gui_qt_imagecropper The Image Cropper
+\page org_mitk_views_imagecropper The Image Cropper
 
 \imageMacro{crop.svg,"Icon of the Image Cropper Plugin.",20}
 
-\tableofcontents
+\section org_mitk_views_imagecropperUsage Usage
 
-\section org_mitk_gui_qt_imagecropperUsage Usage
+The Image Cropper Plugin allows to crop and mask subvolumes out of the original image volume by defining a cubic bounding shape.
 
-The Image Cropper Plugin allows to crop subvolumes out of your original image volume by defining a cubic bounding box.
+\imageMacro{BoundingBox_ImageCropperView.png,"Bounding Shape.",12.00}
 
-This box can be placed at an arbitrary position in the volume and can be easily adjusted by using the handles on each of the faces. 
-Touching the handles changes the size of the box whereas touching the box itself changes its position.
+A new bounding shape can be created by selecting an image and pressing the 'New' button. The bounding shape appears as a child node in the data manager. Alternatively, an existing bounding shape can be selected.
 
-As soon as the bounding box is placed at the desired position, pressing the button 'Crop' creates a new image assigned to the original image
-as child node containing only the selected subvolume. The size of the subvolume equals the size of the bounding box.  
-Pressing the "Mask" button keeps the original image size but masks out the area not contained within the bounding box bounds.
-In case of 3D+t images the whole time series is cropped by default.
-
-\imageMacro{BoundingBox_ImageCropperView.png,"Bounding Box.",12.00}
 \imageMacro{Basic_ImageCropperView.png,"Basic Settings.",7.09}
 
-\section org_mitk_gui_qt_imagecropperAdvanced Advanced settings
-In the advanced settings view you find additional features to manipulate the bounding box.
+This bounding shape can be placed at an arbitrary position in the volume and can be easily adjusted by using the handles on each of the faces. When activated, the handles are shown in red, otherwise, they are colored white. Hovering over either the shape or a single handle allows modifying the bounding shape. Moving the handles changes the respective extent of the bounding shape, whereas moving the shape itself changes its position.
+
+
+As soon as the bounding shape is placed at the desired position, pressing the button 'Crop' creates a new image assigned to the original image as a child node containing only the selected subvolume. The size of the subvolume equals the size of the bounding shape.  
+Pressing the 'Mask' button keeps the original image size but masks out the area not contained within the bounding shape bounds.
+In the case of 3D+t images, the whole time series is cropped by default.
+
+
+\section org_mitk_views_imagecropperAdvanced Advanced settings
+
+In the advanced settings view you find additional features:
 \imageMacro{Advanced_ImageCropperView.png,"Advanced Settings.",7.09}
 
-\subsection org_mitk_gui_qt_imagecropperAdvancedOverwrite Overwrite original image
+\subsection org_mitk_views_imagecropperMaskOutsidePixel Mask with outside pixel
+
+Assigns the value of the voxels outside of the bounding shape when 'Mask' is used.
+
+
+\subsection org_mitk_views_imagecropperAdvancedOverwrite Overwrite original image
+
 By enabling this checkbox the image is replaced by the cropped subvolume. Be careful to use this option since there is no undo action available.
 
-\subsection org_mitk_gui_qt_imagecropperAdvancedTimestep Crop current time step only
-If this checkbox is enabled the xD + t image is reduced to a xD image (e.g., 3D+t --> 3D) with the time step visible in the widget. This is useful if you want to extract a single image or its corresponding subvolume of the time series. The whole time series is cropped by default using the timeGeometry of the time step visible in the widget.
+\subsection org_mitk_views_imagecropperAdvancedTimestep Crop current time step only
 
-\section org_mitk_gui_qt_imagecropperIssues Current issues
+If you have an xD + t image, the whole time series (all timesteps) is cropped by default. In this case, the 'time geometry' of the current time step is used.
+
+If the checkbox 'Only crop current time step' is ticked, the xD + t image is reduced to an xD image (e.g., 3D+t --> 3D) with the current time step only. That can be useful if you want to extract a single image or its corresponding subvolume of the time series. 
+
+\section org_mitk_views_imagecropperIssues Current issues
+
 Cropping 2D images is not supported unless the are 3D images containing only a single slice. The user will be notified by a warning and the input is handled as a single label image.
 
-Right now changing the shape or rotation of the bounding box is not supported but might be integrated in the future.
+Right now changing the shape or rotation of the bounding shape is not supported but might be integrated in the future.
+
+Furthermore, a warning appears when the bounding shape is not aligned with the image. In this case, the handles can not be used correctly and get deactivated. You can continue to alter them by performing a 'Reinit' on the image.
+
 */

@@ -82,6 +82,7 @@ namespace mitk
      * @param maxNumber
      */
     void SetMaxPoints(unsigned int maxNumber = 0);
+    int GetMaxPoints();
 
   protected:
     PointSetDataInteractor();

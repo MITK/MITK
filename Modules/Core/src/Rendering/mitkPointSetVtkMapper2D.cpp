@@ -333,11 +333,18 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
       {
         const char * pointLabel = dynamic_cast<mitk::StringProperty *>(
           this->GetDataNode()->GetProperty("label"))->GetValue();
+
+        int offset = 0;
+        mitk::IntProperty* labelOffset = dynamic_cast<mitk::IntProperty*>(this->GetDataNode()->GetProperty("label.offset"));
+        if (labelOffset) {
+          offset = labelOffset->GetValue();
+        }
+
         std::string l = pointLabel;
         if (input->GetSize() > 1)
         {
           std::stringstream ss;
-          ss << pointsIter->Index();
+          ss << pointsIter->Index() + offset;
           l.append(ss.str());
         }
 

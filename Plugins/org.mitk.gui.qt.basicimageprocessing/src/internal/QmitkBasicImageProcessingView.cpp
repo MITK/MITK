@@ -1117,12 +1117,11 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
     return;
   }
 
-  auto newImage1 = dynamic_cast<mitk::Image*>(selectedNode->GetData());
-  auto newImage2 = dynamic_cast<mitk::Image*>(selectedNode2->GetData());
+  mitk::Image::Pointer newImage1 = dynamic_cast<mitk::Image*>(selectedNode->GetData());
+  mitk::Image::Pointer newImage2 = dynamic_cast<mitk::Image*>(selectedNode2->GetData());
 
   // check if images are valid
-  if(nullptr == newImage1 || nullptr == newImage2
- || false == newImage1->IsInitialized() || false == newImage2->IsInitialized())
+  if(newImage1.IsNull() || newImage2.IsNull() || false == newImage1->IsInitialized() || false == newImage2->IsInitialized())
   {
     itkGenericExceptionMacro(<< "At least one of the input images is broken or not initialized.");
     return;

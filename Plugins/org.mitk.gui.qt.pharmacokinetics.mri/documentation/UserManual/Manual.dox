@@ -52,7 +52,7 @@ Furthermore, the <i>Hematocrit Level</i> has to be set (from 0 to 1) for convers
 \imageMacro{dce_mri_start.png, "Example screenshot for start parameter settings.", 10}
 In cases of noisy data it can be useful to define the initial starting values of the parameter estimates, at which optimization starts, in order to prevent optimization results in local optima.
 Each model has default scalar values (applied to every voxel) for initial values of each parameter, however these can be adjusted.
-Moreover, initial values can also be defined locally for each individual voxel via starting value images. To load a starting value image, change the <i>Type</i> from <i>scalar</i> to <i>image</i>. 
+Moreover, initial values can also be defined locally for each individual voxel via starting value images. To load a starting value image, change the <i>Type</i> from <i>scalar</i> to <i>image</i>. This can be done by double-clicking on the type cell.
 In the <i>Value</i> column, selection of a starting value image will be available. 
 
 \subsection FIT_DCE_Settings_constraint Constraints settings

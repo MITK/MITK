@@ -13,7 +13,6 @@ Parameters describing the tissue microvasculature can be derived by fitting a ph
 This view offers a comprehensive set of tools to perform pharmacokinetic analysis.
 
 \section FIT_DCE_Contact Contact information
-This plug-in is being developed by the SIDT group (Software Development for Integrated Diagnostics and Therapy) at the German Cancer Research Center (DKFZ).
 If you have any questions, need support, find a bug or have a feature request, feel free to contact us at www.mitk.org.
 
 \subsection FIT_DCE_Cite Citation information

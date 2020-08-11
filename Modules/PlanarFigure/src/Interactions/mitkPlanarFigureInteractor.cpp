@@ -28,7 +28,10 @@ found in the LICENSE file.
 #include "mitkPlaneGeometry.h"
 
 mitk::PlanarFigureInteractor::PlanarFigureInteractor()
-  : DataInteractor(), m_Precision(6.5), m_MinimumPointDistance(25.0), m_IsHovering(false), m_LastPointWasValid(false)
+  : DataInteractor()
+  , m_Precision(6.5)
+  , m_MinimumPointDistance(25.0)
+  , m_IsHovering(false)
 {
 }
 
@@ -98,8 +101,7 @@ void mitk::PlanarFigureInteractor::MoveCurrentPoint(StateMachineAction *, Intera
   if (abstractTransformGeometry != nullptr)
     return;
 
-  // Extract point in 2D world coordinates (relative to PlaneGeometry of
-  // PlanarFigure)
+  // Extract point in 2D world coordinates (relative to PlaneGeometry of PlanarFigure)
   Point2D point2D;
   if (!this->TransformPositionEventToPoint2D(positionEvent, planarFigureGeometry, point2D) || !isEditable)
   {
@@ -199,13 +201,15 @@ void mitk::PlanarFigureInteractor::PerformPointResetOnSelect(StateMachineAction 
 bool mitk::PlanarFigureInteractor::CheckMinimalFigureFinished(const InteractionEvent * /*interactionEvent*/)
 {
   const mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
-  return (planarFigure->GetNumberOfControlPoints() >= planarFigure->GetMinimumNumberOfControlPoints());
+
+  return planarFigure->GetNumberOfControlPoints() >= planarFigure->GetMinimumNumberOfControlPoints();
 }
 
 bool mitk::PlanarFigureInteractor::CheckFigureFinished(const InteractionEvent * /*interactionEvent*/)
 {
   const mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
-  return (planarFigure->GetNumberOfControlPoints() >= planarFigure->GetMaximumNumberOfControlPoints());
+
+  return planarFigure->GetNumberOfControlPoints() >= planarFigure->GetMaximumNumberOfControlPoints();
 }
 
 bool mitk::PlanarFigureInteractor::CheckFigureIsExtendable(const InteractionEvent * /*interactionEvent*/)
@@ -244,7 +248,6 @@ void mitk::PlanarFigureInteractor::DeselectPoint(StateMachineAction *, Interacti
     planarFigure->InvokeEvent(EndInteractionPlanarFigureEvent());
 
     GetDataNode()->SetBoolProperty("planarfigure.drawcontrolpoints", true);
-    //    GetDataNode()->SetBoolProperty( "planarfigure.ishovering", false );
     GetDataNode()->Modified();
   }
 }
@@ -369,7 +372,6 @@ void mitk::PlanarFigureInteractor::AddInitialPoint(StateMachineAction *, Interac
 
   auto *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
   mitk::BaseRenderer *renderer = interactionEvent->GetSender();
-  auto *planarFigureGeometry = dynamic_cast<PlaneGeometry *>(planarFigure->GetGeometry(0));
   const mitk::AbstractTransformGeometry *abstractTransformGeometry =
     dynamic_cast<AbstractTransformGeometry *>(planarFigure->GetGeometry(0));
 
@@ -381,7 +383,6 @@ void mitk::PlanarFigureInteractor::AddInitialPoint(StateMachineAction *, Interac
     dynamic_cast<const mitk::PlaneGeometry *>(renderer->GetSliceNavigationController()->GetCurrentPlaneGeometry()));
   if (planeGeometry != nullptr && abstractTransformGeometry == nullptr)
   {
-    planarFigureGeometry = planeGeometry;
     planarFigure->SetPlaneGeometry(planeGeometry);
   }
   else
@@ -392,7 +393,7 @@ void mitk::PlanarFigureInteractor::AddInitialPoint(StateMachineAction *, Interac
   // Extract point in 2D world coordinates (relative to PlaneGeometry of
   // PlanarFigure)
   Point2D point2D;
-  if (!this->TransformPositionEventToPoint2D(positionEvent, planarFigureGeometry, point2D))
+  if (!this->TransformPositionEventToPoint2D(positionEvent, planeGeometry, point2D))
   {
     return;
   }
@@ -534,14 +535,7 @@ bool mitk::PlanarFigureInteractor::CheckControlPointHovering(const InteractionEv
   pointIndex = mitk::PlanarFigureInteractor::IsPositionInsideMarker(
     positionEvent, planarFigure, planarFigureGeometry, projectionPlane, renderer);
 
-  if (pointIndex >= 0)
-  {
-    return true;
-  }
-  else
-  {
-    return false;
-  }
+  return pointIndex >= 0;
 }
 
 bool mitk::PlanarFigureInteractor::CheckSelection(const InteractionEvent * /*interactionEvent*/)
@@ -602,8 +596,7 @@ bool mitk::PlanarFigureInteractor::CheckPointValidity(const InteractionEvent *in
 
   const mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
 
-  m_LastPointWasValid = IsMousePositionAcceptableAsNewControlPoint(positionEvent, planarFigure);
-  return m_LastPointWasValid;
+  return IsMousePositionAcceptableAsNewControlPoint(positionEvent, planarFigure);
 }
 
 void mitk::PlanarFigureInteractor::RemoveSelectedPoint(StateMachineAction *, InteractionEvent *interactionEvent)

@@ -104,6 +104,7 @@ void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
 
   m_Controls.singleSlot->SetDataStorage(GetDataStorage());
   m_Controls.singleSlot->SetSelectionIsOptional(true);
+  m_Controls.singleSlot->SetAutoSelectNewNodes(true);
   m_Controls.singleSlot->SetEmptyInfo(QString("Please select a data node"));
   m_Controls.singleSlot->SetPopUpTitel(QString("Select data node"));
 

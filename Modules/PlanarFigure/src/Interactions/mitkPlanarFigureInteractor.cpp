@@ -201,7 +201,15 @@ void mitk::PlanarFigureInteractor::FinalizeFigure( StateMachineAction*, Interact
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
 
   planarFigure->Modified();
-  planarFigure->DeselectControlPoint();
+  bool isSinglePoint = CheckFigureIsSinglePoint(interactionEvent);
+  if (isSinglePoint) {
+    int index = planarFigure->GetNumberOfControlPoints() - 1;
+    if (index >= 0) {
+      planarFigure->SelectControlPoint(index);
+    }
+  } else {
+    planarFigure->DeselectControlPoint();
+  }
   planarFigure->RemoveLastControlPoint();
   planarFigure->SetProperty( "initiallyplaced", mitk::BoolProperty::New( true ) );
   GetDataNode()->SetBoolProperty( "planarfigure.drawcontrolpoints", true );
@@ -313,8 +321,13 @@ bool mitk::PlanarFigureInteractor::CheckFigureIsSinglePoint(const InteractionEve
   return planarFigure->GetNumberOfControlPoints() < 2;
 }
 
-void mitk::PlanarFigureInteractor::DeselectPoint(StateMachineAction*, InteractionEvent* /*interactionEvent*/)
+void mitk::PlanarFigureInteractor::DeselectPoint(StateMachineAction*, InteractionEvent* interactionEvent)
 {
+  bool isSinglePoint = CheckFigureIsSinglePoint(interactionEvent);
+  if (isSinglePoint) {
+    return;
+  }
+
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(
     GetDataNode()->GetData() );
 
@@ -530,7 +543,10 @@ void mitk::PlanarFigureInteractor::SetPreviewPointPosition( StateMachineAction*,
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
   mitk::BaseRenderer *renderer = interactionEvent->GetSender();
 
-  planarFigure->DeselectControlPoint();
+  bool isSinglePoint = CheckFigureIsSinglePoint(interactionEvent);
+  if (!isSinglePoint || isSinglePoint && !CheckSelection(interactionEvent)) {
+    planarFigure->DeselectControlPoint();
+  }
 
   bool selected(false);
   bool isExtendable(false);
@@ -720,12 +736,13 @@ void mitk::PlanarFigureInteractor::SelectPoint( StateMachineAction*, Interaction
     projectionPlane,
     renderer);
 
-  if ( pointIndex >= 0 )
+  bool isSinglePoint = CheckFigureIsSinglePoint(interactionEvent);
+  if ( pointIndex >= 0 && (!isSinglePoint || isSinglePoint && CheckSelection(interactionEvent)))
   {
     // If mouse is above control point, mark it as selected
     planarFigure->SelectControlPoint( pointIndex );
   }
-  else
+  else if (!isSinglePoint)
   {
     planarFigure->DeselectControlPoint();
   }

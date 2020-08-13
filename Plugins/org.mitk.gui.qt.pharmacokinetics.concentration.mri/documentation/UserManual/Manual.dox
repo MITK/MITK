@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_pharmacokinetics_concentration_mri The DCE Concentration Curve Converter View
 
-\imageMacro{pharmacokinetics_concentration_doc.svg,"Icon of the Concentration Curve Converter View",3.0}
+\imageMacro{pharmacokinetics_concentration_doc.svg,"Icon of the DCE Concentration Curve Converter View",3.0}
 
 \tableofcontents
 

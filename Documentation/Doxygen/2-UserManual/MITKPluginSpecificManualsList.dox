@@ -6,7 +6,7 @@
   \li \subpage org_mitk_gui_qt_classificationsegmentation
   \li \subpage org_mitk_gui_qt_flowapplication
   \li \subpage org_mitk_views_cmdlinemodules
-  \li \subpage org_mitk_gui_qt_pharmacokinetics_concentration_mri
+  \li \subpage org_mitk_views_pharmacokinetics_concentration_mri
   \li \subpage org_mitk_views_pharmacokinetics_mri
   \li \subpage org_mitk_gui_qt_pharmacokinetics_pet
   \li \subpage org_mitk_gui_qt_eventrecorder

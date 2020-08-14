@@ -144,35 +144,46 @@ bool ConcentrationCurveConverterView::CheckSettings() const
 {
   bool ok = true;
 
-  if(m_Controls.radioButton_T1->isChecked())
+  if (m_Controls.radioButton_T1->isChecked())
   {
-      if (this->m_Controls.radioButtonTurboFlash->isChecked())
-      {
-          ok = ok && (m_Controls.recoverytime->value() > 0);
-          ok = ok && (m_Controls.relaxationtime->value() > 0);
-          ok = ok && (m_Controls.relaxivity->value() > 0);
-
-      }
-      else if (this->m_Controls.radioButton_absoluteEnhancement->isChecked()
-               || this->m_Controls.radioButton_relativeEnchancement->isChecked())
-      {
-          ok = ok && (m_Controls.factorSpinBox->value() > 0);
-      }
-      else
-      {
-          ok = false;
-      }
+    if (this->m_Controls.radioButtonTurboFlash->isChecked())
+    {
+      ok = ok && (m_Controls.recoverytime->value() > 0);
+      ok = ok && (m_Controls.relaxationtime->value() > 0);
+      ok = ok && (m_Controls.relaxivity->value() > 0);
+      ok = ok && (m_Controls.AifRecoverytime->value() > 0);
+      ok = ok && CheckBaselineSelectionSettings();
+    }
+    else if (this->m_Controls.radioButton_absoluteEnhancement->isChecked()
+      || this->m_Controls.radioButton_relativeEnchancement->isChecked())
+    {
+      ok = ok && (m_Controls.factorSpinBox->value() > 0);
+      ok = ok && CheckBaselineSelectionSettings();
+    }
+    else if (this->m_Controls.radioButtonUsingT1viaVFA->isChecked())
+    {
+      ok = ok && (m_Controls.FlipangleSpinBox->value() > 0);
+      ok = ok && (m_Controls.TRSpinBox->value() > 0);
+      ok = ok && (m_Controls.RelaxivitySpinBox->value() > 0);
+      ok = ok && (m_Controls.PDWImageNodeSelector->GetSelectedNode().IsNotNull());
+      ok = ok && CheckBaselineSelectionSettings();
+    }
+    else
+    {
+      ok = false;
+    }
   }
   else if (this->m_Controls.radioButton_T2->isChecked())
   {
-       ok = ok && m_Controls.T2EchoTimeSpinBox->value() > 0;
-       ok = ok && m_Controls.T2FactorSpinBox->value() > 0;
+    ok = ok && m_Controls.T2EchoTimeSpinBox->value() > 0;
+    ok = ok && m_Controls.T2FactorSpinBox->value() > 0;
   }
   else
   {
-      ok=false;
+    ok = false;
   }
-
+  return ok;
+}
 
 bool ConcentrationCurveConverterView::CheckBaselineSelectionSettings() const
 {

@@ -21,7 +21,7 @@ found in the LICENSE file.
 #include "mitkConvertToConcentrationAbsoluteFunctor.h"
 #include "mitkConvertToConcentrationRelativeFunctor.h"
 #include "itkBinaryFunctorImageFilter.h"
-
+#include "boost/math/constants/constants.hpp"
 
 
 // Includes for image casting between ITK and MITK

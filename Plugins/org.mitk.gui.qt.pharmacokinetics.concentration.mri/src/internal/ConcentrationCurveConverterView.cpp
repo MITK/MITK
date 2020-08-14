@@ -143,6 +143,8 @@ void ConcentrationCurveConverterView::OnSettingChanged()
 }
 
 
+
+
 bool ConcentrationCurveConverterView::CheckSettings() const
 {
   bool ok = true;
@@ -191,7 +193,6 @@ bool ConcentrationCurveConverterView::CheckSettings() const
 bool ConcentrationCurveConverterView::CheckBaselineSelectionSettings() const
 {
   return m_Controls.spinBox_baselineStartTimeStep->value() <= m_Controls.spinBox_baselineEndTimeStep->value();
-  return ok;
 }
 
 void ConcentrationCurveConverterView::OnConvertToConcentrationButtonClicked()
@@ -331,6 +332,7 @@ mitk::Image::Pointer ConcentrationCurveConverterView::Convert4DConcentrationImag
   concentrationGen->SetisTurboFlashSequence(m_Controls.radioButtonTurboFlash->isChecked());
   concentrationGen->SetAbsoluteSignalEnhancement(m_Controls.radioButton_absoluteEnhancement->isChecked());
   concentrationGen->SetRelativeSignalEnhancement(m_Controls.radioButton_relativeEnchancement->isChecked());
+  concentrationGen->SetUsingT1Map(m_Controls.radioButtonUsingT1viaVFA->isChecked());
 
   concentrationGen->SetisT2weightedImage(false);
 
@@ -339,6 +341,19 @@ mitk::Image::Pointer ConcentrationCurveConverterView::Convert4DConcentrationImag
     concentrationGen->SetRecoveryTime(m_Controls.recoverytime->value());
     concentrationGen->SetRelaxationTime(m_Controls.relaxationtime->value());
     concentrationGen->SetRelaxivity(m_Controls.relaxivity->value());
+    concentrationGen->SetBaselineStartTimeStep(m_Controls.spinBox_baselineStartTimeStep->value());
+    concentrationGen->SetBaselineEndTimeStep(m_Controls.spinBox_baselineEndTimeStep->value());
+  }
+  else if (this->m_Controls.radioButtonUsingT1viaVFA->isChecked())
+  {
+    concentrationGen->SetRecoveryTime(m_Controls.TRSpinBox->value());
+    concentrationGen->SetRelaxivity(m_Controls.RelaxivitySpinBox->value());
+    concentrationGen->SetT10Image(dynamic_cast<mitk::Image*>(m_Controls.PDWImageNodeSelector->GetSelectedNode()->GetData()));
+    concentrationGen->SetBaselineStartTimeStep(m_Controls.spinBox_baselineStartTimeStep->value());
+    concentrationGen->SetBaselineEndTimeStep(m_Controls.spinBox_baselineEndTimeStep->value());
+    //Convert Flipangle from degree to radiant
+      double alpha = m_Controls.FlipangleSpinBox->value()/360*2* boost::math::constants::pi<double>();
+      concentrationGen->SetFlipAngle(alpha);
   }
 
   else

@@ -51,7 +51,6 @@ void ConcentrationCurveConverterView::CreateQtPartControl(QWidget* parent)
     m_Controls.groupBox3D->hide();
     m_Controls.groupBox4D->hide();
     m_Controls.groupBoxTurboFlash->hide();
-    m_Controls.factorSpinBox->setEnabled(false);
     m_Controls.groupConcentration->hide();
 
     connect(m_Controls.radioButton_T1, SIGNAL(toggled(bool)),this, SLOT(OnSettingChanged()));

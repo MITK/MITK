@@ -64,7 +64,6 @@ void ConcentrationCurveConverterView::CreateQtPartControl(QWidget* parent)
     m_Controls.groupConcentration->hide();
     m_Controls.groupBoxEnhancement->hide();
     m_Controls.groupBoxTurboFlash->hide();
-    m_Controls.radioButtonNoConversion->setChecked(true);
     m_Controls.groupBox_T1MapviaVFA->hide();
 
     m_Controls.spinBox_baselineStartTimeStep->setValue(0);
@@ -135,7 +134,6 @@ void ConcentrationCurveConverterView::OnSettingChanged()
       m_Controls.groupConcentration->setVisible(false);
 
       ok = m_selectedImage.IsNotNull() && CheckSettings();
-
   }
 
   m_Controls.spinBox_baselineStartTimeStep->setEnabled(m_Controls.radioButtonTurboFlash->isChecked() || m_Controls.radioButton_absoluteEnhancement->isChecked() || m_Controls.radioButton_relativeEnchancement->isChecked() || m_Controls.radioButtonUsingT1viaVFA->isChecked());

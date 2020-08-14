@@ -52,7 +52,7 @@ void ConcentrationCurveConverterView::CreateQtPartControl(QWidget* parent)
     m_Controls.groupBox4D->hide();
     m_Controls.groupBoxTurboFlash->hide();
     m_Controls.factorSpinBox->setEnabled(false);
-    m_Controls.groupBox_ConcentrationParameters->hide();
+    m_Controls.groupConcentration->hide();
 
     connect(m_Controls.radioButton_T1, SIGNAL(toggled(bool)),this, SLOT(OnSettingChanged()));
     connect(m_Controls.radioButton_T2, SIGNAL(toggled(bool)),this, SLOT(OnSettingChanged()));
@@ -65,9 +65,9 @@ void ConcentrationCurveConverterView::CreateQtPartControl(QWidget* parent)
 
     connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), this,
             SLOT(OnSettingChanged()));
-    connect(m_Controls.relaxationTime, SIGNAL(valueChanged(double)), this,
+    connect(m_Controls.relaxationtime, SIGNAL(valueChanged(double)), this,
             SLOT(OnSettingChanged()));
-    connect(m_Controls.recoveryTime, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
+    connect(m_Controls.recoverytime, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
     connect(m_Controls.relaxivity, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
 
     connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), this,
@@ -93,7 +93,7 @@ void ConcentrationCurveConverterView::OnSettingChanged()
 
   if(m_Controls.radioButton_T1->isChecked())
   {
-      m_Controls.groupBox_ConcentrationParameters->setVisible(true);
+      m_Controls.groupConcentration->setVisible(true);
       m_Controls.groupBox3D->setVisible(m_Controls.radioButton3D->isChecked());
       m_Controls.groupBox4D->setVisible(m_Controls.radioButton4D->isChecked());
 
@@ -109,7 +109,7 @@ void ConcentrationCurveConverterView::OnSettingChanged()
   }
   else if (m_Controls.radioButton_T2->isChecked())
   {
-      m_Controls.groupBox_ConcentrationParameters->setVisible(false);
+      m_Controls.groupConcentration->setVisible(false);
 
       ok = m_selectedImage.IsNotNull() && CheckSettings();
 
@@ -127,8 +127,8 @@ bool ConcentrationCurveConverterView::CheckSettings() const
   {
       if (this->m_Controls.radioButtonTurboFlash->isChecked())
       {
-          ok = ok && (m_Controls.recoveryTime->value() > 0);
-          ok = ok && (m_Controls.relaxationTime->value() > 0);
+          ok = ok && (m_Controls.recoverytime->value() > 0);
+          ok = ok && (m_Controls.relaxationtime->value() > 0);
           ok = ok && (m_Controls.relaxivity->value() > 0);
 
       }
@@ -204,7 +204,7 @@ mitk::Image::Pointer ConcentrationCurveConverterView::Convert3DConcentrationImag
         typedef itk::BinaryFunctorImageFilter<InputImageType,InputImageType, ConvertedImageType, ConversionFunctorTurboFlashType> FilterTurboFlashType;
 
         ConversionFunctorTurboFlashType ConversionTurboFlashFunctor;
-        ConversionTurboFlashFunctor.initialize(m_Controls.relaxationTime->value(), m_Controls.relaxivity->value(), m_Controls.recoveryTime->value());
+        ConversionTurboFlashFunctor.initialize(m_Controls.relaxationtime->value(), m_Controls.relaxivity->value(), m_Controls.recoverytime->value());
 
         FilterTurboFlashType::Pointer ConversionTurboFlashFilter = FilterTurboFlashType::New();
 
@@ -298,8 +298,8 @@ mitk::Image::Pointer ConcentrationCurveConverterView::Convert4DConcentrationImag
 
   if (m_Controls.radioButtonTurboFlash->isChecked())
   {
-    concentrationGen->SetRecoveryTime(m_Controls.recoveryTime->value());
-    concentrationGen->SetRelaxationTime(m_Controls.relaxationTime->value());
+    concentrationGen->SetRecoveryTime(m_Controls.recoverytime->value());
+    concentrationGen->SetRelaxationTime(m_Controls.relaxationtime->value());
     concentrationGen->SetRelaxivity(m_Controls.relaxivity->value());
   }
 

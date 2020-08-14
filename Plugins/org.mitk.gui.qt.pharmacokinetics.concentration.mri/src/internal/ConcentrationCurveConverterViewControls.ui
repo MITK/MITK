@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>475</width>
-    <height>735</height>
+    <height>745</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -152,16 +152,6 @@
            <property name="topMargin">
             <number>10</number>
            </property>
-           <item>
-            <widget class="QRadioButton" name="radioButtonNoConversion">
-             <property name="text">
-              <string>No Signal Conversion</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
            <item>
             <widget class="QRadioButton" name="radioButton_absoluteEnhancement">
              <property name="text">

@@ -67,6 +67,8 @@ protected:
 	 */
 	void SetFocus() override;
 
+  bool CheckBaselineSelectionSettings() const;
+
     /*! Helper method that adds an concentration image as child node to the current m_selectedNode and returns this new child node.*/
     mitk::DataNode::Pointer AddConcentrationImage(mitk::Image* image, std::string nodeName) const;
 

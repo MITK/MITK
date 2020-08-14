@@ -60,27 +60,47 @@ void ConcentrationCurveConverterView::CreateQtPartControl(QWidget* parent)
     connect(m_Controls.radioButton3D, SIGNAL(toggled(bool)),this, SLOT(OnSettingChanged()));
     connect(m_Controls.radioButton4D, SIGNAL(toggled(bool)),this, SLOT(OnSettingChanged()));
 
-    connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), m_Controls.groupBoxTurboFlash,
-            SLOT(setVisible(bool)));
 
-    connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), this,
-            SLOT(OnSettingChanged()));
-    connect(m_Controls.relaxationtime, SIGNAL(valueChanged(double)), this,
-            SLOT(OnSettingChanged()));
+  //Concentration
+    m_Controls.groupConcentration->hide();
+    m_Controls.groupBoxEnhancement->hide();
+    m_Controls.groupBoxTurboFlash->hide();
+    m_Controls.radioButtonNoConversion->setChecked(true);
+    m_Controls.groupBox_T1MapviaVFA->hide();
+
+    m_Controls.spinBox_baselineStartTimeStep->setValue(0);
+    m_Controls.spinBox_baselineEndTimeStep->setValue(0);
+
+    connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), m_Controls.groupBoxTurboFlash, SLOT(setVisible(bool)));
+    connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), this, SLOT(OnSettingChanged()));
+    connect(m_Controls.relaxationtime, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
     connect(m_Controls.recoverytime, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
     connect(m_Controls.relaxivity, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
 
-    connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), this,
-            SLOT(OnSettingChanged()));
-    connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), this,
-            SLOT(OnSettingChanged()));
-    connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), m_Controls.factorSpinBox,
-            SLOT(setEnabled(bool)));
-    connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)),
-            m_Controls.factorSpinBox,
-            SLOT(setEnabled(bool)));
-    connect(m_Controls.factorSpinBox, SIGNAL(valueChanged(double)), this,
-            SLOT(OnSettingChanged()));
+
+    connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), this, SLOT(OnSettingChanged()));
+    connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), this, SLOT(OnSettingChanged()));
+    connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), m_Controls.groupBoxEnhancement, SLOT(setVisible(bool)));
+    connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), m_Controls.groupBoxEnhancement, SLOT(setVisible(bool)));
+
+
+    connect(m_Controls.factorSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
+    connect(m_Controls.spinBox_baselineStartTimeStep, SIGNAL(valueChanged(int)), this, SLOT(OnSettingChanged()));
+    connect(m_Controls.spinBox_baselineEndTimeStep, SIGNAL(valueChanged(int)), this, SLOT(OnSettingChanged()));
+
+    connect(m_Controls.radioButtonUsingT1viaVFA, SIGNAL(toggled(bool)), m_Controls.groupBox_T1MapviaVFA, SLOT(setVisible(bool)));
+    connect(m_Controls.radioButtonUsingT1viaVFA, SIGNAL(toggled(bool)), this, SLOT(OnSettingChanged()));
+    connect(m_Controls.FlipangleSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
+    connect(m_Controls.RelaxivitySpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
+    connect(m_Controls.TRSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
+
+    //m_Controls.PDWImageNodeSelector->SetNodePredicate(m_isValidPDWImagePredicate);
+    m_Controls.PDWImageNodeSelector->SetDataStorage(this->GetDataStorage());
+    m_Controls.PDWImageNodeSelector->SetInvalidInfo("Please select PDW Image.");
+    m_Controls.PDWImageNodeSelector->setEnabled(false);
+
+    connect(m_Controls.radioButtonUsingT1viaVFA, SIGNAL(toggled(bool)), m_Controls.PDWImageNodeSelector, SLOT(setEnabled(bool)));
+
 
 }
 
@@ -93,16 +113,17 @@ void ConcentrationCurveConverterView::OnSettingChanged()
 
   if(m_Controls.radioButton_T1->isChecked())
   {
-      m_Controls.groupConcentration->setVisible(true);
       m_Controls.groupBox3D->setVisible(m_Controls.radioButton3D->isChecked());
       m_Controls.groupBox4D->setVisible(m_Controls.radioButton4D->isChecked());
 
       if(m_Controls.radioButton4D->isChecked())
       {
+          m_Controls.groupConcentration->setVisible(true);
           ok = m_selectedImage.IsNotNull() && CheckSettings();
       }
       else if(m_Controls.radioButton3D->isChecked())
       {
+          m_Controls.groupConcentration->setVisible(true);
           ok = m_selectedImage.IsNotNull() && m_selectedBaselineImage.IsNotNull() && CheckSettings();
 
       }
@@ -153,6 +174,9 @@ bool ConcentrationCurveConverterView::CheckSettings() const
   }
 
 
+bool ConcentrationCurveConverterView::CheckBaselineSelectionSettings() const
+{
+  return m_Controls.spinBox_baselineStartTimeStep->value() <= m_Controls.spinBox_baselineEndTimeStep->value();
   return ok;
 }
 

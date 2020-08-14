@@ -71,6 +71,9 @@ void ConcentrationCurveConverterView::CreateQtPartControl(QWidget* parent)
     m_Controls.spinBox_baselineStartTimeStep->setValue(0);
     m_Controls.spinBox_baselineEndTimeStep->setValue(0);
 
+    m_Controls.spinBox_baselineEndTimeStep->setMinimum(0);
+    m_Controls.spinBox_baselineStartTimeStep->setMinimum(0);
+
     connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), m_Controls.groupBoxTurboFlash, SLOT(setVisible(bool)));
     connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), this, SLOT(OnSettingChanged()));
     connect(m_Controls.relaxationtime, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
@@ -135,6 +138,9 @@ void ConcentrationCurveConverterView::OnSettingChanged()
       ok = m_selectedImage.IsNotNull() && CheckSettings();
 
   }
+
+  m_Controls.spinBox_baselineStartTimeStep->setEnabled(m_Controls.radioButtonTurboFlash->isChecked() || m_Controls.radioButton_absoluteEnhancement->isChecked() || m_Controls.radioButton_relativeEnchancement->isChecked() || m_Controls.radioButtonUsingT1viaVFA->isChecked());
+  m_Controls.spinBox_baselineEndTimeStep->setEnabled(m_Controls.radioButton_absoluteEnhancement->isChecked() || m_Controls.radioButton_relativeEnchancement->isChecked() || m_Controls.radioButtonUsingT1viaVFA->isChecked() || m_Controls.radioButtonTurboFlash->isChecked());
 
   m_Controls.btnConvertToConcentration->setEnabled(ok);
 }
@@ -418,6 +424,11 @@ void ConcentrationCurveConverterView::OnSelectionChanged( berry::IWorkbenchPart:
         }
     }
 
+    if (this->m_selectedImage.IsNotNull())
+    {
+      m_Controls.spinBox_baselineStartTimeStep->setMaximum((this->m_selectedImage->GetDimension(3)) - 1);
+      m_Controls.spinBox_baselineEndTimeStep->setMaximum((this->m_selectedImage->GetDimension(3)) - 1);
+    }
 
     m_Controls.btnConvertToConcentration->setEnabled(m_selectedImage.IsNotNull() && CheckSettings());
 

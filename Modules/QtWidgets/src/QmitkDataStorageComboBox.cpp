@@ -27,6 +27,7 @@ QmitkDataStorageComboBox::QmitkDataStorageComboBox( QWidget* parent, bool _AutoS
 , m_Predicate(nullptr)
 , m_BlockEvents(false)
 , m_AutoSelectNewNodes(_AutoSelectNewNodes)
+, m_AllowEmptySelection(false)
 {
   this->Init();
 }
@@ -38,6 +39,7 @@ QmitkDataStorageComboBox::QmitkDataStorageComboBox( mitk::DataStorage* _DataStor
 , m_Predicate(_Predicate)
 , m_BlockEvents(false)
 , m_AutoSelectNewNodes(_AutoSelectNewNodes)
+, m_AllowEmptySelection(false)
 {
   // make connections, fill combobox
   this->Init();
@@ -125,6 +127,11 @@ mitk::DataStorage::SetOfObjects::ConstPointer QmitkDataStorageComboBox::GetNodes
   return _SetOfObjects.GetPointer();
 }
 
+bool QmitkDataStorageComboBox::GetAllowEmptySelection()
+{
+  return m_AllowEmptySelection;
+}
+
 bool QmitkDataStorageComboBox::GetAutoSelectNewItems()
 {
   return m_AutoSelectNewNodes;
@@ -200,7 +207,9 @@ void QmitkDataStorageComboBox::RemoveNode( int index )
       m_PropertyToNode.erase(_DataNode);
     }
     // then remove delete listener on the node itself
-    _DataNode->RemoveObserver(m_NodesDeleteObserverTags[index]);
+    if (_DataNode) {
+      _DataNode->RemoveObserver(m_NodesDeleteObserverTags[index]);
+    }
     // remove observer tags from lists
     m_NodesModifiedObserverTags.erase(m_NodesModifiedObserverTags.begin()+index);
     m_NodesDeleteObserverTags.erase(m_NodesDeleteObserverTags.begin()+index);
@@ -238,6 +247,12 @@ void QmitkDataStorageComboBox::SetNode( const mitk::DataNode* _DataNode, const m
 void QmitkDataStorageComboBox::SetAutoSelectNewItems( bool _AutoSelectNewItems )
 {
   m_AutoSelectNewNodes = _AutoSelectNewItems;
+}
+
+void QmitkDataStorageComboBox::SetAllowEmptySelection(bool v)
+{
+  m_AllowEmptySelection = v;
+  this->Reset();
 }
 
 void QmitkDataStorageComboBox::OnDataNodeDeleteOrModified(const itk::Object *caller, const itk::EventObject &event)
@@ -326,8 +341,9 @@ void QmitkDataStorageComboBox::OnCurrentIndexChanged(int index)
 void QmitkDataStorageComboBox::InsertNode(int index, const mitk::DataNode* _DataNode)
 {
   // check new or updated node first
-  if(m_Predicate.IsNotNull() && !m_Predicate->CheckNode(_DataNode))
+  if(m_Predicate.IsNotNull() && ((!m_AllowEmptySelection && _DataNode == nullptr) || (_DataNode != nullptr && !m_Predicate->CheckNode(_DataNode)))) {
     return;
+  }
 
   bool addNewNode = false;
   bool insertNewNode = false;
@@ -372,15 +388,19 @@ void QmitkDataStorageComboBox::InsertNode(int index, const mitk::DataNode* _Data
     {
       m_NodesModifiedObserverTags.push_back( nameProperty->AddObserver(itk::ModifiedEvent(), modifiedCommand) );
       m_PropertyToNode[_NonConstDataNode] = nameProperty;
-    }
-    // if there is no name node save an invalid value for the observer tag (-1)
-    else
+    } else {
+      // if there is no name node save an invalid value for the observer tag (-1)
       m_NodesModifiedObserverTags.push_back( -1 );
+    }
 
     // add delete observer
-    itk::MemberCommand<QmitkDataStorageComboBox>::Pointer deleteCommand = itk::MemberCommand<QmitkDataStorageComboBox>::New();
-    deleteCommand->SetCallbackFunction(this, &QmitkDataStorageComboBox::OnDataNodeDeleteOrModified);
-    m_NodesDeleteObserverTags.push_back( _NonConstDataNode->AddObserver(itk::DeleteEvent(), modifiedCommand) );
+    if (_DataNode != nullptr) {
+      itk::MemberCommand<QmitkDataStorageComboBox>::Pointer deleteCommand = itk::MemberCommand<QmitkDataStorageComboBox>::New();
+      deleteCommand->SetCallbackFunction(this, &QmitkDataStorageComboBox::OnDataNodeDeleteOrModified);
+      m_NodesDeleteObserverTags.push_back( _NonConstDataNode->AddObserver(itk::DeleteEvent(), modifiedCommand) );
+    } else {
+      m_NodesDeleteObserverTags.push_back(-1);
+    }
   }
 
   // add node to the vector
@@ -393,7 +413,7 @@ void QmitkDataStorageComboBox::InsertNode(int index, const mitk::DataNode* _Data
   {
     this->addItem(GetDisplayedNodeName(_DataNode));
     // select new node if m_AutoSelectNewNodes is true or if we have just added the first node
-    if(m_AutoSelectNewNodes || m_Nodes.size() == 1)
+    if(m_AutoSelectNewNodes || (!m_AllowEmptySelection && m_Nodes.size() == 1))
       this->setCurrentIndex(index);
   }
   else
@@ -439,10 +459,17 @@ void QmitkDataStorageComboBox::Reset()
       this->AddNode( nodeIt.Value().GetPointer() );
     }
   }
+  if (m_AllowEmptySelection) {
+    this->setCurrentIndex(-1);
+  }
 }
 
 QString QmitkDataStorageComboBox::GetDisplayedNodeName(const mitk::DataNode* node)
 {
+  if (node == nullptr) {
+    return QString(" ");
+  }
+
   mitk::BaseProperty* nameProperty = getNameProprety(node);
   std::string _NonConstDataNodeName = "unnamed node";
   if (nameProperty) {
@@ -454,6 +481,9 @@ QString QmitkDataStorageComboBox::GetDisplayedNodeName(const mitk::DataNode* nod
 
 mitk::BaseProperty::Pointer QmitkDataStorageComboBox::getNameProprety(const mitk::DataNode* node)
 {
+  if (node == nullptr) {
+    return nullptr;
+  }
   mitk::BaseProperty::Pointer prop = node->GetProperty("caption");
   if (prop == nullptr) {
     prop = node->GetProperty("name");

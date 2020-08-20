@@ -104,7 +104,7 @@ class MITKQTWIDGETS_EXPORT QmitkDataStorageComboBox : public QComboBox
     /// \see SetAutoSelectNewItems
     ///
     virtual bool GetAutoSelectNewItems();
-
+    bool GetAllowEmptySelection();
   //#PUBLIC SETTER
   public:
     ///
@@ -143,6 +143,7 @@ class MITKQTWIDGETS_EXPORT QmitkDataStorageComboBox : public QComboBox
     /// Sets AutoSelectNewItems flag. If set to true new Nodes will be automatically selected. Default is false.
     ///
     virtual void SetAutoSelectNewItems(bool _AutoSelectNewItems);
+    void SetAllowEmptySelection(bool v);
     ///
     /// \brief Called when a node is deleted or the name property of the node was modified. Calls RemoveNode or SetNode then.
     ///
@@ -246,7 +247,8 @@ class MITKQTWIDGETS_EXPORT QmitkDataStorageComboBox : public QComboBox
     ///
     /// \brief If set to "true" new Nodes will be automatically selected.
     bool m_AutoSelectNewNodes;
-    
+   
+    bool m_AllowEmptySelection;
   private:
     
     boost::signals2::connection m_CurrentDataChange;

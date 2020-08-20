@@ -830,7 +830,7 @@ namespace mitk
   }
 
 
-  const ImageStatisticsCalculator::Statistics &
+  const ImageStatisticsCalculator::Statistics&
     ImageStatisticsCalculator::GetStatistics(unsigned int timeStep, unsigned int label) const
   {
     if (m_Image.IsNull() || (timeStep >= m_Image->GetTimeSteps()))
@@ -840,19 +840,41 @@ namespace mitk
 
     switch (m_MaskingMode)
     {
-    case MASKING_MODE_NONE:
-    default:
-    {
-      if (m_DoIgnorePixelValue)
-        return m_MaskedImageStatisticsVector[timeStep][label];
-
-      return m_ImageStatisticsVector[timeStep][label];
-    }
-    case MASKING_MODE_IMAGE:
-      return m_MaskedImageStatisticsVector[timeStep][label];
-
-    case MASKING_MODE_PLANARFIGURE:
-      return m_PlanarFigureStatisticsVector[timeStep][label];
+      case MASKING_MODE_NONE:
+      default:
+      {
+        if (m_DoIgnorePixelValue) {
+          if (m_MaskedImageStatisticsVector.size() > timeStep
+           && m_MaskedImageStatisticsVector[timeStep].size() > label) {
+            return m_MaskedImageStatisticsVector[timeStep][label];
+          } else {
+            return m_EmptyStatistics;
+          }
+        } else {
+          if (m_ImageStatisticsVector.size() > timeStep
+           && m_ImageStatisticsVector[timeStep].size() > label) {
+            return m_ImageStatisticsVector[timeStep][label];
+          } else {
+            return m_EmptyStatistics;
+          }
+        }
+      }
+      case MASKING_MODE_IMAGE: {
+        if (m_MaskedImageStatisticsVector.size() > timeStep
+         && m_MaskedImageStatisticsVector[timeStep].size() > label) {
+          return m_MaskedImageStatisticsVector[timeStep][label];
+        } else {
+          return m_EmptyStatistics;
+        }
+      }
+      case MASKING_MODE_PLANARFIGURE: {
+        if (m_PlanarFigureStatisticsVector.size() > timeStep
+         && m_PlanarFigureStatisticsVector[timeStep].size() > label) {
+          return m_PlanarFigureStatisticsVector[timeStep][label];
+        } else {
+          return m_EmptyStatistics;
+        }
+      }
     }
   }
 

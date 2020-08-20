@@ -366,7 +366,7 @@ namespace mitk
 
     * \param label The label for which to retrieve the statistics in multi-label situations (ascending order).
     */
-    const Statistics &GetStatistics( unsigned int timeStep = 0, unsigned int label = 0 ) const;
+    const Statistics& GetStatistics( unsigned int timeStep = 0, unsigned int label = 0 ) const;
 
     /** \brief Retrieve statistics depending on the current masking mode (for all image labels). */
     const StatisticsContainer &GetStatisticsVector( unsigned int timeStep = 0 ) const;

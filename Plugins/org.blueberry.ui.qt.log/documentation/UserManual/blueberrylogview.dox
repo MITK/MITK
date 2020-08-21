@@ -5,11 +5,11 @@
 
 This plug-in records all logging output of events and progress as specified in the source code with time of occurrence, level of importance (Info, Warning, Error, Fatal, Debug), the message given and the origin of the message (source code section).
 
-\imageMacro{LogView.png,"Screenshot of the Logging Module",16.00}
+\imageMacro{LogView.png,"Screenshot of the Logging Plugin",16.00}
 
 There are different features available in the view. The 'Filter' text field provides the possibility to search for all log events containing a certain substring. The 'Copy to clipboard' button allows you to copy the current content of the logging view to your clipboard. This enables you to insert the logging information to any text processing application.
 
-In the simple logging view, you'll see logging messages and logging levels. A brief description of the logging levels can be found in the \ref LoggingPage "logging concept documentation". With two checkboxes more information on every logging message can be activated. The checkbox 'categories' adds a column for the category. The checkbox 'advanced fields' additionally displays the time from application start to the log message entry, method, filename, and line number of the logging message origin.
+In the simple logging view, you'll see logging messages and logging levels. A brief description of the logging levels can be found in the \ref LoggingPage "logging concept documentation". With two checkboxes more information on every logging message can be activated. The checkbox 'categories' adds a column for the category. The checkbox 'advanced fields' additionally displays the time from application start to the log message entry and the function, filename and line number of the logging message origin.
 
 \imageMacro{LogViewExplain.png,"Details on the Vizualized Logging Information",16.00}
 

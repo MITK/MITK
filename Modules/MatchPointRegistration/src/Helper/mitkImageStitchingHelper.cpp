@@ -70,7 +70,7 @@ typename ::itk::InterpolateImageFunction< TImage >::Pointer generateInterpolator
 };
 
 template <typename TPixelType, unsigned int VImageDimension >
-void doMITKStitching(const ::itk::Image<TPixelType,VImageDimension>* input1,
+void doMITKStitching(const ::itk::Image<TPixelType,VImageDimension>* /*input1*/,
   mitk::Image::Pointer& result,
   std::vector<mitk::Image::ConstPointer> inputs,
   std::vector<::map::core::RegistrationBase::ConstPointer> registrations,
@@ -90,7 +90,7 @@ void doMITKStitching(const ::itk::Image<TPixelType,VImageDimension>* input1,
   const auto spacing = resultGeometry->GetSpacing();
   stitcher->SetOutputSpacing(spacing);
 
-  StitchingFilterType::DirectionType itkDirection;
+  typename StitchingFilterType::DirectionType itkDirection;
   const auto mitkDirection = resultGeometry->GetIndexToWorldTransform()->GetMatrix();
   for (unsigned int i = 0; i < VImageDimension; ++i)
   {
@@ -101,7 +101,7 @@ void doMITKStitching(const ::itk::Image<TPixelType,VImageDimension>* input1,
   }
   stitcher->SetOutputDirection(itkDirection);
 
-  ItkImageType::SizeType size;
+  typename ItkImageType::SizeType size;
   size[0] = resultGeometry->GetExtent(0);
   size[1] = resultGeometry->GetExtent(1);
   size[2] = resultGeometry->GetExtent(2);

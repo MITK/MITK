@@ -154,7 +154,9 @@ public:
   /** Typedef the reference image type to be the ImageBase of the OutputImageType */
   typedef ImageBase<ImageDimension> ReferenceImageBaseType;
 
-  virtual void SetInput(unsigned int index, const InputImageType* image);
+  using Superclass::SetInput;
+  void SetInput(const InputImageType* image) override;
+  void SetInput(unsigned int index, const InputImageType* image) override;
   /** Convinience methods that allows setting of input image and its transform in
    one call.*/
   virtual void SetInput(unsigned int index, const InputImageType* image, const TransformType* transform);

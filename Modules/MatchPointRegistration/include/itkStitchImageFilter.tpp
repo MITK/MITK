@@ -59,6 +59,17 @@ template< typename TInputImage,
   typename TOutputImage,
   typename TInterpolatorPrecisionType,
   typename TTransformPrecisionType >
+  void
+  StitchImageFilter< TInputImage, TOutputImage, TInterpolatorPrecisionType, TTransformPrecisionType >
+  ::SetInput(const InputImageType* image)
+{
+  this->SetInput(0, image, itk::IdentityTransform< TTransformPrecisionType, ImageDimension>::New().GetPointer(), LinearInterpolatorType::New().GetPointer());
+}
+
+template< typename TInputImage,
+  typename TOutputImage,
+  typename TInterpolatorPrecisionType,
+  typename TTransformPrecisionType >
 void
 StitchImageFilter< TInputImage, TOutputImage, TInterpolatorPrecisionType, TTransformPrecisionType >
 ::SetInput(unsigned int index, const InputImageType* image)
@@ -261,8 +272,8 @@ StitchImageFilter< TInputImage, TOutputImage, TInterpolatorPrecisionType, TTrans
   InputImageVectorType inputs = this->GetInputs();
   TransformMapType transforms = this->GetTransforms();
 
-  std::map<const InputImageType*, typedef InputImageType::IndexType> lowerIndices;
-  std::map<const InputImageType*, typedef InputImageType::IndexType> upperIndices;
+  std::map<const InputImageType*, typename InputImageType::IndexType> lowerIndices;
+  std::map<const InputImageType*, typename InputImageType::IndexType> upperIndices;
   for (const auto& input : inputs)
   {
     const auto largestRegion = input->GetLargestPossibleRegion();

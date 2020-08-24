@@ -325,7 +325,7 @@
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Allows that pixels may not be registred because they are outside of the field of view of the used registration. The location in the correlated input image pixel(s) are therefore unkown. The pixels will be marked witrh the given error value.&lt;/p&gt;&lt;p&gt;If unchecked the mapping will be aborted in a case of unregistered pixels.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="title">
-          <string>Allow unregistred pixels</string>
+          <string>Allow unregistered pixels</string>
          </property>
          <property name="flat">
           <bool>false</bool>

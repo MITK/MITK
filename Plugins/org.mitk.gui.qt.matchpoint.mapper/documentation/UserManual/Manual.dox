@@ -12,20 +12,21 @@ When mapping images the user can control the field of view (image geometry) the 
 It is one of several MatchPoint registration plugins.
 
 <b>Typical usage scenarios</b>\n
-\li You have registered image I1 onto image I2. (Most obious) you want to map I1 onto I2 with the registration, e.g. to make a joint statistical analysis.
-\li You have registered image I1 onto image I2. Now you want to map I3 (e.g. an other MRI sequence of the same session) also onto I2 with the same registration.
-\li You have registered image I1 onto image I2. Now you want to map a segmentation created on I1 also onto I2 with the same registration.
-\li You have registered image I1 onto image I2. Now you want to map a point set of image I1 also onto I2 with the same registration.
+You have registered image I1 onto image I2. Now you want to
+\li (Most obvious) map I1 onto I2 with the registration, e.g. to make a joint statistical analysis.
+\li map image I3 (e.g. an other MRI sequence of the same session) also onto I2 with the same registration.
+\li map a segmentation created on I1 also onto I2 with the same registration.
+\li map a point set of image I1 also onto I2 with the same registration.
 
 \section MAP_MAPPER_Usage Usage
-To use the mapper at least the input (image or point set) must be selected. Additionally you may select a registration object and, in case the input is an image, an optional reference image.
+To use the mapper at least the input (image or point set) must be selected. Additionally, you may select a registration object and, in case the input is an image, an optional reference image.
 
 The reference image defines the geometry (field of view, orientation, spacing) that should be used for the result image.
 The view will try to automatically determine the reference image. By default it is the target image that was used to determine the selected registration.
 If auto selection cannot determine the reference (e.g. because it was not specified or it is currently not loaded), the input image will be selected as reference.
 The reference image can be also defined by the user explicitly by activating manual selection.
 
-REMARK: If you map point sets you can ignore the reference image slot. It has no affect.
+REMARK: If you map point sets you can ignore the reference image slot. It has no effect.
 
 REMARK: The mapping results will be added as child nodes to the used input node.
 
@@ -47,9 +48,9 @@ advantage of the different interpolation and sub/super sampling strategies.
 The mapper view offers two options to map images:\n
 \li "Map" (default)
 \li "Refine geometry"
-For images "Map" fills the pixels of the output image by interpolating input image pixels using the registration object. This option always works.
-But may take longer and introduces interpolation errors, because a new image is resampled.\n
-The second option "Refine geometry" is only offered, if the registration (more precise its inverse kernel) is matrix based and the selected data is an image.
+For images "Map" fills the pixels of the output image by interpolating input image pixels using the registration object. This option always works,
+but may take longer and introduces interpolation errors, because a new image is resampled.\n
+The second option "Refine geometry" is only offered, if the registration (more precisely its inverse kernel) is matrix based and the selected data is an image.
 In this case it just clones the image and refines its image geometry (origin and orientation) to project it to the position indicated by the registration; thus no interpolation artefacts are introduced.
 \remark If you want to use a mapped image in conjunction with the image statistics plugin and a mask of the reference image (or you want to proceed any other computation that expects the voxel to be in the same grid for direct numeric comparison), you must use "Map" to ensure the same geometry
 (including the same image grid; including same spacing and resolution). Otherwise operations like the images statistics plugin will fail.
@@ -58,13 +59,13 @@ In this case it just clones the image and refines its image geometry (origin and
 \imageMacro{map_mapper-settings.png, "Available settings for mapping images.", 7}
 If you map the image (and not just refine the geometry), you have several settings available:\n
 \li "Allow undefined pixels": Activate to handle pixels of the result image that are not in the field of view of the input image. These pixels will get the "padding value".
-\li "Allow error pixels": Activate to handle pixels of the result image that can not be mapped because the registration does not support this part of the output image. These pixels will get the "error value".
+\li "Allow unregistered pixels": Activate to handle pixels of the result image that can not be mapped because the registration does not support this part of the output image. These pixels will get the "error value".
 \li "Interpolator": Set to choose the interpolation strategy that should be used for mapping.
 \li "Activate super/sub sampling": Activate if you want to use origin and orientation of the reference image but want to alter the spacing.
 
 \section MAP_MAPPER_Interpolation Interpolation
 You can choose from the following interpolation strategies:\n
-\li "nearest neighbor": Use the value of the nearest pixel. Fastest, but high interpolation errors for gray value images. Right choice for label images or masks.
+\li "Nearest Neighbor": Use the value of the nearest pixel. Fastest, but high interpolation errors for gray value images. Right choice for label images or masks.
 \li "Linear": Fast linear interpolation with often sufficient quality. Tends to blur edges.
 \li "BSpline (3rd order)": Good trade off between time and quality.
 \li "Windowed Sinc (Hamming)": Good interpolation quality but very time consuming.
@@ -72,7 +73,7 @@ You can choose from the following interpolation strategies:\n
 
 \section MAP_MAPPER_Masks Handling of masks/segmentations
 If you select an mask as input image, the plugin will be automatically reconfigured to settings that are suitable for the task of mapping masks.
-Most importantly the interpolator will be set to "nearest neighbor".
+Most importantly the interpolator will be set to "Nearest Neighbor".
 
 */
 

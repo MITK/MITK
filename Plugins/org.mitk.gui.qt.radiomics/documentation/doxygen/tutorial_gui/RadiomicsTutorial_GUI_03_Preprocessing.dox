@@ -6,7 +6,7 @@ The first step we take is to resample the data. To do so, we open the "Radiomics
 
 \imageMacro{RadiomicsTutorial_GUI_Step3_01_DetailView.png,"Details showing the spacing of the original image.",1} 
 
-To resample the image, we de-select "Dimension X" and "Dimension Y" option and set the "Dimension Z" option to 1, as indiciated by the image above. This tells the resampling algorithm to change only the last dimension to the value we specified. We further select to have the output image as double and chose B-Spline as resampling algorithm. This is a fast and still accurate option for resampling. To learn more about the other interpolation modes, refer to \ref org_mitk_gui_qt_matchpoint_mapper .
+To resample the image, we de-select "Dimension X" and "Dimension Y" option and set the "Dimension Z" option to 1, as indiciated by the image above. This tells the resampling algorithm to change only the last dimension to the value we specified. We further select to have the output image as double and chose B-Spline as resampling algorithm. This is a fast and still accurate option for resampling. To learn more about the other interpolation modes, refer to \ref org_mitk_views_matchpoint_mapper .
 
 After resampling the original image, we also need to resample the segmentation. For this, we select the segmentation, leave the dimensions unchanged. Remove the "Output as double" option, as segmentations are not double values and choose a linear interpolation, which seems to be a better solution for resampling masks. We also check the option that we are resampling a mask. 
 

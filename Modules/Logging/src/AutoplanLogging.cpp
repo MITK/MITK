@@ -276,6 +276,9 @@ namespace Logger
       boost::shared_ptr< boost::asio::ip::tcp::iostream > stream =
         boost::make_shared< boost::asio::ip::tcp::iostream >();
 
+      std::locale l("C");
+      stream->imbue(l);
+
       m_TaskGroup.Enqueue([stream] {
         stream->connect(Options::get().iphost, Options::get().ipport);
       });

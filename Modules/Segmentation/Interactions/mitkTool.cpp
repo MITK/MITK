@@ -59,8 +59,11 @@ mitk::Tool::~Tool()
 {
 }
 
-bool mitk::Tool::CanHandle(BaseData *) const
+bool mitk::Tool::CanHandle(const BaseData* referenceData, const BaseData* /*workingData*/) const
 {
+  if (referenceData == nullptr)
+    return false;
+
   return true;
 }
 

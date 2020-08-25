@@ -66,6 +66,8 @@ protected:
   QmitkBinaryThresholdToolGUI();
   ~QmitkBinaryThresholdToolGUI() override;
 
+  void BusyStateChanged(bool) override;
+
   ctkSliderWidget* m_ThresholdSlider = nullptr;
   QCheckBox* m_CheckProcessAll = nullptr;
   QCheckBox* m_CheckCreateNew = nullptr;

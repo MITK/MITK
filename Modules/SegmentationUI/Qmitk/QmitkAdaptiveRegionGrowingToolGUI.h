@@ -180,7 +180,7 @@ protected:
    *
    * This ensures that the seed point is taken from the current selected 3D image
    */
-  mitk::Image::ConstPointer Get3DImageByTimePoint(const mitk::Image *image,
+  mitk::Image::ConstPointer GetImageByTimePoint(const mitk::Image *image,
                                                           mitk::TimePointType timePoint) const;
 
 private:

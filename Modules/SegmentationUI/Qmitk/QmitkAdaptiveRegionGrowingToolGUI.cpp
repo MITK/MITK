@@ -199,7 +199,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
     const mitk::Image *image = dynamic_cast<mitk::Image *>(m_InputImageNode->GetData());
     const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
 
-    auto image3D = Get3DImageByTimePoint(image, timePoint);
+    auto image3D = GetImageByTimePoint(image, timePoint);
 
     if (nullptr == image3D)
     {
@@ -339,7 +339,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
   }
 }
 
-mitk::Image::ConstPointer QmitkAdaptiveRegionGrowingToolGUI::Get3DImageByTimePoint(const mitk::Image *image,
+mitk::Image::ConstPointer QmitkAdaptiveRegionGrowingToolGUI::GetImageByTimePoint(const mitk::Image *image,
                                                                                    mitk::TimePointType timePoint) const
 {
   if (nullptr == image)
@@ -413,7 +413,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::RunSegmentation()
 
     mitk::PointSet::PointType seedPoint = seedPointSet->GetPointSet(timeStep)->GetPoints()->Begin().Value();
 
-    auto image3D = Get3DImageByTimePoint(orgImage, timePoint);
+    auto image3D = GetImageByTimePoint(orgImage, timePoint);
 
     if (image3D.IsNotNull())
     {

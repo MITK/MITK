@@ -28,7 +28,7 @@ const char *mitk::AutoSegmentationTool::GetGroup() const
   return "autoSegmentation";
 }
 
-mitk::Image::ConstPointer mitk::AutoSegmentationTool::Get3DImage(const mitk::Image* image, unsigned int timestep) const
+mitk::Image::ConstPointer mitk::AutoSegmentationTool::GetImageByTimeStep(const mitk::Image* image, unsigned int timestep)
 {
   if (nullptr == image)
     return image;
@@ -46,7 +46,7 @@ mitk::Image::ConstPointer mitk::AutoSegmentationTool::Get3DImage(const mitk::Ima
   return imageTimeSelector->GetOutput();
 }
 
-mitk::Image::ConstPointer mitk::AutoSegmentationTool::Get3DImageByTimePoint(const mitk::Image* image, TimePointType timePoint) const
+mitk::Image::ConstPointer mitk::AutoSegmentationTool::GetImageByTimePoint(const mitk::Image* image, TimePointType timePoint)
 {
   if (nullptr == image)
     return image;
@@ -54,7 +54,7 @@ mitk::Image::ConstPointer mitk::AutoSegmentationTool::Get3DImageByTimePoint(cons
   if (!image->GetTimeGeometry()->IsValidTimePoint(timePoint))
     return nullptr;
 
-  return this->Get3DImage(image, image->GetTimeGeometry()->TimePointToTimeStep(timePoint));
+  return AutoSegmentationTool::GetImageByTimeStep(image, image->GetTimeGeometry()->TimePointToTimeStep(timePoint));
 }
 
 void mitk::AutoSegmentationTool::SetOverwriteExistingSegmentation(bool overwrite)

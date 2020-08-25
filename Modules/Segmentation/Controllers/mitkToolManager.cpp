@@ -178,7 +178,14 @@ bool mitk::ToolManager::ActivateTool(int id)
     workingData = workingDataNode->GetData();
   }
 
-  if (id != -1 && !this->GetToolById(id)->CanHandle(this->GetReferenceData(0)->GetData(), workingData))
+  const auto referenceDataNode = this->GetReferenceData(0);
+  const mitk::BaseData* referenceData = nullptr;
+  if (nullptr != referenceDataNode)
+  {
+    referenceData = referenceDataNode->GetData();
+  }
+
+  if (id != -1 && !this->GetToolById(id)->CanHandle(referenceData, workingData))
     return false;
 
   if (this->GetDataStorage())

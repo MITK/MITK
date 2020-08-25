@@ -177,7 +177,7 @@ void mitk::FastMarchingTool3D::Deactivated()
 
   // Deactivate Interaction
   m_SeedPointInteractor->SetDataNode(nullptr);
-  m_ToolManager->GetDataStorage()->Remove(this->m_SeedsAsPointSetNode);
+  m_ToolManager->GetDataStorage()->Remove(m_SeedsAsPointSetNode);
   m_SeedsAsPointSetNode = nullptr;
   m_SeedsAsPointSet->RemoveObserver(m_PointSetAddObserverTag);
   m_SeedsAsPointSet->RemoveObserver(m_PointSetRemoveObserverTag);

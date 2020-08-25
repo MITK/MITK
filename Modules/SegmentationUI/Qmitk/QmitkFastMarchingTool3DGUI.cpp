@@ -231,12 +231,12 @@ void QmitkFastMarchingTool3DGUI::OnNewToolAssociated(mitk::Tool *tool)
     m_FastMarchingTool->CurrentlyBusy +=
       mitk::MessageDelegate1<QmitkFastMarchingTool3DGUI, bool>(this, &QmitkFastMarchingTool3DGUI::BusyStateChanged);
 
-    m_FastMarchingTool->SetLowerThreshold(this->m_slwThreshold->minimumValue());
-    m_FastMarchingTool->SetUpperThreshold(this->m_slwThreshold->maximumValue());
-    m_FastMarchingTool->SetStoppingValue(this->m_slStoppingValue->value());
-    m_FastMarchingTool->SetSigma(this->m_slSigma->value());
-    m_FastMarchingTool->SetAlpha(this->m_slAlpha->value());
-    m_FastMarchingTool->SetBeta(this->m_slBeta->value());
+    m_FastMarchingTool->SetLowerThreshold(m_slwThreshold->minimumValue());
+    m_FastMarchingTool->SetUpperThreshold(m_slwThreshold->maximumValue());
+    m_FastMarchingTool->SetStoppingValue(m_slStoppingValue->value());
+    m_FastMarchingTool->SetSigma(m_slSigma->value());
+    m_FastMarchingTool->SetAlpha(m_slAlpha->value());
+    m_FastMarchingTool->SetBeta(m_slBeta->value());
     m_FastMarchingTool->SetOverwriteExistingSegmentation(true);
     m_FastMarchingTool->ClearSeeds();
     m_CheckProcessAll->setVisible(m_FastMarchingTool->GetTargetSegmentationNode()->GetData()->GetTimeSteps() > 1);
@@ -247,12 +247,12 @@ void QmitkFastMarchingTool3DGUI::Update()
 {
   if (m_FastMarchingTool.IsNotNull())
   {
-    m_FastMarchingTool->SetLowerThreshold(this->m_slwThreshold->minimumValue());
-    m_FastMarchingTool->SetUpperThreshold(this->m_slwThreshold->maximumValue());
-    m_FastMarchingTool->SetStoppingValue(this->m_slStoppingValue->value());
-    m_FastMarchingTool->SetSigma(this->m_slSigma->value());
-    m_FastMarchingTool->SetAlpha(this->m_slAlpha->value());
-    m_FastMarchingTool->SetBeta(this->m_slBeta->value());
+    m_FastMarchingTool->SetLowerThreshold(m_slwThreshold->minimumValue());
+    m_FastMarchingTool->SetUpperThreshold(m_slwThreshold->maximumValue());
+    m_FastMarchingTool->SetStoppingValue(m_slStoppingValue->value());
+    m_FastMarchingTool->SetSigma(m_slSigma->value());
+    m_FastMarchingTool->SetAlpha(m_slAlpha->value());
+    m_FastMarchingTool->SetBeta(m_slBeta->value());
     m_FastMarchingTool->UpdatePreview();
   }
 }
@@ -349,13 +349,13 @@ void QmitkFastMarchingTool3DGUI::BusyStateChanged(bool value)
 
 void QmitkFastMarchingTool3DGUI::EnableWidgets(bool enable)
 {
-  this->m_slSigma->setEnabled(enable);
-  this->m_slAlpha->setEnabled(enable);
-  this->m_slBeta->setEnabled(enable);
-  this->m_slStoppingValue->setEnabled(enable);
-  this->m_slwThreshold->setEnabled(enable);
-  this->m_btClearSeeds->setEnabled(enable);
-  this->m_btConfirm->setEnabled(enable);
-  this->m_CheckCreateNew->setEnabled(enable);
-  this->m_CheckProcessAll->setEnabled(enable);
+  m_slSigma->setEnabled(enable);
+  m_slAlpha->setEnabled(enable);
+  m_slBeta->setEnabled(enable);
+  m_slStoppingValue->setEnabled(enable);
+  m_slwThreshold->setEnabled(enable);
+  m_btClearSeeds->setEnabled(enable);
+  m_btConfirm->setEnabled(enable);
+  m_CheckCreateNew->setEnabled(enable);
+  m_CheckProcessAll->setEnabled(enable);
 }

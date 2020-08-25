@@ -52,9 +52,9 @@ mitk::OtsuTool3D::~OtsuTool3D()
 
 void mitk::OtsuTool3D::SetSelectedRegions(const SelectedRegionVectorType& regions)
 {
-  if (this->m_SelectedRegions != regions)
+  if (m_SelectedRegions != regions)
   {
-    this->m_SelectedRegions = regions;
+    m_SelectedRegions = regions;
     //Note: we do not call this->Modified() on puprose. Reason: changing the
     //selected regions should not force to run otsu filter in DoUpdatePreview due to changed MTime.
   }
@@ -80,12 +80,12 @@ void mitk::OtsuTool3D::Activated()
   m_OtsuResultNode->SetVisibility(true);
   m_OtsuResultNode->SetOpacity(1.0);
 
-  m_ToolManager->GetDataStorage()->Add(this->m_OtsuResultNode);
+  m_ToolManager->GetDataStorage()->Add(m_OtsuResultNode);
 }
 
 void mitk::OtsuTool3D::Deactivated()
 {
-  m_ToolManager->GetDataStorage()->Remove(this->m_OtsuResultNode);
+  m_ToolManager->GetDataStorage()->Remove(m_OtsuResultNode);
   m_OtsuResultNode = nullptr;
 
   Superclass::Deactivated();

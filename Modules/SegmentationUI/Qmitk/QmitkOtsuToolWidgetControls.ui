@@ -202,7 +202,7 @@
    <item>
     <widget class="QCheckBox" name="m_CheckProcessAll">
      <property name="toolTip">
-      <string>&quot;Add the confirmed segmentation as a new segmentation instead of overwriting the currently selected.&quot;</string>
+      <string>Process/overwrite all time steps of the dynamic segmentation and not just the currently visible time step.</string>
      </property>
      <property name="text">
       <string>Process all time steps</string>

@@ -613,7 +613,7 @@ void QmitkToolSelectionBox::RecreateButtons()
       workingData = workingDataNode->GetData();
     }
 
-    if (dataNode != nullptr && !tool->CanHandle(dataNode->GetData(), workingData))
+    if (nullptr == dataNode || !tool->CanHandle(dataNode->GetData(), workingData))
       button->setEnabled(false);
 
     m_ButtonIDForToolID[currentToolID] = currentButtonID;

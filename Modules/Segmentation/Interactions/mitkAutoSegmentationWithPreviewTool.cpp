@@ -40,8 +40,11 @@ mitk::AutoSegmentationWithPreviewTool::~AutoSegmentationWithPreviewTool()
 {
 }
 
-bool mitk::AutoSegmentationWithPreviewTool::CanHandle(const BaseData* /*referenceData*/, const BaseData* workingData) const
+bool mitk::AutoSegmentationWithPreviewTool::CanHandle(const BaseData* referenceData, const BaseData* workingData) const
 {
+  if (!Superclass::CanHandle(referenceData, workingData))
+    return false;
+
   if (workingData == nullptr)
     return true;
 
@@ -55,7 +58,8 @@ bool mitk::AutoSegmentationWithPreviewTool::CanHandle(const BaseData* /*referenc
   if (image == nullptr)
     return false;
 
-  //if it is a normal image and not a lable set  as working data it must have the same pixel type as a label set.
+  //if it is a normal image and not a label set image is used as working data
+  //it must have the same pixel type as a label set.
   return MakeScalarPixelType< DefaultSegmentationDataType >() == image->GetPixelType();
 }
 
@@ -74,14 +78,14 @@ void mitk::AutoSegmentationWithPreviewTool::Activated()
 
   m_LastTimePointOfUpdate = 0;
 
-  if (m_PreviewNode.IsNull())
+  if (m_PreviewSegmentationNode.IsNull())
   {
-    m_PreviewNode = DataNode::New();
-    m_PreviewNode->SetProperty("color", ColorProperty::New(0.0, 1.0, 0.0));
-    m_PreviewNode->SetProperty("name", StringProperty::New(std::string(this->GetName())+" preview"));
-    m_PreviewNode->SetProperty("opacity", FloatProperty::New(0.3));
-    m_PreviewNode->SetProperty("binary", BoolProperty::New(true));
-    m_PreviewNode->SetProperty("helper object", BoolProperty::New(true));
+    m_PreviewSegmentationNode = DataNode::New();
+    m_PreviewSegmentationNode->SetProperty("color", ColorProperty::New(0.0, 1.0, 0.0));
+    m_PreviewSegmentationNode->SetProperty("name", StringProperty::New(std::string(this->GetName())+" preview"));
+    m_PreviewSegmentationNode->SetProperty("opacity", FloatProperty::New(0.3));
+    m_PreviewSegmentationNode->SetProperty("binary", BoolProperty::New(true));
+    m_PreviewSegmentationNode->SetProperty("helper object", BoolProperty::New(true));
   }
 
   if (m_SegmentationInputNode.IsNotNull())
@@ -110,7 +114,7 @@ void mitk::AutoSegmentationWithPreviewTool::Deactivated()
   {
     if (DataStorage *storage = m_ToolManager->GetDataStorage())
     {
-      storage->Remove(m_PreviewNode);
+      storage->Remove(m_PreviewSegmentationNode);
       RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
@@ -119,14 +123,13 @@ void mitk::AutoSegmentationWithPreviewTool::Deactivated()
     // don't care
   }
 
-  m_PreviewNode->SetData(nullptr);
+  m_PreviewSegmentationNode->SetData(nullptr);
 
   Superclass::Deactivated();
 }
 
 void mitk::AutoSegmentationWithPreviewTool::ConfirmSegmentation()
-{ 
-
+{
   if (m_LazyDynamicPreviews && m_CreateAllTimeSteps)
   { // The tool should create all time steps but is currently in lazy mode,
     // thus ensure that a preview for all time steps is available.
@@ -151,17 +154,17 @@ void  mitk::AutoSegmentationWithPreviewTool::InitiateToolByInput()
 
 mitk::Image* mitk::AutoSegmentationWithPreviewTool::GetPreviewSegmentation()
 {
-  if (m_PreviewNode.IsNull())
+  if (m_PreviewSegmentationNode.IsNull())
   {
     return nullptr;
   }
 
-  return dynamic_cast<Image*>(m_PreviewNode->GetData());
+  return dynamic_cast<Image*>(m_PreviewSegmentationNode->GetData());
 }
 
 mitk::DataNode* mitk::AutoSegmentationWithPreviewTool::GetPreviewSegmentationNode()
 {
-  return m_PreviewNode;
+  return m_PreviewSegmentationNode;
 }
 
 const mitk::Image* mitk::AutoSegmentationWithPreviewTool::GetSegmentationInput() const
@@ -206,7 +209,7 @@ void mitk::AutoSegmentationWithPreviewTool::ResetPreviewNode()
         return;
       }
 
-      m_PreviewNode->SetData(newPreviewImage);
+      m_PreviewSegmentationNode->SetData(newPreviewImage);
 
       // Let's paint the feedback node green...
       newPreviewImage->GetActiveLabel()->SetColor(previewColor);
@@ -215,27 +218,34 @@ void mitk::AutoSegmentationWithPreviewTool::ResetPreviewNode()
     else
     {
       mitk::Image::ConstPointer workingImageBin = dynamic_cast<const mitk::Image*>(m_ToolManager->GetWorkingData(0)->GetData());
-      if (workingImageBin)
+      if (workingImageBin.IsNotNull())
       {
-        m_PreviewNode->SetData(workingImageBin->Clone());
+        auto newPreviewImage = workingImageBin->Clone();
+        if (newPreviewImage.IsNull())
+        {
+          MITK_ERROR << "Cannot create preview helper objects. Unable to clone working image";
+          return;
+        }
+
+        m_PreviewSegmentationNode->SetData(newPreviewImage->Clone());
       }
       else
       {
-        mitkThrow() << "Tool is an invalid state. Cannot setup preview node. Working data is an unsupported class and should have never be accepted by CanHandle().";
+        mitkThrow() << "Tool is an invalid state. Cannot setup preview node. Working data is an unsupported class and should have not been accepted by CanHandle().";
       }
     }
 
-    m_PreviewNode->SetColor(previewColor);
-    m_PreviewNode->SetOpacity(0.5);
+    m_PreviewSegmentationNode->SetColor(previewColor);
+    m_PreviewSegmentationNode->SetOpacity(0.5);
 
     int layer(50);
     m_ReferenceDataNode->GetIntProperty("layer", layer);
-    m_PreviewNode->SetIntProperty("layer", layer + 1);
+    m_PreviewSegmentationNode->SetIntProperty("layer", layer + 1);
 
     if (DataStorage *ds = m_ToolManager->GetDataStorage())
     {
-      if (!ds->Exists(m_PreviewNode))
-        ds->Add(m_PreviewNode, m_ReferenceDataNode);
+      if (!ds->Exists(m_PreviewSegmentationNode))
+        ds->Add(m_PreviewSegmentationNode, m_ReferenceDataNode);
     }
   }
 }
@@ -256,7 +266,7 @@ void mitk::AutoSegmentationWithPreviewTool::TransferImageAtTimeStep(const Image*
 {
   try
   {
-    Image::ConstPointer image3D = this->Get3DImage(sourceImage, timeStep);
+    Image::ConstPointer image3D = this->GetImageByTimeStep(sourceImage, timeStep);
 
     if (image3D->GetPixelType() != destinationImage->GetPixelType())
     {
@@ -301,13 +311,12 @@ void mitk::AutoSegmentationWithPreviewTool::CreateResultSegmentationFromPreview(
       const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
       auto resultSegmentation = dynamic_cast<Image*>(resultSegmentationNode->GetData());
 
-      // actually perform a thresholding
-      // REMARK: the following code in this scope assumes that feedBackImage and emptySegmentationImage
-      // are clones of the working image (segmentation provided to the tool). Therefor the have the same
-      // time geometry.
+      // REMARK: the following code in this scope assumes that previewImage and resultSegmentation
+      // are clones of the working image (segmentation provided to the tool). Therefore they have
+      // the same time geometry.
       if (previewImage->GetTimeSteps() != resultSegmentation->GetTimeSteps())
       {
-        mitkThrow() << "Cannot performe threshold. Internal tool state is invalid."
+        mitkThrow() << "Cannot perform threshold. Internal tool state is invalid."
           << " Preview segmentation and segmentation result image have different time geometries.";
       }
 
@@ -376,11 +385,11 @@ void mitk::AutoSegmentationWithPreviewTool::OnRoiDataChanged()
 
 void mitk::AutoSegmentationWithPreviewTool::OnTimePointChanged()
 {
-  if (m_IsTimePointChangeAware && m_PreviewNode.IsNotNull() && m_SegmentationInputNode.IsNotNull())
+  if (m_IsTimePointChangeAware && m_PreviewSegmentationNode.IsNotNull() && m_SegmentationInputNode.IsNotNull())
   {
     const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
 
-    const bool isStaticSegOnDynamicImage = m_PreviewNode->GetData()->GetTimeSteps() == 1 && m_SegmentationInputNode->GetData()->GetTimeSteps() > 1;
+    const bool isStaticSegOnDynamicImage = m_PreviewSegmentationNode->GetData()->GetTimeSteps() == 1 && m_SegmentationInputNode->GetData()->GetTimeSteps() > 1;
     if (timePoint!=m_LastTimePointOfUpdate && (isStaticSegOnDynamicImage || m_LazyDynamicPreviews))
     { //we only need to update either because we are lazzy
       //or because we have a static segmentation with a dynamic image 
@@ -410,14 +419,14 @@ void mitk::AutoSegmentationWithPreviewTool::UpdatePreview(bool ignoreLazyPreview
       {
         for (unsigned int timeStep = 0; timeStep < inputImage->GetTimeSteps(); ++timeStep)
         {
-          auto feedBackImage3D = this->Get3DImage(inputImage, timeStep);
+          auto feedBackImage3D = this->GetImageByTimeStep(inputImage, timeStep);
 
           this->DoUpdatePreview(feedBackImage3D, previewImage, timeStep);
         }
       }
       else
       {
-        auto feedBackImage3D = this->Get3DImageByTimePoint(inputImage, timePoint);
+        auto feedBackImage3D = this->GetImageByTimePoint(inputImage, timePoint);
         auto timeStep = previewImage->GetTimeGeometry()->TimePointToTimeStep(timePoint);
 
         this->DoUpdatePreview(feedBackImage3D, previewImage, timeStep);

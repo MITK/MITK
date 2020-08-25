@@ -27,8 +27,8 @@ namespace mitk
   This tool class implements a lot basic logic to handle auto segmentation tools with preview,
   Time point and ROI support. Derived classes will ask to update the segmentation preview if needed
   (e.g. because the ROI or the current time point has changed) or because derived tools
-  indicated the need of update them self.
-  This class also then take care to properly transfer a confirmed preview into the segementation
+  indicated the need to update themselves.
+  This class also takes care to properly transfer a confirmed preview into the segementation
   result.
 
   \ingroup ToolManagerEtAl
@@ -63,7 +63,7 @@ namespace mitk
     /** Triggers the actualization of the preview
      * @param ignoreLazyPreviewSetting If set true UpdatePreview will always
      * generate the preview for all time steps. If set to false, UpdatePreview
-     * will regard the setting of m_LazyDynamicPreviews.
+     * will regard the setting specified by the constructor.
      * To define the update generation for time steps implement DoUpdatePreview.
      * To alter what should be done directly before or after the update of the preview,
      * reimplement UpdatePrepare() or UpdateCleanUp().*/
@@ -120,9 +120,12 @@ namespace mitk
     void OnRoiDataChanged();
     void OnTimePointChanged();
 
-    DataNode::Pointer m_PreviewNode;
-    /** The reference data recieved from tool manager when tool was activated.*/
+    /** Node that containes the preview data generated and managed by this class or derived ones.*/
+    DataNode::Pointer m_PreviewSegmentationNode;
+    /** The reference data recieved from ToolManager::GetReferenceData when tool was activated.*/
     DataNode::Pointer m_ReferenceDataNode;
+    /** Node that containes the data that should be used as input for any auto segmentation. It might
+     * be the same like m_ReferenceDataNode (if no ROI is set) or a sub region (if ROI is set).*/
     DataNode::Pointer m_SegmentationInputNode;
 
     /** Indicates if Accepting the threshold should transfer/create the segmentations
@@ -135,8 +138,8 @@ namespace mitk
     /** Relevant if the working data / preview image has multiple time steps (dynamic segmentations).
      * This flag has to be set by derived classes accordingly to there way to generate dynamic previews.
      * If LazyDynamicPreview is true, the tool generates only the preview for the current time step.
-     * so it always has to update the preview if current time point has changed and it has to (re)compute
-     * the whole previewnode Indicates it a tool */
+     * Therefore it always has to update the preview if current time point has changed and it has to (re)compute
+     * all timeframes if ConfirmSegmentation() is called.*/
     bool m_LazyDynamicPreviews = false;
 
     bool m_IsTimePointChangeAware = true;

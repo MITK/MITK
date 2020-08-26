@@ -31,9 +31,6 @@
   <property name="windowTitle">
    <string>QmitkOtsuToolWidget</string>
   </property>
-  <property name="toolTip">
-   <string>Move to adjust the segmentation</string>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">

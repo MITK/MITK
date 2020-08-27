@@ -35,8 +35,16 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
 
   while (y <= yMax)
   {
+    bool ignorePixel = false;
+    if (localStorage->m_CurtainActive) {
+      if (x < localStorage->m_CurtainPlaneStart[0]) ignorePixel = true;
+	  if (x > localStorage->m_CurtainPlaneEnd[0])   ignorePixel = true;
+	  if (y < localStorage->m_CurtainPlaneStart[1]) ignorePixel = true;
+	  if (y > localStorage->m_CurtainPlaneEnd[1])   ignorePixel = true;
+    }
+
     //if the current pixel value is set to something
-    if ((currentPixel) && (*currentPixel != 0))
+    if ((!ignorePixel) && (currentPixel) && (*currentPixel != 0))
     {
       //check in which direction a line is necessary
       //a line is added if the neighbor of the current pixel has the value 0

@@ -189,6 +189,16 @@ public:
     vtkSmartPointer<vtkActor> m_OutlineShadowActor;
     /** \brief A mapper for the outline */
     vtkSmartPointer<vtkOpenGLPolyDataMapper> m_OutlineMapper;
+    /** \brief PolyData object containg separartion curtain */
+    vtkSmartPointer<vtkPolyData> m_CurtainPolyData;
+    /** \brief An actor for the separartion curtain */
+    vtkSmartPointer<vtkActor> m_CurtainActor;
+    /** \brief A mapper for the separartion curtain */
+    vtkSmartPointer<vtkOpenGLPolyDataMapper> m_CurtainMapper;
+
+    mitk::Point2D m_CurtainPlaneStart;
+    mitk::Point2D m_CurtainPlaneEnd;
+    bool m_CurtainActive;
 
     /** \brief Timestamp of last update of stored data. */
     itk::TimeStamp m_LastUpdateTime;

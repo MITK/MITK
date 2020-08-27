@@ -105,6 +105,8 @@ public:
        */
     vtkSmartPointer<vtkPlane> m_CuttingPlane;
 
+    vtkSmartPointer<vtkPolyData> m_EmptyPolyData;
+
     /** \brief Default constructor of the local storage. */
     LocalStorage();
     /** \brief Default deconstructor of the local storage. */

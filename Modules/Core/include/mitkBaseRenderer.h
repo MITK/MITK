@@ -467,6 +467,10 @@ namespace mitk
     itkGetConstMacro(ConstrainZoomingAndPanning, bool)
     virtual void SetConstrainZoomingAndPanning(bool constrain);
 
+    void lock3dDrawing();
+    void unlock3dDrawing();
+    bool is3dDrawingLocked() const;
+
     /**
     * \brief Provides (1) world coordinates for a given mouse position and (2)
     * translates mousePosition to Display coordinates
@@ -611,6 +615,8 @@ namespace mitk
     unsigned int m_NumberOfVisibleLODEnabledMappers;
 
     std::string m_StudyUID;
+
+    int m_3dDrawingLock;
 
   // Local Storage Handling for mappers
   protected:

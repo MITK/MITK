@@ -57,8 +57,6 @@ public:
 
   void OnRegionSpinboxChanged(int);
 
-  void OnVolumePreviewChecked(int);
-
 private slots:
 
   void OnAdvancedSettingsButtonToggled(bool toggled);
@@ -66,6 +64,8 @@ private slots:
 protected:
   QmitkOtsuTool3DGUI();
   ~QmitkOtsuTool3DGUI() override;
+
+  void BusyStateChanged(bool value) override;
 
   mitk::OtsuTool3D::Pointer m_OtsuTool3DTool;
 

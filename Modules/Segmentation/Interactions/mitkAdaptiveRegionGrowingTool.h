@@ -46,7 +46,7 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      bool CanHandle(BaseData *referenceData) const override;
+    bool CanHandle(const BaseData* referenceData, const BaseData* workingData) const override;
 
     /**
      * @brief Get XPM

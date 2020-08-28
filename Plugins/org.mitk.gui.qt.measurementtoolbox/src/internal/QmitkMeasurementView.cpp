@@ -185,6 +185,7 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
     mitk::TNodePredicateDataType<mitk::Image>::New(),
     mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))));
   d->m_SingleNodeSelectionWidget->SetSelectionIsOptional(true);
+  d->m_SingleNodeSelectionWidget->SetAutoSelectNewNodes(true);
   d->m_SingleNodeSelectionWidget->SetEmptyInfo(QStringLiteral("Please select a reference image"));
   d->m_SingleNodeSelectionWidget->SetPopUpTitel(QStringLiteral("Select a reference image"));
 

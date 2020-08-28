@@ -20,8 +20,7 @@ found in the LICENSE file.
 class ctkSliderWidget;
 class ctkRangeWidget;
 class QPushButton;
-
-#include "QmitkStepperAdapter.h"
+class QCheckBox;
 
 /**
 \ingroup org_mitk_gui_qt_interactivesegmentation_internal
@@ -49,8 +48,6 @@ protected slots:
   void OnSigmaChanged(double);
   void OnStoppingValueChanged(double);
   void OnConfirmSegmentation();
-  void Refetch();
-  void SetStepper(mitk::Stepper *);
   void OnClearSeeds();
 
 protected:
@@ -70,12 +67,10 @@ protected:
   QPushButton *m_btConfirm;
   QPushButton *m_btClearSeeds;
 
+  QCheckBox* m_CheckProcessAll = nullptr;
+  QCheckBox* m_CheckCreateNew = nullptr;
+
   mitk::FastMarchingTool3D::Pointer m_FastMarchingTool;
-
-  bool m_TimeIsConnected;
-  mitk::Stepper::Pointer m_TimeStepper;
-
-  void OnFastMarchingToolReady();
 
 private:
   void EnableWidgets(bool);

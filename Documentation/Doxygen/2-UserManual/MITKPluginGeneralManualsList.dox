@@ -5,9 +5,9 @@
   \li \subpage org_mitk_views_basicimageprocessing
   \li \subpage org_mitk_views_datamanager
   \li \subpage org_mitk_views_properties
-  \li \subpage org_mitk_gui_qt_dicom
+  \li \subpage org_mitk_editors_dicombrowser
   \li \subpage org_mitk_gui_qt_dicominspector
-  \li \subpage org_mitk_gui_qt_imagecropper
+  \li \subpage org_mitk_views_imagecropper
   \li \subpage org_mitk_views_imagenavigator
   \li \subpage org_blueberry_views_logview
   \li \subpage org_mitk_gui_qt_matchpoint_algorithm_batch

@@ -2,7 +2,7 @@
 <plugin>
 
   <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.gui.qt.pharmacokinetics.mri"
+    <view id="org_mitk_views_pharmacokinetics_mri"
           name="DCE MR Perfusion Datafit View"
 		  category="Perfusion"
           class="MRPerfusionView"

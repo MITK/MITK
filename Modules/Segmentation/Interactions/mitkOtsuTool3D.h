@@ -13,7 +13,8 @@ found in the LICENSE file.
 #define MITKOTSUTOOL3D_H
 
 #include "itkImage.h"
-#include "mitkAutoSegmentationTool.h"
+#include "mitkAutoSegmentationWithPreviewTool.h"
+#include "mitkDataNode.h"
 #include <MitkSegmentationExports.h>
 
 namespace us
@@ -25,44 +26,55 @@ namespace mitk
 {
   class Image;
 
-  class MITKSEGMENTATION_EXPORT OtsuTool3D : public AutoSegmentationTool
+  class MITKSEGMENTATION_EXPORT OtsuTool3D : public AutoSegmentationWithPreviewTool
   {
   public:
-    mitkClassMacro(OtsuTool3D, AutoSegmentationTool);
+    mitkClassMacro(OtsuTool3D, AutoSegmentationWithPreviewTool);
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      const char *GetName() const override;
+    const char *GetName() const override;
     const char **GetXPM() const override;
     us::ModuleResource GetIconResource() const override;
 
     void Activated() override;
     void Deactivated() override;
 
-    void RunSegmentation(int regions, bool useValley, int numberOfBins);
-    void ConfirmSegmentation();
-    // void UpdateBinaryPreview(int regionID);
-    void UpdateBinaryPreview(std::vector<int> regionIDs);
-    void UpdateVolumePreview(bool volumeRendering);
-    void ShowMultiLabelResultNode(bool);
+    itkSetMacro(NumberOfBins, unsigned int);
+    itkGetConstMacro(NumberOfBins, unsigned int);
 
-    int GetNumberOfBins();
+    itkSetMacro(NumberOfRegions, unsigned int);
+    itkGetConstMacro(NumberOfRegions, unsigned int);
+
+    itkSetMacro(UseValley, bool);
+    itkGetConstMacro(UseValley, bool);
+    itkBooleanMacro(UseValley);
+
+    using SelectedRegionVectorType = std::vector<int>;
+    void SetSelectedRegions(const SelectedRegionVectorType& regions);
+    SelectedRegionVectorType GetSelectedRegions() const;
+
+    /**Returns the number of max bins based on the current input image.*/
+    unsigned int GetMaxNumberOfBins() const;
 
   protected:
     OtsuTool3D();
     ~OtsuTool3D() override;
 
+    void UpdateCleanUp() override;
+    void DoUpdatePreview(const Image* inputAtTimeStep, Image* previewImage, TimeStepType timeStep) override;
+
     template <typename TPixel, unsigned int VImageDimension>
-    void CalculatePreview(itk::Image<TPixel, VImageDimension> *itkImage, std::vector<int> regionIDs);
+    void CalculatePreview(itk::Image<TPixel, VImageDimension> *itkImage, mitk::Image* segmentation, unsigned int timeStep);
 
-    itk::SmartPointer<Image> m_OriginalImage;
-    // holds the user selected binary segmentation
-    mitk::DataNode::Pointer m_BinaryPreviewNode;
+    unsigned int m_NumberOfBins = 128;
+    unsigned int m_NumberOfRegions = 2;
+    bool m_UseValley = false;
+    SelectedRegionVectorType m_SelectedRegions = {};
+
     // holds the multilabel result as a preview image
-    mitk::DataNode::Pointer m_MultiLabelResultNode;
-    // holds the user selected binary segmentation masked original image
-    mitk::DataNode::Pointer m_MaskedImagePreviewNode;
-
+    mitk::DataNode::Pointer m_OtsuResultNode;
+    TimeStepType m_LastOtsuTimeStep = 0;
   }; // class
 } // namespace
 #endif

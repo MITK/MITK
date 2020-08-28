@@ -330,6 +330,7 @@ mitk::SurfaceVtkMapper2D::LocalStorage::LocalStorage()
   m_PropAssembly->AddPart( m_Actor );
   m_CuttingPlane = vtkSmartPointer<vtkPlane>::New();
   m_SphereTree = nullptr;
+  m_EmptyPolyData = vtkSmartPointer<vtkPolyData>::New();
 }
 
 // destructor LocalStorage
@@ -411,10 +412,16 @@ void mitk::SurfaceVtkMapper2D::Update(mitk::BaseRenderer* renderer)
 
 void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
+  LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
+
+  if (renderer->is3dDrawingLocked()) {
+    localStorage->m_Mapper->SetInputData(localStorage->m_EmptyPolyData);
+    return;
+  }
+
   const DataNode* node = GetDataNode();
   Surface* surface  = static_cast<Surface *>( node->GetData() );
   const TimeGeometry *dataTimeGeometry = surface->GetTimeGeometry();
-  LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
 
   ScalarType time =renderer->GetTime();
   int timestep=0;

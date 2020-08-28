@@ -121,6 +121,7 @@ mitk::BaseRenderer::BaseRenderer(const char* name, vtkRenderWindow * renWin, mit
   , m_NumberOfVisibleLODEnabledMappers(0)
   , m_StudyUID()
   , m_ConstrainZoomingAndPanning(false)
+  , m_3dDrawingLock(0)
 {
   m_Bounds[0] = 0;
   m_Bounds[1] = 0;
@@ -868,3 +869,21 @@ void mitk::BaseRenderer::PrintSelf(std::ostream& os, itk::Indent indent) const
 
   Superclass::PrintSelf(os, indent);
 }
+
+void mitk::BaseRenderer::lock3dDrawing()
+{
+  m_3dDrawingLock++;
+}
+
+void mitk::BaseRenderer::unlock3dDrawing()
+{
+  if (m_3dDrawingLock > 0) {
+    m_3dDrawingLock--;
+  }
+}
+
+bool mitk::BaseRenderer::is3dDrawingLocked() const
+{
+  return m_3dDrawingLock > 0;
+}
+

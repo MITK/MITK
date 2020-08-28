@@ -195,6 +195,10 @@ void QmitkDataStorageComboBox::RemoveNode( int index )
 {
   if(this->HasIndex(index))
   {
+    if (m_AllowEmptySelection && currentIndex() == index) {
+      setCurrentIndex(-1);
+    }
+
     //# remove itk::Event observer
     mitk::DataNode* _DataNode = m_Nodes.at(index);
     // get name property first
@@ -411,7 +415,12 @@ void QmitkDataStorageComboBox::InsertNode(int index, const mitk::DataNode* _Data
 
   if(addNewNode)
   {
+    int curIndex = currentIndex();
     this->addItem(GetDisplayedNodeName(_DataNode));
+    // addItem changes selected index from -1 to 0 if QComboBox was empty when addItem was called
+    if (m_AllowEmptySelection && curIndex != currentIndex()) {
+      setCurrentIndex(curIndex);
+    }
     // select new node if m_AutoSelectNewNodes is true or if we have just added the first node
     if(m_AutoSelectNewNodes || (!m_AllowEmptySelection && m_Nodes.size() == 1))
       this->setCurrentIndex(index);

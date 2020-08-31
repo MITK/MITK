@@ -23,7 +23,15 @@ found in the LICENSE file.
 #include "itkBinaryFunctorImageFilter.h"
 #include "boost/math/constants/constants.hpp"
 
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateOr.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateDimension.h>
+#include "mitkNodePredicateFunction.h"
 
+#include <mitkModelFitConstants.h>
 // Includes for image casting between ITK and MITK
 #include "mitkImageTimeSelector.h"
 #include "mitkImageCast.h"
@@ -95,7 +103,7 @@ void ConcentrationCurveConverterView::CreateQtPartControl(QWidget* parent)
     connect(m_Controls.RelaxivitySpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
     connect(m_Controls.TRSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
 
-    //m_Controls.PDWImageNodeSelector->SetNodePredicate(m_isValidPDWImagePredicate);
+    m_Controls.PDWImageNodeSelector->SetNodePredicate(m_isValidPDWImagePredicate);
     m_Controls.PDWImageNodeSelector->SetDataStorage(this->GetDataStorage());
     m_Controls.PDWImageNodeSelector->SetInvalidInfo("Please select PDW Image.");
     m_Controls.PDWImageNodeSelector->setEnabled(false);
@@ -359,6 +367,8 @@ mitk::Image::Pointer ConcentrationCurveConverterView::Convert4DConcentrationImag
   else
   {
     concentrationGen->SetFactor(m_Controls.factorSpinBox->value());
+    concentrationGen->SetBaselineStartTimeStep(m_Controls.spinBox_baselineStartTimeStep->value());
+    concentrationGen->SetBaselineEndTimeStep(m_Controls.spinBox_baselineEndTimeStep->value());
   }
 
   mitk::Image::Pointer concentrationImage = concentrationGen->GetConvertedImage();
@@ -452,4 +462,29 @@ void ConcentrationCurveConverterView::OnSelectionChanged( berry::IWorkbenchPart:
 
 ConcentrationCurveConverterView::ConcentrationCurveConverterView()
 {
+  mitk::NodePredicateDataType::Pointer isLabelSet = mitk::NodePredicateDataType::New("LabelSetImage");
+  mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New("Image");
+  mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
+  mitk::NodePredicateAnd::Pointer isLegacyMask = mitk::NodePredicateAnd::New(isImage, isBinary);
+  mitk::NodePredicateDimension::Pointer is3D = mitk::NodePredicateDimension::New(3);
+  mitk::NodePredicateOr::Pointer isMask = mitk::NodePredicateOr::New(isLegacyMask, isLabelSet);
+  mitk::NodePredicateAnd::Pointer isNoMask = mitk::NodePredicateAnd::New(isImage, mitk::NodePredicateNot::New(isMask));
+  mitk::NodePredicateAnd::Pointer is3DImage = mitk::NodePredicateAnd::New(isImage, is3D, isNoMask);
+
+  this->m_IsMaskPredicate = mitk::NodePredicateAnd::New(isMask, mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
+
+  this->m_IsNoMaskImagePredicate = mitk::NodePredicateAnd::New(isNoMask, mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
+
+  auto isDynamicData = mitk::NodePredicateFunction::New([](const mitk::DataNode* node)
+  {
+    return  (node && node->GetData() && node->GetData()->GetTimeSteps() > 1);
+  });
+
+  auto isNoModelFitNodePredicate = mitk::NodePredicateFunction::New([](const mitk::DataNode* node) {
+    bool isNoModelFitNode = node->GetData()->GetProperty(mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str()).IsNull();
+    return isNoModelFitNode;
+  });
+
+  this->m_isValidPDWImagePredicate = mitk::NodePredicateAnd::New(is3DImage, isNoModelFitNodePredicate);
+  this->m_isValidTimeSeriesImagePredicate = mitk::NodePredicateAnd::New(isDynamicData, isImage, isNoMask);
 }

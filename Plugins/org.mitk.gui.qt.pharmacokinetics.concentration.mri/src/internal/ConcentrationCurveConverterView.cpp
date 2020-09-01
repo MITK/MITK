@@ -54,6 +54,24 @@ void ConcentrationCurveConverterView::CreateQtPartControl(QWidget* parent)
 
     connect(m_Controls.btnConvertToConcentration, SIGNAL(clicked()), this, SLOT(OnConvertToConcentrationButtonClicked()));
 
+    m_Controls.timeSeriesNodeSelector->SetNodePredicate(this->m_isValidTimeSeriesImagePredicate);
+    m_Controls.timeSeriesNodeSelector->SetDataStorage(this->GetDataStorage());
+    m_Controls.timeSeriesNodeSelector->SetSelectionIsOptional(false);
+    m_Controls.timeSeriesNodeSelector->SetInvalidInfo("Please select time series.");
+    m_Controls.timeSeriesNodeSelector->SetAutoSelectNewNodes(true);
+
+    m_Controls.image3DNodeSelector->SetNodePredicate(this->m_isValidPDWImagePredicate);
+    m_Controls.image3DNodeSelector->SetDataStorage(this->GetDataStorage());
+    m_Controls.image3DNodeSelector->SetSelectionIsOptional(false);
+    m_Controls.image3DNodeSelector->SetInvalidInfo("Please select 3D image.");
+
+
+    m_Controls.baselineImageNodeSelector->SetNodePredicate(this->m_isValidPDWImagePredicate);
+    m_Controls.baselineImageNodeSelector->SetDataStorage(this->GetDataStorage());
+    m_Controls.baselineImageNodeSelector->SetSelectionIsOptional(false);
+    m_Controls.baselineImageNodeSelector->SetInvalidInfo("Please select baseline image.");
+
+
     m_Controls.groupBox_T1->hide();
     m_Controls.groupBox_T2->hide();
     m_Controls.groupBox3D->hide();
@@ -86,6 +104,9 @@ void ConcentrationCurveConverterView::CreateQtPartControl(QWidget* parent)
     connect(m_Controls.recoverytime, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
     connect(m_Controls.relaxivity, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
 
+    connect(m_Controls.timeSeriesNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &ConcentrationCurveConverterView::OnSelectionChanged);
+    connect(m_Controls.image3DNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &ConcentrationCurveConverterView::OnSelectionChanged);
+    connect(m_Controls.baselineImageNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &ConcentrationCurveConverterView::OnSelectionChanged);
 
     connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), this, SLOT(OnSettingChanged()));
     connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), this, SLOT(OnSettingChanged()));
@@ -400,30 +421,72 @@ mitk::Image::Pointer ConcentrationCurveConverterView::ConvertT2ConcentrationImga
     return concentrationImage;
 }
 
-void ConcentrationCurveConverterView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,const QList<mitk::DataNode::Pointer>& selectedNodes ){
-
+void ConcentrationCurveConverterView::OnSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/)
+{
     m_selectedNode = nullptr;
     m_selectedImage = nullptr;
     m_selectedBaselineNode = nullptr;
     m_selectedBaselineImage = nullptr;
 
-    m_Controls.timeserieslabel->setText("No (valid) series selected.");
-    m_Controls.BaselineImageLabel->setText("No (valid) baseline image selected.");
-    m_Controls.ImageLabel->setText("No (valid) image selected.");
-    m_Controls.T2_SeriesLabel->setText("No (valid) series selected.");
+    if (m_Controls.radioButton_T1->isChecked())
+    {
+      if (m_Controls.radioButton4D->isChecked())
+      {
+        if (m_Controls.timeSeriesNodeSelector->GetSelectedNode().IsNotNull())
+        {
+          this->m_selectedNode = m_Controls.timeSeriesNodeSelector->GetSelectedNode();
+          m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
+
+        }
+        else
+        {
+          this->m_selectedNode = nullptr;
+          this->m_selectedImage = nullptr;
+        }
+      }
+      else if (m_Controls.radioButton3D->isChecked())
+      {
+        if (m_Controls.image3DNodeSelector->GetSelectedNode().IsNotNull() && m_Controls.baselineImageNodeSelector->GetSelectedNode().IsNotNull())
+        {
+          this->m_selectedNode = m_Controls.image3DNodeSelector->GetSelectedNode();
+          m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
+          this->m_selectedBaselineNode = m_Controls.baselineImageNodeSelector->GetSelectedNode();
+          m_selectedBaselineImage = dynamic_cast<mitk::Image*>(m_selectedBaselineNode->GetData());
+        }
+        else
+        {
+          this->m_selectedNode = nullptr;
+          this->m_selectedImage = nullptr;
+          m_selectedBaselineNode = nullptr;
+          m_selectedBaselineImage = nullptr;
+        }
+      }
+
+    }
+    if (m_Controls.radioButton_T2->isChecked())
+    {
+
+    }
+
+
+    //m_Controls.BaselineImageLabel->setText("No (valid) baseline image selected.");
+    //m_Controls.ImageLabel->setText("No (valid) image selected.");
+    //m_Controls.T2_SeriesLabel->setText("No (valid) series selected.");
+
+
 
     m_Controls.btnConvertToConcentration->setEnabled(false);
 
-    QList<mitk::DataNode::Pointer> nodes = selectedNodes;
-    mitk::NodePredicateDataType::Pointer imagePredicate = mitk::NodePredicateDataType::New("Image");
-
+    //QList<mitk::DataNode::Pointer> nodes = selectedNodes;
+    //mitk::NodePredicateDataType::Pointer imagePredicate = mitk::NodePredicateDataType::New("Image");
+    /*
     if(m_Controls.radioButton_T1->isChecked())
     {
         if (nodes.size() > 0 && imagePredicate->CheckNode(nodes.front()))
         {
             this->m_selectedNode = nodes.front();
             this->m_selectedImage = dynamic_cast<mitk::Image*>(this->m_selectedNode->GetData());
-            m_Controls.timeserieslabel->setText((this->m_selectedNode->GetName()).c_str());
+            //m_Controls.timeserieslabel->setText((this->m_selectedNode->GetName()).c_str());
             nodes.pop_front();
         }
 
@@ -435,7 +498,8 @@ void ConcentrationCurveConverterView::OnSelectionChanged( berry::IWorkbenchPart:
             this->m_Controls.BaselineImageLabel->setText((this->m_selectedBaselineNode->GetName()).c_str());
         }
     }
-    else if(m_Controls.radioButton_T2->isChecked())
+    
+    if(m_Controls.radioButton_T2->isChecked())
     {
         if (nodes.size() > 0 && imagePredicate->CheckNode(nodes.front()))
         {
@@ -445,7 +509,7 @@ void ConcentrationCurveConverterView::OnSelectionChanged( berry::IWorkbenchPart:
             nodes.pop_front();
         }
     }
-
+    */
     if (this->m_selectedImage.IsNotNull())
     {
       m_Controls.spinBox_baselineStartTimeStep->setMaximum((this->m_selectedImage->GetDimension(3)) - 1);

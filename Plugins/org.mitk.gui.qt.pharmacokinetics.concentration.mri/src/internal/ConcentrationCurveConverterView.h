@@ -75,8 +75,7 @@ protected:
 
   /*! \brief called by QmitkFunctionality when DataManager's selection has changed
   */
-  void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-    const QList<mitk::DataNode::Pointer>& nodes) override;
+  void OnSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/);
 
 	// Variables
 

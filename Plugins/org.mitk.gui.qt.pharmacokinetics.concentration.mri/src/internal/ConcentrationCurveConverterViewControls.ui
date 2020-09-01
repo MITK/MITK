@@ -83,18 +83,14 @@
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout">
            <item>
-            <widget class="QLabel" name="label_6">
+            <widget class="QLabel" name="timeSeriesLabel">
              <property name="text">
               <string>Selected Time Series:</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="timeserieslabel">
-             <property name="text">
-              <string>No series selected</string>
-             </property>
-            </widget>
+            <widget class="QmitkSingleNodeSelectionWidget" name="timeSeriesNodeSelector" native="true"/>
            </item>
           </layout>
          </widget>
@@ -105,28 +101,20 @@
            <string>3D Image</string>
           </property>
           <layout class="QGridLayout" name="gridLayout">
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_9">
-             <property name="text">
-              <string>Selected 3D Image</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="ImageLabel">
-             <property name="text">
-              <string>No Image selected</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_11">
-             <property name="text">
-              <string>Baseline Image (without CA):</string>
-             </property>
-            </widget>
+           <item row="2" column="1">
+            <widget class="QmitkSingleNodeSelectionWidget" name="baselineImageNodeSelector" native="true"/>
            </item>
            <item row="1" column="1">
+            <widget class="QmitkSingleNodeSelectionWidget" name="image3DNodeSelector" native="true"/>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="ImageLabel">
+             <property name="text">
+              <string>Selected 3D Image:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
             <widget class="QLabel" name="BaselineImageLabel">
              <property name="frameShape">
               <enum>QFrame::NoFrame</enum>
@@ -135,7 +123,7 @@
               <enum>QFrame::Plain</enum>
              </property>
              <property name="text">
-              <string>No Baseline Image selected</string>
+              <string>Selected Baseline Image:</string>
              </property>
             </widget>
            </item>

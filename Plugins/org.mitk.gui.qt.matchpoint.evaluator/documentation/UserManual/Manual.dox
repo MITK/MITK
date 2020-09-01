@@ -1,5 +1,5 @@
 /**
-\page org_mitk_gui_qt_matchpoint_evaluator The MatchPoint Registration Evaluation View
+\page org_mitk_views_matchpoint_evaluator The MatchPoint Registration Evaluation View
 
 \imageMacro{map_evaluator_doc.svg, "Icon of the MatchPoint Registration Evaluator", 3}
 
@@ -7,39 +7,45 @@
 
 \section MAP_REGEVAL_Introduction Introduction
 This view offers the possibility to evaluate the quality of the registration/mapping of two given images by visual inspection.
-One may select no registration. Then the images will be displayed in evaluation mode assuming an identity transform (so no mapping).
+This can either by used to assess the visual quality of a registration or to assess how well the image contents are already aligned
+by default. To achieve the latter, one may select no registration. Then the images will be displayed in evaluation mode assuming an identity transform (so no mapping).
 It is one of several MatchPoint registration plug-ins.\n
 
-\section MAP_REGEVAL_Contact Contact information
-This plug-in is being developed by the SIDT group (Software development for Integrated Diagnostics
-and Therapy) at the German Cancer Research Center (DKFZ). If you have any questions, need support,
-find a bug or have a feature request, feel free to contact us at www.mitk.org.
-
 \section MAP_REGEVAL_Usage Usage
-\imageMacro{map_view_example.png, "Example screenshot showing the plug-in in use.", 14}
-To use the evaluation view you must have selected at least the moving and the target image you want to use to evaluate.
-If you select a registration with referenced target and moving image (the normal state if you generate registrations with the MatchPoint plugins)
-these images will be auto selected by just clicking on the registration.
-If you select no registration the view will assume that an identity transform should be used.\n
-As long as no valid set of data is selected the "Start evaluation" button will be disabled. If its enabled you may start the evaluation mode with it.
-
-\imageMacro{map_no_data_selected.png, "Example screenshot showing the state if no data is selected", 5}
+\imageMacro{map_view_evaluator_example.png, "Example screenshot showing the main elements of the view.", 14}
+(1) The currently selected registration that should be used to map the moving image for evaluation. Click to change. If no registration is selected, a direct evaluation will be performed.\n
+(2) Reset button will remove the currently selected registration.\n
+(3) Auto select option. If active the view will try to deduce and automatically select (if loaded in the application) the moving and target image when the registration changes. The view assumes that the moving and target images used to determine the registration should be used.\n
+(4) The currently selected moving data. Click to change.\n
+(5) The currently selected target data. Click to change.\n
+(6) Start/Stop button used to activate/deactivate the evaluation. This button become active when at least the moving and the target image are selected.\n
+(7) Selection of the visualization style. (only visible if evaluation is active)\n
+(8) Style specific settings. (only visible if evaluation is active)\n
 
 If the evaluation view is active you can choose between different modes of visualization. For more details see \ref MAP_REGEVAL_Styles.\n
 To stop the evaluation mode, you may use the "Stop evaluation" button or just close the evaluation view.
 
-\remark The evaluation view will use the level window settings of the used images. So to changes the level windowing of the evaluation view, you must change the
-level windowing of the respective images.
+\remark The evaluation view will use the level window settings of the used images. So to change the level windowing of the evaluation view, you must change the
+level windowing of the respective input images (moving image and target image).
+
+\section MAP_REGEVAL_Accuracy Evaluating accuracy
+<b>Important note:</b> Please be aware, that a visual inspection of registration quality is only a weak surrogate for a thorough accuracy analysis based on representative and suitable ground truth data. From a visually good mapping you can not deduce a correct registration. This is especially true if the degrees of freedom of the registration increases. For a rigid registration it might by feasible to discern correct and incorrect registration. But for none rigid registrations you definitely you should use this view only for first visual inspection (to check if it SEEMS to do the right thing and is worth further exploration) or illustrating the registration effect for registration you have assessed in a sound way.
 
 \section MAP_REGEVAL_Styles Visualization styles
 You can choose from the following visualization styles to evaluate the registration/mapping quality:\n
 \li "Blend": Blends the images with a user defined weight. Default is 50:50.
-\imageMacro{map_style_blend.png, "Example for mode: Blend", 5}
-\li "Checkerboard": Checkerboard style that composes both images. You may define the resolution of the checkerboard.
+\imageMacro{map_view_blend_settings.png, "Settings of the Blend style", 8}
+(1) Click to set the weights to 100% target image.\n
+(2) Click to set the weights to 50:50 (equal blend).\n
+(3) Slider to adjust the weights between target image and the mapped input image. The spin box shows the weight of the mapped input image.\n
+(4) Click to set the weights to 100% mapped input image.\n
+(5) Click to toggle the weight between both images.\n
+\imageMacro{map_style_blend.png, "Example for mode: Blend (50:50)", 5}
+\li "Checkerboard": Checkerboard style that composes both images by showing image 1 in all light squares and image 2 in all dark squares. You can define the resolution/number of squares of the checkerboard.
 \imageMacro{map_style_checkerboard.png, "Example for mode: Checkerboard", 5}
 \li "Color blend": Color blend of the images (blue: target image; yellow: moving). Areas where you see no color implies good intensity matchings.
 \imageMacro{map_style_color_blend.png, "Example for mode: Color blend", 5}
-\li "Contour": Blend mode that display one image as blue "background" and the other image in yellow contours. You may choose the role of the images.
+\li "Contour": Blend mode that displays one image as blue "background" and the other image in yellow contours. You can choose the role of the images.
 \imageMacro{map_style_contour.png, "Example for mode: Contour", 5}
 \li "Difference": Displays the absolute difference of both images.
 \li "Wipe": Blend mode that makes a rectilinear combination of the images. You can choose the mode how the images are splitted. The split is synchronized with the current selection. So you may interact with the split border to position it on interesting areas.

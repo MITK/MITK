@@ -873,12 +873,14 @@ void mitk::BaseRenderer::PrintSelf(std::ostream& os, itk::Indent indent) const
 void mitk::BaseRenderer::lock3dDrawing()
 {
   m_3dDrawingLock++;
+  m_CurrentWorldPlaneGeometryUpdateTime.Modified();
 }
 
 void mitk::BaseRenderer::unlock3dDrawing()
 {
   if (m_3dDrawingLock > 0) {
     m_3dDrawingLock--;
+    m_CurrentWorldPlaneGeometryUpdateTime.Modified();
   }
 }
 

@@ -28,7 +28,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -265,28 +265,28 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1780"
+     inkscape:window-width="1680"
      inkscape:window-height="1017"
      id="namedview4487"
      showgrid="false"
      inkscape:zoom="1"
-     inkscape:cx="294.88541"
+     inkscape:cx="76.38541"
      inkscape:cy="266.99957"
-     inkscape:window-x="2015"
-     inkscape:window-y="284"
+     inkscape:window-x="249"
+     inkscape:window-y="97"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg4485" />
   <image
-     sodipodi:absref="D:\Dev\MITK\sMaster\Plugins\org.mitk.gui.qt.matchpoint.evaluator\documentation\UserManual\map_view_example_raw.png"
-     xlink:href="map_view_example_raw.png"
-     transform="translate(0,-297.78046)"
-     clip-path="url(#clipPath5294)"
-     y="1"
-     x="0"
-     id="image4493"
-     preserveAspectRatio="none"
+     sodipodi:absref="D:\Dev\MITK\sMaster\Plugins\org.mitk.gui.qt.matchpoint.evaluator\documentation\UserManual\map_view_evaluator_example_raw.png"
+     xlink:href="map_view_evaluator_example_raw.png"
+     width="427"
      height="471"
-     width="427" />
+     preserveAspectRatio="none"
+     id="image4493"
+     x="0"
+     y="1"
+     clip-path="url(#clipPath5294)"
+     transform="translate(0,-297.78046)" />
   <path
      style="fill:#ff0000;stroke:#ff0000;stroke-width:5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker5281-0-0)"
      d="m 396.13594,118.55192 h 38.53626 -0.76851"
@@ -350,7 +350,7 @@
          height="48"
          x="353"
          y="188" /></flowRegion><flowPara
-       id="flowPara4723"></flowPara></flowRoot>  <path
+       id="flowPara4723" /></flowRoot>  <path
      style="fill:none;stroke:#ff0000;stroke-width:5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker5562-7)"
      d="M 208.88504,77.775776 V 48.448036 H 434.6722"
      id="path5464-3"
@@ -395,4 +395,4 @@
          height="349"
          x="-160"
          y="-82.780457" /></flowRegion><flowPara
-       id="flowPara8277"></flowPara></flowRoot></svg>
+       id="flowPara8277" /></flowRoot></svg>

@@ -17,7 +17,7 @@ set(Boost_DEPENDS ${proj})
 
 if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
 
-  set(_boost_version 1_60)
+  set(_boost_version 1_68)
   set(_boost_install_include_dir include/boost)
   if(WIN32)
     set(_boost_install_include_dir include/boost-${_boost_version}/boost)
@@ -25,6 +25,7 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
 
   set(_boost_libs )
   set(_with_boost_libs )
+  set(_bootstrap_args )
   set(_install_lib_dir )
 
   # Set the boost root to the libraries install directory
@@ -33,6 +34,14 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
   if(MITK_USE_Boost_LIBRARIES)
     string(REPLACE ";" "," _boost_libs "${MITK_USE_Boost_LIBRARIES}")
     foreach(_boost_lib ${MITK_USE_Boost_LIBRARIES})
+      if (_boost_lib MATCHES "python[0-9]*")
+        find_package (Python2 COMPONENTS Interpreter Development)
+        if(Python2_FOUND)
+#          list(APPEND _bootstrap_args "--with-python=${Python2_EXECUTABLE}")
+          get_filename_component(_python_basedir ${Python2_INCLUDE_DIRS} DIRECTORY) #< this maybe for windows only
+          list(APPEND _bootstrap_args "--with-python=${_python_basedir}")
+        endif()
+      endif()
       list(APPEND _with_boost_libs --with-${_boost_lib})
     endforeach()
   endif()
@@ -139,11 +148,12 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}
     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_${_boost_version}_0.7z
-    URL_MD5 7ce7f5a4e396484da8da6b60d4ed7661
+    URL_MD5 ae25f29cdb82cf07e8e26187ddf7d330
     BINARY_DIR "${ep_prefix}/src/${proj}"
     CONFIGURE_COMMAND "<SOURCE_DIR>/bootstrap${_shell_extension}"
       --with-toolset=${_boost_with_toolset}
       --with-libraries=${_boost_libs}
+      ${_bootstrap_args}
       "--prefix=<INSTALL_DIR>"
     ${_boost_build_cmd}
     INSTALL_COMMAND ${_install_cmd}

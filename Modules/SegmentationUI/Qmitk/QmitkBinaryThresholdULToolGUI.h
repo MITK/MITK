@@ -15,7 +15,9 @@ found in the LICENSE file.
 
 #include "QmitkToolGUI.h"
 #include "ctkRangeWidget.h"
+#include <qcheckbox.h>
 #include "mitkBinaryThresholdULTool.h"
+
 #include <MitkSegmentationUIExports.h>
 
 /**
@@ -35,7 +37,7 @@ public:
   itkFactorylessNewMacro(Self);
   itkCloneMacro(Self);
 
-    void OnThresholdingIntervalBordersChanged(double lower, double upper, bool isFloat);
+  void OnThresholdingIntervalBordersChanged(double lower, double upper, bool isFloat);
   void OnThresholdingValuesChanged(mitk::ScalarType lower, mitk::ScalarType upper);
 
 signals:
@@ -54,7 +56,11 @@ protected:
   QmitkBinaryThresholdULToolGUI();
   ~QmitkBinaryThresholdULToolGUI() override;
 
+  void BusyStateChanged(bool) override;
+
   ctkRangeWidget *m_DoubleThresholdSlider;
+  QCheckBox* m_CheckProcessAll = nullptr;
+  QCheckBox* m_CheckCreateNew = nullptr;
 
   mitk::BinaryThresholdULTool::Pointer m_BinaryThresholdULTool;
 };

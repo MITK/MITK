@@ -24,10 +24,11 @@ found in the LICENSE file.
 #include <qlabel.h>
 #include <qlayout.h>
 #include <qpushbutton.h>
+#include <qcheckbox.h>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkFastMarchingTool3DGUI, "")
 
-QmitkFastMarchingTool3DGUI::QmitkFastMarchingTool3DGUI() : QmitkToolGUI(), m_TimeIsConnected(false)
+QmitkFastMarchingTool3DGUI::QmitkFastMarchingTool3DGUI() : QmitkToolGUI()
 {
   this->setContentsMargins(0, 0, 0, 0);
 
@@ -187,6 +188,16 @@ QmitkFastMarchingTool3DGUI::QmitkFastMarchingTool3DGUI() : QmitkToolGUI(), m_Tim
   widgetLayout->addWidget(m_btConfirm);
   connect(m_btConfirm, SIGNAL(clicked()), this, SLOT(OnConfirmSegmentation()));
 
+  m_CheckProcessAll = new QCheckBox("Process all time steps", this);
+  m_CheckProcessAll->setChecked(false);
+  m_CheckProcessAll->setToolTip("Process/overwrite all time steps of the dynamic segmentation and not just the currently visible time step.");
+  widgetLayout->addWidget(m_CheckProcessAll);
+
+  m_CheckCreateNew = new QCheckBox("Create as new segmentation", this);
+  m_CheckCreateNew->setChecked(false);
+  m_CheckCreateNew->setToolTip("Add the confirmed segmentation as a new segmentation instead of overwriting the currently selected.");
+  widgetLayout->addWidget(m_CheckCreateNew);
+
   connect(this, SIGNAL(NewToolAssociated(mitk::Tool *)), this, SLOT(OnNewToolAssociated(mitk::Tool *)));
 
   m_slSigma->setDecimals(2);
@@ -202,8 +213,6 @@ QmitkFastMarchingTool3DGUI::~QmitkFastMarchingTool3DGUI()
   {
     m_FastMarchingTool->CurrentlyBusy -=
       mitk::MessageDelegate1<QmitkFastMarchingTool3DGUI, bool>(this, &QmitkFastMarchingTool3DGUI::BusyStateChanged);
-    m_FastMarchingTool->RemoveReadyListener(
-      mitk::MessageDelegate<QmitkFastMarchingTool3DGUI>(this, &QmitkFastMarchingTool3DGUI::OnFastMarchingToolReady));
   }
 }
 
@@ -213,8 +222,6 @@ void QmitkFastMarchingTool3DGUI::OnNewToolAssociated(mitk::Tool *tool)
   {
     m_FastMarchingTool->CurrentlyBusy -=
       mitk::MessageDelegate1<QmitkFastMarchingTool3DGUI, bool>(this, &QmitkFastMarchingTool3DGUI::BusyStateChanged);
-    m_FastMarchingTool->RemoveReadyListener(
-      mitk::MessageDelegate<QmitkFastMarchingTool3DGUI>(this, &QmitkFastMarchingTool3DGUI::OnFastMarchingToolReady));
   }
 
   m_FastMarchingTool = dynamic_cast<mitk::FastMarchingTool3D *>(tool);
@@ -223,18 +230,16 @@ void QmitkFastMarchingTool3DGUI::OnNewToolAssociated(mitk::Tool *tool)
   {
     m_FastMarchingTool->CurrentlyBusy +=
       mitk::MessageDelegate1<QmitkFastMarchingTool3DGUI, bool>(this, &QmitkFastMarchingTool3DGUI::BusyStateChanged);
-    m_FastMarchingTool->AddReadyListener(
-      mitk::MessageDelegate<QmitkFastMarchingTool3DGUI>(this, &QmitkFastMarchingTool3DGUI::OnFastMarchingToolReady));
 
-    // listen to timestep change events
-    mitk::BaseRenderer::Pointer renderer;
-    renderer = mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget0"));
-    if (renderer.IsNotNull() && !m_TimeIsConnected)
-    {
-      new QmitkStepperAdapter(this, renderer->GetSliceNavigationController()->GetTime(), "stepper");
-      //  connect(m_TimeStepper, SIGNAL(Refetch()), this, SLOT(Refetch()));
-      m_TimeIsConnected = true;
-    }
+    m_FastMarchingTool->SetLowerThreshold(m_slwThreshold->minimumValue());
+    m_FastMarchingTool->SetUpperThreshold(m_slwThreshold->maximumValue());
+    m_FastMarchingTool->SetStoppingValue(m_slStoppingValue->value());
+    m_FastMarchingTool->SetSigma(m_slSigma->value());
+    m_FastMarchingTool->SetAlpha(m_slAlpha->value());
+    m_FastMarchingTool->SetBeta(m_slBeta->value());
+    m_FastMarchingTool->SetOverwriteExistingSegmentation(true);
+    m_FastMarchingTool->ClearSeeds();
+    m_CheckProcessAll->setVisible(m_FastMarchingTool->GetTargetSegmentationNode()->GetData()->GetTimeSteps() > 1);
   }
 }
 
@@ -242,13 +247,13 @@ void QmitkFastMarchingTool3DGUI::Update()
 {
   if (m_FastMarchingTool.IsNotNull())
   {
-    m_FastMarchingTool->SetLowerThreshold(this->m_slwThreshold->minimumValue());
-    m_FastMarchingTool->SetUpperThreshold(this->m_slwThreshold->maximumValue());
-    m_FastMarchingTool->SetStoppingValue(this->m_slStoppingValue->value());
-    m_FastMarchingTool->SetSigma(this->m_slSigma->value());
-    m_FastMarchingTool->SetAlpha(this->m_slAlpha->value());
-    m_FastMarchingTool->SetBeta(this->m_slBeta->value());
-    m_FastMarchingTool->Update();
+    m_FastMarchingTool->SetLowerThreshold(m_slwThreshold->minimumValue());
+    m_FastMarchingTool->SetUpperThreshold(m_slwThreshold->maximumValue());
+    m_FastMarchingTool->SetStoppingValue(m_slStoppingValue->value());
+    m_FastMarchingTool->SetSigma(m_slSigma->value());
+    m_FastMarchingTool->SetAlpha(m_slAlpha->value());
+    m_FastMarchingTool->SetBeta(m_slBeta->value());
+    m_FastMarchingTool->UpdatePreview();
   }
 }
 
@@ -300,39 +305,22 @@ void QmitkFastMarchingTool3DGUI::OnStoppingValueChanged(double value)
 
 void QmitkFastMarchingTool3DGUI::OnConfirmSegmentation()
 {
-  QmitkConfirmSegmentationDialog dialog;
-  QString segName = QString::fromStdString(m_FastMarchingTool->GetCurrentSegmentationName());
-
-  dialog.SetSegmentationName(segName);
-  int result = dialog.exec();
-
-  switch (result)
-  {
-    case QmitkConfirmSegmentationDialog::CREATE_NEW_SEGMENTATION:
-      m_FastMarchingTool->SetOverwriteExistingSegmentation(false);
-      break;
-    case QmitkConfirmSegmentationDialog::OVERWRITE_SEGMENTATION:
-      m_FastMarchingTool->SetOverwriteExistingSegmentation(true);
-      break;
-    case QmitkConfirmSegmentationDialog::CANCEL_SEGMENTATION:
-      return;
-  }
   if (m_FastMarchingTool.IsNotNull())
   {
+    if (m_CheckCreateNew->isChecked())
+    {
+      m_FastMarchingTool->SetOverwriteExistingSegmentation(false);
+    }
+    else
+    {
+      m_FastMarchingTool->SetOverwriteExistingSegmentation(true);
+    }
+
+    m_FastMarchingTool->SetCreateAllTimeSteps(m_CheckProcessAll->isChecked());
+
     m_btConfirm->setEnabled(false);
     m_FastMarchingTool->ConfirmSegmentation();
   }
-}
-
-void QmitkFastMarchingTool3DGUI::SetStepper(mitk::Stepper *stepper)
-{
-  this->m_TimeStepper = stepper;
-}
-
-void QmitkFastMarchingTool3DGUI::Refetch()
-{
-  // event from image navigator recieved - timestep has changed
-  m_FastMarchingTool->SetCurrentTimeStep(m_TimeStepper->GetPos());
 }
 
 void QmitkFastMarchingTool3DGUI::OnClearSeeds()
@@ -348,16 +336,15 @@ void QmitkFastMarchingTool3DGUI::OnClearSeeds()
 void QmitkFastMarchingTool3DGUI::BusyStateChanged(bool value)
 {
   if (value)
+  {
     QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
+    this->EnableWidgets(false);
+  }
   else
+  {
     QApplication::restoreOverrideCursor();
-}
-
-void QmitkFastMarchingTool3DGUI::OnFastMarchingToolReady()
-{
-  this->EnableWidgets(true);
-  this->m_btClearSeeds->setEnabled(true);
-  this->m_btConfirm->setEnabled(true);
+    this->EnableWidgets(true);
+  }
 }
 
 void QmitkFastMarchingTool3DGUI::EnableWidgets(bool enable)
@@ -367,4 +354,8 @@ void QmitkFastMarchingTool3DGUI::EnableWidgets(bool enable)
   m_slBeta->setEnabled(enable);
   m_slStoppingValue->setEnabled(enable);
   m_slwThreshold->setEnabled(enable);
+  m_btClearSeeds->setEnabled(enable);
+  m_btConfirm->setEnabled(enable);
+  m_CheckCreateNew->setEnabled(enable);
+  m_CheckProcessAll->setEnabled(enable);
 }

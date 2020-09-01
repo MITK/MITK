@@ -248,7 +248,7 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     };
 
-    mitk::PreferenceListReaderOptionsFunctor readerFilterFunctor = mitk::PreferenceListReaderOptionsFunctor({ "MITK DICOM Reader v2 (classic config)" }, { "MITK DICOM Reader" });
+    mitk::PreferenceListReaderOptionsFunctor readerFilterFunctor = mitk::PreferenceListReaderOptionsFunctor({ "MITK DICOM Reader v2 (autoselect)" }, { "" });
 
     // Show a help message
     if (parsedArgs.count("help") || parsedArgs.count("h"))

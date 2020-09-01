@@ -1,5 +1,7 @@
 MITK_CREATE_MODULE(
-  INCLUDE_DIRS PUBLIC Rendering Helper algorithms
+  INCLUDE_DIRS
+    PUBLIC algorithms
+    PRIVATE src/Helper src/Rendering
   DEPENDS MitkCore MitkSceneSerializationBase
   PACKAGE_DEPENDS
    PUBLIC MatchPoint
@@ -22,4 +24,5 @@ if(TARGET ${MODULE_TARGET})
   if(BUILD_TESTING)
     ADD_SUBDIRECTORY(Testing)
   endif(BUILD_TESTING)
+  ADD_SUBDIRECTORY(cmdapps)
 endif()

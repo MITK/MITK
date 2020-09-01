@@ -289,6 +289,9 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
 
   this->CreateConnections();
   this->AddAllInteractors();
+
+  // placed after CreateConnections to trigger update of the current selection
+  d->m_SingleNodeSelectionWidget->SetAutoSelectNewNodes(true);
 }
 
 void QmitkMeasurementView::CreateConnections()

@@ -89,7 +89,7 @@ void mitk::WatershedTool::DoIt()
     return;
 
   const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
-  input = Get3DImageByTimePoint(input, timePoint);
+  input = GetImageByTimePoint(input, timePoint);
 
   if (nullptr == input)
   {

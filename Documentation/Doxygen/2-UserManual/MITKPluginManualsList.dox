@@ -9,19 +9,19 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
 <ul>
   <li> \ref  org_mitk_views_basicimageprocessing </li>
   <li> \ref  org_mitk_views_datamanager </li>
-  <li> \ref  org_mitk_gui_qt_dicombrowser</li>
+  <li> \ref  org_mitk_editors_dicombrowser </li>
   <li> \ref  org_mitk_gui_qt_dicominspector </li>
   <li> \ref  org_mitk_gui_qt_flowapplication </li>
-  <li> \ref  org_mitk_gui_qt_imagecropper </li>
+  <li> \ref  org_mitk_views_imagecropper </li>
   <li> \ref  org_mitk_views_imagenavigator </li>
   <li> \ref  org_blueberry_ui_qt_log </li>
-  <li> \ref  org_mitk_gui_qt_matchpoint_algorithm_browser</li>
-  <li> \ref  org_mitk_gui_qt_matchpoint_algorithm_control</li>
-  <li> \ref  org_mitk_gui_qt_matchpoint_evaluator</li>
-  <li> \ref  org_mitk_gui_qt_matchpoint_framereg</li>
-  <li> \ref  org_mitk_gui_qt_matchpoint_manipulator</li>
-  <li> \ref  org_mitk_gui_qt_matchpoint_mapper</li>
-  <li> \ref  org_mitk_gui_qt_matchpoint_visualizer</li>
+  <li> \ref  org_mitk_views_matchpoint_algorithm_browser</li>
+  <li> \ref  org_mitk_views_matchpoint_algorithm_control</li>
+  <li> \ref  org_mitk_views_matchpoint_evaluator</li>
+  <li> \ref  org_mitk_views_matchpoint_framereg</li>
+  <li> \ref  org_mitk_views_matchpoint_manipulator</li>
+  <li> \ref  org_mitk_views_matchpoint_mapper</li>
+  <li> \ref  org_mitk_views_matchpoint_visualizer</li>
   <li> \ref  org_mitk_gui_qt_measurementtoolbox </li>
   <li> \ref  org_mitk_views_moviemaker </li>
   <li> \ref  org_mitk_views_multilabelsegmentation </li>
@@ -45,7 +45,7 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
   <li> \ref  org_mitk_gui_qt_classificationsegmentation </li>
   <li> \ref  org_mitk_views_cmdlinemodules </li>
   <li> \ref  org_mitk_gui_qt_pharmacokinetics_concentration_mri</li>
-  <li> \ref  org_mitk_gui_qt_pharmacokinetics_mri</li>
+  <li> \ref  org_mitk_views_pharmacokinetics_mri</li>
   <li> \ref  org_mitk_gui_qt_pharmacokinetics_pet</li>
   <li> \ref  org_mitk_gui_qt_eventrecorder </li>
   <li> \ref  org_mitk_gui_qt_examples </li>

@@ -286,7 +286,8 @@ void mitk::RegionGrowingTool::CalculateInitialThresholds(const itk::Image<TPixel
   LevelWindow levelWindow;
   m_ToolManager->GetReferenceData(0)->GetLevelWindow(levelWindow);
 
-  m_ThresholdExtrema = { std::numeric_limits<TPixel>::lowest(), std::numeric_limits<TPixel>::max() };
+  m_ThresholdExtrema[0] = static_cast<ScalarType>(std::numeric_limits<TPixel>::lowest());
+  m_ThresholdExtrema[1] = static_cast<ScalarType>(std::numeric_limits<TPixel>::max());
 
   const ScalarType lowerWindowBound = std::max(m_ThresholdExtrema[0], levelWindow.GetLowerWindowBound());
   const ScalarType upperWindowBound = std::min(m_ThresholdExtrema[1], levelWindow.GetUpperWindowBound());

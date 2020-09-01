@@ -57,6 +57,7 @@ void QmitkImageCropperView::CreateQtPartControl(QWidget *parent)
   m_Controls.imageSelectionWidget->SetDataStorage(GetDataStorage());
   m_Controls.imageSelectionWidget->SetNodePredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
   m_Controls.imageSelectionWidget->SetSelectionIsOptional(true);
+  m_Controls.imageSelectionWidget->SetAutoSelectNewNodes(true);
   m_Controls.imageSelectionWidget->SetEmptyInfo(QString("Please select an image node"));
   m_Controls.imageSelectionWidget->SetPopUpTitel(QString("Select image node"));
 
@@ -68,6 +69,7 @@ void QmitkImageCropperView::CreateQtPartControl(QWidget *parent)
     mitk::TNodePredicateDataType<mitk::GeometryData>::New(),
     mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))));
   m_Controls.boundingBoxSelectionWidget->SetSelectionIsOptional(true);
+  m_Controls.boundingBoxSelectionWidget->SetAutoSelectNewNodes(true);
   m_Controls.boundingBoxSelectionWidget->SetEmptyInfo(QString("Please select a bounding box"));
   m_Controls.boundingBoxSelectionWidget->SetPopUpTitel(QString("Select bounding box node"));
 

@@ -28,7 +28,7 @@ namespace itk
   enum class StitchStrategy
   {
     Mean = 0, //use the mean value of all inputs that can provide a pixel vaule
-    BorderDistance = 1 //use the value that is largest minimal distance to its image borders (use e.g. if vaules tend to be not relyable at borders)
+    BorderDistance = 1 //use the value that is largest minimal distance to its image borders (use e.g. if vaules tend to be not reliable at borders)
   };
 
   std::ostream& operator<< (std::ostream& os, const itk::StitchStrategy& strategy)
@@ -46,14 +46,14 @@ namespace itk
   /** \class StitchImageFilter
  * \brief ITK filter that resamples/stitches multiple images into a given reference geometry.
  *
- * StitchImageFilter is simelar to itk's ResampleImageFilter, but in difference to the last
+ * StitchImageFilter is similar to itk's ResampleImageFilter, but in difference to the last
  * mentioned StitchImageFilter is able to resample multiple input images at once (with a transform
- * for each input image). If mutliple input images cover the output region the behavior depends on
+ * for each input image). If multiple input images cover the output region the behavior depends on
  * the StitchStragy:
- * - Mean: a wighted sum of all voxels mapped input pixel values will be calculated.
- * - BorderDisntance: the voxel will be choosen that have the largest minimal distance to its own image borders.
+ * - Mean: a weighted sum of all voxels mapped input pixel values will be calculated.
+ * - BorderDistance: the voxels will be choosen that have the largest minimal distance to its own image borders.
  *
- * All other behaviors are simelar to itk::ResampleImageFilter. See the filter's description for
+ * All other behaviors are similar to itk::ResampleImageFilter. See the filter's description for
  * more details.
  */
 template< typename TInputImage,

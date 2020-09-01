@@ -27,17 +27,17 @@ found in the LICENSE file.
 
 namespace mitk
 {
-    /**Helper that stitch a given vector of input images
+    /**Helper that stitches a given vector of input images
      * @param inputs vector of input images that should be stitched.
-     * @param registrations vector of registrations that should be used for mapping of the inputs befor stitching.
-     * the method assumes that order of registrations is the same than the order of inputs, thus for the n-th input
+     * @param registrations vector of registrations that should be used for mapping of the inputs before stitching.
+     * the method assumes that order of registrations is the same as the order of inputs, thus for the n-th input
      * the n-th registration will be used.
      * @param resultGeometry Pointer to the Geometry object that specifies the grid of the result image.
      * @param paddingValue Indicates the value that should be used if an out of input error occurs (and throwOnOutOfInputAreaError is false).
      * @param interpolatorType Indicates the type of interpolation strategy that should be used.
-     * @param stitchStrategy Strategy used if more then one input can contribute. for more details see the documentation of itk::StitchStrategy.
+     * @param stitchStrategy Strategy used if more than one input can contribute. for more details see the documentation of itk::StitchStrategy.
      * @pre inputs must not be empty and contain valid instances
-     * @pre registration must have same size then inputs and contain valid instances.
+     * @pre registration must have same size as inputs and contain valid instances.
      * @pre Dimensionality of the registrations must match with the inputs
      * @pre resultGeometry must be valid.
      * @remark The helper currently only supports 3D images.

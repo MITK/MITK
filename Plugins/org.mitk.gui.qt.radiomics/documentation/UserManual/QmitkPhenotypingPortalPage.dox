@@ -21,17 +21,17 @@ Views that were developed with the main focus on Radiomics. They still might be 
 
 \subsection sub1 Non-Specific Views:
 This section contains views that are included within MITK Phenotyping, but were developed with a broader application in mind. 
-\li \subpage org_mitk_views_basicimageprocessing : Deprecated plugin for performing different image-related tasks like subtraction, mutliplaction, filtering etc.
-\li \subpage org_mitk_views_matchpoint_algorithm_browser : Selection of MatchPoint (Registration) Algorithm
-\li \subpage org_mitk_views_matchpoint_algorithm_control : Configuring and Controlling MatchPoint (Registration) Algorithm
-\li \subpage org_mitk_views_matchpoint_evaluator : Evaluate the Registration performance using MatchPoint
-\li \subpage org_mitk_views_matchpoint_manipulator : Adapt a registration calculated using MatchPoint
-\li \subpage org_mitk_views_matchpoint_mapper : Apply a MatchPoint Registration to a specific image
-\li \subpage org_mitk_views_matchpoint_visualizer : Visualize a Registration obtained with MatchPoint
-\li \subpage org_mitk_views_matchpoint_algorithm_batch : Running MatchPoint over multiple images (BatchMode)
-\li \subpage org_mitk_views_multilabelsegmentation : Create and editing of Multilabel-Segmentations.
-\li \subpage org_mitk_views_segmentation : Create simple segmentations
-\li \subpage org_mitk_views_segmentationutilities : Utilities for the processing of simple segmentations. 
+\li \ref org_mitk_views_basicimageprocessing : Deprecated plugin for performing different image-related tasks like subtraction, mutliplaction, filtering etc.
+\li \ref org_mitk_views_matchpoint_algorithm_browser : Selection of MatchPoint (Registration) Algorithm
+\li \ref org_mitk_views_matchpoint_algorithm_control : Configuring and Controlling MatchPoint (Registration) Algorithm
+\li \ref org_mitk_views_matchpoint_evaluator : Evaluate the Registration performance using MatchPoint
+\li \ref org_mitk_views_matchpoint_manipulator : Adapt a registration calculated using MatchPoint
+\li \ref org_mitk_views_matchpoint_mapper : Apply a MatchPoint Registration to a specific image
+\li \ref org_mitk_views_matchpoint_visualizer : Visualize a Registration obtained with MatchPoint
+\li \ref org_mitk_views_matchpoint_algorithm_batch : Running MatchPoint over multiple images (BatchMode)
+\li \ref org_mitk_views_multilabelsegmentation : Create and editing of Multilabel-Segmentations.
+\li \ref org_mitk_views_segmentation : Create simple segmentations
+\li \ref org_mitk_views_segmentationutilities : Utilities for the processing of simple segmentations. 
 
 \section radiomics_miniapps MiniApps (Command line Tools)
 \li \subpage MiniAppExplainPage Explanation of the Command Line App concept in MITK

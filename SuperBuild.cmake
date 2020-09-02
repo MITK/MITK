@@ -378,6 +378,18 @@ if(DOXYGEN_EXECUTABLE)
   )
 endif()
 
+if(MITK_DOXYGEN_BUILD_ALWAYS)
+  list(APPEND mitk_optional_cache_args
+    -DMITK_DOXYGEN_BUILD_ALWAYS:BOOL=${MITK_DOXYGEN_BUILD_ALWAYS}
+  )
+endif()
+
+if(BLUEBERRY_DOC_TOOLS_DIR)
+  list(APPEND mitk_optional_cache_args
+    "-DBLUEBERRY_DOC_TOOLS_DIR:PATH=${BLUEBERRY_DOC_TOOLS_DIR}"
+  )
+endif()
+
 set(proj MITK-Configure)
 
 ExternalProject_Add(${proj}

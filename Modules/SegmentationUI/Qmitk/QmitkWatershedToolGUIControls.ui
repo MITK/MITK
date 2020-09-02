@@ -55,19 +55,17 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="ctkSliderWidget" name="thresholdSlider">
-      </widget>
+      <widget class="ctkSliderWidget" name="thresholdSlider" native="true"/>
      </item>
      <item row="1" column="1">
-      <widget class="ctkSliderWidget" name="levelSlider">
-      </widget>
+      <widget class="ctkSliderWidget" name="levelSlider" native="true"/>
      </item>
     </layout>
    </item>
    <item>
     <widget class="QmitkSimpleLabelSetListWidget" name="m_selectionListWidget" native="true">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+      <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -75,7 +73,7 @@
      <property name="maximumSize">
       <size>
        <width>10000000</width>
-       <height>100</height>
+       <height>10000000</height>
       </size>
      </property>
     </widget>
@@ -83,7 +81,7 @@
    <item>
     <widget class="QPushButton" name="previewButton">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -105,7 +103,7 @@
       <bool>false</bool>
      </property>
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -150,12 +148,12 @@
    <extends>QWidget</extends>
    <header>QmitkSimpleLabelSetListWidget.h</header>
   </customwidget>
-   <customwidget>
-     <class>ctkSliderWidget</class>
-     <extends>QWidget</extends>
-     <header location="global">ctkSliderWidget.h</header>
-     <container>1</container>
-   </customwidget>
+  <customwidget>
+   <class>ctkSliderWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ctkSliderWidget.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <resources/>
  <connections/>

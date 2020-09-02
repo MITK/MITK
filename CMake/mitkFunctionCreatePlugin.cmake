@@ -51,7 +51,7 @@ function(mitk_create_plugin)
     PACKAGE_DEPENDS
     DOXYGEN_TAGFILES
     MOC_OPTIONS
-    SUBPROJECTS
+    SUBPROJECTS # deprecated
   )
 
   cmake_parse_arguments(_PLUGIN "${arg_options}" "${arg_single}" "${arg_multiple}" ${ARGN})
@@ -246,21 +246,6 @@ function(mitk_create_plugin)
   if(plugin_cxx_flags)
     string(REPLACE " " ";" plugin_cxx_flags "${plugin_cxx_flags}")
     target_compile_options(${PLUGIN_TARGET} PRIVATE ${plugin_cxx_flags})
-  endif()
-
-  if(NOT MY_SUBPROJECTS)
-    if(MITK_DEFAULT_SUBPROJECTS)
-      set(MY_SUBPROJECTS ${MITK_DEFAULT_SUBPROJECTS})
-    elseif(TARGET MITK-Plugins)
-      set(MY_SUBPROJECTS MITK-Plugins)
-    endif()
-  endif()
-
-  if(MY_SUBPROJECTS)
-    set_property(TARGET ${PLUGIN_TARGET} PROPERTY LABELS ${MY_SUBPROJECTS})
-    foreach(subproject ${MY_SUBPROJECTS})
-      add_dependencies(${subproject} ${PLUGIN_TARGET})
-    endforeach()
   endif()
 
   if(_PLUGIN_TEST_PLUGIN)

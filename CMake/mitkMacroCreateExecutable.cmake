@@ -29,7 +29,7 @@ macro(mitk_create_executable)
      )
 
   set(_macro_multiparams
-      SUBPROJECTS            # list of CDash labels
+      SUBPROJECTS            # list of CDash labels (deprecated)
       INCLUDE_DIRS           # additional include dirs
       DEPENDS                # list of modules this module depends on
       PACKAGE_DEPENDS        # list of "packages" this module depends on (e.g. Qt, VTK, etc.)
@@ -60,7 +60,6 @@ macro(mitk_create_executable)
   endif()
 
   mitk_create_module(${EXEC_UNPARSED_ARGUMENTS}
-                     SUBPROJECTS ${EXEC_SUBPROJECTS}
                      VERSION ${EXEC_VERSION}
                      INCLUDE_DIRS ${EXEC_INCLUDE_DIRS}
                      DEPENDS ${EXEC_DEPENDS}

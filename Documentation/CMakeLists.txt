@@ -1,6 +1,3 @@
-# Compile source code snippets
-add_subdirectory(Snippets)
-
 # Different doxygen versions produce significantly different behaviour in the MITK documentation
 # especially in regards to the MITK Qt assistant help files and markdown files.
 # The HTML documentation is supposed to be build with Doxygen 1.8.7 or newer, the

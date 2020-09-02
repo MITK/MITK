@@ -1,5 +1,4 @@
 MITK_CREATE_MODULE(
-  SUBPROJECTS MITK-IGT
   INCLUDE_DIRS Qmitk
   DEPENDS MitkIGT MitkQtWidgetsExt MitkPersistence
 )

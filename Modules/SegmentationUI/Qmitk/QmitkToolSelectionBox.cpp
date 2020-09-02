@@ -297,7 +297,8 @@ void QmitkToolSelectionBox::OnToolManagerReferenceDataModified()
 
   MITK_DEBUG << "OnToolManagerReferenceDataModified()";
 
-  SetGUIEnabledAccordingToToolManagerState();
+  this->UpdateButtonsEnabledState();
+  this->SetGUIEnabledAccordingToToolManagerState();
 }
 
 void QmitkToolSelectionBox::OnToolManagerWorkingDataModified()
@@ -307,7 +308,8 @@ void QmitkToolSelectionBox::OnToolManagerWorkingDataModified()
 
   MITK_DEBUG << "OnToolManagerWorkingDataModified()";
 
-  SetGUIEnabledAccordingToToolManagerState();
+  this->UpdateButtonsEnabledState();
+  this->SetGUIEnabledAccordingToToolManagerState();
 }
 
 /**
@@ -371,6 +373,34 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
 void QmitkToolSelectionBox::setEnabled(bool /*enable*/)
 {
   SetGUIEnabledAccordingToToolManagerState();
+}
+
+void QmitkToolSelectionBox::UpdateButtonsEnabledState()
+{
+  auto buttons = m_ToolButtonGroup->buttons();
+
+  const auto refDataNode = m_ToolManager->GetReferenceData(0);
+  const mitk::BaseData* refData = nullptr;
+  if (nullptr != refDataNode)
+  {
+    refData = refDataNode->GetData();
+  }
+
+  const auto workingDataNode = m_ToolManager->GetWorkingData(0);
+  const mitk::BaseData* workingData = nullptr;
+  if (nullptr != workingDataNode)
+  {
+    workingData = workingDataNode->GetData();
+  }
+
+  for (const auto& button : buttons)
+  {
+    const auto buttonID = m_ToolButtonGroup->id(button);
+    const auto toolID = m_ToolIDForButtonID[buttonID];
+    const auto tool = m_ToolManager->GetToolById(toolID);
+
+    button->setEnabled(tool->CanHandle(refData, workingData));
+  }
 }
 
 void QmitkToolSelectionBox::RecreateButtons()
@@ -605,17 +635,6 @@ void QmitkToolSelectionBox::RecreateButtons()
         firstLetter); // a keyboard shortcut (just the first letter of the given name w/o any CTRL or something)
     }
 
-    mitk::DataNode *dataNode = m_ToolManager->GetReferenceData(0);
-    const auto workingDataNode = m_ToolManager->GetWorkingData(0);
-    const mitk::BaseData* workingData = nullptr;
-    if (nullptr != workingDataNode)
-    {
-      workingData = workingDataNode->GetData();
-    }
-
-    if (nullptr == dataNode || !tool->CanHandle(dataNode->GetData(), workingData))
-      button->setEnabled(false);
-
     m_ButtonIDForToolID[currentToolID] = currentButtonID;
     m_ToolIDForButtonID[currentButtonID] = currentToolID;
 
@@ -636,6 +655,7 @@ void QmitkToolSelectionBox::RecreateButtons()
   // setting grid layout for this groupbox
   this->setLayout(m_ButtonLayout);
 
+  this->UpdateButtonsEnabledState();
   // this->update();
 }
 

@@ -58,7 +58,6 @@ void ConcentrationCurveConverterView::CreateQtPartControl(QWidget* parent)
     m_Controls.timeSeriesNodeSelector->SetDataStorage(this->GetDataStorage());
     m_Controls.timeSeriesNodeSelector->SetSelectionIsOptional(false);
     m_Controls.timeSeriesNodeSelector->SetInvalidInfo("Please select time series.");
-    m_Controls.timeSeriesNodeSelector->SetAutoSelectNewNodes(true);
 
     m_Controls.image3DNodeSelector->SetNodePredicate(this->m_isValidPDWImagePredicate);
     m_Controls.image3DNodeSelector->SetDataStorage(this->GetDataStorage());
@@ -74,7 +73,11 @@ void ConcentrationCurveConverterView::CreateQtPartControl(QWidget* parent)
     m_Controls.t2TimeSeriesNodeSelector->SetDataStorage(this->GetDataStorage());
     m_Controls.t2TimeSeriesNodeSelector->SetSelectionIsOptional(false);
     m_Controls.t2TimeSeriesNodeSelector->SetInvalidInfo("Please select time series.");
-    m_Controls.t2TimeSeriesNodeSelector->SetAutoSelectNewNodes(true);
+
+    m_Controls.PDWImageNodeSelector->SetNodePredicate(m_isValidPDWImagePredicate);
+    m_Controls.PDWImageNodeSelector->SetDataStorage(this->GetDataStorage());
+    m_Controls.PDWImageNodeSelector->SetInvalidInfo("Please select PDW Image.");
+    m_Controls.PDWImageNodeSelector->setEnabled(false);
 
     m_Controls.groupBox_T1->hide();
     m_Controls.groupBox_T2->hide();
@@ -112,12 +115,12 @@ void ConcentrationCurveConverterView::CreateQtPartControl(QWidget* parent)
     connect(m_Controls.image3DNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &ConcentrationCurveConverterView::OnSelectionChanged);
     connect(m_Controls.baselineImageNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &ConcentrationCurveConverterView::OnSelectionChanged);
     connect(m_Controls.t2TimeSeriesNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &ConcentrationCurveConverterView::OnSelectionChanged);
+    connect(m_Controls.PDWImageNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &ConcentrationCurveConverterView::OnSettingChanged);
 
     connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), this, SLOT(OnSettingChanged()));
     connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), this, SLOT(OnSettingChanged()));
     connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), m_Controls.groupBoxEnhancement, SLOT(setVisible(bool)));
     connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), m_Controls.groupBoxEnhancement, SLOT(setVisible(bool)));
-
 
     connect(m_Controls.factorSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
     connect(m_Controls.spinBox_baselineStartTimeStep, SIGNAL(valueChanged(int)), this, SLOT(OnSettingChanged()));
@@ -129,11 +132,6 @@ void ConcentrationCurveConverterView::CreateQtPartControl(QWidget* parent)
     connect(m_Controls.RelaxivitySpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
     connect(m_Controls.TRSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
 
-    m_Controls.PDWImageNodeSelector->SetNodePredicate(m_isValidPDWImagePredicate);
-    m_Controls.PDWImageNodeSelector->SetDataStorage(this->GetDataStorage());
-    m_Controls.PDWImageNodeSelector->SetInvalidInfo("Please select PDW Image.");
-    m_Controls.PDWImageNodeSelector->setEnabled(false);
-
     connect(m_Controls.radioButtonUsingT1viaVFA, SIGNAL(toggled(bool)), m_Controls.PDWImageNodeSelector, SLOT(setEnabled(bool)));
 
 
@@ -142,19 +140,24 @@ void ConcentrationCurveConverterView::CreateQtPartControl(QWidget* parent)
 
 void ConcentrationCurveConverterView::OnSettingChanged()
 {
-  bool ok = true;
+  bool ok = false;
   m_Controls.groupBox_T1->setVisible(m_Controls.radioButton_T1->isChecked());
   m_Controls.groupBox_T2->setVisible(m_Controls.radioButton_T2->isChecked());
 
   if(m_Controls.radioButton_T1->isChecked())
   {
+    MITK_INFO << "radioButton_T1 is checked.";
       m_Controls.groupBox3D->setVisible(m_Controls.radioButton3D->isChecked());
       m_Controls.groupBox4D->setVisible(m_Controls.radioButton4D->isChecked());
 
       if(m_Controls.radioButton4D->isChecked())
       {
+        MITK_INFO << "radioButton4D is checked";
           m_Controls.groupConcentration->setVisible(true);
+          MITK_INFO << "m_selectedImage.IsNotNull(): "<< m_selectedImage.IsNotNull();
+          MITK_INFO << "CheckSettings()" << CheckSettings();
           ok = m_selectedImage.IsNotNull() && CheckSettings();
+          MITK_INFO << "ok" << ok;
       }
       else if(m_Controls.radioButton3D->isChecked())
       {
@@ -174,6 +177,7 @@ void ConcentrationCurveConverterView::OnSettingChanged()
   m_Controls.spinBox_baselineEndTimeStep->setEnabled(m_Controls.radioButton_absoluteEnhancement->isChecked() || m_Controls.radioButton_relativeEnchancement->isChecked() || m_Controls.radioButtonUsingT1viaVFA->isChecked() || m_Controls.radioButtonTurboFlash->isChecked());
 
   m_Controls.btnConvertToConcentration->setEnabled(ok);
+
 }
 
 
@@ -428,6 +432,7 @@ mitk::Image::Pointer ConcentrationCurveConverterView::ConvertT2ConcentrationImga
 
 void ConcentrationCurveConverterView::OnSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/)
 {
+  MITK_INFO << "OnSelectionChanged  is called.";
     m_selectedNode = nullptr;
     m_selectedImage = nullptr;
     m_selectedBaselineNode = nullptr;
@@ -437,6 +442,7 @@ void ConcentrationCurveConverterView::OnSelectionChanged(QList<mitk::DataNode::P
     {
       if (m_Controls.radioButton4D->isChecked())
       {
+        MITK_INFO << "m_Controls.timeSeriesNodeSelector->GetSelectedNode().IsNotNull()"<< m_Controls.timeSeriesNodeSelector->GetSelectedNode().IsNotNull();
         if (m_Controls.timeSeriesNodeSelector->GetSelectedNode().IsNotNull())
         {
           this->m_selectedNode = m_Controls.timeSeriesNodeSelector->GetSelectedNode();
@@ -493,7 +499,8 @@ void ConcentrationCurveConverterView::OnSelectionChanged(QList<mitk::DataNode::P
     }
 
     m_Controls.btnConvertToConcentration->setEnabled(m_selectedImage.IsNotNull() && CheckSettings());
-
+    MITK_INFO << "m_selectedImage.IsNotNull()" << m_selectedImage.IsNotNull();
+    MITK_INFO << "CheckSettings()" << CheckSettings();
 
 
 }

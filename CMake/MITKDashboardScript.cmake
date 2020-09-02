@@ -4,7 +4,7 @@
 
  ]============================================================================]
 
- set(CTEST_CMAKE_GENERATOR
+set(CTEST_CMAKE_GENERATOR
 # "Unix Makefiles"
   "Visual Studio 16 2019"
 )
@@ -38,6 +38,10 @@ set(CTEST_BUILD_NAME
   ""
 )
 
+set(CTEST_BUILD_FLAGS
+# "-j8"
+)
+
 # If empty: Default URL is CTEST_SUBMIT_URL (CTestConfig.cmake)
 set(MITK_SUBMIT_URL
   "https://cdash.mitk.org/submit.php?project=MITK"
@@ -52,6 +56,9 @@ set(MITK_BUILD_CONFIGURATION
 set(MITK_SUPERBUILD_OPTIONS
 # "MITK_WHITELIST:STRING=Minimal"
   "Qt5_DIR:PATH=C:/Qt/5.12.9/msvc2017_64/lib/cmake/Qt5"
+  "MITK_AUTOCLEAN_EXTERNAL_PROJECTS:BOOL=ON"
+  "MITK_FAST_TESTING:BOOL=ON"
+  "MITK_XVFB_TESTING:BOOL=OFF"
 )
 
 set(MITK_BUILD_OPTIONS

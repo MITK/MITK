@@ -56,8 +56,12 @@ protected:
   ~QmitkWatershedToolGUI() override;
 
   void BusyStateChanged(bool value) override;
-  
-  double m_Level = 0.4;
+
+  //Recommendation from ITK is to have a threshold:level ration around 1:100
+  //we set Level a bit higher. This provokes more oversegmentation,
+  //but produces less objects in the first run and profits form the fact that
+  //decreasing level is quite fast in the filter.
+  double m_Level = 0.6;
   double m_Threshold = 0.004;
 
   Ui_QmitkWatershedToolGUIControls m_Controls;

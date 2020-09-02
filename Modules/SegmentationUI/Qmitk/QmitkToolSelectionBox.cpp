@@ -50,7 +50,6 @@ QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget *parent, mitk::DataStorage 
 
   m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
 
-  // muellerm
   // QButtonGroup
   m_ToolButtonGroup = new QButtonGroup(this);
   // some features of QButtonGroup
@@ -146,7 +145,6 @@ void QmitkToolSelectionBox::toolButtonClicked(int id)
 
   MITK_DEBUG << "toolButtonClicked(" << id << "): id translates to tool ID " << m_ToolIDForButtonID[id];
 
-  // QToolButton* toolButton = dynamic_cast<QToolButton*>( Q3ButtonGroup::find(id) );
   QToolButton *toolButton = dynamic_cast<QToolButton *>(m_ToolButtonGroup->buttons().at(id));
   if (toolButton)
   {
@@ -157,7 +155,6 @@ void QmitkToolSelectionBox::toolButtonClicked(int id)
          id)) // the tool corresponding to this button is already active
     {
       // disable this button, disable all tools
-      // mmueller
       toolButton->setChecked(false);
       m_ToolManager->ActivateTool(-1); // disable everything
     }
@@ -201,8 +198,6 @@ void QmitkToolSelectionBox::SetOrUnsetButtonForActiveTool()
       m_ToolGUIWidget->layout()->removeWidget(m_LastToolGUI);
     }
 
-    // m_LastToolGUI->reparent(nullptr, QPoint(0,0));
-    // TODO: reparent <-> setParent, Daniel fragen
     m_LastToolGUI->setParent(nullptr);
     delete m_LastToolGUI; // will hopefully notify parent and layouts
     m_LastToolGUI = nullptr;
@@ -215,11 +210,9 @@ void QmitkToolSelectionBox::SetOrUnsetButtonForActiveTool()
   }
 
   QToolButton *toolButton(nullptr);
-  // mitk::Tool* tool = m_ToolManager->GetActiveTool();
 
   if (m_ButtonIDForToolID.find(id) != m_ButtonIDForToolID.end()) // if this tool is in our box
   {
-    // toolButton = dynamic_cast<QToolButton*>( Q3ButtonGroup::find( m_ButtonIDForToolID[id] ) );
     toolButton = dynamic_cast<QToolButton *>(m_ToolButtonGroup->buttons().at(m_ButtonIDForToolID[id]));
   }
 
@@ -254,8 +247,6 @@ void QmitkToolSelectionBox::SetOrUnsetButtonForActiveTool()
       {
         gui->SetTool(tool);
 
-        // mmueller
-        // gui->reparent(m_ToolGUIWidget, gui->geometry().topLeft(), true );
         gui->setParent(m_ToolGUIWidget);
         gui->move(gui->geometry().topLeft());
         gui->show();
@@ -267,9 +258,7 @@ void QmitkToolSelectionBox::SetOrUnsetButtonForActiveTool()
         }
         if (layout)
         {
-          // mmueller
           layout->addWidget(gui);
-          // layout->add( gui );
           layout->activate();
         }
       }
@@ -279,13 +268,9 @@ void QmitkToolSelectionBox::SetOrUnsetButtonForActiveTool()
   {
     // disable all buttons
     QToolButton *selectedToolButton = dynamic_cast<QToolButton *>(m_ToolButtonGroup->checkedButton());
-    // QToolButton* selectedToolButton = dynamic_cast<QToolButton*>( Q3ButtonGroup::find( Q3ButtonGroup::selectedId() )
-    // );
     if (selectedToolButton)
     {
-      // mmueller
       selectedToolButton->setChecked(false);
-      // selectedToolButton->setOn(false);
     }
   }
 }
@@ -319,9 +304,6 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
 {
   mitk::DataNode *referenceNode = m_ToolManager->GetReferenceData(0);
   mitk::DataNode *workingNode = m_ToolManager->GetWorkingData(0);
-
-  // MITK_DEBUG << this->name() << ": SetGUIEnabledAccordingToToolManagerState: referenceNode " << (void*)referenceNode
-  // << " workingNode " << (void*)workingNode << " isVisible() " << isVisible();
 
   bool enabled = true;
 
@@ -408,26 +390,6 @@ void QmitkToolSelectionBox::RecreateButtons()
   if (m_ToolManager.IsNull())
     return;
 
-  /*
-  // remove all buttons that are there
-  QObjectList *l = Q3ButtonGroup::queryList( "QButton" );
-  QObjectListIt it( *l ); // iterate over all buttons
-  QObject *obj;
-
-  while ( (obj = it.current()) != 0 )
-  {
-    ++it;
-    QButton* button = dynamic_cast<QButton*>(obj);
-    if (button)
-    {
-      Q3ButtonGroup::remove(button);
-      delete button;
-    }
-  }
-  delete l; // delete the list, not the objects
-  */
-
-  // mmueller Qt impl
   QList<QAbstractButton *> l = m_ToolButtonGroup->buttons();
   // remove all buttons that are there
   QList<QAbstractButton *>::iterator it;
@@ -437,10 +399,8 @@ void QmitkToolSelectionBox::RecreateButtons()
   {
     btn = *it;
     m_ToolButtonGroup->removeButton(btn);
-    // this->removeChild(btn);
     delete btn;
   }
-  // end mmueller Qt impl
 
   mitk::ToolManager::ToolVectorTypeConst allPossibleTools = m_ToolManager->GetTools();
   mitk::ToolManager::ToolVectorTypeConst allTools;
@@ -490,14 +450,8 @@ void QmitkToolSelectionBox::RecreateButtons()
     MITK_DEBUG << (*iter)->GetName();
   }
 
-  // try to change layout... bad?
-  // Q3GroupBox::setColumnLayout ( m_LayoutColumns, Qt::Horizontal );
-  // mmueller using gridlayout instead of Q3GroupBox
-  // this->setLayout(0);
   if (m_ButtonLayout == nullptr)
     m_ButtonLayout = new QGridLayout;
-  /*else
-    delete m_ButtonLayout;*/
 
   int row(0);
   int column(-1);
@@ -533,19 +487,13 @@ void QmitkToolSelectionBox::RecreateButtons()
 
     if (m_LayoutColumns == 1)
     {
-      // button->setTextPosition( QToolButton::BesideIcon );
-      // mmueller
       button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     }
     else
     {
-      // button->setTextPosition( QToolButton::BelowIcon );
-      // mmueller
       button->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     }
 
-    // button->setToggleButton( true );
-    // mmueller
     button->setCheckable(true);
 
     if (currentToolID == m_ToolManager->GetActiveToolID())
@@ -563,15 +511,8 @@ void QmitkToolSelectionBox::RecreateButtons()
 
     if (m_ShowNames)
     {
-      /*
-      button->setUsesTextLabel(true);
-      button->setTextLabel( label );              // a label
-      QToolTip::add( button, tooltip );
-      */
-      // mmueller Qt
       button->setText(label); // a label
       button->setToolTip(tooltip);
-      // mmueller
 
       QFont currentFont = button->font();
       currentFont.setBold(false);

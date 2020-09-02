@@ -3,7 +3,6 @@ MITK_CREATE_MODULE(
     PUBLIC ${MITK_BINARY_DIR}
     PRIVATE src/DataManagement
   DEPENDS PUBLIC MitkCore
-  SUBPROJECTS MITK-Examples
 )
 
 add_subdirectory(autoload/IO)

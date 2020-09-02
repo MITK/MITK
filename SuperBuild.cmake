@@ -81,13 +81,6 @@ if(EXTERNAL_BOOST_ROOT)
   set(BOOST_ROOT ${EXTERNAL_BOOST_ROOT})
 endif()
 
-# Setup file for setting custom ctest vars
-configure_file(
-  CMake/SuperbuildCTestCustom.cmake.in
-  ${MITK_BINARY_DIR}/CTestCustom.cmake
-  @ONLY
-)
-
 if(BUILD_TESTING)
   set(EXTERNAL_MITK_DATA_DIR "${MITK_DATA_DIR}" CACHE PATH "Path to the MITK data directory")
   mark_as_advanced(EXTERNAL_MITK_DATA_DIR)

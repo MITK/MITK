@@ -1,4 +1,4 @@
-MITK_CREATE_MODULE_TESTS(LABELS MITK-Modules)
+MITK_CREATE_MODULE_TESTS()
 
 if(TARGET ${TESTDRIVER})
   if(BUILD_TESTING AND MODULE_IS_ENABLED)
@@ -9,7 +9,6 @@ if(TARGET ${TESTDRIVER})
                ${MITK_DATA_DIR}/Pic3D.nrrd
                ${MITK_DATA_DIR}/binary.stl
             )
-    set_property(TEST mitkSceneIOTest_Pic3D.nrrd_binary.stl PROPERTY LABELS MITK-Modules)
 
     mitkAddCustomModuleTest(mitkSceneIOCompatibility_NoRainbowCT mitkSceneIOCompatibilityTest
                             ${MITK_DATA_DIR}/RenderingTestData/SceneFiles/rainbows-post-17547.mitk # scene to load

@@ -87,10 +87,6 @@ foreach(_test ${_tests})
   add_test(NAME ${_test} COMMAND ${_test_driver} ${_test})
 endforeach()
 
-if(US_TEST_LABELS)
-  set_tests_properties(${_tests} PROPERTIES LABELS "${US_TEST_LABELS}")
-endif()
-
 #-----------------------------------------------------------------------------
 # Add dependencies for shared libraries
 #-----------------------------------------------------------------------------

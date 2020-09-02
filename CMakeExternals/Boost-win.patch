@@ -1,0 +1,12 @@
+diff -bdur Boost0/bootstrap.bat Boost/bootstrap.bat
+--- Boost0/bootstrap.bat	2018-08-02 00:50:46.000000000 +0400
++++ Boost/bootstrap.bat	2020-09-01 19:17:21.488476129 +0400
+@@ -54,6 +54,8 @@
+ ECHO import option ; > project-config.jam
+ ECHO. >> project-config.jam
+ ECHO using %TOOLSET% ; >> project-config.jam
++ECHO %USINGP2% ; >> project-config.jam
++ECHO %USINGP3% ; >> project-config.jam
+ ECHO. >> project-config.jam
+ ECHO option.set keep-going : false ; >> project-config.jam
+ ECHO. >> project-config.jam

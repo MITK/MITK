@@ -1,3 +1,6 @@
+file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
+file(GLOB_RECURSE TPP_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*.tpp")
+
 set(CPP_FILES
   mitkMAPRegistrationWrapper.cpp
   mitkMAPRegistrationWrapperObjectFactory.cpp
@@ -8,6 +11,7 @@ set(CPP_FILES
   Helper/mitkMaskedAlgorithmHelper.cpp
   Helper/mitkRegistrationHelper.cpp
   Helper/mitkImageMappingHelper.cpp
+  Helper/mitkImageStitchingHelper.cpp
   Helper/mitkPointSetMappingHelper.cpp
   Helper/mitkResultNodeGenerationHelper.cpp
   Helper/mitkTimeFramesRegistrationHelper.cpp
@@ -22,43 +26,6 @@ set(CPP_FILES
   Rendering/mitkRegVisHelper.cpp
   Rendering/mitkRegEvalStyleProperty.cpp
   Rendering/mitkRegEvalWipeStyleProperty.cpp
-)
-
-set(H_FILES
-  mitkMatchPointPropertyTags.h
-  mitkMAPRegistrationWrapper.h
-  mitkMAPRegistrationWrapperObjectFactory.h
-  mitkRegEvaluationObjectFactory.h
-  mitkRegEvaluationObject.h
-  algorithms/mitkMultiModalAffineDefaultRegistrationAlgorithm.h
-  algorithms/mitkMultiModalRigidDefaultRegistrationAlgorithm.h
-  algorithms/mitkMultiModalTransDefaultRegistrationAlgorithm.h
-  algorithms/mitkFastSymmetricForcesDemonsMultiResDefaultRegistrationAlgorithm.h
-  algorithms/mitkLevelSetMotionMultiResDefaultRegistrationAlgorithm.h
-  algorithms/mitkRigidClosedFormPointsDefaultRegistrationAlgorithm.h
-  algorithms/mitkRigidICPDefaultRegistrationAlgorithm.h
-  Helper/mitkUIDHelper.h
-  Helper/mitkMAPAlgorithmHelper.h
-  Helper/mitkMaskedAlgorithmHelper.h
-  Helper/mitkRegistrationHelper.h
-  Helper/mitkImageMappingHelper.h
-  Helper/mitkPointSetMappingHelper.h
-  Helper/mitkResultNodeGenerationHelper.h
-  Helper/mitkTimeFramesRegistrationHelper.h
-  Rendering/mitkRegistrationWrapperMapper2D.h
-  Rendering/mitkRegistrationWrapperMapper3D.h
-  Rendering/mitkRegistrationWrapperMapperBase.h
-  Rendering/mitkRegVisStyleProperty.h
-  Rendering/mitkRegVisDirectionProperty.h
-  Rendering/mitkRegVisColorStyleProperty.h
-  Rendering/mitkRegVisPropertyTags.h
-  Rendering/mitkRegVisHelper.h
-  Rendering/mitkRegEvaluationMapper2D.h
-  Rendering/mitkRegEvalStyleProperty.h
-  Rendering/mitkRegEvalWipeStyleProperty.h
-)
-
-set(TPP_FILES
 )
 
 set(MOC_H_FILES

@@ -791,7 +791,7 @@ int main(int argc, char* argv[])
     setupParser(parser);
     const std::map<std::string, us::Any>& parsedArgs = parser.parseArguments(argc, argv);
 
-    mitk::PreferenceListReaderOptionsFunctor readerFilterFunctor = mitk::PreferenceListReaderOptionsFunctor({ "MITK DICOM Reader v2 (classic config)" }, { "MITK DICOM Reader" });
+    mitk::PreferenceListReaderOptionsFunctor readerFilterFunctor = mitk::PreferenceListReaderOptionsFunctor({ "MITK DICOM Reader v2 (autoselect)" }, { "" });
 
     if (!configureApplicationSettings(parsedArgs))
     {

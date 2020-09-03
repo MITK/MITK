@@ -21,7 +21,9 @@ QmitkWatershedToolGUI::QmitkWatershedToolGUI() : QmitkToolGUI()
   m_Controls.setupUi(this);
 
   m_Controls.thresholdSlider->setMinimum(0);
-  m_Controls.thresholdSlider->setMaximum(1);
+  //We set the threshold maximum to 0.5 to avoid crashes in the watershed filter
+  //see T27703 for more details.
+  m_Controls.thresholdSlider->setMaximum(0.5);
   m_Controls.thresholdSlider->setValue(m_Threshold);
   m_Controls.thresholdSlider->setPageStep(0.01);
   m_Controls.thresholdSlider->setSingleStep(0.001);

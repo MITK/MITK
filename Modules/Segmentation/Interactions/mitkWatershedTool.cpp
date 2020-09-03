@@ -91,6 +91,11 @@ mitk::LabelSetImage::Pointer mitk::WatershedTool::ComputeMLPreview(const Image* 
   }
   catch (itk::ExceptionObject & e)
   {
+    //force reset of filters as they might be in an invalid state now.
+    m_MagFilter = nullptr;
+    m_WatershedFilter = nullptr;
+    m_LastFilterInput = nullptr;
+
     MITK_ERROR << "Watershed Filter Error: " << e.GetDescription();
   }
   

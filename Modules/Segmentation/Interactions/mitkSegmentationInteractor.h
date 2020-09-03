@@ -20,7 +20,7 @@ namespace mitk
 {
   /**
    *\class SegmentationInteractor
-   *@brief Observer that adds interaction with a segmentation session to the default display interaction.
+   *@brief Observer that adds interaction with a multi-label segmentation session to the default display interaction.
    *
    * At the moment, this includes changing the active label.
    *

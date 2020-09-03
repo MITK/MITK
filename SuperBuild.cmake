@@ -81,13 +81,6 @@ if(EXTERNAL_BOOST_ROOT)
   set(BOOST_ROOT ${EXTERNAL_BOOST_ROOT})
 endif()
 
-# Setup file for setting custom ctest vars
-configure_file(
-  CMake/SuperbuildCTestCustom.cmake.in
-  ${MITK_BINARY_DIR}/CTestCustom.cmake
-  @ONLY
-)
-
 if(BUILD_TESTING)
   set(EXTERNAL_MITK_DATA_DIR "${MITK_DATA_DIR}" CACHE PATH "Path to the MITK data directory")
   mark_as_advanced(EXTERNAL_MITK_DATA_DIR)
@@ -382,6 +375,18 @@ endif()
 if(DOXYGEN_EXECUTABLE)
   list(APPEND mitk_optional_cache_args
        -DDOXYGEN_EXECUTABLE:FILEPATH=${DOXYGEN_EXECUTABLE}
+  )
+endif()
+
+if(MITK_DOXYGEN_BUILD_ALWAYS)
+  list(APPEND mitk_optional_cache_args
+    -DMITK_DOXYGEN_BUILD_ALWAYS:BOOL=${MITK_DOXYGEN_BUILD_ALWAYS}
+  )
+endif()
+
+if(BLUEBERRY_DOC_TOOLS_DIR)
+  list(APPEND mitk_optional_cache_args
+    "-DBLUEBERRY_DOC_TOOLS_DIR:PATH=${BLUEBERRY_DOC_TOOLS_DIR}"
   )
 endif()
 

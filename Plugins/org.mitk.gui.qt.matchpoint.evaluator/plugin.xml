@@ -2,7 +2,7 @@
 <plugin>
 
   <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.views.matchpoint.evaluation.editor"
+    <view id="org.mitk.views.matchpoint.evaluator"
           name="MatchPoint Registration Evaluator"
           class="QmitkMatchPointRegistrationEvaluator"
           category="Registration"

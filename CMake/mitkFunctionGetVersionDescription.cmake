@@ -38,7 +38,9 @@ function(mitkFunctionGetVersionDescription source_dir prefix)
         execute_process(COMMAND ${GIT_EXECUTABLE} describe --exact-match --dirty=${_dirty_repo_str}
                         WORKING_DIRECTORY ${source_dir}
                         OUTPUT_VARIABLE _project_git_tagname
-                        RESULT_VARIABLE _proper_version)
+                        RESULT_VARIABLE _proper_version
+                        ERROR_VARIABLE _error_msg)
+
         if(_proper_version EQUAL 0)
           set(_wc_description ${_project_git_tagname})
         else()
@@ -47,7 +49,8 @@ function(mitkFunctionGetVersionDescription source_dir prefix)
           execute_process(COMMAND ${GIT_EXECUTABLE} describe --dirty=${_dirty_repo_str}
                           WORKING_DIRECTORY ${source_dir}
                           OUTPUT_VARIABLE _wc_description
-                          RESULT_VARIABLE _proper_version)
+                          RESULT_VARIABLE _proper_version
+                          ERROR_VARIABLE _error_msg)
 
           if(NOT _proper_version EQUAL 0)
             # last fallback, i.e. working copy is a shallow clone, at least use

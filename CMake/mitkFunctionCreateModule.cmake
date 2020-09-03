@@ -46,7 +46,6 @@
 #! - MODULE_NAME
 #! - MODULE_TARGET
 #! - MODULE_IS_ENABLED
-#! - MODULE_SUBPROJECTS
 #!
 #! \sa mitk_create_executable
 #!
@@ -64,7 +63,6 @@
 #! Multi-value Parameters (all optional):
 #!
 
-#! \param SUBPROJECTS List of CDash labels
 #! \param INCLUDE_DIRS Include directories for this module:
 #!        \verbatim
 #! [[PUBLIC|PRIVATE|INTERFACE] <dir1>...]...
@@ -112,7 +110,7 @@ function(mitk_create_module)
      )
 
   set(_macro_multiparams
-      SUBPROJECTS            # list of CDash labels
+      SUBPROJECTS            # list of CDash labels (deprecated)
       INCLUDE_DIRS           # include directories: [PUBLIC|PRIVATE|INTERFACE] <list>
       INTERNAL_INCLUDE_DIRS  # include dirs internal to this module (DEPRECATED)
       DEPENDS                # list of modules this module depends on: [PUBLIC|PRIVATE|INTERFACE] <list>
@@ -186,23 +184,6 @@ function(mitk_create_module)
   endif()
   if(NOT IS_ABSOLUTE ${MODULE_FILES_CMAKE})
     set(MODULE_FILES_CMAKE ${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_FILES_CMAKE})
-  endif()
-
-  if(NOT MODULE_SUBPROJECTS)
-    if(MITK_DEFAULT_SUBPROJECTS)
-      set(MODULE_SUBPROJECTS ${MITK_DEFAULT_SUBPROJECTS})
-    elseif(TARGET MITK-Modules)
-      set(MODULE_SUBPROJECTS MITK-Modules)
-    endif()
-  endif()
-
-  # check if the subprojects exist as targets
-  if(MODULE_SUBPROJECTS)
-    foreach(subproject ${MODULE_SUBPROJECTS})
-      if(NOT TARGET ${subproject})
-        message(SEND_ERROR "The subproject ${subproject} does not have a corresponding target")
-      endif()
-    endforeach()
   endif()
 
   # -----------------------------------------------------------------
@@ -456,10 +437,6 @@ function(mitk_create_module)
         ${CPP_FILES} ${H_FILES} ${GLOBBED__H_FILES} ${CORRESPONDING__H_FILES} ${TXX_FILES}
         ${TOOL_CPPS} ${TOOL_GUI_CPPS})
 
-    if(MODULE_SUBPROJECTS)
-      set_property(SOURCE ${coverage_sources} APPEND PROPERTY LABELS ${MODULE_SUBPROJECTS} MITK)
-    endif()
-
     # ---------------------------------------------------------------
     # Create the actual module target
 
@@ -613,13 +590,6 @@ function(mitk_create_module)
       add_dependencies(${MODULE_TARGET} ${MODULE_TARGET_DEPENDS})
     endif()
 
-    if(MODULE_SUBPROJECTS AND NOT MODULE_HEADERS_ONLY)
-      set_property(TARGET ${MODULE_TARGET} PROPERTY LABELS ${MODULE_SUBPROJECTS} MITK)
-      foreach(subproject ${MODULE_SUBPROJECTS})
-        add_dependencies(${subproject} ${MODULE_TARGET})
-      endforeach()
-    endif()
-
     set(DEPENDS "${MODULE_DEPENDS}")
     if(NOT MODULE_NO_INIT AND NOT MODULE_HEADERS_ONLY)
       # Add a CppMicroServices dependency implicitly, since it is
@@ -672,6 +642,5 @@ function(mitk_create_module)
   set(MODULE_NAME ${MODULE_NAME} PARENT_SCOPE)
   set(MODULE_TARGET ${MODULE_TARGET} PARENT_SCOPE)
   set(MODULE_IS_ENABLED ${MODULE_IS_ENABLED} PARENT_SCOPE)
-  set(MODULE_SUBPROJECTS ${MODULE_SUBPROJECTS} PARENT_SCOPE)
 
 endfunction()

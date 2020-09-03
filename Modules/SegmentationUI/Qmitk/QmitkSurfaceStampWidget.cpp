@@ -59,7 +59,7 @@ void QmitkSurfaceStampWidget::OnStamp()
     return;
   }
 
-  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager(mitk::ToolManagerProvider::MULTILABEL_SEGMENTATION);
   assert(m_ToolManager);
   m_ToolManager->ActivateTool(-1);
 

@@ -12,75 +12,34 @@ found in the LICENSE file.
 
 #include "QmitkWatershedToolGUI.h"
 
-#include "QmitkNewSegmentationDialog.h"
-#include "mitkProgressBar.h"
-
-#include <qapplication.h>
-#include <qlabel.h>
-#include <qlayout.h>
-#include <qpainter.h>
-#include <qpushbutton.h>
-#include <qslider.h>
+#include <QMessageBox>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkWatershedToolGUI, "")
 
-QmitkWatershedToolGUI::QmitkWatershedToolGUI() : QmitkToolGUI(), m_SliderThreshold(nullptr), m_SliderLevel(nullptr)
+QmitkWatershedToolGUI::QmitkWatershedToolGUI() : QmitkToolGUI()
 {
-  // create the visible widgets
-  QGridLayout *layout = new QGridLayout(this);
-  this->setContentsMargins(0, 0, 0, 0);
+  m_Controls.setupUi(this);
 
-  QLabel *label = new QLabel("Threshold ", this);
-  QFont f = label->font();
-  f.setBold(false);
-  label->setFont(f);
-  layout->addWidget(label, 0, 0);
+  m_Controls.thresholdSlider->setMinimum(0);
+  //We set the threshold maximum to 0.5 to avoid crashes in the watershed filter
+  //see T27703 for more details.
+  m_Controls.thresholdSlider->setMaximum(0.5);
+  m_Controls.thresholdSlider->setValue(m_Threshold);
+  m_Controls.thresholdSlider->setPageStep(0.01);
+  m_Controls.thresholdSlider->setSingleStep(0.001);
+  m_Controls.thresholdSlider->setDecimals(4);
 
-  QLabel *label2 = new QLabel("Level ", this);
-  f = label2->font();
-  f.setBold(false);
-  label2->setFont(f);
-  layout->addWidget(label2, 2, 0);
+  m_Controls.levelSlider->setMinimum(0);
+  m_Controls.levelSlider->setMaximum(1);
+  m_Controls.levelSlider->setValue(m_Level);
+  m_Controls.levelSlider->setPageStep(0.1);
+  m_Controls.levelSlider->setSingleStep(0.01);
 
-  m_ThresholdLabel = new QLabel(" 0.04", this);
-  f = m_ThresholdLabel->font();
-  f.setBold(false);
-  m_ThresholdLabel->setFont(f);
-  layout->addWidget(m_ThresholdLabel, 0, 1);
-
-  m_SliderThreshold = new QSlider(Qt::Horizontal, this);
-  m_SliderThreshold->setMinimum(0);
-  m_SliderThreshold->setMaximum(100);
-  m_SliderThreshold->setPageStep(1);
-  m_SliderThreshold->setValue(4);
-  connect(m_SliderThreshold, SIGNAL(valueChanged(int)), this, SLOT(OnSliderValueThresholdChanged(int)));
-  layout->addWidget(m_SliderThreshold, 1, 0, 1, 2);
-
-  m_LevelLabel = new QLabel(" 0.35", this);
-  f = m_LevelLabel->font();
-  f.setBold(false);
-  m_LevelLabel->setFont(f);
-  layout->addWidget(m_LevelLabel, 2, 1);
-
-  m_SliderLevel = new QSlider(Qt::Horizontal, this);
-  m_SliderLevel->setMinimum(0);
-  m_SliderLevel->setMaximum(100);
-  m_SliderLevel->setPageStep(1);
-  m_SliderLevel->setValue(35);
-  connect(m_SliderLevel, SIGNAL(valueChanged(int)), this, SLOT(OnSliderValueLevelChanged(int)));
-  layout->addWidget(m_SliderLevel, 3, 0, 1, 2);
-
-  QPushButton *okButton = new QPushButton("Run Segmentation", this);
-  connect(okButton, SIGNAL(clicked()), this, SLOT(OnCreateSegmentation()));
-  okButton->setFont(f);
-  layout->addWidget(okButton, 4, 0, 1, 2);
-
-  m_InformationLabel = new QLabel("", this);
-  f = m_InformationLabel->font();
-  f.setBold(false);
-  m_InformationLabel->setFont(f);
-  layout->addWidget(m_InformationLabel, 5, 0, 1, 2);
-
+  connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnSettingsAccept()));
+  connect(m_Controls.m_selectionListWidget, &QmitkSimpleLabelSetListWidget::SelectedLabelsChanged, this, &QmitkWatershedToolGUI::OnRegionSelectionChanged);
+  connect(m_Controls.levelSlider, SIGNAL(valueChanged(double)), this, SLOT(OnLevelChanged(double)));
+  connect(m_Controls.thresholdSlider, SIGNAL(valueChanged(double)), this, SLOT(OnThresholdChanged(double)));
+  connect(m_Controls.m_ConfSegButton, SIGNAL(clicked()), this, SLOT(OnSegmentationRegionAccept()));
   connect(this, SIGNAL(NewToolAssociated(mitk::Tool *)), this, SLOT(OnNewToolAssociated(mitk::Tool *)));
 }
 
@@ -88,8 +47,25 @@ QmitkWatershedToolGUI::~QmitkWatershedToolGUI()
 {
   if (m_WatershedTool.IsNotNull())
   {
-    // m_WatershedTool->SizeChanged -= mitk::MessageDelegate1<QmitkWatershedToolGUI, int>( this,
-    // &QmitkWatershedToolGUI::OnSizeChanged );
+    m_WatershedTool->CurrentlyBusy -=
+      mitk::MessageDelegate1<QmitkWatershedToolGUI, bool>(this, &QmitkWatershedToolGUI::BusyStateChanged);
+  }
+}
+
+void QmitkWatershedToolGUI::OnRegionSelectionChanged(const QmitkSimpleLabelSetListWidget::LabelVectorType& selectedLabels)
+{
+  if (m_WatershedTool.IsNotNull())
+  {
+    mitk::AutoMLSegmentationWithPreviewTool::SelectedLabelVectorType labelIDs;
+    for (const auto& label : selectedLabels)
+    {
+      labelIDs.push_back(label->GetValue());
+    }
+
+    m_WatershedTool->SetSelectedLabels(labelIDs);
+    m_WatershedTool->UpdatePreview();
+
+    m_Controls.m_ConfSegButton->setEnabled(!labelIDs.empty());
   }
 }
 
@@ -97,54 +73,127 @@ void QmitkWatershedToolGUI::OnNewToolAssociated(mitk::Tool *tool)
 {
   if (m_WatershedTool.IsNotNull())
   {
-    // m_WatershedTool->SizeChanged -= mitk::MessageDelegate1<QmitkWatershedToolGUI, int>( this,
-    // &QmitkWatershedToolGUI::OnSizeChanged );
+    m_WatershedTool->CurrentlyBusy -=
+      mitk::MessageDelegate1<QmitkWatershedToolGUI, bool>(this, &QmitkWatershedToolGUI::BusyStateChanged);
   }
 
   m_WatershedTool = dynamic_cast<mitk::WatershedTool *>(tool);
-  OnSliderValueLevelChanged(35);
-  OnSliderValueThresholdChanged(4);
 
   if (m_WatershedTool.IsNotNull())
   {
-    //    m_WatershedTool->SizeChanged += mitk::MessageDelegate1<QmitkWatershedToolGUI, int>( this,
-    //    &QmitkWatershedToolGUI::OnSizeChanged );
+    m_WatershedTool->CurrentlyBusy +=
+      mitk::MessageDelegate1<QmitkWatershedToolGUI, bool>(this, &QmitkWatershedToolGUI::BusyStateChanged);
+
+    m_WatershedTool->SetLevel(m_Level);
+    m_WatershedTool->SetThreshold(m_Threshold);
+
+    m_WatershedTool->SetOverwriteExistingSegmentation(true);
+    m_WatershedTool->IsTimePointChangeAwareOff();
+    m_Controls.m_CheckProcessAll->setVisible(m_WatershedTool->GetTargetSegmentationNode()->GetData()->GetTimeSteps() > 1);
   }
 }
 
-void QmitkWatershedToolGUI::OnSliderValueThresholdChanged(int value)
+void QmitkWatershedToolGUI::OnSegmentationRegionAccept()
+{
+  QString segName = QString::fromStdString(m_WatershedTool->GetCurrentSegmentationName());
+
+  if (m_WatershedTool.IsNotNull())
+  {
+    if (this->m_Controls.m_CheckCreateNew->isChecked())
+    {
+      m_WatershedTool->SetOverwriteExistingSegmentation(false);
+    }
+    else
+    {
+      m_WatershedTool->SetOverwriteExistingSegmentation(true);
+    }
+
+    m_WatershedTool->SetCreateAllTimeSteps(this->m_Controls.m_CheckProcessAll->isChecked());
+
+    this->m_Controls.m_ConfSegButton->setEnabled(false);
+    m_WatershedTool->ConfirmSegmentation();
+  }
+}
+
+void QmitkWatershedToolGUI::OnSettingsAccept()
 {
   if (m_WatershedTool.IsNotNull())
   {
-    double realValue = value / 100.;
-    m_WatershedTool->SetThreshold(realValue);
-    m_ThresholdLabel->setText(QString::number(realValue));
+    try
+    {
+      m_Threshold = m_Controls.thresholdSlider->value();
+      m_Level = m_Controls.levelSlider->value();
+      m_WatershedTool->SetThreshold(m_Threshold);
+      m_WatershedTool->SetLevel(m_Level);
+
+      m_WatershedTool->UpdatePreview();
+    }
+    catch (const std::exception& e)
+    {
+      this->setCursor(Qt::ArrowCursor);
+      std::stringstream stream;
+      stream << "Error while generation watershed segmentation. Reason: " << e.what();
+
+      QMessageBox* messageBox =
+        new QMessageBox(QMessageBox::Critical,
+          nullptr, stream.str().c_str());
+      messageBox->exec();
+      delete messageBox;
+      MITK_ERROR << stream.str();
+      return;
+    }
+    catch (...)
+    {
+      this->setCursor(Qt::ArrowCursor);
+      std::stringstream stream;
+      stream << "Unkown error occured while generation watershed segmentation.";
+
+      QMessageBox* messageBox =
+        new QMessageBox(QMessageBox::Critical,
+          nullptr, stream.str().c_str());
+      messageBox->exec();
+      delete messageBox;
+      MITK_ERROR << stream.str();
+      return;
+    }
+
+    m_Controls.m_selectionListWidget->SetLabelSetImage(m_WatershedTool->GetMLPreview());
+    m_WatershedTool->IsTimePointChangeAwareOn();
   }
 }
 
-void QmitkWatershedToolGUI::OnSliderValueLevelChanged(int value)
+void QmitkWatershedToolGUI::BusyStateChanged(bool value)
+{
+  if (value)
+  {
+    QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
+  }
+  else
+  {
+    QApplication::restoreOverrideCursor();
+  }
+
+  m_Controls.levelSlider->setEnabled(!value);
+  m_Controls.thresholdSlider->setEnabled(!value);
+  m_Controls.m_ConfSegButton->setEnabled(!m_WatershedTool->GetSelectedLabels().empty() && !value);
+  m_Controls.m_CheckProcessAll->setEnabled(!value);
+  m_Controls.m_CheckCreateNew->setEnabled(!value);
+  m_Controls.previewButton->setEnabled(!value);
+}
+
+
+void QmitkWatershedToolGUI::OnLevelChanged(double value)
 {
   if (m_WatershedTool.IsNotNull())
   {
-    double realValue = value / 100.;
-    m_WatershedTool->SetLevel(realValue);
-    m_LevelLabel->setText(QString::number(realValue));
+    m_WatershedTool->SetLevel(value);
   }
 }
 
-void QmitkWatershedToolGUI::OnCreateSegmentation()
+void QmitkWatershedToolGUI::OnThresholdChanged(double value)
 {
-  QApplication::setOverrideCursor(Qt::BusyCursor);
-  m_InformationLabel->setText(QString("Please wait some time for computation..."));
-  m_InformationLabel->repaint();
-  QApplication::processEvents();
-
-  m_WatershedTool->DoIt();
-  m_InformationLabel->setText(QString(""));
-  QApplication::setOverrideCursor(Qt::ArrowCursor);
-
-  for (int i = 0; i < 60; ++i)
+  if (m_WatershedTool.IsNotNull())
   {
-    mitk::ProgressBar::GetInstance()->Progress();
+    m_WatershedTool->SetThreshold(value);
   }
 }

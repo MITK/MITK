@@ -13,10 +13,9 @@ found in the LICENSE file.
 #ifndef mitkWatershedTool_h_Included
 #define mitkWatershedTool_h_Included
 
-#include "mitkAutoSegmentationTool.h"
+#include "mitkAutoMLSegmentationWithPreviewTool.h"
 #include "mitkCommon.h"
 #include <MitkSegmentationExports.h>
-#include <itkImage.h>
 
 namespace us
 {
@@ -25,8 +24,6 @@ namespace us
 
 namespace mitk
 {
-  class Image;
-
   /**
     \brief Simple watershed segmentation tool.
 
@@ -36,27 +33,38 @@ namespace mitk
     Wraps ITK Watershed Filter into tool concept of MITK. For more information look into ITK documentation.
 
     \warning Only to be instantiated by mitk::ToolManager.
-
-    $Darth Vader$
   */
-  class MITKSEGMENTATION_EXPORT WatershedTool : public AutoSegmentationTool
+  class MITKSEGMENTATION_EXPORT WatershedTool : public AutoMLSegmentationWithPreviewTool
   {
   public:
-    mitkClassMacro(WatershedTool, AutoSegmentationTool);
+    mitkClassMacro(WatershedTool, AutoMLSegmentationWithPreviewTool);
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      void SetThreshold(double t)
-    {
-      m_Threshold = t;
-    }
+    const char** GetXPM() const override;
+    const char* GetName() const override;
+    us::ModuleResource GetIconResource() const override;
 
-    void SetLevel(double l) { m_Level = l; }
-    /** \brief Grabs the tool reference data and creates an ITK pipeline consisting of a GradientMagnitude
-      * image filter followed by a Watershed image filter. The output of the filter pipeline is then added
-      * to the data storage. */
-    void DoIt();
+    void Activated() override;
 
+    itkSetMacro(Threshold, double);
+    itkGetConstMacro(Threshold, double);
+
+    itkSetMacro(Level, double);
+    itkGetConstMacro(Level, double);
+
+  protected:
+    WatershedTool() = default;
+    ~WatershedTool() = default;
+
+    LabelSetImage::Pointer ComputeMLPreview(const Image* inputAtTimeStep, TimeStepType timeStep) override;
+
+    /** \brief Threshold parameter of the ITK Watershed Image Filter. See ITK Documentation for more information. */
+    double m_Threshold = 0.0;
+    /** \brief Threshold parameter of the ITK Watershed Image Filter. See ITK Documentation for more information. */
+    double m_Level = 0.0;
+
+private:
     /** \brief Creates and runs an ITK filter pipeline consisting of the filters: GradientMagnitude-, Watershed- and
      * CastImageFilter.
       *
@@ -64,23 +72,11 @@ namespace mitk
       * \param segmentation A pointer to the output image, which will point to the pipeline output after execution.
       */
     template <typename TPixel, unsigned int VImageDimension>
-    void ITKWatershed(const itk::Image<TPixel, VImageDimension> *originalImage, itk::SmartPointer<mitk::Image> &segmentation);
+    void ITKWatershed(const itk::Image<TPixel, VImageDimension>* originalImage, itk::SmartPointer<mitk::Image>& segmentation, bool inputChanged);
 
-    const char **GetXPM() const override;
-    const char *GetName() const override;
-    us::ModuleResource GetIconResource() const override;
-
-  protected:
-    WatershedTool(); // purposely hidden
-    ~WatershedTool() override;
-
-    void Activated() override;
-    void Deactivated() override;
-
-    /** \brief Threshold parameter of the ITK Watershed Image Filter. See ITK Documentation for more information. */
-    double m_Threshold;
-    /** \brief Threshold parameter of the ITK Watershed Image Filter. See ITK Documentation for more information. */
-    double m_Level;
+    itk::ProcessObject::Pointer m_MagFilter;
+    itk::ProcessObject::Pointer m_WatershedFilter;
+    mitk::Image::ConstPointer m_LastFilterInput;
   };
 
 } // namespace

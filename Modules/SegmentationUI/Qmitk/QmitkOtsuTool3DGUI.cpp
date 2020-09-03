@@ -11,14 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkOtsuTool3DGUI.h"
-#include "QmitkConfirmSegmentationDialog.h"
 
 #include <QMessageBox>
-#include <qlabel.h>
-#include <qlayout.h>
-#include <qlistwidget.h>
-#include <qpushbutton.h>
-#include <qspinbox.h>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkOtsuTool3DGUI, "")
 
@@ -27,7 +21,7 @@ QmitkOtsuTool3DGUI::QmitkOtsuTool3DGUI() : QmitkToolGUI(), m_NumberOfRegions(0)
   m_Controls.setupUi(this);
 
   connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnSpinboxValueAccept()));
-  connect(m_Controls.m_selectionListWidget, SIGNAL(itemSelectionChanged()), this, SLOT(OnRegionSelectionChanged()));
+  connect(m_Controls.m_selectionListWidget, &QmitkSimpleLabelSetListWidget::SelectedLabelsChanged, this, &QmitkOtsuTool3DGUI::OnRegionSelectionChanged);
   connect(m_Controls.m_Spinbox, SIGNAL(valueChanged(int)), this, SLOT(OnRegionSpinboxChanged(int)));
   connect(m_Controls.m_ConfSegButton, SIGNAL(clicked()), this, SLOT(OnSegmentationRegionAccept()));
   connect(this, SIGNAL(NewToolAssociated(mitk::Tool *)), this, SLOT(OnNewToolAssociated(mitk::Tool *)));
@@ -53,22 +47,20 @@ void QmitkOtsuTool3DGUI::OnRegionSpinboxChanged(int numberOfRegions)
     m_Controls.m_BinsSpinBox->setValue(numberOfRegions);
 }
 
-void QmitkOtsuTool3DGUI::OnRegionSelectionChanged()
+void QmitkOtsuTool3DGUI::OnRegionSelectionChanged(const QmitkSimpleLabelSetListWidget::LabelVectorType& selectedLabels)
 {
-  m_SelectedItems = m_Controls.m_selectionListWidget->selectedItems();
-
   if (m_OtsuTool3DTool.IsNotNull())
   {
-    // update preview of region
-    QList<QListWidgetItem *>::Iterator it;
-    std::vector<int> regionIDs;
-    for (it = m_SelectedItems.begin(); it != m_SelectedItems.end(); ++it)
-      regionIDs.push_back((*it)->text().toInt());
+    mitk::AutoMLSegmentationWithPreviewTool::SelectedLabelVectorType labelIDs;
+    for (const auto& label : selectedLabels)
+    {
+      labelIDs.push_back(label->GetValue());
+    }
 
-    m_OtsuTool3DTool->SetSelectedRegions(regionIDs);
+    m_OtsuTool3DTool->SetSelectedLabels(labelIDs);
     m_OtsuTool3DTool->UpdatePreview();
 
-    m_Controls.m_ConfSegButton->setEnabled(!regionIDs.empty());
+    m_Controls.m_ConfSegButton->setEnabled(!labelIDs.empty());
   }
 }
 
@@ -111,7 +103,6 @@ void QmitkOtsuTool3DGUI::OnNewToolAssociated(mitk::Tool *tool)
 
 void QmitkOtsuTool3DGUI::OnSegmentationRegionAccept()
 {
-  QmitkConfirmSegmentationDialog dialog;
   QString segName = QString::fromStdString(m_OtsuTool3DTool->GetCurrentSegmentationName());
 
   if (m_OtsuTool3DTool.IsNotNull())
@@ -177,18 +168,7 @@ void QmitkOtsuTool3DGUI::OnSpinboxValueAccept()
       return;
     }
 
-    // insert regions into widget
-    QString itemName;
-    QListWidgetItem *item;
-    m_Controls.m_selectionListWidget->clear();
-    for (int i = 0; i < m_Controls.m_Spinbox->value(); ++i)
-    {
-      itemName = QString::number(i);
-      item = new QListWidgetItem(itemName);
-      m_Controls.m_selectionListWidget->addItem(item);
-    }
-    // deactivate 'confirm segmentation'-button
-    m_Controls.m_ConfSegButton->setEnabled(false);
+    m_Controls.m_selectionListWidget->SetLabelSetImage(m_OtsuTool3DTool->GetMLPreview());
     m_OtsuTool3DTool->IsTimePointChangeAwareOn();
   }
 }
@@ -207,7 +187,7 @@ void QmitkOtsuTool3DGUI::BusyStateChanged(bool value)
   m_Controls.m_ValleyCheckbox->setEnabled(!value);
   m_Controls.binLabel->setEnabled(!value);
   m_Controls.m_BinsSpinBox->setEnabled(!value);
-  m_Controls.m_ConfSegButton->setEnabled(!m_OtsuTool3DTool->GetSelectedRegions().empty() && !value);
+  m_Controls.m_ConfSegButton->setEnabled(!m_OtsuTool3DTool->GetSelectedLabels().empty() && !value);
   m_Controls.m_CheckProcessAll->setEnabled(!value);
   m_Controls.m_CheckCreateNew->setEnabled(!value);
   m_Controls.previewButton->setEnabled(!value);

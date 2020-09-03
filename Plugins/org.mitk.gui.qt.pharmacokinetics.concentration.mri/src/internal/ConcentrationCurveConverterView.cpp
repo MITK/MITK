@@ -105,6 +105,12 @@ void ConcentrationCurveConverterView::CreateQtPartControl(QWidget* parent)
     m_Controls.spinBox_baselineEndTimeStep->setMinimum(0);
     m_Controls.spinBox_baselineStartTimeStep->setMinimum(0);
 
+    m_Controls.spinBox_baselineStartTimeStepT2->setValue(0);
+    m_Controls.spinBox_baselineEndTimeStepT2->setValue(0);
+
+    m_Controls.spinBox_baselineEndTimeStepT2->setMinimum(0);
+    m_Controls.spinBox_baselineStartTimeStepT2->setMinimum(0);
+
     connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), m_Controls.groupBoxTurboFlash, SLOT(setVisible(bool)));
     connect(m_Controls.radioButtonTurboFlash, SIGNAL(toggled(bool)), this, SLOT(OnSettingChanged()));
     connect(m_Controls.relaxationtime, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
@@ -125,12 +131,17 @@ void ConcentrationCurveConverterView::CreateQtPartControl(QWidget* parent)
     connect(m_Controls.factorSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
     connect(m_Controls.spinBox_baselineStartTimeStep, SIGNAL(valueChanged(int)), this, SLOT(OnSettingChanged()));
     connect(m_Controls.spinBox_baselineEndTimeStep, SIGNAL(valueChanged(int)), this, SLOT(OnSettingChanged()));
+    connect(m_Controls.spinBox_baselineStartTimeStepT2, SIGNAL(valueChanged(int)), this, SLOT(OnSettingChanged()));
+    connect(m_Controls.spinBox_baselineEndTimeStepT2, SIGNAL(valueChanged(int)), this, SLOT(OnSettingChanged()));
 
     connect(m_Controls.radioButtonUsingT1viaVFA, SIGNAL(toggled(bool)), m_Controls.groupBox_T1MapviaVFA, SLOT(setVisible(bool)));
     connect(m_Controls.radioButtonUsingT1viaVFA, SIGNAL(toggled(bool)), this, SLOT(OnSettingChanged()));
     connect(m_Controls.FlipangleSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
     connect(m_Controls.RelaxivitySpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
     connect(m_Controls.TRSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
+
+    connect(m_Controls.T2EchoTimeSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
+    connect(m_Controls.T2FactorSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
 
     connect(m_Controls.radioButtonUsingT1viaVFA, SIGNAL(toggled(bool)), m_Controls.PDWImageNodeSelector, SLOT(setEnabled(bool)));
 
@@ -146,18 +157,13 @@ void ConcentrationCurveConverterView::OnSettingChanged()
 
   if(m_Controls.radioButton_T1->isChecked())
   {
-    MITK_INFO << "radioButton_T1 is checked.";
       m_Controls.groupBox3D->setVisible(m_Controls.radioButton3D->isChecked());
       m_Controls.groupBox4D->setVisible(m_Controls.radioButton4D->isChecked());
 
       if(m_Controls.radioButton4D->isChecked())
       {
-        MITK_INFO << "radioButton4D is checked";
           m_Controls.groupConcentration->setVisible(true);
-          MITK_INFO << "m_selectedImage.IsNotNull(): "<< m_selectedImage.IsNotNull();
-          MITK_INFO << "CheckSettings()" << CheckSettings();
           ok = m_selectedImage.IsNotNull() && CheckSettings();
-          MITK_INFO << "ok" << ok;
       }
       else if(m_Controls.radioButton3D->isChecked())
       {
@@ -169,12 +175,14 @@ void ConcentrationCurveConverterView::OnSettingChanged()
   else if (m_Controls.radioButton_T2->isChecked())
   {
       m_Controls.groupConcentration->setVisible(false);
-
       ok = m_selectedImage.IsNotNull() && CheckSettings();
   }
 
   m_Controls.spinBox_baselineStartTimeStep->setEnabled(m_Controls.radioButtonTurboFlash->isChecked() || m_Controls.radioButton_absoluteEnhancement->isChecked() || m_Controls.radioButton_relativeEnchancement->isChecked() || m_Controls.radioButtonUsingT1viaVFA->isChecked());
   m_Controls.spinBox_baselineEndTimeStep->setEnabled(m_Controls.radioButton_absoluteEnhancement->isChecked() || m_Controls.radioButton_relativeEnchancement->isChecked() || m_Controls.radioButtonUsingT1viaVFA->isChecked() || m_Controls.radioButtonTurboFlash->isChecked());
+
+  //m_Controls.spinBox_baselineStartTimeStepT2->setEnabled(m_Controls.radioButtonTurboFlash->isChecked() || m_Controls.radioButton_absoluteEnhancement->isChecked() || m_Controls.radioButton_relativeEnchancement->isChecked() || m_Controls.radioButtonUsingT1viaVFA->isChecked());
+  //m_Controls.spinBox_baselineEndTimeStepT2->setEnabled(m_Controls.radioButton_absoluteEnhancement->isChecked() || m_Controls.radioButton_relativeEnchancement->isChecked() || m_Controls.radioButtonUsingT1viaVFA->isChecked() || m_Controls.radioButtonTurboFlash->isChecked());
 
   m_Controls.btnConvertToConcentration->setEnabled(ok);
 
@@ -230,7 +238,18 @@ bool ConcentrationCurveConverterView::CheckSettings() const
 
 bool ConcentrationCurveConverterView::CheckBaselineSelectionSettings() const
 {
-  return m_Controls.spinBox_baselineStartTimeStep->value() <= m_Controls.spinBox_baselineEndTimeStep->value();
+  if (this->m_Controls.radioButton_T1->isChecked())
+  {
+    return m_Controls.spinBox_baselineStartTimeStep->value() <= m_Controls.spinBox_baselineEndTimeStep->value();
+  }
+  else if (this->m_Controls.radioButton_T2->isChecked())
+  {
+    return m_Controls.spinBox_baselineStartTimeStepT2->value() <= m_Controls.spinBox_baselineEndTimeStepT2->value();
+  }
+  else
+  {
+    return 0;
+  }
 }
 
 void ConcentrationCurveConverterView::OnConvertToConcentrationButtonClicked()
@@ -371,6 +390,8 @@ mitk::Image::Pointer ConcentrationCurveConverterView::Convert4DConcentrationImag
   concentrationGen->SetAbsoluteSignalEnhancement(m_Controls.radioButton_absoluteEnhancement->isChecked());
   concentrationGen->SetRelativeSignalEnhancement(m_Controls.radioButton_relativeEnchancement->isChecked());
   concentrationGen->SetUsingT1Map(m_Controls.radioButtonUsingT1viaVFA->isChecked());
+  concentrationGen->SetBaselineStartTimeStep(m_Controls.spinBox_baselineStartTimeStepT2->value());
+  concentrationGen->SetBaselineEndTimeStep(m_Controls.spinBox_baselineEndTimeStepT2->value());
 
   concentrationGen->SetisT2weightedImage(false);
 
@@ -424,6 +445,8 @@ mitk::Image::Pointer ConcentrationCurveConverterView::ConvertT2ConcentrationImga
     concentrationGen->SetT2Factor(m_Controls.T2FactorSpinBox->value());
     concentrationGen->SetT2EchoTime(m_Controls.T2EchoTimeSpinBox->value());
 
+    concentrationGen->SetBaselineStartTimeStep(m_Controls.spinBox_baselineStartTimeStep->value());
+    concentrationGen->SetBaselineEndTimeStep(m_Controls.spinBox_baselineEndTimeStep->value());
 
     mitk::Image::Pointer concentrationImage = concentrationGen->GetConvertedImage();
 
@@ -432,7 +455,6 @@ mitk::Image::Pointer ConcentrationCurveConverterView::ConvertT2ConcentrationImga
 
 void ConcentrationCurveConverterView::OnSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/)
 {
-  MITK_INFO << "OnSelectionChanged  is called.";
     m_selectedNode = nullptr;
     m_selectedImage = nullptr;
     m_selectedBaselineNode = nullptr;
@@ -442,7 +464,6 @@ void ConcentrationCurveConverterView::OnSelectionChanged(QList<mitk::DataNode::P
     {
       if (m_Controls.radioButton4D->isChecked())
       {
-        MITK_INFO << "m_Controls.timeSeriesNodeSelector->GetSelectedNode().IsNotNull()"<< m_Controls.timeSeriesNodeSelector->GetSelectedNode().IsNotNull();
         if (m_Controls.timeSeriesNodeSelector->GetSelectedNode().IsNotNull())
         {
           this->m_selectedNode = m_Controls.timeSeriesNodeSelector->GetSelectedNode();
@@ -473,6 +494,11 @@ void ConcentrationCurveConverterView::OnSelectionChanged(QList<mitk::DataNode::P
         }
       }
 
+      if (this->m_selectedImage.IsNotNull())
+      {
+        m_Controls.spinBox_baselineStartTimeStep->setMaximum((this->m_selectedImage->GetDimension(3)) - 1);
+        m_Controls.spinBox_baselineEndTimeStep->setMaximum((this->m_selectedImage->GetDimension(3)) - 1);
+      }
     }
     if (m_Controls.radioButton_T2->isChecked())
     {
@@ -480,27 +506,21 @@ void ConcentrationCurveConverterView::OnSelectionChanged(QList<mitk::DataNode::P
       {
         this->m_selectedNode = m_Controls.t2TimeSeriesNodeSelector->GetSelectedNode();
         m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
-
       }
       else
       {
         this->m_selectedNode = nullptr;
         this->m_selectedImage = nullptr;
       }
+      if (this->m_selectedImage.IsNotNull())
+      {
+        m_Controls.spinBox_baselineStartTimeStepT2->setMaximum((this->m_selectedImage->GetDimension(3)) - 1);
+        m_Controls.spinBox_baselineEndTimeStepT2->setMaximum((this->m_selectedImage->GetDimension(3)) - 1);
+      }
     }
 
     m_Controls.btnConvertToConcentration->setEnabled(false);
-
-
-    if (this->m_selectedImage.IsNotNull())
-    {
-      m_Controls.spinBox_baselineStartTimeStep->setMaximum((this->m_selectedImage->GetDimension(3)) - 1);
-      m_Controls.spinBox_baselineEndTimeStep->setMaximum((this->m_selectedImage->GetDimension(3)) - 1);
-    }
-
     m_Controls.btnConvertToConcentration->setEnabled(m_selectedImage.IsNotNull() && CheckSettings());
-    MITK_INFO << "m_selectedImage.IsNotNull()" << m_selectedImage.IsNotNull();
-    MITK_INFO << "CheckSettings()" << CheckSettings();
 
 
 }

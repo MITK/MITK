@@ -28,6 +28,8 @@ namespace mitk
 /**
   \brief GUI for mask stamp functionality
 
+  This class uses the mitk::ToolManagerProvider::MULTILABEL_SEGMENTATION context.
+
   \ingroup ToolManagerEtAl
   \ingroup Widgets
 */

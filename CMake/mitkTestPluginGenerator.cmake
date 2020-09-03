@@ -27,6 +27,14 @@ if(BUILD_TESTING)
   set_tests_properties(mitkPluginGeneratorCreateTest PROPERTIES
                        DEPENDS "${exec_target};mitkPluginGeneratorCleanTest;mitkPluginGeneratorCleanTest3")
 
+  mitkFunctionGetLibrarySearchPaths(MITK_RUNTIME_PATH_RELEASE release RELEASE)
+  mitkFunctionGetLibrarySearchPaths(MITK_RUNTIME_PATH_DEBUG debug DEBUG)
+  set(test_env_path ${MITK_RUNTIME_PATH_RELEASE} ${MITK_RUNTIME_PATH_DEBUG} $ENV{PATH})
+  list(REMOVE_DUPLICATES test_env_path)
+  string (REGEX REPLACE "\;" "\\\;" test_env_path "${test_env_path}")
+  set_property(TEST mitkPluginGeneratorCreateTest APPEND PROPERTY ENVIRONMENT "PATH=${test_env_path}")
+  set_property(TEST mitkPluginGeneratorCreateTest PROPERTY SKIP_RETURN_CODE 77)
+
   set(configure_options
     -DMITK_DIR:PATH=${MITK_BINARY_DIR}
     -DCMAKE_C_COMPILER:STRING=${CMAKE_C_COMPILER}

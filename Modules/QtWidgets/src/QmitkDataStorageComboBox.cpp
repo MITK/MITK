@@ -302,16 +302,17 @@ void QmitkDataStorageComboBox::OnDataNodeDeleteOrModified(const itk::Object *cal
 
 void QmitkDataStorageComboBox::SetSelectedNode(mitk::DataNode::Pointer item)
 {
-  int index = this->Find(item);
-  if (index == -1)
-  {
-    MITK_INFO << "QmitkDataStorageComboBox: item not available";
-  }
-  else
-  {
-    this->setCurrentIndex(index);
+  if (m_AllowEmptySelection && item == nullptr) {
+    this->setCurrentIndex(-1);
+    return;
   }
 
+  int index = this->Find(item);
+  if (index == -1) {
+    MITK_INFO << "QmitkDataStorageComboBox: item not available";
+  } else {
+    this->setCurrentIndex(index);
+  }
 }
 
 //#PROTECTED GETTER

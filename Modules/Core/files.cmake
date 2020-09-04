@@ -109,6 +109,7 @@ set(CPP_FILES
   DataManagement/mitkNodePredicateData.cpp
   DataManagement/mitkNodePredicateDataType.cpp
   DataManagement/mitkNodePredicateDimension.cpp
+  DataManagement/mitkNodePredicateDimensionOnly.cpp
   DataManagement/mitkNodePredicateFirstLevel.cpp
   DataManagement/mitkNodePredicateMinTimeSlices.cpp
   DataManagement/mitkNodePredicateNot.cpp

@@ -34,8 +34,8 @@ class QmitkAbstractDataStorageModel;
 * @remark This class provides a public function 'SetAutoSelectNewNodes' that can be used to enable
 *         the auto selection mode (default is false).
 *         The user of this class calling this function has to make sure that the base-class Q_SIGNAL
-*         'CurrentSelectionChanged', which will be eventually emitted by this function, is already
-*         connected to a receiving slot.
+*         'CurrentSelectionChanged', which will be emitted by this function, is already
+*         connected to a receiving slot, if the initial valid auto selection should not get lost.
 */
 class MITK_QT_COMMON QmitkSingleNodeSelectionWidget : public QmitkAbstractNodeSelectionWidget
 {
@@ -61,11 +61,11 @@ public Q_SLOTS:
   *  - no selection is set
   *
   * @remark Enabling the auto selection mode by calling 'SetAutoSelectNewNodes(true)'
-  *         needs to be done after this selection widget has been connected with the
-  *         'QmitkSingleNodeSelectionWidget::CurrentSelectionChanged' Q_SIGNAL.
-  *         The reason for that is that 'SetAutoSelectNewNodes' creates a new selection and eventually
-  *         emits the signal 'CurrentSelectionChanged', which has not been connected,
-  *         if the call happens before the connect.
+  *         will directly emit a 'QmitkSingleNodeSelectionWidget::CurrentSelectionChanged' Q_SIGNAL
+  *         if a valid auto selection was made.
+  *         If this initial emission should not get lost, auto selection mode needs to be enabled after this
+  *         selection widget has been connected via the 'QmitkSingleNodeSelectionWidget::CurrentSelectionChanged'
+  *         Q_SIGNAL to a receiving function.
   */
   void SetAutoSelectNewNodes(bool autoSelect);
 

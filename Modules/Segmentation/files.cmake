@@ -33,6 +33,7 @@ set(CPP_FILES
   Interactions/mitkAutoCropTool.cpp
   Interactions/mitkAutoSegmentationTool.cpp
   Interactions/mitkAutoSegmentationWithPreviewTool.cpp
+  Interactions/mitkAutoMLSegmentationWithPreviewTool.cpp
   Interactions/mitkBinaryThresholdBaseTool.cpp
   Interactions/mitkBinaryThresholdTool.cpp
   Interactions/mitkBinaryThresholdULTool.cpp

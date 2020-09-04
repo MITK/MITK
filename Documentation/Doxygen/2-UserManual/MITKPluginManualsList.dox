@@ -14,7 +14,7 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
   <li> \ref  org_mitk_gui_qt_flowapplication </li>
   <li> \ref  org_mitk_views_imagecropper </li>
   <li> \ref  org_mitk_views_imagenavigator </li>
-  <li> \ref  org_blueberry_ui_qt_log </li>
+  <li> \ref  org_blueberry_views_logview </li>
   <li> \ref  org_mitk_views_matchpoint_algorithm_browser</li>
   <li> \ref  org_mitk_views_matchpoint_algorithm_control</li>
   <li> \ref  org_mitk_views_matchpoint_evaluator</li>

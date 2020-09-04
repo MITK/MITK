@@ -360,6 +360,13 @@ External enableization...
 */
 void QmitkSlicesInterpolator::setEnabled( bool enable )
 {
+  if (m_ToolManager) {
+    mitk::DataNode* referenceNode = m_ToolManager->GetReferenceData(0);
+    mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+
+    enable &= referenceNode && workingNode;
+  }
+
   QWidget::setEnabled(enable);
 
   //Set the gui elements of the different interpolation modi enabled

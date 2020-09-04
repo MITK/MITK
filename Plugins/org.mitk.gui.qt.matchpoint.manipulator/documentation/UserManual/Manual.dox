@@ -7,13 +7,13 @@
 
 \section MAP_REGMANIP_Introduction Introduction
 This view offers the possibility to manually manipulate a registration to establish a good mapping between data.
-The effect of manipulation is visualized with two user defined images to allow visual inspection.\n
+The effect of manipulation is visualized with two user defined images to allow for visual inspection.\n
 It is one of several MatchPoint registration plug-ins.\n
 
 \section MAP_REGMANIP_Usage Usage
 \imageMacro{map_view_manipulator_example.png, "Example screenshot showing the main elements of the view used to start a manipulation.", 14}
 The typical workflow with the manipulator has following steps/sections:\n\n
-(1) <b>Source selection</b>: You can choose between starting a new registration and using a selected registration. For later option,
+(1) <b>Source selection</b>: You can choose between starting a new registration and using a selected registration. For latter option,
 the registration must be selected (see (2)).
 \remark If you choose a new registration, the manipulator will automatically pre initialize this new transform
 to align the centers of the used images and therefore starts with sensible settings.
@@ -21,13 +21,13 @@ to align the centers of the used images and therefore starts with sensible setti
 for the manipulation, which will be "on top" of the existing registration.
 
 
-(2) <b>Registration slot</b>: Shows the currently selected registration that serves as base line. Only active if (1) is selected appropriately. Click to change.\n\n
+(2) <b>Registration slot</b>: Shows the currently selected registration that serves as baseline. Only active if (1) is selected appropriately. Click to change.\n\n
 
-(3) <b>Auto select option</b>: If active the view will try to deduce and automatically select (if loaded in the application) the moving and target image when the base line registration changes. The view assumes that the moving and target images used to determine the registration should be used to illustrate the effects of the manipulation.\n\n
+(3) <b>Auto select option</b>: If active the view will try to deduce and automatically select (if loaded in the application) the moving and target image when the baseline registration changes. The view assumes that the moving and target images used to determine the registration should be used to illustrate the effects of the manipulation.\n\n
 
-(4) <b>Moving image slot</b>: To allow visual inspection of the manipulation a moving image must be specified. This image is mapped by the manipulated registration to illustrate the effects of the manipulation. Click to change the image.\n\n
+(4) <b>Moving image slot</b>: To allow for visual inspection of the manipulation a moving image must be specified. This image is mapped by the manipulated registration to illustrate the effects of the manipulation. Click to change the image.\n\n
 
-(5) <b>Target image slot</b>: To allow visual inspection of the manipulation a target image must be specified. This image is used to compare against the mapped moving image to illustrate the effects of the manipulation. Click to change the image.\n\n
+(5) <b>Target image slot</b>: To allow for visual inspection of the manipulation a target image must be specified. This image is used to compare against the mapped moving image to illustrate the effects of the manipulation. Click to change the image.\n\n
 
 (6) <b>Start manual registration</b>: If all settings are valid, you can start the manipulation. The render windows will automatically
 switch to the visual inspection mode. The views will be reinitialized to the field of view of the target image.\n\n\n

@@ -46,7 +46,9 @@ namespace mitk {
             TOutputpixel concentration(0);
             if(value !=0 && baseline != 0)
             {
-                concentration = (-1)*this->m_k / this->m_TE * log((double)(value / baseline));
+              concentration = (-1) * ((double)this->m_k / this->m_TE) * log( (double)value/baseline);
+
+
             }
             return concentration;
         }

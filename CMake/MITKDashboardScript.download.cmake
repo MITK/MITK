@@ -602,6 +602,31 @@ else()
   endforeach()
 endif()
 
+if(MITK_BUILD_DOCUMENTATION)
+  message("MITK build - Build documentation")
+
+  ctest_build(TARGET doc
+    NUMBER_ERRORS num_doc_errors
+    NUMBER_WARNINGS num_doc_warnings
+    RETURN_VALUE return_value
+    APPEND
+  )
+
+  submit(PARTS Build)
+
+  if(0 LESS num_doc_warnings)
+      message("${indent}${num_doc_warnings} warning(s)")
+    endif()
+
+    if(NOT (0 EQUAL return_value AND 0 EQUAL num_doc_errors))
+      submit(PARTS Done)
+      message("${indent}${num_doc_errors} error(s)")
+      return()
+    else()
+      message("${indent}Documentation was built successfully")
+    endif()
+endif()
+
 message("Run unit tests...")
 
 set(CTEST_CONFIGURATION_TYPE "${CTEST_BUILD_CONFIGURATION}")

@@ -606,6 +606,7 @@ if(MITK_BUILD_DOCUMENTATION)
   message("MITK build - Build documentation")
 
   ctest_build(TARGET doc
+    BUILD "${CTEST_BINARY_DIRECTORY}/MITK-build"
     NUMBER_ERRORS num_doc_errors
     NUMBER_WARNINGS num_doc_warnings
     RETURN_VALUE return_value
@@ -615,16 +616,16 @@ if(MITK_BUILD_DOCUMENTATION)
   submit(PARTS Build)
 
   if(0 LESS num_doc_warnings)
-      message("${indent}${num_doc_warnings} warning(s)")
-    endif()
+    message("${indent}${num_doc_warnings} warning(s)")
+  endif()
 
-    if(NOT (0 EQUAL return_value AND 0 EQUAL num_doc_errors))
-      submit(PARTS Done)
-      message("${indent}${num_doc_errors} error(s)")
-      return()
-    else()
-      message("${indent}Documentation was built successfully")
-    endif()
+  if(NOT (0 EQUAL return_value AND 0 EQUAL num_doc_errors))
+    submit(PARTS Done)
+    message("${indent}${num_doc_errors} error(s)")
+    return()
+  else()
+    message("${indent}Documentation was built successfully")
+  endif()
 endif()
 
 message("Run unit tests...")

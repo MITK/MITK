@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>475</width>
-    <height>745</height>
+    <height>825</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -360,11 +360,29 @@
    </item>
    <item>
     <widget class="QGroupBox" name="groupBox_T2">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>2</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
      <property name="title">
       <string>T2 weighted images</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="7" column="0" colspan="2">
+      <item row="1" column="1">
+       <widget class="QmitkSingleNodeSelectionWidget" name="t2TimeSeriesNodeSelector" native="true"/>
+      </item>
+      <item row="5" column="1">
+       <widget class="QDoubleSpinBox" name="T2EchoTimeSpinBox"/>
+      </item>
+      <item row="6" column="0" colspan="2">
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="3" column="1">
          <widget class="QSpinBox" name="spinBox_baselineEndTimeStepT2"/>
@@ -386,13 +404,17 @@
           </property>
          </widget>
         </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_baselineRangeT2">
+          <property name="text">
+           <string>Baseline Range Selection:</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item row="4" column="1">
        <widget class="QDoubleSpinBox" name="T2FactorSpinBox"/>
-      </item>
-      <item row="5" column="1">
-       <widget class="QDoubleSpinBox" name="T2EchoTimeSpinBox"/>
       </item>
       <item row="5" column="0">
        <widget class="QLabel" name="label_12">
@@ -400,9 +422,6 @@
          <string>Echo Time TE [ms]</string>
         </property>
        </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QmitkSingleNodeSelectionWidget" name="t2TimeSeriesNodeSelector" native="true"/>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="T2_SeriesLabel">
@@ -415,13 +434,6 @@
        <widget class="QLabel" name="label_10">
         <property name="text">
          <string>Conversion Factor k</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Baseline Range Selection:</string>
         </property>
        </widget>
       </item>

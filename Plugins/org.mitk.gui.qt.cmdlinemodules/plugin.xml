@@ -2,7 +2,7 @@
 <plugin>
 
   <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.gui.qt.cmdlinemodules"
+    <view id="org.mitk.views.cmdlinemodules"
           name="Command Line Modules"
           class="CommandLineModulesView"
           icon="resources/icon.xpm" >

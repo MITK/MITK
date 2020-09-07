@@ -223,6 +223,7 @@ bool ConcentrationCurveConverterView::CheckSettings() const
   {
     ok = ok && m_Controls.T2EchoTimeSpinBox->value() > 0;
     ok = ok && m_Controls.T2FactorSpinBox->value() > 0;
+    ok = ok && CheckBaselineSelectionSettings();
   }
   else
   {

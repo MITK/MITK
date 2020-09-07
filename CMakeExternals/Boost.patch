@@ -1,0 +1,24 @@
+diff -bdur Boost0/bootstrap.sh Boost/bootstrap.sh
+--- Boost0/bootstrap.sh	2018-08-02 00:50:46.000000000 +0400
++++ Boost/bootstrap.sh	2020-09-01 19:19:09.556696361 +0400
+@@ -348,17 +348,13 @@
+ EOF
+ 
+ #  - Python configuration
+-if test "x$flag_no_python" = x; then
+-  cat >> project-config.jam <<EOF
++cat >> project-config.jam <<EOF
+ 
+ # Python configuration
+ import python ;
+-if ! [ python.configured ]
+-{
+-    using python : $PYTHON_VERSION : $PYTHON_ROOT ;
+-}
++$USINGP2 ;
++$USINGP3 ;
+ EOF
+-fi
+ 
+ if test "x$ICU_ROOT" != x; then
+   cat >> project-config.jam << EOF

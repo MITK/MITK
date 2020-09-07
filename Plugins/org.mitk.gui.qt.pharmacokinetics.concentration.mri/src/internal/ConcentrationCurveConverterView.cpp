@@ -30,6 +30,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateDimension.h>
 #include "mitkNodePredicateFunction.h"
+#include <mitkModelFitResultRelationRule.h>
 
 #include <mitkModelFitConstants.h>
 // Includes for image casting between ITK and MITK
@@ -547,10 +548,8 @@ ConcentrationCurveConverterView::ConcentrationCurveConverterView()
     return  (node && node->GetData() && node->GetData()->GetTimeSteps() > 1);
   });
 
-  auto isNoModelFitNodePredicate = mitk::NodePredicateFunction::New([](const mitk::DataNode* node) {
-    bool isNoModelFitNode = node->GetData()->GetProperty(mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str()).IsNull();
-    return isNoModelFitNode;
-  });
+  auto modelFitResultRelationRule = mitk::ModelFitResultRelationRule::New();
+  auto isNoModelFitNodePredicate = mitk::NodePredicateNot::New(modelFitResultRelationRule->GetConnectedSourcesDetector());
 
   this->m_isValidPDWImagePredicate = mitk::NodePredicateAnd::New(is3DImage, isNoModelFitNodePredicate);
   this->m_isValidTimeSeriesImagePredicate = mitk::NodePredicateAnd::New(isDynamicData, isImage, isNoMask);

@@ -375,7 +375,7 @@
         <item row="2" column="0">
          <widget class="QLabel" name="label_baselineStartTimeStepT2">
           <property name="text">
-           <string>Start Time Frage</string>
+           <string>Start Time Frame</string>
           </property>
          </widget>
         </item>

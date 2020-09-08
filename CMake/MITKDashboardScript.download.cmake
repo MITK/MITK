@@ -379,6 +379,10 @@ if(NOT CTEST_CMAKE_GENERATOR MATCHES "^Visual Studio")
   unset(CTEST_CMAKE_GENERATOR_PLATFORM)
 endif()
 
+if(CTEST_CMAKE_GENERATOR MATCHES "^(Unix Makefiles|Ninja)$")
+  set(CTEST_USE_LAUNCHERS ON)
+endif()
+
 if(NOT CTEST_SITE)
   unset(CTEST_SITE)
   site_name(CTEST_SITE)
@@ -605,6 +609,8 @@ endif()
 if(MITK_BUILD_DOCUMENTATION)
   message("MITK build - Build documentation")
 
+  list(APPEND CTEST_CUSTOM_WARNING_EXCEPTION ".*")
+
   ctest_build(TARGET doc
     BUILD "${CTEST_BINARY_DIRECTORY}/MITK-build"
     NUMBER_ERRORS num_doc_errors
@@ -612,6 +618,8 @@ if(MITK_BUILD_DOCUMENTATION)
     RETURN_VALUE return_value
     APPEND
   )
+
+  list(POP_BACK CTEST_CUSTOM_WARNING_EXCEPTION)
 
   submit(PARTS Build)
 

@@ -3,112 +3,99 @@
 
 \imageMacro{"multilabelsegmentation.svg", "Icon of the MultiLabelSegmentation Plugin", 12}
 
-Please reference \ref org_mitk_views_segmentation for the description of the general segmentation tools.
+The difference between a binary and a multi-label segmentation is that a multi-label segmentation can not only contain more than one label but also more than one layer. This allows you to create different labels for different regions of interest encapsulated in one single image. The difference between labels and layers is that labels on one layer cannot overlap but labels on different layers can.
+
+Hereinafter, a description is given on how multi-label segmentations can be created and modified. Please refer to \ref org_mitk_views_segmentation for a description of the general segmentation tools.
 
 \tableofcontents
 
-\section org_mitk_views_multilabelsegmentationUserManualCreateOpenSaveImportAdd Start Segmenting
+\section org_mitk_views_multilabelsegmentationUserManualCreateOpenSaveImportAdd Data Selection
 
-To start using the <b>Segmentation Perspective</b> you will have to either create a new segmentation session or
-load an existing one from disk. The <b>Segmentation toolbar</b> collects buttons for the these actions:
+In the 'MultiLabel Segmentation' view you can first select an image. Thereafter, you can either create a new segmentation session by pressing the symbol right to the selection widget or select an existing one. 
 
-\imageMacro{"org_mitk_views_multilabelsegmentationIMGtoolbar.png", "Segmentation toolbar", 12}
+\imageMacro{"org_mitk_views_multilabelsegmentationIMGtoolbar.png", "Data selection",12}
+
+
+\section org_mitk_views_multilabelsegmentationUserManualLayerTable Segmentation Layers
+Once you started a segmentation session you can add or delete different layers. You can use the layers independently and switch layers by the left and right arrows. 
+
+
+\imageMacro{"org_mitk_views_multilabelsegmentationIMGlayerManager.png", "Layer selection",12}
+
+\subsection org_mitk_views_multilabelsegmentationUserManualLayerCreation Creating a New Layer
+
+A layer is a set of labels that occupy a non-overlapping anatomical space. The best way to describe them is by a real use case. Imagine you are working on a radiotherapy planning application. In the first layer of your segmentation
+session, you would like to trace the contours of the liver and neighboring organs. You can accommodate all these segmentations in separate labels because they all occupy different anatomical regions and do not overlap. Now say you would like to segment the arteries and veins inside the liver. If you don't trace them in a different layer, you will overwrite the previous ones. You may also need a third layer for segmenting the different irrigation territories in the liver and a fourth layer to contain the lesion you would like to treat.
+
+\section org_mitk_views_multilabelsegmentationUserManualLabelTable Segmentation Labels
+
+For each layer, you can add one or more labels. Pressing the double arrow on the right, all created labels are shown in the 'Lable Table'. The following label properties are available:
 
 <ul>
-  <li>Create segmentation session</li> a new segmentation session is created.
-  <li>Load segmentation session</li> a segmentation session can be loaded from disk (.lset file extensions).
-  <li>Save segmentation session</li> the current segmentation session can be saved to disk.
-  <li>Import segmentation session</li> a segmentation session can be incorporated into the current one. All new labels will be appended
-  at the end of the table.
-  <li>Add label</li> a new label is appended to the current segmentation session, at the end of the table.
+  <li><b>Name:</b></li> the name of the label. Can be a predefined one or any other.
+  <li><b>Locked:</b></li> whether the label is locked or editable. A locked label cannot be overwritten by another.
+  <li><b>Color:</b></li> the color of the label.
+  <li><b>Visible:</b></li> whether the label is currently visible or hidden.
 </ul>
 
-\section org_mitk_views_multilabelsegmentationUserManualLabelTable The Label Table
 
-The following label properties are readily available to modify:
+\imageMacro{"org_mitk_views_multilabelsegmentationIMGlabeltable.png", "The 'Label Table' shows all labels in the current segmentation session", 12}
 
-<ul>
-  <li>Name</li> the name of the label. Can be a predefined one or any other.
-  <li>Color</li> the color of the label.
-  <li>Visible</li> whether the label is currently visible or hiden.
-  <li>Locked</li> whether the label is locked or editable. A locked label cannot be overwritten by another.
-</ul>
+\subsection org_mitk_views_multilabelsegmentationUserManualLabelCreation Creating a New Label
 
-The Label Table is shown below:
+Click the 'New Label' button to add a new label. A dialog will show up to enter the name and color. Preset organ names and
+corresponding colors are offered while you type in, but you can set any name. The new name - if not known - will be automatically remembered and made available the next time you create a new label. In the current implementation of the plugin, the maximum number of labels is restricted to 255. If you need more, you will have to create a new segmentation session.
 
-\imageMacro{"org_mitk_views_multilabelsegmentationIMGlabeltable.png", "The <b>Label Table</b> showing all the labels in the current segmentation session", 12}
 
-\section org_mitk_views_multilabelsegmentationUserManualLabelCreation Creating a New Label
+\subsection org_mitk_views_multilabelsegmentationUserManualLabelSearch Searching a Label
 
-Click the "New Label" button to add a new label. A dialog will show-up to enter the name and color. Preset organ names and
-corresponding colors are offered while you type in, but you can set any name. The new name if not known will be automatically
-remembered and made available the next time you create a new label. In the current implementation of the plugin,
-the maximum number of labels is restricted to 255. If you need more, you will have to create a new segmentation session.
+It may happen that many labels (e.g. > 200) are present in a segmentation session and therefore manual searching can be time-consuming.
+The 'Label Search' edit box allows for quickly finding the label you want. Just start writing its name and you will get assistance for completing its name. If the label you were searching is found, press 'enter' and it will become the active one.
 
-\section org_mitk_views_multilabelsegmentationUserManualLayerCreation Creating a New Layer
 
-A layer is a set of labels that occupy a non-overlapping anatomical space. The best way to describe them is by a real use
-case. Imagine you are working on a radiotherpay planning application. In the first <b> layer </b> of your segmentation
-session you would like to trace the contours of the liver and neighboring organs. You can accomodate all these segmentations
-in separate labels because they all occupy different anamical regions and do not overlap. Now say you would like to segment
-the arteries and veins inside the liver. If you don´t trace them in a different layer, you will overwrite the previous ones.
-You may also need a third layer for segmenting the different irrigation territories in the liver and a fourth layer to contain
-the lession you would like to treat.
+\subsection org_mitk_views_multilabelsegmentationUserManualLabelEditing Label Editing
 
-The next figure illustrates the <b> Layer Manager </b>. The buttons in it contained serve for adding a new layer, selecting the
-previous and the next one. The active layer is shown together with the buttons.
+Here the actual segmentation takes place. First of all, you have to select the active label by clicking on the corresponding row in the 'Label Table'. Note that only one label can be active at the time. Then you can select segmentation tool in the toolbox.
 
-\imageMacro{"org_mitk_views_multilabelsegmentationIMGlayerManager.png", "Correction Tool",12}
+\imageMacro{"org_mitk_views_multilabelsegmentationIMGSegmentationToolbox.png", "Segmentation toolbox", 12}
 
-\section org_mitk_views_multilabelsegmentationUserManualLabelSearch Searching a Label
 
-It may happen that many labels (e.g. > 200) are present in a segmentation session and therefore manual searching is time consuming.
-The <b> Label Search </b> edit box allows for quickly finding the label you want. Just start writing its name and and you will get
-assitance for completing its name. If the label you were searching is found, press enter and it will became the active one.
+\note Not all segmentation tools can be found here. This is because some of the semi-automatic tools can not be applied in case of multiple labels.
 
-\imageMacro{"org_mitk_views_multilabelsegmentationIMGsearchlabel.png", "Label search", 12}
+\subsection org_mitk_views_multilabelsegmentationUserManualOperationsOnLabels Operations on Labels
 
-\section org_mitk_views_multilabelsegmentationUserManualLabelEditing Label Editing
+Depending on your selection in the 'Label Table', several actions are offered:
 
-First of all, you have to select the active label by clicking on the corresponding row in the <b>Label Table</b>. Only one label
-can be active at the time. Then you can select an editing tool in the toolbox.
+\subsubsection org_mitk_views_multilabelsegmentationUserManualOperationsOnSingleSelection Single Label Selection
 
-\section org_mitk_views_multilabelsegmentationUserManualOperationsOnLabels Operations on Labels
-
-Depending on your selection in the <b> Label Table </b>, several actions are offered:
-
-\subsection org_mitk_views_multilabelsegmentationUserManualOperationsOnSingleSelection Single Label Selection
-
-If you right click on any label in the table, a menu will pop-up offering the following actions to be performed on the selected label:
+If you right click on any label in the table, a pop-up menu offers the following actions to be performed on the selected label:
 
 <ul>
-  <li><b>Rename...</b></li> : change the name and/or color of the selected label.
-  <li><b>Remove label </b></li> : delete the selected label.
-  <li><b>Erase label </b></li> : only clear the contents of the selected label.
-  <li><b>Random color </b></li> : generate a surface mesh out of the selected label.
-  <li><b>View only </b></li> : generate a mask out of the selected label. A mask is a binary image with "1" inside and "0" outside.
-  <li><b>View/Hide all </b></li> : generate a mask out of the selected label. A mask is a binary image with "1" inside and "0" outside.
-  <li><b>Lock/Unlock all </b></li> : generate a mask out of the selected label. A mask is a binary image with "1" inside and "0" outside.
-  <li><b>Create surface </b></li> : generate a surface out of the selected label.
+<li><b>Rename...</b></li> : change the name and/or color of the selected label.
+<li><b>Remove...</b></li> : delete the selected label.
+<li><b>Erase...</b></li> : only clear the contents of the selected label.
+<li><b>Merge...</b></li> : merge two labels by selecting a second label.
+<li><b>Random color </b></li> : assign a random color to the label.
+<li><b>View only </b></li> : make all labels except the current selected label invisible.
+<li><b>View/Hide all </b></li> : make all labels visible / invisible
+<li><b>Lock/Unlock all </b></li> : lock or unlock all labels.
+<li><b>Create surface </b></li> : generate a surface out of the selected label.
   <li><b>Create mask </b></li> : generate a mask out of the selected label. A mask is a binary image with "1" inside and "0" outside.
+  <li><b>Create cropped mask </b></li> : generate a binary mask out of the selected label. Crop changes the extent of the resulting image to the extent of the label.
 </ul>
 
 \imageMacro{"org_mitk_views_multilabelsegmentationIMGLabelTableSingleSelectionContextMenu.png", "Context menu for single label selection", 12}
 
-\subsection org_mitk_views_multilabelsegmentationUserManualOperationsOnMultipleSelection Multiple Label Selection
+\subsubsection org_mitk_views_multilabelsegmentationUserManualOperationsOnMultipleSelection Multiple Label Selection
 
-If more than one label is selected, a different menu will show up:
+You can select more than one label by shift-click on other labels. If more than one label is selected, different options will appear in the menu:
 
 \imageMacro{"org_mitk_views_multilabelsegmentationIMGLabelTableMultipleSelectionContextMenu.png", "Context menu for multiple label selection", 12}
 
 <ul>
-  <li><b>Merge selection on current label</b></li> : transfer the contents of the selected labels in the <b>Label Table</b> into the current one.
+  <li><b>Merge selection on current label</b></li> : transfer the contents of the selected labels in the 'Label Table' into the current one.
   <li><b>Remove selected labels</b></li> : delete the selected labels.
   <li><b>Erase selected labels</b></li> : only clear the contents of the selected labels.
-  <li><b>Create a surface for each selected label</b></li> : generate a surface mesh out of each selected label.
-  <li><b>Combine and create a surface</b></li> : generate a surface out of the combination of the selected labels.
-  <li><b>Create a mask for each selected label</b></li> : generate a mask out of each selected label. A mask is a binary image with "1" inside and "0" outside.
-  <li><b>Combine and create a mask</b></li> : generate a mask out of the combination of the selected labels.
 </ul>
 
 */

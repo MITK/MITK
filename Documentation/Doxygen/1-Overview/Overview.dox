@@ -3,44 +3,48 @@
 
 ![MITK Logo][logo]
 
-The [Medical Imaging Interaction Toolkit][mitk] (MITK) is a free and versatile open-source software project for development of medical image processing applications. It can be used as a C++ toolkit or application framework for software development.
-Below you find documentation targeting different
+The [Medical Imaging Interaction Toolkit][mitk] (MITK) is a free and versatile open-source software project for the development of medical image processing applications. It can be used as a C++ toolkit or application framework for software development.
+Below you can find documentation targeting different
 usage scenarios:
 
 <ul>
-	<li> <b> I want to use MITK as an application </b>
+	<li> <b> You may want to use MITK as an application </b>
 
-	You will use the MITK Workbench as an end user and will find 	user manuals in \ref UserManualPortal and \ref 	PluginListPage.
+	You may want to use the MITK Workbench as an end user and will find user manuals in \ref UserManualPortal and \ref PluginListPage.
 
-<li>  <b> I want to develop my own software framework, and use some of MITK's data structures and algorithms</b>
+<li>  <b> You may want to develop your own software framework, and use some of MITK's data structures and algorithms</b>
 
-You will use MITK as a toolkit and probably benefit most from the \ref BuildInstructionsPage and <a
+You may want to use MITK as a toolkit and probably benefit most from the \ref BuildInstructionsPage and <a
 href="modules.html">MITK API Documentation</a>.
 
-<li> <b>I want to use the MITK and BlueBerry software framework to develop my own software </b>
+<li> <b>You may want to use the MITK and BlueBerry software framework to develop your own software </b>
 
-Here you have again two options.
+</ul>
 
-<li>  <b>I want use the MITK Workbench and extend its capabilities</b>
+Here you have again two options:
 
-You are using MITK as software framework and writing your own modules and plugins for MITK. You want to read the \ref BuildInstructionsPage and further on \ref Development. Also you might want to take a look at our \ref CMAKE_FAQ.
 
-<li>  <b>I want to create my own application based on MITK</b>
+<ul>
+<li>  <b>You may want to use the MITK Workbench and extend its capabilities</b>
 
-This is probably the most common way to use MITK. You are using MITK as software framework and building your own project and application using MITK. You want to read \ref HowToNewProject and the general information in \ref Development. Also you might want to take a look at our \ref CMAKE_FAQ.
+You may want to use MITK as a software framework and writing your own modules and plugins for MITK. You may want to read the \ref BuildInstructionsPage and \ref StartingDevelopment. Also, you might want to take a look at our \ref CMAKE_FAQ.
+
+<li>  <b>You may want to create your own application based on MITK</b>
+
+This is probably the most common way to use MITK. You may want to use MITK as a software framework and build your own project and application using MITK. You may want to read \ref HowToNewProject and the general information in \ref StartingDevelopment. Also, you might want to take a look at our \ref CMAKE_FAQ.
 </ul>
 
 <h2>About MITK</h2>
 
-MITK is an open-source framework that was originally developed as a common framework for Ph.D. students in the Division of Medical and Biological Informatics (MBI) at the German Cancer Research Center. MITK aims at supporting the development of leading-edge medical imaging software with a high degree of interaction.
+MITK is an open-source framework that was originally developed as a common framework for Ph.D. students in the Division of Medical and Biological Informatics (MBI) of the German Cancer Research Center. MITK aims to support the development of leading-edge medical imaging software with a high degree of interaction.
 
-MITK re-uses virtually anything from VTK and ITK. Thus, it is not at all a competitor to VTK or ITK, but an extension, which tries to ease the combination of both and to add features not supported by VTK or ITK.
+MITK re-uses virtually anything from VTK and ITK. Thus, it is not a competitor to VTK or ITK at all, but an extension, which tries to ease the combination of both, and to add features not supported by VTK or ITK.
 
 Research institutes, medical professionals and companies alike can use MITK as a basic framework for their research and even commercial (thorough code research needed) software due to the BSD-like software license.
 
-Research institutes will profit from the high level of integration of ITK and VTK enhanced with data management, advanced visualization and interaction functionality in a single framework that is supported by a wide variety of researchers and developers. You will not have to reinvent the wheel over and over and can concentrate on your work.
+Research institutes will profit from the high level of integration of ITK and VTK, enhanced with data management, advanced visualization and interaction functionality in a single framework that is supported by a wide variety of researchers and developers. You don't need to reinvent the wheel over and over and can concentrate on your work.
 
-Medical Professionals will profit from MITK and the MITK applications by using its basic functionalities for research projects. But nonetheless they will be better off, unless they are programmers themselves, to cooperate with a research institute developing with MITK to get the functionalitiy they need. MITK and the MITK applications are not certified medical products and may be used in a research setting only. They must not be used in patient care.
+Medical Professionals will profit from MITK and MITK applications by using its basic functionalities for research projects. Nonetheless, they will be better off, unless they are programmers themselves, to cooperate with a research institute developing with MITK to get the functionality they need. MITK and MITK applications are not certified medical products and may be used in a research setting only. They must not be used in patient care.
 
 
 <h2>License</h2>
@@ -69,7 +73,7 @@ MITK is available as free open-source software under a [BSD-style license][licen
 [mitk-apiref]: http://docs.mitk.org/nightly/usergroup0.html
 [platforms]: http://docs.mitk.org/nightly/SupportedPlatformsPage.html
 [dkfz]: https://www.dkfz.de
-[license]: https://github.com/MITK/MITK/blob/master/LICENSE.txt
+[license]: https://github.com/MITK/MITK/blob/master/LICENSE
 [release-cycle]: http://mitk.org/MitkReleaseCycle
 [download]: http://mitk.org/Download
 [diffusion]: https://phabricator.mitk.org/source/mitk/

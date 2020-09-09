@@ -4,11 +4,11 @@
 \section NewModulePageCreateFolder Create a Folder for your Module
 
 First, create a folder for your module within /Modules  e.g. 'NewModule'.
-You need to add the new Folder to the CMakeLists.txt in the Module directory as well as well.
-Open /Modules/CMakeLists.txt, insert it into the set(module_dirs) section.
+You need to add the new folder to the ModuleList.cmake file in the Module directory as well.
+Open /Modules/ModuleList.cmake, append the folder to the MITK_MODULES list.
 
 \code
-set(module_dirs
+set(MITK_MODULES
     ...
     NewModule
 )

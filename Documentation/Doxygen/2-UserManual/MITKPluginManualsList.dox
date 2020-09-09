@@ -65,7 +65,7 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
   <li> \ref  org_mitk_gui_qt_photoacoustics_pausmotioncompensation</li>
   <li> \ref  org_mitk_example_gui_pcaexample</li>
   <li>  \ref org_mitk_gui_qt_preprocessing_resampling</li>
-  <li> \ref  org_mitk_gui_qt_pharmacokinetics_curvedescriptor</li>
+  <li> \ref  org_mitk_views_pharmacokinetics_curvedescriptor</li>
   <li> \ref  org_mitk_gui_qt_photoacoustics_imageprocessing</li>
   <li> \ref  org_mitk_gui_qt_pharmacokinetics_simulation</li>
   <li> \ref  org_mitk_gui_qt_pointsetinteractionmultispectrum</li>

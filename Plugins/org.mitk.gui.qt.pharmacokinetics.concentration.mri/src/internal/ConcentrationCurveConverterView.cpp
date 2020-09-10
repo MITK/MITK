@@ -118,10 +118,10 @@ void ConcentrationCurveConverterView::CreateQtPartControl(QWidget* parent)
     connect(m_Controls.recoverytime, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
     connect(m_Controls.relaxivity, SIGNAL(valueChanged(double)), this, SLOT(OnSettingChanged()));
 
-    connect(m_Controls.timeSeriesNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &ConcentrationCurveConverterView::OnSelectionChanged);
-    connect(m_Controls.image3DNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &ConcentrationCurveConverterView::OnSelectionChanged);
-    connect(m_Controls.baselineImageNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &ConcentrationCurveConverterView::OnSelectionChanged);
-    connect(m_Controls.t2TimeSeriesNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &ConcentrationCurveConverterView::OnSelectionChanged);
+    connect(m_Controls.timeSeriesNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &ConcentrationCurveConverterView::OnNodeSelectionChanged);
+    connect(m_Controls.image3DNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &ConcentrationCurveConverterView::OnNodeSelectionChanged);
+    connect(m_Controls.baselineImageNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &ConcentrationCurveConverterView::OnNodeSelectionChanged);
+    connect(m_Controls.t2TimeSeriesNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &ConcentrationCurveConverterView::OnNodeSelectionChanged);
     connect(m_Controls.PDWImageNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &ConcentrationCurveConverterView::OnSettingChanged);
 
     connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), this, SLOT(OnSettingChanged()));
@@ -449,7 +449,7 @@ mitk::Image::Pointer ConcentrationCurveConverterView::ConvertT2ConcentrationImga
     return concentrationImage;
 }
 
-void ConcentrationCurveConverterView::OnSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/)
+void ConcentrationCurveConverterView::OnNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/)
 {
     m_selectedNode = nullptr;
     m_selectedImage = nullptr;

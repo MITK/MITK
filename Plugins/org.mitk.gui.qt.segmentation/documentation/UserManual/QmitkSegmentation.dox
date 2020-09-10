@@ -7,57 +7,43 @@
 
 \tableofcontents
 
-\section org_mitk_gui_qt_segmentationUserManualOverview Overview
+\section org_mitk_views_segmentationUserManualOverview Overview
 
-The <b>Segmentation plugin</b> allows you to create segmentations of anatomical and pathological structures in medical images of the human body.
-The plugin consists of a number of view which can be used for:
+Segmentation is the act of partitioning an image into subsets by either manual or automated delineation to create i.e. a distinction between foreground and background. 
+The MITK <b>Segmentation plugin</b> allows you to create segmentations of anatomical and pathological structures in medical images.
+The plugin consists of a number of views which can be used for:
 <ul>
-  <li> manual and (semi-)automatic segmentation of organs on CT or MR image volumes via the <b>Segmentation View</b>
-  <li> segmentation postprocessing via the \subpage org_mitk_views_segmentationutilities
-  <li> clipping of existing segmentations using a resection plane via the \subpage org_mitk_views_deformableclippingplane
+  <li> Manual and (semi-)automatic segmentation via the <b>Segmentation View</b>
+  <li> Segmentation post-processing via \subpage org_mitk_views_segmentationutilities
+  <li> Clipping of existing segmentations using a resection plane via \subpage org_mitk_views_deformableclippingplane
 </ul>
 
-\imageMacro{QmitkSegmentation_IMGApplication.png,"Segmentation Plugin consisting of the Segmentation View the Segmentation Utilities View and the Clipping Plane View", 16.00}
+\imageMacro{QmitkSegmentationPlugin_Overview.png,"Segmentation plugin overview", 16.00}
 
+\section org_mitk_views_segmentationPreferences Preferences
 The segmentation plugin offers a number of preferences which can be set via the MITK Workbench application preference dialog:
 
-\imageMacro{QmitkSegmentation_IMGPreferences.png,"Segmentation Plugin consisting of the Segmentation View the Segmentation Utilities View and the Clipping Plane View", 10.00}
+\imageMacro{QmitkSegmentationPreferences.png,"Segmentation preferences", 10.00}
 
-The following preferences can be set:
 <ul>
   <li> <b>Slim view:</b> Allows you to show or hide the tool button description of the Segmentation View
   <li> <b>2D display:</b> Specify whether the segmentation is drawn as outline or as a transparent overlay
   <li> <b>3D display:</b> Activate 3D volume rendering for your segmentation
-  <li> <b>Data node selection mode:</b> If activated the segmentation image combo box is always sychronized with the data manager selection.
+  <li> <b>Data node selection mode:</b> If activated the segmentation image selection is automatically chosen from the data manager selection.
   <li> <b>Smoothed surface creation:</b> Set certain smoothing parameters for surface creation
 </ul>
 
-If you wonder what segmentations are good for, we shortly revisit the concept of a segmentation here.
-A CT or MR image is made up of volume of physical measurements (volume elements are called voxels).
-In CT images, for example, the gray value of each voxel corresponds to the mass absorbtion coefficient for X-rays in this voxel, which is similar in many %parts of the human body.
-The gray value does not contain any further information, so the computer does not know whether a given voxel is part of the body or the background, nor can it tell a brain from a liver.
-However, the distinction between a foreground and a background structure is required when:
-<ul>
-<li>you want to know the volume of a given organ (the computer needs to know which %parts of the image belong to this organ)
-<li>you want to create 3D polygon visualizations (the computer needs to know the surfaces of structures that should be drawn)
-<li>as a necessary pre-processing step for therapy planning, therapy support, and therapy monitoring
-</ul>
-Creating this distinction between foreground and background is called <i>segmentation</i>.
-The Segmentation perspective of the MITK Workbench uses a voxel based approach to segmentation, i.e. each voxel of an image must be completely assigned to either foreground or background.
-This is in contrast to some other applications which might use an approach based on contours, where the border of a structure might cut a voxel into two %parts.
 
-The remainder of this document will summarize the features of the Segmentation perspective and how they are used.
+\section org_mitk_views_segmentationUserManualTechnical Technical Issues
 
-\section org_mitk_gui_qt_segmentationUserManualTechnical Technical Issues
-
-The Segmentation perspective makes a number of assumptions. To know what this view can be used for, it will help you to know that:
+The Segmentation perspective makes a number of assumptions:
 <ul>
   <li> Images must be 2D, 3D, or 3D+t
   <li> Images must be single-values, i.e. CT, MRI or "normal" ultrasound. Images from color doppler or photographic (RGB) images are not supported
   <li> Segmentations are handled as binary images of the same extent as the original image
 </ul>
 
-\section org_mitk_gui_qt_segmentationUserManualImageSelection Image Selection
+\section org_mitk_views_segmentationUserManualImageSelection Image Selection
 
 The Segmentation perspective makes use of the Data Manager view to give you an overview of all images and segmentations.
 
@@ -70,7 +56,7 @@ If no segmentation image exists or none is selected create a new segmentation im
 Some items of the graphical user interface might be disabled when no image is selected or the selected image does not fit to the patient image's geoemtry.
 In any case, the application will give you hints if a selection is needed.
 
-\section org_mitk_gui_qt_segmentationUserManualToolOverview Tool overview
+\section org_mitk_views_segmentationUserManualToolOverview Tool overview
 
 MITK comes with a comprehensive set of segmentation tools. These tools can be differenciated between manual slice-based 2D segmentation tools and (semi-)automated 3D tools.
 The manual 2D tools require a big amount of user interaction and can only be applied to a single image slice whereas the 3D tools operate on the hole image. The 3D tools usually
@@ -79,7 +65,7 @@ You can switch between the different toolsets by switching the 2D/3D tab in the 
 
 \imageMacro{QmitkSegmentation_ToolOverview.png,"An overview of the existing tools in MITK. There are interactive 2D tools as well as (semi-)automated 3D tools",5.50}
 
-\section org_mitk_gui_qt_segmentationUserManualManualKringeling Manual Contouring
+\section org_mitk_views_segmentationUserManualManualKringeling Manual Contouring
 
 With manual contouring you define which voxels are part of the segmentation and which are not.
 This allows you to create segmentations of any structeres that you may find in an image, even if they are not part of the human body.
@@ -87,7 +73,7 @@ You might also use manual contouring to correct segmentations that result from s
 The drawback of manual contouring is that you might need to define contours on many 2D slices.
 However, this is moderated by the interpolation feature, which will make suggestions for a segmentation.
 
-\subsection org_mitk_gui_qt_segmentationUserManualManualKringeling1 Creating New Segmentations
+\subsection org_mitk_views_segmentationUserManualManualKringeling1 Creating New Segmentations
 
 Unless you want to edit existing segmentations, you have to create a new, empty segmentation before you can edit it.
 To do so, click the "New manual segmentation" button.
@@ -99,7 +85,7 @@ If you use names that are not yet known to the application, it will automaticall
 Once you created a new segmentation, you can notice a new item with the "binary mask" icon in the Data Manager tree view.
 This item is automatically selected for you, allowing you to %start editing the new segmentation right away.
 
-\subsection org_mitk_gui_qt_segmentationUserManualManualKringeling2 Selecting Segmentations for Editing
+\subsection org_mitk_views_segmentationUserManualManualKringeling2 Selecting Segmentations for Editing
 
 As you might want to have segmentations of multiple structures in a single patient image, the application needs to know which of them to use for editing.
 You select a segmenation by clicking it in the tree view of Data Manager. Note that segmentations are usually displayed as sub-items of "their" patient image.
@@ -108,7 +94,7 @@ In the rare case, where you need to edit a segmentation that is not displayed as
 When a selection is made, the Segmentation View will hide all but the selected segmentation and the corresponding original image.
 When there are multiple segmentations, the unselected ones will remain in the Data Manager, you can make them visible at any time by selecting them.
 
-\subsection org_mitk_gui_qt_segmentationUserManualManualKringeling3 Selecting Editing Tools
+\subsection org_mitk_views_segmentationUserManualManualKringeling3 Selecting Editing Tools
 
 If you are familiar with the MITK Workbench, you know that clicking and moving the mouse in any of the 2D render windows will move around the crosshair that defines what part of the image is displayed.
 This behavior is disabled while any of the manual segmentation tools are active -- otherwise you might have a hard time concentrating on the contour you are drawing.
@@ -119,7 +105,7 @@ Selecting a different tool also deactivates the previous one.
 
 If you have to delineate a lot of images, you should try using shortcuts to switch tools. Just hit the first letter of each tool to activate it (A for Add, S for Subtract, etc.).
 
-\subsection org_mitk_gui_qt_segmentationUserManualManualKringeling4 Using Editing Tools
+\subsection org_mitk_views_segmentationUserManualManualKringeling4 Using Editing Tools
 
 All of the editing tools work by the same principle: you use the mouse (left button) to click anywhere in a 2D window (any of the orientations axial, sagittal, or frontal), move the mouse while holding the mouse button and release to finish the editing action.
 
@@ -193,7 +179,7 @@ The contour will be transfered to its binary image representation by deactivatin
 Provides a fast marching based 2D interaction segmentation tool. You start with setting seedpoints in an image slice. Via several sliders you can
 adapt parameters and see the fast marching result instantly.
 
-\subsection org_mitk_gui_qt_segmentationUserManualManualKringeling5 Interpolation
+\subsection org_mitk_views_segmentationUserManualManualKringeling5 Interpolation
 
 Creating segmentations for modern CT volumes is very time-consuming, because structures of interest can easily cover a range of 50 or more slices.
 The Manual Segmentation View offers two helpful features for these cases:
@@ -228,41 +214,41 @@ Interpolated suggestions are displayed in a different way than manual segmentati
 To accept single slices, click the "Accept" button below the toolbox.
 If you have segmented a whole organ in every-x-slice, you may also review the interpolations and then accept all of them at once by clicking "... all slices".
 
-\section org_mitk_gui_qt_segmentationUserManual3DSegmentationTools 3D Segmenation tools
+\section org_mitk_views_segmentationUserManual3DSegmentationTools 3D Segmenation tools
 
 The 3D tools operate on the hole image and require usually a small amount of interaction like placing seed-points or specifying certain parameters. All 3D tools provide
 an immediate segmentation feedback, which is displayed as a transparent green overlay. For accepting a preview you have to press the "Comfirm" button of the selected tool.
 The following 3D tools are at your disposal:
 
-\subsection org_mitk_gui_qt_segmentationUserManual3DThresholdTool 3D Threshold tool
+\subsection org_mitk_views_segmentationUserManual3DThresholdTool 3D Threshold tool
 
 The Thresholding tool simply applies a 3D threshold to the patient image. All pixels with values equal or above the selected threshold are labeled.
 You can change the threshold by either moving the slider of setting a certain value in the spinbox.
 
 \imageMacro{QmitkSegmentation_3DThresholdTool.png,"3D Threshold tool",10.00}
 
-\subsection org_mitk_gui_qt_segmentationUserManual3DULTool 3D Upper/Lower Threshold tool
+\subsection org_mitk_views_segmentationUserManual3DULTool 3D Upper/Lower Threshold tool
 
 The Upper/Lower Thresholding tool works similar to the simple 3D threshold tool but allows you to define an upper and lower threshold. All pixels with
 values within this threshold intervall will be labeled
 
 \imageMacro{QmitkSegmentation_3DULThresholdTool.png,"3D Upper/Lower Threshold tool",10.00}
 
-\subsection org_mitk_gui_qt_segmentationUserManual3DOtsuTool 3D Otsu tool
+\subsection org_mitk_views_segmentationUserManual3DOtsuTool 3D Otsu tool
 
 The 3D Otsu tool provides a more sophisticated thresholding algorithm. It allows you to define a number of regions. Based on the image histogram the pixels will
 then divided into different regions. There more regions you define the longer will the calculation take.
 
 \imageMacro{QmitkSegmentation_3DOtsuTool.png,"3D Otsu tool",10.00}
 
-\subsection org_mitk_gui_qt_segmentationUserManual3DFMTool 3D Fast Marching tool
+\subsection org_mitk_views_segmentationUserManual3DFMTool 3D Fast Marching tool
 
 The 3D Fast Marching tools works similar to the 2D pendant but on the hole image. Depending on you image's size the calculation will take some time.
 You can interactive set the parameters of the algorithm via the tool GUI.
 
 \imageMacro{QmitkSegmentation_3DFMTool.png,"3D Fast Marching tool",10.00}
 
-\subsection org_mitk_gui_qt_segmentationUserManual3DRGTool 3D Region Growing tool
+\subsection org_mitk_views_segmentationUserManual3DRGTool 3D Region Growing tool
 
 The 3D Region Growing tool works similar to the 2D pendant. At the beginning you have to place a seedpoint and define a threshold intervall. If you press
 "Run segmentation" a preview is calculated, if the "3D preview" box is checked you will also see the result in 3D. By moving the "Adapt region growing slider"
@@ -270,20 +256,20 @@ you can interactively adapt the result to you image.
 
 \imageMacro{QmitkSegmentation_3DRGTool.png,"3D Region Growing tool",10.00}
 
-+\subsection org_mitk_gui_qt_segmentationUserManual3DWatershedTool 3D Watershed tool
++\subsection org_mitk_views_segmentationUserManual3DWatershedTool 3D Watershed tool
 
 This tool provides a watershed based segmentation algorithm.
 
 \imageMacro{QmitkSegmentation_3DWatershedTool.png,"3D Watershed tool",10.00}
 
-\subsection org_mitk_gui_qt_segmentationUserManualPickingTool Picking tool
+\subsection org_mitk_views_segmentationUserManualPickingTool Picking tool
 
 The Picking tool allows you to select islands within your segmentation. This is especially usefull if e.g. a thresholding delivered your several areas within
 your image but you are just interested in one special region.
 
 \imageMacro{QmitkSegmentation_PickingTool.png,"Picking tool",10.00}
 
-\section org_mitk_gui_qt_segmentationUserManualPostprocessing Things you can do with segmentations
+\section org_mitk_views_segmentationUserManualPostprocessing Things you can do with segmentations
 
 As mentioned in the introduction, segmentations are never an end in themselves.
 Consequently, the Segmentation view adds a couple of "post-processing" %actions to the Data Manager.
@@ -310,7 +296,7 @@ Select the image and the surface in the corresponding drop-down boxes (both are 
 
 After clicking "Create segmentation from surface" the newly created binary image is inserted in the DataManager and can be used for further processing
 
-\section org_mitk_gui_qt_segmentationUserManualTechnicalDetail Technical Information for Developers
+\section org_mitk_views_segmentationUserManualTechnicalDetail Technical Information for Developers
 
 For technical specifications see \subpage QmitkSegmentationTechnicalPage and for information on the extensions of the tools system \subpage toolextensions .
 

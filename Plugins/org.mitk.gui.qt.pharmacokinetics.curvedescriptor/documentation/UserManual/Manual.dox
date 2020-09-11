@@ -23,7 +23,5 @@ Alternatively, if semi-quantitative parameters should be calculated from concent
 Parameters of interest can be selected from the list. Selecting a 4D image enables the <i>Calculate Parameters</i> button.
 Resulting parameter maps will afterwards be added to the data manager as subnodes to the analyzed 4D image.
 
-\section org_mitk_views_pharmacokinetics_curvedescriptor_Contact Contact information
-If you have any questions, need support, find a bug or have a feature request, feel free to contact us at www.mitk.org.
 
 */

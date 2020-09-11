@@ -27,7 +27,7 @@
   \li \subpage org_mitk_gui_qt_photoacoustics_pausmotioncompensation
   \li \subpage org_mitk_example_gui_pcaexample
   \li \subpage org_mitk_gui_qt_preprocessing_resampling
-  \li \subpage org_mitk_gui_qt_pharmacokinetics_curvedescriptor
+  \li \subpage org_mitk_views_pharmacokinetics_curvedescriptor
   \li \subpage org_mitk_gui_qt_photoacoustics_imageprocessing
   \li \subpage org_mitk_gui_qt_pharmacokinetics_simulation
   \li \subpage org_mitk_gui_qt_pointsetinteractionmultispectrum

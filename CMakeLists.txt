@@ -986,12 +986,13 @@ endif()
 #-----------------------------------------------------------------------------
 
 if(BUILD_TESTING)
+  #[[ See T27701
   # Initial cache for ProjectTemplate and PluginGenerator tests
   configure_file(
      CMake/mitkTestInitialCache.txt.in
      ${MITK_BINARY_DIR}/mitkTestInitialCache.txt
      @ONLY
-  )
+  )]]
 
   # Configuration for the CMake-generated test driver
   set(CMAKE_TESTDRIVER_EXTRA_INCLUDES "#include <stdexcept>")

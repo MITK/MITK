@@ -17,8 +17,8 @@ The plugin consists of a number of views:
   <li> \subpage org_mitk_views_segmentationutilities : Segmentation post-processing
   <li> \subpage org_mitk_views_deformableclippingplane : Clipping of existing segmentations using a resection plane
 </ul>
-In this documentation, the features and usage of the segmentation plugin will be described. 
-For an introduction to the segmentation utilities and clipping plane plugin, please be referred to the respective documentation pages. 
+In this documentation, the features and usage of the segmentation view will be described.
+For an introduction to the segmentation utilities and clipping plane views, please be referred to the respective documentation pages.
 
 \imageMacro{QmitkSegmentationPlugin_Overview.png,"Segmentation plugin overview", 16.00}
 
@@ -51,13 +51,12 @@ To select a reference image for the segmentation, click on the <i>Patient Image<
 By default the auto selection mode is enabled (see \ref org_mitk_views_segmentationPreferences).\n
 Once a patient image is selected, a new segmentation can be created on this reference image by clicking the <i>New...</i> button to the right of the <i>Segmentation</i> selection widget.
 An input field will appear which allows you to set the name and display color of the segmentation. Notice that the input field suggests names once you %start typing and that it also suggests colors for known organ names. 
-If you use names that are not yet known to the application, it will automatically remember these names and consider them the next time you create a new segmentation.
 Once generated the segmentation will be added with "binary mask" icon to the data manager as subnode of the reference image. This item is automatically selected for you, allowing you to start editing the new segmentation right away.
 
 
 \subsection org_mitk_views_segmentationUserManualManualKringeling2 Selecting Segmentations for Editing
 Alternatively to creating a new segmentation, an existing one can be edited as well.
-As you might have segmented multiple structures in a single patient image, the application needs to know which of them to use for editing.
+As you might have segmented multiple structures within a single image, the application needs to know which of them to use for editing.
 For that you click the segmentation selection widget and a selection field will open, containing all suitable segmentations for the parent dataset available in the data manager. 
 
 
@@ -65,7 +64,7 @@ For that you click the segmentation selection widget and a selection field will 
 
 MITK offers a comprehensive set of slice-based 2D and (semi-)automated 3D segmentation tools.
 The manual 2D tools require some user interaction and can only be applied to a single image slice whereas the 3D tools operate on the whole image. The 3D tools usually only
-require a small amount of user interaction, i.e. placing seed points or setting setting/adjusting parameters.
+require a small amount of user interaction, i.e. placing seed points or setting/adjusting parameters.
 You can switch between the different toolsets by selecting the 2D or 3D tab in the segmentation view.
 
 \imageMacro{QmitkSegmentation_ToolOverview.png,"An overview of the existing 2D and 3D tools in MITK.",5.50}
@@ -73,7 +72,7 @@ You can switch between the different toolsets by selecting the 2D or 3D tab in t
 \section org_mitk_views_segmentationUserManualManualKringeling 2D Segmentation Tools
 
 With 2D manual contouring you define which voxels are part of the segmentation and which ones are not. This allows you to create segmentations of any structures of interest in an image.
-You might also use manual contouring to correct segmentations that result from sub-optimal automatic methods.
+You can also use manual contouring to correct segmentations that result from sub-optimal automatic methods.
 The drawback of manual contouring is that you might need to define contours on many 2D slices. However, this is mitigated by the interpolation feature, which will make suggestions for a segmentation.
 
 \subsection org_mitk_views_segmentationUserManualManualKringeling3 Selecting Editing Tools
@@ -144,7 +143,7 @@ Left-click inside a segmentation with holes to completely fill all holes. Left-c
 
 \imageMacro{QmitkSegmentation_IMGIconErase.png,"Erase Tool",3.79}
 
-This tool removes a connected part of pixels that form a segmentation. You may use it to remove single segmentations(left-click on specific segmentation) or to clear a whole slice at once (left-click outside a segmentation).
+This tool removes a connected part of pixels that form a segmentation. You may use it to remove single segmentations (left-click on specific segmentation) or to clear a whole slice at once (left-click outside a segmentation).
 
 \subsection org_mitk_views_segmentationUserManualLiveWireTool Live Wire Tool
 
@@ -152,7 +151,7 @@ This tool removes a connected part of pixels that form a segmentation. You may u
 
 The Live Wire Tool acts as a magnetic lasso with a contour snapping to edges of objects.
 
-\imageMacro{QmitkSegmentation_IMGLiveWireUsage.PNG,"Steps for using LiveWire Tool",16.00}
+\imageMacro{QmitkSegmentation_IMGLiveWireUsage.PNG,"Steps for using the Live Wire Tool",16.00}
 
 <ul>
 <li>(1) To start the Tool you have to double click near the edge of the object you want to segment. The initial anchor point will snap to the edge within a 3x3 region.
@@ -196,9 +195,9 @@ To confirm single slices, click the <i>Confirm for single slice</i> button below
 
 <b>The 3D interpolation</b> creates suggestions for 3D segmentations. That means if you start contouring, from the second contour onwards, the surface of the segmented area will be interpolated based on the given contour information.
 The interpolation works with all available manual tools. Please note that this is currently a pure mathematical interpolation, i.e. image intensity information is not taken into account. 
-With each further contour the interpolation result will be improved,but the more contours you provide the longer the recalculation will take. 
+With each further contour the interpolation result will be improved, but the more contours you provide the longer the recalculation will take. 
 To achieve an optimal interpolation result and in this way a most accurate segmentation you should try to describe the surface with sparse contours by segmenting in arbitrary
-oriented planes. The 3D interpolation is not meant to be used for parallel slice-wise segmentation, but rather i.e. a segmentation in the axial, coronal and sagittal plane.
+oriented planes. The 3D interpolation is not meant to be used for parallel slice-wise segmentation, but rather segmentations in i.e. the axial, coronal and sagittal plane.
 
 \imageMacro{QmitkSegmentation_3DInterpolationWrongRight.png,"3D Interpolation Usage",16.00}
 
@@ -237,20 +236,20 @@ values within this threshold interval will be labeled as part of the segmentatio
 \subsection org_mitk_views_segmentationUserManual3DOtsuTool 3D Otsu Tool
 
 The 3D Otsu tool provides a more sophisticated thresholding algorithm. It allows you to define a number of regions. Based on the image histogram the pixels will
-then be divided into different regions. There more regions you define the longer the calculation will take.
+then be divided into different regions. The more regions you define the longer the calculation will take.
 
 \imageMacro{QmitkSegmentation_3DOtsuTool.png,"3D Otsu tool",10.00}
 
 \subsection org_mitk_views_segmentationUserManual3DFMTool 3D Fast Marching Tool
 
-The 3D Fast Marching tools works similar to the 2D pendant but on the whole image. Depending on your image size the calculation might take some time.
+The 3D Fast Marching tool works similar to the 2D pendant but on the whole image. Depending on your image size the calculation might take some time.
 You can interactively set the parameters of the algorithm via the GUI. The resulting segmentation will be automatically updated.
 
 \imageMacro{QmitkSegmentation_3DFMTool.png,"3D Fast Marching tool",10.00}
 
 \subsection org_mitk_views_segmentationUserManual3DRGTool 3D Region Growing Tool
 
-The 3D Region Growing tool works similar to the 2D pendant. At the beginning you have to place a more seedpoint and define a threshold interval. If you press
+The 3D Region Growing tool works similar to the 2D pendant. At the beginning you have to place a seedpoint and define a threshold interval. If you press
 <i>Run Segmentation</i> a preview is calculated. By moving the <i>Adapt region growing</i> slider you can interactively adapt the segmentation result.
 
 \imageMacro{QmitkSegmentation_3DRGTool.png,"3D Region Growing tool",10.00}
@@ -263,7 +262,7 @@ This tool provides a watershed based segmentation algorithm.
 
 \subsection org_mitk_views_segmentationUserManualPickingTool Picking Tool
 
-The Picking tool allows you to select islands within your segmentation. This is especially useful if e.g. a thresholding delivered your several areas within
+The Picking tool allows you to select islands within your segmentation. This is especially useful if e.g. a thresholding provided you with several areas within
 your image but you are just interested in one special region.
 
 \imageMacro{QmitkSegmentation_PickingTool.png,"Picking tool",10.00}

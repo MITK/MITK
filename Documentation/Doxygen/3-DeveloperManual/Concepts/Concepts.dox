@@ -18,6 +18,7 @@ The following items describe some issues about MITK on a more abstract level.
  -# \subpage PipelineingConceptPage
  -# \subpage AnnotationPage
  -# \subpage PersistenceConceptPage
+ -# \subpage SelectionConceptPage
 -# \subpage QVTKRendering
 -# Interaction
  -# \subpage DataInteractionPage

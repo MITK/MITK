@@ -173,7 +173,7 @@ void QmitkBasicImageProcessing::CreateQtPartControl(QWidget *parent)
   m_Controls->gbTwoImageOps->hide();
 
   m_Controls->cbWhat1->clear();
-  m_Controls->cbWhat1->insertItem(NOACTIONSELECTED, "Please select operation");
+  m_Controls->cbWhat1->insertItem(NOACTIONSELECTED, "Please select an operation");
   m_Controls->cbWhat1->insertItem(CATEGORY_DENOISING, "--- Denoising ---");
   m_Controls->cbWhat1->insertItem(GAUSSIAN, "Gaussian");
   m_Controls->cbWhat1->insertItem(MEDIAN, "Median");
@@ -197,7 +197,7 @@ void QmitkBasicImageProcessing::CreateQtPartControl(QWidget *parent)
   m_Controls->cbWhat1->insertItem(RESCALE2, "Rescale values by scalar");
 
   m_Controls->cbWhat2->clear();
-  m_Controls->cbWhat2->insertItem(TWOIMAGESNOACTIONSELECTED, "Please select on operation");
+  m_Controls->cbWhat2->insertItem(TWOIMAGESNOACTIONSELECTED, "Please select an operation");
   m_Controls->cbWhat2->insertItem(CATEGORY_ARITHMETIC, "--- Arithmetric operations ---");
   m_Controls->cbWhat2->insertItem(ADD, "Add to Image 1:");
   m_Controls->cbWhat2->insertItem(SUBTRACT, "Subtract from Image 1:");

@@ -9,11 +9,6 @@
 This view (Model Fit Inspector; MFI) offers the possibility to display the time course of the signal within an individual
 voxel (with or without fit).
 
-\section FIT_INSPECTOR_Contact Contact information
-This plug-in is being developed by the SIDT group (Software development for Integrated Diagnostics
-and Therapy) at the German Cancer Research Center (DKFZ). If you have any questions, need support,
-find a bug or have a feature request, feel free to contact us at www.mitk.org.
-
 \section FIT_INSPECTOR_Raw Viewing without a model fit
 \imageMacro{fit_inspect_raw.png, "Example screen shot showing the inspection of raw dynamic data without a fit.", 10}
 Open the view and select the dynamic image in the data manager.

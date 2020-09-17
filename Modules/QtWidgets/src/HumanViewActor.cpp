@@ -121,7 +121,7 @@ void HumanViewActor::AllocateBuffers()
 
 HumanViewActor::~HumanViewActor()
 {
-  if (!m_FirstRender) {
+  if (!m_FirstRender && GLEW_VERSION_3_0) {
     glDeleteBuffers(2, m_Vbo);
     glDeleteBuffers(1, &m_Ibo);
     glDeleteVertexArrays(1, &m_Vao);
@@ -171,6 +171,9 @@ int HumanViewActor::RenderOverlay(vtkViewport* viewport)
 {
   if (m_FirstRender) {
     // God forbids using glew before window is created
+    if (!GLEW_VERSION_3_0) {
+      return 0;
+    }
     AllocateBuffers();
     m_FirstRender = false;
   }

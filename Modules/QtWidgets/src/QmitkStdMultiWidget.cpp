@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #define SMW_INFO MITK_INFO("widget.stdmulti")
 
+#include "HumanViewActor.h"
 #include "QmitkStdMultiWidget.h"
 
 #include <boost/format.hpp>
@@ -56,8 +57,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCornerAnnotation.h>
 #include <vtkMitkRectangleProp.h>
 #include "mitkPixelTypeMultiplex.h"
-
-#include "HumanViewActor.h"
 
 void QmitkStdMultiWidget::UpdateAnnotationFonts()
 {

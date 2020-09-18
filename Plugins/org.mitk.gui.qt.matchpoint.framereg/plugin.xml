@@ -2,7 +2,7 @@
 <plugin>
 
   <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.views.matchpoint.algorithm.framereg"
+    <view id="org.mitk.views.matchpoint.framereg"
           name="MatchPoint Frame Correction"
           class="QmitkMatchPointFrameCorrection"
 		  category="Registration"

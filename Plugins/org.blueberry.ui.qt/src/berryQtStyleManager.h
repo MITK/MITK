@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QHash>
 
+#include <typeinfo>
+
 namespace berry {
 
 class BERRY_UI_QT QtStyleManager : public QObject, public IQtStyleManager

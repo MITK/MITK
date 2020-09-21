@@ -207,6 +207,15 @@ void mitk::ExtractSliceFilter::GenerateData(){
         extent[1] = bottomInIndex.GetNorm();
       }
 
+      // Coresponds to most common max opengl texture size
+      // Can't use opengl to get value cause filter could be started without opengl (?)
+      // vtkTexture will resample to real max dim anyway, if it is too big
+      if (m_VtkOutputRequested) {
+        const double maxDimGL = 32768.;
+        extent[0] = std::min(extent[0], maxDimGL);
+        extent[1] = std::min(extent[1], maxDimGL);
+      }
+
       // Get the extent of the current world geometry and calculate resampling
       // spacing therefrom.
       widthInMM = m_WorldGeometry->GetExtentInMM( 0 );

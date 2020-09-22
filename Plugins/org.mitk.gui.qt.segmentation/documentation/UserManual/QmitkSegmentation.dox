@@ -41,7 +41,7 @@ The segmentation plugin offers a number of preferences which can be set via the 
 The segmentation plugin makes a number of assumptions:
 <ul>
   <li> Images must be 2D, 3D, or 3D+t.
-  <li> Images must be single-values, i.e. CT, MRI or "normal" ultrasound. Images from color doppler or photographic (RGB) images are not supported.
+  <li> Images must be single-values, i.e. CT, MRI or "normal" ultrasound. Images from color doppler or photographic (RGB) images are only partially supported (please be aware that some tools might not be compatible with this image type).
   <li> Segmentations are handled as binary images of the same extent as the original image.
 </ul>
 

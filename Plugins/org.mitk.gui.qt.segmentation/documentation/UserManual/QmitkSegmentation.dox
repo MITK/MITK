@@ -174,15 +174,12 @@ Provides a fast marching based 2D interaction segmentation tool. You start with 
 
 Creating segmentations using 2D manual contouring for large image volumes may be very time-consuming, because structures of interest may cover a large range of slices.
 The segmentation view offers two helpful features to mitigate this drawback:
-
 <ul>
-<li> <b>2D Interpolation</b>
-<li> <b>3D Interpolation</b>
+<li> 2D Interpolation
+<li> 3D Interpolation
 </ul>
-<br>
 
-<br>
-<b>The 2D Interpolation</b> creates suggestions for a segmentation whenever you have a slice that
+The <b>2D Interpolation</b> creates suggestions for a segmentation whenever you have a slice that
 <ul>
 <li> has got neighboring slices with segmentations (these do not need to be direct neighbors but could also be a couple of slices away) AND
 <li> is completely clear of a manual segmentation, i.e. there will be no suggestion if there is even only a single pixel of segmentation in the current slice.
@@ -193,7 +190,7 @@ The segmentation view offers two helpful features to mitigate this drawback:
 Interpolated suggestions are displayed as outlines, until you confirm them as part of the segmentation.
 To confirm single slices, click the <i>Confirm for single slice</i> button below the toolbox. You may also review the interpolations visually and then accept all of them at once by selecting <i>Confirm for all slices</i>.
 
-<b>The 3D interpolation</b> creates suggestions for 3D segmentations. That means if you start contouring, from the second contour onwards, the surface of the segmented area will be interpolated based on the given contour information.
+The <b>3D interpolation</b> creates suggestions for 3D segmentations. That means if you start contouring, from the second contour onwards, the surface of the segmented area will be interpolated based on the given contour information.
 The interpolation works with all available manual tools. Please note that this is currently a pure mathematical interpolation, i.e. image intensity information is not taken into account. 
 With each further contour the interpolation result will be improved, but the more contours you provide the longer the recalculation will take. 
 To achieve an optimal interpolation result and in this way a most accurate segmentation you should try to describe the surface with sparse contours by segmenting in arbitrary

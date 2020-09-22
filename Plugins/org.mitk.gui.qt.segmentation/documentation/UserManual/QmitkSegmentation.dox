@@ -84,7 +84,7 @@ If you have to delineate a lot of images, shortcuts to switch between tools beco
 
 \subsection org_mitk_views_segmentationUserManualManualKringeling4 Using Editing Tools
 
-All of the editing tools work by the same principle: you use the mouse (left button) to click anywhere in a 2D window (any of the orientations axial, sagittal, or frontal), 
+All of the editing tools work by the same principle: you use the mouse (left button) to click anywhere in a 2D window (any of the orientations axial, sagittal, or coronal),
 move the mouse while holding the mouse button and release to finish the editing action.
 Multi-step undo and redo is fully supported by all editing tools. Use the application-wide undo button in the toolbar to revert erroneous %actions.
 

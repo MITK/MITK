@@ -1,7 +1,7 @@
 /**
-\page org_mitk_views_segmentation The Segmentation
+\page org_mitk_views_segmentation The Segmentation View
 
-\imageMacro{segmentation.svg,"Icon of the Segmentation Plugin",2.00}
+\imageMacro{segmentation.svg,"Icon of the segmentation view",2.00}
 
 <i>Some of the features described below are closed source additions to the open source toolkit MITK and are not  available in every application.</i>
 
@@ -10,7 +10,7 @@
 \section org_mitk_views_segmentationUserManualOverview Overview
 
 Segmentation is the act of partitioning an image into subsets by either manual or automated delineation to create i.e. a distinction between foreground and background. 
-The MITK <b>Segmentation plugin</b> allows you to create segmentations of anatomical and pathological structures in medical images.
+The MITK <b>segmentation plugin</b> allows you to create segmentations of anatomical and pathological structures in medical images.
 The plugin consists of a number of views:
 <ul>
   <li> <b>Segmentation View</b>: Manual and (semi-)automatic segmentation
@@ -28,7 +28,7 @@ The segmentation plugin offers a number of preferences which can be set via the 
 \imageMacro{QmitkSegmentationPreferences.png,"Segmentation preferences", 10.00}
 
 <ul>
-  <li> <b>Slim view:</b> Allows you to show or hide the tool button description of the Segmentation View
+  <li> <b>Slim view:</b> Allows you to show or hide the tool button description of the segmentation view
   <li> <b>2D display:</b> Specify whether the segmentation is drawn as outline or as a transparent overlay
   <li> <b>3D display:</b> Activate 3D volume rendering for your segmentation
   <li> <b>Data node selection mode:</b> If activated the segmentation image is automatically chosen from the data manager selection.

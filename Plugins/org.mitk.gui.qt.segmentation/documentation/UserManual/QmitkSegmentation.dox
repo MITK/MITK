@@ -162,7 +162,7 @@ The Live Wire Tool acts as a magnetic lasso with a contour snapping to edges of 
 <li>(6) After closing, the contour can be edited by moving, inserting and deleting anchor points.
 </ul>
 
-The contour will be transfered to its binary image representation by deactivating the tool.
+The contour will be transferred to its binary image representation by deactivating the tool.
 
 \subsection org_mitk_views_segmentationUserManual2DFastMarchingTool 2D Fast Marching Tool
 

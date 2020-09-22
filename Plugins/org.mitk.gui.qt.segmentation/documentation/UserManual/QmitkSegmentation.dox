@@ -253,7 +253,11 @@ The 3D Region Growing tool works similar to the 2D pendant. At the beginning you
 
 \subsection org_mitk_views_segmentationUserManual3DWatershedTool 3D Watershed Tool
 
-This tool provides a watershed based segmentation algorithm.
+This tool provides a watershed based segmentation algorithm. For further information please be referred to the relevant literature, i.e.
+<ul>
+<li> T.S. Yoo, U. Neumann, H. Fuchs, S.M. Pizer, T. Cullip, J. Rhoades, and R.T.Whitaker. Direct visualization of volume data. IEEE Computer Graphics and Applications, 12(4):63–71, 1992
+<li> T.S. Yoo, S.M. Pizer, H. Fuchs, T. Cullip, J. Rhoades, and R. Whitaker. Achieving direct volume visualization with interactive semantic region selection. In Information Processing in Medical Images. Springer Verlag, 1991.
+</ul>
 
 \imageMacro{QmitkSegmentation_3DWatershedTool.png,"3D Watershed tool",10.00}
 

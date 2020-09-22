@@ -233,7 +233,7 @@ values within this threshold interval will be labeled as part of the segmentatio
 \subsection org_mitk_views_segmentationUserManual3DOtsuTool 3D Otsu Tool
 
 The 3D Otsu tool provides a more sophisticated thresholding algorithm. It allows you to define a number of regions. Based on the image histogram the pixels will
-then be divided into different regions. The more regions you define the longer the calculation will take.
+then be divided into different regions. The more regions you define the longer the calculation will take. You can select afterwards which of these regions you want to confirm as segmentation.
 
 \imageMacro{QmitkSegmentation_3DOtsuTool.png,"3D Otsu tool",10.00}
 

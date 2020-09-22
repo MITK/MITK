@@ -51,7 +51,7 @@ To select a reference image for the segmentation, click on the <i>Patient Image<
 By default the auto selection mode is enabled (see \ref org_mitk_views_segmentationPreferences).\n
 Once a patient image is selected, a new segmentation can be created on this reference image by clicking the <i>New...</i> button to the right of the <i>Segmentation</i> selection widget.
 An input field will appear which allows you to set the name and display color of the segmentation. Notice that the input field suggests names once you start typing and that it also suggests colors for known organ names.
-Once generated the segmentation will be added with "binary mask" icon to the data manager as subnode of the reference image. This item is automatically selected for you, allowing you to start editing the new segmentation right away.
+Once generated the segmentation will be added with "binary mask" icon to the data manager as sub-node of the reference image. This item is automatically selected for you, allowing you to start editing the new segmentation right away.
 
 
 \subsection org_mitk_views_segmentationUserManualManualKringeling2 Selecting Segmentations for Editing

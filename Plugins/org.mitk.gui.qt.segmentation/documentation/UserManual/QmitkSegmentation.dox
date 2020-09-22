@@ -158,7 +158,7 @@ The Live Wire Tool acts as a magnetic lasso with a contour snapping to edges of 
 <li>(2) Move the mouse. You don't have trace the edge of the object. The contour will automatically snap to it.
 <li>(3) To fix a segment you can set anchor points by single left mouse button click.
 <li>(4) Go on with moving the mouse and setting anchor points.
-<li>(5) To close the contour double click on the initial anchor point.
+<li>(5) To close the contour double-click on the initial anchor point.
 <li>(6) After closing, the contour can be edited by moving, inserting and deleting anchor points.
 </ul>
 

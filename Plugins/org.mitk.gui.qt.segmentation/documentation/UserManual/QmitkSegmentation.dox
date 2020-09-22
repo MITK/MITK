@@ -277,6 +277,17 @@ Segmentations are never an end in themselves. Consequently, the segmentation vie
 </ul>
 
 
+\section org_mitk_views_segmentationof3DTImages Segmentation of 3D+t images
+
+For segmentation of 3D+t images, some tools give you the option to choose between creating dynamic and static masks.
+<ul>
+<li> Dynamic masks can be created on each time frame individually.
+<li> Static masks will be defined on one time frame and will be the same for all other time frames.
+</ul>
+In general, segmentation is applied on the time frame that is selected when execution is performed. If you alter the time frame, the segmentation preview is adapted.
+
+
+
 \section org_mitk_views_segmentationUserManualTechnicalDetail Technical Information for Developers
 
 For technical specifications see \subpage QmitkSegmentationTechnicalPage and for information on the extensions of the tools system \subpage toolextensions .

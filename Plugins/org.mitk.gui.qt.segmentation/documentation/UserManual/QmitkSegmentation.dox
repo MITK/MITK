@@ -271,7 +271,7 @@ Segmentations are never an end in themselves. Consequently, the segmentation vie
 \imageMacro{QmitkSegmentation_IMGDataManagerContextMenu.png,"Context menu items for segmentations.",10.58}
 
 <ul>
-<li> <b>Create polygon %model</b> applies the marching cubes algorithms to the segmentation. This polygon %model can be used for visualization in 3D or other things such as stereolithography (3D printing).
+<li> <b>Create polygon %model</b> applies the marching cubes algorithm to the segmentation. This polygon %model can be used for visualization in 3D or other applications such as stereolithography (3D printing).
 <li> <b>Create smoothed polygon %model</b> uses smoothing in addition to the marching cubes algorithms, which creates models that do not follow the exact outlines of the segmentation, but look smoother.
 <li> <b>Autocrop</b> can save memory. Manual segmentations have the same extent as the patient image, even if the segmentation comprises only a small sub-volume. This invisible and meaningless margin is removed by autocropping.
 </ul>

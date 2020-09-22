@@ -15,9 +15,8 @@ To run the demo please follow these steps:\n
 
 1. Press the button <i>Generate test data</i> to create 3D+t demo data. Alternatively, you can also load a different data set of your choice. 
 2. Choose the data node that should be used as <i>Selected Time Series</i> input. You can optionally create a mask on the data set and select it by pressing "CTRL" and the selected mask node.
-3. Press <i>Start Modelling</i> to start the fitting process.
-4. Wait and see...
-5. The output nodes <i>slope</i>, <i>offset</i>, <i>x-intercept</i> and fit evaluation parameters can be found as child nodes of the chosen input.
+3. Press <i>Start Modelling</i> to start the fitting process and wait for it to finish.
+4. The output nodes <i>slope</i>, <i>offset</i>, <i>x-intercept</i> and fit evaluation parameters can be found as child nodes of the chosen input.
 
 
 */

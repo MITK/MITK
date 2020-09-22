@@ -154,7 +154,7 @@ The Live Wire Tool acts as a magnetic lasso with a contour snapping to edges of 
 \imageMacro{QmitkSegmentation_IMGLiveWireUsage.PNG,"Steps for using the Live Wire Tool",16.00}
 
 <ul>
-<li>(1) To start the Tool you have to double click near the edge of the object you want to segment. The initial anchor point will snap to the edge within a 3x3 region.
+<li>(1) To start the tool you have to double-click near the edge of the object you want to segment. The initial anchor point will snap to the edge within a 3x3 region.
 <li>(2) Move the mouse. You don't have trace the edge of the object. The contour will automatically snap to it.
 <li>(3) To fix a segment you can set anchor points by single left mouse button click.
 <li>(4) Go on with moving the mouse and setting anchor points.

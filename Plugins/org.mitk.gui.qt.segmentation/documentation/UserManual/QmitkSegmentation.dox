@@ -77,7 +77,7 @@ The drawback of manual contouring is that you might need to define contours on m
 
 \subsection org_mitk_views_segmentationUserManualManualKringeling3 Selecting Editing Tools
 
-To %start using one of the editing tools, click its button from the displayed toolbox.
+To start using one of the editing tools, click its button from the displayed toolbox.
 The selected editing tool will be active and its corresponding button will stay pressed until you click the button again.
 Selecting a different tool also deactivates the previous one.\n
 If you have to delineate a lot of images, shortcuts to switch between tools becomes convenient. For that, just hit the first letter of each tool to activate it (A for Add, S for Subtract, etc.).

@@ -109,8 +109,12 @@ Holding CTRL / CMD while drawing will invert the current tool's behavior (i.e. i
 
 Click at one point in a 2D slice widget to add an image region to the segmentation with the region growing tool. 
 Region Growing selects all pixels around the mouse cursor that have a similar gray value as the pixel below the mouse cursor. This enables you to quickly create segmentations of structures that have a good contrast to surrounding tissue.
-Moving up the cursor while holding the left mouse button widens the range for the included grey values; moving it down narrows it. Moving the mouse left and right will shift the range.
+The tool operates based on the current level window, so changing the level window to optimize the contrast for the ROI is encouraged.
+Moving the mouse up/down is different from left/right: Moving up the cursor while holding the left mouse button widens the range for the included grey values; moving it down narrows it. Moving the mouse left and right will shift the range.
 The tool will select more or less pixels, corresponding to the changing gray value range.
+
+
+
 
 \if THISISNOTIMPLEMENTEDATTHEMOMENT
 A common issue with region growing is the so called "leakage" which happens when the structure of interest is connected to other pixels, of similar gray values, through a narrow "bridge" at the border of the structure.

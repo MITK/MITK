@@ -1435,7 +1435,7 @@
           <item>
            <widget class="QLabel" name="label_26">
             <property name="text">
-             <string>FOV Reverence:</string>
+             <string>FOV Reference:</string>
             </property>
            </widget>
           </item>

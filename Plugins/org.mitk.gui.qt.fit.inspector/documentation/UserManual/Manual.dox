@@ -57,7 +57,7 @@ The <i>View settings</i> tab is used to adjust the plot display, namely, x and y
 \subsection FIT_INSPECTOR_Fit_Export Plot data export tab
 \imageMacro{fit_inspect_plotDataExport.png, "Details of the plot data export tab.", 5}
 The <i>Plot data export</i> displays voxel data (<i>Sample</i>) and corresponding time grid (<i>Time [s]</i>) together with model fit values (<i>Signal</i>) and additional curves (like AIF values) for each time point.
-The table will contain the position depended values of the current selected position as well as of all inspection positions (see also \ref FIT_INSPECTOR_Inspect "inspection positions").
+The table will contain the values of the current selected position as well as of all inspection positions (see also \ref FIT_INSPECTOR_Inspect "inspection positions").
 The data in the table can also be copied to clipboard or exported to csv files, by clicking the respective button below the table.
 
 \section FIT_INSPECTOR_Inspect Inspection positions

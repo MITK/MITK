@@ -7,40 +7,63 @@
 
 \section MAP_BROWSER_Introduction Introduction
 This view offers the user a way to search for available registration algorithms and select them for
-further usage by other views (e.g. MatchPoint Algorithm Control \ref org_mitk_gui_qt_algorithm_control).
+further usage by other views (e.g. \ref org_mitk_views_matchpoint_algorithm_control).
 
 \section MAP_BROWSER_Usage Usage
-\remark If you see no algorithms available by the browser, please check the search paths which can be configured at the MatchPoint preference page (Ctrl+P).
+\remark If you see no algorithms available by the browser, please check the search path which can be configured at the MatchPoint preference page (Ctrl+P). 
+As default it is set to MITK-build-directory\ep\deployed\MatchPoint-0.13.
+\imageMacro{map_browser_preferencesPath.png, "Matchpoint preferences",14}
 
-The basic idea of the browser is that you can use this view as central place to search for suitable algorithms. If you select an algorithm you can see its profile in the lower part of the view.
-If a algorithm is selected all other views (e.g. \ref org_mitk_gui_qt_algorithm_control) which use registration algorithms will be notified and allow to choose the selected algorithm for usage.
-\imageMacro{map_browser.png, "View of the browser with the list of available algorithm and the profile area",14}
+The basic idea of the browser is that you can use this view as central place to search for suitable registration algorithms. 
+If an algorithm is selected, all other views (e.g. \ref org_mitk_views_matchpoint_algorithm_control) which use registration algorithms will be notified and allow to choose the selected algorithm for usage.
+If you select an algorithm you can see its profile in the lower part of the view.
+\imageMacro{map_browser_viewScreenshot.png, "View of the browser with the list of available algorithms and the profile area",14}
 
 \section MAP_BROWSER_Profile Profile info
-In the following a short information about the different properties classified in the profile.\n
+In the following, a short description of the properties classified in the profile is given.\n
 
+\subsection MAP_BROWSER_Profile_Identification Identification
 <ul>
-<li><b>UID</b> Unique identifier for the registration algorithm (e.g. used in the library; may not be "human readable/understandable")</li>
-<li><b>Author</b> Name of the author(s) that has (have) developed the algorithm.</li>
-<li><b>Terms</b> Terms of usage for the algorithm.</li>
-<li><b>Data</b> type The type of date which is used by the algorithm to determine the registration. E.g. Image, point set, contour or surface</li>
-<li><b>Computation style</b> Specifies of the algorithm determines the registration by an iterative optimization process or analytically (e.g. closed form solution).
-Deterministic Specifies if the algorithm is deterministic (same input -> same output) or stochastic (e.g. by sampling the image while determining the registration). Results of stochastic algorithm may vary (slightly) because of their random aspect.
-Resolution style Defines if the algorithm uses a multi resolution/scale approach.</li>
-<li><b>Dim (Moving)</b> Number of dimensions of the frame of reference within which the data is defined that should be registered.</li>
-<li><b>Modality (Moving)</b> Modality of the moving entity (image). Thus the frame of reference where the registration should map from. E.g. CT, MRI, PET </li>
-<li><b>Dim (Target)</b> Number of dimensions of the frame of reference into which the data should be mapped. </li>
-<li><b>Modality (Target)</b> Modality of the target entity (image). Thus the frame of reference where the registration should map into. E.g. CT, MRI, PET </li>
-<li><b>Subject</b> Defines if the algorithm was developed to register data of the same subject (intrasubject), to register two subjects (intersubject) or to register onto an atlas. </li>
-<li><b>Object</b> Specifies for which "part" of the anatomy the algorithm was developed for. </li>
-<li><b>Transformation model</b> Specifies the type of transformation used by the algorithm. E.g.: affine, b-spline, non-rigid. </li>
-<li><b>Transformation domain</b> Defines it the transformation operates globally (e.g. Matrix) or locally (e.g. vector field). </li>
-<li><b>Optimization strategy</b> The used optimization strategy (if an optimizer is used). </li>
+<li><b>Namespace</b> Namespace in which the registration name is defined. </li>
+<li><b>Name</b> Identifies the name of the registration algorithm. The name is unique within the specified namespace.</li>
+<li><b>Version</b> </li>
+<li><b>BuildTag</b> </li>
+<li><b>Location</b> Specifies the path where the dll-file of the registration implementation can be found.</li>
+</ul>
+\subsection MAP_BROWSER_Profile_Description Description
+A short description of the chosen registration algorithm.
+
+\subsection MAP_BROWSER_Profile_Keywords Keywords
+Typical keywords associated with the selected algorithm. They can i.e. be used in the search field.  
+
+\subsection MAP_BROWSER_Profile_Characteristics Characteristics
+<ul>
+<li><b>Data type(s)</b> The type(s) of date which is used by the algorithm to determine the registration, e.g. image, point set, contour or surface.</li>
+<li><b>Computational style</b> Specifies if the registration is determined by an iterative optimization process or analytically (e.g. closed form solution). </li>
+<li><b>Deterministic</b> Specifies if the algorithm is deterministic (same input -> same output) or stochastic (e.g. by sampling the image while determining the registration). 
+Results of stochastic algorithm may vary (slightly) because of their random aspect.</li>
+<li><b>Resolution style</b> Defines if the algorithm uses a multi resolution/scale approach.</li>
+<li><b>Moving dim</b> Number of dimensions of the frame of reference within which the data is defined that should be registered. </li>
+<li><b>Moving modality</b> Modality of the moving entity (image). Thus the frame of reference where the registration should map from, e.g. CT, MRI, PET. </li>
+<li><b>Target dim</b> Number of dimensions of the frame of reference into which the data should be mapped.</li>
+<li><b>Target modality</b> Modality of the target entity (image). Thus the frame of reference where the registration should map into, e.g. CT, MRI, PET. </li>
+<li><b>Subject</b> Defines if the algorithm was developed to register data of the same subject (intra-subject), to register two subjects (inter-subject) or to register onto an atlas. </li>
+<li><b>Object</b> Specifies which "part" of the anatomy the algorithm was developed for. </li>
+<li><b>Transformation model</b> Specifies the type of transformation used by the algorithm,  e.g. affine, b-spline, non-rigid.</li>
+<li><b>Transformation domain</b> Defines if the transformation operates globally (e.g. Matrix) or locally (e.g. vector field).</li>
 <li><b>Metric</b> The cost function/metric that is used by the optimizer (if an optimizer is used). </li>
-<li><b>Citation/Reference</b> Reference to literature that contains information about the algorithm and should be used to cite the algorithm.</li>
-<li><b>Literature</b> Secondary literature regarding the algorithm or used concepts in the algorithm. Use the field "Citation/Reference" for the literature that should be cited when using the algorithm.</li>
-<li><b>Contact</b> Internal contact for questions regarding the algorithm. </li>
+<li><b>Optimization</b> The used optimization strategy (if an optimizer is used). </li>
+<li><b>Interaction</b>  </li>
+</ul>
+
+\subsection MAP_BROWSER_Profile_ContactAndUsage Contact & Usage
+<ul>
+<li><b>Contact</b> Name of the author(s) that has (have) developed the algorithm and an email address for further questions regarding the algorithm.</li>
+<li><b>Terms</b> Terms of usage for the algorithm.</li>
+<li><b>Citation</b> Reference to the literature that contains information about the algorithm and should be used to cite the algorithm. </li>
 </ul>
 
 */
+
+
 

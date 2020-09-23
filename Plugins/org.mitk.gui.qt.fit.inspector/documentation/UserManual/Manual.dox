@@ -34,7 +34,7 @@ The <i>Fit info</i> tab displays meta-data for selected fits performed on the di
 The <i>Fit parameter</i> tab shows fit related parameter estimates, derived parameters, fit criterion values and (optional) debug parameter maps
 in the selected voxel (and all inspection positions; see also \ref FIT_INSPECTOR_Inspect "inspection positions") listed as a table.
 If no fit was performed and only raw data is visualized, the table is empty.
-The content of the table may by copied to clipboard or exported as csv file, by clicking the respective button below the table.
+The content of the table may be copied to the clipboard or exported as csv file, by clicking the respective button below the table.
 
 \subsection FIT_INSPECTOR_Fit_Inspection Inspection positions tab
 \imageMacro{fit_inspect_positions.png, "Details of the inspection position tab.", 5}

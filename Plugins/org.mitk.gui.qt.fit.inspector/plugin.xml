@@ -2,7 +2,7 @@
 <plugin>
 
   <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.gui.qt.fit.inspector"
+    <view id="org.mitk.views.fit.inspector"
           name="ModelFit Inspector View"
 		  category="Fitting"
           class="ModelFitInspectorView"

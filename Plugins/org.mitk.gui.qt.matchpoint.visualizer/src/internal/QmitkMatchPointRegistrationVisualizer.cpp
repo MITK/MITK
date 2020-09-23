@@ -125,6 +125,9 @@ void QmitkMatchPointRegistrationVisualizer::CreateQtPartControl(QWidget* parent)
     this->CheckInputs();
     this->LoadStateFromNode();
     this->ConfigureVisualizationControls();
+
+    //deactivate because currently not an implemented style
+    this->m_Controls->m_pbStylePoints->setVisible(false);
 }
 
 void QmitkMatchPointRegistrationVisualizer::ConfigureNodePredicates()

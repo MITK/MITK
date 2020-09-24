@@ -27,7 +27,7 @@ In the following, a short description of the properties classified in the profil
 <li><b>Name</b> Identifies the name of the registration algorithm. The name is unique within the specified namespace.</li>
 <li><b>Version</b> </li>
 <li><b>BuildTag</b> </li>
-<li><b>Location</b> Specifies the path where the dll-file of the registration implementation can be found.</li>
+<li><b>Location</b> Specifies the path where the so-/dll-file of the registration implementation can be found.</li>
 </ul>
 \subsection MAP_BROWSER_Profile_Description Description
 A short description of the chosen registration algorithm.

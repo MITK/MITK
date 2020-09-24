@@ -25,8 +25,8 @@ In the following, a short description of the properties classified in the profil
 <ul>
 <li><b>Namespace</b> Namespace in which the registration name is defined. </li>
 <li><b>Name</b> Identifies the name of the registration algorithm. The name is unique within the specified namespace.</li>
-<li><b>Version</b> </li>
-<li><b>BuildTag</b> </li>
+<li><b>Version</b> Specifies the version of the registration algorithm.</li>
+<li><b>BuildTag</b> Specifies the build-date and -time of the so-/dll-file, the Matchpoint and the ITK version.</li>
 <li><b>Location</b> Specifies the path where the so-/dll-file of the registration implementation can be found.</li>
 </ul>
 \subsection MAP_BROWSER_Profile_Description Description

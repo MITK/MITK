@@ -52,7 +52,7 @@ Results of stochastic algorithm may vary (slightly) because of their random aspe
 <li><b>Transformation domain</b> Defines if the transformation operates globally (e.g. Matrix) or locally (e.g. vector field).</li>
 <li><b>Metric</b> The cost function/metric that is used by the optimizer (if an optimizer is used). </li>
 <li><b>Optimization</b> The used optimization strategy (if an optimizer is used). </li>
-<li><b>Interaction</b>  </li>
+<li><b>Interaction</b> Style of interaction. Currently only fully automatic registration algorithms are supported by MITK.  </li>
 </ul>
 
 \subsection MAP_BROWSER_Profile_ContactAndUsage Contact & Usage

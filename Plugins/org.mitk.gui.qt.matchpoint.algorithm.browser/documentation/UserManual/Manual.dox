@@ -11,7 +11,6 @@ further usage by other views (e.g. \ref org_mitk_views_matchpoint_algorithm_cont
 
 \section MAP_BROWSER_Usage Usage
 \remark If you see no algorithms available by the browser, please check the search path which can be configured at the MatchPoint preference page (Ctrl+P). 
-As default it is set to MITK-build-directory\ep\deployed\MatchPoint-0.13.
 \imageMacro{map_browser_preferencesPath.png, "Matchpoint preferences",14}
 
 The basic idea of the browser is that you can use this view as central place to search for suitable registration algorithms. 

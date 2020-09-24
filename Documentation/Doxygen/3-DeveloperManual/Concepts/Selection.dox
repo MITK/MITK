@@ -66,15 +66,16 @@ The document starts with a brief explanation of the disadvantages of the old con
 						 
 		\b QmitkAbstractDataStorageInspector
 		
-		The QmitkAbstractDataStorageInspector extends the QWidget to provide a custom view onto the data storage using a QmitkAbstractDataStorageModel. This custom widget extends the QWidget functionality in order to accept an mitk::DataStorage and an mitk::NodePredicateBase.
+		The QmitkAbstractDataStorageInspector serves as a base class that can be derived from to provide a custom view onto the data storage using a QmitkAbstractDataStorageModel derivative.
+		This custom widget extends the QWidget functionality in order to accept an mitk::DataStorage and an mitk::NodePredicateBase.
 		The data storage is used to define which data storage the widget should inspect. The node predicate can be set and later be used to filter the data storage, so that only a subset of the contained data nodes is inspected by the data storage inspector.
 		The data storage and the node predicate can be set by the corresponding setter, which in turn calls the pure virtual function QmitkAbstractDataStorageInspector::Initialize.
 		Any subclass of this abstract data storage inspector can now define its own functionality inside the Initialize-function to define what happens if the data storage or the node predicate is (re-)set.
 		Typically an inspector will forward the data storage and the node predicate to the data storage model to make it aware of the data it should hold.
 
-		Additionally a data storage inspector holds a QmitkModelViewSelectionConnector and initializes it with a QAbstractItemView (e.g. a QListView) and the data storage model. The idea behind this connector-class will be explained in the next section.
+		Additionally a data storage inspector holds a QmitkModelViewSelectionConnector and initializes it with a QAbstractItemView derived class (e.g. a QListView) and the data storage model. The idea behind this connector-class will be explained in the next section.
 		
-		Furthermore the abstract class provides a QSignal, CurrentSelectionChanged(NodeList) that is emitted if the selection of the underlying data storage model has changed.
+		Furthermore the abstract class provides a QSignal, CurrentSelectionChanged(NodeList), that is emitted if the selection of the underlying data storage model has changed.
 		The abstract class also provides two QSlots, SetSelectOnlyVisibleNodes(bool) and SetCurrentSelection(NodeList). Calling these slots will forward the given arguments to the model view selection connector member which in turn can manipulate the data storage models selection.
 				
 		\b QmitkModelViewSelectionConnector
@@ -144,20 +145,22 @@ The document starts with a brief explanation of the disadvantages of the old con
 		If the selection inside a data storage inspector changes, the slot sets the selected nodes of the dialog and propagates this selection to all its known data storage inspectors. This way all inspectors that are currently held in the tab widget show the same selection.
 				
 		In order to dynamically add and receive new data storage inspectors the microservice approach is used: Each concrete implementation of a data storage inspector provider registers itself as an mitk::IDataStorageInspectorProvider via the service registry.
-		Any class can then use the mitk::DataStorageInspectorGenerator to receive all registered data storage inspectors providers. Each provider in turn represents a data storage inspector, which can than be displayed to provide a view onto the data storage and it's data nodes.
+		For this the QmitkDataStorageInspectorProviderBase can be used.
+		Any class can use the mitk::DataStorageInspectorGenerator to either receive all registered data storage inspector providers or a specific one.
+		A provider in turn provides a specific data storage inspector, which can be used to display the data nodes of the data storage.
 
 		The user can define which of the registered data storage inspectors should be available when using a QmitkNodeSelectionDialog: Using the workbench preferences one can select the <a>Node Selection</a> entry and enable or disable certain data storage inspectors.
 
 		\b mitk::IDataStorageInspectorProvider
 		
 		The mitk::IDataStorageInspectorProvider declares the service interface for all data storage inspector providers. It must be implemented to override the mitk::IDataStorageInspectorProvider::CreateInspector-function.
-		This function should return the concrete data storage inspector represented by the provider. In order to simplify the use of this interface and to add some basic functionality, the QmitkDataStorageInspectorProviderBase class should be used.
+		This function should return the concrete data storage inspector created by the provider. In order to simplify the use of this interface and to add some basic functionality, the QmitkDataStorageInspectorProviderBase class should be used.
 				
 		\b QmitkDataStorageInspectorProviderBase
 		
-		The QmitkDataStorageInspectorProviderBase implements the mitk::IDataStorageInspectorProvider-interface and is a template implementation: It can be used with a concrete implementation of the QmitkAbstractDataStorageInspector; the data storage inspector that the provider base should represent.
+		The QmitkDataStorageInspectorProviderBase implements the mitk::IDataStorageInspectorProvider-interface and is a template implementation: It can be used with a concrete implementation of the QmitkAbstractDataStorageInspector; the data storage inspector that the provider base should create.
 		When the provider base is initialized it registers itself as an mitk::IDataStorageInspectorProvider service reference.
-		The provider base overrides the mitk::IDataStorageInspectorProvider::CreateInspector-function of the interface to create and return a concrete instance of the represented data storage inspector.
+		The provider base overrides the mitk::IDataStorageInspectorProvider::CreateInspector-function of the interface to create and return a concrete instance of the provided data storage inspector.
 		This way each concrete data storage inspector can be created by receiving the corresponding data storage inspector provider as a service and using the mitk::IDataStorageInspectorProvider::CreateInspector-function.
 				
 		\b mitk::DataStorageInspectorGenerator
@@ -167,7 +170,7 @@ The document starts with a brief explanation of the disadvantages of the old con
 		This way a developer can easily add their own concrete data storage inspector by creating a new QmitkDataStorageInspectorProviderBase with the concrete inspector as the template argument.
 				
 	\subsection CustomDataStorageInspector Adding a custom data storage inspector
-		As mentioned above, the microservice approach is used inside the mitk::DataStorageInspectorGenerator to receive all known or a specific data storage provider. In order to let the microservice know about a new custom data storage inspector, it has to be represented by a data storage provider.
+		As mentioned above, the microservice approach is used inside the mitk::DataStorageInspectorGenerator to receive all known or a specific data storage provider. In order to let the microservice know about a new custom data storage inspector, it has to be provided by a data storage provider.
 		This data storage provider has to be registered as an mitk::IDataStorageInspectorProvider service.
 		The new selection concept provides the QmitkDataStorageInspectorProviderBase class (see above), which automatically registers the data storage provider as a provider service. For this the following constructor can be used:
 		\code
@@ -179,7 +182,7 @@ The document starts with a brief explanation of the disadvantages of the old con
 			mitk::IDataStorageInspectorProvider* dataStorageInspectorProvider = new QmitkDataStorageInspectorProviderBase<QmitkDataStorageListInspector>("org.mitk.QmitkDataStorageListInspector", "Simple list", "Displays the filtered content of the data storage in a simple list."));
 		\endcode
 			
-		This registers a new QmitkDataStorageInspectorProviderBase instance as an mitk::IDataStorageInspectorProvider service. The data storage provider and its represented data storage inspector can later be received using the following code:
+		This registers a new QmitkDataStorageInspectorProviderBase instance as an mitk::IDataStorageInspectorProvider service. The data storage provider and its specific data storage inspector can later be received using the following code:
 		\code
 			mitk::IDataStorageInspectorProvider* dataStorageProvider = mitk::DataStorageInspectorGenerator::GetProvider("org.mitk.QmitkDataStorageListInspector");
 			QmitkAbstractDataStorageInspector* dataStorageInspector = dataStorageProvider->CreateInspector();
@@ -188,20 +191,24 @@ The document starts with a brief explanation of the disadvantages of the old con
 		In the code snippets the QmitkDataStorageListInspector class was used. This is an example of a concrete data storage inspector which is provided by the presented selection concept. It is a frequently used basic inspector and already registered via a corresponding provider base.
 		This is done inside the mitk::QtWidgetsActivator class; a class that is used during module activation.
 		
-		\b QmitkDataStorageListInspector
+		\subsubsection QmitkDataStorageListInspector
 
-		The QmitkDataStorageListInspector is an example of a concrete data storage inspector, subclassing the QmitkAbstractDataStorageInspector. Its only purpose is to provide a custom model-view pair that represents a list view onto the data storage. The view is a simple QListView.
-		The model is a custom model derived from the above mentioned QmitkAbstractDataStorageModel: The QmitkDataStorageDefaultListModel overrides the five pure virtual functions to react on changes of the data storage or the node predicate:
-		each function calls the private UpdateModelData-function, which will simply retrieve the currently available (possibly filtered) data nodes of the data storage.
-		Additionally the default list model needs to override some functions of the QAbstractItemModel in order to represent a list model. One important function to override is the data(const QModelIndex\& index, int role = Qt::DisplayRole)}-function:
-		This function is used by Qt to define what has to be displayed in the list view. It is important that a custom model returns an mitk::DataNode::Pointer object for a model index when the role is mitkDataNodeRole.
+			The QmitkDataStorageListInspector is an example of a concrete data storage inspector, subclassing the QmitkAbstractDataStorageInspector. Its only purpose is to provide a custom model-view pair that represents a list view onto the data storage. The view is a simple QListView.
+			The model is a custom model derived from the above mentioned QmitkAbstractDataStorageModel: The QmitkDataStorageDefaultListModel overrides the five pure virtual functions to react on changes of the data storage or the node predicate:
+			each function calls the private UpdateModelData-function, which will simply retrieve the currently available (possibly filtered) data nodes of the data storage.
+			Additionally the default list model needs to override some functions of the QAbstractItemModel in order to represent a list model. One important function to override is the data(const QModelIndex\& index, int role = Qt::DisplayRole)}-function:
+			This function is used by Qt to define what has to be displayed in the list view. It is important that a custom model returns an mitk::DataNode::Pointer object for a model index when the role is mitkDataNodeRole.
 		
-		\b QmitkDataStorageTreeInspector
+		\subsubsection QmitkDataStorageTreeInspector
 
-		The QmitkDataStorageTreeInspector is another example of a concrete data storage inspector, subclassing the QmitkAbstractDataStorageInspector. Its only purpose is to provide a custom model-view pair that represents a tree view onto the data storage. The view is a simple QTreeView.
-		The model is a custom model derived from the above mentioned QmitkAbstractDataStorageModel: The QmitkDataStorageSimpleTreeModel needs to override some functions of the QAbstractItemModel in order to represent a tree model.
-		Again, one important function to override is the data(const QModelIndex\& index, int role = Qt::DisplayRole)}-function. It is important that the simple tree model returns
-		an mitk::DataNode::Pointer object for a model index when the role is mitkDataNodeRole.
+			The QmitkDataStorageTreeInspector is another example of a concrete data storage inspector, subclassing the QmitkAbstractDataStorageInspector. Its only purpose is to provide a custom model-view pair that represents a tree view onto the data storage. The view is a simple QTreeView.
+			The model is a custom model derived from the above mentioned QmitkAbstractDataStorageModel: The QmitkDataStorageSimpleTreeModel needs to override some functions of the QAbstractItemModel in order to represent a tree model.
+			Again, one important function to override is the data(const QModelIndex\& index, int role = Qt::DisplayRole)}-function. It is important that the simple tree model returns an mitk::DataNode::Pointer object for a model index when the role is mitkDataNodeRole.
+			The QmitkDataStorageTreeInspector is designed to reflect the classical data manager view.
+
+		\subsubsection QmitkDataStorageSelectionHistoryInspector
+		
+		\subsubsection QmitkDataStorageFavoriteNodesInspector
 
 	\subsection NodeSelectionWidgets The node selection widgets
 		\b QmitkAbstractNodeSelectionWidget

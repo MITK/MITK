@@ -515,8 +515,7 @@ void ConcentrationCurveConverterView::OnNodeSelectionChanged(QList<mitk::DataNod
       }
     }
 
-    m_Controls.btnConvertToConcentration->setEnabled(false);
-    m_Controls.btnConvertToConcentration->setEnabled(m_selectedImage.IsNotNull() && CheckSettings());
+
 
 
 }

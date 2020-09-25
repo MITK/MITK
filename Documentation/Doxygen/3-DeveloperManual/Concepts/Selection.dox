@@ -235,21 +235,52 @@ The document starts with a brief explanation of the disadvantages of the old con
 		\b QmitkSingleNodeSelectionWidget
 
 		The QmitkSingleNodeSelectionWidget is an example of a concrete node selection widget, subclassing the QmitkAbstractNodeSelectionWidget. It overrides the virtual functions to react on changes of the node selection.
-		If the QmitkNodeSelectionButton is pressed, a QmitkNodeSelectionDialog is opened as a pop-up for data node selection. This dialog is a \ref QmitkNodeSelectionDialog_ref "QmitkNodeSelectionDialog" (see \ref DataStorageInspectors).
+		If the QmitkNodeSelectionButton of the widget is pressed, a QmitkNodeSelectionDialog is opened as a pop-up for data node selection. This dialog is a \ref QmitkNodeSelectionDialog_ref "QmitkNodeSelectionDialog" (see \ref DataStorageInspectors).
 		It presents the currently known and active data storage inspectors for the user to select a single data node. If a selection is confirmed, the pop-up closes and the selected data node will be shown in the QmitkSingleNodeSelectionWidget.
 		The user will see a thumbnail or an icon of the data node (if available) along with an HTML text of the data node info.
+
+		The QmitkSingleNodeSelectionWidget is currently used inside plugin views to allow to select specific nodes of the data storage for further processing.
+		A plugin view can connect a function to the CurrentSelectionChanged-signal to immediately react on a new selection of the QmitkSingleNodeSelectionWidget.
+		Using QmitkSingleNodeSelectionWidget::GetSelectedNode the currently selected node of the selection widget can be retrieved anytime.
+
+		Additionally an auto-selection-mode is available that automatically selects a node from the data storage if such a data storage is set and contains a node that matches the given predicate.
+		The auto-selection-mode only works if the QmitkSingleNodeSelectionWidget does not already show a selected node.
 
 		\b QmitkMultiNodeSelectionWidget
 
 		The QmitkMultiNodeSelectionWidget is another example of a concrete node selection widget, subclassing the QmitkAbstractNodeSelectionWidget. It overrides the virtual functions to react on changes of the node selection.
-		If the QmitkNodeSelectionButton is pressed a QmitkNodeSelectionDialog is opened as a pop-up for data node selection. This dialog is a \ref QmitkNodeSelectionDialog_ref "QmitkNodeSelectionDialog" (see \ref DataStorageInspectors).
+		If the 'Change selection'-button is pressed a QmitkNodeSelectionDialog is opened as a pop-up for data node selection. This dialog is a \ref QmitkNodeSelectionDialog_ref "QmitkNodeSelectionDialog" (see \ref DataStorageInspectors).
 		It presents the currently known and active data storage inspectors for the user to select a single data node. If a selection is confirmed, the pop-up closes and the selected data nodes will be shown in the QmitkMultiNodeSelectionWidget.
 		Unlike single node selection the multi node selection is presented as a list of all the selected nodes.
 
+		The QmitkMultiNodeSelectionWidget is currently used inside plugin views to allow to select a set of specific nodes of the data storage for further processing.
+		A plugin view can connect a function to the CurrentSelectionChanged-signal to immediately react on a new selection of the QmitkMultiNodeSelectionWidget.
+		Using QmitkAbstractNodeSelectionWidget::GetSelectedNodes the currently selected node of the selection widget can be retrieved anytime.
+
+		QmitkMultiNodeSelectionWidget::SetSelectionCheckFunction allows to define a function that puts a constraint on the node selection (dialog) to only allow specific combinations or seletions of nodes.
+		The result of the constraint has to result in either an empty string (valid node selection) or
+		A simple check function can look like this:
+		\code
+			auto checkFunction = [](const QmitkMultiNodeSelectionWidget::NodeList & nodes)
+			{
+				if (!(nodes.size() % 2))
+				{
+					std::stringstream ss;
+					ss << "<font class=\"warning\"><p>Invalid selection.<p/><p>The number of selected nodes must be uneven! the current number is " << nodes.size() << ".</p>";
+					return ss.str();
+				}
+				return std::string();
+			};
+
+			multNodeSelectionWidget->SetSelectionCheckFunction(checkFunction);
+		\endcode
+
+		This check function will be passed to the QmitkNodeSelectionDialog and is used to print an error message, if an invalid selection is made inside the node selection dialog.
+		This will prevent the user from confirming an even selection. If a valid selection is made no error message will be printed and the user can confirm the selection.
+
 		\b QmitkNodeSelectionButton
 
-		The QmitkNodeSelectionButton is used inside the QmitkSingleNodeSelectionWidget to display the thumbnail or icon of the selected data node (if available) along with an HTML text of the data node info. It is a custom QPushButton that overrides
-		QPushButton::paintEvent(QPaintEvent *p) to draw the thumbnail or icon and to display the HTML text.
+		The QmitkNodeSelectionButton is a customized QPushButton and is used for example inside the QmitkSingleNodeSelectionWidget: It displays the thumbnail or icon of the selected data node (if available) along with an HTML text of the data node info.
 
 \section DataStorageViewerTestPlugin The DataStorageViewerTest plugin
 	The \a org.mitk.gui.qt.datastorageviewertest plugin can be enabled and used inside the MITK workbench. It serves as a test / demo plugin with a single view that shows different uses of the new selection concept and its related classes. The following classes are used:

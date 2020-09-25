@@ -20,7 +20,7 @@
   \li \subpage org_mitk_gui_qt_lasercontrol
   \li \subpage org_mitk_views_fit_demo
   \li \subpage org_mitk_gui_qt_fit_genericfitting
-  \li \subpage org_mitk_gui_qt_fit_inspector
+  \li \subpage org_mitk_views_fit_inspector
   \li \subpage org_mitkexamplesopencv
   \li \subpage org_mitk_gui_qt_overlaymanager
   \li \subpage org_mitk_gui_qt_mitkphenotyping

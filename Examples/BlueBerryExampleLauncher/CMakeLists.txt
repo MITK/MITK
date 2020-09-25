@@ -74,9 +74,3 @@ mitkFunctionCreateBlueBerryApplication(
 )
 
 add_dependencies(${PROJECT_NAME} ${ALL_REQUIRED_PLUGIN_TARGETS})
-
-# subproject support
-set_property(TARGET ${PROJECT_NAME} PROPERTY LABELS ${MITK_DEFAULT_SUBPROJECTS})
-foreach(subproject ${MITK_DEFAULT_SUBPROJECTS})
-  add_dependencies(${subproject} ${PROJECT_NAME})
-endforeach()

@@ -46,19 +46,23 @@ and accordingly add or remove this mitk::DataInteractor from its internal list.
 
 \dot
 digraph {
-  node [shape=record, fontname=Helvetica, fontsize=10];
-  d [ label="DataInteractor" ];
-  a [ label="DataNode" ];
-  b [ label="DataStorage" ];
-  c [ label="Dispatcher" ];
+  node [shape=box fontname=Helvetica fontsize=10]
+
+  { rank=same b c a }
+  { rank=same e }
+
+  d [ label="DataInteractor" ]
+  a [ label="DataNode" ]
+  b [ label="DataStorage" ]
+  c [ label="Dispatcher" ]
   e [ label="BaseRenderer"]
-  edge [fontname=Helvetica, fontsize=10]
-  d -> a [label="SetDataInteractor(this)"];
-  a -> b [label="Modified()"];
-  b -> c [label="NodeModified(dataNode)"];
-  e -> c [label="HandleEvent(interactionEvent)"];
- { rank=same; b c a }
- { rank=same; e }
+
+  edge [fontname=Helvetica fontsize=10]
+
+  d -> a [label="SetDataInteractor(this)"]
+  a -> b [label="Modified()"]
+  b -> c [label="NodeModified(dataNode)"]
+  e -> c [label="HandleEvent(interactionEvent)"]
 }
 \enddot
 

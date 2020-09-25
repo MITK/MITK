@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_imagestatistics The Image Statistics View
 
-\imageMacro{bar-chart.svg,"Icon of the Image Statistics View",2.00}
+\imageMacro{bar-chart2.svg,"Icon of the Image Statistics View",2.00}
 
 \section QmitkImageStatisticsUserManualSummary Summary
 
@@ -10,7 +10,6 @@ This view provides an easy interface to quickly compute some features of a whole
 This document will tell you how to use this view, but it is assumed that you already know how to use MITK in general.
 
 Please see \ref QmitkImageStatisticsUserManualDetails for more detailed information on usage and supported filters.
-If you encounter problems using the view, please have a look at the \ref QmitkImageStatisticsUserManualTrouble page.
 
 \section QmitkImageStatisticsUserManualDetails Details
 
@@ -18,7 +17,6 @@ Manual sections:
 
 - \ref QmitkImageStatisticsUserManualOverview
 - \ref QmitkImageStatisticsUserManualUsage
-- \ref QmitkImageStatisticsUserManualTrouble
 
 \section QmitkImageStatisticsUserManualOverview Overview
 
@@ -28,28 +26,38 @@ This view provides an easy interface to quickly compute some features of a whole
 
 \section QmitkImageStatisticsUserManualUsage Usage
 
-After selection of an image or a binary mask of an image in the datamanager, the Image Statistics view shows some statistical information. If a mask is selected, the name of the mask and the name of the image, to which the mask is applied, are shown at the top. For time data the current time step is used for the selected mask and the selected image. If the total number of time steps on the selected mask is less than the current time step, the last time step of the mask is used. If a mask is selected, its used time step will be displayed next to its name like this: (t=0).
+
+To select the input data, either use the quick selection button (labeled "+"), or select the input data via the "Input Data" tab.
+
+\imageMacro{QmitkImageStatistics_InputData.png,"Select the input data via the \"Input data\" tab (marked red) or via the quick selection button (marked yellow)",10}
+
+\subsection QmitkImageStatisticStatistics Statistics
+After selection of an image or a binary mask as input data, the image statistics are calculated and displayed in the "Statistics" section. If masks (ROIs: segmentations, planarfigures, ...) are selected, the statistics for these masks are shown. For time data the statistics for each time step are calculated correspondingly.
+
+An example of parts of the calculated statistical features (Mean, Median, StandardDeviation, RMS, Max, MaxPosition, Min, MinPosition, Voxel, Volume [mm^3], Skewness, Kurtosis, Uniformity, Entropy, MPP, UPP and Variance) for different timesteps and different masks is pictured below.
+
+\imageMacro{QmitkImageStatistics_statistics.png, "Example of parts of the statistics for different masks and timestamps", 1.00}
 
 Check "Ignore zero-valued voxels" to hide voxels with grayvalue zero.
 
-Below it is the statistics window which displays the calculated statistical features (such as mean, standard deviation...).
+\subsection QmitkImageStatisticHistogram Histogram
 
 Beneath the statistics window is the histogram window, which shows the histogram of the current selection.
 
-Draw a rectangular window with pressed left button to zoom the histogram view in. With a double click in the view area you can zoom out to the default viewport.
-You can also just pan the view in horizontal or vertical direction by dragging with the left mousebutton in the respective direction.
+The histogram window is currently only available for a single image and no or one ROI: When selection multiple images and/or multiple masks, the histogram window is deactivated!
+
+Draw a rectangular window with a pressed left button to zoom in on the histogram. With a double click in the view area you can zoom out to the default viewport. You can also pan the view in horizontal or vertical direction by dragging with the left mouse button in the respective direction. Additionally, different options like "Custom Zoom", to set the maximum and minimum value, or by adjusting the number of bins, can be used to modify the view.
 
 If the mask is not a closed planar figure or a segmentation an intensity profile is created instead of the histogram.
 
 A tooltip is available by hovering over one of the bins.
 
-At the bottom of each view is one button. They copy their respective data in csv format to the clipboard.
+\subsection QmitkImageStatisticsUserManualCopytoClipboard Copy to Clipboard
 
-\section QmitkImageStatisticsUserManualTrouble Troubleshooting
+At the bottom of each view is a "Copy to Clipboard" button, allowing to copy the respective data in csv format to the clipboard.
+Be aware of the following information regarding this functionality:
+\li The values are separated by tabulator.
+\li  Numeric values will be converted using the system language (e.g. with German as system language the decimal separator will be ",", with English it will be '.').
+\li  One can directly copy'n'paste into Excel (and alike) as long as Excel supports/is configured to the system language
 
-No known problems.
-
-<B>All other problems.</B><BR>
-Please report to the MITK mailing list.
-See http://www.mitk.org/wiki/Mailinglist on how to do this.
 */

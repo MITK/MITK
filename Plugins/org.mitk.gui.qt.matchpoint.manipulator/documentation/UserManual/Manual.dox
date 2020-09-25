@@ -1,5 +1,5 @@
 /**
-\page org_mitk_gui_qt_matchpoint_manipulator The MatchPoint Registration Manipulator View
+\page org_mitk_views_matchpoint_manipulator The MatchPoint Registration Manipulator View
 
 \imageMacro{map_manipulator_icon_doc.svg, "Icon of the MatchPoint Registration Manipulator", 3}
 
@@ -7,41 +7,49 @@
 
 \section MAP_REGMANIP_Introduction Introduction
 This view offers the possibility to manually manipulate a registration to establish a good mapping between data.
-The effect of manipulation is visualized with to user defined images to allow visual inspection.\n
+The effect of manipulation is visualized with two user defined images to allow for visual inspection.\n
 It is one of several MatchPoint registration plug-ins.\n
-\imageMacro{map_view_example.png, "Example screenshot showing the plug-in in use", 10}
-
-\section MAP_REGMANIP_Contact Contact information
-This plug-in is being developed by the SIDT group (Software development for Integrated Diagnostics
-and Therapy) at the German Cancer Research Center (DKFZ). If you have any questions, need support,
-find a bug or have a feature request, feel free to contact us at www.mitk.org.
 
 \section MAP_REGMANIP_Usage Usage
-\imageMacro{map_view_steps.png, "Illustration of the workflow steps.", 7}
-The typical workflow with the manipulator has following steps/sections:
-1. <b>Source selection</b>: You can choose between starting a new registration and using a selected registration. For later option,
-the registration must be selected in the data manager.
+\imageMacro{map_view_manipulator_example.png, "Example screenshot showing the main elements of the view used to start a manipulation.", 14}
+The typical workflow with the manipulator has following steps/sections:\n\n
+(1) <b>Source selection</b>: You can choose between starting a new registration and using a selected registration. For latter option,
+the registration must be selected (see (2)).
 \remark If you choose a new registration, the manipulator will automatically pre initialize this new transform
 to align the centers of the used images and therefore starts with sensible settings.
 \remark If you choose an existing registration, the registration will *not* be altered. It serves as template/baseline
 for the manipulation, which will be "on top" of the existing registration.
 
-2. <b>Image selection</b>: To allow visual inspection of the manipulation to images are needed. If you have selected a registration
-(independent from the source selection mode) the manipulator will use the moving and target images used to determine the selected
-registration as images for the manipulation. You can also explicitly select images in the data manager (press shift while
-selecting for multi select).
 
-3. <b>Start manual registration</b>: If all settings are valid, you can start the manipulation. The render windows will automatically
-switch to the visual inspection mode. The views will be reinitialized to the field of view of the target image.
+(2) <b>Registration slot</b>: Shows the currently selected registration that serves as baseline. Only active if (1) is selected appropriately. Click to change.\n\n
 
-4. <b>Generation settings</b>: You may choose to give the resulting registration a special name. Additionally you can choose the convenience
-option to map the moving image with the confirmed registration automatically.
+(3) <b>Auto select option</b>: If active the view will try to deduce and automatically select (if loaded in the application) the moving and target image when the baseline registration changes. The view assumes that the moving and target images used to determine the registration should be used to illustrate the effects of the manipulation.\n\n
 
-5. <b>Settings</b>: You can alter the settings of the transform (\ref MAP_REGMANIP_TransSettings) and the rendering settings (\ref MAP_REGMANIP_EvalSettings)
-for the visual inspection.
+(4) <b>Moving image slot</b>: To allow for visual inspection of the manipulation a moving image must be specified. This image is mapped by the manipulated registration to illustrate the effects of the manipulation. Click to change the image.\n\n
 
-6. <b>Cancel or confirmation</b>: You may cancel the manipulation process (Closing the view equals cancelation) or confirm the determined registration
-and store it in the data storage with the given name.\n
+(5) <b>Target image slot</b>: To allow for visual inspection of the manipulation a target image must be specified. This image is used to compare against the mapped moving image to illustrate the effects of the manipulation. Click to change the image.\n\n
+
+(6) <b>Start manual registration</b>: If all settings are valid, you can start the manipulation. The render windows will automatically
+switch to the visual inspection mode. The views will be reinitialized to the field of view of the target image.\n\n\n
+
+\imageMacro{map_view_manipulator_started.png, "Controls after the manipulation session is started.", 14}
+
+(7) <b>New registration name</b>: You may choose to give the resulting registration a special name.\n\n
+
+(8) Additionally you can choose the convenience
+option to map the moving image with the confirmed registration automatically and also store the mapped image.\n\n
+
+(9) <b>Settings</b>: You can alter the settings of the transform (\ref MAP_REGMANIP_TransSettings) and the rendering settings (\ref MAP_REGMANIP_EvalSettings) for the visual inspection.\n\n
+
+(10) <b>Translation parameters</b>: You can alter the translation parameter of the transform by using the sliders or the spinboxes. For more details see transform settings section (\ref MAP_REGMANIP_TransSettings).\n\n
+
+(11) <b>Rotation parameters</b>: You can alter the rotation parameter of the transform by using the sliders or the spinboxes. For more details see transform settings section (\ref MAP_REGMANIP_TransSettings).\n\n
+
+(12) <b>Center of rotation</b>: You may choose the center of rotation for your manipulation. For more details see transform settings section (\ref MAP_REGMANIP_TransSettings).\n\n
+
+(13) <b>Confirmation</b>: You may confirm the determined registration and store it in the data storage with the given name. The manipulation session will be automatically closed.\n\n
+
+(14) <b>Cancel</b>: You may cancel the session any time. No changes will be stored and the manipulation session will be automatically closed.\n
 
 \section MAP_REGMANIP_TransSettings Transformation settings
 You can alter the translation and the rotation of the transform. In addition you may choose the center of rotation type.
@@ -57,13 +65,13 @@ where x': transformed point; x: point to transform; R: rotation matrix; C: cente
 The offset of a transform is defined as O = -RC + C + T\n
 The offset as well as the rotation matrix stay constant if the center point changes, therefore the translation has to be altered.
 
-\note To ease the orientation, the edit fields have background colours which resemble the colours of the plane the changes will
+\note To ease the orientation, the edit fields have background colors which resemble the colors of the plane the changes will
 "happen".\n
 For translation, the translation vector will be perpendicular to the indicated plane (The image moves "through" the plane).
 For rotation, the rotation axis will be perpendicular to the indicated plane.
 
 \section MAP_REGMANIP_EvalSettings Evaluation settings
-The settings you can choose are equal to the settings of the evaluation view (\ref org_mitk_gui_qt_matchpoint_evaluator).
+The settings you can choose are equal to the settings of the evaluation view (\ref org_mitk_views_matchpoint_evaluator).
 Please see the documentation of the MatchPoint Registration Evaluator view for more details.
 
 */

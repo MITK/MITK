@@ -124,14 +124,6 @@ Var AR_RegFlags
  "exit_${SecName}:"
 !macroend
 
-!macro RemoveSection SecName
-  ;  This macro is used to call section's Remove_... macro
-  ;from the uninstaller.
-  ;Input: section index constant name specified in Section command.
-
-  !insertmacro "Remove_${${SecName}}"
-!macroend
-
 ; NSIS example code to only include some code if a file exists at compile time (whereas IfFileExists works at runtime)
 ; See http://nsis.sourceforge.net/Check_if_a_file_exists_at_compile_time for documentation
 !macro !defineifexist _VAR_NAME _FILE_NAME

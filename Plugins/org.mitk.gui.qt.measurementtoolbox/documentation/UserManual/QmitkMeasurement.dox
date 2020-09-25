@@ -5,7 +5,7 @@
 
 <h1>Overview</h1>
 
-The Measurement view allows you to measure distances, angels, paths and several geometric figures on 2D images or image slices of 3D and 4D images. The measurement view is repeatedly useable with the same or different measurement figures, which are correlated to the chosen image and can be saved together with it for future use. 
+The Measurement view allows you to measure distances, angles, paths and several geometric figures on 2D images or image slices of 3D and 4D images. The measurement view is repeatedly useable with the same or different measurement figures that are related to the chosen image and can be saved together with it for future use. 
 
 
 \imageMacro{QmitkMeasurementToolbox_BasicScreenEdited.jpg,"Image with measurements",16.00}
@@ -29,7 +29,7 @@ Draws a line between two set points and returns the distance between these point
 
 <li> <b>Path:</b>
 
-Draws a line between several set points (two and more) and calculates the overall length, which is all line's length summed up. Add the final point by double left-click.
+Draws a line between several set points (two and more) and calculates the overall length, which is all lines length summed up. Add the final point by double left-click.
 
 <li> <b>Angle:</b>
 
@@ -37,7 +37,7 @@ Draws two lines from three set points connected in the second set point and retu
 
 <li> <b>Four Point / Double Angle:</b>
 
-Draws two lines that may but must not intersect from four set points. The returned angle is the one depicted in the icon.
+Draws two lines that may but do not have to intersect from four set points. The returned angle is the one depicted in the icon.
 
 <li> <b>Circle:</b>
 
@@ -53,7 +53,7 @@ Draws two ellipses by adjusting four points. The middle point can be used to mov
 
 <li> <b>Rectangle:</b>
 
-Draws a rectangle by setting two points at the opposing edges of the rectangle starting with the upper left edge. The measured values are the circumference and the included area.
+Draws a rectangle by setting two points at the opposing edges of the rectangle starting with the upper left corner. The measured values are the circumference and the included area.
 
 <li> <b>Polygon:</b>
 
@@ -69,7 +69,7 @@ Draws a closed subdivision polygon by adding some control points with left mouse
 </ul>
 
 <h2>Fixed sizes of measurement figures</h2>
-The measurement view offers a fixed size for circle and double ellipses to preset a radius and a thickness. This is useful e.g. for disagnostic studies where you want to derive gray value statistics from a well defined region.
+The measurement view offers a fixed size for circle and double ellipses to preset a radius and a thickness. This is useful e.g. for diagnostic studies where you want to derive gray value statistics from a well defined region.
 
 <h2>Modify measurements</h2>
 
@@ -86,5 +86,5 @@ The entire scene containing the image and the measurement figures can be saved f
 The content of the measurement widget can be copied to the clipboard with the corresponding button for further use in a table calculation program (e.g. Open Office Calc etc.).
 
 <h2>Remove measurement figures or image</h2>
-If the single measurement figures or the image is not needed any longer, it can be removed solely or as an entire group. The image can't be removed without simultaneously removing all the dependent measurement figures that belong to the image tree in the data manager. To remove just select the wanted items in the data manager list by left-clicking on the respective node or, if several items wanted to be removed, left-click on all wanted by simultaneously holding the ctrl-button pressed.
+If the single measurement figures or the image is not needed any longer, it can be removed solely or as an entire group. The image can't be removed without simultaneously removing all the dependent measurement figures that belong to the image tree in the data manager. To remove, just select the wanted items in the data manager list by right-clicking on the respective node or, if several items wanted to be removed, right-click on all wanted by simultaneously holding the ctrl-button pressed.
 */

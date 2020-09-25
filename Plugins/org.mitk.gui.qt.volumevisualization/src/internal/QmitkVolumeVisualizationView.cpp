@@ -58,7 +58,6 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
     mitk::TNodePredicateDataType<mitk::Image>::New(),
     mitk::NodePredicateOr::New(mitk::NodePredicateDimension::New(3), mitk::NodePredicateDimension::New(4)),
     mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))));
-
   m_Controls->volumeSelectionWidget->SetSelectionIsOptional(true);
   m_Controls->volumeSelectionWidget->SetEmptyInfo(QString("Please select a 3D / 4D image volume"));
   m_Controls->volumeSelectionWidget->SetPopUpTitel(QString("Select image volume"));
@@ -99,6 +98,8 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
   m_Controls->renderMode->setEnabled(false);
   m_Controls->transferFunctionWidget->setEnabled(false);
   m_Controls->transferFunctionGeneratorWidget->setEnabled(false);
+
+  m_Controls->volumeSelectionWidget->SetAutoSelectNewNodes(true);
 }
 
 void QmitkVolumeVisualizationView::OnMitkInternalPreset(int mode)

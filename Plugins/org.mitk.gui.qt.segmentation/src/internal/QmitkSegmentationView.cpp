@@ -79,8 +79,12 @@ QmitkSegmentationView::QmitkSegmentationView()
   mitk::NodePredicateAnd::Pointer isABinaryImagePredicate = mitk::NodePredicateAnd::New(m_IsOfTypeImagePredicate, isBinaryPredicate);
   mitk::NodePredicateAnd::Pointer isNotABinaryImagePredicate = mitk::NodePredicateAnd::New(m_IsOfTypeImagePredicate, isNotBinaryPredicate);
 
-  m_IsASegmentationImagePredicate = mitk::NodePredicateOr::New(isABinaryImagePredicate, mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
-  m_IsAPatientImagePredicate = mitk::NodePredicateAnd::New(isNotABinaryImagePredicate, mitk::NodePredicateNot::New(mitk::TNodePredicateDataType<mitk::LabelSetImage>::New()));
+  auto isMLImageType = mitk::TNodePredicateDataType<mitk::LabelSetImage>::New();
+  mitk::NodePredicateAnd::Pointer isAMLImagePredicate = mitk::NodePredicateAnd::New(isMLImageType, m_IsNotAHelperObject);
+  mitk::NodePredicateAnd::Pointer isNotAMLImagePredicate = mitk::NodePredicateAnd::New(mitk::NodePredicateNot::New(isMLImageType), m_IsNotAHelperObject);
+
+  m_IsASegmentationImagePredicate = mitk::NodePredicateOr::New(isABinaryImagePredicate, isAMLImagePredicate);
+  m_IsAPatientImagePredicate = mitk::NodePredicateAnd::New(isNotABinaryImagePredicate, isNotAMLImagePredicate);
 }
 
 QmitkSegmentationView::~QmitkSegmentationView()

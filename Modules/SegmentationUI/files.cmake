@@ -28,6 +28,7 @@ Qmitk/QmitkMaskStampWidget.cpp
 Qmitk/QmitkSliceBasedInterpolatorWidget.cpp
 Qmitk/QmitkSurfaceBasedInterpolatorWidget.cpp
 Qmitk/QmitkSearchLabelDialog.cpp
+Qmitk/QmitkSimpleLabelSetListWidget.cpp
 )
 
 set(MOC_H_FILES
@@ -59,6 +60,7 @@ Qmitk/QmitkMaskStampWidget.h
 Qmitk/QmitkSliceBasedInterpolatorWidget.h
 Qmitk/QmitkSurfaceBasedInterpolatorWidget.h
 Qmitk/QmitkSearchLabelDialog.h
+Qmitk/QmitkSimpleLabelSetListWidget.h
 )
 
 set(UI_FILES
@@ -67,6 +69,7 @@ Qmitk/QmitkConfirmSegmentationDialog.ui
 Qmitk/QmitkOtsuToolWidgetControls.ui
 Qmitk/QmitkPickingToolGUIControls.ui
 Qmitk/QmitkLiveWireTool2DGUIControls.ui
+Qmitk/QmitkWatershedToolGUIControls.ui
 #Added from ML
 Qmitk/QmitkLabelSetWidgetControls.ui
 Qmitk/QmitkSurfaceStampWidgetGUIControls.ui

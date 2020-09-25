@@ -37,7 +37,6 @@ function(mitkFunctionCompileSnippets snippet_path)
       target_link_libraries(${snippet_target_name} ${ARGN})
     endif()
     set_target_properties(${snippet_target_name} PROPERTIES
-      LABELS Documentation
       RUNTIME_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/snippets"
       ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/snippets"
       LIBRARY_OUTPUT_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/snippets"

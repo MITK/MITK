@@ -12,9 +12,7 @@ found in the LICENSE file.
 #ifndef MITKOTSUTOOL3D_H
 #define MITKOTSUTOOL3D_H
 
-#include "itkImage.h"
-#include "mitkAutoSegmentationWithPreviewTool.h"
-#include "mitkDataNode.h"
+#include "mitkAutoMLSegmentationWithPreviewTool.h"
 #include <MitkSegmentationExports.h>
 
 namespace us
@@ -26,10 +24,10 @@ namespace mitk
 {
   class Image;
 
-  class MITKSEGMENTATION_EXPORT OtsuTool3D : public AutoSegmentationWithPreviewTool
+  class MITKSEGMENTATION_EXPORT OtsuTool3D : public AutoMLSegmentationWithPreviewTool
   {
   public:
-    mitkClassMacro(OtsuTool3D, AutoSegmentationWithPreviewTool);
+    mitkClassMacro(OtsuTool3D, AutoMLSegmentationWithPreviewTool);
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
@@ -38,7 +36,6 @@ namespace mitk
     us::ModuleResource GetIconResource() const override;
 
     void Activated() override;
-    void Deactivated() override;
 
     itkSetMacro(NumberOfBins, unsigned int);
     itkGetConstMacro(NumberOfBins, unsigned int);
@@ -50,31 +47,18 @@ namespace mitk
     itkGetConstMacro(UseValley, bool);
     itkBooleanMacro(UseValley);
 
-    using SelectedRegionVectorType = std::vector<int>;
-    void SetSelectedRegions(const SelectedRegionVectorType& regions);
-    SelectedRegionVectorType GetSelectedRegions() const;
-
     /**Returns the number of max bins based on the current input image.*/
     unsigned int GetMaxNumberOfBins() const;
 
   protected:
-    OtsuTool3D();
-    ~OtsuTool3D() override;
+    OtsuTool3D() = default;
+    ~OtsuTool3D() = default;
 
-    void UpdateCleanUp() override;
-    void DoUpdatePreview(const Image* inputAtTimeStep, Image* previewImage, TimeStepType timeStep) override;
-
-    template <typename TPixel, unsigned int VImageDimension>
-    void CalculatePreview(itk::Image<TPixel, VImageDimension> *itkImage, mitk::Image* segmentation, unsigned int timeStep);
+    LabelSetImage::Pointer ComputeMLPreview(const Image* inputAtTimeStep, TimeStepType timeStep) override;
 
     unsigned int m_NumberOfBins = 128;
     unsigned int m_NumberOfRegions = 2;
     bool m_UseValley = false;
-    SelectedRegionVectorType m_SelectedRegions = {};
-
-    // holds the multilabel result as a preview image
-    mitk::DataNode::Pointer m_OtsuResultNode;
-    TimeStepType m_LastOtsuTimeStep = 0;
   }; // class
 } // namespace
 #endif

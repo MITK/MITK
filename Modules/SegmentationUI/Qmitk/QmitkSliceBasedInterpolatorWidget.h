@@ -47,6 +47,8 @@ namespace mitk
   visible. It triggers generation of interpolation suggestions and also triggers acception of
   suggestions.
 
+  This class uses the mitk::ToolManagerProvider::MULTILABEL_SEGMENTATION context.
+
   \todo show/hide feedback on demand
 
   Last contributor: $Author: maleike $

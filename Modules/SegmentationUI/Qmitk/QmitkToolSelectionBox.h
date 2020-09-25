@@ -112,6 +112,7 @@ protected slots:
 
   void toolButtonClicked(int id);
   void SetGUIEnabledAccordingToToolManagerState();
+  void UpdateButtonsEnabledState();
 
 protected:
   void showEvent(QShowEvent *) override;

@@ -1,21 +1,88 @@
 /**
-\page org_mitk_gui_qt_matchpoint_visualizer The MatchPoint Registration Visualizer View
+\page org_mitk_views_matchpoint_visualizer The MatchPoint Registration Visualizer View
 
 \imageMacro{map_vis_icon_doc.svg, "Icon of the Registration Visualizer",3}
 
 \tableofcontents
 
 \section MAP_VIS_Introduction Introduction
-This view is in development to offer the user a way to visualize MatchPoint registrations in a MITK scene.
-Currently only a simple grid visualization and glyph visualization is implemented.\n
-\remark <b>This is an experimental version and work in progress.</b> So please excuse errors or usage issues and report them. This view will be improved and polished with the next releases.
-
-\section MAP_VIS_Contact Contact information
-This plug-in is being developed by the SIDT group (Software development for Integrated Diagnostics
-and Therapy) at the German Cancer Research Center (DKFZ). If you have any questions, need support,
-find a bug or have a feature request, feel free to contact us at www.mitk.org.
+This view is in development to offer the user a way to visualize MatchPoint registrations (so the transformation/deformation field they represent) in a MITK scene.
+Currently, a simple grid visualization and glyph visualization is implemented.\n
+\remark <b>This is an experimental version and work in progress.</b> So please excuse errors or usage issues and report them at https://phabricator.mitk.org.
 
 \section MAP_VIS_Usage Usage
-Oops. Documentation is missing and to be done.
-*/
+\imageMacro{map_view_visualizer_example.png, "Example screenshot showing the main elements of the view used to visualize a registration.", 14}
+The view has following steps/sections:\n\n
+(1) <b>Registration slot</b>: Shows the currently selected registration which is visualized and whose visualization settings should be altered. Click to change.\n\n
 
+(2) <b>Registration information</b>: General information on the selected registration.\n\n
+
+(3) <b>Update visual settings</b>: By clicking the button the current settings will be accepted and the visualization of the registration will be updated accordingly.\n\n
+
+(4) <b>Mapping direction</b>: Allows to select the mapping direction that should be visualized (more details see below \ref MAP_VIS_Direction).\n\n
+
+(5) <b>Visualization style</b>: Select how the registration should be visualized. Currently two options are available.:
+- Grid: Visualize as a wire frame grid that is deformed by the registration. The magnitude of deformation can be encoded in the grid color (cf style example "a)" below).
+- Glyph: Visualize as a cloud of arrows that follow the deformation vectors of the registrations. The magnitude of deformation can be encoded in the glyph color (cf style example "f)" below).
+
+More details can be found in the settings and style section below.
+
+\imageMacro{map_view_visualizer_style_example.png, "Example of the appearance of different style settings: a) grid style; b) grid with no color interpolation; c) grid in unicolor; d) grid with different grid frequency (frequency=1); e) grid also showing start grid (in gray); f) glyph style.", 14}
+
+\section MAP_VIS_Settings_vis Visualization settings
+\imageMacro{map_view_visualizer_vis_settings.png, "Visualization settings offered by view.", 8}
+(6) <b>Color style</b>: The following color styles are available:
+- uni color: everything painted in the selected color (cf style example "c)"). Click on the color button to change the used color.
+- vector magnitode: the color is depending on the respective vector magnitude of the deformation field (cf style example "a)" and "b)"). See (7) for instructions to change the used color encoding for the magnitude.
+
+(7) <b>Color coding settings</b>: One can change the color and associated vector length (in mm) for 4 classes of magnitude (negligible, small, medium and large). The color is encoded accordingly.\n\n
+
+(8) <b>Interpolate colors</b>: By default activated, the colors between to magnitude classes (see (7)) will be linear interpolated (e.g. with the settings given in the example shifts of 5 mm will be yellow, 10 mm will be orange and >=15 mm will be red). If interpolation is deactivated the color of one class is used till a next higher class is reached. Cf style example "a)" and "b)", in "b)" no red color can be seen because no shift was 15 mm or greater (magnitude class "large").
+
+\section MAP_VIS_Settings_grid Grid settings
+\imageMacro{map_view_visualizer_grid_settings.png, "Grid settings offered by view.", 8}
+These are only available for style "grid".\n\n
+(9) <b>Grid frequency</b>: Allows to control how spares the grid frame should be. With a frequency n only each n-th element of the frame will be visualized, so the visual grid has n-times the spacing of the FOV. One can also achieve something similar with just changing the FOV spacing (see below), but using the frequency allows for a sparse frame and still having a high resolution in the frame deformation. The latter one would loose if just using a low FOV spacing. Style example "a)" and "d)" illustrate different frequency settings and there effect.\n\n
+
+(10) <b>Start grid</b>: If activated also the start grid of the registration will (for the chosen direction) will be visible. This is another grid specific possibility to illustrate the amount of deformation (cf style example "e)").\n\n
+
+(11) <b>Start grid color</b>: Select the color that should be used for the start grid. Click on the color button to change the used color.
+
+\section MAP_VIS_Settings_FOV Field of view (FOV) settings
+\imageMacro{map_view_visualizer_FOV_settings.png, "FOV settings offered by view.", 8}
+The field of view defines the area of space (grid) that should be used for the visualization of the registration.\n\n
+
+(12) <b>Size</b>: Size of the FOV in mm.\n\n
+
+(13) <b>Origin</b>: Origin of the FOV in mm.\n\n
+
+(14) <b>Spacing</b>: Spacing of the FOV in mm. This directly impact the visualization's level of detail. IMPORTANT: Please be careful with setting small spacings, as it can lead to computational very expensive visualizations.\n\n
+
+(15) <b>Orientation</b>: Orientation matrix of the FOV (only readable).\n\n
+
+(16) <b>FOV Reference slot</b>: Select an image that should be used to define the geometric properties of the FOV. By default (and available) the target image used to determine the registration will be used. Click slot to change the FOV reference.\n\n
+
+(17) <b>Relevant FOV reference properties</b>: One can select which properties of the reference image will be used to specify the FOV.\n\n
+
+\section MAP_VIS_Direction Information regarding the directions
+
+Registrations can have two supported directions (direct and inverse). The direct kernel maps from the moving space into the target space, so this is the direction that "naively" people assume when they think about registrations. But practically it is only used to map continuous data like point sets. The inverse kernel maps from the target space into the moving space and is used to map images by so called inverse mapping. The effect is most obvious in the glyph style, where the glyphs points from the mapped space to the point in the moving space.
+
+\section MAP_VIS_used_data Data reference
+The data visible in the visualization styles images is part of the Patient 1 of the DIR_validation_data data set.
+For further information:
+https://www.creatis.insa-lyon.fr/rio/dir_validation_data
+
+--------------
+
+    By downloading this data, you agreeing to follow these guidelines. When using any of the data provided for publications, please make reference to:
+
+    The institution from which they were obtained: the Léon Bérard Cancer Center & CREATIS lab, Lyon, France.
+    The article containing the description of this data:
+
+    J. Vandemeulebroucke, S. Rit, J. Kybic, P. Clarysse, and D. Sarrut. Spatiotemporal motion estimation for respiratory-correlated imaging of the lungs. In Med Phys, 2011, 38(1), 166-178. pdf
+	
+---------------
+
+
+*/

@@ -48,10 +48,7 @@ function(CreateExample _name)
     endforeach()
   endif()
   target_link_libraries(Example-${_name} ${CppMicroServices_LIBRARIES})
-  set_target_properties(Example-${_name} PROPERTIES
-    LABELS Examples
-    OUTPUT_NAME ${_name}
-  )
+  set_target_properties(Example-${_name} PROPERTIES OUTPUT_NAME ${_name})
 endfunction()
 
 add_subdirectory(eventlistener)
@@ -167,10 +164,6 @@ if(US_BUILD_TESTING)
                            ENVIRONMENT "CppMicroServices_ROOT=${CppMicroServices_BINARY_DIR}/install_test${CMAKE_INSTALL_PREFIX};US_CXX_FLAGS=${US_CXX_FLAGS}")
       list(APPEND _example_tests usMakefileExampleCleanTest usMakefileExampleTest)
     endif()
-  endif()
-
-  if(US_TEST_LABELS)
-    set_tests_properties(${_example_tests} PROPERTIES LABELS "${US_TEST_LABELS}")
   endif()
 
 endif()

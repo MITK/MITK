@@ -35,7 +35,7 @@ It represents the true metadata of the selected data like DICOM tags of a DICOM 
 When saving specific data, most data properties are written to the data file, as long as the selected file format supports metadata.
 A popular example is the NRRD image format that allows to save custom key value pairs in text format in the file header.
 Not all data properties are meant for persistence, though.
-To check if a certain data property will be written to a metadata-enabled file format, click on in the properties tree view and check if there is a save icon at the bottom in the additional property info box.
+To check if a certain data property will be written to a metadata-enabled file format, click on it in the properties tree view and check if there is a save icon at the bottom in the additional property info box.
 
 \subsection org_mitk_views_propertiesUsageFilter Filter
 

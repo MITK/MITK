@@ -1,6 +1,3 @@
-# Compile source code snippets
-add_subdirectory(Snippets)
-
 # Different doxygen versions produce significantly different behaviour in the MITK documentation
 # especially in regards to the MITK Qt assistant help files and markdown files.
 # The HTML documentation is supposed to be build with Doxygen 1.8.7 or newer, the
@@ -62,17 +59,6 @@ if(MITK_DOXYGEN_GENERATE_QCH_FILES)
   #mark_as_advanced(MITK_DOXYGEN_GENERATE_VTK_QCH_FILE MITK_DOXYGEN_GENERATE_ITK_QCH_FILE)
 
 endif()
-
-
-if(MITK_USE_BLUEBERRY)
-  file(RELATIVE_PATH _blueberry_doxygen_path ${MITK_DOXYGEN_OUTPUT_DIR}/html ${BLUEBERRY_DOXYGEN_OUTPUT_DIR}/html)
-  set(BLUEBERRY_DOXYGEN_TAGFILE "${BLUEBERRY_DOXYGEN_TAGFILE_NAME}=${_blueberry_doxygen_path}")
-  set(BLUEBERRY_DOXYGEN_LINK "<a class=\"el\" href=\"${_blueberry_doxygen_path}/index.html\">BlueBerry Documentation</a>")
-  set(MITK_XP_LINK "\\ref mitkExtPointsIndex")
-  configure_file(schema.css ${MITK_DOXYGEN_OUTPUT_DIR}/html/schema.css)
-
-  set(MITK_DOXYGEN_ENABLED_SECTIONS "${MITK_DOXYGEN_ENABLED_SECTIONS} BLUEBERRY")
-endif(MITK_USE_BLUEBERRY)
 
 # Compile a doxygen input filter for processing CMake scripts
 include(mitkFunctionCMakeDoxygenFilterCompile)

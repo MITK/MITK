@@ -232,7 +232,7 @@ switch (actionId)
 \li Use lots of whitespace to separate logical blocks of code, intermixed with
 comments
 
-\li <b>DO NOT USE TABS.</b> The standard indention is <b>2 spaces</b> (see <a href="http://www.insightsoftwareconsortium.org/documents/policies/Style.pdf">ITK Style Guide</a>). Configure your
+\li <b>DO NOT USE TABS.</b> The standard indention is <b>2 spaces</b> (see <a href="https://itk.org/Wiki/images/c/c6/ITKStyle.pdf">ITK Style Guide</a>). Configure your
 editor accordingly.
 
 \li DO NOT USE trailing whitespaces

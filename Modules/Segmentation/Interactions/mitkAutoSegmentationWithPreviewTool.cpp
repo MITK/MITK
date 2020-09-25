@@ -123,7 +123,10 @@ void mitk::AutoSegmentationWithPreviewTool::Deactivated()
     // don't care
   }
 
-  m_PreviewSegmentationNode->SetData(nullptr);
+  if (m_PreviewSegmentationNode.IsNotNull())
+  {
+    m_PreviewSegmentationNode->SetData(nullptr);
+  }
 
   Superclass::Deactivated();
 }
@@ -404,13 +407,14 @@ void mitk::AutoSegmentationWithPreviewTool::UpdatePreview(bool ignoreLazyPreview
   auto previewImage = this->GetPreviewSegmentation();
   int progress_steps = 200;
 
+  this->CurrentlyBusy.Send(true);
+
   this->UpdatePrepare();
 
   const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
 
   try
   {
-    this->CurrentlyBusy.Send(true);
     if (nullptr != inputImage && nullptr != previewImage)
     {
       m_ProgressCommand->AddStepsToDo(progress_steps);

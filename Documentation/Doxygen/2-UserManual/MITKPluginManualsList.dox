@@ -14,7 +14,7 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
   <li> \ref  org_mitk_gui_qt_flowapplication </li>
   <li> \ref  org_mitk_views_imagecropper </li>
   <li> \ref  org_mitk_views_imagenavigator </li>
-  <li> \ref  org_blueberry_ui_qt_log </li>
+  <li> \ref  org_blueberry_views_logview </li>
   <li> \ref  org_mitk_views_matchpoint_algorithm_browser</li>
   <li> \ref  org_mitk_views_matchpoint_algorithm_control</li>
   <li> \ref  org_mitk_views_matchpoint_evaluator</li>
@@ -33,18 +33,18 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
   <li> \ref  org_mitk_gui_qt_flow_segmentation </li>
   <li> \ref  org_mitk_gui_qt_viewnavigator </li>
   <li> \ref  org_mitk_views_volumevisualization</li>
+  <li> \ref  org_mitk_views_properties </li>
 
 </ul>
 
 \subpage PluginListSpecificPage
 
 <ul>
-  <li> \ref  org_mitk_views_properties </li>
   <li> \ref  org_mitk_gui_qt_aicpregistration </li>
   <li> \ref  org_mitk_gui_qt_cest </li>
   <li> \ref  org_mitk_gui_qt_classificationsegmentation </li>
   <li> \ref  org_mitk_views_cmdlinemodules </li>
-  <li> \ref  org_mitk_gui_qt_pharmacokinetics_concentration_mri</li>
+  <li> \ref  org_mitk_views_pharmacokinetics_concentration_mri</li>
   <li> \ref  org_mitk_views_pharmacokinetics_mri</li>
   <li> \ref  org_mitk_gui_qt_pharmacokinetics_pet</li>
   <li> \ref  org_mitk_gui_qt_eventrecorder </li>
@@ -56,16 +56,16 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
   <li> \ref  org_mitk_gui_qt_igttrackingsemiautomaticmeasurement</li>
   <li> \ref  org_mitk_views_imagestatistics</li>
   <li> \ref  org_mitk_gui_qt_lasercontrol</li>
-  <li> \ref  org_mitk_gui_qt_fit_demo </li>
+  <li> \ref  org_mitk_views_fit_demo </li>
   <li> \ref  org_mitk_gui_qt_fit_genericfitting </li>
-  <li> \ref  org_mitk_gui_qt_fit_inspector </li>
+  <li> \ref  org_mitk_views_fit_inspector </li>
   <li> \ref  org_mitkexamplesopencv</li>
   <li> \ref  org_mitk_gui_qt_overlaymanager</li>
   <li> \ref  org_mitk_gui_qt_mitkphenotyping</li>
   <li> \ref  org_mitk_gui_qt_photoacoustics_pausmotioncompensation</li>
   <li> \ref  org_mitk_example_gui_pcaexample</li>
   <li>  \ref org_mitk_gui_qt_preprocessing_resampling</li>
-  <li> \ref  org_mitk_gui_qt_pharmacokinetics_curvedescriptor</li>
+  <li> \ref  org_mitk_views_pharmacokinetics_curvedescriptor</li>
   <li> \ref  org_mitk_gui_qt_photoacoustics_imageprocessing</li>
   <li> \ref  org_mitk_gui_qt_pharmacokinetics_simulation</li>
   <li> \ref  org_mitk_gui_qt_pointsetinteractionmultispectrum</li>

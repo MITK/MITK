@@ -22,7 +22,6 @@ if(MITK_USE_POLHEMUS_TRACKER)
 endif(MITK_USE_POLHEMUS_TRACKER)
 
 MITK_CREATE_MODULE(
-  SUBPROJECTS MITK-IGT
   INCLUDE_DIRS
     PUBLIC Algorithms Common DataManagement ExceptionHandling IO Rendering TrackingDevices TestingHelper
     PRIVATE ${ADDITIONAL_INCLUDE_DIRS}

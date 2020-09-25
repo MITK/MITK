@@ -23,9 +23,6 @@ endif()
 # Link the CppMicroServices library
 target_link_libraries(Example-${_lib_name} ${CppMicroServices_LIBRARIES})
 
-set_target_properties(Example-${_lib_name} PROPERTIES
-  LABELS Examples
-  OUTPUT_NAME ${_lib_name}
-)
+set_target_properties(Example-${_lib_name} PROPERTIES OUTPUT_NAME ${_lib_name})
 
 #CreateExample(dictionaryservice ${_srcs})

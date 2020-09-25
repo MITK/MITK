@@ -55,6 +55,7 @@ found in the LICENSE file.
 #include <mitkImageTimeSelector.h>
 #include <mitkMaskedDynamicImageStatisticsGenerator.h>
 #include <mitkExtractTimeGrid.h>
+#include <mitkModelFitResultRelationRule.h>
 
 #include <QMessageBox>
 #include <QThreadPool>
@@ -1133,11 +1134,8 @@ MRPerfusionView::MRPerfusionView() : m_FittingInProgress(false), m_HasGeneratedN
     return  (node && node->GetData() && node->GetData()->GetTimeSteps() > 1);
   });
 
-  auto isNoModelFitNodePredicate = mitk::NodePredicateFunction::New([](const mitk::DataNode* node) {
-    bool isNoModelFitNode = node->GetData()->GetProperty(mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str()).IsNull();
-    return isNoModelFitNode;
-  });
-
+  auto modelFitResultRelationRule = mitk::ModelFitResultRelationRule::New();
+  auto isNoModelFitNodePredicate = mitk::NodePredicateNot::New(modelFitResultRelationRule->GetConnectedSourcesDetector());
 
   this->m_isValidPDWImagePredicate = mitk::NodePredicateAnd::New(is3DImage, isNoModelFitNodePredicate);
   this->m_isValidTimeSeriesImagePredicate = mitk::NodePredicateAnd::New(isDynamicData, isImage, isNoMask);

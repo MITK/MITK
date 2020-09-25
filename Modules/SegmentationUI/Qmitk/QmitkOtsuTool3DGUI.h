@@ -15,13 +15,11 @@ found in the LICENSE file.
 
 #include "QmitkToolGUI.h"
 #include "mitkOtsuTool3D.h"
-#include "ui_QmitkOtsuToolWidgetControls.h"
-#include <MitkSegmentationUIExports.h>
-#include <QListWidget>
-#include <QPushButton>
 
-class QSpinBox;
-class QLabel;
+#include "ui_QmitkOtsuToolWidgetControls.h"
+
+#include <MitkSegmentationUIExports.h>
+#include <QPushButton>
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
@@ -41,19 +39,15 @@ public:
   itkFactorylessNewMacro(Self);
   itkCloneMacro(Self);
 
-    signals :
+protected slots :
 
-    public slots :
-
-    protected slots :
-
-    void OnNewToolAssociated(mitk::Tool *);
+  void OnNewToolAssociated(mitk::Tool *);
 
   void OnSpinboxValueAccept();
 
   void OnSegmentationRegionAccept();
 
-  void OnRegionSelectionChanged();
+  void OnRegionSelectionChanged(const QmitkSimpleLabelSetListWidget::LabelVectorType& selectedLabels);
 
   void OnRegionSpinboxChanged(int);
 
@@ -76,8 +70,6 @@ protected:
   bool m_UseValleyEmphasis;
 
   int m_NumberOfBins;
-
-  QList<QListWidgetItem *> m_SelectedItems;
 };
 
 #endif

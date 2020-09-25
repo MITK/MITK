@@ -150,6 +150,7 @@ The document starts with a brief explanation of the disadvantages of the old con
 		A provider in turn provides a specific data storage inspector, which can be used to display the data nodes of the data storage.
 
 		The user can define which of the registered data storage inspectors should be available when using a QmitkNodeSelectionDialog: Using the workbench preferences one can select the <a>Node Selection</a> entry and enable or disable certain data storage inspectors.
+		Currently four frequently used custom data storage inspectors are already registered and available inside the QmitkNodeSelectionDialog.
 
 		\b mitk::IDataStorageInspectorProvider
 		
@@ -189,10 +190,9 @@ The document starts with a brief explanation of the disadvantages of the old con
 		\endcode
 		
 		In the code snippets the QmitkDataStorageListInspector class was used. This is an example of a concrete data storage inspector which is provided by the presented selection concept. It is a frequently used basic inspector and already registered via a corresponding provider base.
-		This is done inside the mitk::QtWidgetsActivator class; a class that is used during module activation.
+		This is done inside the mitk::QtWidgetsActivator class; a class that is used during module activation. The following sections describe these four frequently used basic inspectors.
 		
 		\subsubsection QmitkDataStorageListInspector
-
 			The QmitkDataStorageListInspector is an example of a concrete data storage inspector, subclassing the QmitkAbstractDataStorageInspector. Its only purpose is to provide a custom model-view pair that represents a list view onto the data storage. The view is a simple QListView.
 			The model is a custom model derived from the above mentioned QmitkAbstractDataStorageModel: The QmitkDataStorageDefaultListModel overrides the five pure virtual functions to react on changes of the data storage or the node predicate:
 			each function calls the private UpdateModelData-function, which will simply retrieve the currently available (possibly filtered) data nodes of the data storage.
@@ -200,15 +200,20 @@ The document starts with a brief explanation of the disadvantages of the old con
 			This function is used by Qt to define what has to be displayed in the list view. It is important that a custom model returns an mitk::DataNode::Pointer object for a model index when the role is mitkDataNodeRole.
 		
 		\subsubsection QmitkDataStorageTreeInspector
-
 			The QmitkDataStorageTreeInspector is another example of a concrete data storage inspector, subclassing the QmitkAbstractDataStorageInspector. Its only purpose is to provide a custom model-view pair that represents a tree view onto the data storage. The view is a simple QTreeView.
 			The model is a custom model derived from the above mentioned QmitkAbstractDataStorageModel: The QmitkDataStorageSimpleTreeModel needs to override some functions of the QAbstractItemModel in order to represent a tree model.
 			Again, one important function to override is the data(const QModelIndex\& index, int role = Qt::DisplayRole)}-function. It is important that the simple tree model returns an mitk::DataNode::Pointer object for a model index when the role is mitkDataNodeRole.
 			The QmitkDataStorageTreeInspector is designed to reflect the classical data manager view.
 
 		\subsubsection QmitkDataStorageSelectionHistoryInspector
-		
+			The QmitkDataStorageSelectionHistoryInspector is a concrete data storage inspector that allows to view the recently used nodes of the data storage.
+			It uses the same QmitkDataStorageDefaultListModel as the QmitkDataStorageListInspector. The QmitkDataStorageSelectionHistoryInspector provides a function to add nodes to the selection history.
+			The selection history will be displayed in chronological order and a selected node will only appear once in the history list.
+
 		\subsubsection QmitkDataStorageFavoriteNodesInspector
+			The QmitkDataStorageFavoriteNodesInspector is a concrete data storage inspector that allows to view a user's favorite nodes of the data storage. It extends the QmitkDataStorageListInspector.
+			The QmitkNodeSelectionDialog provides a function to set nodes as favorite nodes. This allows the QmitkDataStorageFavoriteNodesInspector to use a customized node predicate to filter nodes according to their favorite-property-state.
+			The QmitkDataStorageSelectionHistoryInspector provides a function to unset nodes as favorite nodes, so that they won't appear anymore in the list of favorite nodes.
 
 	\subsection NodeSelectionWidgets The node selection widgets
 		\b QmitkAbstractNodeSelectionWidget

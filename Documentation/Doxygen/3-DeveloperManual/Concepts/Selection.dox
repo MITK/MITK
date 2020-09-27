@@ -150,7 +150,6 @@ The document starts with a brief explanation of the disadvantages of the old con
 		A provider in turn provides a specific data storage inspector, which can be used to display the data nodes of the data storage.
 
 		The user can define which of the registered data storage inspectors should be available when using a QmitkNodeSelectionDialog: Using the workbench preferences one can select the <a>Node Selection</a> entry and enable or disable certain data storage inspectors.
-		Currently four frequently used custom data storage inspectors are already registered and available inside the QmitkNodeSelectionDialog.
 
 		\b mitk::IDataStorageInspectorProvider
 		
@@ -189,8 +188,8 @@ The document starts with a brief explanation of the disadvantages of the old con
 			QmitkAbstractDataStorageInspector* dataStorageInspector = dataStorageProvider->CreateInspector();
 		\endcode
 		
-		In the code snippets the QmitkDataStorageListInspector class was used. This is an example of a concrete data storage inspector which is provided by the presented selection concept. It is a frequently used basic inspector and already registered via a corresponding provider base.
-		This is done inside the mitk::QtWidgetsActivator class; a class that is used during module activation. The following sections describe these four frequently used basic inspectors.
+		In the code snippets the QmitkDataStorageListInspector class was used. This is an example of a concrete data storage inspector which is provided by the presented selection concept. It is a frequently used data storage inspector and already registered via a corresponding provider base.
+		This is done inside the mitk::QtWidgetsActivator class; a class that is used during module activation. Currently four frequently used custom data storage inspectors are already registered. The following sections describe these four frequently used basic inspectors.
 		
 		\subsubsection QmitkDataStorageListInspector
 			The QmitkDataStorageListInspector is an example of a concrete data storage inspector, subclassing the QmitkAbstractDataStorageInspector. Its only purpose is to provide a custom model-view pair that represents a list view onto the data storage. The view is a simple QListView.
@@ -212,8 +211,10 @@ The document starts with a brief explanation of the disadvantages of the old con
 
 		\subsubsection QmitkDataStorageFavoriteNodesInspector
 			The QmitkDataStorageFavoriteNodesInspector is a concrete data storage inspector that allows to view a user's favorite nodes of the data storage. It extends the QmitkDataStorageListInspector.
-			The QmitkNodeSelectionDialog provides a function to set nodes as favorite nodes. This allows the QmitkDataStorageFavoriteNodesInspector to use a customized node predicate to filter nodes according to their favorite-property-state.
-			The QmitkDataStorageSelectionHistoryInspector provides a function to unset nodes as favorite nodes, so that they won't appear anymore in the list of favorite nodes.
+			The QmitkNodeSelectionDialog provides a function to set nodes as favorite nodes using a specific node property.
+			It allows the QmitkDataStorageFavoriteNodesInspector to use a customized node predicate to filter nodes according to their favorite-property-state.
+			This favorite-property-state is defined by the node property "org.mitk.selection.favorite"
+			The QmitkDataStorageFavoriteNodesInspector provides a function to unset nodes as favorite nodes by setting this specific node property to "false", so that they won't appear anymore in the list of favorite nodes.
 
 	\subsection NodeSelectionWidgets The node selection widgets
 		\b QmitkAbstractNodeSelectionWidget
@@ -258,7 +259,7 @@ The document starts with a brief explanation of the disadvantages of the old con
 		Using QmitkAbstractNodeSelectionWidget::GetSelectedNodes the currently selected node of the selection widget can be retrieved anytime.
 
 		QmitkMultiNodeSelectionWidget::SetSelectionCheckFunction allows to define a function that puts a constraint on the node selection (dialog) to only allow specific combinations or seletions of nodes.
-		The result of the constraint has to result in either an empty string (valid node selection) or
+		The result of the constraint check has to be either an empty string (indicating a valid node selection) or a string that explains the error / constraint violation.
 		A simple check function can look like this:
 		\code
 			auto checkFunction = [](const QmitkMultiNodeSelectionWidget::NodeList & nodes)

@@ -6,13 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>270</width>
-    <height>300</height>
+    <width>98</width>
+    <height>62</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QmitkDataSelectionWidget" name="dataSelectionWidget" native="true"/>
+    <widget class="QmitkDataSelectionWidget" name="dataSelectionWidget" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QPushButton" name="pushButton">
@@ -29,7 +36,7 @@
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>273</height>
+       <height>40</height>
       </size>
      </property>
     </spacer>

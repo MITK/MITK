@@ -43,12 +43,13 @@ namespace mitk {
 
         inline TOutputpixel operator()( const TInputPixel1 & value, const TInputPixel2 & baseline)
         {
-            TOutputpixel concentration(0);
+            double concentration = 0.0;
             if(value !=0 && baseline != 0)
             {
-                concentration = this->m_k / this->m_TE * log((double)(value- baseline)) ;
+              concentration = (-1.) * (this->m_k / this->m_TE) * log(static_cast<double>(value) / baseline);
+
             }
-            return concentration;
+            return static_cast<TOutputpixel>(concentration);
         }
 
     private:

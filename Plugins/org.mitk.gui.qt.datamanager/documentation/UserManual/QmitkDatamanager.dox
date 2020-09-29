@@ -137,13 +137,13 @@ If the data types of multiple selected data nodes differ, the actions might not 
 \section DataManagerPreferences Preferences
 
 The MITK Workbench provides a <em>preference page</em> for specific plugins. The preference page provided for the Datamanager can be seen in the \ref PreferencePage "Preference page" screenshot.
-It allows to set preferences for the Datamanager that define the behavior of the Datamanager.
-The user can open the preference page either:
+The user can open the preference page by
 <ul>
   <li> using the keyboard shortcut <em>Ctrl + p</em>
-  <li> useing <em>Window -> Preferences...</em> from the top menu
+  <li> using <em>Window -> Preferences...</em> from the top menu.
 </ul>
 
+It allows to set the following preferences for the Datamanager, which define the behavior of the Datamanager:
 <ul>
   <li> <em>Place new nodes on top</em>: If enabled, newly added data nodes will be inserted at the top of the list of data nodes inside the Datamanager.
   If disabled, newly added nodes will be inserted at the bottom of the list.

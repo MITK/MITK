@@ -358,7 +358,13 @@ function(submit)
     unset(submit_url)
   endif()
 
-  ctest_submit(${submit_url} RETRY_COUNT 3 RETRY_DELAY 5 PARTS ${ARG_PARTS})
+  if(MITK_AUTH_TOKEN)
+    set(http_header HTTPHEADER "Authorization: Bearer ${MITK_AUTH_TOKEN}")
+  else()
+    unset(http_header)
+  endif()
+
+  ctest_submit(${submit_url} ${http_header} RETRY_COUNT 3 RETRY_DELAY 5 PARTS ${ARG_PARTS})
 endfunction()
 
 #[============================================================================[

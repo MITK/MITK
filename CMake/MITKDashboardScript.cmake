@@ -47,6 +47,10 @@ set(MITK_SUBMIT_URL
   "https://cdash.mitk.org/submit.php?project=MITK"
 )
 
+set(MITK_AUTH_TOKEN
+  ""
+)
+
 set(MITK_BUILD_CONFIGURATION
 # "All"
   "WorkbenchRelease"

@@ -46,8 +46,8 @@ The plugin provides a <b>ball</b> and a <b>cross</b> as structuring elements. Th
 <ul>
 	<li> <b>Dilation:</b> Each labeled pixel within the segmentation will be dilated based on the selected structuring element.
 	<li> <b>Erosion:</b> Each labeled pixel within the segmentation will be eroded based on the selected structuring element.
+	<li> <b>Closing:</b> An erosion followed by a dilation, used for filling small holes.
 	<li> <b>Opening:</b> A dilation followed by an erosion, used for smoothing edges or eliminating small objects.
-	<li> <b>Closing:</b> An erosion followed by an dilation, used for filling small holes.
 	<li> <b>Fill Holes:</b> Fills bigger holes within a segmentation.
 </ul>
 

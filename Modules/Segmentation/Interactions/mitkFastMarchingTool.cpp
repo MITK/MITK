@@ -269,11 +269,14 @@ void mitk::FastMarchingTool::ConfirmSegmentation()
   {
     // logical or combination of preview and segmentation slice
 
-    mitk::Image::Pointer workingImageSlice;
-    mitk::Image::Pointer workingImage = dynamic_cast<mitk::Image *>(this->m_ToolManager->GetWorkingData(0)->GetData());
-    workingImageSlice = GetAffectedImageSliceAs2DImage(m_WorkingPlane, workingImage, m_CurrentTimeStep);
+    Image::Pointer workingImageSlice;
 
-    mitk::Image::Pointer segmentationResult = mitk::Image::New();
+    Image::Pointer workingImage = dynamic_cast<Image *>(this->m_ToolManager->GetWorkingData(0)->GetData());
+    TimePointType referenceImageTimePoint = m_ReferenceImage->GetTimeGeometry()->TimeStepToTimePoint(m_CurrentTimeStep);
+    TimeStepType workingImageTimeStep = workingImage->GetTimeGeometry()->TimePointToTimeStep(referenceImageTimePoint);
+    workingImageSlice = GetAffectedImageSliceAs2DImage(m_WorkingPlane, workingImage, workingImageTimeStep);
+
+    Image::Pointer segmentationResult = Image::New();
 
     bool isDeprecatedUnsignedCharSegmentation =
       (workingImage->GetPixelType().GetComponentType() == itk::ImageIOBase::UCHAR);
@@ -316,7 +319,7 @@ void mitk::FastMarchingTool::ConfirmSegmentation()
 
     // write to segmentation volume and hide preview image
     // again, current time step is not considered
-    this->WriteBackSegmentationResult(m_WorkingPlane, segmentationResult, m_CurrentTimeStep);
+    this->WriteBackSegmentationResult(m_WorkingPlane, segmentationResult, workingImageTimeStep);
     this->m_ResultImageNode->SetVisibility(false);
 
     this->ClearSeeds();

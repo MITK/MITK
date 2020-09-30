@@ -137,14 +137,16 @@ void mitk::LiveWireTool2D::EnableContourLiveWireInteraction(bool on)
 
 void mitk::LiveWireTool2D::ConfirmSegmentation()
 {
+  auto referenceNode = m_ToolManager->GetReferenceData(0);
   auto workingNode = m_ToolManager->GetWorkingData(0);
 
-  if (nullptr == workingNode)
+  if (nullptr == referenceNode || nullptr == workingNode)
     return;
 
+  auto referenceImage = dynamic_cast<Image *>(referenceNode->GetData());
   auto workingImage = dynamic_cast<Image *>(workingNode->GetData());
 
-  if (nullptr == workingImage)
+  if (nullptr == referenceImage || nullptr == workingImage)
     return;
 
   std::vector<SliceInformation> sliceInfos;
@@ -164,12 +166,15 @@ void mitk::LiveWireTool2D::ConfirmSegmentation()
       if (contour->IsEmptyTimeStep(t))
         continue;
 
-      auto workingSlice = this->GetAffectedImageSliceAs2DImage(workingContour.second, workingImage, t);
+      TimePointType referenceImageTimePoint = referenceImage->GetTimeGeometry()->TimeStepToTimePoint(t);
+      TimeStepType workingImageTimeStep = workingImage->GetTimeGeometry()->TimePointToTimeStep(referenceImageTimePoint);
+
+      auto workingSlice = this->GetAffectedImageSliceAs2DImage(workingContour.second, workingImage, workingImageTimeStep);
       auto projectedContour = ContourModelUtils::ProjectContourTo2DSlice(workingSlice, contour, true, false);
 
-      ContourModelUtils::FillContourInSlice(projectedContour, t, workingSlice, workingImage, 1);
+      ContourModelUtils::FillContourInSlice(projectedContour, referenceImageTimePoint, workingSlice, workingImage, 1);
 
-      sliceInfos.emplace_back(workingSlice, workingContour.second, t);
+      sliceInfos.emplace_back(workingSlice, workingContour.second, referenceImageTimePoint);
       this->WriteSliceToVolume(sliceInfos.back());
     }
   }

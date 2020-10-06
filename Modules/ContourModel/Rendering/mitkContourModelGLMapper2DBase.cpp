@@ -391,6 +391,45 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel* r
       }
     }
 
+    std::vector<float> offsetLinePoints;
+    bool showOffsetLine = false;
+    dataNode->GetBoolProperty("contour.offset-line", showOffsetLine);
+    if (showOffsetLine && (renderingContour->IteratorEnd() - renderingContour->IteratorBegin() > 1)) {
+      auto itBegin = renderingContour->Begin();
+      mitk::Point3D startPoint = (*itBegin)->Coordinates;
+      mitk::Point3D endPoint = (*++itBegin)->Coordinates;
+
+      mitk::Point2D startPoint2d;
+      mitk::Point2D endPoint2d;
+      renderer->WorldToDisplay(startPoint, startPoint2d);
+      renderer->WorldToDisplay(endPoint, endPoint2d);
+      renderer->DisplayToPlane(startPoint2d, startPoint2d);
+      renderer->DisplayToPlane(endPoint2d, endPoint2d);
+
+      mitk::Vector2D directionVector2d = endPoint2d - startPoint2d;
+      double vectorLength = directionVector2d.GetNorm();
+      directionVector2d.Normalize();
+
+      mitk::Vector2D ortoVector2d;
+      ortoVector2d[0] = directionVector2d[1];
+      ortoVector2d[1] = -directionVector2d[0];
+
+      mitk::Point2D sectionBegin2d = startPoint2d;
+      mitk::Point2D sectionEnd2d = startPoint2d;
+
+      double sectionLength = 15.0;
+      sectionBegin2d -= ortoVector2d * sectionLength;
+      sectionEnd2d += ortoVector2d * sectionLength;
+
+      renderer->PlaneToDisplay(sectionBegin2d, sectionBegin2d);
+      renderer->PlaneToDisplay(sectionEnd2d, sectionEnd2d);
+
+      offsetLinePoints.push_back(sectionBegin2d[0]);
+      offsetLinePoints.push_back(sectionBegin2d[1]);
+      offsetLinePoints.push_back(sectionEnd2d[0]);
+      offsetLinePoints.push_back(sectionEnd2d[1]);
+    }
+
     //close contour if necessary
     if(renderingContour->IsClosed(timestep) && drawit && showSegments)
     {
@@ -429,6 +468,21 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel* r
       this->m_Context->GetPen()->SetColorF(penColor);
       this->m_Context->GetPen()->SetOpacity(opacity);
     }
+
+    if (showOffsetLine) {
+      double opacity = this->m_Context->GetPen()->GetOpacity();
+      double penColor[3];
+      this->m_Context->GetPen()->SetWidth(5.0);
+      this->m_Context->GetPen()->SetOpacity(200);
+      this->m_Context->GetPen()->GetColorF(penColor);
+      if (offsetLinePoints.size() > 1) {
+        this->m_Context->GetPen()->SetColorF(1.0, 0.9, 0.0);
+        this->m_Context->DrawLines(offsetLinePoints.data(), offsetLinePoints.size() / 2);
+      }
+      this->m_Context->GetPen()->SetColorF(penColor);
+      this->m_Context->GetPen()->SetOpacity(opacity);
+    }
+
     this->m_Context->GetPen()->SetWidth(1);
 
     //draw selected vertex if exists

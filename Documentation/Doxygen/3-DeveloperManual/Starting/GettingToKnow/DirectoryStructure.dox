@@ -35,7 +35,7 @@ The %CMake directory contains %CMake files, macros and templates for the configu
 
 This directory contains %CMake files for the configuration of other projects used by MITK.
 
-\subsection DirectoryStructurePageDocumentation Documenation
+\subsection DirectoryStructurePageDocumentation Documentation
 
 The Documentation directory contains doxygen and other documentation as well as tutorials and examples. It includes basic end user manuals for the framework as well as developer documentation which does not depend on any additional modules.
 
@@ -43,19 +43,19 @@ The Documentation directory contains doxygen and other documentation as well as 
 
 This directory contains example code used by the documentation in the Documentation directory.
 
-\subsection DirectoryStructurePageLicenses
+\subsection DirectoryStructurePageLicenses Licenses
 
 The Licenses directory contains various licenses used by MITK's dependencies.
 
 \subsection DirectoryStructurePageModules Modules
 
-This directory contains modules which extend the capabilities of MITK. For the concept behind modules see \ref ModularizationPageModules .
+This directory contains modules, which extend the capabilities of MITK. For the concept behind modules see \ref ModularizationPageModules .
 
 \subsection DirectoryStructurePagePlugins Plugins
 
 This directory contains plugins, which provide specific solutions. For further information see \ref ModularizationPagePlugInBundles .
 
-\subsection DirectoryStructurePageTemplates
+\subsection DirectoryStructurePageTemplates Templates
 
 This directory contains template files for recurring snippets like the copyright header for all source files.
 

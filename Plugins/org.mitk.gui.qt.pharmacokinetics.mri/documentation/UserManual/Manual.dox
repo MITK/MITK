@@ -1,6 +1,6 @@
 ﻿/**
 
-\page org_mitk_views_pharmacokinetics_mri DCE MR Perfusion Datafit View
+\page org_mitk_views_pharmacokinetics_mri The DCE MR Perfusion DataFit View
 
 
 \imageMacro{pharmacokinetics_mri_doc.svg,"Icon of the DCE MR Perfusion View",3.0}

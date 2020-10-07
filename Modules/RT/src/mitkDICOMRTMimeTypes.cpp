@@ -56,6 +56,16 @@ bool DICOMRTMimeTypes::RTDoseMimeType::AppliesTo(const std::string &path) const
     return false;
   }
 
+  // fix for bug 18572
+  // Currently this function is called for writing as well as reading, in that case
+  // the image information can of course not be parsed or further identifyed.
+  //so as a work arround we just return the current canRead if the file does not exist.
+  if (!itksys::SystemTools::FileExists(path.c_str()))
+  {
+    return canRead;
+  }
+  // end fix for bug 18572
+
   auto modality = GetModality(path);
   if (modality == "RTDOSE")
   {
@@ -118,6 +128,16 @@ bool DICOMRTMimeTypes::RTStructMimeType::AppliesTo(const std::string &path) cons
     return false;
   }
 
+  // fix for bug 18572
+  // Currently this function is called for writing as well as reading, in that case
+  // the image information can of course not be parsed or further identifyed.
+  //so as a work arround we just return the current canRead if the file does not exist.
+  if (!itksys::SystemTools::FileExists(path.c_str()))
+  {
+    return canRead;
+  }
+  // end fix for bug 18572
+
   auto modality = GetModality(path);
   if (modality == "RTSTRUCT") {
     return true;
@@ -148,6 +168,16 @@ bool DICOMRTMimeTypes::RTPlanMimeType::AppliesTo(const std::string &path) const
   if (!canRead) {
     return false;
   }
+
+  // fix for bug 18572
+  // Currently this function is called for writing as well as reading, in that case
+  // the image information can of course not be parsed or further identifyed.
+  //so as a work arround we just return the current canRead if the file does not exist.
+  if (!itksys::SystemTools::FileExists(path.c_str()))
+  {
+    return canRead;
+  }
+  // end fix for bug 18572
 
   auto modality = GetModality(path);
   if (modality == "RTPLAN") {

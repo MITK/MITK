@@ -1,5 +1,5 @@
 /**
-\page org_mitk_gui_qt_igttrackingsemiautomaticmeasurement The IGT Tracking Semi Automatic Measurement
+\page org_mitk_views_igttrackingsemiautomaticmeasurement The IGT Tracking Semi Automatic Measurement
 
 \imageMacro{icon.png,"Icon of IGT Tracking Semi Automatic Measurement",2.00}
 

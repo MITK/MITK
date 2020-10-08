@@ -15,7 +15,7 @@
   \li \subpage org_mitk_gui_qt_igtexample
   \li \subpage org_mitk_gui_qt_igtlplugin
   \li \subpage org_mitk_gui_qt_igttracking
-  \li \subpage org_mitk_gui_qt_igttrackingsemiautomaticmeasurement
+  \li \subpage org_mitk_views_igttrackingsemiautomaticmeasurement
   \li \subpage org_mitk_views_imagestatistics
   \li \subpage org_mitk_gui_qt_lasercontrol
   \li \subpage org_mitk_views_fit_demo

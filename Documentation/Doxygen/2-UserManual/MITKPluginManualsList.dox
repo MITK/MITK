@@ -53,7 +53,7 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
   <li> \ref  org_mitk_gui_qt_igtexample </li>
   <li> \ref  org_mitk_gui_qt_igtlplugin</li>
   <li> \ref  org_mitk_gui_qt_igttracking</li>
-  <li> \ref  org_mitk_gui_qt_igttrackingsemiautomaticmeasurement</li>
+  <li> \ref  org_mitk_views_igttrackingsemiautomaticmeasurement</li>
   <li> \ref  org_mitk_views_imagestatistics</li>
   <li> \ref  org_mitk_gui_qt_lasercontrol</li>
   <li> \ref  org_mitk_views_fit_demo </li>

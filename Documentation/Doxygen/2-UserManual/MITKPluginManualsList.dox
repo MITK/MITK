@@ -46,14 +46,14 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
   <li> \ref  org_mitk_views_cmdlinemodules </li>
   <li> \ref  org_mitk_views_pharmacokinetics_concentration_mri</li>
   <li> \ref  org_mitk_views_pharmacokinetics_mri</li>
-  <li> \ref  org_mitk_gui_qt_pharmacokinetics_pet</li>
+  <li> \ref  org_mitk_views_pharmacokinetics_pet</li>
   <li> \ref  org_mitk_gui_qt_eventrecorder </li>
   <li> \ref  org_mitk_gui_qt_examples </li>
   <li> \ref  org_mitk_gui_qt_geometrytools </li>
   <li> \ref  org_mitk_gui_qt_igtexample </li>
   <li> \ref  org_mitk_gui_qt_igtlplugin</li>
   <li> \ref  org_mitk_gui_qt_igttracking</li>
-  <li> \ref  org_mitk_gui_qt_igttrackingsemiautomaticmeasurement</li>
+  <li> \ref  org_mitk_views_igttrackingsemiautomaticmeasurement</li>
   <li> \ref  org_mitk_views_imagestatistics</li>
   <li> \ref  org_mitk_gui_qt_lasercontrol</li>
   <li> \ref  org_mitk_views_fit_demo </li>
@@ -66,7 +66,7 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
   <li> \ref  org_mitk_example_gui_pcaexample</li>
   <li>  \ref org_mitk_gui_qt_preprocessing_resampling</li>
   <li> \ref  org_mitk_views_pharmacokinetics_curvedescriptor</li>
-  <li> \ref  org_mitk_gui_qt_photoacoustics_imageprocessing</li>
+  <li> \ref  org_mitk_views_photoacoustics_imageprocessing</li>
   <li> \ref  org_mitk_gui_qt_pharmacokinetics_simulation</li>
   <li> \ref  org_mitk_gui_qt_pointsetinteractionmultispectrum</li>
   <li> \ref  org_mitk_gui_qt_renderwindowmanager</li>

@@ -26,6 +26,8 @@ found in the LICENSE file.
 #include <vtkPolyData.h>
 #include <vtkProperty.h>
 
+const std::string QmitkRemeshingView::VIEW_ID = "org.mitk.views.remeshing";
+
 QmitkRemeshingView::QmitkRemeshingView()
 {
 }

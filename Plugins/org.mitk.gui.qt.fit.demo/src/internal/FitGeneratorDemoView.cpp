@@ -37,7 +37,7 @@ found in the LICENSE file.
 
 #include <iostream>
 
-const std::string FitGeneratorDemoView::VIEW_ID = "org.mitk.gui.qt.fit.demo";
+const std::string FitGeneratorDemoView::VIEW_ID = "org.mitk.views.fit.demo";
 
 typedef itk::Image<double, 3> FrameITKImageType;
 typedef itk::Image<double, 4> DynamicITKImageType;

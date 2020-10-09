@@ -211,7 +211,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
       // Can't use opengl to get value cause filter could be started without opengl (?)
       // vtkTexture will resample to real max dim anyway, if it is too big
       if (m_VtkOutputRequested) {
-        const double maxDimGL = 32768.;
+        const double maxDimGL = 8192; // maxDimGl - 32k on modern machines. Reduced by 4 to reduce gpu vram, ram and cpu usage
         extent[0] = std::min(extent[0], maxDimGL);
         extent[1] = std::min(extent[1], maxDimGL);
       }

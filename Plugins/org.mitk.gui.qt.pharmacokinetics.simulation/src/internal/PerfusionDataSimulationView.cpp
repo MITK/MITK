@@ -47,7 +47,7 @@ found in the LICENSE file.
 #include <iostream>
  #include <QFileDialog>
 
-const std::string PerfusionDataSimulationView::VIEW_ID = "org.mitk.gui.qt.pharmacokinetics.simulation";
+const std::string PerfusionDataSimulationView::VIEW_ID = "org.mitk.views.pharmacokinetics.simulation";
 
 inline double convertToDouble(const std::string& data)
 {

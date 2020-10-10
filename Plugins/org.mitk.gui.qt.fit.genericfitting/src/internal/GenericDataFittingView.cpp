@@ -53,7 +53,7 @@ found in the LICENSE file.
 #include <iostream>
 
 
-const std::string GenericDataFittingView::VIEW_ID = "org.mitk.gui.qt.fit.genericfitting";
+const std::string GenericDataFittingView::VIEW_ID = "org.mitk.views.fit.genericfitting";
 
 void GenericDataFittingView::SetFocus()
 {

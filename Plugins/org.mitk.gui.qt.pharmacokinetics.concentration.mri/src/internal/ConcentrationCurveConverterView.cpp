@@ -41,7 +41,7 @@ found in the LICENSE file.
 
 #include <iostream>
 
-const std::string ConcentrationCurveConverterView::VIEW_ID = "org.mitk.ConcentrationCurveConverterView";
+const std::string ConcentrationCurveConverterView::VIEW_ID = "org.mitk.views.pharmacokinetics.concentration.mri";
 
 void ConcentrationCurveConverterView::SetFocus()
 {

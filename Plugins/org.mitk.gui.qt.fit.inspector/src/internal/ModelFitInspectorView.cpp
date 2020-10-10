@@ -40,7 +40,7 @@ found in the LICENSE file.
 
 #include "ModelFitInspectorView.h"
 
-const std::string ModelFitInspectorView::VIEW_ID = "org.mitk.gui.gt.fit.inspector";
+const std::string ModelFitInspectorView::VIEW_ID = "org.mitk.views.fit.inspector";
 const unsigned int ModelFitInspectorView::INTERPOLATION_STEPS = 10;
 const std::string DEFAULT_X_AXIS = "Time [s]";
 

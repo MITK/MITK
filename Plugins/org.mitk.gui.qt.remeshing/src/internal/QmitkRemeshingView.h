@@ -22,6 +22,8 @@ class QmitkRemeshingView : public QmitkAbstractView
   Q_OBJECT
 
 public:
+  static const std::string VIEW_ID;
+
   QmitkRemeshingView();
   ~QmitkRemeshingView() override;
 

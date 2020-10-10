@@ -27,7 +27,7 @@ found in the LICENSE file.
 #include "mitkCESTPropertyHelper.h"
 #include "mitkCESTImageDetectionHelper.h"
 
-const std::string QmitkCESTNormalizeView::VIEW_ID = "org.mitk.gui.qt.cest.normalize";
+const std::string QmitkCESTNormalizeView::VIEW_ID = "org.mitk.views.cest.normalization";
 
 void QmitkCESTNormalizeView::SetFocus()
 {

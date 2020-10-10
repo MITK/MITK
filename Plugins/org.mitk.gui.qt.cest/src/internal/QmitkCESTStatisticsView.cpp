@@ -103,7 +103,7 @@ namespace
   }
 } // namespace
 
-const std::string QmitkCESTStatisticsView::VIEW_ID = "org.mitk.views.ceststatistics";
+const std::string QmitkCESTStatisticsView::VIEW_ID = "org.mitk.views.cest.statistics";
 
 QmitkCESTStatisticsView::QmitkCESTStatisticsView(QObject * /*parent*/, const char * /*name*/)
 {

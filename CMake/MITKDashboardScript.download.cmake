@@ -299,6 +299,8 @@ function(git)
     set(ARG_WORKING_DIRECTORY "${CTEST_SOURCE_DIRECTORY}")
   endif()
 
+  get_filename_component(ARG_WORKING_DIRECTORY "${ARG_WORKING_DIRECTORY}" ABSOLUTE)
+
   execute_process(
     WORKING_DIRECTORY "${ARG_WORKING_DIRECTORY}"
     RESULT_VARIABLE error_code
@@ -321,6 +323,8 @@ function(git_log)
   if(NOT ARG_WORKING_DIRECTORY)
     set(ARG_WORKING_DIRECTORY "${CTEST_SOURCE_DIRECTORY}")
   endif()
+
+  get_filename_component(ARG_WORKING_DIRECTORY "${ARG_WORKING_DIRECTORY}" ABSOLUTE)
 
   set(args WORKING_DIRECTORY "${ARG_WORKING_DIRECTORY}" "log" "-1")
 

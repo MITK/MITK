@@ -13,6 +13,8 @@ if(EXTERNAL_MITK_DIR)
   set(MITK_DIR ${EXTERNAL_MITK_DIR})
 endif()
 
+find_package(Git REQUIRED)
+
 #-----------------------------------------------------------------------------
 # External project settings
 #-----------------------------------------------------------------------------

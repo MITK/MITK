@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCrosshairManager.h>
 #include <QmitkRenderWindow.h>
 #include <QmitkLevelWindowWidget.h>
+#include <QmitkShadowWidget.h>
 
 #include <mitkBaseRenderer.h>
 
@@ -87,10 +88,10 @@ public:
   void setShadowWidget3Visible(bool visible) const;
   void setShadowWidget4Visible(bool visible) const;
 
-  QWidget* getShadowWidget1() const;
-  QWidget* getShadowWidget2() const;
-  QWidget* getShadowWidget3() const;
-  QWidget* getShadowWidget4() const;
+  QmitkShadowWidget* getShadowWidget1() const;
+  QmitkShadowWidget* getShadowWidget2() const;
+  QmitkShadowWidget* getShadowWidget3() const;
+  QmitkShadowWidget* getShadowWidget4() const;
 
   void setDisplayPositionText(bool draw = true);
 
@@ -438,7 +439,7 @@ protected:
   QWidget *mitkWidget3Container;
   QWidget *mitkWidget4Container;
 
-  QWidget *m_ShadowWidgets[4];
+  QmitkShadowWidget*m_ShadowWidgets[4];
   mutable bool m_ShadowWidgetVisible[4];
 
   vtkSmartPointer<vtkCornerAnnotation> m_CornerAnnotations[4];
@@ -465,6 +466,6 @@ protected:
 
   void ResetTransformation(mitk::VtkPropRenderer* renderer);
 
-  QWidget* createShadowWidget(QWidget* parent);
+  QmitkShadowWidget* createShadowWidget(QWidget* parent);
 };
 #endif /*QmitkStdMultiWidget_h*/

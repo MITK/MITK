@@ -26,27 +26,23 @@ function(mitkFunctionGetVersion source_dir prefix)
   set(_wc_id "")
   set(_wc_name "")
 
-  find_package(Git)
+  execute_process(COMMAND ${GIT_EXECUTABLE} rev-list -1 HEAD
+    WORKING_DIRECTORY "${source_dir}"
+    RESULT_VARIABLE _result_var
+    OUTPUT_VARIABLE ${prefix}_WC_REVISION_HASH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET)
 
-  if(Git_FOUND)
-    execute_process(COMMAND ${GIT_EXECUTABLE} rev-list -1 HEAD
+  if(NOT _result_var)
+    set(_wc_type "git")
+
+    execute_process(COMMAND ${GIT_EXECUTABLE} name-rev --name-only ${${prefix}_WC_REVISION_HASH}
       WORKING_DIRECTORY "${source_dir}"
-      RESULT_VARIABLE _result_var
-      OUTPUT_VARIABLE ${prefix}_WC_REVISION_HASH
-      OUTPUT_STRIP_TRAILING_WHITESPACE
-      ERROR_QUIET)
+      OUTPUT_VARIABLE ${prefix}_WC_REVISION_NAME
+      OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-    if(NOT _result_var)
-      set(_wc_type "git")
-
-      execute_process(COMMAND ${GIT_EXECUTABLE} name-rev --name-only ${${prefix}_WC_REVISION_HASH}
-        WORKING_DIRECTORY "${source_dir}"
-        OUTPUT_VARIABLE ${prefix}_WC_REVISION_NAME
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-      set(_wc_id ${${prefix}_WC_REVISION_HASH})
-      set(_wc_name ${${prefix}_WC_REVISION_NAME})
-    endif()
+    set(_wc_id ${${prefix}_WC_REVISION_HASH})
+    set(_wc_name ${${prefix}_WC_REVISION_NAME})
   endif()
 
   set(${prefix}_WC_TYPE ${_wc_type} PARENT_SCOPE)

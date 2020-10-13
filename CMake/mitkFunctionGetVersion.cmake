@@ -33,7 +33,7 @@ function(mitkFunctionGetVersion source_dir prefix)
       WORKING_DIRECTORY "${source_dir}"
       RESULT_VARIABLE _result_var
       OUTPUT_VARIABLE ${prefix}_WC_REVISION_HASH
-      OUTPUT_STRIP_TRAILING_SPACE
+      OUTPUT_STRIP_TRAILING_WHITESPACE
       ERROR_QUIET)
 
     if(NOT _result_var)
@@ -42,7 +42,7 @@ function(mitkFunctionGetVersion source_dir prefix)
       execute_process(COMMAND ${GIT_EXECUTABLE} name-rev --name-only ${${prefix}_WC_REVISION_HASH}
         WORKING_DIRECTORY "${source_dir}"
         OUTPUT_VARIABLE ${prefix}_WC_REVISION_NAME
-        OUTPUT_STRIP_TRAILING_SPACE)
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
 
       set(_wc_id ${${prefix}_WC_REVISION_HASH})
       set(_wc_name ${${prefix}_WC_REVISION_NAME})

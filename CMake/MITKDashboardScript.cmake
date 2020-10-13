@@ -42,6 +42,14 @@ set(CTEST_BUILD_FLAGS
 # "-j8"
 )
 
+set(MITK_CLEAN_SOURCE_DIR
+  OFF
+)
+
+set(MITK_CLEAN_BINARY_DIR
+  OFF
+)
+
 # If empty: Default URL is CTEST_SUBMIT_URL (CTestConfig.cmake)
 set(MITK_SUBMIT_URL
   "https://cdash.mitk.org/submit.php?project=MITK"

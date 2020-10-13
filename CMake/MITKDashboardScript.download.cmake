@@ -353,6 +353,10 @@ function(git_log)
   endif()
 endfunction()
 
+function(rm)
+  execute_process(COMMAND ${CMAKE_COMMAND} "-E" "rm" "-rf" ${ARGN})
+endfunction()
+
 function(submit)
   cmake_parse_arguments(PARSE_ARGV 0 ARG "" "" "PARTS")
 
@@ -417,6 +421,22 @@ message("\
 ${indent}Dashboard model: ${CTEST_DASHBOARD_MODEL}
 ${indent}Build name: ${CTEST_BUILD_NAME}
 ${indent}Site: ${CTEST_SITE}")
+
+if(MITK_CLEAN_SOURCE_DIR OR MITK_CLEAN_BINARY_DIR)
+  message("Clean")
+
+  if(MITK_CLEAN_SOURCE_DIR)
+     set(clean_dir "${CMAKE_CURRENT_SOURCE_DIR}/src")
+     message("${indent}Source directory: ${clean_dir}")
+     rm("${clean_dir}")
+  endif()
+
+  if(MITK_CLEAN_BINARY_DIR)
+    set(clean_dir "${CMAKE_CURRENT_SOURCE_DIR}/build")
+    message("${indent}Binary directory: ${clean_dir}")
+    rm("${clean_dir}")
+  endif()
+endif()
 
 message("MITK repository")
 

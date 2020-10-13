@@ -476,6 +476,8 @@ if(NOT MITK_ACCESSBYITK_DIMENSIONS)
       CACHE STRING "List of dimensions used in AccessByItk and InstantiateAccessFunction macros")
 endif()
 
+find_package(Git REQUIRED)
+
 #-----------------------------------------------------------------------------
 # Superbuild script
 #-----------------------------------------------------------------------------

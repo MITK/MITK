@@ -30,39 +30,39 @@ function(mitkFunctionGetVersionDescription source_dir prefix)
     set(_wc_description "unknown_version")
     set(_dirty_repo_str "-local_changes")
 
-    find_package(Git)
+    execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --is-inside-work-tree
+      WORKING_DIRECTORY "${source_dir}"
+      RESULT_VARIABLE _result_var
+      OUTPUT_QUIET
+      ERROR_QUIET)
+    if(NOT _result_var)
+      execute_process(COMMAND ${GIT_EXECUTABLE} describe --exact-match --dirty=${_dirty_repo_str}
+                      WORKING_DIRECTORY ${source_dir}
+                      OUTPUT_VARIABLE _project_git_tagname
+                      RESULT_VARIABLE _proper_version
+                      ERROR_VARIABLE _error_msg)
 
-    if(GIT_FOUND)
-      GIT_IS_REPO(${source_dir} _is_git_repo)
-      if(_is_git_repo)
-        execute_process(COMMAND ${GIT_EXECUTABLE} describe --exact-match --dirty=${_dirty_repo_str}
+      if(_proper_version EQUAL 0)
+        set(_wc_description ${_project_git_tagname})
+      else()
+        # the execution failed, i.e. the HEAD has no tag,
+        # for fallback string: execute again but without the --exact-match
+        execute_process(COMMAND ${GIT_EXECUTABLE} describe --dirty=${_dirty_repo_str}
                         WORKING_DIRECTORY ${source_dir}
-                        OUTPUT_VARIABLE _project_git_tagname
+                        OUTPUT_VARIABLE _wc_description
                         RESULT_VARIABLE _proper_version
                         ERROR_VARIABLE _error_msg)
 
-        if(_proper_version EQUAL 0)
-          set(_wc_description ${_project_git_tagname})
-        else()
-          # the execution failed, i.e. the HEAD has no tag,
-          # for fallback string: execute again but without the --exact-match
-          execute_process(COMMAND ${GIT_EXECUTABLE} describe --dirty=${_dirty_repo_str}
+        if(NOT _proper_version EQUAL 0)
+          # last fallback, i.e. working copy is a shallow clone, at least use
+          # commit hash
+          execute_process(COMMAND ${GIT_EXECUTABLE} describe --always --dirty=${_dirty_repo_str}
                           WORKING_DIRECTORY ${source_dir}
-                          OUTPUT_VARIABLE _wc_description
-                          RESULT_VARIABLE _proper_version
-                          ERROR_VARIABLE _error_msg)
-
-          if(NOT _proper_version EQUAL 0)
-            # last fallback, i.e. working copy is a shallow clone, at least use
-            # commit hash
-            execute_process(COMMAND ${GIT_EXECUTABLE} describe --always --dirty=${_dirty_repo_str}
-                            WORKING_DIRECTORY ${source_dir}
-                            OUTPUT_VARIABLE _wc_description)
-          endif()
+                          OUTPUT_VARIABLE _wc_description)
         endif()
-        # remove newline at and of the string
-        string(STRIP "${_wc_description}" _wc_description)
       endif()
+      # remove newline at and of the string
+      string(STRIP "${_wc_description}" _wc_description)
     endif()
   endif()
 

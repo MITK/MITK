@@ -32,9 +32,13 @@ function(mitkFunctionGetVersionDescription source_dir prefix)
 
     find_package(Git)
 
-    if(GIT_FOUND)
-      GIT_IS_REPO(${source_dir} _is_git_repo)
-      if(_is_git_repo)
+    if(Git_FOUND)
+      execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --is-inside-work-tree
+        WORKING_DIRECTORY "${source_dir}"
+        RESULT_VARIABLE _result_var
+        OUTPUT_QUIET
+        ERROR_QUIET)
+      if(NOT _result_var)
         execute_process(COMMAND ${GIT_EXECUTABLE} describe --exact-match --dirty=${_dirty_repo_str}
                         WORKING_DIRECTORY ${source_dir}
                         OUTPUT_VARIABLE _project_git_tagname

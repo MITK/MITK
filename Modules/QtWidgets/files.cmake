@@ -38,6 +38,7 @@ QmitkPropertyItem.cpp
 QmitkPropertyItemDelegate.cpp
 QmitkPropertyItemModel.cpp
 QmitkSynchronizeSelectedData.cpp
+QmitkShadowWidget.cpp
 mitkCrosshairManager.cpp
 HumanViewActor.cpp
 )
@@ -72,6 +73,7 @@ set(MOC_H_FILES
   include/QmitkPropertyItem.h
   include/QmitkPropertyItemDelegate.h
   include/QmitkPropertyItemModel.h
+  include/QmitkShadowWidget.h
   include/mitkCrosshairManager.h
   include/HumanViewActor.h
   include/HumanModel.h

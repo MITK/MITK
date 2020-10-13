@@ -293,9 +293,9 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mit
   connect(levelWindowWidget, &QmitkLevelWindowWidget::RequestUpdate, this, &QmitkStdMultiWidget::RequestUpdate);
 }
 
-QWidget* QmitkStdMultiWidget::createShadowWidget(QWidget* parent)
+QmitkShadowWidget* QmitkStdMultiWidget::createShadowWidget(QWidget* parent)
 {
-  QWidget* shadowWidget = new QWidget(parent);
+  QmitkShadowWidget* shadowWidget = new QmitkShadowWidget(parent);
   QLabel* l = new QLabel(shadowWidget);
   l->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
   QHBoxLayout *layout = new QHBoxLayout();
@@ -2748,22 +2748,22 @@ void QmitkStdMultiWidget::setShadowWidget4Visible(bool visible) const
   m_ShadowWidgetVisible[3] = visible;
 }
 
-QWidget* QmitkStdMultiWidget::getShadowWidget1() const
+QmitkShadowWidget* QmitkStdMultiWidget::getShadowWidget1() const
 {
   return m_ShadowWidgets[0];
 }
 
-QWidget* QmitkStdMultiWidget::getShadowWidget2() const
+QmitkShadowWidget* QmitkStdMultiWidget::getShadowWidget2() const
 {
   return m_ShadowWidgets[1];
 }
 
-QWidget* QmitkStdMultiWidget::getShadowWidget3() const
+QmitkShadowWidget* QmitkStdMultiWidget::getShadowWidget3() const
 {
   return m_ShadowWidgets[2];
 }
 
-QWidget* QmitkStdMultiWidget::getShadowWidget4() const
+QmitkShadowWidget* QmitkStdMultiWidget::getShadowWidget4() const
 {
   return m_ShadowWidgets[3];
 }

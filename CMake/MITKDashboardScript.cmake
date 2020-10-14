@@ -32,14 +32,20 @@ set(CTEST_SITE
   ""
 )
 
-# If empty: Default build name is based on OS, compiler,
-# CTEST_BUILD_CONFIGURATION, and MITK_BUILD_CONFIGURATION
+# If empty: Default build name is automatically generated based on OS,
+# compiler, CTEST_BUILD_CONFIGURATION, MITK_BUILD_CONFIGURATION,
+# and MITK_BUILD_NAME_SUFFIX
 set(CTEST_BUILD_NAME
   ""
 )
 
 set(CTEST_BUILD_FLAGS
 # "-j8"
+)
+
+# Only appended to automatically generated CTEST_BUILD_NAME
+set(MITK_BUILD_NAME_SUFFIX
+  ""
 )
 
 set(MITK_CLEAN_SOURCE_DIR

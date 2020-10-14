@@ -289,6 +289,10 @@ function(get_default_build_name)
     set(default_build_name "${default_build_name} ${MITK_BUILD_CONFIGURATION}")
   endif()
 
+  if(MITK_BUILD_NAME_SUFFIX)
+    set(default_build_name "${default_build_name} ${MITK_BUILD_NAME_SUFFIX}")
+  endif()
+
   set(${ARGV0} ${default_build_name} PARENT_SCOPE)
 endfunction()
 

@@ -112,11 +112,7 @@ void mitk::LabelSetIOHelper::LoadLabelSetImagePreset(const std::string &presetFi
     {
       auto label = mitk::LabelSetIOHelper::LoadLabelFromTiXmlDocument(labelElement);
 
-      if (0 == label->GetValue())
-      {
-        inputImage->SetExteriorLabel(label);
-      }
-      else
+      if (0 != label->GetValue())
       {
         inputImage->GetLabelSet(layerIndex)->AddLabel(label);
       }

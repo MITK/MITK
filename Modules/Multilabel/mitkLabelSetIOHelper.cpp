@@ -114,7 +114,18 @@ void mitk::LabelSetIOHelper::LoadLabelSetImagePreset(const std::string &presetFi
 
       if (0 != label->GetValue())
       {
-        inputImage->GetLabelSet(layerIndex)->AddLabel(label);
+        auto* labelSet = inputImage->GetLabelSet(layerIndex);
+        auto* alreadyExistingLabel = labelSet->GetLabel(label->GetValue());
+
+        if (nullptr != alreadyExistingLabel)
+        {
+          // Override existing label with label from preset
+          alreadyExistingLabel->ConcatenatePropertyList(label);
+        }
+        else
+        {
+          labelSet->AddLabel(label);
+        }
       }
 
       labelElement = labelElement->NextSiblingElement("Label");

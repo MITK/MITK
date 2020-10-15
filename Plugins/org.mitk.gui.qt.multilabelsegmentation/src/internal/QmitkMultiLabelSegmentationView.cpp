@@ -29,9 +29,12 @@ found in the LICENSE file.
 #include "mitkNodePredicateSubGeometry.h"
 
 // Qmitk
+#include <QmitkStyleManager.h>
 #include "QmitkNewSegmentationDialog.h"
 #include "QmitkRenderWindow.h"
 #include "QmitkSegmentationOrganNamesHandling.cpp"
+#include "QmitkCreateMultiLabelPresetAction.h"
+#include "QmitkLoadMultiLabelPresetAction.h"
 
 // us
 #include <usGetModuleContext.h>
@@ -103,6 +106,9 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget *parent)
   m_Parent = parent;
 
   m_Controls.setupUi(parent);
+
+  m_Controls.m_tbSavePreset->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg")));
+  m_Controls.m_tbLoadPreset->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-open.svg")));
 
   // *------------------------
   // * Shortcuts
@@ -215,6 +221,8 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget *parent)
   // *------------------------*
 
   connect(m_Controls.m_pbNewLabel, SIGNAL(clicked()), this, SLOT(OnNewLabel()));
+  connect(m_Controls.m_tbSavePreset, SIGNAL(clicked()), this, SLOT(OnSavePreset()));
+  connect(m_Controls.m_tbLoadPreset, SIGNAL(clicked()), this, SLOT(OnLoadPreset()));
   connect(m_Controls.m_pbNewSegmentationSession, SIGNAL(clicked()), this, SLOT(OnNewSegmentationSession()));
   connect(m_Controls.m_pbShowLabelTable, SIGNAL(toggled(bool)), this, SLOT(OnShowLabelTable(bool)));
 
@@ -258,6 +266,8 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget *parent)
 
   m_Controls.m_pbNewLabel->setEnabled(false);
   m_Controls.m_btLockExterior->setEnabled(false);
+  m_Controls.m_tbSavePreset->setEnabled(false);
+  m_Controls.m_tbLoadPreset->setEnabled(false);
   m_Controls.m_pbShowLabelTable->setEnabled(false);
 
   // Make sure the GUI notices if appropriate data is already present on creation
@@ -416,6 +426,24 @@ void QmitkMultiLabelSegmentationView::OnNewLabel()
   m_Controls.m_LabelSetWidget->ResetAllTableWidgetItems();
 
   this->ReinitializeViews();
+}
+
+void QmitkMultiLabelSegmentationView::OnSavePreset()
+{
+  QmitkAbstractNodeSelectionWidget::NodeList nodes;
+  nodes.append(m_WorkingNode);
+
+  QmitkCreateMultiLabelPresetAction action;
+  action.Run(nodes);
+}
+
+void QmitkMultiLabelSegmentationView::OnLoadPreset()
+{
+  QmitkAbstractNodeSelectionWidget::NodeList nodes;
+  nodes.append(m_WorkingNode);
+
+  QmitkLoadMultiLabelPresetAction action;
+  action.Run(nodes);
 }
 
 void QmitkMultiLabelSegmentationView::OnShowLabelTable(bool value)
@@ -923,6 +951,8 @@ void QmitkMultiLabelSegmentationView::UpdateControls()
   m_Controls.m_btNextLayer->setEnabled(false);
   m_Controls.m_btLockExterior->setChecked(false);
   m_Controls.m_btLockExterior->setEnabled(false);
+  m_Controls.m_tbSavePreset->setEnabled(false);
+  m_Controls.m_tbLoadPreset->setEnabled(false);
   m_Controls.m_pbShowLabelTable->setChecked(false);
   m_Controls.m_pbShowLabelTable->setEnabled(false);
 
@@ -938,6 +968,8 @@ void QmitkMultiLabelSegmentationView::UpdateControls()
     {
       m_Controls.m_pbNewLabel->setEnabled(true);
       m_Controls.m_btLockExterior->setEnabled(true);
+      m_Controls.m_tbSavePreset->setEnabled(true);
+      m_Controls.m_tbLoadPreset->setEnabled(true);
       m_Controls.m_pbShowLabelTable->setEnabled(true);
       m_Controls.m_gbInterpolation->setEnabled(true);
       m_Controls.m_SliceBasedInterpolatorWidget->setEnabled(true);

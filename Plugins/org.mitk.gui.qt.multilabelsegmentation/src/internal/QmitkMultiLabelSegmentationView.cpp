@@ -859,8 +859,13 @@ void QmitkMultiLabelSegmentationView::OnEstablishLabelSetConnection()
   workingImage->GetActiveLabelSet()->ActiveLabelEvent +=
     mitk::MessageDelegate1<QmitkLabelSetWidget, mitk::Label::PixelType>(m_Controls.m_LabelSetWidget,
                                                                         &QmitkLabelSetWidget::SelectLabelByPixelValue);
-  workingImage->BeforeChangeLayerEvent += mitk::MessageDelegate<QmitkMultiLabelSegmentationView>(
-    this, &QmitkMultiLabelSegmentationView::OnLooseLabelSetConnection);
+
+  // Removed in T27851 to have a chance to react to AfterChangeLayerEvent. Did it brake something?
+  // workingImage->BeforeChangeLayerEvent += mitk::MessageDelegate<QmitkMultiLabelSegmentationView>(
+  //   this, &QmitkMultiLabelSegmentationView::OnLooseLabelSetConnection);
+
+  workingImage->AfterChangeLayerEvent += mitk::MessageDelegate<QmitkMultiLabelSegmentationView>(
+    this, &QmitkMultiLabelSegmentationView::UpdateControls);
 }
 
 void QmitkMultiLabelSegmentationView::OnLooseLabelSetConnection()
@@ -885,8 +890,13 @@ void QmitkMultiLabelSegmentationView::OnLooseLabelSetConnection()
   workingImage->GetActiveLabelSet()->ActiveLabelEvent -=
     mitk::MessageDelegate1<QmitkLabelSetWidget, mitk::Label::PixelType>(m_Controls.m_LabelSetWidget,
                                                                         &QmitkLabelSetWidget::SelectLabelByPixelValue);
-  workingImage->BeforeChangeLayerEvent -= mitk::MessageDelegate<QmitkMultiLabelSegmentationView>(
-    this, &QmitkMultiLabelSegmentationView::OnLooseLabelSetConnection);
+
+  // Removed in T27851 to have a chance to react to AfterChangeLayerEvent. Did it brake something?
+  // workingImage->BeforeChangeLayerEvent -= mitk::MessageDelegate<QmitkMultiLabelSegmentationView>(
+  //   this, &QmitkMultiLabelSegmentationView::OnLooseLabelSetConnection);
+
+  workingImage->AfterChangeLayerEvent -= mitk::MessageDelegate<QmitkMultiLabelSegmentationView>(
+    this, &QmitkMultiLabelSegmentationView::UpdateControls);
 }
 
 void QmitkMultiLabelSegmentationView::SetFocus()

@@ -16,13 +16,23 @@ found in the LICENSE file.
 #include <mitkBasePropertySerializer.h>
 #include <tinyxml.h>
 
-bool mitk::LabelSetIOHelper::SaveLabelSetImagePreset(std::string &presetFilename,
+namespace
+{
+  std::string EnsureExtension(const std::string& filename)
+  {
+    const std::string extension = ".lsetp";
+
+    if (filename.size() < extension.size() || std::string::npos == filename.find(extension, filename.size() - extension.size()))
+      return filename + extension;
+
+    return filename;
+  }
+}
+
+bool mitk::LabelSetIOHelper::SaveLabelSetImagePreset(const std::string &presetFilename,
                                                      mitk::LabelSetImage::Pointer &inputImage)
 {
-  if (presetFilename.find(".lsetp") == std::string::npos)
-  {
-    presetFilename.append(".lsetp");
-  }
+  const auto filename = EnsureExtension(presetFilename);
 
   auto *presetXmlDoc = new TiXmlDocument();
 
@@ -49,23 +59,20 @@ bool mitk::LabelSetIOHelper::SaveLabelSetImagePreset(std::string &presetFilename
     }
   }
 
-  bool wasSaved = presetXmlDoc->SaveFile(presetFilename);
+  bool wasSaved = presetXmlDoc->SaveFile(filename);
   delete presetXmlDoc;
 
   return wasSaved;
 }
 
-void mitk::LabelSetIOHelper::LoadLabelSetImagePreset(std::string &presetFilename,
+void mitk::LabelSetIOHelper::LoadLabelSetImagePreset(const std::string &presetFilename,
                                                      mitk::LabelSetImage::Pointer &inputImage)
 {
-  if (presetFilename.find(".lsetp") == std::string::npos)
-  {
-    presetFilename.append(".lsetp");
-  }
+  const auto filename = EnsureExtension(presetFilename);
 
   std::unique_ptr<TiXmlDocument> presetXmlDoc(new TiXmlDocument());
 
-  bool ok = presetXmlDoc->LoadFile(presetFilename);
+  bool ok = presetXmlDoc->LoadFile(filename);
   if (!ok)
     return;
 

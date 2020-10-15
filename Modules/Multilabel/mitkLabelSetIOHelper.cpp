@@ -111,16 +111,18 @@ void mitk::LabelSetIOHelper::LoadLabelSetImagePreset(const std::string &presetFi
     for (int labelIndex = 0; labelIndex < numberOfLabels; labelIndex++)
     {
       auto label = mitk::LabelSetIOHelper::LoadLabelFromTiXmlDocument(labelElement);
+      const auto labelValue = label->GetValue();
 
-      if (0 != label->GetValue())
+      if (0 != labelValue)
       {
         auto* labelSet = inputImage->GetLabelSet(layerIndex);
-        auto* alreadyExistingLabel = labelSet->GetLabel(label->GetValue());
+        auto* alreadyExistingLabel = labelSet->GetLabel(labelValue);
 
         if (nullptr != alreadyExistingLabel)
         {
           // Override existing label with label from preset
           alreadyExistingLabel->ConcatenatePropertyList(label);
+          labelSet->UpdateLookupTable(labelValue);
         }
         else
         {

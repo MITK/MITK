@@ -137,11 +137,25 @@ if(MITK_USE_Qt5)
       MITK_INSTALL(PROGRAMS "${_qmake_path}/../libexec/QtWebEngineProcess")
     endif()
 
-    MITK_INSTALL(DIRECTORY "${_qmake_path}/../resources")
+    # make sure resources and translations exist and try system location as well
+    if(EXISTS "${_qmake_path}/../resources")
+      MITK_INSTALL(DIRECTORY "${_qmake_path}/../resources")
+    elseif(EXISTS "/usr/share/qt5/resources")
+      MITK_INSTALL(DIRECTORY "/usr/share/qt5/resources")
+    else()
+      message(WARNING "No webengine resources found!")
+    endif()
 
     set(_install_DESTINATION "translations")
-    MITK_INSTALL(DIRECTORY "${_qmake_path}/../translations/qtwebengine_locales")
-  endif()
+    if(EXISTS "${_qmake_path}/../translations/qtwebengine_locales")
+      MITK_INSTALL(DIRECTORY "${_qmake_path}/../translations/qtwebengine_locales")
+    elseif(EXISTS "/usr/share/qt5/translations/qtwebengine_locales")
+      MITK_INSTALL(DIRECTORY "/usr/share/qt5/translations/qtwebengine_locales")
+    else()
+      message(WARNING "No webengine translations found!")
+    endif()
+
+   endif()
 endif()
 
 set(_install_DESTINATION "")

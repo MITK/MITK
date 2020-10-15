@@ -369,13 +369,13 @@ void mitk::LevelWindow::SetAuto(const mitk::Image *image,
   SetRangeMinMax(minValue, maxValue);
   SetDefaultBoundaries(minValue, maxValue);
 
-  unsigned int numPixelsInDataset = image->GetDimensions()[0];
-  for (unsigned int k = 0; k < image->GetDimension(); ++k)
+  size_t numPixelsInDataset = image->GetDimensions()[0];
+  for (decltype(image->GetDimension()) k = 1; k < image->GetDimension(); ++k)
     numPixelsInDataset *= image->GetDimensions()[k];
-  unsigned int minCount = image->GetStatistics()->GetCountOfMinValuedVoxelsNoRecompute();
-  unsigned int maxCount = image->GetStatistics()->GetCountOfMaxValuedVoxelsNoRecompute();
-  ScalarType minCountFraction = minCount / ScalarType(numPixelsInDataset);
-  ScalarType maxCountFraction = maxCount / ScalarType(numPixelsInDataset);
+  const auto minCount = image->GetStatistics()->GetCountOfMinValuedVoxelsNoRecompute();
+  const auto maxCount = image->GetStatistics()->GetCountOfMaxValuedVoxelsNoRecompute();
+  const auto minCountFraction = minCount / static_cast<ScalarType>(numPixelsInDataset);
+  const auto maxCountFraction = maxCount / static_cast<ScalarType>(numPixelsInDataset);
 
   //// binary image
   if (min2ndValue == maxValue)

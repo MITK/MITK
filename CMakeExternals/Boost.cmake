@@ -240,6 +240,11 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
             COMPONENT runtime)
 
     file(GLOB _boost_libs
+         "${install_dir}/bin/boost*.dll")
+    install(FILES ${_boost_libs}
+            DESTINATION "../ep/bin")
+            
+    file(GLOB _boost_libs
          "${install_dir}/lib/libboost*.lib"
          "${install_dir}/lib/libboost*.a")
     install(FILES ${_boost_libs}

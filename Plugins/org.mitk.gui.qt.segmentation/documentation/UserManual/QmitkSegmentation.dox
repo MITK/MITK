@@ -9,13 +9,12 @@
 
 \section org_mitk_views_segmentationUserManualOverview Overview
 
-Segmentation is the act of partitioning an image into subsets by either manual or automated delineation to create i.e. a distinction between foreground and background. 
+Segmentation is the act of partitioning an image into subsets by either manual or automated delineation to create i.e. a distinction between foreground and background.
 The MITK <b>segmentation plugin</b> allows you to create segmentations of anatomical and pathological structures in medical images.
 The plugin consists of a number of views:
 <ul>
   <li> <b>Segmentation View</b>: Manual and (semi-)automatic segmentation
   <li> \subpage org_mitk_views_segmentationutilities : Segmentation post-processing
-  <li> \subpage org_mitk_views_deformableclippingplane : Clipping of existing segmentations using a resection plane
 </ul>
 In this documentation, the features and usage of the segmentation view will be described.
 For an introduction to the segmentation utilities and clipping plane views, please be referred to the respective documentation pages.
@@ -47,7 +46,7 @@ The segmentation plugin makes a number of assumptions:
 
 \section org_mitk_views_segmentationUserManualImageSelection Data Selection & Creating New Segmentations
 
-To select a reference image for the segmentation, click on the <i>Patient Image</i> selection widget and choose a suitable image from the selection available in the data manager. 
+To select a reference image for the segmentation, click on the <i>Patient Image</i> selection widget and choose a suitable image from the selection available in the data manager.
 By default the auto selection mode is enabled (see \ref org_mitk_views_segmentationPreferences).\n
 Once a patient image is selected, a new segmentation can be created on this reference image by clicking the <i>New...</i> button to the right of the <i>Segmentation</i> selection widget.
 An input field will appear which allows you to set the name and display color of the segmentation. Notice that the input field suggests names once you start typing and that it also suggests colors for known organ names.
@@ -57,7 +56,7 @@ Once generated the segmentation will be added with "binary mask" icon to the dat
 \subsection org_mitk_views_segmentationUserManualManualKringeling2 Selecting Segmentations for Editing
 Alternatively to creating a new segmentation, an existing one can be edited as well.
 As you might have segmented multiple structures within a single image, the application needs to know which of them to use for editing.
-For that you click the segmentation selection widget and a selection field will open, containing all suitable segmentations for the parent dataset available in the data manager. 
+For that you click the segmentation selection widget and a selection field will open, containing all suitable segmentations for the parent dataset available in the data manager.
 
 
 \section org_mitk_views_segmentationUserManualToolOverview Segmentation Tool Overview
@@ -95,7 +94,7 @@ This behavior is disabled whilst any of the manual segmentation tools are active
 \subsection org_mitk_views_segmentationUserManualAddSubtractTools Add and Subtract Tools
 \imageMacro{QmitkSegmentation_IMGIconAddSubtract.png,"Add and Subtract Tools",7.70}
 
-Use the left mouse button to draw a closed contour. When releasing the mouse button, the contour will be added (Add tool) to or removed (Subtract tool) from the current segmentation. 
+Use the left mouse button to draw a closed contour. When releasing the mouse button, the contour will be added (Add tool) to or removed (Subtract tool) from the current segmentation.
 Adding and subtracting voxels can be iteratively repeated for the same segmentation. Holding CTRL / CMD while drawing will invert the current tool's behavior (i.e. instead of adding voxels, they will be subtracted).
 
 \subsection org_mitk_views_segmentationUserManualPaintWipeTools Paint and Wipe Tools
@@ -107,7 +106,7 @@ Holding CTRL / CMD while drawing will invert the current tool's behavior (i.e. i
 \subsection org_mitk_views_segmentationUserManualRegionGrowingTool Region Growing Tool
 \imageMacro{QmitkSegmentation_IMGIconRegionGrowing.png,"Region Growing Tool",3.81}
 
-Click at one point in a 2D slice widget to add an image region to the segmentation with the region growing tool. 
+Click at one point in a 2D slice widget to add an image region to the segmentation with the region growing tool.
 Region Growing selects all pixels around the mouse cursor that have a similar gray value as the pixel below the mouse cursor. This enables you to quickly create segmentations of structures that have a good contrast to surrounding tissue.
 The tool operates based on the current level window, so changing the level window to optimize the contrast for the ROI is encouraged.
 Moving the mouse up/down is different from left/right: Moving up the cursor while holding the left mouse button widens the range for the included grey values; moving it down narrows it. Moving the mouse left and right will shift the range.
@@ -195,8 +194,8 @@ Interpolated suggestions are displayed as outlines, until you confirm them as pa
 To confirm single slices, click the <i>Confirm for single slice</i> button below the toolbox. You may also review the interpolations visually and then accept all of them at once by selecting <i>Confirm for all slices</i>.
 
 The <b>3D interpolation</b> creates suggestions for 3D segmentations. That means if you start contouring, from the second contour onwards, the surface of the segmented area will be interpolated based on the given contour information.
-The interpolation works with all available manual tools. Please note that this is currently a pure mathematical interpolation, i.e. image intensity information is not taken into account. 
-With each further contour the interpolation result will be improved, but the more contours you provide the longer the recalculation will take. 
+The interpolation works with all available manual tools. Please note that this is currently a pure mathematical interpolation, i.e. image intensity information is not taken into account.
+With each further contour the interpolation result will be improved, but the more contours you provide the longer the recalculation will take.
 To achieve an optimal interpolation result and in this way a most accurate segmentation you should try to describe the surface with sparse contours by segmenting in arbitrary
 oriented planes. The 3D interpolation is not meant to be used for parallel slice-wise segmentation, but rather segmentations in i.e. the axial, coronal and sagittal plane.
 
@@ -206,11 +205,11 @@ You can accept the interpolation result by clicking the <i>Confirm</i>-button be
 In this case the 3D interpolation will be deactivated automatically so that the result can be post-processed without any interpolation running in the background.
 
 Additional to the surface, black contours are shown in the 3D render window, which mark all the drawn contours used for the interpolation.
-You can navigate between the drawn contours by clicking on the corresponding <i>position</i> nodes in the data manager which are stored as sub-nodes of the selected segmentation. 
+You can navigate between the drawn contours by clicking on the corresponding <i>position</i> nodes in the data manager which are stored as sub-nodes of the selected segmentation.
 If you do not want to see these nodes just uncheck the <i>Show Position Nodes</i> checkbox and these nodes will be hidden.
 
 If you want to delete a drawn contour we recommend to use the Erase-Tool since Redo/Undo is not yet working for 3D interpolation.
-The current state of the 3D interpolation can be saved across application restart. For that, just click on save project during the interpolation is active. 
+The current state of the 3D interpolation can be saved across application restart. For that, just click on save project during the interpolation is active.
 After restarting the application and load your project you can click on "Reinit Interpolation" within the 3D interpolation GUI area.
 
 

@@ -147,22 +147,31 @@ mitk::TwoStepLinearModel::StaticParameterValuesType mitk::TwoStepLinearModel::Ge
 mitk::ModelBase::DerivedParameterMapType mitk::TwoStepLinearModel::ComputeDerivedParameters(
   const mitk::ModelBase::ParametersType& parameters) const
 {
-    double     tmax = (double) parameters[POSITION_PARAMETER_t] ;
-    double     s1 = (double) parameters[POSITION_PARAMETER_a1] ;
-    double     s2 = (double) parameters[POSITION_PARAMETER_a2] ;
+    double     t = (double) parameters[POSITION_PARAMETER_t] ;
+    double     a1 = (double) parameters[POSITION_PARAMETER_a1] ;
+    double     a2 = (double) parameters[POSITION_PARAMETER_a2] ;
     double     b1 = (double) parameters[POSITION_PARAMETER_y1] ;
-
+    double     b2 = (a1 - a2) * t + b1;
 
     unsigned int timeSteps = m_TimeGrid.GetSize();
 
     double Taq = 0;
     Taq = m_TimeGrid.GetElement(timeSteps-1);
 
-    double Smax = s1*tmax+b1;
-    double b2 = Smax-s2*tmax;
-    double AUC = s1/2*(tmax*tmax)+b1*tmax
-                 +s2/2*(Taq*Taq-tmax*tmax)+b2*(Taq-tmax);
-    double Sfin = s2*Taq+b2;
+    double Sfin = a2 * Taq + b2;
+
+    double Smax;
+    if (a2 <= 0)
+    {
+      Smax = a1 * t + b1;
+    }
+    else
+    {
+      Smax = Sfin;
+    }
+
+    double AUC = a1/2*(t*t)+b1*t
+                 +a2/2*(Taq*Taq-t*t)+b2*(Taq-t);
 
     DerivedParameterMapType result;
 

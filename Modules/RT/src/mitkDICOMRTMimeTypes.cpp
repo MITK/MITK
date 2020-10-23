@@ -21,10 +21,7 @@ found in the LICENSE file.
 
 #include <itksys/SystemTools.hxx>
 
-#include <usModuleContext.h>
-#include <usGetModuleContext.h>
-#include <usServiceProperties.h>
-#include <usServiceRegistration.h>
+
 
 namespace mitk
 {
@@ -54,45 +51,44 @@ bool DICOMRTMimeTypes::RTDoseMimeType::AppliesTo(const std::string &path) const
 {
   bool canRead( CustomMimeType::AppliesTo(path) );
 
-  if (!canRead) {
+  if (!canRead)
+  {
     return false;
   }
 
-  if (!canReadByDicomFileReader(path)) {
-    return false;
+  // fix for bug 18572
+  // Currently this function is called for writing as well as reading, in that case
+  // the image information can of course not be parsed or further identifyed.
+  //so as a work arround we just return the current canRead if the file does not exist.
+  if (!itksys::SystemTools::FileExists(path.c_str()))
+  {
+    return canRead;
   }
+  // end fix for bug 18572
 
   auto modality = GetModality(path);
-
-  if (modality == "RTDOSE") {
-    return true;
+  if (modality == "RTDOSE")
+  {
+    return canReadByDicomFileReader(path);
   }
-  else {
-    return false;
-    }
+
+  return false;
 }
 
 std::string DICOMRTMimeTypes::GetModality(const std::string & path)
 {
-  mitk::IDICOMTagsOfInterest* toiSrv = GetDicomTagsOfInterestService();
-
-  auto tagsOfInterest = toiSrv->GetTagsOfInterest();
-
-  DICOMTagPathList tagsOfInterestList;
-  for (const auto& tag : tagsOfInterest) {
-    tagsOfInterestList.push_back(tag.first);
-  }
+  const auto modalityTagPath = DICOMTagPath(0x0008, 0x0060);
 
   mitk::DICOMDCMTKTagScanner::Pointer scanner = mitk::DICOMDCMTKTagScanner::New();
   scanner->SetInputFiles({ path });
-  scanner->AddTagPaths(tagsOfInterestList);
+  scanner->AddTagPaths({ modalityTagPath });
   scanner->Scan();
 
   mitk::DICOMDatasetAccessingImageFrameList frames = scanner->GetFrameInfoList();
   std::string modality = "";
   if (frames.empty())
     return modality;
-  auto findings = frames.front()->GetTagValueAsString(DICOMTagPath(0x0008, 0x0060));
+  auto findings = frames.front()->GetTagValueAsString(modalityTagPath);
 
   modality = findings.front().value;
   return modality;
@@ -106,12 +102,7 @@ bool DICOMRTMimeTypes::canReadByDicomFileReader(const std::string & filename)
 
   mitk::DICOMFileReader::Pointer reader = selector->GetFirstReaderWithMinimumNumberOfOutputImages();
 
-  if (reader.IsNull()) {
-    return false;
-  }
-  else {
-    return true;
-  }
+  return reader.IsNotNull();
 }
 
 DICOMRTMimeTypes::RTDoseMimeType* DICOMRTMimeTypes::RTDoseMimeType::Clone() const
@@ -137,13 +128,22 @@ bool DICOMRTMimeTypes::RTStructMimeType::AppliesTo(const std::string &path) cons
     return false;
   }
 
+  // fix for bug 18572
+  // Currently this function is called for writing as well as reading, in that case
+  // the image information can of course not be parsed or further identifyed.
+  //so as a work arround we just return the current canRead if the file does not exist.
+  if (!itksys::SystemTools::FileExists(path.c_str()))
+  {
+    return canRead;
+  }
+  // end fix for bug 18572
+
   auto modality = GetModality(path);
   if (modality == "RTSTRUCT") {
     return true;
   }
-  else {
-    return false;
-  }
+
+  return false;
 }
 
 DICOMRTMimeTypes::RTStructMimeType* DICOMRTMimeTypes::RTStructMimeType::Clone() const
@@ -169,13 +169,22 @@ bool DICOMRTMimeTypes::RTPlanMimeType::AppliesTo(const std::string &path) const
     return false;
   }
 
+  // fix for bug 18572
+  // Currently this function is called for writing as well as reading, in that case
+  // the image information can of course not be parsed or further identifyed.
+  //so as a work arround we just return the current canRead if the file does not exist.
+  if (!itksys::SystemTools::FileExists(path.c_str()))
+  {
+    return canRead;
+  }
+  // end fix for bug 18572
+
   auto modality = GetModality(path);
-    if (modality == "RTPLAN") {
-      return true;
-    }
-    else {
-      return false;
-    }
+  if (modality == "RTPLAN") {
+    return true;
+  }
+
+  return false;
 }
 
 DICOMRTMimeTypes::RTPlanMimeType* DICOMRTMimeTypes::RTPlanMimeType::Clone() const
@@ -230,23 +239,6 @@ std::string DICOMRTMimeTypes::DICOMRT_STRUCT_MIMETYPE_DESCRIPTION()
 std::string DICOMRTMimeTypes::DICOMRT_PLAN_MIMETYPE_DESCRIPTION()
 {
   return "RTPLAN reader";
-}
-
-mitk::IDICOMTagsOfInterest* DICOMRTMimeTypes::GetDicomTagsOfInterestService()
-{
-  mitk::IDICOMTagsOfInterest* result = nullptr;
-
-  std::vector<us::ServiceReference<mitk::IDICOMTagsOfInterest> > toiRegisters = us::GetModuleContext()->GetServiceReferences<mitk::IDICOMTagsOfInterest>();
-  if (!toiRegisters.empty())
-  {
-    if (toiRegisters.size() > 1)
-    {
-      MITK_WARN << "Multiple DICOM tags of interest services found. Using just one.";
-    }
-    result = us::GetModuleContext()->GetService<mitk::IDICOMTagsOfInterest>(toiRegisters.front());
-  }
-
-  return result;
 }
 
 }

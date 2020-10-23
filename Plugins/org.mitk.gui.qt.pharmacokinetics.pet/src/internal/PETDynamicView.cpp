@@ -64,7 +64,7 @@ found in the LICENSE file.
 #include <iostream>
 
 
-const std::string PETDynamicView::VIEW_ID = "org.mitk.gui.qt.pharmacokinetics.pet";
+const std::string PETDynamicView::VIEW_ID = "org.mitk.views.pharmacokinetics.pet";
 
 inline double convertToDouble(const std::string& data)
 {

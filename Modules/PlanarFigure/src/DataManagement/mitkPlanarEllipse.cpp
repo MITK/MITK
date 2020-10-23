@@ -60,7 +60,7 @@ bool mitk::PlanarEllipse::SetControlPoint(unsigned int index, const Point2D &poi
     if (otherIndex > 2)
       otherIndex = 1;
 
-    const Point2D &centerPoint = GetControlPoint(0);
+    const Point2D centerPoint = GetControlPoint(0);
     Point2D otherPoint = GetControlPoint(otherIndex);
     Point2D point3 = GetControlPoint(3);
 

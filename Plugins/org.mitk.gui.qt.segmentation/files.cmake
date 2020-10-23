@@ -10,7 +10,6 @@ set(INTERNAL_CPP_FILES
   #QmitkStatisticsAction.cpp
   QmitkAutocropAction.cpp
   QmitkAutocropLabelSetImageAction.cpp
-  QmitkDeformableClippingPlaneView.cpp
   Common/QmitkDataSelectionWidget.cpp
   SegmentationUtilities/QmitkSegmentationUtilitiesView.cpp
   SegmentationUtilities/QmitkSegmentationUtilityWidget.cpp
@@ -23,7 +22,6 @@ set(INTERNAL_CPP_FILES
 
 set(UI_FILES
   src/internal/QmitkSegmentationControls.ui
-  src/internal/QmitkDeformableClippingPlaneViewControls.ui
   src/internal/Common/QmitkDataSelectionWidgetControls.ui
   src/internal/SegmentationUtilities/QmitkSegmentationUtilitiesViewControls.ui
   src/internal/SegmentationUtilities/BooleanOperations/QmitkBooleanOperationsWidgetControls.ui
@@ -42,7 +40,6 @@ set(MOC_H_FILES
   #src/internal/QmitkStatisticsAction.h
   src/internal/QmitkAutocropAction.h
   src/internal/QmitkAutocropLabelSetImageAction.h
-  src/internal/QmitkDeformableClippingPlaneView.h
   src/internal/Common/QmitkDataSelectionWidget.h
   src/internal/SegmentationUtilities/QmitkSegmentationUtilitiesView.h
   src/internal/SegmentationUtilities/QmitkSegmentationUtilityWidget.h
@@ -55,10 +52,6 @@ set(MOC_H_FILES
 
 set(CACHED_RESOURCE_FILES
   resources/segmentation.svg
-  resources/deformablePlane.png
-  resources/clipping_plane_translate_48x48.png
-  resources/clipping_plane_rotate48x48.png
-  resources/clipping_plane_deform48x48.png
   resources/segmentation_utilities.svg
   plugin.xml
 )

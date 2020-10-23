@@ -67,14 +67,15 @@ protected:
 	 */
 	void SetFocus() override;
 
+  bool CheckBaselineSelectionSettings() const;
+
     /*! Helper method that adds an concentration image as child node to the current m_selectedNode and returns this new child node.*/
     mitk::DataNode::Pointer AddConcentrationImage(mitk::Image* image, std::string nodeName) const;
 
 
   /*! \brief called by QmitkFunctionality when DataManager's selection has changed
   */
-  void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-    const QList<mitk::DataNode::Pointer>& nodes) override;
+  void OnNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/);
 
 	// Variables
 
@@ -94,6 +95,10 @@ private:
 
     mitk::Image::Pointer ConvertT2ConcentrationImgage(mitk::Image::Pointer inputImage);
 
+    mitk::NodePredicateBase::Pointer m_IsNoMaskImagePredicate;
+    mitk::NodePredicateBase::Pointer m_IsMaskPredicate;
+    mitk::NodePredicateBase::Pointer m_isValidPDWImagePredicate;
+    mitk::NodePredicateBase::Pointer m_isValidTimeSeriesImagePredicate;
 };
 
 #endif

@@ -8,16 +8,14 @@ To avoid clutter and ease the administration of the source code the MITK source 
 The top level directories are the following:
 
 \li \ref DirectoryStructurePageApplications
-\li \ref DirectoryStructurePageBlueBerry
-\li \ref DirectoryStructurePageBuild
 \li \ref DirectoryStructurePageCMake
 \li \ref DirectoryStructurePageCMakeExternals
-\li \ref DirectoryStructurePageConfig
-\li \ref DirectoryStructurePageCore
 \li \ref DirectoryStructurePageDocumentation
 \li \ref DirectoryStructurePageExamples
+\li \ref DirectoryStructurePageLicenses
 \li \ref DirectoryStructurePageModules
 \li \ref DirectoryStructurePagePlugins
+\li \ref DirectoryStructurePageTemplates
 \li \ref DirectoryStructurePageUtilities
 \li \ref DirectoryStructurePageWrapping
 
@@ -29,14 +27,6 @@ see the corresponding section for more information.
 
 This directory contains the different applications. Each application has its own subfolder, including the necessary code, icons and other resources. For more information on applications see \ref ModularizationPageApplications or \ref ApplicationsPageApplications .
 
-\subsection DirectoryStructurePageBlueBerry BlueBerry
-
-The BlueBerry directory contains all code related to the BlueBerry framework. This code can be used independently of MITK.
-
-\subsection DirectoryStructurePageBuild Build
-
-The Build directory contains tools for the generation of MITK Plugins, editing of StateMachines and similar tasks. They are usually their own executables which are not integrated within any applications from the Applications directory.
-
 \subsection DirectoryStructurePageCMake CMake
 
 The %CMake directory contains %CMake files, macros and templates for the configuration of MITK as a project.
@@ -45,41 +35,33 @@ The %CMake directory contains %CMake files, macros and templates for the configu
 
 This directory contains %CMake files for the configuration of other projects used by MITK.
 
-\subsection DirectoryStructurePageConfig Config
+\subsection DirectoryStructurePageDocumentation Documentation
 
-The Config directory contains configuration files. These provide presets and default values.
-
-\subsection DirectoryStructurePageCore Core
-
-The Core directory contains the basic MITK classes, which are used by most of the Plugins or Modules. They provide the basic MITK functionality and are subject to stricter quality controls than the rest of the code.
-
-\subsubsection DirectoryStructurePageCoreCode Code
-
-This subdirectory contains the actual core code of MITK. It provides datastructures, rendering classes, interactors and many more.
-
-\subsubsection DirectoryStructurePageCoreDocumentation Documentation
-
-This subdirectory contains the documentation on the concepts MITK was designed upon.
-
-\subsection DirectoryStructurePageDocumentation Documenation
-
-The Documentation directory contains doxygen and other documentation as well as tutorials and examples. It includes basic end user manuals for the framework as well as developer documentation which does not depend on any additional Modules.
+The Documentation directory contains doxygen and other documentation as well as tutorials and examples. It includes basic end user manuals for the framework as well as developer documentation which does not depend on any additional modules.
 
 \subsection DirectoryStructurePageExamples Examples
 
 This directory contains example code used by the documentation in the Documentation directory.
 
+\subsection DirectoryStructurePageLicenses Licenses
+
+The Licenses directory contains various licenses used by MITK's dependencies.
+
 \subsection DirectoryStructurePageModules Modules
 
-This directory contains modules which extend the capabilities of MITK. For the concept behind modules see \ref ModularizationPageModules .
+This directory contains modules, which extend the capabilities of MITK. For the concept behind modules see \ref ModularizationPageModules .
 
 \subsection DirectoryStructurePagePlugins Plugins
 
 This directory contains plugins, which provide specific solutions. For further information see \ref ModularizationPagePlugInBundles .
 
+\subsection DirectoryStructurePageTemplates Templates
+
+This directory contains template files for recurring snippets like the copyright header for all source files.
+
 \subsection DirectoryStructurePageUtilities Utilities
 
-The Utilities directory contains self contained libraries, which are used by MITK, but not necessarily developed or maintained by the MITK team.
+The Utilities directory contains self contained components, which are used by MITK, but not necessarily developed or maintained by the MITK team.
 
 \subsection DirectoryStructurePageWrapping Wrapping
 

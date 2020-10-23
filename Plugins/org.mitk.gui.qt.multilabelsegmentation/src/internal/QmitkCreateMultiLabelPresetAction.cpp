@@ -10,74 +10,54 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <qcoreapplication.h>
-#include "QFileDialog"
-#include "QMessageBox"
-
-#include "tinyxml.h"
-
-#include "mitkLabelSetImage.h"
-#include "mitkLabelSetIOHelper.h"
 #include "QmitkCreateMultiLabelPresetAction.h"
 
-QmitkCreateMultiLabelPresetAction::QmitkCreateMultiLabelPresetAction()
-{
-}
+#include <mitkLabelSetImage.h>
+#include <mitkLabelSetIOHelper.h>
 
-QmitkCreateMultiLabelPresetAction::~QmitkCreateMultiLabelPresetAction()
-{
-}
+#include <QFileDialog>
+#include <QMessageBox>
 
-void QmitkCreateMultiLabelPresetAction::Run( const QList<mitk::DataNode::Pointer> &selectedNodes )
+void QmitkCreateMultiLabelPresetAction::Run(const QList<mitk::DataNode::Pointer> &selectedNodes)
 {
-  foreach ( mitk::DataNode::Pointer referenceNode, selectedNodes )
+  for (auto node : selectedNodes)
   {
-    if (referenceNode.IsNotNull())
+    if (node.IsNull())
+      continue;
+
+    mitk::LabelSetImage::Pointer image = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
+
+    if (image.IsNull())
+      continue;
+
+    const auto filename = QFileDialog::getSaveFileName(nullptr, QStringLiteral("Save LabelSet Preset"),
+      QString(), QStringLiteral("LabelSet Preset (*.lsetp)")).toStdString();
+
+    if (filename.empty())
+      continue;
+
+    if(!mitk::LabelSetIOHelper::SaveLabelSetImagePreset(filename, image))
     {
-      mitk::LabelSetImage::Pointer referenceImage = dynamic_cast<mitk::LabelSetImage*>( referenceNode->GetData() );
-      assert(referenceImage);
-
-      if(referenceImage->GetNumberOfLabels() <= 1)
-      {
-        QMessageBox::information(nullptr, "Create LabelSetImage Preset", "Could not create a LabelSetImage preset.\nNo Labels defined!\n");\
-        return;
-      }
-
-      std::string sName = referenceNode->GetName();
-      QString qName;
-      qName.sprintf("%s.lsetp",sName.c_str());
-      QString filename = QFileDialog::getSaveFileName( nullptr,"save file dialog",QString(),"LabelSet Preset(*.lsetp)");
-      if ( filename.isEmpty() )
-        return;
-
-      std::string fileName = filename.toStdString();
-      bool wasSaved = mitk::LabelSetIOHelper::SaveLabelSetImagePreset(fileName,referenceImage);
-
-      if(!wasSaved)
-      {
-        QMessageBox::information(nullptr, "Create LabelSetImage Preset", "Could not save a LabelSetImage preset as Xml.\n");\
-        return;
-      }
+      QMessageBox::critical(nullptr, QStringLiteral("Save LabelSetImage Preset"),
+        QString("Could not save \"%1\" as preset.").arg(QString::fromStdString(node->GetName())));
+      
+      continue;
     }
   }
 }
 
-void QmitkCreateMultiLabelPresetAction::SetDataStorage(mitk::DataStorage* dataStorage)
+void QmitkCreateMultiLabelPresetAction::SetDataStorage(mitk::DataStorage*)
 {
-  m_DataStorage = dataStorage;
 }
 
-void QmitkCreateMultiLabelPresetAction::SetFunctionality(berry::QtViewPart* /*functionality*/)
+void QmitkCreateMultiLabelPresetAction::SetFunctionality(berry::QtViewPart*)
 {
-  //not needed
 }
 
 void QmitkCreateMultiLabelPresetAction::SetSmoothed(bool)
 {
-  //not needed
 }
 
 void QmitkCreateMultiLabelPresetAction::SetDecimated(bool)
 {
-  //not needed
 }

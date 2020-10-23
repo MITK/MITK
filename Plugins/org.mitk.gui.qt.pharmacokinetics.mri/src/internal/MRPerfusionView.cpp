@@ -72,7 +72,7 @@ found in the LICENSE file.
 
 
 
-const std::string MRPerfusionView::VIEW_ID = "org.mitk.gui.qt.pharmacokinetics.mri";
+const std::string MRPerfusionView::VIEW_ID = "org.mitk.views.pharmacokinetics.mri";
 
 inline double convertToDouble(const std::string& data)
 {

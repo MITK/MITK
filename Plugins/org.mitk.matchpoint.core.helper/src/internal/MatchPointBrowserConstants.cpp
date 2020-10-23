@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "MatchPointBrowserConstants.h"
 
-const std::string MatchPointBrowserConstants::VIEW_ID = "org.mitk.gui.qt.algorithm.browser";
+const std::string MatchPointBrowserConstants::VIEW_ID = "org.mitk.views.matchpoint.algorithm.browser";
 const std::string MatchPointBrowserConstants::MDAR_DIRECTORIES_NODE_NAME = "Deployed algorithm directories";
 const std::string MatchPointBrowserConstants::MDAR_FILES_NODE_NAME = "Deployed algorithms";
 const std::string MatchPointBrowserConstants::DEBUG_OUTPUT_NODE_NAME = "debug output";

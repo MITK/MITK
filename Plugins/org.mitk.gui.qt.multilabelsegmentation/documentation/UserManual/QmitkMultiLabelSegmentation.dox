@@ -4,6 +4,12 @@
 \imageMacro{"multilabelsegmentation.svg", "Icon of the MultiLabelSegmentation Plugin", 12}
 
 The difference between a binary and a multi-label segmentation is that a multi-label segmentation can not only contain more than one label but also more than one layer. This allows you to create different labels for different regions of interest encapsulated in one single image. The difference between labels and layers is that labels on one layer cannot overlap but labels on different layers can.
+<br>
+The <b>Multilabel Segmentation plugin</b> consists of two views which can be used for:
+<ul>
+  <li> manual and (semi-)automatic segmentation of anatomical and pathological structures in medical images via <b>the Multilabel Segmentation View</b>
+  <li> multilabel segmentation postprocessing via \subpage org_mitk_views_multilabelsegmentationutilities
+</ul>
 
 Hereinafter, a description is given on how multi-label segmentations can be created and modified. Please refer to \ref org_mitk_views_segmentation for a description of the general segmentation tools.
 

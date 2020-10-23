@@ -13,10 +13,7 @@ if(EXTERNAL_MITK_DIR)
   set(MITK_DIR ${EXTERNAL_MITK_DIR})
 endif()
 
-# Look for git early on, if needed
-if(NOT MITK_DIR AND MITK_USE_CTK AND NOT CTK_DIR)
-  find_package(Git REQUIRED)
-endif()
+find_package(Git REQUIRED)
 
 #-----------------------------------------------------------------------------
 # External project settings

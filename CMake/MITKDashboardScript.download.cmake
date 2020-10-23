@@ -289,6 +289,10 @@ function(get_default_build_name)
     set(default_build_name "${default_build_name} ${MITK_BUILD_CONFIGURATION}")
   endif()
 
+  if(MITK_BUILD_NAME_SUFFIX)
+    set(default_build_name "${default_build_name} ${MITK_BUILD_NAME_SUFFIX}")
+  endif()
+
   set(${ARGV0} ${default_build_name} PARENT_SCOPE)
 endfunction()
 
@@ -353,6 +357,10 @@ function(git_log)
   endif()
 endfunction()
 
+function(rm)
+  execute_process(COMMAND ${CMAKE_COMMAND} "-E" "rm" "-rf" ${ARGN})
+endfunction()
+
 function(submit)
   cmake_parse_arguments(PARSE_ARGV 0 ARG "" "" "PARTS")
 
@@ -362,7 +370,13 @@ function(submit)
     unset(submit_url)
   endif()
 
-  ctest_submit(${submit_url} RETRY_COUNT 3 RETRY_DELAY 5 PARTS ${ARG_PARTS})
+  if(MITK_AUTH_TOKEN)
+    set(http_header HTTPHEADER "Authorization: Bearer ${MITK_AUTH_TOKEN}")
+  else()
+    unset(http_header)
+  endif()
+
+  ctest_submit(${submit_url} ${http_header} RETRY_COUNT 3 RETRY_DELAY 5 PARTS ${ARG_PARTS})
 endfunction()
 
 #[============================================================================[
@@ -411,6 +425,22 @@ message("\
 ${indent}Dashboard model: ${CTEST_DASHBOARD_MODEL}
 ${indent}Build name: ${CTEST_BUILD_NAME}
 ${indent}Site: ${CTEST_SITE}")
+
+if(MITK_CLEAN_SOURCE_DIR OR MITK_CLEAN_BINARY_DIR)
+  message("Clean")
+
+  if(MITK_CLEAN_SOURCE_DIR)
+     set(clean_dir "${CMAKE_CURRENT_SOURCE_DIR}/src")
+     message("${indent}Source directory: ${clean_dir}")
+     rm("${clean_dir}")
+  endif()
+
+  if(MITK_CLEAN_BINARY_DIR)
+    set(clean_dir "${CMAKE_CURRENT_SOURCE_DIR}/build")
+    message("${indent}Binary directory: ${clean_dir}")
+    rm("${clean_dir}")
+  endif()
+endif()
 
 message("MITK repository")
 
@@ -534,6 +564,21 @@ endif()
 
 if(MITK_BUILD_CONFIGURATION)
   list(APPEND options "-D" "MITK_BUILD_CONFIGURATION:STRING=${MITK_BUILD_CONFIGURATION}")
+endif()
+
+if(MITK_BUILD_OPTIONS)
+  get_temp_directory(temp_dir)
+  set(mitk_initial_cache_file "${temp_dir}/MITKInitialCache.cmake")
+  file(WRITE "${mitk_initial_cache_file}" "")
+  foreach(mitk_option ${MITK_BUILD_OPTIONS})
+    if(mitk_option MATCHES "^([^:]+):([^=]+)=(.*)")
+      set(var "${CMAKE_MATCH_1}")
+      set(type "${CMAKE_MATCH_2}")
+      set(value "${CMAKE_MATCH_3}")
+      file(APPEND "${mitk_initial_cache_file}" "set(${var} \"${value}\" CACHE ${type} \"\" FORCE)\n")
+    endif()
+  endforeach()
+  list(APPEND options "-D" "MITK_INITIAL_CACHE_FILE:FILEPATH=${mitk_initial_cache_file}")
 endif()
 
 foreach(option ${MITK_SUPERBUILD_OPTIONS})

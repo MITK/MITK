@@ -32,8 +32,9 @@ set(CTEST_SITE
   ""
 )
 
-# If empty: Default build name is based on OS, compiler,
-# CTEST_BUILD_CONFIGURATION, and MITK_BUILD_CONFIGURATION
+# If empty: Default build name is automatically generated based on OS,
+# compiler, CTEST_BUILD_CONFIGURATION, MITK_BUILD_CONFIGURATION,
+# and MITK_BUILD_NAME_SUFFIX
 set(CTEST_BUILD_NAME
   ""
 )
@@ -42,9 +43,26 @@ set(CTEST_BUILD_FLAGS
 # "-j8"
 )
 
+# Only appended to automatically generated CTEST_BUILD_NAME
+set(MITK_BUILD_NAME_SUFFIX
+  ""
+)
+
+set(MITK_CLEAN_SOURCE_DIR
+  OFF
+)
+
+set(MITK_CLEAN_BINARY_DIR
+  OFF
+)
+
 # If empty: Default URL is CTEST_SUBMIT_URL (CTestConfig.cmake)
 set(MITK_SUBMIT_URL
   "https://cdash.mitk.org/submit.php?project=MITK"
+)
+
+set(MITK_AUTH_TOKEN
+  ""
 )
 
 set(MITK_BUILD_CONFIGURATION

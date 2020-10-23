@@ -28,7 +28,7 @@ found in the LICENSE file.
 
 #include "QmitkDicomInspectorView.h"
 
-const std::string QmitkDicomInspectorView::VIEW_ID = "org.mitk.gui.qt.dicominspector";
+const std::string QmitkDicomInspectorView::VIEW_ID = "org.mitk.views.dicominspector";
 
 QmitkDicomInspectorView::ObserverInfo::ObserverInfo(mitk::SliceNavigationController* controller,
   int observerTag, const std::string& renderWindowName, mitk::IRenderWindowPart* part) : controller(controller), observerTag(observerTag),

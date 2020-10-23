@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "CommandLineModulesViewConstants.h"
 
-const QString CommandLineModulesViewConstants::VIEW_ID = "org.mitk.gui.qt.cmdlinemodules";
+const QString CommandLineModulesViewConstants::VIEW_ID = "org.mitk.views.cmdlinemodules";
 const QString CommandLineModulesViewConstants::TEMPORARY_DIRECTORY_NODE_NAME = "temporary directory";
 const QString CommandLineModulesViewConstants::OUTPUT_DIRECTORY_NODE_NAME = "output directory";
 const QString CommandLineModulesViewConstants::MODULE_DIRECTORIES_NODE_NAME = "module directories";

@@ -29,7 +29,7 @@ found in the LICENSE file.
 #include <iostream>
 
 const std::string PerfusionCurveDescriptionParameterView::VIEW_ID =
-  "org.mitk.gui.qt.pharmacokinetics.curvedescriptor";
+  "org.mitk.views.pharmacokinetics.curvedescriptor";
 
 void PerfusionCurveDescriptionParameterView::SetFocus()
 {

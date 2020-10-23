@@ -14,7 +14,6 @@ found in the LICENSE file.
 #define MITKDICOMRTMimeTypes_H
 
 #include <mitkCustomMimeType.h>
-#include <mitkIDICOMTagsOfInterest.h>
 #include <MitkRTExports.h>
 
 #include <array>
@@ -69,7 +68,6 @@ public:
   DICOMRTMimeTypes() = delete;
   DICOMRTMimeTypes(const DICOMRTMimeTypes&) = delete;
 
-  static mitk::IDICOMTagsOfInterest* GetDicomTagsOfInterestService();
   static bool canReadByDicomFileReader(const std::string & path);
   static std::string GetModality(const std::string & path);
 };

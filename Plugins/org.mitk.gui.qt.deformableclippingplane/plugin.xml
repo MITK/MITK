@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.deformableclippingplane"
+          name="Clipping Plane"
+          category="Segmentation"
+          class="QmitkDeformableClippingPlaneView"
+          icon="resources/deformablePlane.png">
+      <description>Allow the clipping of a volume using a deformable plane.</description>
+      <keywordReference id="org.mitk.views.deformableclippingplane.ViewKeyword" />
+    </view>
+  </extension>
+  <extension point="org.blueberry.ui.keywords">
+    <keyword id="org.mitk.views.deformableclippingplane.ViewKeyword" label="Plane" />
+    <keyword id="org.mitk.views.deformableclippingplane.ViewKeyword" label="Volume calculation" />
+    <keyword id="org.mitk.views.deformableclippingplane.ViewKeyword" label="Splitting" />
+    <keyword id="org.mitk.views.deformableclippingplane.ViewKeyword" label="Deformation" />
+    <keyword id="org.mitk.views.deformableclippingplane.ViewKeyword" label="Volume analysis" />
+  </extension>
+</plugin>

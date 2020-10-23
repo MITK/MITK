@@ -71,7 +71,7 @@ protected slots:
   // reaction to button "New Label"
   void OnNewLabel();
 
-  // raction to button "Save Preset"
+  // reaction to button "Save Preset"
   void OnSavePreset();
 
   // reaction to button "Load Preset"

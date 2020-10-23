@@ -16,95 +16,133 @@ found in the LICENSE file.
 #include <mitkBasePropertySerializer.h>
 #include <tinyxml.h>
 
-bool mitk::LabelSetIOHelper::SaveLabelSetImagePreset(std::string &presetFilename,
-                                                     mitk::LabelSetImage::Pointer &inputImage)
+namespace
 {
-  if (presetFilename.find(".lsetp") == std::string::npos)
+  std::string EnsureExtension(const std::string& filename)
   {
-    presetFilename.append(".lsetp");
+    const std::string extension = ".lsetp";
+
+    if (filename.size() < extension.size() || std::string::npos == filename.find(extension, filename.size() - extension.size()))
+      return filename + extension;
+
+    return filename;
   }
-
-  auto *presetXmlDoc = new TiXmlDocument();
-
-  auto *decl = new TiXmlDeclaration("1.0", "", "");
-  presetXmlDoc->LinkEndChild(decl);
-
-  auto *presetElement = new TiXmlElement("LabelSetImagePreset");
-  presetElement->SetAttribute("layers", inputImage->GetNumberOfLayers());
-
-  presetXmlDoc->LinkEndChild(presetElement);
-
-  for (unsigned int layerIdx = 0; layerIdx < inputImage->GetNumberOfLayers(); layerIdx++)
-  {
-    auto *layerElement = new TiXmlElement("Layer");
-    layerElement->SetAttribute("index", layerIdx);
-    layerElement->SetAttribute("labels", inputImage->GetNumberOfLabels(layerIdx));
-
-    presetElement->LinkEndChild(layerElement);
-
-    for (unsigned int labelIdx = 0; labelIdx < inputImage->GetNumberOfLabels(layerIdx); labelIdx++)
-    {
-      TiXmlElement *labelAsXml = LabelSetIOHelper::GetLabelAsTiXmlElement(inputImage->GetLabel(labelIdx, layerIdx));
-      layerElement->LinkEndChild(labelAsXml);
-    }
-  }
-
-  bool wasSaved = presetXmlDoc->SaveFile(presetFilename);
-  delete presetXmlDoc;
-
-  return wasSaved;
 }
 
-void mitk::LabelSetIOHelper::LoadLabelSetImagePreset(std::string &presetFilename,
+bool mitk::LabelSetIOHelper::SaveLabelSetImagePreset(const std::string &presetFilename,
                                                      mitk::LabelSetImage::Pointer &inputImage)
 {
-  if (presetFilename.find(".lsetp") == std::string::npos)
+  const auto filename = EnsureExtension(presetFilename);
+
+  TiXmlDocument xmlDocument;
+  xmlDocument.LinkEndChild(new TiXmlDeclaration("1.0", "", ""));
+
+  auto *rootElement = new TiXmlElement("LabelSetImagePreset");
+  rootElement->SetAttribute("layers", inputImage->GetNumberOfLayers());
+  xmlDocument.LinkEndChild(rootElement);
+
+  for (unsigned int layerIndex = 0; layerIndex < inputImage->GetNumberOfLayers(); layerIndex++)
   {
-    presetFilename.append(".lsetp");
+    auto *layerElement = new TiXmlElement("Layer");
+    layerElement->SetAttribute("index", layerIndex);
+    layerElement->SetAttribute("labels", inputImage->GetNumberOfLabels(layerIndex));
+    rootElement->LinkEndChild(layerElement);
+
+    for (unsigned int labelIndex = 0; labelIndex < inputImage->GetNumberOfLabels(layerIndex); labelIndex++)
+      layerElement->LinkEndChild(LabelSetIOHelper::GetLabelAsTiXmlElement(inputImage->GetLabel(labelIndex, layerIndex)));
   }
 
-  std::unique_ptr<TiXmlDocument> presetXmlDoc(new TiXmlDocument());
+  return xmlDocument.SaveFile(filename);
+}
 
-  bool ok = presetXmlDoc->LoadFile(presetFilename);
-  if (!ok)
+void mitk::LabelSetIOHelper::LoadLabelSetImagePreset(const std::string &presetFilename,
+                                                     mitk::LabelSetImage::Pointer &inputImage)
+{
+  if (inputImage.IsNull())
     return;
 
-  TiXmlElement *presetElem = presetXmlDoc->FirstChildElement("LabelSetImagePreset");
-  if (!presetElem)
+  const auto filename = EnsureExtension(presetFilename);
+
+  TiXmlDocument xmlDocument;
+
+  if(!xmlDocument.LoadFile(filename))
+    return;
+
+  auto *rootElement = xmlDocument.FirstChildElement("LabelSetImagePreset");
+
+  if (nullptr == rootElement)
   {
-    MITK_INFO << "No valid preset XML";
+    MITK_WARN << "Not a valid LabelSet preset";
     return;
   }
 
-  int numberOfLayers;
-  presetElem->QueryIntAttribute("layers", &numberOfLayers);
+  auto activeLayerBackup = inputImage->GetActiveLayer();
 
-  for (int i = 0; i < numberOfLayers; i++)
+  int numberOfLayers = 0;
+  rootElement->QueryIntAttribute("layers", &numberOfLayers);
+
+  auto* layerElement = rootElement->FirstChildElement("Layer");
+
+  if (nullptr == layerElement)
   {
-    TiXmlElement *layerElem = presetElem->FirstChildElement("Layer");
-    int numberOfLabels;
-    layerElem->QueryIntAttribute("labels", &numberOfLabels);
+    MITK_WARN << "LabelSet preset does not contain any layers";
+    return;
+  }
 
-    if (inputImage->GetLabelSet(i) == nullptr)
-      inputImage->AddLayer();
+  for (int layerIndex = 0; layerIndex < numberOfLayers; layerIndex++)
+  {
+    int numberOfLabels = 0;
+    layerElement->QueryIntAttribute("labels", &numberOfLabels);
 
-    TiXmlElement *labelElement = layerElem->FirstChildElement("Label");
-    if (labelElement == nullptr)
-      break;
-    for (int j = 0; j < numberOfLabels; j++)
+    if (nullptr == inputImage->GetLabelSet(layerIndex))
     {
-      mitk::Label::Pointer label = mitk::LabelSetIOHelper::LoadLabelFromTiXmlDocument(labelElement);
+      inputImage->AddLayer();
+    }
+    else
+    {
+      inputImage->SetActiveLayer(layerIndex);
+    }
 
-      if (label->GetValue() == 0)
-        inputImage->SetExteriorLabel(label);
-      else
-        inputImage->GetLabelSet()->AddLabel(label);
+    auto *labelElement = layerElement->FirstChildElement("Label");
+
+    if (nullptr == labelElement)
+      continue;
+
+    for (int labelIndex = 0; labelIndex < numberOfLabels; labelIndex++)
+    {
+      auto label = mitk::LabelSetIOHelper::LoadLabelFromTiXmlDocument(labelElement);
+      const auto labelValue = label->GetValue();
+
+      if (0 != labelValue)
+      {
+        auto* labelSet = inputImage->GetLabelSet(layerIndex);
+        auto* alreadyExistingLabel = labelSet->GetLabel(labelValue);
+
+        if (nullptr != alreadyExistingLabel)
+        {
+          // Override existing label with label from preset
+          alreadyExistingLabel->ConcatenatePropertyList(label);
+          labelSet->UpdateLookupTable(labelValue);
+        }
+        else
+        {
+          labelSet->AddLabel(label);
+        }
+      }
 
       labelElement = labelElement->NextSiblingElement("Label");
-      if (labelElement == nullptr)
-        break;
+
+      if (nullptr == labelElement)
+        continue;
     }
+
+    layerElement = layerElement->NextSiblingElement("Layer");
+
+    if (nullptr == layerElement)
+      continue;
   }
+
+  inputImage->SetActiveLayer(activeLayerBackup);
 }
 
 TiXmlElement *mitk::LabelSetIOHelper::GetLabelAsTiXmlElement(Label *label)

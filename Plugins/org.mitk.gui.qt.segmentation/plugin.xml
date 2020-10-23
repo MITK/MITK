@@ -11,14 +11,6 @@
       <description>Allows the segmentation of images using different tools.</description>
       <keywordReference id="org.mitk.views.segmentation.ViewKeyword"/>
     </view>
-     <view id="org.mitk.views.deformableclippingplane"
-       name="Clipping Plane"
-       category="Segmentation"
-       class="QmitkDeformableClippingPlaneView"
-       icon="resources/deformablePlane.png" >
-      <description>Allow the clipping of a volume using a deformable plane.</description>
-      <keywordReference id="org.mitk.views.deformableclippingplane.ViewKeyword"/>
-    </view>
     <view
       id="org.mitk.views.segmentationutilities"
       name="Segmentation Utilities"
@@ -67,12 +59,6 @@
     <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Annotation annote" />
     <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Labeling" />
     <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Tools" />
-
-    <keyword id="org.mitk.views.deformableclippingplane.ViewKeyword"  label="Plane" />
-    <keyword id="org.mitk.views.deformableclippingplane.ViewKeyword"  label="Volumne calculation" />
-    <keyword id="org.mitk.views.deformableclippingplane.ViewKeyword"  label="Splitting" />
-    <keyword id="org.mitk.views.deformableclippingplane.ViewKeyword"  label="Deformation" />
-    <keyword id="org.mitk.views.deformableclippingplane.ViewKeyword"  label="Volume analysis" />
 
     <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Segmentation" />
     <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Difference" />

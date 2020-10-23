@@ -29,6 +29,7 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
   <li> \ref org_mitk_views_remeshing </li>
   <li> \ref org_mitk_views_screenshotmaker </li>
   <li> \ref org_mitk_views_segmentation </li>
+  <li> \ref org_mitk_views_deformableclippingplane </li>
   <li> \ref org_mitk_views_viewnavigatorview </li>
   <li> \ref org_mitk_views_volumevisualization </li>
   <li> \ref org_mitk_views_properties </li>

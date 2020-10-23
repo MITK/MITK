@@ -12,7 +12,7 @@
   </extension>
   <extension point="org.blueberry.ui.keywords">
     <keyword id="org.mitk.views.deformableclippingplane.ViewKeyword" label="Plane" />
-    <keyword id="org.mitk.views.deformableclippingplane.ViewKeyword" label="Volumne calculation" />
+    <keyword id="org.mitk.views.deformableclippingplane.ViewKeyword" label="Volume calculation" />
     <keyword id="org.mitk.views.deformableclippingplane.ViewKeyword" label="Splitting" />
     <keyword id="org.mitk.views.deformableclippingplane.ViewKeyword" label="Deformation" />
     <keyword id="org.mitk.views.deformableclippingplane.ViewKeyword" label="Volume analysis" />

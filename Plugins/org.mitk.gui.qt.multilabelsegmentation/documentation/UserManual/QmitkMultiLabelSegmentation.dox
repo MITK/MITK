@@ -17,13 +17,13 @@ Hereinafter, a description is given on how multi-label segmentations can be crea
 
 \section org_mitk_views_multilabelsegmentationUserManualCreateOpenSaveImportAdd Data Selection
 
-In the 'MultiLabel Segmentation' view you can first select an image. Thereafter, you can either create a new segmentation session by pressing the symbol right to the selection widget or select an existing one. 
+In the 'MultiLabel Segmentation' view you can first select an image. Thereafter, you can either create a new segmentation session by pressing the symbol right to the selection widget or select an existing one.
 
 \imageMacro{"org_mitk_views_multilabelsegmentationIMGtoolbar.png", "Data selection",12}
 
 
 \section org_mitk_views_multilabelsegmentationUserManualLayerTable Segmentation Layers
-Once you started a segmentation session you can add or delete different layers. You can use the layers independently and switch layers by the left and right arrows. 
+Once you started a segmentation session you can add or delete different layers. You can use the layers independently and switch layers by the left and right arrows.
 
 
 \imageMacro{"org_mitk_views_multilabelsegmentationIMGlayerManager.png", "Layer selection",12}
@@ -51,6 +51,17 @@ For each layer, you can add one or more labels. Pressing the double arrow on the
 
 Click the 'New Label' button to add a new label. A dialog will show up to enter the name and color. Preset organ names and
 corresponding colors are offered while you type in, but you can set any name. The new name - if not known - will be automatically remembered and made available the next time you create a new label. In the current implementation of the plugin, the maximum number of labels is restricted to 255. If you need more, you will have to create a new segmentation session.
+
+
+\subsection org_mitk_views_multilabelsegmentationUserManualLabelPresets Saving and Loading Label Set Presets
+
+Label set presets are useful to share a certain style or scheme between different segmentation sessions or to provide templates for new segmentation sessions.
+
+The properties of all labels in all layers like their names, colors, and visibilities are saved as a label set preset by clicking on the 'Save label set preset' button.
+Label set presets are applied to any segmentation session by clicking on the 'Load label set preset' button.
+If a label for a certain value already exists, its properties are overridden by the preset.
+If a label for a certain value does not yet exist, an empty label with the label properties of the preset is created.
+The actual segmentations of labels are unaffected as label set presets only store label properties.
 
 
 \subsection org_mitk_views_multilabelsegmentationUserManualLabelSearch Searching a Label

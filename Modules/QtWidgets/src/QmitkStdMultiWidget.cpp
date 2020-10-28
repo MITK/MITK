@@ -225,7 +225,11 @@ void QmitkStdMultiWidget::ResetCrosshair()
     return;
   }
 
-  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(dataStorage);
+  auto geo = dataStorage->ComputeBoundingGeometry3D(dataStorage->GetAll());
+  mitk::RenderingManager::GetInstance()->InitializeView(GetRenderWindow1()->GetRenderWindow(), geo);
+  mitk::RenderingManager::GetInstance()->InitializeView(GetRenderWindow2()->GetRenderWindow(), geo);
+  mitk::RenderingManager::GetInstance()->InitializeView(GetRenderWindow3()->GetRenderWindow(), geo);
+  mitk::RenderingManager::GetInstance()->InitializeView(GetRenderWindow4()->GetRenderWindow(), geo);
 
   SetWidgetPlaneMode(mitk::InteractionSchemeSwitcher::MITKStandard);
 }
@@ -719,9 +723,7 @@ void QmitkStdMultiWidget::SetLayoutImpl()
   CreateRenderWindowWidgets();
   GetMultiWidgetLayoutManager()->SetLayoutDesign(QmitkMultiWidgetLayoutManager::LayoutDesign::DEFAULT);
 
-  // Initialize views as axial, sagittal, coronal to all data objects in DataStorage
-  auto geo = GetDataStorage()->ComputeBoundingGeometry3D(GetDataStorage()->GetAll());
-  mitk::RenderingManager::GetInstance()->InitializeViews(geo);
+  ResetCrosshair();
 }
 
 void QmitkStdMultiWidget::CreateRenderWindowWidgets()
@@ -742,7 +744,6 @@ void QmitkStdMultiWidget::CreateRenderWindowWidgets()
   auto renderWindow2 = renderWindowWidget2->GetRenderWindow();
   renderWindow2->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
   renderWindowWidget2->SetDecorationColor(GetDecorationColor(1));
-  renderWindowWidget2->setStyleSheet("border: 0px");
   renderWindowWidget2->SetCornerAnnotationText("Sagittal");
   renderWindowWidget2->GetRenderWindow()->SetLayoutIndex(ViewDirection::SAGITTAL);
   AddRenderWindowWidget(renderWindowWidgetName, renderWindowWidget2);

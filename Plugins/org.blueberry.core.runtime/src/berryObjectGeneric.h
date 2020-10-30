@@ -94,6 +94,7 @@ class org_blueberry_core_runtime_EXPORT ObjectGeneric : public Object
  * Please see berryObjects.h for examples
  * @param ObjectName the name of the instantiation of ObjectGeneric
  * @param Type the value type
+ * @param DefaultValue the default value
  */
 #define berrySpecializeGenericObject(ObjectName,Type,DefaultValue)   \
 class org_blueberry_core_runtime_EXPORT ObjectName: public ::berry::ObjectGeneric< Type > \

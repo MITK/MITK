@@ -40,7 +40,7 @@ advantage of the different interpolation and sub/super sampling strategies.
 (3) The currently selected input data, that will be mapped. Click to change.\n
 (4) The currently (automatically or by user) selected reference image, that defines the geometry of the result. Click to change.\n
 (5) The name of the result data in the data manager.\n
-(6) The start button(s) to commence the mapping process. For details regarding the two options see \ref MAP_MAPPER_Refine.\n
+(6) The start button(s) to commence the mapping process. For details regarding the two options see \ref MAP_MAPPER_Refine .\n
 (7) Log windows with messages regarding the mapping process.\n
 
 

@@ -34,7 +34,7 @@ The \link org_mitk_gui_qt_photoacoustics_imageprocessing Photoacoustic Imageproc
   <li> mitk::BeamformingSettings: The class used by many filters for storing the configuration to be used when applying them.
   <li> Five filters are currently implemented in the Photoacoustic Algorithms module:
   <ul>
-    <li> mitk::PhotoacousticBModeFilter/mitk::PhotoacousticOCLBModeFilter: Two classes for the B-Mode filter on GPU and CPU.
+    <li> mitk::PhotoacousticBModeFilter: A class for the B-Mode filter on GPU and CPU.
     <li> Resampling Filter: A resampling filter for post-processing.
     <li> mitk::BeamformingFilter: A filter with a switch for GPU/CPU computation, to compute the beamformed image out of raw ultrasound/photoacoustic data.
     <li> Crop Filter: A filter for cropping artifacts on the upper and lower edges of the image.

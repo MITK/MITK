@@ -11,7 +11,7 @@ The Basic Image Processing Mini Apps bundle the functionality that is commonly n
 Allows to convert a file from one type to another file type, for example to convert an image, saved in the nifti format to an image saved in the .nrrd format. 
 
 \subsection bipmasub2 mitkForwardWavelet
-Calculates the forward wavelet transformation of an image. The output will consist of multiple images, which will be saved in the format <output>%id%<output-extension>, where <output> and <output-extension> are specified by the user and %id% is a consecutive number.
+Calculates the forward wavelet transformation of an image. The output will consist of multiple images, which will be saved in the format \<output\>%id%\<output-extension\>, where \<output\> and \<output-extension\> are specified by the user and %id% is a consecutive number.
 
 \subsection bipmasub3 mitkImageAndValueArithmetic
 Mathematical operations with two operants, the individual voxels of the image and a specified floating point value. By default, the floating point value is the right operand.

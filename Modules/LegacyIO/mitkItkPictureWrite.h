@@ -22,6 +22,7 @@ found in the LICENSE file.
  * @brief ITK-Like method to be called for writing an single-component image using the AccessByItk Macros
  *
  * @param itkImage an image with single-component pixel type
+ * @param fileName the filename
  *
  * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
  */
@@ -32,6 +33,7 @@ DEPRECATED(void _mitkItkPictureWrite(itk::Image<TPixel, VImageDimension> *itkIma
  * @brief ITK-Like method to be called for writing an image
  *
  * @param itkImage an Image with single-component or composite pixel type
+ * @param fileName the filename
  *
  * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
  */

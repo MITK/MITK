@@ -41,7 +41,7 @@
 
   In the plugin.xml file of the plugin the extensions are defined as follows:
   \image html ContributionXML.png
-  The extension point ID in the plugin.xml matches the ID of the extension point and is therefore found by the registry as a valid extension. A description is given for each extension although the schema for the extension point allows an extension without a description (<element ref="description" minOccurs="0" maxOccurs="1"/>).
+  The extension point ID in the plugin.xml matches the ID of the extension point and is therefore found by the registry as a valid extension. A description is given for each extension although the schema for the extension point allows an extension without a description (\c \<element ref="description" minOccurs="0" maxOccurs="1"/\>).
 
   The GUI now holds two buttons that change the input text of the user to upper or lower case. This is done by two simple methods.
 

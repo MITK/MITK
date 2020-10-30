@@ -1,7 +1,7 @@
 /**
 \page org_videoplayer The Video Player Module
 
-\imageMacro{videoplayer.gif,"Icon of the Module",2.00}
+\imageMacro{videoplayer-dox.gif,"Icon of the Module",2.00}
 
 Available sections:
   - \ref QmitkVideoPlayerUserManualOverview 

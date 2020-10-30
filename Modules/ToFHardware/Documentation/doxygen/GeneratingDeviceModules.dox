@@ -32,7 +32,7 @@ If you do not know much about MicroServices, please take a look at:
        In this file, the module is generated via CMake commands. The module name is set, the necessary libraries will be searched here in order to link them with your module. For the Kinect, we chose OpenNI and need the XnCppWrapper.h. Your device must inherit from the mitkToFCameraDevice and consequently your module must depend on mitkToFHardware -> what is the reason for the <EM>DEPENDS mitkToFHardware</EM> -line. For autoloading your Module with mitkToFHardware, insert the following CMake Macro: <EM>AUTOLOAD_WITH mitkToFHardware</EM> . We usually add an option for the user to activate the device module, but this is not essential (refer to <EM> OPTION(MITK_USE_TOF_KINECT "Enable support for Kinect camera" OFF)</EM>).
        \n -> refer to CMakeList.text in the Kinect-Folder
 
-       \Warning The dll/so files are not automatically deleted.
+       Warning: The dll/so files are not automatically deleted.
 
     \n<li>files.cmake
         The files.cmake contains all the previously mentioned files (device, deviceFactory, controller, and ModuleActivator)

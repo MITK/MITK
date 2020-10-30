@@ -79,7 +79,7 @@ signals:
     virtual void CreateQtPartControl(QWidget *parent);
 
     /*! \brief Method performs the rotation.
-    \params rotateVector New rotation to be combined with geometry. */
+    \param rotateVector New rotation to be combined with geometry. */
     void Rotate(mitk::Vector3D rotateVector);
 
     // Member variables

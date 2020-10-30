@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_segmentationutilities The Segmentation Utilities View
 
-\imageMacro{segmentation_utilities.svg,"Icon of the Segmentation Utilities View",5.00}
+\imageMacro{segmentation_utilities-dox.svg,"Icon of the Segmentation Utilities View",5.00}
 
 \imageMacro{QmitkSegmentationUtilities_Overview.png,"The Segmentation Utilities View",16.00}
 

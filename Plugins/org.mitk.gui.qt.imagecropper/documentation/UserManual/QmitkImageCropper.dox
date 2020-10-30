@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_imagecropper The Image Cropper
 
-\imageMacro{crop.svg,"Icon of the Image Cropper Plugin.",20}
+\imageMacro{imagecropper-dox.svg,"Icon of the Image Cropper Plugin.",20}
 
 \section org_mitk_views_imagecropperUsage Usage
 

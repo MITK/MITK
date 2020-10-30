@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_multilabelsegmentation The Multilabel Segmentation
 
-\imageMacro{"multilabelsegmentation.svg", "Icon of the MultiLabelSegmentation Plugin", 12}
+\imageMacro{"multilabelsegmentation-dox.svg", "Icon of the MultiLabelSegmentation Plugin", 12}
 
 The difference between a binary and a multi-label segmentation is that a multi-label segmentation can not only contain more than one label but also more than one layer. This allows you to create different labels for different regions of interest encapsulated in one single image. The difference between labels and layers is that labels on one layer cannot overlap but labels on different layers can.
 <br>

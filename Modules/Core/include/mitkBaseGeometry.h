@@ -663,8 +663,9 @@ namespace mitk
   *
   * @ingroup MITKTestingAPI
   *
-  * @overload This is an overloaded version that uses a single tolerance for spatial and directional aspects. For more details,
+  * This is an overloaded version that uses a single tolerance for spatial and directional aspects. For more details,
   * see the other overloaded version.
+  *
   * @param rightHandSide Compare this against leftHandSide.
   * @param leftHandSide Compare this against rightHandSide.
   * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
@@ -745,8 +746,9 @@ namespace mitk
   * @brief A function checks if a test geometry is a sub geometry of
   * a given reference geometry.
   *
-  * @overload This is a overloaded version that uses a single tolerance for spatial and directional aspects. For more details,
+  * This is a overloaded version that uses a single tolerance for spatial and directional aspects. For more details,
   * see the other overloaded version.
+  *
   * @param testGeo Geometry that should be checked if it is a sub geometry of referenceGeo.
   * @param referenceGeo Geometry that should contain testedGeometry as sub geometry.
   * @param eps Tolarence for comparison (both spatial and directional). You can use mitk::eps in most cases.

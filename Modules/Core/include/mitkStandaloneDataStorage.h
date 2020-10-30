@@ -96,11 +96,7 @@ namespace mitk
     //## @brief noncyclical directed graph data structure to store the nodes with their relation
     typedef std::map<mitk::DataNode::ConstPointer, SetOfObjects::ConstPointer> AdjacencyList;
 
-    //##Documentation
-    //## @brief Standard Constructor for ::New() instantiation
     StandaloneDataStorage();
-    //##Documentation
-    //## @brief Standard Destructor
     ~StandaloneDataStorage() override;
 
     //##Documentation

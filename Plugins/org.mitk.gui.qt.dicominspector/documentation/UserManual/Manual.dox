@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_dicominspector The DICOM Inspector
 
-\imageMacro{ "inspector.png", "Icon of DICOM Inspector", 2}
+\imageMacro{ "inspector-dox.png", "Icon of DICOM Inspector", 2}
 
 This is a simple view that displays all DICOM properties of the data of the currently selected node.
 DICOM properties are all properties that have a property name starting with "DICOM".

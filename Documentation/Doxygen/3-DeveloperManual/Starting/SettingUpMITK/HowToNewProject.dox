@@ -61,7 +61,7 @@ The usage of the Plugin Generator for creating a new project is described in
 Download the project as a tarball or zipball and extract it to your desired source
 directory.
 
-\note This is a \b template \b. You must modify it such that it fits the needs of
+\note This is a <b>template</b>. You must modify it such that it fits the needs of
 your particular project. Especially you should do a global search and replace for
 the string "awesome" to rename the template application and plug-in. You may want
 to rename some files too.
@@ -156,7 +156,7 @@ You can either inject an already build MITK to be used by your project or config
 some MITK options directly in your project's superbuild configuration if MITK is
 going to be build inside your project.
 
-\subsubsection HowToNewProjectCustomizingMITKInjectMITK  Inject a MITK build
+\subsubsection HowToNewProjectCustomizingMITKInjectMITK Inject a MITK build
 
 By setting the \b EXTERNAL_MITK_DIR \b variable in your project's superbuild
 %CMake configuration to a MITK build directory (containing the MITKConfig.cmake)

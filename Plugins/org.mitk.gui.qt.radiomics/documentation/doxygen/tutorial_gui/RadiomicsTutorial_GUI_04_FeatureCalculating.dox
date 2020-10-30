@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_radiomicstutorial_gui_04_featurecalulation GUI based Radiomics Tutorial - Calculating the Radiomics Features
 
-\subsection Calculating the Radiomics Features
+\section Calculating the Radiomics Features
 The most important step of a radiomic study is the calculating of the features. With MITK Phenotyping this is done using the "Radiomics Statistic" View. Open it using the View Navigator. Within this view, we select the resampled image and the resampled and cleaned mask. In a first step, we select the features we aim to calculate. For this tutorial we chose four features:
 \li Volumetric Features
 \li First Order Numerics
@@ -29,16 +29,13 @@ Now select a different image and repeat the calculation of the Co-occurence feat
 You will now have a long list of features. To further process these features, press the "Table to Clipboard" button. You can now paste the results in your favourit editor or statistic program and perfom the analysis of the radiomic study. 
 
 To give you some ideas how the results look like, here are some results from our experiment. If you used the same image and made a similar mask, you should obtain similar results, although small differences might be based on variations of the segmentation:
-\li Pic3D__Resampled;Bone__Resampled__MaskRange;Co-occurenced Based Features::Min-160_Max-900_Bins-64_Range-1::Mean Sum Average;52.5338
-\li Pic3D__Resampled;Bone__Resampled__MaskRange;Co-occurenced Based Features::Min-160_Max-900_Bins-32_Range-1::Mean Sum Average;26.7659
-\li Pic3D__Resampled__LoG__Sigma-1;Bone__Resampled__MaskRange;Co-occurenced Based Features::Min-160_Max-900_Bins-64_Range-1::Overall Sum Average;2
-\li Pic3D__Resampled__LoG__Sigma-1;Bone__Resampled__MaskRange;Co-occurenced Based Features::Min-160_Max-900_Bins-32_Range-1::Overall Sum Average;2
-\li Pic3D__Resampled;Bone__Resampled__MaskRange;First Order Numeric::Min-160_Max-900_Bins-32::Mean;420.761
-\li Pic3D__Resampled__LoG__Sigma-1;Bone__Resampled__MaskRange;First Order Numeric::Min-160_Max-900_Bins-32::Mean;-137.746
+\li Pic3D__Resampled;Bone__Resampled__MaskRange;Co-occurenced Based Features::Min-160_Max-900_Bins-64_Range-1::%Mean Sum Average;52.5338
+\li Pic3D__Resampled;Bone__Resampled__MaskRange;Co-occurenced Based Features::Min-160_Max-900_Bins-32_Range-1::%Mean Sum Average;26.7659
+\li Pic3D__Resampled__LoG__Sigma-1;Bone__Resampled__MaskRange;Co-occurenced Based Features::Min-160_Max-900_Bins-64_Range-1::%Overall Sum Average;2
+\li Pic3D__Resampled__LoG__Sigma-1;Bone__Resampled__MaskRange;Co-occurenced Based Features::Min-160_Max-900_Bins-32_Range-1::%Overall Sum Average;2
+\li Pic3D__Resampled;Bone__Resampled__MaskRange;First Order Numeric::Min-160_Max-900_Bins-32::%Mean;420.761
+\li Pic3D__Resampled__LoG__Sigma-1;Bone__Resampled__MaskRange;First Order Numeric::Min-160_Max-900_Bins-32::%Mean;-137.746
 
 You can see that the parameters used as well as image used have a clear impact on the final features. You can also see how the name of the image, the mask, and the parameters are encoded so that you are able to reproduce how the results were obtained.
-
-
-
 
 */

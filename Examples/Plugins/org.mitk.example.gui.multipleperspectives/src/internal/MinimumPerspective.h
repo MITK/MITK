@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MINIMALPERSPECTIVE_H_
-#define MINIMALPERSPECTIVE_H_
+#ifndef MINIMUMPERSPECTIVE_H_
+#define MINIMUMPERSPECTIVE_H_
 
 // berry includes
 #include <berryIPerspectiveFactory.h>
@@ -19,15 +19,15 @@ found in the LICENSE file.
 // Qt includes
 #include <QObject>
 
-class MinimalPerspective : public QObject, public berry::IPerspectiveFactory
+class MinimumPerspective : public QObject, public berry::IPerspectiveFactory
 {
   Q_OBJECT
   Q_INTERFACES(berry::IPerspectiveFactory)
 
 public:
-  MinimalPerspective();
+  MinimumPerspective();
 
   void CreateInitialLayout(berry::IPageLayout::Pointer layout) override;
 };
 
-#endif /* MINIMALPERSPECTIVE_H_ */
+#endif /* MINIMUMPERSPECTIVE_H_ */

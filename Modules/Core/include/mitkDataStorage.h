@@ -416,11 +416,7 @@ namespace mitk
     //## to suppress NodeChangedEvent to be emitted.
     bool m_BlockNodeModifiedEvents;
 
-    //##Documentation
-    //## @brief Standard Constructor for ::New() instantiation
     DataStorage();
-    //##Documentation
-    //## @brief Standard Destructor
     ~DataStorage() override;
 
     //##Documentation

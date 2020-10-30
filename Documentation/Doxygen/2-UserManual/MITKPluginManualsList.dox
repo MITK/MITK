@@ -40,7 +40,6 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
 
 <ul>
   <li> \ref org_mitk_gui_qt_flowapplication </li>
-  <li> \ref org_mitk_views_flow_control </li>
   <li> \ref org_mitk_gui_qt_aicpregistration </li>
   <li> \ref org_mitk_gui_qt_cest </li>
   <li> \ref org_mitk_gui_qt_classificationsegmentation </li>
@@ -48,35 +47,26 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
   <li> \ref org_mitk_views_pharmacokinetics_concentration_mri </li>
   <li> \ref org_mitk_views_pharmacokinetics_mri </li>
   <li> \ref org_mitk_views_pharmacokinetics_pet </li>
-  <li> \ref org_mitk_gui_qt_eventrecorder </li>
   <li> \ref org_mitk_gui_qt_examples </li>
   <li> \ref org_mitk_gui_qt_geometrytools </li>
   <li> \ref org_mitk_gui_qt_igtexample </li>
-  <li> \ref org_mitk_gui_qt_igtlplugin </li>
   <li> \ref org_mitk_gui_qt_igttracking </li>
   <li> \ref org_mitk_views_igttrackingsemiautomaticmeasurement </li>
-  <li> \ref org_mitk_gui_qt_lasercontrol </li>
   <li> \ref org_mitk_views_fit_demo </li>
   <li> \ref org_mitk_views_fit_genericfitting </li>
   <li> \ref org_mitk_views_fit_inspector </li>
   <li> \ref org_mitkexamplesopencv </li>
   <li> \ref org_mitk_gui_qt_overlaymanager </li>
   <li> \ref org_mitk_gui_qt_mitkphenotyping </li>
-  <li> \ref org_mitk_gui_qt_photoacoustics_pausmotioncompensation </li>
-  <li> \ref org_mitk_example_gui_pcaexample </li>
   <li> \ref org_mitk_gui_qt_preprocessing_resampling </li>
   <li> \ref org_mitk_views_pharmacokinetics_curvedescriptor </li>
   <li> \ref org_mitk_views_photoacoustics_imageprocessing </li>
   <li> \ref org_mitk_gui_qt_pharmacokinetics_simulation </li>
-  <li> \ref org_mitk_gui_qt_pointsetinteractionmultispectrum </li>
-  <li> \ref org_mitk_gui_qt_renderwindowmanager </li>
   <li> \ref org_mitk_gui_qt_photoacoustics_spectralunmixing </li>
-  <li> \ref org_mitk_gui_qt_spectrocamrecorder </li>
   <li> \ref org_surfacematerialeditor </li>
   <li> \ref org_toftutorial </li>
   <li> \ref org_blueberry_ui_qt_objectinspector </li>
   <li> \ref org_mitk_gui_qt_ultrasound </li>
-  <li> \ref org_mitk_gui_qt_igt_app_echotrack </li>
   <li> \ref org_mitk_gui_qt_xnat </li>
 </ul>
 

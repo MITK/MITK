@@ -48,9 +48,9 @@ In order to use CppUnit via MITK you will need to include the corresponding file
 
 \subsection GeneralTestsAddingHow How to structure your test
 
-As mentioned before, all test suites derive from mitk::TestFixture. A suggested name for your test suite would be <FUNCTIONALITY_TO_BE_TESTED>TestSuite.
+As mentioned before, all test suites derive from mitk::TestFixture. A suggested name for your test suite would be \c \<FUNCTIONALITY_TO_BE_TESTED\>TestSuite .
 
-You then create a suite and register your tests. A suggested naming convention for test methods is <METHOD_TO_BE_TESTED>_<INPUT_PARAMETERS/CONDITION>_<EXPECTED_RESULT>. We suggest not to add the word test, because that is most likely the only thing the reader knows anyway about your test, as he is reading a test suite.
+You then create a suite and register your tests. A suggested naming convention for test methods is \c \<METHOD_TO_BE_TESTED\>_\<INPUT_PARAMETERS/CONDITION\>_\<EXPECTED_RESULT\> . We suggest not to add the word test, because that is most likely the only thing the reader knows anyway about your test, as he is reading a test suite.
 
 An example:
 \code

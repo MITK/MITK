@@ -46,9 +46,10 @@ namespace mitk {
       /**
        * @brief LoadFluenceContributionMaps loads multiple nrrd files from a given folder
        * and sorts them into a position map if such meta information is available in
-       * the filename. </br>
+       * the filename.
+       * 
        * As this method was specifically designed to load many fluence files, the
-       * naming convention for the position values is: </br>
+       * naming convention for the position values is:
        *
        * <b>*_pN,N,NFluence*.nrrd</b>
        *

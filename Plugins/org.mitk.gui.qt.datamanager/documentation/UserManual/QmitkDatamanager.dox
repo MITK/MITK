@@ -1,8 +1,8 @@
 /**
 
-\page org_mitk_views_datamanager The Datamanager
+\page org_mitk_views_datamanager The Data Manager View
 
-\imageMacro{data-manager.svg,"Icon of the Data Manager", 2.00}
+\imageMacro{data-manager-dox.svg,"Icon of the Data Manager", 2.00}
 
 \tableofcontents
 
@@ -34,7 +34,7 @@ A lot of file-formats can be loaded into MITK, for example:
   <li> and many more
 </ul>
 
-The user can also load a series of 2D images (e.g. image001.png, image002.png ...) to a MITK 3D volume. 
+The user can also load a series of 2D images (e.g. image001.png, image002.png ...) to a MITK 3D volume.
 To do this, just drag and drop one of those 2D data files into the Datamanager by holding the ALT key.
 <em>Note: What really happens is that the data nodes are stored inside a "Data storage" and the Datamanager is just a visual representation of the data inside the "Data storage".
 That's why the documentation sometimes uses the term "Data storage" instead of "Datamanager".</em>

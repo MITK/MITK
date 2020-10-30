@@ -2,7 +2,7 @@
 
 \page org_mitk_views_igttrackingtoolbox The MITK-IGT Tracking Toolbox
 
-\imageMacro{../resources/iconTrackingToolbox.png,"Icon of the MITK-IGT Tracking Toolbox",2.00}
+\imageMacro{iconTrackingToolbox.png,"Icon of the MITK-IGT Tracking Toolbox",2.00}
 
 \tableofcontents
 

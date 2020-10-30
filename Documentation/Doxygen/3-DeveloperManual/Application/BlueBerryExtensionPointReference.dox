@@ -2,93 +2,1345 @@
 
 \page BlueBerryExtPointsIndex BlueBerry Extension-Point Reference
 
-<center>
-  <h1>BlueBerry Platform Extension Points</h1>
-</center>
+\tableofcontents{html:2}
 
-The following extension points can be used to extend the capabilities
-of the platform infrastructure:
+\section BlueBerryExtPointsIndex_CoreExpr Platform Core Expressions
 
-<h3><a name="runtime"></a>Platform Core Expressions</h3>
-<ul>
-  <li>\subpage xp_org_blueberry_core_expressions_definitions
-  <li>\subpage xp_org_blueberry_core_expressions_commonExpression
-  <li>\subpage xp_org_blueberry_core_expressions_propertyTesters
-</ul>
+\subsection BlueBerryExtPointsIndex_CoreExpr_ExprDef Expression Definitions
 
+\subsubsection BlueBerryExtPointsIndex_CoreExpr_ExprDef_Id Identifier
 
-<h3><a name="runtime"></a>Platform Runtime</h3>
-<ul>
-  <li>\subpage xp_org_blueberry_osgi_applications
-  <li>\subpage xp_org_blueberry_core_runtime_products
-</ul>
+\c org.blueberry.core.expressions.definitions
 
-<h3><a name="workbench"></a>Workbench</h3>
-<ul>
-  <li>\subpage xp_org_blueberry_ui_editors
-  <li>\subpage xp_org_blueberry_ui_elementFactories
-  <li>\subpage xp_org_blueberry_ui_keywords
-  <li>\subpage xp_org_blueberry_ui_menus
-  <li>\subpage xp_org_blueberry_ui_perspectiveExtensions
-  <li>\subpage xp_org_blueberry_ui_perspectives
-  <li>\subpage xp_org_blueberry_ui_preferencePages
-  <li>\subpage xp_org_blueberry_ui_presentationFactories
-  <li>\subpage xp_org_blueberry_ui_services
-  <li>\subpage xp_org_blueberry_ui_tweaklets
-  <li>\subpage xp_org_blueberry_ui_views
-</ul>
+\subsubsection BlueBerryExtPointsIndex_CoreExpr_ExprDef_Desc Description
 
-<h3><a name="other"></a>Other</h3>
-<ul>
-    <li>\subpage xp_org_blueberry_tests
-</ul>
+This extension point allows you to create reusable extensions.
+They can then be used in other core expression constructs.
+The reference element in a core expression will evaluated the expression definition with the evaluation context that is active for the reference element.
 
-\page xp_org_blueberry_core_expressions_definitions org.blueberry.core.expressions.definitions
-\htmlinclude org_blueberry_core_expressions_definitions.html
+\subsubsection BlueBerryExtPointsIndex_CoreExpr_ExprDef_ConfMarkup Configuration Markup
 
-\page xp_org_blueberry_core_expressions_commonExpression org.blueberry.core.expressions.commonExpression
-\htmlinclude org_blueberry_core_expressions_commonExpression.html
+\code{.unparsed}
+<!ELEMENT extension (definition*)>
+<!ATTLIST extension
+  point CDATA #REQUIRED
+  id    CDATA #IMPLIED
+  name  CDATA #IMPLIED>
+\endcode
 
-\page xp_org_blueberry_core_expressions_propertyTesters org.blueberry.core.expressions.propertyTesters
-\htmlinclude org_blueberry_core_expressions_propertyTesters.html
+- <tt>point</tt>: a fully qualified identifier of the target extension point
+- <tt>id</tt>: an optional identifier of the extension instance
+- <tt>name</tt>: an optional name of the extension instance
 
-\page xp_org_blueberry_osgi_applications org.blueberry.osgi.applications
-\htmlinclude org_blueberry_osgi_applications.html
+\code{.unparsed}
+<!ELEMENT definition (not | and | or | instanceof | test | systemTest | equals | count | with | resolve | adapt | iterate)>
+<!ATTLIST definition
+  id CDATA #REQUIRED>
+\endcode
 
-\page xp_org_blueberry_core_runtime_products org.blueberry.core.runtime.products
-\htmlinclude org_blueberry_core_runtime_products.html
+Provides a global definition of an expression to be used with the \c \<reference/\> expression element.
+This helps to reuse common expressions.
 
-\page xp_org_blueberry_ui_elementFactories org.blueberry.ui.elementFactories
-\htmlinclude org_blueberry_ui_elementFactories.html
+- <tt>id</tt>: a globally unique identifier for the expression definition
 
-\page xp_org_blueberry_ui_menus org.blueberry.ui.menus
-\htmlinclude org_blueberry_ui_menus.html
+\code{.unparsed}
+<!ELEMENT enablement (not , and , or , instanceof , test , systemTest , equals , count , with , resolve , adapt , iterate , reference)*>
+\endcode
 
-\page xp_org_blueberry_ui_perspectiveExtensions org.blueberry.ui.perspectiveExtensions
-\htmlinclude org_blueberry_ui_perspectiveExtensions.html
+A generic root element.
+The element can be used inside an extension point to define its enablement expression.
+The children of an enablement expression are combined using the and operator.
 
-\page xp_org_blueberry_ui_editors org.blueberry.ui.editors
-\htmlinclude org_blueberry_ui_editors.html
+\code{.unparsed}
+<!ELEMENT not (not | and | or | instanceof | test | systemTest | equals | count | with | resolve | adapt | iterate | reference)>
+\endcode
 
-\page xp_org_blueberry_ui_perspectives org.blueberry.ui.perspectives
-\htmlinclude org_blueberry_ui_perspectives.html
+This element represent a NOT operation on the result of evaluating it's sub-element expression.
 
-\page xp_org_blueberry_ui_presentationFactories org.blueberry.ui.presentationFactories
-\htmlinclude org_blueberry_ui_presentationFactories.html
+\code{.unparsed}
+<!ELEMENT and (not , and , or , instanceof , test , systemTest , equals , count , with , resolve , adapt , iterate , reference)*>
+\endcode
 
-\page xp_org_blueberry_ui_services org.blueberry.ui.services
-\htmlinclude org_blueberry_ui_services.html
+This element represent an AND operation on the result of evaluating all it's sub-elements expressions.
 
-\page xp_org_blueberry_ui_keywords org.blueberry.ui.keywords
-\htmlinclude org_blueberry_ui_keywords.html
+\code{.unparsed}
+<!ELEMENT or (not , and , or , instanceof , test , systemTest , equals , count , with , resolve , adapt , iterate , reference)*>
+\endcode
 
-\page xp_org_blueberry_ui_preferencePages org.blueberry.ui.preferencePages
-\htmlinclude org_blueberry_ui_preferencePages.html
+This element represent an OR operation on the result of evaluating all it's sub-element expressions.
 
-\page xp_org_blueberry_ui_tweaklets org.blueberry.ui.tweaklets
-\htmlinclude org_blueberry_ui_tweaklets.html
+\code{.unparsed}
+<!ELEMENT instanceof EMPTY>
+<!ATTLIST instanceof
+  value CDATA #REQUIRED>
+\endcode
 
-\page xp_org_blueberry_ui_views org.blueberry.ui.views
-\htmlinclude org_blueberry_ui_views.html
+This element is used to perform an instanceof check of the object in focus.
+The expression returns \c EvaluationResult.TRUE if the object's type is a sub type of the type specified by the attribute value.
+Otherwise \c EvaluationResult.FALSE is returned.
+
+- <tt>value</tt>: a fully qualified name of a class or interface
+
+\code{.unparsed}
+<!ELEMENT test EMPTY>
+<!ATTLIST test
+  property              CDATA #REQUIRED
+  args                  CDATA #IMPLIED
+  value                 CDATA #IMPLIED
+  forcePluginActivation (true | false)>
+\endcode
+
+This element is used to evaluate the property state of the object in focus.
+The set of testable properties can be extended using the propery tester extension point.
+The test expression returns \c EvaluationResult.NOT_LOADED if the property tester doing the actual testing isn't loaded yet and the attribute \c forcePluginActivation is set to \c false.
+If \c forcePluginActivation is set to \c true and the evaluation context used to evaluate this expression support plug-in activation then evaluating the property will result in activating the plug-in defining the tester.
+
+- <tt>property</tt>: The name of an object's property to test.
+- <tt>args</tt>: Additional arguments passed to the property tester. Multiple arguments are seperated by commas. Each individual argument is converted into a Java base type using the same rules as defined for the value attribute of the test expression.
+- <tt>value</tt>: The expected value of the property. Can be omitted if the property is a boolean property. The test expression is supposed to return \c EvaluationResult.TRUE if the property matches the value and \c EvaluationResult.FALSE otherwise. The value attribute is converted into a Java base type using the following rules:
+ - The string \c "true" is converted into \c Boolean.TRUE .
+ - The string \c "false" is converted into \c Boolean.FALSE .
+ - If the string contains a dot then the interpreter tries to convert the value into a \c Float object. If this fails the string is treated as a \c java.lang.String.
+ - If the string only consists of numbers then the interpreter converts the value in an \c Integer object.
+ - In all other cases the string is treated as a \c java.lang.String .
+ - The conversion of the string into a \c Boolean , \c Float , or \c Integer can be suppressed by surrounding the string with single quotes. For example, the attribute \c value="'true'" is converted into the string "true".
+- <tt>forcePluginActivation</tt>: A flag indicating whether the plug-in contributing the property tester should be loaded if necessary. As such, this flag should be used judiciously, in order to avoid unnecessary plug-in activations. Most clients should avoid setting this flag to \c true. This flag is only honored if the evaluation context used to evaluate this expression allows plug-in activation. Otherwise the flag is ignored and no plug-in loading takes place.
+
+\code{.unparsed}
+<!ELEMENT systemTest EMPTY>
+<!ATTLIST systemTest
+  property CDATA #REQUIRED
+  value    CDATA #REQUIRED>
+\endcode
+
+Tests a system property by calling the \c System.getProperty method and compares the result with the value specified through the value attribute.
+
+- <tt>property</tt>: The name of an system property to test.
+- <tt>value</tt>: The expected value of the property. The value is interpreted as a string value.
+
+\code{.unparsed}
+<!ELEMENT equals EMPTY>
+<!ATTLIST equals
+  value CDATA #REQUIRED>
+\endcode
+
+This element is used to perform an equals check of the object in focus.
+The expression returns \c EvaluationResult.TRUE if the object is equal to the value provided by the attribute value.
+Otherwise \c EvaluationResult.FALSE is returned.
+
+- <tt>value</tt>: The expected value. The value provided as a string is converted into a Java base type using the same rules as for the value attribute of the test expression.
+
+\code{.unparsed}
+<!ELEMENT count EMPTY>
+<!ATTLIST count
+  value CDATA #REQUIRED>
+\endcode
+
+This element is used to test the number of elements in a collection.
+
+- <tt>value</tt>: An expression to specify the number of elements in a list. Following wildcard characters can be used:
+ - <tt>*</tt>: any number of elements
+ - <tt>?</tt>: no elements or one element
+ - <tt>+</tt>: one or more elements
+ - <tt>!</tt>: no elements
+ - <tt>integer value</tt>: the list must contain the exact number of elements
+
+\code{.unparsed}
+<!ELEMENT with (not , and , or , instanceof , test , systemTest , equals , count , with , resolve , adapt , iterate , reference)*>
+<!ATTLIST with
+  variable CDATA #REQUIRED>
+\endcode
+
+This element changes the object to be inspected for all its child element to the object referenced by the given variable.
+If the variable can not be resolved then the expression will throw an \c ExpressionException when evaluating it.
+The children of a with expression are combined using the and operator.
+
+- <tt>variable</tt>: The name of the variable to be used for further inspection. It is up to the evaluator of an extension point to provide the variable in the variable pool.
+
+\code{.unparsed}
+<!ELEMENT resolve (not , and , or , instanceof , test , systemTest , equals , count , with , resolve , adapt , iterate , reference)*>
+<!ATTLIST resolve
+  variable CDATA #REQUIRED
+  args     CDATA #IMPLIED>
+\endcode
+
+This element changes the object to be inspected for all its child element to the object referenced by the given variable.
+If the variable can not be resolved then the expression will throw an \c ExpressionException when evaluating it.
+The children of a with expression are combined using the and operator.
+
+- <tt>variable</tt>: The name of the variable to be resolved. This variable is then used as the object in focus for child element evaluation. It is up to the evaluator of an extension point to provide a corresponding variable resolver (see berry::IVariableResolver) through the evaluation context passed to the root expression element when evaluating the expression.
+- <tt>args</tt>: Additional arguments passed to the variable resolver. Multiple arguments are seperated by commas. Each individual argument is converted into a Java base type using the same rules as defined for the value attribute of the test expression.
+
+\code{.unparsed}
+<!ELEMENT adapt (not , and , or , instanceof , test , systemTest , equals , count , with , resolve , adapt , iterate , reference)*>
+<!ATTLIST adapt
+  type CDATA #REQUIRED>
+\endcode
+
+This element is used to adapt the object in focus to the type specified by the attribute type.
+The expression returns not loaded if either the adapter or the type referenced isn't loaded yet.
+It throws an \c ExpressionException during evaluation if the type name doesn't exist at all.
+The children of an adapt expression are combined using the and operator.
+
+- <tt>type</tt>: the type to which the object in focus is to be adapted
+
+\code{.unparsed}
+<!ELEMENT iterate (not , and , or , instanceof , test , systemTest , equals , count , with , resolve , adapt , iterate , reference)*>
+<!ATTLIST iterate
+  operator (or|and)
+  ifEmpty  (true | false) >
+\endcode
+
+This element is used to iterate over a variable that is of type \c java.util.Collection.
+If the object in focus is not of type \c java.util.Collection then an \c ExpressionException will be thrown while evaluating the expression.
+
+- <tt>operator</tt>: Either "and" or "or". The operator defines how the child elements will be combined. If not specified, "and" will be used.
+- <tt>ifEmpty</tt>: The value return from the iterate expression if the collection is empty. If not specified then \c true is returned when the operator equals "and" and \c false is returned if the operator equals "or".
+
+\code{.unparsed}
+<!ELEMENT reference EMPTY>
+<!ATTLIST reference
+  definitionId CDATA #REQUIRED>
+\endcode
+
+This element is used to reference an expression from the \c org.blueberry.core.expressions.definitions extension point.
+The expression definition will be evaluated within the current expression element using the current evaluation context.
+
+- <tt>definitionId</tt>: the unique id of an expression from \c org.blueberry.core.expressions.definitions
+
+\subsubsection BlueBerryExtPointsIndex_CoreExpr_ExprDef_Examples Examples
+
+\code{.unparsed}
+<extension point="org.blueberry.core.expressions.definitions">
+  <definition id="com.example.parts.activeProblemsView">
+    <with variable="activePartId">
+      <equals value="org.blueberry.ui.views.ProblemsView"/>
+    </with>
+  </definition>
+  <definition id="com.example.markers.markerSelection">
+    <iterate>
+      <instanceof value="org.blueberry.core.resources.IMarker"/>
+    </with>
+  </definition>
+</extension>
+\endcode
+
+Then this expression definition can be used when composing other expressions.
+
+\code{.unparsed}
+<enabledWhen>
+  <reference definitionId="com.example.parts.activeProblemsView">
+</enabledWhen>
+
+<visibleWhen>
+  <and>
+    <reference definitionId="com.example.parts.activeProblemsView"/>
+    <reference definitionId="com.example.markers.markerSelection"/>
+  </and>
+</visibleWhen>
+\endcode
+
+\subsection BlueBerryExtPointsIndex_CoreExpr_CommExpr Common Expressions
+
+\subsubsection BlueBerryExtPointsIndex_CoreExpr_CommExpr_Id Identifier
+
+\c org.blueberry.core.expressions.commonExpression
+
+\subsubsection BlueBerryExtPointsIndex_CoreExpr_CommExpr_ConfMarkup Configuration Markup
+
+\code{.unparsed}
+<!ELEMENT enablement (not , and , or , instanceof , test , systemTest , equals , count , with , resolve , adapt , iterate , reference)*>
+\endcode
+
+A generic root element. The element can be used inside an extension point to define its enablement expression.
+The children of an enablement expression are combined using the and operator.
+
+\code{.unparsed}
+<!ELEMENT not (not | and | or | instanceof | test | systemTest | equals | count | with | resolve | adapt | iterate | reference)>
+\endcode
+
+This element represent a NOT operation on the result of evaluating it's sub-element expression.
+
+\code{.unparsed}
+<!ELEMENT and (not , and , or , instanceof , test , systemTest , equals , count , with , resolve , adapt , iterate , reference)*>
+\endcode
+
+This element represent an AND operation on the result of evaluating all it's sub-elements expressions.
+
+\code{.unparsed}
+<!ELEMENT or (not , and , or , instanceof , test , systemTest , equals , count , with , resolve , adapt , iterate , reference)*>
+\endcode
+
+This element represent an OR operation on the result of evaluating all it's sub-element expressions.
+
+\code{.unparsed}
+<!ELEMENT instanceof EMPTY>
+<!ATTLIST instanceof
+  value CDATA #REQUIRED>
+\endcode
+
+This element is used to perform an instanceof check of the object in focus.
+The expression returns \c EvaluationResult.TRUE if the object's type is a sub type of the type specified by the attribute value.
+Otherwise \c EvaluationResult.FALSE is returned.
+
+- <tt>value</tt>: a fully qualified name of a class or interface
+
+\code{.unparsed}
+<!ELEMENT test EMPTY>
+<!ATTLIST test
+  property              CDATA #REQUIRED
+  args                  CDATA #IMPLIED
+  value                 CDATA #IMPLIED
+  forcePluginActivation (true | false) >
+\endcode
+
+This element is used to evaluate the property state of the object in focus.
+The set of testable properties can be extended using the propery tester extension point.
+The test expression returns \c EvaluationResult.NOT_LOADED if the property tester doing the actual testing isn't loaded yet and the attribute \c forcePluginActivation is set to false.
+If \c forcePluginActivation is set to \c true and the evaluation context used to evaluate this expression support plug-in activation then evaluating the property will result in activating the plug-in defining the tester.
+
+- <tt>property</tt>: The name of an object's property to test.
+- <tt>args</tt>: Additional arguments passed to the property tester. Multiple arguments are seperated by commas. Each individual argument is converted into a Java base type using the same rules as defined for the value attribute of the test expression.
+- <tt>value</tt>: The expected value of the property. Can be omitted if the property is a boolean property. The test expression is supposed to return EvaluationResult.TRUE if the property matches the value and EvaluationResult.FALSE otherwise. The value attribute is converted into a Java base type using the following rules:
+ - The string "true" is converted into \c Boolean.TRUE
+ - The string "false" is converted into \c Boolean.FALSE
+ - If the string contains a dot then the interpreter tries to convert the value into a \c Float object. If this fails the string is treated as a \c java.lang.String
+ - If the string only consists of numbers then the interpreter converts the value in an \c Integer object.
+ - In all other cases the string is treated as a \c java.lang.String
+ - The conversion of the string into a \c Boolean , \c Float , or \c Integer can be suppressed by surrounding the string with single quotes. For example, the attribute \c value="'true'" is converted into the string "true"
+- <tt>forcePluginActivation</tt>: A flag indicating whether the plug-in contributing the property tester should be loaded if necessary. As such, this flag should be used judiciously, in order to avoid unnecessary plug-in activations. Most clients should avoid setting this flag to true. This flag is only honored if the evaluation context used to evaluate this expression allows plug-in activation. Otherwise the flag is ignored and no plug-in loading takes place.
+
+\code{.unparsed}
+<!ELEMENT systemTest EMPTY>
+<!ATTLIST systemTest
+  property CDATA #REQUIRED
+  value    CDATA #REQUIRED>
+\endcode
+
+Tests a system property by calling the \c System.getProperty method and compares the result with the value specified through the value attribute.
+
+- <tt>property</tt>: The name of an system property to test.
+- <tt>value</tt>: The expected value of the property. The value is interpreted as a string value.
+
+\code{.unparsed}
+<!ELEMENT equals EMPTY>
+<!ATTLIST equals
+  value CDATA #REQUIRED>
+\endcode
+
+This element is used to perform an equals check of the object in focus.
+The expression returns \c EvaluationResult.TRUE if the object is equal to the value provided by the attribute value.
+Otherwise \c EvaluationResult.FALSE is returned.
+
+- <tt>value</tt>: The expected value. The value provided as a string is converted into a Java base type using the same rules as for the value attribute of the test expression.
+
+\code{.unparsed}
+<!ELEMENT count EMPTY>
+<!ATTLIST count
+  value CDATA #REQUIRED>
+\endcode
+
+This element is used to test the number of elements in a collection.
+
+- <tt>value</tt>: An expression to specify the number of elements in a list. Following wildcard characters can be used:
+ - <tt>*</tt>: any number of elements
+ - <tt>?</tt>: no elements or one element
+ - <tt>+</tt>: one or more elements
+ - <tt>!</tt>: no elements
+ - <tt>integer value</tt>: the list must contain the exact number of elements
+
+\code{.unparsed}
+<!ELEMENT with (not , and , or , instanceof , test , systemTest , equals , count , with , resolve , adapt , iterate , reference)*>
+<!ATTLIST with
+  variable CDATA #REQUIRED>
+\endcode
+
+This element changes the object to be inspected for all its child element to the object referenced by the given variable.
+If the variable can not be resolved then the expression will throw an \c ExpressionException when evaluating it.
+The children of a with expression are combined using the and operator.
+
+- <tt>variable</tt>: The name of the variable to be used for further inspection. It is up to the evaluator of an extension point to provide the variable in the variable pool.
+
+\code{.unparsed}
+<!ELEMENT resolve (not , and , or , instanceof , test , systemTest , equals , count , with , resolve , adapt , iterate , reference)*>
+<!ATTLIST resolve
+  variable CDATA #REQUIRED
+  args     CDATA #IMPLIED>
+\endcode
+
+This element changes the object to be inspected for all its child element to the object referenced by the given variable.
+If the variable can not be resolved then the expression will throw an \c ExpressionException when evaluating it.
+The children of a with expression are combined using the and operator.
+
+- <tt>variable</tt>: The name of the variable to be resolved. This variable is then used as the object in focus for child element evaluation. It is up to the evaluator of an extension point to provide a corresponding variable resolver (see berry::IVariableResolver) through the evaluation context passed to the root expression element when evaluating the expression.
+- <tt>args</tt>: Additional arguments passed to the variable resolver. Multiple arguments are seperated by commas. Each individual argument is converted into a Java base type using the same rules as defined for the value attribute of the test expression.
+
+\code{.unparsed}
+<!ELEMENT adapt (not , and , or , instanceof , test , systemTest , equals , count , with , resolve , adapt , iterate , reference)*>
+<!ATTLIST adapt
+  type CDATA #REQUIRED>
+\endcode
+
+This element is used to adapt the object in focus to the type specified by the attribute type.
+The expression returns not loaded if either the adapter or the type referenced isn't loaded yet. It throws an \c ExpressionException during evaluation if the type name doesn't exist at all.
+The children of an adapt expression are combined using the and operator.
+
+- <tt>type</tt>: the type to which the object in focus is to be adapted
+
+\code{.unparsed}
+<!ELEMENT iterate (not , and , or , instanceof , test , systemTest , equals , count , with , resolve , adapt , iterate , reference)*>
+<!ATTLIST iterate
+  operator (or|and)
+  ifEmpty  (true | false) >
+\endcode
+
+This element is used to iterate over a variable that is of type \c java.util.Collection.
+If the object in focus is not of type \c java.util.Collection then an \c ExpressionException will be thrown while evaluating the expression.
+
+- <tt>operator</tt>: Either "and" or "or". The operator defines how the child elements will be combined. If not specified, "and" will be used.
+- <tt>ifEmpty</tt>: The value return from the iterate expression if the collection is empty. If not specified then \c true is returned when the operator equals "and" and \c false is returned if the operator equals "or".
+
+\code{.unparsed}
+<!ELEMENT reference EMPTY>
+<!ATTLIST reference
+  definitionId CDATA #REQUIRED>
+\endcode
+
+This element is used to reference an expression from the \c org.blueberry.core.expressions.definitions extension point.
+The expression definition will be evaluated within the current expression element using the current evaluation context.
+
+- <tt>definitionId</tt>: the unique id of an expression from \c org.blueberry.core.expressions.definitions
+
+\subsection BlueBerryExtPointsIndex_CoreExpr_PropTest Property Testers
+
+\subsubsection BlueBerryExtPointsIndex_CoreExpr_PropTest_Id Identifier
+
+\c org.blueberry.core.expressions.propertyTesters
+
+\subsubsection BlueBerryExtPointsIndex_CoreExpr_PropTest_Desc Description
+
+This extension point allows to add properties to an already existing type.
+Those properties can then be used inside the expression language's test expression element.
+
+\subsubsection BlueBerryExtPointsIndex_CoreExpr_PropTest_ConfMarkup Configuration Markup
+
+\code{.unparsed}
+<!ELEMENT extension (propertyTester*)>
+<!ATTLIST extension
+  point CDATA #REQUIRED
+  id    CDATA #IMPLIED
+  name  CDATA #IMPLIED>
+\endcode
+
+- <tt>point</tt>: a fully qualified identifier of the target extension point
+- <tt>id</tt>: an optional identifier of the extension instance
+- <tt>name</tt>: an optional name of the extension instance
+
+\code{.unparsed}
+<!ELEMENT propertyTester EMPTY>
+<!ATTLIST propertyTester
+  id         CDATA #REQUIRED
+  type       CDATA #REQUIRED
+  namespace  CDATA #REQUIRED
+  properties CDATA #REQUIRED
+  class      CDATA #REQUIRED>
+\endcode
+
+- <tt>id</tt>: Unique identifier for the property tester.
+- <tt>type</tt>: The type to be extended by this property tester.
+- <tt>namespace</tt>: A unique id determining the name space the properties are added to.
+- <tt>properties</tt>: A comma separated list of properties provided by this property tester.
+- <tt>class</tt>: The name of the class that implements the testing methods. The class must be public and extend \c org.blueberry.core.expressions.PropertyTester with a public 0-argument constructor.
+
+\subsubsection BlueBerryExtPointsIndex_CoreExpr_PropTest_Examples Examples
+
+\code{.unparsed}
+<extension point="org.eclipse.core.expressions.propertyTesters">
+  <propertyTester
+    id="org.eclipse.jdt.ui.IResourceTester"
+    type="org.eclipse.core.resources.IResource"
+    namespace="org.eclipse.jdt.ui"
+    properties="canDelete"
+    class="org.eclipse.jdt.ui.internal.ResourceTester">
+  </propertyTester>
+</extension>
+\endcode
+
+\section BlueBerryExtPointsIndex_PlatformRuntime Platform Runtime
+
+\subsection BlueBerryExtPointsIndex_PlatformRuntime_App Applications
+
+\subsubsection BlueBerryExtPointsIndex_PlatformRuntime_App_Id Identifier
+
+\c org.blueberry.osgi.applications
+
+\subsubsection BlueBerryExtPointsIndex_PlatformRuntime_App_Desc Description
+
+The applications extension point allows plugins to contribute applications to the BlueBerry Platform.
+
+\subsubsection BlueBerryExtPointsIndex_PlatformRuntime_App_ConfMarkup Configuration Markup
+
+\code{.unparsed}
+<!ELEMENT extension (application)+>
+<!ATTLIST extension
+  point CDATA #REQUIRED
+  id    CDATA #IMPLIED
+  name  CDATA #IMPLIED>
+\endcode
+
+\code{.unparsed}
+<!ELEMENT application (run)>
+<!ATTLIST application
+  id   CDATA #REQUIRED
+  name CDATA #IMPLIED>
+\endcode
+
+\code{.unparsed}
+<!ELEMENT run EMPTY>
+<!ATTLIST run
+  class CDATA #REQUIRED>
+\endcode
+
+\subsubsection BlueBerryExtPointsIndex_PlatformRuntime_App_Examples Examples
+
+\code{.unparsed}
+<extension id="sampleApplication" point="org.blueberry.osgi.applications">
+  <application id="my.domain.application">
+  <run class="xyz::SampleApp"/>
+  </application>
+</extension>
+\endcode
+
+\subsection BlueBerryExtPointsIndex_PlatformRuntime_Prod Products
+
+\subsubsection BlueBerryExtPointsIndex_PlatformRuntime_Prod_Id Identifier
+
+\c org.blueberry.core.runtime.products
+
+\subsubsection BlueBerryExtPointsIndex_PlatformRuntime_Prod_Desc Description
+
+Products are the BlueBerry unit of branding.
+Product extensions are supplied by plug-ins wishing to define one or more products.
+There must be one product per extension as the extension id is used in processing and identifying the product.
+
+There are two possible forms of product extension, static and dynamic.
+Static product extensions directly contain all relevant information about the product.
+Dynamic product extensions identify a class (an \c IProductProvider) which is capable of defining one or more products when queried.
+
+\subsubsection BlueBerryExtPointsIndex_PlatformRuntime_Prod_ConfMarkup Configuration Markup
+
+\code{.unparsed}
+<!ELEMENT extension ((product | provider))>
+<!ATTLIST extension
+  point CDATA #REQUIRED
+  id    CDATA #IMPLIED
+  name  CDATA #IMPLIED>
+\endcode
+
+\code{.unparsed}
+<!ELEMENT product (property*)>
+<!ATTLIST product
+  application CDATA #REQUIRED
+  name        CDATA #REQUIRED
+  description CDATA #IMPLIED>
+\endcode
+
+- <tt>application</tt>: the default application to run when running this product
+- <tt>name</tt>: the human-readable name of this product
+- <tt>description</tt>: the human-readable description of this product
+
+\code{.unparsed}
+<!ELEMENT property EMPTY>
+<!ATTLIST property
+  name  CDATA #REQUIRED
+  value CDATA #REQUIRED>
+\endcode
+
+- <tt>name</tt>: the key under which this property is stored
+- <tt>value</tt>: the value of this property
+
+\code{.unparsed}
+<!ELEMENT provider (run)>
+\endcode
+
+\code{.unparsed}
+<!ELEMENT run EMPTY>
+<!ATTLIST run
+  class CDATA #REQUIRED>
+\endcode
+
+- <tt>class</tt>: the fully-qualified name of a class which implements \c IProductProvider
+
+\subsubsection BlueBerryExtPointsIndex_PlatformRuntime_Prod_Examples Examples
+
+\code{.unparsed}
+<extension id="coolProduct" point="org.blueberry.core.runtime.products">
+  <product name="%coolName" application="coolApplication" description="%coolDescription">
+    <property name="windowImages" value="window.gif"/>
+    <property name="aboutImage" value="image.gif"/>
+    <property name="aboutText" value="%aboutText"/>
+    <property name="appName" value="CoolApp"/>
+    <property name="welcomePage" value="$nl$/welcome.xml"/>
+    <property name="preferenceCustomization" value="plugin_customization.ini"/>
+  </product>
+</extension>
+\endcode
+
+The following is an example of a dynamic product (product provider) declaration: Following is an example of an application declaration:
+
+\code{.unparsed}
+<extension id="coolProvider" point="org.blueberry.core.runtime.products">
+  <provider>
+     <run class="me::CoolProvider"/>
+  </provider>
+</extension>
+\endcode
+
+\subsubsection BlueBerryExtPointsIndex_PlatformRuntime_Prod_SupplImpl Supplied Implementation
+
+No implementations of \c IProductProvider are supplied.
+
+\section BlueBerryExtPointsIndex_Workbench Workbench
+
+\subsection BlueBerryExtPointsIndex_Workbench_Edit Internal and External Editors
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_Edit_Id Identifier
+
+\c org.blueberry.ui.editors
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_Edit_Desc Description
+
+This extension point is used to add new editors to the workbench.
+A editor is a visual component within a workbench page.
+It is typically used to edit or browse a document or input object.
+To open an editor, the user will typically invoke "Open" on an \c IFile.
+When this action is performed the workbench registry is consulted to determine an appropriate editor for the file type and then a new instance of the editor type is created.
+The actual result depends on the type of the editor.
+The workbench provides support for the creation of internal editors, which are tightly integrated into the workbench, and external editors, which are launched in a separate frame window.
+There are also various levels of integration between these extremes.
+
+In the case of an internal editor tight integration can be achieved between the workbench window and the editor part.
+The workbench menu and toolbar are pre-loaded with a number of common actions, such as cut, copy, and paste.
+The active part, view or editor, is expected to provide the implementation for these actions.
+An internal editor may also define new actions which appear in the workbench window.
+These actions only appear when the editor is active.
+
+The integration between the workbench and external editors is more tenuous.
+In this case the workbench may launch an editor but after has no way of determining the state of the external editor or collaborating with it by any means except through the file system.
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_Edit_ConfMarkup Configuration Markup
+
+\code{.unparsed}
+<!ELEMENT extension (editor*)>
+<!ATTLIST extension
+  point CDATA #REQUIRED
+  id    CDATA #IMPLIED
+  name  CDATA #IMPLIED>
+\endcode
+
+- <tt>point</tt>: a fully qualified identifier of the target extension point
+- <tt>id</tt>: an optional identifier of the extension instance
+- <tt>name</tt>: an optional name of the extension instance
+
+\code{.unparsed}
+<!ELEMENT editor (contentTypeBinding*)>
+<!ATTLIST editor
+  id               CDATA #REQUIRED
+  name             CDATA #REQUIRED
+  icon             CDATA #IMPLIED
+  extensions       CDATA #IMPLIED
+  class            CDATA #IMPLIED
+  command          CDATA #IMPLIED
+  launcher         CDATA #IMPLIED
+  contributorClass CDATA #IMPLIED
+  default          (true | false) "false"
+  filenames        CDATA #IMPLIED
+  matchingStrategy CDATA #IMPLIED>
+\endcode
+
+- <tt>id</tt>: a unique name that will be used to identify this editor
+- <tt>name</tt>: a translatable name that will be used in the UI for this editor
+- <tt>icon</tt>: A relative name of the icon that will be used for all resources that match the specified extensions. Editors should provide an icon to make it easy for users to distinguish between different editor types. If you specify a command rather than a class, an icon is not needed. In that case, the workbench will use the icon provided by the operating system.
+- <tt>extensions</tt>: an optional field containing the list of file types understood by the editor. This is a string containing comma separate file extensions. For instance, an editor which understands hypertext documents may register for "htm, html".
+- <tt>class</tt>: the name of a class that implements berry::IEditorPart. The attributes \c class , \c command , and \c launcher are mutually exclusive. If this attribute is defined then \c contributorClass should also be defined.
+- <tt>command</tt>: a command to run in order to launch an external editor. The executable command must be located on the system path or in the plug-in's directory. The attributes class, command, and launcher are mutually exclusive.
+- <tt>launcher</tt>: the name of a class which that implements berry::IEditorLauncher. A launcher will open an external editor. The attributes \c class , \c command , and \c launcher are mutually exclusive.
+- <tt>contributorClass</tt>: the name of a class that implements berry::IEditorActionBarContributor. This attribute should only be defined if the \c class attribute is defined. This class is used to add new actions to the workbench menu and tool bar which reflect the features of the editor type.
+- <tt>default</tt>: if true, this editor will be used as the default editor for the type. This is only relevant in a case where more than one editor is registered for the same type. If an editor is not the default for the type, it can still be launched using "Open with..." submenu for the selected resource.
+Please note that this attribute is only honored for filename and extension associations at this time. It will not be honored for content type bindings. Content type-based resolution will occur on a first come, first serve basis and is not explicitly specified.
+- <tt>filenames</tt>: an optional field containing the list of file names understood by the editor. This is a string containing comma separate file names. For instance, an editor which understands specific hypertext documents may register for "ejb.htm, ejb.html".
+- <tt>matchingStrategy</tt>: the name of a class that implements berry::IEditorMatchingStrategy. This attribute should only be defined if the \c class attribute is defined. This allows the editor extension to provide its own algorithm for matching the input of one of its editors to a given editor input.
+
+\code{.unparsed}
+<!ELEMENT contentTypeBinding EMPTY>
+<!ATTLIST contentTypeBinding
+  contentTypeId CDATA #REQUIRED>
+\endcode
+
+Advertises that the containing editor understands the given content type and is suitable for editing files of that type.
+
+- <tt>contentTypeId</tt>: The content type identifier. This is an ID defined by the \c org.blueberry.core.runtime.contentTypes extension point.
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_Edit_Examples Examples
+
+The following is an example of an internal editor extension definition:
+
+\code{.unparsed}
+<extension point="org.blueberry.ui.editors">
+  <editor
+    id="com.xyz.XMLEditor"
+    name="Fancy XYZ XML editor"
+    icon="./icons/XMLEditor.gif"
+    extensions="xml"
+    class="xyz::XMLEditor"
+    contributorClass="xyz::XMLEditorContributor"
+    default="false">
+  </editor>
+</extension>
+\endcode
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_Edit_SupplImpl Supplied Implementation
+
+The workbench provides a "Default Text Editor". The end user product may contain other editors as part of the shipping bundle. In that case, editors will be registered as extensions using the syntax described above.
+
+\subsection BlueBerryExtPointsIndex_Workbench_Keywords Keywords
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_Keywords_Id Identifier
+
+\c org.blueberry.ui.keywords
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_Keywords_Desc Description
+
+The keywords extension point defines keywords and a unique id for reference by other schemas. See \c propertyPages and \c preferencePages .
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_Keywords_ConfMarkup Configuration Markup
+
+\code{.unparsed}
+<!ELEMENT extension (keyword*)>
+<!ATTLIST extension
+  point CDATA #REQUIRED
+  id    CDATA #IMPLIED
+  name  CDATA #IMPLIED>
+\endcode
+
+- <tt>point</tt>: a fully qualified identifier of the target extension point
+- <tt>id</tt>: an optional identifier of the extension instance
+- <tt>name</tt>: an optional name of the extension instance
+
+\code{.unparsed}
+<!ELEMENT keyword EMPTY>
+<!ATTLIST keyword
+  id    CDATA #REQUIRED
+  label CDATA #REQUIRED>
+\endcode
+
+- <tt>id</tt>: The id is the unique id used to reference the keyword
+- <tt>label</tt>: The human readable label of the keyword
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_Keywords_Examples Examples
+
+The following is an example of a keyword extension:
+
+\code{.unparsed}
+<extension
+  point="org.blueberry.ui.keywords">
+  <keyword
+    label="presentation tab themes"
+    id="com.xyz.AppearanceKeywords"/>
+</extension>
+\endcode
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_Keywords_SupplImpl Supplied Implementation
+
+Keywords are used only with preference and property pages. See the \c keywordReference element of the \c org.blueberry.ui.propertyPages and \c org.blueberry.ui.preferencePages extension points.
+
+\subsection BlueBerryExtPointsIndex_Workbench_PerspExt Perspective Extensions
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_PerspExt_Id Identifier
+
+\c org.blueberry.ui.perspectiveExtensions
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_PerspExt_Desc Description
+
+This extension point is used to extend perspectives registered by other plug-ins.
+A perspective defines the initial contents of the window action bars (menu and toolbar) and the initial set of views and their layout within a workbench page.
+Other plug-ins may contribute actions or views to the perspective which appear when the perspective is selected.
+Optional additions by other plug-ins are appended to the initial definition.
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_PerspExt_ConfMarkup Configuration Markup
+
+\code{.unparsed}
+<!ELEMENT extension (perspectiveExtension*)>
+<!ATTLIST extension
+  point CDATA #REQUIRED
+  id    CDATA #IMPLIED
+  name  CDATA #IMPLIED>
+\endcode
+
+- <tt>point</tt>: a fully qualified identifier of the target extension point
+- <tt>id</tt>: an optional identifier of the extension instance
+- <tt>name</tt>: an optional name of the extension instance
+
+\code{.unparsed}
+<!ELEMENT perspectiveExtension (actionSet | viewShortcut | perspectiveShortcut | newWizardShortcut | view | showInPart | hiddenMenuItem | hiddenToolBarItem)*>
+<!ATTLIST perspectiveExtension
+  targetID IDREF #REQUIRED>
+\endcode
+
+- <tt>targetID</tt>: the unique identifier of the perspective (as specified in the registry) into which the contribution is made. If the value is set to "*" the extension is applied to all perspectives.
+
+\code{.unparsed}
+<!ELEMENT actionSet EMPTY>
+<!ATTLIST actionSet
+  id IDREF #REQUIRED>
+\endcode
+
+- <tt>id</tt>: the unique identifier of the action set which will be added to the perspective.
+
+\code{.unparsed}
+<!ELEMENT viewShortcut EMPTY>
+<!ATTLIST viewShortcut
+  id IDREF #REQUIRED>
+\endcode
+
+- <tt>id</tt>: the unique identifier of the view which will be added to the perspective's "Show View" submenu of the "Window" menu.
+
+\code{.unparsed}
+<!ELEMENT perspectiveShortcut EMPTY>
+<!ATTLIST perspectiveShortcut
+  id IDREF #REQUIRED>
+\endcode
+
+- <tt>id</tt>: the unique identifier of the perspective which will be added to the perspective's "Open Perspective" submenu of the "Window" menu.
+
+\code{.unparsed}
+<!ELEMENT newWizardShortcut EMPTY>
+<!ATTLIST newWizardShortcut
+  id IDREF #REQUIRED>
+\endcode
+
+- <tt>id</tt>: the unique identifier of the new wizard which will be added to the perspective's "New" submenu of the "File" menu.
+
+\code{.unparsed}
+<!ELEMENT showInPart EMPTY>
+<!ATTLIST showInPart
+  id IDREF #IMPLIED>
+\endcode
+
+- <tt>id</tt>: the unique identifier of the view which will be added to the perspective's "Show In..." prompter in the Navigate menu.
+
+\code{.unparsed}
+<!ELEMENT view EMPTY>
+<!ATTLIST view
+  id           IDREF #REQUIRED
+  relative     IDREF #IMPLIED
+  relationship (stack|left|right|top|bottom|fast)
+  ratio        CDATA #IMPLIED
+  visible      (true | false)
+  closeable    (true | false)
+  moveable     (true | false)
+  standalone   (true | false)
+  showTitle    (true | false)
+  minimized    (true | false) "false">
+\endcode
+
+- <tt>id</tt>: the unique identifier of the view which will be added to the perspective layout.
+- <tt>relative</tt>: the unique identifier of a view which already exists in the perspective. This will be used as a reference point for placement of the view. The relationship between these two views is defined by \c relationship . Ignored if relationship is "fast".
+- <tt>relationship</tt>: specifies the relationship between \c id and \c relative . The following values are supported:
+ - <tt>fast</tt>: the view extension will be created as a fast view.
+ - <tt>stack</tt>: the view extension will be stacked with the relative view in a folder.
+ - <tt>left, right, top, bottom</tt>: the view extension will be placed beside the relative view. In this case a \c ratio must also be defined.
+- <tt>ratio</tt>: the percentage of area within the relative view which will be donated to the view extension. If the view extension is a fast view, the ratio is the percentage of the workbench the fast view will cover when active. This must be defined as a floating point value and lie between 0.05 and 0.95.
+- <tt>visible</tt>: whether the view is initially visible when the perspective is opened. This attribute should have a value of "true" or "false" if used. If this attribute is not used, the view will be initially visible by default.
+- <tt>closeable</tt>: whether the view is closeable in the target perspective. This attribute should have a value of "true" or "false" if used. If this attribute is not used, the view will be closeable, unless the perspective itself is marked as fixed.
+- <tt>moveable</tt>: whether the view is moveable. A non-moveable view cannot be moved either within the same folder, or moved between folders in the perspective. This attribute should have a value of "true" or "false" if used. If this attribute is not used, the view will be moveable, unless the perspective itself is marked as fixed.
+- <tt>standalone</tt>: whether the view is a standalone view. A standalone view cannot be docked together with others in the same folder. This attribute should have a value of "true" or "false" if used. This attribute is ignored if the relationship attribute is "fast" or "stacked". If this attribute is not used, the view will be a regular view, not a standalone view (default is "false").
+- <tt>showTitle</tt>: whether the view's title is shown. This attribute should have a value of "true" or "false" if used. This attribute only applies to standalone views. If this attribute is not used, the view's title will be shown (default is "true").
+- <tt>minimized</tt>: If the perspective extension will result in a new view stack being created (i.e. the 'relationship' attribute is one of left, right, top or bottom) this field determines the new stack's initial display state.
+
+\code{.unparsed}
+<!ELEMENT hiddenMenuItem EMPTY>
+<!ATTLIST hiddenMenuItem
+  id CDATA #REQUIRED>
+\endcode
+
+- <tt>id</tt>: The unique identifier of the Command which is to be removed from the menu. <b>WARNING:</b> This is considered to be a 'Product level' extension and should not be used in consumable plugins without great care.
+
+\code{.unparsed}
+<!ELEMENT hiddenToolBarItem EMPTY>
+<!ATTLIST hiddenToolBarItem
+  id CDATA #REQUIRED>
+\endcode
+
+- <tt>id</tt>: The unique identifier of the Command which is to be removed from thetoolbar. <b>WARNING:</b> This is considered to be a 'Product level' extension and should not be used in consumable plugins without great care.
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_PerspExt_Examples Examples
+
+The following is an example of a perspective extension (note the subelements and the way attributes are used):
+
+\code{.unparsed}
+<extension point="org.blueberry.ui.perspectiveExtensions">
+  <perspectiveExtension
+    targetID="org.blueberry.ui.resourcePerspective">
+    <actionSet id="org.xyz.MyActionSet"/>
+    <viewShortcut id="org.xyz.views.PackageExplorer"/>
+    <newWizardShortcut id="org.xyz.wizards.NewProjectCreationWizard"/>
+    <perspectiveShortcut id="org.xyz.MyPerspective"/>
+    <view id="org.xyz.views.PackageExplorer"
+      relative="org.blueberry.ui.views.ResourceNavigator"
+      relationship="stack"/>
+    <view id="org.xyz.views.TypeHierarchy"
+      relative="org.blueberry.ui.views.ResourceNavigator"
+      relationship="left"
+      ratio="0.50"/>
+  </perspectiveExtension>
+</extension>
+\endcode
+
+In the example above, an action set, view shortcut, new wizard shortcut, and perspective shortcut are contributed to the initial contents of the Resource Perspective.
+In addition, the Package Explorer view is stacked on the Resource Navigator and the Type Hierarchy View is added beside the Resource Navigator.
+
+\subsection BlueBerryExtPointsIndex_Workbench_Persp Perspectives
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_Persp_Id Identifier
+
+\c org.blueberry.ui.perspective
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_Persp_Desc Description
+
+This extension point is used to add perspective factories to the workbench.
+A perspective factory is used to define the initial layout and visible action sets for a perspective.
+The user can select a perspective by invoking the "Open Perspective" submenu of the "Window" menu.
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_Persp_ConfMarkup Configuration Markup
+
+\code{.unparsed}
+<!ELEMENT extension (perspective*)>
+<!ATTLIST extension
+  point CDATA #REQUIRED
+  id    CDATA #IMPLIED
+  name  CDATA #IMPLIED>
+\endcode
+
+- <tt>point</tt>: a fully qualified identifier of the target extension point
+- <tt>id</tt>: an optional identifier of the extension instance
+- <tt>name</tt>: an optional name of the extension instance
+
+\code{.unparsed}
+<!ELEMENT perspective (description? , keywordReference*)>
+<!ATTLIST perspective
+  id    CDATA #REQUIRED
+  name  CDATA #REQUIRED
+  class CDATA #REQUIRED
+  icon  CDATA #IMPLIED
+  fixed (true | false)>
+\endcode
+
+- <tt>id</tt>: a unique name that will be used to identify this perspective.
+- <tt>name</tt>: a translatable name that will be used in the workbench window menu bar to represent this perspective.
+- <tt>class</tt>: a fully qualified name of the class that implements berry::IPerspectiveFactory interface.
+- <tt>icon</tt>: a relative name of the icon that will be associated with this perspective.
+- <tt>fixed</tt>: indicates whether the layout of the perspective is fixed. If true, then views created by the perspective factory are not closeable, and cannot be moved. The default is false.
+
+\code{.unparsed}
+<!ELEMENT description (#PCDATA)>
+\endcode
+
+An optional subelement whose body should contain text providing a short description of the perspective.
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_Persp_Examples Examples
+
+The following is an example of a perspective extension:
+
+\code{.unparsed}
+<extension
+  point="org.blueberry.ui.perspectives">
+  <perspective
+    id="org.blueberry.ui.resourcePerspective"
+    name="Resource"
+    class="berry::ResourcePerspective"
+    icon="resources/MyIcon.gif">
+  </perspective>
+</extension>
+\endcode
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_Persp_SupplImpl Supplied Implementation
+
+The workbench provides a "Resource Perspective".
+Additional perspectives may be added by plug-ins.
+They are selected using the "Open Perspective" submenu of the "Window" menu.
+
+\subsection BlueBerryExtPointsIndex_Workbench_PrefPages Preference Pages
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_PrefPages_Id Identifier
+
+\c org.blueberry.ui.preferencePages
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_PrefPages_Desc Description
+
+The workbench provides one common dialog box for preferences.
+The purpose of this extension point is to allow plug-ins to add pages to the preference dialog box.
+When preference dialog box is opened (initiated from the menu bar), pages contributed in this way will be added to the dialog box.
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_PrefPages_ConfMarkup Configuration Markup
+
+\code{.unparsed}
+<!ELEMENT extension (page*)>
+<!ATTLIST extension
+  point CDATA #REQUIRED
+  id    CDATA #IMPLIED
+  name  CDATA #IMPLIED>
+\endcode
+
+- <tt>point</tt>: a fully qualified identifier of the target extension point
+- <tt>id</tt>: an optional identifier of the extension instance
+- <tt>name</tt>: an optional name of the extension instance
+
+\code{.unparsed}
+<!ELEMENT page (keywordReference*)>
+<!ATTLIST page
+  id       CDATA #REQUIRED
+  name     CDATA #REQUIRED
+  class    CDATA #REQUIRED
+  category IDREF #IMPLIED>
+\endcode
+
+- <tt>id</tt>: a unique name that will be used to identify this page.
+- <tt>name</tt>: a translatable name that will be used in the UI for this page.
+- <tt>class</tt>: a name of the fully qualified class that implements berry::IWorkbenchPreferencePage.
+- <tt>category</tt>: a path indicating the location of the page in the preference tree. The path may either be a parent node ID or a sequence of IDs separated by '/', representing the full path from the root node.
+
+\code{.unparsed}
+<!ELEMENT keywordReference EMPTY>
+<!ATTLIST keywordReference
+  id IDREF #REQUIRED>
+\endcode
+
+A reference by a preference page to a keyword. See the keywords extension point.
+
+- <tt>id</tt>: The id of the keyword being referred to.
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_PrefPages_Examples Examples
+
+The following is an example for the preference extension point:
+
+\code{.unparsed}
+<extension
+  point="org.blueberry.ui.preferencePages">
+  <page
+    id="com.xyz.prefpage1"
+    name="XYZ"
+    class="xyz::PrefPage1">
+    <keywordReference id="xyz.Keyword"/>
+  </page>
+  <page
+    id="com.xyz.prefpage2"
+    name="Keyboard Settings"
+    class="xyz::PrefPage2"
+    category="com.xyz.prefpage1">
+  </page>
+</extension>
+\endcode
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_PrefPages_SupplImpl Supplied Implementation
+
+The workbench adds several pages for setting the preferences of the platform. Pages registered through this extension will be added after them according to their category information.
+
+\subsection BlueBerryExtPointsIndex_Workbench_PresFact Presentation Factories
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_PresFact_Id Identifier
+
+\c org.blueberry.ui.presentationFactories
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_PresFact_Desc Description
+
+This extension point is used to add presentation factories to the workbench. A presentation factory defines the overall look and feel of the workbench, including how views and editors are presented.
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_PresFact_ConfMarkup Configuration Markup
+
+\code{.unparsed}
+<!ELEMENT extension (factory*)>
+<!ATTLIST extension
+  point CDATA #REQUIRED
+  id    CDATA #IMPLIED
+  name  CDATA #IMPLIED>
+\endcode
+
+\code{.unparsed}
+<!ELEMENT factory EMPTY>
+<!ATTLIST factory
+  class CDATA #REQUIRED
+  id    CDATA #REQUIRED
+  name  CDATA #REQUIRED>
+\endcode
+
+- <tt>class</tt>: Specify the fully qualified class to be used for the presentation factory. The specified value must implement the interface berry::IPresentationFactory.
+- <tt>id</tt>: a unique name that will be used to identify this presentation factory
+- <tt>name</tt>: a translatable name that can be used to show this presentation factory in the UI
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_PresFact_Examples Examples
+
+The following is an example of a presentationFactory extension:
+
+\code{.unparsed}
+<extension point="org.blueberry.ui.presentationFactories">
+  <factory
+    class="berry::ExampleWorkbenchPresentationFactory"/>
+</extension>
+\endcode
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_PresFact_SupplImpl Supplied Implementation
+
+If a presentation factory is not specified or is missing then the implementation in berry::QtWorkbenchPresentationFactory will be used.
+
+\subsection BlueBerryExtPointsIndex_Workbench_Services Services
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_Services_Id Identifier
+
+\c org.blueberry.ui.services
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_Services_Desc Description
+
+Define service factories so that services can be contributed declaratively and will be available through berry::IServiceLocator::GetService(Class).
+The implementation of \c AbstractServiceFactory must be able to return a global service and multiple child services (if applicable).
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_Services_ConfMarkup Configuration Markup
+
+\code{.unparsed}
+<!ELEMENT extension (serviceFactory? , sourceProvider?)+>
+<!ATTLIST extension
+  point CDATA #REQUIRED
+  id    CDATA #IMPLIED
+  name  CDATA #IMPLIED>
+\endcode
+
+Contribute services to the workbench.
+
+\code{.unparsed}
+<!ELEMENT serviceFactory (service+)>
+<!ATTLIST serviceFactory
+  factoryClass CDATA #REQUIRED>
+\endcode
+
+Match a service interface to a factory that can supply a hierachical implementation of that service.
+
+- <tt>factoryClass</tt>: The factory that extends \c AbstractServiceFactory and can create the implementation for the \c serviceClass.
+
+\code{.unparsed}
+<!ELEMENT service EMPTY>
+<!ATTLIST service
+  serviceClass CDATA #IMPLIED>
+\endcode
+
+A service this factory can provide.
+
+- <tt>serviceClass</tt>: The interface that represents a service contract.
+
+\code{.unparsed}
+<!ELEMENT sourceProvider (variable+)>
+<!ATTLIST sourceProvider
+  provider CDATA #REQUIRED>
+\endcode
+
+A Source Provider supplies source variables to the IEvaluationService. It can also notify the IEvaluationService when one or more of the variables change.
+
+- <tt>provider</tt>: This class must provide variables and call the appropriate \c fireSourceChanged(*) method when any of the variables change.
+
+\code{.unparsed}
+<!ELEMENT variable EMPTY>
+<!ATTLIST variable
+  name          CDATA #REQUIRED
+  priorityLevel (workbench|activeContexts|activeShell|activeWorkbenchWindow|activeEditorId|activePartId|activeSite) >
+\endcode
+
+A source variable from this provider.
+A source provider must declare all variables that it provides.
+
+- <tt>name</tt>: The name of a contributed source variable. It is a good practice to prepend the plugin id to the variable name to avoid collisions with other source providers.
+- <tt>priorityLevel</tt>: For conflict resolution used by services like the \c IHandlerService , contributed source variables must assign a priority. workbench is the global default priority. See \c ISources for relative priority information.
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_Services_Examples Examples
+
+Here is a basic definition:
+
+\code{.unparsed}
+<extension point="org.blueberry.ui.services">
+  <serviceFactory factoryClass="my::LevelServiceFactory">
+    <service serviceClass="my::ILevelService">
+    </service>
+  </serviceFactory>
+</extension>
+\endcode
+
+The LevelServiceFactory can return an ILevelService when it is requested from the IServiceLocator:
+
+\code{.unparsed}
+berry::ILevelService::Pointer s = GetSite()->GetService(my::ILevelService::GetStaticClassName());
+std::cout << s->GetLevel();
+\endcode
+
+In this test example, the factory would instantiate three \c ILevelService implementations during the first call to \c GetSite()->GetService(*) . The global one in the workbench, one for the workbench window, and one for the site.
+
+\subsection BlueBerryExtPointsIndex_Workbench_Tweak Tweaklets
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_Tweak_Id Identifier
+
+\c org.blueberry.ui.tweaklets
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_Tweak_Desc Description
+
+Typically, although not required, the value of the \c definition attribute is the fully qualified name without colons of an abstract class defined by the workbench, and the value of the \c implementation attribute is the fully qualified name of a non-abstract class provided by the extending plug-in.
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_Tweak_ConfMarkup Configuration Markup
+
+\code{.unparsed}
+<!ELEMENT extension (tweaklet)*>
+<!ATTLIST extension
+  point CDATA #REQUIRED
+  id    CDATA #IMPLIED
+  name  CDATA #IMPLIED>
+\endcode
+
+\code{.unparsed}
+<!ELEMENT tweaklet EMPTY>
+<!ATTLIST tweaklet
+  id             CDATA #REQUIRED
+  name           CDATA #REQUIRED
+  description    CDATA #IMPLIED
+  definition     CDATA #IMPLIED
+  implementation CDATA #IMPLIED>
+\endcode
+
+- <tt>id</tt>: a unique name that will be used to identify this tweaklet
+- <tt>name</tt>: a translatable name that will be used in the UI for this tweaklet
+- <tt>description</tt>: a translatable short description of this tweaklet, to be used in the UI
+- <tt>definition</tt>: an identifier of the tweaklet definition in the workbench, typically a fully qualified type name without colons
+- <tt>implementation</tt>: an identifier of the tweaklet implementation provided by the extender, typically a fully qualified class name
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_Tweak_SupplImpl Supplied Implementation
+
+Tweaklets are usually used to specialize the workbench for a specific GUI toolkit.
+
+\subsection BlueBerryExtPointsIndex_Workbench_Views Views
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_Views_Id Identifier
+
+\c org.blueberry.ui.views
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_Views_Desc Description
+
+This extension point is used to define additional views for the workbench.
+A view is a visual component within a workbench page.
+It is typically used to navigate a hierarchy of information (like the workspace), open an editor, or display properties for the active editor.
+The user can make a view visible from the Window > Show View menu or close it from the view local title bar.
+
+In order to reduce the visual clutter in the Show View Dialog, views should be grouped using categories.
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_Views_ConfMarkup Configuration Markup
+
+\code{.unparsed}
+<!ELEMENT extension (category | view | stickyView)*>
+<!ATTLIST extension
+  point CDATA #REQUIRED
+  id    CDATA #IMPLIED
+  name  CDATA #IMPLIED>
+\endcode
+
+- <tt>point</tt>: a fully qualified identifier of the target extension point
+- <tt>id</tt>: an optional identifier of the extension instance
+- <tt>name</tt>: an optional name of the extension instance
+
+\code{.unparsed}
+<!ELEMENT category EMPTY>
+<!ATTLIST category
+  id             CDATA #REQUIRED
+  name           CDATA #REQUIRED
+  parentCategory IDREF #IMPLIED>
+\endcode
+
+- <tt>id</tt>: a unique name that will be used to identify this category
+- <tt>name</tt>: a translatable name that will be used in the UI for this category
+- <tt>parentCategory</tt>: an optional path composed of category IDs separated by '/'. This allows the creation of a hierarchy of categories.
+
+\code{.unparsed}
+<!ELEMENT view (description? , keywordReference*)>
+<!ATTLIST view
+  id                 CDATA #REQUIRED
+  name               CDATA #REQUIRED
+  category           IDREF #IMPLIED
+  class              CDATA #REQUIRED
+  icon               CDATA #IMPLIED
+  fastViewWidthRatio CDATA #IMPLIED
+  allowMultiple      (true | false)
+  restorable         (true | false) "true">
+\endcode
+
+- <tt>id</tt>: a unique name that will be used to identify this view
+- <tt>name</tt>: a translatable name that will be used in the UI for this view
+- <tt>category</tt>: an optional attribute that is composed of the category IDs separated by '/'. Each referenced category must be declared in a corresponding category element.
+- <tt>class</tt>: a fully qualified name of the class that implements berry::IViewPart. A common practice is to subclass berry::ViewPart or berry::QtViewPart in order to inherit the default functionality.
+- <tt>icon</tt>: a relative name of the icon that will be associated with the view.
+- <tt>fastViewWidthRatio</tt>: the percentage of the width of the workbench that the view will take up as an active fast view. This must be defined as a floating point value and lie between 0.05 and 0.95. If no value is supplied, a default ratio will be used.
+- <tt>allowMultiple</tt>: flag indicating whether this view allows multiple instances to be created using IWorkbenchPage::ShowView(QString id, QString secondaryId). The default is false.
+- <tt>restorable</tt>: flag indicating whether this view allows to be restored upon workbench restart. If set to false, the view will not be open after a workbench restart. The default is true.
+
+\code{.unparsed}
+<!ELEMENT description (#PCDATA)>
+\endcode
+
+An optional subelement whose body should contain text providing a short description of the view.
+
+\code{.unparsed}
+<!ELEMENT stickyView EMPTY>
+<!ATTLIST stickyView
+  id        IDREF #REQUIRED
+  location  (RIGHT|LEFT|TOP|BOTTOM)
+  closeable (true | false)
+  moveable  (true | false)>
+\endcoe
+
+A sticky view is a view that will appear by default across all perspectives in a window once it is opened.
+Its initial placement is governemed by the location attribute, but nothing prevents it from being moved or closed by the user.
+Use of this element will only cause a placeholder for the view to be created, it will not show the view.
+Please note that usage of this element should be done with great care and should only be applied to views that truely have a need to live across perspectives.
+
+- <tt>id</tt>: the id of the view to be made sticky.
+- <tt>location</tt>: optional attribute that specifies the location of the sticky view relative to the editor area. If absent, the view will be docked to the right of the editor area.
+- <tt>closeable</tt>: optional attribute that specifies wether the view should be closeable. If absent it will be closeable.
+- <tt>moveable</tt>: optional attribute that specifies wether the view should be moveable. If absent it will be moveable.
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_Views_Examples Examples
+
+The following is an example of the extension point:
+
+\code{.unparsed}
+<extension point="org.blueberry.ui.views">
+  <category
+    id="com.xyz.views.XYZviews"
+    name="XYZ"/>
+  <view
+    id="com.xyz.views.XYZView"
+    name="XYZ View"
+    category="com.xyz.views.XYZviews"
+    class="ns::XYZView"
+    icon="icons/XYZ.gif"/>
+</extension>
+\endcode
+
+The following is an example of a sticky view declaration:
+
+\code{.unparsed}
+<extension point="org.blueberry.ui.views">
+  <stickyView id="com.xyz.views.XYZView" />
+</extension>
+\endcode
+
+\subsubsection BlueBerryExtPointsIndex_Workbench_Views_SupplImpl Supplied Implementation
+
+The BlueBerry Platform provides a number of standard views.
+From the user point of view, these views are no different from any other view provided by the plug-ins.
+All the views can be shown from the "Show View" submenu of the "Window" menu.
+The position of a view is persistent: it is saved when the view is closed and restored when the view is reopened in a single session.
+The position is also persisted between workbench sessions.
 
 */

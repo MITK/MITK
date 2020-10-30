@@ -1,5 +1,5 @@
 /**
-\page org_mitk_views_deformableclippingplane The Clipping Plane
+\page org_mitk_views_deformableclippingplane The Clipping Plane View
 
 \imageMacro{QmitkClippingPlane_Icon.png,"Icon of the Clipping Plane Plugin",5.00}
 

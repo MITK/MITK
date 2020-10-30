@@ -10,16 +10,16 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "MinimalPerspective.h"
+#include "MinimumPerspective.h"
 
 // berry includes
 #include "berryIViewLayout.h"
 
-MinimalPerspective::MinimalPerspective()
+MinimumPerspective::MinimumPerspective()
 {
 }
 
-void MinimalPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
+void MinimumPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
   // Editors are placed for free.
   QString editorAreaId = layout->GetEditorArea();

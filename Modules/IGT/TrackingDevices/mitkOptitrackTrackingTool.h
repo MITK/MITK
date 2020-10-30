@@ -64,11 +64,11 @@ namespace mitk
     * \brief Define the tool by a calibration File.
     * The file must to have the next structure. Makers locations must to have "%fe %fe %fe\n" format and in (mm). See http://www.cplusplus.com/reference/cstdio/fscanf/
     *    ToolName
-    *    #NumberOfMarkers
+    *    \#NumberOfMarkers
     *    X Y Z - for the first marker
     *    X Y Z - for the second marker
     *    ...
-    *    X Y Z - for the last marker, the number #NumberOfMarkers
+    *    X Y Z - for the last marker, the number \#NumberOfMarkers
     *    X Y Z - for the PIVOT point
     * \return Returns true if the tool was set correctly
     * @throw mitk::IGTException Throws an exception if there exist any problem during the configuration file reading.

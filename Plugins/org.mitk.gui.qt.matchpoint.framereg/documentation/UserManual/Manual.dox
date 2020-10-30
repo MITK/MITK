@@ -12,7 +12,7 @@ This is for example useful if you have a dynamic image with motion artifacts in 
 
 \section MAP_FRAME_Usage Usage
 \imageMacro{"map_framereg_example.png" , "Example screenshot of the view.", 15}
-To use the view, a 3D+t image must be selected and a registration algorithm must be loaded. For the selection of an algorithm please see \ref org_mitk_views_matchpoint_algorithm_browser.\n
+To use the view, a 3D+t image must be selected and a registration algorithm must be loaded. For the selection of an algorithm please see \ref org_mitk_views_matchpoint_algorithm_browser .\n
 The correction is performed such that every time frame of the image is registered to the first time frame. And the corrected time frames are mapped to the same geometry as the first frame.\n
 If an algorithm is loaded and an input images is selected, the view will automatically switch to the <i>Execution</i> tab.
 

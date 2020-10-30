@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_radiomicstutorial_gui_03_preprocessing GUI based Radiomics Tutorial - Preprocessing the data
 
-\subsection Preprocessing the data
+\section Preprocessing the data
 The first step we take is to resample the data. To do so, we open the "Radiomics Transformation" View and select the "Resample Image" panel. We start by resampling the original image and therefore select the original picture (for us, Pic3D). Right-clicking on the image in the "Data Manager" and selecting the option "Details" gives us more information on the image. As we can see, our image has a spacing of [1, 1, 3], with an inplane resolution of 1x1mm and a out-of-plane resolution of 3 mm. We therefore decide to resample the image to an isotropic resolution of 1x1x1 mm.
 
 \imageMacro{RadiomicsTutorial_GUI_Step3_01_DetailView.png,"Details showing the spacing of the original image.",1} 
@@ -17,7 +17,5 @@ As a second step, we calculate some Laplacian of Gaussian images of the resample
 Finally, we clear the mask to obtain a clear segmentation of the target structure and remove possible resampling artifacts. To do so, we open the "Radiomics Mask Processing" View and select the resampled image and the resampled mask. We then select a lower limit only and set it to 160. Since we are working with MR, this is not a fixed value but something we manually determined. With this set, we perform the mask reducing by cklicking "Clean Mask based on Intervall". After this, we have the resampled image, three LoG images and a resampled and cleaned mask. The result should look similar to the next picture. You can also see the final image structure we obtained from our processing. It might help you to compare your results, although it is not necessary to obtain the same structure as long as you have all necessary images. 
 
 \imageMacro{RadiomicsTutorial_GUI_Step3_02_FinishedPreprocessing.png,"Final results with a completed resampling",1} 
-
-
 
 */

@@ -197,11 +197,11 @@ namespace mitk
     * \brief Add a new tool using a text file which described the tool.
     * The file must to have the next structure
     *    ToolName
-    *    #NumberOfMarkers
+    *    \#NumberOfMarkers
     *    X Y Z - for the first marker
     *    X Y Z - for the second marker
     *    ...
-    *    X Y Z - for the last marker, the number #NumberOfMarkers
+    *    X Y Z - for the last marker, the number \#NumberOfMarkers
     *    X Y Z - for the PIVOT point
     * \return Returns true if system was initialized correctly
     * @throw mitk::IGTException Throws an exception if Tool could not be added or System is not Initialized

@@ -113,7 +113,9 @@ namespace mitk {
 
   }; // end struct WorkbenchUtilPrivate
 
+  //! [UtilLoadFiles]
   void WorkbenchUtil::LoadFiles(const QStringList &fileNames, berry::IWorkbenchWindow::Pointer window, bool openEditor)
+  //! [UtilLoadFiles]
   {
     if (fileNames.empty())
     {

@@ -2,7 +2,7 @@
 
 \page org_mitk_views_datamanager The Datamanager
 
-\imageMacro{data-manager.svg,"Icon of the Data Manager", 2.00}
+\imageMacro{data-manager-dox.svg,"Icon of the Data Manager", 2.00}
 
 \tableofcontents
 

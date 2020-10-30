@@ -64,14 +64,14 @@
 *imported classes and methods:
 *std::complex
 *
-*@warningThese module is not finished
+*@warning These module is not finished
 *
 *
-*@version1.0
+*@version 1.0
 *
-* @date07.09.2000
+* @date 07.09.2000
 *
-* @authorMarcus Vetter
+* @author Marcus Vetter
 *
 */
 

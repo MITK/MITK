@@ -18,13 +18,12 @@ found in the LICENSE file.
 
 namespace mbilog
 {
-  /**
-   * This enum defines the type of the output of a backend.
+  /** This enum defines the type of the output of a backend.
    * Console: output generated to the console
    * File: output generated to a file
    * Other: all other kinds of output
    */
-  enum MBILOG_EXPORT OutputType
+  enum OutputType
   {
     Console = 0,
     File,

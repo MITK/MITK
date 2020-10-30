@@ -1,7 +1,7 @@
 /**
 \page org_blueberry_views_logview The Logging Plugin
 
-\imageMacro{logging.svg,"Icon of the Logging Plugin",2.00}
+\imageMacro{logview-dox.svg,"Icon of the Logging Plugin",2.00}
 
 This plug-in records all logging output of events and progress as specified in the source code with time of occurrence, level of importance (Info, Warning, Error, Fatal, Debug), the message given and the origin of the message (source code section).
 

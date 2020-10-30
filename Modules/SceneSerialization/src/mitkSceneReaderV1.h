@@ -27,7 +27,7 @@ namespace mitk
 
   protected:
     /**
-      \brief tries to create one DataNode from a given XML <node> element
+      \brief tries to create one DataNode from a given XML \<node\> element
     */
     DataNode::Pointer LoadBaseDataFromDataTag(TiXmlElement *dataElement,
                                               const std::string &workingDirectory,

@@ -15,6 +15,6 @@ As part of the tutorial, it is recommended to get familiar with each of the foll
 <li> \subpage org_mitk_views_igtregistrationview : The IGTFiducialRegistration view allows the recording of real world landmarks and corresponding landmarks on a virtual object.
 </ul>
 
-\ref Return to the \ref TrackingPlugins "[IGT Tutorial Overview]"
+Return to the \ref TrackingPlugins "[IGT Tutorial Overview]"
 
 */

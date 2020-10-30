@@ -95,8 +95,10 @@ void DicomView::AddDataNodeFromDICOM(QHash<QString, QVariant> eventProperties)
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       // //! [DicomViewCreateAddDataNodeActivatePersp]
     }
+    // //! [DicomViewCreateAddDataNodeLoadSeries]
   }
 }
+// //! [DicomViewCreateAddDataNodeInformation]
 
 void DicomView::SetFocus()
 {

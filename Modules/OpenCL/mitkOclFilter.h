@@ -85,7 +85,7 @@ protected:
   /** @brief Unique ID of the filter, needs to be specified in the constructor of the derived class */
   std::string m_FilterID;
 
-  /*! @brief source preambel for e.g. #define commands to be inserted into the OpenCL source */
+  /*! @brief source preambel for e.g. \c \#define commands to be inserted into the OpenCL source */
   const char* m_Preambel;
 
   /** @brief List of sourcefiles that will be compiled for this filter.*/

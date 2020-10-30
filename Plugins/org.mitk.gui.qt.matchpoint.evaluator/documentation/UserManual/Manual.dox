@@ -22,7 +22,7 @@ It is one of several MatchPoint registration plug-ins.\n
 (7) Selection of the visualization style. (only visible if evaluation is active)\n
 (8) Style specific settings. (only visible if evaluation is active)\n
 
-If the evaluation view is active you can choose between different modes of visualization. For more details see \ref MAP_REGEVAL_Styles.\n
+If the evaluation view is active you can choose between different modes of visualization. For more details see \ref MAP_REGEVAL_Styles .\n
 To stop the evaluation mode, you may use the "Stop evaluation" button or just close the evaluation view.
 
 \remark The evaluation view will use the level window settings of the used images. So to change the level windowing of the evaluation view, you must change the

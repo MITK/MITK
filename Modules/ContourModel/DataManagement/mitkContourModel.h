@@ -199,8 +199,8 @@ namespace mitk
 
     /** \brief Concatenate two contours.
     The starting control point of the other will be added at the end of the contour.
-    \pararm timestep - the timestep at which the vertex will be add ( default 0)
-    \pararm check - check for intersections ( default false)
+    \param timestep - the timestep at which the vertex will be add ( default 0)
+    \param check - check for intersections ( default false)
     */
     void Concatenate(mitk::ContourModel *other, int timestep = 0, bool check = false);
 
@@ -247,7 +247,7 @@ namespace mitk
     int GetNumberOfVertices(int timestep = 0) const;
 
     /** \brief Returns whether the contour model is empty at a given timestep.
-    \pararm timestep - default = 0
+    \param timestep - default = 0
     */
     virtual bool IsEmpty(int timestep) const;
 

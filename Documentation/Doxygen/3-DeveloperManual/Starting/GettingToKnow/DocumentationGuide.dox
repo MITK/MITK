@@ -3,7 +3,7 @@
 
 \section DocumentationGuideCodeGeneral General remarks
 
-MITK uses <a href="http://www.stack.nl/~dimitri/doxygen/">Doxygen</a> for the generation of our user manual pages as well as for the generation of the on- and offline reference manuals. So on the technical side many questions can be answered by the <a href="http://www.stack.nl/~dimitri/doxygen/manual.html">doxygen documentation</a>, such as the list of commands or a few basic doxygen tutorials.
+MITK uses <a href="https://www.doxygen.nl/">Doxygen</a> for the generation of our user manual pages as well as for the generation of the on- and offline reference manuals. So on the technical side many questions can be answered by the <a href="https://www.doxygen.nl/manual/index.html">doxygen documentation</a>, such as the list of commands or a few basic doxygen tutorials.
 
 Therefore this document is not primarily intended as a guide to using doxygen, the doxygen manual does a much better job of that, but as a guide to use doxygen in MITK and a collection of helpful hints and advise about pittfalls.
 

@@ -10,8 +10,6 @@ Knowing about these concepts will prevent you from reimplementing functionality.
 
 Once you start consuming more specific functionality, the \link MITKModuleManualsListPage Module Manual\endlink will be helpful to understand how a specific plugin works and what functionality it provides.
 
-Finally, generated API-Documentation can be found \link DevelopmentAPI here\endlink.
-
 <ul>
   <li> \subpage StartingDevelopment </li>
   <ul>

@@ -2,19 +2,21 @@
 
 \page mitkExtPointsIndex MITK Extension-Point Reference
 
+- \subpage mitkExtPointsIndex_InputDevices
+
+\page mitkExtPointsIndex_InputDevices Input Devices
+
 \tableofcontents
 
-\section mitkExtPointsIndex_InputDevices Input Devices
-
-\subsection mitkExtPointsIndex_InputDevices_Identifier Identifier
+\section mitkExtPointsIndex_InputDevices_Identifier Identifier
 
 \c org.mitk.core.ext.inputdevices
 
-\subsection mitkExtPointsIndex_InputDevices_Description Description
+\section mitkExtPointsIndex_InputDevices_Description Description
 
 This extension point is used to define additional input devices.
 
-\subsection mitkExtPointsIndex_InputDevices_ConfigurationMarkup Configuration Markup
+\section mitkExtPointsIndex_InputDevices_ConfigurationMarkup Configuration Markup
 
 \code{.unparsed}
 <!ELEMENT extension (inputdevice*)>
@@ -46,7 +48,7 @@ This extension point is used to define additional input devices.
 
 An optional subelement whose body should contain text providing a short description of the input device.
 
-\subsection mitkExtPointsIndex_InputDevices_Examples Examples
+\section mitkExtPointsIndex_InputDevices_Examples Examples
 
 \code{.unparsed}
 <extension point="org.mitk.core.ext.inputdevices">

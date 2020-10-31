@@ -7,9 +7,9 @@
 
 \section CLIPrefix Contribution
 
-This plugin was developed at the <a href="http://cmic.cs.ucl.ac.uk/">Centre For Medical Image Computing</a> (CMIC),
-part of <a href="http://www.ucl.ac.uk/">University College London</a> (UCL) and contributed back to the
-<a href="http://www.mitk.org">MITK</a> community with thanks.
+This plugin was developed at the <a href="https://www.ucl.ac.uk/medical-image-computing/">Centre For Medical Image Computing</a> (CMIC),
+part of <a href="https://www.ucl.ac.uk/">University College London</a> (UCL) and contributed back to the
+<a href="https://www.mitk.org">MITK</a> community with thanks.
 
 \section CLIIntroduction Introduction
 
@@ -35,7 +35,7 @@ command line modules in a general sense. The examples shown have been constructe
 Futher information on the NiftyReg package, including links to the source code, can be found on the wiki page <a href="http://cmictig.cs.ucl.ac.uk/wiki/index.php/NiftyReg">here</a>.
 NiftyReg provides valid XML descriptors to enable the integration of the NiftyReg affine (RegAladin) and and non-rigid (RegF3D) image registration algorithms, as well
 as utility programs to resample an image, and calculate a Jacobian image. These same XML descriptors work within
-<a href="http://www.slicer.org/">Slicer</a> and <a href="http://www.mitk.org/">MITK</a> based applications.
+<a href="https://www.slicer.org/">Slicer</a> and <a href="https://www.mitk.org/">MITK</a> based applications.
 
 \section CLIPreferences Preferences
 
@@ -51,7 +51,7 @@ Each of these preferences is now explained in some detail.
 \li XML time-out (secs): Sets the time-out for the retrieval of the XML.
 \li XML validation mode: The user may select a different mode for XML validation. If this is changed, the application will
 need to be restarted.  There are 3 modes available.  If the user selects "strict" mode, the XML schema produced by the
-command line application must exactly conform to <a href="http://www.slicer.org/slicerWiki/index.php/Slicer3:Execution_Model_Documentation">
+command line application must exactly conform to <a href="https://www.slicer.org/w/index.php/Slicer3:Execution_Model_Documentation">
 this definition</a>. For "none", there will be no validation. For "weak"  validation, the application will report errors,
 but try to carry on and load as many modules as possible. The XML validation errors are available as tool-tips on
 the tab widget when the module is launched. Many third party modules included with Slicer currently have
@@ -89,7 +89,7 @@ the directories specified in the "additional module directories" section.
 In addition, the preferences page provides:
 
 \li temporary directory: Images stored in the DataManager are first written to a temporary folder as
-<a href="http://niftilib.sourceforge.net/">Nifti</a> images before being passed to each command line program.
+<a href="https://niftilib.sourceforge.net/">Nifti</a> images before being passed to each command line program.
 This temporary directory will default to a platform specific temporary folder, but the user may select their preferred choice
 of temporary workspace.
 
@@ -114,7 +114,7 @@ Each section can be individually expanded if necessary to see the parameters.
 \imageMacro{cmdlinemodules_NiftyReg.png,"Figure 6. An example program\, showing parameters for NiftyReg's program RegAladin.",10.24}
 
 In this example, the parameters are displayed for <a href="https://sourceforge.net/projects/niftyreg/">NiftyReg</a>
-produced at <a href="http://www.ucl.ac.uk">UCL</a>, and more specifically for the affine registration program called
+produced at <a href="https://www.ucl.ac.uk">UCL</a>, and more specifically for the affine registration program called
 RegAladin. The interface can contain a wide variety of controls. If a parameter for a command line program is an input image,
 then the widget displayed is linked to the DataManager, so that as new images are loaded, the correct image can be easily
 selected from the combo box.
@@ -163,6 +163,6 @@ If information is missing, the user must contact the third party developers.
 \section CLITechnicalNotes Technical Notes
 
 From a technical perspective, the Command Line Modules View is a simple view, harnessing the power of the CTK
-command line modules framework. For technical information see the <a href="http://www.commontk.org/index.php/Documentation/Command_Line_Interface">CTK wiki page</a>
+command line modules framework. For technical information see the <a href="https://commontk.org/index.php/Documentation/Command_Line_Interface">CTK wiki page</a>
 and obviously the CTK code base.
 */

@@ -20,15 +20,15 @@ shown in the next figure for overview.
 
 As shown above, MITK uses the following libraries.
 <ul>
- <li> The <a href="http://www.itk.org">Insight Toolkit (ITK)</a>, which provides registration and
+ <li> The <a href="https://itk.org/">Insight Toolkit (ITK)</a>, which provides registration and
 segmentation algorithms, but is not designed for visualization or interaction.
 
- <li> The <a href="http://www.vtk.org">Visualization Toolkit (VTK)</a>, which provides powerful visualization capabilities
+ <li> The <a href="https://vtk.org/">Visualization Toolkit (VTK)</a>, which provides powerful visualization capabilities
  and low-level support for interaction such as picking methods, rotation, movement and scaling of objects.
 
- <li> The <a href="http://www.commontk.org">Common Toolkit (CTK)</a>, which focuses on DICOM support and a plug-in framework.
+ <li> The <a href="https://commontk.org/">Common Toolkit (CTK)</a>, which focuses on DICOM support and a plug-in framework.
 
- <li> The <a href="http://qt.nokia.com/">Qt Cross-platform application and UI framework (Qt)</a> as a framework for UI and application
+ <li> The <a href="https://www.qt.io/">Qt Cross-platform application and UI framework (Qt)</a> as a framework for UI and application
  support.
 </ul>
 

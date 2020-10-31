@@ -6,7 +6,7 @@ To get an introduction to the usage of any MITK based application please read \r
 For more specific information on how a plugin operates you can find the plugin documentation in \ref PluginListPage. The Plugin documentation usually explains the functionality in depth and should solve most problems you might encounter with the plugin. Depending on the application you are using you might have only some or all of the listed plugins available.
 
 Lastly, if your question is not answered here, please use our <a href="https://lists.sourceforge.net/lists/listinfo/mitk-users">Mailinglist</a> to let us know about your problem.
-Alternatively, you can <a href="http://www.mitk.org/Contact">contact us directly</a>.
+Alternatively, you can <a href="https://www.mitk.org/wiki/Contact">contact us directly</a>.
 
 <h2>List of topics</h2>
 <ul>

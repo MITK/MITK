@@ -25,10 +25,10 @@ Visit \ref TroubleshootingPage for a guide to miscellaneous issues and their res
 Two data files are used to execute the example code.
 
 \li Pic3D.nrrd \n
-This file contains an image and can be downloaded from http://mitk.org/download/tutorial-data/Pic3D.nrrd .
+This file contains an image and can be downloaded from https://www.mitk.org/download/tutorial-data/Pic3D.nrrd .
 
 \li lungs.vtk \n
-This file contains a surface and can be downloaded from http://mitk.org/download/tutorial-data/lungs.vtk .
+This file contains a surface and can be downloaded from https://www.mitk.org/download/tutorial-data/lungs.vtk .
 
 \li \subpage Step00Page "Step 0: Getting started"
 \li \subpage Step01Page "Step 1: Displaying an image"

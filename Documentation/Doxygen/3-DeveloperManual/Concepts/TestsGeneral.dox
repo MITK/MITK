@@ -71,7 +71,7 @@ You also may provide a setUp() and a tearDown() function. These will be called b
 
 \section GeneralTestsRunning Running your test suite
 
-The build system of MITK generates a test driver which includes all test suites that have been added to the project. Alternatively you can run MITK test suites by using the program ctest. This is the way all MITK tests run on the continuous dart clients of MITK. The results of these runs can be found at http://cdash.mitk.org.
+The build system of MITK generates a test driver which includes all test suites that have been added to the project. Alternatively you can run MITK test suites by using the program ctest. This is the way all MITK tests run on the continuous dart clients of MITK. The results of these runs can be found at https://cdash.mitk.org/.
 
 If you use the test driver, you only need to start the executable. If you start it without parameters, it will then give you an overview of all tests which are included in this test driver and you can choose one by typing a number. Alternatively, you can give your test driver the name of your test suite as parameter. If you want to use ctest instead of the test driver you need to start a command line, go to the binary directory of MITK and call ctest. To avoid errors, check if your path variable contains all relevant paths to start MITK.
 
@@ -81,7 +81,7 @@ If possible, the setUp() method of the test suite should provide all necessary i
 
 \section GeneralTestsPredefinedAssertions Predefined assertions
 
-MITK and CppUnit offer predefined assertions, i.e. helper methods which will help to compare your data against a certain reference. All basic types are covered by CppUnit assertions, such as CPPUNIT_ASSERT. For examples, please check the <a href="http://cppunit.sourceforge.net/doc/cvs/group___assertions.htmll">CppUnit documentation</a>. MITK further offers comparison tools for floating point numbers, vectors, images, surfaces and point sets. A complete list of assertion macros is given in \ref MITKTestingAPI.
+MITK and CppUnit offer predefined assertions, i.e. helper methods which will help to compare your data against a certain reference. All basic types are covered by CppUnit assertions, such as CPPUNIT_ASSERT. For examples, please check the <a href="http://cppunit.sourceforge.net/doc/cvs/group___assertions.html">CppUnit documentation</a>. MITK further offers comparison tools for floating point numbers, vectors, images, surfaces and point sets. A complete list of assertion macros is given in \ref MITKTestingAPI.
 
 An example to compare images:
 \code
@@ -96,7 +96,7 @@ By default, the method uses an mitk::eps for floating point comparison, but this
 
 \section GeneralTestsFurtherInfo Further information
 
-More examples can be found in the corresponding <a href="http://www.mitk.org/images/5/5d/BugSquashingSeminars%24CppUnitFrameworkSeminar.pdf"> bugsquashing presentation</a>.
+More examples can be found in the corresponding <a href="https://www.mitk.org/w/images/5/5d/BugSquashingSeminars%24CppUnitFrameworkSeminar.pdf"> bugsquashing presentation</a>.
 */
 
 \section GeneralTestsDeprecatedOldTestingStyle Deprecated macros

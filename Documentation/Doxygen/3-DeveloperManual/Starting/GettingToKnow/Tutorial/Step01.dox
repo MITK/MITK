@@ -3,7 +3,7 @@
 \page Step01Page MITK Tutorial - Step 1: Displaying an image
 
 \li Path to files used in this step: \n
-http://mitk.org/download/tutorial-data/Pic3D.nrrd
+https://www.mitk.org/download/tutorial-data/Pic3D.nrrd
 
 \imageMacro{step1_result.png,"",6.22}
 

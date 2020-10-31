@@ -10,9 +10,9 @@ The MITK chart module is able to show different types of charts in a widget with
 \imageMacro{complexExample.png,"Example chart",10}
 
 
-\subsection Chart_Technical Technical background 
+\subsection Chart_Technical Technical background
 
-The module uses the java script library <a href="https://plot.ly/javascript/">plotly</a> to display the chart in a <a href="http://doc.qt.io/qt-5/qwebengineview.html">QWebEngineView</a> (that renders html/js content). 
+The module uses the java script library <a href="https://plot.ly/javascript/">plotly</a> to display the chart in a <a href="https://doc.qt.io/qt-5/qwebengineview.html">QWebEngineView</a> (that renders html/js content).
 
 For examples, please visit https://plot.ly/javascript/.
 
@@ -20,13 +20,13 @@ For examples, please visit https://plot.ly/javascript/.
 
 \note Be sure that the dependency to the Chart Module is resolved in the CMakeLists.txt of the plugin: <code>MODULE_DEPENDS MitkChart</code>.
 
-Open the ui file of the plugin. Then add a widget (we always use the name <code>chartWidget</code> in the following) at the desired position. Change the class of the widget to a user-defined widget (right click &rarr; user defined classes, see http://doc.qt.io/qt-5/designer-using-custom-widgets.html). Set "QWidget" as base class. Set "QmitkChartWidget" as class name and "QmitkChartWidget.h" as include file.
+Open the ui file of the plugin. Then add a widget (we always use the name <code>chartWidget</code> in the following) at the desired position. Change the class of the widget to a user-defined widget (right click &rarr; user defined classes, see https://doc.qt.io/qt-5/designer-using-custom-widgets.html). Set "QWidget" as base class. Set "QmitkChartWidget" as class name and "QmitkChartWidget.h" as include file.
 
 \imageMacro{userDefinedWidget.png,"User defined widget",10}
 
 \subsection Chart_data Data
 
-The most important functionality is to add data to the chartWidget. Either one dimensional or two dimensional data can be used. One-dimensional data has the same interval between values on the x-axis (and no x-axis values) while the two-dimensional data has arbitrary x-axis difference values (and given x-axis values). 
+The most important functionality is to add data to the chartWidget. Either one dimensional or two dimensional data can be used. One-dimensional data has the same interval between values on the x-axis (and no x-axis values) while the two-dimensional data has arbitrary x-axis difference values (and given x-axis values).
 
 An example for one-dimensional data is the temperature for each month of a year: <code>std::vector<double> temperatureHD = {1.8, 3.1, 6.3, 10.2, 14.5, 17.4, 19.4, 18.9, 15.5, 11.2, 5.8, 2.6}</code>. The first entry corresponds (implicitly) to the temperature in january, two second to the temperature in february the last entry to the temperature in december. Thus, the x values have same intervals. The given temperature values are defined as y-axis values.
 
@@ -38,7 +38,7 @@ Data is added by calling <code>chartWidget->AddData1D(temperatureHD, "Heidelberg
 
 \imageMacro{2DDataExample.png,"2D data example: Heidelberg has fewer entries and their x-range (years) is smaller than Freiburg",8}
 
-As the data labels are used as identifier, they have to be unique. This is checked. If non-unique entries are entered, they are made unique by adding numbers. Example: 
+As the data labels are used as identifier, they have to be unique. This is checked. If non-unique entries are entered, they are made unique by adding numbers. Example:
 \code{.cpp}
 chartWidget->AddData1D(temperatureHD, "Heidelberg")
 chartWidget->AddData1D(temperatureOslo, "Heidelberg")

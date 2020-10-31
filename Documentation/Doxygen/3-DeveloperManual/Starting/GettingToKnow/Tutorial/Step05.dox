@@ -5,8 +5,8 @@
  \li \ref Step5.cpp "Step5.cpp"\n
  Contains the code for this step.
  \li Path to files used in this step: \n
-http://mitk.org/download/tutorial-data/Pic3D.nrrd (image) \n
-http://mitk.org/download/tutorial-data/lungs.vtk (surface)
+https://www.mitk.org/download/tutorial-data/Pic3D.nrrd (image) \n
+https://www.mitk.org/download/tutorial-data/lungs.vtk (surface)
 
  In addition to Step 4 where 3 views were created on the data, we now want to interactively add points.
 

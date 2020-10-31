@@ -1,7 +1,7 @@
 /**
 \page AboutTestingPage Testing
 
-Testing is a very important part of ensuring code quality. We use <a href="http://www.cdash.org/">CDash</a> for testing whether MITK builds on a variety of platforms and configurations. You can find our dashboard <a href="http://cdash.mitk.org/index.php?project=MITK&display=project">here</a>.
+Testing is a very important part of ensuring code quality. We use <a href="https://www.cdash.org/">CDash</a> for testing whether MITK builds on a variety of platforms and configurations. You can find our dashboard <a href="https://cdash.mitk.org/index.php?project=MITK&display=project">here</a>.
 
 Additionally we support tests of software function as well. More detailed information on testing in MITK can be found below.
 

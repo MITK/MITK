@@ -3,7 +3,7 @@
   \ingroup MITKPlugins
 
   \brief This plugin, provided by University College London (UCL), written by Matt
-  Clarkson (m.clarkson@ucl.ac.uk) uses the CTK (http://www.commontk.org) Command
+  Clarkson (m.clarkson@ucl.ac.uk) uses the CTK (https://commontk.org/) Command
   Line Modules library to run command line programs as an external process.
 
 */

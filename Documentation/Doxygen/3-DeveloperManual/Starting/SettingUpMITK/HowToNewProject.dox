@@ -22,8 +22,7 @@ To bootstrap your project MITK offers two convenient options:
 
 <ol>
  <li> Use the MITK Plugin Generator, a command line tool used to generate a customized
-      MITK project and/or MITK plug-ins (available for download
-      <a href="http://www.mitk.org/Download#Plugin_Generator">here</a>).
+      MITK project and/or MITK plug-ins.
  <li> Use the <a href="https://github.com/MITK/MITK-ProjectTemplate">MITK project template</a>
       as an example project.
 </ol>

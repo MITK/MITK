@@ -429,8 +429,7 @@ protected:
 
 \li Set- and Get-methods can be created with the macros @a itkSetObjectMacro(name,type) and
 @a itkGetObjectMacro(name,type), respectively, if the @a type is derived from @a itk::LightObject or
-@a itk::Object. There are also macros for other types, e.g., strings, see
-<a href="http://www.itk.org/Doxygen12/html/itkMacro_8h.html">itkMacro.h</a>.
+@a itk::Object.
 
 \li When using inner classes of a parent class which is templated, you have
 to use the keyword @a typename for gcc 3.x and standard compliance. For example,
@@ -462,6 +461,6 @@ Prefixes for the constants are to be used like corresponding others. See file @a
 
 We offer a .clang-format file, which can be used to automatically format code acceptably.
 
-For an explanation of the different options check out http://clang.llvm.org/docs/ClangFormatStyleOptions.html
+For an explanation of the different options check out https://clang.llvm.org/docs/ClangFormatStyleOptions.html
 
 */

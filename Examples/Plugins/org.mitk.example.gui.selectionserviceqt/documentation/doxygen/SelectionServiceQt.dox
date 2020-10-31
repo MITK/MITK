@@ -13,7 +13,7 @@
   (the selection listener) does not provide any selection events. If the user changes the radio button state
   the QListWidget is not altered.
 
-  For additional informations on the selection service concept see http://www.mitk.org/wiki/Article_Using_the_Selection_Service
+  For additional informations on the selection service concept see https://www.mitk.org/wiki/Article_Using_the_Selection_Service
 
   The berry::QtSelectionProvider class implements the interface berry::ISelectionProvider. Due to the model/view concept in Qt, the workbench
   provides the berry::QtSelectionProvider class for Qt viewers which must be provided with a QItemSelectionModel.

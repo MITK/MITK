@@ -8,8 +8,8 @@
 \tableofcontents
 
 \section FIT_DCE_Introduction Introduction
-In dynamic contrast-enhanced (DCE) MRI, pharmacokinetic (PK) modeling can be used to quantify tissue physiology. 
-Parameters describing the tissue microvasculature can be derived by fitting a pharmacokinetic model, e.g. a compartment model, to the dynamic data. 
+In dynamic contrast-enhanced (DCE) MRI, pharmacokinetic (PK) modeling can be used to quantify tissue physiology.
+Parameters describing the tissue microvasculature can be derived by fitting a pharmacokinetic model, e.g. a compartment model, to the dynamic data.
 This view offers a comprehensive set of tools to perform pharmacokinetic analysis.
 
 \section FIT_DCE_Contact Contact information
@@ -44,7 +44,7 @@ Selecting one of the \ref FIT_DCE_General_models "supported models" will open be
 - The standard Tofts model, the extended Tofts model and the 2CXM are compartment models that require the input of the concentration time curve in the tissue feeding artery, the arterial input function (AIF).
 In the DCE MR Perfusion Datafit View, the arterial input function can be defined in several ways. For patient individual image derived AIFs, select the radio button <i>Select AIF from Image</i>.
 In that case, a segmentation ROI for the artery has to be selected. This can be done by clicking on the <i>AIF Mask</i> selection widget and selecting a suitable AIF segmentation from the data loaded in the Data Manager. In cases where the respective artery does not lie in the same image as the investigated tissue (e.g. in animal experiments, where a slice through the heart is used for AIF extraction), a dedicated AIF image can be selected using the corresponding <i>Dedicated AIF image</i> selection widget.
-An alternative option is to define the AIF via an external file by selecting <i>Select AIF from File</i> (e.g. for population derived AIFs or AIFs from blood sampling). By clicking the <i>Browse</i> button, one can select a csv file that holds the AIF values and corresponding timepoints (in tuple format (Time, Value)). 
+An alternative option is to define the AIF via an external file by selecting <i>Select AIF from File</i> (e.g. for population derived AIFs or AIFs from blood sampling). By clicking the <i>Browse</i> button, one can select a csv file that holds the AIF values and corresponding timepoints (in tuple format (Time, Value)).
 Caution: the file must not contain a header line, but the first line must start with Time and Intensity values.
 Furthermore, the <i>Hematocrit Level</i> has to be set (from 0 to 1) for conversion from whole blood to plasma concentration. It is set as default to the literature value of 0.45.
 
@@ -53,7 +53,7 @@ Furthermore, the <i>Hematocrit Level</i> has to be set (from 0 to 1) for convers
 In cases of noisy data it can be useful to define the initial starting values of the parameter estimates, at which optimization starts, in order to prevent optimization results in local optima.
 Each model has default scalar values (applied to every voxel) for initial values of each parameter, however these can be adjusted.
 Moreover, initial values can also be defined locally for each individual voxel via starting value images. To load a starting value image, change the <i>Type</i> from <i>scalar</i> to <i>image</i>. This can be done by double-clicking on the type cell.
-In the <i>Value</i> column, selection of a starting value image will be available. 
+In the <i>Value</i> column, selection of a starting value image will be available.
 
 \subsection FIT_DCE_Settings_constraint Constraints settings
 \imageMacro{dce_mri_constraints.png, "Example screenshot for constraints settings.", 10}
@@ -69,7 +69,7 @@ Most models require contrast agent concentration values as input rather than raw
 The DCE MR Perfusion DataFit View offers a variety of tools for the conversion from signal to concentration:
 by means of relative and absolute signal enhancement, via a T1-map calculated by the variable flip angle method, as well as a special conversion for turbo flash sequences.
 For the conversion methods, a baseline image prior to contrast agent arrival is required.
-In many data sets, multiple baseline images are available. The <i>Baseline Range Selection</i> allows for selection of a range of time frames, from which the average image (along the time dimension) is calculated and set as baseline input image. 
+In many data sets, multiple baseline images are available. The <i>Baseline Range Selection</i> allows for selection of a range of time frames, from which the average image (along the time dimension) is calculated and set as baseline input image.
 Remark: The number of the first time frame is 0.
 
 \section FIT_DCE_Fitting Executing a fit
@@ -96,7 +96,7 @@ Progress can be seen in the message box on the bottom. Resulting parameter maps 
 - \anchor FIT_DCE_lit_ref2 [2] Tofts PS, Kermode AG. Measurement of the blood-brain barrier permeability and leakage space using dynamic MR imaging. 1. Fundamental concepts. Magn Reson Med. 1991;17:357–67.
 - \anchor FIT_DCE_lit_ref3 [3] Sourbron SP, Buckley DL. On the scope and interpretation of the Tofts models for DCE-MRI. Magn Reson Med. 2011;66:735–45.
 - \anchor FIT_DCE_lit_ref4 [4] Brix G, Kiessling F, Lucht R, Darai S, Wasser K, Delorme S, et al. Microcirculation and microvasculature in breast tumors: Pharmacokinetic analysis of dynamic MR image series. Magn Reson Med. 2004;52:420–9.
-- \anchor FIT_DCE_lit_ref5 [5] Sourbron, Buckley. Tracer kinetic modelling in MRI: estimating perfusion and capillary permeability - pdf. Phys Med Biol. 2012. http://iopscience.iop.org/article/10.1088/0031-9155/57/2/R1/pdf. Accessed 1 May 2016.
+- \anchor FIT_DCE_lit_ref5 [5] Sourbron, Buckley. Tracer kinetic modelling in MRI: estimating perfusion and capillary permeability - pdf. Phys Med Biol. 2012. https://iopscience.iop.org/article/10.1088/0031-9155/57/2/R1/pdf. Accessed 1 May 2016.
 
 
 

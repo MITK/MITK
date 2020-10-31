@@ -9,9 +9,9 @@ Available documentation sections:
 
 \section QmitkRegionGrowingUserManualOverview Overview
 
-The Region growing view provides a programming example, showing developers how to create new views for MITK with a graphical user interface (GUI) that also uses some ITK image filters. 
+The Region growing view provides a programming example, showing developers how to create new views for MITK with a graphical user interface (GUI) that also uses some ITK image filters.
 
-<b>For the programmers:</b> this functionality is the result of <a href="http://docs.mitk.org/nightly/Step9Page.html">tutorial step 9</a>
+<b>For the programmers:</b> this functionality is the result of <a href="https://docs.mitk.org/nightly/Step09Page.html">tutorial step 9</a>
 
 \section QmitkRegionGrowingUserManualUsage Usage
 

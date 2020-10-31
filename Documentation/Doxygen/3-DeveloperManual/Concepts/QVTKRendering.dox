@@ -16,7 +16,7 @@ A vtkPropAssembly is an assembly of several vtkProps, which appears like one sin
 MITK uses a new interface class, the "vtkMitkRenderProp", which is inherited from vtkProp. Similar to a vtkPropAssembly, all MITK rendering stuff is performed via this interface class.
 Thus, the MITK rendering process is completely integrated into the VTK rendering pipeline. From VTK point of view, MITK renders like a custom vtkProp object.
 
-More information about the VTK rendering pipeline can be found at http://www.vtk.org and in the several VTK books.
+More information about the VTK rendering pipeline can be found at https://vtk.org/ and in the several VTK books.
 
 
 

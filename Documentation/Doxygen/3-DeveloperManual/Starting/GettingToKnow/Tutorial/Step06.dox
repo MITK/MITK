@@ -11,7 +11,7 @@ The source is now split among several files:
 \li \ref Step6RegionGrowing2.cpp "Step6RegionGrowing2.cpp"
 \li \ref Step6main.cpp "Step6main.cpp"
 \li Path to files used in this step: \n
-http://mitk.org/download/tutorial-data/Pic3D.nrrd (image)
+https://www.mitk.org/download/tutorial-data/Pic3D.nrrd (image)
 
 
 In this step the program is enhanced by the possibility to start a region-grower at interactively added points.

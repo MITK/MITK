@@ -2,8 +2,7 @@
 \page NewPluginPage How to create a new MITK Plugin
 
 The MITK Plugin Generator is a command line tool to simplify the process of creating your own MITK project
-(optional) and plugins. It can either be downloaded <a href="http://www.mitk.org/wiki/Download">here</a>
-or used from an existing MITK build.
+(optional) and plugins.
 
 The Plugin Generator takes the following command line arguments:
 

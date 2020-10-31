@@ -71,7 +71,7 @@ digraph linker_deps {
 
 \subsection DataInteractionPage_DataInteractorsSection DataInteractors
 DataInteractors are specialized mitk::InteractionEventHandler which handle events for one spefific DataNode. They are implemented following a concept called state machines
-(see e.g. <a href="http://en.wikipedia.org/wiki/Mealy_machine"> Wikipedia </a>).
+(see e.g. <a href="https://en.wikipedia.org/wiki/Mealy_machine"> Wikipedia </a>).
 
 \subsubsection DataInteractionPage_StateMachinesSection StateMachines
 
@@ -127,7 +127,7 @@ The definition is made up out of four components.
 <ul>
     <li> States - represent the current status of the interaction
     <li> Transitions - describe the events needed to change from one state to another
-    <li> Conditions - are executed, before a transition is taken 
+    <li> Conditions - are executed, before a transition is taken
     <li> Actions - are executed, when a transition is taken and conditions for that transition have passed
 </ul>
 

@@ -3,10 +3,10 @@
   \ingroup MITKPlugins
 
   \brief Provides legacy classes and functionality common for MITK plug-ins.
-  
+
   \deprecated This plug-in is deprecated. Old plug-ins having a dependency on it should
-              migrate to the org_mitk_gui_qt_common Plug-in using http://www.mitk.org/wiki/ViewsWithoutMultiWidget
-  
+              migrate to the org_mitk_gui_qt_common Plug-in using https://www.mitk.org/wiki/Views_Without_Multi_Widget
+
 */
 
 /**

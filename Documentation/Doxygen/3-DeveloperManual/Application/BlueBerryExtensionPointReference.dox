@@ -2,23 +2,27 @@
 
 \page BlueBerryExtPointsIndex BlueBerry Extension-Point Reference
 
-\tableofcontents{html:2}
+- \subpage BlueBerryExtPointsIndex_CoreExpr
+- \subpage BlueBerryExtPointsIndex_PlatformRuntime
+- \subpage BlueBerryExtPointsIndex_Workbench
 
-\section BlueBerryExtPointsIndex_CoreExpr Platform Core Expressions
+\page BlueBerryExtPointsIndex_CoreExpr Platform Core Expressions
 
-\subsection BlueBerryExtPointsIndex_CoreExpr_ExprDef Expression Definitions
+\tableofcontents
 
-\subsubsection BlueBerryExtPointsIndex_CoreExpr_ExprDef_Id Identifier
+\section BlueBerryExtPointsIndex_CoreExpr_ExprDef Expression Definitions
+
+\subsection BlueBerryExtPointsIndex_CoreExpr_ExprDef_Id Identifier
 
 \c org.blueberry.core.expressions.definitions
 
-\subsubsection BlueBerryExtPointsIndex_CoreExpr_ExprDef_Desc Description
+\subsection BlueBerryExtPointsIndex_CoreExpr_ExprDef_Desc Description
 
 This extension point allows you to create reusable extensions.
 They can then be used in other core expression constructs.
 The reference element in a core expression will evaluated the expression definition with the evaluation context that is active for the reference element.
 
-\subsubsection BlueBerryExtPointsIndex_CoreExpr_ExprDef_ConfMarkup Configuration Markup
+\subsection BlueBerryExtPointsIndex_CoreExpr_ExprDef_ConfMarkup Configuration Markup
 
 \code{.unparsed}
 <!ELEMENT extension (definition*)>
@@ -208,7 +212,7 @@ The expression definition will be evaluated within the current expression elemen
 
 - <tt>definitionId</tt>: the unique id of an expression from \c org.blueberry.core.expressions.definitions
 
-\subsubsection BlueBerryExtPointsIndex_CoreExpr_ExprDef_Examples Examples
+\subsection BlueBerryExtPointsIndex_CoreExpr_ExprDef_Examples Examples
 
 \code{.unparsed}
 <extension point="org.blueberry.core.expressions.definitions">
@@ -240,13 +244,13 @@ Then this expression definition can be used when composing other expressions.
 </visibleWhen>
 \endcode
 
-\subsection BlueBerryExtPointsIndex_CoreExpr_CommExpr Common Expressions
+\section BlueBerryExtPointsIndex_CoreExpr_CommExpr Common Expressions
 
-\subsubsection BlueBerryExtPointsIndex_CoreExpr_CommExpr_Id Identifier
+\subsection BlueBerryExtPointsIndex_CoreExpr_CommExpr_Id Identifier
 
 \c org.blueberry.core.expressions.commonExpression
 
-\subsubsection BlueBerryExtPointsIndex_CoreExpr_CommExpr_ConfMarkup Configuration Markup
+\subsection BlueBerryExtPointsIndex_CoreExpr_CommExpr_ConfMarkup Configuration Markup
 
 \code{.unparsed}
 <!ELEMENT enablement (not , and , or , instanceof , test , systemTest , equals , count , with , resolve , adapt , iterate , reference)*>
@@ -411,18 +415,18 @@ The expression definition will be evaluated within the current expression elemen
 
 - <tt>definitionId</tt>: the unique id of an expression from \c org.blueberry.core.expressions.definitions
 
-\subsection BlueBerryExtPointsIndex_CoreExpr_PropTest Property Testers
+\section BlueBerryExtPointsIndex_CoreExpr_PropTest Property Testers
 
-\subsubsection BlueBerryExtPointsIndex_CoreExpr_PropTest_Id Identifier
+\subsection BlueBerryExtPointsIndex_CoreExpr_PropTest_Id Identifier
 
 \c org.blueberry.core.expressions.propertyTesters
 
-\subsubsection BlueBerryExtPointsIndex_CoreExpr_PropTest_Desc Description
+\subsection BlueBerryExtPointsIndex_CoreExpr_PropTest_Desc Description
 
 This extension point allows to add properties to an already existing type.
 Those properties can then be used inside the expression language's test expression element.
 
-\subsubsection BlueBerryExtPointsIndex_CoreExpr_PropTest_ConfMarkup Configuration Markup
+\subsection BlueBerryExtPointsIndex_CoreExpr_PropTest_ConfMarkup Configuration Markup
 
 \code{.unparsed}
 <!ELEMENT extension (propertyTester*)>
@@ -452,7 +456,7 @@ Those properties can then be used inside the expression language's test expressi
 - <tt>properties</tt>: A comma separated list of properties provided by this property tester.
 - <tt>class</tt>: The name of the class that implements the testing methods. The class must be public and extend \c org.blueberry.core.expressions.PropertyTester with a public 0-argument constructor.
 
-\subsubsection BlueBerryExtPointsIndex_CoreExpr_PropTest_Examples Examples
+\subsection BlueBerryExtPointsIndex_CoreExpr_PropTest_Examples Examples
 
 \code{.unparsed}
 <extension point="org.eclipse.core.expressions.propertyTesters">
@@ -466,19 +470,21 @@ Those properties can then be used inside the expression language's test expressi
 </extension>
 \endcode
 
-\section BlueBerryExtPointsIndex_PlatformRuntime Platform Runtime
+\page BlueBerryExtPointsIndex_PlatformRuntime Platform Runtime
 
-\subsection BlueBerryExtPointsIndex_PlatformRuntime_App Applications
+\tableofcontents
 
-\subsubsection BlueBerryExtPointsIndex_PlatformRuntime_App_Id Identifier
+\section BlueBerryExtPointsIndex_PlatformRuntime_App Applications
+
+\subsection BlueBerryExtPointsIndex_PlatformRuntime_App_Id Identifier
 
 \c org.blueberry.osgi.applications
 
-\subsubsection BlueBerryExtPointsIndex_PlatformRuntime_App_Desc Description
+\subsection BlueBerryExtPointsIndex_PlatformRuntime_App_Desc Description
 
 The applications extension point allows plugins to contribute applications to the BlueBerry Platform.
 
-\subsubsection BlueBerryExtPointsIndex_PlatformRuntime_App_ConfMarkup Configuration Markup
+\subsection BlueBerryExtPointsIndex_PlatformRuntime_App_ConfMarkup Configuration Markup
 
 \code{.unparsed}
 <!ELEMENT extension (application)+>
@@ -501,7 +507,7 @@ The applications extension point allows plugins to contribute applications to th
   class CDATA #REQUIRED>
 \endcode
 
-\subsubsection BlueBerryExtPointsIndex_PlatformRuntime_App_Examples Examples
+\subsection BlueBerryExtPointsIndex_PlatformRuntime_App_Examples Examples
 
 \code{.unparsed}
 <extension id="sampleApplication" point="org.blueberry.osgi.applications">
@@ -511,13 +517,13 @@ The applications extension point allows plugins to contribute applications to th
 </extension>
 \endcode
 
-\subsection BlueBerryExtPointsIndex_PlatformRuntime_Prod Products
+\section BlueBerryExtPointsIndex_PlatformRuntime_Prod Products
 
-\subsubsection BlueBerryExtPointsIndex_PlatformRuntime_Prod_Id Identifier
+\subsection BlueBerryExtPointsIndex_PlatformRuntime_Prod_Id Identifier
 
 \c org.blueberry.core.runtime.products
 
-\subsubsection BlueBerryExtPointsIndex_PlatformRuntime_Prod_Desc Description
+\subsection BlueBerryExtPointsIndex_PlatformRuntime_Prod_Desc Description
 
 Products are the BlueBerry unit of branding.
 Product extensions are supplied by plug-ins wishing to define one or more products.
@@ -527,7 +533,7 @@ There are two possible forms of product extension, static and dynamic.
 Static product extensions directly contain all relevant information about the product.
 Dynamic product extensions identify a class (an \c IProductProvider) which is capable of defining one or more products when queried.
 
-\subsubsection BlueBerryExtPointsIndex_PlatformRuntime_Prod_ConfMarkup Configuration Markup
+\subsection BlueBerryExtPointsIndex_PlatformRuntime_Prod_ConfMarkup Configuration Markup
 
 \code{.unparsed}
 <!ELEMENT extension ((product | provider))>
@@ -571,7 +577,7 @@ Dynamic product extensions identify a class (an \c IProductProvider) which is ca
 
 - <tt>class</tt>: the fully-qualified name of a class which implements \c IProductProvider
 
-\subsubsection BlueBerryExtPointsIndex_PlatformRuntime_Prod_Examples Examples
+\subsection BlueBerryExtPointsIndex_PlatformRuntime_Prod_Examples Examples
 
 \code{.unparsed}
 <extension id="coolProduct" point="org.blueberry.core.runtime.products">
@@ -596,19 +602,21 @@ The following is an example of a dynamic product (product provider) declaration:
 </extension>
 \endcode
 
-\subsubsection BlueBerryExtPointsIndex_PlatformRuntime_Prod_SupplImpl Supplied Implementation
+\subsection BlueBerryExtPointsIndex_PlatformRuntime_Prod_SupplImpl Supplied Implementation
 
 No implementations of \c IProductProvider are supplied.
 
-\section BlueBerryExtPointsIndex_Workbench Workbench
+\page BlueBerryExtPointsIndex_Workbench Workbench
 
-\subsection BlueBerryExtPointsIndex_Workbench_Edit Internal and External Editors
+\tableofcontents
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_Edit_Id Identifier
+\section BlueBerryExtPointsIndex_Workbench_Edit Internal and External Editors
+
+\subsection BlueBerryExtPointsIndex_Workbench_Edit_Id Identifier
 
 \c org.blueberry.ui.editors
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_Edit_Desc Description
+\subsection BlueBerryExtPointsIndex_Workbench_Edit_Desc Description
 
 This extension point is used to add new editors to the workbench.
 A editor is a visual component within a workbench page.
@@ -628,7 +636,7 @@ These actions only appear when the editor is active.
 The integration between the workbench and external editors is more tenuous.
 In this case the workbench may launch an editor but after has no way of determining the state of the external editor or collaborating with it by any means except through the file system.
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_Edit_ConfMarkup Configuration Markup
+\subsection BlueBerryExtPointsIndex_Workbench_Edit_ConfMarkup Configuration Markup
 
 \code{.unparsed}
 <!ELEMENT extension (editor*)>
@@ -681,7 +689,7 @@ Advertises that the containing editor understands the given content type and is 
 
 - <tt>contentTypeId</tt>: The content type identifier. This is an ID defined by the \c org.blueberry.core.runtime.contentTypes extension point.
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_Edit_Examples Examples
+\subsection BlueBerryExtPointsIndex_Workbench_Edit_Examples Examples
 
 The following is an example of an internal editor extension definition:
 
@@ -699,21 +707,21 @@ The following is an example of an internal editor extension definition:
 </extension>
 \endcode
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_Edit_SupplImpl Supplied Implementation
+\subsection BlueBerryExtPointsIndex_Workbench_Edit_SupplImpl Supplied Implementation
 
 The workbench provides a "Default Text Editor". The end user product may contain other editors as part of the shipping bundle. In that case, editors will be registered as extensions using the syntax described above.
 
-\subsection BlueBerryExtPointsIndex_Workbench_Keywords Keywords
+\section BlueBerryExtPointsIndex_Workbench_Keywords Keywords
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_Keywords_Id Identifier
+\subsection BlueBerryExtPointsIndex_Workbench_Keywords_Id Identifier
 
 \c org.blueberry.ui.keywords
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_Keywords_Desc Description
+\subsection BlueBerryExtPointsIndex_Workbench_Keywords_Desc Description
 
 The keywords extension point defines keywords and a unique id for reference by other schemas. See \c propertyPages and \c preferencePages .
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_Keywords_ConfMarkup Configuration Markup
+\subsection BlueBerryExtPointsIndex_Workbench_Keywords_ConfMarkup Configuration Markup
 
 \code{.unparsed}
 <!ELEMENT extension (keyword*)>
@@ -737,7 +745,7 @@ The keywords extension point defines keywords and a unique id for reference by o
 - <tt>id</tt>: The id is the unique id used to reference the keyword
 - <tt>label</tt>: The human readable label of the keyword
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_Keywords_Examples Examples
+\subsection BlueBerryExtPointsIndex_Workbench_Keywords_Examples Examples
 
 The following is an example of a keyword extension:
 
@@ -750,24 +758,24 @@ The following is an example of a keyword extension:
 </extension>
 \endcode
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_Keywords_SupplImpl Supplied Implementation
+\subsection BlueBerryExtPointsIndex_Workbench_Keywords_SupplImpl Supplied Implementation
 
 Keywords are used only with preference and property pages. See the \c keywordReference element of the \c org.blueberry.ui.propertyPages and \c org.blueberry.ui.preferencePages extension points.
 
-\subsection BlueBerryExtPointsIndex_Workbench_PerspExt Perspective Extensions
+\section BlueBerryExtPointsIndex_Workbench_PerspExt Perspective Extensions
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_PerspExt_Id Identifier
+\subsection BlueBerryExtPointsIndex_Workbench_PerspExt_Id Identifier
 
 \c org.blueberry.ui.perspectiveExtensions
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_PerspExt_Desc Description
+\subsection BlueBerryExtPointsIndex_Workbench_PerspExt_Desc Description
 
 This extension point is used to extend perspectives registered by other plug-ins.
 A perspective defines the initial contents of the window action bars (menu and toolbar) and the initial set of views and their layout within a workbench page.
 Other plug-ins may contribute actions or views to the perspective which appear when the perspective is selected.
 Optional additions by other plug-ins are appended to the initial definition.
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_PerspExt_ConfMarkup Configuration Markup
+\subsection BlueBerryExtPointsIndex_Workbench_PerspExt_ConfMarkup Configuration Markup
 
 \code{.unparsed}
 <!ELEMENT extension (perspectiveExtension*)>
@@ -874,7 +882,7 @@ Optional additions by other plug-ins are appended to the initial definition.
 
 - <tt>id</tt>: The unique identifier of the Command which is to be removed from thetoolbar. <b>WARNING:</b> This is considered to be a 'Product level' extension and should not be used in consumable plugins without great care.
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_PerspExt_Examples Examples
+\subsection BlueBerryExtPointsIndex_Workbench_PerspExt_Examples Examples
 
 The following is an example of a perspective extension (note the subelements and the way attributes are used):
 
@@ -900,19 +908,19 @@ The following is an example of a perspective extension (note the subelements and
 In the example above, an action set, view shortcut, new wizard shortcut, and perspective shortcut are contributed to the initial contents of the Resource Perspective.
 In addition, the Package Explorer view is stacked on the Resource Navigator and the Type Hierarchy View is added beside the Resource Navigator.
 
-\subsection BlueBerryExtPointsIndex_Workbench_Persp Perspectives
+\section BlueBerryExtPointsIndex_Workbench_Persp Perspectives
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_Persp_Id Identifier
+\subsection BlueBerryExtPointsIndex_Workbench_Persp_Id Identifier
 
 \c org.blueberry.ui.perspective
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_Persp_Desc Description
+\subsection BlueBerryExtPointsIndex_Workbench_Persp_Desc Description
 
 This extension point is used to add perspective factories to the workbench.
 A perspective factory is used to define the initial layout and visible action sets for a perspective.
 The user can select a perspective by invoking the "Open Perspective" submenu of the "Window" menu.
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_Persp_ConfMarkup Configuration Markup
+\subsection BlueBerryExtPointsIndex_Workbench_Persp_ConfMarkup Configuration Markup
 
 \code{.unparsed}
 <!ELEMENT extension (perspective*)>
@@ -948,7 +956,7 @@ The user can select a perspective by invoking the "Open Perspective" submenu of 
 
 An optional subelement whose body should contain text providing a short description of the perspective.
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_Persp_Examples Examples
+\subsection BlueBerryExtPointsIndex_Workbench_Persp_Examples Examples
 
 The following is an example of a perspective extension:
 
@@ -964,25 +972,25 @@ The following is an example of a perspective extension:
 </extension>
 \endcode
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_Persp_SupplImpl Supplied Implementation
+\subsection BlueBerryExtPointsIndex_Workbench_Persp_SupplImpl Supplied Implementation
 
 The workbench provides a "Resource Perspective".
 Additional perspectives may be added by plug-ins.
 They are selected using the "Open Perspective" submenu of the "Window" menu.
 
-\subsection BlueBerryExtPointsIndex_Workbench_PrefPages Preference Pages
+\section BlueBerryExtPointsIndex_Workbench_PrefPages Preference Pages
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_PrefPages_Id Identifier
+\subsection BlueBerryExtPointsIndex_Workbench_PrefPages_Id Identifier
 
 \c org.blueberry.ui.preferencePages
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_PrefPages_Desc Description
+\subsection BlueBerryExtPointsIndex_Workbench_PrefPages_Desc Description
 
 The workbench provides one common dialog box for preferences.
 The purpose of this extension point is to allow plug-ins to add pages to the preference dialog box.
 When preference dialog box is opened (initiated from the menu bar), pages contributed in this way will be added to the dialog box.
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_PrefPages_ConfMarkup Configuration Markup
+\subsection BlueBerryExtPointsIndex_Workbench_PrefPages_ConfMarkup Configuration Markup
 
 \code{.unparsed}
 <!ELEMENT extension (page*)>
@@ -1020,7 +1028,7 @@ A reference by a preference page to a keyword. See the keywords extension point.
 
 - <tt>id</tt>: The id of the keyword being referred to.
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_PrefPages_Examples Examples
+\subsection BlueBerryExtPointsIndex_Workbench_PrefPages_Examples Examples
 
 The following is an example for the preference extension point:
 
@@ -1042,21 +1050,21 @@ The following is an example for the preference extension point:
 </extension>
 \endcode
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_PrefPages_SupplImpl Supplied Implementation
+\subsection BlueBerryExtPointsIndex_Workbench_PrefPages_SupplImpl Supplied Implementation
 
 The workbench adds several pages for setting the preferences of the platform. Pages registered through this extension will be added after them according to their category information.
 
-\subsection BlueBerryExtPointsIndex_Workbench_PresFact Presentation Factories
+\section BlueBerryExtPointsIndex_Workbench_PresFact Presentation Factories
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_PresFact_Id Identifier
+\subsection BlueBerryExtPointsIndex_Workbench_PresFact_Id Identifier
 
 \c org.blueberry.ui.presentationFactories
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_PresFact_Desc Description
+\subsection BlueBerryExtPointsIndex_Workbench_PresFact_Desc Description
 
 This extension point is used to add presentation factories to the workbench. A presentation factory defines the overall look and feel of the workbench, including how views and editors are presented.
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_PresFact_ConfMarkup Configuration Markup
+\subsection BlueBerryExtPointsIndex_Workbench_PresFact_ConfMarkup Configuration Markup
 
 \code{.unparsed}
 <!ELEMENT extension (factory*)>
@@ -1078,7 +1086,7 @@ This extension point is used to add presentation factories to the workbench. A p
 - <tt>id</tt>: a unique name that will be used to identify this presentation factory
 - <tt>name</tt>: a translatable name that can be used to show this presentation factory in the UI
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_PresFact_Examples Examples
+\subsection BlueBerryExtPointsIndex_Workbench_PresFact_Examples Examples
 
 The following is an example of a presentationFactory extension:
 
@@ -1089,22 +1097,22 @@ The following is an example of a presentationFactory extension:
 </extension>
 \endcode
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_PresFact_SupplImpl Supplied Implementation
+\subsection BlueBerryExtPointsIndex_Workbench_PresFact_SupplImpl Supplied Implementation
 
 If a presentation factory is not specified or is missing then the implementation in berry::QtWorkbenchPresentationFactory will be used.
 
-\subsection BlueBerryExtPointsIndex_Workbench_Services Services
+\section BlueBerryExtPointsIndex_Workbench_Services Services
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_Services_Id Identifier
+\subsection BlueBerryExtPointsIndex_Workbench_Services_Id Identifier
 
 \c org.blueberry.ui.services
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_Services_Desc Description
+\subsection BlueBerryExtPointsIndex_Workbench_Services_Desc Description
 
 Define service factories so that services can be contributed declaratively and will be available through berry::IServiceLocator::GetService(Class).
 The implementation of \c AbstractServiceFactory must be able to return a global service and multiple child services (if applicable).
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_Services_ConfMarkup Configuration Markup
+\subsection BlueBerryExtPointsIndex_Workbench_Services_ConfMarkup Configuration Markup
 
 \code{.unparsed}
 <!ELEMENT extension (serviceFactory? , sourceProvider?)+>
@@ -1159,7 +1167,7 @@ A source provider must declare all variables that it provides.
 - <tt>name</tt>: The name of a contributed source variable. It is a good practice to prepend the plugin id to the variable name to avoid collisions with other source providers.
 - <tt>priorityLevel</tt>: For conflict resolution used by services like the \c IHandlerService , contributed source variables must assign a priority. workbench is the global default priority. See \c ISources for relative priority information.
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_Services_Examples Examples
+\subsection BlueBerryExtPointsIndex_Workbench_Services_Examples Examples
 
 Here is a basic definition:
 
@@ -1181,17 +1189,17 @@ std::cout << s->GetLevel();
 
 In this test example, the factory would instantiate three \c ILevelService implementations during the first call to \c GetSite()->GetService(*) . The global one in the workbench, one for the workbench window, and one for the site.
 
-\subsection BlueBerryExtPointsIndex_Workbench_Tweak Tweaklets
+\section BlueBerryExtPointsIndex_Workbench_Tweak Tweaklets
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_Tweak_Id Identifier
+\subsection BlueBerryExtPointsIndex_Workbench_Tweak_Id Identifier
 
 \c org.blueberry.ui.tweaklets
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_Tweak_Desc Description
+\subsection BlueBerryExtPointsIndex_Workbench_Tweak_Desc Description
 
 Typically, although not required, the value of the \c definition attribute is the fully qualified name without colons of an abstract class defined by the workbench, and the value of the \c implementation attribute is the fully qualified name of a non-abstract class provided by the extending plug-in.
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_Tweak_ConfMarkup Configuration Markup
+\subsection BlueBerryExtPointsIndex_Workbench_Tweak_ConfMarkup Configuration Markup
 
 \code{.unparsed}
 <!ELEMENT extension (tweaklet)*>
@@ -1217,17 +1225,17 @@ Typically, although not required, the value of the \c definition attribute is th
 - <tt>definition</tt>: an identifier of the tweaklet definition in the workbench, typically a fully qualified type name without colons
 - <tt>implementation</tt>: an identifier of the tweaklet implementation provided by the extender, typically a fully qualified class name
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_Tweak_SupplImpl Supplied Implementation
+\subsection BlueBerryExtPointsIndex_Workbench_Tweak_SupplImpl Supplied Implementation
 
 Tweaklets are usually used to specialize the workbench for a specific GUI toolkit.
 
-\subsection BlueBerryExtPointsIndex_Workbench_Views Views
+\section BlueBerryExtPointsIndex_Workbench_Views Views
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_Views_Id Identifier
+\subsection BlueBerryExtPointsIndex_Workbench_Views_Id Identifier
 
 \c org.blueberry.ui.views
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_Views_Desc Description
+\subsection BlueBerryExtPointsIndex_Workbench_Views_Desc Description
 
 This extension point is used to define additional views for the workbench.
 A view is a visual component within a workbench page.
@@ -1236,7 +1244,7 @@ The user can make a view visible from the Window > Show View menu or close it fr
 
 In order to reduce the visual clutter in the Show View Dialog, views should be grouped using categories.
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_Views_ConfMarkup Configuration Markup
+\subsection BlueBerryExtPointsIndex_Workbench_Views_ConfMarkup Configuration Markup
 
 \code{.unparsed}
 <!ELEMENT extension (category | view | stickyView)*>
@@ -1309,7 +1317,7 @@ Please note that usage of this element should be done with great care and should
 - <tt>closeable</tt>: optional attribute that specifies wether the view should be closeable. If absent it will be closeable.
 - <tt>moveable</tt>: optional attribute that specifies wether the view should be moveable. If absent it will be moveable.
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_Views_Examples Examples
+\subsection BlueBerryExtPointsIndex_Workbench_Views_Examples Examples
 
 The following is an example of the extension point:
 
@@ -1335,7 +1343,7 @@ The following is an example of a sticky view declaration:
 </extension>
 \endcode
 
-\subsubsection BlueBerryExtPointsIndex_Workbench_Views_SupplImpl Supplied Implementation
+\subsection BlueBerryExtPointsIndex_Workbench_Views_SupplImpl Supplied Implementation
 
 The BlueBerry Platform provides a number of standard views.
 From the user point of view, these views are no different from any other view provided by the plug-ins.

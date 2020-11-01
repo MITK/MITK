@@ -26,10 +26,9 @@ class vtkLinearTransform;
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Standard implementation of BaseGeometry.
-  //##
-  //## @ingroup Geometry
+  /** @brief Standard implementation of BaseGeometry.
+    * @ingroup Geometry
+    */
   class MITKCORE_EXPORT Geometry3D : public BaseGeometry
   {
   public:
@@ -43,33 +42,32 @@ namespace mitk
     mitkNewMacro1Param(Self, const Self&);
 
     itkCloneMacro(Self);
-    // itkGetConstReferenceMacro(TimeBounds, TimeBounds);
-
-    // virtual void SetTimeBounds(const TimeBounds& timebounds);
 
   protected : Geometry3D();
     Geometry3D(const Geometry3D &);
 
-    //##Documentation
-    //## @brief clones the geometry
-    //##
-    //## Overwrite in all sub-classes.
-    //## Normally looks like:
-    //## \code
-    //##  Self::Pointer newGeometry = new Self(*this);
-    //##  newGeometry->UnRegister();
-    //##  return newGeometry.GetPointer();
-    //## \endcode
+    /**
+      * @brief clones the geometry
+      *
+      * Overwrite in all sub-classes.
+      * Normally looks like:
+      * \code
+      *  Self::Pointer newGeometry = new Self(*this);
+      *  newGeometry->UnRegister();
+      *  return newGeometry.GetPointer();
+      * \endcode
+      */
     itk::LightObject::Pointer InternalClone() const override;
 
     ~Geometry3D() override;
 
-    //##Documentation
-    //## @brief PreSetSpacing
-    //##
-    //## These virtual function allows a different beahiour in subclasses.
-    //## Do implement them in every subclass of BaseGeometry. If not needed, use
-    //## {Superclass::PreSetSpacing();};
+    /**
+      * @brief PreSetSpacing
+      *
+      * These virtual function allows a different beahiour in subclasses.
+      * Do implement them in every subclass of BaseGeometry. If not needed, use
+      * \c Superclass::PreSetSpacing().
+      */
     void PreSetSpacing(const mitk::Vector3D &aSpacing) override { Superclass::PreSetSpacing(aSpacing); };
   };
 } // namespace mitk

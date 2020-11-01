@@ -54,7 +54,7 @@ To serve as a test tool for ImageStatisticsCalculator, esp. the "hotspot search"
 
 \section Generation-of-a-multigauss-image Generation of a multigauss image
 
-A multigauss function consists of the sum of \f$ N \f$ gauss function. The \f$ i \f$-th \linebreak (\f$0 \leq i \leq N \f$) gaussian is described with the following seven parameters (see above):
+A multigauss function consists of the sum of \f$ N \f$ gauss function. The \f$ i \f$-th \n (\f$0 \leq i \leq N \f$) gaussian is described with the following seven parameters (see above):
 - \f$ x_0^{(i)} \f$ is the expectancy value in the \f$ x \f$-Axis
 - \f$ y_0^{(i)} \f$ is the expectancy value in the \f$ y \f$-Axis
 - \f$ z_0^{(i)} \f$ is the expectancy value in the \f$ z \f$-Axis

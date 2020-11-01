@@ -237,7 +237,7 @@ public:
   IEditorRegistry* GetEditorRegistry();
 
   /**
-   * Answer the element factory for an id, or <code>null</code. if not found.
+   * Answer the element factory for an id, or <code>null</code>. if not found.
    * @param targetID
    * @return IElementFactory
    */
@@ -364,7 +364,7 @@ public:
 
   /**
    * Log the throwable.
-   * @param t
+   * @param exc
    */
   static void Log(const ctkException& exc);
 

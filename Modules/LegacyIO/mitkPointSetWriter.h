@@ -50,7 +50,6 @@ namespace mitk
 
     /**
      * Sets the filename of the file to write.
-     * @param FileName the name of the file to write.
      */
     itkSetStringMacro(FileName);
 
@@ -89,6 +88,7 @@ namespace mitk
      * Sets the n'th input object for the filter. If num is
      * larger than GetNumberOfInputs() the number of inputs is
      * resized appropriately.
+     * @param num
      * @param input the n'th input for the filter.
      */
     void SetInput(const unsigned int &num, InputType *input);

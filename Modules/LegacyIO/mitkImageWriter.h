@@ -40,7 +40,7 @@ namespace mitk
 
     /**
      * Sets the filename of the file to write.
-     * @param _arg the name of the file to write.
+     * @param fileName the name of the file to write.
      */
     void SetFileName(const char *fileName) override;
     virtual void SetFileName(const std::string &fileName);
@@ -52,7 +52,7 @@ namespace mitk
 
     /**
      * \brief Explicitly set the extension to be added to the filename.
-     * @param _arg to be added to the filename, including a "."
+     * @param extension Extension to be added to the filename, including a "."
      * (e.g., ".mhd").
      */
     virtual void SetExtension(const char *extension);

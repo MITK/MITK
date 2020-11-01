@@ -85,9 +85,7 @@ namespace mitk
      * type id can be set via SetMimeType() or it will be auto-generated using \c extension,
      * having the form "application/vnd.mitk.<extension>".
      *
-     * @param extension The file extension (without a leading period) for which a registered
-     *        mime-type object is looked up and associated with this reader instance.
-     * @param description A human readable description of this reader.
+     * @param context
      */
     us::ServiceRegistration<IFileReader> RegisterService(us::ModuleContext *context = us::GetModuleContext());
     void UnregisterService();

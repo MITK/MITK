@@ -117,6 +117,7 @@ namespace mitk {
 
     /** @brief Defines an offset for a representation object. This offset is applied before the object is visualized.
      *         If no offset is given, no offset will be used. To deactivate the offset just set it to nullptr. The offset is deactivated by default.
+     * @param index
      * @param offset The new offset which will be set. Set to nullptr to deactivate the offset.
      */
     void SetOffset(int index, mitk::AffineTransform3D::Pointer offset);

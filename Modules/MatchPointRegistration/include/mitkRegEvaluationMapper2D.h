@@ -160,8 +160,6 @@ protected:
 
   /** \brief Generates a plane according to the size of the resliced image in milimeters.
     *
-    * \image html texturedPlane.png
-    *
     * In VTK a vtkPlaneSource is defined through three points. The origin and two
     * points defining the axes of the plane (see VTK documentation). The origin is
     * set to (xMin; yMin; Z), where xMin and yMin are the minimal bounds of the
@@ -221,6 +219,8 @@ protected:
    * @brief ApplyLevelWindow Apply the level window for the given renderer.
    * \warning To use the level window, the property 'LevelWindow' must be set and a 'Image Rendering.Mode' which uses the level window must be set.
    * @param renderer Level window for which renderer?
+   * @param dataNode
+   * @param levelFilter
    */
   void ApplyLevelWindow(mitk::BaseRenderer *renderer, const mitk::DataNode* dataNode, vtkMitkLevelWindowFilter* levelFilter);
 
@@ -236,6 +236,9 @@ protected:
     * 8 cornerpoints of the SlicedGeometry3D. If all distances have the same
     * sign (all positive or all negative) there is no intersection.
     * If the distances have different sign, there is an intersection.
+    * 
+    * \param renderingGeometry
+    * \param imageGeometry
     **/
   bool RenderingGeometryIntersectsImage( const PlaneGeometry* renderingGeometry, SlicedGeometry3D* imageGeometry );
 };

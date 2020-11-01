@@ -29,11 +29,13 @@ namespace mitk
   {
   public:
     /** @brief Generate a rendering test helper object including a render window of the size width * height (in pixel).
+        @param width
+        @param height
         @param argc Number of parameters. (here: Images) "Usage: [filename1 filenam2 -V referenceScreenshot
           (optional -T /directory/to/save/differenceImage)]
         @param argv Given parameters. If no data is inserted via commandline, you can add data
         later via AddNodeToDataStorage().
-        @param renderingMode The rendering mode.
+        @param antiAliasing The anti-aliasing mode.
       **/
     RenderingTestHelper(
       int width,
@@ -68,12 +70,13 @@ namespace mitk
     /**
      * @brief SetStopRenderWindow Convenience method to make the renderwindow hold after rendering. Usefull for
      * debugging.
-     * @param flag Flag indicating whether the renderwindow should automatically close (false, default) or stay open
+     * @param automaticallyCloseRenderWindow Flag indicating whether the renderwindow should automatically close (false, default) or stay open
      * (true). Usefull for debugging.
      */
     void SetAutomaticallyCloseRenderWindow(bool automaticallyCloseRenderWindow);
 
     /** @brief This method set the property of the member datastorage
+          @param propertyKey
           @param property Set a property for each image in the datastorage m_DataStorage. If you want
           to set the property for a single data node, use GetDataStorage() and set the property
           yourself for the destinct node.
@@ -182,7 +185,7 @@ namespace mitk
        * @brief Initialize Internal method to initialize the renderwindow and set the datastorage.
        * @param width Height of renderwindow.
        * @param height Width of renderwindow.
-       * @param renderingMode The rendering mode.
+       * @param antiAliasing The anti-aliasing mode.
        */
     void Initialize(
       int width,
@@ -190,7 +193,7 @@ namespace mitk
       AntiAliasing antiAliasing = AntiAliasing::None);
 
     /** @brief This method tries to load the given file into a member datastorage, in order to render it.
-          @param fileName The filename of the file to be loaded (including path).
+          @param filename The filename of the file to be loaded (including path).
       **/
     void AddToStorage(const std::string &filename);
 

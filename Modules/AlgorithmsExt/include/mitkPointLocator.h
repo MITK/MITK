@@ -127,6 +127,8 @@ namespace mitk
     * no point is found, since as a precondition at least one point has to be contained
     * in the point set.
     * @param point the query point, for whom the minimal distance will be determined
+    * @param id
+    * @param dist
     * @returns the index of and distance (in world coordinates) between the nearest point in point set and the given
     * point
     */

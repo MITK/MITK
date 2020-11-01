@@ -77,17 +77,17 @@ namespace mitk
      - (0020,0037) %Image Orientation (Patient)
      - (0018,0050) Slice Thickness
      - (0028,0008) Number of Frames
-    2. As are two forced \b last steps:
-      1. There will always be an instance of EquiDistantBlocksSorter,
-         which ensures that there is an equal distance between all the frames of an Image.
-         This is required to achieve correct geometrical positions in the mitk::Image,
-         i.e. it is essential to be able to make measurements in images.
-         - whether or not the distance is required to be orthogonal to the image planes is configured by SetFixTiltByShearing().
-         - during this check, we need to tolerate some minor errors in documented vs. calculated image origins.
-           The amount of tolerance can be adjusted by SetToleratedOriginOffset() and SetToleratedOriginOffsetToAdaptive().
-           Please see EquiDistantBlocksSorter for more details. The default should be good for most cases.
-      2. There is always an instance of NormalDirectionConsistencySorter,
-         which makes the order of images go along the image normals (see NormalDirectionConsistencySorter)
+   2. As are two forced \b last steps:
+     1. There will always be an instance of EquiDistantBlocksSorter,
+        which ensures that there is an equal distance between all the frames of an Image.
+        This is required to achieve correct geometrical positions in the mitk::Image,
+        i.e. it is essential to be able to make measurements in images.
+       - whether or not the distance is required to be orthogonal to the image planes is configured by SetFixTiltByShearing().
+       - during this check, we need to tolerate some minor errors in documented vs. calculated image origins.
+         The amount of tolerance can be adjusted by SetToleratedOriginOffset() and SetToleratedOriginOffsetToAdaptive().
+         Please see EquiDistantBlocksSorter for more details. The default should be good for most cases.
+     2. There is always an instance of NormalDirectionConsistencySorter,
+        which makes the order of images go along the image normals (see NormalDirectionConsistencySorter)
 
   \section DICOMITKSeriesGDCMReader_UserConfiguration User Configuration
 
@@ -163,7 +163,7 @@ namespace mitk
 
   For the correction, we examine two consecutive slices of a series, both described as a pair (origin/orientation):
     - we calculate if the first origin is on a line along the normal of the second slice
-      - if this is not the case, the geometry will not fit a normal mitk::Image/mitk::Geometry3D
+      - if this is not the case, the geometry will not fit a normal mitk::Image/mitk::%Geometry3D
       - we then project the second origin into the first slice's coordinate system to quantify the shift
       - both is done in class GantryTiltInformation with quite some comments.
 
@@ -172,7 +172,7 @@ namespace mitk
     - red: the output of ITK ImageSeriesReader: wrong, larger spacing, no tilt
     - blue: how much a shear must correct
 
-  \image html tilt-correction.jpg
+  \image html Modules/DICOM/doc/Doxygen/tilt-correction.jpg
 
   \subsection DICOMITKSeriesGDCMReader_Condensing Sub-classes can condense multiple blocks into a single larger block
 

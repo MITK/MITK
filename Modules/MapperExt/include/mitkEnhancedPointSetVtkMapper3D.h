@@ -55,7 +55,7 @@ namespace mitk
   * extended so that point representations are stored in a lookup table,
   * which is indexed by point data from the rendered PointSet.
   *
-  * \warn This mapper requires the PointData container to be the same size
+  * \warning This mapper requires the PointData container to be the same size
   *       as the point container.
   *
   * \sa PointSetVtkMapper3D

@@ -39,7 +39,7 @@ namespace mitk
     mitkClassMacro(LabeledImageLookupTable, LookupTable);
 
     /**
-     * Make this object constructable by the ::New() Method.
+     * Make this object constructable by the ::%New() Method.
      */
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);

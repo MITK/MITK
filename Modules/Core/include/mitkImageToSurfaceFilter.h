@@ -162,9 +162,7 @@ namespace mitk
      * Set desired TargetReduction of triangles in the range from 0.0 to 1.0.
      * The destroyed triangles are in relation with the size of data. For example 0.9
      * will reduce the data set to 10%.
-     *
-     * @param Set a TargetReduction float-value from 0.0 to 1.0
-     * */
+     */
     itkSetMacro(TargetReduction, float);
 
     /**

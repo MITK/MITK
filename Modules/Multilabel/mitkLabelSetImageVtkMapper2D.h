@@ -148,8 +148,6 @@ namespace mitk
 
     /** \brief Generates a plane according to the size of the resliced image in milimeters.
       *
-      * \image html texturedPlane.png
-      *
       * In VTK a vtkPlaneSource is defined through three points. The origin and two
       * points defining the axes of the plane (see VTK documentation). The origin is
       * set to (xMin; yMin; Z), where xMin and yMin are the minimal bounds of the
@@ -164,7 +162,9 @@ namespace mitk
     void GeneratePlane(mitk::BaseRenderer *renderer, double planeBounds[6]);
 
     /** \brief Generates a vtkPolyData object containing the outline of a given binary slice.
-        \param renderer: Pointer to the renderer containing the needed information
+        \param renderer Pointer to the renderer containing the needed information
+        \param image
+        \param pixelValue
         \note This code is based on code from the iil library.
         */
     vtkSmartPointer<vtkPolyData> CreateOutlinePolyData(mitk::BaseRenderer *renderer,

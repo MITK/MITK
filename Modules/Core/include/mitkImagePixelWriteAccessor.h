@@ -36,8 +36,8 @@ namespace mitk
     typedef itk::SmartPointer<mitk::Image> ImagePointer;
 
     /** \brief Instantiates a mitk::ImageWriteAccessor (see its doxygen page for more details)
-     *  \param Image::Pointer specifies the associated Image
-     *  \param ImageDataItem* specifies the allocated image part
+     *  \param iP specifies the associated Image
+     *  \param iDI specifies the allocated image part
      *  \param OptionFlags properties from mitk::ImageAccessorBase::Options can be chosen and assembled with bitwise
      * unification.
      *  \throws mitk::Exception if the Constructor was created inappropriately

@@ -64,8 +64,8 @@ namespace mitk
      * exist.
       * @param rethrowNumber The internal number of the rethrow.
       * @param file (returnvalue) This varaiable will be filled with the file of the specified rethrow.
-      * @param file (returnvalue) This varaiable will be filled with the line of the specified rethrow.
-      * @param file (returnvalue) This varaiable will be filled with the message of the specified rethrow.
+      * @param line (returnvalue) This varaiable will be filled with the line of the specified rethrow.
+      * @param message (returnvalue) This varaiable will be filled with the message of the specified rethrow.
       */
     void GetRethrowData(int rethrowNumber, std::string &file, int &line, std::string &message);
 

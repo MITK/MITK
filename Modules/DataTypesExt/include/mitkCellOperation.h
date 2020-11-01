@@ -31,10 +31,9 @@ namespace mitk
     //##Documentation
     //##@brief constructor
     //##
-    //## @param
-    //## operationType is the type of that operation (see mitkOperation.h; e.g. move or add; Information for
-    //StateMachine::ExecuteOperation());
-    //## cellId: Id of the cell and a vector if needed
+    //## @param operationType is the type of that operation (see mitkOperation.h; e.g. move or add; Information for StateMachine::ExecuteOperation());
+    //## @param cellId Id of the cell and a vector if needed
+    //## @param vector
     CellOperation(OperationType operationType, int cellId, Vector3D vector);
 
     CellOperation(OperationType operationType, int cellId);

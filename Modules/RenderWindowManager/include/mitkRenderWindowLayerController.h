@@ -88,6 +88,7 @@ namespace mitk
     * @brief Move the data node to the given layer. This will change only the "layer" property.
     *
     * @param dataNode   The data node that should be moved.
+    * @param newLayer
     * @param renderer   Pointer to the renderer instance for which the data node should be moved.
     *                   If it is a nullptr (default) all controlled renderer will be affected.
     */
@@ -134,7 +135,7 @@ namespace mitk
     *
     * @post After a successful call , the "visibility" property will be set to the "visibility" value.
     */
-    void SetVisibilityOfDataNode(bool visiblity, DataNode* dataNode, const BaseRenderer* renderer = nullptr);
+    void SetVisibilityOfDataNode(bool visibility, DataNode* dataNode, const BaseRenderer* renderer = nullptr);
     /**
     * @brief Hide the given data node by setting the "visible" property of the data node for
     *        all controlled renderer to false.
@@ -151,7 +152,7 @@ namespace mitk
     *        If "onlyVisibility = true": set all data nodes for the given render window to invisible, except for the base node.
     *        If "onlyVisibility = false": remove all data nodes from the render window, except for the base node.
     *
-    * @param visibility Boolean to define the reset mode.
+    * @param onlyVisibility Boolean to define the reset mode.
     * @param renderer   Pointer to the renderer instance for which the data node should be reset.
     *                   If it is a nullptr (default) all controlled renderer will be affected.
     *

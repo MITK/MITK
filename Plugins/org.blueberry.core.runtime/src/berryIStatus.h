@@ -80,7 +80,7 @@ struct org_blueberry_core_runtime_EXPORT IStatus: public Object
    * multi-status, or an empty list if this is not a multi-status.
    *
    * @return an array of status objects
-   * @see #isMultiStatus()
+   * @see #IsMultiStatus()
    */
   virtual QList<IStatus::Pointer> GetChildren() const = 0;
 
@@ -135,7 +135,6 @@ struct org_blueberry_core_runtime_EXPORT IStatus: public Object
    *
    * @return the severity: one of <code>OK_TYPE</code>, <code>ERROR_TYPE</code>,
    * <code>INFO_TYPE</code>, <code>WARNING_TYPE</code>,  or <code>CANCEL_TYPE</code>
-   * @see #matches(int)
    */
   virtual Severity GetSeverity() const = 0;
 
@@ -154,7 +153,7 @@ struct org_blueberry_core_runtime_EXPORT IStatus: public Object
    *
    * @return <code>true</code> for a multi-status,
    *    <code>false</code> otherwise
-   * @see #getChildren()
+   * @see #GetChildren()
    */
   virtual bool IsMultiStatus() const = 0;
 
@@ -178,7 +177,7 @@ struct org_blueberry_core_runtime_EXPORT IStatus: public Object
    *    <code>INFO_TYPE</code>, <code>CANCEL_TYPE</code>)
    * @return <code>true</code> if there is at least one match,
    *    <code>false</code> if there are no matches
-   * @see #getSeverity()
+   * @see #GetSeverity()
    * @see #CANCEL_TYPE
    * @see #ERROR_TYPE
    * @see #WARNING_TYPE

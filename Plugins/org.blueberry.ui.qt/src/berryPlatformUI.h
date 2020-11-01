@@ -90,7 +90,7 @@ public:
    * Fails if the workbench UI has already been created.
    * </p>
    * <p>
-   * Use {@link #createDisplay createDisplay} to create the display to pass in.
+   * Use \c createDisplay to create the display to pass in.
    * </p>
    * <p>
    * Note that this method is intended to be called by the application
@@ -104,7 +104,7 @@ public:
    * specializes the workbench
    * @return return code {@link #RETURN_OK RETURN_OK} for normal exit;
    * {@link #RETURN_RESTART RETURN_RESTART} if the workbench was terminated
-   * with a call to {@link IWorkbench#restart IWorkbench.restart};
+   * with a call to \c IWorkbench.restart ;
    * {@link #RETURN_UNSTARTABLE RETURN_UNSTARTABLE} if the workbench could
    * not be started;
    * {@link #RETURN_EMERGENCY_CLOSE RETURN_EMERGENCY_CLOSE} if the UI quit

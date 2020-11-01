@@ -46,7 +46,8 @@ public:
 
   ///
   /// \brief InterpolateCreateCheckerboardPrediction
-  /// \param image
+  /// \param checkerboard_prediction
+  /// \param checkerboard_mask
   /// \param outimage
   ///
   static void InterpolateCheckerboardPrediction(mitk::Image::Pointer checkerboard_prediction, mitk::Image::Pointer & checkerboard_mask, mitk::Image::Pointer & outimage);
@@ -95,6 +96,7 @@ public:
   /// \brief LogicalAndImages
   /// \param image1
   /// \param image2
+  /// \param outimage
   ///
   static void LogicalAndImages(const Image::Pointer &image1, const Image::Pointer &image2, Image::Pointer &outimage);
 
@@ -121,25 +123,23 @@ public:
   /// \param image
   /// \param smoothed (Result is sigma1-sigma2)
   /// \param sigma1
-  /// \param sigma2
   ///
   static void LaplacianOfGaussianFilter(mitk::Image::Pointer image, mitk::Image::Pointer & smoothed, double sigma1);
 
   ///
   /// \brief SubtractGaussianFilter
   /// \param image
-  /// \param smoothed (Result is sigma1-sigma2)
-  /// \param sigma1
-  /// \param sigma2
+  /// \param out
+  /// \param sigma
   ///
   static void HessianOfGaussianFilter(mitk::Image::Pointer image, std::vector<mitk::Image::Pointer> &out, double sigma);
 
   ///
   /// \brief Local Histogram
   /// \param image
-  /// \param smoothed (Result is sigma1-sigma2)
-  /// \param sigma1
-  /// \param sigma2
+  /// \param out
+  /// \param Bins
+  /// \param NeighbourhoodSize
   ///
   static void LocalHistogram(mitk::Image::Pointer image, std::vector<mitk::Image::Pointer> &out, int Bins, int NeighbourhoodSize);
 
@@ -147,7 +147,6 @@ public:
   /// \brief transform
   /// \param matrix
   /// \param mask
-  /// \param outimage
   ///
   template<typename TMatrixElementType>
   static mitk::Image::Pointer Transform(const Eigen::Matrix<TMatrixElementType, Eigen::Dynamic, Eigen::Dynamic> & matrix, const mitk::Image::Pointer & mask)
@@ -189,9 +188,8 @@ public:
   }
   ///
   /// \brief TransformImageToMatrix
-  /// \param in_img
+  /// \param img
   /// \param mask
-  /// \param out_matrix
   ///
   template<typename TMatrixElementType>
   static Eigen::Matrix<TMatrixElementType, Eigen::Dynamic, Eigen::Dynamic> Transform(const mitk::Image::Pointer & img, const mitk::Image::Pointer & mask)
@@ -222,51 +220,51 @@ public:
 
   ///
   /// \brief DilateBinary
-  /// \param BinaryImage
-  /// \param BinaryImage
-  /// \param Size of the StructuringElement
-  /// \param Dimension
+  /// \param sourceImage
+  /// \param resultImage
+  /// \param radius Size of the StructuringElement
+  /// \param d
   ///
   static void DilateBinary(mitk::Image::Pointer & sourceImage, mitk::Image::Pointer& resultImage, int radius , MorphologicalDimensions d);
 
   ///
   /// \brief ErodeBinary
-  /// \param BinaryImage
-  /// \param BinaryImage
-  /// \param Size of the StructuringElement
-  /// \param Dimension
+  /// \param sourceImage
+  /// \param resultImage
+  /// \param radius Size of the StructuringElement
+  /// \param d
   ///
   static void ErodeBinary(mitk::Image::Pointer & sourceImage, mitk::Image::Pointer& resultImage, int radius, MorphologicalDimensions d);
 
   ///
   /// \brief ClosingBinary
-  /// \param BinaryImage
-  /// \param BinaryImage
-  /// \param Size of the StructuringElement
-  /// \param Dimension
+  /// \param sourceImage
+  /// \param resultImage
+  /// \param radius Size of the StructuringElement
+  /// \param d
   ///
   static void ClosingBinary(mitk::Image::Pointer & sourceImage, mitk::Image::Pointer& resultImage, int radius, MorphologicalDimensions d);
 
 
   ///
   /// \brief MergeLabels
-  /// \param MultilabelImage
+  /// \param img
   /// \param map merge instruction where each map entry defines a mapping instruction. Key \c \<sourcelabel\> - Value \c \<targetlabel\>
   ///
   static void MergeLabels(mitk::Image::Pointer & img, const std::map<unsigned int, unsigned int> & map);
 
   ///
   /// \brief ConnectedComponentsImage
-  /// \param BinaryImage
-  /// \param BinaryImage
-  /// \param MultilabelImage
-  /// \param Number of components found in the image
+  /// \param image
+  /// \param mask
+  /// \param outimage
+  /// \param num_components Number of components found in the image
   ///
   static void ConnectedComponentsImage(mitk::Image::Pointer & image, mitk::Image::Pointer& mask, mitk::Image::Pointer &outimage, unsigned int& num_components);
 
   ///
   /// \brief GrabLabel
-  /// \param MultiLabelImage
+  /// \param image
   /// \param outimage
   /// \param label
   ///

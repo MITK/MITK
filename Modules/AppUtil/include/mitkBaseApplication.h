@@ -37,10 +37,10 @@ namespace mitk
    * org.blueberry.osgi.applications extension point.
    *
    * This class contains many convenience methods to:
-   *  - Put the application in \emph{safe mode} which catches unhandled
+   *  - Put the application in <em>safe mode</em> which catches unhandled
    *    exceptions thrown in the Qt event loop and displays an error
    *    message.
-   *  - Put the application in \emph{single mode} which by default
+   *  - Put the application in <em>single mode</em> which by default
    *    sends the command line arguments to an already running instance
    *    of the same application instead of creating a second instance.
    *  - Add a list of library names which should be pre-loaded at
@@ -58,7 +58,7 @@ namespace mitk
    *  - getQApplication() to provide a custom QCoreApplication instance
    *
    * A simple but complete example:
-   * <code>
+   * \code
    * #include <mitkBaseApplication.h>
    *
    * int main(int argc, char* argv[])
@@ -70,7 +70,7 @@ namespace mitk
    *   // Run the workbench
    *   return app.run();
    * }
-   * </code>
+   * \endcode
    */
   class MITKAPPUTIL_EXPORT BaseApplication : public Poco::Util::Application
   {
@@ -275,7 +275,7 @@ namespace mitk
      * then the command line arguments used in starting the platform, and not consumed
      * by the platform code, are passed to the application as a <code>QStringList</code>.
      * </p>
-     * @param argument the argument passed to the application. May be <code>invalid</code>
+     * @param args the argument passed to the application. May be <code>invalid</code>
      * @return the result of running the application
      * @throws std::exception if anything goes wrong
      */

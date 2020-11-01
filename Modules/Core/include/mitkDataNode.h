@@ -202,7 +202,7 @@ namespace mitk
      *
      * Overwrites values in m_PropertyList only when possible (i.e. when types are compatible).
      * If you want to allow for object type changes (replacing a "visible":BoolProperty with "visible":IntProperty,
-     * set the \param replace.
+     * set \c replace .
      *
      * \param replace true: if \param pList contains a property "visible" of type ColorProperty and our m_PropertyList
      * also has a "visible" property of a different type (e.g. BoolProperty), change the type, i.e. replace the objects
@@ -494,7 +494,7 @@ namespace mitk
      * of BoolProperty)
      * \param visible If set to true, the data will be rendered. If false, the render will skip this data.
      * \param renderer Specify a renderer if the visibility shall be specific to a renderer
-     * \param propertykey Can be used to specify a user defined name of the visibility propery.
+     * \param propertyKey Can be used to specify a user defined name of the visibility propery.
      */
     void SetVisibility(bool visible, const mitk::BaseRenderer *renderer = nullptr, const char *propertyKey = "visible");
 

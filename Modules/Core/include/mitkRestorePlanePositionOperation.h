@@ -19,26 +19,9 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  //##Documentation
-  //## TODO
-
   class MITKCORE_EXPORT RestorePlanePositionOperation : public Operation
   {
   public:
-    //##Documentation
-    //##@brief Operation that handles all actions on one Point.
-    //##
-    //## @param operationType is the type of the operation (see mitkOperation.h; e.g. move or add; Information for
-    // StateMachine::ExecuteOperation());
-    //## @param width
-    //## @param height
-    //## @param spacing
-    //## @param pos
-    //## @param direction
-    //## @param transform
-    // PointOperation(OperationType operationType,  Point3D point, int index = -1, bool selected = true,
-    // PointSpecificationType type = PTUNDEFINED);
-
     RestorePlanePositionOperation(OperationType operationType,
                                   ScalarType width,
                                   ScalarType height,

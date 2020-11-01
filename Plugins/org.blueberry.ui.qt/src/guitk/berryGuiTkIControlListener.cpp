@@ -50,6 +50,18 @@ IControlListener::Events
   destroyedEvent -= Delegate(l.GetPointer(), &IControlListener::ControlDestroyed);
 }
 
+void
+IControlListener
+::ControlMoved(ControlEvent::Pointer)
+{
+}
+
+void
+IControlListener
+::ControlResized(ControlEvent::Pointer)
+{
+}
+
 }
 
 }

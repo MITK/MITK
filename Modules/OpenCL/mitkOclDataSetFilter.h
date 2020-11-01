@@ -43,12 +43,14 @@ public:
   /**
    * @brief SetInput Set the input DataSet (as a pointer to the data).
    * @param DataSet The DataSet in mitk::OclDataSet.
+   * @param size
+   * @param BpE
    */
   void SetInput(void* DataSet, unsigned int size, unsigned int BpE);
 
   /**
   * @brief SetInput Set the input DataSet (as mitk::Image).
-  * @param DataSet The DataSet in mitk::OclDataSet.
+  * @param image The DataSet in mitk::OclDataSet.
   */
   void SetInput(mitk::Image::Pointer image);
 

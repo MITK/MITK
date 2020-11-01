@@ -46,7 +46,7 @@ struct BERRY_EXPRESSIONS IPropertyTester : public Object
    * Returns whether the property tester can handle the given
    * property or not.
    *
-   * @param namespace the name space to be considered
+   * @param namespaze the name space to be considered
    * @param property the property to test
    * @return <code>true</code> if the tester provides an implementation
    *  for the given property; otherwise <code>false</code> is returned

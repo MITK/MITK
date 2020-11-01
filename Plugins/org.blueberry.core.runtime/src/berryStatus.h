@@ -99,6 +99,7 @@ public:
    * @param code the plug-in-specific status code, or <code>OK</code>
    * @param message a human-readable message, localized to the
    *    current locale
+   * @param sl
    */
   Status(const Severity& severity, const QString& pluginId, int code, const QString& message,
          const SourceLocation& sl);
@@ -112,7 +113,8 @@ public:
    * @param code the plug-in-specific status code, or <code>OK</code>
    * @param message a human-readable message, localized to the
    *    current locale
-   * @param exception a low-level exception.
+   * @param exc a low-level exception.
+   * @param sl
    */
   Status(const Severity& severity, const QString& pluginId, int code, const QString& message,
          const ctkException& exc, const SourceLocation& sl);
@@ -126,6 +128,7 @@ public:
    * @param pluginId the unique identifier of the relevant plug-in
    * @param message a human-readable message, localized to the
    *    current locale
+   * @param sl
    */
   Status(const Severity& severity, const QString& pluginId, const QString& message,
          const SourceLocation& sl);
@@ -139,7 +142,8 @@ public:
    * @param pluginId the unique identifier of the relevant plug-in
    * @param message a human-readable message, localized to the
    *    current locale
-   * @param exception a low-level exception.
+   * @param exc a low-level exception.
+   * @param sl
    */
   Status(const Severity& severity, const QString& pluginId, const QString& message,
          const ctkException& exc, const SourceLocation& sl);

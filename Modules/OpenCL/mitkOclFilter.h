@@ -37,7 +37,7 @@ public:
     * @brief Add a source file from the resource files to the
     *        OpenCL shader file list. Multiple files can be added to the list.
     *
-    *  @param name of the file in the resource system
+    *  @param filename of the file in the resource system
     */
     void AddSourceFile(const char* filename);
 
@@ -137,7 +137,7 @@ protected:
       * @brief Add some source code on the beginning of the loaded source
       *
       * In this way, some preprocessor flags for the CL compiler can at the beginning of the filter
-      * @param preambel Source preambel for e.g. #define commands to be inserted into the OpenCL source
+      * @param preambel Source preambel for e.g. \c \#define commands to be inserted into the OpenCL source
       */
   void SetSourcePreambel(const char* preambel);
 
@@ -151,6 +151,7 @@ protected:
    * @brief Helper functions that load sourcefiles from the module context in the Initialize function.
    * @param SourceCodeList holds the sourcecode for every file as string, the SourceCodeSizeList holst the
    *        size of every file in bytes.
+   * @param SourceCodeSizeList
    */
   void LoadSourceFiles(CStringList &SourceCodeList, ClSizeList &SourceCodeSizeList);
 };

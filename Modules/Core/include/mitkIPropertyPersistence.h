@@ -23,13 +23,12 @@ namespace mitk
     *
     * This service allows you to manage persistence info for base data properties.
     * Persistent properties will be saved if the file format supports custom key value pairs like the .nrrd file
-   * format.\n
+    * format.\n
     * \remark The service supports the use of regular expressions (regex; ECMAscript syntax)
     * for property names and persistance keys to specifiy persistence rules in a generic way. The getter of the
-   * interface
+    * interface
     * (GetInfo and GetInfoByKey) will always ensure that the return containes no regex, thus name and key in the results
-    * can directly be used. For details on how the result names and keys are determined, please @TODO
-    *
+    * can directly be used.
     */
   class MITKCORE_EXPORT IPropertyPersistence
   {
@@ -46,7 +45,6 @@ namespace mitk
       * You may enforce to overwrite the old equal info for a property name
       * by the overwrite parameter.
       *
-      * \param[in] propertyName Name of the property.
       * \param[in] info Persistence info of the property.
       * \param[in] overwrite Overwrite already existing persistence info.
       * \return True if persistence info was added successfully.
@@ -79,7 +77,7 @@ namespace mitk
 
     /** \brief Get the persistence info that will use the specified key.
     *
-    * \param[in] propertyName Name of the property.
+    * \param[in] persistenceKey Name of the property.
     * \param[in] allowKeyRegEx Indicates if also added info instances with regexs for the key are being checked.
     * \return Property persistence info or null pointer if no persistence info is available.
     */

@@ -84,7 +84,7 @@ namespace mitk
       *
       * @param input The photoacoustic image
       */
-    void SetPaInput(mitk::Image::Pointer);
+    void SetPaInput(mitk::Image::Pointer input);
     /*!
      * \brief Wrapper which gets the photoacoustic image out of the correct input
      *
@@ -104,7 +104,7 @@ namespace mitk
      *
      * @param input The ultrasonic image
      */
-    void SetUsInput(mitk::Image::Pointer);
+    void SetUsInput(mitk::Image::Pointer input);
     /*!
      * \brief Wrapper which gets the ultrasonic image out of the correct input
      *
@@ -267,7 +267,7 @@ namespace mitk
      * @param flow The optical flow which is the base for the remapping.
      * @return The remapping map.
      */
-    cv::Mat ComputeFlowMap(cv::Mat);
+    cv::Mat ComputeFlowMap(cv::Mat flow);
 
   private:
     // Parameters

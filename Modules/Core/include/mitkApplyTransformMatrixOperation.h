@@ -24,14 +24,12 @@ namespace mitk
   class MITKCORE_EXPORT ApplyTransformMatrixOperation : public Operation
   {
   public:
-    //##Documentation
-    //##@brief Operation that applies a new vtk transform matrix.
-    //##
-    //## @param operationType is the type of the operation (see mitkOperation.h; e.g. move or add; Information for
-    // StateMachine::ExecuteOperation());
-    //## @param matrix is the vtk 4x4 vtk matrix of the transformation
-    //## @param refPoint is the reference point for realigning the plane stack
-
+    /** @brief Operation that applies a new vtk transform matrix.
+      *
+      * @param operationType is the type of the operation (see mitkOperation.h; e.g. move or add; Information for StateMachine::ExecuteOperation());
+      * @param matrix is the vtk 4x4 vtk matrix of the transformation
+      * @param refPoint is the reference point for realigning the plane stack
+      */
     ApplyTransformMatrixOperation(OperationType operationType,
                                   vtkSmartPointer<vtkMatrix4x4> matrix,
                                   mitk::Point3D refPoint);

@@ -24,7 +24,7 @@ namespace mitk
   * An input device provides a method to register and unregister itself. Meaning <br>
   * for example adding listeners and instianciate classes necessary to use the input device.
   *
-  * @noimplement This interface is not intended to be implemented by clients.
+  * @note This interface is not intended to be implemented by clients.
   * @ingroup org_mitk_core_ext
   */
   struct IInputDevice : public berry::Object

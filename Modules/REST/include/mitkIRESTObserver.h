@@ -34,8 +34,10 @@ namespace mitk
     /**
      * @brief Called if there's an incoming request for the observer, observer implements how to handle request
      *
+     * @param uri
      * @param data the data of the incoming request
-	 * @param method the http method of the incoming request
+	   * @param method the http method of the incoming request
+     * @param headers
      * @return the modified data
      */
     virtual web::http::http_response Notify(const web::uri &uri,

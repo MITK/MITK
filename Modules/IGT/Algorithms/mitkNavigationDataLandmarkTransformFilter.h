@@ -138,10 +138,9 @@ namespace mitk {
     * after ICP, landmark correspondences are established and the source landmarks are sorted, so that
     * corresponding landmarks have the same indices.
     *
-    * \param[in] sources Source landmarks that will be mapped to the target landmarks
+    * \param[in,out] sources Source landmarks that will be mapped to the target landmarks. The sources container will be sorted,
+    *                        so that landmarks have the same index as their corresponding target landmarks.
     * \param[in] targets Target landmarks onto which the source landmarks will be mapped
-    * \param[out] sources The sources container will be sorted,
-                  so that landmarks have the same index as their corresponding target landmarks
     * \return true if ICP was successful and sources are sorted , false otherwise
     */
     bool FindCorrespondentLandmarks(LandmarkPointContainer& sources, const LandmarkPointContainer& targets) const;

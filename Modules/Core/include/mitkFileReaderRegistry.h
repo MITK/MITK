@@ -46,7 +46,7 @@ namespace mitk
 
     /**
      * @brief Get the highest ranked mime-type for the given file name.
-     * @param extension A file name extension without a leading dot.
+     * @param path
      * @param context
      * @return The highest ranked mime-type containing \c extension in
      *         its extension list.

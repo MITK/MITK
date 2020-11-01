@@ -48,7 +48,7 @@ namespace mitk
 </DICOMFileReader>
 \endverbatim
 
-  The root-tag \i <DICOMFileReader> names the class to be instantiated, currently this can be one of
+  The root-tag \c \<DICOMFileReader\> names the class to be instantiated, currently this can be one of
    - DICOMITKSeriesGDCMReader
    - ThreeDnTDICOMSeriesReader
 
@@ -62,8 +62,8 @@ namespace mitk
   <pre>group3DnT="true|false"</pre>
   Determines whether images at the same spatial position should be interpreted as 3D+t images.
 
-  The tags <Distinguishing> and <Sorting> describe the basic loading strategy of both
-  reader mentioned above: first images are divided into incompatible groups (<Distinguishing>),
+  The tags \c \<Distinguishing\> and \c \<Sorting\> describe the basic loading strategy of both
+  reader mentioned above: first images are divided into incompatible groups (\c \<Distinguishing\>),
   and afterwards the images within each group are sorted by means of DICOMSortCriterion, which
   most commonly mentions a tag.
 

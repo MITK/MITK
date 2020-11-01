@@ -32,15 +32,14 @@ namespace berry {
  * attribute in a <code>view</code> extension contributed to the workbench's
  * view extension point (named <code>"org.blueberry.ui.views"</code>).
  * For example, the plug-in's XML markup might contain:
- * <pre>
- * &LT;extension point="org.blueberry.ui.views"&GT;
- *      &LT;view id="com.example.myplugin.view"
+ * \code{.unparsed}
+ * <extension point="org.blueberry.ui.views">
+ *   <view id="com.example.myplugin.view"
  *         name="My View"
  *         class="com.example.myplugin.MyView"
- *         icon="images/eview.gif"
- *      /&GT;
- * &LT;/extension&GT;
- * </pre>
+ *         icon="images/eview.gif"/>
+ * </extension>
+ * \endcode
  * where <code>com.example.myplugin.MyView</code> is the name of the
  * <code>ViewPart</code> subclass.
  * </p>

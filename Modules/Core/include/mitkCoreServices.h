@@ -109,6 +109,7 @@ namespace mitk
     /**
      * @brief Unget a previously acquired service instance.
      * @param service The service instance to be released.
+     * @param context
      * @return \c true if ungetting the service was successful, \c false otherwise.
      */
     template <class S>

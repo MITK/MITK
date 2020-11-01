@@ -31,8 +31,8 @@ namespace mitk
     typedef Image::Pointer ImagePointer;
 
     /** \brief Orders write access for a slice, volume or 4D-Image
-     *  \param Image::Pointer specifies the associated Image
-     *  \param ImageDataItem* specifies the allocated image part
+     *  \param image specifies the associated Image
+     *  \param iDI specifies the allocated image part
      *  \param OptionFlags properties from mitk::ImageAccessorBase::Options can be chosen and assembled with bitwise
      * unification.
      *  \throws mitk::Exception if the Constructor was created inappropriately

@@ -181,7 +181,7 @@ public:
   * @param checkParameterActivation Indicates if the features should only be calculated and added if the FeatureClass is activated in the parameters.
   * True: only append if activated in the parametes. False: always and append it.
   */
-  void CalculateAndAppendFeatures(const Image* image, const Image* mask, const Image* maskNoNAN, FeatureListType &featureList, bool checkParameterActivation = true);
+  void CalculateAndAppendFeatures(const Image* image, const Image* mask, const Image* maskNoNaN, FeatureListType &featureList, bool checkParameterActivation = true);
 
   itkSetMacro(Prefix, std::string);
   itkSetMacro(ShortName, std::string);

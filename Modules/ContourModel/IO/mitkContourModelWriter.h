@@ -89,7 +89,7 @@ namespace mitk
     * Writes the geometry information of the TimeGeometry to an outstream.
     * The root tag is not included.
     * @param geometry the TimeGeometry of the contour.
-    * @param the stream to write to.
+    * @param out the stream to write to.
     */
     void WriteGeometryInformation(const mitk::TimeGeometry *geometry, std::ostream &out);
 
@@ -97,7 +97,7 @@ namespace mitk
     * Writes the geometry information of the TimeGeometry to an outstream.
     * The root tag is not included.
     * @param geometry the TimeGeometry of the contour.
-    * @param the stream to write to.
+    * @param out the stream to write to.
     *
     * \deprecatedSince{2013_09} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see
     * http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201

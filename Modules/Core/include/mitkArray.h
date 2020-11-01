@@ -49,7 +49,7 @@ namespace mitk
    * @brief Copies elements of an array to this Vector
    * @param[in] array    the array whose values will be copied into the Vector. Must be of a type which overrides the []
    * operator
-   * @param return       the FixedArrray (e.g., mitk::Vector or mitk::Point) which should hold the elements of array.
+   * @return       the FixedArray (e.g., mitk::Vector or mitk::Point) which should hold the elements of array.
    * @attention array must be of dimension NVectorDimension!
    * @attention this method implicitly converts between data types.
    */

@@ -42,7 +42,7 @@ namespace mitk
    * make sure to set the mitk::RenderingModeProperty to a mode which
    * supports color (e.g. LEVELWINDOW_COLOR). For an example how to use
    * the mitk::ColorProperty see mitkImageVtkMapper2DColorTest.cpp in
-   * Core\Code\Rendering.
+   * Core/Code/Rendering.
    */
   class MITKCORE_EXPORT ColorProperty : public BaseProperty
   {

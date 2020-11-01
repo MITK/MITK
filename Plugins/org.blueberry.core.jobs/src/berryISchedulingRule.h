@@ -76,7 +76,7 @@ struct BERRY_JOBS ISchedulingRule: public Object
    * and must return <code>false</code> when compared  to a rule they know
    * nothing about.
    *
-   * @param rule the rule to check for conflicts
+   * @param myRule the rule to check for conflicts
    * @return <code>true</code> if the rule is conflicting, and <code>false</code>
    *   otherwise.
    */

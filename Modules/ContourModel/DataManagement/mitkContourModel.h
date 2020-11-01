@@ -199,6 +199,7 @@ namespace mitk
 
     /** \brief Concatenate two contours.
     The starting control point of the other will be added at the end of the contour.
+    \param other
     \param timestep - the timestep at which the vertex will be add ( default 0)
     \param check - check for intersections ( default false)
     */

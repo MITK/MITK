@@ -37,7 +37,7 @@ namespace mbilog
      *         the mbi logging mechanism and a logging message is emitted. The method formats the
      *         logging messages to a normal string (depending on formatting mode) and writes it to std::cout.
      *
-     *  \param logMessage Logging message.
+     *  \param l Logging message.
      */
     void ProcessMessage(const mbilog::LogMessage &l) override;
 

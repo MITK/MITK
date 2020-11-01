@@ -30,7 +30,9 @@ namespace mitk
   {
   public:
     /** \brief Creates an ImageVtkWriteAccessor for a whole Image
-     *  \param Image::Pointer specifies the associated Image
+     *  \param iP specifies the associated Image
+     *  \param iDI
+     *  \param imageDataVtk
      */
     ImageVtkReadAccessor(ImageConstPointer iP, const ImageDataItem *iDI, const vtkImageData *imageDataVtk);
 

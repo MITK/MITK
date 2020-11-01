@@ -35,7 +35,7 @@ namespace mitk
   /*!
    *	@brief		This class offers the functionality to evaluate simple mathematical formula
    *				strings (e.g. <code>"3.5 + 4 * x * sin(x) - 1 / 2"</code>).
-   *	@details	Internally it utilizes the @c boost::spirit framework with the @ref Grammar
+   *	@details	Internally it utilizes the @c boost::spirit framework with the Grammar
    *				structure to parse the input string into a valid result number.
    *				Function strings (e.g. @c "sin", @c "tan" or @c "abs") are translated to
    *				actual function calls and variables (e.g. @c "x", @c "myVariable", "amount_")

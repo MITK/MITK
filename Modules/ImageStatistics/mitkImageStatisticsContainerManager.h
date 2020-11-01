@@ -43,6 +43,9 @@ namespace mitk
     @details if more than one StatisticsContainer is found, only the newest (ModifiedTime) is returned
     @pre Datastorage must point to a valid instance.
     @pre image must Point to a valid instance.
+    @param dataStorage
+    @param image
+    @param mask
     @param onlyIfUpToDate Indicates if results should only be returned if the are up to date, thus not older then image and ROI.
     @param noWIP If noWIP is true, the function only returns valid final result and not just its placeholder (WIP).
     If noWIP equals false it might also return a WIP, thus the valid result is currently processed/ordered but might not be ready yet.

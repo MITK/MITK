@@ -45,10 +45,6 @@ namespace mitk {
 
   /** \brief Mapper to resample and display 2D slices of a 3D image.
   *
-  * The following image gives a brief overview of the mapping and the involved parts.
-  *
-  * \image html DoseImageVtkMapper2Darchitecture.png
-  *
   * First, the image is resliced by means of vtkImageReslice. The volume image
   * serves as input to the mapper in addition to spatial placement of the slice and a few other
   * properties such as thick slices. This code was already present in the old version
@@ -215,8 +211,6 @@ namespace mitk {
     void TransformActor(mitk::BaseRenderer* renderer);
 
     /** \brief Generates a plane according to the size of the resliced image in milimeters.
-    *
-    * \image html texturedPlane.png
     *
     * In VTK a vtkPlaneSource is defined through three points. The origin and two
     * points defining the axes of the plane (see VTK documentation). The origin is

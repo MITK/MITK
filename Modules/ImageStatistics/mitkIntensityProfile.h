@@ -84,6 +84,7 @@ namespace mitk
   /** \brief Compute global maximum of an intensity profile.
     *
     * \param[in] intensityProfile An intensity profile.
+    * \param[out] max The global maximum.
     *
     * \return Index of the global maximum.
     */
@@ -92,6 +93,7 @@ namespace mitk
   /** \brief Compute global minimum of an intensity profile.
     *
     * \param[in] intensityProfile An intensity profile.
+    * \param[out] min The global minimum.
     *
     * \return Index of the global minimum.
     */

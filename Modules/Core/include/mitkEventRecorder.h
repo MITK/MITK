@@ -22,27 +22,29 @@ namespace mitk
   /**
      *\class EventRecorder
      *@brief Observer that enables recoding of all user interaction with the render windows and storing it in an XML
-    *file.
+     *file.
      *
      * @ingroup Interaction
      *
-     * XML file will look like
+     * XML file will look like:
      *
-     *  <?xml version="1.0"?>
-     *  <interactions>
+     * \code{.unparsed}
+     * <?xml version="1.0"?>
+     * <interactions>
      *   <config>
-     *    <renderer RendererName="stdmulti.widget0" ViewDirection="0"/>
-     *    <renderer RendererName="stdmulti.widget1" ViewDirection="1"/>
-     *    <renderer RendererName="stdmulti.widget2" ViewDirection="2"/>
+     *     <renderer RendererName="stdmulti.widget0" ViewDirection="0"/>
+     *     <renderer RendererName="stdmulti.widget1" ViewDirection="1"/>
+     *     <renderer RendererName="stdmulti.widget2" ViewDirection="2"/>
      *   </config>
      *   <events>
-     *    <event_variant class="MOUSEMOVEEVENT" >
-     *     <attribute name="PositionOnScreen" value="491,388"/>
-     *     <attribute name="PositionInWorld" value="128,235.771,124.816"/>
-     *     <attribute name="RendererName" value="stdmulti.widget1"/>
-     *    </event_variant>
+     *     <event_variant class="MOUSEMOVEEVENT" >
+     *       <attribute name="PositionOnScreen" value="491,388"/>
+     *       <attribute name="PositionInWorld" value="128,235.771,124.816"/>
+     *       <attribute name="RendererName" value="stdmulti.widget1"/>
+     *     </event_variant>
      *   </events>
-     *  </interactions>
+     * </interactions>
+     * \endcode
      **/
   class MITKCORE_EXPORT EventRecorder : public InteractionEventObserver
   {

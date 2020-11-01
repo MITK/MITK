@@ -23,48 +23,6 @@ found in the LICENSE file.
 
 namespace mitk {
 
-   ///**
-   //* \brief Is a helper class to make measurments for latency and fps
-   //*
-   //* \ingroup OpenIGTLink
-   //*/
-   //class MITKOPENIGTLINK_EXPORT IGTLMeasurementsImplementation : public itk::Object
-   //{
-   //public:
-   //   mitkClassMacroItkParent(IGTLMeasurementsImplementation, itk::Object);
-   //   itkFactorylessNewMacro(Self)
-   //   itkCloneMacro(Self)
-
-   //   typedef std::list<long long>                    MeasurementList;
-   //   typedef std::map<unsigned int, MeasurementList> MeasurementPoints;
-
-   //   /**
-   //   * \brief AddMeasurementPoint
-   //   */
-   //   void AddMeasurement(unsigned int measurementPoint);
-   //   bool ExportData(std::string filename);
-
-   //   /**
-   //   * \brief clears all measurements
-   //   */
-   //   void Reset();
-
-   //   void SetStarted(bool started);
-
-   //   void RegisterAsMicroservice();
-   //   void UnRegisterMicroservice();
-   //protected:
-   //   IGTLMeasurementsImplementation();
-   //   ~IGTLMeasurementsImplementation();
-
-   //   /** \brief  */
-   //   MeasurementPoints                                      m_MeasurementPoints;
-
-   //   bool m_IsStarted;
-
-   //   us::ServiceRegistration<Self> m_ServiceRegistration;
-   //};
-
   /**
   * \brief Is a helper class to make measurments for latency and fps
   *
@@ -78,6 +36,8 @@ namespace mitk {
 
     /**
     * \brief AddMeasurementPoint
+    * \param measurementPoint
+    * \param index
     * \param timestamp Sets the timestamp, if it is 0 the current system time is used.
     */
     void AddMeasurement(unsigned int measurementPoint, unsigned int index, long long timestamp = 0);

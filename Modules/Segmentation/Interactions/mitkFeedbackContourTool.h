@@ -72,8 +72,11 @@ namespace mitk
     /**
       \brief Projects a contour onto an image point by point. Converts from world to index coordinates.
 
+      \param slice
+      \param contourIn3D
       \param correctionForIpSegmentation adds 0.5 to x and y index coordinates (difference between ipSegmentation and
       MITK contours)
+      \param constrainToInside
     */
     ContourModel::Pointer ProjectContourTo2DSlice(Image *slice,
                                                   ContourModel *contourIn3D,
@@ -83,6 +86,8 @@ namespace mitk
     /**
       \brief Projects a slice index coordinates of a contour back into world coordinates.
 
+      \param sliceGeometry
+      \param contourIn2D
       \param correctionForIpSegmentation subtracts 0.5 to x and y index coordinates (difference between ipSegmentation
       and MITK contours)
     */

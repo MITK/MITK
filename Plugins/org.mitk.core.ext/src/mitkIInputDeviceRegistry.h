@@ -31,7 +31,7 @@ namespace mitk
    * </p>
    *
    * @see mitk::IInputDeviceDescriptor
-   * @noimplement This interface is not intended to be implemented by clients.
+   * @note This interface is not intended to be implemented by clients.
    * @ingroup org_mitk_core_ext
    */
   struct IInputDeviceRegistry

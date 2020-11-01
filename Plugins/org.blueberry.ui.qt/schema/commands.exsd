@@ -1,0 +1,466 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.blueberry.ui" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="org.blueberry.ui" id="commands" name="Commands"/>
+      </appinfo>
+      <documentation>
+         &lt;p&gt;
+The &lt;code&gt;org.blueberry.ui.commands&lt;/code&gt; extension point is used to declare commands and command categories, using the &lt;code&gt;command&lt;/code&gt; and &lt;code&gt;category&lt;/code&gt; elements. A command is an abstract representation of some semantic behaviour, but not it&apos;s actual implementation.  This allows different developers to contribute specific behaviour for their individual parts.  For example, there might be a &quot;paste&quot; command with one implementation in an editor and a different implementation in an explorer widget.  These implementations are called handlers.  Commands can also be viewed as declarative function pointers, or signal handlers.
+&lt;/p&gt;
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="category" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="command" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="commandParameterType" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  An optional identifier of the extension instance.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  An optional name of the extension instance.
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  A fully qualified identifier of the target extension point.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="command">
+      <annotation>
+         <documentation>
+            &lt;p&gt;
+This element is used to define commands. A command represents an request from the user that can be handled by an action, and should be semantically unique among other commands. Do not define a command if there is already one defined with the same meaning. If more than one of these elements exist with the same &lt;code&gt;id&lt;/code&gt; attribute, only the last declared element (in order of reading the plugin registry) is considered valid. See the extension points &lt;a href=&quot;org_blueberry_ui_actionSets.html&quot;&gt;org.blueberry.ui.actionSets&lt;/a&gt; and &lt;a href=&quot;org_blueberry_ui_editorActions.html&quot;&gt;org.blueberry.ui.editorActions&lt;/a&gt; to understand how actions are connected to commands.
+&lt;/p&gt;
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="defaultHandler" minOccurs="0" maxOccurs="1"/>
+            <element ref="state" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="commandParameter" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="description" type="string">
+            <annotation>
+               <documentation>
+                  A translatable short description of this command for display in the UI.
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The unique identifier of this command.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The translatable name of this command for display in the UI. Commands are typically named in the form of an imperative verb.
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="categoryId" type="string">
+            <annotation>
+               <documentation>
+                  The unique id of the category for this command. If this command does not specify a category it will be placed in an global &quot;Uncategorized&quot; category.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="defaultHandler" type="string">
+            <annotation>
+               <documentation>
+                  The default handler for this command (see the &lt;a href=&quot;org_blueberry_ui_handlers.html&quot;&gt;org.blueberry.ui.handlers&lt;/a&gt; extension point).  If no other handler is active, this handler will be active.  This handler will conflict with other handler definitions that specify no &lt;code&gt;activeWhen&lt;/code&gt; conditions.  If you are creating an &lt;code&gt;IExecutableExtension&lt;/code&gt;, you can use the &lt;code&gt;defaultHandler&lt;/code&gt; element instead.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn="org.eclipse.core.commands.IHandler"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="returnTypeId" type="string">
+            <annotation>
+               <documentation>
+                  The id of a &lt;code&gt;commandParameterType&lt;/code&gt; indicating the type of value returned by this command.  Specifying a &lt;code&gt;returnTypeId&lt;/code&gt; allows clients executing the command to associate the value returned with a type and to convert the value to a QString form that may be stored and/or passed to another command that accepts parameters of the same type.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="helpContextId" type="string">
+            <annotation>
+               <documentation>
+                  The identifier of the help context that relates to this command in general.  Handlers can override this context identifier to provide help that is more specific to their particular behaviours.
+&lt;p&gt;&lt;em&gt;Not used yet&lt;/em&gt;&lt;/p&gt;
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="category">
+      <annotation>
+         <documentation>
+            &lt;p&gt;
+In the UI, commands are often organized by category to make them more manageable. This element is used to define these categories. Commands can add themselves to at most one category. If more than one of these elements exist with the same &lt;code&gt;id&lt;/code&gt; attribute, only the last declared element (in order of reading the plugin registry) is considered valid.
+&lt;/p&gt;
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="description" type="string">
+            <annotation>
+               <documentation>
+                  A translatable short description of this category for display in the UI.
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The unique identifier of this category.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The translatable name of this category for display in the UI.
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="commandParameter">
+      <annotation>
+         <appinfo>
+            <meta.element labelAttribute="id"/>
+         </appinfo>
+         <documentation>
+            &lt;p&gt;
+Defines a parameter that a command should understand.  A parameter is a way to provide more information to a handler at execution time.  For example, a &quot;show view&quot; command might take a view as a parameter.  Handlers should be able to understand these parameters, so they should be treated like API.
+&lt;/p&gt;
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="values" minOccurs="0" maxOccurs="1"/>
+         </sequence>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The unique identifier for this parameter.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The name for the parameter.  This is the name as it will be displayed to an end-user.  As such, it should be translatable.  The name should be short -- preferrably one word.
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="values" type="string">
+            <annotation>
+               <documentation>
+                  The class providing a list of parameter values for the user to select.  This class should implement &lt;code&gt;org.blueberry.core.commands.IParameterValues&lt;/code&gt;.  If this class is not specified, you must specify the more verbose &lt;code&gt;values&lt;/code&gt; element.  Please see &lt;code&gt;org.blueberry.osgi.IExecutableExtension&lt;/code&gt;.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.blueberry.core.commands.IParameterValues"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="typeId" type="string">
+            <annotation>
+               <documentation>
+                  The id of a commandParameterType for this commandParameter.  Specifying a typeId allows handlers of a command to convert string parameter values to objects in a consistent way and it allows potential callers of a command to look for commands that take objects of various types for their parameters.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="optional" type="boolean" use="default" value="true">
+            <annotation>
+               <documentation>
+                  Whether this parameter is optional.  If a parameter is optional, the handler should be able to handle the absence of the parameter.  By default, all parameters are optional.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="commandParameterType">
+      <annotation>
+         <documentation>
+            &lt;p&gt;
+Defines the object type of a commandParameter and may specify an &lt;code&gt;org.blueberry.core.commands.AbstractParameterValueConverter&lt;/code&gt; subclass to convert between string parameter values and objects.
+&lt;/p&gt;
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The unique identifier for this commandParameterType.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="type" type="string">
+            <annotation>
+               <documentation>
+                  The fully qualified name of a class to use as the type of this command parameter.  This attribute is optional, however if omitted, &lt;code&gt;org.blueberry.osgi.Object&lt;/code&gt; will be used as the parameter type.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="converter" type="string">
+            <annotation>
+               <documentation>
+                  The class for converting between objects and string representations of objects for command parameter values.  This class should extend &lt;code&gt;org.blueberry.core.commands.AbstractParameterValueConverter&lt;/code&gt;. The converter should produce and consume objects of the type indicated in the &lt;code&gt;type&lt;/code&gt; attribute. If this class is not specified, this facility to convert between string and object values for this parameter type will not be available (the &lt;code&gt;GetValueConverter()&lt;/code&gt; on class &lt;code&gt;ParameterType&lt;/code&gt; will return &lt;code&gt;null&lt;/code&gt;).
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn="org.eclipse.core.commands.AbstractParameterValueConverter"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="values">
+      <annotation>
+         <appinfo>
+            <meta.element labelAttribute="class"/>
+         </appinfo>
+         <documentation>
+            &lt;p&gt;
+The more verbose version of the &lt;code&gt;values&lt;/code&gt; attribute on the &lt;code&gt;commandParameter&lt;/code&gt;.
+&lt;/p&gt;
+         </documentation>
+      </annotation>
+      <complexType>
+         <choice>
+            <element ref="parameter" minOccurs="0" maxOccurs="unbounded"/>
+         </choice>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The class providing a list of parameter values for the user to select.  This class should implement &lt;code&gt;org.blueberry.core.commands.IParameterValues&lt;/code&gt;.  If this class is not specified, you must specify the more verbose &lt;code&gt;values&lt;/code&gt; element.  Please see &lt;code&gt;org.blueberry.osgi.IExecutableExtension&lt;/code&gt;.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn="org.eclipse.core.commands.IParameterValues"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="parameter">
+      <annotation>
+         <appinfo>
+            <meta.element labelAttribute="name"/>
+         </appinfo>
+         <documentation>
+            &lt;p&gt;
+A possible value for a parameter.
+&lt;/p&gt;
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The name of the parameter to pass to the &lt;code&gt;IExecutableExtension&lt;/code&gt;.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="value" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The value of the parameter to pass to the &lt;code&gt;IExecutableExtension&lt;/code&gt;.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="defaultHandler">
+      <annotation>
+         <appinfo>
+            <meta.element labelAttribute="class"/>
+         </appinfo>
+         <documentation>
+            &lt;p&gt;
+The default handler for this command.  If no other handler is active, this handler will be active.  This handler will conflict with other handler definitions that specify no &lt;code&gt;activeWhen&lt;/code&gt; conditions.  If you are not creating an &lt;code&gt;IExecutableExtension&lt;/code&gt;, you can use the &lt;code&gt;defaultHandler&lt;/code&gt; attribute instead.
+&lt;/p&gt;
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="parameter"/>
+         </sequence>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The class which implements &lt;code&gt;org.blueberry.core.commands.IHandler&lt;/code&gt;.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn="org.eclipse.core.commands.IHandler"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="state">
+      <annotation>
+         <appinfo>
+            <meta.element labelAttribute="class"/>
+         </appinfo>
+         <documentation>
+            &lt;p&gt;
+State information shared between all handlers, and potentially persisted between sessions.The state is simply a class that is loaded to look after the state.  See the API Information for more details.  This is not used for UI attributes like a menu contribution check box state or label.
+&lt;/p&gt;
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="class" minOccurs="0" maxOccurs="1"/>
+         </sequence>
+         <attribute name="class" type="string">
+            <annotation>
+               <documentation>
+                  The class that can be loaded to store the state of this command.  State is shared amongst handlers, and can be persisted between sessions.  This class must implement &lt;code&gt;org.blueberry.core.commands.State&lt;/code&gt;.  Please see API Information.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  A unique identifier for this state.  This is used for persisting the state between sessions (if the state is an instance of &lt;code&gt;org.blueberry.core.commands.PersistentState&lt;/code&gt;).  Certain common identifiers (see &lt;code&gt;org.blueberry.ui.menus.IMenuStateIds&lt;/code&gt;) are understood when the command is being rendered in the menus or tool bars.  The identifier only needs to be unique within the command defining the state.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="class">
+      <annotation>
+         <appinfo>
+            <meta.element labelAttribute="class"/>
+         </appinfo>
+         <documentation>
+            &lt;p&gt;
+The class that can be loaded to store the state of this command.  This element is used if you wish to pass multiple parameters to an &lt;code&gt;org.blueberry.osgi.IExecutableExtension&lt;/code&gt;.
+&lt;/p&gt;
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="parameter" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The class that can be loaded to store the state of this command.  State is shared amongst handlers, and can be persisted between sessions.  This class must implement &lt;code&gt;org.blueberry.core.commands.State&lt;/code&gt;.  Please see API Information.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         &lt;p&gt;
+1.0
+&lt;/p&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         &lt;p&gt;
+The &lt;code&gt;plugin.xml&lt;/code&gt; file in the &lt;code&gt;org.blueberry.ui&lt;/code&gt; plugin makes extensive use of the &lt;code&gt;org.blueberry.ui.commands&lt;/code&gt; extension point.
+&lt;/p&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="apiInfo"/>
+      </appinfo>
+      <documentation>
+         &lt;p&gt;
+Handlers can be registered with commands using the &lt;code&gt;org.blueberry.ui.handlers.IHandlerService&lt;/code&gt;. This can be retrieved from various workbench components (e.g., workbench, workbench window, part site, etc.) by calling &lt;code&gt;GetService(IHandlerService::ID)&lt;/code&gt;.
+&lt;/p&gt;
+&lt;p&gt;
+In general, it is preferrably to declare all commands statically (in &lt;code&gt;plugin.xml&lt;/code&gt;).  This is so that users can attach key bindings to the commands.  However, it is possible to declare commands at run-time.  To do this, retrieve the &lt;code&gt;org.blueberry.ui.commands.ICommandService&lt;/code&gt; from a workbench component, call &lt;code&gt;GetCommand(yourCommandID)&lt;/code&gt; and then call &lt;code&gt;Command::Define(...)&lt;/code&gt;.
+Commands defined programmatically must be cleaned up by the plugin if it is unloaded.
+&lt;/p&gt;
+&lt;p&gt;
+There are a few default implementations of handler states that may be useful to users of this extension point:
+&lt;/p&gt;
+&lt;ul&gt;
+&lt;!--
+&lt;li&gt;org.eclipse.jface.commands.TextState&lt;/li&gt;
+&lt;li&gt;org.eclipse.jface.commands.RadioState&lt;/li&gt;
+&lt;li&gt;org.eclipse.jface.commands.ToggleState&lt;/li&gt;
+&lt;li&gt;org.eclipse.ui.handlers.RegistryRadioState&lt;/li&gt;
+&lt;li&gt;org.eclipse.ui.handlers.RegistryToggleState&lt;/li&gt;
+--&gt;
+&lt;/ul&gt;
+      </documentation>
+   </annotation>
+
+
+
+</schema>

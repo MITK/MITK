@@ -1,0 +1,535 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.blueberry.core.expressions">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="org.blueberry.core.expressions" id="commonExpression" name="Common Expressions"/>
+      </appInfo>
+      <documentation>
+         
+      </documentation>
+   </annotation>
+
+   <element name="enablement">
+      <annotation>
+         <documentation>
+            A generic root element. The element can be used inside an extension point to define its enablement expression.
+            The children of an enablement expression are combined using the and operator.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="unbounded">
+            <element ref="not"/>
+            <element ref="and"/>
+            <element ref="or"/>
+            <element ref="instanceof"/>
+            <element ref="test"/>
+            <element ref="systemTest"/>
+            <element ref="equals"/>
+            <element ref="count"/>
+            <element ref="with"/>
+            <element ref="resolve"/>
+            <element ref="adapt"/>
+            <element ref="iterate"/>
+            <element ref="reference"/>
+         </sequence>
+      </complexType>
+   </element>
+
+   <element name="not">
+      <annotation>
+         <documentation>
+            This element represent a NOT operation on the result of evaluating it&apos;s sub-element expression.
+         </documentation>
+      </annotation>
+      <complexType>
+         <choice>
+            <element ref="not"/>
+            <element ref="and"/>
+            <element ref="or"/>
+            <element ref="instanceof"/>
+            <element ref="test"/>
+            <element ref="systemTest"/>
+            <element ref="equals"/>
+            <element ref="count"/>
+            <element ref="with"/>
+            <element ref="resolve"/>
+            <element ref="adapt"/>
+            <element ref="iterate"/>
+            <element ref="reference"/>
+         </choice>
+      </complexType>
+   </element>
+
+   <element name="and">
+      <annotation>
+         <documentation>
+            This element represent an AND operation on the result of evaluating all it&apos;s sub-elements expressions.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="unbounded">
+            <element ref="not"/>
+            <element ref="and"/>
+            <element ref="or"/>
+            <element ref="instanceof"/>
+            <element ref="test"/>
+            <element ref="systemTest"/>
+            <element ref="equals"/>
+            <element ref="count"/>
+            <element ref="with"/>
+            <element ref="resolve"/>
+            <element ref="adapt"/>
+            <element ref="iterate"/>
+            <element ref="reference"/>
+         </sequence>
+      </complexType>
+   </element>
+
+   <element name="or">
+      <annotation>
+         <documentation>
+            This element represent an  OR operation on the result of evaluating all it&apos;s sub-element expressions.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="unbounded">
+            <element ref="not"/>
+            <element ref="and"/>
+            <element ref="or"/>
+            <element ref="instanceof"/>
+            <element ref="test"/>
+            <element ref="systemTest"/>
+            <element ref="equals"/>
+            <element ref="count"/>
+            <element ref="with"/>
+            <element ref="resolve"/>
+            <element ref="adapt"/>
+            <element ref="iterate"/>
+            <element ref="reference"/>
+         </sequence>
+      </complexType>
+   </element>
+
+   <element name="instanceof">
+      <annotation>
+         <appInfo>
+            <meta.element labelAttribute="value"/>
+         </appInfo>
+         <documentation>
+            This element is used to perform an instanceof check of the object in focus. The expression returns
+            EvaluationResult.TRUE if the object&apos;s type is a sub type of the type specified by the attribute value.
+            Otherwise EvaluationResult.FALSE is returned.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="value" type="string" use="required">
+            <annotation>
+               <documentation>
+                  a fully qualified name of a class or interface.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn="java.lang.Object"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="test">
+      <annotation>
+         <appInfo>
+            <meta.element labelAttribute="property"/>
+         </appInfo>
+         <documentation>
+            This element is used to evaluate the property state of the object in focus. The set of
+            testable properties can be extended using the propery tester extension point. The test
+            expression returns EvaluationResult.NOT_LOADED if the property tester doing the actual
+            testing isn&apos;t loaded yet and the attribute forcePluginActivation is set to false. 
+            If forcePluginActivation is set to true and the evaluation context used to evaluate
+            this expression support plug-in activation then evaluating the property will result in 
+            activating the plug-in defining the tester.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="property" type="string" use="required">
+            <annotation>
+               <documentation>
+                  the name of an object&apos;s property to test.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="args" type="string">
+            <annotation>
+               <documentation>
+                  additional arguments passed to the property tester. Multiple arguments are seperated
+                  by commas. Each individual argument is converted into a Java base type using the same
+                  rules as defined for the value attribute of the test expression.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="value" type="string">
+            <annotation>
+               <documentation>
+                  the expected value of the property. Can be omitted if the property 
+                  is a boolean property. The test expression is supposed to return 
+EvaluationResult.TRUE if the property matches the value and EvaluationResult.FALSE
+otherwise. The value attribute is converted into a Java base type using the following
+rules:
+&lt;ul&gt;
+ &lt;li&gt;the string &amp;quot;true&amp;quot; is converted into Boolean.TRUE&lt;/li&gt;
+ &lt;li&gt;the string &amp;quot;false&amp;quot; is converted into Boolean.FALSE&lt;/li&gt;
+ &lt;li&gt;if the string contains a dot then the interpreter tries to convert
+ the value into a Float object. If this fails the string is treated as a
+ java.lang.String&lt;/li&gt;
+ &lt;li&gt;if the string only consists of numbers then the interpreter
+ converts the value in an Integer object.&lt;/li&gt;
+ &lt;li&gt;in all other cases the string is treated as a java.lang.String&lt;/li&gt;
+ &lt;li&gt;the conversion of the string into a Boolean, Float, or Integer can
+ be suppressed by surrounding the string with single quotes. For
+ example, the attribute value=&amp;quot;&apos;true&apos;&amp;quot; is converted into the
+ string &amp;quot;true&amp;quot;&lt;/li&gt;
+&lt;/ul&gt;
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="forcePluginActivation" type="boolean">
+            <annotation>
+               <documentation>
+                  a flag indicating whether the plug-in contributing the property tester
+                  should be loaded if necessary. As such, this flag should be used judiciously, 
+                  in order to avoid unnecessary plug-in activations. Most clients should avoid
+                  setting this flag to true. This flag is only honored if the evaluation context
+                  used to evaluate this expression allows plug-in activation. Otherwise the flag
+                  is ignored and no plug-in loading takes place.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="systemTest">
+      <annotation>
+         <appInfo>
+            <meta.element labelAttribute="value"/>
+         </appInfo>
+         <documentation>
+            Tests a system property by calling the System.getProperty method and compares the result
+            with the value specified through the value attribute.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="property" type="string" use="required">
+            <annotation>
+               <documentation>
+                  the name of an system property to test.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="value" type="string" use="required">
+            <annotation>
+               <documentation>
+                  the expected value of the property. The value is interpreted as a string value.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="equals">
+      <annotation>
+         <appInfo>
+            <meta.element labelAttribute="value"/>
+         </appInfo>
+         <documentation>
+            This element is used to perform an equals check of the object in focus. The expression returns
+            EvaluationResult.TRUE if the object is equal to the value provided by the attribute value. Otherwise
+            EvaluationResult.FALSE is returned.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="value" type="string" use="required">
+            <annotation>
+               <documentation>
+                  the expected value. The value provided as a string is converted into
+                  a Java base type using the same rules as for the value attribute of the test expression.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="count">
+      <annotation>
+         <documentation>
+            This element is used to test the number of elements in a collection.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="value" type="string" use="required">
+            <annotation>
+               <documentation>
+                  an expression to specify the number of elements in a list. Following wildcard
+                  characters can be used:
+                  &lt;dl&gt;
+                    &lt;dt&gt;*&lt;/dt&gt; &lt;dd&gt;any number of elements&lt;/dd&gt;
+                    &lt;dt&gt;?&lt;/dt&gt; &lt;dd&gt;no elements or one element&lt;/dd&gt;
+                    &lt;dt&gt;+&lt;/dt&gt; &lt;dd&gt;one or more elements&lt;/dd&gt;
+                    &lt;dt&gt;!&lt;/dt&gt; &lt;dd&gt;no elements&lt;/dd&gt;
+                    &lt;dt&gt;integer value&lt;/dt&gt; &lt;dd&gt;the list must contain the exact number of elements&lt;/dd&gt;
+                  &lt;/dl&gt;
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="with">
+      <annotation>
+         <appInfo>
+            <meta.element labelAttribute="variable"/>
+         </appInfo>
+         <documentation>
+            This element changes the object to be inspected for all its child element to the object
+            referenced by the given variable. If the variable can not be resolved then the expression
+            will throw a ExpressionException when evaluating it. The children of a with expression 
+            are combined using the and operator.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="unbounded">
+            <element ref="not"/>
+            <element ref="and"/>
+            <element ref="or"/>
+            <element ref="instanceof"/>
+            <element ref="test"/>
+            <element ref="systemTest"/>
+            <element ref="equals"/>
+            <element ref="count"/>
+            <element ref="with"/>
+            <element ref="resolve"/>
+            <element ref="adapt"/>
+            <element ref="iterate"/>
+            <element ref="reference"/>
+         </sequence>
+         <attribute name="variable" type="string" use="required">
+            <annotation>
+               <documentation>
+                  the name of the variable to be used for further inspection. It is up to the evaluator
+                  of an extension point to provide the variable in the variable pool.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="resolve">
+      <annotation>
+         <appInfo>
+            <meta.element labelAttribute="variable"/>
+         </appInfo>
+         <documentation>
+            This element changes the object to be inspected for all its child element to the object
+            referenced by the given variable. If the variable can not be resolved then the expression
+            will throw a ExpressionException when evaluating it. The children of a with expression 
+            are combined using the and operator.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="unbounded">
+            <element ref="not"/>
+            <element ref="and"/>
+            <element ref="or"/>
+            <element ref="instanceof"/>
+            <element ref="test"/>
+            <element ref="systemTest"/>
+            <element ref="equals"/>
+            <element ref="count"/>
+            <element ref="with"/>
+            <element ref="resolve"/>
+            <element ref="adapt"/>
+            <element ref="iterate"/>
+            <element ref="reference"/>
+         </sequence>
+         <attribute name="variable" type="string" use="required">
+            <annotation>
+               <documentation>
+                  the name of the variable to be resolved. This variable is then used as the object in focus
+                  for child element evaluation. It is up to the evaluator of an extension point to provide a 
+                  corresponding variable resolver (see IVariableResolver) through the evaluation context passed
+                  to the root expression element when evaluating the expression.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="args" type="string">
+            <annotation>
+               <documentation>
+                  additional arguments passed to the variable resolver. Multiple arguments are seperated
+                  by commas. Each individual argument is converted into a Java base type using the same
+                  rules as defined for the value attribute of the test expression.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="adapt">
+      <annotation>
+         <appInfo>
+            <meta.element labelAttribute="type"/>
+         </appInfo>
+         <documentation>
+            This element is used to adapt the object in focus to the type specified by the attribute
+            type. The expression returns not loaded if either the adapter or the type referenced isn&apos;t
+            loaded yet. It throws a ExpressionException during evaluation if the type name doesn&apos;t exist 
+            at all. The children of an adapt expression are combined using the and operator.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="unbounded">
+            <element ref="not"/>
+            <element ref="and"/>
+            <element ref="or"/>
+            <element ref="instanceof"/>
+            <element ref="test"/>
+            <element ref="systemTest"/>
+            <element ref="equals"/>
+            <element ref="count"/>
+            <element ref="with"/>
+            <element ref="resolve"/>
+            <element ref="adapt"/>
+            <element ref="iterate"/>
+            <element ref="reference"/>
+         </sequence>
+         <attribute name="type" type="string" use="required">
+            <annotation>
+               <documentation>
+                  the type to which the object in focus is to be adapted.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn="java.lang.Object"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="iterate">
+      <annotation>
+         <documentation>
+            This element is used to iterate over a variable that is of type java.util.Collection. If
+            the object in focus is not of type java.util.Collection then an ExpressionException will
+            be thrown while evaluating the expression.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="unbounded">
+            <element ref="not"/>
+            <element ref="and"/>
+            <element ref="or"/>
+            <element ref="instanceof"/>
+            <element ref="test"/>
+            <element ref="systemTest"/>
+            <element ref="equals"/>
+            <element ref="count"/>
+            <element ref="with"/>
+            <element ref="resolve"/>
+            <element ref="adapt"/>
+            <element ref="iterate"/>
+            <element ref="reference"/>
+         </sequence>
+         <attribute name="operator">
+            <annotation>
+               <documentation>
+                  either &quot;and&quot; or &quot;or&quot;. The operator defines how the child
+                  elements will be combined. If not specified, &quot;and&quot; will be used.
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="or">
+                  </enumeration>
+                  <enumeration value="and">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+         <attribute name="ifEmpty" type="boolean">
+            <annotation>
+               <documentation>
+                 the value return from the iterate expression if the collection is empty. If
+                 not specified then true is returned when the operator equals &quot;and&quot; 
+                 and false is return if the operator equals &quot;or&quot;.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="reference">
+      <annotation>
+         <appInfo>
+            <meta.element labelAttribute="definitionId"/>
+         </appInfo>
+         <documentation>
+            This element is used to reference an expression from the &lt;b&gt;org.blueberry.core.expressions.definitions&lt;/b&gt; extension point.  The expression definition will be evaluated within the current expression element using the current evaluation context.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="definitionId" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The unique id of an expression from &lt;b&gt;org.blueberry.core.expressions.definitions&lt;/b&gt;.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="since"/>
+      </appInfo>
+      <documentation>
+         Release 3.0
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="examples"/>
+      </appInfo>
+      <documentation>
+         
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="apiInfo"/>
+      </appInfo>
+      <documentation>
+         
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="implementation"/>
+      </appInfo>
+      <documentation>
+         
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="copyright"/>
+      </appInfo>
+      <documentation>
+         Copyright (c) 2001, 2004 IBM Corporation and others.&lt;br&gt;
+All rights reserved. This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0 which accompanies this distribution, and is available at &lt;a href=&quot;http://www.eclipse.org/legal/epl-v10.html&quot;&gt;http://www.eclipse.org/legal/epl-v10.html&lt;/a&gt;
+      </documentation>
+   </annotation>
+
+</schema>

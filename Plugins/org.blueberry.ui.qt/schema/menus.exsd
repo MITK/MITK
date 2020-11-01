@@ -1,0 +1,646 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.blueberry.ui" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="org.blueberry.ui" id="menus" name="Menus"/>
+      </appInfo>
+      <documentation>
+&lt;p&gt;
+This extension point allows the plug-in developer to add (contribute) a variety of custom additions to the BlueBerry framework:
+&lt;ul&gt;
+  &lt;li&gt;Main Menu&lt;/li&gt;
+  &lt;li&gt;Main Toolbars&lt;/li&gt;
+  &lt;li&gt;View Menus/Toolbars:
+  &lt;ul&gt;
+    &lt;li&gt;View Dropdown Menu&lt;/li&gt;
+    &lt;li&gt;View Toolbar&lt;/li&gt;
+    &lt;li&gt;Context Menu(s)&lt;/li&gt;
+  &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Trim&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/p&gt;
+&lt;p&gt;
+The general strategy for this mechanism is to separate the &apos;location&apos; where the contributions should be inserted from the visibility and enablement state of the element. Each contribution first defines its insertion location through a Menu &apos;URI&apos;, a string (loosely) formatted according to the jave.net.URI format:
+&lt;/p&gt;&lt;p&gt;
+&lt;b&gt;&quot;[Scheme]:[ID]?[ArgList]&quot;&lt;/b&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;b&gt;Scheme&lt;/b&gt; - The &apos;type&apos; of the UI component into which the contributions will be added. It may be either &quot;menu&quot;, &quot;popup&quot; or &quot;toolbar&quot;. While &apos;popup&apos; is indeed a form of menu it is provided to allow a distinction between a view&apos;s &apos;chevron&apos; menu (for which we use the &quot;menu&quot; scheme) and its default context menu which, by convention, should be registered using the &quot;popup&quot; scheme.&lt;/li&gt;
+&lt;li&gt;&lt;b&gt;ID&lt;/b&gt; - This is the id of menu or toolbar into which the contributions should be added. By convention views should use their view id as the id of the root of their chevron and default popup menu. Note that there is no explicit distinction between contributions supporting editors and &apos;normal&apos; contributions into the Menu Menu or Toolbar; both global contributions and editor contributions would use the &quot;org.blueberry.ui.main.menu&quot; id or &quot;org.blueberry.ui.main.toolbar&quot;. A special id used with popup:, &quot;org.blueberry.ui.popup.any&quot;, is reserved to handle contributions which are candidates to appear on any (top level) context menu. Note that these contributions are expected to implement a &apos;visibleWhen&apos; expression sufficient to limit their visibility to appropriate menus&lt;/li&gt;
+&lt;li&gt;&lt;b&gt;Query&lt;/b&gt; - This field allows fine-grained definition of the specific location &lt;i&gt;within&lt;/i&gt; a given menu. It has the form &quot;[placement]=[id]&quot; where placement is one of &quot;before&quot;, &quot;after&quot;, or &quot;endof&quot; and the id is expected to be the id of some IContributionItem in the menu.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;
+This will define the location at which the contributions will appear in the BlueBerry UI. Once the insertion point has been defined the rest of the contributions describe the UI elements that will be added at that location. Each element supports a &apos;visibleWhen&apos; expression that determines at run time whether a particular item should appear in the menu based on the system&apos;s current state (selection, active view/editor, context...).  See &lt;code&gt;berry::ISources&lt;/code&gt; for a list of currently
+supported variables.
+&lt;/p&gt;
+      </documentation>
+   </annotation>
+
+   <include schemaLocation="schema://org.blueberry.core.expressions/schema/expressionLanguage.exsd"/>
+
+   <element name="extension">
+      <annotation>
+         <appInfo>
+            <meta.element />
+         </appInfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="group" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="widget" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="menuContribution" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  org.blueberry.ui.menus
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  An optional identifier of the extension instance.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  An optional name of the extension instance.
+               </documentation>
+               <appInfo>
+                  <meta.attribute translatable="true"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="class">
+      <annotation>
+         <documentation>
+            A class element supporting the executable extension parsing syntax for both &lt;code&gt;widget&lt;/code&gt; and &lt;code&gt;dynamic&lt;/code&gt; elements.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="parameter" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The class to load as an &lt;code&gt;IExecutableExtension&lt;/code&gt;.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="visibleWhen">
+      <annotation>
+         <documentation>
+            A core Expression that controls the visibility of the given element.
+         </documentation>
+      </annotation>
+      <complexType>
+         <choice minOccurs="0" maxOccurs="1">
+            <element ref="not"/>
+            <element ref="or"/>
+            <element ref="and"/>
+            <element ref="instanceof"/>
+            <element ref="test"/>
+            <element ref="systemTest"/>
+            <element ref="equals"/>
+            <element ref="count"/>
+            <element ref="with"/>
+            <element ref="resolve"/>
+            <element ref="adapt"/>
+            <element ref="iterate"/>
+            <element ref="reference"/>
+         </choice>
+         <attribute name="checkEnabled" type="boolean" use="default" value="false">
+            <annotation>
+               <documentation>
+                  If this attribute is set to &lt;code&gt;true&lt;/code&gt;, then there should be no sub-elements.  This just checks the enabled state of the command, and makes the corresponding element visible if the command is enabled.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="parameter">
+      <annotation>
+         <documentation>
+            A parameter to either an executable extension or a command -- depending on where it appears in the extension.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The name is either the name of the parameter to pass to the executable extension, or the identifier of the parameter for the command.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="identifier" basedOn="org.blueberry.ui.commands/command/commandParameter/@id"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="value" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The value to pass for this parameter.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="menuContribution">
+      <annotation>
+         <documentation>
+            &lt;p&gt;Defines an ordered set of additions to the command UI structure. The defined elements will be added into the command UI structure at the location specified by the &lt;code&gt;locationURI&lt;/code&gt; element.
+&lt;/p&gt;&lt;p&gt;
+This should be the starting point for &lt;i&gt;all&lt;/i&gt; contributions into menus, toolbars or trim, wherever they occur in the UI.
+&lt;/p&gt;
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="menu" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="command" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="separator" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="dynamic" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="toolbar" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="control" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="locationURI" type="string" use="required">
+            <annotation>
+               <documentation>
+                  A &lt;code&gt;URI&lt;/code&gt; specification that defines the insertion point at which the contained additions will be added.
+
+The format for the URI is comprised of three basic parts:
+
+Scheme: One of &quot;menu&quot;, &quot;popup&quot; or &quot;toolbar. Indicates the type of the manager used to handle the contributions
+Id: This is either the id of an existing menu, a view id or the id of the editor &apos;type&apos;
+Query: The query format is &amp;lt;placement&amp;gt;=&amp;lt;id&amp;gt; where:
+ &amp;lt;placement&amp;gt; is either &quot;before&quot;, &quot;after&quot;, or &quot;endof&quot; and
+ &amp;lt;id&amp;gt; is the id of an existing menu item.  The placement modifier is executed when this contribution is processed.  Following contributions may change the final shape of the menu when they are processed.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string">
+            <annotation>
+               <documentation>
+                  If this optional attribute is specified the provided class will be instantiated and used to provide menu contributions at this location.  If provided, all child elements will be ignored.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn="org.blueberry.ui.menus.ExtensionContributionFactory:"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="allPopups" type="boolean" use="default" value="false">
+            <annotation>
+               <documentation>
+                  By default popup contributions are not contributed to context menus that do not include an &lt;b&gt;additions&lt;/b&gt; marker.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="menu">
+      <annotation>
+         <documentation>
+            Defines a new menu contribution at the given insertion point.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="1">
+            <element ref="visibleWhen" minOccurs="0" maxOccurs="1"/>
+            <choice minOccurs="0" maxOccurs="unbounded">
+               <element ref="menu" minOccurs="0" maxOccurs="1"/>
+               <element ref="command" minOccurs="0" maxOccurs="1"/>
+               <element ref="separator" minOccurs="0" maxOccurs="1"/>
+               <element ref="dynamic" minOccurs="0" maxOccurs="1"/>
+            </choice>
+         </sequence>
+         <attribute name="label" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The label to be displayed for this element when it is placed in either a menu or a toolbar. This value should be translatable.
+               </documentation>
+               <appInfo>
+                  <meta.attribute translatable="true"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  The &apos;id&apos; of this menu contribution. If defined then it can be extended through other &apos;menuAddition&apos; elements or the id can be used as a reference in the Query part of the location defining whether the additions are to go before or after this element.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="mnemonic" type="string">
+            <annotation>
+               <documentation>
+                  The character of the Label that should be given the mnemonic affordance. This is to allow the menu system to re-define the value during translation without having to understand the various platforms&apos; conventions for menu label definition (i.e. using the &apos;&amp;amp;&apos; character...).
+               </documentation>
+               <appInfo>
+                  <meta.attribute translatable="true"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="icon" type="string">
+            <annotation>
+               <documentation>
+                  A plugin relative path to the image to be used as the icon for this menu in either a menu or a toolbar.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="tooltip" type="string">
+            <annotation>
+               <documentation>
+                  The tooltip to be displayed for this element when it is placed in a toolbar. This value should be translatable.
+               </documentation>
+               <appInfo>
+                  <meta.attribute translatable="true"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="commandId" type="string">
+            <annotation>
+               <documentation>
+                  Th commandId is used to update the submenu text with a keyboard shortcut.  The command should have a handler that can launch a quickmenu version of this menu.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="identifier" basedOn="org.blueberry.ui.commands/command/@id"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="command">
+      <annotation>
+         <documentation>
+            Defines a new Command Contribution at the defined insertion point.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="visibleWhen" minOccurs="0" maxOccurs="1"/>
+            <element ref="parameter" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="label" type="string">
+            <annotation>
+               <documentation>
+                  The label to be displayed for this element when it is placed in either a menu. This value should be translatable.
+               </documentation>
+               <appInfo>
+                  <meta.attribute translatable="true"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="commandId" type="string" use="required">
+            <annotation>
+               <documentation>
+                  This is the id of the Command that is to be bound to this element. This is the hook into the Commands/Handlers/Key binding services that actually do the work should this item be selected. In many cases this command will have been defined in a previous extension declaration.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="identifier" basedOn="org.blueberry.ui.commands/command/@id"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  The &apos;id&apos; of this contribution. If defined then it can be  used as a reference in the Query part of the location defining whether the additions are to go before or after this element.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="mnemonic" type="string">
+            <annotation>
+               <documentation>
+                  The character of the Label that should be given the mnemonic affordance. This is to allow the menu system to re-define the value during translation without having to understand the various platforms&apos; conventions for menu label definition (i.e. using the &apos;&amp;amp;&apos; character...).
+               </documentation>
+               <appInfo>
+                  <meta.attribute translatable="true"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="icon" type="string">
+            <annotation>
+               <documentation>
+                  a relative path of an icon used to visually represent the action in its context.
+If omitted and the action appears in the toolbar, the Workbench will use a placeholder icon. The path is relative to the location of the plugin.xml file of the contributing plug-in, or the &lt;code&gt;ISharedImages&lt;/code&gt; constant.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="disabledIcon" type="string">
+            <annotation>
+               <documentation>
+                  a relative path of an icon used to visually represent the action in its context when the action is disabled. If omitted, the normal icon will simply appear greyed out. The path is relative to the location of the plugin.xml file of the contributing plug-in. The disabled icon will appear in toolbars but not in menus. Icons for disabled actions in menus will be supplied by the OS.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="hoverIcon" type="string">
+            <annotation>
+               <documentation>
+                  a relative path of an icon used to visually represent the action in its context when the mouse pointer is over the action. If omitted, the normal icon will be used. The path is relative to the location of the plugin.xml file of the contributing plug-in.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="tooltip" type="string">
+            <annotation>
+               <documentation>
+                  The tooltip to be displayed for this element when it is placed in a toolbar. This value should be translatable.
+               </documentation>
+               <appInfo>
+                  <meta.attribute translatable="true"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="helpContextId" type="string">
+            <annotation>
+               <documentation>
+                  a unique identifier indicating the help context for this action. If the action appears as a menu item, then pressing F1 while the menu item is highlighted will display help.  This overrides the help context id provided by the active handler or command.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="style" use="default" value="push">
+            <annotation>
+               <documentation>
+                  an attribute to define the user interface style type for the action. If omitted, then it is &lt;samp&gt;push&lt;/samp&gt; by default. The attribute value will be one of the following:
+    &lt;table border=&quot;0&quot; width=&quot;80%&quot;&gt;
+      &lt;tr&gt;
+ &lt;td valign=&quot;top&quot; width=&quot;25&quot;&gt;&lt;/td&gt;
+        &lt;td valign=&quot;top&quot; nowrap&gt;&lt;b&gt;push&lt;/b&gt;&lt;/td&gt;
+        &lt;td valign=&quot;top&quot;&gt;- as a regular menu item or tool item.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+ &lt;td valign=&quot;top&quot; width=&quot;25&quot;&gt;&lt;/td&gt;
+        &lt;td valign=&quot;top&quot; nowrap&gt;&lt;b&gt;radio&lt;/b&gt;&lt;/td&gt;
+        &lt;td valign=&quot;top&quot;&gt;- as a radio style menu item or tool item. Actions with the radio style within the same menu or toolbar group behave as a radio set. The initial value is specified by the &lt;samp&gt;state&lt;/samp&gt; attribute.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+ &lt;td valign=&quot;top&quot; width=&quot;25&quot;&gt;&lt;/td&gt;
+        &lt;td valign=&quot;top&quot; nowrap&gt;&lt;b&gt;toggle&lt;/b&gt;&lt;/td&gt;
+        &lt;td valign=&quot;top&quot;&gt;- as a checked style menu item or as a toggle tool item. The initial value is specified by the &lt;samp&gt;state&lt;/samp&gt; attribute.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+ &lt;td valign=&quot;top&quot; width=&quot;25&quot;&gt;&lt;/td&gt;
+        &lt;td valign=&quot;top&quot; nowrap&gt;&lt;b&gt;pulldown&lt;/b&gt;&lt;/td&gt;
+        &lt;td valign=&quot;top&quot;&gt;- (ToolBar only) Creates a ToolItem with the &lt;code&gt;SWT.DROP_DOWN&lt;/code&gt; affordance. The URI of the menu is &quot;menu:&quot; + this item&apos;s ID.&lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/table&gt;
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="push">
+                  </enumeration>
+                  <enumeration value="radio">
+                  </enumeration>
+                  <enumeration value="toggle">
+                  </enumeration>
+                  <enumeration value="pulldown">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+         <attribute name="mode">
+            <annotation>
+               <documentation>
+                  For commands appearing in a toolbar, &lt;code&gt;FORCE_TEXT&lt;/code&gt; will show text even if there is an icon.  See CommandContributionItem.
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="FORCE_TEXT">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="separator">
+      <annotation>
+         <documentation>
+            Inserts a separator at the current insertion point.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The &apos;id&apos; of this contribution. If defined then it can be  used as a reference in the Query part of the location defining whether the additions are to go before or after this element (or at the end of the logical group containing this element using the &apos;endof&apos; value).
+&lt;p&gt;
+Separator contributions that have an id define the start of a logical group so the result of using the &apos;endof&apos; value for placement is to search forward in the current menu to locate the next separator and to place the inserted elements before that element. If no trailing separator is found then the items are placed at the end of the menu.
+&lt;/p&gt;
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="visible" type="boolean">
+            <annotation>
+               <documentation>
+                  Indicates whether or not the separator should be visible in the UI. &lt;code&gt;false&lt;/code&gt; by default.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="toolbar">
+      <annotation>
+         <documentation>
+            Contributes a new ToolBar at the current insertion point.  This element is only currently valid for CoolBarManagers, which can contain toolbars.  For example, the trim location URIs specified in &lt;code&gt;org.blueberry.ui.menus.MenuUtil&lt;/code&gt;.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="1">
+            <element ref="visibleWhen" minOccurs="0" maxOccurs="1"/>
+            <choice minOccurs="0" maxOccurs="unbounded">
+               <element ref="command" minOccurs="0" maxOccurs="1"/>
+               <element ref="separator" minOccurs="0" maxOccurs="1"/>
+               <element ref="dynamic" minOccurs="0" maxOccurs="1"/>
+               <element ref="control" minOccurs="0" maxOccurs="1"/>
+            </choice>
+         </sequence>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The &apos;id&apos; of this toolbar contribution. If defined then it can be extended through other &apos;menuAddition&apos; elements or the id can be used as a reference in the Query part of the location defining whether the additions are to go before or after this element.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="label" type="string">
+            <annotation>
+               <documentation>
+                  The label to be displayed for this element when it is displayed in the customize perspective dialog. This value should be translatable.
+               </documentation>
+               <appInfo>
+                  <meta.attribute translatable="true"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="control">
+      <annotation>
+         <documentation>
+            Used to contribute controls to ToolBars in the workbench. The &apos;class&apos; attribute must be a derivative of the
+WorkbenchWindowControlContribution base class.
+&lt;p&gt;
+&lt;b&gt;NOTE:&lt;/b&gt; Due to platform restrictions control contributions are only supported for toolbars; Attempts to contribute controls into a menu or popup will be treated as a NO-OP.
+&lt;/p&gt;
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="visibleWhen" minOccurs="0" maxOccurs="1"/>
+         </sequence>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  The &apos;id&apos; of this menu contribution. If defined then it can be used as a reference in the Query part of the location defining whether the additions are to go before or after this element.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The class which will be used to create the control that is to be hosted in a ToolBar. This must be a subclass of
+WorkbenchWindowControlContribution which provides information as to the control&apos;s location (i.e. which workbench window it&apos;s being hosted in and the side of the window that it is currently being displayed on.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn="org.blueberry.ui.menus.WorkbenchWindowControlContribution"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="dynamic">
+      <annotation>
+         <documentation>
+            The element provides a mechanism that will call back into the defined class to provide an IContributionItem to be shown when the menu or toolbar is built. The defined class must be a derivative of the org.blueberry.jface.action.ContributionItem base class.  It can also use org.blueberry.ui.action.CompoundContributionItem and provide an implementation for the abstract &lt;code&gt;getContributionItems&lt;/code&gt; method to provide a dynamic menu item.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="class" minOccurs="0" maxOccurs="1"/>
+            <element ref="visibleWhen" minOccurs="0" maxOccurs="1"/>
+         </sequence>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  A unique identifier for this contribution.  It is recommended that the identifier be prefixed by the plug-in name, to guarantee uniqueness.  For example, a widget contributed by &lt;code&gt;org.blueberry.ui&lt;/code&gt; might be called &lt;code&gt;org.blueberry.ui.widget1&lt;/code&gt;.
+&lt;p&gt;
+If defined then it can be  used as a reference in the Query part of the location defining whether the additions are to go before or after this element (or at the end of the logical group containing this element using the &apos;endof&apos; value).
+&lt;/p&gt;
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  This class is expected to be a subclass of ContributionItem. The item may implement IWorkbenchContribution to be provided an IServiceLocator.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn="org.blueberry.jface.action.ContributionItem"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="apiInfo"/>
+      </appInfo>
+      <documentation>
+         &lt;p&gt;
+It is preferred that menu contributions be added in the &lt;code&gt;plugin.xml&lt;/code&gt;.  Plugins can
+programmatically add their own menu contributions using &lt;code&gt;org.blueberry.ui.menus.IMenuService&lt;/code&gt; and &lt;code&gt;org.blueberry.ui.menus.AbstractContributionFactory&lt;/code&gt;, but should be sure to remove them if the plugin is unloaded.  The &lt;code&gt;IMenuService&lt;/code&gt; can be retrieved through any of the &lt;code&gt;IServiceLocators&lt;/code&gt;, the workbench, the workbench window, or the part site.
+&lt;/p&gt;
+&lt;p&gt;
+See &lt;a href=&quot;org_blueberry_ui_commands.html&quot;&gt;org.blueberry.ui.commands&lt;/a&gt; to define a command and &lt;a href=&quot;org_blueberry_ui_handlers.html&quot;&gt;org.blueberry.ui.handlers&lt;/a&gt; to define an implementation for the command.
+&lt;/p&gt;
+&lt;p&gt;To register a context menu, use the &lt;code&gt;IWorkbenchPartSite.registerContextMenu&lt;/code&gt; methods.&lt;/p&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="since"/>
+      </appInfo>
+      <documentation>
+         3.3
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="examples"/>
+      </appInfo>
+      <documentation>
+         &lt;p&gt;
+A basic extension looks like this.
+&lt;/p&gt;
+&lt;pre&gt;
+   &lt;extension
+         id=&quot;add.item&quot;
+         point=&quot;org.blueberry.ui.menus&quot;&gt;
+      &lt;menuContribution
+         locationURI=&quot;menu:someorg.somemenu.id?after=additions&quot;&gt;
+         &lt;command
+               commandId=&quot;someorg.someid.someCommand&quot;
+               icon=&quot;icons/anything.gif&quot;
+               id=&quot;someorg.someid.BasicCmdItem&quot;
+               label=&quot;Simple Item&quot;
+               mnemonic=&quot;S&quot;&gt;
+         &lt;/command&gt;
+      &lt;/menuContribution&gt;
+   &lt;/extension&gt;
+&lt;/pre&gt;
+&lt;p&gt;
+This is the simplest example; adding a command contribution after an existing menu&apos;s additions group.
+&lt;/p&gt;
+      </documentation>
+   </annotation>
+
+
+   <annotation>
+      <appInfo>
+         <meta.section type="copyright"/>
+      </appInfo>
+      <documentation>
+         Copyright (c) 2005,2007 IBM Corporation and others.&lt;br&gt;
+All rights reserved. This program and the accompanying materials are made
+available under the terms of the Eclipse Public License v1.0 which accompanies
+this distribution, and is available at &lt;a
+href=&quot;http://www.eclipse.org/legal/epl-v10.html&quot;&gt;http://www.eclipse.org/legal/epl-v10.html&lt;/a&gt;
+      </documentation>
+   </annotation>
+
+</schema>

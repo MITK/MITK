@@ -46,7 +46,8 @@ inline    itk::Array<double> wrap1d(itk::Array<double> kernel)
         }
 
     /** @brief Fuction for zeropadding (adding zeros) of an Array/vnl_vector, so that is has size paddedDimensions
-     * @param paddedDimensions Dimensions that the Array should have after padding (convolution dimensions)
+     * @param unpaddedSpectrum
+     * @param paddedDimension Dimensions that the Array should have after padding (convolution dimensions)
      * \remark dim = Dimensions of padded image --> PaddedDimension
      * \remark m dimensions of larger image
      * \remark n dimensions of image to be padded --> InitialDimension*/

@@ -158,8 +158,7 @@ namespace mitk
         const mitk::DataStorage* storage);
 
     /** creates a new ModelFitInfo instance from a passed modal instance and his traits instance*
-    *	@param usedModel	Pointer to a model which was used for a fit, which should get a fit info created.
-    *	@param modelTraits	Pointer to traits interface for the model that was used for the fit.
+    *	@param usedParameterizer Pointer to a model which was used for a fit, which should get a fit info created.
     * @param inputImage Pointer to the input image. If it has no UID yet, a property will be added to the node.
     * @param fitType String identifying the type of the fit (e.g. ROI based or voxel based)
     * @param fitName Optional human readable name of the fit.

@@ -54,7 +54,7 @@ namespace mitk {
     * - "ERROR! REMOVE WAVELENGTHS!": One needs at least the same amount of images (z-dimension) then added wavelengths.
     * - "ADD MORE WAVELENGTHS!": One needs at least the same amount of wavelengths then added chromophores.
     * - "WAVELENGTH XXX nm NOT SUPPORTED!": The wavelength is not part of the proptery calculater data base. The data base can be found @
-    *   [...]\mitk\Modules\PhotoacousticsLib\Resources\spectralLIB.dat
+    *   [...]/mitk/Modules/PhotoacousticsLib/Resources/spectralLIB.dat
     * - "ADD OUTPUTS HAS TO BE LARGER THEN ZERO!"
     * - "NO WAVELENGHTS/CHROMOPHORES SELECZED!
     * - "INDEX ERROR! NUMBER OF OUTPUTS DOESN'T FIT TO OTHER SETTIGNS!"

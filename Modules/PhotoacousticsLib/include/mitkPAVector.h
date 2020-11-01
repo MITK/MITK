@@ -50,6 +50,7 @@ namespace mitk {
        *
        * @param percentage
        * @param bendingFactor
+       * @param rng
        */
       void RandomizeByPercentage(double percentage, double bendingFactor, std::mt19937* rng);
 
@@ -62,6 +63,7 @@ namespace mitk {
        * @param yUpperLimit
        * @param zLowerLimit
        * @param zUpperLimit
+       * @param rng
        */
       void Randomize(double xLowerLimit, double xUpperLimit, double yLowerLimit, double yUpperLimit, double zLowerLimit, double zUpperLimit, std::mt19937* rng);
 
@@ -71,19 +73,22 @@ namespace mitk {
        * @param xLimit
        * @param yLimit
        * @param zLimit
+       * @param rng
        */
       void Randomize(double xLimit, double yLimit, double zLimit, std::mt19937* rng);
 
       /**
        * @brief Randomize randomizes this vector to be [-1, 1] in each element
+       * 
+       * @param rng
        */
       void Randomize(std::mt19937* rng);
 
       /**
        * @brief Rotate rotates this Vector around the x, y and z axis with the given angles in radians
        *
-       * @param thetaChange rotation of the inclination angle in radians
-       * @param phiChange rotation of the azimuthal angle in radians
+       * @param xAngle rotation of the inclination angle in radians
+       * @param yAngle rotation of the azimuthal angle in radians
        */
       void Rotate(double xAngle, double yAngle);
 

@@ -125,6 +125,7 @@ namespace mitk
        * @param xDim x dimension of the data
        * @param yDim y dimension of the data
        * @param zDim z dimension of the data
+       * @param spacing spacing of the data
        */
       Volume(double* data, unsigned int xDim, unsigned int yDim, unsigned int zDim, double spacing);
       Volume(mitk::Image::Pointer image);

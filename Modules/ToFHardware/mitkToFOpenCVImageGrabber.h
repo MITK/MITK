@@ -79,7 +79,8 @@ namespace mitk
   protected:
     /*!
     \brief map scalars through lookup table
-    \param image current MITK image
+    \param mitkImage current MITK image
+    \param openCVImage
     */
     void MapScalars(mitk::Image::Pointer mitkImage, IplImage* openCVImage);
 

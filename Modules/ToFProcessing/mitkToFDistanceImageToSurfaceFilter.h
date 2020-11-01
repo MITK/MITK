@@ -34,9 +34,9 @@ namespace mitk
   *
   * The coordinate conversion follows the model of a common pinhole camera where the origin of the camera
   * coordinate system (world coordinates) is at the pinhole
-  * \image html ../Modules/ToFProcessing/Documentation/PinholeCameraModel.png
+  * \image html Modules/ToFProcessing/Documentation/PinholeCameraModel.png
   * The definition of the image plane and its coordinate systems (pixel and mm) is depicted in the following image
-  * \image html ../Modules/ToFProcessing/Documentation/ImagePlane.png
+  * \image html Modules/ToFProcessing/Documentation/ImagePlane.png
   *
   * @ingroup SurfaceFilters
   * @ingroup ToFProcessing
@@ -115,6 +115,7 @@ namespace mitk
     /*!
     \brief Sets the input of this filter and the intrinsic parameters
     \param distanceImage input is the distance image of e.g. a ToF camera
+    \param cameraIntrinsics
     */
     virtual void SetInput( Image* distanceImage, mitk::CameraIntrinsics::Pointer cameraIntrinsics );
 

@@ -34,6 +34,7 @@ namespace mitk {
          * @brief CalculateNewPositionInStraightLine calculates the new position by just following the direction vector.
          * @param direction
          * @param bendingFactor
+         * @param rng
          */
         void CalculateNewDirectionVectorInStraightLine(Vector::Pointer direction, double bendingFactor, std::mt19937* rng);
 
@@ -44,6 +45,7 @@ namespace mitk {
        *
        * @param direction
        * @param bendingFactor
+       * @param rng
        */
       void CalculateNewRandomlyDivergingDirectionVector(Vector::Pointer direction, double bendingFactor, std::mt19937* rng);
 

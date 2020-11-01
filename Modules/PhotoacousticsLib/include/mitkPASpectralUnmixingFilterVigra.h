@@ -74,7 +74,7 @@ namespace mitk {
       /**
       * \brief Takes a mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType and fix it for usage at the "SpectralUnmixingAlgorithm"
       * method.
-      * @param algorithmName has to be a mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType
+      * @param inputAlgorithmName has to be a mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType
       */
       void SetAlgorithm(VigraAlgortihmType inputAlgorithmName);
 
@@ -86,7 +86,7 @@ namespace mitk {
       * \brief overrides the baseclass method with a mehtod to calculate the spectral unmixing result vector. Herain it first converts the
       * Eigen inputs to the Vigra class. Afterwards the class performs the algorithm set by the "SetAlgorithm" method and writes the result
       * into a Eigen vector which is the return value.
-      * @param endmemberMatrix Matrix with number of chromophores colums and number of wavelengths rows so matrix element (i,j) contains
+      * @param EndmemberMatrix Matrix with number of chromophores colums and number of wavelengths rows so matrix element (i,j) contains
       * the absorbtion of chromophore j @ wavelength i taken from the database by PropertyElement method.
       * @param inputVector Vector containing values of one pixel of XY-plane image with number of wavelength rows (z-dimension of a sequenece)
       * so the pixelvalue of the first wavelength is stored in inputVector[0] and so on.

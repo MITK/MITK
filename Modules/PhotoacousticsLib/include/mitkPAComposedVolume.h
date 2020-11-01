@@ -40,7 +40,7 @@ namespace mitk {
       /**
         * @brief fluenceYOffsetPair
         *
-        * @param nrrdFile path to the nrrd file on hard drive
+        * @param fluenceYOffsetPair
         */
       void AddSlice(mitk::pa::FluenceYOffsetPair::Pointer fluenceYOffsetPair);
 

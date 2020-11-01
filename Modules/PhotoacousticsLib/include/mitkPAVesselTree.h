@@ -39,6 +39,7 @@ namespace mitk {
         * @param volume
         * @param calculateNewPosition
         * @param bendingFactor
+        * @param rng
         */
       void Step(InSilicoTissueVolume::Pointer volume,
         Vessel::CalculateNewVesselPositionCallback calculateNewPosition,

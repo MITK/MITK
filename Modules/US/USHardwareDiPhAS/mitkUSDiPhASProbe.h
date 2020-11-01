@@ -32,10 +32,9 @@ namespace mitk
 
   protected:
     /**
-      * Constructs mitk::USDiPhASProbe object with given API objects.
+      * Constructs mitk::USDiPhASProbe object.
       *
-      * \param probe API probe object which should be represented by the constructed object
-      * \param dataView API data view object conected to this probe object
+      * \param ProbeName
       */
     USDiPhASProbe(std::string ProbeName);
     virtual ~USDiPhASProbe();

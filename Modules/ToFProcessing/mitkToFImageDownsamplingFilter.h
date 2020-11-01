@@ -66,8 +66,6 @@ namespace mitk
      /*!
     \brief Templated method for ITK image type which performs the resampling with an itk filter.
     \param itkImage is the input to the filter converted to ITK format
-    \param TPixel is a pixel type such as float or char or double
-    \param VImageDimension is the image dimension (2D or 3D)
     */
     template<typename TPixel, unsigned int VImageDimension>
     void ItkImageResampling( const itk::Image<TPixel,VImageDimension>* itkImage );

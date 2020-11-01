@@ -56,6 +56,7 @@ namespace mitk
     \param distanceFloatData from distance image as float value
     \param amplitudeFloatData from amplitude image as float value
     \param intensityFloatData from intensity image as float value
+    \param rgbData
     */
     void Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData, unsigned char* rgbData=nullptr) override;
 

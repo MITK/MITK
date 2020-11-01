@@ -540,16 +540,6 @@ namespace mitk
     BaseGeometry(const BaseGeometry &other);
     ~BaseGeometry() override;
 
-    //##Documentation
-    //## @brief clones the geometry
-    //##
-    //## Overwrite in all sub-classes.
-    //## Normally looks like:
-    //## \code
-    //##  Self::Pointer newGeometry = new Self(*this);
-    //##  newGeometry->UnRegister();
-    //##  return newGeometry.GetPointer();
-    //## \endcode
     itk::LightObject::Pointer InternalClone() const override = 0;
 
     void PrintSelf(std::ostream &os, itk::Indent indent) const override;

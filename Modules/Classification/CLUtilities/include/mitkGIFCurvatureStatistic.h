@@ -50,30 +50,30 @@ namespace mitk
   *
   * The following features are defined. All features are calculated for all four possible
   * curvation calculation methods (Gaussian, Mean, Minimum, Maximum). The principal way
-  * of calculating these features is the same, the used curvation is indicated by <name> in the
+  * of calculating these features is the same, the used curvation is indicated by \<name\> in the
   * feature name:
   *
-  * - <b>Curvature Feature::Minimum <name> Curvature</b>:
+  * - <b>Curvature Feature::Minimum \<name\> Curvature</b>:
   * The minimum curvature for the whole given mask
-  * - <b>Curvature Feature::Maximum <name> Curvature</b>:
+  * - <b>Curvature Feature::Maximum \<name\> Curvature</b>:
   * The maximum curvature for the whole given mask
-  * - <b>Curvature Feature::Mean <name> Curvature</b>:
+  * - <b>Curvature Feature::Mean \<name\> Curvature</b>:
   * The mean curvature for the whole given mask
-  * - <b>Curvature Feature::Standard Deviation <name> Curvature</b>:
+  * - <b>Curvature Feature::Standard Deviation \<name\> Curvature</b>:
   * The standard deviation curvature for the whole given mask
-  * - <b>Curvature Feature::Skewness <name> Curvature</b>:
+  * - <b>Curvature Feature::Skewness \<name\> Curvature</b>:
   * The skewness curvature for the whole given mask
-  * - <b>Curvature Feature::Mean Positive <name> Curvature</b>:
+  * - <b>Curvature Feature::Mean Positive \<name\> Curvature</b>:
   * The mean curvature of all positive curvatures from the whole given mask
-  * - <b>Curvature Feature::Standard Deviation Positive <name> Curvature</b>:
+  * - <b>Curvature Feature::Standard Deviation Positive \<name\> Curvature</b>:
   * The Standard Deviation curvature of all positive curvatures from the whole given mask
-  * - <b>Curvature Feature::Skewness Positive <name> Curvature</b>:
+  * - <b>Curvature Feature::Skewness Positive \<name\> Curvature</b>:
   * The Skewness curvature of all positive curvatures from the whole given mask
-  * - <b>Curvature Feature::Mean Negative <name> Curvature</b>:
+  * - <b>Curvature Feature::Mean Negative \<name\> Curvature</b>:
   * The mean curvature of all Negative curvatures from the whole given mask
-  * - <b>Curvature Feature::Standard Deviation Negative <name> Curvature</b>:
+  * - <b>Curvature Feature::Standard Deviation Negative \<name\> Curvature</b>:
   * The Standard Deviation curvature of all Negative curvatures from the whole given mask
-  * - <b>Curvature Feature::Skewness Negative <name> Curvature</b>:
+  * - <b>Curvature Feature::Skewness Negative \<name\> Curvature</b>:
   * The Skewness curvature of all Negative curvatures from the whole given mask
   */
   class MITKCLUTILITIES_EXPORT GIFCurvatureStatistic : public AbstractGlobalImageFeature

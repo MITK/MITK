@@ -181,9 +181,9 @@ namespace mitk
      * @brief Initializes the renderwindows by the aggregated geometry of
      *        all objects that are held in the data storage.
      * This is basically a global reinit
-     * @param The data storage from which the bounding object can be retrieved
+     * @param dataStorage The data storage from which the bounding object can be retrieved
      */
-    virtual void InitializeViewsByBoundingObjects(const DataStorage *);
+    virtual void InitializeViewsByBoundingObjects(const DataStorage *dataStorage);
 
     /** Gets the (global) SliceNavigationController responsible for
      * time-slicing. */

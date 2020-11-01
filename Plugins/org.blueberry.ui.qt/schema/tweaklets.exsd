@@ -1,0 +1,145 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.blueberry.ui" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="org.blueberry.ui" id="tweaklets" name="Tweaklets"/>
+      </appinfo>
+      <documentation>
+         This extension point is used to define tweaklets.  A tweaklet is anything that can be used to tweak the look and feel of the Workbench.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <choice minOccurs="0" maxOccurs="unbounded">
+            <element ref="tweaklet"/>
+         </choice>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="tweaklet">
+      <annotation>
+         <appinfo>
+            <meta.element labelAttribute="name" icon="icon"/>
+         </appinfo>
+      </annotation>
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  a unique name that will be used to identify this tweaklet
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  a translatable name that will be used in the UI for this tweaklet
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="description" type="string">
+            <annotation>
+               <documentation>
+                  a translatable short description of this tweaklet, to be used in the UI
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="definition" type="string">
+            <annotation>
+               <documentation>
+                  an identifier of the tweaklet definition in the workbench, typically a fully qualified type name without colons
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="implementation" type="string">
+            <annotation>
+               <documentation>
+                  an identifier of the tweaklet implementation provided by the extender, typically a fully qualified class name
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+
+   <annotation>
+      <appinfo>
+         <meta.section type="apiInfo"/>
+      </appinfo>
+      <documentation>
+         The following is an example tweaklet:
+&lt;p&gt;
+&lt;pre&gt;
+   &lt;extension point=&quot;org.blueberry.ui.tweaklets&quot;&gt;
+      &lt;tweaklet
+         id=&quot;org.blueberry.ui.tweaklets.ConcreteXYZTweaklet&quot;
+         name=&quot;XYZ Tweaklet&quot;
+         description=&quot;Short description of the tweak&quot;
+         definition=&quot;berryAbstractXYZTweaklet&quot;
+         implementation=&quot;berry::ConcreteXYZTweaklet&quot;/&gt;
+   &lt;/extension&gt;
+&lt;/pre&gt;
+&lt;/p&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         Typically, although not required, the value of the &lt;samp&gt;definition&lt;/samp&gt; attribute is the
+fully qualified name without colons of an abstract class defined by the
+workbench, and the value of the &lt;samp&gt;implementation&lt;/samp&gt; attribute is the
+fully qualified name of a non-abstract class provided by the extending plug-in.
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="implementation"/>
+      </appinfo>
+      <documentation>
+         Tweaklets are usually used to specialize the workbench for a specific GUI toolkit.
+      </documentation>
+   </annotation>
+
+
+</schema>

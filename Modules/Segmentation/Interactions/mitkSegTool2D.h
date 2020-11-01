@@ -61,6 +61,8 @@ namespace mitk
       the plane.
 
       \return false, if no slice direction seems right (e.g. rotated planes)
+      \param image
+      \param plane
       \param affectedDimension The image dimension, which is constant for all points in the plane, e.g. Axial --> 2
       \param affectedSlice The index of the image slice
     */
@@ -122,6 +124,8 @@ namespace mitk
     /**
     * \brief Extract the slice of an image that the user just scribbles on. The given component denotes the vector component of a dwi-image.
     *
+    * \param positionEvent
+    * \param image
     * \param component  The component to be extracted of a given multi-component image. -1 is the default parameter to denote an invalid component.
     *
     * \return 'nullptr' if SegTool2D is either unable to determine which slice was affected, or if there was some problem
@@ -132,6 +136,9 @@ namespace mitk
     /**
     * \brief Extract the slice of an image cut by given plane. The given component denotes the vector component of a dwi-image.
     *
+    * \param planeGeometry
+    * \param image
+    * \param timeStep
     * \param component  The component to be extracted of a given multi-component image. -1 is the default parameter to denote an invalid component.
     *
     * \return 'nullptr' if SegTool2D is either unable to determine which slice was affected, or if there was some problem

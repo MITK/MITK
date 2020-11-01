@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.blueberry.ui">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="org.blueberry.ui" id="elementFactories" name="Element Factories"/>
+      </appInfo>
+      <documentation>
+         This extension point is used to add element factories
+to the workbench.  An element factory is used to
+recreate &lt;samp&gt;IAdaptable&lt;/samp&gt; objects which are
+persisted during workbench shutdown.
+&lt;p&gt;
+As an example, the element factory is used to
+persist editor input.  The input for an
+editor must implement
+&lt;samp&gt;berry::EditorInput&lt;/samp&gt;.
+The life cycle of an &lt;samp&gt;berry::IEditorInput&lt;/samp&gt; within
+an editor has a number of phases.
+&lt;ol&gt;
+&lt;li&gt;
+The initial input for an editor is passed in during
+editor creation.
+&lt;/li&gt;
+&lt;li&gt;
+On shutdown the workbench state is captured.
+In this process the workbench will create a memento
+for each open editor and its input.  The input is
+saved as a two part memento containing a factory ID
+and any primitive data required to recreate the
+element on startup.  For more information see
+the documentation on
+&lt;samp&gt;berry::IPersistableElement&lt;/samp&gt;.
+&lt;/li&gt;
+&lt;li&gt;
+On startup the workbench state is read and the
+editors from the previous session are recreated.
+In this process the workbench will recreate the input
+element for each open editor.  To do this it will
+map the original factory ID for the input element
+to a concrete factory class defined in the registry.
+If a mapping exists, and the factory class is valid,
+an instance of the factory class is created.  Then
+the workbench asks the factory to recreate the original
+element from the remaining primitive data within the
+memento.  The resulting &lt;samp&gt;berry::IAdaptable&lt;/samp&gt; is cast
+to an &lt;samp&gt;berry::IEditorInput&lt;/samp&gt; and passed to the
+new editor.
+&lt;/li&gt;
+&lt;/ol&gt;
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <complexType>
+         <sequence>
+            <element ref="factory" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  a fully qualified identifier of the target extension point
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  an optional identifier of the extension instance
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  an optional name of the extension instance
+               </documentation>
+               <appInfo>
+                  <meta.attribute translatable="true"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="factory">
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  a unique name that will be used to identify this factory.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  a fully qualified name of a class that implements
+&lt;samp&gt;berry::IElementFactory&lt;/samp&gt;
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="c++" basedOn="berry::IElementFactory"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="examples"/>
+      </appInfo>
+      <documentation>
+         The following is an example of an element factory extension:
+&lt;p&gt;
+&lt;pre&gt;
+   &lt;extension
+        point = &quot;org.blueberry.ui.elementFactories&quot;&gt;
+        &lt;factory
+           id =&quot;com.xyz.ElementFactory&quot;
+           class=&quot;xyz::ElementFactory&quot;&gt;
+        &lt;/factory&gt;
+    &lt;/extension&gt;
+&lt;/pre&gt;
+&lt;/p&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="apiInfo"/>
+      </appInfo>
+      <documentation>
+         The value of the &lt;samp&gt;class&lt;/samp&gt; attribute must
+be a fully qualified name of a class that implements
+&lt;samp&gt;berry::IElementFactory&lt;/samp&gt;. An instance
+of this class must create an &lt;samp&gt;berry::IAdaptable&lt;/samp&gt;
+object from a workbench memento.
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="implementation"/>
+      </appInfo>
+      <documentation>
+         The workbench provides an &lt;samp&gt;IResource&lt;/samp&gt; factory.
+Additional factories should be added to recreate other
+&lt;samp&gt;berry::IAdaptable&lt;/samp&gt; types commonly found in other
+object models.
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="copyright"/>
+      </appInfo>
+      <documentation>
+         Copyright (c) 2002, 2005 IBM Corporation and others.&lt;br&gt;
+All rights reserved. This program and the accompanying materials are made
+available under the terms of the Eclipse Public License v1.0 which accompanies
+this distribution, and is available at &lt;a
+href=&quot;http://www.eclipse.org/legal/epl-v10.html&quot;&gt;http://www.eclipse.org/legal/epl-v10.html&lt;/a&gt;
+      </documentation>
+   </annotation>
+
+</schema>

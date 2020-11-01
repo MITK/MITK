@@ -1,0 +1,166 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.blueberry.core.expressions">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="org.blueberry.core.expressions" id="definitions" name="Expression Definitions"/>
+      </appInfo>
+      <documentation>
+         &lt;p&gt;
+This extension point allows you to create reusable extensions.  They can then be used in other core expression constructs.
+&lt;/p&gt;
+&lt;p&gt;
+The reference element in a core expression will evaluated the expression definition with the evaluation context that is active for the reference element.
+&lt;/p&gt;
+
+      </documentation>
+   </annotation>
+
+   <include schemaLocation="expressionLanguage.exsd"/>
+
+   <element name="extension">
+      <complexType>
+         <sequence>
+            <element ref="definition" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  a fully qualified identifier of the target extension point
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  an optional identifier of the extension instance
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  an optional name of the extension instance
+               </documentation>
+               <appInfo>
+                  <meta.attribute translatable="true"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="definition">
+      <annotation>
+         <documentation>
+            Provides a global definition of an expression to be used with the &amp;lt;reference/&amp;gt; expression element.  This helps to reuse common expressions.
+         </documentation>
+      </annotation>
+      <complexType>
+         <choice>
+            <element ref="not"/>
+            <element ref="and"/>
+            <element ref="or"/>
+            <element ref="instanceof"/>
+            <element ref="test"/>
+            <element ref="systemTest"/>
+            <element ref="equals"/>
+            <element ref="count"/>
+            <element ref="with"/>
+            <element ref="resolve"/>
+            <element ref="adapt"/>
+            <element ref="iterate"/>
+         </choice>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  A globally unique identifier for the expression definition.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="examples"/>
+      </appInfo>
+      <documentation>
+         You can define and the use core expressions:
+
+&lt;p&gt;
+&lt;pre&gt;
+&amp;lt;extension point=&quot;org.blueberry.core.expressions.definitions&quot;&amp;gt;
+   &amp;lt;definition id=&quot;com.example.parts.activeProblemsView&quot;&amp;gt;
+       &amp;lt;with variable=&quot;activePartId&quot;&amp;gt;
+          &amp;lt;equals value=&quot;org.blueberry.ui.views.ProblemsView&quot;/&amp;gt;
+       &amp;lt;/with&amp;gt;
+   &amp;lt;/definition&amp;gt;
+   &amp;lt;definition id=&quot;com.example.markers.markerSelection&quot;&amp;gt;
+       &amp;lt;iterate&amp;gt;
+          &amp;lt;instanceof value=&quot;org.blueberry.core.resources.IMarker&quot;/&amp;gt;
+       &amp;lt;/with&amp;gt;
+   &amp;lt;/definition&amp;gt;
+&amp;lt;/extension&amp;gt;
+&lt;/pre&gt;
+&lt;/p&gt;
+&lt;p&gt;
+Then this expression definition can be used when composing other expressions.
+&lt;/p&gt;
+&lt;p&gt;
+&lt;pre&gt;
+&amp;lt;enabledWhen&amp;gt;
+   &amp;lt;reference definitionId=&quot;com.example.parts.activeProblemsView&quot;&amp;gt;
+&amp;lt;/enabledWhen&amp;gt;
+&lt;/pre&gt;
+&lt;pre&gt;
+&amp;lt;visibleWhen&amp;gt;
+   &amp;lt;and&amp;gt;
+      &amp;lt;reference definitionId=&quot;com.example.parts.activeProblemsView&quot;/&amp;gt;
+      &amp;lt;reference definitionId=&quot;com.example.markers.markerSelection&quot;/&amp;gt;
+   &amp;lt;/and&amp;gt;
+&amp;lt;/visibleWhen&amp;gt;
+&lt;/pre&gt;
+&lt;/p&gt;
+
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="since"/>
+      </appInfo>
+      <documentation>
+         3.3
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="apiInfo"/>
+      </appInfo>
+      <documentation>
+         
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="implementation"/>
+      </appInfo>
+      <documentation>
+         
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="copyright"/>
+      </appInfo>
+      <documentation>
+         Copyright (c) 2007 IBM Corporation and others.&lt;br&gt;
+All rights reserved. This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0 which accompanies this distribution, and is available at &lt;a href=&quot;http://www.eclipse.org/legal/epl-v10.html&quot;&gt;http://www.eclipse.org/legal/epl-v10.html&lt;/a&gt;
+      </documentation>
+   </annotation>
+
+</schema>

@@ -62,7 +62,7 @@ namespace mitk
     * is the directory of the given filename. This function can be used to load an already unpacked scene and create objects with
     * parent/child relations into a DataStorage.
     *
-    * \param filename full filename of the scene index file
+    * \param indexfilename full filename of the scene index file
     * \param storage If given, this DataStorage is used instead of a newly created one
     * \param clearStorageFirst If set, the provided DataStorage will be cleared before populating it with the loaded
     * objects
@@ -82,9 +82,9 @@ namespace mitk
      * Attempts to write a scene file, which contains the nodes of the
      * provided DataStorage, their parent/child relations, and properties.
      *
+     * \param sceneNodes
      * \param storage a DataStorage containing all nodes that should be saved
-     * \param filename full filename of the scene file
-     * \param predicate defining which items of the datastorage to use and which not
+     * \param filename
      */
     virtual bool SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes,
                            const DataStorage *storage,

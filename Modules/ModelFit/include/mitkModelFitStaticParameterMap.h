@@ -103,22 +103,22 @@ namespace mitk
       *				ordered by the first variable that contains more than one value (also in
       *				ascending order).
       *	@details	Example:
-      *				<li>Before sorting:
-      *					"A": [3, 2, 5, 1, 4]
-      *					"B": [0]
-      *					"C": [3, 4, 1, 5, 2]
-      *				<li>Sort():
-      *					"A": [1, 2, 3, 4, 5]
-      *					"B": [0]
-      *					"C": [5, 4, 3, 2, 1]
-      *				<li>Sort("B"):
-      *					"A": [5, 4, 3, 2, 1]
-      *					"B": [0]
-      *					"C": [1, 2, 3, 4, 5]
-      *				<li>Sort("X"):
-      *					"A": [1, 2, 3, 4, 5]
-      *					"B": [0]
-      *					"C": [5, 4, 3, 2, 1]
+      *	- Before sorting:
+      *		-	"A": [3, 2, 5, 1, 4]
+      *		-	"B": [0]
+      *		- "C": [3, 4, 1, 5, 2]
+      *	- Sort():
+      *		- "A": [1, 2, 3, 4, 5]
+      *		-	"B": [0]
+      *		-	"C": [5, 4, 3, 2, 1]
+      *	- Sort("B"):
+      *		-	"A": [5, 4, 3, 2, 1]
+      *		-	"B": [0]
+      *		- "C": [1, 2, 3, 4, 5]
+      *	- Sort("X"):
+      *		-	"A": [1, 2, 3, 4, 5]
+      *		-	"B": [0]
+      *		-	"C": [5, 4, 3, 2, 1]
       *	@param name	The name of the variable the map should be sorted by.
       */
       void Sort(const std::string& name = "");

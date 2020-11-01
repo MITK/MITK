@@ -55,12 +55,7 @@ namespace mitk
     SegmentationInterpolationController needs to maintain some information about the image slices (in every dimension).
     This information is stored internally in m_SegmentationCountInSlice, which is basically three std::vectors (one for
     each dimension).
-    Each item describes one image dimension, each vector item holds the count of pixels in "its" slice. This is perhaps
-    better to understand
-    from the following picture (where red items just mean to symbolize "there is some segmentation" - in reality there
-    is an integer count).
-
-    \image html slice_based_segmentation_interpolator.png
+    Each item describes one image dimension, each vector item holds the count of pixels in "its" slice.
 
     $Author$
   */
@@ -134,6 +129,8 @@ namespace mitk
       \param sliceDimension Number of the dimension which is constant for all pixels of the meant slice.
 
       \param sliceIndex Which slice to take, in the direction specified by sliceDimension. Count starts from 0.
+
+      \param currentPlane
 
       \param timeStep Which time step to use
     */

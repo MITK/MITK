@@ -56,6 +56,7 @@ namespace mitk {
        * @param foldername
        * @param blur
        * @param progress
+       * @param log10
        *
        * @return
        */
@@ -105,7 +106,7 @@ namespace mitk {
        * This method ensures that all added slices are in the correct order
        * corresponding to their y-offset.
        *
-       * @param nrrdFile path to the nrrd file on hard drive
+       * @param fluenceSimulation path to the nrrd file on hard drive
        */
       static FluenceYOffsetPair::Pointer LoadFluenceSimulation(std::string fluenceSimulation);
 

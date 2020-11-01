@@ -54,7 +54,7 @@ namespace mitk
     /**
       \brief reads all properties assigned to a base data element and assigns the list to the base data object
 
-      The baseDataNodeElem is supposed to be the <properties file="..."> element.
+      The baseDataNodeElem is supposed to be the \c \<properties file="..."\> element.
     */
     bool DecorateBaseDataWithProperties(BaseData::Pointer data,
                                         TiXmlElement *baseDataNodeElem,

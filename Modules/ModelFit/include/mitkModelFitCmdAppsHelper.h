@@ -42,7 +42,7 @@ namespace mitk
 
   /** Helper function that takes the given image, sets its properties according to the fit session and stores it.
   The output path will be determined given the outputPathTemplate (which determines the directory,
-  the basic file name and the file formate). The output file name is:  <basic file name>_<parameterName>.<extension indicated by outputPathTemplate>*/
+  the basic file name and the file formate). The output file name is:  \<basic file name\>_\<parameterName\>.\<extension indicated by outputPathTemplate\>*/
   MITKMODELFIT_EXPORT void storeModelFitResultImage(const std::string& outputPathTemplate, const std::string& parameterName, mitk::Image* image, mitk::modelFit::Parameter::Type nodeType, const mitk::modelFit::ModelFitInfo* modelFitInfo);
 
   /** Helper function that stores all results of the passed generator according to the passed outputPathTemplate.

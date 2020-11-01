@@ -251,7 +251,7 @@ public:
   ///
   /// \brief MergeLabels
   /// \param MultilabelImage
-  /// \param map merge instruction where each map entry defines a mapping instruction. Key <sourcelabel> - Value <targetlabel>
+  /// \param map merge instruction where each map entry defines a mapping instruction. Key \c \<sourcelabel\> - Value \c \<targetlabel\>
   ///
   static void MergeLabels(mitk::Image::Pointer & img, const std::map<unsigned int, unsigned int> & map);
 

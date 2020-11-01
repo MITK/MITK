@@ -41,6 +41,8 @@ namespace mitk {
 
   /** @brief Computes the fiducial registration error out of two sets of fiducials.
   *  The two sets must have the same size and the points must correspond to each other.
+  *  @param imageFiducials
+  *  @param realWorldFiducials
   *  @param transform        This transform is applied to the image fiducials before the FRE calculation if it is given.
   *  @return                 Returns the FRE. Returns -1 if there was an error.
   */

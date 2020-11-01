@@ -136,7 +136,7 @@ namespace mitk {
     *
     * If you want to use a "third-party" RealTimeClock, e.g PocoRealTimeClock, BoostRealTimeClock
     * or ITKRealTimeClock, you can set it using this method:
-    * mitk::<bla>RealTimeClock::Pointer RealTimeClock = mitk::<bla>RealTimeClock::New();
+    * auto RealTimeClock = mitk::RealTimeClock::New();
     * mitk::TimeStamp::GetInstance()->SetRealTimeClock(RealTimeClock);
     *
     * Right now, none of these RealTimeClocks have been implemented!!

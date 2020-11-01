@@ -50,7 +50,7 @@ namespace mitk
    * to a mode which supports transfer functions (e.g. COLORTRANSFERFUNCTION_COLOR).
    * Make sure to check the documentation of the mitk::RenderingModeProperty. For a
    * code example how to use the mitk::TransferFunction check the
-   * mitkImageVtkMapper2DTransferFunctionTest.cpp in Core\Code\Testing.
+   * mitkImageVtkMapper2DTransferFunctionTest.cpp in Core/Code/Testing.
    */
   class MITKCORE_EXPORT TransferFunction : public itk::Object
   {

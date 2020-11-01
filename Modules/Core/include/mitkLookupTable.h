@@ -37,7 +37,7 @@ namespace mitk
    * to a mode which supports lookup tables (e.g. LOOKUPTABLE_COLOR). Make
    * sure to check the documentation of the mitk::RenderingModeProperty. For a
    * code example how to use the mitk::LookupTable check the
-   * mitkImageVtkMapper2DLookupTableTest.cpp in Core\Code\Testing.
+   * mitkImageVtkMapper2DLookupTableTest.cpp in Core/Code/Testing.
    */
   class MITKCORE_EXPORT LookupTable : public itk::DataObject
   {

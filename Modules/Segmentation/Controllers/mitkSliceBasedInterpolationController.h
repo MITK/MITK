@@ -59,8 +59,6 @@ namespace mitk
     from the following picture (where red items just mean to symbolize "there is some segmentation" - in reality there
     is an integer count).
 
-    \image html slice_based_segmentation_interpolator.png
-
     $Author$
   */
   class MITKSEGMENTATION_EXPORT SliceBasedInterpolationController : public itk::Object
@@ -117,21 +115,13 @@ namespace mitk
                          unsigned int timeStep);
 
     /**
-      \brief Update after changing the whole working image.
-
-      \param image is a 3D image with the difference image of the slice determined by sliceDimension and sliceIndex.
-             The difference is (pixel value in the new slice minus pixel value in the old slice).
-
-      \param timeStep Which time step is changed
-    */
-    //    void SetChangedImage( const Image* image, unsigned int timeStep );
-
-    /**
       \brief Generates an interpolated image for the given slice.
 
       \param sliceDimension Number of the dimension which is constant for all pixels of the meant slice.
 
       \param sliceIndex Which slice to take, in the direction specified by sliceDimension. Count starts from 0.
+
+      \param currentPlane
 
       \param timeStep Which time step to use
     */

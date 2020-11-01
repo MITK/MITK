@@ -30,8 +30,12 @@ namespace mitk
     //##
     //## @param operationType is the type of the operation (see mitkOperation.h; e.g. move or add; Information for
     // StateMachine::ExecuteOperation());
-    //## @param point is the information of the point to add or is the information to change a point into
-    //## @param index is e.g. the position in a list which describes the element to change
+    //## @param width
+    //## @param height
+    //## @param spacing
+    //## @param pos
+    //## @param direction
+    //## @param transform
     // PointOperation(OperationType operationType,  Point3D point, int index = -1, bool selected = true,
     // PointSpecificationType type = PTUNDEFINED);
 

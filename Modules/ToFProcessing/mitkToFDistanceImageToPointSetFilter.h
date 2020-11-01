@@ -33,9 +33,9 @@ namespace mitk
   *
   * The coordinate conversion follows the model of a common pinhole camera where the origin of the camera
   * coordinate system (world coordinates) is at the pinhole
-  * \image html ../Modules/ToFProcessing/Documentation/PinholeCameraModel.png
+  * \image html Modules/ToFProcessing/Documentation/PinholeCameraModel.png
   * The definition of the image plane and its coordinate systems (pixel and mm) is depicted in the following image
-  * \image html ../Modules/ToFProcessing/Documentation/ImagePlane.png
+  * \image html Modules/ToFProcessing/Documentation/ImagePlane.png
   *
   * @ingroup SurfaceFilters
   * @ingroup ToFProcessing
@@ -87,7 +87,7 @@ namespace mitk
     /*!
     \brief Sets the subset of indizes used for caluclation of output PointSet as a PointSet.
     Warning: make sure the points in your PointSet are index coordinates.
-    \param PointSet specified in index coordinates.
+    \param pointSet specified in index coordinates.
     */
     void SetSubset( mitk::PointSet::Pointer pointSet);
 

@@ -33,7 +33,7 @@ namespace mitk
    * (e.g. LOOKUPTABLE_COLOR). Make sure to check the documentation of the
    * mitk::RenderingModeProperty. For a code example how to use the mitk::LookupTable
    * and this property check the mitkImageVtkMapper2DLookupTableTest.cpp in
-   * Core\Code\Testing.
+   * Core/Code/Testing.
    */
   class MITKCORE_EXPORT LookupTableProperty : public BaseProperty
   {

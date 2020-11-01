@@ -28,7 +28,7 @@ namespace mitk
   end of the contour and to iterate in both directions.
   To mark a vertex as a special one it can be set as a control point.
 
-  \Note It is highly not recommend to use this class directly as no secure mechanism is used here.
+  \note It is highly not recommend to use this class directly as no secure mechanism is used here.
   Use mitk::ContourModel instead providing some additional features.
   */
   class MITKCONTOURMODEL_EXPORT ContourElement : public itk::LightObject

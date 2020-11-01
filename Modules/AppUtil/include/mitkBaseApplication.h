@@ -192,10 +192,10 @@ namespace mitk
      * Set the path to the provisioning file.
      *
      * By default a provisioning file located in the same directory
-     * as the executable and named <executable>.provisioning
+     * as the executable and named \<executable\>.provisioning
      * is loaded if it exists. To disable parsing of provisioning
      * files, use an empty string as the argument. Use a
-     * null QString (<code>QString::null</code>) to reset to the
+     * null QString (\c QString::null ) to reset to the
      * default behaviour.
      *
      * @param filePath An absolute file path to the provisioning file.

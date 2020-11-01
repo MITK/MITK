@@ -73,7 +73,7 @@ namespace mitk
     std::vector<TimeStepType> GetAvailableTimeSteps(const IndexValueType& slice) const;
     /** return all time steps stored in the property.*/
     std::vector<TimeStepType> GetAvailableTimeSteps() const;
-    /** return all slices stored in the property. @Remark not all time steps may contain all slices.*/
+    /** return all slices stored in the property. @remark not all time steps may contain all slices.*/
     std::vector<IndexValueType> GetAvailableSlices() const;
 
     void SetValue(const TimeStepType &timeStep, const IndexValueType &zSlice, const ValueType &value);

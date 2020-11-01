@@ -52,7 +52,7 @@ namespace mitk {
 
       /**
       * \brief Verbose gives more information to the console. Default value is false.
-      * @param m_Verbose is the boolian to activate the MITK_INFO logged to the console
+      * @param verbose is the boolian to activate the MITK_INFO logged to the console
       */
       virtual void Verbose(bool verbose);
 

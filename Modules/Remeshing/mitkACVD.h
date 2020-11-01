@@ -49,6 +49,7 @@ namespace mitk
      * \param[in] edgeSplitting Recursively split edges that are longer than the average edge length times this
      * parameter.
      * \param[in] optimizationLevel Minimize distance between input surface and remeshed surface.
+     * \param[in] forceManifold
      * \param[in] boundaryFixing Keep original surface boundaries by adding additional polygons.
      * \return Returns the remeshed surface or nullptr if input surface is invalid.
      */

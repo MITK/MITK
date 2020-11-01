@@ -220,13 +220,14 @@ namespace mitk
     * BaseGeometry and the number of slices according to
     * BaseGeometry::GetExtent(2).
     *
+    * \param geometry3D
     * \param planeorientation side parallel to which the slices will be oriented
     * \param top if \a true, create plane at top, otherwise at bottom
     * (for PlaneOrientation Axial, for other plane locations respectively)
     * \param frontside defines the side of the plane (the definition of
     * front/back is somewhat arbitrary)
     *
-    * \param rotate rotates the plane by 180 degree around its normal (the
+    * \param rotated rotates the plane by 180 degree around its normal (the
     * definition of rotated vs not rotated is somewhat arbitrary)
     */
     virtual void InitializePlanes(const mitk::BaseGeometry *geometry3D,

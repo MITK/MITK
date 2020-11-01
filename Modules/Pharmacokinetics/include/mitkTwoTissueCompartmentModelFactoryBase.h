@@ -35,7 +35,7 @@ namespace mitk
     {
       SimpleBarrierConstraintChecker::Pointer constraints = SimpleBarrierConstraintChecker::New();
 
-      /**@TODO: Mit Charlie klaren ob es eine sinnvolle default Einstellung gibt.*/
+      /**@todo Mit Charlie klaren ob es eine sinnvolle default Einstellung gibt.*/
       constraints->SetLowerBarrier(ModelType::POSITION_PARAMETER_K1, 0, 0);
       constraints->SetLowerBarrier(ModelType::POSITION_PARAMETER_k2, 0, 0);
       constraints->SetLowerBarrier(ModelType::POSITION_PARAMETER_k3, 0, 0);

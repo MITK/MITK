@@ -103,6 +103,7 @@ namespace mitk
     \param sourceDataArray contains the complete source data from the camera device.
     \param requiredImageSequence the required image sequence number
     \param capturedImageSequence the actually captured image sequence number
+    \param rgbDataArray
     */
     virtual void GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray,
                               int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray=nullptr) = 0;

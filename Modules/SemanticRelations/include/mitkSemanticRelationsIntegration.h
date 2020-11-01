@@ -241,8 +241,8 @@ namespace mitk
     * @pre    The UID of the examination period has to exist for an examination period instance.
     * @throw  SemanticRelationException, if the UID of the examination period does not exist for an examination period instance (this can be checked via 'InstanceExists').
     *
-    * @param caseID   The current case identifier is defined by the given string.
-    * @param lesion   The examination period instance that renames an existing examination period.
+    * @param caseID The current case identifier is defined by the given string.
+    * @param examinationPeriod The examination period instance that renames an existing examination period.
     */
     void RenameExaminationPeriod(const SemanticTypes::CaseID& caseID, const SemanticTypes::ExaminationPeriod& examinationPeriod);
     /**

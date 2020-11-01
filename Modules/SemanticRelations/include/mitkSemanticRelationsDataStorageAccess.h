@@ -130,6 +130,7 @@ namespace mitk
     *         The function uses the 'SemanticRelationsInference::GetAllImageIDsOfExaminationPeriod'-function to retrieve the imageIDs of the examination period and
     *         then compares the information type of all these images against the given information type.
     *
+    * @param caseID
     * @param informationType      An information type that identifies the corresponding information type instance.
     * @param examinationPeriod    An examination period that identifies the corresponding examination period instance.
     *

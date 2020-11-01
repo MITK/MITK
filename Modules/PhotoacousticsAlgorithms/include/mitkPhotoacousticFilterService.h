@@ -50,7 +50,6 @@ namespace mitk {
     * @param inputImage The image to be processed.
     * @param method The kind of B-Mode Filter to be used.
     * @param UseLogFilter Setting this to true will apply a simple logarithm to the image after the B-Mode Filter has been applied.
-    * @param resampleSpacing If this is set to 0, nothing will be done; otherwise, the image is resampled to a spacing of resampleSpacing mm per pixel.
     * @return The processed image is returned after the filter has finished.
     */
     mitk::Image::Pointer ApplyBmodeFilter(mitk::Image::Pointer inputImage,
@@ -61,7 +60,7 @@ namespace mitk {
     *
     * Resamples an image using the given parameters.
     * @param inputImage The image to be processed.
-    * @param outputSize An array of dimensions the image should be resampled to.
+    * @param outputSpacing An array of dimensions the image should be resampled to.
     * @return The processed image is returned after the filter has finished.
     */
     mitk::Image::Pointer ApplyResampling(mitk::Image::Pointer inputImage, double* outputSpacing);
@@ -89,6 +88,7 @@ namespace mitk {
     * @param left How many voxels will be cut from the left side of the image.
     * @param minSlice The first slice to be present in the resulting volume.
     * @param maxSlice How many slices are cut off from the end of the volume.
+    * @param errCode
     * @return The processed image is returned after the filter has finished. For the purposes of this module, the returned image is always of type float.
     */
     mitk::Image::Pointer ApplyCropping(mitk::Image::Pointer inputImage, int above, int below, int right, int left, int minSlice, int maxSlice, int* errCode);
@@ -103,6 +103,9 @@ namespace mitk {
     * @param BPLowPass The position at which Higher frequencies are completely cut off in Hz.
     * @param alphaHighPass The high pass tukey window parameter to control the shape of the bandpass filter: 0 will make it a Box function, 1 a Hann function. alpha can be set between those two bounds.
     * @param alphaLowPass The low passtukey window parameter to control the shape of the bandpass filter: 0 will make it a Box function, 1 a Hann function. alpha can be set between those two bounds.
+    * @param timeSpacing
+    * @param SpeedOfSound
+    * @param IsBFImage
     * @return The processed image is returned after the filter has finished.
     */
     mitk::Image::Pointer ApplyBandpassFilter(mitk::Image::Pointer data,

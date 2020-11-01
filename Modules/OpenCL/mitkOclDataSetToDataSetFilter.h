@@ -57,6 +57,9 @@ protected:
   /**
    * @brief InitExec Initialize the execution
    * @param ckKernel The GPU kernel.
+   * @param dimensions
+   * @param outputDataSize
+   * @param outputBpE
    * @throws mitk::Exception if something goes wrong.
    * @return True for success.
    */

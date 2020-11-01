@@ -61,8 +61,8 @@ namespace mitk
 
   Rules use relation instance identifing (RII) properties in order to manage their relations that are stored in the
   Source. The RII-properties follow the following naming schema:
-  "MITK.Relations.<InstanceID>.[relationUID|destinationUID|ruleID|<data-layer-specific>]"
-  - <InstanceID>: The unique index of the relation for the Source. Used to assign/group the properties to
+  "MITK.Relations.\<InstanceID\>.[relationUID|destinationUID|ruleID|\<data-layer-specific\>]"
+  - \<InstanceID\>: The unique index of the relation for the Source. Used to assign/group the properties to
   their relation. In the default implementation of this class the instance id is an positive integer (i>0).
   - relationUID: The UID of the relation. Set by the ID-layer (so by this class)
   - destinationUID: The UID of the Destination. Set by the ID-layer (so by this class) if Destination implements
@@ -99,7 +99,7 @@ namespace mitk
 
     using InstanceIDType = std::string;
     /** Returns the property key path for a RII property.
-     * @param propName If not empty a PropertyPath element will added (with the passed value) after the <InstanceID> element.
+     * @param propName If not empty a PropertyPath element will added (with the passed value) after the \<InstanceID\> element.
      * @param instanceID If not empty, the PropertyKeyPath is only for a specific instance. If empty,
      * it is wildcarded and will match RIIs property of any instance.*/
     static PropertyKeyPath GetRIIPropertyKeyPath(const std::string propName, const InstanceIDType& instanceID);
@@ -162,6 +162,8 @@ namespace mitk
     @remark Abstract rules may also indicate RelationType::Complete if there
     are multiple relations (from different supported concrete rules), that cover
     both ID and Data relations.
+    @param source
+    @param destination
     @param requiredRelation Defines the type of relation that should be present. None: does not matter which one, as long as at least one is present.
     Data: Only data layer exclusive connections, ID: Only ID layer exclusive connections. Complete: Only relations that are connected on both layers.
     @pre source must be a pointer to a valid IPropertyProvider instance.
@@ -172,6 +174,7 @@ namespace mitk
     /** Returns a vector of relation UIDs for all relations of this rule instance that are defined for
     the passed source.
     @pre source must be a pointer to a valid IPropertyOwner instance.
+    @param source
     @param layer Defines the layer the relations must be reflected. None: does not matter which one, as long as at least one is present.
     Data: Only data layer exclusive connections, ID: Only ID layer exclusive connections. Complete: Only relations that are connected on both layers.*/
     RelationUIDVectorType GetExistingRelations(const IPropertyProvider *source, RelationType layer = RelationType::None) const;
@@ -219,6 +222,7 @@ namespace mitk
       const IPropertyProvider *source, RelationType exclusiveRelation = RelationType::None) const;
     /**Returns a predicate that can be used to find the Destination of the passed Source for a given relationUID.
     @param source Pointer to the Source instance that should be used for detection.
+    @param relationUID
     @pre source must be a valid instance.
     @pre relationUID must identify a relation of the passed source and rule. (This must be in the return of
     this->GetExistingRelations(source). */
@@ -231,6 +235,8 @@ namespace mitk
     for the passed destination will be removed.
     @pre source must be a valid instance.
     @pre destination must be a valid instance.
+    @param source
+    @param destination
     @param layer Defines the way of disconnection. Data: Only the remove the connection on the data layer. ID: Only remove the connection
     on the ID layer. Complete: Remove the connection on all layers. If a connection does not exist on a selected layer, it is silently ignored.*/
     void Disconnect(IPropertyOwner *source, const IPropertyProvider *destination, RelationType layer = RelationType::Complete) const;
@@ -241,6 +247,8 @@ namespace mitk
     for the passed destination will be removed.
     If the relationUID is not part of the source. Nothing will be changed.
     @pre source must be a valid instance.
+    @param source
+    @param relationUID
     @param layer Defines the way of disconnection. Data: Only the remove the connection on the data layer. ID: Only remove the connection
     on the ID layer. Complete: Remove the connection on all layers. If a connection does not exist on a selected layer, it is silently ignored.*/
     void Disconnect(IPropertyOwner *source, RelationUIDType relationUID, RelationType layer = RelationType::Complete) const;
@@ -286,11 +294,12 @@ namespace mitk
     and therefore multiple relation instances of the rule instance could match.
     The implementation of this function should report all relation instances. The calling function
     will take care.
-    @pre source must be a pointer to a valid IPropertyProvider instance.
+    @param source
     @param destination Destination the find relations should point to. If destination is NULL any relation
     on the data layer for this rule and source are wanted.
     @param instances_IDLayer List of releation instances that are already defined by the ID layer. The implementation of this
-    function should only cover releations that are not already resembled in the passed relarions_IDLayer.*/
+    function should only cover releations that are not already resembled in the passed relarions_IDLayer.
+    @pre source must be a pointer to a valid IPropertyProvider instance.*/
     virtual DataRelationUIDVectorType GetRelationUIDs_DataLayer(const IPropertyProvider * source,
       const IPropertyProvider * destination, const InstanceIDVectorType& instances_IDLayer) const = 0;
 
@@ -318,6 +327,8 @@ namespace mitk
     and encode the relation on the data layer (data-layer-specific relation properties).
     If the passed instance are already connected, the old settings should be
     overwritten. Connect() will ensure that source and destination are valid pointers.
+    @param source
+    @param destination
     @param instanceID is the ID for the relation instance that should be connected. Existance of the relation instance
     is ensured.
     @pre source must be a valid instance.
@@ -340,7 +351,7 @@ namespace mitk
     virtual bool IsSupportedRuleID(const RuleIDType& ruleID) const;
 
     /** Helper function that generates a reg ex that can be used to find a specific RII property for the rule instance.
-     * @param propName If not empty a PropertyPath element will be added (with the passed value) after the <InstanceID> element.
+     * @param propName If not empty a PropertyPath element will be added (with the passed value) after the \<InstanceID\> element.
      * @param instanceID If not empty only for the reg ex will only valid for the passed instanceID. Otherwise for all.*/
     std::string GetRIIPropertyRegEx(const std::string propName = "", const InstanceIDType &instanceID = "") const;
 

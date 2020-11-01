@@ -76,7 +76,7 @@ namespace mitk
     pplx::task<web::json::value> SendBinaryRequest(
       const web::uri &uri,
       const RequestType &type = RequestType::Get,
-      const std::vector<unsigned char> * = {},
+      const std::vector<unsigned char> *body = {},
       const std::map<utility::string_t, utility::string_t> headers = {}) override;
 
     /**

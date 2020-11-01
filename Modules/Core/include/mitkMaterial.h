@@ -215,7 +215,7 @@ namespace mitk
     /**
      * Sets the specular power which controls the shininess of the object
      * together with the specular coefficient
-     * @param specularCoefficient the new specular coefficient. Valid range
+     * @param specularPower the new specular coefficient. Valid range
      *        is [0..inf]
      */
     virtual void SetSpecularPower(double specularPower);

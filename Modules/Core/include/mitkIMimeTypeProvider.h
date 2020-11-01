@@ -25,7 +25,7 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @ingroupg IO
+   * @ingroup IO
    * @ingroup MicroServices_Interfaces
    *
    * @brief The IMimeTypeProvider service interface allows to query all registered

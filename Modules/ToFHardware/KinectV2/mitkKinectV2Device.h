@@ -107,6 +107,7 @@ namespace mitk
     \param sourceDataArray Does nothing for Kinect V2.
     \param requiredImageSequence The required image sequence number.
     \param capturedImageSequence Does nothing for Kinect V2.
+    \param rgbDataArray
     */
     virtual void GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray,
       int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray=nullptr);

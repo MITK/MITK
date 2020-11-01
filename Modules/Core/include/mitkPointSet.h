@@ -248,6 +248,7 @@ namespace mitk
      *
      * \param point is in world coordinates.
      * \param distance is in mm.
+     * \param t
      * returns -1 if no point is found
      * or the position in the list of the first match
      */

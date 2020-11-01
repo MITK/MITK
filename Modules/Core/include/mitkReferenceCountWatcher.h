@@ -19,14 +19,6 @@ namespace mitk
   //##Documentation
   //## @brief Keeps track of the reference count of an object even if
   //## it is destroyed.
-  //##
-  //## Example usage:
-  //## \code
-  //##   SomeFilter* filter = GetSomeFilter();
-  //##   ReferenceCountWatcher::Pointer filterWatcher;
-  //##   filterWatcher = new ReferenceCountWatcher(filter, "name of filter");
-  //##   filterWatcher->GetReferenceCount();
-  //## \endcode
   //## @ingroup Testing
   class ReferenceCountWatcher : public itk::Object
   {

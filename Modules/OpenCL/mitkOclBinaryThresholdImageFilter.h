@@ -46,7 +46,7 @@ public:
   void Update();
 
   /** Set the lower threshold
-    @param thr Threshold value
+    @param lowerThreshold Threshold value
     */
   void SetLowerThreshold( int lowerThreshold )
   {
@@ -54,7 +54,7 @@ public:
   }
 
   /** Set the upper threshold
-    @param thr Threshold value
+    @param upperThreshold Threshold value
     */
   void SetUpperThreshold( int upperThreshold )
   {
@@ -63,7 +63,7 @@ public:
 
   /** Set the outside value
 
-    @param val The outside value
+    @param outsideValue The outside value
     */
   void SetOutsideValue( int outsideValue )
   {
@@ -71,7 +71,7 @@ public:
   }
 
   /** Set the inside value
-    @param val The inside value
+    @param insideValue The inside value
     */
   void SetInsideValue( int insideValue )
   {

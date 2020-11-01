@@ -54,7 +54,7 @@ namespace mitk
 
     //##Documentation
     //## @brief Sets the current amount of progress to current progress + steps.
-    //## @param: steps the number of steps done since last Progress(int steps) call.
+    //## @param steps the number of steps done since last Progress(int steps) call.
     void Progress(unsigned int steps = 1);
 
     //##Documentation

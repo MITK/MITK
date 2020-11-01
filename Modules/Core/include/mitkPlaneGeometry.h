@@ -155,8 +155,12 @@ namespace mitk
     * (default: axial) with respect to \a BaseGeometry (default: identity).
     * Spacing also taken from \a BaseGeometry.
     *
+    * \param geometry3D
     * \param top if \a true, create plane at top, otherwise at bottom
     * (for PlaneOrientation Axial, for other plane locations respectively)
+    * \param planeorientation
+    * \param frontside
+    * \param rotated
     */
     virtual void InitializeStandardPlane(const BaseGeometry *geometry3D,
                                          bool top,
@@ -389,6 +393,7 @@ namespace mitk
     /**
     * \brief Calculate intersection point between the plane and a line
     *
+    * \param line
     * \param intersectionPoint intersection point
     * \return \a true if \em unique intersection exists, i.e., if line
     * is \em not on or parallel to the plane
@@ -399,6 +404,7 @@ namespace mitk
     * \brief Calculate line parameter of intersection point between the
     * plane and a line
     *
+    * \param line
     * \param t parameter of line: intersection point is
     * line.GetPoint()+t*line.GetDirection()
     * \return \a true if \em unique intersection exists, i.e., if line

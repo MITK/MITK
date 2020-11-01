@@ -47,7 +47,7 @@ public:
    * Constructs a new instance of this class based on the
    * information in the given untyped event.
    *
-   * @param e the untyped event containing the information
+   * @param source the untyped event containing the information
    */
   ShellEvent(SmartPointer<Shell> source) ;
 

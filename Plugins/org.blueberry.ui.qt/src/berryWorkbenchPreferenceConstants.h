@@ -21,12 +21,9 @@ namespace berry
 /**
  * Preference ids exposed by the BlueBerry Platform User Interface. These
  * preference settings can be obtained from the UI plug-in's preference store.
- * <p>
- * <b>Note:</b>This interface should not be implemented or extended.
- * </p>
  *
  * @see PlatformUI#PLUGIN_ID
- * @noextend This class is not intended to be extended by clients.
+ * @note This class is not intended to be extended by clients.
  */
 struct BERRY_UI_QT WorkbenchPreferenceConstants
 {
@@ -58,16 +55,12 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
   /**
    * A preference value indicating that an action should open a new
    * perspective in a new window.
-   *
-   * @see #PROJECT_OPEN_NEW_PERSPECTIVE
    */
   static const QString OPEN_PERSPECTIVE_WINDOW; // "OPEN_PERSPECTIVE_WINDOW";
 
   /**
    * A preference value indicating that an action should open a new
    * perspective in a new page.
-   *
-   * @see #PROJECT_OPEN_NEW_PERSPECTIVE
    * @deprecated Opening a Perspective in a new page is no longer supported
    *             functionality as of 2.0.
    */
@@ -76,16 +69,12 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
   /**
    * A preference value indicating that an action should open a new
    * perspective by replacing the current perspective.
-   *
-   * @see #PROJECT_OPEN_NEW_PERSPECTIVE
    */
   static const QString OPEN_PERSPECTIVE_REPLACE; // "OPEN_PERSPECTIVE_REPLACE";
 
   /**
    * A preference value indicating that an action should not open a new
    * perspective.
-   *
-   * @see #PROJECT_OPEN_NEW_PERSPECTIVE
    */
   static const QString NO_NEW_PERSPECTIVE; // "NO_NEW_PERSPECTIVE";
 
@@ -442,7 +431,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    * Stores whether or not the workbench prompts for saving when a dirty
    * editor or view is closed, but the Saveable objects are still open in
    * other parts. If
-   * <code>true<code> (default), the user will be prompted. If <code>false</code>, there will be
+   * <code>true</code> (default), the user will be prompted. If <code>false</code>, there will be
    * no prompt.
    *
    * @see Saveable
@@ -508,7 +497,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
 
   /**
    * An named preference for whether or not tabs are on the top or bottom
-   * for views. Values are either {@link SWT#TOP} or {@link SWT#BOTTOM}.
+   * for views. Values are either \c SWT.TOP or \c SWT.BOTTOM .
    * <p>
    * The default value for this preference is: <code>SWT.TOP</code>.
    * </p>
@@ -519,7 +508,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
 
   /**
    * An named preference for whether or not tabs are on the top or bottom
-   * for editors. Values are either {@link SWT#TOP} or {@link SWT#BOTTOM}.
+   * for editors. Values are either \c SWT.TOP or \c SWT.BOTTOM .
    * <p>
    * The default value for this preference is: <code>SWT.TOP</code>.
    * </p>

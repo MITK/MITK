@@ -84,8 +84,8 @@ public:
    *
    * @see IJobManager#CreateProgressGroup()
    * @see Job#setProgressGroup(IProgressMonitor, int)
-   * @param job the job to create a progress monitor for
-   * @param group the progress monitor group that this job belongs to
+   * @param sptr_job the job to create a progress monitor for
+   * @param sptr_group the progress monitor group that this job belongs to
    * @param ticks the number of ticks of work for the progress monitor
    * @return a progress monitor, or <code>null</code> if no progress monitoring
    * is needed.

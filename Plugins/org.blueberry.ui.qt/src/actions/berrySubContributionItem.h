@@ -27,7 +27,6 @@ namespace berry {
  * <p>
  * This class is not intended to be subclassed.
  * </p>
- * @noextend This class is not intended to be subclassed by clients.
  */
 class BERRY_UI_QT SubContributionItem : public IContributionItem
 {
@@ -60,16 +59,21 @@ public:
 
     /*
      * Method declared on IContributionItem.
+     * \param parent
      */
     void Fill(QStatusBar* parent) override;
 
     /*
      * Method declared on IContributionItem.
+     * \param parent
+     * \param before
      */
     void Fill(QMenu* parent, QAction* before) override;
 
     /*
      * Method declared on IContributionItem.
+     * \param parent
+     * \param before
      */
     void Fill(QToolBar* parent, QAction* before) override;
 

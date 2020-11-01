@@ -77,7 +77,7 @@ public:
    * @param source
    *            The source of the event. If an ISaveablesSource notifies
    *            about changes to the saveables returned by
-   *            {@link ISaveablesSource#getSaveables()}, the source must be
+   *            \c ISaveablesSource#getSaveables() , the source must be
    *            the ISaveablesSource object.
    * @param eventType
    *            the event type, currently one of POST_OPEN, PRE_CLOSE,
@@ -88,8 +88,8 @@ public:
    *            true if the event type is PRE_CLOSE and this is a closed force
    *            that cannot be canceled.
    */
-  SaveablesLifecycleEvent(Object::Pointer source_, int eventType_,
-      const QList<Saveable::Pointer>& saveables_, bool force_);
+  SaveablesLifecycleEvent(Object::Pointer source, int eventType,
+      const QList<Saveable::Pointer>& saveables, bool force);
 
   /**
    * Returns the eventType, currently one of POST_OPEN, PRE_CLOSE, POST_CLOSE,

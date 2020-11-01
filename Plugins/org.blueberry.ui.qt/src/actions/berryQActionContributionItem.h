@@ -23,7 +23,6 @@ namespace berry {
  * <p>
  * This class may be instantiated; it is not intended to be subclassed.
  * </p>
- * @noextend This class is not intended to be subclassed by clients.
  */
 class BERRY_UI_QT QActionContributionItem : public ContributionItem
 {
@@ -33,8 +32,8 @@ public:
   /**
    * Creates a new contribution item from the given action and id.
    *
-   * @param action
-   *            the action
+   * @param action the action
+   * @param id
    */
   QActionContributionItem(QAction* action, const QString& id);
 

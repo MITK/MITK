@@ -84,18 +84,14 @@ struct BERRY_UI_QT IControlListener: public virtual Object
    *
    * @param e an event containing information about the move
    */
-  virtual void ControlMoved(ControlEvent::Pointer /*e*/)
-  {
-  }
+  virtual void ControlMoved(ControlEvent::Pointer e);
 
   /**
    * Sent when the size (width, height) of a control changes.
    *
    * @param e an event containing information about the resize
    */
-  virtual void ControlResized(ControlEvent::Pointer /*e*/)
-  {
-  }
+  virtual void ControlResized(ControlEvent::Pointer e);
 
   virtual void ControlActivated(ControlEvent::Pointer /*e*/)
   {

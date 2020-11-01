@@ -1085,10 +1085,6 @@ set(MITK_DOXYGEN_OUTPUT_DIR "${PROJECT_BINARY_DIR}/Documentation/Doxygen" CACHE 
   "Output directory for doxygen generated documentation.")
 
 if(MITK_USE_BLUEBERRY)
-
-  set(BLUEBERRY_XPDOC_OUTPUT_DIR "${MITK_DOXYGEN_OUTPUT_DIR}/html/extension-points/html/")
-  execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${BLUEBERRY_XPDOC_OUTPUT_DIR})
-
   include("${CMAKE_CURRENT_SOURCE_DIR}/Plugins/PluginList.cmake")
   mitkFunctionWhitelistPlugins(MITK MITK_PLUGINS)
 

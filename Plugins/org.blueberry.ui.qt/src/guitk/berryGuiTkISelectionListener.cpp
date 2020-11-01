@@ -40,6 +40,18 @@ ISelectionListener::Events
   defaultSelected -= Delegate(l.GetPointer(), &ISelectionListener::WidgetDefaultSelected);
 }
 
+void
+ISelectionListener
+::WidgetSelected(SelectionEvent::Pointer)
+{
+}
+
+void
+ISelectionListener
+::WidgetDefaultSelected(SelectionEvent::Pointer)
+{
+}
+
 }
 
 }

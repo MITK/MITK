@@ -59,7 +59,7 @@ class BERRY_UI_QT XMLMemento : public IMemento
     * </p>
     *
     * @param document the document for the memento
-    * @param element the element node for the memento
+    * @param elem the element node for the memento
     */
     XMLMemento(Poco::XML::Document* document, Poco::XML::Element* elem);
 
@@ -128,7 +128,7 @@ class BERRY_UI_QT XMLMemento : public IMemento
      * @param type the type
      * @param id the child id
      * @return a new child memento with the given type and id
-     * @see #getID
+     * @see #GetID
      */
     IMemento::Pointer CreateChild(const QString& type, const QString& id) override;
 
@@ -214,8 +214,7 @@ class BERRY_UI_QT XMLMemento : public IMemento
     /**
      * Puts another memento in this memento as a child
      *
-     * @param key the key
-     * @param value the value
+     * @param memento
      */
     void PutMemento(IMemento::Pointer memento) override;
 

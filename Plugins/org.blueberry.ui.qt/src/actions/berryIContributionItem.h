@@ -67,8 +67,7 @@ struct IContributionItem : public virtual Object
    * Used by <code>MenuBarManager</code>.
    *
    * @param parent the parent menu
-   * @param index the index where the controls are inserted,
-   *   or <code>-1</code> to insert at the end
+   * @param before
    */
   virtual void Fill(QMenuBar* parent, QAction* before) = 0;
 
@@ -77,8 +76,7 @@ struct IContributionItem : public virtual Object
    * Used by <code>MenuManager</code>.
    *
    * @param parent the parent menu
-   * @param index the index where the controls are inserted,
-   *   or <code>-1</code> to insert at the end
+   * @param before
    */
   virtual void Fill(QMenu* parent, QAction* before) = 0;
 
@@ -87,8 +85,7 @@ struct IContributionItem : public virtual Object
    * Used by <code>ToolBarManager</code>.
    *
    * @param parent the parent tool bar
-   * @param index the index where the controls are inserted,
-   *   or <code>-1</code> to insert at the end
+   * @param before
    */
   virtual void Fill(QToolBar* parent, QAction* before) = 0;
 

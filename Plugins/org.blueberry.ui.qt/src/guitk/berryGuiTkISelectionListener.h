@@ -88,7 +88,7 @@ struct BERRY_UI_QT ISelectionListener: public virtual Object
    *
    * @param e an event containing information about the default selection
    */
-  virtual void WidgetDefaultSelected(SelectionEvent::Pointer e)
+  virtual void WidgetDefaultSelected(SelectionEvent::Pointer e);
 };
 
 }

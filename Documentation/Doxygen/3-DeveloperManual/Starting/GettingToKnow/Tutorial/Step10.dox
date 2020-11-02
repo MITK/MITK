@@ -245,6 +245,7 @@ receive events.
 \endcode
 
 \subsection TransitionSection Transitions
+
 Transitions are part of a state and describe all possible state switches, and are therefore important for modeling an interaction scheme.
 Transitions consist a part that describes the event which triggers the transition (event class and event variant) and a target which is state
 to which the state machine switches after executing a transition.
@@ -252,7 +253,8 @@ An event class describes the event type (see mitk::InteractionEvent for the diff
 and the exact description is taken from  a config file. Together they determine which event can trigger this transition.
 For example this state machine will switch from state A to state B when the StdMousePressPrimaryButton event (left mouse button is pressed) occurs.
 
-\subsubsection EventClassSection Event Class
+\subsection EventClassSection Event Class
+
 The event class description supports the polymorphism of the event classes. Therefore state machine patters should be written in the most
 general ways possible.
 So for a given class hierarchy like this:

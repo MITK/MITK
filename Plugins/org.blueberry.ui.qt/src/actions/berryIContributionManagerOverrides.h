@@ -31,8 +31,6 @@ struct IContributionItem;
  * This interface is internal to the framework; it should not be implemented outside
  * the framework.
  * </p>
- *
- * @noimplement This interface is not intended to be implemented by clients.
  */
 struct BERRY_UI_QT IContributionManagerOverrides : virtual Object
 {
@@ -48,7 +46,6 @@ struct BERRY_UI_QT IContributionManagerOverrides : virtual Object
    * Find out the enablement of the item
    * @param item the contribution item for which the enable override value is
    * determined
-   * @param defaultValue the default value
    * @return <ul>
    *           <li><code>1</code> if the given contribution item should be enabled</li>
    *           <li><code>0</code> if the item should not be enabled</li>

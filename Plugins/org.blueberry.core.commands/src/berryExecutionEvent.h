@@ -120,7 +120,7 @@ public:
    * the provided id.
    * <p>
    * This is intended to be used in the scope of an
-   * {@link IHandler#execute(ExecutionEvent)} method, so any problem getting
+   * {@link IHandler#Execute} method, so any problem getting
    * the object value causes <code>ExecutionException</code> to be thrown.
    * </p>
    *

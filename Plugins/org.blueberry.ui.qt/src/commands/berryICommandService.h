@@ -45,8 +45,8 @@ class ParameterType;
  * <li>This service is available globally.</li>
  * </ul>
  * </p>
- * @noimplement This interface is not intended to be implemented by clients.
- * @noextend This interface is not intended to be extended by clients.
+ * @note This interface is not intended to be implemented by clients.
+ * @note This interface is not intended to be extended by clients.
  */
 struct BERRY_UI_QT ICommandService : public IDisposable
 {
@@ -70,14 +70,14 @@ struct BERRY_UI_QT ICommandService : public IDisposable
    *
    * @param listener
    *            The listener to add; must not be <code>null</code>.
-   * @see #removeExecutionListener(IExecutionListener)
+   * @see #RemoveExecutionListener
    */
   virtual void AddExecutionListener(IExecutionListener* listener) = 0;
 
   /**
    * Sets the name and description of the category for uncategorized commands.
    * This is the category that will be returned if
-   * {@link #getCategory(String)} is called with <code>null</code>.
+   * {@link #GetCategory} is called with <code>null</code>.
    *
    * @param name
    *            The name of the category for uncategorized commands; must not
@@ -94,7 +94,7 @@ struct BERRY_UI_QT ICommandService : public IDisposable
    * parameterizations as specified in the provided
    * <code>serializedParameterizedCommand</code> string. The
    * <code>serializedParameterizedCommand</code> must use the format
-   * returned by {@link ParameterizedCommand#serialize()} and described in the
+   * returned by {@link ParameterizedCommand#Serialize} and described in the
    * Javadoc for that method.
    * </p>
    * <p>
@@ -302,7 +302,7 @@ struct BERRY_UI_QT ICommandService : public IDisposable
    * @throws NotDefinedException
    *             If the command included in the ParameterizedCommand is not
    *             defined, or the element is <code>null</code>.
-   * @see #unregisterElement(IElementReference)
+   * @see #UnregisterElement
    */
   virtual SmartPointer<IElementReference> RegisterElementForCommand(
       const SmartPointer<ParameterizedCommand>& command,
@@ -312,7 +312,7 @@ struct BERRY_UI_QT ICommandService : public IDisposable
    * Re-register a callback element provided by the ICommandService. This
    * element reference must not currently be held by the ICommandService. i.e.
    * it must have been removed using
-   * {@link #unregisterElement(IElementReference)}.
+   * {@link #UnregisterElement}.
    * <p>
    * <b>Note:</b> elements should be removed when no longer necessary. If
    * not, they will be removed when the IServiceLocator used to acquire this
@@ -321,7 +321,7 @@ struct BERRY_UI_QT ICommandService : public IDisposable
    *
    * @param elementReference
    *            The reference to re-register. Must not be <code>null</code>.
-   * @see #unregisterElement(IElementReference)
+   * @see #UnregisterElement
    */
   virtual void RegisterElement(const SmartPointer<IElementReference>& elementReference) = 0;
 

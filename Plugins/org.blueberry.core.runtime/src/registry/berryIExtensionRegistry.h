@@ -44,7 +44,7 @@ struct IRegistryEventListener;
  * are intended for relatively short-term use. Clients that deal with these objects
  * must be aware that they may become invalid if the declaring plug-in is updated
  * or uninstalled. If this happens, all methods on these object except
- * <code>isValid()</code> will throw {@link org.eclipse.core.runtime.InvalidRegistryObjectException}.
+ * <code>isValid()</code> will throw {@link InvalidRegistryObjectException}.
  * Code in a plug-in that has declared that it is not dynamic aware (or not declared
  * anything) can safely ignore this issue, since the registry would not be
  * modified while it is active. However, code in a plug-in that declares that it
@@ -61,13 +61,12 @@ struct IRegistryEventListener;
  * </p>
  * <p>
  * Extensions and extension points are declared by generic entities called
- * <cite>namespaces</cite>. The only fact known about namespaces is that they
+ * \c namespaces . The only fact known about namespaces is that they
  * have unique string-based identifiers. One example of a namespace
  * is a plug-in, for which the namespace id is the plug-in id.
  * </p><p>
  * This interface is not intended to be implemented by clients.
  * </p>
- * @noimplement This interface is not intended to be implemented by clients.
  */
 struct org_blueberry_core_runtime_EXPORT IExtensionRegistry
 {
@@ -93,7 +92,7 @@ struct org_blueberry_core_runtime_EXPORT IExtensionRegistry
    * point does not exist, has no extensions configured, or none of the extensions
    * contain configuration elements.
    *
-   * @param namespace the namespace for the extension point
+   * @param namespaze the namespace for the extension point
    *    (e.g. <code>"org.eclipse.core.resources"</code>)
    * @param extensionPointName the simple identifier of the
    *    extension point (e.g. <code>"builders"</code>)
@@ -107,7 +106,7 @@ struct org_blueberry_core_runtime_EXPORT IExtensionRegistry
    * Returns an empty array if the extension does not exist or
    * contains no configuration elements.
    *
-   * @param namespace the namespace for the extension point
+   * @param namespaze the namespace for the extension point
    *    (e.g. <code>"org.eclipse.core.resources"</code>)
    * @param extensionPointName the simple identifier of the
    *    extension point (e.g. <code>"builders"</code>)
@@ -149,7 +148,7 @@ struct org_blueberry_core_runtime_EXPORT IExtensionRegistry
    * The first two parameters identify the extension point, and the third
    * parameter identifies an extension plugged in to that extension point.
    *
-   * @param namespace the namespace for the extension point
+   * @param namespaze the namespace for the extension point
    *    (e.g. <code>"org.eclipse.core.resources"</code>)
    * @param extensionPointName the simple identifier of the
    *    extension point (e.g. <code>"builders"</code>)
@@ -177,7 +176,7 @@ struct org_blueberry_core_runtime_EXPORT IExtensionRegistry
    * with the given namespace and extension point simple identifier,
    * or <code>null</code> if there is no such extension point.
    *
-   * @param namespace the namespace for the given extension point
+   * @param namespaze the namespace for the given extension point
    *    (e.g. <code>"org.eclipse.core.resources"</code>)
    * @param extensionPointName the simple identifier of the
    *    extension point (e.g. <code>"builders"</code>)
@@ -198,7 +197,7 @@ struct org_blueberry_core_runtime_EXPORT IExtensionRegistry
    * Returns all extension points declared in the given namespace. Returns an empty array if
    * there are no extension points declared in the namespace.
    *
-   * @param namespace the namespace for the extension points
+   * @param namespaze the namespace for the extension points
    *    (e.g. <code>"org.eclipse.core.resources"</code>)
    * @return the extension points in this registry declared in the given namespace
    */
@@ -220,7 +219,7 @@ struct org_blueberry_core_runtime_EXPORT IExtensionRegistry
    * Returns all extensions declared in the given namespace. Returns an empty array if
    * no extensions are declared in the namespace.
    *
-   * @param namespace the namespace for the extensions
+   * @param namespaze the namespace for the extensions
    *    (e.g. <code>"org.eclipse.core.resources"</code>)
    * @return the extensions in this registry declared in the given namespace
    */
@@ -258,8 +257,7 @@ struct org_blueberry_core_runtime_EXPORT IExtensionRegistry
    * editor) is ignored by this method.
    * <p>
    * This method is an access controlled method. Proper token (master token or user token) should
-   * be passed as an argument. Two registry keys are set in the registry constructor
-   * {@link RegistryFactory#CreateRegistry(RegistryStrategy*, QObject*, QObject*)}:
+   * be passed as an argument. Two registry keys are set in the registry constructor:
    * master token and a user token. Master token allows all operations; user token allows
    * non-persisted registry elements to be modified.
    * </p>
@@ -285,8 +283,7 @@ struct org_blueberry_core_runtime_EXPORT IExtensionRegistry
    * Removes the given extension from this registry.
    * <p>
    * This method is an access controlled method. Proper token (master token or user token) should
-   * be passed as an argument. Two registry keys are set in the registry constructor
-   * {@link RegistryFactory#CreateRegistry(RegistryStrategy*, QObject*, QObject*)}:
+   * be passed as an argument. Two registry keys are set in the registry constructor:
    * master token and a user token. Master token allows all operations; user token only
    * allows non-persisted registry elements to be modified.
    * </p>
@@ -302,8 +299,7 @@ struct org_blueberry_core_runtime_EXPORT IExtensionRegistry
    * Removes the specified extension point from this registry.
    * <p>
    * This method is an access controlled method. Proper token (master token or user token) should
-   * be passed as an argument. Two registry keys are set in the registry constructor
-   * {@link RegistryFactory#CreateRegistry(RegistryStrategy*, QObject*, QObject*)}:
+   * be passed as an argument. Two registry keys are set in the registry constructor:
    * master token and a user token. Master token allows all operations; user token only
    * allows non-persisted registry elements to be modified.
    * </p>
@@ -323,7 +319,6 @@ struct org_blueberry_core_runtime_EXPORT IExtensionRegistry
    * <p>
    * This method is an access controlled method. Master token should be passed as an argument.
    * </p>
-   * @see RegistryFactory#CreateRegistry(RegistryStrategy*, QObject*, QObject*)
    * @param token master token for the registry
    * @throws IllegalArgumentException if incorrect token is passed
    */

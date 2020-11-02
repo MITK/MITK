@@ -91,7 +91,7 @@ struct BERRY_UI_QT IIntroPart : public virtual Object
      * <p>
      * This method is automatically called by the workbench at appropriate
      * times. Clients must not call this method directly (call
-     * {@link IIntroManager#setIntroStandby(IIntroPart, boolean)} instead.
+     * {@link IIntroManager#SetIntroStandby} instead.
      * </p>
      *
      * @param standby <code>true</code> to put this part in its partially
@@ -176,7 +176,7 @@ struct BERRY_UI_QT IIntroPart : public virtual Object
      * <p>
      * Clients should not call this method (the workbench calls this method at
      * appropriate times).  To have the workbench activate a part, use
-     * {@link IIntroManager#showIntro(IWorkbenchWindow, boolean)}.
+     * {@link IIntroManager#ShowIntro}.
      * </p>
      */
     virtual void SetFocus() = 0;

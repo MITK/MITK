@@ -28,7 +28,7 @@ namespace berry {
  * Abstract base class for all expressions provided by the common
  * expression language.
  * <p>
- * An expression is evaluated by calling {@link #evaluate(IEvaluationContext)}.
+ * An expression is evaluated by calling {@link #Evaluate}.
  * </p>
  * <p>
  * This class may be subclassed to provide specific expressions.
@@ -65,19 +65,6 @@ private:
   mutable uint fHashCode;
 
 protected:
-
-  /**
-   * Checks whether two objects are equal using the
-   * <code>equals(Object)</code> method of the <code>left</code> object.
-   * This method handles <code>null</code> for either the <code>left</code>
-   * or <code>right</code> object.
-   *
-   * @param left the first object to compare; may be <code>null</code>.
-   * @param right the second object to compare; may be <code>null</code>.
-   * @return <code>TRUE_EVAL</code> if the two objects are equivalent;
-   *         <code>FALSE_EVAL</code> otherwise.
-   */
-   // static bool Equals(final Object left, final Object right);
 
   /**
    * Tests whether two arrays of objects are equal to each other. The arrays
@@ -170,7 +157,7 @@ public:
    * Computes the expression information for the given expression tree.
    * <p>
    * This is a convenience method for collecting the expression information
-   * using {@link Expression#collectExpressionInfo(ExpressionInfo)}.
+   * using {@link Expression#CollectExpressionInfo}.
    * </p>
    *
    * @return the expression information

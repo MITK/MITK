@@ -29,11 +29,11 @@ struct IMemento;
  * in an extension to the platform extension point named
  * <code>"org.blueberry.ui.elementFactories"</code>.
  * For example, the plug-in's XML markup might contain:
- * <pre>
- * &LT;extension point="org.blueberry.ui.elementFactories"&GT;
- *    &LT;factory id="com.example.myplugin.MyFactory" class="MyFactory" /&GT;
- * &LT;/extension&GT;
- * </pre>
+ * \code{.unparsed}
+ * <extension point="org.blueberry.ui.elementFactories">
+ *   <factory id="com.example.myplugin.MyFactory" class="MyFactory" />
+ * </extension>
+ * \endcode
  * </p>
  *
  * @see IPersistableElement

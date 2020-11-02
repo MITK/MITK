@@ -24,8 +24,6 @@ namespace berry {
  * The workbench exposes its implemention of intro part sites via this
  * interface, which is not intended to be implemented or extended by clients.
  * </p>
- *
- * @noimplement This interface is not intended to be implemented by clients.
  */
 struct BERRY_UI_QT IIntroSite : public IWorkbenchSite
 {

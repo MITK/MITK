@@ -104,9 +104,7 @@ struct BERRY_UI_QT IEditorPart : public virtual IWorkbenchPart,
    * Initializes this editor with the given editor site and input.
    * <p>
    * This method is automatically called shortly after the part is instantiated.
-   * It marks the start of the part's lifecycle. The
-   * {@link IWorkbenchPart#dispose IWorkbenchPart.dispose} method will be called
-   * automically at the end of the lifecycle. Clients must not call this method.
+   * It marks the start of the part's lifecycle. Clients must not call this method.
    * </p><p>
    * Implementors of this method must examine the editor input object type to
    * determine if it is understood.  If not, the implementor must throw

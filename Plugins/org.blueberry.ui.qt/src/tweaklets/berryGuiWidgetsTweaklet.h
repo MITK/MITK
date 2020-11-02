@@ -39,6 +39,7 @@ struct BERRY_UI_QT GuiWidgetsTweaklet
    * it one of the messages defined in the <code>IControlListener</code>
    * interface.
    *
+   * @param widget
    * @param listener the listener which should be notified
    *
    * @see IControlListener
@@ -50,6 +51,7 @@ struct BERRY_UI_QT GuiWidgetsTweaklet
    * Removes the listener from the collection of listeners who will
    * be notified when the widget is moved or resized.
    *
+   * @param widget
    * @param listener the listener which should no longer be notified
    *
    * @see IControlListener

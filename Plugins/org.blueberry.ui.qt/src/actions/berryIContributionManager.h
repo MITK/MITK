@@ -41,12 +41,6 @@ struct IContributionManagerOverrides;
  * to contribute actions. This interface should be implemented
  * by all objects that wish to manage contributions.
  * </p>
- * <p>
- * There are several implementions of this interface in this package,
- * including ones for menus ({@link MenuManager <code>MenuManager</code>}),
- * tool bars ({@link ToolBarManager <code>ToolBarManager</code>}),
- * and status lines ({@link StatusLineManager <code>StatusLineManager</code>}).
- * </p>
  */
 struct IContributionManager : public virtual Object
 {

@@ -24,8 +24,8 @@ struct IPropertyChangeListener;
  * A token representing a core expression and property change listener currently
  * working in the <code>IEvaluationService</code>.
  *
- * @noimplement This interface is not intended to be implemented by clients.
- * @noextend This interface is not intended to be extended by clients.
+ * @note This interface is not intended to be implemented by clients.
+ * @note This interface is not intended to be extended by clients.
  */
 struct IEvaluationReference : public virtual IEvaluationResultCache
 {

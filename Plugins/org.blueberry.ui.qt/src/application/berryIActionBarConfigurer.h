@@ -37,7 +37,6 @@ struct IToolBarManager;
  * </p>
  *
  * @see org.blueberry.ui.application.WorkbenchAdvisor#fillActionBars
- * @noimplement This interface is not intended to be implemented by clients.
  */
 struct BERRY_UI_QT IActionBarConfigurer : public Object
 {

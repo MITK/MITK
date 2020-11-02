@@ -31,17 +31,16 @@ namespace berry {
  * attribute in a <code>editor</code> extension contributed to the workbench's
  * editor extension point (named <code>"org.mitk.ui.editors"</code>).
  * For example, the plug-in's XML markup might contain:
- * <pre>
- * &LT;extension point="org.blueberry.ui.editors"&GT;
- *      &LT;editor id="com.example.myplugin.ed"
- *         name="My Editor"
- *         icon="./images/cedit.gif"
- *       extensions="foo"
- *       class="com.example.myplugin.MyFooEditor"
- *       contributorClass="com.example.myplugin.MyFooEditorContributor"
- *      /&GT;
- * &LT;/extension&GT;
- * </pre>
+ * \code{.unparsed}
+ * <extension point="org.blueberry.ui.editors">
+ *   <editor id="com.example.myplugin.ed"
+ *     name="My Editor"
+ *     icon="./images/cedit.gif"
+ *     extensions="foo"
+ *     class="com.example.myplugin.MyFooEditor"
+ *     contributorClass="com.example.myplugin.MyFooEditorContributor" />
+ * </extension>
+ * \endcode
  * where <code>com.example.myplugin.MyEditor</code> is the name of the
  * <code>EditorPart</code> subclass.
  * </p>
@@ -110,7 +109,7 @@ protected:
      *
      * @param input the editor input
      *
-     * @see #setInputWithNotify(IEditorInput)
+     * @see #SetInputWithNotify
      */
     virtual void SetInput(IEditorInput::Pointer input) ;
 

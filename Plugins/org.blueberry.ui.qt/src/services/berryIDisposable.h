@@ -31,7 +31,7 @@ namespace berry {
  * <p>
  * A service has life-cycle. When the constructor completes, the service must be
  * fully functional. When it comes time for the service to go away, then the
- * service will receive a {@link #dispose()} call. At this point, the service
+ * service will receive a {@link #Dispose} call. At this point, the service
  * must release all resources and detach all listeners. A service can only be
  * disposed once; it cannot be reused.
  * </p>

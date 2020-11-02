@@ -33,8 +33,8 @@ namespace berry {
  * @see ContributorFactoryOSGi
  * @see ContributorFactorySimple
  *
- * @noimplement This interface is not intended to be implemented by clients.
- * @noextend This interface is not intended to be extended by clients.
+ * @note This interface is not intended to be implemented by clients.
+ * @note This interface is not intended to be extended by clients.
  */
 struct org_blueberry_core_runtime_EXPORT IContributor : public Object
 {

@@ -169,7 +169,7 @@ public:
   /**
    * Sets the name and description of the category for uncategorized commands.
    * This is the category that will be returned if
-   * {@link #getCategory(String)} is called with <code>null</code>.
+   * {@link #GetCategory} is called with <code>null</code>.
    *
    * @param name
    *            The name of the category for uncategorized commands; must not
@@ -187,7 +187,7 @@ public:
    * parameterizations as specified in the provided
    * <code>serializedParameterizedCommand</code> string. The
    * <code>serializedParameterizedCommand</code> must use the format
-   * returned by {@link ParameterizedCommand#serialize()} and described in the
+   * returned by {@link ParameterizedCommand#Serialize} and described in the
    * Javadoc for that method.
    * </p>
    * <p>

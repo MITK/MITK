@@ -30,8 +30,6 @@ struct IContributor;
  * <p>
  * This class can not be extended or instantiated by clients.
  * </p>
- * @noinstantiate This class is not intended to be instantiated by clients.
- * @noextend This class is not intended to be subclassed by clients.
  */
 class org_blueberry_core_runtime_EXPORT ContributorFactory
 {

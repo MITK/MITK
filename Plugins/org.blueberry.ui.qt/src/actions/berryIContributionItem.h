@@ -38,7 +38,7 @@ struct IContributionManager;
  * A contribution item can realize itself in different Qt widgets, using the different
  * <code>fill</code> methods.  The same type of contribution item can be used with a
  * <code>MenuBarManager</code>, <code>ToolBarManager</code>,
- * </code>or a <code>StatusLineManager</code>.
+ * or a <code>StatusLineManager</code>.
  * </p>
  * <p>
  * This interface is internal to the framework; it should not be implemented outside
@@ -46,7 +46,6 @@ struct IContributionManager;
  * </p>
  *
  * @see IContributionManager
- * @noimplement This interface is not intended to be implemented by clients.
  */
 struct IContributionItem : public virtual Object
 {

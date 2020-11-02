@@ -30,7 +30,7 @@ struct IExtension;
  * These registry objects are intended for relatively short-term use. Clients that
  * deal with these objects must be aware that they may become invalid if the
  * declaring plug-in is updated or uninstalled. If this happens, all methods except
- * {@link #isValid()} will throw {@link InvalidRegistryObjectException}.
+ * {@link #IsValid()} will throw {@link InvalidRegistryObjectException}.
  * For extension point objects, the most common case is code in a plug-in dealing
  * with one of the extension points it declares. These extension point objects are
  * guaranteed to be valid while the plug-in is active. Code in a plug-in that has
@@ -40,7 +40,7 @@ struct IExtension;
  * must be careful if it access the extension point object of a different plug-in,
  * because it's at risk if that other plug-in is removed. Similarly,
  * tools that analyze or display the extension registry are vulnerable.
- * Client code can pre-test for invalid objects by calling {@link #isValid()},
+ * Client code can pre-test for invalid objects by calling {@link #IsValid()},
  * which never throws this exception. However, pre-tests are usually not sufficient
  * because of the possibility of the extension point object becoming invalid as a
  * result of a concurrent activity. At-risk clients must treat
@@ -51,7 +51,6 @@ struct IExtension;
  * <p>
  * This interface is not intended to be implemented by clients.
  * </p>
- * @noimplement This interface is not intended to be implemented by clients.
  */
 struct IExtensionPoint : public virtual Object
 {

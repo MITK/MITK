@@ -40,7 +40,7 @@ struct BERRY_UI_QT Geometry
    * of a rectangle. That is, returns true for the top and bottom but false for the
    * left and right.
    *
-   * @param swtSideConstant one of Constants::TOP, Constants::BOTTOM, Constants::LEFT, or Constants::RIGHT
+   * @param berrySideConstant one of Constants::TOP, Constants::BOTTOM, Constants::LEFT, or Constants::RIGHT
    * @return true iff the given side is horizontal.
    * @since 3.0
    */
@@ -101,7 +101,7 @@ struct BERRY_UI_QT Geometry
    * Returns the opposite of the given direction. That is, returns SWT.LEFT if
    * given SWT.RIGHT and visa-versa.
    *
-   * @param swtDirectionConstant one of SWT.LEFT, SWT.RIGHT, SWT.TOP, or SWT.BOTTOM
+   * @param directionConstant one of SWT.LEFT, SWT.RIGHT, SWT.TOP, or SWT.BOTTOM
    * @return one of SWT.LEFT, SWT.RIGHT, SWT.TOP, or SWT.BOTTOM
    * @since 3.0
    */

@@ -35,7 +35,7 @@ class Expression;
 
 /**
  * An expression converter converts an XML expression represented by an
- * {@link IConfigurationElement} or {@link Element} (DOM) subtree into a
+ * {@link IConfigurationElement} (DOM) subtree into a
  * corresponding expression tree.
  *
  * <p>

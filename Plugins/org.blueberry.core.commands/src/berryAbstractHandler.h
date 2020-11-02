@@ -26,9 +26,9 @@ namespace berry {
  * abstract implementation provides support for handler listeners. You should
  * subclass from this class unless you want to implement your own listener
  * support. Subclasses should call
- * {@link AbstractHandler#fireHandlerChanged(HandlerEvent)}when the handler
- * changes. Subclasses can also override {@link AbstractHandler#isEnabled()} and
- * {@link AbstractHandler#isHandled()}.
+ * {@link AbstractHandler#FireHandlerChanged} when the handler
+ * changes. Subclasses can also override {@link AbstractHandler#IsEnabled} and
+ * {@link AbstractHandler#IsHandled}.
  * </p>
  */
 class BERRY_COMMANDS AbstractHandler : public QObject, public IHandler { // ,public EventManager {
@@ -68,12 +68,12 @@ public:
   /**
    * Whether this handler is capable of executing at this time. Subclasses may
    * override this method. If clients override this method they should also
-   * consider overriding {@link #setEnabled(Object)} so they can be notified
+   * consider overriding {@link #SetEnabled} so they can be notified
    * about framework execution contexts.
    *
    * @return <code>true</code>
-   * @see #setEnabled(Object)
-   * @see #setBaseEnabled(boolean)
+   * @see #SetEnabled
+   * @see #SetBaseEnabled
    */
   bool IsEnabled() const override;
 
@@ -123,9 +123,9 @@ protected:
   void FireHandlerChanged(const SmartPointer<HandlerEvent>& handlerEvent);
 
   /**
-   * Allow the default {@link #isEnabled()} to answer our enabled state. It
+   * Allow the default {@link #IsEnabled} to answer our enabled state. It
    * will fire a HandlerEvent if necessary. If clients use this method they
-   * should also consider overriding {@link #setEnabled(Object)} so they can
+   * should also consider overriding {@link #SetEnabled} so they can
    * be notified about framework execution contexts.
    *
    * @param state

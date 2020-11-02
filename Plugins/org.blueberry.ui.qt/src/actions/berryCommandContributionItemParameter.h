@@ -162,10 +162,6 @@ public:
    *            definition. May be <code>null</code>
    * @param icon
    *            An icon for this item. May be <code>null</code>.
-   * @param disabledIcon
-   *            A disabled icon for this item. May be <code>null</code>.
-   * @param hoverIcon
-   *            A hover icon for this item. May be <code>null</code>.
    * @param label
    *            A label for this item. May be <code>null</code>.
    * @param mnemonic
@@ -181,7 +177,7 @@ public:
    *            <code>null</code>
    * @param visibleEnabled
    *            Visibility tracking for the menu contribution.
-   * @noreference This constructor is not intended to be referenced by clients.
+   * @note This constructor is not intended to be referenced by clients.
    */
   CommandContributionItemParameter(IServiceLocator* serviceLocator,
                                    const QString& id, const QString& commandId,

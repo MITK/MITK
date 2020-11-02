@@ -37,13 +37,6 @@ namespace berry {
  * The and operation:
  * </p>
  * <table border="1" cellpadding="5">
- *   <colgroup>
- *     <col width="120">
- *     <col width="120">
- *     <col width="120">
- *     <col width="120">
- *   </colgroup>
- *   <tbody>
  *     <tr>
  *       <td><em>AND</em></td>
  *       <td>FALSE_EVAL</td>
@@ -68,19 +61,11 @@ namespace berry {
  *       <td>NOT_LOADED</td>
  *       <td>NOT_LOADED</td>
  *     </tr>
- *   </tbody>
  * </table>
  * <p>
  * The or operation:
  * </p>
  * <table border="1" cellpadding="5">
- *   <colgroup>
- *     <col width="120">
- *     <col width="120">
- *     <col width="120">
- *     <col width="120">
- *   </colgroup>
- *   <tbody>
  *     <tr>
  *       <td><em>OR</em></td>
  *       <td>FALSE_EVAL</td>
@@ -105,21 +90,13 @@ namespace berry {
  *       <td>TRUE_EVAL</td>
  *       <td>NOT_LOADED</td>
  *     </tr>
- *   </tbody>
  * </table>
  * <p>
  * The not operation:
  * </p>
  * <table border="1" cellpadding="5">
- *   <colgroup>
- *     <col width="120">
- *     <col width="120">
- *     <col width="120">
- *     <col width="120">
- *   </colgroup>
- *   <tbody>
  *     <tr>
- *       <td><em>NOT<em></td>
+ *       <td><em>NOT</em></td>
  *       <td>FALSE_EVAL</td>
  *       <td>TRUE_EVAL</td>
  *       <td>NOT_LOADED</td>
@@ -130,7 +107,6 @@ namespace berry {
  *       <td>FALSE_EVAL</td>
  *       <td>NOT_LOADED</td>
  *     </tr>
- *   </tbody>
  * </table>
  *
  * <p>

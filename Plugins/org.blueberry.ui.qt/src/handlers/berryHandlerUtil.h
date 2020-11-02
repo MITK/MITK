@@ -111,42 +111,6 @@ public:
   static StringVectorType::ConstPointer GetActiveContextsChecked(const ExecutionEvent::ConstPointer& event);
 
   /**
-   * Return the active shell. Is not necessarily the active workbench window
-   * shell.
-   *
-   * @param event
-   *            The execution event that contains the application context
-   * @return the active shell, or <code>null</code>.
-   */
-//  static Shell GetActiveShell(const ExecutionEvent::ConstPointer& event) {
-//    Object::Pointer o = getVariable(event, ISources.ACTIVE_SHELL_NAME);
-//    if (o instanceof Shell) {
-//      return (Shell) o;
-//    }
-//    return null;
-//  }
-
-  /**
-   * Return the active shell. Is not necessarily the active workbench window
-   * shell.
-   *
-   * @param event
-   *            The execution event that contains the application context
-   * @return the active shell. Will not return <code>null</code>.
-   * @throws ExecutionException
-   *             If the active shell variable is not found.
-   */
-//  static Shell GetActiveShellChecked(const ExecutionEvent::ConstPointer& event)
-//       {
-//    Object::Pointer o = getVariableChecked(event, ISources.ACTIVE_SHELL_NAME);
-//    if (!(o instanceof Shell)) {
-//      incorrectTypeFound(event, ISources.ACTIVE_SHELL_NAME, Shell.class,
-//          o.getClass());
-//    }
-//    return (Shell) o;
-//  }
-
-  /**
      * Return the active workbench window.
      *
      * @param event
@@ -166,26 +130,6 @@ public:
      */
     static IWorkbenchWindow::Pointer GetActiveWorkbenchWindowChecked(
         const ExecutionEvent::ConstPointer& event);
-
-  /**
-   * Return the active editor.
-   *
-   * @param event
-   *            The execution event that contains the application context
-   * @return the active editor, or <code>null</code>.
-   */
-  //static IEditorPart::Pointer GetActiveEditor(const ExecutionEvent::ConstPointer& event);
-
-  /**
-   * Return the active editor.
-   *
-   * @param event
-   *            The execution event that contains the application context
-   * @return the active editor. Will not return <code>null</code>.
-   * @throws ExecutionException
-   *             If the active editor variable is not found.
-   */
-  //static IEditorPart::Pointer GetActiveEditorChecked(const ExecutionEvent::ConstPointer& event);
 
   /**
    * Return the part id of the active editor.
@@ -289,8 +233,7 @@ public:
   static ISelection::ConstPointer GetCurrentSelectionChecked(const ExecutionEvent::ConstPointer& event);
 
   /**
-   * Return the menu IDs that were applied to the registered context menu. For
-   * example, #CompilationUnitEditorContext.
+   * Return the menu IDs that were applied to the registered context menu.
    *
    * @param event
    *            The execution event that contains the application context
@@ -299,8 +242,7 @@ public:
   static StringVectorType::ConstPointer GetActiveMenus(const ExecutionEvent::ConstPointer& event);
 
   /**
-   * Return the menu IDs that were applied to the registered context menu. For
-   * example, #CompilationUnitEditorContext.
+   * Return the menu IDs that were applied to the registered context menu.
    *
    * @param event
    *            The execution event that contains the application context

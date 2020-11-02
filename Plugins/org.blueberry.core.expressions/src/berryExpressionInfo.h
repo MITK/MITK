@@ -106,9 +106,7 @@ public:
   void AddAccessedPropertyName(const QString& name);
 
   /**
-   * Returns the set of expression types which don't implement the
-   * new (@link Expression#computeReevaluationInfo(IEvaluationContext)}
-   * method. If one expression didn't implement the method the expression
+   * If one expression didn't implement the method the expression
    * tree no optimizations can be done. Returns <code>null</code> if
    * all expressions implement the method.
    *

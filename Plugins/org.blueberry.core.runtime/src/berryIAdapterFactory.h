@@ -60,7 +60,6 @@ struct org_blueberry_core_runtime_EXPORT IAdapterFactory {
    *
    * @param adaptableObject the adaptable object being queried
    *   (usually an instance of <code>IAdaptable</code>)
-   * @param adaptableType the type information for the adaptable object
    * @param adapterType the type of adapter to look up
    * @return a object castable to the given adapter type,
    *    or <code>0</code> if this adapter factory

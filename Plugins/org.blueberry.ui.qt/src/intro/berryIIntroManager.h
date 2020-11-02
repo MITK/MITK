@@ -25,11 +25,11 @@ namespace berry
  * The intro part is typically shown the first time a product is started up.
  * <p>
  * The initial behavior of the intro part is controlled by the application
- * from via the {@link org.eclipse.ui.application.WorkbenchWindowAdvisor#openIntro()}
+ * from via the {@link WorkbenchWindowAdvisor#OpenIntro()}
  * method.
  * </p>
  * <p>
- * See {@link org.eclipse.ui.intro.IIntroPart} for details on where intro parts
+ * See {@link IIntroPart} for details on where intro parts
  * come from.
  * </p>
  * <p>
@@ -38,7 +38,6 @@ namespace berry
  *
  * @see org.eclipse.ui.IWorkbench#getIntroManager()
  * @since 3.0
- * @noimplement This interface is not intended to be implemented by clients.
  */
 struct BERRY_UI_QT IIntroManager
 {
@@ -51,14 +50,14 @@ struct BERRY_UI_QT IIntroManager
    * @return <code>true</code> if the intro part was closed, and
    * <code>false</code> otherwise.  <code>false</code> is returned
    * if part is <code>null</code> or it is not the intro part returned
-   * by {@link #getIntro()}.
+   * by {@link #GetIntro()}.
    */
   virtual bool CloseIntro(IIntroPart::Pointer part) = 0;
 
   /**
    * Returns the intro part. Returns <code>null</code> if there is no intro
-   * part, if it has been previously closed via {@link #closeIntro(IIntroPart)}
-   * or if there is an intro part but {@link #showIntro(IWorkbenchWindow, boolean)}
+   * part, if it has been previously closed via {@link #CloseIntro}
+   * or if there is an intro part but {@link #ShowIntro}
    * has not yet been called to create it.
    *
    * @return the intro part, or <code>null</code> if none is available
@@ -69,7 +68,7 @@ struct BERRY_UI_QT IIntroManager
    * Return whether an intro is available. Note that this checks whether
    * there is an applicable intro part that could be instantiated and shown
    * to the user.
-   * Use {@link #getIntro()} to discover whether an intro part has already
+   * Use {@link #GetIntro} to discover whether an intro part has already
    * been created.
    *
    * @return <code>true</code> if there is an intro that could be shown, and
@@ -84,7 +83,7 @@ struct BERRY_UI_QT IIntroManager
    * @return <code>true</code> if the part in its partially
    * visible standy mode, and <code>false</code> if in its fully visible state.
    * <code>false</code> is returned if part is <code>null</code> or it is not
-   * the intro part returned by {@link #getIntro()}.
+   * the intro part returned by {@link #GetIntro}.
    */
   virtual bool IsIntroStandby(IIntroPart::Pointer part) const = 0;
 
@@ -96,7 +95,7 @@ struct BERRY_UI_QT IIntroManager
    * be the center of the user's attention.
    * <p>
    * This method does nothing if the part is <code>null</code> or is not
-   * the intro part returned by {@link #getIntro()}.
+   * the intro part returned by {@link #GetIntro}.
    * </p>
    *
    * @param part the intro part, or <code>null</code>

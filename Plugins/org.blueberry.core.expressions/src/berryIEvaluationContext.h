@@ -77,7 +77,7 @@ struct BERRY_EXPRESSIONS IEvaluationContext : public Object
 
   /**
    * Returns whether this evaluation context supports plug-in
-   * activation. If not set via {@link #setAllowPluginActivation(boolean)}
+   * activation. If not set via {@link #SetAllowPluginActivation}
    * the parent value is returned. If no parent is set <code>false</code>
    * is returned.
    *

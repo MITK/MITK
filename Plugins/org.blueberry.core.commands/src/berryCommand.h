@@ -341,7 +341,7 @@ public:
   /**
    * Returns the help context identifier associated with this command. This
    * method should not be called by clients. Clients should use
-   * {@link CommandManager#getHelpContextId(Command)} instead.
+   * {@link CommandManager#GetHelpContextId} instead.
    *
    * @return The help context identifier for this command; may be
    *         <code>null</code> if there is none.

@@ -28,7 +28,7 @@ struct IParameterValueConverter;
  * <p>
  * Provides information about the type of a command parameter. Clients can use a
  * parameter type to check if an object matches the type of the parameter with
- * {@link #IsCompatible(Object::Pointer)} and can get an
+ * \c IsCompatible(Object::Pointer) and can get an
  * {@link IParameterValueConverter} to convert between objects matching
  * the parameter type and strings that encode the object's identity.
  * </p>
@@ -95,7 +95,7 @@ void  AddListener(IParameterTypeListener* listener);
    *            type; <code>null</code> is interpreted as
    *            <code>"QObject"</code>
    * @param parameterTypeConverter
-   *            an {@link AbstractParameterValueConverter} to perform
+   *            an \c AbstractParameterValueConverter to perform
    *            string/object conversions for parameter values; may be
    *            <code>null</code>
    */

@@ -46,7 +46,7 @@ struct BERRY_UI_QT IPartService {
    * </p>
    *
    * @param listener a part listener
-   * @see #removePartListener(IPartListener)
+   * @see #RemovePartListener
    */
     virtual void AddPartListener(IPartListener* listener) = 0;
 

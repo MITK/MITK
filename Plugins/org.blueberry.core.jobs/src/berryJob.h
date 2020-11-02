@@ -16,7 +16,6 @@ found in the LICENSE file.
 #include <Poco/Thread.h>
 
 #include <org_blueberry_core_jobs_Export.h>
-// #include "berryISchedulingRule.h"
 #include "berryJobExceptions.h"
 #include "internal/berryInternalJob.h"
 
@@ -56,7 +55,6 @@ struct IJobManager;
  * @see IJobManager
  *
  */
-//TODO  struct Job: public InternalJob, public IAdaptable
 class BERRY_JOBS Job: public InternalJob
 {
 
@@ -108,7 +106,6 @@ public:
    *
    * @see #GetPriority()
    * @see #SetPriority(int)
-   * @see #Run(IProgressMonitor)
    */
   static const int BUILD = 40;
 
@@ -120,7 +117,6 @@ public:
    *
    * @see #GetPriority()
    * @see #SetPriority(int)
-   * @see #Run(IProgressMonitor)
    */
   static const int DECORATE = 50;
   /**
@@ -134,7 +130,6 @@ public:
   /**
    * Job state code (value 1) indicating that a job is sleeping.
    *
-   * @see #Run(IProgressMonitor)
    * @see #GetState()
    */
   static const int SLEEPING = 0x01;
@@ -239,18 +234,6 @@ public:
   int GetPriority() const;
 
   /**
-   * Returns the value of the property of this job identified by the given key,
-   * or <code>null</code> if this job has no such property.
-   *
-   * @param key the name of the property
-   * @return the value of the property,
-   *     or <code>null</code> if this job has no such property
-   * @see #SetProperty(QualifiedName, Object)
-   */
-  //TODO QualifiedName GetPropertys
-  ///Object GetProperty(QualifiedName key) const ;
-
-  /**
    * Returns the result of this job's last run.
    *
    * @return the result of this job's last run, or <code>null</code> if this
@@ -332,35 +315,6 @@ public:
   bool IsUser() const;
 
   /**
-   * Waits until this job is finished.  This method will block the calling thread until the
-   * job has finished executing, or until this thread has been interrupted.  If the job
-   * has not been scheduled, this method returns immediately.  A job must not
-   * be joined from within the scope of its run method.
-   * <p>
-   * If this method is called on a job that reschedules itself from within the
-   * <tt>run</tt> method, the join will return at the end of the first execution.
-   * In other words, join will return the first time this job exits the
-   * {@link #RUNNING} state, or as soon as this job enters the {@link #NONE} state.
-   * </p>
-   * <p>
-   * If this method is called while the job manager is suspended, this job
-   * will only be joined if it is already running; if this job is waiting or sleeping,
-   * this method returns immediately.
-   * </p>
-   * <p>
-   * Note that there is a deadlock risk when using join.  If the calling thread owns
-   * a lock or object monitor that the joined thread is waiting for, deadlock
-   * will occur.
-   * </p>
-   *
-   * @exception InterruptedException if this thread is interrupted while waiting
-   * @see ILock
-   *  @see IJobManager#Suspend()
-   */
-  //TODO Error Join  Problem InterruptedException
-  /// void Join() ;
-
-  /**
    * Removes a job listener from this job.
    * Has no effect if an identical listener is not already registered.
    *
@@ -376,7 +330,6 @@ public:
    * This is a convenience method, fully equivalent to
    * <code>Schedule(0L)</code>.
    * </p>
-   * @see #Schedule(long)
    */
   void Schedule();
 
@@ -444,28 +397,6 @@ public:
    *    parent monitor, or {@link IProgressMonitor#UNKNOWN}
    */
   void SetProgressGroup(IProgressMonitor::Pointer group, int ticks);
-
-  /**
-   * Sets the value of the property of this job identified
-   * by the given key. If the supplied value is <code>null</code>,
-   * the property is removed from this resource.
-   * <p>
-   * Properties are intended to be used as a caching mechanism
-   * by ISV plug-ins. They allow key-object associations to be stored with
-   * a job instance.  These key-value associations are maintained in
-   * memory (at all times), and the information is never discarded automatically.
-   * </p><p>
-   * The qualifier part of the property name must be the unique identifier
-   * of the declaring plug-in (e.g. <code>"com.example.plugin"</code>).
-   * </p>
-   *
-   * @param key the qualified name of the property
-   * @param value the value of the property,
-   *     or <code>null</code> if the property is to be removed
-   * @see #GetProperty(QualifiedName)
-   */
-  //TODO QualifiedName SetProperty
-  /// void SetProperty(QualifiedName key, Object value);
 
   /**
    * Sets the scheduling rule to be used when scheduling this job.  This method
@@ -593,7 +524,7 @@ public:
 protected:
 
   /**
-   * A hook method indicating that this job is running and {@link #cancel()}
+   * A hook method indicating that this job is running and {@link #Cancel()}
    * is being called for the first time.
    * <p>
    * Subclasses may override this method to perform additional work when
@@ -607,7 +538,7 @@ protected:
    * The provided monitor can be used to report progress and respond to
    * cancellation.  If the progress monitor has been canceled, the job
    * should finish its execution at the earliest convenience and return a result
-   * status of severity {@link IStatus#CANCEL}.  The singleton
+   * status of severity \c IStatus.CANCEL .  The singleton
    * cancel status {@link Status#CANCEL_STATUS} can be used for
    * this purpose.  The monitor is only valid for the duration of the invocation
    * of this method.
@@ -621,11 +552,10 @@ protected:
    * <code>setThread</code>, and must indicate when they are finished by calling
    * the method <code>done</code>.
    *
-   * @param monitor the monitor to be used for reporting progress and
+   * @param myProgressMonitor the monitor to be used for reporting progress and
    * responding to cancellation. The monitor is never <code>null</code>
    * @return resulting status of the run. The result must not be <code>null</code>
    * @see #ASYNC_FINISH
-   * @see #Done(IStatus)
    */
   IStatus::Pointer Run(IProgressMonitor::Pointer myProgressMonitor) override = 0;
 

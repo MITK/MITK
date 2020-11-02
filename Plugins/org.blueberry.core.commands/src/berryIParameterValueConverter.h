@@ -41,8 +41,7 @@ namespace berry {
  * <code>commandParameterType</code> elemement of the
  * <code>org.blueberry.ui.commands</code> extension-point. Objects implementing
  * this interface may also be passed directly to
- * {@link ParameterType#Define(IParameterValueConverter::Pointer)} by
- * clients.
+ * {@link ParameterType#Define} by clients.
  * </p>
  *
  * @see ParameterType#Define(IParameterValueConverter::Pointer)
@@ -51,20 +50,6 @@ namespace berry {
 struct BERRY_COMMANDS IParameterValueConverter {
 
   virtual ~IParameterValueConverter();
-
-  /**
-   * Returns whether the provided value is compatible with this parameter
-   * value converter. An object is compatible with a converter if the object is an
-   * instance of the class defined in the <code>type</code> attribute of
-   * the <code>commandParameterType</code> element.
-   *
-   * @param value
-   *            an object to check for compatibility with this parameter type;
-   *            may be <code>null</code>.
-   * @return <code>true</code> if the value is compatible with this converter,
-   *         <code>false</code> otherwise
-   */
-  //virtual bool IsCompatible(const Object::ConstPointer value) const = 0;
 
   /**
    * Converts a string encoded command parameter value into the parameter

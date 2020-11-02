@@ -32,7 +32,6 @@ namespace berry {
  * This package provides a concrete menu manager implementation,
  * {@link MenuManager <code>MenuManager</code>}.
  * </p>
- * @noimplement This interface is not intended to be implemented by clients.
  */
 struct IMenuManager : public virtual IContributionManager, public IContributionItem
 {

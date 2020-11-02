@@ -130,7 +130,7 @@ namespace berry
      * @throws NullPointerException if <code>key</code> or <code>value</code> is
      *         <code>null</code>.
      * @throws IllegalStateException if this node (or an ancestor) has been
-     *         removed with the {@link #removeNode()}method.
+     *         removed with the {@link #Remove()}method.
      */
     virtual void Put(const QString& key, const QString& value) = 0;
 
@@ -146,7 +146,7 @@ namespace berry
      * @return the value associated with <code>key</code>, or <code>def</code> if
      *         no value is associated with <code>key</code>.
      * @throws IllegalStateException if this node (or an ancestor) has been
-     *         removed with the {@link #removeNode()}method.
+     *         removed with the {@link #Remove()}method.
      * @throws NullPointerException if <code>key</code> is <code>null</code>. (A
      *         <code>null</code> default <i>is </i> permitted.)
      */
@@ -157,9 +157,9 @@ namespace berry
      * node, if any.
      *
      * @param key key whose mapping is to be removed from this node.
-     * @see #get(const QString&,const QString&)
+     * @see #Get
      * @throws IllegalStateException if this node (or an ancestor) has been
-     *         removed with the {@link #removeNode()}method.
+     *         removed with the {@link #Remove()}method.
      */
     virtual void Remove(const QString& key) = 0;
 
@@ -171,8 +171,8 @@ namespace berry
      *         to a failure in the backing store, or inability to communicate
      *         with it.
      * @throws IllegalStateException if this node (or an ancestor) has been
-     *         removed with the {@link #removeNode()}method.
-     * @see #remove(const QString&)
+     *         removed with the {@link #Remove()}method.
+     * @see #Remove(const QString&)
      */
     virtual void Clear() = 0;
 
@@ -181,7 +181,7 @@ namespace berry
      * <code>int</code> value with the specified <code>key</code> in this node. The
      * associated string is the one that would be returned if the <code>int</code>
      * value were passed to <code>Integer.toString(int)</code>. This method is
-     * intended for use in conjunction with {@link #getInt}method.
+     * intended for use in conjunction with {@link #GetInt}method.
      *
      * <p>
      * Implementor's note: it is <i>not </i> necessary that the property value
@@ -197,8 +197,8 @@ namespace berry
      *        <code>key</code>.
      * @throws NullPointerException if <code>key</code> is <code>null</code>.
      * @throws IllegalStateException if this node (or an ancestor) has been
-     *         removed with the {@link #removeNode()}method.
-     * @see #getInt(const QString&,int)
+     *         removed with the {@link #Remove()}method.
+     * @see #GetInt
      */
     virtual void PutInt(const QString& key, int value) = 0;
 
@@ -211,7 +211,7 @@ namespace berry
      * is inaccessible, or if <code>Integer.parseInt(QString)</code> would throw a
      * <code>NumberFormatException</code> if the associated <code>value</code> were
      * passed. This method is intended for use in conjunction with the
-     * {@link #putInt}method.
+     * {@link #PutInt}method.
      *
      * @param key key whose associated value is to be returned as an
      *        <code>int</code>.
@@ -225,9 +225,9 @@ namespace berry
      *         be interpreted as an <code>int</code> type.
      * @throws NullPointerException if <code>key</code> is <code>null</code>.
      * @throws IllegalStateException if this node (or an ancestor) has been
-     *         removed with the {@link #removeNode()}method.
-     * @see #putInt(const QString&,int)
-     * @see #get(const QString&,const QString&)
+     *         removed with the {@link #Remove()}method.
+     * @see #PutInt(const QString&,int)
+     * @see #Get
      */
     virtual int GetInt(const QString& key, int def) const = 0;
 
@@ -236,7 +236,7 @@ namespace berry
      * <code>long</code> value with the specified <code>key</code> in this node. The
      * associated <code>QString</code> object is the one that would be returned if
      * the <code>long</code> value were passed to <code>Long.toString(long)</code>.
-     * This method is intended for use in conjunction with the {@link #getLong}
+     * This method is intended for use in conjunction with the {@link #GetLong}
      * method.
      *
      * <p>
@@ -254,8 +254,8 @@ namespace berry
      *        <code>key</code>.
      * @throws NullPointerException if <code>key</code> is <code>null</code>.
      * @throws IllegalStateException if this node (or an ancestor) has been
-     *         removed with the {@link #removeNode()}method.
-     * @see #getLong(const QString&,long)
+     *         removed with the {@link #Remove()}method.
+     * @see #GetLong
      */
     virtual void PutLong(const QString& key, long value) = 0;
 
@@ -268,7 +268,7 @@ namespace berry
      * is inaccessible, or if <code>Long.parseLong(QString)</code> would throw a
      * <code>NumberFormatException</code> if the associated <code>value</code> were
      * passed. This method is intended for use in conjunction with the
-     * {@link #putLong}method.
+     * {@link #PutLong}method.
      *
      * @param key <code>key</code> whose associated value is to be returned as a
      *        <code>long</code> value.
@@ -282,9 +282,9 @@ namespace berry
      *         be interpreted as a <code>long</code> type.
      * @throws NullPointerException if <code>key</code> is <code>null</code>.
      * @throws IllegalStateException if this node (or an ancestor) has been
-     *         removed with the {@link #removeNode()}method.
-     * @see #putLong(const QString&,long)
-     * @see #get(const QString&,const QString&)
+     *         removed with the {@link #Remove()}method.
+     * @see #PutLong(const QString&,long)
+     * @see #Get
      */
     virtual long GetLong(const QString& key, long def) const = 0;
 
@@ -293,7 +293,7 @@ namespace berry
      * <code>bool</code> value with the specified key in this node. The
      * associated string is "true" if the value is <code>true</code>, and "false"
      * if it is <code>false</code>. This method is intended for use in
-     * conjunction with the {@link #getBool}method.
+     * conjunction with the {@link #GetBool}method.
      *
      * <p>
      * Implementor's note: it is <i>not </i> necessary that the value be
@@ -310,9 +310,9 @@ namespace berry
      *        <code>key</code>.
      * @throws NullPointerException if <code>key</code> is <code>null</code>.
      * @throws IllegalStateException if this node (or an ancestor) has been
-     *         removed with the {@link #removeNode()}method.
-     * @see #getBool(const QString&,bool)
-     * @see #get(const QString&,const QString&)
+     *         removed with the {@link #Remove()}method.
+     * @see #GetBool
+     * @see #Get
      */
     virtual void PutBool(const QString& key, bool value) = 0;
 
@@ -322,7 +322,7 @@ namespace berry
      * strings are "true", which represents <code>true</code>, and "false", which
      * represents <code>false</code>. Case is ignored, so, for example, "TRUE"
      * and "False" are also valid. This method is intended for use in
-     * conjunction with the {@link #putBool}method.
+     * conjunction with the {@link #PutBool}method.
      *
      * <p>
      * Returns the specified default if there is no value associated with the
@@ -341,9 +341,9 @@ namespace berry
      *         be interpreted as a <code>bool</code>.
      * @throws NullPointerException if <code>key</code> is <code>null</code>.
      * @throws IllegalStateException if this node (or an ancestor) has been
-     *         removed with the {@link #removeNode()}method.
-     * @see #get(const QString&,const QString&)
-     * @see #putBool(const QString&,bool)
+     *         removed with the {@link #Remove()}method.
+     * @see #Get
+     * @see #PutBool
      */
     virtual bool GetBool(const QString& key, bool def) const = 0;
 
@@ -353,7 +353,7 @@ namespace berry
      * The associated <code>QString</code> object is the one that would be returned
      * if the <code>float</code> value were passed to
      * <code>Float.toString(float)</code>. This method is intended for use in
-     * conjunction with the {@link #getFloat}method.
+     * conjunction with the {@link #GetFloat}method.
      *
      * <p>
      * Implementor's note: it is <i>not </i> necessary that the value be
@@ -369,8 +369,8 @@ namespace berry
      *        <code>key</code>.
      * @throws NullPointerException if <code>key</code> is <code>null</code>.
      * @throws IllegalStateException if this node (or an ancestor) has been
-     *         removed with the {@link #removeNode()}method.
-     * @see #getFloat(const QString&,float)
+     *         removed with the {@link #Remove()}method.
+     * @see #GetFloat
      */
     virtual void PutFloat(const QString& key, float value) = 0;
 
@@ -382,7 +382,7 @@ namespace berry
      * there is no value associated with the <code>key</code>, the backing store
      * is inaccessible, or if <code>Float.parseFloat(QString)</code> would throw a
      * <code>NumberFormatException</code> if the associated value were passed.
-     * This method is intended for use in conjunction with the {@link #putFloat}
+     * This method is intended for use in conjunction with the {@link #PutFloat}
      * method.
      *
      * @param key <code>key</code> whose associated value is to be returned as a
@@ -396,10 +396,10 @@ namespace berry
      *         associated value does not exist or cannot be interpreted as a
      *         <code>float</code> type.
      * @throws IllegalStateException if this node (or an ancestor) has been
-     *         removed with the {@link #removeNode()}method.
+     *         removed with the {@link #Remove()}method.
      * @throws NullPointerException if <code>key</code> is <code>null</code>.
-     * @see #putFloat(const QString&,float)
-     * @see #get(const QString&,const QString&)
+     * @see #PutFloat
+     * @see #Get
      */
     virtual float GetFloat(const QString& key, float def) const = 0;
 
@@ -409,7 +409,7 @@ namespace berry
      * The associated <code>QString</code> object is the one that would be returned
      * if the <code>double</code> value were passed to
      * <code>Double.toString(double)</code>. This method is intended for use in
-     * conjunction with the {@link #getDouble}method
+     * conjunction with the {@link #GetDouble}method
      *
      * <p>
      * Implementor's note: it is <i>not </i> necessary that the value be
@@ -426,8 +426,8 @@ namespace berry
      *        <code>key</code>.
      * @throws NullPointerException if <code>key</code> is <code>null</code>.
      * @throws IllegalStateException if this node (or an ancestor) has been
-     *         removed with the {@link #removeNode()}method.
-     * @see #getDouble(const QString&,double)
+     *         removed with the {@link #Remove()}method.
+     * @see #GetDouble
      */
     virtual void PutDouble(const QString& key, double value) = 0;
 
@@ -440,7 +440,7 @@ namespace berry
      * is inaccessible, or if <code>Double.parseDouble(QString)</code> would throw
      * a <code>NumberFormatException</code> if the associated value were passed.
      * This method is intended for use in conjunction with the
-     * {@link #putDouble}method.
+     * {@link #PutDouble}method.
      *
      * @param key <code>key</code> whose associated value is to be returned as a
      *        <code>double</code> value.
@@ -453,10 +453,10 @@ namespace berry
      *         <code>def</code> if the associated value does not exist or cannot
      *         be interpreted as a <code>double</code> type.
      * @throws IllegalStateException if this node (or an ancestor) has been
-     *         removed with the the {@link #removeNode()}method.
+     *         removed with the the {@link #Remove()}method.
      * @throws NullPointerException if <code>key</code> is <code>null</code>.
-     * @see #putDouble(const QString&,double)
-     * @see #get(const QString&,const QString&)
+     * @see #PutDouble
+     * @see #Get
      */
     virtual double GetDouble(const QString& key, double def) const = 0;
 
@@ -465,7 +465,7 @@ namespace berry
      * <code>QByteArray</code> with the specified <code>key</code> in this node. The
      * associated <code>QByteArray</code> object is stored in <i>Base64</i> encoding.
      * This method is intended for use in conjunction with the
-     * {@link #getByteArray}method.
+     * {@link #GetByteArray}method.
      *
      * @param key <code>key</code> with which the string form of <code>value</code>
      *        is to be associated.
@@ -474,9 +474,9 @@ namespace berry
      * @throws NullPointerException if <code>key</code> or <code>value</code> is
      *         <code>null</code>.
      * @throws IllegalStateException if this node (or an ancestor) has been
-     *         removed with the {@link #removeNode()}method.
-     * @see #GetByteArray(const QString&,const QByteArray&)
-     * @see #Get(const QString&,const QString&)
+     *         removed with the {@link #Remove()}method.
+     * @see #GetByteArray
+     * @see #Get
      */
     virtual void PutByteArray(const QString& key, const QByteArray& value) = 0;
 
@@ -488,7 +488,7 @@ namespace berry
      * Section 6.8, with one minor change: the string must consist solely of
      * characters from the <i>Base64 Alphabet </i>; no newline characters or
      * extraneous characters are permitted. This method is intended for use in
-     * conjunction with the {@link #putByteArray}method.
+     * conjunction with the {@link #PutByteArray}method.
      *
      * <p>
      * Returns the specified default if there is no value associated with the
@@ -508,9 +508,9 @@ namespace berry
      * @throws NullPointerException if <code>key</code> is <code>null</code>. (A
      *         <code>null</code> value for <code>def</code> <i>is </i> permitted.)
      * @throws IllegalStateException if this node (or an ancestor) has been
-     *         removed with the {@link #removeNode()}method.
-     * @see #get(const QString&,const QString&)
-     * @see #putByteArray(const QString&,std::vector<char>)
+     *         removed with the {@link #Remove()}method.
+     * @see #Get
+     * @see #PutByteArray
      */
     virtual QByteArray GetByteArray(const QString& key, const QByteArray& def) const = 0;
 
@@ -524,7 +524,7 @@ namespace berry
      *         to a failure in the backing store, or inability to communicate
      *         with it.
      * @throws IllegalStateException if this node (or an ancestor) has been
-     *         removed with the {@link #removeNode()}method.
+     *         removed with the {@link #Remove()}method.
      */
     virtual QStringList Keys() const = 0;
 
@@ -537,7 +537,7 @@ namespace berry
      *         to a failure in the backing store, or inability to communicate
      *         with it.
      * @throws IllegalStateException if this node (or an ancestor) has been
-     *         removed with the {@link #removeNode()}method.
+     *         removed with the {@link #Remove()}method.
      */
     virtual QStringList ChildrenNames() const = 0;
 
@@ -546,7 +546,7 @@ namespace berry
      *
      * @return the parent of this node.
      * @throws IllegalStateException if this node (or an ancestor) has been
-     *         removed with the {@link #removeNode()}method.
+     *         removed with the {@link #Remove()}method.
      */
     virtual IPreferences::Pointer Parent() const = 0;
 
@@ -570,9 +570,9 @@ namespace berry
      * @return the specified <code>IPreferences</code> object.
      * @throws IllegalArgumentException if the path name is invalid.
      * @throws IllegalStateException if this node (or an ancestor) has been
-     *         removed with the {@link #removeNode()}method.
+     *         removed with the {@link #Remove()}method.
      * @throws NullPointerException if path name is <code>null</code>.
-     * @see #flush()
+     * @see #Flush()
      */
     virtual IPreferences::Pointer Node(const QString& pathName) = 0;
 
@@ -586,7 +586,7 @@ namespace berry
      *
      * <p>
      * If this node (or an ancestor) has already been removed with the
-     * {@link #removeNode()}method, it <i>is </i> legal to invoke this method,
+     * {@link #Remove()}method, it <i>is </i> legal to invoke this method,
      * but only with the pathname <code>""</code>; the invocation will return
      * <code>false</code>. Thus, the idiom <code>p.nodeExists("")</code> may be
      * used to test whether <code>p</code> has been removed.
@@ -598,7 +598,7 @@ namespace berry
      *         to a failure in the backing store, or inability to communicate
      *         with it.
      * @throws IllegalStateException if this node (or an ancestor) has been
-     *         removed with the {@link #removeNode()}method and
+     *         removed with the {@link #Remove()}method and
      *         <code>pathname</code> is not the empty string (<code>""</code>).
      * @throws IllegalArgumentException if the path name is invalid (i.e., it
      *         contains multiple consecutive slash characters, or ends with a
@@ -620,11 +620,11 @@ namespace berry
      * method is called on the parent of this node.
      *
      * @throws IllegalStateException if this node (or an ancestor) has already
-     *         been removed with the {@link #removeNode()}method.
+     *         been removed with the {@link #Remove()}method.
      * @throws BackingStoreException if this operation cannot be completed due
      *         to a failure in the backing store, or inability to communicate
      *         with it.
-     * @see #flush()
+     * @see #Flush()
      */
     virtual void RemoveNode() = 0;
 
@@ -674,8 +674,8 @@ namespace berry
      *         to a failure in the backing store, or inability to communicate
      *         with it.
      * @throws IllegalStateException if this node (or an ancestor) has been
-     *         removed with the {@link #removeNode()}method.
-     * @see #sync()
+     *         removed with the {@link #Remove()}method.
+     * @see #Sync()
      */
     virtual void Flush() = 0;
 
@@ -690,8 +690,8 @@ namespace berry
      *         to a failure in the backing store, or inability to communicate
      *         with it.
      * @throws IllegalStateException if this node (or an ancestor) has been
-     *         removed with the {@link #removeNode()}method.
-     * @see #flush()
+     *         removed with the {@link #Remove()}method.
+     * @see #Flush()
      */
     virtual void Sync() = 0;
 

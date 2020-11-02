@@ -50,6 +50,7 @@ public:
    * @param newChildren the list of children status objects
    * @param message a human-readable message, localized to the
    *    current locale
+   * @param sl
    */
   MultiStatus(const QString& pluginId, int code, const QList<IStatus::Pointer>& newChildren,
               const QString& message, const SourceLocation& sl);
@@ -63,6 +64,7 @@ public:
    * @param message a human-readable message, localized to the
    *    current locale
    * @param exception a low-level exception.
+   * @param sl
    */
   MultiStatus(const QString& pluginId, int code, const QList<IStatus::Pointer>& newChildren,
               const QString& message, const ctkException& exception, const SourceLocation& sl);
@@ -74,6 +76,7 @@ public:
    * @param code the plug-in-specific status code
    * @param message a human-readable message, localized to the
    *    current locale
+   * @param sl
    */
   MultiStatus(const QString& pluginId, int code, const QString& message,
               const SourceLocation& sl);
@@ -87,6 +90,7 @@ public:
    *    current locale
    * @param exception a low-level exception, or <code>null</code> if not
    *    applicable
+   * @param sl
    */
   MultiStatus(const QString& pluginId, int code, const QString& message,
               const ctkException& exception, const SourceLocation& sl);
@@ -119,14 +123,12 @@ public:
 
   /**
    * Merges the given status into this multi-status.
-   * Equivalent to <code>add(status)</code> if the
+   * Equivalent to <code>Add(status)</code> if the
    * given status is not a multi-status.
-   * Equivalent to <code>addAll(status)</code> if the
+   * Equivalent to <code>AddAll(status)</code> if the
    * given status is a multi-status.
    *
    * @param status the status to merge into this one
-   * @see #add(IStatus)
-   * @see #addAll(IStatus)
    */
   void Merge(const IStatus::Pointer& status);
 

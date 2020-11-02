@@ -33,7 +33,7 @@ namespace berry {
  * <p>
  * When a perspective is opened, it creates a new page layout with a single editor area.
  * This layout is then passed to the perspective factory (implementation of
- * {@link org.blueberry.ui.IPerspectiveFactory#createInitialLayout(IPageLayout)}) where
+ * {@link IPerspectiveFactory#CreateInitialLayout}) where
  * additional views and other content can be added, using the existing editor area as
  * the initial point of reference.
  * </p>
@@ -78,7 +78,7 @@ namespace berry {
  * layout.addView(IPageLayout.ID_TASK_LIST, IPageLayout.BOTTOM, 0.66f, editorArea);
  * </pre>
  * </p>
- * @noimplement This interface is not intended to be implemented by clients.
+ * @note This interface is not intended to be implemented by clients.
  */
 struct BERRY_UI_QT IPageLayout : public Object
 {
@@ -188,16 +188,6 @@ struct BERRY_UI_QT IPageLayout : public Object
      * @since 2.0
      */
     static const float nullptr_RATIO; // = -2f;
-
-    /**
-     * Adds an action set with the given id to this page layout.
-     * The id must name an action set contributed to the workbench's extension
-     * point (named <code>"org.blueberry.ui.actionSet"</code>).
-     *
-     * @param actionSetId the action set id
-     */
-    //virtual void AddActionSet(const QString& actionSetId) = 0;
-
 
     /**
      * Adds a perspective shortcut to the page layout.

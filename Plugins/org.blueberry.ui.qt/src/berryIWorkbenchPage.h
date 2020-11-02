@@ -74,8 +74,7 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    * which identifies the preferred editor type to be opened when
    * <code>openEditor</code> is called.
    *
-   * @see #openEditor(IEditorInput, String)
-   * @see #openEditor(IEditorInput, String, boolean)
+   * @see #OpenEditor
    * @deprecated in 3.0 since the notion of markers this is not generally
    *             applicable. Use the IDE-specific constant
    *             <code>IDE.EDITOR_ID_ATTR</code>.
@@ -157,7 +156,7 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
   /**
    * Show view mode that indicates the view should be made visible and
    * activated. Use of this mode has the same effect as calling
-   * {@link #showView(String)}.
+   * #ShowView .
    */
   static const int VIEW_ACTIVATE; // = 1;
 
@@ -202,14 +201,6 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    *            the part to activate
    */
   virtual void Activate(IWorkbenchPart::Pointer part) = 0;
-
-  /**
-   * Adds a property change listener.
-   *
-   * @param listener
-   *            the property change listener to add
-   */
-  //virtual void addPropertyChangeListener(IPropertyChangeListener listener);
 
   /**
    * Moves the given part forward in the Z order of this page so as to make it
@@ -371,7 +362,7 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    *
    * @return a list of open editors
    *
-   * @deprecated use #getEditorReferences() instead
+   * @deprecated use #GetEditorReferences instead
    */
   virtual QList<IEditorPart::Pointer> GetEditors() = 0;
 
@@ -413,8 +404,8 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    * <code>null</code> if there is no current perspective.
    *
    * @return the current perspective descriptor or <code>null</code>
-   * @see #setPerspective
-   * @see #savePerspective
+   * @see #SetPerspective
+   * @see #SavePerspective
    */
   virtual IPerspectiveDescriptor::Pointer GetPerspective() = 0;
 
@@ -438,7 +429,7 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    *
    * @return a list of visible views
    *
-   * @deprecated use #getViewReferences() instead.
+   * @deprecated use #GetViewReferences() instead.
    */
   virtual QList<IViewPart::Pointer> GetViews() = 0;
 
@@ -478,14 +469,6 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    * @return boolean <code>true</code> if part is visible
    */
   virtual bool IsPartVisible(IWorkbenchPart::Pointer part) = 0;
-
-  /**
-   * Removes the perspective specified by desc.
-   *
-   * @param desc
-   *            the perspective that will be removed
-   */
-  //virtual void RemovePerspective(IPerspectiveDescriptor::Pointer desc) = 0;
 
   /**
    * Reuses the specified editor by setting its new input.
@@ -534,7 +517,7 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    * If this page already has an editor open on the target input that editor
    * is brought to the front; otherwise, a new editor is opened. Two editor
    * inputs are considered the same if they equal. See
-   * <code>Object.equals(Object)<code>
+   * <code>Object.equals(Object)</code>
    * and <code>IEditorInput</code>. If <code>activate == true</code> the editor
    * will be activated.
    * </p><p>
@@ -562,7 +545,7 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    * and/or editor id (as specified by the matchFlags argument), that editor
    * is brought to the front; otherwise, a new editor is opened. Two editor
    * inputs are considered the same if they equal. See
-   * <code>Object.equals(Object)<code>
+   * <code>Object.equals(Object)</code>
    * and <code>IEditorInput</code>. If <code>activate == true</code> the editor
    * will be activated.
    * </p><p>
@@ -587,14 +570,6 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    */
   virtual IEditorPart::Pointer OpenEditor(IEditorInput::Pointer input,
       const QString& editorId, bool activate, int matchFlags) = 0;
-
-  /**
-   * Removes the property change listener.
-   *
-   * @param listener
-   *            the property change listener to remove
-   */
-  //virtual void removePropertyChangeListener(IPropertyChangeListener listener);
 
   /**
    * Changes the visible views, their layout, and the visible action sets
@@ -792,17 +767,6 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    * @return the open perspective descriptors, in order of activation
    */
   virtual QList<IPerspectiveDescriptor::Pointer> GetSortedPerspectives() = 0;
-
-  /**
-   * Closes current perspective. If last perspective, then entire page
-   * is closed.
-   *
-   * @param saveParts
-   *            whether the page's parts should be saved if closed
-   * @param closePage
-   *            whether the page itself should be closed if last perspective
-   */
-  //virtual void CloseCurrentPerspective(bool saveParts, bool closePage) = 0;
 
   /**
    * Closes the specified perspective in this page. If the last perspective in

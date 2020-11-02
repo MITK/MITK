@@ -27,8 +27,6 @@ namespace berry {
  * objects. It is not intended to be instantiated or
  * subclassed by clients.
  * </p>
- * @noinstantiate This class is not intended to be instantiated by clients.
- * @noextend This class is not intended to be subclassed by clients.
  */
 class org_blueberry_core_runtime_EXPORT InvalidRegistryObjectException : public ctkRuntimeException
 {

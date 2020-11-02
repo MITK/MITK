@@ -57,7 +57,7 @@ namespace berry
  * </p>
  *
  * @see IJobManager#NewLock()
- * @noimplement This interface is not intended to be implemented by clients.
+ * @note This interface is not intended to be implemented by clients.
  */
 struct BERRY_JOBS ILock: public Object
 {

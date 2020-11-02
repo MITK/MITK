@@ -334,7 +334,7 @@ public:
    * The <code>MenuManager</code> implementation of this <code>IContributionManager</code>
    * updates this menu, but not any of its submenus.
    *
-   * @see #updateAll
+   * @see #UpdateAll
    */
   void Update(bool force) override;
 
@@ -378,7 +378,7 @@ protected:
    * @param ci
    *            An <code>IContributionItem</code> whose <code>fill()</code>
    *            method should be called.
-   * @param index
+   * @param before
    *            The position the <code>fill()</code> method should start
    *            inserting at.
    */

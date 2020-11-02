@@ -30,7 +30,6 @@ namespace berry
  * Not intended to be implemented by clients.
  *
  * @since 3.0
- * @noimplement This interface is not intended to be implemented by clients.
  */
 struct BERRY_UI_QT IStackPresentationSite : public Object
 {

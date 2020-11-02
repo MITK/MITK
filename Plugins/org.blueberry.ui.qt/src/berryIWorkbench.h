@@ -57,7 +57,7 @@ struct IWorkbenchPage;
  * The platform creates a workbench when the workbench plug-in is activated;
  * since this happens at most once during the life of the running platform,
  * there is only one workbench instance. Due to its singular nature, it is
- * commonly referred to as <it>the</it> workbench.
+ * commonly referred to as <em>the</em> workbench.
  * </p>
  * <p>
  * The workbench supports a few {@link IServiceLocator services} by default. If
@@ -67,7 +67,6 @@ struct IWorkbenchPage;
  * are:
  * </p>
  * <ul>
- * <li>{@link IBindingService}</li>
  * <li>{@link ICommandService}</li>
  * <li>{@link IContextService}</li>
  * <li>{@link IHandlerService}</li>
@@ -76,8 +75,7 @@ struct IWorkbenchPage;
  * This interface is not intended to be implemented by clients.
  * </p>
  *
- * @see PlatformUI#getWorkbench
- * @noimplement This interface is not intended to be implemented by clients.
+ * @see PlatformUI#GetWorkbench
  */
 struct BERRY_UI_QT IWorkbench : public IServiceLocator {
 
@@ -89,7 +87,7 @@ struct BERRY_UI_QT IWorkbench : public IServiceLocator {
    * Returns the display for this workbench.
    * <p>
    * Code should always ask the workbench for the display rather than rely on
-   * {@link Display#getDefault Display.getDefault()}.
+   * {@link Display#GetDefault Display.getDefault()}.
    * </p>
    *
    * @return the display to be used for all UI interactions with this

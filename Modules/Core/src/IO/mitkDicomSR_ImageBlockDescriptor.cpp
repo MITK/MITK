@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkDicomSeriesReader.h>
 #include <mitkImage.h>
+#include <mitkStructuredReport.h>
 #include <mitkPixelTypeMultiplex.h>
 #include <vnl/vnl_cross.h>
 
@@ -397,6 +398,31 @@ DicomSeriesReader::ImageBlockDescriptor::ImageBlockDescriptor(std::string path, 
   }
 }
 
+bool DicomSeriesReader::ImageBlockDescriptor::loadStructeredReport(DcmFileFormat& ff, ImageBlockDescriptor* src)
+{
+  if (!src) {
+    src = this;
+  }
+
+  std::unique_lock<std::mutex> lock(*m_Mutex);
+  auto filename = src->m_Filenames[0];
+  auto& info = m_SlicesInfo.at(filename);
+  lock.unlock();
+
+  ff.convertToUTF8();
+
+  StructuredReport::Pointer report = StructuredReport::New();
+
+  DcmDataset* fileData = ff.getDataset();
+  report->reportData.read(*fileData);
+
+  lock.lock();
+  info.m_Data = report;
+  lock.unlock();
+
+  return true;
+}
+
 bool DicomSeriesReader::ImageBlockDescriptor::loadImage(DcmFileFormat& ff, ImageBlockDescriptor* src)
 {
   if (!src) {
@@ -486,7 +512,7 @@ bool DicomSeriesReader::ImageBlockDescriptor::loadImage(DcmFileFormat& ff, Image
     }
 
     lock.lock();
-    info.m_Image = image;
+    info.m_Data = image;
     lock.unlock();
   }
   return true;
@@ -498,9 +524,9 @@ void DicomSeriesReader::ImageBlockDescriptor::loadTags(DcmFileFormat& ff)
   if (m_Filenames.empty()) {
     return;
   }
-  auto image = m_SlicesInfo.at(m_Filenames[0]).m_Image;
+  auto image = m_SlicesInfo.at(m_Filenames[0]).m_Data;
   for (int i=1; i<m_Filenames.size() && !image; i++) {
-    image = m_SlicesInfo.at(m_Filenames[i]).m_Image;
+    image = m_SlicesInfo.at(m_Filenames[i]).m_Data;
   }
   lock.unlock();
 
@@ -707,7 +733,7 @@ std::shared_ptr<DicomSeriesReader::ImageBlockDescriptor> DicomSeriesReader::Imag
   m_HasMultipleTimePoints = timeSteps > 1;
   m_MultiOriented = false;
 
-  if (sliceInfo->m_Image) { // Correct spacing value to sqrt(step2)
+  if (sliceInfo->m_Data) { // Correct spacing value to sqrt(step2)
     if (zSteps > 1) {
       auto last2 = squaredStep(*preLastSlice, *referenceSlice, step2);
       if (zSteps > 2) {
@@ -831,9 +857,9 @@ Image::Pointer DicomSeriesReader::ImageBlockDescriptor::GetImage(size_t *slicesC
     return Image::Pointer();
   }
   auto filename = m_Filenames[0];
-  auto firstImage = m_SlicesInfo.at(filename).m_Image;
+  mitk::Image::Pointer firstImage = dynamic_cast<mitk::Image*>(m_SlicesInfo.at(filename).m_Data.GetPointer());
   for (int i=1; i<m_Filenames.size() && !firstImage; i++) {
-    firstImage = m_SlicesInfo.at(filename = m_Filenames[i]).m_Image;
+    firstImage = dynamic_cast<mitk::Image*>(m_SlicesInfo.at(filename = m_Filenames[i]).m_Data.GetPointer());
   }
   if (m_Filenames.size()==1 || !firstImage) {
     if (slicesCnt) {
@@ -878,7 +904,7 @@ Image::Pointer DicomSeriesReader::ImageBlockDescriptor::GetImage(size_t *slicesC
       for (auto& file: block) {
         lock.lock();
         auto& sliceInfo = m_SlicesInfo.at(file);
-        auto slice = sliceInfo.m_Image;
+        mitk::Image::Pointer slice = dynamic_cast<mitk::Image*>(sliceInfo.m_Data.GetPointer());
         lock.unlock();
         if (slice) {
           filename = file;
@@ -950,7 +976,7 @@ void DicomSeriesReader::ImageBlockDescriptor::DropImages()
 {
   std::unique_lock<std::mutex> lock(*m_Mutex);
   for (auto& slice: m_SlicesInfo) {
-    slice.second.m_Image = nullptr;
+    slice.second.m_Data = nullptr;
   }
 }
 

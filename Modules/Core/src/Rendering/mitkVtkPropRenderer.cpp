@@ -162,8 +162,6 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type, vtkInf
   //Update all overlays in any case
   this->UpdateOverlays();
   // Do we have objects to render?
-  if (this->GetEmptyWorldGeometry())
-    return 0;
 
   if (m_DataStorage.IsNull())
     return 0;

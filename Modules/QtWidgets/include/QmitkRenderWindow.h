@@ -31,6 +31,11 @@ class QmitkStdMultiWidget;
 class QDragEnterEvent;
 class QDropEvent;
 class QInputEvent;
+class QTextBrowser;
+
+namespace mitk {
+  class StructuredReport;
+}
 
 /**
  * \ingroup QmitkModule
@@ -75,6 +80,8 @@ public:
 
   void HideRenderWindowMenu();
 
+  void UpdateStructuredReportVisibility(mitk::StructuredReport* report, bool visible);
+
   //Activate or Deactivate MenuWidget.
   void ActivateMenuWidget(bool state, QmitkStdMultiWidget* stdMultiWidget = 0);
 
@@ -108,6 +115,8 @@ public:
 
   void setTwoDimensionalViewState(bool state);
   bool isTwoDimensionalViewState();
+
+  void ConnectStructuredReportWidgetToDataStorage(mitk::DataStorage* ds);
 
   void updateAllWindows();
 
@@ -148,6 +157,16 @@ protected:
 
   void AdjustRenderWindowMenuVisibility(const QPoint& pos);
 
+  QWidget* m_StructuredReportWidget;
+  QTextBrowser* m_StructuredReportText;
+  std::set<mitk::StructuredReport*> m_VisibleReports;
+
+  void initStructuredReportWidget();
+  void freeStructuredReportWidget();
+  void fillStructuredReportWidget(mitk::StructuredReport* report);
+
+  void AddNodeCallback(const mitk::DataNode* node);
+  void RemoveNodeCallback(const mitk::DataNode* node);
 signals:
 
   // \brief int parameters are enum from QmitkStdMultiWidget

@@ -39,6 +39,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSlicedGeometry3D.h"
 #include "mitkSmartPointerProperty.h"
 #include "mitkStringProperty.h"
+#include "mitkStructuredReport.h"
+#include "mitkStructuredReportMapper.h"
 #include "mitkSurface.h"
 #include "mitkSurface.h"
 #include "mitkSurfaceVtkMapper2D.h"
@@ -140,6 +142,12 @@ void mitk::CoreObjectFactory::SetDefaultProperties(mitk::DataNode* node)
     mitk::PointSetVtkMapper2D::SetDefaultProperties(node);
     mitk::PointSetVtkMapper3D::SetDefaultProperties(node);
   }
+
+  mitk::StructuredReport::Pointer report = dynamic_cast<mitk::StructuredReport*>(node->GetData());
+  if (report.IsNotNull()) {
+    mitk::StructuredReportMapper::SetDefaultProperties(node);
+  }
+
   for (ExtraFactoriesContainer::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; ++it ) {
     (*it)->SetDefaultProperties(node);
   }
@@ -200,6 +208,10 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node
         newMapper = mitk::PointSetVtkMapper2D::New();
         newMapper->SetDataNode(node);
       }
+      else if ((dynamic_cast<StructuredReport*>(data) != nullptr)) {
+        newMapper = StructuredReportMapper::New();
+        newMapper->SetDataNode(node);
+      }
     }
     else if ( id == mitk::BaseRenderer::Standard3D )
     {
@@ -216,6 +228,9 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node
       else if((dynamic_cast<PointSet*>(data)!=NULL))
       {
         newMapper = mitk::PointSetVtkMapper3D::New();
+        newMapper->SetDataNode(node);
+      } else if ((dynamic_cast<StructuredReport*>(data) != nullptr)) {
+        newMapper = StructuredReportMapper::New();
         newMapper->SetDataNode(node);
       }
     }

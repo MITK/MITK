@@ -17,14 +17,20 @@
 #include "QmitkRenderWindow.h"
 
 #include <QCursor>
+#include <QDesktopServices>
+#include <QDir>
+#include <QLayout>
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QKeyEvent>
 #include <QResizeEvent>
+#include <QTextBrowser>
 #include <QTimer>
 #include <QDragEnterEvent>
 #include <QDropEvent>
+#include <QScrollArea>
 #include <QSurfaceFormat>
+#include <QTemporaryFile>
 #include <QWindow>
 #include "mitkMousePressEvent.h"
 #include "mitkMouseMoveEvent.h"
@@ -33,9 +39,14 @@
 #include "mitkInteractionKeyEvent.h"
 #include "mitkMouseWheelEvent.h"
 #include "mitkInternalEvent.h"
+#include "mitkStructuredReport.h"
+#include "mitkStructuredReportMapper.h"
 
 #include "QmitkRenderWindowMenu.h"
 #include "QmitkMimeTypes.h"
+
+Q_DECLARE_METATYPE(mitk::StructuredReport*);
+Q_DECLARE_METATYPE(mitk::DataStorage*);
 
 QmitkRenderWindow::QmitkRenderWindow(QWidget *parent,
   QString name,
@@ -79,11 +90,117 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent,
 
   setFocusPolicy(Qt::StrongFocus);
   setMouseTracking(true);
+
+  initStructuredReportWidget();
 }
 
 QmitkRenderWindow::~QmitkRenderWindow()
 {
+  freeStructuredReportWidget();
   Destroy(); // Destroy mitkRenderWindowBase
+}
+
+void QmitkRenderWindow::initStructuredReportWidget()
+{
+  m_StructuredReportWidget = new QWidget(this);
+  m_StructuredReportWidget->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
+
+  class SRPropagateFilter : public QObject {
+  public:
+    QmitkRenderWindow* window;
+    bool eventFilter(QObject* object, QEvent* event) override{
+      if (event->type() == QEvent::MouseMove) {
+        window->event(event);
+      } else if (event->type() == QEvent::MouseButtonPress) {
+        window->event(event);
+      }
+      return false;
+    }
+  };
+
+  SRPropagateFilter* pf = new SRPropagateFilter();
+  pf->window = this;
+
+  QVBoxLayout* srLayout = new QVBoxLayout();
+  m_StructuredReportWidget->setLayout(srLayout);
+
+  QVBoxLayout* mainLayout = new QVBoxLayout();
+  mainLayout->setContentsMargins(0, 0, 0, 0);
+  setLayout(mainLayout);
+  mainLayout->addWidget(m_StructuredReportWidget);
+
+  m_StructuredReportWidget->setVisible(false);
+  
+  QPushButton* browserButton = new QPushButton(m_StructuredReportWidget);
+  browserButton->setText(tr("View in Browser"));
+  srLayout->addWidget(browserButton);
+
+  m_StructuredReportText = new QTextBrowser(m_StructuredReportWidget);
+  m_StructuredReportText->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
+  srLayout->addWidget(m_StructuredReportText);
+
+  connect(browserButton, &QAbstractButton::pressed, [this]() {
+    mitk::StructuredReport* rep = m_StructuredReportWidget->property("StructuredReportPointer").value<mitk::StructuredReport*>();
+
+    QDir tempDir(QDir::tempPath() + "/autoplan_sr");
+    if (!tempDir.exists()) {
+      tempDir.mkpath(".");
+    }
+
+    QString postfix = "";
+    int counter = 0;
+    while (tempDir.exists("sr_report" + postfix + ".html") && counter < 255) {
+      counter++;
+      postfix = QString::number(counter);
+    }
+
+    if (counter >= 255) {
+      return;
+    }
+
+    QFile f(tempDir.filePath("sr_report" + postfix + ".html"));
+    f.open(QFile::OpenModeFlag::WriteOnly);
+    f.write(rep->GetReportText().c_str());
+    f.close();
+
+    QDesktopServices::openUrl(QUrl("file:///" + f.fileName()));
+  });
+
+  m_StructuredReportText->viewport()->installEventFilter(pf);
+}
+
+void QmitkRenderWindow::freeStructuredReportWidget()
+{
+  mitk::DataStorage* ds = m_StructuredReportWidget->property("connectedDataStorage").value<mitk::DataStorage*>();
+  if (ds != nullptr) {
+    auto s = ds->GetAll();
+    for (const auto& node : *s) {
+      RemoveNodeCallback(node);
+    }
+  }
+
+  delete m_StructuredReportWidget;
+}
+
+void QmitkRenderWindow::fillStructuredReportWidget(mitk::StructuredReport* report)
+{
+  m_StructuredReportText->setText(QString::fromStdString(report->GetReportText()));
+  m_StructuredReportWidget->setProperty("StructuredReportPointer", QVariant::fromValue(report));
+}
+
+void QmitkRenderWindow::UpdateStructuredReportVisibility(mitk::StructuredReport* report, bool visible)
+{
+  if (visible) {
+    m_VisibleReports.insert(report);
+  } else {
+    m_VisibleReports.erase(report);
+  }
+
+  bool hasVisibleReport = m_VisibleReports.size() > 0;
+  m_StructuredReportWidget->setVisible(hasVisibleReport);
+  if (hasVisibleReport) {
+    fillStructuredReportWidget(*m_VisibleReports.begin());
+  }
 }
 
 void QmitkRenderWindow::SetResendQtEvents(bool resend)
@@ -179,6 +296,40 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
   if (!this->HandleEvent(mMoveEvent.GetPointer()))
   {
     QVTKWidget::mouseMoveEvent(me);
+  }
+}
+
+void QmitkRenderWindow::AddNodeCallback(const mitk::DataNode* node)
+{
+  mitk::StructuredReportMapper* srMapper = dynamic_cast<mitk::StructuredReportMapper*>(node->GetMapper(mitk::BaseRenderer::Standard3D));
+
+  if (srMapper != nullptr) {
+    srMapper->updateQtActorContext = this;
+    srMapper->updateQtActor = [](mitk::StructuredReport* report, bool visible, void* context) {
+      QmitkRenderWindow* window = (QmitkRenderWindow*)context;
+      window->UpdateStructuredReportVisibility(report, visible);
+    };
+  }
+}
+
+void QmitkRenderWindow::RemoveNodeCallback(const mitk::DataNode* node)
+{
+  mitk::StructuredReportMapper* srMapper = dynamic_cast<mitk::StructuredReportMapper*>(node->GetMapper(mitk::BaseRenderer::Standard3D));
+  if (srMapper != nullptr) {
+    srMapper->freeConnection();
+  }
+}
+
+void QmitkRenderWindow::ConnectStructuredReportWidgetToDataStorage(mitk::DataStorage* ds)
+{
+  ds->AddNodeEvent.AddListener(mitk::MessageDelegate1<QmitkRenderWindow, const mitk::DataNode*>(this, &QmitkRenderWindow::AddNodeCallback));
+  ds->RemoveNodeEvent.AddListener(mitk::MessageDelegate1<QmitkRenderWindow, const mitk::DataNode*>(this, &QmitkRenderWindow::RemoveNodeCallback));
+
+  m_StructuredReportWidget->setProperty("connectedDataStorage", QVariant::fromValue(ds));
+
+  auto s = ds->GetAll();
+  for (const auto& node : *s) {
+    AddNodeCallback(node);
   }
 }
 

@@ -334,7 +334,7 @@ public:
     bool m_HasImagePositionPatient; ///< ImagePositionPatient exists in DICOM tags as 3 coordinates
     bool m_HasOrientation;
     std::string m_GantryTilt;       // TODO: convert to double
-    Image::Pointer m_Image; ///< Preloaded slice or frames
+    BaseData::Pointer m_Data; ///< Preloaded slice or frames
 
     SliceInfo(): m_AcquisitionNumber(std::numeric_limits<long>::max()), m_TemporalPosition(std::numeric_limits<long>::max()),
       m_InstanceNumber(std::numeric_limits<long>::max()), m_FileSize(0), m_HasImagePositionPatient(false) {}
@@ -486,6 +486,7 @@ public:
 
       void loadTags(DcmFileFormat& ff);
       bool loadImage(DcmFileFormat& ff, ImageBlockDescriptor* file=0); ///< call after addFile
+      bool loadStructeredReport(DcmFileFormat& ff, ImageBlockDescriptor* file = nullptr);
       void fillSeriesInfo(DcmItem* d1, DcmItem* d2 = nullptr, DcmItem* d3 = nullptr);
       void AddFile(ImageBlockDescriptor& file);
       void EraseFile(const ImageBlockDescriptor& file);

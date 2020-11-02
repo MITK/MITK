@@ -1541,6 +1541,7 @@ void QmitkStdMultiWidget::SetDataStorage(mitk::DataStorage* ds)
   mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow())->SetDataStorage(ds);
   mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow())->SetDataStorage(ds);
   mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->SetDataStorage(ds);
+  mitkWidget4->ConnectStructuredReportWidgetToDataStorage(ds);
   m_DataStorage = ds;
 }
 

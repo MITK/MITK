@@ -51,11 +51,11 @@ set(CPP_FILES
   Controllers/mitkVerboseLimitedLinearUndo.cpp
   Controllers/mitkVtkLayerController.cpp
 
-  DataManagement/mitkArbitraryTimeGeometry.cpp
   DataManagement/mitkAbstractTransformGeometry.cpp
   DataManagement/mitkAnnotationProperty.cpp
   DataManagement/mitkApplicationCursor.cpp
   DataManagement/mitkApplyTransformMatrixOperation.cpp
+  DataManagement/mitkArbitraryTimeGeometry.cpp
   DataManagement/mitkBaseData.cpp
   DataManagement/mitkBaseGeometry.cpp
   DataManagement/mitkBaseProperty.cpp
@@ -70,27 +70,27 @@ set(CPP_FILES
   DataManagement/mitkGeometryData.cpp
   DataManagement/mitkGeometryTransformHolder.cpp
   DataManagement/mitkGroupTagProperty.cpp
-  DataManagement/mitkImageAccessLock.cpp
-  DataManagement/mitkImageCaster.cpp
-  DataManagement/mitkImageCastPart1.cpp
-  DataManagement/mitkImageCastPart2.cpp
-  DataManagement/mitkImageCastPart3.cpp
-  DataManagement/mitkImageCastPart4.cpp
-  DataManagement/mitkImage.cpp
-  DataManagement/mitkImageDataItem.cpp
-  DataManagement/mitkImageDescriptor.cpp
-  DataManagement/mitkImageRegionAccessor.cpp
-  DataManagement/mitkImageStatisticsHolder.cpp
-  DataManagement/mitkImageVtkAccessor.cpp
-  DataManagement/mitkIntPropertyExtension.cpp
   DataManagement/mitkIPersistenceService.cpp
   DataManagement/mitkIPropertyAliases.cpp
   DataManagement/mitkIPropertyDescriptions.cpp
   DataManagement/mitkIPropertyExtensions.cpp
   DataManagement/mitkIPropertyFilters.cpp
   DataManagement/mitkIPropertyPersistence.cpp
-  DataManagement/mitkLandmarkProjectorBasedCurvedGeometry.cpp
+  DataManagement/mitkImage.cpp
+  DataManagement/mitkImageAccessLock.cpp
+  DataManagement/mitkImageCastPart1.cpp
+  DataManagement/mitkImageCastPart2.cpp
+  DataManagement/mitkImageCastPart3.cpp
+  DataManagement/mitkImageCastPart4.cpp
+  DataManagement/mitkImageCaster.cpp
+  DataManagement/mitkImageDataItem.cpp
+  DataManagement/mitkImageDescriptor.cpp
+  DataManagement/mitkImageRegionAccessor.cpp
+  DataManagement/mitkImageStatisticsHolder.cpp
+  DataManagement/mitkImageVtkAccessor.cpp
+  DataManagement/mitkIntPropertyExtension.cpp
   DataManagement/mitkLandmarkProjector.cpp
+  DataManagement/mitkLandmarkProjectorBasedCurvedGeometry.cpp
   DataManagement/mitkLevelWindow.cpp
   DataManagement/mitkLevelWindowManager.cpp
   DataManagement/mitkLevelWindowPreset.cpp
@@ -147,15 +147,16 @@ set(CPP_FILES
   DataManagement/mitkSmartPointerProperty.cpp
   DataManagement/mitkStandaloneDataStorage.cpp
   DataManagement/mitkStringProperty.cpp
+  DataManagement/mitkStructuredReport.cpp
   DataManagement/mitkSurface.cpp
   DataManagement/mitkSurfaceOperation.cpp
+  DataManagement/mitkTemporoSpatialStringProperty.cpp
   DataManagement/mitkThinPlateSplineCurvedGeometry.cpp
   DataManagement/mitkTimeGeometry.cpp
   DataManagement/mitkTransferFunction.cpp
   DataManagement/mitkTransferFunctionInitializer.cpp
   DataManagement/mitkTransferFunctionPresetManager.cpp
   DataManagement/mitkTransferFunctionProperty.cpp
-  DataManagement/mitkTemporoSpatialStringProperty.cpp
   DataManagement/mitkVector.cpp
   DataManagement/mitkVectorProperty.cpp
   DataManagement/mitkVtkInterpolationProperty.cpp
@@ -272,6 +273,7 @@ set(CPP_FILES
   Rendering/mitkRenderWindowBase.cpp
   Rendering/mitkRenderWindow.cpp
   Rendering/mitkRenderWindowFrame.cpp
+  Rendering/mitkStructuredReportMapper.cpp
   #Rendering/mitkSurfaceGLMapper2D.cpp Moved to deprecated LegacyGL Module
   Rendering/mitkSurfaceVtkMapper2D.cpp
   Rendering/mitkSurfaceVtkMapper3D.cpp

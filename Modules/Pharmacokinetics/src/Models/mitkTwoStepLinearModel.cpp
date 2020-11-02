@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkTwoStepLinearModel.h"
+#include <mitkIOUtil.h>
 
 const std::string mitk::TwoStepLinearModel::MODELL_NAME = "Two Step Linear Model";
 
@@ -88,13 +89,11 @@ mitk::TwoStepLinearModel::ComputeModelfunction(const ParametersType& parameters)
 {
 
   //Model Parameters
-  double     t = (double) parameters[POSITION_PARAMETER_t] ;
-  double     a1 = (double) parameters[POSITION_PARAMETER_a1] ;
-  double     a2 = (double) parameters[POSITION_PARAMETER_a2] ;
-
-
-  double     b1 = (double) parameters[POSITION_PARAMETER_y1] ;
-  double     b2 = (a1 - a2)*t + b1;
+  const auto t = parameters[POSITION_PARAMETER_t] ;
+  const auto a1 = parameters[POSITION_PARAMETER_a1] ;
+  const auto a2 = parameters[POSITION_PARAMETER_a2] ;
+  const auto b1 = parameters[POSITION_PARAMETER_y1] ;
+  const auto b2 = (a1 - a2)*t + b1;
 
   ModelResultType signal(m_TimeGrid.GetSize());
 
@@ -147,37 +146,29 @@ mitk::TwoStepLinearModel::StaticParameterValuesType mitk::TwoStepLinearModel::Ge
 mitk::ModelBase::DerivedParameterMapType mitk::TwoStepLinearModel::ComputeDerivedParameters(
   const mitk::ModelBase::ParametersType& parameters) const
 {
-    double     t = (double) parameters[POSITION_PARAMETER_t] ;
-    double     a1 = (double) parameters[POSITION_PARAMETER_a1] ;
-    double     a2 = (double) parameters[POSITION_PARAMETER_a2] ;
-    double     b1 = (double) parameters[POSITION_PARAMETER_y1] ;
-    double     b2 = (a1 - a2) * t + b1;
+    const auto t = parameters[POSITION_PARAMETER_t] ;
+    const auto a1 = parameters[POSITION_PARAMETER_a1] ;
+    const auto a2 = parameters[POSITION_PARAMETER_a2] ;
+    const auto b1 = parameters[POSITION_PARAMETER_y1] ;
+    const auto b2 = (a1 - a2) * t + b1;
 
     unsigned int timeSteps = m_TimeGrid.GetSize();
 
-    double Taq = 0;
-    Taq = m_TimeGrid.GetElement(timeSteps-1);
 
-    double Sfin = a2 * Taq + b2;
+    const double taq = (m_TimeGrid.empty() == false) ? (m_TimeGrid.GetElement(timeSteps - 1)) : (mitkThrow() << "An exception occured because time grid is empty, method can't continue.");
 
-    double Smax;
-    if (a2 <= 0)
-    {
-      Smax = a1 * t + b1;
-    }
-    else
-    {
-      Smax = Sfin;
-    }
+    const double sfin = a2 * taq + b2;
 
-    double AUC = a1/2*(t*t)+b1*t
-                 +a2/2*(Taq*Taq-t*t)+b2*(Taq-t);
+    const double smax = (a2 <= 0) ? (a1 * t + b1) : (sfin);
+
+    const double auc = a1/2*(t*t)+b1*t
+                 +a2/2*(taq*taq-t*t)+b2*(taq-t);
 
     DerivedParameterMapType result;
 
-    result.insert(std::make_pair("AUC", AUC));
-    result.insert(std::make_pair("FinalUptake", Sfin));
-    result.insert(std::make_pair("Smax", Smax));
+    result.insert(std::make_pair("AUC", auc));
+    result.insert(std::make_pair("FinalUptake", sfin));
+    result.insert(std::make_pair("Smax", smax));
     result.insert(std::make_pair("y-intercept2", b2));
 
     return result;

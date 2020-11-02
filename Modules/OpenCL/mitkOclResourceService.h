@@ -46,7 +46,7 @@ public:
    *
    * @param program A cl_program object.
    * @param string Text identifier of the inserted program. Used for getting the program.
-   * @param todo: what is the flag?
+   * @param flag
   */
   virtual void InsertProgram(cl_program program, std::string string, bool flag) = 0;
 
@@ -69,7 +69,7 @@ public:
    * @param dimension (unsigned int) identifier of the image diemsion in {0,1,2}
    * @param image object type, either CL_MEM_OBJECT_IMAGE2D, CL_MEM_OBJECT_IMAGE3D
    */
-  virtual unsigned int GetMaximumImageSize( unsigned int , cl_mem_object_type) = 0;
+  virtual unsigned int GetMaximumImageSize(unsigned int dimension, cl_mem_object_type image) = 0;
 
   virtual ~OclResourceService() = 0;
 

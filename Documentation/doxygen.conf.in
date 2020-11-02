@@ -877,6 +877,7 @@ EXAMPLE_PATH           = "@MITK_SOURCE_DIR@/Examples/" \
                          "@MITK_SOURCE_DIR@/Modules/Core/" \
                          "@MITK_SOURCE_DIR@/Modules/CppMicroServices/core/doc/snippets/" \
                          "@MITK_SOURCE_DIR@/Modules/CppMicroServices/core/examples/" \
+                         "@MITK_SOURCE_DIR@/Modules/CppMicroServices/" \
                          "@MITK_SOURCE_DIR@/Modules/OpenCL/Documentation/doxygen/snippets/" \
                          "@MITK_SOURCE_DIR@/Modules/IGT/Tutorial/" \
                          "@MITK_SOURCE_DIR@/Plugins/org.mitk.gui.common/src/" \

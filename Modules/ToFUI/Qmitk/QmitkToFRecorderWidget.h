@@ -61,7 +61,7 @@ class MITKTOFUI_EXPORT QmitkToFRecorderWidget :public QWidget
     /*!
     \brief Set the parameters used for this widget
     \param ToFImageGrabber image grabber providing images from a ToF device
-    \param tofImageRecorder image recorder allowing to record ToF images
+    \param toFImageRecorder image recorder allowing to record ToF images
     */
     void SetParameter(mitk::ToFImageGrabber* ToFImageGrabber,  mitk::ToFImageRecorder* toFImageRecorder);
     /*!

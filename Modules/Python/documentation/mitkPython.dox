@@ -12,7 +12,7 @@ To use the features of the different toolkits make sure they are enabled during 
 
 \section python_sec2 Build Instructions
 
-Have a look at \ref python_ssec3 on how to build MITK-Python with Qt5.
+Have a look at \ref python_sec3 on how to build MITK-Python with Qt5.
 The following CMake build options are available:
 <ul>
   <li> MITK_USE_Python3

@@ -45,7 +45,7 @@ Ultrasound Devices are managed in a simple hierarchy:
     The \link org_mitk_gui_qt_ultrasound UltrasoundSupport plugin \endlink enables the user to create instances of mitk::USVideoDevice.
     There also is a reusable Widget for this Task in the USUI Module. </li>
     <li> mitk::USTelemedDevice: This class can be used for API-enabled ultrasound devices of Telemed (e.g. Telemed LogicScan 128). </li>
-    <li> One can add another device by subclassing mitk::USDevice and mitk::USImageSource. Additionally the control interfaces may be implemented (see \link USControlInterfaces). </li>
+    <li> One can add another device by subclassing mitk::USDevice and mitk::USImageSource. Additionally the control interfaces may be implemented (see \link USControlInterfaces \endlink ). </li>
   </ul>
   </li>
 </ul>
@@ -55,7 +55,7 @@ Ultrasound Devices are managed in a simple hierarchy:
 Each mitk::USDevice follows a life cycle handling the availabilty as a micro service and the connection to the hardware:
 \imageMacro{MicroServiceLifeCycle.png,"",16.00}
 
-For changing the states corresponding methods are available in mitk::USDevice: mitk::USDevice::Initialize() for initialization, mitk::USDevice::Connect() for connecting, mitk::USDevice::Disconnect() for disconnecting and so on. For example, once an object of mitk::USDevice is constructed it can be made available as a micro service via a call to mitk::USDevice::Initialize(). The state changes to Initialized then and the device is available to other modules or plugins (\link org_mitk_gui_qt_ultrasound UltrasoundSupport\endlink,  QmitkUSDeviceManagerWidget) through the micro service framework.
+For changing the states corresponding methods are available in mitk::USDevice: mitk::USDevice::Initialize() for initialization, mitk::USDevice::Connect() for connecting, mitk::USDevice::Disconnect() for disconnecting and so on. For example, once an object of mitk::USDevice is constructed it can be made available as a micro service via a call to mitk::USDevice::Initialize(). The state changes to Initialized then and the device is available to other modules or plugins (\link org_mitk_gui_qt_ultrasound UltrasoundSupport \endlink, QmitkUSDeviceManagerWidget) through the micro service framework.
 
 The methods for changing the states should not be overwritten by sublcasses. Instead mitk::USDevice::OnInitialization(), mitk::USDevice::OnConnection() and so on can be overwritten for handling everything that has to be done on the corresponding state change.
 

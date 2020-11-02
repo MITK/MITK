@@ -52,6 +52,7 @@ public:
   /** @brief Initializes the widget.
     * @param dataStorage  The data storage is needed to offer the possibility to choose surfaces from the data storage for tool visualization.
     * @param supposedIdentifier This Identifier is supposed for the user. It is needed because every identifier in a navigation tool storage must be unique and we don't know the others.
+    * @param supposedName
     */
   void Initialize(mitk::DataStorage* dataStorage, const std::string &supposedIdentifier, const std::string &supposedName = "NewTool");
 

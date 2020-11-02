@@ -667,7 +667,7 @@ namespace mitk
  * inputMitkImage1.GetPointer().
  *
  * \param mitkImage1 The first MITK input image.
- * \param mitkImage1 The second MITK input image.
+ * \param mitkImage2 The second MITK input image.
  * \param itkImageTypeFunction The name of the template access-function to be called.
  * \param dimension Dimension of the two mitk-images.
  *

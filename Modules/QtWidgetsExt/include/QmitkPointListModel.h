@@ -68,10 +68,10 @@ public:
   * the corresponding point id for a given QModelIndex. The point and the point ID
   * are returned in the outgoing parameters p and id. If a valid point and ID were
   * found, the method returns true, otherwise it returns false
-  * \param[in] QModelIndex &index the index for which a point is requested.
+  * \param[in] index the index for which a point is requested.
   The row() part of the index is used to find a corresponding point
-  * \param[out] mitk::Point3D& p If a valid point is found, it will be stored in the p parameter
-  * \param[out] mitk::PointSet::PointIdentifier& id If a valid point is found, the corresponding ID will be stored in id
+  * \param[out] p If a valid point is found, it will be stored in the p parameter
+  * \param[out] id If a valid point is found, the corresponding ID will be stored in id
   * \return Returns true, if a valid point was found, false otherwise
   */
   bool GetPointForModelIndex(const QModelIndex &index,
@@ -85,8 +85,8 @@ public:
   * The IDs are not neccesarily continuously numbered, therefore, we can not
   * directly use the point ID as a QModelIndex. This method returns a QModelIndex
   * for a given point ID in the outgoing parameter index.
-  * \param[in] mitk::PointSet::PointIdentifier id The point ID for which the QModelIndex will be created
-  * \param[out] QModelIndex& index if a point with the ID id was found, index will contain a corresponding QModelIndex
+  * \param[in] id The point ID for which the QModelIndex will be created
+  * \param[out] index if a point with the ID id was found, index will contain a corresponding QModelIndex
   * for that point
   * \return returns true, if a valid QModelIndex was created, false otherwise
   */

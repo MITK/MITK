@@ -76,6 +76,7 @@ class MITKTOFUI_EXPORT QmitkToFSurfaceGenerationWidget :public QWidget
      * @param grabber ToFImageGrabber to get/set device properties.
      * @param intrinsics Intrincs of the device.
      * @param surface Generated Surface.
+     * @param camera
      * @param generateSurface Check the generate surface combo box.
      * @param showAdvancedOptions Show/Hide advanced options.
      */

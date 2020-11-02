@@ -53,6 +53,7 @@ class MITKTOFUI_EXPORT QmitkToFVisualisationSettingsWidget :public QWidget
     \param distanceImageNode image holding the range image of a ToF camera
     \param amplitudeImageNode image holding the amplitude image of a ToF camera
     \param intensityImageNode image holding the intensity image of a ToF camera
+    \param surfaceNode
     */
     void Initialize(mitk::DataNode* distanceImageNode=nullptr, mitk::DataNode* amplitudeImageNode=nullptr,
                     mitk::DataNode* intensityImageNode=nullptr, mitk::DataNode* surfaceNode=nullptr);

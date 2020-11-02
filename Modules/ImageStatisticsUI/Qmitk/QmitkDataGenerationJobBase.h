@@ -53,7 +53,7 @@ signals:
     void Error(QString err, const QmitkDataGenerationJobBase* job);
     /*! @brief Signal is emitted when results are available. 
     @param results produced by the job and ready to be used.
-    @param the job that produced the data
+    @param job the job that produced the data
     */
     void ResultsAvailable(ResultMapType results, const QmitkDataGenerationJobBase* job);
     

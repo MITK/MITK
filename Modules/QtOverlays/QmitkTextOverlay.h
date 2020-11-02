@@ -71,7 +71,7 @@ public:
   * First, this method sets text-overlay specific properties as described in the class docu above.
   * Secondly, the actual text of the label is set.
   *
-  * \WARNING No error will be issued if the property containing the text is not found, the TextOverlay
+  * \warning No error will be issued if the property containing the text is not found, the TextOverlay
   * will show an empty string!
   */
   void GenerateData(mitk::PropertyList::Pointer) override;

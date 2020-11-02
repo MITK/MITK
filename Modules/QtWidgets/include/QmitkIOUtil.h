@@ -94,8 +94,8 @@ public:
    * If the provided DataStorage is not nullptr, some files will be added to it automatically,
    * dependeing on the IFileReader used.
    *
-   * @param files A list of files to load.
-   * @param ds An optional data storage passed to IFileReader instances
+   * @param paths
+   * @param parent
    * @return A list of BaseData instances which have not already been added to the data storage.
    */
   static QList<mitk::BaseData::Pointer> Load(const QStringList &paths, QWidget *parent = nullptr);
@@ -174,6 +174,7 @@ public:
    * @param defaultBaseNames
    * @param defaultPath
    * @param parent
+   * @param setPathProperty
    * @return
    */
   static QStringList Save(const std::vector<const mitk::BaseData *> &data,

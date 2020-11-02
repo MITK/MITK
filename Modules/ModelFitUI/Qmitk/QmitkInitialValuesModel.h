@@ -38,7 +38,7 @@ public:
   /** Sets the names and the values of the initial parameter set for the model.
    @param names List of all possible parameter names. It is assumed that the
    index of the list equals the parameter index in the respective fitting model and its parameter values.
-   @values Default values to start with.*/
+   @param values Default values to start with.*/
   void setInitialValues(const mitk::ModelTraitsInterface::ParameterNamesType& names,
                         const mitk::ModelTraitsInterface::ParametersType values);
   /**@overload
@@ -62,7 +62,7 @@ public:
   /** Returns a pointer to a delegate instance that represents the parameterization of the model.*/
   mitk::InitialParameterizationDelegateBase::Pointer getInitialParametrizationDelegate() const;
   /** Returns the current set initial values of the model.
-   * @Remark: this are only the simpel scalar initial values. If an source image was set, this is missed here.
+   * @remark this are only the simpel scalar initial values. If an source image was set, this is missed here.
    * Use getInitialParametrizationDelegate() to get everything at once.*/
   mitk::ModelTraitsInterface::ParametersType getInitialValues() const;
 

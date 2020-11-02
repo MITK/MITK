@@ -108,7 +108,7 @@ public:
   void ShowGradientBackground(const QString& widgetID, bool show);
   void ShowAllGradientBackgrounds(bool show);
   /**
-  * @rief Return a render window (widget) specific background color gradient
+  * @brief Return a render window (widget) specific background color gradient
   *
   * @param widgetID   The widget identifier.
   *

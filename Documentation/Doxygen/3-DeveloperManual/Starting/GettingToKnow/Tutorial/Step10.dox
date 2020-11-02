@@ -80,7 +80,7 @@ for (std::list<mitk::ServiceReference>::iterator it = listEventObserver.begin();
 \section SectionImplementationDataInteractor How to implement a new DataInteractor
 
 This second part of the tutorial step goes beyond the activation of an interactor, that modifies data by user interaction) as shown above. It shows what needs to be implemented to add a new way of interaction within your MITK application.
-Please see \ref DataInteractionPage as an introduction to the MITK interaction mechanism, you may also want to read \ref DataInteractionTechnicalPage.
+Please see \ref DataInteractionPage as an introduction to the MITK interaction mechanism.
 
 This tutorial is structured as follows: The first section deals with config files, describing all the parameters of events and how to use them
 in a configuration file. In the second section the basics are described that are needed to write a state machine pattern. The last section
@@ -382,8 +382,8 @@ Now all that is left is to write a state machine pattern and a config file as is
 To provide a useful example the mitk::PointSetDataInteractor is annotated with comments that describe the important parts for an implementation
 of a mitk::DataInteractor.
 
-This step assumes knowledge of the Interaction concept described in \ref DataInteractionPage and some background of the implementation which is described in
-\ref DataInteractionPageTechnical. Please refer to these pages before proceeding.
+This step assumes knowledge of the Interaction concept described in \ref DataInteractionPage and some background of the implementation.
+Please refer to these pages before proceeding.
 
 Now all that is left it to write a state machine pattern and a config file as is described in the tutorials.
 

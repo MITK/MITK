@@ -61,7 +61,7 @@ public:
 
   /**
    * @brief Convenience method to get a render window widget.
-   * @param   Number of the widget (0-3)
+   * @param   number of the widget (0-3)
    * @return  The render window widget
    */
   QmitkRenderWindow* GetRenderWindow(unsigned int number) const;
@@ -72,7 +72,7 @@ public:
 
   /**
   * @brief Convenience method to get a widget plane.
-  * @param   Number of the widget plane (1-3)
+  * @param   number of the widget plane (1-3)
   * @return  The widget plane as data node
   */
   mitk::DataNode::Pointer GetWidgetPlane(unsigned int number) const;

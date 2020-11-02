@@ -38,7 +38,7 @@ public:
 
   /**
    * \brief Changes the current algorithm and updates widget accordingly.
-   * \param pointer to the algorithm instance.
+   * \param alg pointer to the algorithm instance.
    */
   void setAlgorithm(map::algorithm::RegistrationAlgorithmBase *alg);
 

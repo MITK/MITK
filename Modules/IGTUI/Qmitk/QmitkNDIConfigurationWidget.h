@@ -97,8 +97,7 @@ protected:
   * \brief scans the ports provided as key in the portsAndDevices and fills the respective value of portsAndDevices with the tracking device type at that port
   *
   *
-  * \param[in] portsAndDevices keys are used to query serial ports
-  * \param[out] portsAndDevices values of the existing keys will be filled with the tracking device type
+  * \param[in,out] portsAndDevices keys are used to query serial ports, values of the existing keys will be filled with the tracking device type
   */
   void ScanPortsForNDITrackingDevices(PortDeviceMap& portsAndDevices);
   mitk::TrackingDeviceType ScanPort(QString port);

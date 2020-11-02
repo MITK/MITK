@@ -2,10 +2,8 @@
 
  \page Step05Page MITK Tutorial - Step 5: Interactively add points
 
- \li \ref Step5.cpp "Step5.cpp"\n
- Contains the code for this step.
- \li Path to files used in this step: \n
-https://www.mitk.org/download/tutorial-data/Pic3D.nrrd (image) \n
+ \li Examples/Tutorial/Step5
+ \li https://www.mitk.org/download/tutorial-data/Pic3D.nrrd (image) \n
 https://www.mitk.org/download/tutorial-data/lungs.vtk (surface)
 
  In addition to Step 4 where 3 views were created on the data, we now want to interactively add points.

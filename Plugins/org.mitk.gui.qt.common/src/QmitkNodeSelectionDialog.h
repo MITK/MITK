@@ -110,7 +110,7 @@ Q_SIGNALS:
   *        The function iterates over the dialog's panels and sets the current selection of each panel accordingly.
   *        Each panel is a concrete data storage inspector.
   *
-  * @param nodes		A list of data nodes that should be newly selected.
+  * @param selectedNodes A list of data nodes that should be newly selected.
   */
   void SetCurrentSelection(NodeList selectedNodes);
 

@@ -101,7 +101,10 @@ namespace mitk
   * mitk::ITKImageImport does not cast pixel types etc., it just imports
   * image data. If you get a compile error, try image.GetPointer().
   *
-  * \param update: if \a true, fill mitk::Image, which will execute the
+  * \param itkimage
+  * \param geometry
+  * 
+  * \param update if \a true, fill mitk::Image, which will execute the
   * up-stream pipeline connected to the input itk::Image. Otherwise you
   * need to make sure that Update() is called on the mitk::Image before
   * its data is being used, e.g., by connecting it to an mitk-pipeline
@@ -120,8 +123,11 @@ namespace mitk
   * Instantiates instance of ITKImageImport
   * mitk::ITKImageImport does not cast pixel types etc., it just imports
   * image data. If you get a compile error, try image.GetPointer().
+  * 
+  * \param itkimage
+  * \param geometry
   *
-  * \param update: if \a true, fill mitk::Image, which will execute the
+  * \param update if \a true, fill mitk::Image, which will execute the
   * up-stream pipeline connected to the input itk::Image. Otherwise you
   * need to make sure that Update() is called on the mitk::Image before
   * its data is being used, e.g., by connecting it to an mitk-pipeline
@@ -135,11 +141,11 @@ namespace mitk
   * affects especially the
   * usage in combination with AccessByItk macros as in following example code
   *
-  * \snippet Testing/mitkGrabItkImageMemoryTest.cpp OutOfScopeCall
+  * \snippet test/mitkGrabItkImageMemoryTest.cpp OutOfScopeCall
   *
   * which calls an ITK-like filter
   *
-  * \snippet Testing/mitkGrabItkImageMemoryTest.cpp ItkThresholdFilter
+  * \snippet test/mitkGrabItkImageMemoryTest.cpp ItkThresholdFilter
   *
   *
   * \sa itk::Image::CastToMitkImage
@@ -158,7 +164,12 @@ namespace mitk
   * The memory is managed by the mitk::Image after calling this
   * function. The itk::Image remains valid until the mitk::Image
   * decides to free the memory.
-  * \param update: if \a true, fill mitk::Image, which will execute the
+  * 
+  * \param itkimage
+  * \param mitkImage
+  * \param geometry
+  * 
+  * \param update if \a true, fill mitk::Image, which will execute the
   * up-stream pipeline connected to the input itk::Image. Otherwise you
   * need to make sure that Update() is called on the mitk::Image before
   * its data is being used, e.g., by connecting it to an mitk-pipeline
@@ -179,7 +190,12 @@ namespace mitk
   * The memory is managed by the mitk::Image after calling this
   * function. The itk::Image remains valid until the mitk::Image
   * decides to free the memory.
-  * \param update: if \a true, fill mitk::Image, which will execute the
+  * 
+  * \param itkimage
+  * \param mitkImage
+  * \param geometry
+  * 
+  * \param update if \a true, fill mitk::Image, which will execute the
   * up-stream pipeline connected to the input itk::Image. Otherwise you
   * need to make sure that Update() is called on the mitk::Image before
   * its data is being used, e.g., by connecting it to an mitk-pipeline

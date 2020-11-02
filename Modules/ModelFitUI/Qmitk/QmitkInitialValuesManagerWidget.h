@@ -58,7 +58,7 @@ public Q_SLOTS:
   /** Sets the names and the values of the initial parameter set for the model.
    @param names List of all possible parameter names. It is assumed that the
    index of the list equals the parameter index in the respective fitting model and its parameter values.
-   @values Default values to start with.*/
+   @param values Default values to start with.*/
   void setInitialValues(const mitk::ModelTraitsInterface::ParameterNamesType& names,
                         const mitk::ModelTraitsInterface::ParametersType values);
   void setInitialValues(const mitk::ModelTraitsInterface::ParameterNamesType& names);

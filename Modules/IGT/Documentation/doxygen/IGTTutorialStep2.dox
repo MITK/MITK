@@ -50,6 +50,6 @@ Finally, we apply the new position of the tracked object (source->GetOutput) to 
 
 The red cylinder is now moved accodring to the tracked transform.
 
-\ref Return to the \ref IGTTutorialOverview "[IGT Tutorial Overview]"
+Return to the \ref IGTTutorialOverview "[IGT Tutorial Overview]"
 
 */

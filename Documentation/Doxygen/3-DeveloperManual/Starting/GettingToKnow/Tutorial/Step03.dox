@@ -2,10 +2,8 @@
 
  \page Step03Page MITK Tutorial - Step 3: Create 3D view
 
- \li \ref Step3.cpp "Step3.cpp" \n
-Contains the code that both creates a 3D view and turns volume rendering on.
- \li Path to files used in this step: \n
-https://www.mitk.org/download/tutorial-data/Pic3D.nrrd (image) \n
+ \li Examples/Tutorial/Step3
+ \li https://www.mitk.org/download/tutorial-data/Pic3D.nrrd (image) \n
 https://www.mitk.org/download/tutorial-data/lungs.vtk (surface)
 
 

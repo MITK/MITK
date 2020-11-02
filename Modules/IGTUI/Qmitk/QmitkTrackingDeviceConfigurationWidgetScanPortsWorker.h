@@ -36,6 +36,7 @@ signals:
 
   /**
   * @param Port Returns the port, returns -1 if no device was found.
+  * @param result
   * @param PortType Returns the port type (0=usb,1=tty), returns -1 if the port type is not specified, e.g, in case of Windows.
   */
   void PortsScanned(int Port, QString result, int PortType);

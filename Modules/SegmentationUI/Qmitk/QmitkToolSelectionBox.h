@@ -71,10 +71,12 @@ public:
 
   /**
     You may specify a list of tool "groups" that should be displayed in this widget. Every Tool can report its group
-    as a string. This method will try to find the tool's group inside the supplied string \param toolGroups. If there is
+    as a string. This method will try to find the tool's group inside the supplied string \c toolGroups . If there is
     a match,
     the tool is displayed. Effectively, you can provide a human readable list like "default, lymphnodevolumetry,
     oldERISstuff".
+
+    @param toolGroups
   */
   void SetDisplayedToolGroups(const std::string &toolGroups = nullptr);
 

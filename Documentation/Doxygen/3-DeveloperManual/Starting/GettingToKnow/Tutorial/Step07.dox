@@ -2,11 +2,8 @@
 
  \page Step07Page MITK Tutorial - Step 7: Convert result of region growing into a surface
 
- \li \ref Step7.cpp "Step7.cpp"\n
- \li \ref Step7.h "Step7.h"\n
- \li \ref Step7main.cpp "Step7main.cpp"\n
- \li Path to files used in this step: \n
-https://www.mitk.org/download/tutorial-data/Pic3D.nrrd (image)
+ \li Examples/Tutorial/Step7
+ \li https://www.mitk.org/download/tutorial-data/Pic3D.nrrd (image)
 
  In this step the result of the previous step is converted into a surface by means of a VTK filter.
 

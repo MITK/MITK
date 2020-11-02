@@ -65,6 +65,7 @@ public:
    * @param labledSegmentation Name of the labeled segmentation
    * @param binaryImage Name of the binary image
    * @param surface Name of the surface
+   * @param maskedSegmentation
    */
   void SetDataNodeNames(std::string labledSegmentation,
                         std::string binaryImage,
@@ -75,13 +76,13 @@ public:
    * @brief Method to enable/disable controls for region growing
    *
    * This method checks if a seed point is set and a segmentation exists.
-   * @param enable/disable controls
+   * @param enable enable/disable controls
    */
   void EnableControls(bool enable);
 
   /**
    * @brief Method to set the input image node
-   * @param data node
+   * @param node data node
    */
   void SetInputImageNode(mitk::DataNode *node);
 
@@ -106,7 +107,7 @@ protected slots:
    * @brief Method to change the level window
    *
    * This method is called, when the level window slider is changed via the slider in the control widget
-   * @param new value
+   * @param newValue new value
    */
   void ChangeLevelWindow(double newValue);
 
@@ -133,7 +134,7 @@ protected slots:
 
   /**
    * @brief Method to switch the volume rendering on/off
-   * @param on/off
+   * @param on
    */
   void UseVolumeRendering(bool on);
 
@@ -141,7 +142,7 @@ protected slots:
    * @brief Method to set the lower threshold
    *
    * This method is called, when the minimum threshold slider has changed
-   * @param lower threshold
+   * @param lowerThreshold lower threshold
    */
   void SetLowerThresholdValue(double lowerThreshold);
 
@@ -149,7 +150,7 @@ protected slots:
    * @brief Method to set upper threshold
    *
    * This Method is called, when the maximum threshold slider has changed
-   * @param upper threshold
+   * @param upperThreshold upper threshold
    */
   void SetUpperThresholdValue(double upperThreshold);
 

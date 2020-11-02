@@ -105,7 +105,7 @@ Q_SIGNALS:
   *   in the data storage viewer. By storing the non-visible nodes it is possible to send the new, modified selection
   *   but also include the selected nodes from the original selection that could not be modified (see 'SetSelectOnlyVisibleNodes').
   *
-  * @param nodes		A list of data nodes that should be newly selected.
+  * @param selectedNodes A list of data nodes that should be newly selected.
   */
   void SetCurrentSelection(NodeList selectedNodes);
 

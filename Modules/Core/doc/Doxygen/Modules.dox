@@ -21,7 +21,7 @@
   surfaces (mitk::Surface), vessel-trees (mitk::VesselTreeData), etc.
 
   Data access classes are only included, if there is no equivalent in itk (see
-  \ref ProcessAndAdaptorClasses "Process and Adaptor Classes" below).
+  \ref ProcessAdaptor "Process and Adaptor Classes" below).
 */
 
 /**

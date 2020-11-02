@@ -35,7 +35,7 @@ public:
   /**
    * Configures the passed settings according to the current state of the
    * widget.
-   * \param pointer to a instance based on QmitkMappingJobSettings.
+   * \param settings to a instance based on QmitkMappingJobSettings.
    * \pre settings must point to a valid instance..
    */
   void ConfigureJobSettings(QmitkMappingJobSettings *settings);

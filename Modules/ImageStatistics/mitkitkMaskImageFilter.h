@@ -119,7 +119,7 @@ private:
  * operator != with zero. This condition is required because internally this
  * filter will perform the operation
  *
- * \code
+ * \code{.unparsed}
  *        if pixel_from_mask_image == masking_value
  *             pixel_output_image = pixel_input_image
  *        else
@@ -135,10 +135,6 @@ private:
  * \ingroup IntensityImageFilters
  * \ingroup MultiThreaded
  * \ingroup ITKImageIntensity
- *
- * \wiki
- * \wikiexample{ImageProcessing/MaskImageFilter,Apply a mask to an image}
- * \endwiki
  */
 template< typename TInputImage, typename TMaskImage, typename TOutputImage = TInputImage >
 class MITKIMAGESTATISTICS_EXPORT MaskImageFilter2:

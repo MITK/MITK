@@ -38,7 +38,7 @@ of it and call the `Load()` and `Unload()` methods:
 Now we need to compile the source code. This example uses CMake as the build
 system and the top-level CMakeLists.txt file could look like this:
 
-\dontinclude examples/CMakeLists.txt
+\dontinclude core/examples/CMakeLists.txt
 \skip project
 \until eventlistener
 
@@ -50,7 +50,7 @@ The call to `#usFunctionGenerateModuleInit` is necessary to integrate the shared
 library as a module within the C++ Micro Service library. If you are not using
 CMake, you have to place a macro call to `#US_INITIALIZE_MODULE` yourself into the
 module's source code, e.g. in `Activator.cpp`. Have a look at the
-\ref MicroServices_GettingStarted documentation for more details about using CMake
+Getting Started documentation for more details about using CMake
 or other build systems (e.g. Makefiles) when writing modules.
 
 To run the examples contained in the C++ Micro Services library, we use a small

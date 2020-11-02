@@ -65,6 +65,6 @@ Your output should look similar to this:
 
 \imageMacro{IGTTutorialStep1_output.png,"",9.53}
 
-\ref Return to the \ref IGTTutorialOverview "[IGT Tutorial Overview]"
+Return to the \ref IGTTutorialOverview "[IGT Tutorial Overview]"
 
 */

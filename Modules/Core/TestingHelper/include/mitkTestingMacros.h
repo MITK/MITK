@@ -374,6 +374,7 @@ namespace mitk
  *
  * @param TESTMETHOD The name of the member function test.
  * @param arg1 A custom string parameter being passed to the fixture.
+ * @param arg2
  *
  * @note Use the macro MITK_PARAMETERIZED_TEST_2 only if you know what
  * you are doing. If you are not sure, use MITK_TEST instead.

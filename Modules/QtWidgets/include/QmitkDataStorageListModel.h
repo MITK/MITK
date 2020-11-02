@@ -42,7 +42,7 @@ class MITKQTWIDGETS_EXPORT QmitkDataStorageListModel : public QAbstractListModel
 {
 public:
   //! \param dataStorage the data storage to represent
-  //! \param predicate the optional predicate to filter filters
+  //! \param pred the optional predicate to filter filters
   //! \param parent the Qt parent of this Qt object
   QmitkDataStorageListModel(mitk::DataStorage *dataStorage = nullptr,
                             mitk::NodePredicateBase::Pointer pred = nullptr,

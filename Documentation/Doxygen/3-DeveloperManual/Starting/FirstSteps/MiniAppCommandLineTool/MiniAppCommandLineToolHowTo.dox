@@ -80,14 +80,12 @@ Required I/O parameters
 According to the specified command line arguments, a XML representation of the arguments is generated and emitted on the console if the MiniApp command line tool is executed with argument "--xml".
 
 In order to use the XML representation for automatic user interface generation additional information has to be provided for the parser.
-Please provide category, title, description and contributor as shown in code snippet below for the \ref TensorReconstruction command line tool:
+Please provide category, title, description and contributor as shown in code snippet below:
 
 \snippet ExampleToUpperCaseMiniApp.cpp create parser
 
 Note that in the generated UI the parameter widgets are contained in a group box. There is a default label ("Parameters") and a default description ("Groupbox containing parameters.") specified. The label of such a parameter group and the description can be set via the parser's changeParameterGroup method.
 The method must be called before adding the arguments.
-
-See \ref MiniAppExplainPageWorkbenchIntegration for information how to access your MiniApp from within the application instead of calling it directly from the command line.
 
 \subsection MiniAppCommandLineToolHowToPageXMLRepresentationExampleXMLOutput Example XML Output
 

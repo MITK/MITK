@@ -106,7 +106,7 @@ Four labels can be set to custom strings. These are
   <li> the title of the chart
 </ul>
 
-Data labels provide the name for data legend entries ("Heidelberg" for our 1D data \ref{Chart_data} as it is the average temperature in Heidelberg) and are given by the second argument of AddData1D and AddData2D. They are also displayed in the legend. An example x-Axis and y-axis label would be <i>month</i> and <i>temperature</i>, respectively.
+Data labels provide the name for data legend entries ("Heidelberg" for our 1D data \ref Chart_data as it is the average temperature in Heidelberg) and are given by the second argument of AddData1D and AddData2D. They are also displayed in the legend. An example x-Axis and y-axis label would be <i>month</i> and <i>temperature</i>, respectively.
 
 The data label argument is mandatory. All other labels are optional and empty strings by default.
 

@@ -201,8 +201,10 @@ public:
  * @param argLabel The label of this argument, when auto generated interface is used.
  * @param argHelp A help string describing the argument.
  * @param defaultValue A default value for the argument.
+ * @param optional
  * @param ignoreRest All arguments after the current one will be ignored.
  * @param deprecated Declares the argument deprecated.
+ * @param channel
  *
  * @see setExactMatchRegularExpression()
  * @see addDeprecatedArgument()
@@ -230,6 +232,7 @@ public:
  *
  * @param longarg The long argument name.
  * @param shortarg The short argument name.
+ * @param argLabel
  * @param argHelp A help string describing alternatives to the deprecated argument.
  */
   void addDeprecatedArgument(const std::string &longarg,

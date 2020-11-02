@@ -31,13 +31,13 @@ namespace berry
  * in an extension contributed to the workbench's preference extension point
  * (named <code>"org.blueberry.ui.preferencePages"</code>).
  * For example, the plug-in's XML markup might contain:
- * <pre>
- * &LT;extension point="org.blueberry.ui.preferencePages"&GT;
- *      &LT;page id="com.example.myplugin.prefs"
+ * \code{.unparsed}
+ * <extension point="org.blueberry.ui.preferencePages>
+ *   <page id="com.example.myplugin.prefs"
  *         name="Knobs"
- *         class="ns::MyPreferencePage" /&GT;
- * &LT;/extension&GT;
- * </pre>
+ *         class="ns::MyPreferencePage" />
+ * </extension>
+ * \endcode
  * </p>
  */
 struct BERRY_UI_QT IPreferencePage: virtual public Object

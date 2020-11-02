@@ -52,7 +52,6 @@ namespace berry {
  * This interface is not intended to be implemented by clients.
  * </p>
  * @see IPerspectiveRegistry
- * @noimplement This interface is not intended to be implemented by clients.
  */
 struct BERRY_UI_QT IPerspectiveDescriptor : public virtual Object
 {

@@ -47,8 +47,7 @@ namespace berry {
  * {@link berry::IntroPart}.
  * </p>
  *
- * @see IIntroManager#ShowIntro(IWorkbenchWindow::Pointer, bool)
- * @noimplement This interface is not intended to be implemented by clients.
+ * @see IIntroManager#ShowIntro
  */
 struct BERRY_UI_QT IIntroPart : public virtual Object
 { // IAdaptable {
@@ -56,15 +55,6 @@ struct BERRY_UI_QT IIntroPart : public virtual Object
   berryObjectMacro(berry::IIntroPart);
 
   ~IIntroPart() override;
-
-    /**
-   * The property id for <code>getTitleImage</code> and
-   * <code>getTitle</code>.
-   *
-   * @since 3.2 this property now covers changes to <code>getTitle</code> in
-   *        addition to <code>getTitleImage</code>
-   */
-   //static const int PROP_TITLE = IWorkbenchPart::PROP_TITLE;
 
     /**
    * Returns the site for this intro part.
@@ -123,12 +113,6 @@ struct BERRY_UI_QT IIntroPart : public virtual Object
     /**
      * Adds a listener for changes to properties of this intro part.
      * Has no effect if an identical listener is already registered.
-     * <p>
-     * The properties ids are as follows:
-     * <ul>
-     *   <li><code>IIntroPart.PROP_TITLE</code> </li>
-     * </ul>
-     * </p>
      *
      * @param listener a property listener
      */
@@ -157,9 +141,7 @@ struct BERRY_UI_QT IIntroPart : public virtual Object
     virtual void CreatePartControl(void* parent) = 0;
 
     /**
-     * Returns the title image of this intro part.  If this value changes
-     * the part must fire a property listener event with
-     * {@link IIntroPart#PROP_TITLE}.
+     * Returns the title image of this intro part.
      * <p>
      * The title image is usually used to populate the title bar of this part's
      * visual container. Since this image is managed by the part itself, callers
@@ -171,9 +153,7 @@ struct BERRY_UI_QT IIntroPart : public virtual Object
     virtual QIcon GetTitleImage() const = 0;
 
     /**
-     * Returns the title of this intro part. If this value changes
-     * the part must fire a property listener event with
-     * {@link IIntroPart#PROP_TITLE}.
+     * Returns the title of this intro part.
      * <p>
      * The title is used to populate the title bar of this part's visual
      * container.

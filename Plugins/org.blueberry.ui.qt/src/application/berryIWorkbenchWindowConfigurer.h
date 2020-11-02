@@ -260,8 +260,7 @@ struct BERRY_UI_QT IWorkbenchWindowConfigurer : public Object
    * capable of handling any of those transfer types.
    * </p>
    *
-   * @param transfer a drag and drop transfer object
-   * @see #configureEditorAreaDropListener
+   * @param transferTypes drag and drop transfer objects
    * @see org.blueberry.ui.part.EditorInputTransfer
    */
   virtual void AddEditorAreaTransfer(const QStringList& transferTypes) = 0;

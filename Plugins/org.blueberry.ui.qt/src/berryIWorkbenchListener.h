@@ -69,9 +69,6 @@ struct BERRY_UI_QT IWorkbenchListener
    * leave the workbench in an inconsistent state.
    * </p>
    *
-   * @param workbench the workbench
-   * @param forced <code>true</code> if the workbench is being forced to shutdown,
-   *   <code>false</code> for a regular close
    * @return <code>true</code> to allow the workbench to proceed with shutdown,
    *   <code>false</code> to veto a non-forced shutdown
    */
@@ -83,8 +80,6 @@ struct BERRY_UI_QT IWorkbenchListener
    * This method is called during workbench shutdown after all windows
    * have been closed.
    * </p>
-   *
-   * @param workbench the workbench
    */
   virtual void PostShutdown(IWorkbench*  /*workbench*/) {}
 

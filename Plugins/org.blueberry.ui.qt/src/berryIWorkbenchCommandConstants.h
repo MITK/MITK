@@ -23,8 +23,8 @@ namespace berry {
 /**
  * Constants for all commands defined by the BlueBerry workbench.
  *
- * @noextend This interface is not intended to be extended by clients.
- * @noimplement This interface is not intended to be implemented by clients.
+ * @note This interface is not intended to be extended by clients.
+ * @note This interface is not intended to be implemented by clients.
  */
 struct BERRY_UI_QT IWorkbenchCommandConstants {
 

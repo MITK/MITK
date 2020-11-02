@@ -20,13 +20,12 @@ namespace berry
 {
 
 /**
- * This interface describes the constants used for <link>IWorkbenchPart</link> properties.
+ * This interface describes the constants used for IWorkbenchPart properties.
  * <p>
  * <b>Note:</b>This interface should not be implemented or extended.
  * </p>
  *
  * @since 3.0
- * @noimplement This interface is not intended to be implemented by clients.
  */
 struct BERRY_UI_QT IWorkbenchPartConstants {
 

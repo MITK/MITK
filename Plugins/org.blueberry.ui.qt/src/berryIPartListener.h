@@ -76,8 +76,6 @@ struct BERRY_UI_QT IPartListener
 
   /**
    * Notifies this listener that the given part has been activated.
-   *
-   * @param partRef the part that was activated
    * @see IWorkbenchPage#activate
    */
   virtual void PartActivated(const IWorkbenchPartReference::Pointer& /*partRef*/) {}
@@ -91,8 +89,6 @@ struct BERRY_UI_QT IPartListener
    * programmatically (via <code>IPerspective.bringToTop</code>). When a part is
    * activated by the user clicking on it, only <code>partActivated</code> is sent.
    * </p>
-   *
-   * @param partRef the part that was surfaced
    * @see IWorkbenchPage#bringToTop
    */
   virtual void PartBroughtToTop(const IWorkbenchPartReference::Pointer& /*partRef*/) {}
@@ -104,16 +100,12 @@ struct BERRY_UI_QT IPartListener
    * this notification is not sent.  It is only sent when the view
    * is being removed from the page entirely (it is being disposed).
    * </p>
-   *
-   * @param partRef the part that was closed
    * @see IWorkbenchPage#hideView
    */
   virtual void PartClosed(const IWorkbenchPartReference::Pointer& /*partRef*/) {}
 
   /**
    * Notifies this listener that the given part has been deactivated.
-   *
-   * @param partRef the part that was deactivated
    * @see IWorkbenchPage#activate
    */
   virtual void PartDeactivated(const IWorkbenchPartReference::Pointer& /*partRef*/) {}
@@ -125,30 +117,22 @@ struct BERRY_UI_QT IPartListener
    * this notification is not sent.  It is only sent when the view
    * is being newly opened in the page (it is being created).
    * </p>
-   *
-   * @param partRef the part that was opened
    * @see IWorkbenchPage#showView
    */
   virtual void PartOpened(const IWorkbenchPartReference::Pointer& /*partRef*/) {}
 
   /**
    * Notifies this listener that the given part is hidden or obscured by another part.
-   *
-   * @param partRef the part that is hidden or obscured by another part
    */
   virtual void PartHidden(const IWorkbenchPartReference::Pointer& /*partRef*/) {}
 
   /**
    * Notifies this listener that the given part is visible.
-   *
-   * @param partRef the part that is visible
    */
   virtual void PartVisible(const IWorkbenchPartReference::Pointer& /*partRef*/) {}
 
   /**
    * Notifies this listener that the given part's input was changed.
-   *
-   * @param partRef the part whose input was changed
    */
   virtual void PartInputChanged(const IWorkbenchPartReference::Pointer& /*partRef*/) {}
 };

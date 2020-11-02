@@ -29,8 +29,9 @@ public:
   /**
    * Creates a new job status with no interesting error code or exception.
    * @param severity
-   * @param job
+   * @param sptr_job
    * @param message
+   * @param sl
    */
   JobStatus(const Severity& severity, Job::Pointer sptr_job, const QString& message,
             const Status::SourceLocation& sl);

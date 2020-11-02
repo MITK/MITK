@@ -54,8 +54,6 @@ namespace berry
  *
  * @see IPersistableElement
  * @see IElementFactory
- * @noimplement This interface is not intended to be implemented by clients.
- *
  **/
 struct BERRY_UI_QT IMemento: public Object
 {
@@ -65,7 +63,7 @@ struct BERRY_UI_QT IMemento: public Object
    * Special reserved key used to store the memento id
    * (value <code>"IMemento.internal.id"</code>).
    *
-   * @see #getID()
+   * @see #GetID
    */
   static const QString TAG_ID; // = "IMemento.internal.id";
 

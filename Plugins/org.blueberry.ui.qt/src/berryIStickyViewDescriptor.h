@@ -31,7 +31,6 @@ namespace berry {
  * @see org.eclipse.ui.views.IViewRegistry
  * @see org.eclipse.ui.views.IViewDescriptor
  * @since 3.1
- * @noimplement This interface is not intended to be implemented by clients.
  */
 struct BERRY_UI_QT IStickyViewDescriptor : public Object {
 

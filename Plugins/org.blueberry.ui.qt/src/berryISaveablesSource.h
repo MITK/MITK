@@ -34,11 +34,10 @@ namespace berry {
  * <ul>
  * <li>the part must implement <code>ISaveablePart</code></li>
  * <li>if any of its Saveable objects are dirty, the part must return
- * <code>true</code> from {@link ISaveablePart#isDirty()}</li>
+ * <code>true</code> from {@link ISaveablePart#IsDirty()}</li>
  * <li>the part must return <code>true</code> from
- * {@link ISaveablePart#isSaveOnCloseNeeded()} if it is dirty (the default
+ * {@link ISaveablePart#IsSaveOnCloseNeeded()} if it is dirty (the default
  * behaviour implemented by {@link EditorPart})</li>
- * <li>the part must not implement {@link ISaveablePart2}</li>
  * </ul>
  * </li>
  * <li>If ISaveablesSource is implemented by a non-part (possible as of 3.2.1 and 3.3):
@@ -46,7 +45,7 @@ namespace berry {
  * <li>the Workbench's {@link ISaveablesLifecycleListener} (obtained from the
  * Workbench by calling
  * <code>workbench.getService(ISaveablesLifecycleListener.class)</code>) must
- * be notified of any change to the result of {@link #getSaveables()} </li>
+ * be notified of any change to the result of {@link #GetSaveables()} </li>
  * <li>getActiveSaveables() should be implemented to return an empty array
  * </li>
  * </ul>
@@ -72,7 +71,7 @@ struct BERRY_UI_QT ISaveablesSource : public virtual Object
    * value of this method changes during the lifetime of
    * this part (i.e. after initialization and control creation but before disposal)
    * the part must notify an implicit listener using
-   * {@link ISaveablesLifecycleListener#handleLifecycleEvent(SaveablesLifecycleEvent)}.
+   * {@link ISaveablesLifecycleListener#HandleLifecycleEvent}.
    * <p>
    * Additions of saveables to the list of saveables of this part are
    * announced using an event of type
@@ -93,7 +92,7 @@ struct BERRY_UI_QT ISaveablesSource : public virtual Object
    * The part must not notify from its initialization methods (e.g. <code>init</code>
    * or <code>createPartControl</code>), or from its dispose method. Parts that
    * implement {@link IReusableEditor} must notify when their input is changed
-   * through {@link IReusableEditor#setInput(IEditorInput)}.
+   * through {@link IReusableEditor#SetInput}.
    * </p>
    *
    * @return the saveables presented by the workbench part

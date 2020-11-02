@@ -21,8 +21,8 @@ found in the LICENSE file.
  /**
   * Represents status relating to the execution of jobs.
   * @see IStatus
-  * @noimplement This interface is not intended to be implemented by clients.
-  * @noextend This interface is not intended to be extended by clients.
+  * @note This interface is not intended to be implemented by clients.
+  * @note This interface is not intended to be extended by clients.
   */
 
 struct IJobStatus : public virtual IStatus

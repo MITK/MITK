@@ -59,7 +59,7 @@ struct BERRY_JOBS IProgressMonitorWithBlocking: public IProgressMonitor
    * @param reason an optional status object whose message describes the
    * reason why this operation is blocked, or <code>null</code> if this
    * information is not available.
-   * @see #clearBlocked()
+   * @see #ClearBlocked
    */
    virtual void SetBlocked(IStatus::Pointer reason)= 0;
 
@@ -68,7 +68,7 @@ struct BERRY_JOBS IProgressMonitorWithBlocking: public IProgressMonitor
    * operation ever calls <code>setBlocked</code>, it must eventually call
    * <code>clearBlocked</code> before the operation completes.
    *
-   * @see #setBlocked(IStatus)
+   * @see #SetBlocked
    */
    virtual void  ClearBlocked() = 0;
 

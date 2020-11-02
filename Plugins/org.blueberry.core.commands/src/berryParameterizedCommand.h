@@ -157,13 +157,13 @@ public:
   uint HashCode() const override;
 
   /**
-   * Returns a {@link String} containing the command id, parameter ids and
-   * parameter values for this {@link ParameterizedCommand}. The returned
-   * {@link String} can be stored by a client and later used to reconstruct an
+   * Returns a \c String containing the command id, parameter ids and
+   * parameter values for this \c ParameterizedCommand . The returned
+   * \c String can be stored by a client and later used to reconstruct an
    * equivalent {@link ParameterizedCommand} using the
-   * {@link CommandManager#deserialize(String)} method.
+   * \c CommandManager.deserialize(String) method.
    * <p>
-   * The syntax of the returned {@link String} is as follows:
+   * The syntax of the returned \c String is as follows:
    * </p>
    *
    * <blockquote>
